@@ -1,0 +1,20 @@
+--[[
+
+===============
+ABOUT NEVERMORE
+===============
+Nevermore is a game engine developed by Quenty that is designed to do several things. Nevermore is designed to handle three major issues on ROBLOX when it comes to developing code. These issues are networking (Client to Server and Server to Client communication), reusable code, and resource management (easily editing scripts and resources).
+
+Nevermore handles each of these issues in different ways that fit Quenty's taste. Nevermore is primarily used by Quenty, and is designed for Quenty's use.
+
+
+----------
+NETWORKING
+----------
+Nevermore handles networking by associating it with the LibrarySystem and by allowing arbitrary code to be ran on the server or the client.  Although a potential security risk is involved, the much bigger benefit is that data can easily be passed around. 
+
+Nevermore itself instantiates in _G.Nevermore and _G.NevermoreEngine on both the server and the client. This provides some problems in ROBLOX's testSolo mode. 
+
+
+
+--]]
