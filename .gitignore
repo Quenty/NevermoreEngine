@@ -1,4 +1,23 @@
 #################
+## CUSTOM
+#################
+APIMod/
+CatalogSystems/
+Reference/
+TopoxiaLocal/
+Markdown/
+PenlightModified/
+Libraries/Unimplimented/
+LocalSystems/Unimplimented/
+TestScripts/
+Commands.lua
+QuentyAdminCommandsProject.sublime-project
+QuentyAdminCommandsProject.sublime-workspace
+Settings.lua
+ProjectPlanning.lua
+
+
+#################
 ## Eclipse
 #################
 
