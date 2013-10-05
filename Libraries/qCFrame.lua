@@ -206,7 +206,7 @@ local function TweenPart(part, a, b, length)
 		c = c + 1
 		part.CFrame = cf
 	end
-	print("Average Cost Per Slerp+ToCFrame:", string.format("%.4fms", tot/c*1000))
+	--print("Average Cost Per Slerp+ToCFrame:", string.format("%.4fms", tot/c*1000))
 end
 lib.TweenPart = TweenPart;
 lib.tweenPart = TweenPart;

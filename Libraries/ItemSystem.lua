@@ -61,6 +61,8 @@ local ClassMetatable = {
 
 		if IndexName == "ClassName" then
 			return ClassBase.ClassName;
+		elseif Instance == "Interfaces" then
+			return ClassBase.Interfaces	
 		end
 
 		return nil;
@@ -110,7 +112,8 @@ local MakeItemSystem = Class 'ItemSystem' (function(ItemSystem, Configuration, I
 		if not ItemClasses[ItemName] then
 			local NewClass = {}
 			NewClass.ClassName = ItemName;
-
+			NewClass.Interfaces = {}
+			
 			-- Get bins and verify existance.
 			local StaticAttributeBin = Item:FindFirstChild(Configuration.StaticAttributeBinName)
 			assert(StaticAttributeBin, "[ItemSystem] - StaticAttribute in Item "..Item.Name.." could not be found. (Expect to be @ "..Item:GetFullName().."."..Configuration.StaticAttributeBinName)
@@ -155,6 +158,7 @@ local MakeItemSystem = Class 'ItemSystem' (function(ItemSystem, Configuration, I
 			NewClass.ClassName = NewClassName;
 			NewClass.Container = Instance.new("Configuration")
 			NewClass.Container.Name = NewClassName.."LocalData";
+			NewClass.Interfaces = {}
 
 			for AttributeName, AttributeObject in pairs(ItemClasses[NewClassName].AttributeBin) do
 				local Clone = AttributeObject:Clone()
@@ -180,11 +184,25 @@ local MakeItemSystem = Class 'ItemSystem' (function(ItemSystem, Configuration, I
 	ItemSystem.New = ConstructNewClass;
 	ItemSystem.new = ConstructNewClass;
 
-	local function GetClassFromDataBin(NewClassName, ...)
+	local function GetNewClassFromDataBin(DataBin, ...)
+		local NewClass = {}
+		NewClass.ClassBase = ItemClasses[NewClassName]
+		NewClass.ClassName = DataBin.ClassName.Value;
+		NewClass.Container = DataBin;
+		NewClass.Container.Name = NewClassName.."LocalData";
+		NewClass.Interfaces = {}
 
+		if Constructor then
+			Constructor(NewClass, ...) -- May error with the '...', may have to repack and unpack...
+		end
+		setmetatable(NewClass, ClassMetatable)
+
+		return NewClass
 	end
-	ItemSystem.GetClassFromDataBin = GetClassFromDataBin;
-	ItemSystem.getClassFromDataBin = GetClassFromDataBin
+	ItemSystem.GetNewClassFromDataBin = GetNewClassFromDataBin;
+	ItemSystem.getNewClassFromDataBin = GetNewClassFromDataBin;
+	ItemSystem.ParseDatabin = GetNewClassFromDataBin;
+	ItemSystem.parseDatabin = GetNewClassFromDataBin;
 
 	if ItemClassList then
 		for _, Item in pairs(ItemClassList) do

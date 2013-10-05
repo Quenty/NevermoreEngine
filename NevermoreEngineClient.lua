@@ -1,5 +1,6 @@
 local Players            = game:GetService('Players')
-local Lighting           = game:GetService('Lighting')
+local ServerStorage      = game:GetService("ServerStorage")
+local ReplicatedStorage  = game:GetService("ReplicatedStorage")
 local Libraries          = _G.LocalLibraries or {}
 local FailedLibraries    = {}
 local RequestedLibraries = {}
@@ -25,7 +26,7 @@ local Settings = {
 -- Load and Verify required assets
 local Mailbox = LocalPlayer:FindFirstChild("Mailbox")
 assert(Mailbox, "[NevermoreEngine] - Could not identify Mailbox, essential component")
-local qSystemsBin = Lighting:FindFirstChild(Settings.SystemName)
+local qSystemsBin = ReplicatedStorage:FindFirstChild(Settings.SystemName)
 assert(qSystemsBin, "[NevermoreEngine] - qSystemsBin could not be identified")
 local ResourceBin = qSystemsBin:FindFirstChild("Resources");
 assert(ResourceBin, "[NevermoreEngine] - ResourceBin could not be identified")

@@ -4,6 +4,8 @@ local Players                 = Game:GetService('Players')
 local StarterPack             = Game:GetService('StarterPack')
 local StarterGui              = Game:GetService('StarterGui')
 local Lighting                = Game:GetService('Lighting')
+local ServerStorage           = game:GetService("ServerStorage")
+local ReplicatedStorage       = game:GetService("ReplicatedStorage")
 local Debris                  = Game:GetService('Debris')
 local Teams                   = Game:GetService('Teams')
 local BadgeService            = Game:GetService('BadgeService')
@@ -11,7 +13,7 @@ local InsertService           = Game:GetService('InsertService')
 local Terrain                 = Workspace.Terrain
 local TestService             = game:GetService('TestService')
 
-local NevermoreEngine          = _G.NevermoreEngine
+local NevermoreEngine         = _G.NevermoreEngine
 local LoadCustomLibrary       = NevermoreEngine.LoadLibrary;
 
 local RbxUtility              = LoadLibrary('RbxUtility')
@@ -24,7 +26,7 @@ local classList               = {}
 local serviceList             = {}
 local classAndServiceNameList = {}
 
-local qSystemsBin = Lighting:FindFirstChild(NevermoreEngine.SystemName)
+local qSystemsBin = ReplicatedStorage:FindFirstChild(NevermoreEngine.SystemName)
 assert(qSystemsBin, "[QuentySupportSystem] - qSystemsBin could not be identified")
 
 local ResourceBin = qSystemsBin:FindFirstChild("Resources");
