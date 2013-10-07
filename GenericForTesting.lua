@@ -1,7 +1,7 @@
 local VoxelGridMetatable = {
 	__index = {
 		GetSlot = function(self, X, Y, Z)
-			-- Return's the slot at X, Y, Z
+			-- Returns the slot at X, Y, Z
 			local Content = self;
 			if Content[X] ~= nil then
 				if Content[X][Y] ~= nil then
