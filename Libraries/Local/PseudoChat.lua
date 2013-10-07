@@ -366,6 +366,12 @@ ServerChatLog:AddObject(Make 'StringValue' {
 
 
 local MakePseudoChat = Class 'PseudoChat' (function(PseudoChat, ScreenGui)
+	--- Makes pseudo chat that can be used instead of ROBLOX's coreGui. Based off of the same script
+	--  ROBLOX uses, so it's chill... Also scrollable. 
+	-- @param ScreenGui the screen GUI to put the PseudoChat in. That's it. 
+	-- @pre PlayerManager has been setup server-side, thus generating the ServerChatLog and the PlayerChatLog yay!
+	-- @return the pseudochat class (I think?) 
+
 	local ServerChatLog = PersistantLog.MakePersistantLog(PersistantLog.AddSubDataLayer("ServerChatLog", ResourceBin))
 
 	local TemporarySpaceLabel

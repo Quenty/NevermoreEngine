@@ -318,7 +318,14 @@ lib.MakeKineticModel = MakeKineticModel
 
 
 local MakeScroller = Class 'Scroller' (function(Scroller, Container, Content, ScreenGui, Axis)
-	-- Models an iOS style window / a scroll bar.
+	--- Models an iOS style window / a scroll bar.
+	-- @param Container The content frame. This is the space that renders. Stuff from 'Content' will
+	--        display inside of this. If it's a GuiButton, then it will also allow for ROBLOX user input,
+	--        like iOS scrolling. It is suggested you use a GuiButton. 
+	-- @param Content The frame inside of the container that contains the actual content.  Probably larger
+	--        then the Container, otherwise, there's nothing to scroll...
+	-- @param ScreenGui The screengui the Container and Content are in.
+	-- @param Axis a char of 'X' or 'Y' that defines what axis the scrollbar works upon.  Only Y works for scroll bars. 
 
 	-- Axis: Char 'X' or Char 'Y'
 	Axis = Axis or 'Y';
@@ -457,13 +464,13 @@ local MakeScroller = Class 'Scroller' (function(Scroller, Container, Content, Sc
 	end
 
 	function Scroller:AddScrollBar(ScrollBarContainer, DoNotDecorate)
-		-- Add's a ScrollBar in the 'ScrollBarContainer', linked to this scrolling frame. Will generate the scroll bar and
-		-- Parent to the ScrollBarContainer. 
-
-		-- Prerequests: ScrollBarContainer is a Gui, and it's actually called on the class it comes from...
-		-- PostResults: ScrollBarContainer is decorated unless DoNotDecorate is set to true,
-		             -- There is now a scroll bar inside of ScrollBarContainer linked to the
-		             -- Scroller. 
+		--- Add's a ScrollBar in the 'ScrollBarContainer', linked to this scrolling frame. Will generate the scroll bar and
+		--  Parent to the ScrollBarContainer. 
+		-- @param ScrollBarContainer the container that it should be generated in. A frame object.
+		-- @pre ScrollBarContainer is a Gui, and it's actually called on the class it comes from...
+		-- @post ScrollBarContainer is decorated unless DoNotDecorate is set to true,
+		--        There is now a scroll bar inside of ScrollBarContainer linked to the
+		--        Scroller. 
 		
 		--TODO: Add support for horizontal rendering
 

@@ -11,8 +11,8 @@ Libraries/Unimplimented/
 LocalSystems/Unimplimented/
 TestScripts/
 Commands.lua
-NevermoreEngineProject.sublime-project
-NevermoreEngineProject.sublime-workspace
+*.sublime-project
+*.sublime-workspace
 Settings.lua
 ProjectPlanning.lua
 
