@@ -56,7 +56,7 @@ local function GetEnum(EnumTable, EnumValue)
 
 	It'll return the enum ID (Number)...
 
-		pizze --> 0
+		pizza --> 0
 		0 --> 0
 
 		etc. 
