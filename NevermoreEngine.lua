@@ -1,8 +1,9 @@
---[[-----------
--- META DATA --
----------------
+--[[
+---------
+META DATA
+---------
 @author Quenty
-Version 0.1.1
+Version 0.2.0.2
 
 This script handles players and characters loading into the game and the 
 networking of information from the client to the server and vice versa. It 
@@ -10,9 +11,9 @@ handles resource management and is designed to make libraries work together.
 
 It should be parented to ServerScriptService, and is a ModularScript
 
---------------------
--- File Structure --
---------------------
+--------------
+File Structure
+--------------
 Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
 should be setup like this
 
@@ -80,6 +81,10 @@ Main resouces are scripts in Modules that end in .Main or are not disabled.
 -------------------
 Update / Change Log
 -------------------
+February 8th, 2014 [0.2.0.2]
+- Pushed to github
+- Fixed release notes for MD
+
 February 7th, 2014 [0.2.0.1]
 - Made Parent argument in GetDataStreamObject optional. Defaults to bin.
 - Made Parent argument in GetEventStreamObject optional. Defaults to bin.
@@ -133,7 +138,6 @@ Janurary 4th, 2014 [0.1.0.1]
 
 Janurary 2nd, 2013 [0.1.0.0]
 - Nevermore works as expected in solo mode and solotest mode
-
 
 --]]
 
