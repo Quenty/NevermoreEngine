@@ -1,0 +1,7 @@
+*.sublime-project
+*.sublime-workspace
+*.txt
+*.rbxl
+/TestScripts
+/DataConverters
+ProjectPlanning.lua
