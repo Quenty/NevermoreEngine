@@ -179,6 +179,10 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 	AreaHandler.AddDestiation = AddDestiation
 	AreaHandler.addDestiation = AddDestiation
 
+	local function OnGatewayTouch(Part)
+
+	end
+
 	local function SetupGateway(GatewayIn, DestinationID)
 		-- @param GatewayIn The gateway model going in
 		-- @param DestinationID The destination ID (already registered) to where this gateway goes. Will probably be generated based on parent-child structure.
@@ -186,7 +190,11 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 		DestinationID = DestinationID:lower()
 
 		if DestinationIDToRender[DestinationID] then
+			local Connection = MakeGateConnection()
 
+			GatewayIn.Touched:connect(function(Part)
+				OnGatewayTouch(GatewayIn, Part)
+			end)
 		else
 			error("[AreaHandler] - Destination '" .. DestinationID .. "' does not exist")
 		end
