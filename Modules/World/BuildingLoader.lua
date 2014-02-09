@@ -334,7 +334,15 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 		-- Model.Name = "Door:DestinationA:DoorA"
 
 		local BrokenString = qString.BreakString(GatewayName, ":")
-		if BrokenString[1] and qString.CompareStrings(BrokenString[1])
+		if BrokenString[1] and qString.CompareStrings(BrokenString[1], "Door") then
+			if #BrokenString == 3 then
+				return BrokenString[2], BrokenString[3]
+			else
+				return nil
+			end
+		else
+			return nil
+		end
 	end
 end)
 
