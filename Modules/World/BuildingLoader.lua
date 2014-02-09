@@ -147,17 +147,21 @@ local MakeGridManager = Class(function(GridManager, Center, StudsPerGridSquare, 
 	GridManager.slotLocationToWorldLocation = SlotLocationToWorldLocation
 end)
 
-local MakeGateConnection = Class(function(GateConnection, BaseGate, DestinationID)
+local MakeGateConnection = Class(function(GateConnection, BaseGate, DestinationID, DoorID)
 	--- Represents the connection between a gate and a Area
 	-- @param BaseGate The gateway in, BasePart
 	-- @param DestinationGateRender The rendering function to use if GateOut fails. ()
+	-- @param DoorID The doorId in the DestinationID
 
 	GateConnection.BaseGate              = BaseGate
 	GateConnection.DestinationID         = DestinationID
-	GateConnection.DestinationGat        = nil
+	GateConnection.DoorID                = DoorID
+	GateConnection.DestinationGate       = nil
 end)
 
-local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
+local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, BuildingList)
+	--- @param Container The container all the buildings go into.
+
 	local Configuration = OverriddenConfiguration.new(Configuration, {
 		StudsPerGridSquare = 100;
 		RenderHeight       = 10000;
@@ -166,45 +170,8 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 
 	local Grid = MakeGridManager(Vector3.new(0, Configuration.RenderHeight, 0), Configuration.StudsPerGridSquare, Configuration.GridSize, Configuration.GridSize)
 	local DestinationIDToRender = {}
-	local Gateways = {}
 
-	local function AddDestiation(DestinationID, DestinatinoRender)
-		--- Adds a destination to the render handler. 
-		-- @param DestinationID String, the ID of the destination available.
-		-- @param DestinatinoRender Function that returns the model to use as the destination.
-
-		DestinationID = DestinationID:lower()
-		DestinationIDToRender[DestinationID] = DestinatinoRender
-	end
-	AreaHandler.AddDestiation = AddDestiation
-	AreaHandler.addDestiation = AddDestiation
-
-	local function OnGatewayTouch(Part)
-		--- Handles gateway touchy thing.
-	end
-
-	local function SetupGateway(GatewayIn, DestinationID)
-		-- @param GatewayIn The gateway model going in
-		-- @param DestinationID The destination ID (already registered) to where this gateway goes. Will probably be generated based on parent-child structure.
-
-		DestinationID = DestinationID:lower()
-
-		if DestinationIDToRender[DestinationID] then
-			local Connection = MakeGateConnection()
-
-			GatewayIn.Touched:connect(function(Part)
-				OnGatewayTouch(GatewayIn, Part)
-			end)
-		else
-			error("[AreaHandler] - Destination '" .. DestinationID .. "' does not exist")
-		end
-	end
-	AreaHandler.SetupGateway = SetupGateway
-	AreaHandler.setupGateway = SetupGateway
-
-
-
-	local function LoadNewArea(Parent, Area)
+	local function LoadNewArea(Parent, Area, NewCharacter)
 		local NewLocation = GridManager.GetOpenSlotPosition()
 		if NewLocation then
 			local NewSpawnLocation = GridManager.SlotLocationToWorldLocation(NewLocation)
@@ -213,6 +180,14 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 			NewArea.ActiveCharacterCount = 0
 			NewArea.GridLocation         = NewLocation
 			NewArea.WorldLocation        = NewSpawnLocation
+
+			NewArea.GatewayConnections = {}
+
+			local function AddGatewayConnection(Connection)
+				NewArea.GatewayConnections[#NewArea.GatewayConnections+1] = Connection
+			end
+			NewArea.AddGatewayConnection = AddGatewayConnection
+			NewArea.addGatewayConnection = AddGatewayConnection
 
 			local NewModel = Make 'Model' {
 				Parent     = Parent
@@ -226,6 +201,7 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 				Parent     = Parent
 				Name       = "CharacterBin";
 				Archivable = false;
+				NewCharacter;
 			}
 			NewArea.CharacterBin = CharacterBin
 
@@ -234,9 +210,22 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 				
 				local Children = CharacterBin:GetChildren()
 				NewArea.ActiveCharacterCount = #Children
+
+				if NewArea.ActiveCharacterCount <= 0 then
+					NewArea.Destroy()
+				end
 			end
 			NewArea.UpdateCount = UpdateCount
 			NewArea.updateCount = UpdateCount
+
+			local function Destroy()
+				NewModel:Destroy()
+				for _, Item in pairs(NewArea.GatewayConnections) do
+					Item.DestinationGate = nil
+				end
+			end
+			NewArea.Destroy = Destroy
+			NewArea.destroy = Destroy
 
 			CharacterBin.ChildAdded:connect(function(Child)
 				UpdateCount()
@@ -248,8 +237,74 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 			return nil
 		end
 	end
-	AreaHandler.LoadNewArea = LoadNewArea
-	AreaHandler.loadNewArea = LoadNewArea
+
+	local function AddDestination(DestinationID, DestinationRender)
+		--- Adds a destination to the render handler. 
+		-- @param DestinationID String, the ID of the destination available.
+		-- @param DestinationRender Function that returns the model to use as the destination.
+		--        DestinationRender(GatewayConnection)
+
+		DestinationID = DestinationID:lower()
+		DestinationIDToRender[DestinationID] = DestinationRender
+	end
+	AreaHandler.AddDestination = AddDestination
+	AreaHandler.addDestination = AddDestination
+
+	local function PositionCharacter(Door, Character)
+		--- Positions the character relative to the front of the door. Better algorithm laster.
+
+		Character.HumanoidRootPart.CFrame = Door.CFrame * CFrame.new(0, 0, -4)
+	end
+
+	local function OnGatewayRequest(Player, Character, GatewayConnection, DestinationRender)
+		--- When a player requests to go into a gateway, (triggered by touch), this will actaully handle the request.
+
+		if GatewayConnection.DestinationGate then
+			PositionCharacter(GatewayConnection.DestinationGate, Character)
+		else
+			local Rendered = DestinationRender(GatewayConnection)
+			local RenderArea = LoadNewArea(Container, Rendered, Character)
+			RenderArea.AddGatewayConnection(GatewayConnection)
+
+			PositionCharacter(GatewayConnection.DestinationGate, Character)
+		end
+	end
+
+	local function OnGatewayTouch(Part, GatewayConnection, DestinationRender)
+		--- Handles gateway touchy thing, verifys that a connection request occured
+		-- @param Part The part that touched
+		-- @param  GatewayConnection The connection linked to the part.
+
+		local Character, Player = GetCharacter(Part)
+		if Character and Player then
+			if CheckCharacter(Player) and Character.Humanoid.Health > 0 then
+				OnGatewayRequest(Player, Character, GatewayConnection, DestinationRender)
+
+				return true
+			end
+		end
+		return false
+	end
+
+	local function SetupGateway(GatewayIn, DoorID, DestinationID)
+		-- @param GatewayIn The gateway model going in
+		-- @param DestinationID The destination ID (already registered) to where this gateway goes. Will probably be generated based on parent-child structure.
+
+		DestinationID = DestinationID:lower()
+
+		if DestinationIDToRender[DestinationID] then
+			local DestinationRender = DestinationIDToRender[DestinationID]
+			local GatewayConnection = MakeGateConnection(GatewayIn, DestinationID, DoorID)
+
+			GatewayIn.Touched:connect(function(Part)
+				OnGatewayTouch(Part, GatewayConnection, DestinationRender)
+			end)
+		else
+			error("[AreaHandler] - Destination '" .. DestinationID .. "' does not exist")
+		end
+	end
+	AreaHandler.SetupGateway = SetupGateway
+	AreaHandler.setupGateway = SetupGateway
 
 
 end)

@@ -28,6 +28,9 @@ local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
 
 --[[
 Updates and Changes log
+February 9th, 2014
+- Updated CheckCharacter to check for HumanoidRootPart
+
 January 26th, 2014
 - Removed old code
 - Fixed issue with constructor and class system
@@ -403,7 +406,7 @@ local function checkPlayer(player)
 	return player and player:IsA("Player") 
 		and player:FindFirstChild("Backpack") 
 		and player:FindFirstChild("StarterGear")
-		-- and player.PlayerGui:IsA("PlayerGui") -- PlayerGui does not replicate to other clients.
+		-- and player.PlayerGui:IsA("PlayerGui") -- PlayerGui does not replicate to other clients. If FilteringEnabled is true, does not replicate to Server
 end
 lib.checkPlayer = checkPlayer
 lib.CheckPlayer = checkPlayer
@@ -416,8 +419,8 @@ local function checkCharacter(player)
 
 	if character and checkPlayer(player) then
 		
-
-		return character:FindFirstChild("Humanoid") 
+		return character:FindFirstChild("Humanoid")
+			and character:FindFirstChild("HumanoidRootPart")
 			and character:FindFirstChild("Torso") 
 			and character:FindFirstChild("Head") 
 			and character.Humanoid:IsA("Humanoid")
