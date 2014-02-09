@@ -174,13 +174,27 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 		-- @param DestinatinoRender Function that returns the model to use as the destination.
 
 		DestinationID = DestinationID:lower()
-		DestinationIDToRender[] = DestinatinoRender
+		DestinationIDToRender[DestinationID] = DestinatinoRender
 	end
+	AreaHandler.AddDestiation = AddDestiation
+	AreaHandler.addDestiation = AddDestiation
 
 	local function SetupGateway(GatewayIn, DestinationID)
+		-- @param GatewayIn The gateway model going in
+		-- @param DestinationID The destination ID (already registered) to where this gateway goes. Will probably be generated based on parent-child structure.
+
 		DestinationID = DestinationID:lower()
-		
+
+		if DestinationIDToRender[DestinationID] then
+
+		else
+			error("[AreaHandler] - Destination '" .. DestinationID .. "' does not exist")
+		end
 	end
+	AreaHandler.SetupGateway = SetupGateway
+	AreaHandler.setupGateway = SetupGateway
+
+
 
 	local function LoadNewArea(Parent, Area)
 		local NewLocation = GridManager.GetOpenSlotPosition()
