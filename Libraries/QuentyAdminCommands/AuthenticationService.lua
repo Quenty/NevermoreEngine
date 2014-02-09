@@ -28,6 +28,7 @@ local AuthenticationService = {} do
 		"Seranok";
 		"blobbyblob";
 		"xXxMoNkEyMaNxXx";
+		"Azureous";
 
 		-- Chill admins 
 		"Anaminus";

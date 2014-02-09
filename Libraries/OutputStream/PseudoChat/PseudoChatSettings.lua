@@ -7,7 +7,7 @@ return {
 	-- COLORS --
 	SpecialChatColors = {
 		["Quenty"]          = BrickColor.new("Br. yellowish green").Color;
-		["bob104810"]       = BrickColor.new("Br. yellowish green").Color; -- Color3.new(1, 215/255, 0); 
+		["Mauv"]       = BrickColor.new("Br. yellowish green").Color; -- Color3.new(1, 215/255, 0); 
 		["Player1"]         = BrickColor.new("Br. yellowish green").Color; -- Color3.new(1, 215/255, 0);
 		["PumpedRobloxian"] = Color3.new(0, 202/255, 220/255);
 		["xXxMoNkEyMaNxXx"] = BrickColor.new("Lavender").Color;
