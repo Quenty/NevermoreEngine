@@ -180,7 +180,7 @@ local MakeAreaHandler = Class(function(AreaHandler, Configuration, BuildingList)
 	AreaHandler.addDestiation = AddDestiation
 
 	local function OnGatewayTouch(Part)
-
+		--- Handles gateway touchy thing.
 	end
 
 	local function SetupGateway(GatewayIn, DestinationID)
