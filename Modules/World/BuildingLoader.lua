@@ -5,6 +5,7 @@ local LoadCustomLibrary       = NevermoreEngine.LoadLibrary
 
 local qSystems                = LoadCustomLibrary("qSystems")
 local qInstance               = LoadCustomLibrary("qInstance")
+local qString                 = LoadCustomLibrary("qString")
 local qCFrame                 = LoadCustomLibrary("qCFrame")
 local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
 
@@ -171,7 +172,11 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 	local Grid = MakeGridManager(Vector3.new(0, Configuration.RenderHeight, 0), Configuration.StudsPerGridSquare, Configuration.GridSize, Configuration.GridSize)
 	local DestinationIDToRender = {}
 
-	local function LoadNewArea(Parent, Area, NewCharacter)
+	local function LoadNewArea(Parent, AreaModel, MainPart, NewCharacter)
+		--- Loads the new area into a new location
+		-- @param Parent The parent of the new area
+		-- @param MainPart The mainpart of the whole model. 
+
 		local NewLocation = GridManager.GetOpenSlotPosition()
 		if NewLocation then
 			local NewSpawnLocation = GridManager.SlotLocationToWorldLocation(NewLocation)
@@ -183,7 +188,13 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 
 			NewArea.GatewayConnections = {}
 
-			local function AddGatewayConnection(Connection)
+			local function AddGatewayConnection(GateConnection)
+				--- Adds the GateConnection to the system, and sets the DestinationGate
+				-- @param GateConnection The connection to add.
+
+				local DoorName = GateConnection.DoorID
+				GateConnection.DestinationGate = NewArea:FindFirstChild(DoorName) or error("New Area does not have a door named '" .. DoorName .."'")
+
 				NewArea.GatewayConnections[#NewArea.GatewayConnections+1] = Connection
 			end
 			NewArea.AddGatewayConnection = AddGatewayConnection
@@ -191,9 +202,9 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 
 			local NewModel = Make 'Model' {
 				Parent     = Parent
-				Name       = Area.Name .. "Cloned";
+				Name       = AreaModel.Name .. "Cloned";
 				Archivable = false;
-				Area;
+				AreaModel;
 			}
 			NewArea.Model = Model
 
@@ -204,6 +215,9 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 				NewCharacter;
 			}
 			NewArea.CharacterBin = CharacterBin
+
+			local Bricks = qInstance.GetBricks(AreaModel)
+			qCFrame.TransformModel(Bricks, MainPart.CFrame, CFrame.new(NewSpawnLocation))
 
 			local function UpdateCount()
 				--- TODO: Integrate GC with this.
@@ -219,6 +233,7 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 			NewArea.updateCount = UpdateCount
 
 			local function Destroy()
+				NewModel.Parent = nil
 				NewModel:Destroy()
 				for _, Item in pairs(NewArea.GatewayConnections) do
 					Item.DestinationGate = nil
@@ -243,6 +258,8 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 		-- @param DestinationID String, the ID of the destination available.
 		-- @param DestinationRender Function that returns the model to use as the destination.
 		--        DestinationRender(GatewayConnection)
+		--            @param GatewayConnection The connection being used to request the model.
+		--            @return Model, MainPart
 
 		DestinationID = DestinationID:lower()
 		DestinationIDToRender[DestinationID] = DestinationRender
@@ -262,10 +279,10 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 		if GatewayConnection.DestinationGate then
 			PositionCharacter(GatewayConnection.DestinationGate, Character)
 		else
-			local Rendered = DestinationRender(GatewayConnection)
-			local RenderArea = LoadNewArea(Container, Rendered, Character)
+			local Rendered, MainPart = DestinationRender(GatewayConnection)
+			local RenderArea = LoadNewArea(Container, Rendered, MainPart, Character)
 			RenderArea.AddGatewayConnection(GatewayConnection)
-
+			wait(0.5)
 			PositionCharacter(GatewayConnection.DestinationGate, Character)
 		end
 	end
@@ -286,9 +303,11 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 		return false
 	end
 
-	local function SetupGateway(GatewayIn, DoorID, DestinationID)
+	local function SetupGateway(GatewayIn, DestinationID, DoorID)
+		--- Setups up the connection structure, and the event on-touch.
 		-- @param GatewayIn The gateway model going in
 		-- @param DestinationID The destination ID (already registered) to where this gateway goes. Will probably be generated based on parent-child structure.
+		-- @param DoorID String, the DoorID of the gateway.
 
 		DestinationID = DestinationID:lower()
 
@@ -306,7 +325,17 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 	AreaHandler.SetupGateway = SetupGateway
 	AreaHandler.setupGateway = SetupGateway
 
+	local function ParseGatewayName(GatewayName)
+		--- Parses a gateway's name and return's the DoorID and DestinationID
+		-- @param GatewayName The gateway name to parse.
+		-- @return nil, if it failed, otherwise, the DestinationID, Followed by the GatewayIn
 
+		-- Gateways are setup like this: "Door:<DestinationId>:<DoorId>"
+		-- Model.Name = "Door:DestinationA:DoorA"
+
+		local BrokenString = qString.BreakString(GatewayName, ":")
+		if BrokenString[1] and qString.CompareStrings(BrokenString[1])
+	end
 end)
 
 

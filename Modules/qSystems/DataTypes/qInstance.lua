@@ -9,12 +9,16 @@ qSystems:Import(getfenv(0))
 
 local lib = {}
 
+-- See Type library for more identification stuff.
+-- @author Quenty
+-- Last Modified Februrary 9th, 2014
+
 local function GetBricks(StartInstance)
 	local List = {}
 
-	if StartInstance:IsA("BasePart") then
-		List[#List+1] = StartInstance
-	end
+	-- if StartInstance:IsA("BasePart") then
+	-- 	List[#List+1] = StartInstance
+	-- end
 
 	CallOnChildren(StartInstance, function(Item)
 		if Item:IsA("BasePart") then

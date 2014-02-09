@@ -25,8 +25,10 @@ end
 lib.CompareStrings = CompareStrings;
 lib.compareStrings = CompareStrings;
 lib.compare_strings = CompareStrings;
-lib.Equals = CompareStrings
-lib.equals = CompareStrings
+lib.Compare = CompareStrings
+lib.compare = CompareStrings
+-- lib.Equals = CompareStrings
+-- lib.equals = CompareStrings
 
 local function CompareCutFirst(firstString, secondString)
 	-- Compare's two strings, but only the beginning of the first string, to see if it matches the second one

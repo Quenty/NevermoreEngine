@@ -77,7 +77,7 @@ lib.moveModel = MoveModel;
 lib.MoveModel = MoveModel;
 lib.move_model = MoveModel;
 --]]
-
+--[[
 local function TransformModel(objects, center, new)
 	for _, object in pairs(objects) do
 		object.CFrame = new:toWorldSpace(center:toObjectSpace(object.CFrame))
@@ -85,7 +85,7 @@ local function TransformModel(objects, center, new)
 end
 lib.TransformModel = TransformModel
 lib.transformModel = TransformModel;
-
+--]]
 
 local function QuaternionFromCFrame(cf)
 	local mx,  my,  mz,
@@ -223,9 +223,9 @@ local function TransformModel(objects, center, new)
 	-- Transforms a group of bricks (objects) relative to center to the new CFrame (new).  
 
 	for _,object in pairs(objects) do
-		if object:IsA("BasePart") then
-			object.CFrame = new:toWorldSpace(center:toObjectSpace(object.CFrame))
-		end
+		-- if object:IsA("BasePart") then
+		object.CFrame = new:toWorldSpace(center:toObjectSpace(object.CFrame))
+		-- end
 	end
 end
 lib.TransformModel = TransformModel
