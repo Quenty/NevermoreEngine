@@ -1,6 +1,4 @@
----------
-META DATA
----------
+# About
 ```
 @author Quenty
 (C) 2014 Quenty
