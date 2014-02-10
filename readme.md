@@ -97,20 +97,22 @@ Nevermore has several configuration options that can be modified in the main
 module. 
 
 # Update / Change Log
+This change log is *strictly* for Nevermore's module and documentation only.
 
-February 9th, 2014 [0.2.0.3]
+##### February 9th, 2014 [0.2.0.3]
 - Fixed `RemoteEvent` Firing in server
+- Updated 
 
-February 8th, 2014 [0.2.0.2]
+##### February 8th, 2014 [0.2.0.2]
 - Pushed to github
 - Fixed release notes for MD
 
-February 7th, 2014 [0.2.0.1]
+##### February 7th, 2014 [0.2.0.1]
 - Made Parent argument in GetDataStreamObject optional. Defaults to bin.
 - Made Parent argument in GetEventStreamObject optional. Defaults to bin.
 - Added Workspace.FilteringEnabled as a property on Configuration
 
-February 6th, 2014 [0.2.0.0]
+##### February 6th, 2014 [0.2.0.0]
 - Updated system to work with Workspace.FilteringEnabled. 
 - Updated so it does not warn when unregistered requests come through to prevent 
   bug with output streams looping output
@@ -118,44 +120,44 @@ February 6th, 2014 [0.2.0.0]
 - Now clients wait for DataStreamObject's to replicate from the server, instead 
   of creating them themselves, because they cannot create them themselves. 
 
-February 4th, 2014 [0.1.0.9]
+##### February 4th, 2014 [0.1.0.9]
 - Fixed character loading issue
 - Moved events with character load
 - Removed client loader dependency
 
-February 3rd, 2014 [0.1.0.8]
+##### February 3rd, 2014 [0.1.0.8]
 - Added GetSplashEnabled function
 
-February 2nd, 2014 [0.1.0.7]
+##### February 2nd, 2014 [0.1.0.7]
 - Fixed firing client bug
 
-February 1st, 2014 [0.1.0.6]
+##### February 1st, 2014 [0.1.0.6]
 - Fixed serverside bug with event storage
 
-January 24th, 2014 [0.1.0.5]
+##### January 24th, 2014 [0.1.0.5]
 - Added EventStream 
 - Added new setting "EventStreamName"
 - Added new bin in the replicated bin thing for EventStreams
 - Add GetDataStreamObject to public API
 - Add GetEventStreamObject and make it public
 
-January 23th, 2014 [0.1.0.4]
+##### January 23th, 2014 [0.1.0.4]
 - Added more documentation
 
-January 20th, 2014 [0.1.0.3]
+##### January 20th, 2014 [0.1.0.3]
 - Updated networking against. 
 - Removed ypcall wrapping as ModuleScripts have been fixed.
 - Fixed data replication package being cleared / nilled
 - Debugged networking in server mode. 
 
-January 19th, 2014 [0.1.0.2]
+##### January 19th, 2014 [0.1.0.2]
 - Fixed problem with client / server networking
 
-Janurary 4th, 2014 [0.1.0.1]
+##### Janurary 4th, 2014 [0.1.0.1]
 - Added SendSpawn property to DataStreams, as a networking option.
 - Recursion added to modules, will now recurse through everything not a script, 
   local script, or module script in search of resources.
 - ypcall wrapped Nevermore for debugging, until modulescripts are fixed.
 
-Janurary 2nd, 2013 [0.1.0.0]
+##### Janurary 2nd, 2013 [0.1.0.0]
 - Nevermore works as expected in solo mode and solotest mode
