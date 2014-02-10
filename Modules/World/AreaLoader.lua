@@ -1,4 +1,5 @@
 local ReplicatedStorage       = game:GetService("ReplicatedStorage")
+local Players                 = game:GetService("Players")
 
 local NevermoreEngine         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary       = NevermoreEngine.LoadLibrary
@@ -8,11 +9,13 @@ local qInstance               = LoadCustomLibrary("qInstance")
 local qString                 = LoadCustomLibrary("qString")
 local qCFrame                 = LoadCustomLibrary("qCFrame")
 local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
+local EventGroup              = LoadCustomLibrary("EventGroup")
 
 qSystems:Import(getfenv(0));
 
--- BuidingLoader.lua
+-- AreaLoader.lua
 -- Handles building loading and management. Handles it server-side. 
+-- @author Quenty
 
 local lib = {}
 
@@ -98,7 +101,7 @@ local MakeGridManager = Class(function(GridManager, Center, StudsPerGridSquare, 
 		-- @param SlotLocation Vector2, the location of the slot.
 
 		if SlotInBounds(SlotLocation) then
-			return Grid[SlotLocation.X][SlotLocation.Y] ~= nil
+			return Grid[SlotLocation.X][SlotLocation.Y] == nil
 		else
 			return false
 		end
@@ -142,7 +145,7 @@ local MakeGridManager = Class(function(GridManager, Center, StudsPerGridSquare, 
 
 	local function SlotLocationToWorldLocation(SlotLocation)
 		local CenteredSlotLocation = (SlotLocation - (Vector2.new(Rows, Columns)/2))
-		return (Center + Vector3.new(CenteredSlotLocation.X, 0, CenteredSlotLocation.Y))
+		return (Center + Vector3.new(CenteredSlotLocation.X * StudsPerGridSquare, 0, CenteredSlotLocation.Y * StudsPerGridSquare))
 	end
 	GridManager.SlotLocationToWorldLocation = SlotLocationToWorldLocation
 	GridManager.slotLocationToWorldLocation = SlotLocationToWorldLocation
@@ -160,100 +163,207 @@ local MakeGateConnection = Class(function(GateConnection, BaseGate, DestinationI
 	GateConnection.DestinationGate       = nil
 end)
 
-local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, BuildingList)
+local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 	--- @param Container The container all the buildings go into.
 
-	local Configuration = OverriddenConfiguration.new(Configuration, {
-		StudsPerGridSquare = 100;
+	local Configuration    = OverriddenConfiguration.new(Configuration, {
+		StudsPerGridSquare = 300;
 		RenderHeight       = 10000;
-		GridSize           = 20; -- 400 should be enough, no?
+		GridSize           = 8; -- 64 should be enough, no?
+		Lifetime           = 30; -- Lifetime is areas after players leave, in seconds.
+		UpdateCycle        = 60; -- Every X seconds run the GC.
 	})
+
+	-- MaximumLifetime for an area is UpdateCycle + Lifetime
 
 	local Grid = MakeGridManager(Vector3.new(0, Configuration.RenderHeight, 0), Configuration.StudsPerGridSquare, Configuration.GridSize, Configuration.GridSize)
 	local DestinationIDToRender = {}
 
-	local function LoadNewArea(Parent, AreaModel, MainPart, NewCharacter)
+	local function PositionCharacter(Door, Character)
+		--- Positions the character relative to the front of the door. Better algorithm laster.
+
+		local DoorBase = Door.CFrame - Vector3.new(0, Door.Size.Y/2, 0)
+		local DistanceCheckingRay = Ray.new(Character.Torso.Position, Vector3.new(0,-999,0))
+
+		local IgnoreList = {Character}
+
+		local Hit, Position = Workspace:FindPartOnRayWithIgnoreList(DistanceCheckingRay, IgnoreList)
+		local DistanceOffGround
+		
+		if Hit and Position then
+			DistanceOffGround = math.max(3, (Character.Torso.Position - Position).magnitude)
+			-- print("Player is " .. DistanceOffGround .. " studs off of the ground")
+		else
+			DistanceOffGround = 3
+		end
+		
+		Character.Torso.CFrame = (DoorBase * CFrame.new(0, 0, -4)) + Vector3.new(0, DistanceOffGround, 0)
+	end
+
+	local EventTracker = EventGroup.MakeEventGroup()
+	local Areas = {}
+
+	local function LoadNewArea(Parent, AreaModel, MainPart, NewPlayer, NewCharacter)
 		--- Loads the new area into a new location
 		-- @param Parent The parent of the new area
 		-- @param MainPart The mainpart of the whole model. 
 
-		local NewLocation = GridManager.GetOpenSlotPosition()
+		local NewLocation = Grid.GetOpenSlotPosition()
 		if NewLocation then
-			local NewSpawnLocation = GridManager.SlotLocationToWorldLocation(NewLocation)
+			local NewSpawnLocation = Grid.SlotLocationToWorldLocation(NewLocation)
 
 			local NewArea = {}
-			NewArea.ActiveCharacterCount = 0
 			NewArea.GridLocation         = NewLocation
 			NewArea.WorldLocation        = NewSpawnLocation
 
-			NewArea.GatewayConnections = {}
+			Grid.AddItemToSlot(NewLocation, NewArea)
+
+			local GatewayConnections = {}
 
 			local function AddGatewayConnection(GateConnection)
+				print("[AreaLoader] - Added GateConnection")
 				--- Adds the GateConnection to the system, and sets the DestinationGate
 				-- @param GateConnection The connection to add.
 
 				local DoorName = GateConnection.DoorID
-				GateConnection.DestinationGate = NewArea:FindFirstChild(DoorName) or error("New Area does not have a door named '" .. DoorName .."'")
+				GateConnection.DestinationGate = AreaModel:FindFirstChild(DoorName) or error("New Area does not have a door named '" .. DoorName .."'")
 
-				NewArea.GatewayConnections[#NewArea.GatewayConnections+1] = Connection
+				GateConnection.DestinationGate.Touched:connect(function(Part)
+					local Character, Player = GetCharacter(Part)
+					if Character and Player then
+						if CheckCharacter(Player) and Character.Humanoid.Health > 0 then
+							PositionCharacter(GateConnection.BaseGate, Character)
+							NewArea.UntrackCharacter(Player)
+						end
+					end
+				end)
+
+				GatewayConnections[#GatewayConnections+1] = GateConnection
 			end
 			NewArea.AddGatewayConnection = AddGatewayConnection
 			NewArea.addGatewayConnection = AddGatewayConnection
 
 			local NewModel = Make 'Model' {
-				Parent     = Parent
+				Parent     = Parent;
 				Name       = AreaModel.Name .. "Cloned";
 				Archivable = false;
 				AreaModel;
 			}
 			NewArea.Model = Model
 
-			local CharacterBin = Make 'Model' { -- We'll presume it ONLY stores children
-				Parent     = Parent
-				Name       = "CharacterBin";
-				Archivable = false;
-				NewCharacter;
-			}
-			NewArea.CharacterBin = CharacterBin
-
 			local Bricks = qInstance.GetBricks(AreaModel)
 			qCFrame.TransformModel(Bricks, MainPart.CFrame, CFrame.new(NewSpawnLocation))
 
-			local function UpdateCount()
-				--- TODO: Integrate GC with this.
-				
-				local Children = CharacterBin:GetChildren()
-				NewArea.ActiveCharacterCount = #Children
+			-- START GC SECTION --
 
-				if NewArea.ActiveCharacterCount <= 0 then
+			local Characters = {}
+			local LastUpdate = tick() -- Record the last time players occuped the area
+
+			local function GCCheckCycle()
+				--- Checks if the area can be GC, and if so, GC's it.
+				-- Conditions are met when there are no active players, and lifetime is exceeded
+
+				local CurrentTime = tick()
+				local Count = 0
+				for Player, Character in pairs(Characters) do
+					if (Player and Player.Parent == Players and Player.Character) then
+						Count = Count + 1
+					else
+						NewArea.UntrackCharacter(Player)
+					end
+				end
+				if Count <= 0 and LastUpdate + Configuration.Lifetime < CurrentTime then
 					NewArea.Destroy()
+				else
+					LastUpdate = CurrentTime
 				end
 			end
-			NewArea.UpdateCount = UpdateCount
-			NewArea.updateCount = UpdateCount
+			NewArea.GCCheckCycle = GCCheckCycle
 
+			local function TrackCharacter(Player, Character)
+				--- Tracks a player. 
+				-- @param Player The player to track
+				-- @param Charater The character of the player
+				-- @pre Charater is checked (Verify Humanoid)
+
+				print("[AreaLoader] - Tracking player " .. Player.Name)
+				
+				Characters[Player] = Character
+
+				EventTracker[NewArea][Player.Name].Died = Character.Humanoid.Died:connect(function()
+					NewArea.UntrackCharacter(Player)
+				end)
+
+				EventTracker[NewArea][Player.Name].Respawn = Player.CharacterAdded:connect(function()
+					NewArea.UntrackCharacter(Player)
+				end)
+			end
+			NewArea.TrackCharacter = TrackCharacter
+			NewArea.trackCharacter = TrackCharacter
+
+			local function UntrackCharacter(Player)
+				--- Untracks a player, should be called when a player is not in the area anymore
+				-- @param Player The player to untrack.
+
+				print("[AreaLoader] - Untracked " .. Player.Name)
+				Characters[Player] = nil
+				EventTracker[NewArea][Player.Name] = nil
+				-- GCCheckCycle() 
+			end
+			NewArea.UntrackCharacter = UntrackCharacter
+			NewArea.untrackCharacter = UntrackCharacter
+
+			-- END GC SECTION --
 			local function Destroy()
-				NewModel.Parent = nil
-				NewModel:Destroy()
-				for _, Item in pairs(NewArea.GatewayConnections) do
+				Areas[NewArea] = nil
+				-- print("[AreaLoader] - GC Area.")
+				NewArea.Destroy        = nil
+				NewArea.TrackCharacter = nil
+				NewArea.trackCharacter = nil
+				Characters = nil
+				NewSpawnLocation = nil
+
+				EventTracker[NewArea] = nil -- GC events is so awesome. <3 Anaminus
+
+				Grid.RemoteItemFromSlot(NewLocation)
+
+				for _, Item in pairs(GatewayConnections) do
 					Item.DestinationGate = nil
 				end
+				NewModel.Parent = nil
+				NewModel:Destroy()
 			end
 			NewArea.Destroy = Destroy
 			NewArea.destroy = Destroy
 
-			CharacterBin.ChildAdded:connect(function(Child)
-				UpdateCount()
-			end)		
+			Areas[NewArea] = true -- Track areas
 
 			return NewArea
 		else
-			print("[AreaHandler] - Unable to find open slot. D:")
+			print("[AreaLoader] - Unable to find open slot. D:")
 			return nil
 		end
 	end
 
-	local function AddDestination(DestinationID, DestinationRender)
+	EventTracker.PlayerLeaving = Players.PlayerRemoving:connect(function(Player)
+		for NewArea, _ in pairs(Areas) do
+			NewArea.UntrackCharacter(Player)
+		end
+	end)
+
+	Spawn(function()
+		while true do
+			local Count = 0
+			for NewArea, _ in pairs(Areas) do
+				Count = Count + 1
+				NewArea.GCCheckCycle()
+			end
+			print("[AreaLoader] - ActiveArea count = " .. Count)
+			wait(Configuration.UpdateCycle)
+		end
+	end)
+
+	local function AddDestination(DestinationID, DestinationRender, ...)
 		--- Adds a destination to the render handler. 
 		-- @param DestinationID String, the ID of the destination available.
 		-- @param DestinationRender Function that returns the model to use as the destination.
@@ -262,16 +372,18 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 		--            @return Model, MainPart
 
 		DestinationID = DestinationID:lower()
-		DestinationIDToRender[DestinationID] = DestinationRender
+		if not DestinationIDToRender[DestinationID] then
+			DestinationIDToRender[DestinationID] = {
+				Render    = DestinationRender;
+				Arguments = {...};
+			}
+		else
+			error("[AreaLoader] - DestinationID '" .. DestinationID .. "' is already registered.")
+		end
 	end
-	AreaHandler.AddDestination = AddDestination
-	AreaHandler.addDestination = AddDestination
+	AreaLoader.AddDestination = AddDestination
+	AreaLoader.addDestination = AddDestination
 
-	local function PositionCharacter(Door, Character)
-		--- Positions the character relative to the front of the door. Better algorithm laster.
-
-		Character.HumanoidRootPart.CFrame = Door.CFrame * CFrame.new(0, 0, -4)
-	end
 
 	local function OnGatewayRequest(Player, Character, GatewayConnection, DestinationRender)
 		--- When a player requests to go into a gateway, (triggered by touch), this will actaully handle the request.
@@ -279,15 +391,15 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 		if GatewayConnection.DestinationGate then
 			PositionCharacter(GatewayConnection.DestinationGate, Character)
 		else
-			local Rendered, MainPart = DestinationRender(GatewayConnection)
-			local RenderArea = LoadNewArea(Container, Rendered, MainPart, Character)
+			local Rendered, MainPart = DestinationRender.Render(GatewayConnection, unpack(DestinationRender.Arguments))
+			local RenderArea = LoadNewArea(Container, Rendered, MainPart, Player, Character)
 			RenderArea.AddGatewayConnection(GatewayConnection)
-			wait(0.5)
 			PositionCharacter(GatewayConnection.DestinationGate, Character)
+			RenderArea.TrackCharacter(Player, Character)
 		end
 	end
 
-	local function OnGatewayTouch(Part, GatewayConnection, DestinationRender)
+	function OnGatewayTouch(Part, GatewayConnection, DestinationRender)
 		--- Handles gateway touchy thing, verifys that a connection request occured
 		-- @param Part The part that touched
 		-- @param  GatewayConnection The connection linked to the part.
@@ -319,11 +431,11 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 				OnGatewayTouch(Part, GatewayConnection, DestinationRender)
 			end)
 		else
-			error("[AreaHandler] - Destination '" .. DestinationID .. "' does not exist")
+			error("[AreaLoader] - Destination '" .. DestinationID .. "' is not registered.")
 		end
 	end
-	AreaHandler.SetupGateway = SetupGateway
-	AreaHandler.setupGateway = SetupGateway
+	AreaLoader.SetupGateway = SetupGateway
+	AreaLoader.setupGateway = SetupGateway
 
 	local function ParseGatewayName(GatewayName)
 		--- Parses a gateway's name and return's the DoorID and DestinationID
@@ -344,7 +456,28 @@ local MakeAreaHandler = Class(function(AreaHandler, Container, Configuration, Bu
 			return nil
 		end
 	end
-end)
+	AreaLoader.ParseGatewayName = ParseGatewayName
+	AreaLoader.ParseGatewayName = ParseGatewayName
 
+	local function LookForGatewaysAndSetup(Model)
+		--- Sweeps a model's children and searches for valid doors. Call after adding destinations.
+		-- @param Model The model to sweep
+
+		CallOnChildren(Model, function(Item)
+			if Item:IsA("BasePart") and Item.Name:sub(1, 5) == "Door:" then
+				local DestinationID, DoorID = ParseGatewayName(Item.Name)
+				if DestinationID and DoorID then
+					SetupGateway(Item, DestinationID, DoorID)
+				else
+					error("[AreaLoader] - Invalid door found at '" .. Item:GetFullname() .. "'")
+				end
+			end
+		end)
+	end
+	AreaLoader.LookForGatewaysAndSetup = LookForGatewaysAndSetup
+	AreaLoader.LookForGatewaysAndSetup = LookForGatewaysAndSetup
+end)
+lib.MakeAreaLoader = MakeAreaLoader
+lib.makeAreaLoader = MakeAreaLoader
 
 return lib

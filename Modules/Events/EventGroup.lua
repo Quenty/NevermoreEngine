@@ -9,7 +9,8 @@ local qSystems          = LoadCustomLibrary("qSystems")
 qSystems:Import(getfenv(0));
 
 -- EventBin.lua
--- A library to handle events
+-- A library to handle events. It is beautiful.
+
 -- @author Anaminus, modified by Quenty
 -- Last modified by Quenty, January 23rd, 2014
 

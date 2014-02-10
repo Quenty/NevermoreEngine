@@ -2,6 +2,7 @@
 META DATA
 ---------
 @author Quenty
+(C) 2014 Quenty
 Version 0.2.0.2
 
 This script handles players and characters loading into the game and the 
@@ -16,6 +17,7 @@ File Structure
 Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
 should be setup like this
 
+```
 <<< ROOT >>>
 	Workspace
 	Players
@@ -30,6 +32,7 @@ should be setup like this
 			App
 				NevermoreEngine
 				NevermoreEngineLoader
+```
 
 Modules
 -------
@@ -52,6 +55,7 @@ Loading
 -------
 Loading on the server and the client may be done by using the following code:
 
+```
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Nevermore         = require(ReplicatedStorage:WaitForChild("NevermoreEngine")))
@@ -60,6 +64,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 
 qSystems:Import(getfenv(0))
+```
 
 -----
 
@@ -69,9 +74,11 @@ Nevermore is loaded by NevermoreEngineLoader.lua, which clones it into Replicate
 so, runs it for the server. This guarantees that it knows whether or not it's in the server or client, albeit,
 by a hacky method. It also makes sure the cloned Nevermore is archivable false incase it's loaded in a PBS. 
 
+```
 NOTE: Setting Players.CharacterAutoLoads to false will make 
 	> attempt to call nil value
 show up on ROBLOX studio version "0. 135. 0. 42435"
+```
 
 MAIN RESOURCES
 --------------
@@ -80,6 +87,9 @@ Main resouces are scripts in Modules that end in .Main or are not disabled.
 -------------------
 Update / Change Log
 -------------------
+February 9th, 2014 [0.2.0.3]
+- Fixed RemoteEvent Firing in server
+
 February 8th, 2014 [0.2.0.2]
 - Pushed to github
 - Fixed release notes for MD
@@ -137,5 +147,4 @@ Janurary 4th, 2014 [0.1.0.1]
 
 Janurary 2nd, 2013 [0.1.0.0]
 - Nevermore works as expected in solo mode and solotest mode
-
 

@@ -277,7 +277,7 @@ local MakeCharacterAnimationService = Class(function(CharacterAnimationService, 
 				end
 
 				if not JointData then
-					print("[CharacterAnimationService] - Creating JointData for Joint "..Joint.Name)
+					-- print("[CharacterAnimationService] - Creating JointData for Joint "..Joint.Name)
 					JointData               = {}
 					JointData.InitialOffset = Joint.C1
 					JointData.LastKeyframe  = ActiveAnimation.TargetKeyFrame;
