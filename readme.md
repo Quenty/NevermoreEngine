@@ -87,6 +87,12 @@ NOTE: Setting Players.CharacterAutoLoads to false will make
 show up on ROBLOX studio version "0. 135. 0. 42435"
 ```
 
+Nevermore, when it loads, does two things. It creates an internal directory
+that is not archivable in `ReplicatedStorage` and it clones itself into
+ReplicatedStorage. Both of these are `Archivable` false. The reasons behind
+doing this is complicated, but mostly it guarantees Nevermore works in solo
+test mode and the server.
+
 ## Main Resources
 Main resouces are scripts in Modules that end in .Main or are not disabled. 
 
