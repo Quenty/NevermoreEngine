@@ -12,7 +12,7 @@ This script handles players and characters loading into the game and the
 networking of information from the client to the server and vice versa. It 
 handles resource management and is designed to make libraries work together.
 
-It should be parented to ServerScriptService.NevermoreEngine, and is a ModularScript
+It should be parented to `ServerScriptService.NevermoreEngine`, and is a `ModularScript`
 
 --------------
 File Structure
@@ -43,8 +43,8 @@ file structure uploaded to the git repository.
 
 Modules
 -------
-Modules contain scripts, localscripts, and ModuleScripts. LocalScripts and 
-ModuleScripts are replciated. Any script ending in .Main will execute, as well
+Modules contain scripts, localscripts, and ModuleScripts. `LocalScripts` and 
+`ModuleScripts` are replciated. Any script ending in .Main will execute, as well
 as any script that is not disabled (Although Nevermore will complain).
 
 Modules cache, so it is important that all required modules already exist at the
@@ -95,7 +95,7 @@ Main resouces are scripts in Modules that end in .Main or are not disabled.
 Update / Change Log
 -------------------
 February 9th, 2014 [0.2.0.3]
-- Fixed RemoteEvent Firing in server
+- Fixed `RemoteEvent` Firing in server
 
 February 8th, 2014 [0.2.0.2]
 - Pushed to github
