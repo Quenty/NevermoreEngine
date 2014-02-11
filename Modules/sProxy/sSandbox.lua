@@ -46,6 +46,9 @@ local function MakeExecutor(Source, Options)
 			if Type.isAnInstance(Value) and Value.Name == "Quenty" then -- Filter out anything named "Quenty"
 				return true
 			end
+
+			-- Another example would be: Filter = function(Value) if Value == game.SavePlace then return true end end
+			-- to filter SavePlace
 		end
 	}
 	--]]
