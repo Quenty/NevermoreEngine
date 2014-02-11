@@ -1,7 +1,8 @@
 -- A system by Seranok to sandbox methods in ROBLOX.
 -- https://github.com/matthewdean/sandbox.lua/blob/master/examples/sandbox.lua
 
--- Modified by Quenty
+-- @author Quenty
+-- Last Modified February 10th, 2014
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
