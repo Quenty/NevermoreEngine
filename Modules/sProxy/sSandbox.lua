@@ -53,6 +53,12 @@ local function MakeExecutor(Source, Options)
 	--[[
 
 	Executor
+		An executor is a pseudo object used to regulate the execution of Lua code. It will attempt to collect
+		output, errors, and execution span, as well as regulate what ROBLOX API is accessed. 
+
+		Note that the Filter function in Options must be very well designed otherwise methods such as :ClearAllChildren()
+		and Workspace.Destroy(Workspace.Part.SomethingYouDoNotWantRemoved) can be abused to escape the sandbox.
+
 		`Number` TimeStamp
 			The timestamp when the executor was created and executed
 		`Output` Signal
