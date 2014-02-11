@@ -14,6 +14,9 @@ qSystems:Import(getfenv(0))
 -- qSystems is only required for CreateSignal(), which may also be found in RbxUtility
 -- qSystems CreateSignal() is better, but you may use RbxUtilities. 
 
+-- The following line will remove qSystem dependency. 
+-- local CreateSignal = LoadLibrary("RbxUtility").CreateSignal
+
 local lib = {}
 
 local function MakeExecuter(Source, Options)
