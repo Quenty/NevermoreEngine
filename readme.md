@@ -100,6 +100,8 @@ Main resouces are scripts in Modules that end in .Main or are not disabled.
 Nevermore has several configuration options that can be modified in the main 
 module. 
 
+Blacklist - The blacklist is used to ban players automatically from the game. 
+
 # Update / Change Log
 This change log is *strictly* for Nevermore's module and documentation only.
 
