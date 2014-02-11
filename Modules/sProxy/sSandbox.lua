@@ -7,10 +7,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
+local qSystems          = LoadCustomLibrary("qSystems") -- See import statement.
 local FilteredProxy     = LoadCustomLibrary("FilteredProxy")
 
 qSystems:Import(getfenv(0))
+-- qSystems is only required for CreateSignal(), which may also be found in RbxUtility
+-- qSystems CreateSignal() is better, but you may use RbxUtilities. 
 
 local lib = {}
 
