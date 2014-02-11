@@ -19,21 +19,19 @@ local AuthenticationService = {} do
 		-- Testing purposes
 		"Player1";
 		"Player";
-		
-		-- Regular
 		"Quenty";
 		"Mauv";
-		-- "ColorfulBody";
+		"ColorfulBody";
 		"Merely";
 		"Seranok";
 		"blobbyblob";
 		"xXxMoNkEyMaNxXx";
 		"Azureous";
-
-		-- Chill admins 
 		"Anaminus";
 		"sim0nsays";
 		"tone";
+		"Shobobo99";
+		"Worsen";
 	}
 
 	local function IsAuthorized(PlayerName)

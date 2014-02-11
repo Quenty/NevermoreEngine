@@ -227,12 +227,14 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 
 				local DoorName = GateConnection.DoorID
 				GateConnection.DestinationGate = AreaModel:FindFirstChild(DoorName) or error("New Area does not have a door named '" .. DoorName .."'")
+				GateConnection.DestinationArea = NewArea
 
 				GateConnection.DestinationGate.Touched:connect(function(Part)
 					local Character, Player = GetCharacter(Part)
 					if Character and Player then
 						if CheckCharacter(Player) and Character.Humanoid.Health > 0 then
 							PositionCharacter(GateConnection.BaseGate, Character)
+							print("Player leave")
 							NewArea.UntrackCharacter(Player)
 						end
 					end
@@ -266,9 +268,10 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 				local CurrentTime = tick()
 				local Count = 0
 				for Player, Character in pairs(Characters) do
-					if (Player and Player.Parent == Players and Player.Character) then
+					if (Player and Player.Parent == Players and Character and Character.Parent) then
 						Count = Count + 1
 					else
+						-- print("Player invalid")
 						NewArea.UntrackCharacter(Player)
 					end
 				end
@@ -286,17 +289,21 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 				-- @param Charater The character of the player
 				-- @pre Charater is checked (Verify Humanoid)
 
-				print("[AreaLoader] - Tracking player " .. Player.Name)
+				-- print("[AreaLoader] - Tracking player " .. Player.Name)
 				
 				Characters[Player] = Character
 
 				EventTracker[NewArea][Player.Name].Died = Character.Humanoid.Died:connect(function()
+					-- print("Player died")
 					NewArea.UntrackCharacter(Player)
 				end)
 
 				EventTracker[NewArea][Player.Name].Respawn = Player.CharacterAdded:connect(function()
+					-- print("Player respawn")
 					NewArea.UntrackCharacter(Player)
 				end)
+
+				LastUpdate = tick()
 			end
 			NewArea.TrackCharacter = TrackCharacter
 			NewArea.trackCharacter = TrackCharacter
@@ -305,9 +312,10 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 				--- Untracks a player, should be called when a player is not in the area anymore
 				-- @param Player The player to untrack.
 
-				print("[AreaLoader] - Untracked " .. Player.Name)
+				-- print("[AreaLoader] - Untracked " .. Player.Name)
 				Characters[Player] = nil
 				EventTracker[NewArea][Player.Name] = nil
+				LastUpdate = tick()
 				-- GCCheckCycle() 
 			end
 			NewArea.UntrackCharacter = UntrackCharacter
@@ -329,6 +337,7 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 
 				for _, Item in pairs(GatewayConnections) do
 					Item.DestinationGate = nil
+					Item.DestinationArea = nil
 				end
 				NewModel.Parent = nil
 				NewModel:Destroy()
@@ -347,6 +356,7 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 
 	EventTracker.PlayerLeaving = Players.PlayerRemoving:connect(function(Player)
 		for NewArea, _ in pairs(Areas) do
+			-- print("Player leave game")
 			NewArea.UntrackCharacter(Player)
 		end
 	end)
@@ -389,6 +399,8 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 		--- When a player requests to go into a gateway, (triggered by touch), this will actaully handle the request.
 
 		if GatewayConnection.DestinationGate then
+			GatewayConnection.DestinationArea.TrackCharacter(Player, Character)
+
 			PositionCharacter(GatewayConnection.DestinationGate, Character)
 		else
 			local Rendered, MainPart = DestinationRender.Render(GatewayConnection, unpack(DestinationRender.Arguments))
