@@ -78,6 +78,8 @@ local function MakeExecutor(Source, Options)
 
 	local Executor = {}
 	Executor.TimeStamp = tick() 
+
+	--Note that LogService provides a more robust solution than this.
 	Executor.Output = CreateSignal() -- Fires (Output)
 		-- @param Output A string
 	Executor.Finished = CreateSignal() -- Fires (Success, Error)
