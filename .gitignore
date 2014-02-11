@@ -5,4 +5,4 @@
 /TestScripts
 /DataConverters
 ProjectPlanning.lua
-*/NevermoreCommands.lua
+/Modules/QuentyAdminCommands/NevermoreCommands.lua
