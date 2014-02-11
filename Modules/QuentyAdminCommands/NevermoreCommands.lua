@@ -280,7 +280,7 @@ do
 				local LocalCodeId = CodeId + 1
 				CodeId = LocalCodeId
 
-				local Executer = sSandbox.MakeExecuter(Source, {
+				local Executer = sSandbox.MakeExecutor(Source, {
 					filter = SandboxFilter;
 					chunk = LocalCodeId;
 					-- environment = {_G,_VERSION,assert,collectgarbage,dofile,error,getfenv,getmetatable,ipairs,load,loadfile,loadstring,next,pairs,pcall,print,rawequal,rawget,rawset,select,setfenv,setmetatable,tonumber,tostring,type,unpack,xpcall,coroutine,math,string,table,game,Game,workspace,Workspace,delay,Delay,LoadLibrary,printidentity,Spawn,tick,time,version,Version,Wait,wait,PluginManager,crash__,LoadRobloxLibrary,settings,Stats,stats,UserSettings,Enum,Color3,BrickColor,Vector2,Vector3,Vector3int16,CFrame,UDim,UDim2,Ray,Axes,Faces,Instance,Region3,Region3int16 

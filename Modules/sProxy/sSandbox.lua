@@ -19,8 +19,8 @@ qSystems:Import(getfenv(0))
 
 local lib = {}
 
-local function MakeExecuter(Source, Options)
-	--- Executes code and creates an "executer" object.
+local function MakeExecutor(Source, Options)
+	--- Executes code and creates an "Executor" object.
 	-- @param Source A String, the source of the code to execute.  
 	-- @param Options A table filled with Options, in this case, organized like this:
 	--[[
@@ -50,11 +50,11 @@ local function MakeExecuter(Source, Options)
 	}
 	--]]
 
-	local Executer = {}
-	Executer.TimeStamp = tick() 
-	Executer.Output = CreateSignal() -- Fires (Output)
+	local Executor = {}
+	Executor.TimeStamp = tick() 
+	Executor.Output = CreateSignal() -- Fires (Output)
 		-- @param Output A string
-	Executer.Finished = CreateSignal() -- Fires (Success, Error)
+	Executor.Finished = CreateSignal() -- Fires (Success, Error)
 		-- @param Boolean, true if it executed without error.
 		-- @param Error The error if it happened. 
 
@@ -72,12 +72,12 @@ local function MakeExecuter(Source, Options)
 					t[i] = tostring(t[i])
 				end
 
-				Executer.Output:fire(table.concat(t, ' '))
+				Executor.Output:fire(table.concat(t, ' '))
 			end
 			
 			local ExecuteFunction, err = loadstring(Source, Options.chunk or "chunk")
 			if ExecuteFunction == nil then
-				Executer.Finished:fire(false, err)
+				Executor.Finished:fire(false, err)
 			else
 				Options.environment = Options.environment or getfenv(0);--{_G,_VERSION,assert,collectgarbage,dofile,error,getfenv,getmetatable,ipairs,load,loadfile,loadstring,next,pairs,pcall,print,rawequal,rawget,rawset,select,setfenv,setmetatable,tonumber,tostring,type,unpack,xpcall,coroutine,math,string,table,game,Game,workspace,Workspace,delay,Delay,LoadLibrary,printidentity,Spawn,tick,time,version,Version,Wait,wait,PluginManager,crash__,LoadRobloxLibrary,settings,Stats,stats,UserSettings,Enum,Color3,BrickColor,Vector2,Vector3,Vector3int16,CFrame,UDim,UDim2,Ray,Axes,Faces,Instance,Region3,Region3int16 = _G,_VERSION,assert,collectgarbage,dofile,error,getfenv,getmetatable,ipairs,load,loadfile,loadstring,next,pairs,pcall,print,rawequal,rawget,rawset,select,setfenv,setmetatable,tonumber,tostring,type,unpack,xpcall,coroutine,math,string,table,game,Game,workspace,Workspace,delay,Delay,LoadLibrary,printidentity,Spawn,tick,time,version,Version,Wait,wait,PluginManager,crash__,LoadRobloxLibrary,settings,Stats,stats,UserSettings,Enum,Color3,BrickColor,Vector2,Vector3,Vector3int16,CFrame,UDim,UDim2,Ray,Axes,Faces,Instance,Region3,Region3int16}
 				Options.environment.print = print
@@ -89,19 +89,19 @@ local function MakeExecuter(Source, Options)
 					-- if err == "Game script timout" then
 					-- 	wait() --FIXME hack
 					-- end
-					Executer.Finished:fire(false, err)
+					Executor.Finished:fire(false, err)
 				else
-					Executer.Finished:fire(true)
+					Executor.Finished:fire(true)
 				end
 			end
 		end)
 	end
-	Executer.Execute = Execute
-	Executer.execute = Execute
+	Executor.Execute = Execute
+	Executor.execute = Execute
 
-	return Executer
+	return Executor
 end
-lib.MakeExecuter = MakeExecuter
-lib.makeExecuter = MakeExecuter
+lib.MakeExecutor = MakeExecutor
+lib.makeExecutor = MakeExecutor
 
 return lib
