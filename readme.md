@@ -1,4 +1,4 @@
-# About
+## About
 ```
 @author Quenty
 (C) 2014 Quenty
@@ -14,7 +14,7 @@ It should be parented to `ServerScriptService.NevermoreEngine`, and is a
 
 Nevermore was written for use in ROBLOX.
 
-# File Structure
+## File Structure
 Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
 should be setup like this. Nevermore Engine uses Backpack objects to store 
 modules
@@ -51,14 +51,14 @@ as any script that is not disabled (Although Nevermore will complain).
 Modules cache, so it is important that all required modules already exist at the
 time of running.
 
-## App
+### App
 App contains specific files used by Nevermore.
 
 
 Nevermore is designed to execute multiple times without breaking anything, so it
 will work in a PrivateServer. Modules will be cloned, et cetera.
 
-# Loading
+## Loading
 Loading on the server and the client may be done by using the following code:
 
 ```lua
@@ -102,7 +102,7 @@ module.
 
 Blacklist - The blacklist is used to ban players automatically from the game. 
 
-# Update / Change Log
+## Update / Change Log
 This change log is *strictly* for Nevermore's module and documentation only.
 
 ##### February 9th, 2014 [0.2.0.3]
