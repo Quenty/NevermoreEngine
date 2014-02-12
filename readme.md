@@ -19,7 +19,7 @@ Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
 should be setup like this. Nevermore Engine uses Backpack objects to store 
 modules
 
-```lua
+```
 <<< ROOT >>>
 	Workspace
 	Players
