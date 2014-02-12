@@ -155,17 +155,17 @@ local function PersonifyCharacter(Character, PartSource, DoNotRemoveAnimateScrip
 
 	local BodyColors = Character:FindFirstChild("Body Colors")
 
-	local torso = AddPart("PTorso", CharacterTorso, CFrame.new(0, 0.5, 0), CFrame.new()); torso.BrickColor = (BodyColors and BodyColors.TorsoColor) or GetColor("Torso")
+	local torso         = AddPart("PTorso", CharacterTorso, CFrame.new(0, 0.5, 0), CFrame.new()); torso.BrickColor = (BodyColors and BodyColors.TorsoColor) or GetColor("Torso")
 	local rightshoulder = AddPart("PRightShoulder", torso, CFrame.new(1.0, 0.25, 0), CFrame.new(0, 0.25, 0)); rightshoulder.BrickColor = (BodyColors and BodyColors.RightArmColor) or GetColor("Right Arm")
-	local leftshoulder = AddPart("PLeftShoulder", torso, CFrame.new(-1.0, 0.25, 0), CFrame.new(0, 0.25, 0)); leftshoulder.BrickColor = (BodyColors and BodyColors.LeftArmColor) or GetColor("Left Arm")
-	local rightbicep = AddPart("PRightBicep", rightshoulder, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.5, 0)); rightbicep.BrickColor = (BodyColors and BodyColors.RightArmColor) or GetColor("Right Arm")
-	local leftbicep = AddPart("PLeftBicep", leftshoulder, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.5, 0)); leftbicep.BrickColor = (BodyColors and BodyColors.LeftArmColor) or GetColor("Left Arm")
+	local leftshoulder  = AddPart("PLeftShoulder", torso, CFrame.new(-1.0, 0.25, 0), CFrame.new(0, 0.25, 0)); leftshoulder.BrickColor = (BodyColors and BodyColors.LeftArmColor) or GetColor("Left Arm")
+	local rightbicep    = AddPart("PRightBicep", rightshoulder, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.5, 0)); rightbicep.BrickColor = (BodyColors and BodyColors.RightArmColor) or GetColor("Right Arm")
+	local leftbicep     = AddPart("PLeftBicep", leftshoulder, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.5, 0)); leftbicep.BrickColor = (BodyColors and BodyColors.LeftArmColor) or GetColor("Left Arm")
 	--
-	local hips = AddPart("PHips", torso, CFrame.new(0, -0.25, 0), CFrame.new(0, 0.5, 0)); hips.BrickColor = (BodyColors and BodyColors.TorsoColor) or GetColor("Torso")
-	local rightleg = AddPart("PRightLeg", hips, CFrame.new(0.4, -0.5, 0), CFrame.new(0, 0.25, 0)); rightleg.BrickColor = (BodyColors and BodyColors.RightLegColor) or GetColor("Right Leg")
-	local leftleg = AddPart("PLeftLeg", hips, CFrame.new(-0.4, -0.5, 0), CFrame.new(0, 0.25, 0)); leftleg.BrickColor = (BodyColors and BodyColors.LeftLegColor) or GetColor("Left Leg")
-	local rightshin = AddPart("PRightShin", rightleg, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.75, 0)); rightshin.BrickColor = (BodyColors and BodyColors.RightLegColor) or GetColor("Right Leg")
-	local leftshin = AddPart("PLeftShin", leftleg, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.75, 0)); leftshin.BrickColor = (BodyColors and BodyColors.LeftLegColor) or GetColor("Left Leg")
+	local hips          = AddPart("PHips", torso, CFrame.new(0, -0.25, 0), CFrame.new(0, 0.5, 0)); hips.BrickColor = (BodyColors and BodyColors.TorsoColor) or GetColor("Torso")
+	local rightleg      = AddPart("PRightLeg", hips, CFrame.new(0.4, -0.5, 0), CFrame.new(0, 0.25, 0)); rightleg.BrickColor = (BodyColors and BodyColors.RightLegColor) or GetColor("Right Leg")
+	local leftleg       = AddPart("PLeftLeg", hips, CFrame.new(-0.4, -0.5, 0), CFrame.new(0, 0.25, 0)); leftleg.BrickColor = (BodyColors and BodyColors.LeftLegColor) or GetColor("Left Leg")
+	local rightshin     = AddPart("PRightShin", rightleg, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.75, 0)); rightshin.BrickColor = (BodyColors and BodyColors.RightLegColor) or GetColor("Right Leg")
+	local leftshin      = AddPart("PLeftShin", leftleg, CFrame.new(0, -0.5, 0), CFrame.new(0, 0.75, 0)); leftshin.BrickColor = (BodyColors and BodyColors.LeftLegColor) or GetColor("Left Leg")
 end
 lib.PersonifyCharacter = PersonifyCharacter
 lib.personifyCharacter = PersonifyCharacter

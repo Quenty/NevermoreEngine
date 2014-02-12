@@ -19,7 +19,7 @@ Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
 should be setup like this. Nevermore Engine uses Backpack objects to store 
 modules
 
-```
+```lua
 <<< ROOT >>>
 	Workspace
 	Players
@@ -61,7 +61,7 @@ will work in a PrivateServer. Modules will be cloned, et cetera.
 # Loading
 Loading on the server and the client may be done by using the following code:
 
-```
+```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Nevermore         = require(ReplicatedStorage:WaitForChild("NevermoreEngine")))
