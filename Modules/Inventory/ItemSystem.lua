@@ -15,6 +15,9 @@ local lib = {}
 -- @author Quenty
 
 --[[ -- Change Log
+February 11th, 2014
+- Opened up GenerateUID to the world
+
 February 7th, 2014
 - Updated so Data is now stored locally in a table. 
 - Added change log
@@ -275,6 +278,8 @@ local MakeItemSystem = Class(function(ItemSystem, Configuration, ItemClassList, 
 		UIDCounter = UIDCounter + 1
 		return "Class@" .. tostring(ItemData) .. "@" .. UIDCounter
 	end
+	ItemSystem.GenerateUID = GenerateUID]
+	ItemSystem.generateUID = GenerateUID
 
 	local function ConstructNewItem(ClassName, ...)
 		--- Constructs a new item, with the ClassName 'ClassName'
@@ -344,6 +349,12 @@ local MakeItemSystem = Class(function(ItemSystem, Configuration, ItemClassList, 
 		NewClass.Data       = {}
 		for Index, Value in pairs(Data) do
 			NewClass.Data[Index:lower()] = Value
+		end
+		for AttributeName, AttributeObject in pairs(ItemClasses[ClassName].AttributeBin) do
+			if not NewClass.Data[AttributeName:lower()] then
+				print("[ItemSystem] - Warning, '" .. AttributeName .. "' was not included in Data!")
+				NewClass.Data[AttributeName:lower()] = AttributeObject.Value
+			end
 		end
 		NewClass.Interfaces = {}
 

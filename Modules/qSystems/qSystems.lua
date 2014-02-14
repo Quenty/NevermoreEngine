@@ -341,20 +341,20 @@ lib.waitForChild = waitForChild;
 lib.WaitForChild = waitForChild;
 lib.wait_for_child = waitForChild;
 
-local callOnChildren
+local CallOnChildren
 
-local function callOnChildren(instance, functionToCall)
+local function CallOnChildren(Instance, FunctionToCall)
 	-- Calls a function on each of the children of a certain object, using recursion.  
 
-	functionToCall(instance)
+	FunctionToCall(Instance)
 
-	for _, child in next, instance:GetChildren() do
-		callOnChildren(child, functionToCall)
+	for _, Child in next, Instance:GetChildren() do
+		CallOnChildren(Child, FunctionToCall)
 	end
 end
-lib.callOnChildren = callOnChildren
-lib.CallOnChildren = callOnChildren
-lib.call_on_children = callOnChildren
+lib.callOnChildren = CallOnChildren
+lib.CallOnChildren = CallOnChildren
+lib.call_on_children = CallOnChildren
 
 
 local function getNearestParent(instance, className)

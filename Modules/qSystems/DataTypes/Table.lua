@@ -58,7 +58,8 @@ lib.get_string_table = GetStringTable
 
 
 local function Append(Table, NewTable, Callback)
--- Addes al of NewTable's values to Table..
+	-- Addes all of NewTable's values to Table..
+
 	if Callback then
 		for _, Item in pairs(NewTable) do
 			if Callback(Item) then

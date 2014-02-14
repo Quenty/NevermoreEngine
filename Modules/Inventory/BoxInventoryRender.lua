@@ -3,12 +3,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
-local Table             = LoadCustomLibrary("Table")
-local qString           = LoadCustomLibrary("qString")
-local qGUI              = LoadCustomLibrary("qGUI")
-local ScrollBar         = LoadCustomLibrary("ScrollBar")
-local EventGroup        = LoadCustomLibrary("EventGroup")
+local qSystems                = LoadCustomLibrary("qSystems")
+local Table                   = LoadCustomLibrary("Table")
+local qString                 = LoadCustomLibrary("qString")
+local qGUI                    = LoadCustomLibrary("qGUI")
+local ScrollBar               = LoadCustomLibrary("ScrollBar")
+local EventGroup              = LoadCustomLibrary("EventGroup")
+local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
 
 -- BoxInventoryRender.lua
 -- @author Quenty
@@ -16,6 +17,10 @@ local EventGroup        = LoadCustomLibrary("EventGroup")
 -- with it. It's basically split between datastructures and rendering structures. 
 
 --[[ -- Change Log
+---- NOTE INDIVIDUAL CHANGE LOGS ARE NOW ALSO MAINTAINED PER A CLASS. GLOBAL CHANGES LISTED HERE (Changes related to whole system)
+
+February 13th, 2014
+- OverriddenConfiguration is now semi-utilized
 
 February 7th, 2014
 - Updated to name BoxInventoryRender (previous InventoryRender)
@@ -168,6 +173,9 @@ local function RenderSizeIcon(IconSize, GridSize, Color, ZIndex)
 	return RenderFrame
 end
 
+--[[
+	Made Configuration use OverriddenConfiguration 
+--]]
 local function MakeCollapseButton(State, Configuration)
 	--- Makes a minimize/maximize window icon.
 	-- @param State If true, shows the maximize button, otherwise shows the minimze button.
@@ -175,82 +183,82 @@ local function MakeCollapseButton(State, Configuration)
 	
 	State = State or false; -- Presume if no state is given that the window is shown.
 
-	local Configuration = {
-		DefaultTransparency = (Configuration and Configuration.DefaultTransparency) or 0.3;
-		Color = (Configuration and Configuration.Color) or Color3.new(1, 1, 1);
-		ZIndex = (Configuration and Configuration.ZIndex) or 1;
-		OnOverTransparency = (Configuration and Configuration.OnOverTransparency) or 0;
+	Configuration = OverriddenConfiguration.new(Configuration, {
+		DefaultTransparency    = (Configuration and Configuration.DefaultTransparency) or 0.3;
+		Color                  = (Configuration and Configuration.Color) or Color3.new(1, 1, 1);
+		ZIndex                 = (Configuration and Configuration.ZIndex) or 1;
+		OnOverTransparency     = (Configuration and Configuration.OnOverTransparency) or 0;
 		TransparencyChangeTime = (Configuration and Configuration.TransparencyChangeTime) or 0.1;
-		DoAnimateOnOver = (Configuration and Configuration.DoAnimateOnOver ~= nil and Configuration.DoAnimateOnOver) or true;
-	}
+		DoAnimateOnOver        = (Configuration and Configuration.DoAnimateOnOver ~= nil and Configuration.DoAnimateOnOver) or true;
+	})
 	local Button = {}
 	
 	
 	local CollapseButton = Make 'ImageButton' {
-		Archivable = false;
+		Archivable             = false;
 		BackgroundTransparency = 1;
-		BackgroundColor3 = Configuration.Color;
-		Image = "";
-		Size = UDim2.new(0, 30, 0, 25);
-		ZIndex = Configuration.ZIndex + 1;
-		BorderSizePixel = 0;
+		BackgroundColor3       = Configuration.Color;
+		Image                  = "";
+		Size                   = UDim2.new(0, 30, 0, 25);
+		ZIndex                 = Configuration.ZIndex + 1;
+		BorderSizePixel        = 0;
 		Make 'Frame' {
-			Name = "Minimize";
-			ZIndex = Configuration.ZIndex;
-			Archivable = false;
-			BorderSizePixel = 0;
-			BackgroundColor3 = Configuration.Color;
-			Position = UDim2.new(0.1, 0, 0.6, 0);
-			Style = "Custom";
-			Visible = false;
+			Name                   = "Minimize";
+			ZIndex                 = Configuration.ZIndex;
+			Archivable             = false;
+			BorderSizePixel        = 0;
+			BackgroundColor3       = Configuration.Color;
+			Position               = UDim2.new(0.1, 0, 0.6, 0);
+			Style                  = "Custom";
+			Visible                = false;
 			BackgroundTransparency = Configuration.DefaultTransparency;
-			Size = UDim2.new(0.8, 0, 0.2, 0);
+			Size                   = UDim2.new(0.8, 0, 0.2, 0);
 		};
 		Make 'Frame' {
-			Name = "Maximize";
-			ZIndex = ZIndex;
-			Archivable = false;
-			BorderSizePixel = 0;
+			Name                   = "Maximize";
+			ZIndex                 = ZIndex;
+			Archivable             = false;
+			BorderSizePixel        = 0;
 			BackgroundTransparency = 1;
-			Position = UDim2.new(0, 0, 0, 0);
-			Style = "Custom";
-			Visible = false;
-			Size = UDim2.new(1, 0, 1, 0);
+			Position               = UDim2.new(0, 0, 0, 0);
+			Style                  = "Custom";
+			Visible                = false;
+			Size                   = UDim2.new(1, 0, 1, 0);
 			Make 'Frame' {
-				ZIndex = Configuration.ZIndex;
-				Archivable = false;
-				BorderSizePixel = 0;
+				ZIndex                 = Configuration.ZIndex;
+				Archivable             = false;
+				BorderSizePixel        = 0;
 				BackgroundTransparency = Configuration.DefaultTransparency;
-				BackgroundColor3 = Configuration.Color;
-				Position = UDim2.new(0.1, 0, 0.2, 0);
-				Size = UDim2.new(0.8, 0, 0.25, 0);
+				BackgroundColor3       = Configuration.Color;
+				Position               = UDim2.new(0.1, 0, 0.2, 0);
+				Size                   = UDim2.new(0.8, 0, 0.25, 0);
 			};
 			Make 'Frame' {
-				ZIndex = Configuration.ZIndex;
-				Archivable = false;
-				BorderSizePixel = 0;
+				ZIndex                 = Configuration.ZIndex;
+				Archivable             = false;
+				BorderSizePixel        = 0;
 				BackgroundTransparency = Configuration.DefaultTransparency;
-				BackgroundColor3 = Configuration.Color;
-				Position = UDim2.new(0.1, 0, 0.75, 0);
-				Size = UDim2.new(0.8, 0, 0.1, 0);
+				BackgroundColor3       = Configuration.Color;
+				Position               = UDim2.new(0.1, 0, 0.75, 0);
+				Size                   = UDim2.new(0.8, 0, 0.1, 0);
 			};
 			Make 'Frame' {
-				ZIndex = Configuration.ZIndex;
-				Archivable = false;
-				BorderSizePixel = 0;
+				ZIndex                 = Configuration.ZIndex;
+				Archivable             = false;
+				BorderSizePixel        = 0;
 				BackgroundTransparency = Configuration.DefaultTransparency;
-				BackgroundColor3 = Configuration.Color;
-				Position = UDim2.new(0.8, 0, 0.45, 0);
-				Size = UDim2.new(0.1, 0, 0.3, 0);
+				BackgroundColor3       = Configuration.Color;
+				Position               = UDim2.new(0.8, 0, 0.45, 0);
+				Size                   = UDim2.new(0.1, 0, 0.3, 0);
 			};
 			Make 'Frame' {
-				ZIndex = Configuration.ZIndex;
-				Archivable = false;
-				BorderSizePixel = 0;
+				ZIndex                 = Configuration.ZIndex;
+				Archivable             = false;
+				BorderSizePixel        = 0;
 				BackgroundTransparency = Configuration.DefaultTransparency;
-				BackgroundColor3 = Configuration.Color;
-				Position = UDim2.new(0.1, 0, 0.45, 0);
-				Size = UDim2.new(0.1, 0, 0.3, 0);
+				BackgroundColor3       = Configuration.Color;
+				Position               = UDim2.new(0.1, 0, 0.45, 0);
+				Size                   = UDim2.new(0.1, 0, 0.3, 0);
 			};
 		};
 	}
@@ -401,6 +409,11 @@ lib.makePercentFilledImage = MakePercentFilledImage
 ------------------------
 -- MAIN CLASS SYSTEMS --
 ------------------------
+--[[
+Change Log
+- Added SelectionChanged event.
+
+--]]
 local MakeBoxSelection = Class(function(BoxSelection, Box2DInterface)
 	-- Datastructure to handle the selection of items...
 	-- @param Box2DInterface The Box2DInterface associated with the selection. The Box2DInterface will
@@ -411,11 +424,16 @@ local MakeBoxSelection = Class(function(BoxSelection, Box2DInterface)
 	local Selected = {}
 	local SelectedListCache -- Cache selection list.
 
-	BoxSelection.SelectionAdded = CreateSignalInternal() -- When a single new item is selected. Will fire many times relative to
+	BoxSelection.SelectionAdded        = CreateSignalInternal() -- When a single new item is selected. Will fire many times relative to
 	                                           -- SelectionGroupAdded's firing rate.
-	BoxSelection.SelectionGroupAdded = CreateSignalInternal() -- When a group is added. Cut down on calcuations..
-	BoxSelection.SelectionRemoved = CreateSignalInternal() -- Like above, but when an item is unselected. 
+	BoxSelection.SelectionGroupAdded   = CreateSignalInternal() -- When a group is added. Cut down on calcuations..
+	BoxSelection.SelectionRemoved      = CreateSignalInternal() -- Like above, but when an item is unselected. 
 	BoxSelection.SelectionGroupRemoved = CreateSignalInternal() -- Like above, but when an item is unselected. 
+	
+	BoxSelection.SelectionChanged      = CreateSignalInternal() -- This one is fired when the counts inside of the selection change.
+	-- Also fired when group events fires.
+
+	-- Note that firing is done via outside items of the class too....
 
 	local function Select(self, ...)
 		-- Select's an object, if it can be selected.
@@ -445,6 +463,7 @@ local MakeBoxSelection = Class(function(BoxSelection, Box2DInterface)
 		end
 		if #SelectedList >= 1 then
 			BoxSelection.SelectionGroupAdded:fire(SelectedList)
+			BoxSelection.SelectionChanged:fire()
 		end
 	end
 	BoxSelection.Select = Select;
@@ -489,6 +508,7 @@ local MakeBoxSelection = Class(function(BoxSelection, Box2DInterface)
 		end
 		if #UnselectedItems >= 1 then
 			BoxSelection.SelectionGroupRemoved:fire(UnselectedItems)
+			BoxSelection.SelectionChanged:fire()
 		end
 	end
 	BoxSelection.Unselect = Unselect
@@ -527,8 +547,13 @@ local MakeBoxSelection = Class(function(BoxSelection, Box2DInterface)
 	BoxSelection.unselectAll = UnselectAll
 end)
 
+--[[ Change Log
 
-local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRender, ItemColor)
+February 13th, 2014
+- Added Configuration argument
+
+--]]
+local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRender, ItemColor, Configuration)
 	--  Will probably be removed/added a lot.. Only one should exist per an item. Used internally. 
 
 	-- Local variables
@@ -540,7 +565,7 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 
 	-- Global variables.
 
-	local Configuration = {
+	local Configuration = OverriddenConfiguration.new(Configuration, {
 		DefaultTransparency           = 1; -- Normal transparency...
 		SelectedTransparency          = 0.4; -- Transparency when the item is selected. 
 		MouseOverTransparencyChange   = 0.8; -- Transparency when the mouse is over it. Inversed.
@@ -554,7 +579,7 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 		CheckmarkIconSize             = 20; -- In pixels
 		GridSizeIconSize              = 30;
 		CheckmarkIcon                 = "http://www.roblox.com/asset/?id=136822096"; --"http://www.roblox.com/asset/?id=136821278";
-	}
+	})
 	Configuration.CurrentTransparency = Configuration.DefaultTransparency
 
 	-- Start rendering. 
@@ -771,12 +796,13 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 
 		return #CurrentItems
 	end
-	Box2DRenderItem.GetCurrentItemCount = GetCurrentItemCount;
-
+	Box2DRenderItem.GetCurrentItemCount = GetCurrentItemCount
+	Box2DRenderItem.getCurrentItemCount = GetCurrentItemCount
 
 	local function UpdateItemCount()
 		-- Updates rendering/item count
 		-- TODO: Animate better
+
 		local CurrentItemCount = GetCurrentItemCount()
 
 		CountLabel.Text = "// "..CurrentItemCount
@@ -794,6 +820,9 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 
 		CurrentItems[#CurrentItems+1] = Item;
 		UpdateItemCount()
+
+		-- Update selection change, so the option modules change. Yes, it's this complicated.
+		BoxInventoryRender.Box2DInterface.BoxSelection.SelectionChanged:fire()
 	end
 	Box2DRenderItem.AddItemToSlot = AddItemToSlot;
 	Box2DRenderItem.addItemToSlot = AddItemToSlot
@@ -806,7 +835,7 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 
 		for Index, ItemInList in pairs(CurrentItems) do
 			if ItemInList.UID == Item.UID then
-				return Index;
+				return Index
 			end
 		end
 		return nil;
@@ -825,9 +854,12 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 		if ItemIndex then
 			local Removed = table.remove(CurrentItems, ItemIndex)
 			UpdateItemCount()
+
+			-- Update selection change, so the option modules change. Panic. Now.
+			BoxInventoryRender.Box2DInterface.BoxSelection.SelectionChanged:fire()
 			return Removed
 		else
-			error("[InventoryRender][RemoveItemFromSlot] - ItemIndex could not be identified, the item is not in the slot.")
+			error("[BoxInventoryRender][RemoveItemFromSlot] - ItemIndex could not be identified, the item is not in the slot.")
 			return nil
 		end
 		
@@ -881,7 +913,7 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 		-- @return If it is successfully destroyed.
 
 		if GetCurrentItemCount() > 0 then
-			error("[InventoryRender] - Cannot destroy, There are still "..GetCurrentItemCount().." item(s) in this renderthingy")
+			error("[BoxInventoryRender] - Cannot destroy, There are still "..GetCurrentItemCount().." item(s) in this renderthingy")
 			return false;
 		else
 			if BoxInventoryRender.Box2DInterface.BoxSelection.IsSelected(Item) then
@@ -949,7 +981,13 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 	--Update()
 end)
 
+--[[
+Change Log
 
+February 13th, 2014
+- Fixed problem with RenderFrame leaving some frames visible.
+
+--]]
 local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, OptionSystem, ShowCallback)
 	--- An option module that can be assigned to specific types of inventories.  Groups options, such as "Jetson" and "Destroy" I guess
 	-- Can be collapsed.
@@ -989,8 +1027,8 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 		ClipsDescendants       = true;
 		Name                   = "RenderFrame";
 		Parent                 = MainFrame; -- Can be sketch. But tweening requires a parent. Also, title doesn't work without it.
-		Position               = UDim2.new(0, 0, 0, 0);
-		Size                   = UDim2.new(1, 0, 0, 40);
+		Position               = UDim2.new(0, 0, 0, Configuration.IndividualHeaderHeight);
+		Size                   = UDim2.new(1, 0, 1, -Configuration.IndividualHeaderHeight);
 		Visible                = true;
 		ZIndex                 = Configuration.ZIndex;
 	}
@@ -1093,7 +1131,7 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 
 		CollapseButton.SetState(IsCollapsed)
 
-		local YHeight = Configuration.IndividualHeaderHeight;
+		local YHeight = 0;
 		local ShowCount = 0;
 
 		for _, Option in pairs(OptionList) do
@@ -1112,8 +1150,7 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 		end
 		InventoryOptionModule.RenderHeightY = YHeight;
 		MainFrame.Size = UDim2.new(0, Configuration.ColumnWidth, 0, InventoryOptionModule.RenderHeightY)
-		--RenderFrame.Size = UDim2.new(1, 0, 0, InventoryOptionModule.RenderHeightY)
-		RenderFrame:TweenSize(UDim2.new(1, 0, 0, InventoryOptionModule.RenderHeightY), "Out", "Sine", Configuration.TweenAnimationTime, true)
+		RenderFrame:TweenSize(UDim2.new(1, 0, 0, YHeight), "Out", "Sine", Configuration.TweenAnimationTime, true)
 		return ShowCount;
 	end
 	InventoryOptionModule.Update = Update
@@ -1142,6 +1179,12 @@ local function GetCenterY(ScreenGui, RenderHeightY)
 end
 
 
+--[[
+Change log
+
+February 13th, 2014
+- Set it so modules now render at the top, not centered.
+--]]
 local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 	--- This handles options and stuff. This is basically how the player will interact with the inventory, so it
 	--  deserves much documentation.
@@ -1176,12 +1219,12 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 
 	OptionSystem.Configuration = {
 		IndividualHeaderHeight = 40;
-		ColumnWidth = 250;
-		ZIndex = 2;
-		PaddingY = 20; -- Padding on the top and the bottom for the topions.
-		SpacingSize = 30; -- Padding between each option;
-		ColumnPaddingX = 50; -- Padding between each column
-		TweenAnimationTime = 0.2; -- Universal animation time;
+		ColumnWidth            = 250;
+		ZIndex                 = 2;
+		PaddingY               = 20; -- Padding on the top and the bottom for the topions.
+		SpacingSize            = 30; -- Padding between each option;
+		ColumnPaddingX         = 50; -- Padding between each column
+		TweenAnimationTime     = 0.2; -- Universal animation time;
 	}
 	local Configuration = OptionSystem.Configuration
 	local BoxSelection = Box2DInterface.BoxSelection
@@ -1234,7 +1277,7 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 			if ((CurrentRenderHeightY) > MaxYHeight) then
 				-- Recenter and switch to a new column
 
-				local HeightY = GetCenterY(Box2DInterface.ScreenGui, CurrentRenderHeightY)
+				local HeightY = OptionSystem.Configuration.PaddingY -- GetCenterY(Box2DInterface.ScreenGui, CurrentRenderHeightY)
 				for Index, OptionModule in pairs(CurrentOptionModulesInColumn) do
 					if Index < #CurrentOptionModulesInColumn then -- We don't want the last one, it wraps around
 						OptionModule.Gui.Position = UDim2.new(0, (ColumnCount - 1) * (Configuration.ColumnWidth + Configuration.ColumnPaddingX), 0, HeightY)
@@ -1263,7 +1306,7 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 		if #CurrentOptionModulesInColumn >= 1 then
 			-- Finish rendering up the rest of them, but only if there's something left to render. #CurrentOptionModulesInColumn is generally > 0, except when 0 options exist.
 
-			local HeightY = GetCenterY(Box2DInterface.ScreenGui, CurrentRenderHeightY)
+			local HeightY = OptionSystem.Configuration.PaddingY -- GetCenterY(Box2DInterface.ScreenGui, CurrentRenderHeightY)
 
 			for Index, OptionModule in pairs(CurrentOptionModulesInColumn) do
 				local NewPosition = UDim2.new(0, (ColumnCount - 1) * (Configuration.ColumnWidth + Configuration.ColumnPaddingX), 0, HeightY)
@@ -1278,12 +1321,12 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 	OptionSystem.update = Update
 
 	-- Connect events. Better is use groups so a ton of items selected at once doesn't lag.
-	BoxSelection.SelectionGroupAdded:connect(function()
+	BoxSelection.SelectionChanged:connect(function()
 		Update()
 	end)
-	BoxSelection.SelectionGroupRemoved:connect(function()
-		Update()
-	end)
+	-- BoxSelection.SelectionGroupRemoved:connect(function()
+	-- 	Update()
+	-- end)
 end)
 
 
@@ -1405,7 +1448,7 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 
 		-- Loop through each item and add it.
 		for _, Item in pairs(Items) do
-			-- print("[InventoryRender] - Adding Item "..Item.ClassName)
+			-- print("[BoxInventoryRender] - Adding Item "..Item.ClassName)
 			local Interface = FindRenderInterface(Item.ClassName)
 			if not Interface then
 				Interface = {}
@@ -1416,7 +1459,7 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 				BoxInventoryRender.EventStorage[Item.ClassName].MouseButton1Click = Interface.Render.Gui.MouseButton1Click:connect(function()
 					-- Select! Yay!
 
-					-- print("[InventoryRender] - Item button clicked")
+					-- print("[BoxInventoryRender] - Item button clicked")
 					if Interface.Render.Selected then
 						Box2DInterface.BoxSelection:Unselect(Interface.Render);
 					else
@@ -1458,7 +1501,7 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 					table.remove(VisibleItems, Index) -- Clean out from VisibleItems...
 				end
 			else
-				error("[BoxInventoryRender] - Item does not exist in the InventoryRender system, cannot remove.")
+				error("[BoxInventoryRender] - Item '" .. Item.ClassName .."' does not exist in the InventoryRender system, cannot remove.")
 			end
 		end
 
@@ -1608,15 +1651,24 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 	ResizeContentFrame(true)
 end)
 
+--[[
+Box2DInterface is the TOP LEVEL interface.
 
+Change Log
+
+February 13th, 2014
+- Added "Gui" field pointing to MainFrame
+- Made configuration use OverriddenConfiguration
+
+--]]
 local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Configuration)
 	--- Models and controls the Box2D rendering overall. Supports multiple inventories. 
 
 	-- Configuration and settings
-	local Configuration = {
-		Subtitle = Configuration.Subtitle or "// yours";
-		Title    = Configuration.Title or "Inventory";
-		Width    = Configuration.Width or 250;
+	Configuration = OverriddenConfiguration.new(Configuration, {
+		Subtitle = "// trade enterprise";
+		Title    = "Stock";
+		Width    = 250;
 
 		-- Rendering options
 		ScrollbarWidth         = 7;
@@ -1629,7 +1681,7 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 		CloseIconOver          = "http://www.roblox.com/asset/?id=139944744";
 		CloseButtonSize        = 30; -- Since it's a square, the length of one side.
 		ToggleAnimationTime = 0.3; -- When toggling the inventory open or closed
-	}
+	})
 
 	Box2DInterface.Mouse = Mouse;
 
@@ -1646,6 +1698,7 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 		ZIndex                 = Configuration.ZIndex;
 		Archivable             = false;
 	}
+	Box2DInterface.Gui = MainFrame
 
 	local ContentContainer = Make 'Frame' {
 		Archivable             = false;

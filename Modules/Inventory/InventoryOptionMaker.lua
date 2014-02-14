@@ -11,6 +11,9 @@ local qGUI              = LoadCustomLibrary("qGUI")
 
 
 --[[ -- Change Log
+February 13th, 2014
+- Fixed glitch / problem with icon variables being overwritten
+
 February 7th, 2014
 - Removed BoxInventoryRender dependency
 - Added change log
@@ -48,6 +51,8 @@ local function MakeIconOptionBase(Name, Color, IconURL)
 		Visible                = true;
 		ZIndex                 = Configuration.ZIndex + 1;
 	}
+
+	local Icon
 
 	-- Generate icon if available.
 	if IconURL then
@@ -109,12 +114,12 @@ local function MakeIconOptionBase(Name, Color, IconURL)
 	end)
 
 	local Option = {}
-	Option.Gui = Button
+	Option.Gui           = Button
 	Option.RenderHeightY = Configuration.Height;
-	Option.Shown = true;
-	Option.Update = function(self, Box2DInterface)
+	Option.Shown         = true;
+	Option.Update        = function(self, Box2DInterface)
 		local Selection = Box2DInterface.BoxSelection.GetSelection()
-		self.Shown = #Selected >= 1
+		self.Shown      = #Selected >= 1
 	end
 	return Option
 end

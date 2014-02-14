@@ -17,6 +17,9 @@ local lib = {}
 -- This system handles 3D inventory interactions (datastructure).
 
 --[[ Change Log
+February 13th, 2014
+- Removed ItemSystem dependency as an argument, the BoxInventory doesn't need to know the ItemSystem.
+
 February 7rd, 2014
 - Moved 3D inventory rendering to a seperate script.
 - Removed qCFrame dependency
@@ -344,9 +347,8 @@ end
 -- MAIN CLASS --
 ----------------
 
-local MakeBoxInventory = Class(function(BoxInventory, ItemSystem, Name)
+local MakeBoxInventory = Class(function(BoxInventory, Name)
 	--- A 3D "Box" inventory, that revolves around packaging items into crates as representation.
-	-- @param ItemSystem The ItemSystem to use with this inventory
 	-- @param Name The Name of the BoxInventory. If no name is given, then it'll just generate one. 
 
 	--[[

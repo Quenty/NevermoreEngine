@@ -18,9 +18,13 @@ qSystems:Import(getfenv(0))
 -- @author Quenty
 
 --[[ -- Change Log --
+Febrary 13th, 2014
+v.1.1.1
+- Made inventory remove on client, and then send request, on retreival, if it fails then it
+  adds it back in .
+- Added save and load functions
 
 February 7th, 2014
-
 v.1.1.0
 - Added IsUIDRegistered function
 - Added GetInventoryName function
@@ -49,8 +53,10 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 		-- @param InventoryUID String, the UID to associate the inventory with.
 
 		local Events = EventGroup.MakeEventGroup() -- We'll manage events like this.
-		local InventoryManager = {}
+
+		local InventoryManager = {} -- Returned object
 		InventoryManager.UID = InventoryUID
+		InventoryManager.Updated = CreateSignal() -- Whenever it updates. Suppose to be used as a hook to save the inventory.
 
 		local function FireEventOnClient(EventName, ...)
 			--- Fires the event on the client with the EventName given. Used internally.
@@ -58,13 +64,95 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 
 			RemoteEvent:FireClient(Player, InventoryUID, EventName, ...)
 		end
+
+		-- SAVING UTILITY STUFF --
+		local function ValidateData(OldValue)
+			if OldValue and OldValue.SaveVersion == "1.0" and type(OldValue.TimeStamp) == "number" and type(OldValue.Items) == "table" then
+				return true
+			else
+				
+				if OldValue then
+					print("OldValue.SaveVersion == " .. tostring(OldValue.SaveVersion) .. "; type(OldValue.TimeStamp) == '" .. type(OldValue.TimeStamp) .."'; type(OldValue.Items) == '" .. type(OldValue.Items) .."'")
+				else
+					print("OldValue is " .. tostring(OldValue))
+				end
+				return false
+			end
+		end
+
+		local function UpdateSaveInventory(OldValue)
+			-- Utility function used by SaveInventory, updated inventory.
+			-- Meant to be caled by DataStore:UpdateAsync's function thingy
+
+			return {
+				Items       = InventoryManager.GetListOfItems();
+				TimeStamp   = tick();
+				SaveVersion = "1.0";
+			}
+		end
+
+		local function SaveInventory(DataStore, Key)
+			-- @param DataStore The DataStore to load from
+			-- @param Key The key to use when loading.
+
+			if DataStore then
+				DataStore:UpdateAsync(Key, UpdateSaveInventory)
+			else
+				print("[InventoryManager] - No Datastore provided, cannot save")
+			end
+		end
+		InventoryManager.SaveInventory = SaveInventory
+		InventoryManager.saveInventory = SaveInventory
+
+		local function LoadValidData(ItemSystem, InventoryData)
+			for _, Data in pairs(InventoryData.Items) do
+				if type(Data.classname) == "string" and Data.uid then
+					local NewConstruct = ItemSystem.ConstructClassFromData(Data)
+					if NewConstruct then
+
+						-- Add item, make sure we can add it.
+						local DidAdd = BoxInventory.AddItem(NewConstruct, nil, true)
+
+						if not DidAdd then
+							print("[ItemSystem][LoadInventory] - Inventory failed to add item")
+						end
+					else
+						print("[ItemSystem][LoadInventory] - Unable to construct new Item class '" .. Item.classname .."'")
+					end
+				end
+			end
+
+			-- We set it to not sort on add. Now we sort!
+			BoxInventory.DeepSort()
+		end
+
+		local function LoadInventory(ItemSystem, DataStore, Key)
+			--- Load's the inventory. Only call once nubs.
+			-- @param DataStore The DataStore to load from
+			-- @param Key The Key to use when loading
+
+			if DataStore then
+				local InventoryData = DataStore:GetAsync(Key)
+				if ValidateData(InventoryData) then
+					LoadValidData(ItemSystem, InventoryData)
+				else
+					print("[InventoryManager][LoadInventory] - Invalid data from datastore given.")
+				end
+			else
+				print("[InventoryManager] - No Datastore provided, cannot save")
+			end
+		end
+		InventoryManager.LoadInventory = LoadInventory
+		InventoryManager.loadInventory = LoadInventory
 		
+		-- OTHER METHODS --
+
 		local function Destroy()
 			--- Destroy's the InventoryManager
 
 			-- Tell the client the inventory is disconnecting
 			FireEventOnClient(EventName, "InventoryRemoving")
-
+			InventoryManager.Updated:Destroy()
 			Events("Clear")
 			Events = nil
 			InventoryManager.Destroy = nil
@@ -75,9 +163,10 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 		InventoryManager.destroy = Destroy
 
 		-- VALID REQUESTS --
-
 		local function GetListOfItems()
 			--- Return's a list of items in the inventory
+			--- Only returns the Data, nothing more.
+			--- Used by the networking side of this.
 
 			local Items = BoxInventory.GetListOfItems()
 			local ParsedItems = {}
@@ -131,12 +220,12 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 		-- Setup actual events --
 		Events.ItemAdded = BoxInventory.ItemAdded:connect(function(Item, Slot)
 			-- We won't (and can't) send the slot. Only the ItemData is safe. 
-
+			InventoryManager.Updated:fire()
 			FireEventOnClient("ItemAdded", Item.Data)
 		end)
 		Events.ItemRemoved = BoxInventory.ItemRemoved:connect(function(Item, Slot)
 			-- We won't (and can't) send the slot. Only the ItemData is safe.  Client side will interpret based on UID to remove the correct item.
-
+			InventoryManager.Updated:fire()
 			FireEventOnClient("ItemRemoved", Item.Data)
 		end)
 
@@ -275,6 +364,54 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 			return nil, false
 		end
 
+		local OnItemRemove
+		local OnItemAdd
+
+		local function AddInterfacesToItem(ItemData, Constructed)
+			--- Addes interfaces to an item
+			-- @param ItemData The item data
+			-- @param Constructed The newly constructed item
+
+			local BoxInventoryManagerInterface = {} do
+				BoxInventoryManagerInterface.PendingRemoval = false
+
+				local function RemoveItemFromInventory()
+					-- You have no idea how inefficient this is...
+
+					if not BoxInventoryManagerInterface.PendingRemoval then
+						OnItemRemove(ItemData)
+						BoxInventoryManagerInterface.PendingRemoval = true
+						local DidRemove = {RemoteFunction:InvokeServer(InventoryUID, "RemoveItemFromInventory", Constructed.UID)}
+						if not DidRemove then
+							print("[BoxInventoryClientManager] - Data failed to remove, adding back to inventory")
+
+							OnItemAdd(ItemData)
+							BoxInventoryManagerInterface.PendingRemoval = false
+						end
+						return DidRemove
+					end
+				end
+				BoxInventoryManagerInterface.RemoveItemFromInventory = RemoveItemFromInventory
+			end
+			Constructed.Interfaces.BoxInventoryManager = BoxInventoryManagerInterface
+
+			local BoxInventoryInterface = {} do
+				BoxInventoryInterface.CrateData = CrateDataCache[Constructed.Model] 
+
+				if not BoxInventoryInterface.CrateData then
+					if Constructed.Model then
+						BoxInventoryInterface.CrateData = BoxInventory.GenerateCrateData(qInstance.GetBricks(Constructed.Model))
+						CrateDataCache[Constructed.Model] = BoxInventoryInterface.CrateData
+					else
+						error("[BoxInventoryClientManager] - BoxInventory requires all items to have a 'Model'")
+					end
+				end
+
+				BoxInventoryInterface.RemoveSelfFromInventory = BoxInventoryManagerInterface.RemoveItemFromInventory
+			end
+			Constructed.Interfaces.BoxInventory = BoxInventoryInterface
+		end
+
 		local function DeparseItemData(ItemData)
 			--- Deparses the item into a valid item. If the item already exists, will return it.
 			-- @param ItemData The item data
@@ -291,27 +428,7 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 			else
 				local Constructed = ItemSystem.ConstructClassFromData(ItemData)
 
-				if not Constructed.Interfaces.BoxInventory then
-					local NewInterface = {}
-					NewInterface.CrateData = CrateDataCache[Constructed.Model] 
-
-					if not NewInterface.CrateData then
-						if Constructed.Model then
-							NewInterface.CrateData = BoxInventory.GenerateCrateData(qInstance.GetBricks(Constructed.Model))
-							CrateDataCache[Constructed.Model] = NewInterface.CrateData
-						else
-							error("[BoxInventoryClientManager] - BoxInventory requires all items to have a 'Model'")
-						end
-					end
-
-					function NewInterface.RemoveSelfFromInventory()
-						-- You have no idea how inefficient this is...
-
-						return RemoteFunction:InvokeServer(InventoryUID, "RemoveItemFromInventory", Constructed.UID)
-					end
-					
-					Constructed.Interfaces.BoxInventory = NewInterface
-				end 
+				AddInterfacesToItem(ItemData, Constructed)
 
 				return Constructed, false
 			end
@@ -340,7 +457,7 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 		InventoryInterface.GetListOfItems = GetListOfItems
 		InventoryInterface.getListOfItems = GetListOfItems
 
-		local function OnItemAdd(ItemData)
+		function OnItemAdd(ItemData)
 			local NewItem, AlreadyInSystem = DeparseItemData(ItemData)
 			if not AlreadyInSystem then
 				ItemList[#ItemList+1] = NewItem
@@ -350,13 +467,19 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 			end
 		end
 
-		local function OnItemRemove(ItemData)
+		function OnItemRemove(ItemData)
 			local Item, AlreadyInSystem = GetItemFromData(ItemData)
 			if AlreadyInSystem then
-				InventoryInterface.ItemRemoved:fire(Item)
-			else
-				print("[BoxInventoryClientManager][OnItemRemove] - Item " .. ItemData.classname .. "@" .. ItemData.uid .. " was not in the inventory.")
+				if not Item.Interfaces.BoxInventoryManager.PendingRemoval then
+					InventoryInterface.ItemRemoved:fire(Item)
+				else
+					print("[BoxInventoryClientManager][OnItemRemove] - Item " .. ItemData.classname .. "@" .. ItemData.uid .. " is pending removal. Removal confirmed, setting PendingRemoval to false")
+					Item.Interfaces.BoxInventoryManager.PendingRemoval = false
+				end
+			else 
+				print("[BoxInventoryClientManager][OnItemRemove] - Item " .. ItemData.classname .. "@" .. ItemData.uid .. " was not in the inventory. ")
 			end
+			
 		end
 
 		local function HandleNewEvent(EventName, ...)
@@ -385,7 +508,7 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 		return Inventories[InventoryUID]
 	end
 	BoxInventoryClientManager.MakeClientInventoryInterface = MakeClientInventoryInterface
-	BoxInventoryClientManager.MakeClientInventoryInterface = MakeClientInventoryInterface
+	BoxInventoryClientManager.makeClientInventoryInterface = MakeClientInventoryInterface
 
 	local ClientEventConnection = RemoteEvent.OnClientEvent:connect(function(InventoryUID, EventName, ...)
 		if InventoryUID then
