@@ -13,6 +13,14 @@ local lib = {}
 -- @author Quenty
 -- Last Modified Februrary 9th, 2014
 
+--[[
+Change log
+
+February 15th, 2014
+- Added GetPartVolume
+
+--]]
+
 local function GetBricks(StartInstance)
 	local List = {}
 
@@ -31,5 +39,26 @@ end
 lib.GetBricks  = GetBricks
 lib.get_bricks = GetBricks
 lib.getBricks  = GetBricks
+
+local function GetPartVolume(Part, CountWedgesAsSolids)
+	-- Returns a parts volume.
+	-- @param Part The part to get the volume for
+	-- @param CountWedgesAsSolids Boolean, if true, counts a wedge part as a solid.
+	
+	local Size = Part.Size
+	if Part:IsA("Part") or CountWedgesAsSolids then
+		return Size.X * Size.Y * Size.Z
+	elseif Part:IsA("WedgePart") then
+		return (Size.X * Size.Y * Size.Z) / 2
+	elseif Part:IsA("CornerWedgePart") then
+		return (Size.X * Size.Y * Size.Z) / 3
+	else
+		error("[GetPartVolume] - Not a part")
+	end
+end
+lib.GetPartVolume = GetPartVolume
+lib.getPartVolume = GetPartVolume
+lib.get_part_volume = GetPartVolume
+
 
 return lib

@@ -18,6 +18,14 @@ qSystems:Import(getfenv(0))
 -- @author Quenty
 
 --[[ -- Change Log --
+February 16th, 2014
+- Added system to make clients open inventories via server.
+
+February 15th, 2014
+v.1.1.2
+- Added GetAvailableVolume, GetInventoryVolume, GetTakenVolume methods to networking model.
+- Added StorageSlotAdded event client side (Does not pass actual storage slot).
+
 Febrary 13th, 2014
 v.1.1.1
 - Made inventory remove on client, and then send request, on retreival, if it fails then it
@@ -43,20 +51,96 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 	-- @param StreamName The name of the stream
 
 	-- Get raw stream data.
-	local RemoteFunction  = NevermoreEngine.GetDataStreamObject(StreamName)
-	local RemoteEvent = NevermoreEngine.GetEventStreamObject(StreamName)
+	local RemoteFunction = NevermoreEngine.GetDataStreamObject(StreamName)
+	local RemoteEvent    = NevermoreEngine.GetEventStreamObject(StreamName)
 
 	local Managers = {}
 
+	local ClientData = {}
+	setmetatable(ClientData, {__mode = "k"})
+
+	local function GetClientData(Client)
+		--- Tracked client data. *Should?* GC.
+
+		local Data = ClientData[Client] 
+
+		if Data then
+			return Data
+		else
+			Data = {}
+			Data.OpenInventories = {}
+
+			ClientData[Client] = Data
+			return Data
+		end
+	end
+
+	local function GetOpenInventoryList(Client)
+		--- Return's an array of the open inventories.
+
+		local ClientData = GetClientData(Client)
+
+		local UIDs = {}
+		for UID, _ in pairs(ClientData.OpenInventories) do
+			UIDs[#UIDs+1] = UID
+		end
+
+		return UIDs
+	end
+
+	local function RequestClientOpenInventory(Client, InventoryUID)
+		--- Request's that a client open an inventory on their client.
+		-- @param Client The active client.
+
+		if Client then
+			if Managers[InventoryUID] then
+				RemoteEvent:FireClient(Client, InventoryUID, "OpenInventory")
+				GetClientData(Client).OpenInventories[InventoryUID] = true
+			else
+				error("[BoxInventoryServerManager] - The inventory '" .. InventoryUID .. "' does not exist in the system")
+			end
+		else
+			error("[BoxInventoryServerManager] - Client is nil")
+		end
+	end
+	BoxInventoryServerManager.RequestClientOpenInventory = RequestClientOpenInventory
+	BoxInventoryServerManager.requestClientOpenInventory = RequestClientOpenInventory
+
+	local function RequestCilentCloseInventory(Client, InventoryUID)
+		--- Request's that the client close their inventory
+
+		if Client then
+			if Managers[InventoryUID] then
+				if GetClientData(Client).OpenInventories[InventoryUID] then
+					RemoteEvent:FireClient(Client, InventoryUID, "CloseInventory")
+					GetClientData(Client).OpenInventories[InventoryUID] = false
+				else
+					print("[BoxInventoryServerManager] - Client data says inventory is not open. You can't close this!")
+				end
+			else
+				error("[BoxInventoryServerManager] - The inventory '" .. InventoryUID .. "' does not exist in the system")
+			end
+		else
+			error("[BoxInventoryServerManager] - Client is nil")
+		end
+	end
+	BoxInventoryServerManager.RequestCilentCloseInventory = RequestCilentCloseInventory
+	BoxInventoryServerManager.requestCilentCloseInventory = RequestCilentCloseInventory
+
 	local function AddInventoryToManager(BoxInventory, InventoryUID)
+		--- Add's a box inventory into the manager so it can be accessed by the client.
 		-- @param BoxInventory The BoxInventory to send events for.
-		-- @param InventoryUID String, the UID to associate the inventory with.
+		-- @param InventoryUID String, the UID to associate the inventory with. May not be "GetOpenInventoryList"
 
 		local Events = EventGroup.MakeEventGroup() -- We'll manage events like this.
 
 		local InventoryManager = {} -- Returned object
 		InventoryManager.UID = InventoryUID
 		InventoryManager.Updated = CreateSignal() -- Whenever it updates. Suppose to be used as a hook to save the inventory.
+
+		if InventoryUID:lower() == ("GetOpenInventoryList"):lower() then
+			error("[BoxInventoryServerManager] - GetOpenInventoryList can not be the name of the inventory")
+		end
 
 		local function FireEventOnClient(EventName, ...)
 			--- Fires the event on the client with the EventName given. Used internally.
@@ -107,6 +191,8 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 		local function LoadValidData(ItemSystem, InventoryData)
 			for _, Data in pairs(InventoryData.Items) do
 				if type(Data.classname) == "string" and Data.uid then
+					Data.uid = ItemSystem.GenerateUID(Data)
+					
 					local NewConstruct = ItemSystem.ConstructClassFromData(Data)
 					if NewConstruct then
 
@@ -154,10 +240,10 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 			FireEventOnClient(EventName, "InventoryRemoving")
 			InventoryManager.Updated:Destroy()
 			Events("Clear")
-			Events = nil
+			Events                   = nil
 			InventoryManager.Destroy = nil
-			FireEventOnClient = nil
-			Managers[InventoryUID] = nil
+			FireEventOnClient        = nil
+			Managers[InventoryUID]   = nil
 		end
 		InventoryManager.Destroy = Destroy
 		InventoryManager.destroy = Destroy
@@ -216,6 +302,13 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 		end
 		InventoryManager.RemoveItemFromInventory = RemoveItemFromInventory
 		InventoryManager.removeItemFromInventory = RemoveItemFromInventory
+		
+		InventoryManager.GetTakenVolume     = BoxInventory.GetTakenVolume
+		InventoryManager.getTakenVolume     = BoxInventory.GetTakenVolume
+		InventoryManager.GetInventoryVolume = BoxInventory.GetInventoryVolume
+		InventoryManager.getInventoryVolume = BoxInventory.GetInventoryVolume
+		-- InventoryManager.GetAvailableVolume = BoxInventory.GetAvailableVolume
+		-- InventoryManager.getAvailableVolume = BoxInventory.GetAvailableVolume
 
 		-- Setup actual events --
 		Events.ItemAdded = BoxInventory.ItemAdded:connect(function(Item, Slot)
@@ -227,6 +320,10 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 			-- We won't (and can't) send the slot. Only the ItemData is safe.  Client side will interpret based on UID to remove the correct item.
 			InventoryManager.Updated:fire()
 			FireEventOnClient("ItemRemoved", Item.Data)
+		end)
+		Events.StorageSlotAdded = BoxInventory.ItemRemoved:connect(function(Item, Slot)
+			-- We won't (and can't) send the slot. Only the ItemData is safe.  Client side will interpret based on UID to remove the correct item.
+			FireEventOnClient("StorageSlotAdded", Item.Data)
 		end)
 
 		-- Make sure we aren't killing a manager.
@@ -251,6 +348,10 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 		GetInventoryName        = true;
 		GetLargestGridSize      = true;
 		RemoveItemFromInventory = true;
+
+		-- Volume operations
+		GetTakenVolume          = true;
+		GetInventoryVolume      = true;
 	}
 
 	RemoteFunction.OnServerInvoke = function(Requester, InventoryUID, Request, ...)
@@ -259,8 +360,10 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 			Requester = Players:GetPlayers()[1]
 		end
 
-		if Requester == Player then
-			if InventoryUID then
+		if Requester and Requester:IsA("Player") then
+			if InventoryUID == "GetOpenInventoryList" then
+				return GetOpenInventoryList(Requester)
+			elseif InventoryUID then
 				if ValidRequests[Request] then
 					if Managers[InventoryUID] then
 						return Managers[InventoryUID][Request](...)
@@ -276,7 +379,7 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 				error("[BoxInventoryServerManager] - InventoryUID is nil or false")
 			end
 		else
-			error("[BoxInventoryServerManager] - RemoteFunction.OnServerInvoke, Requester (" .. tostring(Requester) .. ") ~= Player (" .. tostring(Player) ..").")
+			error("[BoxInventoryServerManager] - RemoteFunction.OnServerInvoke, Requester (" .. tostring(Requester) .. ") is not a player")
 		end
 	end
 
@@ -298,16 +401,24 @@ lib.MakeBoxInventoryServerManager = MakeBoxInventoryServerManager
 lib.makeBoxInventoryServerManager = MakeBoxInventoryServerManager
 
 local CrateDataCache = {}
+setmetatable(CrateDataCache, {__mode = "k"})
 
 local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, Player, StreamName, ItemSystem)
 	local RemoteFunction = NevermoreEngine.GetDataStreamObject(StreamName)
 	local RemoteEvent    = NevermoreEngine.GetEventStreamObject(StreamName)
 
 	local Inventories = {}
+	local InventoryInterfaces = {} -- If the interface ever gets destroyed, whooops!
+	-- setmetatable(InventoryInterfaces, {__mode = "v"})
 
 	local function MakeClientInventoryInterface(InventoryUID)
+		if Inventories[InventoryUID] then
+			error("***ERRR*** [BoxInventoryClientManager] - An inventory with the UID '" .. InventoryUID .. "' already exists.")
+		end
+
 		-- print("[BoxInventoryClientManager] - Registering ClientInventoryInterface '" .. InventoryUID .."'")
-		
+		-- @param InventoryUID The UID of the inventory. Obviously needs to be synced with the server.
+
 		--- Connects to the server system, and makes an inteface that can be interaced with.
 		-- Tracks only the items in the current inventory, so duplicates *may* exist if removal occurs.
 		-- Removal should only occur on serverside.. 
@@ -316,21 +427,70 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 		InventoryInterface.UID         = InventoryUID
 		InventoryInterface.Interfaces  = {} -- Client side Interfaces linker.
 		
-		InventoryInterface.ItemAdded   = CreateSignal()
-		InventoryInterface.ItemRemoved = CreateSignal()
+		InventoryInterface.ItemAdded   = CreateSignal() -- Passes reconstructed object.
+		InventoryInterface.ItemRemoved = CreateSignal() -- Passes reconstructed object.
+		InventoryInterface.StorageSlotAdded = CreateSignal() -- Does not pass actual storage slot
 
 		local Events = EventGroup.MakeEventGroup() -- We'll manage events like this.
 		local ItemList = {}
 
+		-- Get initial data from the server --
 		while not RemoteFunction:InvokeServer(InventoryUID, "IsUIDRegistered") do
 			print("[BoxInventoryClientManager] - Waiting for server to register UID '" .. InventoryUID .."'")
 			wait(0)
 		end
 
+		local InventoryVolume = RemoteFunction:InvokeServer(InventoryUID, "GetInventoryVolume")
+		local TakenVolume     = RemoteFunction:InvokeServer(InventoryUID, "GetTakenVolume")
+
+		-- print("[BoxInventoryClientManager] - InventoryVolume = " .. InventoryVolume)
+		-- print("[BoxInventoryClientManager] - TakenVolume = " .. TakenVolume)
+
 		InventoryInterface.Name            = RemoteFunction:InvokeServer(InventoryUID, "GetInventoryName")
 		InventoryInterface.LargestGridSize = RemoteFunction:InvokeServer(InventoryUID, "GetLargestGridSize")
 		
 		-- Methods --
+		local function GetAvailableVolume(DoPollServer)
+			--- Get's the current available volume
+			-- @param DoPollServer Boolean, if true, gets the data from the server. May yield thread.
+			-- @return Available volume, in studs^3 
+
+			if DoPollServer then
+				InventoryVolume = RemoteFunction:InvokeServer(InventoryUID, "GetInventoryVolume")
+				TakenVolume     = RemoteFunction:InvokeServer(InventoryUID, "GetTakenVolume")
+			end
+
+			return InventoryVolume - TakenVolume
+		end
+		InventoryInterface.GetAvailableVolume = GetAvailableVolume
+		InventoryInterface.getAvailableVolume = GetAvailableVolume
+
+		local function GetTakenVolume(DoPollServer)
+			-- @return Current volume taken up.
+			-- @param DoPollServer Boolean, if true, gets the data from the server. May yield thread.
+
+			if DoPollServer then
+				TakenVolume = RemoteFunction:InvokeServer(InventoryUID, "GetTakenVolume")
+			end
+
+			return TakenVolume
+		end
+		InventoryInterface.GetTakenVolume = GetTakenVolume
+		InventoryInterface.getTakenVolume = GetTakenVolume
+
+		local function GetInventoryVolume(DoPollServer)
+			-- @param DoPollServer Boolean, if true, gets the data from the server. May yield thread.
+			-- @return The amount of volume of items that the inventory could hold
+
+			if DoPollServer then
+				InventoryVolume = RemoteFunction:InvokeServer(InventoryUID, "GetInventoryVolume")
+			end
+
+			return InventoryVolume
+		end
+		InventoryInterface.GetInventoryVolume = GetInventoryVolume
+		InventoryInterface.getInventoryVolume = GetInventoryVolume
+
 		local function Destroy()
 			Events("Clear")
 			Events = nil
@@ -399,6 +559,7 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 				BoxInventoryInterface.CrateData = CrateDataCache[Constructed.Model] 
 
 				if not BoxInventoryInterface.CrateData then
+					print("[BoxInventoryClientManager] - Generating CrateData.") -- Make sure weak table is working
 					if Constructed.Model then
 						BoxInventoryInterface.CrateData = BoxInventory.GenerateCrateData(qInstance.GetBricks(Constructed.Model))
 						CrateDataCache[Constructed.Model] = BoxInventoryInterface.CrateData
@@ -463,8 +624,12 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 				ItemList[#ItemList+1] = NewItem
 				InventoryInterface.ItemAdded:fire(NewItem)
 			else
-				print("[BoxInventoryClientManager][OnItemAdd] - Item " .. ItemData.classname .. " UID '" .. ItemData.uid .. "'' already exists in the inventory")
+				print("***ERRR*** [BoxInventoryClientManager][OnItemAdd] - Item " .. ItemData.classname .. " UID '" .. ItemData.uid .. "'' already exists in the inventory")
 			end
+		end
+
+		local function OnStorageSlotAdded()
+			InventoryInterface.StorageSlotAdded:fire()
 		end
 
 		function OnItemRemove(ItemData)
@@ -473,13 +638,12 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 				if not Item.Interfaces.BoxInventoryManager.PendingRemoval then
 					InventoryInterface.ItemRemoved:fire(Item)
 				else
-					print("[BoxInventoryClientManager][OnItemRemove] - Item " .. ItemData.classname .. "@" .. ItemData.uid .. " is pending removal. Removal confirmed, setting PendingRemoval to false")
+					-- print("[BoxInventoryClientManager][OnItemRemove] - Item " .. ItemData.classname .. "@" .. ItemData.uid .. " is pending removal. Removal confirmed, setting PendingRemoval to false")
 					Item.Interfaces.BoxInventoryManager.PendingRemoval = false
 				end
 			else 
-				print("[BoxInventoryClientManager][OnItemRemove] - Item " .. ItemData.classname .. "@" .. ItemData.uid .. " was not in the inventory. ")
+				print("***ERRR*** [BoxInventoryClientManager][OnItemRemove] - Item " .. ItemData.classname .. "@" .. ItemData.uid .. " was not in the inventory. ")
 			end
-			
 		end
 
 		local function HandleNewEvent(EventName, ...)
@@ -488,35 +652,119 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 			-- print("[BoxInventoryClientManager] - New event '" .. EventName .."' fired")
 			if EventName == "ItemAdded" then
 				OnItemAdd(...)
+				TakenVolume = RemoteFunction:InvokeServer(InventoryUID, "GetTakenVolume")
+
 			elseif EventName == "ItemRemoved" then
 				OnItemRemove(...)
+
+				TakenVolume = RemoteFunction:InvokeServer(InventoryUID, "GetTakenVolume")
+			elseif EventName == "StorageSlotAdded" then
+				OnStorageSlotAdded(...)
+
+				InventoryVolume = RemoteFunction:InvokeServer(InventoryUID, "GetInventoryVolume")
 			else
-				print("[BoxInventoryClientManager] - No event linked to '" .. tostring(EnventName) .. "'")
+				print("***ERRR*** [BoxInventoryClientManager] - No event linked to '" .. tostring(EnventName) .. "'")
 			end
 		end
 		InventoryInterface.HandleNewEvent = HandleNewEvent
 		InventoryInterface.handleNewEvent = HandleNewEvent
 
+
+
 		-- Update list --
 		GetListOfItems()
 
-		if Inventories[InventoryUID] then
-			error("[BoxInventoryClientManager] - An inventory with the UID '" .. InventoryUID .. "' already exists.")
-		else
-			Inventories[InventoryUID] = InventoryInterface
-		end
+		Inventories[InventoryUID] = InventoryInterface
 		return Inventories[InventoryUID]
 	end
-	BoxInventoryClientManager.MakeClientInventoryInterface = MakeClientInventoryInterface
-	BoxInventoryClientManager.makeClientInventoryInterface = MakeClientInventoryInterface
+	-- BoxInventoryClientManager.MakeClientInventoryInterface = MakeClientInventoryInterface
+	-- BoxInventoryClientManager.makeClientInventoryInterface = MakeClientInventoryInterface
+
+	local function AddBox2DInterface(Box2DInterface)
+		--- Add's a new render into the system. Really, only one interface should be added....
+		-- @param Box2DInterface The interface to add.
+
+		-- Not to be confused with a "ClientInventoryInterface" which is the networking interface. 
+		
+		InventoryInterfaces[#InventoryInterfaces+1] = Box2DInterface
+
+		-- Add existing inventories.
+		for InventoryUID, InventoryInterface in pairs(Inventories) do
+			Box2DInterface.AddClientInventory(InventoryInterface)
+		end
+	end
+	BoxInventoryClientManager.AddBox2DInterface = AddBox2DInterface
+	BoxInventoryClientManager.addBox2DInterface = AddBox2DInterface
+
+	local function OpenInventory(InventoryUID)
+		--- "Opens" the inventory connection up. Probably really badly named, but this is used when new items are added.
+
+		if not Inventories[InventoryUID] then
+			local NewInventory = MakeClientInventoryInterface(InventoryUID)
+
+			for _, Box2DInterface in pairs(InventoryInterfaces) do
+				Box2DInterface.AddClientInventory(NewInventory)
+			end
+		else
+			print("[BoxInventoryClientManager] - Failure. Cannot open inventory that is already open. ")
+		end
+	end
+
+	local function GetCurrentInventoriesOpen()
+		--- Return's a list of current inventories open.
+		local UIDList = RemoteFunction:InvokeServer("GetOpenInventoryList")
+		return UIDList
+	end
+
+	local function LoadInventories()
+		-- Should be called on instantiation (as it is). Gets the current inventories open and loads them up.
+
+		local InventoryUIDs = GetCurrentInventoriesOpen()
+
+		for _, InventoryUID in pairs(InventoryUIDs) do
+			if not Inventories[InventoryUID] then
+				Spawn(function()
+					OpenInventory(InventoryUID)
+				end)
+			end
+		end
+	end
+
+	local function CloseInventory(InventoryUID)
+		--- Closes an inventory of the UID "InventoryUID"
+
+		local ClosingInventory = Inventories[InventoryUID]
+		if ClosingInventory then
+
+			-- Remove from existing libraries.
+			for _, Box2DInterface in pairs(InventoryInterfaces) do
+				Box2DInterface.RemoveClientInventory(ClosingInventory)
+			end
+
+			-- print(ClosingInventory)
+			-- Destroy!
+			ClosingInventory.Destroy()
+			Inventories[InventoryUID] = nil
+		else
+			print("[BoxInventoryClientManager] - Failure. Cannot close non existant Inventory UID '" .. InventoryUID .. "'")
+		end
+	end
 
 	local ClientEventConnection = RemoteEvent.OnClientEvent:connect(function(InventoryUID, EventName, ...)
 		if InventoryUID then
-			local InventoryInterface = Inventories[InventoryUID]
-			if InventoryInterface then
-				InventoryInterface.HandleNewEvent(EventName, ...)
+			if EventName == "OpenInventory" then
+				OpenInventory(InventoryUID)
 			else
-				print("[BoxInventoryClientManager] - No InventoryInterface exists with UID of '" .. tostring(InventoryUID) .."'")
+				local InventoryInterface = Inventories[InventoryUID]
+				if InventoryInterface then
+					if EventName == "CloseInventory" then
+						CloseInventory(InventoryUID)
+					else
+						InventoryInterface.HandleNewEvent(EventName, ...)
+					end
+				else
+					print("[BoxInventoryClientManager] - No InventoryInterface exists with UID of '" .. tostring(InventoryUID) .."'")
+				end
 			end
 		else
 			print("[BoxInventoryClientManager] - InventoryUID is not correct, is '" .. tostring(InventoryUID) .."'")
@@ -537,6 +785,8 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 	end
 	BoxInventoryClientManager.Destroy = Destroy
 	BoxInventoryClientManager.destroy = Destroy
+
+	Spawn(LoadInventories)
 end)
 lib.MakeBoxInventoryClientManager = MakeBoxInventoryClientManager
 lib.makeBoxInventoryClientManager = MakeBoxInventoryClientManager

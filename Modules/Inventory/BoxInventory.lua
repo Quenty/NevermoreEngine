@@ -17,6 +17,10 @@ local lib = {}
 -- This system handles 3D inventory interactions (datastructure).
 
 --[[ Change Log
+February 15th, 2014
+- Added volume tracking (To track total volume)
+- Added GetTakenVolume, GetInventoryVolume, GetAvailableVolume
+
 February 13th, 2014
 - Removed ItemSystem dependency as an argument, the BoxInventory doesn't need to know the ItemSystem.
 
@@ -139,24 +143,25 @@ local function GenerateCrateData(Objects)
 
 	-- It is all scaled to Volume per part. 
 
-	local VolumeListByMaterial = {};
-
-	local PartToVolumeList = {}
-	local MaterialToPartList = {};
-
-	local WeightedColor = Vector3.new();
-	local TotalVolume = 0
+	local VolumeListByMaterial = {}
+	
+	local PartToVolumeList     = {}
+	local MaterialToPartList   = {}
+	
+	local WeightedColor        = Vector3.new()
+	local TotalVolume          = 0
 
 	-- Go through each object and calculate results cumulatively
 	for _, Child in pairs(Objects) do
 		if Child:IsA("BasePart") then
-			local Material = Child.Material
-			local Volume = Child.Size.x * Child.Size.y * Child.Size.z
-			local Color = Vector3.new(Child.BrickColor.Color.r, Child.BrickColor.Color.g, Child.BrickColor.Color.b)
+			local Material                 = Child.Material
+			local Volume                   = Child.Size.x * Child.Size.y * Child.Size.z
+			local Color                    = Vector3.new(Child.BrickColor.Color.r, Child.BrickColor.Color.g, Child.BrickColor.Color.b)
 			VolumeListByMaterial[Material] = (VolumeListByMaterial[Material] or 0) + Volume
-			WeightedColor = WeightedColor + Color*Volume;
-			TotalVolume = TotalVolume + Volume;
-			PartToVolumeList[Child] = Volume;
+			WeightedColor                  = WeightedColor + Color * Volume
+			TotalVolume                    = TotalVolume + Volume
+			PartToVolumeList[Child]        = Volume
+
 			if MaterialToPartList[Material] and PartToVolumeList[MaterialToPartList[Material]] > Volume then
 				MaterialToPartList[Material] = Child;
 			end
@@ -166,24 +171,25 @@ local function GenerateCrateData(Objects)
 	local Color = BrickColor.new(Color3.new(WeightedColor.x, WeightedColor.y, WeightedColor.z))
 
 	-- Find the largest material possible
-	local LargestMaterial = Enum.Material.Plastic;
+	local LargestMaterial       = Enum.Material.Plastic;
 	local LargestMaterialVolume = 0;
+
 	for Material, Volume in pairs(VolumeListByMaterial) do
 		if Volume > LargestMaterialVolume then
-			LargestMaterial = Material;
-			LargestMaterialVolume = Volume;
+			LargestMaterial       = Material
+			LargestMaterialVolume = Volume
 		end
 	end
 
 	-- Return all values.
 	local CrateData = {}
 	CrateData.MostCommonMaterial = LargestMaterial;
-	CrateData.BrickColor = Color;
-	CrateData.Volume = TotalVolume;
+	CrateData.BrickColor         = Color;
+	CrateData.Volume             = TotalVolume;
 	CrateData.MaterialToPartList = MaterialToPartList[LargestMaterial];
-	CrateData.SideLength = SideLengthFromVolume(TotalVolume)
-	CrateData.ItemSize = CrateData.SideLength -- For now, they're the same.
-	CrateData.GridSize = ItemSizeToGridSize(CrateData.ItemSize); -- Scalier, what the item fits INTO. 
+	CrateData.SideLength         = SideLengthFromVolume(TotalVolume)
+	CrateData.ItemSize           = CrateData.SideLength -- For now, they're the same.
+	CrateData.GridSize           = ItemSizeToGridSize(CrateData.ItemSize); -- Scalier, what the item fits INTO. 
 
 	return CrateData;
 end
@@ -403,6 +409,39 @@ local MakeBoxInventory = Class(function(BoxInventory, Name)
 
 	local StorageSpaces = StorageSpaces;
 
+	-- Tracking volume.
+	local InventoryVolume = 0 -- Track in studs^3
+	local TakenVolume = 0
+
+	local function GetAvailableVolume()
+		--- Get's the current available volume
+		-- @return Available volume, in studs^3 
+
+		return InventoryVolume - TakenVolume
+	end
+	BoxInventory.GetAvailableVolume = GetAvailableVolume
+	BoxInventory.getAvailableVolume = GetAvailableVolume
+
+	local function GetTakenVolume()
+		-- @return Current volume taken up.
+
+		-- print("[BoxInventory] - TakenVolume = " .. TakenVolume)
+
+		return TakenVolume
+	end
+	BoxInventory.GetTakenVolume = GetTakenVolume
+	BoxInventory.getTakenVolume = GetTakenVolume
+
+	local function GetInventoryVolume()
+		-- @return The amount of volume of items that the inventory could hold
+
+		-- print("[BoxInventory] - InventoryVolume = " .. InventoryVolume)
+
+		return InventoryVolume
+	end
+	BoxInventory.GetInventoryVolume = GetInventoryVolume
+	BoxInventory.getInventoryVolume = GetInventoryVolume
+
 	local function AddVoxelGridToSlot(Slot, GridSize, ItemSize, Size)
 		-- Add's a VoxelGrid to Slot.Content and updates relative information.
 		-- @Param Size The X, Y, Z number of slots, a Vector3 Value
@@ -489,16 +528,19 @@ local MakeBoxInventory = Class(function(BoxInventory, Name)
 
 		Center = Center or Part.CFrame;
 
-		local PartSize = Part.Size
-		local SmallestSide = GetSmallestSide(PartSize)
-		local GridSize = GetMaxGridSizeFromSmallestSide(SmallestSide) -- Scalier
+		local PartSize               = Part.Size
+		local SmallestSide           = GetSmallestSide(PartSize)
+		local GridSize               = GetMaxGridSizeFromSmallestSide(SmallestSide) -- Scalier
 		BoxInventory.LargestGridSize = math.max(BoxInventory.LargestGridSize, GridSize)
-		local ItemSize = GridSizeToItemSize(GridSize);
-		local Size = Vector3.new(
+		local ItemSize               = GridSizeToItemSize(GridSize);
+		local Size                   = Vector3.new(
 			math.floor(PartSize.X/SmallestSide), 
 			math.floor(PartSize.Y/SmallestSide), 
 			math.floor(PartSize.Z/SmallestSide)
 		)
+
+		-- Storage slots add volume.
+		InventoryVolume = InventoryVolume + qInstance.GetPartVolume(Part)
 		
 		--print("[Adding Storage Slot] - GridSize (Linear) "..tostring(GridSize).."; ItemSize (Scaliar): "..ItemSize.."; Size = "..tostring(Size))
 		-- assert(PartSize ~= nil, "[BoxInventory][AddStorageSlot] - PartSize is nil")
@@ -836,6 +878,8 @@ local MakeBoxInventory = Class(function(BoxInventory, Name)
 		--- 'Item' is an InventoryObject item...
 		-- SourceCFrame is the position that the item came from. Not required. Relative to global origin. 
 		-- Return's the slot it was added too..
+
+		-- @param Item An InventoryItem with a "Model" as one of it's properties. Item should not already be in an inventory.
 		-- @param DoNotSort 
 
 		AddBoxInventoryInterface(Item)
@@ -843,10 +887,10 @@ local MakeBoxInventory = Class(function(BoxInventory, Name)
 		local EmptySlot = GetEmptySlot(Item.Interfaces.BoxInventory.CrateData)
 		if EmptySlot then
 			--print(EmptySlot.Content, EmptySlot.LocalPosition)
-			EmptySlot.Content = Item;
-			EmptySlot.Type = "Item"
+			EmptySlot.Content                        = Item;
+			EmptySlot.Type                           = "Item"
 			Item.Interfaces.BoxInventory.CurrentSlot = EmptySlot
-			Item.Interfaces.BoxInventory.AddTime = tick() -- For sorting.
+			Item.Interfaces.BoxInventory.AddTime     = tick() -- For sorting.
 
 			-- assert(EmptySlot.VoxelGrid ~= nil, "EmptySlot.VoxelGrid is nil. What is this!")
 			--SimpleSort(EmptySlot.VoxelGrid)
@@ -867,6 +911,8 @@ local MakeBoxInventory = Class(function(BoxInventory, Name)
 			if not DoNotSort then
 				DeepSort()
 			end
+
+			TakenVolume = TakenVolume + Item.Interfaces.BoxInventory.CrateData.Volume
 
 			BoxInventory.ItemAdded:fire(Item, Item.Interfaces.BoxInventory.CurrentSlot); -- Fire OnAdd event...
 			return EmptySlot;
@@ -905,6 +951,9 @@ local MakeBoxInventory = Class(function(BoxInventory, Name)
 
 			DeepSort()
 
+			-- When removing, obviously volume drops.
+			TakenVolume = TakenVolume - ItemBeingRemoved.Interfaces.BoxInventory.CrateData.Volume
+			
 			BoxInventory.ItemRemoved:fire(ItemBeingRemoved, Slot)
 			return OldContent;
 		else

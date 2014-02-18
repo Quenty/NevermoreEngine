@@ -278,7 +278,7 @@ local MakeItemSystem = Class(function(ItemSystem, Configuration, ItemClassList, 
 		UIDCounter = UIDCounter + 1
 		return "Class@" .. tostring(ItemData) .. "@" .. UIDCounter
 	end
-	ItemSystem.GenerateUID = GenerateUID]
+	ItemSystem.GenerateUID = GenerateUID
 	ItemSystem.generateUID = GenerateUID
 
 	local function ConstructNewItem(ClassName, ...)

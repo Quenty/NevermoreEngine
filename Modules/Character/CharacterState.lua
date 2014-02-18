@@ -249,34 +249,38 @@ local MakeCharacterState = Class(function(CharacterState, Character)
 	local AdvanceRaycast = qCFrame.AdvanceRaycast
 
 	local function Step()
-		local Torso = Character.Torso
-		local TorsoPosition = Torso.Position
+		local Torso = Character:FindFirstChild("Torso")
+		if Torso then
+			local TorsoPosition = Torso.Position
 
-		-- Check Distance Off Ground --
-		local DistanceCheckingRay = Ray.new(Torso.Position, Vector3.new(0,-999,0))
-		local Hit, Position = AdvanceRaycast(DistanceCheckingRay, IgnoreList, false, true)
-		if Hit and Hit.CanCollide then
-			CharacterData.LastGroundHit = Hit
-			CharacterData.OnGround.DistanceOff = math.max(0, (TorsoPosition - Position).magnitude - 3)
+			-- Check Distance Off Ground --
+			local DistanceCheckingRay = Ray.new(Torso.Position, Vector3.new(0,-999,0))
+			local Hit, Position = AdvanceRaycast(DistanceCheckingRay, IgnoreList, false, true)
+			if Hit and Hit.CanCollide then
+				CharacterData.LastGroundHit = Hit
+				CharacterData.OnGround.DistanceOff = math.max(0, (TorsoPosition - Position).magnitude - 3)
+			else
+				CharacterData.OnGround.DistanceOff = 100
+				CharacterData.LastGroundHit = nil
+			end
+
+			if CharacterData.OnGround.DistanceOff > 1.3 then
+				CharacterData.OffGround.LastPoint = tick()
+			elseif CharacterData.OnGround.DistanceOff < 0.5 then
+				CharacterData.OnGround.LastPoint = tick()
+			end
+			-- Check Torso Velocity --
+			CharacterData.PositiveTorsoVelocity.Value = Torso.Velocity.y
+			if Torso.Velocity.y > 1 then
+				CharacterData.PositiveTorsoVelocity.LastPoint = tick()
+			end
+
+			-- Check States --
+			CurrentState.LastPoint = tick()
+			CurrentState.CheckDuring(Character, CharacterData, Torso, PreviousState)
 		else
-			CharacterData.OnGround.DistanceOff = 100
-			CharacterData.LastGroundHit = nil
+			print("[CharacterState] - Torso is nil")
 		end
-
-		if CharacterData.OnGround.DistanceOff > 1.3 then
-			CharacterData.OffGround.LastPoint = tick()
-		elseif CharacterData.OnGround.DistanceOff < 0.5 then
-			CharacterData.OnGround.LastPoint = tick()
-		end
-		-- Check Torso Velocity --
-		CharacterData.PositiveTorsoVelocity.Value = Torso.Velocity.y
-		if Torso.Velocity.y > 1 then
-			CharacterData.PositiveTorsoVelocity.LastPoint = tick()
-		end
-
-		-- Check States --
-		CurrentState.LastPoint = tick()
-		CurrentState.CheckDuring(Character, CharacterData, Torso, PreviousState)
 	end
 	CharacterState.Step = Step
 end)

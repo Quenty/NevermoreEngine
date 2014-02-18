@@ -17,6 +17,13 @@ qSystems:Import(getfenv(0));
 -- Handles building loading and management. Handles it server-side. 
 -- @author Quenty
 
+--[[
+
+February 15th, 2014
+- Modified to use RootPart
+
+--]]
+
 local lib = {}
 
 local MakeGridManager = Class(function(GridManager, Center, StudsPerGridSquare, Rows, Columns)
@@ -183,7 +190,7 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 		--- Positions the character relative to the front of the door. Better algorithm laster.
 
 		local DoorBase = Door.CFrame - Vector3.new(0, Door.Size.Y/2, 0)
-		local DistanceCheckingRay = Ray.new(Character.Torso.Position, Vector3.new(0,-999,0))
+		local DistanceCheckingRay = Ray.new(Character.HumanoidRootPart.Position, Vector3.new(0,-999,0))
 
 		local IgnoreList = {Character}
 
@@ -191,13 +198,13 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 		local DistanceOffGround
 		
 		if Hit and Position then
-			DistanceOffGround = math.max(3, (Character.Torso.Position - Position).magnitude)
+			DistanceOffGround = math.max(3, (Character.HumanoidRootPart.Position - Position).magnitude)
 			-- print("Player is " .. DistanceOffGround .. " studs off of the ground")
 		else
 			DistanceOffGround = 3
 		end
 		
-		Character.Torso.CFrame = (DoorBase * CFrame.new(0, 0, -4)) + Vector3.new(0, DistanceOffGround, 0)
+		Character.HumanoidRootPart.CFrame = (DoorBase * CFrame.new(0, 0, -4)) + Vector3.new(0, DistanceOffGround, 0)
 	end
 
 	local EventTracker = EventGroup.MakeEventGroup()
@@ -368,7 +375,7 @@ local MakeAreaLoader = Class(function(AreaLoader, Container, Configuration)
 				Count = Count + 1
 				NewArea.GCCheckCycle()
 			end
-			print("[AreaLoader] - ActiveArea count = " .. Count)
+			-- print("[AreaLoader] - ActiveArea count = " .. Count)
 			wait(Configuration.UpdateCycle)
 		end
 	end)

@@ -10,22 +10,21 @@ local HttpService        = game:GetService("HttpService")
 local ReplicatedStorage  = game:GetService("ReplicatedStorage")
 local RunService         = game:GetService("RunService")
 local MarketplaceService = game:GetService("MarketplaceService")
-local UserInputService   = game:GetService('UserInputService')
+local UserInputService   = game:GetService("UserInputService")
 local Terrain            = Workspace.Terrain
 
 local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary('qSystems')
-local qMath             = LoadCustomLibrary('qMath')
-local qCFrame           = LoadCustomLibrary('qCFrame')
-local Table             = LoadCustomLibrary('Table')
-local qColor3           = LoadCustomLibrary('qColor3')
+local qSystems          = LoadCustomLibrary("qSystems")
+local qMath             = LoadCustomLibrary("qMath")
+local qCFrame           = LoadCustomLibrary("qCFrame")
+local Table             = LoadCustomLibrary("Table")
+local qColor3           = LoadCustomLibrary("qColor3")
 
 qSystems:import(getfenv(0));
 
 local lib = {}
-local doc = {}
 
 local DEFAULTS = {}
 
@@ -40,27 +39,40 @@ local COLORS = {
 
 }
 
+-- qGUI.lua
+-- @author Quenty
+-- A group of utility functions to be used by ROBLOX GUIs
 
 --[[
-GetScreen ( Instance `object` )
-	returns ScreenGui `screen`
 
-Gets the nearest ascending ScreenGui of `object`.
-Returns `object` if it is a ScreenGui.
-Returns nil if `object` isn't the descendant of a ScreenGui.
+Change Log
+February 15th, 2014
+- Updated TweenTransparency method to use single thread update model for efficiency.
+- Updated TweenColor3 method to use a single thread update model for efficiency.
 
-Arguments:
-	`object`
-		The instance to get the ascending ScreenGui from.
-
-Returns:
-	`screen`
-		The ascending screen.
-		Will be nil if `object` isn't the descendant of a ScreenGui.
 --]]
+
 
 local function GetScreen(object)
 	-- Given a GUI object, returns it's screenGui. 
+
+	--[[
+	GetScreen ( Instance `object` )
+		returns ScreenGui `screen`
+
+	Gets the nearest ascending ScreenGui of `object`.
+	Returns `object` if it is a ScreenGui.
+	Returns nil if `object` isn't the descendant of a ScreenGui.
+
+	Arguments:
+		`object`
+			The instance to get the ascending ScreenGui from.
+
+	Returns:
+		`screen`
+			The ascending screen.
+			Will be nil if `object` isn't the descendant of a ScreenGui.
+	--]]
 
 	local screen = object
 	while not screen:IsA("ScreenGui") do
@@ -186,37 +198,55 @@ lib.UDim2OffsetFromVector2 = UDim2OffsetFromVector2
 lib.uDim2OffsetFromVector2 = UDim2OffsetFromVector2
 lib.udim2_offset_from_vector2 = UDim2OffsetFromVector2
 
-local function WorldToScreen(Position, Mouse, Camera)
-	-- Translates a position in ROBLOX space to ScreenSpace.  
-	-- Math credit to xXxMoNkEyMaNxXx
-	-- Returns if it's on the screen, then the ScreenPosition, and then the angle at which the object is (if it's off the screen?) Not sure entirely.
-	
-	local RealPosition = qCFrame.PointToObjectSpace(Camera.CoordinateFrame, Position)
-	local Angle = math.atan2(RealPosition.x, -RealPosition.y) -- Rotate 90 degrees ccw so that angles start at "straight down"
-	local Theta
-	local ViewSize = Vector2.new(Mouse.ViewSizeX, Mouse.ViewSizeY) / 2
-	if RealPosition.Z < 0 then -- Object is in front
-		local ATY = math.tan(Camera.FieldOfView * math.pi / 360)
-		local AT1 = Vector2.new(ATY * ViewSize.X / ViewSize.Y, ATY)
-		local UPOS = Vector2.new(-RealPosition.x, RealPosition.y) / RealPosition.z
-		local SPOS = ViewSize + ViewSize * UPOS / AT1
-		if SPOS.x >= 0 and SPOS.x <= Mouse.ViewSizeX and SPOS.Y >= 0 and SPOS.Y <= Mouse.ViewSizeY then
-			return true, SPOS, Angle
+do
+	local PointToObjectSpace = CFrame.new().pointToObjectSpace
+	local atan2              = math.atan2
+	local tan                = math.tan
+	local Vector2New         = Vector2.new
+	local abs                = math.abs
+	local max                = math.max
+	local min                = math.min
+	local pi                 = math.pi
+
+	local PiOver360 = pi / 360
+	-- local Sign = Sign
+
+	local function WorldToScreen(Position, Mouse, Camera)
+		-- Translates a position in ROBLOX space to ScreenSpace.  
+		-- Math credit to xXxMoNkEyMaNxXx
+		-- Returns if it's on the screen, then the ScreenPosition, and then the angle at which the object is (if it's off the screen?) Not sure entirely.
+		
+		local RealPosition = PointToObjectSpace(Camera.CoordinateFrame, Position)
+		local RealPositionX = RealPosition.x
+		local RealPositionY = RealPosition.y
+		local RealPositionZ = RealPosition.z
+
+		local Angle = atan2(RealPositionX, -RealPositionY) -- Rotate 90 degrees ccw so that angles start at "straight down"
+		local Theta
+		local ViewSize = Vector2New(Mouse.ViewSizeX, Mouse.ViewSizeY) / 2
+		if RealPositionZ < 0 then -- Object is in front
+			local ATY = tan(Camera.FieldOfView * PiOver360)
+			local AT1 = Vector2New(ATY * ViewSize.X / ViewSize.Y, ATY)
+			local UPOS = Vector2New(-RealPositionX, RealPositionY) / RealPositionZ
+			local SPOS = ViewSize + ViewSize * UPOS / AT1
+			if SPOS.X >= 0 and SPOS.X <= Mouse.ViewSizeX and SPOS.Y >= 0 and SPOS.Y <= Mouse.ViewSizeY then
+				return true, SPOS, Angle
+			else
+				Theta = true
+			end
 		else
 			Theta = true
 		end
-	else
-		Theta = true
+		if Theta then
+			return false, 
+			ViewSize + Vector2New(Sign(RealPositionX) * abs(max(-ViewSize.x, min(ViewSize.x, ViewSize.y * RealPositionX/RealPositionY))), -Sign(RealPositionY) * abs(max(-ViewSize.y,min(ViewSize.y,ViewSize.x * RealPositionY/RealPositionX)))),
+			Angle
+		end
 	end
-	if Theta then
-		return false, 
-		ViewSize + Vector2.new(qMath.Sign(RealPosition.x) * math.abs(math.max(-ViewSize.x, math.min(ViewSize.x, ViewSize.y * RealPosition.x/RealPosition.y))), -qMath.Sign(RealPosition.y) * math.abs(math.max(-ViewSize.y,math.min(ViewSize.y,ViewSize.x * RealPosition.y/RealPosition.x)))),
-		Angle
-	end
+	lib.WorldToScreen = WorldToScreen
+	lib.worldToScreen = WorldToScreen
+	lib.world_to_screen = WorldToScreen
 end
-lib.WorldToScreen = WorldToScreen
-lib.worldToScreen = WorldToScreen
-lib.world_to_screen = WorldToScreen
 
 local function MultiplyUDim2Offset(Original, Factor)
 	return UDim2.new(Original.X.Scale, Original.X.Offset * Factor, Original.Y.Scale, Original.Y.OFfset * Factor)
@@ -329,152 +359,199 @@ end
 lib.TweenImages = TweenImages
 lib.tweenImages = TweenImages
 
-local TransparencyTweenIds = {}
-local TransparencyTweenOperatingStatus = {} -- Boolean, holds if a GUI is being tweened or not...
+do
+	local ProcessList = {}
+	-- setmetatable(ProcessList, WEAK_MODE.K)
+	local ActivelyProcessing = false
 
-setmetatable(TransparencyTweenIds, WEAK_MODE.K) -- So we don't prevent collection using this cache. :/
-setmetatable(TransparencyTweenOperatingStatus, WEAK_MODE.K)
+	local function SetProperties(Gui, Percent, StartProperties, NewProperties)
+		-- Maybe there's a better way to do this?
 
-local function TweenTransparency(Gui, NewProperties, Time, Override)
-	-- Override tween system to tween the transparency of properties. Unfortunately, overriding is per a GUI as of now. 
-	--- Tween's the Transparency values in a GUI,
-	-- @param Gui The GUI to tween the Transparency's upon
-	-- @param NewProperties The properties to be changed. It will take the current
-	--                      properties and tween to the new ones. This table should be
-	--                      setup so {Index = NewValue} that is, for example, 
-	--                      {TextTransparency = 1}.
-	-- @param Time The amount of time to spend transitioning.
-	-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
-
-	local CanExecute = false;
-	TransparencyTweenIds[Gui] = TransparencyTweenIds[Gui] or 0
-
-	if TransparencyTweenOperatingStatus[Gui] and Override then
-		TransparencyTweenIds[Gui] = TransparencyTweenIds[Gui] + 1
-	elseif TransparencyTweenOperatingStatus[Gui] then
-		return false
+		for Index, EndValue in next, NewProperties do
+			local StartProperty = StartProperties[Index]
+			Gui[Index] = StartProperty + (EndValue - StartProperty) * Percent
+		end
 	end
 
-	local LocalTweenId = TransparencyTweenIds[Gui]
-	TransparencyTweenOperatingStatus[Gui] = true
+	local function UpdateTweenModels()
+		local CurrentTick = tick()
+		ActivelyProcessing = false
 
-	Spawn(function()
-		local StartProperties = {}
-		local StartTime = time()
-		local CurrentTime = time()
-		for Index, _ in pairs(NewProperties) do
-			StartProperties[Index] = Gui[Index]
-		end
+		for Gui, TweenState in next, ProcessList do
+			if Gui and Gui.Parent then
+				ActivelyProcessing = true
 
-		local function SetProperties(Percent)
-			for Index, EndValue in pairs(NewProperties) do
-				local StartProperty = StartProperties[Index]
-				Gui[Index] = StartProperty + ((EndValue - StartProperty) * Percent)
+				local TimeElapsed = (CurrentTick - TweenState.StartTime)
+				local Duration    = TweenState.Duration
+
+				if TimeElapsed > Duration then
+					-- Then we end it.
+					
+					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties) 
+					ProcessList[Gui] = nil
+				else
+					-- Otherwise do the animations.
+
+					SetProperties(Gui, TimeElapsed/Duration, TweenState.StartProperties, TweenState.NewProperties)
+				end
+			else
+				ProcessList[Gui] = nil
 			end
 		end
-
-		while LocalTweenId == TransparencyTweenIds[Gui] and StartTime + Time >= CurrentTime do
-			local Percent = (CurrentTime - StartTime) / Time
-			local SmoothedPercent = math.sin((Percent - 0.5) * math.pi)/2 + 0.5
-			SetProperties(SmoothedPercent)
-			wait(0.05)
-			CurrentTime = time()
-		end
-
-		if TransparencyTweenIds[Gui] ~= LocalTweenId then 
-			return false
-		end 
-
-		TransparencyTweenOperatingStatus[Gui] = false
-		SetProperties(1)
-	end)
-end
-lib.TweenTransparency = TweenTransparency
-lib.tweenTransparency = TweenTransparency
-
-local function StopTransparencyTween(Gui)
-	-- Overrides all the current transparency animations in a GUI. Perhaps useful.
-
-	if TransparencyTweenOperatingStatus[Gui] and TransparencyTweenIds[Gui] then
-		TransparencyTweenIds[Gui] = TransparencyTweenIds[Gui] + 1
-	end
-end
-lib.StopTransparencyTween = StopTransparencyTween
-lib.stopTransparencyTween = StopTransparencyTween
-
-
-
-local Color3TweenIds = {}
-local Color3TweenOperatingStatus = {} -- Boolean, holds if a GUI is being tweened or not...
-
-setmetatable(Color3TweenIds, WEAK_MODE.K) -- So we don't prevent collection using this cache. :/
-setmetatable(Color3TweenOperatingStatus, WEAK_MODE.K)
-
-local function TweenColor3(Gui, NewProperties, Time, Override)
-	--- Tween's the Color3 values in a GUI,
-	-- @param Gui The GUI to tween the Color3's upon
-	-- @param NewProperties The properties to be changed. It will take the current
-	--                      properties and tween to the new ones. This table should be
-	--                      setup so {Index = NewValue} that is, for example, 
-	--                      {BackgroundColor3 = Color3.new(1, 1, 1)}.
-	-- @param Time The amount of time to spend transitioning.
-	-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
-
-	local CanExecute = false;
-	Color3TweenIds[Gui] = Color3TweenIds[Gui] or 0
-
-	if Color3TweenOperatingStatus[Gui] and Override then
-		Color3TweenIds[Gui] = Color3TweenIds[Gui] + 1
-	elseif Color3TweenOperatingStatus[Gui] then
-		return false
 	end
 
-	local LocalTweenId = Color3TweenIds[Gui]
-	Color3TweenOperatingStatus[Gui] = true
-
-	Spawn(function()
-		local StartProperties = {}
-		local StartTime = time()
-		local CurrentTime = time()
-		for Index, _ in pairs(NewProperties) do
-			StartProperties[Index] = Gui[Index]
+	local function StartProcessUpdate()
+		if not ActivelyProcessing then
+			ActivelyProcessing = true
+			Spawn(function()
+				while ActivelyProcessing do
+					UpdateTweenModels()
+					RunService.RenderStepped:wait(0.05)
+				end
+			end)
 		end
+	end
 
-		local function SetProperties(Percent)
-			for Index, EndValue in pairs(NewProperties) do
-				local StartProperty = StartProperties[Index]
-				Gui[Index] = qColor3.LerpColor3(StartProperty, EndValue, Percent)
+	local function TweenTransparency(Gui, NewProperties, Duration, Override)
+		-- Override tween system to tween the transparency of properties. Unfortunately, overriding is per a GUI as of now. 
+		--- Tween's the Transparency values in a GUI,
+		-- @param Gui The GUI to tween the Transparency's upon
+		-- @param NewProperties The properties to be changed. It will take the current
+		--                      properties and tween to the new ones. This table should be
+		--                      setup so {Index = NewValue} that is, for example, 
+		--                      {TextTransparency = 1}.
+		-- @param Time The amount of time to spend transitioning.
+		-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
+
+		if not ProcessList[Gui] or Override then
+			-- Fill StartProperties
+			local StartProperties = {}
+			for Index, _ in pairs(NewProperties) do
+				StartProperties[Index] = Gui[Index]	
+			end
+
+			-- And set NewState
+			local NewState = {
+				StartTime       = tick();
+				Duration        = Duration;
+				-- Gui          = Gui;
+				StartProperties = StartProperties;
+				NewProperties   = NewProperties;
+			}
+
+			ProcessList[Gui] = NewState
+			StartProcessUpdate()
+		end
+	end
+	lib.TweenTransparency = TweenTransparency
+	lib.tweenTransparency = TweenTransparency
+
+	local function StopTransparencyTween(Gui)
+		-- Overrides all the current transparency animations in a GUI. Perhaps useful.
+		-- @param Gui The GUI to stop the tween the Transparency's upon
+
+		ProcessList[Gui] = nil
+	end
+	lib.StopTransparencyTween = StopTransparencyTween
+	lib.stopTransparencyTween = StopTransparencyTween
+end
+
+do
+	local ProcessList = {}
+	-- setmetatable(ProcessList, WEAK_MODE.K)
+	local ActivelyProcessing = false
+
+	local LerpColor3 = qColor3.LerpColor3
+	local function SetProperties(Gui, Percent, StartProperties, NewProperties)
+		-- Maybe there's a better way to do this?
+
+		for Index, EndValue in next, NewProperties do
+			local StartProperty = StartProperties[Index]
+			Gui[Index] = LerpColor3(StartProperty, EndValue, Percent)
+		end
+	end
+
+	local function UpdateTweenModels()
+		local CurrentTick = tick()
+		ActivelyProcessing = false
+
+		for Gui, TweenState in next, ProcessList do
+			if Gui and Gui.Parent then
+				ActivelyProcessing = true
+
+				local TimeElapsed = (CurrentTick - TweenState.StartTime)
+				local Duration    = TweenState.Duration
+
+				if TimeElapsed > Duration then
+					-- Then we end it.
+					
+					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties) 
+					ProcessList[Gui] = nil
+				else
+					-- Otherwise do the animations.
+
+					SetProperties(Gui, TimeElapsed/Duration, TweenState.StartProperties, TweenState.NewProperties)
+				end
+			else
+				ProcessList[Gui] = nil
 			end
 		end
-
-		while LocalTweenId == Color3TweenIds[Gui] and StartTime + Time >= CurrentTime do
-			local Percent = (CurrentTime - StartTime) / Time
-			local SmoothedPercent = math.sin((Percent - 0.5) * math.pi)/2 + 0.5
-			SetProperties(SmoothedPercent)
-			wait(0.05)
-			CurrentTime = time()
-		end
-
-		if Color3TweenIds[Gui] ~= LocalTweenId then 
-			return false
-		end 
-
-		Color3TweenOperatingStatus[Gui] = false
-		SetProperties(1)
-	end)
-end
-lib.TweenColor3 = TweenColor3
-lib.tweenColor3 = TweenColor3
-
-local function StopColor3Tween(Gui)
-	-- Overrides all the current animations of Color3 in the GUI. 
-
-	if Color3TweenOperatingStatus[Gui] and Color3TweenIds[Gui] then
-		Color3TweenIds[Gui] = Color3TweenIds[Gui] + 1
 	end
+
+	local function StartProcessUpdate()
+		if not ActivelyProcessing then
+			ActivelyProcessing = true
+			Spawn(function()
+				while ActivelyProcessing do
+					UpdateTweenModels()
+					RunService.RenderStepped:wait(0.05)
+				end
+			end)
+		end
+	end
+
+	local function TweenColor3(Gui, NewProperties, Duration, Override)
+		--- Tween's the Color3 values in a GUI,
+		-- @param Gui The GUI to tween the Color3's upon
+		-- @param NewProperties The properties to be changed. It will take the current
+		--                      properties and tween to the new ones. This table should be
+		--                      setup so {Index = NewValue} that is, for example, 
+		--                      {BackgroundColor3 = Color3.new(1, 1, 1)}.
+		-- @param Duration The amount of time to spend transitioning.
+		-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
+
+		if not ProcessList[Gui] or Override then
+			-- Fill StartProperties
+			local StartProperties = {}
+			for Index, _ in pairs(NewProperties) do
+				StartProperties[Index] = Gui[Index]	
+			end
+
+			-- And set NewState
+			local NewState = {
+				StartTime       = tick();
+				Duration        = Duration;
+				-- Gui          = Gui;
+				StartProperties = StartProperties;
+				NewProperties   = NewProperties;
+			}
+
+			ProcessList[Gui] = NewState
+			StartProcessUpdate()
+		end
+	end
+	lib.TweenColor3 = TweenColor3
+	lib.tweenColor3 = TweenColor3
+
+	local function StopColor3Tween(Gui)
+		-- Overrides all the current animations of Color3 in the GUI. 
+		-- @param Gui The GUI to stop the tween animations on
+
+		ProcessList[Gui] = nil
+	end
+	lib.StopColor3Tween = StopColor3Tween
+	lib.stopColor3Tween = StopColor3Tween
 end
-lib.StopColor3Tween = StopColor3Tween
-lib.stopColor3Tween = StopColor3Tween
 
 local function GenerateMouseDrag()
 	-- Generate's a dragger to catch the mouse...

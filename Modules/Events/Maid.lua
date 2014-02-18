@@ -11,6 +11,8 @@ API:
 	Maid:GiveTask(task)               Same as above, but uses an incremented number as a key.
 	Maid:DoCleaning()                 Disconnects all managed events and performs all clean-up tasks.
 ]]
+
+local lib = {}
  
 local index = {
 	GiveTask = function(self,task)
@@ -53,7 +55,13 @@ local mt = {
 		tasks[k] = v
 	end;
 }
- 
-return function()
+
+local function MakeMaid()
 	return setmetatable({Tasks={}},mt)
 end
+lib.MakeMaid = MakeMaid
+lib.makeMaid = MakeMaid
+lib.new = MakeMaid
+lib.New = makeMaid
+
+return lib

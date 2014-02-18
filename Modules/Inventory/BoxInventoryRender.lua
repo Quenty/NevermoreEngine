@@ -18,6 +18,11 @@ local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
 
 --[[ -- Change Log
 ---- NOTE INDIVIDUAL CHANGE LOGS ARE NOW ALSO MAINTAINED PER A CLASS. GLOBAL CHANGES LISTED HERE (Changes related to whole system)
+Feburary 16th, 2014
+- Fixed label issue with Open inventory button
+
+February 15th, 2014
+- Added "show" icon with a quick info GUI.
 
 February 13th, 2014
 - OverriddenConfiguration is now semi-utilized
@@ -54,7 +59,7 @@ local function MakeTitleFrame(Parent, Title, Subtitle, ZIndex, Height, XOffset)
 
 	-- @param Parent the parent of the TitleFrame, which must be rendered to get the right rendering.
 	-- @param Title the title of the frame
-	-- @param Subtitle the subtitle to display. Will auto offset from title.
+	-- @param [Subtitle] the subtitle to display. Will auto offset from title.
 	-- @param [ZIndex] the ZIndex of the title frame. 
 	-- @param [Height] the height of the title frame to be. 
 	-- @param [XOffset] the offset from the left (X Axis)
@@ -126,11 +131,12 @@ local function MakeTitleFrame(Parent, Title, Subtitle, ZIndex, Height, XOffset)
 	return TitleFrame;
 end
 
-local function RenderSizeIcon(IconSize, GridSize, Color, ZIndex)
+local function RenderSizeIcon(IconSize, GridSize, Color, ZIndex, SetSolidColor)
 	--- Render's a SizeIcon that is broken up like a grid.
-	-- @param IconSize size of the icon in pixels
+	-- @param IconSize size of the icon in pixels (Single number)
 	-- @param GridSize the number of seperations to make
 	-- @param Color the color of the hightlighted icon.
+	-- @param SetSolidColor If true, will set the whole grid to be the color of "Color"
 	
 	local RenderFrame = Make 'Frame' {
 		Archivable             = false;
@@ -156,7 +162,7 @@ local function RenderSizeIcon(IconSize, GridSize, Color, ZIndex)
 		for YPosition = 0, (GridSize - 1) do
 			local BoxPartFrame = Make 'Frame' {
 				Archivable       = false;
-				BackgroundColor3 = RegularColor;
+				BackgroundColor3 = SetSolidColor and Color or RegularColor;
 				BorderSizePixel  = 0;
 				Name             = "BoxPart-" .. XPosition .. "-" .. YPosition;
 				Parent           = RenderFrame;
@@ -174,7 +180,14 @@ local function RenderSizeIcon(IconSize, GridSize, Color, ZIndex)
 end
 
 --[[
-	Made Configuration use OverriddenConfiguration 
+Change Log
+
+February 16th, 2014
+- Added GC Destroy function.
+
+February ??th, 2014
+- Made Configuration use OverriddenConfiguration 
+
 --]]
 local function MakeCollapseButton(State, Configuration)
 	--- Makes a minimize/maximize window icon.
@@ -184,15 +197,14 @@ local function MakeCollapseButton(State, Configuration)
 	State = State or false; -- Presume if no state is given that the window is shown.
 
 	Configuration = OverriddenConfiguration.new(Configuration, {
-		DefaultTransparency    = (Configuration and Configuration.DefaultTransparency) or 0.3;
-		Color                  = (Configuration and Configuration.Color) or Color3.new(1, 1, 1);
-		ZIndex                 = (Configuration and Configuration.ZIndex) or 1;
-		OnOverTransparency     = (Configuration and Configuration.OnOverTransparency) or 0;
-		TransparencyChangeTime = (Configuration and Configuration.TransparencyChangeTime) or 0.1;
-		DoAnimateOnOver        = (Configuration and Configuration.DoAnimateOnOver ~= nil and Configuration.DoAnimateOnOver) or true;
+		DefaultTransparency    = 0.3;
+		Color                  = Color3.new(1, 1, 1);
+		ZIndex                 = 1;
+		OnOverTransparency     = 0;
+		TransparencyChangeTime = 0.1;
+		DoAnimateOnOver        = true;
 	})
 	local Button = {}
-	
 	
 	local CollapseButton = Make 'ImageButton' {
 		Archivable             = false;
@@ -300,6 +312,26 @@ local function MakeCollapseButton(State, Configuration)
 			qGUI.TweenTransparency(CollapseButton.Minimize, {BackgroundTransparency = Configuration.DefaultTransparency}, Configuration.TransparencyChangeTime, true)
 		end)
 	end
+
+	function Button:Destroy()
+		--- Destroy's the button
+
+		-- Stop animations if they are running.
+		for _, Item in pairs(CollapseButton.Maximize:GetChildren()) do
+			qGUI.StopTransparencyTween(Item)
+		end
+		qGUI.StopTransparencyTween(CollapseButton.Minimize)
+
+		-- Clean up GUIs
+		CollapseButton:Destroy()
+		Configuration = nil
+		State         = nil
+
+		-- Whole class declaration cleaned up. 
+		for Index, Item in pairs(Button) do
+			Button[Index] = nil
+		end
+	end
 	
 	return Button;
 end
@@ -405,6 +437,69 @@ local MakePercentFilledImage = Class(function(PercentFilledImage, ImageLabel, Fu
 end)
 lib.MakePercentFilledImage = MakePercentFilledImage
 lib.makePercentFilledImage = MakePercentFilledImage
+
+-- Used by OptionSystem
+local function GetCenterY(ScreenGui, RenderHeightY)
+	--- Get's the Y.Offset factor of a screenGUI, and frame (withthe RenderHeightY given), 
+	--- Used internally by the options module
+	-- @return Number value that the UDim2Y should be set to
+
+	local Height = ScreenGui.AbsoluteSize.Y;
+	return (Height - RenderHeightY)/2
+end
+
+-- Used by BoxInventoryRenderCard
+local function MakeIconedFrame(IconFrame, Text, ZIndex, XOffset)
+	-- Makes a frame with the icon on the left and the text on the right.
+	-- @param IconFrame A ROBLOX GUI element, it uses it's Size.Y.Offset to determine it's own height.
+	-- @param Text the text to generate
+	-- @param [ZIndex] The index of the frame
+	-- @param [XOffset] The XOffset between the text and the icon. So the text isn't directly against the frame.
+
+	--- The IconFrame will be offset by XOffset
+	-- The Text will have the X whitespace as XOffset
+
+	local XOffset = XOffset or 10
+	ZIndex = ZIndex or IconFrame.ZIndex;
+
+	local MainFrame = Make 'Frame' {
+		Archivable             = false;
+		BackgroundColor3       = Color3.new(1, 1, 1);
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		Name                   = "BoxInventoryRenderCard";
+		Position               = UDim2.new(0, 0, 0, 0);
+		Size                   = UDim2.new(1, 0, 0, IconFrame.Size.Y.Offset);
+		Visible                = true;
+		ZIndex                 = ZIndex;
+	}
+
+	IconFrame.Parent   = MainFrame;
+	IconFrame.Position = UDim2.new(0, XOffset, 0, 0)
+
+	local TextLabel = Make 'TextLabel' {
+		Archivable             = false;
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		Font                   = "Arial";
+		FontSize               = "Size14";
+		Name                   = "TextLabel";
+		Parent                 = MainFrame;
+		Position               = UDim2.new(0, IconFrame.Size.X.Offset + XOffset*2, 0, 0);
+		Size                   = UDim2.new(1, -(IconFrame.Size.X.Offset + (XOffset*3)), 1, 0);
+		Text                   = Text;
+		TextColor3             = Color3.new(64/255, 64/255, 64/255);
+		TextStrokeTransparency = 1;
+		TextWrapped            = true;
+		TextXAlignment         = "Left";
+		TextYAlignment         = "Center";
+		Visible                = true;
+		ZIndex                 = ZIndex;
+	}
+
+	return MainFrame
+end
+
 
 ------------------------
 -- MAIN CLASS SYSTEMS --
@@ -557,10 +652,6 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 	--  Will probably be removed/added a lot.. Only one should exist per an item. Used internally. 
 
 	-- Local variables
-	local MouseOver = false;
-	--local CurrentItemCount = 1; -- How many of this thing does it have.
-	local CurrentItems = {} -- Store items in the inventory render thing.
-
 	ItemColor = ItemColor or Color3.new(199/255, 244/255, 100/255) -- Let's use this pallet -- http://www.colourlovers.com/palette/1930/cheer_up_emo_kid
 
 	-- Global variables.
@@ -678,12 +769,16 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 	SizeIcon.Position                 = UDim2.new(1, -(Configuration.GridSizeIconSize + ((Configuration.Height - Configuration.GridSizeIconSize)/2)), 0, 5);
 	Box2DRenderItem.YRenderHeight     = Configuration.Height;
 	
+	local MouseOver = false;
+	local CurrentItems = {} -- Store items in the inventory render thing.
+
+
 	-- READ ONLY VALUES --
 	Box2DRenderItem.IsBox2DRenderItem = true; -- For selection service debug
 	--Box2DRenderItem.BoxInventory      = BoxInventoryRender.BoxInventory -- The active inventory that this is associated with.
 	Box2DRenderItem.RenderedClassName = Item.ClassName -- Class name of the item being rendered/represented.
-
 	Box2DRenderItem.Selected = false;
+
 	local MouseDown = false;
 
 	local function Update()
@@ -843,10 +938,11 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 	Box2DRenderItem.GetItemIndex = GetItemIndex
 	Box2DRenderItem.getItemIndex = GetItemIndex
 
-	local function RemoveItemFromSlot(Item)
+	local function RemoveItemFromSlot(Item, DoNotFireEvent)
 		--- Used internally to remove an item from the slot.
 		-- @pre The item is in the list
 		-- @param Item the item to remove
+		-- @param DoNotFireEvent Boolean, if true, won't fire selection change event. Used by GC
 		-- @return The item removed
 		-- Kind of expensive
 
@@ -856,7 +952,10 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 			UpdateItemCount()
 
 			-- Update selection change, so the option modules change. Panic. Now.
-			BoxInventoryRender.Box2DInterface.BoxSelection.SelectionChanged:fire()
+			if not DoNotFireEvent then
+				BoxInventoryRender.Box2DInterface.BoxSelection.SelectionChanged:fire()
+			end
+
 			return Removed
 		else
 			error("[BoxInventoryRender][RemoveItemFromSlot] - ItemIndex could not be identified, the item is not in the slot.")
@@ -906,30 +1005,6 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 	Box2DRenderItem.GetItemIndex = GetItemIndex;
 	Box2DRenderItem.getItemIndex = GetItemIndex;
 
-	local function Destroy()
-		--- Destroy's the object for GC. 
-		-- @post the object is gone, and can be GCed. Item, if it was selected, will be disselected. 
-		-- @pre There are no items in the list
-		-- @return If it is successfully destroyed.
-
-		if GetCurrentItemCount() > 0 then
-			error("[BoxInventoryRender] - Cannot destroy, There are still "..GetCurrentItemCount().." item(s) in this renderthingy")
-			return false;
-		else
-			if BoxInventoryRender.Box2DInterface.BoxSelection.IsSelected(Item) then
-				BoxInventoryRender.Box2DInterface.BoxSelection:Unselect(Item);
-			end
-			BoxInventoryRender.EventStorage[Item.ClassName] = nil
-			Gui:Destroy()
-			for Index, Value in pairs(Box2DRenderItem) do
-				Box2DRenderItem[Index] = nil;
-			end
-			return true;
-		end
-	end
-	Box2DRenderItem.Destroy = Destroy;
-	Box2DRenderItem.destroy = Destroy;
-
 	local function MouseDownUpdate()
 		-- Updates the renderer when the mouse goes down.
 		if not MouseDown then
@@ -953,26 +1028,82 @@ local MakeBox2DRenderItem = Class(function(Box2DRenderItem, Item, BoxInventoryRe
 		end
 	end
 
+
+	local function Destroy()
+		--- Destroy's the object for GC. 
+		-- @post the object is gone, and can be GCed. Item, if it was selected, will be disselected. 
+		-- @pre There are no items in the list
+		-- @return If it is successfully destroyed.
+
+		for _, Item in pairs(CurrentItems) do
+			RemoveItemFromSlot(Item, true)
+		end
+
+		if GetCurrentItemCount() > 0 then
+			print("[BoxInventoryRender] - Should not destroy, There are still "..GetCurrentItemCount().." item(s) in this renderthingy")
+		end
+
+		if BoxInventoryRender.Box2DInterface.BoxSelection.IsSelected(Item) then
+			BoxInventoryRender.Box2DInterface.BoxSelection:Unselect(Item);
+		end
+		
+		CurrentItems  = nil
+		Configuration = nil
+		MouseDown     = nil
+		ItemColor     = nil
+
+		--- WHY. WHY. WHY.
+		Update               = nil
+		ShowSelection        = nil
+		HideSelection        = nil
+		AnimateShow          = nil
+		AnimateHide          = nil
+		GetItemCountPosition = nil
+		Select               = nil
+		Unselect             = nil
+		GetCurrentItemCount  = nil
+		UpdateItemCount      = nil
+		AddItemToSlot        = nil
+		GetItemIndex         = nil
+		RemoveItemFromSlot   = nil
+		GetLastItem          = nil
+		GetItems             = nil
+		GetRawItems          = nil
+		GetItemIndex         = nil
+		MouseDownUpdate      = nil
+		MouseUpUpdate        = nil
+
+		BoxInventoryRender.EventStorage["ItemEvent" .. Item.ClassName] = nil
+		Gui:Destroy()
+
+		for Index, Value in pairs(Box2DRenderItem) do
+			Box2DRenderItem[Index] = nil;
+		end
+		return true;
+	end
+	Box2DRenderItem.Destroy = Destroy;
+	Box2DRenderItem.destroy = Destroy;
+
 	-- Connect events --
-	BoxInventoryRender.EventStorage[Item.ClassName].MouseEnter = Gui.MouseEnter:connect(function()
+	BoxInventoryRender.EventStorage["ItemEvent" .. Item.ClassName].MouseEnter = Gui.MouseEnter:connect(function()
 		MouseOver = true
 		Update()
 	end)
 
-	BoxInventoryRender.EventStorage[Item.ClassName].MouseLeave = Gui.MouseLeave:connect(function()
+	BoxInventoryRender.EventStorage["ItemEvent" .. Item.ClassName].MouseLeave = Gui.MouseLeave:connect(function()
 		MouseOver = false
 		Update()
 	end)
 
-	BoxInventoryRender.EventStorage[Item.ClassName].MouseButton1Down = Gui.MouseButton1Down:connect(function()
+	BoxInventoryRender.EventStorage["ItemEvent" .. Item.ClassName].MouseButton1Down = Gui.MouseButton1Down:connect(function()
 		MouseDownUpdate()
 	end)
 
-	BoxInventoryRender.EventStorage[Item.ClassName].MouseButton1Up = Gui.MouseButton1Up:connect(function()
+	BoxInventoryRender.EventStorage["ItemEvent" .. Item.ClassName].MouseButton1Up = Gui.MouseButton1Up:connect(function()
 		MouseUpUpdate()
 	end)
 
-	BoxInventoryRender.EventStorage[Item.ClassName].Button1Up = BoxInventoryRender.Box2DInterface.Mouse.Button1Up:connect(function()
+	BoxInventoryRender.EventStorage["ItemEvent" .. Item.ClassName].Button1Up = BoxInventoryRender.Box2DInterface.Mouse.Button1Up:connect(function()
 		MouseUpUpdate()
 	end)
 
@@ -983,6 +1114,9 @@ end)
 
 --[[
 Change Log
+
+February 15th, 2014
+- Added Show and Hide methods
 
 February 13th, 2014
 - Fixed problem with RenderFrame leaving some frames visible.
@@ -1016,6 +1150,7 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 		Size                   = UDim2.new(0, Configuration.ColumnWidth, 0, Configuration.IndividualHeaderHeight);
 		Visible                = true;
 		ZIndex                 = Configuration.ZIndex;
+		ClipsDescendants       = true;
 	}
 	InventoryOptionModule.Gui = MainFrame
 
@@ -1058,7 +1193,7 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 	
 	InventoryOptionModule.XRenderWidth         = Configuration.ColumnWidth;
 	InventoryOptionModule.Name                 = Name;
-	InventoryOptionModule.ShowCallback         = ShowCallback 
+	InventoryOptionModule.ShowCallback         = ShowCallback -- If used incorrectly to modify selection, can create infinite loop.
 
 	-- Private variables --
 	local IsCollapsed = false;
@@ -1081,12 +1216,44 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 	-- Public Methods --
 	local function AddOption(Option)
 		-- Adds an option to the list...
+		-- @param Option The option to add.
+
 		table.insert(OptionList, Option);
 		Option.Gui.Parent = RenderFrame;
 		Option.OptionSystem = OptionSystem -- Make sure it can access the OptionSystem
 	end
 	InventoryOptionModule.AddOption = AddOption;
 	InventoryOptionModule.addOption = AddOption
+
+	local function Show(DoNotAnimate)
+		-- Shows the inventory with a nice animation. Uses Configuration.ShowAnimateTime.
+		-- This method can be overriden by Hide() or Show().
+		-- @param DoNotAnimate boolean, it true, will not animate.
+
+		local NewSize = UDim2.new(0, Configuration.ColumnWidth, 0, InventoryOptionModule.RenderHeightY)
+		if DoNotAnimate then
+			MainFrame.Size = NewSize
+		else
+			MainFrame:TweenSize(NewSize, "Out", "Sine", Configuration.ShowAnimateTime, true)
+		end
+	end
+	InventoryOptionModule.Show = Show
+	InventoryOptionModule.show = Show
+
+	local function Hide(DoNotAnimate)
+		-- Hides the inventory with a nice animation. Uses Configuration.ShowAnimateTime.
+		-- This method can be overriden by Hide() or Show().
+		-- @param DoNotAnimate boolean, it true, will not animate.
+
+		local NewSize = UDim2.new(0, Configuration.ColumnWidth, 0, 0)
+		if DoNotAnimate then
+			MainFrame.Size = NewSize
+		else
+			MainFrame:TweenSize(NewSize, "Out", "Sine", Configuration.ShowAnimateTime, true)
+		end
+	end
+	InventoryOptionModule.Hide = Hide
+	InventoryOptionModule.hide = Hide
 
 	local function Collapse()
 		-- Collapses the option module
@@ -1135,21 +1302,22 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 		local ShowCount = 0;
 
 		for _, Option in pairs(OptionList) do
-			Option:Update(OptionSystem.Box2DInterface)
+			Option:Update(OptionSystem.Box2DInterface) -- Better not yield.
 
+			-- Make sure the option is shown
 			if Option.Shown then
-				if IsCollapsed then
-					--Option.Gui.Visible = false;
-				else
+				if not IsCollapsed then -- We reposition it should be shown.
 					Option.Gui.Position = UDim2.new(0, 0, 0, YHeight)
-					--Option.Gui.Visible = true;
 					YHeight = YHeight + Option.RenderHeightY
 				end
 				ShowCount = ShowCount + 1;
 			end
 		end
-		InventoryOptionModule.RenderHeightY = YHeight;
-		MainFrame.Size = UDim2.new(0, Configuration.ColumnWidth, 0, InventoryOptionModule.RenderHeightY)
+
+		InventoryOptionModule.RenderHeightY = YHeight + Configuration.IndividualHeaderHeight;
+		-- MainFrame.Size = UDim2.new(0, Configuration.ColumnWidth, 0, InventoryOptionModule.RenderHeightY)
+		MainFrame:TweenSize(UDim2.new(0, Configuration.ColumnWidth, 0, InventoryOptionModule.RenderHeightY), "Out", "Sine", Configuration.ShowAnimateTime, true)
+	
 		RenderFrame:TweenSize(UDim2.new(1, 0, 0, YHeight), "Out", "Sine", Configuration.TweenAnimationTime, true)
 		return ShowCount;
 	end
@@ -1168,22 +1336,16 @@ end)
 lib.MakeInventoryOptionModule = MakeInventoryOptionModule
 lib.makeInventoryOptionModule = MakeInventoryOptionModule
 
--- Utility Function --
-local function GetCenterY(ScreenGui, RenderHeightY)
-	--- Get's the Y.Offset factor of a screenGUI, and frame (withthe RenderHeightY given), 
-	--- Used internally by the options module
-	-- @return Number value that the UDim2Y should be set to
-
-	local Height = ScreenGui.AbsoluteSize.Y;
-	return (Height - RenderHeightY)/2
-end
-
 
 --[[
 Change log
 
+February 15th, 2014
+- Added DoNotAnimate option to Update()
+
 February 13th, 2014
 - Set it so modules now render at the top, not centered.
+
 --]]
 local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 	--- This handles options and stuff. This is basically how the player will interact with the inventory, so it
@@ -1225,6 +1387,7 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 		SpacingSize            = 30; -- Padding between each option;
 		ColumnPaddingX         = 50; -- Padding between each column
 		TweenAnimationTime     = 0.2; -- Universal animation time;
+		ShowAnimateTime        = 0.2; -- Time to show a module.
 	}
 	local Configuration = OptionSystem.Configuration
 	local BoxSelection = Box2DInterface.BoxSelection
@@ -1243,24 +1406,25 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 
 
 	-- Functions --
-	local function AddModule(Module)
+	local function AddModule(Module, DoNotAnimate)
 		--- Adds a module into the system
 
 		OptionsSystemModules[Module.Name] = Module
 		Module.Gui.Parent = RenderFrame
 
 		-- Connect events.
-		Module.CollapseStateChanged:connect(function()
+		Module.CollapseStateChanged:connect(function() -- Could be ugly GC problem with event connection.
 			OptionSystem.Update()
 		end)
 
-		OptionSystem.Update() -- Update whenever a new module is added.
+		OptionSystem.Update(DoNotAnimate) -- Update whenever a new module is added.
 	end
 	OptionSystem.AddModule = AddModule
 	OptionSystem.addModule = AddModule
 
-	local function Update()
+	local function Update(DoNotAnimate)
 		-- Updates the whol thing, relaigns columns 
+		-- @param DoNotAnimate Boolean, dictates whether or not it animates
 
 		local MaxYHeight = Box2DInterface.ScreenGui.AbsoluteSize.Y
 		MaxYHeight = MaxYHeight - (Configuration.PaddingY*2)
@@ -1269,6 +1433,7 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 		local CurrentRenderHeightY = Configuration.PaddingY*2;
 		local CurrentOptionModulesInColumn = {}
 
+		-- Utility functions.
 		local function CheckifBranchToNewColumnAndExecute()
 			-- Checks if a new column needs to be made, recenters the modulers
 			-- If you have a really big modular, this kind of messes up, as far as I can think. I think it'll float over an extra one
@@ -1292,14 +1457,18 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 		end
 
 		for _, OptionModule in pairs(OptionsSystemModules) do
+			-- Update the module...
 			OptionModule.Update(Box2DInterface.BoxSelection)
+
 			if OptionModule.CheckIfShowable() then
-				OptionModule.Gui.Visible = true;
+				OptionModule.Show(DoNotAnimate)
+
+				-- Track modules in the column.
 				table.insert(CurrentOptionModulesInColumn, OptionModule)
 				CurrentRenderHeightY = CurrentRenderHeightY + OptionModule.RenderHeightY + Configuration.SpacingSize
 				CheckifBranchToNewColumnAndExecute()
 			else
-				OptionModule.Gui.Visible = false;
+				OptionModule.Hide(DoNotAnimate)
 			end
 		end
 
@@ -1311,7 +1480,12 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 			for Index, OptionModule in pairs(CurrentOptionModulesInColumn) do
 				local NewPosition = UDim2.new(0, (ColumnCount - 1) * (Configuration.ColumnWidth + Configuration.ColumnPaddingX), 0, HeightY)
 				--OptionModule.Gui.Position = NewPosition
-				OptionModule.Gui:TweenPosition(NewPosition, "Out", "Sine", Configuration.TweenAnimationTime, true);
+				if DoNotAnimate then
+					OptionModule.Gui:TweenPosition(NewPosition, "Out", "Sine", Configuration.TweenAnimationTime, true);
+				else
+					OptionModule.Gui.Position = NewPosition
+				end
+
 				HeightY = HeightY + OptionModule.RenderHeightY + Configuration.SpacingSize
 			end
 		end
@@ -1321,15 +1495,204 @@ local MakeOptionSystem = Class(function(OptionSystem, Box2DInterface)
 	OptionSystem.update = Update
 
 	-- Connect events. Better is use groups so a ton of items selected at once doesn't lag.
-	BoxSelection.SelectionChanged:connect(function()
+	BoxSelection.SelectionChanged:connect(function() -- Another ugly GC problem?
 		Update()
 	end)
-	-- BoxSelection.SelectionGroupRemoved:connect(function()
-	-- 	Update()
-	-- end)
 end)
 
+--[[
+Change Log
 
+February 15th, 2014
+- Added GCing stuff to the system.
+
+--]]
+local MakeBoxInventoryRenderCard = Class(function(BoxInventoryRenderCard, BoxInventoryRender, ZIndex)
+	--- A card displaying information about the box inventory
+	-- Renders a title, 
+
+	-- Todo: Add actual statistics.
+
+	local BoxInventory = BoxInventoryRender.Inventory
+	local Box2DInterface = BoxInventoryRender.Box2DInterface
+	local Configuration = Box2DInterface.Configuration
+
+	ZIndex = ZIndex or Configuration.ZIndex
+
+	local MainFrame = Make 'Frame' {
+		Archivable             = false;
+		BackgroundColor3       = Color3.new(1, 1, 1);
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		ClipsDescendants       = false;
+		Name                   = "BoxInventoryRenderCard";
+		Position               = UDim2.new(0, 0, 0, 0);
+		Size                   = UDim2.new(1, 0, 0, 0);
+		Visible                = true;
+		ZIndex                 = ZIndex;
+	}
+	BoxInventoryRenderCard.Gui = MainFrame
+
+	local TitleFrame = Make 'Frame' {
+		Archivable             = false;
+		BackgroundColor3       = Color3.new(242/255, 242/255, 242/255);
+		BackgroundTransparency = 0;
+		BorderSizePixel        = 0;
+		ClipsDescendants       = true; -- Make sure if the Title goes past the size, we can still work....
+		Name                   = "TitleFrame";
+		Parent                 = MainFrame;
+		Position               = UDim2.new(0, 0, 0, 0);
+		Size                   = UDim2.new(1, 0, 0, Configuration.IndividualHeaderHeight);
+		Visible                = true;
+		ZIndex                 = ZIndex + 1;
+	}
+
+	local TitleLabel = Make 'TextLabel' {
+		Archivable             = false;
+		BackgroundColor3       = Color3.new(0, 0, 0);
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		Font                   = "Arial";
+		FontSize               = "Size18";
+		Name                   = "Title";
+		Parent                 = TitleFrame;
+		Position               = UDim2.new(0, 10, 0, 0);
+		Size                   = UDim2.new(1, -10, 1, 0);
+		Text                   = BoxInventory.Name .." Inventory";
+		TextColor3             = Color3.new(0, 0, 0);
+		TextStrokeTransparency = 1;
+		TextXAlignment         = "Left";
+		TextYAlignment         = "Center";
+		Visible                = true;
+		ZIndex                 = ZIndex + 1;
+	}
+
+	local Stats = {}
+
+	local function Update()
+		--- To be called everytime the BoxInventoryRender updates / changes
+
+		for Index, Stat in pairs(Stats) do
+			Stat.Update()
+		end
+	end
+	BoxInventoryRenderCard.Update = Update
+	BoxInventoryRenderCard.update = Update
+
+	local function Destroy()
+		-- Should GC the card
+
+		Update         = nil
+
+		ZIndex         = nil
+		BoxInventory   = nil
+		Box2DInterface = nil
+		Configuration  = nil
+
+		for Index, Stat in pairs(Stats) do
+			Stats[Index] = nil
+		end
+
+		MainFrame:Destroy()
+		TitleFrame:Destroy()
+		TitleLabel:Destroy()
+
+		--- Clean out whole class declaration
+		for Index, Value in pairs(BoxInventoryRenderCard) do
+			BoxInventoryRenderCard[Index] = nil
+		end
+	end
+	BoxInventoryRenderCard.Destroy = Destroy
+	BoxInventoryRenderCard.destroy = Destroy
+
+
+	-- DEFINE STATS
+	local InventoryVolumeInfo = {} do
+		-- This tracks the inventory size, and how much is left.
+
+		local SizeIcon                = RenderSizeIcon(30, 3, Color3.new(255/255, 107/255, 107/255),  ZIndex, true)
+		local SizeIconOver            = RenderSizeIcon(30, 3, Color3.new(217/255, 217/255, 217/255),  ZIndex+1, true)
+		SizeIconOver.Parent           = SizeIcon
+		SizeIconOver.ClipsDescendants = true
+		
+		local MainFrame         = MakeIconedFrame(SizeIcon, "* ERROR *", ZIndex)
+		InventoryVolumeInfo.Gui = MainFrame
+		local TextLabel         = MainFrame.TextLabel
+
+		local function Update()
+			-- Updates the information. called by BoxInventoryRenderCard.Update
+			-- Will also be called automatically on render.
+
+			local InventoryVolume = BoxInventory.GetInventoryVolume()
+			local TakenVolume = BoxInventory.GetTakenVolume()
+			local PercentUsed = TakenVolume / InventoryVolume
+
+			SizeIconOver.Size = UDim2.new(1, 0, 1-PercentUsed, 0) -- Resize so color only shows through is the % used.
+			TextLabel.Text    = Round(PercentUsed * 100, 0.1) .. "% used [" .. TakenVolume .. " blocks out of " .. InventoryVolume .. "]"
+		end
+		InventoryVolumeInfo.Update = Update
+	end
+	Stats[#Stats+1] = InventoryVolumeInfo
+	InventoryVolumeInfo = nil
+
+	local InventoryItemCount = {} do
+		local CountIcon = Make 'TextLabel' {
+			Archivable             = false;
+			BackgroundTransparency = 1;
+			BorderSizePixel        = 0;
+			Font                   = "Arial";
+			Name                   = "CountIcon";
+			Size                   = UDim2.new(0, 30, 0, 30);
+			Text                   = "0";
+			TextColor3             = Color3.new(78/255, 205/255, 196/255);
+			TextScaled             = true;
+			TextXAlignment         = "Center";
+			TextYAlignment         = "Center";
+			ZIndex                 = ZIndex;
+		}
+
+		local MainFrame = MakeIconedFrame(CountIcon, "* ERROR *", ZIndex)
+		InventoryItemCount.Gui = MainFrame
+		local TextLabel = MainFrame.TextLabel
+
+		local function Update()
+			local Count = BoxInventoryRender.GetTotalItemCount()
+
+			CountIcon.Text = tostring(Count)
+			TextLabel.Text = "There are " .. Count .. " items stored"
+		end
+		InventoryItemCount.Update = Update
+	end
+	Stats[#Stats+1] = InventoryItemCount
+	InventoryItemCount = nil
+
+	-- PROCESS STATS
+	local YHeight = Configuration.IndividualHeaderHeight + 10
+	for Index, Stat in pairs(Stats) do
+		Stat.Gui.Parent   = MainFrame
+		Stat.Gui.Position = UDim2.new(0, 0, 0, YHeight)
+		YHeight           = YHeight + Stat.Gui.Size.Y.Offset + 10;
+		-- Stat.Update() -- Already called.
+	end
+	MainFrame.Size = UDim2.new(1, 0, 0, YHeight)
+	YHeight = nil
+
+	Update()
+end)
+
+--[[
+Change Log
+February 16th, 2014
+- Added GC stuff on events
+- Added Destroy method fix
+- Fixed GC stuffz.
+
+February 15th, 2014
+- Added GetTotalItemCount
+- Fixed resizing the frame
+- Added info card on mouse over
+
+--]]
 local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface, BoxInventory)
 	-- Render's itself in a frame, can be collapsed, et cetera. Represents a SINGLE inventory. 
 
@@ -1337,6 +1700,7 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 	-- @param Box2DRenderItem The Box2DRenderItem that the BoxInventoryRender will be represented in
 	-- @param BoxInventory The inventory of which content's are being displayed
 
+	BoxInventoryRender.Interfaces = {} -- For other things to store information in
 	local Configuration = Box2DInterface.Configuration;
 
 	-- Render GUIs, this holds everything in it.
@@ -1351,9 +1715,9 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		Position               = UDim2.new(0, 0, 0, 0);
 		Size                   = UDim2.new(1, 0, 0, Configuration.IndividualHeaderHeight);
 		Visible                = true;
-		ZIndex                 = Box2DInterface.Configuration.ZIndex;
+		ZIndex                 = Configuration.ZIndex;
 	}
-	BoxInventoryRender.Gui = RenderFrame
+	BoxInventoryRender.Gui       = RenderFrame
 	BoxInventoryRender.Inventory = BoxInventory
 
 	-- Holds all the specific items in it.
@@ -1368,7 +1732,7 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		Position               = UDim2.new(0, 0, 0, Configuration.IndividualHeaderHeight);
 		Size                   = UDim2.new(0, Configuration.ColumnWidth, 0, 0);
 		Visible                = true;
-		ZIndex                 = Box2DInterface.Configuration.ZIndex;
+		ZIndex                 = Configuration.ZIndex;
 	}
 	BoxInventoryRender.ContentFrame = ContentFrame
 
@@ -1386,36 +1750,31 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		Configuration.IndividualHeaderHeight
 	);
 	TitleFrame.BackgroundTransparency = 0.7;
-	TitleFrame.Parent = RenderFrame;
-	TitleFrame.Position = UDim2.new(0, 0, 0, 0); 	
+	TitleFrame.Parent                 = RenderFrame;
+	TitleFrame.Position               = UDim2.new(0, 0, 0, 0); 	
 
 	CollapseButton.Gui.Parent = TitleFrame
 	CollapseButton.Gui.Position = UDim2.new(1, -(CollapseButton.Gui.Size.X.Offset + 5), 0.5, -CollapseButton.Gui.Size.Y.Offset/2)
 	--CollapseButton.Gui.BackgroundColor3 = Color3.new(0, 0, 0)
 
 	-- Public variables
-	BoxInventoryRender.Box2DInterface = Box2DInterface; -- Read only
-	BoxInventoryRender.BoxInventory = BoxInventory	-- Read only
+	BoxInventoryRender.Box2DInterface       = Box2DInterface; -- Read only
+	BoxInventoryRender.BoxInventory         = BoxInventory	-- Read only
 	BoxInventoryRender.CollapseStateChanged = CreateSignalInternal()
-	local EventStorage = EventGroup.MakeEventGroup() -- Store Box2DRenderItem
-	BoxInventoryRender.EventStorage = EventStorage
 
-	EventStorage.CollapseButton.MouseEnter = CollapseButton.Gui.MouseEnter:connect(function()
-		qGUI.TweenTransparency(CollapseButton.Gui, {BackgroundTransparency = 0.7;}, 0.1, true)
-	end)
-
-	EventStorage.CollapseButton.MouseLeave = CollapseButton.Gui.MouseLeave:connect(function()
-		qGUI.TweenTransparency(CollapseButton.Gui, {BackgroundTransparency = 1;}, 0.1, true)
-	end)
+	local EventStorage                      = EventGroup.MakeEventGroup() -- Store Box2DRenderItem
+	BoxInventoryRender.EventStorage         = EventStorage
 
 	-- Private variables
-	local RenderHeightY = Box2DInterface.Configuration.IndividualHeaderHeight; -- Read only
-	local IsCollapsed = false; 
-	local HasContentToRender = false;
-
-	local RenderHeightY = 0;
-
-	local VisibleItems = {}
+	local RenderHeightY      = Configuration.IndividualHeaderHeight; -- Read only
+	local IsCollapsed        = false
+	local HasContentToRender = false
+	
+	local TotalItemCount     = 0 -- Items held in the inventory. Track it!
+	
+	local VisibleItems       = {} -- This holds all the Box2DRender items
+	local ActiveCards        = {} -- Hold all active "info cards" that are attached to the inventory. A weak table, so it *should?* GC?
+	setmetatable(ActiveCards, {__mode  ="v"})
 
 	-- Private Methods
 	local function FindRenderInterface(ClassName)
@@ -1433,6 +1792,14 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		return nil, nil, false
 	end
 
+	local function UpdateCards()
+		--- Updates all InfoCards. Internally called on item add or remove.
+
+		for _, ActiveCard in pairs(ActiveCards) do
+			ActiveCard.Update()
+		end
+	end
+
 	local function SortInventory(Mode)
 		-- Sort's visible items. Default is "alphabetical", which is currenlty the only option.
 		-- Mode is the mode to sort by...
@@ -1448,7 +1815,10 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 
 		-- Loop through each item and add it.
 		for _, Item in pairs(Items) do
-			-- print("[BoxInventoryRender] - Adding Item "..Item.ClassName)
+			if Item.Interfaces.BoxInventoryRender then
+				error("[BoxInventoryRender] - This item already has a BoxInventoryRender interface, is already added into system.!")
+			end
+
 			local Interface = FindRenderInterface(Item.ClassName)
 			if not Interface then
 				Interface = {}
@@ -1456,7 +1826,7 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 				Interface.Render = MakeBox2DRenderItem(Item, BoxInventoryRender, nil)
 				Interface.ClassName = Item.ClassName
 
-				BoxInventoryRender.EventStorage[Item.ClassName].MouseButton1Click = Interface.Render.Gui.MouseButton1Click:connect(function()
+				EventStorage[Item.ClassName].MouseButton1Click = Interface.Render.Gui.MouseButton1Click:connect(function()
 					-- Select! Yay!
 
 					-- print("[BoxInventoryRender] - Item button clicked")
@@ -1470,6 +1840,7 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 				Interface.Render.Gui.Parent = ContentFrame;
 				Interface.Render.AnimateShow()
 
+				-- Add interfaces, insert it into the list, and sort the inventory!
 				Item.Interfaces["BoxInventoryRender"] = Interface
 				table.insert(VisibleItems, Interface)
 				SortInventory()
@@ -1477,8 +1848,11 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 				Item.Interfaces["BoxInventoryRender"] = Interface
 				Interface.Render.AddItemToSlot(Item)
 			end
+
+			TotalItemCount = TotalItemCount + 1
 		end
 		BoxInventoryRender.Update()
+		UpdateCards()
 	end
 
 	local function RemoveItems(Items)
@@ -1497,53 +1871,39 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 					Box2DInterface.BoxSelection:Unselect(RenderInterface.Render)
 					RenderInterface.Render:Destroy() -- Destroys the render interface, which is removed from the item
 					-- by setting Item.Interfaces.BoxInventoryRender to nil below.
-
+					EventStorage[Item.ClassName] = nil
 					table.remove(VisibleItems, Index) -- Clean out from VisibleItems...
 				end
+
+				TotalItemCount = TotalItemCount - 1
 			else
 				error("[BoxInventoryRender] - Item '" .. Item.ClassName .."' does not exist in the InventoryRender system, cannot remove.")
 			end
 		end
 
 		Box2DInterface.Update()
+		UpdateCards()
 	end
 
 	-- Public Methods --
 
-	local UpdatePropertiesId = 0; -- Prevent override
+	local function GetInfoCard(ZIndex)
+		--- Return's a BoxInventory info card!
+
+		local NewCard = MakeBoxInventoryRenderCard(BoxInventoryRender, ZIndex)
+		ActiveCards[#ActiveCards+1] = NewCard -- MORE HORRID GC THINGS
+
+		return NewCard
+	end
+	BoxInventoryRender.GetInfoCard = GetInfoCard
+	BoxInventoryRender.getInfoCard = GetInfoCard
 
 	local function UpdateProperties()
 		--- Updates BoxInventoryRender.RenderHeightY to the correct value. Also updates
 		--  HasContentToRender and IsCollapsed
 		-- Called by Update()
-		local YHeight = 0;
-		--[[ --Box2DInterface.Configuration.IndividualHeaderHeight;
-		local LocalUpdatePropertiesId = UpdatePropertiesId + 1;
-		UpdatePropertiesId = LocalUpdatePropertiesId;
 
-		if not IsCollapsed then
-			for _, Interface in pairs(VisibleItems) do
-				Interface.Render.Update() -- Maybe disable if it's too inefficient?
-				Interface.Render.Gui:TweenPosition(UDim2.new(0, 0, 0, YHeight), "Out", "Sine", Configuration.CollapseAnimateTime, true);
-				YHeight = YHeight + Interface.Render.YRenderHeight;
-			end
-		else -- Hide if collapsed. 
-			for _, Interface in pairs(VisibleItems) do
-				for _, Interface in pairs(VisibleItems) do -- This can get messy. Fix later. 
-					Interface.Render.Gui:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Sine", Configuration.CollapseAnimateTime, true);
-				end
-			end
-		end
-		RenderHeightY = YHeight + Box2DInterface.Configuration.IndividualHeaderHeight;
-		if RenderFrame.Size.Y.Offset > RenderHeightY then
-			delay(Configuration.CollapseAnimateTime, function()
-				if UpdatePropertiesId == LocalUpdatePropertiesId then
-					RenderFrame.Size = UDim2.new(1, 0, 0, RenderHeightY)
-				end
-			end)
-		else
-			RenderFrame.Size = UDim2.new(1, 0, 0, RenderHeightY)
-		end--]]
+		local YHeight = 0;
 
 		if not IsCollapsed then
 			for _, Interface in pairs(VisibleItems) do
@@ -1553,7 +1913,10 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 			end
 		end
 		RenderHeightY = YHeight + Box2DInterface.Configuration.IndividualHeaderHeight
+		RenderFrame.Size = UDim2.new(1, 0, 0, RenderHeightY)
 	end
+	BoxInventoryRender.UpdateProperties = UpdateProperties
+	BoxInventoryRender.updateProperties = UpdateProperties
 
 	local function ResizeContentFrame(DoNotAnimate)
 		-- Resizes the content frame based upon collapsed or not
@@ -1578,15 +1941,18 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		BoxInventoryRender.CollapseStateChanged:fire(IsCollapsed); -- Should fire Update()
 		--ResizeContentFrame() -- Handled by event being fired
 	end
-	BoxInventoryRender.Collapse = Collapse;
+	BoxInventoryRender.Collapse = Collapse
+	BoxInventoryRender.collapse = Collapse
 
 	local function Uncollapse()
 		-- Decollapses the inventory 
+
 		IsCollapsed = false;
 		BoxInventoryRender.CollapseStateChanged:fire(IsCollapsed); -- Should fire Update()
 		--ResizeContentFrame() -- Handled by event being fired
 	end
-	BoxInventoryRender.Uncollapse = Uncollapse;
+	BoxInventoryRender.Uncollapse = Uncollapse
+	BoxInventoryRender.uncollapse = Uncollapse
 
 	local function Update()
 		-- Redraw's and updates the render.
@@ -1595,52 +1961,177 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		ResizeContentFrame()
 		CollapseButton.SetState(IsCollapsed)
 	end
-	BoxInventoryRender.Update = Update;
+	BoxInventoryRender.Update = Update
+	BoxInventoryRender.update = Update
+
+	-- GET methods 
+
+	local function GetHasContentToRender()
+		--- Return's if this class has any content to render.
+
+		return HasContentToRender
+	end
+	BoxInventoryRender.GetHasContentToRender = GetHasContentToRender
+	BoxInventoryRender.getHasContentToRender = GetHasContentToRender
+
+	local function GetIsCollapsed()
+		-- Return if this inventory is collapsed or not. 
+		return IsCollapsed
+	end
+	BoxInventoryRender.GetIsCollapsed = GetIsCollapsed
+	BoxInventoryRender.getIsCollapsed = GetIsCollapsed
+
+	local function GetRenderHeightY()
+		-- Return the RenderHeightY value of the inventory. 
+
+		return RenderHeightY
+	end
+	BoxInventoryRender.GetRenderHeightY = GetRenderHeightY
+	BoxInventoryRender.getRenderHeightY = GetRenderHeightY
+
+	local function GetTotalItemCount()
+		--- Return's how many items the inventory is holding.
+
+		return TotalItemCount
+	end
+	BoxInventoryRender.GetTotalItemCount = GetTotalItemCount
+	BoxInventoryRender.getTotalItemCount = GetTotalItemCount
+
+	local InfoCard = {} do 
+		-- This setups up an info card that will work on MouseEnter
+		-- So inefficient. Oh well.
+
+		InfoCardClass                            = GetInfoCard(Configuration.ZIndex + 3)
+		InfoCardClass.Gui.Parent                 = Box2DInterface.Gui;
+		InfoCardClass.Gui.BackgroundTransparency = 0
+
+		InfoCard.InfoCardClass = InfoCardClass
+
+		local CornerWedgeThingy = Make 'ImageLabel' {
+			Archivable             = false;
+			BackgroundTransparency = 1;
+			BorderSizePixel        = 0;
+			Image                  = "http://www.roblox.com/asset/?id=146421657";
+			Name                   = "Tip";
+			Parent                 = InfoCardClass.Gui;
+			Position               = UDim2.new(0, -20, 0, 0);
+			Size                   = UDim2.new(0, 20, 0, 20);
+			ZIndex                 = Configuration.ZIndex + 3;
+		}
+
+		local function UpdatePosition()
+			InfoCardClass.Gui.Position = UDim2.new(0, Configuration.Width + 10, 0, TitleFrame.AbsolutePosition.Y + 10);
+		end
+		InfoCard.UpdatePosition = UpdatePosition
+		InfoCard.updatePosition = UpdatePosition
+
+		local function Show()
+			-- Shows the InfoCard
+
+			UpdatePosition()
+			InfoCardClass.Gui.Visible = true
+		end
+		InfoCard.Show = Show
+		InfoCard.show = Show
+
+		local function Hide()
+			-- Hides the InfoCard
+
+			InfoCardClass.Gui.Visible = false
+		end
+		InfoCard.Hide = Hide
+		InfoCard.hide = Hide
+
+		UpdatePosition()
+		Hide()
+
+		local function Destroy()
+			CornerWedgeThingy:Destroy()
+			InfoCard = nil
+		end
+		InfoCard.Destroy = Destroy
+	end
 
 	local function Destroy()
-		-- Destroy's the render for GC.
-		-- Not tested. 
+		-- Destroy's the box inventory render. 
+		-- If Cards are still enabled in a system, they will be destroyed, but not GCed. Problem!
 
-		for _, Item in pairs(VisibleItems) do
-			Box2DInterface.BoxSelection:Unselect(VisibleItems.Render) -- Unselect this thing
-			Item.Interfaces.BoxInventoryRender.Render.Destroy()
+		for Index, Box2DRenderItem in pairs(VisibleItems) do
+			VisibleItems[Index] = nil
+			Box2DInterface.BoxSelection:Unselect(Box2DRenderItem.Render)
+			Box2DRenderItem.Render.Destroy()
 		end
 
-		EventStorage("Clear")
+		for Index, ActiveCard in pairs(ActiveCards) do
+			ActiveCard.Destroy()
+			ActiveCards[Index] = nil
+		end
 
+		BoxInventoryRender.Interfaces = nil
+
+		ActiveCards = nil
+		VisibleItems = nil
+
+		InfoCard:Destroy()
+		CollapseButton:Destroy()
+		CollapseButton = nil
+
+		-- Clean up events
+		EventStorage("Clear")
+		BoxInventoryRender.CollapseStateChanged:destroy()
+		BoxInventoryRender.CollapseStateChanged = nil
+
+		-- Clean up internal stuff.
+		EventStorage       = nil
+		Configuration      = nil
+		
+		RenderHeightY      = nil
+		IsCollapsed        = nil
+		HasContentToRender = nil
+		VisibleItems       = nil
+		ActiveCards        = nil
+		
+		BoxInventory       = nil
+		Box2DInterface     = nil
+
+		-- Clean up GUIs
 		RenderFrame:Destroy()
+		RenderFrame = nil
+
+		-- Clean up class declaration
 		for Index, Item in pairs(BoxInventoryRender) do
 			BoxInventoryRender[Index] = nil;
 		end
 	end
-
-	-- GET methods 
-
-	function BoxInventoryRender.GetHasContentToRender()
-		--- Return's if this class has any content to render.
-		return HasContentToRender
-	end
-	function BoxInventoryRender.GetIsCollapsed()
-		-- Return if this inventory is collapsed or not. 
-		return IsCollapsed
-	end
-	function BoxInventoryRender.GetRenderHeightY()
-		-- Return the RenderHeightY value 
-		return RenderHeightY
-	end
+	BoxInventoryRender.Destroy = Destroy
+	BoxInventoryRender.destroy = Destroy
 
 	-- Add initial items on creation. --
+
 	AddItems(BoxInventory.GetListOfItems())
 
-	BoxInventory.ItemAdded:connect(function(Item)
-		AddItems({Item})
+	-- Connect events.
+	EventStorage.ItemAdded = BoxInventory.ItemAdded:connect(function(Item)
+		AddItems({Item}) -- Also will call UpdateCards()
 	end)
 
-	BoxInventory.ItemRemoved:connect(function(Item)
-		RemoveItems({Item})
+	EventStorage.ItemRemoved = BoxInventory.ItemRemoved:connect(function(Item)
+		RemoveItems({Item}) -- Also will call UpdateCards()
 	end)
 
-	CollapseButton.Gui.MouseButton1Click:connect(function()
+	EventStorage.StorageSlotAdded = BoxInventory.StorageSlotAdded:connect(function()
+		UpdateCards()
+	end)
+
+	EventStorage.CollapseButtonMouseEnter = CollapseButton.Gui.MouseEnter:connect(function()
+		qGUI.TweenTransparency(CollapseButton.Gui, {BackgroundTransparency = 0.7;}, 0.1, true)
+	end)
+
+	EventStorage.CollapseButtonMouseLeave = CollapseButton.Gui.MouseLeave:connect(function()
+		qGUI.TweenTransparency(CollapseButton.Gui, {BackgroundTransparency = 1;}, 0.1, true)
+	end)
+
+	EventStorage.CollapseButtonMouseButton1Click = CollapseButton.Gui.MouseButton1Click:connect(function()
 		if not CollapseButton.GetState() then
 			Collapse()
 		else
@@ -1648,13 +2139,141 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		end
 	end)
 
+	--- Setup TitleFrame stuff.
+	EventStorage.TitleFrameMouseEnter = TitleFrame.MouseEnter:connect(function()
+		InfoCard.Show()
+	end)
+
+	EventStorage.TitleFrameMouseLeave = TitleFrame.MouseLeave:connect(function()
+		InfoCard.Hide()
+	end)
+
+	EventStorage.ScrollFinished = Box2DInterface.Scroller.ScrollFinished:connect(function()
+		InfoCard.UpdatePosition()
+	end)
+
+	EventStorage.Box2DInterfaceClosed = Box2DInterface.Closed:connect(function()
+		InfoCard.Hide() -- We need to hide on close because ROBLOX's MouseLeave event doesn't fire right.
+	end)
+
+	InfoCard.Hide()
 	ResizeContentFrame(true)
 end)
+
+local MakeVerticalCardHolder = Class(function(VerticalCardHolder, Width, ZIndex)
+	--- Holds "Cards", short pockets of information. 
+	-- @param ZIndex The ZINdex to set
+	-- @param Width The width of the card holder.
+
+	-- This one holds cards vertically. 
+	-- Has a member .Gui, must be parented
+	-- Scrollbars come later, I suppose.
+
+	local MainFrame = Make 'Frame' {
+		BackgroundColor3       = Color3.new(1, 1, 1);
+		BackgroundTransparency = 0;
+		BorderSizePixel 	   = 0;
+		Name                   = "VerticalCardHolder";
+		Position               = UDim2.new(0, 0, 0, 0);
+		Size                   = UDim2.new(0, Width, 0, 0);
+		Visible                = true;
+		ZIndex                 = ZIndex;
+		Archivable             = false;
+	}
+	VerticalCardHolder.Gui = MainFrame
+
+	local Pointer = Make 'ImageLabel' {
+		Image                  = "http://www.roblox.com/asset/?id=146409029";
+		Parent                 = MainFrame;
+		Size                   = UDim2.new(0, 30, 0, 20);
+		BackgroundTransparency = 1;
+		Position               = UDim2.new(0, 0, 0, -20);
+		BorderSizePixel        = 0;
+		Archivable             = false;
+		ZIndex                 = ZIndex;
+	}
+
+	local Cards = {}
+
+	local function RepositionCards()
+		-- Repositions all the cards and resizes the container.
+
+		local YHeight = 0
+		for _, Card in pairs(Cards) do
+			Card.Gui.Position = UDim2.new(0, 0, 0, YHeight)
+			YHeight = YHeight + Card.Gui.Size.Y.Offset
+		end
+
+		MainFrame.Size = UDim2.new(0, Width, 0, YHeight)
+	end
+
+	local function SetPosition(NewPosition)
+		--- Set's the position of the VerticalCardHolder. Should be used because it will make the pointer point at it
+		--  correctly.
+		-- @param NewPosition The new position to set
+		-- @post The postion is set.
+
+		MainFrame.Position = NewPosition + UDim2.new(0, 0, 0, 20)
+	end
+	VerticalCardHolder.SetPosition = SetPosition
+	VerticalCardHolder.setPosition = SetPosition
+
+	local function AddCard(NewCard)
+		-- Adds a new card to the system and updates it. 
+		-- @param NewCard A table that should have a single thing, ".Gui")
+
+		NewCard.Gui.Parent = MainFrame
+		Cards[#Cards+1] = NewCard
+		RepositionCards()
+	end
+	VerticalCardHolder.AddCard = AddCard
+	VerticalCardHolder.addCard = AddCard
+
+	local function RemoveCard(CardToRemove)
+		--- Removes a card from the render.
+		RepositionCards()
+
+		local DidRemove = false
+		for Index, Card in pairs(Cards) do
+			if Card == CardToRemove then
+				DidRemove = true
+				Card.Gui.Parent = nil
+				table.remove(Cards, Index)
+				break;
+			end
+		end
+
+		if not DidRemove then
+			error("[VerticalCardHolder] - Removal failed. Could not find card sent.")
+		end
+	end
+	VerticalCardHolder.RemoveCard = RemoveCard
+	VerticalCardHolder.removeCard = RemoveCard
+
+	local function Show()
+		MainFrame.Visible = true
+	end
+	VerticalCardHolder.Show = Show
+	VerticalCardHolder.show = Show
+
+	local function Hide()
+		MainFrame.Visible = false
+	end
+	VerticalCardHolder.Hide = Hide
+	VerticalCardHolder.hide = Hide
+
+	-- We want to get the size right.
+	RepositionCards()
+	Hide()
+end)
+
 
 --[[
 Box2DInterface is the TOP LEVEL interface.
 
 Change Log
+February 15th, 2014
+- Made Scroller available to the world (Will be used by the Infobox in InventoryRender's)
 
 February 13th, 2014
 - Added "Gui" field pointing to MainFrame
@@ -1666,10 +2285,10 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 
 	-- Configuration and settings
 	Configuration = OverriddenConfiguration.new(Configuration, {
-		Subtitle = "// trade enterprise";
-		Title    = "Stock";
-		Width    = 250;
-
+		Subtitle               = "// trade enterprise";
+		Title                  = "Stock";
+		Width                  = 250;
+		
 		-- Rendering options
 		ScrollbarWidth         = 7;
 		ZIndex                 = 1; -- Index may go 2+ this, so range [1-8]
@@ -1680,7 +2299,18 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 		CloseIconRegular       = "http://www.roblox.com/asset/?id=139944727";
 		CloseIconOver          = "http://www.roblox.com/asset/?id=139944744";
 		CloseButtonSize        = 30; -- Since it's a square, the length of one side.
-		ToggleAnimationTime = 0.3; -- When toggling the inventory open or closed
+		-- Also CloseButtonSize will be used for OpenButtonSize.
+		
+		OpenButtonOffset       = UDim2.new(0, 5, 0, 5); -- Offset from top left portion of screen
+		OpenIconRegular        = "http://www.roblox.com/asset/?id=146357554";
+		OpenIconOver           = "http://www.roblox.com/asset/?id=146357731";
+		
+		ToggleAnimationTime    = 0.3; -- When toggling the inventory open or closed
+		
+		CardWidth              = 300;
+		CardZIndex             = 2;
+
+		ShowOpenInventoryLabelTime = 0.5;
 	})
 
 	Box2DInterface.Mouse = Mouse;
@@ -1741,6 +2371,10 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 	local HeaderFrame = MakeTitleFrame(MainFrame, Configuration.Title, Configuration.Subtitle, MainFrame.ZIndex, Configuration.IndividualHeaderHeight)
 	HeaderFrame.Size  = UDim2.new(1, -Configuration.ScrollbarWidth, 0, Configuration.IndividualHeaderHeight)
 
+	-- Display thing that shows up on mouse enter over the "Show inventory" thing.
+	local FastInfoViewerDisplay      = MakeVerticalCardHolder(Configuration.CardWidth, Configuration.CardZIndex)
+	FastInfoViewerDisplay.Gui.Parent = ScreenGui
+
 	local CloseButtonOffset = (Configuration.IndividualHeaderHeight - Configuration.CloseButtonSize)/2
 	local CloseButton = Make 'ImageButton' {
 		Archivable             = false;
@@ -1753,6 +2387,49 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 		Size                   = UDim2.new(0, Configuration.CloseButtonSize, 0, Configuration.CloseButtonSize);
 	}
 
+	-- SETUP OPEN BUTTON --
+	local OpenButton = Make 'ImageButton' { -- Goes in the top left corner, but fills the whole corner.
+		Archivable             = false;
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		Image                  = "";
+		Name                   = "OpenInventoryButton";
+		Parent                 = ScreenGui;
+		Position               = UDim2.new(0, 0, 0, 0);
+		Size                   = Configuration.OpenButtonOffset + UDim2.new(0, Configuration.CloseButtonSize, 0, Configuration.CloseButtonSize);
+	}
+
+	local OpenButtonImage = Make 'ImageLabel' { -- Image that goes in the top left corner. 
+		Archivable             = false;
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		Image                  = Configuration.OpenIconRegular;
+		Name                   = "ImageLabel";
+		Parent                 = OpenButton;
+		Position               = Configuration.OpenButtonOffset;
+		Size                   = UDim2.new(0, Configuration.CloseButtonSize, 0, Configuration.CloseButtonSize);
+	}
+
+	local OpenButtonTextLabel = Make 'TextLabel' { -- Shows up next to the OpenButtonImage
+		Archivable             = false;
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		Position               = UDim2.new(1, 10, 0.5, -Configuration.CloseButtonSize/2);
+		Size                   = UDim2.new(0, 200, 0, Configuration.CloseButtonSize);
+		Text                   = "Open Inventory [E]";
+		TextColor3             = Color3.new(1, 1, 1);
+		TextXAlignment         = "Left";
+		TextYAlignment         = "Center";
+		Font                   = "Arial";
+		FontSize               = "Size14";
+		TextStrokeTransparency = 1;
+		TextTransparency = 1;
+		Parent                 = OpenButton;
+		-- Visible = true;
+	}
+
+	FastInfoViewerDisplay.SetPosition(Configuration.OpenButtonOffset + UDim2.new(0, Configuration.CloseButtonSize/2, 0, Configuration.CloseButtonSize/2));
+
 	-- Properties
 	Box2DInterface.Configuration = Configuration -- Should not be modified, technically read only.
 	Box2DInterface.BoxSelection  = MakeBoxSelection(Box2DInterface)
@@ -1761,7 +2438,7 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 	Box2DInterface.Opened = CreateSignal() -- Fires when ShowInterface() is called
 	Box2DInterface.Closed = CreateSignal() -- Fires when HideInterface is called
 	
-	local OptionSystem = MakeOptionSystem(Box2DInterface)
+	local OptionSystem          = MakeOptionSystem(Box2DInterface)
 	OptionSystem.Gui.Parent     = MainFrame
 	OptionSystem.Gui.Position   = UDim2.new(0, Configuration.Width + Configuration.OptionPanePaddingX, 0, 0);
 	Box2DInterface.OptionSystem = OptionSystem
@@ -1769,26 +2446,57 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 	--assert(OptionSystem.Box2DInterface ~= nil, "OptionSystem.Box2DInterface == "..tostring(OptionSystem.Box2DInterface))
 
 	-- Signals
-	Box2DInterface.InventoryAdded = CreateSignalInternal();
+	Box2DInterface.InventoryAdded   = CreateSignalInternal();
 	Box2DInterface.InventoryRemoved = CreateSignalInternal();
-
-	local Scroller = ScrollBar.MakeScroller(ContentContainer, ContentFrame, ScreenGui, 'Y')
-	local ScrollBar = Scroller:AddScrollBar(ScrollBarFrame)
+	
+	local Scroller                  = ScrollBar.MakeScroller(ContentContainer, ContentFrame, ScreenGui, 'Y')
+	local ScrollBar                 = Scroller:AddScrollBar(ScrollBarFrame)
+	Box2DInterface.Scroller = Scroller
 
 	-- Local Properties (Private)
 	local RenderedInventories = {}
-	local UpdateEvents = EventGroup.MakeEventGroup()
+	local OpenInventories  = 0 -- Counter for OpenButtonOver
+	local UpdateEvents     = EventGroup.MakeEventGroup()
 	local InterfaceVisible = false; 
+
+	local function OpenButtonOver()
+		-- Whenever the mouse enters the open button
+
+		OpenButtonImage.Image       = Configuration.OpenIconOver;
+		qGUI.TweenTransparency(OpenButtonTextLabel, {TextTransparency = 0}, Configuration.ShowOpenInventoryLabelTime, true)
+		-- OpenButtonTextLabel.Visible = true
+		if OpenInventories >= 1 then
+			FastInfoViewerDisplay.Show()
+		end
+	end
+
+	local function OpenButtonLeave()
+		-- Whenever the mouse leaves the open button
+		OpenButtonImage.Image       = Configuration.OpenIconRegular;
+		qGUI.TweenTransparency(OpenButtonTextLabel, {TextTransparency = 1}, Configuration.ShowOpenInventoryLabelTime, true)
+		-- OpenButtonTextLabel.Visible = false
+		FastInfoViewerDisplay.Hide()
+	end
+
 
 	-- Global Methods
 	local function ShowInterface(DoNotAnimate)
+		-- Show's the interface
+		-- @param DoNotAnimate If true, will not animate
+
+		OpenButtonLeave() -- Fix on leave not firing on tweening stuff
+
 		Box2DInterface.Opened:fire()
 		InterfaceVisible = true;
-		local Position = UDim2.new(0, 0, 0, 0)
+
+		local Position           = UDim2.new(0, 0, 0, 0)
+		local OpenButtonPosition = UDim2.new(0, -OpenButton.Size.X.Offset, 0, Configuration.OpenButtonOffset.Y.Offset)
 
 		if DoNotAnimate then
-			MainFrame.Position = Position;
+			MainFrame.Position  = Position
+			OpenButton.Position = OpenButtonPosition
 		else
+			OpenButton:TweenPosition(OpenButtonPosition, "Out", "Quart", Configuration.ToggleAnimationTime, true)
 			MainFrame:TweenPosition(Position, "Out", "Quart", Configuration.ToggleAnimationTime, true)
 		end
 	end
@@ -1796,15 +2504,23 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 	Box2DInterface.showInterface = ShowInterface
 
 	local function HideInterface(DoNotAnimate)
+
+		-- Fix image on close (if mouse is over)
+		CloseButton.Image = Configuration.CloseIconRegular;
+
 		Box2DInterface.Closed:fire()
 		InterfaceVisible = false;
-		local Position = UDim2.new(0, -Configuration.Width, 0, 0)
+		local Position           = UDim2.new(0, -Configuration.Width, 0, 0)
+		local OpenButtonPosition = UDim2.new(0, 0, 0, 0);
+		
 		Box2DInterface.BoxSelection:UnselectAll()
 
 		if DoNotAnimate then
-			MainFrame.Position = Position;
+			MainFrame.Position  = Position
+			OpenButton.Position = OpenButtonPosition
 		else
 			MainFrame:TweenPosition(Position, "In", "Quart", Configuration.ToggleAnimationTime, true)
+			OpenButton:TweenPosition(OpenButtonPosition, "In", "Quart", Configuration.ToggleAnimationTime, true)
 		end
 	end
 	Box2DInterface.HideInterface = HideInterface;
@@ -1848,17 +2564,29 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 		--- Displays ClientInventoryInterface to the world.  The actual inventory will be on the server.
 		-- @param ClientInventory The ClientInventory to use. 
 
+		local InventoryUID = ClientInventory.UID or error("No UID!") -- Only reason why this wouldn't work via the immediate BoxINventory if it was stored client side.
+
 		local Interface = ClientInventory.Interfaces.BoxInventoryRender
 		if not Interface then
 			Interface            = MakeBoxInventoryRender(Box2DInterface, ClientInventory);
 			Interface.Gui.Parent = ContentFrame;
 		end
-		table.insert(RenderedInventories, Interface)
+		RenderedInventories[InventoryUID] = Interface
 
-		UpdateEvents[Box2DInterface].OnCollapse = Interface.CollapseStateChanged:connect(function()
+		local NewInterface = {} do
+				-- Do the card information stuff
+			local NewCard = Interface.GetInfoCard(Configuration.CardZIndex)
+			FastInfoViewerDisplay.AddCard(NewCard)
+
+			NewInterface.Card = NewCard
+		end
+		Interface.Interfaces.Box2DInterface = NewInterface
+
+		UpdateEvents[ClientInventory].OnCollapse = Interface.CollapseStateChanged:connect(function()
 			Update(true) -- Update the rendering to compensate. 
 		end)
 
+		OpenInventories = OpenInventories + 1
 		Update()
 
 		return Interface
@@ -1866,13 +2594,24 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 	Box2DInterface.AddClientInventory = AddClientInventory
 	Box2DInterface.addClientInventory = AddClientInventory
 
-	local function RemoveClientInventory(Index)
+	local function RemoveClientInventory(ClientInventory)
 		--- Removes the inventory from the interface.
+		-- @param Inventory The inventory being removed.
 
-		RenderedInventories[Index].Destroy()
-		table.remove(RenderedInventories, Index)
-		UpdateEvents[Box2DInterface]("Clear")
-		UpdateEvents[Box2DInterface] = {}
+		print("[Box2DInterface] - Removing client inventory")
+
+		local InventoryUID = ClientInventory.UID or error("No UID found!") -- Meh!
+		assert(RenderedInventories[InventoryUID] ~= nil, "cannot remove a nil inventory")
+
+		local RemovingInventory = RenderedInventories[InventoryUID]
+		FastInfoViewerDisplay.RemoveCard(RemovingInventory.Interfaces.Box2DInterface.Card)
+		UpdateEvents[RemovingInventory] = nil
+
+		RemovingInventory.Destroy()
+		RenderedInventories[InventoryUID] = nil
+
+		OpenInventories = OpenInventories - 1
+		Update()
 	end
 	Box2DInterface.RemoveClientInventory = RemoveClientInventory
 	Box2DInterface.removeClientInventory = RemoveClientInventory
@@ -1884,15 +2623,25 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 		end
 	end)
 
+	--- Button toggles
 	CloseButton.MouseEnter:connect(function()
 		CloseButton.Image = Configuration.CloseIconOver;
 	end)
-
 	CloseButton.MouseLeave:connect(function()
 		CloseButton.Image = Configuration.CloseIconRegular;
 	end)
-
 	CloseButton.MouseButton1Click:connect(function()
+		ToggleInterface()
+	end)
+
+	-- Open button toggles
+	OpenButton.MouseEnter:connect(function()
+		OpenButtonOver()
+	end)
+	OpenButton.MouseLeave:connect(function()
+		OpenButtonLeave()
+	end)
+	OpenButton.MouseButton1Click:connect(function()
 		ToggleInterface()
 	end)
 

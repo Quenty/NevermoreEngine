@@ -25,10 +25,15 @@ Janurary 8th, 2014
 local lib = {}
 local ScrollBackings = {}
 	ScrollBackings.Default = {}
+		-- ScrollBackings.Default.ScrollFrameBacking = {
+			-- ["Top"] = 'http://www.roblox.com/asset/?id=94910723';
+			-- ["Middle"] = 'http://www.roblox.com/asset/?id=94910803';
+			-- ["Bottom"] = 'http://www.roblox.com/asset/?id=94910858';
+		-- }
 		ScrollBackings.Default.ScrollFrameBacking = {
-			["Top"] = 'http://www.roblox.com/asset/?id=94910723';
-			["Middle"] = 'http://www.roblox.com/asset/?id=94910803';
-			["Bottom"] = 'http://www.roblox.com/asset/?id=94910858';
+			["Top"] = '';
+			["Middle"] = '';
+			["Bottom"] = '';
 		}
 		ScrollBackings.Default.ScrollThumb = {
 			["Top"] = 'http://www.roblox.com/asset/?id=94916615';
@@ -575,7 +580,7 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 			BackgroundColor3       = Color3.new(0, 0, 0);
-			Active                 = false;
+			Active                 = true;
 		}
 		Scrollbar.Bar = Bar
 
@@ -613,7 +618,7 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 				wait(0)
 				local DecorationSize = ScrollBarContainer.AbsoluteSize[Scroller.Axis == 'Y' and 'X' or 'Y']
 			
-				ApplyScrollbarBacking(ScrollBarContainer, ScrollBarContainer.ZIndex, ScrollBackings.Default.ScrollFrameBacking, DecorationSize, "OnOver")
+				-- ApplyScrollbarBacking(ScrollBarContainer, ScrollBarContainer.ZIndex, ScrollBackings.Default.ScrollFrameBacking, DecorationSize, "OnOver")
 				ApplyScrollbarBacking(Bar, Bar.ZIndex, ScrollBackings.Default.ScrollThumb, DecorationSize, "OnOver")
 			end
 		end
@@ -622,7 +627,7 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 			if not DoNotDecorate then
 				local DecorationSize = ScrollBarContainer.AbsoluteSize[Scroller.Axis == 'Y' and 'X' or 'Y']
 			
-				ApplyScrollbarBacking(ScrollBarContainer, ScrollBarContainer.ZIndex, ScrollBackings.Default.Invisible, DecorationSize, "OnOver")
+				-- ApplyScrollbarBacking(ScrollBarContainer, ScrollBarContainer.ZIndex, ScrollBackings.Default.Invisible, DecorationSize, "OnOver")
 				ApplyScrollbarBacking(Bar, Bar.ZIndex, ScrollBackings.Default.Invisible, DecorationSize, "OnOver")
 			end
 		end
@@ -679,13 +684,16 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 		if not DoNotDecorate then
 			local DecorationSize = ScrollBarContainer.AbsoluteSize[Scroller.Axis == 'Y' and 'X' or 'Y']
 		
-			ApplyScrollbarBacking(ScrollBarContainer, ScrollBarContainer.ZIndex, ScrollBackings.Default.ScrollFrameBacking, DecorationSize)
+			-- ApplyScrollbarBacking(ScrollBarContainer, ScrollBarContainer.ZIndex, ScrollBackings.Default.ScrollFrameBacking, DecorationSize)
 			ApplyScrollbarBacking(Bar, Bar.ZIndex, ScrollBackings.Default.ScrollThumb, DecorationSize)
 		end
 
 		Bar.MouseButton1Down:connect(Scrollbar.StartDrag) -- Hookup events...
 		Bar.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
+
+		ScrollBarContainer.Active = true
 		if ScrollBarContainer:IsA("GuiButton") then
+			-- These events actually do have to be hooked up, if the container is a thing.
 			ScrollBarContainer.MouseButton1Down:connect(Scrollbar.MouseDownOnWhitespace) -- Hookup events...
 			ScrollBarContainer.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
 			ScrollBarContainer.MouseEnter:connect(Scrollbar.OnEnterDisplay)
@@ -721,8 +729,8 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 		end
 	end
 
+	Content.Active = true
 	if Content:IsA("GuiButton") then
-		Content.Active = false
 		Content.MouseEnter:connect(function()
 			Scroller.EnabledMouseScroll()
 			--[[for _, Scrollbar in pairs(Scrollbars) do
@@ -738,11 +746,11 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 		Content.MouseButton1Down:connect(Scroller.StartDrag)
 	end
 
-	Mouse.WheelForward:connect(function()
+	Content.MouseWheelForward:connect(function()
 		--print("[Scroller] - Wheel Move Forward")
 		Scroller.ScrollUp()
 	end)
-	Mouse.WheelBackward:connect(function()
+	Content.MouseWheelBackward:connect(function()
 		--print("[Scroller] - Wheel Move Backwards")
 		Scroller.ScrollDown()
 	end)
