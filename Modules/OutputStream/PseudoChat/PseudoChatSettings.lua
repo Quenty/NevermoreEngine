@@ -13,6 +13,7 @@ return {
 		["xXxMoNkEyMaNxXx"] = BrickColor.new("Lavender").Color;
 		["ColorfulBody"]    = BrickColor.new("Br. yellowish green").Color;
 		-- ["ColorfulBody"]    = Color3.new(252/255, 0, 154/255); -- Magenta #fc009a 
+		["chc4"]    = Color3.new(252/255, 0, 154/255); -- Magenta #fc009a 
 	};
 	SpecialNameColors = {
 		-- ["ColorfulBody"]    = Color3.new(254/255, 191/255, 229/255); -- Magenta #febfe5 
