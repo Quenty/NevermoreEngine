@@ -1,9 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary('qSystems')
-local qInstance         = LoadCustomLibrary('qInstance')
+local qSystems          = LoadCustomLibrary("qSystems")
+local qInstance         = LoadCustomLibrary("qInstance")
 
 qSystems:Import(getfenv(0));
 
@@ -19,7 +20,6 @@ local bb_points = { -- Ask anaminus.  D: Bouding box posiitions.
 	Vector3.new(-1, 1, 1);
 	Vector3.new( 1, 1, 1);
 }
-
 
 local function RecurseGetBoundingBox(object,sides,parts)
 	-- Credit to Anaminus, I have a general understanding on how this works. Basically, 
@@ -253,9 +253,8 @@ lib.PointInsidePart = PointInsidePart
 lib.pointInsidePart = PointInsidePart
 
 local FindPartOnRay = Workspace.FindPartOnRayWithIgnoreList
-local AdvanceRaycast
 
-function AdvanceRaycast(Ray, IgnoreList, IgnoreInvisible, IgnoreCollisions)
+local function AdvanceRaycast(Ray, IgnoreList, IgnoreInvisible, IgnoreCollisions)
 	-- Abuses raycasing to force ignoring of invisible and collision parts.
 
 	-- IgnoreList should be a metatable __mode = "k"
@@ -270,5 +269,334 @@ function AdvanceRaycast(Ray, IgnoreList, IgnoreInvisible, IgnoreCollisions)
 end
 lib.AdvanceRaycast = AdvanceRaycast
 lib.advanceRaycast = AdvanceRaycast
+
+local function WeldParts(Part0, Part1, JointType, WeldParent)
+	--- Weld's 2 parts together
+	-- @param Part0 The first part
+	-- @param Part1 The second part (Dependent part most of the time).
+	-- @param [JointType] The type of joint. Defaults to weld.
+	-- @param [WeldParent] Parent of the weld, Defaults to Part0 (so GC is better).
+	-- @return The weld created.
+
+	JointType = JointType or "Weld"
+
+	local NewWeld = Make(JointType)({
+		Part0  = Part0;
+		Part1  = Part1;
+		C0     = Part0.CFrame:inverse();
+		C1     = Part1.CFrame:inverse();
+		Parent = WeldParent or Part0;
+	})
+
+	return NewWeld
+end
+lib.WeldParts = WeldParts
+lib.weldParts = WeldParts
+
+local function WeldModel(Model, MainPart, JointType, DoNotUnanchor)
+	-- @param Model The model to weld. Should be anchored to prevent really horrible results.
+	-- @param MainPart The part to weld the model to (can be in the model).
+	-- @param [JointType] The type of joint. Defaults to weld. 
+	-- @parm DoNotUnanchor Boolean, if true, will not unachor the model after cmopletion.
+
+	local Parts = qInstance.GetBricksWithIgnore(Model, MainPart)
+
+	for _, Part in pairs(Parts) do
+		WeldParts(MainPart, Part, JointType, MainPart)
+	end
+
+	if not DoNotUnanchor then
+		for _, Part in pairs(Parts) do
+			Part.Anchored = false
+		end
+		MainPart.Anchored = false
+	end
+end
+lib.WeldModel = WeldModel
+lib.weldModel = WeldModel
+
+local function GetSurfaceNormal(Part, Vector)
+	--[[
+		CirrusGeometry.getSurfaceNormal(part, point)
+		Returns unit vector of the surface normal given a point on the surface of part
+	--]]
+
+	local Percent = Part.CFrame:toObjectSpace(CFrame.new(Vector)).p / ((Part.Size  - Vector3.new(0.02, 0.02, 0.02))/ 2)
+	local ab      = Vector3.new(math.abs(Percent.X), math.abs(Percent.Y), math.abs(Percent.Z))
+	local normal  = Vector3.new(0, 1, 0)
+
+	if Part:IsA("Part") and (Part.Shape == Enum.PartType.Ball or Part.Shape == Enum.PartType.Cylinder) then
+		normal = (Vector - Part.Position).unit
+	elseif Part:IsA("WedgePart") and ((Percent.Y > 0) or (Percent.Z < 0)) and ab.X < 1 and ab.Y < 1 and ab.Z < 1 then
+		normal = CFrame.new(Part.Position, (Part.CFrame * CFrame.new(0,Part.Size.Z,-Part.Size.Y)).p).lookVector
+	elseif math.abs(Percent.X) > math.abs(Percent.Y) and math.abs(Percent.X) > math.abs(Percent.Z) then
+		normal = lib.vecRight(Part.CFrame) * Percent.X/math.abs(Percent.X)
+	elseif math.abs(Percent.Y) >= math.abs(Percent.X) and math.abs(Percent.Y) >= math.abs(Percent.Z) then
+		normal = lib.vecUp(Part.CFrame) * Percent.Y/math.abs(Percent.Y)
+	elseif math.abs(Percent.Z) > math.abs(Percent.X) and math.abs(Percent.Z) > math.abs(Percent.Y) then
+		normal = lib.vecForwards(Part.CFrame) * -Percent.Z/math.abs(Percent.Z)
+	end
+	return normal
+end
+
+--[[
+You can think of a CFrame as a set of the lookVectors of 3 of the faces of a part.
+
+Really all I do is:
+-Take one of the two directions that _isn't_ "up" from the current CFrame
+-Construct a new direction that removes all of that direction's y component, and normalizes the direction to a new unit vector.
+-Constructs a CFrame from that vector and the "up" vector (the third vector can be found from the other two).
+
+~ Stravant
+http://www.roblox.com/Forum/ShowPost.aspx?PostID=78453245
+]]
+
+
+local function GetRightVector(CFrameValue)
+	--- Get's the right vector of a CFrame Value
+	-- @param CFrameValue A CFrame, of which the vector will be retrieved
+	-- @return The right vector of the CFrame
+
+	local _,_,_,r4,_,_,r7,_,_,r10,_,_ = CFrameValue:components()
+	return Vector3.new(r4,r7,r10)
+end
+lib.GetRightVector = GetRightVector
+lib.getRightVector = GetRightVector
+
+local function GetLeftVector(CFrameValue)
+	--- Get's the left vector of a CFrame Value
+	-- @param CFrameValue A CFrame, of which the vector will be retrieved
+	-- @return The left vector of the CFrame
+
+	local _,_,_,r4,_,_,r7,_,_,r10,_,_ = CFrameValue:components()
+	return Vector3.new(-r4,-r7,-r10)
+end
+lib.GetLeftVector = GetLeftVector
+lib.getLeftVector = GetLeftVector
+
+local function GetTopVector(CFrameValue)
+	--- Get's the top vector of a CFrame Value
+	-- @param CFrameValue A CFrame, of which the vector will be retrieved
+	-- @return The top vector of the CFrame
+
+	local _,_,_,_,r5,_,_,r8,_,_,r11,_ = CFrameValue:components()
+	return Vector3.new(r5,r8,r11)
+end
+lib.GetTopVector = GetTopVector
+lib.getTopVector = GetTopVector
+
+local function GetBottomVector(CFrameValue)
+	--- Get's the bottom vector of a CFrame Value
+	-- @param CFrameValue A CFrame, of which the vector will be retrieved
+	-- @return The bottom vector of the CFrame
+
+	local _,_,_,_,r5,_,_,r8,_,_,r11,_ = CFrameValue:components()
+	return Vector3.new(-r5,-r8,-r11)
+end
+lib.GetBottomVector = GetBottomVector
+lib.getBottomVector = GetBottomVector
+
+local function GetBackVector(CFrameValue)
+	--- Get's the back vector of a CFrame Value
+	-- @param CFrameValue A CFrame, of which the vector will be retrieved
+	-- @return The back vector of the CFrame
+
+	local _,_,_,_,_,r6,_,_,r9,_,_,r12 = CFrameValue:components()
+	return Vector3.new(r6,r9,r12)
+end
+lib.GetBackVector = GetBackVector
+lib.getBackVector = GetBackVector
+
+local function GetFrontVector(CFrameValue)
+	--- Get's the front vector of a CFrame Value
+	-- @param CFrameValue A CFrame, of which the vector will be retrieved
+	-- @return The front vector of the CFrame
+
+	local _,_,_,_,_,r6,_,_,r9,_,_,r12 = CFrameValue:components()
+	return Vector3.new(-r6,-r9,-r12)
+end
+lib.GetFrontVector = GetFrontVector
+lib.getFrontVector = GetFrontVector
+
+local function GetCFrameFromTopBack(CFrameAt, Top, Back)
+	--- Get's the CFrame fromt he "top back" vector. or something
+
+	local Right = Top:Cross(Back)
+	return CFrame.new(CFrameAt.x, CFrameAt.y, CFrameAt.z,
+		Right.x, Top.x, Back.x,
+		Right.y, Top.y, Back.y,
+		Right.z, Top.z, Back.z
+	)
+end
+lib.GetCFrameFromTopBack = GetCFrameFromTopBack
+lib.getCFrameFromTopBack = GetCFrameFromTopBack
+
+local function GetRotationInXZPlane(CFrameValue)
+	--- Get's the rotation in the XZ plane (global).
+
+	local Back = GetBackVector(CFrameValue)
+	return GetCFrameFromTopBack(CFrameValue.p, Vector3.new(0,1,0), Vector3.new(Back.x, 0, Back.z).unit)
+end
+lib.GetRotationInXZPlane = GetRotationInXZPlane
+lib.getRotationInXZPlane = GetRotationInXZPlane
+
+local function FindFaceFromCoord(Size, RelativePosition)
+	--- Find's a faces coordanate given it's size and RelativePosition.
+
+	local pa, pb = -Size/2, Size/2
+	local dx = math.min(math.abs(RelativePosition.x - pa.x), math.abs(RelativePosition.x - pb.x))
+	local dy = math.min(math.abs(RelativePosition.y - pa.y), math.abs(RelativePosition.y - pb.y))
+	local dz = math.min(math.abs(RelativePosition.z - pa.z), math.abs(RelativePosition.z - pb.z))
+	--
+	if dx < dy and dx < dz then
+		if math.abs(RelativePosition.x - pa.x) < math.abs(RelativePosition.x - pb.x) then
+			return Enum.NormalId.Left --'Left'
+		else
+			return Enum.NormalId.Right --'Right'
+		end
+	elseif dy < dx and dy < dz then
+		if math.abs(RelativePosition.y - pa.y) < math.abs(RelativePosition.y - pb.y) then
+			return Enum.NormalId.Bottom --'Bottom'
+		else
+			return Enum.NormalId.Top --'Top'
+		end
+	elseif dz < dx and dz < dy then
+		if math.abs(RelativePosition.z - pa.z) < math.abs(RelativePosition.z - pb.z) then
+			return Enum.NormalId.Front --'Front'
+		else
+			return Enum.NormalId.Back --'Back'
+		end	
+	end 
+end
+lib.FindFaceFromCoord = FindFaceFromCoord
+lib.findFaceFromCoord = FindFaceFromCoord
+
+--[[ EXAMPLE
+
+local function CreateScorch(part, hit)
+	local scorch = Modify(Instance.new("Part"), {
+		Name         = 'SpotWeld_Scorch';
+		FormFactor   = 'Custom';
+		CanCollide   = false;
+		Anchored     = true;
+		Size         = Vector3.new(2, 0.1, 2);
+		Transparency = 1;
+		Modify(Instance.new("Decal"), {
+			Face    = 'Top',
+			Texture = 'http://www.roblox.com/asset/?id=22915150',
+			Shiny   = 0,
+		});
+	});
+
+	scorch.Parent = BulletHolder;
+	local hitFace = FindFaceFromCoord(part.Size, part.CFrame:toObjectSpace(CFrame.new(hit)))
+	local dir = (part.CFrame-part.Position)*Vector3.FromNormalId(hitFace)
+	if part:IsA('Terrain') then
+		scorch.CFrame = CFrame.new(hit)
+	else
+		scorch.CFrame = CFrame.new(hit, hit+dir)*CFrame.Angles(-math.pi/2, 0, 0)
+	end
+
+	game.Debris:AddItem(scorch, 15)
+end
+--]]
+
+local function GetCFramePitch(Angle)
+	-- returns CFrame.Angles(Angle, 0, 0) 
+
+	return CFrame.Angles(Angle, 0, 0)
+end
+lib.GetCFramePitch = GetCFramePitch
+lib.getCFramePitch = GetCFramePitch
+
+local function GetCFrameYaw(Angle)
+	-- returns CFrame.Angles(0, Angle, 0) 
+
+	return CFrame.Angles(0, Angle, 0)
+end
+lib.GetCFrameYaw = GetCFrameYaw
+lib.getCFrameYaw = GetCFrameYaw
+
+local function GetCFrameRoll(Angle)
+	-- returns CFrame.Angles(0, 0, Angle) 
+
+	return CFrame.Angles(0, 0, Angle)
+end
+lib.GetCFrameRoll = GetCFrameRoll
+lib.getCFrameRoll = GetCFrameRoll
+
+local function GetPitchFromLookVector(Vector)
+	-- Returns pitch of a Vector
+
+	return -math.asin(vec.Y) + math.pi/2
+end
+lib.GetPitchFromLookVector = GetPitchFromLookVector
+lib.getPitchFromLookVector = GetPitchFromLookVector
+
+local function GetYawFromLookVector(Vector)
+	-- Returns yaw of a Vector
+
+	return -math.atan2(vec.Z, vec.X) - math.pi/2
+end
+lib.GetYawFromLookVector = GetYawFromLookVector
+lib.getYawFromLookVector = GetYawFromLookVector
+
+local function GetRollFromCFrame(CFrameValue)
+	-- Returns roll of a CFrame
+
+	local RollDifferance = CFrame.new(CFrameValue.p, CFrameValue.p + CFrameValue.lookVector):toObjectSpace(CFrameValue)
+	local Vector = GetRightVector(RollDifferance)
+
+	return math.atan2(Vector.Y, Vector.X)
+end
+lib.GetRollFromCFrame = GetRollFromCFrame
+lib.getRollFromCFrame = GetRollFromCFrame
+
+local function DrawRay(Ray, Parent)
+	--- Draw's a ray out (for debugging)
+	-- Credit to Cirrus for initial code.
+
+	Parent = Parent or Workspace
+
+	local NewPart = Instance.new("NewPart", Parent)
+
+	NewPart.FormFactor = "Custom"
+	NewPart.Size       = Vector3.new(.2, Ray.Direction.magnitude, 0.2)
+	NewPart.CFrame     = CFrame.new(Ray.Origin + Ray.Direction/2, Ray.Origin + Ray.Direction) * GetCFramePitch(math.pi/2)
+	NewPart.Anchored   = true
+	NewPart.CanCollide = false
+	NewPart.BrickColor = BrickColor.new("Bright red")
+
+	Instance.new("SpecialMesh", NewPart)
+
+	return part
+end
+lib.DrawRay = DrawRay
+lib.drawRay = DrawRay
+
+local function GetSlopeRelativeToGravity(Part, Position)
+	--- Return's the slope of the surface a character is walking upon.
+	-- @param Part The part the ray found
+	-- @param Position A vector on the Part's surface, probably the one the ray found
+	-- @return The Angle, in radians, that was calculated.
+	-- 		0 radians should be level
+	--		math.pi/2 radians should be straight up and down?
+	-- If it's past that, I'm not sure how it happened.
+
+	local Face = FindFaceFromCoord(Part.Size, Part.CFrame:toObjectSpace(CFrame.new(Position)))
+	if Face then
+		local SlopeDirection = ((Part.CFrame - Part.Position) * Vector3.FromNormalId(Face)).unit
+
+		local GravityVector = Vector3.new(0, -1, 0)
+
+		local Angle = math.acos(SlopeDirection:Dot(GravityVector)) -- Would divide by magnitude * magnitude, but it's 1.
+		return math.abs((Angle - math.pi))
+	else
+		print("[GetSlopeRelativeToGravity] No face found")
+		return nil
+	end
+end
+lib.GetSlopeRelativeToGravity = GetSlopeRelativeToGravity
+lib.getSlopeRelativeToGravity = GetSlopeRelativeToGravity
 
 return lib

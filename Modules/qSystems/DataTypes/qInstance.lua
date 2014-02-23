@@ -40,6 +40,23 @@ lib.GetBricks  = GetBricks
 lib.get_bricks = GetBricks
 lib.getBricks  = GetBricks
 
+local function GetBricksWithIgnore(StartInstance, NoInclude)
+	--- Get's the bricks in a model, but will not get a brick that is "NoInclude"
+
+	local List = {}
+
+	CallOnChildren(StartInstance, function(Item)
+		if Item:IsA("BasePart") and Item ~= NoInclude then
+			List[#List+1] = Item;
+		end
+	end)
+
+	return List;
+end
+lib.GetBricksWithIgnore = GetBricksWithIgnore
+lib.getBricksWithIgnore = GetBricksWithIgnore
+
+
 local function GetPartVolume(Part, CountWedgesAsSolids)
 	-- Returns a parts volume.
 	-- @param Part The part to get the volume for

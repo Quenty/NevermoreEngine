@@ -91,7 +91,6 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 	local function RequestClientOpenInventory(Client, InventoryUID)
 		--- Request's that a client open an inventory on their client.
 		-- @param Client The active client.
-
 		if Client then
 			if Managers[InventoryUID] then
 				RemoteEvent:FireClient(Client, InventoryUID, "OpenInventory")
@@ -154,11 +153,10 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 			if OldValue and OldValue.SaveVersion == "1.0" and type(OldValue.TimeStamp) == "number" and type(OldValue.Items) == "table" then
 				return true
 			else
-				
 				if OldValue then
-					print("OldValue.SaveVersion == " .. tostring(OldValue.SaveVersion) .. "; type(OldValue.TimeStamp) == '" .. type(OldValue.TimeStamp) .."'; type(OldValue.Items) == '" .. type(OldValue.Items) .."'")
+					print("[BoxInventoryServerManager] - OldValue.SaveVersion == " .. tostring(OldValue.SaveVersion) .. "; type(OldValue.TimeStamp) == '" .. type(OldValue.TimeStamp) .."'; type(OldValue.Items) == '" .. type(OldValue.Items) .."'")
 				else
-					print("OldValue is " .. tostring(OldValue))
+					print("[BoxInventoryServerManager] - OldValue is " .. tostring(OldValue))
 				end
 				return false
 			end
@@ -191,8 +189,6 @@ local MakeBoxInventoryServerManager = Class(function(BoxInventoryServerManager, 
 		local function LoadValidData(ItemSystem, InventoryData)
 			for _, Data in pairs(InventoryData.Items) do
 				if type(Data.classname) == "string" and Data.uid then
-					Data.uid = ItemSystem.GenerateUID(Data)
-					
 					local NewConstruct = ItemSystem.ConstructClassFromData(Data)
 					if NewConstruct then
 
@@ -723,9 +719,7 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 
 		for _, InventoryUID in pairs(InventoryUIDs) do
 			if not Inventories[InventoryUID] then
-				Spawn(function()
-					OpenInventory(InventoryUID)
-				end)
+				OpenInventory(InventoryUID)
 			end
 		end
 	end
@@ -750,10 +744,33 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 		end
 	end
 
+	local function Destroy()
+		-- Destroys the BoxInventoryClientManager, cannot destroy connection objects.
+
+		ClientEventConnection:disconnect()
+		ClientEventConnection = nil
+
+		for _, InventoryInterface in pairs(Inventories) do
+			InventoryInterface:Destroy()
+		end
+		Inventories = nil
+		BoxInventoryClientManager.Destroy = nil
+	end
+	BoxInventoryClientManager.Destroy = Destroy
+	BoxInventoryClientManager.destroy = Destroy
+
+	LoadInventories()
+
 	local ClientEventConnection = RemoteEvent.OnClientEvent:connect(function(InventoryUID, EventName, ...)
+		-- print("[BoxInventoryClientManager] - New Event '" .. EventName .."'' For InventoryUID '" .. InventoryUID .. "'")
+
 		if InventoryUID then
 			if EventName == "OpenInventory" then
-				OpenInventory(InventoryUID)
+				if not Inventories[InventoryUID] then
+					OpenInventory(InventoryUID)
+				else
+					print("[BoxInventoryClientManager] - Inventory already open")
+				end
 			else
 				local InventoryInterface = Inventories[InventoryUID]
 				if InventoryInterface then
@@ -771,22 +788,6 @@ local MakeBoxInventoryClientManager = Class(function(BoxInventoryClientManager, 
 		end
 	end)
 
-	local function Destroy()
-		-- Destroys the BoxInventoryClientManager, cannot destroy connection objects.
-
-		ClientEventConnection:disconnect()
-		ClientEventConnection = nil
-
-		for _, InventoryInterface in pairs(Inventories) do
-			InventoryInterface:Destroy()
-		end
-		Inventories = nil
-		BoxInventoryClientManager.Destroy = nil
-	end
-	BoxInventoryClientManager.Destroy = Destroy
-	BoxInventoryClientManager.destroy = Destroy
-
-	Spawn(LoadInventories)
 end)
 lib.MakeBoxInventoryClientManager = MakeBoxInventoryClientManager
 lib.makeBoxInventoryClientManager = MakeBoxInventoryClientManager

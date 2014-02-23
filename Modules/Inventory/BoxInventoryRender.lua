@@ -47,7 +47,7 @@ local lib = {}
 -- INTERNAL UTILITY --
 ----------------------
 
-local function MakeTitleFrame(Parent, Title, Subtitle, ZIndex, Height, XOffset)
+local function MakeTitleFrame(Parent, Title, Subtitle, ZIndex, Height, XOffset, GuiType)
 	--- Generates the top 'header frame' at the top.
 	--[[ Looks something like this:
 	   __________________________
@@ -70,7 +70,9 @@ local function MakeTitleFrame(Parent, Title, Subtitle, ZIndex, Height, XOffset)
 	Height = Height or 50;
 	XOffset = XOffset or 10;
 
-	local TitleFrame = Make 'Frame' {
+	GuiType = GuiType or "Frame"
+
+	local TitleFrame = Make(GuiType)({
 		Archivable             = false;
 		BackgroundColor3       = Color3.new(0, 0, 0);
 		BackgroundTransparency = 0.3;
@@ -82,7 +84,7 @@ local function MakeTitleFrame(Parent, Title, Subtitle, ZIndex, Height, XOffset)
 		Size                   = UDim2.new(1, 0, 0, Height);
 		Visible                = true;
 		ZIndex                 = ZIndex;
-	}
+	})
 
 	local Title = Make 'TextLabel' {
 		Archivable             = false;
@@ -467,7 +469,7 @@ local function MakeIconedFrame(IconFrame, Text, ZIndex, XOffset)
 		BackgroundColor3       = Color3.new(1, 1, 1);
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0;
-		Name                   = "BoxInventoryRenderCard";
+		Name                   = "IconedFrame";
 		Position               = UDim2.new(0, 0, 0, 0);
 		Size                   = UDim2.new(1, 0, 0, IconFrame.Size.Y.Offset);
 		Visible                = true;
@@ -1174,7 +1176,9 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 		Name, 
 		nil,
 		Configuration.ZIndex, 
-		Configuration.IndividualHeaderHeight
+		Configuration.IndividualHeaderHeight,
+		nil,
+		"ImageButton"
 	);
 	TitleFrame.Parent = MainFrame;
 	TitleFrame.Position = UDim2.new(0, 0, 0, 0);
@@ -1273,6 +1277,16 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 	InventoryOptionModule.Uncollapse = Uncollapse
 	InventoryOptionModule.uncollapse = Uncollapse
 
+	local function ToggleCollapse()
+		if IsCollapsed then
+			Uncollapse()
+		else
+			Collapse()
+		end
+	end
+	InventoryOptionModule.ToggleCollapse = ToggleCollapse
+	InventoryOptionModule.toggleCollapse = ToggleCollapse
+
 	local function CheckIfShowable()
 		--- Return's if the option module can be shown or not. Also updates the modules.
 		-- ShowCallback does not have to exist.		
@@ -1326,11 +1340,11 @@ local MakeInventoryOptionModule = Class(function(InventoryOptionModule, Name, Op
 
 	-- Connect events --
 	CollapseButton.Gui.MouseButton1Click:connect(function()
-		if IsCollapsed then
-			Uncollapse()
-		else
-			Collapse()
-		end
+		ToggleCollapse()
+	end)
+	
+	TitleFrame.MouseButton1Click:connect(function()
+		ToggleCollapse()
 	end)
 end)
 lib.MakeInventoryOptionModule = MakeInventoryOptionModule
@@ -1513,9 +1527,9 @@ local MakeBoxInventoryRenderCard = Class(function(BoxInventoryRenderCard, BoxInv
 
 	-- Todo: Add actual statistics.
 
-	local BoxInventory = BoxInventoryRender.Inventory
+	local BoxInventory   = BoxInventoryRender.Inventory
 	local Box2DInterface = BoxInventoryRender.Box2DInterface
-	local Configuration = Box2DInterface.Configuration
+	local Configuration  = Box2DInterface.Configuration
 
 	ZIndex = ZIndex or Configuration.ZIndex
 
@@ -1566,6 +1580,8 @@ local MakeBoxInventoryRenderCard = Class(function(BoxInventoryRenderCard, BoxInv
 		Visible                = true;
 		ZIndex                 = ZIndex + 1;
 	}
+
+	-- print("Constructing infocard from " .. BoxInventory.Name)
 
 	local Stats = {}
 
@@ -1682,6 +1698,10 @@ end)
 
 --[[
 Change Log
+February 21th, 2014
+- Added ToggleCollapse function
+- Clicking on title frame works.
+
 February 16th, 2014
 - Added GC stuff on events
 - Added Destroy method fix
@@ -1747,7 +1767,9 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		BoxInventory.Name, 
 		nil,--"// subtitle",
 		Configuration.ZIndex, 
-		Configuration.IndividualHeaderHeight
+		Configuration.IndividualHeaderHeight,
+		nil,
+		"ImageButton"
 	);
 	TitleFrame.BackgroundTransparency = 0.7;
 	TitleFrame.Parent                 = RenderFrame;
@@ -1764,6 +1786,8 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 
 	local EventStorage                      = EventGroup.MakeEventGroup() -- Store Box2DRenderItem
 	BoxInventoryRender.EventStorage         = EventStorage
+
+	local InfoCard -- Defined later, stores specific info card.
 
 	-- Private variables
 	local RenderHeightY      = Configuration.IndividualHeaderHeight; -- Read only
@@ -1885,11 +1909,23 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 		UpdateCards()
 	end
 
+	local function OnTitleFrameMouseEnter()
+		qGUI.TweenTransparency(TitleFrame, {BackgroundTransparency = Configuration.TitleFrameMouseOverTransparency}, Configuration.TitleFrameMouseOverTweenTime, true)
+		InfoCard.Show()
+	end
+
+	local function OnTitleFrameMouseLeave()
+		qGUI.TweenTransparency(TitleFrame, {BackgroundTransparency = Configuration.TitleFrameDefaultTransparency}, Configuration.TitleFrameMouseOverTweenTime, true)
+		InfoCard.Hide()
+	end
+
 	-- Public Methods --
 
 	local function GetInfoCard(ZIndex)
 		--- Return's a BoxInventory info card!
 
+		-- print("Getting infocard from " .. BoxInventory.Name)
+		
 		local NewCard = MakeBoxInventoryRenderCard(BoxInventoryRender, ZIndex)
 		ActiveCards[#ActiveCards+1] = NewCard -- MORE HORRID GC THINGS
 
@@ -1954,6 +1990,16 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 	BoxInventoryRender.Uncollapse = Uncollapse
 	BoxInventoryRender.uncollapse = Uncollapse
 
+	local function ToggleCollapse()
+		if not CollapseButton.GetState() then
+			Collapse()
+		else
+			Uncollapse()
+		end
+	end
+	BoxInventoryRender.ToggleCollapse = ToggleCollapse
+	BoxInventoryRender.toggleCollapse = ToggleCollapse
+
 	local function Update()
 		-- Redraw's and updates the render.
 
@@ -1997,11 +2043,11 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 	BoxInventoryRender.GetTotalItemCount = GetTotalItemCount
 	BoxInventoryRender.getTotalItemCount = GetTotalItemCount
 
-	local InfoCard = {} do 
+	InfoCard = {} do 
 		-- This setups up an info card that will work on MouseEnter
 		-- So inefficient. Oh well.
 
-		InfoCardClass                            = GetInfoCard(Configuration.ZIndex + 3)
+		local InfoCardClass                      = BoxInventoryRender.GetInfoCard(Configuration.ZIndex + 3)
 		InfoCardClass.Gui.Parent                 = Box2DInterface.Gui;
 		InfoCardClass.Gui.BackgroundTransparency = 0
 
@@ -2132,20 +2178,20 @@ local MakeBoxInventoryRender = Class(function(BoxInventoryRender, Box2DInterface
 	end)
 
 	EventStorage.CollapseButtonMouseButton1Click = CollapseButton.Gui.MouseButton1Click:connect(function()
-		if not CollapseButton.GetState() then
-			Collapse()
-		else
-			Uncollapse()
-		end
+		ToggleCollapse()
+	end)
+
+	EventStorage.TitleFrameButtonClick = TitleFrame.MouseButton1Click:connect(function()
+		ToggleCollapse()
 	end)
 
 	--- Setup TitleFrame stuff.
 	EventStorage.TitleFrameMouseEnter = TitleFrame.MouseEnter:connect(function()
-		InfoCard.Show()
+		OnTitleFrameMouseEnter()
 	end)
 
 	EventStorage.TitleFrameMouseLeave = TitleFrame.MouseLeave:connect(function()
-		InfoCard.Hide()
+		OnTitleFrameMouseLeave()
 	end)
 
 	EventStorage.ScrollFinished = Box2DInterface.Scroller.ScrollFinished:connect(function()
@@ -2285,32 +2331,36 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 
 	-- Configuration and settings
 	Configuration = OverriddenConfiguration.new(Configuration, {
-		Subtitle               = "// trade enterprise";
-		Title                  = "Stock";
-		Width                  = 250;
+		Subtitle                        = "// trade enterprise";
+		Title                           = "Stock";
+		Width                           = 250;
 		
 		-- Rendering options
-		ScrollbarWidth         = 7;
-		ZIndex                 = 1; -- Index may go 2+ this, so range [1-8]
-		IndividualHeaderHeight = 40; -- Per each inventory. 
-		FooterHeight           = 80;
-		CollapseAnimateTime    = 0.1; -- When collapsing inventory rendering. 
-		OptionPanePaddingX     = 20; -- Padding between the inventory and the options
-		CloseIconRegular       = "http://www.roblox.com/asset/?id=139944727";
-		CloseIconOver          = "http://www.roblox.com/asset/?id=139944744";
-		CloseButtonSize        = 30; -- Since it's a square, the length of one side.
+		ScrollbarWidth                  = 7;
+		ZIndex                          = 1; -- Index may go 2+ this, so range [1-8]
+		IndividualHeaderHeight          = 40; -- Per each inventory. 
+		FooterHeight                    = 80;
+		CollapseAnimateTime             = 0.2; -- When collapsing inventory rendering. 
+		OptionPanePaddingX              = 20; -- Padding between the inventory and the options
+		CloseIconRegular                = "http://www.roblox.com/asset/?id=139944727";
+		CloseIconOver                   = "http://www.roblox.com/asset/?id=139944744";
+		CloseButtonSize                 = 30; -- Since it's a square, the length of one side.
 		-- Also CloseButtonSize will be used for OpenButtonSize.
 		
-		OpenButtonOffset       = UDim2.new(0, 5, 0, 5); -- Offset from top left portion of screen
-		OpenIconRegular        = "http://www.roblox.com/asset/?id=146357554";
-		OpenIconOver           = "http://www.roblox.com/asset/?id=146357731";
+		OpenButtonOffset                = UDim2.new(0, 5, 0, 5); -- Offset from top left portion of screen
+		OpenIconRegular                 = "http://www.roblox.com/asset/?id=146357554";
+		OpenIconOver                    = "http://www.roblox.com/asset/?id=146357731";
 		
-		ToggleAnimationTime    = 0.3; -- When toggling the inventory open or closed
+		TitleFrameMouseOverTweenTime    = 0.2; -- When they mouse over the title frame, how fast does the transparency change?
+		TitleFrameDefaultTransparency   = 0.7;
+		TitleFrameMouseOverTransparency = 0.5;
 		
-		CardWidth              = 300;
-		CardZIndex             = 2;
-
-		ShowOpenInventoryLabelTime = 0.5;
+		ToggleAnimationTime             = 0.1; -- When toggling the inventory open or closed
+		
+		CardWidth                       = 300;
+		CardZIndex                      = 9;
+		
+		ShowOpenInventoryLabelTime      = 0.5;
 	})
 
 	Box2DInterface.Mouse = Mouse;
@@ -2330,7 +2380,7 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 	}
 	Box2DInterface.Gui = MainFrame
 
-	local ContentContainer = Make 'Frame' {
+	local ContentContainer = Make 'ImageButton' {
 		Archivable             = false;
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0;
@@ -2536,9 +2586,9 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 	Box2DInterface.ToggleInterface = ToggleInterface;
 	Box2DInterface.toggleInterface = ToggleInterface;
 
-	local function Update(IsCollapseUpdate)
+	local function Update(DoNotAnimate)
 		--- Updates rendering and the children.
-		-- @param [IsCollapseUpdate] Boolean, if this update is after a collapse.
+		-- @param [DoNotAnimate] Boolean, if true, will not animate.
 
 		local YHeight = 0;
 		for _, Interface in pairs(RenderedInventories) do
@@ -2546,7 +2596,7 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 			BoxInventoryRender.Update();
 			local Position = UDim2.new(0, 0, 0, YHeight);
 
-			if IsCollapseUpdate then
+			if DoNotAnimate then
 				BoxInventoryRender.Gui.Position = Position
 			else
 				BoxInventoryRender.Gui:TweenPosition(Position, "Out", "Sine", Configuration.CollapseAnimateTime, true);
@@ -2583,7 +2633,7 @@ local MakeBox2DInterface = Class(function(Box2DInterface, Mouse, ScreenGui, Conf
 		Interface.Interfaces.Box2DInterface = NewInterface
 
 		UpdateEvents[ClientInventory].OnCollapse = Interface.CollapseStateChanged:connect(function()
-			Update(true) -- Update the rendering to compensate. 
+			Update() -- Update the rendering to compensate. 
 		end)
 
 		OpenInventories = OpenInventories + 1

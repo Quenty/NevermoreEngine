@@ -1,4 +1,5 @@
 local ReplicatedStorage       = game:GetService("ReplicatedStorage")
+local HttpService             = game:GetService("HttpService")
 
 local NevermoreEngine         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary       = NevermoreEngine.LoadLibrary
@@ -273,14 +274,6 @@ local MakeItemSystem = Class(function(ItemSystem, Configuration, ItemClassList, 
 	ItemSystem.GetItemClasses = GetItemClasses
 	ItemSystem.getItemClasses = GetItemClasses
 
-	local UIDCounter = 1
-	local function GenerateUID(ItemData)
-		UIDCounter = UIDCounter + 1
-		return "Class@" .. tostring(ItemData) .. "@" .. UIDCounter
-	end
-	ItemSystem.GenerateUID = GenerateUID
-	ItemSystem.generateUID = GenerateUID
-
 	local function ConstructNewItem(ClassName, ...)
 		--- Constructs a new item, with the ClassName 'ClassName'
 		-- @param ClassName The name of the class to construct
@@ -294,7 +287,7 @@ local MakeItemSystem = Class(function(ItemSystem, Configuration, ItemClassList, 
 			NewClass.Data       = {}
 			NewClass.Interfaces = {}
 
-			local UID = GenerateUID(NewClass.Data)
+			local UID = HttpService:GenerateGUID()
 
 			for AttributeName, AttributeObject in pairs(ItemClasses[ClassName].AttributeBin) do
 				NewClass.Data[AttributeName:lower()] = AttributeObject.Value

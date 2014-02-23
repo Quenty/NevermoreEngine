@@ -433,7 +433,7 @@ do
 			-- And set NewState
 			local NewState = {
 				StartTime       = tick();
-				Duration        = Duration;
+				Duration        = Duration or error("No duration");
 				-- Gui          = Gui;
 				StartProperties = StartProperties;
 				NewProperties   = NewProperties;
@@ -530,7 +530,7 @@ do
 			-- And set NewState
 			local NewState = {
 				StartTime       = tick();
-				Duration        = Duration;
+				Duration        = Duration or error("No duration");
 				-- Gui          = Gui;
 				StartProperties = StartProperties;
 				NewProperties   = NewProperties;

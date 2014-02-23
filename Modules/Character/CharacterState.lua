@@ -14,6 +14,9 @@ qSystems:Import(getfenv(0))
 -- Last Modified February 3rd, 2014
 
 --[[
+February 21st, 2014
+- Step now returns the Part / Position that the character is standing upon (From raycast)
+
 February 4th, 2014
 - Fixed fall state where raycast ignored invisible parts.
 
@@ -255,9 +258,9 @@ local MakeCharacterState = Class(function(CharacterState, Character)
 
 			-- Check Distance Off Ground --
 			local DistanceCheckingRay = Ray.new(Torso.Position, Vector3.new(0,-999,0))
-			local Hit, Position = AdvanceRaycast(DistanceCheckingRay, IgnoreList, false, true)
-			if Hit and Hit.CanCollide then
-				CharacterData.LastGroundHit = Hit
+			local Part, Position = AdvanceRaycast(DistanceCheckingRay, IgnoreList, false, true)
+			if Part and Part.CanCollide then
+				CharacterData.LastGroundHit = Part
 				CharacterData.OnGround.DistanceOff = math.max(0, (TorsoPosition - Position).magnitude - 3)
 			else
 				CharacterData.OnGround.DistanceOff = 100
@@ -278,6 +281,8 @@ local MakeCharacterState = Class(function(CharacterState, Character)
 			-- Check States --
 			CurrentState.LastPoint = tick()
 			CurrentState.CheckDuring(Character, CharacterData, Torso, PreviousState)
+
+			return Part, Position
 		else
 			print("[CharacterState] - Torso is nil")
 		end
