@@ -11,10 +11,12 @@ return {
 		["Player1"]         = BrickColor.new("Br. yellowish green").Color; -- Color3.new(1, 215/255, 0);
 		["PumpedRobloxian"] = Color3.new(0, 202/255, 220/255);
 		["xXxMoNkEyMaNxXx"] = BrickColor.new("Lavender").Color;
-		["ColorfulBody"]    = Color3.new(252/255, 0, 154/255); -- Magenta #fc009a 
+		["ColorfulBody"]    = BrickColor.new("Br. yellowish green").Color;
+		-- ["ColorfulBody"]    = Color3.new(252/255, 0, 154/255); -- Magenta #fc009a 
 	};
 	SpecialNameColors = {
-		["ColorfulBody"]    = Color3.new(254/255, 191/255, 229/255); -- Magenta #febfe5 
+		-- ["ColorfulBody"]    = Color3.new(254/255, 191/255, 229/255); -- Magenta #febfe5 
+		["ColorfulBody"] = Color3.new(222/255, 244/255, 135/255);
 	};
 	RobloxAdminChatColor = BrickColor.new("Hot pink").Color;
 	DefaultChatColor = Color3.new(1, 1, 1);

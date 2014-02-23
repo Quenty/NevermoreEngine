@@ -1,10 +1,11 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedStorage       = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local NevermoreEngine         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary       = NevermoreEngine.LoadLibrary
 
-local qSystems = LoadCustomLibrary("qSystems")
-local qGUI     = LoadCustomLibrary("qGUI")
+local qSystems                = LoadCustomLibrary("qSystems")
+local qGUI                    = LoadCustomLibrary("qGUI")
+local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
 
 qSystems:Import(getfenv(0));
 
@@ -44,7 +45,7 @@ local function GetCameraRotation(CoordinateFrame, Focus)
 
 	-- 0 degrees is north (I think?)
 
-	return math.abs(math.atan2(math.rad(CoordinateFrame.X - Focus.X), math.rad(CoordinateFrame.Z - Focus.Z))) % 360
+	return math.atan2(math.rad(CoordinateFrame.X - Focus.X), math.rad(CoordinateFrame.Z - Focus.Z)) + math.pi
 end
 
 local MakeCompassModel = Class(function(CompassModel)
@@ -67,7 +68,8 @@ local MakeCompassModel = Class(function(CompassModel)
 		RealAngle = Rotation
 
 		local Direction, ChangeInRotation = GetRotationDirection(Angle, Rotation)
-		Angle = Angle + Direction * ChangeInRotation * Delta * SmoothnessFactor
+		Angle = math.abs((Angle + Direction * ChangeInRotation * Delta * SmoothnessFactor) % Tau)
+
 
 		LastUpdatePoint = CurrentTime
 
@@ -78,6 +80,7 @@ local MakeCompassModel = Class(function(CompassModel)
 
 	local function GetAngle()
 		--- Returns the smoothed angle 
+
 		return Angle
 	end
 	CompassModel.GetAngle = GetAngle
@@ -85,6 +88,7 @@ local MakeCompassModel = Class(function(CompassModel)
 
 	local function GetRealAngle()
 		--- Return's the actual angle of the camera
+
 		return RealAngle
 	end
 	CompassModel.GetRealAngle = GetRealAngle
@@ -92,7 +96,7 @@ local MakeCompassModel = Class(function(CompassModel)
 
 	local function SetSmoothnessFactor(NewSmoothnessFactor)
 		--- Set's the smoothness factor of the inertia compass.
-		-- @param NewSmoothnessFactor A number, the new smoothness factor.
+		-- @param NewSmoothnessFactor The smoothness factor. (Number)
 
 		assert(type(NewSmoothnessFactor) == "number")
 
@@ -116,29 +120,32 @@ end)
 lib.MakeCompassModel = MakeCompassModel
 lib.makeCompassModel = MakeCompassModel
 
-local MakeStripCompass = Class(function(StripCompass)
+local MakeStripCompass = Class(function(StripCompass, Configuration)
 	--- Makes a skyrim style "strip" compass.
+	-- @param Configuration The configuration to use (overrides).
 
-	local Configuration = {
+	local Configuration = OverriddenConfiguration.new(Configuration, {
 		ShownArea     = math.pi/2; -- The area shown by the compass (the rest will be hidden). (In radians)
 		SolidArea     = 0.8; -- Area in the center where GUIs are not transparent. (Percentage). (Will fade out to ends).
-		ZIndex        = 5;
-		DefaultWidth  = 200; -- The user can modify Container however they want, so these don't matter too much
+		ZIndex        = 1;
+		DefaultWidth  = 300; -- The user can modify Container however they want, so these don't matter too much
 		DefaultHeight = 40; -- The user can modify Container however they want, so these don't matter too much
+
+		DefaultYOffset = 60;
 
 		DefaultBackgroundTransparency = 0.8; -- Default BackgroundTransparency of the frame.
 		MouseOverBackgroundTransparency = 0.3; -- Mouse over transparency.
 		AnimationTime = 0.2; -- On mouse over. 
-	}
+	})
 
 	local Container = Make 'Frame' {
 		Archivable             = false;
 		BackgroundColor3       = Color3.new(0, 0, 0);
 		BackgroundTransparency = Configuration.DefaultBackgroundTransparency;
 		BorderSizePixel        = 0;
-		ClipsDescendents       = true;
+		ClipsDescendants       = false;
 		Name                   = "StripCompassFrame";
-		Position               = UDim2.new(0.5, -Container.DefaultWidth/2, 0, Container.DefaultHeight)
+		Position               = UDim2.new(0.5, -Configuration.DefaultWidth/2, 0, Configuration.DefaultYOffset);
 		Size                   = UDim2.new(0, Configuration.DefaultWidth, 0, Configuration.DefaultHeight);
 		Visible                = true;
 		ZIndex                 = Configuration.ZIndex;
@@ -152,18 +159,40 @@ local MakeStripCompass = Class(function(StripCompass)
 	local CurrentCoordinateDirections = {} -- Stores stuff like NSEW
 
 	local function GetPercentPosition(CurrentAngle, Angle)
-		--- Get's a percent position for a GUI
+		--- Get's a percent position for a GUI. Tries to handle the wrap-around based upon CurrentAngle and Angle.
 		-- @param CurrentAngle The current angle of the compass.
 		-- @param Angle The angle that the percent is needed.
 		-- @return Percent in [0, 1]. May be greater than range (for scaling purposes). 
 
-		local SmallBounds = Angle + Configuration.ShownArea/2
+		local SmallBounds = Angle - Configuration.ShownArea/2
 		local RelativeAngle = CurrentAngle - SmallBounds
-		-- if RelativeAngle < 0 or RelativeAngle > Configuration.ShownArea then
-			-- return nil
-		-- else
-		return RelativeAngle / Configuration.ShownArea
-		-- end
+		local PercentPosition = RelativeAngle / Configuration.ShownArea
+
+		-- We want to distribute the compass's "pointers" equally on both sides. So if the Angle is 
+
+		-- Mental notes.
+		-- Angle @ 180
+		-- [0, 180] [180, 360]
+		-- 
+
+		-- Angle @ 270
+		-- [90, 270] [270, 90]
+
+		-- if Angle < CurrentAngle - 180 or Angle > CurrentAngle + 180 then we are on the opposite side. However, 
+		-- if Angle is [90, 270]
+
+		-- if Angle > CurrentAngle + math.pi then
+
+		local MaximumPercent = Tau / Configuration.ShownArea
+		local SwitchPoint = MaximumPercent/2 -- The point left, or right, where it will "switch" over to be on the other side (Aka wrap around).
+
+		if PercentPosition < -SwitchPoint + Configuration.ShownArea/2 then -- Factor in the "shown" area to when it'll switch over.
+			return PercentPosition + MaximumPercent
+		elseif PercentPosition > SwitchPoint then
+			return PercentPosition - MaximumPercent
+		else
+			return PercentPosition
+		end
 	end
 
 	local function GetGuiTransparency(PercentPosition)
@@ -171,24 +200,33 @@ local MakeStripCompass = Class(function(StripCompass)
 
 		local Distance = math.abs(0.5 - PercentPosition)
 		local Range = Configuration.SolidArea/2
+		local ExternalRange = (1 - Configuration.SolidArea)/2
+		local Transparency = (Distance-Range) / ExternalRange
 
-		return math.min(1, Distance/Range)
+		if Transparency >= 1 then
+			return 1
+		elseif Transparency <= 0 then
+			return 0
+		else
+			return Transparency
+		end
 	end
 
 	local function Step(Camera)
 		--- Updates the compass model.
 		-- @param Camera The current camera.
 
-		local CurrentAngle = CompassModel.Step(Camera)
+		local CurrentAngle, RealAngle = CompassModel.Step(Camera)
+		-- print("[Compass] - CurrentAngle = " .. Round(CurrentAngle, 0.01) .. "; Real Angle = " .. Round(RealAngle, 0.01))
 
-		for _, CoordinateDirection in pairs(CurrentInterestPoints) do
+		for _, CoordinateDirection in pairs(CurrentCoordinateDirections) do
 			local PercentPosition = GetPercentPosition(CurrentAngle, CoordinateDirection.Angle)
 
 			local Gui = CoordinateDirection.Gui
 			Gui.Position = UDim2.new(PercentPosition, -Gui.AbsoluteSize.X/2, 0.5, -Gui.AbsoluteSize.Y/2)
 
 			local Transparency = GetGuiTransparency(PercentPosition)
-			CoordinateDirection.SetTransparency(Transparency)
+			CoordinateDirection.SetTransparency(Gui, Transparency)
 		end
 
 		for _, InterestPoint in pairs(CurrentInterestPoints) do
@@ -199,7 +237,7 @@ local MakeStripCompass = Class(function(StripCompass)
 			Gui.Position = UDim2.new(PercentPosition, -Gui.AbsoluteSize.X/2, 0.5, -Gui.AbsoluteSize.Y/2)
 
 			local Transparency = GetGuiTransparency(PercentPosition)
-			InterestPoint.SetTransparency(Transparency)
+			InterestPoint.SetTransparency(Gui, Transparency)
 		end
 	end
 	StripCompass.Step = Step
