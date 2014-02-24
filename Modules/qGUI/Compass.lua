@@ -45,7 +45,7 @@ local function GetCameraRotation(CoordinateFrame, Focus)
 
 	-- 0 degrees is north (I think?)
 
-	return math.atan2(math.rad(CoordinateFrame.X - Focus.X), math.rad(CoordinateFrame.Z - Focus.Z)) + math.pi
+	return math.atan2(CoordinateFrame.X - Focus.X, CoordinateFrame.Z - Focus.Z) + math.pi
 end
 
 local MakeCompassModel = Class(function(CompassModel)
@@ -111,8 +111,10 @@ local MakeCompassModel = Class(function(CompassModel)
 		-- @param TargetPosition The world target position.
 		-- @pre Step has been called.
 
-		local RelativeAngle = GetCameraRotation(Camera.CoordinateFrame, TargetPosition)
-		return Angle - RelativeAngle
+		local RelativeAngle = GetCameraRotation(Camera.CoordinateFrame, TargetPosition) 
+		-- print("RelativeAngle: " .. Round(RelativeAngle, 0.01) .. "; Angle: " .. Round(Angle, 0.01) .. "; Angle - RelativeAngle = " .. Round(Angle - RelativeAngle, 0.01))
+
+		return RelativeAngle
 	end
 	CompassModel.GetRelativeAngle = GetRelativeAngle
 	CompassModel.getRelativeAngle = GetRelativeAngle

@@ -379,7 +379,7 @@ do
 
 		for Gui, TweenState in next, ProcessList do
 			if Gui and Gui.Parent then
-				ActivelyProcessing = true
+				ActivelyProcessing = tick()
 
 				local TimeElapsed = (CurrentTick - TweenState.StartTime)
 				local Duration    = TweenState.Duration
@@ -401,8 +401,8 @@ do
 	end
 
 	local function StartProcessUpdate()
-		if not ActivelyProcessing then
-			ActivelyProcessing = true
+		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
+			ActivelyProcessing = tick()
 			Spawn(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
@@ -477,7 +477,7 @@ do
 
 		for Gui, TweenState in next, ProcessList do
 			if Gui and Gui.Parent then
-				ActivelyProcessing = true
+				ActivelyProcessing = tick()
 
 				local TimeElapsed = (CurrentTick - TweenState.StartTime)
 				local Duration    = TweenState.Duration
@@ -499,8 +499,8 @@ do
 	end
 
 	local function StartProcessUpdate()
-		if not ActivelyProcessing then
-			ActivelyProcessing = true
+		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
+			ActivelyProcessing = tick()
 			Spawn(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
@@ -509,7 +509,6 @@ do
 			end)
 		end
 	end
-
 	local function TweenColor3(Gui, NewProperties, Duration, Override)
 		--- Tween's the Color3 values in a GUI,
 		-- @param Gui The GUI to tween the Color3's upon

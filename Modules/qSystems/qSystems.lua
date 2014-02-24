@@ -341,8 +341,6 @@ lib.waitForChild = waitForChild;
 lib.WaitForChild = waitForChild;
 lib.wait_for_child = waitForChild;
 
-local CallOnChildren
-
 local function CallOnChildren(Instance, FunctionToCall)
 	-- Calls a function on each of the children of a certain object, using recursion.  
 

@@ -19,7 +19,7 @@ return {
 		-- ["ColorfulBody"]    = Color3.new(254/255, 191/255, 229/255); -- Magenta #febfe5 
 		["ColorfulBody"] = Color3.new(222/255, 244/255, 135/255);
 	};
-	RobloxAdminChatColor = BrickColor.new("Hot pink").Color;
+	RobloxAdminChatColor = Color3.new(218/255, 165/255, 32/255); -- BrickColor.new("Hot pink").Color;
 	DefaultChatColor = Color3.new(1, 1, 1);
 	
 	-- RENDERING --
@@ -59,7 +59,8 @@ return {
 		"DaveYorkRBX";
 		"David.Baszucki";
 		"Dbapostle";
-		"Doughtless";
+		"Doughtless,";
+		"effward";
 		"Erik.Cassel";
 		"FusRoblox";
 		"Games";
@@ -70,6 +71,7 @@ return {
 		"Keith";
 		"LordRugDump";
 		"Matt Dusek";
+		"mleask";
 		"nJay";
 		"OnlyTwentyCharacters";
 		"OstrichSized";
@@ -85,8 +87,9 @@ return {
 		"Tarabyte";
 		"Telamon";
 		"TobotRobot";
-		"Tone";
 		"Totbl";
 		"twberg";
+		"Doughtless";
+		"Tone";
 	};
 };
