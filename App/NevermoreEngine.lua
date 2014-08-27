@@ -80,15 +80,6 @@ end
 -----------------------
 -- UTILITY FUNCTIONS --
 -----------------------
-local function Warn(WarningText)
-	--- Used to yell at the player
-	-- @param WarningText The text to warn with.
-
-	Spawn(function()
-		--TestService:Warn(false, WarningText)
-		error("[WARNING] - " .. WarningText, 2)
-	end)
-end
 
 local function WaitForChild(Parent, Name)
 	--- Yields until a child is added. Warns after 5 seconds of yield.
@@ -104,7 +95,7 @@ local function WaitForChild(Parent, Name)
 		Child = Parent:FindFirstChild(Name)
 		if not Warned and StartTime + 5 <= tick() then
 			Warned = true;
-			Warn(Configuration.PrintHeader .. " " .. Name .. " has not replicated after 5 seconds, may not be able to execute Nevermore.")
+			warn(Configuration.PrintHeader .. " " .. Name .. " has not replicated after 5 seconds, may not be able to execute Nevermore.")
 		end
 	end
 	return Child
@@ -638,11 +629,11 @@ do
 
 							return RequestExecuter(Client, unpack(RequestArguments))
 						else
-							Warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
+							warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
 							return nil
 						end
 					else
-						Warn(Configuration.PrintHeader .. "Invalid request to the DataStream, DataType '" .. type(Request) .. "' received. Resolved into '" .. tostring(Request) .. "'")
+						warn(Configuration.PrintHeader .. "Invalid request to the DataStream, DataType '" .. type(Request) .. "' received. Resolved into '" .. tostring(Request) .. "'")
 						return nil
 					end
 				end
@@ -694,7 +685,7 @@ do
 									RequestExecuter(unpack(RequestArguments))
 								end)
 							else
-								-- Warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
+								-- warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
 							end
 						else
 							error(Configuration.PrintHeader .. "Invalid request to the DataStream, DataType '" .. type(Request) .. "' received. Resolved into '" .. tostring(Request) .. "'")
@@ -830,7 +821,7 @@ do
 						if RequestExecuter then
 							RequestExecuter(Client, unpack(RequestArguments))
 						else
-							-- Warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
+							-- warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
 						end
 					else
 						error(Configuration.PrintHeader .. "Invalid request to the DataStream, DataType '" .. type(Request) .. "' received. Resolved into '" .. tostring(Request) .. "'")
@@ -874,7 +865,7 @@ do
 									RequestExecuter(unpack(RequestArguments))
 								end)
 							else
-								-- Warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
+								-- warn(Configuration.PrintHeader .. "Unregistered request called, request tag '" .. Request .. "'.")
 							end
 						else
 							error(Configuration.PrintHeader .. "Invalid request to the DataStream, DataType '" .. type(Request) .. "' received. Resolved into '" .. tostring(Request) .. "'")
@@ -1100,7 +1091,7 @@ do
 
 				if Configuration.BlackList and CheckIfPlayerIsBlacklisted(Player, Configuration.BlackList) then
 					Player:Kick()
-					Warn("Kicked Player " .. Player.Name .. " who was blacklisted")
+					warn("Kicked Player " .. Player.Name .. " who was blacklisted")
 				else
 					local PlayerSplashScreen
 					local HumanoidDiedEvent
