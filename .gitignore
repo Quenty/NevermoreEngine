@@ -1,0 +1,14 @@
+*.sublime-project
+*.sublime-workspace
+*.txt
+*.rbxl
+/TestScripts
+/DataConverters
+ProjectPlanning.lua
+*.jar
+*.rbxm
+Exported.rbxm
+/_Archive
+AxisCameraEngine.lua
+*.bat
+*.jar
