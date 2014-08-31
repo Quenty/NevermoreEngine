@@ -62,7 +62,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## Modules
-Modules contain scripts, localscripts, and ModuleScripts. `LocalScripts` and 
+Modules contain Scripts, LocalScripts, and ModuleScripts. `LocalScripts` and 
 `ModuleScripts` are replciated. Any script ending in .Main will execute, as well
 as any script that is not disabled (Although Nevermore will complain).
 
@@ -94,7 +94,7 @@ However, it should be noted that Nevermore will appear in
 `ReplicatedStorage.NevermoreEngine`
 
 Nevermore is loaded by NevermoreEngineLoader.lua, which clones it into 
-ReplicatedStorage, but before doingso, runs it for the server. This guarantees 
+ReplicatedStorage, but before doing so, runs it for the server. This guarantees 
 that it knows whether or not it's in the server or client, albeit, by a hacky 
 method. It also makes sure the cloned Nevermore is archivable false incase it's 
 loaded in a PBS. 
@@ -122,6 +122,10 @@ Blacklist - The blacklist is used to ban players automatically from the game.
 
 ## Update / Change Log
 This change log is *strictly* for Nevermore's module and documentation only.
+
+##### August 26th, 2014 [0.2.0.4]
+- Fixed warn issue
+- Updated
 
 ##### February 9th, 2014 [0.2.0.3]
 - Fixed `RemoteEvent` Firing in server
