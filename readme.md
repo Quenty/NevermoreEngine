@@ -82,7 +82,7 @@ Loading on the server and the client may be done by using the following code:
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Nevermore         = require(ReplicatedStorage:WaitForChild("NevermoreEngine")))
+local NevermoreEngine         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
