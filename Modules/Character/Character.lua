@@ -7,7 +7,7 @@ local RawCharacter      = LoadCustomLibrary("RawCharacter")
 local qSystems          = LoadCustomLibrary("qSystems")
 
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local safeLib = {}
 

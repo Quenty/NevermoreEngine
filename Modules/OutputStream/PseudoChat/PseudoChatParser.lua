@@ -7,14 +7,16 @@ local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
 local qSystems           = LoadCustomLibrary("qSystems")
 local qString            = LoadCustomLibrary("qString")
 local PseudoChatSettings = LoadCustomLibrary("PseudoChatSettings")
-local qColor3            = LoadCustomLibrary("qColor3")
 local qMath              = LoadCustomLibrary("qMath")
 local qGUI               = LoadCustomLibrary("qGUI")
 local OutputStream       = LoadCustomLibrary("OutputStream")
+local qTime              = LoadCustomLibrary("qTime")
+local qColor3            = LoadCustomLibrary("qColor3")
+local qPlayer            = LoadCustomLibrary("qPlayer")
 
 local RbxUtility         = LoadLibrary("RbxUtility")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -26,9 +28,9 @@ local lib = {}
 local GetPlayerNameColorRaw do 
 	local PlayerColours = {
 		BrickColor.new("Bright red"),
-		BrickColor.new("Bright blue"),
-		BrickColor.new("Earth green"),
-		BrickColor.new("Bright violet"),
+		BrickColor.new("Pastel light blue"); --BrickColor.new("Bright blue"),
+		BrickColor.new("Br. yellowish green"), --BrickColor.new("Earth green"), -- Suppose to be earth green, but it looks ugly.
+		BrickColor.new("Lavender"), --BrickColor.new("Bright violet"),
 		BrickColor.new("Bright orange"),
 		BrickColor.new("Bright yellow"),
 		BrickColor.new("Light reddish violet"),
@@ -78,21 +80,6 @@ end
 lib.IsRobloxAdmin = IsRobloxAdmin
 lib.isRobloxAdmin = IsRobloxAdmin
 
-local function GetPlayerFromName(PlayerName)
-	--- Get's a player from their username.
-	-- @param PlayerName THe name of the player
-	-- @return The player, if they are in-game.
-
-	local Player = Players:FindFirstChild(PlayerName)
-	if Player and Player:IsA("Player") then
-		return Player
-	else
-		return nil
-	end
-end
-lib.GetPlayerFromName = GetPlayerFromName
-lib.getPlayerFromName = GetPlayerFromName
-
 local function GetPlayerChatColor(Name)
 	--- Return's a player's chat color
 	-- @param Name THe name of the player
@@ -114,22 +101,22 @@ local function GetPlayerNameColor(Name)
 	-- @param Name THe name of the player
 	-- @return Color3 value of what to color their name.
 
-	local Player = GetPlayerFromName(Name)
+	local Player = qPlayer.GetPlayerFromName(Name)
 
 	if PseudoChatSettings.SpecialNameColors[Name] then
 		return PseudoChatSettings.SpecialNameColors[Name]
 	else
 		if not Player or Player.Neutral then
-			return GetPlayerNameColorRaw(Name)
+			return qColor3.AdjustColorTowardsWhite(GetPlayerNameColorRaw(Name).Color)
 		else
-			return Player.TeamColor.Color
+			return qColor3.AdjustColorTowardsWhite(Player.TeamColor.Color)
 		end
 	end
 end
 lib.GetPlayerNameColor = GetPlayerNameColor
 lib.getPlayerNameColor = GetPlayerNameColor
 
-local CachedSpaceStringList = {}
+local CachedSpaceStringList = {} -- It's worth it to cache this data. Eventual memory leak, but not for a long long time. 
 
 local function ComputeSpaceString(Label, PlayerLabel)
 	--- Given a name, return the spaces required to push a text wrapped thing out of the way. Tricky Sorcus. Tricky. 
@@ -179,6 +166,13 @@ local function GenericTextFadeIn(Gui, Time)
 				TextTransparency       = CurrentTextTransparency;
 				TextStrokeTransparency = CurrentStrokeTransparency;
 			}, Time, true)
+		elseif Child:IsA("ImageLabel") or Child:IsA("ImageButton") then
+			local CurrentImageTransparency = Child.ImageTransparency
+			Child.ImageTransparency = 1;
+
+			qGUI.TweenTransparency(Child, {
+				ImageTransparency      = CurrentImageTransparency;
+			}, Time, true)
 		end
 	end)
 end
@@ -192,124 +186,164 @@ local function GenericTextFadeOut(Gui, Time)
 				TextTransparency       = 1;
 				TextStrokeTransparency = 1;
 			}, Time, true)
+		elseif Child:IsA("ImageLabel") or Child:IsA("ImageButton") then
+			qGUI.TweenTransparency(Child, {
+				ImageTransparency      = 1;
+			}, Time, true)
 		end
 	end)
 end
-local ChatParser, ChatRender, ChatOutputClass do -- Chat parsing
-	function ChatRender(Parent, Data, DoNotAnimate)
-		--- Renders a frame, and returns it
-		-- @param Data The data is sent from the below parser, to the client
-		--[[ The following expected
-			Message 'String' The message to be displayed.
-			PlayerColor 'Color3' The Color3 value, in JSON, of the Player's name.
-			ClassName 'String' The class of the chat. Automatically added.
-			ChatColor 'Color3' The Color3 value
-		--]]
-		-- @return Gui Frame, resized correctly for the parent. 
 
-		local PlayerChatFrame = Make("Frame", {
+local ChatParser, ChatRender, ChatOutputClass do -- Chat parsing
+
+	local function ShouldDisplayNameTag(Data, LastData)
+		if LastData and LastData.ClassName == Data.ClassName and LastData.PlayerName == Data.PlayerName then
+			if not LastData.ClientData.ContinuedMessageLevel or LastData.ClientData.ContinuedMessageLevel < (PseudoChatSettings.LinesShown - 1) then
+				if LastData.PlayerColor == Data.PlayerColor then
+					return false
+				end
+			end
+		end
+
+		return true
+	end
+
+	function ChatRender(Parent, Data, DoNotAnimate, LastData)
+		local RenderFrame = Make("Frame", {
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 			Parent                 = Parent;
-			Size                   = UDim2.new(1, 0, 1, 0);
+			Size                   = UDim2.new(1, 0, 0, math.ceil(PseudoChatSettings.LinesShown/2) * PseudoChatSettings.LineHeight); -- Y is only 0.5, to limit lines to half the screen. Super hacky. 
 			Visible                = true;
 			Name                   = Data.ClassName;
+			ZIndex                 = Parent.ZIndex;	
 		})
+
+		local PlayerDotColor
+		local ContinuedMessage = true -- Presume we are continuing a spam rampage
+		if ShouldDisplayNameTag(Data, LastData) then
+			--- When we have a new message by a new player, indicate with dot. However, after PseudoChatSettings.LinesShown - 1, we won't continue our message chain. 
+			-- Yes, this uh, argument thing is cringey. I'm sorry mother!
+
+			PlayerDotColor = Make("ImageLabel", {
+				Name                   = "PlayerDot";
+				Parent                 = RenderFrame;
+				Size                   = UDim2.new(0, 14, 0, 14);
+				BackgroundTransparency = 1;
+				Position               = UDim2.new(0, 18, 0, 4);
+				BorderSizePixel        = 0; 
+				Image                  = "rbxasset://textures/ui/chat_teamButton.png";
+				ImageTransparency      = 0;
+				ImageColor3            = Data.PlayerColor;
+				ZIndex                 = Parent.ZIndex;
+			});
+
+			ContinuedMessage = false
+		else
+			-- We know we're operrating only in the ChatRender class...
+			LastData.ClientData.ContinuedMessageLevel = LastData.ClientData.ContinuedMessageLevel or 1 
+			Data.ClientData.ContinuedMessageLevel     = LastData.ClientData.ContinuedMessageLevel + 1
+			-- print("Set @ ", Data.ClientData.ContinuedMessageLevel)
+		end
+
 
 		local PlayerLabel = Make("TextLabel", {
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
-			FontSize               = PseudoChatSettings.ChatFontSize;
-			Name                   = "ChatNameLabel";
-			Parent                 = PlayerChatFrame; -- For text bounds, reassigned later. 
-			Position               = UDim2.new(0, PseudoChatSettings.LabelOffsetX, 0, 0);
-			Size                   = UDim2.new(1, -PseudoChatSettings.LabelOffsetX, 1, 0);
-			Text                   = Data.PlayerName..":";
-			TextColor3             = Data.PlayerColor;
-			TextStrokeColor3       = Color3.new(0.5, 0.5, 0.5);
-			TextStrokeTransparency = 1;
+			Name                   = Data.PlayerName .. "Label";
+			Parent                 = RenderFrame; -- For text bounds, reassigned later. 
+			Position               = UDim2.new(0, 38, 0, 0);
+			Size                   = UDim2.new(1, -38, 1, 0);
+			Text                   = Data.PlayerName..": ";
+			TextColor3             = Data.PlayerColor; --Data.ChatColor;
+			TextStrokeColor3       = Color3.new(0, 0, 0);--Color3.new(0, 0, 0);
+			TextStrokeTransparency = 0.87; --0.8;
 			TextTransparency       = 0;
-			TextWrapped            = false;
+			TextWrapped            = true;
 			TextXAlignment         = "Left";
 			TextYAlignment         = "Top";
 			ZIndex                 = Parent.ZIndex;	
+			Font                   = "SourceSans";
+			FontSize               = "Size18"
 		})
 
 		local MessageLabel = Make("TextLabel", {
 			BackgroundTransparency = 1;
-			BorderSizePixel        = 0.0;
-			FontSize               = PseudoChatSettings.ChatFontSize;
-			Name                   = "Message";
-			Parent                 = PlayerChatFrame;
-			Position               = UDim2.new(0, PseudoChatSettings.LabelOffsetX, 0, 0);
-			Size                   = UDim2.new(1, -PseudoChatSettings.LabelOffsetX, 1, 0);
+			BorderSizePixel        = 0;
+			Name                   = Data.PlayerName .. "MessageLabel - " .. Data.Message;
+			Parent                 = RenderFrame; -- For text bounds, reassigned later. 
+			Position               = UDim2.new(0, 38, 0, 0);
+			Size                   = UDim2.new(1, -38, 1, 0);
+			-- Text                   = PseudoChatSettings.ContentFailed;
 			TextColor3             = Data.ChatColor;
 			TextStrokeColor3       = Color3.new(0, 0, 0);
+			TextStrokeTransparency = 0.8;
+			TextTransparency       = 0;
 			TextWrapped            = true;
-			TextStrokeTransparency = Data.MessageLabelTextStrokeTransparency;
 			TextXAlignment         = "Left";
 			TextYAlignment         = "Top";
 			ZIndex                 = Parent.ZIndex;
+			Font                   = "SourceSans";
+			FontSize               = "Size18"
 		})
 
-		-- Set Message's Text --
-		local MessageSpacer = GetSpaceString(MessageLabel, PlayerLabel)
-		MessageLabel.Text   = MessageSpacer .. PseudoChatSettings.ContentFailed
-		MessageLabel.Text   = MessageSpacer .. Data.Message
+		MessageLabel.Position = UDim2.new(0, PlayerLabel.Position.X.Offset + PlayerLabel.TextBounds.X, 0, 0)
+		MessageLabel.Size = UDim2.new(1, -(PlayerLabel.Position.X.Offset + PlayerLabel.TextBounds.X), 1, 0)
+
+		MessageLabel.Text = Data.Message
+
+		if ContinuedMessage then
+			PlayerLabel:Destroy()
+		end
 
 		local Height = qMath.RoundUp(MessageLabel.TextBounds.Y, PseudoChatSettings.LineHeight)
-		PlayerChatFrame.Size = UDim2.new(1, 0, 0, Height)
+		RenderFrame.Size = UDim2.new(1, 0, 0, Height)
+
 
 		if DoNotAnimate then
 			
 		else
-			GenericTextFadeIn(PlayerChatFrame, 0.2)
+			if PlayerDotColor then
+				local OldPosition          = PlayerDotColor.Position
+				local OldColor             = PlayerDotColor.ImageColor3
+				PlayerDotColor.Position    = UDim2.new(0, -18, 0, 4)
+				PlayerDotColor.ImageColor3 = Color3.new(1, 1, 1);
+
+				qGUI.ResponsiveCircleClickEffect(PlayerDotColor, nil, nil, 0.5, true)
+
+				PlayerDotColor:TweenPosition(OldPosition, "Out", "Quad", 0.15, true)
+				qGUI.TweenColor3(PlayerDotColor, {ImageColor3 = OldColor}, 0.15, true)
+			end
+
+			GenericTextFadeIn(RenderFrame, 0.15)
 		end
-		return PlayerChatFrame
+
+		return RenderFrame
 	end
+
 
 	ChatParser = OutputStream.MakeOutputParser(function(Data)
 		--- Constructs a new "data" field to be sent, as well as fills in Data.
 
 		local Parsed = {}
 
-		Data.Message     = qString.TrimString(Data.Message and tostring(Data.Message) or "[ No Message Provided ]")
-		Data.PlayerName  = Data.PlayerName or "NoPlayerName";
-		Data.PlayerColor = Data.PlayerColor or GetPlayerNameColor(Data.PlayerName)
-		Data.ChatColor   = Data.ChatColor or GetPlayerChatColor(Data.PlayerName)
+		Data.Message                            = Data.Message and tostring(Data.Message) or "[ No Message Provided ]"
+		Data.PlayerName                         = Data.PlayerName or "NoPlayerName";
+		Data.PlayerColor                        = Data.PlayerColor or GetPlayerNameColor(Data.PlayerName)
+		Data.ChatColor                          = Data.ChatColor or GetPlayerChatColor(Data.PlayerName)
 		Data.MessageLabelTextStrokeTransparency = Data.MessageLabelTextStrokeTransparency or 0.8
 
 		Parsed.Message     = Data.Message
 		Parsed.PlayerName  = Data.PlayerName
-		Parsed.PlayerColor = qColor3.Encode(Data.PlayerColor)
-		Parsed.ChatColor   = qColor3.Encode(Data.ChatColor)		
-		Parsed.MessageLabelTextStrokeTransparency = Data.MessageLabelTextStrokeTransparency
+		Parsed.PlayerColor = Data.PlayerColor
+		Parsed.ChatColor   = Data.ChatColor
 
-		-- print(Parsed.PlayerColor)
-		-- print(Parsed.ChatColor)
+		Parsed.MessageLabelTextStrokeTransparency = Data.MessageLabelTextStrokeTransparency
 
 		return Parsed
 	end, function(Data)
-		--- Decodes JSON (unparses) it.
-		-- @return Table, if unparsed successfully, otherwise, nil
 
-		-- print(Data.PlayerColor)
-		-- print(Data.ChatColor)
-
-		local DecodedChatColor = qColor3.Decode(Data.ChatColor)
-		if DecodedChatColor then
-			Data.ChatColor = DecodedChatColor
-		else
-			Warn("[OutputParser] - Unable to parse Notifications's ChatColor in data")
-		end
-
-		local DecodedPlayerColor = qColor3.Decode(Data.PlayerColor)
-		if DecodedPlayerColor then
-			Data.PlayerColor = DecodedPlayerColor
-		else
-			Warn("[OutputParser] - Unable to parse Notifications's PlayerColor in data")
-		end
-
+		-- print(LoadCustomLibrary("Type").getType(Data.PlayerColor))
 		return Data
 	end)
 
@@ -329,7 +363,7 @@ local OutputParser, OutputRender, OutputOutputClass do -- Output parsing
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 			Parent                 = Parent;
-			Size                   = UDim2.new(1, 0, 1, 0);
+			Size                   = UDim2.new(1, 0, 0, 60000); -- If textBounds > 65535 (16 bits), then we go negative. 
 			Visible                = true;
 			Name                   = Data.ClassName;
 		})
@@ -337,7 +371,8 @@ local OutputParser, OutputRender, OutputOutputClass do -- Output parsing
 		local MessageLabel = Make("TextLabel", {
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0.0;
-			FontSize               = PseudoChatSettings.ChatFontSize;
+			Font                   = "SourceSans";
+			FontSize               = "Size18";
 			Name                   = "Message";
 			Parent                 = NotificationChatFrame;
 			Position               = UDim2.new(0, PseudoChatSettings.LabelOffsetXOutput, 0, 0);
@@ -353,9 +388,15 @@ local OutputParser, OutputRender, OutputOutputClass do -- Output parsing
 		})
 		MessageLabel.Text = tostring(Data.Message)
 
-		-- print(NotificationChatFrame.AbsoluteSize.Y)
-		-- print(NotificationChatFrame:GetFullName())
-		-- print(MessageLabel.TextBounds.Y)
+		-- if MessageLabel.TextBounds.Y == 18 then
+		-- 	print("MessageLabel.TextBounds.Y: " .. MessageLabel.TextBounds.Y)
+		-- 	print("MessageLabel.TextBounds.X: " .. MessageLabel.TextBounds.X)
+		-- 	print("MessageLabel.AbsoluteSize.Y: " .. MessageLabel.AbsoluteSize.Y)
+		-- 	wait()
+		-- 	print("MessageLabel.TextBounds.Y: " .. MessageLabel.TextBounds.Y)
+		-- 	print("MessageLabel.TextBounds.X: " .. MessageLabel.TextBounds.X)
+		-- 	print("MessageLabel.AbsoluteSize.Y: " .. MessageLabel.AbsoluteSize.Y)
+		-- end
 
 		local Height = qMath.RoundUp(MessageLabel.TextBounds.Y, PseudoChatSettings.LineHeight)
 		NotificationChatFrame.Size = UDim2.new(1, 0, 0, Height)
@@ -370,27 +411,17 @@ local OutputParser, OutputRender, OutputOutputClass do -- Output parsing
 
 		local Parsed = {}
 
-		Data.Message     = qString.TrimString(Data.Message and tostring(Data.Message) or "[ No Message Provided ]")
-		Data.ChatColor   = Data.ChatColor or PseudoChatSettings.DefaultNotificationColor;
+		Data.Message                            = Data.Message and tostring(Data.Message) or "[ No Message Provided ]"
+		Data.ChatColor                          = Data.ChatColor or PseudoChatSettings.DefaultNotificationColor;
 		Data.MessageLabelTextStrokeTransparency = Data.MessageLabelTextStrokeTransparency or 0.8
 
-		Parsed.Message     = Data.Message
-		Parsed.ChatColor   = qColor3.Encode(Data.ChatColor)		
+		Parsed.Message                            = Data.Message
+		Parsed.ChatColor                          = Data.ChatColor
 		Parsed.MessageLabelTextStrokeTransparency = Data.MessageLabelTextStrokeTransparency
 		
 
 		return Parsed
 	end, function(Data)
-		--- Decodes JSON (unparses) it.
-		-- @param JSONData String JSON data, to be deparsed
-
-		local DecodedChatColor = qColor3.Decode(Data.ChatColor)
-		if DecodedChatColor then
-			Data.ChatColor = DecodedChatColor
-		else
-			Warn("[OutputParser] - Unable to parse Notifications's ChatColor in data")
-		end
-
 		return Data
 	end)
 
@@ -400,5 +431,143 @@ local OutputParser, OutputRender, OutputOutputClass do -- Output parsing
 	);
 end
 lib.OutputOutputClass = OutputOutputClass
+
+do
+	local function OutputRender(Parent, Data, DoNotAnimate)
+		--- Renders a new "Output" from the Data given.
+		-- @param Data The data given. 
+		local RenderFrame = Make("Frame", {
+			BackgroundTransparency = 1;
+			BorderSizePixel        = 0;
+			Parent                 = Parent;
+			Size                   = UDim2.new(1, 0, 0, 60000); -- 65k is the limit, before we go negative.
+			Visible                = true;
+			Name                   = Data.ClassName;
+			ZIndex                 = Parent.ZIndex;	
+		})
+
+		local CommandDot = Make("ImageLabel", {
+			Name                   = "CommandDot";
+			Parent                 = RenderFrame;
+			Size                   = UDim2.new(0, 14, 0, 14);
+			BackgroundTransparency = 1;
+			Position               = UDim2.new(0, 18, 0, 4);
+			BorderSizePixel        = 0; 
+			Image                  = "rbxassetid://176695944";
+			ImageTransparency      = 0;
+			ImageColor3            = Data.CommandColor;
+			ZIndex                 = Parent.ZIndex;
+		});
+
+		local UserLabel = Make("TextLabel", {
+			BackgroundTransparency = 1;
+			BorderSizePixel        = 0;
+			Name                   = Data.PlayerExecutingName .. "Label";
+			Parent                 = RenderFrame; -- For text bounds, reassigned later. 
+			Position               = UDim2.new(0, 38, 0, 0);
+			Size                   = UDim2.new(1, -38, 0, 0);
+			Text                   = Data.CommandName:upper() .. "  ";
+			TextColor3             = Data.CommandColor;--Color3.new(1, 1, 1);
+			TextStrokeColor3       = Color3.new(0, 0, 0);
+			TextStrokeTransparency = 0.87; --0.8;
+			TextTransparency       = 0;
+			TextWrapped            = true;
+			TextXAlignment         = "Left";
+			TextYAlignment         = "Top";
+			ZIndex                 = Parent.ZIndex;	
+			Font                   = "SourceSans";
+			FontSize               = "Size18"
+		})
+		UserLabel.Size = UDim2.new(0, UserLabel.TextBounds.X, 1, 0)
+
+		--[[
+		local Backing = Make("Frame", {
+			Parent                 = UserLabel;
+			ZIndex                 = Parent.ZIndex;
+			BackgroundTransparency = 0;
+			BackgroundColor3       = Data.CommandColor;
+			Size                   = UDim2.new(1, 6, 1, 0);
+			Position               = UDim2.new(0, -3, 0, 0);
+			BorderSizePixel        = 0;
+			Name                   = "Backing";
+		})--]]
+		-- qGUI.BackWithRoundedRectangle(Backing, 5, Data.CommandColor)
+
+		local MessageLabel = Make("TextLabel", {
+			BackgroundTransparency = 1;
+			BorderSizePixel        = 0;
+			Name                   = Data.PlayerExecutingName .. "MessageLabel - " .. Data.CommandDescription;
+			Parent                 = RenderFrame; -- For text bounds, reassigned later. 
+			Position               = UDim2.new(0, 38, 0, 0);
+			Size                   = UDim2.new(1, -38, 1, 0);
+			-- Text                   = PseudoChatSettings.ContentFailed;
+			TextColor3             = Color3.new(1, 1, 1);
+			TextStrokeColor3       = Color3.new(0, 0, 0);
+			TextStrokeTransparency = 0.8;
+			TextTransparency       = 0;
+			TextWrapped            = true;
+			TextXAlignment         = "Left";
+			TextYAlignment         = "Top";
+			ZIndex                 = Parent.ZIndex;
+			Font                   = "SourceSans";
+			FontSize               = "Size18"
+		})
+
+		MessageLabel.Position = UDim2.new(0, UserLabel.Position.X.Offset + UserLabel.TextBounds.X, 0, 0)
+		MessageLabel.Size = UDim2.new(1, -(UserLabel.Position.X.Offset + UserLabel.TextBounds.X), 1, 0)
+
+		MessageLabel.Text = qTime.GetFormattedTime("[h:i A] ", Data.TimeStamp) .. Data.PlayerExecutingName .. ": " .. Data.CommandDescription
+
+		local Height = qMath.RoundUp(MessageLabel.TextBounds.Y, PseudoChatSettings.LineHeight)
+		RenderFrame.Size = UDim2.new(1, 0, 0, Height)
+
+		if DoNotAnimate then
+			
+		else
+			if CommandDot then
+				local OldPosition          = CommandDot.Position
+				local OldColor             = CommandDot.ImageColor3
+				CommandDot.Position    = UDim2.new(0, -18, 0, 4)
+				CommandDot.ImageColor3 = Color3.new(1, 1, 1);
+
+				qGUI.ResponsiveCircleClickEffect(CommandDot, nil, nil, 0.5, true)
+
+				CommandDot:TweenPosition(OldPosition, "Out", "Quad", 0.15, true)
+				qGUI.TweenColor3(CommandDot, {ImageColor3 = OldColor}, 0.15, true)
+			end
+
+			GenericTextFadeIn(RenderFrame, 0.15)
+		end
+
+		return RenderFrame
+	end
+
+	local OutputParser = OutputStream.MakeOutputParser(function(Data)
+		--- Constructs a new "data" field to be sent.
+
+		local Parsed = {}
+
+		Data.CommandName         = Data.CommandName or "Unknown";
+		Data.CommandDescription  = Data.CommandDescription and tostring(Data.CommandDescription) or "[ No Message Provided ]"
+		Data.PlayerExecutingName = Data.PlayerExecutingName or "[ Unknown ]"
+		Data.CommandColor        = Data.CommandColor or GetPlayerNameColor(Data.CommandName);
+
+		Parsed.CommandName         = Data.CommandName
+		Parsed.CommandDescription  = Data.CommandDescription
+		Parsed.CommandColor        = Data.CommandColor
+		Parsed.PlayerExecutingName = Data.PlayerExecutingName
+
+		return Parsed
+	end, function(Data)
+		return Data
+	end)
+
+	AdminLogOutputClass = OutputStream.MakeOutputClass("AdminLogOutputClass", 
+		OutputParser, 
+		OutputRender
+	);
+end
+lib.AdminLogOutputClass = AdminLogOutputClass
+
 
 return lib

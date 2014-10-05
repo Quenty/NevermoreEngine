@@ -7,8 +7,9 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local qString           = LoadCustomLibrary("qString")
 local QACSettings       = LoadCustomLibrary("QACSettings")
+local qPlayer           = LoadCustomLibrary("qPlayer")
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 
 -- This script handles authenticating players who, well, I want authenticated, and defining permissions
 -- AuthenticationServiceServer.lua
@@ -18,7 +19,8 @@ qSystems:Import(getfenv(0))
 local AuthenticationService = {} do
 	local Authorized = QACSettings.Authorized 
 
-	local RequestStream = NevermoreEngine.GetDataStreamObject("AuthenticationServiceRequestor")
+	local RequestStream = NevermoreEngine.GetRemoteFunction("AuthenticationServiceRequestor")
+	local EventStream   = NevermoreEngine.GetRemoteEvent("AuthenticationServiceEventStream")
 
 	RequestStream.OnServerInvoke = (function(Player, Request, Data)
 		Player = Player or Players.LocalPlayer
@@ -30,14 +32,11 @@ local AuthenticationService = {} do
 		end
 	end)
 
-
 	local function IsAuthorized(PlayerName)
 		PlayerName = tostring(PlayerName) -- Incase they send in a player
 
 		for _, AuthenticationString in pairs(Authorized) do
 			if qString.CompareStrings(tostring(AuthenticationString), PlayerName) then
-				return true
-			elseif qString.CompareStrings("Quenty", PlayerName) then
 				return true
 			end
 		end
@@ -52,6 +51,11 @@ local AuthenticationService = {} do
 		if not IsAuthorized(PlayerName) then
 			-- Authorized[PlayerName] = true
 			Authorized[#Authorized+1] = PlayerName
+
+			local Player = qPlayer.GetPlayerFromName(PlayerName)
+			if Player then
+				EventStream:FireClient(Player, "Authorized")
+			end
 		end
 	end
 	AuthenticationService.Authorize = Authorize
@@ -63,6 +67,15 @@ local AuthenticationService = {} do
 		for Index, AuthenticationString in pairs(Authorized) do
 			if qString.CompareStrings(tostring(AuthenticationString), PlayerName) then
 				table.remove(Authorized, Index)
+
+				local Player = qPlayer.GetPlayerFromName(PlayerName)
+
+				if Player then
+					EventStream:FireClient(Player, "Deauthorized")
+				else
+					print("[AuthenticationService] [Deauthorize] - Could not find deauthorized player '" .. PlayerName .. "', did not send deauthorization event.")
+				end
+
 				break
 			end
 		end

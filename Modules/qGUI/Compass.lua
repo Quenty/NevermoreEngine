@@ -7,7 +7,7 @@ local qSystems                = LoadCustomLibrary("qSystems")
 local qGUI                    = LoadCustomLibrary("qGUI")
 local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 

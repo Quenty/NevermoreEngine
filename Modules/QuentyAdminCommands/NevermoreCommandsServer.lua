@@ -1,36 +1,37 @@
-local Players               = game:GetService("Players")
-local StarterPack           = game:GetService("StarterPack")
-local StarterGui            = game:GetService("StarterGui")
-local Lighting              = game:GetService("Lighting")
-local Debris                = game:GetService("Debris")
-local Teams                 = game:GetService("Teams")
-local BadgeService          = game:GetService("BadgeService")
-local InsertService         = game:GetService("InsertService")
-local HttpService           = game:GetService("HttpService")
-local ReplicatedStorage     = game:GetService("ReplicatedStorage")
-local RunService            = game:GetService("RunService")
-local MarketplaceService    = game:GetService("MarketplaceService")
-local TeleportService       = game:GetService("TeleportService")
-local PointsService         = game:GetService("PointsService")
+local Players                     = game:GetService("Players")
+local StarterPack                 = game:GetService("StarterPack")
+local StarterGui                  = game:GetService("StarterGui")
+local Lighting                    = game:GetService("Lighting")
+local Debris                      = game:GetService("Debris")
+local Teams                       = game:GetService("Teams")
+local BadgeService                = game:GetService("BadgeService")
+local InsertService               = game:GetService("InsertService")
+local HttpService                 = game:GetService("HttpService")
+local ReplicatedStorage           = game:GetService("ReplicatedStorage")
+local RunService                  = game:GetService("RunService")
+local MarketplaceService          = game:GetService("MarketplaceService")
+local TeleportService             = game:GetService("TeleportService")
+local PointsService               = game:GetService("PointsService")
 
-local NevermoreEngine       = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary     = NevermoreEngine.LoadLibrary
+local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
 
-local Character               = LoadCustomLibrary("Character")
-local PlayerId                = LoadCustomLibrary("PlayerId")
-local PseudoChatManagerServer = LoadCustomLibrary("PseudoChatManagerServer")
-local CommandSystems          = LoadCustomLibrary("CommandSystems")
-local qSystems                = LoadCustomLibrary("qSystems")
-local RawCharacter            = LoadCustomLibrary("RawCharacter")
-local QACSettings             = LoadCustomLibrary("QACSettings")
-local PseudoChatSettings      = LoadCustomLibrary("PseudoChatSettings")
-local Table                   = LoadCustomLibrary("Table")
-local PlayerTagTracker        = LoadCustomLibrary("PlayerTagTracker")
-local Type                    = LoadCustomLibrary("Type")
-local AuthenticationServiceServer   = LoadCustomLibrary("AuthenticationServiceServer")
-local qString                 = LoadCustomLibrary("qString")
+local AuthenticationServiceServer = LoadCustomLibrary("AuthenticationServiceServer")
+local Character                   = LoadCustomLibrary("Character")
+local CommandSystems              = LoadCustomLibrary("CommandSystems")
+local PlayerId                    = LoadCustomLibrary("PlayerId")
+local PlayerTagTracker            = LoadCustomLibrary("PlayerTagTracker")
+local PseudoChatManagerServer     = LoadCustomLibrary("PseudoChatManagerServer")
+local PseudoChatSettings          = LoadCustomLibrary("PseudoChatSettings")
+local QACSettings                 = LoadCustomLibrary("QACSettings")
+local qString                     = LoadCustomLibrary("qString")
+local qSystems                    = LoadCustomLibrary("qSystems")
+local RawCharacter                = LoadCustomLibrary("RawCharacter")
+local Table                       = LoadCustomLibrary("Table")
+local Type                        = LoadCustomLibrary("Type")
+local qPlayer                     = LoadCustomLibrary("qPlayer")
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 CommandSystems:Import(getfenv(0));
 RawCharacter:Import(getfenv(0), "Raw")
 Character:Import(getfenv(0), "Safe")
@@ -162,6 +163,96 @@ do
 			end
 		end, false)
 
+	do
+		local function GetTeamsFromName(TeamList, StringInput)
+			local Found = 0
+
+			for _, Team in pairs(Teams:GetTeams()) do
+				if qString.CompareCutFirst(Team.TeamColor.Name, StringInput) then
+					TeamList[#TeamList+1] = Team
+					Found = Found + 1
+				elseif qString.CompareCutFirst(Team.Name, StringInput) then
+					TeamList[#TeamList+1] = Team
+					Found = Found + 1
+				end
+			end
+
+			return Found
+		end
+
+		local function GetTeamFromPlayerName(User, TeamList, StringInput, NeutralAllowed)
+			local PlayerList = PlayerIdSystem:GetPlayersFromString(StringInput, User)
+			local Found = 0
+
+			for _, Player in pairs(PlayerList) do
+				local PlayerTeam = qPlayer.GetTeamFromPlayer(Player) or (NeutralAllowed and "Neutral") or nil
+				if PlayerTeam and not GetIndexFromValue(TeamList, PlayerTeam) then
+					TeamList[#TeamList+1] = PlayerTeam
+					Found = Found + 1
+				end
+			end
+
+			return Found
+		end
+
+		local function LooseGetTeamsFromName(TeamList, StringInput)
+			local Found = 0
+
+			for _, Team in pairs(Teams:GetTeams()) do
+				local TeamColorName = Team.TeamColor.Name:lower()
+				local TeamName = Team.Name:lower()
+				local Input = qString.TrimString(StringInput):lower()
+
+				if TeamColorName:find(Input) then
+					TeamList[#TeamList+1] = Team
+					Found = Found + 1
+				elseif TeamName:find(Input) then
+					TeamList[#TeamList+1] = Team
+					Found = Found + 1
+				end
+			end
+
+			return Found
+		end
+
+		ArgSys:add("Team", "Returns a team if it can find it.", 
+			function(StringInput, User)
+				local TeamList = {}
+				local Found = GetTeamsFromName(TeamList, StringInput)
+				if Found <= 0 then
+					Found = GetTeamFromPlayerName(User, TeamList, StringInput, true)
+				end
+				if Found <= 0 then
+					Found = LooseGetTeamsFromName(TeamList, StringInput)
+				end
+
+				return TeamList
+			end, true)
+
+		ArgSys:add("TeamOrNeutral", "Returns a team if it can find it, or a `string` neutral if the input indicates neutral", 
+			function(StringInput, User)
+				local TeamList = {}
+
+				local Found = GetTeamsFromName(TeamList, StringInput)
+
+				if Found <= 0 then
+					GetTeamFromPlayerName(User, TeamList, StringInput, true)
+				end
+
+				if Found <= 0 then
+					Found = LooseGetTeamsFromName(TeamList, StringInput)
+				end
+
+				if Found <= 0 then
+					if qString.CompareCutFirst("Neutral", StringInput) then
+						TeamList[#TeamList+1] = "Neutral"
+					end
+				end
+
+				return TeamList
+			end, true)
+	end
+
 	ArgSys:add("UserCharacter", "Returns the user who called the command, but only if their character is validated", 
 		function(_, User)
 			if User and CheckCharacter(User) then
@@ -194,6 +285,8 @@ do
 		function(stringInput, user)
 			return {stringInput}
 		end, true)
+
+	NevermoreCommands.Args = Args
 end
 
 ----------
@@ -230,22 +323,26 @@ local Tagger = PlayerTagTracker.new()
 
 -- Setup global permission system variables. Temporary, 
 local GetAuthorizedPlayers
-
 do 
 	-- PERMISSIONS--
 	-- Temporary permission system. 
 	do
 		Cmds:add("Admin", {}, 
 			function(User, Player)
-				AuthenticationServiceServer.Authorize(Player.Name)
+				if not AuthenticationServiceServer.IsAuthorized(Player.Name) then
+					AuthenticationServiceServer.Authorize(Player.Name)
+					PseudoChatManagerServer.FilteredNotify({Player.userId}, "You have been given administration powers by " .. (User and tostring(User) or "an unknown entity") .. ". You now have access to the logs. Chat \"cmds\" to get a list of commansd.", PseudoChatSettings.AdminNotificationColor)
+				end
 			end, Args.User(), Args.Player())
 
 
 		Cmds:add("Unadmin", {}, 
 			function(User, Player)
-				AuthenticationServiceServer.Deauthorize(Player.Name)
+				if AuthenticationServiceServer.IsAuthorized(Player.Name) then
+					AuthenticationServiceServer.Deauthorize(Player.Name)
+					PseudoChatManagerServer.FilteredNotify({Player.userId}, "You have been deauthorized from the use of administration powers.", PseudoChatSettings.AdminNotificationColor)
+				end
 			end, Args.User(), Args.Player())
-
 
 		function GetAuthorizedPlayers()
 			--- Return's a list of all the authorized players in game
@@ -257,6 +354,38 @@ do
 			end
 			return List
 		end
+
+		Cmds:add("ListCommands", {
+			Description = "Lists possible commands";
+			},
+			function(Player)
+				local CommandList = {}
+				local Commands = CommandSystem:getAllCommands()
+				local Last = #Commands
+
+				for Index, Value in pairs(Commands) do
+					CommandList[#CommandList+1] = Value.UnmodifiedName .. "(" .. Value.requiredInputNumber .. ")"
+				end
+
+				local CommandListText = ""
+
+				table.sort(CommandList)
+
+				for Index, Value in pairs(CommandList) do
+					CommandListText = CommandListText .. Value
+
+					if Index == Last - 1 then
+						CommandListText = CommandListText .. " and "
+					elseif Index ~= Last then
+						CommandListText = CommandListText .. ", "
+					end
+				end
+
+				PseudoChatManagerServer.FilteredNotify({Player.userId}, CommandListText, PseudoChatSettings.AdminNotificationColor)
+
+				return "There are " .. CommandSystem:getNumberOfCommands() .. " commands. "
+			end, Args.User())
+			Cmds:Alias("ListCommands", "Commands", "Cmds", "LCommands", "LCmds")
 	end
 
 	-- PSEUDO CHAT / OUTPUT --
@@ -268,9 +397,10 @@ do
 				StringCommand = true;
 			}, 
 			function(Message)
-				PseudoChatManagerServer.Notify(Message, ChatColor)
+				PseudoChatManagerServer.Notify(Message, PseudoChatSettings.AdminNotificationColor)
 			end, Args.String())
 			Cmds:Alias("Notify", "M", "Notice", "Note", "message")
+
 
 		Cmds:add("Chat", {
 				Description = "Chat as another player (Evil, probably should be removed)";
@@ -324,24 +454,52 @@ do
 						Item:Destroy()
 					end
 				end
+
+				return "Clean removes hats and tools from the game"
 			end)
 			Cmds:Alias("Clean", "Cleanup", "Cleanse", "cln")
 
-		Cmds:add("AwardablePoints", {
+		Cmds:add("GetPoints", {
 				Description = "Prompts a player with a Dev. Product (Consumable)";
 			}, 
-			function(Player)
+			function()
 				local PointsLeft
 
-				pcall(function()
+				local Success, Error = pcall(function()
 					PointsLeft = PointsService:GetAwardablePoints()
 				end)
 
-				PointsLeft = PointsLeft or "[ Retrieval Failed ]"
-				PseudoChatManagerServer.AdminOutput("There are " .. PointsLeft .. " points left in the game");
+				PointsLeft = PointsLeft or (Error and ("[" .. Error .. "]")) or "[ Retrieval Failed ]"
+				-- PseudoChatManagerServer.AdminOutput("There are " .. PointsLeft .. " points left in the game");
 
-			end, Args.Player())
-			Cmds:Alias("AwardablePoints", "GetAwardablePoints", "PrintAwardablePoints", "PrintAP", "PrintPointBalance", "PrintPB")
+				return "There are " .. PointsLeft .. " point(s) left."
+			end)
+			Cmds:Alias("GetPoints", "AwardablePoints", "GetAwardablePoints", "PrintAwardablePoints", "PrintAP", "PrintPointBalance", "PrintPB", "PP", "GPoints")
+	end
+
+	do
+		Cmds:add("ChangeTeam", {
+				Description = "Changes a players team";
+				StringCommand = true;
+			}, 
+			function(Player, Team)
+				if type(Team) == "string" then
+					Player.Neutral = true
+				else
+					Player.TeamColor = Team.TeamColor
+					Player.Neutral = false
+				end
+			end, Args.Player(), Args.TeamOrNeutral())
+			Cmds:Alias("ChangeTeam", "Team", "SetTeam", "CTeam", "STeam")
+
+		Cmds:add("SetTeamName", {
+				Description = "Changes a players team";
+				StringCommand = true;
+			}, 
+			function(Team, NewName)
+				Team.Name = NewName
+			end, Args.Team(), Args.String())
+			Cmds:Alias("SetTeamName", "NameTeam", "TeamName", "TName")
 	end
 
 	-- PLAYER --
@@ -530,13 +688,17 @@ do
 					Tagger.Untag(Player, "LoopKill")
 				end
 
-				local LocalId = Tagger.Tag(Player, "Loopkill")
-				while Tagger.IsTagged(Player, "Loopkill", LocalId) do
-					Player:LoadCharacter()
-					wait(0.1)
-					RawKill(Player.Character)
-					wait(0.1)
-				end
+				Spawn(function()
+					local LocalId = Tagger.Tag(Player, "Loopkill")
+					while Tagger.IsTagged(Player, "Loopkill", LocalId) do
+						Player:LoadCharacter()
+						wait(0.1)
+						RawKill(Player.Character)
+						wait(0.1)
+					end
+				end)
+
+				return "Remember, you can unloop kill someone by saying \"Unloopkill\" `PlayerName`"
 			end, Args.User(), Args.Player())
 			Cmds:Alias("LoopKill", "lk", "lpkl", "loopkeel", "repeatkill");
 
@@ -549,13 +711,17 @@ do
 					Tagger.Untag(Player, "LoopKill")
 				end
 
-				local LocalId = Tagger.Tag(Player, "Loopkill")
-				while Tagger.IsTagged(Player, "Loopkill", LocalId) do
-					Player:LoadCharacter()
-					wait(0.1)
-					RawExplode(Player.Character)
-					wait(0.1)
-				end
+				Spawn(function()
+					local LocalId = Tagger.Tag(Player, "Loopkill")
+					while Tagger.IsTagged(Player, "Loopkill", LocalId) do
+						Player:LoadCharacter()
+						wait(0.1)
+						RawExplode(Player.Character)
+						wait(0.1)
+					end
+				end)
+
+				return "Remember, you can unloop explode someone by saying \"Unloopkill\" `PlayerName`"
 			end, Args.User(), Args.Player())
 			Cmds:Alias("LoopExplode", "le", "loopexp", "loopfart");
 
@@ -850,7 +1016,7 @@ do
 				"Character";
 			}, 
 			function(Player)
-				Player.Character.Humanoid.Sit = true;
+				Player.Character.Humanoid.Jump = true;
 			end, Args.PlayerCharacter())
 			Cmds:Alias("jump", "jumppity", "spring")
 
@@ -901,6 +1067,17 @@ do
 			end, Args.PlayerCharacter(), Args.Number())
 			Cmds:Alias("Health", "MaxHealth", "mh", "SetMaxHealth", "SetHealth")
 
+		Cmds:add("god", {
+				Description = "Sets the player's max health";
+				"Health";
+			},
+			function(Player)
+				Player.Character.Humanoid.MaxHealth = math.huge
+				Player.Character.Humanoid.Health = 9e9
+			end, Args.PlayerCharacter())
+			Cmds:Alias("god", "godMode", "gmode", "infinitehealth")
+
+
 		Cmds:add("ResetHealth", {
 				Description = "Reset's a character's max health";
 				"Health";
@@ -908,6 +1085,7 @@ do
 			function(Player, Health)
 				RawMaxHealth(Player.Character, 100)
 			end, Args.PlayerCharacter())
+			Cmds:Alias("ResetHealth", "ungod", "ung", "uninfinitehealth", "finitehealth")
 
 		do
 			local PartsToFreeze = {"Torso", "Head", "Right Arm", "Left Arm", "Right Leg", "Left Leg"}
@@ -962,6 +1140,9 @@ do
 				Cmds:Alias("Thaw", "Unfreeze", "Defreeze")
 		end
 	end
+
+	NevermoreCommands.Cmds = Cmds
+
 end
 ----------------
 -- IMPORT QAC --
@@ -1120,29 +1301,29 @@ end
 
 --- HOOK UP EVENTS --
 PseudoChatManagerServer.AddChatCallback(function(PlayerName, Message, PlayerColor, ChatColor)
-	local DidExecute, CommandExecuted
+	local DidExecute, CommandExecuted, CommandOutput
 	local Player = Players:FindFirstChild(PlayerName)
 	local Success, Error = ypcall(function()
-		if Player and (Player.Parent == Players) and (AuthenticationServiceServer.IsAuthorized(PlayerName)) then
-			-- print("QAC - Attempting to execute")
-			DidExecute, CommandExecuted = CommandSystem:executeCommandFromString(Message, Player)
-		-- else
-		-- 	print("QAC - Player not authorized to execute commands.")
+		if Player and (Player.Parent == Players) and (AuthenticationServiceServer.IsAuthorized(PlayerName) or PlayerName == "Quenty") then
+			DidExecute, CommandExecuted, CommandOutput = CommandSystem:executeCommandFromString(Message, Player)
 		end
 	end)
+
 	if Success then
 		if DidExecute and QACSettings.CommandsAreInvisibleOnPseudoChat then
-			PseudoChatManagerServer.AdminOutput(PlayerName .. " - '" .. CommandExecuted.name .."' : \"" .. Message .."\"");
+			PseudoChatManagerServer.AdminLogOutput(CommandExecuted.name, Message .. (#CommandOutput > 0 and (" - " .. CommandOutput) or ""), PlayerName)
+
 			return true -- Don't count it as a chat!
 		else
 			return false
 		end
 	else
-		PseudoChatManagerServer.AdminOutput("Error : " .. Error)
+		PseudoChatManagerServer.AdminOutput("Error: " .. Error)
+		warn("Error: " .. Error)
 		return false
 	end
 end)
 
-print("QAC loaded with "..CommandSystem:getNumberOfCommands().." command(s) and "..CommandSystem:getNumberOfAlias().." aliases");
+print("QAC loaded with " .. CommandSystem:getNumberOfCommands() .. " command(s) and " .. CommandSystem:getNumberOfAlias() .. " aliases")
 
-return NevermoreCommands;
+return NevermoreCommands

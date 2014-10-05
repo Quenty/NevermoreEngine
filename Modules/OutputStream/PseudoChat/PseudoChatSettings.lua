@@ -32,30 +32,30 @@ return {
 	-- RENDERING --
 	LineHeight         = 18; -- Recommended Height per chat line.
 	LinesShown         = 6;  -- Chat lines to show
+
+	-- MAY BE BLATENTLY IGNORED. PHASE OUT. 
 	LabelOffsetX       = 6; -- Offset from the left side of the frame.
 	LabelOffsetXOutput = 40; -- Output get's indented more.
 	ChatFontSize       = "Size12"; -- Fontsize of chat.
 
+
+
 	-- RENDERSTREAM CHOICE MENU --
-	RenderStreamMenu = {
-		ChoiceSizeY        = 30; 
-		ChoiceSizeXPadding = 10; -- Padding total on the X axis. 
-		ChoiceYPadding     = 5; -- Padding between each choice. 
-	};
 
 	DefaultNotificationColor = Color3.new(1, 1, 1);
 	ContentFailed = "[ Content Deleted ]"; -- When it fails to display content. 
 	MutedMessage = "You are muted, and cannot chat."; -- Message to send to players when they are muted. 
 	MutedMessageColor = Color3.new(255/255, 233/255, 181/255);
+	AdminNotificationColor = Color3.new(0, 209/255, 255/255);
 	
 	ScriptBuilder = {
 		-- Blue color, specifying when stuff is running, et cetera. 
 		InternalOutputColor = Color3.new(0, 209/255, 255/255);
 		ErrorOutputColor = Color3.new(1, 0, 0);
 	};
-	
-	OutputFontSize = "Size10";
 
+
+	
 	BufferSize = 25;
 	
 	ROBLOXAdminList = {

@@ -1,18 +1,22 @@
 local ReplicatedStorage       = game:GetService("ReplicatedStorage")
+local UserInputService        = game:GetService("UserInputService")
 local Players                 = game:GetService("Players")
 
 local NevermoreEngine         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary       = NevermoreEngine.LoadLibrary
 
 local qSystems                = LoadCustomLibrary("qSystems")
-local ScrollBar               = LoadCustomLibrary('ScrollBar')
-local qGUI                    = LoadCustomLibrary('qGUI')
+local qGUI                    = LoadCustomLibrary("qGUI")
 local CircularBuffer          = LoadCustomLibrary("CircularBuffer")
 local PseudoChatSettings      = LoadCustomLibrary("PseudoChatSettings")
 local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
-local qTime = LoadCustomLibrary("qTime")
+local qTime                   = LoadCustomLibrary("qTime")
+local qMath                   = LoadCustomLibrary("qMath")
+local Maid                    = LoadCustomLibrary("Maid")
+local ScrollingFrame          = LoadCustomLibrary("ScrollingFrame")
+local qColor3                 = LoadCustomLibrary("qColor3")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -33,16 +37,28 @@ local lib = {}
 --]]
 local DefaultConfiguration = {
 	TitleWidth            = 30;
-	ContentHeight         = 108; -- Height of the inteface. 
 	ScrollbarWidth        = 7;
 	ZIndex                = 8;
 	FrameRenderBufferSize = PseudoChatSettings.BufferSize;
 	
-	TitleLabelOffset = 10;
-	MenuZIndex       = 9; -- ZIndex of the menu overlay. We'll try to maintain a [8,9] ZIndex range. 
-	MenuAnimateTime  = 0.1;
-	MenuDefaultColor = Color3.new(0.5, 0.5, 0.5);
-	MenuNameWhenOpen = "Switch Channels?";
+	TitleLabelOffsetY     = 10;
+	TitleLabelOffsetX     = 6;
+	
+	MenuZIndex            = 9; -- ZIndex of the menu overlay. We'll try to maintain a [8,9] ZIndex range. 
+	MenuAnimateTime       = 0.1;
+	MenuDefaultColor      = Color3.new(0.5, 0.5, 0.5);
+	MenuNameWhenOpen      = "Change Channels?";
+
+	RenderStreamMenu = {
+		ChoiceSizeY        = 38;
+		ChoiceSizeXPadding = 0; -- Padding total on the X axis. 
+		ChoiceYPadding     = 0; -- Padding between each choice. 
+		DividerPaddingX    = 15;
+	};
+
+	-- FactoryConfigurationSettingNameEnumThingHere
+	UIBackgroundTransparencyOnMouseOver = 1;
+	ScrollBarBackingTransparencyOnMouseOver = 0.3;
 }
 
 local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui, Configuration)
@@ -50,12 +66,23 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 	-- @param OutputStreamInterface The interface that this stream menu is associated with. 
 	-- Used internally, Configuration is expected to be sent by the script, all contents intact.
 
+	local MouseEvent
+	local Mouse         = Players.LocalPlayer:GetMouse()
+	local IsCollapsed   = false
+	local CurrentColor  = Color3.new(247/255, 247/255, 247/255);
+	local CurrentTitle  = "[ Nothing Active ]"
+	local ActiveChoices = {}
+
+	local Scroller, MenuScrollBar
+
+	RenderStreamMenu.MenuCollapseChanged = CreateSignal() -- Sends Signal(IsCollapsed)
+
 	local MainFrame = Make("Frame", {
 		Active                 = false;
 		Archivable             = false;
-		BackgroundColor3       = Color3.new(0.25, 0.25, 0.25);
+		BackgroundColor3       = Color3.new(250/255, 250/255, 250/255);
 		BackgroundTransparency = 0;
-		BorderSizePixel        = 1;
+		BorderSizePixel        = 0;
 		Name                   = "MenuFrame";
 		Position               = UDim2.new(0.5, 0, 0, 0);
 		Size                   = UDim2.new(0.5, 0, 1, 0);
@@ -66,14 +93,35 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 
 	local TitleButton = Make("ImageButton", {
 		Archivable       = false;
-		BackgroundColor3 = Color3.new(0.25, 0.25, 0.25);
+		BackgroundColor3 = Color3.new(247/255, 247/255, 247/255);
 		BorderSizePixel  = 0;
 		Name             = "TitleButton";
 		Parent           = MainFrame;
 		Position         = UDim2.new(0, -Configuration.TitleWidth, 0, 0);
-		Size             = UDim2.new(0, Configuration.TitleWidth + 1, 1, 0);
+		Size             = UDim2.new(0, Configuration.TitleWidth, 1, 0);
 		ZIndex           = Configuration.MenuZIndex;
+		AutoButtonColor  = false;
+
+		Make("Frame", {
+			BorderSizePixel  = 0;
+			BackgroundColor3 = Color3.new(215/255, 215/255, 215/255);
+			Name             = "Divider";
+			Position         = UDim2.new(1, -3, 0, 0);
+			Size             = UDim2.new(0, 3, 1, 0);
+			ZIndex           = Configuration.MenuZIndex;
+		})
 	})
+
+	local function OnTitleButtonEnter()
+		TitleButton.BackgroundColor3 = Color3.new(247/255 - 0.05, 247/255 - 0.05, 247/255 - 0.05)
+	end
+
+	local function OnTitleButtonLeave()
+		TitleButton.BackgroundColor3 = Color3.new(247/255, 247/255, 247/255)
+	end
+
+	TitleButton.MouseEnter:connect(OnTitleButtonEnter)
+	TitleButton.MouseLeave:connect(OnTitleButtonLeave)
 
 	local TitleLabel = Make("TextLabel", {
 		BackgroundTransparency = 1;
@@ -81,19 +129,23 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 		Name                   = "TitleLabel";
 		Parent                 = TitleButton;
 		Rotation               = 90;
-		Size                   = UDim2.new(0, TitleButton.AbsoluteSize.Y - Configuration.TitleLabelOffset, 0, Configuration.TitleWidth);
+		Size                   = UDim2.new(0, TitleButton.AbsoluteSize.Y - Configuration.TitleLabelOffsetY, 0, Configuration.TitleWidth - Configuration.TitleLabelOffsetX);
 		Text                   = "Main Menu";
 		TextColor3             = Color3.new(1, 1, 1);
 		TextXAlignment         = "Right";
 		ZIndex                 = Configuration.MenuZIndex;
+		TextTransparency       = 0.13;
+		FontSize               = "Size14";
+		Font                   = "SourceSans";
 	})
-	TitleLabel.Position = UDim2.new(0.5, -(TitleButton.AbsoluteSize.Y) / 2, 0.5, -(Configuration.TitleWidth) / 2);
+	TitleLabel.Position = UDim2.new(0.5, -(TitleButton.AbsoluteSize.Y - Configuration.TitleLabelOffsetX) / 2, 0.5, -(TitleButton.AbsoluteSize.X - Configuration.TitleLabelOffsetY) / 2);
 
 	local ContentContainer = Make("Frame", {
 		Active                 = false;
 		BackgroundTransparency = 1;
 		ClipsDescendants       = true;
 		Name                   = "ContentContainer";
+		BorderSizePixel        = 0;
 		Parent                 = MainFrame;
 		Position               = UDim2.new(0, 0, 0, 0);
 		Size                   = UDim2.new(1, -Configuration.ScrollbarWidth, 1, 0);
@@ -101,20 +153,30 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 		Archivable             = false;
 	})
 
-	local ContentFrame = Make("ImageButton", {
-		Image                  = ""; 
+	local ContentFrame = Make("Frame", {
 		Active                 = false;
 		BackgroundTransparency = 1;
 		ClipsDescendants       = true;
 		Name                   = "ContentFrame";
 		Parent                 = ContentContainer;
-		Position               = UDim2.new(0, 0, 0, 0);
-		Size                   = UDim2.new(1, 0, 1, 0);
+		Position               = UDim2.new(0, 1, 0, 0);
+		Size                   = UDim2.new(1, -1, 1, 0);
 		ZIndex                 = Configuration.MenuZIndex;
 		Archivable             = false;
+		BorderSizePixel        = 0;
+
+		Make("Frame", {
+			BorderSizePixel  = 0;
+			BackgroundColor3 = Color3.new(225/255, 225/255, 225/255);
+			Name             = "Divider";
+			Position         = UDim2.new(0, Configuration.RenderStreamMenu.DividerPaddingX, 0, 0);
+			Size             = UDim2.new(1, -Configuration.RenderStreamMenu.DividerPaddingX, 0, 1);
+			ZIndex           = Configuration.MenuZIndex;
+		})
 	})
 
 	local ScrollBarFrame = Make("Frame", {
+		Active                 = true;
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0; 
 		Name                   = "ScrollBarFrame";
@@ -126,32 +188,48 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 		Archivable             = false;
 	})
 
-	local Scroller = ScrollBar.MakeScroller(ContentContainer, ContentFrame, ScreenGui, 'Y')
+	local Scroller  = ScrollingFrame.new(ContentFrame)
 	local ScrollBar = Scroller:AddScrollBar(ScrollBarFrame)
-	local IsShown = false
-	local CurrentColor = Color3.new(0.25, 0.25, 0.25);
-	local CurrentTitle = "[ Nothing Active ]"
-	local ActiveChoices = {}
-
-	RenderStreamMenu.MenuCollapseChanged = CreateSignal() -- Sends Signal(IsCollapsed)
 
 	local function UpdateChoices()
 		--- Repositions and updates the choices to new locations. 
 
-		local YPosition = PseudoChatSettings.RenderStreamMenu.ChoiceYPadding;
+		local YPosition = DefaultConfiguration.RenderStreamMenu.ChoiceYPadding + 1;
 		local ChoiceCount = 0
-		for _, Choice in pairs(ActiveChoices) do
-			ChoiceCount = ChoiceCount + 1
-			Choice.Gui.Position = UDim2.new(0, PseudoChatSettings.RenderStreamMenu.ChoiceSizeXPadding/2,
-				0, YPosition);
-			YPosition = YPosition + PseudoChatSettings.RenderStreamMenu.ChoiceYPadding + Choice.YHeight
+
+		table.sort(ActiveChoices, function(A, B)
+			if A == B then
+				return A.Index < B.Index
+			else
+				return A.Priority < B.Priority
+			end
+		end)
+
+		for Index, Choice in pairs(ActiveChoices) do
+			ChoiceCount         = ChoiceCount + 1
+			
+			local OldTarget = Choice.TargetPosition
+			Choice.TargetPosition = UDim2.new(0, Configuration.RenderStreamMenu.ChoiceSizeXPadding/2, 0, YPosition)
+			Choice.Index = Index
+
+			if not OldTarget then
+				if IsCollapsed then
+					Choice.OnCollapse(true)
+				else
+					Choice.OnUnCollapse(true)
+				end
+			end
+
+			YPosition             = YPosition + Configuration.RenderStreamMenu.ChoiceYPadding + Choice.YHeight
 		end
 		ContentFrame.Size = UDim2.new(1, 0, 0, math.max(YPosition, ContentContainer.AbsoluteSize.Y))
 
 		if YPosition > ContentContainer.AbsoluteSize.Y then
 			ScrollBarFrame.Visible = true
+			ContentContainer.Size  = UDim2.new(1, -Configuration.ScrollbarWidth, 1, 0);
 		else
 			ScrollBarFrame.Visible = false
+			ContentContainer.Size  = UDim2.new(1, 0, 1, 0);
 		end
 
 		if ChoiceCount > 1 then
@@ -161,26 +239,22 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 		end
 	end
 
-	local function UpdateTitleBar(BackgroundColor3, Text, DoNotAnimate)
+	local function UpdateTitleBar(TextColor3, Text, DoNotAnimate)
 		--- Sets the TitleBar, helper function
-		-- @param BackgroundColor3 The new backgroundColor3 to set
+		-- @param TextColor3 The new TextColor3 to set
 		-- @param Text The text to set
 		-- @param DoNotAnimate Shoudl it animate or not?
 
 		TitleLabel.Text = Text;
 
 		if DoNotAnimate then
-			TitleButton.BackgroundColor3 = BackgroundColor3
+			TitleLabel.TextColor3 = TextColor3
 		else
-			qGUI.TweenColor3(TitleButton, {BackgroundColor3 = BackgroundColor3}, Configuration.MenuAnimateTime, true)
+			qGUI.TweenColor3(TitleLabel, {TextColor3 = TextColor3}, Configuration.MenuAnimateTime, true)
 		end
 	end
 
-	local MouseEvent
-	local Mouse = Players.LocalPlayer:GetMouse()
-
-
-	local function Uncollapse(DoNotAnimate)
+	local function UnCollapse(DoNotAnimate)
 		--- Show's the menu
 		-- @param [DoNotAnimate] If indicated, will not animate the menu when showing or hiding. 
 
@@ -193,9 +267,18 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 			end)
 		end
 
-		IsShown = true
+		IsCollapsed = true
 		local Position = UDim2.new(0.5, 0, 0, 0)
 		UpdateTitleBar(Configuration.MenuDefaultColor, Configuration.MenuNameWhenOpen, DoNotAnimate)
+
+		--- Fixes issues with the leave event not firing when tweening stuff.
+		for _, Choice in pairs(ActiveChoices) do
+			if qGUI.MouseOver(Mouse, Choice.Gui) then
+				Choice.OnMouseEnter()
+			end
+
+			Choice.OnUnCollapse(DoNotAnimate)
+		end
 
 		if DoNotAnimate then
 			MainFrame.Position = Position
@@ -205,8 +288,8 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 
 		RenderStreamMenu.MenuCollapseChanged:fire(false)
 	end
-	RenderStreamMenu.Uncollapse = Uncollapse
-	RenderStreamMenu.uncollapse = Uncollapse
+	RenderStreamMenu.UnCollapse = UnCollapse
+	RenderStreamMenu.unCollapse = UnCollapse
 
 	local function Collapse(DoNotAnimate)
 		--- Hide's the menu
@@ -217,9 +300,15 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 			MouseEvent = nil
 		end
 
-		IsShown = false
+		IsCollapsed = false
 		local Position = UDim2.new(1, 0, 0, 0)
 		UpdateTitleBar(CurrentColor, CurrentTitle, DoNotAnimate)
+
+		--- Fixes issues with the leave event not firing when tweening stuff.
+		for _, Choice in pairs(ActiveChoices) do
+			Choice.OnMouseLeave()
+			Choice.OnCollapse(DoNotAnimate)
+		end
 
 		if DoNotAnimate then
 			MainFrame.Position = Position
@@ -229,7 +318,6 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 
 		RenderStreamMenu.MenuCollapseChanged:fire(true)
 	end
-	RenderStreamMenu.Collapse = Collapse
 	RenderStreamMenu.Collapse = Collapse
 
 	local CurrentTransparency
@@ -242,44 +330,96 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 		assert(NewTransparency ~= nil, "NewTransparency is nil.")
 
 		if CurrentTransparency ~= NewTransparency then -- Make sure we don't waste processing power. 
+			-- Tweening stuff....
+
 			CurrentTransparency = NewTransparency
-			if AnimateTime then
-				qGUI.TweenTransparency(MainFrame, {BackgroundTransparency = NewTransparency}, AnimateTime, true)
-				qGUI.TweenTransparency(TitleButton, {BackgroundTransparency = NewTransparency}, AnimateTime, true)
-				qGUI.TweenTransparency(TitleLabel, {TextTransparency = NewTransparency}, AnimateTime, true)
+			if AnimateTime and AnimateTime > 0 then -- Do tween
+				local NewBackground = {BackgroundTransparency = NewTransparency}
+				local NewText       = {TextTransparency = qMath.LerpNumber(0.13, 1, NewTransparency)}
+
+				qGUI.TweenTransparency(MainFrame,           NewBackground, AnimateTime, true)
+				qGUI.TweenTransparency(TitleButton,         NewBackground, AnimateTime, true)
+				qGUI.TweenTransparency(TitleButton.Divider, NewBackground, AnimateTime, true)
+				qGUI.TweenTransparency(TitleLabel,          NewText,       AnimateTime, true)
+
 				for _, Item in pairs(ActiveChoices) do
-					qGUI.TweenTransparency(Item.Gui, {BackgroundTransparency = NewTransparency}, AnimateTime, true)
-					qGUI.TweenTransparency(Item.Gui.ChoiceLabel, {TextTransparency = NewTransparency}, AnimateTime, true)
+					qGUI.TweenTransparency(Item.Gui,             NewBackground, AnimateTime, true)
+					qGUI.TweenTransparency(Item.Gui.Divider,     NewBackground, AnimateTime, true)
+					qGUI.TweenTransparency(Item.Gui.ChoiceLabel, NewText,       AnimateTime, true)
 				end
 			else
+				--- Don't tween!
+
+
+				local NewTextTransparency = qMath.LerpNumber(0.13, 1, NewTransparency)
+
 				qGUI.StopTransparencyTween(MainFrame)
 				qGUI.StopTransparencyTween(TitleButton)
+				qGUI.StopTransparencyTween(TitleButton.Divider)
 				qGUI.StopTransparencyTween(TitleLabel)
-				MainFrame.BackgroundTransparency = NewTransparency
-				TitleButton.BackgroundTransparency = NewTransparency
-				TitleLabel.TextTransparency = NewTransparency
+
+				MainFrame.BackgroundTransparency           = NewTransparency
+				TitleButton.BackgroundTransparency         = NewTransparency
+				TitleButton.Divider.BackgroundTransparency = NewTransparency
+				TitleLabel.TextTransparency                = NewTextTransparency
+
 				for _, Item in pairs(ActiveChoices) do
-					qGUI.StopTransparencyTween(Item.Gui) 
+					qGUI.StopTransparencyTween(Item.Gui)
+					qGUI.StopTransparencyTween(Item.Gui.Divider)
 					qGUI.StopTransparencyTween(Item.Gui.ChoiceLabel)
 
-					Item.Gui.BackgroundTransparency = NewTransparency
-					Item.Gui.ChoiceLabel.BackgroundTransparency = NewTransparency
+					Item.Gui.BackgroundTransparency         = NewTransparency
+					Item.Gui.Divider.BackgroundTransparency = NewTransparency
+					Item.Gui.ChoiceLabel.TextTransparency   = NewTextTransparency
 				end
 			end
 		end
 	end
 	RenderStreamMenu.SetTransparency = SetTransparency
-	RenderStreamMenu.setTransparency = SetTransparency
 
-	local function SetColorAndTitle(Color, Title)
+	local function Show(AnimateTime)
+		--- Ugh, two layers of shown. IsCollapsed is for collapsing.
+
+		SetTransparency(0, AnimateTime)
+
+		if not IsCollapsed then
+			local Position = UDim2.new(1, 0, 0, 0)
+
+			if AnimateTime and AnimateTime > 0 then
+				MainFrame:TweenPosition(Position, "Out", "Quad", AnimateTime, true)
+			else
+				MainFrame.Position = Position
+			end
+		end
+	end
+	RenderStreamMenu.Show = Show
+
+	local function Hide(AnimateTime)
+		--- Ugh, two layers of shown. IsCollapsed is for collapsing.
+		-- If AnimateTime is nil, it will not animate.
+
+		SetTransparency(1, AnimateTime)
+
+		local Position = UDim2.new(1, Configuration.TitleWidth, 0, 0)
+
+		if AnimateTime and AnimateTime > 0 then
+			MainFrame:TweenPosition(Position, "Out", "Quad", AnimateTime, true)
+		else
+			MainFrame.Position = Position
+		end
+	end
+	RenderStreamMenu.Hide = Hide
+
+
+	local function SetColorAndTitle(Color, Title, DoNotAnimate)
 		-- Sets the color and title of the Menu that it will display while "Hidden." "
 		-- @param Color A Color3, the color of the menu to set.
 		-- @param Title The title to show.
 
 		CurrentColor = Color
 		CurrentTitle = Title
-		if not IsShown then
-			UpdateTitleBar(Color, Title)
+		if not IsCollapsed then
+			UpdateTitleBar(Color, Title, DoNotAnimate)
 		end
 	end
 	RenderStreamMenu.SetColorAndTitle = SetColorAndTitle
@@ -290,89 +430,196 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 		--- Toggle's the menu's visibility. 
 		-- @param [DoNotAnimate] If indicated, will not animate the menu when showing or hiding. 
 
-		if IsShown then
+		if IsCollapsed then
 			Collapse(DoNotAnimate)
 		else
-			Uncollapse(DoNotAnimate)
+			UnCollapse(DoNotAnimate)
 		end
 	end
 	RenderStreamMenu.Toggle = Toggle
 	RenderStreamMenu.toggle = Toggle
 
-	local function MakeChoice(Text, BackgroundColor3)
+	local function MakeChoice(Text, TextColor3, Priority)
 		--- Creates a new "Choice" GUI, for further manipulation.
-		-- @param [BackgroundColor3] The color3 value of the background
+		-- @param [TextColor3] The color3 value of the text
 		-- @param Text The text to display on the button.
 		-- @return The new choice
+		-- @param Priority Sorted by this number. 
 
-		BackgroundColor3 = BackgroundColor3 or Color3.new(0, 0, 0)
+		assert(Priority, "No Priority")
+		assert(TextColor3, "No TextColor3")
+
+		-- print("Before: " .. tostring(TextColor3))
+		-- TextColor3 = qColor3.SetSaturationAndLuminance(TextColor3, 0.7, 0.6) -- Normalize, keep hue.
+		-- print("After: " .. tostring(TextColor3))
 
 		local NewChoice = {}
+		NewChoice.Priority = Priority
 
-		NewChoice.BackgroundColor3 = BackgroundColor3
+		local ChoiceMaid = Maid.MakeMaid()
+
+		NewChoice.TextColor3 = TextColor3
 		NewChoice.Text = Text
+
+		NewChoice.ChoiceSelected = CreateSignal()
 		
-		NewChoice.Gui = Make("TextButton", {
+		local ChoiceButton = Make("ImageButton", {
 			Archivable             = false;
-			BackgroundColor3       = BackgroundColor3;
+			BackgroundColor3       = Color3.new(1, 1, 1);
 			BackgroundTransparency = 0.3;
 			BorderSizePixel        = 0;
-			FontSize               = PseudoChatSettings.ChatFontSize;
 			Name                   = "ChoiceButton";
 			Parent                 = ContentFrame;
-			Size                   = UDim2.new(1, -PseudoChatSettings.RenderStreamMenu.ChoiceSizeXPadding, 0, PseudoChatSettings.RenderStreamMenu.ChoiceSizeY);
-			Text                   = "";
+			Size                   = UDim2.new(1, -Configuration.RenderStreamMenu.ChoiceSizeXPadding, 0, Configuration.RenderStreamMenu.ChoiceSizeY);
+			Image                  = "";
 			Visible                = true;
 			ZIndex                 = Configuration.MenuZIndex;
+			AutoButtonColor        = false;
+
+			-- Actual text.
 			Make("TextLabel", {
 				BackgroundTransparency = 1;
 				BorderSizePixel        = 0;
 				Name                   = "ChoiceLabel";
-				Position               = UDim2.new(0, 10, 0, 0);
-				Size                   = UDim2.new(1, -10, 1, 0);
+				Position               = UDim2.new(0, Configuration.RenderStreamMenu.DividerPaddingX, 0, 0);
+				Size                   = UDim2.new(1, -Configuration.RenderStreamMenu.DividerPaddingX, 1, 0);
 				Text                   = Text;
-				TextColor3             = Color3.new(1, 1, 1);
+				TextColor3             = TextColor3;
 				TextXAlignment         = "Left";
-				ZIndex                 = Configuration.MenuZIndex
+				ZIndex                 = Configuration.MenuZIndex;
+				TextTransparency       = 0.13;
+				FontSize               = "Size14";
+				Font                   = "SourceSans";
 			});
-		});
-		NewChoice.YHeight = PseudoChatSettings.RenderStreamMenu.ChoiceSizeY
 
-		ActiveChoices[#ActiveChoices + 1] = NewChoice
+			-- Divider
+			Make("Frame", {
+				BorderSizePixel  = 0;
+				BackgroundColor3 = Color3.new(225/255, 225/255, 225/255);
+				Name             = "Divider";
+				Position         = UDim2.new(0, Configuration.RenderStreamMenu.DividerPaddingX, 1, -1);
+				Size             = UDim2.new(1, -Configuration.RenderStreamMenu.DividerPaddingX, 0, 1);
+				ZIndex           = Configuration.MenuZIndex;
+			})
+		});
+		NewChoice.YHeight = Configuration.RenderStreamMenu.ChoiceSizeY
+		NewChoice.Gui     = ChoiceButton
+
+		local function OnUnCollapse(DoNotAnimate)
+			local NewPosition = NewChoice.TargetPosition
+
+			if DoNotAnimate then
+				ChoiceButton.Position = NewPosition
+			else
+				delay(Configuration.MenuAnimateTime * (NewChoice.Index/#ActiveChoices), function()
+					ChoiceButton:TweenPosition(NewPosition, "Out", "Sine", Configuration.MenuAnimateTime, true)
+				end)
+			end
+		end
+		NewChoice.OnUnCollapse = OnUnCollapse
+
+		local function OnCollapse(DoNotAnimate)
+			local NewPosition = NewChoice.TargetPosition + UDim2.new(1 ,0, 0, 0) --UDim2.new(0, 0, 1, 0)
+
+			if DoNotAnimate then
+				ChoiceButton.Position = NewPosition
+			else
+				delay(Configuration.MenuAnimateTime * (NewChoice.Index/#ActiveChoices), function()
+					ChoiceButton:TweenPosition(NewPosition, "Out", "Sine", Configuration.MenuAnimateTime, true)
+				end)
+			end
+		end
+		NewChoice.OnCollapse = OnCollapse
+
+		local function OnMouseLeave()
+			ChoiceButton.BackgroundColor3 = Color3.new(1, 1, 1)
+		end
+		NewChoice.OnMouseLeave = OnMouseLeave
+
+		local function OnMouseEnter()
+			ChoiceButton.BackgroundColor3 = Color3.new(0.95, 0.95, 0.95)
+		end
+		NewChoice.OnMouseEnter = OnMouseEnter
 
 		function NewChoice:Destroy()
 			-- For the GC of the choice.
 
-			local Index = GetIndexByValue(ActiveChoices, NewChoice)
+			local Index = NewChoice.Index
 
-			NewChoice.Gui:Destroy()
+			ChoiceButton:Destroy()
 			NewChoice.Destroy = nil
 			NewChoice         = nil
 
+			ChoiceMaid:DoCleaning()
+
 			table.remove(ActiveChoices, Index)
+			for Index, ActiveChoice in pairs(ActiveChoices) do
+				ActiveChoice.Index = Index
+			end
+
 			UpdateChoices()
 		end
 
+		ChoiceButton.MouseEnter:connect(OnMouseEnter) -- We'll GC these by using :Destroy()
+		ChoiceButton.MouseLeave:connect(OnMouseLeave) -- We'll GC these by using :Destroy()
+
+		--[[ChoiceButton.MouseButton1Down:connect(function(PositionX, PositionY)
+			Scroller.StartDrag(PositionX, PositionY)
+		end)
+
+		ChoiceMaid.ScrollDone = Scroller.InputFinished:connect(function()
+			if (tick() - TimeStart) <= 0.2 then
+				print("Probably a click")
+				if qGUI.MouseOver(Players.LocalPlayer:GetMouse(), ChoiceButton) then
+					NewChoice.ChoiceSelected:fire()
+				end
+			end
+		end)--]]
+		
+		ChoiceButton.MouseButton1Down:connect(function()
+			Scroller:Tap(function(ConsideredClick, ElapsedTime, ScrollDistance)
+				if ConsideredClick then
+					NewChoice.ChoiceSelected:fire()
+				end
+			end)
+		end)
+
+		ChoiceButton.MouseWheelForward:connect(function()
+			Scroller:ScrollUp()
+		end)
+
+		ChoiceButton.MouseWheelBackward:connect(function()
+			Scroller:ScrollDown()
+		end)
+
+		local Index = #ActiveChoices + 1
+		NewChoice.Index = Index
+		ActiveChoices[Index] = NewChoice
 		UpdateChoices()
 		return NewChoice
 	end
 	RenderStreamMenu.MakeChoice = MakeChoice
 	RenderStreamMenu.makeChoice = MakeChoice
 
-	local function GetIsShown()
-		return IsShown
+	local function GetIsCollapsed()
+		return IsCollapsed
 	end
-	RenderStreamMenu.GetIsShown = GetIsShown
-	RenderStreamMenu.getIsShown = GetIsShown
+	RenderStreamMenu.GetIsCollapsed = GetIsCollapsed
+	RenderStreamMenu.getIsCollapsed = GetIsCollapsed
 
 	-- Setup events
 	TitleButton.MouseButton1Click:connect(function()
 		Toggle()
+		OnTitleButtonLeave()
 	end)
 
 	Collapse(true)
 	UpdateChoices()
 end)
+
+
+
+
 
 local MakeNotifier = Class(function(Notifier, ContentContainer, IsTop)
 	-- Used by the OutputStreamRender, creates a notification bar.
@@ -464,15 +711,50 @@ local MakeNotifier = Class(function(Notifier, ContentContainer, IsTop)
 	Hide(true)
 end)
 
-local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration, ScreenGui)
+
+
+--- UTILITY ---
+
+local function TimeStampToText(TimeStamp)
+	-- Converts the time stamp into something more relative...
+	-- @param TimeStamp A time stamp
+
+	local RenderTimePass = "[ Error ]"
+	if TimeStamp < 20 then
+		RenderTimePass = "a few seconds";
+	elseif TimeStamp < 60 then
+		RenderTimePass = "less than a minute";
+	elseif TimeStamp < 120 then
+		RenderTimePass = "1 minute"
+	elseif TimeStamp < 3600 then
+		RenderTimePass = qTime.GetMinute(TimeStamp) .. " minutes"
+	elseif TimeStamp < 216000 then
+		RenderTimePass = "about 1 hour"
+	elseif TimeStamp < 219600 then
+		RenderTimePass = "about " .. qTime.GetHour(TimeStamp) .. " hours"
+	else
+		RenderTimePass = qTime.GetDayOfTheWeek(SmallestTimeStamp) -- If this ever ever happens in a ROBLOX server, I may die. 
+	end
+
+	return RenderTimePass
+end
+
+
+
+--- RENDERING ----
+
+local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration, ScreenGui, RenderColor)
 	--- Render's a single stream, actual "view" model versus DataStreamRender conceptual model. 
 	-- @param FrameRenderBufferSize Number The amount of frames to render.
 	--                              This get's kind of messy when it comes down to it, because a render can be used by multiple
 	--                              classes. A standardized number should be used. 
 
-	local Configuration = OverriddenConfiguration.New(Configuration, DefaultConfiguration)
-	local Buffer   = CircularBuffer.New(Configuration.FrameRenderBufferSize)
+	local RenderMaid          = Maid.MakeMaid()
+	
+	local Configuration       = OverriddenConfiguration.new(Configuration, DefaultConfiguration)
+	local Buffer              = CircularBuffer.new(Configuration.FrameRenderBufferSize)
 	OutputStreamRender.Buffer = Buffer
+
 	-- Make the new frame containing the whole thing. Will also hold the scroll bar. 
 	local MainFrame = Make("Frame", {
 		Active                 = false;
@@ -487,7 +769,7 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 
 	local ContentContainer = Make("Frame", {
 		Active                 = false;
-		BackgroundTransparency  = 1;
+		BackgroundTransparency = 1;
 		ClipsDescendants       = true;
 		Name                   = "ContentContainer";
 		Parent                 = MainFrame;
@@ -496,13 +778,8 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 		ZIndex                 = Configuration.ZIndex;
 	})
 
-	local ContentFrameClass = "ImageButton";
-	if qGUI.IsPhone(ScreenGui) then
-		ContentFrameClass = "Frame";
-	end
 
-
-	local ContentFrame = Make(ContentFrameClass, {
+	local ContentFrame = Make("Frame", {
 		Active                 = false;
 		BackgroundTransparency = 1;
 		ClipsDescendants       = true;
@@ -514,11 +791,8 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 	})
 	OutputStreamRender.ContentFrame = ContentFrame
 
-	if ContentFrameClass == "ImageButton" then
-		ContentFrame.Image = ""; 
-	end
-
 	local ScrollBarFrame = Make("Frame", {
+		Active                 = true;
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0; 
 		Name                   = "ScrollBarFrame";
@@ -533,40 +807,20 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 	local NotifierTop           = MakeNotifier(ContentContainer, true)
 	local NotifierBottom        = MakeNotifier(ContentContainer, false)
 	
-	local Scroller              = ScrollBar.MakeScroller(ContentContainer, ContentFrame, ScreenGui, 'Y')
+	local Scroller  = ScrollingFrame.new(ContentFrame)
+	local ScrollBar = Scroller:AddScrollBar(ScrollBarFrame)
 	OutputStreamRender.Scroller = Scroller
-	local ScrollBar             = Scroller:AddScrollBar(ScrollBarFrame)
-	local ScrollBarAtBottom     = true
-	local IsScrolling           = false
-	local IsAutoScrolling       = false -- Is the porgram scrolling by itself? 
 
-	--[[local function IsItemGuiVisible(Gui)
-		--- Calculates whether or not the player can see the label.
-		-- Used internally.
-
-		if MainFrame.Visible then
-			local PositionY = Gui.AbsolutePosition.Y
-			if ContentContainer.AbsolutePosition.Y >= PositionY and (ContentContainer.AbsolutePosition.Y + ContentContainer.Size.Y.Offset) <= PositionY then
-				return true
-			else
-				PositionY = PositionY + Gui.Size.Y.Offset
-				return ContentContainer.AbsolutePosition.Y >= PositionY and (ContentContainer.AbsolutePosition.Y + ContentContainer.Size.Y.Offset) <= PositionY 
-			end
-		else
-			return false
-		end
-	end--]]
+	ScrollBar.BarFrame.Backing.BackgroundColor3 = qColor3.SetSaturationAndLuminance(RenderColor, 0.4, 0.6) -- Normalize colors.
 
 	local function DoShowInterface()
 		--- Returns whether or not the interface shoudl be shown.
 		-- Not efficient, but readable, which is more important.
 		-- @return boolean Should be shown, if true, otherwise, false
 
-		-- print(IsScrolling, IsAutoScrolling, ScrollBarAtBottom)
-
-		if IsScrolling or IsAutoScrolling then
+		if Scroller:IsScrolling() or Scroller:IsAutoScrolling() then
 			return true
-		elseif not ScrollBarAtBottom then
+		elseif not Scroller:ExpectedAtBottom() then
 			return true
 		end
 
@@ -585,12 +839,14 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 	local function HideScrollBar(AnimateTime)
 		--- Makes the scroll bar invisible
 
-		-- print("Hideing scroll bar")
-		-- ScrollBarFrame.Visible = false
+		local NewPosition = UDim2.new(1, 0, 0, 0);
+
 		if AnimateTime <= 0 then
 			ScrollBarFrame.ScrollBar.Backing.BackgroundTransparency = 1
+			ScrollBarFrame.Position = NewPosition
 		else
 			qGUI.TweenTransparency(ScrollBarFrame.ScrollBar.Backing, {BackgroundTransparency = 1}, AnimateTime, true)
+			ScrollBarFrame:TweenPosition(NewPosition, "Out", "Quad", AnimateTime, true)
 		end
 		
 	end
@@ -600,33 +856,18 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 	local function ShowScrollBar(AnimateTime)
 		--- Makes the scroll bar visible.
 
-		-- print("Showing scroll bar")
-		-- ScrollBarFrame.Visible = true
+		local NewPosition = UDim2.new(1, -Configuration.ScrollbarWidth, 0, 0);
+
 		if AnimateTime <= 0 then
-			ScrollBarFrame.ScrollBar.Backing.BackgroundTransparency = 0.5
+			ScrollBarFrame.ScrollBar.Backing.BackgroundTransparency = Configuration.ScrollBarBackingTransparencyOnMouseOver
+			ScrollBarFrame.Position = NewPosition
 		else
-			qGUI.TweenTransparency(ScrollBarFrame.ScrollBar.Backing, {BackgroundTransparency = 0.5}, AnimateTime, true)
+			qGUI.TweenTransparency(ScrollBarFrame.ScrollBar.Backing, {BackgroundTransparency = Configuration.ScrollBarBackingTransparencyOnMouseOver}, AnimateTime, true)
+			ScrollBarFrame:TweenPosition(NewPosition, "In", "Quad", AnimateTime, true)
 		end
 	end
 	OutputStreamRender.ShowScrollBar = ShowScrollBar
 	OutputStreamRender.showScrollBar = ShowScrollBar
-
-	local function GetScrollBarAtBottom()
-		--- Check's to see if the scroll bar is at the bottom or not
-		-- @return Boolean, true if the scroll bar is at the bottom. 
-		-- Used internally.
-
-		return Scroller.KineticModel.Position <= Scroller.KineticModel.Minimum + 2
-	end
-
-	local function ScrollToBottom(DoNotAnimate)
-		--- Scrolls the scrol bar to the bottom. 
-		-- print(DoNotAnimate)
-		Scroller:AdjustRange() -- Unfortunately, the event fires slow otherwise. 
-		Scroller.ScrollTo(ContentContainer.AbsoluteSize.Y - ContentFrame.AbsoluteSize.Y, DoNotAnimate)
-	end
-	OutputStreamRender.ScrollToBottom = ScrollToBottom
-	OutputStreamRender.ScrollToBottom = ScrollToBottom
 
 	local function UpdateInterface(IsActive)
 		if IsActive then
@@ -638,34 +879,7 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 	OutputStreamRender.UpdateInterface = UpdateInterface
 	OutputStreamRender.updateInterface = UpdateInterface
 
-	local LastFrameHeight = ContentFrame.Size.Y.Offset
-
-	local function TimeStampToText(TimeStamp)
-		-- Converts the time stamp into something more relative...
-		-- @param TimeStamp A time stamp
-
-		local RenderTimePass = "[ Error ]"
-		if TimeStamp < 20 then
-			RenderTimePass = "a few seconds";
-		elseif TimeStamp < 60 then
-			RenderTimePass = "less than a minute";
-		elseif TimeStamp < 120 then
-			RenderTimePass = "1 minute"
-		elseif TimeStamp < 3600 then
-			RenderTimePass = qTime.GetMinute(TimeStamp) .. " minutes"
-		elseif TimeStamp < 216000 then
-			RenderTimePass = "about 1 hour"
-		elseif TimeStamp < 219600 then
-			RenderTimePass = "about " .. qTime.GetHour(TimeStamp) .. " hours"
-		else
-			RenderTimePass = qTime.GetDayOfTheWeek(SmallestTimeStamp) -- If this ever ever happens in a ROBLOX server, I may die. 
-		end
-
-		return RenderTimePass
-	end
-
 	local function UpdateSeenCount(TopOfWindow, BottomOfWindow)
-		---[[
 		local ItemsNotSeenBelow = 0;
 		local ItemsNotSeenAbove = 0;
 		local SmallestTimeStampBelow = tick()
@@ -708,54 +922,51 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 		end
 	end
 
+	local function UpdateSeenCountOffset(OffsetFromTop, OffsetFromBottom)
+		-- Just includes the absolute position and size stuff and lets you just send offsets.
 
-	local function Update(DoNotAnimate, OldItemChange)
+		OffsetFromTop = OffsetFromTop or 0
+		OffsetFromBottom = OffsetFromBottom or 0
+
+		UpdateSeenCount(ContentContainer.AbsolutePosition.Y + OffsetFromTop, ContentContainer.AbsolutePosition.Y + ContentContainer.AbsoluteSize.Y + OffsetFromBottom)
+	end
+
+	local function Update(DoNotAnimate, FeedPositionDeltaY)
 		--- Updates positions and rendering.
 		-- @param DoNotAnimate Set to true if you do not want to animate
+		-- @param FeedPositionDeltaY The change in position that all of the feed experienced when an old item was removed. 
 
-		local WasAtBottom = ScrollBarAtBottom
+		local WasAtBottom = Scroller:ExpectedAtBottom()
 		local CurrentHeight = 0
 
 		local DataBuffer = Buffer:GetData()
 
-		for Index = #DataBuffer, 1, -1 do
-			local Item = DataBuffer[Index]
+		for Index = #DataBuffer, 1, -1 do -- Transverse backwards. 
+			local Item        = DataBuffer[Index]
 			Item.Gui.Position = UDim2.new(0, 0, 0, CurrentHeight)
-			CurrentHeight = CurrentHeight + Item.Gui.Size.Y.Offset
+
+			CurrentHeight     = CurrentHeight + Item.Gui.Size.Y.Offset
 		end
 
-		-- for _, Element in ipairs(Buffer:GetData()) do
-			-- CurrentHeight = CurrentHeight + Element.Gui.Size.Y.Offset
-			-- Element.Gui.Position = UDim2.new(0, 0, 1, -CurrentHeight)
-		-- end
-
 		ContentFrame.Size = UDim2.new(1, 0, 0, math.max(CurrentHeight, ContentContainer.AbsoluteSize.Y))
-		local ChangeInSize = (LastFrameHeight - ContentFrame.Size.Y.Offset)
-		LastFrameHeight = ContentFrame.Size.Y.Offset
+		local OffsetUpdateY = 0
 
-		-- Only auto scroll if we are already auto scrolling and the user is not scrolling.
-		if not IsScrolling or IsAutoScrolling then
-			if WasAtBottom then
-				-- Autoscroll down if we're already at the bottom. 
-				
-				-- IsAutoScrolling = true
-				ScrollToBottom(true)
-			elseif OldItemChange ~= 0 then
-				if Scroller.KineticModel.Position < -OldItemChange then
-					-- Stay even, unless we're at the very end. 
-					-- print("Item was not at bottom; ChangeInIndex = " .. ChangeInIndex .. " Scroller.KineticModel.Position = " .. Scroller.KineticModel.Position)
-					print("Current Position @ " .. Scroller.KineticModel.Position .. "! OldItemChange is " .. OldItemChange)
-					-- Scroller.ScrollTo(Scroller.KineticModel.Position + ChangeInIndex, true)
-					IsAutoScrolling = true
-					Scroller.ScrollTo(Scroller.KineticModel.Position + OldItemChange, true)
-				else
-					IsAutoScrolling = true
-					Scroller.ScrollTo(0, true)
+		-- Handle scrolling stuff.
+		if not Scroller:IsScrolling() then
+			if WasAtBottom then -- If we're at the bottom, autoincrement.
+				local Time = DoNotAnimate and 0 or 0.05
+				Scroller:ScrollToBottom(Time)
+
+				if not DoNotAnimate and DataBuffer[1] then -- Recently added item, consider we're scrolling to the bottom.
+					OffsetUpdateY = -(ContentContainer.AbsolutePosition.Y + ContentContainer.AbsoluteSize.Y) + ContentFrame.AbsolutePosition.Y + ContentFrame.AbsoluteSize.Y
 				end
+			elseif FeedPositionDeltaY ~= 0 then 
+				Scroller:ScrollTo(Scroller.Offset - FeedPositionDeltaY, 0)
 			end
 		end
 
-		UpdateSeenCount(ContentContainer.AbsolutePosition.Y, ContentContainer.AbsolutePosition.Y + ContentContainer.AbsoluteSize.Y)
+		UpdateSeenCountOffset(0, OffsetUpdateY)
+
 		LastHeight = CurrentHeight
 	end
 
@@ -780,61 +991,87 @@ local MakeOutputStreamRender = Class(function(OutputStreamRender, Configuration,
 	-- CONNECT EVENTS --
 	--------------------
 
-	-- Scroll events. 
-	local StartScrollPosition = 0
-	local TopOfWindow = 0
-	local BottomOfWindow = 0
+	local CountingScrolls = false
+	RenderMaid.ScrollStarted = Scroller.ScrollStart:connect(function(LastOffset)
+		local StartTime = tick() -- For debugging.
 
-	--[[
-	0     StartPosition
+		if not CountingScrolls then
+			CountingScrolls = true
 
+			local function UpdateScrollingDown(Delta)
+				UpdateSeenCountOffset(-Delta, 0)
+			end
 
-	-5000 EndPosition
-	-----------
-	0 EndPosition
+			local function UpdateScrollingUp(Delta)
+				UpdateSeenCountOffset(0, -Delta)
+			end
 
-	-5000 StartPosition
-	---]]
-	Scroller.ScrollStarted:connect(function(Position)
-		StartScrollPosition = ContentFrame.AbsolutePosition.Y -- Let's say this is -200 out of -400 max range.
-		TopOfWindow, BottomOfWindow = ContentContainer.AbsolutePosition.Y, ContentContainer.AbsolutePosition.Y + ContentContainer.AbsoluteSize.Y
+			while Scroller.Active and (Scroller:IsScrolling() or Scroller:IsAutoScrolling()) do
+				local Offset = Scroller.Offset
+				local Delta = Scroller.Offset - LastOffset
+				if Delta > 10 then -- Scrolling down. Top of window trails. 
 
-		IsScrolling = true -- We scroll to -300 (So we've scrolled up) We need to catch 
+					LastOffset = Scroller.Offset
+					UpdateScrollingDown(Delta)
+				elseif Delta < -10 then -- Scrolling up. Bottom of window trails.
+					LastOffset = Scroller.Offset
+					UpdateScrollingUp(Delta)
+				end
+				wait(0.05)
+			end
+
+			--- Finish up.
+			local Delta = Scroller.Offset - LastOffset
+			if Delta > 0 then
+				UpdateScrollingDown(Delta)
+			else
+				UpdateScrollingUp(Delta)
+			end
+
+			CountingScrolls = false
+		end
 	end)
 
-	Scroller.ScrollFinished:connect(function(KineticEndPosition)
-		if IsAutoScrolling then -- Make sure it isn't the program that is scrolling. 
-			IsAutoScrolling = false
-		else
-			local ChangeInPosition = ContentFrame.AbsolutePosition.Y - StartScrollPosition
-			if ChangeInPosition ~= 0 then
-				-- local EndPosition
-				-- local StartPosition
+	RenderMaid.NotificationBottomGuiMouseButton1Click = NotifierBottom.Gui.MouseButton1Click:connect(function()
+		local DataBuffer = Buffer:GetData()
 
-				if ChangeInPosition > 0 then
-					-- Moved up
-
-
-					UpdateSeenCount(ContentContainer.AbsolutePosition.Y, BottomOfWindow)
-
-					-- EndPosition = ContentContainer.AbsolutePosition.Y
-					-- StartPosition = ContentContainer.AbsolutePosition.Y + ContentContainer.AbsoluteSize.Y + ChangeInPosition
-					-- print("Scroll Up: StartPosition = " .. StartPosition .. " :: EndPosition = " .. EndPosition)
-				elseif ChangeInPosition < 0 then
-					-- Moved down 
-
-					UpdateSeenCount(TopOfWindow, ContentContainer.AbsolutePosition.Y + ContentContainer.AbsoluteSize.Y)
-
-					-- EndPosition = ContentContainer.AbsolutePosition.Y + ContentContainer.AbsoluteSize.Y
-					-- StartPosition = ContentContainer.AbsolutePosition.Y + ChangeInPosition
-					-- print("Scroll Down: StartPosition = " .. StartPosition .. " :: EndPosition = " .. EndPosition)
-				end
+		for Index = #DataBuffer, 1, -1 do
+			local Item = DataBuffer[Index]
+			
+			if not Item.Seen then -- Scroll to the first unseen item.
+				Scroller:ScrollToChild(Item.Gui, -10)
+				break;
 			end
 		end
-
-		IsScrolling = false
-		ScrollBarAtBottom = GetScrollBarAtBottom()
 	end)
+
+	RenderMaid.NotificationTopGuiMouseButton1Click = NotifierTop.Gui.MouseButton1Click:connect(function()
+		local DataBuffer = Buffer:GetData()
+
+		for Index = 1, #DataBuffer do
+			local Item = DataBuffer[Index]
+			
+			if not Item.Seen then -- Scroll to the first unseen item.
+				Scroller:ScrollToChild(Item.Gui, -10)
+				break
+			end
+		end
+	end)
+
+	function OutputStreamRender:Destroy()
+		RenderMaid:DoCleaning()
+		Scroller:Destroy()
+
+		local DataBuffer = Buffer:GetData()
+		for _, Item in pairs(DataBuffer) do
+			Item.Gui:Destroy()
+		end
+		DataBuffer = nil;
+
+		MainFrame:Destroy() -- Recursively calls Destroy on children, should be set. 
+
+		OutputStreamRender.Destroy = nil
+	end
 end)
 
 local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configuration, ScreenGui)
@@ -843,21 +1080,24 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 	local Configuration = OverriddenConfiguration.New(Configuration, DefaultConfiguration)
 	local Subscribed = {} -- Maintain list of subscribed units. 
 
+	local MainFrame do
+		local SizeIfPhone = UDim2.new(0, 280 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight) 
+		local SizeNormal  = UDim2.new(0, 500 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight);
 
-	local MainFrame = Make("ImageButton", {
-		Active                 = false;
-		BackgroundColor3       = Color3.new(0, 0, 0);
-		BackgroundTransparency = 1.0;
-		Name                   = "OutputStreamInterface";
-		Parent                 = ScreenGui;
-		Size                   = qGUI.IsPhone(ScreenGui) and -- Some really horrible calculatinzsdf
-		                         UDim2.new(0, 280 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, Configuration.ContentHeight + PseudoChatSettings.LineHeight) 
-		                         or UDim2.new(0, 500 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, Configuration.ContentHeight + PseudoChatSettings.LineHeight);
-		ZIndex                 = Configuration.MenuZIndex - 1;
-		ClipsDescendants       = true;
-		Position = UDim2.new(0, 0, 0, 6);
-	})
-	OutputStreamInterface.Gui = MainFrame
+		MainFrame = Make("Frame", {
+			Active                 = false;
+			BackgroundColor3       = Color3.new(0, 0, 0);
+			BackgroundTransparency = 1.0;
+			BorderSizePixel        = 0;
+			Name                   = "OutputStreamInterface";
+			Parent                 = ScreenGui;
+			Size                   = qGUI.IsPhone(ScreenGui) and SizeIfPhone or SizeNormal; -- Some really horrible calculatinzsdf
+			ZIndex                 = Configuration.MenuZIndex - 1;
+			ClipsDescendants       = true;
+			Position               = UDim2.new(0, 4, 0, 4);
+		})
+		OutputStreamInterface.Gui = MainFrame
+	end
 
 	local ContentContainer = Make("Frame", {
 		Active                 = false;
@@ -870,15 +1110,15 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 		ZIndex                 = Configuration.ZIndex;
 	})
 
-	local Menu      = MakeOutputStreamMenu(MainFrame, ScreenGui, Configuration)
 	local ActiveSubscriber
+	local Menu      = MakeOutputStreamMenu(MainFrame, ScreenGui, Configuration)
 	local Mouse     = Players.LocalPlayer:GetMouse()
 	local MouseOver = qGUI.MouseOver(Mouse, MainFrame)
 
 	local function DoShowInterface()
 		if MouseOver then --qGUI.MouseOver(Mouse, MainFrame) then
 			return true
-		elseif Menu.GetIsShown() then
+		elseif Menu.GetIsCollapsed() then
 			return true
 		elseif ActiveSubscriber then
 			return ActiveSubscriber.RenderFrame.DoShowInterface()
@@ -889,14 +1129,40 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 
 	local function UpdateVisibility(DoNotAnimate)
 		if DoShowInterface() then
-			Menu.SetTransparency(0, DoNotAnimate and nil or Configuration.MenuAnimateTime)
+			Menu.Show(DoNotAnimate and nil or Configuration.MenuAnimateTime)
+
+			if UserInputService.MouseEnabled then
+				if DoNotAnimate then
+					MainFrame.BackgroundTransparency = Configuration.UIBackgroundTransparencyOnMouseOver
+				else
+					qGUI.TweenTransparency(MainFrame, {BackgroundTransparency = Configuration.UIBackgroundTransparencyOnMouseOver}, Configuration.MenuAnimateTime, true)
+				end
+			end
+
 			for _, Item in pairs(Subscribed) do
-				Item.RenderFrame.ShowScrollBar(Configuration.MenuAnimateTime)
+				if ActiveSubscriber == Item and not DoNotAnimate then
+					Item.RenderFrame.ShowScrollBar(Configuration.MenuAnimateTime)
+				else
+					Item.RenderFrame.ShowScrollBar(0)
+				end
 			end
 		else
-			Menu.SetTransparency(1, DoNotAnimate and nil or Configuration.MenuAnimateTime)
+			Menu.Hide(DoNotAnimate and nil or Configuration.MenuAnimateTime)
+
+			if UserInputService.MouseEnabled then
+				if DoNotAnimate then
+					MainFrame.BackgroundTransparency = 1
+				else
+					qGUI.TweenTransparency(MainFrame, {BackgroundTransparency = 1}, Configuration.MenuAnimateTime, true)
+				end
+			end
+
 			for _, Item in pairs(Subscribed) do
-				Item.RenderFrame.HideScrollBar(Configuration.MenuAnimateTime)
+				if ActiveSubscriber == Item and not DoNotAnimate then
+					Item.RenderFrame.HideScrollBar(Configuration.MenuAnimateTime)
+				else
+					Item.RenderFrame.HideScrollBar(0)
+				end
 			end
 		end
 	end
@@ -909,8 +1175,6 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 			ActiveSubscriber.Hide()
 		end
 		ActiveSubscriber = Subscriber
-		Subscriber.Show()
-		UpdateVisibility(DoNotAnimate)
 
 
 		if ScrollerEvent then
@@ -918,10 +1182,16 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 			ScrollerEvent = nil
 		end
 
-		ScrollerEvent = Subscriber.RenderFrame.Scroller.ScrollFinished:connect(function()
-			wait(0)
-			UpdateVisibility()
-		end)
+		if Subscriber then
+			Subscriber.Show(DoNotAnimate)
+			UpdateVisibility(DoNotAnimate)
+			
+			ScrollerEvent = Subscriber.RenderFrame.Scroller.ScrollEnd:connect(function()
+				UpdateVisibility()
+			end)
+		else
+			print("Set no active subscriber!")
+		end
 	end
 
 	local function Subscribe(OutputStreamSyndicator, RenderName, RenderColor)
@@ -935,8 +1205,11 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 			RenderName = RenderName or OutputStreamSyndicator.Name or tostring(OutputStreamSyndicator)
 
 			local Subscriber = {}
-			local RenderFrame = MakeOutputStreamRender(Configuration, ScreenGui)
-			local MenuOption = Menu.MakeChoice(RenderName, RenderColor)
+
+			local SubscriberMaid = Maid.MakeMaid()
+
+			local RenderFrame      = MakeOutputStreamRender(Configuration, ScreenGui, RenderColor)
+			local MenuOption       = Menu.MakeChoice(RenderName, RenderColor, 1)
 			Subscriber.RenderFrame = RenderFrame
 
 			local function HandleNewItem(OutputClass, Data, DoNotAnimate)
@@ -965,7 +1238,9 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 				if Index < RenderFrame.Buffer.BufferSize then
 					local NewItem = {}
 
-					local Gui    = OutputClass.Render(ActiveSubscriber.RenderFrame.ContentFrame, Data, DoNotAnimate or (Index == RenderFrame.Buffer.BufferSize))
+					local LastData = BufferData[Index] and BufferData[Index].Data or nil
+					-- Sends the parent, the data, DoNotAnimate, and the last data set (Which may be nil.)
+					local Gui    = OutputClass.Render(ActiveSubscriber.RenderFrame.ContentFrame, Data, DoNotAnimate or (Index == RenderFrame.Buffer.BufferSize), LastData)
 					Gui.Parent   = RenderFrame.ContentFrame
 					NewItem.Gui  = Gui
 					NewItem.Data = Data
@@ -977,23 +1252,23 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 				end
 			end
 
-			function Subscriber.Show()
+			function Subscriber.Show(DoNotAnimate)
 				RenderFrame.Gui.Visible = true
-				Menu.SetColorAndTitle(RenderColor, RenderName)
+				Menu.SetColorAndTitle(RenderColor, RenderName, DoNotAnimate)
 			end
 
-			function Subscriber.Hide()
+			function Subscriber.Hide(DoNotAnimate)
 				RenderFrame.Gui.Visible = false
 			end
 
 			-- Connect Events --
 
-			OutputStreamSyndicator.NewItem:connect(function(OutputStreamClient, OutputClass, Data)
+			SubscriberMaid.NewItem = OutputStreamSyndicator.NewItem:connect(function(OutputStreamClient, OutputClass, Data)
 				assert(Data ~= nil, "Data is nil")
 				HandleNewItem(OutputClass, Data, ActiveSubscriber ~= Subscriber)
 			end)
 
-			MenuOption.Gui.MouseButton1Click:connect(function()
+			SubscriberMaid.MenuOptionButtonClick = MenuOption.ChoiceSelected:connect(function()
 				SetActiveStream(Subscriber)
 				Menu.Collapse()
 			end)
@@ -1002,9 +1277,33 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 
 			RenderFrame.Gui.Parent = ContentContainer
 
+			function Subscriber:Destroy()
+				--- GCs itself
+
+				Subscribed[OutputStreamSyndicator] = nil
+
+				-- Set the active subscriber to something not us. 
+				for AOutputStreamSyndicator, ASubscriber in pairs(Subscribed) do
+					SetActiveStream(ASubscriber)
+					break;
+				end
+
+				SubscriberMaid:DoCleaning()
+				SubscriberMaid = nil
+
+				MenuOption:Destroy()
+				MenuOption = nil
+
+				RenderFrame:Destroy()
+				RenderFrame = nil
+
+				Subscriber.Destroy = nil
+				Subscriber = nil
+			end
+
 			Subscribed[OutputStreamSyndicator] = Subscriber
 			if not ActiveSubscriber then
-				SetActiveStream(Subscriber)
+				SetActiveStream(Subscriber, true)
 			else
 				Subscriber.Hide()
 			end
@@ -1021,6 +1320,11 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 	end
 	OutputStreamInterface.Subscribe = Subscribe
 	OutputStreamInterface.subscribe = Subscribe
+
+	local CancelButton = Menu.MakeChoice("Cancel", Color3.new(0.1, 0.1, 0.1), 2)
+	CancelButton.ChoiceSelected:connect(function()
+		Menu.Collapse()
+	end)
 
 	-- SETUP EVENTS --
 	MainFrame.MouseEnter:connect(function()

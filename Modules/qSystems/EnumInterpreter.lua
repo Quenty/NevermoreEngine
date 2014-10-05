@@ -14,7 +14,7 @@ local lib               = {}
 -- @author Quenty
 -- Last Modified February 3rd, 2014
 
-qSystems:import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local function Scan(Table, StringName)
 	for Index, Value in pairs(Table) do

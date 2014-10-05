@@ -5,7 +5,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -34,7 +34,7 @@ local function GetBricks(StartInstance)
 		end
 	end)
 
-	return List;
+	return List
 end
 lib.GetBricks  = GetBricks
 lib.get_bricks = GetBricks

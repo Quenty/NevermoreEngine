@@ -69,6 +69,7 @@ December 28th, 2013
 ]]
 	
 local Type                    = LoadCustomLibrary('Type')
+local Signal                  = LoadCustomLibrary('Signal')
 
 local lib                     = {}
 
@@ -78,118 +79,8 @@ local lib                     = {}
 
 -- Creates a signal, like before, but this time uses internal Lua signals that allow for the sending of recursive
 -- tables versus using ROBLOX's parsing system. 
-local function CreateSignalInternal()
-
-	local this = {}
-	local mListeners = {}
-	local mListenerCount = 0
-	local mWaitProxy = nil
-	local mWaitReturns = nil
-	local mHasWaiters = false
-
-	function this:connect(func)
-		if self ~= this then error("connect must be called with `:`, not `.`", 2) end
-		if type(func) ~= 'function' then
-			error("Argument #1 of connect must be a function, got a "..type(func), 2)
-		end
-		mListenerCount = mListenerCount + 1
-		local conn = {}
-		function conn:disconnect()
-			if mListeners[conn] then
-				mListeners[conn] = nil
-				mListenerCount = mListenerCount - 1
-			end
-		end
-		mListeners[conn] = func
-		return conn
-	end
-
-	function this:disconnect()
-		if self ~= this then error("disconnect must be called with `:`, not `.`", 2) end
-		for k, v in pairs(mListeners) do
-			mListeners[k] = nil
-		end
-		mListenerCount = 0
-	end
-
-	function this:wait()
-		if self ~= this then error("wait must be called with `:`, not `.`", 2) end
-		if not mWaitProxy then
-			mWaitProxy = Instance.new('BoolValue')
-		end
-		mHasWaiters = true
-		mWaitProxy.Changed:wait()
-		return unpack(mWaitReturns)
-	end
-
-	function this:fire(...)
-		if self ~= this then error("fire must be called with `:`, not `.`", 2) end
-		local arguments;
-		if mListenerCount > 0 or mHasWaiters then
-			arguments = {...}
-		end
-		if mHasWaiters then
-			mHasWaiters = false
-			mWaitReturns = arguments
-			mWaitProxy.Value = not mWaitProxy.Value
-			mWaitReturns = nil
-		end
-		if mListenerCount > 0 then
-			for _, handlerFunc in pairs(mListeners) do
-				Spawn(function()
-					handlerFunc(unpack(arguments))
-				end)
-			end
-		end
-	end
-
-	function this:fireSync(...)
-		if self ~= this then error("fire must be called with `:`, not `.`", 2) end
-		local arguments;
-		if mListenerCount > 0 or mHasWaiters then
-			arguments = {...}
-		end
-		if mHasWaiters then
-			mHasWaiters = false
-			mWaitReturns = arguments
-			mWaitProxy.Value = not mWaitProxy.Value
-			mWaitReturns = nil
-		end
-		if mListenerCount > 0 then
-			for _, handlerFunc in pairs(mListeners) do
-				handlerFunc(...)
-			end
-		end
-	end
-
-	function this:destroy()
-		this:disconnect()
-		this.mListeners = nil
-		this.mListenerCount = nil
-		this.mWaitProxy = nil
-		this.mWaitReturns = nil
-		this.mHasWaiters = nil
-		this.destroy = nil
-		this.Destroy = nil
-		this.fire = nil
-		this.wait = nil
-		this.connect = nil
-		this.fireSync = nil
-		this = nil
-	end
-
-	function this:Destroy()
-		this:destroy()
-	end
-	
-	return this;
-end
-lib.CreateSignalInternal = CreateSignalInternal
-lib.createSignalInternal = CreateSignalInternal
-lib.create_internal_signal = CreateSignalInternal
-lib.CreateSignal = CreateSignalInternal 
-lib.createSignal = CreateSignalInternal
-lib.create_signal = CreateSignalInternal
+lib.CreateSignal = Signal.new
+lib.createSignal = Signal.new
 
 local function RoundNumber(Number, Divider)
 	-- Rounds a Number, with 1.5 rounding up to 2, and so forth, by default. 
@@ -308,7 +199,8 @@ local function GetHumanoid(Descendant)
 	-- However, only works on objects named "Humanoid" (this is intentional)
 
 	-- @param Descendant The child you're searching up from. Really, this is for weapon scripts. 
-
+	-- @return Humanoid, or nil. 
+	
 	while true do
 		local Humanoid = Descendant:FindFirstChild("Humanoid")
 
@@ -324,7 +216,7 @@ local function GetHumanoid(Descendant)
 			end
 		end
 
-		if Descendant.Parent and Descendant.Parent ~= Workspace then
+		if Descendant.Parent and Descendant:IsDescendantOf(Workspace) then
 			Descendant = Descendant.Parent
 		else
 			return nil
@@ -366,7 +258,7 @@ local function CheckPlayer(Player)
 	--- Makes sure a player has all necessary components.
 	-- @return Boolean If the player has all the right components
 
-	return Player and Player:IsA("Player") 
+	return Player and Player:IsA("Player") and Player:IsDescendantOf(Players)
 end
 lib.checkPlayer = CheckPlayer
 lib.CheckPlayer = CheckPlayer
@@ -416,6 +308,8 @@ end
 lib.getIndexByValue = GetIndexByValue
 lib.GetIndexByValue = GetIndexByValue
 lib.get_index_by_value = GetIndexByValue
+
+lib.GetIndexFromValue = GetIndexByValue
 
 lib.getIndex = getIndexByValue
 lib.GetIndex = getIndexByValue

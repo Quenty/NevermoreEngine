@@ -8,14 +8,14 @@ local qSystems          = LoadCustomLibrary("qSystems")
 local CircularBuffer    = LoadCustomLibrary("CircularBuffer")
 local Table             = LoadCustomLibrary("Table")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
 -- @author Quenty
 -- OutputClassStreamLoggers.lua
 -- This script handles some logging stuff for OutputStreams. 
--- Last modified January 26th, 2014
+-- Last modified September 9th, 2014
 
 local MakeGlobalOutputStreamLog = Class(function(GlobalOutputStreamLog, BufferSize)
 	--- Represents a "stream" that can be subscribbed too. Each stream has it's own way of
@@ -189,7 +189,7 @@ local MakeFilteredLogStreamLog = Class(function(FilteredLogStreamLog, BufferSize
 		-- @param Data The data to check
 		-- @return Boolean true if it should be sent, false otherwise. 
 
-		return Data.Filter(Client)
+		return Data.Filter(Client, Data)
 	end
 end)
 lib.MakeFilteredLogStreamLog = MakeFilteredLogStreamLog
@@ -238,7 +238,7 @@ local MakeGlobalFilteredLogStreamLog = Class(function(FilteredLogStreamLog, Filt
 		-- @param Data The data to check
 		-- @return Boolean true if it should be sent, false otherwise. 
 
-		return Filter(Client)
+		return Filter(Client, Data)
 	end
 end)
 lib.MakeGlobalFilteredLogStreamLog = MakeGlobalFilteredLogStreamLog

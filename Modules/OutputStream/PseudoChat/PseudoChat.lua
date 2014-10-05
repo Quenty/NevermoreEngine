@@ -26,6 +26,9 @@ local ClientAuthenticationService = LoadCustomLibrary("ClientAuthenticationServi
 -- Last modified Janurary 19th, 2014
 
 --[[-- Update Log --
+September 9th, 2014
+- Added team chat
+
 July 25th, 2014
 - Made ChatBar API avialable. 
 
@@ -48,11 +51,11 @@ January 5th, 2014
 --]]
 
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
-local function MakePseudoChat(ScreenGui)
+local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 	--- This will render a pseudo chat output stream thingy. Of course, you don't have to use this module, but it simplifies everything.
 	-- @param ScreenGui The ScreenGui the chat goes into. 
 	local Chat = {}
@@ -64,8 +67,7 @@ local function MakePseudoChat(ScreenGui)
 	Chat.Interface  = Interface
 	Chat.Gui        = Interface.Gui
 
-	local ChatBar = PseudoChatBar.MakePseudoChatBar(ScreenGui)
-	Chat.ChatBar = ChatBar
+	local ChatBar
 
 	local function SendMessage(Message)
 		ClientToServerOutputStream.Fire("Message", Message); --[[{
@@ -74,40 +76,44 @@ local function MakePseudoChat(ScreenGui)
 		})--]]
 	end
 
+
+	if not DoNotDisableCoreGui then
+		ChatBar = PseudoChatBar.MakePseudoChatBar(ScreenGui)
+		Chat.ChatBar = ChatBar
+
+		ChatBar.NewChat:connect(function(Message)
+			SendMessage(Message)
+		end)
+	end
+
 	LocalPlayer.Chatted:connect(function(Message)
 		SendMessage(Message)
 	end)
-
-	ChatBar.NewChat:connect(function(Message)
-		SendMessage(Message)
-	end)
-
 
 	local ChatChannel = OutputStream.MakeOutputStreamClient(
 		"ChatChannel"
 	);
 	ChatChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
 	ChatChannel.AddOutputClass(PseudoChatParser.ChatOutputClass)
-	-- ChatChannel.AddOutputClass(ShipKillFeedParser.ShipKillFeedClass)
+
+	local TeamChannel = OutputStream.MakeOutputStreamClient(
+		"TeamChannel"
+	);
+	TeamChannel.AddOutputClass(PseudoChatParser.ChatOutputClass)
+
 
 	-- Notification stream
 	local NotificationChannel = OutputStream.MakeOutputStreamClient(
 		"NotificationChannel"
 	);
 	NotificationChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
-	-- NotificationChannel.AddOutputClass(ShipKillFeedParser.ShipKillFeedClass)
 
 	-- Admin stream
 	local AdminLogChannel = OutputStream.MakeOutputStreamClient(
 		"AdminChannel"
 	);
 	AdminLogChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
-
-	-- Output Stream
-	-- local AdminOutput = OutputStream.MakeOutputStreamClient(
-	-- 	"Admin-Output"
-	-- );
-	-- AdminOutput.AddOutputClass(PseudoChatParser.OutputOutputClass)
+	AdminLogChannel.AddOutputClass(PseudoChatParser.AdminLogOutputClass)
 
 	-- We will syndicate resources. 
 	-- Global one has all of 'em. 
@@ -115,45 +121,48 @@ local function MakePseudoChat(ScreenGui)
 		GlobalSyndictator.AddOutputStream(ChatChannel)
 		GlobalSyndictator.AddOutputStream(NotificationChannel)
 		GlobalSyndictator.AddOutputStream(AdminLogChannel)
-		-- GlobalSyndictator.AddOutputStream(AdminOutput)
+		GlobalSyndictator.AddOutputStream(TeamChannel)
 
-	Interface.Subscribe(GlobalSyndictator,         nil, Color3.new( 85/255,  98/255, 112/255), true)
+	Interface.Subscribe(GlobalSyndictator, nil, Color3.new(78/255, 205/255, 196/255), true) --Color3.new( 85/255,  98/255, 112/255), true)
 
-	if ClientAuthenticationService.IsAuthorized() then
-		-- Chat Syndictator has only chat.
-		-- local ChatOnly = OutputStream.MakeOutputStreamSyndicator("Main chat")
-		-- 	ChatOnly.AddOutputStream(ChatChannel)
-		-- 	ChatOnly.AddOutputStream(NotificationChannel)
+	Spawn(function()
+		local AdminSyndictator
+		local Subscriber
 
-		-- local NotificationSyndictator = OutputStream.MakeOutputStreamSyndicator("Notifications")
-		-- 	NotificationSyndictator.AddOutputStream(NotificationChannel)
+		local function SetupAdmin()
+			if not AdminSyndictator then
+				AdminSyndictator = OutputStream.MakeOutputStreamSyndicator("Admin Logs")
+				AdminSyndictator.AddOutputStream(AdminLogChannel)
+			end
 
-		-- And admin only admin stuff. 
-		local AdminSyndictator  = OutputStream.MakeOutputStreamSyndicator("Admin Logs")
-			AdminSyndictator.AddOutputStream(AdminLogChannel)
+			if not Subscriber then
+				Subscriber = Interface.Subscribe(AdminSyndictator, nil, Color3.new(255/255, 107/255, 107/255), true)
+			end
+		end
 
+		local function DeconstructAdmin()
+			if Subscriber then
+				Subscriber:Destroy()
+				Subscriber = nil
+			end
+		end
 
-		-- Interface.Subscribe(ChatOnly,           nil, Color3.new( 78/255, 205/255, 196/255), true)
-		-- Interface.Subscribe(NotificationSyndictator,   nil, Color3.new(199/255, 244/255, 100/255), true)
-		Interface.Subscribe(AdminSyndictator,          nil, Color3.new(255/255, 107/255, 107/255), true)
-	end
+		if ClientAuthenticationService.IsAuthorized() then
+			SetupAdmin()
+		end
 
-
-	--[[if not NevermoreEngine.SoloTestMode then
-		-- In SoloTest mode we log Errors already. 
-		
-		ScriptContext.Error:connect(function(Message, StackTrace, Script)
-			Script = tostring(Script)
-
-			ClientToServerOutputStream.Fire("Error", {
-				Message    = Message;
-				StackTrace = StackTrace;
-				Script     = Script;
-			})
+		ClientAuthenticationService.AuthenticationChanged:connect(function(IsAuthorized)
+			if IsAuthorized then
+				SetupAdmin()
+			else
+				DeconstructAdmin()
+			end
 		end)
-	end--]]
+	end)
 
-	StarterGui:SetCoreGuiEnabled("Chat", false)
+	if not DoNotDisableCoreGui then
+		StarterGui:SetCoreGuiEnabled("Chat", false)
+	end
 
 	return Chat
 end

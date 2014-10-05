@@ -11,7 +11,7 @@ local qSystems          = LoadCustomLibrary("qSystems")
 local Table             = LoadCustomLibrary("Table")
 
 local lib               = {}
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 -- PlayerId.lua
 -- Last modified on January 23rd, 2014

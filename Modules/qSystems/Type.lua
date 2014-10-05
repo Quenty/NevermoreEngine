@@ -60,29 +60,34 @@ function lib.isOfEnumType(value, enum)
 	end
 end
 
+local Color3Value = Instance.new('Color3Value')
 function lib.isAColor3(value)
 	-- Returns whether 'value' is a Color3 value.
-	return pcall(set, Instance.new('Color3Value'), 'Value', value) == true
+	return pcall(set, Color3Value, 'Value', value) == true
 end
 
+local CFrameValue = Instance.new('CFrameValue')
 function lib.isACoordinateFrame(value)
 	-- Returns whether 'value' is a CFrame value.
-	return pcall(set, Instance.new('CFrameValue'), 'Value', value) == true
+	return pcall(set, CFrameValue, 'Value', value) == true
 end
 
+local BrickColor3Value = Instance.new('BrickColorValue')
 function lib.isABrickColor(value)
 	-- Returns whether 'value' is a BrickColor value.
-	return pcall(set, Instance.new('BrickColorValue'), 'Value', value) == true
+	return pcall(set, BrickColor3Value, 'Value', value) == true
 end
 
+local RayValue = Instance.new('RayValue')
 function lib.isARay(value)
 	-- Returns whether 'value' is a Ray value.
-	return pcall(set, Instance.new('RayValue'), 'Value', value) == true
+	return pcall(set, RayValue, 'Value', value) == true
 end
 
+local Vector3Value = Instance.new('Vector3Value')
 function lib.isAVector3(value)
 	-- Returns whether 'value' is a Vector3 value.
-	return pcall(set, Instance.new('Vector3Value'), 'Value', value) == true
+	return pcall(set, Vector3Value, 'Value', value) == true
 end
 
 function lib.isAVector2(value)
@@ -90,9 +95,10 @@ function lib.isAVector2(value)
 	return pcall(function() return Vector2.new() + value end) == true
 end
 
+local FrameValue = Instance.new('Frame')
 function lib.isAUdim2(value)
 	-- Returns whether 'value' is a UDim2 value.
-	return pcall(set, Instance.new('Frame'), 'Position', value) == true
+	return pcall(set, FrameValue, 'Position', value) == true
 end
 
 function lib.isAUDim(value)
@@ -100,14 +106,16 @@ function lib.isAUDim(value)
 	return pcall(function() return UDim.new() + value end) == true
 end
 
+local ArcHandleValue = Instance.new('ArcHandles')
 function lib.isAAxis(value)
 	-- Returns whether 'value' is an Axes value.
-	return pcall(set, Instance.new('ArcHandles'), 'Axes', value) == true
+	return pcall(set, ArcHandleValue, 'Axes', value) == true
 end
 
+local FaceValue = Instance.new('Handles')
 function lib.isAFace(value)
 	-- Returns whether 'value' is a Faces value.
-	return pcall(set, Instance.new('Handles'), 'Faces', value) == true
+	return pcall(set, FaceValue, 'Faces', value) == true
 end
 
 function lib.isASignal(value)

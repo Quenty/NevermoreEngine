@@ -5,7 +5,7 @@ local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
 
-qSystems:import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 

@@ -14,7 +14,7 @@ local lib    = {}
 -- @author Quenty
 -- Last Modified February 3rd, 2014
 
-qSystems:import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 lib.STYLES = {}
 lib.TYPES = {
@@ -195,12 +195,14 @@ local StyleFunctions = {
 		-- Optimal with fast animation times.
 
 		TransitionIn = function(Time, BaseCover, AnimationStyles)
-			local NewCover = BaseCover:Clone()
-			NewCover.Parent = BaseCover
-			NewCover.Size = UDim2.new(1, 0, 1, 0)
-			NewCover.Position = UDim2.new(0, 0, 1, 0)
-			NewCover.BackgroundTransparency = 0;
+			local NewCover                   = BaseCover:Clone()
+			NewCover.Parent                  = BaseCover
+			NewCover.Size                    = UDim2.new(1, 0, 1, 0)
+			NewCover.Position                = UDim2.new(0, 0, 1, 0)
+			NewCover.BackgroundTransparency  = 0;
+
 			NewCover:TweenPosition(UDim2.new(0, 0, 0, 0), "In", AnimationStyles.EasingStyle or ("Quad"), Time, true)
+			
 			BaseCover.BackgroundTransparency = 1
 			wait(Time)
 			NewCover:Destroy()
@@ -248,7 +250,7 @@ local StyleFunctions = {
 					local NewPosition = Square.Position - UDim2.new(0, SquareSize/2, 0, SquareSize/2)
 					table.insert(Squares, Square)
 
-					delay(WaitEach * (ValY/SquareSize), function() 
+					delay(WaitEach * (ValY/SquareSize), function()
 						Square:TweenSizeAndPosition(UDim2.new(0, SquareSize, 0, SquareSize), NewPosition, "In", "Quad", Time/2, true)
 					end)
 					ValX = ValX + SquareSize
@@ -259,7 +261,7 @@ local StyleFunctions = {
 
 			BaseCover.BackgroundTransparency = 0;
 			for _, Square in pairs(Squares) do
-				Square:Destroy();
+				Square:Destroy()
 			end
 			return true;
 		end;
@@ -297,7 +299,7 @@ local StyleFunctions = {
 			BaseCover.BackgroundTransparency = 1;
 			wait(Time)
 			for _, Square in pairs(Squares) do
-				Square:Destroy();
+				Square:Destroy()
 			end
 			return true;
 		end;

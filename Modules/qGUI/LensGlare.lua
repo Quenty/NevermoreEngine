@@ -10,7 +10,7 @@ local qGUI              = LoadCustomLibrary("qGUI")
 local qCFrame           = LoadCustomLibrary("qCFrame")
 local qMath             = LoadCustomLibrary("qMath")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 

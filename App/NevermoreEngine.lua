@@ -2,80 +2,73 @@
 -- @author Quenty
 
 --[[
-
-
 Update August 16th, 2014
 - Any module with the name "Server" in it is not replicated, to prevent people from stealing
   nevermore's complete source. 
-
-
 ]]
 
-local NevermoreEngine     = {}
-local Players             = game:GetService("Players")
-local ReplicatedStorage   = game:GetService("ReplicatedStorage")
-local MarketplaceService  = game:GetService("MarketplaceService")
-local TestService         = game:GetService("TestService")
-local StarterGui          = game:GetService("StarterGui")
+local NevermoreEngine    = {}
 
-local RbxUtility = LoadLibrary("RbxUtility")
-
-
+local Players            = game:GetService("Players")
+local ReplicatedStorage  = game:GetService("ReplicatedStorage")
+local MarketplaceService = game:GetService("MarketplaceService")
+local TestService        = game:GetService("TestService")
+local StarterGui         = game:GetService("StarterGui")
+local RunService         = game:GetService("RunService")
+local ContentProvider    = game:GetService("ContentProvider")
 local ServerStorage      
 local ServerScriptService
 
+local RbxUtility         = LoadLibrary("RbxUtility")
+
 local Configuration = {	
-	Blacklist              = ""; -- Ban list
 	ClientName             = "NevermoreClient";
-	CustomCharacters       = false; -- When enabled, allows the client to set Player.Character itself.
-	IsClient               = script.Parent ~= nil;
 	ReplicatedPackageName  = "NevermoreResources";
-	SoloTestMode           = (game:FindService("NetworkServer") == nil and game.PlaceId == 0); -- Are we testing in solo test mode?
-	SplashScreen           = true; -- Should a splashscreen be rendered?
-	CharacterRespawnTime   = 0.5; -- How long does it take for characters to respawn? Only kept updated on the server-side.
 	DataSteamName          = "NevermoreDataStream";
-	NevermoreRequestPrefix = "NevermoreEngineRequest"; -- For network requests, what should it prefix it as?
-	EnableFiltering        = false; -- Set Workspace.FilteringEnabled
-	ResetPlayerGuiOnSpawn  = false; -- Set StarterGui.ResetPlayerGuiOnSpawn --- NOTE the client script must reparent itself to the PlayerGui
+	NevermoreRequestPrefix = "NevermoreEngineRequest";                   -- For network requests, what should it prefix it as?
+
+	IsClient               = script.Parent ~= nil;
+	SoloTestMode           = game:FindService("NetworkServer") == nil and game:FindService("NetworkClient") == nil;
+
+	Blacklist              = "";                                         -- Ban list
+	CustomCharacters       = false;                                      -- When enabled, allows the client to set Player.Character itself. Untested!
+	SplashScreen           = true;                                       -- Should a splashscreen be rendered?
+	CharacterRespawnTime   = 0.5;                                        -- How long does it take for characters to respawn? Only kept updated on the server-side.
+	ResetPlayerGuiOnSpawn  = false;                                      -- Set StarterGui.ResetPlayerGuiOnSpawn --- NOTE the client script must reparent itself to the PlayerGui
 }
 Configuration.IsServer = not Configuration.IsClient
 
 
--- DO CONFIGURATION STUFF --
-if Configuration.EnableFiltering or Workspace.FilteringEnabled then
-	Workspace.FilteringEnabled = true
+-- Print out information on whether or not FilteringEnabled is up or not. 
+if Workspace.FilteringEnabled then
 	print("**** Workspace.FilteringEnabled is enabled")
 end
 
+-- Print out whether or not ResetPlayerGuiOnSpawn is enabled or not. 
 if not Configuration.ResetPlayerGuiOnSpawn or not StarterGui.ResetPlayerGuiOnSpawn then
-	print("**** StarterGui.ResetPlayerGuiOnSpawn is disabled. No GUI reload mode enabled. ")
+	print("**** StarterGui.ResetPlayerGuiOnSpawn = false. GUIs will not reload on player death or respawn.")
 	StarterGui.ResetPlayerGuiOnSpawn = false
 end
 
--- SETUP HEADER --
+-- Print headers are used to help debugging process
 if Configuration.SoloTestMode then
 	Configuration.PrintHeader = "[NevermoreEngineSolo] - "
 else
-	-- print(game:FindService("NetworkServer") == nil, game.PlaceId == 0)
 	if Configuration.IsServer then
-		Configuration.PrintHeader = "[NevermoreEngine] - "
+		Configuration.PrintHeader = "[NevermoreEngineServer] - "
 	else
 		Configuration.PrintHeader = "[NevermoreEngineLocal] - "
 	end
 end
+print(Configuration.PrintHeader .. "NevermoreEngine loaded.")
 
--- SET AUTOLOADING TO FALSE.
-Players.CharacterAutoLoads = false;
+Players.CharacterAutoLoads = false
 
--- GET STORAGE UNITS
+-- If we're the server than we should retrieve server storage units. 
 if not Configuration.IsClient then
 	ServerStorage       = game:GetService("ServerStorage")
 	ServerScriptService = game:GetService("ServerScriptService")
 end
-
--- DEBUG -- 
--- print("script.Parent == " .. tostring(script.Parent))
--- print(Configuration.PrintHeader .. "Nevermore is Loadingg.")
 
 -----------------------
 -- UTILITY FUNCTIONS --
@@ -89,7 +82,7 @@ local function WaitForChild(Parent, Name)
 
 	local Child = Parent:FindFirstChild(Name)
 	local StartTime = tick()
-	local Warned = false;
+	local Warned = false
 	while not Child do
 		wait(0)
 		Child = Parent:FindFirstChild(Name)
@@ -249,9 +242,9 @@ local ResouceManager = {} do
 				-- If an item is not disabled, then it's disabled, but yell at 
 				-- the user.
 
-				if Item.Name:lower():match("\.main$") == nil then
-					error(Configuration.PrintHeader .. Item:GetFullName() .. " is not disabled, and does not end with .Main.")
-				end
+				--if Item.Name:lower():match("\.main$") == nil then
+				error(Configuration.PrintHeader .. Item:GetFullName() .. " is not disabled, and does not end with .Main.")
+				--end
 
 				return true
 			end
@@ -322,10 +315,10 @@ local ResouceManager = {} do
 								-- Clone the item into the replication packet for
 								-- replication. However, we do not clone server scripts.
 
-								local ItemClone
+								--[[local ItemClone
 								
 								if not (Item:IsA("ModuleScript") and Item.Name:lower():find("server")) then -- Don't clone scripts with the name "server" in it.
-									ItemClone      = Item:Clone()
+									ItemClone            = Item:Clone()
 									ItemClone.Archivable = false;
 									ItemClone.Parent     = ReplicatedPackage
 								else
@@ -336,7 +329,20 @@ local ResouceManager = {} do
 									ResourceCache[Item.Name] = ItemClone or Item;
 								elseif IsMainResource(Item) then
 									MainResourcesClient[#MainResourcesClient+1] = Item
+								end--]]
+
+								if not (Item:IsA("ModuleScript") and Item.Name:lower():find("server")) then
+									if not Configuration.SoloTestMode then -- Do not move parents in SoloTestMode (keeps the error monitoring correct).
+										Item.Parent = ReplicatedPackage
+									end
 								end
+
+								if Item:IsA("ModuleScript") then
+									ResourceCache[Item.Name] = Item
+								elseif IsMainResource(Item) then
+									MainResourcesClient[#MainResourcesClient+1] = Item
+								end
+
 							else -- Do not replicate local scripts
 								if IsMainResource(Item) then
 									MainResourcesServer[#MainResourcesServer+1] = Item
@@ -394,7 +400,7 @@ local ResouceManager = {} do
 			if Configuration.IsServer then
 				NewScript.Parent = NevermoreContainer;
 			else
-				NewScript.Parent = Players.LocalPlayer:FindFirstChild("Backpack")
+				NewScript.Parent = Players.LocalPlayer:FindFirstChild("PlayerGui")
 			end
 
 			Spawn(function()
@@ -417,7 +423,7 @@ local ResouceManager = {} do
 			if Script and Script:IsA("LocalScript") then
 				local NewScript = Script:Clone()
 				NewScript.Disabled = true;
-				NewScript.Parent = Client:FindFirstChild("Backpack")
+				NewScript.Parent = Client:FindFirstChild("PlayerGui")
 
 				Spawn(function()
 					wait(0)
@@ -494,8 +500,8 @@ local ResouceManager = {} do
 							LibraryDefinition[Name] = Value
 						end
 					end
-				else
-					error(Configuration.PrintHeader .. " Library '" .. LibraryName .. "' did not return a table, returned a '" .. type(LibraryDefinition) .. "' value, '" .. tostring(LibraryDefinition) .. "'")
+				--else
+					--error(Configuration.PrintHeader .. " Library '" .. LibraryName .. "' did not return a table, returned a '" .. type(LibraryDefinition) .. "' value, '" .. tostring(LibraryDefinition) .. "'")
 				end
 
 				return LibraryDefinition
@@ -952,20 +958,22 @@ do
 	end
 	Network.GetMainDatastream = GetMainDatastream
 
+	local SplashConfiguration = {
+		BackgroundColor3      = Color3.new(237/256, 236/256, 233/256);       -- Color of background of loading screen.
+		AccentColor3          = Color3.new(8/256, 130/256, 83/256);          -- Not used. 
+		LogoSize              = 200;
+		LogoTexture           = "http://www.roblox.com/asset/?id=129733987";
+		LogoSpacingUp         = 70; -- Pixels up from loading frame.
+		ParticalOrbitDistance = 50;                                         -- How far out the particals orbit
+		ZIndex                = 10;
+	}
+
+
 	local function GenerateInitialSplashScreen(Player)
 		--- Generates the initial SplashScreen for the player.  
 		-- @param Player The player to genearte the SplashScreen in.
 		-- @return The generated splashsreen
 
-		local Configuration = {
-			BackgroundColor3      = Color3.new(237/256, 236/256, 233/256);       -- Color of background of loading screen.
-			AccentColor3          = Color3.new(8/256, 130/256, 83/256);          -- Not used. 
-			LogoSize              = 200;
-			LogoTexture           = "http://www.roblox.com/asset/?id=129733987";
-			LogoSpacingUp         = 70; -- Pixels up from loading frame.
-			ParticalOrbitDistance = 50;                                         -- How far out the particals orbit
-			ZIndex                = 9;
-		}
 
 		local ScreenGui = Instance.new("ScreenGui", Player:FindFirstChild("PlayerGui"))
 		ScreenGui.Name = "SplashScreen";
@@ -974,43 +982,44 @@ do
 			MainFrame.Name             = "SplashScreen";
 			MainFrame.Position         = UDim2.new(0, 0, 0, -2);
 			MainFrame.Size             = UDim2.new(1, 0, 1, 22); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
-			MainFrame.BackgroundColor3 = Configuration.BackgroundColor3;
+			MainFrame.BackgroundColor3 = SplashConfiguration.BackgroundColor3;
 			MainFrame.Visible          = true;
-			MainFrame.ZIndex           = Configuration.ZIndex;
+			MainFrame.ZIndex           = SplashConfiguration.ZIndex;
 			MainFrame.BorderSizePixel  = 0;
 			MainFrame.Parent           = ScreenGui;
 
 		local ParticalFrame = Instance.new('Frame')
 			ParticalFrame.Name                   = "ParticalFrame";
-			ParticalFrame.Position               = UDim2.new(0.5, -Configuration.ParticalOrbitDistance, 0.7, -Configuration.ParticalOrbitDistance);
-			ParticalFrame.Size                   = UDim2.new(0, Configuration.ParticalOrbitDistance*2, 0, Configuration.ParticalOrbitDistance*2); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			ParticalFrame.Position               = UDim2.new(0.5, -SplashConfiguration.ParticalOrbitDistance, 0.7, -SplashConfiguration.ParticalOrbitDistance);
+			ParticalFrame.Size                   = UDim2.new(0, SplashConfiguration.ParticalOrbitDistance*2, 0, SplashConfiguration.ParticalOrbitDistance*2); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
 			ParticalFrame.Visible                = true;
 			ParticalFrame.BackgroundTransparency = 1
-			ParticalFrame.ZIndex                 = Configuration.ZIndex;
+			ParticalFrame.ZIndex                 = SplashConfiguration.ZIndex;
 			ParticalFrame.BorderSizePixel        = 0;
 			ParticalFrame.Parent                 = MainFrame;
 
 		local LogoLabel = Instance.new('ImageLabel')
 			LogoLabel.Name                   = "LogoLabel";
-			LogoLabel.Position               = UDim2.new(0.5, -Configuration.LogoSize/2, 0.7, -Configuration.LogoSize/2 - Configuration.ParticalOrbitDistance*2 - Configuration.LogoSpacingUp);
-			LogoLabel.Size                   = UDim2.new(0, Configuration.LogoSize, 0, Configuration.LogoSize); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			LogoLabel.Position               = UDim2.new(0.5, -SplashConfiguration.LogoSize/2, 0.7, -SplashConfiguration.LogoSize/2 - SplashConfiguration.ParticalOrbitDistance*2 - SplashConfiguration.LogoSpacingUp);
+			LogoLabel.Size                   = UDim2.new(0, SplashConfiguration.LogoSize, 0, SplashConfiguration.LogoSize); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
 			LogoLabel.Visible                = true;
 			LogoLabel.BackgroundTransparency = 1
-			LogoLabel.Image                  = Configuration.LogoTexture;
-			LogoLabel.ZIndex                 = Configuration.ZIndex;
+			LogoLabel.Image                  = SplashConfiguration.LogoTexture;
+			LogoLabel.ZIndex                 = SplashConfiguration.ZIndex;
 			LogoLabel.BorderSizePixel        = 0;
 			LogoLabel.Parent                 = MainFrame;
+			LogoLabel.ImageTransparency      = 1;
 
 		--[[
 		local LoadingText = Instance.new("TextLabel")
 			LoadingText.Name                   = "LoadingText"
-			LoadingText.Position               = UDim2.new(0.5, -Configuration.LogoSize/2, 0.7, -Configuration.LogoSize/2 - Configuration.ParticalOrbitDistance*2 - Configuration.LogoSpacingUp);
-			LoadingText.Size                   = UDim2.new(0, Configuration.LogoSize, 0, Configuration.LogoSize); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			LoadingText.Position               = UDim2.new(0.5, -SplashConfiguration.LogoSize/2, 0.7, -SplashConfiguration.LogoSize/2 - SplashConfiguration.ParticalOrbitDistance*2 - SplashConfiguration.LogoSpacingUp);
+			LoadingText.Size                   = UDim2.new(0, SplashConfiguration.LogoSize, 0, SplashConfiguration.LogoSize); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
 			LoadingText.Visible                = true;
 			LoadingText.BackgroundTransparency = 1
-			LoadingText.ZIndex                 = Configuration.ZIndex;
+			LoadingText.ZIndex                 = SplashConfiguration.ZIndex;
 			LoadingText.BorderSizePixel        = 0;
-			LoadingText.TextColor3             = Configuration.AccentColor3;
+			LoadingText.TextColor3             = SplashConfiguration.AccentColor3;
 			LoadingText.TextXAlignment         = "Center";
 			LoadingText.Text                   = "Boostrapping Adventure..."
 			LoadingText.Parent                 = MainFrame;
@@ -1071,9 +1080,11 @@ do
 			--- Executes all "MainResources" for the player
 			-- @param Player The player to load the resources on 
 
-			print(Configuration.PrintHeader .. "Loading executables onto " .. tostring(Player))
-			for _, Item in pairs(ResouceManager.GetLoadablesForClient()) do
-				ResouceManager.LoadScriptOnClient(Item, Player)
+			if Player:IsDescendantOf(Players) then
+				print(Configuration.PrintHeader .. "Loading executables onto " .. tostring(Player))
+				for _, Item in pairs(ResouceManager.GetLoadablesForClient()) do
+					ResouceManager.LoadScriptOnClient(Item, Player)
+				end
 			end
 		end
 
@@ -1081,118 +1092,125 @@ do
 			--- Setups up a player
 			-- @param Player The player to setup
 
-			Spawn(function()
-				-- Wait for initial load
-				
-				--[[while not (Player.Parent) do
-					wait(0)
-					print("Waiting for Player.Parent")
-				end--]]
+			if Configuration.BlackList and CheckIfPlayerIsBlacklisted(Player, Configuration.BlackList) then
+				Player:Kick()
+				warn("Kicked Player " .. Player.Name .. " who was blacklisted")
 
-				if Configuration.BlackList and CheckIfPlayerIsBlacklisted(Player, Configuration.BlackList) then
-					Player:Kick()
-					warn("Kicked Player " .. Player.Name .. " who was blacklisted")
-				else
-					local PlayerSplashScreen
-					local HumanoidDiedEvent
-					local ExecutablesDumped = false
+				return nil
+			else
+				local PlayerSplashScreen
+				local HumanoidDiedEvent
+				local ExecutablesDumped = false
 
-					local function SetupCharacter(ForceDumpExecutables)
-						--- Setup's up a player's character
-						-- @param ForceDumpExecutables Forces executables to be dumped, even if StarterGui.ResetPlayerGuiOnSpawn is true.
-						if not Configuration.CustomCharacters then
-							if Player and Player.Parent == Players then
-								while not (Player.Character 
-									and Player.Character:FindFirstChild("Humanoid") 
-									and Player.Character.Humanoid:IsA("Humanoid")) 
-									and Player.Parent == Players do
+				local function SetupCharacter(ForceDumpExecutables)
+					--- Setup's up a player's character
+					-- @param ForceDumpExecutables Forces executables to be dumped, even if StarterGui.ResetPlayerGuiOnSpawn is true.
+					if not Configuration.CustomCharacters then
+						if Player and Player:IsDescendantOf(Players) then
+							while not (Player.Character 
+								and Player.Character:FindFirstChild("Humanoid") 
+								and Player.Character.Humanoid:IsA("Humanoid")) 
+								and Player:IsDescendantOf(Players) do
 
-									wait(0) -- Wait for the player's character to load
+								wait(0) -- Wait for the player's character to load
+							end
+
+							-- Make sure the player is still in game.
+							if Player.Parent == Players then
+								if HumanoidDiedEvent then
+									HumanoidDiedEvent:disconnect()
+									HumanoidDiedEvent = nil
 								end
-
-								-- Make sure the player is still in game.
-								if Player.Parent == Players then
-									if HumanoidDiedEvent then
-										HumanoidDiedEvent:disconnect()
-										HumanoidDiedEvent = nil
-									end
-								
-									HumanoidDiedEvent = Player.Character.Humanoid.Died:connect(function()
-										wait(Configuration.CharacterRespawnTime)
+							
+								HumanoidDiedEvent = Player.Character.Humanoid.Died:connect(function()
+									wait(Configuration.CharacterRespawnTime)
+									if Player:IsDescendantOf(Players) then
 										Player:LoadCharacter()
-									end)
-
-									wait()
-									if not ExecutablesDumped or ForceDumpExecutables == true or StarterGui.ResetPlayerGuiOnSpawn then
-										DumpExecutables(Player)
-										ExecutablesDumped = true
 									end
-								else
-									print(Configuration.PrintHeader .. "is not int he game. Cannot finish load.")
+								end)
+
+								if not ExecutablesDumped or ForceDumpExecutables == true or StarterGui.ResetPlayerGuiOnSpawn then
+									wait() -- On respawn for some reason, this wait is needed. 
+									DumpExecutables(Player)
+									ExecutablesDumped = true
 								end
 							else
-								print(Configuration.PrintHeader .. " is not in the game. Cannot load.")
-							end
-						end
-					end
-
-					local function LoadSplashScreen()
-						--- Load's the splash screen into the player
-
-						if Configuration.SplashScreen and (not Configuration.EnableFiltering or Configuration.SoloTestMode) then
-							PlayerSplashScreen = GenerateInitialSplashScreen(Player)
-
-							if Configuration.SoloTestMode then
-								Network.AddSplashToNevermore(NevermoreEngine)
-							end
-						end
-					end
-
-					local function InitialCharacterLoad()
-						-- Makes sure the character loads, and sets up the character if it has already loaded
-
-						if not Player.Character then -- Incase the characters do start auto-loading. 
-							if PlayerSplashScreen then
-								PlayerSplashScreen.Parent = nil;
-							end
-						
-							if Configuration.CustomCharacters then
-								Player:LoadCharacter()
-								if not Player.Character then
-									Player.CharacterAdded:wait()
-								end
-								Player.Character:Destroy()
-							else
-								Player:LoadCharacter()
-							end
-
-							if PlayerSplashScreen then
-								PlayerSplashScreen.Parent = Player.PlayerGui
+								print(Configuration.PrintHeader .. "is not int he game. Cannot finish load.")
 							end
 						else
-							SetupCharacter(true) -- Force dump on the first load. 
+							print(Configuration.PrintHeader .. " is not in the game. Cannot load.")
 						end
 					end
-
-					-- WHAT MUST HAPPEN
-					-- Character must be loaded at least once
-					-- Nevermore must run on the client to get a splash running. However, this can be seen as optinoal. 
-					-- Nevermore must load the splash into the player. 
-
-					-- SETUP EVENT FIRST
-					Player.CharacterAdded:connect(SetupCharacter)
-					InitialCharacterLoad() -- Force load the character, no matter what.
-					LoadSplashScreen()
 				end
-			end)
+
+				local function LoadSplashScreen()
+					--- Load's the splash screen into the player
+
+					if Configuration.SplashScreen then
+						PlayerSplashScreen = GenerateInitialSplashScreen(Player)
+
+						if Configuration.SoloTestMode then
+							Network.AddSplashToNevermore(NevermoreEngine)
+						end
+					end
+				end
+
+				local function InitialCharacterLoad()
+					-- Makes sure the character loads, and sets up the character if it has already loaded
+
+					if not Player.Character then -- Incase the characters do start auto-loading. 
+						if PlayerSplashScreen then
+							PlayerSplashScreen.Parent = nil
+						end
+					
+						if Configuration.CustomCharacters then
+							Player:LoadCharacter()
+							if not Player.Character then
+								-- Player.CharacterAdded:wait()
+
+								-- Fixes potential infinite yield. 
+								while not Player.Character and Player:IsDescendantOf(Players) do
+									wait()
+								end
+							end
+
+							if Player:IsDescendantOf(Players) then
+								Player.Character:Destroy()
+							end
+						else
+							Player:LoadCharacter()
+						end
+
+						if PlayerSplashScreen then
+							PlayerSplashScreen.Parent = Player.PlayerGui
+						end
+					else
+						SetupCharacter(true) -- Force dump on the first load. 
+					end
+				end
+
+				-- WHAT MUST HAPPEN
+				-- Character must be loaded at least once
+				-- Nevermore must run on the client to get a splash running. However, this can be seen as optinoal. 
+				-- Nevermore must load the splash into the player. 
+
+				-- SETUP EVENT FIRST
+				Player.CharacterAdded:connect(SetupCharacter)
+				InitialCharacterLoad() -- Force load the character, no matter what.
+				LoadSplashScreen()
+			end
 		end
 
 		local function ConnectPlayers()
 			--- Connects all the events and adds players into the system. 
 
+			Network.ConnectPlayers = nil -- Only do this once!
+
 			-- Setup all the players that joined...
 			for _, Player in pairs(game.Players:GetPlayers()) do
-				SetupPlayer(Player)
+				coroutine.resume(coroutine.create(function()
+					SetupPlayer(Player)
+				end))
 			end
 
 			-- And when they are added...
@@ -1226,21 +1244,51 @@ do
 
 			local Splash = {}
 
-			local IsActive = true;
-			local MainFrame = ScreenGui.SplashScreen
+			local IsActive      = true
+			local MainFrame     = ScreenGui.SplashScreen
 			local ParticalFrame = MainFrame.ParticalFrame
-			local ParticalList = {}
+			local LogoLabel     = MainFrame.LogoLabel
+			local ParticalList  = {}
 
 			local function Destroy()
 				-- Can be called to Destroy the SplashScreen. Will have the Alias
 				-- ClearSplash in NevermoreEngine
 
 				IsActive = false;
-				ScreenGui:Destroy()
+				MainFrame:Destroy()
+
+				if ScreenGui then
+					ScreenGui:Destroy()
+				end
 			end
 			Splash.Destroy = Destroy
 
+			local function SetParent(NewParent)
+				-- Used to fix rendering issues with multiple ScreenGuis.
+				MainFrame.Parent = NewParent
+
+				if ScreenGui then
+					ScreenGui:Destroy()
+					ScreenGui = nil
+				end
+			end
+			Splash.SetParent = SetParent
+
 			Spawn(function()
+				LogoLabel.ImageTransparency = 1
+				ContentProvider:Preload(SplashConfiguration.LogoTexture)
+				while IsActive and (ContentProvider.RequestQueueSize > 0) do
+					RunService.RenderStepped:wait()
+				end
+
+				Spawn(function()
+					while IsActive and LogoLabel.ImageTransparency >= 0 do
+						LogoLabel.ImageTransparency = LogoLabel.ImageTransparency - 0.05
+						RunService.RenderStepped:wait()
+					end
+					LogoLabel.ImageTransparency = 0
+				end)
+
 				if IsActive then
 					local function MakePartical(Parent, RotationRadius, Size, Texture)
 						-- Creates a partical that will circle around the center of it's Parent.  
@@ -1365,12 +1413,12 @@ do
 								Partical:SetPosition(GetTransitionedPercent(630, 760, EaseOut(GetFramePercent(0.92, 1, CurrentPercent), 1.1)))
 							end
 						end
-						wait()
+						RunService.RenderStepped:wait()
 					end
 				end
 			end)
 
-			return Splash;
+			return Splash
 		end
 
 		local function SetupSplashScreenIfEnabled()
@@ -1394,38 +1442,49 @@ do
 
 			if Configuration.SplashScreen and ScreenGui then
 				SplashEnabled = true
-				SplashScreen = AnimateSplashScreen(ScreenGui)
+				SplashScreen  = AnimateSplashScreen(ScreenGui)
 			elseif Configuration.SplashScreen and Configuration.EnableFiltering and not Configuration.SoloTestMode then
 				SplashEnabled = true
-				ScreenGui = GenerateInitialSplashScreen(LocalPlayer)
-				SplashScreen = AnimateSplashScreen(ScreenGui)
+				ScreenGui     = GenerateInitialSplashScreen(LocalPlayer)
+				SplashScreen  = AnimateSplashScreen(ScreenGui)
 			else
 				print(Configuration.PrintHeader .. "Splash Screen could not be found, or is not enabled")
 			end
 
 			local function ClearSplash()
-				print(Configuration.PrintHeader .. "Clearing splash.")
+				-- print(Configuration.PrintHeader .. "Clearing splash.")
 
 				--- Destroys and stops all animation of the current splashscreen, if it exists.
 				if SplashScreen then
 					SplashEnabled = false
 					SplashScreen.Destroy()
 					SplashScreen = nil;
-				--else
-					--print(Configuration.PrintHeader .. "No splash to clear.")
 				end
 			end
 
 			local function GetSplashEnabled()
 				return SplashEnabled
 			end
+
+			local function SetSplashParent(NewParent)
+				assert(NewParent:IsDescendantOf(game), Configuration.PrintHeader .. "New parent must be a descendant of of game")
+
+				if SplashScreen then
+					SplashScreen.SetParent(NewParent)
+				else
+					warn(Configuration.PrintHeader .. "Could not set NewParent, Splash Screen could not be found, or is not enabled")
+				end
+			end
 			
-			return ClearSplash, GetSplashEnabled
+			return ClearSplash, GetSplashEnabled, SetSplashParent
 		end
 		-- Network.SetupSplashScreenIfEnabled = SetupSplashScreenIfEnabled
 
 		local function AddSplashToNevermore(NevermoreEngine)
-			local ClearSplash, GetSplashEnabled = SetupSplashScreenIfEnabled()
+			local ClearSplash, GetSplashEnabled, SetSplashParent = SetupSplashScreenIfEnabled()
+
+			NevermoreEngine.SetSplashParent = SetSplashParent
+			NevermoreEngine.setSplashParent = SetSplashParent
 
 			NevermoreEngine.ClearSplash  = ClearSplash
 			NevermoreEngine.clearSplash  = ClearSplash
@@ -1504,14 +1563,14 @@ NevermoreEngine.GetDataStreamObject     = ResouceManager.GetDataStreamObject
 NevermoreEngine.getDataStreamObject     = ResouceManager.GetDataStreamObject
 NevermoreEngine.get_data_stream_object  = ResouceManager.GetDataStreamObject
 
-NevermoreEngine.GetRemoteFunction     = ResouceManager.GetDataStreamObject -- Uh, yeah, why haven't I done this before?
+NevermoreEngine.GetRemoteFunction       = ResouceManager.GetDataStreamObject -- Uh, yeah, why haven't I done this before?
 
 
 NevermoreEngine.GetEventStreamObject    = ResouceManager.GetEventStreamObject
 NevermoreEngine.getEventStreamObject    = ResouceManager.GetEventStreamObject
 NevermoreEngine.get_event_stream_object = ResouceManager.GetEventStreamObject
 
-NevermoreEngine.GetRemoteEvent    = ResouceManager.GetEventStreamObject
+NevermoreEngine.GetRemoteEvent          = ResouceManager.GetEventStreamObject
 
 
 NevermoreEngine.GetDataStream           = Network.GetDataStream
@@ -1537,6 +1596,8 @@ NevermoreEngine.replicated_package      = ReplicatedPackage
 
 if Configuration.IsServer then
 	local function Initiate()
+		--- Called up by the loader. 
+
 		--print(Configuration.PrintHeader .. "Nevermore is initiating.")
 		--- Initiates Nevermore. This should only be called once. 
 		-- Since Nevermore sets all of its executables, and executes them manually, 
@@ -1560,8 +1621,8 @@ else
 	ResouceManager.PopulateResourceCache()
 	Network.AddSplashToNevermore(NevermoreEngine)
 end	
-	--print(Configuration.PrintHeader .. "Nevermore is initiated successfully."
 
+--print(Configuration.PrintHeader .. "Nevermore is initiated successfully."
 --print(Configuration.PrintHeader .. "#ReturnValues = ".. (#ReturnValues))
 
 return NevermoreEngine

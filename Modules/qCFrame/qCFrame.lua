@@ -6,7 +6,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local qInstance         = LoadCustomLibrary("qInstance")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -327,7 +327,20 @@ lib.pointInsidePart = PointInsidePart
 
 local FindPartOnRayWithIgnoreList = Workspace.FindPartOnRayWithIgnoreList
 
-local function AdvanceRaycast(RayTrace, IgnoreList, IgnoreInvisible, IgnoreCanCollideFalse, TerrainCellsAreCubes, MaximumCastCount)
+local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, IgnoreCanCollideFalse, TerrainCellsAreCubes, MaximumCastCount, CustomCondition)
+	-- @param TransparencyThreshold The transparency a part can be for it to be counted. For example, if TransparencyThreshold is 0.25, and a part is 0.24 transparency then it will be counted as solid, otherwise if it
+	--                              is 0.26 then it will be counted as transparent.
+	--                              If you don't want to hit transparent parts, then you can set it to -math.huge.
+	--                              TransparencyThreshold should not be above 1, probably. 
+	-- @param [CustomCondition] A function that can be defined to create a custom condition (such as making sure a character is hit)
+		-- CustomCondition(HitObject, Position)
+			-- @return boolean If true, then it will automatically abort the cycle and return. 
+
+	assert(type(MaximumCastCount) == "number", "MaximumCastCount is not a number")
+	assert(type(TransparencyThreshold) == "number", "TransparencyThreshold must be a number")
+
+	--print(TransparencyThreshold)
+
 	local ContinueCasting = true;
 	local CastCount = 0
 
@@ -341,11 +354,13 @@ local function AdvanceRaycast(RayTrace, IgnoreList, IgnoreInvisible, IgnoreCanCo
 		local Object, Position = FindPartOnRayWithIgnoreList(Workspace, NewRayTrace, IgnoreList, TerrainCellsAreCubes)
 
 		if Object and Position then
-			if IgnoreCanCollideFalse and Object.CanCollide == false then
+			if CustomCondition and CustomCondition(Object, Position) then
+				return Object, Position
+			elseif IgnoreCanCollideFalse and Object.CanCollide == false then
 				IgnoreList[#IgnoreList+1] = Object
 				CastCount = CastCount + 1
 				return CastAttempt(NewRayTrace)
-			elseif IgnoreInvisible and Object.Transparency >= 1 then
+			elseif TransparencyThreshold and Object.Transparency >= TransparencyThreshold then
 				IgnoreList[#IgnoreList+1] = Object
 				CastCount = CastCount + 1
 				return CastAttempt(NewRayTrace)
@@ -364,7 +379,7 @@ local function AdvanceRaycast(RayTrace, IgnoreList, IgnoreInvisible, IgnoreCanCo
 	while CastedMagnitude < Magnitude do
 		local ToCastMagnitude = Magnitude - CastedMagnitude + 1
 
-		if ToCastMagnitude > 999 then
+		if ToCastMagnitude > 999.5 then
 			ToCastMagnitude = 999
 		end
 
@@ -378,7 +393,7 @@ local function AdvanceRaycast(RayTrace, IgnoreList, IgnoreInvisible, IgnoreCanCo
 		CastedMagnitude = CastedMagnitude + ToCastMagnitude
 
 		if CastCount > MaximumCastCount then
-			--print("[AdvanceRaycast] - Reached maximum cast count @ " .. CastCount)
+			print("[AdvanceRaycast] - Reached maximum cast count @ " .. CastCount)
 			return nil
 		end
 	end

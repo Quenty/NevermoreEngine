@@ -51,16 +51,16 @@ utils.dir_separator = _G.package.config:sub(1,1)
 -- @param code The exit code or a message to be printed
 -- @param ... extra arguments for message's format'
 -- @see utils.fprintf
-function utils.quit(code,...)
-    if type(code) == 'string' then
-        utils.fprintf(io.stderr,code,...)
-        code = -1
-    else
-        utils.fprintf(io.stderr,...)
-    end
-    io.stderr:write('\n')
-    os.exit(code)
-end
+-- function utils.quit(code,...)
+--     if type(code) == 'string' then
+--         utils.fprintf(io.stderr,code,...)
+--         code = -1
+--     else
+--         utils.fprintf(io.stderr,...)
+--     end
+--     io.stderr:write('\n')
+--     os.exit(code)
+-- end
 
 --- print an arbitrary number of arguments using a format.
 -- @param fmt The format (see string.format)
@@ -145,16 +145,16 @@ local raise
 -- @param filename The file path
 -- @param is_bin open in binary mode
 -- @return file contents
-function utils.readfile(filename,is_bin)
-    local mode = is_bin and 'b' or ''
-    utils.assert_string(1,filename)
-    local f,err = io.open(filename,'r'..mode)
-    if not f then return utils.raise (err) end
-    local res,err = f:read('*a')
-    f:close()
-    if not res then return raise (err) end
-    return res
-end
+-- function utils.readfile(filename,is_bin)
+--     local mode = is_bin and 'b' or ''
+--     utils.assert_string(1,filename)
+--     local f,err = io.open(filename,'r'..mode)
+--     if not f then return utils.raise (err) end
+--     local res,err = f:read('*a')
+--     f:close()
+--     if not res then return raise (err) end
+--     return res
+-- end
 
 --- write a string to a file
 -- @param filename The file path
@@ -162,31 +162,31 @@ end
 -- @return true or nil
 -- @return error message
 -- @raise error if filename or str aren't strings
-function utils.writefile(filename,str)
-    utils.assert_string(1,filename)
-    utils.assert_string(2,str)
-    local f,err = io.open(filename,'w')
-    if not f then return raise(err) end
-    f:write(str)
-    f:close()
-    return true
-end
+-- function utils.writefile(filename,str)
+--     utils.assert_string(1,filename)
+--     utils.assert_string(2,str)
+--     local f,err = io.open(filename,'w')
+--     if not f then return raise(err) end
+--     f:write(str)
+--     f:close()
+--     return true
+-- end
 
 --- return the contents of a file as a list of lines
 -- @param filename The file path
 -- @return file contents as a table
 -- @raise errror if filename is not a string
-function utils.readlines(filename)
-    utils.assert_string(1,filename)
-    local f,err = io.open(filename,'r')
-    if not f then return raise(err) end
-    local res = {}
-    for line in f:lines() do
-        append(res,line)
-    end
-    f:close()
-    return res
-end
+-- function utils.readlines(filename)
+--     utils.assert_string(1,filename)
+--     local f,err = io.open(filename,'r')
+--     if not f then return raise(err) end
+--     local res = {}
+--     for line in f:lines() do
+--         append(res,line)
+--     end
+--     f:close()
+--     return res
+-- end
 
 --- split a string into a list of strings separated by a delimiter.
 -- @param s The input string
@@ -300,14 +300,14 @@ end
 -- @param cmd a shell command
 -- @return true if successful
 -- @return actual return code
-function utils.execute (cmd)
-    local res1,res2,res2 = os.execute(cmd)
-    if lua51 then
-        return res1==0,res1
-    else
-        return res1,res2
-    end
-end
+-- function utils.execute(cmd)
+--     local res1,res2,res2 = os.execute(cmd)
+--     if lua51 then
+--         return res1==0,res1
+--     else
+--         return res1,res2
+--     end
+-- end
 
 if lua51 then
     function table.pack (...)

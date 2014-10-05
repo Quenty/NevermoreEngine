@@ -16,51 +16,55 @@ API:
 
 local lib = {}
  
-local index = {
-	GiveTask = function(self,task)
-		local n = #self.Tasks+1
-		self.Tasks[n] = task
-		return n
-	end;
-	DoCleaning = function(self)
-		local tasks = self.Tasks
-		for name,task in pairs(tasks) do
-			if type(task) == 'function' then
-				task()
-			else
-				task:disconnect()
+local MakeMaid do
+	local index = {
+		GiveTask = function(self, task)
+			local n = #self.Tasks+1
+			self.Tasks[n] = task
+			return n
+		end;
+		DoCleaning = function(self)
+			local tasks = self.Tasks
+			for name,task in pairs(tasks) do
+				if type(task) == 'function' then
+					task()
+				else
+					task:disconnect()
+				end
+				tasks[name] = nil
 			end
-			tasks[name] = nil
-		end
-		-- self.Tasks = {}
-	end;
-};
-local mt = {
-	__index = function(self,k)
-		if index[k] then
-			return index[k]
-		else
-			return self.Tasks[k]
-		end
-	end;
-	__newindex = function(self,k,v)
-		local tasks = self.Tasks
-		if v == nil then
-			-- disconnect if the task is an event
-			if type(tasks[k]) ~= 'function' then
-				tasks[k]:disconnect()
-			end
-		elseif tasks[k] then
-			-- clear previous task
-			self[k] = nil
-		end
-		tasks[k] = v
-	end;
-}
+			-- self.Tasks = {}
+		end;
+	};
 
-local function MakeMaid()
-	return setmetatable({Tasks={},Instances={}},mt)
+	local mt = {
+		__index = function(self, k)
+			if index[k] then
+				return index[k]
+			else
+				return self.Tasks[k]
+			end
+		end;
+		__newindex = function(self, k, v)
+			local tasks = self.Tasks
+			if v == nil then
+				-- disconnect if the task is an event
+				if type(tasks[k]) ~= 'function' and tasks[k] then
+					tasks[k]:disconnect()
+				end
+			elseif tasks[k] then
+				-- clear previous task
+				self[k] = nil
+			end
+			tasks[k] = v
+		end;
+	}
+
+	function MakeMaid()
+		return setmetatable({Tasks={},Instances={}},mt)
+	end
 end
+
 lib.MakeMaid = MakeMaid
 lib.makeMaid = MakeMaid
 lib.new = MakeMaid

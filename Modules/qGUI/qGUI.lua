@@ -22,7 +22,7 @@ local qCFrame           = LoadCustomLibrary("qCFrame")
 local Table             = LoadCustomLibrary("Table")
 local qColor3           = LoadCustomLibrary("qColor3")
 
-qSystems:import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -46,6 +46,9 @@ local COLORS = {
 --[[
 
 Change Log
+September 9th, 2014
+- Optimized tweening for GUIs with time less than 0
+
 February 15th, 2014
 - Updated TweenTransparency method to use single thread update model for efficiency.
 - Updated TweenColor3 method to use a single thread update model for efficiency.
@@ -122,16 +125,22 @@ end
 lib.Center = Center
 lib.center = center
 
-local function MouseOver(Mouse, Frame)
-	local TopBound 		= Frame.AbsolutePosition.Y
-	local BottomBound 	= Frame.AbsolutePosition.Y + Frame.AbsoluteSize.Y
-	local LeftBound		= Frame.AbsolutePosition.X
-	local RightBound		= Frame.AbsolutePosition.X + Frame.AbsoluteSize.X
-	if Mouse.Y > TopBound and Mouse.Y < BottomBound and Mouse.X > LeftBound and Mouse.X < RightBound then
+local function PointInBounds(Frame, X, Y)
+	local TopBound    = Frame.AbsolutePosition.Y
+	local BottomBound = Frame.AbsolutePosition.Y + Frame.AbsoluteSize.Y
+	local LeftBound   = Frame.AbsolutePosition.X
+	local RightBound  = Frame.AbsolutePosition.X + Frame.AbsoluteSize.X
+
+	if Y > TopBound and Y < BottomBound and X > LeftBound and X < RightBound then
 		return true
 	else
 		return false
 	end
+end
+lib.PointInBounds = PointInBounds
+
+local function MouseOver(Mouse, Frame)
+	return PointInBounds(Frame, Mouse.X, Mouse.Y)
 end
 lib.MouseOver = MouseOver
 lib.mouseOver = MouseOver
@@ -285,6 +294,9 @@ lib.PickRandomColor3 = PickRandomColor3
 lib.pickRandomColor3 = PickRandomColor3
 
 local TweenTransparency, StopTransparencyTween do
+	local IsLocal = game:FindService("MeshContentProvider") ~= nil or (game:FindService("NetworkServer") == nil)
+	print("[qGUI][IsLocal] - " .. tostring(IsLocal))
+
 	local ProcessList = {}
 	-- setmetatable(ProcessList, WEAK_MODE.K)
 	local ActivelyProcessing = false
@@ -331,8 +343,12 @@ local TweenTransparency, StopTransparencyTween do
 			Spawn(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
-					wait(0.05)
-					-- RunService.RenderStepped:wait(0.05)
+					-- wait(0.05)
+					if IsLocal then
+						RunService.RenderStepped:wait()
+					else
+						wait(0.05)
+					end
 				end
 			end)
 		end
@@ -350,23 +366,34 @@ local TweenTransparency, StopTransparencyTween do
 		-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
 
 		if not ProcessList[Gui] or Override then
-			-- Fill StartProperties
-			local StartProperties = {}
-			for Index, _ in pairs(NewProperties) do
-				StartProperties[Index] = Gui[Index]	
+			if Duration <= 0 then
+				warn("[TweenTransparency] - Duration <= 0")
+				SetProperties(Gui, 1, NewProperties, NewProperties)
+			else
+				-- Fill StartProperties
+				local StartProperties = {}
+				local CopiedNewProperties = {}
+
+				for Index, Value in pairs(NewProperties) do
+					if Gui[Index] ~= Value then
+						StartProperties[Index] = Gui[Index]
+						CopiedNewProperties[Index] = Value
+					-- else
+					-- 	warn("Number " .. Index .. " of " .. Gui:GetFullName() .. " is not changing. @" .. tostring(Value))
+					end
+				end
+
+				-- And set NewState
+				local NewState = {
+					StartTime       = tick();
+					Duration        = Duration or error("No duration");
+					StartProperties = StartProperties;
+					NewProperties   = CopiedNewProperties;
+				}
+
+				ProcessList[Gui] = NewState
+				StartProcessUpdate()
 			end
-
-			-- And set NewState
-			local NewState = {
-				StartTime       = tick();
-				Duration        = Duration or error("No duration");
-				-- Gui          = Gui;
-				StartProperties = StartProperties;
-				NewProperties   = NewProperties;
-			}
-
-			ProcessList[Gui] = NewState
-			StartProcessUpdate()
 		end
 	end
 
@@ -386,6 +413,7 @@ local TweenTransparency, StopTransparencyTween do
 end
 
 local TweenColor3, StopColor3Tween do
+	local IsLocal = game:FindService("MeshContentProvider") ~= nil or (game:FindService("NetworkServer") == nil)
 	local ProcessList = {}
 	-- setmetatable(ProcessList, WEAK_MODE.K)
 	local ActivelyProcessing = false
@@ -433,8 +461,12 @@ local TweenColor3, StopColor3Tween do
 			Spawn(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
-					wait(0.05)
-					-- RunService.RenderStepped:wait(0.05)
+					-- wait(0.05)
+					if IsLocal then
+						RunService.RenderStepped:wait()
+					else
+						wait(0.05)
+					end
 				end
 			end)
 		end
@@ -451,23 +483,33 @@ local TweenColor3, StopColor3Tween do
 		-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
 
 		if not ProcessList[Gui] or Override then
-			-- Fill StartProperties
-			local StartProperties = {}
-			for Index, _ in pairs(NewProperties) do
-				StartProperties[Index] = Gui[Index]	
+			if Duration <= 0 then
+				SetProperties(Gui, 1, NewProperties, NewProperties)
+			else
+				-- Fill StartProperties
+				local StartProperties = {}
+				local CopiedNewProperties = {}
+
+				for Index, Value in pairs(NewProperties) do
+					if Gui[Index] ~= Value then
+						StartProperties[Index] = Gui[Index]
+						CopiedNewProperties[Index] = Value
+					-- else
+					-- 	warn("Color3", Index, " of", Gui:GetFullName(), " is not changing")
+					end
+				end
+
+				-- And set NewState
+				local NewState = {
+					StartTime       = tick();
+					Duration        = Duration or error("No duration");
+					StartProperties = StartProperties;
+					NewProperties   = CopiedNewProperties;
+				}
+
+				ProcessList[Gui] = NewState
+				StartProcessUpdate()
 			end
-
-			-- And set NewState
-			local NewState = {
-				StartTime       = tick();
-				Duration        = Duration or error("No duration");
-				-- Gui          = Gui;
-				StartProperties = StartProperties;
-				NewProperties   = NewProperties;
-			}
-
-			ProcessList[Gui] = NewState
-			StartProcessUpdate()
 		end
 	end
 
@@ -485,8 +527,10 @@ local TweenColor3, StopColor3Tween do
 	lib.stopColor3Tween = StopColor3Tween
 end
 
-local function ResponsiveCircleClickEffect(Gui, X, Y, Time)
+local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect, OverrideSize)
 	--- Google design thing.
+	-- @param DoNotConstrainEffect If set to true, it will not constrain the effect within the GUI.
+	-- @param OverrideSize An overridden size.
 
 	Time = Time or 0.6;
 
@@ -498,15 +542,19 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time)
 
 	local StartDiameter = 6;
 
-	local ParentFrame                  = Instance.new("Frame", Gui)
-	ParentFrame.ClipsDescendants       = true;
-	ParentFrame.Archivable             = false;
-	ParentFrame.BorderSizePixel        = 0;
-	ParentFrame.BackgroundTransparency = 1;
-	ParentFrame.Name                   = "Circle_Effect";
-	ParentFrame.Size                   = UDim2.new(1, 0, 1, 0);
-	ParentFrame.ZIndex                 = Gui.ZIndex + 1
-	
+	local ParentFrame
+	if not DoNotConstrainEffect then
+		ParentFrame                        = Instance.new("Frame", Gui)
+		ParentFrame.ClipsDescendants       = true;
+		ParentFrame.Archivable             = false;
+		ParentFrame.BorderSizePixel        = 0;
+		ParentFrame.BackgroundTransparency = 1;
+		ParentFrame.Name                   = "Circle_Effect";
+		ParentFrame.Size                   = UDim2.new(1, 0, 1, 0);
+		ParentFrame.ZIndex                 = Gui.ZIndex + 1
+		ParentFrame.Parent                 = Gui;
+	end
+
 	local Circle                       = Instance.new("ImageLabel");
 	Circle.Image                       = "http://www.roblox.com/asset/?id=172318712"
 	Circle.Name                        = "Circle";
@@ -525,20 +573,27 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time)
 		Gui.SizeConstraint = "RelativeYY"
 	end
 
-	local NewDiameter = math.max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y)
-	local NewSize = UDim2.new(0, NewDiameter * 2.82842712475, 0,  NewDiameter * 2.82842712475)
+	local NewDiameter = OverrideSize or math.max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y) * 2 -- multiply times 2 because we want it resize for the whole time, and at 1/2 we expect it to fill the whole place.
+	local NewSize     = UDim2.new(0, NewDiameter * 2.82842712475, 0,  NewDiameter * 2.82842712475)
 	local NewPosition = UDim2.new(0, X - (NewDiameter * 1.41421356237), 0, Y - (NewDiameter * 1.41421356237))
 	
-	Circle.Parent                      = ParentFrame
-	ParentFrame.Parent                 = Gui;
+	Circle.Parent                      = ParentFrame or Gui
+	
 
-	Circle:TweenSizeAndPosition(NewSize, NewPosition, "Out", "Linear", Time/2, true)
+	Circle:TweenSizeAndPosition(NewSize, NewPosition, "Out", "Linear", Time, true)
 	TweenTransparency(Circle, {ImageTransparency = 0.5}, Time/3, true)
 	delay(Time/3, function()
 		TweenTransparency(Circle, {ImageTransparency = 1}, Time*2/3, true)
 		wait(Time*2/3 + 0.1)
-		ParentFrame:Destroy()
+
+		if ParentFrame then
+			ParentFrame:Destroy()
+		else
+			Circle:Destroy()
+		end
 	end)
+
+	return ParentFrame or Circle
 end
 lib.ResponsiveCircleClickEffect = ResponsiveCircleClickEffect
 
@@ -575,11 +630,11 @@ local function AddTexturedWindowTemplate(Frame, Radius, Type)
 		ZIndex                 = Frame.ZIndex;
 	});
 
-	local TopRight = Make(Type, {
+	local BottomLeft = Make(Type, {
 		Archivable             = false;
 		BackgroundColor3       = Frame.BackgroundColor3;
 		BorderSizePixel        = 0;
-		Name                   = "TopRight";
+		Name                   = "BottomLeft";
 		Parent                 = Frame;
 		Position               = UDim2.new(0, 0, 1, -Radius);
 		Size                   = UDim2.new(0, Radius, 0, Radius);
@@ -587,11 +642,11 @@ local function AddTexturedWindowTemplate(Frame, Radius, Type)
 		ZIndex                 = Frame.ZIndex;
 	});
 
-	local BottomLeft = Make(Type, {
+	local TopRight = Make(Type, {
 		Archivable             = false;
 		BackgroundColor3       = Frame.BackgroundColor3;
 		BorderSizePixel        = 0;
-		Name                   = "BottomLeft";
+		Name                   = "TopRight";
 		Parent                 = Frame;
 		Position               = UDim2.new(1, -Radius, 0, 0);
 		Size                   = UDim2.new(0, Radius, 0, Radius);
@@ -652,7 +707,7 @@ end
 lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 lib.addTexturedWindowTemplate = AddTexturedWindowTemplate
 
-local function AddNinePatch(Frame, Image, ImageSize, Radius, Type)
+local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	--- Makes a NinePatch in the frame, with the image. 
 	-- @param Frame The frame to texturize
 	-- @param Radius the radius you want the image to be at
@@ -667,7 +722,7 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type)
 	Middle.Size = UDim2.new(1, -Radius*2, 1, -Radius*2); -- Fix middle...
 	Middle.Position = UDim2.new(0, Radius, 0, Radius);
 
-	local MiddleTop = Make(Type)({
+	local MiddleTop = Make(Type, {
 		Archivable             = false;
 		BackgroundColor3       = Frame.BackgroundColor3;
 		BorderSizePixel        = 0;
@@ -679,7 +734,7 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type)
 		ZIndex                 = Frame.ZIndex;
 	});
 
-	local MiddleBottom = Make(Type)({
+	local MiddleBottom = Make(Type, {
 		Archivable             = false;
 		BackgroundColor3       = Frame.BackgroundColor3;
 		BorderSizePixel        = 0;
@@ -713,5 +768,14 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type)
 end
 lib.AddNinePatch = AddNinePatch
 lib.addNinePatch = AddNinePatch
+
+local function BackWithRoundedRectangle(Frame, Radius, Color)
+	Color = Color or Color3.new(1, 1, 1);
+
+	AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {
+		ImageColor3 = Color;
+	})
+end
+lib.BackWithRoundedRectangle = BackWithRoundedRectangle
 
 return lib

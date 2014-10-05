@@ -347,7 +347,7 @@ end
 
 MatchString = MatchString.."]";
 
-function lib.GetFormatedTime(Format, CurrentTime)
+function lib.GetFormattedTime(Format, CurrentTime)
 	CurrentTime = CurrentTime or tick();
 	
 	local ReturnString = Format;

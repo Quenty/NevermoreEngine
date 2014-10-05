@@ -82,12 +82,12 @@ Loading on the server and the client may be done by using the following code:
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Nevermore         = require(ReplicatedStorage:WaitForChild("NevermoreEngine")))
+local Nevermore         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 ```
 
 However, it should be noted that Nevermore will appear in 

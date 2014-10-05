@@ -5,7 +5,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary('qSystems')
 local qCFrame           = LoadCustomLibrary('qCFrame')
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -118,106 +118,5 @@ end
 lib.TweenCamera = TweenCamera
 lib.tweenCamera = TweenCamera
 
-local AdvanceRaycast = qCFrame.AdvanceRaycast
-
-local MakeCameraSystem = Class(function(CameraSystem, Player)
-	local CurrentState
-	local States = {}
-
-	local IgnoreList = {}
-	setmetatable(IgnoreList, {__mode = "k"})
-
-	local function SetCurrentState(Name)
-		if States[Name] then
-			if CurrentState.OnStop then
-				CurrentState:OnStop(Player, Mouse, Camera)
-			end
-			CurrentState = States[Name]
-			if CurrentState.OnStart then
-				CurrentState:OnStart(Player, Mouse, Camera)
-			end
-		elseif Name == "Custom" then
-			CurrentState = nil
-		else
-			error("State "..Name.." does not exist")
-		end
-	end
-
-	do
-		local SquareRootOf3 = math.sqrt(3)
-
-		States.TopDown = {
-			Configuration = {
-				RotationGoal = 90;
-				RotationCurrent = 90;
-				Zoom = 10;
-				CurrentCoordinateFrame = Workspace.CurrentCamera.CoordinateFrame.p
-			};
-			RaycastIgnoreList = {Character, Camera};
-			Step = function(self, Player, Mouse, Camera)
-				if CheckCharacter(Player) then
-					local Configuration = self.Configuration
-					local Tilt = RoundNumber(Configuration.RotationGoal, 90)/90%4
-					local ZoomLevel = Configuration.Zoom + 10
-
-					Configuration.RotationCurrent = Configuration.RotationCurrent - (RotationCurrent - RotationGoal) * 0.2
-					local Inverse     = Configuration.RotationGoal < 180 and 180 or -180
-					local PositionOne = Player.Character.Head.Position * Vector3.new(1, 0, 1);
-					local PositionTwo = PositionOne + Vector3.new((Mouse.X/Mouse.ViewSizeX - 0.5) * (Inverse/90), 0, (Mouse.Y/Mouse.ViewSizeY - 0.5) * (Inverse/90)) * Vector3.new(30, 0, 30)
-					local Distance    = -math.min((PositionOne - PositionTwo).magnitude, 80)/2
-					local MidPoint    = CFrame.new(PositionOne, PositionTwo) * CFrame.new(Tilt % 2 == 1 and Distance or 0, 0, Tilt % 2 == 0 and Distance or 0)
-					local CameraGoal  = MidPoint.p + Vector3.new(0, Player.Character.head.Position.Y + SquareRootOf3 * ZoomLevel * 0.5)
-					if Tilt == 1 then
-						CameraGoal = CameraGoal + Vector3.new(ZoomLevel * 0.5, 0, 0)
-					elseif Tilt == 3 then
-						CameraGoal = CameraGoal + Vector3.new(-ZoomLevel * 0.5, 0, 0)
-					elseif Tilt == 0 then
-						CameraGoal = CameraGoal + Vector3.new(0, 0, ZoomLevel * 0.5)
-					elseif Tilt == 2 then
-						CameraGoal = CameraGoal + Vector3.new(0, 0, -ZoomLevel * 0.5)
-					end
-					local RayDestination = (CameraGoal - Character.Head.Position)
-					local Checker = Ray.new(Character.Head.Position, RayDestination)
-					local Hit, Position = AdvanceRaycast(Ray, self.RaycastIgnoreList, true, true)
-					if Hit and Position then
-						CameraGoal = CameraGoal - (RayDestination.unit * 1)
-					end
-					Camera.CoordinateFrame = CFrame.new(Configuration.CurrentCoordinateFrame - (Configuration.CurrentCoordinateFrame - CameraGoal) * Vector3.new(0.2, 0.2, 0.2)) * CFrame.Angles(0, math.rad(Configuration.RotationCurrent), 0) * CFrame.Angles(math.rad(-60), 0, 0);
-					Configuration.CurrentCoordinateFrame = Camera.CoordinateFrame.p
-				else
-					print("[CameraSystem] - CharacterCheck failed, resetting to custom system.")
-					SetCurrentState("Custom")
-				end
-			end;
-		}
-	end
-
-	States.FirstPerson = {
-		OnStart = function(Player, Mouse, Camera)
-			Player.CameraMode = "Classic";
-			Player.CameraMode = "LockFirstPerson";
-		end;
-		OnStop = function(Player, Mouse, Camera)
-			Player.CameraMode = "LockFirstPerson";
-			Player.CameraMode = "Classic";
-		end;
-	}
-
-	CameraSystem.SetCurrentState = SetCurrentState
-
-	local function Step(Mouse)
-		if CurrentState and CurrentState.Step then
-			local Camera = Workspace.CurrentCamera
-			local CoordinateFrame, Focus = CurrentState:Step(Player, Mouse, Camera) -- Returns instead of setting directly to enable tweening.
-			if CoordinateFrame then
-				Camera.CoordinateFrame = CoordinateFrame
-			end
-			if Focus then
-				Camera.Focus = Focus
-			end
-		end
-	end
-	CameraSystem.Step = Step
-end)
 
 return lib

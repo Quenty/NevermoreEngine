@@ -1,13 +1,15 @@
 local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local RunService        = game:GetService("RunService")
+
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary('qSystems')
-local qGUI              = LoadCustomLibrary('qGUI')
+local qSystems          = LoadCustomLibrary("qSystems")
+local qGUI              = LoadCustomLibrary("qGUI")
+local Maid              = LoadCustomLibrary("Maid")
 
-qSystems:import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 -- ScrollBar library
 -- Change Log --
@@ -96,7 +98,7 @@ local MakeKineticModel = Class(function(KineticModel, ContainerFrame, ContentFra
 		self.Maximum = End
 	end
 
-	function KineticModel:GetRange(Start, End)
+	function KineticModel:GetRange()
 		-- Return's the range...
 
 		return self.Minimum, self.Maximum
@@ -325,6 +327,7 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 
 	-- Axis: Char 'X' or Char 'Y'
 	Axis = Axis or 'Y';
+	local ScrollMaid = Maid.MakeMaid()
 
 	--[[
 		Positioning is based on some super hacky negative scale
@@ -356,7 +359,6 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 	local KineticModel       = MakeKineticModel()
 	local Pressed            = false
 	local ScrollbarPressed -- Hold's a 'Scrollbar' object. 
-	-- local MouseScrollEnabled = false -- Can we use the mouse wheel to scroll around? Glitches in First Person. 
 	local ReferencePosition  = 0 -- Reference position to the last 'Drag' position, and then calculate velocity from this. :D
 	local MouseDrag          = qGUI.GenerateMouseDrag() -- A big GUI to capture Mouse.Moved()
 	local Mouse              = Players.LocalPlayer:GetMouse()
@@ -645,19 +647,19 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 			Backing.BackgroundTransparency = 0.5;
 		end
 
-		Bar.MouseButton1Down:connect(Scrollbar.StartDrag) -- Hookup events...
-		Bar.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
+		ScrollMaid[tostring(ScrollBar) .. "BarMouseButton1Down"] = Bar.MouseButton1Down:connect(Scrollbar.StartDrag) -- Hookup events...
+		ScrollMaid[tostring(ScrollBar) .. "BarMouseButton1Up"] = Bar.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
 
 		ScrollBarContainer.Active = true
 		if ScrollBarContainer:IsA("GuiButton") then
 			-- These events actually do have to be hooked up, if the container is a thing.
-			ScrollBarContainer.MouseButton1Down:connect(Scrollbar.MouseDownOnWhitespace) -- Hookup events...
-			ScrollBarContainer.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
-			ScrollBarContainer.MouseEnter:connect(Scrollbar.OnEnterDisplay)
-			ScrollBarContainer.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
+			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseButton1Down"] = ScrollBarContainer.MouseButton1Down:connect(Scrollbar.MouseDownOnWhitespace) -- Hookup events...
+			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseButton1Up"] = ScrollBarContainer.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
+			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseEnter"] = ScrollBarContainer.MouseEnter:connect(Scrollbar.OnEnterDisplay)
+			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseLeave"] = ScrollBarContainer.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
 		else
-			Bar.MouseEnter:connect(Scrollbar.OnEnterDisplay)
-			Bar.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
+			ScrollMaid[tostring(ScrollBar) .. "BarMouseEnter"] = Bar.MouseEnter:connect(Scrollbar.OnEnterDisplay)
+			ScrollMaid[tostring(ScrollBar) .. "BarMouseLeave"] = Bar.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
 		end
 		Scrollbar.ResizeBar()
 		Scrollbars[#Scrollbars+1] = Scrollbar -- Add the scrollbar 'Object' to the list of scrollbars. 
@@ -700,29 +702,43 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 		-- 		Scrollbar.OnLeaveDisplay()
 		-- 	end--]]
 		-- end)
-		Content.MouseButton1Down:connect(Scroller.StartDrag)
+		ScrollMaid.DatContentMouseButton1Down = Content.MouseButton1Down:connect(Scroller.StartDrag)
 	end
 
-	Content.MouseWheelForward:connect(function()
+	ScrollMaid.ContentMouseWheelForward = Content.MouseWheelForward:connect(function()
 		--print("[Scroller] - Wheel Move Forward")
 		Scroller.ScrollUp()
 	end)
-	Content.MouseWheelBackward:connect(function()
+	ScrollMaid.ContentMouseWheelBackward = Content.MouseWheelBackward:connect(function()
 		--print("[Scroller] - Wheel Move Backwards")
 		Scroller.ScrollDown()
 	end)
 
 	--MouseDrag.MouseMoved:connect(Scroller.Drag)
-	MouseDrag.MouseButton1Up:connect(function()
+	ScrollMaid.MouseDragButton1Up = MouseDrag.MouseButton1Up:connect(function()
 		Scroller.StopDrag()
 	end)
-	Container.Changed:connect(OnAbsoluteSizeAdjust)
-	Content.Changed:connect(OnAbsoluteSizeAdjust)
+	ScrollMaid.ConainerChangedEvent = Container.Changed:connect(OnAbsoluteSizeAdjust)
+	ScrollMaid.ContentChangedEvent = Content.Changed:connect(OnAbsoluteSizeAdjust)
 
 	Scroller:AdjustRange()
 
 	KineticModel.OnScrollStop = function(Position)
 		Scroller.ScrollFinished:fire(KineticModel.DisplayPosition)
+	end
+
+	function Scroller:Destroy()
+		KineticModel:ResetSpeed()
+		KineticModel = nil
+
+		StopStepEvent()
+		MouseDrag:Destroy()
+
+		ScrollMaid:DoCleaning()
+		ScrollMaid = nil
+
+		Scroller.Destroy = nil
+		Scroller = nil
 	end
 end)
 lib.MakeScroller = MakeScroller

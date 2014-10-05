@@ -1,22 +1,23 @@
-local ReplicatedStorage        = game:GetService("ReplicatedStorage")
-local Players                  = game:GetService("Players")
-local LogService               = game:GetService("LogService")
-local ScriptContext            = game:GetService("ScriptContext")
+local ReplicatedStorage           = game:GetService("ReplicatedStorage")
+local Players                     = game:GetService("Players")
+local LogService                  = game:GetService("LogService")
+local ScriptContext               = game:GetService("ScriptContext")
 
-local NevermoreEngine          = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary        = NevermoreEngine.LoadLibrary
+local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
 
-local qSystems                 = LoadCustomLibrary("qSystems")
-local PseudoChatSettings       = LoadCustomLibrary("PseudoChatSettings")
-local PseudoChatParser         = LoadCustomLibrary("PseudoChatParser")
-local OutputClassStreamLoggers = LoadCustomLibrary("OutputClassStreamLoggers")
-local OutputStream             = LoadCustomLibrary("OutputStream")
-local qString                  = LoadCustomLibrary("qString")
-local AuthenticationServiceServer    = LoadCustomLibrary("AuthenticationServiceServer")
+local qSystems                    = LoadCustomLibrary("qSystems")
+local PseudoChatSettings          = LoadCustomLibrary("PseudoChatSettings")
+local PseudoChatParser            = LoadCustomLibrary("PseudoChatParser")
+local OutputClassStreamLoggers    = LoadCustomLibrary("OutputClassStreamLoggers")
+local OutputStream                = LoadCustomLibrary("OutputStream")
+local qString                     = LoadCustomLibrary("qString")
+local AuthenticationServiceServer = LoadCustomLibrary("AuthenticationServiceServer")
+local qPlayer                     = LoadCustomLibrary("qPlayer")
 
 -- local ShipKillFeedParser       = LoadCustomLibrary("ShipKillFeedParser")
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 
 -- PseudoChatManagerServer.lua
 -- Manages chat connections, sends and making chats, filtering, et cetera.
@@ -25,6 +26,9 @@ qSystems:Import(getfenv(0))
 -- Last modified Janurary 19th, 2014
 
 --[[-- Change Log --
+September 9th, 2014
+- Added team chat
+
 Febraury 6th, 2015
 - Updated to use AuthenticationServiceServer
 - Modified AdminOutput to not use filter
@@ -51,33 +55,42 @@ local PseudoChatManager = {} do
 	local ClientToServerOutputStream = NevermoreEngine.GetEventStream("ClientToServerOutputStream")
 
 	local ChatChannel = OutputStream.MakeOutputStreamServer(
-		OutputClassStreamLoggers.MakeGlobalOutputStreamLog(PseudoChatSettings.BufferSize),
-		"ChatChannel"
-	);
-	ChatChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
-	ChatChannel.AddOutputClass(PseudoChatParser.ChatOutputClass)
+			OutputClassStreamLoggers.MakeGlobalOutputStreamLog(PseudoChatSettings.BufferSize),
+			"ChatChannel"
+		)
+		ChatChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
+		ChatChannel.AddOutputClass(PseudoChatParser.ChatOutputClass)
+
+	-- Team chat channel
+	local TeamChannel = OutputStream.MakeOutputStreamServer(
+			OutputClassStreamLoggers.MakeGlobalFilteredLogStreamLog(function(Client, Item)
+				assert(Item.TeamColor, "No Item.TeamColor")
+
+				if (Client.Neutral and Item.TeamColor == "Neutral") or (not Client.Neutral and Client.TeamColor.Name == Item.TeamColor.Name) then
+					return true
+				end
+
+				return false
+			end, PseudoChatSettings.BufferSize),
+			"TeamChannel"
+		)
+		TeamChannel.AddOutputClass(PseudoChatParser.ChatOutputClass)
 
 	-- Notification stream
 	local NotificationChannel = OutputStream.MakeOutputStreamServer(
-		OutputClassStreamLoggers.MakePlayerNotificationStreamLog(PseudoChatSettings.BufferSize), 
-		"NotificationChannel"
-	);
-	NotificationChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
+			OutputClassStreamLoggers.MakePlayerNotificationStreamLog(PseudoChatSettings.BufferSize), 
+			"NotificationChannel"
+		)
+		NotificationChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
 
 
 	-- Admin stream
 	local AdminLogChannel = OutputStream.MakeOutputStreamServer(
-		OutputClassStreamLoggers.MakeGlobalFilteredLogStreamLog(AuthenticationServiceServer.IsAuthorized, PseudoChatSettings.BufferSize), 
-		"AdminChannel"
-	);
-	AdminLogChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
-
-	-- Output Stream
-	-- local AdminOutputClass = OutputStream.MakeOutputStreamServer(
-	-- 	OutputClassStreamLoggers.MakeGlobalFilteredLogStreamLog(AuthenticationServiceServer.IsAuthorized, PseudoChatSettings.BufferSize), 
-	-- 	"Admin-Output"
-	-- );
-	-- AdminOutputClass.AddOutputClass(PseudoChatParser.OutputOutputClass)
+			OutputClassStreamLoggers.MakeGlobalFilteredLogStreamLog(AuthenticationServiceServer.IsAuthorized, PseudoChatSettings.BufferSize), 
+			"AdminChannel"
+		)
+		AdminLogChannel.AddOutputClass(PseudoChatParser.OutputOutputClass)
+		AdminLogChannel.AddOutputClass(PseudoChatParser.AdminLogOutputClass)
 
 	local Muted = {} -- List of muted players
 	local ChatCallbacks = {}
@@ -88,16 +101,16 @@ local PseudoChatManager = {} do
 		-- Called even if mute is enabled. Calls every one. Order is undefined. 
 		-- @return Boolean True if it should not render.
 
-		local DoExecute = false
+		local DoNotRender = false
 
 		for _, Item in pairs(ChatCallbacks) do
-			local Result = Item(Player, Message, PlayerColor, ChatColor)
+			local Result = Item(Player, Message, PlayerColor, ChatColor, DoNotRender)
 			if Result then
 				-- print("[PseudoChatManager] - Callback result was " .. tostring(Result))
-				DoExecute = true
+				DoNotRender = true
 			end
 		end
-		return DoExecute
+		return DoNotRender
 	end
 
 	local function AddChatCallback(Callback)
@@ -167,7 +180,7 @@ local PseudoChatManager = {} do
 	PseudoChatManager.filteredNotify = FilteredNotify
 
 	local function Notify(Message, ChatColor)
-		print("Notify")
+		-- print("Notify")
 		NotificationChannel.Send("OutputOutputClass", {
 			Message = tostring(Message);
 			ChatColor = ChatColor;
@@ -211,6 +224,21 @@ local PseudoChatManager = {} do
 	PseudoChatManager.AdminOutput = AdminOutput
 	PseudoChatManager.adminOutput = AdminOutput
 
+	local function AdminLogOutput(CommandName, CommandDescription, PlayerExecutingName, CommandColor)
+		-- CommandColor is optional
+
+		assert(PlayerExecutingName, "Need a PlayerExecutingName")
+
+		AdminLogChannel.Send("AdminLogOutputClass", {
+			CommandName         = CommandName;
+			CommandDescription  = CommandDescription;
+			PlayerExecutingName = PlayerExecutingName;
+			CommandColor        = CommandColor
+		})
+	end
+	PseudoChatManager.AdminLogOutput = AdminLogOutput
+	PseudoChatManager.adminLogOutput = AdminLogOutput
+
 	local function Chat(PlayerName, Message, PlayerColor, ChatColor)
 		--- Makes the player with the name "PlayerName" chat "Message" No callbacks or filtered anything
 		-- @param PlayerName The name of the player saying the message
@@ -218,16 +246,47 @@ local PseudoChatManager = {} do
 		-- @param [PlayerColor] The color of the player's name. Optional. 
 		-- @param [ChatColor] The color of the chat. Optional. 
 
-		ChatChannel.Send("ChatOutputClass", {
-			PlayerName  = tostring(PlayerName);
-			Message     = tostring(Message);
-			PlayerColor = PlayerColor;
-			ChatColor   = ChatColor;
-		})
+		Message = tostring(Message)
+		Message = qString.TrimString(Message, "%s")
+
+		if #Message > 0 then
+			ChatChannel.Send("ChatOutputClass", {
+				PlayerName  = tostring(PlayerName);
+				Message     = Message;
+				PlayerColor = PlayerColor;
+				ChatColor   = ChatColor;
+			})
+		else
+			warn("[Chat] - Empty string, will not send")
+		end
 	end
 	PseudoChatManager.RawChat  = Chat
 	PseudoChatManager.rawChat  = Chat
 	PseudoChatManager.raw_chat = Chat
+
+	local function TeamChat(Player, Message, PlayerColor, ChatColor)
+		--- Makes the player with the name "PlayerName" chat "Message" No callbacks or filtered anything
+		-- @param PlayerName The name of the player saying the message
+		-- @param Message The message to say
+		-- @param [PlayerColor] The color of the player's name. Optional. 
+		-- @param [ChatColor] The color of the chat. Optional. 
+
+		Message = tostring(Message)
+		Message = qString.TrimString(Message, "%s")
+
+		if #Message > 0 then
+			TeamChannel.Send("ChatOutputClass", {
+				PlayerName  = tostring(Player.Name);
+				Message     = "(TEAM) " .. Message;
+				PlayerColor = PlayerColor;
+				ChatColor   = ChatColor;
+				TeamColor   = Player.Neutral and "Neutral" or Player.TeamColor 
+			})
+		else
+			warn("[TeamChat] - Empty string, will not send")
+		end
+	end
+	PseudoChatManager.TeamChat = TeamChat
 
 	local function SendCustomNotification(OutputClass, Data)
 		--- Used to send killfeed and stuff...
@@ -335,11 +394,12 @@ PseudoChatManager.AddChatCallback(function(Player, Message, PlayerColor, ChatCol
 	return false
 end)
 
-do
+
+local IsMuted do -- Spamming
 	local SpamMuted = {}
 	local MuteDurationOnViolation = 10
-	local TimeWindow = 15;
-	local MaxChatRatioPerASecond = 1.5--2; -- 2 chats, every 1 seconds.
+	local TimeWindow              = 15;
+	local MaxChatRatioPerASecond  = 1.5--2; -- 2 chats, every 1 seconds.
 
 	local function MutePlayer(PlayerName)
 		SpamMuted[PlayerName:lower()] = tick() + MuteDurationOnViolation
@@ -349,24 +409,12 @@ do
 
 	PseudoChatManager.AddChatCallback(function(PlayerName, Message, PlayerColor, ChatColor)
 		local CurrentTime = tick()
+		local Player = qPlayer.GetPlayerFromName(PlayerName)
+		local IsMuted, MutedMessage = IsMuted(CurrentTime, Player)
 
-		local MutedState = SpamMuted[PlayerName:lower()]
-		if MutedState then
-			local TimeLeft = MutedState - CurrentTime
-
-			if TimeLeft > 0 then
-				local Player = Players:FindFirstChild(PlayerName)
-				if Player and Player:IsA("Player") then
-					PseudoChatManager.FilteredNotify({Player.userId}, "Stop spamming please. You've been muted for " .. math.floor(TimeLeft+1) .. " more seconds.", PseudoChatSettings.MutedMessageColor)
-				else
-					warn("[ChatSpamManager] - Could not find player with name '" .. PlayerName .. "' in game.")
-				end
-
-				return true
-			else
-				SpamMuted[PlayerName:lower()] = nil
-				return false
-			end
+		if IsMuted then
+			PseudoChatManager.FilteredNotify({Player.userId}, MutedMessage, PseudoChatSettings.MutedMessageColor)
+			return true
 		else
 			local DataBin = PlayerDataBin[PlayerName:lower()]
 			if DataBin then
@@ -397,12 +445,30 @@ do
 				end
 				DataBin[#DataBin+1] = tick() -- Add a new timestamp in.
 			else
-				warn("[ChatSpamManager] - Warning, no data for player '" .. PlayerName .. "'")
+				warn("[ChatSpamManager] - Warning, no data for player '" .. PlayerName .. "'. Something is wrong with our PlayerAdd event.")
 			end
 
 			return false
 		end
 	end)
+
+	function IsMuted(CurrentTime, Player)
+		if Player then
+			local MutedState = SpamMuted[Player.Name:lower()]
+			if MutedState then
+				local TimeLeft = MutedState - CurrentTime
+
+				if TimeLeft > 0 then
+					return true, "Stop spamming please. You've been muted for " .. math.floor(TimeLeft+1) .. " more seconds."
+				else
+					SpamMuted[Player.Name:lower()] = nil
+					return false
+				end
+			end
+		else
+			return false
+		end
+	end
 
 	local function HandlePlayerAdd(Player)
 		PlayerDataBin[Player.Name:lower()] = {}
@@ -419,5 +485,28 @@ do
 
 	Players.PlayerRemoving:connect(HandlePlayerLeave)
 end
+
+
+do -- Team chat
+	PseudoChatManager.AddChatCallback(function(PlayerName, Message, PlayerColor, ChatColor, DoNotRender)
+		local Player = qPlayer.GetPlayerFromName(PlayerName)
+
+		if Player and not DoNotRender then
+			local TeamMessage
+
+			if qString.CompareCutFirst(Message, "%") then
+				TeamMessage = Message:sub(2)
+			elseif qString.CompareCutFirst(Message, "(team)")  then
+				TeamMessage = Message:sub(7)
+			end
+
+			if TeamMessage then
+				PseudoChatManager.TeamChat(Player, TeamMessage, PlayerColor, ChatColor)
+				return true
+			end
+		end
+	end)
+end
+
 
 return PseudoChatManager

@@ -9,7 +9,7 @@ local Table          = LoadCustomLibrary("Table")
 local RbxUtility     = LoadLibrary("RbxUtility")
 local CircularBuffer = LoadCustomLibrary("CircularBuffer")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -66,7 +66,7 @@ local MakeOutputParser = Class(function(OutputParser, Parse, Unparse)
 	--- Parses and deparses data between transit. 
 	-- @param Parse Lua function 
 		-- Parse( Table `Data`)
-			--- Returns a Table of the data to be sent over.
+			--- Returns a Table of the data to be sent over. Send back a new table, not the unparsed data. 
 		-- Unparse( Table `Data`)
 			--- Return's a Table of the deparsed data
 
@@ -124,8 +124,8 @@ local MakeOutputStreamServer = Class(function(OutputStreamServer, Logger, Stream
 
 	OutputStreamServer.Name = StreamName
 
-	local DataStream = NevermoreEngine.GetDataStream(StreamName)
-	local EventStream = NevermoreEngine.GetEventStream(StreamName)
+	local DataStream = NevermoreEngine.GetDataStream("OutputStream/" .. StreamName)
+	local EventStream = NevermoreEngine.GetEventStream("OutputStream/" .. StreamName)
 
 	local OutputClasses = {}
 
@@ -192,15 +192,21 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	
 	assert(type(StreamName) == "string", "[OutputStreamClient] - StreamName is a '" .. type(StreamName) .. "' tostring() == " .. tostring(StreamName))
 
-	local DataStream = NevermoreEngine.GetDataStream(StreamName)
-	local EventStream = NevermoreEngine.GetEventStream(StreamName)
+	local DataStream = NevermoreEngine.GetDataStream("OutputStream/" .. StreamName)
+	local EventStream = NevermoreEngine.GetEventStream("OutputStream/" .. StreamName)
 
 	OutputStreamClient.Name = StreamName
 
 	local OutputClasses = {}
 	local OutputClassesSignals = {}
 
-	OutputStreamClient.NewItem = CreateSignalInternal()
+	OutputStreamClient.NewItem = CreateSignal() --[[
+	Fires with: OutputClass, Data
+		--> OutputClass doesn't change.
+		Data has the specific unparsed data.
+			Data.ClientData = {} -- Created for storing stuff in rendering
+			Data has been processed by the OutputClass automatically.
+	]]
 
 	local function GetOutputClass(OutputClassName)
 		return OutputClasses[OutputClassName:lower()]
@@ -227,10 +233,12 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 
 		local OutputClass = GetOutputClass(OutputClassName)
 		if OutputClass then
+			Data.ClientData = {} -- Client data for rendering stuff.
+
 			OutputClass.Parser.Unparse(Data)
 			OutputStreamClient.NewItem:fire(OutputClass, Data)
 		else
-			Warn("[OutputStreamClient] - No OutputStream class for '" .. tostring(OutputClassName) .. "'")
+			warn("[OutputStreamClient] - No OutputStream class for '" .. tostring(OutputClassName) .. "'")
 		end
 	end)
 
@@ -244,18 +252,19 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 			for Index, Item in pairs(Logs) do
 				local Class = GetOutputClass(Item.ClassName)
 				if Class then
+					Item.ClientData = {}
 					Class.Parser.Unparse(Item)
 					UnparsedLogs[#UnparsedLogs+1] = {
 						Data = Item;
 						OutputClass = Class;
 					}
 				else
-					Warn("[OutputStreamClient] - Class '" .. Item.ClassName .. "' is not registered!")
+					warn("[OutputStreamClient] - Class '" .. Item.ClassName .. "' is not registered!")
 				end
 			end
 			return UnparsedLogs, true
 		else
-			Warn("[OutputStreamClient] - Could not retrieve logs! Logs were nil!")
+			warn("[OutputStreamClient] - Could not retrieve logs! Logs were nil!")
 			return {}, false
 		end
 	end
@@ -276,8 +285,8 @@ end)
 lib.MakeOutputStreamClient = MakeOutputStreamClient
 lib.makeOutputStreamClient = MakeOutputStreamClient
 
-_G.OutputSyndicatedLogs = {}
-local LoggerDatabase = _G.OutputSyndicatedLogs
+-- _G.OutputSyndicatedLogs = {}
+-- local LoggerDatabase = _G.OutputSyndicatedLogs
 
 local MakeOutputStreamSyndicator = Class(function(OutputStreamSyndicator, Name, BufferSize)
 	--- Managers multiple streams being synced into one. Caches data so chat loads fast on respawn. Used on the client only.
@@ -288,7 +297,7 @@ local MakeOutputStreamSyndicator = Class(function(OutputStreamSyndicator, Name, 
 
 	OutputStreamSyndicator.Name = Name or tostring("[ " .. OutputStreamSyndicator .." ]")
 	local OutputStreams = {}
-	OutputStreamSyndicator.NewItem = CreateSignalInternal()
+	OutputStreamSyndicator.NewItem = CreateSignal()
 
 	local function GetOutputStream(StreamName)
 		return OutputStreams[StreamName:lower()]

@@ -7,7 +7,7 @@ local qSystems          = LoadCustomLibrary("qSystems")
 local qGUI          = LoadCustomLibrary("qGUI")
 local Maid          = LoadCustomLibrary("Maid")
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -231,6 +231,8 @@ local function GenerateTitle(ScreenGui, Text, TopLabelText, BottomLabelText)
 		qGUI.TweenTransparency(BottomStripe, {BackgroundTransparency = 1}, Configuration.AnimationTime, true)
 
 		Container:TweenSizeAndPosition(UDim2.new(0, MiddleLabelSize*2, 0, Configuration.Height*Configuration.ExpandFactor), UDim2.new(0.5, -MiddleLabelSize, 0.5, -Configuration.Height*(Configuration.ExpandFactor/2 + 0.5)), "In", "Quad", Configuration.AnimationTime, true)
+		TopStripe:TweenSizeAndPosition(UDim2.new(1, 0, 0, 0), UDim2.new(0, 0, 0.25, Configuration.LabelHeight), "Out", "Quad", Configuration.AnimationTime)
+		BottomStripe:TweenSizeAndPosition(UDim2.new(1, 0, 0, 0), UDim2.new(0, 0, 0.75, -Configuration.BarHeight - Configuration.LabelHeight), "Out", "Quad", Configuration.AnimationTime)
 
 		-- Midle animation
 		for Index, TextLabel in pairs(MiddleTextLabels) do

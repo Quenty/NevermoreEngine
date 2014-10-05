@@ -361,13 +361,13 @@ end
 
 
 -- Tween the camera's roll
-function API:TweenRoll(startRoll, endRoll, duration, easingFunc, override)
+function API:TweenRoll(startRoll, endRoll, duration, easingFunc)
 	Workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
 	local roll = startRoll
 	local diffRoll = (endRoll - startRoll)
 	local function Callback(ratio)
 		roll = (startRoll + (diffRoll * ratio))
-		camera:SetRoll(roll)
+		Workspace.CurrentCamera:SetRoll(roll)
 	end
 	Tween(easingFunc, duration, Callback, "Roll")
 end
@@ -375,8 +375,8 @@ end
 
 
 -- Tween the camera's roll from the current roll
-function API:TweenToRoll(endRoll, duration, easingFunc, override)
-	self:TweenRoll(camera:GetRoll(), endRoll, duration, easingFunc, override)
+function API:TweenToRoll(endRoll, duration, easingFunc)
+	self:TweenRoll(Workspace.CurrentCamera:GetRoll(), endRoll, duration, easingFunc)
 end
 
 

@@ -8,6 +8,8 @@ local PlayerMouse = Player and Player:GetMouse()
 -- @author xLEGOx, modified by Quenty
 -- Last Updated July 26th, 2014
 
+warn("[ScreenGeometry] - Don't use me! Use screenspace instead!")
+
 function Utility.ViewSizeX()
 	local x = PlayerMouse.ViewSizeX
 	if x == 0 then

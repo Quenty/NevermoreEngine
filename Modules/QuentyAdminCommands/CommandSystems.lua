@@ -7,7 +7,7 @@ local qString           = LoadCustomLibrary("qString")
 local qSystems          = LoadCustomLibrary("qSystems")
 local QACSettings       = LoadCustomLibrary("QACSettings")
 
-qSystems:Import(getfenv(0));
+qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -313,7 +313,8 @@ local MakeCommand = Class(function(command, commandSystem, commandName, commandF
 		command.stringCommand = false
 	end
 	command.commandSystem = commandSystem;
-	command.name = commandName;
+	command.UnmodifiedName = commandName
+	command.name = commandName:lower();
 	command.arguments = arguments;
 
 	command.requiredInputNumber = ArgumentSystem:getNumberOfRequiredInputArguments(arguments)
@@ -335,7 +336,7 @@ local MakeCommand = Class(function(command, commandSystem, commandName, commandF
 		-- Execute the command, given ambigius number of arguments. Not even sure why I wrap it, but probably useful for 
 		-- return filtering (Through strings)
 
-		commandFunction(...)
+		return commandFunction(...)
 	end
 
 	function command:safeExecute(...)
@@ -413,19 +414,20 @@ local CommandSystem = {} do
 
 		-- VerifyArg(commandName, "string", "commandName");
 		-- VerifyArg(commandTags, "table", "commandTags");
+		local UnmodifiedName = commandName
 		commandName = commandName:lower()
 		local otherCommands = CommandSystem:getCommands(commandName)
-		local newCommand = MakeCommand(CommandSystem, commandName, commandFunction, commandTags, ...);
+		local newCommand = MakeCommand(CommandSystem, UnmodifiedName, commandFunction, commandTags, ...);
 		--newCommand:addTags(commandTags);
 
 		if otherCommands and commandTags.StringCommand == true then  -- Check to make sure there's no ambiguity in the command system for that command. 
-			error(QACSettings.PrintHeader.."Another command(s) by the name of '"..commandName.."' already exist, no 'stringCommand' may be registered for that name")
+			error(QACSettings.PrintHeader.."Another command(s) by the name of '"..UnmodifiedName.."' already exist, no 'stringCommand' may be registered for that name")
 		elseif otherCommands then
 			for _, otherCommand in pairs(otherCommands) do
 				if otherCommand.requiredInputNumber == newCommand.requiredInputNumber then
-					error(QACSettings.PrintHeader.."Another command by the name of '"..commandName.."' already exists, and has the same number of inputs ("..newCommand.requiredInputNumber..") leading to ambiguity")
+					error(QACSettings.PrintHeader.."Another command by the name of '"..UnmodifiedName.."' already exists, and has the same number of inputs ("..newCommand.requiredInputNumber..") leading to ambiguity. There are " .. commandCount .. " commands loaded.")
 				elseif otherCommand.stringCommand then
-					error(QACSettings.PrintHeader.."Another command by the name of '"..commandName.."' is stringCommand, so no new commands may be registered with this name")
+					error(QACSettings.PrintHeader.."Another command by the name of '"..UnmodifiedName.."' is stringCommand, so no new commands may be registered with this name")
 				end
 			end
 		end
@@ -505,33 +507,17 @@ local CommandSystem = {} do
 		-- VerifyArg(user, "Player", "user", true);
 
 		local seperatedString = qString.BreakString(commandString, QACSettings.CommandSeperators)
-		--[[
-		print(commandString)
-		for Index, Value in pairs(seperatedString) do
-			print(Index,Value)
-		end
-		--]]
 		local commandName = seperatedString[1]
+		local commandOutput = ""
 
-
-		-- local oldPrint = print
-		-- local returnLine = ""
 		local didExecute = false
 		local commandExecuted
-		-- local function print(...)
-		-- 	for _, Item in pairs({...}) do
-		-- 		oldPrint(Item)
-		-- 		returnLine = returnLine..tostring(Item).." ";
-		-- 	end
-		-- 	returnLine = returnLine.."\n";
-		-- end
 		
 		if type(commandName) == "string" then
 			local possibleCommands = CommandSystem:getCommands(commandName)
 			if (possibleCommands) then
 				local argumentInputs = #seperatedString - 1;
 				local foundCommand;
-				--local argumentClosness = math.huge;
 
 				for _, possibleCommand in pairs(possibleCommands) do -- Identify the command closest too the 
 					if possibleCommand.requiredInputNumber == argumentInputs then
@@ -552,9 +538,9 @@ local CommandSystem = {} do
 								newSeperatedString[index-1] = seperatedString[index];
 								--print(seperatedString[index])
 							end
-							print(QACSettings.PrintHeader.."Message: ("..tostring(foundCommand.requiredInputNumber)..") '"..tostring(qString.GetRestOfSemiTokenizedString(commandString, QACSettings.CommandSeperators, foundCommand.totalArgumentRequired)).."' ")
+							-- print(QACSettings.PrintHeader.."Message: ("..tostring(foundCommand.requiredInputNumber)..") '"..tostring(qString.GetRestOfSemiTokenizedString(commandString, QACSettings.CommandSeperators, foundCommand.totalArgumentRequired)).."' ")
 							newSeperatedString[foundCommand.requiredInputNumber] = qString.GetRestOfSemiTokenizedString(commandString, QACSettings.CommandSeperators, foundCommand.requiredInputNumber)
-							print(QACSettings.PrintHeader.."newSeperateString["..foundCommand.requiredInputNumber.."] = "..tostring(newSeperatedString[foundCommand.requiredInputNumber]))
+							-- print(QACSettings.PrintHeader.."newSeperateString["..foundCommand.requiredInputNumber.."] = "..tostring(newSeperatedString[foundCommand.requiredInputNumber]))
 						else
 							print(QACSettings.PrintHeader.."Could not execute, not enough arguments... ")
 							commandCanExecute = false
@@ -565,6 +551,7 @@ local CommandSystem = {} do
 							newSeperatedString[index-1] = seperatedString[index]; -- Shift over values in table...
 						end
 					end
+
 					if commandCanExecute then -- Make sure that the above anti-overloading didnt' cancel..
 						local arguments = ArgumentSystem:getArgumentsFromInput(foundCommand.arguments, newSeperatedString, user);
 
@@ -577,7 +564,12 @@ local CommandSystem = {} do
 								if specificIndex < 1 then
 									-- print(QACSettings.PrintHeader.."Exeucting Specific: '"..commandName.."'")
 									-- Execute
-									foundCommand:execute(...)
+									local Output = foundCommand:execute(...)
+
+									if Output then
+										commandOutput = tostring(Output); -- Only save one output...
+									end
+
 									didExecute = true
 									commandExecuted = foundCommand
 								else
@@ -606,18 +598,18 @@ local CommandSystem = {} do
 			-- argumentError("commandName", false, "string", Type.getType(commandName))
 		end
 
-		return didExecute, commandExecuted
+		return didExecute, commandExecuted, commandOutput
 	end
 
 	function CommandSystem:getNumberOfCommands()
-		return commandCount;
+		return commandCount
 	end
 
 	function CommandSystem:getNumberOfAlias()
-		return aliasCount;
+		return aliasCount
 	end
 
-	function CommandSystem:getComands()
+	function CommandSystem:getAllCommands()
 		return commandList
 	end
 
@@ -649,11 +641,11 @@ end
 -----------------
 
 lib.ArgumentSystem = ArgumentSystem
-lib.CommandSystem = CommandSystem
+lib.CommandSystem  = CommandSystem
 
 -- Faster coding in sb
-lib.ArgSys = ArgumentSystem
-lib.Args = ArgumentSystem.Arguments
-lib.Cmds = CommandSystem
+lib.ArgSys         = ArgumentSystem
+lib.Args           = ArgumentSystem.Arguments
+lib.Cmds           = CommandSystem
 
 return lib

@@ -5,7 +5,8 @@ local NevermoreEngine       = require(ReplicatedStorage:WaitForChild("NevermoreE
 local LoadCustomLibrary     = NevermoreEngine.LoadLibrary
 
 local qSystems              = LoadCustomLibrary("qSystems")
-qSystems:Import(getfenv(0))
+local MakeMaid              = LoadCustomLibrary("Maid").MakeMaid
+qSystems:Import(getfenv(1))
 
 -- NevermoreCommandsLocal
 -- @author Quenty
@@ -24,6 +25,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local ClientRequests = {} do-- Requests from the server. 
 	local RequestList = {}
+	local Maid = MakeMaid()
 
 	local function GetRequest(Name)
 		return RequestList[Name:lower()]
@@ -35,7 +37,7 @@ local ClientRequests = {} do-- Requests from the server.
 		RequestList[RequestName:lower()] = FunctionExecute
 	end
 
-	NevermoreRemoteEvent.OnClientEvent:connect(function(RequestName, ...)
+	local function HandleRequest(RequestName, ...)
 		-- Errrrr.... this may definitely disconnect if player GUI reset not enabled.
 		
 		if RequestName and type(RequestName) == "string" then
@@ -52,11 +54,19 @@ local ClientRequests = {} do-- Requests from the server.
 		else
 			warn("[NevermoreCommandsLocal] - Invalid RequestName, type not string.")
 		end
-	end)
+	end
+
+	local function ConnectEvents()
+		Maid.NevermoreRemoteEventOnClientEvent = NevermoreRemoteEvent.OnClientEvent:connect(HandleRequest)
+	end
+	ClientRequests.ConnectEvents = ConnectEvents
+	ClientRequests.connectEvents = ConnectEvents
 end
 
 
-do
+--- LOAD UP LocAL COMMANDS ---
+
+do -- FREECAM
 	local LastCharacterCFrame
 
 	ClientRequests:AddRequestHandler("Freecam", function()
@@ -86,14 +96,22 @@ do
 	end)
 end
 
-do
+do -- SONGS
 	local LastSong
 
 	local function RemoveLastSong()
 		if LastSong then
-			LastSong:Stop()
-			LastSong:Destroy()
+			local Song = LastSong
 			LastSong = nil
+
+			Spawn(function()
+				while Song.Volume > 0 do
+					Song.Volume = Song.Volume - 0.05
+					wait()
+				end
+				Song:Stop()
+				Song:Destroy()
+			end)
 		end
 	end
 
@@ -125,8 +143,17 @@ do
 	ClientRequests:AddRequestHandler("StopSong", function()
 		RemoveLastSong()
 	end)
-
-
 end
+
+
+--- SETUP COMMAND API ---
+
+function NevermoreCommandsLocal:Initiate()
+	--- We need to call this if ResetCoreGuiEnabled is false.
+
+	ClientRequests.ConnectEvents()
+end
+
+NevermoreCommandsLocal:Initiate()
 
 return NevermoreCommandsLocal

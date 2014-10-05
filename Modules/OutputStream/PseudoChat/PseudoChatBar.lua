@@ -10,7 +10,7 @@ local Maid     = LoadCustomLibrary("Maid")
 local qString  = LoadCustomLibrary("qString")
 local qGUI     = LoadCustomLibrary("qGUI")
 
-qSystems:Import(getfenv(0))
+qSystems:Import(getfenv(1))
 
 -- PseudoChatBar.lua
 -- @author Quenty
@@ -21,15 +21,19 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 	--- Creates a new pseudo chat bar for chatting
 
 	local Configuration = {
-		DefaultText = UserInputService.MouseEnabled and "Push \"/\" to chat" or "Tap here to chat";
-		XOffset     = 65;
-		ZIndex      = 10;
-		DefaultTransparency = 1;
+		DefaultText          = UserInputService.MouseEnabled and "Push \"/\" to chat" or "Tap here to chat";
+		XOffset              = 60;
+		ZIndex               = 10;
+		DefaultTransparency  = 1;
 		SelectedTransparency = 0.3;
-		AnimationTime = 0.05;
-		AnimationTimeHide = 0.1;
-		DefaultHeight = 30;
+		AnimationTime        = 0.05;
+		AnimationTimeHide    = 0.3;
+		DefaultHeight        = 30;
 	}
+
+	-- if CurrentPlatformName == "IOS" or CurrentPlatformName == "Android" then
+	-- 	Configuration.XOffset = 10;
+	-- end
 
 	local NewChat         = CreateSignal()
 	PseudoChatBar.NewChat = NewChat
@@ -60,19 +64,20 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 		BackgroundColor3       = Color3.new(0, 0, 0);
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0;
-		Font                   = "Arial";
-		FontSize               = "Size14";
+		Font                   = "SourceSans";
+		FontSize               = "Size18";
 		Name                   = "ChatBar";
 		Parent                 = ChatBarBacking;
 		Position               = UDim2.new(0, Configuration.XOffset, 0, 0);
-		Size                   = UDim2.new(1, -Configuration.XOffset, 1, 0);
+		Size                   = UDim2.new(1, -Configuration.XOffset - 10, 1, 0);
 		Text                   = Configuration.DefaultText;
 		TextColor3             = Color3.new(1, 1, 1);
 		TextStrokeTransparency = 0.9;
 		TextTransparency       = 0;
 		TextXAlignment         = "Left";
 		ZIndex                 = Configuration.ZIndex-1;
-		MultiLine = false;
+		MultiLine              = false;
+		ClearTextOnFocus       = false;
 	})
 
 	local LastChat = ""
@@ -92,7 +97,21 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 
 			InputCleaner = Maid.new()
 			qGUI.TweenTransparency(ChatBarBacking, {BackgroundTransparency = Configuration.SelectedTransparency}, Configuration.AnimationTime, true)
+
+			if not UserInputService.KeyboardEnabled then
+				-- http://stackoverflow.com/questions/1419221/what-is-the-iphones-default-keyboard-animation-rate
+
+				-- Dang it ROBLOX, I have to hardcode. Poor japanese people. 
+				ChatBarBacking:TweenPosition(UDim2.new(0, 0, 0.5, -Configuration.DefaultHeight - 30), "Out", "Quad", 0.3, true)
+			end
 		end
+	end
+
+	local function RespondOnInput()
+		local XPosition = InputGui.AbsolutePosition.X + InputGui.TextBounds.X
+		local YPosition = InputGui.AbsolutePosition.Y + InputGui.AbsoluteSize.Y/2
+
+		qGUI.ResponsiveCircleClickEffect(ChatBarBacking, XPosition, YPosition, Configuration.AnimationTimeHide*2, false, math.max(100, XPosition))
 	end
 
 	local function GetAutoCompleteOption(Message)
@@ -106,7 +125,12 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 			for _, Player in pairs(Players:GetPlayers()) do
 				if qString.CompareCutFirst(Player.Name, LastWord) then
 					--Possibles[#Possibles+1] = Player.Name
-					return Message:sub(1, Start-1) .. Player.Name .. " "
+
+					if Start == 1 then
+						return Message:sub(1, Start-1) .. Player.Name .. ": "
+					else
+						return Message:sub(1, Start-1) .. Player.Name .. " "
+					end
 				end
 			end
 
@@ -117,6 +141,8 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 	end
 
 	local function StopFocus(EnterPressed)
+		-- print("Lost focus")
+
 		if PseudoChatBar.Focused then
 			qGUI.TweenTransparency(ChatBarBacking, {BackgroundTransparency = Configuration.DefaultTransparency}, Configuration.AnimationTimeHide, true)
 
@@ -130,6 +156,9 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 			if EnterPressed then
 				if InputGui.Text ~= "" and InputGui.Text ~= Configuration.DefaultText then
 					LastChat = InputGui.Text
+
+					RespondOnInput()
+
 					NewChat:fire(LastChat)
 				end
 
@@ -140,6 +169,9 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 
 			InputGui.Text = Configuration.DefaultText
 
+			if not UserInputService.KeyboardEnabled or ChatBarBacking.Position.Y.Scale ~= 1 then
+				ChatBarBacking:TweenPosition(UDim2.new(0, 0, 1, -Configuration.DefaultHeight), "Out", "Quad", 0.3, true)
+			end
 		end
 	end
 
@@ -157,6 +189,8 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 			else
 				if Input.KeyCode.Name == "Up" then
 					InputGui.Text = LastChat
+					InputGui:CaptureFocus()
+
 					LastInput = InputGui.Text
 				elseif Input.KeyCode.Name == "Tab" then
 					local Option = GetAutoCompleteOption(InputGui.Text)
@@ -167,7 +201,11 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 					end
 
 					if Option then
-						InputGui.Text = Option
+						if InputGui.Text ~= Option then
+							InputGui.Text = Option
+							InputGui:CaptureFocus()
+							RespondOnInput()
+						end
 					end
 				else
 					LastInput = InputGui.Text
