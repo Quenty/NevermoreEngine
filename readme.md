@@ -87,7 +87,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
 
-qSystems:Import(getfenv(1))
 ```
 
 However, it should be noted that Nevermore will appear in 
@@ -122,6 +121,17 @@ Blacklist - The blacklist is used to ban players automatically from the game.
 
 ## Update / Change Log
 This change log is *strictly* for Nevermore's module and documentation only.
+
+##### November 21st, 2014 [0.3.0.0]
+- Removed :Import() syntax
+- Lots of bug fixes
+- Redesign of class architecture should be coming soon
+	- Specifically designed for testing
+	- Existing implimentation has lots of errors
+- Lots of bug fixes
+- Was **not** updated to use ReplicatedFirst because of the way ROBLOX currently handles replicated first
+	- Updates planned to make Nevermore more accessible
+- Documentation added, more to come.
 
 ##### February 9th, 2014 [0.2.0.3]
 - Fixed `RemoteEvent` Firing in server
