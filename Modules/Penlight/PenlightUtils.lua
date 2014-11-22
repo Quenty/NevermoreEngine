@@ -2,9 +2,9 @@
 -- See  @{01-introduction.md.Generally_useful_functions|the Guide}.
 -- @module pl.utils
 local format,gsub,byte = string.format,string.gsub,string.byte
-local clock = os.clock
-local stdout = io.stdout
-local append = table.insert
+local clock            = os.clock
+local stdout           = print
+local append           = table.insert
 
 local collisions = {}
 
@@ -14,36 +14,35 @@ local utils = {}
 -- https://github.com/stevedonovan/Penlight/blob/master/lua/pl/utils.lua
 
 --[[
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
-    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-    PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT
-    SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
-    ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-    OR OTHER DEALINGS IN THE SOFTWARE.
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+	ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+	TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+	PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT
+	SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+	ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+	ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+	OR OTHER DEALINGS IN THE SOFTWARE.
 --]]
 
 utils._VERSION = "1.1.0"
 
-local lua51 = rawget(_G,'setfenv')
+local debug = setmetatable({}, {__index = function(...)
+	error("[Penlight] - Debug is not implimented.")
+end})
 
-utils.lua51 = lua51
-if not lua51 then -- Lua 5.2 compatibility
-    unpack = table.unpack
-    loadstring = load
-end
+local unpack = table.unpack
+
 
 utils.dir_separator = _G.package.config:sub(1,1)
 
@@ -66,8 +65,8 @@ utils.dir_separator = _G.package.config:sub(1,1)
 -- @param fmt The format (see string.format)
 -- @param ... Extra arguments for format
 function utils.printf(fmt,...)
-    utils.assert_string(1,fmt)
-    utils.fprintf(stdout,fmt,...)
+	utils.assert_string(1,fmt)
+	utils.fprintf(stdout,fmt,...)
 end
 
 --- write an arbitrary number of arguments to a file using a format.
@@ -76,24 +75,24 @@ end
 -- @param ... Extra arguments for format
 --[[
 function utils.fprintf(f,fmt,...)
-    utils.assert_string(2,fmt)
-    f:write(format(fmt,...))
+	utils.assert_string(2,fmt)
+	f:write(format(fmt,...))
 end
 --]]
 local function import_symbol(T,k,v,libname)
-    local key = rawget(T,k)
-    -- warn about collisions!
-    if key and k ~= '_M' and k ~= '_NAME' and k ~= '_PACKAGE' and k ~= '_VERSION' then
-        utils.printf("warning: '%s.%s' overrides existing symbol\n",libname,k)
-    end
-    rawset(T,k,v)
+	local key = rawget(T,k)
+	-- warn about collisions!
+	if key and k ~= '_M' and k ~= '_NAME' and k ~= '_PACKAGE' and k ~= '_VERSION' then
+		utils.printf("warning: '%s.%s' overrides existing symbol\n",libname,k)
+	end
+	rawset(T,k,v)
 end
 
 local function lookup_lib(T,t)
-    for k,v in pairs(T) do
-        if v == t then return k end
-    end
-    return '?'
+	for k,v in pairs(T) do
+		if v == t then return k end
+	end
+	return '?'
 end
 
 local already_imported = {}
@@ -102,31 +101,31 @@ local already_imported = {}
 -- @param t The Table
 -- @param T An optional destination table (defaults to callers environment)
 function utils.import(t,T)
-    T = T or _G
-    t = t or utils
-    if type(t) == 'string' then
-        t = require (t)
-    end
-    local libname = lookup_lib(T,t)
-    if already_imported[t] then return end
-    already_imported[t] = libname
-    for k,v in pairs(t) do
-        import_symbol(T,k,v,libname)
-    end
+	T = T or _G
+	t = t or utils
+	if type(t) == 'string' then
+		t = require (t)
+	end
+	local libname = lookup_lib(T,t)
+	if already_imported[t] then return end
+	already_imported[t] = libname
+	for k,v in pairs(t) do
+		import_symbol(T,k,v,libname)
+	end
 end
 
 utils.patterns = {
-    FLOAT = '[%+%-%d]%d*%.?%d*[eE]?[%+%-]?%d*',
-    INTEGER = '[+%-%d]%d*',
-    IDEN = '[%a_][%w_]*',
-    FILE = '[%a%.\\][:%][%w%._%-\\]*'
+	FLOAT = '[%+%-%d]%d*%.?%d*[eE]?[%+%-]?%d*',
+	INTEGER = '[+%-%d]%d*',
+	IDEN = '[%a_][%w_]*',
+	FILE = '[%a%.\\][:%][%w%._%-\\]*'
 }
 
 --- escape any 'magic' characters in a string
 -- @param s The input string
 function utils.escape(s)
-    utils.assert_string(1,s)
-    return (s:gsub('[%-%.%+%[%]%(%)%$%^%%%?%*]','%%%1'))
+	utils.assert_string(1,s)
+	return (s:gsub('[%-%.%+%[%]%(%)%$%^%%%?%*]','%%%1'))
 end
 
 --- return either of two values, depending on a condition.
@@ -134,9 +133,9 @@ end
 -- @param value1 Value returned if cond is true
 -- @param value2 Value returned if cond is false (can be optional)
 function utils.choose(cond,value1,value2)
-    if cond then return value1
-    else return value2
-    end
+	if cond then return value1
+	else return value2
+	end
 end
 
 local raise
@@ -196,29 +195,29 @@ local raise
 -- @return a list-like table
 -- @raise error if s is not a string
 function utils.split(s,re,plain,n)
-    utils.assert_string(1,s)
-    local find,sub,append = string.find, string.sub, table.insert
-    local i1,ls = 1,{}
-    if not re then re = '%s+' end
-    if re == '' then return {s} end
-    while true do
-        local i2,i3 = find(s,re,i1,plain)
-        if not i2 then
-            local last = sub(s,i1)
-            if last ~= '' then append(ls,last) end
-            if #ls == 1 and ls[1] == '' then
-                return {}
-            else
-                return ls
-            end
-        end
-        append(ls,sub(s,i1,i2-1))
-        if n and #ls == n then
-            ls[#ls] = sub(s,i1)
-            return ls
-        end
-        i1 = i3+1
-    end
+	utils.assert_string(1,s)
+	local find,sub,append = string.find, string.sub, table.insert
+	local i1,ls = 1,{}
+	if not re then re = '%s+' end
+	if re == '' then return {s} end
+	while true do
+		local i2,i3 = find(s,re,i1,plain)
+		if not i2 then
+			local last = sub(s,i1)
+			if last ~= '' then append(ls,last) end
+			if #ls == 1 and ls[1] == '' then
+				return {}
+			else
+				return ls
+			end
+		end
+		append(ls,sub(s,i1,i2-1))
+		if n and #ls == n then
+			ls[#ls] = sub(s,i1)
+			return ls
+		end
+		i1 = i3+1
+	end
 end
 
 --- split a string into a number of values.
@@ -228,7 +227,7 @@ end
 -- @usage first,next = splitv('jane:doe',':')
 -- @see split
 function utils.splitv (s,re)
-    return unpack(utils.split(s,re))
+	return unpack(utils.split(s,re))
 end
 
 --- convert an array of values to strings.
@@ -238,60 +237,62 @@ end
 -- Otherwise use `tostring`
 -- @return the converted buffer
 function utils.array_tostring (t,temp,tostr)
-    temp, tostr = temp or {}, tostr or tostring
-    for i = 1,#t do
-        temp[i] = tostr(t[i],i)
-    end
-    return temp
+	temp, tostr = temp or {}, tostr or tostring
+	for i = 1,#t do
+		temp[i] = tostr(t[i],i)
+	end
+	return temp
 end
 
-local lua51_load = load
+local lua51_load = loadstring
 
 if utils.lua51 then -- define Lua 5.2 style load()
-    function utils.load(str,src,mode,env)
-        local chunk,err
-        if type(str) == 'string' then
-            chunk,err = loadstring(str,src)
-        else
-            chunk,err = lua51_load(str,src)
-        end
-        if chunk and env then setfenv(chunk,env) end
-        return chunk,err
-    end
+	function utils.load(str,src,mode,env)
+		local chunk,err
+		if type(str) == 'string' then
+			chunk,err = loadstring(str,src)
+		else
+			error("[Penlight] - Something happened, but lua51_load is not supported")
+			-- chunk,err = lua51_load(str,src)
+		end
+		if chunk and env then setfenv(chunk,env) end
+		return chunk,err
+	end
 else
-    utils.load = load
-    -- setfenv/getfenv replacements for Lua 5.2
-    -- by Sergey Rozhenko
-    -- http://lua-users.org/lists/lua-l/2010-06/msg00313.html
-    -- Roberto Ierusalimschy notes that it is possible for getfenv to return nil
-    -- in the case of a function with no globals:
-    -- http://lua-users.org/lists/lua-l/2010-06/msg00315.html
-    function setfenv(f, t)
-        f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
-        local name
-        local up = 0
-        repeat
-            up = up + 1
-            name = debug.getupvalue(f, up)
-        until name == '_ENV' or name == nil
-        if name then
-            debug.upvaluejoin(f, up, function() return name end, 1) -- use unique upvalue
-            debug.setupvalue(f, up, t)
-        end
-        if f ~= 0 then return f end
-    end
+	utils.load = loadstring
+	-- setfenv/getfenv replacements for Lua 5.2
+	-- by Sergey Rozhenko
+	-- http://lua-users.org/lists/lua-l/2010-06/msg00313.html
+	-- Roberto Ierusalimschy notes that it is possible for getfenv to return nil
+	-- in the case of a function with no globals:
+	-- http://lua-users.org/lists/lua-l/2010-06/msg00315.html
 
-    function getfenv(f)
-        local f = f or 0
-        f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
-        local name, val
-        local up = 0
-        repeat
-            up = up + 1
-            name, val = debug.getupvalue(f, up)
-        until name == '_ENV' or name == nil
-        return val
-    end
+--[[function setfenv(f, t)
+		f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
+		local name
+		local up = 0
+		repeat
+			up = up + 1
+			name = debug.getupvalue(f, up)
+		until name == '_ENV' or name == nil
+		if name then
+			debug.upvaluejoin(f, up, function() return name end, 1) -- use unique upvalue
+			debug.setupvalue(f, up, t)
+		end
+		if f ~= 0 then return f end
+	end
+
+	function getfenv(f)
+		local f = f or 0
+		f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
+		local name, val
+		local up = 0
+		repeat
+			up = up + 1
+			name, val = debug.getupvalue(f, up)
+		until name == '_ENV' or name == nil
+		return val
+	end--]]
 end
 
 
@@ -308,22 +309,22 @@ end
 --         return res1,res2
 --     end
 -- end
-
+--[[
 if lua51 then
-    function table.pack (...)
-        local n = select('#',...)
-        return {n=n; ...}
-    end
-    local sep = package.config:sub(1,1)
-    function package.searchpath (mod,path)
-        mod = mod:gsub('%.',sep)
-        for m in path:gmatch('[^;]+') do
-            local nm = m:gsub('?',mod)
-            local f = io.open(nm,'r')
-            if f then f:close(); return nm end
-        end
-    end
-end
+	function table.pack (...)
+		local n = select('#',...)
+		return {n=n; ...}
+	end
+	local sep = package.config:sub(1,1)
+	function package.searchpath (mod,path)
+		mod = mod:gsub('%.',sep)
+		for m in path:gmatch('[^;]+') do
+			local nm = m:gsub('?',mod)
+			local f = io.open(nm,'r')
+			if f then f:close(); return nm end
+		end
+	end
+end--]]
 
 if not table.pack then table.pack = _G.pack end
 if not rawget(_G,"pack") then _G.pack = table.pack end
@@ -342,20 +343,20 @@ if not rawget(_G,"pack") then _G.pack = table.pack end
 -- @param func a function of at least one argument
 -- @return a function with at least one argument, which is used as the key.
 function utils.memoize(func)
-    return setmetatable({}, {
-        __index = function(self, k, ...)
-            local v = func(k,...)
-            self[k] = v
-            return v
-        end,
-        __call = function(self, k) return self[k] end
-    })
+	return setmetatable({}, {
+		__index = function(self, k, ...)
+			local v = func(k,...)
+			self[k] = v
+			return v
+		end,
+		__call = function(self, k) return self[k] end
+	})
 end
 
 --- is the object either a function or a callable object?.
 -- @param obj Object to check.
 function utils.is_callable (obj)
-    return type(obj) == 'function' or getmetatable(obj) and getmetatable(obj).__call
+	return type(obj) == 'function' or getmetatable(obj) and getmetatable(obj).__call
 end
 
 --- is the object of the specified type?.
@@ -363,12 +364,12 @@ end
 -- @param obj An object to check
 -- @param tp String of what type it should be
 function utils.is_type (obj,tp)
-    if type(tp) == 'string' then return type(obj) == tp end
-    local mt = getmetatable(obj)
-    return tp == mt
+	if type(tp) == 'string' then return type(obj) == tp end
+	local mt = getmetatable(obj)
+	return tp == mt
 end
 
-local fileMT = getmetatable(io.stdout)
+--local fileMT = getmetatable(io.stdout)
 
 --- a string representation of a type.
 -- For tables with metatables, we assume that the metatable has a `_name`
@@ -376,29 +377,29 @@ local fileMT = getmetatable(io.stdout)
 -- @param obj an object
 -- @return a string like 'number', 'table' or 'List'
 function utils.type (obj)
-    local t = type(obj)
-    if t == 'table' or t == 'userdata' then
-        local mt = getmetatable(obj)
-        if mt == fileMT then
-            return 'file'
-        else
-            return mt._name or "unknown "..t
-        end
-    else
-        return t
-    end
+	local t = type(obj)
+	if t == 'table' or t == 'userdata' then
+		local mt = getmetatable(obj)
+		--ppif mt == fileMT then
+		--	return 'file'
+		--else
+			return mt._name or "unknown "..t
+		--end
+	else
+		return t
+	end
 end
 
 --- is this number an integer?
 -- @param x a number
 -- @raise error if x is not a number
 function utils.is_integer (x)
-    return math.ceil(x)==x
+	return math.ceil(x)==x
 end
 
 utils.stdmt = {
-    List = {_name='List'}, Map = {_name='Map'},
-    Set = {_name='Set'}, MultiMap = {_name='MultiMap'}
+	List = {_name='List'}, Map = {_name='Map'},
+	Set = {_name='Set'}, MultiMap = {_name='MultiMap'}
 }
 
 local _function_factories = {}
@@ -409,26 +410,26 @@ local _function_factories = {}
 -- @param mt metatable
 -- @param fun a callable that returns a function
 function utils.add_function_factory (mt,fun)
-    _function_factories[mt] = fun
+	_function_factories[mt] = fun
 end
 
 local function _string_lambda(f)
-    local raise = utils.raise
-    if f:find '^|' or f:find '_' then
-        local args,body = f:match '|([^|]*)|(.+)'
-        if f:find '_' then
-            args = '_'
-            body = f
-        else
-            if not args then return raise 'bad string lambda' end
-        end
-        local fstr = 'return function('..args..') return '..body..' end'
-        local fn,err = loadstring(fstr)
-        if not fn then return raise(err) end
-        fn = fn()
-        return fn
-    else return raise 'not a string lambda'
-    end
+	local raise = utils.raise
+	if f:find '^|' or f:find '_' then
+		local args,body = f:match '|([^|]*)|(.+)'
+		if f:find '_' then
+			args = '_'
+			body = f
+		else
+			if not args then return raise 'bad string lambda' end
+		end
+		local fstr = 'return function('..args..') return '..body..' end'
+		local fn,err = loadstring(fstr)
+		if not fn then return raise(err) end
+		fn = fn()
+		return fn
+	else return raise 'not a string lambda'
+	end
 end
 
 --- an anonymous function as a string. This string is either of the form
@@ -454,34 +455,34 @@ local ops
 -- @raise if idx is not a number or if f is not callable
 -- @see utils.is_callable
 function utils.function_arg (idx,f,msg)
-    utils.assert_arg(1,idx,'number')
-    local tp = type(f)
-    if tp == 'function' then return f end  -- no worries!
-    -- ok, a string can correspond to an operator (like '==')
-    if tp == 'string' then
-        if not ops then ops = require 'pl.operator'.optable end
-        local fn = ops[f]
-        if fn then return fn end
-        local fn, err = utils.string_lambda(f)
-        if not fn then error(err..': '..f) end
-        return fn
-    elseif tp == 'table' or tp == 'userdata' then
-        local mt = getmetatable(f)
-        if not mt then error('not a callable object',2) end
-        local ff = _function_factories[mt]
-        if not ff then
-            if not mt.__call then error('not a callable object',2) end
-            return f
-        else
-            return ff(f) -- we have a function factory for this type!
-        end
-    end
-    if not msg then msg = " must be callable" end
-    if idx > 0 then
-        error("argument "..idx..": "..msg,2)
-    else
-        error(msg,2)
-    end
+	utils.assert_arg(1,idx,'number')
+	local tp = type(f)
+	if tp == 'function' then return f end  -- no worries!
+	-- ok, a string can correspond to an operator (like '==')
+	if tp == 'string' then
+		if not ops then ops = require 'pl.operator'.optable end
+		local fn = ops[f]
+		if fn then return fn end
+		local fn, err = utils.string_lambda(f)
+		if not fn then error(err..': '..f) end
+		return fn
+	elseif tp == 'table' or tp == 'userdata' then
+		local mt = getmetatable(f)
+		if not mt then error('not a callable object',2) end
+		local ff = _function_factories[mt]
+		if not ff then
+			if not mt.__call then error('not a callable object',2) end
+			return f
+		else
+			return ff(f) -- we have a function factory for this type!
+		end
+	end
+	if not msg then msg = " must be callable" end
+	if idx > 0 then
+		error("argument "..idx..": "..msg,2)
+	else
+		error(msg,2)
+	end
 end
 
 --- bind the first argument of the function to a value.
@@ -491,8 +492,8 @@ end
 -- @raise same as @{function_arg}
 -- @see pl.func.curry
 function utils.bind1 (fn,p)
-    fn = utils.function_arg(1,fn)
-    return function(...) return fn(p,...) end
+	fn = utils.function_arg(1,fn)
+	return function(...) return fn(p,...) end
 end
 
 --- bind the second argument of the function to a value.
@@ -501,8 +502,8 @@ end
 -- @return a function such that f(x) is fn(x,p)
 -- @raise same as @{function_arg}
 function utils.bind2 (fn,p)
-    fn = utils.function_arg(1,fn)
-    return function(x,...) return fn(x,p,...) end
+	fn = utils.function_arg(1,fn)
+	return function(x,...) return fn(x,p,...) end
 end
 
 
@@ -517,12 +518,12 @@ end
 -- @usage assert_arg(1,t,'table')
 -- @usage assert_arg(n,val,'string',path.isdir,'not a directory')
 function utils.assert_arg (n,val,tp,verify,msg,lev)
-    if type(val) ~= tp then
-        error(("argument %d expected a '%s', got a '%s'"):format(n,tp,type(val)),lev or 2)
-    end
-    if verify and not verify(val) then
-        error(("argument %d: '%s' %s"):format(n,val,msg),lev or 2)
-    end
+	if type(val) ~= tp then
+		error(("argument %d expected a '%s', got a '%s'"):format(n,tp,type(val)),lev or 2)
+	end
+	if verify and not verify(val) then
+		error(("argument %d: '%s' %s"):format(n,val,msg),lev or 2)
+	end
 end
 
 --- assert the common case that the argument is a string.
@@ -530,7 +531,7 @@ end
 -- @param val a value that must be a string
 -- @raise val must be a string
 function utils.assert_string (n,val)
-    utils.assert_arg(n,val,'string',nil,nil,3)
+	utils.assert_arg(n,val,'string',nil,nil,3)
 end
 
 local err_mode = 'default'
@@ -543,13 +544,13 @@ local err_mode = 'default'
 -- @param mode - either 'default', 'quit'  or 'error'
 -- @see utils.raise
 function utils.on_error (mode)
-    if ({['default'] = 1, ['quit'] = 2, ['error'] = 3})[mode] then
-      err_mode = mode
-    else
-      -- fail loudly
-      if err_mode == 'default' then err_mode = 'error' end
-      utils.raise("Bad argument expected string; 'default', 'quit', or 'error'. Got '"..tostring(mode).."'")
-    end
+	if ({['default'] = 1, ['quit'] = 2, ['error'] = 3})[mode] then
+	  err_mode = mode
+	else
+	  -- fail loudly
+	  if err_mode == 'default' then err_mode = 'error' end
+	  utils.raise("Bad argument expected string; 'default', 'quit', or 'error'. Got '"..tostring(mode).."'")
+	end
 end
 
 --- used by Penlight functions to return errors.  Its global behaviour is controlled
@@ -557,10 +558,10 @@ end
 -- @param err the error string.
 -- @see utils.on_error
 function utils.raise (err)
-    if err_mode == 'default' then return nil,err
-    elseif err_mode == 'quit' then utils.quit(err)
-    else error(err,2)
-    end
+	if err_mode == 'default' then return nil,err
+	elseif err_mode == 'quit' then utils.quit(err)
+	else error(err,2)
+	end
 end
 
 raise = utils.raise

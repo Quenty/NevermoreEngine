@@ -8,12 +8,15 @@ local qSystems       = LoadCustomLibrary("qSystems")
 local Table          = LoadCustomLibrary("Table")
 local RbxUtility     = LoadLibrary("RbxUtility")
 local CircularBuffer = LoadCustomLibrary("CircularBuffer")
+local Signal         = LoadCustomLibrary("Signal")
 
-qSystems:Import(getfenv(1))
+local Class = qSystems.Class
 
 local lib = {}
 
 --[[-- Change Log
+November 17th, 2014
+- Removed importing
 
 January 27th, 2014
 - Fixed logging
@@ -200,7 +203,7 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	local OutputClasses = {}
 	local OutputClassesSignals = {}
 
-	OutputStreamClient.NewItem = CreateSignal() --[[
+	OutputStreamClient.NewItem = Signal.new() --[[
 	Fires with: OutputClass, Data
 		--> OutputClass doesn't change.
 		Data has the specific unparsed data.
@@ -297,7 +300,7 @@ local MakeOutputStreamSyndicator = Class(function(OutputStreamSyndicator, Name, 
 
 	OutputStreamSyndicator.Name = Name or tostring("[ " .. OutputStreamSyndicator .." ]")
 	local OutputStreams = {}
-	OutputStreamSyndicator.NewItem = CreateSignal()
+	OutputStreamSyndicator.NewItem = Signal.new()
 
 	local function GetOutputStream(StreamName)
 		return OutputStreams[StreamName:lower()]

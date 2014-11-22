@@ -8,8 +8,10 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local qGUI              = LoadCustomLibrary("qGUI")
 local Maid              = LoadCustomLibrary("Maid")
+local Signal              = LoadCustomLibrary("Signal")
 
-qSystems:Import(getfenv(1))
+local Make = qSystems.Make
+local Class = qSystems.Class
 
 -- ScrollBar library
 -- Change Log --
@@ -223,7 +225,7 @@ local MakeKineticModel = Class(function(KineticModel, ContainerFrame, ContentFra
 		self.UpdatingId = self.UpdatingId + 1
 		local LocalUpdateId = self.UpdatingId
 		-- print("release start " .. LocalUpdateId)
-		Spawn(function() -- Update loop start.
+		spawn(function() -- Update loop start.
 			while (LocalUpdateId == self.UpdatingId) do
 				local ElapsedTime = tick() - self.TimeStamp
 				local NewPosition = Start + Amplitude * ((ElapsedTime/self.Duration)^(1/2))
@@ -372,9 +374,9 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 	Scroller.Axis               = Axis
 	Scroller.MouseDrag          = MouseDrag
 	Scroller.CanDrag            = true
-	Scroller.ScrollFinished     = CreateSignal() -- Fires an event whenever a scroll finishes moving. 
-	Scroller.InputFinished      = CreateSignal() -- When mouse down, this fires when mouse up
-	Scroller.ScrollStarted      = CreateSignal()
+	Scroller.ScrollFinished     = Signal.new() -- Fires an event whenever a scroll finishes moving. 
+	Scroller.InputFinished      = Signal.new() -- When mouse down, this fires when mouse up
+	Scroller.ScrollStarted      = Signal.new()
 
 	-- For scrollbaroverlays
 	local ScrollbarDefaultColor3 = Color3.new(0, 0, 0)
@@ -647,19 +649,19 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 			Backing.BackgroundTransparency = 0.5;
 		end
 
-		ScrollMaid[tostring(ScrollBar) .. "BarMouseButton1Down"] = Bar.MouseButton1Down:connect(Scrollbar.StartDrag) -- Hookup events...
-		ScrollMaid[tostring(ScrollBar) .. "BarMouseButton1Up"] = Bar.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
+		ScrollMaid[tostring(Scrollbar) .. "BarMouseButton1Down"] = Bar.MouseButton1Down:connect(Scrollbar.StartDrag) -- Hookup events...
+		ScrollMaid[tostring(Scrollbar) .. "BarMouseButton1Up"] = Bar.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
 
 		ScrollBarContainer.Active = true
 		if ScrollBarContainer:IsA("GuiButton") then
 			-- These events actually do have to be hooked up, if the container is a thing.
-			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseButton1Down"] = ScrollBarContainer.MouseButton1Down:connect(Scrollbar.MouseDownOnWhitespace) -- Hookup events...
-			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseButton1Up"] = ScrollBarContainer.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
-			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseEnter"] = ScrollBarContainer.MouseEnter:connect(Scrollbar.OnEnterDisplay)
-			ScrollMaid[tostring(ScrollBar) .. "ScrollBarContainerMouseLeave"] = ScrollBarContainer.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
+			ScrollMaid[tostring(Scrollbar) .. "ScrollBarContainerMouseButton1Down"] = ScrollBarContainer.MouseButton1Down:connect(Scrollbar.MouseDownOnWhitespace) -- Hookup events...
+			ScrollMaid[tostring(Scrollbar) .. "ScrollBarContainerMouseButton1Up"] = ScrollBarContainer.MouseButton1Up:connect(Scrollbar.StopScrollFromWhitespace)
+			ScrollMaid[tostring(Scrollbar) .. "ScrollBarContainerMouseEnter"] = ScrollBarContainer.MouseEnter:connect(Scrollbar.OnEnterDisplay)
+			ScrollMaid[tostring(Scrollbar) .. "ScrollBarContainerMouseLeave"] = ScrollBarContainer.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
 		else
-			ScrollMaid[tostring(ScrollBar) .. "BarMouseEnter"] = Bar.MouseEnter:connect(Scrollbar.OnEnterDisplay)
-			ScrollMaid[tostring(ScrollBar) .. "BarMouseLeave"] = Bar.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
+			ScrollMaid[tostring(Scrollbar) .. "BarMouseEnter"] = Bar.MouseEnter:connect(Scrollbar.OnEnterDisplay)
+			ScrollMaid[tostring(Scrollbar) .. "BarMouseLeave"] = Bar.MouseLeave:connect(Scrollbar.OnLeaveDisplay)
 		end
 		Scrollbar.ResizeBar()
 		Scrollbars[#Scrollbars+1] = Scrollbar -- Add the scrollbar 'Object' to the list of scrollbars. 
@@ -680,7 +682,7 @@ local MakeScroller = Class(function(Scroller, Container, Content, ScreenGui, Axi
 		if Axis == 'Y' then
 			Content.Position = UDim2.new(Content.Position.X.Scale, Content.Position.X.Offset, 0, NewPosition)
 		else
-			Content.Position = UDim2.new(0, NewPosition, NewPositionContent.Position.Y.Scale, Content.Position.Y.Offset)
+			Content.Position = UDim2.new(0, NewPosition, Content.Position.Y.Scale, Content.Position.Y.Offset)
 		end
 
 		for _, Scrollbar in pairs(Scrollbars) do

@@ -16,6 +16,8 @@ local PointsService               = game:GetService("PointsService")
 local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
 
+assert(script.Name == "NevermoreCommandsServer", "Assertion failed! Script name = " .. tostring(script:GetFullName()))
+
 local AuthenticationServiceServer = LoadCustomLibrary("AuthenticationServiceServer")
 local Character                   = LoadCustomLibrary("Character")
 local CommandSystems              = LoadCustomLibrary("CommandSystems")
@@ -31,12 +33,15 @@ local Table                       = LoadCustomLibrary("Table")
 local Type                        = LoadCustomLibrary("Type")
 local qPlayer                     = LoadCustomLibrary("qPlayer")
 
-qSystems:Import(getfenv(1))
-CommandSystems:Import(getfenv(0));
-RawCharacter:Import(getfenv(0), "Raw")
-Character:Import(getfenv(0), "Safe")
+local ArgSys            = CommandSystems.ArgSys
+local Args              = CommandSystems.Args
+local Cmds              = CommandSystems.Cmds
+local CommandSystem     = CommandSystems.CommandSystem
 
-assert(script.Name == "NevermoreCommandsServer")
+local GetIndexFromValue = qSystems.GetIndexFromValue
+local Make              = qSystems.Make
+local CheckCharacter    = qSystems.CheckCharacter
+local CheckPlayer       = qSystems.CheckPlayer
 
 
 local GlobalGUID = HttpService:GenerateGUID() -- Generate a global GUID so we don't ever have name comflicts.
@@ -446,10 +451,10 @@ do
 	do
 		Cmds:add("Clean", {
 				Description = "Cleans workspace of all hats and tools.";
-				"Utility"; "Object:Workspace";
+				"Utility"; "Object:workspace";
 			},
 			function()
-				for _, Item in pairs(Workspace:GetChildren()) do
+				for _, Item in pairs(workspace:GetChildren()) do
 					if Item:IsA("Hat") or Item:IsA("Tool") then
 						Item:Destroy()
 					end
@@ -607,7 +612,7 @@ do
 			PseudoChatManagerServer.Notify("Updating game, please hold...", Color3.new(0.8, 0, 0));
 			wait(0.1)
 			for _, Player in pairs(Players:GetPlayers()) do			
-				Spawn(function()
+				spawn(function()
 					Player:LoadCharacter()
 					TeleportService:Teleport(154325868, Player.Character)
 				end)
@@ -666,7 +671,7 @@ do
 			Tags = {"Kill"; "Explosive"; "Explosion";};
 		},
 		function(PlayerCharacter)
-			RawExplode(PlayerCharacter.Character)
+			RawCharacter.Explode(PlayerCharacter.Character)
 		end, Args.PlayerCharacter())
 		Cmds:Alias("Explode", "Expld", "Boom", "fart", "exd", "exp") -- Let's be honest, some people actually could pull it off...
 
@@ -675,7 +680,7 @@ do
 				"Kill";
 			},
 			function(PlayerCharacter)
-				RawKill(PlayerCharacter.Character)
+				RawCharacter.Kill(PlayerCharacter.Character)
 			end, Args.PlayerCharacter())
 			Cmds:Alias("Kill", "Die", "Murder", "Terminate", "Assassinate", "Slaughter", "keel", "k33l", "Snuff", "slay", "kl", "knockoff", "knock_off")
 
@@ -688,12 +693,12 @@ do
 					Tagger.Untag(Player, "LoopKill")
 				end
 
-				Spawn(function()
+				spawn(function()
 					local LocalId = Tagger.Tag(Player, "Loopkill")
 					while Tagger.IsTagged(Player, "Loopkill", LocalId) do
 						Player:LoadCharacter()
 						wait(0.1)
-						RawKill(Player.Character)
+						RawCharacter.Kill(Player.Character)
 						wait(0.1)
 					end
 				end)
@@ -711,12 +716,12 @@ do
 					Tagger.Untag(Player, "LoopKill")
 				end
 
-				Spawn(function()
+				spawn(function()
 					local LocalId = Tagger.Tag(Player, "Loopkill")
 					while Tagger.IsTagged(Player, "Loopkill", LocalId) do
 						Player:LoadCharacter()
 						wait(0.1)
-						RawExplode(Player.Character)
+						RawCharacter.Explode(Player.Character)
 						wait(0.1)
 					end
 				end)
@@ -740,7 +745,7 @@ do
 				"Kill";
 			},
 			function(Player, DamageAmount)
-				RawDamage(Player.Character, DamageAmount)
+				RawCharacter.Damage(Player.Character, DamageAmount)
 			end, Args.PlayerCharacter(), Args.Number())
 			Cmds:Alias("Damage", "Inflict")
 
@@ -759,7 +764,7 @@ do
 			function(Player)
 				Player:LoadCharacter();
 			end, Args.Player())	
-			Cmds:Alias("Respawn", "LoadCharacter", "Reset", "Suicide", "Spawn", "rs")
+			Cmds:Alias("Respawn", "LoadCharacter", "Reset", "Suicide", "spawn", "rs")
 
 		Cmds:add("Cow", {
 				Description = "Turns the player into a badly built cow.";
@@ -899,8 +904,8 @@ do
 			},
 			function(PlayerCharacter)
 				--print("Gave '"..PlayerCharacter.Name.."'' a cape. ")\
-				RawDecape(PlayerCharacter)
-				RawCape(PlayerCharacter)
+				RawCharacter.Decape(PlayerCharacter)
+				RawCharacter.Cape(PlayerCharacter)
 			end, Args.PlayerCharacter())
 			Cmds:add("Cape", {
 				Description = "Gives the chatted player a cape, which is colored the same as their Torso. ";
@@ -908,8 +913,8 @@ do
 			},
 			function(PlayerCharacter)
 				--print("Gave '"..PlayerCharacter.Name.."'' a cape. ")\
-				RawDecape(PlayerCharacter)
-				RawCape(PlayerCharacter)
+				RawCharacter.Decape(PlayerCharacter)
+				RawCharacter.Cape(PlayerCharacter)
 			end, Args.UserCharacter())
 			Cmds:Alias("Cape", "Cloak", "Frock")
 
@@ -918,13 +923,13 @@ do
 				Tags = {"Decoration"};
 			},
 			function(PlayerCharacter)
-				RawDecape(PlayerCharacter)
+				RawCharacter.Decape(PlayerCharacter)
 			end, Args.PlayerCharacter())
 			Cmds:add("Decape", {
 				Description = "Removes a the chatter's cape.";
 			},
 			function(PlayerCharacter)
-				RawDecape(PlayerCharacter)
+				RawCharacter.Decape(PlayerCharacter)
 			end, Args.UserCharacter())
 			Cmds:Alias("Decape", "Uncape", "Defrock", "Decloak")
 
@@ -932,7 +937,7 @@ do
 				Description = "Gives a player a forcefield. ";
 			},
 			function(Player)
-				RawGiveForceField(Player.Character)
+				RawCharacter.GiveForceField(Player.Character)
 			end, Args.PlayerCharacter())
 			Cmds:Alias("Forcefield", "ff", "giveff", "giveforcefield", "protect", "shield")
 
@@ -940,7 +945,7 @@ do
 				Description = "Removes and strips away the forcefield that a player might have";
 			},
 			function(Player)
-				RawRemoveForceField(Player.Character)
+				RawCharacter.RemoveForceField(Player.Character)
 			end, Args.PlayerCharacter())
 			Cmds:Alias("unforcefield", "unff", "deff", "removeff", "removeforcefield", "unshield", "deshield", "deprotect", "unprotect")
 
@@ -948,7 +953,7 @@ do
 				Description = "Removes a player's hat";
 			},
 			function(Player)
-				RawDehat(Player.Character)
+				RawCharacter.Dehat(Player.Character)
 			end, Args.PlayerCharacter())
 			Cmds:Alias("Dehat", "RemoveHats", "nohats", "remotehat", "hatless", "bald", "nohat") 
 
@@ -957,8 +962,8 @@ do
 				"Utility";
 			}, 
 			function(Player)
-				RawUnstick(Player.Character)
-				RawRemoveVelocity(Player.Character)
+				RawCharacter.Unstick(Player.Character)
+				RawCharacter.RemoveVelocity(Player.Character)
 
 				Player.Character.Torso.CFrame = CFrame.new(Player.Character.Torso.Position + Vector3.new(0, 500, 0))
 			end, Args.PlayerCharacter())
@@ -968,8 +973,8 @@ do
 				"Utility";
 			}, 
 			function(Player, Distance)
-				RawUnstick(Player.Character)
-				RawRemoveVelocity(Player.Character)
+				RawCharacter.Unstick(Player.Character)
+				RawCharacter.RemoveVelocity(Player.Character)
 
 				Player.Character.Torso.CFrame = CFrame.new(Player.Character.Torso.Position + Vector3.new(0, Distance, 0))
 			end, Args.PlayerCharacter(), Args.Number())
@@ -1035,8 +1040,8 @@ do
 			}, 
 			function(Player, PlayerTarget)
 				local Character = Player.Character
-				RawUnstick(Player.Character)
-				RawRemoveVelocity(Character)
+				RawCharacter.Unstick(Player.Character)
+				RawCharacter.RemoveVelocity(Character)
 				Character.Torso.CFrame = PlayerTarget.Character.Torso.CFrame
 			end, Args.PlayerCharacter(), Args.PlayerCharacter())
 			Cmds:Alias("Teleport", "Tele", "Move", "tp", "t")
@@ -1046,7 +1051,7 @@ do
 				"Health";
 			},
 			function(Player)
-				RawHeal(Player.Character)
+				RawCharacter.Heal(Player.Character)
 			end, Args.PlayerCharacter())
 
 		Cmds:add("Heal", {
@@ -1054,7 +1059,7 @@ do
 				"Health";
 			},
 			function(Player)
-				RawHeal(Player.Character)
+				RawCharacter.Heal(Player.Character)
 			end, Args.UserCharacter())
 			Cmds:Alias("Heal", "repair", "treat")
 
@@ -1063,7 +1068,7 @@ do
 				"Health";
 			},
 			function(Player, Health)
-				RawMaxHealth(Player.Character, Health)
+				RawCharacter.MaxHealth(Player.Character, Health)
 			end, Args.PlayerCharacter(), Args.Number())
 			Cmds:Alias("Health", "MaxHealth", "mh", "SetMaxHealth", "SetHealth")
 
@@ -1083,7 +1088,7 @@ do
 				"Health";
 			},
 			function(Player, Health)
-				RawMaxHealth(Player.Character, 100)
+				RawCharacter.ResetHealth(Player.Character, 100)
 			end, Args.PlayerCharacter())
 			Cmds:Alias("ResetHealth", "ungod", "ung", "uninfinitehealth", "finitehealth")
 

@@ -6,7 +6,8 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local Type              = LoadCustomLibrary("Type")
 
-qSystems:Import(getfenv(1))
+local Make = qSystems.Make
+local Modify = qSystems.Modify
 
 -- EasyConfiguration.lua
 -- @author Quenty

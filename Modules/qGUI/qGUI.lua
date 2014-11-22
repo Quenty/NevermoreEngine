@@ -1,20 +1,10 @@
-local Players            = game:GetService("Players")
-local StarterPack        = game:GetService("StarterPack")
-local StarterGui         = game:GetService("StarterGui")
-local Lighting           = game:GetService("Lighting")
-local Debris             = game:GetService("Debris")
-local Teams              = game:GetService("Teams")
-local BadgeService       = game:GetService("BadgeService")
-local InsertService      = game:GetService("InsertService")
-local HttpService        = game:GetService("HttpService")
-local ReplicatedStorage  = game:GetService("ReplicatedStorage")
-local RunService         = game:GetService("RunService")
-local MarketplaceService = game:GetService("MarketplaceService")
-local UserInputService   = game:GetService("UserInputService")
-local Terrain            = Workspace.Terrain
+local Players           = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService        = game:GetService("RunService")
+local UserInputService  = game:GetService("UserInputService")
 
-local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
 local qMath             = LoadCustomLibrary("qMath")
@@ -22,22 +12,18 @@ local qCFrame           = LoadCustomLibrary("qCFrame")
 local Table             = LoadCustomLibrary("Table")
 local qColor3           = LoadCustomLibrary("qColor3")
 
-qSystems:Import(getfenv(1))
+local Make              = qSystems.Make
+local Modify            = qSystems.Modify
+
 
 local lib = {}
 
-local DEFAULTS = {}
-
 local WEAK_MODE = {
-	K = {__mode="k"};
-	V = {__mode="v"};
+	K  = {__mode="k"};
+	V  = {__mode="v"};
 	KV = {__mode="kv"};
 }
 
-local COLORS = {
-	
-
-}
 
 -- qGUI.lua
 -- @author Quenty
@@ -46,6 +32,9 @@ local COLORS = {
 --[[
 
 Change Log
+November 17th, 2014
+- Removed importing into the environment
+
 September 9th, 2014
 - Optimized tweening for GUIs with time less than 0
 
@@ -86,7 +75,7 @@ local function GetScreen(object)
 end
 lib.GetScreen = GetScreen
 lib.getScreen = GetScreen
-lib.get_screen = GetScreens
+lib.get_screen = GetScreen
 
 local function NewColor3(red, green, blue)
 	-- Given a red, green, and blue, it'll return a formatted Color3 object. 
@@ -123,7 +112,7 @@ local function Center(Object)
 	Object.Position = GetCenteringPosition(Object)
 end
 lib.Center = Center
-lib.center = center
+lib.center = Center
 
 local function PointInBounds(Frame, X, Y)
 	local TopBound    = Frame.AbsolutePosition.Y
@@ -340,7 +329,7 @@ local TweenTransparency, StopTransparencyTween do
 	local function StartProcessUpdate()
 		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
 			ActivelyProcessing = tick()
-			Spawn(function()
+			spawn(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
 					-- wait(0.05)
@@ -458,7 +447,7 @@ local TweenColor3, StopColor3Tween do
 	local function StartProcessUpdate()
 		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
 			ActivelyProcessing = tick()
-			Spawn(function()
+			spawn(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
 					-- wait(0.05)

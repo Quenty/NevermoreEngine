@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
+local RunService        = game:GetService("RunService")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
@@ -8,13 +8,16 @@ local qSystems          = LoadCustomLibrary("qSystems")
 local EnumInterpreter   = LoadCustomLibrary("EnumInterpreter")
 local qMath             = LoadCustomLibrary("qMath");
 
-local lib    = {}
+local lib               = {}
 
 -- ScreenCover.lua
 -- @author Quenty
--- Last Modified February 3rd, 2014
+-- Last Modified November 17th, 2014
 
-qSystems:Import(getfenv(1))
+local Make   = qSystems.Make
+local Round  = qSystems.Round
+local Modify = qSystems.Modify
+
 
 lib.STYLES = {}
 lib.TYPES = {

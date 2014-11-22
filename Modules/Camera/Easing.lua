@@ -308,6 +308,8 @@ local function inOutElastic(t, b, c, d, a, p)
 	if not p then p = d * (0.3 * 1.5) end
 	if not a then a = 0 end
 
+	local s
+
 	if not a or a < abs(c) then
 		a = c
 		s = p / 4

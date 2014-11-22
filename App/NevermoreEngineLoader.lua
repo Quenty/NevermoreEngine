@@ -12,7 +12,7 @@ local function Warn(WarningText)
 	--- Used to yell at the player
 	-- @param WarningText The text to warn with.
 
-	Spawn(function()
+	spawn(function()
 		TestService:Warn(false, WarningText)
 	end)
 end

@@ -6,14 +6,19 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local Type              = LoadCustomLibrary("Type")
 local qSystems          = LoadCustomLibrary("qSystems")
 
-qSystems:Import(getfenv(1))
+local CallOnChildren    = qSystems.CallOnChildren
+local Make              = qSystems.Make
+local Modify            = qSystems.Modify
+local CheckCharacter    = qSystems.CheckCharacter
 
 -- RawCharacter.lua
 -- This script handles character interaction, presuming that the character is "validated"
 -- @author Quenty
--- Last modified January 20th, 2014
+-- Last modified November 17th, 2014
 
 --[[--Change Log--
+November 17th, 2014
+- Removed importing
 
 January 20th, 2014
 - Added change log
@@ -62,7 +67,7 @@ local function Heal(character)
 	character.Humanoid.Health = character.Humanoid.MaxHealth;
 end
 lib.Heal = Heal
-lib.heal = heal
+lib.heal = Heal
 
 local function MaxHealth(character, MaxHealth)
 	-- Sets the character's MaxHealth
@@ -86,8 +91,8 @@ lib.Explode = Explode;
 local function GetFace(character)
 	-- Returns the character's face, if it exists. 
 
-	if (Character.Head:FindFirstChild("face") and Character.Head.face:IsA("decal")) then
-		return Character.Head.face;
+	if (character.Head:FindFirstChild("face") and character.Head.face:IsA("Decal")) then
+		return character.Head.face;
 	end
 	return nil
 end
@@ -98,12 +103,13 @@ lib.get_face = GetFace;
 local function GetOrCreateFace(character)
 	-- Returns the character's face, or craetes a new one
 
-	local face = getFace(character) or create 'decal' {
+	local Face = GetFace(character) or Make("decal", {
 		Name = "face";
 		Parent = character.Head;
 		Texture = "http://www.roblox.com/asset/?id=20418518";
-	}
-	return face;
+	})
+	
+	return Face;
 end
 lib.getOrCreateFace = GetOrCreateFace;
 lib.GetOrCreateFace = GetOrCreateFace;
@@ -161,7 +167,7 @@ local function Unstick(character)
 	end
 end
 lib.Unstick = Unstick
-lib.unstick = unstick;
+lib.unstick = Unstick;
 
 local function Dehat(character)
 	--- Remove's a character's hats
@@ -365,7 +371,7 @@ local function Cape(Player, Color)
 			Index = Index+1
 		end
 	end
-	Spawn(function()
+	spawn(function()
 		StartUpdate();
 	end)
 end

@@ -7,7 +7,7 @@ local qString           = LoadCustomLibrary("qString")
 local qSystems          = LoadCustomLibrary("qSystems")
 local QACSettings       = LoadCustomLibrary("QACSettings")
 
-qSystems:Import(getfenv(1))
+local Class = qSystems.Class
 
 local lib = {}
 
@@ -343,7 +343,7 @@ local MakeCommand = Class(function(command, commandSystem, commandName, commandF
 		-- Same as above, but in a non-error way, so we can't have errors.  Little bit of a weird hack because of Lua syntax errors. 
 
 		local arguments = {...} -- Yeah, we have to do this. 
-		Spawn(function()
+		spawn(function() -- TODO: See if this delay can be removed via pcall.
 			commandFunction(unpack(arguments));
 		end)
 	end

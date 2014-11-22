@@ -1,11 +1,10 @@
-local ReplicatedStorage  = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
-
-qSystems:Import(getfenv(1))
+local Make              = qSystems.Make
 
 local lib = {}
 
@@ -47,6 +46,7 @@ local NewVector3 = Vector3.new
 local Dot        = Vector3.new().Dot
 local Cross      = Vector3.new().Cross
 
+local BlankVector = Vector3.new()
 
 local function GetWedgeCFrames(VectorA, VectorB, VectorC, TriangleWidth)
 	--- Draws a triangle (with a width of 0) between the three given vectors. Used when welding. 
@@ -90,7 +90,7 @@ local function GetWedgeCFrames(VectorA, VectorB, VectorC, TriangleWidth)
 	-- local WedgeArea     = sqrt(SemiPerimeter * (SemiPerimeter - SegmentABMagnitude) * (SemiPerimeter - SegmentBCMagnitude) * (SemiPerimeter - SegmentCAMagnitude))
 	-- local Height = 2 * WedgeArea / SegmentABMagnitude
 
-	if WedgeArea ~= 0 then
+	if VectorA + VectorB + VectorC ~= BlankVector then
 		-- Project AC onto AB to get the split point
 
 		-- local SplitLength = (((-SegmentCA):Dot(SegmentAB)/(-SegmentABMagnitude*SegmentABMagnitude))*SegmentAB).magnitude
@@ -111,19 +111,19 @@ local function GetWedgeCFrames(VectorA, VectorB, VectorC, TriangleWidth)
 		local DirectionVectorB = Cross(DirectionVectorC, DirectionVectorA)
 
 		return NewCFrame(
-			Center0.X, Center0.Y, Center0.Z, 
-			-DirectionVectorA.x, -DirectionVectorB.x, DirectionVectorC.x,
-			-DirectionVectorA.Y, -DirectionVectorB.Y, DirectionVectorC.Y,
-			-DirectionVectorA.Z, -DirectionVectorB.Z, DirectionVectorC.Z
-		), -- CFrame0
-		NewVector3(TriangleWidth, Height, SplitLength), -- Wedge0 size
-		NewCFrame(
-			Center1.X, Center1.Y, Center1.Z, 
-			DirectionVectorA.x, -DirectionVectorB.x, -DirectionVectorC.x,
-			DirectionVectorA.Y, -DirectionVectorB.Y, -DirectionVectorC.Y,
-			DirectionVectorA.Z, -DirectionVectorB.Z, -DirectionVectorC.Z
-		), -- Frame1
-		NewVector3(TriangleWidth, Height, SegmentABMagnitude-SplitLength) -- Wedge1 size
+				Center0.X, Center0.Y, Center0.Z, 
+				-DirectionVectorA.x, -DirectionVectorB.x, DirectionVectorC.x,
+				-DirectionVectorA.Y, -DirectionVectorB.Y, DirectionVectorC.Y,
+				-DirectionVectorA.Z, -DirectionVectorB.Z, DirectionVectorC.Z
+			), -- CFrame0
+			NewVector3(TriangleWidth, Height, SplitLength), -- Wedge0 size
+			NewCFrame(
+				Center1.X, Center1.Y, Center1.Z, 
+				DirectionVectorA.x, -DirectionVectorB.x, -DirectionVectorC.x,
+				DirectionVectorA.Y, -DirectionVectorB.Y, -DirectionVectorC.Y,
+				DirectionVectorA.Z, -DirectionVectorB.Z, -DirectionVectorC.Z
+			), -- Frame1
+			NewVector3(TriangleWidth, Height, SegmentABMagnitude-SplitLength) -- Wedge1 size
 	else
 		--- Not a triangle. 
 		return NewCFrame(VectorA), NewVector3(0, 0, 0), NewCFrame(VectorA), NewVector3(0, 0, 0)
@@ -231,8 +231,8 @@ local function DrawTriangle(Part0, Part1, VectorA, VectorB, VectorC)
 	-- @return Part0 and Part1
 
 
-	Part0 = Part0 or MakeDefaultBrick(Workspace)
-	Part1 = Part1 or MakeDefaultBrick(Workspace)
+	Part0 = Part0 or MakeDefaultBrick(workspace)
+	Part1 = Part1 or MakeDefaultBrick(workspace)
 
 	local A, B, C
 
@@ -347,20 +347,19 @@ local function GetWedgeCFramesTwo(n1, n2, n3, TriangleWidth)
     local Position1 = Node1:Lerp(Node2, .5);
 
     --Part2 bridges between Node2, Node3, and InterimNode.
-    local Position2 = Node3:Lerp(Node2, .5);
+	local Position2 = Node3:Lerp(Node2, .5);
 
-    return
-        CFrame.new(Position1.x, Position1.y, Position1.z, 
+	return CFrame.new(Position1.x, Position1.y, Position1.z, 
 			-Vec1.x, -Vec2.x, Vec3.x, 
 			-Vec1.y, -Vec2.y, Vec3.y, 
 			-Vec1.z, -Vec2.z, Vec3.z
 		) * CFrame.new(TriangleWidth / 2, 0, 0),
-        Vector3.new(TriangleWidth, (InterimNode - Node2).magnitude, (InterimNode - Node1).magnitude),
-        CFrame.new(Position2.x, Position2.y, Position2.z, 
-        	Vec1.x, -Vec2.x, -Vec3.x, 
-        	Vec1.y, -Vec2.y, -Vec3.y, 
-        	Vec1.z, -Vec2.z, -Vec3.z) * CFrame.new(-TriangleWidth / 2, 0, 0),
-        Vector3.new(TriangleWidth, (InterimNode - Node2).magnitude, (InterimNode - Node3).magnitude);
+		Vector3.new(TriangleWidth, (InterimNode - Node2).magnitude, (InterimNode - Node1).magnitude),
+		CFrame.new(Position2.x, Position2.y, Position2.z, 
+			Vec1.x, -Vec2.x, -Vec3.x, 
+			Vec1.y, -Vec2.y, -Vec3.y, 
+			Vec1.z, -Vec2.z, -Vec3.z) * CFrame.new(-TriangleWidth / 2, 0, 0),
+		Vector3.new(TriangleWidth, (InterimNode - Node2).magnitude, (InterimNode - Node3).magnitude);
 end
 lib.GetWedgeCFramesTwo = GetWedgeCFramesTwo
 lib.getWedgeCFramesTwo = GetWedgeCFramesTwo
@@ -371,9 +370,9 @@ lib.getWedgeCFramesTwo = GetWedgeCFramesTwo
 local function CFrameFromTopBack(at, top, back)
 	local right = top:Cross(back)
 	return CFrame.new(at.x, at.y, at.z,
-	                  right.x, top.x, back.x,
-	                  right.y, top.y, back.y,
-	                  right.z, top.z, back.z)
+		right.x, top.x, back.x,
+		right.y, top.y, back.y,
+		right.z, top.z, back.z)
 end
  
 --"Fill" function. a, b, and c are the vertices of the triangle to fill.
@@ -417,9 +416,9 @@ local function GetWedgeCFramesThree(a, b, c, TriangleWidth)
 		-- w1.CFrame = maincf*CFrame.Angles(math.pi,0,math.pi/2)*CFrame.new(0,width/2,len1/2)
 
 		return maincf*CFrame.Angles(math.pi,0,math.pi/2)*CFrame.new(0,width/2,len1/2),
-		Vector3.new(TriangleWidth, width, len1),
-		maincf*CFrame.Angles(math.pi,math.pi,-math.pi/2)*CFrame.new(0,width/2,-len1 - len2/2),
-		Vector3.new(0.2, width, len2)
+			Vector3.new(TriangleWidth, width, len1),
+			maincf*CFrame.Angles(math.pi,math.pi,-math.pi/2)*CFrame.new(0,width/2,-len1 - len2/2),
+			Vector3.new(0.2, width, len2)
 	elseif len2 > 0.2 then
 		-- local w2 = Instance.new('WedgePart', fill)
 		-- w2.BottomSurface = 'Smooth'

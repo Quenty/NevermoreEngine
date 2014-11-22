@@ -33,9 +33,9 @@ function Utility.AspectRatio()
 end
 
 function Utility.PointToScreenSpace(at)
-	local point = Workspace.CurrentCamera.CoordinateFrame:pointToObjectSpace(at)
+	local point = workspace.CurrentCamera.CoordinateFrame:pointToObjectSpace(at)
 	local aspectRatio = Utility.AspectRatio()
-	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	--
 	local x = (point.x/point.z) / -wfactor
@@ -46,7 +46,7 @@ end
 
 function Utility.WidthToScreenSpace(depth, width)
 	local aspectRatio = Utility.AspectRatio()
-	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	--
 	return Utility.ViewSizeX() * 0.5 * width / depth / wfactor
@@ -54,7 +54,7 @@ end
 
 function Utility.ScreenSpaceToWorld(x, y, depth)
 	local aspectRatio = Utility.AspectRatio()
-	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	--
 	local xf, yf = x/Utility.ViewSizeX()*2 - 1, y/Utility.ViewSizeY()*2 - 1
@@ -66,7 +66,7 @@ end
 
 function Utility.GetDepthForWidth(partWidth, visibleSize) -- part size, s size -> depth
 	local aspectRatio = Utility.AspectRatio()
-	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)  -- 0.7
+	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)  -- 0.7
 	local wfactor = aspectRatio*hfactor  -- 1.05
 	--
 	return -0.5*Utility.ViewSizeX()*partWidth/(visibleSize*wfactor)
@@ -74,14 +74,14 @@ end
 
 function Utility.GetWidthForDepth(depth, visibleSize)
 	local aspectRatio = Utility.AspectRatio()
-	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	return -2*depth*visibleSize*wfactor/Utility.ViewSizeX()
 end
 
 function Utility.ScreenSpaceToWorldWithHeight(x, y, screenHeight, depth)
 	local aspectRatio = Utility.AspectRatio()
-	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx, sy = Utility.ViewSizeX(), Utility.ViewSizeY()
 	--
@@ -95,7 +95,7 @@ function Utility.ScreenSpaceToWorldWithHeight(x, y, screenHeight, depth)
 end
 
 function Utility.HeightToScreenHeight(height, depth)
-	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView))
+	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView))
 	local sy = Utility.ViewSizeY()
 	return -height*sy / (2*hfactor*depth)
 end
@@ -111,7 +111,7 @@ function Utility.GetSideSlopes(GUIPaddingX, GUIPaddingY)
 	GUIPaddingX, GUIPaddingY = GUIPaddingX or 0, GUIPaddingY or 0
 
 	local ScreenSizeX, ScreenSizeY = Utility.ViewSizeX(), Utility.ViewSizeY()
-	local CameraFOV = Workspace.CurrentCamera.FieldOfView
+	local CameraFOV = workspace.CurrentCamera.FieldOfView
 
 	local SlopeY = tan(CameraFOV*pi/360)
 	return SlopeY*ScreenSizeX/ScreenSizeY*(1-GUIPaddingX/ScreenSizeX), --slopeX

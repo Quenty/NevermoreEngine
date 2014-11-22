@@ -15,7 +15,7 @@ local v2           = Vector2.new
 local ud2          = UDim2.new
 local tick         = tick
 local ray          = Ray.new
-local RayCast      = game.Workspace.FindPartOnRay
+local RayCast      = workspace.FindPartOnRay
 local Dot = v3().Dot
 local lib = {}
 
@@ -129,7 +129,7 @@ local function RealMakeEngine(Screen)
 		PlaneSizeY  = 2*tan(Camera.FieldOfView*0.0087266462599716)
 		PlaneSizeX  = PlaneSizeY*ScreenSizeX/ScreenSizeY
 	end
-	ParticleUpdateScreenInformation(Workspace.CurrentCamera)
+	ParticleUpdateScreenInformation(workspace.CurrentCamera)
 
 	local function SetScreen(NewScreen)
 		assert(NewScreen, "Must be a screen!")
@@ -175,7 +175,7 @@ local function RealMakeEngine(Screen)
 					Vec = Vec * (999/Mag)
 				end
 
-				if RayCast(Workspace,ray(c,Vec),Player.Character, true) then
+				if RayCast(workspace,ray(c,Vec),Player.Character, true) then
 					Visible = false
 				end
 			end
@@ -195,7 +195,7 @@ local function RealMakeEngine(Screen)
 			if rp.z>0 then
 				p.LastScreenPosition = nil
 			else
-				sp                   = rp/rp.z
+				local sp                   = rp/rp.z
 				p.LastScreenPosition = Vector2.new((0.5-sp.x/PlaneSizeX)*ScreenSizeX,(0.5+sp.y/PlaneSizeY)*ScreenSizeY)
 			end
 		end
@@ -277,8 +277,8 @@ local function RealMakeEngine(Screen)
 	end
 	Engine.ParticleRemove = ParticleRemove
 
-	local Terrain = Workspace.Terrain
-	local Workspace = Workspace
+	local Terrain = workspace.Terrain
+	local workspace = workspace
 
 	local function HandleParticleUpdate(Camera, CameraInverse, Frame, Particle, t, dt)
 		--- Handles both priority and regular particles
@@ -304,7 +304,7 @@ local function RealMakeEngine(Screen)
 					Displacement = Displacement * (999/Distance)
 				end
 
-				local Hit, Position = RayCast(Workspace, ray(OldPosition, Displacement), Player.Character, true)
+				local Hit, Position = RayCast(workspace, ray(OldPosition, Displacement), Player.Character, true)
 				if Hit then
 					if type(Particle.RemoveOnCollision) == "function" then
 						if not Particle.RemoveOnCollision(Particle, Hit, Position) then
@@ -325,7 +325,7 @@ local function RealMakeEngine(Screen)
 	local function ParticleUpdate()
 		--- This guy is expensive
 		-- Should be in a loop, so no need for debounce
-		local Camera = Workspace.CurrentCamera
+		local Camera = workspace.CurrentCamera
 
 		AddNewParticles()
 		ParticleUpdateScreenInformation(Camera)

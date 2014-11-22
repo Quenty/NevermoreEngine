@@ -6,7 +6,6 @@ local ScriptContext               = game:GetService("ScriptContext")
 local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
 
-local qSystems                    = LoadCustomLibrary("qSystems")
 local PseudoChatSettings          = LoadCustomLibrary("PseudoChatSettings")
 local PseudoChatParser            = LoadCustomLibrary("PseudoChatParser")
 local OutputClassStreamLoggers    = LoadCustomLibrary("OutputClassStreamLoggers")
@@ -17,7 +16,6 @@ local qPlayer                     = LoadCustomLibrary("qPlayer")
 
 -- local ShipKillFeedParser       = LoadCustomLibrary("ShipKillFeedParser")
 
-qSystems:Import(getfenv(1))
 
 -- PseudoChatManagerServer.lua
 -- Manages chat connections, sends and making chats, filtering, et cetera.

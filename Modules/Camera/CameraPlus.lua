@@ -28,7 +28,7 @@ local qCFrame = LoadCustomLibrary("qCFrame")
 	
 	Camera Plus is an API wrapper for the default Camera
 	object in ROBLOX to give additional support for
-	doing tween animations with the Workspace.CurrentCamera.
+	doing tween animations with the workspace.CurrentCamera.
 	
 	I made this API because I got tired of always writing
 	custom camera cutscene systems for every new game I
@@ -160,7 +160,7 @@ API.StopTween = StopTween
 -- API:
 
 
--- local camera = game.Workspace.CurrentCamera
+-- local camera = game.workspace.CurrentCamera
 local lookAt = nil
 
 
@@ -200,17 +200,17 @@ end)();
 -- Set the camera's position
 function API:SetPosition(position)
 	
-	if (Workspace.CurrentCamera.CameraType == CAMTYPE_SCRIPTABLE) then
+	if (workspace.CurrentCamera.CameraType == CAMTYPE_SCRIPTABLE) then
 		if (not lookAt) then
-			lookAt = (Workspace.CurrentCamera.CoordinateFrame.p + (Workspace.CurrentCamera.CoordinateFrame.lookVector * 5))
+			lookAt = (workspace.CurrentCamera.CoordinateFrame.p + (workspace.CurrentCamera.CoordinateFrame.lookVector * 5))
 		end
-		Workspace.CurrentCamera.CoordinateFrame = CFRAME(position, lookAt)
+		workspace.CurrentCamera.CoordinateFrame = CFRAME(position, lookAt)
 	else
 		if (not lookAt) then
-			lookAt = Workspace.CurrentCamera.Focus.p
+			lookAt = workspace.CurrentCamera.Focus.p
 		end
-		Workspace.CurrentCamera.CoordinateFrame = CFRAME(position)
-		Workspace.CurrentCamera.Focus = CFRAME(lookAt)
+		workspace.CurrentCamera.CoordinateFrame = CFRAME(position)
+		workspace.CurrentCamera.Focus = CFRAME(lookAt)
 	end
 	
 end
@@ -219,7 +219,7 @@ end
 
 -- Get the camera's position
 function API:GetPosition()
-	return Workspace.CurrentCamera.CoordinateFrame.p
+	return workspace.CurrentCamera.CoordinateFrame.p
 end
 
 
@@ -243,51 +243,28 @@ end
 
 -- Set the camera's FieldOfView
 function API:SetFOV(fov)
-	Workspace.CurrentCamera.FieldOfView = fov
+	workspace.CurrentCamera.FieldOfView = fov
 end
 
 
 
 -- Get the camera's FieldOfView
 function API:GetFOV()
-	return Workspace.CurrentCamera.FieldOfView
+	return workspace.CurrentCamera.FieldOfView
 end
 
 
 
 -- Increment the camera's current FieldOfView
 function API:IncrementFOV(deltaFov)
-	Workspace.CurrentCamera.FieldOfView = (Workspace.CurrentCamera.FieldOfView + deltaFov)
-end
-
-
-
--- Set the camera's roll
--- OVERRIDE Camera:SetRoll
-function API:SetRoll(roll)
-	camera:SetRoll(roll)
-end
-
-
-
--- Get the camera's roll
--- OVERRIDE Camera:GetRoll
-function API:GetRoll()
-	return camera:GetRoll()
-end
-
-
-
--- Increment the camera's current roll
-function API:IncrementRoll(deltaRoll)
-	camera:SetRoll(camera:GetRoll() + deltaRoll)
+	workspace.CurrentCamera.FieldOfView = (workspace.CurrentCamera.FieldOfView + deltaFov)
 end
 
 
 
 -- Tween the camera from one position to the next
 function API:Tween(cframeStart, cframeEnd, duration, easingFunc, UserCallback)
-	Workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
+	workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
 	-- local startPos, startLook = CFrameToPosAndFocus(cframeStart)
 	-- local endPos, endLook = CFrameToPosAndFocus(cframeEnd)
 	-- local curPos, curLook = startPos, startLook
@@ -295,12 +272,12 @@ function API:Tween(cframeStart, cframeEnd, duration, easingFunc, UserCallback)
 		local Callback
 		if UserCallback then
 			function Callback(ratio)
-				Workspace.CurrentCamera.CoordinateFrame = qCFrame.SlerpCFrame(cframeStart, cframeEnd, ratio)
+				workspace.CurrentCamera.CoordinateFrame = qCFrame.SlerpCFrame(cframeStart, cframeEnd, ratio)
 				UserCallback(ratio)
 			end
 		else
 			function Callback(ratio)
-				Workspace.CurrentCamera.CoordinateFrame = qCFrame.SlerpCFrame(cframeStart, cframeEnd, ratio)
+				workspace.CurrentCamera.CoordinateFrame = qCFrame.SlerpCFrame(cframeStart, cframeEnd, ratio)
 			end
 		end
 		Tween(easingFunc, duration, Callback, "CoordinateFrame")
@@ -313,8 +290,8 @@ end
 
 -- Tween the camera to the position from the current position
 function API:TweenTo(cframeEnd, duration, easingFunc, callback)
-	Workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
-	self:Tween(Workspace.CurrentCamera.CoordinateFrame, cframeEnd, duration, easingFunc, callback)
+	workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
+	self:Tween(workspace.CurrentCamera.CoordinateFrame, cframeEnd, duration, easingFunc, callback)
 end
 
 
@@ -331,8 +308,8 @@ function API:TweenToPlayer(duration, easingFunc, callback)
 	local cframeEnd = CFrame.new((head.Position - (head.CFrame.lookVector * 10)), head.Position)
 	self:TweenTo(cframeEnd, duration, easingFunc, callback)
 	
-	Workspace.CurrentCamera.CameraType = CAMTYPE_CUSTOM
-	Workspace.CurrentCamera.CameraSubject = player.Character
+	workspace.CurrentCamera.CameraType = CAMTYPE_CUSTOM
+	workspace.CurrentCamera.CameraSubject = player.Character
 	if (humanoid) then
 		humanoid.WalkSpeed = walkSpeed
 	end
@@ -346,7 +323,7 @@ function API:TweenFOV(startFov, endFov, duration, easingFunc, override)
 	local diffFov = (endFov - startFov)
 	local function Callback(ratio)
 		fov = (startFov + (diffFov * ratio))
-		Workspace.CurrentCamera.FieldOfView = fov
+		workspace.CurrentCamera.FieldOfView = fov
 	end
 	Tween(easingFunc, duration, Callback, "FOV")
 end
@@ -355,19 +332,19 @@ end
 
 -- Tween to FieldOfView from current FieldOfView
 function API:TweenToFOV(endFov, duration, easingFunc, override)
-	self:TweenFOV(Workspace.CurrentCamera.FieldOfView, endFov, duration, easingFunc, override)
+	self:TweenFOV(workspace.CurrentCamera.FieldOfView, endFov, duration, easingFunc, override)
 end
 
 
 
 -- Tween the camera's roll
 function API:TweenRoll(startRoll, endRoll, duration, easingFunc)
-	Workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
+	workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
 	local roll = startRoll
 	local diffRoll = (endRoll - startRoll)
 	local function Callback(ratio)
 		roll = (startRoll + (diffRoll * ratio))
-		Workspace.CurrentCamera:SetRoll(roll)
+		workspace.CurrentCamera:SetRoll(roll)
 	end
 	Tween(easingFunc, duration, Callback, "Roll")
 end
@@ -376,7 +353,7 @@ end
 
 -- Tween the camera's roll from the current roll
 function API:TweenToRoll(endRoll, duration, easingFunc)
-	self:TweenRoll(Workspace.CurrentCamera:GetRoll(), endRoll, duration, easingFunc)
+	self:TweenRoll(workspace.CurrentCamera:GetRoll(), endRoll, duration, easingFunc)
 end
 
 
@@ -385,7 +362,7 @@ end
 function API:TweenAll(cframeStart, cframeEnd, fovStart, fovEnd, rollStart, rollEnd, duration, easingFunc)
 	--- DOES NOT SUPPORT OVERRIDE
 
-	Workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
+	workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
 	local startPos, startLook = CFrameToPosAndFocus(cframeStart)
 	local endPos, endLook = CFrameToPosAndFocus(cframeEnd)
 	local pos, look = startPos, startLook
@@ -396,9 +373,9 @@ function API:TweenAll(cframeStart, cframeEnd, fovStart, fovEnd, rollStart, rollE
 		look = startLook:lerp(endLook, ratio)
 		fov = (fovStart + (fovDiff * ratio))
 		roll = (rollStart + (rollDiff * ratio))
-		Workspace.CurrentCamera.CoordinateFrame = CFRAME(pos, look)
-		Workspace.CurrentCamera.FieldOfView = fov
-		camera:SetRoll(roll)
+		workspace.CurrentCamera.CoordinateFrame = CFRAME(pos, look)
+		workspace.CurrentCamera.FieldOfView = fov
+		workspace.CurrentCamera:SetRoll(roll)
 	end
 
 	Tween(easingFunc, duration, Callback)
@@ -410,11 +387,11 @@ end
 function API:TweenToAll(cframeEnd, fovEnd, rollEnd, duration, easingFunc)
 	--- DOES NOT SUPPORT OVERRIDE
 
-	Workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
+	workspace.CurrentCamera.CameraType = CAMTYPE_SCRIPTABLE
 	self:TweenAll(
-		Workspace.CurrentCamera.CoordinateFrame, 	cframeEnd,
-		Workspace.CurrentCamera.FieldOfView,			fovEnd,
-		camera:GetRoll(),			rollEnd,
+		workspace.CurrentCamera.CoordinateFrame, 	cframeEnd,
+		workspace.CurrentCamera.FieldOfView,			fovEnd,
+		workspace.CurrentCamera:GetRoll(),			rollEnd,
 		duration,
 		easingFunc
 	)

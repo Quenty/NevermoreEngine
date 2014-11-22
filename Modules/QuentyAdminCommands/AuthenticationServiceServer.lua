@@ -4,12 +4,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
 local qString           = LoadCustomLibrary("qString")
 local QACSettings       = LoadCustomLibrary("QACSettings")
 local qPlayer           = LoadCustomLibrary("qPlayer")
 
-qSystems:Import(getfenv(1))
 
 -- This script handles authenticating players who, well, I want authenticated, and defining permissions
 -- AuthenticationServiceServer.lua

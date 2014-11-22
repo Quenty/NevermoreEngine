@@ -2,18 +2,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService  = game:GetService("UserInputService")
 local Players           = game:GetService("Players")
 
-local NevermoreEngine          = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary        = NevermoreEngine.LoadLibrary
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems = LoadCustomLibrary("qSystems")
-local Maid     = LoadCustomLibrary("Maid")
-local qString  = LoadCustomLibrary("qString")
-local qGUI     = LoadCustomLibrary("qGUI")
+local qSystems          = LoadCustomLibrary("qSystems")
+local Maid              = LoadCustomLibrary("Maid")
+local qString           = LoadCustomLibrary("qString")
+local qGUI              = LoadCustomLibrary("qGUI")
+local Signal            = LoadCustomLibrary("Signal")
 
-qSystems:Import(getfenv(1))
+local Make              = qSystems.Make
+local Class             = qSystems.Class
 
 -- PseudoChatBar.lua
 -- @author Quenty
+-- Last modified November 17th, 2014
 
 local lib = {}
 
@@ -35,7 +38,7 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 	-- 	Configuration.XOffset = 10;
 	-- end
 
-	local NewChat         = CreateSignal()
+	local NewChat         = Signal.new()
 	PseudoChatBar.NewChat = NewChat
 
 	-- GENERATE GUIS 
@@ -176,7 +179,8 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 	end
 
 	UserInputService.InputBegan:connect(function(Input)
-		Spawn(function()
+		-- TODO: See if coroutine.create(coroutine.resume() would fare better)
+		spawn(function()
 			if not PseudoChatBar.Focused then
 				-- print(Input)
 				-- print(tostring(Input.KeyCode))

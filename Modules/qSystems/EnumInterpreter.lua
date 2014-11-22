@@ -2,10 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
 local qString           = LoadCustomLibrary("qString")
 
 local lib               = {}
@@ -14,7 +11,6 @@ local lib               = {}
 -- @author Quenty
 -- Last Modified February 3rd, 2014
 
-qSystems:Import(getfenv(1))
 
 local function Scan(Table, StringName)
 	for Index, Value in pairs(Table) do

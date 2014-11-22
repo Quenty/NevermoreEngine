@@ -7,7 +7,6 @@ local StarterGui                  = game:GetService("StarterGui")
 local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
 
-local qSystems                    = LoadCustomLibrary("qSystems")
 local OutputStreamInterface       = LoadCustomLibrary("OutputStreamInterface")
 local PseudoChatParser            = LoadCustomLibrary("PseudoChatParser")
 local OutputClassStreamLoggers    = LoadCustomLibrary("OutputClassStreamLoggers")
@@ -51,7 +50,6 @@ January 5th, 2014
 --]]
 
 
-qSystems:Import(getfenv(1))
 
 local lib = {}
 
@@ -125,7 +123,7 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 
 	Interface.Subscribe(GlobalSyndictator, nil, Color3.new(78/255, 205/255, 196/255), true) --Color3.new( 85/255,  98/255, 112/255), true)
 
-	Spawn(function()
+	spawn(function()
 		local AdminSyndictator
 		local Subscriber
 

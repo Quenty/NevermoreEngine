@@ -1,5 +1,5 @@
-local Players           = Game:GetService("Players")
-local Teams             = Game:GetService("Teams")
+local Players           = game:GetService("Players")
+local Teams             = game:GetService("Teams")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
@@ -11,7 +11,9 @@ local qSystems          = LoadCustomLibrary("qSystems")
 local Table             = LoadCustomLibrary("Table")
 
 local lib               = {}
-qSystems:Import(getfenv(1))
+
+local Class = qSystems.Class
+
 
 -- PlayerId.lua
 -- Last modified on January 23rd, 2014
@@ -230,7 +232,7 @@ local MakePlayerIdSystem = Class(function(PlayerIdSystem, MoreArguments, Specifi
 				PlayerIdSystem:AddAlias(Name, Item)
 			end
 		else
-			argumentError("NewAliasName", false, "table or string", Type.getType(NewAliasName))
+			error("NewAliasName failed to show up, should be a table or string, got " .. Type.getType(NewAliasName))
 		end
 	end
 	PlayerIdSystem.AddAlias = AddAlias

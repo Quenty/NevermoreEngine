@@ -6,7 +6,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local qInstance         = LoadCustomLibrary("qInstance")
 
-qSystems:Import(getfenv(1))
+local Make = qSystems.Make
 
 local lib = {}
 
@@ -325,7 +325,8 @@ end
 lib.PointInsidePart = PointInsidePart
 lib.pointInsidePart = PointInsidePart
 
-local FindPartOnRayWithIgnoreList = Workspace.FindPartOnRayWithIgnoreList
+
+local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
 
 local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, IgnoreCanCollideFalse, TerrainCellsAreCubes, MaximumCastCount, CustomCondition)
 	-- @param TransparencyThreshold The transparency a part can be for it to be counted. For example, if TransparencyThreshold is 0.25, and a part is 0.24 transparency then it will be counted as solid, otherwise if it
@@ -345,29 +346,35 @@ local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, Ignor
 	local CastCount = 0
 
 	local function CastAttempt(NewRayTrace)
-		if CastCount > MaximumCastCount then
+		-- print("Cast attempt " .. CastCount)
+
+		if CastCount >= MaximumCastCount then
 			return
 		else
 			CastCount = CastCount + 1
 		end
 
-		local Object, Position = FindPartOnRayWithIgnoreList(Workspace, NewRayTrace, IgnoreList, TerrainCellsAreCubes)
+		local Object, Position = FindPartOnRayWithIgnoreList(workspace, NewRayTrace, IgnoreList, TerrainCellsAreCubes)
 
 		if Object and Position then
 			if CustomCondition and CustomCondition(Object, Position) then
+				-- print("Custom override")
 				return Object, Position
 			elseif IgnoreCanCollideFalse and Object.CanCollide == false then
 				IgnoreList[#IgnoreList+1] = Object
-				CastCount = CastCount + 1
+
+				-- print("Hit something cancollide false", Object:GetFullName())
 				return CastAttempt(NewRayTrace)
 			elseif TransparencyThreshold and Object.Transparency >= TransparencyThreshold then
 				IgnoreList[#IgnoreList+1] = Object
-				CastCount = CastCount + 1
+				
+				-- print("Hit something transparent false", Object:GetFullName())
 				return CastAttempt(NewRayTrace)
 			else
 				return Object, Position
 			end
 		else
+			-- print("Just didn't hit anything")
 			return
 		end
 	end
@@ -376,15 +383,24 @@ local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, Ignor
 	local Magnitude = RayTrace.Direction.magnitude
 	local CastedMagnitude = 0
 
+	--game:GetService("Debris"):AddItem(
+	-- lib.DrawRay(RayTrace, BrickColor.new("Bright orange"))
+	--, 2)
+
 	while CastedMagnitude < Magnitude do
-		local ToCastMagnitude = Magnitude - CastedMagnitude + 1
+		local ToCastMagnitude = Magnitude - CastedMagnitude
 
 		if ToCastMagnitude > 999.5 then
 			ToCastMagnitude = 999
 		end
 
-		local NewRayTrace = Ray.new(RayTrace.Origin, DirectionUnit * ToCastMagnitude)
+		local WaysAlongPath = RayTrace.Origin + (DirectionUnit * CastedMagnitude)
+		local NewRayTrace = Ray.new(WaysAlongPath, DirectionUnit * ToCastMagnitude)
 		local Object, Position = CastAttempt(NewRayTrace)
+
+		-- game:GetService("Debris"):AddItem(
+		--	lib.DrawRay(NewRayTrace, BrickColor.new("Bright green"))
+		--, 2)
 
 		if Object then
 			return Object, Position
@@ -392,8 +408,8 @@ local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, Ignor
 
 		CastedMagnitude = CastedMagnitude + ToCastMagnitude
 
-		if CastCount > MaximumCastCount then
-			print("[AdvanceRaycast] - Reached maximum cast count @ " .. CastCount)
+		if CastCount >= MaximumCastCount then
+			print("[AdvanceRaycast] - Reached maximum cast count @ " .. CastCount .. "; MaximumCastCount = " .. MaximumCastCount)
 			return nil
 		end
 	end
@@ -409,7 +425,7 @@ local function AdvanceRaycast(Ray, IgnoreList, IgnoreInvisible, IgnoreCollisions
 	MaximumDepth = MaximumDepth and MaximumDepth - 1 or 10
 
 	-- print("Advance raycast @ " .. MaximumDepth)
-	local Object, Position = FindPartOnRayWithIgnoreList(Workspace, Ray, IgnoreList, TerrainCellsAreCubes)
+	local Object, Position = FindPartOnRayWithIgnoreList(workspace, Ray, IgnoreList, TerrainCellsAreCubes)
 	if not Object or ((Object.CanCollide == IgnoreCollisions or not IgnoreCollisions) and (Object.Transparency < 1 or not IgnoreInvisible)) then
 		return Object, Position
 	elseif MaximumDepth > 0 then
@@ -490,7 +506,8 @@ local function GetSurfaceNormal(Part, Vector)
 	end
 	return normal
 end
-
+lib.GetSurfaceNormal = GetSurfaceNormal
+lib.getSurfaceNormal = GetSurfaceNormal
 --[[
 You can think of a CFrame as a set of the lookVectors of 3 of the faces of a part.
 
@@ -683,7 +700,7 @@ lib.getCFrameRoll = GetCFrameRoll
 local function GetPitchFromLookVector(Vector)
 	-- Returns pitch of a Vector
 
-	return -math.asin(vec.Y) + math.pi/2
+	return -math.asin(Vector.Y) + math.pi/2
 end
 lib.GetPitchFromLookVector = GetPitchFromLookVector
 lib.getPitchFromLookVector = GetPitchFromLookVector
@@ -691,7 +708,7 @@ lib.getPitchFromLookVector = GetPitchFromLookVector
 local function GetYawFromLookVector(Vector)
 	-- Returns yaw of a Vector
 
-	return -math.atan2(vec.Z, vec.X) - math.pi/2
+	return -math.atan2(Vector.Z, Vector.X) - math.pi/2
 end
 lib.GetYawFromLookVector = GetYawFromLookVector
 lib.getYawFromLookVector = GetYawFromLookVector
@@ -711,7 +728,7 @@ local function DrawRay(Ray, Color, Parent)
 	--- Draw's a ray out (for debugging)
 	-- Credit to Cirrus for initial code.
 
-	Parent = Parent or Workspace
+	Parent = Parent or workspace
 
 	local NewPart = Instance.new("Part", Parent)
 
@@ -728,7 +745,8 @@ local function DrawRay(Ray, Color, Parent)
 	NewPart.CanCollide = false
 	NewPart.Transparency = 0.5
 	NewPart.BrickColor = Color or BrickColor.new("Bright red")
-
+	NewPart.Name = "DrawnRay"
+	
 	Instance.new("SpecialMesh", NewPart)
 
 	return NewPart
@@ -740,7 +758,7 @@ local function DrawPoint(Position, Color, Parent)
 	--- FOR DEBUGGING
 
 	local NewDraw = Make("Part", {
-		Parent        = Parent or Workspace;
+		Parent        = Parent or workspace;
 		Size          = Vector3.new(1, 1, 1);
 		Transparency  = 0.5;
 		BrickColor    = Color or BrickColor.new("Bright red");

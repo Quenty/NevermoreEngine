@@ -9,7 +9,7 @@ local qString           = LoadCustomLibrary("qString")
 local qMath             = LoadCustomLibrary("qMath")
 local Easing            = LoadCustomLibrary("Easing")
 
-qSystems:Import(getfenv(1))
+local Round = qSystems.Round
 
 local RbxUtility = LoadLibrary("RbxUtility")
 

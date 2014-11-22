@@ -6,7 +6,10 @@ local LoadCustomLibrary     = NevermoreEngine.LoadLibrary
 
 local qSystems              = LoadCustomLibrary("qSystems")
 local MakeMaid              = LoadCustomLibrary("Maid").MakeMaid
-qSystems:Import(getfenv(1))
+
+local CheckCharacter = qSystems.CheckCharacter
+local Make = qSystems.Make
+
 
 -- NevermoreCommandsLocal
 -- @author Quenty
@@ -45,7 +48,7 @@ local ClientRequests = {} do-- Requests from the server.
 			if RequestFunction then
 
 				local Args = {...}
-				Spawn(function()
+				spawn(function()
 					RequestFunction(unpack(Args))
 				end)
 			else
@@ -80,13 +83,13 @@ do -- FREECAM
 	end)
 
 	ClientRequests:AddRequestHandler("Unfreecam", function()
-		Workspace.CurrentCamera:Destroy();
+		workspace.CurrentCamera:Destroy();
 		wait(0)
-		while not Workspace.CurrentCamera do
+		while not workspace.CurrentCamera do
 			wait(0)
 		end
-		Workspace.CurrentCamera.CameraType = "Custom";
-		Workspace.CurrentCamera.CameraSubject = LocalPlayer.Character;
+		workspace.CurrentCamera.CameraType = "Custom";
+		workspace.CurrentCamera.CameraSubject = LocalPlayer.Character;
 
 		if LastCharacterCFrame and CheckCharacter(LocalPlayer) then
 			LocalPlayer.Character.Torso.CFrame = LastCharacterCFrame
@@ -104,7 +107,7 @@ do -- SONGS
 			local Song = LastSong
 			LastSong = nil
 
-			Spawn(function()
+			spawn(function()
 				while Song.Volume > 0 do
 					Song.Volume = Song.Volume - 0.05
 					wait()

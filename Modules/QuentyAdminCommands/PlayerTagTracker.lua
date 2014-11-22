@@ -6,7 +6,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
 
-qSystems:Import(getfenv(1))
+local Class = qSystems.Class
 
 -- PlayerTagTracker.lua
 -- This script is used to "tag" a player, and keep track of their "status". Meant to be used
@@ -15,6 +15,9 @@ qSystems:Import(getfenv(1))
 -- Last Modified January 20th, 2014
 
 --[[--Change Log--
+November 17th, 2014
+- Removed env importing
+
 January 23rd, 2014
 - Updated to new class system
 

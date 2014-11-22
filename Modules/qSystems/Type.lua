@@ -20,7 +20,7 @@ end
 
 function lib.isAnInstance(value)
 	-- Returns whether 'value' is an Instance value.
-	local _, result = pcall(Game.IsA, value, 'Instance')
+	local _, result = pcall(game.IsA, value, 'Instance')
 	return result == true
 end
 
@@ -120,7 +120,7 @@ end
 
 function lib.isASignal(value)
 	-- Returns whether 'value' is a RBXScriptSignal.
-	local success, connection = pcall(function() return Game.AllowedGearTypeChanged.connect(value) end)
+	local success, connection = pcall(function() return game.AllowedGearTypeChanged.connect(value) end)
 	if success and connection then
 		connection:disconnect()
 		return true
@@ -164,7 +164,7 @@ end
 function lib.isPositiveInt(number)
 	-- Returns whether 'value' is a positive interger or not.  
 	-- Useful for money transactions, and is used in the method isAnArray ( )
-	return type(value) == "number" and number > 0 and math.floor(number) == number
+	return type(number) == "number" and number > 0 and math.floor(number) == number
 end
 
 

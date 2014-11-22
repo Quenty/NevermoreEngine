@@ -4,12 +4,12 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
-local qGUI          = LoadCustomLibrary("qGUI")
-local Maid          = LoadCustomLibrary("Maid")
+local qGUI              = LoadCustomLibrary("qGUI")
+local Maid              = LoadCustomLibrary("Maid")
 
-qSystems:Import(getfenv(1))
+local Make              = qSystems.Make
 
-local lib = {}
+local lib               = {}
 
 -- TitleGenerator.lua
 -- @author Quenty
@@ -50,7 +50,6 @@ local function GenerateTitle(ScreenGui, Text, TopLabelText, BottomLabelText)
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0;
 		Name                   = "TitleContainer";
-		Parent                 = TextLabel;
 		ZIndex                 = Configuration.ZIndex;
 		ClipsDescendants       = true;
 	})

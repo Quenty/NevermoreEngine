@@ -78,7 +78,8 @@ local function load(str,src,mode,env)
 	if type(str) == 'string' then
 		chunk,err = loadstring(str,src)
 	else
-		chunk,err = lua51_load(str,src)
+		error("[Penlight] - Something happened, but lua51_load is not supported")
+		--chunk,err = lua51_load(str,src)
 	end
 	if chunk and env then setfenv(chunk,env) end
 	return chunk, err

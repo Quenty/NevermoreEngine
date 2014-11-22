@@ -40,8 +40,8 @@ Configuration.IsServer = not Configuration.IsClient
 
 
 -- Print out information on whether or not FilteringEnabled is up or not. 
-if Workspace.FilteringEnabled then
-	print("**** Workspace.FilteringEnabled is enabled")
+if workspace.FilteringEnabled then
+	print("**** workspace.FilteringEnabled is enabled")
 end
 
 -- Print out whether or not ResetPlayerGuiOnSpawn is enabled or not. 
@@ -403,7 +403,7 @@ local ResouceManager = {} do
 				NewScript.Parent = Players.LocalPlayer:FindFirstChild("PlayerGui")
 			end
 
-			Spawn(function()
+			spawn(function()
 				wait(0)
 				NewScript.Disabled = false;
 			end)
@@ -425,7 +425,7 @@ local ResouceManager = {} do
 				NewScript.Disabled = true;
 				NewScript.Parent = Client:FindFirstChild("PlayerGui")
 
-				Spawn(function()
+				spawn(function()
 					wait(0)
 					NewScript.Disabled = false;
 				end)
@@ -445,7 +445,7 @@ local ResouceManager = {} do
 		ResouceManager.ExecuteExecutables = ExecuteExecutables
 	end
 
-	local NativeImports
+	--[[local NativeImports
 
 	local function ImportLibrary(LibraryDefinition, Environment, Prefix)
 		--- Imports a library into a given environment, potentially adding a PreFix 
@@ -478,7 +478,7 @@ local ResouceManager = {} do
 	NativeImports = {
 		import = ImportLibrary;
 		Import = ImportLibrary;
-	}
+	}--]]
 
 	local function LoadLibrary(LibraryName)
 		--- Load's a modular script and packages it as a library. 
@@ -493,7 +493,7 @@ local ResouceManager = {} do
 				-- print(Configuration.PrintHeader .. "Loading Library " .. ModularScript:GetFullName())
 				local LibraryDefinition = require(ModularScript)
 
-				if type(LibraryDefinition) == "table" then
+				--[[if type(LibraryDefinition) == "table" then
 					-- Import native definitions
 					for Name, Value in pairs(NativeImports) do
 						if LibraryDefinition[Name] == nil then
@@ -502,7 +502,7 @@ local ResouceManager = {} do
 					end
 				--else
 					--error(Configuration.PrintHeader .. " Library '" .. LibraryName .. "' did not return a table, returned a '" .. type(LibraryDefinition) .. "' value, '" .. tostring(LibraryDefinition) .. "'")
-				end
+				end--]]
 
 				return LibraryDefinition
 			else
@@ -593,7 +593,7 @@ do
 						return nil
 					end
 				else
-					error(Configuration.PrintHeader .. "Invalid request to the DataStream, DataType '" .. type(Request))
+					error(Configuration.PrintHeader .. "Invalid request to the DataStream, DataType '" .. type(PossibleClient))
 				end
 			end
 
@@ -601,7 +601,7 @@ do
 				--- Sends the data, but doesn't wait for a response or return one. 
 
 				local Data = {...}
-				Spawn(function()
+				spawn(function()
 					Send(unpack(Data))
 				end)
 			end
@@ -687,7 +687,7 @@ do
 							local RequestExecuter = RequestTagDatabase[Request:lower()]
 							local RequestArguments = {...}
 							if RequestExecuter then
-								Spawn(function()
+								spawn(function()
 									RequestExecuter(unpack(RequestArguments))
 								end)
 							else
@@ -793,7 +793,7 @@ do
 						return nil
 					end
 				else
-					error(Configuration.PrintHeader .. "Invalid request DataType to the DataStream, DataType '" .. type(Request) .. "', String expected.")
+					error(Configuration.PrintHeader .. "Invalid request DataType to the DataStream, DataType '" .. type(PossibleClient) .. "', String expected.")
 				end
 			end
 
@@ -867,7 +867,7 @@ do
 							local RequestExecuter = RequestTagDatabase[Request:lower()]
 							local RequestArguments = {...}
 							if RequestExecuter then
-								Spawn(function()
+								spawn(function()
 									RequestExecuter(unpack(RequestArguments))
 								end)
 							else
@@ -1274,14 +1274,14 @@ do
 			end
 			Splash.SetParent = SetParent
 
-			Spawn(function()
+			spawn(function()
 				LogoLabel.ImageTransparency = 1
 				ContentProvider:Preload(SplashConfiguration.LogoTexture)
 				while IsActive and (ContentProvider.RequestQueueSize > 0) do
 					RunService.RenderStepped:wait()
 				end
 
-				Spawn(function()
+				spawn(function()
 					while IsActive and LogoLabel.ImageTransparency >= 0 do
 						LogoLabel.ImageTransparency = LogoLabel.ImageTransparency - 0.05
 						RunService.RenderStepped:wait()
@@ -1505,7 +1505,7 @@ end
 -----------------------
 local SetRespawnTime
 if Configuration.IsServer then
-	local function SetRespawnTime(NewTime)
+	function SetRespawnTime(NewTime)
 		--- Sets how long it takes for a character to respawn.
 		-- @param NewTime The new time it takes for a character to respawn
 		if type(NewTime) == "number" then
@@ -1519,11 +1519,11 @@ if Configuration.IsServer then
 		SetRespawnTime(NewTime)
 	end)
 else
-	local function SetRespawnTime(NewTime)
+	function SetRespawnTime(NewTime)
 		--- Sends a request to the server to set the respawn time.
 		-- @param NewTime The new respawn time.
 
-		DataStreamMain.Send(Configuration.NevermoreRequestPrefix .. "SetRespawnTime", NewTime)
+		Network.GetMainDatastream().Send(Configuration.NevermoreRequestPrefix .. "SetRespawnTime", NewTime)
 	end
 end
 

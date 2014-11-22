@@ -4,16 +4,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
+local Signal          = LoadCustomLibrary("Signal")
 
-qSystems:Import(getfenv(1))
-
+-- @author Quenty
 
 local ClientAuthenticationService = {} do
 	local RequestStream = NevermoreEngine.GetRemoteFunction("AuthenticationServiceRequestor")
 	local EventStream   = NevermoreEngine.GetRemoteEvent("AuthenticationServiceEventStream")
 
-	ClientAuthenticationService.AuthenticationChanged = CreateSignal()
+	ClientAuthenticationService.AuthenticationChanged = Signal.new()
 
 	EventStream.OnClientEvent:connect(function(AuthenticationChange)
 		if type(AuthenticationChange) == "string" then

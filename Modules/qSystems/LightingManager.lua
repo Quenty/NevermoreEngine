@@ -1,11 +1,13 @@
-local Lighting = game:GetService("Lighting")
+local Lighting          = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qGUI = LoadCustomLibrary("qGUI")
-local qMath = LoadCustomLibrary("qMath")
+local qGUI              = LoadCustomLibrary("qGUI")
+local qMath             = LoadCustomLibrary("qMath")
+
+-- @author Quenty
 
 local TweenTimeOfDay do
 	local TweenId
@@ -14,7 +16,7 @@ local TweenTimeOfDay do
 		TweenId = TweenId + 1
 		local LocalTweenId = TweenId
 	
-		Spawn(function()
+		spawn(function()
 			Lighting.TimeOfDay = Finish;
 			local MinutesFinish = Lighting:GetMinutesAfterMidnight()
 			Lighting.TimeOfDay = Start;

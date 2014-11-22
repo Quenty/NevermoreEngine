@@ -5,9 +5,9 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local RawCharacter      = LoadCustomLibrary("RawCharacter")
 local qSystems          = LoadCustomLibrary("qSystems")
+local Type              = LoadCustomLibrary("Type")
 
-
-qSystems:Import(getfenv(1))
+local CheckCharacter = qSystems.CheckCharacter
 
 local safeLib = {}
 

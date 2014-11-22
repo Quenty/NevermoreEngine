@@ -16,14 +16,15 @@ local qPlayer            = LoadCustomLibrary("qPlayer")
 
 local RbxUtility         = LoadLibrary("RbxUtility")
 
-qSystems:Import(getfenv(1))
+local Make               = qSystems.Make
+local CallOnChildren     = qSystems.CallOnChildren
 
 local lib = {}
 
 -- @author Quenty
 -- This script handles parsing and rendering of specific pseudo chat stuff,
 -- to be used with OutputStream
--- Last Modified January 26th, 2014
+-- Last Modified November 18th, 2014
 
 local GetPlayerNameColorRaw do 
 	local PlayerColours = {

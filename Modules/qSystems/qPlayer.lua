@@ -8,7 +8,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local qCFrame          = LoadCustomLibrary("qCFrame")
 
-qSystems:Import(getfenv(1))
+local CheckCharacter = qSystems.CheckCharacter
 
 -- qPlayer.lua
 -- Just utilities involving players (and teams).

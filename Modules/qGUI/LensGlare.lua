@@ -10,7 +10,8 @@ local qGUI              = LoadCustomLibrary("qGUI")
 local qCFrame           = LoadCustomLibrary("qCFrame")
 local qMath             = LoadCustomLibrary("qMath")
 
-qSystems:Import(getfenv(1))
+local Make = qSystems.Make
+local Class = qSystems.Class
 
 local lib = {}
 
@@ -60,7 +61,7 @@ local MakeLensGlare = Class(function(LensGlare, ScreenGui)
 
 	local function Step(Mouse)
 
-		local CameraAngle = (Workspace.CurrentCamera.CoordinateFrame.p - Workspace.CurrentCamera.Focus.p).unit
+		local CameraAngle = (workspace.CurrentCamera.CoordinateFrame.p - workspace.CurrentCamera.Focus.p).unit
 		local SunAngleUnit = Lighting:GetSunDirection()
 
 		
@@ -69,8 +70,8 @@ local MakeLensGlare = Class(function(LensGlare, ScreenGui)
 		if not IsNight() then
 			local Transparency = 1.45 - (SunAngleUnit - CameraAngle).magnitude / 3
 
-			local SunPositionGlobal = GetSunPositionOnScreenRelativeToCamera(Workspace.CurrentCamera, 10).p
-			local SunIsOnScreen, SunPositionOnScreen, Angle = qGUI.WorldToScreen(SunPositionGlobal, Mouse, Workspace.CurrentCamera)
+			local SunPositionGlobal = GetSunPositionOnScreenRelativeToCamera(workspace.CurrentCamera, 10).p
+			local SunIsOnScreen, SunPositionOnScreen, Angle = qGUI.WorldToScreen(SunPositionGlobal, Mouse, workspace.CurrentCamera)
 			if SunIsOnScreen then
 				Gui.BackgroundTransparency = Transparency
 			else
@@ -230,7 +231,7 @@ local MakeLensFlare = Class(function(LensFlare, ScreenGui)
 	local function Step(Mouse)
 		-- assert(Mouse, "[LensFlare] - Mouse is nil")
 
-		local CurrentCamera = Workspace.CurrentCamera
+		local CurrentCamera = workspace.CurrentCamera
 		local CoordinateFrame = CurrentCamera.CoordinateFrame
 
 		local SunPositionGlobal = GetSunPositionOnScreenRelativeToCamera(CurrentCamera, 900).p
@@ -243,8 +244,8 @@ local MakeLensFlare = Class(function(LensFlare, ScreenGui)
 				-- (CoordinateFrame.p - CurrentCamera.Focus.p).Unit * -999
 			)
 
-			-- local Part, EndPoint = Workspace:FindPartOnRayWithIgnoreList(Ray, {Players.LocalPlayer.Character})
-			local Part, EndPoint = Workspace:FindPartOnRay(Ray, Players.LocalPlayer.Character)
+			-- local Part, EndPoint = workspace:FindPartOnRayWithIgnoreList(Ray, {Players.LocalPlayer.Character})
+			local Part, EndPoint = workspace:FindPartOnRay(Ray, Players.LocalPlayer.Character)
 			if not Part then
 				IsRendering = true
 				Render(SunPositionOnScreen, Mouse, SunIsOnScreen)

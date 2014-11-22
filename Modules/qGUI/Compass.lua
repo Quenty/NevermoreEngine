@@ -7,7 +7,8 @@ local qSystems                = LoadCustomLibrary("qSystems")
 local qGUI                    = LoadCustomLibrary("qGUI")
 local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
 
-qSystems:Import(getfenv(1))
+local Class = qSystems.Class
+local Make = qSystems.Make
 
 local lib = {}
 
@@ -46,10 +47,22 @@ local function GetCameraRotation(CoordinateFrame, Focus)
 
 	-- 0 degrees is north (I think?)
 
-	-- assert(Focus, "No focus?")
-
 	return math.atan2(CoordinateFrame.X - Focus.X, CoordinateFrame.Z - Focus.Z) + math.pi
 end
+lib.GetCameraRotation = GetCameraRotation
+
+local function GetRelativeAngle(Camera, TargetPosition)
+	--- Get's the relative angle from the camera to a "target" position in the world coordinates.
+	-- @param Camera The camera to get the relative angle on.
+	-- @param TargetPosition The world target position.
+	-- @pre Step has been called.
+
+	local RelativeAngle = GetCameraRotation(Camera.CoordinateFrame, TargetPosition)
+	-- print("RelativeAngle: " .. Round(RelativeAngle, 0.01) .. "; Angle: " .. Round(Angle, 0.01) .. "; Angle - RelativeAngle = " .. Round(Angle - RelativeAngle, 0.01))
+
+	return RelativeAngle
+end
+lib.GetRelativeAngle = GetRelativeAngle
 
 local MakeCompassModel = Class(function(CompassModel)
 	--- This is an inertia model compass thing. 

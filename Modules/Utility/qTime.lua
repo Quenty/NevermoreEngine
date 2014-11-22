@@ -138,7 +138,7 @@ function lib.GetJulianDate(CurrentTime)
 	local Y = Year + 4800 - A
 	local M = Month + 12 * A - 3
 	
-	JulianDay = Day + ((153 * M + 2) / 5) + 365 * Y + (Y/4) - (Y/100) + (Y/400) - 32045
+	local JulianDay = Day + ((153 * M + 2) / 5) + 365 * Y + (Y/4) - (Y/100) + (Y/400) - 32045
 	
 	--[[local JulianDay = (Day 
 	+ ((153 * (Month + 12 * ((14 - Month) / 12 ) - 3) + 2) / 5)
@@ -367,6 +367,21 @@ function lib.GetFormattedTime(Format, CurrentTime)
 	end
 	
 	return ReturnString;
+end
+
+-- UTCTime handling
+local mLastCachedTimeAt = nil
+local mLastCachedTime = nil
+local mTimeOffset = os.time() - tick()
+function lib.UTCTimeExact()
+	return tick() + mTimeOffset
+end
+function lib.UTCTime()
+	if game.Workspace.DistributedGameTime ~= mLastCachedTimeAt then
+		mLastCachedTime = tick() + mTimeOffset
+		mLastCachedTimeAt = game.Workspace.DistributedGameTime
+	end
+	return mLastCachedTime
 end
 
 return lib

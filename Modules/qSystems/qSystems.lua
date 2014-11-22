@@ -11,7 +11,7 @@ local ReplicatedStorage  = game:GetService("ReplicatedStorage")
 local RunService         = game:GetService("RunService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local TestService        = game:GetService("TestService")
-local Terrain            = Workspace.Terrain
+local Terrain            = workspace	.Terrain
 
 local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
@@ -28,6 +28,9 @@ local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
 
 --[[
 Updates and Changes log
+November 17th, 2014
+- Removed importing into the environment
+
 August 18th, 2014
 - Removed isA method
 - Cleaned up commented code
@@ -68,8 +71,8 @@ December 28th, 2013
 - Added new alias to roundnumber (Round)
 ]]
 	
-local Type                    = LoadCustomLibrary('Type')
-local Signal                  = LoadCustomLibrary('Signal')
+local Type                    = LoadCustomLibrary("Type")
+local Signal                  = LoadCustomLibrary("Signal")
 
 local lib                     = {}
 
@@ -173,27 +176,28 @@ lib.CallOnChildren = CallOnChildren
 lib.call_on_children = CallOnChildren
 
 
-local function getNearestParent(instance, className)
+local function GetNearestParent(Instance, ClassName)
 	-- Returns the nearest parent of a certain class, or returns nil
 
-	local ancestor = instance
+	local Ancestor = Instance
 	repeat
-		ancestor = ancestor.Parent
-		if ancestor == nil then
+		Ancestor = Ancestor.Parent
+		if Ancestor == nil then
 			return nil
 		end
-	until ancestor:IsA(className)
-	return ancestor
+	until Ancestor:IsA(ClassName)
+
+	return Ancestor
 end
-lib.getNearestParent = getNearestParent;
-lib.GetNearestParent = getNearestParent;
-lib.get_nearest_parent = getNearestParent;
+lib.getNearestParent = GetNearestParent
+lib.GetNearestParent = GetNearestParent
+lib.get_nearest_parent = GetNearestParent
 
 
 local function GetHumanoid(Descendant)
-	-- Return's a humanoid in the parent structure if it can find it. Intended to be used in Workspace only.
+	-- Return's a humanoid in the parent structure if it can find it. Intended to be used in workspace	 only.
 	-- Useful for weapon scripts, and all that, especially to work on non player targets.
-	-- Will scan *up* to workspace. If workspace has a humanoid in it, it won't find it.
+	-- Will scan *up* to workspace	. If workspace	 has a humanoid in it, it won't find it.
 
 	-- Will work even if there are non-humanoid objects named "Humanoid"
 	-- However, only works on objects named "Humanoid" (this is intentional)
@@ -216,7 +220,7 @@ local function GetHumanoid(Descendant)
 			end
 		end
 
-		if Descendant.Parent and Descendant:IsDescendantOf(Workspace) then
+		if Descendant.Parent and Descendant:IsDescendantOf(workspace	) then
 			Descendant = Descendant.Parent
 		else
 			return nil
@@ -309,11 +313,6 @@ lib.getIndexByValue = GetIndexByValue
 lib.GetIndexByValue = GetIndexByValue
 lib.get_index_by_value = GetIndexByValue
 
-lib.GetIndexFromValue = GetIndexByValue
-
-lib.getIndex = getIndexByValue
-lib.GetIndex = getIndexByValue
-lib.get_index = getIndexByValue
 
 local function Class(Constructor, Metatable)
 	--- Provides a wrapper for new classes. 

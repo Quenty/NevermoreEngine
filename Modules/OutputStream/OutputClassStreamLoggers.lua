@@ -8,7 +8,7 @@ local qSystems          = LoadCustomLibrary("qSystems")
 local CircularBuffer    = LoadCustomLibrary("CircularBuffer")
 local Table             = LoadCustomLibrary("Table")
 
-qSystems:Import(getfenv(1))
+local Class = qSystems.Class
 
 local lib = {}
 

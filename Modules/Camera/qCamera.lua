@@ -1,32 +1,32 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players           = game:GetService("Players")
+
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary('qSystems')
-local qCFrame           = LoadCustomLibrary('qCFrame')
+local qCFrame           = LoadCustomLibrary("qCFrame")
 
-qSystems:Import(getfenv(1))
 
 local lib = {}
 
 local function PointCamera(CoordinateFrame, Focus)
-	Workspace.CurrentCamera.Focus = Focus
-	Workspace.CurrentCamera.CoordinateFrame = CFrame.new(CoordinateFrame.p, Focus.p)
+	workspace.CurrentCamera.Focus = Focus
+	workspace.CurrentCamera.CoordinateFrame = CFrame.new(CoordinateFrame.p, Focus.p)
 end
 lib.PointCamera = PointCamera
 lib.pointCamera = PointCamera
 
 local function SetCurrentCameraToScriptable()
-	--[[local CoordinateFrame, Focus = Workspace.CurrentCamera.CoordinateFrame.p, Workspace.CurrentCamera.Focus
-	Workspace.CurrentCamera:Destroy()
+	--[[local CoordinateFrame, Focus = workspace.CurrentCamera.CoordinateFrame.p, workspace.CurrentCamera.Focus
+	workspace.CurrentCamera:Destroy()
 	wait(0)
-	while not Workspace.CurrentCamera do wait(0) end
-	Workspace.CurrentCamera.CameraType = "Scriptable"
-	Workspace.CurrentCamera.CoordinateFrame = CFrame.new(CoordinateFrame, Focus.p)
-	Workspace.CurrentCamera.Focus = Focus
+	while not workspace.CurrentCamera do wait(0) end
+	workspace.CurrentCamera.CameraType = "Scriptable"
+	workspace.CurrentCamera.CoordinateFrame = CFrame.new(CoordinateFrame, Focus.p)
+	workspace.CurrentCamera.Focus = Focus
 	return CoordinateFrame, Focus--]]
 
-	Workspace.CurrentCamera.CameraType = "Scriptable";
+	workspace.CurrentCamera.CameraType = "Scriptable";
 end
 lib.SetCurrentCameraToScriptable = SetCurrentCameraToScriptable
 lib.setCurrentCameraToScriptable = SetCurrentCameraToScriptable
@@ -39,18 +39,17 @@ local function ShakeCamera(c0,f0,intensity,durration,opposite)
 	local i = (intensity/2)
 	local i2 = i
 	while ((time()-t) < durration) do
-		if (skip) then break end
 		if (opposite) then
 			i = (i2*((time()-t)/durration))
 		else
 			i = (i*(1-((time()-t)/durration)))
 		end
-		Workspace.CurrentCamera.CoordinateFrame = (c0*CFrame.new((-i+(math.random()*i)),(-i+(math.random()*i)),(-i+(math.random()*i))))
-		Workspace.CurrentCamera.Focus = (f0*CFrame.new((-i+(math.random()*i)),(-i+(math.random()*i)),(-i+(math.random()*i))))
+		workspace.CurrentCamera.CoordinateFrame = (c0*CFrame.new((-i+(math.random()*i)),(-i+(math.random()*i)),(-i+(math.random()*i))))
+		workspace.CurrentCamera.Focus = (f0*CFrame.new((-i+(math.random()*i)),(-i+(math.random()*i)),(-i+(math.random()*i))))
 		wait(0)
 	end
-	Workspace.CurrentCamera.CoordinateFrame = c0
-	Workspace.CurrentCamera.Focus = f0
+	workspace.CurrentCamera.CoordinateFrame = c0
+	workspace.CurrentCamera.Focus = f0
 end
 
 lib.ShakeCamera = ShakeCamera
@@ -58,9 +57,9 @@ lib.shakeCamera = ShakeCamera
 
 local function SetPlayerControl()
 	if Players.LocalPlayer.Character then
-		Workspace.CurrentCamera.CameraSubject = Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+		workspace.CurrentCamera.CameraSubject = Players.LocalPlayer.Character:FindFirstChild("Humanoid")
 	end
-	Workspace.CurrentCamera.CameraType = "Custom"
+	workspace.CurrentCamera.CameraType = "Custom"
 end
 lib.SetPlayerControl = SetPlayerControl
 lib.setPlayerControl = SetPlayerControl
@@ -71,7 +70,7 @@ local OpeatingTweenCamera = false;
 
 local function TweenCamera(CoordinateFrameTarget, FocusTarget, TimeToTween, Override, RollTarget, FieldOfViewTarget)
 	SetCurrentCameraToScriptable()
-	Spawn(function()
+	spawn(function()
 		if Override and OpeatingTweenCamera then
 			--print("Camera Tween: Overriding operation");
 			TweenCameraOverideId = TweenCameraOverideId+1;
@@ -81,14 +80,14 @@ local function TweenCamera(CoordinateFrameTarget, FocusTarget, TimeToTween, Over
 		end
 		OpeatingTweenCamera = true;
 
-		FieldOfViewTarget = FieldOfViewTarget or Workspace.CurrentCamera.FieldOfView
-		RollTarget = RollTarget or Workspace.CurrentCamera:GetRoll()
+		FieldOfViewTarget = FieldOfViewTarget or workspace.CurrentCamera.FieldOfView
+		RollTarget = RollTarget or workspace.CurrentCamera:GetRoll()
 
 		local CurrentNumber = TweenCameraOverideId;
-		local OriginalRoll = Workspace.CurrentCamera:GetRoll()
-		local OriginalFieldOfView = Workspace.CurrentCamera.FieldOfView
-		local CoordinateFocusStart = Workspace.CurrentCamera.Focus.p
-		local CoordinateFrameStart = CFrame.new(Workspace.CurrentCamera.CoordinateFrame.p, CoordinateFocusStart)
+		local OriginalRoll = workspace.CurrentCamera:GetRoll()
+		local OriginalFieldOfView = workspace.CurrentCamera.FieldOfView
+		local CoordinateFocusStart = workspace.CurrentCamera.Focus.p
+		local CoordinateFrameStart = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p, CoordinateFocusStart)
 		local CoordinateFrameFinish = CFrame.new(CoordinateFrameTarget, FocusTarget)
 
 		local RepetitionIntervol = (1/(TimeToTween/wait(0)))
@@ -97,10 +96,10 @@ local function TweenCamera(CoordinateFrameTarget, FocusTarget, TimeToTween, Over
 		for Index = 0, 1, RepetitionIntervol do
 			local SmoothIndex = math.sin((Index - 0.5) * math.pi)/2 + 0.5
 			local Focus = CoordinateFocusStart:lerp(FocusTarget, SmoothIndex)
-			Workspace.CurrentCamera.CoordinateFrame = qCFrame.SlerpCFrame(CoordinateFrameStart, CoordinateFrameFinish, SmoothIndex)
-			Workspace.CurrentCamera.Focus = CFrame.new(Focus)
-			Workspace.CurrentCamera:SetRoll(OriginalRoll + ((RollTarget - OriginalRoll) * SmoothIndex))
-			Workspace.CurrentCamera.FieldOfView = OriginalFieldOfView + ((FieldOfViewTarget - OriginalFieldOfView)) * SmoothIndex
+			workspace.CurrentCamera.CoordinateFrame = qCFrame.SlerpCFrame(CoordinateFrameStart, CoordinateFrameFinish, SmoothIndex)
+			workspace.CurrentCamera.Focus = CFrame.new(Focus)
+			workspace.CurrentCamera:SetRoll(OriginalRoll + ((RollTarget - OriginalRoll) * SmoothIndex))
+			workspace.CurrentCamera.FieldOfView = OriginalFieldOfView + ((FieldOfViewTarget - OriginalFieldOfView)) * SmoothIndex
 			wait(0)
 
 			if TweenCameraOverideId ~= CurrentNumber then
@@ -110,8 +109,8 @@ local function TweenCamera(CoordinateFrameTarget, FocusTarget, TimeToTween, Over
 
 		OpeatingTweenCamera = false;
 		PointCamera(CFrame.new(CoordinateFrameTarget), CFrame.new(FocusTarget))
-		Workspace.CurrentCamera:SetRoll(RollTarget)
-		Workspace.CurrentCamera.FieldOfView = FieldOfViewTarget
+		workspace.CurrentCamera:SetRoll(RollTarget)
+		workspace.CurrentCamera.FieldOfView = FieldOfViewTarget
 		return true;
 	end)
 end

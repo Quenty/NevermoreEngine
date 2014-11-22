@@ -36,8 +36,15 @@ local function RecurseMakeOverridenConfiguration(UserConfiguration, DefaultConfi
 	for Index, Value in pairs(DefaultConfiguration) do
 		if UserConfiguration[Index] == Value then -- Remove unnecessary data.
 			UserConfiguration[Index] = nil
-		elseif type(Value) == "table" and UserConfiguration[Index] ~= nil then
-			UserConfiguration[Index] = RecurseMakeOverridenConfiguration(UserConfiguration[Index], Value)
+		elseif type(Value) == "table" then
+			if UserConfiguration[Index] == nil then
+				UserConfiguration[Index] = {}
+			elseif type(UserConfiguration[Index]) ~= "table" then
+				error("User configuration had a non-table value in an index (" .. Index .. ") that should be a table")
+			end
+			--if UserConfiguration[Index] ~= nil then
+				UserConfiguration[Index] = RecurseMakeOverridenConfiguration(UserConfiguration[Index], Value)
+			--end
 		end
 	end
 
@@ -58,6 +65,49 @@ local function MakeOverridenConfiguration(UserConfiguration, DefaultConfiguratio
 
 	return UserConfiguration
 end
+
+
+
+local function RecurseAppendDefaultData(UserData, DefaultData)
+	--- Primary use is to allow a data without having to have every single default value. Good for networking
+	--- Will NOT wipe out existing values... will append.
+
+	setmetatable(UserData, nil) --
+
+	for Index, Value in pairs(DefaultData) do
+		if UserData[Index] == Value then -- Remove unnecessary data.
+			UserData[Index] = nil
+		elseif type(Value) == "table" then
+			if UserData[Index] == nil then
+				UserData[Index] = {}
+			elseif type(UserData[Index]) ~= "table" then
+				error("User configuration had a non-table value in an index (" .. Index .. ") that should be a table")
+			end
+			--if UserData[Index] ~= nil then
+				UserData[Index] = RecurseAppendDefaultData(UserData[Index], Value)
+			--end
+		end
+	end
+
+	setmetatable(UserData, {__index=DefaultData})
+
+	return UserData
+
+end
+
+local function AppendDefaultData(UserData, DefaultData)
+	UserData = UserData or {}
+
+	if UserData ~= DefaultData then
+		UserData = RecurseAppendDefaultData(UserData, DefaultData)
+	else
+		error("User configuration is equal to default configuration")
+	end
+
+	return UserData
+end
+
+
 
 --[[
 local function MakeOverridenConfiguration(UserConfiguration, DefaultConfiguration)
@@ -86,5 +136,7 @@ lib.MakeOverridenConfiguration = MakeOverridenConfiguration
 lib.makeOverridenConfiguration = MakeOverridenConfiguration
 lib.New                        = MakeOverridenConfiguration
 lib.new                        = MakeOverridenConfiguration
+
+lib.AppendDefaultData = AppendDefaultData
 
 return lib
