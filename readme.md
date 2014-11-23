@@ -32,12 +32,17 @@ Nevermore can be accessed by other scripts as being found in ReplicatedStorage, 
 moves itself. 
 
 ## Nevermore seems really hack, is it?
-Yes. It is, but it's simply because ROBLOX has really weird glitches and bugs. Nevermore
+Short answer: Yes. 
+
+Long answer: It is, but it's simply because ROBLOX has really weird glitches and bugs. Nevermore
 is designed to streamline testing, and so it moves resources around accordingly to make sure
-that it still works with debugging while resources are loaded accordingly. 
+that it still works with debugging while resources are loaded accordingly. **Some assets well
+designed, and the ones that are not are being redesigned to be more testable and reliable.**
 
 Nevermore's class system and other "hacky" elements are being redesigned right now.
-Recently, the import syntax has been removed for this reason.
+Recently, the import syntax has been removed for this reason. Expect updates. 
+
+In the long run though, it is still reliable. 
 
 ## How do I load up Nevermore?
 Loading on the server and the client may be done by using the following code:
