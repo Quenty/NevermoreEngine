@@ -20,16 +20,6 @@ local AuthenticationService = {} do
 	local RequestStream = NevermoreEngine.GetRemoteFunction("AuthenticationServiceRequestor")
 	local EventStream   = NevermoreEngine.GetRemoteEvent("AuthenticationServiceEventStream")
 
-	RequestStream.OnServerInvoke = (function(Player, Request, Data)
-		Player = Player or Players.LocalPlayer
-
-		if Request == "IsAuthorized" then
-			return AuthenticationService.IsAuthorized(Data or Player)
-		else
-			error("[AuthenticationService] - Unknown request")
-		end
-	end)
-
 	local function IsAuthorized(PlayerName)
 		PlayerName = tostring(PlayerName) -- Incase they send in a player
 
@@ -80,6 +70,16 @@ local AuthenticationService = {} do
 	end
 	AuthenticationService.Deauthorize = Deauthorize
 	AuthenticationService.deauthorize = Deauthorize
+
+	RequestStream.OnServerInvoke = (function(Player, Request, Data)
+		Player = Player or Players.LocalPlayer
+
+		if Request == "IsAuthorized" then
+			return AuthenticationService.IsAuthorized(Data or Player)
+		else
+			error("[AuthenticationService] - Unknown request")
+		end
+	end)
 end
 
 return AuthenticationService
