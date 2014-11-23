@@ -540,7 +540,7 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 		ParentFrame.BackgroundTransparency = 1;
 		ParentFrame.Name                   = "Circle_Effect";
 		ParentFrame.Size                   = UDim2.new(1, 0, 1, 0);
-		ParentFrame.ZIndex                 = Gui.ZIndex + 1
+		ParentFrame.ZIndex                 = math.min(Gui.ZIndex + 1, 10)
 		ParentFrame.Parent                 = Gui;
 	end
 
@@ -552,15 +552,15 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 	Circle.BorderSizePixel             = 0;
 	Circle.Archivable                  = false;
 	Circle.Size                        = UDim2.new(0, StartDiameter, 0, StartDiameter);
-	Circle.ZIndex                      = Gui.ZIndex + 1
+	Circle.ZIndex                      = math.min(Gui.ZIndex + 1, 10)
 	
 	Circle.Position                    = UDim2.new(0, X-StartDiameter/2, 0, Y-StartDiameter/2)
 
-	if Gui.AbsoluteSize.X > Gui.AbsoluteSize.Y then
+	--[[if Gui.AbsoluteSize.X > Gui.AbsoluteSize.Y then
 		Gui.SizeConstraint = "RelativeXX"
 	else
 		Gui.SizeConstraint = "RelativeYY"
-	end
+	end--]]
 
 	local NewDiameter = OverrideSize or math.max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y) * 2 -- multiply times 2 because we want it resize for the whole time, and at 1/2 we expect it to fill the whole place.
 	local NewSize     = UDim2.new(0, NewDiameter * 2.82842712475, 0,  NewDiameter * 2.82842712475)
