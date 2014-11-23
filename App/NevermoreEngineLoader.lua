@@ -8,32 +8,34 @@
 local TestService       = game:GetService('TestService')
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local function Warn(WarningText)
-	--- Used to yell at the player
-	-- @param WarningText The text to warn with.
+local function WaitForChild(Parent, Name, TimeLimit)
+	-- Waits for a child to appear. Not efficient, but it shoudln't have to be. It helps with debugging. 
+	-- Useful when ROBLOX lags out, and doesn't replicate quickly.
+	-- @param TimeLimit If TimeLimit is given, then it will return after the timelimit, even if it hasn't found the child.
 
-	spawn(function()
-		TestService:Warn(false, WarningText)
-	end)
-end
+	assert(Parent ~= nil, "Parent is nil")
+	assert(type(Name) == "string", "Name is not a string.")
 
-local function WaitForChild(Parent, Name)
-	--- Yields until a child is added. Warns after 5 seconds of yield.
-	-- @param Parent The parent to wait for the child of
-	-- @param Name The name of the child
-	-- @return The child found
-
-	local Child = Parent:FindFirstChild(Name)
+	local Child     = Parent:FindFirstChild(Name)
 	local StartTime = tick()
-	local Warned = false;
-	while not Child do
+	local Warned    = false
+
+	while not Child and Parent do
 		wait(0)
 		Child = Parent:FindFirstChild(Name)
-		if not Warned and StartTime + 5 <= tick() then
-			Warned = true;
-			Warn("[NevermoreEngineLoader] -" .. " " .. Name .. " has not replicated after 5 seconds, may not be able to execute Nevermore.")
+		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
+			Warned = true
+			warn("Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")")
+			if TimeLimit then
+				return Parent:FindFirstChild(Name)
+			end
 		end
 	end
+
+	if not Parent then
+		warn("Parent became nil.")
+	end
+
 	return Child
 end
 
@@ -47,12 +49,9 @@ while not script.Parent do
 end
 
 -- Identify the modular script
--- local NevermoreModularScript = WaitForChild(script.Parent, "NevermoreEngine")
-
 local NevermoreModularScript = ReplicatedStorage:FindFirstChild("NevermoreEngine")
 if not NevermoreModularScript then
 	local NevermoreModularScriptSource = WaitForChild(script.Parent, "NevermoreEngine")
-
 	NevermoreModularScript             = NevermoreModularScriptSource:Clone()
 	NevermoreModularScript.Archivable  = false
 end
