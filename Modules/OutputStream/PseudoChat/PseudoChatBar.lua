@@ -220,7 +220,7 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 
 	InputGui.FocusLost:connect(StopFocus)
 
-	InputButton.MouseButton1Click:connect(function()
+	InputButton.MouseButton1Click:connect(function(X, Y)
 		StartFocus()
 	end)
 

@@ -9,74 +9,37 @@ It should be parented to `ServerScriptService.NevermoreEngine`, and is a
 
 Nevermore was written for use in ROBLOX.
 
-## File Structure
-Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
-should be setup like this. Nevermore Engine uses Backpack objects to store 
-modules
 
-```
-<<< ROOT >>>
-	Workspace
-	Players
-	Lighting
-	ReplicatedStorage
-	ServerScriptService
-		Nevermore
-			Modules
-				...
-				Game
-					Client.Main
-					Server.Main
-			App
-				NevermoreEngine
-				NevermoreEngineLoader
-```
+# FAQ
+## What is Nevermore?
+Nevermore is Quenty's solution to reusing code on ROBLOX. It's a collaborate piece 
+of work that is actively used in games. Nevermore was developed several years ago,
+before Module Scripts. Now, Nevermore still provides an easy way to load modules
+and ensure reusable code.
 
-`NevermoreEngineLoader` should be the only script enabled, and will queue 
-loading of the rest of Nevermore.
+## What does Nevermore do?
+Nevermore handles three things. Loading libraries, loading code, and loading characters.
+To put it simply, ROBLOX's loading system when it comes to character respawn and code
+loading is annoying to work with, so it's been rewritten.
+ 
+Nevermore's libraries handle many more functions that ROBLOX does not provide. A 
+majority of common methods are used in qSystems, for example, are rewritten to make
+debugging easier. **These libraries are optional.**
 
-Modules may be organized however one likes, but it is suggested that users 
-follow the file structure uploaded to the git repository.
+## How do I use Nevermore?
+Simple insert the files in the correct place as specified by "File sStructure" below.
+Nevermore can be accessed by other scripts as being found in ReplicatedStorage, where it
+moves itself. 
 
-## Liscense
-The MIT License (MIT)
+## Nevermore seems really hack, is it?
+Yes. It is, but it's simply because ROBLOX has really weird glitches and bugs. Nevermore
+is designed to streamline testing, and so it moves resources around accordingly to make sure
+that it still works with debugging while resources are loaded accordingly. 
 
-Copyright (C) 2014 Quenty
+Nevermore's class system and other "hacky" elements are being redesigned right now.
+Recently, the import syntax has been removed for this reason.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-## Modules
-Modules contain scripts, localscripts, and ModuleScripts. `LocalScripts` and 
-`ModuleScripts` are replciated. Any script ending in .Main will execute, as well
-as any script that is not disabled (Although Nevermore will complain).
-
-Modules cache, so it is important that all required modules already exist at the
-time of running.
-
-### App
-App contains specific files used by Nevermore.
-
-
-Nevermore is designed to execute multiple times without breaking anything, so it
-will work in a PrivateServer. Modules will be cloned, et cetera.
-
-## Loading
+## How do I load up Nevermore?
 Loading on the server and the client may be done by using the following code:
 
 ```lua
@@ -118,6 +81,50 @@ Nevermore has several configuration options that can be modified in the main
 module. 
 
 Blacklist - The blacklist is used to ban players automatically from the game. 
+
+## File Structure
+Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
+should be setup like this. Nevermore Engine uses Backpack objects to store 
+modules
+
+```
+<<< ROOT >>>
+	Workspace
+	Players
+	Lighting
+	ReplicatedStorage
+	ServerScriptService
+		Nevermore
+			Modules
+				...
+				Game
+					Client.Main
+					Server.Main
+			App
+				NevermoreEngine
+				NevermoreEngineLoader
+```
+
+`NevermoreEngineLoader` should be the only script enabled, and will queue 
+loading of the rest of Nevermore.
+
+Modules may be organized however one likes, but it is suggested that users 
+follow the file structure uploaded to the git repository.
+
+## Modules
+Modules contain scripts, localscripts, and ModuleScripts. `LocalScripts` and 
+`ModuleScripts` are replicated. Any script ending in .Main will execute, as well
+as any script that is not disabled (Although Nevermore will complain).
+
+Modules cache, so it is important that all required modules already exist at the
+time of running.
+
+### App
+App contains specific files used by Nevermore.
+
+
+Nevermore is designed to execute multiple times without breaking anything, so it
+will work in a PrivateServer. Modules will be cloned, et cetera.
 
 ## Update / Change Log
 This change log is *strictly* for Nevermore's module and documentation only.

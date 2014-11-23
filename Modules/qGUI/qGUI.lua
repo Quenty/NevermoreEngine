@@ -517,7 +517,7 @@ local TweenColor3, StopColor3Tween do
 end
 
 local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect, OverrideSize)
-	--- Google design thing.
+	--- Google design thing. Actually, it's ink. :P
 	-- @param DoNotConstrainEffect If set to true, it will not constrain the effect within the GUI.
 	-- @param OverrideSize An overridden size.
 
