@@ -959,8 +959,8 @@ do
 	Network.GetMainDatastream = GetMainDatastream
 
 	local SplashConfiguration = {
-		BackgroundColor3      = Color3.new(237/256, 236/256, 233/256);       -- Color of background of loading screen.
-		AccentColor3          = Color3.new(8/256, 130/256, 83/256);          -- Not used. 
+		BackgroundColor3      = Color3.new(237/255, 236/255, 233/255);       -- Color of background of loading screen.
+		AccentColor3          = Color3.new(8/255, 130/255, 83/255);          -- Not used. 
 		LogoSize              = 200;
 		LogoTexture           = "http://www.roblox.com/asset/?id=129733987";
 		LogoSpacingUp         = 70; -- Pixels up from loading frame.

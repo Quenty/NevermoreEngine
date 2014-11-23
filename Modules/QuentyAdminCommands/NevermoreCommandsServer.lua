@@ -464,7 +464,7 @@ do
 			end)
 			Cmds:Alias("Clean", "Cleanup", "Cleanse", "cln")
 
-		Cmds:add("GetPoints", {
+		--[[Cmds:add("GetPoints", {
 				Description = "Prompts a player with a Dev. Product (Consumable)";
 			}, 
 			function()
@@ -479,7 +479,7 @@ do
 
 				return "There are " .. PointsLeft .. " point(s) left."
 			end)
-			Cmds:Alias("GetPoints", "AwardablePoints", "GetAwardablePoints", "PrintAwardablePoints", "PrintAP", "PrintPointBalance", "PrintPB", "PP", "GPoints")
+			Cmds:Alias("GetPoints", "AwardablePoints", "GetAwardablePoints", "PrintAwardablePoints", "PrintAP", "PrintPointBalance", "PrintPB", "PP", "GPoints")--]]
 	end
 
 	do

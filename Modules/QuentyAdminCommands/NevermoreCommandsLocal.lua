@@ -83,6 +83,8 @@ do -- FREECAM
 	end)
 
 	ClientRequests:AddRequestHandler("Unfreecam", function()
+		local LastCameraPosition = workspace.CurrentCamera.CoordinateFrame
+
 		workspace.CurrentCamera:Destroy();
 		wait(0)
 		while not workspace.CurrentCamera do
@@ -92,7 +94,8 @@ do -- FREECAM
 		workspace.CurrentCamera.CameraSubject = LocalPlayer.Character;
 
 		if LastCharacterCFrame and CheckCharacter(LocalPlayer) then
-			LocalPlayer.Character.Torso.CFrame = LastCharacterCFrame
+			--LocalPlayer.Character.Torso.CFrame = LastCharacterCFrame
+			LocalPlayer.Character.Torso.CFrame = LastCameraPosition or LastCharacterCFrame
 		end
 
 		LastCharacterCFrame = nil

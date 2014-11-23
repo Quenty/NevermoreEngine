@@ -585,7 +585,7 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 	return ParentFrame or Circle
 end
 lib.ResponsiveCircleClickEffect = ResponsiveCircleClickEffect
-
+lib.SimpleInk = ResponsiveCircleClickEffect
 
 local function GenerateMouseDrag()
 	-- Generate's a dragger to catch the mouse...
