@@ -11,7 +11,7 @@ local ReplicatedStorage  = game:GetService("ReplicatedStorage")
 local RunService         = game:GetService("RunService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local TestService        = game:GetService("TestService")
-local Terrain            = workspace	.Terrain
+local Terrain            = workspace.Terrain
 
 local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary  = NevermoreEngine.LoadLibrary

@@ -50,11 +50,7 @@ Loading on the server and the client may be done by using the following code:
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Nevermore         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems          = LoadCustomLibrary("qSystems")
-
+local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 ```
 
 However, it should be noted that Nevermore will appear in 
@@ -66,17 +62,27 @@ that it knows whether or not it's in the server or client, albeit, by a hacky
 method. It also makes sure the cloned Nevermore is archivable false incase it's 
 loaded in a PBS. 
 
-```
-NOTE: Setting Players.CharacterAutoLoads to false will make 
-	> attempt to call nil value
-show up on ROBLOX studio version "0. 135. 0. 42435"
-```
 
 Nevermore, when it loads, does two things. It creates an internal directory
 that is not archivable in `ReplicatedStorage` and it clones itself into
 ReplicatedStorage. Both of these are `Archivable` false. The reasons behind
 doing this is complicated, but mostly it guarantees Nevermore works in solo
 test mode and the server.
+
+## Splash Screen
+By default, the splash screen is added. The splash screen must be manually removed
+on the ClientSide by using
+
+```lua
+NevermoreEngine.ClearSplash()
+```
+
+The splash will not animate on the client until the player requires NevermoreEngine
+locally. You can also specify the parent of the splash screen using a method within
+NevermoreEngine if you want it to obscure GUIs being loaded.
+
+The splash does not, at this time, use ReplicatedFirst as ReplicatedFirst replicates
+after the whole level geometry loads, making it a moot point. 
 
 ## Main Resources
 Main resouces are scripts in Modules that end in .Main or are not disabled. 
