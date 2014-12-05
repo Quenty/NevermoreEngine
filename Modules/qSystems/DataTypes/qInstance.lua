@@ -4,17 +4,20 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
-
-local CallOnChildren = qSystems.CallOnChildren
+local CallOnChildren    = qSystems.CallOnChildren
 
 local lib = {}
 
 -- See Type library for more identification stuff.
 -- @author Quenty
--- Last Modified Februrary 9th, 2014
+-- Last Modified November 28th, 2014
 
 --[[
 Change log
+
+November 28th, 2014
+- Added GetSeats
+- Added some documentation
 
 February 15th, 2014
 - Added GetPartVolume
@@ -22,11 +25,9 @@ February 15th, 2014
 --]]
 
 local function GetBricks(StartInstance)
-	local List = {}
+	-- Returns a list of bricks (will include StartInstance)
 
-	-- if StartInstance:IsA("BasePart") then
-	-- 	List[#List+1] = StartInstance
-	-- end
+	local List = {}
 
 	CallOnChildren(StartInstance, function(Item)
 		if Item:IsA("BasePart") then
@@ -39,6 +40,22 @@ end
 lib.GetBricks  = GetBricks
 lib.get_bricks = GetBricks
 lib.getBricks  = GetBricks
+
+local function GetSeats(StartInstance)
+	-- Returns a list of the seats, such as GetBricks
+
+	local List = {}
+
+	CallOnChildren(StartInstance, function(Item)
+		if Item:IsA("Seat") or Item:IsA("VehicleSeat") then
+			List[#List+1] = Item;
+		end
+	end)
+
+	return List
+end
+lib.GetSeats = GetSeats
+
 
 local function GetBricksWithIgnore(StartInstance, NoInclude)
 	--- Get's the bricks in a model, but will not get a brick that is "NoInclude"

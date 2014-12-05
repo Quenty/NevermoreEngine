@@ -23,6 +23,12 @@ local function GetExperienceForNextLevel(CurrentExperience)
 end
 ExperienceCalculator.GetExperienceForNextLevel = GetExperienceForNextLevel
 
+local function GetExperienceRequiredForLevel(Level)
+	Level = Level - 1 -- Because normally this formula calculates experience required for next level.
+	return ExperienceFactor*(Level*(1+Level))
+end
+ExperienceCalculator.GetExperienceRequiredForLevel = GetExperienceRequiredForLevel
+
 local function GetSubExperience(CurrentExperience)
 	-- @return Achieved of next level, Total required for next level, Percent
 	

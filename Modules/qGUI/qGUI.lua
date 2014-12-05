@@ -516,7 +516,7 @@ local TweenColor3, StopColor3Tween do
 	lib.stopColor3Tween = StopColor3Tween
 end
 
-local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect, OverrideSize)
+local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect, OverrideSize, InkColor)
 	--- Google design thing. Actually, it's ink. :P
 	-- @param DoNotConstrainEffect If set to true, it will not constrain the effect within the GUI.
 	-- @param OverrideSize An overridden size.
@@ -544,17 +544,17 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 		ParentFrame.Parent                 = Gui;
 	end
 
-	local Circle                       = Instance.new("ImageLabel");
-	Circle.Image                       = "http://www.roblox.com/asset/?id=172318712"
-	Circle.Name                        = "Circle";
-	Circle.ImageTransparency           = 0.75;
-	Circle.BackgroundTransparency      = 1;
-	Circle.BorderSizePixel             = 0;
-	Circle.Archivable                  = false;
-	Circle.Size                        = UDim2.new(0, StartDiameter, 0, StartDiameter);
-	Circle.ZIndex                      = math.min(Gui.ZIndex + 1, 10)
-	
-	Circle.Position                    = UDim2.new(0, X-StartDiameter/2, 0, Y-StartDiameter/2)
+	local Circle                  = Instance.new("ImageLabel");
+	Circle.Image                  = "http://www.roblox.com/asset/?id=172318712"
+	Circle.Name                   = "Circle";
+	Circle.ImageTransparency      = 0.75;
+	Circle.BackgroundTransparency = 1;
+	Circle.BorderSizePixel        = 0;
+	Circle.Archivable             = false;
+	Circle.Size                   = UDim2.new(0, StartDiameter, 0, StartDiameter);
+	Circle.ZIndex                 = math.min(Gui.ZIndex + 1, 10)
+	Circle.ImageColor3            = InkColor or Color3.new(1, 1, 1)
+	Circle.Position               = UDim2.new(0, X-StartDiameter/2, 0, Y-StartDiameter/2)
 
 	--[[if Gui.AbsoluteSize.X > Gui.AbsoluteSize.Y then
 		Gui.SizeConstraint = "RelativeXX"
@@ -563,7 +563,7 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 	end--]]
 
 	local NewDiameter = OverrideSize or math.max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y) * 2 -- multiply times 2 because we want it resize for the whole time, and at 1/2 we expect it to fill the whole place.
-	local NewSize     = UDim2.new(0, NewDiameter * 2.82842712475, 0,  NewDiameter * 2.82842712475)
+	local NewSize     = UDim2.new(0, NewDiameter * 2.82842712475, 0,  NewDiameter * 2.28842712475)
 	local NewPosition = UDim2.new(0, X - (NewDiameter * 1.41421356237), 0, Y - (NewDiameter * 1.41421356237))
 	
 	Circle.Parent                      = ParentFrame or Gui

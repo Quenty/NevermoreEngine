@@ -3,6 +3,15 @@ local lib = {}
 -- qMath.lua
 -- @author Quenty
 
+local function MapNumber(OldValue, OldMin, OldMax, NewMin, NewMax)
+	-- Maps a number from one range to another
+	-- http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
+	-- Make sure old range is not 0
+
+	return (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+end
+lib.MapNumber = MapNumber
+
 local function ClampNumber(Number, Lower, Upper)
 	if Number > Upper then
 		return Upper, true

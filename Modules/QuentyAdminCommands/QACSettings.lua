@@ -15,7 +15,7 @@ return {
 	Authorized = {
 		-- Testing purposes
 		"Player1";
-		-- "Player";
+		"Player";
 		"Quenty";
 		-- "Mauv";
 		-- "ColorfulBody";

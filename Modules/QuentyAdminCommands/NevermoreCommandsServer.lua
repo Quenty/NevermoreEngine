@@ -1040,7 +1040,7 @@ do
 			}, 
 			function(Player, PlayerTarget)
 				local Character = Player.Character
-				RawCharacter.Unstick(Player.Character)
+				RawCharacter.Unstick(Character)
 				RawCharacter.RemoveVelocity(Character)
 				Character.Torso.CFrame = PlayerTarget.Character.Torso.CFrame
 			end, Args.PlayerCharacter(), Args.PlayerCharacter())

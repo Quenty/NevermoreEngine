@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService       = game:GetService("HttpService")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
@@ -6,7 +7,8 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local qInstance         = LoadCustomLibrary("qInstance")
 
-local Make = qSystems.Make
+local Make              = qSystems.Make
+local RbxUtility        = LoadLibrary("RbxUtility") -- For encoding/decoding
 
 local lib = {}
 
@@ -91,6 +93,7 @@ local function GetBoundingBox(Objects)
 end
 lib.GetBoundingBox = GetBoundingBox
 
+
 local function QuaternionFromCFrame(cf)
 	local mx,  my,  mz,
 	      m00, m01, m02,
@@ -145,7 +148,6 @@ end
 lib.QuaternionToCFrame = QuaternionToCFrame;
 lib.quaternionToCFrame = QuaternionToCFrame;
 
-
 local function QuaternionSlerp(a, b, t)
 	local cosTheta = a[1]*b[1] + a[2]*b[2] + a[3]*b[3] + a[4]*b[4]
 	local startInterp, finishInterp;
@@ -177,7 +179,6 @@ local function QuaternionSlerp(a, b, t)
 end
 lib.QuaternionSlerp = QuaternionSlerp;
 lib.quaternionSlerp = QuaternionSlerp;
---]==]
 
 local function TweenPart(part, a, b, length)
 	local qa = {QuaternionFromCFrame(a)}
@@ -207,6 +208,63 @@ lib.TweenPart = TweenPart;
 lib.tweenPart = TweenPart;
 
 
+local function EncodeQuaternionCFrame(CFrameValue)
+	--- Encodes a CFrameValue in JSON, using quaternions
+	-- Slightly smaller package size.
+
+	local NewData = {
+		CFrameValue.x,
+		CFrameValue.y,
+		CFrameValue.z,
+		QuaternionFromCFrame(CFrameValue)--CFrameValue:components();
+	}
+
+	return HttpService:JSONEncode(NewData)
+end
+lib.EncodeQuaternionCFrame = EncodeQuaternionCFrame
+
+local function DecodeQuaternionCFrame(Data)
+	--- decode's a previously encoded CFrameValue.
+	
+	if Data then
+		local DecodedData = HttpService:JSONDecode(Data) --RbxUtility.DecodeJSON(Data)
+		if DecodedData then
+			return QuaternionToCFrame(unpack(DecodedData))
+		else
+			return nil
+		end
+	else
+		return nil
+	end
+end
+lib.DecodeQuaternionCFrame = DecodeQuaternionCFrame
+
+local function EncodeCFrame(CFrameValue)
+	--- Encodes a CFrameValue in JSON, using quaternions
+	-- Slightly smaller package size.
+
+	local NewData = {CFrameValue:components()}
+
+	return HttpService:JSONEncode(NewData)
+end
+lib.EncodeCFrame = EncodeCFrame
+
+local function DecodeCFrame(Data)
+	--- decode's a previously encoded CFrameValue.
+	
+	if Data then
+		local DecodedData = HttpService:JSONDecode(Data) --RbxUtility.DecodeJSON(Data)
+		if DecodedData then
+			return CFrame.new(unpack(DecodedData))
+		else
+			return nil
+		end
+	else
+		return nil
+	end
+end
+lib.DecodeCFrame = DecodeCFrame
+
 local function SlerpCFrame(a, b, scale)
 	-- Same thing as lerp, but with rotation, scale is mapped between 0 and 1... 
 
@@ -224,16 +282,16 @@ end
 lib.QuaternionSlerpCFrame = SlerpCFrame;
 lib.quaternionSlerpCFrame = SlerpCFrame;
 
-lib.SlerpCFrame = SlerpCFrame;
-lib.slerpCFrame = SlerpCFrame;
+-- lib.SlerpCFrame = SlerpCFrame;
+-- lib.slerpCFrame = SlerpCFrame;
 
 do
-	local v3 = Vector3.new
-	local acos = math.acos
-	local components = CFrame.new().components
-	local inverse = CFrame.new().inverse
+	local v3            = Vector3.new
+	local acos          = math.acos
+	local components    = CFrame.new().components
+	local inverse       = CFrame.new().inverse
 	local fromAxisAngle = CFrame.fromAxisAngle
-	local abs = math.abs
+	local abs           = math.abs
 
 	local function AxisAngleInterpolate(c0,c1,t)--CFrame0,CFrame1,Tween
 		local _,_,_,xx,yx,zx,xy,yy,zy,xz,yz,zz=components(inverse(c0)*c1)
@@ -247,6 +305,8 @@ do
 	lib.FastSlerp = AxisAngleInterpolate
 	lib.fastSlerp = AxisAngleInterpolate
 
+	lib.SlerpCFrame = AxisAngleInterpolate;
+	lib.slerpCFrame = AxisAngleInterpolate;
 end
 
 local toObjectSpace = CFrame.new().toObjectSpace
@@ -334,7 +394,7 @@ local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, Ignor
 	--                              If you don't want to hit transparent parts, then you can set it to -math.huge.
 	--                              TransparencyThreshold should not be above 1, probably. 
 	-- @param [CustomCondition] A function that can be defined to create a custom condition (such as making sure a character is hit)
-		-- CustomCondition(HitObject, Position)
+	-- CustomCondition(HitObject, Position)
 			-- @return boolean If true, then it will automatically abort the cycle and return. 
 
 	assert(type(MaximumCastCount) == "number", "MaximumCastCount is not a number")
@@ -413,7 +473,6 @@ local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, Ignor
 			return nil
 		end
 	end
-
 end
 
 --[[

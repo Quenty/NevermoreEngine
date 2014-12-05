@@ -9,6 +9,7 @@ local qSystems          = LoadCustomLibrary("qSystems")
 local qCFrame          = LoadCustomLibrary("qCFrame")
 
 local CheckCharacter = qSystems.CheckCharacter
+local GetCharacter = qSystems.GetCharacter
 
 -- qPlayer.lua
 -- Just utilities involving players (and teams).
@@ -134,5 +135,60 @@ local function GetPlayersWithValidCharacters()
 end
 lib.GetPlayersWithValidCharacters = GetPlayersWithValidCharacters
 lib.getPlayersWithValidCharacters = GetPlayersWithValidCharacters
+
+local function GetPlayerWhoSatOnChair(PotentialSeatWeld)
+	-- Intended to be used with ROBLOX's seat system, where .ChildAdded fires whenever a player
+	-- sits in a seat and the child's name is "SeatWeld" and is a "Weld" and the Part1 is a 
+	-- HumanoidRootPart
+	-- @return Player who sat on seat.
+
+	-- Players must be alive (Health > 0) and pass character check to qualify
+
+	if PotentialSeatWeld and PotentialSeatWeld.Parent and PotentialSeatWeld.Parent and PotentialSeatWeld:IsA("Weld") and PotentialSeatWeld.Name == "SeatWeld" then
+		if PotentialSeatWeld.Part1 and PotentialSeatWeld.Part0 then
+			local HumanoidRootPart = PotentialSeatWeld.Part1
+
+			if HumanoidRootPart:IsA("BasePart") then
+				local Character, Player = GetCharacter(HumanoidRootPart)
+				if Character and Player and CheckCharacter(Player) and Character.Humanoid.Health > 0 then
+					return Player
+				end
+			else
+				warn("[GetPlayerWhoSatOnChair] - HumanoidRootPart was not a base part??!?")
+				return nil
+			end
+		else
+			warn("[GetPlayerWhoSatOnChair] - Weld failed to have part1 or part0")
+			return nil
+		end
+
+		-- Don't randomly warn everytime a weld get's added.
+		return nil
+	end
+end
+lib.GetPlayerWhoSatOnChair = GetPlayerWhoSatOnChair
+
+local function CheckIfPlayerStillSittingOnChair(OriginalSeatWeld, OriginalPlayer)
+	-- Checks to see if the weld and player are aOK in the chair. 
+	-- Players must be alive (Health > 0) and pass character check to qualify
+
+	if OriginalSeatWeld:IsDescendantOf(game) and OriginalSeatWeld.Part1 and OriginalSeatWeld.Part0 and OriginalSeatWeld.Part0:IsDescendantOf(game) and OriginalSeatWeld.Part1:IsDescendantOf(game) then
+		if OriginalPlayer and OriginalPlayer:IsDescendantOf(Players) and CheckCharacter(OriginalPlayer) and OriginalPlayer.Character.Humanoid.Health > 0 then
+			local HumanoidRootPart = OriginalSeatWeld.Part1
+			if HumanoidRootPart:IsA("BasePart") and HumanoidRootPart:IsDescendantOf(OriginalPlayer.Character) then
+				return true
+			else
+				-- warn("[CheckIfPlayerStillSittingOnChair] - HumanoidRootPart was not a base part, or is not a descendant of the player's character")
+				return false
+			end
+		else
+			-- warn("[OriginalPlayer] - Player has invalid character or has left game...")
+			return false
+		end
+	else
+		return false
+	end
+end
+lib.CheckIfPlayerStillSittingOnChair = CheckIfPlayerStillSittingOnChair
 
 return lib

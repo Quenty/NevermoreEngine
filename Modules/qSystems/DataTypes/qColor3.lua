@@ -30,7 +30,7 @@ local function EncodeColor3(Color3)
 		Color3.b;
 	}
 
-	return RbxUtility.EncodeJSON(NewData)
+	return HttpService:JSONEncode(NewData)
 end
 lib.EncodeColor3 = EncodeColor3
 lib.encodeColor3 = EncodeColor3

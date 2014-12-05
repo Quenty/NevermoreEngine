@@ -162,6 +162,8 @@ lib.removeVelocity = RemoveVelocity
 lib.remove_velocity = RemoveVelocity
 
 local function Unstick(character)
+	--- Used before teleportation to unstick a player.
+	
 	if character.Humanoid.Sit then
 		character.Humanoid.Sit = false
 	end
