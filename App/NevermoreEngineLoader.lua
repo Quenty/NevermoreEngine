@@ -1,5 +1,5 @@
 --- This scripts loads Nevermore from the server.
--- It also replicates the into ReplicatedStorage for internal usage. 
+-- It also replicates Nevermore into ReplicatedStorage for internal usage. 
 
 -----------------------
 -- UTILITY FUNCTIONS --
@@ -9,9 +9,10 @@ local TestService       = game:GetService('TestService')
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local function WaitForChild(Parent, Name, TimeLimit)
-	-- Waits for a child to appear. Not efficient, but it shoudln't have to be. It helps with debugging. 
+	--- Waits for a child to appear. Not efficient, but it shouldn't have to be. Helps with debugging. 
 	-- Useful when ROBLOX lags out, and doesn't replicate quickly.
-	-- @param TimeLimit If TimeLimit is given, then it will return after the timelimit, even if it hasn't found the child.
+	-- @param TimeLimit If given, function will return after TimeLimit, even if Child isn't found.
+	-- @return The Child if found, or nil if not.
 
 	assert(Parent ~= nil, "Parent is nil")
 	assert(type(Name) == "string", "Name is not a string.")
@@ -48,7 +49,7 @@ while not script.Parent do
 	wait(0)
 end
 
--- Identify the modular script
+-- Identify the NevermoreEngine module
 local NevermoreModularScript = ReplicatedStorage:FindFirstChild("NevermoreEngine")
 if not NevermoreModularScript then
 	local NevermoreModularScriptSource = WaitForChild(script.Parent, "NevermoreEngine")

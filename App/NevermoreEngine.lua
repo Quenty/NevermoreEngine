@@ -33,24 +33,24 @@ local Configuration = {
 	Blacklist              = "";                                         -- Ban list
 	CustomCharacters       = false;                                      -- When enabled, allows the client to set Player.Character itself. Untested!
 	SplashScreen           = true;                                       -- Should a splashscreen be rendered?
-	CharacterRespawnTime   = 0.5;                                        -- How long does it take for characters to respawn? Only kept updated on the server-side.
+	CharacterRespawnTime   = 0.5;                                        -- How long does it take for characters to respawn? Only kept updated server-side.
 	ResetPlayerGuiOnSpawn  = false;                                      -- Set StarterGui.ResetPlayerGuiOnSpawn --- NOTE the client script must reparent itself to the PlayerGui
 }
 Configuration.IsServer = not Configuration.IsClient
 
 
--- Print out information on whether or not FilteringEnabled is up or not. 
+-- Print whether Filtering is enabled or not.
 if workspace.FilteringEnabled then
 	print("**** workspace.FilteringEnabled is enabled")
 end
 
--- Print out whether or not ResetPlayerGuiOnSpawn is enabled or not. 
+-- Print whether ResetPlayerGuiOnSpawn is enabled or not. 
 if not Configuration.ResetPlayerGuiOnSpawn or not StarterGui.ResetPlayerGuiOnSpawn then
 	print("**** StarterGui.ResetPlayerGuiOnSpawn = false. GUIs will not reload on player death or respawn.")
 	StarterGui.ResetPlayerGuiOnSpawn = false
 end
 
--- Print headers are used to help debugging process
+-- Print headers, to help with debugging
 if Configuration.SoloTestMode then
 	Configuration.PrintHeader = "[NevermoreEngineSolo] - "
 else
@@ -64,7 +64,7 @@ print(Configuration.PrintHeader .. "NevermoreEngine loaded.")
 
 Players.CharacterAutoLoads = false
 
--- If we're the server than we should retrieve server storage units. 
+-- If we're the server, we should retrieve the server-side storage services. 
 if not Configuration.IsClient then
 	ServerStorage       = game:GetService("ServerStorage")
 	ServerScriptService = game:GetService("ServerScriptService")
@@ -107,9 +107,9 @@ end
 local NevermoreContainer, ModulesContainer, ApplicationContainer, ReplicatedPackage, DataStreamContainer, EventStreamContainer
 do
 	local function LoadResource(Parent, ResourceName)
-		--- Loads a resource or errors. Makes sure that a resource is available.
+		--- Loads a resource, or errors. Makes sure that a resource is available.
 		-- @param Parent The parent of the resource to load
-		-- @param ResourceName The name of the resource attempting to load
+		-- @param ResourceName The name of the resource to load
 
 		local Resource = Parent:FindFirstChild(ResourceName)
 		if not Resource then
@@ -175,15 +175,15 @@ local ResouceManager = {} do
 	local MainResourcesServer, MainResourcesClient
 
 	if Configuration.IsServer then
-		MainResourcesServer = {} -- Resources to load.
+		MainResourcesServer = {} -- Resources to load and run immediately.
 		MainResourcesClient = {}
 	else
 		MainResourcesClient = {}
 	end
 
 	local function GetDataStreamObject(Name, Parent)
-		--- Products a new DataStream object if it doesn't already exist, otherwise
-		--  return's the current datastream.
+		--- Creates a new DataStream object if it doesn't already exist, otherwise
+		--  returns the current datastream.
 		-- @param Name The Name of the DataStream
 		-- @param [Parent] The parent to add to
 
@@ -197,7 +197,7 @@ local ResouceManager = {} do
 				DataStreamObject.Archivable = false;
 				DataStreamObject.Parent     = Parent
 			else
-				DataStreamObject = WaitForChild(Parent, Name) -- Client side, we must wait.'
+				DataStreamObject = WaitForChild(Parent, Name) -- Client side, we must wait.
 			end
 		end
 		return DataStreamObject
@@ -205,8 +205,8 @@ local ResouceManager = {} do
 	ResouceManager.GetDataStreamObject = GetDataStreamObject
 
 	local function GetEventStreamObject(Name, Parent)
-		--- Products a new EventStream object if it doesn't already exist, otherwise
-		--  return's the current datastream. 
+		--- Creates a new EventStream object if it doesn't already exist, otherwise
+		--  returns the current datastream. 
 		-- @param Name The Name of the EventStream
 		-- @param [Parent] The parent to add to
 
@@ -234,38 +234,37 @@ local ResouceManager = {} do
 	end
 
 	local function IsMainResource(Item)
-		--- Finds out if an Item is considered a MainResource
+		--- Determines if a resource is a Main resource.
 		-- @return Boolean is a main resource
 
 		if Item:IsA("Script") then
 			if not Item.Disabled then
-				-- If an item is not disabled, then it's disabled, but yell at 
-				-- the user.
+				-- Yells at the user for not Disabling resources.
 
 				--if Item.Name:lower():match("\.main$") == nil then
-				error(Configuration.PrintHeader .. Item:GetFullName() .. " is not disabled, and does not end with .Main.")
+				error(Configuration.PrintHeader .. Item:GetFullName() .. " is not disabled!"--[[, and does not end with `.Main`.]])
 				--end
 
 				return true
 			end
 			return Item.Name:lower():match("\.main$") ~= nil -- Check to see if it ends
-			                                                  -- in .main, ignoring caps
+			                                                 -- in .main, ignoring caps
 		else
 			return false;
 		end
 	end
 
 	local function GetLoadablesForServer()
-		--- Get's the loadable items for the server, that should be insta-ran
-		-- @return A table full of the resources to be loaded
+		--- Gets loadable Server resources to be immediately run.
+		-- @return A table of the resources to be loaded
 
 		return MainResourcesServer
 	end
 	ResouceManager.GetLoadablesForServer = GetLoadablesForServer
 
 	local function GetLoadablesForClient()
-		--- Get's the loadable items for the Client, that should be insta-ran
-		-- @return A table full of the resources to be loaded
+		--- Gets loadable Client resources to be immediately run.
+		-- @return A table of the resources to be loaded
 		
 		return MainResourcesClient
 	end
@@ -274,7 +273,7 @@ local ResouceManager = {} do
 	local PopulateResourceCache
 	if Configuration.IsClient then
 		function PopulateResourceCache()
-			--- Populates the resource cache. For the client.
+			--- Populates the Client's resource cache.
 			-- Should only be called once. Used internally. 
 
 			local Populate
@@ -295,11 +294,11 @@ local ResouceManager = {} do
 
 			Populate(ReplicatedPackage)
 		end
-	else -- Configuration.IsServer then
+	else --if Configuration.IsServer then
 		function PopulateResourceCache()
-			--- Populates the resource cache. For the server. Also populates
-			-- the replication cache. Used internally. 
-			-- Should be called once. 
+			--- Populates the Servers's resource cache. Also populates the
+			--  replication cache.
+			-- Should only be called once. Used internally. 
 
 			--[[local NevermoreModule = script:Clone()
 			NevermoreModule.Archivable = false;
@@ -307,7 +306,7 @@ local ResouceManager = {} do
 
 			local function Populate(Parent)
 				for _, Item in pairs(Parent:GetChildren()) do
-					if Item:IsA("Script") or Item:IsA("ModuleScript") then -- Will catch LocalScripts as they inherit from script
+					if Item:IsA("Script") or Item:IsA("ModuleScript") then -- Also catches LocalScripts (they inherit from Script)
 						if ResourceCache[Item.Name] then
 							error(Configuration.PrintHeader .. "There are two Resources called '" .. Item:GetFullName() .."'. Nevermore failed to populate the cache..", 2)
 						else
@@ -343,7 +342,7 @@ local ResouceManager = {} do
 									MainResourcesClient[#MainResourcesClient+1] = Item
 								end
 
-							else -- Do not replicate local scripts
+							else -- Do not replicate LocalScripts
 								if IsMainResource(Item) then
 									MainResourcesServer[#MainResourcesServer+1] = Item
 								end
@@ -363,24 +362,23 @@ local ResouceManager = {} do
 	ResouceManager.PopulateResourceCache = PopulateResourceCache
 
 	local function GetResource(ResourceName)
-		--- This script will load another script, module script, et cetera, if it is 
-		--  available.  It will return the resource in question.
-		-- @param ResourceName The name of the resource 
-		-- @return The found resource
+		--- Finds a resource, and returns it.
+		-- @param ResourceName The name of the resource to find.
+		-- @return The found resource.
 
 		local ResourceFound = ResourceCache[ResourceName]
 
 		if ResourceFound then
 			return ResourceFound
 		else
-			error(Configuration.PrintHeader .. "The resource '" .. ResourceName .. "' does not exist, cannot load", 2)
+			error(Configuration.PrintHeader .. "The resource '" .. ResourceName .. "' does not exist, cannot load.", 2)
 		end
 	end
 	ResouceManager.GetResource = GetResource
 
 	local function LoadScript(ScriptName)
-		--- Runs a script, and can be called multiple times if the script is not
-		--  a modular script. 
+		--- Runs a script. Can be called multiple times if the script is not
+		--  a ModuleScript. 
 		-- @param ScriptName The name of the script to load.
 		
 		local ScriptToLoad = GetResource(ScriptName)
@@ -436,7 +434,8 @@ local ResouceManager = {} do
 		ResouceManager.LoadScriptOnClient = LoadScriptOnClient
 
 		local function ExecuteExecutables()
-			--- Executes all the executable scripts on the server.
+			--- Executes all executable scripts on the server.
+			-- May or may not kill administrative users.
 
 			for _, Item in pairs(GetLoadablesForServer()) do
 				LoadScript(Item.Name)
@@ -448,9 +447,8 @@ local ResouceManager = {} do
 	--[[local NativeImports
 
 	local function ImportLibrary(LibraryDefinition, Environment, Prefix)
-		--- Imports a library into a given environment, potentially adding a PreFix 
-		--  into any of the values of the library,
-		--  incase that's wanted. :)
+		--- Imports a library into a given environment, optionally adding a prefix
+		--  to all members of the library.
 		-- @param LibraryDefinition Table, the libraries definition
 		-- @param Environment Another table, probably received by getfenv() in Lua 5.1, and __ENV in Lua 5.2
 		-- @Param [Prefix] Optional string that will be prefixed to each function imported into the environment.
@@ -481,8 +479,8 @@ local ResouceManager = {} do
 	}--]]
 
 	local function LoadLibrary(LibraryName)
-		--- Load's a modular script and packages it as a library. 
-		-- @param LibraryName A string of the resource that ist the LibraryName
+		--- Loads a ModuleScript and packages it as a library. 
+		-- @param LibraryName Name of the ModuleScript resource to load.
 
 		-- print(Configuration.PrintHeader .. "Loading Library " .. LibraryName)
 
@@ -507,7 +505,7 @@ local ResouceManager = {} do
 				return LibraryDefinition
 			else
 				error(Configuration.PrintHeader .. " The resource " .. LibraryName 
-					.. " is not a ModularScript, as expected, it is a " 
+					.. " is not a ModuleScript, as expected. It is a " 
 					.. ModularScript.ClassName, 2
 				)
 			end
@@ -523,13 +521,12 @@ end
 -----------------------------
 -- NETWORKING STREAM SETUP --
 -----------------------------
-local Network = {} -- API goes in here
+local Network = {}
 --[[
 Contains the following API:
 
 Network.GetDataStream
 Network.GetDataStream
-
 --]]
 do
 	--- Handles networking and PlayerLoading
@@ -539,8 +536,7 @@ do
 	-- setmetatable(DataStreamCache, {__mode = "v"});
 
 	local function GetCachedDataStream(RemoteFunction)
-		--- Creates a datastream filter that will take requests and 
-		--  filter them out. 
+		--- Creates a datastream filter.
 		-- @param RemoteFunction A remote function to connect to
 
 		-- Execute on the server:
@@ -556,7 +552,7 @@ do
 			local DataStream = {}
 			local RequestTagDatabase = {}
 
-			-- Set request handling, for solo test mode. The problem here is that Server and Client scripts share the same
+			-- Set request handling, for SoloTestMode. The problem here is that Server and Client scripts share the same
 			-- code base, because both load the same engine in replicated storage. 
 			local function Send(...)
 				-- print(Configuration.PrintHeader .. " Sending SoloTestMode")
@@ -598,7 +594,7 @@ do
 			end
 
 			local function SpawnSend(...)
-				--- Sends the data, but doesn't wait for a response or return one. 
+				--- Sends the data, but doesn't wait for or return a response. 
 
 				local Data = {...}
 				spawn(function()
@@ -658,19 +654,18 @@ do
 					end
 				end
 			end	
-			if Configuration.IsClient or Configuration.SoloTestMode then -- Handle clientside streaming.
-				-- We do this for solotest mode, to connect the OnClientInvoke and the OnServerInvoke 
+			if Configuration.IsClient or Configuration.SoloTestMode then
+				-- Handle client-side streaming.
+				-- We do this for SoloTestMode to define the OnClientInvoke and the OnServerInvoke callbacks.
 				
 
 				function DataStream.ReloadConnection()
-					--- Reloads the OnClientInvoke event, which gets disconnected when scripts die on the client.
-					-- However, this fixes it, because those scripts have to request the events every time. 
+					--- Reloads the OnClientInvoke callback, which gets disconnected when LocalScripts die on the client.
 
 					--[[
-						-- Note: When using RemoteFunctions, in a module script, on ROBLOX, and you load the ModuleScript
-						with a LOCAL SCRIPT. When this LOCAL SCRIPT is killed, your OnClientInvoke function will be GARBAGE
-						COLLECTED. You must thus, reload the OnClientInvoke function everytime the local script is loaded.
-
+						-- Note: To clarify, when the ROBLOX client kills a LocalScript that has loaded a ModuleScript using
+						RemoteFunctions, the callback function definitions are garbage collected and can't
+						be reused. You have to reload the definitions every time you load the LocalScript.
 					--]]
 
 					function RemoteFunction.OnClientInvoke(Request, ...)
@@ -845,13 +840,13 @@ do
 					end
 				end
 			end	
-			if Configuration.IsClient or Configuration.SoloTestMode then -- Handle clientside streaming.
-				-- We do this for solotest mode, to connect the OnClientInvoke and the OnServerInvoke 
+			if Configuration.IsClient or Configuration.SoloTestMode then
+				-- Handle clientside streaming.
+				-- We do this for SoloTestMode, to connect the OnClientEvent and the OnServerEvent events.
 				
 				local Event 
 				function DataStream.ReloadConnection()
-					--- Reloads the OnClientInvoke event, which gets disconnected when scripts die on the client.
-					-- However, this fixes it, because those scripts have to request the events every time. 
+					--- Reloads the OnClientEvent event, which gets disconnected when LocalScripts die on the client.
 
 					if Event then
 						Event:disconnect()
@@ -926,7 +921,7 @@ do
 	local DataStreamMain = GetCachedDataStream(NetworkingRemoteFunction)
 
 	local function GetDataStream(DataStreamName)
-		--- Get's a dataStream channel
+		--- Gets a dataStream channel
 		-- @param DataSteamName The channel to log in to. 
 		-- @return The main datastream, if no DataSteamName is provided
 
@@ -939,7 +934,7 @@ do
 	Network.GetDataStream = GetDataStream
 
 	local function GetEventStream(EventStreamName)
-		--- Get's an EventStream chanel
+		--- Gets an EventStream channel
 		-- @param DataSteamName The channel to log in to. 
 		-- @return The main datastream, if no DataSteamName is provided
 
@@ -952,7 +947,7 @@ do
 	Network.GetEventStream = GetEventStream
 
 	local function GetMainDatastream()
-		--- Return's the main datastream, used internally for networking
+		--- Returns the main datastream. Used internally for networking.
 
 		return DataStreamMain
 	end
@@ -970,9 +965,9 @@ do
 
 
 	local function GenerateInitialSplashScreen(Player)
-		--- Generates the initial SplashScreen for the player.  
-		-- @param Player The player to genearte the SplashScreen in.
-		-- @return The generated splashsreen
+		--- Builds the initial SplashScreen for the player.  
+		-- @param Player The player to build the SplashScreen in.
+		-- @return The built splashsreen
 
 
 		local ScreenGui = Instance.new("ScreenGui", Player:FindFirstChild("PlayerGui"))
@@ -981,7 +976,8 @@ do
 		local MainFrame = Instance.new('Frame')
 			MainFrame.Name             = "SplashScreen";
 			MainFrame.Position         = UDim2.new(0, 0, 0, -2);
-			MainFrame.Size             = UDim2.new(1, 0, 1, 22); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			MainFrame.Size             = UDim2.new(1, 0, 1, 22);
+			-- Sized and positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen when the Chat bar is enabled.
 			MainFrame.BackgroundColor3 = SplashConfiguration.BackgroundColor3;
 			MainFrame.Visible          = true;
 			MainFrame.ZIndex           = SplashConfiguration.ZIndex;
@@ -991,7 +987,7 @@ do
 		local ParticalFrame = Instance.new('Frame')
 			ParticalFrame.Name                   = "ParticalFrame";
 			ParticalFrame.Position               = UDim2.new(0.5, -SplashConfiguration.ParticalOrbitDistance, 0.7, -SplashConfiguration.ParticalOrbitDistance);
-			ParticalFrame.Size                   = UDim2.new(0, SplashConfiguration.ParticalOrbitDistance*2, 0, SplashConfiguration.ParticalOrbitDistance*2); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			ParticalFrame.Size                   = UDim2.new(0, SplashConfiguration.ParticalOrbitDistance*2, 0, SplashConfiguration.ParticalOrbitDistance*2);
 			ParticalFrame.Visible                = true;
 			ParticalFrame.BackgroundTransparency = 1
 			ParticalFrame.ZIndex                 = SplashConfiguration.ZIndex;
@@ -1001,7 +997,7 @@ do
 		local LogoLabel = Instance.new('ImageLabel')
 			LogoLabel.Name                   = "LogoLabel";
 			LogoLabel.Position               = UDim2.new(0.5, -SplashConfiguration.LogoSize/2, 0.7, -SplashConfiguration.LogoSize/2 - SplashConfiguration.ParticalOrbitDistance*2 - SplashConfiguration.LogoSpacingUp);
-			LogoLabel.Size                   = UDim2.new(0, SplashConfiguration.LogoSize, 0, SplashConfiguration.LogoSize); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			LogoLabel.Size                   = UDim2.new(0, SplashConfiguration.LogoSize, 0, SplashConfiguration.LogoSize);
 			LogoLabel.Visible                = true;
 			LogoLabel.BackgroundTransparency = 1
 			LogoLabel.Image                  = SplashConfiguration.LogoTexture;
@@ -1014,7 +1010,7 @@ do
 		local LoadingText = Instance.new("TextLabel")
 			LoadingText.Name                   = "LoadingText"
 			LoadingText.Position               = UDim2.new(0.5, -SplashConfiguration.LogoSize/2, 0.7, -SplashConfiguration.LogoSize/2 - SplashConfiguration.ParticalOrbitDistance*2 - SplashConfiguration.LogoSpacingUp);
-			LoadingText.Size                   = UDim2.new(0, SplashConfiguration.LogoSize, 0, SplashConfiguration.LogoSize); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			LoadingText.Size                   = UDim2.new(0, SplashConfiguration.LogoSize, 0, SplashConfiguration.LogoSize);
 			LoadingText.Visible                = true;
 			LoadingText.BackgroundTransparency = 1
 			LoadingText.ZIndex                 = SplashConfiguration.ZIndex;
@@ -1030,7 +1026,7 @@ do
 
 	if Configuration.IsServer then
 		local function CheckIfPlayerIsBlacklisted(Player, BlackList)
-			--- Checks to see if a player is blacklisted from the server
+			--- Checks to see if a player is blacklisted on the server
 			-- @param Player The player to check for
 			-- @param Blacklist The string blacklist
 			-- @return Boolean is blacklisted
@@ -1052,8 +1048,8 @@ do
 		end
 
 		local function CheckPlayer(player)
-			--- Makes sure a player has all necessary components.
-			-- @return Boolean If the player has all the right components
+			--- Makes sure a Player has fully loaded.
+			-- @return Boolean If the Player is loaded.
 
 			return player and player:IsA("Player") 
 				and player:FindFirstChild("Backpack") 
@@ -1062,8 +1058,8 @@ do
 		end
 
 		local function CheckCharacter(player)
-			--- Make sure that a character has all necessary components
-			--  @return Boolean If the player has all the right components
+			--- Makes sure a Character has fully loaded.
+			--  @return Boolean If the Character is loaded.
 
 			local character = player.Character;
 			return character
@@ -1089,7 +1085,7 @@ do
 		end
 
 		local function SetupPlayer(Player)
-			--- Setups up a player
+			--- Sets up a Player.
 			-- @param Player The player to setup
 
 			if Configuration.BlackList and CheckIfPlayerIsBlacklisted(Player, Configuration.BlackList) then
@@ -1103,7 +1099,7 @@ do
 				local ExecutablesDumped = false
 
 				local function SetupCharacter(ForceDumpExecutables)
-					--- Setup's up a player's character
+					--- Sets up up a Player's Character
 					-- @param ForceDumpExecutables Forces executables to be dumped, even if StarterGui.ResetPlayerGuiOnSpawn is true.
 					if not Configuration.CustomCharacters then
 						if Player and Player:IsDescendantOf(Players) then
@@ -1112,7 +1108,7 @@ do
 								and Player.Character.Humanoid:IsA("Humanoid")) 
 								and Player:IsDescendantOf(Players) do
 
-								wait(0) -- Wait for the player's character to load
+								wait(0) -- Wait for the Character to load
 							end
 
 							-- Make sure the player is still in game.
@@ -1130,7 +1126,7 @@ do
 								end)
 
 								if not ExecutablesDumped or ForceDumpExecutables == true or StarterGui.ResetPlayerGuiOnSpawn then
-									wait() -- On respawn for some reason, this wait is needed. 
+									wait() -- This wait is needed on respawn, for some reason..
 									DumpExecutables(Player)
 									ExecutablesDumped = true
 								end
@@ -1144,7 +1140,7 @@ do
 				end
 
 				local function LoadSplashScreen()
-					--- Load's the splash screen into the player
+					--- Loads the SplashScreen into the Player
 
 					if Configuration.SplashScreen then
 						PlayerSplashScreen = GenerateInitialSplashScreen(Player)
@@ -1156,9 +1152,9 @@ do
 				end
 
 				local function InitialCharacterLoad()
-					-- Makes sure the character loads, and sets up the character if it has already loaded
+					-- Makes sure the character loads, and sets up the Character if it has already loaded
 
-					if not Player.Character then -- Incase the characters do start auto-loading. 
+					if not Player.Character then -- In case the characters do start auto-loading. 
 						if PlayerSplashScreen then
 							PlayerSplashScreen.Parent = nil
 						end
@@ -1189,12 +1185,13 @@ do
 					end
 				end
 
-				-- WHAT MUST HAPPEN
-				-- Character must be loaded at least once
-				-- Nevermore must run on the client to get a splash running. However, this can be seen as optinoal. 
-				-- Nevermore must load the splash into the player. 
+				--[[ WHAT MUST HAPPEN:
+				    * Character must be loaded at least once
+				    * Nevermore must run on the client to animate the splash. Can be seen as optional. 
+				    * Nevermore must load the splash into the player. 
+				--]]
 
-				-- SETUP EVENT FIRST
+				-- SET UP EVENT FIRST
 				Player.CharacterAdded:connect(SetupCharacter)
 				InitialCharacterLoad() -- Force load the character, no matter what.
 				LoadSplashScreen()
@@ -1202,18 +1199,18 @@ do
 		end
 
 		local function ConnectPlayers()
-			--- Connects all the events and adds players into the system. 
+			--- Connects all events and adds the Players into the system.
 
 			Network.ConnectPlayers = nil -- Only do this once!
 
-			-- Setup all the players that joined...
+			-- Set up all the Players that have already joined
 			for _, Player in pairs(game.Players:GetPlayers()) do
 				coroutine.resume(coroutine.create(function()
 					SetupPlayer(Player)
 				end))
 			end
 
-			-- And when they are added...
+			-- Set up new Players as they join
 			Players.PlayerAdded:connect(function(Player)
 				SetupPlayer(Player)
 			end)
@@ -1221,9 +1218,9 @@ do
 		Network.ConnectPlayers = ConnectPlayers
 	end
 	if Configuration.IsClient or Configuration.SoloTestMode then 
-		-- Setup the Splash Screen.
-		-- However, in SoloTestMode, we need to setup the splashscreen in the
-		-- replicated storage module, which is technically the server module. 
+		-- Set up the Splash Screen.
+		-- However, in SoloTestMode, we need to set up the SplashScreen in the
+		-- replicated storage module, which is *technically* the server module. 
 
 		local function AnimateSplashScreen(ScreenGui)
 			--- Creates a Windows 8 style loading screen, finishing the loading animation
@@ -1251,8 +1248,7 @@ do
 			local ParticalList  = {}
 
 			local function Destroy()
-				-- Can be called to Destroy the SplashScreen. Will have the Alias
-				-- ClearSplash in NevermoreEngine
+				--- Can be called to Destroy the SplashScreen. Aliased as 'ClearSplash'.
 
 				IsActive = false;
 				MainFrame:Destroy()
@@ -1264,7 +1260,7 @@ do
 			Splash.Destroy = Destroy
 
 			local function SetParent(NewParent)
-				-- Used to fix rendering issues with multiple ScreenGuis.
+				--- Used to fix rendering issues with multiple ScreenGuis.
 				MainFrame.Parent = NewParent
 
 				if ScreenGui then
@@ -1291,12 +1287,12 @@ do
 
 				if IsActive then
 					local function MakePartical(Parent, RotationRadius, Size, Texture)
-						-- Creates a partical that will circle around the center of it's Parent.  
-						-- RotationRadius is how far away it orbits
-						-- Size is the size of the ball...
-						-- Texture is the asset id of the texture to use... 
+						--- Creates a particle that will circle around the center of its Parent.  
+						-- @param RotationRadius How far away the particle orbits
+						-- @param Size The size of the particle
+						-- @param Texture The asset id of the texture to use
 
-						-- Create a new ImageLabel to be our rotationg partical
+						-- Create a new ImageLabel to be our rotationg particle
 						local Partical = Instance.new("ImageLabel")
 							Partical.Name                   = "Partical";
 							Partical.Size                   = UDim2.new(0, Size, 0, Size);
@@ -1313,7 +1309,7 @@ do
 							StartTime      = math.huge;
 							Size           = Size;
 							SetPosition    = function(ParticalData, CurrentPercent)
-								-- Will set the position of the partical relative to CurrentPercent.  CurrentPercent @ 0 should be 0 radians.
+								-- Will set the position of the particle relative to CurrentPercent.  CurrentPercent @ 0 should be 0 radians.
 
 								local PositionX = math.cos(math.pi * 2 * CurrentPercent) * ParticalData.RotationRadius
 								local PositionY = math.sin(math.pi * 2 * CurrentPercent) * ParticalData.RotationRadius
@@ -1326,21 +1322,20 @@ do
 					end
 
 					local function EaseOut(Percent, Amount)
-						-- Just return's the EaseOut smoothed out percentage 
+						--- Returns the EaseOut smoothed out percentage 
 
 						return -(1 - Percent^Amount) + 1
 					end
 
 					local function EaseIn(Percent, Amount)
-						-- Just return's the Easein smoothed out percentage 
+						--- Returns the EaseIn smoothed out percentage 
 
 						return Percent^Amount
 					end
 
 					local function EaseInOut(Percent, Amount)
-						-- Return's a smoothed out percentage, using in-out.  'Amount' 
-						-- is the powered amount (So 2 would be a quadratic EaseInOut, 
-						-- 3 a cubic, and so forth.  Decimals supported)
+						--- Returns a smoothed out percentage, using in-out.
+						--@param Amount The powered amount (2 would be a quadratic, 3 a cubic, and so forth.  Decimals supported)
 
 						if Percent < 0.5 then
 							return ((Percent*2)^Amount)/2
@@ -1350,7 +1345,7 @@ do
 					end
 
 					local function GetFramePercent(Start, Finish, CurrentPercent)
-						-- Return's the  relative percentage to the overall 
+						--- Returns the  relative percentage to the overall 
 						-- 'CurrentPercentage' which ranges from 0 to 100; So in one 
 						-- case, 0 to 0.07, at 50% would be 0.035;
 
@@ -1358,34 +1353,34 @@ do
 					end
 
 					local function GetTransitionedPercent(Origin, Target, CurrentPercent)
-						-- Return's the Transitional percentage (How far around the 
-						-- circle the little ball is), when given a Origin ((In degrees)
+						--- Returns the Transitional percentage (How far around the 
+						-- circle the little ball is), when given a Origin (In degrees)
 						-- and a Target (In degrees), and the percentage transitioned 
-						-- between the two...)
+						-- between the two.)
 
 						return (Origin + ((Target - Origin) * CurrentPercent)) / 360;
 					end
 
 					-- Start the beautiful update loop
 					
-					-- Add / Create particals
+					-- Add / Create particles
 					for Index = 1, Configuration.ParticalCount do
 						ParticalList[Index] = MakePartical(ParticalFrame, 1, Configuration.ParticalSize, Configuration.Texture)
 					end
 
-					local LastStartTime       = 0; -- Last time a partical was started
+					local LastStartTime       = 0; -- Last time a particle was started
 					local ActiveParticalCount = 0;
-					local NextRunTime         = 0 -- When the particals can be launched again...
+					local NextRunTime         = 0 -- When the particles can be launched again...
 
 					while IsActive do
 						local CurrentTime = tick();
 						for Index, Partical in ipairs(ParticalList) do
-							-- Calculate the CurrentPercentage from the time and 
+							-- Calculate the CurrentPercentage from the time and...
 							local CurrentPercent = ((CurrentTime - Partical.StartTime) / Configuration.OrbitTime);
 
 							if CurrentPercent < 0 then 
 								if LastStartTime + Configuration.ParticleSpacingTime <= CurrentTime and ActiveParticalCount == (Index - 1) and NextRunTime <= CurrentTime then
-									-- Launch Partical...
+									-- Launch Particle
 
 									Partical.Frame.Visible = true;
 									Partical.StartTime     = CurrentTime;
@@ -1422,9 +1417,9 @@ do
 		end
 
 		local function SetupSplashScreenIfEnabled()
-			-- CLient stuff.
-			--- Sets up the Splashscreen if it's enabled, and returnst he disabling / removing function.
-			-- @return The removing function, even if the splashscreen doesn't exist.
+			-- Client stuff.
+			--- Sets up the Splashscreen if it's enabled, and returns the disabling / removing function.
+			-- @return The removing function, even if the SplashScreen already doesn't exist.
 
 			local LocalPlayer = Players.LocalPlayer
 			local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
@@ -1454,7 +1449,7 @@ do
 			local function ClearSplash()
 				-- print(Configuration.PrintHeader .. "Clearing splash.")
 
-				--- Destroys and stops all animation of the current splashscreen, if it exists.
+				--- Destroys and stops all animation of the current SplashScreen, if it exists.
 				if SplashScreen then
 					SplashEnabled = false
 					SplashScreen.Destroy()
@@ -1596,12 +1591,11 @@ NevermoreEngine.replicated_package      = ReplicatedPackage
 
 if Configuration.IsServer then
 	local function Initiate()
-		--- Called up by the loader. 
-
-		--print(Configuration.PrintHeader .. "Nevermore is initiating.")
 		--- Initiates Nevermore. This should only be called once. 
 		-- Since Nevermore sets all of its executables, and executes them manually, 
-		-- there is no need to wait for Nevermore when these run. 
+		-- there is no need to wait for Nevermore when these run.
+		
+		--print(Configuration.PrintHeader .. "Nevermore is initiating.")
 
 		NevermoreEngine.Initiate = nil
 		ResouceManager.PopulateResourceCache()
