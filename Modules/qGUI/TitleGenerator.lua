@@ -244,16 +244,20 @@ local function GenerateTitle(ScreenGui, Text, TopLabelText, BottomLabelText)
 		-- Top Animation
 		for Index, TextLabel in pairs(TopLabels) do
 			delay(Configuration.AnimationTime * ((Index/#Text)/2), function()
-				TextLabel:TweenPosition(UDim2.new(0, 0, 0, 0), "In", "Quad", Configuration.AnimationTime/2, true)
-				qGUI.TweenTransparency(TextLabel, {TextTransparency = 1, TextStrokeTransparency=1}, Configuration.AnimationTime/2, true)
+				if TextLabel:IsDescendantOf(game) then
+					TextLabel:TweenPosition(UDim2.new(0, 0, 0, 0), "In", "Quad", Configuration.AnimationTime/2, true)
+					qGUI.TweenTransparency(TextLabel, {TextTransparency = 1, TextStrokeTransparency=1}, Configuration.AnimationTime/2, true)
+				end
 			end)
 		end
 
 		-- Bottom Animation
 		for Index, TextLabel in pairs(BottomLabels) do
 			delay(Configuration.AnimationTime * (((Index)/#Text)/2), function()
-				TextLabel:TweenPosition(UDim2.new(1, 0, 1, -Configuration.LabelHeight), "In", "Quad", Configuration.AnimationTime/2, true)
-				qGUI.TweenTransparency(TextLabel, {TextTransparency = 1, TextStrokeTransparency=1}, Configuration.AnimationTime/2, true)
+				if TextLabel:IsDescendantOf(game) then
+					TextLabel:TweenPosition(UDim2.new(1, 0, 1, -Configuration.LabelHeight), "In", "Quad", Configuration.AnimationTime/2, true)
+					qGUI.TweenTransparency(TextLabel, {TextTransparency = 1, TextStrokeTransparency=1}, Configuration.AnimationTime/2, true)
+				end
 			end)
 		end
 
