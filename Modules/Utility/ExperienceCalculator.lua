@@ -49,10 +49,10 @@ local function GetSubExperience(CurrentExperience)
 	print("ExperienceRequired", ExperienceRequired)--]]
 	
 	local AchievedOfNext = CurrentExperience - ExperienceRequiredForCurrentLevel 
-	local TotalRequired = ExperienceRequired - ExperienceRequiredForCurrentLevel
-	local Percent = AchievedOfNext/ExperienceRequired
+	local SubTotalRequired = ExperienceRequired - ExperienceRequiredForCurrentLevel
+	local Percent = AchievedOfNext/SubTotalRequired
 	
-	return AchievedOfNext, TotalRequired, Percent
+	return AchievedOfNext, SubTotalRequired, Percent
 end
 ExperienceCalculator.GetSubExperience = GetSubExperience
 
