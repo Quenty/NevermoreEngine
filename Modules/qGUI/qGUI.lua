@@ -135,6 +135,7 @@ lib.MouseOver = MouseOver
 lib.mouseOver = MouseOver
 lib.mouse_over = MouseOver
 
+--[[
 local function SubtractColor3(a, b)
 	local R = a.r + b.r
 	local G = a.g + b.g
@@ -164,7 +165,7 @@ local function InverseColor3(Color)
 end
 lib.InverseColor3 = InverseColor3
 lib.inverseColor3 = InverseColor3
-lib.inverse_color3 = InverseColor3
+lib.inverse_color3 = InverseColor3--]]
 
 local function IsPhone(ScreenGui)
 	-- Return's if ROBLOX is being played on a phone or not.
@@ -329,7 +330,7 @@ local TweenTransparency, StopTransparencyTween do
 	local function StartProcessUpdate()
 		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
 			ActivelyProcessing = tick()
-			spawn(function()
+			assert(coroutine.resume(coroutine.create(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
 					-- wait(0.05)
@@ -339,7 +340,7 @@ local TweenTransparency, StopTransparencyTween do
 						wait(0.05)
 					end
 				end
-			end)
+			end)))
 		end
 	end
 
@@ -447,7 +448,7 @@ local TweenColor3, StopColor3Tween do
 	local function StartProcessUpdate()
 		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
 			ActivelyProcessing = tick()
-			spawn(function()
+			assert(coroutine.resume(coroutine.create(function()
 				while ActivelyProcessing do
 					UpdateTweenModels()
 					-- wait(0.05)
@@ -457,7 +458,7 @@ local TweenColor3, StopColor3Tween do
 						wait(0.05)
 					end
 				end
-			end)
+			end)))
 		end
 	end
 	
@@ -562,9 +563,15 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 		Gui.SizeConstraint = "RelativeYY"
 	end--]]
 
-	local NewDiameter = OverrideSize or math.max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y) * 2 -- multiply times 2 because we want it resize for the whole time, and at 1/2 we expect it to fill the whole place.
-	local NewSize     = UDim2.new(0, NewDiameter * 2.82842712475, 0,  NewDiameter * 2.28842712475)
-	local NewPosition = UDim2.new(0, X - (NewDiameter * 1.41421356237), 0, Y - (NewDiameter * 1.41421356237))
+	local NewDiameter
+	if OverrideSize then
+		NewDiameter = OverrideSize
+	else
+		NewDiameter = math.max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y) * 2 * 2.82842712475-- multiply times 2 because we want it resize for the whole time, and at 1/2 we expect it to fill the whole place.
+	end
+
+	local NewSize     = UDim2.new(0, NewDiameter, 0,  NewDiameter)
+	local NewPosition = UDim2.new(0, X - (NewDiameter / 2), 0, Y - (NewDiameter / 2))
 	
 	Circle.Parent                      = ParentFrame or Gui
 	
@@ -750,8 +757,8 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	BottomLeft.ImageRectOffset   = Vector2.new(0, ImageSize.Y * (2/3))
 	
 	Middle.ImageRectOffset       = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
-	MiddleTop.ImageRectOffset    = Vector2.new(0, ImageSize.Y/3)
-	MiddleBottom.ImageRectOffset = Vector2.new(ImageSize.Y * (2/3), ImageSize.Y/3)
+	MiddleTop.ImageRectOffset    = Vector2.new(ImageSize.Y/3, 0)
+	MiddleBottom.ImageRectOffset = Vector2.new(ImageSize.Y/3, ImageSize.Y * (2/3))
 
 	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom
 end
@@ -761,7 +768,7 @@ lib.addNinePatch = AddNinePatch
 local function BackWithRoundedRectangle(Frame, Radius, Color)
 	Color = Color or Color3.new(1, 1, 1);
 
-	AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {
+	return AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {
 		ImageColor3 = Color;
 	})
 end
