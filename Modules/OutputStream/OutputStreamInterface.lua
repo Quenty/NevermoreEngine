@@ -47,7 +47,7 @@ local DefaultConfiguration = {
 	TitleLabelOffsetX     = 6;
 	
 	MenuZIndex            = 9; -- ZIndex of the menu overlay. We'll try to maintain a [8,9] ZIndex range. 
-	MenuAnimateTime       = 0.1;
+	MenuAnimateTime       = 0.18;
 	MenuDefaultColor      = Color3.new(0.5, 0.5, 0.5);
 	MenuNameWhenOpen      = "Change Channels?";
 
@@ -124,6 +124,26 @@ local MakeOutputStreamMenu = Class(function(RenderStreamMenu, Parent, ScreenGui,
 
 	TitleButton.MouseEnter:connect(OnTitleButtonEnter)
 	TitleButton.MouseLeave:connect(OnTitleButtonLeave)
+
+	--[[
+	local UncollapseButton = Make("TextButton", {
+		Parent                 = Parent;
+		Name                   = "UncollapseButton";
+		Text                   = "X";
+		Size                   = UDim2.new(0, 20, 0, 20);
+		TextColor3             = Color3.new(1, 1, 1);
+		Font                   = "SourceSans";
+		TextTransparency       = 0;
+		TextStrokeTransparency = 0.13;
+		TextStrokeColor3       = Color3.new(0, 0, 0);
+		Archivable             = false;
+		BackgroundTransparency = 1;
+		BorderSizePixel        = 0;
+		FontSize               = "Size14";
+		TextXAlignment         = "Center";
+		TextYAlignment         = "Center";
+		Position               = UDim2.new(1, 0, 0, 0);
+	})--]]
 
 	local TitleLabel = Make("TextLabel", {
 		BackgroundTransparency = 1;
@@ -1081,7 +1101,7 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 	local Subscribed = {} -- Maintain list of subscribed units. 
 
 	local MainFrame do
-		local SizeIfPhone = UDim2.new(0, 280 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight) 
+		local SizeIfPhone = UDim2.new(0, 280 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight/2) 
 		local SizeNormal  = UDim2.new(0, 500 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight);
 
 		MainFrame = Make("Frame", {
@@ -1131,6 +1151,21 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 		if DoShowInterface() then
 			Menu.Show(DoNotAnimate and nil or Configuration.MenuAnimateTime)
 
+			local TargetPosition
+			if Menu.GetIsCollapsed() then
+				TargetPosition = UDim2.new(0, -100, 0, 0)
+			else
+				TargetPosition = UDim2.new(0, 0, 0, 0)
+			end
+
+			if ContentContainer.Position ~= TargetPosition then
+				if DoNotAnimate then
+					ContentContainer.Position = TargetPosition
+				else
+					ContentContainer:TweenPosition(TargetPosition, "Out", "Quad", Configuration.MenuAnimateTime*0.9, true)
+				end
+			end
+
 			if UserInputService.MouseEnabled then
 				if DoNotAnimate then
 					MainFrame.BackgroundTransparency = Configuration.UIBackgroundTransparencyOnMouseOver
@@ -1147,6 +1182,8 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 				end
 			end
 		else
+			ContentContainer.Position = UDim2.new(0, 0, 0, 0)
+
 			Menu.Hide(DoNotAnimate and nil or Configuration.MenuAnimateTime)
 
 			if UserInputService.MouseEnabled then

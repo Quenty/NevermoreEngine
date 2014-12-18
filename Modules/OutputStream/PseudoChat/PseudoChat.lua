@@ -13,6 +13,7 @@ local OutputClassStreamLoggers    = LoadCustomLibrary("OutputClassStreamLoggers"
 local OutputStream                = LoadCustomLibrary("OutputStream")
 local PseudoChatBar               = LoadCustomLibrary("PseudoChatBar")
 local ClientAuthenticationService = LoadCustomLibrary("ClientAuthenticationService")
+local qGUI                        = LoadCustomLibrary("qGUI")
 
 -- local ShipKillFeedParser          = LoadCustomLibrary("ShipKillFeedParser")
 
@@ -64,6 +65,14 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 	local Interface = OutputStreamInterface.MakeOutputStreamInterface(nil, ScreenGui)
 	Chat.Interface  = Interface
 	Chat.Gui        = Interface.Gui
+
+	function Chat.GetDefaultPosition()
+		if qGUI.IsPhone(ScreenGui) then
+			return UDim2.new(0, 36, 0, 4)
+		else
+			return UDim2.new(0, 4, 0, 4)
+		end
+	end
 
 	local ChatBar
 

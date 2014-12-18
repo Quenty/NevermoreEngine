@@ -23,15 +23,17 @@ local lib = {}
 local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 	--- Creates a new pseudo chat bar for chatting
 
+	local IsPhone = qGUI.IsPhone(ScreenGui)
+
 	local Configuration = {
-		DefaultText          = UserInputService.MouseEnabled and "Push \"/\" to chat" or "Tap here to chat";
-		XOffset              = 60;
+		DefaultText          = IsPhone and "Push \"/\" to chat" or "Tap here to chat";
+		XOffset              = IsPhone and 10 or 60;
 		ZIndex               = 10;
 		DefaultTransparency  = 1;
 		SelectedTransparency = 0.3;
 		AnimationTime        = 0.05;
 		AnimationTimeHide    = 0.3;
-		DefaultHeight        = 30;
+		DefaultHeight        = IsPhone and 20 or 30;
 	}
 
 	-- if CurrentPlatformName == "IOS" or CurrentPlatformName == "Android" then
@@ -77,7 +79,7 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 		TextColor3             = Color3.new(1, 1, 1);
 		TextStrokeTransparency = 0.9;
 		TextTransparency       = 0;
-		TextXAlignment         = "Left";
+		TextXAlignment         = IsPhone and "Center" or "Left";
 		ZIndex                 = Configuration.ZIndex-1;
 		MultiLine              = false;
 		ClearTextOnFocus       = false;
