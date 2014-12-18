@@ -1515,16 +1515,16 @@ if Configuration.IsServer then
 		end
 	end
 
-	Network.GetMainDatastream().RegisterRequestTag(Configuration.NevermoreRequestPrefix .. "SetRespawnTime", function(Client, NewTime)
+	--[[Network.GetMainDatastream().RegisterRequestTag(Configuration.NevermoreRequestPrefix .. "SetRespawnTime", function(Client, NewTime)
 		SetRespawnTime(NewTime)
-	end)
-else
-	function SetRespawnTime(NewTime)
+	end)--]]
+--else
+	--[[function SetRespawnTime(NewTime)
 		--- Sends a request to the server to set the respawn time.
 		-- @param NewTime The new respawn time.
 
 		Network.GetMainDatastream().Send(Configuration.NevermoreRequestPrefix .. "SetRespawnTime", NewTime)
-	end
+	end--]]
 end
 
 --print(Configuration.PrintHeader .. "Loaded Nevermore Utilities")
@@ -1542,10 +1542,6 @@ NevermoreEngine.set_respawn_time        = SetRespawnTime
 NevermoreEngine.GetResource             = ResouceManager.GetResource
 NevermoreEngine.getResource             = ResouceManager.GetResource
 NevermoreEngine.get_resource            = ResouceManager.GetResource
-
--- NevermoreEngine.LoadScript              = ResouceManager.LoadScript
--- NevermoreEngine.loadScript              = ResouceManager.LoadScript
--- NevermoreEngine.load_script             = ResouceManager.LoadScript
 
 NevermoreEngine.LoadLibrary             = ResouceManager.LoadLibrary
 NevermoreEngine.loadLibrary             = ResouceManager.LoadLibrary
@@ -1598,7 +1594,6 @@ if Configuration.IsServer then
 	local function Initiate()
 		--- Called up by the loader. 
 
-		--print(Configuration.PrintHeader .. "Nevermore is initiating.")
 		--- Initiates Nevermore. This should only be called once. 
 		-- Since Nevermore sets all of its executables, and executes them manually, 
 		-- there is no need to wait for Nevermore when these run. 
@@ -1610,11 +1605,6 @@ if Configuration.IsServer then
 			Network.ConnectPlayers()
 			ResouceManager.ExecuteExecutables()
 		end
-
-		-- if Configuration.SoloTestMode then
-			-- print(Configuration.PrintHeader .. "SoloTestMode enabled for NevermoreEngine.")
-			-- SetupSplash()
-		-- end
 	end
 	NevermoreEngine.Initiate = Initiate
 else
