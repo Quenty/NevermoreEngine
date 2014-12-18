@@ -679,9 +679,10 @@ do
 				Description = "Kills the player.  (Duh).";
 				"Kill";
 			},
-			function(PlayerCharacter)
+			function(User, PlayerCharacter)
+				RawCharacter.TagHumanoid(PlayerCharacter.Character.Humanoid, User)
 				RawCharacter.Kill(PlayerCharacter.Character)
-			end, Args.PlayerCharacter())
+			end, Args.User(), Args.PlayerCharacter())
 			Cmds:Alias("Kill", "Die", "Murder", "Terminate", "Assassinate", "Slaughter", "keel", "k33l", "Snuff", "slay", "kl", "knockoff", "knock_off")
 
 		Cmds:add("LoopKill", {
