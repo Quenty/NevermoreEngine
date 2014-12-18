@@ -285,6 +285,7 @@ function ScrollBar:HandleClickOnBacking(Offset)
 
 	if not (self.Pressed or self.Scroller.Pressed) then
 		local CurrentRelativePosition = self.BarFrame.AbsolutePosition[self.Axis] - self.BarContainer.AbsolutePosition[self.Axis]
+
 		if Offset > CurrentRelativePosition then
 			self.Scroller:ScrollTo(self.Scroller.Offset + self.Scroller.PixelsPerPageUpDown, self.ScrollSpeedOnContainerClick)
 		else
@@ -313,9 +314,9 @@ function ScrollBar:UpdateRender()
 	end
 
 	local ScrollerOffset = self.Scroller.Offset
-	if self.Scroller:IsAutoScrolling() and self.Scroller.Target then
+	--[[if self.Scroller:IsAutoScrolling() and self.Scroller.Target then
 		ScrollerOffset = self.Scroller.Target
-	end
+	end--]]
 
 	-- Handle over bounds...
 	local AmountOver = -math.min(ScrollerOffset, self.Scroller.Max - ScrollerOffset)
@@ -329,9 +330,6 @@ function ScrollBar:UpdateRender()
 	self.BarFrame.Size          = GetSizeFromAxis(ScaledSize, self.Axis)
 	
 	-- Position it
-
-
-
 	local CurrentPercent = ScrollerOffset/self.Scroller.Max
 	CurrentPercent       = math.min(1, math.max(0, CurrentPercent)) -- Constrain between 0 and 1.
 
@@ -403,7 +401,7 @@ function ScrollBar:Tap()
 		end))
 		assert(Success, Error)
 	else
-		warn("[ScrollBar] - Cannot tap, already tapping!")
+		warn("[ScrollBar] - Cannot tap, already tapping! This may be caused by the fact ROBLOX fires MouseButton1 and Touch events simultaneously.")
 	end
 end
 
@@ -431,7 +429,6 @@ end
 --- SCROLLING FRAME ---
 local ScrollingFrame = {}
 ScrollingFrame.__index = ScrollingFrame
-
 ScrollingFrame.PixelsPerWheelTurn = 40
 
 
@@ -485,11 +482,19 @@ function ScrollingFrame.new(Frame, Axis)
 		end
 	end)
 
-	new.Maid.FrameInputBegan = Frame.InputBegan:connect(function(InputObject)
-		if InputObject.UserInputType.Name == "MouseButton1" or InputObject.UserInputType.Name == "Touch" then
-			new:Tap()
-		end
-	end)
+	if UserInputService.TouchEnabled then
+		new.Maid.FrameInputBegan = Frame.InputBegan:connect(function(InputObject)
+			if InputObject.UserInputType.Name == "MouseButton1" or InputObject.UserInputType.Name == "Touch" then
+				new:Tap()
+			end
+		end)
+	else
+		new.Maid.FrameInputBegan = Frame.InputBegan:connect(function(InputObject)
+			if InputObject.UserInputType.Name == "MouseButton1" then
+				new:Tap()
+			end
+		end)
+	end
 
 	-- if UserInputService.TouchEnabled then
 	-- 	new.LastFingerCount = 0
@@ -712,7 +717,7 @@ function ScrollingFrame:Tap(OnTapEndCallback)
 		end))
 		assert(Success, Error)
 	else
-		warn("[ScrollingFrame] - Cannot tap, already tapping!")
+		warn("[ScrollingFrame] - Cannot tap, already tapping! This may be caused by the fact ROBLOX fires MouseButton1 and Touch events simultaneously.")
 	end
 end
 
@@ -843,7 +848,7 @@ function InertiaScrollingFrame:Tap(OnTapEndCallback)
 		-- @param ScrollDistance the distance it scrolled only, no direction. 
 
 		-- Note: Even though it is called in a coroutine, it should still error, as this script also yields using ROBLOX's thing first.
-
+	
 	if not self.Pressed then
 		self.Pressed = true
 
@@ -879,7 +884,7 @@ function InertiaScrollingFrame:Tap(OnTapEndCallback)
 		end))
 		assert(Success, Error)
 	else
-		warn("[InertiaScrollingFrame] - Cannot tap, already tapping!")
+		warn("[InertiaScrollingFrame] - Cannot tap, already tapping! This may be caused by the fact ROBLOX fires MouseButton1 and Touch events simultaneously.")
 	end
 end
 
@@ -1046,13 +1051,12 @@ end
 
 function BounceScrollingFrame:Release(OverridenTimeConstraint, PressedNotRequired)
 	--- Note that BounceBackTimeConstraint will override [OverridenTimeConstraint] if self.Offset is over bounds.
-
+	
 	if self.Pressed or PressedNotRequired then
 		self:DisconnectReleaseEvent()
 		self.Pressed = false
 
 		--- Modify so we derive Amplitude from target, and so that if we are over bounds, we ALWAYS scroll.
-
 		local PreConstrainedAmplitude = 0.8 * self.Velocity
 		self.Target = Round(self.Offset + PreConstrainedAmplitude)
 		self.TimeStamp = tick()
