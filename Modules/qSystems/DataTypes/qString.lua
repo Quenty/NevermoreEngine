@@ -182,6 +182,21 @@ end
 lib.CheckNumOfCharacterInString = CheckNumOfCharacterInString
 lib.checkNumOfCharacterInString = CheckNumOfCharacterInString
 
+local function CommaValue(Amount)
+	local FormattedString = Amount
+	local Index
+
+	while true do  
+		FormattedString, Index = string.gsub(FormattedString, "^(-?%d+)(%d%d%d)", '%1,%2')
+		if Index==0 then
+			return FormattedString
+		end
+	end
+
+	return FormattedString
+end
+lib.CommaValue = CommaValue
+
 
 local function GetRomanNumeral(Number)
 	--- Return's the Roman Numeral version of the number
