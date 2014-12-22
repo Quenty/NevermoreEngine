@@ -232,23 +232,23 @@ lib.getHumanoid = GetHumanoid
 
 
 local function GetCharacter(Descendant)
-	-- Returns the Player and Charater that a descendent is part of, if it is part of one.
+	-- Returns the Player and Character that a descendent is part of, if it is part of one.
 	-- @param Descendant A child of the potential character. 
 
-	local Charater = Descendant
-	local Player   = Players:GetPlayerFromCharacter(Charater)
+	local Character = Descendant
+	local Player   = Players:GetPlayerFromCharacter(Character)
 
 	while not Player do
-		if Charater.Parent then
-			Charater = Charater.Parent
-			Player   = Players:GetPlayerFromCharacter(Charater)
+		if Character.Parent then
+			Character = Character.Parent
+			Player   = Players:GetPlayerFromCharacter(Character)
 		else
 			return nil
 		end
 	end
 
 	-- Found the player, character must be true.
-	return Charater, Player
+	return Character, Player
 end
 lib.getCharacter = GetCharacter
 lib.GetCharacter = GetCharacter
