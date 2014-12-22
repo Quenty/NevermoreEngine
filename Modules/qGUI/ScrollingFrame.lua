@@ -371,7 +371,7 @@ function ScrollBar:Drag()
 		-- self.BarFrame.Position = GetPositionFromOffset(-SupposeToRender, self.Axis)
 		local NewScrollerOffset = (self.Scroller.Max) * Percent
 
-		self.Scroller:SetOffset(NewScrollerOffset)
+		self.Scroller:SetOffset(math.max(self.Scroller.Min, math.min(self.Scroller.Max, NewScrollerOffset)))
 	else
 		warn("[ScrollBar] - Cannot drag, not pressed")
 	end
@@ -1009,7 +1009,7 @@ function BounceScrollingFrame:SetOffset(Offset)
 		--- In this case, we're over boundaries, we must scale.
 
 		local Displacement = Offset - self.Max
-		local TimesOverBounds = Displacement /BackBounceRange
+		local TimesOverBounds = Displacement / BackBounceRange
 		local ScaleBy = (1 - 0.5 ^ TimesOverBounds)
 		RenderedOffset = self.Max + (ScaleBy * BackBounceRange)
 
