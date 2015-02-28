@@ -1,4 +1,4 @@
-local Players                     = game:GetService("Players")
+	local Players                     = game:GetService("Players")
 local StarterPack                 = game:GetService("StarterPack")
 local StarterGui                  = game:GetService("StarterGui")
 local Lighting                    = game:GetService("Lighting")
@@ -38,7 +38,7 @@ local Args              = CommandSystems.Args
 local Cmds              = CommandSystems.Cmds
 local CommandSystem     = CommandSystems.CommandSystem
 
-local GetIndexFromValue = qSystems.GetIndexFromValue
+local GetIndexByValue = qSystems.GetIndexByValue
 local Make              = qSystems.Make
 local CheckCharacter    = qSystems.CheckCharacter
 local CheckPlayer       = qSystems.CheckPlayer
@@ -191,7 +191,7 @@ do
 
 			for _, Player in pairs(PlayerList) do
 				local PlayerTeam = qPlayer.GetTeamFromPlayer(Player) or (NeutralAllowed and "Neutral") or nil
-				if PlayerTeam and not GetIndexFromValue(TeamList, PlayerTeam) then
+				if PlayerTeam and not GetIndexByValue(TeamList, PlayerTeam) then
 					TeamList[#TeamList+1] = PlayerTeam
 					Found = Found + 1
 				end

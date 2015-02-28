@@ -26,7 +26,7 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui)
 	local IsPhone = qGUI.IsPhone(ScreenGui)
 
 	local Configuration = {
-		DefaultText          = IsPhone and "Push \"/\" to chat" or "Tap here to chat";
+		DefaultText          = IsPhone and "Tap here to chat" or "Push \"/\" to chat";
 		XOffset              = IsPhone and 10 or 60;
 		ZIndex               = 10;
 		DefaultTransparency  = 1;

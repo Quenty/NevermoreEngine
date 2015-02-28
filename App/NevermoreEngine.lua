@@ -111,6 +111,8 @@ do
 		-- @param Parent The parent of the resource to load
 		-- @param ResourceName The name of the resource attempting to load
 
+		assert(type(ResourceName) == "string", "[NevermoreEngine] - ResourceName '" .. tostring(ResourceName) .. "' is " .. type(ResourceName) .. ", should be string")
+
 		local Resource = Parent:FindFirstChild(ResourceName)
 		if not Resource then
 			error(Configuration.PrintHeader .. "Failed to load required resource '" .. ResourceName .. "', expected at '" .. Parent:GetFullName() .. "'", 2)
@@ -130,7 +132,7 @@ do
 		-- Create the replicated package --
 		ReplicatedPackage = ReplicatedStorage:FindFirstChild(Configuration.ReplicatedPackageName)
 		if not ReplicatedPackage then
-			ReplicatedPackage            = Instance.new("Backpack")
+			ReplicatedPackage            = Instance.new("Folder")
 			ReplicatedPackage.Name       = Configuration.ReplicatedPackageName
 			ReplicatedPackage.Parent     = ReplicatedStorage
 			ReplicatedPackage.Archivable = false;		
@@ -139,7 +141,7 @@ do
 
 		DataStreamContainer = ReplicatedPackage:FindFirstChild("DataStreamContainer")
 		if not DataStreamContainer then
-			DataStreamContainer            = Instance.new("Backpack")
+			DataStreamContainer            = Instance.new("Folder")
 			DataStreamContainer.Name       = "DataStreamContainer"
 			DataStreamContainer.Parent     = ReplicatedPackage
 			DataStreamContainer.Archivable = false;
@@ -147,7 +149,7 @@ do
 
 		EventStreamContainer = ReplicatedPackage:FindFirstChild("EventStreamContainer")
 		if not EventStreamContainer then
-			EventStreamContainer            = Instance.new("Backpack")
+			EventStreamContainer            = Instance.new("Folder")
 			EventStreamContainer.Name       = "EventStreamContainer"
 			EventStreamContainer.Parent     = ReplicatedPackage
 			EventStreamContainer.Archivable = false;

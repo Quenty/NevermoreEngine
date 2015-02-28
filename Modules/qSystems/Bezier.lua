@@ -38,7 +38,7 @@ local function BezierFactory(P1x, P1y, P2x, P2y)
 	end
 
 	-- Newton raphson iteration
-	function GetTForX(aX)
+	local function GetTForX(aX)
 		local aGuessT = aX
 
 		for Index = 1, 4 do

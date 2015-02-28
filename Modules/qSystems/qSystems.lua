@@ -115,8 +115,6 @@ local function Modify(Instance, Values)
 	end
 	return Instance
 end
-lib.modify = Modify
-lib.Modify = Modify
 
 
 local function Make(ClassType, Properties)
@@ -124,6 +122,10 @@ local function Make(ClassType, Properties)
 
 	return Modify(Instance.new(ClassType), Properties)
 end
+
+lib.modify = Modify
+lib.Modify = Modify
+
 lib.make = Make;
 lib.Make = Make;
 
@@ -140,20 +142,16 @@ local function WaitForChild(Parent, Name, TimeLimit)
 	local StartTime = tick()
 	local Warned    = false
 
-	while not Child and Parent do
+	while not Child do
 		wait(0)
 		Child = Parent:FindFirstChild(Name)
 		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
 			Warned = true
-			warn("Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")")
+				warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")")
 			if TimeLimit then
 				return Parent:FindFirstChild(Name)
 			end
 		end
-	end
-
-	if not Parent then
-		warn("Parent became nil.")
 	end
 
 	return Child
@@ -220,7 +218,7 @@ local function GetHumanoid(Descendant)
 			end
 		end
 
-		if Descendant.Parent and Descendant:IsDescendantOf(workspace	) then
+		if Descendant.Parent and Descendant:IsDescendantOf(workspace) then
 			Descendant = Descendant.Parent
 		else
 			return nil

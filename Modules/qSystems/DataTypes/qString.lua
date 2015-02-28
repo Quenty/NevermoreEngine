@@ -156,13 +156,17 @@ lib.getRestOfSemiTokenizedString = GetRestOfSemiTokenizedString
 lib.get_rest_of_semi_tokenized_string = GetRestOfSemiTokenizedString
 
 local function IsWhitespace(Text) 
+	--- Returns whether or not text is whitespace
+	
 	return string.match(Text, "[%s]+") == Text
 end
 lib.isWhitespace = IsWhitespace
 lib.IsWhitespace = IsWhitespace
 lib.is_whitespace = IsWhitespace
 
-local function DumbElipseLimit(Text, CharacterLimit) 
+local function DumbElipseLimit(Text, CharacterLimit)
+	--- Converts text to have a ... after it if it's too long.
+
 	if #Text > CharacterLimit then 
 		Text = Text:sub(1, CharacterLimit-3).."..." 
 	end 

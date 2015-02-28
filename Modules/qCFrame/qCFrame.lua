@@ -1,3 +1,4 @@
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService       = game:GetService("HttpService")
 
@@ -497,22 +498,25 @@ end--]]
 lib.AdvanceRaycast = AdvanceRaycast
 lib.advanceRaycast = AdvanceRaycast
 
-local function WeldTogether(Part0, Part1, JointType, WeldParent)
+local function WeldTogether(Part0, Part1, JointType, WeldParent, JointAxisCFrame)
 	--- Weld's 2 parts together
 	-- @param Part0 The first part
 	-- @param Part1 The second part (Dependent part most of the time).
 	-- @param [JointType] The type of joint. Defaults to weld.
-	-- @param [WeldParent] Parent of the weld, Defaults to Part0 (so GC is better).
+	-- @param [WeldParent] Parent of the weld, Defaults to game.JointsService (Joints GC automatically from there)
+	-- @param [JointAxisCFrame] The CFrame axis of the joints. Optional. Defaultas as Part0's CFrame
 	-- @return The weld created.
 
 	JointType = JointType or "Weld"
 
+	JointAxisCFrame = JointAxisCFrame or Part0.CFrame
+
 	local NewWeld = Make(JointType, {
 		Part0  = Part0;
 		Part1  = Part1;
-		C0     = CFrame.new();--Part0.CFrame:inverse();
-		C1     = Part1.CFrame:toObjectSpace(Part0.CFrame); --Part1.CFrame:inverse() * Part0.CFrame;-- Part1.CFrame:inverse();
-		Parent = WeldParent or Part0;
+		C0     = Part0.CFrame:toObjectSpace(JointAxisCFrame);
+		C1     = Part1.CFrame:toObjectSpace(JointAxisCFrame);
+		Parent = game.JointsService;
 	})
 
 	return NewWeld
@@ -663,9 +667,9 @@ local function GetRotationInXZPlane(CFrameValue)
 	--- Get's the rotation in the XZ plane (global).
 
 	local Back = GetBackVector(CFrameValue)
-	return GetCFrameFromTopBack(CFrameValue.p, 
+	return GetCFrameFromTopBack(CFrameValue.p,
 		Vector3.new(0,1,0), -- Top lookVector (straight up)
-		Vector3.new(Back.x, 0, Back.z).unit -- Right facing direction (removed Y axis.)
+		Vector3.new(Back.x, 0, Back.z).unit -- Back facing direction (removed Y axis.)
 	)
 end
 lib.GetRotationInXZPlane = GetRotationInXZPlane
