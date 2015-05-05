@@ -37,12 +37,10 @@ end
 lib.RoundDown = RoundDown
 lib.roundDown = RoundDown
 
-local function RoundNumber(number, divider)
-	--verifyArg(number, "number", "number")
-	--verifyArg(divider, "number", "divider", true)
+local function RoundNumber(Number, Divider)
 
-	divider = divider or 1
-	return (math.floor((number/divider)+0.5)*divider)
+	Divider = Divider or 1
+	return math.floor((Number/Divider) + 0.5) * Divider
 end
 lib.roundNumber = RoundNumber
 lib.RoundNumber = RoundNumber
