@@ -20,6 +20,9 @@
 			
 		... wait()
 			Wait for fire to be called, and return the arguments it was given.
+
+		Destroy()
+			Disconnects all connected events to the signal and voids the signal as unusable.
 --]]
 
 local Signal = {}
@@ -49,6 +52,13 @@ function Signal.new()
 		mSignaler.Event:wait()
 		assert(mArgData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
 		return unpack(mArgData, 1, mArgDataCount)
+	end
+
+	function sig:Destroy()
+		mSignaler:Destroy()
+		mArgData      = nil
+		mArgDataCount = nil
+		mSignaler     = nil
 	end
 	
 	return sig
