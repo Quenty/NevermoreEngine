@@ -39,28 +39,32 @@ local Configuration = {
 Configuration.IsServer = not Configuration.IsClient
 
 
--- Print out information on whether or not FilteringEnabled is up or not. 
-if workspace.FilteringEnabled then
-	print("**** workspace.FilteringEnabled is enabled")
-end
-
--- Print out whether or not ResetPlayerGuiOnSpawn is enabled or not. 
-if not Configuration.ResetPlayerGuiOnSpawn or not StarterGui.ResetPlayerGuiOnSpawn then
-	print("**** StarterGui.ResetPlayerGuiOnSpawn = false. GUIs will not reload on player death or respawn.")
-	StarterGui.ResetPlayerGuiOnSpawn = false
-end
-
--- Print headers are used to help debugging process
-if Configuration.SoloTestMode then
-	Configuration.PrintHeader = "[NevermoreEngineSolo] - "
-else
-	if Configuration.IsServer then
-		Configuration.PrintHeader = "[NevermoreEngineServer] - "
+do
+	-- Print headers are used to help debugging process
+	if Configuration.SoloTestMode then
+		Configuration.PrintHeader = "[NevermoreEngineSolo] - "
 	else
-		Configuration.PrintHeader = "[NevermoreEngineLocal] - "
+		if Configuration.IsServer then
+			Configuration.PrintHeader = "[NevermoreEngineServer] - "
+		else
+			Configuration.PrintHeader = "[NevermoreEngineLocal] - "
+		end
 	end
+	
+	local Output = Configuration.PrintHeader .. "NevermoreEngine loaded. Modes: "
+
+		-- Print out information on whether or not FilteringEnabled is up or not. 
+	if workspace.FilteringEnabled then
+		Output = Output .. " Filtering enabled. "
+	end
+
+	-- Print out whether or not ResetPlayerGuiOnSpawn is enabled or not. 
+	if not Configuration.ResetPlayerGuiOnSpawn or not StarterGui.ResetPlayerGuiOnSpawn then
+		Output = Output ..  " GUIs will not reload."
+		StarterGui.ResetPlayerGuiOnSpawn = false
+	end
+	print(Output)
 end
-print(Configuration.PrintHeader .. "NevermoreEngine loaded.")
 
 Players.CharacterAutoLoads = false
 
@@ -982,8 +986,8 @@ do
 
 		local MainFrame = Instance.new('Frame')
 			MainFrame.Name             = "SplashScreen";
-			MainFrame.Position         = UDim2.new(0, 0, 0, -2);
-			MainFrame.Size             = UDim2.new(1, 0, 1, 22); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
+			MainFrame.Position         = UDim2.new(0, 0, 0, -38); -- top bar fix
+			MainFrame.Size             = UDim2.new(1, 0, 1, 60); -- Sized ans positioned weirdly because ROBLOX's ScreenGui doesn't cover the whole screen.
 			MainFrame.BackgroundColor3 = SplashConfiguration.BackgroundColor3;
 			MainFrame.Visible          = true;
 			MainFrame.ZIndex           = SplashConfiguration.ZIndex;
@@ -1429,7 +1433,7 @@ do
 			-- @return The removing function, even if the splashscreen doesn't exist.
 
 			local LocalPlayer = Players.LocalPlayer
-			local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+			local PlayerGui   = LocalPlayer:FindFirstChild("PlayerGui")
 
 			while not LocalPlayer:FindFirstChild("PlayerGui") do 
 				wait(0)
@@ -1597,21 +1601,30 @@ if Configuration.IsServer then
 		--- Called up by the loader. 
 
 		--- Initiates Nevermore. This should only be called once. 
-		-- Since Nevermore sets all of its executables, and executes them manually, 
-		-- there is no need to wait for Nevermore when these run. 
+		--  Since Nevermore sets all of its executables, and executes them manually, 
+		--  there is no need to wait for Nevermore when these run. 
 
 		NevermoreEngine.Initiate = nil
-		ResouceManager.PopulateResourceCache()
 
-		if Configuration.IsServer then
-			Network.ConnectPlayers()
-			ResouceManager.ExecuteExecutables()
-		end
+		ResouceManager.PopulateResourceCache()
+		Network.ConnectPlayers()
+		ResouceManager.ExecuteExecutables()
 	end
 	NevermoreEngine.Initiate = Initiate
 else
 	ResouceManager.PopulateResourceCache()
-	Network.AddSplashToNevermore(NevermoreEngine)
+
+	-- Yield until player loads
+	assert(coroutine.resume(coroutine.create(function()
+		local LocalPlayer do
+			while not (LocalPlayer and LocalPlayer:IsA("Player")) do
+				warn(Configuration.PrintHeader, "Yielding until player is added. Currently found: " .. tostring(LocalPlayer))
+				LocalPlayer = Players.LocalPlayer or Players.ChildAdded:wait()
+			end
+		end
+		
+		Network.AddSplashToNevermore(NevermoreEngine)
+	end)))
 end	
 
 --print(Configuration.PrintHeader .. "Nevermore is initiated successfully."
