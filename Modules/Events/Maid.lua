@@ -66,8 +66,6 @@ local MakeMaid do
 end
 
 lib.MakeMaid = MakeMaid
-lib.makeMaid = MakeMaid
 lib.new = MakeMaid
-lib.New = MakeMaid
 
 return lib
