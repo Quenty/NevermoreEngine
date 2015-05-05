@@ -7,10 +7,7 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
-local qMath             = LoadCustomLibrary("qMath")
-local qCFrame           = LoadCustomLibrary("qCFrame")
 local Table             = LoadCustomLibrary("Table")
-local qColor3           = LoadCustomLibrary("qColor3")
 
 local Make              = qSystems.Make
 local Modify            = qSystems.Modify
@@ -27,7 +24,7 @@ local WEAK_MODE = {
 
 -- qGUI.lua
 -- @author Quenty
--- A group of utility functions to be used by ROBLOX GUIs
+-- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
 --[[
 
@@ -197,7 +194,7 @@ lib.UDim2OffsetFromVector2 = UDim2OffsetFromVector2
 lib.uDim2OffsetFromVector2 = UDim2OffsetFromVector2
 lib.udim2_offset_from_vector2 = UDim2OffsetFromVector2
 
-
+--[[ -- Use new camera API instead
 local function WorldToScreen(ScreenSize, Camera, Position)
 	--- Converts a 3D point to a 2D point on the screen. 
 	-- @param ScreenSize Vector2, the current screensize.
@@ -218,7 +215,6 @@ local function WorldToScreen(ScreenSize, Camera, Position)
 	return 0.5 - RelativePosition.x/RelativePosition.z/(ScreenLimitY*ScreenSize.X/VSY), 0.5 + RelativePosition.y/RelativePosition.z/ScreenLimitY, -RelativePosition.z
 end
 
---[[
 do
 	local PointToObjectSpace = CFrame.new().pointToObjectSpace
 	local atan2              = math.atan2
@@ -264,13 +260,13 @@ do
 			Angle
 		end
 	end
-end
---]]
+EndValue
+
 
 lib.WorldToScreen = WorldToScreen
 lib.worldToScreen = WorldToScreen
 lib.world_to_screen = WorldToScreen
-
+--]]
 local function MultiplyUDim2Offset(Original, Factor)
 	return UDim2.new(Original.X.Scale, Original.X.Offset * Factor, Original.Y.Scale, Original.Y.OFfset * Factor)
 end
@@ -285,11 +281,10 @@ lib.pickRandomColor3 = PickRandomColor3
 
 local TweenTransparency, StopTransparencyTween do
 	local IsLocal = game:FindService("MeshContentProvider") ~= nil or (game:FindService("NetworkServer") == nil)
-	print("[qGUI][IsLocal] - " .. tostring(IsLocal))
+	print("[qGUI]- IsLocal is " .. tostring(IsLocal))
 
 	local ProcessList = {}
-	-- setmetatable(ProcessList, WEAK_MODE.K)
-	local ActivelyProcessing = false
+	local ProcessingList = false
 
 	local function SetProperties(Gui, Percent, StartProperties, NewProperties)
 		-- Maybe there's a better way to do this?
@@ -301,46 +296,63 @@ local TweenTransparency, StopTransparencyTween do
 	end
 
 	local function UpdateTweenModels()
+		-- @return Boolean, DidUpdate, whether it updated or not.
+
 		local CurrentTick = tick()
-		ActivelyProcessing = false
+		local DidUpdate = false
 
 		for Gui, TweenState in next, ProcessList do
-			if Gui and Gui:IsDescendantOf(game) then
-				ActivelyProcessing = tick()
+			if Gui:IsDescendantOf(game) then
+				DidUpdate = true
 
 				local TimeElapsed = (CurrentTick - TweenState.StartTime)
 				local Duration    = TweenState.Duration
 
-				if TimeElapsed > Duration then
-					-- Then we end it.
-					
+				if TimeElapsed > Duration then -- Then we end it.
 					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties) 
 					ProcessList[Gui] = nil
-				else
-					-- Otherwise do the animations.
-
+				else -- Otherwise do the animations.
 					SetProperties(Gui, TimeElapsed/Duration, TweenState.StartProperties, TweenState.NewProperties)
 				end
 			else
 				ProcessList[Gui] = nil
 			end
 		end
+
+		return DidUpdate
 	end
 
 	local function StartProcessUpdate()
-		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
-			ActivelyProcessing = tick()
-			assert(coroutine.resume(coroutine.create(function()
-				while ActivelyProcessing do
-					UpdateTweenModels()
-					-- wait(0.05)
-					if IsLocal then
-						RunService.RenderStepped:wait()
-					else
-						wait(0.05)
+		-- ProcessingList stores state of processing.
+
+		if not (ProcessingList) then
+			ProcessingList = true
+			
+			if IsLocal then
+				local UpdateName = "TweenTransparencyOnGuis" .. tick()
+
+				RunService:BindToRenderStep(UpdateName, 2000, function()
+					local DidUpdate = UpdateTweenModels()
+					if not DidUpdate then
+						ProcessingList = false
+						RunService:UnbindFromRenderStep(UpdateName)
 					end
+				end)
+			else
+				local DidDoIt, Error = coroutine.resume(coroutine.create(function()
+					local DidUpdate
+					repeat
+						DidUpdate = UpdateTweenModels()
+					until (not DidUpdate) and wait(0.05) -- repeat until DidUpdate is false. 
+
+					ProcessingList = false
+				end))
+
+				if not DidDoIt then
+					ProcessingList = false
+					error(Error)
 				end
-			end)))
+			end
 		end
 	end
 
@@ -408,7 +420,19 @@ local TweenColor3, StopColor3Tween do
 	-- setmetatable(ProcessList, WEAK_MODE.K)
 	local ActivelyProcessing = false
 
-	local LerpColor3 = qColor3.LerpColor3
+
+	local function LerpNumber(ValueOne, ValueTwo, Alpha)
+		--- From qMath
+
+		return ValueOne + ((ValueTwo - ValueOne) * Alpha)
+	end
+
+	local function LerpColor3(ColorOne, ColorTwo, Alpha)
+		--- From qColor3
+		
+		return Color3.new(LerpNumber(ColorOne.r, ColorTwo.r, Alpha), LerpNumber(ColorOne.g, ColorTwo.g, Alpha), LerpNumber(ColorOne.b, ColorTwo.b, Alpha))
+	end
+
 	local function SetProperties(Gui, Percent, StartProperties, NewProperties)
 		-- Maybe there's a better way to do this?
 
