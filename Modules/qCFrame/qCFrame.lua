@@ -507,18 +507,16 @@ local function WeldTogether(Part0, Part1, JointType, WeldParent, JointAxisCFrame
 	-- @param [JointAxisCFrame] The CFrame axis of the joints. Optional. Defaultas as Part0's CFrame
 	-- @return The weld created.
 
-	JointType = JointType or "Weld"
-
+	JointType       = JointType or "Weld"
 	JointAxisCFrame = JointAxisCFrame or Part0.CFrame
 
-	local NewWeld = Make(JointType, {
-		Part0  = Part0;
-		Part1  = Part1;
-		C0     = Part0.CFrame:toObjectSpace(JointAxisCFrame);
-		C1     = Part1.CFrame:toObjectSpace(JointAxisCFrame);
-		Parent = game.JointsService;
-	})
-
+	local NewWeld  = Instance.new(JointType)
+	NewWeld.Part0  = Part0
+	NewWeld.Part1  = Part1
+	NewWeld.C0     = Part0.CFrame:toObjectSpace(JointAxisCFrame)
+	NewWeld.C1     = Part1.CFrame:toObjectSpace(JointAxisCFrame)
+	NewWeld.Parent = game.JointsService
+	
 	return NewWeld
 end
 lib.WeldTogether = WeldTogether
@@ -803,12 +801,12 @@ local function DrawRay(Ray, Color, Parent)
 	-- lib.DrawPoint(Center).Name = "Center"
 	-- lib.DrawPoint(Ray.Origin + Ray.Direction).Name = "Destination"
 
-	NewPart.CFrame     = CFrame.new(Center, Ray.Origin + Ray.Direction) * CFrame.Angles(math.pi/2, 0, 0) --* GetCFramePitch(math.pi/2)
-	NewPart.Anchored   = true
-	NewPart.CanCollide = false
+	NewPart.CFrame       = CFrame.new(Center, Ray.Origin + Ray.Direction) * CFrame.Angles(math.pi/2, 0, 0) --* GetCFramePitch(math.pi/2)
+	NewPart.Anchored     = true
+	NewPart.CanCollide   = false
 	NewPart.Transparency = 0.5
-	NewPart.BrickColor = Color or BrickColor.new("Bright red")
-	NewPart.Name = "DrawnRay"
+	NewPart.BrickColor   = Color or BrickColor.new("Bright red")
+	NewPart.Name         = "DrawnRay"
 	
 	Instance.new("SpecialMesh", NewPart)
 
@@ -820,19 +818,19 @@ lib.drawRay = DrawRay
 local function DrawPoint(Position, Color, Parent)
 	--- FOR DEBUGGING
 
-	local NewDraw = Make("Part", {
-		Parent        = Parent or workspace;
-		Size          = Vector3.new(1, 1, 1);
-		Transparency  = 0.5;
-		BrickColor    = Color or BrickColor.new("Bright red");
-		Name          = "PointRender";
-		Archivable    = false;
-		Anchored      = true;
-		CanCollide    = false;
-		TopSurface    = "Smooth";
-		BottomSurface = "Smooth";
-		Shape         = "Ball";
-	})
+	local NewDraw = Instance.new("Part")
+	NewDraw.Parent        = Parent or workspace;
+	NewDraw.Size          = Vector3.new(1, 1, 1);
+	NewDraw.Transparency  = 0.5;
+	NewDraw.BrickColor    = Color or BrickColor.new("Bright red");
+	NewDraw.Name          = "PointRender";
+	NewDraw.Archivable    = false;
+	NewDraw.Anchored      = true;
+	NewDraw.CanCollide    = false;
+	NewDraw.TopSurface    = "Smooth";
+	NewDraw.BottomSurface = "Smooth";
+	NewDraw.Shape         = "Ball";
+	
 	NewDraw.CFrame = CFrame.new(Position);
 
 	return NewDraw
