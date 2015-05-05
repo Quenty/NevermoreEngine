@@ -162,7 +162,8 @@ lib.wait_for_child = WaitForChild
 
 local function CallOnChildren(Instance, FunctionToCall)
 	-- Calls a function on each of the children of a certain object, using recursion.  
-
+	-- Exploration note: Parents are always called before children.
+	
 	FunctionToCall(Instance)
 
 	for _, Child in next, Instance:GetChildren() do
