@@ -74,6 +74,11 @@ function GetShape(part)
         return 'CornerWedge', UniformScale
     elseif part:IsA('Terrain') then
         return 'Terrain', UniformScale
+    elseif part:IsA('TrussPart') then
+        return 'Brick', UniformScale
+    elseif part:IsA("UnionOperation") then
+        -- Yeah, can't do too much about this. :/
+        return 'Brick', UniformScale
     else
         -- BasePart
         if part.Shape == Enum.PartType.Ball then
