@@ -374,6 +374,7 @@ local mLastCachedTimeAt = nil
 local mLastCachedTime = nil
 local mTimeOffset = os.time() - tick()
 function lib.UTCTimeExact()
+	-- NOTE THIS IS NOT EXACT, MAY BE OFF BY 3+ SECONDS. USE TIME SYNC INSTEAD.
 	return tick() + mTimeOffset
 end
 function lib.UTCTime()
