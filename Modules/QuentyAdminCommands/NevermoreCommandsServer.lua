@@ -1,4 +1,4 @@
-	local Players                     = game:GetService("Players")
+local Players                     = game:GetService("Players")
 local StarterPack                 = game:GetService("StarterPack")
 local StarterGui                  = game:GetService("StarterGui")
 local Lighting                    = game:GetService("Lighting")
@@ -16,7 +16,7 @@ local PointsService               = game:GetService("PointsService")
 local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
 
-assert(script.Name == "NevermoreCommandsServer", "Assertion failed! Script name = " .. tostring(script:GetFullName()))
+assert(script.Name                == "NevermoreCommandsServer", "Assertion failed! Script name = " .. tostring(script:GetFullName()))
 
 local AuthenticationServiceServer = LoadCustomLibrary("AuthenticationServiceServer")
 local Character                   = LoadCustomLibrary("Character")
@@ -33,18 +33,18 @@ local Table                       = LoadCustomLibrary("Table")
 local Type                        = LoadCustomLibrary("Type")
 local qPlayer                     = LoadCustomLibrary("qPlayer")
 
-local ArgSys            = CommandSystems.ArgSys
-local Args              = CommandSystems.Args
-local Cmds              = CommandSystems.Cmds
-local CommandSystem     = CommandSystems.CommandSystem
+local ArgSys                      = CommandSystems.ArgSys
+local Args                        = CommandSystems.Args
+local Cmds                        = CommandSystems.Cmds
+local CommandSystem               = CommandSystems.CommandSystem
 
-local GetIndexByValue = qSystems.GetIndexByValue
-local Make              = qSystems.Make
-local CheckCharacter    = qSystems.CheckCharacter
-local CheckPlayer       = qSystems.CheckPlayer
+local GetIndexByValue             = qSystems.GetIndexByValue
+local Make                        = qSystems.Make
+local CheckCharacter              = qSystems.CheckCharacter
+local CheckPlayer                 = qSystems.CheckPlayer
 
 
-local GlobalGUID = HttpService:GenerateGUID() -- Generate a global GUID so we don't ever have name comflicts.
+local GlobalGUID                  = HttpService:GenerateGUID() -- Generate a global GUID so we don't ever have name comflicts.
 
 local NevermoreCommands = {} -- Toss API hooks in here.
 
@@ -1045,7 +1045,18 @@ do
 				RawCharacter.RemoveVelocity(Character)
 				Character.Torso.CFrame = PlayerTarget.Character.Torso.CFrame
 			end, Args.PlayerCharacter(), Args.PlayerCharacter())
-			Cmds:Alias("Teleport", "Tele", "Move", "tp", "t")
+			Cmds:Alias("Teleport", "Tele", "Move", "tp", "t", "warp")
+
+		Cmds:add("Teleport", {
+				Description = "Teleport's a player to another player.";
+				"Utility";
+			}, 
+			function(Player, X, Y, Z)
+				local Character = Player.Character
+				RawCharacter.Unstick(Character)
+				RawCharacter.RemoveVelocity(Character)
+				Character.Torso.CFrame = CFrame.new(X, Y, Z)
+			end, Args.PlayerCharacter(), Args.Number(), Args.Number(), Args.Number())
 
 		Cmds:add("Heal", {
 				Description = "Heals the player";
@@ -1330,6 +1341,6 @@ PseudoChatManagerServer.AddChatCallback(function(PlayerName, Message, PlayerColo
 	end
 end)
 
-print("QAC loaded with " .. CommandSystem:getNumberOfCommands() .. " command(s) and " .. CommandSystem:getNumberOfAlias() .. " aliases")
+print("[NevermoreCommands] - Loaded with " .. CommandSystem:getNumberOfCommands() .. " commands and " .. CommandSystem:getNumberOfAlias() .. " aliases")
 
 return NevermoreCommands
