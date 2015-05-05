@@ -35,6 +35,7 @@ function ScreenSpace.ViewSizeY()
 	end
 end--]]
 
+---[[ Use new camera API instead, please
 function ScreenSpace.ViewSizeX()
 	local x = PlayerMouse.ViewSizeX
 	if x == 0 then
@@ -60,6 +61,7 @@ function ScreenSpace.AspectRatio()
 	return ScreenSpace.ViewSizeX() / ScreenSpace.ViewSizeY()
 end
 
+--[[ Use new camera API instead
 -- WorldSpace -> ScreenSpace. Raw function taking a world position and giving you the
 -- screen position.
 function ScreenSpace.WorldToScreen(at)
@@ -73,6 +75,7 @@ function ScreenSpace.WorldToScreen(at)
 	--
 	return Vector2.new(ScreenSpace.ViewSizeX()*(0.5 + 0.5*x), ScreenSpace.ViewSizeY()*(0.5 + 0.5*y))
 end
+--]]
 
 -- ScreenSpace -> WorldSpace. Raw function taking a screen position and a depth and 
 -- converting it into a world position.

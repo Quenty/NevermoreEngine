@@ -32,8 +32,8 @@ local function MakeCover(Properties)
 
 	return Modify(Make("Frame", {
 			--Parent               = ScreenGui;
-			Size                   = UDim2.new(1, 0, 1, 2);
-			Position               = UDim2.new(0, 0, 0, -2); -- Fix ROBLOX's glitches...
+			Size                   = UDim2.new(1, 0, 1, 38); -- 38 is because topbar. dang it ROBLOX.
+			Position               = UDim2.new(0, 0, 0, -36); -- Fix ROBLOX's glitches...
 			BackgroundColor3       = Color3.new(0, 0, 0);
 			BackgroundTransparency = 1;
 			Visible                = false;
