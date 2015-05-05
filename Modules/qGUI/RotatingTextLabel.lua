@@ -100,6 +100,11 @@ function RotatingTextCharacter:UpdateWidth()
 	self.ContainerFrame.Size = UDim2.new(0, self.Width, self.ContainerFrame.Size.Y.Scale, self.ContainerFrame.Size.Y.Offset)
 end
 
+function RotatingTextCharacter:SetWidth(NewWidth)
+	self.Width = NewWidth
+	self:UpdateWidth()
+end
+
 function RotatingTextCharacter:GetCharacterFromPosition(Position)
 	Position = math.floor(Position)
 
@@ -341,10 +346,20 @@ function RotatingTextLabel.new(TextLabel)
 	return self
 end
 
+function RotatingTextLabel:SetCharacterWidth(NewCharacterWidth)
+	assert(tonumber(NewCharacterWidth), "NewCharacterWidth must be a number")
+
+	self.CharacterWidth = NewCharacterWidth
+	for _, Item in pairs(self.RotatingTextCharacters) do
+		Item:SetWidth(self.CharacterWidth)
+	end
+end
+
 function RotatingTextLabel:AddRotatingTextCharacter(Index, Character)
-	local Gui = self:GetRotatingTextCharacterGui(Index, Character)
+	local Gui      = self:GetRotatingTextCharacterGui(Index, Character)
 	local NewLabel = RotatingTextCharacter.new(Gui)
-	NewLabel:UpdateWidth()
+	NewLabel:SetWidth(self.CharacterWidth or NewLabel.Width)
+	-- NewLabel:UpdateWidth()
 
 	self.RotatingTextCharacters[Index] = NewLabel
 	return NewLabel
@@ -381,12 +396,12 @@ function RotatingTextLabel:GetXOffsetForIndex(Index, TextXAlignment, TotalWidth)
 end--]]
 
 function RotatingTextLabel:GetRotatingTextCharacterGui(Index, Character)
-	local NewLabel    = self.TextLabel:Clone()
-	NewLabel.Text     = Character
-	NewLabel.Size     = UDim2.new(0, 0, 1, 0)
+	local NewLabel          = self.TextLabel:Clone()
+	NewLabel.Text           = Character
+	NewLabel.Size           = UDim2.new(0, 0, 1, 0)
 	NewLabel.TextXAlignment = "Center"
-	NewLabel.Parent   = self.Gui
-	NewLabel.Name     = "RotatingLabel_AtIndex" .. Index
+	NewLabel.Parent         = self.Gui
+	NewLabel.Name           = "RotatingLabel_AtIndex" .. Index
 
 	return NewLabel
 end
@@ -436,8 +451,8 @@ function RotatingTextLabel:UpdateTextBoxes()
 			local Character = self.Text:sub(Index, Index)
 			local RotatingTextCharacter = self:UpdateRotationgTextCharacterForIndex(Index, Character)
 
-			TotalWidth = TotalWidth + RotatingTextCharacter.Width
 			RotatingTextCharacter:SetPosition(UDim2.new(0, TotalWidth, 0, 0))
+			TotalWidth = TotalWidth + RotatingTextCharacter.Width
 		end
 	end
 
