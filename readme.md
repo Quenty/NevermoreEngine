@@ -1,8 +1,9 @@
 ## About
 
 This script handles players and characters loading into the game and the 
-networking of information from the client to the server and vice versa. It 
-handles resource management and is designed to make libraries work together.
+networking of information (read: ROBLOX Remote events being replicated)
+from the client to the server and vice versa. It handles resource management 
+and is designed to make libraries easily be loaded. 
 
 It should be parented to `ServerScriptService.NevermoreEngine`, and is a 
 `ModularScript`
