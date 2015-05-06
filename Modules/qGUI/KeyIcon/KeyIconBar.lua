@@ -57,6 +57,7 @@ function KeyIconBar:AddIcon(NewIcon, AnimationTime)
 
 	NewIcon.GUI.Parent  = self.GUI
 	NewIcon.GUI.Visible = true
+	NewIcon:RescaleLabel()
 	NewIcon:ResizeWidth(0, 0)
 	
 	local CurrentWidth = 0
@@ -106,6 +107,3 @@ function KeyIconBar:UpdatePositions(AnimationTime)
 end
 
 return KeyIconBar
-
-
-
