@@ -1100,9 +1100,13 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 	local Configuration = OverriddenConfiguration.New(Configuration, DefaultConfiguration)
 	local Subscribed = {} -- Maintain list of subscribed units. 
 
+	-- Kinda hacky, really should be rwritten some day.
+	local IsPhone       = qGUI.IsPhone(ScreenGui)
+	local ChatbarHeight = IsPhone and 20 or 30; -- Consider now that the chat bar is inside of the frame. :)
+
 	local MainFrame do
-		local SizeIfPhone = UDim2.new(0, 280 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight/2) 
-		local SizeNormal  = UDim2.new(0, 500 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight);
+		local SizeIfPhone = UDim2.new(0, 280 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight/2 + ChatbarHeight) 
+		local SizeNormal  = UDim2.new(0, 500 + Configuration.TitleWidth + Configuration.ScrollbarWidth, 0, PseudoChatSettings.LinesShown * PseudoChatSettings.LineHeight + ChatbarHeight);
 
 		MainFrame = Make("Frame", {
 			Active                 = false;
@@ -1126,7 +1130,7 @@ local MakeOutputStreamInterface = Class(function(OutputStreamInterface, Configur
 		Name                   = "ContentContainer";
 		Parent                 = MainFrame;
 		Position               = UDim2.new(0, 0, 0, 0);
-		Size                   = UDim2.new(1, -Configuration.TitleWidth, 1, 0);
+		Size                   = UDim2.new(1, -Configuration.TitleWidth, 1, -ChatbarHeight);
 		ZIndex                 = Configuration.ZIndex;
 	})
 

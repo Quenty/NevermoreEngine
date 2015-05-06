@@ -85,8 +85,9 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 
 
 	if not DoNotDisableCoreGui then
-		ChatBar = PseudoChatBar.MakePseudoChatBar(ScreenGui)
+		ChatBar = PseudoChatBar.MakePseudoChatBar(ScreenGui, Chat.Gui)
 		Chat.ChatBar = ChatBar
+		
 
 		ChatBar.NewChat:connect(function(Message)
 			SendMessage(Message)
