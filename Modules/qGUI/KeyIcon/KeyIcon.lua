@@ -28,12 +28,12 @@ KeyIcon.__index   = KeyIcon
 KeyIcon.ClassName = "KeyIcon"
 
 KeyIcon.DefaultIconData = {
-	Image = "";
-	ImageSize = 150;
+	Image     = "rbxassetid://245609912";
+	ImageSize = Vector2.new(150, 150);
 }
 KeyIcon.DefaultFillIconData = {
-	Image = "";
-	ImageSize = 150;
+	Image     = "rbxassetid://245608758";
+	ImageSize = Vector2.new(150, 150);
 }
 
 function KeyIcon.new(GUI, OutlineTween, FillFrameTween)
@@ -52,7 +52,7 @@ function KeyIcon.new(GUI, OutlineTween, FillFrameTween)
 	self.GUI            = GUI
 	self.OutlineTween   = OutlineTween
 	self.FillFrameTween = FillFrameTween
-	self.Width          = GUI.Width
+	self.Width          = GUI.Size.X.Offset
 
 	return self
 end
@@ -63,7 +63,7 @@ function KeyIcon:SetFillTransparency(PercentTransparency, AnimationTime)
 	-- @param [AnimationTime] The time to animate the outline. Defaults at 0.2.
 
 	AnimationTime = AnimationTime or 0.2 
-	self.FillFrameTween:Tween({ImageTransparency = PercentTransparency}, AnimationTime, true)
+	self.FillFrameTween:Map(PercentTransparency, AnimationTime, true)
 end
 
 function KeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
@@ -72,7 +72,7 @@ function KeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
 	-- @param [AnimationTime] The time to animate the outline. Defaults at 0.2.
 
 	AnimationTime = AnimationTime or 0.2 
-	self.OutlineTween:Tween({ImageTransparency = PercentTransparency}, AnimationTime, true)
+	self.OutlineTween:Map(PercentTransparency, AnimationTime, true)
 end
 
 function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
@@ -92,32 +92,68 @@ function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
 	end
 
 	Map(OutlineLabels, SetZIndex)
-	Map(FillFrames,    SetZIndex)
+	Map(FillFrames,    function(Item)
+		SetZIndex(Item)
+		Item.ImageTransparency = 1
+	end)
 
-	return KeyIcon.new(GUI, FunctionMap.new(OutlineLabels, qGUI.TweenTransparency), FunctionMap.new(FillFrames, qGUI.TweenTransparency), GUI)
+
+	local function TweenFunctionFactory(Properties, Function, Transform)
+		-- Hardcore functional programming here.
+		-- Properties is a table
+		-- Function is the animation function
+		-- Transform transforms the PercentTransparency per property...
+		return function (Item, PercentTransparency, AnimationTime)
+
+			local TweenData = {}
+			for _, PropertyName in pairs(Properties) do
+				TweenData[PropertyName] = Transform(PercentTransparency, PropertyName)
+			end
+
+			Function(Item, TweenData, AnimationTime, true)
+		end
+	end
+
+	local FillMap = FunctionMap.new(FillFrames, 
+		TweenFunctionFactory({"ImageTransparency"}, qGUI.TweenTransparency, 
+			function(PercentTransparency, PropertyName)
+				return PercentTransparency
+			end))
+
+	if GUI:IsA("TextLabel") then
+		FillMap:AddChild(FunctionMap.new({GUI}, 
+			TweenFunctionFactory({"TextColor3"}, qGUI.TweenColor3, 
+				function(PercentTransparency, PropertyName)
+					return Color3.new(PercentTransparency^2, PercentTransparency^2, PercentTransparency^2)
+				end)))
+	end
+
+	return KeyIcon.new(GUI, FunctionMap.new(OutlineLabels, qGUI.TweenTransparency), FillMap, GUI)
 end
 
-function KeyIcon.NewDefaultTextLabel()
-	--- Creates a new default text label to be used by the KeyIcon. 
+function KeyIcon.NewDefaultTextLabel(Height)
+	--- Creates a new default text label to be used by the KeyIcon.
+
+	Height = Height or 30
 
 	local TextLabel                  = Instance.new("TextLabel")
 	TextLabel.Name                   = "DefaultKeyIcon"
-	TextLabel.Size                   = UDim2.new(0, 30, 0, 30)
+	TextLabel.Size                   = UDim2.new(0, Height, 0, Height)
 	TextLabel.BackgroundTransparency = 1
 	TextLabel.TextColor3             = Color3.new(1, 1, 1)
 	TextLabel.BorderSizePixel        = 0
-	TextLabel.Font                   = "SourceSans"
-	TextLabel.FontSize               = "Size18"
+	TextLabel.Font                   = "SourceSansBold"
+	TextLabel.FontSize               = "Size24"
 	TextLabel.Text                   = "X"
 
 	return TextLabel
 end
 
-function KeyIcon.NewDefault()
+function KeyIcon.NewDefault(Height)
 	--- Creates a new "default" KeyIcon to be used.
 	-- @return The new KeyIcon produced
 
-	local TextLabel = KeyIcon.NewDefaultTextLabel()
+	local TextLabel = KeyIcon.NewDefaultTextLabel(Height)
 	return KeyIcon.FromBaseGUI(TextLabel, KeyIcon.DefaultIconData, KeyIcon.DefaultFillIconData)
 end
 
