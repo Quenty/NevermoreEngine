@@ -49,10 +49,10 @@ function KeyIconProvider:GetIcon(KeyIconBar, KeyCode)
 	-- @param KeyIconBar The icon bar to make the icon sized to. Considers the height.
 	-- @param KeyCode Enum, The KeyCode 
 
-	local Height = KeyIconBar:GetHeight()
-	local Text = self:GetKeycodeText(KeyCode):upper()
-
-	local NewIcon = KeyIcon.NewDefault()
+	local Height     = KeyIconBar:GetHeight()
+	local Text       = self:GetKeycodeText(KeyCode):upper()
+	
+	local NewIcon    = KeyIcon.NewDefault(Height)
 	NewIcon.GUI.Text = Text
 
 	return NewIcon
