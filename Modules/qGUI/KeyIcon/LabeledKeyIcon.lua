@@ -21,7 +21,8 @@ function LabeledKeyIcon.new(Frame, KeyIcon, TextLabel)
 	self.TextLabel            = TextLabel
 
 	self:SetLabelVisible(true, 0) -- Calls AutoResize too!
-	self:RescaleLabel(0)
+	self:RescaleLabel()
+	self:AutoResize(0)
 
 	return self
 end
@@ -39,19 +40,35 @@ function LabeledKeyIcon.FromKeyIcon(KeyIcon, LabelText)
 	Frame.Name                   = "LabeledKeyIconFrame"
 	Frame.ClipsDescendants       = true
 
-	local TextLabel      = Instance.new("TextLabel", Frame)
-	TextLabel.Size       = UDim2.new(0, 0, 1, 0)
-	TextLabel.Position   = UDim2.new(0, KeyIcon.GUI.Size.X.Offset + 10, 0, 0)
-	TextLabel.TextColor3 = Color3.new(1, 1, 1)
-	TextLabel.Font       = "SourceSans"
-	TextLabel.FontSize   = "Size14"
-	TextLabel.Name       = "KeyIconLabel"
-	TextLabel.Text       = LabelText or "[ label goes here ]"
+	local TextLabel                  = Instance.new("TextLabel", Frame)
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.BorderSizePixel        = 0
+	TextLabel.TextXAlignment         = "Left"
+	TextLabel.Size                   = UDim2.new(0, 0, 1, 0)
+	TextLabel.Position               = UDim2.new(0, KeyIcon.GUI.Size.X.Offset + 10, 0, 0)
+	TextLabel.TextColor3             = Color3.new(1, 1, 1)
+	TextLabel.Font                   = "SourceSans"
+	TextLabel.FontSize               = "Size18"
+	TextLabel.Name                   = "KeyIconLabel"
+	TextLabel.Text                   = LabelText or "[ label goes here ]"
 
 	KeyIcon.GUI.Parent   = Frame
 
 	return LabeledKeyIcon.new(Frame, KeyIcon, TextLabel)
 end
+
+function LabeledKeyIcon:SetFillTransparency(PercentTransparency, AnimationTime)
+	--- Sets the fill of the KeyIcon to a specific transparency. Used to indicate state. 
+
+	self.KeyIcon:SetFillTransparency(PercentTransparency, AnimationTime)
+end
+
+function LabeledKeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
+	--- Sets the outline of the KeyIcon to a specific transparency
+
+	self.KeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
+end
+
 
 function LabeledKeyIcon:ResizeWidth(Width, AnimationTime)
 	--- Resizes the who icon. Used to show/hide the label.
@@ -76,11 +93,12 @@ end
 
 function LabeledKeyIcon:AutoResize(AnimationTime)
 	local Width = self.KeyIcon.Width
+
 	if self.LabelVisible then
 		-- Calculate TextLabel Offset from KeyIcon:
 		local Offset = (self.TextLabel.Position - self.GUI.Size).X.Offset
 
-		Width = Width + Offset + self.TextLabel.Size.X
+		Width = Width + Offset + self.TextLabel.Size.X.Offset
 	end
 	self:ResizeWidth(Width, AnimationTime)
 end
@@ -96,20 +114,20 @@ function LabeledKeyIcon:SetLabelVisible(LabelVisible, AnimationTime)
 	end
 end
 
-function LabeledKeyIcon:RescaleLabel(AnimationTime)
+function LabeledKeyIcon:RescaleLabel()
 	--- Rescales the text label to its text bounds
 	-- @param [AnimationTime] [0, infinity)
 
 	local Y = self.TextLabel.Size.Y
 
 	self.TextLabel.Size = UDim2.new(0, self.TextLabel.TextBounds.X, Y.Scale, Y.Offset)
-	self:AutoResize(AnimationTime)
 end
 
 function LabeledKeyIcon:SetIconText(NewText, AnimationTime)
 	-- @param [AnimationTime] [0, infinity)
 	self.TextLabel.Text = NewText
-	self:RescaleLabel(AnimationTime)
+	self:RescaleLabel()
+	self:AutoResize(AnimationTime)
 end
 
 return LabeledKeyIcon
