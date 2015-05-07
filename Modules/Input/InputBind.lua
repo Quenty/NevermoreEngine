@@ -1,10 +1,10 @@
-local ContextActionService  = game:GetService("ContextActionService")
-local ReplicatedStorage     = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine       = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary     = NevermoreEngine.LoadLibrary
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local Signal                = LoadCustomLibrary("Signal")
+local Signal            = LoadCustomLibrary("Signal")
+local BindableAction    = LoadCustomLibrary("BindableAction")
 
 -- Binds and unbinds select commands on request.
 -- @author Quenty
@@ -18,10 +18,10 @@ function InputBind.new()
 	setmetatable(self, InputBind)
 	
 	-- Contains already / actively bound items
-	self.BoundActionsMap = {}
+	self.BoundActions = {}
 
 	-- Contains the list of actions to bind
-	self.ActionDataList = {} -- [Name] = Table `ActionData` {}
+	self.AllActions = {} -- [Name] = Table `ActionData` {}
 
 	self.IsCurrentlyBound = false
 
@@ -32,59 +32,24 @@ function InputBind.new()
 end
 
 -- PUBLIC FUNCTIONS
-
-function InputBind:GetActionMap()
-	return self.BoundActionsMap
+function InputBind:GetActions()
+	return self.AllActions
 end
 
-function InputBind:AddAction(ActionData)
-	--- Adds an action that will be bound upon InputBind:Bind()
+function InputBind:AddAction(Action)
+	--- Adds a new BindableAction into the system.
+	-- @param Action BindableAction, the action to add into the system
 
-	assert(ActionData.ActionName, "Need ActionData.ActionName")
-	assert(ActionData.FunctionToBind, "Need ActionData.FunctionToBind")
-	assert(ActionData.CreateTouchButton ~= nil, "ActionData.CreateTouchButton cannot equal nil")
+	self.AllActions[Action:GetName()] = Action
 
-	self.ActionDataList[ActionData.ActionName] = ActionData
-end
-
-function InputBind:IsBound()
-	-- Returns whether or not the input is already bound. 
-	
-	return self.IsCurrentlyBound
-end
-
-function InputBind:BindInput()
-	-- Binds all the action to input.
-
-	assert(not self.IsCurrentlyBound, "Already bound")
-	self.IsCurrentlyBound = true
-
-	for _, ActionData in pairs(self.ActionDataList) do
-		if not self.BoundActionsMap[ActionData.ActionName] then
-			self:BindAction(ActionData)
-		end
+	if self:IsBound() then
+		self:BindAction(Action)
 	end
 end
 
-function InputBind:UnbindInput()
-	-- Unbinds all actions associated with the interface. Used on
-	-- GC most of the time.
-
-	assert(self.IsCurrentlyBound, "Already unbound")
-	self.IsCurrentlyBound = false
-
-	for BoundActionName, ActionData in pairs(self.BoundActionsMap) do
-		self:UnbindAction(BoundActionName)
-	end
-end
-
-
-
--- PRIVATE FUNCTIONS
-
-function InputBind:BindAction(ActionData)
-	--- Binds an action to the ContextActionService and to the input manager
-	-- @param ActionData The data used to bind the action.
+function InputBind:AddFromData(ActionData)
+	--- Adds a new action from data
+	-- @param ActionData Table, contains information to call BindableAction.FromData to construct from.
 	--[[
 		ActionData = {
 			ActionName = "Start_Flying";
@@ -98,50 +63,69 @@ function InputBind:BindAction(ActionData)
 			InputTypes = {Enum.UserInputType.Accelerometer, Enum.KeyCode.E, Enum.KeyCode.F};
 		}
 	--]]
-	assert(not self.BoundActionsMap[ActionData.ActionName], "Action is already bound")
+	-- @return The new action
 
-	ActionData.CreateTouchButton = ActionData.CreateTouchButton or false;
-	
-	ContextActionService:BindActionToInputTypes(	
-		ActionData.ActionName or error("No action name"),
-		ActionData.FunctionToBind or error("No function to bind"),
-		ActionData.CreateTouchButton,
-		unpack(ActionData.InputTypes)
-	)
-	
-	if ActionData.ButtonTitle then
-		ContextActionService:SetTitle(ActionData.ActionName, ActionData.ButtonTitle)
-	end
-	
-	if ActionData.ButtonImage then
-		ContextActionService:SetImage(ActionData.ActionName, ActionData.ButtonImage)
-	end
-	
-	if ActionData.InternalDescription then
-		ContextActionService:SetDescription(ActionData.ActionName, ActionData.InternalDescription)
-	end
-	
-	self:RegisterNewlyBoundAction(ActionData)
+	local NewAction = BindableAction.FromData(ActionData)
+	self:AddAction(NewAction)
+
+	return NewAction
 end
 
-function InputBind:UnbindAction(BoundActionName)
-	local ActionData = self.BoundActionsMap[BoundActionName]
-	
-	ContextActionService:UnbindAction(BoundActionName)
-	self.BoundActionsMap[BoundActionName] = nil
-	
-	self.ActionUnbound:fire(ActionData)
+function InputBind:IsBound()
+	-- Returns whether or not the input is already bound. 
+
+	return self.IsCurrentlyBound
 end
 
-function InputBind:RegisterNewlyBoundAction(ActionData)
-	--- Registers an action (that has been bound into ContextActionService)
-	--  into the controller interface so that it can later be unbound. 
-	-- @param ActionName The string name of the action bound to ContextActionService.
-	
-	local ActionName = ActionData.ActionName	
-	self.BoundActionsMap[ActionName] = ActionData
-	
-	self.ActionBound:fire(ActionData)
+function InputBind:BindInput()
+	-- Binds all the action to input.
+
+	assert(not self.IsCurrentlyBound, "Already bound")
+	self.IsCurrentlyBound = true
+
+	for _, Action in pairs(self.AllActions) do
+		if not self.BoundActions[Action:GetName()] then
+			self:BindAction(Action)
+		end
+	end
+end
+
+function InputBind:UnbindInput()
+	-- Unbinds all actions associated with the interface. Used on
+	-- GC most of the time.
+
+	assert(self.IsCurrentlyBound, "Already unbound")
+	self.IsCurrentlyBound = false
+
+	for ActionName, Action in pairs(self.BoundActions) do
+		self:UnbindAction(ActionName)
+	end
+end
+
+
+
+-- PRIVATE FUNCTIONS
+
+function InputBind:BindAction(Action)
+	--- Binds an action to the ContextActionService and to the input manager
+	-- @param Action The action to bind.
+
+	assert(not self.BoundActions[Action:GetName()], "Action is already bound")
+
+	Action:Bind()
+
+	self.BoundActions[Action:GetName()] = Action
+	self.ActionBound:fire(Action)
+end
+
+function InputBind:UnbindAction(ActionName)
+	local Action = self.BoundActions[ActionName]
+	assert(Action, "Action '" .. ActionName .. "' is not bound")
+
+	Action:Unbind()
+
+	self.BoundActions[ActionName] = nil
+	self.ActionUnbound:fire(Action)
 end
 
 return InputBind
