@@ -28,13 +28,15 @@ KeyIcon.__index   = KeyIcon
 KeyIcon.ClassName = "KeyIcon"
 
 KeyIcon.DefaultIconData = {
-	Image     = "rbxassetid://245609912";
-	ImageSize = Vector2.new(150, 150);
+	Image     = "rbxassetid://245857779";
+	ImageSize = Vector2.new(30, 30);
 }
 KeyIcon.DefaultFillIconData = {
 	Image     = "rbxassetid://245608758";
 	ImageSize = Vector2.new(150, 150);
 }
+
+-- CONSTRUCTION
 
 function KeyIcon.new(GUI, OutlineTween, FillFrameTween)
 	-- @param GUI The parent of both the outline and fillframe, the text of this label
@@ -52,27 +54,36 @@ function KeyIcon.new(GUI, OutlineTween, FillFrameTween)
 	self.GUI            = GUI
 	self.OutlineTween   = OutlineTween
 	self.FillFrameTween = FillFrameTween
-	self.Width          = GUI.Size.X.Offset
+
+	self:RescaleWidth()
 
 	return self
 end
 
-function KeyIcon:SetFillTransparency(PercentTransparency, AnimationTime)
-	--- Sets the fill of the KeyIcon to a specific transparency. Used to indicate state. 
-	-- @param PercentTransparency Number [0, 1], where 1 is completely transparency
-	-- @param [AnimationTime] The time to animate the outline. Defaults at 0.2.
+function KeyIcon.NewDefaultTextLabel(Height)
+	--- Creates a new default text label to be used by the KeyIcon.
 
-	AnimationTime = AnimationTime or 0.2 
-	self.FillFrameTween:Map(PercentTransparency, AnimationTime, true)
+	Height = Height or 30
+
+	local TextLabel                  = Instance.new("TextLabel")
+	TextLabel.Name                   = "DefaultKeyIcon"
+	TextLabel.Size                   = UDim2.new(0, Height, 0, Height)
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.TextColor3             = Color3.new(1, 1, 1)
+	TextLabel.BorderSizePixel        = 0
+	TextLabel.Font                   = "Arial"
+	TextLabel.FontSize               = "Size18"
+	TextLabel.Text                   = "X"
+
+	return TextLabel
 end
 
-function KeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
-	--- Sets the outline of the KeyIcon to a specific transparency
-	-- @param PercentTransparency Number [0, 1], where 1 is completely transparency
-	-- @param [AnimationTime] The time to animate the outline. Defaults at 0.2.
+function KeyIcon.NewDefault(Height)
+	--- Creates a new "default" KeyIcon to be used.
+	-- @return The new KeyIcon produced
 
-	AnimationTime = AnimationTime or 0.2 
-	self.OutlineTween:Map(PercentTransparency, AnimationTime, true)
+	local TextLabel = KeyIcon.NewDefaultTextLabel(Height)
+	return KeyIcon.FromBaseGUI(TextLabel, KeyIcon.DefaultIconData, KeyIcon.DefaultFillIconData)
 end
 
 function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
@@ -84,8 +95,8 @@ function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
 	--                         size in pixels of the image.
 	-- @return The new KeyIcon that was produced
 
-	local OutlineLabels = {qGUI.AddNinePatch(GUI, OutlineImageData.Image, OutlineImageData.ImageSize, 5, "ImageLabel")}
-	local FillFrames    = {qGUI.AddNinePatch(GUI, FillImageData.Image, FillImageData.ImageSize, 5, "ImageLabel")}
+	local OutlineLabels = {qGUI.AddNinePatch(GUI, OutlineImageData.Image, OutlineImageData.ImageSize, 7, "ImageLabel")}
+	local FillFrames    = {qGUI.AddNinePatch(GUI, FillImageData.Image, FillImageData.ImageSize, 7, "ImageLabel")}
 
 	local function SetZIndex(Item)
 		Item.ZIndex = GUI.ZIndex - 1
@@ -131,30 +142,47 @@ function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
 	return KeyIcon.new(GUI, FunctionMap.new(OutlineLabels, qGUI.TweenTransparency), FillMap, GUI)
 end
 
-function KeyIcon.NewDefaultTextLabel(Height)
-	--- Creates a new default text label to be used by the KeyIcon.
 
-	Height = Height or 30
 
-	local TextLabel                  = Instance.new("TextLabel")
-	TextLabel.Name                   = "DefaultKeyIcon"
-	TextLabel.Size                   = UDim2.new(0, Height, 0, Height)
-	TextLabel.BackgroundTransparency = 1
-	TextLabel.TextColor3             = Color3.new(1, 1, 1)
-	TextLabel.BorderSizePixel        = 0
-	TextLabel.Font                   = "SourceSansBold"
-	TextLabel.FontSize               = "Size24"
-	TextLabel.Text                   = "X"
+-- METHODS
 
-	return TextLabel
+function KeyIcon:SetFillTransparency(PercentTransparency, AnimationTime)
+	--- Sets the fill of the KeyIcon to a specific transparency. Used to indicate state. 
+	-- @param PercentTransparency Number [0, 1], where 1 is completely transparency
+	-- @param [AnimationTime] The time to animate the outline. Defaults at 0.2.
+
+	AnimationTime = AnimationTime or 0.2 
+	self.FillFrameTween:Map(PercentTransparency, AnimationTime, true)
 end
 
-function KeyIcon.NewDefault(Height)
-	--- Creates a new "default" KeyIcon to be used.
-	-- @return The new KeyIcon produced
+function KeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
+	--- Sets the outline of the KeyIcon to a specific transparency
+	-- @param PercentTransparency Number [0, 1], where 1 is completely transparency
+	-- @param [AnimationTime] The time to animate the outline. Defaults at 0.2.
 
-	local TextLabel = KeyIcon.NewDefaultTextLabel(Height)
-	return KeyIcon.FromBaseGUI(TextLabel, KeyIcon.DefaultIconData, KeyIcon.DefaultFillIconData)
+	AnimationTime = AnimationTime or 0.2 
+	self.OutlineTween:Map(PercentTransparency, AnimationTime, true)
+end
+
+function KeyIcon:RescaleWidth()
+	--- Used with TextLabels to rescale the width. Note: Only works if the icon is parented.
+
+	if self.GUI:IsA("TextLabel") then
+		local Y = self.GUI.Size.Y
+		local X = self.GUI.Size.X
+
+		self.GUI.Size = UDim2.new(0, math.max(X.Offset, self.GUI.TextBounds.X + 16), Y.Scale, Y.Offset)
+	end
+
+	self.Width = self.GUI.Size.X.Offset
+end
+
+
+function KeyIcon:Destroy()
+	setmetatable(self, nil)
+	self.OutlineTween = nil
+	self.FillFrameTween = nil
+	self.GUI:Destroy()
 end
 
 return KeyIcon
