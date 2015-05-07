@@ -64,21 +64,23 @@ function KeyIconBar:AddIcon(NewIcon, AnimationTime)
 	for _, Item in pairs(self.KeyIcons) do
 		CurrentWidth = CurrentWidth + Item.Width
 	end
-	NewIcon.Position = UDim2.new(0, CurrentWidth, 0, 0)
+	NewIcon.GUI.Position = UDim2.new(0, CurrentWidth, 0, 0)
 
 	self.KeyIcons[#self.KeyIcons+1] = NewIcon
 	self:UpdatePositions(AnimationTime)
 end
 
-function KeyIconBar:RemoveIcon(Icon)
+function KeyIconBar:RemoveIcon(Icon, AnimationTime)
 	--- Removes the icon from the bar. Sets visibility to false.
 	-- @param Icon A KeyIcon or LabeledKeyIcon to be removed that already exists
 
-	local Index      = self:GetIconIndex(Icon) or error("Icon does not exist in the bar")
-	Icon.GUI.Visible = false
+	local Index      = self:GetIconIndex(Icon) or error("Icon '" .. tostring(Icon) .. "' does not exist in the bar")
+	-- Icon.GUI.Visible = false
+	Icon:ResizeWidth(0, AnimationTime)
+	Icon.GUI:TweenPosition(Icon.GUI.Position + UDim2.new(0, Icon.Width, 0, 0), "Out", "Quad", AnimationTime or 0.2, true)
 
 	table.remove(self.KeyIcons, Index)
-	self:UpdatePositions()
+	self:UpdatePositions(AnimationTime)
 end
 
 function KeyIconBar:UpdatePositions(AnimationTime)
@@ -94,7 +96,7 @@ function KeyIconBar:UpdatePositions(AnimationTime)
 
 		local NewPosition = UDim2.new(0, OffsetX, 0, 0)
 		
-		OffsetX = OffsetX + (KeyIcon.Width or error("Element has no width"))
+		OffsetX = OffsetX + (KeyIcon.Width or error("Element has no width")) + 5
 
 		if KeyIcon.GUI.Position ~= NewPosition then
 			if AnimationTime > 0 then
