@@ -72,7 +72,7 @@ local BoxPointCollision do
 		local Relative	=VecDiv(CFrame,Point)
 		local sx,sy,sz	=Size.x/2,Size.y/2,Size.z/2
 		local rx,ry,rz	=Relative.x,Relative.y,Relative.z
-		return			rx*rx<sx*sx and rx*rx<sx*sx and rx*rx<sx*sx
+		return			rx*rx<sx*sx and ry*ry<sy*sy and rz*rz<sz*sz
 	end
 end
 
