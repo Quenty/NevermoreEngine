@@ -12,8 +12,9 @@ local BindedIcon = {}
 BindedIcon.__index = BindedIcon
 BindedIcon.ClassName = "BindedIcon"
 
-function BindedIcon.new(Icon, BindableAction)
+function BindedIcon.new(Icon)
 	-- @param Icon, A LabeledKeyIcon (or KeyIcon), that will be pushed upon the IconBar
+	-- Note: Must call :SetBindableAction(BindableAction) to get this to work.
 
 	local self = {}
 	setmetatable(self, BindedIcon)
@@ -21,9 +22,6 @@ function BindedIcon.new(Icon, BindableAction)
 	-- PRIVATE
 	self.Maid  = MakeMaid()
 	self.Icon  = Icon or error("No icon sent, need icon")
-
-	-- DATA
-	self:SetBindableAction(BindableAction)
 
 	return self
 end
@@ -61,14 +59,33 @@ BindedBarIcon.__index = BindedBarIcon
 BindedBarIcon.ClassName = "BindedBarIcon"
 setmetatable(BindedBarIcon, BindedIcon)
 
-function BindedBarIcon.new(Icon, BindableAction)
-	local self = BindedIcon.new(Icon, BindableAction)
+function BindedBarIcon.new(Icon)
+	local self = BindedIcon.new(Icon)
 	setmetatable(self, BindedBarIcon)
 
 	self.OnBar = false
 
 	return self
 end
+
+function BindedBarIcon.FromProviderAndAction(IconProvider, Action, IconBar)
+	-- Parents the icon to the IconProvider:GetIconBar()
+	-- @param [IconBar] Optional
+
+	IconBar = IconBar or IconProvider:GetIconBar()
+
+	local Icon = IconProvider:GetLabeledKey(
+		Action:GetInputTypes()[1],
+		Action:GetName(),
+		IconBar)
+			
+	local NewBind = BindedBarIcon.new(Icon)
+	NewBind:SetBindableAction(Action)
+	NewBind:SetIconBar(IconBar)
+
+	return NewBind
+end
+
 
 function BindedBarIcon:PopOffBar(AnimationTime)
 	--- Pops the icon onto the current bar.
@@ -110,10 +127,10 @@ function BindedBarIcon:SetIconBar(IconBar)
 	end
 end
 
-function BindedIcon:SetBindableAction(BindableAction)
+function BindedBarIcon:SetBindableAction(BindableAction)
 	assert(BindableAction, "Need to send BindableAction")
 
-	local Super = getmetatable(BindedIcon)
+	local Super = getmetatable(BindedBarIcon)
 
 	-- EVENTS
 	self.Maid.Bound = BindableAction.Bound:connect(function()
