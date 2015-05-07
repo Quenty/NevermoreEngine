@@ -20,4 +20,10 @@ function EffectFence.new(Region)
 	return self
 end
 
+function EffectFence:PointInFence(Point)
+	-- @param Point A Vector3 Point
+	
+	return self.Region:CastPoint(Point)
+end
+
 return EffectFence
