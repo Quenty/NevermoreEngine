@@ -42,11 +42,13 @@ function BindedIcon:SetBindableAction(BindableAction)
 end
 
 function BindedIcon:Destroy()
-	-- Disconnects events.
+	-- Disconnects events
 	setmetatable(self, nil)
 
 	self.BindableAction:UnbindFunction("_UpdateIcon")
 	self.Maid:DoCleaning()
+
+	self.Icon:Destroy()
 end
 
 
@@ -146,6 +148,16 @@ function BindedBarIcon:SetBindableAction(BindableAction)
 	end)
 
 	Super.SetBindableAction(self, BindableAction)
+end
+
+function BindedBarIcon:Destroy()
+	local Super = getmetatable(BindedBarIcon)
+
+	if self.OnBar then
+		self:PopOffBar()
+	end
+
+	Super.Destroy(self)
 end
 
 return BindedBarIcon
