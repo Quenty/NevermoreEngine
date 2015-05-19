@@ -16,6 +16,7 @@ function EffectFence.new(Region)
 	setmetatable(self, EffectFence)
 
 	self.Region = Region or error("No region")
+	self.Name = "Unnamed"
 
 	return self
 end
@@ -24,6 +25,10 @@ function EffectFence:PointInFence(Point)
 	-- @param Point A Vector3 Point
 	
 	return self.Region:CastPoint(Point)
+end
+
+function EffectFence.__tostring(self)
+	return self.Name
 end
 
 return EffectFence
