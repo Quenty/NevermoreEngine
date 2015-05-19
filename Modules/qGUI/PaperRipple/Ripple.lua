@@ -1,7 +1,7 @@
 local Ripple = {}
 Ripple.__index = Ripple
 Ripple.ClassName = "Ripple"
-Ripple.MaxRadius = 300 -- Absolute maximum
+Ripple.MaxRadius = 150--300 -- Absolute maximum
 Ripple.TransparencyDecayVelocity = 0.8
 
 -- @author Quenty
@@ -39,6 +39,8 @@ function Ripple.NewDefault(Parent)
 	--- Creates a new "default" ripple 
 	-- @param Parent A ROBLOX GUI to parent the ripple to.
 
+	assert(Parent, "Must send parent")
+
 	local Circle                  = Instance.new("ImageLabel");
 	Circle.Image                  = "http://www.roblox.com/asset/?id=172318712"
 	Circle.Name                   = "Circle";
@@ -60,10 +62,14 @@ function Ripple.FromPosition(Parent, Position)
 	-- @param Parent A ROBLOX GUI to parent the ripple to.
 	-- @param Position Vector2 world space (2D) vector.
 
-	local NewRipple = Ripple.NewDefault()
+	assert(Parent, "Must send parent")
+	assert(Position, "Must send Position")
+
+	local NewRipple = Ripple.NewDefault(Parent)
 
 	local RelativePosition = Position - NewRipple:GetContainer().AbsolutePosition
 	NewRipple:SetInitialPosition(RelativePosition)
+	NewRipple:SetTargetPosition(RelativePosition)
 
 	return NewRipple
 end
@@ -72,14 +78,14 @@ function Ripple:SetInitialPosition(Position)
 	--- Sets the initial position of the ripple.
 	-- @param Position Vector2, relative local space position in offset.
 
-	self.InitialPosition = Position
+	self.InitialPosition = Position or error("InitialPosition")
 end
 
 function Ripple:SetTargetPosition(Position)
 	--- Sets the target position of the ripple.
 	-- @param Position Vector2, relative local space in offset to target.s
 
-	self.TargetPosition = Position
+	self.TargetPosition = Position or error("InitialPosition")
 end
 
 function Ripple:TargetCenter()
@@ -121,11 +127,23 @@ end
 function Ripple:GetMouseDownElapsed()
 	-- @return The time (in seconds) elapsed since the mouse went down. 0 if it hasn't gone down.
 
-	return self.MouseDownStart and (tick() - self.MouseUpStart) or 0
+	local Elapsed
+
+	if not self.MouseDownStart then
+		return 0
+	end
+
+	Elapsed = tick() - self.MouseDownStart
+
+	if self.MouseUpStart then
+		Elapsed = Elapsed - self:GetMouseUpElapsed()
+	end
+
+	return Elapsed
 end
 
 function Ripple:GetMouseInteractionElapsed()
-	return self:GetMouseDownElapsed() + self:GetMouseDownElapsed()
+	return self:GetMouseDownElapsed() + self:GetMouseUpElapsed()
 end
 
 ---[[]
@@ -136,16 +154,17 @@ function Ripple:GetOuterTransparency()
 	local OuterTransparency = 1 - (self:GetMouseUpElapsed() * 0.3)
 	local WaveTransparency = self:GetTransparency()
 
-	return math.max(
-		1, 
-		math.max(OuterTransparency, WaveTransparency)
+	return math.min(
+		1,
+		OuterTransparency, 
+		WaveTransparency -- WaveTransparency is consistently 0.75 for start, OuterTransparency is not. We want to use that.
 	)
 end--]]
 
 function Ripple:GetTransparency()
 	-- @return The transparency of the ripple.
 
-	if not self.MouseUpStart then
+	if self.MouseDownStart and not self.MouseUpStart then
 		return self.InitialTransparency
 	else
 		-- Inversed from the Polymer version because the opacity vs. transparency deal.
@@ -180,7 +199,7 @@ function Ripple:IsTransparencyDecayed()
 	-- the radius.
 	-- @return Boolean, true if the transparency is completely decayed.
 
-	return self:GetTransparency() >= 0.99 and 
+	return self:GetTransparency() >= 1 and 
 		self:GetRadius() >= math.min(self.MaxRadius, self.TargetRadius)
 end
 
@@ -228,20 +247,20 @@ function Ripple:Draw()
 	local Gui = self.Gui
 	local Container = self.Container
 
-	Gui.Transparency = self:GetTransparency()
+	Gui.ImageTransparency = self:GetTransparency()
 
-	local Radius = self:GetRadius()
-	local ContainerLargerSize = self:GetLargestContainerSize()
-	local Scale  = Radius / (ContainerLargerSize / 2)
+	local Radius = math.floor(self:GetRadius()) -- Floor keeps the GUI from jiggling as ROBLOX rounds the position.
+	-- local ContainerLargerSize = self:GetLargestContainerSize()
+	-- local Scale  = Radius / (ContainerLargerSize / 2)
 
-	Gui.Size = UDim2.new(Scale, 0, Scale, 0)
+	Gui.Size = UDim2.new(0, Radius*2, 0, Radius*2)
 
 	local Offset = self.TargetPosition - self.InitialPosition
 	local Position = self.InitialPosition + Offset * self:GetTranslationFraction()
 	local RadiusOffset = Vector2.new(Radius, Radius)
 	local RenderPosition = Position - RadiusOffset
 
-	Gui.Position = UDim2.new(0, RenderPosition.X, 0, RenderPosition.Y) 
+	Gui.Position = UDim2.new(0, RenderPosition.X, 0, RenderPosition.Y)
 end
 
 function Ripple:Up()

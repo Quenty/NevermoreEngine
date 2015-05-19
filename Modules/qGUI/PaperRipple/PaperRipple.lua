@@ -144,15 +144,15 @@ function PaperRipple:Draw()
 
 	local Index = 1
 	while Index <= #self.Ripples do
-		local Ripples = self.Ripples[Index]
+		local IndexedRipple = self.Ripples[Index]
 
-		if Ripple:IsAnimationComplete() then
+		if IndexedRipple:IsAnimationComplete() then
 			-- Remove completed ripples.
 
-			self:RemoveRipple(Ripple)
+			self:RemoveRipple(IndexedRipple)
 		else
-			Ripple:Draw()
-			self.Container.Transparency = Ripple:GetOuterTransparency()
+			IndexedRipple:Draw()
+			self.Container.BackgroundTransparency = IndexedRipple:GetOuterTransparency()
 			Index = Index + 1 -- Only increment the ripple when we didn't remove a ripple.
 		end
 	end
@@ -176,7 +176,7 @@ function PaperRipple:StopAnimating()
 		self.Animating = false
 	end
 
-	self.Container.Transparency = 1
+	self.Container.BackgroundTransparency = 1
 end
 
 function PaperRipple:BeginAnimating()
@@ -208,7 +208,7 @@ function PaperRipple:ConstructNewRipple(Position)
 	-- No position? SEt to center.
 	Position = Position or (self.Container.AbsolutePosition + self.Container.AbsoluteSize/2)
 
-	local Radius = self:FurthestCornerDistanceFrom()
+	local Radius = self:FurthestCornerDistanceFrom(Position)
 
 	local NewRipple = Ripple.FromPosition(self.Container, Position) 
 	NewRipple:SetInkColor(self.InkColor)
@@ -227,7 +227,7 @@ function PaperRipple:Down(Position)
 	-- @return The new ripple
 
 	self:ReleaseRipples() -- Release current ripples...
-	local NewRipple = 
+	local NewRipple = self:ConstructNewRipple(Position)
 	self:AddRipple(NewRipple)
 
 	return NewRipple
@@ -284,7 +284,7 @@ function PaperRipple:BindInput()
 	end)
 
 	--[[
-	self.InputMaid.InputEnded = self.Gui.InputEnded:connect(function(InputObject)
+	self.InputMaid.InputEnded = self.Container.InputEnded:connect(function(InputObject)
 		if ValidInputEnums[InputObject.UserInputType] then
 			self:Up()
 		end
