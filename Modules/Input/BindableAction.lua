@@ -54,6 +54,10 @@ function BindableAction.FromData(Data)
 
 	local New = BindableAction.new(Data.ActionName or error("No ActionName"), Data.InputTypes or error("NO InputTypes"))
 
+	if Data.CreateTouchButton ~= nil then
+		New:SetCreateTouchButton(Data.CreateTouchButton)
+	end
+
 	-- BUTTON
 	if Data.ButtonTitle then
 		New:SetButtonTitle(Data.ButtonTitle)
@@ -77,6 +81,15 @@ function BindableAction.FromData(Data)
 	end
 
 	return New
+end
+
+function BindableAction:SetCreateTouchButton(DoCreateTouchButton)
+	-- @param DoCreateTouchButton Boolean, should the action create a touch button
+	-- Will not change until rebound. 
+
+	assert(type(DoCreateTouchButton) == "boolean", "DoCreateTouchButton must be a boolean")
+
+	self.CreateTouchButton = DoCreateTouchButton
 end
 
 function BindableAction:GetInputTypes()
