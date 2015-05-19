@@ -13,6 +13,10 @@ local Signal              = LoadCustomLibrary("Signal")
 local Make = qSystems.Make
 local Class = qSystems.Class
 
+-- NOTE: DEPRICATED
+
+warn("Scroll bar class is depcricated, used ScrollingFrame")
+
 -- ScrollBar library
 -- Change Log --
 --[[
