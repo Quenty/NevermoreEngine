@@ -15,8 +15,17 @@ end
 
 function EffectGroup:AddEffectFence(Fence)
 	-- @param Fence An EffectFence to add to the EffectGroup
+	assert(Fence, "Must send Fence")
 
-	self.Fences[#self.Fences+1] = Fence or error("No fence")
+	self.Fences[Fence] = true
+end
+
+function EffectGroup:RemoveFence(Fence)
+	-- @param Fence An already existing fence to remove
+	assert(Fence, "Must send Fence")
+	assert(self.Fences[Fence], "Fence must already be added to the group")
+
+	self.Fences[Fence] = nil
 end
 
 function EffectGroup:FindFirstActive(Point)
@@ -24,7 +33,7 @@ function EffectGroup:FindFirstActive(Point)
 
 	assert(Point, "Need point to cast")
 
-	for _, Fence in pairs(self.Fences) do
+	for Fence, _ in pairs(self.Fences) do
 		if Fence:PointInFence(Point) then
 			return Fence
 		end
