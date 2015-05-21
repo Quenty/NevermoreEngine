@@ -23,6 +23,8 @@ PaperRipple.Recenter = false
 
 function PaperRipple.new(Container)
 	-- @param Container A container that clips descendants to parent
+
+	assert(Container, "Needs Container")
 	assert(Container.ClipsDescendants, "Container must clip descendants")
 
 	local self = setmetatable({}, PaperRipple)
@@ -48,7 +50,8 @@ function PaperRipple.FromParent(Parent)
 	--               restriction when it comes to rotation.
 	-- @return The new paper ripple.
 
-	assert(Parent, "Must send Parent GUI")
+	assert(Parent, "Must send parent")
+	assert(type(Parent) == "userdata", "Parent must be a ROBLOX object, type = " .. type(Parent))
 
 	local Container                  = Instance.new("Frame")
 	Container.ClipsDescendants       = true;
