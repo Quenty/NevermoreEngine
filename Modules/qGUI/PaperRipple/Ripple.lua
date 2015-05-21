@@ -27,7 +27,7 @@ function Ripple.new(Gui)
 	self.TargetPosition = self.InitialPosition
 
 	self.InitialTransparency = Gui.ImageTransparency
-	self.TargetRadius = 20
+	self.TargetRadius = self.Container.AbsoluteSize.magnitude
 
 	-- NOTE: In order to begin, one should call ":Down()"
 	self:Draw()
@@ -164,7 +164,7 @@ end--]]
 function Ripple:GetTransparency()
 	-- @return The transparency of the ripple.
 
-	if self.MouseDownStart and not self.MouseUpStart then
+	if not self.MouseUpStart then
 		return self.InitialTransparency
 	else
 		-- Inversed from the Polymer version because the opacity vs. transparency deal.
@@ -181,9 +181,9 @@ function Ripple:GetRadius()
 	-- https://github.com/PolymerElements/paper-ripple/blob/master/paper-ripple.html#L263
 
 	local WaveRadius = math.min(
-		self.Container.AbsoluteSize.magnitude,
+		self.TargetRadius,
 		self.MaxRadius
-	) * 1.1 + 5
+	) * 1.1 + 3 -- Normally adds + 5, in this case, ROBLOX is 1/2 the pixel size, add 3 as the closest whole number.
 
 	-- Formula from PaperRipple on Polymer's project
 	local Duration = 1.1 - 0.2 * (WaveRadius / Ripple.MaxRadius)
