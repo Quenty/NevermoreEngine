@@ -1,7 +1,10 @@
-# What is this?
+## What is this?
 This is a GUI compass interface and calculator. It's designed to be extendible.
 
-# Example code?
+## Dependencies
+This section of code does not, as of 5/21/2015, require another other modules outside of its own folder. 
+
+## Example code?
 Although there is not loading code or actual GUI elements (for example, `WaitForChild` or `LoadCustomLibrary`), this code here
 should give you a good example of how to use this.
 
