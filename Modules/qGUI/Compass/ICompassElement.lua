@@ -60,7 +60,7 @@ function ICompassElement:CalculateTransparency()
 	elseif Transparency <= 0 then
 		return 0
 	else
-		return Transparency
+		return Transparency^2
 	end
 end
 
