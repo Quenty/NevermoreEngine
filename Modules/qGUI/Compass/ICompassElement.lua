@@ -17,6 +17,7 @@ function ICompassElement.new(Gui)
 	-- Private
 	self.PercentPosition = 0
 	self.Position = UDim2.new()
+	self.Rotation = 0
 
 	return self
 end
@@ -70,6 +71,13 @@ function ICompassElement:SetPercentPosition(Percent)
 	self.PercentPosition = Percent
 end
 
+function ICompassElement:SetRotation(Rotation)
+	-- @param Rotation in degrees.
+
+	-- print("Rotation", Rotation)
+	self.Rotation = Rotation
+end
+
 function ICompassElement:GetPercentPosition()
 	return self.PercentPosition
 end
@@ -81,6 +89,7 @@ function ICompassElement:Draw()
 
 	local Size = self.Gui.AbsoluteSize
 	self.Gui.Position = self.Position + UDim2.new(0, -Size.X/2, 0, -Size.Y/2)
+	self.Gui.Rotation = self.Rotation
 end
 
 
