@@ -33,7 +33,7 @@ function CardinalElement:SetAngle(Angle)
 	self.Angle = Angle
 end
 
-function ICompassElement:CalculatePercentPosition(CompassModel)
+function CardinalElement:CalculatePercentPosition(CompassModel)
 	-- Calculates the percent position for the element
 	-- @return The percent position
 
