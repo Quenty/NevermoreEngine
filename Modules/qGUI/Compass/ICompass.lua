@@ -40,7 +40,8 @@ function ICompass:SetThetaVisible(ThetaVisible)
 	-- Sets the area shown by the compass (the rest will be hidden). (In radians).
 	-- @param ThetaVisible Number [0, 6.28...] The theta in radians visible to the player overall.
 
-	self.ThetaVisible = tostring(ThetaVisible) or error("No or invalid ThetaVisible sent")
+	self.ThetaVisible = tonumber(ThetaVisible) or error("No or invalid ThetaVisible sent")
+	assert(ThetaVisible > 0, "ThetaVisible must be > 0")
 
 	for Element, _ in pairs(self.Elements) do
 		Element:SetThetaVisible(self.ThetaVisible)
@@ -63,6 +64,7 @@ function ICompass:GetPosition(PercentPosition)
 	--- Calculates the GUI position for the element
 	-- @param PercentPosition Number, the percent position to use
 	-- @return UDim2 The position (center) of the GUI element given its percentage. Relative to the container.
+	-- @return [Rotation] Number in degrees, the rotation of the GUI to be set.
 
 	error("GetPosition is not overridden yet")
 end
@@ -76,8 +78,11 @@ function ICompass:Draw()
 		local PercentPosition = Element:CalculatePercentPosition(self.CompassModel)
 		Element:SetPercentPosition(PercentPosition)
 
-		local NewPosition = self:GetPosition(PercentPosition)
+		local NewPosition, NewRotation = self:GetPosition(PercentPosition)
 		Element:SetPosition(NewPosition)
+		if NewRotation then
+			Element:SetRotation(NewRotation)
+		end
 		Element:Draw()
 	end
 end
