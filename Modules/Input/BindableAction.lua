@@ -144,6 +144,9 @@ function BindableAction:BindFunction(Name, Function)
 	-- Did some tests. When the BindableAction is GCed, this will also GC the signal and method. So Maid:DoCleaning() need not be called
 	-- to finalize GC even with anonymous functions.
 
+	assert(type(Name) == "string", "Name must be a string")
+	assert(type(Function) == "function", "Function must be a function")
+
 	self.BoundFunctionMaid[Name] = self.ActionFired:connect(Function)
 end
 
