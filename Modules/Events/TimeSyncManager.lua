@@ -1,3 +1,4 @@
+
 local MasterClock = {}
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
@@ -150,6 +151,11 @@ local Manager
 if game:FindService("NetworkServer") == nil and game:FindService("NetworkClient") == nil then
 	-- Solo test mode
 	Manager = MasterClock.new(SyncEvent, DelayedRequestFunction)
+
+	--> Edge case issue:
+		--> Remote event invocation queue exhausted for ReplicatedStorage.NevermoreResources.EventStreamContainer.TimeSyncEvent; did you forget to implement OnClientEvent?
+		-- Occurs because there is no OnClientEvent invoked for the sync thing. Will do so now.
+	SyncEvent.OnClientEvent:connect(function() end)
 	
 	print("[TimeSyncManager] - SoloTestMode enabled. MasterClock constructed.")
 elseif Players.LocalPlayer then
