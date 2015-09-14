@@ -23,6 +23,10 @@ function TrackingEffectGroup.new()
 	return self
 end
 
+function TrackingEffectGroup:GetActive()
+	return self.Active
+end
+
 function TrackingEffectGroup:SetActive(NewActive)
 	--- Fires the event too!
 	-- @param NewActive May be nil. If so, clears the active tracker.
