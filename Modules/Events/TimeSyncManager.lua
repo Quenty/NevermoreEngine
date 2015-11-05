@@ -142,23 +142,25 @@ end
 
 local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 local SyncEvent = NevermoreEngine.GetRemoteEvent("TimeSyncEvent")
 local DelayedRequestFunction = NevermoreEngine.GetRemoteFunction("DelayedRequestEvent")
 local Manager
 
-if game:FindService("NetworkServer") == nil and game:FindService("NetworkClient") == nil then
+if RunService:IsStudio() then
 	-- Solo test mode
 	Manager = MasterClock.new(SyncEvent, DelayedRequestFunction)
 
-	--> Edge case issue:
+	--> Solves edge case issue:
 		--> Remote event invocation queue exhausted for ReplicatedStorage.NevermoreResources.EventStreamContainer.TimeSyncEvent; did you forget to implement OnClientEvent?
 		-- Occurs because there is no OnClientEvent invoked for the sync thing. Will do so now.
 	SyncEvent.OnClientEvent:connect(function() end)
 	
 	print("[TimeSyncManager] - SoloTestMode enabled. MasterClock constructed.")
-elseif Players.LocalPlayer then
+elseif RunService:IsClient() then
 	-- Client
 	Manager = SlaveClock.new(SyncEvent, DelayedRequestFunction)
 	
