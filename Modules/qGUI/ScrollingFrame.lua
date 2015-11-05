@@ -142,11 +142,6 @@ local function PointInBounds(Frame, X, Y)
 	end
 end
 
-local function MouseOver(Mouse, Frame)
-	return PointInBounds(Frame, Mouse.X, Mouse.Y)
-end
-
-
 local function GetIndexByValue(Values, Value)
 	-- Return's the index of a Value. 
 
@@ -227,7 +222,7 @@ function ScrollBar.new(BarContainer, Scroller)
 
 	CreateFlatBacking(BarFrame, 1)
 
-	new.BarFrame              = BarFrame
+	new.BarFrame = BarFrame
 
 	new.Max = 0 -- About to update. Max offset really.
 	new:UpdateRender()
@@ -300,7 +295,7 @@ function ScrollBar:GetRelativePosition()
 	-- Relative input position to frame. 
 	-- Mouse Offset from top of frame. 
 
-	return Mouse[self.Axis] - self.BarContainer.AbsolutePosition[self.Axis]
+	return self.Scroller:GetMousePosition() - self.BarContainer.AbsolutePosition[self.Axis]
 end
 
 function ScrollBar:UpdateRender()
@@ -430,7 +425,7 @@ end
 local ScrollingFrame = {}
 ScrollingFrame.__index = ScrollingFrame
 ScrollingFrame.PixelsPerWheelTurn = 40
-
+ScrollingFrame.MouseOffset = Vector2.new(0, 36) -- Topbar GUI screws up mouse relative to GUIs.
 
 
 -- Local memory usage scroll frame using metatables. 
@@ -499,7 +494,7 @@ function ScrollingFrame.new(Frame, Axis)
 	-- if UserInputService.TouchEnabled then
 	-- 	new.LastFingerCount = 0
 	-- 	new:DisconnectReleaseEvent() -- Connects up the trigger event.
-	-- end
+	-- endg
 
 	return new
 end
@@ -597,17 +592,23 @@ function ScrollingFrame:RecalculateOffset()
 	self.Offset = self.Container.AbsolutePosition[self.Axis] - self.Frame.AbsolutePosition[self.Axis]
 end
 
+function ScrollingFrame:GetMousePosition()
+	-- @return The mouse position relative to the GUI's ScreenGUI.
+
+	return Mouse[self.Axis] - self.MouseOffset[self.Axis]
+end
+
 function ScrollingFrame:GetRelativePosition()
 	-- Relative input position to frame. 
 	-- Mouse Offset from top of frame. 
 
-	if self.LastAverageFingerPosition then -- This is iOS case.
+	--[[if self.LastAverageFingerPosition then -- This is iOS case.
 		local RelativePosition = self.LastAverageFingerPosition[self.Axis] - self.Container.AbsolutePosition[self.Axis]
 
 		return RelativePosition
-	end
+	end--]]
 
-	return Mouse[self.Axis] - self.Container.AbsolutePosition[self.Axis]
+	return self:GetMousePosition() - self.Container.AbsolutePosition[self.Axis]
 end
 
 function ScrollingFrame:ConstrainOffset(Offset)
