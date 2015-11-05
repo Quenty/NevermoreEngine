@@ -38,7 +38,7 @@ KeyIcon.DefaultFillIconData = {
 
 -- CONSTRUCTION
 
-function KeyIcon.new(GUI, OutlineTween, FillFrameTween)
+function KeyIcon.new(GUI, FillFrameTween)
 	-- @param GUI The parent of both the outline and fillframe, the text of this label
 	--            also forms the basis of a key icon. Assumedly a TextLabel, but it doesn't
 	--            have to be
@@ -52,7 +52,7 @@ function KeyIcon.new(GUI, OutlineTween, FillFrameTween)
 	setmetatable(self, KeyIcon)
 
 	self.GUI            = GUI
-	self.OutlineTween   = OutlineTween
+	--self.OutlineTween   = OutlineTween
 	self.FillFrameTween = FillFrameTween
 
 	self:RescaleWidth()
@@ -78,12 +78,71 @@ function KeyIcon.NewDefaultTextLabel(Height)
 	return TextLabel
 end
 
-function KeyIcon.NewDefault(Height)
+function KeyIcon.NewDefaultImageLabel(Height, ImageURL)
+	Height = Height or 30
+
+	local ImageLabel                  = Instance.new("ImageLabel")
+	ImageLabel.Name                   = "DefaultKeyIcon"
+	ImageLabel.Size                   = UDim2.new(0, Height, 0, Height)
+	ImageLabel.BackgroundTransparency = 1
+	ImageLabel.BorderSizePixel        = 0
+	ImageLabel.Image                  = ImageURL or error("No Image URL")
+
+	return ImageLabel
+end
+
+function KeyIcon.NewDefault(Height, ImageData)
 	--- Creates a new "default" KeyIcon to be used.
+	-- @param [Height=30] The height of the icon
+	-- @param [ImageData] The ImageData of the icon to use
+	--                    Has two fields, "ImageData.Fill" and "ImageData.Default"
 	-- @return The new KeyIcon produced
 
-	local TextLabel = KeyIcon.NewDefaultTextLabel(Height)
-	return KeyIcon.FromBaseGUI(TextLabel, KeyIcon.DefaultIconData, KeyIcon.DefaultFillIconData)
+
+	if ImageData then
+		local ImageLabel = KeyIcon.NewDefaultImageLabel(Height, ImageData.Default)
+		return KeyIcon.FromBaseGUIImage(ImageLabel, ImageData)
+	else
+		local TextLabel = KeyIcon.NewDefaultTextLabel(Height)
+		return KeyIcon.FromBaseGUI(TextLabel, KeyIcon.DefaultIconData, KeyIcon.DefaultFillIconData)
+	end
+end
+
+
+
+
+local function TweenFunctionFactory(Properties, Function, Transform)
+	-- Hardcore functional programming here.
+	-- Properties is a table
+	-- Function is the animation function
+	-- Transform transforms the PercentTransparency per property...
+	return function (Item, PercentTransparency, AnimationTime)
+
+		local TweenData = {}
+		for _, PropertyName in pairs(Properties) do
+			TweenData[PropertyName] = Transform(PercentTransparency, PropertyName)
+		end
+
+		Function(Item, TweenData, AnimationTime, true)
+	end
+end
+
+
+function KeyIcon.FromBaseGUIImage(GUI, ImageData)
+	local Secondary = KeyIcon.NewDefaultImageLabel(nil, ImageData.Fill or error("No fill data"))
+	Secondary.Size = UDim2.new(1, 0, 1, 0)
+	Secondary.ZIndex = GUI.ZIndex - 1
+	Secondary.Name = "FillIcon"
+	Secondary.Parent = GUI
+	Secondary.ImageTransparency = 1
+
+	local FillMap = FunctionMap.new({Secondary},
+		TweenFunctionFactory({"ImageTransparency"}, qGUI.TweenTransparency, 
+			function(PercentTransparency, PropertyName)
+				return PercentTransparency
+			end))
+
+	return KeyIcon.new(GUI, FillMap)
 end
 
 function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
@@ -109,22 +168,6 @@ function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
 	end)
 
 
-	local function TweenFunctionFactory(Properties, Function, Transform)
-		-- Hardcore functional programming here.
-		-- Properties is a table
-		-- Function is the animation function
-		-- Transform transforms the PercentTransparency per property...
-		return function (Item, PercentTransparency, AnimationTime)
-
-			local TweenData = {}
-			for _, PropertyName in pairs(Properties) do
-				TweenData[PropertyName] = Transform(PercentTransparency, PropertyName)
-			end
-
-			Function(Item, TweenData, AnimationTime, true)
-		end
-	end
-
 	local FillMap = FunctionMap.new(FillFrames, 
 		TweenFunctionFactory({"ImageTransparency"}, qGUI.TweenTransparency, 
 			function(PercentTransparency, PropertyName)
@@ -139,7 +182,13 @@ function KeyIcon.FromBaseGUI(GUI, OutlineImageData, FillImageData)
 				end)))
 	end
 
-	return KeyIcon.new(GUI, FunctionMap.new(OutlineLabels, qGUI.TweenTransparency), FillMap, GUI)
+	--[[local OutlineMap = FunctionMap.new(OutlineLabels, 
+		TweenFunctionFactory({"ImageTransparency"}, qGUI.TweenTransparency, 
+			function(PercentTransparency, PropertyName)
+				return PercentTransparency
+			end)))--]]
+
+	return KeyIcon.new(GUI, FillMap) --return KeyIcon.new(GUI, OutlineMap, FillMap)
 end
 
 
@@ -154,7 +203,7 @@ function KeyIcon:SetFillTransparency(PercentTransparency, AnimationTime)
 	AnimationTime = AnimationTime or 0.2 
 	self.FillFrameTween:Map(PercentTransparency, AnimationTime, true)
 end
-
+--[[
 function KeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
 	--- Sets the outline of the KeyIcon to a specific transparency
 	-- @param PercentTransparency Number [0, 1], where 1 is completely transparency
@@ -162,7 +211,7 @@ function KeyIcon:SetOutlineTransparency(PercentTransparency, AnimationTime)
 
 	AnimationTime = AnimationTime or 0.2 
 	self.OutlineTween:Map(PercentTransparency, AnimationTime, true)
-end
+end--]]
 
 function KeyIcon:RescaleWidth()
 	--- Used with TextLabels to rescale the width. Note: Only works if the icon is parented.

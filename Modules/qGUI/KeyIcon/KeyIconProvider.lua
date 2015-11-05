@@ -34,6 +34,10 @@ KeyIconProvider.KeyCodeToText = {
 	[Enum.KeyCode.RightControl] = "CTRL";
 }
 
+KeyIconProvider.ImageMap = {
+	[Enum.UserInputType.MouseButton1] = {Default = "rbxassetid://314340595", Fill="rbxassetid://314357774"};
+}
+
 function KeyIconProvider.new(DefaultIconBar)
 	-- Constructs for a specific DefaultIconBar, making the icon bar optional.
 
@@ -62,13 +66,18 @@ function KeyIconProvider:GetIcon(KeyCode, KeyIconBar)
 	KeyIconBar       = KeyIconBar or self.DefaultIconBar or error("No KeyIconBar")
 
 	local Height     = KeyIconBar:GetHeight()
-	local Text       = self:GetKeycodeText(KeyCode):upper()
-	
-	local NewIcon    = KeyIcon.NewDefault(Height)
-	NewIcon.GUI.Text = Text
-	NewIcon:RescaleWidth()
+	if KeyIconProvider.ImageMap[KeyCode] then
+		local NewIcon    = KeyIcon.NewDefault(Height, KeyIconProvider.ImageMap[KeyCode])
+		return NewIcon
+	else
+		local Text       = self:GetKeycodeText(KeyCode):upper()
+		
+		local NewIcon    = KeyIcon.NewDefault(Height)
+		NewIcon.GUI.Text = Text
+		NewIcon:RescaleWidth()
 
-	return NewIcon
+		return NewIcon
+	end
 end
 
 function KeyIconProvider:GetLabeledKey(KeyCode, LabelText, KeyIconBar)

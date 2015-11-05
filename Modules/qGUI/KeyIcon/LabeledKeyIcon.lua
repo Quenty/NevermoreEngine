@@ -48,9 +48,9 @@ function LabeledKeyIcon.FromKeyIcon(KeyIcon, LabelText)
 	TextLabel.Position               = UDim2.new(0, KeyIcon.GUI.Size.X.Offset + 5, 0, 0) -- Will be recalculated anyway.
 	TextLabel.TextColor3             = Color3.new(1, 1, 1)
 	TextLabel.Font                   = "SourceSans"
-	TextLabel.FontSize               = "Size18"
+	TextLabel.FontSize               = "Size10"
 	TextLabel.Name                   = "KeyIconLabel"
-	TextLabel.Text                   = LabelText or "[ label goes here ]"
+	TextLabel.Text                   = LabelText:upper() or "[ label goes here ]"
 
 	KeyIcon.GUI.Parent = Frame
 
