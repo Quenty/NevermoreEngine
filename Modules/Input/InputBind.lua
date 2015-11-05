@@ -7,6 +7,7 @@ local Signal            = LoadCustomLibrary("Signal")
 local BindableAction    = LoadCustomLibrary("BindableAction")
 
 -- Binds and unbinds select commands on request.
+-- Allows for better handling of bind states (that is, cleanup and initalizing commands).
 -- @author Quenty
 
 local InputBind = {}
