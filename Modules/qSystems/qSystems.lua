@@ -71,7 +71,6 @@ December 28th, 2013
 - Added new alias to roundnumber (Round)
 ]]
 	
-local Type                    = LoadCustomLibrary("Type")
 local Signal                  = LoadCustomLibrary("Signal")
 
 local lib                     = {}
