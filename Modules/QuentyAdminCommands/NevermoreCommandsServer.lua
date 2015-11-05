@@ -431,7 +431,7 @@ do
 			Cmds:Alias("Mute", "shutup", "silent", "mum", "muffle", "devoice")
 
 		Cmds:add("Unmute", {
-				Description = "Mute's a player. ";
+				Description = "Unmute's a player. ";
 			}, 
 			function(Player, User)
 				local PlayerList = PlayerIdSystem:GetPlayersFromString(Player, User)
@@ -1341,6 +1341,6 @@ PseudoChatManagerServer.AddChatCallback(function(PlayerName, Message, PlayerColo
 	end
 end)
 
-print("[NevermoreCommands] - Loaded with " .. CommandSystem:getNumberOfCommands() .. " commands and " .. CommandSystem:getNumberOfAlias() .. " aliases")
+-- print("[NevermoreCommands] - Loaded with " .. CommandSystem:getNumberOfCommands() .. " commands and " .. CommandSystem:getNumberOfAlias() .. " aliases")
 
 return NevermoreCommands
