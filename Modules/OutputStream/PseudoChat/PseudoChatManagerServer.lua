@@ -50,7 +50,7 @@ January 19th, 2014
 --]]
 
 local PseudoChatManager = {} do
-	local ClientToServerOutputStream = NevermoreEngine.GetEventStream("ClientToServerOutputStream")
+	local ClientChatted = NevermoreEngine.GetRemoteEvent("ClientChatted")
 
 	local ChatChannel = OutputStream.MakeOutputStreamServer(
 			OutputClassStreamLoggers.MakeGlobalOutputStreamLog(PseudoChatSettings.BufferSize),
@@ -190,24 +190,6 @@ local PseudoChatManager = {} do
 	PseudoChatManager.Notify = Notify
 	PseudoChatManager.Notify = Notify
 
-	-- local function Output(Output, ChatColor)
-	-- 	--- Output's script builder output to a player
-	-- 	-- @param Output The output to output
-	-- 	-- @param ChatColor The chat color to output.
-
-	-- 	-- print("*** OUTPUT \"" .. Output .. "\"")
-
-	-- 	local Data = {
-	-- 		Message = Output;
-	-- 		ChatColor = ChatColor;
-	-- 	}
-	-- 	-- print("Filter list [0] @ Send" .. tostring(Data.FilterList) .. ", Data = " .. tostring(Data))
-
-	-- 	AdminOutputClass.Send("OutputOutputClass", Data)
-	-- end
-	-- PseudoChatManager.Output = Output
-	-- PseudoChatManager.output = Output
-
 	local function AdminOutput(Output, ChatColor)
 		--- Output's admin commands log
 		-- @param Output The output to Output
@@ -328,59 +310,11 @@ local PseudoChatManager = {} do
 	PseudoChatManager.Chat = HandleChat
 	PseudoChatManager.chat = HandleChat
 
-	--[[local function HandlePlayer(Player)
-		--- Handle's the player by connecting events, et cetera.
-
-		Player.Chatted:connect(function(Message)
-			HandleChat(Player.Name, Message)
-		end)
-	end--]]
-	
-	--[==[
-	local function Initiate()
-		-- Sets up PseudoChat. 
-
-		-- Connect events
-		--[[for _, Player in pairs(Players:GetPlayers()) do
-			HandlePlayer(Player)
-		end
-
-		Players.PlayerAdded:connect(function(Player)
-			HandlePlayer(Player)
-		end)--]]
-
-		ScriptContext.Error:connect(function(Message, StackTrace, Script)
-			Script = tostring(Script)
-			
-			Output((Script .. " " .. Message), Color3.new(1, 0, 0))
-			Output(StackTrace, Color3.new(0, 209/255, 255/255))
-		end)
-
-		LogService.MessageOut:connect(function(Message, MessageType)
-			local MessageColor
-			if MessageType.Name == "MessageWarning" then
-				MessageColor = Color3.new(255/255, 233/255, 181/255)
-			elseif MessageType.Name == "MessageError" then
-				MessageColor = Color3.new(1, 0, 0)
-			elseif MessageType.Name == MessageInfo then
-				MessageColor = Color3.new(0, 209/255, 255/255)
-			end
-			Output(Message, MessageColor)
-		end)
-	end
-	PseudoChatManager.Initiate = Initiate
-	PseudoChatManager.Initiate = Initiate--]==]
-
-	-- ClientToServerOutputStream.RegisterRequestTag("Error", function(Client, NewOutput)
-	-- 	Output("[" .. tostring(Client) .. "] - " .. NewOutput.Script .. NewOutput.Message, Color3.new(1, 0, 0))
-	-- 	Output(NewOutput.StackTrace, Color3.new(0, 209/255, 255/255))
-	-- end)
-
-	ClientToServerOutputStream.RegisterRequestTag("Message", function(Client, Message)
+	ClientChatted.OnServerEvent:connect(function(Client, Message)
 		if Message then
 			HandleChat(Client.Name, Message)
 		else
-			warn("[ClientToServerOutputStream] - No message sent. :/")
+			warn("[ClientChatted] - No message sent. :/")
 		end
 	end)
 end
