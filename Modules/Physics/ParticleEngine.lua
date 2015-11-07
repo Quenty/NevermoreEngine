@@ -27,7 +27,7 @@ local function MakeParticleEngineServer()
 
 	local Engine = {}
 
-	local RemoteEvent = NevermoreEngine.GetEventStreamObject("ParticleEventDistributor")
+	local RemoteEvent = NevermoreEngine.GetRemoteEvent("ParticleEventDistributor")
 
 	local function ParticleNew(p) -- PropertiesTable
 		p.Position      = p.Position or error("No Position Yo")
@@ -98,7 +98,7 @@ local function RealMakeEngine(Screen)
 	local Time = tick()
 
 	local Player         = game.Players.LocalPlayer
-	local RemoteEvent    = NevermoreEngine.GetEventStreamObject("ParticleEventDistributor")
+	local RemoteEvent    = NevermoreEngine.GetRemoteEvent("ParticleEventDistributor")
 
 	-- Screen = Screen or Instance.new("ScreenGui", Player.PlayerGui)
 
