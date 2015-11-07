@@ -60,7 +60,7 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 	local Chat = {}
 	local LocalPlayer = game.Players.LocalPlayer
 
-	local ClientToServerOutputStream = NevermoreEngine.GetEventStream("ClientToServerOutputStream")
+	local ClientChatted = NevermoreEngine.GetRemoteEvent("ClientChatted")
 
 	local Interface = OutputStreamInterface.MakeOutputStreamInterface(nil, ScreenGui)
 	Chat.Interface  = Interface
@@ -77,7 +77,9 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 	local ChatBar
 
 	local function SendMessage(Message)
-		ClientToServerOutputStream.Fire("Message", Message); --[[{
+		assert(Message, "Need message")
+		
+		ClientChatted:FireServer(Message); --[[{
 			Message = Message;
 			-- Player  = LocalPlayer;
 		})--]]
