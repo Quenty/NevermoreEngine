@@ -150,7 +150,7 @@ local SyncEvent = NevermoreEngine.GetRemoteEvent("TimeSyncEvent")
 local DelayedRequestFunction = NevermoreEngine.GetRemoteFunction("DelayedRequestEvent")
 local Manager
 
-if RunService:IsStudio() then
+if RunService:IsClient() and RunService:IsServer() then
 	-- Solo test mode
 	Manager = MasterClock.new(SyncEvent, DelayedRequestFunction)
 
@@ -159,7 +159,7 @@ if RunService:IsStudio() then
 		-- Occurs because there is no OnClientEvent invoked for the sync thing. Will do so now.
 	SyncEvent.OnClientEvent:connect(function() end)
 	
-	print("[TimeSyncManager] - SoloTestMode enabled. MasterClock constructed.")
+	print("[TimeSyncManager] - Studio mode enabled. MasterClock constructed.")
 elseif RunService:IsClient() then
 	-- Client
 	Manager = SlaveClock.new(SyncEvent, DelayedRequestFunction)
