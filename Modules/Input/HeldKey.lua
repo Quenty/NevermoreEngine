@@ -1,6 +1,8 @@
 local HeldInput = {}
 HeldInput.__index = HeldInput
 HeldInput.ClassName = "HeldInput"
+HeldInput.DelayTime = 0.2
+HeldInput.InitialDelayTime = 0.2
 
 -- @author Quenty
 
@@ -25,13 +27,12 @@ function HeldInput:HandleNewState(UserInputState)
 		local LocalPressId = self.PressId
 		
 		self.RepeatFunction()
-		delay(0.2, function()
+		delay(self.InitialDelayTime, function()
 			while LocalPressId == self.PressId do
 				self.RepeatFunction()
-				wait(0.2)
+				wait(self.DelayTime)
 			end
 		end)
-		
 	elseif UserInputState.Name == "End" then
 		self:Stop()
 	end
@@ -39,6 +40,20 @@ end
 
 function HeldInput:Stop()
 	self.PressId = self.PressId + 1
+end
+
+function HeldInput:WithDelayTime(Time)
+	--- The time to delay between each instance of a siulated press
+
+	self.DelayTime = Time
+
+	return self
+end
+
+function HeldInput:WithInitialDelayTime(Time)
+	self.InitialDelayTime = Time
+
+	return self
 end
 
 return HeldInput
