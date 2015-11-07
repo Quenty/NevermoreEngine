@@ -19,7 +19,7 @@ local ContentProvider    = game:GetService("ContentProvider")
 local ServerStorage      
 local ServerScriptService
 
-local RbxUtility         = LoadLibrary("RbxUtility")
+-- local RbxUtility         = LoadLibrary("RbxUtility")
 
 local Configuration = {	
 	ClientName             = "NevermoreClient";
