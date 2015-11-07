@@ -127,8 +127,8 @@ local MakeOutputStreamServer = Class(function(OutputStreamServer, Logger, Stream
 
 	OutputStreamServer.Name = StreamName
 
-	local DataStream = NevermoreEngine.GetDataStream("OutputStream/" .. StreamName)
-	local EventStream = NevermoreEngine.GetEventStream("OutputStream/" .. StreamName)
+	local StreamRemoteFunction = NevermoreEngine.GetRemoteFunction("OutputStream/" .. StreamName)
+	local StreamRemoteEvent = NevermoreEngine.GetRemoteEvent("OutputStream/" .. StreamName)
 
 	local OutputClasses = {}
 
@@ -165,11 +165,11 @@ local MakeOutputStreamServer = Class(function(OutputStreamServer, Logger, Stream
 
 					-- print("Filter list [2] @ Send " .. tostring(Data.FilterList) .. ", Data = " .. tostring(Data))
 					if Logger:Sendable(Player, Data) then
-						EventStream.Fire(Player, "Push", OutputClassName, Data.Parsed)
+						StreamRemoteEvent:FireClient(Player, "Push", OutputClassName, Data.Parsed)
 					end
 				end
 			else
-				EventStream.FireAllClients("Push", OutputClassName, Data.Parsed)
+				StreamRemoteEvent:FireAllClients("Push", OutputClassName, Data.Parsed)
 			end
 
 			Logger:LogData(Data)
@@ -181,10 +181,14 @@ local MakeOutputStreamServer = Class(function(OutputStreamServer, Logger, Stream
 	OutputStreamServer.Send = Send
 	OutputStreamServer.send = Send
 
-	DataStream.RegisterRequestTag("Pull", function(Client)
+	function StreamRemoteFunction.OnServerInvoke(Client, Request)
 		-- print("[OutputStreamServer] - Returning log pull from Client " .. tostring(Client))
-		return Logger:GetLogs(Client)
-	end)
+		if Request == "Pull" then
+			return Logger:GetLogs(Client)
+		else
+			error("Unable to handle request '" .. Request .. "'")
+		end
+	end
 end)
 lib.MakeOutputStreamServer = MakeOutputStreamServer
 lib.makeOutputStreamServer = MakeOutputStreamServer
@@ -195,8 +199,8 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	
 	assert(type(StreamName) == "string", "[OutputStreamClient] - StreamName is a '" .. type(StreamName) .. "' tostring() == " .. tostring(StreamName))
 
-	local DataStream = NevermoreEngine.GetDataStream("OutputStream/" .. StreamName)
-	local EventStream = NevermoreEngine.GetEventStream("OutputStream/" .. StreamName)
+	local StreamRemoteFunction = NevermoreEngine.GetRemoteFunction("OutputStream/" .. StreamName)
+	local StreamRemoteEvent = NevermoreEngine.GetRemoteEvent("OutputStream/" .. StreamName)
 
 	OutputStreamClient.Name = StreamName
 
@@ -230,18 +234,21 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	OutputStreamClient.AddOutputClass = AddOutputClass
 	OutputStreamClient.addOutputClass = AddOutputClass
 
-	EventStream.RegisterRequestTag("Push", function(OutputClassName, Data)
-
-		assert(Data.TimeStamp ~= nil, "TimeStamp is nil")
-
-		local OutputClass = GetOutputClass(OutputClassName)
-		if OutputClass then
-			Data.ClientData = {} -- Client data for rendering stuff.
-
-			OutputClass.Parser.Unparse(Data)
-			OutputStreamClient.NewItem:fire(OutputClass, Data)
+	StreamRemoteEvent.OnClientEvent:connect(function(Request, OutputClassName, Data)
+		if Request == "Push" then
+			assert(Data.TimeStamp ~= nil, "TimeStamp is nil")
+	
+			local OutputClass = GetOutputClass(OutputClassName)
+			if OutputClass then
+				Data.ClientData = {} -- Client data for rendering stuff.
+	
+				OutputClass.Parser.Unparse(Data)
+				OutputStreamClient.NewItem:fire(OutputClass, Data)
+			else
+				warn("[OutputStreamClient] - No OutputStream class for '" .. tostring(OutputClassName) .. "'")
+			end
 		else
-			warn("[OutputStreamClient] - No OutputStream class for '" .. tostring(OutputClassName) .. "'")
+			error("Invalid request '" .. tostring(Request) .."'")
 		end
 	end)
 
@@ -249,7 +256,7 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	local function GetLogs()
 		--- Takes all the logs from all the classes
 
-		local Logs = DataStream.Call("Pull")
+		local Logs = StreamRemoteFunction:InvokeServer("Pull")
 		if Logs then
 			local UnparsedLogs = {}
 			for Index, Item in pairs(Logs) do
