@@ -47,8 +47,10 @@ function BindedIcon:Destroy()
 
 	self.BindableAction:UnbindFunction("_UpdateIcon")
 	self.Maid:DoCleaning()
+	self.Maid = nil
 
 	self.Icon:Destroy()
+	self.Icon = nil
 end
 
 
