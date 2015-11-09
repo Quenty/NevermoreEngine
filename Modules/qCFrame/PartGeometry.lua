@@ -63,7 +63,7 @@ function GetShape(part)
                 return 'Round', scale
             else
                 --spawn(function() 
-                warn("PartGeometry: Unsupported Mesh Type, treating as a normal brick.")
+                warn("PartGeometry: Unsupported Mesh Type `" .. ch.MeshType.Name .. "`, treating as a normal brick.")
                -- end)
             end
         end
