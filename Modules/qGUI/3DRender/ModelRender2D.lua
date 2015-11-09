@@ -45,6 +45,8 @@ function ModelRender3D:GetModelWidth()
 end
 
 function ModelRender3D:UseScale(Scale)
+	-- @param Scale Can be a Vector3 or Number value
+	
 	self.Scale = Scale -- A zoom factor, used to compensate when GetExtentsSize fails.
 end
 
@@ -52,16 +54,15 @@ function ModelRender3D:GetPrimaryCFrame()
 	if self.Gui and self.Model then
 		local Frame = self.Gui
 		local ModelSize = self.Model:GetExtentsSize() * self.Scale
-		local Part = self.Model.PrimaryPart
 		local FrameAbsoluteSize = Frame.AbsoluteSize
 		local FrameCenter = Frame.AbsolutePosition + FrameAbsoluteSize/2 -- Center of the frame. 
-	
-		local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, self.RelativeRotation:vectorToWorldSpace(ModelSize).X)--math.max(ModelSize.X, ModelSize.Z))
+		
+		local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, ModelSize.X)--math.max(ModelSize.X, ModelSize.Z))
 		
 		local Position = ScreenSpace.ScreenToWorld(FrameCenter.X, FrameCenter.Y, Depth)
 		local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame * 
 		                      CFrame.new(Position) * -- Transform by camera coordinates
-		                      CFrame.new(0, 0, -self.RelativeRotation:vectorToWorldSpace(ModelSize).Z/2) -- And take out the part size factor. 
+		                      CFrame.new(0, 0, -ModelSize.Z/2) -- And take out the part size factor. 
 		
 		return AdorneeCFrame * self.RelativeRotation
 	else
