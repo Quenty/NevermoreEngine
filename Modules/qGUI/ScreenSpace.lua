@@ -37,7 +37,7 @@ end--]]
 
 ---[[ Use new camera API instead, please
 function ScreenSpace.ViewSizeX()
-	local x = PlayerMouse.ViewSizeX
+	local x = workspace.CurrentCamera.ViewportSize.X--PlayerMouse.ViewSizeX
 	if x == 0 then
 		return 1024
 	else
@@ -46,7 +46,7 @@ function ScreenSpace.ViewSizeX()
 end
 
 function ScreenSpace.ViewSizeY()
-	local y = PlayerMouse.ViewSizeY
+	local y = workspace.CurrentCamera.ViewportSize.Y--PlayerMouse.ViewSizeY
 	if y == 0 then
 		return 768
 	else
@@ -80,6 +80,7 @@ end
 -- ScreenSpace -> WorldSpace. Raw function taking a screen position and a depth and 
 -- converting it into a world position.
 function ScreenSpace.ScreenToWorld(x, y, Depth)
+	y = y + 34
 	local aspectRatio = ScreenSpace.AspectRatio()
 	local hfactor     = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor     = aspectRatio*hfactor
@@ -163,6 +164,7 @@ end
 -- at, and returning a size of how big that object has to be to appear that size
 -- at that depth.
 function ScreenSpace.ScreenToWorldByWidthDepth(x, y, screenWidth, depth)
+	y = y + 34
 	local aspectRatio = ScreenSpace.AspectRatio()
 	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
