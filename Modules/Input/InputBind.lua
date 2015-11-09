@@ -48,6 +48,10 @@ function InputBind:AddAction(Action)
 	end
 end
 
+function InputBind:GetAction(ActionName)
+	return self.AllActions[ActionName]
+end
+
 function InputBind:AddFromData(ActionData)
 	--- Adds a new action from data
 	-- @param ActionData Table, contains information to call BindableAction.FromData to construct from.
