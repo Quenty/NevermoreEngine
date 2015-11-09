@@ -57,6 +57,7 @@ function GUIRender3D:SetFrame(Frame)
 	FakeFrame.Position = Frame.Position
 	FakeFrame.SizeConstraint = Frame.SizeConstraint
 	FakeFrame.Visible = true
+	FakeFrame.Active = Frame.Active
 	self.FakeFrame = FakeFrame
 	
 	Frame.Parent = self.SurfaceGui;
@@ -65,6 +66,10 @@ function GUIRender3D:SetFrame(Frame)
 	Frame.SizeConstraint = "RelativeXY"
 	
 	self:UpdatePartSize()
+end
+
+function GUIRender3D:GetFakeFrame()
+	return self.FakeFrame
 end
 
 function GUIRender3D:UpdatePartSize()
@@ -89,7 +94,7 @@ function GUIRender3D:GetPrimaryCFrame()
 	local Size = self.FakeFrame.AbsoluteSize
 	local FrameCenter = self.FakeFrame.AbsolutePosition + Size/2
 
-	local Position = ScreenSpace.ScreenToWorldByWidthDepth(FrameCenter.X, FrameCenter.Y, Size.Y, self.Depth)
+	local Position = ScreenSpace.ScreenToWorldByWidthDepth(FrameCenter.X, FrameCenter.Y, Size.X, self.Depth)
 
 	return workspace.CurrentCamera.CoordinateFrame *
           CFrame.new(Position) * -- Transform by camera coordinates
