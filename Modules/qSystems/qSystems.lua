@@ -1,33 +1,24 @@
-local Players            = game:GetService("Players")
-local StarterPack        = game:GetService("StarterPack")
-local StarterGui         = game:GetService("StarterGui")
-local Lighting           = game:GetService("Lighting")
-local Debris             = game:GetService("Debris")
-local Teams              = game:GetService("Teams")
-local BadgeService       = game:GetService("BadgeService")
-local InsertService      = game:GetService("InsertService")
-local HttpService        = game:GetService("HttpService")
-local ReplicatedStorage  = game:GetService("ReplicatedStorage")
-local RunService         = game:GetService("RunService")
-local MarketplaceService = game:GetService("MarketplaceService")
-local TestService        = game:GetService("TestService")
-local Terrain            = workspace.Terrain
-
-local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
+local Players = game:GetService("Players")
 
 -------------------------
 -- Documentation Stuff --
 -------------------------
 
+-- Revised November 13th, 2015
 -- @author Quenty
--- Revised Janurary 4th, 2014
 -- This script handles a variety of tasks and generic functions that are useful for
 -- ROBLOX game developement. It is meant to be imported into another script.
 -- @return The qSystems library. 
 
 --[[
 Updates and Changes log
+November 21st, 2015
+- Removed Signal library, and Nevermore dependency
+
+November 15th, 2015
+- Updated documentation
+- Cleaned up code a bit
+
 November 17th, 2014
 - Removed importing into the environment
 
@@ -71,39 +62,32 @@ December 28th, 2013
 - Added new alias to roundnumber (Round)
 ]]
 	
-local Signal                  = LoadCustomLibrary("Signal")
-
-local lib                     = {}
+local lib = {}
 
 -----------------------
 -- General functions --
 -----------------------
 
--- Creates a signal, like before, but this time uses internal Lua signals that allow for the sending of recursive
--- tables versus using ROBLOX's parsing system. 
-lib.CreateSignal = Signal.new
-lib.createSignal = Signal.new
-
 local function RoundNumber(Number, Divider)
 	-- Rounds a Number, with 1.5 rounding up to 2, and so forth, by default. 
 	-- @param Number the Number to round
-	-- @param [Divider] optional Number of which to "round" to. If nothing is given, it will default to 1. 
+	-- @param [Divider] optional Number of which to "round" to. If nothing is given, it will default
+	--     to 1.
 
 	Divider = Divider or 1
 
 	return (math.floor((Number/Divider)+0.5)*Divider)
 end
-lib.roundNumber = RoundNumber
 lib.RoundNumber = RoundNumber
-lib.round_number = RoundNumber
 lib.Round = RoundNumber
-lib.round = RoundNumber
-
 
 local function Modify(Instance, Values)
-	-- Modifies an Instance by using a table.  
+	--- Modifies an Instance by using a table.  
+	-- @param Instance The instance to modify
+	-- @param Values A table with keys as the value to change, and the value as the property to
+	--     assign
 
-	assert(type(Values) == "table", "Values is not a table");
+	assert(type(Values) == "table", "Values is not a table")
 
 	for Index, Value in next, Values do
 		if type(Index) == "number" then
@@ -115,26 +99,26 @@ local function Modify(Instance, Values)
 	return Instance
 end
 
-
 local function Make(ClassType, Properties)
-	-- Using a syntax hack to create a nice way to Make new items.  
+	--- Using a syntax hack to create a nice way to Make new items.  
+	-- @param ClassType The type of class to instantiate
+	-- @param Properties The properties to use
 
 	return Modify(Instance.new(ClassType), Properties)
 end
 
-lib.modify = Modify
 lib.Modify = Modify
-
-lib.make = Make;
-lib.Make = Make;
-
+lib.Make = Make
 
 local function WaitForChild(Parent, Name, TimeLimit)
-	-- Waits for a child to appear. Not efficient, but it shoudln't have to be. It helps with debugging. 
-	-- Useful when ROBLOX lags out, and doesn't replicate quickly.
-	-- @param TimeLimit If TimeLimit is given, then it will return after the timelimit, even if it hasn't found the child.
+	-- Waits for a child to appear. Not efficient, but it shoudln't have to be. It helps with
+	-- debugging. Useful when ROBLOX lags out, and doesn't replicate quickly. Will warn
+	-- @param Parent The Parent to search in for the child.
+	-- @param Name The name of the child to search for
+	-- @param TimeLimit If TimeLimit is given, then it will return after the t imelimit, even if it
+	--     hasn't found the child.
 
-	assert(Parent ~= nil, "Parent is nil")
+	assert(Parent, "Parent is nil")
 	assert(type(Name) == "string", "Name is not a string.")
 
 	local Child     = Parent:FindFirstChild(Name)
@@ -142,7 +126,7 @@ local function WaitForChild(Parent, Name, TimeLimit)
 	local Warned    = false
 
 	while not Child do
-		wait(0)
+		wait()
 		Child = Parent:FindFirstChild(Name)
 		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
 			Warned = true
@@ -155,13 +139,14 @@ local function WaitForChild(Parent, Name, TimeLimit)
 
 	return Child
 end
-lib.waitForChild = WaitForChild
 lib.WaitForChild = WaitForChild
-lib.wait_for_child = WaitForChild
 
 local function CallOnChildren(Instance, FunctionToCall)
-	-- Calls a function on each of the children of a certain object, using recursion.  
+	--- Calls a function on each of the children of a certain object, using recursion.  
 	-- Exploration note: Parents are always called before children.
+	-- @param Instance The Instance to search for
+	-- @param FunctionToCall The function to call. Will be called on the Instance and then on all
+	--     descendants.
 	
 	FunctionToCall(Instance)
 
@@ -169,13 +154,12 @@ local function CallOnChildren(Instance, FunctionToCall)
 		CallOnChildren(Child, FunctionToCall)
 	end
 end
-lib.callOnChildren = CallOnChildren
 lib.CallOnChildren = CallOnChildren
-lib.call_on_children = CallOnChildren
-
 
 local function GetNearestParent(Instance, ClassName)
-	-- Returns the nearest parent of a certain class, or returns nil
+	--- Returns the nearest parent of a certain class, or returns nil
+	-- @param Instance The instance to start searching
+	-- @param ClassName The class to look for
 
 	local Ancestor = Instance
 	repeat
@@ -187,22 +171,19 @@ local function GetNearestParent(Instance, ClassName)
 
 	return Ancestor
 end
-lib.getNearestParent = GetNearestParent
 lib.GetNearestParent = GetNearestParent
-lib.get_nearest_parent = GetNearestParent
-
 
 local function GetHumanoid(Descendant)
-	-- Return's a humanoid in the parent structure if it can find it. Intended to be used in workspace	 only.
-	-- Useful for weapon scripts, and all that, especially to work on non player targets.
-	-- Will scan *up* to workspace	. If workspace	 has a humanoid in it, it won't find it.
-
-	-- Will work even if there are non-humanoid objects named "Humanoid"
-	-- However, only works on objects named "Humanoid" (this is intentional)
-
+	---- Retrieves a humanomid from a descendant (Players only).
 	-- @param Descendant The child you're searching up from. Really, this is for weapon scripts. 
-	-- @return Humanoid, or nil. 
-	
+	-- @return A humanoid in the parent structure if it can find it. Intended to be used in
+	--     workspace  only. Useful for weapon scripts, and all that, especially to work on non
+	--     player targets. Will scan *up* to workspace . If workspace   has a humanoid in it, it
+	--     won't find it.
+	-- Will work even if there are non-humanoid objects named "Humanoid" However, only works on
+	-- objects named "Humanoid" (this is intentional)
+
+
 	while true do
 		local Humanoid = Descendant:FindFirstChild("Humanoid")
 
@@ -226,12 +207,11 @@ local function GetHumanoid(Descendant)
 	end
 end
 lib.GetHumanoid = GetHumanoid
-lib.getHumanoid = GetHumanoid
-
 
 local function GetCharacter(Descendant)
-	-- Returns the Player and Character that a descendent is part of, if it is part of one.
+	--- Returns the Player and Character that a descendent is part of, if it is part of one.
 	-- @param Descendant A child of the potential character. 
+	-- @return The character found.
 
 	local Character = Descendant
 	local Player   = Players:GetPlayerFromCharacter(Character)
@@ -248,33 +228,29 @@ local function GetCharacter(Descendant)
 	-- Found the player, character must be true.
 	return Character, Player
 end
-lib.getCharacter = GetCharacter
 lib.GetCharacter = GetCharacter
-lib.get_character = GetCharacter
-
 lib.GetPlayerFromCharacter = GetCharacter
-lib.getPlayerFromCharacter = GetCharacter
-lib.get_player_from_character = GetCharacter
 
 local function CheckPlayer(Player)
 	--- Makes sure a player has all necessary components.
+	-- @param Player The Player to check for
 	-- @return Boolean If the player has all the right components
 
 	return Player and Player:IsA("Player") and Player:IsDescendantOf(Players)
 end
-lib.checkPlayer = CheckPlayer
 lib.CheckPlayer = CheckPlayer
-lib.check_player = CheckPlayer
-
 
 local function CheckCharacter(Player)
-	-- Makes sure a character has all the right "parts"
+	--- Makes sure a character has all the right "parts". This also validates the player's status as
+	--  a player. This is useful when you want to load a character, as ROBLOX's character added
+	--  event doesn't guarantee loaded character status.
+	-- @param Player The player to search for
+	-- @return Boolean, True if it's good, false if it's not.
 	
 	if CheckPlayer(Player) then
-		local Character = Player.Character;
+		local Character = Player.Character
 
 		if Character then
-			
 			return Character.Parent
 				and Character:FindFirstChild("Humanoid")
 				and Character:FindFirstChild("HumanoidRootPart")
@@ -291,29 +267,36 @@ local function CheckCharacter(Player)
 
 	return nil
 end
-lib.checkCharacter = CheckCharacter
 lib.CheckCharacter = CheckCharacter
-lib.check_character = CheckCharacter
 
 
 local function GetIndexByValue(Values, Value)
-	-- Return's the index of a Value. 
+	--- Return's the index of a Value in a table.
+	-- @param Values A table to search for 
+	-- @value the Value to search for
+	-- @return THe key of the value. Returns nil if it can't find it.
 
 	for Index, TableValue in next, Values do
 		if Value == TableValue then
-			return Index;
+			return Index
 		end
 	end
 
 	return nil
 end
-lib.getIndexByValue = GetIndexByValue
 lib.GetIndexByValue = GetIndexByValue
-lib.get_index_by_value = GetIndexByValue
 
 
 local function Class(Constructor, Metatable)
-	--- Provides a wrapper for new classes. 
+	--- Provides a wrapper for new classes. Abuses closures to create this class. It's recommended
+	--  this class system not be used. Left here for legacy reasons. This sort of class system is
+	--  more efficient in terms of calcuation speed, but costs more to construct and uses a lot more
+	--  memory. In most cases, the fact it's linked to qSystems makes it unreasonable to use this
+	--  class system. Furthermore, this class system does not do inheritance well.
+	-- @param Constructor A function that's passed the parameters `newClass` and any extra arguments
+	--     passed in on construction
+	-- @param [Metatable] The metatable to assign to the new class. 
+	-- @return The constructor of the class to use
 
 	local ConstructNewClass
 
@@ -336,11 +319,13 @@ local function Class(Constructor, Metatable)
 
 	return ConstructNewClass
 end
-lib.class = Class;
-lib.Class = Class;
+lib.Class = Class
 
 local function Sign(Number)
-	-- Return's the mathetmatical sign of an object
+	--- Return's the mathetmatical sign of an object
+	-- @param Number The number to use
+	-- @return An int from [-1, 1]. 
+
 	if Number == 0 then
 		return 0
 	elseif Number > 0 then
@@ -350,7 +335,5 @@ local function Sign(Number)
 	end
 end
 lib.Sign = Sign
-lib.sign = Sign
-
 
 return lib
