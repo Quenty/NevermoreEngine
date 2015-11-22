@@ -28,6 +28,9 @@ function ModelRender3D:SetModel(Model)
 	
 	if Model then
 		assert(Model.PrimaryPart, "Model needs primary part")
+		self.PrimaryPart = Model.PrimaryPart
+	else
+		self.PrimaryPart = nil
 	end
 end
 
@@ -41,7 +44,7 @@ end
 
 function ModelRender3D:GetModelWidth()
 	local ModelSize = self.Model:GetExtentsSize() * self.Scale
-	return ModelSize.X-- math.sqrt(ModelSize.X^2+ModelSize.Z^2)
+	return math.max(ModelSize.X, ModelSize.Y, ModelSize.Z)--ModelSize.X-- math.sqrt(ModelSize.X^2+ModelSize.Z^2)
 end
 
 function ModelRender3D:UseScale(Scale)
@@ -53,20 +56,21 @@ end
 function ModelRender3D:GetPrimaryCFrame()
 	if self.Gui and self.Model then
 		local Frame = self.Gui
-		local ModelSize = self.Model:GetExtentsSize() * self.Scale
+		local ModelSize = self.PrimaryPart.Size * self.Scale
+		
 		local FrameAbsoluteSize = Frame.AbsoluteSize
 		local FrameCenter = Frame.AbsolutePosition + FrameAbsoluteSize/2 -- Center of the frame. 
 		
-		local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, ModelSize.X)--math.max(ModelSize.X, ModelSize.Z))
+		local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, math.max(ModelSize.X, ModelSize.Y, ModelSize.Z))--math.max(ModelSize.X, ModelSize.Z))
 		
 		local Position = ScreenSpace.ScreenToWorld(FrameCenter.X, FrameCenter.Y, Depth)
 		local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame * 
-		                      CFrame.new(Position) * -- Transform by camera coordinates
-		                      CFrame.new(0, 0, -ModelSize.Z/2) -- And take out the part size factor. 
+		                      CFrame.new(Position)--[[ * -- Transform by camera coordinates
+		                      CFrame.new(0, 0, -ModelSize.Z/2) -- And take out the part size factor. --]]
 		
 		return AdorneeCFrame * self.RelativeRotation
 	else
-		warn("Cannot update model render, GUI or model aren't there.")
+		warn("ModelRender3D cannot update model render, GUI or model aren't there.")
 	end
 end
 
