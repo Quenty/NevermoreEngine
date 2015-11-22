@@ -16,6 +16,7 @@ function GUIRender3D.new(Frame)
 	local self = setmetatable({}, GUIRender3D)
 	
 	self.Depth = -10 -- studs
+	self.RenderParent = workspace.CurrentCamera
 	
 	return self
 end
@@ -27,14 +28,24 @@ function GUIRender3D:SetDepth(Depth)
 	self.Depth = Depth
 end
 
+function GUIRender3D:GetDepth()
+	return self.Depth
+end
+
 function GUIRender3D:GetFrame()
 	return self.Frame
+end
+
+function GUIRender3D:WithRenderParent(RenderParent)
+	self.RenderParent = RenderParent or error()
+	
+	return self
 end
 
 function GUIRender3D:SetFrame(Frame)
 	self.Frame = Frame or error()
 	
-	local Part = Instance.new("Part", workspace.CurrentCamera)
+	local Part = Instance.new("Part", self.RenderParent)
 	Part.Archivable = false
 	Part.FormFactor = "Custom"
 	Part.CanCollide = false
@@ -87,7 +98,7 @@ function GUIRender3D:Hide()
 end
 
 function GUIRender3D:Show()
-	self.Part.Parent = workspace.CurrentCamera
+	self.Part.Parent = self.RenderParent
 end
 
 function GUIRender3D:GetPrimaryCFrame()
@@ -101,9 +112,11 @@ function GUIRender3D:GetPrimaryCFrame()
           CFrame.new(0, 0, -self.Part.Size.Z/2) -- And take out the part size factor. 
 end
 
-function GUIRender3D:Update()
+function GUIRender3D:Update(RelativeCFrame)
+	RelativeCFrame = RelativeCFrame or CFrame.new()
+
 	self:UpdatePartSize()
-	self.Part.CFrame = self:GetPrimaryCFrame()
+	self.Part.CFrame = self:GetPrimaryCFrame() * RelativeCFrame
 end
 
 function GUIRender3D:Destroy()
