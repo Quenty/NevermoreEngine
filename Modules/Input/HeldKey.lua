@@ -29,7 +29,7 @@ function HeldInput:HandleNewState(UserInputState)
 		self.RepeatFunction()
 		delay(self.InitialDelayTime, function()
 			while LocalPressId == self.PressId do
-				self.RepeatFunction()
+				self.RepeatFunction(UserInputState)
 				wait(self.DelayTime)
 			end
 		end)
