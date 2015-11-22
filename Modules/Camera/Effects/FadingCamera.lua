@@ -1,0 +1,60 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+
+local CameraState       = LoadCustomLibrary("CameraState")
+local SpringPhysics     = LoadCustomLibrary("SpringPhysics")
+local SummedCamera       = LoadCustomLibrary("SummedCamera")
+
+
+-- Intent: Add another layer of effects that can be faded in/out
+
+local FadingCamera = {}
+FadingCamera.ClassName = "FadingCamera"
+
+function FadingCamera.new(Camera)
+	local self = setmetatable({}, FadingCamera)
+
+	self.Spring = SpringPhysics.NumberSpring.New()
+
+	self.Camera = Camera or error("No camera")
+	self.Damper = 1
+	self.Speed = 20
+
+	return self
+end
+
+function FadingCamera:__add(Other)
+	return SummedCamera.new(self, Other)
+end
+
+function FadingCamera:__newindex(Index, Value)
+	if Index == "Damper" then
+		self.Spring.Damper = Value
+	elseif Index == "Speed" then
+		self.Spring.Speed = Value
+	elseif Index == "Target" then
+		self.Spring.Target = Value
+	elseif Index == "Spring" or Index == "Camera" then
+		rawset(self, Index, Value)
+	else
+		error(Index .. " is not a valid member of fading camera")
+	end
+end
+
+function FadingCamera:__index(Index)
+	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+		return (self.Camera.CameraState or self.Camera) * self.Spring.Value
+	elseif Index == "Damper" then
+		return self.Spring.Damper
+	elseif Index == "Speed" then
+		return self.Spring.Speed
+	elseif Index == "Target" then
+		return self.Spring.Target
+	else
+		return FadingCamera[Index]
+	end
+end
+
+return FadingCamera
