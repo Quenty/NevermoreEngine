@@ -24,4 +24,22 @@ local function LerpUDim2(UDim2One, UDim2Two, Alpha)
 end
 lib.LerpUDim2 = LerpUDim2
 
+local function Mult(UDim2One, UDim2Two)
+	return UDim2.new(
+		UDim2One.X.Scale * UDim2Two.X.Scale,
+		UDim2One.X.Offset * UDim2Two.X.Offset,
+		UDim2One.Y.Scale * UDim2Two.Y.Scale,
+		UDim2One.Y.Offset * UDim2Two.Y.Offset)
+end
+lib.Mult = Mult
+
+local function Divide(UDim2One, UDim2Two)
+	return UDim2.new(
+		UDim2One.X.Scale / UDim2Two.X.Scale,
+		UDim2One.X.Offset / UDim2Two.X.Offset,
+		UDim2One.Y.Scale / UDim2Two.Y.Scale,
+		UDim2One.Y.Offset / UDim2Two.Y.Offset)
+end
+lib.Divide = Divide
+
 return lib
