@@ -502,7 +502,7 @@ local function WeldTogether(Part0, Part1, JointType, WeldParent, JointAxisCFrame
 	-- @param Part0 The first part
 	-- @param Part1 The second part (Dependent part most of the time).
 	-- @param [JointType] The type of joint. Defaults to weld.
-	-- @param [WeldParent] Parent of the weld, Defaults to game.JointsService (Joints GC automatically from there)
+	-- @param [WeldParent] Parent of the weld, Defaults to Part0 (Joints GC automatically from JointsService, but the real issue is when you :Destroy() and descending joints do not, )
 	-- @param [JointAxisCFrame] The CFrame axis of the joints. Optional. Defaultas as Part0's CFrame
 	-- @return The weld created.
 
@@ -514,7 +514,7 @@ local function WeldTogether(Part0, Part1, JointType, WeldParent, JointAxisCFrame
 	NewWeld.Part1  = Part1
 	NewWeld.C0     = Part0.CFrame:toObjectSpace(JointAxisCFrame)
 	NewWeld.C1     = Part1.CFrame:toObjectSpace(JointAxisCFrame)
-	NewWeld.Parent = game.JointsService
+	NewWeld.Parent = Part0
 	
 	return NewWeld
 end
