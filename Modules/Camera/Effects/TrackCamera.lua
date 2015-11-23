@@ -1,0 +1,60 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+
+local CameraState       = LoadCustomLibrary("CameraState")
+local SummedCamera      = LoadCustomLibrary("SummedCamera")
+
+local TrackCamera = {}
+TrackCamera.ClassName = "TrackCamera"
+TrackCamera.FieldOfView = 0
+
+-- Intent: Track a current element
+
+function TrackCamera.new(CameraSubject)
+	-- @param [CameraSubject] The CameraSubject to look at. A ROBLOX part of ROBLOX model
+	
+	local self = setmetatable({}, TrackCamera)
+
+	self.CameraSubject = CameraSubject
+
+	return self
+end
+
+function TrackCamera:__add(Other)
+	return SummedCamera.new(self, Other)
+end
+
+function TrackCamera:__newindex(Index, Value)
+	if Index == "CameraSubject" then
+		assert(type(Value) == "userdata" or type(Value) == "nil", "CameraSubject must be a ROBLOX Model or ROBLOX Part or nil")
+		rawset(self, Index, Value)
+	elseif Index == "FieldOfView" then
+		rawset(self, Index, Value)
+	else
+		error(Index .. " is not a valid member of TrackCamera")
+	end
+end
+
+function TrackCamera:__index(Index)
+	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+		local CameraSubject = self.CameraSubject
+		local State = CameraState.new()
+		State.FieldOfView = self.FieldOfView
+
+		if CameraSubject then
+			if CameraSubject:IsA("Model") then
+				State.CoordinateFrame = CameraSubject:GetPrimaryPartCFrame()
+			elseif CameraSubject:IsA("BasePart") then
+				State.CoordinateFrame = CameraSubject.CFrame
+			end
+		end
+
+		return State
+	else
+		return TrackCamera[Index]
+	end
+end
+
+return TrackCamera
