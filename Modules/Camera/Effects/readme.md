@@ -3,6 +3,9 @@ Camera state is an immutable camera system used for camera interpolation. Design
 
 Camera state stores internal state of Coordinate frames as quaternions. This means that the classic lerp equation. Operations have been overridden to make this easier to work with.
 
+Ok. It's not entirely immutable. They are kind of lazy, that is, reading data doesn't affect the state of them. There are no
+required update loops or anything for the most part.
+
 ### Camera effect API
 Current Camera Effects have the following API available. Adding new effects means that these two should follow the same API specifications
 
@@ -27,6 +30,7 @@ This class tracks the current camera ROBLOX uses and lets it maintain how it ope
 
 * Should call `BindToRenderStep` during construction
 * Only one should exist at once per client (not enforced in code, however)
+* Requires a SpringPhysics module that is not distributed by Nevermore right now
 
 #### SummedCamera
 This class takes two arguments and returns the summation of the two
@@ -37,3 +41,4 @@ This class takes two arguments and returns the summation of the two
 This classes allows the effects of a camera to be faded / varied based upon a spring
 
 * Starts at 0 percent effect
+* Requires a SpringPhysics module that is not distributed by Nevermore right now
