@@ -5,7 +5,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState       = LoadCustomLibrary("CameraState")
 local SpringPhysics     = LoadCustomLibrary("SpringPhysics")
-local SummedCamera       = LoadCustomLibrary("SummedCamera")
+local SummedCamera      = LoadCustomLibrary("SummedCamera")
 
 
 -- Intent: Add another layer of effects over any other camera by allowing an "impulse"
