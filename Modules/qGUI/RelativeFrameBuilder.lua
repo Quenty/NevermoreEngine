@@ -29,12 +29,14 @@ function RelativeFrameBuilder.new()
 
 	self.RelativePosition = self.Types.Middle
 	self.SizeConstraint = "RelativeXY"
+	self.Name = "RelativeFrame"
 
 	return self
 end
 
 function RelativeFrameBuilder:WithType(Name)
-	return self:WithRelativePosition(self.Types[Name] or error("Not a default type"))
+	self.Name = Name or error("Sent invalid name")
+	return self:WithPosition(self.Types[Name] or error("Not a default type"))
 end
 
 function RelativeFrameBuilder:WithPosition(RelativePosition)
@@ -66,7 +68,7 @@ function RelativeFrameBuilder:Create()
 		Parent = self.Parent; -- may be nil
 		Size = UDim2.new(1, 0, 1, 0);
 		Position = UDim2.new(self.RelativePosition.X, 0, self.RelativePosition.Y, 0);
-		Name = "RelativeFrame";
+		Name = self.Name;
 		SizeConstraint = self.SizeConstraint;
 	})
 end
