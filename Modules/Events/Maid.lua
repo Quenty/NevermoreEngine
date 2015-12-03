@@ -8,6 +8,7 @@ API:
  
 	Maid[key] = (function)            Adds a task to perform when cleaning up.
 	Maid[key] = (event connection)    Manages an event connection. Anything that isn't a function is assumed to be this.
+	Maid[key] = (Maid)                Maids can act as an event connection, allowing a Maid to have other maids to clean up.
 	Maid[key] = nil                   Removes a named task. If the task is an event, it is disconnected.
  
 	Maid:GiveTask(task)               Same as above, but uses an incremented number as a key.
@@ -33,9 +34,9 @@ local MakeMaid do
 				end
 				tasks[name] = nil
 			end
-			-- self.Tasks = {}
 		end;
 	};
+	index.disconnect = index.DoCleaning -- Allow maids to be stacked.
 
 	local mt = {
 		__index = function(self, k)
