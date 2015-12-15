@@ -72,6 +72,18 @@ end
 lib.LerpColor3 = LerpColor3
 lib.lerpColor3 = LerpColor3
 
+local function LerpColor3HSL(ColorOne, ColorTwo, Alpha)
+	--- Interpolates between two color3 values using HSL.
+	-- @param ColorOne The first Color
+	-- @param ColorTwo The second color
+	-- @param Alpha The amount to interpolate between
+	-- @return The resultent Color3 value. 
+		
+	local H1, S1, L1 = lib.RGBtoHSL(ColorOne.r, ColorOne.g, ColorOne.b)
+	local H2, S2, L2 = lib.RGBtoHSL(ColorTwo.r, ColorTwo.g, ColorTwo.b)
+	return Color3.new(lib.HSLtoRGB(LerpNumber(H1, H2, Alpha), LerpNumber(S1, S2, Alpha), LerpNumber(L1, L2, Alpha)))
+end
+lib.LerpColor3HSL = LerpColor3HSL
 
 
 -- Code from Anaminus --
@@ -183,6 +195,16 @@ local function SetLuminance(Color, Luminance)
 	return Color3.new(HSLtoRGB(H, S, Luminance))
 end
 lib.SetLuminance = SetLuminance
+
+local function SetHue(Color, Hue)
+	-- @param Color The color to set hue
+	-- @param [Hue] A number from 0 to 1 of what hue it should be
+
+	local H, S, L = Color3ToHSL(Color)
+	return Color3.new(HSLtoRGB(H, S, Hue))
+end
+lib.SetHue = SetHue
+
 
 local function AdjustColorTowardsWhite(Color)
 	--- We'll use this to try to make text more readable. Mess with saturation and Luminance, while keeping hue
