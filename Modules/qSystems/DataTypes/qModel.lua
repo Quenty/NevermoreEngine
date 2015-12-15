@@ -13,7 +13,7 @@ local lib = {}
 
 local NON_FORM_FACTOR_PARTS = {
 	["TrussPart"]       = true,
-	["VehichleSeat"]    = true,
+	["VehicleSeat"]    = true,
 	["CornerWedgePart"] = true,
 	["UnionOperation"]  = true,
 }
@@ -25,7 +25,7 @@ local MINIMUM_SIZES = {
 	["Custom"]    = Vector3.new(0.2, 0.2, 0.2),
 
 	["TrussPart"]       = Vector3.new(2, 2, 2),
-	["VehichleSeat"]    = Vector3.new(1, 1, 1),
+	["VehicleSeat"]    = Vector3.new(1, 1, 1),
 	["CornerWedgePart"] = Vector3.new(1, 1, 1),
 	["UnionOperation"]  = Vector3.new(0, 0, 0),
 }
