@@ -5,6 +5,9 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid          = LoadCustomLibrary("Maid").MakeMaid
+local qMath             = LoadCustomLibrary("qMath")
+
+local ClampNumber = qMath.ClampNumber
 
 -- Intent: Interface between user input and camera controls
 
@@ -31,11 +34,51 @@ function CameraControls:SetRotationCamera(RotationCamera)
 	return self
 end
 
+local function rk4Integrator(position, velocity, t)
+	-- Stolen directly from ROBLOX's core scripts.
+	-- Looks like a simple integrator. 
+	-- Called (zoom, zoomScale, 1) returns zoom
+
+	local direction = velocity < 0 and -1 or 1
+	local function acceleration(p, v)
+		local accel = direction * math.max(1, (p / 3.3) + 0.5)
+		return accel
+	end
+
+	local p1 = position
+	local v1 = velocity
+	local a1 = acceleration(p1, v1)
+	local p2 = p1 + v1 * (t / 2)
+	local v2 = v1 + a1 * (t / 2)
+	local a2 = acceleration(p2, v2)
+	local p3 = p1 + v2 * (t / 2)
+	local v3 = v1 + a2 * (t / 2)
+	local a3 = acceleration(p3, v3)
+	local p4 = p1 + v3 * t
+	local v4 = v1 + a3 * t
+	local a4 = acceleration(p4, v4)
+
+	local positionResult = position + (v1 + 2 * v2 + 2 * v3 + v4) * (t / 6)
+	local velocityResult = velocity + (a1 + 2 * a2 + 2 * a3 + a4) * (t / 6)
+	return positionResult, velocityResult
+end
+
 function CameraControls:HandleMouseWheel(InputObject)
-	self.ZoomCamera:ZoomIn(InputObject.Position.Z*1.4, -1.4, 1.4)
+	--- This code was the same algorithm used by ROBLOX. It makes it so you can zoom easier at further distances.
+
+	local Delta = ClampNumber(-InputObject.Position.Z, -1, 1)*1.4
+	local Zoom = rk4Integrator(self.ZoomCamera.TargetZoom, Delta, 1)
+
+	if self.RotationCamera.ClassName == "PushCamera" then
+		self.RotationCamera:StopRotateBack()
+	end
+	
+	self.ZoomCamera.TargetZoom = Zoom
 end
 
 function CameraControls:MouseTranslationToAngle(translationVector)
+	--- This is also a ROBLOX algorithm. Not sure why screen resolution is locked like it is.
+
 	local xTheta = (translationVector.x / 1920)
 	local yTheta = (translationVector.y / 1200)
 	return Vector2.new(xTheta, yTheta)
