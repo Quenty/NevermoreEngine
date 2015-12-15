@@ -16,12 +16,18 @@ local GetCharacter = qSystems.GetCharacter
 
 local lib = {}
 
-local function IsTeamMate(PlayerOne, PlayerTwo)
+local function IsTeamMate(PlayerOne, PlayerTwo, NeutralCounts)
 	--- Are playerone and playertwo teammates?
+	-- @param [NeutralCounts=true] Whether neutral counts as neutral. True if neutral players are considered teammates.
 
-	if PlayerOne.Neutral == PlayerTwo.Neutral then
+
+	NeutralCounts = NeutralCounts == nil and true or NeutralCounts
+	
+	if PlayerOne == PlayerTwo then
+		return false
+	elseif PlayerOne.Neutral == PlayerTwo.Neutral then
 		if PlayerOne.Neutral then
-			return true
+			return NeutralCounts
 		else
 			return PlayerOne.TeamColor.Name == PlayerTwo.TeamColor.Name
 		end
