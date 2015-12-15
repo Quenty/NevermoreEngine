@@ -24,12 +24,18 @@ RelativeFrameBuilder.Types = {
 	MiddleBottom = Vector2.new(0.5, 1);
 }
 
-function RelativeFrameBuilder.new()
+function RelativeFrameBuilder.new(Parent)
+	-- @param [Parent] Parent to use
+
 	local self = setmetatable({}, RelativeFrameBuilder)
 
 	self.RelativePosition = self.Types.Middle
 	self.SizeConstraint = "RelativeXY"
 	self.Name = "RelativeFrame"
+
+	if Parent then
+		RelativeFrameBuilder:WithParent(Parent)
+	end
 
 	return self
 end
