@@ -55,6 +55,9 @@ function MasterClock:HandleDelayRequest(TimeThree)
     return TimeFour - TimeThree -- -Offset + SM Delay
 end
 
+function MasterClock:IsSynced()
+	return true
+end
 
 
 
@@ -79,6 +82,10 @@ function SlaveClock.new(SyncEvent, DelayedRequestFunction)
 	self.SyncEvent:FireServer()
 	
 	return self
+end
+
+function SlaveClock:IsSynced()
+	return self.Offset ~= -1
 end
 
 function SlaveClock:GetLocalTime()
