@@ -76,7 +76,7 @@ local function RoundNumber(Number, Divider)
 
 	Divider = Divider or 1
 
-	return (math.floor((Number/Divider)+0.5)*Divider)
+	return math.floor(Number/Divider+0.5)*Divider
 end
 lib.RoundNumber = RoundNumber
 lib.Round = RoundNumber
@@ -130,7 +130,7 @@ local function WaitForChild(Parent, Name, TimeLimit)
 		Child = Parent:FindFirstChild(Name)
 		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
 			Warned = true
-				warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")")
+				warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. debug.traceback())
 			if TimeLimit then
 				return Parent:FindFirstChild(Name)
 			end
