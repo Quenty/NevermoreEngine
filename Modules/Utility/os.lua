@@ -1,6 +1,9 @@
 -- to use: local os = require(this_script)
 -- Adds an os.date() function back to the Roblox os table!
 -- More precise than qTime (doesn't use 365.25 days per year)
+-- Abbreviated tables have been left in for now. Could be replaced with dayNames[wday + 1]:sub(1,3)
+
+local firstRequired = os.time()
 
 return {
 help = function(...) return 
@@ -62,11 +65,11 @@ date = function(unix, opt)
 			unix		= unix:match("/Date%((%d+)") / 1000
 			JSONOption	= true
 
-		elseif unix == "*t" then
-			unix		= opt or nil
+		elseif unix:find("*t") then
+			unix		= unix:find("^!") and os.time() or opt or nil
 		else
 			assert(unix:find("%%"), "Invalid string passed to os.date")
-			opt, unix	= unix, opt
+			opt, unix	= unix:find("^!") and unix:sub(2) or unix, unix:find("^!") and os.time() or opt
 			stringPassed = true
 		end
 	end
@@ -138,5 +141,6 @@ date = function(unix, opt)
 	return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 end,
 time = function(...) return os.time(...) end,
-difftime = function(...) return os.difftime(...) end
+difftime = function(...) return os.difftime(...) end,
+clock = function(...) return os.difftime(os.time(), firstRequired) end
 }
