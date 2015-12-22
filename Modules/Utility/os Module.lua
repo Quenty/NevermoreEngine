@@ -1,4 +1,4 @@
--- local os = require(this_script)
+-- to use: local os = require(this_script)
 -- Adds an os.date() function back to the Roblox library!
 -- More precise than qTime (doesn't use 365.25 days per year)
 
