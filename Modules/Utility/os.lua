@@ -71,7 +71,7 @@ date = function(unix, opt)
 		end
 	end
 
-	local unix		= type(unix) == "number" and unix or os.time()
+	local unix		= type(unix) == "number" and unix or tick()
 	local dayCount		= function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end
 	local year		= 1970
 	local days		= math.ceil(unix / 86400)
