@@ -28,22 +28,15 @@ end
 --- LIBRARY ---
 
 function lib.GetSecond(CurrentTime)
-	local TSec = CurrentTime % 86400
-	local CurrentSecond = math.floor(TSec%60)
-
-	return CurrentSecond;
+	return math.floor(CurrentTime % 60)
 end
 
 function lib.GetMinute(CurrentTime)
-	local TSec = CurrentTime % 86400
-	local CurrentMinute = math.floor((TSec/60)%60)
-	return CurrentMinute;
+	return math.floor(CurrentTime/60 % 60)
 end
 
 function lib.GetHour(CurrentTime)
-	local TSec = CurrentTime % 86400
-	local CurrentHour = math.floor((TSec/60/60)%24)
-	return CurrentHour;
+	return math.floor(CurrentTime / 3600 % 24)
 end
 
 function lib.GetDay(CurrentTime)
@@ -276,7 +269,7 @@ end
 function lib.LeapYear(CurrentTime)
 	local Year = lib.GetYear(CurrentTime);
 
-	if Year % 4 == 0 then
+	if Year % 4 == 0 and (Year % 100 ~= 0 or Year % 400 == 0) then
 		return 1
 	else
 		return 0
