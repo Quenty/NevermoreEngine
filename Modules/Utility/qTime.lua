@@ -18,7 +18,7 @@ local DaysOfTheWeekShort = {"Sun";    "Mon";    "Tues";    "Weds";      "Thurs";
 local function FixLeapYear(Year)
 	--- Fixes The DaysInMonth table, given a year. 
 
-	if Year % 4 == 0 then
+	if Year % 4 == 0 and (Year % 100 ~= 0 or Year % 400 == 0) then
 		DaysInMonth[2] = 29;
 	else
 		DaysInMonth[2] = 28;
