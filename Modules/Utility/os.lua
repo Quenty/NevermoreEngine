@@ -83,6 +83,7 @@ date = function(unix, opt)
 	local dayNamesAbbr	= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 	local monthsAbbr	= {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	local months, month	= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+--	local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
 	local hours		= math.floor(unix / 3600 % 24)
 	local minutes		= math.floor(unix / 60 % 60)
 	local seconds		= math.floor(unix % 60)
