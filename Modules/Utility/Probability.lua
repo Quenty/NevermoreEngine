@@ -10,11 +10,11 @@ function lib.BoxMuller()
 end
 
 function lib.UnboundedNormalDistribution(Average, StdDeviation)
-	return Average + BoxMuller() * StdDeviation
+	return Average + lib.BoxMuller() * StdDeviation
 end
 
 function lib.NormalDistribution(Average, StdDeviation, HardMin, HardMax)
-	return math.min(HardMax, math.max(HardMin, Average + BoxMuller() * StdDeviation))
+	return math.min(HardMax, math.max(HardMin, Average + lib.BoxMuller() * StdDeviation))
 end
 
 return lib
