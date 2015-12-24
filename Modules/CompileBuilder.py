@@ -1,4 +1,5 @@
 import os
+import fnmatch
 
 # Writes files to ModuleList.txt for easy installation
 # Author: Quenty
@@ -7,11 +8,15 @@ import os
 # the name of the file
 
 fileList = ''
+ignoreFiles = ['AxisCameraEngine.lua', 'SpringPhysics.lua']
 
 for (root, dirNames, fileNames) in os.walk("."):
-    for fileName in fileNames:
-        if fileName.endswith('.lua'):
-            #fileName = fileName[:-4]
+    newFileNames = fileNames
+
+    for ignoreName in ignoreFiles:
+        newFileNames = [fileName for fileName in newFileNames if not fnmatch.fnmatch(fileName, ignoreName)]
+
+    for fileName in [fileName for fileName in newFileNames if fileName.endswith('.lua')]:
             fileList += os.path.join(root[2:], fileName) + '\n'
 
 print(fileList)
