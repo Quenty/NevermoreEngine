@@ -55,31 +55,34 @@ return {
 		-- Precise!
 
 		local stringPassed = false
-
-		if type(optString) == "string" then
-			if optString:find("*t") then
-				unix		= optString:find("^!") and os.time() or unix
-			else
-				assert(optString:find("%%"), "Invalid string passed to os.date")
-				optString, unix	= optString:find("^!") and optString:sub(2) or optString, optString:find("^!") and os.time() or unix
-				stringPassed = true
-			end
-		end
-
-		if type(optString) == "number" or optString:match("/Date%((%d+)") or optString:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then
-			unix, optString = optString
-		end
 		
-		if type(unix) == "string" then
-			if unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
-				unix		= unix:match("/Date%((%d+)") / 1000
-			elseif unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- Untested MarketPlaceService compatibility
-				-- This part of the script is untested
-				local year, month, day, hour, minute, second = unix:match("(%d+)\-(%d+)\-(%d+)T(%d+):(%d+):([%d%.]+).+")
-				unix = os.time{year = year, month = month, day = day, hour = hour, minute = minute, second = second}
+		if not (optString == nil and unix == nil) then
+
+			if type(optString) == "string" then
+				if optString:find("*t") then
+					unix		= optString:find("^!") and os.time() or unix
+				else
+					assert(optString:find("%%"), "Invalid string passed to os.date")
+					optString, unix	= optString:find("^!") and optString:sub(2) or optString, optString:find("^!") and os.time() or unix
+					stringPassed = true
+				end
+			end
+
+			if type(optString) == "number" or optString:match("/Date%((%d+)") or optString:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then
+				unix, optString = optString
+			end
+
+			if type(unix) == "string" then
+				if unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
+					unix		= unix:match("/Date%((%d+)") / 1000
+				elseif unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- Untested MarketPlaceService compatibility
+					-- This part of the script is untested
+					local year, month, day, hour, minute, second = unix:match("(%d+)\-(%d+)\-(%d+)T(%d+):(%d+):([%d%.]+).+")
+					unix = os.time{year = year, month = month, day = day, hour = hour, minute = minute, second = second}
+				end
 			end
 		end
-	
+
 		local unix		= type(unix) == "number" and unix or tick()
 		local dayCount		= function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end
 		local year		= 1970
