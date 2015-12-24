@@ -36,6 +36,22 @@ function BindableAction.new(ActionName, InputTypes)
 	return self
 end
 
+function BindableAction.FromUsualInput(ActionName, Function, CreateTouchButton, ...)
+	local New = BindableAction.new(ActionName or error("No ActionName"), {...})
+
+	if CreateTouchButton ~= nil then
+		New:SetCreateTouchButton(CreateTouchButton)
+	end
+
+	if type(Function) == "function" then
+		New:BindFunction("Primary", Function)
+	else
+		error("Function must be a function");
+	end
+
+	return New
+end
+
 function BindableAction.FromData(Data)
 	--- Construct from table
 	--[[
@@ -44,6 +60,9 @@ function BindableAction.FromData(Data)
 			FunctionToBind = function(ActionName, UserInputState, InputObject)
 				-- Use UserInputState to determine whether the input is beginning or endnig
 			end;
+			[FunctionToBind] = {
+				... -- Bind multiple functions
+			}
 			CreateTouchButton = false;
 			[ButtonTitle] = "Fly";
 			[ButtonImage] = "rbxassetid://137511721";

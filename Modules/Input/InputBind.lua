@@ -46,10 +46,16 @@ function InputBind:AddAction(Action)
 	if self:IsBound() then
 		self:BindAction(Action)
 	end
+
+	return Action
 end
 
 function InputBind:GetAction(ActionName)
 	return self.AllActions[ActionName]
+end
+
+function InputBind:Add(ActionName, Function, CreateTouchButton, ...)
+	return self:AddAction(BindableAction.FromUsualInput(ActionName, Function, CreateTouchButton, ...))
 end
 
 function InputBind:AddFromData(ActionData)
