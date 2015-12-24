@@ -1,9 +1,96 @@
-## About
+# About
 NevermoreEngine is a collection of useful libraries for ROBLOX development.
 
 Pick and choose the libraries to load, and NevermoreEngine will lazily load libraries and dependencies.
 
-## Installation
+## Features 
+* **Lazy loading** - Loads libraries only when you ask for them
+* **Lots of libraries** - Lots of libraries that handle all sorts of logical issues that may occur during ROBLOX game development
+* **Tested** - Used in several games that have made it to the front page, NevermoreEngine works without lots of testing
+* **Simple** - Nevermore is essential a big group of libraries with lots of utility functions. It's designed with simplicity in mind.
+	* The main module is only 200 lines long
+	* Fast install, just one line in the command line
+* **Open source** - Nevermore is open source
+* **Built for ROBLOX** - Nevermore is built for ROBLOX
+
+# Easy Installation
+Paste the following code into your command bar in ROBLOX Studio to install Nevermore.
+
+```lua
+local a=game:GetService("HttpService")local b=game:GetService("ReplicatedStorage")local c=game:GetService("ServerScriptService")local d=a.HttpEnabled;a.HttpEnabled=true;local function e(f)f=f:gsub("\\","/"):gsub("^%s*(.-)%s*$","%1")return a:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/"..f)end;local function g(h,f)local i=f:gmatch("(%w+)%.lua")()local j=h:FindFirstChild(i)or Instance.new("ModuleScript",h)j.Name=i;j.Source=e(f)or error("Unable to load script")return j end;local function k(h,f)local l=f:gmatch("%w+\\")()if l then l=l:sub(1,#l-1)local j=h:FindFirstChild(l)or Instance.new("Folder",h)j.Name=l;return k(j,f:sub(#l+2,#f))else return h end end;print("Loading Nevermore")g(b,"App/NevermoreEngine.lua")print("Loading sublibraries")local m=k(c,"NevermoreEngine\\")local n={}for o in e("Modules/ModuleList.txt"):gmatch("[^\r\n]+")do n[#n+1]=o end;for p,o in pairs(n)do g(k(m,o),"Modules/"..o)print(p,"/",#n)end;a.HttpEnabled=d;print("Done loading")
+```
+
+## Usage
+Load up Nevermore on your server and client. This is the header code you need.
+
+
+```lua
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+```
+
+### Loading a library
+With the above code, you can easily load a library and all dependencies
+
+```lua
+local qSystems = LoadCustomLibrary("qSystems")
+```
+
+Libraries have different functions with a variety of useful methods. For example, let's say we want to make a lava brick
+
+Vanilla ROBLOX Lua to turn all red parts into killing bricks
+```lua
+local function HandleTouch(Part)
+	-- Recursively find the humanoid
+	local Humanoid = Part:FindFirstChild("Humanoid")
+	if not Humanoid then
+		if Part.Parent then
+			return HandleTouch(Part.Parent)
+		end
+	elseif Humanoid:IsA("Humanoid") then
+		Part.Humanoid:TakeDamage(100)
+	end
+end
+
+local function RecurseApplyLava(Parent)
+	for _, Item in pairs(Parent:GetChildren()) do
+		if Item:IsA("BasePart") then
+			Item.Touched:connect(HandleTouch)
+		end
+
+		RecurseApplyLava(Item)
+	end
+end
+
+RecurseApplyLava(workspace)
+```
+
+With NevermoreEngine, this is easier:
+
+```lua
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local qSystems = LoadCustomLibrary("qSystems")
+
+local function HandleTouch(Part)
+	local Humanoid = qSystems.GetHumanoid(Part)
+	if Humanoid then
+		Humanoid:TakeDamage(100)
+	end
+end
+
+qSystems.CallOnChildren(workspace, function(Item)
+	if Item:IsA("BasePart") then
+		Item.Touched:connect(HandleTouch)
+	end
+end)
+```
+
+
+## Manual Installation
 Put `NevermoreEngine.lua`'s content's in `game.ReplicatedStorage` in a ModuleScript name `NevermoreEngine`
 
 Put all the modules in a folder in `game.ServerScriptStorage` and name them the names of their script, but without
