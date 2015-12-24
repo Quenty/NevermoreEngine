@@ -35,7 +35,7 @@ local PseudoChatManagerServer = LoadCustomLibrary("PseudoChatManagerServer")
 
 ### Load client components
 
-In `StarterPlayer.StarterPlayerScripts` go ahead and load local commands. Put this in a `LocalScript`
+In `PlayerGui` go ahead and load local commands. Put this in a `LocalScript`
 
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -56,6 +56,14 @@ local Chat do
 	Chat = PseudoChat.MakePseudoChat(ScreenGui)
 end
 ```
+
+#### For `ResetCoreGuiOnDeath=true`
+If you have ResetCoreGuiOnDeath as true, you should put the load code in the `StarterPlayer.StarterPlayerScripts`.
+
+This is preferred for several reasons
+
+* Don't have to reload chats everytime you die
+* Persistent chat
 
 Note that `ScreenGui` can be parented to whatever you want.
 
