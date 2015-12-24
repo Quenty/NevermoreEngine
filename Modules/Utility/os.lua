@@ -52,29 +52,22 @@ return {
 	end;
 	
 	date = function(optString, unix)
-		-- Precise!
 
 		local stringPassed = false
-		
+
 		if not (optString == nil and unix == nil) then
-
-			if type(optString) == "string" then
-				if optString:find("*t") then
-					unix		= optString:find("^!") and os.time() or unix
-				else
-					assert(optString:find("%%"), "Invalid string passed to os.date")
-					optString, unix	= optString:find("^!") and optString:sub(2) or optString, optString:find("^!") and os.time() or unix
-					stringPassed = true
-				end
-			end
-
 			if type(optString) == "number" or optString:match("/Date%((%d+)") or optString:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then
+				-- if they didn't pass a non unix time
 				unix, optString = optString
+			elseif type(optString) == "string" then
+				assert(optString:find("*t") or optString:find("%%"), "Invalid string passed to os.date")
+				unix, optString = optString:find("^!") and os.time() or unix, optString:find("^!") and optString:sub(2) or optString
+				stringPassed = true
 			end
 
 			if type(unix) == "string" then
 				if unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
-					unix		= unix:match("/Date%((%d+)") / 1000
+					unix = unix:match("/Date%((%d+)") / 1000
 				elseif unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- Untested MarketPlaceService compatibility
 					-- This part of the script is untested
 					local year, month, day, hour, minute, second = unix:match("(%d+)\-(%d+)\-(%d+)T(%d+):(%d+):([%d%.]+).+")
@@ -117,9 +110,8 @@ return {
 		padded = function(num)
 			return string.format("%02d", num)
 		end
-		if optString == "*t" then
-			return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
-		elseif stringPassed then
+		
+		if stringPassed then
 			local returner = optString
 			:gsub("%%c", "%%x %%X")
 			:gsub("%%_c", "%%_x %%_X")
