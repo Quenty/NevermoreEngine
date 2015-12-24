@@ -27,6 +27,11 @@ local a=game:GetService("HttpService")local b=game:GetService("ReplicatedStorage
 Please note that installing Nevermore will **not** change any behavior in your game. Nevermore is a collection of libraries. If you want to see the power of Nevermore try using some [Admin Commmands](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/QuentyAdminCommands)
 
 
+# Updating Nevermore
+
+To update Nevermore, back up your place file and run the install code above. It should preserve all of your existing code (although code changes to core Nevermore libraries will be overridden).
+
+
 ----
 
 ## Usage
