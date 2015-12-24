@@ -1,6 +1,7 @@
 *.sublime-project
 *.sublime-workspace
 *.txt
+!ModuleList.txt
 *.rbxl
 /TestScripts
 /DataConverters
