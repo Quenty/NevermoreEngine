@@ -44,10 +44,11 @@ local Players           = game:GetService("Players")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
+local qSystems = LoadCustomLibrary("qSystems")
 local NevermoreCommandsLocal = LoadCustomLibrary("NevermoreCommandsLocal")
 
 local LocalPlayer   = Players.LocalPlayer
-local PlayerGui     = WaitForChild(LocalPlayer, "PlayerGui")
+local PlayerGui     = qSystems.WaitForChild(LocalPlayer, "PlayerGui")
 local ScreenGui     = Instance.new("ScreenGui", PlayerGui)
 
 local Chat do

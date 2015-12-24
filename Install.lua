@@ -37,7 +37,7 @@ end
 print("Loading Nevermore")
 MakeScript(ReplicatedStorage, "App/NevermoreEngine.lua")
 print("Loading sublibraries")
-local MainDirectory = GetDirectory(ServerScriptService, "NevermoreEngine\\")
+local MainDirectory = GetDirectory(ServerScriptService, "Nevermore\\")
 local Paths = {}
 for ScriptPath in (LoadURL("Modules/ModuleList.txt")):gmatch("[^\r\n]+") do
 	Paths[#Paths+1] = ScriptPath
