@@ -94,6 +94,11 @@ function RotatingCharacter:__newindex(Index, Value)
 		self.Spring[Index] = Value
 	elseif Index == "Transparency" then
 		self._Transparency = Value
+
+		-- We need to call this because if transparency updates and we hit past "IsDoneAnimating" but not past 
+		-- actual position updates, the TransparencyMap is wrong.
+		self:UpdatePositionRender()
+
 		local TransparencyMap = self.TransparencyMap
 
 		for _, Data in pairs(self.TransparencyList) do
@@ -107,10 +112,14 @@ function RotatingCharacter:__newindex(Index, Value)
 	end
 end
 
-function RotatingCharacter:UpdateRender()
+function RotatingCharacter:UpdatePositionRender()
 	self.Label.Text = self.Character
 	self.LabelTwo.Text = self.NextCharacter
 	self.Label.Position = UDim2.new(0, 0, -(self.Position % 1), 0)
+end
+
+function RotatingCharacter:UpdateRender()
+	--self:UpdatePositionRender() -- Covered by setting transparency. Yeah. This is weird.
 	self.Transparency = self.Transparency
 
 	return self.IsDoneAnimating
@@ -330,6 +339,7 @@ function RotatingLabel:__newindex(Index, Value)
 				if NewIndex < 1 or NewIndex > #Value then
 					Label.TargetCharacter = " "
 				end
+				
 				self.Labels[Index] = nil
 			end
 
