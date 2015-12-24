@@ -1,4 +1,3 @@
-Camera\AxisCameraEngine.lua
 Camera\CameraPlus.lua
 Camera\CameraState.lua
 Camera\Easing.lua
@@ -44,7 +43,6 @@ Penlight\PenlightUtils.lua
 Physics\ParticleEngine.lua
 Physics\ProjectilePhysics.lua
 Physics\qPhysics.lua
-Physics\SpringPhysics.lua
 qCFrame\CFrameInterpolator.lua
 qCFrame\Joints.lua
 qCFrame\PartGeometry.lua
