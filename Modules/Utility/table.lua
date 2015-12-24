@@ -3,8 +3,8 @@
 
 return {
 	concat		= function(...) return table.concat		(...) end;
-	foreach		= function(...) return table.foreach	(...) end;
-	foreachi	= function(...) return table.foreachi	(...) end;
+	foreach		= function(...) return table.foreach		(...) end;
+	foreachi	= function(...) return table.foreachi		(...) end;
 	getn		= function(...) return table.getn		(...) end;
 	insert		= function(...) return table.insert		(...) end;
 	remove		= function(...) return table.remove		(...) end;
