@@ -1,145 +1,33 @@
 ## About
+NevermoreEngine is a collection of useful libraries for ROBLOX development.
 
-This script handles players and characters loading into the game and the 
-networking of information (read: ROBLOX Remote events being replicated)
-from the client to the server and vice versa. It handles resource management 
-and is designed to make libraries easily be loaded. 
+Pick and choose the libraries to load, and NevermoreEngine will lazily load libraries and dependencies.
 
-It should be parented to `ServerScriptService.NevermoreEngine`, and is a 
-`ModularScript`
+## Installation
+Put `NevermoreEngine.lua`'s content's in `game.ReplicatedStorage` in a ModuleScript name `NevermoreEngine`
 
-Nevermore was written for use in ROBLOX.
-
-
-# FAQ
-## What is Nevermore?
-Nevermore is Quenty's solution to reusing code on ROBLOX. It's a collaborate piece 
-of work that is actively used in games. Nevermore was developed several years ago,
-before Module Scripts. Now, Nevermore still provides an easy way to load modules
-and ensure reusable code.
-
-## What does Nevermore do?
-Nevermore handles three things. Loading libraries, loading code, and loading characters.
-To put it simply, ROBLOX's loading system when it comes to character respawn and code
-loading is annoying to work with, so it's been rewritten.
- 
-Nevermore's libraries handle many more functions that ROBLOX does not provide. A 
-majority of common methods are used in qSystems, for example, are rewritten to make
-debugging easier. **These libraries are optional.**
-
-## How do I use Nevermore?
-Simple insert the files in the correct place as specified by "File sStructure" below.
-Nevermore can be accessed by other scripts as being found in ReplicatedStorage, where it
-moves itself. 
-
-## Nevermore seems really hack, is it?
-Short answer: Yes. 
-
-Long answer: It is, but it's simply because ROBLOX has really weird glitches and bugs. Nevermore
-is designed to streamline testing, and so it moves resources around accordingly to make sure
-that it still works with debugging while resources are loaded accordingly. **Some assets well
-designed, and the ones that are not are being redesigned to be more testable and reliable.**
-
-Nevermore's class system and other "hacky" elements are being redesigned right now.
-Recently, the import syntax has been removed for this reason. Expect updates. 
-
-In the long run though, it is still reliable. 
-
-## How do I load up Nevermore?
-Loading on the server and the client may be done by using the following code:
-
-```lua
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-```
-
-However, it should be noted that Nevermore will appear in 
-`ReplicatedStorage.NevermoreEngine`
-
-Nevermore is loaded by NevermoreEngineLoader.lua, which clones it into 
-ReplicatedStorage, but before doingso, runs it for the server. This guarantees 
-that it knows whether or not it's in the server or client, albeit, by a hacky 
-method. It also makes sure the cloned Nevermore is archivable false incase it's 
-loaded in a PBS. 
-
-
-Nevermore, when it loads, does two things. It creates an internal directory
-that is not archivable in `ReplicatedStorage` and it clones itself into
-ReplicatedStorage. Both of these are `Archivable` false. The reasons behind
-doing this is complicated, but mostly it guarantees Nevermore works in solo
-test mode and the server.
-
-## Splash Screen
-By default, the splash screen is added. The splash screen must be manually removed
-on the ClientSide by using
-
-```lua
-NevermoreEngine.ClearSplash()
-```
-
-The splash will not animate on the client until the player requires NevermoreEngine
-locally. You can also specify the parent of the splash screen using a method within
-NevermoreEngine if you want it to obscure GUIs being loaded.
-
-The splash does not, at this time, use ReplicatedFirst as ReplicatedFirst replicates
-after the whole level geometry loads, making it a moot point. 
-
-## Main Resources
-Main resouces are scripts in Modules that end in .Main or are not disabled. 
-
-# Nevermore Configuration
-Nevermore has several configuration options that can be modified in the main 
-module. 
-
-Blacklist - The blacklist is used to ban players automatically from the game. 
-
-## File Structure
-Nevermore is designed to work with ROBLOX's services that replicate. Nevermore
-should be setup like this. Nevermore Engine uses Backpack objects to store 
-modules
+Put all the modules in a folder in `game.ServerScriptStorage` and name them the names of their script, but without
+.lua
 
 ```
-<<< ROOT >>>
-	Workspace
-	Players
-	Lighting
+game
 	ReplicatedStorage
-	ServerScriptService
-		Nevermore
-			Modules
-				...
-				Game
-					Client.Main
-					Server.Main
-			App
-				NevermoreEngine
-				NevermoreEngineLoader
+		`ModuleScript` NevermoreEngine
+	ServerScriptStorage
+		`Folder` Nevermore
+			`Folder` qSystems
+				`ModuleScript` qSystems
+
 ```
 
-`NevermoreEngineLoader` should be the only script enabled, and will queue 
-loading of the rest of Nevermore.
+## Using NevermoreEngine
 
-Modules may be organized however one likes, but it is suggested that users 
-follow the file structure uploaded to the git repository.
-
-## Modules
-Modules contain scripts, localscripts, and ModuleScripts. `LocalScripts` and 
-`ModuleScripts` are replicated. Any script ending in .Main will execute, as well
-as any script that is not disabled (Although Nevermore will complain).
-
-Modules cache, so it is important that all required modules already exist at the
-time of running.
-
-### App
-App contains specific files used by Nevermore.
-
-
-Nevermore is designed to execute multiple times without breaking anything, so it
-will work in a PrivateServer. Modules will be cloned, et cetera.
+See App/readme.md
 
 ## Update / Change Log
 This change log is *strictly* for Nevermore's module and documentation only.
+##### December 23rd, 2015 [0.4.0.0]
+- Moved NevermoreEngine into a simplified module that had 3 API components, for loading Libraries, RemoteEvents, and RemoteFunctions
 
 ##### November 21st, 2014 [0.3.0.0]
 - Removed :Import() syntax
