@@ -18,7 +18,7 @@ return {
 	end;
 
 
-	check = function(tab, value)
+	contains = function(tab, value)
 		-- Returns true if value is in table
 		for _, Value in pairs(tab) do
 			if Value == value then
