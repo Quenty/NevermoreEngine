@@ -17,8 +17,13 @@ game
 		`Folder` Nevermore
 			`Folder` qSystems
 				`ModuleScript` qSystems
+				... more libraries
+			... more folders and libraries
 
 ```
+
+## Libraries
+Nevermore loads libraries from name. 
 
 ## Using NevermoreEngine
 
