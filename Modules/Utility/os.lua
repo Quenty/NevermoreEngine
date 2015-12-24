@@ -1,18 +1,19 @@
 -- to use: local os = require(this_script)
 -- Adds an os.date() function back to the Roblox os table!
--- More precise than qTime (doesn't use 365.25 days per year)
--- Abbreviated tables have been left in for now. Could be replaced with dayNames[wday + 1]:sub(1,3)
-
 -- @author Narrev
+
+-- Abbreviated tables have been left in for now. Could be replaced with dayNames[wday + 1]:sub(1,3)
+-- local timeZone = math.ceil( os.difftime(os.time(), tick()) / 3600)
+-- timeZoneDiff = os.date("*t", os.time()).hour - os.date("*t").hour
 
 local firstRequired = os.time()
 
 return {
 	help = function(...) return 
-	[[Note: Padding for Months, Days, and Hours have been turned off because I don't think it looks as good
-
+	[[Note: Padding can be turned off by putting a '_' between '%' and the letter toggles padding
+	
 	os.date("*t") returns a table with the following indices:
-
+	
 	hour	14
 	min	36
 	wday	1
@@ -21,7 +22,7 @@ return {
 	month	5
 	sec	33
 	day	4
-
+	
 	String reference:
 	%a	abbreviated weekday name (e.g., Wed)
 	%A	full weekday name (e.g., Wednesday)
@@ -31,10 +32,11 @@ return {
 	%d	day of the month (16) [01-31]
 	%H	hour, using a 24-hour clock (23) [00-23]
 	%I	hour, using a 12-hour clock (11) [01-12]
-	%n	New-line character ('\n')
+	%j	day of year [01-365]
 	%M	minute (48) [00-59]
 	%m	month (09) [01-12]
-	%p	either "am" or "pm" (pm)
+	%n	New-line character ('\n')
+	%p	either "am" or "pm" ('_' makes it uppercase)
 	%r	12-hour clock time *	02:55:02 pm
 	%R	24-hour HH:MM time, equivalent to %H:%M	14:55
 	%S	second (10) [00-61]
@@ -47,35 +49,37 @@ return {
 	%Y	full year (1998)
 	%y	two-digit year (98) [00-99]
 	%%	the character `%´]]
-	end,
-
-	date = function(unix, opt)
+	end;
+	
+	date = function(optString, unix)
 		-- Precise!
 
-		--assert(unix == nil or type(unix) == "number" or unix:find("/Date%((%d+)"), "Please input a valid number to \"getDate\"")
-		
-		local JSONOption = false
 		local stringPassed = false
-		
-		if type(unix) == "string" then
-			if unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- This is for MarketPlaceService compatibility
-				local year, month, day, hour, minute, second = unix:match("(%d+)\-(%d+)\-(%d+)T(%d+):(%d+):([%d%.]+).+")
 
-				return {year = year, month = month, day = day, hour = hour, minute = minute, second = second}
-
-			elseif unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
-				unix		= unix:match("/Date%((%d+)") / 1000
-				JSONOption	= true
-
-			elseif unix:find("*t") then
-				unix		= unix:find("^!") and os.time() or opt or nil
+		if type(optString) == "string" then
+			if optString:find("*t") then
+				unix		= optString:find("^!") and os.time() or unix
 			else
-				assert(unix:find("%%"), "Invalid string passed to os.date")
-				opt, unix	= unix:find("^!") and unix:sub(2) or unix, unix:find("^!") and os.time() or opt
+				assert(optString:find("%%"), "Invalid string passed to os.date")
+				optString, unix	= optString:find("^!") and optString:sub(2) or optString, optString:find("^!") and os.time() or unix
 				stringPassed = true
 			end
 		end
 
+		if type(optString) == "number" or optString:match("/Date%((%d+)") or optString:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then
+			unix, optString = optString
+		end
+		
+		if type(unix) == "string" then
+			if unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
+				unix		= unix:match("/Date%((%d+)") / 1000
+			elseif unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- Untested MarketPlaceService compatibility
+				-- This part of the script is untested
+				local year, month, day, hour, minute, second = unix:match("(%d+)\-(%d+)\-(%d+)T(%d+):(%d+):([%d%.]+).+")
+				unix = os.time{year = year, month = month, day = day, hour = hour, minute = minute, second = second}
+			end
+		end
+	
 		local unix		= type(unix) == "number" and unix or tick()
 		local dayCount		= function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end
 		local year		= 1970
@@ -85,16 +89,17 @@ return {
 		local dayNamesAbbr	= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 		local monthsAbbr	= {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 		local months, month	= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
-	--	local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
+		local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
+	
 		local hours		= math.floor(unix / 3600 % 24)
 		local minutes		= math.floor(unix / 60 % 60)
 		local seconds		= math.floor(unix % 60)
-
+	
 		 -- Calculate year and days into that year
 		while days > dayCount(year) do days = days - dayCount(year) year = year + 1 end
 		
 		local yDay		= days
-
+	
 		 -- Subtract amount of days from each month until we find what month we are in and what day in that month
 		for monthIndex, daysInMonth in ipairs{31,(dayCount(year) - 337),31,30,31,30,31,31,30,31,30,31} do
 			if days - daysInMonth <= 0 then
@@ -103,47 +108,62 @@ return {
 			end
 			days = days - daysInMonth
 		end
-
+	
 	--	string.format("%d/%d/%04d", month, days, year) same as "%x"
 	--	string.format("%02d:%02d:%02d %s", hours, minutes, seconds, period) same as "%r"
-
-		if unix == "*t" then
+		padded = function(num)
+			return string.format("%02d", num)
+		end
+		if optString == "*t" then
 			return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
-		elseif JSONOption then
-			return string.format("%d/%d/%04d", month, days, year)
 		elseif stringPassed then
-			local returner = opt
+			local returner = optString
 			:gsub("%%c", "%%x %%X")
+			:gsub("%%_c", "%%_x %%_X")
 			:gsub("%%x", "%%m/%%d/%%y")
-			:gsub("%%T", "%%I:%%M %%p")
+			:gsub("%%_x", "%%_m/%%_d/%%y")
 			:gsub("%%X", "%%H:%%M:%%S")
+			:gsub("%%_X", "%%_H:%%M:%%S")
+			:gsub("%%T", "%%I:%%M %%p")
+			:gsub("%%_T", "%%_I:%%M %%p")
 			:gsub("%%r", "%%I:%%M:%%S %%p")
-			:gsub("%%R", "%%H:%%M")
+			:gsub("%%_r", "%%_I:%%M:%%S %%p")
+			:gsub("%%R", "%%H:%%M")		
+			:gsub("%%_R", "%%_H:%%M")
 			:gsub("%%a", dayNamesAbbr[wday + 1])
 			:gsub("%%A", dayNames[wday + 1])
 			:gsub("%%b", monthsAbbr[month])
 			:gsub("%%B", months[month])
-			:gsub("%%d", days)
-			:gsub("%%H", string.format("%02d", hours))
-			:gsub("%%I", hours > 12 and hours - 12 or hours == 0 and 12 or hours)
-			:gsub("%%M", string.format("%02d", minutes))
-			:gsub("%%m", month)
-			:gsub("%%p", hours > 12 and "pm" or "am")
-			:gsub("%%S", string.format("%02d", seconds))
+			:gsub("%%d", padded(days))
+			:gsub("%%_d", days)
+			:gsub("%%H", padded(hours))
+			:gsub("%%_H", hours)
+			:gsub("%%I", padded(hours > 12 and hours - 12 or hours == 0 and 12 or hours))
+			:gsub("%%_I", hours > 12 and hours - 12 or hours == 0 and 12 or hours)
+			:gsub("%%j", padded(yDay))
+			:gsub("%%_j", yDay)
+			:gsub("%%M", padded(minutes))
+			:gsub("%%_M", minutes)
+			:gsub("%%m", padded(month))		
+			:gsub("%%_m", month)
+			:gsub("%%n","\n")
+			:gsub("%%p", hours >= 12 and "pm" or "am")
+			:gsub("%%_p", hours >= 12 and "PM" or "AM")
+			:gsub("%%S", padded(seconds))
+			:gsub("%%_S", seconds)
+			:gsub("%%t", "\t")
+			:gsub("%%u", wday == 0 and 7 or wday)
 			:gsub("%%w", wday)
 			:gsub("%%Y", year)
-			:gsub("%%y", year % 100)
-			:gsub("%%j", yDay)
-			:gsub("%%u", wday == 0 and 7 or wday)
-			:gsub("%%n","\n")
-			:gsub("%%t", "\t")
+			:gsub("%%y", padded(year % 100))
+			:gsub("%%_y", year % 100)
 			:gsub("%%%%", "%%")
 			return returner -- We declare returner and then return it because we don't want to return the second value of the last gsub function
 		end
 		
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
-	end,
-	time = function(...) return os.time(...) end,
-	difftime = function(...) return os.difftime(...) end,
-	clock = function(...) return os.difftime(os.time(), firstRequired) end
+	end;
+	time = function(...) return os.time(...) end;
+	difftime = function(...) return os.difftime(...) end;
+	clock = function(...) return os.difftime(os.time(), firstRequired) end;
 }
