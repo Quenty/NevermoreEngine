@@ -59,8 +59,8 @@ return {
 
 	help = function(...)
 		return [[
-	There are 4 additional functions that have been added; check, overflow, sum, and copy
-	table.check(table, value)
+	There are 4 additional functions that have been added; contains, overflow, sum, and copy
+	table.contains(table, value)
 		returns whether @param value is in @param table
 
 	table.copy(table)
