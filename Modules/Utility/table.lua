@@ -2,13 +2,13 @@
 -- @author Narrev
 
 return {
-	concat		= function(...) return table.concat		(...) end;
-	foreach		= function(...) return table.foreach		(...) end;
-	foreachi	= function(...) return table.foreachi		(...) end;
-	getn		= function(...) return table.getn		(...) end;
-	insert		= function(...) return table.insert		(...) end;
-	remove		= function(...) return table.remove		(...) end;
-	sort		= function(...) return table.sort		(...) end;
+	concat		= function(...) return table.concat	(...) end;
+	foreach		= function(...) return table.foreach	(...) end;
+	foreachi	= function(...) return table.foreachi	(...) end;
+	getn		= function(...) return table.getn	(...) end;
+	insert		= function(...) return table.insert	(...) end;
+	remove		= function(...) return table.remove	(...) end;
+	sort		= function(...) return table.sort	(...) end;
 
 	random = function(tab)
 		-- returns a random value from the table
