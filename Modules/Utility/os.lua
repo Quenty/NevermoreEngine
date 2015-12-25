@@ -6,6 +6,8 @@
 -- local timeZone = math.ceil( os.difftime(os.time(), tick()) / 3600)
 -- timeZoneDiff = os.date("*t", os.time()).hour - os.date("*t").hour
 
+-- add day suffixes
+
 local firstRequired = os.time()
 
 return {
@@ -39,6 +41,7 @@ return {
 	%p	either "am" or "pm" ('_' makes it uppercase)
 	%r	12-hour clock time *	02:55:02 pm
 	%R	24-hour HH:MM time, equivalent to %H:%M	14:55
+	%s	day suffix
 	%S	second (10) [00-61]
 	%t	Horizontal-tab character ('\t')
 	%T	Basically %r but without seconds (HH:MM AM), equivalent to %I:%M %p	2:55 pm
@@ -143,6 +146,7 @@ return {
 			:gsub("%%n","\n")
 			:gsub("%%p", hours >= 12 and "pm" or "am")
 			:gsub("%%_p", hours >= 12 and "PM" or "AM")
+			:gsub("%%s", suffixes[days])
 			:gsub("%%S", padded(seconds))
 			:gsub("%%_S", seconds)
 			:gsub("%%t", "\t")
