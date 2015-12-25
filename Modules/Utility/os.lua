@@ -52,6 +52,7 @@ return {
 	end;
 	
 	date = function(optString, unix)
+		-- Precise!
 
 		local stringPassed = false
 
@@ -67,7 +68,7 @@ return {
 
 			if type(unix) == "string" then
 				if unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
-					unix = unix:match("/Date%((%d+)") / 1000
+					unix		= unix:match("/Date%((%d+)") / 1000
 				elseif unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- Untested MarketPlaceService compatibility
 					-- This part of the script is untested
 					local year, month, day, hour, minute, second = unix:match("(%d+)\-(%d+)\-(%d+)T(%d+):(%d+):([%d%.]+).+")
@@ -75,8 +76,8 @@ return {
 				end
 			end
 		end
-
-		local unix		= type(unix) == "number" and unix or tick()
+		local dayAlign	= unix == 0 and 1 or 0
+		local unix		= type(unix) == "number" and unix + dayAlign or tick()
 		local dayCount		= function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end
 		local year		= 1970
 		local days		= math.ceil(unix / 86400)
@@ -89,8 +90,8 @@ return {
 	
 		local hours		= math.floor(unix / 3600 % 24)
 		local minutes		= math.floor(unix / 60 % 60)
-		local seconds		= math.floor(unix % 60)
-	
+		local seconds		= math.floor(unix % 60) - dayAlign
+		
 		 -- Calculate year and days into that year
 		while days > dayCount(year) do days = days - dayCount(year) year = year + 1 end
 		
@@ -104,9 +105,7 @@ return {
 			end
 			days = days - daysInMonth
 		end
-	
-	--	string.format("%d/%d/%04d", month, days, year) same as "%x"
-	--	string.format("%02d:%02d:%02d %s", hours, minutes, seconds, period) same as "%r"
+
 		padded = function(num)
 			return string.format("%02d", num)
 		end
