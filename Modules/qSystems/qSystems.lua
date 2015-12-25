@@ -92,9 +92,12 @@ local function Modify(Instance, Values)
 	for Index, Value in next, Values do
 		if type(Index) == "number" then
 			Value.Parent = Instance
-		else
+		elseif Index ~= "CFrame" and Index ~= "Cframe" then
 			Instance[Index] = Value
 		end
+	end
+	if Values["CFrame"] or Values["Cframe"] then -- If CFrame is in Values, change it last
+		Instance["CFrame"] = Values["CFrame"] or Values["Cframe"]
 	end
 	return Instance
 end
