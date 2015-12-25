@@ -106,7 +106,7 @@ return {
 			days = days - daysInMonth
 		end
 
-		padded = function(num)
+		local padded = function(num)
 			return string.format("%02d", num)
 		end
 		
