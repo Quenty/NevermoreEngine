@@ -1,25 +1,15 @@
 -- To extend your table library, use: local table = require(this_script)
 -- @author Narrev
 
-return {
-	concat		= function(...) return table.concat	(...) end;
-	foreach		= function(...) return table.foreach	(...) end;
-	foreachi	= function(...) return table.foreachi	(...) end;
-	getn		= function(...) return table.getn	(...) end;
-	insert		= function(...) return table.insert	(...) end;
-	remove		= function(...) return table.remove	(...) end;
-	sort		= function(...) return table.sort	(...) end;
+local lib;
 
+lib = {
 	random = function(tab)
-		-- returns a random value from the table
-		-- newMap = table.random{map1, map2, map3}
-
+		-- This should be rewritten to support tables with string keys
 		return tab[math.random(1, #tab)]
 	end;
 
-
 	contains = function(tab, value)
-		-- Returns true if value is in table
 		for _, Value in pairs(tab) do
 			if Value == value then
 				return true
@@ -29,9 +19,6 @@ return {
 	end;
 
 	overflow = function(tab, seed)
-		-- This subtracts values from the table from seed until an overflow
-		
-
 		for i, value in ipairs(tab) do
 			if seed - value <= 0 then
 				return i, seed
@@ -41,12 +28,21 @@ return {
 	end;
 
 	sum = function(tab)
-		-- finds the sum of the elements in the table
+		-- This should be updated to support tables with string keys
 		local sum = 0
 			for _, value in ipairs(tab) do
 				sum = sum + value
 			end
 		return sum
+	end;
+
+	GetIndexByValue = function(tab, Value)
+		for Index, TableValue in next, tab do
+			if Value == TableValue then
+				return Index
+			end
+		end
+		return nil
 	end;
 
 	copy = function(tab)
@@ -59,12 +55,18 @@ return {
 
 	help = function(...)
 		return [[
-	There are 4 additional functions that have been added; contains, overflow, sum, and copy
+	There are 6 additional functions that have been added; contains, copy, getIndexByValue, random, sum, and overflow
 	table.contains(table, value)
 		returns whether @param value is in @param table
 
 	table.copy(table)
 		returns a new table that is a copy of @param table
+
+	table.getIndexByValue(table, value)
+		Return's the index of a Value in a table.
+		@param tab table to search through 
+		@value the Value to search for
+		@return THe key of the value. Returns nil if it can't find it.
 
 	table.random(table)
 		returns a random value (with an integer key) from @param table
@@ -90,5 +92,23 @@ return {
 
 		The above operation could be shortened to the following line:
 		local randomChoiceFromOptions = Options[(table.overflow(tab, math.random(1, table.sum(tab))))] ]]
-	end
+	end;
+
+	getIndexByValue		= function(...) return lib.GetIndexByValue		(...) end;
+	Copy			= function(...) return lib.copy				(...) end;
+	Sum			= function(...) return lib.sum				(...) end;
+	Contains		= function(...) return lib.contains			(...) end;
+	Overflow		= function(...) return lib.overflow			(...) end;
+	Random			= function(...) return lib.random			(...) end;
+	Help			= function(...) return lib.help				(...) end;
+
+	concat			= function(...) return table.concat			(...) end;
+	foreach			= function(...) return table.foreach			(...) end;
+	foreachi		= function(...) return table.foreachi			(...) end;
+	getn			= function(...) return table.getn			(...) end;
+	insert			= function(...) return table.insert			(...) end;
+	remove			= function(...) return table.remove			(...) end;
+	sort			= function(...) return table.sort			(...) end;
 }
+
+return lib
