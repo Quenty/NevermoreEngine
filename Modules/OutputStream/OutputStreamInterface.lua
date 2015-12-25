@@ -752,7 +752,7 @@ local function TimeStampToText(TimeStamp)
 		RenderTimePass = os.date(TimeStamp).min .. " minutes"
 	elseif TimeStamp < 7200 then
 		RenderTimePass = "about 1 hour, ".. os.date(TimeStamp).min .. " minutes"
-	elseif TimeStamp < 219600 then
+	else
 		RenderTimePass = "about " .. os.date(TimeStamp).hour .. " hours"
 	end
 	local wDay = os.date("%A", tick() - TimeStamp)
