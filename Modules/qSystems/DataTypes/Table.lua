@@ -3,7 +3,7 @@
 
 lib = {
 	help = function(...)
-	-- Add your own documentation Quenty
+	-- Please add your documentation here, Quenty
 		return [[
 	There are 6 additional functions that have been added; contains, copy, getIndexByValue, random, sum, and overflow
 	table.contains(table, value)
