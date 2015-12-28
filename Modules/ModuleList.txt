@@ -88,6 +88,7 @@ qSystems\qPlayer.lua
 qSystems\qSystems.lua
 qSystems\Triangle.lua
 qSystems\Type.lua
+qSystems\DataTypes\CompariableTuple.lua
 qSystems\DataTypes\qColor3.lua
 qSystems\DataTypes\qInstance.lua
 qSystems\DataTypes\qMath.lua
