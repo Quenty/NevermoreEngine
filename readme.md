@@ -1,9 +1,9 @@
 # About
-NevermoreEngine is a collection of useful libraries for ROBLOX development.
+Nevermore is a collection of useful libraries for ROBLOX development.
 
-Pick and choose the libraries to load, and NevermoreEngine will lazily load libraries and dependencies.
 
 ## Features 
+* **OOP** - Many of the libraries in Nevermore are OOP
 * **Lazy loading** - Loads libraries only when you ask for them
 * **Lots of libraries** - Lots of libraries that handle all sorts of logical issues that may occur during ROBLOX game development
 * **Tested** - Used in several games that have made it to the front page, NevermoreEngine works without lots of testing
@@ -12,6 +12,35 @@ Pick and choose the libraries to load, and NevermoreEngine will lazily load libr
 	* Fast install, just one line in the command line
 * **Open source** - Nevermore is open source
 * **Built for ROBLOX** - Nevermore is built for ROBLOX
+* **Works well with frameworks** - Nevermore works alongside your existing frameworks because it's just a collection of libraries and a loader.
+
+## A sample of libraries
+You don't have to use a library unless you load it. Nevermore should not impact performance (it can sit in a game without taking up processing power, as it's just a ton of libraries). Here are a few of the libraries Nevermore offers
+
+
+* Additive Camera effects 
+* Admin commands
+* Pseudo chat
+* Welding, CFrame manipulation code, quaternion slerp
+* Bezier Curves
+* Player manipulation utilities (check teammates, et cetera)
+* Type checkers
+* GUI transparency and Color3 animation code
+* Material design UI code
+    * Ripple
+    * Snackbar
+* Kinetic scrolling frame (mobile inertia scrollling)
+* Compass code
+* TimeSync between server and client
+* Custom Signals
+* Promises
+* HeldInputs
+* Projectile physics
+* 3D rendering
+* Rotating text labels
+* Screen cover effects
+* Title generation
+
 
 # Get Nevermore
 Paste the following code into your command bar in ROBLOX Studio to install Nevermore.
@@ -31,8 +60,8 @@ Please note that installing Nevermore will **not** change any behavior in your g
 
 To update Nevermore, back up your place file and run the install code above. It should preserve all of your existing code (although code changes to core Nevermore libraries will be overridden).
 
-
 ----
+
 
 ## Usage
 Load up Nevermore on your server and client. This is the header code you need.
