@@ -517,7 +517,7 @@ do
 		MessageLabel.Position = UDim2.new(0, UserLabel.Position.X.Offset + UserLabel.TextBounds.X, 0, 0)
 		MessageLabel.Size = UDim2.new(1, -(UserLabel.Position.X.Offset + UserLabel.TextBounds.X), 1, 0)
 
-		MessageLabel.Text = os.date("[%I:%M] %_p") .. Data.PlayerExecutingName .. ": " .. Data.CommandDescription
+		MessageLabel.Text = os.date("[%I:%M %_p]") .. Data.PlayerExecutingName .. ": " .. Data.CommandDescription
 
 		local Height = qMath.RoundUp(MessageLabel.TextBounds.Y, PseudoChatSettings.LineHeight)
 		RenderFrame.Size = UDim2.new(1, 0, 0, Height)
