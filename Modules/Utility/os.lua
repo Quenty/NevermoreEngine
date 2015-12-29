@@ -12,7 +12,9 @@ local firstRequired = os.time()
 
 return {
 	help = function(...) return 
-	[[Note: Padding can be turned off by putting a '_' between '%' and the letter toggles padding
+	[[
+	This adds os.date back to Roblox! It functions just like Lua's built-in os.date, but with a few additions.
+	Note: Padding can be toggled by inserting a '_' like so: os.date("%_x", os.time())
 	
 	os.date("*t") returns a table with the following indices:
 	
