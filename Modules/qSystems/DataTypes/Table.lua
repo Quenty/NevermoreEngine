@@ -1,3 +1,4 @@
+--- This library handles a variety of table-based operations, which can be quite useful.
 -- To extend your table library, use: local table = require(this_script)
 -- @author Quenty, Narrev
 
@@ -40,7 +41,7 @@
 		local randomChoiceFromOptions = Options[chosenKey]
 --]]
 
-lib = {
+local lib = {
 	concat			= function(...) return table.concat	(...) end;
 	foreach			= function(...) return table.foreach	(...) end;
 	foreachi		= function(...) return table.foreachi	(...) end;
