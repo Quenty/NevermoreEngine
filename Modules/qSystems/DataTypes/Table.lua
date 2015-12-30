@@ -185,9 +185,7 @@ local function ShellSort(Table, GetValue)
 	-- Shell Sort -- Pretty efficient... GetValue should return a number of some sort. Will sort from Least to Greatest.
 
 	local function Swap(Table, A, B)
-		local Copy = Table[A]
-		Table[A] = Table[B]
-		Table[B] = Copy
+		Table[A], Table[B] = Table[B], Table[A]
 	end
 
 	local TableSize = #Table
