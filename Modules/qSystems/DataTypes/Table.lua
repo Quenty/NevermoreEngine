@@ -1,10 +1,8 @@
 -- To extend your table library, use: local table = require(this_script)
 -- @author Quenty, Narrev
 
-lib = {
-	help = function(...)
-	-- Please add your documentation here, Quenty
-		return [[
+--[[Please add your documentation here, Quenty
+
 	There are 6 additional functions that have been added; contains, copy, getIndexByValue, random, sum, and overflow
 	table.contains(table, value)
 		returns whether @param value is in @param table
@@ -19,14 +17,15 @@ lib = {
 		@return The key of the value. Returns nil if it can't find it.
 
 	table.random(table)
+		*Needs an update*
 		returns a random value (with an integer key) from @param table
 		newMap = table.random{map1, map2, map3}
 
 	table.sum(table)
-		adds up all the values in @param table via ipairs
+		adds up all the values in @param table via pairs
 
 	table.overflow(table, seed)
-		continually subtracts the values (with ipairs) in @param table from @param seed until seed cannot be subtracted from further
+		continually subtracts the values (via ipairs) in @param table from @param seed until seed cannot be subtracted from further
 		It then returns index at which the iterated value is greater than the remaining seed, and leftover seed (before subtracting final value)
 
 		This can be used for relative probability :D
@@ -38,9 +37,10 @@ lib = {
 		local seed		= math.random(1, table.sum(tab))
 		
 		local chosenKey, LeftoverSeed = table.overflow(tab, seed)
-		local randomChoiceFromOptions = Options[chosenKey] ]]
-	end;
+		local randomChoiceFromOptions = Options[chosenKey]
+--]]
 
+lib = {
 	concat			= function(...) return table.concat	(...) end;
 	foreach			= function(...) return table.foreach	(...) end;
 	foreachi		= function(...) return table.foreachi	(...) end;
@@ -255,9 +255,9 @@ lib.sum = sum
 lib.Sum = sum
 
 
-local function GetIndexByValue(tab, Value)
+local function GetIndexByValue(tab, value)
 	for Index, TableValue in next, tab do
-		if Value == TableValue then
+		if value == TableValue then
 			return Index
 		end
 	end
