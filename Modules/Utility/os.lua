@@ -1,21 +1,11 @@
 -- to use: local os = require(this_script)
--- Adds an os.date() function back to the Roblox os table!
 -- @author Narrev
 
--- Abbreviated tables have been left in for now. Could be replaced with dayNames[wday + 1]:sub(1,3)
--- local timeZone = math.ceil( os.difftime(os.time(), tick()) / 3600)
--- timeZoneDiff = os.date("*t", os.time()).hour - os.date("*t").hour
-
--- add day suffixes
-
-local firstRequired = os.time()
-
-return {
-	help = function(...) return 
-	[[
+--[[
 	This adds os.date back to Roblox! It functions just like Lua's built-in os.date, but with a few additions.
 	Note: Padding can be toggled by inserting a '_' like so: os.date("%_x", os.time())
-	
+	Note: tick() is the default unix time used for os.date()
+
 	os.date("*t") returns a table with the following indices:
 	
 	hour	14
@@ -53,12 +43,18 @@ return {
 	%X	time (e.g., 23:48:10)
 	%Y	full year (1998)
 	%y	two-digit year (98) [00-99]
-	%%	the character `%´]]
-	end;
+	%%	the character `%´
 	
-	date = function(optString, unix)
-		-- Precise!
+	os.clock() returns how long the server has been active, or more realistically, how long since when you required this module
+--]]
 
+-- Abbreviated tables have been left in for now. Could be replaced with dayNames[wday + 1]:sub(1,3)
+-- Spare code: ; -- timeZoneDiff = os.date("*t", os.time()).hour - os.date("*t").hour
+
+local firstRequired = os.time()
+
+return {
+	date = function(optString, unix)
 		local stringPassed = false
 
 		if not (optString == nil and unix == nil) then
@@ -73,7 +69,7 @@ return {
 
 			if type(unix) == "string" then
 				if unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
-					unix		= unix:match("/Date%((%d+)") / 1000
+					unix = unix:match("/Date%((%d+)") / 1000
 				elseif unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- Untested MarketPlaceService compatibility
 					-- This part of the script is untested
 					local year, month, day, hour, minute, second = unix:match("(%d+)\-(%d+)\-(%d+)T(%d+):(%d+):([%d%.]+).+")
@@ -81,12 +77,12 @@ return {
 				end
 			end
 		end
-		local dayAlign	= unix == 0 and 1 or 0
+		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
 		local dayCount		= function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end
 		local year		= 1970
 		local days		= math.ceil(unix / 86400)
-		local wday		= math.floor( (days + 3) % 7 ) -- Jan 1, 1970 was a thursday, so we add 3
+		local wday		= math.floor((days + 3) % 7) -- Jan 1, 1970 was a thursday, so we add 3
 		local dayNames		= {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 		local dayNamesAbbr	= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 		local monthsAbbr	= {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
@@ -110,13 +106,16 @@ return {
 			end
 			days = days - daysInMonth
 		end
-
+		-- With the table module, the following can be used instead of the above for loop
+		-- month, days = table.overflow({31,(dayCount(year) - 337),31,30,31,30,31,31,30,31,30,31}, days)
 		local padded = function(num)
 			return string.format("%02d", num)
 		end
 		
 		if stringPassed then
-			local returner = optString
+			-- We don't want second argument of gsub
+			return (
+			optString
 			:gsub("%%c", "%%x %%X")
 			:gsub("%%_c", "%%_x %%_X")
 			:gsub("%%x", "%%m/%%d/%%y")
@@ -158,7 +157,7 @@ return {
 			:gsub("%%y", padded(year % 100))
 			:gsub("%%_y", year % 100)
 			:gsub("%%%%", "%%")
-			return returner -- We declare returner and then return it because we don't want to return the second value of the last gsub function
+			)
 		end
 		
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
@@ -166,4 +165,5 @@ return {
 	time = function(...) return os.time(...) end;
 	difftime = function(...) return os.difftime(...) end;
 	clock = function(...) return os.difftime(os.time(), firstRequired) end;
+	localTimeZone = math.ceil( os.difftime(tick(), os.time()) / 3600); -- tick() - localTimeZone * 3600 = UTC time
 }
