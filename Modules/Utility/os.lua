@@ -46,10 +46,10 @@
 	%%	the character `%´
 	
 	os.clock() returns how long the server has been active, or more realistically, how long since when you required this module
+	os.UTCToTick returns your time in seconds given @param UTC time in seconds
 --]]
 
 -- Abbreviated tables have been left in for now. Could be replaced with dayNames[wday + 1]:sub(1,3)
--- Spare code: ; -- timeZoneDiff = os.date("*t", os.time()).hour - os.date("*t").hour
 
 local firstRequired = os.time()
 
