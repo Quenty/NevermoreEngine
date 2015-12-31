@@ -162,8 +162,11 @@ return {
 		
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end;
+	UTCToTick = function(time)
+		-- UTC time in seconds to your time in seconds
+		return time + math.ceil(tick()) - os.time()
+	end;
 	time = function(...) return os.time(...) end;
 	difftime = function(...) return os.difftime(...) end;
 	clock = function(...) return os.difftime(os.time(), firstRequired) end;
-	localTimeZone = math.ceil( os.difftime(tick(), os.time()) / 3600); -- tick() - localTimeZone * 3600 = UTC time
 }
