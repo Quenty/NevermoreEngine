@@ -164,6 +164,7 @@ return {
 	end;
 	UTCToTick = function(time)
 		-- UTC time in seconds to your time in seconds
+		-- This is for scheduling Roblox events across timezones
 		return time + math.ceil(tick()) - os.time()
 	end;
 	time = function(...) return os.time(...) end;
