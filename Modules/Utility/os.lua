@@ -99,7 +99,7 @@ return {
 		local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
 	
 		 -- Subtract amount of days from each month until we find what month we are in and what day in that month
-		for monthIndex, daysInMonth in ipairs{31,yr%4==0 and(yr%100~=0 or yr%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31} do
+		for monthIndex, daysInMonth in ipairs{31,year%4==0 and(year%100~=0 or year%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31} do
 			if days - daysInMonth <= 0 then
 				month = monthIndex
 				break
@@ -107,7 +107,7 @@ return {
 			days = days - daysInMonth
 		end
 		-- With the table module, the following can be used instead of the above for loop
-		-- month, days = table.overflow({31,yr%4==0 and(yr%100~=0 or yr%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
+		-- month, days = table.overflow({31,year%4==0 and(year%100~=0 or year%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
 		
 		if stringPassed then
 			local padded = function(num)
