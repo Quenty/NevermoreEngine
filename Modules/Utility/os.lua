@@ -78,31 +78,28 @@ return {
 				end
 			end
 		end
-		local GetLeaps = function(yr) --return leaps since 1970 to January 1 of @param yr
-			local yr = yr - 1 -- don't include leap from this year
-			return math.floor(yr/4) - math.floor(yr/100) + math.floor(yr/400) - 477
-		end
+		local GetLeaps		= function(yr) local yr = yr - 1 return math.floor(yr/4) - math.floor(yr/100) + math.floor(yr/400) - 477 end
 		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
-		local dayCount		= function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end
+		
 		local days		= math.ceil(unix / 86400)
 		local wday		= math.floor((days + 3) % 7) -- Jan 1, 1970 was a thursday, so we add 3
 		local year		= math.floor(1970 + (days - GetLeaps(1970 + days/365)) / 365)
 		      days		= days - (year - 1970) * 365 - GetLeaps(year)
 		local yDay		= days
+		local month
+		local hours		= math.floor(unix / 3600 % 24)
+		local minutes		= math.floor(unix / 60 % 60)
+		local seconds		= math.floor(unix % 60) - dayAlign
 		
 		local dayNames		= {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 		local dayNamesAbbr	= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 		local monthsAbbr	= {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
-		local months, month	= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+		local months		= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 		local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
 	
-		local hours		= math.floor(unix / 3600 % 24)
-		local minutes		= math.floor(unix / 60 % 60)
-		local seconds		= math.floor(unix % 60) - dayAlign
-	
 		 -- Subtract amount of days from each month until we find what month we are in and what day in that month
-		for monthIndex, daysInMonth in ipairs{31,(dayCount(year) - 337),31,30,31,30,31,31,30,31,30,31} do
+		for monthIndex, daysInMonth in ipairs{31,yr%4==0 and(yr%100~=0 or yr%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31} do
 			if days - daysInMonth <= 0 then
 				month = monthIndex
 				break
@@ -110,13 +107,12 @@ return {
 			days = days - daysInMonth
 		end
 		-- With the table module, the following can be used instead of the above for loop
-		-- month, days = table.overflow({31,(dayCount(year) - 337),31,30,31,30,31,31,30,31,30,31}, days)
-		local padded = function(num)
-			return string.format("%02d", num)
-		end
+		-- month, days = table.overflow({31,yr%4==0 and(yr%100~=0 or yr%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
 		
 		if stringPassed then
-			-- We don't want second argument of gsub
+			local padded = function(num)
+				return string.format("%02d", num)
+			end
 			return (
 			optString
 			:gsub("%%c", "%%x %%X")
