@@ -78,19 +78,20 @@ return {
 				end
 			end
 		end
-		local GetLeaps		= function(yr) local yr = yr - 1 return math.floor(yr/4) - math.floor(yr/100) + math.floor(yr/400) - 477 end
+		local getLeaps		= function(yr) local yr = yr - 1 return math.floor(yr/4) - math.floor(yr/100) + math.floor(yr/400) - 477 end
 		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
 		
 		local days		= math.ceil(unix / 86400)
 		local wday		= math.floor((days + 3) % 7) -- Jan 1, 1970 was a thursday, so we add 3
-		local year		= math.floor(1970 + (days - GetLeaps(1970 + days/365)) / 365)
-		      days		= days - (year - 1970) * 365 - GetLeaps(year)
+		local year		= days - getLeaps(1970 + days/365.2425)
+		      year		= math.floor(1970 + year / 365) - (year % 365 == 0 and 1 or 0) --If it is the last day of the year, don't go to the next year
+		      days		= days - (year - 1970) * 365 - getLeaps(year)
 		local yDay		= days
-		local month
 		local hours		= math.floor(unix / 3600 % 24)
 		local minutes		= math.floor(unix / 60 % 60)
 		local seconds		= math.floor(unix % 60) - dayAlign
+		local month
 		
 		local dayNames		= {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 		local dayNamesAbbr	= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
@@ -99,7 +100,7 @@ return {
 		local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
 	
 		 -- Subtract amount of days from each month until we find what month we are in and what day in that month
-		for monthIndex, daysInMonth in ipairs{31,year%4==0 and(year%100~=0 or year%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31} do
+		for monthIndex, daysInMonth in ipairs{31,(year%4==0 and(year%100~=0 or year%400==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31} do
 			if days - daysInMonth <= 0 then
 				month = monthIndex
 				break
@@ -107,7 +108,7 @@ return {
 			days = days - daysInMonth
 		end
 		-- With the table module, the following can be used instead of the above for loop
-		-- month, days = table.overflow({31,year%4==0 and(year%100~=0 or year%400==0)and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
+		-- month, days = table.overflow({31,(year%4==0 and(year%100~=0 or year%400==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
 		
 		if stringPassed then
 			local padded = function(num)
