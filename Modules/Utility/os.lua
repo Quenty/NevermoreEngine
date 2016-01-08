@@ -1,5 +1,6 @@
 -- to use: local os = require(this_script)
 -- @author Narrev
+-- Please message Narrev (on Roblox) for any functionality you would like added
 
 --[[
 	This adds os.date back to Roblox! It functions just like Lua's built-in os.date, but with a few additions.
@@ -81,11 +82,10 @@ return {
 		local getLeaps		= function(yr) local yr = yr - 1 return math.floor(yr/4) - math.floor(yr/100) + math.floor(yr/400) - 477 end
 		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
-		
+
 		local days		= math.ceil(unix / 86400)
-		local wday		= math.floor((days + 3) % 7) -- Jan 1, 1970 was a thursday, so we add 3
-		local year		= days - getLeaps(1970 + days/365)
-		      year		= math.floor(1970 + year / 365) - (year % 365 == 0 and 1 or 0) --If it is the last day of the year, don't go to the next year
+		local wday		= (days + 3) % 7
+		local year		= math.ceil(1969 + (days - getLeaps(1970 + days/365)) / 365)
 		      days		= days - (year - 1970) * 365 - getLeaps(year)
 		local yDay		= days
 		local hours		= math.floor(unix / 3600 % 24)
