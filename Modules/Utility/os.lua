@@ -49,10 +49,9 @@
 	os.clock() returns how long the server has been active, or more realistically, how long since when you required this module
 	os.UTCToTick returns your time in seconds given @param UTC time in seconds
 --]]
-
--- Abbreviated tables have been left in for now. Could be replaced with dayNames[wday + 1]:sub(1,3)
-
-local firstRequired = os.time()
+local firstRequire	= os.time()
+local LoadCustomLibrary	= require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary
+local overflow		= LoadCustomLibrary("table").overflow
 
 return {
 	date = function(optString, unix)
@@ -79,54 +78,43 @@ return {
 				end
 			end
 		end
-		local getLeaps		= function(yr) local yr = yr - 1 return math.floor(yr/4) - math.floor(yr/100) + math.floor(yr/400) - 477 end
+		local getLeaps		= function(yr) local yr = yr - 1 return math.floor(yr/4) - math.floor(yr/100) + math.floor(yr/400) end
 		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
-
-		local days		= math.ceil(unix / 86400)
-		local wday		= (days + 3) % 7
-		local year		= math.ceil(1969 + (days - getLeaps(1970 + days/365)) / 365)
-		      days		= days - (year - 1970) * 365 - getLeaps(year)
+		local days, month, year	= math.ceil(unix / 86400) + 719527
+		local wday		= (days + 6) % 7
+		local _4Years		= math.floor(days % 146097 / 1461) * 4 + math.floor(days / 146097) * 400 
+		      year, days	= overflow({366,365,365,365}, days - 365*_4Years - getLeaps(_4Years)) -- [0-1461]
+		      year, _4Years	= year + _4Years - 1
 		local yDay		= days
+		      month, days	= overflow({31,(year%4==0 and(year%100~=0 or year%400==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
 		local hours		= math.floor(unix / 3600 % 24)
 		local minutes		= math.floor(unix / 60 % 60)
 		local seconds		= math.floor(unix % 60) - dayAlign
-		local month
 		
+		local dayNamesAbbr	= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"} -- Consider using dayNames[wday + 1]:sub(1,3)
+		local monthsAbbr	= {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"} -- Consider using months[wday + 1]:sub(1,3)
 		local dayNames		= {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
-		local dayNamesAbbr	= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
-		local monthsAbbr	= {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 		local months		= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 		local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
-	
-		 -- Subtract amount of days from each month until we find what month we are in and what day in that month
-		for monthIndex, daysInMonth in ipairs{31,(year%4==0 and(year%100~=0 or year%400==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31} do
-			if days - daysInMonth <= 0 then
-				month = monthIndex
-				break
-			end
-			days = days - daysInMonth
-		end
-		-- With the table module, the following can be used instead of the above for loop
-		-- month, days = table.overflow({31,(year%4==0 and(year%100~=0 or year%400==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
-		
+
 		if stringPassed then
 			local padded = function(num)
 				return string.format("%02d", num)
 			end
 			return (
 			optString
-			:gsub("%%c", "%%x %%X")
+			:gsub("%%c",  "%%x %%X")
 			:gsub("%%_c", "%%_x %%_X")
-			:gsub("%%x", "%%m/%%d/%%y")
+			:gsub("%%x",  "%%m/%%d/%%y")
 			:gsub("%%_x", "%%_m/%%_d/%%y")
-			:gsub("%%X", "%%H:%%M:%%S")
+			:gsub("%%X",  "%%H:%%M:%%S")
 			:gsub("%%_X", "%%_H:%%M:%%S")
-			:gsub("%%T", "%%I:%%M %%p")
+			:gsub("%%T",  "%%I:%%M %%p")
 			:gsub("%%_T", "%%_I:%%M %%p")
-			:gsub("%%r", "%%I:%%M:%%S %%p")
+			:gsub("%%r",  "%%I:%%M:%%S %%p")
 			:gsub("%%_r", "%%_I:%%M:%%S %%p")
-			:gsub("%%R", "%%H:%%M")		
+			:gsub("%%R",  "%%H:%%M")		
 			:gsub("%%_R", "%%_H:%%M")
 			:gsub("%%a", dayNamesAbbr[wday + 1])
 			:gsub("%%A", dayNames[wday + 1])
@@ -159,7 +147,6 @@ return {
 			:gsub("%%%%", "%%")
 			)
 		end
-		
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end;
 	UTCToTick = function(time)
