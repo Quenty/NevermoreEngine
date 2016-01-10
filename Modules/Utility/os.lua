@@ -50,7 +50,7 @@
 	os.UTCToTick returns your time in seconds given @param UTC time in seconds
 --]]
 local firstRequire	= os.time()
-local LoadCustomLibrary	= require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary
+local LoadCustomLibrary = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary
 local overflow		= LoadCustomLibrary("table").overflow
 
 return {
