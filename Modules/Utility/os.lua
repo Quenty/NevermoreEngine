@@ -50,7 +50,7 @@
 	os.UTCToTick returns your time in seconds given @param UTC time in seconds
 --]]
 local firstRequired	= os.time()
-local overflow		= (require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary)("table").overflow
+--local overflow	= (require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary)("table").overflow
 
 return {
 	date = function(optString, unix)
@@ -78,6 +78,7 @@ return {
 			end
 		end
 		local floor, ceil	= math.floor, math.ceil
+		local overflow		= function(tab, seed) for i, value in ipairs(tab) do if seed - value <= 0 then return i, seed end seed = seed - value end end
 		local getLeaps		= function(yr) local yr = yr - 1 return floor(yr/4) - floor(yr/100) + floor(yr/400) end
 		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
