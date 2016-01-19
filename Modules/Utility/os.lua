@@ -62,7 +62,7 @@ return {
 				-- if they didn't pass a non unix time
 				unix, optString = optString
 			elseif type(optString) == "string" and optString ~= "*t" then
-				assert(optString:find("%%[_cxXTrRaAbBdHIjMmnpsStuwyY]"), "Invalid string passed to os.date")
+				assert(optString:find("%%[_cxXTrRaAbBdHIjMmpsSuwyY]"), "Invalid string passed to os.date")
 				unix, optString = optString:find("^!") and os.time() or unix, optString:find("^!") and optString:sub(2) or optString
 				stringPassed = true
 			end
