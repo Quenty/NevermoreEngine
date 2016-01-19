@@ -61,13 +61,13 @@ return {
 			if type(optString) == "number" or optString:match("/Date%((%d+)") or optString:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then
 				-- if they didn't pass a non unix time
 				unix, optString = optString
-			elseif type(optString) == "string" then
-				assert(optString:find("*t") or optString:find("%%"), "Invalid string passed to os.date")
+			elseif type(optString) == "string" and optString ~= "*t" then
+				assert(optString:find("%%[_cxXTrRaAbBdHIjMmnpsStuwyY]"), "Invalid string passed to os.date")
 				unix, optString = optString:find("^!") and os.time() or unix, optString:find("^!") and optString:sub(2) or optString
 				stringPassed = true
 			end
 
-			if type(unix) == "string" then
+			if type(unix) == "string" then -- If it is a unix time, but in a Roblox format
 				if unix:match("/Date%((%d+)") then -- This is for a certain JSON compatibility. It works the same even if you don't need it
 					unix = unix:match("/Date%((%d+)") / 1000
 				elseif unix:match("%d+\-%d+\-%d+T%d+:%d+:[%d%.]+.+") then -- Untested MarketPlaceService compatibility
@@ -76,6 +76,8 @@ return {
 					unix = os.time{year = year, month = month, day = day, hour = hour, minute = minute, second = second}
 				end
 			end
+		else
+			optString, stringPassed = "%c", true
 		end
 		local floor, ceil	= math.floor, math.ceil
 		local overflow		= function(tab, seed) for i, value in ipairs(tab) do if seed - value <= 0 then return i, seed end seed = seed - value end end
