@@ -99,12 +99,22 @@ local function Modify(Instance, Values)
 	return Instance
 end
 
-local function Make(ClassType, Properties)
+local function Make(ClassType, Properties, ...)
 	--- Using a syntax hack to create a nice way to Make new items.  
 	-- @param ClassType The type of class to instantiate
 	-- @param Properties The properties to use
-
-	return Modify(Instance.new(ClassType), Properties)
+	-- @returns object of ClassType with Properties
+	-- @param {...} if used, @returns an object for each subsequent table that is a modification to Properties
+	-- 	This would be used for creating a custom "default" list of properties so you don't need to rewrite the same properties over and over.
+	local objects = {...}
+	if #objects > 0 then
+		for index, objectProps in next, objects do
+			objects[index] = Modify(Modify(Instance.new(ClassType), Properties), objectProps)
+		end
+		return unpack(objects)
+	else
+		return Modify(Instance.new(ClassType), Properties)
+	end
 end
 
 lib.Modify = Modify
