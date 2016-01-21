@@ -279,267 +279,200 @@ end
 lib.PickRandomColor3 = PickRandomColor3
 lib.pickRandomColor3 = PickRandomColor3
 
-local TweenTransparency, StopTransparencyTween do
-	local IsLocal = game:FindService("MeshContentProvider") ~= nil or (game:FindService("NetworkServer") == nil)
-	print("[qGUI]- IsLocal is " .. tostring(IsLocal))
+local function CreateYieldedUpdate(UpdateFunction)
+	-- UpdateFunction()
+		-- @return ShouldStop, if true, will stop updating
+	-- @return StartUpdate()
 
-	local ProcessList = {}
-	local ProcessingList = false
+	local AnimationId = 0
+	local LastUpdatePoint = -1 -- If it's -1, no active thread.
 
-	local function SetProperties(Gui, Percent, StartProperties, NewProperties)
-		-- Maybe there's a better way to do this?
+	local function GetNewUpdateFunction(RenderStepKey)
+		-- Increments the AnimationId and returns a new UpdateFunction
+		-- to be bound into RenderStep
 
-		for Index, EndValue in next, NewProperties do
-			local StartProperty = StartProperties[Index]
-			Gui[Index] = StartProperty + (EndValue - StartProperty) * Percent
+		local LocalAnimationId = AnimationId + 1
+		AnimationId = LocalAnimationId 
+
+		-- Note that we're now updating.
+		LastUpdatePoint = tick()
+
+		return function()
+			-- Intended to be called each RenderStep. Will unbind itself if the UpdateFunction fails 
+			-- or a new update function is generated
+
+			LastUpdatePoint = tick()
+
+			if UpdateFunction() or (AnimationId ~= LocalAnimationId) then
+				RunService:UnbindFromRenderStep(RenderStepKey)
+
+				if AnimationId == LocalAnimationId then
+					LastUpdatePoint = -1
+				end
+			end
 		end
 	end
 
-	local function UpdateTweenModels()
-		-- @return Boolean, DidUpdate, whether it updated or not.
+	local function TimeSinceUpdate()
+		-- Calculates the time since the last update function was called
+		-- Used to determine if a new update function should be generated, since clients tend to
+		-- kill threads when local scripts are GCed
 
-		local CurrentTick = tick()
-		local DidUpdate = false
+		return tick() - LastUpdatePoint
+	end
 
-		for Gui, TweenState in next, ProcessList do
+	local function ShouldStartUpdate()
+		return LastUpdatePoint == -1 -- In this case, we have no active threads
+			or TimeSinceUpdate() > 0.1 -- In this case, our presumed active thread is dead.
+	end
+
+	local function StartNewThread()
+		--- Starts an update thread, potentialy removing the old one.
+
+		local RenderStepKey = "TweenTransparencyOnGuis" .. tostring(UpdateFunction) .. tick()
+		RunService:BindToRenderStep(RenderStepKey, 2000, GetNewUpdateFunction(RenderStepKey))
+	end
+
+	return function()
+		-- Starts the tween
+		if ShouldStartUpdate() then
+			StartNewThread()
+		end
+	end
+end
+
+local function MakePropertyTweener(SetProperties)
+	--- Creates a tweener that only runs when it's updating with a set properties system.
+	-- @param function `SetProperties` 
+		-- SetProperties(Gui, Percent, StartProperties, NewProperties)
+			-- @param Gui The Gui to set properties on
+			-- @param Percent Number [0, 1] of properties to set
+			-- @param StartProperties The properties we started with
+			-- @param NewProperties The properties we ended with
+	-- @return 
+
+	local GuiMap = {} -- [Gui] = TweenData
+
+	local function GetTweenData(Gui, NewProperties, Duration)
+		-- Returns new tween data for the GUI in question
+
+		local StartProperties = {}
+		local EndProperties = {}
+
+		-- Copy data into the table
+		for Index, Value in pairs(NewProperties) do
+			if Gui[Index] ~= Value then
+				StartProperties[Index] = Gui[Index]
+				EndProperties[Index] = Value
+			end
+		end
+
+		return {
+			StartTime       = tick();
+			Duration        = Duration;
+			StartProperties = StartProperties;
+			NewProperties   = EndProperties;
+		}
+	end
+
+	local StartRenderStepUpdater = CreateYieldedUpdate(function()
+		-- Update function that will be called each second
+
+		local tick = tick()
+		local ShouldStop = true
+
+		for Gui, TweenState in next, GuiMap do
 			if Gui:IsDescendantOf(game) then
-				DidUpdate = true
+				local TimeElapsed = tick - TweenState.StartTime
 
-				local TimeElapsed = (CurrentTick - TweenState.StartTime)
-				local Duration    = TweenState.Duration
-
-				if TimeElapsed > Duration then -- Then we end it.
+				if TimeElapsed > TweenState.Duration then -- Then we end it.
 					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties) 
-					ProcessList[Gui] = nil
-				else -- Otherwise do the animations.
-					SetProperties(Gui, TimeElapsed/Duration, TweenState.StartProperties, TweenState.NewProperties)
+					GuiMap[Gui] = nil
+				else
+					SetProperties(Gui, TimeElapsed/TweenState.Duration, TweenState.StartProperties, TweenState.NewProperties)
+					ShouldStop = false
 				end
 			else
-				ProcessList[Gui] = nil
+				GuiMap[Gui] = nil
 			end
 		end
 
-		return DidUpdate
-	end
+		return ShouldStop
+	end)
 
-	local function StartProcessUpdate()
-		-- ProcessingList stores state of processing.
-
-		if not (ProcessingList) then
-			ProcessingList = true
-			
-			if IsLocal then
-				local UpdateName = "TweenTransparencyOnGuis" .. tick()
-
-				RunService:BindToRenderStep(UpdateName, 2000, function()
-					local DidUpdate = UpdateTweenModels()
-					if not DidUpdate then
-						ProcessingList = false
-						RunService:UnbindFromRenderStep(UpdateName)
-					end
-				end)
-			else
-				local DidDoIt, Error = coroutine.resume(coroutine.create(function()
-					local DidUpdate
-					repeat
-						DidUpdate = UpdateTweenModels()
-					until (not DidUpdate) and wait(0.05) -- repeat until DidUpdate is false. 
-
-					ProcessingList = false
-				end))
-
-				if not DidDoIt then
-					ProcessingList = false
-					error(Error)
-				end
-			end
-		end
-	end
-
-	function TweenTransparency(Gui, NewProperties, Duration, Override)
-		-- Override tween system to tween the transparency of properties. Unfortunately, overriding is per a GUI as of now. 
-		--- Tween's the Transparency values in a GUI,
+	return function(Gui, NewProperties, Duration)
+		--- A tweening function to begin tweening on a Gui element
 		-- @param Gui The GUI to tween the Transparency's upon
 		-- @param NewProperties The properties to be changed. It will take the current
 		--                      properties and tween to the new ones. This table should be
 		--                      setup so {Index = NewValue} that is, for example, 
 		--                      {TextTransparency = 1}.
-		-- @param Time The amount of time to spend transitioning.
-		-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
+		-- @param Duration The amount of time to spend transitioning.
 
-		if not ProcessList[Gui] or Override then
-			if Duration <= 0 then
-				warn("[TweenTransparency] - Duration <= 0")
-				SetProperties(Gui, 1, NewProperties, NewProperties)
-			else
-				-- Fill StartProperties
-				local StartProperties = {}
-				local CopiedNewProperties = {}
-
-				for Index, Value in pairs(NewProperties) do
-					if Gui[Index] ~= Value then
-						StartProperties[Index] = Gui[Index]
-						CopiedNewProperties[Index] = Value
-					-- else
-					-- 	warn("Number " .. Index .. " of " .. Gui:GetFullName() .. " is not changing. @" .. tostring(Value))
-					end
-				end
-
-				-- And set NewState
-				local NewState = {
-					StartTime       = tick();
-					Duration        = Duration or error("No duration");
-					StartProperties = StartProperties;
-					NewProperties   = CopiedNewProperties;
-				}
-
-				ProcessList[Gui] = NewState
-				StartProcessUpdate()
-			end
+		if Duration <= 0 then
+			SetProperties(Gui, 1, NewProperties, NewProperties)
+		else
+			GuiMap[Gui] = GetTweenData(Gui, NewProperties, Duration)
+			StartRenderStepUpdater()
 		end
+	end, function(Gui)
+	 	-- A tweening function to manually terminate tweening on a Gui element
+	 	-- @param Gui The GUI to stop tweening
+
+		GuiMap[Gui] = nil
 	end
-
-	function StopTransparencyTween(Gui)
-		-- Overrides all the current transparency animations in a GUI. Perhaps useful.
-		-- @param Gui The GUI to stop the tween the Transparency's upon
-
-		ProcessList[Gui] = nil
-	end
-
-
-	lib.TweenTransparency = TweenTransparency
-	lib.tweenTransparency = TweenTransparency
-
-	lib.StopTransparencyTween = StopTransparencyTween
-	lib.stopTransparencyTween = StopTransparencyTween
 end
 
+-- TweenTransparency(Gui, NewProperties, Time)
+--- Tween's the Transparency values in a GUI,
+-- @param Gui The GUI to tween the Transparency's upon
+-- @param NewProperties The properties to be changed. It will take the current
+--                      properties and tween to the new ones. This table should be
+--                      setup so {Index = NewValue} that is, for example, 
+--                      {TextTransparency = 1}.
+-- @param Time The amount of time to spend transitioning.
+local TweenTransparency, StopTransparencyTween = MakePropertyTweener(function(Gui, Percent, StartProperties, NewProperties)
+	for Index, EndValue in next, NewProperties do
+		local StartProperty = StartProperties[Index]
+		Gui[Index] = StartProperty + (EndValue - StartProperty) * Percent
+	end
+end)
+
+lib.TweenTransparency = TweenTransparency
+lib.StopTransparencyTween = StopTransparencyTween
+
+
+--- TweenColor3(Gui, NewProperties, Time)
+--- Tween's the Color3 values in a GUI,
+-- @param Gui The GUI to tween the Color3's upon
+-- @param NewProperties The properties to be changed. It will take the current
+--                      properties and tween to the new ones. This table should be
+--                      setup so {Index = NewValue} that is, for example, 
+--                      {BackgroundColor3 = Color3.new(1, 1, 1)}.
+-- @param Duration The amount of time to spend transitioning.
+
 local TweenColor3, StopColor3Tween do
-	local IsLocal = game:FindService("MeshContentProvider") ~= nil or (game:FindService("NetworkServer") == nil)
-	local ProcessList = {}
-	-- setmetatable(ProcessList, WEAK_MODE.K)
-	local ActivelyProcessing = false
-
-
 	local function LerpNumber(ValueOne, ValueTwo, Alpha)
-		--- From qMath
-
 		return ValueOne + ((ValueTwo - ValueOne) * Alpha)
 	end
 
 	local function LerpColor3(ColorOne, ColorTwo, Alpha)
-		--- From qColor3
-		
 		return Color3.new(LerpNumber(ColorOne.r, ColorTwo.r, Alpha), LerpNumber(ColorOne.g, ColorTwo.g, Alpha), LerpNumber(ColorOne.b, ColorTwo.b, Alpha))
 	end
 
-	local function SetProperties(Gui, Percent, StartProperties, NewProperties)
-		-- Maybe there's a better way to do this?
-
+	TweenColor3, StopColor3Tween = MakePropertyTweener(function(Gui, Percent, StartProperties, NewProperties)
 		for Index, EndValue in next, NewProperties do
 			local StartProperty = StartProperties[Index]
 			Gui[Index] = LerpColor3(StartProperty, EndValue, Percent)
 		end
-	end
-
-	local function UpdateTweenModels()
-		local CurrentTick = tick()
-		ActivelyProcessing = false
-
-		for Gui, TweenState in next, ProcessList do
-			if Gui and Gui:IsDescendantOf(game) then
-				ActivelyProcessing = tick()
-
-				local TimeElapsed = (CurrentTick - TweenState.StartTime)
-				local Duration    = TweenState.Duration
-
-				if TimeElapsed > Duration then
-					-- Then we end it.
-					
-					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties) 
-					ProcessList[Gui] = nil
-				else
-					-- Otherwise do the animations.
-
-					SetProperties(Gui, TimeElapsed/Duration, TweenState.StartProperties, TweenState.NewProperties)
-				end
-			else
-				ProcessList[Gui] = nil
-			end
-		end
-	end
-
-	local function StartProcessUpdate()
-		if not (ActivelyProcessing and ActivelyProcessing + 0.1 >= tick()) then
-			ActivelyProcessing = tick()
-			assert(coroutine.resume(coroutine.create(function()
-				while ActivelyProcessing do
-					UpdateTweenModels()
-					-- wait(0.05)
-					if IsLocal then
-						RunService.RenderStepped:wait()
-					else
-						wait(0.05)
-					end
-				end
-			end)))
-		end
-	end
-	
-	function TweenColor3(Gui, NewProperties, Duration, Override)
-		--- Tween's the Color3 values in a GUI,
-		-- @param Gui The GUI to tween the Color3's upon
-		-- @param NewProperties The properties to be changed. It will take the current
-		--                      properties and tween to the new ones. This table should be
-		--                      setup so {Index = NewValue} that is, for example, 
-		--                      {BackgroundColor3 = Color3.new(1, 1, 1)}.
-		-- @param Duration The amount of time to spend transitioning.
-		-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
-
-		if not ProcessList[Gui] or Override then
-			if Duration <= 0 then
-				SetProperties(Gui, 1, NewProperties, NewProperties)
-			else
-				-- Fill StartProperties
-				local StartProperties = {}
-				local CopiedNewProperties = {}
-
-				for Index, Value in pairs(NewProperties) do
-					if Gui[Index] ~= Value then
-						StartProperties[Index] = Gui[Index]
-						CopiedNewProperties[Index] = Value
-					-- else
-					-- 	warn("Color3", Index, " of", Gui:GetFullName(), " is not changing")
-					end
-				end
-
-				-- And set NewState
-				local NewState = {
-					StartTime       = tick();
-					Duration        = Duration or error("No duration");
-					StartProperties = StartProperties;
-					NewProperties   = CopiedNewProperties;
-				}
-
-				ProcessList[Gui] = NewState
-				StartProcessUpdate()
-			end
-		end
-	end
-
-	function StopColor3Tween(Gui)
-		-- Overrides all the current animations of Color3 in the GUI. 
-		-- @param Gui The GUI to stop the tween animations on
-
-		ProcessList[Gui] = nil
-	end
-
-	lib.TweenColor3 = TweenColor3
-	lib.tweenColor3 = TweenColor3
-
-	lib.StopColor3Tween = StopColor3Tween
-	lib.stopColor3Tween = StopColor3Tween
+	end)
 end
+
+lib.TweenColor3 = TweenColor3
+lib.StopColor3Tween = StopColor3Tween
+
+
+
 
 local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect, OverrideSize, InkColor)
 	--- Google design thing. Actually, it's ink. :P
