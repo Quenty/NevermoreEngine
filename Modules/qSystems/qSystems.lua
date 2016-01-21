@@ -94,12 +94,12 @@ local function Modify(Instance, Values)
 			Value.Parent = Instance
 		elseif type(Value) == "function" then
 			Instance[Index]:connect(Value)
-		elseif Index ~= "CFrame" then
+		elseif Index ~= "Parent" then
 			Instance[Index] = Value
 		end
 	end
-	if Values["CFrame"] then -- If CFrame is in Values, change it last
-		Instance["CFrame"] = Values["CFrame"]
+	if Values["Parent"] then -- If Parent is in Values, change it last
+		Instance["Parent"] = Values["Parent"]
 	end
 	return Instance
 end
