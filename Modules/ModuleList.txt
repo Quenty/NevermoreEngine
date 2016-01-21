@@ -26,8 +26,8 @@ Events\Signal.lua
 Events\TimeSyncManager.lua
 Input\BindableAction.lua
 Input\BindedIcon.lua
-Input\HeldKey.lua
-Input\HeldRateKey.lua
+Input\HeldInput.lua
+Input\HeldRateInput.lua
 Input\InputBind.lua
 OutputStream\OutputClassStreamLoggers.lua
 OutputStream\OutputStream.lua
@@ -49,10 +49,6 @@ qCFrame\PartGeometry.lua
 qCFrame\qCFrame.lua
 qCFrame\Quaternion.lua
 qCFrame\SurfaceNormal.lua
-qCFrame\Regions\EffectFence.lua
-qCFrame\Regions\EffectGroup.lua
-qCFrame\Regions\Region.lua
-qCFrame\Regions\TrackingEffectGroup.lua
 qGUI\LensGlare.lua
 qGUI\qGUI.lua
 qGUI\RelativeFrameBuilder.lua
