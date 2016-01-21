@@ -58,7 +58,7 @@ function RotatedCamera:__newindex(Index, Value)
 		self._MaxY = Value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif Index == "MinY" then
-		assert(Value < self.MinY, "MinY must be less than MeeeaxY")
+		assert(Value < self.MinY, "MinY must be less than MaxY")
 		self._MaxY = Value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif RotatedCamera[Index] ~= nil then
