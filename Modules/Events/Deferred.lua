@@ -220,7 +220,8 @@ function M.map(args, fn)
 	return d
 end
 
-function M.first(args)
+function M.first(...)
+	local args = {...}
 	
 	local d = M.new()
 	for _, v in ipairs(args) do
