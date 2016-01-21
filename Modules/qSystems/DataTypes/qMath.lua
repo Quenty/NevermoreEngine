@@ -38,9 +38,8 @@ lib.RoundDown = RoundDown
 lib.roundDown = RoundDown
 
 local function RoundNumber(Number, Divider)
-
 	Divider = Divider or 1
-	return math.floor((Number/Divider) + 0.5) * Divider
+	return (math.floor((Number/Divider)+0.5)*Divider)
 end
 lib.roundNumber = RoundNumber
 lib.RoundNumber = RoundNumber
