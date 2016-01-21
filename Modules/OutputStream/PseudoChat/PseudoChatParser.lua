@@ -127,11 +127,14 @@ local function ComputeSpaceString(Label, PlayerLabel)
 	local newString = " "
 	
 	Label.Text = newString
-
-	while Label.TextBounds.X < PlayerLabel.TextBounds.X do
-		-- print(Label.TextBounds.X .. " < " .. PlayerLabel.TextBounds.X)
+	
+	local LastTextBounds = Label.TextBounds.X
+	while Label.TextBounds.X < PlayerLabel.TextBounds.X do		
 		newString = newString .. " "
 		Label.Text = newString;
+		
+		LastTextBounds = Label.TextBounds.X
+		assert(LastTextBounds ~= Label.TextBounds.X, "Textbounds not changing")
 	end
 	newString = newString .. " "
 	CachedSpaceStringList[PlayerLabel.Text] = newString
