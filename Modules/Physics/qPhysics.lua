@@ -5,7 +5,7 @@ local lib = {}
 -- @owner Trey Reynolds
 
 local function GetConnectedParts(Part)
-	--- Retrieves all connected parts of a part, plus the connected
+	--- Retrieves all connected parts of a part, plus the connected part
 	
 	local Parts = Part:GetConnectedParts(true)
 	Parts[#Parts+1] = Part
