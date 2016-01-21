@@ -114,7 +114,7 @@ local function Make(ClassType, Properties, ...)
 	local objects = {...}
 	if #objects > 0 then
 		for index, objectProps in next, objects do
-			objects[index] = Modify(Modify(Instance.new(ClassType), Properties), objectProps)
+			objects[index] = Modify(Modify(Instance.new(ClassType), objectProps), Properties)
 		end
 		return unpack(objects)
 	else
