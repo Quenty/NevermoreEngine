@@ -81,6 +81,20 @@ end
 lib.RoundNumber = RoundNumber
 lib.Round = RoundNumber
 
+local function Debounce(func)
+    local isRunning = false    -- Create a local debounce variable
+    return function(...)       -- Return a new function
+        if not isRunning then
+            isRunning = true
+ 
+            func(...)          -- Call it with the original arguments
+ 
+            isRunning = false
+        end
+    end
+end
+lib.Debounce = Debounce
+
 local function Modify(Instance, Values)
 	--- Modifies an Instance by using a table.  
 	-- @param Instance The instance to modify
@@ -93,7 +107,7 @@ local function Modify(Instance, Values)
 		if type(Index) == "number" then
 			Value.Parent = Instance
 		elseif type(Value) == "function" then
-			Instance[Index]:connect(Value)
+			Instance[Index]:connect(Debounce(Value))
 		elseif Index ~= "Parent" then
 			Instance[Index] = Value
 		end
