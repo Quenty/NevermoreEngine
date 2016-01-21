@@ -3,8 +3,8 @@ local RunService = game:GetService("RunService")
 local HeldRateInput = {}
 HeldRateInput.__index = HeldRateInput
 HeldRateInput.ClassName = "HeldRateInput"
-HeldRateInput.Rate = 0.25
-HeldRateInput.Acceleration = 1.1
+HeldRateInput.Rate = 1
+HeldRateInput.Acceleration = 1.5
 
 --- Like a Heldkey, but with an increasing rate
 -- @author Quenty
@@ -42,9 +42,9 @@ function HeldRateInput:HandleNewState(UserInputState)
 		RunService:BindToRenderStep(RenderStepBindKey, 101, function()
 			local Time = tick()
 			local dt = Time - LastUpdate
-			LastUpdate = Time
 			
-			local Delta = (self.Acceleration^(Time - StartTime) * self.Acceleration^dt-1)/math.log(self.Acceleration)
+			
+			local Delta = (self.Acceleration^(LastUpdate-StartTime) * self.Acceleration^dt-1)/math.log(self.Acceleration)
 			Delta = Delta*self.Rate
 			
 			if LocalPressId == self.PressId then
@@ -53,6 +53,8 @@ function HeldRateInput:HandleNewState(UserInputState)
 				self.RepeatFunction(Delta, Enum.UserInputState.End)
 				RunService:UnbindFromRenderStep(RenderStepBindKey)
 			end
+			
+			LastUpdate = Time
 		end)
 	elseif UserInputState.Name == "End" then
 		self:Stop()
