@@ -1,18 +1,19 @@
 local ExperienceCalculator = {}
-local ExperienceFactor = 200
+local ExperienceFactor = 10
 
-function ExperienceCalculator.GetLevelFromExperience(Experience)
+local function GetLevelFromExperience(Experience)
 	-- http://stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
 	
 	return math.floor((ExperienceFactor + math.sqrt(ExperienceFactor * ExperienceFactor - 4 * ExperienceFactor * (-Experience)))/ (2 * ExperienceFactor))
 end
+ExperienceCalculator.GetLevelFromExperience = GetLevelFromExperience
 
-function ExperienceCalculator.GetExperienceForNextLevel(CurrentExperience)
+local function GetExperienceForNextLevel(CurrentExperience)
 	if CurrentExperience - 1 == CurrentExperience then -- Math.huge
 		return 0
 	end
 	
-	local CurrentLevel = ExperienceCalculator.GetLevelFromExperience(CurrentExperience)
+	local CurrentLevel = GetLevelFromExperience(CurrentExperience)
 	local ExperienceRequired = ExperienceFactor*(CurrentLevel*(1+CurrentLevel))
 	--local ExperienceRequiredForCurrentLevel = ExperienceFactor*(CurrentLevel*(1+CurrentLevel))
 
@@ -20,20 +21,22 @@ function ExperienceCalculator.GetExperienceForNextLevel(CurrentExperience)
 	
 	return ExperienceLeft
 end
+ExperienceCalculator.GetExperienceForNextLevel = GetExperienceForNextLevel
 
-function ExperienceCalculator.GetExperienceRequiredForLevel(Level)
+local function GetExperienceRequiredForLevel(Level)
 	Level = Level - 1 -- Because normally this formula calculates experience required for next level.
 	return ExperienceFactor*(Level*(1+Level))
 end
+ExperienceCalculator.GetExperienceRequiredForLevel = GetExperienceRequiredForLevel
 
-function ExperienceCalculator.GetSubExperience(CurrentExperience)
+local function GetSubExperience(CurrentExperience)
 	-- @return Achieved of next level, Total required for next level, Percent
 	
 	if CurrentExperience - 1 == CurrentExperience then -- Math.huge
 		return 1,1,1
 	end
 	
-	local CurrentLevel = ExperienceCalculator.GetLevelFromExperience(CurrentExperience)
+	local CurrentLevel = GetLevelFromExperience(CurrentExperience)
 	local LastLevel = CurrentLevel-1
 	
 	local ExperienceRequiredForCurrentLevel = ExperienceFactor*(LastLevel*(1+LastLevel))
@@ -51,5 +54,6 @@ function ExperienceCalculator.GetSubExperience(CurrentExperience)
 	
 	return AchievedOfNext, SubTotalRequired, Percent
 end
+ExperienceCalculator.GetSubExperience = GetSubExperience
 
 return ExperienceCalculator
