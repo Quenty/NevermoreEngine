@@ -1,18 +1,19 @@
--- Intent: Be able to comparable tuples
+-- Intent: Be able to compare tuples
+-- @author Quenty
 
-local CompariableTuple = {}
-CompariableTuple.__index = CompariableTuple
-CompariableTuple.ClassName = "CompariableTuple"
+local ComparableTuple = {}
+ComparableTuple.__index = ComparableTuple
+ComparableTuple.ClassName = "ComparableTuple"
 
-function CompariableTuple.new(...)
-	local self = setmetatable({}, CompariableTuple)
+function ComparableTuple.new(...)
+	local self = setmetatable({}, ComparableTuple)
 
 	self.Args = {...}
 
 	return self
 end
 
-function CompariableTuple:__eq(Value)
+function ComparableTuple:__eq(Value)
 	if #self.Args ~= #Value.Args then
 		return false
 	end
@@ -29,4 +30,4 @@ function CompariableTuple:__eq(Value)
 	return true
 end
 
-return CompariableTuple
+return ComparableTuple
