@@ -70,7 +70,7 @@ function PushCamera:__newindex(Index, Value)
 		local YRotation = XZRotation:toObjectSpace(Value).lookVector.y
 		self.AngleY = math.asin(YRotation)
 	elseif Index == "AngleY" then
-		self._AngleY = ClampgoNumber(Value, self.MinY, self.MaxY)
+		self._AngleY = ClampNumber(Value, self.MinY, self.MaxY)
 	elseif Index == "AngleX" or Index == "AngleXZ" then
 		self.LastUpdateTime = tick()
 		self._AngleXZ0 = Value
