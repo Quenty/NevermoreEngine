@@ -636,93 +636,22 @@ lib.generateMouseDrag = GenerateMouseDrag
 local function AddTexturedWindowTemplate(Frame, Radius, Type)
 	-- Makes a 'Textured' window...  9Scale thingy?
 
-	Type = Type or 'Frame';
-
-	local TopLeft = Make(Type, {
+	return Make(Type or 'Frame', {
 		Archivable             = false;
 		BackgroundColor3       = Frame.BackgroundColor3;
 		BorderSizePixel        = 0;
-		Name                   = "TopLeft";
 		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 0, 0);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
 		BackgroundTransparency = 1;
 		ZIndex                 = Frame.ZIndex;
-	});
-
-	local BottomLeft = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "BottomLeft";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 1, -Radius);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local TopRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "TopRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 0, 0);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local BottomRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "BottomRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 1, -Radius);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local Middle = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "Middle";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, Radius, 0, 0);
-		Size                   = UDim2.new(1, -Radius*2, 1, 0);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local MiddleLeft = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleLeft";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 0, Radius);
-		Size                   = UDim2.new(0, Radius, 1, -Radius*2);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local MiddleRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 0, Radius);
-		Size                   = UDim2.new(0, Radius, 1, -Radius*2);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
+	},
+		{Name = "TopLeft";	Position = UDim2.new(0, 0, 0, 0);		Size = UDim2.new(0, Radius, 0, Radius)},
+		{Name = "BottomLeft";	Position = UDim2.new(0, 0, 1, -Radius);		Size = UDim2.new(0, Radius, 0, Radius)},
+		{Name = "TopRight";	Position = UDim2.new(1, -Radius, 0, 0);		Size = UDim2.new(0, Radius, 0, Radius)},
+		{Name = "BottomRight";	Position = UDim2.new(1, -Radius, 1, -Radius);	Size = UDim2.new(0, Radius, 0, Radius)},
+		{Name = "Middle";	Position = UDim2.new(0, Radius, 0, 0);		Size = UDim2.new(1, -Radius*2, 1, 0  )},
+		{Name = "MiddleLeft";	Position = UDim2.new(0, 0, 0, Radius);		Size = UDim2.new(0, Radius, 1, -Radius*2)},
+		{Name = "MiddleRight";	Position = UDim2.new(1, -Radius, 0, Radius);	Size = UDim2.new(0, Radius, 1, -Radius*2)}
+	)
 end
 lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 lib.addTexturedWindowTemplate = AddTexturedWindowTemplate
