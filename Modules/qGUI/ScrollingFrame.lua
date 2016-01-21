@@ -9,6 +9,7 @@ local Mouse            = LocalPlayer:GetMouse()
 -- @author Quenty
 
 --- UTILITY ---
+-- Utility funtions have been added to allow ScrollingFrame to operate as a standalone module.
 
 local function GetPositionFromOffset(Offset, Axis)
 	-- Utility function
