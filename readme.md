@@ -45,6 +45,7 @@ You don't have to use a library unless you load it. Nevermore should not impact 
 # Get Nevermore
 Paste the following code into your command bar in ROBLOX Studio to install Nevermore.
 
+
 ```lua
 local a=game:GetService("HttpService")local b=game:GetService("ReplicatedStorage")local c=game:GetService("ServerScriptService")local d=a.HttpEnabled;a.HttpEnabled=true;local function e(f)f=f:gsub("\\","/"):gsub("^%s*(.-)%s*$","%1")return a:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/"..f)end;local function g(h,f)local i=f:gmatch("(%w+)%.lua")()local j=h:FindFirstChild(i)or Instance.new("ModuleScript",h)j.Name=i;j.Source=e(f)or error("Unable to load script")return j end;local function k(h,f)local l=f:gmatch("%w+\\")()if l then l=l:sub(1,#l-1)local j=h:FindFirstChild(l)or Instance.new("Folder",h)j.Name=l;return k(j,f:sub(#l+2,#f))else return h end end;print("Loading Nevermore")g(b,"App/NevermoreEngine.lua")print("Loading sublibraries")local m=k(c,"Nevermore\\")local n={}for o in e("Modules/ModuleList.txt"):gmatch("[^\r\n]+")do n[#n+1]=o end;for p,o in pairs(n)do g(k(m,o),"Modules/"..o)print(p,"/",#n)end;a.HttpEnabled=d;print("Done loading")
 ```
