@@ -56,6 +56,7 @@ end
 function ModelRender3D:GetPrimaryCFrame()
 	if self.Gui and self.Model then
 		local Frame = self.Gui
+		--local ModelSize = self.Model:GetExtentsSize() * self.Scale
 		local ModelSize = self.PrimaryPart.Size * self.Scale
 		
 		local FrameAbsoluteSize = Frame.AbsoluteSize
