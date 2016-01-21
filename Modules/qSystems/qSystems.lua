@@ -82,16 +82,16 @@ lib.RoundNumber = RoundNumber
 lib.Round = RoundNumber
 
 local function Debounce(func)
-    local isRunning = false    -- Create a local debounce variable
-    return function(...)       -- Return a new function
-        if not isRunning then
-            isRunning = true
- 
-            func(...)          -- Call it with the original arguments
- 
-            isRunning = false
-        end
-    end
+	--- Debounces a function
+	-- @param func The function to debounce
+	local isRunning = false    -- Create a local debounce variable
+	return function(...)       -- Return a new function
+		if not isRunning then
+			isRunning = true
+			func(...)          -- Call it with the original arguments
+			isRunning = false
+		end
+	end
 end
 lib.Debounce = Debounce
 
@@ -99,7 +99,6 @@ local function Modify(Instance, Values)
 	--- Modifies an Instance by using a table.  
 	-- @param Instance The instance to modify
 	-- @param Values A table with keys as the value to change, and the value as the property to
-	--     assign
 
 	assert(type(Values) == "table", "Values is not a table")
 
@@ -112,6 +111,7 @@ local function Modify(Instance, Values)
 			Instance[Index] = Value
 		end
 	end
+
 	if Values["Parent"] then -- If Parent is in Values, change it last
 		Instance["Parent"] = Values["Parent"]
 	end
@@ -127,8 +127,9 @@ local function Make(ClassType, Properties, ...)
 	-- 	This would be used for creating a custom "default" list of properties so you don't need to rewrite the same properties over and over.
 	local objects = {...}
 	if #objects > 0 then
-		for index, objectProps in next, objects do
-			objects[index] = Modify(Modify(Instance.new(ClassType), objectProps), Properties)
+		for a = 1, #objects do
+			objects[a] = Modify(Instance.new(ClassType), objectProps)
+			objects[a] = Modify(objects[a], Properties)
 		end
 		return unpack(objects)
 	else
