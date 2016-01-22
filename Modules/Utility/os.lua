@@ -3,7 +3,7 @@
 -- Please message Narrev (on Roblox) for any functionality you would like added
 
 --[[
-	This adds os.date back to Roblox! It functions just like Lua's built-in os.date, but with a few additions.
+	This extends the os table to include os.date! It functions just like Lua's built-in os.date, but with a few additions.
 	Note: Padding can be toggled by inserting a '_' like so: os.date("%_x", os.time())
 	Note: tick() is the default unix time used for os.date()
 
@@ -49,10 +49,8 @@
 	os.clock() returns how long the server has been active, or more realistically, how long since when you required this module
 	os.UTCToTick returns your time in seconds given @param UTC time in seconds
 --]]
-local firstRequired	= os.time()
---local overflow	= (require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary)("table").overflow
-
-return {
+local firstRequired = os.time()
+return setmetatable({
 	date = function(optString, unix)
 		local stringPassed = false
 		
@@ -80,7 +78,14 @@ return {
 			optString, stringPassed = "%c", true
 		end
 		local floor, ceil	= math.floor, math.ceil
-		local overflow		= function(tab, seed) for i, value in ipairs(tab) do if seed - value <= 0 then return i, seed end seed = seed - value end end
+		local overflow		= function(tab, seed)
+			for i = 1, #tab do
+				if seed - tab[i] <= 0 then
+					return i, seed
+				end
+				seed = seed - tab[i]
+			end
+		end
 		local getLeaps		= function(yr) local yr = yr - 1 return floor(yr/4) - floor(yr/100) + floor(yr/400) end
 		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
@@ -151,12 +156,5 @@ return {
 		end
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end;
-	UTCToTick = function(time)
-		-- UTC time in seconds to your time in seconds
-		-- This is for scheduling Roblox events across timezones
-		return time + math.ceil(tick()) - os.time()
-	end;
-	time = function(...) return os.time(...) end;
-	difftime = function(...) return os.difftime(...) end;
 	clock = function(...) return os.difftime(os.time(), firstRequired) end;
-}
+}, {__index = os})
