@@ -113,9 +113,6 @@ local function Modify(Instance, Values)
 	end
 	if Values.CFrame then
 		Instance.CFrame = Values.CFrame
-		if Values.Parent then
-			Instance.Parent = Parent
-		end
 	end
 	return Instance
 end
@@ -130,8 +127,8 @@ local function Make(ClassType, Properties, ...)
 	local objects = {...}
 	if #objects > 0 then
 		for a = 1, #objects do
-			objects[a] = Modify(Instance.new(ClassType), objectProps)
-			objects[a] = Modify(objects[a], Properties)
+			objects[a] = Modify(Instance.new(ClassType), Properties)
+			objects[a] = Modify(objects[a], objectProps)
 		end
 		return unpack(objects)
 	else
