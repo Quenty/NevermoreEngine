@@ -103,17 +103,19 @@ local function Modify(Instance, Values)
 	assert(type(Values) == "table", "Values is not a table")
 
 	for Index, Value in next, Values do
-		if type(Index) == "number" then
-			Value.Parent = Instance
-		elseif type(Value) == "function" then
+		if type(Value) == "function" then
 			Instance[Index]:connect(Debounce(Value))
-		elseif Index ~= "Parent" then
+		elseif type(Index) == "string" then
 			Instance[Index] = Value
+		elseif type(Index) == "number" then
+			Value.Parent = Instance
 		end
 	end
-
-	if Values["Parent"] then -- If Parent is in Values, change it last
-		Instance["Parent"] = Values["Parent"]
+	if Values.CFrame then
+		Instance.CFrame = Values.CFrame
+		if Values.Parent then
+			Instance.Parent = Parent
+		end
 	end
 	return Instance
 end
