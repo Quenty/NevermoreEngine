@@ -47,7 +47,6 @@
 	%%	the character `%´
 	
 	os.clock() returns how long the server has been active, or more realistically, how long since when you required this module
-	os.UTCToTick returns your time in seconds given @param UTC time in seconds
 --]]
 local firstRequired = os.time()
 return setmetatable({
