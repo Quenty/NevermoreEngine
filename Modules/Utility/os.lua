@@ -77,21 +77,13 @@ return setmetatable({
 			optString, stringPassed = "%c", true
 		end
 		local floor, ceil	= math.floor, math.ceil
-		local overflow		= function(tab, seed)
-			for i = 1, #tab do
-				if seed - tab[i] <= 0 then
-					return i, seed
-				end
-				seed = seed - tab[i]
-			end
-		end
-		local getLeaps		= function(yr) local yr = yr - 1 return floor(yr/4) - floor(yr/100) + floor(yr/400) end
+		local overflow		= function(tab, seed) for i = 1, #tab do if seed - tab[i] <= 0 then return i, seed end seed = seed - tab[i] end end
 		local dayAlign		= unix == 0 and 1 or 0 -- fixes calculation for unix == 0
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
 		local days, month, year	= ceil(unix / 86400) + 719527
 		local wday		= (days + 6) % 7
 		local _4Years		= floor(days % 146097 / 1461) * 4 + floor(days / 146097) * 400 
-		      year, days	= overflow({366,365,365,365}, days - 365*_4Years - getLeaps(_4Years)) -- [0-1461]
+		      year, days	= overflow({366,365,365,365}, days - 365*_4Years - floor(_4Years/4 - .25) + floor(_4Years/100 - .01) - floor(_4Years/400 - .0025)) -- [0-1461]
 		      year, _4Years	= year + _4Years - 1
 		local yDay		= days
 		      month, days	= overflow({31,(year%4==0 and(year%100~=0 or year%400==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
@@ -108,8 +100,7 @@ return setmetatable({
 			local padded = function(num)
 				return string.format("%02d", num)
 			end
-			return (
-			optString
+			return (optString
 			:gsub("%%c",  "%%x %%X")
 			:gsub("%%_c", "%%_x %%_X")
 			:gsub("%%x",  "%%m/%%d/%%y")
@@ -155,5 +146,5 @@ return setmetatable({
 		end
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end;
-	clock = function(...) return os.difftime(os.time(), firstRequired) end;
+	clock = function(...) return os.time() - firstRequired end;
 }, {__index = os})
