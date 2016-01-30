@@ -82,11 +82,11 @@ return setmetatable({
 		local unix		= type(unix) == "number" and unix + dayAlign or tick()
 		local days, month, year	= ceil(unix / 86400) + 719527
 		local wday		= (days + 6) % 7
-		local _4Years		= floor(days % 146097 % 36525 / 1461) * 4 + floor(days % 146097 / 36525) * 100 + floor(days / 146097) * 400
+		local _4Years		= 400*floor(days / 146097) + 100*floor(days % 146097 / 36525) + 4*floor(days % 146097 % 36525 / 1461)
 		      year, days	= overflow({366,365,365,365}, days - 365*_4Years - floor(.25*_4Years - .25) + floor(.01*_4Years - .01) - floor(.0025*_4Years - .0025) ) -- [0-1461]
 		      year, _4Years	= year + _4Years - 1
 		local yDay		= days
-		      month, days	= overflow({31,(year%4==0 and(year%100~=0 or year%400==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
+		      month, days	= overflow({31,(year%4==0 and(year%25~=0 or year%16==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
 		local hours		= floor(unix / 3600 % 24)
 		local minutes		= floor(unix / 60 % 60)
 		local seconds		= floor(unix % 60) - dayAlign
