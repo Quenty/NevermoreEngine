@@ -60,3 +60,6 @@ API:
 	Maid:GiveTask(task)            // Same as above, but uses an incremented number as a key.
 	Maid:DoCleaning()              // Disconnects all managed events and performs all clean-up tasks.
 ```
+
+# Deferred
+Written by zserge, [documentation](https://github.com/zserge/lua-promises) can be found [here](https://github.com/zserge/lua-promises). 
