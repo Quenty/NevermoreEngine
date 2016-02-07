@@ -29,18 +29,34 @@ Written by Vorlias, [documentation here](https://github.com/Vorlias/ROBLOX-ModRe
 	their signal arguments by value, meaning tables will be deep copied when that
 	is almost never the desired behavior.
 ```javascript
-	class Signal
-	API:
-		void fire(...)
-		//	Fire the event with the given arguments.
-			
-		Connection connect(Function handler)
-		//	Connect a new handler to the event, returning a connection object that
-		//	can be disconnected.
-			
-		... wait()
-		//	Wait for fire to be called, and return the arguments it was given.
-	
-		Destroy()
-		//	Disconnects all connected events to the signal and voids the signal as unusable.
+class Signal
+API:
+	void fire(...)
+	//	Fire the event with the given arguments.
+		
+	Connection connect(Function handler)
+	//	Connect a new handler to the event, returning a connection object that
+	//	can be disconnected.
+		
+	... wait()
+	//	Wait for fire to be called, and return the arguments it was given.
+
+	Destroy()
+	//	Disconnects all connected events to the signal and voids the signal as unusable.
+```
+
+# Maid
+Manages the cleaning of events and other things.
+Modified by Quenty
+```javascript
+API:
+	HireMaid()                     // Returns a new Maid object.
+ 
+	Maid[key] = (function)         // Adds a task to perform when cleaning up.
+	Maid[key] = (event connection) // Manages an event connection. Anything that isn't a function is assumed to be this.
+	Maid[key] = (Maid)             // Maids can act as an event connection, allowing a Maid to have other maids to clean up.
+	Maid[key] = nil                // Removes a named task. If the task is an event, it is disconnected.
+ 
+	Maid:GiveTask(task)            // Same as above, but uses an incremented number as a key.
+	Maid:DoCleaning()              // Disconnects all managed events and performs all clean-up tasks.
 ```
