@@ -1,5 +1,3 @@
--- Via https://github.com/zserge/lua-promises
-
 --[[
 The MIT License (MIT)
 
