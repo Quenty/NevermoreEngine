@@ -7,8 +7,7 @@ function Signal.new()
 	
 	local mSignaler = Instance.new('BindableEvent')
 	
-	local mArgData = nil
-	local mArgDataCount = nil
+	local mArgData, mArgDataCount
 	
 	function sig:fire(...)
 		mArgData = {...}
