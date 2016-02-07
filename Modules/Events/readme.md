@@ -1,5 +1,5 @@
 # Trello
-A set-up tutorial can be found [here](https://scriptinghelpers.org/blog/logging-errors-with-trello).
+A [set-up tutorial](https://scriptinghelpers.org/blog/logging-errors-with-trello) can be found [here](https://scriptinghelpers.org/blog/logging-errors-with-trello).
 Trello should be called like so:
 
 **Server:**
@@ -17,3 +17,7 @@ local Trello			= LoadCustomLibrary("Trello"){
 ```lua
 local Trello = LoadCustomLibrary("Trello")
 ```
+
+# ModRemote
+Written by Vorlias, [documentation here](https://github.com/Vorlias/ROBLOX-ModRemote).
+
