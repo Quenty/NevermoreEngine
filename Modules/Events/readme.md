@@ -1,6 +1,7 @@
 # Trello
 A set-up tutorial can be found [here](https://scriptinghelpers.org/blog/logging-errors-with-trello).
 Trello should be called like so:
+
 Server:
 ```lua
 local Trello			= LoadCustomLibrary("Trello"){
