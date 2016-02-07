@@ -2,7 +2,7 @@
 A set-up tutorial can be found [here](https://scriptinghelpers.org/blog/logging-errors-with-trello).
 Trello should be called like so:
 
-Server:
+**Server:**
 ```lua
 local Trello			= LoadCustomLibrary("Trello"){
 	trelloUsername		= "Narrev";
@@ -13,7 +13,7 @@ local Trello			= LoadCustomLibrary("Trello"){
 }
 ```
 
-Client:
+**Client:**
 ```lua
 local Trello = LoadCustomLibrary("Trello")
 ```
