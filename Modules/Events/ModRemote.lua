@@ -1,3 +1,4 @@
+-- @Author Vorlias
 -- Main variables
 local replicated = game:GetService("ReplicatedStorage");
 local server = game:FindService("NetworkServer");
