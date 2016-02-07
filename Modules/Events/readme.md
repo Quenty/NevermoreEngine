@@ -4,7 +4,7 @@ Trello should be called like so:
 Server:
 ```lua
 local Trello			= LoadCustomLibrary("Trello"){
-	trelloUsername			= "Narrev";
+	trelloUsername		= "Narrev";
 	boardName			= "Roblox Error Logs";
 	listName			= "Errors";
 	key					= "54b8fe02d0ecafa8eaca8a783d85d0bd";
