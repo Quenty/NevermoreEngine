@@ -5,7 +5,7 @@ local ModRemote			= LoadCustomLibrary("ModRemote")
 
 if game:GetService("RunService"):IsServer() then -- Server
 	return function(tab)
-		local trelloUsername, boardName, listName, key, token = tab.trelloUsername, tab.boardName, tab.listName, tab.key, tab.token
+		local trelloUsername, boardName, listName, key, token = tab.trelloUsername, tab.boardName, tab.listName, tab.key, tab.secret
 		local trelloClientBridge = ModRemote:CreateEvent("TrelloClientBridge") -- RemoteFunction for logging Client errors too
 		
 		local listId = (function()
