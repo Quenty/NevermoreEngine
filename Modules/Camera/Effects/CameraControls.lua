@@ -69,10 +69,12 @@ function CameraControls:HandleMouseWheel(InputObject)
 	local Delta = ClampNumber(-InputObject.Position.Z, -1, 1)*1.4
 	local Zoom = rk4Integrator(self.ZoomCamera.TargetZoom, Delta, 1)
 
-	if self.RotationCamera.ClassName == "PushCamera" then
-		self.RotationCamera:StopRotateBack()
+	if self.RotationCamera then
+		if self.RotationCamera.ClassName == "PushCamera" then
+			self.RotationCamera:StopRotateBack()
+		end
 	end
-	
+
 	self.ZoomCamera.TargetZoom = Zoom
 end
 
@@ -87,9 +89,11 @@ end
 function CameraControls:HandleMouseMovement(InputObject)
 	if self.LastMousePosition then
 
-		-- This calculation may seem weird, but either .Position updates (if it's locked), or .Delta updates (if it's not).
-		local Delta = -InputObject.Delta + self.LastMousePosition - InputObject.Position
-		self.RotationCamera:RotateXY(self:MouseTranslationToAngle(Delta) * self.MOUSE_SENSITIVITY)
+		if self.RotationCamera then
+			-- This calculation may seem weird, but either .Position updates (if it's locked), or .Delta updates (if it's not).
+			local Delta = -InputObject.Delta + self.LastMousePosition - InputObject.Position
+			self.RotationCamera:RotateXY(self:MouseTranslationToAngle(Delta) * self.MOUSE_SENSITIVITY)
+		end
 		
 		self.LastMousePosition = InputObject.Position
 	end

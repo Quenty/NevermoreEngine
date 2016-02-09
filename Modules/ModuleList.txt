@@ -7,6 +7,7 @@ Camera\Effects\DefaultCamera.lua
 Camera\Effects\FadingCamera.lua
 Camera\Effects\ImpulseCamera.lua
 Camera\Effects\InverseFader.lua
+Camera\Effects\PointCamera.lua
 Camera\Effects\PushCamera.lua
 Camera\Effects\RotatedCamera.lua
 Camera\Effects\SmoothZoomedCamera.lua
