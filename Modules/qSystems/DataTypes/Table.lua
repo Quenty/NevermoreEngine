@@ -1,8 +1,55 @@
--- This library handles a variety of table-based operations, which can be quite useful.
--- @author Quenty
--- Revised January 1st, 2013
+--- This library handles a variety of table-based operations, which can be quite useful.
+-- To extend your table library, use: local table = require(this_script)
+-- @author Quenty, Narrev
 
-local lib = {}
+--[[Please add your documentation here, Quenty
+
+	There are 6 additional functions that have been added; contains, copy, getIndexByValue, random, sum, and overflow
+	table.contains(table, value)
+		returns whether @param value is in @param table
+
+	table.copy(table)
+		returns a new table that is a copy of @param table
+
+	table.getIndexByValue(table, value)
+		Return's the index of a Value in a table.
+		@param tab table to search through 
+		@value the Value to search for
+		@return The key of the value. Returns nil if it can't find it.
+
+	table.random(table)
+		*Needs an update*
+		returns a random value (with an integer key) from @param table
+		newMap = table.random{map1, map2, map3}
+
+	table.sum(table)
+		adds up all the values in @param table via pairs
+
+	table.overflow(table, seed)
+		continually subtracts the values (via ipairs) in @param table from @param seed until seed cannot be subtracted from further
+		It then returns index at which the iterated value is greater than the remaining seed, and leftover seed (before subtracting final value)
+
+		This can be used for relative probability :D
+		
+		The following example chooses a random value from the Options table, with some options being more likely than others:
+		
+		local Options	= {"opt1","opt2","opt3","opt4","opt5","opt6"}
+		local tab		= {2,4,5,6,1,2} -- Each number is likelihood relative to the rest
+		local seed		= math.random(1, table.sum(tab))
+		
+		local chosenKey, LeftoverSeed = table.overflow(tab, seed)
+		local randomChoiceFromOptions = Options[chosenKey]
+--]]
+
+local lib = {
+	concat			= function(...) return table.concat	(...) end;
+	foreach			= function(...) return table.foreach	(...) end;
+	foreachi		= function(...) return table.foreachi	(...) end;
+	getn			= function(...) return table.getn	(...) end;
+	insert			= function(...) return table.insert	(...) end;
+	remove			= function(...) return table.remove	(...) end;
+	sort			= function(...) return table.sort	(...) end;
+}
 
 local function Count(Table)
 	local Count = 0;
@@ -13,6 +60,7 @@ local function Count(Table)
 end
 lib.Count = Count
 lib.count = Count
+
 
 local function CopyAndAppendTable(OriginalTable, Appendees)
 	-- Copies a table, and appends the values in appendees.
@@ -77,6 +125,7 @@ end
 lib.Append = Append
 lib.append = Append
 
+
 local function DirectAppend(Table, NewTable, Callback)
 -- Addes al of NewTable's values to Table..
 	if Callback then
@@ -96,10 +145,10 @@ end
 lib.DirectAppend = DirectAppend
 lib.directAppend = DirectAppend
 
+
 local function CopyTable(OriginalTable)
-	local OriginalType = type(OriginalTable)
 	local Copy
-	if OriginalType == 'table' then
+	if type(OriginalTable) == 'table' then
 		Copy = {}
 		for Index, Value in pairs(OriginalTable) do
 			Copy[Index] = Value
@@ -109,17 +158,14 @@ local function CopyTable(OriginalTable)
 	end
 	return Copy
 end
-
 lib.Copy = CopyTable
 lib.copy = CopyTable
 
 
 local DeepCopy
-
 function DeepCopyTable(OriginalTable)
-	local OriginalType = type(OriginalTable)
 	local Copy
-	if OriginalType == 'table' then
+	if type(OriginalTable) == 'table' then
 		Copy = {}
 		for Index, Value in next, OriginalTable, nil do
 			Copy[DeepCopy(Index)] = DeepCopy(Value)
@@ -130,19 +176,17 @@ function DeepCopyTable(OriginalTable)
 	end
 	return Copy
 end
-
 lib.DeepCopy = DeepCopyTable
 lib.deepCopy = DeepCopyTable
 lib.deep_copy = DeepCopyTable
 
-local function Swap(Table, A, B)
-	local Copy = Table[A]
-	Table[A] = Table[B]
-	Table[B] = Copy
-end
 
 local function ShellSort(Table, GetValue)
 	-- Shell Sort -- Pretty efficient... GetValue should return a number of some sort. Will sort from Least to Greatest.
+
+	local function Swap(Table, A, B)
+		Table[A], Table[B] = Table[B], Table[A]
+	end
 
 	local TableSize = #Table
 	local Gap = #Table
@@ -165,5 +209,64 @@ end
 lib.ShellSort = ShellSort
 lib.shellSort = ShellSort
 lib.shell_sort = ShellSort
+
+
+local function random(tab)
+	-- This should be rewritten to support tables with string keys
+	return tab[math.random(1, #tab)]
+end;
+lib.random = random
+lib.Random = random
+
+
+local function contains(tab, value)
+	for _, Value in pairs(tab) do
+		if Value == value then
+			return true
+		end
+	end
+	return false
+end
+lib.contains = contains
+lib.Contains = contains
+
+
+local function overflow(tab, seed)
+	for i, value in ipairs(tab) do
+		if seed - value <= 0 then
+			return i, seed
+		end
+		seed = seed - value
+	end
+end
+lib.overflow = overflow
+lib.Overflow = overflow
+
+
+local function sum(tab)
+	local sum = 0
+		for _, value in pairs(tab) do
+			sum = sum + value
+		end
+	return sum
+end
+lib.sum = sum
+lib.Sum = sum
+
+
+local function GetIndexByValue(tab, value)
+	for Index, TableValue in next, tab do
+		if value == TableValue then
+			return Index
+		end
+	end
+	return nil
+end
+lib.GetIndexByValue = GetIndexByValue
+lib.getIndexByValue = GetIndexByValue
+lib.indexByValue = GetIndexByValue
+lib.IndexByValue = GetIndexByValue
+lib.index_by_value = GetIndexByValue
+
 
 return lib
