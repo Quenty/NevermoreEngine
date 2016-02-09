@@ -643,15 +643,35 @@ local function AddTexturedWindowTemplate(Frame, Radius, Type)
 		Parent                 = Frame;
 		BackgroundTransparency = 1;
 		ZIndex                 = Frame.ZIndex;
-	},
-		{Name = "TopLeft";	Position = UDim2.new(0, 0, 0, 0);		Size = UDim2.new(0, Radius, 0, Radius)},
-		{Name = "BottomLeft";	Position = UDim2.new(0, 0, 1, -Radius);		Size = UDim2.new(0, Radius, 0, Radius)},
-		{Name = "TopRight";	Position = UDim2.new(1, -Radius, 0, 0);		Size = UDim2.new(0, Radius, 0, Radius)},
-		{Name = "BottomRight";	Position = UDim2.new(1, -Radius, 1, -Radius);	Size = UDim2.new(0, Radius, 0, Radius)},
-		{Name = "Middle";	Position = UDim2.new(0, Radius, 0, 0);		Size = UDim2.new(1, -Radius*2, 1, 0  )},
-		{Name = "MiddleLeft";	Position = UDim2.new(0, 0, 0, Radius);		Size = UDim2.new(0, Radius, 1, -Radius*2)},
-		{Name = "MiddleRight";	Position = UDim2.new(1, -Radius, 0, Radius);	Size = UDim2.new(0, Radius, 1, -Radius*2)}
-	)
+	}; { 
+		Name = "TopLeft";
+		Position = UDim2.new(0, 0, 0, 0);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "BottomLeft";
+		Position = UDim2.new(0, 0, 1, -Radius);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "TopRight";
+		Position = UDim2.new(1, -Radius, 0, 0);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "BottomRight";
+		Position = UDim2.new(1, -Radius, 1, -Radius);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "Middle";
+		Position = UDim2.new(0, Radius, 0, 0);
+		Size = UDim2.new(1, -Radius*2, 1, 0);
+	}; {
+		Name = "MiddleLeft";
+		Position = UDim2.new(0, 0, 0, Radius);
+		Size = UDim2.new(0, Radius, 1, -Radius*2);
+	}; {
+		Name = "MiddleRight";
+		Position = UDim2.new(1, -Radius, 0, Radius);
+		Size = UDim2.new(0, Radius, 1, -Radius*2);
+	})
 end
 lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 lib.addTexturedWindowTemplate = AddTexturedWindowTemplate
