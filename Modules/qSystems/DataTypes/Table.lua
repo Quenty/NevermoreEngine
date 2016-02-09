@@ -3,8 +3,33 @@
 -- @author Quenty, Narrev
 
 --[[
+	qTable functions are as follows:
+	table.Count(Table)
+		Counts the number of elements in the table
+
+	table.CopyAndAppendTable(OriginalTable, Appendees)
+		Copies the original table, and then appends the values
+
+	table.GetStringTable(Table)
+		Converts a table into a more human readable string
+
+	table.Append(Table, NewTable, Callback=nil)
+		Appends items to Table from NewTable
+		Callback(Item)
+			If exists, calls this before adding the item to the table
 	
-	
+	table.DirectAppend(Table, NewTable, Callback)
+		Same way, but appends in a key-value merge instead of table.insert
+
+	table.CopyTable(Table)
+		Shallow copy of the table involved
+
+	table.DeepCopyTable
+		Deep copy of the table involved
+
+	table.ShellSort
+		Shellsort on the table
+		
 	There are 6 additional functions that have been added; contains, copy, getIndexByValue, random, sum, and overflow
 	table.contains(table, value)
 		returns whether @param value is in @param table
@@ -120,7 +145,7 @@ lib.append = Append
 
 
 local function DirectAppend(Table, NewTable, Callback)
--- Addes al of NewTable's values to Table..
+	-- Addes al of NewTable's values to Table..
 	if Callback then
 		for Index, Item in pairs(NewTable) do
 			if Callback(Item) then
