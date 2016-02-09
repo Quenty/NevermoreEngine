@@ -2,12 +2,13 @@
 -- To extend your table library, use: local table = require(this_script)
 -- @author Quenty, Narrev
 
---[[Please add your documentation here, Quenty
-
+--[[
+	
+	
 	There are 6 additional functions that have been added; contains, copy, getIndexByValue, random, sum, and overflow
 	table.contains(table, value)
 		returns whether @param value is in @param table
-
+	
 	table.copy(table)
 		returns a new table that is a copy of @param table
 
@@ -41,15 +42,7 @@
 		local randomChoiceFromOptions = Options[chosenKey]
 --]]
 
-local lib = {
-	concat			= function(...) return table.concat	(...) end;
-	foreach			= function(...) return table.foreach	(...) end;
-	foreachi		= function(...) return table.foreachi	(...) end;
-	getn			= function(...) return table.getn	(...) end;
-	insert			= function(...) return table.insert	(...) end;
-	remove			= function(...) return table.remove	(...) end;
-	sort			= function(...) return table.sort	(...) end;
-}
+local lib = setmetatable({}, {__index = table})
 
 local function Count(Table)
 	local Count = 0;
