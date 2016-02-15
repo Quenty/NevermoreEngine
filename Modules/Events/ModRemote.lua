@@ -14,10 +14,8 @@ local remote		= {
 assert(workspace.FilteringEnabled or not server, "[ModRemote] ModRemote 3.0 does not work with filterless games due to security vulnerabilties. Please consider using Filtering or use ModRemote 2.7x")
 
 local function Make(ClassType, Properties)
-	--- Using a syntax hack to create a nice way to Make new items.  
 	-- @param ClassType The type of class to instantiate
 	-- @param Properties The properties to use
-	-- Optimized for use in this script
 
 	assert(type(Properties) == "table", "Properties is not a table")
 
