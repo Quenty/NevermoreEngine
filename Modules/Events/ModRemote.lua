@@ -17,23 +17,17 @@ local function Make(ClassType, Properties)
 	--- Using a syntax hack to create a nice way to Make new items.  
 	-- @param ClassType The type of class to instantiate
 	-- @param Properties The properties to use
+	-- Optimized for use in this script
 
-	return (function(Instance, Values)
-		--- Modifies an Instance by using a table.  
-		-- @param Instance The instance to modify
-		-- @param Values A table with keys as the value to change, and the value as the property to
+	assert(type(Properties) == "table", "Properties is not a table")
 
-		assert(type(Values) == "table", "Values is not a table")
+	local Object = Instance.new(ClassType)
+	
+	for Index, Value in next, Properties do
+		Object[Index] = Value
+	end
 
-		for Index, Value in next, Values do
-			if type(Index) == "number" then
-				Value.Parent = Instance
-			else
-				Instance[Index] = Value
-			end
-		end
-		return Instance
-	end)(Instance.new(ClassType), Properties)
+	return Object
 end
 
 local functionStorage = ReplicatedStorage:FindFirstChild("RemoteFunctions") or Make("Folder" , {
@@ -185,35 +179,32 @@ function remote:CreateFunction(name)
 	return CreateFunction(name)
 end
 
-do
-	local FuncCache	= remote.FuncCache
-	local remEnv	= remote.event
-	local remFunc	= remote.func
-	
-	-- [[REMOTE EVENT OBJECT METHODS]]
-	function remEnv:SendToPlayers(playerList, ...) 
+do	local FuncCache, remoteEvent, remoteFunction = remote.FuncCache, remote.event, remote.func
+
+	-- RemoteEvent Object Methods
+	function remoteEvent:SendToPlayers(playerList, ...)
 		assert(server, "[ModRemote] SendToPlayers should be called from the Server side.")
 		for _, player in pairs(playerList) do
 			self.Instance:FireClient(player, ...)
-		end	
+		end
 	end
 	
-	function remEnv:SendToPlayer(player, ...)
+	function remoteEvent:SendToPlayer(player, ...)
 		assert(server, "[ModRemote] SendToPlayers should be called from the Server side.")
 		self.Instance:FireClient(player, ...)
 	end
 	
-	function remEnv:SendToServer(...)
+	function remoteEvent:SendToServer(...)
 		assert(not server, "SendToServer should be called from the Client side.")
 		self.Instance:FireServer(...)
 	end
 	
-	function remEnv:SendToAllPlayers(...)
+	function remoteEvent:SendToAllPlayers(...)
 		assert(server, "[ModRemote] SendToPlayers should be called from the Server side.")
 		self.Instance:FireAllClients(...)
 	end
 	
-	function remEnv:Listen(func)
+	function remoteEvent:Listen(func)
 		if server then
 			self.Instance.OnServerEvent:connect(func)
 		else
@@ -221,25 +212,25 @@ do
 		end
 	end
 	
-	function remEnv:Wait()
+	function remoteEvent:Wait()
 		if server then
 			self.Instance.OnServerEvent:wait()
 		else
 			self.Instance.OnClientEvent:wait()
-		end	
+		end
 	end
 
-	function remEnv:GetInstance()
+	function remoteEvent:GetInstance()
 		return self.Instance
 	end
 
-	function remEnv:Destroy()
+	function remoteEvent:Destroy()
 		self.Instance:Destroy()
 	end
 
-	-- [[REMOTE FUNCTION OBJECT METHODS ]]
-	function remFunc:CallPlayer(player, ...)
-		
+	-- RemoteFunction Object Methods
+	function remoteFunction:CallPlayer(player, ...)
+
 		assert(server, "[ModRemote] CallPlayer should be called from the server side.")
 		
 		local args = {...}
@@ -253,12 +244,12 @@ do
 		end	
 	end
 	
-	function remFunc:CallServerIntl(...) 
+	function remoteFunction:CallServerIntl(...)
 		assert(not server, "[ModRemote] CallServer should be called from the client side.")
 		return self.Instance:InvokeServer(...)
 	end
 	
-	function remFunc:Callback(func)
+	function remoteFunction:Callback(func)
 		if server then
 			self.Instance.OnServerInvoke = func
 		else
@@ -266,15 +257,15 @@ do
 		end
 	end
 	
-	function remFunc:GetInstance()
+	function remoteFunction:GetInstance()
 		return self.Instance
 	end
 	
-	function remFunc:Destroy()
+	function remoteFunction:Destroy()
 		self.Instance:Destroy()
 	end
 	
-	function remFunc:SetClientCache(seconds, useAction)
+	function remoteFunction:SetClientCache(seconds, useAction)
 		
 		local seconds = seconds or 10
 		assert(server, "SetClientCache must be called on the server.")
@@ -303,7 +294,7 @@ do
 		end
 	end
 	
-	function remFunc:ResetClientCache()
+	function remoteFunction:ResetClientCache()
 
 		assert(not server, "ResetClientCache must be used on the client.")
 
@@ -314,7 +305,7 @@ do
 		end		
 	end
 	
-	function remFunc:CallServer(...)
+	function remoteFunction:CallServer(...)
 		local args = {...}
 		local clientCache = self.Instance:FindFirstChild("ClientCache")
 
@@ -334,7 +325,6 @@ do
 			return self:CallServerIntl(...)
 		end
 	end
-
 end
 
 local remoteMT = {
