@@ -406,6 +406,7 @@ function RotatingLabel:UpdateRender()
 				self.Labels:Remove(Index)
 			else
 				Label.Value = Label.Target
+				Label:UpdateRender()
 			end
 		else -- Label is sitll animating
 			IsDone = false
