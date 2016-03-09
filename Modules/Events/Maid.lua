@@ -15,9 +15,7 @@ API:
 	Maid:DoCleaning()                 Disconnects all managed events and performs all clean-up tasks.
 ]]
 
-local lib = {}
- 
-local MakeMaid do
+local HireMaid do
 	local index = {
 		GiveTask = function(self, task)
 			local n = #self.Tasks+1
@@ -61,12 +59,9 @@ local MakeMaid do
 		end;
 	}
 
-	function MakeMaid()
-		return setmetatable({Tasks={},Instances={}},mt)
+	function HireMaid()
+		return setmetatable({Tasks = {}, Instances = {}}, mt)
 	end
 end
 
-lib.MakeMaid = MakeMaid
-lib.new = MakeMaid
-
-return lib
+return HireMaid
