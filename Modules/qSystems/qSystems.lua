@@ -127,8 +127,7 @@ local function Make(ClassType, Properties, ...)
 	local objects = {...}
 	if #objects > 0 then
 		for a = 1, #objects do
-			objects[a] = Modify(Instance.new(ClassType), Properties)
-			objects[a] = Modify(objects[a], objectProps)
+			objects[a] = Modify(Modify(Instance.new(ClassType), Properties), objectProps)
 		end
 		return unpack(objects)
 	else
