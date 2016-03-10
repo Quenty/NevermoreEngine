@@ -179,9 +179,9 @@ local function CallOnChildren(Instance, FunctionToCall)
 	--     descendants.
 	
 	FunctionToCall(Instance)
-
-	for _, Child in next, Instance:GetChildren() do
-		CallOnChildren(Child, FunctionToCall)
+	local children = Instance:GetChildren()
+	for a = 1, #children do
+		CallOnChildren(children[a], FunctionToCall)
 	end
 end
 lib.CallOnChildren = CallOnChildren
