@@ -125,9 +125,10 @@ local function Make(ClassType, Properties, ...)
 	-- @param {...} if used, @returns an object for each subsequent table that is a modification to Properties
 	-- 	This would be used for creating a custom "default" list of properties so you don't need to rewrite the same properties over and over.
 	local objects = {...}
-	if #objects > 0 then
-		for a = 1, #objects do
-			objects[a] = Modify(Modify(Instance.new(ClassType), Properties), objectProps)
+	local numObjects = #objects
+	if numObjects > 0 then
+		for a = 1, numObjects do
+			objects[a] = Modify(Modify(Instance.new(ClassType), Properties), objects[a])
 		end
 		return unpack(objects)
 	else
