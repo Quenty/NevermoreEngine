@@ -82,13 +82,14 @@ lib.RoundNumber = RoundNumber
 lib.Round = RoundNumber
 
 local function Debounce(func)
-	--- Debounces a function
+	--- Debounces a function such that the function
+	--  will not run when called if it is already running
 	-- @param func The function to debounce
-	local isRunning = false    -- Create a local debounce variable
-	return function(...)       -- Return a new function
+	local isRunning = false
+	return function(...)
 		if not isRunning then
 			isRunning = true
-			func(...)          -- Call it with the original arguments
+			func(...)
 			isRunning = false
 		end
 	end
