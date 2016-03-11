@@ -221,7 +221,9 @@ local function GetHumanoid(Descendant)
 			if Humanoid:IsA("Humanoid") then
 				return Humanoid
 			else -- Incase there are other humanoids in there.
-				for _, Item in pairs(Descendant:GetChildren()) do
+				local DescendantChildren = Descendant:GetChildren()
+				for a = 1, #DescendantChildren do
+					local Item = DescendantChildren[a]
 					if Item.Name == "Humanoid" and Item:IsA("Humanoid") then
 						return Item
 					end
