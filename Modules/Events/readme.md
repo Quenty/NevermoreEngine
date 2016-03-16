@@ -55,7 +55,7 @@ API:
 # Deferred
 Written by zserge, [documentation](https://github.com/zserge/lua-promises) can be found [here](https://github.com/zserge/lua-promises).
 
-# Trello
+# TrelloErrorLogger
 This module is for automatically logging errors with a Trello Board. Credit to [YonaJune](https://scriptinghelpers.org/user/8/YonaJune) for [original](https://scriptinghelpers.org/blog/logging-errors-with-trello).
 
 To set up, first you are going to want to create a new board on [Trello](https://trello.com/).
@@ -72,13 +72,13 @@ Next, go to [this link](https://trello.com/app-key) and replace YOUR_KEY in the 
 
 
 
-<h3>Trello should be called like so:</h3>
+<h3>TrelloErrorLogger should be called like so:</h3>
 
 **Server:**
 Replace the following with [your information](https://trello.com/app-key):
 ![](http://i.imgur.com/9xqynfZ.png)
 ```lua
-local Trello			= LoadCustomLibrary("Trello"){
+local TrelloErrorLogger			= LoadCustomLibrary("TrelloErrorLogger"){
 	trelloUsername		= "Narrev";
 	boardName			= "Roblox Error Logs";
 	listName			= "Errors";
@@ -89,5 +89,5 @@ local Trello			= LoadCustomLibrary("Trello"){
 
 **Client:**
 ```lua
-local Trello = LoadCustomLibrary("Trello")
+local TrelloErrorLogger = LoadCustomLibrary("TrelloErrorLogger")
 ```
