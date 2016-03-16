@@ -78,7 +78,7 @@ Next, go to [this link](https://trello.com/app-key) and replace YOUR_KEY in the 
 Replace the following with [your information](https://trello.com/app-key):
 ![](http://i.imgur.com/9xqynfZ.png)
 ```lua
-local TrelloErrorLogger			= LoadCustomLibrary("TrelloErrorLogger"){
+local TrelloErrorLogger		= LoadCustomLibrary("TrelloErrorLogger"){
 	trelloUsername		= "Narrev";
 	boardName			= "Roblox Error Logs";
 	listName			= "Errors";
