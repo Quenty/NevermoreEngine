@@ -28,6 +28,37 @@ local function Make(ClassType, Properties)
 	return Object
 end
 
+local function WaitForChild(Parent, Name, TimeLimit)
+	-- Waits for a child to appear. Not efficient, but it shouldn't have to be. It helps with
+	-- debugging. Useful when ROBLOX lags out, and doesn't replicate quickly. Will warn
+	-- @param Parent The Parent to search in for the child.
+	-- @param Name The name of the child to search for
+	-- @param TimeLimit If TimeLimit is given, then it will return after the t imelimit, even if it
+	--     hasn't found the child.
+
+	assert(Parent, "Parent is nil")
+	assert(type(Name) == "string", "Name is not a string.")
+
+	local Child     = Parent:FindFirstChild(Name)
+	local StartTime = tick()
+	local Warned    = false
+
+	while not Child do
+		wait()
+		Child = Parent:FindFirstChild(Name)
+		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
+			Warned = true
+				warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. debug.traceback())
+			if TimeLimit then
+				return Parent:FindFirstChild(Name)
+			end
+		end
+	end
+
+	return Child
+end
+
+
 local functionStorage = ReplicatedStorage:FindFirstChild("RemoteFunctions") or Make("Folder" , {
 	Parent	= ReplicatedStorage;
 	Name	= "RemoteFunctions";
@@ -107,7 +138,7 @@ local function CreateEvent(name, instance)
 	
 	return _event
 end
-
+--[[
 local function GetEvent(name)
 	return eventStorage:FindFirstChild(name)
 end
@@ -115,6 +146,7 @@ end
 local function GetFunction(name)
 	return functionStorage:FindFirstChild(name)
 end
+]]
 
 -- Remote functions
 
@@ -150,7 +182,7 @@ function remote:GetEvent(name)
 	-- @param string name - the name of the event.
 
 	assert(type(name) == 'string', "[ModRemote] GetEvent - Name must be a string")
-	assert(eventStorage:FindFirstChild(name),"[ModRemote] GetEvent - Event " .. name .. " not found, create it using CreateEvent.")
+	assert(WaitForChild(eventStorage, name, 3),"[ModRemote] GetEvent - Event " .. name .. " not found, create it using CreateEvent.")
 	
 	return remote.Events[name] or CreateEvent(name)
 end
@@ -164,7 +196,7 @@ function remote:GetFunction(name)
 	-- @param string name - the name of the function.
 
 	assert(type(name) == 'string', "[ModRemote] GetFunction - Name must be a string")
-	assert(functionStorage:FindFirstChild(name),"[ModRemote] GetFunction - Function " .. name .. " not found, create it using CreateFunction.")
+	assert(WaitForChild(functionStorage, name, 3),"[ModRemote] GetFunction - Function " .. name .. " not found, create it using CreateFunction.")
 
 	return remote.Functions[name] or CreateFunction(name)
 end
