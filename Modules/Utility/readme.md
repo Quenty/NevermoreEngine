@@ -48,4 +48,4 @@ String reference:
 %y	two-digit year (98) [00-99]
 %%	the character `%´
 ```
-os.clock() returns how long the server has been active, or more realistically, how long since when you required this module
+os.clock() returns how long the server has been active
