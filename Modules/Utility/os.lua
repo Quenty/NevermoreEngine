@@ -1,7 +1,5 @@
 -- @author Narrev
 
-local firstRequired = os.time()
-
 local date = function(optString, unix)
 	local stringPassed = false
 	
@@ -34,9 +32,9 @@ local date = function(optString, unix)
 	local unix		= type(unix) == "number" and unix + dayAlign or tick()
 	local days, month, year	= ceil(unix / 86400) + 719527
 	local wday		= (days + 6) % 7
-	local _4Years		= 400*floor(days / 146097) + 100*floor(days % 146097 / 36524) + 4*floor(days % 146097 % 36524 / 1461)
-	      year, days	= overflow({366,365,365,365}, days - 365*_4Years - floor(.25*_4Years - .25) - floor(.0025*_4Years - .0025) + floor(.01*_4Years - .01)) -- [0-1461]
-	      year, _4Years	= year + _4Years - 1
+	local _4Years		= 400*floor(days / 146097) + 100*floor(days % 146097 / 36524) + 4*floor(days % 146097 % 36524 / 1461) - 1
+	      year, days	= overflow({366,365,365,365}, days - 365*(_4Years + 1) - floor(.25*_4Years) - floor(.0025*_4Years) + floor(.01*_4Years)) -- [0-1461]
+	      year, _4Years	= year + _4Years
 	local yDay		= days
 	      month, days	= overflow({31,(year%4==0 and(year%25~=0 or year%16==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
 	local hours		= floor(unix / 3600 % 24)
@@ -99,6 +97,6 @@ local date = function(optString, unix)
 	return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 end
 
-local clock = function() return os.time() - firstRequired end
+local clock = function() return ({wait()})[2] end
 
-return setmetatable({date, clock}, {__index = os})
+return setmetatable({date = date, clock = clock}, {__index = os})
