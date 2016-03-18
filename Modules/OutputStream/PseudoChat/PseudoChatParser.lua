@@ -10,7 +10,7 @@ local PseudoChatSettings = LoadCustomLibrary("PseudoChatSettings")
 local qMath              = LoadCustomLibrary("qMath")
 local qGUI               = LoadCustomLibrary("qGUI")
 local OutputStream       = LoadCustomLibrary("OutputStream")
-local qTime              = LoadCustomLibrary("qTime")
+local os                 = LoadCustomLibrary("os")
 local qColor3            = LoadCustomLibrary("qColor3")
 local qPlayer            = LoadCustomLibrary("qPlayer")
 
@@ -520,7 +520,7 @@ do
 		MessageLabel.Position = UDim2.new(0, UserLabel.Position.X.Offset + UserLabel.TextBounds.X, 0, 0)
 		MessageLabel.Size = UDim2.new(1, -(UserLabel.Position.X.Offset + UserLabel.TextBounds.X), 1, 0)
 
-		MessageLabel.Text = qTime.GetFormattedTime("[h:i A] ", Data.TimeStamp) .. Data.PlayerExecutingName .. ": " .. Data.CommandDescription
+		MessageLabel.Text = os.date("[%I:%M %_p]") .. Data.PlayerExecutingName .. ": " .. Data.CommandDescription
 
 		local Height = qMath.RoundUp(MessageLabel.TextBounds.Y, PseudoChatSettings.LineHeight)
 		RenderFrame.Size = UDim2.new(1, 0, 0, Height)
