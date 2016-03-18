@@ -49,4 +49,5 @@ String reference:
 %%	the character `%´
 ```
 os.clock() returns how long the server has been active
-  Note: os.clock() uses wait() to get how long the server has been active, so the thread will yield for approximately 2 frames.
+
+Note: os.clock() uses wait() to get how long the server has been active, so the thread will yield for approximately 2 frames.
