@@ -1,4 +1,4 @@
-local RenderStepped = game:GetService("RunService").RenderStepped
+local Heartbeat = game:GetService("RunService").Heartbeat
 
 local HashProcessor = {}
 HashProcessor.__index = HashProcessor
@@ -7,7 +7,7 @@ HashProcessor.__index = HashProcessor
 -- @author Quenty
 
 function HashProcessor.new(OnProcess, OnAddition, OnRemoval)
-	-- Processes at the speed of RenderStep
+	-- Processes at the speed of Heartbeat
 	-- OnAddition and OnRemoval are optional
 		-- function(HashProcessor, Index, Item)
 
@@ -23,7 +23,7 @@ function HashProcessor.new(OnProcess, OnAddition, OnRemoval)
 	self.ProcessCoroutine = coroutine.create(function()
 		while true do
 			repeat
-				RenderStepped:wait()
+				Heartbeat:wait()
 			until self:Process() <= 0
 
 			self.Processing = false
