@@ -5,14 +5,16 @@ local function date(formatString, unix)
 	--		date ([format [, time]])
 	-- 
 	-- @param string formatString
-	--		If present, function date returns a string formatted by the tags in formatString. 
+	--		If present, function date returns a string formatted by the tags in formatString.
 	--		If formatString starts with "!", date is formatted in UTC.
 	--		If formatString is "*t", date returns a table
+	--		Placing "_" in the middle of a tag (e.g. "%_d" "%_I") removes padding
+	--		String Reference: https://github.com/Narrev/NevermoreEngine/blob/patch-5/Modules/Utility/readme.md
 	--		@default "%c"
 	--
 	-- @param number unix
 	--		If present, unix is the time to be formatted. Otherwise, date formats the current time.
-	--		The amount of seconds since 1970 (negative numbers aren't supported, usually)
+	--		The amount of seconds since 1970 (negative numbers are occasionally supported)
 	--		@default tick()
 
 	-- @returns a string or a table containing date and time, formatted according to the given string format. If called without arguments, returns the equivalent of date("%c").
