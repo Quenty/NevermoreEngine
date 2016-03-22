@@ -22,7 +22,7 @@ local function date(formatString, unix)
 	-- Localize functions
 	local ceil, floor, sub, find, gsub, format = math.ceil, math.floor, string.sub, string.find, string.gsub, string.format
 
-	-- Helper functions
+	-- Helper function
 	local function overflow(array, seed)
 		--- Subtracts the integer values in an array from a seed until the seed cannot be subtracted from any further
 		-- @param array array A table filled with integers to be subtracted from seed
@@ -35,13 +35,6 @@ local function date(formatString, unix)
 			end
 			seed = seed - array[i]
 		end
-	end
-
-	local function padded(number)
-		--- Gives a number padding
-		-- @param number The number to give padding
-		-- @returns number as a string with a 0 in front if less than 10 
-		return format("%02d", number)
 	end
 
 	-- Find whether formatString was used
@@ -103,29 +96,29 @@ local function date(formatString, unix)
 		"%%A", dayNames[wday + 1]),
 		"%%b", sub(months[month], 1, 3)),
 		"%%B", months[month]),
-		"%%d", padded(days)),
+		"%%d", format("%02d", days)),
 		"%%_d", days),
-		"%%H", padded(hours)),
+		"%%H", format("%02d", hours)),
 		"%%_H", hours),
-		"%%I", padded(hours > 12 and hours - 12 or hours == 0 and 12 or hours)),
+		"%%I", format("%02d", hours > 12 and hours - 12 or hours == 0 and 12 or hours)),
 		"%%_I", hours > 12 and hours - 12 or hours == 0 and 12 or hours),
-		"%%j", padded(yDay)),
+		"%%j", format("%02d", yDay)),
 		"%%_j", yDay),
-		"%%M", padded(minutes)),
+		"%%M", format("%02d", minutes)),
 		"%%_M", minutes),
-		"%%m", padded(month)),
+		"%%m", format("%02d", month)),
 		"%%_m", month),
 		"%%n", "\n"),
 		"%%p", hours >= 12 and "pm" or "am"),
 		"%%_p", hours >= 12 and "PM" or "AM"),
 		"%%s", suffixes[days]),
-		"%%S", padded(seconds)),
+		"%%S", format("%02d", seconds)),
 		"%%_S", seconds),
 		"%%t", "\t"),
 		"%%u", wday == 0 and 7 or wday),
 		"%%w", wday),
 		"%%Y", year),
-		"%%y", padded(year % 100)),
+		"%%y", format("%02d", year % 100)),
 		"%%_y", year % 100),
 		"%%%%", "%%")
 	)	
