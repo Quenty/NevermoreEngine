@@ -61,7 +61,7 @@ local function date(formatString, unix)
 	local hours, minutes, seconds = floor(unix / 3600 % 24), floor(unix / 60 % 60), floor(unix % 60)
 
 	-- Get years, months, and days
-	local days, month, year	= ceil((unix + 1) / 86400) + 719527
+	local days, month, year	= floor(unix / 86400) + 719528
 	local wday		= (days + 6) % 7
 	local _4Years		= 400*floor(days / 146097) + 100*floor(days % 146097 / 36524) + 4*floor(days % 146097 % 36524 / 1461) - 1
 	      year, days	= overflow({366,365,365,365}, days - 365*(_4Years + 1) - floor(.25*_4Years) - floor(.0025*_4Years) + floor(.01*_4Years)) -- [0-1461]
