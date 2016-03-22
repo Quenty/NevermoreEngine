@@ -24,7 +24,7 @@ local function date(formatString, unix)
 	-- Localize functions
 	local ceil, floor, sub, find, gsub, format = math.ceil, math.floor, string.sub, string.find, string.gsub, string.format
 
-	-- Helper function
+	-- Helper functions
 	local function overflow(array, seed)
 		--- Subtracts the integer values in an array from a seed until the seed cannot be subtracted from any further
 		-- @param array array A table filled with integers to be subtracted from seed
@@ -37,6 +37,13 @@ local function date(formatString, unix)
 			end
 			seed = seed - array[i]
 		end
+	end
+
+	local function suffix(Number)
+		--- Returns st, nd (Like 1st, 2nd)
+		-- @param number Number The number to get the suffix of [1-31]
+		if Number < 21 and Number > 3 or Number > 23 and Number < 31 then return "th" end
+		return ({"st", "nd", "rd"})[Number % 10]
 	end
 
 	-- Find whether formatString was used
@@ -78,8 +85,7 @@ local function date(formatString, unix)
 	-- Necessary string tables
 	local dayNames		= {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 	local months		= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
-	local suffixes		= {"st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"}
-
+	
 	-- Return formatted string
 	return (gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(formatString,
 		"%%c",  "%%x %%X"),
@@ -113,7 +119,7 @@ local function date(formatString, unix)
 		"%%n", "\n"),
 		"%%p", hours >= 12 and "pm" or "am"),
 		"%%_p", hours >= 12 and "PM" or "AM"),
-		"%%s", suffixes[days]),
+		"%%s", suffix(days)),
 		"%%S", format("%02d", seconds)),
 		"%%_S", seconds),
 		"%%t", "\t"),
