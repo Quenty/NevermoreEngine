@@ -3,6 +3,8 @@
 local function date(formatString, unix)
 	--- Allows you to use os.date in RobloxLua!
 	--		date ([format [, time]])
+	-- This is an optimized version. If you want to see how the numbers work, see the following:
+	-- https://github.com/Narrev/Unix-Epoch-Date-and-Time-Calculations/blob/master/Time%20Functions.lua
 	-- 
 	-- @param string formatString
 	--		If present, function date returns a string formatted by the tags in formatString.
