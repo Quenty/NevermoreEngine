@@ -90,7 +90,7 @@ local CameraState = {}
 CameraState.ClassName = "CameraState"
 
 function CameraState:__index(Index)
-	if Index == "CoordinateFrame" then
+	if Index == "CoordinateFrame" or Index == "CFrame" then
 		return CFrame.new(self.qPosition.x, self.qPosition.y, self.qPosition.z, QuaternionToCFrame(self.qCoordinateFrame))
 	else
 		return CameraState[Index]
@@ -98,7 +98,7 @@ function CameraState:__index(Index)
 end
 
 function CameraState:__newindex(Index, Value)
-	if Index == "CoordinateFrame" then
+	if Index == "CoordinateFrame" or Index == "CFrame" then
 		self.qPosition = Value.p
 		self.qCoordinateFrame = {QuaternionFromCFrame(Value)}
 	else
