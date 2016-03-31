@@ -10,7 +10,7 @@ local qGUI                    = LoadCustomLibrary("qGUI")
 local CircularBuffer          = LoadCustomLibrary("CircularBuffer")
 local PseudoChatSettings      = LoadCustomLibrary("PseudoChatSettings")
 local OverriddenConfiguration = LoadCustomLibrary("OverriddenConfiguration")
-local qTime                   = LoadCustomLibrary("qTime")
+local os                      = LoadCustomLibrary("os")
 local qMath                   = LoadCustomLibrary("qMath")
 local Maid                    = LoadCustomLibrary("Maid")
 local ScrollingFrame          = LoadCustomLibrary("ScrollingFrame")
@@ -749,16 +749,15 @@ local function TimeStampToText(TimeStamp)
 	elseif TimeStamp < 120 then
 		RenderTimePass = "1 minute"
 	elseif TimeStamp < 3600 then
-		RenderTimePass = qTime.GetMinute(TimeStamp) .. " minutes"
-	elseif TimeStamp < 216000 then
-		RenderTimePass = "about 1 hour"
-	elseif TimeStamp < 219600 then
-		RenderTimePass = "about " .. qTime.GetHour(TimeStamp) .. " hours"
+		RenderTimePass = os.date(TimeStamp).min .. " minutes"
+	elseif TimeStamp < 7200 then
+		RenderTimePass = "about 1 hour, ".. os.date(TimeStamp).min .. " minutes"
 	else
-		RenderTimePass = qTime.GetDayOfTheWeek(TimeStamp) -- If this ever ever happens in a ROBLOX server, I may die. 
+		RenderTimePass = "about " .. os.date(TimeStamp).hour .. " hours"
 	end
+	local wDay = os.date("%A", tick() - TimeStamp)
 
-	return RenderTimePass
+	return wDay ~= os.date("%A") and wDay or RenderTimePass
 end
 
 
