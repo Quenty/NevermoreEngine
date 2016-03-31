@@ -76,7 +76,7 @@ function lib.Scale(selection, scale, centeroid)
 			local trueSize = foundMesh and object.Size * foundMesh.Scale or object.Size
 			local newSize = trueSize * scale
 
-			if not object:IsA("Truss") and not object:IsA("UnionOperation") then
+			if not object:IsA("TrussPart") and not object:IsA("UnionOperation") then
 				if newSize.X < minSize.X or newSize.Y < minSize.Y or newSize.Z < minSize.Z then
 					if not foundMesh then
 						foundMesh = Instance.new("SpecialMesh", object)
