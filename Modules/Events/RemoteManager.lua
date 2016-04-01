@@ -11,7 +11,7 @@ local remote		= {
 	FuncCache = {};
 }
 
-assert(workspace.FilteringEnabled or not server, "[ModRemote] ModRemote 3.0 does not work with filterless games due to security vulnerabilties. Please consider using Filtering or use ModRemote 2.7x")
+assert(workspace.FilteringEnabled or not server, "[RemoteManager] RemoteManager 3.0 does not work with filterless games due to security vulnerabilties. Please consider using Filtering or use RemoteManager 2.7x")
 
 local function Make(ClassType, Properties)
 	-- @param ClassType The type of class to instantiate
@@ -48,7 +48,7 @@ local function WaitForChild(Parent, Name, TimeLimit)
 		Child = Parent:FindFirstChild(Name)
 		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
 			Warned = true
-				warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. debug.traceback())
+			warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. debug.traceback())
 			if TimeLimit then
 				return Parent:FindFirstChild(Name)
 			end
@@ -173,7 +173,7 @@ function remote:CreateEvent(name)
 	--- Creates an event 
 	-- @param string name - the name of the event.
 
-	if not server then warn("[ModRemote] CreateEvent should be used by the server.") end
+	if not server then warn("[RemoteManager] CreateEvent should be used by the server.") end
 	return CreateEvent(name)
 end
 
@@ -181,8 +181,8 @@ function remote:GetEvent(name)
 	--- Gets an event if it exists, otherwise errors
 	-- @param string name - the name of the event.
 
-	assert(type(name) == 'string', "[ModRemote] GetEvent - Name must be a string")
-	assert(WaitForChild(eventStorage, name, 3),"[ModRemote] GetEvent - Event " .. name .. " not found, create it using CreateEvent.")
+	assert(type(name) == 'string', "[RemoteManager] GetEvent - Name must be a string")
+	assert(WaitForChild(eventStorage, name, 3),"[RemoteManager] GetEvent - Event " .. name .. " not found, create it using CreateEvent.")
 	
 	return remote.Events[name] or CreateEvent(name)
 end
@@ -195,8 +195,8 @@ function remote:GetFunction(name)
 	--- Gets a function if it exists, otherwise errors
 	-- @param string name - the name of the function.
 
-	assert(type(name) == 'string', "[ModRemote] GetFunction - Name must be a string")
-	assert(WaitForChild(functionStorage, name, 3),"[ModRemote] GetFunction - Function " .. name .. " not found, create it using CreateFunction.")
+	assert(type(name) == 'string', "[RemoteManager] GetFunction - Name must be a string")
+	assert(WaitForChild(functionStorage, name, 3),"[RemoteManager] GetFunction - Function " .. name .. " not found, create it using CreateFunction.")
 
 	return remote.Functions[name] or CreateFunction(name)
 end
@@ -205,7 +205,7 @@ function remote:CreateFunction(name)
 	--- Creates a function
 	-- @param string name - the name of the function.
 
-	if not server then warn("[ModRemote] CreateFunction should be used by the server.") end
+	if not server then warn("[RemoteManager] CreateFunction should be used by the server.") end
 	return CreateFunction(name)
 end
 
@@ -213,14 +213,14 @@ do	local FuncCache, remoteEvent, remoteFunction = remote.FuncCache, remote.event
 
 	-- RemoteEvent Object Methods
 	function remoteEvent:SendToPlayers(playerList, ...)
-		assert(server, "[ModRemote] SendToPlayers should be called from the Server side.")
+		assert(server, "[RemoteManager] SendToPlayers should be called from the Server side.")
 		for _, player in pairs(playerList) do
 			self.Instance:FireClient(player, ...)
 		end
 	end
 	
 	function remoteEvent:SendToPlayer(player, ...)
-		assert(server, "[ModRemote] SendToPlayers should be called from the Server side.")
+		assert(server, "[RemoteManager] SendToPlayers should be called from the Server side.")
 		self.Instance:FireClient(player, ...)
 	end
 	
@@ -230,7 +230,7 @@ do	local FuncCache, remoteEvent, remoteFunction = remote.FuncCache, remote.event
 	end
 	
 	function remoteEvent:SendToAllPlayers(...)
-		assert(server, "[ModRemote] SendToPlayers should be called from the Server side.")
+		assert(server, "[RemoteManager] SendToPlayers should be called from the Server side.")
 		self.Instance:FireAllClients(...)
 	end
 	
@@ -261,7 +261,7 @@ do	local FuncCache, remoteEvent, remoteFunction = remote.FuncCache, remote.event
 	-- RemoteFunction Object Methods
 	function remoteFunction:CallPlayer(player, ...)
 
-		assert(server, "[ModRemote] CallPlayer should be called from the server side.")
+		assert(server, "[RemoteManager] CallPlayer should be called from the server side.")
 		
 		local args = {...}
 		local attempt, err = pcall(function()
@@ -269,13 +269,12 @@ do	local FuncCache, remoteEvent, remoteFunction = remote.FuncCache, remote.event
 		end)
 		
 		if not attempt then
-			warn("[ModRemote] CallPlayer - Failed to recieve response from " .. player.Name)
-			return nil
+			return warn("[RemoteManager] CallPlayer - Failed to recieve response from " .. player.Name)
 		end	
 	end
 	
 	function remoteFunction:CallServerIntl(...)
-		assert(not server, "[ModRemote] CallServer should be called from the client side.")
+		assert(not server, "[RemoteManager] CallServer should be called from the client side.")
 		return self.Instance:InvokeServer(...)
 	end
 	
@@ -359,7 +358,7 @@ end
 
 local remoteMT = {
 	__call = function(self, ...)
-		assert(server, "ModRemote can only be called from server.")
+		assert(server, "RemoteManager can only be called from server.")
 		
 		local args = {...}
 		if #args > 0 then
