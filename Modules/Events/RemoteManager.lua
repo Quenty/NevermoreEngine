@@ -22,9 +22,7 @@ local remote		= {remoteEvent = {}; remoteFunction = {}}
 local remoteEvent, remoteFunction, FuncCache, RemoteEvents, RemoteFunctions = remote.remoteEvent, remote.remoteFunction, {}, {}, {}
 
 -- Localize Functions
-local time = os.time
-local newInstance = Instance.new
-local traceback = debug.traceback
+local time, newInstance, traceback = os.time, Instance.new, debug.traceback
 
 assert(workspace.FilteringEnabled or not server, "[RemoteManager] RemoteManager 4.0 does not work with filterless games due to security vulnerabilties. Please consider using Filtering or use RemoteManager 2.7x")
 
