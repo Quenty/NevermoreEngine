@@ -1,12 +1,11 @@
 local HttpService		= game:GetService("HttpService")
-
-local LoadCustomLibrary	= require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary
-local ModRemote			= LoadCustomLibrary("ModRemote")
+local LoadCustomLibrary		= require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary
+local RemoteManager		= LoadCustomLibrary("RemoteManager")
 
 if game:GetService("RunService"):IsServer() then -- Server
 	return function(tab)
 		local trelloUsername, boardName, listName, key, token = tab.trelloUsername, tab.boardName, tab.listName, tab.key, tab.secret
-		local trelloClientBridge = ModRemote:CreateEvent("TrelloClientBridge") -- RemoteFunction for logging Client errors too
+		local trelloClientBridge = RemoteManager:CreateEvent("TrelloClientBridge") -- RemoteFunction for logging Client errors too
 		
 		local listId = (function()
 			local boards = HttpService:JSONDecode(HttpService:GetAsync("https://trello.com/1/members/" .. trelloUsername:lower() .. "/boards"))
@@ -38,7 +37,8 @@ if game:GetService("RunService"):IsServer() then -- Server
 		game:GetService("ScriptContext").Error:connect(function(...) POSTError(false, ...) end) -- Hookup Server
 	end
 else
-	local trelloClientBridge = ModRemote:GetEvent("TrelloClientBridge")
+	local trelloClientBridge = RemoteManager:GetEvent("TrelloClientBridge")
 	game:GetService("ScriptContext").Error:connect(function(...) trelloClientBridge:SendToServer(...) end)
 end
+
 return nil
