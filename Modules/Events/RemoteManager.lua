@@ -152,21 +152,23 @@ local function CreateEventMetatable(instance)
 end
 
 local function CreateFunction(name, instance)
-	local _event = CreateFunctionMetatable(instance or functionStorage:FindFirstChild(name) or Make("RemoteFunction", {
-		Parent = functionStorage;
-		Name = name;
-	}))
-
-	RemoteEvents[name] = _event
+	local instance = instance or functionStorage:FindFirstChild(name) or newInstance("RemoteFunction")
+	instance.Parent = functionStorage
+	instance.Name = name
+	
+	local _event = CreateFunctionMetatable(instance)
+	
+	RemoteFunctions[name] = _event
 	
 	return _event
 end
 
 local function CreateEvent(name, instance)
-	local _event = CreateEventMetatable(instance or eventStorage:FindFirstChild(name) or Make("RemoteEvent", {
-		Parent = eventStorage;
-		Name = name;
-	}))
+	local instance = instance or eventStorage:FindFirstChild(name) or newInstance("RemoteEvent")
+	instance.Parent = eventStorage
+	instance.Name = name
+	
+	local _event = CreateEventMetatable(instance)
 	
 	RemoteEvents[name] = _event
 	
