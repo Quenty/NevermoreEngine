@@ -1,4 +1,4 @@
-# ModRemote
+# RemoteManager
 Written by Vorlias, [documentation here](https://github.com/Vorlias/ROBLOX-ModRemote).
 
 The MIT License (MIT)
