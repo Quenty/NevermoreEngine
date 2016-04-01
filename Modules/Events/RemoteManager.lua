@@ -2,7 +2,7 @@
 -- Edited by Narrev
 
 --[[
-	ModRemote v4.00
+	RemoteManager v4.00
 		ModuleScript for handling networking via client/server
 		
 	Documentation for this ModuleScript can be found at
@@ -15,7 +15,7 @@ local default_Client_Cache = 10
 
 -- Services
 local ReplicatedStorage	= game:GetService("ReplicatedStorage")
-local server		= game:GetService("NetworkServer")
+local server		= game:FindService("NetworkServer")
 local remote		= {remoteEvent = {}; remoteFunction = {}}
 
 -- Localize Tables
@@ -367,7 +367,7 @@ function remoteFunction:CallServer(...)
 	local clientCache = instance:FindFirstChild("ClientCache")
 
 	if clientCache then
-		local cacheName = instance:GetFullName() .. (instance:FindFirstChild("UseActionCaching") and tostring({...}[1]) or "")
+		local cacheName = instance:GetFullName() .. (instance:FindFirstChild("UseActionCaching") and tostring(({...})[1]) or "")
 		
 		local cache = FuncCache[cacheName]
 		if cache and time() < cache.Expires then
