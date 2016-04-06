@@ -29,7 +29,7 @@ String reference:
 %d	day of the month (16) [01-31]
 %H	hour, using a 24-hour clock (23) [00-23]
 %I	hour, using a 12-hour clock (11) [01-12]
-%j	day of year [01-365]
+%j	day of year [0-365] (March 1st is treated as 1st day of year)
 %M	minute (48) [00-59]
 %m	month (09) [01-12]
 %n	New-line character ('\n')
