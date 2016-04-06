@@ -24,13 +24,6 @@ local function date(formatString, unix)
 	-- Localize functions
 	local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
 
-	local function suffix(Number)
-		--- Returns st, nd (Like 1st, 2nd)
-		-- @param number Number The number to get the suffix of [1-31]
-		if Number < 21 and Number > 3 or Number > 23 and Number < 31 then return "th" end
-		return ({"st", "nd", "rd"})[Number % 10]
-	end
-
 	-- Find whether formatString was used
 	if formatString then
 		if type(formatString) == "number" then -- If they didn't pass a formatString, and only passed unix through
