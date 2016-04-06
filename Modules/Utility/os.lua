@@ -109,7 +109,7 @@ local function date(formatString, unix)
 		"%%n", "\n"),
 		"%%p", hours >= 12 and "pm" or "am"),
 		"%%_p", hours >= 12 and "PM" or "AM"),
-		"%%s", suffix(days)),
+		"%%s", (days < 21 and days > 3 or days > 23 and days < 31) and "th" or ({"st", "nd", "rd"})[days % 10]),
 		"%%S", format("%02d", seconds)),
 		"%%_S", seconds),
 		"%%t", "\t"),
