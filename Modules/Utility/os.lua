@@ -3,8 +3,8 @@
 local function date(formatString, unix)
 	--- Allows you to use os.date in RobloxLua!
 	--		date ([format [, time]])
-	-- This is an optimized version. If you want to see how the numbers work, see the following:
-	-- https://github.com/Narrev/Unix-Epoch-Date-and-Time-Calculations/blob/master/Time%20Functions.lua
+	-- This doesn't include the explanations for the math. If you want to see how the numbers work, see the following:
+	-- http://howardhinnant.github.io/date_algorithms.html#weekday_from_days
 	-- 
 	-- @param string formatString
 	--		If present, function date returns a string formatted by the tags in formatString.
@@ -22,29 +22,7 @@ local function date(formatString, unix)
 	-- @returns a string or a table containing date and time, formatted according to the given string format. If called without arguments, returns the equivalent of date("%c").
 
 	-- Localize functions
-	local ceil, floor, sub, find, gsub, format = math.ceil, math.floor, string.sub, string.find, string.gsub, string.format
-
-	-- Helper functions
-	local function overflow(array, seed)
-		--- Subtracts the integer values in an array from a seed until the seed cannot be subtracted from any further
-		-- @param array array A table filled with integers to be subtracted from seed
-		-- @param integer seed A seed that is subtracted by the values in array until it would become negative from subtraction
-		-- @returns index at which the iterated value is greater than the remaining seed and what is left of the seed (before subtracting final value)
-
-		for i = 1, #array do
-			if seed - array[i] <= 0 then
-				return i, seed
-			end
-			seed = seed - array[i]
-		end
-	end
-
-	local function suffix(Number)
-		--- Returns st, nd (Like 1st, 2nd)
-		-- @param number Number The number to get the suffix of [1-31]
-		if Number < 21 and Number > 3 or Number > 23 and Number < 31 then return "th" end
-		return ({"st", "nd", "rd"})[Number % 10]
-	end
+	local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
 
 	-- Find whether formatString was used
 	if formatString then
@@ -63,21 +41,26 @@ local function date(formatString, unix)
 		formatString = "%c"
 	end
 
-	-- Declare Variables
-	local unix = type(unix) == "number" and unix or tick()
+	-- Set unix
+	local unix = type(tonumber(unix)) == "number" and unix or tick()
 
 	-- Get hours, minutes, and seconds	
 	local hours, minutes, seconds = floor(unix / 3600 % 24), floor(unix / 60 % 60), floor(unix % 60)
 
-	-- Get years, months, and days
-	local days, month, year	= floor(unix / 86400) + 719528
-	local wday		= (days + 6) % 7
-	local _4Years		= 400*floor(days / 146097) + 100*floor(days % 146097 / 36524) + 4*floor(days % 146097 % 36524 / 1461) - 1
-	      year, days	= overflow({366,365,365,365}, days - 365*(_4Years + 1) - floor(.25*_4Years) - floor(.0025*_4Years) + floor(.01*_4Years)) -- [0-1461]
-	      year, _4Years	= year + _4Years -- _4Years is set to nil
-	local yDay		= days
-	      month, days	= overflow({31,(year%4==0 and(year%25~=0 or year%16==0))and 29 or 28,31,30,31,30,31,31,30,31,30,31}, days)
+	-- Get days, month and year
+	local days	= floor(unix / 86400) + 719468
+	local wday	= (days + 3) % 7
+	local year	= floor((days >= 0 and days or days - 146096) / 146097)				-- 400 Year bracket
+	days		= (days - year * 146097)								-- Days into 400 year bracket [0, 146096]
+	local years	= floor((days - floor(days/1460) + floor(days/36524) - floor(days/146096))/365)	-- Years into 400 Year bracket[0, 399]
+	days		= days - (365*years + floor(years/4) - floor(years/100))				-- Days into year (March 1st is first day) [0, 365]
+	local month	= floor((5*days + 2)/153)							-- Month of year (March is month 0) [0, 11]
+	local yDay	= days										-- Hi readers :)
+	days		= days - floor((153*month + 2)/5) + 1						-- Days into month [1, 31]
+	month		= month + (month < 10 and 3 or -9)						-- Real life month [1, 12]
+	year		= years + year*400 + (month < 3 and 1 or 0)					-- Actual year (Shift 1st month from March to January)
 
+	
 	if formatString == "*t" then -- Return a table if "*t" was used
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end
@@ -119,7 +102,7 @@ local function date(formatString, unix)
 		"%%n", "\n"),
 		"%%p", hours >= 12 and "pm" or "am"),
 		"%%_p", hours >= 12 and "PM" or "AM"),
-		"%%s", suffix(days)),
+		"%%s", (days < 21 and days > 3 or days > 23 and days < 31) and "th" or ({"st", "nd", "rd"})[days % 10]),
 		"%%S", format("%02d", seconds)),
 		"%%_S", seconds),
 		"%%t", "\t"),
