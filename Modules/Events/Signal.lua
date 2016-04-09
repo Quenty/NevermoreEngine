@@ -20,7 +20,7 @@
 			
 		... wait()
 			Wait for fire to be called, and return the arguments it was given.
-
+			
 		Destroy()
 			Disconnects all connected events to the signal and voids the signal as unusable.
 --]]
