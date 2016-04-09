@@ -124,25 +124,28 @@ end
 
 -- LoadLibrary function
 local LoadLibrary do
-	local DebugID = 0
-	local RequestDepth = 0
+	if not DEBUG_MODE then
+		function LoadLibrary(LibraryName)
+			assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
+			return require(_LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist."))
+		end
+	else
+		local DebugID = 0
+		local RequestDepth = 0
 
-	function LoadLibrary(LibraryName)
-		--- Loads a library from Nevermore's library cache
-		-- @param LibraryName The name of the library
-		-- @return The library's value
-		assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
-		local Library = _LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist.")
-		if not DEBUG_MODE then
-			return require(Library)
-		else
+		function LoadLibrary(LibraryName)
+			--- Loads a library from Nevermore's library cache
+			-- @param LibraryName The name of the library
+			-- @return The library's value
+			assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
+
 			DebugID = DebugID + 1
 			local LocalDebugID = DebugID
 
 			print(rep("\t", RequestDepth), LocalDebugID, "Loading: ", LibraryName)
 			RequestDepth = RequestDepth + 1
 
-			local Library = require(Library)
+			local Library = require(_LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist."))
 
 			RequestDepth = RequestDepth - 1
 			print(rep("\t", RequestDepth), LocalDebugID, "Done loading: ", LibraryName)
