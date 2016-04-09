@@ -491,29 +491,31 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 
 	local ParentFrame
 	if not DoNotConstrainEffect then
-		ParentFrame                        = Instance.new("Frame", Gui)
-		ParentFrame.ClipsDescendants       = true;
-		ParentFrame.Archivable             = false;
-		ParentFrame.BorderSizePixel        = 0;
-		ParentFrame.BackgroundTransparency = 1;
-		ParentFrame.Name                   = "Circle_Effect";
-		ParentFrame.Size                   = UDim2.new(1, 0, 1, 0);
-		ParentFrame.ZIndex                 = math.min(Gui.ZIndex + 1, 10)
-		ParentFrame.Parent                 = Gui;
+		ParentFrame            = Make("Frame", {
+		ClipsDescendants       = true;
+		Archivable             = false;
+		BorderSizePixel        = 0;
+		BackgroundTransparency = 1;
+		Name                   = "Circle_Effect";
+		Size                   = UDim2.new(1, 0, 1, 0);
+		ZIndex                 = math.min(Gui.ZIndex + 1, 10);
+		Parent                 = Gui;
+	})
 	end
 
-	local Circle                  = Instance.new("ImageLabel");
-	Circle.Image                  = "http://www.roblox.com/asset/?id=172318712"
-	Circle.Name                   = "Circle";
-	Circle.ImageTransparency      = 0.75;
-	Circle.BackgroundTransparency = 1;
-	Circle.BorderSizePixel        = 0;
-	Circle.Archivable             = false;
-	Circle.Size                   = UDim2.new(0, StartDiameter, 0, StartDiameter);
-	Circle.ZIndex                 = math.min(Gui.ZIndex + 1, 10)
-	Circle.ImageColor3            = InkColor or Color3.new(1, 1, 1)
-	Circle.Position               = UDim2.new(0, X-StartDiameter/2, 0, Y-StartDiameter/2)
-
+	local Circle           = Make("ImageLabel", {
+	Image                  = "http://www.roblox.com/asset/?id=172318712";
+	Name                   = "Circle";
+	ImageTransparency      = 0.75;
+	BackgroundTransparency = 1;
+	BorderSizePixel        = 0;
+	Archivable             = false;
+	Size                   = UDim2.new(0, StartDiameter, 0, StartDiameter);
+	ZIndex                 = math.min(Gui.ZIndex + 1, 10);
+	ImageColor3            = InkColor or Color3.new(1, 1, 1);
+	Position               = UDim2.new(0, X-StartDiameter/2, 0, Y-StartDiameter/2);
+	Parent                 = ParentFrame or Gui;
+	})
 	--[[if Gui.AbsoluteSize.X > Gui.AbsoluteSize.Y then
 		Gui.SizeConstraint = "RelativeXX"
 	else
@@ -530,9 +532,7 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 	local NewSize     = UDim2.new(0, NewDiameter, 0,  NewDiameter)
 	local NewPosition = UDim2.new(0, X - (NewDiameter / 2), 0, Y - (NewDiameter / 2))
 	
-	Circle.Parent                      = ParentFrame or Gui
 	
-
 	Circle:TweenSizeAndPosition(NewSize, NewPosition, "Out", "Linear", Time, true)
 	TweenTransparency(Circle, {ImageTransparency = 0.5}, Time/3, true)
 	delay(Time/3, function()
@@ -569,93 +569,42 @@ lib.generateMouseDrag = GenerateMouseDrag
 local function AddTexturedWindowTemplate(Frame, Radius, Type)
 	-- Makes a 'Textured' window...  9Scale thingy?
 
-	Type = Type or 'Frame';
-
-	local TopLeft = Make(Type, {
+	return Make(Type or 'Frame', {
 		Archivable             = false;
 		BackgroundColor3       = Frame.BackgroundColor3;
 		BorderSizePixel        = 0;
-		Name                   = "TopLeft";
 		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 0, 0);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
 		BackgroundTransparency = 1;
 		ZIndex                 = Frame.ZIndex;
-	});
-
-	local BottomLeft = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "BottomLeft";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 1, -Radius);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local TopRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "TopRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 0, 0);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local BottomRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "BottomRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 1, -Radius);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local Middle = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "Middle";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, Radius, 0, 0);
-		Size                   = UDim2.new(1, -Radius*2, 1, 0);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local MiddleLeft = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleLeft";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 0, Radius);
-		Size                   = UDim2.new(0, Radius, 1, -Radius*2);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	local MiddleRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 0, Radius);
-		Size                   = UDim2.new(0, Radius, 1, -Radius*2);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
-
-	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
+	}; { 
+		Name = "TopLeft";
+		Position = UDim2.new(0, 0, 0, 0);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "BottomLeft";
+		Position = UDim2.new(0, 0, 1, -Radius);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "TopRight";
+		Position = UDim2.new(1, -Radius, 0, 0);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "BottomRight";
+		Position = UDim2.new(1, -Radius, 1, -Radius);
+		Size = UDim2.new(0, Radius, 0, Radius);
+	}; {
+		Name = "Middle";
+		Position = UDim2.new(0, Radius, 0, 0);
+		Size = UDim2.new(1, -Radius*2, 1, 0);
+	}; {
+		Name = "MiddleLeft";
+		Position = UDim2.new(0, 0, 0, Radius);
+		Size = UDim2.new(0, Radius, 1, -Radius*2);
+	}; {
+		Name = "MiddleRight";
+		Position = UDim2.new(1, -Radius, 0, Radius);
+		Size = UDim2.new(0, Radius, 1, -Radius*2);
+	})
 end
 lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 lib.addTexturedWindowTemplate = AddTexturedWindowTemplate

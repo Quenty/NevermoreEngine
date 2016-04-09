@@ -94,46 +94,23 @@ local function GenerateCircleGui(BaseCover, CircleSize, ZIndex)
 		Image                  = "http://www.roblox.com/asset/?id=148523274";
 		Size                   = UDim2.new(0, CircleSize, 0, CircleSize);
 		Parent                 = BaseCover;
-		ZIndex = ZIndex;
+		ZIndex                 = ZIndex;
 	})
 
 	-- Stretch accross the whole top.
-	local TopFrame = Make("Frame", {
-		Archivable       = false;
-		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "TopFrame";
-		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
-
 	-- Stretch accross the whole bottom.
-	local BottomFrame = Make("Frame", {
+	local TopFrame, BottomFrame, LeftFrame, RightFrame = Make("Frame", {
 		Archivable       = false;
 		BorderSizePixel  = 0;
 		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "BottomFrame";
 		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
-
-	local LeftFrame = Make("Frame", {
-		Archivable       = false;
-		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "LeftFrame";
-		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
-
-	local RightFrame = Make("Frame", {
-		Archivable       = false;
-		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "RightFrame";
-		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
+		ZIndex           = ZIndex;
+	},
+		{Name            = "TopFrame"},
+		{Name            = "BottomFrame"},
+		{Name            = "LeftFrame"},
+		{Name            = "RightFrame"}
+	)
 
 	return CircleGui, TopFrame, BottomFrame, LeftFrame, RightFrame
 end

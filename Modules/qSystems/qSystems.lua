@@ -81,30 +81,60 @@ end
 lib.RoundNumber = RoundNumber
 lib.Round = RoundNumber
 
+local function Debounce(func)
+	--- Debounces a function such that the function
+	--  will not run when called if it is already running
+	-- @param func The function to debounce
+	local isRunning = false
+	return function(...)
+		if not isRunning then
+			isRunning = true
+			func(...)
+			isRunning = false
+		end
+	end
+end
+lib.Debounce = Debounce
+
 local function Modify(Instance, Values)
 	--- Modifies an Instance by using a table.  
 	-- @param Instance The instance to modify
 	-- @param Values A table with keys as the value to change, and the value as the property to
-	--     assign
 
 	assert(type(Values) == "table", "Values is not a table")
 
 	for Index, Value in next, Values do
-		if type(Index) == "number" then
-			Value.Parent = Instance
-		else
+		if type(Value) == "function" then
+			Instance[Index]:connect(Debounce(Value))
+		elseif type(Index) == "string" then
 			Instance[Index] = Value
+		elseif type(Index) == "number" then
+			Value.Parent = Instance
 		end
+	end
+	if Values.CFrame then
+		Instance.CFrame = Values.CFrame
 	end
 	return Instance
 end
 
-local function Make(ClassType, Properties)
+local function Make(ClassType, Properties, ...)
 	--- Using a syntax hack to create a nice way to Make new items.  
 	-- @param ClassType The type of class to instantiate
 	-- @param Properties The properties to use
-
-	return Modify(Instance.new(ClassType), Properties)
+	-- @returns object of ClassType with Properties
+	-- @param {...} if used, @returns an object for each subsequent table that is a modification to Properties
+	-- 	This would be used for creating a custom "default" list of properties so you don't need to rewrite the same properties over and over.
+	local objects = {...}
+	local numObjects = #objects
+	if numObjects > 0 then
+		for a = 1, numObjects do
+			objects[a] = Modify(Modify(Instance.new(ClassType), Properties), objects[a])
+		end
+		return unpack(objects)
+	else
+		return Modify(Instance.new(ClassType), Properties)
+	end
 end
 
 lib.Modify = Modify
@@ -149,9 +179,9 @@ local function CallOnChildren(Instance, FunctionToCall)
 	--     descendants.
 	
 	FunctionToCall(Instance)
-
-	for _, Child in next, Instance:GetChildren() do
-		CallOnChildren(Child, FunctionToCall)
+	local children = Instance:GetChildren()
+	for a = 1, #children do
+		CallOnChildren(children[a], FunctionToCall)
 	end
 end
 lib.CallOnChildren = CallOnChildren
@@ -191,7 +221,9 @@ local function GetHumanoid(Descendant)
 			if Humanoid:IsA("Humanoid") then
 				return Humanoid
 			else -- Incase there are other humanoids in there.
-				for _, Item in pairs(Descendant:GetChildren()) do
+				local DescendantChildren = Descendant:GetChildren()
+				for a = 1, #DescendantChildren do
+					local Item = DescendantChildren[a]
 					if Item.Name == "Humanoid" and Item:IsA("Humanoid") then
 						return Item
 					end
