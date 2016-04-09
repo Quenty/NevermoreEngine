@@ -35,7 +35,7 @@ function MasterClock.new(SyncEvent, DelayedRequestFunction)
 end
 
 function MasterClock:GetTime()
-	return workspace.DistributedGameTime
+	return tick()
 end
 
 function MasterClock:Sync()
@@ -89,7 +89,7 @@ function SlaveClock:IsSynced()
 end
 
 function SlaveClock:GetLocalTime()
-    return workspace.DistributedGameTime
+    return tick()
 end
 
 function SlaveClock:HandleSyncEvent(TimeOne)
