@@ -1,3 +1,7 @@
+-- ScreenCover.lua
+-- @author Quenty
+-- Last Modified November 17th, 2014
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService        = game:GetService("RunService")
 
@@ -10,20 +14,23 @@ local qMath             = LoadCustomLibrary("qMath");
 
 local lib               = {}
 
--- ScreenCover.lua
--- @author Quenty
--- Last Modified November 17th, 2014
+local Make              = qSystems.Make
+local Round             = qSystems.Round
+local Modify            = qSystems.Modify
+local roundUp           = qMath.roundUp
+local GetEnumName       = EnumInterpreter.GetEnumName
 
-local Make   = qSystems.Make
-local Round  = qSystems.Round
-local Modify = qSystems.Modify
+local max               = math.max
+local insert            = table.insert
 
+local UDim2             = UDim2.new
+local Color3            = Color3.new
 
-lib.STYLES = {}
-lib.TYPES = {
-	"TransitionOut";
-	"TransitionIn";
-}
+local STYLES = {}
+local TYPES = {"TransitionOut", "TransitionIn"}
+
+lib.STYLES = STYLES
+lib.TYPES  = TYPES
 
 local function MakeCover(Properties)
 	-- Generates a cover frame that is basically standard. :D
@@ -32,9 +39,9 @@ local function MakeCover(Properties)
 
 	return Modify(Make("Frame", {
 			--Parent               = ScreenGui;
-			Size                   = UDim2.new(1, 0, 1, 38); -- 38 is because topbar. dang it ROBLOX.
-			Position               = UDim2.new(0, 0, 0, -36); -- Fix ROBLOX's glitches...
-			BackgroundColor3       = Color3.new(0, 0, 0);
+			Size                   = UDim2(1, 0, 1, 38); -- 38 is because topbar. dang it ROBLOX.
+			Position               = UDim2(0, 0, 0, -36); -- Fix ROBLOX's glitches...
+			BackgroundColor3       = Color3(0, 0, 0);
 			BackgroundTransparency = 1;
 			Visible                = false;
 			Name                   = "ScreenCover";
@@ -65,23 +72,23 @@ end
 local Offset = 10
 local function CenterCircleGui(BaseCover, TopFrame, BottomFrame, LeftFrame, RightFrame, CircleGui) 
 
-	CircleGui.Position = UDim2.new(0.5, -CircleGui.Size.X.Offset/2, 0.5, -CircleGui.Size.Y.Offset/2);
+	CircleGui.Position = UDim2(0.5, -CircleGui.Size.X.Offset/2, 0.5, -CircleGui.Size.Y.Offset/2);
 
 	--- Center's the circle gui and resizes the surrounding labels
-	TopFrame.Size = UDim2.new(1, Offset, 0, (BaseCover.AbsoluteSize.Y - CircleGui.Size.Y.Offset)/2 + Offset/2)
-	TopFrame.Position = UDim2.new(0, -Offset/2, 0.5, -(CircleGui.Size.Y.Offset/2 + TopFrame.Size.Y.Offset))
+	TopFrame.Size = UDim2(1, Offset, 0, (BaseCover.AbsoluteSize.Y - CircleGui.Size.Y.Offset)/2 + Offset/2)
+	TopFrame.Position = UDim2(0, -Offset/2, 0.5, -(CircleGui.Size.Y.Offset/2 + TopFrame.Size.Y.Offset))
 
-	BottomFrame.Size = TopFrame.Size; --UDim2.new(1, Offset, 0, (BaseCover.AbsoluteSize.Y - CircleGui.Size.Y.Offset)/2 + Offset/2)
-	BottomFrame.Position = UDim2.new(0, -Offset/2, 0.5, (CircleGui.Size.Y.Offset/2))
+	BottomFrame.Size = TopFrame.Size; --UDim2(1, Offset, 0, (BaseCover.AbsoluteSize.Y - CircleGui.Size.Y.Offset)/2 + Offset/2)
+	BottomFrame.Position = UDim2(0, -Offset/2, 0.5, (CircleGui.Size.Y.Offset/2))
 
-	LeftFrame.Size = UDim2.new(0, (BaseCover.AbsoluteSize.X - CircleGui.Size.X.Offset)/2 + Offset/2, 1, Offset)
-	LeftFrame.Position = UDim2.new(0.5, -(CircleGui.Size.X.Offset/2 + LeftFrame.Size.X.Offset), 0, -Offset/2)
-	-- LeftFrame.Position = UDim2.new(0, -Offset, 0.5, -CircleGui.Size.Y.Offset/2 - Offset/2)
+	LeftFrame.Size = UDim2(0, (BaseCover.AbsoluteSize.X - CircleGui.Size.X.Offset)/2 + Offset/2, 1, Offset)
+	LeftFrame.Position = UDim2(0.5, -(CircleGui.Size.X.Offset/2 + LeftFrame.Size.X.Offset), 0, -Offset/2)
+	-- LeftFrame.Position = UDim2(0, -Offset, 0.5, -CircleGui.Size.Y.Offset/2 - Offset/2)
 
-	RightFrame.Size = LeftFrame.Size-- UDim2.new(0, (BaseCover.AbsoluteSize.X - CircleGui.Size.X.Offset)/2 + Offset/2, 1, Offset)
-	RightFrame.Position = UDim2.new(0.5, (CircleGui.Size.X.Offset/2), 0, -Offset/2)
-	-- RightFrame.Size = UDim2.new(0.5, -CircleGui.Size.X.Offset/2 + Offset, 0, CircleGui.Size.Y.Offset  + Offset)
-	-- RightFrame.Position = UDim2.new(1, -CircleGui.Size.X.Offset, 0.5, -CircleGui.Size.Y.Offset/2 - Offset/2)
+	RightFrame.Size = LeftFrame.Size-- UDim2(0, (BaseCover.AbsoluteSize.X - CircleGui.Size.X.Offset)/2 + Offset/2, 1, Offset)
+	RightFrame.Position = UDim2(0.5, (CircleGui.Size.X.Offset/2), 0, -Offset/2)
+	-- RightFrame.Size = UDim2(0.5, -CircleGui.Size.X.Offset/2 + Offset, 0, CircleGui.Size.Y.Offset  + Offset)
+	-- RightFrame.Position = UDim2(1, -CircleGui.Size.X.Offset, 0.5, -CircleGui.Size.Y.Offset/2 - Offset/2)
 end
 
 local function GenerateCircleGui(BaseCover, CircleSize, ZIndex)
@@ -92,7 +99,7 @@ local function GenerateCircleGui(BaseCover, CircleSize, ZIndex)
 		BorderSizePixel        = 0;
 		BackgroundTransparency = 1;
 		Image                  = "http://www.roblox.com/asset/?id=148523274";
-		Size                   = UDim2.new(0, CircleSize, 0, CircleSize);
+		Size                   = UDim2(0, CircleSize, 0, CircleSize);
 		Parent                 = BaseCover;
 		ZIndex                 = ZIndex;
 	})
@@ -102,7 +109,7 @@ local function GenerateCircleGui(BaseCover, CircleSize, ZIndex)
 	local TopFrame, BottomFrame, LeftFrame, RightFrame = Make("Frame", {
 		Archivable       = false;
 		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
+		BackgroundColor3 = Color3(0, 0, 0);
 		Parent           = BaseCover;
 		ZIndex           = ZIndex;
 	},
@@ -149,10 +156,10 @@ local StyleFunctions = {
 		TransitionIn = function(Time, BaseCover, AnimationStyles)
 			local NewCover = BaseCover:Clone()
 			NewCover.Parent = BaseCover
-			NewCover.Size = UDim2.new(1, 0, 1, 0)
-			NewCover.Position = UDim2.new(0, 0, -1, 0)
+			NewCover.Size = UDim2(1, 0, 1, 0)
+			NewCover.Position = UDim2(0, 0, -1, 0)
 			NewCover.BackgroundTransparency = 0;
-			NewCover:TweenPosition(UDim2.new(0, 0, 0, 0), "In", AnimationStyles.EasingStyle or ("Quad"), Time, true)
+			NewCover:TweenPosition(UDim2(0, 0, 0, 0), "In", AnimationStyles.EasingStyle or ("Quad"), Time, true)
 			BaseCover.BackgroundTransparency = 1
 			wait(Time)
 			NewCover:Destroy()
@@ -162,9 +169,9 @@ local StyleFunctions = {
 		TransitionOut = function(Time, BaseCover, AnimationStyles)
 			local NewCover = BaseCover:Clone()
 			NewCover.Parent = BaseCover
-			NewCover.Size = UDim2.new(1, 0, 1, 0)
-			NewCover.Position = UDim2.new(0, 0, 0, 0)
-			NewCover:TweenPosition(UDim2.new(0, 0, 1, 0), "Out", AnimationStyles.EasingStyle or ("Quad"), Time, true)
+			NewCover.Size = UDim2(1, 0, 1, 0)
+			NewCover.Position = UDim2(0, 0, 0, 0)
+			NewCover:TweenPosition(UDim2(0, 0, 1, 0), "Out", AnimationStyles.EasingStyle or ("Quad"), Time, true)
 			BaseCover.BackgroundTransparency = 1
 			wait(Time)
 			NewCover:Destroy()
@@ -177,11 +184,11 @@ local StyleFunctions = {
 		TransitionIn = function(Time, BaseCover, AnimationStyles)
 			local NewCover                   = BaseCover:Clone()
 			NewCover.Parent                  = BaseCover
-			NewCover.Size                    = UDim2.new(1, 0, 1, 0)
-			NewCover.Position                = UDim2.new(0, 0, 1, 0)
+			NewCover.Size                    = UDim2(1, 0, 1, 0)
+			NewCover.Position                = UDim2(0, 0, 1, 0)
 			NewCover.BackgroundTransparency  = 0;
 
-			NewCover:TweenPosition(UDim2.new(0, 0, 0, 0), "In", AnimationStyles.EasingStyle or ("Quad"), Time, true)
+			NewCover:TweenPosition(UDim2(0, 0, 0, 0), "In", AnimationStyles.EasingStyle or ("Quad"), Time, true)
 			
 			BaseCover.BackgroundTransparency = 1
 			wait(Time)
@@ -192,9 +199,9 @@ local StyleFunctions = {
 		TransitionOut = function(Time, BaseCover, AnimationStyles)
 			local NewCover = BaseCover:Clone()
 			NewCover.Parent = BaseCover
-			NewCover.Size = UDim2.new(1, 0, 1, 0)
-			NewCover.Position = UDim2.new(0, 0, 0, 0)
-			NewCover:TweenPosition(UDim2.new(0, 0, -1, 0), "Out", AnimationStyles.EasingStyle or ("Quad"), Time, true)
+			NewCover.Size = UDim2(1, 0, 1, 0)
+			NewCover.Position = UDim2(0, 0, 0, 0)
+			NewCover:TweenPosition(UDim2(0, 0, -1, 0), "Out", AnimationStyles.EasingStyle or ("Quad"), Time, true)
 			BaseCover.BackgroundTransparency = 1
 			wait(Time)
 			NewCover:Destroy()
@@ -206,15 +213,15 @@ local StyleFunctions = {
 			-- SquareSize must be divisible by 2. 
 			-- If the squareSize is too small, you can get wait() lag (I think).
 
-			SquareSize                       = qMath.roundUp(AnimationStyles.SquareSize or 76, 2);
+			SquareSize                       = roundUp(AnimationStyles.SquareSize or 76, 2);
 			local NewCover                   = BaseCover:Clone()
 			NewCover.Name                    = "Square"
-			NewCover.Size                    = UDim2.new(0, 0, 0, 0);
+			NewCover.Size                    = UDim2(0, 0, 0, 0);
 			NewCover.BackgroundTransparency  = 0;
 			BaseCover.BackgroundTransparency = 1;
 			
 			
-			local MaxSize                    = qMath.roundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
+			local MaxSize                    = roundUp(max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
 			local Squares                    = {}
 			local ValX                       = 0;
 			local ValY                       = 0;
@@ -225,13 +232,13 @@ local StyleFunctions = {
 				while ValX <= ValY do
 					local Square = NewCover:Clone()
 					Square.Archivable = false;
-					Square.Position = UDim2.new(0, ValX + (SquareSize/2), 0, ValY - (ValX) + (SquareSize/2));
+					Square.Position = UDim2(0, ValX + (SquareSize/2), 0, ValY - (ValX) + (SquareSize/2));
 					Square.Parent = BaseCover;
-					local NewPosition = Square.Position - UDim2.new(0, SquareSize/2, 0, SquareSize/2)
-					table.insert(Squares, Square)
+					local NewPosition = Square.Position - UDim2(0, SquareSize/2, 0, SquareSize/2)
+					insert(Squares, Square)
 
 					delay(WaitEach * (ValY/SquareSize), function()
-						Square:TweenSizeAndPosition(UDim2.new(0, SquareSize, 0, SquareSize), NewPosition, "In", "Quad", Time/2, true)
+						Square:TweenSizeAndPosition(UDim2(0, SquareSize, 0, SquareSize), NewPosition, "In", "Quad", Time/2, true)
 					end)
 					ValX = ValX + SquareSize
 				end
@@ -246,13 +253,13 @@ local StyleFunctions = {
 			return true;
 		end;
 		TransitionOut = function(Time, BaseCover, AnimationStyles)
-			SquareSize                      = qMath.roundUp(AnimationStyles.SquareSize or 76, 2);
+			SquareSize                      = roundUp(AnimationStyles.SquareSize or 76, 2);
 			
 			local NewCover                  = BaseCover:Clone()
 			NewCover.Name                   = "Square"
-			NewCover.Size                   = UDim2.new(0, SquareSize, 0, SquareSize);
+			NewCover.Size                   = UDim2(0, SquareSize, 0, SquareSize);
 			
-			local MaxSize                   = qMath.roundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
+			local MaxSize                   = roundUp(max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
 			local Squares                   = {}
 			local ValX                      = 0;
 			local ValY                      = MaxSize;
@@ -264,12 +271,12 @@ local StyleFunctions = {
 					local Square = NewCover:Clone()
 					Square.Archivable = false;
 					Square.Parent = BaseCover;
-					Square.Position = UDim2.new(0, ValX, 0, ValY - ValX);
-					local NewPosition = Square.Position + UDim2.new(0, (SquareSize/2), 0, (SquareSize/2));
-					table.insert(Squares, Square)
+					Square.Position = UDim2(0, ValX, 0, ValY - ValX);
+					local NewPosition = Square.Position + UDim2(0, (SquareSize/2), 0, (SquareSize/2));
+					insert(Squares, Square)
 
 					delay(WaitEach * (ValY/SquareSize), function() 
-						Square:TweenSizeAndPosition(UDim2.new(0, 0, 0, 0), NewPosition, "Out", "Quad", Time/2, true)
+						Square:TweenSizeAndPosition(UDim2(0, 0, 0, 0), NewPosition, "Out", "Quad", Time/2, true)
 					end)
 					ValX = ValX + SquareSize
 				end
@@ -289,15 +296,15 @@ local StyleFunctions = {
 			-- SquareSize must be divisible by 2. 
 			-- If the squareSize is too small, you can get wait() lag (I think).
 
-			SquareSize                       = qMath.roundUp(AnimationStyles.SquareSize or 76, 2);
+			SquareSize                       = roundUp(AnimationStyles.SquareSize or 76, 2);
 			local NewCover                   = BaseCover:Clone()
 			NewCover.Name                    = "Square"
-			NewCover.Size                    = UDim2.new(0, 0, 0, 0);
+			NewCover.Size                    = UDim2(0, 0, 0, 0);
 			NewCover.BackgroundTransparency  = 0;
 			BaseCover.BackgroundTransparency = 1;
 			
 			
-			local MaxSize                    = qMath.roundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
+			local MaxSize                    = roundUp(max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
 			local Squares                    = {}
 			local ValX                       = 0;
 			local ValY                       = 0;
@@ -308,13 +315,13 @@ local StyleFunctions = {
 				while ValX <= MaxSize do
 					local Square = NewCover:Clone()
 					Square.Archivable = false;
-					Square.Position = UDim2.new(0, ValX, 0, ValY);
+					Square.Position = UDim2(0, ValX, 0, ValY);
 					Square.Parent = BaseCover;
-					local NewPosition = Square.Position - UDim2.new(0, SquareSize/2, 0, SquareSize/2)
-					table.insert(Squares, Square)
+					local NewPosition = Square.Position - UDim2(0, SquareSize/2, 0, SquareSize/2)
+					insert(Squares, Square)
 
 					delay(WaitEach * (ValX/SquareSize), function() 
-						Square:TweenSizeAndPosition(UDim2.new(0, SquareSize, 0, SquareSize), NewPosition, "In", "Quad", Time/2, true)
+						Square:TweenSizeAndPosition(UDim2(0, SquareSize, 0, SquareSize), NewPosition, "In", "Quad", Time/2, true)
 					end)
 					ValX = ValX + SquareSize
 				end
@@ -334,14 +341,14 @@ local StyleFunctions = {
 	};
 	Circle = {
 		TransitionIn = function(Time, BaseCover, AnimationStyles)
-			local CircleSize = math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y)*math.sqrt(2) -- Presuming image takes up whole area.
+			local CircleSize = max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y)*2^.5 -- Presuming image takes up whole area.
 			BaseCover.BackgroundTransparency = 1;
 
 			local CircleGui, TopFrame, BottomFrame, LeftFrame, RightFrame = GenerateCircleGui(BaseCover, CircleSize, BaseCover.ZIndex)
 
 			local function ResizeCircle(Radius)
 				Radius = Round(Radius, 2)
-				CircleGui.Size = UDim2.new(0, Radius, 0, Radius)
+				CircleGui.Size = UDim2(0, Radius, 0, Radius)
 				CenterCircleGui(BaseCover, TopFrame, BottomFrame, LeftFrame, RightFrame, CircleGui)
 			end
 			
@@ -366,14 +373,14 @@ local StyleFunctions = {
 			return true;
 		end;
 		TransitionOut = function(Time, BaseCover, AnimationStyles)
-			local CircleSize = math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y)*math.sqrt(2) -- Presuming image takes up whole area.
+			local CircleSize = max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y)*2^.5 -- Presuming image takes up whole area.
 			BaseCover.BackgroundTransparency = 1;
 
 			local CircleGui, TopFrame, BottomFrame, LeftFrame, RightFrame = GenerateCircleGui(BaseCover, 0, BaseCover.ZIndex)
 
 			local function ResizeCircle(Radius)
 				Radius = Round(Radius, 2)
-				CircleGui.Size = UDim2.new(0, Radius, 0, Radius)
+				CircleGui.Size = UDim2(0, Radius, 0, Radius)
 				CenterCircleGui(BaseCover, TopFrame, BottomFrame, LeftFrame, RightFrame, CircleGui)
 			end
 			
@@ -399,8 +406,8 @@ local StyleFunctions = {
 }
 
 for StyleName, StyleData in pairs(StyleFunctions) do
-	lib.STYLES[#lib.STYLES+1] = StyleName;
-	StyleData.EnumID = #lib.STYLES
+	STYLES[#STYLES+1] = StyleName;
+	StyleData.EnumID = #STYLES
 end
 
 --[[
@@ -419,8 +426,8 @@ AnimationStyles = {
 
 local function MakeScreenCover(BaseCover, AnimationStyles)
 	local AnimationTime = AnimationStyles.AnimationTime or 1;
-	local AnimationStyle = EnumInterpreter.GetEnumName(lib.STYLES, (AnimationStyles.AnimationStyle or "Fade")) -- Guarantee exact results (Lowercase, uppercase, etc. )
-	local Type = EnumInterpreter.GetEnumName(lib.TYPES, (AnimationStyles.Type or "TransitionOut"))
+	local AnimationStyle = GetEnumName(STYLES, (AnimationStyles.AnimationStyle or "Fade")) -- Guarantee exact results (Lowercase, uppercase, etc. )
+	local Type = GetEnumName(TYPES, (AnimationStyles.Type or "TransitionOut"))
 
 	--print("[ScreenCover] - running animation: Type: "..Type.."; Style: "..AnimationStyle.."; Time: "..AnimationTime)
 
