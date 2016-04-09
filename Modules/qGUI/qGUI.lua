@@ -1,29 +1,6 @@
-local Players           = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService        = game:GetService("RunService")
-local UserInputService  = game:GetService("UserInputService")
-
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems          = LoadCustomLibrary("qSystems")
-local Table             = LoadCustomLibrary("Table")
-
-local Make              = qSystems.Make
-local Modify            = qSystems.Modify
-
-
-local lib = {}
-
-local WEAK_MODE = {
-	K  = {__mode="k"};
-	V  = {__mode="v"};
-	KV = {__mode="kv"};
-}
-
-
 -- qGUI.lua
 -- @author Quenty
+-- @editor Narrev
 -- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
 --[[
@@ -41,7 +18,41 @@ February 15th, 2014
 
 --]]
 
+-- Services
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService  = game:GetService("UserInputService")
+local RunService        = game:GetService("RunService")
+local Players           = game:GetService("Players")
 
+-- Load Nevermore
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+
+-- Load Libraries
+local qSystems          = LoadCustomLibrary("qSystems")
+
+-- Localize functions
+local Make              = qSystems.Make
+local Modify            = qSystems.Modify
+
+local min               = math.min
+local max               = math.max
+local random            = math.random
+
+local UDim2             = UDim2.new
+local Instance          = Instance.new
+local Vector2           = Vector2.new
+local Color3            = Color3.new
+
+local lib = {}
+
+local WEAK_MODE = {
+	K  = {__mode="k"};
+	V  = {__mode="v"};
+	KV = {__mode="kv"};
+}
+
+
+-- Library functions
 local function GetScreen(object)
 	-- Given a GUI object, returns it's screenGui. 
 
@@ -76,7 +87,7 @@ lib.get_screen = GetScreen
 
 local function NewColor3(red, green, blue)
 	-- Given a red, green, and blue, it'll return a formatted Color3 object. 
-	return Color3.new(red/255, green/255, blue/255)
+	return Color3(red/255, green/255, blue/255)
 end
 lib.NewColor3 = NewColor3
 lib.newColor3 = NewColor3
@@ -87,7 +98,7 @@ lib.makeColor3 = NewColor3
 
 local function GetCenteringPosition(Object)
 	-- Return's the center of
-	return UDim2.new(0.5, -Object.AbsoluteSize.X/2, 0.5, -Object.AbsoluteSize.Y/2)
+	return UDim2(0.5, -Object.AbsoluteSize.X/2, 0.5, -Object.AbsoluteSize.Y/2)
 end
 lib.GetCenteringPosition = GetCenteringPosition
 lib.getCenteringPosition = GetCenteringPosition
@@ -97,7 +108,7 @@ local function GetHalfSize(Object)
 	-- Return's half the size of an object. 
 
 	local ObjectSize = Object.Size
-	return UDim2.new(ObjectSize.X.Scale / 2, ObjectSize.X.Offset /2, ObjectSize.Y.Scale / 2, ObjectSize.Y.Offset / 2)
+	return UDim2(ObjectSize.X.Scale / 2, ObjectSize.X.Offset /2, ObjectSize.Y.Scale / 2, ObjectSize.Y.Offset / 2)
 end
 lib.GetHalfSize = GetHalfSize
 lib.getHalfSize = GetHalfSize
@@ -105,7 +116,6 @@ lib.get_half_size = GetHalfSize
 
 local function Center(Object)
 	-- Centers an object (Sized with offset) into the middle of the screen.
-
 	Object.Position = GetCenteringPosition(Object)
 end
 lib.Center = Center
@@ -137,7 +147,7 @@ local function SubtractColor3(a, b)
 	local R = a.r + b.r
 	local G = a.g + b.g
 	local B = a.b + b.b
-	return Color3.new(R, G, B)
+	return Color3(R, G, B)
 end
 lib.SubtractColor3 = SubtractColor3
 lib.subtractColor3 = SubtractColor3
@@ -149,7 +159,7 @@ local function MultiplyColor3(Num, Color)
 	local R = Color.r * Num
 	local G = Color.g * Num
 	local B = Color.b * Num
-	return Color3.new(R, G, B)
+	return Color3(R, G, B)
 end
 lib.MultiplyColor3 = MultiplyColor3
 lib.multiplyColor3 = MultiplyColor3
@@ -158,7 +168,7 @@ lib.multiply_color3 = MultiplyColor3
 local function InverseColor3(Color)
 	-- Inverses a Color3...
 
-	return Color3.new(1 - Color.r, 1 - Color.g, 1 - Color.b)
+	return Color3(1 - Color.r, 1 - Color.g, 1 - Color.b)
 end
 lib.InverseColor3 = InverseColor3
 lib.inverseColor3 = InverseColor3
@@ -166,7 +176,6 @@ lib.inverse_color3 = InverseColor3--]]
 
 local function IsPhone(ScreenGui)
 	-- Return's if ROBLOX is being played on a phone or not.
-
 	if ScreenGui.AbsoluteSize.Y < 600 and UserInputService.TouchEnabled then 
 		return true
 	end 
@@ -178,7 +187,6 @@ lib.is_phone = IsPhone
 
 local function TouchOnly()
 	-- Return's if it's TouchOnly
-
 	return not UserInputService.MouseEnabled 
 end
 lib.TouchOnly = TouchOnly
@@ -188,7 +196,7 @@ lib.touch_only = TouchOnly
 local function UDim2OffsetFromVector2(Vector2ConvertFrom)
 	-- Return's a UDim2 generated from the Vector2ConvertFrom
 
-	return UDim2.new(0, Vector2ConvertFrom.X, 0, Vector2ConvertFrom.Y)
+	return UDim2(0, Vector2ConvertFrom.X, 0, Vector2ConvertFrom.Y)
 end
 lib.UDim2OffsetFromVector2 = UDim2OffsetFromVector2
 lib.uDim2OffsetFromVector2 = UDim2OffsetFromVector2
@@ -219,7 +227,7 @@ do
 	local PointToObjectSpace = CFrame.new().pointToObjectSpace
 	local atan2              = math.atan2
 	local tan                = math.tan
-	local Vector2New         = Vector2.new
+	local Vector2New         = Vector2
 	local abs                = math.abs
 	local max                = math.max
 	local min                = math.min
@@ -268,16 +276,18 @@ lib.worldToScreen = WorldToScreen
 lib.world_to_screen = WorldToScreen
 --]]
 local function MultiplyUDim2Offset(Original, Factor)
-	return UDim2.new(Original.X.Scale, Original.X.Offset * Factor, Original.Y.Scale, Original.Y.OFfset * Factor)
+	return UDim2(Original.X.Scale, Original.X.Offset * Factor, Original.Y.Scale, Original.Y.OFfset * Factor)
 end
 lib.MultiplyUDim2Offset = MultiplyUDim2Offset
 lib.multiplyUDim2Offset = MultiplyUDim2Offset
 
 local function PickRandomColor3(List)
-	return List[math.random(1, #List)]
+	return List[random(1, #List)]
 end
 lib.PickRandomColor3 = PickRandomColor3
 lib.pickRandomColor3 = PickRandomColor3
+lib.arrayRandom      = PickRandomColor3
+
 
 local TweenTransparency, StopTransparencyTween do
 	local IsLocal = game:FindService("MeshContentProvider") ~= nil or (game:FindService("NetworkServer") == nil)
@@ -405,8 +415,6 @@ local TweenTransparency, StopTransparencyTween do
 
 		ProcessList[Gui] = nil
 	end
-
-
 	lib.TweenTransparency = TweenTransparency
 	lib.tweenTransparency = TweenTransparency
 
@@ -430,7 +438,7 @@ local TweenColor3, StopColor3Tween do
 	local function LerpColor3(ColorOne, ColorTwo, Alpha)
 		--- From qColor3
 		
-		return Color3.new(LerpNumber(ColorOne.r, ColorTwo.r, Alpha), LerpNumber(ColorOne.g, ColorTwo.g, Alpha), LerpNumber(ColorOne.b, ColorTwo.b, Alpha))
+		return Color3(LerpNumber(ColorOne.r, ColorTwo.r, Alpha), LerpNumber(ColorOne.g, ColorTwo.g, Alpha), LerpNumber(ColorOne.b, ColorTwo.b, Alpha))
 	end
 
 	local function SetProperties(Gui, Percent, StartProperties, NewProperties)
@@ -492,7 +500,7 @@ local TweenColor3, StopColor3Tween do
 		-- @param NewProperties The properties to be changed. It will take the current
 		--                      properties and tween to the new ones. This table should be
 		--                      setup so {Index = NewValue} that is, for example, 
-		--                      {BackgroundColor3 = Color3.new(1, 1, 1)}.
+		--                      {BackgroundColor3 = Color3(1, 1, 1)}.
 		-- @param Duration The amount of time to spend transitioning.
 		-- @param [Override] If true, it will override a previous animation, otherwise, it will not.
 
@@ -558,31 +566,30 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 
 	local ParentFrame
 	if not DoNotConstrainEffect then
-		ParentFrame            = Make("Frame", {
-		ClipsDescendants       = true;
-		Archivable             = false;
-		BorderSizePixel        = 0;
-		BackgroundTransparency = 1;
-		Name                   = "Circle_Effect";
-		Size                   = UDim2.new(1, 0, 1, 0);
-		ZIndex                 = math.min(Gui.ZIndex + 1, 10);
-		Parent                 = Gui;
-	})
+		ParentFrame                        = Instance("Frame")
+		ParentFrame.ClipsDescendants       = true
+		ParentFrame.Archivable             = false
+		ParentFrame.BorderSizePixel        = 0
+		ParentFrame.BackgroundTransparency = 1
+		ParentFrame.Name                   = "Circle_Effect"
+		ParentFrame.Size                   = UDim2(1, 0, 1, 0)
+		ParentFrame.ZIndex                 = min(Gui.ZIndex + 1, 10)
+		ParentFrame.Parent                 = Gui
 	end
 
-	local Circle           = Make("ImageLabel", {
-	Image                  = "http://www.roblox.com/asset/?id=172318712";
-	Name                   = "Circle";
-	ImageTransparency      = 0.75;
-	BackgroundTransparency = 1;
-	BorderSizePixel        = 0;
-	Archivable             = false;
-	Size                   = UDim2.new(0, StartDiameter, 0, StartDiameter);
-	ZIndex                 = math.min(Gui.ZIndex + 1, 10);
-	ImageColor3            = InkColor or Color3.new(1, 1, 1);
-	Position               = UDim2.new(0, X-StartDiameter/2, 0, Y-StartDiameter/2);
-	Parent                 = ParentFrame or Gui;
-	})
+	local Circle                  = Instance("ImageLabel")
+	Circle.Image                  = "http://www.roblox.com/asset/?id=172318712"
+	Circle.Name                   = "Circle"
+	Circle.ImageTransparency      = 0.75
+	Circle.BackgroundTransparency = 1
+	Circle.BorderSizePixel        = 0
+	Circle.Archivable             = false
+	Circle.Size                   = UDim2(0, StartDiameter, 0, StartDiameter)
+	Circle.ZIndex                 = min(Gui.ZIndex + 1, 10)
+	Circle.ImageColor3            = InkColor or Color3(1, 1, 1)
+	Circle.Position               = UDim2(0, X-StartDiameter/2, 0, Y-StartDiameter/2)
+	Circle.Parent                 = ParentFrame or Gui
+
 	--[[if Gui.AbsoluteSize.X > Gui.AbsoluteSize.Y then
 		Gui.SizeConstraint = "RelativeXX"
 	else
@@ -593,11 +600,11 @@ local function ResponsiveCircleClickEffect(Gui, X, Y, Time, DoNotConstrainEffect
 	if OverrideSize then
 		NewDiameter = OverrideSize
 	else
-		NewDiameter = math.max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y) * 2 * 2.82842712475-- multiply times 2 because we want it resize for the whole time, and at 1/2 we expect it to fill the whole place.
+		NewDiameter = max(Gui.AbsoluteSize.X, Gui.AbsoluteSize.Y) * 2 * 2.82842712475-- multiply times 2 because we want it resize for the whole time, and at 1/2 we expect it to fill the whole place.
 	end
 
-	local NewSize     = UDim2.new(0, NewDiameter, 0,  NewDiameter)
-	local NewPosition = UDim2.new(0, X - (NewDiameter / 2), 0, Y - (NewDiameter / 2))
+	local NewSize     = UDim2(0, NewDiameter, 0,  NewDiameter)
+	local NewPosition = UDim2(0, X - (NewDiameter / 2), 0, Y - (NewDiameter / 2))
 	
 	
 	Circle:TweenSizeAndPosition(NewSize, NewPosition, "Out", "Linear", Time, true)
@@ -620,15 +627,15 @@ lib.SimpleInk = ResponsiveCircleClickEffect
 
 local function GenerateMouseDrag()
 	-- Generate's a dragger to catch the mouse...
-	return Make("ImageButton", {
-		Active                 = false;
-		Size                   = UDim2.new(1.5, 0, 1.5, 0);
-		AutoButtonColor        = false;
-		BackgroundTransparency = 1;
-		Name                   = "MouseDrag";
-		Position               = UDim2.new(-0.25, 0, -0.25, 0);
-		ZIndex                 = 10;
-	})
+	local Dragger                  = Instance("ImageButton")
+	Dragger.Active                 = false
+	Dragger.Size                   = UDim2(1.5, 0, 1.5, 0)
+	Dragger.AutoButtonColor        = false
+	Dragger.BackgroundTransparency = 1
+	Dragger.Name                   = "MouseDrag"
+	Dragger.Position               = UDim2(-0.25, 0, -0.25, 0)
+	Dragger.ZIndex                 = 10
+	return Dragger
 end
 lib.GenerateMouseDrag = GenerateMouseDrag
 lib.generateMouseDrag = GenerateMouseDrag
@@ -645,32 +652,32 @@ local function AddTexturedWindowTemplate(Frame, Radius, Type)
 		ZIndex                 = Frame.ZIndex;
 	}; { 
 		Name = "TopLeft";
-		Position = UDim2.new(0, 0, 0, 0);
-		Size = UDim2.new(0, Radius, 0, Radius);
+		Position = UDim2(0, 0, 0, 0);
+		Size = UDim2(0, Radius, 0, Radius);
 	}; {
 		Name = "BottomLeft";
-		Position = UDim2.new(0, 0, 1, -Radius);
-		Size = UDim2.new(0, Radius, 0, Radius);
+		Position = UDim2(0, 0, 1, -Radius);
+		Size = UDim2(0, Radius, 0, Radius);
 	}; {
 		Name = "TopRight";
-		Position = UDim2.new(1, -Radius, 0, 0);
-		Size = UDim2.new(0, Radius, 0, Radius);
+		Position = UDim2(1, -Radius, 0, 0);
+		Size = UDim2(0, Radius, 0, Radius);
 	}; {
 		Name = "BottomRight";
-		Position = UDim2.new(1, -Radius, 1, -Radius);
-		Size = UDim2.new(0, Radius, 0, Radius);
+		Position = UDim2(1, -Radius, 1, -Radius);
+		Size = UDim2(0, Radius, 0, Radius);
 	}; {
 		Name = "Middle";
-		Position = UDim2.new(0, Radius, 0, 0);
-		Size = UDim2.new(1, -Radius*2, 1, 0);
+		Position = UDim2(0, Radius, 0, 0);
+		Size = UDim2(1, -Radius*2, 1, 0);
 	}; {
 		Name = "MiddleLeft";
-		Position = UDim2.new(0, 0, 0, Radius);
-		Size = UDim2.new(0, Radius, 1, -Radius*2);
+		Position = UDim2(0, 0, 0, Radius);
+		Size = UDim2(0, Radius, 1, -Radius*2);
 	}; {
 		Name = "MiddleRight";
-		Position = UDim2.new(1, -Radius, 0, Radius);
-		Size = UDim2.new(0, Radius, 1, -Radius*2);
+		Position = UDim2(1, -Radius, 0, Radius);
+		Size = UDim2(0, Radius, 1, -Radius*2);
 	})
 end
 lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
@@ -684,54 +691,47 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	-- @param Image The URL of the image in question
 	-- @param ImageSize The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
 
-	Properties = Properties or {}
-	Type = Type or "ImageLabel";
+	local Properties = Properties or {}
+	local Type = Type or "ImageLabel";
 	local TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight = AddTexturedWindowTemplate(Frame, Radius, Type)
 
-	Middle.Size = UDim2.new(1, -Radius*2, 1, -Radius*2); -- Fix middle...
-	Middle.Position = UDim2.new(0, Radius, 0, Radius);
+	Middle.Size = UDim2(1, -Radius*2, 1, -Radius*2); -- Fix middle...
+	Middle.Position = UDim2(0, Radius, 0, Radius);
 
-	local MiddleTop = Make(Type, {
+
+	local MiddleBottom, MiddleTop = Make(Type, {
 		Archivable             = false;
 		BackgroundColor3       = Frame.BackgroundColor3;
 		BorderSizePixel        = 0;
-		Name                   = "MiddleTop";
 		Parent                 = Frame;
-		Position               = UDim2.new(0, Radius, 0, 0);
-		Size                   = UDim2.new(1, -Radius*2, 0, Radius);
 		BackgroundTransparency = 1;
 		ZIndex                 = Frame.ZIndex;
-	});
-
-	local MiddleBottom = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
+		Size                   = UDim2(1, -Radius*2, 0, Radius);
+	}; { 
 		Name                   = "MiddleBottom";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, Radius, 1, -Radius);
-		Size                   = UDim2.new(1, -Radius*2, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+		Position               = UDim2(0, Radius, 1, -Radius);
+	}; {
+		Name                   = "MiddleTop";
+		Position               = UDim2(0, Radius, 0, 0);
+	})
 
 	for _, Item in pairs({TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom}) do
 		Modify(Item, Properties)
 		Item.Image = Image;
-		Item.ImageRectSize = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
+		Item.ImageRectSize = Vector2(ImageSize.X/3, ImageSize.Y/3)
 	end
 
-	TopRight.ImageRectOffset     = Vector2.new(ImageSize.X * (2/3), 0)
-	MiddleRight.ImageRectOffset  = Vector2.new(ImageSize.X * (2/3), ImageSize.Y/3)
-	BottomRight.ImageRectOffset  = Vector2.new(ImageSize.X * (2/3), ImageSize.Y * (2/3))
+	TopRight.ImageRectOffset     = Vector2(ImageSize.X * (2/3), 0)
+	MiddleRight.ImageRectOffset  = Vector2(ImageSize.X * (2/3), ImageSize.Y/3)
+	BottomRight.ImageRectOffset  = Vector2(ImageSize.X * (2/3), ImageSize.Y * (2/3))
 	
-	--TopLeft.ImageRectOffset    = Vector2.new(0, 0);
-	MiddleLeft.ImageRectOffset   = Vector2.new(0, ImageSize.Y/3)
-	BottomLeft.ImageRectOffset   = Vector2.new(0, ImageSize.Y * (2/3))
+	--TopLeft.ImageRectOffset    = Vector2(0, 0);
+	MiddleLeft.ImageRectOffset   = Vector2(0, ImageSize.Y/3)
+	BottomLeft.ImageRectOffset   = Vector2(0, ImageSize.Y * (2/3))
 	
-	Middle.ImageRectOffset       = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
-	MiddleTop.ImageRectOffset    = Vector2.new(ImageSize.Y/3, 0)
-	MiddleBottom.ImageRectOffset = Vector2.new(ImageSize.Y/3, ImageSize.Y * (2/3))
+	Middle.ImageRectOffset       = Vector2(ImageSize.X/3, ImageSize.Y/3)
+	MiddleTop.ImageRectOffset    = Vector2(ImageSize.Y/3, 0)
+	MiddleBottom.ImageRectOffset = Vector2(ImageSize.Y/3, ImageSize.Y * (2/3))
 
 	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom
 end
@@ -739,10 +739,8 @@ lib.AddNinePatch = AddNinePatch
 lib.addNinePatch = AddNinePatch
 
 local function BackWithRoundedRectangle(Frame, Radius, Color)
-	Color = Color or Color3.new(1, 1, 1);
-
-	return AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {
-		ImageColor3 = Color;
+	return AddNinePatch(Frame, "rbxassetid://176688412", Vector2(150, 150), Radius, "ImageLabel", {
+		ImageColor3 = Color or Color3(1, 1, 1);
 	})
 end
 lib.BackWithRoundedRectangle = BackWithRoundedRectangle
