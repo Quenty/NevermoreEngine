@@ -1,6 +1,5 @@
 -- qGUI.lua
 -- @author Quenty
--- @editor Narrev
 -- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
 --[[
