@@ -22,7 +22,7 @@ local function date(formatString, unix)
 	-- @returns a string or a table containing date and time, formatted according to the given string format. If called without arguments, returns the equivalent of date("%c").
 
 	-- Localize functions
-	local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
+	local floor, sub, find, gsub, format, time = math.floor, string.sub, string.find, string.gsub, string.format, os.time
 
 	-- Find whether formatString was used
 	if formatString then
@@ -35,7 +35,7 @@ local function date(formatString, unix)
 			local UTC
 			formatString, UTC = gsub(formatString, "^!", "") -- If formatString begins in '!', use os.time()
 			assert(UTC == 0 or not unix, "Cannot determine time to format for os.date. Use either an \"!\" at the beginning of the string or pass a time parameter")
-			unix = UTC == 1 and os.time() or unix
+			unix = UTC == 1 and time() or unix
 		end
 	else -- If they did not pass a formatting string
 		formatString = "%c"
