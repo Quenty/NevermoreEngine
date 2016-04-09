@@ -12,6 +12,10 @@ local Players = game:GetService("Players")
 
 --[[
 Updates and Changes log
+April 9th, 2016
+- Expanded Make function to support creating multiple instances at once
+- Added Debounce function
+
 November 21st, 2015
 - Removed Signal library, and Nevermore dependency
 
@@ -117,6 +121,7 @@ local function Modify(Instance, Values)
 	end
 	return Instance
 end
+lib.Modify = Modify
 
 local function Make(ClassType, Properties, ...)
 	--- Using a syntax hack to create a nice way to Make new items.  
@@ -127,17 +132,15 @@ local function Make(ClassType, Properties, ...)
 	-- 	This would be used for creating a custom "default" list of properties so you don't need to rewrite the same properties over and over.
 	local objects = {...}
 	local numObjects = #objects
-	if numObjects > 0 then
+	if numObjects == 0 then
+		return Modify(Instance.new(ClassType), Properties)
+	else
 		for a = 1, numObjects do
 			objects[a] = Modify(Modify(Instance.new(ClassType), Properties), objects[a])
 		end
 		return unpack(objects)
-	else
-		return Modify(Instance.new(ClassType), Properties)
 	end
 end
-
-lib.Modify = Modify
 lib.Make = Make
 
 local function WaitForChild(Parent, Name, TimeLimit)
