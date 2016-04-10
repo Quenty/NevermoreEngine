@@ -1,3 +1,5 @@
+-- ParticleEngine.lua
+
 local WindSpeed    = 10
 
 local sin          = math.sin
@@ -16,18 +18,19 @@ local ud2          = UDim2.new
 local tick         = tick
 local ray          = Ray.new
 local RayCast      = workspace.FindPartOnRay
-local Dot = v3().Dot
-local lib = {}
+local Dot          = v3().Dot
+local lib          = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local RemoteManager     = LoadCustomLibrary("RemoteManager")
 
 local function MakeParticleEngineServer()
 	--- Required for networking....
 
 	local Engine = {}
 
-	local RemoteEvent = NevermoreEngine.GetRemoteEvent("ParticleEventDistributor")
+	local RemoteEvent = RemoteManager:GetEvent("ParticleEventDistributor")
 
 	local function ParticleNew(p) -- PropertiesTable
 		p.Position      = p.Position or error("No Position Yo")
@@ -74,7 +77,6 @@ local function RealMakeEngine(Screen)
 	To generate a new particle
 	ParticleNew{
 		Position          = Vector3
-
 		--Nonrequired 
 		Global            = Bool
 		Velocity          = Vector3
@@ -89,16 +91,14 @@ local function RealMakeEngine(Screen)
 		RemoveOnCollision = function(BasePart Hit, Vector3 Position))
 		Function          = function(Table ParticleProperties, Number dt, Number t)
 	}
-
 	To remove a particle
 	ParticleRemove(Table ParticleProperties)
-
 	]]
 
 	local Time = tick()
 
 	local Player         = game.Players.LocalPlayer
-	local RemoteEvent    = NevermoreEngine.GetRemoteEvent("ParticleEventDistributor")
+	local RemoteEvent    = RemoteManagerGetEvent("ParticleEventDistributor")
 
 	-- Screen = Screen or Instance.new("ScreenGui", Player.PlayerGui)
 
