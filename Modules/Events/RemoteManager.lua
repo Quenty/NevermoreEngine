@@ -1,4 +1,4 @@
--- @Author Vorlias
+-- @author Vorlias
 -- Edited by Narrev
 
 --[[
