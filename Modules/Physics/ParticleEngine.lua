@@ -42,19 +42,19 @@ local function MakeParticleEngineServer()
 		p.Color         = p.Color or Color3.new(1,1,1)
 		p.Transparency  = p.Transparency or 0.5
 
-		RemoteEvent:FireAllClients(p)
+		RemoteEvent:SendToAllPlayers(p)
 
 		return p
 	end
 	Engine.ParticleNew = ParticleNew
 
-	RemoteEvent.OnServerEvent:connect(function(Player, p)
+	RemoteEvent:Listen(function(Player, p)
 		-- print("Server -- New particle")
 		p.Global = nil
 
 		for _, PlayerX in pairs(game.Players:GetPlayers()) do
 			if PlayerX ~= Player then
-				RemoteEvent:FireClient(PlayerX, p)
+				RemoteEvent:SendToPlayer(PlayerX, p)
 			end
 		end
 	end)
@@ -98,7 +98,7 @@ local function RealMakeEngine(Screen)
 	local Time = tick()
 
 	local Player         = game.Players.LocalPlayer
-	local RemoteEvent    = RemoteManagerGetEvent("ParticleEventDistributor")
+	local RemoteEvent    = RemoteManager:GetEvent("ParticleEventDistributor")
 
 	-- Screen = Screen or Instance.new("ScreenGui", Player.PlayerGui)
 
@@ -377,7 +377,7 @@ local function RealMakeEngine(Screen)
 			local Function, RemoveOnCollision = p.Function, p.RemoveOnCollision
 			p.Function, p.RemoveOnCollision = nil, (p.RemoveOnCollision and true or nil)
 
-			RemoteEvent:FireServer(p)
+			RemoteEvent:SendToServer(p)
 
 			p.Function, p.RemoveOnCollision = Function, RemoveOnCollision
 		end
@@ -385,7 +385,7 @@ local function RealMakeEngine(Screen)
 		p.LifeTime      = p.LifeTime and p.LifeTime+tick()
 		NewParticles[#NewParticles+1] = p
 	end
-	RemoteEvent.OnClientEvent:connect(ParticleNew)
+	RemoteEvent:Listen(ParticleNew)
 	Engine.ParticleNew = ParticleNew
 
 	local RenderStepped = game:GetService("RunService").RenderStepped
