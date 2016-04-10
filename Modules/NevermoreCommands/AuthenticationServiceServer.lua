@@ -1,24 +1,22 @@
+-- AuthenticationServiceServer.lua
+-- @author Quenty
+-- This script handles authenticating players who, well, I want authenticated, and defining permissions
+
 local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 local qString           = LoadCustomLibrary("qString")
-local QACSettings       = LoadCustomLibrary("QACSettings")
 local qPlayer           = LoadCustomLibrary("qPlayer")
-
-
--- This script handles authenticating players who, well, I want authenticated, and defining permissions
--- AuthenticationServiceServer.lua
--- @author Quenty
--- Last Modified February 6th, 2014
+local QACSettings       = LoadCustomLibrary("QACSettings")
+local RemoteManger      = LoadCustomLibrary("RemoteManger")
 
 local AuthenticationService = {} do
 	local Authorized = QACSettings.Authorized 
 
-	local RequestStream = NevermoreEngine.GetRemoteFunction("AuthenticationServiceRequestor")
-	local EventStream   = NevermoreEngine.GetRemoteEvent("AuthenticationServiceEventStream")
+	local RequestStream = RemoteManger:GetFunction("AuthenticationServiceRequestor")
+	local EventStream   = RemoteManger:GetEvent("AuthenticationServiceEventStream")
 
 	local function IsAuthorized(PlayerName)
 		PlayerName = tostring(PlayerName) -- Incase they send in a player
@@ -42,7 +40,7 @@ local AuthenticationService = {} do
 
 			local Player = qPlayer.GetPlayerFromName(PlayerName)
 			if Player then
-				EventStream:FireClient(Player, "Authorized")
+				EventStream:SendToPlayer(Player, "Authorized")
 			end
 		end
 	end
@@ -59,7 +57,7 @@ local AuthenticationService = {} do
 				local Player = qPlayer.GetPlayerFromName(PlayerName)
 
 				if Player then
-					EventStream:FireClient(Player, "Deauthorized")
+					EventStream:SendToPlayer(Player, "Deauthorized")
 				else
 					print("[AuthenticationService] [Deauthorize] - Could not find deauthorized player '" .. PlayerName .. "', did not send deauthorization event.")
 				end
@@ -71,7 +69,7 @@ local AuthenticationService = {} do
 	AuthenticationService.Deauthorize = Deauthorize
 	AuthenticationService.deauthorize = Deauthorize
 
-	RequestStream.OnServerInvoke = (function(Player, Request, Data)
+	RequestStream:Callback(function(Player, Request, Data)
 		Player = Player or Players.LocalPlayer
 
 		if Request == "IsAuthorized" then
