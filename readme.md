@@ -57,12 +57,12 @@ local a=game:GetService("HttpService")local b=game:GetService("ReplicatedStorage
 * The main NevermoreModule in `ReplicatedStorage`
 * All the modules in `ServerScriptService`
 
-Please note that installing Nevermore will **not** change any behavior in your game. Nevermore does not affect preexisting code. If you want to see the power of Nevermore try using some [Admin Commmands](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/NevermoreCommands)
+Please note that installing Nevermore will **not** change any behavior in your game. Nevermore does not affect preexisting code. If you want to see the power of Nevermore try using some [Admin Commmands](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/NevermoreCommands).
 
 
 # Updating Nevermore
 
-To update Nevermore, back up your place file and run the install code above. It will preserve all of your existing code. Note that code changes to Nevermore's default libraries will be overridden).
+To update Nevermore, **back up your place file** and run the install code above. Existing code will be preserved, however, Nevermore's default libraries will be overridden.
 
 ----
 
