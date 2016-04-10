@@ -8,7 +8,7 @@ Nevermore is a collection of useful libraries for ROBLOX development.
 * **Lots of libraries** - Lots of libraries that handle all sorts of logical issues that may occur during ROBLOX game development
 * **Tested** - Used in several games that have made it to the front page, NevermoreEngine works without lots of testing
 * **Simple** - Nevermore is essential a big group of libraries with lots of utility functions. It's designed with simplicity in mind.
-	* The main module is only 200 lines long
+	* The main module has only 105 lines of code
 	* Fast install, just one line in the command line
 * **Open source** - Nevermore is open source
 * **Built for ROBLOX** - Nevermore is built for ROBLOX
@@ -18,28 +18,33 @@ Nevermore is a collection of useful libraries for ROBLOX development.
 You don't have to use a library unless you load it. Nevermore should not impact performance (it can sit in a game without taking up processing power, as it's just a ton of libraries). Here are a few of the libraries Nevermore offers
 
 
-* Additive Camera effects 
-* Admin commands
-* Pseudo chat
-* Welding, CFrame manipulation code, quaternion slerp
-* Bezier Curves
-* Player manipulation utilities (check teammates, et cetera)
-* Type checkers
+* 3D rendering
+* [Additive Camera effects](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Camera)
+* [Admin commands](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/NevermoreCommands)
+* [Bezier Curves](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qSystems/Bezier.lua)
+* [Compass code](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qGUI/Compass)
+* [Custom Signals](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Events#signal)
 * GUI transparency and Color3 animation code
+* HeldInputs
+* Kinetic scrolling frame (mobile inertia scrollling)
 * Material design UI code
     * Ripple
     * Snackbar
-* Kinetic scrolling frame (mobile inertia scrollling)
-* Compass code
-* TimeSync between server and client
-* Custom Signals
-* Promises
-* HeldInputs
+* [Player manipulation utilities](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qSystems/qPlayer.lua) (check teammates et cetera)
 * Projectile physics
-* 3D rendering
-* Rotating text labels
-* Screen cover effects
+* [Promises](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Events#deferred)
+* [Pseudo chat](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/OutputStream/PseudoChat)
+* [RemoteEvent and RemoteFunction manager](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Events#remotemanager)
+* [Rotating text labels](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qGUI/RotatingTextLabel.lua)
+* [Screen cover effects](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qGUI/ScreenCover.lua)
+* Time formatting ([os.date](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Utility#os))
+* TimeSync between server and client
 * Title generation
+* Type checkers
+* Useful Data Structures
+* Welding
+* CFrame manipulation code
+* Quaternion slerp
 
 
 # Get Nevermore
