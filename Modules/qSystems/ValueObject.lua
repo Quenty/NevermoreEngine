@@ -1,14 +1,14 @@
+-- ValueObject.lua
+-- Intent: To work like value objects in ROBLOX and track a single item,
+--         with .Changed events
+-- @author Quenty
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 local Signal = LoadCustomLibrary("Signal")
-
--- @author Quenty
--- Intent: To work like value objects in ROBLOX and track a single item,
---         with .Changed events
 
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
