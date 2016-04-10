@@ -9,7 +9,7 @@ Nevermore Engine is a module-loader designed to simplify the loading of librarie
 * **Tested** - Nevermore functions properly without testing
 * **Simple** - Nevermore is designed with simplicity in mind:
 	* The loader itself only includes 105 lines of code
-	* Fast and easy install; just paste installer code into Command Bar
+	* Fast and easy install; just paste [installer code](https://github.com/Quenty/NevermoreEngine/blob/master/Install.lua) into Command Bar
 * **Open source** - Nevermore is open source. Includes modules contributed by experienced scripters!
 * **Built for Roblox** - Made specifically for use on Roblox
 * **Works well with existing frameworks** - Nevermore doesn't interfere with existing code
