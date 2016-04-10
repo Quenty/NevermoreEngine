@@ -1,3 +1,6 @@
+-- NevermoreCommands.lua
+-- @author Quenty
+
 local Players                     = game:GetService("Players")
 local StarterPack                 = game:GetService("StarterPack")
 local StarterGui                  = game:GetService("StarterGui")
@@ -13,11 +16,11 @@ local MarketplaceService          = game:GetService("MarketplaceService")
 local TeleportService             = game:GetService("TeleportService")
 local PointsService               = game:GetService("PointsService")
 
-local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary           = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 assert(script.Name                == "NevermoreCommandsServer", "Assertion failed! Script name = " .. tostring(script:GetFullName()))
 
+local RemoteManager               = LoadCustomLibrary("RemoteManager")
 local AuthenticationServiceServer = LoadCustomLibrary("AuthenticationServiceServer")
 local Character                   = LoadCustomLibrary("Character")
 local CommandSystems              = LoadCustomLibrary("CommandSystems")
@@ -48,50 +51,15 @@ local GlobalGUID                  = HttpService:GenerateGUID() -- Generate a glo
 
 local NevermoreCommands = {} -- Toss API hooks in here.
 
---[[
--- NevermoreCommands.lua
--- @author Quenty
-
---Change log--
-February 6th, 2014
-- Added authentication service usage
-- Verified teleportation to places works
-- Modified AdminOutput to not use filter log.
-- Modified Output to not use player list
-
-January 26th, 2014
-- Updated to QACSettings.lua
-- Modified to use OutputStream
-
-January 20th, 2014
-- Organized commands
-- Added BSOD command
-- Removed spectate command (Commented out) until new system can be setup
-- Fixed sandboxing bug
-- Fixed chat mute command
-- Added loop kill 
-- Fixed Sandboxing error / Execution problem
-
-January 19th, 2014
-- Updated to use module scripts.
-- Added update log
-- Converted to PlayerId system
-- Rewrote most of the script (Some copypasta)
-- Wrapped stuff in "do" for environment preservation
-- Updated to use Settings.QAC and camal case
-- Fixed Teleporting to places.
-
---]]
-
 ----------------
 -- NETWORKING --
 ----------------
 
 local CommandNetworkManager = {} do
-	local NevermoreRemoteEvent = NevermoreEngine.GetRemoteEvent("NevermoreCommands")
+	local NevermoreRemoteEvent = RemoteManager:GetEvent("NevermoreCommands")
 
 	function CommandNetworkManager.RequestClientCommand(Client, CommandName, ...)
-		NevermoreRemoteEvent:FireClient(Client, CommandName, ...)
+		NevermoreRemoteEvent:SendToPlayer(Client, CommandName, ...)
 	end
 end
 
@@ -164,7 +132,7 @@ do
 			if User and CheckPlayer(User) then
 				return {User};
 			else
-				error("Valid user expected, got  '"..Type.getType(User).."' value, which did not pass check")
+				error("Valid user expected, got  '"..Type(User).."' value, which did not pass check")
 			end
 		end, false)
 
@@ -263,7 +231,7 @@ do
 			if User and CheckCharacter(User) then
 				return {User};
 			else
-				error("Valid user expected, got  '"..Type.getType(User).."' value, which did not pass check")
+				error("Valid user expected, got  '"..Type(User).."' value, which did not pass check")
 			end
 		end, false)
 
