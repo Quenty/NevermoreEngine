@@ -1,12 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local ICompassElement   = LoadCustomLibrary("ICompassElement")
-
+-- PointElement.lua
 -- An interest point for an element
 -- @author Quenty
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local ICompassElement   = LoadCustomLibrary("ICompassElement")
 
 local PointElement = setmetatable({}, ICompassElement)
 PointElement.__index = PointElement
