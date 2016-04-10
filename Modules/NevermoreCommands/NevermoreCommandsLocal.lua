@@ -1,28 +1,25 @@
-local Players               = game:GetService("Players")
-local ReplicatedStorage     = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine       = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary     = NevermoreEngine.LoadLibrary
-
-local qSystems              = LoadCustomLibrary("qSystems")
-local MakeMaid              = LoadCustomLibrary("Maid").MakeMaid
-
-local CheckCharacter = qSystems.CheckCharacter
-local Make = qSystems.Make
-
-
--- NevermoreCommandsLocal
+-- NevermoreCommandsLocal.lua
 -- @author Quenty
 -- Module should load client side in order to enable certain commands in Nevermore. May add support later
 -- to handle a GUI interface. 
 
--- Created August 14th, 2014
--- Last updated August 14th, 2014
+local Players               = game:GetService("Players")
+local ReplicatedStorage     = game:GetService("ReplicatedStorage")
+
+local LoadCustomLibrary     = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+
+local RemoteManager         = LoadCustomLibrary("RemoteManager")
+local qSystems              = LoadCustomLibrary("qSystems")
+local MakeMaid              = LoadCustomLibrary("Maid")
+
+local NevermoreRemoteEvent  = RemoteManager:GetEvent("NevermoreCommands")
+
+local CheckCharacter        = qSystems.CheckCharacter
+local Make                  = qSystems.Make
 
 assert(script.Name == "NevermoreCommandsLocal")
 
 local NevermoreCommandsLocal = {}
-local NevermoreRemoteEvent = NevermoreEngine.GetRemoteEvent("NevermoreCommands")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -60,7 +57,7 @@ local ClientRequests = {} do-- Requests from the server.
 	end
 
 	local function ConnectEvents()
-		Maid.NevermoreRemoteEventOnClientEvent = NevermoreRemoteEvent.OnClientEvent:connect(HandleRequest)
+		Maid.NevermoreRemoteEventOnClientEvent = NevermoreRemoteEvent:Listen(HandleRequest)
 	end
 	ClientRequests.ConnectEvents = ConnectEvents
 	ClientRequests.connectEvents = ConnectEvents
