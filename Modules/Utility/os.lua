@@ -1,3 +1,5 @@
+-- os.lua
+-- Adds date([format [, time]]) and clock() back to os table!
 -- @author Narrev
 
 local function date(formatString, unix)
@@ -16,7 +18,7 @@ local function date(formatString, unix)
 	--
 	-- @param number unix
 	--		If present, unix is the time to be formatted. Otherwise, date formats the current time.
-	--		The amount of seconds since 1970 (negative numbers are occasionally supported)
+	--		The amount of seconds since 1970 (negative numbers are fully supported)
 	--		@default tick()
 
 	-- @returns a string or a table containing date and time, formatted according to the given string format. If called without arguments, returns the equivalent of date("%c").
