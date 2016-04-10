@@ -18,8 +18,6 @@ local Class             = qSystems.Class
 -- @author Quenty
 -- Last modified November 17th, 2014
 
-local lib = {}
-
 local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui, Parent)
 	--- Creates a new pseudo chat bar for chatting
 
@@ -235,6 +233,5 @@ local MakePseudoChatBar = Class(function(PseudoChatBar, ScreenGui, Parent)
 
 	ChatBarBacking.Parent = Parent
 end)
-lib.MakePseudoChatBar = MakePseudoChatBar
 
-return lib
+return setmetatable({MakePseudoChatBar = MakePseudoChatBar}, {__call = function(_, ...) MakePseudoChatBar(...) end})
