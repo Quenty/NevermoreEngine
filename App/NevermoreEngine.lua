@@ -1,5 +1,6 @@
 -- Simplifies resource loading and networking for a more unified server-client codebase
 -- @author Quenty
+-- @editor Narrev
 
 -- Services
 local RunService = game:GetService("RunService")
