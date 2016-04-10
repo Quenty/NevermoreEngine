@@ -1,15 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- PointCamera.lua
+-- Intent: Point a current element
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 local CameraState       = LoadCustomLibrary("CameraState")
 local SummedCamera      = LoadCustomLibrary("SummedCamera")
 
 local PointCamera = {}
 PointCamera.ClassName = "PointCamera"
-
--- Intent: Point a current element
 
 function PointCamera.new(OriginCamera, FocusCamera)
 	-- @param OriginCamera A camera to use
