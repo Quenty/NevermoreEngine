@@ -1,9 +1,9 @@
+-- MasterClock sends time to client.
+-- @author Quenty
 
 local MasterClock = {}
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
-
--- MasterClock sends time to client.
 
 function MasterClock.new(SyncEvent, DelayedRequestFunction)
 	local self = {}
@@ -13,14 +13,14 @@ function MasterClock.new(SyncEvent, DelayedRequestFunction)
 	self.DelayedRequestFunction = DelayedRequestFunction
 	
 	-- Define function calls and events.
-	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)
+	self.DelayedRequestFunction:Callback(function(Player, TimeThree)
 		-- @return SlaveMasterDifference
 		
 		return self:HandleDelayRequest(TimeThree)
-	end
+	end)
 	
-	self.SyncEvent.OnServerEvent:connect(function(Player)
-		 self.SyncEvent:FireClient(Player, self:GetTime())
+	self.SyncEvent:Listen(function(Player)
+		 self.SyncEvent:SendToPlayer(Player, self:GetTime())
 	end)
 	
 	-- Create thread.... forever! Yeah! That's right!
@@ -44,7 +44,7 @@ function MasterClock:Sync()
 	local TimeOne = self:GetTime()
 	--print("[MasterClock] - Syncing all clients, TimeOne = ", TimeOne)
 	
-    self.SyncEvent:FireAllClients(TimeOne)
+    self.SyncEvent:SendToAllPlayers(TimeOne)
 end
 
 function MasterClock:HandleDelayRequest(TimeThree)
@@ -74,12 +74,12 @@ function SlaveClock.new(SyncEvent, DelayedRequestFunction)
 	self.Offset = -1 -- Uncalculated.
 	
 	-- Connect
-	self.SyncEvent.OnClientEvent:connect(function(TimeOne)
+	self.SyncEvent:Listen(function(TimeOne)
 		self:HandleSyncEvent(TimeOne)
 	end)
 	
 	-- Request sync.
-	self.SyncEvent:FireServer()
+	self.SyncEvent:SendToServer()
 	
 	return self
 end
@@ -106,17 +106,13 @@ function SlaveClock:HandleSyncEvent(TimeOne)
         The result is that we have the following two equations:
         MS_difference = offset + MS delay
         SM_difference = ?offset + SM delay
-
         With two measured quantities:
         MS_difference = 90 minutes
         SM_difference = ?20 minutes
-
         And three unknowns:
         offset , MS delay, and SM delay
-
         Rearrange the equations according to the tutorial.
         -- Assuming this: MS delay = SM delay = one_way_delay
-
         one_way_delay = (MSDelay + SMDelay) / 2
     ]]
 
@@ -130,7 +126,7 @@ function SlaveClock:HandleSyncEvent(TimeOne)
 end
 
 function SlaveClock:SendDelayRequest(TimeThree)
-	return self.DelayedRequestFunction:InvokeServer(TimeThree)
+	return self.DelayedRequestFunction:CallServer(TimeThree)
 end
 
 function SlaveClock:GetTime()
@@ -149,12 +145,13 @@ end
 
 local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
+local RunService        = game:GetService("RunService")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local RemoteManager     = LoadCustomLibrary("RemoteManager")
 
-local SyncEvent = NevermoreEngine.GetRemoteEvent("TimeSyncEvent")
-local DelayedRequestFunction = NevermoreEngine.GetRemoteFunction("DelayedRequestEvent")
+local SyncEvent         = RemoteManager:GetEvent("TimeSyncEvent")
+local DelayedRequestFunction = RemoteManager:GetFunction("DelayedRequestEvent")
 local Manager
 
 if RunService:IsClient() and RunService:IsServer() then
@@ -164,7 +161,7 @@ if RunService:IsClient() and RunService:IsServer() then
 	--> Solves edge case issue:
 		--> Remote event invocation queue exhausted for ReplicatedStorage.NevermoreResources.EventStreamContainer.TimeSyncEvent; did you forget to implement OnClientEvent?
 		-- Occurs because there is no OnClientEvent invoked for the sync thing. Will do so now.
-	SyncEvent.OnClientEvent:connect(function() end)
+	SyncEvent:Listen(function() end)
 	
 	print("[TimeSyncManager] - Studio mode enabled. MasterClock constructed.")
 elseif RunService:IsClient() then
