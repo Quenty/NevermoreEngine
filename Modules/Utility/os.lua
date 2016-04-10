@@ -11,7 +11,7 @@ local function date(formatString, unix)
 	--		If formatString starts with "!", date is formatted in UTC.
 	--		If formatString is "*t", date returns a table
 	--		Placing "_" in the middle of a tag (e.g. "%_d" "%_I") removes padding
-	--		String Reference: https://github.com/Narrev/NevermoreEngine/blob/patch-5/Modules/Utility/readme.md
+	--		String Reference: https://github.com/Quenty/NevermoreEngine/blob/master/Modules/Utility/readme.md#os
 	--		@default "%c"
 	--
 	-- @param number unix
