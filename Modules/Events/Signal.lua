@@ -64,4 +64,4 @@ function Signal.new()
 	return sig
 end
 
-return Signal
+return setmetatable(Signal, {__call = Signal.new})
