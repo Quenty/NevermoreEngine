@@ -117,8 +117,8 @@ Simpler code utilizing Nevermore's libraries:
 
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+
 local qSystems = LoadCustomLibrary("qSystems")
 
 local function HandleTouch(Part)
