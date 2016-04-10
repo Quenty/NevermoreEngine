@@ -1,12 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local ICompassElement   = LoadCustomLibrary("ICompassElement")
-
+-- CardinalElement.lua
 -- A cardinal direction for a compass
 -- @author Quenty
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local ICompassElement   = LoadCustomLibrary("ICompassElement")
 
 local CardinalElement = setmetatable({}, ICompassElement)
 CardinalElement.__index = CardinalElement
