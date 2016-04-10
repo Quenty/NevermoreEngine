@@ -1,10 +1,13 @@
+-- PseudoChatManagerServer.lua
+-- Manages chat connections, sends and making chats, filtering, et cetera. Serverside use only. 
+-- @author Quenty
+
 local ReplicatedStorage           = game:GetService("ReplicatedStorage")
 local Players                     = game:GetService("Players")
 local LogService                  = game:GetService("LogService")
 local ScriptContext               = game:GetService("ScriptContext")
 
-local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary           = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 local PseudoChatSettings          = LoadCustomLibrary("PseudoChatSettings")
 local PseudoChatParser            = LoadCustomLibrary("PseudoChatParser")
@@ -12,45 +15,15 @@ local OutputClassStreamLoggers    = LoadCustomLibrary("OutputClassStreamLoggers"
 local OutputStream                = LoadCustomLibrary("OutputStream")
 local qString                     = LoadCustomLibrary("qString")
 local AuthenticationServiceServer = LoadCustomLibrary("AuthenticationServiceServer")
-local qPlayer                     = LoadCustomLibrary("qPlayer")
+local RemoteManager               = LoadCustomLibrary("RemoteManager")
 
--- local ShipKillFeedParser       = LoadCustomLibrary("ShipKillFeedParser")
+local TrimString = qString.TrimString
+local CompareCutFirst = qString.CompareCutFirst
 
-
--- PseudoChatManagerServer.lua
--- Manages chat connections, sends and making chats, filtering, et cetera.
--- Intendend for Serverside use only. 
--- @author Quenty
--- Last modified Janurary 19th, 2014
-
---[[-- Change Log --
-September 9th, 2014
-- Added team chat
-
-Febraury 6th, 2015
-- Updated to use AuthenticationServiceServer
-- Modified AdminOutput to not use filter
-- Modified to accept error output from client
-
-February 3rd, 2014
-- Fixed issue with /e emoticons and filtering.
-
-January 26th, 2014
-- Switched to OutputStream system. 
-
-January 19th, 2014
-- Added callback system to PseudoChatManager
-- Added QuentyAdminCommandsOutput parser to system
-- Added ScriptbuilderParser to the system
-- Added Changelog
-
--- January 5th, 2014 --
-- Wrote initial script
-
---]]
+local GetPlayerFromName = LoadCustomLibrary("qPlayer").GetPlayerFromName
 
 local PseudoChatManager = {} do
-	local ClientChatted = NevermoreEngine.GetRemoteEvent("ClientChatted")
+	local ClientChatted = RemoteManager:GetEvent("ClientChatted")
 
 	local ChatChannel = OutputStream.MakeOutputStreamServer(
 			OutputClassStreamLoggers.MakeGlobalOutputStreamLog(PseudoChatSettings.BufferSize),
@@ -227,7 +200,7 @@ local PseudoChatManager = {} do
 		-- @param [ChatColor] The color of the chat. Optional. 
 
 		Message = tostring(Message)
-		Message = qString.TrimString(Message, "%s")
+		Message = TrimString(Message, "%s")
 
 		if #Message > 0 then
 			ChatChannel.Send("ChatOutputClass", {
@@ -252,7 +225,7 @@ local PseudoChatManager = {} do
 		-- @param [ChatColor] The color of the chat. Optional. 
 
 		Message = tostring(Message)
-		Message = qString.TrimString(Message, "%s")
+		Message = TrimString(Message, "%s")
 
 		if #Message > 0 then
 			TeamChannel.Send("ChatOutputClass", {
@@ -310,7 +283,7 @@ local PseudoChatManager = {} do
 	PseudoChatManager.Chat = HandleChat
 	PseudoChatManager.chat = HandleChat
 
-	ClientChatted.OnServerEvent:connect(function(Client, Message)
+	ClientChatted:Listen(function(Client, Message)
 		if Message then
 			HandleChat(Client.Name, Message)
 		else
@@ -320,7 +293,7 @@ local PseudoChatManager = {} do
 end
 
 PseudoChatManager.AddChatCallback(function(Player, Message, PlayerColor, ChatColor)
-	if qString.CompareCutFirst(Message, "/e") then
+	if CompareCutFirst(Message, "/e") then
 		return true
 	end
 	return false
@@ -341,7 +314,7 @@ local IsMuted do -- Spamming
 
 	PseudoChatManager.AddChatCallback(function(PlayerName, Message, PlayerColor, ChatColor)
 		local CurrentTime = tick()
-		local Player = qPlayer.GetPlayerFromName(PlayerName)
+		local Player = GetPlayerFromName(PlayerName)
 		local IsMuted, MutedMessage = IsMuted(CurrentTime, Player)
 
 		if IsMuted then
@@ -421,14 +394,14 @@ end
 
 do -- Team chat
 	PseudoChatManager.AddChatCallback(function(PlayerName, Message, PlayerColor, ChatColor, DoNotRender)
-		local Player = qPlayer.GetPlayerFromName(PlayerName)
+		local Player = GetPlayerFromName(PlayerName)
 
 		if Player and not DoNotRender then
 			local TeamMessage
 
-			if qString.CompareCutFirst(Message, "%") then
+			if CompareCutFirst(Message, "%") then
 				TeamMessage = Message:sub(2)
-			elseif qString.CompareCutFirst(Message, "(team)")  then
+			elseif CompareCutFirst(Message, "(team)")  then
 				TeamMessage = Message:sub(7)
 			end
 
