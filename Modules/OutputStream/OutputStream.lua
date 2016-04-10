@@ -1,14 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players           = game:GetService("Players")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 local qSystems       = LoadCustomLibrary("qSystems")
 local Table          = LoadCustomLibrary("Table")
 local RbxUtility     = LoadLibrary("RbxUtility")
 local CircularBuffer = LoadCustomLibrary("CircularBuffer")
 local Signal         = LoadCustomLibrary("Signal")
+local RemoteManager  = LoadCustomLibrary("RemoteManager")
 
 local Class = qSystems.Class
 
@@ -127,8 +127,8 @@ local MakeOutputStreamServer = Class(function(OutputStreamServer, Logger, Stream
 
 	OutputStreamServer.Name = StreamName
 
-	local StreamRemoteFunction = NevermoreEngine.GetRemoteFunction("OutputStream/" .. StreamName)
-	local StreamRemoteEvent = NevermoreEngine.GetRemoteEvent("OutputStream/" .. StreamName)
+	local StreamRemoteFunction = RemoteManager:GetFunction("OutputStream/" .. StreamName)
+	local StreamRemoteEvent = RemoteManager:GetEvent("OutputStream/" .. StreamName)
 
 	local OutputClasses = {}
 
@@ -165,11 +165,11 @@ local MakeOutputStreamServer = Class(function(OutputStreamServer, Logger, Stream
 
 					-- print("Filter list [2] @ Send " .. tostring(Data.FilterList) .. ", Data = " .. tostring(Data))
 					if Logger:Sendable(Player, Data) then
-						StreamRemoteEvent:FireClient(Player, "Push", OutputClassName, Data.Parsed)
+						StreamRemoteEvent:SendToPlayer(Player, "Push", OutputClassName, Data.Parsed)
 					end
 				end
 			else
-				StreamRemoteEvent:FireAllClients("Push", OutputClassName, Data.Parsed)
+				StreamRemoteEvent:SendToAllPlayers("Push", OutputClassName, Data.Parsed)
 			end
 
 			Logger:LogData(Data)
@@ -181,14 +181,14 @@ local MakeOutputStreamServer = Class(function(OutputStreamServer, Logger, Stream
 	OutputStreamServer.Send = Send
 	OutputStreamServer.send = Send
 
-	function StreamRemoteFunction.OnServerInvoke(Client, Request)
+	StreamRemoteFunction:Callback(function(Client, Request)
 		-- print("[OutputStreamServer] - Returning log pull from Client " .. tostring(Client))
 		if Request == "Pull" then
 			return Logger:GetLogs(Client)
 		else
 			error("Unable to handle request '" .. Request .. "'")
 		end
-	end
+	end)
 end)
 lib.MakeOutputStreamServer = MakeOutputStreamServer
 lib.makeOutputStreamServer = MakeOutputStreamServer
@@ -199,8 +199,8 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	
 	assert(type(StreamName) == "string", "[OutputStreamClient] - StreamName is a '" .. type(StreamName) .. "' tostring() == " .. tostring(StreamName))
 
-	local StreamRemoteFunction = NevermoreEngine.GetRemoteFunction("OutputStream/" .. StreamName)
-	local StreamRemoteEvent = NevermoreEngine.GetRemoteEvent("OutputStream/" .. StreamName)
+	local StreamRemoteFunction = RemoteManager:GetFunction("OutputStream/" .. StreamName)
+	local StreamRemoteEvent = RemoteManager:GetEvent("OutputStream/" .. StreamName)
 
 	OutputStreamClient.Name = StreamName
 
@@ -234,7 +234,7 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	OutputStreamClient.AddOutputClass = AddOutputClass
 	OutputStreamClient.addOutputClass = AddOutputClass
 
-	StreamRemoteEvent.OnClientEvent:connect(function(Request, OutputClassName, Data)
+	StreamRemoteEvent:Listen(function(Request, OutputClassName, Data)
 		if Request == "Push" then
 			assert(Data.TimeStamp ~= nil, "TimeStamp is nil")
 	
@@ -256,7 +256,7 @@ local MakeOutputStreamClient = Class(function(OutputStreamClient, StreamName)
 	local function GetLogs()
 		--- Takes all the logs from all the classes
 
-		local Logs = StreamRemoteFunction:InvokeServer("Pull")
+		local Logs = StreamRemoteFunction:CallServer("Pull")
 		if Logs then
 			local UnparsedLogs = {}
 			for Index, Item in pairs(Logs) do
