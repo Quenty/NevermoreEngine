@@ -2,27 +2,24 @@
 -- @author Quenty
 -- This script handles authenticating players who, well, I want authenticated, and defining permissions
 
-local Players           = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-
-local qString           = LoadCustomLibrary("qString")
-local qPlayer           = LoadCustomLibrary("qPlayer")
-local QACSettings       = LoadCustomLibrary("QACSettings")
-local RemoteManger      = LoadCustomLibrary("RemoteManger")
-
 local AuthenticationService = {} do
-	local Authorized = QACSettings.Authorized 
+	local Players           = game:GetService("Players")
+	
+	local LoadCustomLibrary = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+	local RemoteManger      = LoadCustomLibrary("RemoteManger")
+	local CompareStrings    = LoadCustomLibrary("qString").CompareStrings
+	local GetPlayerFromName = LoadCustomLibrary("qPlayer").GetPlayerFromName
 
-	local RequestStream = RemoteManger:GetFunction("AuthenticationServiceRequestor")
-	local EventStream   = RemoteManger:GetEvent("AuthenticationServiceEventStream")
+	local Authorized        = LoadCustomLibrary("QACSettings").Authorized
+
+	local RequestStream     = RemoteManger:GetFunction("AuthenticationServiceRequestor")
+	local EventStream       = RemoteManger:GetEvent("AuthenticationServiceEventStream")
 
 	local function IsAuthorized(PlayerName)
 		PlayerName = tostring(PlayerName) -- Incase they send in a player
 
 		for _, AuthenticationString in pairs(Authorized) do
-			if qString.CompareStrings(tostring(AuthenticationString), PlayerName) then
+			if CompareStrings(tostring(AuthenticationString), PlayerName) then
 				return true
 			end
 		end
@@ -38,7 +35,7 @@ local AuthenticationService = {} do
 			-- Authorized[PlayerName] = true
 			Authorized[#Authorized+1] = PlayerName
 
-			local Player = qPlayer.GetPlayerFromName(PlayerName)
+			local Player = GetPlayerFromName(PlayerName)
 			if Player then
 				EventStream:SendToPlayer(Player, "Authorized")
 			end
@@ -51,10 +48,10 @@ local AuthenticationService = {} do
 		PlayerName = tostring(PlayerName) -- Incase they send in a player
 
 		for Index, AuthenticationString in pairs(Authorized) do
-			if qString.CompareStrings(tostring(AuthenticationString), PlayerName) then
+			if CompareStrings(tostring(AuthenticationString), PlayerName) then
 				table.remove(Authorized, Index)
 
-				local Player = qPlayer.GetPlayerFromName(PlayerName)
+				local Player = GetPlayerFromName(PlayerName)
 
 				if Player then
 					EventStream:SendToPlayer(Player, "Deauthorized")
