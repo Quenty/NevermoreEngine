@@ -55,11 +55,10 @@ function AnimationPlayer:PlayTrack(TrackName, FadeTime, Weight, Speed, StopFadeT
 	
 	FadeTime = FadeTime or self.FadeTime
 	local Track = self:GetTrack(TrackName)
-	
-	self.TrackPlayed:fire(TrackName, FadeTime, Weight, Speed, StopFadeTime)
 
 	if not Track.IsPlaying then
-		
+		self.TrackPlayed:fire(TrackName, FadeTime, Weight, Speed, StopFadeTime)
+
 		self:StopAllTracks(StopFadeTime or FadeTime)
 		Track:Play(FadeTime, Weight, Speed)
 	end
