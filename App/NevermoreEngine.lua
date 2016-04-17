@@ -16,6 +16,7 @@ local find = string.find
 local lower = string.lower
 local Instance = Instance.new
 
+-- Assertions
 assert(script:IsA("ModuleScript"),  "Invalid script type. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
 assert(script.Name == "NevermoreEngine", "Invalid script name. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
 assert(script.Parent == ReplicatedStorage,  "Invalid parent. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
@@ -26,7 +27,6 @@ local _LibraryCache = {} do
 	-- Helper functions
 	local function Make(ClassType, Properties)
 		--- Make a new Instance of ClassType with Properties
-		assert(type(Properties) == "table", "Properties is not a table")
 		local Instance = Instance(ClassType) 
 		for Index, Value in next, Properties do
 			Instance[Index] = Value
@@ -34,40 +34,18 @@ local _LibraryCache = {} do
 		return Instance
 	end
 
-	local function WaitForChild(Parent, Name, TimeLimit)
-		-- Waits for a child to appear. Not efficient, but it shoudln't have to be. It helps with debugging. 
-		-- Useful when ROBLOX lags out, and doesn't replicate quickly.
-		-- @param TimeLimit If TimeLimit is given, then it will return after the timelimit, even if it hasn't found the child.
-
-		assert(Parent ~= nil, "Parent is nil")
-		assert(type(Name) == "string", "Name is not a string.")
-
-		local Child     = Parent:FindFirstChild(Name)
-		local StartTime = tick()
-		local Warned    = false
-
-		while not Child do
-			wait(0)
-			Child = Parent:FindFirstChild(Name)
-			if not Warned and StartTime + (TimeLimit or 5) <= tick() then
-				Warned = true
-					warn("Warning: Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")")
-				if TimeLimit then
-					return Parent:FindFirstChild(Name)
-				end
-			end
-		end
-
-		return Child
-	end
-
-	local function CallOnChildren(Instance, FunctionToCall)
-		-- Calls a function on each of the children of a certain object, using recursion.  
+	local function CacheChildren(Instance)
+		-- Caches children of Instance into _LibraryCache
 		-- Note: Parents are always called before children.
-		FunctionToCall(Instance)
+
 		local Children = Instance:GetChildren()
 		for a = 1, #Children do
-			CallOnChildren(Children[a], FunctionToCall)
+			local Child = Children[a]
+			if Child:IsA("ModuleScript") then
+				assert(not _LibraryCache[Child.Name], "Error: Duplicate name of \"" .. Child.Name .. "\" already exists")
+				_LibraryCache[Child.Name] = Child
+			end
+			CacheChildren(Child)
 		end
 	end
 
@@ -95,17 +73,11 @@ local _LibraryCache = {} do
 	else
 		-- In regular server, run only if it is on client
 		-- Does not run in SoloTestMode
-		ResourceFolder = WaitForChild(ReplicatedStorage, "NevermoreResources")
-		Repository = WaitForChild(ResourceFolder, "Modules")
+		ResourceFolder = ReplicatedStorage:WaitForChild("NevermoreResources")
+		Repository = ResourceFolder:WaitForChild("Modules")
 	end
 
-	CallOnChildren(Repository, function(Child)
-		if Child:IsA("ModuleScript") then
-			assert(not _LibraryCache[Child.Name], "Error: Duplicate name of '" .. Child.Name .. "' already exists")
-
-			_LibraryCache[Child.Name] = Child
-		end
-	end)
+	CacheChildren(Repository)
 
 	if not RunService:IsClient() then
 		-- In regular server, run only if it is on server
@@ -115,22 +87,27 @@ local _LibraryCache = {} do
 			Archivable = false;
 			Parent = ResourceFolder;
 		})
-		for Name, Library in pairs(_LibraryCache) do
-			if not find(lower(Name), "server") then
+
+		for Name, Library in next, _LibraryCache do
+			if not find(lower(Name), "server") then -- Anything with Server in the Name is not put in ReplicationFolder
 				Library.Parent = ReplicationFolder
 			end
 		end
 	end
+
 end
 
 -- LoadLibrary function
 local LoadLibrary do
-	if not DEBUG_MODE then
-		function LoadLibrary(LibraryName)
-			assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
-			return require(_LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist."))
-		end
-	else
+
+	function LoadLibrary(LibraryName)
+		assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
+		return require(_LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist."))
+	end
+
+	if DEBUG_MODE then
+		
+		local Load = LoadLibrary
 		local DebugID = 0
 		local RequestDepth = 0
 
@@ -138,7 +115,6 @@ local LoadLibrary do
 			--- Loads a library from Nevermore's library cache
 			-- @param LibraryName The name of the library
 			-- @return The library's value
-			assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
 
 			DebugID = DebugID + 1
 			local LocalDebugID = DebugID
@@ -146,7 +122,7 @@ local LoadLibrary do
 			print(rep("\t", RequestDepth), LocalDebugID, "Loading: ", LibraryName)
 			RequestDepth = RequestDepth + 1
 
-			local Library = require(_LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist."))
+			local Library = Load(LibraryName)
 
 			RequestDepth = RequestDepth - 1
 			print(rep("\t", RequestDepth), LocalDebugID, "Done loading: ", LibraryName)
