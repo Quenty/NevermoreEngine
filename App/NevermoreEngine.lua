@@ -10,12 +10,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 -- DEBUG_MODE helps you identify what libraries are failing to load.
 local DEBUG_MODE = false
 
--- Localize Functions
-local rep = string.rep
-local find = string.find
-local lower = string.lower
-local Instance = Instance.new
-
 -- Assertions
 assert(script:IsA("ModuleScript"),  "Invalid script type. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
 assert(script.Name == "NevermoreEngine", "Invalid script name. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
@@ -25,6 +19,8 @@ assert(script.Parent == ReplicatedStorage,  "Invalid parent. For NevermoreEngine
 local _LibraryCache = {} do
 	
 	-- Helper functions
+	local Instance = Instance.new
+
 	local function Make(ClassType, Properties)
 		--- Make a new Instance of ClassType with Properties
 		local Instance = Instance(ClassType) 
@@ -82,6 +78,10 @@ local _LibraryCache = {} do
 	if not RunService:IsClient() then
 		-- In regular server, run only if it is on server
 		-- Does not run in SoloTestMode
+
+		local find = string.find
+		local lower = string.lower
+
 		local ReplicationFolder = ResourceFolder:FindFirstChild("Modules") or Make("Folder", {
 			Name = "Modules";
 			Archivable = false;
@@ -98,36 +98,34 @@ local _LibraryCache = {} do
 end
 
 -- LoadLibrary function
-local LoadLibrary do
+local function LoadLibrary(LibraryName)
+	assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
+	return require(_LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist."))
+end
+
+if DEBUG_MODE then
+	
+	local Load = LoadLibrary
+	local DebugID = 0
+	local RequestDepth = 0
+	local rep = string.rep
 
 	function LoadLibrary(LibraryName)
-		assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
-		return require(_LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist."))
-	end
+		--- Loads a library from Nevermore's library cache
+		-- @param LibraryName The name of the library
+		-- @return The library's value
 
-	if DEBUG_MODE then
-		
-		local Load = LoadLibrary
-		local DebugID = 0
-		local RequestDepth = 0
+		DebugID = DebugID + 1
+		local LocalDebugID = DebugID
 
-		function LoadLibrary(LibraryName)
-			--- Loads a library from Nevermore's library cache
-			-- @param LibraryName The name of the library
-			-- @return The library's value
+		print(rep("\t", RequestDepth), LocalDebugID, "Loading: ", LibraryName)
+		RequestDepth = RequestDepth + 1
 
-			DebugID = DebugID + 1
-			local LocalDebugID = DebugID
+		local Library = Load(LibraryName)
 
-			print(rep("\t", RequestDepth), LocalDebugID, "Loading: ", LibraryName)
-			RequestDepth = RequestDepth + 1
-
-			local Library = Load(LibraryName)
-
-			RequestDepth = RequestDepth - 1
-			print(rep("\t", RequestDepth), LocalDebugID, "Done loading: ", LibraryName)
-			return Library
-		end
+		RequestDepth = RequestDepth - 1
+		print(rep("\t", RequestDepth), LocalDebugID, "Done loading: ", LibraryName)
+		return Library
 	end
 end
 
