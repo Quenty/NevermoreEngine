@@ -791,23 +791,24 @@ local function DrawRay(Ray, Color, Parent)
 	Parent = Parent or workspace
 
 	local NewPart = Instance.new("Part", Parent)
-
+	NewPart.Material = "Neon"
 	NewPart.FormFactor = "Custom"
-	NewPart.Size       = Vector3.new(0.2, Ray.Direction.magnitude, 0.2)
+	NewPart.Shape = "Cylinder"
+	NewPart.Size       = Vector3.new(Ray.Direction.magnitude, 0.2, 0.2)
 
 	local Center = Ray.Origin + Ray.Direction/2
 	-- lib.DrawPoint(Ray.Origin).Name = "origin"
 	-- lib.DrawPoint(Center).Name = "Center"
 	-- lib.DrawPoint(Ray.Origin + Ray.Direction).Name = "Destination"
 
-	NewPart.CFrame       = CFrame.new(Center, Ray.Origin + Ray.Direction) * CFrame.Angles(math.pi/2, 0, 0) --* GetCFramePitch(math.pi/2)
+	NewPart.CFrame       = CFrame.new(Center, Ray.Origin + Ray.Direction) * CFrame.Angles(0, math.pi/2, 0)
 	NewPart.Anchored     = true
 	NewPart.CanCollide   = false
 	NewPart.Transparency = 0.5
 	NewPart.BrickColor   = Color or BrickColor.new("Bright red")
 	NewPart.Name         = "DrawnRay"
 	
-	Instance.new("SpecialMesh", NewPart)
+	-- Instance.new("SpecialMesh", NewPart)
 
 	return NewPart
 end
@@ -818,6 +819,7 @@ local function DrawPoint(Position, Color, Parent)
 	--- FOR DEBUGGING
 
 	local NewDraw = Instance.new("Part")
+	NewDraw.Material      = "Neon"
 	NewDraw.Parent        = Parent or workspace;
 	NewDraw.Size          = Vector3.new(1, 1, 1);
 	NewDraw.Transparency  = 0.5;

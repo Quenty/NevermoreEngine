@@ -1,12 +1,15 @@
+assert(not game:FindFirstChild("NetworkClient"), "You can't install with TeamCreate on. Please turn TeamCreate off to proceed.")
+
+-- Install.lua
+-- Installs the latest version of NevermoreEngine into your game
+-- @author Quenty
+
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local WasHttpEnabled = HttpService.HttpEnabled
 HttpService.HttpEnabled = true
-
--- @author Quenty
--- Installs the latest version of NevermoreEngine into your game
 
 local function LoadURL(URL)
 	URL = URL:gsub("\\", "/"):gsub("^%s*(.-)%s*$", "%1") -- Trim whitespace and swap slashes
