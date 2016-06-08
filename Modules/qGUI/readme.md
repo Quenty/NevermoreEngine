@@ -25,7 +25,13 @@ Creates a screen. `BaseCover` is a GUI frame that will be used as a property far
 `AnimationStyle` is a table with specifications on animation style.
 
 ```
-ScreenCover.MakeCover({
+local ScreenGui = ...
+local MyCover = ScreenCover.MakeCover({
+	Parent = ScreenGui;
+	Name = "LoadingScreenCover";
+})
+
+ScreenCover.MakeCover(MyCover, {
 	AnimationStyle = "DiagonalSquares";
 	Type = "TransitionIn";
 	AnimationTime = 1;
