@@ -1,77 +1,80 @@
 # About
-Nevermore is a collection of useful libraries for ROBLOX development.
+Nevermore Engine is a module-loader designed to simplify the loading of libraries and unify the networking of resources between the client and server. Nevermore comes equipped with a large codebase of useful libraries intended to streamline game development on Roblox.
 
+## Features
 
-## Features 
-* **OOP** - Many of the libraries in Nevermore are OOP
-* **Lazy loading** - Loads libraries only when you ask for them
-* **Lots of libraries** - Lots of libraries that handle all sorts of logical issues that may occur during ROBLOX game development
-* **Tested** - Used in several games that have made it to the front page, NevermoreEngine works without lots of testing
-* **Simple** - Nevermore is essential a big group of libraries with lots of utility functions. It's designed with simplicity in mind.
-	* The main module is only 200 lines long
-	* Fast install, just one line in the command line
-* **Open source** - Nevermore is open source
-* **Built for ROBLOX** - Nevermore is built for ROBLOX
-* **Works well with frameworks** - Nevermore works alongside your existing frameworks because it's just a collection of libraries and a loader.
+* **OOP** - Many of Nevermore's libraries employ Object-Oriented Programming
+* **Lazy loading** - Libraries won't load unless asked to (Consequently, Nevermore will not impact game performance)
+* **Many useful libraries** - Nevermore's libraries handle logical issues to decrease the number of code-based errors that occur during game development
+* **Tested** - Nevermore functions properly without testing
+* **Simple** - Nevermore is designed with simplicity in mind:
+	* The loader itself only includes 105 lines of code
+	* Fast and easy install; just paste [installer code](https://github.com/Quenty/NevermoreEngine/blob/master/Install.lua) into Command Bar
+* **Open source** - Nevermore is open source. Includes modules contributed by experienced scripters!
+* **Built for Roblox** - Made specifically for use on Roblox
+* **Works well with existing frameworks** - Nevermore doesn't interfere with existing code
 
 ## A sample of libraries
-You don't have to use a library unless you load it. Nevermore should not impact performance (it can sit in a game without taking up processing power, as it's just a ton of libraries). Here are a few of the libraries Nevermore offers
 
+Here are a few of the features that Nevermore's libraries offer:
 
-* Additive Camera effects 
-* Admin commands
-* Pseudo chat
-* Welding, CFrame manipulation code, quaternion slerp
-* Bezier Curves
-* Player manipulation utilities (check teammates, et cetera)
-* Type checkers
+* 3D rendering
+* [Additive Camera effects](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Camera)
+* [Admin commands](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/NevermoreCommands)
+* [Bezier Curves](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qSystems/Bezier.lua)
+* [Compass code](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qGUI/Compass)
+* [Custom Signals](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Events#signal)
 * GUI transparency and Color3 animation code
+* HeldInputs
+* Kinetic scrolling frame (mobile inertia scrollling)
 * Material design UI code
     * Ripple
     * Snackbar
-* Kinetic scrolling frame (mobile inertia scrollling)
-* Compass code
-* TimeSync between server and client
-* Custom Signals
-* Promises
-* HeldInputs
+* [Player manipulation utilities](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qSystems/qPlayer.lua) (check teammates et cetera)
 * Projectile physics
-* 3D rendering
-* Rotating text labels
-* Screen cover effects
+* [Promises](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Events#deferred)
+* [Pseudo chat](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/OutputStream/PseudoChat)
+* [RemoteEvent and RemoteFunction manager](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Events#remotemanager)
+* [Rotating text labels](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qGUI/RotatingTextLabel.lua)
+* [Screen cover effects](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/qGUI/ScreenCover.lua)
+* Time formatting ([os.date](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/Utility#os))
+* TimeSync between server and client
 * Title generation
-
+* Type checkers
+* Useful Data Structures
+* Welding
+* CFrame manipulation code
+* Quaternion slerp
 
 # Get Nevermore
-Paste the following code into your command bar in ROBLOX Studio to install Nevermore.
+To Install Nevermore, paste the following code into your command bar.
 
 ```lua
-assert(not game:FindFirstChild("NetworkClient"), "You can't install with TeamCreate on. Please turn TeamCreate off to proceed.") local a=game:GetService("HttpService")local b=game:GetService("ReplicatedStorage")local c=game:GetService("ServerScriptService")local d=a.HttpEnabled;a.HttpEnabled=true;local function e(f)f=f:gsub("\\","/"):gsub("^%s*(.-)%s*$","%1")return a:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/"..f)end;local function g(h,f)local i=f:gmatch("(%w+)%.lua")()local j=h:FindFirstChild(i)or Instance.new("ModuleScript",h)j.Name=i;j.Source=e(f)or error("Unable to load script")return j end;local function k(h,f)local l=f:gmatch("%w+\\")()if l then l=l:sub(1,#l-1)local j=h:FindFirstChild(l)or Instance.new("Folder",h)j.Name=l;return k(j,f:sub(#l+2,#f))else return h end end;print("Loading Nevermore")g(b,"App/NevermoreEngine.lua")print("Loading sublibraries")local m=k(c,"Nevermore\\")local n={}for o in e("Modules/ModuleList.txt"):gmatch("[^\r\n]+")do n[#n+1]=o end;for p,o in pairs(n)do g(k(m,o),"Modules/"..o)print(p,"/",#n)end;a.HttpEnabled=d;print("Done loading")
+local a=game:GetService("HttpService")local b=game:GetService("ReplicatedStorage")local c=game:GetService("ServerScriptService")local d=a.HttpEnabled;a.HttpEnabled=true;local function e(f)f=f:gsub("\\","/"):gsub("^%s*(.-)%s*$","%1")return a:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/"..f)end;local function g(h,f)local i=f:gmatch("(%w+)%.lua")()local j=h:FindFirstChild(i)or Instance.new("ModuleScript",h)j.Name=i;j.Source=e(f)or error("Unable to load script")return j end;local function k(h,f)local l=f:gmatch("%w+\\")()if l then l=l:sub(1,#l-1)local j=h:FindFirstChild(l)or Instance.new("Folder",h)j.Name=l;return k(j,f:sub(#l+2,#f))else return h end end;print("Loading Nevermore")g(b,"App/NevermoreEngine.lua")print("Loading sublibraries")local m=k(c,"Nevermore\\")local n={}for o in e("Modules/ModuleList.txt"):gmatch("[^\r\n]+")do n[#n+1]=o end;for p,o in pairs(n)do g(k(m,o),"Modules/"..o)print(p,"/",#n)end;a.HttpEnabled=d;print("Done loading")
 ```
-## What you just got
+## What you just got:
 
 * The main NevermoreModule in `ReplicatedStorage`
 * All the modules in `ServerScriptService`
 
-Please note that installing Nevermore will **not** change any behavior in your game. Nevermore is a collection of libraries. If you want to see the power of Nevermore try using some [Admin Commmands](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/NevermoreCommands)
+Please note that installing Nevermore will **not** change any behavior in your game. Nevermore does not affect preexisting code. If you want to see the power of Nevermore try using some [Admin Commmands](https://github.com/Quenty/NevermoreEngine/tree/master/Modules/NevermoreCommands).
 
 
 # Updating Nevermore
 
-To update Nevermore, back up your place file and run the install code above. It should preserve all of your existing code (although code changes to core Nevermore libraries will be overridden).
+To update Nevermore, **back up your place file** and run the install code above. Existing code will be preserved, however, Nevermore's default libraries will be overridden.
 
 ----
 
 
 ## Usage
-Load up Nevermore on your server and client. This is the header code you need.
+To load Nevermore on your server and client, use the following header code:
 
 
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 ```
 
 ### Loading a library
@@ -81,9 +84,9 @@ With the above code, you can easily load a library and all dependencies
 local qSystems = LoadCustomLibrary("qSystems")
 ```
 
-Libraries have different functions with a variety of useful methods. For example, let's say we want to make a lava brick
+Libraries have different functions with a variety of useful methods. For example, let's say we want to make a lava brick.
 
-Vanilla ROBLOX Lua to turn all red parts into killing bricks
+Vanilla RobloxLua code to turn all `Part`s into killing bricks:
 ```lua
 local function HandleTouch(Part)
 	-- Recursively find the humanoid
@@ -110,12 +113,12 @@ end
 RecurseApplyLava(workspace)
 ```
 
-With NevermoreEngine, this is easier:
+Simpler code utilizing Nevermore's libraries:
 
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+
 local qSystems = LoadCustomLibrary("qSystems")
 
 local function HandleTouch(Part)
@@ -152,12 +155,10 @@ game
 
 ```
 
-## Libraries
-Nevermore loads libraries from name. 
-
-## Using NevermoreEngine
-
-See App/readme.md
+## That's all folks!
+For help or questions, contact **ONE** of the following. (You may need to follow a user to contact them on Roblox)
+* Contact Narrev on Roblox
+	
 
 ## Update / Change Log
 This change log is *strictly* for Nevermore's module and documentation only.
@@ -171,7 +172,7 @@ This change log is *strictly* for Nevermore's module and documentation only.
 	- Specifically designed for testing
 	- Existing implimentation has lots of errors
 - Lots of bug fixes
-- Was **not** updated to use ReplicatedFirst because of the way ROBLOX currently handles replicated first
+- Was **not** updated to use ReplicatedFirst because of the way Roblox currently handles replicated first
 	- Updates planned to make Nevermore more accessible
 - Documentation added, more to come.
 
