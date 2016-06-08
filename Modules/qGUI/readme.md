@@ -31,7 +31,7 @@ local MyCover = ScreenCover.MakeCover({
 	Name = "LoadingScreenCover";
 })
 
-ScreenCover.MakeCover(MyCover, {
+ScreenCover.MakeScreenCover(MyCover, {
 	AnimationStyle = "DiagonalSquares";
 	Type = "TransitionIn";
 	AnimationTime = 1;
