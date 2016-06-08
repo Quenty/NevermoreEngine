@@ -30,9 +30,15 @@ function AnimationPlayer:WithAnimation(Animation)
 	return self
 end
 
-function AnimationPlayer:AddAnimation(Name, AnimationID)
+function AnimationPlayer:AddAnimation(Name, AnimationId)
 	local Animation = Instance.new("Animation")
-	Animation.AnimationId = "http://www.roblox.com/Asset?ID=" .. tonumber(AnimationID) or error("No AnimationID")
+
+	if tonumber(AnimationId) then
+		Animation.AnimationId = "http://www.roblox.com/Asset?ID=" .. tonumber(AnimationId) or error("No AnimationId")
+	else
+		Animation.AnimationId = AnimationId
+	end
+
 	Animation.Name = Name or error("No name")
 	
 	return self:WithAnimation(Animation)
