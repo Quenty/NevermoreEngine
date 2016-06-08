@@ -7,6 +7,7 @@ Camera\Effects\DefaultCamera.lua
 Camera\Effects\FadingCamera.lua
 Camera\Effects\ImpulseCamera.lua
 Camera\Effects\InverseFader.lua
+Camera\Effects\LagPointCamera.lua
 Camera\Effects\PointCamera.lua
 Camera\Effects\PushCamera.lua
 Camera\Effects\RotatedCamera.lua
@@ -23,8 +24,10 @@ DataStructures\Chain\LinkedConstructor.lua
 Events\Deferred.lua
 Events\Maid.lua
 Events\PromiseChild.lua
+Events\RemoteManager.lua
 Events\Signal.lua
 Events\TimeSyncManager.lua
+Events\TrelloErrorLogger.lua
 Input\BindableAction.lua
 Input\BindedIcon.lua
 Input\HeldInput.lua
@@ -52,7 +55,9 @@ Penlight\PenlightUtils.lua
 Physics\ParticleEngine.lua
 Physics\ProjectilePhysics.lua
 Physics\qPhysics.lua
+qCFrame\AdvanceRaycastFactory.lua
 qCFrame\CFrameInterpolator.lua
+qCFrame\CFrameMirror.lua
 qCFrame\Joints.lua
 qCFrame\PartGeometry.lua
 qCFrame\qCFrame.lua
@@ -91,8 +96,10 @@ qSystems\LightingManager.lua
 qSystems\OverriddenConfiguration.lua
 qSystems\qPlayer.lua
 qSystems\qSystems.lua
+qSystems\SignaledList.lua
 qSystems\Triangle.lua
 qSystems\Type.lua
+qSystems\ValueObject.lua
 qSystems\DataTypes\ComparableTuple.lua
 qSystems\DataTypes\qColor3.lua
 qSystems\DataTypes\qInstance.lua
@@ -101,6 +108,7 @@ qSystems\DataTypes\qModel.lua
 qSystems\DataTypes\qString.lua
 qSystems\DataTypes\qUDim2.lua
 qSystems\DataTypes\Table.lua
+ROBLOXAnimations\AnimationPlayer.lua
 Utility\ExperienceCalculator.lua
 Utility\FunctionMap.lua
 Utility\HashProcessor.lua
