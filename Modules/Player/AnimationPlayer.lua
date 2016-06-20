@@ -1,3 +1,6 @@
+-- Makes playing and loading tracks into a humanoid easy.
+-- @author Quenty
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
@@ -8,9 +11,6 @@ local Signal = LoadCustomLibrary("Signal")
 local AnimationPlayer = {}
 AnimationPlayer.__index = AnimationPlayer
 AnimationPlayer.ClassName = "AnimationPlayer"
-
--- Intent: Makes playing and loading tracks into a humanoid easy.
--- @author Quenty
 
 function AnimationPlayer.new(Humanoid)
 	local self = setmetatable({}, AnimationPlayer)
@@ -89,8 +89,7 @@ function AnimationPlayer:StopAllTracks(FadeTime)
 end
 
 function AnimationPlayer:Destroy()
-	self:StopAllTracks()
-	setmetatable(self, nil)
+	self = self:StopAllTracks() -- setmetatable(self, nil)
 end
 
 return AnimationPlayer

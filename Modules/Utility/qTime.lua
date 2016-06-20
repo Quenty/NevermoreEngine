@@ -1,8 +1,5 @@
--- qTime.lua
--- Library handles time based parsing / operations. Untested. Based off of PHP.
-
+-- Deprecated, please use os
 -- @author Quenty
--- Last modified February 1st, 2014
 
 local lib = {}
 

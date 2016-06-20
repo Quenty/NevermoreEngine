@@ -1,19 +1,47 @@
-local Players = game:GetService("Players")
+-- Utilities involving players and teams
+
 local Teams = game:GetService("Teams")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems          = LoadCustomLibrary("qSystems")
-local qCFrame          = LoadCustomLibrary("qCFrame")
-
-local CheckCharacter = qSystems.CheckCharacter
-
--- qPlayer.lua
--- Just utilities involving players (and teams).
+local Load = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local qCFrame = Load("qCFrame")
 
 local lib = {}
+
+local function CheckPlayer(Player)
+	--- Makes sure a player has all necessary components.
+	-- @param Player The Player to check for
+	-- @return Boolean If the player has all the right components
+
+	return Player and Player:IsA("Player") and Player:IsDescendantOf(Players)
+end
+lib.CheckPlayer = CheckPlayer
+
+local function CheckCharacter(Player)
+	--- Makes sure a character has all the right "parts". This also validates the player's status as
+	--  a player. This is useful when you want to load a character, as ROBLOX's character added
+	--  event doesn't guarantee loaded character status.
+	-- @param Player The player to search for
+	-- @return Boolean, True if it's good, false if it's not.
+	
+	if CheckPlayer(Player) then
+		local Character = Player.Character
+
+		if Character then
+			return Character.Parent
+				and Character:FindFirstChild("Humanoid")
+				and Character:FindFirstChild("HumanoidRootPart")
+				and Character:FindFirstChild("Torso") 
+				and Character:FindFirstChild("Head") 
+				and Character.Humanoid:IsA("Humanoid")
+				and Character.Head:IsA("BasePart")
+				and Character.Torso:IsA("BasePart")
+		end
+	end
+	return warn("[CheckCharacter] - Character Check failed!")
+end
+lib.CheckCharacter = CheckCharacter
 
 local function IsTeamMate(PlayerOne, PlayerTwo, NeutralCounts)
 	--- Are playerone and playertwo teammates?
@@ -146,12 +174,12 @@ local function GetCharacter(Character)
 	-- @param Character A child of the potential character. 
 	-- @return The character found.
 
-	local Player = Players:GetPlayerFromCharacter(Character)
+	local Player= Players:GetPlayerFromCharacter(Character)
 
 	while not Player do
 		if Character.Parent then
 			Character = Character.Parent
-			Player = Players:GetPlayerFromCharacter(Character)
+			Player   = Players:GetPlayerFromCharacter(Character)
 		else
 			return nil
 		end
@@ -162,44 +190,6 @@ local function GetCharacter(Character)
 end
 lib.GetCharacter = GetCharacter
 lib.GetPlayerFromCharacter = GetCharacter
-
-local function CheckPlayer(Player)
-	--- Makes sure a player has all necessary components.
-	-- @param Player The Player to check for
-	-- @return Boolean If the player has all the right components
-
-	return Player and Player:IsA("Player") and Player:IsDescendantOf(Players)
-end
-lib.CheckPlayer = CheckPlayer
-
-local function CheckCharacter(Player)
-	--- Makes sure a character has all the right "parts". This also validates the player's status as
-	--  a player. This is useful when you want to load a character, as ROBLOX's character added
-	--  event doesn't guarantee loaded character status.
-	-- @param Player The player to search for
-	-- @return Boolean, True if it's good, false if it's not.
-	
-	if CheckPlayer(Player) then
-		local Character = Player.Character
-
-		if Character then
-			return Character.Parent
-				and Character:FindFirstChild("Humanoid")
-				and Character:FindFirstChild("HumanoidRootPart")
-				and Character:FindFirstChild("Torso") 
-				and Character:FindFirstChild("Head") 
-				and Character.Humanoid:IsA("Humanoid")
-				and Character.Head:IsA("BasePart")
-				and Character.Torso:IsA("BasePart")
-				and true
-		end
-	else
-		warn("[CheckCharacter] - Character Check failed!")
-	end
-
-	return nil
-end
-lib.CheckCharacter = CheckCharacter
 
 local function GetPlayerWhoSatOnChair(PotentialSeatWeld)
 	-- Intended to be used with ROBLOX's seat system, where .ChildAdded fires whenever a player

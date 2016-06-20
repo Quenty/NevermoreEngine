@@ -1,6 +1,5 @@
 Camera\CameraPlus.lua
 Camera\CameraState.lua
-Camera\Easing.lua
 Camera\Effects\CameraControls.lua
 Camera\Effects\CustomCameraEffect.lua
 Camera\Effects\DefaultCamera.lua
@@ -21,18 +20,33 @@ Character\RawCharacter.lua
 DataStructures\CircularBuffer.lua
 DataStructures\Chain\ChainConstructor.lua
 DataStructures\Chain\LinkedConstructor.lua
+Debug\TrelloErrorLogger.lua
 Events\Deferred.lua
 Events\Maid.lua
 Events\PromiseChild.lua
 Events\RemoteManager.lua
 Events\Signal.lua
 Events\TimeSyncManager.lua
-Events\TrelloErrorLogger.lua
+Helper Functions\CallOnChildren.lua
+Helper Functions\Debounce.lua
+Helper Functions\GetNearestParent.lua
+Helper Functions\Make.lua
+Helper Functions\Modify.lua
+Helper Functions\WaitForChild.lua
 Input\BindableAction.lua
 Input\BindedIcon.lua
 Input\HeldInput.lua
 Input\HeldRateInput.lua
 Input\InputBind.lua
+Input\InputMode\InputModeProcessor.lua
+Input\InputMode\InputModeState.lua
+Input\InputMode\InputModeSwapper.lua
+Input\InputMode\InputStates.lua
+Math\Bezier.lua
+Math\Easing.lua
+Math\Probability.lua
+Math\qMath.lua
+Math\Triangle.lua
 NevermoreCommands\AuthenticationServiceServer.lua
 NevermoreCommands\ClientAuthenticationService.lua
 NevermoreCommands\CommandSystems.lua
@@ -55,6 +69,8 @@ Penlight\PenlightUtils.lua
 Physics\ParticleEngine.lua
 Physics\ProjectilePhysics.lua
 Physics\qPhysics.lua
+Player\AnimationPlayer.lua
+Player\qPlayer.lua
 qCFrame\AdvanceRaycastFactory.lua
 qCFrame\CFrameInterpolator.lua
 qCFrame\CFrameMirror.lua
@@ -89,7 +105,6 @@ qGUI\KeyIcon\KeyIconProvider.lua
 qGUI\KeyIcon\LabeledKeyIcon.lua
 qGUI\PaperRipple\PaperRipple.lua
 qGUI\PaperRipple\Ripple.lua
-qSystems\Bezier.lua
 qSystems\EasyConfiguration.lua
 qSystems\EnumInterpreter.lua
 qSystems\LightingManager.lua
@@ -97,22 +112,19 @@ qSystems\OverriddenConfiguration.lua
 qSystems\qPlayer.lua
 qSystems\qSystems.lua
 qSystems\SignaledList.lua
-qSystems\Triangle.lua
 qSystems\Type.lua
 qSystems\ValueObject.lua
 qSystems\DataTypes\ComparableTuple.lua
 qSystems\DataTypes\qColor3.lua
 qSystems\DataTypes\qInstance.lua
-qSystems\DataTypes\qMath.lua
 qSystems\DataTypes\qModel.lua
 qSystems\DataTypes\qString.lua
+qSystems\DataTypes\qTable.lua
 qSystems\DataTypes\qUDim2.lua
 qSystems\DataTypes\Table.lua
-ROBLOXAnimations\AnimationPlayer.lua
 Utility\ExperienceCalculator.lua
 Utility\FunctionMap.lua
 Utility\HashProcessor.lua
 Utility\IsA.lua
 Utility\os.lua
-Utility\Probability.lua
 Utility\qTime.lua
