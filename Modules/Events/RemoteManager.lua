@@ -1,393 +1,504 @@
--- @Author Vorlias
--- Edited by Narrev
+-- Table Wrapper for handling client/server networking
+-- @author Narrev
+-- @original https://github.com/Vorlias/ROBLOX-ModRemote
 
---[[
-	RemoteManager v4.00
-		ModuleScript for handling networking via client/server
-		
-	Documentation for this ModuleScript can be found at
-		https://github.com/VoidKnight/ROBLOX-RemoteModule/tree/master/Version-3.x
-]]
+-- To do: expand to support connection management by index or value
 
--- Constants
-local client_Max_Wait_For_Remotes = 1
-local default_Client_Cache = 10
+-- Configurable
+local CLIENT_CACHE_TIME = 5
 
 -- Services
-local ReplicatedStorage	= game:GetService("ReplicatedStorage")
-local server		= game:FindService("NetworkServer")
-local remote		= {remoteEvent = {}; remoteFunction = {}}
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Localize Tables
-local remoteEvent, remoteFunction, FuncCache, RemoteEvents, RemoteFunctions = remote.remoteEvent, remote.remoteFunction, {}, {}, {}
+-- Module
+local RemoteManager = {}
+local remoteEvent = {}
+local remoteFunction = {}
+local RemoteEvents = {}
+local RemoteFunctions = {}
 
--- Localize Functions
-local time, newInstance, traceback = os.time, Instance.new, debug.traceback
+-- Server Only
+local LastContact = {}
+local Blacklist = {}
 
-assert(workspace.FilteringEnabled or not server, "[RemoteManager] RemoteManager 4.0 does not work with filterless games due to security vulnerabilties. Please consider using Filtering or use RemoteManager 2.7x")
+-- Client Only
+local clientLastContact = 0 
 
--- Utility functions
-local function Make(ClassType, Properties)
-	-- @param ClassType The type of class to instantiate
-	-- @param Properties The properties to use
+-- Helper functions
+local Load = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local Make = Load("Make")
+local CallOnChildren = Load("CallOnChildren")
 
-	assert(type(Properties) == "table", "Properties is not a table")
+-- Localize frequently called functions
+local time = os.time
+local tick = tick
+local next = next
+local unpack = unpack
+local newInstance = Instance.new
+local connect = script.ChildAdded.connect
+local _connection = connect(script.ChildAdded, function() end)
+local disconnect = _connection.disconnect
+disconnect(_connection)
 
-	local Object = newInstance(ClassType)
-	
-	for Index, Value in next, Properties do
-		Object[Index] = Value
+local FindFirstChild = script.FindFirstChild
+local Destroy = script.Destroy
+
+-- Connection Wrappers
+local function ClientRefresh(func)
+	return function(...)
+		clientLastContact = tick()
+		return func(...)
 	end
-
-	return Object
 end
 
-local function WaitForChild(Parent, Name, TimeLimit)
-	-- Waits for a child to appear. Not efficient, but it shouldn't have to be. It helps with
-	-- debugging. Useful when ROBLOX lags out, and doesn't replicate quickly. Will warn
-	-- @param Parent The Parent to search in for the child.
-	-- @param Name The name of the child to search for
-	-- @param TimeLimit If TimeLimit is given, then it will return after the timelimit, even if it
-	--     hasn't found the child.
-
-	assert(Parent, "Parent is nil")
-	assert(type(Name) == "string", "Name is not a string.")
-
-	local Child     = Parent:FindFirstChild(Name)
-	local StartTime = tick()
-	local Warned    = false
-
-	while not Child do
-		wait()
-		Child = Parent:FindFirstChild(Name)
-		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
-			Warned = true
-			warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. traceback())
-			if TimeLimit then
-				return Parent:FindFirstChild(Name)
+local function ServerRefresh(func)
+	return function(player, ...)
+		local playerName = player.Name
+		if LastContact[playerName] then
+			local timeDifference = tick() - LastContact[playerName] -- > 2
+			if timeDifference > 2 then
+				print(playerName, "is laggy. Blocking data")
+				Blacklist[playerName] = time()
 			end
+			
+			if timeDifference > 4 then
+				print(playerName, "is getting booted from the server")
+				player:Kick("You have lost connection to the game")
+			end	
 		end
-	end
-
-	return Child
-end
-
--- Get storage or create if nonexistent
-local functionStorage = ReplicatedStorage:FindFirstChild("RemoteFunctions") or Make("Folder" , {
-	Parent	= ReplicatedStorage;
-	Name	= "RemoteFunctions";
-})
-
-local eventStorage = ReplicatedStorage:FindFirstChild("RemoteEvents") or Make("Folder", {
-	Parent	= ReplicatedStorage;
-	Name	= "RemoteEvents";
-})
-
--- Metatables
-local functionMetatable = {
-	__index = function(self, i)
-		if rawget(remoteFunction, i) then
-			return rawget(remoteFunction, i)
+		LastContact[playerName] = tick()
+		if not Blacklist[playerName] or Blacklist[playerName] and time() - Blacklist[playerName] > 2 then
+			return func(player, ...)
 		else
-			return rawget(self, i)
-		end
-	end;
-
-	__newindex = function(self, i, v)
-		if i == 'OnCallback' and type(v) == 'function' then
-			self:Callback(v)
-		end
-	end;
-	
-	__call = function(self, ...)
-		if server then
-			return self:CallPlayer(...)
-		else
-			return self:CallServer(...)
-		end
-	end;
-}
-
-local eventMetatable = {
-	__index = function(self, i)
-		if rawget(remoteEvent, i) then
-			return rawget(remoteEvent, i)
-		else
-			return rawget(self, i)
-		end
-	end;
-
-	__newindex = function(self, i, v)
-		if (i == 'OnRecieved' and type(v) == 'function') then
-			self:Listen(v)
-		end
-	end;
-}
-
-local remoteMetatable = {
-	__call = function(self, ...)
-		assert(server, "RemoteManager can only be called from server.")
-		
-		local args = {...}
-
-		if #args > 0 then
-			for a = 1, #args do
-				remote:RegisterChildren(args[a])
-			end
-		else
-			remote:RegisterChildren()
-		end
-		
-		return self
-	end;
-}
-
--- Helper Functions
-local function CreateFunctionMetatable(instance)
-	return setmetatable({Instance = instance}, functionMetatable)
-end
-
-local function CreateEventMetatable(instance)
-	return setmetatable({Instance = instance}, eventMetatable)
-end
-
-local function CreateFunction(name, instance)
-	local instance = instance or functionStorage:FindFirstChild(name) or newInstance("RemoteFunction")
-	instance.Parent = functionStorage
-	instance.Name = name
-	
-	local _event = CreateFunctionMetatable(instance)
-	
-	RemoteFunctions[name] = _event
-	
-	return _event
-end
-
-local function CreateEvent(name, instance)
-	local instance = instance or eventStorage:FindFirstChild(name) or newInstance("RemoteEvent")
-	instance.Parent = eventStorage
-	instance.Name = name
-	
-	local _event = CreateEventMetatable(instance)
-	
-	RemoteEvents[name] = _event
-	
-	return _event
-end
-
--- remote Object Methods
-function remote:RegisterChildren(instance)
-	--- Registers the Children inside of an instance
-	-- @param Instance instance the object with Remotes in
-	--	@default the script this was imported in to
-	assert(server, "RegisterChildren can only be called from the server.")
-	local parent = instance or getfenv(0).script
-
-	if parent then
-		local children = parent:GetChildren()
-		for a = 1, #children do
-			local child = children[a]
-			if child:IsA("RemoteEvent") then
-				CreateEvent(child.Name, child)
-			elseif child:IsA("RemoteFunction") then
-				CreateFunction(child.Name, child)
-			end
+			print("Blocked data from", playerName)
 		end
 	end
 end
 
-function remote:GetFunctionFromInstance(instance)
-	return CreateFunctionMetatable(instance)
+-- Metamethods
+function remoteEvent:__index(i)
+	if i == "OnServerEvent" then
+		return self._OnServerEvent
+	elseif i == "OnClientEvent" then
+		return self._OnClientEvent
+	end
+	return rawget(remoteEvent, i) or self._Instance[i]
 end
 
-function remote:GetEventFromInstance(instance)
-	return CreateEventMetatable(instance)
+function remoteEvent:__newindex(i, v)
+	if i == "OnServerEvent" then
+		self._OnServerEvent:connect(v)
+	elseif i == "OnClientEvent" then
+		self._OnClientEvent:connect(v)
+	else
+		self._Instance[i] = v
+	end
 end
 
-function remote:GetFunction(name)
+function remoteFunction:__index(i)
+	if i == "OnServerInvoke" then
+		return self._OnServerInvoke
+	elseif i == "OnClientInvoke" then
+		return self._OnClientInvoke
+	elseif i == "_cacheDuration" or i == "_cacheByValue" then
+		return false
+	end
+	return rawget(remoteFunction, i) or self._Instance[i]
+end
+
+function remoteFunction:__newindex(i, v)
+	if i == "OnServerInvoke" then
+		self._Instance.OnServerInvoke = ServerRefresh(v)
+	elseif i == "OnClientInvoke" then
+		self._Instance.OnClientInvoke = ClientRefresh(v)
+	else
+		self._Instance[i] = v
+	end
+end
+
+-- MetatableWrap function
+local functionStorage, eventStorage, MetatableWrap do
+	
+	-- OnEvent Object
+	local OnEvent = {}
+
+	OnEvent.__index = OnEvent
+
+	function OnEvent:connect(func) -- expand to support managing connections by index or value
+		local connections = self._Connections
+		local _Event = self._Event
+		local connection = connect(self._Instance[_Event], _Event == "OnServerEvent" and ServerRefresh(func) or ClientRefresh(func))
+		connections[#connections + 1] = connection
+		return connection
+	end
+
+	function OnEvent:disconnect() -- expand to support managing connections by index or value
+		local connections = self._Connections
+		for a = 1, #connections do
+			disconnect(connections[a])
+		end
+	end
+
+	function OnEvent:wait()
+		self._Instance[self._Event]:wait()
+	end
+
+	-- OnInvoke Object
+	local OnInvoke = {}
+
+	OnInvoke.__index = OnInvoke
+
+	function OnInvoke:connect(func)
+		local _Invoke = self._Invoke
+		self._Instance[_Invoke] = _Invoke == "OnServerInvoke" and ServerRefresh(func) or ClientRefresh(func)
+	end
+
+	function OnInvoke:disconnect()
+		self._Instance[self._Invoke] = nil
+	end
+	
+	function MetatableWrap(instance, bool, Storage)
+		--- Gives a metatable to instance, and puts instance in Storage
+		-- @param Instance instance the instance to give the metatable to
+		-- @param bool true for function, false for Event
+		--	@default false
+		-- @param RobloxObject Storage The parent the instance should be parented to
+		--	@default functionStorage or eventStorage
+
+		local remoteTable = bool and RemoteFunctions or RemoteEvents
+		instance.Parent = Storage
+		local instanceName = instance.Name
+		local WrappedRemote = remoteTable[instanceName]
+
+		if not WrappedRemote then
+			local RemoteWrapper = bool and setmetatable({
+					_Instance = instance;
+					_cacheDuration = false;
+					_cacheByValue = false;
+					_cache = false;
+					_OnServerInvoke = setmetatable({_Connections = {}; _Instance = instance; _Invoke = "OnServerInvoke"}, OnInvoke);
+					_OnClientInvoke = setmetatable({_Connections = {}; _Instance = instance; _Invoke = "OnClientInvoke"}, OnInvoke);
+				}, remoteFunction) or setmetatable({
+					_Instance = instance;
+					_OnServerEvent = setmetatable({_Connections = {}; _Instance = instance; _Event = "OnServerEvent"}, OnEvent);
+					_OnClientEvent = setmetatable({_Connections = {}; _Instance = instance; _Event = "OnClientEvent"}, OnEvent);
+				}, remoteEvent)
+
+			remoteTable[instanceName] = RemoteWrapper
+			return RemoteWrapper
+		else
+			return WrappedRemote
+		end
+	end
+end
+
+-- Get Helper
+local function GetRemote(name, bool)
+	--- Gets a Remote if it exists, otherwise errors
+	-- @param string name - the name of the function
+	-- @param boolean bool - true for function, false for Event
+
+	local Storage = bool and functionStorage or eventStorage
+
+	assert(type(name) == "string", "[RemoteManager] Remote retrieval failed: Name must be a string")
+	assert(FindFirstChild(Storage, name), "[RemoteManager] " .. name .. " not found, create it using CreateFunction/CreateEvent.")
+
+	return MetatableWrap(Storage[name], bool, Storage)
+end
+
+-- Universal Methods
+local function GetFunction(name1, name2)
 	--- Gets a function if it exists, otherwise errors
 	-- @param string name - the name of the function.
 
-	assert(type(name) == 'string', "[RemoteManager] GetFunction - Name must be a string")
-	assert(WaitForChild(functionStorage, name, client_Max_Wait_For_Remotes), "[RemoteManager] GetFunction - Function " .. name .. " not found, create it using CreateFunction.")
-
-	return RemoteFunctions[name] or CreateFunction(name)
+	return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1, true)
 end
+RemoteManager.GetFunction = GetFunction
+RemoteManager.GetRemoteFunction = GetFunction
 
-function remote:GetEvent(name)
+local function GetEvent(name1, name2)
 	--- Gets an event if it exists, otherwise errors
 	-- @param string name - the name of the event.
 
-	assert(type(name) == 'string', "[RemoteManager] GetEvent - Name must be a string")
-	assert(WaitForChild(eventStorage, name, client_Max_Wait_For_Remotes), "[RemoteManager] GetEvent - Event " .. name .. " not found, create it using CreateEvent.")
+	return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1)
+end
+RemoteManager.GetEvent = GetEvent
+RemoteManager.GetRemoteEvent = GetEvent
+
+-- Get storage or create if nonexistent
+local ResourceFolder = FindFirstChild(ReplicatedStorage, "NevermoreResources")
+local ExtractMethods_Event = newInstance("RemoteEvent")
+local ExtractMethods_Function = newInstance("RemoteFunction")
+
+if RunService:IsServer() then
 	
-	return RemoteEvents[name] or CreateEvent(name)
-end
+	local FireClient = ExtractMethods_Event.FireClient
+	local FireAllClients = ExtractMethods_Event.FireAllClients
+	local InvokeClient = ExtractMethods_Function.InvokeClient
 
-function remote:CreateFunction(name)
-	--- Creates a function
-	-- @param string name - the name of the function.
+	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions") or Make("Folder" , {
+		Parent	= ResourceFolder;
+		Name	= "RemoteFunctions";
+	})
 
-	if not server then warn("[RemoteManager] CreateFunction should be used by the server.") end
-	return CreateFunction(name)
-end
+	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents") or Make("Folder", {
+		Parent	= ResourceFolder;
+		Name	= "RemoteEvents";
+	})
 
-function remote:CreateEvent(name)
-	--- Creates an event 
-	-- @param string name - the name of the event.
+	-- Helper functions
+	local function CreateRemote(name, bool)
+		--- Creates RemoteEvent/Function with name
+		-- @param bool true for function, false for Event
 
-	if not server then warn("[RemoteManager] CreateEvent should be used by the server.") end
-	return CreateEvent(name)
-end
-
--- RemoteEvent Object Methods
-function remoteEvent:SendToPlayers(playerList, ...)
-	assert(server, "[RemoteManager] SendToPlayers should be called from the Server side.")
-	for a = 1, #playerList do
-		self.Instance:FireClient(playerList[a], ...)
-	end
-end
-
-function remoteEvent:SendToPlayer(player, ...)
-	assert(server, "[RemoteManager] SendToPlayers should be called from the Server side.")
-	self.Instance:FireClient(player, ...)
-end
-
-function remoteEvent:SendToServer(...)
-	assert(not server, "SendToServer should be called from the Client side.")
-	self.Instance:FireServer(...)
-end
-
-function remoteEvent:SendToAllPlayers(...)
-	assert(server, "[RemoteManager] SendToPlayers should be called from the Server side.")
-	self.Instance:FireAllClients(...)
-end
-
-function remoteEvent:Listen(func)
-	if server then
-		self.Instance.OnServerEvent:connect(func)
-	else
-		self.Instance.OnClientEvent:connect(func)
-	end
-end
-
-function remoteEvent:Wait()
-	if server then
-		self.Instance.OnServerEvent:wait()
-	else
-		self.Instance.OnClientEvent:wait()
-	end
-end
-
-function remoteEvent:GetInstance()
-	return self.Instance
-end
-
-function remoteEvent:Destroy()
-	self.Instance:Destroy()
-end
-
--- RemoteFunction Object Methods
-function remoteFunction:CallPlayer(player, ...)
-
-	assert(server, "[RemoteManager] CallPlayer should be called from the server side.")
-	
-	local args = {...}
-	local attempt, err = pcall(function()
-		return self.Instance:InvokeClient(player, unpack(args))
-	end)
-	
-	if not attempt then
-		return warn("[RemoteManager] CallPlayer - Failed to recieve response from " .. player.Name)
-	end	
-end
-
-function remoteFunction:Callback(func)
-	if server then
-		self.Instance.OnServerInvoke = func
-	else
-		self.Instance.OnClientInvoke = func
-	end
-end
-
-function remoteFunction:GetInstance()
-	return self.Instance
-end
-
-function remoteFunction:Destroy()
-	self.Instance:Destroy()
-end
-
-function remoteFunction:SetClientCache(seconds, useAction)
-	
-	local seconds = seconds or default_Client_Cache
-	assert(server, "SetClientCache must be called on the server.")
-	local instance = self.Instance
-
-	if seconds <= 0 then
-		local cache = instance:FindFirstChild("ClientCache")
-		if cache then cache:Destroy() end
-	else
-		local cache = instance:FindFirstChild("ClientCache") or Make("IntValue", {
-			Parent = instance;
-			Name = "ClientCache";
-			Value = seconds;
-		})
-	end
-	
-	if useAction then
-		-- Put a BoolValue object inside of self.Instance to mark that we are UseActionCaching
-		-- Possible Future Update: Come up with a better way to mark we are UseActionCaching
-		--			We could change the ClientCache string, but that might complicate things
-		--			*We could try using the Value of the ClientCache object inside the remoteFunction
-		local cache = instance:FindFirstChild("UseActionCaching") or Make("BoolValue", {
-			Parent = instance;
-			Name = "UseActionCaching";
-		})
-	else
-		local cache = instance:FindFirstChild("UseActionCaching")
-		if cache then cache:Destroy() end			
-	end
-end
-
-function remoteFunction:ResetClientCache()
-
-	assert(not server, "ResetClientCache must be used on the client.")
-	local instance = self.Instance
-
-	if instance:FindFirstChild("ClientCache") then
-		FuncCache[instance:GetFullName()] = {Expires = 0, Value = nil}
-	else
-		warn(instance:GetFullName() .. " does not have a cache.")
-	end		
-end
-
-function remoteFunction:CallServer(...)
-	assert(not server, "[RemoteManager] CallServer should be called from the client side.")
-
-	local instance = self.Instance
-	local clientCache = instance:FindFirstChild("ClientCache")
-
-	if clientCache then
-		local cacheName = instance:GetFullName() .. (instance:FindFirstChild("UseActionCaching") and tostring(({...})[1]) or "")
+		local Storage = bool and functionStorage or eventStorage
+		local instance = FindFirstChild(Storage, name) or newInstance(bool and "RemoteFunction" or "RemoteEvent")
+		instance.Name = name
 		
-		local cache = FuncCache[cacheName]
-		if cache and time() < cache.Expires then
-			-- If the cache exists in FuncCache and the time hasn't expired
-			-- Return cached arguments
-			return unpack(cache.Value)
-		else
-			-- The cache isn't in FuncCache or time has expired
-			-- Invoke the server with the arguments
-			-- Cache Arguments
-			
-			local cacheValue = {instance:InvokeServer(...)}
-			FuncCache[cacheName] = {Expires = time() + clientCache.Value, Value = cacheValue}
-			return unpack(cacheValue)
-		end
-	else
-		return instance:InvokeServer(...)
+		return MetatableWrap(instance, bool, Storage)
 	end
+
+	local function Register(child)
+		local bool = child:IsA("RemoteFunction")
+		MetatableWrap(child, bool, bool and functionStorage or eventStorage)
+	end
+
+	-- RemoteManager Methods
+	function RemoteManager:RegisterChildren(instance)
+		--- Registers the Children inside of an instance
+		-- @param Instance instance the object with Remotes in
+		--	@default the script this was imported in to
+		
+		CallOnChildren(instance or ResourceFolder or ReplicatedStorage, Register)
+	end
+	
+	local function CreateFunction(name1, name2)
+		--- Creates a RemoteFunction
+		-- @param string name - the name of the function.
+
+		return CreateRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1, true)
+	end
+	RemoteManager.CreateFunction = CreateFunction
+	RemoteManager.CreateRemoteFunction = CreateFunction
+
+	local function CreateEvent(name1, name2)
+		--- Creates an RemoteEvent 
+		-- @param string name - the name of the event.
+
+		return CreateRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1)
+	end
+	RemoteManager.CreateEvent = CreateEvent
+	RemoteManager.CreateRemoteEvent = CreateEvent
+
+	-- RemoteEvent Object Methods
+	local function SendToPlayer(self, player, ...)
+		FireClient(self._Instance, player, ...)
+	end
+	remoteEvent.FireClient = SendToPlayer
+	remoteEvent.FirePlayer = SendToPlayer
+	remoteEvent.SendToPlayer = SendToPlayer
+	remoteEvent.SendToClient = SendToPlayer
+
+	local function SendToPlayers(self, playerList, ...)
+		for a = 1, #playerList do
+			FireClient(self._Instance, playerList[a], ...)
+		end
+	end
+	remoteEvent.FireClients = SendToPlayers
+	remoteEvent.FirePlayers = SendToPlayers
+	remoteEvent.SendToPlayers = SendToPlayers
+	remoteEvent.SendToClients = SendToPlayers
+
+	local function SendToAllPlayers(self, ...)
+		FireAllClients(self._Instance, ...)
+	end
+	remoteEvent.FireAllClients = SendToAllPlayers
+	remoteEvent.FireAllPlayers = SendToAllPlayers
+	remoteEvent.SendAllPlayers = SendToAllPlayers
+	remoteEvent.SendAllClients = SendToAllPlayers
+	remoteEvent.SendToAllPlayers = SendToAllPlayers
+	remoteEvent.SendToAllClients = SendToAllPlayers
+
+	-- RemoteFunction Object Methods
+	local function ClientCallPack(player, playerName, successful, ...)
+		return successful and ... or warn("[RemoteManager] CallPlayer - Failed to recieve response from", playerName, "Error Message:", ...)
+	end
+
+	local function ClientCallHelper(playerName, instance, player, ...)
+		return InvokeClient(instance, player, ...)
+	end
+
+	local function ClientCall(self, player, ...)
+		local playerName = player.Name
+		return ClientCallPack(player, playerName, pcall(ClientCallHelper, playerName, self._Instance, player, ...))
+	end
+	remoteFunction.CallPlayer = ClientCall
+	remoteFunction.CallClient = ClientCall
+	remoteFunction.InvokeClient = ClientCall
+	remoteFunction.InvokePlayer = ClientCall
+
+	local function DestroyInstance(self)
+		self = Destroy(self._Instance)
+	end
+	remoteEvent.Destroy = DestroyInstance
+	remoteFunction.Destroy = DestroyInstance
+
+	local CacheManager = CreateRemote("CacheManager")
+	CacheManager.OnServerEvent = function(player) LastContact[player.Name] = tick() end
+
+	local function newPlayerAdded(player)
+		local playerName = player.Name
+		local startCount = time()
+
+		for FunctionName, RemoteFunction in next, RemoteFunctions do
+			if RemoteFunction._cacheDuration then
+				FireClient(CacheManager._Instance, player, FunctionName, "_cacheDuration", RemoteFunction._cacheDuration)
+			end
+			if RemoteFunction._cacheByValue then
+				FireClient(CacheManager._Instance, player, FunctionName, "_cacheByValue", RemoteFunction._cacheByValue)
+			end
+		end
+
+		local function gracePeriod()
+			return wait() and time() - startCount >= 20
+		end
+
+		repeat until LastContact[playerName] or gracePeriod()
+		LastContact[playerName] = tick()
+	end
+
+	local function PlayerRemoving(player)
+		local playerName = player.Name
+		LastContact[playerName], Blacklist[playerName] = wait() and nil
+	end
+	
+	playerList = Players:GetPlayers()
+
+	connect(Players.PlayerAdded, newPlayerAdded)
+	connect(Players.PlayerRemoving, PlayerRemoving)
+
+	for a = 1, #playerList do
+		newPlayerAdded(playerList[a])
+	end
+
+	local function SetClientCache(self, seconds, _cacheByValue)
+		-- @param boolean _cacheByValue determines whether or not the function should be cached depending on the first value of the call
+		assert(type(not _cacheByValue) == "boolean", "[RemoteManger] SetClientCache's last parameter must be a boolean")
+		assert(type(seconds) == "number", "[RemoteManger] SetClientCache's first parameter must be a number")
+
+		local oldcache = self._cacheDuration
+		local old_cacheByValue = self._cacheByValue
+
+		local _cacheDuration = (seconds or CLIENT_CACHE_TIME) > 0 and seconds
+
+		if _cacheDuration ~= oldcache then
+			self._cacheDuration = _cacheDuration
+			FireAllClients(CacheManager._Instance, self._Instance.Name, "_cacheDuration", _cacheDuration)
+		end
+
+		if _cacheByValue ~= old_cacheByValue then
+			self._cacheByValue = _cacheByValue
+			FireAllClients(CacheManager._Instance, self._Instance.Name, "_cacheByValue", _cacheByValue)
+		end
+	end
+	remoteFunction.SetClientCache = SetClientCache
+	remoteFunction.SetCache = SetClientCache
 end
 
-return setmetatable(remote, remoteMetatable)
+if RunService:IsClient() then
+	local FireServer = ExtractMethods_Event.FireServer
+	local InvokeServer = ExtractMethods_Function.InvokeServer
+
+	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions")
+	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents")
+
+	local CacheManager = GetRemote("CacheManager")
+	local ContentProvider = game:GetService("ContentProvider")
+	
+	local function SendToServer(self, ...)
+		clientLastContact = tick()
+		return FireServer(self._Instance, ...)
+	end
+	remoteEvent.FireServer = SendToServer
+	remoteEvent.SendToServer = SendToServer
+	
+	local function ResetClientCache(self)
+		self._cache = self._cache and {} or not warn(self._Instance.Name, "does not have a cache") and {}
+	end
+	remoteFunction.ResetClientCache = ResetClientCache
+	remoteFunction.ResetCache = ResetClientCache
+
+	-- CallServer helper function
+	local function Cache(cache, cacheDuration, ...)
+		clientLastContact = tick()
+		cache.Expires = time() + cacheDuration
+		cache.Data = {...}
+		return ...
+	end
+	
+	local function WaitForResponse(...)
+		clientLastContact = tick()
+		return ...
+	end
+
+	local function CallServer(self, ...)
+		local cacheDuration = self._cacheDuration
+
+		if not cacheDuration then
+			return WaitForResponse(InvokeServer(self._Instance, ...))
+		else
+			local cache
+
+			if self._cacheByValue then
+				local cacheName = ({...})[1]
+				cache = self._cache[cacheName]
+				if not cache then
+					cache = {}
+					self._cache[cacheName] = cache
+					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
+				end
+			else
+				cache = self._cache
+				if not cache then
+					cache = {}
+					self._cache = cache
+					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
+				end
+			end
+
+			return time() >= cache.Expires and Cache(cache, cacheDuration, InvokeServer(self._Instance, ...)) or unpack(cache.Data)
+		end
+	end
+	remoteFunction.CallServer = CallServer
+	remoteFunction.ServerCall = CallServer
+	remoteFunction.InvokeServer = CallServer
+	remoteFunction.ServerInvoke = CallServer
+
+	CacheManager.OnClientEvent = function(Name, key, value)
+		local remoteFunction = GetRemote(Name, true)
+		remoteFunction[key] = value
+
+		if key == "_cacheByValue" then
+			remoteFunction._cache = {}
+		end
+	end
+
+	spawn(function() -- Open a new thread
+		repeat until wait() and ContentProvider.RequestQueueSize == 0
+		SendToServer(CacheManager)
+		while true do -- Ugh
+			local newTick = tick()
+			wait(1 - newTick + clientLastContact)
+			if newTick - clientLastContact > .9 then -- Let server know we're still here!
+				SendToServer(CacheManager)
+			end
+		end
+	end)
+end
+
+Destroy(ExtractMethods_Event)
+Destroy(ExtractMethods_Function)
+
+return RemoteManager
