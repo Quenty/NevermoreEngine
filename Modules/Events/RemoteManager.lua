@@ -98,13 +98,7 @@ function remoteEvent:__newindex(i, v)
 end
 
 function remoteFunction:__index(i)
-	if i == "OnServerInvoke" then
-		return self._OnServerInvoke
-	elseif i == "OnClientInvoke" then
-		return self._OnClientInvoke
-	elseif i == "_cacheDuration" or i == "_cacheByValue" then
-		return false
-	end
+--	if i == "_cacheDuration" or i == "_cacheByValue" then return false end
 	return rawget(remoteFunction, i) or self._Instance[i]
 end
 
@@ -144,20 +138,6 @@ local functionStorage, eventStorage, MetatableWrap do
 	function OnEvent:wait()
 		self._Instance[self._Event]:wait()
 	end
-
-	-- OnInvoke Object
-	local OnInvoke = {}
-
-	OnInvoke.__index = OnInvoke
-
-	function OnInvoke:connect(func)
-		local _Invoke = self._Invoke
-		self._Instance[_Invoke] = _Invoke == "OnServerInvoke" and ServerRefresh(func) or ClientRefresh(func)
-	end
-
-	function OnInvoke:disconnect()
-		self._Instance[self._Invoke] = nil
-	end
 	
 	function MetatableWrap(instance, bool, Storage)
 		--- Gives a metatable to instance, and puts instance in Storage
@@ -178,8 +158,6 @@ local functionStorage, eventStorage, MetatableWrap do
 					_cacheDuration = false;
 					_cacheByValue = false;
 					_cache = false;
-					_OnServerInvoke = setmetatable({_Connections = {}; _Instance = instance; _Invoke = "OnServerInvoke"}, OnInvoke);
-					_OnClientInvoke = setmetatable({_Connections = {}; _Instance = instance; _Invoke = "OnClientInvoke"}, OnInvoke);
 				}, remoteFunction) or setmetatable({
 					_Instance = instance;
 					_OnServerEvent = setmetatable({_Connections = {}; _Instance = instance; _Event = "OnServerEvent"}, OnEvent);
@@ -476,14 +454,14 @@ if RunService:IsClient() then
 	remoteFunction.InvokeServer = CallServer
 	remoteFunction.ServerInvoke = CallServer
 
-	CacheManager.OnClientEvent = function(Name, key, value)
+	CacheManager.OnClientEvent:connect(function(Name, key, value)
 		local remoteFunction = GetRemote(Name, true)
 		remoteFunction[key] = value
 
 		if key == "_cacheByValue" then
 			remoteFunction._cache = {}
 		end
-	end
+	end)
 
 	spawn(function() -- Open a new thread
 		repeat until wait() and ContentProvider.RequestQueueSize == 0
