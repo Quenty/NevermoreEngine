@@ -109,7 +109,6 @@ qSystems\EasyConfiguration.lua
 qSystems\EnumInterpreter.lua
 qSystems\LightingManager.lua
 qSystems\OverriddenConfiguration.lua
-qSystems\qPlayer.lua
 qSystems\qSystems.lua
 qSystems\SignaledList.lua
 qSystems\Type.lua
