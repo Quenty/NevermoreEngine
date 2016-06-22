@@ -2,8 +2,8 @@
 
 local lib = setmetatable({}, {__index = math})
 
-local ceil = ceil
-local floor = floor
+local ceil = math.ceil
+local floor = math.floor
 local unpack = unpack or table.unpack
 local abs = math.abs
 
