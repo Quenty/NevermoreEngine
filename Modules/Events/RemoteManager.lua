@@ -172,43 +172,133 @@ local functionStorage, eventStorage, MetatableWrap do
 	end
 end
 
--- Get Helper
-local function GetRemote(name, bool)
-	--- Gets a Remote if it exists, otherwise errors
-	-- @param string name - the name of the function
-	-- @param boolean bool - true for function, false for Event
-
-	local Storage = bool and functionStorage or eventStorage
-
-	assert(type(name) == "string", "[RemoteManager] Remote retrieval failed: Name must be a string")
-	assert(FindFirstChild(Storage, name), "[RemoteManager] " .. name .. " not found, create it using CreateFunction/CreateEvent.")
-
-	return MetatableWrap(Storage[name], bool, Storage)
-end
-
--- Universal Methods
-local function GetFunction(name1, name2)
-	--- Gets a function if it exists, otherwise errors
-	-- @param string name - the name of the function.
-
-	return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1, true)
-end
-RemoteManager.GetFunction = GetFunction
-RemoteManager.GetRemoteFunction = GetFunction
-
-local function GetEvent(name1, name2)
-	--- Gets an event if it exists, otherwise errors
-	-- @param string name - the name of the event.
-
-	return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1)
-end
-RemoteManager.GetEvent = GetEvent
-RemoteManager.GetRemoteEvent = GetEvent
-
 -- Get storage or create if nonexistent
 local ResourceFolder = FindFirstChild(ReplicatedStorage, "NevermoreResources")
 local ExtractMethods_Event = newInstance("RemoteEvent")
 local ExtractMethods_Function = newInstance("RemoteFunction")
+
+if RunService:IsClient() then
+
+	local function GetRemote(name, bool)
+		--- Gets a Remote if it exists, otherwise errors
+		-- @param string name - the name of the function
+		-- @param boolean bool - true for function, false for Event
+
+		local Storage = bool and functionStorage or eventStorage
+
+		assert(type(name) == "string", "[RemoteManager] Remote retrieval failed: Name must be a string")
+		assert(FindFirstChild(Storage, name), "[RemoteManager] " .. name .. " not found, create it using CreateFunction/CreateEvent.")
+
+		return MetatableWrap(Storage[name], bool, Storage)
+	end
+
+	local function GetFunction(name1, name2)
+		--- Gets a function if it exists, otherwise errors
+		-- @param string name - the name of the function.
+
+		return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1, true)
+	end
+	RemoteManager.GetFunction = GetFunction
+	RemoteManager.GetRemoteFunction = GetFunction
+
+	local function GetEvent(name1, name2)
+		--- Gets an event if it exists, otherwise errors
+		-- @param string name - the name of the event.
+
+		return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1)
+	end
+	RemoteManager.GetEvent = GetEvent
+	RemoteManager.GetRemoteEvent = GetEvent
+
+	local FireServer = ExtractMethods_Event.FireServer
+	local InvokeServer = ExtractMethods_Function.InvokeServer
+
+	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions")
+	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents")
+
+	local CacheManager = GetRemote("CacheManager")
+	local ContentProvider = game:GetService("ContentProvider")
+	
+	local function SendToServer(self, ...)
+		clientLastContact = tick()
+		return FireServer(self._Instance, ...)
+	end
+	remoteEvent.FireServer = SendToServer
+	remoteEvent.SendToServer = SendToServer
+	
+	local function ResetClientCache(self)
+		self._cache = self._cache and {} or not warn(self._Instance.Name, "does not have a cache") and {}
+	end
+	remoteFunction.ResetClientCache = ResetClientCache
+	remoteFunction.ResetCache = ResetClientCache
+
+	-- CallServer helper function
+	local function Cache(cache, cacheDuration, ...)
+		clientLastContact = tick()
+		cache.Expires = time() + cacheDuration
+		cache.Data = {...}
+		return ...
+	end
+	
+	local function WaitForResponse(...)
+		clientLastContact = tick()
+		return ...
+	end
+
+	local function CallServer(self, ...)
+		local cacheDuration = self._cacheDuration
+
+		if not cacheDuration then
+			return WaitForResponse(InvokeServer(self._Instance, ...))
+		else
+			local cache
+
+			if self._cacheByValue then
+				local cacheName = ({...})[1]
+				cache = self._cache[cacheName]
+				if not cache then
+					cache = {}
+					self._cache[cacheName] = cache
+					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
+				end
+			else
+				cache = self._cache
+				if not cache then
+					cache = {}
+					self._cache = cache
+					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
+				end
+			end
+
+			return time() >= cache.Expires and Cache(cache, cacheDuration, InvokeServer(self._Instance, ...)) or unpack(cache.Data)
+		end
+	end
+	remoteFunction.CallServer = CallServer
+	remoteFunction.ServerCall = CallServer
+	remoteFunction.InvokeServer = CallServer
+	remoteFunction.ServerInvoke = CallServer
+
+	CacheManager.OnClientEvent:connect(function(Name, key, value)
+		local remoteFunction = GetRemote(Name, true)
+		remoteFunction[key] = value
+
+		if key == "_cacheByValue" then
+			remoteFunction._cache = {}
+		end
+	end)
+
+	spawn(function() -- Open a new thread
+		repeat until wait() and ContentProvider.RequestQueueSize == 0
+		SendToServer(CacheManager)
+		while true do -- Ugh
+			local newTick = tick()
+			wait(1 - newTick + clientLastContact)
+			if newTick - clientLastContact > .9 then -- Let server know we're still here!
+				SendToServer(CacheManager)
+			end
+		end
+	end)
+end
 
 if RunService:IsServer() then
 	
@@ -387,97 +477,6 @@ if RunService:IsServer() then
 	end
 	remoteFunction.SetClientCache = SetClientCache
 	remoteFunction.SetCache = SetClientCache
-end
-
-if RunService:IsClient() then
-	local FireServer = ExtractMethods_Event.FireServer
-	local InvokeServer = ExtractMethods_Function.InvokeServer
-
-	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions")
-	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents")
-
-	local CacheManager = GetRemote("CacheManager")
-	local ContentProvider = game:GetService("ContentProvider")
-	
-	local function SendToServer(self, ...)
-		clientLastContact = tick()
-		return FireServer(self._Instance, ...)
-	end
-	remoteEvent.FireServer = SendToServer
-	remoteEvent.SendToServer = SendToServer
-	
-	local function ResetClientCache(self)
-		self._cache = self._cache and {} or not warn(self._Instance.Name, "does not have a cache") and {}
-	end
-	remoteFunction.ResetClientCache = ResetClientCache
-	remoteFunction.ResetCache = ResetClientCache
-
-	-- CallServer helper function
-	local function Cache(cache, cacheDuration, ...)
-		clientLastContact = tick()
-		cache.Expires = time() + cacheDuration
-		cache.Data = {...}
-		return ...
-	end
-	
-	local function WaitForResponse(...)
-		clientLastContact = tick()
-		return ...
-	end
-
-	local function CallServer(self, ...)
-		local cacheDuration = self._cacheDuration
-
-		if not cacheDuration then
-			return WaitForResponse(InvokeServer(self._Instance, ...))
-		else
-			local cache
-
-			if self._cacheByValue then
-				local cacheName = ({...})[1]
-				cache = self._cache[cacheName]
-				if not cache then
-					cache = {}
-					self._cache[cacheName] = cache
-					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
-				end
-			else
-				cache = self._cache
-				if not cache then
-					cache = {}
-					self._cache = cache
-					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
-				end
-			end
-
-			return time() >= cache.Expires and Cache(cache, cacheDuration, InvokeServer(self._Instance, ...)) or unpack(cache.Data)
-		end
-	end
-	remoteFunction.CallServer = CallServer
-	remoteFunction.ServerCall = CallServer
-	remoteFunction.InvokeServer = CallServer
-	remoteFunction.ServerInvoke = CallServer
-
-	CacheManager.OnClientEvent:connect(function(Name, key, value)
-		local remoteFunction = GetRemote(Name, true)
-		remoteFunction[key] = value
-
-		if key == "_cacheByValue" then
-			remoteFunction._cache = {}
-		end
-	end)
-
-	spawn(function() -- Open a new thread
-		repeat until wait() and ContentProvider.RequestQueueSize == 0
-		SendToServer(CacheManager)
-		while true do -- Ugh
-			local newTick = tick()
-			wait(1 - newTick + clientLastContact)
-			if newTick - clientLastContact > .9 then -- Let server know we're still here!
-				SendToServer(CacheManager)
-			end
-		end
-	end)
 end
 
 Destroy(ExtractMethods_Event)
