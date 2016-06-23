@@ -1,84 +1,485 @@
--- Simplifies module loading for the purpose of creating a unified server-client codebase
--- @author Quenty
+-- Table Wrapper for handling client/server networking
 -- @author Narrev
+-- @original https://github.com/Vorlias/ROBLOX-ModRemote
 
-local DEBUG_MODE = false -- Helps identify which libraries fail to load
+-- To do: expand to support connection management by index or value
 
+-- Configurable
+local CLIENT_CACHE_TIME = 5
+
+-- Services
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-assert(script:IsA("ModuleScript"), "Error: NevermoreEngine must be a ModuleScript")
-assert(script.Name == "NevermoreEngine", "Error: NevermoreEngine must be named \"NevermoreEngine\"")
-assert(script.Parent == ReplicatedStorage, "Error: NevermoreEngine must be parented to ReplicatedStorage")
+-- Module
+local RemoteManager = {}
+local remoteEvent = {}
+local remoteFunction = {}
+local RemoteEvents = {}
+local RemoteFunctions = {}
 
-local LibraryCache = {} do -- Assemble Library Cache
-	local Repository, ResourceFolder, ReplicationFolder
+-- Server Only
+local LastContact = {}
+local Blacklist = {}
 
-	local function AssembleCache(Instance)
-		local Children = Instance:GetChildren()
-		for a = 1, #Children do
-			local Child = Children[a]
-			local Name = Child.Name
-			AssembleCache(Child)
+-- Client Only
+local clientLastContact = 0 
+
+-- Helper functions
+local Load = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local Make = Load("Make")
+local CallOnChildren = Load("CallOnChildren")
+
+-- Localize frequently called functions
+local time = os.time
+local tick = tick
+local next = next
+local unpack = unpack
+local newInstance = Instance.new
+local connect = script.ChildAdded.connect
+local _connection = connect(script.ChildAdded, function() end)
+local disconnect = _connection.disconnect
+disconnect(_connection)
+
+local FindFirstChild = script.FindFirstChild
+local Destroy = script.Destroy
+
+-- Connection Wrappers
+local function ClientRefresh(func)
+	return function(...)
+		clientLastContact = tick()
+		return func(...)
+	end
+end
+
+local function ServerRefresh(func)
+	return function(player, ...)
+		local playerName = player.Name
+		if LastContact[playerName] then
+			local timeDifference = tick() - LastContact[playerName] -- > 2
+			if timeDifference > 2 then
+				print(playerName, "is laggy. Blocking data")
+				Blacklist[playerName] = time()
+			end
 			
-			if Child:IsA("ModuleScript") then
-				assert(not LibraryCache[Name], "Error: Duplicate name of \"" .. Name .. "\" already exists")
-				LibraryCache[Name] = Child
-				if ReplicationFolder then
-					Child.Parent, Child.Archivable = string.find(string.lower(Name), "server") and Repository or ReplicationFolder
+			if timeDifference > 4 then
+				print(playerName, "is getting booted from the server")
+				player:Kick("You have lost connection to the game")
+			end	
+		end
+		LastContact[playerName] = tick()
+		if not Blacklist[playerName] or Blacklist[playerName] and time() - Blacklist[playerName] > 2 then
+			return func(player, ...)
+		else
+			print("Blocked data from", playerName)
+		end
+	end
+end
+
+-- Metamethods
+function remoteEvent:__index(i)
+	if i == "OnServerEvent" then
+		return self._OnServerEvent
+	elseif i == "OnClientEvent" then
+		return self._OnClientEvent
+	end
+	return rawget(remoteEvent, i) or self._Instance[i]
+end
+
+function remoteEvent:__newindex(i, v)
+	if i == "OnServerEvent" then
+		self._OnServerEvent:connect(v)
+	elseif i == "OnClientEvent" then
+		self._OnClientEvent:connect(v)
+	else
+		self._Instance[i] = v
+	end
+end
+
+function remoteFunction:__index(i)
+--	if i == "_cacheDuration" or i == "_cacheByValue" then return false end
+	return rawget(remoteFunction, i) or self._Instance[i]
+end
+
+function remoteFunction:__newindex(i, v)
+	if i == "OnServerInvoke" then
+		self._Instance.OnServerInvoke = ServerRefresh(v)
+	elseif i == "OnClientInvoke" then
+		self._Instance.OnClientInvoke = ClientRefresh(v)
+	else
+		self._Instance[i] = v
+	end
+end
+
+-- MetatableWrap function
+local functionStorage, eventStorage, MetatableWrap do
+	
+	-- OnEvent Object
+	local OnEvent = {}
+
+	OnEvent.__index = OnEvent
+
+	function OnEvent:connect(func) -- expand to support managing connections by index or value
+		local connections = self._Connections
+		local _Event = self._Event
+		local connection = connect(self._Instance[_Event], _Event == "OnServerEvent" and ServerRefresh(func) or ClientRefresh(func))
+		connections[#connections + 1] = connection
+		return connection
+	end
+
+	function OnEvent:disconnect() -- expand to support managing connections by index or value
+		local connections = self._Connections
+		for a = 1, #connections do
+			disconnect(connections[a])
+		end
+	end
+
+	function OnEvent:wait()
+		self._Instance[self._Event]:wait()
+	end
+	
+	function MetatableWrap(instance, bool, Storage)
+		--- Gives a metatable to instance, and puts instance in Storage
+		-- @param Instance instance the instance to give the metatable to
+		-- @param bool true for function, false for Event
+		--	@default false
+		-- @param RobloxObject Storage The parent the instance should be parented to
+		--	@default functionStorage or eventStorage
+
+		local remoteTable = bool and RemoteFunctions or RemoteEvents
+		instance.Parent = Storage
+		local instanceName = instance.Name
+		local WrappedRemote = remoteTable[instanceName]
+
+		if not WrappedRemote then
+			local RemoteWrapper = bool and setmetatable({
+					_Instance = instance;
+					_cacheDuration = false;
+					_cacheByValue = false;
+					_cache = false;
+				}, remoteFunction) or setmetatable({
+					_Instance = instance;
+					_OnServerEvent = setmetatable({_Connections = {}; _Instance = instance; _Event = "OnServerEvent"}, OnEvent);
+					_OnClientEvent = setmetatable({_Connections = {}; _Instance = instance; _Event = "OnClientEvent"}, OnEvent);
+				}, remoteEvent)
+
+			remoteTable[instanceName] = RemoteWrapper
+			return RemoteWrapper
+		else
+			return WrappedRemote
+		end
+	end
+end
+
+-- Get storage or create if nonexistent
+local ResourceFolder = FindFirstChild(ReplicatedStorage, "NevermoreResources")
+local ExtractMethods_Event = newInstance("RemoteEvent")
+local ExtractMethods_Function = newInstance("RemoteFunction")
+
+if RunService:IsClient() then
+
+	local function GetRemote(name, bool)
+		--- Gets a Remote if it exists, otherwise errors
+		-- @param string name - the name of the function
+		-- @param boolean bool - true for function, false for Event
+
+		local Storage = bool and functionStorage or eventStorage
+
+		assert(type(name) == "string", "[RemoteManager] Remote retrieval failed: Name must be a string")
+		assert(FindFirstChild(Storage, name), "[RemoteManager] " .. name .. " not found, create it using CreateFunction/CreateEvent.")
+
+		return MetatableWrap(Storage[name], bool, Storage)
+	end
+
+	local function GetFunction(name1, name2)
+		--- Gets a function if it exists, otherwise errors
+		-- @param string name - the name of the function.
+
+		return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1, true)
+	end
+	RemoteManager.GetFunction = GetFunction
+	RemoteManager.GetRemoteFunction = GetFunction
+
+	local function GetEvent(name1, name2)
+		--- Gets an event if it exists, otherwise errors
+		-- @param string name - the name of the event.
+
+		return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1)
+	end
+	RemoteManager.GetEvent = GetEvent
+	RemoteManager.GetRemoteEvent = GetEvent
+
+	local FireServer = ExtractMethods_Event.FireServer
+	local InvokeServer = ExtractMethods_Function.InvokeServer
+
+	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions")
+	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents")
+
+	local CacheManager = GetRemote("CacheManager")
+	local ContentProvider = game:GetService("ContentProvider")
+	
+	local function SendToServer(self, ...)
+		clientLastContact = tick()
+		return FireServer(self._Instance, ...)
+	end
+	remoteEvent.FireServer = SendToServer
+	remoteEvent.SendToServer = SendToServer
+	
+	local function ResetClientCache(self)
+		self._cache = self._cache and {} or not warn(self._Instance.Name, "does not have a cache") and {}
+	end
+	remoteFunction.ResetClientCache = ResetClientCache
+	remoteFunction.ResetCache = ResetClientCache
+
+	-- CallServer helper function
+	local function Cache(cache, cacheDuration, ...)
+		clientLastContact = tick()
+		cache.Expires = time() + cacheDuration
+		cache.Data = {...}
+		return ...
+	end
+	
+	local function WaitForResponse(...)
+		clientLastContact = tick()
+		return ...
+	end
+
+	local function CallServer(self, ...)
+		local cacheDuration = self._cacheDuration
+
+		if not cacheDuration then
+			return WaitForResponse(InvokeServer(self._Instance, ...))
+		else
+			local cache
+
+			if self._cacheByValue then
+				local cacheName = ({...})[1]
+				cache = self._cache[cacheName]
+				if not cache then
+					cache = {}
+					self._cache[cacheName] = cache
+					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
 				end
-			elseif ReplicationFolder then
-				Child:Destroy()
+			else
+				cache = self._cache
+				if not cache then
+					cache = {}
+					self._cache = cache
+					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
+				end
+			end
+
+			return time() >= cache.Expires and Cache(cache, cacheDuration, InvokeServer(self._Instance, ...)) or unpack(cache.Data)
+		end
+	end
+	remoteFunction.CallServer = CallServer
+	remoteFunction.ServerCall = CallServer
+	remoteFunction.InvokeServer = CallServer
+	remoteFunction.ServerInvoke = CallServer
+
+	CacheManager.OnClientEvent:connect(function(Name, key, value)
+		local remoteFunction = GetRemote(Name, true)
+		remoteFunction[key] = value
+
+		if key == "_cacheByValue" then
+			remoteFunction._cache = {}
+		end
+	end)
+
+	spawn(function() -- Open a new thread
+		repeat until wait() and ContentProvider.RequestQueueSize == 0
+		SendToServer(CacheManager)
+		while true do -- Ugh
+			local newTick = tick()
+			wait(1 - newTick + clientLastContact)
+			if newTick - clientLastContact > .9 then -- Let server know we're still here!
+				SendToServer(CacheManager)
 			end
 		end
+	end)
+end
+
+if RunService:IsServer() then
+	
+	local FireClient = ExtractMethods_Event.FireClient
+	local FireAllClients = ExtractMethods_Event.FireAllClients
+	local InvokeClient = ExtractMethods_Function.InvokeClient
+
+	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions") or Make("Folder" , {
+		Parent	= ResourceFolder;
+		Name	= "RemoteFunctions";
+	})
+
+	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents") or Make("Folder", {
+		Parent	= ResourceFolder;
+		Name	= "RemoteEvents";
+	})
+
+	-- Helper functions
+	local function CreateRemote(name, bool)
+		--- Creates RemoteEvent/Function with name
+		-- @param bool true for function, false for Event
+
+		local Storage = bool and functionStorage or eventStorage
+		local instance = FindFirstChild(Storage, name) or newInstance(bool and "RemoteFunction" or "RemoteEvent")
+		instance.Name = name
+		
+		return MetatableWrap(instance, bool, Storage)
 	end
 
-	if RunService:IsServer() then
-		local function CreateFolder(CheckHereFirst, Name)
-			local Instance = CheckHereFirst:FindFirstChild(Name) or Instance.new("Folder", ResourceFolder or ReplicatedStorage)
-			Instance.Name, Instance.Archivable = Name
-			return Instance
+	local function Register(child)
+		local bool = child:IsA("RemoteFunction")
+		MetatableWrap(child, bool, bool and functionStorage or eventStorage)
+	end
+
+	-- RemoteManager Methods
+	function RemoteManager:RegisterChildren(instance)
+		--- Registers the Children inside of an instance
+		-- @param Instance instance the object with Remotes in
+		--	@default the script this was imported in to
+		
+		CallOnChildren(instance or ResourceFolder or ReplicatedStorage, Register)
+	end
+	
+	local function CreateFunction(name1, name2)
+		--- Creates a RemoteFunction
+		-- @param string name - the name of the function.
+
+		return CreateRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1, true)
+	end
+	RemoteManager.CreateFunction = CreateFunction
+	RemoteManager.CreateRemoteFunction = CreateFunction
+	RemoteManager.GetFunction = CreateFunction
+	RemoteManager.GetRemoteFunction = CreateFunction
+
+	local function CreateEvent(name1, name2)
+		--- Creates an RemoteEvent 
+		-- @param string name - the name of the event.
+
+		return CreateRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1)
+	end
+	RemoteManager.CreateEvent = CreateEvent
+	RemoteManager.CreateRemoteEvent = CreateEvent
+	RemoteManager.GetEvent = CreateEvent
+	RemoteManager.GetRemoteEvent = CreateEvent
+
+	-- RemoteEvent Object Methods
+	local function SendToPlayer(self, player, ...)
+		FireClient(self._Instance, player, ...)
+	end
+	remoteEvent.FireClient = SendToPlayer
+	remoteEvent.FirePlayer = SendToPlayer
+	remoteEvent.SendToPlayer = SendToPlayer
+	remoteEvent.SendToClient = SendToPlayer
+
+	local function SendToPlayers(self, playerList, ...)
+		for a = 1, #playerList do
+			FireClient(self._Instance, playerList[a], ...)
+		end
+	end
+	remoteEvent.FireClients = SendToPlayers
+	remoteEvent.FirePlayers = SendToPlayers
+	remoteEvent.SendToPlayers = SendToPlayers
+	remoteEvent.SendToClients = SendToPlayers
+
+	local function SendToAllPlayers(self, ...)
+		FireAllClients(self._Instance, ...)
+	end
+	remoteEvent.FireAllClients = SendToAllPlayers
+	remoteEvent.FireAllPlayers = SendToAllPlayers
+	remoteEvent.SendAllPlayers = SendToAllPlayers
+	remoteEvent.SendAllClients = SendToAllPlayers
+	remoteEvent.SendToAllPlayers = SendToAllPlayers
+	remoteEvent.SendToAllClients = SendToAllPlayers
+
+	-- RemoteFunction Object Methods
+	local function ClientCallPack(player, playerName, successful, ...)
+		return successful and ... or warn("[RemoteManager] CallPlayer - Failed to recieve response from", playerName, "Error Message:", ...)
+	end
+
+	local function ClientCallHelper(playerName, instance, player, ...)
+		return InvokeClient(instance, player, ...)
+	end
+
+	local function ClientCall(self, player, ...)
+		local playerName = player.Name
+		return ClientCallPack(player, playerName, pcall(ClientCallHelper, playerName, self._Instance, player, ...))
+	end
+	remoteFunction.CallPlayer = ClientCall
+	remoteFunction.CallClient = ClientCall
+	remoteFunction.InvokeClient = ClientCall
+	remoteFunction.InvokePlayer = ClientCall
+
+	local function DestroyInstance(self)
+		self = Destroy(self._Instance)
+	end
+	remoteEvent.Destroy = DestroyInstance
+	remoteFunction.Destroy = DestroyInstance
+
+	local CacheManager = CreateRemote("CacheManager")
+	CacheManager.OnServerEvent = function(player) LastContact[player.Name] = tick() end
+
+	local function newPlayerAdded(player)
+		local playerName = player.Name
+		local startCount = time()
+
+		for FunctionName, RemoteFunction in next, RemoteFunctions do
+			if RemoteFunction._cacheDuration then
+				FireClient(CacheManager._Instance, player, FunctionName, "_cacheDuration", RemoteFunction._cacheDuration)
+			end
+			if RemoteFunction._cacheByValue then
+				FireClient(CacheManager._Instance, player, FunctionName, "_cacheByValue", RemoteFunction._cacheByValue)
+			end
 		end
 
-		Repository = CreateFolder(game:GetService("ServerScriptService"), "Nevermore")
-		ResourceFolder = CreateFolder(ReplicatedStorage, "NevermoreResources")
-		ReplicationFolder = not RunService:IsStudio() and CreateFolder(ResourceFolder, "Modules")
-	else
-		Repository = ReplicatedStorage:WaitForChild("NevermoreResources"):WaitForChild("Modules")
+		local function gracePeriod()
+			return wait() and time() - startCount >= 20
+		end
+
+		repeat until LastContact[playerName] or gracePeriod()
+		LastContact[playerName] = tick()
 	end
-	AssembleCache(Repository)
-end
 
-local function LoadLibrary(LibraryName)
-	return type(LibraryName) == "string" and require(LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist.")) or error("Nevermore Loading Error: LibraryName must be a string")
-end
-
-if DEBUG_MODE then
-	local Load = LoadLibrary
-	local DebugID, RequestDepth = 0, 0
-
-	function LoadLibrary(LibraryName)
-		DebugID = DebugID + 1
-		local LocalDebugID = DebugID
-		print(string.rep("\t", RequestDepth), LocalDebugID, "Loading:", LibraryName)
-		RequestDepth = RequestDepth + 1
-		local Library = Load(LibraryName)
-		RequestDepth = RequestDepth - 1
-		print(string.rep("\t", RequestDepth), LocalDebugID, "Done loading:", LibraryName)
-		return Library
+	local function PlayerRemoving(player)
+		local playerName = player.Name
+		LastContact[playerName], Blacklist[playerName] = wait() and nil
 	end
+	
+	playerList = Players:GetPlayers()
+
+	connect(Players.PlayerAdded, newPlayerAdded)
+	connect(Players.PlayerRemoving, PlayerRemoving)
+
+	for a = 1, #playerList do
+		newPlayerAdded(playerList[a])
+	end
+
+	local function SetClientCache(self, seconds, _cacheByValue)
+		-- @param boolean _cacheByValue determines whether or not the function should be cached depending on the first value of the call
+		assert(type(not _cacheByValue) == "boolean", "[RemoteManger] SetClientCache's last parameter must be a boolean")
+		assert(type(seconds) == "number", "[RemoteManger] SetClientCache's first parameter must be a number")
+
+		local oldcache = self._cacheDuration
+		local old_cacheByValue = self._cacheByValue
+
+		local _cacheDuration = (seconds or CLIENT_CACHE_TIME) > 0 and seconds
+
+		if _cacheDuration ~= oldcache then
+			self._cacheDuration = _cacheDuration
+			FireAllClients(CacheManager._Instance, self._Instance.Name, "_cacheDuration", _cacheDuration)
+		end
+
+		if _cacheByValue ~= old_cacheByValue then
+			self._cacheByValue = _cacheByValue
+			FireAllClients(CacheManager._Instance, self._Instance.Name, "_cacheByValue", _cacheByValue)
+		end
+	end
+	remoteFunction.SetClientCache = SetClientCache
+	remoteFunction.SetCache = SetClientCache
 end
 
-local Nevermore = {}
+Destroy(ExtractMethods_Event)
+Destroy(ExtractMethods_Function)
 
-local RemoteManager
-function Nevermore:__index(i) -- Nevermore calls from RemoteManager if indexed
-	RemoteManager = RemoteManager or LoadLibrary("RemoteManager")
-	return RemoteManager[i]
-end
-
-function Nevermore:__call(LibraryName)
-	return LoadLibrary(LibraryName)
-end
-
-return setmetatable({LoadLibrary = LoadLibrary}, Nevermore)
+return RemoteManager
