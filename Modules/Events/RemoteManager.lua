@@ -260,6 +260,8 @@ if RunService:IsServer() then
 	end
 	RemoteManager.CreateFunction = CreateFunction
 	RemoteManager.CreateRemoteFunction = CreateFunction
+	RemoteManager.GetFunction = CreateFunction
+	RemoteManager.GetRemoteFunction = CreateFunction
 
 	local function CreateEvent(name1, name2)
 		--- Creates an RemoteEvent 
@@ -269,6 +271,8 @@ if RunService:IsServer() then
 	end
 	RemoteManager.CreateEvent = CreateEvent
 	RemoteManager.CreateRemoteEvent = CreateEvent
+	RemoteManager.GetEvent = CreateEvent
+	RemoteManager.GetRemoteEvent = CreateEvent
 
 	-- RemoteEvent Object Methods
 	local function SendToPlayer(self, player, ...)
