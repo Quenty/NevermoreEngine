@@ -12,7 +12,7 @@ assert(script.Name == "NevermoreEngine", "Error: NevermoreEngine must be named \
 assert(script.Parent == ReplicatedStorage, "Error: NevermoreEngine must be parented to ReplicatedStorage")
 
 local LibraryCache = {} do -- Assemble Library Cache
-	local Repository, ResourceFolder, ReplicationFolder
+	local ReplicationFolder, Repository
 
 	local function AssembleCache(Instance)
 		local Children = Instance:GetChildren()
@@ -34,15 +34,14 @@ local LibraryCache = {} do -- Assemble Library Cache
 	end
 
 	if RunService:IsServer() then
-		local function CreateFolder(CheckHereFirst, Name)
-			local Instance = CheckHereFirst:FindFirstChild(Name) or Instance.new("Folder", ResourceFolder or ReplicatedStorage)
+		local function CreateFolder(Parent, Name)
+			local Instance = Parent:FindFirstChild(Name) or Instance.new("Folder", Parent)
 			Instance.Name, Instance.Archivable = Name
 			return Instance
-		end
-
-		Repository = CreateFolder(game:GetService("ServerScriptService"), "Nevermore")
-		ResourceFolder = CreateFolder(ReplicatedStorage, "NevermoreResources")
+		end		
+		local ResourceFolder = CreateFolder(ReplicatedStorage, "NevermoreResources")
 		ReplicationFolder = not RunService:IsStudio() and CreateFolder(ResourceFolder, "Modules")
+		Repository = CreateFolder(game:GetService("ServerScriptService"), "Nevermore")
 	else
 		Repository = ReplicatedStorage:WaitForChild("NevermoreResources"):WaitForChild("Modules")
 	end
@@ -69,16 +68,15 @@ if DEBUG_MODE then
 	end
 end
 
-local Nevermore = {}
+local Nevermore = {LoadLibrary = LoadLibrary, Load = LoadLibrary}
 
-local RemoteManager
 function Nevermore:__index(i) -- Nevermore calls from RemoteManager if indexed
-	RemoteManager = RemoteManager or LoadLibrary("RemoteManager")
-	return RemoteManager[i]
+	self.__index = LoadLibrary("RemoteManager")
+	return self[i]
 end
 
 function Nevermore:__call(LibraryName)
 	return LoadLibrary(LibraryName)
 end
 
-return setmetatable({LoadLibrary = LoadLibrary}, Nevermore)
+return setmetatable(Nevermore, Nevermore)
