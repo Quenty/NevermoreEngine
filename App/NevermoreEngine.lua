@@ -7,9 +7,9 @@ local DEBUG_MODE = false -- Helps identify which libraries fail to load
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-assert(script:IsA("ModuleScript"), "Error: NevermoreEngine must be a ModuleScript")
-assert(script.Name == "NevermoreEngine", "Error: NevermoreEngine must be named \"NevermoreEngine\"")
-assert(script.Parent == ReplicatedStorage, "Error: NevermoreEngine must be parented to ReplicatedStorage")
+assert(script:IsA("ModuleScript"), "[NevermoreEngine] NevermoreEngine must be a ModuleScript")
+assert(script.Name == "NevermoreEngine", "[NevermoreEngine] NevermoreEngine must be named \"NevermoreEngine\"")
+assert(script.Parent == ReplicatedStorage, "[NevermoreEngine] NevermoreEngine must be parented to ReplicatedStorage")
 
 local LibraryCache = {} do -- Assemble Library Cache
 	local ReplicationFolder, Repository
@@ -22,7 +22,7 @@ local LibraryCache = {} do -- Assemble Library Cache
 			AssembleCache(Child)
 			
 			if Child:IsA("ModuleScript") then
-				assert(not LibraryCache[Name], "Error: Duplicate name of \"" .. Name .. "\" already exists")
+				assert(not LibraryCache[Name], "[NevermoreEngine] Duplicate Library with name of \"" .. Name .. "\"")
 				LibraryCache[Name] = Child
 				if ReplicationFolder then
 					Child.Parent, Child.Archivable = string.find(string.lower(Name), "server") and Repository or ReplicationFolder
@@ -49,7 +49,7 @@ local LibraryCache = {} do -- Assemble Library Cache
 end
 
 local function LoadLibrary(LibraryName)
-	return type(LibraryName) == "string" and require(LibraryCache[LibraryName] or error("Error: Library \"" .. LibraryName .. "\" does not exist.")) or error("Nevermore Loading Error: LibraryName must be a string")
+	return type(LibraryName) == "string" and require(LibraryCache[LibraryName] or error("[NevermoreEngine] Library \"" .. LibraryName .. "\" does not exist.")) or error("[NevermoreEngine] LibraryName must be a string")
 end
 
 if DEBUG_MODE then
