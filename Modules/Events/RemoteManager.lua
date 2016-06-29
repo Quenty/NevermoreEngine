@@ -267,6 +267,7 @@ if RunService:IsServer() then
 		--- Creates RemoteEvent/Function with name
 		-- @param bool true for function, false for Event
 
+		assert(type(name) == "string", "[RemoteManager] Remote creation failed: Name must be a string")
 		local Storage = bool and functionStorage or eventStorage
 		local instance = FindFirstChild(Storage, name) or newInstance(bool and "RemoteFunction" or "RemoteEvent")
 		instance.Name = name
@@ -279,8 +280,11 @@ if RunService:IsServer() then
 	RemoteManager.CreateRemoteEvent = GetEvent
 
 	local function Register(child)
-		local bool = child:IsA("RemoteFunction")
-		MetatableWrap(child, bool, bool and functionStorage or eventStorage)
+		if child:IsA("RemoteFunction") then
+			MetatableWrap(child, true, functionStorage)
+		elseif child:IsA("RemoteEvent") then
+			MetatableWrap(child, false, eventStorage)
+		end
 	end
 
 	-- RemoteManager Methods
@@ -289,7 +293,7 @@ if RunService:IsServer() then
 		-- @param Instance instance the Parent of Remote objects
 		--	@default the script this was imported in to
 		
-		CallOnChildren(instance or ResourceFolder or ReplicatedStorage, Register)
+		CallOnChildren(instance or ReplicatedStorage, Register)
 	end
 
 	-- RemoteEvent Object Methods
