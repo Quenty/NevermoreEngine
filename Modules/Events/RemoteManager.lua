@@ -13,7 +13,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Module
 local RemoteManager = {}
 local remoteEvent = {}
-local remoteFunction = {}
+local remoteFunction = {
+	_cacheDuration = false;
+	_cacheByValue = false;
+	_cache = false;
+}
 local RemoteEvents = {}
 local RemoteFunctions = {}
 
@@ -27,6 +31,7 @@ local clientLastContact = 0
 -- Helper functions
 local Load = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local Make = Load("Make")
+local qMath = Load("qMath")
 local CallOnChildren = Load("CallOnChildren")
 
 -- Localize frequently called functions
@@ -34,6 +39,9 @@ local time = os.time
 local tick = tick
 local next = next
 local unpack = unpack
+local select = select
+
+local ceil = qMath.ceil
 local newInstance = Instance.new
 local connect = script.ChildAdded.connect
 local _connection = connect(script.ChildAdded, function() end)
@@ -45,7 +53,8 @@ local Destroy = script.Destroy
 
 -- Connection Wrappers
 local function WaitForResponse(...)
-	print("Updating clientLastContact")
+	-- We wait for the Client function to finish
+	-- We do this because client functions could involve wait times, I guess
 	clientLastContact = tick()
 	return ...
 end
@@ -61,7 +70,7 @@ local function ServerRefresh(func)
 		local playerName = player.Name
 		if LastContact[playerName] then
 			local timeDifference = tick() - LastContact[playerName]
-			if timeDifference > 1.5 then
+			if timeDifference > 1.8 then
 				print("[RemoteManager]", playerName, "is laggy. Blocking data")
 				Blacklist[playerName] = time()
 			end
@@ -69,15 +78,14 @@ local function ServerRefresh(func)
 			if timeDifference > 3 then
 				print("[RemoteManager]", playerName, "is getting booted from the server")
 				player:Kick("You have lost connection to the game")
-			end	
+			end
 		end
-		print("Updating Last Contact")
 		LastContact[playerName] = tick()
 		local BlacklistTime = Blacklist[playerName]
 		if not BlacklistTime or BlacklistTime and time() - BlacklistTime > 2 then
 			return func(player, ...)
-		else
-			print("Blocked data from", playerName)
+		--else
+		--	print("Blocked data from", playerName)
 		end
 	end
 end
@@ -88,8 +96,11 @@ function remoteEvent:__index(i)
 		return self._OnServerEvent
 	elseif i == "OnClientEvent" then
 		return self._OnClientEvent
+	elseif type(remoteEvent[i]) ~= "nil" then
+		return remoteEvent[i]
+	else
+		return self._Instance[i]
 	end
-	return rawget(remoteEvent, i) or self._Instance[i]
 end
 
 function remoteEvent:__newindex(i, v)
@@ -97,14 +108,23 @@ function remoteEvent:__newindex(i, v)
 		self._OnServerEvent:connect(v)
 	elseif i == "OnClientEvent" then
 		self._OnClientEvent:connect(v)
+	elseif i == "Parent" then
+		error("You cannot modify the Parent property of a RemoteFunction that utilizes RemoteManager.")
 	else
+		if i == "Name" then
+			RemoteEvents[v] = RemoteEvents[self._Instance.Name]
+			RemoteEvents[self._Instance.Name] = nil
+		end
 		self._Instance[i] = v
 	end
 end
 
 function remoteFunction:__index(i)
---	if i == "_cacheDuration" or i == "_cacheByValue" then return false end
-	return rawget(remoteFunction, i) or self._Instance[i]
+	if type(remoteFunction[i]) ~= "nil" then
+		return remoteFunction[i]
+	else
+		return self._Instance[i]
+	end
 end
 
 function remoteFunction:__newindex(i, v)
@@ -112,13 +132,22 @@ function remoteFunction:__newindex(i, v)
 		self._Instance.OnServerInvoke = ServerRefresh(v)
 	elseif i == "OnClientInvoke" then
 		self._Instance.OnClientInvoke = ClientRefresh(v)
+	elseif i == "_cacheByValue" or i == "_cacheDuration" or i == "_cache" then
+		rawset(self, i, v)
+	elseif i == "Parent" then
+		error("You cannot modify the Parent property of a RemoteFunction that utilizes RemoteManager.")
 	else
+		if i == "Name" then
+			local instanceName = self._Instance.Name
+			RemoteFunctions[v] = RemoteFunctions[instanceName]
+			RemoteFunctions[instanceName] = nil
+		end
 		self._Instance[i] = v
 	end
 end
 
 -- MetatableWrap function
-local functionStorage, eventStorage, MetatableWrap do
+local MetatableWrap do
 	
 	-- OnEvent Object
 	local OnEvent = {}
@@ -160,9 +189,6 @@ local functionStorage, eventStorage, MetatableWrap do
 		if not WrappedRemote then
 			local RemoteWrapper = bool and setmetatable({
 					_Instance = instance;
-					_cacheDuration = false;
-					_cacheByValue = false;
-					_cache = false;
 				}, remoteFunction) or setmetatable({
 					_Instance = instance;
 					_OnServerEvent = setmetatable({_Connections = {}; _Instance = instance; _Event = "OnServerEvent"}, OnEvent);
@@ -181,6 +207,8 @@ local ResourceFolder = FindFirstChild(ReplicatedStorage, "NevermoreResources")
 local ExtractMethods_Event = newInstance("RemoteEvent")
 local ExtractMethods_Function = newInstance("RemoteFunction")
 
+local functionStorage, eventStorage
+
 local function GetRemote(name, bool)
 	--- Gets a Remote if it exists, otherwise errors
 	-- @param string name - the name of the function
@@ -194,32 +222,33 @@ local function GetRemote(name, bool)
 	return MetatableWrap(Storage[name], bool, Storage)
 end
 
-local function GetFunction(name1, name2)
+local function extract(...)
+	-- Returns first argument that isn't RemoteManager
+	local firstArgument = ...
+	return (firstArgument == RemoteManager or firstArgument == Load) and select(2, ...) or firstArgument
+end
+
+local function GetFunction(...)
 	--- Creates a RemoteFunction
 	-- @param string name - the name of the function.
-
-	return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1, true)
+	
+	return GetRemote(extract(...), true)
 end
 RemoteManager.GetFunction = GetFunction
 RemoteManager.GetRemoteFunction = GetFunction
 
-local function GetEvent(name1, name2)
+local function GetEvent(...)
 	--- Helper function that gets a RemoteEvent
 	-- Designed to function properly with either '.' or ':'
 	-- @ServerSide Creates new RemoteEvent if nonexistant
 	-- @param string name - the name of the event.
 
-	return GetRemote(type(name2) == "string" and name2 or type(name1) == "string" and name1)
+	return GetRemote(extract(...))
 end
 RemoteManager.GetEvent = GetEvent
 RemoteManager.GetRemoteEvent = GetEvent
 
 if RunService:IsServer() then
-	
-	local FireClient = ExtractMethods_Event.FireClient
-	local FireAllClients = ExtractMethods_Event.FireAllClients
-	local InvokeClient = ExtractMethods_Function.InvokeClient
-
 	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions") or Make("Folder" , {
 		Parent	= ResourceFolder;
 		Name	= "RemoteFunctions";
@@ -229,6 +258,10 @@ if RunService:IsServer() then
 		Parent	= ResourceFolder;
 		Name	= "RemoteEvents";
 	})
+
+	local FireClient = ExtractMethods_Event.FireClient
+	local FireAllClients = ExtractMethods_Event.FireAllClients
+	local InvokeClient = ExtractMethods_Function.InvokeClient
 
 	function GetRemote(name, bool)
 		--- Creates RemoteEvent/Function with name
@@ -253,7 +286,7 @@ if RunService:IsServer() then
 	-- RemoteManager Methods
 	function RemoteManager:RegisterChildren(instance)
 		--- Registers the Children inside of an instance
-		-- @param Instance instance the object with Remotes in
+		-- @param Instance instance the Parent of Remote objects
 		--	@default the script this was imported in to
 		
 		CallOnChildren(instance or ResourceFolder or ReplicatedStorage, Register)
@@ -269,6 +302,7 @@ if RunService:IsServer() then
 	remoteEvent.SendToClient = SendToPlayer
 
 	local function SendToPlayers(self, playerList, ...)
+		assert(type(playerList) == "table", "[RemoteManager] The first argument of SendToPlayers should be a table of players on Event " .. self._Instance.Name)
 		for a = 1, #playerList do
 			FireClient(self._Instance, playerList[a], ...)
 		end
@@ -291,7 +325,6 @@ if RunService:IsServer() then
 	-- RemoteFunction Object Methods
 	local function ClientCallPack(player, playerName, successful, ...)
 		if successful then
-			print("Updating Last Contact")
 			LastContact[playerName] = tick()
 			return ...
 		else
@@ -319,9 +352,8 @@ if RunService:IsServer() then
 	remoteFunction.Destroy = DestroyInstance
 
 	local CacheManager = GetRemote("CacheManager")
-	CacheManager.OnServerEvent = function(player)
-		--LastContact[player.Name] = tick()
-	end
+	CacheManager.OnServerEvent:connect(function() end)
+	local CacheInstance = CacheManager._Instance
 
 	local function newPlayerAdded(player)
 		local playerName = player.Name
@@ -329,10 +361,10 @@ if RunService:IsServer() then
 
 		for FunctionName, RemoteFunction in next, RemoteFunctions do
 			if RemoteFunction._cacheDuration then
-				FireClient(CacheManager._Instance, player, FunctionName, "_cacheDuration", RemoteFunction._cacheDuration)
+				FireClient(CacheInstance, player, FunctionName, "_cacheDuration", RemoteFunction._cacheDuration)
 			end
 			if RemoteFunction._cacheByValue then
-				FireClient(CacheManager._Instance, player, FunctionName, "_cacheByValue", RemoteFunction._cacheByValue)
+				FireClient(CacheInstance, player, FunctionName, "_cacheByValue", RemoteFunction._cacheByValue)
 			end
 		end
 
@@ -341,7 +373,6 @@ if RunService:IsServer() then
 		end
 
 		repeat until LastContact[playerName] or gracePeriod()
-		print("Updating Last Contact")
 		LastContact[playerName] = tick()
 	end
 
@@ -367,16 +398,16 @@ if RunService:IsServer() then
 		local oldcache = self._cacheDuration
 		local old_cacheByValue = self._cacheByValue
 
-		local _cacheDuration = (seconds or CLIENT_CACHE_TIME) > 0 and seconds
+		local _cacheDuration = (seconds or CLIENT_CACHE_TIME) > 0 and seconds or false
 
 		if _cacheDuration ~= oldcache then
 			self._cacheDuration = _cacheDuration
-			FireAllClients(CacheManager._Instance, self._Instance.Name, "_cacheDuration", _cacheDuration)
+			FireAllClients(CacheInstance, self._Instance.Name, "_cacheDuration", _cacheDuration)
 		end
 
 		if _cacheByValue ~= old_cacheByValue then
 			self._cacheByValue = _cacheByValue
-			FireAllClients(CacheManager._Instance, self._Instance.Name, "_cacheByValue", _cacheByValue)
+			FireAllClients(CacheInstance, self._Instance.Name, "_cacheByValue", _cacheByValue)
 		end
 	end
 	remoteFunction.SetClientCache = SetClientCache
@@ -384,9 +415,8 @@ if RunService:IsServer() then
 end
 
 if RunService:IsClient() then
-
-	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions") or error("[RemoteManager] NevermoreResources Function Storage not found")
-	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents") or error("[RemoteManager] NevermoreResources Event Storage not found")
+	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions")
+	eventStorage = FindFirstChild(ResourceFolder, "RemoteEvents")
 
 	local FireServer = ExtractMethods_Event.FireServer
 	local InvokeServer = ExtractMethods_Function.InvokeServer
@@ -395,7 +425,6 @@ if RunService:IsClient() then
 	local ContentProvider = game:GetService("ContentProvider")
 	
 	local function SendToServer(self, ...)
-		print("Updating clientLastContact")
 		clientLastContact = tick()
 		return FireServer(self._Instance, ...)
 	end
@@ -414,18 +443,11 @@ if RunService:IsClient() then
 		cache.Data = {...}
 		return ...
 	end
-	
-	local function WaitForResponse(...)
-		print("Updating clientLastContact")
-		clientLastContact = tick()
-		return ...
-	end
 
 	local function CallServer(self, ...)
 		local cacheDuration = self._cacheDuration
 
 		if not cacheDuration then
-			print("Updating clientLastContact")
 			clientLastContact = tick()
 			return InvokeServer(self._Instance, ...)
 		else
@@ -437,27 +459,21 @@ if RunService:IsClient() then
 				if not cache then
 					cache = {}
 					self._cache[cacheName] = cache
-					print("Updating clientLastContact")
-					clientLastContact = tick()
-					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
 				end
 			else
 				cache = self._cache
 				if not cache then
 					cache = {}
 					self._cache = cache
-					print("Updating clientLastContact")
-					clientLastContact = tick()
-					return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
 				end
 			end
 			
-			if time() >= cache.Expires then
-				print("Updating clientLastContact")
+			local cacheExpiration = cache.Expires
+			if cacheExpiration and time() < cacheExpiration then
+				return unpack(cache.Data)
+			else
 				clientLastContact = tick()
 				return Cache(cache, cacheDuration, InvokeServer(self._Instance, ...))
-			else
-				return unpack(cache.Data)
 			end
 		end
 	end
@@ -479,12 +495,11 @@ if RunService:IsClient() then
 		repeat until wait() and ContentProvider.RequestQueueSize == 0
 		SendToServer(CacheManager)
 		while true do -- Ugh
-			local newTick = tick()
-			print("Waiting", 1 - newTick + clientLastContact)
-			wait(1 - newTick + clientLastContact)
-			if newTick - clientLastContact > .99 then -- Let server know we're still here!
+			local newTick = tick()			
+			if newTick - clientLastContact > .9 then -- Let server know we're still here!
 				SendToServer(CacheManager)
 			end
+			wait(1 - newTick + clientLastContact)
 		end
 	end)
 end
