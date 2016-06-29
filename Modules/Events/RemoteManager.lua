@@ -32,6 +32,7 @@ local clientLastContact = 0
 local Load = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local Make = Load("Make")
 local qMath = Load("qMath")
+local WaitForChild = Load("WaitForChild")
 local CallOnChildren = Load("CallOnChildren")
 
 -- Localize frequently called functions
@@ -214,9 +215,9 @@ local function GetRemote(name, bool)
 	local Storage = bool and functionStorage or eventStorage
 
 	assert(type(name) == "string", "[RemoteManager] Remote retrieval failed: Name must be a string")
-	assert(FindFirstChild(Storage, name), "[RemoteManager] " .. name .. " not found, create it using CreateFunction/CreateEvent on the Server.")
+	local instance = WaitForChild(Storage, name)
 
-	return MetatableWrap(Storage[name], bool)
+	return MetatableWrap(instance, bool)
 end
 
 local function extract(...)
