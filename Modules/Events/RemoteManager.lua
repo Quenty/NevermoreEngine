@@ -284,9 +284,9 @@ if RunService:IsServer() then
 		assert(type(name) == "string", "[RemoteManager] Remote creation failed: Name must be a string")
 		local Storage = bool and functionStorage or eventStorage
 		local instance = FindFirstChild(Storage, name) or Make(bool and "RemoteFunction" or "RemoteEvent", {
-			Name = name
-			Parent = Storage
-			Archivable = false
+			Name = name;
+			Parent = Storage;
+			Archivable = false;
 		})
 
 		return MetatableWrap(instance, bool)
