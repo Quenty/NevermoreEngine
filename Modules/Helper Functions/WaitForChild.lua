@@ -11,18 +11,19 @@ local function WaitForChild(Parent, Name, TimeLimit)
 	assert(Parent, "Parent is nil")
 	assert(type(Name) == "string", "Name is not a string.")
 
-	local Child     = Parent:FindFirstChild(Name)
+	
 	local StartTime = tick()
-	local Warned    = false
-
+	local Warned
+	
+	local Child = Parent:FindFirstChild(Name)
 	while not Child do
 		wait()
 		Child = Parent:FindFirstChild(Name)
-		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
-			Warned = true
-				warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. traceback())
+		if StartTime + (TimeLimit or 5) <= tick() then
 			if TimeLimit then
 				return Parent:FindFirstChild(Name)
+			elseif not Warned then
+				Warned = not warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. traceback())
 			end
 		end
 	end
