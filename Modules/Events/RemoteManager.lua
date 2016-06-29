@@ -173,16 +173,13 @@ local MetatableWrap do
 		self._Instance[self._Event]:wait()
 	end
 	
-	function MetatableWrap(instance, bool, Storage)
+	function MetatableWrap(instance, bool)
 		--- Gives a metatable to instance, and puts instance in Storage
 		-- @param Instance instance the instance to give the metatable to
 		-- @param bool true for function, false for Event
 		--	@default false
-		-- @param RobloxObject Storage The parent the instance should be parented to
-		--	@default functionStorage or eventStorage
 
 		local remoteTable = bool and RemoteFunctions or RemoteEvents
-		instance.Parent, instance.Archivable = Storage
 		local instanceName = instance.Name
 		local WrappedRemote = remoteTable[instanceName]
 
@@ -219,7 +216,7 @@ local function GetRemote(name, bool)
 	assert(type(name) == "string", "[RemoteManager] Remote retrieval failed: Name must be a string")
 	assert(FindFirstChild(Storage, name), "[RemoteManager] " .. name .. " not found, create it using CreateFunction/CreateEvent on the Server.")
 
-	return MetatableWrap(Storage[name], bool, Storage)
+	return MetatableWrap(Storage[name], bool)
 end
 
 local function extract(...)
@@ -248,6 +245,22 @@ end
 RemoteManager.GetEvent = GetEvent
 RemoteManager.GetRemoteEvent = GetEvent
 
+local function Register(child)
+	if child:IsA("RemoteFunction") then
+		MetatableWrap(child, true)
+	elseif child:IsA("RemoteEvent") then
+		MetatableWrap(child, false)
+	end
+end
+
+function RemoteManager:RegisterChildren(instance)
+	--- Registers the Children inside of an instance
+	-- @param Instance instance the Parent of Remote objects
+	--	@default ReplicatedStorage
+	
+	CallOnChildren(instance or ReplicatedStorage, Register)
+end
+
 if RunService:IsServer() then
 	functionStorage = FindFirstChild(ResourceFolder, "RemoteFunctions") or Make("Folder" , {
 		Parent	= ResourceFolder;
@@ -269,32 +282,18 @@ if RunService:IsServer() then
 
 		assert(type(name) == "string", "[RemoteManager] Remote creation failed: Name must be a string")
 		local Storage = bool and functionStorage or eventStorage
-		local instance = FindFirstChild(Storage, name) or newInstance(bool and "RemoteFunction" or "RemoteEvent")
-		instance.Name = name
-		
-		return MetatableWrap(instance, bool, Storage)
+		local instance = FindFirstChild(Storage, name) or Make(bool and "RemoteFunction" or "RemoteEvent", {
+			Name = name
+			Parent = Storage
+			Archivable = false
+		})
+
+		return MetatableWrap(instance, bool)
 	end
 	RemoteManager.CreateFunction = GetFunction
 	RemoteManager.CreateRemoteFunction = GetFunction	
 	RemoteManager.CreateEvent = GetEvent
 	RemoteManager.CreateRemoteEvent = GetEvent
-
-	local function Register(child)
-		if child:IsA("RemoteFunction") then
-			MetatableWrap(child, true, functionStorage)
-		elseif child:IsA("RemoteEvent") then
-			MetatableWrap(child, false, eventStorage)
-		end
-	end
-
-	-- RemoteManager Methods
-	function RemoteManager:RegisterChildren(instance)
-		--- Registers the Children inside of an instance
-		-- @param Instance instance the Parent of Remote objects
-		--	@default the script this was imported in to
-		
-		CallOnChildren(instance or ReplicatedStorage, Register)
-	end
 
 	-- RemoteEvent Object Methods
 	local function SendToPlayer(self, player, ...)
