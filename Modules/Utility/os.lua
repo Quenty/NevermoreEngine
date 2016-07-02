@@ -50,15 +50,15 @@ local function date(formatString, unix)
 	-- Get days, month and year
 	local days	= floor(unix / 86400) + 719468
 	local wday	= (days + 3) % 7
-	local year	= floor((days >= 0 and days or days - 146096) / 146097)				-- 400 Year bracket
-	days		= (days - year * 146097)								-- Days into 400 year bracket [0, 146096]
+	local year	= floor((days >= 0 and days or days - 146096) / 146097) -- 400 Year bracket
+	days		= (days - year * 146097) -- Days into 400 year bracket [0, 146096]
 	local years	= floor((days - floor(days/1460) + floor(days/36524) - floor(days/146096))/365)	-- Years into 400 Year bracket[0, 399]
-	days		= days - (365*years + floor(years/4) - floor(years/100))				-- Days into year (March 1st is first day) [0, 365]
-	local month	= floor((5*days + 2)/153)							-- Month of year (March is month 0) [0, 11]
-	local yDay	= days										-- Hi readers :)
-	days		= days - floor((153*month + 2)/5) + 1						-- Days into month [1, 31]
-	month		= month + (month < 10 and 3 or -9)						-- Real life month [1, 12]
-	year		= years + year*400 + (month < 3 and 1 or 0)					-- Actual year (Shift 1st month from March to January)
+	days		= days - (365*years + floor(years/4) - floor(years/100)) -- Days into year with March 1st @0 [0, 365]
+	local month	= floor((5*days + 2)/153) -- Month with March @0 [0, 11]
+	local yDay	= days
+	days		= days - floor((153*month + 2)/5) + 1 -- Days into month [1, 31]
+	month		= month + (month < 10 and 3 or -9) -- Actual month [1, 12]
+	year		= years + year*400 + (month < 3 and 1 or 0) -- Actual Year
 
 	
 	if formatString == "*t" then -- Return a table if "*t" was used
@@ -66,7 +66,7 @@ local function date(formatString, unix)
 	end
 	
 	-- Necessary string tables
-	local dayNames		= {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+	local dayNames		= {[0] = "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 	local months		= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 	
 	-- Return formatted string
@@ -83,8 +83,8 @@ local function date(formatString, unix)
 		"%%_r", "%%_I:%%M:%%S %%p"),
 		"%%R",  "%%H:%%M"),
 		"%%_R", "%%_H:%%M"),
-		"%%a", sub(dayNames[wday + 1], 1, 3)),
-		"%%A", dayNames[wday + 1]),
+		"%%a", sub(dayNames[wday], 1, 3)),
+		"%%A", dayNames[wday]),
 		"%%b", sub(months[month], 1, 3)),
 		"%%B", months[month]),
 		"%%d", format("%02d", days)),
