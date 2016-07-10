@@ -52,17 +52,10 @@ disconnect(_connection)
 local FindFirstChild = script.FindFirstChild
 local Destroy = script.Destroy
 
--- Connection Wrappers
-local function WaitForResponse(...)
-	-- We wait for the Client function to finish
-	-- We do this because client functions could involve wait times, I guess
-	clientLastContact = tick()
-	return ...
-end
-
 local function ClientRefresh(func)
 	return function(...)
-		return WaitForResponse(func(...))
+		clientLastContact = tick()
+		return func(...)
 	end
 end
 
@@ -71,7 +64,7 @@ local function ServerRefresh(func)
 		local playerName = player.Name
 		if LastContact[playerName] then
 			local timeDifference = tick() - LastContact[playerName]
-			if timeDifference > 1.8 then
+			if timeDifference > 2.5 then
 				print("[RemoteManager]", playerName, "is laggy. Blocking data")
 				Blacklist[playerName] = time()
 			end
@@ -327,22 +320,17 @@ if RunService:IsServer() then
 	remoteEvent.SendToAllClients = SendToAllPlayers
 
 	-- RemoteFunction Object Methods
-	local function ClientCallPack(player, playerName, successful, ...)
+	local function ClientCallPack(player, successful, ...)
 		if successful then
-			LastContact[playerName] = tick()
+			LastContact[player.Name] = tick()
 			return ...
 		else
-			return warn("[RemoteManager] InvokeClient - Failed to recieve response from", playerName, "Error Message:", ...)
+			return warn("[RemoteManager] InvokeClient - Failed to recieve response from", player.Name, "Error Message:", ...)
 		end
 	end
 
-	local function ClientCallHelper(playerName, instance, player, ...)
-		return InvokeClient(instance, player, ...)
-	end
-
 	local function ClientCall(self, player, ...)
-		local playerName = player.Name
-		return ClientCallPack(player, playerName, pcall(ClientCallHelper, playerName, self._Instance, player, ...))
+		return ClientCallPack(player, pcall(InvokeClient, self._Instance, player, ...))
 	end
 	remoteFunction.CallPlayer = ClientCall
 	remoteFunction.CallClient = ClientCall
@@ -377,6 +365,7 @@ if RunService:IsServer() then
 		end
 
 		repeat until LastContact[playerName] or gracePeriod()
+		print("Loaded assets for", playerName)
 		LastContact[playerName] = tick()
 	end
 

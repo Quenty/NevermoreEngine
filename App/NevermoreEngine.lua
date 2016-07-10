@@ -27,7 +27,7 @@ local LibraryCache = {} do -- Assemble Library Cache
 				if ReplicationFolder then
 					Child.Parent, Child.Archivable = string.find(string.lower(Name), "server") and Repository or ReplicationFolder
 				end
-			elseif ReplicationFolder then
+			elseif ReplicationFolder and not Child:IsA("Script") then
 				Child:Destroy()
 			end
 		end
@@ -49,7 +49,7 @@ local LibraryCache = {} do -- Assemble Library Cache
 end
 
 local function LoadLibrary(LibraryName)
-	return type(LibraryName) == "string" and require(LibraryCache[LibraryName] or error("[NevermoreEngine] Library \"" .. LibraryName .. "\" does not exist.")) or error("[NevermoreEngine] LibraryName must be a string")
+	return type(LibraryName) ~= "string" and error("[NevermoreEngine] LibraryName must be a string") or require(LibraryCache[LibraryName] or error("[NevermoreEngine] Library \"" .. LibraryName .. "\" does not exist."))
 end
 
 if DEBUG_MODE then
