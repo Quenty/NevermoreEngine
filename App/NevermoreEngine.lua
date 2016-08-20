@@ -90,6 +90,7 @@ function self:__index(index) -- Using several strings for the same method (e.g. 
 	local index = string.gsub(index, "^Get", "")
 	local Class = Classes[index] or index
 	local Appendage = script:FindFirstChild(index)
+	local Function
 
 	if Appendage and Appendage:IsA("ModuleScript") then
 		local func = require(Appendage)
