@@ -89,23 +89,12 @@ function self:__index(index) -- Using several strings for the same method (e.g. 
 	local originalIndex = index
 	local index = string.gsub(index, "^Get", "")
 	local Class = Classes[index] or index
-	local Appendage = script:FindFirstChild(index)
-	local Function
+	local Table = {}
+	local Folder = self:Folder(Class .. "s")
 
-	if Appendage and Appendage:IsA("ModuleScript") then
-		local func = require(Appendage)
-
-		function Function(...)
-			return func(extract(...))
-		end
-	else -- Procedurally generate a function!
-		local Table = {}
-		local Folder = self:Folder(Class .. "s")
-
-		function Function(...)
-			local Name, Parent = extract(...)
-			return Table[Name] or RetrieveObject(Table, Name, Parent or Folder, Class)
-		end
+	local function Function(...)
+		local Name, Parent = extract(...)
+		return Table[Name] or RetrieveObject(Table, Name, Parent or Folder, Class)
 	end
 
 	self[originalIndex] = Function
@@ -120,6 +109,22 @@ function self:Module(...)
 	return type(Name) ~= "string" and error("[Nevermore] ModuleName must be a string") or require(LibraryCache[Name] or error("[Nevermore] Module \"" .. Name .. "\" does not exist."))
 end
 self.LoadLibrary = self.Module
+
+function self:Append(index) -- Because metatables cannot yield across the C boundary :/
+	local Appendage = script:FindFirstChild(index)
+
+	if Appendage and Appendage:IsA("ModuleScript") then
+		local func = require(Appendage)
+		local function Function(...)
+			return func(extract(...))
+		end
+
+		self[index] = Function
+		return Function
+	else
+		error("Appendage " .. index .. " doesn't exist")
+	end
+end
 
 function self:__call(str, ...)
 	if ... then
