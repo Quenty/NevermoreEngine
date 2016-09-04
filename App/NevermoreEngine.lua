@@ -1,7 +1,6 @@
 -- @author Narrev
 -- @original Quenty
 -- @readme https://github.com/Narrev/Nevermore
--- Nevermore Loader
 
 -- Configuration
 local DEBUG_MODE = false -- Helps identify which modules fail to load
@@ -22,12 +21,10 @@ local LibraryCache = {}
 local ServerModules = ServerScriptService:FindFirstChild(ServerScriptService_Module_Folder_Name)
 local Appended, RetrieveObject, Repository = true
 
--- Error for incorrect setup
 assert(script:IsA("ModuleScript"), "[Nevermore] Nevermore must be a ModuleScript")
 assert(script.Name ~= "ModuleScript", "[Nevermore] Nevermore was never given a name")
 assert(script.Parent == ReplicatedStorage, "[Nevermore] Nevermore must be parented to ReplicatedStorage")
 
--- Helper functions
 local function extract(...) -- Enables functions to support calling by '.' or ':'
 	if ... == self then
 		return select(2, ...)
@@ -80,6 +77,8 @@ else
 	end
 end
 
+function self:Folder() return RetrieveObject(self, "Resources", script, "Folder") end -- First time use only
+
 function self:__index(index) -- Using several strings for the same method (e.g. Event and GetRemoteEvent) is slightly less efficient
 	assert(type(index) == "string", "[Nevermore] Method must be a string")
 	if not Appended then
@@ -100,7 +99,7 @@ function self:__index(index) -- Using several strings for the same method (e.g. 
 		local index = string.gsub(index, "^Get", "")
 		local Class = Classes[index] or index
 		local Table = {}
-		local Folder = self.Folder and self:Folder(Class .. "s") or RetrieveObject(self, "Resources", script, "Folder")
+		local Folder = self:Folder(Class .. "s")
 		local function Function(...)
 			local Name, Parent = extract(...)
 			return Table[Name] or RetrieveObject(Table, Name, Parent or Folder, Class)
