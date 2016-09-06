@@ -5,7 +5,6 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qSystems          = LoadCustomLibrary("qSystems")
-local qInstance         = LoadCustomLibrary("qInstance")
 
 local Make              = qSystems.Make
 local RbxUtility        = LoadLibrary("RbxUtility") -- For encoding/decoding
@@ -68,12 +67,13 @@ local BouncingBoxPoints = { -- Bouding box posiitions.
 	Vector3.new( 1, 1, 1);
 }
 
-local function GetBoundingBox(Objects)
+local function GetBoundingBox(Objects, RelativeTo)
+	RelativeTo = RelativeTo or CFrame.new()
 	local Sides = {-math.huge;math.huge;-math.huge;math.huge;-math.huge;math.huge}
 
 	for _, BasePart in pairs(Objects) do
 		local HalfSize = BasePart.Size/2
-		local Rotation = BasePart.CFrame
+		local Rotation = RelativeTo:toObjectSpace(BasePart.CFrame)
 
 		for _, BoundingBoxPoint in pairs(BouncingBoxPoints) do
 			local Point = Rotation*CFrame.new(HalfSize*BoundingBoxPoint).p
@@ -89,8 +89,10 @@ local function GetBoundingBox(Objects)
 
 	-- Size, Position
 	return Vector3.new(Sides[1]-Sides[2],Sides[3]-Sides[4],Sides[5]-Sides[6]), 
-	       Vector3.new((Sides[1]+Sides[2])/2,(Sides[3]+Sides[4])/2,(Sides[5]+Sides[6])/2)
+	       RelativeTo:pointToWorldSpace(Vector3.new((Sides[1]+Sides[2])/2,(Sides[3]+Sides[4])/2,(Sides[5]+Sides[6])/2))
 end
+lib.GetBoundingBox = GetBoundingBox
+
 lib.GetBoundingBox = GetBoundingBox
 
 
