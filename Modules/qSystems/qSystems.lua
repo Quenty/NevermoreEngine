@@ -130,7 +130,7 @@ local function WaitForChild(Parent, Name, TimeLimit)
 		Child = Parent:FindFirstChild(Name)
 		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
 			Warned = true
-				warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. debug.traceback())
+			warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. debug.traceback())
 			if TimeLimit then
 				return Parent:FindFirstChild(Name)
 			end
@@ -219,7 +219,7 @@ local function GetCharacter(Descendant)
 	while not Player do
 		if Character.Parent then
 			Character = Character.Parent
-			Player   = Players:GetPlayerFromCharacter(Character)
+			Player = Players:GetPlayerFromCharacter(Character)
 		else
 			return nil
 		end
