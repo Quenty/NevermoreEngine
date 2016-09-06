@@ -8,7 +8,7 @@ import fnmatch
 # the name of the file
 
 fileList = ''
-ignoreFiles = ['AxisCameraEngine.lua', 'SpringPhysics.lua']
+ignoreFiles = ['AxisCameraEngine.lua', 'SpringPhysics.lua', 'AccelTween.lua']
 
 for (root, dirNames, fileNames) in os.walk("."):
     newFileNames = fileNames
@@ -17,7 +17,7 @@ for (root, dirNames, fileNames) in os.walk("."):
         newFileNames = [fileName for fileName in newFileNames if not fnmatch.fnmatch(fileName, ignoreName)]
 
     for fileName in [fileName for fileName in newFileNames if fileName.endswith('.lua')]:
-            fileList += os.path.join(root[2:], fileName) + '\n'
+        fileList += os.path.join(root[2:], fileName) + '\n'
 
 print(fileList)
 
