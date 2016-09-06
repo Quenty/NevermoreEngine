@@ -37,7 +37,7 @@ function PaperRipple.new(Container)
 	self.Ripples = {}
 	self.Animating = false
 
-	self:BindInput()
+	self:BindInput(self.Container)
 
 	return self
 end
@@ -243,7 +243,11 @@ function PaperRipple:Up()
 	self.InputMaid.InputEnded = nil
 end
 
-function PaperRipple:BindInput()
+function PaperRipple:UnbindInput(Gui)
+	self.InputMaid[Gui] = nil
+end
+
+function PaperRipple:BindInput(Gui, Filter)
 	--- Binds the input to the InputMaid to detect/handle Touch,
 	--  and mouse button inputs over the GUI in question. Will override
 	--  old bindings with the same names.
@@ -274,8 +278,8 @@ function PaperRipple:BindInput()
 		end
 	end
 
-	self.InputMaid.InputBegan = self.Container.InputBegan:connect(function(InputObject)
-		if ValidInputEnums[InputObject.UserInputType] then
+	self.InputMaid[Gui] = Gui.InputBegan:connect(function(InputObject)
+		if ValidInputEnums[InputObject.UserInputType] and (not Filter or Filter(InputObject)) then
 			local Position = Vector2.new(InputObject.Position.X, InputObject.Position.Y)
 			self:Down(Position)
 
