@@ -17,3 +17,4 @@ Exported.rbxm
 ProjectPlanning.lua
 AxisCameraEngine.lua
 SpringPhysics.lua
+AccelTween.lua
