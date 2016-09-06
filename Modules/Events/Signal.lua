@@ -37,6 +37,7 @@ local function MakeSignal()
 	
 	local BindableEvent = Instance.new("BindableEvent")
 	local Signal = {}
+	local Connections = {}
 	local BindData
 	
 	function Signal:fire(...)
@@ -47,9 +48,11 @@ local function MakeSignal()
 	
 	function Signal:connect(func)
 		if not func then error("connect(nil)", 2) end
-		return BindableEvent.Event:connect(function()
+		local connection = BindableEvent.Event:connect(function()
 			func(unpack(BindData))
 		end)
+		Connections[#Connections + 1] = connection
+		return connection
 	end
 	
 	function Signal:wait()
@@ -59,6 +62,9 @@ local function MakeSignal()
 	end
 
 	function Signal:Destroy()
+		for a = 1, #Connections do
+			Connections[a]:disconnect()
+		end
 		BindData = BindableEvent:Destroy()
 		Signal = nil
 	end
