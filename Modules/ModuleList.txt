@@ -33,6 +33,10 @@ Input\BindedIcon.lua
 Input\HeldInput.lua
 Input\HeldRateInput.lua
 Input\InputBind.lua
+Input\InputMode\InputModeProcessor.lua
+Input\InputMode\InputModeState.lua
+Input\InputMode\InputModeSwapper.lua
+Input\InputMode\InputStates.lua
 NevermoreCommands\AuthenticationServiceServer.lua
 NevermoreCommands\ClientAuthenticationService.lua
 NevermoreCommands\CommandSystems.lua
@@ -63,6 +67,7 @@ qCFrame\PartGeometry.lua
 qCFrame\qCFrame.lua
 qCFrame\Quaternion.lua
 qCFrame\SurfaceNormal.lua
+qGUI\GuiTriangle.lua
 qGUI\LensGlare.lua
 qGUI\qGUI.lua
 qGUI\RelativeFrameBuilder.lua
