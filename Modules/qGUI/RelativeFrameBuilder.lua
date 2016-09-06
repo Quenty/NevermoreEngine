@@ -34,11 +34,19 @@ function RelativeFrameBuilder.new(Parent)
 	self.Name = "RelativeFrame"
 
 	if Parent then
-		RelativeFrameBuilder:WithParent(Parent)
+		self:WithParent(Parent)
 	end
 
 	return self
 end
+
+function RelativeFrameBuilder:SuppressParentWarning()
+	assert(self ~= RelativeFrameBuilder)
+	self.DoNotWarnOnNilParent = true
+	
+	return self
+end
+
 
 function RelativeFrameBuilder:WithType(Name)
 	self.Name = Name or error("Sent invalid name")
@@ -67,7 +75,11 @@ end
 
 function RelativeFrameBuilder:Create()
 	--- Constructs the new class
-
+	
+	if not self.DoNotWarnOnNilParent and not self.Parent then
+		warn("[RelativeFrameBuilder] May be creating nil parented RelativeFrame\n" .. debug.traceback())
+	end
+	
 	return Make("Frame", {
 		BorderSizePixel = 0;
 		BackgroundTransparency = 1;
