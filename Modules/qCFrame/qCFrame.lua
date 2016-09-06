@@ -4,10 +4,9 @@ local HttpService       = game:GetService("HttpService")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
+local Make              = LoadCustomLibrary("Make")
 local qInstance         = LoadCustomLibrary("qInstance")
 
-local Make              = qSystems.Make
 local RbxUtility        = LoadLibrary("RbxUtility") -- For encoding/decoding
 
 local lib = {}

@@ -1,20 +1,47 @@
-local Players = game:GetService("Players")
+-- Utilities involving players and teams
+
 local Teams = game:GetService("Teams")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems          = LoadCustomLibrary("qSystems")
-local qCFrame          = LoadCustomLibrary("qCFrame")
-
-local CheckCharacter = qSystems.CheckCharacter
-local GetCharacter = qSystems.GetCharacter
-
--- qPlayer.lua
--- Just utilities involving players (and teams).
+local Load = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local qCFrame = Load("qCFrame")
 
 local lib = {}
+
+local function CheckPlayer(Player)
+	--- Makes sure a player has all necessary components.
+	-- @param Player The Player to check for
+	-- @return Boolean If the player has all the right components
+
+	return Player and Player:IsA("Player") and Player:IsDescendantOf(Players)
+end
+lib.CheckPlayer = CheckPlayer
+
+local function CheckCharacter(Player)
+	--- Makes sure a character has all the right "parts". This also validates the player's status as
+	--  a player. This is useful when you want to load a character, as ROBLOX's character added
+	--  event doesn't guarantee loaded character status.
+	-- @param Player The player to search for
+	-- @return Boolean, True if it's good, false if it's not.
+	
+	if CheckPlayer(Player) then
+		local Character = Player.Character
+
+		if Character then
+			return Character.Parent
+				and Character:FindFirstChild("Humanoid")
+				and Character:FindFirstChild("HumanoidRootPart")
+				and Character:FindFirstChild("Torso") 
+				and Character:FindFirstChild("Head") 
+				and Character.Humanoid:IsA("Humanoid")
+				and Character.Head:IsA("BasePart")
+				and Character.Torso:IsA("BasePart")
+		end
+	end
+	return warn("[CheckCharacter] - Character Check failed!")
+end
+lib.CheckCharacter = CheckCharacter
 
 local function IsTeamMate(PlayerOne, PlayerTwo, NeutralCounts)
 	--- Are playerone and playertwo teammates?
@@ -142,6 +169,28 @@ end
 lib.GetPlayersWithValidCharacters = GetPlayersWithValidCharacters
 lib.getPlayersWithValidCharacters = GetPlayersWithValidCharacters
 
+local function GetCharacter(Character)
+	--- Returns the Player and Character that a descendent is part of, if it is part of one.
+	-- @param Character A child of the potential character. 
+	-- @return The character found.
+
+	local Player= Players:GetPlayerFromCharacter(Character)
+
+	while not Player do
+		if Character.Parent then
+			Character = Character.Parent
+			Player   = Players:GetPlayerFromCharacter(Character)
+		else
+			return nil
+		end
+	end
+
+	-- Found the player, character must be true.
+	return Character, Player
+end
+lib.GetCharacter = GetCharacter
+lib.GetPlayerFromCharacter = GetCharacter
+
 local function GetPlayerWhoSatOnChair(PotentialSeatWeld)
 	-- Intended to be used with ROBLOX's seat system, where .ChildAdded fires whenever a player
 	-- sits in a seat and the child's name is "SeatWeld" and is a "Weld" and the Part1 is a 
@@ -196,5 +245,40 @@ local function CheckIfPlayerStillSittingOnChair(OriginalSeatWeld, OriginalPlayer
 	end
 end
 lib.CheckIfPlayerStillSittingOnChair = CheckIfPlayerStillSittingOnChair
+
+local function GetHumanoid(Descendant)
+	---- Retrieves a humanomid from a descendant (Players only).
+	-- @param Descendant The child you're searching up from. Really, this is for weapon scripts. 
+	-- @return A humanoid in the parent structure if it can find it. Intended to be used in
+	--     workspace  only. Useful for weapon scripts, and all that, especially to work on non
+	--     player targets. Will scan *up* to workspace . If workspace   has a humanoid in it, it
+	--     won't find it.
+	-- Will work even if there are non-humanoid objects named "Humanoid" However, only works on
+	-- objects named "Humanoid" (this is intentional)
+
+
+	while true do
+		local Humanoid = Descendant:FindFirstChild("Humanoid")
+
+		if Humanoid then
+			if Humanoid:IsA("Humanoid") then
+				return Humanoid
+			else -- Incase there are other humanoids in there.
+				for _, Item in pairs(Descendant:GetChildren()) do
+					if Item.Name == "Humanoid" and Item:IsA("Humanoid") then
+						return Item
+					end
+				end
+			end
+		end
+
+		if Descendant.Parent and Descendant:IsDescendantOf(workspace) then
+			Descendant = Descendant.Parent
+		else
+			return nil
+		end
+	end
+end
+lib.GetHumanoid = GetHumanoid
 
 return lib

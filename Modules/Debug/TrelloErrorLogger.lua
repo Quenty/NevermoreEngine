@@ -1,6 +1,6 @@
-local HttpService		= game:GetService("HttpService")
-local LoadCustomLibrary		= require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary
-local RemoteManager		= LoadCustomLibrary("RemoteManager")
+local HttpService = game:GetService("HttpService")
+local LoadCustomLibrary = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine")).LoadLibrary
+local RemoteManager = LoadCustomLibrary("RemoteManager")
 
 if game:GetService("RunService"):IsServer() then -- Server
 	return function(tab)

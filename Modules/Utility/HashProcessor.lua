@@ -1,10 +1,10 @@
+-- HashProcessor.lua
+-- @author Quenty
+
 local Heartbeat = game:GetService("RunService").Heartbeat
 
 local HashProcessor = {}
 HashProcessor.__index = HashProcessor
-
--- HashProcessor.lua
--- @author Quenty
 
 function HashProcessor.new(OnProcess, OnAddition, OnRemoval)
 	-- Processes at the speed of Heartbeat

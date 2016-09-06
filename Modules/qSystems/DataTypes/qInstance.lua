@@ -3,8 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
-local CallOnChildren    = qSystems.CallOnChildren
+local CallOnChildren    = LoadCustomLibrary("CallOnChildren")
 
 local lib = {}
 

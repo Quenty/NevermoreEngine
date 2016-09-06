@@ -65,9 +65,32 @@
 		
 		local chosenKey, LeftoverSeed = table.overflow(tab, seed)
 		local randomChoiceFromOptions = Options[chosenKey]
+
+	table.assemble(list, conditionFunc)
+		Assembles a table from list that meets conditionFunc
+		@param list An array to be iterated through
+		@param function conditionFunc a function to be used as 
+		 a conditional to whether or not list item makes it into newlist
 --]]
 
 local lib = setmetatable({}, {__index = table})
+
+local function Assemble(list, conditionFunc)
+	--- Assembles a table from list that meets conditionFunc
+	-- @param list An array to be iterated through
+	-- @param function conditionFunc a function to be used as 
+	--	a conditional to whether or not list item makes it into newlist
+	
+	local newList = {}
+	for a = 1, #list do
+		local Value = list[a]
+		if conditionFunc(Value) then
+			newList[#newList + 1] = Value
+		end
+	end
+	return newList
+end
+lib.assemble = Assemble
 
 local function Count(Table)
 	local Count = 0;
