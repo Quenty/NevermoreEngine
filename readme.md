@@ -50,11 +50,7 @@ Here are a few of the features that Nevermore's libraries offer:
 To Install Nevermore, paste the following code into your command bar.
 
 ```lua
-local h = game:GetService("HttpService")
-local e = h.HttpEnabled
-h.HttpEnabled = true
-loadstring(h:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/Install.lua"))()
-h.HttpEnabled = e
+local h = game:GetService("HttpService") local e = h.HttpEnabled h.HttpEnabled = true loadstring(h:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/Install.lua"))() h.HttpEnabled = e
 ```
 ## What you just got:
 
