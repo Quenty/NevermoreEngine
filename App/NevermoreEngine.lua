@@ -206,8 +206,4 @@ Nevermore.GetRemoteFunction = Cache(
 	Retrieve(Retrieve(ResourceFolder, "Folder")("RemoteFunctions"), -- Folder of remote functions
 	"RemoteFunction")) -- Specify remote functions to retrieve
 
-local meta = {}
-function meta:__call(LibraryName)
-	return Nevermore.LoadLibrary(LibraryName)
-end
-return setmetatable(Nevermore, meta)
+return Nevermore
