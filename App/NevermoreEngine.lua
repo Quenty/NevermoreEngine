@@ -4,7 +4,7 @@
 
 -- Configuration
 local DEBUG_MODE = false -- Helps identify which modules fail to load
-local FolderName = "Nevermore"
+local FolderName = "Modules"
 local Classes = { -- Allows for abbreviations
 	Event = "RemoteEvent";
 	Function = "RemoteFunction";
@@ -18,7 +18,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 -- Module
 local self = {__metatable = "[Nevermore] Nevermore's metatable is locked"}
 local LibraryCache = {}
-local ServerModules = ServerScriptService:FindFirstChild(FolderName)
+local ServerModules = ServerScriptService:FindFirstChild(FolderName) or ServerScriptService:FindFirstChild("Nevermore")
 local Appended, RetrieveObject, Repository = true
 
 assert(script:IsA("ModuleScript"), "[Nevermore] Nevermore must be a ModuleScript")
