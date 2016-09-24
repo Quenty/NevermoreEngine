@@ -4,7 +4,7 @@
 
 -- Configuration
 local DEBUG_MODE = false -- Helps identify which modules fail to load
-local ServerScriptService_Module_Folder_Name = "Modules"
+local FolderName = "Nevermore"
 local Classes = { -- Allows for abbreviations
 	Event = "RemoteEvent";
 	Function = "RemoteFunction";
@@ -16,9 +16,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 -- Module
-local self = {__metatable = "[Nevermore] Cannot change metatable because Nevermore relies on __index for procedural generation"}
+local self = {__metatable = "[Nevermore] Nevermore's metatable is locked"}
 local LibraryCache = {}
-local ServerModules = ServerScriptService:FindFirstChild(ServerScriptService_Module_Folder_Name)
+local ServerModules = ServerScriptService:FindFirstChild(FolderName)
 local Appended, RetrieveObject, Repository = true
 
 assert(script:IsA("ModuleScript"), "[Nevermore] Nevermore must be a ModuleScript")
