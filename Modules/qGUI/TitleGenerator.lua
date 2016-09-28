@@ -18,7 +18,6 @@ local function GenerateTitle(ScreenGui, Text, TopLabelText, BottomLabelText)
 	-- Generates a title that looks like this
 	--[[
 	
-
 	--------------
 	   T I T L E
 	--------------

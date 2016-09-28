@@ -15,7 +15,7 @@ local Class = qSystems.Class
 
 -- NOTE: DEPRICATED
 
-warn("Scroll bar class is depcricated, used ScrollingFrame")
+warn("Scroll bar class is depcricated, use ScrollingFrame instead")
 
 -- ScrollBar library
 -- Change Log --
