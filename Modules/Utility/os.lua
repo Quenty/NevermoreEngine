@@ -1,5 +1,9 @@
 -- @author Narrev
 
+-- Necessary string tables
+local dayNames = {[0] = "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+local months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+
 local function date(formatString, unix)
 	--- Allows you to use os.date in RobloxLua!
 	--		date ([format [, time]])
@@ -64,10 +68,6 @@ local function date(formatString, unix)
 	if formatString == "*t" then -- Return a table if "*t" was used
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end
-	
-	-- Necessary string tables
-	local dayNames		= {[0] = "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
-	local months		= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 	
 	-- Return formatted string
 	return (gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(formatString,
