@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService  = game:GetService("UserInputService")
 local RunService        = game:GetService("RunService")
 local Players           = game:GetService("Players")
+local GuiService        = game:GetService("GuiService")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
@@ -368,14 +369,15 @@ end
 
 function DraggableSnackbar:Track()
 	local DragOffset, DragLength
-
+	local TopLeftInset, BottomRightInset = GuiService:GetGuiInset()
+	
 	if self.Vertical then
-		DragOffset = self.Mouse.Y - self.StartDragPosition
+		DragOffset = (self.Mouse.Y + TopLeftInset.Y) - self.StartDragPosition
 		DragLength = self.Gui.AbsoluteSize.Y
 
 		self.Gui.Position = self.Position + UDim2.new(0, 0, 0, DragOffset)
 	else
-		DragOffset = self.Mouse.X - self.StartDragPosition
+		DragOffset = (self.Mouse.X + TopLeftInset.X) - self.StartDragPosition
 		DragLength = self.Gui.AbsoluteSize.Y
 
 		self.Gui.Position = self.Position + UDim2.new(0, DragOffset, 0, 0)
