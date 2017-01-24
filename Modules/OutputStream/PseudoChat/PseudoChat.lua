@@ -1,55 +1,25 @@
+-- PseudoChat.lua
+-- (Client only) Sets up PseudoChat on the client. Equivalent of PseudoChatManager for the server
+-- @author Quenty
+
 local ReplicatedStorage           = game:GetService("ReplicatedStorage")
 local Players                     = game:GetService("Players")
 local LogService                  = game:GetService("LogService")
 local ScriptContext               = game:GetService("ScriptContext")
 local StarterGui                  = game:GetService("StarterGui")
 
-local NevermoreEngine             = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary           = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary           = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 local OutputStreamInterface       = LoadCustomLibrary("OutputStreamInterface")
 local PseudoChatParser            = LoadCustomLibrary("PseudoChatParser")
 local OutputClassStreamLoggers    = LoadCustomLibrary("OutputClassStreamLoggers")
 local OutputStream                = LoadCustomLibrary("OutputStream")
 local PseudoChatBar               = LoadCustomLibrary("PseudoChatBar")
-local ClientAuthenticationService = LoadCustomLibrary("ClientAuthenticationService")
-local qGUI                        = LoadCustomLibrary("qGUI")
+local ClientAuthenticationService = LoadCustomLibrary("ClientAuthenticationService")                 
+local RemoteManager               = LoadCustomLibrary("RemoteManager")
 
--- local ShipKillFeedParser          = LoadCustomLibrary("ShipKillFeedParser")
-
--- Setups up the PseudoChat on the client. It's the equivalent of the PseudoChatManager for the
--- server
-
--- PseudoChat.lua
--- Intended for the client only. Sets up pseudo chat on the client. 
--- @author Quenty
--- Last modified Janurary 19th, 2014
-
---[[-- Update Log --
-September 9th, 2014
-- Added team chat
-
-July 25th, 2014
-- Made ChatBar API avialable. 
-
-February 6th, 2014
-- Added local-side output support for errors.
-- Output does not go to global chat log now
-- Fixed glitch with script concatination
-
-January 26th, 2014
-- Updated to OutputStream
-
-January 19th, 2014
-- Added change log
-- Added ScriptbuilderParser
-- Added QuentyAdminCommandsOutput
-
-January 5th, 2014
-- Wrote intitial script
-
---]]
-
+local Color3 = Color3.new
+local IsPhone = LoadCustomLibrary("qGUI").IsPhone
 
 
 local lib = {}
@@ -60,14 +30,14 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 	local Chat = {}
 	local LocalPlayer = game.Players.LocalPlayer
 
-	local ClientChatted = NevermoreEngine.GetRemoteEvent("ClientChatted")
+	local ClientChatted = RemoteManager:GetEvent("ClientChatted")
 
 	local Interface = OutputStreamInterface.MakeOutputStreamInterface(nil, ScreenGui)
 	Chat.Interface  = Interface
 	Chat.Gui        = Interface.Gui
 
 	function Chat.GetDefaultPosition()
-		if qGUI.IsPhone(ScreenGui) then
+		if IsPhone(ScreenGui) then
 			return UDim2.new(0, 36, 0, 4)
 		else
 			return UDim2.new(0, 4, 0, 4)
@@ -79,7 +49,7 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 	local function SendMessage(Message)
 		assert(Message, "Need message")
 		
-		ClientChatted:FireServer(Message); --[[{
+		ClientChatted:SendToServer(Message); --[[{
 			Message = Message;
 			-- Player  = LocalPlayer;
 		})--]]
@@ -87,7 +57,7 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 
 
 	if not DoNotDisableCoreGui then
-		ChatBar = PseudoChatBar.MakePseudoChatBar(ScreenGui, Chat.Gui)
+		ChatBar = PseudoChatBar(ScreenGui, Chat.Gui)
 		Chat.ChatBar = ChatBar
 		
 
@@ -128,12 +98,13 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 	-- We will syndicate resources. 
 	-- Global one has all of 'em. 
 	local GlobalSyndictator = OutputStream.MakeOutputStreamSyndicator("Chat")
-		GlobalSyndictator.AddOutputStream(ChatChannel)
-		GlobalSyndictator.AddOutputStream(NotificationChannel)
-		GlobalSyndictator.AddOutputStream(AdminLogChannel)
-		GlobalSyndictator.AddOutputStream(TeamChannel)
+	local AddOutputStream = GlobalSyndictator.AddOutputStream
+	AddOutputStream(ChatChannel)
+	AddOutputStream(NotificationChannel)
+	AddOutputStream(AdminLogChannel)
+	AddOutputStream(TeamChannel)
 
-	Interface.Subscribe(GlobalSyndictator, nil, Color3.new(78/255, 205/255, 196/255), true) --Color3.new( 85/255,  98/255, 112/255), true)
+	Interface.Subscribe(GlobalSyndictator, nil, Color3(78/255, 205/255, 196/255), true) --Color3( 85/255,  98/255, 112/255), true)
 
 	spawn(function()
 		local AdminSyndictator
@@ -146,7 +117,7 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 			end
 
 			if not Subscriber then
-				Subscriber = Interface.Subscribe(AdminSyndictator, nil, Color3.new(255/255, 107/255, 107/255), true)
+				Subscriber = Interface.Subscribe(AdminSyndictator, nil, Color3(255/255, 107/255, 107/255), true)
 			end
 		end
 
@@ -176,7 +147,5 @@ local function MakePseudoChat(ScreenGui, DoNotDisableCoreGui)
 
 	return Chat
 end
-lib.MakePseudoChat = MakePseudoChat
-lib.makePseudoChat = MakePseudoChat
 
-return lib
+return setmetatable({MakePseudoChat = MakePseudoChat; makePseudoChat = MakePseudoChat}, {__call = function(_, ...) return MakePseudoChat(...) end})

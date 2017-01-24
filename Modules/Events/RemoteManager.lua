@@ -1,4 +1,4 @@
--- @Author Vorlias
+-- @author Vorlias
 -- Edited by Narrev
 
 --[[
@@ -18,59 +18,22 @@ local ReplicatedStorage	= game:GetService("ReplicatedStorage")
 local server		= game:FindService("NetworkServer")
 local remote		= {remoteEvent = {}; remoteFunction = {}}
 
+-- Nevermore
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local qSystems		= LoadCustomLibrary("qSystems")
+
 -- Localize Tables
 local remoteEvent, remoteFunction, FuncCache, RemoteEvents, RemoteFunctions = remote.remoteEvent, remote.remoteFunction, {}, {}, {}
 
 -- Localize Functions
-local time, newInstance, traceback = os.time, Instance.new, debug.traceback
+local time = os.time
+local Instance = Instance.new
+
+-- Localize Utility functions
+local Make = qSystems.Make
+local WaitForChild = qSystems.WaitForChild
 
 assert(workspace.FilteringEnabled or not server, "[RemoteManager] RemoteManager 4.0 does not work with filterless games due to security vulnerabilties. Please consider using Filtering or use RemoteManager 2.7x")
-
--- Utility functions
-local function Make(ClassType, Properties)
-	-- @param ClassType The type of class to instantiate
-	-- @param Properties The properties to use
-
-	assert(type(Properties) == "table", "Properties is not a table")
-
-	local Object = newInstance(ClassType)
-	
-	for Index, Value in next, Properties do
-		Object[Index] = Value
-	end
-
-	return Object
-end
-
-local function WaitForChild(Parent, Name, TimeLimit)
-	-- Waits for a child to appear. Not efficient, but it shouldn't have to be. It helps with
-	-- debugging. Useful when ROBLOX lags out, and doesn't replicate quickly. Will warn
-	-- @param Parent The Parent to search in for the child.
-	-- @param Name The name of the child to search for
-	-- @param TimeLimit If TimeLimit is given, then it will return after the timelimit, even if it
-	--     hasn't found the child.
-
-	assert(Parent, "Parent is nil")
-	assert(type(Name) == "string", "Name is not a string.")
-
-	local Child     = Parent:FindFirstChild(Name)
-	local StartTime = tick()
-	local Warned    = false
-
-	while not Child do
-		wait()
-		Child = Parent:FindFirstChild(Name)
-		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
-			Warned = true
-			warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. traceback())
-			if TimeLimit then
-				return Parent:FindFirstChild(Name)
-			end
-		end
-	end
-
-	return Child
-end
 
 -- Get storage or create if nonexistent
 local functionStorage = ReplicatedStorage:FindFirstChild("RemoteFunctions") or Make("Folder" , {
@@ -152,7 +115,7 @@ local function CreateEventMetatable(instance)
 end
 
 local function CreateFunction(name, instance)
-	local instance = instance or functionStorage:FindFirstChild(name) or newInstance("RemoteFunction")
+	local instance = instance or functionStorage:FindFirstChild(name) or Instance("RemoteFunction")
 	instance.Parent = functionStorage
 	instance.Name = name
 	
@@ -164,7 +127,7 @@ local function CreateFunction(name, instance)
 end
 
 local function CreateEvent(name, instance)
-	local instance = instance or eventStorage:FindFirstChild(name) or newInstance("RemoteEvent")
+	local instance = instance or eventStorage:FindFirstChild(name) or Instance("RemoteEvent")
 	instance.Parent = eventStorage
 	instance.Name = name
 	

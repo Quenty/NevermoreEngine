@@ -1,3 +1,5 @@
+-- os.lua
+-- Adds date([format [, time]]) and clock() back to os table!
 -- @author Narrev
 
 local function date(formatString, unix)
@@ -11,18 +13,18 @@ local function date(formatString, unix)
 	--		If formatString starts with "!", date is formatted in UTC.
 	--		If formatString is "*t", date returns a table
 	--		Placing "_" in the middle of a tag (e.g. "%_d" "%_I") removes padding
-	--		String Reference: https://github.com/Narrev/NevermoreEngine/blob/patch-5/Modules/Utility/readme.md
+	--		String Reference: https://github.com/Quenty/NevermoreEngine/blob/master/Modules/Utility/readme.md#os
 	--		@default "%c"
 	--
 	-- @param number unix
 	--		If present, unix is the time to be formatted. Otherwise, date formats the current time.
-	--		The amount of seconds since 1970 (negative numbers are occasionally supported)
+	--		The amount of seconds since 1970 (negative numbers are fully supported)
 	--		@default tick()
 
 	-- @returns a string or a table containing date and time, formatted according to the given string format. If called without arguments, returns the equivalent of date("%c").
 
 	-- Localize functions
-	local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
+	local floor, sub, find, gsub, format, time = math.floor, string.sub, string.find, string.gsub, string.format, os.time
 
 	-- Find whether formatString was used
 	if formatString then
@@ -35,7 +37,7 @@ local function date(formatString, unix)
 			local UTC
 			formatString, UTC = gsub(formatString, "^!", "") -- If formatString begins in '!', use os.time()
 			assert(UTC == 0 or not unix, "Cannot determine time to format for os.date. Use either an \"!\" at the beginning of the string or pass a time parameter")
-			unix = UTC == 1 and os.time() or unix
+			unix = UTC == 1 and time() or unix
 		end
 	else -- If they did not pass a formatting string
 		formatString = "%c"

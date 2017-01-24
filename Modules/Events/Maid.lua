@@ -66,7 +66,5 @@ local MakeMaid do
 	end
 end
 
-lib.MakeMaid = MakeMaid
-lib.new = MakeMaid
-
-return lib
+-- Return library, but make it callable
+return setmetatable({new = MakeMaid, MakeMaid = MakeMaid}, {__call = MakeMaid})

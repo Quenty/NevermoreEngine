@@ -1,20 +1,20 @@
+-- ClientAuthenticationService.lua
+-- @author Quenty
+
 local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Signal          = LoadCustomLibrary("Signal")
-
--- @author Quenty
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local RemoteManager     = LoadCustomLibrary("RemoteManager")
+local Signal            = LoadCustomLibrary("Signal")
 
 local ClientAuthenticationService = {} do
-	local RequestStream = NevermoreEngine.GetRemoteFunction("AuthenticationServiceRequestor")
-	local EventStream   = NevermoreEngine.GetRemoteEvent("AuthenticationServiceEventStream")
+	local RequestStream = RemoteManager:GetFunction("AuthenticationServiceRequestor")
+	local EventStream   = RemoteManager:GetEvent("AuthenticationServiceEventStream")
 
-	ClientAuthenticationService.AuthenticationChanged = Signal.new()
+	ClientAuthenticationService.AuthenticationChanged = Signal()
 
-	EventStream.OnClientEvent:connect(function(AuthenticationChange)
+	EventStream:Listen(function(AuthenticationChange)
 		if type(AuthenticationChange) == "string" then
 			AuthenticationChange = AuthenticationChange:lower()
 
@@ -33,7 +33,7 @@ local ClientAuthenticationService = {} do
 	local function IsAuthorized(PlayerName)
 		-- [PlayerName] Optional playername to check
 
-		return RequestStream:InvokeServer("IsAuthorized", PlayerName)
+		return RequestStream:CallServer("IsAuthorized", PlayerName)
 	end
 	ClientAuthenticationService.IsAuthorized = IsAuthorized
 	ClientAuthenticationService.isAuthorized = IsAuthorized

@@ -1,14 +1,11 @@
-local ReplicatedStorage       = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine         = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary       = NevermoreEngine.LoadLibrary
-
-local LinkedConstructor       = LoadCustomLibrary("LinkedConstructor")
-
--- @author Quenty
+-- ChainConstructor.lua
 -- Server/client chain of responsibility constructor.
--- Much like a chain processor, except that it will stop after
--- the first construction.
+-- Much like a chain processor, except it will stop after first construction.
+-- @author Quenty
+
+local ReplicatedStorage       = game:GetService("ReplicatedStorage")
+local LoadCustomLibrary       = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LinkedConstructor       = LoadCustomLibrary("LinkedConstructor")
 
 local ChainConstructor     = {}
 ChainConstructor.__index   = ChainConstructor

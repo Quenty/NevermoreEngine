@@ -21,6 +21,7 @@ day     4
 ```
 String reference:
 ```
+!   Placing this at the beginning of the string sets the unix parameter to os.time()
 %a	abbreviated weekday name (e.g., Wed)
 %A	full weekday name (e.g., Wednesday)
 %b	abbreviated month name (e.g., Sep)

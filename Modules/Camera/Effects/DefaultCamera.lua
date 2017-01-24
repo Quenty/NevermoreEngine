@@ -1,16 +1,16 @@
+-- DefaultCamera.lua
+-- Intent: Hack to maintain default camera control
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SummedCamera       = LoadCustomLibrary("SummedCamera")
+local CameraState = LoadCustomLibrary("CameraState")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
 
 local DefaultCamera = {}
 DefaultCamera.ClassName = "DefaultCamera"
-
--- Intent: Hack to maintain default camera control 
 
 function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)
