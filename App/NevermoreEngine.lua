@@ -180,6 +180,10 @@ do
 		-- @return The library's value
 		assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
 
+		if SecondCache[LibraryName] then
+			return SecondCache[LibraryName]
+		end
+
 		DebugID = DebugID + 1
 		local LocalDebugID = DebugID
 
@@ -189,7 +193,8 @@ do
 		end
 
 		local Library = require(_LibraryCache[LibraryName] or error("Error: Library '" .. LibraryName .. "' does not exist."))
-		
+		SecondCache[LibraryName] = Library
+
 		if DEBUG_MODE then
 			RequestDepth = RequestDepth - 1
 			print(("\t"):rep(RequestDepth), LocalDebugID, "Done loading: ", LibraryName)
