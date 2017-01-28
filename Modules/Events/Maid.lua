@@ -29,14 +29,16 @@ local MakeMaid do
 			for name,task in pairs(tasks) do
 				if type(task) == 'function' then
 					task()
-				else
+				elseif typeof(task) == 'RBXScriptConnection' then
 					task:disconnect()
+				else
+					task:Destroy()
 				end
 				tasks[name] = nil
 			end
 		end;
 	};
-	index.disconnect = index.DoCleaning -- Allow maids to be stacked.
+	index.Destroy = index.DoCleaning -- Allow maids to be stacked.
 
 	local mt = {
 		__index = function(self, k)
@@ -51,7 +53,11 @@ local MakeMaid do
 			if v == nil then
 				-- disconnect if the task is an event
 				if type(tasks[k]) ~= 'function' and tasks[k] then
-					tasks[k]:disconnect()
+					if typeof(tasks[k]) == 'RBXScriptConnection' then
+						tasks[k]:disconnect()
+					else
+						tasks[k]:Destroy()
+					end
 				end
 			elseif tasks[k] then
 				-- clear previous task
