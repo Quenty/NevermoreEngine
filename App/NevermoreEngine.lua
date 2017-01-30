@@ -35,33 +35,6 @@ local function Make(ClassType, Properties)
 	return Modify(Instance.new(ClassType), Properties)
 end
 
-local function WaitForChild(Parent, Name, TimeLimit)
-	-- Waits for a child to appear. Not efficient, but it shoudln't have to be. It helps with debugging. 
-	-- Useful when ROBLOX lags out, and doesn't replicate quickly.
-	-- @param TimeLimit If TimeLimit is given, then it will return after the timelimit, even if it hasn't found the child.
-
-	assert(Parent ~= nil, "Parent is nil")
-	assert(type(Name) == "string", "Name is not a string.")
-
-	local Child     = Parent:FindFirstChild(Name)
-	local StartTime = tick()
-	local Warned    = false
-
-	while not Child do
-		wait(0)
-		Child = Parent:FindFirstChild(Name)
-		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
-			Warned = true
-				warn("Warning: Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")")
-			if TimeLimit then
-				return Parent:FindFirstChild(Name)
-			end
-		end
-	end
-
-	return Child
-end
-
 local function CallOnChildren(Instance, FunctionToCall)
 	-- Calls a function on each of the children of a certain object, using recursion.  
 	-- Exploration note: Parents are always called before children.
@@ -123,7 +96,7 @@ local function Retrieve(Parent, ClassName)
 			Name = Name;
 		})
 	end or function(Name)
-		return WaitForChild(Parent, Name)
+		return Parent:WaitForChild(Name)
 	end
 end
 
@@ -142,7 +115,7 @@ local _LibraryCache = {} do
 			Repository.Name = "Nevermore"
 		end
 	else
-		Repository = WaitForChild(ResourceFolder, "Modules")
+		Repository = ResourceFolder:WaitForChild("Modules")
 	end
 
 	CallOnChildren(Repository, function(Child)
