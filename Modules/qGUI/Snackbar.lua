@@ -511,11 +511,12 @@ function SnackbarManager:ShowSnackbar(Snackbar)
 
 		self.CurrentSnackbar = Snackbar
 		if DismissedSnackbar then
-			wait(Snackbar.FadeTime)
-		end
-
-		-- Show this guy...
-		if self.CurrentSnackbar == Snackbar then
+			delay(Snackbar.FadeTime, function()
+				if self.CurrentSnackbar == Snackbar then
+					Snackbar:Show()
+				end
+			end)
+		else
 			Snackbar:Show()
 		end
 	end
