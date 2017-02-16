@@ -9,7 +9,15 @@
 		rather than by value where possible, as the BindableEvent objects always pass
 		their signal arguments by value, meaning tables will be deep copied when that
 		is almost never the desired behavior.
+
+	local MakeSignal = Load("Signal")
+	local newSignal = MakeSignal() -- Returns new Signal Object
+	
+		or
 		
+	local Signal = Load("Signal")
+	local newSignal = Signal.new() -- Returns new Signal Object
+
 	API:
 		void fire(...)
 			Fire the event with the given arguments.
@@ -25,43 +33,43 @@
 			Disconnects all connected events to the signal and voids the signal as unusable.
 --]]
 
-local Signal = {}
-
-function Signal.new()
-	local sig = {}
+local function MakeSignal()
 	
-	local mSignaler = Instance.new('BindableEvent')
+	local BindableEvent = Instance.new("BindableEvent")
+	local Signal = {}
+	local Connections = {}
+	local BindData
 	
-	local mArgData = nil
-	local mArgDataCount = nil
-	
-	function sig:fire(...)
-		mArgData = {...}
-		mArgDataCount = select('#', ...)
-		mSignaler:Fire()
+	function Signal:fire(...)
+		BindData = {...}
+		BindableEvent:Fire()
 	end
+	Signal.Fire = Signal.fire
 	
-	function sig:connect(f)
-		if not f then error("connect(nil)", 2) end
-		return mSignaler.Event:connect(function()
-			f(unpack(mArgData, 1, mArgDataCount))
+	function Signal:connect(func)
+		if not func then error("connect(nil)", 2) end
+		local connection = BindableEvent.Event:connect(function()
+			func(unpack(BindData))
 		end)
+		Connections[#Connections + 1] = connection
+		return connection
 	end
 	
-	function sig:wait()
-		mSignaler.Event:wait()
-		assert(mArgData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-		return unpack(mArgData, 1, mArgDataCount)
+	function Signal:wait()
+		BindableEvent.Event:wait()
+		assert(BindData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
+		return unpack(BindData)
 	end
 
-	function sig:Destroy()
-		mSignaler:Destroy()
-		mArgData      = nil
-		mArgDataCount = nil
-		mSignaler     = nil
+	function Signal:Destroy()
+		for a = 1, #Connections do
+			Connections[a]:disconnect()
+		end
+		BindData = BindableEvent:Destroy()
+		Signal = nil
 	end
 	
-	return sig
+	return Signal
 end
 
-return Signal
+return setmetatable({new = MakeSignal}, {__call = MakeSignal})
