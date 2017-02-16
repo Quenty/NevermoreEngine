@@ -14,9 +14,10 @@ local client_Max_Wait_For_Remotes = 1
 local default_Client_Cache = 10
 
 -- Services
-local ReplicatedStorage	= game:GetService("ReplicatedStorage")
-local server		= game:FindService("NetworkServer")
-local remote		= {remoteEvent = {}; remoteFunction = {}}
+local ReplicatedStorage			= game:GetService("ReplicatedStorage")
+local RunService			= game:GetService("RunService")
+local server				= RunService:IsServer() and game.Players.LocalPlayer == nil;
+local remote				= {remoteEvent = {}; remoteFunction = {}}
 
 -- Localize Tables
 local remoteEvent, remoteFunction, FuncCache, RemoteEvents, RemoteFunctions = remote.remoteEvent, remote.remoteFunction, {}, {}, {}
