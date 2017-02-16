@@ -1,5 +1,14 @@
 -- @author Narrev
 
+-- Necessary string tables
+local dayNames = {[0] = "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+local months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+
+-- Localize functions
+local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
+local time = os.time
+local type, wait, tick, tonumber, assert = type, wait, tick, tonumber, assert
+
 local function date(formatString, unix)
 	--- Allows you to use os.date in RobloxLua!
 	--		date ([format [, time]])
@@ -21,9 +30,6 @@ local function date(formatString, unix)
 
 	-- @returns a string or a table containing date and time, formatted according to the given string format. If called without arguments, returns the equivalent of date("%c").
 
-	-- Localize functions
-	local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
-
 	-- Find whether formatString was used
 	if formatString then
 		if type(formatString) == "number" then -- If they didn't pass a formatString, and only passed unix through
@@ -35,7 +41,7 @@ local function date(formatString, unix)
 			local UTC
 			formatString, UTC = gsub(formatString, "^!", "") -- If formatString begins in '!', use os.time()
 			assert(UTC == 0 or not unix, "Cannot determine time to format for os.date. Use either an \"!\" at the beginning of the string or pass a time parameter")
-			unix = UTC == 1 and os.time() or unix
+			unix = UTC == 1 and time() or unix
 		end
 	else -- If they did not pass a formatting string
 		formatString = "%c"
@@ -64,10 +70,6 @@ local function date(formatString, unix)
 	if formatString == "*t" then -- Return a table if "*t" was used
 		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end
-	
-	-- Necessary string tables
-	local dayNames		= {[0] = "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
-	local months		= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 	
 	-- Return formatted string
 	return (gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(formatString,
