@@ -325,14 +325,7 @@ local function Sign(Number)
 	--- Return's the mathetmatical sign of an object
 	-- @param Number The number to use
 	-- @return An int from [-1, 1]. 
-
-	if Number == 0 then
-		return 0
-	elseif Number > 0 then
-		return 1
-	else
-		return -1
-	end
+	return Number == 0 and 0 or Number > 0 and 1 or Number < 0 and -1 or nil
 end
 lib.Sign = Sign
 
