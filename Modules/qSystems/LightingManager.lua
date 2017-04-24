@@ -1,5 +1,7 @@
 local Lighting          = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
@@ -43,6 +45,8 @@ local TweenTimeOfDay do
 end
 
 local LightingManager = {} do
+	local LightingEvent = NevermoreEngine.GetRemoteEvent("ReplicateLightingEvent")
+	
 	local Color3Values = {
 		["FogColor"] = true;
 		["Ambient"] = true;
@@ -50,6 +54,7 @@ local LightingManager = {} do
 		["ColorShift_Top"] = true;
 		["OutdoorAmbient"] = true;
 		["ShadowColor"] = true;
+		["TintColor"] = true;
 	}
 	
 	local BooleanValues = {
@@ -61,9 +66,12 @@ local LightingManager = {} do
 		["FogEnd"] = true;
 		["FogStart"] = true;
 		["Brightness"] = true;
+		["Saturation"] = true;
+		["Contrast"] = true;
+		["Intensity"] = true;
 	}
 	
-	function LightingManager.TweenProperties(PropertyTable, Time)
+	local function TweenOnItem(Parent, PropertyTable, Time)
 		Time = Time or 0
 		
 		local TweenColor3Table = {}
@@ -72,7 +80,14 @@ local LightingManager = {} do
 		local DoTweenNumber = false
 		
 		for PropertyName, Value in pairs(PropertyTable) do
-			if Color3Values[PropertyName] then
+			if type(Value) == "table" then
+				local Item = Parent:FindFirstChild(PropertyName)
+				if Item then
+					TweenOnItem(Item, Value)
+				else
+					warn(("[LightingManager] - No child with name of '%s'"):format(PropertyName))
+				end
+			elseif Color3Values[PropertyName] then
 				TweenColor3Table[PropertyName] = Value
 				DoTweenColor3 = true
 			elseif NumberValues[PropertyName] then
@@ -81,27 +96,61 @@ local LightingManager = {} do
 			elseif BooleanValues[PropertyName] then
 				Lighting[PropertyName] = Value
 			elseif PropertyName == "TimeOfDay" then
-				TweenTimeOfDay(Lighting.TimeOfDay, Value, Time)
+				TweenTimeOfDay(Parent.TimeOfDay, Value, Time)
 			else
-				error("No property with the value " .. PropertyName .. " that is tweenable")
+				warn("No property with the value " .. PropertyName .. " that is tweenable")
 			end
 		end
 		
 		if DoTweenColor3 and Time > 0 then
-			qGUI.TweenColor3(Lighting, TweenColor3Table, Time, true)
+			qGUI.TweenColor3(Parent, TweenColor3Table, Time, true)
 		else
 			for Property, Value in pairs(TweenColor3Table) do
-				Lighting[Property] = Value
+				Parent[Property] = Value
 			end
 		end
 		
 		if DoTweenNumber and Time > 0 then
-			qGUI.TweenTransparency(Lighting, TweenNumberTable, Time, true)
+			qGUI.TweenTransparency(Parent, TweenNumberTable, Time, true)
 		else
 			for Property, Value in pairs(TweenNumberTable) do
-				Lighting[Property] = Value
+				Parent[Property] = Value
 			end
 		end
+	end
+	
+	local LastLightingSent 
+	function LightingManager:TweenProperties(PropertyTable, Time)
+		assert(type(PropertyTable) == "table")
+		assert(type(Time) == "number")
+		
+		if RunService:IsClient() then
+			TweenOnItem(Lighting, PropertyTable, Time)
+		else
+			LastLightingSent = {
+				Table = PropertyTable, 
+				EndTime = tick() + Time;
+			}
+			LightingEvent:FireAllClients(PropertyTable, Time)
+		end
+	end
+	
+	if RunService:IsClient() then
+		LightingEvent.OnClientEvent:connect(function(PropertyTable, Time)
+			LightingManager:TweenProperties(PropertyTable, Time)
+		end)
+	end
+	
+	if RunService:IsServer() then
+		local function HandlePlayerAdded(Player)
+			if LastLightingSent then
+				LightingEvent:FireClient(Player, LastLightingSent.Table, math.max(0, tick() - LastLightingSent.EndTime))
+			end
+		end
+		for _, Player in pairs(Players:GetPlayers()) do
+			HandlePlayerAdded(Player)
+		end
+		Players.PlayerAdded:connect(HandlePlayerAdded)
 	end
 end
 
