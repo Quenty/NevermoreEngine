@@ -163,6 +163,23 @@ end
 lib.DirectAppend = DirectAppend
 lib.directAppend = DirectAppend
 
+local function DeepDirectAppend(Table, NewTable)
+	-- Addes al of NewTable's values to Table..
+	
+	for Index, Value in pairs(NewTable) do
+		if type(Table[Index]) == "table" and type(Value) == "table" then
+			Table[Index] = DeepDirectAppend(Table[Index], Value)
+		elseif type(Value) == "table" then
+			Table[Index] = Value
+		else
+			Table[Index] = Value
+		end
+	end
+
+	return Table
+end
+lib.DeepDirectAppend = DeepDirectAppend
+
 
 local function CopyTable(OriginalTable)
 	local Copy
@@ -181,9 +198,11 @@ lib.copy = CopyTable
 
 
 local DeepCopy
-function DeepCopyTable(OriginalTable)
+
+function DeepCopy(OriginalTable)
+	local OriginalType = type(OriginalTable)
 	local Copy
-	if type(OriginalTable) == 'table' then
+	if OriginalType == 'table' then
 		Copy = {}
 		for Index, Value in next, OriginalTable, nil do
 			Copy[DeepCopy(Index)] = DeepCopy(Value)
@@ -194,9 +213,11 @@ function DeepCopyTable(OriginalTable)
 	end
 	return Copy
 end
-lib.DeepCopy = DeepCopyTable
-lib.deepCopy = DeepCopyTable
-lib.deep_copy = DeepCopyTable
+
+lib.DeepCopy = DeepCopy
+lib.deepCopy = DeepCopy
+lib.deep_copy = DeepCopy
+
 
 
 local function ShellSort(Table, GetValue)
