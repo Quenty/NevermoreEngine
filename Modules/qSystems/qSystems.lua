@@ -229,7 +229,6 @@ local function CheckCharacter(Player)
 end
 lib.CheckCharacter = CheckCharacter
 
-
 local function GetIndexByValue(Values, Value)
 	--- Return's the index of a Value in a table.
 	-- @param Values A table to search for 
@@ -245,41 +244,6 @@ local function GetIndexByValue(Values, Value)
 	return nil
 end
 lib.GetIndexByValue = GetIndexByValue
-
-
-local function Class(Constructor, Metatable)
-	--- Provides a wrapper for new classes. Abuses closures to create this class. It's recommended
-	--  this class system not be used. Left here for legacy reasons. This sort of class system is
-	--  more efficient in terms of calcuation speed, but costs more to construct and uses a lot more
-	--  memory. In most cases, the fact it's linked to qSystems makes it unreasonable to use this
-	--  class system. Furthermore, this class system does not do inheritance well.
-	-- @param Constructor A function that's passed the parameters `newClass` and any extra arguments
-	--     passed in on construction
-	-- @param [Metatable] The metatable to assign to the new class. 
-	-- @return The constructor of the class to use
-
-	local ConstructNewClass
-
-	if Metatable then
-		function ConstructNewClass(...)
-			local newClass = {}
-
-			setmetatable(newClass, Metatable)
-
-			local Results = {Constructor(newClass, ...)}
-			return newClass, unpack(Results)
-		end
-	else
-		function ConstructNewClass(...)
-			local newClass = {}
-			local Results = {Constructor(newClass, ...)}
-			return newClass, unpack(Results)
-		end
-	end
-
-	return ConstructNewClass
-end
-lib.Class = Class
 
 local function Sign(Number)
 	--- Return's the mathetmatical sign of an object
