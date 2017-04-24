@@ -37,7 +37,7 @@ function PaperRipple.new(Container)
 	self.Ripples = {}
 	self.Animating = false
 
-	self:BindInput(self.Container)
+	self:BindInput()
 
 	return self
 end
@@ -63,8 +63,17 @@ function PaperRipple.FromParent(Parent)
 	Container.Size                   = UDim2.new(1, 0, 1, 0);
 	Container.ZIndex                 = math.min(Parent.ZIndex + 1, 10)
 	Container.Parent                 = Parent
+	
+	local Ripple = PaperRipple.new(Container)
+	
+	if Parent:IsA("TextLabel") or Parent:IsA("TextButton") then
+		local H, S, V = Color3.toHSV(Parent.BackgroundColor3)
+		if V > 0.9 and S < 0.1 then
+			Ripple:SetInkColor(Parent.TextColor3:lerp(Color3.new(1,1,1), 0.5))
+		end
+	end
 
-	return PaperRipple.new(Container)
+	return Ripple
 end
 
 function PaperRipple:SetInkColor(InkColor)
@@ -77,6 +86,8 @@ function PaperRipple:SetInkColor(InkColor)
 		Item:SetInkColor(self.InkColor)
 	end
 	self.Container.BackgroundColor3 = self.InkColor
+	
+	return self
 end
 
 function PaperRipple:SetRecenter(DoRecenter)
@@ -243,11 +254,7 @@ function PaperRipple:Up()
 	self.InputMaid.InputEnded = nil
 end
 
-function PaperRipple:UnbindInput(Gui)
-	self.InputMaid[Gui] = nil
-end
-
-function PaperRipple:BindInput(Gui, Filter)
+function PaperRipple:BindInput()
 	--- Binds the input to the InputMaid to detect/handle Touch,
 	--  and mouse button inputs over the GUI in question. Will override
 	--  old bindings with the same names.
@@ -278,8 +285,8 @@ function PaperRipple:BindInput(Gui, Filter)
 		end
 	end
 
-	self.InputMaid[Gui] = Gui.InputBegan:connect(function(InputObject)
-		if ValidInputEnums[InputObject.UserInputType] and (not Filter or Filter(InputObject)) then
+	self.InputMaid.InputBegan = self.Container.InputBegan:connect(function(InputObject)
+		if ValidInputEnums[InputObject.UserInputType] then
 			local Position = Vector2.new(InputObject.Position.X, InputObject.Position.Y)
 			self:Down(Position)
 
