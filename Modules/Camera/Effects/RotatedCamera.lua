@@ -54,12 +54,12 @@ function RotatedCamera:__newindex(Index, Value)
 	elseif Index == "AngleX" or Index == "AngleXZ" then
 		self._AngleXZ = Value
 	elseif Index == "MaxY" then
-		assert(Value > self.MinY, "MaxY must be greater than MinY")
+		assert(Value >= self.MinY, "MaxY must be greater than MinY")
 		self._MaxY = Value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif Index == "MinY" then
-		assert(Value < self.MinY, "MinY must be less than MaxY")
-		self._MaxY = Value
+		assert(Value <= self.MaxY, "MinY must be less than MaxY")
+		self._MinY = Value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif RotatedCamera[Index] ~= nil then
 		rawset(self, Index, Value)
