@@ -1,1087 +1,473 @@
 local Players          = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService       = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local LocalPlayer      = Players.LocalPlayer
-local Mouse            = LocalPlayer:GetMouse()
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
--- ScrollingFrame.lua
--- @author Quenty
+local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
+local Signal = LoadCustomLibrary("Signal")
+local SpringPhysics = LoadCustomLibrary("SpringPhysics")
 
---- UTILITY ---
--- Utility funtions have been added to allow ScrollingFrame to operate as a standalone module.
+local Scroller = {}
+Scroller.ClassName = "Scroller"
+Scroller.__index = Scroller
+Scroller._Position = 0
+Scroller._Min = 0
+Scroller._Max = 100
+Scroller._ViewSize = 50
 
-local function GetPositionFromOffset(Offset, Axis)
-	-- Utility function
+function Scroller.new()
+	local self = setmetatable({}, Scroller)
+	
+	self.Spring = SpringPhysics.Spring.New(0)
+	self.Spring.Speed = 20
+	
+	return self
+end
 
-	if Axis == 'Y' then
-		return UDim2.new(0, 0, 0, -Offset)
-	elseif Axis == 'X' then
-		return UDim2.new(0, -Offset, 0, 0)
+function Scroller:GetTimesOverBounds(Position)
+	return self:GetDisplacementPastBounds(Position) / self.BackBounceInputRange
+end
+
+function Scroller:GetDisplacementPastBounds(Position)
+	if Position > self.ContentMax then
+		return Position - self.ContentMax
+	elseif Position < self.ContentMin then
+		return Position
 	else
-		error("[GetPositionFromOffset] - Invalid Axis")
-	end
-end
-
-local function GetSizeFromAxis(Size, Axis)
-	-- Utility function
-
-	if Axis == 'Y' then
-		return UDim2.new(1, 0, 0, Size)
-	elseif Axis == 'X' then
-		return UDim2.new(0, Size, 1, 0)
-	else
-		error("[GetSizeFromAxis] - Invalid Axis")
-	end
-end
-
-
--- Utility that would usually be imported, but I want a portable library:
-
-local MakeMaid do
-	local index = {
-		GiveTask = function(self, task)
-			local n = #self.Tasks+1
-			self.Tasks[n] = task
-			return n
-		end;
-		DoCleaning = function(self)
-			local tasks = self.Tasks
-			for name,task in pairs(tasks) do
-				if type(task) == 'function' then
-					task()
-				else
-					task:disconnect()
-				end
-				tasks[name] = nil
-			end
-			-- self.Tasks = {}
-		end;
-	};
-
-	local mt = {
-		__index = function(self, k)
-			if index[k] then
-				return index[k]
-			else
-				return self.Tasks[k]
-			end
-		end;
-		__newindex = function(self, k, v)
-			local tasks = self.Tasks
-			if v == nil then
-				-- disconnect if the task is an event
-				if type(tasks[k]) ~= 'function' and tasks[k] then
-					tasks[k]:disconnect()
-				end
-			elseif tasks[k] then
-				-- clear previous task
-				self[k] = nil
-			end
-			tasks[k] = v
-		end;
-	}
-
-	function MakeMaid()
-		return setmetatable({Tasks={},Instances={}},mt)
-	end
-end
-
-local Signal = {}
-
-function Signal.new()
-	local sig = {}
-	
-	local mSignaler = Instance.new('BindableEvent')
-	
-	local mArgData = nil
-	local mArgDataCount = nil
-	
-	function sig:fire(...)
-		mArgData = {...}
-		mArgDataCount = select('#', ...)
-		mSignaler:Fire()
-	end
-	
-	function sig:connect(f)
-		if not f then error("connect(nil)", 2) end
-		return mSignaler.Event:connect(function()
-			f(unpack(mArgData, 1, mArgDataCount))
-		end)
-	end
-	
-	function sig:wait()
-		mSignaler.Event:wait()
-		assert(mArgData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-		return unpack(mArgData, 1, mArgDataCount)
-	end
-	
-	return sig
-end
-
-
-local function Round(Number, Divider)
-	-- Rounds a Number, with 1.5 rounding up to 2, and so forth, by default. 
-	-- @param Number the Number to round
-	-- @param [Divider] optional Number of which to "round" to. If nothing is given, it will default to 1. 
-
-	Divider = Divider or 1
-
-	return (math.floor((Number/Divider)+0.5)*Divider)
-end
-
-local function PointInBounds(Frame, X, Y)
-	local TopBound    = Frame.AbsolutePosition.Y
-	local BottomBound = Frame.AbsolutePosition.Y + Frame.AbsoluteSize.Y
-	local LeftBound   = Frame.AbsolutePosition.X
-	local RightBound  = Frame.AbsolutePosition.X + Frame.AbsoluteSize.X
-
-	if Y > TopBound and Y < BottomBound and X > LeftBound and X < RightBound then
-		return true
-	else
-		return false
-	end
-end
-
-local function GetIndexByValue(Values, Value)
-	-- Return's the index of a Value. 
-
-	for Index, TableValue in next, Values do
-		if Value == TableValue then
-			return Index;
-		end
-	end
-
-	return nil
-end
-
-local function CreateFlatBacking(Frame, Spacing)
-	-- Applies a flat backing on the scroll bar. 
-	-- @param Frame The frame to put it on
-	-- @param Spacing The spacing on the left/right/top/bottom sides. The whitespace. Should be divisible by 2.
-
-	Spacing = Spacing or 2
-
-	local SmoothBacking = Instance.new("Frame")
-	SmoothBacking.BackgroundTransparency = 0
-	SmoothBacking.BorderSizePixel        = 0
-	SmoothBacking.Name                   = "Backing"
-	SmoothBacking.BackgroundColor3       = Color3.new(148/255, 161/255, 174/255)
-	SmoothBacking.Size                   = UDim2.new(1, -Spacing*2, 1, -Spacing*2)
-	SmoothBacking.Position               = UDim2.new(0, Spacing, 0, Spacing)
-	SmoothBacking.Parent                 = Frame
-	SmoothBacking.ZIndex                 = Frame.ZIndex
-
-	return SmoothBacking
-end
-
-local function GetAveragePositionFromTouchPositions(TouchPositions)
-	local AveragePosition = Vector2.new(0,0)
-			
-	if #TouchPositions > 0 then
-		for _, Position in pairs(TouchPositions) do
-			AveragePosition = AveragePosition + Position
-		end
-		AveragePosition = AveragePosition / #TouchPositions
-	end
-
-	return AveragePosition
-end
-
---- Scroll Bar ---
-local ScrollBar = {}
-ScrollBar.__index = ScrollBar
-
-function ScrollBar.new(BarContainer, Scroller)
-	--- NOTE: BarContainer.Active MUST be true for the scroll wheels to work. This is for a UX reason.
-	--- NOTE: BarContainer SHOULD be a button. 
-
-	-- @param Scroller A scrolling frame.
-
-	local new = {}
-	setmetatable(new, ScrollBar)
-
-	new.Active = true
-
-	new.Scroller     = Scroller
-	new.BarContainer = BarContainer
-	new.Maid         = MakeMaid()
-	new.Axis         = Scroller.Axis
-
-	new.ScrollSpeedOnContainerClick = 0.0625 -- When someone clicks on the BarContainer, how fast do we scroll.
-	
-	local BarFrame = Instance.new("ImageButton", BarContainer)
-	BarFrame.Name                   = "ScrollBar"
-	BarFrame.BackgroundColor3       = Color3.new(148/255, 161/255, 174/255)
-	BarFrame.BackgroundTransparency = 1;
-	BarFrame.Image                  = ""
-	BarFrame.Archivable             = false
-	BarFrame.Parent                 = BarContainer
-	BarFrame.BorderSizePixel        = 0
-	BarFrame.AutoButtonColor        = false
-	BarFrame.ZIndex                 = BarContainer.ZIndex
-
-	CreateFlatBacking(BarFrame, 1)
-
-	new.BarFrame = BarFrame
-
-	new.Max = 0 -- About to update. Max offset really.
-	new:UpdateRender()
-	new:UpdateMouseWheelEvents()
-
-	new.Maid.ScrollerChanged = Scroller.Frame.Changed:connect(function(Property)
-		if Property == "AbsoluteSize" or Property == "Position" then
-			new:UpdateRender()
-		end
-	end)
-
-	new.Maid.BarFrameMouseButton1Down = BarFrame.MouseButton1Down:connect(function()
-		new:Tap()
-	end)
-
-	new.Maid.BarContainerChanged = BarContainer.Changed:connect(function(Property)
-		if Property == "AbsoluteSize" then
-			new:UpdateRender()
-		elseif Property == "Active" then
-			new:UpdateMouseWheelEvents()
-		end
-	end)
-
-	new.Maid.FrameInputBegan = BarContainer.InputBegan:connect(function(InputObject)
-		if InputObject.UserInputType.Name == "MouseButton1" or InputObject.UserInputType.Name == "Touch" then
-			new:HandleClickOnBacking(new:GetRelativePosition())
-		end
-	end)
-
-	return new
-end
-
-function ScrollBar:UpdateMouseWheelEvents()
-	if self.BarContainer.Active then
-		self.Maid.MouseWheelUp = self.BarContainer.MouseWheelForward:connect(function()
-			if not self.Pressed and not self.Scroller.Pressed  then
-				self.Scroller:ScrollUp()
-			end
-		end)
-
-		self.Maid.MouseWheelBackward = self.BarContainer.MouseWheelBackward:connect(function()
-			if not self.Pressed and not self.Scroller.Pressed then
-				self.Scroller:ScrollDown()
-			end
-		end)
-	else
-		self.Maid.MouseWheelUp       = nil
-		self.Maid.MouseWheelBackward = nil
-	end
-end
-
-function ScrollBar:HandleClickOnBacking(Offset)
-	-- Handles clicking on the back. We'll emulate sublime text behavior.
-	-- @param Offset How far offset the mouse was. 
-
-	if not (self.Pressed or self.Scroller.Pressed) then
-		local CurrentRelativePosition = self.BarFrame.AbsolutePosition[self.Axis] - self.BarContainer.AbsolutePosition[self.Axis]
-
-		if Offset > CurrentRelativePosition then
-			self.Scroller:ScrollTo(self.Scroller.Offset + self.Scroller.PixelsPerPageUpDown, self.ScrollSpeedOnContainerClick)
-		else
-			self.Scroller:ScrollTo(self.Scroller.Offset - self.Scroller.PixelsPerPageUpDown, self.ScrollSpeedOnContainerClick)
-		end
-	else
-		warn("[ScrollBar][HandleClickOnBacking] - Can't scroll, already pressed")
-	end
-end
-
-function ScrollBar:GetRelativePosition()
-	-- Relative input position to frame. 
-	-- Mouse Offset from top of frame. 
-
-	return self.Scroller:GetMousePosition() - self.BarContainer.AbsolutePosition[self.Axis]
-end
-
-function ScrollBar:UpdateRender()
-	-- Resize bar
-
-	local ContentVisible        = self.Scroller.Container.AbsoluteSize[self.Axis]
-	local TotalContentArea      = self.Scroller.Frame.AbsoluteSize[self.Axis]
-
-	if TotalContentArea == 0 then -- Nothing like dividing by 0
-		TotalContentArea = 1
-	end
-
-	local ScrollerOffset = self.Scroller.Offset
-	--[[if self.Scroller:IsAutoScrolling() and self.Scroller.Target then
-		ScrollerOffset = self.Scroller.Target
-	end--]]
-
-	-- Handle over bounds...
-	local AmountOver = -math.min(ScrollerOffset, self.Scroller.Max - ScrollerOffset)
-	if AmountOver > 0 then
-		TotalContentArea = TotalContentArea + AmountOver
-	end
-
-	local ContentVisiblePercent = ContentVisible/TotalContentArea
-	local ScaledSize            = ContentVisiblePercent * (self.BarContainer.AbsoluteSize[self.Axis])
-	
-	self.BarFrame.Size          = GetSizeFromAxis(ScaledSize, self.Axis)
-	
-	-- Position it
-	local CurrentPercent = ScrollerOffset/self.Scroller.Max
-	CurrentPercent       = math.min(1, math.max(0, CurrentPercent)) -- Constrain between 0 and 1.
-
-	local MaximumScrollPosition = self.BarContainer.AbsoluteSize[self.Axis] - self.BarFrame.AbsoluteSize[self.Axis]
-	local Offset                = (CurrentPercent*MaximumScrollPosition)
-	
-	self.BarFrame.Position      = GetPositionFromOffset(-Offset, self.Axis)
-
-	self.Max = self.BarContainer.AbsoluteSize[self.Axis] - self.BarFrame.AbsoluteSize[self.Axis]
-end
-
-function ScrollBar:Destroy()
-	self.Maid:DoCleaning()
-	self.Maid    = nil
-
-	self.BarFrame:Destroy()
-	self.BarFrame = nil
-
-	self.Active = false
-
-	self.Scroller.ScrollBars[self] = nil
-	setmetatable(self, nil)
-end
-
-function ScrollBar:Drag()
-	if (self.Pressed) then
-		local NewReference    = self:GetRelativePosition()
-		local Delta           = self.Reference - NewReference
-		self.Reference        = NewReference
-		
-		self:ConnectReleaseEvent()
-
-		local BarContainerAbsolutePosition = self.BarContainer.AbsolutePosition[self.Axis]
-		local ActualOffset    = BarContainerAbsolutePosition - self.PretendAbsolutePosition--self.BarFrame.AbsolutePosition[self.Axis]
-		local SupposeToRender = -(ActualOffset + Delta)
-		local Percent         = SupposeToRender/self.Max
-
-		self.PretendAbsolutePosition = BarContainerAbsolutePosition + SupposeToRender
-		-- self.BarFrame.Position = GetPositionFromOffset(-SupposeToRender, self.Axis)
-		local NewScrollerOffset = (self.Scroller.Max) * Percent
-
-		self.Scroller:SetOffset(math.max(self.Scroller.Min, math.min(self.Scroller.Max, NewScrollerOffset)))
-	else
-		warn("[ScrollBar] - Cannot drag, not pressed")
-	end
-end
-
-function ScrollBar:Tap()
-	if not self.Pressed and not self.Scroller.Pressed then
-		self.Pressed = true
-		self.Scroller.Pressed = true
-
-		self.Reference = self:GetRelativePosition()
-		self.PretendAbsolutePosition = self.BarFrame.AbsolutePosition[self.Axis]
-
-		if self.Scroller.CurrentAutoScrollThread then -- No auto scrollying while we are dragging.
-			self.Scroller.CurrentAutoScrollThread = nil
-		else
-			self.Scroller.ScrollStart:fire(self.Scroller.Offset)
-		end
-
-		local Success, Error = coroutine.resume(coroutine.create(function()
-			while self.Pressed and self.Active do
-				self:Drag()
-				RunService.Heartbeat:wait()
-			end
-			self.Scroller.Pressed = false
-			self.Scroller:ScrollTo(self.Scroller.Offset) -- scroll to itself, incase we're over the edge, we can bounce back, et cetera. 
-		end))
-		assert(Success, Error)
-	else
-		warn("[ScrollBar] - Cannot tap, already tapping! This may be caused by the fact ROBLOX fires MouseButton1 and Touch events simultaneously.")
-	end
-end
-
-function ScrollBar:DisconnectReleaseEvent()
-	self.Maid.CatchMouseUpInput = nil
-end
-
-function ScrollBar:Release()
-	self.Pressed = false
-	self:DisconnectReleaseEvent()
-
-	self.Scroller.ScrollEnd:fire(self.Scroller.Offset)
-end
-
-function ScrollBar:ConnectReleaseEvent()
-	self.Maid.CatchMouseUpInput = UserInputService.InputEnded:connect(function(InputObject)
-		if InputObject.UserInputType.Name == "MouseButton1" or InputObject.UserInputType.Name == "Touch" then
-			self:Release()
-		end
-	end)
-end
-
-
-
---- SCROLLING FRAME ---
-local ScrollingFrame = {}
-ScrollingFrame.__index = ScrollingFrame
-ScrollingFrame.PixelsPerWheelTurn = 40
-ScrollingFrame.MouseOffset = Vector2.new(0, 36) -- Topbar GUI screws up mouse relative to GUIs.
-
-
--- Local memory usage scroll frame using metatables. 
--- See: https://github.com/ariya/kinetic
-
-function ScrollingFrame.new(Frame, Axis)
-	--- Note: Frame must inherit from GuiButton to work with click and drag.
-	-- Note: Frame must have the "Active" property as true for scrolling to work.
-
-	local new = {}
-	setmetatable(new, ScrollingFrame)
-
-	-- READ ONLY.
-	new.Active    = true -- Has not been destroyed
-	new.Axis      = Axis or 'Y' 
-	new.Frame     = Frame 
-	new.Container = Frame.Parent
-	new.Pressed   = false
-
-	assert(new.Container.ClipsDescendants, "Container does not clip descendants")
-
-	new.Max, new.Min, new.PixelsPerPageUpDown = 0, 0, 0-- About to recalc
-	new:RecalculateBounds()
-	new.Offset = Frame.AbsolutePosition[new.Axis] - new.Container.AbsolutePosition[new.Axis] 
-
-	new.ScrollBars = {}
-
-	--- Events!
-	new.ScrollStart = Signal.new() -- These should fire whenever a scroll starts or finishes. A scroll is anytime the frame is constantly updating, so we can't guarantee that
-	new.ScrollEnd   = Signal.new() -- this will fire at transitions between user and autonimious scrolling, 
-
-	--- CONNECT EVENTS ----
-	local Maid = MakeMaid()
-	new.Maid = Maid
-
-	new:UpdateMouseWheelEvents()
-
-	Maid.FrameChanged = Frame.Changed:connect(function(Property)
-		if Property == "AbsoluteSize" then
-			new:RecalculateBounds()
-		elseif Property == "Active" then
-			new:UpdateMouseWheelEvents()
-		end
-	end)
-
-	Maid.ContainerChanged = new.Container.Changed:connect(function(Property)
-		if Property == "AbsoluteSize" then
-			new:RecalculateBounds()
-		end
-	end)
-
-	if UserInputService.TouchEnabled then
-		new.Maid.FrameInputBegan = Frame.InputBegan:connect(function(InputObject)
-			if InputObject.UserInputType.Name == "MouseButton1" or InputObject.UserInputType.Name == "Touch" then
-				new:Tap()
-			end
-		end)
-	else
-		new.Maid.FrameInputBegan = Frame.InputBegan:connect(function(InputObject)
-			if InputObject.UserInputType.Name == "MouseButton1" then
-				new:Tap()
-			end
-		end)
-	end
-
-	-- if UserInputService.TouchEnabled then
-	-- 	new.LastFingerCount = 0
-	-- 	new:DisconnectReleaseEvent() -- Connects up the trigger event.
-	-- endg
-
-	return new
-end
-
---[[
-function ScrollingFrame:HandleTouchPan(TouchPositions, TotalTransition, Velocity, State)
-	local AveragePosition = GetAveragePositionFromTouchPositions(TouchPositions)
-	
-	if Enum.UserInputState.Begin and not self.Pressed then
-		self.LastAverageFingerPosition = AveragePosition
-		self:Tap()
-	elseif self.Pressed then
-		if InputState == Enum.UserInputState.Change and #TouchPositions > 0 then
-			self.LastAverageFingerPosition = AveragePosition
-		elseif InputState ~= Enum.UserInputState.None then 
-			self.LastAverageFingerPosition = nil
-			self:Release()
-		end
-	end
-end--]]
-
-function ScrollingFrame:ExpectedAtBottom()
-	--- Basically :IsAtBottom, except for future iterations of this, we could be animating TOWARDS the bottom. 
-
-	return self.Offset >= (self.Max - 1)
-end
-
-function ScrollingFrame:AddScrollBar(BarContainer)
-	local NewScrollBar = ScrollBar.new(BarContainer, self)
-	self.ScrollBars[NewScrollBar] = true
-	
-	return NewScrollBar
-end
-
-function ScrollingFrame:Destroy()
-	-- GC
-
-	-- Clear out animation loops
-	self.Active                  = false
-	self.CurrentAutoScrollThread = nil
-
-	for ScrollBar, _ in pairs(self.ScrollBars) do
-		ScrollBar:Destroy()
-	end
-
-	-- Clean up event stuff
-	self.Maid:DoCleaning()
-	self.Maid = nil
-
-	self.ScrollStart = nil
-	self.ScrollEnd   = nil
-
-
-	setmetatable(self, nil)
-end
-
-function ScrollingFrame:ScrollUp(Distance)
-	if not self.Pressed then
-		self:SetOffset(self.Offset - (Distance or self.PixelsPerWheelTurn))
-	end
-end
-
-function ScrollingFrame:ScrollDown(Distance)
-	if not self.Pressed then
-		self:SetOffset(self.Offset + (Distance or self.PixelsPerWheelTurn))
-	end
-end
-
-function ScrollingFrame:UpdateMouseWheelEvents()
-	if self.Frame.Active then
-		self.Maid.MouseWheelUp = self.Frame.MouseWheelForward:connect(function()
-			self:ScrollUp()
-		end)
-
-		self.Maid.MouseWheelBackward = self.Frame.MouseWheelBackward:connect(function()
-			self:ScrollDown()
-		end)
-	else
-		self.Maid.MouseWheelUp       = nil
-		self.Maid.MouseWheelBackward = nil
-	end
-end
-
-function ScrollingFrame:RecalculateBounds()
-	-- Yeah, this could really mess up some animations on inhereted stuff.
-
-	self.Min                 = 0
-	self.Max                 = math.max(1, self.Frame.AbsoluteSize[self.Axis] - self.Container.AbsoluteSize[self.Axis]) -- No dividing by zero, hear me!
-	self.PixelsPerPageUpDown = self.Container.AbsoluteSize[self.Axis]
-end
-
-function ScrollingFrame:RecalculateOffset()
-	--- This may not be a good thing to touch. 
-
-	self.Offset = self.Container.AbsolutePosition[self.Axis] - self.Frame.AbsolutePosition[self.Axis]
-end
-
-function ScrollingFrame:GetMousePosition()
-	-- @return The mouse position relative to the GUI's ScreenGUI.
-
-	return Mouse[self.Axis] - self.MouseOffset[self.Axis]
-end
-
-function ScrollingFrame:GetRelativePosition()
-	-- Relative input position to frame. 
-	-- Mouse Offset from top of frame. 
-
-	--[[if self.LastAverageFingerPosition then -- This is iOS case.
-		local RelativePosition = self.LastAverageFingerPosition[self.Axis] - self.Container.AbsolutePosition[self.Axis]
-
-		return RelativePosition
-	end--]]
-
-	return self:GetMousePosition() - self.Container.AbsolutePosition[self.Axis]
-end
-
-function ScrollingFrame:ConstrainOffset(Offset)
-	--- Constrains ANY offset and returns the constrained value.
-	--- Utility function that returns a newly constrained offset based on max / min
-
-	return (Offset < self.Min) and self.Min or (Offset > self.Max) and self.Max or Offset
-end
-
-function ScrollingFrame:SetOffset(Offset)
-	self.Offset = self:ConstrainOffset(Offset)
-	self.Frame.Position = GetPositionFromOffset(self.Offset, self.Axis)
-end
-
-function ScrollingFrame:ScrollTo(Offset)
-	if self.Pressed then
-		self:SetOffset(Offset)
-	else
-		warn("[ScrollingFrame][ScrollTo] - Will not ScrollTo new location, we are pressed")
-	end
-end
-
-function ScrollingFrame:Drag()
-	-- Interal code used during drag
-
-	if (self.Pressed) then
-		local Offset = self:GetRelativePosition()
-		local Delta = self.Reference - Offset
-		self.Reference = Offset
-
-		self:SetOffset(self.Offset + Delta)
-		return Delta
-	else
-		warn("[ScrollingFrame] - Cannot drag, not pressed")
 		return 0
 	end
 end
 
-function ScrollingFrame:IsScrolling()
-	return self.Pressed
+function Scroller:GetScale(TimesOverBounds)
+	return (1 - 0.5 ^ math.abs(TimesOverBounds))
 end
 
-function ScrollingFrame:ConnectReleaseEvent()
-	self.Maid.CatchMouseUpInput = UserInputService.InputEnded:connect(function(InputObject)
-		if InputObject.UserInputType.Name == "MouseButton1" or InputObject.UserInputType.Name == "Touch" then
-			self:Release()
-		end
-	end)
-
-	-- new.Maid.DragBegan = nil
-
-	-- if UserInputService.TouchEnabled then
-	-- 	self.Maid.UISTouchEnabled = BarContainer.TouchPan:connect(function(TouchPositions, TotalTransition, Velocity, State)
-	-- 		new:HandleTouchPan(TouchPositions, TotalTransition, Velocity, State)
-	-- 	end)
-	-- end
-end
-
-function ScrollingFrame:DisconnectReleaseEvent()
-	self.Maid.CatchMouseUpInput = nil
-
-	-- self.Maid.UISTouchEnabled = nil
-	-- if UserInputService.TouchEnabled then
-	-- 	new.Maid.DragBegan = BarContainer.TouchPan:connect(function(TouchPositions, TotalTransition, Velocity, State)
-	-- 		if not self.Pressed then
-	-- 			new:HandleTouchPan(TouchPositions, TotalTransition, Velocity, State)
-	-- 		end
-	-- 	end)
-	-- end
-end
-
-function ScrollingFrame:Tap(OnTapEndCallback)
-	--- When the player taps. 
-	-- @param [OnTapEndCallback] function(ConsideredClick, ElapsedTime, ScrollDistance)
-		-- This callback is quite useful as the .MouseButton1Up event will not fire if the scroll frame is manually triggered. 
-		-- It will be called in a coroutine
-		-- @param ConsideredClick A boolean, true if it's a click/tap, false if it's a drive. Just an opinion, but prevents broiler plate code. 
-		-- @param TimePassed This is how much time passed since the tap started. This is useful to determine a click or an actual attempt to scroll. 
-			-- Usually 0.15 is a good number. 
-		-- @param ScrollDistance the distance it scrolled only, no direction. 
-
-		-- Note: Even though it is called in a coroutine, it should still error, as this script also yields using ROBLOX's thing first.
-
-
-	if not self.Pressed then
-		self.Pressed = true
-
-		self.Reference = self:GetRelativePosition()
-		self:ConnectReleaseEvent()
-
-		self.ScrollStart:fire(self.Offset)
-
-		local Success, Error = coroutine.resume(coroutine.create(function()
-			local StartTime = tick()
-			local ScrollDistance = 0
-
-			while self.Pressed and self.Active do
-				ScrollDistance = ScrollDistance + math.abs(self:Drag())
-				RunService.Heartbeat:wait()
-			end
-
-			if OnTapEndCallback then
-				local ElapsedTime = tick() - StartTime
-				local ConsideredClick = (ElapsedTime <= 0.15) or (ScrollDistance <  1)
-				OnTapEndCallback(ConsideredClick, ElapsedTime, ScrollDistance)
-			end
-		end))
-		assert(Success, Error)
-	else
-		warn("[ScrollingFrame] - Cannot tap, already tapping! This may be caused by the fact ROBLOX fires MouseButton1 and Touch events simultaneously.")
-	end
-end
-
-function ScrollingFrame:Release()
-	--- When the player stops inputting/tapping.
-
-	self:DisconnectReleaseEvent()
-
-	if self.Pressed then
-		self.Pressed = false
-		self.ScrollEnd:fire(self.Offset)
-	end
-end
-
-function ScrollingFrame:GetPercentOffset()
-	-- Return's the percent offset the thingy is.
-
-	return self.Offset / self.Max
-end
-
-function ScrollingFrame:ScrollToBottom()
-	self:ScrollTo(self.Max)
-end
-
-function ScrollingFrame:ScrollToTop()
-	self:ScrollTo(0)
-end
-
-
--- InertiaScrollingFrame --
-
-local InertiaScrollingFrame = {}
-setmetatable(InertiaScrollingFrame, ScrollingFrame)
-InertiaScrollingFrame.__index = InertiaScrollingFrame
-
-InertiaScrollingFrame.TimeConstant                  = 0.325 -- iOS standard is 325 ms
-InertiaScrollingFrame.WheelTurnAnimationSpeed       = 0.0625 -- Meh, should be instant. 
-InertiaScrollingFrame.DefaultScrollToAnimationSpeed = 0.125
-
-
-function InertiaScrollingFrame.new(Frame, Axis)
-	local new = ScrollingFrame.new(Frame, Axis)
-	setmetatable(new, InertiaScrollingFrame)
-
-	-- READ ONLY 
-	new.Velocity     = 0
-	new.Amplitude    = 0
-
-	return new
-end
-
-function InertiaScrollingFrame:ExpectedAtBottom()
-	--- Basically :IsAtBottom, takes animations into account
-
-	return self.Offset >= (self.Max - 1) or (self.CurrentAutoScrollThread and self.Target and (self.Target >= self.Max - 1) and true or false)
-end
-
-function InertiaScrollingFrame:Track()
-	-- Called during drag. Tracks velocity.
- 
-	local Now = tick()
-	local Elapsed = Now - self.TimeStamp
-	
-	self.TimeStamp = tick()
-
-	local Delta = self.Offset - self.LastOffset
-	self.LastOffset = self.Offset
-
-	local v = Delta / (0.001 + Elapsed)
-	self.Velocity = 0.8 * v + 0.2 * self.Velocity
-end
-
-function InertiaScrollingFrame:StartAutoScroll(OverridenTimeConstraint)
-	--- Internal function. OverridenTimeConstraint can override the TimeConstant. 
-
-	if OverridenTimeConstraint and OverridenTimeConstraint <= 0 then
-		--- INSTANT MODE UNLOCKED WOW PERFORMANCE INCREASED DOGE HAPPY
-		self.CurrentAutoScrollThread = nil
-		self:SetOffset(self.Target)
-	else
-		local Current
-		Current = coroutine.create(function()
-			local TimeStamp    = self.TimeStamp
-			local TimeConstant = OverridenTimeConstraint or self.TimeConstant
-			
-			while Current == self.CurrentAutoScrollThread and self.Active do
-				local Elapsed = tick() - TimeStamp
-				local Delta = -self.Amplitude * math.exp(-Elapsed / TimeConstant)
-
-
-				if math.abs(Delta) > 0.5 then
-					self:SetOffset(self.Target + Delta)
-				else
-					self:SetOffset(self.Target)
-					break -- self.CurrentAutoScrollThread = nil
-				end
-				RunService.RenderStepped:wait()
-			end
-
-			if self.CurrentAutoScrollThread == Current then
-				self.CurrentAutoScrollThread = nil
-				if not self.Pressed then
-					self.ScrollEnd:fire(self.Offset)
-				end
-			end
-		end)
-
-		if not self.Pressed and not self.CurrentAutoScrollThread then -- We set the CurrentAutoScrollThread before firing so it exists when we fire. 
-			self.CurrentAutoScrollThread = Current
-			self.ScrollStart:fire(self.Offset)
+function Scroller:__index(Index)
+	if Index == "TotalContentLength" then
+		return self._Max - self._Min
+	elseif Index == "ViewSize" then
+		return self._ViewSize
+	elseif Index == "Max" then
+		return self._Max
+	elseif Index == "ContentMax" then
+		if self._Max <= self.ContentMin + self._ViewSize then
+			return self.ContentMin
 		else
-			self.CurrentAutoScrollThread = Current
+			return self._Max - self._ViewSize -- Compensate for AnchorPoint = 0
+		end
+	elseif Index == "Min" or Index == "ContentMin" then
+		return self._Min
+	elseif Index == "Position" then
+		return self.Spring.Position		
+	elseif Index == "BackBounceInputRange" then
+		return self._ViewSize -- Maximum distance we can drag past the end
+	elseif Index == "BackBounceRenderRange" then
+		return self._ViewSize
+	elseif Index == "ContentScrollPercentSize" then
+		if self.TotalContentLength == 0 then
+			return 0
 		end
 		
-		local Success, Error = coroutine.resume(Current)
-		assert(Success, Error)
+		return (self._ViewSize / self.TotalContentLength)
+	elseif Index == "RenderedContentScrollPercentSize" then
+		local Position = self.Position
+		return self.ContentScrollPercentSize * (1-self:GetScale(self:GetTimesOverBounds(Position)))
+	elseif Index == "ContentScrollPercent" then
+		return (self.Position - self._Min) / (self.TotalContentLength - self._ViewSize)
+	elseif Index == "RenderedContentScrollPercent" then
+		local Percent = self.ContentScrollPercent
+		if Percent < 0 then
+			return 0
+		elseif Percent > 1 then
+			return 1
+		else
+			return Percent
+		end
+	elseif Index == "BoundedRenderPosition" then
+		local Position = self.Position
+		local TimesOverBounds = self:GetTimesOverBounds(Position)
+		local Scale = self:GetScale(TimesOverBounds)
+		if TimesOverBounds > 0 then
+			return -self.ContentMax - Scale*self.BackBounceRenderRange
+		elseif TimesOverBounds < 0 then
+			return self.ContentMin + Scale*self.BackBounceRenderRange
+		else
+			return -Position
+		end
+	elseif Index == "Velocity" then
+		return self.Spring.Velocity
+	elseif Index == "Target" then
+		return self.Spring.Target
+	elseif Index == "AtRest" then
+		return math.abs(self.Spring.Target - self.Spring.Position) < 1e-5 and math.abs(self.Spring.Velocity) < 1e-5
+	elseif Scroller[Index] then
+		return Scroller[Index]
+	else
+		error(("[Scroller] - '%s' is not a valid member"):format(tostring(Index)))
 	end
 end
 
-function InertiaScrollingFrame:Tap(OnTapEndCallback)
-	--- When the player taps. 
-	-- @param [OnTapEndCallback] function(ConsideredClick, ElapsedTime, ScrollDistance)
-		-- This callback is quite useful as the .MouseButton1Up event will not fire if the scroll frame is manually triggered. 
-		-- It will be called in a coroutine
-		-- @param ConsideredClick A boolean, true if it's a click/tap, false if it's a drive. Just an opinion, but prevents broiler plate code. 
-		-- @param TimePassed This is how much time passed since the tap started. This is useful to determine a click or an actual attempt to scroll. 
-			-- Usually 0.15 is a good number. 
-		-- @param ScrollDistance the distance it scrolled only, no direction. 
-
-		-- Note: Even though it is called in a coroutine, it should still error, as this script also yields using ROBLOX's thing first.
-	
-	if not self.Pressed then
-		self.Pressed = true
-
-		self.Reference        = self:GetRelativePosition()
-		self:ConnectReleaseEvent()
-
-		self.TimeStamp  = tick()
-		self.Velocity   = 0
-		self.LastOffset = self.Offset
-		self.Amplitude  = 0
-
-		if self.CurrentAutoScrollThread then
-			self.CurrentAutoScrollThread = nil -- Stop auto scroll stuff. 
-		else -- Only fire the event if we aren't already scrolling...
-			self.ScrollStart:fire(self.Offset)
+function Scroller:__newindex(Index, Value)
+	if Scroller[Index] or Index == "Spring" then
+		rawset(self, Index, Value)	
+	elseif Index == "Min" or Index == "ContentMin" then
+		self._Min = Value
+	elseif Index == "Max" then
+		self._Max = Value
+		self.Target = self.Target -- Force update! 
+	elseif Index == "TotalContentLength" then
+		self.Max = self._Min + Value
+	elseif Index == "ViewSize" then
+		self._ViewSize = Value
+	elseif Index == "Position" then
+		self.Spring.Position = Value
+	elseif Index == "TargetContentScrollPercent" then
+		self.Target = self._Min + Value * (self.TotalContentLength - self._ViewSize)
+	elseif Index == "ContentScrollPercent" then
+		self.Position = self._Min + Value * (self.TotalContentLength - self._ViewSize)
+	elseif Index == "Target" then
+		if Value > self.ContentMax then
+			Value = self.ContentMax
+		elseif Value < self.ContentMin then
+			Value = self.ContentMin
 		end
+		self.Spring.Target = Value
+	elseif Index == "Velocity" then
+		self.Spring.Velocity = Value
+	else
+		error(("[Scroller] - '%s' is not a valid member"):format(tostring(Index)))
+	end
+end
 
-		local Success, Error = coroutine.resume(coroutine.create(function()
-			local StartTime = tick()
-			local ScrollDistance = 0
 
-			while self.Pressed and self.Active do
-				ScrollDistance = ScrollDistance + math.abs(self:Drag())
-				self:Track()
-				local Step = RunService.Heartbeat:wait()
+local BaseScroller = {}
+BaseScroller.ClassName = "Base"
+BaseScroller.__index = BaseScroller
+
+function BaseScroller.new(Gui)
+	local self = setmetatable({}, BaseScroller)
+	
+	self.Maid = MakeMaid()
+	self.Gui = Gui or error("No Gui")
+	self.Container = self.Gui.Parent or error("No container")
+	
+	return self
+end
+
+function BaseScroller:Destroy()
+	self.Maid:DoCleaning()
+	self.Maid = nil
+
+	setmetatable(self, nil)
+end
+
+local Scrollbar = setmetatable({}, BaseScroller)
+Scrollbar.ClassName = "Scrollbar"
+Scrollbar.__index = Scrollbar
+
+function Scrollbar.new(Gui, ScrollingFrame)
+	local self = setmetatable(BaseScroller.new(Gui), Scrollbar)
+		
+	self.ScrollingFrame = ScrollingFrame or error("No ScrollingFrame")
+	self.ParentScroller = self.ScrollingFrame:GetScroller()
+	self:UpdateRender()
+	
+	self.DraggingBegan = Signal.new()
+	
+	self.Maid.InputBeganGui = self.Gui.InputBegan:connect(function(InputObject)
+		if InputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			self:InputBegan(InputObject)
+		end
+	end)
+	
+	self.Maid.InputBeganContainer = self.Container.InputBegan:connect(function(InputObject)
+		if InputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			self.LastContainerInputObject = InputObject
+		end
+	end)
+	
+	self.Maid.InputEndedContainer = self.Container.InputEnded:connect(function(InputObject)
+		if InputObject == self.LastContainerInputObject then
+			local ScrollbarSize = self.Container.AbsoluteSize.Y * self.ParentScroller.ContentScrollPercentSize
+			local Offset = InputObject.Position.Y - self.Container.AbsolutePosition.Y - ScrollbarSize/2 -- In the middle of the bar
+			local Percent = Offset / (self.Container.AbsoluteSize.Y * (1 - self.ParentScroller.ContentScrollPercentSize))
+			
+			self.ParentScroller.TargetContentScrollPercent = Percent
+			self.ParentScroller.Velocity = 0
+			self.ScrollingFrame:FreeScroll()
+		end
+	end)
+	
+	return self
+end
+
+function Scrollbar:StopDrag()
+	self.ScrollingFrame:StopDrag()
+end
+
+function Scrollbar:InputBegan(InputBeganObject)
+	local Maid = MakeMaid()
+	
+	local StartPosition = InputBeganObject.Position
+	local StartPercent = self.ParentScroller.ContentScrollPercent
+	local UpdateVelocity = self.ScrollingFrame:GetVelocityTracker(0.25)
+	
+	Maid.InputChanged = UserInputService.InputChanged:connect(function(InputObject)
+		if InputObject.UserInputType == Enum.UserInputType.MouseMovement then
+			local Offset = (InputObject.Position - StartPosition).y
+			local Percent = Offset / (self.Container.AbsoluteSize.Y * (1 - self.ParentScroller.ContentScrollPercentSize))
+			self.ParentScroller.ContentScrollPercent = StartPercent + Percent
+			self.ParentScroller.TargetContentScrollPercent = self.ParentScroller.ContentScrollPercent
+			
+			self.ScrollingFrame:UpdateRender()
+			UpdateVelocity()
+		end
+	end)
+	
+	Maid.InputEnded = UserInputService.InputEnded:connect(function(InputObject)
+		if InputObject == InputBeganObject then
+			self:StopDrag()
+		end
+	end)
+	
+	self.Maid.UpdateMaid = Maid
+	self.ScrollingFrame.Maid.UpdateMaid = Maid
+end
+
+function Scrollbar:UpdateRender()
+	if self.ParentScroller.TotalContentLength > self.ParentScroller.ViewSize then
+		local RenderedContentScrollPercentSize = self.ParentScroller.RenderedContentScrollPercentSize
+		self.Gui.Size = UDim2.new(self.Gui.Size.X, UDim.new(RenderedContentScrollPercentSize, 0))
+		self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new((1-RenderedContentScrollPercentSize) * self.ParentScroller.RenderedContentScrollPercent, 0))
+		self.Gui.Visible = true
+	else
+		self.Gui.Visible = false
+	end
+end
+
+local ScrollingFrame = setmetatable({}, BaseScroller)
+ScrollingFrame.ClassName = "ScrollingFrame"
+ScrollingFrame.__index = ScrollingFrame
+
+function ScrollingFrame.new(Gui)
+	local self = setmetatable(BaseScroller.new(Gui), ScrollingFrame)
+
+	self.Scrollbars = {}
+	self.Scroller = Scroller.new()
+	
+	self:BindInput(Gui)
+	self:BindInput(self.Container)
+	
+	self.Maid.ContainerChanged = self.Container.Changed:connect(function(Property)
+		if Property == "AbsoluteSize" then
+			self:UpdateScroller()
+			self:FreeScroll()
+		end
+	end)
+	
+	self.Maid.GuiChanged = self.Gui.Changed:connect(function(Property)
+		if Property == "AbsoluteSize" then
+			self:UpdateScroller()
+			
+			self:FreeScroll()
+		end
+	end)
+	
+	self:UpdateScroller()
+	self:UpdateRender()
+
+	return self
+end
+
+function ScrollingFrame:GetScroller()
+	return self.Scroller
+end
+
+function ScrollingFrame:AddScrollbar(Gui)
+	local Bar = Scrollbar.new(Gui, self)
+	table.insert(self.Scrollbars, Bar)
+	
+	self.Maid[Gui] = Bar
+end
+
+function ScrollingFrame:AddScrollbarFromContainer(Container)
+	local ScrollBar = Instance.new("ImageButton")
+	ScrollBar.Size = UDim2.new(1, 0, 0, 100)
+	ScrollBar.Name = "ScrollBar"
+	ScrollBar.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
+	ScrollBar.BorderSizePixel = 0
+	ScrollBar.Image = ""
+	ScrollBar.Parent = Container
+	ScrollBar.AutoButtonColor = false
+	ScrollBar.ZIndex = Container.ZIndex
+	ScrollBar.Parent = Container
+	
+	return self:AddScrollbar(ScrollBar)
+end
+
+function ScrollingFrame:UpdateScroller()
+	self.Scroller.TotalContentLength = self.Gui.AbsoluteSize.y
+	self.Scroller.ViewSize = self.Container.AbsoluteSize.y
+end
+
+function ScrollingFrame:UpdateRender()	
+	self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new(0, self.Scroller.BoundedRenderPosition))
+	for _, Scrollbar in pairs(self.Scrollbars) do
+		Scrollbar:UpdateRender()
+	end
+end
+
+function ScrollingFrame:StopUpdate()
+	self.Maid.UpdateMaid = nil
+end
+
+function ScrollingFrame:StopDrag()
+	local Position = self.Scroller.Position
+	
+	if self.Scroller:GetDisplacementPastBounds(self.Scroller.Position) == 0 then
+		if self.Scroller.Velocity > 0 then
+			self.Scroller.Target = math.max(self.Scroller.Target, self.Scroller.Position + self.Scroller.Velocity * 0.5)
+		else
+			self.Scroller.Target = math.min(self.Scroller.Target, self.Scroller.Position + self.Scroller.Velocity * 0.5)
+		end
+	end
+	
+	self:FreeScroll()
+end
+
+function ScrollingFrame:FreeScroll()
+	local Maid = MakeMaid()
+	
+	self:UpdateRender()
+	Maid.RenderStepped = RunService.RenderStepped:connect(function()
+		self:UpdateRender()
+		if self.Scroller.AtRest then
+			self:StopUpdate()
+		end
+	end)
+	
+	self.Maid.UpdateMaid = Maid
+end
+
+function ScrollingFrame:GetVelocityTracker(Strength)
+	Strength = Strength or 1
+	self.Scroller.Velocity = 0
+	
+	local LastUpdate = tick()
+	local LastPosition = self.Scroller.Position
+
+	return function()
+		local Position = self.Scroller.Position
+		
+		local Elapsed = tick() - LastUpdate
+		LastUpdate = tick()
+		local Delta = LastPosition - Position
+		LastPosition = Position
+		self.Scroller.Velocity = self.Scroller.Velocity - (Delta / (0.0001 + Elapsed)) * Strength
+	end
+end
+
+function ScrollingFrame:GetProcessInput(InputBeganObject)
+	local Start = self.Scroller.Position
+	local UpdateVelocity = self:GetVelocityTracker()
+	local OriginalPosition = InputBeganObject.Position
+
+	return function(InputObject)
+		local Distance = (InputObject.Position - OriginalPosition).y
+		local Position = Start - Distance
+		self.Scroller.Position = Position
+		self.Scroller.Target = Position
+		
+		self:UpdateRender()
+		UpdateVelocity()
+		
+		return Distance
+	end
+end
+
+function ScrollingFrame:ScrollTo(Position, DoNotAnimate)
+	self.Scroller.Target = Position
+	if DoNotAnimate then
+		self.Scroller.Position = self.Scroller.Target
+		self.Scroller.Velocity = 0
+	end
+end
+
+function ScrollingFrame:ScrollToTop(DoNotAnimate)
+	self:ScrollTo(self.Scroller.Min, DoNotAnimate)
+end
+
+function ScrollingFrame:ScrollToBottom(DoNotAnimate)
+	self:ScrollTo(self.Scroller.Max, DoNotAnimate)
+end
+
+function ScrollingFrame:BindInput(Gui, Options)
+	local Maid = MakeMaid()
+	
+	Maid.GuiInputBegan = Gui.InputBegan:connect(function(InputObject)
+		self:InputBegan(InputObject, Options)
+	end)
+	
+	Maid.GuiInputChanged = Gui.InputChanged:connect(function(InputObject)
+		if InputObject.UserInputType == Enum.UserInputType.MouseWheel and Gui.Active then
+			self.Scroller.Target = self.Scroller.Target + -InputObject.Position.z * 80 -- We have to be active to avoid scrolling
+			self:FreeScroll()
+		end
+	end)
+	
+	return Maid
+end
+
+function ScrollingFrame:InputBegan(InputBeganObject, Options)
+	if InputBeganObject.UserInputType == Enum.UserInputType.MouseButton1 or InputBeganObject.UserInputType == Enum.UserInputType.Touch then
+		local Maid = MakeMaid()
+		
+		local StartTime = tick()
+		local TotalScrollDistance = 0
+		local ProcessInput = self:GetProcessInput(InputBeganObject)
+		
+		if InputBeganObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			Maid.InputChanged = UserInputService.InputChanged:connect(function(InputObject, GameProcessed)
+				if InputObject.UserInputType == Enum.UserInputType.MouseMovement then
+					TotalScrollDistance = TotalScrollDistance + math.abs(ProcessInput(InputObject))
+				end	
+			end)
+		elseif InputBeganObject.UserInputType == Enum.UserInputType.Touch then
+			local function Update(InputObject, GameProcessed)
+				if InputObject.UserInputType == Enum.UserInputType.Touch then
+					TotalScrollDistance = TotalScrollDistance + math.abs(ProcessInput(InputObject))
+				end	
 			end
-
-			if OnTapEndCallback then
+			
+			Maid.InputChanged = UserInputService.InputChanged:connect(Update)
+		end
+	
+		Maid.Cleanup = function()
+			self:UpdateRender()
+			if Options and Options.OnClick then
 				local ElapsedTime = tick() - StartTime
-				local ConsideredClick = (ElapsedTime <= 0.15) or (ScrollDistance <  1)
-				OnTapEndCallback(ConsideredClick, ElapsedTime, ScrollDistance)
+				local ConsideredClick = (ElapsedTime <= 0.05) or (TotalScrollDistance < 1)
+				if ConsideredClick then
+					Options.OnClick(InputBeganObject)
+				end
 			end
-		end))
-		assert(Success, Error)
-	else
-		warn("[InertiaScrollingFrame] - Cannot tap, already tapping! This may be caused by the fact ROBLOX fires MouseButton1 and Touch events simultaneously.")
-	end
-end
-
-function InertiaScrollingFrame:IsAutoScrolling()
-	if self.CurrentAutoScrollThread then
-		return true
-	else
-		return false
-	end
-end
-
-function InertiaScrollingFrame:ScrollTo(NewOffset, OverridenTimeConstraint)
-	--- If OverridenTimeConstraint <= 0 then we won't even animate!
-	-- Will not scroll if user is dragging. 
-
-	if not self.Pressed then
-		self.CurrentAutoScrollThread = nil
-
-		local Velocity = (NewOffset - self.Offset) / 0.8
-		self.Velocity  = Velocity
-		self:Release(OverridenTimeConstraint or self.DefaultScrollToAnimationSpeed, true) -- We need to send a OverridenTimeConstraint so it forces animation.
-	else
-		warn("[InertiaScrollingFrame][ScrollTo] - Will not scroll to new location, we are pressed.")
-	end
-end
-
-function InertiaScrollingFrame:ScrollToTop(OverridenTimeConstraint)
-	--- Scrolls to the top of the window. 
-
-	self:ScrollTo(0, OverridenTimeConstraint)
-end
-
-function InertiaScrollingFrame:ScrollToBottom(OverridenTimeConstraint)
-	--- Scrolls to the bottom of the window.
-
-	self:ScrollTo(self.Max, OverridenTimeConstraint)
-end
-
-function InertiaScrollingFrame:ScrollToChild(Child, Offset, OverridenTimeConstraint)
-	---- Scrolls to the top of a child's frame, (so that it is visible, given, of course, it is in the frame).
-	-- @param [Offset] Offset past the top of the child
-	-- @param [OverridenTimeConstraint] How long it takes to scroll to that point. 
-
-	Offset = Offset or 0
-	local RelativePosition = Child.AbsolutePosition[self.Axis] - self.Frame.AbsolutePosition[self.Axis] + Offset
-
-	self:ScrollTo(RelativePosition, OverridenTimeConstraint)
-end
-
-
-function InertiaScrollingFrame:ScrollUp(OverridenTimeConstraint)
-	-- Scrolls the current frame up
-	-- Won't work is pressed. 
-
-	if not self.Pressed then
-		self:ScrollTo(self.Offset - self.PixelsPerWheelTurn, OverridenTimeConstraint or self.WheelTurnAnimationSpeed)
-	end
-end
-
-function InertiaScrollingFrame:ScrollDown(OverridenTimeConstraint)
-	-- Scrolls the current frame down
-	-- Won't work is pressed. 
-
-	if not self.Pressed then
-		self:ScrollTo(self.Offset + self.PixelsPerWheelTurn, OverridenTimeConstraint or self.WheelTurnAnimationSpeed)
-	end
-end
-
-
-function InertiaScrollingFrame:Release(OverridenTimeConstraint, PressedNotRequired)
-	-- @param OverridenTimeConstraint Number If not nil, it will force an animation and set the OverridenTimeConstraint to be whatever number is specified
-	-- @param PressedNotRequired Lets is do the "release" autoscroll thing when ScrollTo is called. 
-
-	if self.Pressed or PressedNotRequired then
-		self:DisconnectReleaseEvent()
-		self.Pressed = false
-
-		if math.abs(self.Velocity) > 10 or OverridenTimeConstraint then	
-			self.Amplitude = 0.8 * self.Velocity
-			self.Target    = Round(self.Offset + self.Amplitude)
-			self.TimeStamp = tick()
-			self:StartAutoScroll(OverridenTimeConstraint)
-		else
-			self.ScrollEnd:fire(self.Offset)
-			self.CurrentAutoScrollThread = nil -- This should cancel the auto scrolling stuff.
 		end
-	else
-		warn("[InertiaScrollingFrame] - Cannot drag, not pressed")
-	end
-end
-
-
-
-
--- EdgeBounceFrame --
--- Like the inertia system, but edges bounce.
--- See: http://jsbin.com/zudim
-
-local BounceScrollingFrame = {}
-setmetatable(BounceScrollingFrame, InertiaScrollingFrame)
-BounceScrollingFrame.__index = BounceScrollingFrame
-
-BounceScrollingFrame.BounceBackTimeConstraint = 0.125
-
-
-function BounceScrollingFrame.new(Frame, Axis)
-	local new = InertiaScrollingFrame.new(Frame, Axis)
-	setmetatable(new, BounceScrollingFrame)
-
-	return new
-end
-
-function BounceScrollingFrame:SetOffset(Offset)
-	-- Remove constraining from the BounceScrollingFrame
-
-	self.Offset = Offset
-
-	local RenderedOffset = Offset
-	local BackBounceRange = self.Container.AbsoluteSize[self.Axis]
-
-	if Offset > self.Max then
-		--- In this case, we're over boundaries, we must scale.
-
-		local Displacement = Offset - self.Max
-		local TimesOverBounds = Displacement / BackBounceRange
-		local ScaleBy = (1 - 0.5 ^ TimesOverBounds)
-		RenderedOffset = self.Max + (ScaleBy * BackBounceRange)
-
-	elseif Offset < self.Min then
-
-		local Displacement    = math.abs(Offset) -- Must be a positive number, because 0.5^TimesOverBounds
-		local TimesOverBounds = Displacement / BackBounceRange
-		local ScaleBy         = (1 - 0.5 ^ TimesOverBounds)
-		RenderedOffset        = -(ScaleBy * BackBounceRange) -- And now we de-negatize this thing.
-
-	end
 	
-	self.Frame.Position = GetPositionFromOffset(RenderedOffset, self.Axis)
-end
-
-function BounceScrollingFrame:RecalculateOffset()
-	--- This may not be a good thing to touch. 
-
-	error("Not implimented yet") -- TODO: Impliment
-
-	local RenderedOffset = self.Container.AbsolutePosition[self.Axis] - self.Frame.AbsolutePosition[self.Axis]
-	local RealOffset = RenderedOffset
-
-
-	local BackBounceRange = self.Container.AbsoluteSize[self.Axis]
-
-	if self.Offset > self.Max then
-		RealOffset = RealOffset - self.Max
-		RealOffset = RealOffset / BackBounceRange
-
-		--- Urgh. 
-
-		RealOffset = RealOffset + self.Max
-	end
-
-	self.Offset = RealOffset
-end
-
-
-function BounceScrollingFrame:Release(OverridenTimeConstraint, PressedNotRequired)
-	--- Note that BounceBackTimeConstraint will override [OverridenTimeConstraint] if self.Offset is over bounds.
-	
-	if self.Pressed or PressedNotRequired then
-		self:DisconnectReleaseEvent()
-		self.Pressed = false
-
-		--- Modify so we derive Amplitude from target, and so that if we are over bounds, we ALWAYS scroll.
-		local PreConstrainedAmplitude = 0.8 * self.Velocity
-		self.Target = Round(self.Offset + PreConstrainedAmplitude)
-		self.TimeStamp = tick()
-
-		local ConstrainedTarget = self:ConstrainOffset(self.Target)
-		self.Amplitude = ConstrainedTarget - self.Offset
-
-		if math.abs(self.Velocity) > 10 or ConstrainedTarget ~= self.Target then
-			local CustomTimeConstraint = OverridenTimeConstraint
-
-			-- Lets make rubber banding faster.
-			if self.Offset > self.Max or self.Offset < self.Min then
-				CustomTimeConstraint = self.BounceBackTimeConstraint
+		Maid.InputEnded = UserInputService.InputEnded:connect(function(InputObject, GameProcessed)
+			if InputObject == InputBeganObject then
+				self:StopDrag()
 			end
-
-			self.Target = ConstrainedTarget
-			self:StartAutoScroll(CustomTimeConstraint)
-		else
-			self.CurrentAutoScrollThread = nil -- This should cancel the auto scrolling stuff.
-		end
+		end)
+		
+		Maid.WindowFocusReleased = UserInputService.WindowFocusReleased:connect(function()
+			self:StopDrag()
+		end)
+	
+		self.Maid.UpdateMaid = Maid
 	end
 end
 
-
-
-return BounceScrollingFrame
+return ScrollingFrame
