@@ -9,7 +9,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local qSystems          = LoadCustomLibrary("qSystems")
 local Table             = LoadCustomLibrary("Table")
 
-local Make              = qSystems.Make
 local Modify            = qSystems.Modify
 
 
@@ -551,109 +550,88 @@ end
 lib.ResponsiveCircleClickEffect = ResponsiveCircleClickEffect
 lib.SimpleInk = ResponsiveCircleClickEffect
 
-local function GenerateMouseDrag()
-	-- Generate's a dragger to catch the mouse...
-	return Make("ImageButton", {
-		Active                 = false;
-		Size                   = UDim2.new(1.5, 0, 1.5, 0);
-		AutoButtonColor        = false;
-		BackgroundTransparency = 1;
-		Name                   = "MouseDrag";
-		Position               = UDim2.new(-0.25, 0, -0.25, 0);
-		ZIndex                 = 10;
-	})
-end
-lib.GenerateMouseDrag = GenerateMouseDrag
-lib.generateMouseDrag = GenerateMouseDrag
 
 local function AddTexturedWindowTemplate(Frame, Radius, Type)
 	-- Makes a 'Textured' window...  9Scale thingy?
 
-	Type = Type or 'Frame';
+	Type = Type or 'Frame'
 
-	local TopLeft = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "TopLeft";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 0, 0);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local TopLeft = Instance.new(Type)
+	TopLeft.Archivable = false
+	TopLeft.BackgroundColor3 = Frame.BackgroundColor3
+	TopLeft.BorderSizePixel = 0
+	TopLeft.Name = "TopLeft"
+	TopLeft.Position = UDim2.new(0, 0, 0, 0)
+	TopLeft.Size = UDim2.new(0, Radius, 0, Radius)
+	TopLeft.BackgroundTransparency = 1
+	TopLeft.ZIndex = Frame.ZIndex
+	TopLeft.Parent = Frame
 
-	local BottomLeft = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "BottomLeft";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 1, -Radius);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local BottomLeft = Instance.new(Type)
+	BottomLeft.Archivable = false
+	BottomLeft.BackgroundColor3 = Frame.BackgroundColor3
+	BottomLeft.BorderSizePixel = 0
+	BottomLeft.Name = "BottomLeft"
+	BottomLeft.Position = UDim2.new(0, 0, 1, -Radius)
+	BottomLeft.Size = UDim2.new(0, Radius, 0, Radius)
+	BottomLeft.BackgroundTransparency = 1
+	BottomLeft.ZIndex = Frame.ZIndex
+	BottomLeft.Parent = Frame
 
-	local TopRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "TopRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 0, 0);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local TopRight = Instance.new(Type)
+	TopRight.Archivable = false
+	TopRight.BackgroundColor3 = Frame.BackgroundColor3
+	TopRight.BorderSizePixel = 0
+	TopRight.Name = "TopRight"
+	TopRight.Position = UDim2.new(1, -Radius, 0, 0)
+	TopRight.Size = UDim2.new(0, Radius, 0, Radius)
+	TopRight.BackgroundTransparency = 1
+	TopRight.ZIndex = Frame.ZIndex
+	TopRight.Parent = Frame
 
-	local BottomRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "BottomRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 1, -Radius);
-		Size                   = UDim2.new(0, Radius, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local BottomRight = Instance.new(Type)
+	BottomRight.Archivable = false
+	BottomRight.BackgroundColor3 = Frame.BackgroundColor3
+	BottomRight.BorderSizePixel = 0
+	BottomRight.Name = "BottomRight"
+	BottomRight.Position = UDim2.new(1, -Radius, 1, -Radius)
+	BottomRight.Size = UDim2.new(0, Radius, 0, Radius)
+	BottomRight.BackgroundTransparency = 1
+	BottomRight.ZIndex = Frame.ZIndex
+	BottomRight.Parent = Frame
 
-	local Middle = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "Middle";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, Radius, 0, 0);
-		Size                   = UDim2.new(1, -Radius*2, 1, 0);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local Middle = Instance.new(Type)
+	Middle.Archivable = false
+	Middle.BackgroundColor3 = Frame.BackgroundColor3
+	Middle.BorderSizePixel = 0
+	Middle.Name = "Middle"
+	Middle.Position = UDim2.new(0, Radius, 0, 0)
+	Middle.Size = UDim2.new(1, -Radius*2, 1, 0)
+	Middle.BackgroundTransparency = 1
+	Middle.ZIndex = Frame.ZIndex
+	Middle.Parent = Frame
 
-	local MiddleLeft = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleLeft";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, 0, 0, Radius);
-		Size                   = UDim2.new(0, Radius, 1, -Radius*2);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local MiddleLeft = Instance.new(Type)
+	MiddleLeft.Archivable = false
+	MiddleLeft.BackgroundColor3 = Frame.BackgroundColor3
+	MiddleLeft.BorderSizePixel = 0
+	MiddleLeft.Name = "MiddleLeft"
+	MiddleLeft.Position = UDim2.new(0, 0, 0, Radius)
+	MiddleLeft.Size = UDim2.new(0, Radius, 1, -Radius*2)
+	MiddleLeft.BackgroundTransparency = 1
+	MiddleLeft.ZIndex = Frame.ZIndex
+	MiddleLeft.Parent = Frame
 
-	local MiddleRight = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleRight";
-		Parent                 = Frame;
-		Position               = UDim2.new(1, -Radius, 0, Radius);
-		Size                   = UDim2.new(0, Radius, 1, -Radius*2);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local MiddleRight = Instance.new(Type)
+	MiddleRight.Archivable = false
+	MiddleRight.BackgroundColor3 = Frame.BackgroundColor3
+	MiddleRight.BorderSizePixel = 0
+	MiddleRight.Name = "MiddleRight"
+	MiddleRight.Position = UDim2.new(1, -Radius, 0, Radius)
+	MiddleRight.Size = UDim2.new(0, Radius, 1, -Radius*2)
+	MiddleRight.BackgroundTransparency = 1
+	MiddleRight.ZIndex = Frame.ZIndex
+	MiddleRight.Parent = Frame
 
 	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
 end
@@ -669,52 +647,50 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	-- @param ImageSize The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
 
 	Properties = Properties or {}
-	Type = Type or "ImageLabel";
+	Type = Type or "ImageLabel"
 	local TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight = AddTexturedWindowTemplate(Frame, Radius, Type)
 
-	Middle.Size = UDim2.new(1, -Radius*2, 1, -Radius*2); -- Fix middle...
-	Middle.Position = UDim2.new(0, Radius, 0, Radius);
+	Middle.Size = UDim2.new(1, -Radius*2, 1, -Radius*2) -- Fix middle...
+	Middle.Position = UDim2.new(0, Radius, 0, Radius)
 
-	local MiddleTop = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleTop";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, Radius, 0, 0);
-		Size                   = UDim2.new(1, -Radius*2, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local MiddleTop = Instance.new(Type)
+	MiddleTop.Archivable = false
+	MiddleTop.BackgroundColor3 = Frame.BackgroundColor3
+	MiddleTop.BorderSizePixel = 0
+	MiddleTop.Name = "MiddleTop"
+	MiddleTop.Position = UDim2.new(0, Radius, 0, 0)
+	MiddleTop.Size = UDim2.new(1, -Radius*2, 0, Radius)
+	MiddleTop.BackgroundTransparency = 1
+	MiddleTop.ZIndex = Frame.ZIndex
+	MiddleTop.Parent = Frame
 
-	local MiddleBottom = Make(Type, {
-		Archivable             = false;
-		BackgroundColor3       = Frame.BackgroundColor3;
-		BorderSizePixel        = 0;
-		Name                   = "MiddleBottom";
-		Parent                 = Frame;
-		Position               = UDim2.new(0, Radius, 1, -Radius);
-		Size                   = UDim2.new(1, -Radius*2, 0, Radius);
-		BackgroundTransparency = 1;
-		ZIndex                 = Frame.ZIndex;
-	});
+	local MiddleBottom = Instance.new(Type)
+	MiddleBottom.Archivable = false
+	MiddleBottom.BackgroundColor3 = Frame.BackgroundColor3
+	MiddleBottom.BorderSizePixel = 0
+	MiddleBottom.Name = "MiddleBottom"
+	MiddleBottom.Position = UDim2.new(0, Radius, 1, -Radius)
+	MiddleBottom.Size = UDim2.new(1, -Radius*2, 0, Radius)
+	MiddleBottom.BackgroundTransparency = 1
+	MiddleBottom.ZIndex = Frame.ZIndex
+	MiddleBottom.Parent = Frame
 
 	for _, Item in pairs({TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom}) do
 		Modify(Item, Properties)
-		Item.Image = Image;
+		Item.Image = Image
 		Item.ImageRectSize = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
 	end
 
-	TopRight.ImageRectOffset     = Vector2.new(ImageSize.X * (2/3), 0)
-	MiddleRight.ImageRectOffset  = Vector2.new(ImageSize.X * (2/3), ImageSize.Y/3)
-	BottomRight.ImageRectOffset  = Vector2.new(ImageSize.X * (2/3), ImageSize.Y * (2/3))
+	TopRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), 0)
+	MiddleRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y/3)
+	BottomRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y * (2/3))
 	
-	--TopLeft.ImageRectOffset    = Vector2.new(0, 0);
-	MiddleLeft.ImageRectOffset   = Vector2.new(0, ImageSize.Y/3)
-	BottomLeft.ImageRectOffset   = Vector2.new(0, ImageSize.Y * (2/3))
+	--TopLeft.ImageRectOffset = Vector2.new(0, 0)
+	MiddleLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y/3)
+	BottomLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y * (2/3))
 	
-	Middle.ImageRectOffset       = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
-	MiddleTop.ImageRectOffset    = Vector2.new(ImageSize.Y/3, 0)
+	Middle.ImageRectOffset = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
+	MiddleTop.ImageRectOffset = Vector2.new(ImageSize.Y/3, 0)
 	MiddleBottom.ImageRectOffset = Vector2.new(ImageSize.Y/3, ImageSize.Y * (2/3))
 
 	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom
