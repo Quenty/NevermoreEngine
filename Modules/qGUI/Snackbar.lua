@@ -53,18 +53,18 @@ Snackbar.ClassName       = "Snackbar"
 Snackbar.__index         = Snackbar
 Snackbar.Height          = 48
 Snackbar.MinimumWidth    = 288 -- Taken from google material design
-Snackbar.MaximumWidth    = 568
-Snackbar.TextWidthOffset = 28
+Snackbar.MaximumWidth    = 700--568
+Snackbar.TextWidthOffset = 24
 Snackbar.Position        = UDim2.new(1, -10, 1, -10 - Snackbar.Height)
 Snackbar.FadeTime        = 0.16
-Snackbar.CornerRadius    = 24
+Snackbar.CornerRadius    = 2--24
 
-function Snackbar.new(Parent, Text)
+function Snackbar.new(Parent, Text, Options)
 	local self = {}
 	setmetatable(self, Snackbar)
 
 	local Gui                  = Instance.new("ImageButton")
-	Gui.ZIndex                 = 5
+	Gui.ZIndex                 = 7
 	Gui.Name                   = "Snackbar"
 	Gui.Size                   = UDim2.new(0, 100, 0, self.Height)
 	Gui.BorderSizePixel        = 0
@@ -77,21 +77,22 @@ function Snackbar.new(Parent, Text)
 	self.Gui                   = Gui
 
 	self.BackgroundImages = {qGUI.BackWithRoundedRectangle(Gui, self.CornerRadius, Gui.BackgroundColor3)}
-
-	local ShadowRadius = 2
+	
+	local ShadowRadius = 1
 	local ShadowContainer                  = Instance.new("Frame")
+	ShadowContainer.AnchorPoint = Vector2.new(0.5, 0.5)
 	ShadowContainer.Parent                 = Gui
 	ShadowContainer.Name                   = "ShadowContainer"
 	ShadowContainer.BackgroundTransparency = 1
 	ShadowContainer.Size                   = UDim2.new(1, ShadowRadius*2, 1, ShadowRadius*2)
 	ShadowContainer.Archivable             = false
-	ShadowContainer.Position = UDim2.new(0, -ShadowRadius, 0, -ShadowRadius + 2)
-
+	ShadowContainer.Position = UDim2.new(0.5, 0, 0.5, 0)--UDim2.new(0, -ShadowRadius, 0, -ShadowRadius + 2)
+	--ShadowContainer.Style = Enum.FrameStyle.DropShadow
+	
 	--- Image is blurred at 
-	local ShadowImages = {qGUI.AddNinePatch(ShadowContainer, "rbxassetid://191838004", Vector2.new(150, 150), self.CornerRadius + ShadowRadius, "ImageLabel")}
-	self.ShadowImages = ShadowImages
+	self.ShadowImages = {qGUI.AddNinePatch(ShadowContainer, "rbxassetid://191838004", Vector2.new(150, 150), self.CornerRadius + ShadowRadius, "ImageLabel")}
 
-	for _, Item in pairs(ShadowImages) do
+	for _, Item in pairs(self.ShadowImages) do
 		Item.ImageTransparency = 0.74
 		Item.ZIndex = Gui.ZIndex - 2
 	end
@@ -100,28 +101,81 @@ function Snackbar.new(Parent, Text)
 		Item.ZIndex = Gui.ZIndex - 1
 	end
 
-	local TextLabel                  = Instance.new("TextLabel", Gui)
-	TextLabel.Size                   = UDim2.new(1, -self.TextWidthOffset*2, 0, 20)
+	local TextLabel                  = Instance.new("TextLabel")
+	TextLabel.Size                   = UDim2.new(1, -self.TextWidthOffset*2, 0, 16)
 	TextLabel.Position               = UDim2.new(0, self.TextWidthOffset, 0, 16)
-	TextLabel.TextXAlignment         = "Left"
-	TextLabel.TextYAlignment         = "Top"
+	TextLabel.TextXAlignment         = Enum.TextXAlignment.Left
+	TextLabel.TextYAlignment         = Enum.TextYAlignment.Center
 	TextLabel.Name                   = "SnackbarLabel"
 	TextLabel.TextTransparency       = 0.87
 	TextLabel.TextColor3             = Color3.new(1, 1, 1)
 	TextLabel.BackgroundTransparency = 1
 	TextLabel.BorderSizePixel        = 0
-	TextLabel.Font                   = "Arial"
+	TextLabel.Font                   = Enum.Font.SourceSans--"Arial"
 	TextLabel.Text                   = Text
-	TextLabel.FontSize               = "Size14"
+	TextLabel.FontSize               = Enum.FontSize.Size18
 	TextLabel.ZIndex                 = Gui.ZIndex-1
+	TextLabel.Parent = Gui
 	self.TextLabel                   = TextLabel
-
+	
+	self.WhileActiveMaid = MakeMaid()
 	self.Gui.Parent = Parent
+	
+	local CallToActionText
+	if Options and Options.CallToAction then
+		CallToActionText = (type(Options.CallToAction) == "string" and Options.CallToAction or tostring(Options.CallToAction.Text)):upper()
+		local DefaultTextColor3 = Color3.new(78/255,205/255,196/255)
+		
+		local Button = Instance.new("TextButton")
+		Button.Name = "CallToActionButton"
+		Button.AnchorPoint = Vector2.new(1, 0.5)
+		Button.BackgroundTransparency = 1
+		Button.Position = UDim2.new(1, -self.TextWidthOffset, 0.5, 0)
+		Button.Size = UDim2.new(0.5, 0, 0.8, 0)
+		Button.Text = CallToActionText
+		Button.Font = Enum.Font.SourceSans
+		Button.FontSize = TextLabel.FontSize
+		--Button.TextScaled = true
+		Button.TextXAlignment = Enum.TextXAlignment.Right
+		Button.TextColor3 = DefaultTextColor3
+		Button.ZIndex = Gui.ZIndex
+		Button.Parent = Gui
+		
+		-- Resize
+		Button.Size = UDim2.new(UDim.new(0, Button.TextBounds.X), Button.Size.Y)
+		
+		self.WhileActiveMaid.CallToActionClick = Button.MouseButton1Click:connect(function()
+			if Options.CallToAction.OnClick then
+				Options.CallToAction.OnClick()
+				self:Dismiss()
+			end
+		end)
+		
+		self.WhileActiveMaid[Button.MouseEnter] = Button.MouseEnter:connect(function()
+			Button.TextColor3 = DefaultTextColor3:lerp(Color3.new(0, 0, 0), 0.2)
+		end)
+		
+		self.WhileActiveMaid[Button.MouseLeave] = Button.MouseLeave:connect(function()
+			Button.TextColor3 = DefaultTextColor3
+		end)
+		
+		self.CallToActionButton = Button
+	end
+	
+	
 	local Width = self.TextLabel.TextBounds.X + self.TextWidthOffset*2
+	if self.CallToActionButton then
+		Width = Width + self.CallToActionButton.Size.X.Offset + self.TextWidthOffset*2
+	end
+	
 	if Width < self.MinimumWidth then
 		Width = self.MinimumWidth
 	elseif Width > self.MaximumWidth then
 		Width = self.MaximumWidth
+	end
+	
+	if CallToActionText then
+		self.TextLabel.Text = Text
 	end
 
 	self.Gui.Size = UDim2.new(0, Width, 0, self.Height)
@@ -129,10 +183,12 @@ function Snackbar.new(Parent, Text)
 	self.Position = self.Position + UDim2.new(0, -Width, 0, 0)
 	self.Gui.Position = self.Position
 	self.AbsolutePosition = self.Gui.AbsolutePosition
-
-	self.WhileActiveMaid = MakeMaid()
-
+		
 	return self
+end
+
+function Snackbar:Dismiss()
+	error("Not implemented")
 end
 
 function Snackbar:SetBackgroundTransparency(Transparency)
@@ -149,6 +205,10 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 		-- self.Gui.BackgroundTransparency = MapNumber(PercentFaded, 0, 1, 0, 1)
 		self:SetBackgroundTransparency(MapNumber(PercentFaded, 0, 1, 0, 1))
 		self.TextLabel.TextTransparency = MapNumber(PercentFaded, 0, 1, 0.13, 1)
+		
+		if self.CallToActionButton then
+			self.CallToActionButton.TextTransparency = PercentFaded
+		end
 	else
 		--[[qGUI.TweenTransparency(self.Gui, {
 			BackgroundTransparency = 1;
@@ -168,6 +228,12 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 		qGUI.TweenTransparency(self.TextLabel, {
 			TextTransparency = 1;
 		}, self.FadeTime, true)
+		
+		if self.CallToActionButton then
+			qGUI.TweenTransparency(self.CallToActionButton, {
+				TextTransparency = 1;
+			}, self.FadeTime, true)
+		end
 	end
 end
 
@@ -178,6 +244,10 @@ function Snackbar:FadeInTransparency(PercentFaded)
 		-- self.Gui.BackgroundTransparency = MapNumber(PercentFaded, 0, 1, 1, 0)
 		self:SetBackgroundTransparency(MapNumber(PercentFaded, 0, 1, 1, 0))
 		self.TextLabel.TextTransparency = MapNumber(PercentFaded, 0, 1, 1, 0.13)
+		
+		if self.CallToActionButton then
+			self.CallToActionButton.TextTransparency = PercentFaded
+		end
 	else
 		-- Should be an ease-in-out transparency fade.
 		--[[qGUI.TweenTransparency(self.Gui, {
@@ -200,6 +270,12 @@ function Snackbar:FadeInTransparency(PercentFaded)
 		qGUI.TweenTransparency(self.TextLabel, {
 			TextTransparency = 0.13;
 		}, self.FadeTime, true)
+		
+		if self.CallToActionButton then
+			qGUI.TweenTransparency(self.CallToActionButton, {
+				TextTransparency = 0;
+			}, self.FadeTime, true)
+		end
 	end
 end
 
@@ -260,11 +336,12 @@ DraggableSnackbar.Duration = 3
 DraggableSnackbar.AutoCloseDisabled = false -- By default the Snackbar will close automatically if
 -- the user types outside or presses the esc key.
 
-function DraggableSnackbar.new(Parent, Text, GCOnDismissal)
+function DraggableSnackbar.new(Parent, Text, GCOnDismissal, Options)
 	--- Note that this will not show until :Show() is called
 	-- @param [GCOnDismissal] If true, will destroy itself and GC after being dismissed. Defaults to true
-
-	local self = Snackbar.new(Parent, Text)
+	-- @param [Options] Table of optional values, adds call to actions, et cetera
+	
+	local self = Snackbar.new(Parent, Text, Options)
 	setmetatable(self, DraggableSnackbar)
 
 	self.Visible = false
@@ -275,7 +352,6 @@ function DraggableSnackbar.new(Parent, Text, GCOnDismissal)
 	self.Mouse = Players.LocalPlayer:GetMouse()
 	self.GCOnDismissal = GCOnDismissal == nil and true or false
 	
-
 	-- Set to transparency and faded out direction automatically
 	self[self.DefaultFadeOut](self, true)
 	-- self:Show()
@@ -522,10 +598,10 @@ function SnackbarManager:ShowSnackbar(Snackbar)
 	end
 end
 
-function SnackbarManager:MakeSnackbar(Parent, Text)
+function SnackbarManager:MakeSnackbar(Parent, Text, Options)
 	-- Automatically makes a snackbar and then adds it.
 
-	local NewSnackbar = DraggableSnackbar.new(Parent, Text)
+	local NewSnackbar = DraggableSnackbar.new(Parent, Text, nil, Options)
 	self:ShowSnackbar(NewSnackbar)
 end
 lib.SnackbarManager = SnackbarManager
