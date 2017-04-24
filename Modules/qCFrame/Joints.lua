@@ -2,7 +2,7 @@ local lib = {}
 
 -- Joints.lua
 -- @author Quenty
--- A library dedicated to workign with ROBLOX joints.
+-- A library dedicated to working with ROBLOX joints.
 
 local function GetRelativeCFrameValues(BasePart, Bricks)
 	--- Oftentimes it's valuable to have a relative location of every single part
