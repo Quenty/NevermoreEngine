@@ -98,48 +98,8 @@ local function Modify(Instance, Values)
 	end
 	return Instance
 end
-
-local function Make(ClassType, Properties)
-	--- Using a syntax hack to create a nice way to Make new items.  
-	-- @param ClassType The type of class to instantiate
-	-- @param Properties The properties to use
-
-	return Modify(Instance.new(ClassType), Properties)
-end
-
 lib.Modify = Modify
-lib.Make = Make
 
-local function WaitForChild(Parent, Name, TimeLimit)
-	-- Waits for a child to appear. Not efficient, but it shoudln't have to be. It helps with
-	-- debugging. Useful when ROBLOX lags out, and doesn't replicate quickly. Will warn
-	-- @param Parent The Parent to search in for the child.
-	-- @param Name The name of the child to search for
-	-- @param TimeLimit If TimeLimit is given, then it will return after the t imelimit, even if it
-	--     hasn't found the child.
-
-	assert(Parent, "Parent is nil")
-	assert(type(Name) == "string", "Name is not a string.")
-
-	local Child     = Parent:FindFirstChild(Name)
-	local StartTime = tick()
-	local Warned    = false
-
-	while not Child do
-		wait()
-		Child = Parent:FindFirstChild(Name)
-		if not Warned and StartTime + (TimeLimit or 5) <= tick() then
-			Warned = true
-			warn("[WaitForChild] - Infinite yield possible for WaitForChild(" .. Parent:GetFullName() .. ", " .. Name .. ")\n" .. debug.traceback())
-			if TimeLimit then
-				return Parent:FindFirstChild(Name)
-			end
-		end
-	end
-
-	return Child
-end
-lib.WaitForChild = WaitForChild
 
 local function CallOnChildren(Instance, FunctionToCall)
 	--- Calls a function on each of the children of a certain object, using recursion.  
