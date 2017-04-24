@@ -28,6 +28,7 @@ local SmoothZoomedCamera = {}
 SmoothZoomedCamera.ClassName = "SmoothZoomedCamera"
 SmoothZoomedCamera._MaxZoom = 100
 SmoothZoomedCamera._MinZoom = 0.5
+SmoothZoomedCamera.BounceAtEnd = true
 
 function SmoothZoomedCamera.new()
 	local self = setmetatable({}, SmoothZoomedCamera)
@@ -58,11 +59,18 @@ function SmoothZoomedCamera:__newindex(Index, Value)
 	if Index == "TargetZoom" or Index == "Target" then
 		local Target = ClampNumber(Value, self.MinZoom, self.MaxZoom)
 		self.Spring.Target = Target
-		if Target < Value then
-			self:Impulse(self.MaxZoom)
-		elseif Target > Value then
-			self:Impulse(-self.MinZoom)
+		
+		if self.BounceAtEnd then
+			if Target < Value then
+				self:Impulse(self.MaxZoom)
+			elseif Target > Value then
+				self:Impulse(-self.MinZoom)
+			end
 		end
+	elseif Index == "TargetPercentZoom" then
+		self.Target = self.MinZoom + self.Range*Value
+	elseif Index == "PercentZoom" then
+		self.Zoom = self.MinZoom + self.Range*Value
 	elseif Index == "Damper" then
 		self.Spring.Damper = Value
 	elseif Index == "Value" or Index == "Zoom" then
@@ -70,15 +78,13 @@ function SmoothZoomedCamera:__newindex(Index, Value)
 	elseif Index == "Speed" then
 		self.Spring.Speed = Value
 	elseif Index == "MaxZoom" then
-		assert(Value > self.MinZoom, "MaxZoom can't be less than MinZoom")
+		--assert(Value > self.MinZoom, "MaxZoom can't be less than MinZoom")
 
 		self._MaxZoom = Value
-		self.Zoom = self.Zoom -- Reset the zoom with new constraints.
 	elseif Index == "MinZoom" then
-		assert(Value < self.MaxZoom, "MinZoom can't be greater than MinZoom")
+		--assert(Value < self.MaxZoom, "MinZoom can't be greater than MinZoom")
 
 		self._MinZoom = Value
-		self.Zoom = self.Zoom -- Reset the zoom with new constraints.
 	else
 		rawset(self, Index, Value)
 	end
@@ -91,10 +97,16 @@ function SmoothZoomedCamera:__index(Index)
 		return State
 	elseif Index == "Zoom" or Index == "Value" then
 		return self.Spring.Value
+	elseif Index == "TargetPercentZoom" then
+		return (self.Target - self.MinZoom) / self.Range
+	elseif Index == "PercentZoom" then
+		return (self.Zoom - self.MinZoom) / self.Range
 	elseif Index == "MaxZoom" then
 		return self._MaxZoom
 	elseif Index == "MinZoom" then
 		return self._MinZoom
+	elseif Index == "Range" then
+		return self.MaxZoom - self.MinZoom
 	elseif Index == "Damper" then
 		return self.Spring.Damper
 	elseif Index == "Speed" then
