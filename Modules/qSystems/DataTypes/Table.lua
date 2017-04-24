@@ -169,8 +169,6 @@ local function DeepDirectAppend(Table, NewTable)
 	for Index, Value in pairs(NewTable) do
 		if type(Table[Index]) == "table" and type(Value) == "table" then
 			Table[Index] = DeepDirectAppend(Table[Index], Value)
-		elseif type(Value) == "table" then
-			Table[Index] = Value
 		else
 			Table[Index] = Value
 		end
