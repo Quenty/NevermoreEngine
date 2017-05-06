@@ -57,74 +57,72 @@ else
 	LocalResourcesLocation = ServerStorage
 end
 
-local function GetFolder() -- Placeholder for first timme `CreateResourceManager` runs; gets overwritten
+local function GetFolder() -- Placeholder for first time `CreateResourceManager` runs; gets overwritten
 	return GetFirstChild(ResourcesLocation, "Resources", "Folder")
 end
 
-local function GetLocalFolder(...) -- Doesn't load by default on the Client, so the first call intializes the function
-	function GetLocalFolder()
-        return Retrieve(LocalResourcesLocation, "Resources", "Folder")
-	end
-	GetLocalFolder = Nevermore.GetLocalFolder or CreateResourceManager(Nevermore, "GetLocalFolder")
-	return GetLocalFolder(...)
+local function GetLocalFolder() -- Doesn't load by default on the Client
+	return Retrieve(LocalResourcesLocation, "Resources", "Folder")
 end
 
-function CreateResourceManager(Nevermore, Name, Data) -- Create methods called to Nevermore
-	if type(Name) == "string" then
-		local FullName, Local = Name
-		Name, Local = Name:gsub("^Get", ""):gsub("^Local", "")
+local SmartFolder = {}
+
+function SmartFolder:__call(this, Name, Parent)
+	if this ~= Nevermore then -- Enables functions to support calling by '.' or ':'
+		Name, Parent = this, Name
+	end
+	local Table = self.Table
+	local Object, Bool = Table[Name], false
+	if not Object then
+		local Folder = self.Folder
+		if not Folder then
+			Folder = self.GetFolder(self.FolderName)
+			self.Folder = Folder
+		end
+		Object, Bool = self.Retrieve(Parent or Folder, Name, self.Class)
+		if not Parent then
+			Table[Name] = Object
+		end
+	end
+	return Object, Bool
+end
+
+function CreateResourceManager(Nevermore, FullName, Data) -- Create methods called to Nevermore
+	if type(FullName) == "string" then
+		local GetFirstChild = GetFirstChild
+		local Name, Local = FullName:gsub("^Get", ""):gsub("^Local", "")
 		local Class = Classes[Name] or Name
-		local GetFirstChild, Folder = GetFirstChild
+		local ResourceManager = {
+			Class = Class;
+			Table = Data or {};
+			FolderName = Plurals[Class] or Class .. "s";
+			Retrieve = GetFirstChild;
+		}
+
 		if Local == 0 then
-			Local = GetFolder
-			local Success, Object = pcall(Instance.new, Class)
-			if Success then
-				Object:Destroy()
-			else
-				if GetFirstChild == Retrieve then
-					GetFirstChild = Error
-				end
-			end
+			ResourceManager.GetFolder = GetFolder
 		else
-			Local = GetLocalFolder
+			ResourceManager.GetFolder = GetLocalFolder
 			GetFirstChild = Retrieve
 		end
-		local Table = Data or {}
-		Data = Plurals[Class] or Class .. "s"
 
-		local function Function(self, Name, Parent)
-			if self ~= Nevermore then -- Enables functions to support calling by '.' or ':'
-				Name, Parent = self, Name
-			end
-
-			if type(Name) == "string" then
-				local Object, Bool = Table[Name]
-
-				if not Object then
-				    Folder = Folder or Local(Data)
-					Object, Bool = GetFirstChild(Parent or Folder, Name, Class)
-					if not Parent then
-						Table[Name] = Object
-					end
-					return Object, Bool
-				end
-				return Object
-			else
-				error(("[Nevermore] Attempt to call function %s: string expected, got %s"):format(FullName, type(Name)))
-			end
+		if GetFirstChild == Retrieve then
+			local Success, Object = pcall(Instance.new, Class)
+			ResourceManager.Retrieve = Success and not Object:Destroy() and GetFirstChild or Error
 		end
-		Nevermore[FullName] = Function
-		return Function
+
+		Nevermore[FullName] = ResourceManager
+		return setmetatable(ResourceManager, SmartFolder)
 	else
-		error("[Nevermore] Attempt to index Nevermore with a non-string")
+		error("[Nevermore] Attempt to index Nevermore with invalid key: string expected, got " .. type(FullName))
 	end
 end
 GetFolder = CreateResourceManager(Nevermore, "GetFolder")
+GetLocalFolder = CreateResourceManager(Nevermore, "GetLocalFolder")
 
 local Modules do -- Assembles table `Modules`
-	local Repository = GetFolder("Modules") -- Gets Module Repository Folder
-
 	if IsServer then
+		local Repository = GetFolder("Modules") -- Gets your new Module Repository Folder
 		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation, FolderName or "Nevermore"))
 		ModuleRepository.Name = ModuleRepository.Name .. " "
 		local ServerRepository = GetLocalFolder("Modules")
@@ -132,7 +130,6 @@ local Modules do -- Assembles table `Modules`
 		local Count, BoundaryCount = 0, 0
 		local NumDescendants, CurrentBoundary = 1, 1
 		local LowerBoundary, SetsEnabled
-
 		Modules = {ModuleRepository}
 
 		repeat -- Most efficient way of iterating over every descendant of the Module Repository
@@ -182,16 +179,15 @@ local Modules do -- Assembles table `Modules`
 				end
 			elseif Child.ClassName ~= "Folder" then
 				Child.Parent = GetLocalFolder("ServerStuff", ServerScriptService)
-				warn("[Nevermore] You shouldn't have", Child:GetFullName(), "in your modules Repository")
 			end
 			NumDescendants, Modules[Count] = NumDescendants + NumGrandChildren
 		until Count == NumDescendants
 		ModuleRepository:Destroy()
 	end
 end
+
 local GetModule = CreateResourceManager(Nevermore, "GetModule", Modules)
 local LibraryCache = {}
-
 function Nevermore.LoadLibrary(self, Name) -- Custom Require function
 	Name = self ~= Nevermore and self or Name
 	local Library = LibraryCache[Name]
