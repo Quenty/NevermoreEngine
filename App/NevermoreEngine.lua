@@ -1,187 +1,207 @@
--- Intent: To simply resource loading and networking so a more unified server / client codebased can be used
--- @author Quenty
+-- @author Validark
+-- @readme https://github.com/Quenty/NevermoreEngine
 
 local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
--- DEBUG_MODE helps you identify what libraries are failing to load.
-local DEBUG_MODE = false
+-- Configuration
+local FolderName = "Modules" -- Name of Module Folder in ServerScriptService
+local ModuleRepositoryLocation = ServerScriptService
+local ResourcesLocation = ReplicatedStorage -- Where the "Resources" folder is, it will be generated if needed
 
-assert(script:IsA("ModuleScript"),  "Invalid script type. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
-assert(script.Name == "NevermoreEngine", "Invalid script name. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
-assert(script.Parent == ReplicatedStorage,  "Invalid parent. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
+local Classes = { -- Allows for abbreviations
+	Event = "RemoteEvent"; -- You can use Nevermore:GetEvent() instead of GetRemoteEvent()
+	Function = "RemoteFunction";
+}
 
-local Nevermore = {}
+local Plurals = { -- If you want to name the folder something besides [Name .. "s"]
+	Accessory = "Accessories";
+	Folder = script.Name;
+}
 
-local function Modify(Instance, Values)
-	-- Modifies an Instance by using a table.  
+local IsServer = RunService:IsServer()
 
-	assert(type(Values) == "table", "Values is not a table");
+if script.Name == "ModuleScript" then error("[Nevermore] Nevermore was never given a name") end
+if script.ClassName ~= "ModuleScript" then error("[Nevermore] Nevermore must be a ModuleScript") end
+if script.Parent ~= ReplicatedStorage then error("[Nevermore] Nevermore must be parented to ReplicatedStorage") end
 
-	for Index, Value in next, Values do
-		if type(Index) == "number" then
-			Value.Parent = Instance
+local function GetFirstChild(Parent, Name, Class) -- This is what allows the client / server to run the same code
+	local Object, Bool = Parent:FindFirstChild(Name)
+
+	if not Object then
+		Object = Instance.new(Class, Parent)
+		Object.Name = Name
+		Bool = true
+	end
+
+	return Object, Bool
+end
+local Retrieve = GetFirstChild
+
+local function Error(Parent, Name, Class)
+	return Parent:FindFirstChild(Name) or error(("[Nevermore] %s \"%s\" is not installed."):format(Class, Name))
+end
+
+local Nevermore = {
+	__metatable = "[Nevermore] Nevermore's metatable is locked";
+	GetFirstChild = GetFirstChild;
+}
+
+local LocalResourcesLocation, CreateResourceManager
+if not IsServer then
+	LocalResourcesLocation = game:GetService("Players").LocalPlayer
+	GetFirstChild = game.WaitForChild
+else
+	LocalResourcesLocation = ServerStorage
+end
+
+local function GetFolder() -- Placeholder for first timme `CreateResourceManager` runs; gets overwritten
+	return GetFirstChild(ResourcesLocation, "Resources", "Folder")
+end
+
+local function GetLocalFolder(...) -- Doesn't load by default on the Client, so the first call intializes the function
+	function GetLocalFolder()
+        return Retrieve(LocalResourcesLocation, "Resources", "Folder")
+	end
+	GetLocalFolder = Nevermore.GetLocalFolder or CreateResourceManager(Nevermore, "GetLocalFolder")
+	return GetLocalFolder(...)
+end
+
+function CreateResourceManager(Nevermore, Name, Data) -- Create methods called to Nevermore
+	if type(Name) == "string" then
+		local FullName, Local = Name
+		Name, Local = Name:gsub("^Get", ""):gsub("^Local", "")
+		local Class = Classes[Name] or Name
+		local GetFirstChild, Folder = GetFirstChild
+		if Local == 0 then
+			Local = GetFolder
+			local Success, Object = pcall(Instance.new, Class)
+			if Success then
+				Object:Destroy()
+			else
+				if GetFirstChild == Retrieve then
+					GetFirstChild = Error
+				end
+			end
 		else
-			Instance[Index] = Value
+			Local = GetLocalFolder
+			GetFirstChild = Retrieve
 		end
-	end
-	return Instance
-end
+		local Table = Data or {}
+		Data = Plurals[Class] or Class .. "s"
 
-local function Make(ClassType, Properties)
-	-- Using a syntax hack to create a nice way to Make new items.  
+		local function Function(self, Name, Parent)
+			if self ~= Nevermore then -- Enables functions to support calling by '.' or ':'
+				Name, Parent = self, Name
+			end
 
-	return Modify(Instance.new(ClassType), Properties)
-end
+			if type(Name) == "string" then
+				local Object, Bool = Table[Name]
 
-local function CallOnChildren(Instance, FunctionToCall)
-	-- Calls a function on each of the children of a certain object, using recursion.  
-	-- Exploration note: Parents are always called before children.
-	
-	FunctionToCall(Instance)
-
-	for _, Child in next, Instance:GetChildren() do
-		CallOnChildren(Child, FunctionToCall)
-	end
-end
-
-local function HandleRetrieving(Retrieving, Function, Argument)
-	-- Handles yielded operations by caching the retrieval process
-	assert(type(Retrieving) == "table", "Error: Retrieving must be a table")
-	assert(type(Function) == "function", "Error: Function must be a function")
-
-	local Signal = Instance.new("BindableEvent")
-	local Result
-	Retrieving[Argument] = function()
-		return Result ~= nil and Result or Signal.Event:wait()
-	end;
-
-	Result = Function(Argument)
-	Retrieving[Argument] = nil
-	Signal:Fire(Result)
-	
-	return Result
-end
-
-local function Cache(Function)
-	-- Caches single argument, single output only
-
-	assert(type(Function) == "function", "Error: Function must be a userdata")
-
-	local Cache = {}
-	local Retrieving = {}
-
-	return function(Argument)
-		assert(Argument ~= nil, "Error: ARgument ")
-		if Cache[Argument] then
-			return Cache[Argument]
-		elseif Retrieving[Argument] then
-			return Retrieving[Argument]()
-		else
-			Cache[Argument] = HandleRetrieving(Retrieving, Function, Argument)
-			return Cache[Argument]
-		end
-	end
-end
-
-local function Retrieve(Parent, ClassName)
-	assert(type(ClassName) == "string", "Error: ClassName must be a string")
-	assert(type(Parent) == "userdata", "Error: Parent must be a userdata")
-
-	return RunService:IsServer() and function(Name)
-		return Parent:FindFirstChild(Name) or Make(ClassName, {
-			Parent = Parent;
-			Archivable = false;
-			Name = Name;
-		})
-	end or function(Name)
-		return Parent:WaitForChild(Name)
-	end
-end
-
-local ResourceFolder = Retrieve(ReplicatedStorage, "Folder")("NevermoreResources")
-
-local _LibraryCache = {} do
-	local Repository
-	if RunService:IsServer() then
-		Repository = ServerScriptService:FindFirstChild("Nevermore")
-
-		if not Repository then
-			warn("Warning: No repository of Nevermore modules found (Expected in ServerScriptService with name \"Nevermore\"). Library retrieval will fail.")
-
-			-- Make sure the client Nevermore still loads
-			Repository = Instance.new("Folder")
-			Repository.Name = "Nevermore"
-		end
-	else
-		Repository = ResourceFolder:WaitForChild("Modules")
-	end
-
-	CallOnChildren(Repository, function(Child)
-		if Child:IsA("ModuleScript") then
-			assert(not _LibraryCache[Child.Name], "Error: Duplicate name of '" .. Child.Name .. "' already exists")
-
-			_LibraryCache[Child.Name] = Child
-		end
-	end)
-
-	if not RunService:IsClient() then -- Written in this "not" fashion specifically so SoloTestMode doesn't move items.
-		local ReplicationFolder = ResourceFolder:FindFirstChild("Modules") or Make("Folder", {
-			Name = "Modules";
-			Archivable = false;
-			Parent = ResourceFolder;
-		})
-
-		local Secondary
-		for Name, Library in pairs(_LibraryCache) do
-			if not Name:lower():find("server") then
-				Library.Parent = ReplicationFolder
+				if not Object then
+				    Folder = Folder or Local(Data)
+					Object, Bool = GetFirstChild(Parent or Folder, Name, Class)
+					if not Parent then
+						Table[Name] = Object
+					end
+					return Object, Bool
+				end
+				return Object
+			else
+				error(("[Nevermore] Attempt to call function %s: string expected, got %s"):format(FullName, type(Name)))
 			end
 		end
+		Nevermore[FullName] = Function
+		return Function
+	else
+		error("[Nevermore] Attempt to index Nevermore with a non-string")
 	end
 end
+GetFolder = CreateResourceManager(Nevermore, "GetFolder")
 
-do
-	local SecondCache = {}
-	local DebugID = 0
-	local RequestDepth = 0
+local Modules do -- Assembles table `Modules`
+	local Repository = GetFolder("Modules") -- Gets Module Repository Folder
 
-	function Nevermore.LoadLibrary(LibraryName)
-		--- Loads a library from Nevermore's library cache
-		-- @param LibraryName The name of the library
-		-- @return The library's value
-		assert(type(LibraryName) == "string", "Error: LibraryName must be a string")
+	if IsServer then
+		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation, FolderName or "Nevermore"))
+		ModuleRepository.Name = ModuleRepository.Name .. " "
+		local ServerRepository = GetLocalFolder("Modules")
+		local Boundaries = {} -- This is a system for keeping track of which items should be stored in ServerStorage (vs ReplicatedStorage)
+		local Count, BoundaryCount = 0, 0
+		local NumDescendants, CurrentBoundary = 1, 1
+		local LowerBoundary, SetsEnabled
 
-		if SecondCache[LibraryName] then
-			return SecondCache[LibraryName]
-		end
+		Modules = {ModuleRepository}
 
-		DebugID = DebugID + 1
-		local LocalDebugID = DebugID
+		repeat -- Most efficient way of iterating over every descendant of the Module Repository
+			Count = Count + 1
+			local Child = Modules[Count]
+			local Name = Child.Name
+			local GrandChildren = Child:GetChildren()
+			local NumGrandChildren = #GrandChildren
 
-		if DEBUG_MODE then
-			print(("\t"):rep(RequestDepth), LocalDebugID, "Loading: ", LibraryName)
-			RequestDepth = RequestDepth + 1
-		end
+			if SetsEnabled then
+				if not LowerBoundary and Count > Boundaries[CurrentBoundary] then
+					LowerBoundary = true
+				elseif LowerBoundary and Count > Boundaries[CurrentBoundary + 1] then
+					CurrentBoundary = CurrentBoundary + 2
+					local Boundary = Boundaries[CurrentBoundary]
 
-		local Library = require(_LibraryCache[LibraryName] or error("Error: Library '" .. LibraryName .. "' does not exist."))
-		SecondCache[LibraryName] = Library
+					if Boundary then
+						LowerBoundary = Count > Boundary
+					else
+						SetsEnabled = false
+						LowerBoundary = false
+					end
+				end
+			end
 
-		if DEBUG_MODE then
-			RequestDepth = RequestDepth - 1
-			print(("\t"):rep(RequestDepth), LocalDebugID, "Done loading: ", LibraryName)
-		end
+			local Server = LowerBoundary or Name:lower():find("server")
 
-		return Library
+			if NumGrandChildren ~= 0 then
+				if Server then
+					SetsEnabled = true
+					Boundaries[BoundaryCount + 1] = NumDescendants
+					BoundaryCount = BoundaryCount + 2
+					Boundaries[BoundaryCount] = NumDescendants + NumGrandChildren
+				end
+
+				for a = 1, NumGrandChildren do
+					Modules[NumDescendants + a] = GrandChildren[a]
+				end
+			end
+
+			if Child.ClassName == "ModuleScript" then
+				if LowerBoundary or not Modules[Name] then
+					Modules[Name] = Child
+					Child.Parent = Server and ServerRepository or Repository
+				else
+					error("[Nevermore] Duplicate Module with name \"" .. Name .. "\"")
+				end
+			elseif Child.ClassName ~= "Folder" then
+				Child.Parent = GetLocalFolder("ServerStuff", ServerScriptService)
+				warn("[Nevermore] You shouldn't have", Child:GetFullName(), "in your modules Repository")
+			end
+			NumDescendants, Modules[Count] = NumDescendants + NumGrandChildren
+		until Count == NumDescendants
+		ModuleRepository:Destroy()
 	end
 end
+local GetModule = CreateResourceManager(Nevermore, "GetModule", Modules)
+local LibraryCache = {}
 
-Nevermore.GetRemoteEvent = Cache(
-	Retrieve(Retrieve(ResourceFolder, "Folder")("RemoteEvents"), -- Folder of remote events
-	"RemoteEvent")) -- Specify remote events to retrieve
-Nevermore.GetRemoteFunction = Cache(
-	Retrieve(Retrieve(ResourceFolder, "Folder")("RemoteFunctions"), -- Folder of remote functions
-	"RemoteFunction")) -- Specify remote functions to retrieve
+function Nevermore.LoadLibrary(self, Name) -- Custom Require function
+	Name = self ~= Nevermore and self or Name
+	local Library = LibraryCache[Name]
+	if not Library then
+		Library = require(GetModule(Name))
+		LibraryCache[Name] = Library
+	end
+	return Library
+end
 
-return Nevermore
+Nevermore.__call = Nevermore.LoadLibrary
+Nevermore.__index = CreateResourceManager
+return setmetatable(Nevermore, Nevermore)
