@@ -195,9 +195,9 @@ local LibraryCache = {}
 function Nevermore.LoadLibrary(self, Name) -- Custom Require function
 	Name = self ~= Nevermore and self or Name
 	local Library = LibraryCache[Name]
-	if not Library then
+	if Library == nil then
 		Library = require(GetModule(Name))
-		LibraryCache[Name] = Library
+		LibraryCache[Name] = Library or false
 	end
 	return Library
 end
