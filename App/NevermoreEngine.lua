@@ -123,7 +123,7 @@ GetLocalFolder = CreateResourceManager(Nevermore, "GetLocalFolder")
 local Modules do -- Assembles table `Modules`
 	if IsServer then
 		local Repository = GetFolder("Modules") -- Gets your new Module Repository Folder
-		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation, FolderName or "Nevermore"))
+		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation.Name, FolderName or "Nevermore"))
 		ModuleRepository.Name = ModuleRepository.Name .. " "
 		local ServerRepository = GetLocalFolder("Modules")
 		local Boundaries = {} -- This is a system for keeping track of which items should be stored in ServerStorage (vs ReplicatedStorage)
@@ -136,6 +136,8 @@ local Modules do -- Assembles table `Modules`
 			Count = Count + 1
 			local Child = Modules[Count]
 			local Name = Child.Name
+			local ClassName = Child.ClassName
+			local IsAModuleScript = ClassName == "ModuleScript"
 			local GrandChildren = Child:GetChildren()
 			local NumGrandChildren = #GrandChildren
 
@@ -157,7 +159,7 @@ local Modules do -- Assembles table `Modules`
 
 			local Server = LowerBoundary or Name:lower():find("server")
 
-			if NumGrandChildren ~= 0 then
+			if NumGrandChildren ~= 0 and not IsAModuleScript then
 				if Server then
 					SetsEnabled = true
 					Boundaries[BoundaryCount + 1] = NumDescendants
@@ -168,19 +170,20 @@ local Modules do -- Assembles table `Modules`
 				for a = 1, NumGrandChildren do
 					Modules[NumDescendants + a] = GrandChildren[a]
 				end
+				NumDescendants = NumDescendants + NumGrandChildren
 			end
 
-			if Child.ClassName == "ModuleScript" then
-				if LowerBoundary or not Modules[Name] then
+			if IsAModuleScript then
+				if Server or not Modules[Name] then
 					Modules[Name] = Child
 					Child.Parent = Server and ServerRepository or Repository
 				else
-					error("[Nevermore] Duplicate Module with name \"" .. Name .. "\"")
+					Child.Parent = Repository
 				end
-			elseif Child.ClassName ~= "Folder" then
+			elseif ClassName ~= "Folder" then
 				Child.Parent = GetLocalFolder("ServerStuff", ServerScriptService)
 			end
-			NumDescendants, Modules[Count] = NumDescendants + NumGrandChildren
+			Modules[Count] = nil
 		until Count == NumDescendants
 		ModuleRepository:Destroy()
 	end
