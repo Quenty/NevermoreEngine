@@ -20,9 +20,7 @@ local Plurals = { -- If you want to name the folder something besides [Name .. "
 	Accessory = "Accessories";
 	Folder = script.Name;
 }
-
-local IsServer = RunService:IsServer()
-
+	
 if script.Name == "ModuleScript" then error("[Nevermore] Nevermore was never given a name") end
 if script.ClassName ~= "ModuleScript" then error("[Nevermore] Nevermore must be a ModuleScript") end
 if script.Parent ~= ReplicatedStorage then error("[Nevermore] Nevermore must be parented to ReplicatedStorage") end
@@ -59,7 +57,6 @@ local function GetLocalFolder() -- Doesn't load by default on the Client
 end
 
 local SmartFolder = {}
-
 function SmartFolder:__call(this, Name, Parent)
 	if this ~= Nevermore then -- Enables functions to support calling by '.' or ':'
 		Name, Parent = this, Name
@@ -114,7 +111,7 @@ GetFolder = CreateResourceManager(Nevermore, "GetFolder")
 GetLocalFolder = CreateResourceManager(Nevermore, "GetLocalFolder")
 
 local Modules do -- Assembles table `Modules`
-	if IsServer then
+	if RunService:IsServer() then
 		LocalResourcesLocation = ServerStorage
 		local Repository = GetFolder("Modules") -- Gets your new Module Repository Folder
 		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or Retrieve(LocalResourcesLocation, "Resources", "Folder"):FindFirstChild("Modules") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation.Name, FolderName or "Nevermore"))
