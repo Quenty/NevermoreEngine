@@ -49,18 +49,11 @@ local Nevermore = {
 	GetFirstChild = GetFirstChild;
 }
 
-local LocalResourcesLocation, CreateResourceManager
-if not IsServer then
-	LocalResourcesLocation = game:GetService("Players").LocalPlayer
-	GetFirstChild = game.WaitForChild
-else
-	LocalResourcesLocation = ServerStorage
-end
-
 local function GetFolder() -- Placeholder for first time `CreateResourceManager` runs; gets overwritten
 	return GetFirstChild(ResourcesLocation, "Resources", "Folder")
 end
 
+local LocalResourcesLocation
 local function GetLocalFolder() -- Doesn't load by default on the Client
 	return Retrieve(LocalResourcesLocation, "Resources", "Folder")
 end
@@ -87,7 +80,7 @@ function SmartFolder:__call(this, Name, Parent)
 	return Object, Bool
 end
 
-function CreateResourceManager(Nevermore, FullName, Data) -- Create methods called to Nevermore
+local function CreateResourceManager(Nevermore, FullName, Data) -- Create methods called to Nevermore
 	if type(FullName) == "string" then
 		local GetFirstChild = GetFirstChild
 		local Name, Local = FullName:gsub("^Get", ""):gsub("^Local", "")
@@ -122,8 +115,9 @@ GetLocalFolder = CreateResourceManager(Nevermore, "GetLocalFolder")
 
 local Modules do -- Assembles table `Modules`
 	if IsServer then
+		LocalResourcesLocation = ServerStorage
 		local Repository = GetFolder("Modules") -- Gets your new Module Repository Folder
-		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation.Name, FolderName or "Nevermore"))
+		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or Retrieve(LocalResourcesLocation, "Resources", "Folder"):FindFirstChild("Modules") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation.Name, FolderName or "Nevermore"))
 		ModuleRepository.Name = ModuleRepository.Name .. " "
 		local ServerRepository = GetLocalFolder("Modules")
 		local Boundaries = {} -- This is a system for keeping track of which items should be stored in ServerStorage (vs ReplicatedStorage)
@@ -159,7 +153,7 @@ local Modules do -- Assembles table `Modules`
 
 			local Server = LowerBoundary or Name:lower():find("server")
 
-			if NumGrandChildren ~= 0 and not IsAModuleScript then
+			if NumGrandChildren ~= 0 then
 				if Server then
 					SetsEnabled = true
 					Boundaries[BoundaryCount + 1] = NumDescendants
@@ -180,12 +174,15 @@ local Modules do -- Assembles table `Modules`
 				else
 					Child.Parent = Repository
 				end
-			elseif ClassName ~= "Folder" then
+			elseif ClassName ~= "Folder" and Child.Parent.ClassName == "Folder" then
 				Child.Parent = GetLocalFolder("ServerStuff", ServerScriptService)
 			end
 			Modules[Count] = nil
 		until Count == NumDescendants
 		ModuleRepository:Destroy()
+	else
+		LocalResourcesLocation = game:GetService("Players").LocalPlayer
+		GetFirstChild = game.WaitForChild
 	end
 end
 
