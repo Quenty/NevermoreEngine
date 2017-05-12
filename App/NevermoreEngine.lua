@@ -7,7 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 -- Configuration
-local FolderName = "Modules" -- Name of Module Folder in ServerScriptService
+local FolderName = "Modules" -- Name of Module Folder in ModuleRepositoryLocation
 local ModuleRepositoryLocation = ServerScriptService
 local ResourcesLocation = ReplicatedStorage -- Where the "Resources" folder is, it will be generated if needed
 
@@ -20,7 +20,7 @@ local Plurals = { -- If you want to name the folder something besides [Name .. "
 	Accessory = "Accessories";
 	Folder = script.Name;
 }
-	
+
 if script.Name == "ModuleScript" then error("[Nevermore] Nevermore was never given a name") end
 if script.ClassName ~= "ModuleScript" then error("[Nevermore] Nevermore must be a ModuleScript") end
 if script.Parent ~= ReplicatedStorage then error("[Nevermore] Nevermore must be parented to ReplicatedStorage") end
@@ -113,73 +113,88 @@ GetLocalFolder = CreateResourceManager(Nevermore, "GetLocalFolder")
 local Modules do -- Assembles table `Modules`
 	if RunService:IsServer() then
 		LocalResourcesLocation = ServerStorage
-		local Repository = GetFolder("Modules") -- Gets your new Module Repository Folder
-		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName or "Nevermore") or Retrieve(LocalResourcesLocation, "Resources", "Folder"):FindFirstChild("Modules") or error(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s"):format(ModuleRepositoryLocation.Name, FolderName or "Nevermore"))
-		ModuleRepository.Name = ModuleRepository.Name .. " "
-		local ServerRepository = GetLocalFolder("Modules")
-		local Boundaries = {} -- This is a system for keeping track of which items should be stored in ServerStorage (vs ReplicatedStorage)
-		local Count, BoundaryCount = 0, 0
-		local NumDescendants, CurrentBoundary = 1, 1
-		local LowerBoundary, SetsEnabled
-		Modules = {ModuleRepository}
+		local ModuleRepository = ModuleRepositoryLocation:FindFirstChild(FolderName) or LocalResourcesLocation:FindFirstChild("Resources") and LocalResourcesLocation.Resources:FindFirstChild("Modules")
+		if ModuleRepository then
+			ModuleRepository.Name = ModuleRepository.Name .. " " -- This is just in-case we try to create a new folder of the same name
+			local Repository, ServerRepository, ServerStuff -- Repository folders
+			local Boundaries = {} -- This is a system for keeping track of which items should be stored in ServerStorage (vs ReplicatedStorage)
+			local Count, BoundaryCount = 0, 0
+			local NumDescendants, CurrentBoundary = 1, 1
+			local LowerBoundary, SetsEnabled
+			Modules = {ModuleRepository}
 
-		repeat -- Most efficient way of iterating over every descendant of the Module Repository
-			Count = Count + 1
-			local Child = Modules[Count]
-			local Name = Child.Name
-			local ClassName = Child.ClassName
-			local IsAModuleScript = ClassName == "ModuleScript"
-			local GrandChildren = Child:GetChildren()
-			local NumGrandChildren = #GrandChildren
+			repeat -- Most efficient way of iterating over every descendant of the Module Repository
+				Count = Count + 1
+				local Child = Modules[Count]
+				local Name = Child.Name
+				local ClassName = Child.ClassName
+				local GrandChildren = Child:GetChildren()
+				local NumGrandChildren = #GrandChildren
 
-			if SetsEnabled then
-				if not LowerBoundary and Count > Boundaries[CurrentBoundary] then
-					LowerBoundary = true
-				elseif LowerBoundary and Count > Boundaries[CurrentBoundary + 1] then
-					CurrentBoundary = CurrentBoundary + 2
-					local Boundary = Boundaries[CurrentBoundary]
+				if SetsEnabled then
+					if not LowerBoundary and Count > Boundaries[CurrentBoundary] then
+						LowerBoundary = true
+					elseif LowerBoundary and Count > Boundaries[CurrentBoundary + 1] then
+						CurrentBoundary = CurrentBoundary + 2
+						local Boundary = Boundaries[CurrentBoundary]
 
-					if Boundary then
-						LowerBoundary = Count > Boundary
-					else
-						SetsEnabled = false
-						LowerBoundary = false
+						if Boundary then
+							LowerBoundary = Count > Boundary
+						else
+							SetsEnabled = false
+							LowerBoundary = false
+						end
 					end
 				end
-			end
 
-			local Server = LowerBoundary or Name:lower():find("server")
+				local Server = LowerBoundary or Name:lower():find("server")
 
-			if NumGrandChildren ~= 0 then
-				if Server then
-					SetsEnabled = true
-					Boundaries[BoundaryCount + 1] = NumDescendants
-					BoundaryCount = BoundaryCount + 2
-					Boundaries[BoundaryCount] = NumDescendants + NumGrandChildren
+				if NumGrandChildren ~= 0 then
+					if Server then
+						SetsEnabled = true
+						Boundaries[BoundaryCount + 1] = NumDescendants
+						BoundaryCount = BoundaryCount + 2
+						Boundaries[BoundaryCount] = NumDescendants + NumGrandChildren
+					end
+
+					for a = 1, NumGrandChildren do
+						Modules[NumDescendants + a] = GrandChildren[a]
+					end
+					NumDescendants = NumDescendants + NumGrandChildren
 				end
 
-				for a = 1, NumGrandChildren do
-					Modules[NumDescendants + a] = GrandChildren[a]
+				if ClassName == "ModuleScript" then
+					if Server then
+						Modules[Name] = Child
+						if not ServerRepository then
+							ServerRepository = GetLocalFolder("Modules")
+						end
+						Child.Parent = ServerRepository
+					else
+						if not Repository then
+							Repository = GetFolder("Modules")
+						end
+						Child.Parent = Repository
+						if not Modules[Name] then
+							Modules[Name] = Child
+						end
+					end
+				elseif ClassName ~= "Folder" and Child.Parent.ClassName == "Folder" then
+					if not ServerStuff then
+						ServerStuff = GetLocalFolder("Server", ServerScriptService)
+					end
+					Child.Parent = ServerStuff
 				end
-				NumDescendants = NumDescendants + NumGrandChildren
-			end
-
-			if IsAModuleScript then
-				if Server or not Modules[Name] then
-					Modules[Name] = Child
-					Child.Parent = Server and ServerRepository or Repository
-				else
-					Child.Parent = Repository
-				end
-			elseif ClassName ~= "Folder" and Child.Parent.ClassName == "Folder" then
-				Child.Parent = GetLocalFolder("ServerStuff", ServerScriptService)
-			end
-			Modules[Count] = nil
-		until Count == NumDescendants
-		ModuleRepository:Destroy()
+				Modules[Count] = nil
+			until Count == NumDescendants
+			ModuleRepository:Destroy()
+		else
+			warn(("[Nevermore] Couldn't find the module repository. It should be a descendant of %s named %s. This can be changed in the configuration section at the top of this module"):format(ModuleRepositoryLocation.Name, FolderName))
+		end
 	else
 		LocalResourcesLocation = game:GetService("Players").LocalPlayer
 		GetFirstChild = game.WaitForChild
+		GetFolder.Retrieve = GetFirstChild
 	end
 end
 
@@ -190,7 +205,7 @@ function Nevermore.LoadLibrary(self, Name) -- Custom Require function
 	local Library = LibraryCache[Name]
 	if Library == nil then
 		Library = require(GetModule(Name))
-		LibraryCache[Name] = Library or false
+		LibraryCache[Name] = Library or false -- caches "nil" as false
 	end
 	return Library
 end
