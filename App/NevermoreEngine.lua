@@ -1,5 +1,5 @@
 -- @author Validark
--- @readme https://github.com/Quenty/NevermoreEngine
+-- @readme https://github.com/NevermoreFramework/Nevermore
 
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
@@ -36,79 +36,52 @@ local function GetFirstChild(Parent, Name, Class) -- This is what allows the cli
 
 	return Object, Bool
 end
-local Retrieve = GetFirstChild
 
 local function Error(Parent, Name, Class)
 	return Parent:FindFirstChild(Name) or error(("[Nevermore] %s \"%s\" is not installed."):format(Class, Name))
 end
 
-local Nevermore = {
-	__metatable = "[Nevermore] Nevermore's metatable is locked";
-	GetFirstChild = GetFirstChild;
-}
-
-local function GetFolder() -- Placeholder for first time `CreateResourceManager` runs; gets overwritten
-	return GetFirstChild(ResourcesLocation, "Resources", "Folder")
-end
-
-local LocalResourcesLocation
-local function GetLocalFolder() -- Doesn't load by default on the Client
-	return Retrieve(LocalResourcesLocation, "Resources", "Folder")
-end
-
+local Nevermore = {GetFirstChild = GetFirstChild}
 local SmartFolder = {}
+local Retrieve, LocalResourcesLocation = GetFirstChild
+
 function SmartFolder:__call(this, Name, Parent)
 	if this ~= Nevermore then -- Enables functions to support calling by '.' or ':'
 		Name, Parent = this, Name
 	end
-	local Table = self.Table
-	local Object, Bool = Table[Name], false
+	local Contents = self.Contents
+	local Object, Bool = Contents[Name]
 	if not Object then
-		local Folder = self.Folder
+		local Folder, Class = self.Folder, self.Class
 		if not Folder then
-			Folder = self.GetFolder(self.FolderName)
+			Folder = self.GetFolder(Plurals[Class] or Class .. "s")
 			self.Folder = Folder
 		end
-		Object, Bool = self.Retrieve(Parent or Folder, Name, self.Class)
+		Object, Bool = self.Retrieve(Parent or Folder, Name, Class)
 		if not Parent then
-			Table[Name] = Object
+			Contents[Name] = Object
 		end
 	end
-	return Object, Bool
+	return Object, Bool or false
 end
 
-local function CreateResourceManager(Nevermore, FullName, Data) -- Create methods called to Nevermore
-	if type(FullName) == "string" then
-		local GetFirstChild = GetFirstChild
-		local Name, Local = FullName:gsub("^Get", ""):gsub("^Local", "")
-		local Class = Classes[Name] or Name
-		local ResourceManager = {
-			Class = Class;
-			Table = Data or {};
-			FolderName = Plurals[Class] or Class .. "s";
-			Retrieve = GetFirstChild;
-		}
+local GetFolder = setmetatable({
+	Class = "Folder";
+	Contents = {};
+	Retrieve = GetFirstChild;
+	GetFolder = function() -- Placeholder for first time `CreateResourceManager` runs; gets overwritten
+		return GetFirstChild(ResourcesLocation, "Resources", "Folder")
+	end;
+}, SmartFolder)
 
-		if Local == 0 then
-			ResourceManager.GetFolder = GetFolder
-		else
-			ResourceManager.GetFolder = GetLocalFolder
-			GetFirstChild = Retrieve
-		end
-
-		if GetFirstChild == Retrieve then
-			local Success, Object = pcall(Instance.new, Class)
-			ResourceManager.Retrieve = Success and not Object:Destroy() and GetFirstChild or Error
-		end
-
-		Nevermore[FullName] = ResourceManager
-		return setmetatable(ResourceManager, SmartFolder)
-	else
-		error("[Nevermore] Attempt to index Nevermore with invalid key: string expected, got " .. type(FullName))
-	end
-end
-GetFolder = CreateResourceManager(Nevermore, "GetFolder")
-GetLocalFolder = CreateResourceManager(Nevermore, "GetLocalFolder")
+local GetLocalFolder = setmetatable({
+	Class = "Folder";
+	Contents = {};
+	Retrieve = Retrieve;
+	GetFolder = function() -- Placeholder for first time `CreateResourceManager` runs; gets overwritten
+		return Retrieve(LocalResourcesLocation, "Resources", "Folder")
+	end;
+}, SmartFolder)
 
 local Modules do -- Assembles table `Modules`
 	if RunService:IsServer() then
@@ -198,9 +171,16 @@ local Modules do -- Assembles table `Modules`
 	end
 end
 
-local GetModule = CreateResourceManager(Nevermore, "GetModule", Modules)
+local GetModule = setmetatable({
+	Class = "Module";
+	Contents = Modules or {};
+	Retrieve = GetFirstChild == Retrieve and Error or GetFirstChild;
+	GetFolder = GetFolder;
+}, SmartFolder)
+
 local LibraryCache = {}
-function Nevermore.LoadLibrary(self, Name) -- Custom Require function
+
+function Nevermore:LoadLibrary(Name) -- Custom Require function
 	Name = self ~= Nevermore and self or Name
 	local Library = LibraryCache[Name]
 	if Library == nil then
@@ -210,6 +190,40 @@ function Nevermore.LoadLibrary(self, Name) -- Custom Require function
 	return Library
 end
 
-Nevermore.__call = Nevermore.LoadLibrary
-Nevermore.__index = CreateResourceManager
-return setmetatable(Nevermore, Nevermore)
+Nevermore.GetModule = GetModule
+Nevermore.GetFolder = GetFolder
+Nevermore.GetLocalFolder = GetLocalFolder
+
+return setmetatable(Nevermore, {
+	__call = Nevermore.LoadLibrary;
+	__index = function(self, FullName)
+		if type(FullName) == "string" then
+			local GetFirstChild = GetFirstChild
+			local Name, Local = FullName:gsub("^Get", ""):gsub("^Local", "")
+			local Class = Classes[Name] or Name
+			local ResourceManager = {
+				Class = Class;
+				Contents = {};
+				Retrieve = GetFirstChild;
+			}
+
+			if Local == 0 then
+				ResourceManager.GetFolder = GetFolder
+			else
+				ResourceManager.GetFolder = GetLocalFolder
+				GetFirstChild = Retrieve
+			end
+
+			if GetFirstChild == Retrieve then
+				local Success, Object = pcall(Instance.new, Class)
+				ResourceManager.Retrieve = Success and not Object:Destroy() and GetFirstChild or Error
+			end
+
+			self[FullName] = ResourceManager
+			return setmetatable(ResourceManager, SmartFolder)
+		else
+			error("[Nevermore] Attempt to index Nevermore with invalid key: string expected, got " .. type(FullName))
+		end
+	end;
+	__metatable = "[Nevermore] Nevermore's metatable is locked";
+})
