@@ -1,11 +1,20 @@
--- @author Narrev
+-- @author Validark
+
+-- Necessary string tables
+local dayNames = {[0] = "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+local months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+
+-- Localize functions
+local time = os.time
+local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
+local type, tick, tonumber = type, tick, tonumber
 
 local function date(formatString, unix)
 	--- Allows you to use os.date in RobloxLua!
 	--		date ([format [, time]])
 	-- This doesn't include the explanations for the math. If you want to see how the numbers work, see the following:
-	-- http://howardhinnant.github.io/date_algorithms.html#weekday_from_days
-	-- 
+	-- http://howardhinnant.github.io/date_algorithms.html#civil_from_days
+	--
 	-- @param string formatString
 	--		If present, function date returns a string formatted by the tags in formatString.
 	--		If formatString starts with "!", date is formatted in UTC.
@@ -21,54 +30,48 @@ local function date(formatString, unix)
 
 	-- @returns a string or a table containing date and time, formatted according to the given string format. If called without arguments, returns the equivalent of date("%c").
 
-	-- Localize functions
-	local floor, sub, find, gsub, format = math.floor, string.sub, string.find, string.gsub, string.format
-
 	-- Find whether formatString was used
 	if formatString then
 		if type(formatString) == "number" then -- If they didn't pass a formatString, and only passed unix through
-			assert(type(unix) ~= "string", "Invalid parameters passed to os.date. Your parameters might be in the wrong order")
+			if type(unix) == "string" then error("Invalid parameters passed to os.date. Your parameters might be in the wrong order") end
 			unix, formatString = formatString, "%c"
-
 		elseif type(formatString) == "string" then
-			assert(find(formatString, "*t") or find(formatString, "%%[_cxXTrRaAbBdHIjMmpsSuwyY]"), "Invalid string passed to os.date")
+			if not find(formatString, "*t") and not find(formatString, "%%[_cxXTrRaAbBdHIjMmpsSuwyY]") then
+				warn("[os.date] \"" .. formatString .. "\" has nothing to format")
+			end
 			local UTC
 			formatString, UTC = gsub(formatString, "^!", "") -- If formatString begins in '!', use os.time()
-			assert(UTC == 0 or not unix, "Cannot determine time to format for os.date. Use either an \"!\" at the beginning of the string or pass a time parameter")
-			unix = UTC == 1 and os.time() or unix
+			if UTC == 1 and unix then warn("Cannot determine time to format for os.date: Use either an \"!\" at the beginning of the string OR pass a time parameter") end
+			unix = unix or UTC == 1 and time()
 		end
 	else -- If they did not pass a formatting string
 		formatString = "%c"
 	end
 
 	-- Set unix
-	local unix = type(tonumber(unix)) == "number" and unix or tick()
+	unix = tonumber(unix) or tick()
 
-	-- Get hours, minutes, and seconds	
+	-- Get hours, minutes, and seconds
 	local hours, minutes, seconds = floor(unix / 3600 % 24), floor(unix / 60 % 60), floor(unix % 60)
 
 	-- Get days, month and year
-	local days	= floor(unix / 86400) + 719468
-	local wday	= (days + 3) % 7
-	local year	= floor((days >= 0 and days or days - 146096) / 146097) -- 400 Year bracket
-	days		= (days - year * 146097) -- Days into 400 year bracket [0, 146096]
-	local years	= floor((days - floor(days/1460) + floor(days/36524) - floor(days/146096))/365)	-- Years into 400 Year bracket[0, 399]
-	days		= days - (365*years + floor(years/4) - floor(years/100)) -- Days into year with March 1st @0 [0, 365]
-	local month	= floor((5*days + 2)/153) -- Month with March @0 [0, 11]
-	local yDay	= days
-	days		= days - floor((153*month + 2)/5) + 1 -- Days into month [1, 31]
-	month		= month + (month < 10 and 3 or -9) -- Actual month [1, 12]
-	year		= years + year*400 + (month < 3 and 1 or 0) -- Actual Year
+	local days = floor(unix / 86400) + 719468
+	local wday = (days + 3) % 7 -- Day of week with Sunday @0 [0, 6]
+	local year = floor((days >= 0 and days or days - 146096) / 146097) -- 400 Year bracket
+	days = (days - year * 146097) -- Days into 400 year bracket [0, 146096]
+	local years = floor((days - floor(days/1460) + floor(days/36524) - floor(days/146096))/365)	-- Years into 400 Year bracket[0, 399]
+	days = days - (365*years + floor(years/4) - floor(years/100)) -- Days into year with March 1st @0 [0, 365]
+	local month = floor((5*days + 2)/153) -- Month with March @0 [0, 11]
+	local yday = days
+	days = days - floor((153*month + 2)/5) + 1 -- Days into month [1, 31]
+	month = month + (month < 10 and 3 or -9) -- Actual month [1, 12]
+	year = years + year*400 + (month < 3 and 1 or 0) -- Actual Year
 
-	
+
 	if formatString == "*t" then -- Return a table if "*t" was used
-		return {year = year, month = month, day = days, yday = yDay, wday = wday, hour = hours, min = minutes, sec = seconds}
+		return {year = year, month = month, day = days, yday = yday, wday = wday, hour = hours, min = minutes, sec = seconds}
 	end
-	
-	-- Necessary string tables
-	local dayNames		= {[0] = "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
-	local months		= {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
-	
+
 	-- Return formatted string
 	return (gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(gsub(formatString,
 		"%%c",  "%%x %%X"),
@@ -93,8 +96,8 @@ local function date(formatString, unix)
 		"%%_H", hours),
 		"%%I", format("%02d", hours > 12 and hours - 12 or hours == 0 and 12 or hours)),
 		"%%_I", hours > 12 and hours - 12 or hours == 0 and 12 or hours),
-		"%%j", format("%02d", yDay)),
-		"%%_j", yDay),
+		"%%j", format("%02d", yday)),
+		"%%_j", yday),
 		"%%M", format("%02d", minutes)),
 		"%%_M", minutes),
 		"%%m", format("%02d", month)),
@@ -112,12 +115,29 @@ local function date(formatString, unix)
 		"%%y", format("%02d", year % 100)),
 		"%%_y", year % 100),
 		"%%%%", "%%")
-	)	
+	)
 end
 
 local function clock()
-	local timeYielded, timeServerHasBeenRunning = wait()
-	return timeServerHasBeenRunning
+	return workspace.DistributedGameTime
 end
 
-return setmetatable({date = date, clock = clock}, {__index = os})
+function isLeapYear(year)
+	return year % 4 == 0 and (year % 25 ~= 0 or year % 16 == 0)
+end
+
+local monthLengths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+
+local function monthLength(month, year)
+	return month == 2 and isLeapYear(year) and 29 or monthLengths[month]
+end
+
+local os = {
+	date = date;
+	clock = clock;
+	__index = os;
+	isLeapYear = isLeapYear;
+	monthLength = monthLength;
+}
+
+return setmetatable(os, os)
