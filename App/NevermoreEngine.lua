@@ -25,8 +25,8 @@ if script.Name == "ModuleScript" then error("[Nevermore] Nevermore was never giv
 if script.ClassName ~= "ModuleScript" then error("[Nevermore] Nevermore must be a ModuleScript") end
 if script.Parent ~= ReplicatedStorage then error("[Nevermore] Nevermore must be parented to ReplicatedStorage") end
 
-local function GetFirstChild(Parent, Name, Class) -- This is what allows the client / server to run the same code
-	local Object, Bool = Parent:FindFirstChild(Name)
+local function GetFirstChild(Parent, Name, Class) -- This is what allows the client / server to run the same code :D
+	local Object, Bool = Parent:FindFirstChild(Name), false
 
 	if not Object then
 		Object = Instance.new(Class, Parent)
@@ -69,19 +69,26 @@ local function CreateResourceFunction(self, FullName, Contents)
 			GetFirstChild = Success and not Object:Destroy() and GetFirstChild or Error
 		end
 		
-		local function ResourceFunction(self, Name, Parent)
+		local function ResourceFunction(self, Name)
 			if self ~= Nevermore then -- Enables functions to support calling by '.' or ':'
-				Name, Parent = self, Name
+				Name = self
 			end
 			local Object, Bool = Contents[Name]
 			if not Object then
 				if not Folder then
 					Folder = GetFolder(Plurals[Class] or Class .. "s")
+					local Children = Folder:GetChildren()
+					for a = 1, #Children do
+						local Child = Children[a]
+						Contents[Child.Name] = Child
+					end
+					Object = Contents[Name]
+					if Object then
+						return Object, false
+					end
 				end
-				Object, Bool = GetFirstChild(Parent or Folder, Name, Class)
-				if not Parent then
-					Contents[Name] = Object
-				end
+				Object, Bool = GetFirstChild(Folder, Name, Class)
+				Contents[Name] = Object
 			end
 			return Object, Bool or false
 		end
