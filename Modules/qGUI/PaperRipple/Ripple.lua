@@ -42,7 +42,7 @@ function Ripple.NewDefault(Parent)
 	assert(Parent, "Must send parent")
 
 	local Circle                  = Instance.new("ImageLabel");
-	Circle.Image                  = "http://www.roblox.com/asset/?id=172318712"
+	Circle.Image                  = "rbxassetid://517259585"
 	Circle.Name                   = "Circle";
 	Circle.ImageTransparency      = 0.75;
 	Circle.BackgroundTransparency = 1;
