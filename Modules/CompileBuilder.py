@@ -8,7 +8,7 @@ import fnmatch
 # the name of the file
 
 fileList = ''
-ignoreFiles = ['AxisCameraEngine.lua', 'SpringPhysics.lua', 'AccelTween.lua']
+ignoreFiles = ['AxisCameraEngine.lua', 'AccelTween.lua']
 
 for (root, dirNames, fileNames) in os.walk("."):
     newFileNames = fileNames
