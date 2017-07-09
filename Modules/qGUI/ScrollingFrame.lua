@@ -1,4 +1,3 @@
-local Players          = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService       = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -264,15 +263,14 @@ function ScrollingFrame.new(Gui)
 	self.Maid.ContainerChanged = self.Container.Changed:connect(function(Property)
 		if Property == "AbsoluteSize" then
 			self:UpdateScroller()
-			self:FreeScroll()
+			self:FreeScroll(true)
 		end
 	end)
 	
 	self.Maid.GuiChanged = self.Gui.Changed:connect(function(Property)
 		if Property == "AbsoluteSize" then
 			self:UpdateScroller()
-			
-			self:FreeScroll()
+			self:FreeScroll(true)
 		end
 	end)
 	
@@ -338,7 +336,11 @@ function ScrollingFrame:StopDrag()
 	self:FreeScroll()
 end
 
-function ScrollingFrame:FreeScroll()
+function ScrollingFrame:FreeScroll(LowPriority)
+	if LowPriority and self.Maid.UpdateMaid then
+		return
+	end
+
 	local Maid = MakeMaid()
 	
 	self:UpdateRender()
@@ -444,7 +446,7 @@ function ScrollingFrame:InputBegan(InputBeganObject, Options)
 			
 			Maid.InputChanged = UserInputService.InputChanged:connect(Update)
 		end
-	
+		
 		Maid.Cleanup = function()
 			self:UpdateRender()
 			if Options and Options.OnClick then
