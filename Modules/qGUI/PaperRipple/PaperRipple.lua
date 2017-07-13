@@ -99,8 +99,8 @@ function PaperRipple:FurthestCornerDistanceFrom(Position)
 
 	-- Magnitude distance of each position
 	local TopLeft = (ContainerPosition - Position).magnitude
-	local TopRight = (ContainerPosition + Vector2.new(0, ContainerSize.X) - Position).magnitude
-	local BottomLeft = (ContainerPosition + Vector2.new(ContainerSize.Y, 0) - Position).magnitude
+	local TopRight = (ContainerPosition + Vector2.new(ContainerSize.X, 0) - Position).magnitude
+	local BottomLeft = (ContainerPosition + Vector2.new(0, ContainerSize.Y) - Position).magnitude
 	local BottomRight = (ContainerPosition + ContainerSize - Position).magnitude
 
 	-- Selection
