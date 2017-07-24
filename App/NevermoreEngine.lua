@@ -133,7 +133,6 @@ local _LibraryCache = {} do
 			Parent = ResourceFolder;
 		})
 
-		local Secondary
 		for Name, Library in pairs(_LibraryCache) do
 			if not Name:lower():find("server") then
 				Library.Parent = ReplicationFolder
