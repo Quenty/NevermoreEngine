@@ -14,27 +14,6 @@ assert(script.Parent == ReplicatedStorage,  "Invalid parent. For NevermoreEngine
 
 local Nevermore = {}
 
-local function Modify(Instance, Values)
-	-- Modifies an Instance by using a table.  
-
-	assert(type(Values) == "table", "Values is not a table");
-
-	for Index, Value in next, Values do
-		if type(Index) == "number" then
-			Value.Parent = Instance
-		else
-			Instance[Index] = Value
-		end
-	end
-	return Instance
-end
-
-local function Make(ClassType, Properties)
-	-- Using a syntax hack to create a nice way to Make new items.  
-
-	return Modify(Instance.new(ClassType), Properties)
-end
-
 local function CallOnChildren(Instance, FunctionToCall)
 	-- Calls a function on each of the children of a certain object, using recursion.  
 	-- Exploration note: Parents are always called before children.
@@ -90,11 +69,14 @@ local function Retrieve(Parent, ClassName)
 	assert(type(Parent) == "userdata", "Error: Parent must be a userdata")
 
 	return RunService:IsServer() and function(Name)
-		return Parent:FindFirstChild(Name) or Make(ClassName, {
-			Parent = Parent;
-			Archivable = false;
-			Name = Name;
-		})
+		local Item = Parent:FindFirstChild(Name)
+		if not Item then
+			Item = Instance.new(ClassName)
+			Item.Archivable = false
+			Item.Name = Name
+			Item.Parent = Parent
+		end
+		return Item
 	end or function(Name)
 		return Parent:WaitForChild(Name)
 	end
@@ -127,13 +109,15 @@ local _LibraryCache = {} do
 	end)
 
 	if not RunService:IsClient() then -- Written in this "not" fashion specifically so SoloTestMode doesn't move items.
-		local ReplicationFolder = ResourceFolder:FindFirstChild("Modules") or Make("Folder", {
-			Name = "Modules";
-			Archivable = false;
-			Parent = ResourceFolder;
-		})
-
-		local Secondary
+		local ReplicationFolder = ResourceFolder:FindFirstChild("Modules") 
+		
+		if not ReplicationFolder then
+			ReplicationFolder = Instance.new("Folder")
+			ReplicationFolder.Name = "Modules"
+			ReplicationFolder.Archivable = false
+			ReplicationFolder.Parent = ResourceFolder
+		end
+		
 		for Name, Library in pairs(_LibraryCache) do
 			if not Name:lower():find("server") then
 				Library.Parent = ReplicationFolder
