@@ -1,8 +1,11 @@
+Camera\CameraStack.lua
 Camera\CameraState.lua
+Camera\CameraStateTweener.lua
 Camera\Easing.lua
 Camera\Effects\CameraControls.lua
 Camera\Effects\CustomCameraEffect.lua
 Camera\Effects\DefaultCamera.lua
+Camera\Effects\FadeBetweenCamera.lua
 Camera\Effects\FadingCamera.lua
 Camera\Effects\ImpulseCamera.lua
 Camera\Effects\InverseFader.lua
