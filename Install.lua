@@ -6,12 +6,12 @@ assert(not game:FindFirstChild("NetworkClient"), "You can't install with TeamCre
 
 -- Config
 local HourGlassSize = 32
-local HourGlassCenter = UDim2.new(.5, 0, .5, 0)
-local AnimationTime = .5
+local HourGlassCenter = UDim2.new(0.5, 0, 0.5, 0)
+local AnimationTime = 0.5
 
 -- Generation
-local HSandPos = UDim2.new(0, .25*HourGlassSize - 1, 0, .25*HourGlassSize - (HourGlassSize <= 64 and 1))
-local HSandSize = UDim2.new(0, .5*HourGlassSize + 2, 0, 2 + 38*HourGlassSize / 64)
+local HSandPos = UDim2.new(0, 0.25*HourGlassSize - 1, 0, 0.25*HourGlassSize - (HourGlassSize <= 64 and 1))
+local HSandSize = UDim2.new(0, 0.5*HourGlassSize + 2, 0, 2 + 38*HourGlassSize / 64)
 
 local GeneratedObjects = {}
 local function newInstance(Class, Parent)
@@ -43,7 +43,7 @@ Background.ZIndex = 10
 
 local LoadingText = newInstance('TextLabel', Screen)
 LoadingText.FontSize = "Size48";
-LoadingText.Position = UDim2.new(.5, 0, .5, HourGlassSize + 24);
+LoadingText.Position = UDim2.new(0.5, 0, 0.5, HourGlassSize + 24);
 LoadingText.Text = "Loading Nevermore";
 LoadingText.BackgroundTransparency = 1;
 LoadingText.Font = "SourceSansLight"
@@ -51,7 +51,7 @@ LoadingText.ZIndex = 10
 
 local ProgressText = newInstance('TextLabel', Screen)
 ProgressText.FontSize = "Size32";
-ProgressText.Position = UDim2.new(.5, 0, .5, HourGlassSize + 64);
+ProgressText.Position = UDim2.new(0.5, 0, 0.5, HourGlassSize + 64);
 ProgressText.Text = "";
 ProgressText.BackgroundTransparency = 1;
 ProgressText.Font = "SourceSansLight"
@@ -59,7 +59,7 @@ ProgressText.ZIndex = 10
 
 local Empty = newInstance('ImageLabel', Screen)
 Empty.Transparency = 1
-Empty.Position = HourGlassCenter - UDim2.new(0, .5*HourGlassSize, 0, HourGlassSize)
+Empty.Position = HourGlassCenter - UDim2.new(0, 0.5*HourGlassSize, 0, HourGlassSize)
 Empty.Size = UDim2.new(0, HourGlassSize, 0, 2*HourGlassSize)
 Empty.ZIndex = 10
 Empty.Image = 'rbxassetid://411533268'
@@ -102,7 +102,7 @@ spawn(function()
 		LSand:TweenSize(HSandSize, "Out", "Linear", AnimationTime, false)
 		wait(AnimationTime + .03)
 		HSand.Visible = false
-		local duration = .25	
+		local duration = 0.25	
 		local start = tick()
 		local dur = 0
 		while (dur < duration) do
@@ -114,7 +114,7 @@ spawn(function()
 		Empty.Rotation = 180
 		HSand.Position = HSandPos
 		HSand2.Position = UDim2.new(0, 0, 0, 0)
-		LSand.Size = UDim2.new(0, .5*HourGlassSize + 2, 0, 0)
+		LSand.Size = UDim2.new(0, 0.5*HourGlassSize + 2, 0, 0)
 		HSand.Visible = true
 		LSand.Visible = false
 		Empty.Rotation = 0
@@ -132,7 +132,7 @@ HttpService.HttpEnabled = true
 
 local function LoadURL(URL)
 	URL = URL:gsub("\\", "/"):gsub("^%s*(.-)%s*$", "%1") -- Trim whitespace and swap slashes
-	return HttpService:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/" .. URL)
+	return HttpService:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/" .. URL)
 end
 
 local function MakeScript(Parent, URL)
