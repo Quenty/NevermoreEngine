@@ -260,18 +260,14 @@ function ScrollingFrame.new(Gui)
 	self:BindInput(Gui)
 	self:BindInput(self.Container)
 	
-	self.Maid.ContainerChanged = self.Container.Changed:connect(function(Property)
-		if Property == "AbsoluteSize" then
-			self:UpdateScroller()
-			self:FreeScroll(true)
-		end
+	self.Maid.ContainerChanged = self.Container:GetPropertyChangedSignal("AbsoluteSize"):connect(function()
+		self:UpdateScroller()
+		self:FreeScroll(true)
 	end)
 	
-	self.Maid.GuiChanged = self.Gui.Changed:connect(function(Property)
-		if Property == "AbsoluteSize" then
-			self:UpdateScroller()
-			self:FreeScroll(true)
-		end
+	self.Maid.GuiChanged = self.Gui:GetPropertyChangedSignal("AbsoluteSize"):connect(function(Property)
+		self:UpdateScroller()
+		self:FreeScroll(true)
 	end)
 	
 	self:UpdateScroller()
