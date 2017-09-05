@@ -1,98 +1,97 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems          = LoadCustomLibrary("qSystems")
-local CallOnChildren    = qSystems.CallOnChildren
-
 local lib = {}
 
--- See Type library for more identification stuff.
+-- Utility instance functions, to be depreciated
 -- @author Quenty
--- Last Modified November 28th, 2014
 
---[[
-Change log
 
-November 28th, 2014
-- Added GetSeats
-- Added some documentation
 
-February 15th, 2014
-- Added GetPartVolume
-
---]]
-
+--- Retrieve all parts in a hierarchy
+-- @param StartInstance The instance to start searching under
 local function GetBricks(StartInstance)
-	-- Returns a list of bricks (will include StartInstance)
-
 	local List = {}
 
-	CallOnChildren(StartInstance, function(Item)
+	if StartInstance:IsA("BasePart") then
+		List[#List+1] = StartInstance
+	end
+
+	for _, Item in pairs(StartInstance:GetDescendants()) do
 		if Item:IsA("BasePart") then
-			List[#List+1] = Item;
+			List[#List+1] = Item
 		end
-	end)
+	end
 
 	return List
 end
 lib.GetBricks  = GetBricks
-lib.get_bricks = GetBricks
-lib.getBricks  = GetBricks
 
+
+--- Returns a list of the seats, such as GetBricks
+-- @param StartInstance The instance to start searching under
 local function GetSeats(StartInstance)
-	-- Returns a list of the seats, such as GetBricks
-
 	local List = {}
 
-	CallOnChildren(StartInstance, function(Item)
+	if StartInstance:IsA("Seat") or StartInstance:IsA("VehicleSeat") then
+		List[#List+1] = StartInstance
+	end
+	
+	for _, Item in pairs(StartInstance:GetDescendants()) do
 		if Item:IsA("Seat") or Item:IsA("VehicleSeat") then
 			List[#List+1] = Item;
 		end
-	end)
+	end
 
 	return List
 end
 lib.GetSeats = GetSeats
 
 
+--- Get's the bricks in a model, but will not get a brick that is "NoInclude"
+-- @param StartInstance The instance to start searching under
+-- @param NoInclude The instance to not include
 local function GetBricksWithIgnore(StartInstance, NoInclude)
-	--- Get's the bricks in a model, but will not get a brick that is "NoInclude"
-
 	local List = {}
-
-	CallOnChildren(StartInstance, function(Item)
+		
+	if StartInstance:IsA("BasePart") and StartInstance ~= NoInclude then
+		List[#List+1] = StartInstance
+	end
+	
+	for _, Item in pairs(StartInstance:GetDescendants()) do
 		if Item:IsA("BasePart") and Item ~= NoInclude then
-			List[#List+1] = Item;
+			List[#List+1] = Item
 		end
-	end)
+	end
 
 	return List;
 end
 lib.GetBricksWithIgnore = GetBricksWithIgnore
-lib.getBricksWithIgnore = GetBricksWithIgnore
 
+
+--- Get's the bricks in a model, but will not get a brick that is "DoIgnore"
+-- @param StartInstance The instance to start searching under
+-- @param DoIgnore A Function that is called to filter out components. Return true to ignore.
 local function GetBricksWithIgnoreFunction(StartInstance, DoIgnore)
-	--- Get's the bricks in a model, but will not get a brick that is "NoInclude"
-
 	local List = {}
 
-	CallOnChildren(StartInstance, function(Item)
+	if StartInstance:IsA("BasePart") and not DoIgnore(StartInstance) then
+		List[#List+1] = StartInstance
+	end
+	
+	for _, Item in pairs(StartInstance:GetDescendants()) do
 		if Item:IsA("BasePart") and not DoIgnore(Item) then
 			List[#List+1] = Item
 		end
-	end)
+	end
 
 	return List
 end
 lib.GetBricksWithIgnoreFunction = GetBricksWithIgnoreFunction
-lib.getBricksWithIgnoreFunction = GetBricksWithIgnoreFunction
 
+
+--- Returns a parts volume.
+-- @param Part The part to get the volume for
+-- @param CountWedgesAsSolids Boolean, if true, counts a wedge part as a solid.
 local function GetPartVolume(Part, CountWedgesAsSolids)
-	-- Returns a parts volume.
-	-- @param Part The part to get the volume for
-	-- @param CountWedgesAsSolids Boolean, if true, counts a wedge part as a solid.
+	
 	
 	local Size = Part.Size
 	if Part:IsA("Part") or CountWedgesAsSolids then
@@ -106,8 +105,5 @@ local function GetPartVolume(Part, CountWedgesAsSolids)
 	end
 end
 lib.GetPartVolume = GetPartVolume
-lib.getPartVolume = GetPartVolume
-lib.get_part_volume = GetPartVolume
-
 
 return lib
