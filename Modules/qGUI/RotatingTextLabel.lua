@@ -5,11 +5,8 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qMath = LoadCustomLibrary("qMath")
-local qSystems = LoadCustomLibrary("qSystems")
 local SpringPhysics = LoadCustomLibrary("SpringPhysics")
 
-local Make = qSystems.Make
-local Modify = qSystems.Modify
 local MapNumber = qMath.MapNumber
 local ClampNumber = qMath.ClampNumber
 
@@ -161,42 +158,39 @@ end
 function RotatingCharacterBuilder:Generate(Parent)
 	local Template = self.TextLabelTemplate or error("Must set TextLabelTemplate")
 
-	local Container = Make("Frame", {
-		Name = "RotatingCharacterContainer";
-		Parent = Parent or error("No parent");
-		ClipsDescendants = true;
-		SizeConstraint = "RelativeYY";
-		Size = UDim2.new(1, 0, 1, 0);
+	local Container = Instance.new("Frame")
+	Container.Name = "RotatingCharacterContainer";
+	Container.ClipsDescendants = true
+	Container.SizeConstraint = Enum.SizeConstraint.RelativeYY
+	Container.Size = UDim2.new(1, 0, 1, 0)
+	Container.BackgroundTransparency = Template.BackgroundTransparency
+	Container.ZIndex = Template.ZIndex
+	Container.BorderSizePixel = Template.BorderSizePixel
+	Container.BackgroundColor3 = Template.BackgroundColor3
 
-		BackgroundTransparency = Template.BackgroundTransparency;
-		ZIndex = Template.ZIndex;
-		BorderSizePixel = Template.BorderSizePixel;
-		BackgroundColor3 = Template.BackgroundColor3;
+	local TextLabel = Instance.new("TextLabel")
+	TextLabel.Name = "Label"
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.Size = UDim2.new(1, 0, 1, 0)
+	TextLabel.ZIndex = Template.ZIndex
+	TextLabel.Font = Template.Font
+	TextLabel.TextScaled = Template.TextScaled
+	TextLabel.TextColor3 = Template.TextColor3
+	TextLabel.TextTransparency = Template.TextTransparency
+	TextLabel.TextStrokeTransparency = Template.TextStrokeTransparency
+	TextLabel.TextXAlignment = Enum.TextXAlignment.Center
+	TextLabel.TextYAlignment = Enum.TextYAlignment.Center
+	TextLabel.Text = ""
 
-		Make("TextLabel", {
-			Name = "Label";
-			BackgroundTransparency = 1;
-			Size = UDim2.new(1, 0, 1, 0);
+	TextLabel.Parent = Container
 
-			ZIndex = Template.ZIndex;
-			Font = Template.Font;
-			TextScaled = Template.TextScaled;
-			TextColor3 = Template.TextColor3;
-			TextTransparency = Template.TextTransparency;
-			TextStrokeTransparency = Template.TextStrokeTransparency;
+	local Second = Container.Label:Clone()
+	Second.Name = "SecondLabel"
+	Second.Position = UDim2.new(0, 0, 1, 0)
+	Second.SizeConstraint = Enum.SizeConstraint.RelativeXY
+	Second.Parent = Container.Label
 
-			TextXAlignment = "Center";
-			TextYAlignment = "Center";
-			Text = "";
-		});
-	})
-
-	local Second = Modify(Container.Label:Clone(), {
-		Name = "SecondLabel";
-		Parent = Container.Label;
-		Position = UDim2.new(0, 0, 1, 0);
-		SizeConstraint = "RelativeXY";
-	})
+	Container.Parent = Parent or error("No parent")
 
 	return self:WithGui(Container)
 end
@@ -470,23 +464,25 @@ function RotatingLabelBuilder:WithTemplate(Template)
 	self.Label = RotatingLabel.new()
 	self.Label:SetTemplate(Template)
 
-	return self:WithGui(Make("Frame", {
-		Name = Template.Name .. "_RotatingLabel";
-		Size = Template.Size;
-		Position = Template.Position;
-		Parent = Template.Parent;
-		SizeConstraint = Template.SizeConstraint;
-		
-		BackgroundTransparency = 1;
-		BorderSizePixel = 0;
+	local Frame = Instance.new("Frame")
+	Frame.Name = Template.Name .. "_RotatingLabel"
+	Frame.Size = Template.Size
+	Frame.AnchorPoint = Template.AnchorPoint
+	Frame.Position = Template.Position
+	Frame.SizeConstraint = Template.SizeConstraint
+	Frame.BackgroundTransparency = 1
+	Frame.BorderSizePixel = 0
 
-		Make("Frame", {
-			Name = "Container";
-			SizeConstraint = "RelativeYY";
-			Size = UDim2.new(1, 0, 1, 0);
-			BackgroundTransparency = 1;
-		})
-	}))
+	local Container = Instance.new("Frame")
+	Container.Name = "Container"
+	Container.SizeConstraint = Enum.SizeConstraint.RelativeYY
+	Container.Size = UDim2.new(1, 0, 1, 0)
+	Container.BackgroundTransparency = 1
+	
+	Container.Parent = Frame
+	Frame.Parent = Template.Parent
+
+	return self:WithGui(Frame)
 end
 
 function RotatingLabelBuilder:WithGui(Gui)
