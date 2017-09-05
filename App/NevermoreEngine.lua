@@ -14,17 +14,6 @@ assert(script.Parent == ReplicatedStorage,  "Invalid parent. For NevermoreEngine
 
 local Nevermore = {}
 
-local function CallOnChildren(Instance, FunctionToCall)
-	-- Calls a function on each of the children of a certain object, using recursion.  
-	-- Exploration note: Parents are always called before children.
-	
-	FunctionToCall(Instance)
-
-	for _, Child in next, Instance:GetChildren() do
-		CallOnChildren(Child, FunctionToCall)
-	end
-end
-
 local function HandleRetrieving(Retrieving, Function, Argument)
 	-- Handles yielded operations by caching the retrieval process
 	assert(type(Retrieving) == "table", "Error: Retrieving must be a table")
@@ -99,14 +88,14 @@ local _LibraryCache = {} do
 	else
 		Repository = ResourceFolder:WaitForChild("Modules")
 	end
-
-	CallOnChildren(Repository, function(Child)
+	
+	for _, Child in pairs(Repository:GetDescendants()) do
 		if Child:IsA("ModuleScript") then
 			assert(not _LibraryCache[Child.Name], "Error: Duplicate name of '" .. Child.Name .. "' already exists")
 
 			_LibraryCache[Child.Name] = Child
 		end
-	end)
+	end
 
 	if not RunService:IsClient() then -- Written in this "not" fashion specifically so SoloTestMode doesn't move items.
 		local ReplicationFolder = ResourceFolder:FindFirstChild("Modules") 
