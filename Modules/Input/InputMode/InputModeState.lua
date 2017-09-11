@@ -21,6 +21,10 @@ function InputModeState.new(Valid)
 	return self
 end
 
+function InputModeState:GetLastEnabledTime()
+	return self.LastEnabled
+end
+
 function InputModeState:AddKeys(Keys, EnumSet)
 	-- @param Keys A string for ease of use, or a table of keys
 	-- @param [EnumSet] The enum set to pull from. Defaults to KeyCode.
@@ -71,5 +75,7 @@ function InputModeState:Evaluate(InputObject)
 		self:Enable()
 	end
 end
+
+
 
 return InputModeState
