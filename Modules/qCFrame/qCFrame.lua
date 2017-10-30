@@ -87,9 +87,9 @@ local function GetBoundingBox(Objects, RelativeTo)
 		end
 	end
 
-	-- Size, Position
+	-- Size, CFrame
 	return Vector3.new(Sides[1]-Sides[2],Sides[3]-Sides[4],Sides[5]-Sides[6]), 
-	       RelativeTo:pointToWorldSpace(Vector3.new((Sides[1]+Sides[2])/2,(Sides[3]+Sides[4])/2,(Sides[5]+Sides[6])/2))
+	       RelativeTo:toWorldSpace(CFrame.new((Sides[1]+Sides[2])/2,(Sides[3]+Sides[4])/2,(Sides[5]+Sides[6])/2))
 end
 lib.GetBoundingBox = GetBoundingBox
 
