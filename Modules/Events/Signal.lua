@@ -1,4 +1,5 @@
--- Credit to Stravant
+-- Original author: Stravant
+-- Modified by: Quenty
 
 --[[
 	class Signal
@@ -26,42 +27,49 @@
 --]]
 
 local Signal = {}
+Signal.__index = Signal
+Signal.ClassName = "Signal"
 
 function Signal.new()
-	local sig = {}
+	local self = setmetatable({}, Signal)
 	
-	local mSignaler = Instance.new('BindableEvent')
+	self.BindableEvent = Instance.new("BindableEvent")
+	self.ArgData = nil
+	self.ArgCount = nil
 	
-	local mArgData = nil
-	local mArgDataCount = nil
-	
-	function sig:fire(...)
-		mArgData = {...}
-		mArgDataCount = select('#', ...)
-		mSignaler:Fire()
-	end
-	
-	function sig:connect(f)
-		if not f then error("connect(nil)", 2) end
-		return mSignaler.Event:connect(function()
-			f(unpack(mArgData, 1, mArgDataCount))
-		end)
-	end
-	
-	function sig:wait()
-		mSignaler.Event:wait()
-		assert(mArgData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-		return unpack(mArgData, 1, mArgDataCount)
+	return self
+end
+
+function Signal:fire(...)
+	self.ArgData = {...}
+	self.ArgCount = select("#", ...)
+	self.BindableEvent:Fire()
+end
+
+function Signal:connect(Handler)
+	if not Handler then 
+		error("connect(nil)", 2) 
 	end
 
-	function sig:Destroy()
-		mSignaler:Destroy()
-		mArgData      = nil
-		mArgDataCount = nil
-		mSignaler     = nil
+	return self.BindableEvent.Event:connect(function()
+		Handler(unpack(self.ArgData, 1, self.ArgCount))
+	end)
+end
+
+function Signal:wait()
+	self.BindableEvent.Event:wait()
+	assert(self.ArgData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
+	return unpack(self.ArgData, 1, self.ArgCount)
+end
+
+function Signal:Destroy()
+	if self.BindableEvent then
+		self.BindableEvent:Destroy()
+		self.BindableEvent = nil
 	end
-	
-	return sig
+
+	self.ArgData = nil
+	self.ArgCount = nil
 end
 
 return Signal
