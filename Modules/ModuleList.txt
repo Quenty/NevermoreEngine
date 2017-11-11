@@ -26,7 +26,6 @@ DataStructures\Chain\LinkedConstructor.lua
 Events\Deferred.lua
 Events\Maid.lua
 Events\PromiseChild.lua
-Events\RemoteManager.lua
 Events\Signal.lua
 Events\TimeSyncManager.lua
 Input\HeldInput\HeldInput.lua
@@ -51,11 +50,11 @@ qGUI\GuiTriangle.lua
 qGUI\qGUI.lua
 qGUI\RelativeFrameBuilder.lua
 qGUI\RotatingTextLabel.lua
+qGUI\RoundedBackingBuilder.lua
 qGUI\ScreenCover.lua
 qGUI\ScreenGeometry.lua
 qGUI\ScreenSpace.lua
 qGUI\ScrollingFrame.lua
-qGUI\Snackbar.lua
 qGUI\TitleGenerator.lua
 qGUI\3DRender\GUIRender3D.lua
 qGUI\3DRender\ModelRender3D.lua
@@ -74,6 +73,7 @@ qGUI\Markdown\MarkdownParser.lua
 qGUI\Markdown\MarkdownRender.lua
 qGUI\PaperRipple\PaperRipple.lua
 qGUI\PaperRipple\Ripple.lua
+qGUI\Snackbar\Snackbar.lua
 qSystems\Bezier.lua
 qSystems\EasyConfiguration.lua
 qSystems\EnumInterpreter.lua
