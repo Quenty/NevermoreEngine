@@ -12,14 +12,14 @@
 		is almost never the desired behavior.
 		
 	API:
-		void fire(...)
+		void Fire(...)
 			Fire the event with the given arguments.
 			
-		Connection connect(Function handler)
+		Connection Connect(Function handler)
 			Connect a new handler to the event, returning a connection object that
 			can be disconnected.
 			
-		... wait()
+		... Wait()
 			Wait for fire to be called, and return the arguments it was given.
 
 		Destroy()
@@ -40,13 +40,14 @@ function Signal.new()
 	return self
 end
 
-function Signal:fire(...)
+function Signal:Fire(...)
 	self.ArgData = {...}
 	self.ArgCount = select("#", ...)
 	self.BindableEvent:Fire()
 end
+Signal.fire = Signal.Fire
 
-function Signal:connect(Handler)
+function Signal:Connect(Handler)
 	if not Handler then 
 		error("connect(nil)", 2) 
 	end
@@ -55,12 +56,14 @@ function Signal:connect(Handler)
 		Handler(unpack(self.ArgData, 1, self.ArgCount))
 	end)
 end
+Signal.connect = Signal.Connect
 
-function Signal:wait()
+function Signal:Wait()
 	self.BindableEvent.Event:wait()
 	assert(self.ArgData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
 	return unpack(self.ArgData, 1, self.ArgCount)
 end
+Signal.wait = Signal.Wait
 
 function Signal:Destroy()
 	if self.BindableEvent then
