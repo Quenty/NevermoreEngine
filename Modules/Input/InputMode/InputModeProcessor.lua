@@ -1,5 +1,4 @@
--- Intent: Process inputs
--- @author Quenty
+-- Intent: Process inputs by evaluating states 
 
 local InputModeProcessor = {}
 InputModeProcessor.__index = InputModeProcessor
