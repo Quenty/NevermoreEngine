@@ -3,14 +3,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SummedCamera      = LoadCustomLibrary("SummedCamera")
-local SpringPhysics     = LoadCustomLibrary("SpringPhysics")
+local CameraState = LoadCustomLibrary("CameraState")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
+local SpringPhysics = LoadCustomLibrary("SpringPhysics")
 
 local LagPointCamera = {}
 LagPointCamera.ClassName = "LagPointCamera"
+LagPointCamera._FocusCamera = nil
+LagPointCamera._OriginCamera = nil
 
--- Intent: Point a current element
+-- Intent: Point a current element but lag behind for a smoother experience
 
 function LagPointCamera.new(OriginCamera, FocusCamera)
 	-- @param OriginCamera A camera to use
@@ -20,7 +22,7 @@ function LagPointCamera.new(OriginCamera, FocusCamera)
 
 	self.FocusSpring = SpringPhysics.VectorSpring.New()
 	self.OriginCamera = OriginCamera or error("Must have OriginCamera")
-	self.FocusCamera = FocusCamera or error("Must have OriginCamera")
+	self.FocusCamera = FocusCamera or error("Must have FocusCamera")
 	self.Speed = 10
 
 	return self
@@ -32,11 +34,13 @@ end
 
 function LagPointCamera:__newindex(Index, Value)
 	if Index == "FocusCamera" then
-		rawset(self, Index, Value)
+		rawset(self, "_" .. Index, Value)
 		self.FocusSpring.Target = self.FocusCamera.CameraState.qPosition
 		self.FocusSpring.Position = self.FocusSpring.Target
 		self.FocusSpring.Velocity = Vector3.new(0, 0, 0)
-	elseif Index == "OriginCamera" or Index == "LastFocusUpdate" or Index == "FocusSpring" then
+	elseif Index == "OriginCamera" then
+		rawset(self, "_" .. Index, Value)
+	elseif Index == "LastFocusUpdate" or Index == "FocusSpring" then
 		rawset(self, Index, Value)
 	elseif Index == "Speed" or Index == "Damper" or Index == "Velocity" then
 		self.FocusSpring[Index] = Value
@@ -75,6 +79,8 @@ function LagPointCamera:__index(Index)
 		return self.FocusSpring[Index]
 	elseif Index == "Origin" then
 		return self.OriginCamera.CameraState
+	elseif Index == "FocusCamera" or Index == "OriginCamera" then
+		return rawget(self, "_" .. Index) or error("Internal error: Index does not exist")
 	else
 		return LagPointCamera[Index]
 	end
