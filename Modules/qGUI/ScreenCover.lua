@@ -4,9 +4,9 @@ local RunService        = game:GetService("RunService")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
-local EnumInterpreter   = LoadCustomLibrary("EnumInterpreter")
-local qMath             = LoadCustomLibrary("qMath");
+local qSystems = LoadCustomLibrary("qSystems")
+local EnumInterpreter = LoadCustomLibrary("EnumInterpreter")
+local qMath = LoadCustomLibrary("qMath");
 
 local lib               = {}
 
@@ -14,7 +14,6 @@ local lib               = {}
 -- @author Quenty
 -- Last Modified November 17th, 2014
 
-local Make   = qSystems.Make
 local Round  = qSystems.Round
 local Modify = qSystems.Modify
 
@@ -29,22 +28,20 @@ local function MakeCover(Properties)
 	-- Generates a cover frame that is basically standard. :D
 
 	Properties = Properties or {}
-
-	return Modify(Make("Frame", {
-			--Parent               = ScreenGui;
-			Size                   = UDim2.new(1, 0, 1, 38); -- 38 is because topbar. dang it ROBLOX.
-			Position               = UDim2.new(0, 0, 0, -36); -- Fix ROBLOX's glitches...
-			BackgroundColor3       = Color3.new(0, 0, 0);
-			BackgroundTransparency = 1;
-			Visible                = false;
-			Name                   = "ScreenCover";
-			ZIndex                 = 10;
-			BorderSizePixel        = 0;
-		}), Properties)
+	local Frame = Instance.new("Frame")
+	Frame.Size                   = UDim2.new(1, 0, 1, 2)
+	Frame.Position               = UDim2.new(0, 0, 0, -2)
+	Frame.BackgroundColor3       = Color3.new(0, 0, 0)
+	Frame.BackgroundTransparency = 1
+	Frame.Visible                = false
+	Frame.Name                   = "ScreenCover"
+	Frame.ZIndex                 = 10
+	Frame.BorderSizePixel        = 0
+	
+	return Modify(Frame, Properties)
 end
 
 lib.MakeCover = MakeCover
-lib.makeCover = MakeCover
 
 local function SmoothInOut(Percent, Factor)
 	if Percent < 0.5 then
@@ -87,53 +84,48 @@ end
 local function GenerateCircleGui(BaseCover, CircleSize, ZIndex)
 	ZIndex = ZIndex or 1;
 
-	local CircleGui = Make("ImageLabel", {
-		Archivable             = false;
-		BorderSizePixel        = 0;
-		BackgroundTransparency = 1;
-		Image                  = "http://www.roblox.com/asset/?id=148523274";
-		Size                   = UDim2.new(0, CircleSize, 0, CircleSize);
-		Parent                 = BaseCover;
-		ZIndex = ZIndex;
-	})
+	local CircleGui = Instance.new("ImageLabel")
+	CircleGui.Archivable  = false
+	CircleGui.BorderSizePixel = 0
+	CircleGui.BackgroundTransparency = 1
+	CircleGui.Image = "http://www.roblox.com/asset/?id=148523274"
+	CircleGui.Size = UDim2.new(0, CircleSize, 0, CircleSize)
+	CircleGui.ZIndex = ZIndex
+	CircleGui.Parent = BaseCover
 
 	-- Stretch accross the whole top.
-	local TopFrame = Make("Frame", {
-		Archivable       = false;
-		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "TopFrame";
-		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
+	local TopFrame = Instance.new("Frame")
+	TopFrame.Archivable = false
+	TopFrame.BorderSizePixel = 0
+	TopFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+	TopFrame.Name = "TopFrame"
+	TopFrame.ZIndex = ZIndex
+	TopFrame.Parent = BaseCover
 
 	-- Stretch accross the whole bottom.
-	local BottomFrame = Make("Frame", {
-		Archivable       = false;
-		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "BottomFrame";
-		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
+	local BottomFrame = Instance.new("Frame")
+	BottomFrame.Archivable = false
+	BottomFrame.BorderSizePixel = 0
+	BottomFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+	BottomFrame.Name = "BottomFrame"
+	BottomFrame.ZIndex = ZIndex
+	BottomFrame.Parent = BaseCover
 
-	local LeftFrame = Make("Frame", {
-		Archivable       = false;
-		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "LeftFrame";
-		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
+	local LeftFrame = Instance.new("Frame")
+	LeftFrame.Archivable = false
+	LeftFrame.BorderSizePixel = 0
+	LeftFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+	LeftFrame.Name = "LeftFrame"
+	LeftFrame.ZIndex = ZIndex
+	LeftFrame.Parent = BaseCover
 
-	local RightFrame = Make("Frame", {
-		Archivable       = false;
-		BorderSizePixel  = 0;
-		BackgroundColor3 = Color3.new(0, 0, 0);
-		Name             = "RightFrame";
-		Parent           = BaseCover;
-		ZIndex = ZIndex;
-	})
+	local RightFrame = Instance.new("Frame")
+	RightFrame.Archivable = false
+	RightFrame.BorderSizePixel = 0
+	RightFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+	RightFrame.Name = "RightFrame"
+	RightFrame.ZIndex = ZIndex
+	RightFrame.Parent = BaseCover
 
 	return CircleGui, TopFrame, BottomFrame, LeftFrame, RightFrame
 end
@@ -229,7 +221,7 @@ local StyleFunctions = {
 			-- SquareSize must be divisible by 2. 
 			-- If the squareSize is too small, you can get wait() lag (I think).
 
-			SquareSize                       = qMath.roundUp(AnimationStyles.SquareSize or 76, 2);
+			SquareSize                       = qMath.RoundUp(AnimationStyles.SquareSize or 76, 2);
 			local NewCover                   = BaseCover:Clone()
 			NewCover.Name                    = "Square"
 			NewCover.Size                    = UDim2.new(0, 0, 0, 0);
@@ -237,7 +229,7 @@ local StyleFunctions = {
 			BaseCover.BackgroundTransparency = 1;
 			
 			
-			local MaxSize                    = qMath.roundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
+			local MaxSize                    = qMath.RoundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
 			local Squares                    = {}
 			local ValX                       = 0;
 			local ValY                       = 0;
@@ -269,13 +261,13 @@ local StyleFunctions = {
 			return true;
 		end;
 		TransitionOut = function(Time, BaseCover, AnimationStyles)
-			SquareSize                      = qMath.roundUp(AnimationStyles.SquareSize or 76, 2);
+			SquareSize                      = qMath.RoundUp(AnimationStyles.SquareSize or 76, 2);
 			
 			local NewCover                  = BaseCover:Clone()
 			NewCover.Name                   = "Square"
 			NewCover.Size                   = UDim2.new(0, SquareSize, 0, SquareSize);
 			
-			local MaxSize                   = qMath.roundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
+			local MaxSize                   = qMath.RoundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
 			local Squares                   = {}
 			local ValX                      = 0;
 			local ValY                      = MaxSize;
@@ -312,7 +304,7 @@ local StyleFunctions = {
 			-- SquareSize must be divisible by 2. 
 			-- If the squareSize is too small, you can get wait() lag (I think).
 
-			SquareSize                       = qMath.roundUp(AnimationStyles.SquareSize or 76, 2);
+			SquareSize                       = qMath.RoundUp(AnimationStyles.SquareSize or 76, 2);
 			local NewCover                   = BaseCover:Clone()
 			NewCover.Name                    = "Square"
 			NewCover.Size                    = UDim2.new(0, 0, 0, 0);
@@ -320,7 +312,7 @@ local StyleFunctions = {
 			BaseCover.BackgroundTransparency = 1;
 			
 			
-			local MaxSize                    = qMath.roundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
+			local MaxSize                    = qMath.RoundUp(math.max(BaseCover.AbsoluteSize.X, BaseCover.AbsoluteSize.Y) * 1.6, SquareSize) + SquareSize
 			local Squares                    = {}
 			local ValX                       = 0;
 			local ValY                       = 0;
