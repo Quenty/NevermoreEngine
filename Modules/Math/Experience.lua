@@ -1,5 +1,5 @@
 local ExperienceCalculator = {}
-local ExperienceFactor = 10
+local ExperienceFactor = 200
 
 local function GetLevelFromExperience(Experience)
 	-- http://stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
@@ -15,7 +15,6 @@ local function GetExperienceForNextLevel(CurrentExperience)
 	
 	local CurrentLevel = GetLevelFromExperience(CurrentExperience)
 	local ExperienceRequired = ExperienceFactor*(CurrentLevel*(1+CurrentLevel))
-	--local ExperienceRequiredForCurrentLevel = ExperienceFactor*(CurrentLevel*(1+CurrentLevel))
 
 	local ExperienceLeft = ExperienceRequired - CurrentExperience
 	
@@ -41,12 +40,6 @@ local function GetSubExperience(CurrentExperience)
 	
 	local ExperienceRequiredForCurrentLevel = ExperienceFactor*(LastLevel*(1+LastLevel))
 	local ExperienceRequired = ExperienceFactor*(CurrentLevel*(1+CurrentLevel))
-	
-	--[[print("CurrentExperience", CurrentExperience)
-	print("CurrentLevel", CurrentLevel)
-	print("ExperienceRequiredForCurrentLevel", ExperienceRequiredForCurrentLevel)
-	
-	print("ExperienceRequired", ExperienceRequired)--]]
 	
 	local AchievedOfNext = CurrentExperience - ExperienceRequiredForCurrentLevel 
 	local SubTotalRequired = ExperienceRequired - ExperienceRequiredForCurrentLevel
