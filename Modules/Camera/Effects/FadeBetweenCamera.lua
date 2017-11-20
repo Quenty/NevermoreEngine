@@ -47,17 +47,8 @@ end
 
 function FadeBetweenCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		--print("Spring value", self.Spring.Value)
-		--return (self.Camera.CameraState or self.Camera) * self.Spring.Value
-		--Qmul(q0, Qpow(Qmul(q1, Qinv(q0)), t))
 		local Value = self.Spring.Value
-		
-		--[[
-		if self.Spring.Velocity < 0 then
-			StateA, StateB = StateB, StateA
-			Value = 1-Value
-		end--]]
-		
+
 		if math.abs(Value - 1) <= 1e-4 then
 			return self.CameraStateB
 		elseif math.abs(Value) <= 1e-4 then
@@ -68,9 +59,6 @@ function FadeBetweenCamera:__index(Index)
 	
 			return StateA + (StateB - StateA)*Value
 		end
-		--local Quaternion = LoadCustomLibrary("Quaternion")
-		--print(NewState)
-		--return NewState
 	elseif Index == "CameraStateA" then
 		return self.CameraA.CameraState or self.CameraA
 	elseif Index == "CameraStateB" then
