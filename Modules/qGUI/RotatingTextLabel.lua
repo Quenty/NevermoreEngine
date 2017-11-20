@@ -24,7 +24,7 @@ function RotatingCharacter.new(Gui)
 	self.Label = self.Gui.Label
 	self.LabelTwo = self.Label.SecondLabel
 
-	self.Spring = SpringPhysics.NumberSpring.New()
+	self.Spring = SpringPhysics.new()
 
 	self.TargetCharacter = " "
 	self.Character = self.TargetCharacter

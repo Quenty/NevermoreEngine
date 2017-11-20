@@ -30,7 +30,7 @@ SmoothZoomedCamera.BounceAtEnd = true
 function SmoothZoomedCamera.new()
 	local self = setmetatable({}, SmoothZoomedCamera)
 
-	self.Spring = SpringPhysics.NumberSpring.New()
+	self.Spring = SpringPhysics.new(0)
 	self.Speed = 15
 
 	return self

@@ -20,7 +20,7 @@ Scroller._ViewSize = 50
 function Scroller.new()
 	local self = setmetatable({}, Scroller)
 	
-	self.Spring = SpringPhysics.Spring.New(0)
+	self.Spring = SpringPhysics.new(0)
 	self.Spring.Speed = 20
 	
 	return self

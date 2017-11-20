@@ -17,7 +17,7 @@ ImpulseCamera.ClassName = "ImpulseCamera"
 function ImpulseCamera.new()
 	local self = setmetatable({}, ImpulseCamera)
 
-	self.Spring = SpringPhysics.VectorSpring.New()
+	self.Spring = SpringPhysics.new(Vector3.new())
 
 	self.Damper = 0.5
 	self.Speed = 20

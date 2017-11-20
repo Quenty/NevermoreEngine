@@ -20,7 +20,7 @@ function LagPointCamera.new(OriginCamera, FocusCamera)
 	
 	local self = setmetatable({}, LagPointCamera)
 
-	self.FocusSpring = SpringPhysics.VectorSpring.New()
+	self.FocusSpring = SpringPhysics.new(Vector3.new())
 	self.OriginCamera = OriginCamera or error("Must have OriginCamera")
 	self.FocusCamera = FocusCamera or error("Must have FocusCamera")
 	self.Speed = 10

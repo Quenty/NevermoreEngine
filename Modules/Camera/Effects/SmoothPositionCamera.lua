@@ -17,7 +17,7 @@ SmoothPositionCamera._OriginCamera = nil
 function SmoothPositionCamera.new(BaseCamera)
 	local self = setmetatable({}, SmoothPositionCamera)
 
-	self.Spring = SpringPhysics.VectorSpring.New()
+	self.Spring = SpringPhysics.new(Vector3.new())
 	self.BaseCamera = BaseCamera or error("Must have BaseCamera")
 	self.Speed = 10
 

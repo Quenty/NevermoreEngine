@@ -22,14 +22,12 @@ SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
 SmoothRotatedCamera._MaxY = math.rad(80)
 SmoothRotatedCamera._MinY = math.rad(-80)
 SmoothRotatedCamera._ZoomGiveY = math.rad(5) -- ONly on th
---SmoothRotatedCamera._AngleXZ = 0
---SmoothRotatedCamera._AngleY = 0
 
 function SmoothRotatedCamera.new()
 	local self = setmetatable({}, SmoothRotatedCamera)
 	
-	self.SpringX = SpringPhysics.NumberSpring.New()
-	self.SpringY = SpringPhysics.NumberSpring.New()
+	self.SpringX = SpringPhysics.new(0)
+	self.SpringY = SpringPhysics.new(0)
 	self.Speed = 15
 	
 	return self
@@ -72,13 +70,9 @@ function SmoothRotatedCamera:__newindex(Index, Value)
 	elseif Index == "MaxY" then
 		assert(Value >= self.MinY, "MaxY must be greater than MinY")
 		self._MaxY = Value
-		--self.TargetAngleY = self.TargetAngleY
-		--self.AngleY = self.AngleY -- Reclamp value
 	elseif Index == "MinY" then
 		assert(Value <= self.MaxY, "MinY must be less than MaxY")
 		self._MinY = Value
-		--self.TargetAngleY = self.TargetAngleY
-		--self.AngleY = self.AngleY -- Reclamp value
 	elseif Index == "SpeedAngleX" or Index == "SpeedAngleXZ" then
 		self.SpringX.Speed = Value
 	elseif Index == "SpeedAngleY" then

@@ -15,7 +15,7 @@ FadeBetweenCamera.ClassName = "FadeBetweenCamera"
 function FadeBetweenCamera.new(CameraA, CameraB)
 	local self = setmetatable({}, FadeBetweenCamera)
 
-	self.Spring = SpringPhysics.NumberSpring.New()
+	self.Spring = SpringPhysics.new()
 
 	self.CameraA = CameraA or error("No CameraA")
 	self.CameraB = CameraB or error("No CameraB")

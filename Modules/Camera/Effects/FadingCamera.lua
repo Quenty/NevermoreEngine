@@ -15,7 +15,7 @@ FadingCamera.ClassName = "FadingCamera"
 function FadingCamera.new(Camera)
 	local self = setmetatable({}, FadingCamera)
 
-	self.Spring = SpringPhysics.NumberSpring.New()
+	self.Spring = SpringPhysics.new(0)
 
 	self.Camera = Camera or error("No camera")
 	self.Damper = 1
