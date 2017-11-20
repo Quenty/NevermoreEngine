@@ -3,20 +3,26 @@
 
 local lib = {}
 
-local MONTH_NAMES        = {"January"; "February"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December"}
-local MONTH_NAMES_SHORT  = {"Jan";     "Feb";      "Mar";   "Apr";   "May"; "Jun";  "Jul";  "Aug";    "Sep";       "Oct";     "Nov";      "Dec"}
-local DAYS_IN_MONTH      = { 31;        28;         31;      30;      31;    30;     31;     31;       30;          31;       30;         31}
-local DAYS_OF_WEEK       = {"Sunday"; "Monday"; "Tuesday"; "Wednesday"; "Thursday"; "Friday"; "Saturday"}
-local DAYS_OF_WEEK_SHORT = {"Sun";    "Mon";    "Tues";    "Weds";      "Thurs";    "Fri";    "Sat"}
+local MONTH_NAMES        = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+local MONTH_NAMES_SHORT  = {"Jan",     "Feb",      "Mar",   "Apr",   "May", "Jun",  "Jul",  "Aug",    "Sep",       "Oct",     "Nov",      "Dec"}
+local DAYS_IN_MONTH      = { 31,        28,         31,      30,      31,    30,     31,     31,       30,          31,       30,         31}
+local DAYS_OF_WEEK       = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+local DAYS_OF_WEEK_SHORT = {"Sun",    "Mon",    "Tues",    "Weds",      "Thurs",    "Fri",    "Sat"}
 
---- Fixes The DAYS_IN_MONTH table, given a year. 
-local function FixLeapYear(Year)
+--- Returns a Days in months table for the given year
+local function GetDaysMonth(Year)
+	local Copy = {}
+	for Index, Value in pairs(DAYS_IN_MONTH) do
+		Copy[Index] = Value
+	end
 
 	if Year % 4 == 0 and (Year % 100 ~= 0 or Year % 400 == 0) then
-		DAYS_IN_MONTH[2] = 29;
+		Copy[2] = 29
 	else
-		DAYS_IN_MONTH[2] = 28;
+		Copy[2] = 28
 	end
+
+	return Copy
 end
 
 function lib.GetSecond(CurrentTime)
@@ -28,29 +34,29 @@ function lib.GetMinute(CurrentTime)
 end
 
 function lib.GetHour(CurrentTime)
-	return math.floor(CurrentTime / 3600 % 24)
+	return math.floor(CurrentTime/3600 % 24)
 end
 
 function lib.GetDay(CurrentTime)
-	local CurrentDay = math.ceil(CurrentTime/60/60/24%365.25)
-	return CurrentDay;
+	local CurrentDay = math.ceil(CurrentTime/60/60/24 % 365.25)
+	return CurrentDay
 end
 
 function lib.GetYear(CurrentTime) 
-	local CurrentYear = math.floor(CurrentTime/60/60/24/365.25+1970)
+	local CurrentYear = math.floor(CurrentTime/60/60/24/365.25 + 1970)
 
 	return CurrentYear
 end
 
 function lib.GetYearShort(CurrentTime)
-	local Year = lib.GetYear(CurrentTime);
+	local Year = lib.GetYear(CurrentTime)
 	return Year % 100
 end
 
 function lib.GetYearShortFormatted(CurrentTime) 
-	local ShortYear = lib.GetYearShort(CurrentTime);
+	local ShortYear = lib.GetYearShort(CurrentTime)
 	if ShortYear < 10 then
-		ShortYear = "0"..ShortYear
+		ShortYear = "0" .. ShortYear
 	end
 	return ShortYear
 end
@@ -58,13 +64,13 @@ end
 function lib.GetMonth(CurrentTime)
 	local Year = lib.GetYear(CurrentTime)
 	local Day = lib.GetDay(CurrentTime)
-	local Month;
+	local Month
 	
-	FixLeapYear(Year)
+	local DaysInMonth = GetDaysMonth(Year)
 	
-	for Index=1, #DAYS_IN_MONTH do
-		if Day > DAYS_IN_MONTH[Index] then
-			Day = Day - DAYS_IN_MONTH[Index]
+	for Index=1, #DaysInMonth do
+		if Day > DaysInMonth[Index] then
+			Day = Day - DaysInMonth[Index]
 		else
 			return Index
 		end
@@ -72,24 +78,24 @@ function lib.GetMonth(CurrentTime)
 end
 
 function lib.GetFormattedMonth(CurrentTime)
-	local Month = lib.GetMonth(CurrentTime);
+	local Month = lib.GetMonth(CurrentTime)
 	if Month < 10 then
-		Month = "0"..Month;
+		Month = "0"..Month
 	end
 	
-	return Month;
+	return Month
 end
 
 function lib.GetDayOfTheMonth(CurrentTime)
 	local Year = lib.GetYear(CurrentTime)
 	local Day = lib.GetDay(CurrentTime)
-	local DayOfTheMonth;
+	local DayOfTheMonth
 	
-	FixLeapYear(Year)
+	local DaysInMonth = GetDaysMonth(Year)
 
-	for Index=1, #DAYS_IN_MONTH do
-		if Day > DAYS_IN_MONTH[Index] then
-			Day = Day - DAYS_IN_MONTH[Index]
+	for Index=1, #DaysInMonth do
+		if Day > DaysInMonth[Index] then
+			Day = Day - DaysInMonth[Index]
 		else
 			return Day
 		end
@@ -97,13 +103,13 @@ function lib.GetDayOfTheMonth(CurrentTime)
 end
 
 function lib.GetFormattedDayOfTheMonth(CurrentTime)
-	local DayOfTheMonth = lib.GetDayOfTheMonth(CurrentTime);
+	local DayOfTheMonth = lib.GetDayOfTheMonth(CurrentTime)
 	
 	if DayOfTheMonth < 10 then
-		DayOfTheMonth = "0"..DayOfTheMonth;
+		DayOfTheMonth = "0"..DayOfTheMonth
 	end
 	
-	return DayOfTheMonth;
+	return DayOfTheMonth
 end
 
 function lib.GetMonthName(CurrentTime)
@@ -131,14 +137,14 @@ function lib.GetJulianDate(CurrentTime)
 	+ ((Year + 4800 - ((14 - Month) / 12)) / 4)
 	+ ((Year + 4800 - ((14 - Month) / 12)) / 100)
 	+ ((Year + 4800 - ((14 - Month) / 12)) / 400)
-	- 32045);--]]
+	- 32045)--]]
 
 	return JulianDay
 end
 
 function lib.GetDayOfTheWeek(CurrentTime)
 	
-	local JulianTime = lib.GetJulianDate(CurrentTime);
+	local JulianTime = lib.GetJulianDate(CurrentTime)
 	
 	return math.floor(JulianTime) % 7
 end
@@ -157,29 +163,31 @@ function lib.GetDayOfTheWeekNameShort(CurrentTime)
 	return Name
 end
 
-function lib.GetOrdinalOfNumber(Number) -- Returns st, nd (Like 1st, 2nd)
-	local TenRemainder = Number % 10;
+---
+-- @return st, nd (Like 1st, 2nd)
+function lib.GetOrdinalOfNumber(Number) 
+	local TenRemainder = Number % 10
 	local HundredRemainder = Number % 100
 	
 	if HundredRemainder >= 10 and HundredRemainder <= 20 then
-		return "th";
+		return "th"
 	end
 	
 	if TenRemainder == 1 then
-		return "st";
+		return "st"
 	elseif TenRemainder == 2 then
-		return "nd";
+		return "nd"
 	elseif TenRemainder == 3 then
-		return "rd";
+		return "rd"
 	else
-		return "th";
+		return "th"
 	end
 end
 
 function lib.GetDayOfTheMonthOrdinal(CurrentTime)
 	local DayOfTheMonth = lib.GetDayOfTheMonth(CurrentTime)
 
-	return lib.GetOrdinalOfNumber(DayOfTheMonth);
+	return lib.GetOrdinalOfNumber(DayOfTheMonth)
 end
 
 function lib.GetFormattedSecond(CurrentTime)
@@ -214,7 +222,7 @@ function lib.GetHourFormatted(CurrentTime)
 	local CurrentHour = lib.GetHour(CurrentTime)
 
 	if CurrentHour < 10 then
-		CurrentHour = "0"..CurrentHour;
+		CurrentHour = "0"..CurrentHour
 	end
 
 	return CurrentHour
@@ -227,16 +235,16 @@ function lib.GetRegularHourFormatted(CurrentTime)
 		CurrentHour = "0"..CurrentHour
 	end
 
-	return CurrentHour;
+	return CurrentHour
 end
 
 function lib.GetamOrpm(CurrentTime)
 	local CurrentHour = lib.GetHour(CurrentTime)
 
 	if CurrentHour > 12 then
-		return "pm";
+		return "pm"
 	else
-		return "am";
+		return "am"
 	end
 end
 
@@ -244,9 +252,9 @@ function lib.GetAMorPM(CurrentTime)
 	local CurrentHour = lib.GetHour(CurrentTime)
 
 	if CurrentHour > 12 then
-		return "PM";
+		return "PM"
 	else
-		return "AM";
+		return "AM"
 	end
 end
 
@@ -259,7 +267,7 @@ function lib.GetMilitaryHour(CurrentTime)
 end
 
 function lib.LeapYear(CurrentTime)
-	local Year = lib.GetYear(CurrentTime);
+	local Year = lib.GetYear(CurrentTime)
 
 	if Year % 4 == 0 and (Year % 100 ~= 0 or Year % 400 == 0) then
 		return 1
@@ -269,12 +277,12 @@ function lib.LeapYear(CurrentTime)
 end
 
 function lib.GetDaysInMonth(CurrentTime)
-	local Month = lib.GetMonth(CurrentTime);
-	local Year = lib.GetYear(CurrentTime);
+	local Month = lib.GetMonth(CurrentTime)
+	local Year = lib.GetYear(CurrentTime)
 
-	FixLeapYear(Year)
+	DaysInMonth = GetDaysMonth(Year)
 
-	return DAYS_IN_MONTH[Month]
+	return DaysInMonth[Month]
 end
 
 local ISO_FORMAT_STRINGS = {
@@ -324,18 +332,17 @@ local ISO_FORMAT_STRINGS = {
 	U = time;
 }
 
-local MatchString = "["
-
-for Index, Value in pairs(ISO_FORMAT_STRINGS) do
-	MatchString = MatchString..Index
+local MatchString = "[" do
+	for Index, Value in pairs(ISO_FORMAT_STRINGS) do
+		MatchString = MatchString .. Index
+	end
+	MatchString = MatchString .. "]"
 end
 
-MatchString = MatchString.."]";
-
 function lib.GetFormattedTime(Format, CurrentTime)
-	CurrentTime = CurrentTime or tick();
+	CurrentTime = CurrentTime or tick()
 	
-	local ReturnString = Format;
+	local ReturnString = Format
 	local FormatsRequired = {}
 	
 	for NewFormat in string.gmatch(Format, MatchString) do
@@ -351,7 +358,7 @@ function lib.GetFormattedTime(Format, CurrentTime)
 		ReturnString = ReturnString:gsub(FormatType:rep(3), Replacement)
 	end
 	
-	return ReturnString;
+	return ReturnString
 end
 
 return lib
