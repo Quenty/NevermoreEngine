@@ -5,15 +5,13 @@ local RunService         = game:GetService("RunService")
 local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
 
-local Ripple   = LoadCustomLibrary("Ripple")
-local qSystems = LoadCustomLibrary("qSystems")
+local Ripple = LoadCustomLibrary("Ripple")
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
+local Table = LoadCustomLibrary("Table")
+local GetIndexByValue = Table.GetIndexByValue
 
-local GetIndexByValue = qSystems.GetIndexByValue
-
---- Paper ripple from material design, based off of Polymer's algorithms.
--- https://github.com/PolymerElements/paper-ripple/blob/master/paper-ripple.html
--- @author Quenty
+--- Intent: PaperRipple from material design, based off of Polymer's algorithms.
+-- See: github.com/PolymerElements/paper-ripple/blob/master/paper-ripple.html
 
 local PaperRipple = {}
 PaperRipple.__index = PaperRipple
@@ -21,19 +19,18 @@ PaperRipple.ClassName = "PaperRipple"
 PaperRipple.InkColor = Color3.new(1, 1, 1)
 PaperRipple.Recenter = false
 
+--- Construct a new PaperRipple
+-- @param Container A container with ClipsDescendants=true
 function PaperRipple.new(Container)
-	-- @param Container A container that clips descendants to parent
 
 	assert(Container, "Needs Container")
 	assert(Container.ClipsDescendants, "Container must clip descendants")
 
 	local self = setmetatable({}, PaperRipple)
 
-	-- COMPOSITE
 	self.InputMaid = MakeMaid()
 	self.Container = Container
 
-	-- PRIVATE
 	self.Ripples = {}
 	self.Animating = false
 
@@ -42,13 +39,13 @@ function PaperRipple.new(Container)
 	return self
 end
 
+--- Creates a new container parented to the parent, with a sufficient
+--  construction.
+-- @param Parent A ROBLOX GUI parent, will make sure that the
+--               PaperRipple actually renders under it. Note there is a small 
+--               restriction when it comes to rotation.
+-- @return The new paper ripple.
 function PaperRipple.FromParent(Parent)
-	--- Creates a new container parented to the parent, with a sufficient
-	--  construction.
-	-- @param Parent A ROBLOX GUI parent, will make sure that the
-	--               PaperRipple actually renders under it. Note there is a small 
-	--               restriction when it comes to rotation.
-	-- @return The new paper ripple.
 
 	assert(Parent, "Must send parent")
 	assert(type(Parent) == "userdata", "Parent must be a ROBLOX object, type = " .. type(Parent))
@@ -76,9 +73,9 @@ function PaperRipple.FromParent(Parent)
 	return Ripple
 end
 
+--- Sets the ink color for the ripple and recolors all the things!
+-- @param InkColor Color3, the ink color to set the ripple
 function PaperRipple:SetInkColor(InkColor)
-	--- Sets the ink color for the ripple and recolors all the things!
-	-- @param InkColor Color3, the ink color to set the ripple
 	
 	self.InkColor = InkColor
 
@@ -90,19 +87,18 @@ function PaperRipple:SetInkColor(InkColor)
 	return self
 end
 
+--- Should the ripples recenter itself as stuff happens? 
+-- @param DoRecenter Boolean, if true, will recenter.
 function PaperRipple:SetRecenter(DoRecenter)
-	--- Should the ripples recenter itself as stuff happens? 
-	-- @param DoRecenter Boolean, if true, will recenter.
-
 	assert(type(DoRecenter) == "boolean", "DoRecenter must be a boolean. (kids these days).")
 
 	self.Recenter = DoRecenter
 end
 
-function PaperRipple:FurthestCornerDistanceFrom(Position)
-	-- @param Position Vector2 world position on the GUI.
-	-- @return Number, the further distance from the corner.
-	
+--- Calculates the furthest corner from the position's distance
+-- @param Position Vector2 world position on the GUI.
+-- @return Number, the further distance from the corner.
+function PaperRipple:FurthestCornerDistanceFrom(Position)	
 	local Container = self.Container
 	
 	local ContainerPosition = Container.AbsolutePosition
@@ -118,28 +114,26 @@ function PaperRipple:FurthestCornerDistanceFrom(Position)
 	return math.max(TopLeft, TopRight, BottomLeft, BottomRight)
 end
 
+--- Releases each ripple for mouse down, so they expand all the way and fade.
 function PaperRipple:ReleaseRipples()
-	--- Releases each ripple for mouse down, so they expand all the way and fade.
-
 	for _, Ripple in pairs(self.Ripples) do
 		Ripple:Up()
 	end
 end
 
-function PaperRipple:AddRipple(NewRipple)
-	--- Adds a new ripple to the processing list. Used internally.
-	--  Also calls :Down() to begin animation.
-
+--- Adds a new ripple to the processing list. Used internally.
+--  Also calls :Down() and beings the animation
+function PaperRipple:_addRipple(NewRipple)
 	self.Ripples[#self.Ripples+1] = NewRipple or error("No ripple sent")
 
 	NewRipple:Down()
-	self:BeginAnimating()
+	self:_beginAnimating()
 end
 
+--- Removes the ripple from the processing list. Used internally.
+--  This removal also GCs the Ripple's GUI.s
+--  @param Ripple An active ripple in the list to remove. 
 function PaperRipple:RemoveRipple(Ripple)
-	--- Removes the ripple from the processing list. Used internally.
-	--  This removal also GCs the Ripple's GUI.s
-	--  @param Ripple An active ripple in the list to remove. 
 
 	assert(Ripple, "Must send ripple")
 
@@ -149,12 +143,9 @@ function PaperRipple:RemoveRipple(Ripple)
 	table.remove(self.Ripples, Index)
 end
 
-
-
--- ANIMATION BINDING
+--- Updates the animations on each of the ripples, GCing as needed
+--  Called internally by the animation binding.
 function PaperRipple:Draw()
-	--- Updates the animations on each of the ripples, GCing as needed
-	--  Called internally by the animation binding.
 
 	local Index = 1
 	while Index <= #self.Ripples do
@@ -172,16 +163,15 @@ function PaperRipple:Draw()
 	end
 end
 
+--- Binding to render step requires a unique UID.
+-- @return string The name being used to bind the ripple to RenderStep
 function PaperRipple:GetBindName()
-	--- Binding to render step requires a unique UID.
-	-- @return String The name being used to bind the ripple to RenderStep
-
 	return "PaperRipple" .. tostring(self)
 end
 
-function PaperRipple:StopAnimating()
-	--- Private, stops the animation of the paper ripple.
-	-- @pre There are no ripples in the array self.Ripples.
+--- Stops the animation of the paper ripple.
+-- @pre There are no ripples in the array self.Ripples.
+function PaperRipple:_stopAnimating()
 
 	assert(#self.Ripples == 0, "There are still ripples to process.")
 
@@ -193,9 +183,8 @@ function PaperRipple:StopAnimating()
 	self.Container.BackgroundTransparency = 1
 end
 
-function PaperRipple:BeginAnimating()
-	--- If not animating, begins the animation process of animating.
-
+--- If not animating, begins the animation process of animating.
+function PaperRipple:_beginAnimating()
 	if not self.Animating then
 		self.Animating = true
 
@@ -203,23 +192,17 @@ function PaperRipple:BeginAnimating()
 			self:Draw()
 
 			if #self.Ripples <= 0 or not self.Animating then
-				self:StopAnimating()
+				self:_stopAnimating()
 			end
 		end)
 	end
 end
 
-
-
-
--- INPUT BINDING
-function PaperRipple:ConstructNewRipple(Position)
-	--- Creates a new ripple for use in the Down function. Possible for this
-	--  to be overridden.
-	-- @param [Position] Vector2 position value world space.
-	-- @return The new ripple
-
-	-- No position? SEt to center.
+--- Creates a new ripple for use in the Down function. Possible for this
+--  to be overridden.
+-- @param [Position] Vector2 position value world space. If not given, is set to center
+-- @return The new ripple
+function PaperRipple:_constructNewRipple(Position)
 	Position = Position or (self.Container.AbsolutePosition + self.Container.AbsoluteSize/2)
 
 	local Radius = self:FurthestCornerDistanceFrom(Position)
@@ -235,21 +218,19 @@ function PaperRipple:ConstructNewRipple(Position)
 	return NewRipple
 end
 
+--- Handles a new ripple. Public function. Also bound to input.
+-- @param [Position] Vector2 position value world space.
+-- @return The new ripple
 function PaperRipple:Down(Position)
-	--- Handles a new ripple. Public function. Also bound to input.
-	-- @param [Position] Vector2 position value world space.
-	-- @return The new ripple
-
 	self:ReleaseRipples() -- Release current ripples...
-	local NewRipple = self:ConstructNewRipple(Position)
-	self:AddRipple(NewRipple)
+	local NewRipple = self:_constructNewRipple(Position)
+	self:_addRipple(NewRipple)
 
 	return NewRipple
 end
 
+--- Handles input being released, which is basically just releasing all the ripples. 
 function PaperRipple:Up()
-	--- Handles input being released, which is basically just releasing all the ripples. 
-
 	self:ReleaseRipples()
 	self.InputMaid.InputEnded = nil
 end
@@ -296,27 +277,18 @@ function PaperRipple:BindInput()
 			self.InputMaid.InputEnded = UserInputService.InputEnded:connect(OnUp)
 		end
 	end)
-
-	--[[
-	self.InputMaid.InputEnded = self.Container.InputEnded:connect(function(InputObject)
-		if ValidInputEnums[InputObject.UserInputType] then
-			self:Up()
-		end
-	end)--]]
 end
 
+--- Destroys the ripple, and it's container GUI for easy
+--  GC on dynamically created stuff. Also disconnects all
+--  events in the offchance that somehow we
+--  didn't do that well either.
 function PaperRipple:Destroy()
-	--- Destroys the ripple, and it's container GUI for easy
-	--  GC on dynamically created stuff. Also disconnects all
-	--  events in the offchance that somehow we
-	--  didn't do that well either.
-
-	-- Remove all ripples.
 	while #self.Ripples > 0 do
 		self:RemoveRipple(self.Ripples[1] or error("No ripple?"))
 	end
 
-	self:StopAnimating()
+	self:_stopAnimating()
 
 	self.Container:Destroy()
 	self.Container = nil
