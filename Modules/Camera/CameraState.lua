@@ -3,7 +3,6 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local QuaternionObject = LoadCustomLibrary("QuaternionObject")
-local Quaternion = LoadCustomLibrary("Quaternion")
 
 -- Intent: Data container for the state of a camera
 -- @author Quenty
@@ -11,12 +10,12 @@ local Quaternion = LoadCustomLibrary("Quaternion")
 local CameraState = {}
 CameraState.ClassName = "CameraState"
 CameraState.FieldOfView = 0
-CameraState.Quaterion = QuaternionObject.new(Quaternion.QuaternionFromCFrame(CFrame.new()))
+CameraState.Quaterion = QuaternionObject.new()
 CameraState.Position = Vector3.new()
 
 function CameraState:__index(Index)
 	if Index == "CFrame" or Index == "CoordinateFrame" then
-		return CFrame.new(self.Position.x, self.Position.y, self.Position.z, Quaternion.QuaternionToCFrame(self.Quaterion))
+		return QuaternionObject.toCFrame(self.Quaterion, self.Position)
 	else
 		return CameraState[Index]
 	end
@@ -24,10 +23,12 @@ end
 
 function CameraState:__newindex(Index, Value)
 	if Index == "CFrame" or Index == "CoordinateFrame" then
-		self.Position = Value.p
-		self.Quaterion = QuaternionObject.new(Quaternion.QuaternionFromCFrame(Value))
-	else
+		rawset(self, "Position", Value.p)
+		rawset(self, "Quaterion", QuaternionObject.fromCFrame(Value))
+	elseif Index == "FieldOfView" or Index == "Position" or Index == "Quaterion" then
 		rawset(self, Index, Value)
+	else
+		error(("'%s' is not a valid index of CameraState"):format(tostring(Index)))
 	end
 end
 

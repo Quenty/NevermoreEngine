@@ -1,3 +1,10 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+
+local Quaternion = LoadCustomLibrary("Quaternion")
+
 --By xXxMoNkEyMaNxXx elsez
 --Roblox Lua
 local type=type
@@ -27,10 +34,26 @@ local alt={"w","x","y","z"}
 function metatable.__index(q,i)
 	return q[alt[i]]
 end
-local function new(w,x,y,z)
+
+local function new(w,x,y,z)	
 	return setmetatable({w=w or 1,x=x or 0,y=y or 0,z=z or 0},metatable)
 end
 Q.new=new
+
+local function fromCFrame(cframe)
+	return new(Quaternion.QuaternionFromCFrame(cframe))
+end
+Q.fromCFrame = fromCFrame
+
+local function toCFrame(q, position)
+	local x, y, z = 0, 0, 0
+	if position then
+		x, y, z = position.x, position.y, position.z
+	end
+	return CFrame.new(x, y, z, Quaternion.QuaternionToCFrame(q))
+end
+Q.toCFrame = toCFrame
+
 local function inv(q)
 	local w,x,y,z=q.w,q.x,q.y,q.z
 	local m=w*w+x*x+y*y+z*z
