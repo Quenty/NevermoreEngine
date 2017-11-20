@@ -1,3 +1,5 @@
+local TextService = game:GetService("TextService")
+
 -- Intent: Renders the markdown from MarkdownParser
 -- @author Quenty
 
@@ -9,10 +11,11 @@ MarkdownRender.TextSize = 18
 MarkdownRender.Indent = 30
 MarkdownRender.BaseTextColor3 = Color3.new(56/255, 56/255, 56/255)
 
-function MarkdownRender.new(Gui)
+function MarkdownRender.new(Gui, Width)
 	local self = setmetatable({}, MarkdownRender)
 	
 	self.Gui = Gui or error("No Gui")
+	self.Width = Width or error("No Width")
 	
 	return self
 end
@@ -50,11 +53,12 @@ end
 
 function MarkdownRender:RenderParagraphLabel(Label, Text)
 	-- Strip ending punctuation which screws with roblox's wordwrapping and .TextFits
-	Label.Text = Text:gsub("(%p+)$", "")
+	local StrippedText = Text:gsub("(%p+)$", "")
 	
-	while not Label.TextFits and Label.Size.Y.Offset <= Label.TextSize*20 do
-		Label.Size = UDim2.new(Label.Size.X, UDim.new(0, Label.Size.Y.Offset + Label.TextSize))
-	end
+	local Width = self.Width or error("No width")
+	local LabelWidth = Label.Size.X.Scale*Width + Label.Size.X.Offset
+	local TextSize = TextService:GetTextSize(StrippedText, Label.TextSize, Label.Font, Vector2.new(LabelWidth, Label.TextSize*20))
+	Label.Size = UDim2.new(Label.Size.X, UDim.new(0, TextSize.Y))
 	
 	Label.Text = Text
 	
