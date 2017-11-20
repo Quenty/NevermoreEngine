@@ -1,3 +1,5 @@
+-- Intent: Utility function for estimating low/high arcs of projectiles
+
 --- Returns two possible paths from Origin to Target where the magnitude of the initial velocity is InitialVelocity
 -- @param Origin vector3 Origin
 -- @param Target vector3 Target
