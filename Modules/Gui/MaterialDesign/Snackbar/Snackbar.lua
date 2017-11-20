@@ -17,20 +17,6 @@ local qMath = LoadCustomLibrary("qMath")
 -- after a timeout or user interaction. There can only be
 -- one on the screen at a time.
 
-local function MakeDropShadow(Parent, Radius)
-	Radius = Radius or 4
-
-	local Gui      = Instance.new("Frame")
-	Gui.Size       = UDim2.new(1, Radius*2, 1, Radius*2)
-	Gui.Position   = UDim2.new(0, -Radius, 0, -Radius)
-	Gui.Name       = "DropShadow"
-	Gui.Parent     = Parent
-	Gui.ZIndex     = Parent.ZIndex-1
-	Gui.FrameStyle = "DropShadow"
-
-	return Gui
-end
-
 -- Base clase, not functional.
 local Snackbar           = {}
 Snackbar.ClassName       = "Snackbar"
@@ -46,18 +32,18 @@ Snackbar.CornerRadius    = 2--24
 function Snackbar.new(Parent, Text, Options)
 	local self = setmetatable({}, Snackbar)
 
-	local Gui                  = Instance.new("ImageButton")
-	Gui.ZIndex                 = 7
-	Gui.Name                   = "Snackbar"
-	Gui.Size                   = UDim2.new(0, 100, 0, self.Height)
-	Gui.BorderSizePixel        = 0
-	Gui.BackgroundColor3       = Color3.new(0.196, 0.196, 0.196) -- Google design specifications
-	Gui.Archivable             = false
-	Gui.ClipsDescendants       = false
-	Gui.Position               = self.Position
-	Gui.AutoButtonColor        = false
+	local Gui = Instance.new("ImageButton")
+	Gui.ZIndex = 7
+	Gui.Name = "Snackbar"
+	Gui.Size = UDim2.new(0, 100, 0, self.Height)
+	Gui.BorderSizePixel = 0
+	Gui.BackgroundColor3 = Color3.new(0.196, 0.196, 0.196) -- Google design specifications
+	Gui.Archivable = false
+	Gui.ClipsDescendants = false
+	Gui.Position = self.Position
+	Gui.AutoButtonColor = false
 	Gui.BackgroundTransparency = 1
-	self.Gui                   = Gui
+	self.Gui = Gui
 
 	self.BackgroundImages = {qGUI.BackWithRoundedRectangle(Gui, self.CornerRadius, Gui.BackgroundColor3)}
 	
@@ -69,7 +55,7 @@ function Snackbar.new(Parent, Text, Options)
 	ShadowContainer.BackgroundTransparency = 1
 	ShadowContainer.Size = UDim2.new(1, ShadowRadius*2, 1, ShadowRadius*2)
 	ShadowContainer.Archivable = false
-	ShadowContainer.Position = UDim2.new(0.5, 0, 0.5, 0)--UDim2.new(0, -ShadowRadius, 0, -ShadowRadius + 2)
+	ShadowContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
 	
 	--- Image is blurred at 
 	self.ShadowImages = {qGUI.AddNinePatch(ShadowContainer, "rbxassetid://191838004", Vector2.new(150, 150), self.CornerRadius + ShadowRadius, "ImageLabel")}
@@ -83,22 +69,22 @@ function Snackbar.new(Parent, Text, Options)
 		Item.ZIndex = Gui.ZIndex - 1
 	end
 
-	local TextLabel                  = Instance.new("TextLabel")
-	TextLabel.Size                   = UDim2.new(1, -self.TextWidthOffset*2, 0, 16)
-	TextLabel.Position               = UDim2.new(0, self.TextWidthOffset, 0, 16)
-	TextLabel.TextXAlignment         = Enum.TextXAlignment.Left
-	TextLabel.TextYAlignment         = Enum.TextYAlignment.Center
-	TextLabel.Name                   = "SnackbarLabel"
-	TextLabel.TextTransparency       = 0.87
-	TextLabel.TextColor3             = Color3.new(1, 1, 1)
+	local TextLabel = Instance.new("TextLabel")
+	TextLabel.Size = UDim2.new(1, -self.TextWidthOffset*2, 0, 16)
+	TextLabel.Position = UDim2.new(0, self.TextWidthOffset, 0, 16)
+	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TextLabel.TextYAlignment = Enum.TextYAlignment.Center
+	TextLabel.Name = "SnackbarLabel"
+	TextLabel.TextTransparency = 0.87
+	TextLabel.TextColor3 = Color3.new(1, 1, 1)
 	TextLabel.BackgroundTransparency = 1
-	TextLabel.BorderSizePixel        = 0
-	TextLabel.Font                   = Enum.Font.SourceSans--"Arial"
-	TextLabel.Text                   = Text
-	TextLabel.FontSize               = Enum.FontSize.Size18
-	TextLabel.ZIndex                 = Gui.ZIndex-1
+	TextLabel.BorderSizePixel = 0
+	TextLabel.Font = Enum.Font.SourceSans
+	TextLabel.Text = Text
+	TextLabel.FontSize = Enum.FontSize.Size18
+	TextLabel.ZIndex = Gui.ZIndex-1
 	TextLabel.Parent = Gui
-	self.TextLabel                   = TextLabel
+	self.TextLabel = TextLabel
 	
 	self.WhileActiveMaid = MakeMaid()
 	self.Gui.Parent = Parent
@@ -117,7 +103,6 @@ function Snackbar.new(Parent, Text, Options)
 		Button.Text = CallToActionText
 		Button.Font = Enum.Font.SourceSans
 		Button.FontSize = TextLabel.FontSize
-		--Button.TextScaled = true
 		Button.TextXAlignment = Enum.TextXAlignment.Right
 		Button.TextColor3 = DefaultTextColor3
 		Button.ZIndex = Gui.ZIndex
@@ -184,7 +169,6 @@ end
 
 function Snackbar:FadeOutTransparency(PercentFaded)
 	if PercentFaded then
-		-- self.Gui.BackgroundTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0, 1)
 		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 0, 1))
 		self.TextLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0.13, 1)
 		
@@ -192,10 +176,6 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 			self.CallToActionButton.TextTransparency = PercentFaded
 		end
 	else
-		--[[qGUI.TweenTransparency(self.Gui, {
-			BackgroundTransparency = 1;
-		}, self.FadeTime, true)--]]
-	
 		local NewProperties = {
 			ImageTransparency = 1;
 		}
@@ -219,9 +199,8 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 	end
 end
 
+--- Will animate unless given PercentFaded
 function Snackbar:FadeInTransparency(PercentFaded)
-	--- Will animate unless given PercentFaded
-
 	if PercentFaded then
 		-- self.Gui.BackgroundTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0)
 		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 1, 0))
@@ -232,9 +211,6 @@ function Snackbar:FadeInTransparency(PercentFaded)
 		end
 	else
 		-- Should be an ease-in-out transparency fade.
-		--[[qGUI.TweenTransparency(self.Gui, {
-			BackgroundTransparency = 0;
-		}, self.FadeTime, true)--]]
 		local NewProperties = {
 			ImageTransparency = 0;
 		}
@@ -261,9 +237,8 @@ function Snackbar:FadeInTransparency(PercentFaded)
 	end
 end
 
+-- Utility function
 function Snackbar:FadeHandler(NewPosition, DoNotAnimate, IsFadingOut)
-	-- Utility function
-
 	assert(NewPosition, "[Snackbar] - Internal function should not have been called. Missing NewPosition")
 	
 	if IsFadingOut then
