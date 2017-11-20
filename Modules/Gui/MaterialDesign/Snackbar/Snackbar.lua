@@ -1,16 +1,16 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService  = game:GetService("UserInputService")
-local RunService        = game:GetService("RunService")
-local Players           = game:GetService("Players")
-local GuiService        = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Players  = game:GetService("Players")
+local GuiService = game:GetService("GuiService")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qGUI = LoadCustomLibrary("qGUI")
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
+local qMath = LoadCustomLibrary("qMath")
 
--- @author Quenty
 -- Provides a lightweight feedback on an operation at the base of the screen,
 -- that hide after a timeout or user interaction. Only one is visible at once.
 
@@ -30,14 +30,6 @@ local function MakeDropShadow(Parent, Radius)
 	Gui.FrameStyle = "DropShadow"
 
 	return Gui
-end
-
-local function MapNumber(OldValue, OldMin, OldMax, NewMin, NewMax)
-	-- Maps a number from one range to another
-	-- http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
-	-- Make sure old range is not 0
-
-	return (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
 end
 
 
@@ -196,15 +188,15 @@ function Snackbar:SetBackgroundTransparency(Transparency)
 		Item.ImageTransparency = Transparency
 	end
 	for _, Item in pairs(self.ShadowImages) do
-		Item.ImageTransparency = MapNumber(Transparency, 0, 1, 0.74, 1)
+		Item.ImageTransparency = qMath.MapNumber(Transparency, 0, 1, 0.74, 1)
 	end
 end
 
 function Snackbar:FadeOutTransparency(PercentFaded)
 	if PercentFaded then
-		-- self.Gui.BackgroundTransparency = MapNumber(PercentFaded, 0, 1, 0, 1)
-		self:SetBackgroundTransparency(MapNumber(PercentFaded, 0, 1, 0, 1))
-		self.TextLabel.TextTransparency = MapNumber(PercentFaded, 0, 1, 0.13, 1)
+		-- self.Gui.BackgroundTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0, 1)
+		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 0, 1))
+		self.TextLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0.13, 1)
 		
 		if self.CallToActionButton then
 			self.CallToActionButton.TextTransparency = PercentFaded
@@ -241,9 +233,9 @@ function Snackbar:FadeInTransparency(PercentFaded)
 	--- Will animate unless given PercentFaded
 
 	if PercentFaded then
-		-- self.Gui.BackgroundTransparency = MapNumber(PercentFaded, 0, 1, 1, 0)
-		self:SetBackgroundTransparency(MapNumber(PercentFaded, 0, 1, 1, 0))
-		self.TextLabel.TextTransparency = MapNumber(PercentFaded, 0, 1, 1, 0.13)
+		-- self.Gui.BackgroundTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0)
+		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 1, 0))
+		self.TextLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0.13)
 		
 		if self.CallToActionButton then
 			self.CallToActionButton.TextTransparency = PercentFaded
