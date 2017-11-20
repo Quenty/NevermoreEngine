@@ -12,10 +12,6 @@ local Signal =  LoadCustomLibrary("Signal")
 
 -- Intent: Interface between user input and camera controls
 
-
-
---- Handles gamepad rotation
--- See: https://github.com/Roblox/Core-Scripts/blob/cad3a477e39b93ecafdd610b1d8b89d239ab18e2/PlayerScripts/StarterPlayerScripts/CameraScript/RootCamera.lua#L395
 local GamepadRotate = {}
 GamepadRotate.__index = GamepadRotate
 GamepadRotate.ClassName = "GamepadRotate"
@@ -36,6 +32,7 @@ function GamepadRotate.new()
 end
 
 do
+	-- See: https://github.com/Roblox/Core-Scripts/blob/cad3a477e39b93ecafdd610b1d8b89d239ab18e2/PlayerScripts/StarterPlayerScripts/CameraScript/RootCamera.lua#L395
 	-- K is a tunable parameter that changes the shape of the S-curve
 	-- the larger K is the more straight/linear the curve gets
 	local k = 0.35
