@@ -135,11 +135,10 @@ function CameraControls:SetRotatedCamera(RotatedCamera)
 	return self
 end
 
+--- Stolen directly from ROBLOX's core scripts.
+-- Looks like a simple integrator. 
+-- Called (zoom, zoomScale, 1) returns zoom
 local function rk4Integrator(position, velocity, t)
-	-- Stolen directly from ROBLOX's core scripts.
-	-- Looks like a simple integrator. 
-	-- Called (zoom, zoomScale, 1) returns zoom
-
 	local direction = velocity < 0 and -1 or 1
 	local function acceleration(p, v)
 		local accel = direction * math.max(1, (p / 3.3) + 0.5)
@@ -164,9 +163,8 @@ local function rk4Integrator(position, velocity, t)
 	return positionResult, velocityResult
 end
 
+--- This code was the same algorithm used by ROBLOX. It makes it so you can zoom easier at further distances.
 function CameraControls:HandleMouseWheel(InputObject)
-	--- This code was the same algorithm used by ROBLOX. It makes it so you can zoom easier at further distances.
-
 	if self.ZoomedCamera then
 		local Delta = math.clamp(-InputObject.Position.Z, -1, 1)*1.4
 		local Zoom = rk4Integrator(self.ZoomedCamera.TargetZoom, Delta, 1)
@@ -325,10 +323,9 @@ function CameraControls:HandleGamepadRotateStart()
 	
 	local Maid = MakeMaid()
 	
-	---[[
 	if self.RotatedCamera.ClassName == "SmoothRotatedCamera" then
 		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
-	end--]]
+	end
 	
 	Maid:GiveTask(RunService.Heartbeat:connect(function()
 		local DeltaAngle = self.GamepadRotate:GetThumbstickDeltaAngle()
