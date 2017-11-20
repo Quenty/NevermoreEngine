@@ -1,16 +1,125 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService  = game:GetService("UserInputService")
 local ContextActionService  = game:GetService("ContextActionService")
+local RunService = game:GetService("RunService")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local MakeMaid          = LoadCustomLibrary("Maid").MakeMaid
-local qMath             = LoadCustomLibrary("qMath")
+local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
+local AccelTween =  LoadCustomLibrary("AccelTween")
+local Signal =  LoadCustomLibrary("Signal")
 
-local ClampNumber = qMath.ClampNumber
-
+-- @author Quenty
 -- Intent: Interface between user input and camera controls
+
+-- From https://github.com/Roblox/Core-Scripts/blob/cad3a477e39b93ecafdd610b1d8b89d239ab18e2/PlayerScripts/StarterPlayerScripts/CameraScript/RootCamera.lua#L395
+local GamepadRotate = {}
+GamepadRotate.__index = GamepadRotate
+GamepadRotate.ClassName = "GamepadRotate"
+
+function GamepadRotate.new()
+	local self = setmetatable({}, GamepadRotate)
+	
+	self.DEADZONE = 0.1
+	self.SpeedMultiplier = Vector2.new(0.1, 0.1)
+	
+	self.RampVelocityX = AccelTween.new(5)
+	self.RampVelocityY = AccelTween.new(5)
+	
+	self.IsRotating = Instance.new("BoolValue")
+	self.IsRotating.Value = false
+	
+	return self
+end
+
+do
+	-- K is a tunable parameter that changes the shape of the S-curve
+	-- the larger K is the more straight/linear the curve gets
+	local k = 0.35
+	local lowerK = 0.8
+	function GamepadRotate:SCurveTranform(t)
+		t = math.clamp(t, -1, 1)
+		if t >= 0 then
+			return (k*t) / (k - t + 1)
+		end
+		return -((lowerK*-t) / (lowerK + t + 1))
+	end
+end
+
+function GamepadRotate:ToSCurveSpace(t)
+	return (1 + self.DEADZONE) * (2*math.abs(t) - 1) - self.DEADZONE
+end
+
+function GamepadRotate:FromSCurveSpace(t)
+	return t/2 + 0.5
+end
+
+function GamepadRotate:GamepadLinearToCurve(ThumbstickPosition)
+	local function OnAxis(AxisValue)
+		local Sign = math.sign(AxisValue)
+		local Point = self:FromSCurveSpace(self:SCurveTranform(self:ToSCurveSpace(math.abs(AxisValue))))
+		return math.clamp(Point * Sign, -1, 1)
+	end
+	return Vector2.new(OnAxis(ThumbstickPosition.x), OnAxis(ThumbstickPosition.y))
+end
+
+function GamepadRotate:OutOfDeadzone(InputObject)
+	local StickOffset = InputObject.Position
+	return StickOffset.magnitude >= self.DEADZONE
+end
+
+function GamepadRotate:GetThumbstickDeltaAngle()
+	if not self.LastInputObject then
+		return Vector2.new()
+	end
+	--[[
+	local StickOffset = self.LastInputObject.Position
+	
+	-- Invert axis!
+	StickOffset = Vector2.new(StickOffset.x, -StickOffset.y) 
+	
+	local AdjustedStickOffset = self:GamepadLinearToCurve(StickOffset)
+
+	print(self.RampVelocity.p, AdjustedStickOffset)
+	AdjustedStickOffset = (self.RampVelocity.p * self.SpeedMultiplier) * AdjustedStickOffset
+	
+	return AdjustedStickOffset--]]
+	
+	return Vector2.new(self.RampVelocityX.p, self.RampVelocityY.p)
+end
+
+function GamepadRotate:StopRotate()
+	self.LastInputObject = nil
+	self.RampVelocityX.t = 0
+	self.RampVelocityX.p = self.RampVelocityX.t
+	
+	self.RampVelocityY.t = 0
+	self.RampVelocityY.p = self.RampVelocityY.t
+	
+	self.IsRotating.Value = false
+end
+
+function GamepadRotate:HandleThumbstickInput(InputObject)
+	local OutOfDeadZone = self:OutOfDeadzone(InputObject)
+	
+	if OutOfDeadZone then
+		self.LastInputObject = InputObject
+		
+		
+		local StickOffset = self.LastInputObject.Position
+		StickOffset = Vector2.new(StickOffset.x, -StickOffset.y)  -- Invert axis!
+	
+		local AdjustedStickOffset = self:GamepadLinearToCurve(StickOffset)
+		self.RampVelocityX.t = AdjustedStickOffset.x * self.SpeedMultiplier.x
+		self.RampVelocityY.t = AdjustedStickOffset.y * self.SpeedMultiplier.y
+		
+		self.IsRotating.Value = true
+	else
+		self:StopRotate()
+	end
+end
+
 
 local CameraControls = {}
 CameraControls.__index = CameraControls
@@ -23,6 +132,8 @@ function CameraControls.new()
 
 	self.Enabled = false
 	self.Key = tostring(self) .. "CameraControls"
+	self.GamepadRotate = GamepadRotate.new()
+	
 	
 	return self
 end
@@ -70,7 +181,7 @@ function CameraControls:HandleMouseWheel(InputObject)
 	--- This code was the same algorithm used by ROBLOX. It makes it so you can zoom easier at further distances.
 
 	if self.ZoomedCamera then
-		local Delta = ClampNumber(-InputObject.Position.Z, -1, 1)*1.4
+		local Delta = math.clamp(-InputObject.Position.Z, -1, 1)*1.4
 		local Zoom = rk4Integrator(self.ZoomedCamera.TargetZoom, Delta, 1)
 		
 		self.ZoomedCamera.TargetZoom = Zoom
@@ -134,6 +245,11 @@ function CameraControls:HandleMouseMovement(InputObject, IsMouse)
 	end
 end
 
+
+function CameraControls:HandleThumbstickInput(InputObject)
+	self.GamepadRotate:HandleThumbstickInput(InputObject)
+end
+
 function CameraControls:BeginDrag(BeginInputObject)
 	if not self.RotatedCamera then
 		self.Maid.DragMaid = nil
@@ -174,11 +290,10 @@ function CameraControls:BeginDrag(BeginInputObject)
 	self.Maid.DragMaid = Maid
 end
 
-
-function CameraControls:EndDrag()
-	if self.RotVelocityTracker then
+function CameraControls:ApplyRotVelocityTracker(RotVelocityTracker)
+	if self.RotatedCamera then
 		local Position = self.RotatedCamera.AngleXZ
-		local Velocity = self.RotVelocityTracker:GetVelocity().X
+		local Velocity = RotVelocityTracker:GetVelocity().X
 		local NewVelocityTarget = Position + Velocity
 		local Target = self.RotatedCamera.TargetAngleXZ
 		
@@ -186,12 +301,17 @@ function CameraControls:EndDrag()
 			self.RotatedCamera.TargetAngleXZ = NewVelocityTarget
 		end
 		
-		self.RotVelocityTracker = nil
-		
 		self.RotatedCamera:SnapIntoBounds()
 	end
+end
+
+function CameraControls:EndDrag()
+	if self.RotVelocityTracker then
+		self:ApplyRotVelocityTracker(self.RotVelocityTracker)
+		self.RotVelocityTracker = nil
+	end
+	
 	self.LastMousePosition = nil
-	self.Velocity = nil
 	UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 	
 	self.Maid.DragMaid = nil
@@ -205,12 +325,75 @@ function CameraControls:GetKey()
 	return self.Key
 end
 
+function CameraControls:HandleGamepadRotateStop()
+	if self.RotVelocityTracker then
+		self:ApplyRotVelocityTracker(self.RotVelocityTracker)
+		self.RotVelocityTracker = nil
+	end
+	
+	self.Maid.DragMaid = nil
+end
+
+function CameraControls:HandleGamepadRotateStart()
+	if not self.RotatedCamera then
+		self.Maid.DragMaid = nil
+		return
+	end
+	
+	local Maid = MakeMaid()
+	
+	---[[
+	if self.RotatedCamera.ClassName == "SmoothRotatedCamera" then
+		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
+	end--]]
+	
+	Maid:GiveTask(RunService.Heartbeat:connect(function()
+		local DeltaAngle = self.GamepadRotate:GetThumbstickDeltaAngle()
+		
+		if self.RotatedCamera then
+			self.RotatedCamera:RotateXY(DeltaAngle)
+		end
+		
+		if self.RotVelocityTracker then		
+			self.RotVelocityTracker:Update(DeltaAngle)
+		end
+	end))
+	
+	self.Maid.DragMaid = Maid
+end
+
 function CameraControls:Enable()
 	if not self.Enabled then
 		assert(not self.Maid)
 		self.Enabled = true
 
 		self.Maid = MakeMaid()
+		
+		--[[
+		self.Maid.InputChanged = UserInputService.InputChanged:connect(function(InputObject, GameProcessed)
+			if not GameProcessed then
+				if InputObject.UserInputType == Enum.UserInputType.MouseWheel then
+					self:HandleMouseWheel(InputObject)
+				end
+			end
+		end)
+
+		self.Maid.InputBegan = UserInputService.InputBegan:connect(function(InputObject, GameProcessed)
+			if not GameProcessed then
+				if InputObject.UserInputType == Enum.UserInputType.MouseButton2
+					or InputObject.UserInputType == Enum.UserInputType.Touch then
+					self:BeginDrag(InputObject)
+				end
+			end
+		end)--]]
+		
+		self.Maid:GiveTask(self.GamepadRotate.IsRotating.Changed:connect(function()
+			if self.GamepadRotate.IsRotating.Value then
+				self:HandleGamepadRotateStart()
+			else
+				self:HandleGamepadRotateStop()
+			end
+		end))
 		
 		ContextActionService:BindAction(self.Key, function(ActionName, UserInputState, InputObject)
 			if InputObject.UserInputType == Enum.UserInputType.MouseWheel then
@@ -224,9 +407,14 @@ function CameraControls:Enable()
 			end
 		end, false, unpack(self.DragBeginTypes))
 		
+		ContextActionService:BindAction(self.Key .. "Rotate", function(ActionName, UserInputState, InputObject)
+			self:HandleThumbstickInput(InputObject)
+		end, false, Enum.KeyCode.Thumbstick2)
+		
 		self.Maid.Cleanup = function()
 			ContextActionService:UnbindAction(self.Key)
 			ContextActionService:UnbindAction(self.Key .. "Drag")
+			ContextActionService:UnbindAction(self.Key .. "Rotate")
 		end
 	end
 end
