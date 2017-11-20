@@ -15,9 +15,11 @@ DefaultCamera.ClassName = "DefaultCamera"
 function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)
 
-	self.CameraState = CameraState.new(workspace.CurrentCamera)
-
 	return self
+end
+
+function DefaultCamera:OverrideCameraState(CameraState)
+	self.CameraState = CameraState or error("No CameraState")
 end
 
 function DefaultCamera:BindToRenderStep()
@@ -28,6 +30,8 @@ function DefaultCamera:BindToRenderStep()
 	RunService:BindToRenderStep("DefaultCamera_PostUpdate", Enum.RenderPriority.Camera.Value+1, function()
 		self.CameraState = CameraState.new(workspace.CurrentCamera)
 	end)
+	
+	self.CameraState = CameraState.new(workspace.CurrentCamera)
 end
 
 function DefaultCamera:UnbindFromRenderStep()
