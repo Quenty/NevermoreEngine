@@ -3,17 +3,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SummedCamera      = LoadCustomLibrary("SummedCamera")
+local CameraState = LoadCustomLibrary("CameraState")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
 
 local TrackCamera = {}
 TrackCamera.ClassName = "TrackCamera"
 TrackCamera.FieldOfView = 0
 
--- Intent: Track a current element
+-- Intent: Track a current part, whether it be a model or part
 
+--- Make new track camera
+-- @param [CameraSubject] The CameraSubject to look at. A ROBLOX part of ROBLOX model
 function TrackCamera.new(CameraSubject)
-	-- @param [CameraSubject] The CameraSubject to look at. A ROBLOX part of ROBLOX model
 	
 	local self = setmetatable({}, TrackCamera)
 
@@ -50,9 +51,9 @@ function TrackCamera:__index(Index)
 
 		if CameraSubject then
 			if CameraSubject:IsA("Model") then
-				State.CoordinateFrame = CameraSubject.PrimaryPart and CameraSubject.PrimaryPart:GetRenderCFrame() or CameraSubject:GetPrimaryPartCFrame()
+				State.CoordinateFrame = CameraSubject:GetPrimaryPartCFrame()
 			elseif CameraSubject:IsA("BasePart") then
-				State.CoordinateFrame = CameraSubject:GetRenderCFrame()
+				State.CoordinateFrame = CameraSubject.CFrame
 			end
 		end
 
