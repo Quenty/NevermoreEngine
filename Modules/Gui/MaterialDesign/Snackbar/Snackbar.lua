@@ -7,7 +7,7 @@ local GuiService        = game:GetService("GuiService")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qGUI     = LoadCustomLibrary("qGUI")
+local qGUI = LoadCustomLibrary("qGUI")
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 
 -- @author Quenty
