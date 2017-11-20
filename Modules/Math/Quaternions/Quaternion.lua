@@ -37,15 +37,19 @@ local function BezierPosition(x0,x1,v0,v1,t)
 	local T=1-t
 	return x0*T*T*T+(3*x0+v0)*t*T*T+(3*x1-v1)*t*t*T+x1*t*t*t
 end
+lib.BezierPosition = BezierPosition
+
 local function BezierVelocity(x0,x1,v0,v1,t)
 	local T=1-t
 	return v0*T*T+2*(3*(x1-x0)-(v1+v0))*t*T+v1*t*t
 end
+lib.BezierVelocity = BezierVelocity
 
 local function Qmul(q1,q2) -- Multiply
 	local w1,x1,y1,z1,w2,x2,y2,z2=q1[1],q1[2],q1[3],q1[4],q2[1],q2[2],q2[3],q2[4]
 	return {w1*w2-x1*x2-y1*y2-z1*z2,w1*x2+x1*w2+y1*z2-z1*y2,w1*y2-x1*z2+y1*w2+z1*x2,w1*z2+x1*y2-y1*x2+z1*w2}
 end
+lib.Qmul = Qmul
 
 local function Qinv(q)--Inverse. (q^-1)
 	local w,x,y,z=q[1],q[2],q[3],q[4]
@@ -56,6 +60,7 @@ local function Qinv(q)--Inverse. (q^-1)
 		return {0,0,0,0}
 	end
 end
+lib.Qinv = Qinv
 
 local function Qpow(q,exponent,choice)
 	choice=choice or 0
@@ -78,6 +83,7 @@ local function Qpow(q,exponent,choice)
 		end
 	end
 end
+lib.Qpow = Qpow
 
 local function QuaternionFromCFrame(cf)
 	local mx,my,mz,m00,m01,m02,m10,m11,m12,m20,m21,m22=cf:components()
@@ -103,10 +109,12 @@ local function QuaternionFromCFrame(cf)
 		end
 	end
 end
+lib.QuaternionFromCFrame = QuaternionFromCFrame
 
 local function SlerpQuaternions(q0, q1, t)
 	return Qmul(q0, Qpow(Qmul(q1, Qinv(q0)), t))
 end
+lib.SlerpQuaternions = SlerpQuaternions
 
 local function QuaternionToCFrame(q)
 	local w,x,y,z=q[1],q[2],q[3],q[4]
@@ -115,6 +123,7 @@ local function QuaternionToCFrame(q)
 	local xx,xy,xz,yy,yz,zz=x*xs,x*ys,x*zs,y*ys,y*zs,z*zs
 	return 1-(yy+zz),xy-wz,xz+wy,xy+wz,1-(xx+zz),yz-wx,xz-wy,yz+wx,1-(xx+yy)
 end
+lib.QuaternionToCFrame = QuaternionToCFrame
 
 local function BezierRotation(q0,q1,w0,w1,t)
 	local _30,_31,_32,_33=q0,Qmul(q0,w0),Qmul(q1,Qinv(w1)),q1
@@ -123,6 +132,8 @@ local function BezierRotation(q0,q1,w0,w1,t)
 	local _00=Qmul(_10,Qpow(Qmul(Qinv(_10),_11),t))
 	return _00
 end
+lib.BezierRotation = BezierRotation
+
 local function BezierAngularV(q0,q1,w0,w1,t)
 	local _30,_31,_32,_33=q0,Qmul(q0,w0),Qmul(q1,Qinv(w1)),q1
 	local _20,_21,_22=Qmul(Qinv(_30),_31),Qmul(Qinv(_31),_32),Qmul(Qinv(_32),_33)
@@ -130,6 +141,7 @@ local function BezierAngularV(q0,q1,w0,w1,t)
 	local _00=Qmul(_10,Qpow(Qmul(Qinv(_10),_11),t))
 	return _00
 end
+lib.BezierAngularV = BezierAngularV
 
 --Regular tweening
 local TweenData={}
@@ -360,4 +372,3 @@ end
 lib.newCFrameTween = newCFrameTween
 
 return lib
--- return {Tweens=Tweens,QuaternionTweens=QuaternionTweens,CFrameTweens=CFrameTweens,updateTweens=updateTweens,updateQuaternionTweens=updateQuaternionTweens,updateCFrameTweens=updateCFrameTweens,newTween=newTween,newQuaternionTween=newQuaternionTween,newCFrameTween=newCFrameTween}
