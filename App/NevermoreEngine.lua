@@ -138,7 +138,7 @@ do
 			RequestDepth = RequestDepth + 1
 		end
 
-		local Library = require(_LibraryCache[LibraryName] or error("Error: Library '" .. LibraryName .. "' does not exist."))
+		local Library = require(_LibraryCache[LibraryName] or error("Error: Library '" .. LibraryName .. "' does not exist.", 2))
 		SecondCache[LibraryName] = Library
 
 		if DEBUG_MODE then
