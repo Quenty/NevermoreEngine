@@ -7,13 +7,15 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local AccelTween =  LoadCustomLibrary("AccelTween")
+local AccelTween = LoadCustomLibrary("AccelTween")
 local Signal =  LoadCustomLibrary("Signal")
 
--- @author Quenty
 -- Intent: Interface between user input and camera controls
 
--- From https://github.com/Roblox/Core-Scripts/blob/cad3a477e39b93ecafdd610b1d8b89d239ab18e2/PlayerScripts/StarterPlayerScripts/CameraScript/RootCamera.lua#L395
+
+
+--- Handles gamepad rotation
+-- See: https://github.com/Roblox/Core-Scripts/blob/cad3a477e39b93ecafdd610b1d8b89d239ab18e2/PlayerScripts/StarterPlayerScripts/CameraScript/RootCamera.lua#L395
 local GamepadRotate = {}
 GamepadRotate.__index = GamepadRotate
 GamepadRotate.ClassName = "GamepadRotate"

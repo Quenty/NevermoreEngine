@@ -10,7 +10,6 @@ local CustomCameraEffect = LoadCustomLibrary("CustomCameraEffect")
 
 -- Intent: Holds camera states and allows for the last camera state to be retrieved. Also
 -- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
--- @author Quenty
 
 assert(RunService:IsClient(), "Only require CameraStack on client")
 

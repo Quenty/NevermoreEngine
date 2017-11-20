@@ -7,7 +7,6 @@ local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 local CameraStack = LoadCustomLibrary("CameraStack")
 local FadeBetweenCamera = LoadCustomLibrary("FadeBetweenCamera")
 
--- @author Quenty
 -- Intent: Uses the CameraStack to tween in/out a new camera state
 -- Call :Show() and :Hide() to do so, and make sure to call :Destroy() after usage
 

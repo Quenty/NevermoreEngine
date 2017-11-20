@@ -5,7 +5,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local QuaternionObject = LoadCustomLibrary("QuaternionObject")
 
 -- Intent: Data container for the state of a camera
--- @author Quenty
 
 local CameraState = {}
 CameraState.ClassName = "CameraState"

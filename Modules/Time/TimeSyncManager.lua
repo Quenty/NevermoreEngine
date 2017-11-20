@@ -7,7 +7,6 @@ local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"
 -- across the game. 
 -- Note: This must be required on the server for clients to use it
 -- See: http://www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf
--- @author Quenty
 
 local MasterClock = {}
 MasterClock.__index = MasterClock
