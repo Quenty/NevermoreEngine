@@ -17,17 +17,17 @@ local qMath = LoadCustomLibrary("qMath")
 -- after a timeout or user interaction. There can only be
 -- one on the screen at a time.
 
--- Base clase, not functional.
-local Snackbar           = {}
-Snackbar.ClassName       = "Snackbar"
-Snackbar.__index         = Snackbar
-Snackbar.Height          = 48
-Snackbar.MinimumWidth    = 288 -- Taken from google material design
-Snackbar.MaximumWidth    = 700--568
+-- Base clase, not functional
+local Snackbar = {}
+Snackbar.ClassName = "Snackbar"
+Snackbar.__index = Snackbar
+Snackbar.Height = 48
+Snackbar.MinimumWidth = 288 -- Taken from google material design
+Snackbar.MaximumWidth = 700
 Snackbar.TextWidthOffset = 24
-Snackbar.Position        = UDim2.new(1, -10, 1, -10 - Snackbar.Height)
-Snackbar.FadeTime        = 0.16
-Snackbar.CornerRadius    = 2--24
+Snackbar.Position = UDim2.new(1, -10, 1, -10 - Snackbar.Height)
+Snackbar.FadeTime = 0.16
+Snackbar.CornerRadius = 2--24
 
 function Snackbar.new(Parent, Text, Options)
 	local self = setmetatable({}, Snackbar)

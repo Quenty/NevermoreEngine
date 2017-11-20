@@ -10,6 +10,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local Snackbar = LoadCustomLibrary("Snackbar")
 local qGUI = LoadCustomLibrary("qGUI")
 
+--- Snackbar, but draggable
 local DraggableSnackbar = setmetatable({}, Snackbar)
 DraggableSnackbar.ClassName = "DraggableSnackbar"
 DraggableSnackbar.__index = DraggableSnackbar
@@ -17,7 +18,6 @@ DraggableSnackbar.Vertical = true
 DraggableSnackbar.DefaultFadeOut = "FadeOutDown"
 DraggableSnackbar.Duration = 3
 DraggableSnackbar.AutoCloseDisabled = false -- By default the Snackbar will close automatically if the user types outside or presses the esc key.
-
 
 --- Note that this will not show until :Show() is called
 -- @param [GCOnDismissal] If true, will destroy itself and GC after being dismissed. Defaults to true
