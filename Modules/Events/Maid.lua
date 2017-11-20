@@ -82,8 +82,8 @@ function Maid:DoCleaning()
 
 	-- Disconnect all events first as we know this is safe
 	for Index, Task in pairs(Tasks) do
-		Tasks[Index] = nil
 		if typeof(Task) == "RBXScriptConnection" then
+			Tasks[Index] = nil
 			Task:disconnect()
 		end
 	end
@@ -102,6 +102,6 @@ function Maid:DoCleaning()
 		Index, Task = next(Tasks)
 	end
 end
-Maid.Destroy = Maid.DoCleaning -- Allow maids to nested
+Maid.Destroy = Maid.DoCleaning
 
 return Maid
