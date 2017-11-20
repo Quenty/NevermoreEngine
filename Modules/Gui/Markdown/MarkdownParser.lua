@@ -1,5 +1,4 @@
 -- Intent: Parses text into markdown
--- @author Quenty
 
 local MarkdownParser = {}
 MarkdownParser.__index = MarkdownParser

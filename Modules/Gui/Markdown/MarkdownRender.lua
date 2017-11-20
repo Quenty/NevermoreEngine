@@ -1,7 +1,7 @@
 local TextService = game:GetService("TextService")
 
--- Intent: Renders the markdown from MarkdownParser
--- @author Quenty
+-- Intent: Renders the markdown
+-- See: MarkdownParser
 
 local MarkdownRender = {}
 MarkdownRender.__index = MarkdownRender
