@@ -54,7 +54,7 @@ function SummedCamera:__index(Index)
 			local StateB = self.CameraBState
 			
 			local Result = StateA + StateB
-			Result.qPosition = StateA.CoordinateFrame * StateB.qPosition
+			Result.Position = StateA.CoordinateFrame * StateB.Position
 			return Result
 		end
 	elseif Index == "CameraAState" then

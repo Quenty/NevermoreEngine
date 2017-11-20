@@ -35,7 +35,7 @@ end
 function LagPointCamera:__newindex(Index, Value)
 	if Index == "FocusCamera" then
 		rawset(self, "_" .. Index, Value)
-		self.FocusSpring.Target = self.FocusCamera.CameraState.qPosition
+		self.FocusSpring.Target = self.FocusCamera.CameraState.Position
 		self.FocusSpring.Position = self.FocusSpring.Target
 		self.FocusSpring.Velocity = Vector3.new(0, 0, 0)
 	elseif Index == "OriginCamera" then
@@ -57,7 +57,7 @@ function LagPointCamera:__index(Index)
 		State.FieldOfView = Origin.FieldOfView + self.FocusCamera.CameraState.FieldOfView
 
 		State.CoordinateFrame = CFrame.new(
-			Origin.qPosition,
+			Origin.Position,
 			FocusPosition)
 
 		return State
@@ -68,7 +68,7 @@ function LagPointCamera:__index(Index)
 		end
 
 		self.LastFocusUpdate = tick()
-		self.FocusSpring.Target = self.FocusCamera.CameraState.qPosition
+		self.FocusSpring.Target = self.FocusCamera.CameraState.Position
 
 		if Delta then
 			self.FocusSpring:TimeSkip(Delta)

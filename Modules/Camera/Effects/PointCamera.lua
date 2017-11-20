@@ -43,8 +43,8 @@ function PointCamera:__index(Index)
 		State.FieldOfView = Origin.FieldOfView + Focus.FieldOfView
 
 		State.CoordinateFrame = CFrame.new(
-			Origin.qPosition,
-			Focus.qPosition)
+			Origin.Position,
+			Focus.Position)
 
 		return State
 	elseif Index == "Focus" then

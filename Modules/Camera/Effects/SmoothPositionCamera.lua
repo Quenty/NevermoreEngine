@@ -31,7 +31,7 @@ end
 function SmoothPositionCamera:__newindex(Index, Value)
 	if Index == "BaseCamera" then
 		rawset(self, "_" .. Index, Value)
-		self.Spring.Target = self.BaseCamera.CameraState.qPosition
+		self.Spring.Target = self.BaseCamera.CameraState.Position
 		self.Spring.Position = self.Spring.Target
 		self.Spring.Velocity = Vector3.new(0, 0, 0)
 	elseif Index == "LastUpdateTime" or Index == "Spring" then
@@ -51,7 +51,7 @@ function SmoothPositionCamera:InternalUpdate()
 	end
 
 	self.LastUpdateTime = tick()
-	self.Spring.Target = self.BaseCameraState.qPosition
+	self.Spring.Target = self.BaseCameraState.Position
 
 	if Delta then
 		self.Spring:TimeSkip(Delta)
@@ -65,7 +65,7 @@ function SmoothPositionCamera:__index(Index)
 		local State = CameraState.new()
 		State.FieldOfView = BaseCameraState.FieldOfView
 		State.CoordinateFrame = BaseCameraState.CoordinateFrame
-		State.qPosition = self.Position
+		State.Position = self.Position
 		
 		return State
 	elseif Index == "Position" then
@@ -74,7 +74,7 @@ function SmoothPositionCamera:__index(Index)
 	elseif Index == "Speed" or Index == "Damper" or Index == "Velocity" then
 		return self.Spring[Index]
 	elseif Index == "Target" then
-		return self.BaseCameraState.qPosition
+		return self.BaseCameraState.Position
 	elseif Index == "BaseCameraState" then
 		return self.BaseCamera.CameraState or self.BaseCamera
 	elseif Index == "BaseCamera" then

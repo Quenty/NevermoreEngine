@@ -93,7 +93,7 @@ end
 function SmoothZoomedCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
 		local State = CameraState.new()
-		State.qPosition = Vector3.new(0, 0, self.Zoom)
+		State.Position = Vector3.new(0, 0, self.Zoom)
 		return State
 	elseif Index == "Zoom" or Index == "Value" then
 		return self.Spring.Value
