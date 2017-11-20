@@ -7,24 +7,24 @@ InputModeProcessor.ClassName = InputModeProcessor
 function InputModeProcessor.new()
 	local self = setmetatable({}, InputModeProcessor)
 	
-	self.InputModeStates = {}
+	self.InputModes = {}
 	
 	return self
 end
 
 function InputModeProcessor:AddState(State)
-	self.InputModeStates[#self.InputModeStates+1] = State or error()
+	self.InputModes[#self.InputModes+1] = State or error()
 	
 	return self
 end
 
 function InputModeProcessor:GetStates()
-	return self.InputModeStates
+	return self.InputModes
 end
 
 function InputModeProcessor:Evaluate(InputObject)
-	for _, InputState in pairs(self.InputModeStates) do
-		InputState:Evaluate(InputObject)
+	for _, InputMode in pairs(self.InputModes) do
+		InputMode:Evaluate(InputObject)
 	end
 end
 
