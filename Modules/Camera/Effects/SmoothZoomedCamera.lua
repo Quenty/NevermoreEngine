@@ -5,10 +5,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qMath = LoadCustomLibrary("qMath")
 local SpringPhysics = LoadCustomLibrary("SpringPhysics")
-
-local ClampNumber = qMath.ClampNumber
 
 -- Intent: Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script
@@ -41,7 +38,7 @@ end
 
 function SmoothZoomedCamera:ZoomIn(Value, Min, Max)
 	if Min or Max then
-		self.Zoom = self.Zoom - ClampNumber(Value, Min or -math.huge, Max or math.huge)
+		self.Zoom = self.Zoom - math.clamp(Value, Min or -math.huge, Max or math.huge)
 	else
 		self.Zoom = self.Zoom - Value
 	end
@@ -57,7 +54,7 @@ end
 
 function SmoothZoomedCamera:__newindex(Index, Value)
 	if Index == "TargetZoom" or Index == "Target" then
-		local Target = ClampNumber(Value, self.MinZoom, self.MaxZoom)
+		local Target = math.clamp(Value, self.MinZoom, self.MaxZoom)
 		self.Spring.Target = Target
 		
 		if self.BounceAtEnd then
@@ -74,7 +71,7 @@ function SmoothZoomedCamera:__newindex(Index, Value)
 	elseif Index == "Damper" then
 		self.Spring.Damper = Value
 	elseif Index == "Value" or Index == "Zoom" then
-		self.Spring.Value = ClampNumber(Value, self.MinZoom, self.MaxZoom)
+		self.Spring.Value = math.clamp(Value, self.MinZoom, self.MaxZoom)
 	elseif Index == "Speed" then
 		self.Spring.Speed = Value
 	elseif Index == "MaxZoom" then

@@ -5,8 +5,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qMath = LoadCustomLibrary("qMath")
-local ClampNumber = qMath.ClampNumber
 
 -- Intent: Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script
@@ -37,7 +35,7 @@ end
 
 function ZoomedCamera:ZoomIn(Value, Min, Max)
 	if Min or Max then
-		self.Zoom = self.Zoom - ClampNumber(Value, Min or -math.huge, Max or math.huge)
+		self.Zoom = self.Zoom - math.clamp(Value, Min or -math.huge, Max or math.huge)
 	else
 		self.Zoom = self.Zoom - Value
 	end
@@ -49,7 +47,7 @@ end
 
 function ZoomedCamera:__newindex(Index, Value)
 	if Index == "Zoom" or Index == "TargetZoom" then
-		self._Zoom = ClampNumber(Value, self.MinZoom, self.MaxZoom)
+		self._Zoom = math.clamp(Value, self.MinZoom, self.MaxZoom)
 	elseif Index == "MaxZoom" then
 		assert(Value > self.MinZoom, "MaxZoom can't be less than MinZoom")
 

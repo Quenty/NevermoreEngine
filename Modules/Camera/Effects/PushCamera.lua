@@ -9,7 +9,6 @@ local qMath = LoadCustomLibrary("qMath")
 local qCFrame = LoadCustomLibrary("qCFrame")
 
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
-local ClampNumber = qMath.ClampNumber
 local LerpNumber = qMath.LerpNumber
 
 -- Intent: Like a rotated camera, except we end up pushing back to a default rotation.
@@ -71,7 +70,7 @@ function PushCamera:__newindex(Index, Value)
 		local YRotation = XZRotation:toObjectSpace(Value).lookVector.y
 		self.AngleY = math.asin(YRotation)
 	elseif Index == "AngleY" then
-		self._AngleY = ClampNumber(Value, self.MinY, self.MaxY)
+		self._AngleY = math.clamp(Value, self.MinY, self.MaxY)
 	elseif Index == "AngleX" or Index == "AngleXZ" then
 		self.LastUpdateTime = tick()
 		self._AngleXZ0 = Value
@@ -110,7 +109,7 @@ function PushCamera:__index(Index)
 		return tick() - self.LastUpdateTime - self.PushBackAfter
 	elseif Index == "PercentFaded" then
 		-- How far in we are to the animation. Starts at 0 upon update and goes slowly to 1.
-		return ClampNumber(self.PushBackDelta / self.FadeBackTime, 0, 1)
+		return math.clamp(self.PushBackDelta / self.FadeBackTime, 0, 1)
 	elseif Index == "PercentFadedCurved" then
 		-- A curved value of PercentFaded
 		return self.PercentFaded ^ 2

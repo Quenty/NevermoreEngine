@@ -5,11 +5,9 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qMath = LoadCustomLibrary("qMath")
 local qCFrame = LoadCustomLibrary("qCFrame")
 
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
-local ClampNumber = qMath.ClampNumber
 local SpringPhysics = LoadCustomLibrary("SpringPhysics")
 
 -- Intent: Allow freedom of movement around a current place, much like the classic script works now.
@@ -98,7 +96,7 @@ function SmoothRotatedCamera:__newindex(Index, Value)
 end
 
 function SmoothRotatedCamera:SnapIntoBounds()
-	self.TargetAngleY = ClampNumber(self.TargetAngleY, self.MinY, self.MaxY)
+	self.TargetAngleY = math.clamp(self.TargetAngleY, self.MinY, self.MaxY)
 end
 
 function SmoothRotatedCamera:GetPastBounds(Angle)

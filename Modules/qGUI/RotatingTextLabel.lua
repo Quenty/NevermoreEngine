@@ -8,12 +8,9 @@ local qMath = LoadCustomLibrary("qMath")
 local SpringPhysics = LoadCustomLibrary("SpringPhysics")
 
 local MapNumber = qMath.MapNumber
-local ClampNumber = qMath.ClampNumber
 
--- Intent: Fancy rotating labels
--- RotatingTextLabel.lua
 -- @author Quenty
-
+-- Intent: Fancy rotating labels
 
 local RotatingCharacter = {}
 RotatingCharacter.ClassName = "RotatingCharacter"
@@ -67,7 +64,7 @@ function RotatingCharacter:__index(Index)
 		local Default = (self.Position % 1)
 
 		-- Adjust transparency upwards based upon velocity
-		Default = MapNumber(Default, 0, 1, ClampNumber(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
+		Default = MapNumber(Default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
 
 		local Modifier = (1 - self.Transparency)
 
@@ -174,6 +171,7 @@ function RotatingCharacterBuilder:Generate(Parent)
 	TextLabel.Size = UDim2.new(1, 0, 1, 0)
 	TextLabel.ZIndex = Template.ZIndex
 	TextLabel.Font = Template.Font
+	TextLabel.TextSize = Template.TextSize
 	TextLabel.TextScaled = Template.TextScaled
 	TextLabel.TextColor3 = Template.TextColor3
 	TextLabel.TextTransparency = Template.TextTransparency

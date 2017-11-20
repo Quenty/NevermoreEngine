@@ -5,11 +5,9 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qMath = LoadCustomLibrary("qMath")
 local qCFrame = LoadCustomLibrary("qCFrame")
 
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
-local ClampNumber = qMath.ClampNumber
 
 -- Intent: Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script. This is the rotation component.
@@ -50,7 +48,7 @@ function RotatedCamera:__newindex(Index, Value)
 		local YRotation = XZRotation:toObjectSpace(Value).lookVector.y
 		self.AngleY = math.asin(YRotation)
 	elseif Index == "AngleY" then
-		self._AngleY = ClampNumber(Value, self.MinY, self.MaxY)
+		self._AngleY = math.clamp(Value, self.MinY, self.MaxY)
 	elseif Index == "AngleX" or Index == "AngleXZ" then
 		self._AngleXZ = Value
 	elseif Index == "MaxY" then
