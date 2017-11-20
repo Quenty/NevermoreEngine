@@ -1,3 +1,5 @@
+local HttpService = game:GetService("HttpService")
+
 local lib = {}
 
 --[[
