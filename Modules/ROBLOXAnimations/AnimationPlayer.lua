@@ -5,12 +5,11 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local Signal = LoadCustomLibrary("Signal")
 
+-- Intent: Makes playing and loading tracks into a humanoid easy
+
 local AnimationPlayer = {}
 AnimationPlayer.__index = AnimationPlayer
 AnimationPlayer.ClassName = "AnimationPlayer"
-
--- Intent: Makes playing and loading tracks into a humanoid easy.
--- @author Quenty
 
 function AnimationPlayer.new(Humanoid)
 	local self = setmetatable({}, AnimationPlayer)
@@ -48,17 +47,16 @@ function AnimationPlayer:GetTrack(TrackName)
 	return self.Tracks[TrackName] or error("Track does not exist")
 end
 
-
+---
+-- @param FadeTime How much time it will take to transition into the animation.	
+-- @param Weight Acts as a multiplier for the offsets and rotations of the playing animation
+	-- This parameter is extremely unstable. 
+	-- Any parameter higher than 1.5 will result in very shaky motion, and any parameter higher '
+	-- than 2 will almost always result in NAN errors. Use with caution.
+-- @param Speed The time scale of the animation.	
+	-- Setting this to 2 will make the animation 2x faster, and setting it to 0.5 will make it 
+	-- run 2x slower.
 function AnimationPlayer:PlayTrack(TrackName, FadeTime, Weight, Speed, StopFadeTime)
-	-- @param FadeTime How much time it will take to transition into the animation.	
-	-- @param Weight Acts as a multiplier for the offsets and rotations of the playing animation
-		-- This parameter is extremely unstable. 
-		-- Any parameter higher than 1.5 will result in very shaky motion, and any parameter higher '
-		-- than 2 will almost always result in NAN errors. Use with caution.
-	-- @param Speed The time scale of the animation.	
-		-- Setting this to 2 will make the animation 2x faster, and setting it to 0.5 will make it 
-		-- run 2x slower.
-	
 	FadeTime = FadeTime or self.FadeTime
 	local Track = self:GetTrack(TrackName)
 
