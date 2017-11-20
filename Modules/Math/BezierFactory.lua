@@ -1,7 +1,6 @@
 local lib = {}
 
--- Bezier.lua
--- Used for interpolation curves.
+-- Intent: Make interpolation curves
 -- @author Quenty
 
 -- A good place to generate and test these out: http://cubic-bezier.com/
