@@ -8,30 +8,22 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 
--- @author Quenty
--- Intent: Clip characters locally on the client of other clients so they don't interfer with
---         physics
-
 --[[
-USAGE:
+class ClipCharacters
 
-Init on the server
-```
-ClipCharacters.initServer()
-```
+Description:
+Clip characters locally on the client of other clients so they don't interfer with physics
 
-Make a new ClipCharacters when the client is driving a boat or
-something when you don't want physics to interact
-```
--- On driving start:
-local Clipper = ClipCharacters.new()
+API:
+	ClipCharacters.initServer()
+		Initialize on server
 
-...
+	ClipCharacters.new()
+		Initialize clipping on the client. Returns a new inst
 
--- On driving stop:
-Clipper:Destroy()
-```
-]]
+	ClipCharaters:Destroy()
+		Stop clipping on client
+--]]
 
 local ClipCharacters = {}
 ClipCharacters.ClassName = "ClipCharacters"

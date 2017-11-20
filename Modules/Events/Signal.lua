@@ -1,29 +1,26 @@
--- Original author: Stravant
--- Modified by: Quenty
-
 --[[
-	class Signal
+class Signal
 	
-	Description:
-		Lua-side duplication of the API of Events on Roblox objects. Needed for nicer
-		syntax, and to ensure that for local events objects are passed by reference
-		rather than by value where possible, as the BindableEvent objects always pass
-		their signal arguments by value, meaning tables will be deep copied when that
-		is almost never the desired behavior.
+Description:
+	Lua-side duplication of the API of Events on Roblox objects. Needed for nicer
+	syntax, and to ensure that for local events objects are passed by reference
+	rather than by value where possible, as the BindableEvent objects always pass
+	their signal arguments by value, meaning tables will be deep copied when that
+	is almost never the desired behavior.
 		
-	API:
-		void Fire(...)
-			Fire the event with the given arguments.
-			
-		Connection Connect(Function handler)
-			Connect a new handler to the event, returning a connection object that
-			can be disconnected.
-			
-		... Wait()
-			Wait for fire to be called, and return the arguments it was given.
+API:
+	void Fire(...)
+		Fire the event with the given arguments.
+		
+	Connection Connect(Function handler)
+		Connect a new handler to the event, returning a connection object that
+		can be disconnected.
+		
+	... Wait()
+		Wait for fire to be called, and return the arguments it was given.
 
-		Destroy()
-			Disconnects all connected events to the signal and voids the signal as unusable.
+	Destroy()
+		Disconnects all connected events to the signal and voids the signal as unusable.
 --]]
 
 local Signal = {}

@@ -1,10 +1,12 @@
---[[Maid
-Manages the cleaning of events and other things. 
+--[[
+class Maid
 
-Modified by Quenty
+Description:
+	Manages the cleaning of events and other things. Needed to encapsulate state
+	and make deconstructors easy
  
 API:
-	MakeMaid()                        Returns a new Maid object.
+	Maid.new()                        Returns a new Maid object.
  
 	Maid[key] = (function)            Adds a task to perform when cleaning up.
 	Maid[key] = (event connection)    Manages an event connection. Anything that isn"t a function is assumed to be this.
@@ -18,7 +20,6 @@ API:
 	Maid:Destroy()                    Alias for DoCleaning()
 ]]
 
---- Manages the cleaning of events and other things.
 local Maid = {}
 
 --- Returns a new Maid object
