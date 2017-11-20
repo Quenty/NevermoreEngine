@@ -1,6 +1,6 @@
-local UserInputService   = game:GetService("UserInputService")
-local ReplicatedStorage  = game:GetService("ReplicatedStorage")
-local RunService         = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local NevermoreEngine    = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary  = NevermoreEngine.LoadLibrary
