@@ -73,18 +73,6 @@ function GamepadRotate:GetThumbstickDeltaAngle()
 	if not self.LastInputObject then
 		return Vector2.new()
 	end
-	--[[
-	local StickOffset = self.LastInputObject.Position
-	
-	-- Invert axis!
-	StickOffset = Vector2.new(StickOffset.x, -StickOffset.y) 
-	
-	local AdjustedStickOffset = self:GamepadLinearToCurve(StickOffset)
-
-	print(self.RampVelocity.p, AdjustedStickOffset)
-	AdjustedStickOffset = (self.RampVelocity.p * self.SpeedMultiplier) * AdjustedStickOffset
-	
-	return AdjustedStickOffset--]]
 	
 	return Vector2.new(self.RampVelocityX.p, self.RampVelocityY.p)
 end
@@ -277,15 +265,11 @@ function CameraControls:BeginDrag(BeginInputObject)
 			
 			self:HandleMouseMovement(InputObject)
 		end
-	end)
-
-	
+	end)	
 	
 	if self.RotatedCamera.ClassName == "SmoothRotatedCamera" then
 		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
-	end
-	
-	
+	end	
 	
 	self.Maid.DragMaid = Maid
 end
@@ -368,24 +352,6 @@ function CameraControls:Enable()
 		self.Enabled = true
 
 		self.Maid = MakeMaid()
-		
-		--[[
-		self.Maid.InputChanged = UserInputService.InputChanged:connect(function(InputObject, GameProcessed)
-			if not GameProcessed then
-				if InputObject.UserInputType == Enum.UserInputType.MouseWheel then
-					self:HandleMouseWheel(InputObject)
-				end
-			end
-		end)
-
-		self.Maid.InputBegan = UserInputService.InputBegan:connect(function(InputObject, GameProcessed)
-			if not GameProcessed then
-				if InputObject.UserInputType == Enum.UserInputType.MouseButton2
-					or InputObject.UserInputType == Enum.UserInputType.Touch then
-					self:BeginDrag(InputObject)
-				end
-			end
-		end)--]]
 		
 		self.Maid:GiveTask(self.GamepadRotate.IsRotating.Changed:connect(function()
 			if self.GamepadRotate.IsRotating.Value then
