@@ -280,9 +280,7 @@ function lib.GetDaysInMonth(CurrentTime)
 	local Month = lib.GetMonth(CurrentTime)
 	local Year = lib.GetYear(CurrentTime)
 
-	DaysInMonth = GetDaysMonth(Year)
-
-	return DaysInMonth[Month]
+	return GetDaysMonth(Year)[Month]
 end
 
 local ISO_FORMAT_STRINGS = {
