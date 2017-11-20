@@ -1,5 +1,5 @@
 --[[Maid
-Manages the cleaning of events and other things.
+Manages the cleaning of events and other things. 
 
 Modified by Quenty
  
@@ -26,7 +26,6 @@ function Maid.new()
 	local self = {}
 	
 	self.Tasks = {}
-	self.IsCurrentlyCleaning = false
 	
 	return setmetatable(self, Maid)
 end
@@ -43,73 +42,65 @@ function Maid:__index(Index)
 end
 
 --- Add a task to clean up
--- Maid[key] = (function)            Adds a task to perform when cleaning up.
--- Maid[key] = (event connection)    Manages an event connection. Anything that isn"t a function is assumed to be this.
+-- Maid[key] = (function)            Adds a task to perform
+-- Maid[key] = (event connection)    Manages an event connection
 -- Maid[key] = (Maid)                Maids can act as an event connection, allowing a Maid to have other maids to clean up.
 -- Maid[key] = (Object)              Maids can cleanup objects with a `Destroy` method
 -- Maid[key] = nil                   Removes a named task. If the task is an event, it is disconnected. If it is an object, it is destroyed.
-function Maid:__newindex(Index, Value)
-	if self.IsCurrentlyCleaning then
-		error(("Already cleaning, cannot add index '%s'"):format(tostring(Index)), 2)
-	elseif Maid[Index] ~= nil then
+function Maid:__newindex(Index, NewTask)
+	if Maid[Index] ~= nil then
 		error(("'%s' is reserved"):format(tostring(Index)), 2)
 	end
 	
-	self.IsCurrentlyCleaning = true
 	local Tasks = self.Tasks
-	
-	-- Disconnect if the task is an event and destroy if the task is an object
-	if Tasks[Index] ~= nil and type(Tasks[Index]) ~= "function" then
-		if typeof(Tasks[Index]) == "RBXScriptConnection" then
-			Tasks[Index]:disconnect()
-		else
-			Tasks[Index]:Destroy()
+	local OldTask = Tasks[Index]
+	Tasks[Index] = NewTask
+
+	if OldTask then
+		if type(OldTask) == "function" then
+			OldTask()
+		elseif typeof(OldTask) == "RBXScriptConnection" then
+			OldTask:disconnect()
+		elseif OldTask.Destroy then
+			OldTask:Destroy()
 		end
 	end
-	self.IsCurrentlyCleaning = false
-	
-	Tasks[Index] = Value
 end
 
 --- Same as indexing, but uses an incremented number as a key
 -- @param Task An item to clean
 -- @return int TaskId
 function Maid:GiveTask(Task)
-	if self.IsCurrentlyCleaning then
-		error(("Currently cleaning, cannot give task"), 2)
-	end
-	
 	local TaskId = #self.Tasks+1
 	self[TaskId] = Task
 	return TaskId
 end
 
---- Returns true is in cleaning process
--- @return True if cleaning, false otherwise
-function Maid:IsCleaning()
-	return self.IsCurrentlyCleaning
-end
-
---- Disconnects all managed events and performs all clean-up tasks
+--- Cleans up all tasks
 function Maid:DoCleaning()
-	if self.IsCurrentlyCleaning then
-		error("Already cleaning, cannot call DoCleaning()", 2)
-		return
-	end
-	
-	self.IsCurrentlyCleaning = true
 	local Tasks = self.Tasks
+
+	-- Disconnect all events first as we know this is safe
 	for Index, Task in pairs(Tasks) do
+		Tasks[Index] = nil
+		if typeof(Task) == "RBXScriptConnection" then
+			Task:disconnect()
+		end
+	end
+
+	-- Clear out tasks table completely, even if clean up tasks add more tasks to the maid
+	local Index, Task = next(Tasks)
+	while Task ~= nil do
+		Tasks[Index] = nil
 		if type(Task) == "function" then
 			Task()
 		elseif typeof(Task) == "RBXScriptConnection" then
 			Task:disconnect()
-		else
+		elseif Task.Destroy then
 			Task:Destroy()
 		end
-		Tasks[Index] = nil
+		Index, Task = next(Tasks)
 	end
-	self.IsCurrentlyCleaning = false
 end
 Maid.Destroy = Maid.DoCleaning -- Allow maids to nested
 
