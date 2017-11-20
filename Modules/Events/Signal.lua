@@ -21,7 +21,7 @@ API:
 
 	Destroy()
 		Disconnects all connected events to the signal and voids the signal as unusable.
---]]
+]]
 
 local Signal = {}
 Signal.__index = Signal

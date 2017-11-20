@@ -23,7 +23,7 @@ API:
 
 	ClipCharaters:Destroy()
 		Stop clipping on client
---]]
+]]
 
 local ClipCharacters = {}
 ClipCharacters.ClassName = "ClipCharacters"
