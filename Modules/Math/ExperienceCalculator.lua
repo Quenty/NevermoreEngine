@@ -1,12 +1,14 @@
-local ExperienceCalculator = {}
+local lib = {}
 local ExperienceFactor = 200
 
-local function GetLevelFromExperience(Experience)
-	-- http://stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
-	
+-- @author Quenty
+-- Intent: Calculate experience on an exponential curve and perform relevant calculations
+-- http://stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
+
+local function GetLevelFromExperience(Experience)	
 	return math.floor((ExperienceFactor + math.sqrt(ExperienceFactor * ExperienceFactor - 4 * ExperienceFactor * (-Experience)))/ (2 * ExperienceFactor))
 end
-ExperienceCalculator.GetLevelFromExperience = GetLevelFromExperience
+lib.GetLevelFromExperience = GetLevelFromExperience
 
 local function GetExperienceForNextLevel(CurrentExperience)
 	if CurrentExperience - 1 == CurrentExperience then -- Math.huge
@@ -20,13 +22,13 @@ local function GetExperienceForNextLevel(CurrentExperience)
 	
 	return ExperienceLeft
 end
-ExperienceCalculator.GetExperienceForNextLevel = GetExperienceForNextLevel
+lib.GetExperienceForNextLevel = GetExperienceForNextLevel
 
 local function GetExperienceRequiredForLevel(Level)
 	Level = Level - 1 -- Because normally this formula calculates experience required for next level.
 	return ExperienceFactor*(Level*(1+Level))
 end
-ExperienceCalculator.GetExperienceRequiredForLevel = GetExperienceRequiredForLevel
+lib.GetExperienceRequiredForLevel = GetExperienceRequiredForLevel
 
 local function GetSubExperience(CurrentExperience)
 	-- @return Achieved of next level, Total required for next level, Percent
@@ -47,6 +49,6 @@ local function GetSubExperience(CurrentExperience)
 	
 	return AchievedOfNext, SubTotalRequired, Percent
 end
-ExperienceCalculator.GetSubExperience = GetSubExperience
+lib.GetSubExperience = GetSubExperience
 
-return ExperienceCalculator
+return lib
