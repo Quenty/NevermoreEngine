@@ -1,14 +1,3 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService       = game:GetService("HttpService")
-
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems          = LoadCustomLibrary("qSystems")
-
-local Make              = qSystems.Make
-local RbxUtility        = LoadLibrary("RbxUtility") -- For encoding/decoding
-
 local lib = {}
 
 --[[
@@ -93,8 +82,34 @@ local function GetBoundingBox(Objects, RelativeTo)
 end
 lib.GetBoundingBox = GetBoundingBox
 
-lib.GetBoundingBox = GetBoundingBox
 
+local function EncodeCFrame(CFrameValue)
+	--- Encodes a CFrameValue in JSON
+
+	local NewData = {
+		CFrameValue:components();
+	}
+
+	return HttpService:JSONEncode(NewData)
+	--return RbxUtility.EncodeJSON(NewData)
+end
+lib.EncodeCFrame = EncodeCFrame
+
+local function DecodeCFrame(Data)
+	--- decode's a previously encoded CFrameValue.
+	
+	if Data then
+		local DecodedData = HttpService:JSONDecode(Data) --RbxUtility.DecodeJSON(Data)
+		if DecodedData then
+			return CFrame.new(unpack(DecodedData))
+		else
+			return nil
+		end
+	else
+		return nil
+	end
+end
+lib.DecodeCFrame = DecodeCFrame
 
 local function QuaternionFromCFrame(cf)
 	local mx,  my,  mz,
@@ -150,6 +165,7 @@ end
 lib.QuaternionToCFrame = QuaternionToCFrame;
 lib.quaternionToCFrame = QuaternionToCFrame;
 
+
 local function QuaternionSlerp(a, b, t)
 	local cosTheta = a[1]*b[1] + a[2]*b[2] + a[3]*b[3] + a[4]*b[4]
 	local startInterp, finishInterp;
@@ -181,6 +197,7 @@ local function QuaternionSlerp(a, b, t)
 end
 lib.QuaternionSlerp = QuaternionSlerp;
 lib.quaternionSlerp = QuaternionSlerp;
+--]==]
 
 local function TweenPart(part, a, b, length)
 	local qa = {QuaternionFromCFrame(a)}
@@ -210,63 +227,6 @@ lib.TweenPart = TweenPart;
 lib.tweenPart = TweenPart;
 
 
-local function EncodeQuaternionCFrame(CFrameValue)
-	--- Encodes a CFrameValue in JSON, using quaternions
-	-- Slightly smaller package size.
-
-	local NewData = {
-		CFrameValue.x,
-		CFrameValue.y,
-		CFrameValue.z,
-		QuaternionFromCFrame(CFrameValue)--CFrameValue:components();
-	}
-
-	return HttpService:JSONEncode(NewData)
-end
-lib.EncodeQuaternionCFrame = EncodeQuaternionCFrame
-
-local function DecodeQuaternionCFrame(Data)
-	--- decode's a previously encoded CFrameValue.
-	
-	if Data then
-		local DecodedData = HttpService:JSONDecode(Data) --RbxUtility.DecodeJSON(Data)
-		if DecodedData then
-			return QuaternionToCFrame(unpack(DecodedData))
-		else
-			return nil
-		end
-	else
-		return nil
-	end
-end
-lib.DecodeQuaternionCFrame = DecodeQuaternionCFrame
-
-local function EncodeCFrame(CFrameValue)
-	--- Encodes a CFrameValue in JSON, using quaternions
-	-- Slightly smaller package size.
-
-	local NewData = {CFrameValue:components()}
-
-	return HttpService:JSONEncode(NewData)
-end
-lib.EncodeCFrame = EncodeCFrame
-
-local function DecodeCFrame(Data)
-	--- decode's a previously encoded CFrameValue.
-	
-	if Data then
-		local DecodedData = HttpService:JSONDecode(Data) --RbxUtility.DecodeJSON(Data)
-		if DecodedData then
-			return CFrame.new(unpack(DecodedData))
-		else
-			return nil
-		end
-	else
-		return nil
-	end
-end
-lib.DecodeCFrame = DecodeCFrame
-
 local function SlerpCFrame(a, b, scale)
 	-- Same thing as lerp, but with rotation, scale is mapped between 0 and 1... 
 
@@ -284,16 +244,16 @@ end
 lib.QuaternionSlerpCFrame = SlerpCFrame;
 lib.quaternionSlerpCFrame = SlerpCFrame;
 
--- lib.SlerpCFrame = SlerpCFrame;
--- lib.slerpCFrame = SlerpCFrame;
+lib.SlerpCFrame = SlerpCFrame;
+lib.slerpCFrame = SlerpCFrame;
 
 do
-	local v3            = Vector3.new
-	local acos          = math.acos
-	local components    = CFrame.new().components
-	local inverse       = CFrame.new().inverse
+	local v3 = Vector3.new
+	local acos = math.acos
+	local components = CFrame.new().components
+	local inverse = CFrame.new().inverse
 	local fromAxisAngle = CFrame.fromAxisAngle
-	local abs           = math.abs
+	local abs = math.abs
 
 	local function AxisAngleInterpolate(c0,c1,t)--CFrame0,CFrame1,Tween
 		local _,_,_,xx,yx,zx,xy,yy,zy,xz,yz,zz=components(inverse(c0)*c1)
@@ -307,8 +267,6 @@ do
 	lib.FastSlerp = AxisAngleInterpolate
 	lib.fastSlerp = AxisAngleInterpolate
 
-	lib.SlerpCFrame = AxisAngleInterpolate;
-	lib.slerpCFrame = AxisAngleInterpolate;
 end
 
 local toObjectSpace = CFrame.new().toObjectSpace
@@ -499,25 +457,23 @@ end--]]
 lib.AdvanceRaycast = AdvanceRaycast
 lib.advanceRaycast = AdvanceRaycast
 
-local function WeldTogether(Part0, Part1, JointType, WeldParent, JointAxisCFrame)
+local function WeldTogether(Part0, Part1, JointType, WeldParent)
 	--- Weld's 2 parts together
 	-- @param Part0 The first part
 	-- @param Part1 The second part (Dependent part most of the time).
 	-- @param [JointType] The type of joint. Defaults to weld.
-	-- @param [WeldParent] Parent of the weld, Defaults to Part0 (Joints GC automatically from JointsService, but the real issue is when you :Destroy() and descending joints do not, )
-	-- @param [JointAxisCFrame] The CFrame axis of the joints. Optional. Defaultas as Part0's CFrame
+	-- @param [WeldParent] Parent of the weld, Defaults to Part0 (so GC is better).
 	-- @return The weld created.
 
-	JointType       = JointType or "Weld"
-	JointAxisCFrame = JointAxisCFrame or Part0.CFrame
+	JointType = JointType or "Weld"
 
-	local NewWeld  = Instance.new(JointType)
+	local NewWeld = Instance.new(JointType)
 	NewWeld.Part0  = Part0
 	NewWeld.Part1  = Part1
-	NewWeld.C0     = Part0.CFrame:toObjectSpace(JointAxisCFrame)
-	NewWeld.C1     = Part1.CFrame:toObjectSpace(JointAxisCFrame)
-	NewWeld.Parent = Part0
-	
+	NewWeld.C0     = CFrame.new()--Part0.CFrame:inverse()
+	NewWeld.C1     = Part1.CFrame:toObjectSpace(Part0.CFrame) --Part1.CFrame:inverse() * Part0.CFrame-- Part1.CFrame:inverse()
+	NewWeld.Parent = WeldParent or Part0
+
 	return NewWeld
 end
 lib.WeldTogether = WeldTogether
@@ -666,13 +622,14 @@ local function GetRotationInXZPlane(CFrameValue)
 	--- Get's the rotation in the XZ plane (global).
 
 	local Back = GetBackVector(CFrameValue)
-	return GetCFrameFromTopBack(CFrameValue.p,
+	return GetCFrameFromTopBack(CFrameValue.p, 
 		Vector3.new(0,1,0), -- Top lookVector (straight up)
-		Vector3.new(Back.x, 0, Back.z).unit -- Back facing direction (removed Y axis.)
+		Vector3.new(Back.x, 0, Back.z).unit -- Right facing direction (removed Y axis.)
 	)
 end
 lib.GetRotationInXZPlane = GetRotationInXZPlane
 lib.getRotationInXZPlane = GetRotationInXZPlane
+
 
 local function FindFaceFromCoord(Size, RelativePosition)
 	--- Find's a faces coordanate given it's size and RelativePosition.
@@ -786,55 +743,58 @@ end
 lib.GetRollFromCFrame = GetRollFromCFrame
 lib.getRollFromCFrame = GetRollFromCFrame
 
-local function DrawRay(Ray, Color, Parent)
+local function DrawRay(Ray, Color, Parent, MeshDiameter)
 	--- Draw's a ray out (for debugging)
 	-- Credit to Cirrus for initial code.
-
+	
+	MeshDiameter = MeshDiameter or 0.2
+	local Diameter = 0.2
 	Parent = Parent or workspace
 
-	local NewPart = Instance.new("Part", Parent)
-	NewPart.Material = "Neon"
-	NewPart.FormFactor = "Custom"
-	NewPart.Shape = "Cylinder"
-	NewPart.Size       = Vector3.new(Ray.Direction.magnitude, 0.2, 0.2)
+	local NewPart = Instance.new("Part")
 
+	NewPart.FormFactor = "Custom"
+	NewPart.Size       = Vector3.new(1 * Diameter, Ray.Direction.magnitude, 1 * Diameter)
+	
 	local Center = Ray.Origin + Ray.Direction/2
 	-- lib.DrawPoint(Ray.Origin).Name = "origin"
 	-- lib.DrawPoint(Center).Name = "Center"
 	-- lib.DrawPoint(Ray.Origin + Ray.Direction).Name = "Destination"
 
-	NewPart.CFrame       = CFrame.new(Center, Ray.Origin + Ray.Direction) * CFrame.Angles(0, math.pi/2, 0)
-	NewPart.Anchored     = true
-	NewPart.CanCollide   = false
+	NewPart.CFrame     = CFrame.new(Center, Ray.Origin + Ray.Direction) * CFrame.Angles(math.pi/2, 0, 0) --* GetCFramePitch(math.pi/2)
+	NewPart.Anchored   = true
+	NewPart.CanCollide = false
 	NewPart.Transparency = 0.5
-	NewPart.BrickColor   = Color or BrickColor.new("Bright red")
-	NewPart.Name         = "DrawnRay"
+	NewPart.BrickColor = Color or BrickColor.new("Bright red")
+	NewPart.Name = "DrawnRay"
 	
-	-- Instance.new("SpecialMesh", NewPart)
+	local Mesh = Instance.new("SpecialMesh")
+	Mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(MeshDiameter, 0, MeshDiameter) / Diameter
+	Mesh.Parent = NewPart
+	
+	NewPart.Parent = Parent
 
 	return NewPart
 end
 lib.DrawRay = DrawRay
 lib.drawRay = DrawRay
 
-local function DrawPoint(Position, Color, Parent)
+local function DrawPoint(Position, Color, Parent, Diameter)
 	--- FOR DEBUGGING
 
 	local NewDraw = Instance.new("Part")
-	NewDraw.Material      = "Neon"
-	NewDraw.Parent        = Parent or workspace;
-	NewDraw.Size          = Vector3.new(1, 1, 1);
-	NewDraw.Transparency  = 0.5;
-	NewDraw.BrickColor    = Color or BrickColor.new("Bright red");
-	NewDraw.Name          = "PointRender";
-	NewDraw.Archivable    = false;
-	NewDraw.Anchored      = true;
-	NewDraw.CanCollide    = false;
-	NewDraw.TopSurface    = "Smooth";
-	NewDraw.BottomSurface = "Smooth";
-	NewDraw.Shape         = "Ball";
-	
+	NewDraw.Size = Vector3.new(1, 1, 1) * (Diameter or 1)
+	NewDraw.Transparency = 0.5
+	NewDraw.BrickColor = Color or BrickColor.new("Bright red")
+	NewDraw.Name = "PointRender"
+	NewDraw.Archivable = false
+	NewDraw.Anchored = true
+	NewDraw.CanCollide = false
+	NewDraw.TopSurface = Enum.SurfaceType.Smooth
+	NewDraw.BottomSurface = Enum.SurfaceType.Smooth
+	NewDraw.Shape = Enum.PartType.Ball
 	NewDraw.CFrame = CFrame.new(Position);
+	NewDraw.Parent = Parent or workspace
 
 	return NewDraw
 end
