@@ -3,10 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SummedCamera      = LoadCustomLibrary("SummedCamera")
+local CameraState = LoadCustomLibrary("CameraState")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
 
--- For those barely used effects...
+-- For effects that can be easily bound in scope
 
 local CustomCameraEffect = {}
 CustomCameraEffect.ClassName = "CustomCameraEffect"

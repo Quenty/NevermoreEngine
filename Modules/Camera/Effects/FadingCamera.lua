@@ -7,7 +7,6 @@ local CameraState       = LoadCustomLibrary("CameraState")
 local SpringPhysics     = LoadCustomLibrary("SpringPhysics")
 local SummedCamera      = LoadCustomLibrary("SummedCamera")
 
-
 -- Intent: Add another layer of effects that can be faded in/out
 
 local FadingCamera = {}
@@ -43,7 +42,6 @@ end
 
 function FadingCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		-- print("Spring value", self.Spring.Value)
 		return (self.Camera.CameraState or self.Camera) * self.Spring.Value
 	elseif Index == "Damper" then
 		return self.Spring.Damper

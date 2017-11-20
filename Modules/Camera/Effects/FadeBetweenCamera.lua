@@ -7,7 +7,6 @@ local CameraState       = LoadCustomLibrary("CameraState")
 local SpringPhysics     = LoadCustomLibrary("SpringPhysics")
 local SummedCamera      = LoadCustomLibrary("SummedCamera")
 
-
 -- Intent: Add another layer of effects that can be faded in/out
 
 local FadeBetweenCamera = {}
