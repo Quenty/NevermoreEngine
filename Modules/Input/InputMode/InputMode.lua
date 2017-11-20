@@ -3,16 +3,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local Signal            = LoadCustomLibrary("Signal")
+local Signal = LoadCustomLibrary("Signal")
 
 -- Intent: Trace input mode state and trigger changes correctly
 
-local InputModeState = {}
-InputModeState.__index = InputModeState
-InputModeState.ClassName = "InputModeState"
+local InputMode = {}
+InputMode.__index = InputMode
+InputMode.ClassName = "InputMode"
 
-function InputModeState.new(Valid)
-	local self = setmetatable({}, InputModeState)
+function InputMode.new(Valid)
+	local self = setmetatable({}, InputMode)
 	
 	self.LastEnabled = 0
 	self.Enabled = Signal.new()
@@ -21,14 +21,13 @@ function InputModeState.new(Valid)
 	return self
 end
 
-function InputModeState:GetLastEnabledTime()
+function InputMode:GetLastEnabledTime()
 	return self.LastEnabled
 end
 
-function InputModeState:AddKeys(Keys, EnumSet)
-	-- @param Keys A string for ease of use, or a table of keys
-	-- @param [EnumSet] The enum set to pull from. Defaults to KeyCode.
-	
+-- @param Keys A string for ease of use, or a table of keys
+-- @param [EnumSet] The enum set to pull from. Defaults to KeyCode.
+function InputMode:AddKeys(Keys, EnumSet)
 	EnumSet = EnumSet or Enum.KeyCode
 	
 	if type(Keys) == "string" then
@@ -50,7 +49,7 @@ function InputModeState:AddKeys(Keys, EnumSet)
 	return self
 end
 
-function InputModeState:GetKeys()
+function InputMode:GetKeys()
 	local Keys = {}
 	for Key, _ in pairs(self.Valid) do
 		Keys[#Keys+1] = Key
@@ -58,24 +57,22 @@ function InputModeState:GetKeys()
 	return Keys
 end
 
-function InputModeState:IsValid(InputType)
-	-- @param InputType Maybe be a UserInputType or KeyCode
+-- @param InputType Maybe be a UserInputType or KeyCode
+function InputMode:IsValid(InputType)
 	assert(InputType, "Must send in InputType")
 	
 	return self.Valid[InputType]
 end
 
-function InputModeState:Enable()
+function InputMode:Enable()
 	self.LastEnabled = tick()
 	self.Enabled:fire()
 end
 
-function InputModeState:Evaluate(InputObject)
+function InputMode:Evaluate(InputObject)
 	if self:IsValid(InputObject.UserInputType) or self:IsValid(InputObject.KeyCode) then
 		self:Enable()
 	end
 end
 
-
-
-return InputModeState
+return InputMode
