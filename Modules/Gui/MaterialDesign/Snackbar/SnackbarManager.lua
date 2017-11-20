@@ -4,9 +4,8 @@ SnackbarManager.__index = SnackbarManager
 
 -- Guarantees that only one snackbar is visible at once
 function SnackbarManager.new()
-	local self = {}
-	setmetatable(self, SnackbarManager)
-
+	local self = setmetatable({}, SnackbarManager)
+	
 	self.CurrentSnackbar = nil
 
 	return self
@@ -14,7 +13,6 @@ end
 
 --- Cleanup existing snackbar
 function SnackbarManager:ShowSnackbar(Snackbar)
-
 	assert(Snackbar, "Must send a Snackbar")
 
 	if self.CurrentSnackbar == Snackbar and self.CurrentSnackbar.Visible then
