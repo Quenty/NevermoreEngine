@@ -1,31 +1,23 @@
--- qTime.lua
--- Library handles time based parsing / operations. Untested. Based off of PHP.
-
+-- Intent: Library handles time based parsing / operations. Untested. Based off of PHP.
 -- @author Quenty
--- Last modified February 1st, 2014
 
 local lib = {}
 
---- STATIC DATA ---
-local MonthNames         = {"January"; "February"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December";}
-local MonthNamesShort    = {"Jan";     "Feb";      "Mar";   "Apr";   "May"; "Jun";  "Jul";  "Aug";    "Sep";       "Oct";     "Nov";      "Dec";}
-local DaysInMonth        = { 31;        28;         31;      30;      31;    30;     31;     31;       30;          31; 30; 31} -- Before reading this table, call FixLeapYear(Year)
-local DaysOfTheWeek      = {"Sunday"; "Monday"; "Tuesday"; "Wednesday"; "Thursday"; "Friday"; "Saturday";}
-local DaysOfTheWeekShort = {"Sun";    "Mon";    "Tues";    "Weds";      "Thurs";    "Fri";    "Sat";}
+local MONTH_NAMES        = {"January"; "February"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December"}
+local MONTH_NAMES_SHORT  = {"Jan";     "Feb";      "Mar";   "Apr";   "May"; "Jun";  "Jul";  "Aug";    "Sep";       "Oct";     "Nov";      "Dec"}
+local DAYS_IN_MONTH      = { 31;        28;         31;      30;      31;    30;     31;     31;       30;          31;       30;         31}
+local DAYS_OF_WEEK       = {"Sunday"; "Monday"; "Tuesday"; "Wednesday"; "Thursday"; "Friday"; "Saturday"}
+local DAYS_OF_WEEK_SHORT = {"Sun";    "Mon";    "Tues";    "Weds";      "Thurs";    "Fri";    "Sat"}
 
--- UTILITY --
-
+--- Fixes The DAYS_IN_MONTH table, given a year. 
 local function FixLeapYear(Year)
-	--- Fixes The DaysInMonth table, given a year. 
 
 	if Year % 4 == 0 and (Year % 100 ~= 0 or Year % 400 == 0) then
-		DaysInMonth[2] = 29;
+		DAYS_IN_MONTH[2] = 29;
 	else
-		DaysInMonth[2] = 28;
+		DAYS_IN_MONTH[2] = 28;
 	end
 end
-
---- LIBRARY ---
 
 function lib.GetSecond(CurrentTime)
 	return math.floor(CurrentTime % 60)
@@ -70,9 +62,9 @@ function lib.GetMonth(CurrentTime)
 	
 	FixLeapYear(Year)
 	
-	for Index=1, #DaysInMonth do
-		if Day > DaysInMonth[Index] then
-			Day = Day - DaysInMonth[Index]
+	for Index=1, #DAYS_IN_MONTH do
+		if Day > DAYS_IN_MONTH[Index] then
+			Day = Day - DAYS_IN_MONTH[Index]
 		else
 			return Index
 		end
@@ -95,9 +87,9 @@ function lib.GetDayOfTheMonth(CurrentTime)
 	
 	FixLeapYear(Year)
 
-	for Index=1, #DaysInMonth do
-		if Day > DaysInMonth[Index] then
-			Day = Day - DaysInMonth[Index]
+	for Index=1, #DAYS_IN_MONTH do
+		if Day > DAYS_IN_MONTH[Index] then
+			Day = Day - DAYS_IN_MONTH[Index]
 		else
 			return Day
 		end
@@ -115,11 +107,11 @@ function lib.GetFormattedDayOfTheMonth(CurrentTime)
 end
 
 function lib.GetMonthName(CurrentTime)
-	return MonthNames[lib.GetMonth(CurrentTime)]
+	return MONTH_NAMES[lib.GetMonth(CurrentTime)]
 end
 
 function lib.GetMonthNameShort(CurrentTime)
-	return MonthNamesShort[lib.GetMonth(CurrentTime)]
+	return MONTH_NAMES_SHORT[lib.GetMonth(CurrentTime)]
 end
 
 function lib.GetJulianDate(CurrentTime)
@@ -153,14 +145,14 @@ end
 
 function lib.GetDayOfTheWeekName(CurrentTime)
 	local DayOfTheWeek = lib.GetDayOfTheWeek(CurrentTime)
-	local Name = DaysOfTheWeek[DayOfTheWeek]
+	local Name = DAYS_OF_WEEK[DayOfTheWeek]
 	
 	return Name
 end
 
 function lib.GetDayOfTheWeekNameShort(CurrentTime) 
 	local DayOfTheWeek = lib.GetDayOfTheWeek(CurrentTime)
-	local Name = DaysOfTheWeekShort[DayOfTheWeek] 
+	local Name = DAYS_OF_WEEK_SHORT[DayOfTheWeek] 
 	
 	return Name
 end
@@ -282,10 +274,10 @@ function lib.GetDaysInMonth(CurrentTime)
 
 	FixLeapYear(Year)
 
-	return DaysInMonth[Month]
+	return DAYS_IN_MONTH[Month]
 end
 
-local FormatStrings = {
+local ISO_FORMAT_STRINGS = {
 	d = lib.GetFormattedDayOfTheMonth;
 	D = lib.GetDayOfTheWeekNameShort;
 	j = lib.GetDayOfTheMonth;
@@ -295,7 +287,7 @@ local FormatStrings = {
 	W = lib.GetDayOfTheWeek;
 	Z = lib.GetDay;
 
-	--W -- Mmm.. Idk. 
+	-- W 
 	
 	F = lib.GetMonthName;
 	m = lib.GetFormattedMonth;
@@ -320,7 +312,7 @@ local FormatStrings = {
 	
 	X = lib.GetJulianDate; -- For testing purposes.
 	
-	--e -- No way to get Time Zones
+	-- e -- No way to get Time Zones
 	-- I -- Daylight saving time should be added later.
 	-- O -- No way to get Time Zones
 	-- P -- No way to get Time Zones
@@ -334,7 +326,7 @@ local FormatStrings = {
 
 local MatchString = "["
 
-for Index, Value in pairs(FormatStrings) do
+for Index, Value in pairs(ISO_FORMAT_STRINGS) do
 	MatchString = MatchString..Index
 end
 
@@ -355,27 +347,11 @@ function lib.GetFormattedTime(Format, CurrentTime)
 	end
 	
 	for _, FormatType in pairs(FormatsRequired) do
-		local Replacement = FormatStrings[FormatType](CurrentTime)
+		local Replacement = ISO_FORMAT_STRINGS[FormatType](CurrentTime)
 		ReturnString = ReturnString:gsub(FormatType:rep(3), Replacement)
 	end
 	
 	return ReturnString;
-end
-
--- UTCTime handling
-local mLastCachedTimeAt = nil
-local mLastCachedTime = nil
-local mTimeOffset = os.time() - tick()
-function lib.UTCTimeExact()
-	-- NOTE THIS IS NOT EXACT, MAY BE OFF BY 3+ SECONDS. USE TIME SYNC INSTEAD.
-	return tick() + mTimeOffset
-end
-function lib.UTCTime()
-	if game.Workspace.DistributedGameTime ~= mLastCachedTimeAt then
-		mLastCachedTime = tick() + mTimeOffset
-		mLastCachedTimeAt = game.Workspace.DistributedGameTime
-	end
-	return mLastCachedTime
 end
 
 return lib
