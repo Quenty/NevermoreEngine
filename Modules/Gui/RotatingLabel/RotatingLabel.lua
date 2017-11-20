@@ -201,7 +201,7 @@ function RotatingLabel:__newindex(Index, Value)
 end
 
 -- @return IsDoneUpdating
-function RotatingLabel:_updateRender()
+function RotatingLabel:UpdateRender()
 	local IsDone = true
 
 	for Index, Label in pairs(self.Labels) do
@@ -230,7 +230,7 @@ function RotatingLabel:BeginUpdate()
 		self.Bound = true
 
 		RunService:BindToRenderStep(self.BindKey, 2000, function()
-			if self:_updateRender() then
+			if self:UpdateRender() then
 				self:_stopUpdate()
 			end
 		end)
