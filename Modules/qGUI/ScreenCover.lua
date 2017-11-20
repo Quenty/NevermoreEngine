@@ -1,22 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService        = game:GetService("RunService")
+local RunService  = game:GetService("RunService")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems = LoadCustomLibrary("qSystems")
 local EnumInterpreter = LoadCustomLibrary("EnumInterpreter")
 local qMath = LoadCustomLibrary("qMath");
 
-local lib               = {}
-
--- ScreenCover.lua
--- @author Quenty
--- Last Modified November 17th, 2014
-
-local Round  = qSystems.Round
-local Modify = qSystems.Modify
-
+local lib = {}
 
 lib.STYLES = {}
 lib.TYPES = {
@@ -38,7 +29,10 @@ local function MakeCover(Properties)
 	Frame.ZIndex                 = 10
 	Frame.BorderSizePixel        = 0
 	
-	return Modify(Frame, Properties)
+	for Name, Value in pairs(Properties) do
+		Frame[Name] = Value
+	end
+	return Frame
 end
 
 lib.MakeCover = MakeCover
@@ -355,7 +349,7 @@ local StyleFunctions = {
 			local CircleGui, TopFrame, BottomFrame, LeftFrame, RightFrame = GenerateCircleGui(BaseCover, CircleSize, BaseCover.ZIndex)
 
 			local function ResizeCircle(Radius)
-				Radius = Round(Radius, 2)
+				Radius = qMath.Round(Radius, 2)
 				CircleGui.Size = UDim2.new(0, Radius, 0, Radius)
 				CenterCircleGui(BaseCover, TopFrame, BottomFrame, LeftFrame, RightFrame, CircleGui)
 			end
@@ -387,7 +381,7 @@ local StyleFunctions = {
 			local CircleGui, TopFrame, BottomFrame, LeftFrame, RightFrame = GenerateCircleGui(BaseCover, 0, BaseCover.ZIndex)
 
 			local function ResizeCircle(Radius)
-				Radius = Round(Radius, 2)
+				Radius = qMath.Round(Radius, 2)
 				CircleGui.Size = UDim2.new(0, Radius, 0, Radius)
 				CenterCircleGui(BaseCover, TopFrame, BottomFrame, LeftFrame, RightFrame, CircleGui)
 			end
@@ -437,16 +431,11 @@ local function MakeScreenCover(BaseCover, AnimationStyles)
 	local AnimationStyle = EnumInterpreter.GetEnumName(lib.STYLES, (AnimationStyles.AnimationStyle or "Fade")) -- Guarantee exact results (Lowercase, uppercase, etc. )
 	local Type = EnumInterpreter.GetEnumName(lib.TYPES, (AnimationStyles.Type or "TransitionOut"))
 
-	--print("[ScreenCover] - running animation: Type: "..Type.."; Style: "..AnimationStyle.."; Time: "..AnimationTime)
-
 	BaseCover.Visible = true;
 	BaseCover.Transparency = (Type == "TransitionOut" and 0 or 1);
 
-	--local timeStart = tick();
-
 	StyleFunctions[AnimationStyle][Type](AnimationTime, BaseCover, AnimationStyles)
 
-	--print("[ScreenCover] - Time elapsed: "..tick() - timeStart);
 	return BaseCover;
 end
 
