@@ -8,8 +8,11 @@ local DefaultCamera = LoadCustomLibrary("DefaultCamera")
 local ImpulseCamera = LoadCustomLibrary("ImpulseCamera")
 local CustomCameraEffect = LoadCustomLibrary("CustomCameraEffect")
 
--- Intent: 
+-- Intent: Holds camera states and allows for the last camera state to be retrieved. Also
+-- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
 -- @author Quenty
+
+assert(RunService:IsClient(), "Only require CameraStack on client")
 
 local CameraStack = {}
 CameraStack.__index = CameraStack
@@ -31,11 +34,10 @@ function CameraStack.new()
 	
 	self:Add(self.DefaultCamera)
 	
-		
+	
 	RunService:BindToRenderStep("CameraStackUpdateInternal", Enum.RenderPriority.Camera.Value + 75, function()
 		debug.profilebegin("CameraStackUpdate")
 		local State = self:GetTopState()
-		--print("Top state", self.Stack[#self.Stack], self.Stack[#self.Stack].ClassName, State.CoordinateFrame)
 		if State and State ~= self.DefaultCamera then
 			State:Set(workspace.CurrentCamera)
 		end
@@ -122,6 +124,5 @@ end
 function CameraStack:Add(State)
 	table.insert(self.Stack, State)
 end
-
 
 return CameraStack.new()
