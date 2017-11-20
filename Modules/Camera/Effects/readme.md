@@ -30,7 +30,6 @@ This class tracks the current camera ROBLOX uses and lets it maintain how it ope
 
 * Should call `BindToRenderStep` during construction
 * Only one should exist at once per client (not enforced in code, however)
-* Requires a SpringPhysics module that is not distributed by Nevermore right now
 
 #### SummedCamera
 This class takes two arguments and returns the summation of the two
@@ -41,4 +40,3 @@ This class takes two arguments and returns the summation of the two
 This classes allows the effects of a camera to be faded / varied based upon a spring
 
 * Starts at 0 percent effect
-* Requires a SpringPhysics module that is not distributed by Nevermore right now
