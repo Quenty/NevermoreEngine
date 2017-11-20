@@ -3,16 +3,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SummedCamera      = LoadCustomLibrary("SummedCamera")
-local qMath             = LoadCustomLibrary("qMath")
-local qCFrame           = LoadCustomLibrary("qCFrame")
+local CameraState = LoadCustomLibrary("CameraState")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
+local qMath = LoadCustomLibrary("qMath")
+local qCFrame = LoadCustomLibrary("qCFrame")
 
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 local ClampNumber = qMath.ClampNumber
 local LerpNumber = qMath.LerpNumber
 
--- Intent: Like a rotated camera, except we end up pushing back to a default rotation
+-- Intent: Like a rotated camera, except we end up pushing back to a default rotation.
+-- This same behavior is seen in Roblox vehicle seats
 
 local PushCamera = {}
 PushCamera.ClassName = "PushCamera"

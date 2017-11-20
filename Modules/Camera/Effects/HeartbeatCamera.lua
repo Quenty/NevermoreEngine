@@ -4,14 +4,17 @@ local RunService = game:GetService("RunService")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SummedCamera      = LoadCustomLibrary("SummedCamera")
-local MakeMaid          = LoadCustomLibrary("Maid").MakeMaid
+local CameraState = LoadCustomLibrary("CameraState")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
+local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
+
+-- Intent: Update on heartbeat, must GC this camera state, unlike others. This
+-- allows for camera effects to run on heartbeat and cache information once instead
+-- of potentially going deeep into a tree and getting invoked multiple times
 
 local HeartbeatCamera = {}
 HeartbeatCamera.ClassName = "HeartbeatCamera"
 HeartbeatCamera.ProfileName = "HeartbeatCamera"
--- Intent: Update on heartbeat, autoGCs
 
 function HeartbeatCamera.new(Camera)
 	local self = setmetatable({}, HeartbeatCamera)

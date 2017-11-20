@@ -3,10 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SpringPhysics     = LoadCustomLibrary("SpringPhysics")
-local SummedCamera      = LoadCustomLibrary("SummedCamera")
-
+local CameraState = LoadCustomLibrary("CameraState")
+local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
 
 -- Intent: Add another layer of effects over any other camera by allowing an "impulse"
 -- to be applied.

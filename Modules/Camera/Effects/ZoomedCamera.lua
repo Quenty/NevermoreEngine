@@ -3,10 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local CameraState       = LoadCustomLibrary("CameraState")
-local SummedCamera      = LoadCustomLibrary("SummedCamera")
-local qMath             = LoadCustomLibrary("qMath")
-
+local CameraState = LoadCustomLibrary("CameraState")
+local SummedCamera = LoadCustomLibrary("SummedCamera")
+local qMath = LoadCustomLibrary("qMath")
 local ClampNumber = qMath.ClampNumber
 
 -- Intent: Allow freedom of movement around a current place, much like the classic script works now.
@@ -23,6 +22,7 @@ local ClampNumber = qMath.ClampNumber
 
 	-- Assigning .Zoom will automatically clamp
 ]]
+
 local ZoomedCamera = {}
 ZoomedCamera.ClassName = "ZoomedCamera"
 ZoomedCamera._MaxZoom = 100
