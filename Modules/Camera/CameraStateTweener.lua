@@ -7,6 +7,9 @@ local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 local CameraStack = LoadCustomLibrary("CameraStack")
 local FadeBetweenCamera = LoadCustomLibrary("FadeBetweenCamera")
 
+-- @author Quenty
+-- Intent: Uses the CameraStack to tween in/out a new camera state
+-- Call :Show() and :Hide() to do so, and make sure to call :Destroy() after usage
 
 local CameraStateTweener = {}
 CameraStateTweener.ClassName = "CameraStateTweener"
@@ -27,11 +30,35 @@ function CameraStateTweener.new(CameraEffect, Speed)
 	self.FadeBetween.Target = 0
 	self.FadeBetween.Value = 0
 	
-	self.Maid.CleanupCameraStack = function()	
+	self.Maid:GiveTask(function()	
 		CameraStack:Remove(self.FadeBetween)
-	end
+	end)
 	
 	return self
+end
+
+function CameraStateTweener:Show(DoNotAnimate)
+	self:SetTarget(1, DoNotAnimate)
+end
+
+
+function CameraStateTweener:Hide(DoNotAnimate)
+	self:SetTarget(0, DoNotAnimate)
+end
+
+function CameraStateTweener:Finish(DoNotAnimate, Callback)
+	self:Hide(DoNotAnimate)
+	
+	if self.FadeBetween.HasReachedTarget then
+		Callback()
+	else
+		spawn(function()
+			while not self.FadeBetween.HasReachedTarget do
+				wait(0.05)
+			end
+			Callback()
+		end)
+	end
 end
 
 function CameraStateTweener:GetCameraBelow()
@@ -53,35 +80,11 @@ function CameraStateTweener:SetSpeed(Speed)
 	return self
 end
 
-function CameraStateTweener:Show(DoNotAnimate)
-	self:SetTarget(1, DoNotAnimate)
-end
-
-
 function CameraStateTweener:SetVisible(IsVisible, DoNotAnimate)
 	if IsVisible then
 		self:Show(DoNotAnimate)
 	else
 		self:Hide(DoNotAnimate)
-	end
-end
-
-function CameraStateTweener:Hide(DoNotAnimate)
-	self:SetTarget(0, DoNotAnimate)
-end
-
-function CameraStateTweener:Finish(DoNotAnimate, Callback)
-	self:Hide(DoNotAnimate)
-	
-	if self.FadeBetween.HasReachedTarget then
-		Callback()
-	else
-		spawn(function()
-			while not self.FadeBetween.HasReachedTarget do
-				wait(0.05)
-			end
-			Callback()
-		end)
 	end
 end
 
