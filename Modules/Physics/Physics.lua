@@ -2,7 +2,6 @@
 
 local lib = {}
 
-
 --- Retrieves all connected parts of a part, plus the connected part
 local function GetConnectedParts(Part)
 	local Parts = Part:GetConnectedParts(true)
@@ -10,6 +9,30 @@ local function GetConnectedParts(Part)
 	return Parts
 end
 lib.GetConnectedParts = GetConnectedParts
+
+--- Estimate buoyancy contributed by parts
+local function EstimateBuoyancyContribution(Parts)
+	local TotalMass = 0
+	local TotalVolumeApplicable = 0
+	local TotalFloat = 0
+	
+	for _, Part in pairs(Parts) do
+		local Mass = Part:GetMass()
+		TotalMass = TotalMass + Mass
+		
+		TotalFloat = TotalFloat - Mass * workspace.Gravity
+		
+		if Part.CanCollide then
+			local Volume = Part.Size.X*Part.Size.Y*Part.Size.Z
+			local WaterDensity = 1 --(Mass/Volume)
+			TotalFloat = TotalFloat + Volume*WaterDensity*workspace.Gravity
+			TotalVolumeApplicable = TotalVolumeApplicable + Volume
+		end
+	end
+	
+	return TotalFloat, TotalMass, TotalVolumeApplicable
+end
+lib.EstimateBuoyancyContribution = EstimateBuoyancyContribution
 
 --- Return's the world vector center of mass.
 -- Lots of help from Hippalectryon :D
