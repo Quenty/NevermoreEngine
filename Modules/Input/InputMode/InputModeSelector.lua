@@ -14,15 +14,14 @@ local InputModeSelector = {}
 InputModeSelector.__index = InputModeSelector
 InputModeSelector.ClassName = "InputModeSelector"
 
-function InputModeSelector.new(InputModeStates, UpdateBindFunction)
+function InputModeSelector.new(InputModeList, UpdateBindFunction)
 	local self = setmetatable({}, InputModeSelector)
-	
-	self.BestState = ValueObject.new()
-	
+		
 	self.Maid = MakeMaid()
+	self.MostRecentMode = ValueObject.new()
 
-	if InputModeStates then
-		self:WithInputModeStates(InputModeStates)
+	if InputModeList then
+		self:WithInputModeList(InputModeList)
 	end
 	
 	if UpdateBindFunction then
@@ -36,39 +35,39 @@ function InputModeSelector:BindUpdate(UpdateBindFunction)
 	local BindMaid = MakeMaid()
 	self.Maid[UpdateBindFunction] = BindMaid
 	
-	local function HandleChange(NewState, OldState)
+	local function HandleChange(NewMode, OldMode)
 		BindMaid.CurrentMaid = nil
 		
-		if NewState then
+		if NewMode then
 			local Maid = MakeMaid()
 			BindMaid.CurrentMaid = Maid
 			
-			UpdateBindFunction(NewState, Maid)
+			UpdateBindFunction(NewMode, Maid)
 		end
 	end
 
-	BindMaid.Changed = self.BestState.Changed:connect(HandleChange)
-	HandleChange(self.BestState.Value)
+	BindMaid.Changed = self.MostRecentMode.Changed:connect(HandleChange)
+	HandleChange(self.MostRecentMode.Value)
 	
 	return self
 end
 
-function InputModeSelector:WithInputModeStates(InputModeStates)
+function InputModeSelector:WithInputModeList(InputModeList)
 	local BestInputModeState
 	local BestTimeEnabled = -math.huge
 	
-	for _, InputModeState in pairs(InputModeStates) do
+	for _, InputModeState in pairs(InputModeList) do
 		if InputModeState:GetLastEnabledTime() > BestTimeEnabled then
 			BestTimeEnabled = InputModeState:GetLastEnabledTime()
 			BestInputModeState = InputModeState
 		end
 		
 		self.Maid[InputModeState] = InputModeState.Enabled:connect(function()
-			self.BestState.Value = InputModeState
+			self.MostRecentMode.Value = InputModeState
 		end)
 	end
 	
-	self.BestState.Value = BestInputModeState
+	self.MostRecentMode.Value = BestInputModeState
 
 	return self
 end
