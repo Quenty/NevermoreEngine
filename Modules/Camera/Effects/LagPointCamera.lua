@@ -5,7 +5,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 
 local LagPointCamera = {}
 LagPointCamera.ClassName = "LagPointCamera"
@@ -20,7 +20,7 @@ function LagPointCamera.new(OriginCamera, FocusCamera)
 	
 	local self = setmetatable({}, LagPointCamera)
 
-	self.FocusSpring = SpringPhysics.new(Vector3.new())
+	self.FocusSpring = Spring.new(Vector3.new())
 	self.OriginCamera = OriginCamera or error("Must have OriginCamera")
 	self.FocusCamera = FocusCamera or error("Must have FocusCamera")
 	self.Speed = 10

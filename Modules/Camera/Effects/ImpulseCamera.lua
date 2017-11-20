@@ -4,7 +4,7 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
 
 -- Intent: Add another layer of effects over any other camera by allowing an "impulse"
@@ -17,7 +17,7 @@ ImpulseCamera.ClassName = "ImpulseCamera"
 function ImpulseCamera.new()
 	local self = setmetatable({}, ImpulseCamera)
 
-	self.Spring = SpringPhysics.new(Vector3.new())
+	self.Spring = Spring.new(Vector3.new())
 
 	self.Damper = 0.5
 	self.Speed = 20

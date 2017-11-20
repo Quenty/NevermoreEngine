@@ -5,7 +5,7 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qMath = LoadCustomLibrary("qMath")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 
 local MapNumber = qMath.MapNumber
 
@@ -24,7 +24,7 @@ function RotatingCharacter.new(Gui)
 	self.Label = self.Gui.Label
 	self.LabelTwo = self.Label.SecondLabel
 
-	self.Spring = SpringPhysics.new()
+	self.Spring = Spring.new(0)
 
 	self.TargetCharacter = " "
 	self.Character = self.TargetCharacter

@@ -4,7 +4,7 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
 
 -- Intent: Add another layer of effects that can be faded in/out
@@ -15,7 +15,7 @@ FadingCamera.ClassName = "FadingCamera"
 function FadingCamera.new(Camera)
 	local self = setmetatable({}, FadingCamera)
 
-	self.Spring = SpringPhysics.new(0)
+	self.Spring = Spring.new(0)
 
 	self.Camera = Camera or error("No camera")
 	self.Damper = 1

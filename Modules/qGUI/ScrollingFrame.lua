@@ -7,7 +7,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 local Signal = LoadCustomLibrary("Signal")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 
 local Scroller = {}
 Scroller.ClassName = "Scroller"
@@ -20,7 +20,7 @@ Scroller._ViewSize = 50
 function Scroller.new()
 	local self = setmetatable({}, Scroller)
 	
-	self.Spring = SpringPhysics.new(0)
+	self.Spring = Spring.new(0)
 	self.Spring.Speed = 20
 	
 	return self

@@ -8,7 +8,7 @@ local SummedCamera = LoadCustomLibrary("SummedCamera")
 local qCFrame = LoadCustomLibrary("qCFrame")
 
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 
 -- Intent: Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script. This is the rotation component.
@@ -26,8 +26,8 @@ SmoothRotatedCamera._ZoomGiveY = math.rad(5) -- ONly on th
 function SmoothRotatedCamera.new()
 	local self = setmetatable({}, SmoothRotatedCamera)
 	
-	self.SpringX = SpringPhysics.new(0)
-	self.SpringY = SpringPhysics.new(0)
+	self.SpringX = Spring.new(0)
+	self.SpringY = Spring.new(0)
 	self.Speed = 15
 	
 	return self

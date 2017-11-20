@@ -5,7 +5,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 
 local SmoothPositionCamera = {}
 SmoothPositionCamera.ClassName = "SmoothPositionCamera"
@@ -17,7 +17,7 @@ SmoothPositionCamera._OriginCamera = nil
 function SmoothPositionCamera.new(BaseCamera)
 	local self = setmetatable({}, SmoothPositionCamera)
 
-	self.Spring = SpringPhysics.new(Vector3.new())
+	self.Spring = Spring.new(Vector3.new())
 	self.BaseCamera = BaseCamera or error("Must have BaseCamera")
 	self.Speed = 10
 

@@ -4,7 +4,7 @@ local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngin
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
 
 -- Intent: Add another layer of effects that can be faded in/out
@@ -15,7 +15,7 @@ FadeBetweenCamera.ClassName = "FadeBetweenCamera"
 function FadeBetweenCamera.new(CameraA, CameraB)
 	local self = setmetatable({}, FadeBetweenCamera)
 
-	self.Spring = SpringPhysics.new()
+	self.Spring = Spring.new(0)
 
 	self.CameraA = CameraA or error("No CameraA")
 	self.CameraB = CameraB or error("No CameraB")

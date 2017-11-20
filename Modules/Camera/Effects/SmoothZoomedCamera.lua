@@ -5,7 +5,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-local SpringPhysics = LoadCustomLibrary("SpringPhysics")
+local Spring = LoadCustomLibrary("Spring")
 
 -- Intent: Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script
@@ -30,7 +30,7 @@ SmoothZoomedCamera.BounceAtEnd = true
 function SmoothZoomedCamera.new()
 	local self = setmetatable({}, SmoothZoomedCamera)
 
-	self.Spring = SpringPhysics.new(0)
+	self.Spring = Spring.new(0)
 	self.Speed = 15
 
 	return self
