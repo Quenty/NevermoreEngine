@@ -3,10 +3,23 @@ local RunService = game:GetService("RunService")
 
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
--- Intent: Syncronize time between client and servers so we can use a universal timestamp 
--- across the game. 
--- Note: This must be required on the server for clients to use it
--- See: http://www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf
+--[[
+class TimeSyncManager
+
+Description:
+	Syncronize time between client and servers so we can use a universal timestamp 
+	across the game. See: www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf for more details
+
+API:
+	Use use just require the module, it's a singleton. Load TimeSyncManager on the server to use on the clients.
+
+	number GetTime()
+		Returns the sycncronized time 
+
+	bool IsSynced()
+		Returns true if the manager has synced with the server
+
+--]]
 
 local MasterClock = {}
 MasterClock.__index = MasterClock
