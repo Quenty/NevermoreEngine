@@ -1,29 +1,32 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+
+-- Intent: Syncronize time between client and servers so we can use a universal timestamp 
+-- across the game. 
+-- Note: This must be required on the server for clients to use it
+-- See: http://www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf
+-- @author Quenty
 
 local MasterClock = {}
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
 
--- MasterClock sends time to client.
-
 function MasterClock.new(SyncEvent, DelayedRequestFunction)
-	local self = {}
-	setmetatable(self, MasterClock)
+	local self = setmetatable({}, MasterClock)
 	
 	self.SyncEvent = SyncEvent
-	self.DelayedRequestFunction = DelayedRequestFunction
+	self.DelayedRequestFunction = DelayedRequestFunction or error("No DelayedRequestFunction")
 	
-	-- Define function calls and events.
-	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)
-		-- @return SlaveMasterDifference
-		
-		return self:HandleDelayRequest(TimeThree)
+	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)	
+		return self:_handleDelayRequest(TimeThree) --
 	end
 	
 	self.SyncEvent.OnServerEvent:connect(function(Player)
 		 self.SyncEvent:FireClient(Player, self:GetTime())
 	end)
 	
-	-- Create thread.... forever! Yeah! That's right!
 	spawn(function()
 		while true do
 			wait(5)
@@ -34,73 +37,70 @@ function MasterClock.new(SyncEvent, DelayedRequestFunction)
 	return self
 end
 
-function MasterClock:GetTime()
-	return tick()
-end
-
-function MasterClock:Sync()
-	--- Starts the sync process with all slave clocks.
-	
-	local TimeOne = self:GetTime()
-	--print("[MasterClock] - Syncing all clients, TimeOne = ", TimeOne)
-	
-    self.SyncEvent:FireAllClients(TimeOne)
-end
-
-function MasterClock:HandleDelayRequest(TimeThree)
-    --- Client sends back message to get the SM_Difference.
-    -- @return SlaveMasterDifference
-
-    local TimeFour = self:GetTime()
-    return TimeFour - TimeThree -- -Offset + SM Delay
-end
-
 function MasterClock:IsSynced()
 	return true
 end
 
+function MasterClock:GetTime()
+	return tick()
+end
+
+--- Starts the sync process with all slave clocks.
+function MasterClock:Sync()
+	local TimeOne = self:GetTime()
+    self.SyncEvent:FireAllClients(TimeOne)
+end
+
+--- Client sends back message to get the SM_Difference.
+-- @return SlaveMasterDifference
+function MasterClock:_handleDelayRequest(TimeThree)
+    local TimeFour = self:GetTime()
+    return TimeFour - TimeThree -- -Offset + SM Delay
+end
 
 
 local SlaveClock = {}
 SlaveClock.__index = SlaveClock
 SlaveClock.ClassName = "SlaveClock"
+SlaveClock.Offset = -1 -- Set uncalculated values to -1
 
 function SlaveClock.new(SyncEvent, DelayedRequestFunction)
-	local self = {}
-	setmetatable(self, SlaveClock)
+	local self = setmetatable({}, SlaveClock)
 	
 	self.SyncEvent = SyncEvent
 	self.DelayedRequestFunction = DelayedRequestFunction
-	self.Offset = -1 -- Uncalculated.
 	
-	-- Connect
 	self.SyncEvent.OnClientEvent:connect(function(TimeOne)
-		self:HandleSyncEvent(TimeOne)
+		self:_handleSyncEvent(TimeOne)
 	end)
 	
-	-- Request sync.
-	self.SyncEvent:FireServer()
+	self.SyncEvent:FireServer() -- Request server to syncronize with us
 	
 	return self
+end
+
+function SlaveClock:GetTime()
+	if not self:IsSynced() then
+		warn("[SlaveClock][GetTime] - Slave clock is not yet synced")
+	end
+	
+	return self:_getLocalTime() - self.Offset
 end
 
 function SlaveClock:IsSynced()
 	return self.Offset ~= -1
 end
 
-function SlaveClock:GetLocalTime()
+function SlaveClock:_getLocalTime()
     return tick()
 end
 
-function SlaveClock:HandleSyncEvent(TimeOne)
-    -- http://www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf
-    -- We can't actually get hardware stuff, so we'll send T1 immediately. 
-    local TimeTwo = self:GetLocalTime()
+function SlaveClock:_handleSyncEvent(TimeOne)
+    local TimeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately. 
     local MasterSlaveDifference = TimeTwo - TimeOne -- We have Offst + MS Delay
 
-    -- wait(1)
-    local TimeThree = self:GetLocalTime()
-    local SlaveMasterDifference = self:SendDelayRequest(TimeThree)
+    local TimeThree = self:_getLocalTime()
+    local SlaveMasterDifference = self:_sendDelayRequest(TimeThree)
 
     --[[ From explination link.
         The result is that we have the following two equations:
@@ -123,60 +123,29 @@ function SlaveClock:HandleSyncEvent(TimeOne)
     local Offset = (MasterSlaveDifference - SlaveMasterDifference)/2
     local OneWayDelay = (MasterSlaveDifference + SlaveMasterDifference)/2
 
-	--print("[SlaveClock] - Synced time at ", self.Offset, "change of ", Offset - self.Offset, ". self:GetTime() = ", self:GetTime(), "OneWayDelay time @ ", OneWayDelay)
-
     self.Offset = Offset -- Estimated difference between server/client
     self.OneWayDelay = OneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
 end
 
-function SlaveClock:SendDelayRequest(TimeThree)
+function SlaveClock:_sendDelayRequest(TimeThree)
 	return self.DelayedRequestFunction:InvokeServer(TimeThree)
 end
 
-function SlaveClock:GetTime()
-	if self.Offset == -1 then
-		warn("[SlaveClock] - Offset is -1, may be unsynced clock!")
+
+--- Return a singleton
+local function BuildClock()
+	local SyncEvent = NevermoreEngine.GetRemoteEvent("TimeSyncEvent")
+	local DelayedRequestFunction = NevermoreEngine.GetRemoteFunction("DelayedRequestEvent")
+
+	if RunService:IsClient() and RunService:IsServer() then -- Solo test mode
+		local Clock = MasterClock.new(SyncEvent, DelayedRequestFunction)
+		SyncEvent.OnClientEvent:connect(function() end)
+		return Clock
+	elseif RunService:IsClient() then
+		return SlaveClock.new(SyncEvent, DelayedRequestFunction)
+	else
+		return MasterClock.new(SyncEvent, DelayedRequestFunction)
 	end
-	
-	return self:GetLocalTime() - self.Offset
 end
 
-
---- Actual Construction --
--- Determine what class to send back here: Singleton. 
--- Usually I wouldn't do something as... badly designed... as this, but in this case
--- I'm pretty sure these sync calls are expensive, so it's best that we do it here.
-
-local Players           = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-
-local SyncEvent = NevermoreEngine.GetRemoteEvent("TimeSyncEvent")
-local DelayedRequestFunction = NevermoreEngine.GetRemoteFunction("DelayedRequestEvent")
-local Manager
-
-if RunService:IsClient() and RunService:IsServer() then
-	-- Solo test mode
-	Manager = MasterClock.new(SyncEvent, DelayedRequestFunction)
-
-	--> Solves edge case issue:
-		--> Remote event invocation queue exhausted for ReplicatedStorage.NevermoreResources.EventStreamContainer.TimeSyncEvent; did you forget to implement OnClientEvent?
-		-- Occurs because there is no OnClientEvent invoked for the sync thing. Will do so now.
-	SyncEvent.OnClientEvent:connect(function() end)
-	
-	print("[TimeSyncManager] - Studio mode enabled. MasterClock constructed.")
-elseif RunService:IsClient() then
-	-- Client
-	Manager = SlaveClock.new(SyncEvent, DelayedRequestFunction)
-	
-	print("[TimeSyncManager] - Client mode enabled. SlaveClock constructed.")
-else
-	-- Server
-	Manager = MasterClock.new(SyncEvent, DelayedRequestFunction)
-	
-	print("[TimeSyncManager] - Server mode enabled. MasterClock constructed.")
-end
-
-return Manager
+return BuildClock()
