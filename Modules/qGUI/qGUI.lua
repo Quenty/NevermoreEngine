@@ -1,77 +1,16 @@
-local Players           = game:GetService("Players")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService        = game:GetService("RunService")
-local UserInputService  = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local qSystems          = LoadCustomLibrary("qSystems")
-local Table             = LoadCustomLibrary("Table")
-
-local Modify            = qSystems.Modify
-
+local Table = LoadCustomLibrary("Table")
 
 local lib = {}
 
-local WEAK_MODE = {
-	K  = {__mode="k"};
-	V  = {__mode="v"};
-	KV = {__mode="kv"};
-}
-
-
--- qGUI.lua
--- @author Quenty
 -- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
-
---[[
-
-Change Log
-November 17th, 2014
-- Removed importing into the environment
-
-September 9th, 2014
-- Optimized tweening for GUIs with time less than 0
-
-February 15th, 2014
-- Updated TweenTransparency method to use single thread update model for efficiency.
-- Updated TweenColor3 method to use a single thread update model for efficiency.
-
---]]
-
-
-local function GetScreen(object)
-	-- Given a GUI object, returns it's screenGui. 
-
-	--[[
-	GetScreen ( Instance `object` )
-		returns ScreenGui `screen`
-
-	Gets the nearest ascending ScreenGui of `object`.
-	Returns `object` if it is a ScreenGui.
-	Returns nil if `object` isn't the descendant of a ScreenGui.
-
-	Arguments:
-		`object`
-			The instance to get the ascending ScreenGui from.
-
-	Returns:
-		`screen`
-			The ascending screen.
-			Will be nil if `object` isn't the descendant of a ScreenGui.
-	--]]
-
-	local screen = object
-	while not screen:IsA("ScreenGui") do
-		screen = screen.Parent
-		if screen == nil then return nil end
-	end
-	return screen
-end
-lib.GetScreen = GetScreen
-lib.getScreen = GetScreen
-lib.get_screen = GetScreen
 
 local function NewColor3(red, green, blue)
 	-- Given a red, green, and blue, it'll return a formatted Color3 object. 
@@ -676,7 +615,9 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	MiddleBottom.Parent = Frame
 
 	for _, Item in pairs({TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom}) do
-		Modify(Item, Properties)
+		for Property, Value in pairs(Properties) do
+			Item[Property] = Value
+		end
 		Item.Image = Image
 		Item.ImageRectSize = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
 	end
