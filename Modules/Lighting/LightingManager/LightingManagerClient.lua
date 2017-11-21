@@ -10,7 +10,6 @@ local Table = LoadCustomLibrary("Table")
 
 -- Intent: Stack-based lighting manager which puts server lighting at the bottom and then
 --         allows properties to filter down based upon the stack. Handles lighting effects inside of lighting too.
--- @author Quenty
 
 local LightingManagerClient = setmetatable({}, LightingManager)
 LightingManagerClient.__index = LightingManagerClient
