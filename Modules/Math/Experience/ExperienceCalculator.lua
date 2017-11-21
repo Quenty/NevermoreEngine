@@ -1,9 +1,8 @@
 local lib = {}
 local ExperienceFactor = 200
 
--- @author Quenty
 -- Intent: Calculate experience on an exponential curve and perform relevant calculations
--- http://stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
+-- See: stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
 
 local function GetLevelFromExperience(Experience)	
 	return math.floor((ExperienceFactor + math.sqrt(ExperienceFactor * ExperienceFactor - 4 * ExperienceFactor * (-Experience)))/ (2 * ExperienceFactor))
