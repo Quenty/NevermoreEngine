@@ -6,7 +6,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local Signal = LoadCustomLibrary("Signal")
 
--- @author Quenty
 -- Intent: To work like value objects in ROBLOX and track a single item,
 --         with .Changed events
 
