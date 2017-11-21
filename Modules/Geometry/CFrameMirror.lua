@@ -9,10 +9,10 @@ function CFrameMirror.new()
 	return self
 end
 
-
+--- This is the CFrame that things are reflected over. Reflects over the
+-- x axis. 
 function CFrameMirror:SetCFrame(ReflectOver)
-	-- This is the CFrame that things are reflected over. Reflects over the
-	-- x axis. 
+
 	
 	self.ReflectOver = ReflectOver
 end
@@ -20,7 +20,6 @@ end
 function CFrameMirror:Reflect(ReflectCFrame)
 	local ReflectOver = self.ReflectOver or error("No reflect over")
 	
-	-- Algorithm from wingman8
 	local RelativeCFrame = ReflectOver:toObjectSpace(ReflectCFrame) -- Move to object space.
 	local x,   y,     z,
 	      r00, r01, r02,
@@ -54,14 +53,11 @@ function CFrameMirror:ReflectPoint(Point)
 	return ReflectOver:pointToWorldSpace(Mirror)
 end
 
-
 function CFrameMirror:ReflectRay(MirrorMeRay)
 	local MirrorOrigin = self:ReflectPoint(MirrorMeRay.Origin)
 	local MirrorDirection = self:ReflectVector(MirrorMeRay.Direction)
 	
 	return Ray.new(MirrorOrigin, MirrorDirection)
 end
-
-
 
 return CFrameMirror
