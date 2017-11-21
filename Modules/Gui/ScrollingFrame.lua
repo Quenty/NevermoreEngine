@@ -9,6 +9,35 @@ local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 local Signal = LoadCustomLibrary("Signal")
 local Spring = LoadCustomLibrary("Spring")
 
+--[[
+class ScrollingFrame
+
+Description:
+	Creates an inertia based scrolling frame that is animated and has inertia frames
+	Alternative to a Roblox ScrollingFrame with more control.
+
+API:
+	ScrollingFrame.new(Container)
+		Creates a new ScrollingFrame which can be used. Prefer Container.Active = true so scroll wheel works.
+		Container should be in a Frame with ClipsDescendants = true
+	
+	ScrollingFrame:AddScrollbarFromContainer(ScrollbarContainer)
+		Creates a new scrollbar from the scrollbar container. Once this is called you don't
+		have to do anything
+	
+	ScrollingFrame:ScrollTo(Position, [DoNotAnimate = false])
+		Scrolls to the position in pixels offset
+
+	ScrollingFrame:ScrollToTop([DoNotAnimate = false])
+		Scrolls to the top
+	
+	ScrollingFrame:ScrollToBottom([DoNotAnimate = false])
+		Scrolls tothe bottom
+
+	ScrollingFrame:Destroy()
+		Destroys the scrolling frame
+]]
+
 local Scroller = {}
 Scroller.ClassName = "Scroller"
 Scroller.__index = Scroller
