@@ -57,21 +57,31 @@ function DraggableSnackbar:Show()
 			end
 		end)
 
-		self.WhileActiveMaid.InputDismissEvent = UserInputService.InputBegan:connect(function(InputObject)
-			local UserInputTypeName = InputObject.UserInputType.Name
-
-			if self.ShowId == LocalShowId then
-				if not self.AutoCloseDisabled then
-					if not qGUI.MouseOver(self.Mouse, self.Gui) then
-						if self.AbsolutePosition == self.Gui.AbsolutePosition then
-							if UserInputTypeName == "Touch" or UserInputTypeName == "MouseButton1" then
-								self:Dismiss()
-							end
-						end
-					end
-				end
-			else
+		self.WhileActiveMaid.InputDismissEvent = UserInputService.InputBegan:connect(function(InputObject, GameProcessedEvent)
+			if GameProcessedEvent then
+				return
+			end
+			
+			if self.ShowId ~= LocalShowId then
 				warn("[InputDismissEvent] - self.ShowId ~= LocalShowId, but event fired")
+				return
+			end
+			if self.AutoCloseDisabled then
+				return
+			end
+			
+			if qGUI.MouseOver(self.Mouse, self.Gui) then
+				return
+			end
+				
+			if self.AbsolutePosition ~= self.Gui.AbsolutePosition then
+				return -- Animating / dragging
+			end
+			
+			if InputObject.UserInputType == Enum.UserInputType.Touch 
+				or InputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+				
+				self:Dismiss()
 			end
 		end)
 
