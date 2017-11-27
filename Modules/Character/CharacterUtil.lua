@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 
--- Intent: General hierarchy utility code
+-- Intent: General character utility code
 
 local lib = {}
 
