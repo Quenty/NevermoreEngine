@@ -53,6 +53,14 @@ function SnackbarManager:WithPlayerGui(PlayerGui)
 	return self:_withScreenGui(ScreenGui)
 end
 
+--- Sets the DisplayOrder of the ScreenGui
+function SnackbarManager:WithDisplayOrder(DisplayOrder)
+	assert(self.ScreenGui)
+	
+	self.ScreenGui.DisplayOrder = DisplayOrder or error("No DisplayOrder")
+	return self
+end
+
 --- Automatically makes a snackbar and shows it
 -- @param Text to show
 -- @param Options See above
