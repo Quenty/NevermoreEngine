@@ -1,29 +1,30 @@
-local WindSpeed    = 10
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
-local sin          = math.sin
-local cos          = math.cos
-local tan          = math.tan
-local sqrt         = math.sqrt
-local insert       = table.insert
-local remove       = table.remove
-local atan2        = math.atan2
-local max          = math.max
-local abs          = math.abs
-local random       = math.random
-local v3           = Vector3.new
-local v2           = Vector2.new
-local ud2          = UDim2.new
-local tick         = tick
-local ray          = Ray.new
-local RayCast      = workspace.FindPartOnRay
+-- Legacy code written by AxisAngles to simulate particles with Guis
+
+local WIND_SPEED = 10
+
+local sin = math.sin
+local cos = math.cos
+local tan = math.tan
+local sqrt = math.sqrt
+local insert = table.insert
+local remove = table.remove
+local atan2 = math.atan2
+local max = math.max
+local abs = math.abs
+local random = math.random
+local v3 = Vector3.new
+local v2 = Vector2.new
+local ud2 = UDim2.new
+local tick = tick
+local ray = Ray.new
 local Dot = v3().Dot
 local lib = {}
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-
+--- Required for networking....
 local function MakeParticleEngineServer()
-	--- Required for networking....
 
 	local Engine = {}
 
@@ -146,7 +147,7 @@ local function RealMakeEngine(Screen)
 
 	local function ParticleUpdateProperties(f,p,dt)--Frame,ParticleProperties,ChangeInTime,Time
 		p.Position = p.Position+p.Velocity*dt
-		local w    = p.WindResistance and (ParticleWind(p.Position)*WindSpeed-p.Velocity)*p.WindResistance or v3()
+		local w    = p.WindResistance and (ParticleWind(p.Position)*WIND_SPEED-p.Velocity)*p.WindResistance or v3()
 		p.Velocity = p.Velocity+(p.Gravity+w)*dt
 	end
 
@@ -175,7 +176,7 @@ local function RealMakeEngine(Screen)
 					Vec = Vec * (999/Mag)
 				end
 
-				if RayCast(workspace,ray(c,Vec),Player.Character, true) then
+				if workspace:FindPartOnRay(ray(c,Vec),Player.Character, true) then
 					Visible = false
 				end
 			end
@@ -280,9 +281,8 @@ local function RealMakeEngine(Screen)
 	local Terrain = workspace.Terrain
 	local workspace = workspace
 
+	--- Handles both priority and regular particles
 	local function HandleParticleUpdate(Camera, CameraInverse, Frame, Particle, t, dt)
-		--- Handles both priority and regular particles
-
 		if Particle.LifeTime - t <= 0 then
 			ParticleRemove(Particle)
 		else
@@ -304,7 +304,7 @@ local function RealMakeEngine(Screen)
 					Displacement = Displacement * (999/Distance)
 				end
 
-				local Hit, Position = RayCast(workspace, ray(OldPosition, Displacement), Player.Character, true)
+				local Hit, Position = workspace:FindPartOnRay(ray(OldPosition, Displacement), Player.Character, true)
 				if Hit then
 					if type(Particle.RemoveOnCollision) == "function" then
 						if not Particle.RemoveOnCollision(Particle, Hit, Position) then
@@ -321,10 +321,10 @@ local function RealMakeEngine(Screen)
 		end
 	end
 
+	--- This guy is expensive
+	-- Should be in a loop, so no need for debounce
 	-- _G.AverageProcessTime=0
 	local function ParticleUpdate()
-		--- This guy is expensive
-		-- Should be in a loop, so no need for debounce
 		local Camera = workspace.CurrentCamera
 
 		AddNewParticles()
