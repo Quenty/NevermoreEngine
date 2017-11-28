@@ -34,7 +34,7 @@ function LightingManagerClient:WithRemoteEvent(RemoteEvent)
 	}
 	table.insert(self.Stack, 1, ServerData)
 	
-	self.RemoteEvent.OnClientEvent:connect(function(PropertyTable, Time)
+	self.RemoteEvent.OnClientEvent:Connect(function(PropertyTable, Time)
 		assert(type(PropertyTable) == "table")
 		assert(type(Time) == "number")
 

@@ -31,7 +31,7 @@ function LightingManagerServer:WithRemoteEvent(RemoteEvent)
 	for _, Player in pairs(Players:GetPlayers()) do
 		HandlePlayerAdded(Player)
 	end
-	Players.PlayerAdded:connect(HandlePlayerAdded)
+	Players.PlayerAdded:Connect(HandlePlayerAdded)
 
 	return self
 end

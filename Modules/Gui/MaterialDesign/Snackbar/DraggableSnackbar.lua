@@ -47,7 +47,7 @@ function DraggableSnackbar:Show()
 		self.ShowId = LocalShowId
 
 		-- Connect events
-		self.WhileActiveMaid.DraggingBeginEvent = self.Gui.MouseButton1Down:connect(function(X, Y)
+		self.WhileActiveMaid.DraggingBeginEvent = self.Gui.MouseButton1Down:Connect(function(X, Y)
 			if self.ShowId == LocalShowId then
 				if not self.DraggingCoroutine then
 					self:StartTrack(X, Y)
@@ -57,7 +57,7 @@ function DraggableSnackbar:Show()
 			end
 		end)
 
-		self.WhileActiveMaid.InputDismissEvent = UserInputService.InputBegan:connect(function(InputObject, GameProcessedEvent)
+		self.WhileActiveMaid.InputDismissEvent = UserInputService.InputBegan:Connect(function(InputObject, GameProcessedEvent)
 			if GameProcessedEvent then
 				return
 			end
@@ -106,12 +106,12 @@ function DraggableSnackbar:StartTrack(X, Y)
 	LocalDraggingCoroutine = coroutine.create(function()
 		while self.DraggingCoroutine == LocalDraggingCoroutine do
 			self:Track()
-			RunService.RenderStepped:wait()
+			RunService.RenderStepped:Wait()
 		end
 	end)
 	self.DraggingCoroutine = LocalDraggingCoroutine
 
-	self.WhileActiveMaid.DraggingEnded = UserInputService.InputEnded:connect(function(InputObject)
+	self.WhileActiveMaid.DraggingEnded = UserInputService.InputEnded:Connect(function(InputObject)
 		if self.DraggingCoroutine == LocalDraggingCoroutine then
 			if InputObject.UserInputType.Name == "MouseButton1" then
 				self:EndTrack()
@@ -121,7 +121,7 @@ function DraggableSnackbar:StartTrack(X, Y)
 		end
 	end)
 
-	self.WhileActiveMaid.TouchDraggingEnded = UserInputService.TouchEnded:connect(function(InputObject)
+	self.WhileActiveMaid.TouchDraggingEnded = UserInputService.TouchEnded:Connect(function(InputObject)
 		if self.DraggingCoroutine == LocalDraggingCoroutine then
 			self:EndTrack()
 		else

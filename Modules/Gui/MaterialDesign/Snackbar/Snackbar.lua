@@ -111,18 +111,18 @@ function Snackbar.new(Parent, Text, Options)
 		-- Resize
 		Button.Size = UDim2.new(UDim.new(0, Button.TextBounds.X), Button.Size.Y)
 		
-		self.WhileActiveMaid.CallToActionClick = Button.MouseButton1Click:connect(function()
+		self.WhileActiveMaid.CallToActionClick = Button.MouseButton1Click:Connect(function()
 			if Options.CallToAction.OnClick then
 				Options.CallToAction.OnClick()
 				self:Dismiss()
 			end
 		end)
 		
-		self.WhileActiveMaid[Button.MouseEnter] = Button.MouseEnter:connect(function()
+		self.WhileActiveMaid[Button.MouseEnter] = Button.MouseEnter:Connect(function()
 			Button.TextColor3 = DefaultTextColor3:lerp(Color3.new(0, 0, 0), 0.2)
 		end)
 		
-		self.WhileActiveMaid[Button.MouseLeave] = Button.MouseLeave:connect(function()
+		self.WhileActiveMaid[Button.MouseLeave] = Button.MouseLeave:Connect(function()
 			Button.TextColor3 = DefaultTextColor3
 		end)
 		

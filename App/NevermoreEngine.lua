@@ -23,7 +23,7 @@ local function _handleRetrieving(Retrieving, Function, Argument)
 			return Result
 		end
 		
-		Signal.Event:wait()
+		Signal.Event:Wait()
 		return Result
 	end
 

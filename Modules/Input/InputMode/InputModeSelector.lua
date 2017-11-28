@@ -46,7 +46,7 @@ function InputModeSelector:BindUpdate(UpdateBindFunction)
 		end
 	end
 
-	BindMaid.Changed = self.MostRecentMode.Changed:connect(HandleChange)
+	BindMaid.Changed = self.MostRecentMode.Changed:Connect(HandleChange)
 	HandleChange(self.MostRecentMode.Value)
 	
 	return self
@@ -62,7 +62,7 @@ function InputModeSelector:WithInputModeList(InputModeList)
 			BestInputModeState = InputModeState
 		end
 		
-		self.Maid[InputModeState] = InputModeState.Enabled:connect(function()
+		self.Maid[InputModeState] = InputModeState.Enabled:Connect(function()
 			self.MostRecentMode.Value = InputModeState
 		end)
 	end

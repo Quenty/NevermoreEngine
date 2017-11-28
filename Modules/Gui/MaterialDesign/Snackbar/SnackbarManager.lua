@@ -79,7 +79,7 @@ function SnackbarManager:WithSnackbarRemoteEvent(RemoteEvent)
 	assert(self.ScreenGui, "Must initialize PlayerGui before initializing RemoteEvent")
 	
 	self.RemoteEvent = RemoteEvent or error("No RemoteEvent")
-	self.RemoteEvent.OnClientEvent:connect(function(Text, Options)
+	self.RemoteEvent.OnClientEvent:Connect(function(Text, Options)
 		self:MakeSnackbar(Text, Options)
 	end)
 	

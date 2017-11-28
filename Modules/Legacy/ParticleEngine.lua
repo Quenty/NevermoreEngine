@@ -46,7 +46,7 @@ local function MakeParticleEngineServer()
 	end
 	Engine.ParticleNew = ParticleNew
 
-	RemoteEvent.OnServerEvent:connect(function(Player, p)
+	RemoteEvent.OnServerEvent:Connect(function(Player, p)
 		-- print("Server -- New particle")
 		p.Global = nil
 
@@ -385,7 +385,7 @@ local function RealMakeEngine(Screen)
 		p.LifeTime      = p.LifeTime and p.LifeTime+tick()
 		NewParticles[#NewParticles+1] = p
 	end
-	RemoteEvent.OnClientEvent:connect(ParticleNew)
+	RemoteEvent.OnClientEvent:Connect(ParticleNew)
 	Engine.ParticleNew = ParticleNew
 
 	local RenderStepped = game:GetService("RunService").RenderStepped

@@ -35,7 +35,7 @@ function MasterClock.new(SyncEvent, DelayedRequestFunction)
 		return self:_handleDelayRequest(TimeThree) --
 	end
 	
-	self.SyncEvent.OnServerEvent:connect(function(Player)
+	self.SyncEvent.OnServerEvent:Connect(function(Player)
 		 self.SyncEvent:FireClient(Player, self:GetTime())
 	end)
 	
@@ -82,7 +82,7 @@ function SlaveClock.new(SyncEvent, DelayedRequestFunction)
 	self.SyncEvent = SyncEvent
 	self.DelayedRequestFunction = DelayedRequestFunction
 	
-	self.SyncEvent.OnClientEvent:connect(function(TimeOne)
+	self.SyncEvent.OnClientEvent:Connect(function(TimeOne)
 		self:_handleSyncEvent(TimeOne)
 	end)
 	
@@ -151,7 +151,7 @@ local function BuildClock()
 
 	if RunService:IsClient() and RunService:IsServer() then -- Solo test mode
 		local Clock = MasterClock.new(SyncEvent, DelayedRequestFunction)
-		SyncEvent.OnClientEvent:connect(function() end)
+		SyncEvent.OnClientEvent:Connect(function() end)
 		return Clock
 	elseif RunService:IsClient() then
 		return SlaveClock.new(SyncEvent, DelayedRequestFunction)

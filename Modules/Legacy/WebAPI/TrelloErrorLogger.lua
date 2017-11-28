@@ -34,11 +34,11 @@ if game:GetService("RunService"):IsServer() then -- Server
 		end
 	
 		trelloClientBridge:Listen(function(player, ...) POSTError(true, ...) end) -- Hookup Client
-		game:GetService("ScriptContext").Error:connect(function(...) POSTError(false, ...) end) -- Hookup Server
+		game:GetService("ScriptContext").Error:Connect(function(...) POSTError(false, ...) end) -- Hookup Server
 	end
 else
 	local trelloClientBridge = RemoteManager:GetEvent("TrelloClientBridge")
-	game:GetService("ScriptContext").Error:connect(function(...) trelloClientBridge:SendToServer(...) end)
+	game:GetService("ScriptContext").Error:Connect(function(...) trelloClientBridge:SendToServer(...) end)
 end
 
 return nil

@@ -23,7 +23,7 @@ function HeartbeatCamera.new(Camera)
 	self.Maid = MakeMaid()
 	
 	self.CurrentStateCache = self.Camera.CameraState or error("Camera state returned null")
-	self.Maid.Heartbeat = RunService.Heartbeat:connect(function()
+	self.Maid.Heartbeat = RunService.Heartbeat:Connect(function()
 		debug.profilebegin(self.ProfileName)
 		self.CurrentStateCache = self.Camera.CameraState or error("Camera state returned null")
 		debug.profileend()

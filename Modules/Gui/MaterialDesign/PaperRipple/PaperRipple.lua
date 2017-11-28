@@ -266,7 +266,7 @@ function PaperRipple:BindInput()
 		end
 	end
 
-	self.InputMaid.InputBegan = self.Container.InputBegan:connect(function(InputObject)
+	self.InputMaid.InputBegan = self.Container.InputBegan:Connect(function(InputObject)
 		if ValidInputEnums[InputObject.UserInputType] then
 			local Position = Vector2.new(InputObject.Position.X, InputObject.Position.Y)
 			self:Down(Position)
@@ -274,7 +274,7 @@ function PaperRipple:BindInput()
 			DownTypes[InputObject.UserInputType] = true
 			
 			-- Bind to event.
-			self.InputMaid.InputEnded = UserInputService.InputEnded:connect(OnUp)
+			self.InputMaid.InputEnded = UserInputService.InputEnded:Connect(OnUp)
 		end
 	end)
 end

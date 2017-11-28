@@ -359,7 +359,7 @@ local StyleFunctions = {
 			while FinishTime > time() do
 				local Percent = (1 - ((time() - StartTime) / Time)) * CircleSize
 				ResizeCircle(Percent)
-				RunService.RenderStepped:wait(0)
+				RunService.Stepped:Wait()
 				---wait(0.03);
 			end
 			ResizeCircle(0)
@@ -391,7 +391,7 @@ local StyleFunctions = {
 			while FinishTime > time() do
 				local Percent = ((time() - StartTime) / Time) * CircleSize
 				ResizeCircle(Percent)
-				RunService.RenderStepped:wait(0)
+				RunService.Stepped:Wait()
 				-- wait(0.03);
 			end
 			ResizeCircle(CircleSize)
@@ -440,6 +440,5 @@ local function MakeScreenCover(BaseCover, AnimationStyles)
 end
 
 lib.MakeScreenCover = MakeScreenCover
-lib.makeScreenCover = MakeScreenCover
 
 return lib

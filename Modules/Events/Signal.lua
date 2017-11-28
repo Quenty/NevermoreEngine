@@ -49,7 +49,7 @@ function Signal:Connect(Handler)
 		error("connect(nil)", 2) 
 	end
 
-	return self.BindableEvent.Event:connect(function()
+	return self.BindableEvent.Event:Connect(function()
 		Handler(unpack(self.ArgData, 1, self.ArgCount))
 	end)
 end

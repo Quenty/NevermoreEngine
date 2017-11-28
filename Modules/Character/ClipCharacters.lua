@@ -70,11 +70,11 @@ function ClipCharacters:_onCharacterAdd(PlayerMaid, Character)
 
 	local OriginalTable = {}
 
-	Maid:GiveTask(Character.DescendantAdded:connect(function(Descendant)
+	Maid:GiveTask(Character.DescendantAdded:Connect(function(Descendant)
 		self:_onDescendantAdded(OriginalTable, Descendant)
 	end))
 
-	Maid:GiveTask(Character.DescendantRemoving:connect(function(Descendant)
+	Maid:GiveTask(Character.DescendantRemoving:Connect(function(Descendant)
 		self:_onDescendantRemoving(OriginalTable, Descendant)
 	end))
 
@@ -100,7 +100,7 @@ function ClipCharacters:_onPlayerAdded(Player)
 
 	local Maid = MakeMaid()
 
-	Maid:GiveTask(Player.CharacterAdded:connect(function(Character)
+	Maid:GiveTask(Player.CharacterAdded:Connect(function(Character)
 		self:_onCharacterAdd(Maid, Character)
 	end))
 
@@ -122,11 +122,11 @@ function ClipCharacters:BindUpdatesYielding()
 		self:_onPlayerAdded(Player)
 	end
 	
-	self.Maid:GiveTask(Players.PlayerAdded:connect(function(Player)
+	self.Maid:GiveTask(Players.PlayerAdded:Connect(function(Player)
 		self:_onPlayerAdded(Player)
 	end))
 	
-	self.Maid:GiveTask(Players.PlayerRemoving:connect(function(Player)
+	self.Maid:GiveTask(Players.PlayerRemoving:Connect(function(Player)
 		self.Maid[Player] = nil
 	end))
 end

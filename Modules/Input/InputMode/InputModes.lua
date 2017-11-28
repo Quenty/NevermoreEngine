@@ -122,15 +122,15 @@ local InputProcessor = InputModeProcessor.new()
 do
 	local Maid = MakeMaid()
 
-	Maid:GiveTask(UserInputService.InputBegan:connect(function(InputObject)
+	Maid:GiveTask(UserInputService.InputBegan:Connect(function(InputObject)
 		InputProcessor:Evaluate(InputObject)
 	end))
 
-	Maid:GiveTask(UserInputService.GamepadConnected:connect(function(Gamepad)
+	Maid:GiveTask(UserInputService.GamepadConnected:Connect(function(Gamepad)
 		InputModes.Gamepads:Enable()
 		
 		-- Bind thumbsticks
-		Maid.InputChanged = UserInputService.InputChanged:connect(function(InputObject)
+		Maid.InputChanged = UserInputService.InputChanged:Connect(function(InputObject)
 			if InputObject.KeyCode.Name:find("Thumbstick") then
 				if InputObject.Position.magnitude > InputModes.THUMBSTICK_DEADZONE then
 					InputProcessor:Evaluate(InputObject)
@@ -139,7 +139,7 @@ do
 		end)
 	end))
 
-	Maid:GiveTask(UserInputService.GamepadDisconnected:connect(function(Gamepad)
+	Maid:GiveTask(UserInputService.GamepadDisconnected:Connect(function(Gamepad)
 		-- TODO: Stop assuming state is mouse/keyboard
 		InputModes.Mouse:Enable()
 		InputModes.Keyboard:Enable()

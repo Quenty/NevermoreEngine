@@ -250,13 +250,13 @@ function CameraControls:BeginDrag(BeginInputObject)
 		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
 	end
 	
-	Maid.InputEnded = UserInputService.InputEnded:connect(function(InputObject, GameProcessed)
+	Maid.InputEnded = UserInputService.InputEnded:Connect(function(InputObject, GameProcessed)
 		if InputObject == BeginInputObject then
 			self:EndDrag()
 		end
 	end)
 	
-	Maid.InputChanged = UserInputService.InputChanged:connect(function(InputObject)
+	Maid.InputChanged = UserInputService.InputChanged:Connect(function(InputObject)
 		if IsMouse and InputObject.UserInputType == Enum.UserInputType.MouseMovement 
 			or InputObject == BeginInputObject then
 			
@@ -327,7 +327,7 @@ function CameraControls:HandleGamepadRotateStart()
 		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
 	end
 	
-	Maid:GiveTask(RunService.Heartbeat:connect(function()
+	Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local DeltaAngle = self.GamepadRotate:GetThumbstickDeltaAngle()
 		
 		if self.RotatedCamera then
@@ -349,7 +349,7 @@ function CameraControls:Enable()
 
 		self.Maid = MakeMaid()
 		
-		self.Maid:GiveTask(self.GamepadRotate.IsRotating.Changed:connect(function()
+		self.Maid:GiveTask(self.GamepadRotate.IsRotating.Changed:Connect(function()
 			if self.GamepadRotate.IsRotating.Value then
 				self:HandleGamepadRotateStart()
 			else
