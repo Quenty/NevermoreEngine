@@ -3,7 +3,7 @@ local PhysicsService = game:GetService("PhysicsService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-local NevermoreEngine   = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
