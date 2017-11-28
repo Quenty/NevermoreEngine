@@ -106,7 +106,7 @@ function DraggableSnackbar:StartTrack(X, Y)
 	LocalDraggingCoroutine = coroutine.create(function()
 		while self.DraggingCoroutine == LocalDraggingCoroutine do
 			self:Track()
-			RunService.RenderStepped:Wait()
+			RunService.Stepped:Wait()
 		end
 	end)
 	self.DraggingCoroutine = LocalDraggingCoroutine
