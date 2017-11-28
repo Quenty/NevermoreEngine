@@ -9,7 +9,7 @@ MarkdownRender.ClassName = "MarkdownRender"
 MarkdownRender.SpaceAfterParagraph = 10
 MarkdownRender.TextSize = 18
 MarkdownRender.Indent = 30
-MarkdownRender.BaseTextColor3 = Color3.new(56/255, 56/255, 56/255)
+MarkdownRender.BaseTextColor3 = Color3.fromRGB(56, 56, 56)
 
 function MarkdownRender.new(Gui, Width)
 	local self = setmetatable({}, MarkdownRender)

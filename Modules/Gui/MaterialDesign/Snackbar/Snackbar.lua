@@ -92,7 +92,7 @@ function Snackbar.new(Parent, Text, Options)
 	local CallToActionText
 	if Options and Options.CallToAction then
 		CallToActionText = (type(Options.CallToAction) == "string" and Options.CallToAction or tostring(Options.CallToAction.Text)):upper()
-		local DefaultTextColor3 = Color3.new(78/255,205/255,196/255)
+		local DefaultTextColor3 = Color3.fromRGB(78, 205, 196)
 		
 		local Button = Instance.new("TextButton")
 		Button.Name = "CallToActionButton"

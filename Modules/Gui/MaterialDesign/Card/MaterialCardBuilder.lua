@@ -3,7 +3,7 @@
 local MaterialCardBuilder = {}
 MaterialCardBuilder.__index = MaterialCardBuilder
 MaterialCardBuilder.ClassName = "MaterialCardBuilder"
-MaterialCardBuilder.CardColor = Color3.new(235/255, 235/255, 235/255)
+MaterialCardBuilder.CardColor = Color3.fromRGB(235, 235, 235)
 MaterialCardBuilder.ShadowColor = Color3.new(0, 0, 0)
 
 function MaterialCardBuilder.new(Gui)
