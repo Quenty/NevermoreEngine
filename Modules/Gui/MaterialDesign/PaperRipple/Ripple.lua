@@ -36,16 +36,16 @@ end
 function Ripple.NewDefault(Parent)
 	assert(Parent, "Must send parent")
 
-	local Circle                  = Instance.new("ImageLabel");
-	Circle.Image                  = "rbxassetid://633244888"
-	Circle.Name                   = "Circle";
-	Circle.ImageTransparency      = 0.75;
-	Circle.BackgroundTransparency = 1;
-	Circle.BorderSizePixel        = 0;
-	Circle.Archivable             = false;
-	Circle.ZIndex                 = math.min(Parent.ZIndex + 1, 10)
-	Circle.ImageColor3            = Color3.new(1, 1, 1)
-	Circle.Parent                 = Parent or error("Must send parent")
+	local Circle = Instance.new("ImageLabel")
+	Circle.Image = "rbxassetid://633244888"
+	Circle.Name = "Circle"
+	Circle.ImageTransparency = 0.75
+	Circle.BackgroundTransparency = 1
+	Circle.BorderSizePixel = 0
+	Circle.Archivable = false
+	Circle.ZIndex = math.min(Parent.ZIndex + 1, 10)
+	Circle.ImageColor3 = Color3.new(1, 1, 1)
+	Circle.Parent = Parent or error("Must send parent")
 
 	local NewRipple = Ripple.new(Circle)
 
