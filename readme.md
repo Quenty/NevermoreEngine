@@ -1,97 +1,42 @@
 ## About
-Nevermore is a ModuleScript loader for Roblox, and loads modules by name. Nevermore is designed to make code more portable. Nevermore comes with a variety of utility libraries. 
+Nevermore is a ModuleScript loader for Roblox, and loads modules by name. Nevermore is designed to make code more portable. Nevermore comes with a variety of utility libraries. These libraries are used on both the client and server and are useful for a variety of things. 
+
+Nevermore is primarily OOP. 
 
 ## Get Nevermore
-To Install Nevermore, paste the following code into your command bar.
+To install Nevermore, paste the following code into your command bar in Roblox Studio!
 
 ```lua
 local h = game:GetService("HttpService") local e = h.HttpEnabled h.HttpEnabled = true loadstring(h:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/master/Install.lua"))() h.HttpEnabled = e
 ```
 
 ## Usage
-Nevermore 
-
-
-```lua
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-```
-
-### Loading a library
-With the above code, you can easily load a library and all dependencies
-
-```lua
-local qSystems = LoadCustomLibrary("qSystems")
-```
-
-Libraries have different functions with a variety of useful methods. For example, let's say we want to make a lava brick.
-
-Vanilla RobloxLua code to turn all `Part`s into killing bricks:
-```lua
-local function HandleTouch(Part)
-	-- Recursively find the humanoid
-	local Humanoid = Part:FindFirstChild("Humanoid")
-	if not Humanoid then
-		if Part.Parent then
-			return HandleTouch(Part.Parent)
-		end
-	elseif Humanoid:IsA("Humanoid") then
-		Part.Humanoid:TakeDamage(100)
-	end
-end
-
-local function RecurseApplyLava(Parent)
-	for _, Item in pairs(Parent:GetChildren()) do
-		if Item:IsA("BasePart") then
-			Item.Touched:connect(HandleTouch)
-		end
-
-		RecurseApplyLava(Item)
-	end
-end
-
-RecurseApplyLava(workspace)
-```
-
-Simpler code utilizing Nevermore's libraries:
+Here's an example of using Nevermore
 
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
-local qSystems = LoadCustomLibrary("qSystems")
 
-local function HandleTouch(Part)
-	local Humanoid = qSystems.GetHumanoid(Part)
-	if Humanoid then
-		Humanoid:TakeDamage(100)
-	end
-end
+-- Do actual things
+local Players = game:GetService("Players")
 
-qSystems.CallOnChildren(workspace, function(Item)
-	if Item:IsA("BasePart") then
-		Item.Touched:connect(HandleTouch)
-	end
-end)
+local SnackbarManager = LoadCustomLibrary("SnackbarManager").new()
+	:WithPlayerGui(Players.LocalPlayer:WaitForChild("PlayerGui"))
+
+SnackbarManager:MakeSnackbar("Nevermore loaded!")
 ```
 
+## Programming module
+Modules are stored in the `ServerScriptService.Nevermore`. 
 
-## Manual Installation
-Put `NevermoreEngine.lua`'s content's in `game.ReplicatedStorage` in a ModuleScript name `NevermoreEngine`
+* Modules are loaded by name, case sensitive
+* Modules with the word "Server" (case insensitive) in them at any point will not be replicated to the client
+* Folders are used purely for organization and do not affect loading
+* Children underneath a module that are not a module will be replicated relatively to their parent
 
-Put all the modules in a folder in `game.ServerScriptStorage` and name them the names of their script, but without
-.lua
+### Programming modules best practices
+* Modules should not load on yield
+* Modules should not hold state
+* Document using Nevermore's specified style
 
-```
-game
-	ReplicatedStorage
-		`ModuleScript` NevermoreEngine
-	ServerScriptStorage
-		`Folder` Nevermore
-			`Folder` qSystems
-				`ModuleScript` qSystems
-				... more libraries
-			... more folders and libraries
-
-```
