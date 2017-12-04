@@ -8,17 +8,25 @@ local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local Signal = LoadCustomLibrary("Signal")
 
 local function IsCallable(Value)
-	if type(Value) == "table" then
+	if type(Value) == "function" then
+		return true
+	elseif type(Value) == "table" then
 		local Metatable = getmetatable(Value)
 		return Metatable and type(Metatable.__call) == "function"
 	end
-
-	return type(Value) == "function"
 end
 
+local function IsSignal(Value)
+	if typeof(Value) == "RBXScriptSignal" then
+		return true
+	elseif type(Value) == "table" and IsCallable(Value.Connect) then
+		return true
+	end
+
+	return false
+end
 
 
 local Promise = {}
@@ -32,12 +40,6 @@ local function IsAPromise(Value)
 	return false
 end
 
-local function IsSignal(Value)
-	if type(Value) == "table" and Value.Connect then
-		return true
-	end
-	return false
-end
 
 function Promise.new(Value)
 	local self = setmetatable({}, Promise)
@@ -100,7 +102,7 @@ function Promise:Promisify(Value)
 	if IsCallable(Value) then
 		self:_promisfyYieldingFunction(Value)
 	elseif IsSignal(Value) then
-		self:_promisfySignal(Signal)
+		self:_promisfySignal(Value)
 	end
 end
 
@@ -109,13 +111,9 @@ function Promise:_promisfySignal(Signal)
 		return
 	end
 
-	local Maid = MakeMaid()
-
-	Maid:GiveTask(Signal:Connect(function(...)
+	self.PendingMaid:GiveTask(Signal:Connect(function(...)
 		self:Fulfill(...)
 	end))
-
-	self.PendingMaid:GiveTask(Maid)
 
 	return
 end
