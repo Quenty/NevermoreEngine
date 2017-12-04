@@ -1,6 +1,5 @@
 --- Promises, but without error handling as this screws with stack traces, using Roblox signals
 -- @module Promise
--- @author Quenty
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
