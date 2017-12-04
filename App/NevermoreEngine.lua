@@ -1,4 +1,8 @@
--- Intent: To simply resource loading and networking so a more unified server / client codebased can be used
+--- Nevermore module loader.
+-- Used to simply resource loading and networking so a more unified server / client codebased can be used
+-- @module Nevermore
+
+
 
 local DEBUG_MODE = false -- Set to true to help identify what libraries have circular dependencies
 
@@ -143,10 +147,11 @@ local function _debugLoading(Function)
 	end
 end
 
---- Loads a library from Nevermore's library cache
--- @param Module The name of the library or a module
--- @return The library's value
 local function _getLibraryLoader(LibraryCache)
+
+	--- Loads a library from Nevermore's library cache
+	-- @param Module The name of the library or a module
+	-- @return The library's value
 	return function(Module)
 		if typeof(Module) == "Instance" and Module:IsA("ModuleScript") then
 			return require(Module)
@@ -169,8 +174,21 @@ end
 
 local Nevermore = {}
 
+--- Load a library through Nevermore
+-- @function LoadLibrary
+-- @tparam string LibraryName
 Nevermore.LoadLibrary = _asyncCache(_debugLoading(_getLibraryLoader(LibraryCache)))
+
+--- Get a remote event
+-- @function GetRemoteEvent 
+-- @tparam string RemoteEventName
+-- @return RemoteEvent 
 Nevermore.GetRemoteEvent = _asyncCache(_retrieve(GetSubFolder("RemoteEvents"), "RemoteEvent"))
+
+--- Get a remote function
+-- @function GetRemoteFunction 
+-- @tparam string RemoteFunctionName
+-- @return RemoteFunction
 Nevermore.GetRemoteFunction = _asyncCache(_retrieve(GetSubFolder("RemoteFunctions"), "RemoteFunction"))
 
 setmetatable(Nevermore, {
