@@ -2,8 +2,6 @@
 -- Used to simply resource loading and networking so a more unified server / client codebased can be used
 -- @module Nevermore
 
-
-
 local DEBUG_MODE = false -- Set to true to help identify what libraries have circular dependencies
 
 local RunService = game:GetService("RunService")
@@ -13,7 +11,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 assert(script:IsA("ModuleScript"), "Invalid script type. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
 assert(script.Name == "NevermoreEngine", "Invalid script name. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
 assert(script.Parent == ReplicatedStorage, "Invalid parent. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
-
 
 --- Handles yielded operations by caching the retrieval process
 local function _handleRetrieving(Retrieving, Function, Argument)
@@ -63,7 +60,7 @@ end
 --- Retrieves an instance from a parent
 local function _retrieve(Parent, ClassName)
 	assert(type(ClassName) == "string", "Error: ClassName must be a string")
-	assert(typeof(Parent) == "Instance", "Error: Parent must be an Instance")
+	assert(typeof(Parent) == "Instance", ("Error: Parent must be an Instance, got '%s'"):format(typeof(Parent)))
 
 	return RunService:IsServer() and function(Name)
 		local Item = Parent:FindFirstChild(Name)
@@ -76,11 +73,14 @@ local function _retrieve(Parent, ClassName)
 		return Item
 	end or function(Name)
 		local Resource = Parent:WaitForChild(Name, 5)
-		if not Resource then
-			warn(("Warning: No '%s' found, be sure to require '%s' on the server. Yielding for '%s'"):format(tostring(Name), tostring(Name), ClassName))
-			return Resource:WaitForChild(Name)
+		
+		if Resource then
+			return Resource
 		end
-	end
+
+		warn(("Warning: No '%s' found, be sure to require '%s' on the server. Yielding for '%s'"):format(tostring(Name), tostring(Name), ClassName))
+		return Parent:WaitForChild(Name)
+end
 end
 
 local function _getRepository(GetSubFolder)
