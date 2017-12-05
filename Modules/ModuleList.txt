@@ -79,7 +79,6 @@ Legacy\qSystems\Triangle.lua
 Legacy\qSystems\DataTypes\ComparableTuple.lua
 Legacy\qSystems\DataTypes\qInstance.lua
 Legacy\qSystems\DataTypes\qString.lua
-Legacy\qSystems\DataTypes\qUDim2.lua
 Legacy\WebAPI\TrelloErrorLogger.lua
 Lighting\FakeSkybox\FakeSkybox.lua
 Lighting\FakeSkybox\FakeSkyboxSide.lua
