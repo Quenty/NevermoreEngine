@@ -2,7 +2,6 @@ import os
 import fnmatch
 
 # Writes files to ModuleList.txt for easy installation
-# Author: Quenty
 
 # Outputs a line delimited file with folders delimited by \ and the last string
 # the name of the file
@@ -25,4 +24,5 @@ f = open('ModuleList.txt', 'w+')
 f.write(fileList)
 f.close()
 
-print("Wrote file list")
+print("Wrote file list.")
+input()
