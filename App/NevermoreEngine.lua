@@ -73,14 +73,14 @@ local function _retrieve(Parent, ClassName)
 		return Item
 	end or function(Name)
 		local Resource = Parent:WaitForChild(Name, 5)
-		
+
 		if Resource then
 			return Resource
 		end
 
 		warn(("Warning: No '%s' found, be sure to require '%s' on the server. Yielding for '%s'"):format(tostring(Name), tostring(Name), ClassName))
 		return Parent:WaitForChild(Name)
-end
+	end
 end
 
 local function _getRepository(GetSubFolder)
@@ -103,7 +103,7 @@ local function _getLibraryCache(RepositoryFolder)
 	local LibraryCache = {}
 	
 	for _, Child in pairs(RepositoryFolder:GetDescendants()) do
-		if Child:IsA("ModuleScript") then
+		if Child:IsA("ModuleScript") and not Child:FindFirstAncestorOfClass("ModuleScript") then
 			if LibraryCache[Child.Name] then
 				error(("Error: Duplicate name of '%s' already exists"):format(Child.Name))
 			end
