@@ -1,10 +1,12 @@
-local Players = game:GetService("Players")
+--- General character utility code.
+-- @module CharacterUtil
+-- @alias lib
 
--- Intent: General character utility code
+local Players = game:GetService("Players")
 
 local lib = {}
 
----- Retrieves a humanomid from a descendant (Players only).
+--- Retrieves a humanomid from a descendant (Players only).
 -- @param Descendant The child you're searching up from. Really, this is for weapon scripts. 
 -- @return A humanoid in the parent structure if it can find it. Intended to be used in
 --     workspace  only. Useful for weapon scripts, and all that, especially to work on non
@@ -12,7 +14,7 @@ local lib = {}
 --     won't find it.
 -- Will work even if there are non-humanoid objects named "Humanoid" However, only works on
 -- objects named "Humanoid" (this is intentional)
-local function GetHumanoid(Descendant)
+function lib.GetHumanoid(Descendant)
 	while true do
 		local Humanoid = Descendant:FindFirstChild("Humanoid")
 
@@ -35,12 +37,11 @@ local function GetHumanoid(Descendant)
 		end
 	end
 end
-lib.GetHumanoid = GetHumanoid
 
 --- Returns the Player and Character that a descendent is part of, if it is part of one.
 -- @param Descendant A child of the potential character. 
 -- @return The character found.
-local function GetPlayerFromCharacter(Descendant)
+function lib.GetPlayerFromCharacter(Descendant)
 	local Character = Descendant
 	local Player   = Players:GetPlayerFromCharacter(Character)
 
@@ -56,6 +57,5 @@ local function GetPlayerFromCharacter(Descendant)
 	-- Found the player, character must be true.
 	return Player, Character
 end
-lib.GetPlayerFromCharacter = GetPlayerFromCharacter
 
 return lib
