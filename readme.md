@@ -7,7 +7,7 @@ Nevermore follows both functional and OOP programming paradigms. However, many m
 To install Nevermore, paste the following code into your command bar in Roblox Studio!
 
 ```lua
-local h = game:GetService("HttpService") local e = h.HttpEnabled h.HttpEnabled = true loadstring(h:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/Install.lua"))() h.HttpEnabled = e
+local h = game:GetService("HttpService") local e = h.HttpEnabled h.HttpEnabled = true loadstring(h:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/Install.lua"))(e)
 ```
 
 ## Usage
