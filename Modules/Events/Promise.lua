@@ -91,6 +91,10 @@ function Promise.All(Promises)
 	return Promise2
 end
 
+function Promise:Catch(Function)
+	return self:Then(nil, Function)
+end
+
 
 function Promise:IsPending()
 	return self.PendingMaid ~= nil
