@@ -7,3 +7,4 @@ format = 'markdown'
 use_markdown_titles = true
 style = "!fixed"
 no_summary = false
+dir = 'api'
