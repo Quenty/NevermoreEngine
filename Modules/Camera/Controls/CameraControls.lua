@@ -1,3 +1,6 @@
+--- Interface between user input and camera controls
+-- @classmod CameraControls
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
@@ -10,7 +13,6 @@ local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 local AccelTween = LoadCustomLibrary("AccelTween")
 local Signal =  LoadCustomLibrary("Signal")
 
--- Intent: Interface between user input and camera controls
 
 local GamepadRotate = {}
 GamepadRotate.__index = GamepadRotate
