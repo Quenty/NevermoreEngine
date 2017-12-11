@@ -15,3 +15,7 @@ See [quenty.github.io/api/](http://quenty.github.io/api/) for API documentation.
 
 ## Usage
 See [quenty.github.io/api/](http://quenty.github.io/api/topics/usage.md.html) for examples and usage documentation.
+
+## Community
+
+* [Discord](https://discord.gg/mhtGUS8)
