@@ -1,26 +1,9 @@
---[[
-class Maid
-
-Description:
-	Manages the cleaning of events and other things. Needed to encapsulate state
-	and make deconstructors easy
- 
-API:
-	Maid.new()                        Returns a new Maid object.
- 
-	Maid[key] = (function)            Adds a task to perform when cleaning up.
-	Maid[key] = (event connection)    Manages an event connection. Anything that isn"t a function is assumed to be this.
-	Maid[key] = (Maid)                Maids can act as an event connection, allowing a Maid to have other maids to clean up.
-	Maid[key] = (Object)              Maids can cleanup objects with a `Destroy` method
-	Maid[key] = nil                   Removes a named task. If the task is an event, it is disconnected. If it is an object, it is destroyed.
- 
-	Maid:GiveTask(task)               Same as above, but uses an incremented number as a key.
-	Maid:DoCleaning()                 Disconnects all managed events and performs all clean-up tasks.
-	Maid:IsCleaning()				  Returns true is in cleaning process.
-	Maid:Destroy()                    Alias for DoCleaning()
-]]
+---	Manages the cleaning of events and other things. 
+-- Useful for encapsulating state and make deconstructors easy
+-- @classmod Maid
 
 local Maid = {}
+Maid.ClassName = "Maid"
 
 --- Returns a new Maid object
 function Maid.new()
@@ -43,6 +26,7 @@ function Maid:__index(Index)
 end
 
 --- Add a task to clean up
+-- @usage
 -- Maid[key] = (function)            Adds a task to perform
 -- Maid[key] = (event connection)    Manages an event connection
 -- Maid[key] = (Maid)                Maids can act as an event connection, allowing a Maid to have other maids to clean up.
@@ -68,7 +52,7 @@ function Maid:__newindex(Index, NewTask)
 	end
 end
 
---- Same as indexing, but uses an incremented number as a key
+--- Same as indexing, but uses an incremented number as a key.
 -- @param Task An item to clean
 -- @return int TaskId
 function Maid:GiveTask(Task)
@@ -77,7 +61,8 @@ function Maid:GiveTask(Task)
 	return TaskId
 end
 
---- Cleans up all tasks
+--- Cleans up all tasks.
+-- @alias Destroy
 function Maid:DoCleaning()
 	local Tasks = self.Tasks
 
@@ -103,6 +88,9 @@ function Maid:DoCleaning()
 		Index, Task = next(Tasks)
 	end
 end
+
+--- Alias for DoCleaning()
+-- @function Destroy 
 Maid.Destroy = Maid.DoCleaning
 
 return Maid

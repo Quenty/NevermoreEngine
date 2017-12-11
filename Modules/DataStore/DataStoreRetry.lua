@@ -1,8 +1,12 @@
+--- General usage datastore retry function.
+-- @module DataStoreRetry
+
 local RunService = game:GetService("RunService")
 
--- Intent: General usage datastore retry function
-
 local DATASTORE_RETRIES = 3
+
+-- @function DataStoreRetry
+--- Retries calls to the datastore
 local function DataStoreRetry(DataStoreFunction)
 	local Tries = 0	
 	local Success = true

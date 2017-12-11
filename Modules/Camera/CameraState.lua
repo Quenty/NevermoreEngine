@@ -1,11 +1,12 @@
+--- Data container for the state of a camera.
+-- @classmod CameraState
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local QuaternionObject = LoadCustomLibrary("QuaternionObject")
-
--- Intent: Data container for the state of a camera
 
 local CameraState = {}
 CameraState.ClassName = "CameraState"
@@ -33,7 +34,7 @@ function CameraState:__newindex(Index, Value)
 end
 
 
--- Constructors
+--- Constructor
 function CameraState.new(Cam)
 	local self = setmetatable({}, CameraState)
 
@@ -45,7 +46,7 @@ function CameraState.new(Cam)
 	return self
 end
 
--- Operators
+---
 function CameraState:__add(Other)
 	local New = CameraState.new(self)
 	New.FieldOfView = self.FieldOfView + Other.FieldOfView
@@ -55,6 +56,7 @@ function CameraState:__add(Other)
 	return New
 end
 
+---
 function CameraState:__sub(Other)
 	local New = CameraState.new(self)
 	New.FieldOfView = self.FieldOfView - Other.FieldOfView
@@ -64,6 +66,7 @@ function CameraState:__sub(Other)
 	return New
 end
 
+--- Inverts
 function CameraState:__unm()
 	local New = CameraState.new(self)
 	New.FieldOfView = -self.FieldOfView
@@ -73,6 +76,8 @@ function CameraState:__unm()
 	return New
 end
 
+---
+-- @tparam number Other
 function CameraState:__mul(Other)
 	local New = CameraState.new(self)
 

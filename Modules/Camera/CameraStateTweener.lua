@@ -1,3 +1,8 @@
+--- Makes transitions between states easier. Uses the `CameraStack` to tween in and 
+-- out a new camera state Call `:Show()` and `:Hide()` to do so, and make sure to 
+-- call `:Destroy()` after usage
+-- @classmod CameraStateTweener
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
@@ -6,9 +11,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 local CameraStack = LoadCustomLibrary("CameraStack")
 local FadeBetweenCamera = LoadCustomLibrary("FadeBetweenCamera")
-
--- Intent: Uses the CameraStack to tween in/out a new camera state
--- Call :Show() and :Hide() to do so, and make sure to call :Destroy() after usage
 
 local CameraStateTweener = {}
 CameraStateTweener.ClassName = "CameraStateTweener"

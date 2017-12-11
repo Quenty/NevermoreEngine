@@ -1,3 +1,7 @@
+--- Holds camera states and allows for the last camera state to be retrieved. Also
+-- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
+-- @module CameraStack
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -7,9 +11,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local DefaultCamera = LoadCustomLibrary("DefaultCamera")
 local ImpulseCamera = LoadCustomLibrary("ImpulseCamera")
 local CustomCameraEffect = LoadCustomLibrary("CustomCameraEffect")
-
--- Intent: Holds camera states and allows for the last camera state to be retrieved. Also
--- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
 
 assert(RunService:IsClient(), "Only require CameraStack on client")
 
@@ -46,24 +47,29 @@ function CameraStack.new()
 	return self
 end
 
+--- Outputs the camera stack
 function CameraStack:PrintCameraStack()
 	for Index, Value in pairs(self.Stack) do
 		print(tostring(type(Value) == "table" and Value.ClassName or tostring(Value)))
 	end
 end
 
+--- Returns the default camera
 function CameraStack:GetDefaultCamera()
 	return self.DefaultCamera
 end
 
+--- Returns the impulse camera. Useful for adding camera shake
 function CameraStack:GetImpulseCamera()
 	return self.ImpulseCamera
 end
 
+--- Returns the default camera without any impulse cameras
 function CameraStack:GetRawDefaultCamera()
 	return self.RawDefaultCamera
 end
 
+--- Retrieves the top state off the stack
 function CameraStack:GetTopState()
 	if #self.Stack > 10 then
 		warn(("[CameraStack] - Stack is bigger than 10 in camerastack (%d)"):format(#self.Stack))
@@ -82,6 +88,7 @@ function CameraStack:GetTopState()
 	end
 end
 
+--- Returns a new camera state that retrieves the state below its set state
 function CameraStack:GetNewStateBelow()
 	local StateToUse = nil
 	
@@ -104,6 +111,7 @@ function CameraStack:GetNewStateBelow()
 	end
 end
 
+--- Retrieves the index of a state
 function CameraStack:GetIndex(State)
 	for Index, Value in pairs(self.Stack) do
 		if Value == State then
@@ -112,6 +120,7 @@ function CameraStack:GetIndex(State)
 	end
 end
 
+--- Removes the state from the stack
 function CameraStack:Remove(State)
 	local Index = self:GetIndex(State)
 	
@@ -120,6 +129,7 @@ function CameraStack:Remove(State)
 	end
 end
 
+--- Adds a state to the stack
 function CameraStack:Add(State)
 	table.insert(self.Stack, State)
 end

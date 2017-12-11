@@ -1,24 +1,28 @@
---- Intent: Provide a variety of utility Table operations
+--- Provide a variety of utility Table operations
+-- @module Table
 
 local lib = {}
 
-local function Append(Table, NewTable)
+--- Concats `Table` with `NewTable`
+function lib.Append(Table, NewTable)
 	for _, Item in pairs(NewTable) do
-		table.insert(Table, Item)
+		Table[#Table+1] = Item
 	end
 
 	return Table
 end
-lib.Append = Append
 
-local function Count(Table)
+--- Counts the number of items in the table.
+-- Useful since #table in Lua 5.2 returns just the array part
+-- @tparam table Table
+-- @treturn number Count
+function lib.Count(Table)
 	local Count = 0;
 	for _, _ in pairs(Table) do
 		Count = Count + 1
 	end
 	return Count
 end
-lib.Count = Count
 
 local function DeepCopy(OriginalTable)
 	local OriginalType = type(OriginalTable)
@@ -49,7 +53,7 @@ local function DeepOverwrite(Table, NewTable)
 end
 lib.DeepOverwrite = DeepOverwrite
 
-local function GetIndexByValue(Table, Value)
+function lib.GetIndexByValue(Table, Value)
 	for Index, TableValue in pairs(Table) do
 		if Value == TableValue then
 			return Index
@@ -57,7 +61,6 @@ local function GetIndexByValue(Table, Value)
 	end
 	return nil
 end
-lib.GetIndexByValue = GetIndexByValue
 
 --- Recursively prints the table
 local function GetStringTable(Table, Indent, PrintValue)
@@ -76,13 +79,30 @@ local function GetStringTable(Table, Indent, PrintValue)
 end
 lib.GetStringTable = GetStringTable
 
-local function Overwrite(Table, NewTable)
+function lib.Contains(Table, Value)
+	for _, Item in pairs(Table) do
+		if Item == Value then
+			return true
+		end
+	end
+
+	return false
+end
+
+function lib.Overwrite(Table, NewTable)
 	for Index, Item in pairs(NewTable) do
 		Table[Index] = Item
 	end
 
 	return Table
 end
-lib.Overwrite = Overwrite
+
+function lib.ErrorOnBadIndex(Table)
+	return setmetatable(Table, {
+		__index = function(self, Index)
+			error(("Bad index '%s'"):format(tostring(Index)))
+		end;
+	})
+end
 
 return lib

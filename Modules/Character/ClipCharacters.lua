@@ -1,3 +1,6 @@
+--- Clip characters locally on the client of other clients so they don't interfer with physics.
+-- @classmod ClipCharacters
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PhysicsService = game:GetService("PhysicsService")
 local RunService = game:GetService("RunService")
@@ -8,28 +11,12 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 
---[[
-class ClipCharacters
-
-Description:
-Clip characters locally on the client of other clients so they don't interfer with physics
-
-API:
-	ClipCharacters.initServer()
-		Initialize on server
-
-	ClipCharacters.new()
-		Initialize clipping on the client. Returns a new inst
-
-	ClipCharaters:Destroy()
-		Stop clipping on client
-]]
-
 local ClipCharacters = {}
 ClipCharacters.ClassName = "ClipCharacters"
 ClipCharacters.__index = ClipCharacters
 ClipCharacters.CollisionGroupName = "ClipCharacters"
 
+--- Initialize on server
 function ClipCharacters.initServer()
 	local GroupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.CollisionGroupName, "Default", false)
@@ -40,6 +27,7 @@ function ClipCharacters.initServer()
 	end
 end
 
+--- Initialize clipping on the client. Returns a new inst
 function ClipCharacters.new()
 	local self = setmetatable({}, ClipCharacters)
 
@@ -131,6 +119,7 @@ function ClipCharacters:BindUpdatesYielding()
 	end))
 end
 
+--- Stop clipping on client
 function ClipCharacters:Destroy()
 	self.Maid:DoCleaning()
 	self.Maid = nil

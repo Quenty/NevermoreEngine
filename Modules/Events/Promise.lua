@@ -50,7 +50,7 @@ function Promise.new(Value)
 	return self
 end
 
-function Promise.First(...)
+function Promise.First(Promises)
 	local Promise2 = Promise.new()
 
 	local function Syncronize(Method)
@@ -59,15 +59,15 @@ function Promise.First(...)
 		end
 	end
 
-	for _, Promise in pairs({...}) do
+	for _, Promise in pairs(Promises) do
 		Promise:Then(Syncronize("Fulfill"), Syncronize("Reject"))
 	end
 
 	return Promise2
 end
 
-function Promise.All(...)
-	local RemainingCount = select("#", ...)
+function Promise.All(Promises)
+	local RemainingCount = #Promises
 	local Promise2 = Promise.new()
 	local Results = {}
 	local AllFuilfilled = true
@@ -84,7 +84,7 @@ function Promise.All(...)
 		end
 	end
 
-	for Index, Item in pairs({...}) do
+	for Index, Item in pairs(Promises) do
 		Item:Then(Syncronize(Index, true), Syncronize(Index, false))
 	end
 
@@ -230,7 +230,7 @@ function Promise:_executeThen(ReturnPromise, OnFulfilled, OnRejected)
 		if IsCallable(OnRejected) then
 			Results = {OnRejected(unpack(self.Rejected))}
 		else
-			ReturnPromise:Rejected(unpack(self.Rejected))
+			ReturnPromise:Reject(unpack(self.Rejected))
 		end
 	else
 		error("Internal error, cannot execute while pending")

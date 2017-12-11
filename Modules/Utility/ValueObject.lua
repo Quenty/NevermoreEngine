@@ -1,13 +1,14 @@
+--- To work like value objects in ROBLOX and track a single item,
+-- with `.Changed` events
+-- @classmod ValueObject
+
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local Signal = LoadCustomLibrary("Signal")
-
--- Intent: To work like value objects in ROBLOX and track a single item,
---         with .Changed events
 
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
@@ -19,6 +20,11 @@ function ValueObject.new()
 	
 	return self
 end
+
+
+--- 
+-- @field Value The value of the ValueObject
+
 
 function ValueObject:__index(Index)
 	if Index == "Value" then
