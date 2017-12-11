@@ -26,11 +26,11 @@
 #         if module then
             <h1><span class="api-$(ldoc.module_typename(module):lower())-icon"></span>$(module.name)</h1>
 #         else
-            <h1><span class="api-hierarchy-icon"></span>Class Hierarchy</h1>
+            <h1><span class="api-hierarchy-icon"></span>$(ldoc.project)</h1>
 #         end
           <span class="header-items">
-            <span id="search-form"><label>Search: <input id="search-input" type="text" placeholder="Class or Member"></label></span>
-            <a id="return-link" href="/api">Back to hierarchy<span class="api-hierarchy-icon"></span></a>
+<!--             <span id="search-form"><label>Search: <input id="search-input" type="text" placeholder="Class or Member"></label></span>
+ -->            <a id="return-link" href="/api">Back to reference<span class="api-hierarchy-icon"></span></a>
           </span>
         </div>
 #       if ldoc.body then -- verbatim HTML as contents; 'non-code' entries
