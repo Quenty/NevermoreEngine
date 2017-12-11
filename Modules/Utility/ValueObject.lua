@@ -10,20 +10,25 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local Signal = LoadCustomLibrary("Signal")
 
+
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
 
 function ValueObject.new()
 	local self = setmetatable({}, ValueObject)
 	
-	self.Changed = Signal.new() -- :fire(NewValue, OldValue)
+	--- The value of the ValueObject
+	-- @property Value 
+
+	--- Event fires when the value's object value change
+	-- @event Changed
+	-- @param NewValue The new value
+	-- @param OldValue The old value
+	self.Changed = Signal.new() -- :Fire(NewValue, OldValue)
 	
 	return self
 end
 
-
---- 
--- @field Value The value of the ValueObject
 
 
 function ValueObject:__index(Index)
