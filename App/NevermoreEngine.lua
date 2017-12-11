@@ -192,7 +192,9 @@ Nevermore.GetRemoteEvent = _asyncCache(_retrieve(GetSubFolder("RemoteEvents"), "
 Nevermore.GetRemoteFunction = _asyncCache(_retrieve(GetSubFolder("RemoteFunctions"), "RemoteFunction"))
 
 setmetatable(Nevermore, {
-	__call = Nevermore.LoadLibrary;
+	__call = function(self, ...)
+		return self.LoadLibrary(...)
+	end;
 	__index = function(self, Index)
 		error(("'%s is not a valid member of Nevermore"):format(tostring(Index)))
 	end;
