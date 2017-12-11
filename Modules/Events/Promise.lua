@@ -1,5 +1,5 @@
 --- Promises, but without error handling as this screws with stack traces, using Roblox signals
--- @module Promise
+-- @classmod Promise
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -79,7 +79,7 @@ function Promise.All(Promises)
 			RemainingCount = RemainingCount - 1
 			if RemainingCount == 0 then
 				local Method = AllFuilfilled and "Fulfill" or "Reject"
-				Promise2[Method](Promise2, Results)
+				Promise2[Method](Promise2, unpack(Results))
 			end
 		end
 	end
