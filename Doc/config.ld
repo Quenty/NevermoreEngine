@@ -5,6 +5,11 @@ file = {'../Modules/Events', '../App', '../Modules/Character', '../Modules/DataS
 topics = 'Manual'
 format = 'markdown'
 use_markdown_titles = true
-style = "!fixed"
 no_summary = false
+
+-- Output
 dir = 'api'
+
+-- Custom template
+style = 'Style'
+template ='Style'
