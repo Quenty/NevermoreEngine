@@ -10,6 +10,9 @@ To install Nevermore, paste the following code into your command bar in Roblox S
 local h = game:GetService("HttpService") local e = h.HttpEnabled h.HttpEnabled = true loadstring(h:GetAsync("https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/Install.lua"))() h.HttpEnabled = e
 ```
 
+## API/Documentation
+See [quenty.github.io/api/](http://quenty.github.io/api/) for API documentation.
+
 ## Usage
 Here's an example of using Nevermore
 
