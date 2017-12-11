@@ -24,19 +24,24 @@ function lib.Count(Table)
 	return Count
 end
 
-local function DeepCopy(OriginalTable)
-	local OriginalType = type(OriginalTable)
-	local Copy
-	if OriginalType == 'table' then
-		Copy = {}
-		for Index, Value in next, OriginalTable, nil do
-			Copy[DeepCopy(Index)] = DeepCopy(Value)
-		end
-		setmetatable(Copy, DeepCopy(getmetatable(OriginalTable)))
-	else
-		Copy = OriginalTable
+function lib.Copy(Table)
+	local NewTable = {}
+	for Key, Value in pairs(Table) do
+		NewTable[Key] = Value
 	end
-	return Copy
+	return NewTable
+end
+
+local function DeepCopy(Table)
+	if type(Table) == "table" then
+		local NewTable = {}
+		for Index, Value in pairs(Table) do
+			NewTable[DeepCopy(Index)] = DeepCopy(Value)
+		end
+		return setmetatable(NewTable, DeepCopy(getmetatable(Table)))
+	else
+		return Table
+	end
 end
 lib.DeepCopy = DeepCopy
 
