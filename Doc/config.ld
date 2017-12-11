@@ -1,5 +1,5 @@
 -- Descriptors
-project = 'Nevermore'
+project = 'Nevermore Reference'
 description = 'Nevemore Roblux Lua Libraries'
 title = 'Nevermore Reference'
 full_description = [[
