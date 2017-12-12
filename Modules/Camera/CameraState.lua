@@ -34,19 +34,37 @@ function CameraState:__newindex(Index, Value)
 end
 
 
---- Constructor
+--- Builds a new camera stack
+-- @constructor
+-- @param[opt=nil] Cam
+-- @treturn CameraState
 function CameraState.new(Cam)
 	local self = setmetatable({}, CameraState)
 
 	if Cam then
 		self.FieldOfView = Cam.FieldOfView
+
 		self.CFrame = Cam.CFrame
 	end
 
 	return self
 end
 
----
+--- Current FieldOfView
+-- @tfield number FieldOfView 
+
+--- Current CFrame
+-- @tfield CFrame CFrame
+
+--- Current Position
+-- @tfield Vector3 Position
+
+--- Quaternion representation of the rotation of the CameraState
+-- @tfield Quaterion Quaternion
+
+
+--- Adds two camera states together
+-- @tparam CameraState Other
 function CameraState:__add(Other)
 	local New = CameraState.new(self)
 	New.FieldOfView = self.FieldOfView + Other.FieldOfView
@@ -56,17 +74,18 @@ function CameraState:__add(Other)
 	return New
 end
 
----
+--- Subtract the camera state from another
+-- @tparam CameraState Other
 function CameraState:__sub(Other)
 	local New = CameraState.new(self)
 	New.FieldOfView = self.FieldOfView - Other.FieldOfView
 	New.Position = New.Position - Other.Position
-	New.Quaterion = self.Quaterion/Other.Quaterion
+	New.Quaterion = self.Quaterion/Otcamher.Quaterion
 
 	return New
 end
 
---- Inverts
+--- Inverts camera state
 function CameraState:__unm()
 	local New = CameraState.new(self)
 	New.FieldOfView = -self.FieldOfView
@@ -76,7 +95,7 @@ function CameraState:__unm()
 	return New
 end
 
----
+--- Multiply camera state by percent effect
 -- @tparam number Other
 function CameraState:__mul(Other)
 	local New = CameraState.new(self)
@@ -93,7 +112,8 @@ function CameraState:__mul(Other)
 end
 
 --- Set another camera state. Typically used to set workspace.CurrentCamera's state to match this camera's state
--- @param CameraState A CameraState to set, also accepts a Roblox Camera
+-- @tparam Camera CameraState A CameraState to set, also accepts a Roblox Camera
+-- @treturn nil
 function CameraState:Set(CameraState)
 	CameraState = CameraState or workspace.CurrentCamera
 
