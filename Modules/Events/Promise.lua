@@ -1,5 +1,6 @@
 --- Promises, but without error handling as this screws with stack traces, using Roblox signals
 -- @classmod Promise
+-- See: https://promisesaplus.com/
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -8,7 +9,7 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
 
-local function IsCallable(Value)
+local function _isCallable(Value)
 	if type(Value) == "function" then
 		return true
 	elseif type(Value) == "table" then
@@ -17,39 +18,45 @@ local function IsCallable(Value)
 	end
 end
 
-local function IsSignal(Value)
+local function _isSignal(Value)
 	if typeof(Value) == "RBXScriptSignal" then
 		return true
-	elseif type(Value) == "table" and IsCallable(Value.Connect) then
+	elseif type(Value) == "table" and _isCallable(Value.Connect) then
 		return true
 	end
 
 	return false
 end
 
+local function _isPromise(Value)
+	if type(Value) == "table" and Promise.ClassName == "Promise" then
+		return true
+	end
+	return false
+end
 
 local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
 
-local function IsAPromise(Value)
-	if type(Value) == "table" and getmetatable(Value) == Promise then
-		return true
-	end
-	return false
-end
-
-
+--- Construct a new promise
+-- @constructor Promise.new()
+-- @param Value, default nil
+-- @treturn Promise
 function Promise.new(Value)
 	local self = setmetatable({}, Promise)
 
 	self.PendingMaid = MakeMaid()
 
-	self:Promisify(Value)
+	self:_promisify(Value)
 
 	return self
 end
 
+--- Returns the value of the first promise resolved
+-- @constructor First
+-- @tparam Array(Promise) Promises
+-- @treturn Promise Promise that resolves with first result  
 function Promise.First(Promises)
 	local Promise2 = Promise.new()
 
@@ -66,6 +73,21 @@ function Promise.First(Promises)
 	return Promise2
 end
 
+---
+-- @constructor First
+-- @treturn Promise
+function Promise.Promisfy(Function)
+	return function(...)
+		local Args = {...}
+		return Promise.new(function()
+			Function(unpack(Args))
+		end)
+	end
+end
+
+---
+-- @constructor First
+-- @treturn Promise
 function Promise.All(Promises)
 	local RemainingCount = #Promises
 	local Promise2 = Promise.new()
@@ -91,20 +113,101 @@ function Promise.All(Promises)
 	return Promise2
 end
 
-function Promise:Catch(Function)
-	return self:Then(nil, Function)
-end
-
-
+--- Returns whether or not the promise is pending
+-- @treturn bool True if pending, false otherwise
 function Promise:IsPending()
 	return self.PendingMaid ~= nil
 end
 
+
+---
+-- Resolves a promise
+-- @treturn nil
+function Promise:Resolve(Value)
+	if self == Value then
+		self:Reject("TypeError: Resolved to self")
+		return
+	end
+
+	if _isPromise(Value) then
+		Value:Then(function(...)
+			self:Fulfill(...)
+		end, function(...)
+			self:Reject(...)
+		end)
+		return
+	end
+
+	-- Thenable like objects
+	if type(Value) == "table" and _isCallable(Value.Then) then
+		Value:Then(self:_getResolveReject())
+		return
+	end
+
+	self:Fulfill(Value)
+end
+
+--- Fulfills the promise with the value
+-- @param ... Params to fulfill with
+-- @treturn nil
+function Promise:Fulfill(...)
+	if not self:IsPending() then
+		return
+	end
+
+	self.Fulfilled = {...}
+	self:_endPending()
+end
+
+--- Rejects the promise with the value given
+-- @param ... Params to reject with
+-- @treturn nil
+function Promise:Reject(...)
+	if not self:IsPending() then
+		return
+	end
+
+	self.Rejected = {...}
+	self:_endPending()
+end
+
+--- Handlers when promise is fulfilled/rejected
+-- @tparam[opt=nil] function OnFulfilled Called when fulfilled with parameters
+-- @tparam[opt=nil] function OnRejected Called when rejected with parameters
+-- @treturn Promise
+function Promise:Then(OnFulfilled, OnRejected)
+	local ReturnPromise = Promise.new()
+
+	if self.PendingMaid then
+		self.PendingMaid:GiveTask(function()
+			self:_executeThen(ReturnPromise, OnFulfilled, OnRejected)
+		end)
+	else
+		self:_executeThen(ReturnPromise, OnFulfilled, OnRejected)
+	end
+	
+	return ReturnPromise
+end
+
+--- Catch errors from the promise
+-- @treturn Promise
+function Promise:Catch(Function)
+	return self:Then(nil, Function)
+end
+
+--- Rejects the current promise. 
+-- Utility left for Maid task
+-- @treturn nil
+function Promise:Destroy()
+	self:Reject()
+end
+
 --- Modifies values into promises
-function Promise:Promisify(Value)
-	if IsCallable(Value) then
+-- @local
+function Promise:_promisify(Value)
+	if _isCallable(Value) then
 		self:_promisfyYieldingFunction(Value)
-	elseif IsSignal(Value) then
+	elseif _isSignal(Value) then
 		self:_promisfySignal(Value)
 	end
 end
@@ -120,7 +223,6 @@ function Promise:_promisfySignal(Signal)
 
 	return
 end
-
 
 function Promise:_promisfyYieldingFunction(YieldingFunction)
 	if not self.PendingMaid then
@@ -138,64 +240,6 @@ function Promise:_promisfyYieldingFunction(YieldingFunction)
 	end))
 	self.PendingMaid:GiveTask(Maid)
 	BindableEvent:Fire()
-end
-
----
--- Resolves a promise
-function Promise:Resolve(Value)
-	if self == Value then
-		self:Reject("TypeError: Resolved to self")
-		return
-	end
-
-	if IsAPromise(Value) then
-		Value:Then(function(...)
-			self:Fulfill(...)
-		end, function(...)
-			self:Reject(...)
-		end)
-		return
-	end
-
-	-- Thenable like objects
-	if type(Value) == "table" and IsCallable(Value.Then) then
-		Value:Then(self:_getResolveReject())
-		return
-	end
-
-	self:Fulfill(Value)
-end
-
-function Promise:Fulfill(...)
-	if not self:IsPending() then
-		return
-	end
-
-	self.Fulfilled = {...}
-	self:_endPending()
-end
-
-function Promise:Reject(...)
-	if not self:IsPending() then
-		return
-	end
-
-	self.Rejected = {...}
-	self:_endPending()
-end
-
-function Promise:Then(OnFulfilled, OnRejected)
-	local ReturnPromise = Promise.new()
-
-	if self.PendingMaid then
-		self.PendingMaid:GiveTask(function()
-			self:_executeThen(ReturnPromise, OnFulfilled, OnRejected)
-		end)
-	else
-		self:_executeThen(ReturnPromise, OnFulfilled, OnRejected)
-	end
-	
-	return ReturnPromise
 end
 
 function Promise:_getResolveReject()
@@ -220,18 +264,16 @@ function Promise:_getResolveReject()
 	return ResolvePromise, RejectPromise
 end
 
-
-
 function Promise:_executeThen(ReturnPromise, OnFulfilled, OnRejected)
 	local Results
 	if self.Fulfilled then
-		if IsCallable(OnFulfilled) then
+		if _isCallable(OnFulfilled) then
 			Results = {OnFulfilled(unpack(self.Fulfilled))}
 		else
 			ReturnPromise:Fulfill(unpack(self.Fulfilled))
 		end
 	elseif self.Rejected then
-		if IsCallable(OnRejected) then
+		if _isCallable(OnRejected) then
 			Results = {OnRejected(unpack(self.Rejected))}
 		else
 			ReturnPromise:Reject(unpack(self.Rejected))
@@ -245,16 +287,10 @@ function Promise:_executeThen(ReturnPromise, OnFulfilled, OnRejected)
 	end
 end
 
-
 function Promise:_endPending()
 	local Maid = self.PendingMaid
 	self.PendingMaid = nil
 	Maid:DoCleaning()
-end
-
-
-function Promise:Destroy()
-	self:Reject()
 end
 
 return Promise
