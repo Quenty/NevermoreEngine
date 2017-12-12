@@ -48,6 +48,7 @@ function CameraStack.new()
 end
 
 --- Outputs the camera stack
+-- @treturn nil
 function CameraStack:PrintCameraStack()
 	for Index, Value in pairs(self.Stack) do
 		print(tostring(type(Value) == "table" and Value.ClassName or tostring(Value)))
@@ -55,21 +56,26 @@ function CameraStack:PrintCameraStack()
 end
 
 --- Returns the default camera
+-- @treturn SummedCamera DefaultCamera + ImpulseCamera
 function CameraStack:GetDefaultCamera()
 	return self.DefaultCamera
 end
 
 --- Returns the impulse camera. Useful for adding camera shake
+-- @treturn ImpulseCamera
 function CameraStack:GetImpulseCamera()
 	return self.ImpulseCamera
 end
 
 --- Returns the default camera without any impulse cameras
+-- @treturn DefaultCamera
 function CameraStack:GetRawDefaultCamera()
 	return self.RawDefaultCamera
 end
 
 --- Retrieves the top state off the stack
+-- @treturn[1] CameraState
+-- @treturn[2] nil
 function CameraStack:GetTopState()
 	if #self.Stack > 10 then
 		warn(("[CameraStack] - Stack is bigger than 10 in camerastack (%d)"):format(#self.Stack))
@@ -89,6 +95,8 @@ function CameraStack:GetTopState()
 end
 
 --- Returns a new camera state that retrieves the state below its set state
+-- @treturn[1] CustomCameraEffect
+-- @treturn[1] NewStateToUse
 function CameraStack:GetNewStateBelow()
 	local StateToUse = nil
 	
@@ -112,6 +120,9 @@ function CameraStack:GetNewStateBelow()
 end
 
 --- Retrieves the index of a state
+-- @tparam CameraState State
+-- @treturn number Index of state
+-- @treturn nil If non on stack
 function CameraStack:GetIndex(State)
 	for Index, Value in pairs(self.Stack) do
 		if Value == State then
@@ -121,6 +132,8 @@ function CameraStack:GetIndex(State)
 end
 
 --- Removes the state from the stack
+-- @tparam CameraState State State to remove
+-- @treturn nil
 function CameraStack:Remove(State)
 	local Index = self:GetIndex(State)
 	
@@ -130,6 +143,8 @@ function CameraStack:Remove(State)
 end
 
 --- Adds a state to the stack
+-- @tparam CameraState State State to add
+-- @treturn nil
 function CameraStack:Add(State)
 	table.insert(self.Stack, State)
 end
