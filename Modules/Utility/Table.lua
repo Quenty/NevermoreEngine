@@ -3,90 +3,118 @@
 
 local lib = {}
 
---- Concats `Table` with `NewTable`
-function lib.Append(Table, NewTable)
-	for _, Item in pairs(NewTable) do
-		Table[#Table+1] = Item
+--- Concats `target` with `source`
+-- @tparam table target Table to append to
+-- @tparam table source Table read from
+-- @treturn table parameter table
+function lib.Append(target, source)
+	for _, value in pairs(source) do
+		target[#target+1] = value
 	end
 
-	return Table
+	return target
 end
 
---- Counts the number of items in the table.
--- Useful since #table in Lua 5.2 returns just the array part
--- @tparam table Table
--- @treturn number Count
-function lib.Count(Table)
-	local Count = 0;
-	for _, _ in pairs(Table) do
-		Count = Count + 1
+--- Counts the number of items in `tab`.
+-- Useful since `__len` on table in Lua 5.2 returns just the array length.
+-- @tparam table tab Table to count
+-- @treturn number count
+function lib.Count(tab)
+	local count = 0
+	for _, _ in pairs(tab) do
+		count = count + 1
 	end
-	return Count
+	return count
 end
 
-function lib.Copy(Table)
-	local NewTable = {}
-	for Key, Value in pairs(Table) do
-		NewTable[Key] = Value
+--- Copies a table, but not deep. 
+-- @tparam table target Table to copy
+-- @treturn table New table
+function lib.Copy(target)
+	local new = {}
+	for key, value in pairs(target) do
+		new[key] = value
 	end
-	return NewTable
+	return new
 end
 
-local function DeepCopy(Table)
-	if type(Table) == "table" then
-		local NewTable = {}
-		for Index, Value in pairs(Table) do
-			NewTable[DeepCopy(Index)] = DeepCopy(Value)
+--- Deep copies a table including metatables
+-- @function lib.DeepCopy
+-- @tparam table table Table to deep copy
+-- @treturn table New table
+local function DeepCopy(target)
+	if type(target) == "table" then
+		local new = {}
+		for index, value in pairs(target) do
+			new[DeepCopy(index)] = DeepCopy(value)
 		end
-		return setmetatable(NewTable, DeepCopy(getmetatable(Table)))
+		return setmetatable(new, DeepCopy(getmetatable(target)))
 	else
-		return Table
+		return target
 	end
 end
 lib.DeepCopy = DeepCopy
 
-local function DeepOverwrite(Table, NewTable)
-	for Index, Value in pairs(NewTable) do
-		if type(Table[Index]) == "table" and type(Value) == "table" then
-			Table[Index] = DeepOverwrite(Table[Index], Value)
+--- Overwrites a table's value
+-- @function lib.DeepOverwrite
+-- @tparam table target Target table
+-- @tparam table source Table to read from
+-- @treturn table target
+local function DeepOverwrite(target, source)
+	for index, value in pairs(source) do
+		if type(target[index]) == "table" and type(value) == "table" then
+			target[index] = DeepOverwrite(target[index], value)
 		else
-			Table[Index] = Value
+			target[index] = value
 		end
 	end
-
-	return Table
+	return target
 end
 lib.DeepOverwrite = DeepOverwrite
 
-function lib.GetIndexByValue(Table, Value)
-	for Index, TableValue in pairs(Table) do
-		if Value == TableValue then
-			return Index
+--- Gets an index by value, returning `nil` if no index is found.
+-- @tparam table haystack to search in
+-- @param needle Value to search for
+-- @return The index of the value, if found 
+-- @treturn nil if not found
+function lib.GetIndexByValue(haystack, needle)
+	for index, item in pairs(haystack) do
+		if needle == item then
+			return index
 		end
 	end
 	return nil
 end
 
---- Recursively prints the table
-local function GetStringTable(Table, Indent, PrintValue)
-	PrintValue = PrintValue or tostring(Table)
-	Indent = Indent or 0
-	for Index, Value in pairs(Table) do
-		local FormattedText = "\n" .. string.rep("  ", Indent) .. tostring(Index) .. ": "
+--- Recursively prints the table. Does not handle recursive tables.
+-- @function lib.Stringify
+-- @tparam table table Table to stringify
+-- @tparam[opt=0] number indent Indent level
+-- @tparam[opt=""] string output Output string, used recursively
+-- @treturn string The table in string form  
+local function Stringify(table, indent, output)
+	output = output or tostring(table)
+	indent = indent or 0
+	for Index, Value in pairs(table) do
+		local FormattedText = "\n" .. string.rep("  ", indent) .. tostring(Index) .. ": "
 		if type(Value) == "table" then
-			PrintValue = PrintValue .. FormattedText
-			PrintValue = GetStringTable(Value, Index + 1, PrintValue)
+			output = output .. FormattedText
+			output = Stringify(Value, Index + 1, output)
 		else
-			PrintValue = PrintValue .. FormattedText .. tostring(Value)
+			output = output .. FormattedText .. tostring(Value)
 		end
 	end
-	return PrintValue
+	return output
 end
-lib.GetStringTable = GetStringTable
+lib.Stringify = Stringify
 
-function lib.Contains(Table, Value)
-	for _, Item in pairs(Table) do
-		if Item == Value then
+--- Returns whether `value` is within `table`
+-- @tparam table table to search in for value
+-- @param value Value to search for
+-- @treturn boolean `true` if within, `false` otherwise 
+function lib.Contains(table, value)
+	for _, item in pairs(table) do
+		if item == value then
 			return true
 		end
 	end
@@ -94,16 +122,24 @@ function lib.Contains(Table, Value)
 	return false
 end
 
-function lib.Overwrite(Table, NewTable)
-	for Index, Item in pairs(NewTable) do
-		Table[Index] = Item
+--- Overwrites an existing table
+-- @tparam table target Table to overwite
+-- @tparam table source Source table to read from
+-- @treturn table target
+function lib.Overwrite(target, source)
+	for index, item in pairs(source) do
+		target[index] = item
 	end
 
-	return Table
+	return target
 end
 
-function lib.ErrorOnBadIndex(Table)
-	return setmetatable(Table, {
+--- Sets a metatable on a table such that it errors when 
+-- indexing an undefined value
+-- @tparam table table Table to error on indexing
+-- @treturn table table The same table
+function lib.ErrorOnBadIndex(table)
+	return setmetatable(table, {
 		__index = function(self, Index)
 			error(("Bad index '%s'"):format(tostring(Index)))
 		end;
