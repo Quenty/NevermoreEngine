@@ -10,57 +10,62 @@ Signal.__index = Signal
 Signal.ClassName = "Signal"
 
 --- Constructs a new signal.
+-- @constructor Signal.new()
+-- @treturn Signal
 function Signal.new()
 	local self = setmetatable({}, Signal)
 	
-	self.BindableEvent = Instance.new("BindableEvent")
-	self.ArgData = nil
-	self.ArgCount = nil
+	self._bindableEvent = Instance.new("BindableEvent")
+	self._argData = nil
+	self._argCount = nil
 	
 	return self
 end
 
---- Fire the event with the given arguments
+--- Fire the event with the given arguments. All handlers will be invoked. Handlers follow
+-- Roblox signal conventions.
+-- @param ... Variable arguments to pass to handler
+-- @treturn nil
 function Signal:Fire(...)
-	self.ArgData = {...}
-	self.ArgCount = select("#", ...)
-	self.BindableEvent:Fire()
+	self._argData = {...}
+	self._argCount = select("#", ...)
+	self._bindableEvent:Fire()
 end
 Signal.fire = Signal.Fire
 
---- Connect a new handler to the event, returning a connection object that
--- can be disconnected
--- @tparam function Handler Function handler
+--- Connect a new handler to the event. Returns a connection object that can be disconnected. 
+-- @tparam function handler Function handler called with arguments passed when `:Fire(...)` is called
 -- @treturn Connection Connection object that can be disconnected
-function Signal:Connect(Handler)
-	if not (typeof(Handler) == "function") then 
-		error(("connect(%s)"):format(typeof(Handler)), 2)
+function Signal:Connect(handler)
+	if not (typeof(handler) == "function") then 
+		error(("connect(%s)"):format(typeof(handler)), 2)
 	end
 
-	return self.BindableEvent.Event:Connect(function()
-		Handler(unpack(self.ArgData, 1, self.ArgCount))
+	return self._bindableEvent.Event:Connect(function()
+		handler(unpack(self._argData, 1, self._argCount))
 	end)
 end
 Signal.connect = Signal.Connect
 
 --- Wait for fire to be called, and return the arguments it was given.
--- @return Parameters
+-- @treturn ... Variable arguments from connection
 function Signal:Wait()
-	self.BindableEvent.Event:wait()
-	assert(self.ArgData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-	return unpack(self.ArgData, 1, self.ArgCount)
+	self._bindableEvent.Event:wait()
+	assert(self._argData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
+	return unpack(self._argData, 1, self._argCount)
 end
 Signal.wait = Signal.Wait
 
---- Disconnects all connected events to the signal and voids the signal as unusable.
+--- Disconnects all connected events to the signal. Voids the signal as unusable.
+-- @treturn nil
 function Signal:Destroy()
-	if self.BindableEvent then
-		self.BindableEvent:Destroy()
-		self.BindableEvent = nil
+	if self._bindableEvent then
+		self._bindableEvent:Destroy()
+		self._bindableEvent = nil
 	end
 
-	self.ArgData = nil
-	self.ArgCount = nil
+	self._argData = nil
+	self._argCount = nil
 end
 
 return Signal
