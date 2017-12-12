@@ -176,19 +176,20 @@ local Nevermore = {}
 
 --- Load a library through Nevermore
 -- @function LoadLibrary
--- @tparam string LibraryName
+-- @tparam Variant LibraryName Can either be a ModuleScript or string
+-- @treturn Variant Library
 Nevermore.LoadLibrary = _asyncCache(_debugLoading(_getLibraryLoader(LibraryCache)))
 
 --- Get a remote event
 -- @function GetRemoteEvent 
 -- @tparam string RemoteEventName
--- @return RemoteEvent 
+-- @treturn RemoteEvent RemoteEvent 
 Nevermore.GetRemoteEvent = _asyncCache(_retrieve(GetSubFolder("RemoteEvents"), "RemoteEvent"))
 
 --- Get a remote function
 -- @function GetRemoteFunction 
 -- @tparam string RemoteFunctionName
--- @return RemoteFunction
+-- @treturn RemoteFunction RemoteFunction
 Nevermore.GetRemoteFunction = _asyncCache(_retrieve(GetSubFolder("RemoteFunctions"), "RemoteFunction"))
 
 setmetatable(Nevermore, {
