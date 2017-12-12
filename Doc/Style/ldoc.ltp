@@ -4,6 +4,7 @@
 # local iter = ldoc.modules.iter
 # local function M(txt,item) return ldoc.markup(txt,item,ldoc.plain) end
 # local nowrap = ldoc.wrap and '' or 'nowrap'
+# local METHOD_CALL_TABLE = { ['function'] = true; ['method'] = true; ['signal'] = true; }
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,8 +40,13 @@
           </div>
 #       elseif module then -- module documentation
           <div class="box-content">
-            <p>$(M(module.summary, module))</p>
-            <p>$(M(module.description, module))</p>
+            <div id="info">
+            <p>
+              $(M(module.summary, module))
+            </p>
+            <p>
+              $(M(module.description, module))
+            </p>
 #           if module.tags.include then
                 $(M(ldoc.include_file(module.tags.include)))
 #           end
@@ -65,29 +71,103 @@
               </ul>
 #           end
 
-      
+            <h2>Members</h2>
             <!-- Summary -->
 #           if not ldoc.no_summary then
 #             for kind, items in module.kinds() do
-                <h4>$(kind)</h4>
+                <h3>$(kind)</h3>
                 <table>
                   <tr>
+                    <!-- Function/Methods return types -->
+#                   if kind == 'Functions' or kind == 'Methods' then
+                      <th>Returns</th>
+#                   end
                     <th></th>
                     <th>$(kind)</th>
+#                   if kind == 'Properties' or kind =='Fields' then
+                      <th>Type</th>
+#                   end
                     <th>Description</th>
                   </tr>
 #                 for item in items() do
                     <tr>
+#                     if kind == 'Functions' or kind == 'Methods' then
+                        <td class="col-return-type">
+#                         if item.retgroups then
+#                           local groups = item.retgroups
+#                           for i, group in ldoc.ipairs(groups) do
+#                             for r in group:iter() do 
+#                               local type, ctypes = item:return_type(r)
+#                               local returnType = ldoc.typename(type)
+#                               if returnType ~= '' then
+                                  <span class="api-value-type" href=""><a href="#">$(returnType)</a></span>
+#                               end
+#                             end
+#                           end
+#                         end -- end if
+                        </td>
+#                     end
                       <td class="col-icon"><span class="api-$(kind:lower())-icon"></span></td>
-                      <td class="api-member-name"><a href="#$(item.name)">$(display_name(item))</a></td>
+                      <td class="col-name">
+                        <a class="api-member-name" href="#$(item.name)">$(item.name)</a>
+#                       if item.params and METHOD_CALL_TABLE[item.type] then
+                          <span class="api-arguments">
+                            ( <!--
+#                           for parm in iter(item.params) do
+                              --><span class="api-argument">
+#                               local param, sublist = item:subparam(parm)
+#                               if sublist then
+                                  <p>TODO: HANDLE SUBLIST</p>
+#                               end
+#                               for p in iter(param) do
+#                                 local name = item:display_name_of(p)
+#                                 local paramtype = item:type_of_param(p)
+#                                 local tp = ldoc.typename(paramtype)
+#                                 local def = item:default_of_param(p)
+    
+#                                 if tp ~= '' then
+                                    <span class="api-value-type"><a href="">$(tp)</a></span>
+#                                 end
+    
+                                  <span class="api-argument-name">$(name)</span><!--
+#                                 if def and def ~= true then
+                                   --> = <span class="api-value">$(def)</span><!--
+#                                 end
+#                               end
+#                               if sublist then
+                                  --><p>TODO: HANDLE SUBLIST</p><!--
+#                               end
+                              --></span><!--
+#                           end  
+                            --> )
+                          </span>
+#                       end
                       </td>
+
+                      <!-- Properties / Fields type -->
+#                     if kind == 'Properties' or kind =='Fields' then
+                        <td>
+#                         for parm in iter(item.params) do
+#                           local param, sublist = item:subparam(parm)
+#                           for p in iter(param) do
+#                             local paramtype = item:type_of_param(p)
+#                             local tp = ldoc.typename(paramtype)
+#                             if tp ~= '' then
+                                <a class="api-value-type" href="">$(tp)</a>
+#                               break
+#                             end
+#                           end
+#                           break
+#                         end
+                        </td>
+#                     end
                       <td class="api-summary">$(M(item.summary,item))</td>
                     </tr>
 #                 end
                 </table>
 #             end
 #           end
-
+        
           <!-- Raw content -->
           <!-- Currently works for both Functions and Tables. The params field either contains 
           function parameters or table fields.
@@ -98,14 +178,16 @@
 #           for kind, items in module.kinds() do
 #             local kitem = module.kinds:get_item(kind)
 #             local has_description = kitem and ldoc.descript(kitem) ~= ""
-              <h2 class="section-header $(has_description and 'has-description')"><a name="$(no_spaces(kind))"></a>$(kind)</h2>
+#             local is_field = (kind == 'Properties' or kind =='Fields')
+
+              <h2 class="section-header $(has_description and 'has-description')"><a name="$(no_spaces(kind))"></a>$(kind) Descriptions</h2>
               $(M(module.kinds:get_section_description(kind), nil))
 
               <!-- Document module -->
 #             if kitem then
 #                 if has_description then
                     <div class="section-description">
-                    $(M(ldoc.descript(kitem),kitem))
+                    $(M(ldoc.descript(kitem), kitem))
                     </div>
 #                 end
 #                 if kitem.usage then
@@ -117,24 +199,101 @@
               <!-- Document actual items -->
 #             for item in items() do
                 <div>
-                  <h3><span class="api-$(kind:lower())-icon"></span>$(display_name(item))</h3>
-#                 if item.summary then
-                    <p>$(M(item.summary,item))</p>
-#                 end
-                  <p>
+                  <!-- Title -->
+                  <h3>
+                    <!-- Return type -->
+#                   if kind == 'Functions' or kind == 'Methods' then
+                      <span class="col-return-type">
+#                       if item.retgroups then
+#                         local groups = item.retgroups
+#                         for i, group in ldoc.ipairs(groups) do
+#                           for r in group:iter() do 
+#                             local type, ctypes = item:return_type(r)
+#                             local returnType = ldoc.typename(type)
+#                             if returnType ~= '' then
+                                <span class="api-value-type"><a href="">$(returnType)</a></span>
+#                             end
+#                           end
+#                         end
+#                       end -- end if
+                      </span>
+#                   end
+                    
+                    <!-- Icon -->
+                    <span class="api-$(kind:lower())-icon"></span>
 
+                    <!-- Properties / Fields type -->
+#                   if is_field then
+                      <td>
+#                       for parm in iter(item.params) do
+#                         local param, sublist = item:subparam(parm)
+#                         for p in iter(param) do
+#                           local paramtype = item:type_of_param(p)
+#                           local tp = ldoc.typename(paramtype)
+#                           if tp ~= '' then
+                              <a class="api-value-type" href="">$(tp)</a>
+#                             break
+#                           end
+#                         end
+#                         break
+#                       end
+                      </td>
+#                   end
+
+                    $(item.name)
+
+#                   if item.params and METHOD_CALL_TABLE[item.type] then
+                      <span class="api-arguments">
+                        ( <!--
+#                       for parm in iter(item.params) do
+                          --><span class="api-argument">
+#                           local param, sublist = item:subparam(parm)
+#                           if sublist then
+                              <p>TODO: HANDLE SUBLIST</p>
+#                           end
+#                           for p in iter(param) do
+#                             local name = item:display_name_of(p)
+#                             local paramtype = item:type_of_param(p)
+#                             local tp = ldoc.typename(paramtype)
+#                             local def = item:default_of_param(p)
+
+#                             if tp ~= '' then
+                                <a class="api-value-type" href="">$(tp)</a>
+#                             end
+
+                              <span class="api-argument-name">$(name)</span><!--
+#                             if def and def ~= true then
+                               --> = <span class="api-value">$(def)</span><!--
+#                             end
+#                           end
+#                           if sublist then
+                              --><p>TODO: HANDLE SUBLIST</p><!--
+#                           end
+                          --></span><!--
+#                       end  
+                        --> )
+                      </span>
+#                   end
+                  </h3>
+#                 if item.description then
+                    <p>$(M(item.summary, item)) $(M(item.description, item))</p>
+#                 elseif item.summary then
+                    <p>$(M(item.summary, item))</p>
+#                 elseif item.description then
+                    <p>$(M(item.description, item))</p>
+#                 end
 #                 if ldoc.custom_tags then
                     <!-- TODO: Insert custom tags here -->
                     <p>Custom tags are not supported</p>
 #                 end
                   
                   <!-- Params -->
-#                 if show_parms and item.params and #item.params > 0 then
+#                 if show_parms and item.params and #item.params > 0 and not is_field then
 #                   local subnames = module.kinds:type_of(item).subnames
 #                   if subnames then
-                      <h4>$(subnames):</h4>
+                      <h4>$(subnames)</h4>
 #                   end
-                    <ul>
+                    <ul class="parameter-list">
 #                     for parm in iter(item.params) do
 #                       local param, sublist = item:subparam(parm)
 #                       if sublist then
@@ -148,18 +307,21 @@
 #                         local tp = ldoc.typename(item:type_of_param(p))
 #                         local def = item:default_of_param(p)
                           <li>
-                            <span class="parameter">$(name)</span>
-#                           if tp ~= '' then
-                              <span class="types">$(tp)</span>
-#                           end
-                            $(M(item.params.map[p],item))
-
-#                           if def == true then
-                              (<em>optional</em>)
-#                           elseif def then
-                              (<em>default</em> $(def))
-#                           end
-
+                            <span class="parameter">
+#                             if tp ~= '' then
+                                <a class="api-value-type" href="#">$(tp)</a>
+#                             end
+                              <em>$(name)</em><!--
+#                             if def == true then
+                                --> = nil<!--
+#                             elseif def then
+                                --> = $(def)<!--
+#                             end
+#                             if item.params.map[p] ~= '' then
+                                -->:$(M(item.params.map[p], item))<!--
+#                             end
+                            --></span>
+#
 #                           if item:readonly(p) then
                               <em>readonly</em>
 #                           end
@@ -173,20 +335,25 @@
                     </ul>
 #                 end
                   
-                  <!-- returns -->
-#                 if show_return and item.retgroups then local groups = item.retgroups
+                  <!-- Returns -->
+#                 if show_return and item.retgroups then 
 #                   local groups = item.retgroups
-                    <h4>Returns:</h4>
-                    <ol>
+                    <h4>Returns</h4>
+                    <ul class="parameter-list">
 #                     for i, group in ldoc.ipairs(groups) do
 #                       for r in group:iter() do 
 #                         local type, ctypes = item:return_type(r)
-#                         local rt = ldoc.typename(type)
+#                         local returnType = ldoc.typename(type)
                           <li>
-#                           if rt ~= '' then
-                              <span class="types">$(rt)</span>
+#                           if returnType ~= '' then
+                              <span class="types">
+                                <a href="">$(returnType)</a><!--
+#                               if r.text ~= '' then
+                                  -->:<!--
+#                               end
+                              --></span>
 #                           end
-                            $(M(r.text,item))
+                            $(M(r.text, item))
                           </li>
 #                         if ctypes then
 #                           for c in ctypes:iter() do
@@ -202,7 +369,7 @@
                          <h5>Or</h5>
 #                       end
 #                     end
-                    </ol>
+                    </ul>
 #                 end
                   <!-- Raises -->
 #                 if show_return and item.raise then
@@ -212,16 +379,19 @@
 
                   <!-- Item usage -->
 #                 if item.usage then
-                    <h4>Usage:</h3>
-#                   for usage in iter(item.usage) do
-                      <pre class="example">$(ldoc.escape(usage))</pre>
-#                   end
+                    <h4>Usage</h4>
+                    <div>
+#                     for usage in iter(item.usage) do
+                        <pre class="example">$(ldoc.escape(usage))</pre>
+#                     end
+                    </div>
 #                 end
 
 
                 </div>
 #             end
 #           end
+            </div>
 
           </div>
 #       else -- Project index, no module!
@@ -259,7 +429,7 @@
       <div>
         <ul>
           <li><a href="/api">Main</a></li>
-          <li><a href="https://github.com/Quenty/NevermoreEngine">Github</a></li>
+          <li><a href="https://github.com/Quenty/NevermoreEngine">Source</a></li>
           <li><a href="https://www.roblox.com/">Roblox</a></li>
         </ul>
       </div>
