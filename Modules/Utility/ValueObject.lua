@@ -18,10 +18,10 @@ function ValueObject.new()
 	local self = setmetatable({}, ValueObject)
 	
 	--- The value of the ValueObject
-	-- @property Value 
+	-- @field Value 
 
 	--- Event fires when the value's object value change
-	-- @event Changed
+	-- @signal Changed
 	-- @param NewValue The new value
 	-- @param OldValue The old value
 	self.Changed = Signal.new() -- :Fire(NewValue, OldValue)
