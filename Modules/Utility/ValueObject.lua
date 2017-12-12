@@ -14,16 +14,19 @@ local Signal = LoadCustomLibrary("Signal")
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
 
+--- Constructs a new value object
+-- @constructor
+-- @treturn ValueObject
 function ValueObject.new()
 	local self = setmetatable({}, ValueObject)
 	
 	--- The value of the ValueObject
-	-- @field Value 
+	-- @tfield Variant Value 
 
 	--- Event fires when the value's object value change
 	-- @signal Changed
-	-- @param NewValue The new value
-	-- @param OldValue The old value
+	-- @tparam Variant NewValue The new value
+	-- @tparam Variant OldValue The old value
 	self.Changed = Signal.new() -- :Fire(NewValue, OldValue)
 	
 	return self

@@ -17,6 +17,8 @@ ClipCharacters.__index = ClipCharacters
 ClipCharacters.CollisionGroupName = "ClipCharacters"
 
 --- Initialize on server
+-- @constructor
+-- @treturn nil
 function ClipCharacters.initServer()
 	local GroupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.CollisionGroupName, "Default", false)
@@ -28,6 +30,8 @@ function ClipCharacters.initServer()
 end
 
 --- Initialize clipping on the client. Returns a new inst
+-- @constructor
+-- @treturn ClipCharacters
 function ClipCharacters.new()
 	local self = setmetatable({}, ClipCharacters)
 
@@ -120,6 +124,7 @@ function ClipCharacters:BindUpdatesYielding()
 end
 
 --- Stop clipping on client
+-- @treturn nil
 function ClipCharacters:Destroy()
 	self.Maid:DoCleaning()
 	self.Maid = nil
