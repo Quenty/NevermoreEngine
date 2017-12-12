@@ -7,10 +7,12 @@ local Maid = {}
 Maid.ClassName = "Maid"
 
 --- Returns a new Maid object
+-- @constructor Maid.new()
+-- @treturn Maid
 function Maid.new()
 	local self = {}
 	
-	self.Tasks = {}
+	self._tasks = {}
 	
 	return setmetatable(self, Maid)
 end
@@ -18,11 +20,11 @@ Maid.MakeMaid = Maid.new
 
 --- Returns Maid[key] if not part of Maid metatable
 -- @return Maid[key] value
-function Maid:__index(Index)
-	if Maid[Index] then
-		return Maid[Index]
+function Maid:__index(index)
+	if Maid[index] then
+		return Maid[index]
 	else
-		return self.Tasks[Index]
+		return self._tasks[index]
 	end
 end
 
@@ -33,60 +35,60 @@ end
 -- Maid[key] = (Maid)                Maids can act as an event connection, allowing a Maid to have other maids to clean up.
 -- Maid[key] = (Object)              Maids can cleanup objects with a `Destroy` method
 -- Maid[key] = nil                   Removes a named task. If the task is an event, it is disconnected. If it is an object, it is destroyed.
-function Maid:__newindex(Index, NewTask)
-	if Maid[Index] ~= nil then
-		error(("'%s' is reserved"):format(tostring(Index)), 2)
+function Maid:__newindex(index, newTask)
+	if Maid[index] ~= nil then
+		error(("'%s' is reserved"):format(tostring(index)), 2)
 	end
 	
-	local Tasks = self.Tasks
-	local OldTask = Tasks[Index]
-	Tasks[Index] = NewTask
+	local tasks = self._tasks
+	local oldTask = tasks[index]
+	tasks[index] = newTask
 
-	if OldTask then
-		if type(OldTask) == "function" then
-			OldTask()
-		elseif typeof(OldTask) == "RBXScriptConnection" then
-			OldTask:disconnect()
-		elseif OldTask.Destroy then
-			OldTask:Destroy()
+	if oldTask then
+		if type(oldTask) == "function" then
+			oldTask()
+		elseif typeof(oldTask) == "RBXScriptConnection" then
+			oldTask:disconnect()
+		elseif oldTask.Destroy then
+			oldTask:Destroy()
 		end
 	end
 end
 
 --- Same as indexing, but uses an incremented number as a key.
--- @param Task An item to clean
--- @return int TaskId
-function Maid:GiveTask(Task)
-	local TaskId = #self.Tasks+1
-	self[TaskId] = Task
-	return TaskId
+-- @param task An item to clean
+-- @treturn number taskId
+function Maid:GiveTask(task)
+	local taskId = #self._tasks+1
+	self[taskId] = task
+	return taskId
 end
 
 --- Cleans up all tasks.
 -- @alias Destroy
 function Maid:DoCleaning()
-	local Tasks = self.Tasks
+	local tasks = self._tasks
 
 	-- Disconnect all events first as we know this is safe
-	for Index, Task in pairs(Tasks) do
-		if typeof(Task) == "RBXScriptConnection" then
-			Tasks[Index] = nil
-			Task:disconnect()
+	for index, task in pairs(tasks) do
+		if typeof(task) == "RBXScriptConnection" then
+			tasks[index] = nil
+			task:disconnect()
 		end
 	end
 
 	-- Clear out tasks table completely, even if clean up tasks add more tasks to the maid
-	local Index, Task = next(Tasks)
-	while Task ~= nil do
-		Tasks[Index] = nil
-		if type(Task) == "function" then
-			Task()
-		elseif typeof(Task) == "RBXScriptConnection" then
-			Task:disconnect()
-		elseif Task.Destroy then
-			Task:Destroy()
+	local index, task = next(tasks)
+	while task ~= nil do
+		tasks[index] = nil
+		if type(task) == "function" then
+			task()
+		elseif typeof(task) == "RBXScriptConnection" then
+			task:disconnect()
+		elseif task.Destroy then
+			task:Destroy()
 		end
-		Index, Task = next(Tasks)
+		index, task = next(tasks)
 	end
 end
 
