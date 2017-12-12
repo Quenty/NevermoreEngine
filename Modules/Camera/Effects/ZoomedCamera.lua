@@ -1,3 +1,14 @@
+--- Allow freedom of movement around a current place, much like the classic script works now.
+-- Not intended to be use with the current character script
+-- Intended to be used with a SummedCamera, relative.
+-- @classmod ZoomedCamera
+-- @usage
+-- local Zoom = ZoomedCamera.new()
+-- Zoom.Zoom = 30 -- Distance from original point
+-- Zoom.MaxZoom = 100 -- Max distance away
+-- Zoom.MinZoom = 0.5 -- Min distance away
+-- Assigning .Zoom will automatically clamp
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
@@ -6,20 +17,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local CameraState = LoadCustomLibrary("CameraState")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
 
--- Intent: Allow freedom of movement around a current place, much like the classic script works now.
--- Not intended to be use with the current character script
-
--- Intended to be used with a SummedCamera, relative.
-
---[[ API
-
-	local Zoom = ZoomedCamera.new()
-	Zoom.Zoom = 30 -- Distance from original point
-	Zoom.MaxZoom = 100 -- Max distance away
-	Zoom.MinZoom = 0.5 -- Min distance away
-
-	-- Assigning .Zoom will automatically clamp
-]]
 
 local ZoomedCamera = {}
 ZoomedCamera.ClassName = "ZoomedCamera"

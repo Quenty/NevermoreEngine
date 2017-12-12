@@ -1,3 +1,7 @@
+-- Hack to maintain default camera control by binding before and after the camera update cycle
+-- This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme
+-- @classmod DefaultCamera
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -9,9 +13,6 @@ local SummedCamera = LoadCustomLibrary("SummedCamera")
 
 local DefaultCamera = {}
 DefaultCamera.ClassName = "DefaultCamera"
-
--- Intent: Hack to maintain default camera control by binding before and after the camera update cycle
--- This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme
 
 function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)

@@ -1,3 +1,6 @@
+--- Add another layer of effects that can be faded in/out
+-- @classmod FadingCamera
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
@@ -6,8 +9,6 @@ local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 local CameraState = LoadCustomLibrary("CameraState")
 local Spring = LoadCustomLibrary("Spring")
 local SummedCamera = LoadCustomLibrary("SummedCamera")
-
--- Intent: Add another layer of effects that can be faded in/out
 
 local FadingCamera = {}
 FadingCamera.ClassName = "FadingCamera"
