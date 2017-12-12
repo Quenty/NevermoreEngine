@@ -109,7 +109,7 @@
 #                     end
                       <td class="col-icon"><span class="api-$(kind:lower())-icon"></span></td>
                       <td class="col-name">
-                        <a class="api-member-name" href="#$(item.name)">$(item.name)</a>
+                        <a class="api-member-name" href="#$(item.name)">$(item.name:gsub("^%w+[:]", ""))</a>
 #                       if item.params and METHOD_CALL_TABLE[item.type] then
                           <span class="api-arguments">
                             ( <!--
