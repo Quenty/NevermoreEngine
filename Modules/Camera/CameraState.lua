@@ -51,7 +51,7 @@ function CameraState.new(Cam)
 end
 
 --- Current FieldOfView
--- @tfield number FieldOfView 
+-- @tfield number FieldOfView
 
 --- Current CFrame
 -- @tfield CFrame CFrame
@@ -80,7 +80,7 @@ function CameraState:__sub(Other)
 	local New = CameraState.new(self)
 	New.FieldOfView = self.FieldOfView - Other.FieldOfView
 	New.Position = New.Position - Other.Position
-	New.Quaterion = self.Quaterion/Otcamher.Quaterion
+	New.Quaterion = self.Quaterion/Other.Quaterion
 
 	return New
 end
