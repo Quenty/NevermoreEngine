@@ -8,9 +8,12 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-assert(script:IsA("ModuleScript"), "Invalid script type. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
-assert(script.Name == "NevermoreEngine", "Invalid script name. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
-assert(script.Parent == ReplicatedStorage, "Invalid parent. For NevermoreEngine to work correctly, it should be a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
+assert(script:IsA("ModuleScript"), "Invalid script type. For NevermoreEngine to work correctly, it should be " ..
+	"a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
+assert(script.Name == "NevermoreEngine", "Invalid script name. For NevermoreEngine to work correctly, it should be " ..
+	"a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
+assert(script.Parent == ReplicatedStorage, "Invalid parent. For NevermoreEngine to work correctly, it should be " ..
+	"a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
 
 --- Handles yielded operations by caching the retrieval process
 local function _handleRetrieving(Retrieving, Function, Argument)
@@ -23,7 +26,7 @@ local function _handleRetrieving(Retrieving, Function, Argument)
 		if Result ~= nil and Result then
 			return Result
 		end
-		
+
 		Signal.Event:Wait()
 		return Result
 	end
@@ -78,7 +81,9 @@ local function _retrieve(Parent, ClassName)
 			return Resource
 		end
 
-		warn(("Warning: No '%s' found, be sure to require '%s' on the server. Yielding for '%s'"):format(tostring(Name), tostring(Name), ClassName))
+		warn(("Warning: No '%s' found, be sure to require '%s' on the server. Yielding for '%s'")
+			:format(tostring(Name), tostring(Name), ClassName))
+
 		return Parent:WaitForChild(Name)
 	end
 end
@@ -88,7 +93,9 @@ local function _getRepository(GetSubFolder)
 		local RepositoryFolder = ServerScriptService:FindFirstChild("Nevermore")
 
 		if not RepositoryFolder then
-			warn("Warning: No repository of Nevermore modules found (Expected in ServerScriptService with name \"Nevermore\"). Library retrieval will fail.")
+			warn("Warning: No repository of Nevermore modules found (Expected in ServerScriptService with name \"Nevermore\")" ..
+				". Library retrieval will fail.")
+
 			RepositoryFolder = Instance.new("Folder")
 			RepositoryFolder.Name = "Nevermore"
 		end
@@ -101,11 +108,11 @@ end
 
 local function _getLibraryCache(RepositoryFolder)
 	local LibraryCache = {}
-	
+
 	for _, Child in pairs(RepositoryFolder:GetDescendants()) do
 		if Child:IsA("ModuleScript") and not Child:FindFirstAncestorOfClass("ModuleScript") then
 			if LibraryCache[Child.Name] then
-				error(("Error: Duplicate name of '%s' already exists"):format(Child.Name))
+				warn(("Warning: Duplicate name of '%s' already exists! Using first found!"):format(Child.Name))
 			end
 
 			LibraryCache[Child.Name] = Child
@@ -115,7 +122,7 @@ local function _getLibraryCache(RepositoryFolder)
 	return LibraryCache
 end
 
-local function _replicateRepository(ReplicationFolder, LibraryCache)	
+local function _replicateRepository(ReplicationFolder, LibraryCache)
 	for Name, Library in pairs(LibraryCache) do
 		if not Name:lower():find("server") then
 			Library.Parent = ReplicationFolder
@@ -130,7 +137,7 @@ local function _debugLoading(Function)
 	return function(Module, ...)
 		Count = Count + 1
 		local LibraryID = Count
-		
+
 		if DEBUG_MODE then
 			print(("\t"):rep(RequestDepth), LibraryID, "Loading: ", Module)
 			RequestDepth = RequestDepth + 1
@@ -181,13 +188,13 @@ local Nevermore = {}
 Nevermore.LoadLibrary = _asyncCache(_debugLoading(_getLibraryLoader(LibraryCache)))
 
 --- Get a remote event
--- @function GetRemoteEvent 
+-- @function GetRemoteEvent
 -- @tparam string RemoteEventName
--- @treturn RemoteEvent RemoteEvent 
+-- @treturn RemoteEvent RemoteEvent
 Nevermore.GetRemoteEvent = _asyncCache(_retrieve(GetSubFolder("RemoteEvents"), "RemoteEvent"))
 
 --- Get a remote function
--- @function GetRemoteFunction 
+-- @function GetRemoteFunction
 -- @tparam string RemoteFunctionName
 -- @treturn RemoteFunction RemoteFunction
 Nevermore.GetRemoteFunction = _asyncCache(_retrieve(GetSubFolder("RemoteFunctions"), "RemoteFunction"))
