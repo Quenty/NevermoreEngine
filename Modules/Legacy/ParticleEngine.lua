@@ -344,7 +344,7 @@ local function RealMakeEngine(Screen)
 				Particle.TablePosition = Index
 				HandleParticleUpdate(Camera, CameraInverse, Frame, Particle, t, dt)
 			else
-				Frame.Parent = nil -- Instead of .Visible, it's faster on the rendering side. (99% sure) 
+				Frame.Parent = nil -- Instead of .Visible, it's faster on the rendering side. (99% sure)
 			end
 		end
 
