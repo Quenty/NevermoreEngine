@@ -1,13 +1,5 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems = LoadCustomLibrary("qSystems")
-
-local Make = qSystems.Make
--- Intent: Make frames that allow relative placement of components.
--- @author Quenty
+--- Make frames that allow relative placement of components.
+-- @classmod RelativePosition
 
 local RelativeFrameBuilder = {}
 RelativeFrameBuilder.__index = RelativeFrameBuilder
@@ -80,15 +72,16 @@ function RelativeFrameBuilder:Create()
 		warn("[RelativeFrameBuilder] May be creating nil parented RelativeFrame\n" .. debug.traceback())
 	end
 	
-	return Make("Frame", {
-		BorderSizePixel = 0;
-		BackgroundTransparency = 1;
-		Parent = self.Parent; -- may be nil
-		Size = UDim2.new(1, 0, 1, 0);
-		Position = UDim2.new(self.RelativePosition.X, 0, self.RelativePosition.Y, 0);
-		Name = self.Name;
-		SizeConstraint = self.SizeConstraint;
-	})
+	local Frame = Instance.new("Frame")
+	Frame.BorderSizePixel = 0
+	Frame.BackgroundTransparency = 1
+	Frame.Size = UDim2.new(1, 0, 1, 0)
+	Frame.Position = UDim2.new(self.RelativePosition.X, 0, self.RelativePosition.Y, 0)
+	Frame.Name = self.Name
+	Frame.SizeConstraint = self.SizeConstraint
+	Frame.Parent = self.Parent -- may be nil
+
+	return Frame
 end
 
 
