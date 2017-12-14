@@ -2,52 +2,7 @@ local HttpService = game:GetService("HttpService")
 
 local lib = {}
 
---[[
-local function RecurseGetBoundingBox(object,sides)
-	-- Credit to Anaminus, I have a general understanding on how this works. Basically, 
-	-- It would appear it loops through each part, and finds that part's bounding box.  
-	-- It then expands the "global" bounding box to the correct size. 
-
-	-- I think. Anyway, it finds the bounding box of the object in question.
-
-	if object:IsA("BasePart") then
-		local mod = object.Size/2
-		local rot = object.CFrame
-		for i = 1,#bb_points do
-			local point = rot*CFrame.new(mod*bb_points[i]).p
-			if point.x > sides[1] then sides[1] = point.x end
-			if point.x < sides[2] then sides[2] = point.x end
-			if point.y > sides[3] then sides[3] = point.y end
-			if point.y < sides[4] then sides[4] = point.y end
-			if point.z > sides[5] then sides[5] = point.z end
-			if point.z < sides[6] then sides[6] = point.z end
-		end
-		-- if parts then parts[#parts + 1] = object end
-	end
-	local children = object:GetChildren()
-	for i = 1,#children do
-		RecurseGetBoundingBox(children[i],sides,parts)
-	end
-end
-
-local function GetBoundingBox(objects,return_parts)
-	local sides = {-math.huge;math.huge;-math.huge;math.huge;-math.huge;math.huge}
-	local parts
-	if return_parts then
-		parts = {}
-	end
-	for i = 1,#objects do
-		RecurseGetBoundingBox(objects[i],sides,parts)
-	end
-	return
-		Vector3.new(sides[1]-sides[2],sides[3]-sides[4],sides[5]-sides[6]),
-		Vector3.new((sides[1]+sides[2])/2,(sides[3]+sides[4])/2,(sides[5]+sides[6])/2),
-		parts
-end
-lib.GetBoundingBox = GetBoundingBox
-lib.getBoundingBox = GetBoundingBox--]]
-
-local BouncingBoxPoints = { -- Bouding box posiitions. 
+local BOUNDING_BOX_POINTS = { -- Bouding box posiitions.
 	Vector3.new(-1,-1,-1);
 	Vector3.new( 1,-1,-1);
 	Vector3.new(-1, 1,-1);
@@ -66,7 +21,7 @@ local function GetBoundingBox(Objects, RelativeTo)
 		local HalfSize = BasePart.Size/2
 		local Rotation = RelativeTo:toObjectSpace(BasePart.CFrame)
 
-		for _, BoundingBoxPoint in pairs(BouncingBoxPoints) do
+		for _, BoundingBoxPoint in pairs(BOUNDING_BOX_POINTS) do
 			local Point = Rotation*CFrame.new(HalfSize*BoundingBoxPoint).p
 
 			if Point.x > Sides[1] then Sides[1] = Point.x end
@@ -101,7 +56,7 @@ local function DecodeCFrame(Data)
 	--- decode's a previously encoded CFrameValue.
 	
 	if Data then
-		local DecodedData = HttpService:JSONDecode(Data) --RbxUtility.DecodeJSON(Data)
+		local DecodedData = HttpService:JSONDecode(Data)
 		if DecodedData then
 			return CFrame.new(unpack(DecodedData))
 		else
@@ -664,36 +619,6 @@ end
 lib.FindFaceFromCoord = FindFaceFromCoord
 lib.findFaceFromCoord = FindFaceFromCoord
 
---[[ EXAMPLE
-
-local function CreateScorch(part, hit)
-	local scorch = Modify(Instance.new("Part"), {
-		Name         = 'SpotWeld_Scorch';
-		FormFactor   = 'Custom';
-		CanCollide   = false;
-		Anchored     = true;
-		Size         = Vector3.new(2, 0.1, 2);
-		Transparency = 1;
-		Modify(Instance.new("Decal"), {
-			Face    = 'Top',
-			Texture = 'http://www.roblox.com/asset/?id=22915150',
-			Shiny   = 0,
-		});
-	});
-
-	scorch.Parent = BulletHolder;
-	local hitFace = FindFaceFromCoord(part.Size, part.CFrame:toObjectSpace(CFrame.new(hit)))
-	local dir = (part.CFrame-part.Position)*Vector3.FromNormalId(hitFace)
-	if part:IsA('Terrain') then
-		scorch.CFrame = CFrame.new(hit)
-	else
-		scorch.CFrame = CFrame.new(hit, hit+dir)*CFrame.Angles(-math.pi/2, 0, 0)
-	end
-
-	game.Debris:AddItem(scorch, 15)
-end
---]]
-
 local function GetCFramePitch(Angle)
 	-- returns CFrame.Angles(Angle, 0, 0) 
 
@@ -867,31 +792,6 @@ local function LookCFrame(c,v,t)
 	return l and c*CFrame.new(0,0,0,l.y,-l.x,0,-l.z) or c
 end
 lib.LookCFrame = LookCFrame
-
---[[
-local function RawVectorClosestPointOnRayAToRayB(aox,aoy,aoz,adx,ady,adz,box,boy,boz,bdx,bdy,bdz)--AOrigin x,y,z,ADirection x,y,z,BOrigin x,y,z,BDirection x,y,z
-	-- Trey Reynolds. Finds the closest point on RayA to RayB
-
-	-- Untested. Mostly. Should work according to trey, tested once. 
-
-
-	local bda,bdb=bdx*adx+bdy*ady+bdz*adz,bdx*bdx+bdy*bdy+bdz*bdz--BDirectionDotADirection,BDirectionDotBDirection
-	local nx,ny,nz=bda*bdx-bdb*adx,bda*bdy-bdb*ady,bda*bdz-bdb*adz--Normal x,y,z
-	local d=((aox-box)*nx+(aoy-boy)*ny+(aoz-boz)*nz)/(adx*nx+ady*ny+adz*nz)--Distance
-	return aox-d*adx,aoy-d*ady,aoz-d*adz
-end
-
-local function VectorClosestPointOnRayAToRayB(RayA, RayB)
-	local OriginA, DirectionA = RayA.Origin, Direction
-	local OriginB, DirectionB = RayB.Origin, Direction
-
-	return Vector3.new(RawVectorClosestPointOnRayAToRayB(
-		OriginA.x, OriginA.y, OriginA.z,
-		DirectionA.x, DirectionA.y, DirectionA.z,
-		OriginB.x, OriginB.y, OriginB.z,
-		DirectionB.x, DirectionB.y, DirectionB.z
-	))
-end--]]
 
 do
 	local Dot = Vector3.new().Dot
