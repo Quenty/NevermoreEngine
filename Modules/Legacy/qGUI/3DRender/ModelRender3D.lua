@@ -56,20 +56,18 @@ end
 function ModelRender3D:GetPrimaryCFrame()
 	if self.Gui and self.Model then
 		local Frame = self.Gui
-		--local ModelSize = self.Model:GetExtentsSize() * self.Scale
-		local ModelSize = self.PrimaryPart.Size * self.Scale
 		
 		local FrameAbsoluteSize = Frame.AbsoluteSize
-		local FrameCenter = Frame.AbsolutePosition + FrameAbsoluteSize/2 -- Center of the frame. 
+		local FrameCenter = Frame.AbsolutePosition + FrameAbsoluteSize/2 -- Center of the frame.
 		
-		local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, math.max(ModelSize.X, ModelSize.Y, ModelSize.Z))--math.max(ModelSize.X, ModelSize.Z))
+		local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, self:GetModelWidth())
 		
 		local Position = ScreenSpace.ScreenToWorld(FrameCenter.X, FrameCenter.Y, Depth)
-		local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame * 
-		                      CFrame.new(Position)--[[ * -- Transform by camera coordinates
-		                      CFrame.new(0, 0, -ModelSize.Z/2) -- And take out the part size factor. --]]
 		
-		return AdorneeCFrame * self.RelativeRotation
+		local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame
+			* (CFrame.new(Position, Vector3.new(0, 0, 0)) * self.RelativeRotation)
+
+		return AdorneeCFrame
 	else
 		warn("ModelRender3D cannot update model render, GUI or model aren't there.")
 	end
