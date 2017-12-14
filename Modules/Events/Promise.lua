@@ -29,7 +29,7 @@ local function _isSignal(Value)
 end
 
 local function _isPromise(Value)
-	if type(Value) == "table" and Promise.ClassName == "Promise" then
+	if type(Value) == "table" and Value.ClassName == "Promise" then
 		return true
 	end
 	return false
