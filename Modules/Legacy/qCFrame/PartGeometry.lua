@@ -76,7 +76,7 @@ function GetShape(part)
         return 'Terrain', UniformScale
     elseif part:IsA('TrussPart') then
         return 'Brick', UniformScale
-    elseif part:IsA("UnionOperation") then
+    elseif part:IsA("UnionOperation") or part:IsA("MeshPart") then
         -- Yeah, can't do too much about this. :/
         return 'Brick', UniformScale
     else
@@ -460,6 +460,7 @@ function GetGeometry(part, hit, cframeOverride)
         edges = edges;
         faces = faces;
         vertexMargin = vertexMargin or math.min(sx, sy, sz)*2;
+        cframe = cf;
     }
     --
     local geomId = 0
@@ -979,7 +980,7 @@ local function fillFace(parent, face, color, trans)
                \   cut   /       / Direction edges point in:
            edg3 \       / edg2  /        (clockwise)
                  \     /      |/
-                  \<- /       ¯¯
+                  \<- /       /
                    \ /
                     C
         --]]
