@@ -12,7 +12,7 @@ GUIRender3D.ClassName = "GUIRender3D"
 -- Renders a frame and its descendants in 3D space.
 -- @author Quenty
 
-function GUIRender3D.new(Frame)
+function GUIRender3D.new()
 	local self = setmetatable({}, GUIRender3D)
 	
 	self.Depth = -10 -- studs
@@ -109,7 +109,7 @@ function GUIRender3D:GetPrimaryCFrame()
 
 	return workspace.CurrentCamera.CoordinateFrame *
           CFrame.new(Position) * -- Transform by camera coordinates
-          CFrame.new(0, 0, -self.Part.Size.Z/2) -- And take out the part size factor. 
+          CFrame.new(0, 0, -self.Part.Size.Z/2) -- And take out the part size factor.
 end
 
 function GUIRender3D:Update(RelativeCFrame)
