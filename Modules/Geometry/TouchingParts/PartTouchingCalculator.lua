@@ -1,3 +1,6 @@
+--- Determines if parts are touching or not
+-- @classmod PartTouchingCalculator
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 
@@ -5,10 +8,7 @@ local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local qCFrame = LoadCustomLibrary("qCFrame")
-local qInstance = LoadCustomLibrary("qInstance")
 local CharacterUtil = LoadCustomLibrary("CharacterUtil")
-
--- Intent: Determines if parts are touching or not
 
 local PartTouchingCalculator = {}
 PartTouchingCalculator.__index = PartTouchingCalculator
@@ -26,7 +26,13 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(Humanoid, Parts)
 	assert(Humanoid)
 	assert(Parts, "Must have parts")
 	
-	local HumanoidParts = qInstance.GetBricks(Humanoid.Parent)
+	local HumanoidParts = {}
+	for _, Item in pairs(Humanoid:GetDesendants()) do
+		if Item:IsA("BasePart") then
+			table.insert(HumanoidParts, Item)
+		end
+	end
+
 	if #HumanoidParts == 0 then
 		warn("[BoatPlacer][CheckIfTouchingHumanoid] - #Parts == 0, retrieved from humanoid")
 		return false
@@ -35,9 +41,9 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(Humanoid, Parts)
 	local DummyPart = self:GetCollidingPartFromParts(HumanoidParts)
 	
 	local PreviousProperties = {}
-	local ToSet = { 
-		CanCollide = true; 
-		Anchored = false; 
+	local ToSet = {
+		CanCollide = true;
+		Anchored = false;
 	}
 	local PartSet = {}
 	for _, Part in pairs(Parts) do
@@ -91,7 +97,7 @@ function PartTouchingCalculator:GetCollidingPartFromParts(Parts, RelativeTo, Pad
 	return DummyPart
 end
 
-function PartTouchingCalculator:GetTouchingBoundingBox(Parts, RelativeTo, Padding)	
+function PartTouchingCalculator:GetTouchingBoundingBox(Parts, RelativeTo, Padding)
 	local Dummy = self:GetCollidingPartFromParts(Parts, RelativeTo, Padding)
 	local Touching = Dummy:GetTouchingParts()
 	Dummy:Destroy()
@@ -104,8 +110,8 @@ function PartTouchingCalculator:GetTouchingHull(Parts, Padding)
 	local HitParts = {}
 	
 	for _, Part in pairs(Parts) do
-		for _, Part in pairs(self:GetTouching(Part, Padding)) do
-			HitParts[Part] = true
+		for _, TouchingPart in pairs(self:GetTouching(Part, Padding)) do
+			HitParts[TouchingPart] = true
 		end
 	end
 
@@ -123,7 +129,7 @@ end
 -- @param Padding studs of padding around the part
 function PartTouchingCalculator:GetTouching(BasePart, Padding)
 	Padding = Padding or 2
-	local Copy 
+	local Copy
 	
 	if BasePart:IsA("TrussPart") then
 		-- Truss parts can't be resized
@@ -177,6 +183,7 @@ function PartTouchingCalculator:GetTouchingHumanoids(TouchingList)
 	for Humanoid, Data in pairs(TouchingHumanoids) do
 		table.insert(List, Data)
 	end
+
 	return List
 end
 
