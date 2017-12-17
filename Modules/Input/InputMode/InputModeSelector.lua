@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local Maid.new = LoadCustomLibrary("Maid").Maid.new
+local Maid = LoadCustomLibrary("Maid")
 local ValueObject = LoadCustomLibrary("ValueObject")
 
 -- Intent: Selects the most recent input mode and attempts to
@@ -22,7 +22,7 @@ function InputModeSelector.new(inputModeList, updateBindFunction)
 	if inputModeList then
 		self:WithInputModeList(inputModeList)
 	end
-	
+
 	if updateBindFunction then
 		self:BindUpdate(updateBindFunction)
 	end
