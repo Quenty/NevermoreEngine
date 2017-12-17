@@ -11,66 +11,74 @@ local InputMode = {}
 InputMode.__index = InputMode
 InputMode.ClassName = "InputMode"
 
-function InputMode.new(Valid)
+function InputMode.new(name)
 	local self = setmetatable({}, InputMode)
 	
-	self.LastEnabled = 0
+	self._lastEnabled = 0
+	self._valid = {}
+
+	self.Name = name or "Unnamed"
+
+	--- Fires off when the mode is enabled
+	-- @signal Enabled
 	self.Enabled = Signal.new()
-	self.Valid = Valid or {}
 	
 	return self
 end
 
 function InputMode:GetLastEnabledTime()
-	return self.LastEnabled
+	return self._lastEnabled
 end
 
 -- @param Keys A string for ease of use, or a table of keys
 -- @param [EnumSet] The enum set to pull from. Defaults to KeyCode.
-function InputMode:AddKeys(Keys, EnumSet)
-	EnumSet = EnumSet or Enum.KeyCode
+function InputMode:AddKeys(keys, enumSet)
+	enumSet = enumSet or Enum.KeyCode
 	
-	if type(Keys) == "string" then
-		local NewKeys = {}
-		for Key in Keys:gmatch("%w+") do
-			NewKeys[#NewKeys+1] = Key
+	if type(keys) == "string" then
+		local newKeys = {}
+		for key in keys:gmatch("%w+") do
+			table.insert(newKeys, key)
 		end
-		Keys = NewKeys
+		keys = newKeys
 	end
 	
-	for _, Key in pairs(Keys) do
-		if type(Key) == "string" then
-			Key = EnumSet[Key]
+	for _, key in pairs(keys) do
+		if type(key) == "string" then
+			key = enumSet[key]
 		end
 		
-		self.Valid[Key] = true;
+		self._valid[key] = true
 	end
 	
 	return self
 end
 
 function InputMode:GetKeys()
-	local Keys = {}
-	for Key, _ in pairs(self.Valid) do
-		Keys[#Keys+1] = Key
+	local keys = {}
+	for key, _ in pairs(self._valid) do
+		table.insert(keys, key)
 	end
-	return Keys
+	return keys
 end
 
--- @param InputType Maybe be a UserInputType or KeyCode
-function InputMode:IsValid(InputType)
-	assert(InputType, "Must send in InputType")
+---
+-- @param inputType May be a UserInputType or KeyCode
+function InputMode:IsValid(inputType)
+	assert(inputType, "Must send in inputType")
 	
-	return self.Valid[InputType]
+	return self._valid[inputType]
 end
 
+--- Enables the mode
 function InputMode:Enable()
-	self.LastEnabled = tick()
+	self._lastEnabled = tick()
 	self.Enabled:fire()
 end
 
-function InputMode:Evaluate(InputObject)
-	if self:IsValid(InputObject.UserInputType) or self:IsValid(InputObject.KeyCode) then
+--- Evaluates the input object, and if it's valid, enables the mode
+function InputMode:Evaluate(inputObject)
+	if self:IsValid(inputObject.UserInputType) or self:IsValid(inputObject.KeyCode) then
 		self:Enable()
 	end
 end

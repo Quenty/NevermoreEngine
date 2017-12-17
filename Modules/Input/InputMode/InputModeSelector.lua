@@ -3,8 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local Signal = LoadCustomLibrary("Signal")
+local Maid.new = LoadCustomLibrary("Maid").Maid.new
 local ValueObject = LoadCustomLibrary("ValueObject")
 
 -- Intent: Selects the most recent input mode and attempts to
@@ -14,66 +13,66 @@ local InputModeSelector = {}
 InputModeSelector.__index = InputModeSelector
 InputModeSelector.ClassName = "InputModeSelector"
 
-function InputModeSelector.new(InputModeList, UpdateBindFunction)
+function InputModeSelector.new(inputModeList, updateBindFunction)
 	local self = setmetatable({}, InputModeSelector)
 		
-	self.Maid = MakeMaid()
+	self._maid = Maid.new()
 	self.MostRecentMode = ValueObject.new()
 
-	if InputModeList then
-		self:WithInputModeList(InputModeList)
+	if inputModeList then
+		self:WithInputModeList(inputModeList)
 	end
 	
-	if UpdateBindFunction then
-		self:BindUpdate(UpdateBindFunction)
+	if updateBindFunction then
+		self:BindUpdate(updateBindFunction)
 	end
 	
 	return self
 end
 
-function InputModeSelector:BindUpdate(UpdateBindFunction)
-	local BindMaid = MakeMaid()
-	self.Maid[UpdateBindFunction] = BindMaid
+function InputModeSelector:BindUpdate(updateBindFunction)
+	local bindMaid = Maid.new()
+	self._maid[updateBindFunction] = bindMaid
 	
 	local function HandleChange(NewMode, OldMode)
-		BindMaid.CurrentMaid = nil
+		bindMaid.CurrentMaid = nil
 		
 		if NewMode then
-			local Maid = MakeMaid()
-			BindMaid.CurrentMaid = Maid
+			local maid = Maid.new()
+			bindMaid.CurrentMaid = maid
 			
-			UpdateBindFunction(NewMode, Maid)
+			updateBindFunction(NewMode, maid)
 		end
 	end
 
-	BindMaid.Changed = self.MostRecentMode.Changed:Connect(HandleChange)
+	bindMaid.Changed = self.MostRecentMode.Changed:Connect(HandleChange)
 	HandleChange(self.MostRecentMode.Value)
 	
 	return self
 end
 
-function InputModeSelector:WithInputModeList(InputModeList)
-	local BestInputModeState
-	local BestTimeEnabled = -math.huge
+function InputModeSelector:WithInputModeList(inputModeList)
+	local mostRecentInputMode = nil
+	local mostRecentTime = -math.huge
 	
-	for _, InputModeState in pairs(InputModeList) do
-		if InputModeState:GetLastEnabledTime() > BestTimeEnabled then
-			BestTimeEnabled = InputModeState:GetLastEnabledTime()
-			BestInputModeState = InputModeState
+	for _, inputModeState in pairs(inputModeList) do
+		if inputModeState:GetLastEnabledTime() > mostRecentTime then
+			mostRecentTime = inputModeState:GetLastEnabledTime()
+			mostRecentInputMode = inputModeState
 		end
 		
-		self.Maid[InputModeState] = InputModeState.Enabled:Connect(function()
-			self.MostRecentMode.Value = InputModeState
+		self._maid[inputModeState] = inputModeState.Enabled:Connect(function()
+			self.MostRecentMode.Value = inputModeState
 		end)
 	end
 	
-	self.MostRecentMode.Value = BestInputModeState
+	self.MostRecentMode.Value = mostRecentInputMode
 
 	return self
 end
 
 function InputModeSelector:Destroy()
-	self.Maid:DoCleaning()
+	self._maid:DoCleaning()
 end
 
 
