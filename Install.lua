@@ -1,9 +1,21 @@
 -- Universal Github Installer
--- @author Validark
+-- @see Validark
 -- function GitHub:Install(Link, Parent)
 --		@returns <Folder/LuaSourceContainer> from Link found starting at Link into Parent
+-- function GitHub:GetApprovedRepositories()
+--		@returns table of Repositories with the "rostrap" tag that are approved by Validark and devSparkle
 
-assert(not game:FindFirstChild("NetworkClient"), "You can't install with TeamCreate on. Please turn TeamCreate off to proceed.")
+-- TODO: Make it so that modules with a name identical to the Folder you are creating will be placed inside.
+
+--[[
+local coroutine = {
+	resume = function(func, ...)
+		return func(...)
+	end;
+	create = function(func)
+		return func
+	end;
+}--]]
 
 local function GetFirstChild(Parent, Name, Class)
 	if Parent then -- GetFirstChildWithNameOfClass
@@ -22,9 +34,16 @@ local function GetFirstChild(Parent, Name, Class)
 	return Child, true
 end
 
+
+-- Services
 local HttpService = game:GetService("HttpService")
+
+-- Module
 local GitHub = {}
+
 local DataSources = {}
+
+-- Helper Functions
 local ScriptTypes = {
 	[""] = "ModuleScript";
 	["local"] = "LocalScript";
@@ -38,7 +57,6 @@ local function UrlDecode(Character)
 end
 
 local OpenGetRequests = 0
-
 local function GetAsync(...)
 	repeat until OpenGetRequests == 0 or not wait()
 	local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
@@ -50,13 +68,14 @@ local function GetAsync(...)
 		return GetAsync(...)
 	elseif Data:find("Http requests are not enabled") then
 		OpenGetRequests = OpenGetRequests + 1
+		require(script.Parent.UI):CreateSnackbar(Data)
 		repeat
 			local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-		until Success and not Data:find("Http requests are not enabled") or not wait(1)
+		until Success and not Data:find("Http requests are not enabled") or require(script.Parent.UI):CreateSnackbar(Data) or not wait(1)
 		OpenGetRequests = 0
 		return GetAsync(...)
 	else
-		error(Data, 0)
+		error(Data .. (...), 0)
 	end
 end
 
@@ -68,7 +87,7 @@ end
 local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 	local Value = #Routines + 1
 	Routines[Value] = false
-	local Generated, MainExists
+	local MainExists
 
 	local ScriptCount = 0
 	local Scripts = {}
@@ -117,6 +136,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 			if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
 		end
 
+		-- if MainExists or ScriptCount ~= 1 or ScriptName ~= (LastFolder:match("^RBX%-(.-)%-Library$") or LastFolder) then
 		if MainExists then Directory = Directory + 1 end -- :gsub("[^/]+$", "", 1) end			
 		local Count = 0
 
@@ -125,40 +145,28 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 			if Count > Directory then
 				Directory = Directory + 1
 				if (Parent and Parent.Name) ~= FolderName and "Modules" ~= FolderName then
-					if FolderName == "App" and Link:find("/Quenty/NevermoreEngine/", 1, true) then FolderName = "ReplicatedStorage" end
 					local Success, Service = pcall(game.GetService, game, FolderName)
 					if FolderName ~= "Lighting" and Success and Service then
 						Parent = Service
 					else
+						local Generated
+						Parent, Generated = GetFirstChild(Parent, FolderName, "Folder")
 						if Generated then
-							Parent = Instance.new("Folder", Parent)
-							Parent.Name = FolderName
 							if not Routines[1] then Routines[1] = Parent end
-							DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 1 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
-						else
-							local Object = Parent and Parent:FindFirstChild(FolderName)
-							if not Object then
-								Object = Instance.new("Folder", Parent)
-								Object.Name = FolderName
-								if not Routines[1] then Routines[1] = Object end
-								DataSources[Object] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 1 and Directory + 2 or Directory)) or warn("[2]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
-								Generated = true
-							end
-							Parent = Object
+							DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 2 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
 						end
 					end
 				end
 			end
 		end
 		
-		Link:gsub("[^/]+/?$", ""):gsub("[^/]+", LocateFolder)
+		Link:gsub("[^/]+$", ""):gsub("[^/]+", LocateFolder)
 
 		if MainExists or ScriptCount ~= 1 or ScriptName ~= LastFolder then
 			LocateFolder(LastFolder)
 		end
-		
-		local Script = Instance.new(ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"], Parent)
-		Script.Name = ScriptName
+
+		local Script = GetFirstChild(Parent, ScriptName, ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"])
 		if not Routines[1] then Routines[1] = Script end
 		coroutine.resume(coroutine.create(GiveSourceToScript), "https://raw.githubusercontent.com" .. ScriptLink:gsub("(/[^/]+/[^/]+/)blob/", "%1", 1), Script)
 		
@@ -169,8 +177,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 		for a = 2, ScriptCount do
 			local Link = Scripts[a]
 			local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
-			local Script = Instance.new(ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"], Parent)
-			Script.Name = ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode)
+			local Script = GetFirstChild(Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"])
 			coroutine.resume(coroutine.create(GiveSourceToScript), "https://raw.githubusercontent.com" .. Link:gsub("(/[^/]+/[^/]+/)blob/", "%1", 1), Script)
 		end
 	end
@@ -185,7 +192,10 @@ end
 
 function GitHub:Install(Link, Parent, RoutineList)
 	-- Installs Link into Parent
-	Link = Link:gsub("/$", "")
+
+	if Link:byte(-1) == 47 then --gsub("/$", "")
+		Link = Link:sub(1, -2)
+	end
 
 	-- Extract Link Data
 	local Organization, Repository, Tree, ScriptName, ScriptClass
@@ -214,7 +224,7 @@ function GitHub:Install(Link, Parent, RoutineList)
 	end
 
 	if not Website then Website = "https://github.com/" end
-	Directory = Directory and ("/" .. Directory):gsub("^//", "/") or ""
+	Directory = Directory and ("/" .. Directory) or "" -- :gsub("^//", "/")
 
 	-- Threads
 	local Routines = RoutineList or {false}
@@ -224,29 +234,28 @@ function GitHub:Install(Link, Parent, RoutineList)
 	local Garbage
 
 	if ScriptName then
-		local Script = Instance.new(ScriptTypes[ScriptClass or "mod"])
-		if not Routines[1] then Routines[1] = Script end
-		Script.Name = ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode)
-		local Link = "https://raw.githubusercontent.com/" .. Organization .. "/" .. Repository .. "/" .. (Tree or "master") .. Directory
+		Link = "https://raw.githubusercontent.com/" .. Organization .. "/" .. Repository .. "/" .. (Tree or "master") .. Directory
+		local Source = GetAsync(Link)
+		local Script = GetFirstChild(Parent and not RoutineList and Repository ~= ScriptName and Parent.Name ~= ScriptName and GetFirstChild(Parent, Repository, "Folder") or Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or "mod"])
 		DataSources[Script] = Link
-		Script.Source = GetAsync(Link)
-		Script.Parent = Parent and not RoutineList and Repository ~= ScriptName and GetFirstChild(Parent, Repository, "Folder") or Parent
+		if not Routines[1] then Routines[1] = Script end
+		Script.Source = Source
 	elseif Repository then
-		Link = Website .. Organization .. "/" .. Repository .. ((Tree or Directory ~= "") and (Link .. "/tree/" .. (Tree or "master") .. Directory) or "")
+		Link = Website .. Organization .. "/" .. Repository .. ((Tree or Directory ~= "") and ("/tree/" .. (Tree or "master") .. Directory) or "")
 		if not Parent then Parent, Garbage = Instance.new("Folder"), true end
 		coroutine.resume(coroutine.create(InstallRepo), Link, 1, Parent, Routines) -- "/" .. Repository .. Directory
 	elseif Organization then
-		local Object = Instance.new("Folder")
-		Object.Name = Organization
 		Link = Website .. Organization
+		local Data = GetAsync(Link .. "?tab=repositories")
+		local Object = GetFirstChild(Parent, Organization, "Folder")
+		
 		if not Routines[1] then Routines[1] = Object end
 		
-		for Link, Data in GetAsync(Link .. "?tab=repositories"):gmatch('<a href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository">(.-)</div>') do
-			if not Data:match("Forked from") and not (Organization == "RoStrap" and Link:find("Plugin")) then
+		for Link, Data in Data:gmatch('<a href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository">(.-)</div>') do
+			if not Data:match("Forked from") and not Link:find("Plugin") then
 				GitHub:Install(Link, Object, Routines)
 			end
 		end
-		Object.Parent = Parent
 	end
 
 	Routines[Value] = true
@@ -271,5 +280,6 @@ function GitHub:Install(Link, Parent, RoutineList)
 	end
 end
 
-GitHub:Install("/Quenty/NevermoreEngine", game:GetService("ServerScriptService")).Name = "Nevermore"
+GitHub:Install("https://github.com/Quenty/NevermoreEngine/tree/version2/Modules", game:GetService("ServerScriptService")).Name = "Nevermore"
+GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/App/NevermoreEngine.lua", game:GetService("ReplicatedStorage"))
 HttpService.HttpEnabled = ...
