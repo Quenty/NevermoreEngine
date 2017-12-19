@@ -144,6 +144,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 			Count = Count + 1
 			if Count > Directory then
 				Directory = Directory + 1
+				FolderName = FolderName:gsub("Engine$", "")
 				if (Parent and Parent.Name) ~= FolderName and "Modules" ~= FolderName then
 					local Success, Service = pcall(game.GetService, game, FolderName)
 					if FolderName ~= "Lighting" and Success and Service then
