@@ -11,15 +11,14 @@
 -- @testsite http://cubic-bezier.com/
 -- @testsite http://greweb.me/bezier-easing-editor/example/
 
-
 -- These values are established by empiricism with tests (tradeoff: performance VS precision)
 local NEWTON_ITERATIONS = 4
 local NEWTON_MIN_SLOPE = 0.001
 local SUBDIVISION_PRECISION = 0.0000001
 local SUBDIVISION_MAX_ITERATIONS = 10
+local K_SPLINE_TABLE_SIZE = 11
 
-local KSplineTableSize = 11
-local KSampleStepSize = 1 / (KSplineTableSize - 1)
+local K_SAMPLE_STEP_SIZE = 1 / (K_SPLINE_TABLE_SIZE - 1)
 
 local function Linear(t, b, c, d)
 	return (c or 1)*t / (d or 1) + (b or 0)
@@ -35,33 +34,28 @@ function Bezier.new(x1, y1, x2, y2)
 	end
 
 	-- Precompute redundant values
-	local e = 3*x1
-	local k = 3*x2
-	local f = 1 - k + e
-	local g = k - 2*e
-	local h = 3*(1 - k + e)
-	local j = 2*g
-	local o = 3*y1
-	local m = 1 - 3*y2 + o
-	local n = 3*y2 - 2*o
+	local e, f = 3*x1, 3*x2
+	local g, h, i = 1 - f + e, f - 2*e, 3*(1 - f + e)
+	local j, k = 2*h, 3*y1
+	local l, m = 1 - 3*y2 + k, 3*y2 - 2*k
 	
 	-- Precompute samples table
 	local SampleValues = {}
-	for i = 1, KSplineTableSize do
-		local z = i*KSampleStepSize
-		SampleValues[i] = ((f*z + g)*z + e)*z
+	for a = 1, K_SPLINE_TABLE_SIZE do
+		local z = a*K_SAMPLE_STEP_SIZE
+		SampleValues[a] = ((g*z + h)*z + e)*z -- CalcBezier
 	end
 
 	return function(t, b, c, d)
 		t = (c or 1)*t / (d or 1) + (b or 0)
 
-		if t == 0 or t == 1 then
+		if t == 0 or t == 1 then -- Make sure the endpoints are correct
 			return t
 		end
 
 		local CurrentSample
 
-		for a = 2, KSplineTableSize - 1 do
+		for a = 2, K_SPLINE_TABLE_SIZE - 1 do
 			if SampleValues[a] > t then
 				CurrentSample = a - 1
 				break
@@ -69,34 +63,36 @@ function Bezier.new(x1, y1, x2, y2)
 		end
 
 		-- Interpolate to provide an initial guess for t
-		local IntervalStart = CurrentSample*KSampleStepSize
-		local GuessForT = IntervalStart + ((t - SampleValues[CurrentSample]) / (SampleValues[CurrentSample + 1] - SampleValues[CurrentSample]))*KSampleStepSize
-		local InitialSlope = h*GuessForT*GuessForT + j*GuessForT + e
+		local IntervalStart = CurrentSample*K_SAMPLE_STEP_SIZE
+		local GuessForT = IntervalStart + K_SAMPLE_STEP_SIZE*(t - SampleValues[CurrentSample]) / (SampleValues[CurrentSample + 1] - SampleValues[CurrentSample])
+		local InitialSlope = GuessForT*(i*GuessForT + j) + e
 
-		if (InitialSlope >= NEWTON_MIN_SLOPE) then
+		if InitialSlope >= NEWTON_MIN_SLOPE then
+			-- NewtonRaphsonIterate
 			for _ = 1, NEWTON_ITERATIONS do
-				local CurrentSlope = h*GuessForT*GuessForT + j*GuessForT + e
+				local CurrentSlope = GuessForT*(i*GuessForT + j) + e
 				if CurrentSlope == 0 then break end
-				GuessForT = GuessForT - (((f*GuessForT + g)*GuessForT + e)*GuessForT - t) / CurrentSlope
+				GuessForT = GuessForT - (((g*GuessForT + h)*GuessForT + e)*GuessForT - t) / CurrentSlope
 			end
 		elseif InitialSlope ~= 0 then
-			local IntervalStep = IntervalStart + KSampleStepSize
+			local IntervalStep = IntervalStart + K_SAMPLE_STEP_SIZE
 
+			-- Binary Subdivide
 			for _ = 1, SUBDIVISION_MAX_ITERATIONS do
 				GuessForT = IntervalStart + 0.5*(IntervalStep - IntervalStart)
-				local CurrentX = ((f*GuessForT + g)*GuessForT + e)*GuessForT - t
+				local BezierCalculation = ((g*GuessForT + h)*GuessForT + e)*GuessForT - t
 
-				if CurrentX > 0 then
+				if BezierCalculation > 0 then
 					IntervalStep = GuessForT
 				else
 					IntervalStart = GuessForT
-					CurrentX = -CurrentX
+					BezierCalculation = -BezierCalculation
 				end
 
-				if CurrentX <= SUBDIVISION_PRECISION then break end
+				if BezierCalculation <= SUBDIVISION_PRECISION then break end
 			end
 		end
-		return ((m*GuessForT + n)*GuessForT + o)*GuessForT
+		return ((l*GuessForT + m)*GuessForT + k)*GuessForT
 	end
 end
 
