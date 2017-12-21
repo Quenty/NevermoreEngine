@@ -29,6 +29,7 @@ local Bezier = {}
 function Bezier.new(x1, y1, x2, y2)
 	if not (x1 and y1 and x2 and y2) then error("[Bezier] Need 4 numbers to construct a Bezier curve", 2) end
 	if not (0 <= x1 and x1 <= 1 and 0 <= x2 and x2 <= 1) then error("[Bezier] The x values must be within range [0, 1]", 2) end
+
 	if x1 == y1 and x2 == y2 then
 		return Linear
 	end
@@ -41,7 +42,7 @@ function Bezier.new(x1, y1, x2, y2)
 	
 	-- Precompute samples table
 	local SampleValues = {}
-	for a = 1, K_SPLINE_TABLE_SIZE do
+	for a = 0, K_SPLINE_TABLE_SIZE - 1 do
 		local z = a*K_SAMPLE_STEP_SIZE
 		SampleValues[a] = ((g*z + h)*z + e)*z -- CalcBezier
 	end
@@ -53,9 +54,9 @@ function Bezier.new(x1, y1, x2, y2)
 			return t
 		end
 
-		local CurrentSample
+		local CurrentSample = K_SPLINE_TABLE_SIZE - 2
 
-		for a = 2, K_SPLINE_TABLE_SIZE - 1 do
+		for a = 1, CurrentSample do
 			if SampleValues[a] > t then
 				CurrentSample = a - 1
 				break
@@ -65,20 +66,18 @@ function Bezier.new(x1, y1, x2, y2)
 		-- Interpolate to provide an initial guess for t
 		local IntervalStart = CurrentSample*K_SAMPLE_STEP_SIZE
 		local GuessForT = IntervalStart + K_SAMPLE_STEP_SIZE*(t - SampleValues[CurrentSample]) / (SampleValues[CurrentSample + 1] - SampleValues[CurrentSample])
-		local InitialSlope = GuessForT*(i*GuessForT + j) + e
+		local InitialSlope = (i*GuessForT + j)*GuessForT + e
 
 		if InitialSlope >= NEWTON_MIN_SLOPE then
-			-- NewtonRaphsonIterate
-			for _ = 1, NEWTON_ITERATIONS do
-				local CurrentSlope = GuessForT*(i*GuessForT + j) + e
+			for NewtonRaphsonIterate = 1, NEWTON_ITERATIONS do
+				local CurrentSlope = (i*GuessForT + j)*GuessForT + e
 				if CurrentSlope == 0 then break end
 				GuessForT = GuessForT - (((g*GuessForT + h)*GuessForT + e)*GuessForT - t) / CurrentSlope
 			end
 		elseif InitialSlope ~= 0 then
 			local IntervalStep = IntervalStart + K_SAMPLE_STEP_SIZE
 
-			-- Binary Subdivide
-			for _ = 1, SUBDIVISION_MAX_ITERATIONS do
+			for BinarySubdivide = 1, SUBDIVISION_MAX_ITERATIONS do
 				GuessForT = IntervalStart + 0.5*(IntervalStep - IntervalStart)
 				local BezierCalculation = ((g*GuessForT + h)*GuessForT + e)*GuessForT - t
 
@@ -96,4 +95,6 @@ function Bezier.new(x1, y1, x2, y2)
 	end
 end
 
-return Bezier
+return setmetatable(Bezier, {__call = function(Bezier, ...)
+	return Bezier.new(...)
+end})
