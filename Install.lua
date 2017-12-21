@@ -2,20 +2,6 @@
 -- @see Validark
 -- function GitHub:Install(Link, Parent)
 --		@returns <Folder/LuaSourceContainer> from Link found starting at Link into Parent
--- function GitHub:GetApprovedRepositories()
---		@returns table of Repositories with the "rostrap" tag that are approved by Validark and devSparkle
-
--- TODO: Make it so that modules with a name identical to the Folder you are creating will be placed inside.
-
---[[
-local coroutine = {
-	resume = function(func, ...)
-		return func(...)
-	end;
-	create = function(func)
-		return func
-	end;
-}--]]
 
 local function GetFirstChild(Parent, Name, Class)
 	if Parent then -- GetFirstChildWithNameOfClass
