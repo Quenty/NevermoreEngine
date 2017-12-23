@@ -13,8 +13,6 @@ local HeartbeatCamera = {}
 HeartbeatCamera.ClassName = "HeartbeatCamera"
 HeartbeatCamera.ProfileName = "HeartbeatCamera"
 
-SummedCamera.addToClass(HeartbeatCamera)
-
 function HeartbeatCamera.new(Camera)
 	local self = setmetatable({}, HeartbeatCamera)
 	
@@ -29,6 +27,10 @@ function HeartbeatCamera.new(Camera)
 	end)
 	
 	return self
+end
+
+function HeartbeatCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function HeartbeatCamera:ForceUpdateCache()

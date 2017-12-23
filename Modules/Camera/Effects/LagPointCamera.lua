@@ -12,8 +12,6 @@ LagPointCamera.ClassName = "LagPointCamera"
 LagPointCamera._FocusCamera = nil
 LagPointCamera._OriginCamera = nil
 
-SummedCamera.addToClass(LagPointCamera)
-
 ---
 -- @constructor
 -- @param OriginCamera A camera to use
@@ -27,6 +25,10 @@ function LagPointCamera.new(OriginCamera, FocusCamera)
 	self.Speed = 10
 
 	return self
+end
+
+function LagPointCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function LagPointCamera:__newindex(Index, Value)

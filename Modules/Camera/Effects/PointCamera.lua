@@ -9,8 +9,6 @@ local SummedCamera = require("SummedCamera")
 local PointCamera = {}
 PointCamera.ClassName = "PointCamera"
 
-SummedCamera.addToClass(PointCamera)
-
 ---
 -- @constructor
 -- @param OriginCamera A camera to use
@@ -22,6 +20,10 @@ function PointCamera.new(OriginCamera, FocusCamera)
 	self.FocusCamera = FocusCamera or error("Must have OriginCamera")
 
 	return self
+end
+
+function PointCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function PointCamera:__newindex(Index, Value)

@@ -2,15 +2,15 @@
 -- Not intended to be use with the current character script
 -- Intended to be used with a SummedCamera, relative.
 -- @classmod SmoothZoomedCamera
+-- @example
+--[[
 
---[[ API
+local Zoom = SmoothZoomedCamera.new()
+Zoom.Zoom = 30 -- Distance from original point
+Zoom.MaxZoom = 100 -- Max distance away
+Zoom.MinZoom = 0.5 -- Min distance away
 
-	local Zoom = SmoothZoomedCamera.new()
-	Zoom.Zoom = 30 -- Distance from original point
-	Zoom.MaxZoom = 100 -- Max distance away
-	Zoom.MinZoom = 0.5 -- Min distance away
-
-	-- Assigning .Zoom will automatically clamp
+-- Assigning .Zoom will automatically clamp
 ]]
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
@@ -25,8 +25,6 @@ SmoothZoomedCamera._maxZoom = 100
 SmoothZoomedCamera._minZoom = 0.5
 SmoothZoomedCamera.BounceAtEnd = true
 
-SummedCamera.addToClass(SmoothZoomedCamera)
-
 function SmoothZoomedCamera.new()
 	local self = setmetatable({}, SmoothZoomedCamera)
 
@@ -34,6 +32,10 @@ function SmoothZoomedCamera.new()
 	self.Speed = 15
 
 	return self
+end
+
+function SmoothZoomedCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function SmoothZoomedCamera:ZoomIn(Value, Min, Max)

@@ -13,8 +13,6 @@ local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 local RotatedCamera = {}
 RotatedCamera.ClassName = "RotatedCamera"
 
-SummedCamera.addToClass(RotatedCamera)
-
 -- Max/Min aim up and down
 RotatedCamera._MaxY = math.rad(80)
 RotatedCamera._MinY = math.rad(-80)
@@ -25,6 +23,10 @@ function RotatedCamera.new()
 	local self = setmetatable({}, RotatedCamera)
 
 	return self
+end
+
+function RotatedCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 ---

@@ -11,8 +11,6 @@ local SummedCamera = require("SummedCamera")
 local ImpulseCamera = {}
 ImpulseCamera.ClassName = "ImpulseCamera"
 
-SummedCamera.addToClass(ImpulseCamera)
-
 function ImpulseCamera.new()
 	local self = setmetatable({}, ImpulseCamera)
 
@@ -22,6 +20,10 @@ function ImpulseCamera.new()
 	self.Speed = 20
 
 	return self
+end
+
+function ImpulseCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function ImpulseCamera:__newindex(Index, Value)

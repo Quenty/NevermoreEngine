@@ -11,12 +11,14 @@ local SummedCamera = require("SummedCamera")
 local DefaultCamera = {}
 DefaultCamera.ClassName = "DefaultCamera"
 
-SummedCamera.addToClass(DefaultCamera)
-
 function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)
 
 	return self
+end
+
+function DefaultCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function DefaultCamera:OverrideCameraState(CameraState)

@@ -9,8 +9,6 @@ local SummedCamera = require("SummedCamera")
 local FadeBetweenCamera = {}
 FadeBetweenCamera.ClassName = "FadeBetweenCamera"
 
-SummedCamera.addToClass(FadeBetweenCamera)
-
 function FadeBetweenCamera.new(CameraA, CameraB)
 	local self = setmetatable({}, FadeBetweenCamera)
 
@@ -22,6 +20,10 @@ function FadeBetweenCamera.new(CameraA, CameraB)
 	self.Speed = 15
 
 	return self
+end
+
+function FadeBetweenCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function FadeBetweenCamera:__newindex(Index, Value)

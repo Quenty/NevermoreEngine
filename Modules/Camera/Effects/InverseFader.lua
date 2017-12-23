@@ -8,8 +8,6 @@ local SummedCamera = require("SummedCamera")
 local InverseFader = {}
 InverseFader.ClassName = "InverseFader"
 
-SummedCamera.addToClass(InverseFader)
-
 function InverseFader.new(Camera, Fader)
 	local self = setmetatable({}, InverseFader)
 
@@ -17,6 +15,10 @@ function InverseFader.new(Camera, Fader)
 	self.Fader = Fader or error()
 
 	return self
+end
+
+function InverseFader:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function InverseFader:__index(Index)

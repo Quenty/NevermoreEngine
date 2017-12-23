@@ -12,8 +12,6 @@ SmoothPositionCamera.ClassName = "SmoothPositionCamera"
 SmoothPositionCamera._FocusCamera = nil
 SmoothPositionCamera._OriginCamera = nil
 
-SummedCamera.addToClass(SmoothPositionCamera)
-
 function SmoothPositionCamera.new(BaseCamera)
 	local self = setmetatable({}, SmoothPositionCamera)
 
@@ -22,6 +20,10 @@ function SmoothPositionCamera.new(BaseCamera)
 	self.Speed = 10
 
 	return self
+end
+
+function SmoothPositionCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function SmoothPositionCamera:__newindex(Index, Value)

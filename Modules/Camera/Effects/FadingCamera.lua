@@ -4,20 +4,25 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
 local Spring = require("Spring")
+local SummedCamera = require("SummedCamera")
 
 local FadingCamera = {}
 FadingCamera.ClassName = "FadingCamera"
 
-function FadingCamera.new(Camera)
+function FadingCamera.new(camera)
 	local self = setmetatable({}, FadingCamera)
 
 	self.Spring = Spring.new(0)
 
-	self.Camera = Camera or error("No camera")
+	self.Camera = camera or error("No camera")
 	self.Damper = 1
 	self.Speed = 15
 
 	return self
+end
+
+function FadingCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function FadingCamera:__newindex(Index, Value)

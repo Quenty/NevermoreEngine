@@ -10,18 +10,19 @@ local TrackCamera = {}
 TrackCamera.ClassName = "TrackCamera"
 TrackCamera.FieldOfView = 0
 
-SummedCamera.addToClass(TrackCamera)
-
 --- Make new track camera
 -- @constructor
 -- @param[opt] CameraSubject The CameraSubject to look at. A ROBLOX part of ROBLOX model
 function TrackCamera.new(CameraSubject)
-	
 	local self = setmetatable({}, TrackCamera)
 
 	self.CameraSubject = CameraSubject
 
 	return self
+end
+
+function TrackCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function TrackCamera:__newindex(Index, Value)

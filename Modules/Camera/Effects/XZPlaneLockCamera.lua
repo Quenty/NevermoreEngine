@@ -11,14 +11,16 @@ local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 local XZPlaneLockCamera = {}
 XZPlaneLockCamera.ClassName = "XZPlaneLockCamera"
 
-SummedCamera.addToClass(XZPlaneLockCamera)
-
 function XZPlaneLockCamera.new(Camera)
 	local self = setmetatable({}, XZPlaneLockCamera)
 
 	self.Camera = Camera or error("No camera")
 
 	return self
+end
+
+function XZPlaneLockCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function XZPlaneLockCamera:__index(Index)

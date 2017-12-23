@@ -14,8 +14,6 @@ local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 local SmoothRotatedCamera = {}
 SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
 
-SummedCamera.addToClass(SmoothRotatedCamera)
-
 -- Max/Min aim up and down
 SmoothRotatedCamera._MaxY = math.rad(80)
 SmoothRotatedCamera._MinY = math.rad(-80)
@@ -29,6 +27,10 @@ function SmoothRotatedCamera.new()
 	self.Speed = 15
 	
 	return self
+end
+
+function SmoothRotatedCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 ---

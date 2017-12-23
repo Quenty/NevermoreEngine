@@ -12,11 +12,9 @@ local qCFrame = require("qCFrame")
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 local LerpNumber = qMath.LerpNumber
 
-
 local PushCamera = {}
 PushCamera.ClassName = "PushCamera"
 
-SummedCamera.addToClass(PushCamera)
 
 -- Max/Min aim up and down
 PushCamera._MaxY = math.rad(80)
@@ -36,6 +34,9 @@ function PushCamera.new()
 	return self
 end
 
+function PushCamera:__add(other)
+	return SummedCamera.new(self, other)
+end
 ---
 -- @param XYRotateVector Vector2, the delta rotation to apply
 function PushCamera:RotateXY(XYRotateVector)

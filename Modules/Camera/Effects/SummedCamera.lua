@@ -18,12 +18,6 @@ function SummedCamera.new(cameraA, cameraB)
 	return self
 end
 
-function SummedCamera.addToClass(class)
-	assert(not class.__add)
-
-	class.__add = SummedCamera.__addClass
-end
-
 ---
 -- @param mode Mode to set
 -- If "World", then it just adds positions.
