@@ -8,19 +8,18 @@ stds.roblox = {
 		-- Extra functions
 		"tick", "warn", "spawn",
 		"wait", "settings", "typeof",
-		"delay",
+		"delay", "time", "version",
 
 		-- Libraries
 		"debug",
 
 		-- Types
-		"Vector2", "Vector3",
-		"Color3",
+		"Axes", "BrickColor", "CFrame", "Color3", "ColorSequence",
+		"ColorSequenceKeypoint", "Faces","Instance","NumberRange",
+		"NumberSequence", "NumberSequenceKeypoint", "PhysicalProperties",
+		"Ray", "Rect", "Region3", "Region3int16", "TweenInfo",
 		"UDim", "UDim2",
-		"Rect",
-		"CFrame",
-		"Enum",
-		"Instance",
+		"Vector2", "Vector2int16", "Vector3", "Vector3int16",
 	}
 }
 
@@ -44,7 +43,7 @@ ignore = {
 	"212", -- unused arguments
 	"421", -- shadowing local variable
 	"422", -- shadowing argument
-	"431", -- shadowing upvalue
+	-- "431", -- shadowing upvalue
 	"432", -- shadowing upvalue argument
 }
 
