@@ -14,6 +14,7 @@ stds.roblox = {
 		"debug",
 
 		-- Types
+		"Enum",
 		"Axes", "BrickColor", "CFrame", "Color3", "ColorSequence",
 		"ColorSequenceKeypoint", "Faces","Instance","NumberRange",
 		"NumberSequence", "NumberSequenceKeypoint", "PhysicalProperties",
