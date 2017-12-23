@@ -186,6 +186,7 @@ local Nevermore = {}
 -- @tparam Variant LibraryName Can either be a ModuleScript or string
 -- @treturn Variant Library
 Nevermore.LoadLibrary = _asyncCache(_debugLoading(_getLibraryLoader(LibraryCache)))
+Nevermore.require = Nevermore.LoadLibrary
 
 --- Get a remote event
 -- @function GetRemoteEvent
@@ -204,7 +205,7 @@ setmetatable(Nevermore, {
 		return self.LoadLibrary(...)
 	end;
 	__index = function(self, Index)
-		error(("'%s is not a valid member of Nevermore"):format(tostring(Index)))
+		return Nevermore.LoadLibrary(Index)
 	end;
 })
 
