@@ -16,7 +16,6 @@ function Maid.new()
 	
 	return setmetatable(self, Maid)
 end
-Maid.MakeMaid = Maid.new
 
 --- Returns Maid[key] if not part of Maid metatable
 -- @return Maid[key] value
