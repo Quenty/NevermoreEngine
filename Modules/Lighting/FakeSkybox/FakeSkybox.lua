@@ -1,13 +1,9 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local FakeSkyboxSide = LoadCustomLibrary("FakeSkyboxSide")
-local AccelTween = LoadCustomLibrary("AccelTween")
-local Signal = LoadCustomLibrary("Signal")
+local Maid = require("Maid")
+local FakeSkyboxSide = require("FakeSkyboxSide")
+local AccelTween = require("AccelTween")
+local Signal = require("Signal")
 
 -- Intent: Allow transitions between skyboxes
 
@@ -35,7 +31,7 @@ FakeSkybox.PartSize = 1024
 function FakeSkybox.new(Skybox)
 	local self = setmetatable({}, FakeSkybox)
 	
-	self.Maid = MakeMaid()
+	self.Maid = Maid.new()
 	
 	self.ParentFolder = Instance.new("Folder")
 	self.ParentFolder.Name = "Skybox"

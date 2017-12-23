@@ -2,17 +2,14 @@
 -- identifying the most recent input state provided.
 -- @classmod InputModes
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local InputMode = LoadCustomLibrary("InputMode")
-local InputModeSelector = LoadCustomLibrary("InputModeSelector")
-local InputModeProcessor = LoadCustomLibrary("InputModeProcessor")
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
+local InputMode = require("InputMode")
+local InputModeSelector = require("InputModeSelector")
+local InputModeProcessor = require("InputModeProcessor")
+local Maid = require("Maid")
 
 --[[
 
@@ -139,34 +136,32 @@ local function bindProcessor()
 		:AddState(InputModes.Mouse)
 		:AddState(InputModes.Touch)
 
-	local Maid = MakeMaid()
+	local maid = Maid.new()
 
-	Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject)
+	UserInputService.InputBegan:Connect(function(inputObject)
 		inputProcessor:Evaluate(inputObject)
-	end))
+	end)
 
-	Maid:GiveTask(UserInputService.GamepadConnected:Connect(function(gamepad)
+	UserInputService.GamepadConnected:Connect(function(gamepad)
 		InputModes.Gamepads:Enable()
 		
 		-- Bind thumbsticks
-		Maid.InputChanged = UserInputService.InputChanged:Connect(function(inputObject)
+		maid.InputChanged = UserInputService.InputChanged:Connect(function(inputObject)
 			if inputObject.KeyCode.Name:find("Thumbstick") then
 				if inputObject.Position.magnitude > InputModes.THUMBSTICK_DEADZONE then
 					inputProcessor:Evaluate(inputObject)
 				end
 			end
 		end)
-	end))
+	end)
 
-	Maid:GiveTask(UserInputService.GamepadDisconnected:Connect(function(gamepad)
+	UserInputService.GamepadDisconnected:Connect(function(gamepad)
 		-- TODO: Stop assuming state is mouse/keyboard
 		InputModes.Mouse:Enable()
 		InputModes.Keyboard:Enable()
 		
-		Maid.InputChanged = nil
-	end))
-
-	return inputProcessor
+		maid.InputChanged = nil
+	end)
 end
 
 bindProcessor()

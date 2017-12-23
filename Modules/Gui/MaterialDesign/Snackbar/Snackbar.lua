@@ -1,21 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local Players  = game:GetService("Players")
-local GuiService = game:GetService("GuiService")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qGUI = LoadCustomLibrary("qGUI")
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local qMath = LoadCustomLibrary("qMath")
-
--- Intent:
--- Snackbars provide lightweight feedback on an operation
--- at the base of the screen. They automatically disappear 
+--- Snackbars provide lightweight feedback on an operation
+-- at the base of the screen. They automatically disappear
 -- after a timeout or user interaction. There can only be
 -- one on the screen at a time.
+-- @classmod Snackbar
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local qGUI = require("qGUI")
+local Maid = require("Maid")
+local qMath = require("qMath")
 
 -- Base clase, not functional
 local Snackbar = {}
@@ -86,12 +79,18 @@ function Snackbar.new(Parent, Text, Options)
 	TextLabel.Parent = Gui
 	self.TextLabel = TextLabel
 	
-	self.WhileActiveMaid = MakeMaid()
+	self.WhileActiveMaid = Maid()
 	self.Gui.Parent = Parent
 	
 	local CallToActionText
 	if Options and Options.CallToAction then
-		CallToActionText = (type(Options.CallToAction) == "string" and Options.CallToAction or tostring(Options.CallToAction.Text)):upper()
+		if type(Options.CallToAction) == "string" then
+			CallToActionText = Options.CallToAction
+		else
+			CallToActionText = tostring(Options.CallToAction.Text)
+		end
+		CallToActionText = CallToActionText:upper()
+
 		local DefaultTextColor3 = Color3.fromRGB(78, 205, 196)
 		
 		local Button = Instance.new("TextButton")
@@ -211,18 +210,22 @@ function Snackbar:FadeInTransparency(PercentFaded)
 		end
 	else
 		-- Should be an ease-in-out transparency fade.
-		local NewProperties = {
-			ImageTransparency = 0;
-		}
-		for _, Item in pairs(self.BackgroundImages) do
-			qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+		do
+			local NewProperties = {
+				ImageTransparency = 0;
+			}
+			for _, Item in pairs(self.BackgroundImages) do
+				qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+			end
 		end
 
-		local NewProperties = {
-			ImageTransparency = 0.74;
-		}
-		for _, Item in pairs(self.ShadowImages) do
-			qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+		do
+			local NewProperties = {
+				ImageTransparency = 0.74;
+			}
+			for _, Item in pairs(self.ShadowImages) do
+				qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+			end
 		end
 
 		qGUI.TweenTransparency(self.TextLabel, {
