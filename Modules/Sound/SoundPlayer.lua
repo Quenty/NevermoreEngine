@@ -1,13 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Sound playback
+-- @classmod SoundPlayer
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local SoundService = game:GetService("SoundService")
 local Debris = game:GetService("Debris")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local qGUI = LoadCustomLibrary("qGUI")
-local Table = LoadCustomLibrary("Table")
+local Maid = require("Maid")
+local qGUI = require("qGUI")
+local Table = require("Table")
 
 local SoundPlayer = {}
 SoundPlayer.ClassName = "SoundPlayer"
@@ -16,7 +17,7 @@ function SoundPlayer.new(Folder, ParentSoundPlayer)
 	local self = setmetatable({}, SoundPlayer)
 	
 	self.Children = {}
-	self.Maid = MakeMaid()
+	self.Maid = Maid.new()
 	self.Folder = Folder or error("No folder")
 	self.ParentSoundPlayer = ParentSoundPlayer
 	
@@ -186,9 +187,9 @@ function SoundPlayer:PlayMusic(SoundName, Parent, Options)
 	
 
 
-	local Maid = MakeMaid()
+	local maid = Maid.new()
 	self.CurrentMusicName = Sound.Name
-	Maid.Cleanup = function()
+	maid.Cleanup = function()
 		self.CurrentMusicName = nil
 		if Options.FadeOutTime == 0 then
 			Sound:Stop()
@@ -206,7 +207,7 @@ function SoundPlayer:PlayMusic(SoundName, Parent, Options)
 	if Options.LoopOptions then
 	
 		
-		Maid.DidLoop = Sound.DidLoop:Connect(function(SoundId, LoopCount)
+		maid.DidLoop = Sound.DidLoop:Connect(function(SoundId, LoopCount)
 			if LoopCount > 0 then
 				
 				local NewOptions = Table.DeepCopy(Options)
@@ -231,7 +232,7 @@ function SoundPlayer:PlayMusic(SoundName, Parent, Options)
 				
 				if #Available <= 0 then
 					warn("[SoundPlayer] - Somehow there are no options in LoopOptions")
-					Maid.DidLoop = nil
+					maid.DidLoop = nil
 					return nil
 				end
 				
@@ -248,7 +249,7 @@ function SoundPlayer:PlayMusic(SoundName, Parent, Options)
 		end)
 	end
 		
-	self.Maid.Music = Maid
+	self.Maid.Music = maid
 	
 	return Sound
 end
