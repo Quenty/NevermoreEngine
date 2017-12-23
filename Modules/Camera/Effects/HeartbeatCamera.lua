@@ -3,8 +3,9 @@
 -- of potentially going deeep into a tree and getting invoked multiple times
 -- @classmod HeartbeatCamera
 
-local RunService = game:GetService("RunService")
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local RunService = game:GetService("RunService")
 
 local SummedCamera = require("SummedCamera")
 local Maid = require("Maid")

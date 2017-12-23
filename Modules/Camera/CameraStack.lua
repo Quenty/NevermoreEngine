@@ -2,8 +2,9 @@
 -- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
 -- @module CameraStack
 
-local RunService = game:GetService("RunService")
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local RunService = game:GetService("RunService")
 
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
