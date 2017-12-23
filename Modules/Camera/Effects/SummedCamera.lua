@@ -9,7 +9,7 @@ local CameraState = LoadCustomLibrary("CameraState")
 
 local SummedCamera = {}
 SummedCamera.ClassName = "SummedCamera"
-SummedCamera.Mode = "World" -- If World, then it just adds positions. 
+SummedCamera.Mode = "World" -- If World, then it just adds positions.
                             -- If relative, then it moves position relative to CameraA's CoordinateFrame.
 
 function SummedCamera.new(CameraA, CameraB)
@@ -24,15 +24,25 @@ function SummedCamera.new(CameraA, CameraB)
 	return self
 end
 
+function SummedCamera.addToClass(class)
+	assert(not class.__add)
+
+	class.__add = SummedCamera.__addClass
+end
+
 function SummedCamera:SetMode(Mode)
 	assert(Mode == "World" or Mode == "Relative")
-	self.Mode = Mode
+	self._mode = Mode
 
 	return self
 end
 
-function SummedCamera:__add(Other)
-	return SummedCamera.new(self, Other):SetMode(self.Mode)
+function SummedCamera:__addClass(other)
+	return SummedCamera.new(self, other)
+end
+
+function SummedCamera:__add(other)
+	return SummedCamera.new(self, other):SetMode(self._mode)
 end
 
 function SummedCamera:__sub(Other)
@@ -47,7 +57,7 @@ end
 
 function SummedCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		if self.Mode == "World" then
+		if self._mode == "World" then
 			return self.CameraAState + self.CameraBState
 		else
 			local StateA = self.CameraAState
