@@ -27,7 +27,7 @@ function lib.Count(tab)
 	return count
 end
 
---- Copies a table, but not deep. 
+--- Copies a table, but not deep.
 -- @tparam table target Table to copy
 -- @treturn table New table
 function lib.Copy(target)
@@ -75,9 +75,9 @@ lib.DeepOverwrite = DeepOverwrite
 --- Gets an index by value, returning `nil` if no index is found.
 -- @tparam table haystack to search in
 -- @param needle Value to search for
--- @return The index of the value, if found 
+-- @return The index of the value, if found
 -- @treturn nil if not found
-function lib.GetIndexByValue(haystack, needle)
+function lib.GetIndex(haystack, needle)
 	for index, item in pairs(haystack) do
 		if needle == item then
 			return index
@@ -91,7 +91,7 @@ end
 -- @tparam table table Table to stringify
 -- @tparam[opt=0] number indent Indent level
 -- @tparam[opt=""] string output Output string, used recursively
--- @treturn string The table in string form  
+-- @treturn string The table in string form
 local function Stringify(table, indent, output)
 	output = output or tostring(table)
 	indent = indent or 0
@@ -111,7 +111,7 @@ lib.Stringify = Stringify
 --- Returns whether `value` is within `table`
 -- @tparam table table to search in for value
 -- @param value Value to search for
--- @treturn boolean `true` if within, `false` otherwise 
+-- @treturn boolean `true` if within, `false` otherwise
 function lib.Contains(table, value)
 	for _, item in pairs(table) do
 		if item == value then
@@ -134,7 +134,7 @@ function lib.Overwrite(target, source)
 	return target
 end
 
---- Sets a metatable on a table such that it errors when 
+--- Sets a metatable on a table such that it errors when
 -- indexing an undefined value
 -- @tparam table table Table to error on indexing
 -- @treturn table table The same table
