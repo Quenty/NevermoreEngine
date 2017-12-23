@@ -30,6 +30,12 @@ function Physics.Projectile.New(Initial)
 				v0 = v
 				p0 = p
 			end;
+			SetData = function(_, new_x0, new_p0, new_v0, new_a0)
+				x0 = new_x0
+				p0 = new_p0
+				v0 = new_v0
+				a0 = new_a0
+			end;
 		}, {
 		__index = function(self, Index)
 			if Index=="Value" or Index=="Position" or Index=="p" then
