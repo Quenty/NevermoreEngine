@@ -5,20 +5,25 @@ local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"
 local LoadCustomLibrary = NevermoreEngine.LoadLibrary
 
 local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local BasicPane = LoadCustomLibrary("BasicPane")
 local BaseAction = LoadCustomLibrary("BaseAction")
 local ValueObject = LoadCustomLibrary("ValueObject")
 local Signal = LoadCustomLibrary("Signal")
+local EnabledMixin = LoadCustomLibrary("EnabledMixin")
 
 -- Intent: 
 -- @author Quenty
 
-local ActionManager = setmetatable({}, BasicPane)
+local ActionManager = setmetatable({}, {})
 ActionManager.__index = ActionManager
 ActionManager.ClassName = "ActionManager"
 
+EnabledMixin:Add(ActionManager)
+
 function ActionManager.new()
-	local self = setmetatable(BasicPane.new(nil, {BasicPane.EnabledModule}), ActionManager)
+	local self = setmetatable({}, ActionManager)
+	
+	self.Maid = MakeMaid()
+	self:InitEnableChanged()
 	
 	self.ActiveAction = ValueObject.new()
 	self.Actions = {}
