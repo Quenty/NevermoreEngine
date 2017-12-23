@@ -1,23 +1,24 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Point a current element but lag behind for a smoother experience
+-- @classmod LagPointCamera
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-local Spring = LoadCustomLibrary("Spring")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local Spring = require("Spring")
 
 local LagPointCamera = {}
 LagPointCamera.ClassName = "LagPointCamera"
 LagPointCamera._FocusCamera = nil
 LagPointCamera._OriginCamera = nil
 
--- Intent: Point a current element but lag behind for a smoother experience
+SummedCamera.addToClass(LagPointCamera)
 
+---
+-- @constructor
+-- @param OriginCamera A camera to use
+-- @param FocusCamera The Camera to look at.
 function LagPointCamera.new(OriginCamera, FocusCamera)
-	-- @param OriginCamera A camera to use
-	-- @param FocusCamera The Camera to look at. 
-	
 	local self = setmetatable({}, LagPointCamera)
 
 	self.FocusSpring = Spring.new(Vector3.new())
@@ -26,10 +27,6 @@ function LagPointCamera.new(OriginCamera, FocusCamera)
 	self.Speed = 10
 
 	return self
-end
-
-function LagPointCamera:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function LagPointCamera:__newindex(Index, Value)

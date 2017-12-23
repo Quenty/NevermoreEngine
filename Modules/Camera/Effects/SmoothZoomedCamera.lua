@@ -1,16 +1,7 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-local Spring = LoadCustomLibrary("Spring")
-
--- Intent: Allow freedom of movement around a current place, much like the classic script works now.
+--- Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script
-
 -- Intended to be used with a SummedCamera, relative.
+-- @classmod SmoothZoomedCamera
 
 --[[ API
 
@@ -21,11 +12,20 @@ local Spring = LoadCustomLibrary("Spring")
 
 	-- Assigning .Zoom will automatically clamp
 ]]
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local Spring = require("Spring")
+
 local SmoothZoomedCamera = {}
 SmoothZoomedCamera.ClassName = "SmoothZoomedCamera"
-SmoothZoomedCamera._MaxZoom = 100
-SmoothZoomedCamera._MinZoom = 0.5
+SmoothZoomedCamera._maxZoom = 100
+SmoothZoomedCamera._minZoom = 0.5
 SmoothZoomedCamera.BounceAtEnd = true
+
+SummedCamera.addToClass(SmoothZoomedCamera)
 
 function SmoothZoomedCamera.new()
 	local self = setmetatable({}, SmoothZoomedCamera)
@@ -48,9 +48,6 @@ function SmoothZoomedCamera:Impulse(Value)
 	self.Spring:Impulse(Value)
 end
 
-function SmoothZoomedCamera:__add(Other)
-	return SummedCamera.new(self, Other)
-end
 
 function SmoothZoomedCamera:__newindex(Index, Value)
 	if Index == "TargetZoom" or Index == "Target" then
@@ -77,11 +74,11 @@ function SmoothZoomedCamera:__newindex(Index, Value)
 	elseif Index == "MaxZoom" then
 		--assert(Value > self.MinZoom, "MaxZoom can't be less than MinZoom")
 
-		self._MaxZoom = Value
+		self._maxZoom = Value
 	elseif Index == "MinZoom" then
 		--assert(Value < self.MaxZoom, "MinZoom can't be greater than MinZoom")
 
-		self._MinZoom = Value
+		self._minZoom = Value
 	else
 		rawset(self, Index, Value)
 	end
@@ -99,9 +96,9 @@ function SmoothZoomedCamera:__index(Index)
 	elseif Index == "PercentZoom" then
 		return (self.Zoom - self.MinZoom) / self.Range
 	elseif Index == "MaxZoom" then
-		return self._MaxZoom
+		return self._maxZoom
 	elseif Index == "MinZoom" then
-		return self._MinZoom
+		return self._minZoom
 	elseif Index == "Range" then
 		return self.MaxZoom - self.MinZoom
 	elseif Index == "Damper" then

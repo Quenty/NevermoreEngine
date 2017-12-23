@@ -3,11 +3,12 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
+local SummedCamera = require("SummedCamera")
 
 local CustomCameraEffect = {}
 CustomCameraEffect.ClassName = "CustomCameraEffect"
 
-require("SummedCamera").addToClass(CustomCameraEffect)
+SummedCamera.addToClass(CustomCameraEffect)
 
 --- Constructs a new custom camera effect
 -- @tparam function getCurrentStateFunc to return a function state

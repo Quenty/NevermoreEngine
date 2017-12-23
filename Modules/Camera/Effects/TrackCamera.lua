@@ -1,19 +1,20 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Track a current part, whether it be a model or part
+-- @classmod TrackCamera
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
 
 local TrackCamera = {}
 TrackCamera.ClassName = "TrackCamera"
 TrackCamera.FieldOfView = 0
 
--- Intent: Track a current part, whether it be a model or part
+SummedCamera.addToClass(TrackCamera)
 
 --- Make new track camera
--- @param [CameraSubject] The CameraSubject to look at. A ROBLOX part of ROBLOX model
+-- @constructor
+-- @param[opt] CameraSubject The CameraSubject to look at. A ROBLOX part of ROBLOX model
 function TrackCamera.new(CameraSubject)
 	
 	local self = setmetatable({}, TrackCamera)
@@ -23,13 +24,10 @@ function TrackCamera.new(CameraSubject)
 	return self
 end
 
-function TrackCamera:__add(Other)
-	return SummedCamera.new(self, Other)
-end
-
 function TrackCamera:__newindex(Index, Value)
 	if Index == "CameraSubject" then
-		assert(type(Value) == "userdata" or type(Value) == "nil", "CameraSubject must be a ROBLOX Model or ROBLOX Part or nil")
+		assert(type(Value) == "userdata" or type(Value) == "nil",
+			"CameraSubject must be a ROBLOX Model or ROBLOX Part or nil")
 		
 		if type(Value) == "userdata" then
 			assert(Value:IsA("Model") or Value:IsA("BasePart"), "CameraSubject must be a Model or BasePart")

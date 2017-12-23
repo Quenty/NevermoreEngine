@@ -1,17 +1,17 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Lock camera to only XZPlane, preventing TrackerCameras from making players sick.
+-- @classmod XZPlaneLockCamera
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qCFrame = LoadCustomLibrary("qCFrame")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local qCFrame = require("qCFrame")
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
-
--- Intent: Lock camera to only XZPlane, preventing TrackerCameras from making players sick.
 
 local XZPlaneLockCamera = {}
 XZPlaneLockCamera.ClassName = "XZPlaneLockCamera"
+
+SummedCamera.addToClass(XZPlaneLockCamera)
 
 function XZPlaneLockCamera.new(Camera)
 	local self = setmetatable({}, XZPlaneLockCamera)
@@ -19,10 +19,6 @@ function XZPlaneLockCamera.new(Camera)
 	self.Camera = Camera or error("No camera")
 
 	return self
-end
-
-function XZPlaneLockCamera:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function XZPlaneLockCamera:__index(Index)

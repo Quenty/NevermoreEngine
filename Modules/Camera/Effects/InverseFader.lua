@@ -1,15 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Be the inverse of a fading camera (makes scaling in cameras easy).
+-- @classmod InverseFader
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
+local SummedCamera = require("SummedCamera")
 
 local InverseFader = {}
 InverseFader.ClassName = "InverseFader"
 
--- Intent: Be the inverse of a fading camera (makes scaling in cameras easy).
+SummedCamera.addToClass(InverseFader)
 
 function InverseFader.new(Camera, Fader)
 	local self = setmetatable({}, InverseFader)
@@ -18,10 +17,6 @@ function InverseFader.new(Camera, Fader)
 	self.Fader = Fader or error()
 
 	return self
-end
-
-function InverseFader:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function InverseFader:__index(Index)
