@@ -1,13 +1,11 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Maid = LoadCustomLibrary("Maid")
-local ValueObject = LoadCustomLibrary("ValueObject")
-
--- Intent: Selects the most recent input mode and attempts to
+-- Selects the most recent input mode and attempts to
 -- identify the best state from it
+-- @classmod InputModeSelector
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local Maid = require("Maid")
+local ValueObject = require("ValueObject")
 
 local InputModeSelector = {}
 InputModeSelector.__index = InputModeSelector

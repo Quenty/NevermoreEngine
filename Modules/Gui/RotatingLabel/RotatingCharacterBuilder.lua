@@ -1,9 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local RotatingCharacter = LoadCustomLibrary("RotatingCharacter")
+local RotatingCharacter = require("RotatingCharacter")
 
 local RotatingCharacterBuilder = {}
 RotatingCharacterBuilder.__index = RotatingCharacterBuilder

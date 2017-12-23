@@ -1,10 +1,7 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Maid = LoadCustomLibrary("Maid")
-local Signal = LoadCustomLibrary("Signal")
+local Maid = require("Maid")
+local Signal = require("Signal")
 
 local module = {}
 module.__index = module

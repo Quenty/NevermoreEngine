@@ -1,10 +1,7 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qMath = LoadCustomLibrary("qMath")
-local Spring = LoadCustomLibrary("Spring")
+local qMath = require("qMath")
+local Spring = require("Spring")
 
 local MapNumber = qMath.MapNumber
 

@@ -1,12 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Renders touching parts from the PartTouchingCalculator
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local Debris = game:GetService("Debris")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qGUI = LoadCustomLibrary("qGUI")
-
--- Intent: Renders touching parts from the PartTouchingCalculator
+local qGUI = require("qGUI")
 
 local PartTouchingRenderer = {}
 PartTouchingRenderer.__index = PartTouchingRenderer

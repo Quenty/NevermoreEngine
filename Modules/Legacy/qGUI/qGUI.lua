@@ -1,21 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Table = LoadCustomLibrary("Table")
 
 local lib = {}
 
 -- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
-local function PointInBounds(Frame, X, Y)
-	local TopBound    = Frame.AbsolutePosition.Y
+function lib.PointInBounds(Frame, X, Y)
+	local TopBound = Frame.AbsolutePosition.Y
 	local BottomBound = Frame.AbsolutePosition.Y + Frame.AbsoluteSize.Y
-	local LeftBound   = Frame.AbsolutePosition.X
-	local RightBound  = Frame.AbsolutePosition.X + Frame.AbsoluteSize.X
+	local LeftBound = Frame.AbsolutePosition.X
+	local RightBound = Frame.AbsolutePosition.X + Frame.AbsoluteSize.X
 
 	if Y > TopBound and Y < BottomBound and X > LeftBound and X < RightBound then
 		return true
@@ -23,12 +16,10 @@ local function PointInBounds(Frame, X, Y)
 		return false
 	end
 end
-lib.PointInBounds = PointInBounds
 
-local function MouseOver(Mouse, Frame)
-	return PointInBounds(Frame, Mouse.X, Mouse.Y)
+function lib.MouseOver(Mouse, Frame)
+	return lib.PointInBounds(Frame, Mouse.X, Mouse.Y)
 end
-lib.MouseOver = MouseOver
 
 -- @param UpdateFunction()
 	-- @return ShouldStop, if true, will stop updating
@@ -42,12 +33,12 @@ local function CreateYieldedUpdate(UpdateFunction)
 	local function GetNewUpdateFunction(RenderStepKey)
 
 		local LocalAnimationId = AnimationId + 1
-		AnimationId = LocalAnimationId 
+		AnimationId = LocalAnimationId
 
 		-- Note that we're now updating.
 		LastUpdatePoint = tick()
 
-		--- Intended to be called each RenderStep. Will unbind itself if the UpdateFunction fails 
+		--- Intended to be called each RenderStep. Will unbind itself if the UpdateFunction fails
 		-- or a new update function is generated
 		return function()
 			LastUpdatePoint = tick()
@@ -91,13 +82,13 @@ end
 
 local function MakePropertyTweener(SetProperties)
 	--- Creates a tweener that only runs when it's updating with a set properties system.
-	-- @param function `SetProperties` 
+	-- @param function `SetProperties`
 		-- SetProperties(Gui, Percent, StartProperties, NewProperties)
 			-- @param Gui The Gui to set properties on
 			-- @param Percent Number [0, 1] of properties to set
 			-- @param StartProperties The properties we started with
 			-- @param NewProperties The properties we ended with
-	-- @return 
+	-- @return
 
 	local GuiMap = {} -- [Gui] = TweenData
 
@@ -134,7 +125,7 @@ local function MakePropertyTweener(SetProperties)
 				local TimeElapsed = tick - TweenState.StartTime
 
 				if TimeElapsed > TweenState.Duration then -- Then we end it.
-					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties) 
+					SetProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties)
 					GuiMap[Gui] = nil
 				else
 					SetProperties(Gui, TimeElapsed/TweenState.Duration, TweenState.StartProperties, TweenState.NewProperties)
@@ -152,7 +143,7 @@ local function MakePropertyTweener(SetProperties)
 	-- @param Gui The GUI to tween the Transparency's upon
 	-- @param NewProperties The properties to be changed. It will take the current
 	--                      properties and tween to the new ones. This table should be
-	--                      setup so {Index = NewValue} that is, for example, 
+	--                      setup so {Index = NewValue} that is, for example,
 	--                      {TextTransparency = 1}.
 	-- @param Duration The amount of time to spend transitioning.
 	return function(Gui, NewProperties, Duration)
@@ -164,8 +155,8 @@ local function MakePropertyTweener(SetProperties)
 			StartRenderStepUpdater()
 		end
 
- 	-- A tweening function to manually terminate tweening on a Gui element
- 	-- @param Gui The GUI to stop tweening
+	-- A tweening function to manually terminate tweening on a Gui element
+	-- @param Gui The GUI to stop tweening
 	end, function(Gui)
 		GuiMap[Gui] = nil
 	end
@@ -176,7 +167,7 @@ end
 -- @param Gui The GUI to tween the Transparency's upon
 -- @param NewProperties The properties to be changed. It will take the current
 --                      properties and tween to the new ones. This table should be
---                      setup so {Index = NewValue} that is, for example, 
+--                      setup so {Index = NewValue} that is, for example,
 --                      {TextTransparency = 1}.
 -- @param Time The amount of time to spend transitioning.
 local TweenTransparency, StopTransparencyTween = MakePropertyTweener(function(Gui, Percent, StartProperties, NewProperties)
@@ -195,7 +186,7 @@ lib.StopTransparencyTween = StopTransparencyTween
 -- @param Gui The GUI to tween the Color3's upon
 -- @param NewProperties The properties to be changed. It will take the current
 --                      properties and tween to the new ones. This table should be
---                      setup so {Index = NewValue} that is, for example, 
+--                      setup so {Index = NewValue} that is, for example,
 --                      {BackgroundColor3 = Color3.new(1, 1, 1)}.
 -- @param Duration The amount of time to spend transitioning.
 local TweenColor3, StopColor3Tween do
@@ -303,7 +294,7 @@ local function AddTexturedWindowTemplate(Frame, Radius, Type)
 end
 lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 
---- Makes a NinePatch in the frame, with the image. 
+--- Makes a NinePatch in the frame, with the image.
 -- @param Frame The frame to texturize
 -- @param Radius the radius you want the image to be at
 -- @param Type The type (Class) that the frame should be, either an ImageLabel or an ImageButton

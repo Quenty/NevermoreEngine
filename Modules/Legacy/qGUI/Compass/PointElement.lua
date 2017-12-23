@@ -1,9 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local ICompassElement   = LoadCustomLibrary("ICompassElement")
+local ICompassElement = require("ICompassElement")
 
 -- An interest point for an element
 -- @author Quenty

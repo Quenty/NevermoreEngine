@@ -1,14 +1,11 @@
 ---
--- @classmod HttpPromise
+-- @module HttpPromise
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
 local HttpService = game:GetService("HttpService")
 
-local function LoadCustomLibrary(Name)
-	return require(script.Parent[Name])
-end
-
-local Promise = LoadCustomLibrary("Promise")
-
+local Promise = require("Promise")
 
 local HttpPromise = {}
 
@@ -18,7 +15,7 @@ function HttpPromise.Method(MethodName, Url, ...)
 	return Promise.new(function(Fulfill, Reject)
 		local Result
 		
-		local Success, Error = ypcall(function()
+		local Success, Error = pcall(function()
 			Result = HttpService[MethodName](HttpService, Url, unpack(Args))
 		end)
 		if not Success then

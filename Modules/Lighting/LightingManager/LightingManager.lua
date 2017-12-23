@@ -1,11 +1,9 @@
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local Lighting = game:GetService("Lighting")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qGUI = LoadCustomLibrary("qGUI")
-local qMath = LoadCustomLibrary("qMath")
+local qGUI = require("qGUI")
+local qMath = require("qMath")
 
 -- General LightingManager which can tween items in lighting
 

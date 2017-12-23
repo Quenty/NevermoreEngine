@@ -1,9 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Quaternion = LoadCustomLibrary("Quaternion")
+local Quaternion = require("Quaternion")
 
 --By xXxMoNkEyMaNxXx elsez
 --Roblox Lua
@@ -35,7 +32,7 @@ function metatable.__index(q,i)
 	return q[alt[i]]
 end
 
-local function new(w,x,y,z)	
+local function new(w,x,y,z)
 	return setmetatable({w=w or 1,x=x or 0,y=y or 0,z=z or 0},metatable)
 end
 Q.new=new

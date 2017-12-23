@@ -1,16 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local RunService = game:GetService("RunService")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local RotatingCharacterBuilder = LoadCustomLibrary("RotatingCharacterBuilder")
+local RotatingCharacterBuilder = require("RotatingCharacterBuilder")
 
 --[[
 class RotatingLabel
 
 Description:
-	A text label with most general properties of a textlabel, except when text is set, 
+	A text label with most general properties of a textlabel, except when text is set,
 	it rotates uniformly like an old clock, animating in a satisfying way
 	
 	Construct with RotatingLabelBuilder.new(Template):Create()
@@ -21,7 +19,7 @@ API:
 	RotatingLabel.Width = number
 		Sets the general width of each character
 	RotatingLabel.Transparency
-		Sets the transparency 
+		Sets the transparency
 	RotatingLabel.Damper
 		Sets the damper of the underlying spring model
 	RotatingLabel.Speed

@@ -1,20 +1,17 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
 
 --[[
 class TimeSyncManager
 
 Description:
-	Syncronize time between client and servers so we can use a universal timestamp 
+	Syncronize time between client and servers so we can use a universal timestamp
 	across the game. See: www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf for more details
 
 API:
 	Use use just require the module, it's a singleton. Load TimeSyncManager on the server to use on the clients.
 
 	number GetTime()
-		Returns the sycncronized time 
+		Returns the sycncronized time
 
 	bool IsSynced()
 		Returns true if the manager has synced with the server
@@ -31,7 +28,7 @@ function MasterClock.new(SyncEvent, DelayedRequestFunction)
 	self.SyncEvent = SyncEvent
 	self.DelayedRequestFunction = DelayedRequestFunction or error("No DelayedRequestFunction")
 	
-	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)	
+	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)
 		return self:_handleDelayRequest(TimeThree) --
 	end
 	
@@ -108,7 +105,7 @@ function SlaveClock:_getLocalTime()
 end
 
 function SlaveClock:_handleSyncEvent(TimeOne)
-    local TimeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately. 
+    local TimeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately.
     local MasterSlaveDifference = TimeTwo - TimeOne -- We have Offst + MS Delay
 
     local TimeThree = self:_getLocalTime()
@@ -146,8 +143,10 @@ end
 
 --- Return a singleton
 local function BuildClock()
-	local SyncEvent = NevermoreEngine.GetRemoteEvent("TimeSyncEvent")
-	local DelayedRequestFunction = NevermoreEngine.GetRemoteFunction("DelayedRequestEvent")
+	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+	local SyncEvent = require.GetRemoteEvent("TimeSyncEvent")
+	local DelayedRequestFunction = require.GetRemoteFunction("DelayedRequestEvent")
 
 	if RunService:IsClient() and RunService:IsServer() then -- Solo test mode
 		local Clock = MasterClock.new(SyncEvent, DelayedRequestFunction)

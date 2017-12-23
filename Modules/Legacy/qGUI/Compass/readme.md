@@ -5,13 +5,13 @@ This is a GUI compass interface and calculator. It's designed to be extendible.
 This section of code does not, as of 5/21/2015, require another other modules outside of its own folder. 
 
 ## Example code?
-Although there is not loading code or actual GUI elements (for example, `WaitForChild` or `LoadCustomLibrary`), this code here
+Although there is not loading code or actual GUI elements (for example, `WaitForChild` or `require`), this code here
 should give you a good example of how to use this.
 
 ```lua
 do -- Compass test
-	local StripCompass = LoadCustomLibrary("StripCompass")
-	local CompassModel = LoadCustomLibrary("CompassModel")
+	local StripCompass = require("StripCompass")
+	local CompassModel = require("CompassModel")
 
 	local CompassGui = WaitForChild(ScreenGui, "Compass")
 	
@@ -19,7 +19,7 @@ do -- Compass test
 	local Compass = StripCompass.new(Model, CompassGui)
 	
 	do -- ADD ELEMENTS
-		local CardinalElement = LoadCustomLibrary("CardinalElement")
+		local CardinalElement = require("CardinalElement")
 		local TemplateGui = WaitForChild(CompassGui, "Template")
 		TemplateGui.Parent = nil
 		

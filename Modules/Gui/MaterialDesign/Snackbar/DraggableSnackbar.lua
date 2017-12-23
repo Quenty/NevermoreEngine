@@ -1,14 +1,12 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players  = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local Snackbar = LoadCustomLibrary("Snackbar")
-local qGUI = LoadCustomLibrary("qGUI")
+local Snackbar = require("Snackbar")
+local qGUI = require("qGUI")
 
 --- Snackbar, but draggable
 local DraggableSnackbar = setmetatable({}, Snackbar)

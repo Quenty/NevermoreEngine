@@ -1,11 +1,9 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+---  Trace input mode state and trigger changes correctly
+-- @classmod InputMode
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local Signal = LoadCustomLibrary("Signal")
-
--- Intent: Trace input mode state and trigger changes correctly
+local Signal = require("Signal")
 
 local InputMode = {}
 InputMode.__index = InputMode

@@ -1,13 +1,9 @@
 ---
 -- @classmod ScreenCoverBuilder
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local ScreenCover = LoadCustomLibrary("ScreenCover")
-
+local ScreenCover = require("ScreenCover")
 
 local ScreenCoverBuilder = {}
 ScreenCoverBuilder.__index = ScreenCoverBuilder

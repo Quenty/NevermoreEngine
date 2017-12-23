@@ -2,14 +2,9 @@
 -- with `.Changed` events
 -- @classmod ValueObject
 
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Signal = LoadCustomLibrary("Signal")
-
+local Signal = require("Signal")
 
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"

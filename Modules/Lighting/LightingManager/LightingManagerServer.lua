@@ -1,12 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Syncronizes lighting with clients
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local Players = game:GetService("Players")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local LightingManager = LoadCustomLibrary("LightingManager")
-
--- Intent: Syncronizes lighting with clients
+local LightingManager = require("LightingManager")
 
 local LightingManagerServer = setmetatable({}, LightingManager)
 LightingManagerServer.__index = LightingManagerServer

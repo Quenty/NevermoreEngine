@@ -1,12 +1,9 @@
 --- Makes playing and loading tracks into a humanoid easy
 -- @classmod AnimationPlayer
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Signal = LoadCustomLibrary("Signal")
+local Signal = require("Signal")
 
 local AnimationPlayer = {}
 AnimationPlayer.__index = AnimationPlayer

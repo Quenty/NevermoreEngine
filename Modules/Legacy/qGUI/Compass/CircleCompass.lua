@@ -1,9 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local ICompass          = LoadCustomLibrary("ICompass")
+local ICompass = require("ICompass")
 
 -- CircleCompass.lua
 -- @author Quenty

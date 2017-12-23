@@ -1,15 +1,12 @@
 --- Covers the screen in a satisfying way
 -- @classmod ScreenCover
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local ScreenCoverHelperBuilder = LoadCustomLibrary("ScreenCoverHelperBuilder")
-local Signal = LoadCustomLibrary("Signal")
-local Maid = LoadCustomLibrary("Maid")
-local Promise = LoadCustomLibrary("Promise")
+local ScreenCoverHelperBuilder = require("ScreenCoverHelperBuilder")
+local Signal = require("Signal")
+local Maid = require("Maid")
+local Promise = require("Promise")
 
 local ScreenCover = {}
 ScreenCover.__index = ScreenCover

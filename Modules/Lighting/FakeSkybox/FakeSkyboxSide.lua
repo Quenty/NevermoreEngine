@@ -1,9 +1,3 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
 local FakeSkyboxSide = {}
 FakeSkyboxSide.__index = FakeSkyboxSide
 FakeSkyboxSide.ClassName = "FakeSkyboxSide"
@@ -44,7 +38,7 @@ function FakeSkyboxSide.new(PartSize, Normal, Parent)
 		
 	self:UpdateSizing()
 	
-	self.Part.Parent = Parent	
+	self.Part.Parent = Parent
 	
 	return self
 end
@@ -62,7 +56,7 @@ function FakeSkyboxSide:UpdateSizing()
 	local Direction = Vector3.FromNormalId(self.Normal)
 	local Offset = Direction * self.PartWidth/2
 	
-	self.Relative = CFrame.new(Direction*(self.PartSize/2) + Offset) 
+	self.Relative = CFrame.new(Direction*(self.PartSize/2) + Offset)
 		* CFrame.new(Vector3.new(0, 0, 0), -Direction)
 	
 	if self.Normal == Enum.NormalId.Bottom then

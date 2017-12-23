@@ -1,15 +1,12 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
+--- Stack-based lighting manager which puts server lighting at the bottom and then
+-- allows properties to filter down based upon the stack. Handles lighting effects inside of lighting too.
+
 local Lighting = game:GetService("Lighting")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local LightingManager = LoadCustomLibrary("LightingManager")
-local Table = LoadCustomLibrary("Table")
-
--- Intent: Stack-based lighting manager which puts server lighting at the bottom and then
---         allows properties to filter down based upon the stack. Handles lighting effects inside of lighting too.
+local LightingManager = require("LightingManager")
+local Table = require("Table")
 
 local LightingManagerClient = setmetatable({}, LightingManager)
 LightingManagerClient.__index = LightingManagerClient

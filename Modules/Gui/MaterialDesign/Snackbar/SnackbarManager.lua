@@ -1,9 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local DraggableSnackbar = LoadCustomLibrary("DraggableSnackbar")
+local DraggableSnackbar = require("DraggableSnackbar")
 
 --[[
 class SnackbarManager

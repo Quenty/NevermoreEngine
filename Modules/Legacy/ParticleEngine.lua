@@ -1,26 +1,19 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+--- Legacy code written by AxisAngles to simulate particles with Guis
 
--- Legacy code written by AxisAngles to simulate particles with Guis
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
 local WIND_SPEED = 10
 
 local sin = math.sin
-local cos = math.cos
 local tan = math.tan
 local sqrt = math.sqrt
 local insert = table.insert
-local remove = table.remove
 local atan2 = math.atan2
-local max = math.max
-local abs = math.abs
-local random = math.random
 local v3 = Vector3.new
 local v2 = Vector2.new
 local ud2 = UDim2.new
 local tick = tick
 local ray = Ray.new
-local Dot = v3().Dot
 local lib = {}
 
 --- Required for networking....
@@ -28,7 +21,7 @@ local function MakeParticleEngineServer()
 
 	local Engine = {}
 
-	local RemoteEvent = NevermoreEngine.GetRemoteEvent("ParticleEventDistributor")
+	local RemoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
 
 	local function ParticleNew(p) -- PropertiesTable
 		p.Position      = p.Position or error("No Position Yo")
@@ -76,7 +69,7 @@ local function RealMakeEngine(Screen)
 	ParticleNew{
 		Position          = Vector3
 
-		--Nonrequired 
+		--Nonrequired
 		Global            = Bool
 		Velocity          = Vector3
 		Gravity           = Vector3
@@ -99,24 +92,24 @@ local function RealMakeEngine(Screen)
 	local Time = tick()
 
 	local Player         = game.Players.LocalPlayer
-	local RemoteEvent    = NevermoreEngine.GetRemoteEvent("ParticleEventDistributor")
+	local RemoteEvent    = require.GetRemoteEvent("ParticleEventDistributor")
 
 	-- Screen = Screen or Instance.new("ScreenGui", Player.PlayerGui)
 
 	local ParticleFrames = {}
 
-	local ScreenSizeX 
-	local ScreenSizeY 
-	local PlaneSizeY 
-	local PlaneSizeX  
+	local ScreenSizeX
+	local ScreenSizeY
+	local PlaneSizeY
+	local PlaneSizeX
 
 	local function NewParticle(Name)
-		local NewParticle           = Instance.new("Frame")
-		NewParticle.BorderSizePixel = 0
-		NewParticle.Name            = Name;
-		NewParticle.Archivable      = false
+		local frame = Instance.new("Frame")
+		frame.BorderSizePixel = 0
+		frame.Name  = Name
+		frame.Archivable = false
 
-		return NewParticle
+		return frame
 	end
 
 	--Generate the GUIs
@@ -278,7 +271,6 @@ local function RealMakeEngine(Screen)
 	end
 	Engine.ParticleRemove = ParticleRemove
 
-	local Terrain = workspace.Terrain
 	local workspace = workspace
 
 	--- Handles both priority and regular particles
@@ -387,10 +379,6 @@ local function RealMakeEngine(Screen)
 	end
 	RemoteEvent.OnClientEvent:Connect(ParticleNew)
 	Engine.ParticleNew = ParticleNew
-
-	local RenderStepped = game:GetService("RunService").RenderStepped
-
-	local UpdateId = 0
 
 	return Engine
 end

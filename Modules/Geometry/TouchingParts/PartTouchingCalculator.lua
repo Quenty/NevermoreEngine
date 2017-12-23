@@ -1,14 +1,12 @@
 --- Determines if parts are touching or not
 -- @classmod PartTouchingCalculator
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local CollectionService = game:GetService("CollectionService")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qCFrame = LoadCustomLibrary("qCFrame")
-local CharacterUtil = LoadCustomLibrary("CharacterUtil")
+local qCFrame = require("qCFrame")
+local CharacterUtil = require("CharacterUtil")
 
 local PartTouchingCalculator = {}
 PartTouchingCalculator.__index = PartTouchingCalculator

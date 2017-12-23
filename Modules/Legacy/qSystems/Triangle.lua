@@ -1,16 +1,8 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local qSystems          = LoadCustomLibrary("qSystems")
-local Make              = qSystems.Make
+-- Triangle.lua
+-- @author Quenty, aparently algorithm is from xLEGOx, cannot confirm though.
+-- This library handles drawing (and redrawning) triangles.
 
 local lib = {}
-
--- Triangle.lua
--- @author Quenty, aparently algorithm is from xLEGOx, cannot confirm though. 
--- This library handles drawing (and redrawning) triangles. 
 
 local function ParaD(A, B, C)
 	local DotProduct = (B-A).x*(C-A).x + (B-A).y*(C-A).y + (B-A).z*(C-A).z
@@ -23,24 +15,24 @@ local function PerpD(A, B, C)
 end
 
 local function MakeDefaultBrick(Parent)
-	return Make("WedgePart", {
-		FormFactor    = "Custom";
-		TopSurface    = "Smooth";
-		BottomSurface = "Smooth";
-		Anchored      = true;
-		Size          = Vector3.new(0.2, 7, 7);
-		Name          = "WedgePart";
-		Parent = Parent;
-		CanCollide = false;
+	local part = Instance.new("WedgePart")
+	part.FormFactor = "Custom"
+	part.TopSurface = "Smooth"
+	part.BottomSurface = "Smooth"
+	part.Anchored = true
+	part.Size = Vector3.new(0.2, 7, 7)
+	part.Name = "WedgePart"
+	part.Parent = Parent
+	part.CanCollide = false
 
-		Make("SpecialMesh",{
-			MeshType = "Wedge";
-			Name     = "Mesh";
-		})
-	})
+	local mesh = Instance.new("SpecialMesh")
+	mesh.MeshType = "Wedge"
+	mesh.Name = "Mesh"
+	mesh.Parent = part
+
+	return part
 end
 
-local sqrt       = math.sqrt
 local NewCFrame  = CFrame.new
 local NewVector3 = Vector3.new
 local Dot        = Vector3.new().Dot
