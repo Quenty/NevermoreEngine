@@ -1,10 +1,10 @@
 local lib = {}
 
 -- @author Quenty
--- Generic IsA interface for Lua classes. 
+-- Generic IsA interface for Lua classes.
 
 local function IsA(self, ClassName)
-	--- Using the .ClassName property, returns whether or not a component is 
+	--- Using the .ClassName property, returns whether or not a component is
 	--  a class
 
 	assert(type(ClassName) == "string", "ClassName must be a string")

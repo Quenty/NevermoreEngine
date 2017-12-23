@@ -1,4 +1,4 @@
----	Manages the cleaning of events and other things. 
+---	Manages the cleaning of events and other things.
 -- Useful for encapsulating state and make deconstructors easy
 -- @classmod Maid
 -- @see Signal
@@ -93,7 +93,7 @@ function Maid:DoCleaning()
 end
 
 --- Alias for DoCleaning()
--- @function Destroy 
+-- @function Destroy
 Maid.Destroy = Maid.DoCleaning
 
 return Maid
