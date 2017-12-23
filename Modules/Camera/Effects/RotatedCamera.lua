@@ -1,18 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qCFrame = LoadCustomLibrary("qCFrame")
-
-local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
-
--- Intent: Allow freedom of movement around a current place, much like the classic script works now.
+--- Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script. This is the rotation component.
-
 -- Intended to be used with a SummedCamera, relative.
+-- @classmod RotatedCamera
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local qCFrame = require("qCFrame")
+local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 
 local RotatedCamera = {}
 RotatedCamera.ClassName = "RotatedCamera"
@@ -29,15 +25,15 @@ function RotatedCamera.new()
 	return self
 end
 
-function RotatedCamera:RotateXY(XYRotateVector)
-	-- @param XYRotateVector Vector2, the delta rotation to apply
-
-	self.AngleX = self.AngleX + XYRotateVector.x
-	self.AngleY = self.AngleY + XYRotateVector.y
+function RotatedCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
-function RotatedCamera:__add(Other)
-	return SummedCamera.new(self, Other)
+---
+-- @param XYRotateVector Vector2, the delta rotation to apply
+function RotatedCamera:RotateXY(XYRotateVector)
+	self.AngleX = self.AngleX + XYRotateVector.x
+	self.AngleY = self.AngleY + XYRotateVector.y
 end
 
 function RotatedCamera:__newindex(Index, Value)
@@ -74,7 +70,6 @@ function RotatedCamera:__index(Index)
 	elseif Index == "LookVector" then
 		return self.Rotation.lookVector
 	elseif Index == "CoordinateFrame" then
-		local Angles = self.Angles
 		return CFrame.Angles(0, self.AngleXZ, 0) * CFrame.Angles(self.AngleY, 0, 0)
 	elseif Index == "AngleY" then
 		return self._AngleY

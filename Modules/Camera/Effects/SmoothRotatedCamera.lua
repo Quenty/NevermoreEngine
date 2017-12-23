@@ -1,19 +1,15 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qCFrame = LoadCustomLibrary("qCFrame")
-
-local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
-local Spring = LoadCustomLibrary("Spring")
-
--- Intent: Allow freedom of movement around a current place, much like the classic script works now.
+--- Intent: Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script. This is the rotation component.
-
 -- Intended to be used with a SummedCamera, relative.
+-- @classmod SmoothRotatedCamera
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local qCFrame = require("qCFrame")
+local Spring = require("Spring")
+local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 
 local SmoothRotatedCamera = {}
 SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
@@ -21,7 +17,7 @@ SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
 -- Max/Min aim up and down
 SmoothRotatedCamera._MaxY = math.rad(80)
 SmoothRotatedCamera._MinY = math.rad(-80)
-SmoothRotatedCamera._ZoomGiveY = math.rad(5) -- ONly on th
+SmoothRotatedCamera._ZoomGiveY = math.rad(5) -- Only on th
 
 function SmoothRotatedCamera.new()
 	local self = setmetatable({}, SmoothRotatedCamera)
@@ -33,17 +29,17 @@ function SmoothRotatedCamera.new()
 	return self
 end
 
-function SmoothRotatedCamera:RotateXY(XYRotateVector)
-	-- @param XYRotateVector Vector2, the delta rotation to apply
+function SmoothRotatedCamera:__add(other)
+	return SummedCamera.new(self, other)
+end
 
+---
+-- @param XYRotateVector Vector2, the delta rotation to apply
+function SmoothRotatedCamera:RotateXY(XYRotateVector)
 	self.AngleX = self.AngleX + XYRotateVector.x
 	self.AngleY = self.AngleY + XYRotateVector.y
 	self.TargetAngleX = self.AngleX
 	self.TargetAngleY = self.AngleY
-end
-
-function SmoothRotatedCamera:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function SmoothRotatedCamera:__newindex(Index, Value)

@@ -1,15 +1,12 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Add another layer of effects over any other camera by allowing an "impulse"
+-- to be applied. Good for shockwaves, camera shake, and recoil
+-- @classmod ImpulseCamera
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local Spring = LoadCustomLibrary("Spring")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-
--- Intent: Add another layer of effects over any other camera by allowing an "impulse"
--- to be applied.
--- Good for shockwaves, camera shake, and recoil
+local CameraState = require("CameraState")
+local Spring = require("Spring")
+local SummedCamera = require("SummedCamera")
 
 local ImpulseCamera = {}
 ImpulseCamera.ClassName = "ImpulseCamera"
@@ -23,6 +20,10 @@ function ImpulseCamera.new()
 	self.Speed = 20
 
 	return self
+end
+
+function ImpulseCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function ImpulseCamera:__newindex(Index, Value)
@@ -39,10 +40,6 @@ end
 
 function ImpulseCamera:Impulse(Velocity)
 	self.Spring:Impulse(Velocity)
-end
-
-function ImpulseCamera:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function ImpulseCamera:__index(Index)

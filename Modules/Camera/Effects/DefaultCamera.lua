@@ -2,14 +2,11 @@
 -- This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme
 -- @classmod DefaultCamera
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
 
 local DefaultCamera = {}
 DefaultCamera.ClassName = "DefaultCamera"
@@ -18,6 +15,10 @@ function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)
 
 	return self
+end
+
+function DefaultCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function DefaultCamera:OverrideCameraState(CameraState)
@@ -39,10 +40,6 @@ end
 function DefaultCamera:UnbindFromRenderStep()
 	RunService:UnbindFromRenderStep("DefaultCamera_Preupdate")
 	RunService:UnbindFromRenderStep("DefaultCamera_PostUpdate")
-end
-
-function DefaultCamera:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function DefaultCamera:__index(Index)

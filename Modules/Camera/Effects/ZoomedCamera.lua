@@ -9,13 +9,10 @@
 -- Zoom.MinZoom = 0.5 -- Min distance away
 -- Assigning .Zoom will automatically clamp
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
 
 
 local ZoomedCamera = {}
@@ -24,10 +21,15 @@ ZoomedCamera._MaxZoom = 100
 ZoomedCamera._MinZoom = 0.5
 ZoomedCamera._Zoom = 10
 
+
 function ZoomedCamera.new()
 	local self = setmetatable({}, ZoomedCamera)
 
 	return self
+end
+
+function ZoomedCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function ZoomedCamera:ZoomIn(Value, Min, Max)
@@ -36,10 +38,6 @@ function ZoomedCamera:ZoomIn(Value, Min, Max)
 	else
 		self.Zoom = self.Zoom - Value
 	end
-end
-
-function ZoomedCamera:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function ZoomedCamera:__newindex(Index, Value)

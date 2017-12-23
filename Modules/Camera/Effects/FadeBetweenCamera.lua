@@ -1,14 +1,10 @@
 --- Add another layer of effects that can be faded in/out
 -- @classmod FadeBetweenCamera
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-local Spring = LoadCustomLibrary("Spring")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
+local Spring = require("Spring")
+local SummedCamera = require("SummedCamera")
 
 local FadeBetweenCamera = {}
 FadeBetweenCamera.ClassName = "FadeBetweenCamera"
@@ -24,6 +20,10 @@ function FadeBetweenCamera.new(CameraA, CameraB)
 	self.Speed = 15
 
 	return self
+end
+
+function FadeBetweenCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function FadeBetweenCamera:__newindex(Index, Value)

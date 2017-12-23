@@ -1,18 +1,16 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Like a rotated camera, except we end up pushing back to a default rotation.
+-- This same behavior is seen in Roblox vehicle seats
+-- @classmod PushCamera
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-local qMath = LoadCustomLibrary("qMath")
-local qCFrame = LoadCustomLibrary("qCFrame")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local qMath = require("qMath")
+local qCFrame = require("qCFrame")
 
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 local LerpNumber = qMath.LerpNumber
-
--- Intent: Like a rotated camera, except we end up pushing back to a default rotation.
--- This same behavior is seen in Roblox vehicle seats
 
 local PushCamera = {}
 PushCamera.ClassName = "PushCamera"
@@ -22,12 +20,10 @@ PushCamera._MaxY = math.rad(80)
 PushCamera._MinY = math.rad(-80)
 PushCamera._AngleXZ0 = 0 -- Initial
 PushCamera._AngleY = 0
-
 PushCamera.FadeBackTime = 0.5
 PushCamera.DefaultAngleXZ0 = 0
 PushCamera._LastUpdateTime = -1
 PushCamera.PushBackAfter = 0.5
-
 
 function PushCamera.new()
 	local self = setmetatable({}, PushCamera)
@@ -35,9 +31,12 @@ function PushCamera.new()
 	return self
 end
 
+function PushCamera:__add(other)
+	return SummedCamera.new(self, other)
+end
+---
+-- @param XYRotateVector Vector2, the delta rotation to apply
 function PushCamera:RotateXY(XYRotateVector)
-	-- @param XYRotateVector Vector2, the delta rotation to apply
-
 	self.AngleX = self.AngleX + XYRotateVector.x
 	self.AngleY = self.AngleY + XYRotateVector.y
 end
@@ -46,14 +45,9 @@ function PushCamera:StopRotateBack()
 	self.CoordinateFrame = self.CoordinateFrame
 end
 
+--- Resets to default position automatically
 function PushCamera:Reset()
-	-- Resets to default position automatically
-
 	self.LastUpdateTime = 0
-end
-
-function PushCamera:__add(Other)
-	return SummedCamera.new(self, Other)
 end
 
 function PushCamera:__newindex(Index, Value)
@@ -101,7 +95,6 @@ function PushCamera:__index(Index)
 	elseif Index == "LookVector" then
 		return self.Rotation.lookVector
 	elseif Index == "CoordinateFrame" then
-		local Angles = self.Angles
 		return CFrame.Angles(0, self.AngleXZ, 0) * CFrame.Angles(self.AngleY, 0, 0)
 	elseif Index == "AngleY" then
 		return self._AngleY

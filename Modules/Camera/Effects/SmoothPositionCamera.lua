@@ -1,18 +1,16 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Lags the camera smoothly behind the position maintaining other components
+-- @classmod SmoothPositionCamera
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-local Spring = LoadCustomLibrary("Spring")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
+local Spring = require("Spring")
 
 local SmoothPositionCamera = {}
 SmoothPositionCamera.ClassName = "SmoothPositionCamera"
 SmoothPositionCamera._FocusCamera = nil
 SmoothPositionCamera._OriginCamera = nil
-
--- Intent: Lags the camera smoothly behind the position maintaining other components
 
 function SmoothPositionCamera.new(BaseCamera)
 	local self = setmetatable({}, SmoothPositionCamera)
@@ -24,8 +22,8 @@ function SmoothPositionCamera.new(BaseCamera)
 	return self
 end
 
-function SmoothPositionCamera:__add(Other)
-	return SummedCamera.new(self, Other)
+function SmoothPositionCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function SmoothPositionCamera:__newindex(Index, Value)

@@ -1,20 +1,19 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Point a current element
+-- @classmod PointCamera
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
+local CameraState = require("CameraState")
+local SummedCamera = require("SummedCamera")
 
 local PointCamera = {}
 PointCamera.ClassName = "PointCamera"
 
--- Intent: Point a current element
-
+---
+-- @constructor
+-- @param OriginCamera A camera to use
+-- @param FocusCamera The Camera to look at.
 function PointCamera.new(OriginCamera, FocusCamera)
-	-- @param OriginCamera A camera to use
-	-- @param FocusCamera The Camera to look at. 
-	
 	local self = setmetatable({}, PointCamera)
 	
 	self.OriginCamera = OriginCamera or error("Must have OriginCamera")
@@ -23,8 +22,8 @@ function PointCamera.new(OriginCamera, FocusCamera)
 	return self
 end
 
-function PointCamera:__add(Other)
-	return SummedCamera.new(self, Other)
+function PointCamera:__add(other)
+	return SummedCamera.new(self, other)
 end
 
 function PointCamera:__newindex(Index, Value)
