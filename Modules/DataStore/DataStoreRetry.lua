@@ -8,14 +8,14 @@ local DATASTORE_RETRIES = 3
 -- @function DataStoreRetry
 --- Retries calls to the datastore
 local function DataStoreRetry(DataStoreFunction)
-	local Tries = 0	
+	local Tries = 0
 	local Success = true
 	local Data = nil
 	repeat
 		Tries = Tries + 1
 		local Error
-		Success, Error = ypcall(function() 
-			Data = DataStoreFunction() 
+		Success, Error = pcall(function()
+			Data = DataStoreFunction()
 		end)
 		if not Success then
 			warn(("[DataStoreRetry] - Datastore failure '%s'. Retrying!"):format(tostring(Error)))

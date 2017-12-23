@@ -1,3 +1,6 @@
+--- Mirrors cframe across plane
+-- @classmod CFrameMirror
+
 local CFrameMirror = {}
 CFrameMirror.__index = CFrameMirror
 CFrameMirror.ClassName = "CFrameMirror"
@@ -10,10 +13,8 @@ function CFrameMirror.new()
 end
 
 --- This is the CFrame that things are reflected over. Reflects over the
--- x axis. 
+-- x axis.
 function CFrameMirror:SetCFrame(ReflectOver)
-
-	
 	self.ReflectOver = ReflectOver
 end
 
