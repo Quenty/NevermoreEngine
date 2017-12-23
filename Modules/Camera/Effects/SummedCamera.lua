@@ -1,25 +1,20 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-
--- Intent: Add two cameras together
+--- Add two cameras together
+-- @classmod SummedCamera
 
 local SummedCamera = {}
 SummedCamera.ClassName = "SummedCamera"
-SummedCamera.Mode = "World" -- If World, then it just adds positions.
-                            -- If relative, then it moves position relative to CameraA's CoordinateFrame.
+SummedCamera._mode = "World" -- If World, then it just adds positions.
+                            -- If relative, then it moves position relative to cameraA's CoordinateFrame.
 
-function SummedCamera.new(CameraA, CameraB)
-	-- @param CameraA A CameraState or another CameraEffect to be used
-	-- @param CameraB A CameraState or another CameraEffect to be used
-
+--- Construct a new summed camera
+-- @constructor
+-- @param cameraA A CameraState or another CameraEffect to be used
+-- @param cameraB A CameraState or another CameraEffect to be used
+function SummedCamera.new(cameraA, cameraB)
 	local self = setmetatable({}, SummedCamera)
 
-	self._CameraA = CameraA or error("No CameraA")
-	self._CameraB = CameraB or error("No CameraB")
+	self._cameraA = cameraA or error("No cameraA")
+	self._cameraB = cameraB or error("No cameraB")
 
 	return self
 end
@@ -30,9 +25,9 @@ function SummedCamera.addToClass(class)
 	class.__add = SummedCamera.__addClass
 end
 
-function SummedCamera:SetMode(Mode)
-	assert(Mode == "World" or Mode == "Relative")
-	self._mode = Mode
+function SummedCamera:SetMode(mode)
+	assert(mode == "World" or mode == "Relative")
+	self._mode = mode
 
 	return self
 end
@@ -45,18 +40,18 @@ function SummedCamera:__add(other)
 	return SummedCamera.new(self, other):SetMode(self._mode)
 end
 
-function SummedCamera:__sub(Other)
-	if self._CameraA == Other then
-		return self._CameraA
-	elseif self._CameraB == Other then
-		return self._CameraB
+function SummedCamera:__sub(camera)
+	if self._cameraA == camera then
+		return self._cameraA
+	elseif self._cameraB == camera then
+		return self._cameraB
 	else
 		error("Unable to subtract successfully");
 	end
 end
 
-function SummedCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function SummedCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		if self._mode == "World" then
 			return self.CameraAState + self.CameraBState
 		else
@@ -67,14 +62,14 @@ function SummedCamera:__index(Index)
 			Result.Position = StateA.CoordinateFrame * StateB.Position
 			return Result
 		end
-	elseif Index == "CameraAState" then
-		return self._CameraA.CameraState or self._CameraA
-	elseif Index == "CameraBState" then
-		return self._CameraB.CameraState or self._CameraB
-	elseif SummedCamera[Index] then
-		return SummedCamera[Index]
+	elseif index == "CameraAState" then
+		return self._cameraA.CameraState or self._cameraA
+	elseif index == "CameraBState" then
+		return self._cameraB.CameraState or self._cameraB
+	elseif SummedCamera[index] then
+		return SummedCamera[index]
 	else
-		error(("[SummedCamera] - '%s' is not a valid member"):format(tostring(Index)))
+		error(("[SummedCamera] - '%s' is not a valid member"):format(tostring(index)))
 	end
 end
 
