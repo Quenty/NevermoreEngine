@@ -21,7 +21,7 @@ function ValueObject.new()
 	local self = setmetatable({}, ValueObject)
 	
 	--- The value of the ValueObject
-	-- @tfield Variant Value 
+	-- @tfield Variant Value
 
 	--- Event fires when the value's object value change
 	-- @signal Changed
