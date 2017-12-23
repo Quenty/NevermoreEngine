@@ -1,14 +1,9 @@
 --- For effects that can be easily bound in scope
 -- @classmod CustomCameraEffect
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local CameraState = LoadCustomLibrary("CameraState")
-local SummedCamera = LoadCustomLibrary("SummedCamera")
-
+local SummedCamera = require("SummedCamera")
 
 local CustomCameraEffect = {}
 CustomCameraEffect.ClassName = "CustomCameraEffect"
