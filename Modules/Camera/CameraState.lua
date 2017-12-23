@@ -1,12 +1,9 @@
 --- Data container for the state of a camera.
 -- @classmod CameraState
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local QuaternionObject = LoadCustomLibrary("QuaternionObject")
+local QuaternionObject = require("QuaternionObject")
 
 local CameraState = {}
 CameraState.ClassName = "CameraState"

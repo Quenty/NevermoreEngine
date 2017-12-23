@@ -2,17 +2,14 @@
 -- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
 -- @module CameraStack
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
+local DefaultCamera = require("DefaultCamera")
+local ImpulseCamera = require("ImpulseCamera")
+local CustomCameraEffect = require("CustomCameraEffect")
 
-local DefaultCamera = LoadCustomLibrary("DefaultCamera")
-local ImpulseCamera = LoadCustomLibrary("ImpulseCamera")
-local CustomCameraEffect = LoadCustomLibrary("CustomCameraEffect")
-
-assert(RunService:IsClient(), "Only require CameraStack on client")
+assert(RunService:IsClient(), "[CameraStack] - Only require CameraStack on client")
 
 local CameraStack = {}
 CameraStack.__index = CameraStack
@@ -21,26 +18,25 @@ CameraStack.ClassName = "CameraStack"
 function CameraStack.new()
 	local self = setmetatable({}, CameraStack)
 	
-	self.Stack = {}
+	self._stack = {}
 	
-	local Default = DefaultCamera.new()
-	Default:BindToRenderStep()
-	self.RawDefaultCamera = Default
-	
-	local ImpulseCamera = ImpulseCamera.new()
-	self.ImpulseCamera = ImpulseCamera
-	
-	self.DefaultCamera = (Default + ImpulseCamera):SetMode("Relative")
-	
-	self:Add(self.DefaultCamera)
-	
-	
+	-- Initialize default cameras
+	self._rawDefaultCamera = DefaultCamera.new()
+	self._impulseCamera = ImpulseCamera.new()
+	self._defaultCamera = (self._rawDefaultCamera + self._impulseCamera):SetMode("Relative")
+	self._rawDefaultCamera:BindToRenderStep()
+
+	-- Add camera to stack
+	self:Add(self._defaultCamera)
+
 	RunService:BindToRenderStep("CameraStackUpdateInternal", Enum.RenderPriority.Camera.Value + 75, function()
 		debug.profilebegin("CameraStackUpdate")
-		local State = self:GetTopState()
-		if State and State ~= self.DefaultCamera then
-			State:Set(workspace.CurrentCamera)
+
+		local state = self:GetTopState()
+		if state and state ~= self._defaultCamera then
+			state:Set(workspace.CurrentCamera)
 		end
+
 		debug.profileend()
 	end)
 	
@@ -50,42 +46,42 @@ end
 --- Outputs the camera stack
 -- @treturn nil
 function CameraStack:PrintCameraStack()
-	for Index, Value in pairs(self.Stack) do
-		print(tostring(type(Value) == "table" and Value.ClassName or tostring(Value)))
+	for _, value in pairs(self._stack) do
+		print(tostring(type(value) == "table" and value.ClassName or tostring(value)))
 	end
 end
 
 --- Returns the default camera
 -- @treturn SummedCamera DefaultCamera + ImpulseCamera
 function CameraStack:GetDefaultCamera()
-	return self.DefaultCamera
+	return self._defaultCamera
 end
 
 --- Returns the impulse camera. Useful for adding camera shake
 -- @treturn ImpulseCamera
 function CameraStack:GetImpulseCamera()
-	return self.ImpulseCamera
+	return self._impulseCamera
 end
 
 --- Returns the default camera without any impulse cameras
 -- @treturn DefaultCamera
 function CameraStack:GetRawDefaultCamera()
-	return self.RawDefaultCamera
+	return self._rawDefaultCamera
 end
 
 --- Retrieves the top state off the stack
 -- @treturn[1] CameraState
 -- @treturn[2] nil
 function CameraStack:GetTopState()
-	if #self.Stack > 10 then
-		warn(("[CameraStack] - Stack is bigger than 10 in camerastack (%d)"):format(#self.Stack))
+	if #self._stack > 10 then
+		warn(("[CameraStack] - Stack is bigger than 10 in camerastack (%d)"):format(#self._stack))
 	end
-	local Top = self.Stack[#self.Stack]
+	local topState = self._stack[#self._stack]
 		
-	if type(Top) == "table" then
-		local State = Top.CameraState or Top
-		if State then
-			return State
+	if type(topState) == "table" then
+		local state = topState.CameraState or topState
+		if state then
+			return state
 		else
 			warn("[CameraStack] - No top state!")
 		end
@@ -98,24 +94,24 @@ end
 -- @treturn[1] CustomCameraEffect
 -- @treturn[1] NewStateToUse
 function CameraStack:GetNewStateBelow()
-	local StateToUse = nil
+	local _stateToUse = nil
 	
-	return CustomCameraEffect.new(function(Index)
-		local Index = self:GetIndex(StateToUse)
-		if Index then
-			local Below = self.Stack[Index-1]
-			if Below then
-				return Below.CameraState
+	return CustomCameraEffect.new(function()
+		local index = self:GetIndex(_stateToUse)
+		if index then
+			local below = self._stack[index-1]
+			if below then
+				return below.CameraState
 			else
 				warn("[CameraStack] - Could not get state below, found current state. Returning default.")
-				return self.Stack[1].CameraState
+				return self._stack[1].CameraState
 			end
 		else
 			warn("[CameraStack] - Could not get state, returning default")
-			return self.Stack[1].CameraState
+			return self._stack[1].CameraState
 		end
-	end), function(NewStateToUse) 
-		StateToUse = NewStateToUse
+	end), function(newStateToUse)
+		_stateToUse = newStateToUse
 	end
 end
 
@@ -123,30 +119,30 @@ end
 -- @tparam CameraState State
 -- @treturn number Index of state
 -- @treturn nil If non on stack
-function CameraStack:GetIndex(State)
-	for Index, Value in pairs(self.Stack) do
-		if Value == State then
-			return Index
+function CameraStack:GetIndex(state)
+	for index, value in pairs(self._stack) do
+		if value == state then
+			return index
 		end
 	end
 end
 
 --- Removes the state from the stack
--- @tparam CameraState State State to remove
+-- @tparam CameraState State
 -- @treturn nil
-function CameraStack:Remove(State)
-	local Index = self:GetIndex(State)
+function CameraStack:Remove(state)
+	local index = self:GetIndex(state)
 	
-	if Index then
-		table.remove(self.Stack, Index)
+	if index then
+		table.remove(self._stack, index)
 	end
 end
 
 --- Adds a state to the stack
--- @tparam CameraState State State to add
+-- @tparam CameraState state
 -- @treturn nil
-function CameraStack:Add(State)
-	table.insert(self.Stack, State)
+function CameraStack:Add(state)
+	table.insert(self._stack, state)
 end
 
 return CameraStack.new()

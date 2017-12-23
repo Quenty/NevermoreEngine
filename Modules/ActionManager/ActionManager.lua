@@ -1,17 +1,15 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--- Holds single toggleable actions (like a tool system)
+-- @classmod ActionManager
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local ContextActionService = game:GetService("ContextActionService")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local BaseAction = LoadCustomLibrary("BaseAction")
-local ValueObject = LoadCustomLibrary("ValueObject")
-local Signal = LoadCustomLibrary("Signal")
-local EnabledMixin = LoadCustomLibrary("EnabledMixin")
-
--- Intent: 
--- @author Quenty
+local BaseAction = require("BaseAction")
+local ValueObject = require("ValueObject")
+local Signal = require("Signal")
+local EnabledMixin = require("EnabledMixin")
+local Maid = require("Maid")
 
 local ActionManager = setmetatable({}, {})
 ActionManager.__index = ActionManager
@@ -22,7 +20,7 @@ EnabledMixin:Add(ActionManager)
 function ActionManager.new()
 	local self = setmetatable({}, ActionManager)
 	
-	self.Maid = MakeMaid()
+	self.Maid = Maid.new()
 	self:InitEnableChanged()
 	
 	self.ActiveAction = ValueObject.new()
@@ -43,18 +41,18 @@ function ActionManager.new()
 	end))
 	
 	self.Maid:GiveTask(self.ActiveAction.Changed:Connect(function(Value, OldValue)
-		local Maid = MakeMaid()
+		local maid = Maid.new()
 		if Value then
-			Maid:GiveTask(function()
+			maid:GiveTask(function()
 				Value:Deactivate()
 			end)
-			Maid:GiveTask(Value.Deactivated:Connect(function()
+			maid:GiveTask(Value.Deactivated:Connect(function()
 				if self.ActiveAction == Value then
 					self.ActiveAction.Value = nil
 				end
 			end))
 		end
-		self.Maid.ActiveActionMaid = Maid
+		self.Maid.ActiveActionMaid = maid
 		
 		-- Immediately deactivate
 		if Value and not Value.IsActivatedValue.Value then

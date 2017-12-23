@@ -1,15 +1,13 @@
 --- BaseAction state for Actionmanager
 -- @classmod BaseAction
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local ContextActionService = game:GetService("ContextActionService")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Signal = LoadCustomLibrary("Signal")
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local EnabledMixin = LoadCustomLibrary("EnabledMixin")
+local Signal = require("Signal")
+local Maid = require("Maid")
+local EnabledMixin = require("EnabledMixin")
 
 local BaseAction = {}
 BaseAction.__index = BaseAction
@@ -20,7 +18,7 @@ EnabledMixin:Add(BaseAction)
 function BaseAction.new(Name)
 	local self = setmetatable({}, BaseAction)
 
-	self.Maid = MakeMaid()
+	self.Maid = Maid.new()
 	self:InitEnableChanged()
 
 	self.ActivateData = nil -- Data to be fired with the Activated event
@@ -34,7 +32,7 @@ function BaseAction.new(Name)
 	
 	self.Maid:GiveTask(self.IsActivatedValue.Changed:Connect(function()
 		if self.IsActivatedValue.Value then
-			local ActionMaid = MakeMaid()
+			local ActionMaid = Maid.new()
 			self.Maid.ActionMaid = ActionMaid
 			self.Activated:fire(ActionMaid, unpack(self.ActivateData))
 		else
