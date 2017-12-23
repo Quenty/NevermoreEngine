@@ -2,26 +2,14 @@
 -- @classmod Promise
 -- See: https://promisesaplus.com/
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local Maid = LoadCustomLibrary("Maid")
-
-local function _isCallable(Value)
-	if type(Value) == "function" then
-		return true
-	elseif type(Value) == "table" then
-		local Metatable = getmetatable(Value)
-		return Metatable and type(Metatable.__call) == "function"
-	end
-end
+local Maid = require("Maid")
 
 local function _isSignal(Value)
 	if typeof(Value) == "RBXScriptSignal" then
 		return true
-	elseif type(Value) == "table" and _isCallable(Value.Connect) then
+	elseif type(Value) == "table" and type(Value.Connect) == "function" then
 		return true
 	end
 
@@ -157,7 +145,7 @@ function Promise:Resolve(value)
 	end
 
 	-- Thenable like objects
-	if type(value) == "table" and _isCallable(value.Then) then
+	if type(value) == "table" and type(value.Then) == "function" then
 		value:Then(self:_getResolveReject())
 		return
 	end
@@ -223,7 +211,7 @@ end
 --- Modifies values into promises
 -- @local
 function Promise:_promisify(value)
-	if _isCallable(value) then
+	if type(value) == "function" then
 		self:_promisfyYieldingFunction(value)
 	elseif _isSignal(value) then
 		self:_promisfySignal(value)
@@ -307,13 +295,13 @@ end
 function Promise:_executeThen(returnPromise, onFulfilled, onRejected)
 	local results
 	if self._fulfilled then
-		if not _isCallable(onFulfilled) then
+		if type(onFulfilled) ~= "function" then
 			return returnPromise:Fulfill(unpack(self._fulfilled))
 		end
 
 		results = self:_executeFunc(returnPromise, onFulfilled, self._fulfilled)
 	elseif self._rejected then
-		if not _isCallable(onRejected) then
+		if type(onRejected) ~= "function" then
 			return returnPromise:Reject(unpack(self._rejected))
 		end
 
