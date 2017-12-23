@@ -15,18 +15,15 @@ local LerpNumber = qMath.LerpNumber
 local PushCamera = {}
 PushCamera.ClassName = "PushCamera"
 
-
 -- Max/Min aim up and down
 PushCamera._MaxY = math.rad(80)
 PushCamera._MinY = math.rad(-80)
 PushCamera._AngleXZ0 = 0 -- Initial
 PushCamera._AngleY = 0
-
 PushCamera.FadeBackTime = 0.5
 PushCamera.DefaultAngleXZ0 = 0
 PushCamera._LastUpdateTime = -1
 PushCamera.PushBackAfter = 0.5
-
 
 function PushCamera.new()
 	local self = setmetatable({}, PushCamera)
