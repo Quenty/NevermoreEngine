@@ -8,7 +8,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
 local qCFrame = require("qCFrame")
-
 local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 
 local RotatedCamera = {}

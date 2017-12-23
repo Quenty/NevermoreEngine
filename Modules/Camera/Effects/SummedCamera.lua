@@ -3,8 +3,6 @@
 
 local SummedCamera = {}
 SummedCamera.ClassName = "SummedCamera"
-SummedCamera._mode = "World" -- If World, then it just adds positions.
-                            -- If relative, then it moves position relative to cameraA's CoordinateFrame.
 
 --- Construct a new summed camera
 -- @constructor
@@ -13,6 +11,7 @@ SummedCamera._mode = "World" -- If World, then it just adds positions.
 function SummedCamera.new(cameraA, cameraB)
 	local self = setmetatable({}, SummedCamera)
 
+	self._mode = "World"
 	self._cameraA = cameraA or error("No cameraA")
 	self._cameraB = cameraB or error("No cameraB")
 
@@ -25,6 +24,10 @@ function SummedCamera.addToClass(class)
 	class.__add = SummedCamera.__addClass
 end
 
+---
+-- @param mode Mode to set
+-- If "World", then it just adds positions.
+-- If "Relative", then it moves position relative to cameraA's CoordinateFrame.
 function SummedCamera:SetMode(mode)
 	assert(mode == "World" or mode == "Relative")
 	self._mode = mode

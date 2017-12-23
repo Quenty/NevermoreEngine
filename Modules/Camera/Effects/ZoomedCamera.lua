@@ -14,7 +14,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
 
-
 local ZoomedCamera = {}
 ZoomedCamera.ClassName = "ZoomedCamera"
 ZoomedCamera._MaxZoom = 100
