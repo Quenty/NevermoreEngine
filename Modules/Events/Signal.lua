@@ -1,6 +1,6 @@
---- Lua-side duplication of the API of events on Roblox objects. 
--- Signals are needed for to ensure that for local events objects are passed by 
--- reference rather than by value where possible, as the BindableEvent objects 
+--- Lua-side duplication of the API of events on Roblox objects.
+-- Signals are needed for to ensure that for local events objects are passed by
+-- reference rather than by value where possible, as the BindableEvent objects
 -- always pass signal arguments by value, meaning tables will be deep copied.
 -- Roblox's deep copy method parses to a non-lua table compatable format.
 -- @classmod Signal
@@ -33,11 +33,11 @@ function Signal:Fire(...)
 end
 Signal.fire = Signal.Fire
 
---- Connect a new handler to the event. Returns a connection object that can be disconnected. 
+--- Connect a new handler to the event. Returns a connection object that can be disconnected.
 -- @tparam function handler Function handler called with arguments passed when `:Fire(...)` is called
 -- @treturn Connection Connection object that can be disconnected
 function Signal:Connect(handler)
-	if not (typeof(handler) == "function") then 
+	if not (typeof(handler) == "function") then
 		error(("connect(%s)"):format(typeof(handler)), 2)
 	end
 
