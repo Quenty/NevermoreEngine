@@ -1,18 +1,14 @@
 --- Interface between user input and camera controls
 -- @classmod CameraControls
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local AccelTween = LoadCustomLibrary("AccelTween")
-local Signal =  LoadCustomLibrary("Signal")
-
+local Maid = require("Maid")
+local AccelTween = require("AccelTween")
 
 local GamepadRotate = {}
 GamepadRotate.__index = GamepadRotate
@@ -243,7 +239,7 @@ function CameraControls:BeginDrag(BeginInputObject)
 		return
 	end
 	
-	local Maid = MakeMaid()
+	local maid = Maid.new()
 	
 	self.LastMousePosition = BeginInputObject.Position
 	local IsMouse = BeginInputObject.UserInputType.Name:find("Mouse")
@@ -252,25 +248,25 @@ function CameraControls:BeginDrag(BeginInputObject)
 		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
 	end
 	
-	Maid.InputEnded = UserInputService.InputEnded:Connect(function(InputObject, GameProcessed)
+	maid.InputEnded = UserInputService.InputEnded:Connect(function(InputObject, GameProcessed)
 		if InputObject == BeginInputObject then
 			self:EndDrag()
 		end
 	end)
 	
-	Maid.InputChanged = UserInputService.InputChanged:Connect(function(InputObject)
-		if IsMouse and InputObject.UserInputType == Enum.UserInputType.MouseMovement 
+	maid.InputChanged = UserInputService.InputChanged:Connect(function(InputObject)
+		if IsMouse and InputObject.UserInputType == Enum.UserInputType.MouseMovement
 			or InputObject == BeginInputObject then
 			
 			self:HandleMouseMovement(InputObject)
 		end
-	end)	
+	end)
 	
 	if self.RotatedCamera.ClassName == "SmoothRotatedCamera" then
 		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
-	end	
+	end
 	
-	self.Maid.DragMaid = Maid
+	self.Maid.DragMaid = maid
 end
 
 function CameraControls:ApplyRotVelocityTracker(RotVelocityTracker)
@@ -323,25 +319,25 @@ function CameraControls:HandleGamepadRotateStart()
 		return
 	end
 	
-	local Maid = MakeMaid()
+	local maid = Maid.new()
 	
 	if self.RotatedCamera.ClassName == "SmoothRotatedCamera" then
 		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
 	end
 	
-	Maid:GiveTask(RunService.Heartbeat:Connect(function()
+	maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local DeltaAngle = self.GamepadRotate:GetThumbstickDeltaAngle()
 		
 		if self.RotatedCamera then
 			self.RotatedCamera:RotateXY(DeltaAngle)
 		end
 		
-		if self.RotVelocityTracker then		
+		if self.RotVelocityTracker then
 			self.RotVelocityTracker:Update(DeltaAngle)
 		end
 	end))
 	
-	self.Maid.DragMaid = Maid
+	self.Maid.DragMaid = maid
 end
 
 function CameraControls:Enable()
@@ -349,7 +345,7 @@ function CameraControls:Enable()
 		assert(not self.Maid)
 		self.Enabled = true
 
-		self.Maid = MakeMaid()
+		self.Maid = Maid.new()
 		
 		self.Maid:GiveTask(self.GamepadRotate.IsRotating.Changed:Connect(function()
 			if self.GamepadRotate.IsRotating.Value then

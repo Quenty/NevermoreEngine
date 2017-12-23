@@ -2,8 +2,9 @@
 -- This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme
 -- @classmod DefaultCamera
 
-local RunService = game:GetService("RunService")
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
+local RunService = game:GetService("RunService")
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
@@ -21,20 +22,20 @@ function DefaultCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function DefaultCamera:OverrideCameraState(CameraState)
-	self.CameraState = CameraState or error("No CameraState")
+function DefaultCamera:OverrideCameraState(cameraState)
+	self._cameraState = cameraState or error("No CameraState")
 end
 
 function DefaultCamera:BindToRenderStep()
 	RunService:BindToRenderStep("DefaultCamera_Preupdate", Enum.RenderPriority.Camera.Value-1, function()
-		self.CameraState:Set()
+		self._cameraState:Set()
 	end)
 
 	RunService:BindToRenderStep("DefaultCamera_PostUpdate", Enum.RenderPriority.Camera.Value+1, function()
-		self.CameraState = CameraState.new(workspace.CurrentCamera)
+		self._cameraState = CameraState.new(workspace.CurrentCamera)
 	end)
 	
-	self.CameraState = CameraState.new(workspace.CurrentCamera)
+	self._cameraState = CameraState.new(workspace.CurrentCamera)
 end
 
 function DefaultCamera:UnbindFromRenderStep()
@@ -44,7 +45,7 @@ end
 
 function DefaultCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		return rawget(self, "CameraState")
+		return rawget(self, "_cameraState")
 	else
 		return DefaultCamera[Index]
 	end

@@ -1,16 +1,13 @@
---- Makes transitions between states easier. Uses the `CameraStack` to tween in and 
--- out a new camera state Call `:Show()` and `:Hide()` to do so, and make sure to 
+--- Makes transitions between states easier. Uses the `CameraStack` to tween in and
+-- out a new camera state Call `:Show()` and `:Hide()` to do so, and make sure to
 -- call `:Destroy()` after usage
 -- @classmod CameraStateTweener
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
-local CameraStack = LoadCustomLibrary("CameraStack")
-local FadeBetweenCamera = LoadCustomLibrary("FadeBetweenCamera")
+local Maid = require("Maid")
+local CameraStack = require("CameraStack")
+local FadeBetweenCamera = require("FadeBetweenCamera")
 
 local CameraStateTweener = {}
 CameraStateTweener.ClassName = "CameraStateTweener"
@@ -19,7 +16,7 @@ CameraStateTweener.__index = CameraStateTweener
 function CameraStateTweener.new(CameraEffect, Speed)
 	local self = setmetatable({}, CameraStateTweener)
 	
-	self.Maid = MakeMaid()
+	self.Maid = Maid.new()
 	local CameraBelow, Assign = CameraStack:GetNewStateBelow()
 	self.CameraBelow = CameraBelow
 	self.FadeBetween = FadeBetweenCamera.new(CameraBelow, CameraEffect)
@@ -31,7 +28,7 @@ function CameraStateTweener.new(CameraEffect, Speed)
 	self.FadeBetween.Target = 0
 	self.FadeBetween.Value = 0
 	
-	self.Maid:GiveTask(function()	
+	self.Maid:GiveTask(function()
 		CameraStack:Remove(self.FadeBetween)
 	end)
 	

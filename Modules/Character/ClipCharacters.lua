@@ -1,15 +1,12 @@
 --- Clip characters locally on the client of other clients so they don't interfer with physics.
 -- @classmod ClipCharacters
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local PhysicsService = game:GetService("PhysicsService")
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-local NevermoreEngine = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary = NevermoreEngine.LoadLibrary
-
-local MakeMaid = LoadCustomLibrary("Maid").MakeMaid
+local Maid = require("Maid")
 
 local ClipCharacters = {}
 ClipCharacters.ClassName = "ClipCharacters"
@@ -23,7 +20,7 @@ function ClipCharacters.initServer()
 	local GroupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.CollisionGroupName, "Default", false)
 	
-	local RemoteFunction = NevermoreEngine.GetRemoteFunction("GetClipCharactersId")
+	local RemoteFunction = require.GetRemoteFunction("GetClipCharactersId")
 	function RemoteFunction.OnServerInvoke(Player)
 		return GroupId
 	end
@@ -35,9 +32,9 @@ end
 function ClipCharacters.new()
 	local self = setmetatable({}, ClipCharacters)
 
-	self.RemoteFunction = NevermoreEngine.GetRemoteFunction("GetClipCharactersId")
+	self.RemoteFunction = require.GetRemoteFunction("GetClipCharactersId")
 
-	self.Maid = MakeMaid()
+	self.Maid = Maid.new()
 	self:BindUpdatesYielding()
 
 	return self
@@ -58,20 +55,20 @@ function ClipCharacters:_onDescendantRemoving(OriginalTable, Descendant)
 end
 
 function ClipCharacters:_onCharacterAdd(PlayerMaid, Character)
-	local Maid = MakeMaid()
+	local maid = Maid.new()
 
 	local OriginalTable = {}
 
-	Maid:GiveTask(Character.DescendantAdded:Connect(function(Descendant)
+	maid:GiveTask(Character.DescendantAdded:Connect(function(Descendant)
 		self:_onDescendantAdded(OriginalTable, Descendant)
 	end))
 
-	Maid:GiveTask(Character.DescendantRemoving:Connect(function(Descendant)
+	maid:GiveTask(Character.DescendantRemoving:Connect(function(Descendant)
 		self:_onDescendantRemoving(OriginalTable, Descendant)
 	end))
 
 	-- Cleanup
-	Maid:GiveTask(function()
+	maid:GiveTask(function()
 		for Descendant, _ in pairs(OriginalTable) do
 			self:_onDescendantRemoving(OriginalTable, Descendant)
 		end
@@ -82,7 +79,7 @@ function ClipCharacters:_onCharacterAdd(PlayerMaid, Character)
 		self:_onDescendantAdded(OriginalTable, Descendant)
 	end
 
-	PlayerMaid.CharacterMaid = Maid
+	PlayerMaid.CharacterMaid = maid
 end
 
 function ClipCharacters:_onPlayerAdded(Player)
@@ -90,17 +87,17 @@ function ClipCharacters:_onPlayerAdded(Player)
 		return
 	end
 
-	local Maid = MakeMaid()
+	local maid = Maid.new()
 
-	Maid:GiveTask(Player.CharacterAdded:Connect(function(Character)
-		self:_onCharacterAdd(Maid, Character)
+	maid:GiveTask(Player.CharacterAdded:Connect(function(Character)
+		self:_onCharacterAdd(maid, Character)
 	end))
 
 	if Player.Character then
-		self:_onCharacterAdd(Maid, Player.Character)
+		self:_onCharacterAdd(maid, Player.Character)
 	end
 
-	self.Maid[Player] = Maid
+	self.Maid[Player] = maid
 end
 
 function ClipCharacters:BindUpdatesYielding()
