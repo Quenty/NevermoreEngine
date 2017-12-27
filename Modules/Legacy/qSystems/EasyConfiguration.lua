@@ -1,59 +1,46 @@
-
--- @author Quenty
 --- A better EasyConfiguration system.
+-- @classmod EasyConfiguration
+-- @author Quenty
 
-local MakeEasyConfiguration do
-	local Index = {
-		AddValue = function(self, ClassType, Properties)
-			local OldValue = self.Container:FindFirstChild(Properties.Name) --- Check to make sure the old one doesn't exist.
+local EasyConfiguration = {}
+EasyConfiguration.ClassName = "EasyConfiguration"
 
-			if not OldValue then
-				local newInstance = Instance.new(ClassType)
-				for Index, Value in pairs(Properties) do
-					newInstance[Index] = Value
-				end
-				newInstance.Parent = self.Container
-			elseif not OldValue:IsA(ClassType) then
-				error("Value '" .. tostring(Properties.Name) .. "' already exists in the configuration, but is the wrong class type")
-			end
-		end;
-		GetValue = function(self, ValueName)
-			return self.Container:FindFirstChild(ValueName) or error("Value '" .. tostring(ValueName) .. "' does not exist in EasyConfiguration")
-		end;
-	}
-	Index.Get = Index.GetValue
-	Index.Add = Index.AddValue
+function EasyConfiguration.new(container)
+	local self = setmetatable({
+		_container = container or error("No container")
+		}, EasyConfiguration)
 
-	local Metatable = {
-		__index = function(self, k)
-			if Index[k] then
-				return Index[k]
-			else
-				local Value = self:GetValue(k)
-				return Value and Value.Value
-			end
-		end;
-		__newindex = function(self, k, NewValue)
-			local Value = self:GetValue(k)
-			Value.Value = NewValue
-		end;
-	}
-
-
-	function MakeEasyConfiguration(Container)
-		return setmetatable({Container = Container}, Metatable)
-	end
+	return self
 end
 
-local function FindConfigurationOrCreateNewOne(ConfigurationName, Parent)
-	if Parent:FindFirstChild(ConfigurationName) then
-		return Parent[ConfigurationName]
+function EasyConfiguration:Get(valueName)
+	local rbxObj = self._container:FindFirstChild(valueName)
+	if not rbxObj then
+		error(("[EasyConfiguration] - Value '%s' does not exist"):format(tostring(valueName)))
+	end
+	return rbxObj
+end
+
+function EasyConfiguration:__index(index)
+	if EasyConfiguration[index] then
+		return EasyConfiguration[index]
+	elseif type(index) == "string" then
+		local rbxObj = EasyConfiguration.Get(self, index)
+		return rbxObj.Value
 	else
-		local NewConfiguration = Instance.new("Folder", Parent)
-		NewConfiguration.Name = ConfigurationName
-
-		return NewConfiguration
+		error(("[EasyConfiguration] - Bad index of type '%s'"):format(type(index)))
 	end
 end
 
-return {MakeEasyConfiguration = MakeEasyConfiguration; AddSubDataLayer = FindConfigurationOrCreateNewOne}
+function EasyConfiguration:__newindex(index, newindex)
+	if EasyConfiguration[index] then
+		error(("[EasyConfiguration] - Cannot set '%s'"):format(tostring(index)))
+	elseif type(index) == "string" then
+		local rbxObj = EasyConfiguration.Get(self, index)
+		rbxObj.Value = newindex
+	else
+		error(("[EasyConfiguration] - Bad index of type '%s'"):format(type(index)))
+	end
+end
+
+return EasyConfiguration
