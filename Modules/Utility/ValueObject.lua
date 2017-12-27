@@ -46,7 +46,7 @@ function ValueObject:__newindex(Index, Value)
 		if self.Value ~= Value then
 			local Old = self.Value
 			self._Value = Value
-			self.Changed:fire(Value, Old)
+			self.Changed:Fire(Value, Old)
 		end
 	elseif Index == "_Value" then
 		rawset(self, Index, Value)

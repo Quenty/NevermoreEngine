@@ -53,7 +53,7 @@ function module:SetEnabled(isEnabled, doNotAnimate)
 		local enabledMaid = Maid.new()
 		self.Maid._enabledMaid = enabledMaid
 		
-		self.EnabledChanged:fire(isEnabled, enabledMaid)
+		self.EnabledChanged:Fire(isEnabled, enabledMaid)
 		
 		if self.RefreshGuiPosition then
 			self:RefreshGuiPosition(doNotAnimate)

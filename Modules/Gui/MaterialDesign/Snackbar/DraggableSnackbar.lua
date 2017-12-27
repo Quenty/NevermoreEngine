@@ -1,14 +1,16 @@
+--- Snackbar, but draggable
+-- @classmod DraggableSnackbar
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players  = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
-
 local Snackbar = require("Snackbar")
 local qGUI = require("qGUI")
 
---- Snackbar, but draggable
 local DraggableSnackbar = setmetatable({}, Snackbar)
 DraggableSnackbar.ClassName = "DraggableSnackbar"
 DraggableSnackbar.__index = DraggableSnackbar
@@ -18,18 +20,19 @@ DraggableSnackbar.Duration = 3
 DraggableSnackbar.AutoCloseDisabled = false -- By default the Snackbar will close automatically if the user types outside or presses the esc key.
 
 --- Note that this will not show until :Show() is called
+-- @constructor
 -- @param [GCOnDismissal] If true, will destroy itself and GC after being dismissed. Defaults to true
 -- @param [Options] Table of optional values, adds call to actions, et cetera
 function DraggableSnackbar.new(Parent, Text, GCOnDismissal, Options)
 	local self = setmetatable(Snackbar.new(Parent, Text, Options), DraggableSnackbar)
 
-	self.Visible = false
-	self.DraggingCoroutine = nil
-	self.ShouldDismiss = false
-	self.ShowId = 0
+	self._visible = false
+	self._draggingCoroutine = nil
+	self._shouldDismiss = false
+	self._showId = 0
 
-	self.Mouse = Players.LocalPlayer:GetMouse()
-	self.GCOnDismissal = GCOnDismissal == nil and true or false
+	self._mouse = Players.LocalPlayer:GetMouse()
+	self._gcOnDismissal = GCOnDismissal == nil and true or false
 	
 	-- Set to transparency and faded out direction automatically
 	self[self.DefaultFadeOut](self, true)
@@ -38,37 +41,37 @@ function DraggableSnackbar.new(Parent, Text, GCOnDismissal, Options)
 end
 
 function DraggableSnackbar:Show()
-	if not self.Visible then
-		self.Visible = true
+	if not self._visible then
+		self._visible = true
 		self:FadeIn()
-		local LocalShowId = self.ShowId + 1
-		self.ShowId = LocalShowId
+		local LocalShowId = self._showId + 1
+		self._showId = LocalShowId
 
 		-- Connect events
-		self.WhileActiveMaid.DraggingBeginEvent = self.Gui.MouseButton1Down:Connect(function(X, Y)
-			if self.ShowId == LocalShowId then
-				if not self.DraggingCoroutine then
+		self._whileActiveMaid:GiveTask(self.Gui.MouseButton1Down:Connect(function(X, Y)
+			if self._showId == LocalShowId then
+				if not self._draggingCoroutine then
 					self:StartTrack(X, Y)
 				end
 			else
-				warn("[DraggingBeginEvent] - self.ShowId ~= LocalShowId, but event fired")
+				warn("[DraggingBeginEvent] - self._showId ~= LocalShowId, but event fired")
 			end
-		end)
+		end))
 
-		self.WhileActiveMaid.InputDismissEvent = UserInputService.InputBegan:Connect(function(InputObject, GameProcessedEvent)
+		self._whileActiveMaid:GiveTask(UserInputService.InputBegan:Connect(function(InputObject, GameProcessedEvent)
 			if GameProcessedEvent then
 				return
 			end
 			
-			if self.ShowId ~= LocalShowId then
-				warn("[InputDismissEvent] - self.ShowId ~= LocalShowId, but event fired")
+			if self._showId ~= LocalShowId then
+				warn("[InputDismissEvent] - self._showId ~= LocalShowId, but event fired")
 				return
 			end
 			if self.AutoCloseDisabled then
 				return
 			end
 			
-			if qGUI.MouseOver(self.Mouse, self.Gui) then
+			if qGUI.MouseOver(self._mouse, self.Gui) then
 				return
 			end
 				
@@ -76,16 +79,16 @@ function DraggableSnackbar:Show()
 				return -- Animating / dragging
 			end
 			
-			if InputObject.UserInputType == Enum.UserInputType.Touch 
+			if InputObject.UserInputType == Enum.UserInputType.Touch
 				or InputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 				
 				self:Dismiss()
 			end
-		end)
+		end))
 
 		--- Setup hide on dismissal
 		delay(self.Duration, function()
-			if self.Destroy and self.ShowId == LocalShowId and self.Visible then
+			if self.Destroy and self._showId == LocalShowId and self._visible then
 				self:Dismiss()
 			end
 		end)
@@ -102,15 +105,15 @@ function DraggableSnackbar:StartTrack(X, Y)
 
 	local LocalDraggingCoroutine
 	LocalDraggingCoroutine = coroutine.create(function()
-		while self.DraggingCoroutine == LocalDraggingCoroutine do
+		while self._draggingCoroutine == LocalDraggingCoroutine do
 			self:Track()
 			RunService.Stepped:Wait()
 		end
 	end)
-	self.DraggingCoroutine = LocalDraggingCoroutine
+	self._draggingCoroutine = LocalDraggingCoroutine
 
-	self.WhileActiveMaid.DraggingEnded = UserInputService.InputEnded:Connect(function(InputObject)
-		if self.DraggingCoroutine == LocalDraggingCoroutine then
+	self._whileActiveMaid.DraggingEnded = UserInputService.InputEnded:Connect(function(InputObject)
+		if self._draggingCoroutine == LocalDraggingCoroutine then
 			if InputObject.UserInputType.Name == "MouseButton1" then
 				self:EndTrack()
 			end
@@ -119,28 +122,28 @@ function DraggableSnackbar:StartTrack(X, Y)
 		end
 	end)
 
-	self.WhileActiveMaid.TouchDraggingEnded = UserInputService.TouchEnded:Connect(function(InputObject)
-		if self.DraggingCoroutine == LocalDraggingCoroutine then
+	self._whileActiveMaid.TouchDraggingEnded = UserInputService.TouchEnded:Connect(function(InputObject)
+		if self._draggingCoroutine == LocalDraggingCoroutine then
 			self:EndTrack()
 		else
 			warn("[DraggableSnackbar] - TouchEnded fire, but DraggingCoroutine was not the LocalDraggingCoroutine")
 		end
 	end)
 
-	assert(coroutine.resume(self.DraggingCoroutine))
+	assert(coroutine.resume(self._draggingCoroutine))
 end
 
 function DraggableSnackbar:Track()
 	local DragOffset, DragLength
-	local TopLeftInset, BottomRightInset = GuiService:GetGuiInset()
+	local TopLeftInset, _ = GuiService:GetGuiInset()
 	
 	if self.Vertical then
-		DragOffset = (self.Mouse.Y + TopLeftInset.Y) - self.StartDragPosition
+		DragOffset = (self._mouse.Y + TopLeftInset.Y) - self.StartDragPosition
 		DragLength = self.Gui.AbsoluteSize.Y
 
 		self.Gui.Position = self.Position + UDim2.new(0, 0, 0, DragOffset)
 	else
-		DragOffset = (self.Mouse.X + TopLeftInset.X) - self.StartDragPosition
+		DragOffset = (self._mouse.X + TopLeftInset.X) - self.StartDragPosition
 		DragLength = self.Gui.AbsoluteSize.Y
 
 		self.Gui.Position = self.Position + UDim2.new(0, DragOffset, 0, 0)
@@ -163,14 +166,14 @@ end
 
 function DraggableSnackbar:EndTrack()
 	self.StartDragPosition = nil
-	self.DraggingCoroutine = nil
+	self._draggingCoroutine = nil
 
 	-- Cleanup events
-	self.WhileActiveMaid.DraggingEnded = nil
-	self.WhileActiveMaid.TouchDraggingEnded = nil
+	self._whileActiveMaid.DraggingEnded = nil
+	self._whileActiveMaid.TouchDraggingEnded = nil
 
 	-- Dismissal if dragged out
-	if self.ShouldDismiss then
+	if self._shouldDismiss then
 		self:Dismiss()
 	else
 		local OffsetXY = self:GetOffsetXY()
@@ -185,13 +188,13 @@ function DraggableSnackbar:EndTrack()
 end
 
 function DraggableSnackbar:Dismiss()
-	if self.Visible then
-		if (self.DraggingCoroutine) then
-			self.ShouldDismiss = true
+	if self._visible then
+		if (self._draggingCoroutine) then
+			self._shouldDismiss = true
 		else
-			self.Visible = false
-			self.ShouldDismiss = nil
-			self.WhileActiveMaid:DoCleaning()
+			self._visible = false
+			self._shouldDismiss = nil
+			self._whileActiveMaid:DoCleaning()
 
 			local OffsetXY = self:GetOffsetXY()
 			-- Determine what direction to fade out...
@@ -208,8 +211,8 @@ function DraggableSnackbar:Dismiss()
 			end
 
 			-- GC stuff
-			if self.GCOnDismissal then
-				self.GCOnDismissal = false -- Make sure this is only called once...
+			if self._gcOnDismissal then
+				self._gcOnDismissal = false -- Make sure this is only called once...
 				delay(self.FadeTime, function()
 					self:Destroy()
 				end)
@@ -227,11 +230,11 @@ function DraggableSnackbar:Destroy()
 	self.TextLabel:Destroy()
 	self.TextLabel = nil
 
-	self.WhileActiveMaid:DoCleaning()
-	self.WhileActiveMaid = nil
+	self._whileActiveMaid:DoCleaning()
+	self._whileActiveMaid = nil
 
-	self.Visible = false
-	self.DraggingCoroutine = nil
+	self._visible = false
+	self._draggingCoroutine = nil
 
 	setmetatable(self, nil)
 end

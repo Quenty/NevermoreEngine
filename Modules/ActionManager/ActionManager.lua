@@ -26,7 +26,7 @@ function ActionManager.new()
 	self.ActiveAction = ValueObject.new()
 	self.Actions = {}
 	
-	self.ActionAdded = Signal.new() -- :fire(Action)
+	self.ActionAdded = Signal.new() -- :Fire(Action)
 	
 	self.Maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(Tool)
 		self:StopCurrentAction()
@@ -125,7 +125,7 @@ function ActionManager:AddAction(Action)
 		end
 	end))
 	
-	self.ActionAdded:fire(Action)
+	self.ActionAdded:Fire(Action)
 	
 	return self
 end

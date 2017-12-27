@@ -50,8 +50,14 @@ function Snackbar.new(Parent, Text, Options)
 	ShadowContainer.Archivable = false
 	ShadowContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
 	
-	--- Image is blurred at 
-	self.ShadowImages = {qGUI.AddNinePatch(ShadowContainer, "rbxassetid://191838004", Vector2.new(150, 150), self.CornerRadius + ShadowRadius, "ImageLabel")}
+	--- Image is blurred at
+	self.ShadowImages = {
+		qGUI.AddNinePatch(ShadowContainer, "rbxassetid://191838004",
+			Vector2.new(150, 150),
+			self.CornerRadius + ShadowRadius,
+			"ImageLabel"
+		)
+	}
 
 	for _, Item in pairs(self.ShadowImages) do
 		Item.ImageTransparency = 0.74
@@ -79,7 +85,7 @@ function Snackbar.new(Parent, Text, Options)
 	TextLabel.Parent = Gui
 	self.TextLabel = TextLabel
 	
-	self.WhileActiveMaid = Maid()
+	self.WhileActiveMaid = Maid.new()
 	self.Gui.Parent = Parent
 	
 	local CallToActionText

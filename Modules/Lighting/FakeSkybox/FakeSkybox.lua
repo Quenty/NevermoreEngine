@@ -77,7 +77,7 @@ function FakeSkybox:Show(DoNotAnimate)
 	end
 	
 	self.Visible = true
-	self.VisibleChanged:fire(self.Visible, DoNotAnimate)
+	self.VisibleChanged:Fire(self.Visible, DoNotAnimate)
 	
 	self.PercentVisible.t = 1
 	
@@ -92,7 +92,7 @@ function FakeSkybox:Hide(DoNotAnimate)
 	end
 	
 	self.Visible = false
-	self.VisibleChanged:fire(self.Visible, DoNotAnimate)
+	self.VisibleChanged:Fire(self.Visible, DoNotAnimate)
 	
 	self.PercentVisible.t = 0
 	

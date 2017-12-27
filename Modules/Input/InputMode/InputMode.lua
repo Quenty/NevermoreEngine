@@ -71,7 +71,7 @@ end
 --- Enables the mode
 function InputMode:Enable()
 	self._lastEnabled = tick()
-	self.Enabled:fire()
+	self.Enabled:Fire()
 end
 
 --- Evaluates the input object, and if it's valid, enables the mode

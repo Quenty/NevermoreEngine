@@ -22,8 +22,8 @@ function BaseAction.new(Name)
 	self:InitEnableChanged()
 
 	self.ActivateData = nil -- Data to be fired with the Activated event
-	self.Activated = Signal.new() -- :fire(ActionMaid, ActivateData)
-	self.Deactivated = Signal.new() -- :fire()
+	self.Activated = Signal.new() -- :Fire(ActionMaid, ActivateData)
+	self.Deactivated = Signal.new() -- :Fire()
 	
 	self.Name = Name or error("No ActionData.Name")
 	
@@ -34,10 +34,10 @@ function BaseAction.new(Name)
 		if self.IsActivatedValue.Value then
 			local ActionMaid = Maid.new()
 			self.Maid.ActionMaid = ActionMaid
-			self.Activated:fire(ActionMaid, unpack(self.ActivateData))
+			self.Activated:Fire(ActionMaid, unpack(self.ActivateData))
 		else
 			self.Maid.ActionMaid = nil
-			self.Deactivated:fire()
+			self.Deactivated:Fire()
 		end
 	end))
 	
