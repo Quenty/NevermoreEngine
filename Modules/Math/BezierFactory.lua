@@ -1,12 +1,12 @@
-local lib = {}
-
--- Intent: Make interpolation curves
--- @author Quenty
+--- Make interpolation curves
+-- @module BezierFactory
 
 -- A good place to generate and test these out: http://cubic-bezier.com/
 -- Based upon https://gist.github.com/gre/1926947#file-keyspline-js
 
-local function BezierFactory(P1x, P1y, P2x, P2y)
+local lib = {}
+
+function lib.BezierFactory(P1x, P1y, P2x, P2y)
 	-- Same as CSS transition thing.
 
 	assert(P1x, "[BezierFactory] - Need P1x to construct a Bezier Factory")
@@ -22,7 +22,7 @@ local function BezierFactory(P1x, P1y, P2x, P2y)
 		return 3.0 * aA2 - 6.0 * aA1
 	end
 
-	local function C(aA1)     
+	local function C(aA1)
 		return 3.0 * aA1
 	end
 
@@ -40,7 +40,7 @@ local function BezierFactory(P1x, P1y, P2x, P2y)
 	local function GetTForX(aX)
 		local aGuessT = aX
 
-		for Index = 1, 4 do
+		for _ = 1, 4 do
 			local CurrentSlope = GetSlope(aGuessT, P1x, P2x)
 
 			if CurrentSlope == 0 then
@@ -59,7 +59,6 @@ local function BezierFactory(P1x, P1y, P2x, P2y)
 		return CalculateBezier(GetTForX(aX), P1y, P2y)
 	end
 end
-lib.BezierFactory = BezierFactory
 
 --[[ Testing:
 local Ease = BezierFactory(0.25, 0.1, 0.25, 1)

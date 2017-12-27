@@ -1,4 +1,5 @@
--- Intent: Library handles time based parsing / operations. Untested. Based off of PHP.
+--- Library handles time based parsing / operations. Untested. Based off of PHP.
+-- @module Time
 
 local lib = {}
 

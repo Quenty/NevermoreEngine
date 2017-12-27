@@ -1,4 +1,5 @@
--- Intent: Builds card backings for GUI elements
+--- Builds card backings for GUI elements
+-- @classmod MaterialCardBuilder
 
 local MaterialCardBuilder = {}
 MaterialCardBuilder.__index = MaterialCardBuilder

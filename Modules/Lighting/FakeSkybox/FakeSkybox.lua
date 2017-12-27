@@ -1,11 +1,12 @@
+--- Allow transitions between skyboxes
+-- @classmod FakeSkybox
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
 local Maid = require("Maid")
 local FakeSkyboxSide = require("FakeSkyboxSide")
 local AccelTween = require("AccelTween")
 local Signal = require("Signal")
-
--- Intent: Allow transitions between skyboxes
 
 local SkyboxPropertyImageMap = {}
 for Surface, Direction in pairs({

@@ -1,5 +1,5 @@
--- Intent: Be able to compare tuples
--- @author Quenty
+--- Be able to compare tuples
+-- @classmod ComparableTuple
 
 local ComparableTuple = {}
 ComparableTuple.__index = ComparableTuple

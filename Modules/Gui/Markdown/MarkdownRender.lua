@@ -1,7 +1,8 @@
-local TextService = game:GetService("TextService")
-
--- Intent: Renders the markdown
+--- Renders the markdown
 -- See: MarkdownParser
+-- @classmod MarkdownRender
+
+local TextService = game:GetService("TextService")
 
 local MarkdownRender = {}
 MarkdownRender.__index = MarkdownRender

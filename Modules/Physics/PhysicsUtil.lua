@@ -1,4 +1,5 @@
---- Intent: General physics library for use on Roblox
+--- General physics library for use on Roblox
+-- @module PhysicsUtil
 
 local lib = {}
 
@@ -86,7 +87,7 @@ lib.BodyMomentOfInertia = BodyMomentOfInertia
 
 --- Applies a force to a ROBLOX body
 -- @param Force the force vector to apply
--- @param ForcePosition The position that the force is to be applied from (World vector). 
+-- @param ForcePosition The position that the force is to be applied from (World vector).
 --
 -- It should be noted that setting the velocity to one part of a connected part on ROBLOX sets the velocity of the whole physics model.
 -- http://xboxforums.create.msdn.com/forums/p/34179/196459.aspx

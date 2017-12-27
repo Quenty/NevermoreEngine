@@ -1,4 +1,5 @@
--- Intent: Parses text into markdown
+--- Parses text into markdown
+-- @classmod MarkdownParser
 
 local MarkdownParser = {}
 MarkdownParser.__index = MarkdownParser

@@ -1,4 +1,4 @@
--- Intent: Utility function for estimating low/high arcs of projectiles
+--- Utility function for estimating low/high arcs of projectiles
 
 --- Returns two possible paths from Origin to Target where the magnitude of the initial velocity is InitialVelocity
 -- @param Origin vector3 Origin
@@ -32,7 +32,7 @@ local function Trajectory(Origin, Target, InitialVelocity, GravityForce)
 			local v1=Vector3.new(v1x,v1y,v1z)
 
 			return v0,v1
-		else				
+		else
 			return nil, nil, Vector3.new(rx, (tx2^0.5), rz).unit * InitialVelocity
 		end
 	else

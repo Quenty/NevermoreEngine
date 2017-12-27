@@ -47,21 +47,21 @@ end
 function PaperRipple.FromParent(parent)
 	assert(typeof(parent) == "Instance", "parent must be a Roblox object, type")
 
-	local container                  = Instance.new("Frame")
-	container.ClipsDescendants       = true
-	container.Archivable             = false
-	container.BorderSizePixel        = 0
+	local container = Instance.new("Frame")
+	container.ClipsDescendants = true
+	container.Archivable = false
+	container.BorderSizePixel = 0
 	container.BackgroundTransparency = 1
-	container.BackgroundColor3       = PaperRipple.InkColor
-	container.Name                   = "PaperRipple"
-	container.Size                   = UDim2.new(1, 0, 1, 0)
-	container.ZIndex                 = math.min(parent.ZIndex + 1, 10)
-	container.parent                 = parent
+	container.BackgroundColor3 = PaperRipple.InkColor
+	container.Name = "PaperRipple"
+	container.Size = UDim2.new(1, 0, 1, 0)
+	container.ZIndex = math.min(parent.ZIndex + 1, 10)
+	container.Parent = parent
 	
 	local ripple = PaperRipple.new(container)
 	
 	if parent:IsA("TextLabel") or parent:IsA("TextButton") then
-		local h, s, v = Color3.toHSV(parent.BackgroundColor3)
+		local _, s, v = Color3.toHSV(parent.BackgroundColor3)
 		if v > 0.9 and s < 0.1 then
 			ripple:SetInkColor(parent.TextColor3:lerp(Color3.new(1,1,1), 0.5))
 		end

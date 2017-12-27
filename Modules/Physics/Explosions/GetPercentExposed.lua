@@ -1,5 +1,6 @@
--- Intent: Identify parts that are potentially exposed to an explosion using a random vector
+--- Identify parts that are potentially exposed to an explosion using a random vector
 -- and raycasting
+-- @module GetPercentExposed
 
 local lib = {}
 
@@ -25,12 +26,12 @@ function lib.Search(Parts, Point, Radius)
 	
 	local TotalHit = 0
 	local RaysToCast = 314
-	for i=1, RaysToCast do
+	for _=1, RaysToCast do
 		local Direction = GetRandomUnitVector()
 		local CastRay = Ray.new(Point, Direction * Radius)
 		
 		-- Ignore water
-		local Hit, Position = workspace:FindPartOnRayWithWhitelist(CastRay, Parts, true)
+		local Hit = workspace:FindPartOnRayWithWhitelist(CastRay, Parts, true)
 		if Hit then
 			TotalHit = TotalHit + 1
 			HitCount[Hit] = HitCount[Hit] + 1

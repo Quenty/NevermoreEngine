@@ -1,4 +1,5 @@
--- Intent: Construct a rounded backing with a shadow
+--- Construct a rounded backing with a shadow
+-- @classmod RoundedBackingBuilder
 
 local RoundedBackingBuilder = {}
 RoundedBackingBuilder.__index = RoundedBackingBuilder

@@ -1,4 +1,4 @@
---- Intent: Allow freedom of movement around a current place, much like the classic script works now.
+--- Allow freedom of movement around a current place, much like the classic script works now.
 -- Not intended to be use with the current character script. This is the rotation component.
 -- Intended to be used with a SummedCamera, relative.
 -- @classmod SmoothRotatedCamera

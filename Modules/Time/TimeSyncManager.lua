@@ -29,7 +29,7 @@ function MasterClock.new(SyncEvent, DelayedRequestFunction)
 	self.DelayedRequestFunction = DelayedRequestFunction or error("No DelayedRequestFunction")
 	
 	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)
-		return self:_handleDelayRequest(TimeThree) --
+		return self:_handleDelayRequest(TimeThree)
 	end
 	
 	self.SyncEvent.OnServerEvent:Connect(function(Player)
