@@ -22,7 +22,7 @@ function ScreenCover.new(gui)
 	
 	self._builder = ScreenCoverHelperBuilder.new(gui)
 
-	self.Maid:GiveTask(self.Gui:GetPropertyChangedSignal("AbsoluteSize"):connect(function()
+	self.Maid:GiveTask(self.Gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 		self:_updateSize()
 	end))
 	self:_updateSize()
