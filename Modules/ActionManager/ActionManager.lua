@@ -20,42 +20,44 @@ EnabledMixin:Add(ActionManager)
 function ActionManager.new()
 	local self = setmetatable({}, ActionManager)
 	
-	self.Maid = Maid.new()
-	self:InitEnableChanged()
-	
+	self._maid = Maid.new()
+	self._actions = {}
+
 	self.ActiveAction = ValueObject.new()
-	self.Actions = {}
+	self._maid:GiveTask(self.ActiveAction)
 	
 	self.ActionAdded = Signal.new() -- :Fire(Action)
 	
-	self.Maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(Tool)
+	self:InitEnableChanged()
+
+	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(Tool)
 		self:StopCurrentAction()
 	end)
 	
-	self.Maid:GiveTask(self.EnabledChanged:Connect(function(IsEnabled)
+	self._maid:GiveTask(self.EnabledChanged:Connect(function(isEnabled)
 		self:StopCurrentAction()
 		
-		for _, Action in pairs(self.Actions) do
-			Action:SetEnabled(IsEnabled)
+		for _, action in pairs(self._actions) do
+			action:SetEnabled(isEnabled)
 		end
 	end))
 	
-	self.Maid:GiveTask(self.ActiveAction.Changed:Connect(function(Value, OldValue)
+	self._maid:GiveTask(self.ActiveAction.Changed:Connect(function(value, oldValue)
 		local maid = Maid.new()
-		if Value then
+		if value then
 			maid:GiveTask(function()
-				Value:Deactivate()
+				value:Deactivate()
 			end)
-			maid:GiveTask(Value.Deactivated:Connect(function()
-				if self.ActiveAction == Value then
+			maid:GiveTask(value.Deactivated:Connect(function()
+				if self.ActiveAction == value then
 					self.ActiveAction.Value = nil
 				end
 			end))
 		end
-		self.Maid.ActiveActionMaid = maid
+		self._maid._activeActionMaid = maid
 		
 		-- Immediately deactivate
-		if Value and not Value.IsActivatedValue.Value then
+		if value and not value.IsActivatedValue.Value then
 			warn("Immediate deactiation")
 			self.ActiveAction.Value = nil
 		end
@@ -68,64 +70,64 @@ function ActionManager:StopCurrentAction()
 	self.ActiveAction.Value = nil
 end
 
-function ActionManager:ActivateAction(Name, ...)
-	local Action = self:GetAction(Name)
-	if Action then
-		Action:Activate(...)
+function ActionManager:ActivateAction(name, ...)
+	local action = self:GetAction(name)
+	if action then
+		action:Activate(...)
 	else
-		error(("[ActionManager] - No action with name '%s'"):format(tostring(Name)))
+		error(("[ActionManager] - No action with name '%s'"):format(tostring(name)))
 	end
 end
 
-function ActionManager:GetAction(Name)
-	return self.Actions[Name]
+function ActionManager:GetAction(name)
+	return self._actions[name]
 end
 
-function ActionManager:CreateAction(Name, ActionData)
-	local Action = BaseAction.new(Name)
+function ActionManager:CreateAction(name, actionData)
+	local action = BaseAction.new(name)
 	
-	if ActionData then
-		Action:WithActionData(ActionData)
+	if actionData then
+		action:WithActionData(actionData)
 	end
 	
-	self:AddAction(Action)
+	self:AddAction(action)
 	
-	return Action
+	return action
 end
 
 function ActionManager:GetActions()
-	local Actions = {}
+	local list = {}
 	
-	for _, Action in pairs(self.Actions) do
-		table.insert(Actions, Action)
+	for _, action in pairs(self._actions) do
+		table.insert(list, action)
 	end
 	
-	return Actions
+	return list
 end
 
-function ActionManager:AddAction(Action)
-	local Name = Action:GetName()
+function ActionManager:AddAction(action)
+	local name = action:GetName()
 	
-	if self.Actions[Name] then
-		error(("[ActionManager] - Action with name '%s' already exists"):format(tostring(Name)))
+	if self._actions[name] then
+		error(("[ActionManager] - action with name '%s' already exists"):format(tostring(name)))
 		return
 	end
 	
-	self.Actions[Name] = Action
+	self._actions[name] = action
 	
-	Action:SetEnabled(self:IsEnabled())
+	action:SetEnabled(self:IsEnabled())
 	
-	self.Maid:GiveTask(Action.Activated:Connect(function()
-		self.ActiveAction.Value = Action
+	self._maid:GiveTask(action.Activated:Connect(function()
+		self.ActiveAction.Value = action
 	end))
 	
-	self.Maid:GiveTask(Action.Deactivated:Connect(function()
-		if self.ActiveAction.Value == Action then
+	self._maid:GiveTask(action.Deactivated:Connect(function()
+		if self.ActiveAction.Value == action then
 			self.ActiveAction.Value = nil
 		end
 	end))
 	
-	self.ActionAdded:Fire(Action)
+	self.ActionAdded:Fire(action)
 	
 	return self
 end

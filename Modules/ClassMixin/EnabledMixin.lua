@@ -24,12 +24,15 @@ function module:Add(class)
 end
 
 -- Initialize module
-function module:InitEnableChanged()
-	assert(self.Maid)
+function module:InitEnableChanged(maid)
+	maid = maid or self._maid
+	assert(maid, "Must have maid")
+
+	self._enabledMaidReference = maid
 
 	self._enabled = false
 	self.EnabledChanged = Signal.new()
-	self.Maid:GiveTask(self.EnabledChanged)
+	self._enabledMaidReference:GiveTask(self.EnabledChanged)
 end
 
 function module:IsEnabled()
@@ -51,13 +54,9 @@ function module:SetEnabled(isEnabled, doNotAnimate)
 		self._enabled = isEnabled
 		
 		local enabledMaid = Maid.new()
-		self.Maid._enabledMaid = enabledMaid
+		self._enabledMaidReference._enabledMaid = enabledMaid
 		
 		self.EnabledChanged:Fire(isEnabled, enabledMaid)
-		
-		if self.RefreshGuiPosition then
-			self:RefreshGuiPosition(doNotAnimate)
-		end
 	end
 end
 
