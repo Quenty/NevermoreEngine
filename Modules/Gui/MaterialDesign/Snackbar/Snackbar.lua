@@ -83,9 +83,9 @@ function Snackbar.new(Parent, Text, Options)
 	TextLabel.FontSize = Enum.FontSize.Size18
 	TextLabel.ZIndex = Gui.ZIndex-1
 	TextLabel.Parent = Gui
-	self.TextLabel = TextLabel
+	self._textLabel = TextLabel
 	
-	self.WhileActiveMaid = Maid.new()
+	self._whileActiveMaid = Maid.new()
 	self.Gui.Parent = Parent
 	
 	local CallToActionText
@@ -99,45 +99,45 @@ function Snackbar.new(Parent, Text, Options)
 
 		local DefaultTextColor3 = Color3.fromRGB(78, 205, 196)
 		
-		local Button = Instance.new("TextButton")
-		Button.Name = "CallToActionButton"
-		Button.AnchorPoint = Vector2.new(1, 0.5)
-		Button.BackgroundTransparency = 1
-		Button.Position = UDim2.new(1, -self.TextWidthOffset, 0.5, 0)
-		Button.Size = UDim2.new(0.5, 0, 0.8, 0)
-		Button.Text = CallToActionText
-		Button.Font = Enum.Font.SourceSans
-		Button.FontSize = TextLabel.FontSize
-		Button.TextXAlignment = Enum.TextXAlignment.Right
-		Button.TextColor3 = DefaultTextColor3
-		Button.ZIndex = Gui.ZIndex
-		Button.Parent = Gui
+		local button = Instance.new("TextButton")
+		button.Name = "CallToActionButton"
+		button.AnchorPoint = Vector2.new(1, 0.5)
+		button.BackgroundTransparency = 1
+		button.Position = UDim2.new(1, -self.TextWidthOffset, 0.5, 0)
+		button.Size = UDim2.new(0.5, 0, 0.8, 0)
+		button.Text = CallToActionText
+		button.Font = Enum.Font.SourceSans
+		button.FontSize = TextLabel.FontSize
+		button.TextXAlignment = Enum.TextXAlignment.Right
+		button.TextColor3 = DefaultTextColor3
+		button.ZIndex = Gui.ZIndex
+		button.Parent = Gui
 		
 		-- Resize
-		Button.Size = UDim2.new(UDim.new(0, Button.TextBounds.X), Button.Size.Y)
+		button.Size = UDim2.new(UDim.new(0, button.TextBounds.X), button.Size.Y)
 		
-		self.WhileActiveMaid.CallToActionClick = Button.MouseButton1Click:Connect(function()
+		self._whileActiveMaid:GiveTask(button.MouseButton1Click:Connect(function()
 			if Options.CallToAction.OnClick then
 				Options.CallToAction.OnClick()
 				self:Dismiss()
 			end
-		end)
+		end))
 		
-		self.WhileActiveMaid[Button.MouseEnter] = Button.MouseEnter:Connect(function()
-			Button.TextColor3 = DefaultTextColor3:lerp(Color3.new(0, 0, 0), 0.2)
-		end)
+		self._whileActiveMaid:GiveTask(button.MouseEnter:Connect(function()
+			button.TextColor3 = DefaultTextColor3:lerp(Color3.new(0, 0, 0), 0.2)
+		end))
 		
-		self.WhileActiveMaid[Button.MouseLeave] = Button.MouseLeave:Connect(function()
-			Button.TextColor3 = DefaultTextColor3
-		end)
+		self._whileActiveMaid:GiveTask(button.MouseLeave:Connect(function()
+			button.TextColor3 = DefaultTextColor3
+		end))
 		
-		self.CallToActionButton = Button
+		self._callToActionButton = button
 	end
 	
 	
-	local Width = self.TextLabel.TextBounds.X + self.TextWidthOffset*2
-	if self.CallToActionButton then
-		Width = Width + self.CallToActionButton.Size.X.Offset + self.TextWidthOffset*2
+	local Width = self._textLabel.TextBounds.X + self.TextWidthOffset*2
+	if self._callToActionButton then
+		Width = Width + self._callToActionButton.Size.X.Offset + self.TextWidthOffset*2
 	end
 	
 	if Width < self.MinimumWidth then
@@ -147,7 +147,7 @@ function Snackbar.new(Parent, Text, Options)
 	end
 	
 	if CallToActionText then
-		self.TextLabel.Text = Text
+		self._textLabel.Text = Text
 	end
 
 	self.Gui.Size = UDim2.new(0, Width, 0, self.Height)
@@ -175,10 +175,10 @@ end
 function Snackbar:FadeOutTransparency(PercentFaded)
 	if PercentFaded then
 		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 0, 1))
-		self.TextLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0.13, 1)
+		self._textLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0.13, 1)
 		
-		if self.CallToActionButton then
-			self.CallToActionButton.TextTransparency = PercentFaded
+		if self._callToActionButton then
+			self._callToActionButton.TextTransparency = PercentFaded
 		end
 	else
 		local NewProperties = {
@@ -192,12 +192,12 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 			qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
 		end
 
-		qGUI.TweenTransparency(self.TextLabel, {
+		qGUI.TweenTransparency(self._textLabel, {
 			TextTransparency = 1;
 		}, self.FadeTime, true)
 		
-		if self.CallToActionButton then
-			qGUI.TweenTransparency(self.CallToActionButton, {
+		if self._callToActionButton then
+			qGUI.TweenTransparency(self._callToActionButton, {
 				TextTransparency = 1;
 			}, self.FadeTime, true)
 		end
@@ -209,10 +209,10 @@ function Snackbar:FadeInTransparency(PercentFaded)
 	if PercentFaded then
 		-- self.Gui.BackgroundTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0)
 		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 1, 0))
-		self.TextLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0.13)
+		self._textLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0.13)
 		
-		if self.CallToActionButton then
-			self.CallToActionButton.TextTransparency = PercentFaded
+		if self._callToActionButton then
+			self._callToActionButton.TextTransparency = PercentFaded
 		end
 	else
 		-- Should be an ease-in-out transparency fade.
@@ -234,12 +234,12 @@ function Snackbar:FadeInTransparency(PercentFaded)
 			end
 		end
 
-		qGUI.TweenTransparency(self.TextLabel, {
+		qGUI.TweenTransparency(self._textLabel, {
 			TextTransparency = 0.13;
 		}, self.FadeTime, true)
 		
-		if self.CallToActionButton then
-			qGUI.TweenTransparency(self.CallToActionButton, {
+		if self._callToActionButton then
+			qGUI.TweenTransparency(self._callToActionButton, {
 				TextTransparency = 0;
 			}, self.FadeTime, true)
 		end

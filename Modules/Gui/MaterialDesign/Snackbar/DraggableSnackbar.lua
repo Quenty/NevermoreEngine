@@ -17,7 +17,9 @@ DraggableSnackbar.__index = DraggableSnackbar
 DraggableSnackbar.Vertical = true
 DraggableSnackbar.DefaultFadeOut = "FadeOutDown"
 DraggableSnackbar.Duration = 3
-DraggableSnackbar.AutoCloseDisabled = false -- By default the Snackbar will close automatically if the user types outside or presses the esc key.
+
+-- By default the Snackbar will close automatically if the user types outside or presses the esc key.
+DraggableSnackbar.AutoCloseDisabled = false
 
 --- Note that this will not show until :Show() is called
 -- @constructor
@@ -97,9 +99,9 @@ end
 
 function DraggableSnackbar:StartTrack(X, Y)
 	if self.Vertical then
-		self.StartDragPosition = Y
+		self._startDragPosition = Y
 	else
-		self.StartDragPosition = X
+		self._startDragPosition = X
 	end
 	self.DragOffset = 0
 
@@ -138,12 +140,12 @@ function DraggableSnackbar:Track()
 	local TopLeftInset, _ = GuiService:GetGuiInset()
 	
 	if self.Vertical then
-		DragOffset = (self._mouse.Y + TopLeftInset.Y) - self.StartDragPosition
+		DragOffset = (self._mouse.Y + TopLeftInset.Y) - self._startDragPosition
 		DragLength = self.Gui.AbsoluteSize.Y
 
 		self.Gui.Position = self.Position + UDim2.new(0, 0, 0, DragOffset)
 	else
-		DragOffset = (self._mouse.X + TopLeftInset.X) - self.StartDragPosition
+		DragOffset = (self._mouse.X + TopLeftInset.X) - self._startDragPosition
 		DragLength = self.Gui.AbsoluteSize.Y
 
 		self.Gui.Position = self.Position + UDim2.new(0, DragOffset, 0, 0)
@@ -165,7 +167,7 @@ function DraggableSnackbar:GetOffsetXY()
 end
 
 function DraggableSnackbar:EndTrack()
-	self.StartDragPosition = nil
+	self._startDragPosition = nil
 	self._draggingCoroutine = nil
 
 	-- Cleanup events
