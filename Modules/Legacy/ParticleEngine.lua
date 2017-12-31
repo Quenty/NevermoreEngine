@@ -56,7 +56,6 @@ lib.MakeParticleEngineServer = MakeParticleEngineServer
 
 
 local function RealMakeEngine(Screen)
-	print("[ParticleEngine] - Creating new Particle Engine!!!!")
 	assert(Screen, "Need screen")
 
 	local Engine = {}
