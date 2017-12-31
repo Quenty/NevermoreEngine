@@ -9,20 +9,23 @@ local Promise = require("Promise")
 
 local HttpPromise = {}
 
-function HttpPromise.Method(MethodName, Url, ...)
+function HttpPromise.Method(methodName, url, ...)
+	assert(type(methodName) == "string")
+	assert(type(url) == "string")
+
 	local Args = {...}
 	
-	return Promise.new(function(Fulfill, Reject)
-		local Result
+	return Promise.new(function(fulfill, reject)
+		local result
 		
-		local Success, Error = pcall(function()
-			Result = HttpService[MethodName](HttpService, Url, unpack(Args))
+		local success, err = pcall(function()
+			result = HttpService[methodName](HttpService, url, unpack(Args))
 		end)
-		if not Success then
-			warn(("[HttpPromise] - Failed request '%s'"):format(tostring(Url)), Error)
-			Reject(Error)
+		if not success then
+			warn(("[HttpPromise] - Failed request '%s'"):format(url), err)
+			reject(err)
 		else
-			Fulfill(Result)
+			fulfill(result)
 		end
 	end)
 end
