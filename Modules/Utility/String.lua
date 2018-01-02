@@ -1,4 +1,5 @@
 --- This module provides utility functions for strings
+-- @module String
 
 local lib = {}
 
