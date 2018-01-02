@@ -47,7 +47,7 @@ function Maid:__newindex(index, newTask)
 		if type(oldTask) == "function" then
 			oldTask()
 		elseif typeof(oldTask) == "RBXScriptConnection" then
-			oldTask:disconnect()
+			oldTask:Disconnect()
 		elseif oldTask.Destroy then
 			oldTask:Destroy()
 		end
@@ -72,7 +72,7 @@ function Maid:DoCleaning()
 	for index, task in pairs(tasks) do
 		if typeof(task) == "RBXScriptConnection" then
 			tasks[index] = nil
-			task:disconnect()
+			task:Disconnect()
 		end
 	end
 
@@ -83,7 +83,7 @@ function Maid:DoCleaning()
 		if type(task) == "function" then
 			task()
 		elseif typeof(task) == "RBXScriptConnection" then
-			task:disconnect()
+			task:Disconnect()
 		elseif task.Destroy then
 			task:Destroy()
 		end
