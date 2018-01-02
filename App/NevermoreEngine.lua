@@ -137,6 +137,7 @@ local function _debugLoading(Function)
 	return function(Module, ...)
 		Count = Count + 1
 		local LibraryID = Count
+		local StartTime = tick()
 
 		if DEBUG_MODE then
 			print(("\t"):rep(RequestDepth), LibraryID, "Loading: ", Module)
@@ -147,7 +148,7 @@ local function _debugLoading(Function)
 
 		if DEBUG_MODE then
 			RequestDepth = RequestDepth - 1
-			print(("\t"):rep(RequestDepth), LibraryID, "Done loading: ", Module)
+			print(("\t"):rep(RequestDepth), LibraryID, "Done loading: ", Module, "in", tick() - StartTime)
 		end
 
 		return Result
