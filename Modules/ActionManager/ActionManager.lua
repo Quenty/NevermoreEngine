@@ -28,7 +28,7 @@ function ActionManager.new()
 	
 	self.ActionAdded = Signal.new() -- :Fire(Action)
 	
-	self:InitEnableChanged()
+	self:InitEnabledMixin()
 
 	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(Tool)
 		self:StopCurrentAction()

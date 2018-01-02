@@ -1,3 +1,6 @@
+--- Adds Enabled/Disabled state to class
+-- @module module
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
 local Maid = require("Maid")
@@ -13,18 +16,18 @@ function module:Add(class)
 	assert(not class.Disable)
 	assert(not class.SetEnabled)
 	assert(not class.IsEnabled)
-	assert(not class.InitEnableChanged)
+	assert(not class.InitEnabledMixin)
 
 	-- Inject methods
 	class.IsEnabled = self.IsEnabled
 	class.Enable = self.Enable
 	class.Disable = self.Disable
 	class.SetEnabled = self.SetEnabled
-	class.InitEnableChanged = self.InitEnableChanged
+	class.InitEnabledMixin = self.InitEnabledMixin
 end
 
 -- Initialize module
-function module:InitEnableChanged(maid)
+function module:InitEnabledMixin(maid)
 	maid = maid or self._maid
 	assert(maid, "Must have maid")
 

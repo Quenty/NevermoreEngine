@@ -15,11 +15,11 @@ BaseAction.ClassName = "BaseAction"
 
 EnabledMixin:Add(BaseAction)
 
-function BaseAction.new(Name)
+function BaseAction.new(name)
 	local self = setmetatable({}, BaseAction)
 
 	self._maid = Maid.new()
-	self._name = Name or error("No ActionData.Name")
+	self._name = name or error("No name")
 	self._contextActionKey = ("%s_ContextAction"):format(tostring(self._name))
 	self._activateData = nil -- Data to be fired with the Activated event
 
@@ -29,7 +29,7 @@ function BaseAction.new(Name)
 	self.IsActivatedValue = Instance.new("BoolValue")
 	self.IsActivatedValue.Value = false
 	
-	self:InitEnableChanged()
+	self:InitEnabledMixin()
 	
 	self._maid:GiveTask(self.IsActivatedValue.Changed:Connect(function()
 		if self.IsActivatedValue.Value then
@@ -87,6 +87,9 @@ function BaseAction:_updateShortcuts()
 	end
 end
 
+function BaseAction:GetData()
+	return self._actionData
+end
 function BaseAction:GetFABData()
 	if not self._actionData then
 		return nil
