@@ -1,80 +1,68 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- Builds a new RotatingLabel. See RotatingLabel for more details.
+-- @classmod RotatingLabelBuilder
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local RotatingLabel = require("RotatingLabel")
-
---[[
-class RotatingLabelBuilder
-
-Description:
-	Builds a new RotatingLabel. See RotatingLabel for more details.
-
-API:
-	RotatingLabelBuilder.new([TextLabel Template])
-		Starts building a new rotating label with the template, if given
-
-	RotatingLabelBuilder:WithTemplate(TextLabel Template)
-		Sets the tempate to use, the label will get those properties
-
-	RotatingLabelBuilder:Create()
-		Creates the new label and returns it
-
-]]
 
 local RotatingLabelBuilder = {}
 RotatingLabelBuilder.ClassName = "RotatingLabelBuilder"
 RotatingLabelBuilder.__index = RotatingLabelBuilder
 
-function RotatingLabelBuilder.new(Template)
+--- Starts building a new rotating label with the template, if given
+function RotatingLabelBuilder.new(template)
 	local self = setmetatable({}, RotatingLabelBuilder)
 
-	if Template then
-		self:WithTemplate(Template)
+	if template then
+		self:WithTemplate(template)
 	end
 	
 	return self
 end
 
-function RotatingLabelBuilder:WithTemplate(Template)
-	self.Template = Template
+--- Sets the tempate to use, the label will get those properties
+function RotatingLabelBuilder:WithTemplate(template)
+	self._template = template
 
-	self.Label = RotatingLabel.new()
-	self.Label:SetTemplate(Template)
+	self._label = RotatingLabel.new()
+	self._label:SetTemplate(template)
 
-	local Frame = Instance.new("Frame")
-	Frame.Name = Template.Name .. "_RotatingLabel"
-	Frame.Size = Template.Size
-	Frame.AnchorPoint = Template.AnchorPoint
-	Frame.Position = Template.Position
-	Frame.SizeConstraint = Template.SizeConstraint
-	Frame.BackgroundTransparency = 1
-	Frame.BorderSizePixel = 0
+	local frame = Instance.new("Frame")
+	frame.Name = template.Name .. "_RotatingLabel"
+	frame.Size = template.Size
+	frame.AnchorPoint = template.AnchorPoint
+	frame.Position = template.Position
+	frame.SizeConstraint = template.SizeConstraint
+	frame.BackgroundTransparency = 1
+	frame.BorderSizePixel = 0
 
-	local Container = Instance.new("Frame")
-	Container.Name = "Container"
-	Container.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	Container.Size = UDim2.new(1, 0, 1, 0)
-	Container.BackgroundTransparency = 1
+	local container = Instance.new("Frame")
+	container.Name = "Container"
+	container.SizeConstraint = Enum.SizeConstraint.RelativeYY
+	container.Size = UDim2.new(1, 0, 1, 0)
+	container.BackgroundTransparency = 1
 	
-	Container.Parent = Frame
-	Frame.Parent = Template.Parent
+	container.Parent = frame
+	frame.Parent = template.Parent
 
-	return self:WithGui(Frame)
+	return self:WithGui(frame)
 end
 
-function RotatingLabelBuilder:WithGui(Gui)
-	self.Label:SetGui(Gui)
-	self.Label.TextXAlignment = self.Template.TextXAlignment.Name
-	self.Label.Text = self.Template.Text
+function RotatingLabelBuilder:WithGui(gui)
+	self._label:SetGui(gui)
+	self._label.TextXAlignment = self._template.TextXAlignment.Name
+	self._label.Text = self._template.Text
 
-	self.Template.Parent = nil
+	self._template.Parent = nil
 
 	return self
 end
 
+--- Creates the new label and returns it
 function RotatingLabelBuilder:Create()
-	self.Label:UpdateRender()
+	self._label:UpdateRender()
 
-	return self.Label
+	return self._label
 end
 
 return RotatingLabelBuilder

@@ -1,7 +1,7 @@
 --- Track a current part, whether it be a model or part
 -- @classmod TrackCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")

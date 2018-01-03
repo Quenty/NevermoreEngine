@@ -1,32 +1,13 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- A text label with most general properties of a textlabel, except when text is set,
+-- it rotates uniformly like an old clock, animating in a satisfying way
+-- @usage Construct with RotatingLabelBuilder.new(Template):Create()
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local RunService = game:GetService("RunService")
 
 local RotatingCharacterBuilder = require("RotatingCharacterBuilder")
 
---[[
-class RotatingLabel
-
-Description:
-	A text label with most general properties of a textlabel, except when text is set,
-	it rotates uniformly like an old clock, animating in a satisfying way
-	
-	Construct with RotatingLabelBuilder.new(Template):Create()
-
-API:
-	RotatingLabel.Text = string
-		Sets the text label, which it will automatically update
-	RotatingLabel.Width = number
-		Sets the general width of each character
-	RotatingLabel.Transparency
-		Sets the transparency
-	RotatingLabel.Damper
-		Sets the damper of the underlying spring model
-	RotatingLabel.Speed
-		Sets the speed of the underlying spring model
-	RotatingLabel.TextXAlignment
-		Sets the alignment on the X axis. Cannot be Center.
-]]
 
 local RotatingLabel = {}
 RotatingLabel.ClassName = "RotatingLabel"
@@ -66,7 +47,7 @@ function RotatingLabel.new()
 						for _, PropertyName in pairs({"Transparency", "Damper", "Speed"}) do
 							if NewLabel[PropertyName] ~= self[PropertyName] then
 								NewLabel[PropertyName] = self[PropertyName]
-							end 
+							end
 						end
 
 						rawset(Labels, Index, NewLabel)
@@ -118,6 +99,22 @@ function RotatingLabel:__index(Index)
 	end
 end
 
+---
+-- @usage
+--[[
+	RotatingLabel.Text = string
+		Sets the text label, which it will automatically update
+	RotatingLabel.Width = number
+		Sets the general width of each character
+	RotatingLabel.Transparency
+		Sets the transparency
+	RotatingLabel.Damper
+		Sets the damper of the underlying spring model
+	RotatingLabel.Speed
+		Sets the speed of the underlying spring model
+	RotatingLabel.TextXAlignment
+		Sets the alignment on the X axis. Cannot be Center.
+]]
 function RotatingLabel:__newindex(Index, Value)
 	if Index == "Text" then
 		if type(Value) == "number" then
@@ -128,7 +125,7 @@ function RotatingLabel:__newindex(Index, Value)
 
 
 		if self.TextXAlignment == "Right" then
-			-- Shifts existing labels over in the stack so when we add more they 
+			-- Shifts existing labels over in the stack so when we add more they
 			local Delta = #Value - #self.Text
 
 			local Labels = {}
@@ -164,7 +161,7 @@ function RotatingLabel:__newindex(Index, Value)
 			self.Labels:Get(Index).TargetCharacter = self.Text:sub(Index, Index)
 		end
 
- 		for Index, Label in pairs(self.Labels) do
+		for Index, Label in pairs(self.Labels) do
 			Label.Gui.Position = self:_getLabelPosition(Index)
 		end
 

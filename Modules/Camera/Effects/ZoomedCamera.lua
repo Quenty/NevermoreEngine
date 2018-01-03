@@ -9,7 +9,7 @@
 -- Zoom.MinZoom = 0.5 -- Min distance away
 -- Assigning .Zoom will automatically clamp
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")

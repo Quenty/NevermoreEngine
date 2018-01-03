@@ -1,7 +1,7 @@
 --- Covers the screen in a satisfying way
 -- @classmod ScreenCover
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local ScreenCoverHelperBuilder = require("ScreenCoverHelperBuilder")
 local Signal = require("Signal")

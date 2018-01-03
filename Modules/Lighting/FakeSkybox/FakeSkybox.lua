@@ -1,7 +1,7 @@
 --- Allow transitions between skyboxes
 -- @classmod FakeSkybox
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
 local FakeSkyboxSide = require("FakeSkyboxSide")

@@ -1,7 +1,7 @@
 --- Data container for the state of a camera.
 -- @classmod CameraState
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local QuaternionObject = require("QuaternionObject")
 

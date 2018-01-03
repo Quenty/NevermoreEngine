@@ -1,4 +1,7 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+---
+-- @classmod RotatingCharacterBuilder
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local RotatingCharacter = require("RotatingCharacter")
 

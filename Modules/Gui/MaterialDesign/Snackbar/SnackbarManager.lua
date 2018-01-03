@@ -1,32 +1,9 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- Guarantees that only one snackbar is visible at once
+-- @module SnackbarManager
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local DraggableSnackbar = require("DraggableSnackbar")
-
---[[
-class SnackbarManager
-
-Description:
-	Singleton, guarantees that only one snackbar is visible at once
-
-API:
-	WithPlayerGui(PlayerGui)
-		Sets the PlayerGui/ScreenGui to render the snackbars in. Required before use
-
-	MakeSnackbar(string Text, [table Options])
-		Makes a snackbar and then shows it
-	
-		If options are included, in this format, a call to action will be presented to the player
-		Options = {
-			CallToAction = {
-				Text = "Action";
-				OnClick = function() end);
-			};
-		};
-
-	WithSnackbarRemoteEvent(RemoteEvent)
-		Initializes a RemoteEvent on the client to listen to new requests from the server to show a snackbar.
-		Optional for regular use
-]]
 
 local SnackbarManager = {}
 SnackbarManager.ClassName = "SnackbarManager"
@@ -35,48 +12,65 @@ SnackbarManager.__index = SnackbarManager
 function SnackbarManager.new()
 	local self = setmetatable({}, SnackbarManager)
 
-	self.CurrentSnackbar = nil
+	self._currentSnackbar = nil
 
 	return self
 end
 
---- Set snackbar manager PlayerGui and construct a ScreenGui to use
-function SnackbarManager:WithPlayerGui(PlayerGui)
-	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = "Snackbar_ScreenGui"
-	ScreenGui.DisplayOrder = 10
-	ScreenGui.Parent = PlayerGui
+--- Set snackbar manager PlayerGui and construct a screenGui to use
+function SnackbarManager:WithPlayerGui(playerGui)
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "Snackbar_ScreenGui"
+	screenGui.DisplayOrder = 10
+	screenGui.Parent = playerGui
 
-	return self:_withScreenGui(ScreenGui)
+	return self:_withScreenGui(screenGui)
 end
 
---- Sets the DisplayOrder of the ScreenGui
-function SnackbarManager:WithDisplayOrder(DisplayOrder)
-	assert(self.ScreenGui)
+--- Sets the screenGui to use
+function SnackbarManager:_withScreenGui(screenGui)
+	self._screenGui = screenGui or error("No screenGui")
+
+	return self
+end
+
+--- Sets the DisplayOrder of the screenGui
+function SnackbarManager:WithDisplayOrder(displayOrder)
+	assert(self._screenGui)
 	
-	self.ScreenGui.DisplayOrder = DisplayOrder or error("No DisplayOrder")
+	self._screenGui.DisplayOrder = displayOrder or error("No DisplayOrder")
 	return self
 end
 
 --- Automatically makes a snackbar and shows it
--- @param Text to show
--- @param Options See above
-function SnackbarManager:MakeSnackbar(Text, Options)
-	assert(self.ScreenGui, "Must call :WithPlayerGui(PlayerGui) bofore use")
-	assert(type(Text) == "string", "Text must be a string")
+-- @param text to show
+-- @param[opt] options
+--[[
+		If options are included, in this format, a call to action will be presented to the player
+		options = {
+			CallToAction = {
+				Text = "Action";
+				OnClick = function() end);
+			};
+		};
+]]
+function SnackbarManager:MakeSnackbar(text, options)
+	assert(self._screenGui, "Must call :WithPlayerGui(PlayerGui) bofore use")
+	assert(type(text) == "string", "text must be a string")
 
-	local NewSnackbar = DraggableSnackbar.new(self.ScreenGui, Text, true, Options)
+	local NewSnackbar = DraggableSnackbar.new(self._screenGui, text, true, options)
 	self:_showSnackbar(NewSnackbar)
 
 	return NewSnackbar
 end
 
---- Optional, sets a remote event to listen for feedback
-function SnackbarManager:WithSnackbarRemoteEvent(RemoteEvent)
-	assert(self.ScreenGui, "Must initialize PlayerGui before initializing RemoteEvent")
+--- Initializes a remoteEvent on the client to listen to new requests from the server to show a snackbar.
+-- Optional for regular use
+function SnackbarManager:WithSnackbarRemoteEvent(remoteEvent)
+	assert(self._screenGui, "Must initialize PlayerGui before initializing remoteEvent")
 	
-	self.RemoteEvent = RemoteEvent or error("No RemoteEvent")
-	self.RemoteEvent.OnClientEvent:Connect(function(Text, Options)
+	self._remoteEvent = remoteEvent or error("No remoteEvent")
+	self._remoteEvent.OnClientEvent:Connect(function(Text, Options)
 		self:MakeSnackbar(Text, Options)
 	end)
 	
@@ -84,40 +78,35 @@ function SnackbarManager:WithSnackbarRemoteEvent(RemoteEvent)
 end
 
 --- Cleanup existing snackbar
-function SnackbarManager:_showSnackbar(Snackbar)
-	assert(Snackbar, "Must send a Snackbar")
+function SnackbarManager:_showSnackbar(snackbar)
+	assert(snackbar, "Must send a snackbar")
 
-	if self.CurrentSnackbar == Snackbar and self.CurrentSnackbar.Visible then
-		Snackbar:Dismiss()
+	if self._currentSnackbar == snackbar and self._currentSnackbar:IsVisible() then
+		snackbar:Dismiss()
 	else
-		local DismissedSnackbar = false
+		local dismissedSnackbar = false
 
-		if self.CurrentSnackbar then
-			if self.CurrentSnackbar.Visible then
-				self.CurrentSnackbar:Dismiss()
-				self.CurrentSnackbar = nil
-				DismissedSnackbar = true
+		if self._currentSnackbar then
+			if self._currentSnackbar:IsVisible() then
+				self._currentSnackbar:Dismiss()
+				self._currentSnackbar = nil
+				dismissedSnackbar = true
 			end
 		end
 
-		self.CurrentSnackbar = Snackbar
-		if DismissedSnackbar then
-			delay(Snackbar.FadeTime, function()
-				if self.CurrentSnackbar == Snackbar then
-					Snackbar:Show()
+		self._currentSnackbar = snackbar
+		if dismissedSnackbar then
+			delay(snackbar.FadeTime, function()
+				if self._currentSnackbar == snackbar then
+					snackbar:Show()
 				end
 			end)
 		else
-			Snackbar:Show()
+			snackbar:Show()
 		end
 	end
 end
 
---- Sets the ScreenGui to use
-function SnackbarManager:_withScreenGui(ScreenGui)
-	self.ScreenGui = ScreenGui or error("No ScreenGui")
 
-	return self
-end
 
 return SnackbarManager

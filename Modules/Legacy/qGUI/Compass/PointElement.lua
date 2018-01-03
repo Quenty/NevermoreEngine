@@ -1,9 +1,10 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+-- An interest point for an element
+-- @classmod ICompassElement
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local ICompassElement = require("ICompassElement")
 
--- An interest point for an element
--- @author Quenty
 
 local PointElement = setmetatable({}, ICompassElement)
 PointElement.__index = PointElement

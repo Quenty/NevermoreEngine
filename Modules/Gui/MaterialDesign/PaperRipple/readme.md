@@ -4,7 +4,7 @@ Paper ripple is used to emulate the ripple effect as seen in Google's Material D
 ## Using the PaperRipple to automatically add ripples to your buttons
 
 ```lua
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local PaperRipple = require("PaperRipple")
 

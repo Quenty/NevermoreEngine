@@ -3,7 +3,7 @@
 -- call `:Destroy()` after usage
 -- @classmod CameraStateTweener
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
 local CameraStack = require("CameraStack")

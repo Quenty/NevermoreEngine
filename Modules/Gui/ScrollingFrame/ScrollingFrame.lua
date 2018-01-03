@@ -1,40 +1,15 @@
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+---	Creates an inertia based scrolling frame that is animated and has inertia frames
+-- Alternative to a Roblox ScrollingFrame with more control.
+-- @classmod ScrollingFrame
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local Maid = require("Maid")
 local Signal = require("Signal")
 local Spring = require("Spring")
-
---[[
-class ScrollingFrame
-
-Description:
-	Creates an inertia based scrolling frame that is animated and has inertia frames
-	Alternative to a Roblox ScrollingFrame with more control.
-
-API:
-	ScrollingFrame.new(Container)
-		Creates a new ScrollingFrame which can be used. Prefer Container.Active = true so scroll wheel works.
-		Container should be in a Frame with ClipsDescendants = true
-	
-	ScrollingFrame:AddScrollbarFromContainer(ScrollbarContainer)
-		Creates a new scrollbar from the scrollbar container. Once this is called you don't
-		have to do anything
-	
-	ScrollingFrame:ScrollTo(Position, [DoNotAnimate = false])
-		Scrolls to the position in pixels offset
-
-	ScrollingFrame:ScrollToTop([DoNotAnimate = false])
-		Scrolls to the top
-	
-	ScrollingFrame:ScrollToBottom([DoNotAnimate = false])
-		Scrolls tothe bottom
-
-	ScrollingFrame:Destroy()
-		Destroys the scrolling frame
-]]
 
 local Scroller = {}
 Scroller.ClassName = "Scroller"
@@ -183,6 +158,7 @@ function BaseScroller.new(Gui)
 	return self
 end
 
+--- Destroys the scrolling frame
 function BaseScroller:Destroy()
 	self.Maid:DoCleaning()
 	self.Maid = nil
@@ -276,10 +252,13 @@ function Scrollbar:UpdateRender()
 	end
 end
 
+
 local ScrollingFrame = setmetatable({}, BaseScroller)
 ScrollingFrame.ClassName = "ScrollingFrame"
 ScrollingFrame.__index = ScrollingFrame
 
+--- Creates a new ScrollingFrame which can be used. Prefer Container.Active = true so scroll wheel works.
+-- Container should be in a Frame with ClipsDescendants = true
 function ScrollingFrame.new(Gui)
 	local self = setmetatable(BaseScroller.new(Gui), ScrollingFrame)
 
@@ -316,6 +295,7 @@ function ScrollingFrame:AddScrollbar(Gui)
 	self.Maid[Gui] = Bar
 end
 
+--- Creates a new scrollbar from the scrollbar container. Once this is called you don't have to do anything
 function ScrollingFrame:AddScrollbarFromContainer(Container)
 	local ScrollBar = Instance.new("ImageButton")
 	ScrollBar.Size = UDim2.new(1, 0, 0, 100)
@@ -415,6 +395,7 @@ function ScrollingFrame:GetProcessInput(InputBeganObject)
 	end
 end
 
+--- Scrolls to the position in pixels offset
 function ScrollingFrame:ScrollTo(Position, DoNotAnimate)
 	self.Scroller.Target = Position
 	if DoNotAnimate then
@@ -423,10 +404,12 @@ function ScrollingFrame:ScrollTo(Position, DoNotAnimate)
 	end
 end
 
+--- Scrolls to the top
 function ScrollingFrame:ScrollToTop(DoNotAnimate)
 	self:ScrollTo(self.Scroller.Min, DoNotAnimate)
 end
 
+--- Scrolls to the bottom
 function ScrollingFrame:ScrollToBottom(DoNotAnimate)
 	self:ScrollTo(self.Scroller.Max, DoNotAnimate)
 end

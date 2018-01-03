@@ -4,7 +4,7 @@
 -- one on the screen at a time.
 -- @classmod Snackbar
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local qGUI = require("qGUI")
 local Maid = require("Maid")

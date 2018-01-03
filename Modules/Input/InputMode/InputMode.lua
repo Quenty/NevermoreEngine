@@ -1,7 +1,7 @@
 ---  Trace input mode state and trigger changes correctly
 -- @classmod InputMode
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Signal = require("Signal")
 

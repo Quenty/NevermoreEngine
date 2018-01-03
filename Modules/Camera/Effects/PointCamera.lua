@@ -1,7 +1,7 @@
 --- Point a current element
 -- @classmod PointCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")

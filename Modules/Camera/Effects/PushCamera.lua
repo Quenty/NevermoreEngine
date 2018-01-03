@@ -2,7 +2,7 @@
 -- This same behavior is seen in Roblox vehicle seats
 -- @classmod PushCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")

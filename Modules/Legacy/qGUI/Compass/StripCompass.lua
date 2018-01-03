@@ -1,10 +1,9 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- A Skyrim style compass. Yay!
+-- @classmod StripCompass
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local ICompass = require("ICompass")
-
--- StripCompass.lua
--- @author Quenty
--- A Skyrim style compass. Yay!
 
 local StripCompass = setmetatable({}, ICompass)
 StripCompass.__index = StripCompass

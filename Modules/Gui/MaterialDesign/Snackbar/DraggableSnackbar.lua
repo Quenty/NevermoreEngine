@@ -1,7 +1,7 @@
 --- Snackbar, but draggable
 -- @classmod DraggableSnackbar
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -223,6 +223,10 @@ function DraggableSnackbar:Dismiss()
 	else
 		error("[DraggableSnackbar] - Cannot dismiss, already hidden")
 	end
+end
+
+function DraggableSnackbar:IsVisible()
+	return self._visible
 end
 
 function DraggableSnackbar:Destroy()

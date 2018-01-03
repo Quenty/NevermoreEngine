@@ -1,7 +1,7 @@
 --- Be the inverse of a fading camera (makes scaling in cameras easy).
 -- @classmod InverseFader
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local SummedCamera = require("SummedCamera")
 

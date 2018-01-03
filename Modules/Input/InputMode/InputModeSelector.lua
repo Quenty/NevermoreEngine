@@ -2,7 +2,7 @@
 -- identify the best state from it
 -- @classmod InputModeSelector
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
 local ValueObject = require("ValueObject")

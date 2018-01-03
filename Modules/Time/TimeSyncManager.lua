@@ -143,7 +143,7 @@ end
 
 --- Return a singleton
 local function BuildClock()
-	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 	local SyncEvent = require.GetRemoteEvent("TimeSyncEvent")
 	local DelayedRequestFunction = require.GetRemoteFunction("DelayedRequestEvent")

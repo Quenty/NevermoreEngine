@@ -1,6 +1,7 @@
 --- Legacy code written by AxisAngles to simulate particles with Guis
+-- @module ParticleEngine
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local WIND_SPEED = 10
 

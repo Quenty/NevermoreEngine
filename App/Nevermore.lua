@@ -8,12 +8,12 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-assert(script:IsA("ModuleScript"), "Invalid script type. For NevermoreEngine to work correctly, it should be " ..
-	"a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
-assert(script.Name == "NevermoreEngine", "Invalid script name. For NevermoreEngine to work correctly, it should be " ..
-	"a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
-assert(script.Parent == ReplicatedStorage, "Invalid parent. For NevermoreEngine to work correctly, it should be " ..
-	"a ModuleScript named \"NevermoreEngine\" parented to ReplicatedStorage")
+assert(script:IsA("ModuleScript"), "Invalid script type. For Nevermore to work correctly, it should be " ..
+	"a ModuleScript named \"Nevermore\" parented to ReplicatedStorage")
+assert(script.Name == "Nevermore", "Invalid script name. For Nevermore to work correctly, it should be " ..
+	"a ModuleScript named \"Nevermore\" parented to ReplicatedStorage")
+assert(script.Parent == ReplicatedStorage, "Invalid parent. For Nevermore to work correctly, it should be " ..
+	"a ModuleScript named \"Nevermore\" parented to ReplicatedStorage")
 
 --- Handles yielded operations by caching the retrieval process
 local function _handleRetrieving(Retrieving, Function, Argument)

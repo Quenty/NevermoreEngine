@@ -2,7 +2,7 @@
 -- @classmod Promise
 -- See: https://promisesaplus.com/
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
 

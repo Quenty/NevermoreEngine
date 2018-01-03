@@ -1,9 +1,9 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- A cardinal direction for a compass
+-- @classmod CardinalElement
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local ICompassElement = require("ICompassElement")
-
--- A cardinal direction for a compass
--- @author Quenty
 
 local CardinalElement = setmetatable({}, ICompassElement)
 CardinalElement.__index = CardinalElement

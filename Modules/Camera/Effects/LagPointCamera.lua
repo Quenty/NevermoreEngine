@@ -1,7 +1,7 @@
 --- Point a current element but lag behind for a smoother experience
 -- @classmod LagPointCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")

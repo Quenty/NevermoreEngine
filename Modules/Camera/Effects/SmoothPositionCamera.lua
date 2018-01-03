@@ -1,7 +1,7 @@
 --- Lags the camera smoothly behind the position maintaining other components
 -- @classmod SmoothPositionCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")

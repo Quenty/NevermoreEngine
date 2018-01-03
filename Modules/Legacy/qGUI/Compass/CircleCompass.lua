@@ -1,10 +1,9 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- A classically circle compass
+-- @classmod CircleCompass
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local ICompass = require("ICompass")
-
--- CircleCompass.lua
--- @author Quenty
--- A classically circle compass
 
 local CircleCompass = setmetatable({}, ICompass)
 CircleCompass.__index = CircleCompass

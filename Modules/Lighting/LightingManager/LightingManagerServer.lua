@@ -1,6 +1,6 @@
 --- Syncronizes lighting with clients
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
 

@@ -1,7 +1,7 @@
 --- Adds Enabled/Disabled state to class
--- @module module
+-- @module EnabledMixin
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
 local Signal = require("Signal")

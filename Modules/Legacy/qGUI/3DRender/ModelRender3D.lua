@@ -1,8 +1,9 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- Render models in 3D space
+-- @classmod ModelRender3D
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local ScreenSpace = require("ScreenSpace")
-
--- @author Quenty
 
 local ModelRender3D = {}
 ModelRender3D.__index = ModelRender3D

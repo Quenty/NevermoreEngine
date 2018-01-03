@@ -1,13 +1,13 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+-- Renders a frame and its descendants in 3D space.
+-- @classmod GUIRender3D
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local ScreenSpace  = require("ScreenSpace")
 
 local GUIRender3D = {}
 GUIRender3D.__index = GUIRender3D
 GUIRender3D.ClassName = "GUIRender3D"
-
--- Renders a frame and its descendants in 3D space.
--- @author Quenty
 
 function GUIRender3D.new()
 	local self = setmetatable({}, GUIRender3D)

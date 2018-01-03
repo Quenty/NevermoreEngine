@@ -2,7 +2,7 @@
 -- to be applied. Good for shockwaves, camera shake, and recoil
 -- @classmod ImpulseCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
 local Spring = require("Spring")

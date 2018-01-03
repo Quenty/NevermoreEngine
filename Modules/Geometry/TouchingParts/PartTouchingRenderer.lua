@@ -1,6 +1,7 @@
 --- Renders touching parts from the PartTouchingCalculator
+-- @classmod PartTouchingRenderer
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Debris = game:GetService("Debris")
 

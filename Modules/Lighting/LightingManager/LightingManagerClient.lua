@@ -3,7 +3,7 @@
 
 local Lighting = game:GetService("Lighting")
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local LightingManager = require("LightingManager")
 local Table = require("Table")

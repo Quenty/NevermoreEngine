@@ -1,4 +1,7 @@
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+--- Character that rotates for animations
+-- @classmod RotatingCharacter
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local qMath = require("qMath")
 local Spring = require("Spring")
@@ -23,8 +26,8 @@ function RotatingCharacter.new(Gui)
 	self.Character = self.TargetCharacter
 
 	self.TransparencyList = setmetatable({}, {
-		__newindex = function(self, Index, Value)
-			rawset(self, Index, {
+		__newindex = function(transparencyList, Index, Value)
+			rawset(transparencyList, Index, {
 				Gui = Value;
 				Default = {
 					TextTransparency = Value.TextTransparency;

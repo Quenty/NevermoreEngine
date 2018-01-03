@@ -2,7 +2,7 @@
 -- with `.Changed` events
 -- @classmod ValueObject
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Signal = require("Signal")
 local Maid = require("Maid")

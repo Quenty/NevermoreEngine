@@ -2,7 +2,7 @@
 -- See: github.com/PolymerElements/paper-ripple/blob/master/paper-ripple.html
 -- @classmod PaperRipple
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")

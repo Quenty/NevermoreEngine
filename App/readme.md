@@ -1,13 +1,13 @@
-This is the main loader of NevermoreEngine. It's designed to unify loading
+This is the main loader of Nevermore. It's designed to unify loading
 so that module scripts on both the client and server can safetly load resources without
 seperate code (one for yielding-streamed-in-load and one instantanious)
 
-This module is the _primary function_ of NevermoreEngine. NevermoreEngine is this script and all of the
+This module is the _primary function_ of Nevermore. Nevermore is this script and all of the
 associated libraries used to make developing on ROBLOX easier. 
 
 ## tl;dr
 
-In short, NevermoreEngine does makes unified server-client code easy.
+In short, Nevermore does makes unified server-client code easy.
 
 # What it does
 
@@ -23,15 +23,9 @@ Just stick this baby in the ReplicatedStorage in ROBLOX Studio.
 To safely load Nevermore engine, simply `require` the script. Note that this will only work with RBX.Lua, ROBLOX's
 flavor of Lua.
 
-It's customary to put a LoadCustomLibrary API in here to make loading libraries (the main function of Nevermore) 
-more available, while keeping things relatively safe.
-
 This is the standard snippet used in Nevermore's libraries.
 ```lua
-local ReplicatedStorage   = game:GetService("ReplicatedStorage")
-
-local NevermoreEngine     = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
-local LoadCustomLibrary   = NevermoreEngine.LoadLibrary
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 ```
 
 ## Caveats
@@ -40,7 +34,7 @@ local LoadCustomLibrary   = NevermoreEngine.LoadLibrary
 * Not intended to be used with Build mode editing 
 
 # API
-NevermoreEngine has 3 API methods that you can use. It's that simple.
+Nevermore has 3 API methods that you can use. It's that simple.
 
 `GetRemoteEvent(RemoteEventName)`
 
@@ -60,7 +54,7 @@ Retrieves the library of LibraryName using the `require(ModuleScript)` method. W
 such a library does not exist. It expects to find libraries in `ServerScriptStorage.Nevermore.[...]`
 
 # Debug mode
-By enabling DebugMode (set `local DEBUG_MODE = true` in script), NevermoreEngine will print out the libraries it's loading in order.
+By enabling DebugMode (set `local DEBUG_MODE = true` in script), Nevermore will print out the libraries it's loading in order.
 
 For example, you can see the requirements of `NevermoreCommandsServer` here, the Serverside component of Nevermore's commands.
 

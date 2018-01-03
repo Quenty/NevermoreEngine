@@ -1,7 +1,7 @@
 --- Sound playback
 -- @classmod SoundPlayer
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local SoundService = game:GetService("SoundService")
 local Debris = game:GetService("Debris")
