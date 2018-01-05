@@ -1,4 +1,11 @@
+--- Debounce a existing function by timeout
+-- @tparam number timeout
+-- @tparam function func
+-- @treturn function
 local function Debounce(timeout, func)
+	assert(type(timeout) == "number")
+	assert(type(func) == "function")
+	
 	local key = 1
 	return function(...)
 		key = key + 1
