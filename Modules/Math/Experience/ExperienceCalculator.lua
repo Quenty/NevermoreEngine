@@ -29,7 +29,7 @@ function lib.GetExperienceRequiredForLevel(level)
 	return lib.GetExperienceRequiredForNextLevel(level - 1)
 end
 
---- Gets experience required for next level
+--- Gets experience left to earn required for next level
 -- @tparam number currentExperience Current experience of player
 -- @treturn number experience Experience points left to earn for the player
 function lib.GetExperienceForNextLevel(currentExperience)
