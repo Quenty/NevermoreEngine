@@ -36,12 +36,16 @@ end
 ---
 -- @treturn boolean true, if server
 function module:IsServer()
+	assert(type(self._isServer) == "boolean", "Uninitialized")
+
 	return self._isServer
 end
 
 ---
 -- @treturn boolean true, if client
 function module:IsClient()
+	assert(type(self._isServer) == "boolean", "Uninitialized")
+
 	return not self._isServer
 end
 
