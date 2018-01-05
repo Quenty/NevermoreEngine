@@ -14,11 +14,11 @@ AnimationPlayer.ClassName = "AnimationPlayer"
 -- @tparam Humanoid Humanoid
 function AnimationPlayer.new(Humanoid)
 	local self = setmetatable({}, AnimationPlayer)
-	
+
 	self.Humanoid = Humanoid or error("No Humanoid")
 	self.Tracks = {}
 	self.FadeTime = 0.4 -- Default
-	
+
 	self.TrackPlayed = Signal.new()
 
 	return self
@@ -42,7 +42,7 @@ function AnimationPlayer:AddAnimation(Name, AnimationId)
 	end
 
 	Animation.Name = Name or error("No name")
-	
+
 	return self:WithAnimation(Animation)
 end
 
@@ -72,7 +72,7 @@ function AnimationPlayer:PlayTrack(TrackName, FadeTime, Weight, Speed, StopFadeT
 		self:StopAllTracks(StopFadeTime or FadeTime)
 		Track:Play(FadeTime, Weight, Speed)
 	end
-	
+
 	return Track
 end
 
@@ -82,11 +82,11 @@ end
 -- @treturn AnimationTrack
 function AnimationPlayer:StopTrack(TrackName, FadeTime)
 	FadeTime = FadeTime or self.FadeTime
-	
+
 	local Track = self:GetTrack(TrackName)
-	
+
 	Track:Stop(FadeTime)
-	
+
 	return Track
 end
 

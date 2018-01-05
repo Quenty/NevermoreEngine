@@ -106,7 +106,7 @@ function Spring:__newindex(Index, Value)
 	else
 		error(("'%s' is not a valid member of Spring"):format(tostring(Index)), 2)
 	end
-	
+
 	rawset(self, "_time0", Time)
 end
 

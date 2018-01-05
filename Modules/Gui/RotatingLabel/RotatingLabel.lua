@@ -138,7 +138,7 @@ function RotatingLabel:__newindex(Index, Value)
 				if NewIndex < 1 or NewIndex > #Value then
 					Label.TargetCharacter = " "
 				end
-				
+
 				self.Labels[Index] = nil
 			end
 

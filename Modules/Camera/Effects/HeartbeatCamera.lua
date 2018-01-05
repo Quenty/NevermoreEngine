@@ -16,17 +16,17 @@ HeartbeatCamera.ProfileName = "HeartbeatCamera"
 
 function HeartbeatCamera.new(Camera)
 	local self = setmetatable({}, HeartbeatCamera)
-	
+
 	self.Camera = Camera or error("No camera")
 	self.Maid = Maid.new()
-	
+
 	self.CurrentStateCache = self.Camera.CameraState or error("Camera state returned null")
 	self.Maid.Heartbeat = RunService.Heartbeat:Connect(function()
 		debug.profilebegin(self.ProfileName)
 		self.CurrentStateCache = self.Camera.CameraState or error("Camera state returned null")
 		debug.profileend()
 	end)
-	
+
 	return self
 end
 

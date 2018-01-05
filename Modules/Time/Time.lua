@@ -65,9 +65,9 @@ function lib.GetMonth(CurrentTime)
 	local Year = lib.GetYear(CurrentTime)
 	local Day = lib.GetDay(CurrentTime)
 	local Month
-	
+
 	local DaysInMonth = GetDaysMonth(Year)
-	
+
 	for Index=1, #DaysInMonth do
 		if Day > DaysInMonth[Index] then
 			Day = Day - DaysInMonth[Index]
@@ -82,7 +82,7 @@ function lib.GetFormattedMonth(CurrentTime)
 	if Month < 10 then
 		Month = "0"..Month
 	end
-	
+
 	return Month
 end
 
@@ -90,7 +90,7 @@ function lib.GetDayOfTheMonth(CurrentTime)
 	local Year = lib.GetYear(CurrentTime)
 	local Day = lib.GetDay(CurrentTime)
 	local DayOfTheMonth
-	
+
 	local DaysInMonth = GetDaysMonth(Year)
 
 	for Index=1, #DaysInMonth do
@@ -104,11 +104,11 @@ end
 
 function lib.GetFormattedDayOfTheMonth(CurrentTime)
 	local DayOfTheMonth = lib.GetDayOfTheMonth(CurrentTime)
-	
+
 	if DayOfTheMonth < 10 then
 		DayOfTheMonth = "0"..DayOfTheMonth
 	end
-	
+
 	return DayOfTheMonth
 end
 
@@ -124,13 +124,13 @@ function lib.GetJulianDate(CurrentTime)
 	local Month = lib.GetMonth(CurrentTime)
 	local Year = lib.GetYear(CurrentTime)
 	local Day = lib.GetDay(CurrentTime)
-	
+
 	local A = (14-Month) / 12
 	local Y = Year + 4800 - A
 	local M = Month + 12 * A - 3
-	
+
 	local JulianDay = Day + ((153 * M + 2) / 5) + 365 * Y + (Y/4) - (Y/100) + (Y/400) - 32045
-	
+
 	--[[local JulianDay = (Day 
 	+ ((153 * (Month + 12 * ((14 - Month) / 12 ) - 3) + 2) / 5)
 	+ (365 * (Year + 4800 - ((14 - Month) / 12)))
@@ -143,23 +143,23 @@ function lib.GetJulianDate(CurrentTime)
 end
 
 function lib.GetDayOfTheWeek(CurrentTime)
-	
+
 	local JulianTime = lib.GetJulianDate(CurrentTime)
-	
+
 	return math.floor(JulianTime) % 7
 end
 
 function lib.GetDayOfTheWeekName(CurrentTime)
 	local DayOfTheWeek = lib.GetDayOfTheWeek(CurrentTime)
 	local Name = DAYS_OF_WEEK[DayOfTheWeek]
-	
+
 	return Name
 end
 
 function lib.GetDayOfTheWeekNameShort(CurrentTime) 
 	local DayOfTheWeek = lib.GetDayOfTheWeek(CurrentTime)
 	local Name = DAYS_OF_WEEK_SHORT[DayOfTheWeek] 
-	
+
 	return Name
 end
 
@@ -168,11 +168,11 @@ end
 function lib.GetOrdinalOfNumber(Number) 
 	local TenRemainder = Number % 10
 	local HundredRemainder = Number % 100
-	
+
 	if HundredRemainder >= 10 and HundredRemainder <= 20 then
 		return "th"
 	end
-	
+
 	if TenRemainder == 1 then
 		return "st"
 	elseif TenRemainder == 2 then
@@ -294,18 +294,18 @@ local ISO_FORMAT_STRINGS = {
 	Z = lib.GetDay;
 
 	-- W 
-	
+
 	F = lib.GetMonthName;
 	m = lib.GetFormattedMonth;
 	M = lib.GetMonthNameShort;
 	n = lib.GetMonth;
 	t = lib.GetDaysInMonth;
-	
+
 	L = lib.LeapYear;
 	o = lib.GetYear;
 	Y = lib.GetYear; -- Screw ISO-8610, it confuses me.
 	y = lib.GetYearShortFormatted;
-	
+
 	a = lib.GetamOrpm;
 	A = lib.GetAMorPM;
 	--B -- No one uses it
@@ -315,16 +315,16 @@ local ISO_FORMAT_STRINGS = {
 	H = lib.GetHourFormatted;
 	i = lib.GetFormattedMinute;
 	s = lib.GetFormattedSecond;
-	
+
 	X = lib.GetJulianDate; -- For testing purposes.
-	
+
 	-- e -- No way to get Time Zones
 	-- I -- Daylight saving time should be added later.
 	-- O -- No way to get Time Zones
 	-- P -- No way to get Time Zones
 	-- T -- No way to get Time Zones
 	-- Z -- No way to get Time Zones
-	
+
 	-- c -- ISO 8601
 	-- r -- No need for formatted dates
 	U = time;
@@ -339,23 +339,23 @@ end
 
 function lib.GetFormattedTime(Format, CurrentTime)
 	CurrentTime = CurrentTime or tick()
-	
+
 	local ReturnString = Format
 	local FormatsRequired = {}
-	
+
 	for NewFormat in string.gmatch(Format, MatchString) do
 		FormatsRequired[#FormatsRequired+1] = NewFormat
 	end
-	
+
 	for _, FormatType in pairs(FormatsRequired) do
 		ReturnString = ReturnString:gsub(FormatType, FormatType:rep(3))
 	end
-	
+
 	for _, FormatType in pairs(FormatsRequired) do
 		local Replacement = ISO_FORMAT_STRINGS[FormatType](CurrentTime)
 		ReturnString = ReturnString:gsub(FormatType:rep(3), Replacement)
 	end
-	
+
 	return ReturnString
 end
 

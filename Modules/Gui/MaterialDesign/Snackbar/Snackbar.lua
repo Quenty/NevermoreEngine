@@ -39,7 +39,7 @@ function Snackbar.new(Parent, Text, Options)
 	self.Gui = Gui
 
 	self.BackgroundImages = {qGUI.BackWithRoundedRectangle(Gui, self.CornerRadius, Gui.BackgroundColor3)}
-	
+
 	local ShadowRadius = 1
 	local ShadowContainer = Instance.new("Frame")
 	ShadowContainer.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -49,7 +49,7 @@ function Snackbar.new(Parent, Text, Options)
 	ShadowContainer.Size = UDim2.new(1, ShadowRadius*2, 1, ShadowRadius*2)
 	ShadowContainer.Archivable = false
 	ShadowContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
-	
+
 	--- Image is blurred at
 	self.ShadowImages = {
 		qGUI.AddNinePatch(ShadowContainer, "rbxassetid://191838004",
@@ -84,10 +84,10 @@ function Snackbar.new(Parent, Text, Options)
 	TextLabel.ZIndex = Gui.ZIndex-1
 	TextLabel.Parent = Gui
 	self._textLabel = TextLabel
-	
+
 	self._whileActiveMaid = Maid.new()
 	self.Gui.Parent = Parent
-	
+
 	local CallToActionText
 	if Options and Options.CallToAction then
 		if type(Options.CallToAction) == "string" then
@@ -98,7 +98,7 @@ function Snackbar.new(Parent, Text, Options)
 		CallToActionText = CallToActionText:upper()
 
 		local DefaultTextColor3 = Color3.fromRGB(78, 205, 196)
-		
+
 		local button = Instance.new("TextButton")
 		button.Name = "CallToActionButton"
 		button.AnchorPoint = Vector2.new(1, 0.5)
@@ -112,40 +112,40 @@ function Snackbar.new(Parent, Text, Options)
 		button.TextColor3 = DefaultTextColor3
 		button.ZIndex = Gui.ZIndex
 		button.Parent = Gui
-		
+
 		-- Resize
 		button.Size = UDim2.new(UDim.new(0, button.TextBounds.X), button.Size.Y)
-		
+
 		self._whileActiveMaid:GiveTask(button.MouseButton1Click:Connect(function()
 			if Options.CallToAction.OnClick then
 				Options.CallToAction.OnClick()
 				self:Dismiss()
 			end
 		end))
-		
+
 		self._whileActiveMaid:GiveTask(button.MouseEnter:Connect(function()
 			button.TextColor3 = DefaultTextColor3:lerp(Color3.new(0, 0, 0), 0.2)
 		end))
-		
+
 		self._whileActiveMaid:GiveTask(button.MouseLeave:Connect(function()
 			button.TextColor3 = DefaultTextColor3
 		end))
-		
+
 		self._callToActionButton = button
 	end
-	
-	
+
+
 	local Width = self._textLabel.TextBounds.X + self.TextWidthOffset*2
 	if self._callToActionButton then
 		Width = Width + self._callToActionButton.Size.X.Offset + self.TextWidthOffset*2
 	end
-	
+
 	if Width < self.MinimumWidth then
 		Width = self.MinimumWidth
 	elseif Width > self.MaximumWidth then
 		Width = self.MaximumWidth
 	end
-	
+
 	if CallToActionText then
 		self._textLabel.Text = Text
 	end
@@ -155,7 +155,7 @@ function Snackbar.new(Parent, Text, Options)
 	self.Position = self.Position + UDim2.new(0, -Width, 0, 0)
 	self.Gui.Position = self.Position
 	self.AbsolutePosition = self.Gui.AbsolutePosition
-		
+
 	return self
 end
 
@@ -176,7 +176,7 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 	if PercentFaded then
 		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 0, 1))
 		self._textLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0.13, 1)
-		
+
 		if self._callToActionButton then
 			self._callToActionButton.TextTransparency = PercentFaded
 		end
@@ -195,7 +195,7 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 		qGUI.TweenTransparency(self._textLabel, {
 			TextTransparency = 1;
 		}, self.FadeTime, true)
-		
+
 		if self._callToActionButton then
 			qGUI.TweenTransparency(self._callToActionButton, {
 				TextTransparency = 1;
@@ -210,7 +210,7 @@ function Snackbar:FadeInTransparency(PercentFaded)
 		-- self.Gui.BackgroundTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0)
 		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 1, 0))
 		self._textLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0.13)
-		
+
 		if self._callToActionButton then
 			self._callToActionButton.TextTransparency = PercentFaded
 		end
@@ -237,7 +237,7 @@ function Snackbar:FadeInTransparency(PercentFaded)
 		qGUI.TweenTransparency(self._textLabel, {
 			TextTransparency = 0.13;
 		}, self.FadeTime, true)
-		
+
 		if self._callToActionButton then
 			qGUI.TweenTransparency(self._callToActionButton, {
 				TextTransparency = 0;
@@ -249,7 +249,7 @@ end
 -- Utility function
 function Snackbar:FadeHandler(NewPosition, DoNotAnimate, IsFadingOut)
 	assert(NewPosition, "[Snackbar] - Internal function should not have been called. Missing NewPosition")
-	
+
 	if IsFadingOut then
 		self:FadeOutTransparency(DoNotAnimate and 1 or nil)
 	else

@@ -7,15 +7,15 @@ InputModeProcessor.ClassName = InputModeProcessor
 
 function InputModeProcessor.new()
 	local self = setmetatable({}, InputModeProcessor)
-	
+
 	self._inputModes = {}
-	
+
 	return self
 end
 
 function InputModeProcessor:AddState(state)
 	self._inputModes[#self._inputModes+1] = state or error("No state")
-	
+
 	return self
 end
 

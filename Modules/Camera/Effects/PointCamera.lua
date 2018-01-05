@@ -15,7 +15,7 @@ PointCamera.ClassName = "PointCamera"
 -- @param FocusCamera The Camera to look at.
 function PointCamera.new(OriginCamera, FocusCamera)
 	local self = setmetatable({}, PointCamera)
-	
+
 	self.OriginCamera = OriginCamera or error("Must have OriginCamera")
 	self.FocusCamera = FocusCamera or error("Must have OriginCamera")
 

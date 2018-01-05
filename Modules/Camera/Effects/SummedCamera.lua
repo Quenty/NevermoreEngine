@@ -54,7 +54,7 @@ function SummedCamera:__index(index)
 		else
 			local StateA = self.CameraAState
 			local StateB = self.CameraBState
-			
+
 			local Result = StateA + StateB
 			Result.Position = StateA.CoordinateFrame * StateB.Position
 			return Result

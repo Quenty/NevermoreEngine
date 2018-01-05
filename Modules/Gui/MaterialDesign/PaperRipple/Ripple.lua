@@ -1,6 +1,7 @@
--- A Ripple animation to be used as part of PaperRipple. 
+-- A Ripple animation to be used as part of PaperRipple.
 -- Based off of Polymer's design and Google material design, designed for ROBLOX GUIs
 -- See: github.com/PolymerElements/paper-ripple/blob/master/paper-ripple.html
+-- @classmod Ripple
 
 local Ripple = {}
 Ripple.__index = Ripple
@@ -31,7 +32,7 @@ function Ripple.new(Gui)
 	return self
 end
 
---- Creates a new "default" ripple 
+--- Creates a new "default" ripple
 -- @param Parent A ROBLOX GUI to parent the ripple to.
 function Ripple.NewDefault(Parent)
 	assert(Parent, "Must send parent")
@@ -52,7 +53,7 @@ function Ripple.NewDefault(Parent)
 	return NewRipple
 end
 
---- Creates a ripple from at a worldspace position 
+--- Creates a ripple from at a worldspace position
 -- @param Parent A ROBLOX GUI to parent the ripple to.
 -- @param Position Vector2 world space (2D) vector.
 function Ripple.FromPosition(Parent, Position)
@@ -86,7 +87,7 @@ function Ripple:TargetCenter()
 end
 
 --- Returns the container of the ripple.
--- @return The GUI container of the ripple. 
+-- @return The GUI container of the ripple.
 function Ripple:GetContainer()
 	return self.Container
 end
@@ -97,8 +98,9 @@ function Ripple:SetInkColor(Color)
 	self.Gui.ImageColor3 = Color or error("No InkColor. This is the deepest betrayal. How dare you.")
 end
 
---- Sets the target radius. If TargetRadius is greater than MaxRadius, it may not fill out all the way (up to max radius)
--- @param Radius Number, the radius to target. Shouldn't change after animating. 
+--- Sets the target radius. If TargetRadius is greater than MaxRadius, it may not fill out all the way
+-- (up to max radius)
+-- @param Radius Number, the radius to target. Shouldn't change after animating.
 function Ripple:SetTargetRadius(Radius)
 
 	assert(type(Radius) == "number", "Radius must be a number")
@@ -143,7 +145,7 @@ function Ripple:GetOuterTransparency()
 
 	return math.min(
 		1,
-		OuterTransparency, 
+		OuterTransparency,
 		WaveTransparency -- WaveTransparency is consistently 0.75 for start, OuterTransparency is not. We want to use that.
 	)
 end
@@ -185,7 +187,7 @@ end
 -- the radius.
 -- @return Boolean, true if the transparency is completely decayed.
 function Ripple:IsTransparencyDecayed()
-	return self:GetTransparency() >= 1 and 
+	return self:GetTransparency() >= 1 and
 		self:GetRadius() >= math.min(self.MaxRadius, self.TargetRadius)
 end
 
@@ -193,15 +195,14 @@ end
 --  @return Number [0, 1] of how far along we've translated.
 function Ripple:GetTranslationFraction()
 	return math.min(
-		1, 
+		1,
 		self:GetRadius() / self:GetLargestContainerSize() * 2 / math.sqrt(2)
 	)
 end
 
 --- Not sure on the logic here, trusting it works. Basically, to be done,
--- we need to have the mouse up, and the transparency decayed. 
+-- we need to have the mouse up, and the transparency decayed.
 function Ripple:IsAnimationComplete()
-
 	return self.MouseUpStart and self:IsTransparencyDecayed() --or self:IsRestingAtMaxRadius()
 end
 
@@ -212,17 +213,16 @@ end
 --- Determines the larger of two container sizes
 -- @return Number, the larger size.
 function Ripple:GetLargestContainerSize()
-	
+
 	local Container = self.Container
-	
+
 	return math.max(Container.AbsoluteSize.X, Container.AbsoluteSize.Y)
 end
 
---- Updates the ripple draw state. 
+--- Updates the ripple draw state.
 function Ripple:Draw()
-	
+
 	local Gui = self.Gui
-	local Container = self.Container
 
 	Gui.ImageTransparency = self:GetTransparency()
 
@@ -241,7 +241,7 @@ function Ripple:Draw()
 end
 
 -- Releases the ripple. May be callled multiple times, but will only perform
--- once. 
+-- once.
 function Ripple:Up()
 	if not self.MouseUpStart then
 		self.MouseUpStart = tick()

@@ -23,13 +23,13 @@ function lib.Search(Parts, Point, Radius)
 	for _, Part in pairs(Parts) do
 		HitCount[Part] = 0
 	end
-	
+
 	local TotalHit = 0
 	local RaysToCast = 314
 	for _=1, RaysToCast do
 		local Direction = GetRandomUnitVector()
 		local CastRay = Ray.new(Point, Direction * Radius)
-		
+
 		-- Ignore water
 		local Hit = workspace:FindPartOnRayWithWhitelist(CastRay, Parts, true)
 		if Hit then
@@ -37,13 +37,13 @@ function lib.Search(Parts, Point, Radius)
 			HitCount[Hit] = HitCount[Hit] + 1
 		end
 	end
-	
+
 	if TotalHit > 0 then
 		for BasePart, Count in pairs(HitCount) do
 			HitCount[BasePart] = Count / RaysToCast --/ TotalHit
 		end
 	end
-			
+
 	return HitCount
 end
 

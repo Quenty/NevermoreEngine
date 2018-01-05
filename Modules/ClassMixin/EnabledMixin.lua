@@ -52,13 +52,13 @@ end
 
 function module:SetEnabled(isEnabled, doNotAnimate)
 	assert(type(isEnabled) == "boolean")
-	
+
 	if self._enabled ~= isEnabled then
 		self._enabled = isEnabled
-		
+
 		local enabledMaid = Maid.new()
 		self._enabledMaidReference._enabledMaid = enabledMaid
-		
+
 		self.EnabledChanged:Fire(isEnabled, enabledMaid)
 	end
 end

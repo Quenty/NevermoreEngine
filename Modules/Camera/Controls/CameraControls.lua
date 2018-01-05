@@ -16,16 +16,16 @@ GamepadRotate.ClassName = "GamepadRotate"
 
 function GamepadRotate.new()
 	local self = setmetatable({}, GamepadRotate)
-	
+
 	self.DEADZONE = 0.1
 	self.SpeedMultiplier = Vector2.new(0.1, 0.1)
-	
+
 	self.RampVelocityX = AccelTween.new(5)
 	self.RampVelocityY = AccelTween.new(5)
-	
+
 	self.IsRotating = Instance.new("BoolValue")
 	self.IsRotating.Value = false
-	
+
 	return self
 end
 
@@ -70,7 +70,7 @@ function GamepadRotate:GetThumbstickDeltaAngle()
 	if not self.LastInputObject then
 		return Vector2.new()
 	end
-	
+
 	return Vector2.new(self.RampVelocityX.p, self.RampVelocityY.p)
 end
 
@@ -78,27 +78,27 @@ function GamepadRotate:StopRotate()
 	self.LastInputObject = nil
 	self.RampVelocityX.t = 0
 	self.RampVelocityX.p = self.RampVelocityX.t
-	
+
 	self.RampVelocityY.t = 0
 	self.RampVelocityY.p = self.RampVelocityY.t
-	
+
 	self.IsRotating.Value = false
 end
 
 function GamepadRotate:HandleThumbstickInput(InputObject)
 	local OutOfDeadZone = self:OutOfDeadzone(InputObject)
-	
+
 	if OutOfDeadZone then
 		self.LastInputObject = InputObject
-		
-		
+
+
 		local StickOffset = self.LastInputObject.Position
 		StickOffset = Vector2.new(StickOffset.x, -StickOffset.y)  -- Invert axis!
-	
+
 		local AdjustedStickOffset = self:GamepadLinearToCurve(StickOffset)
 		self.RampVelocityX.t = AdjustedStickOffset.x * self.SpeedMultiplier.x
 		self.RampVelocityY.t = AdjustedStickOffset.y * self.SpeedMultiplier.y
-		
+
 		self.IsRotating.Value = true
 	else
 		self:StopRotate()
@@ -118,8 +118,8 @@ function CameraControls.new()
 	self.Enabled = false
 	self.Key = tostring(self) .. "CameraControls"
 	self.GamepadRotate = GamepadRotate.new()
-	
-	
+
+
 	return self
 end
 
@@ -166,10 +166,10 @@ function CameraControls:HandleMouseWheel(InputObject)
 	if self.ZoomedCamera then
 		local Delta = math.clamp(-InputObject.Position.Z, -1, 1)*1.4
 		local Zoom = rk4Integrator(self.ZoomedCamera.TargetZoom, Delta, 1)
-		
+
 		self.ZoomedCamera.TargetZoom = Zoom
 	end
-	
+
 	if self.RotatedCamera then
 		if self.RotatedCamera.ClassName == "PushCamera" then
 			self.RotatedCamera:StopRotateBack()
@@ -187,10 +187,10 @@ end
 
 function CameraControls:GetVelocityTracker(Strength, StartVelocity)
 	Strength = Strength or 1
-	
+
 	local LastUpdate = tick()
 	local Velocity = StartVelocity
-	
+
 	return {
 		Update = function(self, Delta)
 			local Elapsed = tick() - LastUpdate
@@ -206,7 +206,7 @@ end
 
 function CameraControls:HandleMouseMovement(InputObject, IsMouse)
 	if self.LastMousePosition then
-		
+
 		if self.RotatedCamera then
 			-- This calculation may seem weird, but either .Position updates (if it's locked), or .Delta updates (if it's not).
 			local Delta
@@ -215,15 +215,15 @@ function CameraControls:HandleMouseMovement(InputObject, IsMouse)
 			else
 				Delta = -InputObject.Delta
 			end
-			
+
 			local DeltaAngle = self:MouseTranslationToAngle(Delta) * self.MOUSE_SENSITIVITY
 			self.RotatedCamera:RotateXY(DeltaAngle)
-			
+
 			if self.RotVelocityTracker then
 				self.RotVelocityTracker:Update(DeltaAngle)
 			end
 		end
-		
+
 		self.LastMousePosition = InputObject.Position
 	end
 end
@@ -238,34 +238,34 @@ function CameraControls:BeginDrag(BeginInputObject)
 		self.Maid.DragMaid = nil
 		return
 	end
-	
+
 	local maid = Maid.new()
-	
+
 	self.LastMousePosition = BeginInputObject.Position
 	local IsMouse = BeginInputObject.UserInputType.Name:find("Mouse")
-	
+
 	if IsMouse then
 		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
 	end
-	
+
 	maid.InputEnded = UserInputService.InputEnded:Connect(function(InputObject, GameProcessed)
 		if InputObject == BeginInputObject then
 			self:EndDrag()
 		end
 	end)
-	
+
 	maid.InputChanged = UserInputService.InputChanged:Connect(function(InputObject)
 		if IsMouse and InputObject.UserInputType == Enum.UserInputType.MouseMovement
 			or InputObject == BeginInputObject then
-			
+
 			self:HandleMouseMovement(InputObject)
 		end
 	end)
-	
+
 	if self.RotatedCamera.ClassName == "SmoothRotatedCamera" then
 		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
 	end
-	
+
 	self.Maid.DragMaid = maid
 end
 
@@ -275,11 +275,11 @@ function CameraControls:ApplyRotVelocityTracker(RotVelocityTracker)
 		local Velocity = RotVelocityTracker:GetVelocity().X
 		local NewVelocityTarget = Position + Velocity
 		local Target = self.RotatedCamera.TargetAngleXZ
-		
+
 		if math.abs(NewVelocityTarget - Position) > math.abs(Target - Position) then
 			self.RotatedCamera.TargetAngleXZ = NewVelocityTarget
 		end
-		
+
 		self.RotatedCamera:SnapIntoBounds()
 	end
 end
@@ -289,10 +289,10 @@ function CameraControls:EndDrag()
 		self:ApplyRotVelocityTracker(self.RotVelocityTracker)
 		self.RotVelocityTracker = nil
 	end
-	
+
 	self.LastMousePosition = nil
 	UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-	
+
 	self.Maid.DragMaid = nil
 end
 
@@ -309,7 +309,7 @@ function CameraControls:HandleGamepadRotateStop()
 		self:ApplyRotVelocityTracker(self.RotVelocityTracker)
 		self.RotVelocityTracker = nil
 	end
-	
+
 	self.Maid.DragMaid = nil
 end
 
@@ -318,25 +318,25 @@ function CameraControls:HandleGamepadRotateStart()
 		self.Maid.DragMaid = nil
 		return
 	end
-	
+
 	local maid = Maid.new()
-	
+
 	if self.RotatedCamera.ClassName == "SmoothRotatedCamera" then
 		self.RotVelocityTracker = self:GetVelocityTracker(0.05, Vector2.new())
 	end
-	
+
 	maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local DeltaAngle = self.GamepadRotate:GetThumbstickDeltaAngle()
-		
+
 		if self.RotatedCamera then
 			self.RotatedCamera:RotateXY(DeltaAngle)
 		end
-		
+
 		if self.RotVelocityTracker then
 			self.RotVelocityTracker:Update(DeltaAngle)
 		end
 	end))
-	
+
 	self.Maid.DragMaid = maid
 end
 
@@ -346,7 +346,7 @@ function CameraControls:Enable()
 		self.Enabled = true
 
 		self.Maid = Maid.new()
-		
+
 		self.Maid:GiveTask(self.GamepadRotate.IsRotating.Changed:Connect(function()
 			if self.GamepadRotate.IsRotating.Value then
 				self:HandleGamepadRotateStart()
@@ -354,23 +354,23 @@ function CameraControls:Enable()
 				self:HandleGamepadRotateStop()
 			end
 		end))
-		
+
 		ContextActionService:BindAction(self.Key, function(ActionName, UserInputState, InputObject)
 			if InputObject.UserInputType == Enum.UserInputType.MouseWheel then
 				self:HandleMouseWheel(InputObject)
 			end
 		end, false, Enum.UserInputType.MouseWheel)
-		
+
 		ContextActionService:BindAction(self.Key .. "Drag", function(ActionName, UserInputState, InputObject)
 			if UserInputState == Enum.UserInputState.Begin then
 				self:BeginDrag(InputObject)
 			end
 		end, false, unpack(self.DragBeginTypes))
-		
+
 		ContextActionService:BindAction(self.Key .. "Rotate", function(ActionName, UserInputState, InputObject)
 			self:HandleThumbstickInput(InputObject)
 		end, false, Enum.KeyCode.Thumbstick2)
-		
+
 		self.Maid.Cleanup = function()
 			ContextActionService:UnbindAction(self.Key)
 			ContextActionService:UnbindAction(self.Key .. "Drag")

@@ -9,19 +9,18 @@ local StripCompass = setmetatable({}, ICompass)
 StripCompass.__index = StripCompass
 StripCompass.ClassName = "StripCompass"
 
+--- Constructs a new skyrim style compass
 function StripCompass.new(CompassModel, Container)
-	--- Constructs a new skyrim style compass
-
 	local self = setmetatable(ICompass.new(CompassModel, Container), StripCompass)
 
 	return self
 end
 
+--- Calculates the GUI position for the element
+-- @param PercentPosition Number, the percent position to use
+-- @return UDim2 The position (center) of the GUI element given its percentage. Relative to the container.
 function StripCompass:GetPosition(PercentPosition)
-	--- Calculates the GUI position for the element
-	-- @param PercentPosition Number, the percent position to use
-	-- @return UDim2 The position (center) of the GUI element given its percentage. Relative to the container.
-	
+
 	return UDim2.new(PercentPosition, 0, 0.5, 0)
 end
 

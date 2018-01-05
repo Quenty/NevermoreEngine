@@ -36,7 +36,7 @@ function lib.GetExperienceForNextLevel(currentExperience)
 	if currentExperience - 1 == currentExperience then -- math.huge
 		return 0
 	end
-	
+
 	local currentLevel = lib.GetLevelFromExperience(currentExperience)
 	local experieneRequired = lib.GetExperienceRequiredForNextLevel(currentLevel)
 
@@ -52,17 +52,17 @@ function lib.GetSubExperience(currentExperience)
 	if currentExperience - 1 == currentExperience then -- math.huge
 		return 1, 1, 1
 	end
-	
+
 	local currentLevel = lib.GetLevelFromExperience(currentExperience)
 	local lastLevel = currentLevel-1
-	
+
 	local xpForCurrentLevel = EXPERIENCE_FACTOR*(lastLevel*(1+lastLevel))
 	local experienceRequired = EXPERIENCE_FACTOR*(currentLevel*(1+currentLevel))
-	
+
 	local achievedOfNext = currentExperience - xpForCurrentLevel
 	local subTotalRequired = experienceRequired - xpForCurrentLevel
 	local percent = achievedOfNext/subTotalRequired
-	
+
 	return achievedOfNext, subTotalRequired, percent
 end
 

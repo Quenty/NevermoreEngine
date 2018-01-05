@@ -11,7 +11,7 @@ InputMode.ClassName = "InputMode"
 
 function InputMode.new(name)
 	local self = setmetatable({}, InputMode)
-	
+
 	self._lastEnabled = 0
 	self._valid = {}
 
@@ -20,7 +20,7 @@ function InputMode.new(name)
 	--- Fires off when the mode is enabled
 	-- @signal Enabled
 	self.Enabled = Signal.new()
-	
+
 	return self
 end
 
@@ -32,7 +32,7 @@ end
 -- @param [EnumSet] The enum set to pull from. Defaults to KeyCode.
 function InputMode:AddKeys(keys, enumSet)
 	enumSet = enumSet or Enum.KeyCode
-	
+
 	if type(keys) == "string" then
 		local newKeys = {}
 		for key in keys:gmatch("%w+") do
@@ -40,15 +40,15 @@ function InputMode:AddKeys(keys, enumSet)
 		end
 		keys = newKeys
 	end
-	
+
 	for _, key in pairs(keys) do
 		if type(key) == "string" then
 			key = enumSet[key]
 		end
-		
+
 		self._valid[key] = true
 	end
-	
+
 	return self
 end
 
@@ -64,7 +64,7 @@ end
 -- @param inputType May be a UserInputType or KeyCode
 function InputMode:IsValid(inputType)
 	assert(inputType, "Must send in inputType")
-	
+
 	return self._valid[inputType]
 end
 

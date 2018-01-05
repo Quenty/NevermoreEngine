@@ -85,7 +85,7 @@ function RotatingCharacter:__newindex(Index, Value)
 	elseif Index == "Transparency" then
 		self._Transparency = Value
 
-		-- We need to call this because if transparency updates and we hit past "IsDoneAnimating" but not past 
+		-- We need to call this because if transparency updates and we hit past "IsDoneAnimating" but not past
 		-- actual position updates, the TransparencyMap is wrong.
 		self:UpdatePositionRender()
 

@@ -56,7 +56,7 @@ function FadeBetweenCamera:__index(Index)
 		else
 			local StateA = self.CameraStateA
 			local StateB = self.CameraStateB
-	
+
 			return StateA + (StateB - StateA)*Value
 		end
 	elseif Index == "CameraStateA" then

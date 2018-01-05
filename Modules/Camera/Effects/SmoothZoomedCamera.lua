@@ -45,7 +45,7 @@ function SmoothZoomedCamera:__newindex(Index, Value)
 	if Index == "TargetZoom" or Index == "Target" then
 		local Target = math.clamp(Value, self.MinZoom, self.MaxZoom)
 		self.Spring.Target = Target
-		
+
 		if self.BounceAtEnd then
 			if Target < Value then
 				self:Impulse(self.MaxZoom)

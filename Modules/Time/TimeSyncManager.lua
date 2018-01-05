@@ -1,22 +1,10 @@
+--- Syncronize time between client and servers so we can use a universal timestamp
+-- across the game.
+-- See: www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf
+-- @classmod TimeSyncManager
+-- @usage Use use just require the module, it's a singleton. Load TimeSyncManager on the server to use on the clients.
+
 local RunService = game:GetService("RunService")
-
---[[
-class TimeSyncManager
-
-Description:
-	Syncronize time between client and servers so we can use a universal timestamp
-	across the game. See: www.nist.gov/el/isd/ieee/upload/tutorial-basic.pdf for more details
-
-API:
-	Use use just require the module, it's a singleton. Load TimeSyncManager on the server to use on the clients.
-
-	number GetTime()
-		Returns the sycncronized time
-
-	bool IsSynced()
-		Returns true if the manager has synced with the server
-
---]]
 
 local MasterClock = {}
 MasterClock.__index = MasterClock
@@ -24,32 +12,36 @@ MasterClock.ClassName = "MasterClock"
 
 function MasterClock.new(SyncEvent, DelayedRequestFunction)
 	local self = setmetatable({}, MasterClock)
-	
+
 	self.SyncEvent = SyncEvent
 	self.DelayedRequestFunction = DelayedRequestFunction or error("No DelayedRequestFunction")
-	
+
 	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)
 		return self:_handleDelayRequest(TimeThree)
 	end
-	
+
 	self.SyncEvent.OnServerEvent:Connect(function(Player)
 		 self.SyncEvent:FireClient(Player, self:GetTime())
 	end)
-	
+
 	spawn(function()
 		while true do
 			wait(5)
 			self:Sync()
 		end
 	end)
-	
+
 	return self
 end
 
+--- Returns true if the manager has synced with the server
+-- @treturn boolean
 function MasterClock:IsSynced()
 	return true
 end
 
+--- Returns the sycncronized time
+-- @treturn number current time
 function MasterClock:GetTime()
 	return tick()
 end
@@ -75,16 +67,16 @@ SlaveClock.Offset = -1 -- Set uncalculated values to -1
 
 function SlaveClock.new(SyncEvent, DelayedRequestFunction)
 	local self = setmetatable({}, SlaveClock)
-	
+
 	self.SyncEvent = SyncEvent
 	self.DelayedRequestFunction = DelayedRequestFunction
-	
+
 	self.SyncEvent.OnClientEvent:Connect(function(TimeOne)
 		self:_handleSyncEvent(TimeOne)
 	end)
-	
+
 	self.SyncEvent:FireServer() -- Request server to syncronize with us
-	
+
 	return self
 end
 
@@ -92,7 +84,7 @@ function SlaveClock:GetTime()
 	if not self:IsSynced() then
 		warn("[SlaveClock][GetTime] - Slave clock is not yet synced")
 	end
-	
+
 	return self:_getLocalTime() - self.Offset
 end
 

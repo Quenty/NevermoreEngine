@@ -73,7 +73,7 @@ end
 function RotatingCharacterBuilder:WithCharacter(Char)
 	self.Char.TargetCharacter = Char
 	self.Char.Character = self.Char.TargetCharacter
-	
+
 	return self
 end
 

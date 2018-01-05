@@ -29,7 +29,7 @@ function TrackCamera:__newindex(Index, Value)
 	if Index == "CameraSubject" then
 		assert(type(Value) == "userdata" or type(Value) == "nil",
 			"CameraSubject must be a ROBLOX Model or ROBLOX Part or nil")
-		
+
 		if type(Value) == "userdata" then
 			assert(Value:IsA("Model") or Value:IsA("BasePart"), "CameraSubject must be a Model or BasePart")
 		end

@@ -11,9 +11,9 @@ setmetatable(module, module)
 function module:Add(class, staticResources)
 	assert(class)
 	assert(not class.GenerateWith)
-	
+
 	class.GenerateWith = self.GenerateWith
-	
+
 	if staticResources then
 		class:GenerateWith(staticResources)
 	end
@@ -36,12 +36,12 @@ function module:GenerateWith(resources)
 			self[resourceName] = resource -- inject publically too, for now
 			return self
 		end
-		
+
 		self[("Get%s"):format(resourceName)] = function(self)
 			return self[storeName]
 		end
 	end
-	
+
 	return self
 end
 

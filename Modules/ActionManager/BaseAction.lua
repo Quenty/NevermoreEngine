@@ -25,12 +25,12 @@ function BaseAction.new(name)
 
 	self.Activated = Signal.new() -- :Fire(actionMaid, ... (activateData))
 	self.Deactivated = Signal.new() -- :Fire()
-	
+
 	self.IsActivatedValue = Instance.new("BoolValue")
 	self.IsActivatedValue.Value = false
-	
+
 	self:InitEnabledMixin()
-	
+
 	self._maid:GiveTask(self.IsActivatedValue.Changed:Connect(function()
 		if self.IsActivatedValue.Value then
 			local actionMaid = Maid.new()
@@ -41,16 +41,16 @@ function BaseAction.new(name)
 			self.Deactivated:Fire()
 		end
 	end))
-	
+
 	-- Prevent being activated when disabled
 	self._maid:GiveTask(self.EnabledChanged:Connect(function(IsEnabled)
 		if not IsEnabled then
 			self:Deactivate()
 		end
-		
+
 		self:_updateShortcuts()
 	end))
-	
+
 
 	return self
 end
@@ -61,9 +61,9 @@ end
 
 function BaseAction:WithActionData(actionData)
 	self._actionData = actionData or error("No actionData")
-		
+
 	self:_updateShortcuts()
-	
+
 	return self
 end
 
@@ -71,9 +71,9 @@ function BaseAction:_updateShortcuts()
 	if not self._actionData then
 		return
 	end
-	
+
 	local Shortcuts = self._actionData.Shortcuts
-	
+
 	if Shortcuts and #Shortcuts > 0 then
 		if self:IsEnabled() then
 			ContextActionService:BindAction(self._contextActionKey, function(Name, UserInputState, InputObject)
@@ -94,9 +94,9 @@ function BaseAction:GetFABData()
 	if not self._actionData then
 		return nil
 	end
-	
+
 	local FABData = self._actionData.FABData
-	
+
 	if FABData then
 		return setmetatable({
 			Name = self._name;
@@ -108,7 +108,7 @@ end
 
 function BaseAction:ToggleActivate(...)
 	self._activateData = {...}
-	
+
 	if self:IsEnabled() then
 		self.IsActivatedValue.Value = not (self.IsActivatedValue.Value)
 	else
@@ -128,7 +128,7 @@ end
 
 function BaseAction:Activate(...)
 	self._activateData = {...}
-	
+
 	if self:IsEnabled() then
 		self.IsActivatedValue.Value = true
 	else

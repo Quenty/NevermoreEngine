@@ -52,7 +52,7 @@ function InputModes:BindToSelector(updateFunction)
 		InputModes.Mouse,
 		InputModes.Touch
 	}, updateFunction)
-	
+
 	return new
 end
 
@@ -126,7 +126,7 @@ do
 		InputModes.Gamepads:Enable()
 	end
 end
-	
+
 --- Construct Processor
 -- @local
 local function bindProcessor()
@@ -144,7 +144,7 @@ local function bindProcessor()
 
 	UserInputService.GamepadConnected:Connect(function(gamepad)
 		InputModes.Gamepads:Enable()
-		
+
 		-- Bind thumbsticks
 		maid.InputChanged = UserInputService.InputChanged:Connect(function(inputObject)
 			if inputObject.KeyCode.Name:find("Thumbstick") then
@@ -159,7 +159,7 @@ local function bindProcessor()
 		-- TODO: Stop assuming state is mouse/keyboard
 		InputModes.Mouse:Enable()
 		InputModes.Keyboard:Enable()
-		
+
 		maid.InputChanged = nil
 	end)
 end

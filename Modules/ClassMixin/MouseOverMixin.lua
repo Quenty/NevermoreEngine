@@ -16,7 +16,7 @@ end
 function module:Add(class)
 	assert(class)
 	assert(not class.GetMouseOverColor)
-	
+
 	class.GetMouseOverColor = self.GetMouseOverColor
 	class.GetMouseOverBoolValue = self.GetMouseOverBoolValue
 	class.AddMouseOverEffect = self.AddMouseOverEffect
@@ -30,23 +30,23 @@ end
 
 function module:GetMouseOverBoolValue(gui)
 	local maid = Maid.new()
-	
+
 	local boolValue = Instance.new("BoolValue")
 	boolValue.Value = false
 	maid:GiveTask(boolValue)
-	
+
 	maid:GiveTask(gui.InputBegan:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 			boolValue.Value = true
 		end
 	end))
-	
+
 	maid:GiveTask(gui.InputEnded:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 			boolValue.Value = false
 		end
 	end))
-	
+
 	return maid, boolValue
 end
 
@@ -75,7 +75,7 @@ function module:AddMouseOverEffect(gui, tweenProperties)
 	for property, _ in pairs(tweenProperties) do
 		original[property] = gui[property]
 	end
-	
+
 	local function update()
 		for property, Value in pairs(boolValue.Value and tweenProperties or original) do
 			gui[property] = Value
@@ -83,9 +83,9 @@ function module:AddMouseOverEffect(gui, tweenProperties)
 	end
 	update()
 	maid:GiveTask(boolValue.Changed:Connect(update))
-	
+
 	self._maid[boolValue] = maid
-	
+
 	return boolValue
 end
 

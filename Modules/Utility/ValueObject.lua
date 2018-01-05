@@ -24,7 +24,6 @@ ValueObject.ClassName = "ValueObject"
 -- @treturn ValueObject
 function ValueObject.new()
 	local self = {}
-	
 
 	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid)
 

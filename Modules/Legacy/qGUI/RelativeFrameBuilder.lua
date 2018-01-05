@@ -35,10 +35,9 @@ end
 function RelativeFrameBuilder:SuppressParentWarning()
 	assert(self ~= RelativeFrameBuilder)
 	self.DoNotWarnOnNilParent = true
-	
+
 	return self
 end
-
 
 function RelativeFrameBuilder:WithType(Name)
 	self.Name = Name or error("Sent invalid name")
@@ -46,8 +45,6 @@ function RelativeFrameBuilder:WithType(Name)
 end
 
 function RelativeFrameBuilder:WithPosition(RelativePosition)
-	-- @param RelativePosition
-
 	self.RelativePosition = RelativePosition or error()
 
 	return self
@@ -66,12 +63,10 @@ function RelativeFrameBuilder:WithParent(Parent)
 end
 
 function RelativeFrameBuilder:Create()
-	--- Constructs the new class
-	
 	if not self.DoNotWarnOnNilParent and not self.Parent then
 		warn("[RelativeFrameBuilder] May be creating nil parented RelativeFrame\n" .. debug.traceback())
 	end
-	
+
 	local Frame = Instance.new("Frame")
 	Frame.BorderSizePixel = 0
 	Frame.BackgroundTransparency = 1
@@ -83,6 +78,5 @@ function RelativeFrameBuilder:Create()
 
 	return Frame
 end
-
 
 return RelativeFrameBuilder

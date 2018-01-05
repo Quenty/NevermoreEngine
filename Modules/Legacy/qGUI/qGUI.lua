@@ -1,8 +1,9 @@
+--- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
+-- @classmod qGui
+
 local RunService = game:GetService("RunService")
 
 local lib = {}
-
--- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
 function lib.PointInBounds(Frame, X, Y)
 	local TopBound = Frame.AbsolutePosition.Y
@@ -22,7 +23,7 @@ function lib.MouseOver(Mouse, Frame)
 end
 
 -- @param UpdateFunction()
-	-- @return ShouldStop, if true, will stop updating
+-- @return ShouldStop, if true, will stop updating
 -- @return StartUpdate()
 local function CreateYieldedUpdate(UpdateFunction)
 	local AnimationId = 0
@@ -65,7 +66,7 @@ local function CreateYieldedUpdate(UpdateFunction)
 		return LastUpdatePoint == -1 -- In this case, we have no active threads
 			or TimeSinceUpdate() > 0.1 -- In this case, our presumed active thread is dead.
 	end
-	
+
 	--- Starts an update thread, potentialy removing the old one.
 	local function StartNewThread()
 		local RenderStepKey = "TweenTransparencyOnGuis" .. tostring(UpdateFunction) .. tick()
@@ -80,16 +81,15 @@ local function CreateYieldedUpdate(UpdateFunction)
 	end
 end
 
+--- Creates a tweener that only runs when it's updating with a set properties system.
+-- @param function `SetProperties`
+	-- SetProperties(Gui, Percent, StartProperties, NewProperties)
+		-- @param Gui The Gui to set properties on
+		-- @param Percent Number [0, 1] of properties to set
+		-- @param StartProperties The properties we started with
+		-- @param NewProperties The properties we ended with
+-- @return
 local function MakePropertyTweener(SetProperties)
-	--- Creates a tweener that only runs when it's updating with a set properties system.
-	-- @param function `SetProperties`
-		-- SetProperties(Gui, Percent, StartProperties, NewProperties)
-			-- @param Gui The Gui to set properties on
-			-- @param Percent Number [0, 1] of properties to set
-			-- @param StartProperties The properties we started with
-			-- @param NewProperties The properties we ended with
-	-- @return
-
 	local GuiMap = {} -- [Gui] = TweenData
 
 	local function GetTweenData(Gui, NewProperties, Duration)
@@ -341,11 +341,11 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	TopRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), 0)
 	MiddleRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y/3)
 	BottomRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y * (2/3))
-	
+
 	--TopLeft.ImageRectOffset = Vector2.new(0, 0)
 	MiddleLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y/3)
 	BottomLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y * (2/3))
-	
+
 	Middle.ImageRectOffset = Vector2.new(ImageSize.X/3, ImageSize.Y/3)
 	MiddleTop.ImageRectOffset = Vector2.new(ImageSize.Y/3, 0)
 	MiddleBottom.ImageRectOffset = Vector2.new(ImageSize.Y/3, ImageSize.Y * (2/3))

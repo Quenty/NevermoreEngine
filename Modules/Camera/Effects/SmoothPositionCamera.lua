@@ -64,7 +64,7 @@ function SmoothPositionCamera:__index(Index)
 		State.FieldOfView = BaseCameraState.FieldOfView
 		State.CoordinateFrame = BaseCameraState.CoordinateFrame
 		State.Position = self.Position
-		
+
 		return State
 	elseif Index == "Position" then
 		self:InternalUpdate()

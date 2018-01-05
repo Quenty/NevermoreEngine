@@ -1,7 +1,6 @@
--- Quaternion.lua
-
---By xXxMoNkEyMaNxXx
--- Modified by Quenty
+---
+-- @module Quaternion
+-- @author xXxMoNkEyMaNxXx
 
 --[[
 God, grant me the serenity to accept the things I cannot change,
@@ -10,26 +9,19 @@ And wisdom to know the difference.
 
 I cannot change most of this.
 ]]
-local next     = next
-local tick     = tick
-local type     = type
-local print    = print
-local select   = select
-local tostring = tostring
 
-local pi       = math.pi
-local tau      = 2*pi
-local abs      = math.abs
-local cos,sin  = math.cos,math.sin
-local sqrt     = math.sqrt
-local atan2    = math.atan2
-local max      = math.max
+local pi = math.pi
+local tau = 2*pi
+local cos,sin = math.cos,math.sin
+local sqrt = math.sqrt
+local atan2 = math.atan2
+local max = math.max
 
-local vec3     = Vector3.new
-local CF       = CFrame.new
+local vec3 = Vector3.new
+local CF = CFrame.new
 
-local iv       = vec3()
-local iq       = {1,0,0,0}
+local iv = vec3()
+local iq = {1,0,0,0}
 
 local lib = {}
 
@@ -288,7 +280,7 @@ local CFrameTweens=setmetatable({},{
 lib.CFrameTweens = CFrameTweens
 
 local function updateTweens(timeNow)
-	for i,data in next,TweenData do
+	for _, data in next,TweenData do
 		local f,t0,t1=data.update,data.t0,data.t1
 		if f then
 			if data.tweening then
@@ -307,7 +299,7 @@ end
 lib.updateTweens = updateTweens
 
 local function updateQuaternionTweens(timeNow)
-	for i,data in next,QuaternionTweenData do
+	for _, data in next,QuaternionTweenData do
 		local f,t0,t1=data.update,data.t0,data.t1
 		if f then
 			if data.tweening then
@@ -326,7 +318,7 @@ end
 lib.updateQuaternionTweens = updateQuaternionTweens
 
 local function updateCFrameTweens(timeNow)
-	for i,data in next,CFrameTweenData do
+	for _, data in next,CFrameTweenData do
 		local f,t0,t1=data.update,data.t0,data.t1
 		if f then
 			if data.tweening then

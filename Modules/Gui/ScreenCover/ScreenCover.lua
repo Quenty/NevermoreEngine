@@ -15,18 +15,18 @@ ScreenCover.SQUARE_PADDING = 2 -- Extra pixels to prevent splits
 
 function ScreenCover.new(gui)
 	local self = setmetatable({}, ScreenCover)
-	
+
 	self.Gui = gui or error("No gui")
 	self.Done = Signal.new()
 	self.Maid = Maid.new()
-	
+
 	self._builder = ScreenCoverHelperBuilder.new(gui)
 
 	self.Maid:GiveTask(self.Gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 		self:_updateSize()
 	end))
 	self:_updateSize()
-	
+
 	return self
 end
 
@@ -35,16 +35,16 @@ function ScreenCover:Show(playbackTime)
 
 	local diagonals = self:_getDiagonalSquares(12)
 	self:_showSquares(diagonals, playbackTime)
-	
+
 	return Promise.new(self.Done)
 end
 
 function ScreenCover:Hide(playbackTime)
 	playbackTime = playbackTime or 0.6
-	
+
 	local diagonals = self:_getDiagonalSquares(12)
 	self:_hideSquares(diagonals, playbackTime)
-	
+
 	return Promise.new(self.Done)
 end
 
@@ -60,10 +60,10 @@ end
 
 function ScreenCover:_getSquareData(squareCount)
 	squareCount = squareCount or 10
-	
+
 	local squareSize = 1/squareCount
 	local size = UDim2.new(squareSize, self.SQUARE_PADDING, squareSize, self.SQUARE_PADDING)
-	
+
 	local matrix = {}
 	for x=1, squareCount do
 		matrix[x] = {}
@@ -75,15 +75,15 @@ function ScreenCover:_getSquareData(squareCount)
 			}
 		end
 	end
-	
+
 	return matrix
 end
 
 function ScreenCover:_getDiagonalSquares(squareCount)
 	local matrix = self:_getSquareData(squareCount)
-	
+
 	local squares = {} -- Array of arrays
-	
+
 	for x=1, #matrix do
 		for y=1, #matrix do
 			local square = matrix[x][y]
@@ -92,7 +92,7 @@ function ScreenCover:_getDiagonalSquares(squareCount)
 			table.insert(squares[index], square)
 		end
 	end
-	
+
 	return squares
 end
 
@@ -102,7 +102,7 @@ function ScreenCover:_showSquares(squareDataList, playbackTime)
 
 	local tweenTime = playbackTime/(#squareDataList)*8
 	local squarePlaybackTime = (playbackTime - tweenTime)
-	
+
 	self.Gui.BackgroundTransparency = 1
 	local alive = true
 	maid:GiveTask(function()
@@ -110,7 +110,7 @@ function ScreenCover:_showSquares(squareDataList, playbackTime)
 		alive = false
 		self.Done:Fire()
 	end)
-	
+
 	for i=1, #squareDataList do
 		local dataList = squareDataList[i]
 		local delayTime = squarePlaybackTime*(i/#squareDataList)
@@ -118,18 +118,18 @@ function ScreenCover:_showSquares(squareDataList, playbackTime)
 			if not alive then
 				return
 			end
-			
+
 			for _, squareData in pairs(dataList) do
 				local frame = self._builder:CreateSquare(squareData)
 				frame.Size = UDim2.new(0, 0, 0, 0)
 				frame.Parent = self.Gui
-				
+
 				frame:TweenSize(squareData.Size, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, tweenTime, true)
 				maid:GiveTask(frame)
 			end
 		end)
 	end
-	
+
 	delay(playbackTime, function()
 		maid:DoCleaning()
 	end)
@@ -138,47 +138,47 @@ end
 function ScreenCover:_hideSquares(squareDataList, playbackTime)
 	local maid = Maid.new()
 	self.Maid.animMaid = maid
-	
+
 	local tweenTime = playbackTime/(#squareDataList)*4
 	local squarePlaybackTime = (playbackTime - tweenTime)
-	
+
 	-- Build squares
 	local frameList = {}
 	for i=1, #squareDataList do
 		local frames = {}
 		table.insert(frameList, frames)
-		
+
 		local dataList = squareDataList[i]
 		for _, squareData in pairs(dataList) do
 			local frame = self._builder:CreateSquare(squareData)
 			frame.Size = squareData.Size
 			frame.Parent = self.Gui
-			
+
 			table.insert(frames, frame)
 			maid:GiveTask(frame)
 		end
 	end
-	
+
 	self.Gui.BackgroundTransparency = 1
 	local alive = true
 	maid:GiveTask(function()
 		alive = false
 		self.Done:Fire()
 	end)
-	
+
 	for i=1, #frameList do
 		local delayTime = squarePlaybackTime*(i/#frameList)
 		delay(delayTime, function()
 			if not alive then
 				return
 			end
-			
+
 			for _, frame in pairs(frameList[i]) do
 				frame:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, tweenTime, true)
 			end
 		end)
 	end
-	
+
 	delay(playbackTime, function()
 		maid:DoCleaning()
 	end)

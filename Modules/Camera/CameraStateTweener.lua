@@ -15,23 +15,23 @@ CameraStateTweener.__index = CameraStateTweener
 
 function CameraStateTweener.new(CameraEffect, Speed)
 	local self = setmetatable({}, CameraStateTweener)
-	
+
 	self.Maid = Maid.new()
 	local CameraBelow, Assign = CameraStack:GetNewStateBelow()
 	self.CameraBelow = CameraBelow
 	self.FadeBetween = FadeBetweenCamera.new(CameraBelow, CameraEffect)
 	Assign(self.FadeBetween)
-	
+
 	CameraStack:Add(self.FadeBetween)
-	
+
 	self.FadeBetween.Speed = Speed or 20
 	self.FadeBetween.Target = 0
 	self.FadeBetween.Value = 0
-	
+
 	self.Maid:GiveTask(function()
 		CameraStack:Remove(self.FadeBetween)
 	end)
-	
+
 	return self
 end
 
@@ -46,7 +46,7 @@ end
 
 function CameraStateTweener:Finish(DoNotAnimate, Callback)
 	self:Hide(DoNotAnimate)
-	
+
 	if self.FadeBetween.HasReachedTarget then
 		Callback()
 	else
@@ -74,7 +74,7 @@ end
 
 function CameraStateTweener:SetSpeed(Speed)
 	self.FadeBetween.Speed = Speed
-	
+
 	return self
 end
 

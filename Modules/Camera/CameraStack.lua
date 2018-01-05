@@ -18,9 +18,9 @@ CameraStack.ClassName = "CameraStack"
 
 function CameraStack.new()
 	local self = setmetatable({}, CameraStack)
-	
+
 	self._stack = {}
-	
+
 	-- Initialize default cameras
 	self._rawDefaultCamera = DefaultCamera.new()
 	self._impulseCamera = ImpulseCamera.new()
@@ -40,7 +40,7 @@ function CameraStack.new()
 
 		debug.profileend()
 	end)
-	
+
 	return self
 end
 
@@ -78,7 +78,7 @@ function CameraStack:GetTopState()
 		warn(("[CameraStack] - Stack is bigger than 10 in camerastack (%d)"):format(#self._stack))
 	end
 	local topState = self._stack[#self._stack]
-		
+
 	if type(topState) == "table" then
 		local state = topState.CameraState or topState
 		if state then
@@ -96,7 +96,7 @@ end
 -- @treturn[1] NewStateToUse
 function CameraStack:GetNewStateBelow()
 	local _stateToUse = nil
-	
+
 	return CustomCameraEffect.new(function()
 		local index = self:GetIndex(_stateToUse)
 		if index then
@@ -133,7 +133,7 @@ end
 -- @treturn nil
 function CameraStack:Remove(state)
 	local index = self:GetIndex(state)
-	
+
 	if index then
 		table.remove(self._stack, index)
 	end

@@ -1,3 +1,6 @@
+---
+-- @module ScaleModel
+
 local lib = {}
 
 local MINIMUM_SIZES = {
@@ -6,13 +9,13 @@ local MINIMUM_SIZES = {
 }
 
 --- Scales a group of parts around a centroid
--- @param Parts Table of parts, the parts to scale
+-- @param parts Table of parts, the parts to scale
 -- @param Scale The scale to scale by
 -- @param Centroid Vector3, the center to scale by
-local function Scale(Parts, Scale, Centroid)
-	for _, Object in pairs(Parts) do
+function lib.Scale(parts, scale, Centroid)
+	for _, Object in pairs(parts) do
 		if Object:IsA("BasePart") then
-			
+
 			local MinSize = MINIMUM_SIZES[Object.ClassName] or Vector3.new(0.05, 0.05, 0.05)
 
 			local ObjectOffset = Object.Position - Centroid
@@ -20,7 +23,7 @@ local function Scale(Parts, Scale, Centroid)
 
 			local FoundMesh = Object:FindFirstChildWhichIsA("DataModelMesh")
 			local TrueSize = FoundMesh and Object.Size * FoundMesh.Scale or Object.Size
-			local NewSize = TrueSize * Scale
+			local NewSize = TrueSize * scale
 
 			if not Object:IsA("TrussPart") and not Object:IsA("UnionOperation") then
 				if NewSize.X < MinSize.X or NewSize.Y < MinSize.Y or NewSize.Z < MinSize.Z then
@@ -52,17 +55,16 @@ local function Scale(Parts, Scale, Centroid)
 
 			if FoundMesh then
 				FoundMesh.Scale = NewSize / Object.Size
-				FoundMesh.Offset = FoundMesh.Offset * Scale
-				
+				FoundMesh.Offset = FoundMesh.Offset * scale
+
 				-- if FoundMesh.Scale == Vector3.new(1, 1, 1) and FoundMesh.Offset == Vector3.new(0, 0, 0) then
 				-- 	FoundMesh:Destroy()
 				-- end
 			end
 
-			Object.CFrame = CFrame.new(Centroid + (ObjectOffset * Scale)) * ObjectRotation
+			Object.CFrame = CFrame.new(Centroid + (ObjectOffset * scale)) * ObjectRotation
 		end
 	end
 end
-lib.Scale = Scale
 
 return lib

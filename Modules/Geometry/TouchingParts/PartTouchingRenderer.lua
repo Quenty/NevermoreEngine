@@ -26,7 +26,7 @@ function PartTouchingRenderer:RenderTouchingProps(TouchingPartList)
 		SelectionBox.Transparency = 0
 		SelectionBox.Adornee = Part
 		SelectionBox.Parent = Part
-		
+
 		qGUI.TweenTransparency(SelectionBox, {Transparency = 1}, 0.5)
 		Debris:AddItem(SelectionBox, 0.6)
 	end

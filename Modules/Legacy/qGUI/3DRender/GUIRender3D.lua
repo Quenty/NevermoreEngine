@@ -3,18 +3,18 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local ScreenSpace  = require("ScreenSpace")
+local ScreenSpace = require("ScreenSpace")
 
 local GUIRender3D = {}
-GUIRender3D.__index = GUIRender3D
 GUIRender3D.ClassName = "GUIRender3D"
+GUIRender3D.__index = GUIRender3D
 
 function GUIRender3D.new()
 	local self = setmetatable({}, GUIRender3D)
-	
+
 	self.Depth = -10 -- studs
 	self.RenderParent = workspace.CurrentCamera
-	
+
 	return self
 end
 
@@ -35,13 +35,13 @@ end
 
 function GUIRender3D:WithRenderParent(RenderParent)
 	self.RenderParent = RenderParent or error()
-	
+
 	return self
 end
 
 function GUIRender3D:SetFrame(Frame)
 	self.Frame = Frame or error()
-	
+
 	local Part = Instance.new("Part", self.RenderParent)
 	Part.Archivable = false
 	Part.FormFactor = "Custom"
@@ -50,13 +50,13 @@ function GUIRender3D:SetFrame(Frame)
 	Part.Name = Frame.Name .. "_3DRender"
 	Part.Transparency = 1
 	self.Part = Part
-	
+
 	local SurfaceGui = Instance.new("SurfaceGui", Part)
 	SurfaceGui.Adornee = Part
 	SurfaceGui.Face = "Back"
 
 	self.SurfaceGui = SurfaceGui
-	
+
 	local FakeFrame = Instance.new("Frame")
 	FakeFrame.Parent = Frame.Parent
 	FakeFrame.Name = "FakeFrame_" .. Frame.Name
@@ -67,12 +67,12 @@ function GUIRender3D:SetFrame(Frame)
 	FakeFrame.Visible = true
 	FakeFrame.Active = Frame.Active
 	self.FakeFrame = FakeFrame
-	
+
 	Frame.Parent = self.SurfaceGui;
 	Frame.Position = UDim2.new(0, 0, 0, 0)
 	Frame.Size = UDim2.new(1, 0, 1, 0)
 	Frame.SizeConstraint = "RelativeXY"
-	
+
 	self:UpdatePartSize()
 end
 
@@ -82,10 +82,10 @@ end
 
 function GUIRender3D:UpdatePartSize()
 	local Size = self.FakeFrame.AbsoluteSize
-	
+
 	local WorldWidth = ScreenSpace.ScreenWidthToWorldWidth(Size.X, self.Depth)
 	local WorldHeight = ScreenSpace.ScreenHeightToWorldHeight(Size.Y, self.Depth)
-	
+
 	self.Part.Size = Vector3.new(WorldWidth, WorldHeight, 0.2)
 	self.SurfaceGui.CanvasSize = Size
 end
@@ -120,10 +120,10 @@ function GUIRender3D:Destroy()
 	self.Part:Destroy()
 	self.FakeFrame:Destroy()
 	self.Frame:Destroy()
-	
+
 	self.Part, self.FakeFrame = nil, nil
 	self.Frame = nil
-	
+
 	setmetatable(self, nil)
 end
 

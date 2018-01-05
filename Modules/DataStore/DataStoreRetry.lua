@@ -9,7 +9,7 @@ local DATASTORE_RETRIES = 3
 --- Retries calls to the datastore
 local function DataStoreRetry(DataStoreFunction)
 	local Tries = 0
-	local Success = true
+	local Success
 	local Data = nil
 	repeat
 		Tries = Tries + 1

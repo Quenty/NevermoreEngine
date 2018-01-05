@@ -37,7 +37,7 @@ end
 --- Sets the DisplayOrder of the screenGui
 function SnackbarManager:WithDisplayOrder(displayOrder)
 	assert(self._screenGui)
-	
+
 	self._screenGui.DisplayOrder = displayOrder or error("No DisplayOrder")
 	return self
 end
@@ -68,12 +68,12 @@ end
 -- Optional for regular use
 function SnackbarManager:WithSnackbarRemoteEvent(remoteEvent)
 	assert(self._screenGui, "Must initialize PlayerGui before initializing remoteEvent")
-	
+
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteEvent.OnClientEvent:Connect(function(Text, Options)
 		self:MakeSnackbar(Text, Options)
 	end)
-	
+
 	return self
 end
 
@@ -106,7 +106,5 @@ function SnackbarManager:_showSnackbar(snackbar)
 		end
 	end
 end
-
-
 
 return SnackbarManager

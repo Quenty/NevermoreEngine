@@ -16,7 +16,7 @@ function RotatingLabelBuilder.new(template)
 	if template then
 		self:WithTemplate(template)
 	end
-	
+
 	return self
 end
 
@@ -41,7 +41,7 @@ function RotatingLabelBuilder:WithTemplate(template)
 	container.SizeConstraint = Enum.SizeConstraint.RelativeYY
 	container.Size = UDim2.new(1, 0, 1, 0)
 	container.BackgroundTransparency = 1
-	
+
 	container.Parent = frame
 	frame.Parent = template.Parent
 

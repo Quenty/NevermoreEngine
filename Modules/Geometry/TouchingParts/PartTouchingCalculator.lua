@@ -14,16 +14,16 @@ PartTouchingCalculator.ClassName = "PartTouchingCalculator"
 
 function PartTouchingCalculator.new(BoatDataManager)
 	local self = setmetatable({}, PartTouchingCalculator)
-	
+
 	self.BoatDataManager = BoatDataManager or error("No BoatDataManager")
-	
+
 	return self
 end
 
 function PartTouchingCalculator:CheckIfTouchingHumanoid(Humanoid, Parts)
 	assert(Humanoid)
 	assert(Parts, "Must have parts")
-	
+
 	local HumanoidParts = {}
 	for _, Item in pairs(Humanoid:GetDesendants()) do
 		if Item:IsA("BasePart") then
@@ -35,9 +35,9 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(Humanoid, Parts)
 		warn("[BoatPlacer][CheckIfTouchingHumanoid] - #Parts == 0, retrieved from humanoid")
 		return false
 	end
-	
+
 	local DummyPart = self:GetCollidingPartFromParts(HumanoidParts)
-	
+
 	local PreviousProperties = {}
 	local ToSet = {
 		CanCollide = true;
@@ -52,38 +52,38 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(Humanoid, Parts)
 		end
 		PartSet[Part] = true
 	end
-	
+
 	local Touching = DummyPart:GetTouchingParts()
 	DummyPart:Destroy()
 
 	local ReturnValue = false
-	
+
 	for _, Part in pairs(Touching) do
 		if PartSet[Part] then
 			ReturnValue = true
 			break
 		end
 	end
-	
+
 	for Part, Properties in pairs(PreviousProperties) do
 		for Name, Value in pairs(Properties) do
 			Part[Name] = Value
 		end
 	end
-	
+
 	return ReturnValue
 end
 
 
 function PartTouchingCalculator:GetCollidingPartFromParts(Parts, RelativeTo, Padding)
 	RelativeTo = RelativeTo or CFrame.new()
-	
+
 	local Size, Rotation = qCFrame.GetBoundingBox(Parts, RelativeTo)
-	
+
 	if Padding then
 		Size = Size + Vector3.new(Padding, Padding, Padding)
 	end
-	
+
 	local DummyPart = Instance.new("Part")
 	DummyPart.Name = "CollisionDetection"
 	DummyPart.Size = Size
@@ -91,7 +91,7 @@ function PartTouchingCalculator:GetCollidingPartFromParts(Parts, RelativeTo, Pad
 	DummyPart.Anchored = false
 	DummyPart.CanCollide = true
 	DummyPart.Parent = workspace
-	
+
 	return DummyPart
 end
 
@@ -99,14 +99,14 @@ function PartTouchingCalculator:GetTouchingBoundingBox(Parts, RelativeTo, Paddin
 	local Dummy = self:GetCollidingPartFromParts(Parts, RelativeTo, Padding)
 	local Touching = Dummy:GetTouchingParts()
 	Dummy:Destroy()
-	
+
 	return Touching
 end
 
 --- Expensive hull check on a list of parts (aggregating each parts touching list)
 function PartTouchingCalculator:GetTouchingHull(Parts, Padding)
 	local HitParts = {}
-	
+
 	for _, Part in pairs(Parts) do
 		for _, TouchingPart in pairs(self:GetTouching(Part, Padding)) do
 			HitParts[TouchingPart] = true
@@ -117,7 +117,7 @@ function PartTouchingCalculator:GetTouchingHull(Parts, Padding)
 	for Part, _ in pairs(HitParts) do
 		table.insert(Touching, Part)
 	end
-	
+
 	return Touching
 end
 
@@ -128,21 +128,21 @@ end
 function PartTouchingCalculator:GetTouching(BasePart, Padding)
 	Padding = Padding or 2
 	local Copy
-	
+
 	if BasePart:IsA("TrussPart") then
 		-- Truss parts can't be resized
 		Copy = Instance.new("Part")
 	else
 		-- Clone copy
 		Copy = BasePart:Clone()
-		
+
 		-- Remove all tags
 		for _, Tag in pairs(CollectionService:GetTags(Copy)) do
 			CollectionService:RemoveTag(Copy, Tag)
 		end
 	end
 	Copy:ClearAllChildren()
-	
+
 	Copy.Size = BasePart.Size + Vector3.new(Padding, Padding, Padding)
 	Copy.CFrame = BasePart.CFrame
 	Copy.Anchored = false
@@ -150,16 +150,16 @@ function PartTouchingCalculator:GetTouching(BasePart, Padding)
 	Copy.Transparency = 0.1
 	Copy.Material = Enum.Material.SmoothPlastic
 	Copy.Parent = workspace
-	
+
 	local Touching = Copy:GetTouchingParts()
 	Copy:Destroy()
-	
+
 	return Touching
 end
 
 function PartTouchingCalculator:GetTouchingHumanoids(TouchingList)
 	local TouchingHumanoids = {}
-	
+
 	for _, Part in pairs(TouchingList) do
 		local Humanoid = Part.Parent:FindFirstChildOfClass("Humanoid")
 		if Humanoid then
@@ -176,7 +176,7 @@ function PartTouchingCalculator:GetTouchingHumanoids(TouchingList)
 			end
 		end
 	end
-	
+
 	local List = {}
 	for Humanoid, Data in pairs(TouchingHumanoids) do
 		table.insert(List, Data)
@@ -187,7 +187,7 @@ end
 
 function PartTouchingCalculator:GetTouchingProps(TouchingList)
 	local TouchingProps = {}
-	
+
 	for _, Part in pairs(TouchingList) do
 		local PropData, BasePart = self.BoatDataManager.SearchForPropData(Part)
 		if PropData then
@@ -204,18 +204,18 @@ function PartTouchingCalculator:GetTouchingProps(TouchingList)
 			end
 		end
 	end
-	
+
 	local List = {}
 	for Prop, Data in pairs(TouchingProps) do
 		table.insert(List, Data)
 	end
-	
+
 	return List
 end
 
 function PartTouchingCalculator:GetTouchingBoats(TouchingList)
 	local TouchingBoats = {}
-	
+
 	for _, Part in pairs(TouchingList) do
 		local BoatData, Boat, BoatBasePart = self.BoatDataManager:GetBoatData(Part)
 		if BoatData then
@@ -231,12 +231,12 @@ function PartTouchingCalculator:GetTouchingBoats(TouchingList)
 			end
 		end
 	end
-	
+
 	local List = {}
 	for Boat, Data in pairs(TouchingBoats) do
 		table.insert(List, Data)
 	end
-	
+
 	return List
 end
 

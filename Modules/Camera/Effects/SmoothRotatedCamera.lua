@@ -21,11 +21,11 @@ SmoothRotatedCamera._ZoomGiveY = math.rad(5) -- Only on th
 
 function SmoothRotatedCamera.new()
 	local self = setmetatable({}, SmoothRotatedCamera)
-	
+
 	self.SpringX = Spring.new(0)
 	self.SpringY = Spring.new(0)
 	self.Speed = 15
-	
+
 	return self
 end
 
@@ -113,10 +113,10 @@ function SmoothRotatedCamera:__index(Index)
 	elseif Index == "RenderAngleY" then
 		local Angle = self.AngleY
 		local Past = self:GetPastBounds(Angle)
-		
+
 		local TimesOverBounds = math.abs(Past) / self.ZoomGiveY
 		local Scale = (1 - 0.25 ^ math.abs(TimesOverBounds))
-		
+
 		if Past < 0 then
 			return self.MinY - self.ZoomGiveY*Scale
 		elseif Past > 0 then

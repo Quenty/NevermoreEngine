@@ -1,8 +1,7 @@
 --- Make interpolation curves
--- @module BezierFactory
-
 -- A good place to generate and test these out: http://cubic-bezier.com/
 -- Based upon https://gist.github.com/gre/1926947#file-keyspline-js
+-- @module BezierFactory
 
 local lib = {}
 
@@ -60,7 +59,7 @@ function lib.BezierFactory(P1x, P1y, P2x, P2y)
 	end
 end
 
---[[ Testing:
+--[[ @usage
 local Ease = BezierFactory(0.25, 0.1, 0.25, 1)
 for Index = 0, 1.05, 0.05 do
 	print(Index, ":", Ease(Index))

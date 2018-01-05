@@ -20,6 +20,7 @@ function lib.LerpNumber(low, high, percent)
 	return low + ((high - low) * percent)
 end
 
+--- Round the given number to given precision
 function lib.Round(number, base)
 	base = base or 1
 	return (math.floor((number/base)+0.5)*base)

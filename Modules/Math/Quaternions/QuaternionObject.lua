@@ -1,9 +1,11 @@
+---
+-- @author xXxMoNkEyMaNxXx
+-- @classmod Quaternion
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Quaternion = require("Quaternion")
 
---By xXxMoNkEyMaNxXx elsez
---Roblox Lua
 local type=type
 local getmetatable=getmetatable
 local setmetatable=setmetatable

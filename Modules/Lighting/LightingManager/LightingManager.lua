@@ -1,3 +1,6 @@
+--- General LightingManager which can tween items in lighting
+-- @clasmod LightingManager
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Lighting = game:GetService("Lighting")
@@ -5,22 +8,20 @@ local Lighting = game:GetService("Lighting")
 local qGUI = require("qGUI")
 local qMath = require("qMath")
 
--- General LightingManager which can tween items in lighting
-
 local TweenTimeOfDay do
 	local TweenId
-	
+
 	function TweenTimeOfDay(Start, Finish, TweenTime)
 		TweenId = TweenId + 1
 		local LocalTweenId = TweenId
-	
+
 		spawn(function()
 			Lighting.TimeOfDay = Finish;
 			local MinutesFinish = Lighting:GetMinutesAfterMidnight()
 			Lighting.TimeOfDay = Start;
 			local MinutesStart = Lighting:GetMinutesAfterMidnight()
 			local TimeStart = tick()
-	
+
 			while LocalTweenId == TweenId do
 				if TimeStart + TweenTime <= tick() then
 					Lighting:SetMinutesAfterMidnight(MinutesFinish)
@@ -31,7 +32,7 @@ local TweenTimeOfDay do
 				end
 				wait()
 			end
-			
+
 			if LocalTweenId == TweenId then
 				Lighting.TimeOfDay = Finish;
 			end
@@ -45,7 +46,7 @@ LightingManager.ClassName = "LightingManager"
 
 function LightingManager.new()
 	local self = setmetatable({}, LightingManager)
-	
+
 	return self
 end
 
@@ -79,12 +80,12 @@ local NumberValues = {
 
 function LightingManager:TweenOnItem(Parent, PropertyTable, Time)
 	Time = Time or 0
-	
+
 	local TweenColor3Table = {}
 	local DoTweenColor3 = false
 	local TweenNumberTable = {}
 	local DoTweenNumber = false
-	
+
 	for PropertyName, Value in pairs(PropertyTable) do
 		if type(Value) == "table" then
 			local Item = Parent:FindFirstChild(PropertyName)
@@ -107,7 +108,7 @@ function LightingManager:TweenOnItem(Parent, PropertyTable, Time)
 			warn("[LightingManager] - No property with the value " .. PropertyName .. " that is tweenable")
 		end
 	end
-	
+
 	if DoTweenColor3 and Time > 0 then
 		qGUI.TweenColor3(Parent, TweenColor3Table, Time, true)
 	else
@@ -115,7 +116,7 @@ function LightingManager:TweenOnItem(Parent, PropertyTable, Time)
 			Parent[Property] = Value
 		end
 	end
-	
+
 	if DoTweenNumber and Time > 0 then
 		qGUI.TweenTransparency(Parent, TweenNumberTable, Time, true)
 	else
@@ -125,7 +126,7 @@ function LightingManager:TweenOnItem(Parent, PropertyTable, Time)
 	end
 end
 
-	
+
 
 
 

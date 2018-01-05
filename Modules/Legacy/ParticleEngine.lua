@@ -305,10 +305,10 @@ local function RealMakeEngine(Screen)
 					else
 						ParticleRemove(Particle)
 					end
-					
+
 				end
 			end
-			
+
 			ParticleRender(Camera, Frame, Particle, CameraInverse)
 		end
 	end

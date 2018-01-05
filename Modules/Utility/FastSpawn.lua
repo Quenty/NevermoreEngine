@@ -6,7 +6,7 @@ return function(func, ...)
 	bindable.Event:Connect(function()
 		func(unpack(args))
 	end)
-	
+
 	bindable:Fire(...)
 	bindable:Destroy()
 end

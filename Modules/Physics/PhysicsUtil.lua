@@ -16,13 +16,13 @@ local function EstimateBuoyancyContribution(Parts)
 	local TotalMass = 0
 	local TotalVolumeApplicable = 0
 	local TotalFloat = 0
-	
+
 	for _, Part in pairs(Parts) do
 		local Mass = Part:GetMass()
 		TotalMass = TotalMass + Mass
-		
+
 		TotalFloat = TotalFloat - Mass * workspace.Gravity
-		
+
 		if Part.CanCollide then
 			local Volume = Part.Size.X*Part.Size.Y*Part.Size.Z
 			local WaterDensity = 1 --(Mass/Volume)
@@ -30,7 +30,7 @@ local function EstimateBuoyancyContribution(Parts)
 			TotalVolumeApplicable = TotalVolumeApplicable + Volume
 		end
 	end
-	
+
 	return TotalFloat, TotalMass, TotalVolumeApplicable
 end
 lib.EstimateBuoyancyContribution = EstimateBuoyancyContribution
@@ -74,7 +74,7 @@ lib.MomentOfInertia = MomentOfInertia
 -- @param Axis the axis to use (Should be torque, or offset cross force)
 -- @param Origin The origin of the axis (should be center of mass of the parts)
 local function BodyMomentOfInertia(Parts, Axis, Origin)
-	
+
 	local TotalBodyInertia = 0
 
 	for _, Part in pairs(Parts) do

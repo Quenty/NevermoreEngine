@@ -1,12 +1,12 @@
+--- Provides a basis for the compass GUI. Invidiual CompassElements handle
+-- the positioning.
+-- @classmod ICompass
+
 local ICompass = {}
 ICompass.__index = ICompass
 ICompass.ClassName = "ICompass"
 ICompass.PercentSolid = 0.8
 ICompass.ThetaVisible = math.pi/2
-
---- Provides a basis for the compass GUI. Invidiual CompassElements handle
---  the positioning.
--- @author Quenty
 
 function ICompass.new(CompassModel, Container)
 	--- Makes a skyrim style "strip" compass.
@@ -24,10 +24,10 @@ function ICompass.new(CompassModel, Container)
 	return self
 end
 
+--- Sets the percentage of the compass that is solid (that is, visible), to the player
+-- This way, we can calculate transparency
+-- @param PercentSolid Number [0, 1] of the percentage solid fo the compass element.
 function ICompass:SetPercentSolid(PercentSolid)
-	--- Sets the percentage of the compass that is solid (that is, visible), to the player
-	--  This way, we can calculate transparency
-	-- @param PercentSolid Number [0, 1] of the percentage solid fo the compass element.
 
 	self.PercentSolid = tonumber(PercentSolid) or error("No PercentSolid")
 
@@ -36,9 +36,9 @@ function ICompass:SetPercentSolid(PercentSolid)
 	end
 end
 
+--- Sets the area shown by the compass (the rest will be hidden). (In radians).
+-- @param ThetaVisible Number [0, 6.28...] The theta in radians visible to the player overall.
 function ICompass:SetThetaVisible(ThetaVisible)
-	-- Sets the area shown by the compass (the rest will be hidden). (In radians).
-	-- @param ThetaVisible Number [0, 6.28...] The theta in radians visible to the player overall.
 
 	self.ThetaVisible = tonumber(ThetaVisible) or error("No or invalid ThetaVisible sent")
 	assert(ThetaVisible > 0, "ThetaVisible must be > 0")
@@ -48,8 +48,9 @@ function ICompass:SetThetaVisible(ThetaVisible)
 	end
 end
 
+---
+-- @param Element An ICompassElement to be added to the system
 function ICompass:AddElement(Element)
-	-- @param Element An ICompassElement to be added to the system
 
 	assert(not self.Elements[Element], "Element already added")
 
@@ -60,18 +61,17 @@ function ICompass:AddElement(Element)
 	Element:GetGui().Parent = self.Container
 end
 
+--- Calculates the GUI position for the element
+-- @param PercentPosition Number, the percent position to use
+-- @return UDim2 The position (center) of the GUI element given its percentage. Relative to the container.
+-- @return [Rotation] Number in degrees, the rotation of the GUI to be set.
 function ICompass:GetPosition(PercentPosition)
-	--- Calculates the GUI position for the element
-	-- @param PercentPosition Number, the percent position to use
-	-- @return UDim2 The position (center) of the GUI element given its percentage. Relative to the container.
-	-- @return [Rotation] Number in degrees, the rotation of the GUI to be set.
 
 	error("GetPosition is not overridden yet")
 end
 
+--- Updates the compass for fun!
 function ICompass:Draw()
-	--- Updates the compass for fun!
-
 	self.CompassModel:Step()
 
 	for Element, _ in pairs(self.Elements) do

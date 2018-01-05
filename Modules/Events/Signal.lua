@@ -14,11 +14,11 @@ Signal.ClassName = "Signal"
 -- @treturn Signal
 function Signal.new()
 	local self = setmetatable({}, Signal)
-	
+
 	self._bindableEvent = Instance.new("BindableEvent")
 	self._argData = nil
 	self._argCount = nil
-	
+
 	return self
 end
 

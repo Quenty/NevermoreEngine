@@ -7,7 +7,7 @@ RoundedBackingBuilder.ClassName = "RoundedBackingBuilder"
 
 function RoundedBackingBuilder.new()
 	local self = setmetatable({}, RoundedBackingBuilder)
-		
+
 	return self
 end
 
@@ -22,9 +22,9 @@ function RoundedBackingBuilder:CreateBacking(Gui)
 	Backing.BackgroundTransparency = 1
 	Backing.ZIndex = Gui.ZIndex - 1
 	Backing.Parent = Gui
-	
+
 	Gui.BackgroundTransparency = 1
-	
+
 	return Backing
 end
 
@@ -33,7 +33,7 @@ function RoundedBackingBuilder:CreateTopBacking(Gui)
 	local Backing = self:CreateBacking(Gui)
 	Backing.ImageRectSize = Vector2.new(20, 16)
 	Backing.SliceCenter = Rect.new(4, 4, 16, 16)
-	
+
 	return Backing
 end
 
@@ -43,7 +43,7 @@ function RoundedBackingBuilder:CreateBottomBacking(Gui)
 	Backing.ImageRectOffset = Vector2.new(0, 4)
 	Backing.ImageRectSize = Vector2.new(20, 16)
 	Backing.SliceCenter = Rect.new(4, 4, 16, 16)
-	
+
 	return Backing
 end
 
@@ -62,14 +62,14 @@ function RoundedBackingBuilder:CreateShadow(Backing)
 	Shadow.ImageTransparency = 0.7
 	Shadow.ZIndex = Backing.ZIndex - 1
 	Shadow.Parent = Backing.Parent
-	
+
 	return Shadow
 end
 
 function RoundedBackingBuilder:Create(Gui)
 	local Backing = self:CreateBacking(Gui)
 	local Shadow = self:CreateShadow(Backing)	
-	
+
 	return Backing
 end
 

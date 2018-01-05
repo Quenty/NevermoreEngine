@@ -57,9 +57,9 @@ function PaperRipple.FromParent(parent)
 	container.Size = UDim2.new(1, 0, 1, 0)
 	container.ZIndex = math.min(parent.ZIndex + 1, 10)
 	container.Parent = parent
-	
+
 	local ripple = PaperRipple.new(container)
-	
+
 	if parent:IsA("TextLabel") or parent:IsA("TextButton") then
 		local _, s, v = Color3.toHSV(parent.BackgroundColor3)
 		if v > 0.9 and s < 0.1 then
@@ -73,14 +73,14 @@ end
 --- Sets the ink color for the ripple and recolors all the things!
 -- @param InkColor Color3, the ink color to set the ripple
 function PaperRipple:SetInkColor(InkColor)
-	
+
 	self._inkColor = InkColor
 
 	for _, ripple in pairs(self._ripples) do
 		ripple:SetInkColor(self._inkColor)
 	end
 	self.Container.BackgroundColor3 = self._inkColor
-	
+
 	return self
 end
 
@@ -97,7 +97,7 @@ end
 -- @return Number, the further distance from the corner.
 function PaperRipple:FurthestCornerDistanceFrom(Position)
 	local Container = self.Container
-	
+
 	local ContainerPosition = Container.AbsolutePosition
 	local ContainerSize = Container.AbsoluteSize
 
@@ -269,7 +269,7 @@ function PaperRipple:BindInput()
 			self:Down(Position)
 
 			DownTypes[InputObject.UserInputType] = true
-			
+
 			-- Bind to event.
 			self.InputMaid.InputEnded = UserInputService.InputEnded:Connect(OnUp)
 		end

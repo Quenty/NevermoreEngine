@@ -35,7 +35,7 @@ function DraggableSnackbar.new(Parent, Text, GCOnDismissal, Options)
 
 	self._mouse = Players.LocalPlayer:GetMouse()
 	self._gcOnDismissal = GCOnDismissal == nil and true or false
-	
+
 	-- Set to transparency and faded out direction automatically
 	self[self.DefaultFadeOut](self, true)
 
@@ -64,7 +64,7 @@ function DraggableSnackbar:Show()
 			if GameProcessedEvent then
 				return
 			end
-			
+
 			if self._showId ~= LocalShowId then
 				warn("[InputDismissEvent] - self._showId ~= LocalShowId, but event fired")
 				return
@@ -72,18 +72,18 @@ function DraggableSnackbar:Show()
 			if self.AutoCloseDisabled then
 				return
 			end
-			
+
 			if qGUI.MouseOver(self._mouse, self.Gui) then
 				return
 			end
-				
+
 			if self.AbsolutePosition ~= self.Gui.AbsolutePosition then
 				return -- Animating / dragging
 			end
-			
+
 			if InputObject.UserInputType == Enum.UserInputType.Touch
 				or InputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-				
+
 				self:Dismiss()
 			end
 		end))
@@ -138,7 +138,7 @@ end
 function DraggableSnackbar:Track()
 	local DragOffset, DragLength
 	local TopLeftInset, _ = GuiService:GetGuiInset()
-	
+
 	if self.Vertical then
 		DragOffset = (self._mouse.Y + TopLeftInset.Y) - self._startDragPosition
 		DragLength = self.Gui.AbsoluteSize.Y

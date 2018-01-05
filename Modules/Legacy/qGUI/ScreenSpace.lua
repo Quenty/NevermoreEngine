@@ -1,41 +1,8 @@
-local PlayerMouse = game:GetService('Players').LocalPlayer:GetMouse()
-
--- @author Stravant, modified by Quenty
--- Phase out of ScreenGeometry. 
--- 8/19/14
+---
+-- @module ScreenSpace
 
 local ScreenSpace = {}
 
--- Getter functions, with a couple of hacks for Ipad pre-focus.
---[[function ScreenSpace.ViewSizeX()
-	local x = PlayerMouse.ViewSizeX
-	local y = PlayerMouse.ViewSizeY
-	if x == 0 then
-		return 1024
-	else
-		if x > y then
-			return x
-		else
-			return y
-		end
-	end
-end
-
-function ScreenSpace.ViewSizeY()
-	local x = PlayerMouse.ViewSizeX
-	local y = PlayerMouse.ViewSizeY
-	if y == 0 then
-		return 768
-	else
-		if x > y then
-			return y
-		else
-			return x
-		end
-	end
-end--]]
-
----[[ Use new camera API instead, please
 function ScreenSpace.ViewSizeX()
 	local x = workspace.CurrentCamera.ViewportSize.X--PlayerMouse.ViewSizeX
 	if x == 0 then
@@ -54,30 +21,13 @@ function ScreenSpace.ViewSizeY()
 	end
 end
 
-
 -- Nice getter for aspect ratio. Due to the checks in the ViewSize functions this
 -- will never fail with a divide by zero error.
 function ScreenSpace.AspectRatio()
 	return ScreenSpace.ViewSizeX() / ScreenSpace.ViewSizeY()
 end
 
---[[ Use new camera API instead
--- WorldSpace -> ScreenSpace. Raw function taking a world position and giving you the
--- screen position.
-function ScreenSpace.WorldToScreen(at)
-	local point       = workspace.CurrentCamera.CoordinateFrame:pointToObjectSpace(at)
-	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor     = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
-	local wfactor     = aspectRatio*hfactor
-	--
-	local x = (point.x/point.z) / -wfactor
-	local y = (point.y/point.z) /  hfactor
-	--
-	return Vector2.new(ScreenSpace.ViewSizeX()*(0.5 + 0.5*x), ScreenSpace.ViewSizeY()*(0.5 + 0.5*y))
-end
---]]
-
--- ScreenSpace -> WorldSpace. Raw function taking a screen position and a depth and 
+-- ScreenSpace -> WorldSpace. Raw function taking a screen position and a depth and
 -- converting it into a world position.
 function ScreenSpace.ScreenToWorld(x, y, Depth)
 	y = y + 34
@@ -93,7 +43,7 @@ function ScreenSpace.ScreenToWorld(x, y, Depth)
 end
 
 -- ScreenSize -> WorldSize
-function ScreenSpace.ScreenWidthToWorldWidth(ScreenWidth, depth)	
+function ScreenSpace.ScreenWidthToWorldWidth(ScreenWidth, depth)
 	local aspectRatio = ScreenSpace.AspectRatio()
 	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
@@ -130,19 +80,19 @@ function ScreenSpace.GetDepthForWidth(screenWidth, worldWidth)
 	local aspectRatio = ScreenSpace.AspectRatio()
 	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
-	local sx, sy = ScreenSpace.ViewSizeX(), ScreenSpace.ViewSizeY()
+	local sx, _ = ScreenSpace.ViewSizeX(), ScreenSpace.ViewSizeY()
 	--
-	return -(sx * worldWidth) / (screenWidth * 2 * wfactor)	
+	return -(sx * worldWidth) / (screenWidth * 2 * wfactor)
 end
 
 function ScreenSpace.GetDepthForHeight(screenHeight, worldHeight)
 	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
 	local sy = ScreenSpace.ViewSizeY()
 	--
-	return -(sy * worldHeight) / (screenHeight * 2 * hfactor)	
+	return -(sy * worldHeight) / (screenHeight * 2 * hfactor)
 end
 
--- ScreenSpace -> WorldSpace. Taking a screen height, and a depth to put an object 
+--- ScreenSpace -> WorldSpace. Taking a screen height, and a depth to put an object
 -- at, and returning a size of how big that object has to be to appear that size
 -- at that depth.
 function ScreenSpace.ScreenToWorldByHeightDepth(x, y, screenHeight, depth)
@@ -160,7 +110,7 @@ function ScreenSpace.ScreenToWorldByHeightDepth(x, y, screenHeight, depth)
 	return Vector3.new(xpos, ypos, depth), worldHeight
 end
 
--- ScreenSpace -> WorldSpace. Taking a screen width, and a depth to put an object 
+--- ScreenSpace -> WorldSpace. Taking a screen width, and a depth to put an object
 -- at, and returning a size of how big that object has to be to appear that size
 -- at that depth.
 function ScreenSpace.ScreenToWorldByWidthDepth(x, y, screenWidth, depth)
@@ -179,7 +129,7 @@ function ScreenSpace.ScreenToWorldByWidthDepth(x, y, screenWidth, depth)
 	return Vector3.new(xpos, ypos, depth), worldWidth
 end
 
--- ScreenSpace -> WorldSpace. Taking a screen height that you want that object to be
+--- ScreenSpace -> WorldSpace. Taking a screen height that you want that object to be
 -- and a world height that is the size of that object, and returning the position to
 -- put that object at to satisfy those.
 function ScreenSpace.ScreenToWorldByHeight(x, y, screenHeight, worldHeight)
@@ -197,7 +147,7 @@ function ScreenSpace.ScreenToWorldByHeight(x, y, screenHeight, worldHeight)
 	return Vector3.new(xpos, ypos, depth)
 end
 
--- ScreenSpace -> WorldSpace. Taking a screen width that you want that object to be
+--- ScreenSpace -> WorldSpace. Taking a screen width that you want that object to be
 -- and a world width that is the size of that object, and returning the position to
 -- put that object at to satisfy those.
 function ScreenSpace.ScreenToWorldByWidth(x, y, screenWidth, worldWidth)
@@ -216,18 +166,17 @@ function ScreenSpace.ScreenToWorldByWidth(x, y, screenWidth, worldWidth)
 end
 
 
+--- Returns a part's cframe so it fits in the frame -- width based! That is, it will fit into the screen's width.
 function ScreenSpace.GetAdorneeData(Frame, Part)
-	--- Returns a part's cframe so it fits in the frame -- width based! That is, it will fit into the screen's width. 
-
 	local FrameAbsoluteSize = Frame.AbsoluteSize
-	local FrameCenter = Frame.AbsolutePosition + FrameAbsoluteSize/2 -- Center of the frame. 
+	local FrameCenter = Frame.AbsolutePosition + FrameAbsoluteSize/2 -- Center of the frame.
 
 	local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, Part.Size.X)
 
 	local Position = ScreenSpace.ScreenToWorld(FrameCenter.X, FrameCenter.Y, Depth)
-	local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame * 
+	local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame *
 	                      CFrame.new(Position) * -- Transform by camera coordinates
-	                      CFrame.new(0, 0, -Part.Size.Z/2) -- And take out the part size factor. 
+	                      CFrame.new(0, 0, -Part.Size.Z/2) -- And take out the part size factor.
 
 
 	return AdorneeCFrame

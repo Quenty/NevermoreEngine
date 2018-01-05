@@ -1,5 +1,5 @@
--- Probability.lua
--- @author Quenty
+--- Probability utility functions
+-- @module Probability
 
 local lib = {}
 

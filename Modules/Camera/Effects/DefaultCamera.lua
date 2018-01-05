@@ -34,7 +34,7 @@ function DefaultCamera:BindToRenderStep()
 	RunService:BindToRenderStep("DefaultCamera_PostUpdate", Enum.RenderPriority.Camera.Value+1, function()
 		self._cameraState = CameraState.new(workspace.CurrentCamera)
 	end)
-	
+
 	self._cameraState = CameraState.new(workspace.CurrentCamera)
 end
 

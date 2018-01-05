@@ -14,10 +14,10 @@ function HttpPromise.Method(methodName, url, ...)
 	assert(type(url) == "string")
 
 	local Args = {...}
-	
+
 	return Promise.new(function(fulfill, reject)
 		local result
-		
+
 		local success, err = pcall(function()
 			result = HttpService[methodName](HttpService, url, unpack(Args))
 		end)
@@ -43,14 +43,14 @@ end
 
 function HttpPromise.Json(...)
 	return HttpPromise.Get(...):Then(function(Result)
-		
+
 		-- Decode
 		return Promise.new(function(Fulfill, Reject)
 			local Decoded
 			local Success, Error = pcall(function()
 				Decoded = HttpService:JSONDecode(Result)
 			end)
-			
+
 			if not Success then
 				Reject(Error)
 			elseif Decoded then

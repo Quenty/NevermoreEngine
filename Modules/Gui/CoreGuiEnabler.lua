@@ -13,12 +13,12 @@ CoreGuiEnabler.ClassName = "CoreGuiEnabler"
 
 function CoreGuiEnabler.new()
 	local self = setmetatable({}, CoreGuiEnabler)
-	
+
 	self._states = {}
-	
+
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
-		
+
 		local localPlayer = Players.LocalPlayer
 		local character = localPlayer and localPlayer.Character
 		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -34,7 +34,7 @@ function CoreGuiEnabler.new()
 			end)
 		end
 	end
-	
+
 	self:AddState("TopbarEnabled", function(isEnabled)
 		local success, err = pcall(function()
 			StarterGui:SetCore("TopbarEnabled", isEnabled)
@@ -43,22 +43,22 @@ function CoreGuiEnabler.new()
 			warn("Failed to set topbar", err)
 		end
 	end)
-	
+
 	self:AddState("ModalEnabled", function(isEnabled)
 		UserInputService.ModalEnabled = not isEnabled
 	end)
-	
+
 	self:AddState("MouseIconEnabled", function(isEnabled)
 		UserInputService.MouseIconEnabled = isEnabled
 	end)
-	
+
 	return self
 end
 
 function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
 	assert(type(coreGuiStateChangeFunc) == "function", "must have coreGuiStateChangeFunc as function")
 	assert(self._states[key] == nil, "state already exists")
-	
+
 	local realState = {}
 	local lastState = true
 
@@ -68,11 +68,11 @@ function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
 		end
 		return true
 	end
-	
+
 	self._states[key] = setmetatable({}, {
 		__newindex = function(self, Index, Value)
 			rawset(realState, Index, Value)
-			
+
 			local newState = isEnabled()
 			if lastState ~= newState then
 				lastState = newState
@@ -88,7 +88,7 @@ function CoreGuiEnabler:Disable(key, coreGuiState)
 	end
 
 	self._states[coreGuiState][key] = true
-	
+
 	return function()
 		self:Enable(key, coreGuiState)
 	end

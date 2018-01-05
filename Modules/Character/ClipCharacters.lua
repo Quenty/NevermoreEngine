@@ -19,7 +19,7 @@ ClipCharacters.CollisionGroupName = "ClipCharacters"
 function ClipCharacters.initServer()
 	local GroupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.CollisionGroupName, "Default", false)
-	
+
 	local RemoteFunction = require.GetRemoteFunction("GetClipCharactersId")
 	function RemoteFunction.OnServerInvoke(Player)
 		return GroupId
@@ -102,19 +102,19 @@ end
 
 function ClipCharacters:BindUpdatesYielding()
 	self.CollisionGroupId = self.RemoteFunction:InvokeServer()
-	
+
 	if not self.CollisionGroupId then
 		warn("[ClipCharacters] - No self.CollisionGroupId")
 	end
-	
+
 	for _, Player in pairs(Players:GetPlayers()) do
 		self:_onPlayerAdded(Player)
 	end
-	
+
 	self.Maid:GiveTask(Players.PlayerAdded:Connect(function(Player)
 		self:_onPlayerAdded(Player)
 	end))
-	
+
 	self.Maid:GiveTask(Players.PlayerRemoving:Connect(function(Player)
 		self.Maid[Player] = nil
 	end))
@@ -125,7 +125,7 @@ end
 function ClipCharacters:Destroy()
 	self.Maid:DoCleaning()
 	self.Maid = nil
-	
+
 	setmetatable({}, nil)
 end
 

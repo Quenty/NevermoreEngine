@@ -7,7 +7,7 @@ local Players = game:GetService("Players")
 local lib = {}
 
 --- Retrieves a humanomid from a descendant (Players only).
--- @param Descendant The child you're searching up from. Really, this is for weapon scripts. 
+-- @param Descendant The child you're searching up from. Really, this is for weapon scripts.
 -- @return A humanoid in the parent structure if it can find it. Intended to be used in
 --     workspace  only. Useful for weapon scripts, and all that, especially to work on non
 --     player targets. Will scan *up* to workspace . If workspace   has a humanoid in it, it
@@ -39,7 +39,7 @@ function lib.GetHumanoid(Descendant)
 end
 
 --- Returns the Player and Character that a descendent is part of, if it is part of one.
--- @param Descendant A child of the potential character. 
+-- @param Descendant A child of the potential character.
 -- @return The character found.
 function lib.GetPlayerFromCharacter(Descendant)
 	local Character = Descendant
