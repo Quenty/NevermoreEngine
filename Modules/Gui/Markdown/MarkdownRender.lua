@@ -10,7 +10,7 @@ MarkdownRender.ClassName = "MarkdownRender"
 MarkdownRender.SpaceAfterParagraph = 10
 MarkdownRender.TextSize = 18
 MarkdownRender.Indent = 30
-MarkdownRender.BaseTextColor3 = Color3.fromRGB(56, 56, 56)
+MarkdownRender.TextColor3 = Color3.fromRGB(56, 56, 56)
 
 --- Creates a new markdown render
 -- @tparam GuiObject gui
@@ -24,6 +24,12 @@ function MarkdownRender.new(gui, width)
 	return self
 end
 
+function MarkdownRender:WithOptions(options)
+	self.TextSize = options.TextSize
+	self.SpaceAfterParagraph = options.SpaceAfterParagraph
+
+	return self
+end
 --- Renders the data in the given Gui
 -- @param data Data from MarkdownParser
 function MarkdownRender:Render(data)
@@ -88,7 +94,7 @@ end
 
 function MarkdownRender:_formatTextLabel(textLabel)
 	textLabel.Font = Enum.Font.SourceSans
-	textLabel.TextColor3 = self.BaseTextColor3
+	textLabel.TextColor3 = self.TextColor3
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextYAlignment = Enum.TextYAlignment.Top
 	textLabel.TextWrapped = true
@@ -130,7 +136,7 @@ function MarkdownRender:_getBullet(level)
 	bullet.Name = "bullet"
 	bullet.BorderSizePixel = 0
 
-	bullet.BackgroundColor3 = self.BaseTextColor3
+	bullet.BackgroundColor3 = self.TextColor3
 	bullet.ZIndex = self._gui.ZIndex
 
 	if level == 2 then
