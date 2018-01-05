@@ -7,8 +7,6 @@ local Maid = require("Maid")
 local Signal = require("Signal")
 
 local module = {}
-module.__index = module
-setmetatable(module, module)
 
 function module:Add(class)
 	assert(class)

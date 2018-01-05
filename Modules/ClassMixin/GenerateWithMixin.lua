@@ -2,8 +2,6 @@
 -- @module GenerateWithMixin
 
 local module = {}
-module.__index = module
-setmetatable(module, module)
 
 --- Adds the GenerateWith API to the class
 -- @tparam table class
@@ -17,10 +15,6 @@ function module:Add(class, staticResources)
 	if staticResources then
 		class:GenerateWith(staticResources)
 	end
-end
-
-function module:__call(class, ...)
-	self:Add(class, ...)
 end
 
 --- Generates resources

@@ -1,17 +1,11 @@
 --- Mouse over mixin for general utility button mouse over effects
--- @classmod MouseOverMixin
+-- @module MouseOverMixin
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
 
 local module = {}
-module.__index = module
-setmetatable(module, module)
-
-function module:__call(class, ...)
-	self:Add(class, ...)
-end
 
 function module:Add(class)
 	assert(class)
