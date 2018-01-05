@@ -15,7 +15,8 @@ end
 
 function MarkdownParser:GetLines()
 	local lines = {}
-	for line in self._text:gmatch("([^\r\n]*)[\r\n]") do
+	local text = self._text .. "\n" -- append extra line to force ending match
+	for line in text:gmatch("([^\r\n]*)[\r\n]") do
 		table.insert(lines, line)
 	end
 	return lines
