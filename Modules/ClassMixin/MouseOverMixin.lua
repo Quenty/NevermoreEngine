@@ -17,9 +17,13 @@ function module:Add(class)
 	class._getMouseOverTweenProperties = self._getMouseOverTweenProperties
 end
 
-function module:GetMouseOverColor(OriginalColor)
-	local H, S, V = Color3.toHSV(OriginalColor)
-	return Color3.fromHSV(H, S, V-0.05)
+---
+-- @tparam Color3 originalColor
+-- @tparam[opt=1] number factor
+function module:GetMouseOverColor(originalColor, factor)
+	factor = factor or 1
+	local h, s, v = Color3.toHSV(originalColor)
+	return Color3.fromHSV(h, s, v-0.05*factor)
 end
 
 function module:GetMouseOverBoolValue(gui)
