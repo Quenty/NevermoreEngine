@@ -12,180 +12,184 @@ MarkdownRender.TextSize = 18
 MarkdownRender.Indent = 30
 MarkdownRender.BaseTextColor3 = Color3.fromRGB(56, 56, 56)
 
-function MarkdownRender.new(Gui, Width)
+--- Creates a new markdown render
+-- @tparam GuiObject gui
+-- @tparam number width Width to render at
+function MarkdownRender.new(gui, width)
 	local self = setmetatable({}, MarkdownRender)
-	
-	self.Gui = Gui or error("No Gui")
-	self.Width = Width or error("No Width")
-	
+
+	self._gui = gui or error("No Gui")
+	self._width = width or error("No width")
+
 	return self
 end
 
-function MarkdownRender:GetFrame()
-	local Frame = Instance.new("Frame")
-	Frame.BackgroundTransparency = 1
-	Frame.BorderSizePixel = 0
-	Frame.Size = UDim2.new(1, 0, 0, 0)
-	Frame.ZIndex = self.Gui.ZIndex
-	
-	return Frame
-end
+--- Renders the data in the given Gui
+-- @param data Data from MarkdownParser
+function MarkdownRender:Render(data)
+	local height = 0
+	for index, item in pairs(data) do
+		local gui
+		if type(item) == "string" then
+			gui = self:_renderParagraph(item)
+			gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
 
-function MarkdownRender:GetTextLabel()
-	local TextLabel = Instance.new("TextLabel")
-	TextLabel.BackgroundTransparency = 1
-	TextLabel.Size = UDim2.new(1, 0, 0, 0)
-	TextLabel.ZIndex = self.Gui.ZIndex
-	
-	return self:FormatTextLabel(TextLabel)
-end
+			height = height + gui.Size.Y.Offset + self.SpaceAfterParagraph
+		elseif type(item) == "table" then
+			if item.Type == "List" then
+				gui = self:_renderList(item)
+				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
 
-function MarkdownRender:FormatTextLabel(TextLabel)
-	TextLabel.Font = Enum.Font.SourceSans
-	TextLabel.TextColor3 = self.BaseTextColor3
-	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-	TextLabel.TextYAlignment = Enum.TextYAlignment.Top
-	TextLabel.TextWrapped = true
-	TextLabel.TextSize = self.TextSize
-	TextLabel.TextStrokeTransparency = 1
-	
-	return TextLabel
-end
-
-function MarkdownRender:RenderParagraphLabel(Label, Text)
-	-- Strip ending punctuation which screws with roblox's wordwrapping and .TextFits
-	local StrippedText = Text:gsub("(%p+)$", "")
-	
-	local Width = self.Width or error("No width")
-	local LabelWidth = Label.Size.X.Scale*Width + Label.Size.X.Offset
-	local TextSize = TextService:GetTextSize(StrippedText, Label.TextSize, Label.Font, Vector2.new(LabelWidth, Label.TextSize*20))
-	Label.Size = UDim2.new(Label.Size.X, UDim.new(0, TextSize.Y))
-	
-	Label.Text = Text
-	
-	return Label
-end
-
-function MarkdownRender:RenderParagraph(Text, Options)
-	Options = Options or {}
-	
-	local Label = self:GetTextLabel()
-	Label.Text = Text
-	Label.Name = "Paragraph"
-	Label.Parent = Options.Parent or self.Gui
-	
-	self:RenderParagraphLabel(Label, Text)
-	
-	return Label
-end
-
-function MarkdownRender:GetBullet(Level)
-	local Bullet = Instance.new("Frame")
-	Bullet.Name = "Bullet"
-	Bullet.BorderSizePixel = 0
-	
-	Bullet.BackgroundColor3 = self.BaseTextColor3
-	Bullet.ZIndex = self.Gui.ZIndex
-	
-	if Level == 2 then
-		Bullet.Size = UDim2.new(0, 6, 0, 1)
-	else
-		Bullet.Size = UDim2.new(0, 4, 0, 4)
-	end
-	
-	return Bullet
-end
-
-function MarkdownRender:RenderList(ListData)
-	assert(type(ListData.Level) == "number" and ListData.Level > 0)
-
-	local Frame = self:GetFrame()
-	Frame.Name = ("ListLevel_%d"):format(ListData.Level)
-	Frame.Size = UDim2.new(1, -(ListData.Level)*self.Indent, 0, 0)
-	Frame.Position = UDim2.new(0, -Frame.Size.X.Offset, 0, 0)
-	Frame.Parent = self.Gui
-	
-	local YHeight = 0
-	for Index, Text in ipairs(ListData) do
-		local TextLabel = self:RenderParagraph(Text, { Parent = Frame })
-		
-		local Bullet = self:GetBullet(ListData.Level)
-		Bullet.AnchorPoint = Vector2.new(0.5, 0.5)
-		Bullet.Position = UDim2.new(0, -self.Indent/2, 0, self.TextSize/2 + 1)
-		Bullet.Parent = TextLabel
-		
-		TextLabel.Name = ("%d_%s"):format(Index, TextLabel.Name)
-		TextLabel.Position = UDim2.new(TextLabel.Position.X, UDim.new(0, YHeight))
-		YHeight = YHeight + TextLabel.Size.Y.Offset + 2
-	end
-	
-	Frame.Size = UDim2.new(Frame.Size.X, UDim.new(0, YHeight))
-	
-	return Frame
-end
-
-function MarkdownRender:RenderHeader(HeaderData)
-	local Label = self:GetTextLabel()
-	Label.Name = "Header" .. HeaderData.Level
-	Label.Parent = self.Gui
-	Label.TextSize = self.TextSize + (5-HeaderData.Level) * 2
-	
-	
-	self:RenderParagraphLabel(Label, HeaderData.Text)
-	Label.TextYAlignment = Enum.TextYAlignment.Center
-	Label.Size = UDim2.new(Label.Size.X, UDim.new(Label.Size.Y.Scale, Label.Size.Y.Offset + 6)) -- Extra padding
-	
-	local Underline = self:GetFrame()
-	Underline.Name = "Underline"
-	Underline.BackgroundTransparency = 0
-	Underline.BackgroundColor3 = Color3.new(0.9, 0.9, 0.9)
-	Underline.Size = UDim2.new(1, 0, 0, 1)
-	Underline.AnchorPoint = Vector2.new(0, 1)
-	Underline.Position = UDim2.new(0, 0, 1, 0)
-	Underline.Parent = Label
-	
-	return Label
-end
-
-
-function MarkdownRender:Render(Data)
-	local YHeight = 0
-	for Index, Item in pairs(Data) do
-		local GuiObject
-		if type(Item) == "string" then
-			GuiObject = self:RenderParagraph(Item)
-			GuiObject.Position = UDim2.new(GuiObject.Position.X, UDim.new(0, YHeight))
-			YHeight = YHeight + GuiObject.Size.Y.Offset + self.SpaceAfterParagraph
-		elseif type(Item) == "table" then
-			if Item.Type == "List" then
-				GuiObject = self:RenderList(Item)
-				GuiObject.Position = UDim2.new(GuiObject.Position.X, UDim.new(0, YHeight))
-				YHeight = YHeight + GuiObject.Size.Y.Offset
-				
-				if not (type(Data[Index+1]) == "table" and Data[Index+1].Type == "List" and Data[Index+1].Level ~= Item.Level) then
-					YHeight = YHeight + self.SpaceAfterParagraph
+				height = height + gui.Size.Y.Offset
+				if not (type(data[index+1]) == "table" and data[index+1].Type == "List" and data[index+1].Level ~= item.Level) then
+					height = height + self.SpaceAfterParagraph
 				end
-			elseif Item.Type == "Header" then
-				if Data[Index-1] then -- Add additional spacing for headers
-					YHeight = YHeight + self.SpaceAfterParagraph
+			elseif item.Type == "Header" then
+				if data[index-1] then -- Add additional spacing for headers
+					height = height + self.SpaceAfterParagraph
 				end
-				
-				GuiObject = self:RenderHeader(Item)
-				GuiObject.Position = UDim2.new(GuiObject.Position.X, UDim.new(0, YHeight))
-				YHeight = YHeight + GuiObject.Size.Y.Offset + self.SpaceAfterParagraph
+
+				gui = self:_renderHeader(item)
+				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
+				height = height + gui.Size.Y.Offset + self.SpaceAfterParagraph
 			else
-				error(("Bad data type '%s'"):format(tostring(Item.Type)))
+				error(("Bad data type '%s'"):format(tostring(item.Type)))
 			end
 		else
 			error("Bad data type")
 		end
-		
-		if GuiObject then
-			GuiObject.Name = ("%d_%s"):format(Index, GuiObject.Name)
+
+		if gui then
+			gui.Name = ("%d_%s"):format(index, gui.Name)
 		end
 	end
-	
-	self.Gui.Size = UDim2.new(self.Gui.Size.X, UDim.new(0, YHeight))
+
+	self._gui.Size = UDim2.new(self._gui.Size.X, UDim.new(0, height))
+end
+
+function MarkdownRender:_getFrame()
+	local frame = Instance.new("Frame")
+	frame.BackgroundTransparency = 1
+	frame.BorderSizePixel = 0
+	frame.Size = UDim2.new(1, 0, 0, 0)
+	frame.ZIndex = self._gui.ZIndex
+
+	return frame
+end
+
+function MarkdownRender:_getTextLabel()
+	local textLabel = Instance.new("TextLabel")
+	textLabel.BackgroundTransparency = 1
+	textLabel.Size = UDim2.new(1, 0, 0, 0)
+	textLabel.ZIndex = self._gui.ZIndex
+
+	return self:_formatTextLabel(textLabel)
+end
+
+function MarkdownRender:_formatTextLabel(textLabel)
+	textLabel.Font = Enum.Font.SourceSans
+	textLabel.TextColor3 = self.BaseTextColor3
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel.TextYAlignment = Enum.TextYAlignment.Top
+	textLabel.TextWrapped = true
+	textLabel.TextSize = self.TextSize
+	textLabel.TextStrokeTransparency = 1
+
+	return textLabel
+end
+
+--- Strip ending punctuation which screws with roblox's wordwrapping and .TextFits
+function MarkdownRender:_renderParagraphLabel(label, text)
+	local labelWidth = label.Size.X.Scale*self._width + label.Size.X.Offset
+
+	local strippedText = text:gsub("(%p+)$", "")
+	local textSize = TextService:GetTextSize(strippedText, label.TextSize, label.Font,
+		Vector2.new(labelWidth, label.TextSize*20))
+
+	label.Size = UDim2.new(label.Size.X, UDim.new(0, textSize.Y))
+	label.Text = text
+
+	return label
+end
+
+function MarkdownRender:_renderParagraph(text, options)
+	options = options or {}
+
+	local label = self:_getTextLabel()
+	label.Text = text
+	label.Name = "Paragraph"
+	label.Parent = options.Parent or self._gui
+
+	self:_renderParagraphLabel(label, text)
+
+	return label
+end
+
+function MarkdownRender:_getBullet(level)
+	local bullet = Instance.new("Frame")
+	bullet.Name = "bullet"
+	bullet.BorderSizePixel = 0
+
+	bullet.BackgroundColor3 = self.BaseTextColor3
+	bullet.ZIndex = self._gui.ZIndex
+
+	if level == 2 then
+		bullet.Size = UDim2.new(0, 6, 0, 1)
+	else
+		bullet.Size = UDim2.new(0, 4, 0, 4)
+	end
+
+	return bullet
+end
+
+function MarkdownRender:_renderList(listData)
+	assert(type(listData.Level) == "number" and listData.Level > 0)
+
+	local frame = self:_getFrame()
+	frame.Name = ("List_%d"):format(listData.Level)
+	frame.Size = UDim2.new(1, -(listData.Level)*self.Indent, 0, 0)
+	frame.Position = UDim2.new(0, -frame.Size.X.Offset, 0, 0)
+	frame.Parent = self._gui
+
+	local height = 0
+	for index, text in ipairs(listData) do
+		local textLabel = self:_renderParagraph(text, { Parent = frame })
+		textLabel.Name = ("%d_%s"):format(index, textLabel.Name)
+		textLabel.Position = UDim2.new(textLabel.Position.X, UDim.new(0, height))
+
+		local bullet = self:_getBullet(listData.Level)
+		bullet.AnchorPoint = Vector2.new(0.5, 0.5)
+		bullet.Position = UDim2.new(0, -self.Indent/2, 0, self.TextSize/2 + 1)
+		bullet.Parent = textLabel
+
+		height = height + textLabel.Size.Y.Offset + 2
+	end
+
+	frame.Size = UDim2.new(frame.Size.X, UDim.new(0, height))
+
+	return frame
+end
+
+function MarkdownRender:_renderHeader(headerData)
+	local label = self:_getTextLabel()
+	label.Name = "Header" .. headerData.Level
+	label.TextSize = self.TextSize + (5-headerData.Level) * 2
+	label.TextYAlignment = Enum.TextYAlignment.Center
+	label.Parent = self._gui
+
+	self:_renderParagraphLabel(label, headerData.Text)
+	label.Size = UDim2.new(label.Size.X, UDim.new(label.Size.Y.Scale, label.Size.Y.Offset + 6)) -- Extra padding
+
+	local underline = self:_getFrame()
+	underline.Name = "Underline"
+	underline.BackgroundTransparency = 0
+	underline.BackgroundColor3 = Color3.new(0.9, 0.9, 0.9)
+	underline.Size = UDim2.new(1, 0, 0, 1)
+	underline.AnchorPoint = Vector2.new(0, 1)
+	underline.Position = UDim2.new(0, 0, 1, 0)
+	underline.Parent = label
+
+	return label
 end
 
 return MarkdownRender

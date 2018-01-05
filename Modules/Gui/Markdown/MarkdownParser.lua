@@ -5,134 +5,133 @@ local MarkdownParser = {}
 MarkdownParser.__index = MarkdownParser
 MarkdownParser.ClassName = "MarkdownParser"
 
-function MarkdownParser.new(Text)
+function MarkdownParser.new(text)
 	local self = setmetatable({}, MarkdownParser)
-	
-	self.Text = Text or error("No Text")
-	
+
+	self._text = text or error("No text")
+
 	return self
 end
 
 function MarkdownParser:GetLines()
-	local Lines = {}
-	for Line in self.Text:gmatch("([^\r\n]*)[\r\n]") do
-		table.insert(Lines, Line)
+	local lines = {}
+	for line in self._text:gmatch("([^\r\n]*)[\r\n]") do
+		table.insert(lines, line)
 	end
-	return Lines
+	return lines
 end
 
-function MarkdownParser:ParseList(OldLines)
-	local Lines = {}
-	local CurrentList
-	
-	for _, Line in pairs(OldLines) do
-		local Space, Bullet, Text
-	
-		if type(Line) == "string" then
-			Space, Bullet, Text = Line:match("^([ \t]*)([%-%*])%s*(.+)%s*$")
+function MarkdownParser:ParseList(oldLines)
+	local lines = {}
+	local currentList
+
+	for _, line in pairs(oldLines) do
+		local space, bullet, text
+
+		if type(line) == "string" then
+			space, bullet, text = line:match("^([ \t]*)([%-%*])%s*(.+)%s*$")
 		end
-		
-		if Space and Bullet and Text then
-			Space = Space:gsub("    ", "X")
-			Space = Space:gsub(" ", "")
-			Space = Space:gsub("\t", "X")
-			local Level = #Space + 1
-			
-			if CurrentList and CurrentList.Level ~= Level then
-				table.insert(Lines, CurrentList)
-				CurrentList = nil
+
+		if space and bullet and text then
+			space = space:gsub("    ", "X")
+			space = space:gsub(" ", "")
+			space = space:gsub("\t", "X")
+			local Level = #space + 1
+
+			if currentList and currentList.Level ~= Level then
+				table.insert(lines, currentList)
+				currentList = nil
 			end
-			
-			if CurrentList then
-				table.insert(CurrentList, Text)
+
+			if currentList then
+				table.insert(currentList, text)
 			else
-				CurrentList = {}
-				CurrentList.Level = Level
-				CurrentList.Type = "List"
-				
-				table.insert(CurrentList, Text)
+				currentList = {}
+				currentList.Level = Level
+				currentList.Type = "List"
+
+				table.insert(currentList, text)
 			end
 		else
-			if CurrentList then
-				table.insert(Lines, CurrentList)
-				CurrentList = nil
+			if currentList then
+				table.insert(lines, currentList)
+				currentList = nil
 			end
-			table.insert(Lines, Line)
+			table.insert(lines, line)
 		end
 	end
-	
-	if CurrentList then
-		table.insert(Lines, CurrentList)
-		CurrentList = nil
+
+	if currentList then
+		table.insert(lines, currentList)
 	end
-	
-	return Lines
+
+	return lines
 end
-	
-function MarkdownParser:ParseHeaders(OldLines)
-	local Lines = {}
-	
-	for _, Line in pairs(OldLines) do
-		local Hashtags, Text 
-			
-		if type(Line) == "string" then			
-			Hashtags, Text = Line:match("^%s*([#]+)%s*(.+)%s*$")
+
+function MarkdownParser:ParseHeaders(oldLines)
+	local lines = {}
+
+	for _, line in pairs(oldLines) do
+		local poundSymbols, text
+
+		if type(line) == "string" then
+			poundSymbols, text = line:match("^%s*([#]+)%s*(.+)%s*$")
 		end
-		
-		local Level = Hashtags and #Hashtags
-		if Text and Level and Level >= 1 and Level <= 5 then
-			table.insert(Lines, {
+
+		local level = poundSymbols and #poundSymbols
+		if text and level and level >= 1 and level <= 5 then
+			table.insert(lines, {
 				Type = "Header";
-				Level = Level;
-				Text = Text;
+				Level = level;
+				Text = text;
 			})
 		else
-			table.insert(Lines, Line)
+			table.insert(lines, line)
 		end
 	end
-	
-	return Lines
+
+	return lines
 end
 
-function MarkdownParser:ParseParagraphs(OldLines)
-	local Lines = {}
-	
-	local CurrentParagraph
-	for _, Line in pairs(OldLines) do
-		if type(Line) == "table" then
-			table.insert(Lines, Line)
+function MarkdownParser:ParseParagraphs(oldLines)
+	local lines = {}
+
+	local currentParagraph
+	for _, line in pairs(oldLines) do
+		if type(line) == "table" then
+			table.insert(lines, line)
 		else
-			if Line:match("[^%s]") then
-				if CurrentParagraph then
-					CurrentParagraph = CurrentParagraph .. " " .. Line
+			if line:match("[^%s]") then
+				if currentParagraph then
+					currentParagraph = currentParagraph .. " " .. line
 				else
-					CurrentParagraph = Line
+					currentParagraph = line
 				end
 			else
-				if CurrentParagraph then
-					table.insert(Lines, CurrentParagraph)
-					CurrentParagraph = nil
+				if currentParagraph then
+					table.insert(lines, currentParagraph)
+					currentParagraph = nil
 				end
 			end
 		end
 	end
-	
-	if CurrentParagraph then
-		table.insert(Lines, CurrentParagraph)
-		CurrentParagraph = nil
+
+	if currentParagraph then
+		table.insert(lines, currentParagraph)
 	end
-		
-	return Lines
+
+	return lines
 end
 
+--- Parses the given text into a list of lines
 function MarkdownParser:Parse()
-	local Lines = self:GetLines()
-	
-	Lines = self:ParseList(Lines)
-	Lines = self:ParseHeaders(Lines)
-	Lines = self:ParseParagraphs(Lines) -- do this last
-	
-	return Lines
+	local lines = self:GetLines()
+
+	lines = self:ParseList(lines)
+	lines = self:ParseHeaders(lines)
+	lines = self:ParseParagraphs(lines) -- do this last
+
+	return lines
 end
 
 return MarkdownParser
