@@ -8,7 +8,7 @@ return function(parent, childName, timeOut)
 		if result then
 			fulfill(result)
 		else
-			reject("Timed out")
+			reject("timed out")
 		end
 	end)
 end
