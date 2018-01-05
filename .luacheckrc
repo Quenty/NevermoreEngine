@@ -40,7 +40,6 @@ stds.plugin = {
 }
 
 ignore = {
-	-- "611", -- line contains only whitespace
 	"212", -- unused arguments
 	"421", -- shadowing local variable
 	"422", -- shadowing argument
