@@ -8,9 +8,11 @@ local MarkdownRender = {}
 MarkdownRender.__index = MarkdownRender
 MarkdownRender.ClassName = "MarkdownRender"
 MarkdownRender.SpaceAfterParagraph = 10
+MarkdownRender.SpaceAfterHeader = 5
 MarkdownRender.TextSize = 18
 MarkdownRender.Indent = 30
 MarkdownRender.TextColor3 = Color3.fromRGB(56, 56, 56)
+MarkdownRender.MaxHeaderLevel = 3 -- h5 is the largest
 
 --- Creates a new markdown render
 -- @tparam GuiObject gui
@@ -54,16 +56,12 @@ function MarkdownRender:Render(data)
 					height = height + self.SpaceAfterParagraph
 				end
 			elseif item.Type == "Header" then
-				if data[index-1] then -- Add additional spacing for headers
-					height = height + self.SpaceAfterParagraph
-				end
-
 				gui = self:_renderHeader(item)
 				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
 				height = height + gui.Size.Y.Offset
 
 				if index ~= #data then
-					height = height + self.SpaceAfterParagraph
+					height = height + self.SpaceAfterHeader
 				end
 			else
 				error(("Bad data type '%s'"):format(tostring(item.Type)))
@@ -186,9 +184,10 @@ end
 function MarkdownRender:_renderHeader(headerData)
 	local label = self:_getTextLabel()
 	label.Name = "Header" .. headerData.Level
-	label.TextSize = self.TextSize + (5-headerData.Level) * 2
+	label.TextSize = self.TextSize + (self.MaxHeaderLevel-headerData.Level)
 	label.TextYAlignment = Enum.TextYAlignment.Center
 	label.Parent = self._gui
+	label.Font = Enum.Font.SourceSansSemibold
 
 	self:_renderParagraphLabel(label, headerData.Text)
 	label.Size = UDim2.new(label.Size.X, UDim.new(label.Size.Y.Scale, label.Size.Y.Offset + 6)) -- Extra padding
