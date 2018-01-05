@@ -97,7 +97,7 @@ function Promise:IsPending()
 end
 
 --- Yield until the promise is complete
-function Promise:Await()
+function Promise:Wait()
 	if self._fulfilled then
 		return unpack(self._fulfilled)
 	elseif self._rejected then
@@ -191,7 +191,7 @@ function Promise:Then(onFulfilled, onRejected)
 	else
 		self:_executeThen(returnPromise, onFulfilled, onRejected)
 	end
-	
+
 	return returnPromise
 end
 
