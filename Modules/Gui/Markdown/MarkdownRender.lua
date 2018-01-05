@@ -40,7 +40,10 @@ function MarkdownRender:Render(data)
 			gui = self:_renderParagraph(item)
 			gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
 
-			height = height + gui.Size.Y.Offset + self.SpaceAfterParagraph
+			height = height + gui.Size.Y.Offset
+			if index ~= #data then
+				height = height + self.SpaceAfterParagraph
+			end
 		elseif type(item) == "table" then
 			if item.Type == "List" then
 				gui = self:_renderList(item)
@@ -57,7 +60,11 @@ function MarkdownRender:Render(data)
 
 				gui = self:_renderHeader(item)
 				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
-				height = height + gui.Size.Y.Offset + self.SpaceAfterParagraph
+				height = height + gui.Size.Y.Offset
+
+				if index ~= #data then
+					height = height + self.SpaceAfterParagraph
+				end
 			else
 				error(("Bad data type '%s'"):format(tostring(item.Type)))
 			end
