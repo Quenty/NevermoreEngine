@@ -14,7 +14,7 @@ end
 
 function lib.ToCamelCase(str)
 	str = str:lower()
-	str = str:gsub("_(%a)", string.upper)
+	str = str:gsub("[ _](%a)", string.upper)
 	str = str:gsub("^%a", string.upper)
 	return str
 end
