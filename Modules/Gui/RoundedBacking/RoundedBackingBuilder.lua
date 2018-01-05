@@ -11,66 +11,66 @@ function RoundedBackingBuilder.new()
 	return self
 end
 
-function RoundedBackingBuilder:CreateBacking(Gui)
-	local Backing = Instance.new("ImageLabel")
-	Backing.Name = "Backing";
-	Backing.Size = UDim2.new(1, 0, 1, 0)
-	Backing.Image = "rbxassetid://735637144";
-	Backing.SliceCenter = Rect.new(4, 4, 16, 16)
-	Backing.ImageColor3 = Gui.BackgroundColor3
-	Backing.ScaleType = Enum.ScaleType.Slice
-	Backing.BackgroundTransparency = 1
-	Backing.ZIndex = Gui.ZIndex - 1
-	Backing.Parent = Gui
+function RoundedBackingBuilder:CreateBacking(gui)
+	local backing = Instance.new("ImageLabel")
+	backing.Name = "Backing"
+	backing.Size = UDim2.new(1, 0, 1, 0)
+	backing.Image = "rbxassetid://735637144"
+	backing.SliceCenter = Rect.new(4, 4, 16, 16)
+	backing.ImageColor3 = gui.BackgroundColor3
+	backing.ScaleType = Enum.ScaleType.Slice
+	backing.BackgroundTransparency = 1
+	backing.ZIndex = gui.ZIndex - 1
+	backing.Parent = gui
 
-	Gui.BackgroundTransparency = 1
+	gui.BackgroundTransparency = 1
 
-	return Backing
+	return backing
 end
 
 --- Only top two corners are rounded
-function RoundedBackingBuilder:CreateTopBacking(Gui)
-	local Backing = self:CreateBacking(Gui)
-	Backing.ImageRectSize = Vector2.new(20, 16)
-	Backing.SliceCenter = Rect.new(4, 4, 16, 16)
+function RoundedBackingBuilder:CreateTopBacking(gui)
+	local backing = self:CreateBacking(gui)
+	backing.ImageRectSize = Vector2.new(20, 16)
+	backing.SliceCenter = Rect.new(4, 4, 16, 16)
 
-	return Backing
+	return backing
 end
 
 --- Only bottom two corners are rounded
-function RoundedBackingBuilder:CreateBottomBacking(Gui)
-	local Backing = self:CreateBacking(Gui)
-	Backing.ImageRectOffset = Vector2.new(0, 4)
-	Backing.ImageRectSize = Vector2.new(20, 16)
-	Backing.SliceCenter = Rect.new(4, 4, 16, 16)
+function RoundedBackingBuilder:CreateBottomBacking(gui)
+	local backing = self:CreateBacking(gui)
+	backing.ImageRectOffset = Vector2.new(0, 4)
+	backing.ImageRectSize = Vector2.new(20, 16)
+	backing.SliceCenter = Rect.new(4, 4, 16, 16)
 
-	return Backing
+	return backing
 end
 
 
-function RoundedBackingBuilder:CreateShadow(Backing)
-	local Shadow = Instance.new("ImageLabel")
-	Shadow.Name = "Shadow";
-	Shadow.Size = UDim2.new(1, 6, 1, 6);
-	Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
-	Shadow.Position = UDim2.new(0.5, 0, 0.5, 1)
-	Shadow.Image = "rbxassetid://735644155";
-	Shadow.SliceCenter = Rect.new(16, 16, 64, 64)
-	Shadow.ImageColor3 = Color3.new(0, 0, 0)
-	Shadow.ScaleType = Enum.ScaleType.Slice
-	Shadow.BackgroundTransparency = 1
-	Shadow.ImageTransparency = 0.7
-	Shadow.ZIndex = Backing.ZIndex - 1
-	Shadow.Parent = Backing.Parent
+function RoundedBackingBuilder:CreateShadow(backing)
+	local shadow = Instance.new("ImageLabel")
+	shadow.Name = "Shadow"
+	shadow.Size = UDim2.new(1, 6, 1, 6)
+	shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+	shadow.Position = UDim2.new(0.5, 0, 0.5, 1)
+	shadow.Image = "rbxassetid://735644155"
+	shadow.SliceCenter = Rect.new(16, 16, 64, 64)
+	shadow.ImageColor3 = Color3.new(0, 0, 0)
+	shadow.ScaleType = Enum.ScaleType.Slice
+	shadow.BackgroundTransparency = 1
+	shadow.ImageTransparency = 0.7
+	shadow.ZIndex = backing.ZIndex - 1
+	shadow.Parent = backing.Parent
 
-	return Shadow
+	return shadow
 end
 
-function RoundedBackingBuilder:Create(Gui)
-	local Backing = self:CreateBacking(Gui)
-	local Shadow = self:CreateShadow(Backing)	
+function RoundedBackingBuilder:Create(gui)
+	local backing = self:CreateBacking(gui)
+	self:CreateShadow(backing)
 
-	return Backing
+	return backing
 end
 
 
