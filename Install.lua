@@ -11,7 +11,7 @@ local function GetFirstChild(Parent, Name, Class)
 			if Object.Name == Name and Object.ClassName == Class then
 				return Object
 			end
-		end	
+		end
 	end
 
 	local Child = Instance.new(Class)
@@ -85,7 +85,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 		if Link:find("/[^/]+/[^/]+/tree") then
 			FolderCount = FolderCount + 1
 			Folders[FolderCount] = Link
-		elseif Link:find("/[^/]+/[^/]+/blob.+%.lua$") then			
+		elseif Link:find("/[^/]+/[^/]+/blob.+%.lua$") then
 			local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
 
 			if ScriptName:lower() ~= "install" then
@@ -123,7 +123,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 		end
 
 		-- if MainExists or ScriptCount ~= 1 or ScriptName ~= (LastFolder:match("^RBX%-(.-)%-Library$") or LastFolder) then
-		if MainExists then Directory = Directory + 1 end -- :gsub("[^/]+$", "", 1) end			
+		if MainExists then Directory = Directory + 1 end -- :gsub("[^/]+$", "", 1) end
 		local Count = 0
 
 		local function LocateFolder(FolderName)
@@ -196,7 +196,7 @@ function GitHub:Install(Link, Parent, RoutineList)
 			if Directory then
 				ScriptName, ScriptClass = Directory:match("([%w-_%%]+)%.?(%l*)%.lua$")
 			end
-		end		
+		end
 	elseif Directory then
 		local a, b = Directory:find("^[tb][rl][eo][eb]/[^/]+")
 		if a and b then
