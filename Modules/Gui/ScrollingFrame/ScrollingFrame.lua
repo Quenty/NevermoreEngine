@@ -1,4 +1,4 @@
----	Creates an inertia based scrolling frame that is animated and has inertia frames
+--- Creates an inertia based scrolling frame that is animated and has inertia frames
 -- Alternative to a Roblox ScrollingFrame with more control.
 -- @classmod ScrollingFrame
 
