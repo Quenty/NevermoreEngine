@@ -13,7 +13,7 @@ local function GetFirstChild(Parent, Name, Class)
 			end
 		end	
 	end
-	
+
 	local Child = Instance.new(Class)
 	Child.Name = Name
 	Child.Parent = Parent
@@ -105,7 +105,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 			end
 		end
 	end
-	
+
 	if ScriptCount > 0 then
 		local ScriptLink = Scripts[1]
 		local ScriptName, ScriptClass = ScriptLink:match("([%w-_%%]+)%.?(%l*)%.lua$")
@@ -146,7 +146,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 				end
 			end
 		end
-		
+
 		Link:gsub("[^/]+$", ""):gsub("[^/]+", LocateFolder)
 
 		if MainExists or ScriptCount ~= 1 or ScriptName ~= LastFolder then
@@ -156,7 +156,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 		local Script = GetFirstChild(Parent, ScriptName, ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"])
 		if not Routines[1] then Routines[1] = Script end
 		coroutine.resume(coroutine.create(GiveSourceToScript), "https://raw.githubusercontent.com" .. ScriptLink:gsub("(/[^/]+/[^/]+/)blob/", "%1", 1), Script)
-		
+
 		if MainExists then
 			Parent = Script
 		end
@@ -235,9 +235,9 @@ function GitHub:Install(Link, Parent, RoutineList)
 		Link = Website .. Organization
 		local Data = GetAsync(Link .. "?tab=repositories")
 		local Object = GetFirstChild(Parent, Organization, "Folder")
-		
+
 		if not Routines[1] then Routines[1] = Object end
-		
+
 		for Link, Data in Data:gmatch('<a href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository">(.-)</div>') do
 			if not Data:match("Forked from") and not Link:find("Plugin") then
 				GitHub:Install(Link, Object, Routines)
@@ -268,5 +268,5 @@ function GitHub:Install(Link, Parent, RoutineList)
 end
 
 GitHub:Install("https://github.com/Quenty/NevermoreEngine/tree/version2/Modules", game:GetService("ServerScriptService")).Name = "Nevermore"
-GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/App/NevermoreEngine.lua", game:GetService("ReplicatedStorage"))
+GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/App/Nevermore.lua", game:GetService("ReplicatedStorage"))
 HttpService.HttpEnabled = ...
