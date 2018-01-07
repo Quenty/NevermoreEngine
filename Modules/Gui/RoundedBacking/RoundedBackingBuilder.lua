@@ -37,6 +37,24 @@ function RoundedBackingBuilder:CreateTopBacking(gui)
 	return backing
 end
 
+function RoundedBackingBuilder:CreateLeftBacking(gui)
+	local backing = self:CreateBacking(gui)
+	backing.ImageRectSize = Vector2.new(16, 20)
+	backing.SliceCenter = Rect.new(4, 4, 16, 16)
+
+	return backing
+end
+
+function RoundedBackingBuilder:CreateRightBacking(gui)
+	local backing = self:CreateBacking(gui)
+	backing.ImageRectSize = Vector2.new(16, 20)
+	backing.SliceCenter = Rect.new(4, 4, 16, 16)
+	backing.ImageRectOffset = Vector2.new(4, 0)
+
+	return backing
+end
+
+
 --- Only bottom two corners are rounded
 function RoundedBackingBuilder:CreateBottomBacking(gui)
 	local backing = self:CreateBacking(gui)
