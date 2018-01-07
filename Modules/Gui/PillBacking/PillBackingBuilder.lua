@@ -15,7 +15,7 @@ PillBackingBuilder.SHADOW_SIZE = Vector2.new(128, 128)
 PillBackingBuilder.PILL_SHADOW_IMAGE_ID = "rbxassetid://1304004290"
 PillBackingBuilder.PILL_SHADOW_SIZE = Vector2.new(256, 128)
 PillBackingBuilder.SHADOW_OFFSET_Y = UDim.new(0.05, 0)
-PillBackingBuilder.SHADOW_TRANSPARENCY = 0.7
+PillBackingBuilder.SHADOW_TRANSPARENCY = 0.85
 
 function PillBackingBuilder.new(options)
 	local self = setmetatable({}, PillBackingBuilder)
