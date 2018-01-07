@@ -135,13 +135,16 @@ function lib.Overwrite(target, source)
 end
 
 --- Sets a metatable on a table such that it errors when
--- indexing an undefined value
+-- indexing a nil value
 -- @tparam table table Table to error on indexing
 -- @treturn table table The same table
-function lib.ErrorOnBadIndex(table)
+function lib.ReadOnly(table)
 	return setmetatable(table, {
-		__index = function(self, Index)
-			error(("Bad index '%s'"):format(tostring(Index)))
+		__index = function(self, index)
+			error(("Bad index '%s'"):format(tostring(index)))
+		end;
+		__newindex = function(self, index, value)
+			error(("Bad index '%s'"):format(tostring(index)))
 		end;
 	})
 end
