@@ -39,22 +39,13 @@ local function GetBoundingBox(Objects, RelativeTo)
 end
 lib.GetBoundingBox = GetBoundingBox
 
-
-local function EncodeCFrame(CFrameValue)
-	--- Encodes a CFrameValue in JSON
-
-	local NewData = {
-		CFrameValue:components();
-	}
-
-	return HttpService:JSONEncode(NewData)
-	--return RbxUtility.EncodeJSON(NewData)
+--- Encodes a CFrameValue in JSON
+function lib.EncodeCFrame(CFrameValue)
+	return HttpService:JSONEncode({ CFrameValue:components() })
 end
-lib.EncodeCFrame = EncodeCFrame
 
-local function DecodeCFrame(Data)
-	--- decode's a previously encoded CFrameValue.
-	
+--- Decode's a previously encoded CFrameValue.
+function lib.DecodeCFrame(Data)
 	if Data then
 		local DecodedData = HttpService:JSONDecode(Data)
 		if DecodedData then
@@ -66,143 +57,6 @@ local function DecodeCFrame(Data)
 		return nil
 	end
 end
-lib.DecodeCFrame = DecodeCFrame
-
-local function QuaternionFromCFrame(cf)
-	local mx,  my,  mz,
-	      m00, m01, m02,
-	      m10, m11, m12,
-	      m20, m21, m22 = cf:components()
-	local trace = m00 + m11 + m22
-	if trace > 0 then
-		local s = math.sqrt(1 + trace)
-		local recip = 0.5/s
-		return (m21-m12)*recip, (m02-m20)*recip, (m10-m01)*recip, s*0.5
-	else
-		local i = 0
-		if m11 > m00 then i = 1 end
-		if m22 > (i == 0 and m00 or m11) then i = 2 end
-		if i == 0 then
-			local s = math.sqrt(m00-m11-m22+1)
-			local recip = 0.5/s
-			return 0.5*s, (m10+m01)*recip, (m20+m02)*recip, (m21-m12)*recip
-		elseif i == 1 then
-			local s = math.sqrt(m11-m22-m00+1)
-			local recip = 0.5/s
-			return (m01+m10)*recip, 0.5*s, (m21+m12)*recip, (m02-m20)*recip
-		elseif i == 2 then
-			local s = math.sqrt(m22-m00-m11+1)
-			local recip = 0.5/s
-			return (m02+m20)*recip, (m12+m21)*recip, 0.5*s, (m10-m01)*recip
-		end
-	end
-end
-lib.QuaternionFromCFrame = QuaternionFromCFrame;
-lib.quaternionFromCFrame = QuaternionFromCFrame;
-
-local function QuaternionToCFrame(px, py, pz, x, y, z, w)
-	-- return CFrame.new(x, py, pz, x, y, z, w)
-	
-	---[[
-	local xs, ys, zs = x + x, y + y, z + z
-	local wx, wy, wz = w*xs, w*ys, w*zs
-	--
-	local xx = x*xs
-	local xy = x*ys
-	local xz = x*zs
-	local yy = y*ys
-	local yz = y*zs
-	local zz = z*zs
-	--
-	return CFrame.new(px,        py,        pz,
-	                  1-(yy+zz), xy - wz,   xz + wy,
-	                  xy + wz,   1-(xx+zz), yz - wx,
-	                  xz - wy,   yz + wx,   1-(xx+yy))--]]
-end
-lib.QuaternionToCFrame = QuaternionToCFrame;
-lib.quaternionToCFrame = QuaternionToCFrame;
-
-
-local function QuaternionSlerp(a, b, t)
-	local cosTheta = a[1]*b[1] + a[2]*b[2] + a[3]*b[3] + a[4]*b[4]
-	local startInterp, finishInterp;
-	if cosTheta >= 0.0001 then
-		if (1 - cosTheta) > 0.0001 then
-			local theta = math.acos(cosTheta)
-			local invSinTheta = 1/math.sin(theta)
-			startInterp = math.sin((1-t)*theta)*invSinTheta
-			finishInterp = math.sin(t*theta)*invSinTheta 
-		else
-			startInterp = 1-t
-			finishInterp = t
-		end
-	else
-		if (1+cosTheta) > 0.0001 then
-			local theta = math.acos(-cosTheta)
-			local invSinTheta = 1/math.sin(theta)
-			startInterp = math.sin((t-1)*theta)*invSinTheta
-			finishInterp = math.sin(t*theta)*invSinTheta
-		else
-			startInterp = t-1
-			finishInterp = t
-		end
-	end
-	return a[1]*startInterp + b[1]*finishInterp,
-	       a[2]*startInterp + b[2]*finishInterp,
-	       a[3]*startInterp + b[3]*finishInterp,
-	       a[4]*startInterp + b[4]*finishInterp	       
-end
-lib.QuaternionSlerp = QuaternionSlerp;
-lib.quaternionSlerp = QuaternionSlerp;
---]==]
-
-local function TweenPart(part, a, b, length)
-	local qa = {QuaternionFromCFrame(a)}
-	local qb = {QuaternionFromCFrame(b)}
-	local ax, ay, az = a.x, a.y, a.z
-	local bx, by, bz = b.x, b.y, b.z
-	--
-	local c = 0
-	local tot = 0
-	--
-	local startTime = tick()
-	while true do
-		wait()
-		local t = (tick()-startTime)/length
-		local _t = 1-t
-		if t > 1 then break end
-		local startT = tick()
-		local cf = QuaternionToCFrame(_t*ax + t*bx, _t*ay + t*by, _t*az + t*bz,
-			                             QuaternionSlerp(qa, qb, t))
-		tot = tot+(tick()-startT)
-		c = c + 1
-		part.CFrame = cf
-	end
-	--print("Average Cost Per Slerp+ToCFrame:", string.format("%.4fms", tot/c*1000))
-end
-lib.TweenPart = TweenPart;
-lib.tweenPart = TweenPart;
-
-
-local function SlerpCFrame(a, b, scale)
-	-- Same thing as lerp, but with rotation, scale is mapped between 0 and 1... 
-
-	local qa = {QuaternionFromCFrame(a)}
-	local qb = {QuaternionFromCFrame(b)}
-	local ax, ay, az = a.x, a.y, a.z
-	local bx, by, bz = b.x, b.y, b.z
-
-
-	local _scale = 1-scale;
-	--print(scale, _scale)
-	return QuaternionToCFrame(_scale * ax + scale*bx, _scale*ay + scale*by, _scale*az + scale*bz,
-	                                   QuaternionSlerp(qa, qb, scale))
-end
-lib.QuaternionSlerpCFrame = SlerpCFrame;
-lib.quaternionSlerpCFrame = SlerpCFrame;
-
-lib.SlerpCFrame = SlerpCFrame;
-lib.slerpCFrame = SlerpCFrame;
 
 do
 	local v3 = Vector3.new
@@ -223,69 +77,47 @@ do
 
 	lib.FastSlerp = AxisAngleInterpolate
 	lib.fastSlerp = AxisAngleInterpolate
-
 end
 
 local toObjectSpace = CFrame.new().toObjectSpace
 local toWorldSpace  = CFrame.new().toWorldSpace
 
-local function TransformModel(Objects, Center, NewLocation)
-	--- MoveModel
 
-	-- Transforms a group of bricks (Objects) relative to Center to the NewLocation CFrame (NewLocation).  
-	-- @param Objects is a table of all the ROBLOX parts. It needs to know the parts it's moving. 
-	-- @param Center CFrame, Center is the current center of the model. This will be moved to "NewLocation", and all the other parts will follow, relative to Center
-	-- @param NewLocation CFrame, The new location to move it to
+--- Function factory. Returns a function that will transform all Objects (in the table sent) to the new position, relative to center
+-- @param Objects the objects to transform, should be an an array. Should only be BaseParts. Should be nonempty
+-- @param Center CFrame, the center of the objects. Suggested that it is either the model's GetPrimaryPartCFrame() or one of the Object's CFrame.
+-- @return The transformer function
 
-	-- NewLocation is the new center of the model.
+-- The model is transformed so the "Center"'s CFrame is now the new NewLocation. It respects rotation.
+-- An example would be the "Seat" of a car. If you transform the "Seat" to be the CFrame of a Player's Torso, the seat will be moved
+-- to the new location, and the rest of the car will follow, that is to say, it will move relative to the cframe.
 
+-- If relative positions change relative to the center, and these new changes are to be respected, the transformer must be reconstructed.
+function lib.MakeModelTransformer(objects, Center)
+	local relative = {}
 
-	for _, BasePart in pairs(Objects) do
-		BasePart.CFrame = toWorldSpace(NewLocation, toObjectSpace(Center, BasePart.CFrame))
+	for _, Part in pairs(objects) do
+		relative[Part] = toObjectSpace(Center, Part.CFrame)
 	end
-end
-lib.TransformModel = TransformModel
-lib.transformModel = TransformModel
-
-local function MakeModelTransformer(Objects, Center)
-	--- Function factory. Returns a function that will transform all Objects (in the table sent) to the new position, relative to center
-	-- @param Objects the objects to transform, should be an an array. Should only be BaseParts. Should be nonempty
-	-- @param Center CFrame, the center of the objects. Suggested that it is either the model's GetPrimaryPartCFrame() or one of the Object's CFrame.
-	-- @return The transformer function
-
-	-- The model is transformed so the "Center"'s CFrame is now the new NewLocation. It respects rotation.
-	-- An example would be the "Seat" of a car. If you transform the "Seat" to be the CFrame of a Player's Torso, the seat will be moved
-	-- to the new location, and the rest of the car will follow, that is to say, it will move relative to the cframe.
-
-	-- If relative positions change relative to the center, and these new changes are to be respected, the transformer must be reconstructed.
-
-	local RelativePositions = {}
-
-	for _, Part in pairs(Objects) do
-		RelativePositions[Part] = toObjectSpace(Center, Part.CFrame)
-	end
-	Objects = nil
 
 	return function(NewLocation)
 		--- Transforms the model to the NewLocation
 		-- @param NewLocation A new CFrame to transform the model to.
 
-		for Part, Position in pairs(RelativePositions) do
+		for Part, Position in pairs(relative) do
 			Part.CFrame = toWorldSpace(NewLocation, Position)
 		end
 	end
 end
-lib.MakeModelTransformer = MakeModelTransformer
-lib.makeModelTransformer = MakeModelTransformer
 
 local pointToObjectSpace = CFrame.new().pointToObjectSpace
 lib.pointToObjectSpace = pointToObjectSpace
 lib.PointToObjectSpace = pointToObjectSpace
 
-local function PointInsidePart(Part, Point)
+function lib.PointInsidePart(Part, Point)
 	--- Return's whether a point is inside of a part.
 	-- @param Part The part to check. May also be a table with a .Size and .CFrame value in it.
-	
+
 	local PartSize = Part.Size/2
 	local RelativePosition = Part.CFrame:pointToObjectSpace(Point)
 	--print(RelativePosition, PartSize)
@@ -297,131 +129,16 @@ local function PointInsidePart(Part, Point)
 		return false
 	end
 
-	return true	
-end
-lib.PointInsidePart = PointInsidePart
-lib.pointInsidePart = PointInsidePart
-
-
-local FindPartOnRayWithIgnoreList = workspace.FindPartOnRayWithIgnoreList
-
-local function AdvanceRaycast(RayTrace, IgnoreList, TransparencyThreshold, IgnoreCanCollideFalse, TerrainCellsAreCubes, MaximumCastCount, CustomCondition)
-	-- @param TransparencyThreshold The transparency a part can be for it to be counted. For example, if TransparencyThreshold is 0.25, and a part is 0.24 transparency then it will be counted as solid, otherwise if it
-	--                              is 0.26 then it will be counted as transparent.
-	--                              If you don't want to hit transparent parts, then you can set it to -math.huge.
-	--                              TransparencyThreshold should not be above 1, probably. 
-	-- @param [CustomCondition] A function that can be defined to create a custom condition (such as making sure a character is hit)
-	-- CustomCondition(HitObject, Position)
-			-- @return boolean If true, then it will automatically abort the cycle and return. 
-
-	assert(type(MaximumCastCount) == "number", "MaximumCastCount is not a number")
-	assert(type(TransparencyThreshold) == "number", "TransparencyThreshold must be a number")
-
-	--print(TransparencyThreshold)
-
-	local ContinueCasting = true;
-	local CastCount = 0
-
-	local function CastAttempt(NewRayTrace)
-		-- print("Cast attempt " .. CastCount)
-
-		if CastCount >= MaximumCastCount then
-			return
-		else
-			CastCount = CastCount + 1
-		end
-
-		local Object, Position = FindPartOnRayWithIgnoreList(workspace, NewRayTrace, IgnoreList, TerrainCellsAreCubes)
-
-		if Object and Position then
-			if CustomCondition and CustomCondition(Object, Position) then
-				-- print("Custom override")
-				return Object, Position
-			elseif IgnoreCanCollideFalse and Object.CanCollide == false then
-				IgnoreList[#IgnoreList+1] = Object
-
-				-- print("Hit something cancollide false", Object:GetFullName())
-				return CastAttempt(NewRayTrace)
-			elseif TransparencyThreshold and Object.Transparency >= TransparencyThreshold then
-				IgnoreList[#IgnoreList+1] = Object
-				
-				-- print("Hit something transparent false", Object:GetFullName())
-				return CastAttempt(NewRayTrace)
-			else
-				return Object, Position
-			end
-		else
-			-- print("Just didn't hit anything")
-			return
-		end
-	end
-
-	local DirectionUnit = RayTrace.Direction.unit
-	local Magnitude = RayTrace.Direction.magnitude
-	local CastedMagnitude = 0
-
-	--game:GetService("Debris"):AddItem(
-	-- lib.DrawRay(RayTrace, BrickColor.new("Bright orange"))
-	--, 2)
-
-	while CastedMagnitude < Magnitude do
-		local ToCastMagnitude = Magnitude - CastedMagnitude
-
-		if ToCastMagnitude > 999.5 then
-			ToCastMagnitude = 999
-		end
-
-		local WaysAlongPath = RayTrace.Origin + (DirectionUnit * CastedMagnitude)
-		local NewRayTrace = Ray.new(WaysAlongPath, DirectionUnit * ToCastMagnitude)
-		local Object, Position = CastAttempt(NewRayTrace)
-
-		-- game:GetService("Debris"):AddItem(
-		--	lib.DrawRay(NewRayTrace, BrickColor.new("Bright green"))
-		--, 2)
-
-		if Object then
-			return Object, Position
-		end
-
-		CastedMagnitude = CastedMagnitude + ToCastMagnitude
-
-		if CastCount >= MaximumCastCount then
-			print("[AdvanceRaycast] - Reached maximum cast count @ " .. CastCount .. "; MaximumCastCount = " .. MaximumCastCount)
-			return nil
-		end
-	end
+	return true
 end
 
---[[
-local function AdvanceRaycast(Ray, IgnoreList, IgnoreInvisible, IgnoreCollisions, TerrainCellsAreCubes, MaximumDepth)
-	-- Abuses raycasing to force ignoring of invisible and collision parts.
-	-- @param MaximumDepth The max iterations possible.
-
-	-- IgnoreList should be a metatable __mode = "k"
-	MaximumDepth = MaximumDepth and MaximumDepth - 1 or 10
-
-	-- print("Advance raycast @ " .. MaximumDepth)
-	local Object, Position = FindPartOnRayWithIgnoreList(workspace, Ray, IgnoreList, TerrainCellsAreCubes)
-	if not Object or ((Object.CanCollide == IgnoreCollisions or not IgnoreCollisions) and (Object.Transparency < 1 or not IgnoreInvisible)) then
-		return Object, Position
-	elseif MaximumDepth > 0 then
-		IgnoreList[#IgnoreList + 1] = Object
-		return AdvanceRaycast(Ray, IgnoreList, IgnoreInvisible, IgnoreCollisions, TerrainCellsAreCubes, MaximumDepth)
-	else
-		return nil, nil
-	end
-end--]]
-lib.AdvanceRaycast = AdvanceRaycast
-lib.advanceRaycast = AdvanceRaycast
-
+--- Weld's 2 parts together
+-- @param Part0 The first part
+-- @param Part1 The second part (Dependent part most of the time).
+-- @param [JointType] The type of joint. Defaults to weld.
+-- @param [WeldParent] Parent of the weld, Defaults to Part0 (so GC is better).
+-- @return The weld created.
 local function WeldTogether(Part0, Part1, JointType, WeldParent)
-	--- Weld's 2 parts together
-	-- @param Part0 The first part
-	-- @param Part1 The second part (Dependent part most of the time).
-	-- @param [JointType] The type of joint. Defaults to weld.
-	-- @param [WeldParent] Parent of the weld, Defaults to Part0 (so GC is better).
-	-- @return The weld created.
-
 	JointType = JointType or "Weld"
 
 	local NewWeld = Instance.new(JointType)
@@ -434,13 +151,12 @@ local function WeldTogether(Part0, Part1, JointType, WeldParent)
 	return NewWeld
 end
 lib.WeldTogether = WeldTogether
-lib.WeldTogether = WeldTogether
 
+-- @param Parts The Parts to weld. Should be anchored to prevent really horrible results.
+-- @param MainPart The part to weld the model to (can be in the model).
+-- @param [JointType] The type of joint. Defaults to weld. 
+-- @parm DoNotUnanchor Boolean, if true, will not unachor the model after cmopletion.
 local function WeldParts(Parts, MainPart, JointType, DoNotUnanchor)
-	-- @param Parts The Parts to weld. Should be anchored to prevent really horrible results.
-	-- @param MainPart The part to weld the model to (can be in the model).
-	-- @param [JointType] The type of joint. Defaults to weld. 
-	-- @parm DoNotUnanchor Boolean, if true, will not unachor the model after cmopletion.
 
 	for _, Part in pairs(Parts) do
 		if Part ~= MainPart then
@@ -456,7 +172,6 @@ local function WeldParts(Parts, MainPart, JointType, DoNotUnanchor)
 	end
 end
 lib.WeldParts = WeldParts
-lib.weldParts = WeldParts
 
 local function GetSurfaceNormal(Part, Vector)
 	--[[
@@ -482,19 +197,6 @@ local function GetSurfaceNormal(Part, Vector)
 	return normal
 end
 lib.GetSurfaceNormal = GetSurfaceNormal
-lib.getSurfaceNormal = GetSurfaceNormal
---[[
-You can think of a CFrame as a set of the lookVectors of 3 of the faces of a part.
-
-Really all I do is:
--Take one of the two directions that _isn't_ "up" from the current CFrame
--Construct a new direction that removes all of that direction's y component, and normalizes the direction to a new unit vector.
--Constructs a CFrame from that vector and the "up" vector (the third vector can be found from the other two).
-
-~ Stravant
-http://www.roblox.com/Forum/ShowPost.aspx?PostID=78453245
-]]
-
 
 local function GetRightVector(CFrameValue)
 	--- Get's the right vector of a CFrame Value
@@ -505,7 +207,6 @@ local function GetRightVector(CFrameValue)
 	return Vector3.new(r4,r7,r10)
 end
 lib.GetRightVector = GetRightVector
-lib.getRightVector = GetRightVector
 
 local function GetLeftVector(CFrameValue)
 	--- Get's the left vector of a CFrame Value
@@ -516,7 +217,6 @@ local function GetLeftVector(CFrameValue)
 	return Vector3.new(-r4,-r7,-r10)
 end
 lib.GetLeftVector = GetLeftVector
-lib.getLeftVector = GetLeftVector
 
 local function GetTopVector(CFrameValue)
 	--- Get's the top vector of a CFrame Value
@@ -527,7 +227,6 @@ local function GetTopVector(CFrameValue)
 	return Vector3.new(r5,r8,r11)
 end
 lib.GetTopVector = GetTopVector
-lib.getTopVector = GetTopVector
 
 local function GetBottomVector(CFrameValue)
 	--- Get's the bottom vector of a CFrame Value
@@ -538,7 +237,6 @@ local function GetBottomVector(CFrameValue)
 	return Vector3.new(-r5,-r8,-r11)
 end
 lib.GetBottomVector = GetBottomVector
-lib.getBottomVector = GetBottomVector
 
 local function GetBackVector(CFrameValue)
 	--- Get's the back vector of a CFrame Value
@@ -549,7 +247,6 @@ local function GetBackVector(CFrameValue)
 	return Vector3.new(r6,r9,r12)
 end
 lib.GetBackVector = GetBackVector
-lib.getBackVector = GetBackVector
 
 local function GetFrontVector(CFrameValue)
 	--- Get's the front vector of a CFrame Value
@@ -560,7 +257,6 @@ local function GetFrontVector(CFrameValue)
 	return Vector3.new(-r6,-r9,-r12)
 end
 lib.GetFrontVector = GetFrontVector
-lib.getFrontVector = GetFrontVector
 
 local function GetCFrameFromTopBack(CFrameAt, Top, Back)
 	--- Get's the CFrame fromt he "top back" vector. or something
@@ -573,23 +269,19 @@ local function GetCFrameFromTopBack(CFrameAt, Top, Back)
 	)
 end
 lib.GetCFrameFromTopBack = GetCFrameFromTopBack
-lib.getCFrameFromTopBack = GetCFrameFromTopBack
 
-local function GetRotationInXZPlane(CFrameValue)
+function lib.GetRotationInXZPlane(CFrameValue)
 	--- Get's the rotation in the XZ plane (global).
 
 	local Back = GetBackVector(CFrameValue)
-	return GetCFrameFromTopBack(CFrameValue.p, 
+	return GetCFrameFromTopBack(CFrameValue.p,
 		Vector3.new(0,1,0), -- Top lookVector (straight up)
 		Vector3.new(Back.x, 0, Back.z).unit -- Right facing direction (removed Y axis.)
 	)
 end
-lib.GetRotationInXZPlane = GetRotationInXZPlane
-lib.getRotationInXZPlane = GetRotationInXZPlane
 
-
-local function FindFaceFromCoord(Size, RelativePosition)
-	--- Find's a faces coordanate given it's size and RelativePosition.
+--- Find's a faces coordanate given it's size and RelativePosition.
+function lib.lib.FindFaceFromCoord(Size, RelativePosition)
 
 	local pa, pb = -Size/2, Size/2
 	local dx = math.min(math.abs(RelativePosition.x - pa.x), math.abs(RelativePosition.x - pb.x))
@@ -613,35 +305,21 @@ local function FindFaceFromCoord(Size, RelativePosition)
 			return Enum.NormalId.Front --'Front'
 		else
 			return Enum.NormalId.Back --'Back'
-		end	
-	end 
+		end
+	end
 end
-lib.FindFaceFromCoord = FindFaceFromCoord
-lib.findFaceFromCoord = FindFaceFromCoord
 
-local function GetCFramePitch(Angle)
-	-- returns CFrame.Angles(Angle, 0, 0) 
-
-	return CFrame.Angles(Angle, 0, 0)
+function lib.GetCFramePitch(angle)
+	return CFrame.Angles(angle, 0, 0)
 end
-lib.GetCFramePitch = GetCFramePitch
-lib.getCFramePitch = GetCFramePitch
 
-local function GetCFrameYaw(Angle)
-	-- returns CFrame.Angles(0, Angle, 0) 
-
-	return CFrame.Angles(0, Angle, 0)
+function lib.GetCFrameYaw(angle)
+	return CFrame.Angles(0, angle, 0)
 end
-lib.GetCFrameYaw = GetCFrameYaw
-lib.getCFrameYaw = GetCFrameYaw
 
-local function GetCFrameRoll(Angle)
-	-- returns CFrame.Angles(0, 0, Angle) 
-
-	return CFrame.Angles(0, 0, Angle)
+function lib.GetCFrameRoll(angle)
+	return CFrame.Angles(0, 0, angle)
 end
-lib.GetCFrameRoll = GetCFrameRoll
-lib.getCFrameRoll = GetCFrameRoll
 
 local function GetPitchFromLookVector(Vector)
 	-- Returns pitch of a Vector
@@ -649,7 +327,6 @@ local function GetPitchFromLookVector(Vector)
 	return -math.asin(Vector.Y) + math.pi/2
 end
 lib.GetPitchFromLookVector = GetPitchFromLookVector
-lib.getPitchFromLookVector = GetPitchFromLookVector
 
 local function GetYawFromLookVector(Vector)
 	-- Returns yaw of a Vector
@@ -657,7 +334,6 @@ local function GetYawFromLookVector(Vector)
 	return -math.atan2(Vector.Z, Vector.X) - math.pi/2
 end
 lib.GetYawFromLookVector = GetYawFromLookVector
-lib.getYawFromLookVector = GetYawFromLookVector
 
 local function GetRollFromCFrame(CFrameValue)
 	-- Returns roll of a CFrame
@@ -668,76 +344,18 @@ local function GetRollFromCFrame(CFrameValue)
 	return math.atan2(Vector.Y, Vector.X)
 end
 lib.GetRollFromCFrame = GetRollFromCFrame
-lib.getRollFromCFrame = GetRollFromCFrame
 
-local function DrawRay(Ray, Color, Parent, MeshDiameter)
-	--- Draw's a ray out (for debugging)
-	-- Credit to Cirrus for initial code.
-	
-	MeshDiameter = MeshDiameter or 0.2
-	local Diameter = 0.2
-	Parent = Parent or workspace
 
-	local NewPart = Instance.new("Part")
-
-	NewPart.FormFactor = "Custom"
-	NewPart.Size       = Vector3.new(1 * Diameter, Ray.Direction.magnitude, 1 * Diameter)
-	
-	local Center = Ray.Origin + Ray.Direction/2
-	-- lib.DrawPoint(Ray.Origin).Name = "origin"
-	-- lib.DrawPoint(Center).Name = "Center"
-	-- lib.DrawPoint(Ray.Origin + Ray.Direction).Name = "Destination"
-
-	NewPart.CFrame     = CFrame.new(Center, Ray.Origin + Ray.Direction) * CFrame.Angles(math.pi/2, 0, 0) --* GetCFramePitch(math.pi/2)
-	NewPart.Anchored   = true
-	NewPart.CanCollide = false
-	NewPart.Transparency = 0.5
-	NewPart.BrickColor = Color or BrickColor.new("Bright red")
-	NewPart.Name = "DrawnRay"
-	
-	local Mesh = Instance.new("SpecialMesh")
-	Mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(MeshDiameter, 0, MeshDiameter) / Diameter
-	Mesh.Parent = NewPart
-	
-	NewPart.Parent = Parent
-
-	return NewPart
-end
-lib.DrawRay = DrawRay
-lib.drawRay = DrawRay
-
-local function DrawPoint(Position, Color, Parent, Diameter)
-	--- FOR DEBUGGING
-
-	local NewDraw = Instance.new("Part")
-	NewDraw.Size = Vector3.new(1, 1, 1) * (Diameter or 1)
-	NewDraw.Transparency = 0.5
-	NewDraw.BrickColor = Color or BrickColor.new("Bright red")
-	NewDraw.Name = "PointRender"
-	NewDraw.Archivable = false
-	NewDraw.Anchored = true
-	NewDraw.CanCollide = false
-	NewDraw.TopSurface = Enum.SurfaceType.Smooth
-	NewDraw.BottomSurface = Enum.SurfaceType.Smooth
-	NewDraw.Shape = Enum.PartType.Ball
-	NewDraw.CFrame = CFrame.new(Position);
-	NewDraw.Parent = Parent or workspace
-
-	return NewDraw
-end
-lib.DrawPoint = DrawPoint
-lib.drawPoint = DrawPoint
-
+--- Return's the slope of the surface a character is walking upon.
+-- @param Part The part the ray found
+-- @param Position A vector on the Part's surface, probably the one the ray found
+-- @return The Angle, in radians, that was calculated.
+-- 		0 radians should be level
+--		math.pi/2 radians should be straight up and down?
+-- If it's past that, I'm not sure how it happened.
 local function GetSlopeRelativeToGravity(Part, Position)
-	--- Return's the slope of the surface a character is walking upon.
-	-- @param Part The part the ray found
-	-- @param Position A vector on the Part's surface, probably the one the ray found
-	-- @return The Angle, in radians, that was calculated.
-	-- 		0 radians should be level
-	--		math.pi/2 radians should be straight up and down?
-	-- If it's past that, I'm not sure how it happened.
 
-	local Face = FindFaceFromCoord(Part.Size, Part.CFrame:toObjectSpace(CFrame.new(Position)))
+	local Face = lib.FindFaceFromCoord(Part.Size, Part.CFrame:toObjectSpace(CFrame.new(Position)))
 	if Face then
 		local SlopeDirection = ((Part.CFrame - Part.Position) * Vector3.FromNormalId(Face)).unit
 
@@ -751,18 +369,16 @@ local function GetSlopeRelativeToGravity(Part, Position)
 	end
 end
 lib.GetSlopeRelativeToGravity = GetSlopeRelativeToGravity
-lib.getSlopeRelativeToGravity = GetSlopeRelativeToGravity
 
+--- Return's the slope of the surface a character is walking upon relative to their direction.
+-- @param Part The part the ray found
+-- @param Position A vector on the Part's surface, probably the one the ray found
+-- @return The Angle, in radians, that was calculated.
+-- 		0 radians should be level
+--		math.pi/2 radians should be straight up and down?
+-- If it's past that, I'm not sure how it happened.
 local function GetSlopeRelativeToVector(Part, Position, Vector)
-	--- Return's the slope of the surface a character is walking upon relative to their direction.
-	-- @param Part The part the ray found
-	-- @param Position A vector on the Part's surface, probably the one the ray found
-	-- @return The Angle, in radians, that was calculated.
-	-- 		0 radians should be level
-	--		math.pi/2 radians should be straight up and down?
-	-- If it's past that, I'm not sure how it happened.
-
-	local Face = FindFaceFromCoord(Part.Size, Part.CFrame:toObjectSpace(CFrame.new(Position)))
+	local Face = lib.FindFaceFromCoord(Part.Size, Part.CFrame:toObjectSpace(CFrame.new(Position)))
 	if Face then
 		local SlopeDirection = ((Part.CFrame - Part.Position) * Vector3.FromNormalId(Face)).unit
 
@@ -774,18 +390,14 @@ local function GetSlopeRelativeToVector(Part, Position, Vector)
 	end
 end
 lib.GetSlopeRelativeToVector = GetSlopeRelativeToVector
-lib.getSlopeRelativeToVector = GetSlopeRelativeToVector
 
+
+--- Creates a new CFrame based upon another CFrame, a Vector to look at, and a time (t) to scale [0, 1]
+-- "perfect rotation"
+-- @param c The CFrame (base)
+-- @param v The vector to look at. Target.
+-- @param t The spherical interpolation between c and v (target).
 local function LookCFrame(c,v,t)
-	--- TREY REYNOLDS FOR ALL THE THINGZ
-
-	--- Creates a new CFrame based upon another CFrame, a Vector to look at, and a time (t) to scale [0, 1]
-	-- "perfect rotation"
-
-	-- @param c The CFrame (base)
-	-- @param v The vector to look at. Target.
-	-- @param t The spherical interpolation between c and v (target).
-
 	local t,v=t and t/2 or 0.5,(c:inverse()*v).unit
 	local an=math.abs(v.z)<1 and math.acos(-v.z)
 	local l=an and (math.sin(t*an)*v-Vector3.new(0,0,math.sin((1-t)*an)))/math.sin(an)
@@ -795,13 +407,11 @@ lib.LookCFrame = LookCFrame
 
 do
 	local Dot = Vector3.new().Dot
-	
+
 	local function VectorClosestPointOnRayAToRayB(ao,ad,bo,bd)
 		local n=Dot(bd,ad)*bd-Dot(bd,bd)*ad
 		return ao-Dot(ao-bo,n)/Dot(ad,n)*ad
 	end
-
-
 	lib.VectorClosestPointOnRayAToRayB = VectorClosestPointOnRayAToRayB
 end
 
