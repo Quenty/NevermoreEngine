@@ -259,13 +259,13 @@ ScrollingFrame.__index = ScrollingFrame
 
 --- Creates a new ScrollingFrame which can be used. Prefer Container.Active = true so scroll wheel works.
 -- Container should be in a Frame with ClipsDescendants = true
-function ScrollingFrame.new(Gui)
-	local self = setmetatable(BaseScroller.new(Gui), ScrollingFrame)
+function ScrollingFrame.new(gui)
+	local self = setmetatable(BaseScroller.new(gui), ScrollingFrame)
 
 	self._scrollbars = {}
 	self.Scroller = Scroller.new()
 
-	self:BindInput(Gui)
+	self:BindInput(gui)
 	self:BindInput(self.Container)
 
 	self.Maid.ContainerChanged = self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
