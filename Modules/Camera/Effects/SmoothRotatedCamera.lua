@@ -9,7 +9,6 @@ local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
 local qCFrame = require("qCFrame")
 local Spring = require("Spring")
-local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 
 local SmoothRotatedCamera = {}
 SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
@@ -34,54 +33,54 @@ function SmoothRotatedCamera:__add(other)
 end
 
 ---
--- @param XYRotateVector Vector2, the delta rotation to apply
-function SmoothRotatedCamera:RotateXY(XYRotateVector)
-	self.AngleX = self.AngleX + XYRotateVector.x
-	self.AngleY = self.AngleY + XYRotateVector.y
+-- @param xyRotateVector Vector2, the delta rotation to apply
+function SmoothRotatedCamera:RotateXY(xyRotateVector)
+	self.AngleX = self.AngleX + xyRotateVector.x
+	self.AngleY = self.AngleY + xyRotateVector.y
 	self.TargetAngleX = self.AngleX
 	self.TargetAngleY = self.AngleY
 end
 
-function SmoothRotatedCamera:__newindex(Index, Value)
-	if Index == "CoordinateFrame" or Index == "CFrame" then
-		local XZRotation = GetRotationInXZPlane(Value)
+function SmoothRotatedCamera:__newindex(index, value)
+	if index == "CoordinateFrame" or index == "CFrame" then
+		local XZRotation = qCFrame.GetRotationInXZPlane(value)
 		self.AngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(Value).lookVector.y
+		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
 		self.AngleY = math.asin(YRotation)
-	elseif Index == "TargetCoordinateFrame" or Index == "TargetCFrame" then
-		local XZRotation = GetRotationInXZPlane(Value)
+	elseif index == "TargetCoordinateFrame" or index == "TargetCFrame" then
+		local XZRotation = qCFrame.GetRotationInXZPlane(value)
 		self.TargetAngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(Value).lookVector.y
+		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
 		self.TargetAngleY = math.asin(YRotation)
-	elseif Index == "AngleY" then
-		self.SpringY.Value = Value
-	elseif Index == "AngleX" or Index == "AngleXZ" then
-		self.SpringX.Value = Value
-	elseif Index == "TargetAngleY" then
-		self.SpringY.Target = Value
-	elseif Index == "TargetAngleX" or Index == "TargetAngleXZ" then
-		self.SpringX.Target = Value
-	elseif Index == "MaxY" then
-		assert(Value >= self.MinY, "MaxY must be greater than MinY")
-		self._MaxY = Value
-	elseif Index == "MinY" then
-		assert(Value <= self.MaxY, "MinY must be less than MaxY")
-		self._MinY = Value
-	elseif Index == "SpeedAngleX" or Index == "SpeedAngleXZ" then
-		self.SpringX.Speed = Value
-	elseif Index == "SpeedAngleY" then
-		self.SpringY.Speed = Value
-	elseif Index == "Speed" then
-		self.SpeedAngleX = Value
-		self.SpeedAngleY = Value
-	elseif Index == "ZoomGiveY" then
-		self._ZoomGiveY = Value
-	elseif SmoothRotatedCamera[Index] ~= nil or Index == "SpringX" or Index == "SpringY" then
-		rawset(self, Index, Value)
+	elseif index == "AngleY" then
+		self.SpringY.Value = value
+	elseif index == "AngleX" or index == "AngleXZ" then
+		self.SpringX.Value = value
+	elseif index == "TargetAngleY" then
+		self.SpringY.Target = value
+	elseif index == "TargetAngleX" or index == "TargetAngleXZ" then
+		self.SpringX.Target = value
+	elseif index == "MaxY" then
+		assert(value >= self.MinY, "MaxY must be greater than MinY")
+		self._MaxY = value
+	elseif index == "MinY" then
+		assert(value <= self.MaxY, "MinY must be less than MaxY")
+		self._MinY = value
+	elseif index == "SpeedAngleX" or index == "SpeedAngleXZ" then
+		self.SpringX.Speed = value
+	elseif index == "SpeedAngleY" then
+		self.SpringY.Speed = value
+	elseif index == "Speed" then
+		self.SpeedAngleX = value
+		self.SpeedAngleY = value
+	elseif index == "ZoomGiveY" then
+		self._ZoomGiveY = value
+	elseif SmoothRotatedCamera[index] ~= nil or index == "SpringX" or index == "SpringY" then
+		rawset(self, index, value)
 	else
-		error(Index .. " is not a valid member or SmoothRotatedCamera")
+		error(index .. " is not a valid member or SmoothRotatedCamera")
 	end
 end
 
@@ -89,30 +88,30 @@ function SmoothRotatedCamera:SnapIntoBounds()
 	self.TargetAngleY = math.clamp(self.TargetAngleY, self.MinY, self.MaxY)
 end
 
-function SmoothRotatedCamera:GetPastBounds(Angle)
-	if Angle < self.MinY then
-		return Angle - self.MinY
-	elseif Angle > self.MaxY then
-		return Angle - self.MaxY
+function SmoothRotatedCamera:GetPastBounds(angle)
+	if angle < self.MinY then
+		return angle - self.MinY
+	elseif angle > self.MaxY then
+		return angle - self.MaxY
 	else
 		return 0
 	end
 end
 
-function SmoothRotatedCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function SmoothRotatedCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		local State = CameraState.new()
 		State.CoordinateFrame = self.CoordinateFrame
 		return State
-	elseif Index == "LookVector" then
+	elseif index == "LookVector" then
 		return self.Rotation.lookVector
-	elseif Index == "CoordinateFrame" or Index == "CFrame" then
+	elseif index == "CoordinateFrame" or index == "CFrame" then
 		return CFrame.Angles(0, self.RenderAngleXZ, 0) * CFrame.Angles(self.RenderAngleY, 0, 0)
-	elseif Index == "TargetCoordinateFrame" or Index == "TargetCFrame" then
+	elseif index == "TargetCoordinateFrame" or index == "TargetCFrame" then
 		return CFrame.Angles(0, self.TargetAngleXZ, 0) * CFrame.Angles(self.TargetAngleY, 0, 0)
-	elseif Index == "RenderAngleY" then
-		local Angle = self.AngleY
-		local Past = self:GetPastBounds(Angle)
+	elseif index == "RenderAngleY" then
+		local angle = self.AngleY
+		local Past = self:GetPastBounds(angle)
 
 		local TimesOverBounds = math.abs(Past) / self.ZoomGiveY
 		local Scale = (1 - 0.25 ^ math.abs(TimesOverBounds))
@@ -122,28 +121,28 @@ function SmoothRotatedCamera:__index(Index)
 		elseif Past > 0 then
 			return self.MaxY + self.ZoomGiveY*Scale
 		else
-			return Angle
+			return angle
 		end
-	elseif Index == "RenderAngleX" or Index == "RenderAngleXZ" then
+	elseif index == "RenderAngleX" or index == "RenderAngleXZ" then
 		return self.AngleX
-	elseif Index == "AngleY" then
+	elseif index == "AngleY" then
 		return self.SpringY.Value
-	elseif Index == "AngleX" or Index == "AngleXZ" then
+	elseif index == "AngleX" or index == "AngleXZ" then
 		return self.SpringX.Value
-	elseif Index == "TargetAngleY" then
+	elseif index == "TargetAngleY" then
 		return self.SpringY.Target
-	elseif Index == "TargetAngleX" or Index == "TargetAngleXZ" then
+	elseif index == "TargetAngleX" or index == "TargetAngleXZ" then
 		return self.SpringX.Target
-	elseif Index == "SpeedAngleY" then
+	elseif index == "SpeedAngleY" then
 		return self.SpringX.Speed
-	elseif Index == "MaxY" then
+	elseif index == "MaxY" then
 		return self._MaxY
-	elseif Index == "MinY" then
+	elseif index == "MinY" then
 		return self._MinY
-	elseif Index == "ZoomGiveY" then
+	elseif index == "ZoomGiveY" then
 		return self._ZoomGiveY
 	else
-		return SmoothRotatedCamera[Index]
+		return SmoothRotatedCamera[index]
 	end
 end
 
