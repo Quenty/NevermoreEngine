@@ -5,240 +5,183 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local CollectionService = game:GetService("CollectionService")
 
-local qCFrame = require("qCFrame")
+local BoundingBox = require("BoundingBox")
 local CharacterUtil = require("CharacterUtil")
 
 local PartTouchingCalculator = {}
 PartTouchingCalculator.__index = PartTouchingCalculator
 PartTouchingCalculator.ClassName = "PartTouchingCalculator"
 
-function PartTouchingCalculator.new(BoatDataManager)
+function PartTouchingCalculator.new()
 	local self = setmetatable({}, PartTouchingCalculator)
-
-	self.BoatDataManager = BoatDataManager or error("No BoatDataManager")
 
 	return self
 end
 
-function PartTouchingCalculator:CheckIfTouchingHumanoid(Humanoid, Parts)
-	assert(Humanoid)
-	assert(Parts, "Must have parts")
+function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
+	assert(humanoid)
+	assert(parts, "Must have parts")
 
-	local HumanoidParts = {}
-	for _, Item in pairs(Humanoid:GetDesendants()) do
-		if Item:IsA("BasePart") then
-			table.insert(HumanoidParts, Item)
+	local humanoidParts = {}
+	for _, item in pairs(humanoid:GetDesendants()) do
+		if item:IsA("basePart") then
+			table.insert(humanoidParts, item)
 		end
 	end
 
-	if #HumanoidParts == 0 then
-		warn("[BoatPlacer][CheckIfTouchingHumanoid] - #Parts == 0, retrieved from humanoid")
+	if #humanoidParts == 0 then
+		warn("[BoatPlacer][CheckIfTouchingHumanoid] - #parts == 0, retrieved from humanoid")
 		return false
 	end
 
-	local DummyPart = self:GetCollidingPartFromParts(HumanoidParts)
+	local dummyPart = self:GetCollidingPartFromParts(humanoidParts)
 
-	local PreviousProperties = {}
-	local ToSet = {
+	local previousProperties = {}
+	local toSet = {
 		CanCollide = true;
 		Anchored = false;
 	}
-	local PartSet = {}
-	for _, Part in pairs(Parts) do
-		PreviousProperties[Part] = {}
-		for Name, Value in pairs(ToSet) do
-			PreviousProperties[Part][Name] = Part[Name]
-			Part[Name] = Value
+	local partSet = {}
+	for _, part in pairs(parts) do
+		previousProperties[part] = {}
+		for name, value in pairs(toSet) do
+			previousProperties[part][name] = part[name]
+			part[name] = value
 		end
-		PartSet[Part] = true
+		partSet[part] = true
 	end
 
-	local Touching = DummyPart:GetTouchingParts()
-	DummyPart:Destroy()
+	local touching = dummyPart:GetTouchingParts()
+	dummyPart:Destroy()
 
-	local ReturnValue = false
+	local returnValue = false
 
-	for _, Part in pairs(Touching) do
-		if PartSet[Part] then
-			ReturnValue = true
+	for _, part in pairs(touching) do
+		if partSet[part] then
+			returnValue = true
 			break
 		end
 	end
 
-	for Part, Properties in pairs(PreviousProperties) do
-		for Name, Value in pairs(Properties) do
-			Part[Name] = Value
+	for part, properties in pairs(previousProperties) do
+		for name, value in pairs(properties) do
+			part[name] = value
 		end
 	end
 
-	return ReturnValue
+	return returnValue
 end
 
 
-function PartTouchingCalculator:GetCollidingPartFromParts(Parts, RelativeTo, Padding)
-	RelativeTo = RelativeTo or CFrame.new()
+function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, padding)
+	relativeTo = relativeTo or CFrame.new()
 
-	local Size, Rotation = qCFrame.GetBoundingBox(Parts, RelativeTo)
+	local size, rotation = BoundingBox.GetBoundingBox(parts, relativeTo)
 
-	if Padding then
-		Size = Size + Vector3.new(Padding, Padding, Padding)
+	if padding then
+		size = size + Vector3.new(padding, padding, padding)
 	end
 
-	local DummyPart = Instance.new("Part")
-	DummyPart.Name = "CollisionDetection"
-	DummyPart.Size = Size
-	DummyPart.CFrame = Rotation
-	DummyPart.Anchored = false
-	DummyPart.CanCollide = true
-	DummyPart.Parent = workspace
+	local dummyPart = Instance.new("Part")
+	dummyPart.Name = "CollisionDetection"
+	dummyPart.Size = size
+	dummyPart.CFrame = rotation
+	dummyPart.Anchored = false
+	dummyPart.CanCollide = true
+	dummyPart.Parent = workspace
 
-	return DummyPart
+	return dummyPart
 end
 
-function PartTouchingCalculator:GetTouchingBoundingBox(Parts, RelativeTo, Padding)
-	local Dummy = self:GetCollidingPartFromParts(Parts, RelativeTo, Padding)
-	local Touching = Dummy:GetTouchingParts()
-	Dummy:Destroy()
+function PartTouchingCalculator:GetTouchingBoundingBox(parts, relativeTo, padding)
+	local dummy = self:GetCollidingPartFromParts(parts, relativeTo, padding)
+	local touching = dummy:GetTouchingParts()
+	dummy:Destroy()
 
-	return Touching
+	return touching
 end
 
 --- Expensive hull check on a list of parts (aggregating each parts touching list)
-function PartTouchingCalculator:GetTouchingHull(Parts, Padding)
-	local HitParts = {}
+function PartTouchingCalculator:GetTouchingHull(parts, padding)
+	local hitParts = {}
 
-	for _, Part in pairs(Parts) do
-		for _, TouchingPart in pairs(self:GetTouching(Part, Padding)) do
-			HitParts[TouchingPart] = true
+	for _, part in pairs(parts) do
+		for _, TouchingPart in pairs(self:GetTouching(part, padding)) do
+			hitParts[TouchingPart] = true
 		end
 	end
 
-	local Touching = {}
-	for Part, _ in pairs(HitParts) do
-		table.insert(Touching, Part)
+	local touching = {}
+	for part, _ in pairs(hitParts) do
+		table.insert(touching, part)
 	end
 
-	return Touching
+	return touching
 end
-
 
 --- Retrieves parts touching a base part
--- @param BasePart item to identify touching. Geometry matters
--- @param Padding studs of padding around the part
-function PartTouchingCalculator:GetTouching(BasePart, Padding)
-	Padding = Padding or 2
-	local Copy
+-- @param basePart item to identify touching. Geometry matters
+-- @param padding studs of padding around the part
+function PartTouchingCalculator:GetTouching(basePart, padding)
+	padding = padding or 2
+	local part
 
-	if BasePart:IsA("TrussPart") then
+	if basePart:IsA("TrussPart") then
 		-- Truss parts can't be resized
-		Copy = Instance.new("Part")
+		part = Instance.new("Part")
 	else
-		-- Clone copy
-		Copy = BasePart:Clone()
+		-- Clone part
+		part = basePart:Clone()
 
 		-- Remove all tags
-		for _, Tag in pairs(CollectionService:GetTags(Copy)) do
-			CollectionService:RemoveTag(Copy, Tag)
+		for _, Tag in pairs(CollectionService:GetTags(part)) do
+			CollectionService:RemoveTag(part, Tag)
 		end
 	end
-	Copy:ClearAllChildren()
+	part:ClearAllChildren()
 
-	Copy.Size = BasePart.Size + Vector3.new(Padding, Padding, Padding)
-	Copy.CFrame = BasePart.CFrame
-	Copy.Anchored = false
-	Copy.CanCollide = true
-	Copy.Transparency = 0.1
-	Copy.Material = Enum.Material.SmoothPlastic
-	Copy.Parent = workspace
+	part.Size = basePart.Size + Vector3.new(padding, padding, padding)
+	part.CFrame = basePart.CFrame
+	part.Anchored = false
+	part.CanCollide = true
+	part.Transparency = 0.1
+	part.Material = Enum.Material.SmoothPlastic
+	part.Parent = workspace
 
-	local Touching = Copy:GetTouchingParts()
-	Copy:Destroy()
+	local touching = part:GetTouchingParts()
+	part:Destroy()
 
-	return Touching
+	return touching
 end
 
-function PartTouchingCalculator:GetTouchingHumanoids(TouchingList)
-	local TouchingHumanoids = {}
+function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
+	local touchingHumanoids = {}
 
-	for _, Part in pairs(TouchingList) do
-		local Humanoid = Part.Parent:FindFirstChildOfClass("Humanoid")
-		if Humanoid then
-			if not TouchingHumanoids[Humanoid] then
-				local Player, Character = CharacterUtil.GetPlayerFromCharacter(Humanoid)
-				TouchingHumanoids[Humanoid] = {
-					Humanoid = Humanoid;
-					Character = Character;
-					Player = Player;
-					Touching = {Part}
+	for _, part in pairs(touchingList) do
+		local humanoid = part.Parent:FindFirstChildOfClass("humanoid")
+		if humanoid then
+			if not touchingHumanoids[humanoid] then
+				local player, character = CharacterUtil.GetPlayerFromCharacter(humanoid)
+				touchingHumanoids[humanoid] = {
+					Humanoid = humanoid;
+					Character = character;
+					Player = player;
+					Touching = {part}
 				}
 			else
-				table.insert(TouchingHumanoids[Humanoid].Touching, Part)
+				table.insert(touchingHumanoids[humanoid].Touching, part)
 			end
 		end
 	end
 
-	local List = {}
-	for Humanoid, Data in pairs(TouchingHumanoids) do
-		table.insert(List, Data)
+	local list = {}
+	for _, data in pairs(touchingHumanoids) do
+		table.insert(list, data)
 	end
 
-	return List
+	return list
 end
 
-function PartTouchingCalculator:GetTouchingProps(TouchingList)
-	local TouchingProps = {}
-
-	for _, Part in pairs(TouchingList) do
-		local PropData, BasePart = self.BoatDataManager.SearchForPropData(Part)
-		if PropData then
-			local Prop = PropData.Parent
-			if not TouchingProps[Prop] then
-				TouchingProps[Prop] = {
-					PropData = PropData;
-					Prop = Prop;
-					BasePart = BasePart;
-					Touching = {Part}
-				}
-			else
-				table.insert(TouchingProps[Prop].Touching, Part)
-			end
-		end
-	end
-
-	local List = {}
-	for Prop, Data in pairs(TouchingProps) do
-		table.insert(List, Data)
-	end
-
-	return List
-end
-
-function PartTouchingCalculator:GetTouchingBoats(TouchingList)
-	local TouchingBoats = {}
-
-	for _, Part in pairs(TouchingList) do
-		local BoatData, Boat, BoatBasePart = self.BoatDataManager:GetBoatData(Part)
-		if BoatData then
-			if not TouchingBoats[Boat] then
-				TouchingBoats[Boat] = {
-					BoatData = BoatData;
-					Boat = Boat;
-					BoatBasePart = BoatBasePart;
-					Touching = {Part};
-				}
-			else
-				table.insert(TouchingBoats[Boat].Touching, Part)
-			end
-		end
-	end
-
-	local List = {}
-	for Boat, Data in pairs(TouchingBoats) do
-		table.insert(List, Data)
-	end
-
-	return List
-end
 
 
 
