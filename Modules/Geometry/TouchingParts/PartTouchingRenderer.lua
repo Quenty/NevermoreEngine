@@ -17,18 +17,18 @@ function PartTouchingRenderer.new()
 	return self
 end
 
-function PartTouchingRenderer:RenderTouchingProps(TouchingPartList)
-	for _, Part in pairs(TouchingPartList) do
-		local SelectionBox = Instance.new("SelectionBox")
-		SelectionBox.Name = "TouchingWarning"
-		SelectionBox.LineThickness = 0.05
-		SelectionBox.Color3 = Color3.new(1, 0.3, 0.3)
-		SelectionBox.Transparency = 0
-		SelectionBox.Adornee = Part
-		SelectionBox.Parent = Part
+function PartTouchingRenderer:RenderTouchingProps(touchingPartList)
+	for _, part in pairs(touchingPartList) do
+		local selectionBox = Instance.new("SelectionBox")
+		selectionBox.Name = "TouchingWarning"
+		selectionBox.LineThickness = 0.05
+		selectionBox.Color3 = Color3.new(1, 0.3, 0.3)
+		selectionBox.Transparency = 0
+		selectionBox.Adornee = part
+		selectionBox.Parent = part
 
-		qGUI.TweenTransparency(SelectionBox, {Transparency = 1}, 0.5)
-		Debris:AddItem(SelectionBox, 0.6)
+		qGUI.TweenTransparency(selectionBox, {Transparency = 1}, 0.5)
+		Debris:AddItem(selectionBox, 0.6)
 	end
 end
 
