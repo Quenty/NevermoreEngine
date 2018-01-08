@@ -76,7 +76,7 @@ end
 function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, padding)
 	relativeTo = relativeTo or CFrame.new()
 
-	local size, rotation = BoundingBox.GetBoundingBox(parts, relativeTo)
+	local size, rotation = BoundingBox.GetPartsBoundingBox(parts, relativeTo)
 
 	if padding then
 		size = size + Vector3.new(padding, padding, padding)

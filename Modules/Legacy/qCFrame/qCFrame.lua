@@ -2,41 +2,6 @@ local HttpService = game:GetService("HttpService")
 
 local lib = {}
 
-local BOUNDING_BOX_POINTS = { -- Bouding box posiitions.
-	Vector3.new(-1,-1,-1);
-	Vector3.new( 1,-1,-1);
-	Vector3.new(-1, 1,-1);
-	Vector3.new( 1, 1,-1);
-	Vector3.new(-1,-1, 1);
-	Vector3.new( 1,-1, 1);
-	Vector3.new(-1, 1, 1);
-	Vector3.new( 1, 1, 1);
-}
-
-function lib.GetBoundingBox(Objects, RelativeTo)
-	RelativeTo = RelativeTo or CFrame.new()
-	local Sides = {-math.huge;math.huge;-math.huge;math.huge;-math.huge;math.huge}
-
-	for _, BasePart in pairs(Objects) do
-		local HalfSize = BasePart.Size/2
-		local Rotation = RelativeTo:toObjectSpace(BasePart.CFrame)
-
-		for _, BoundingBoxPoint in pairs(BOUNDING_BOX_POINTS) do
-			local Point = Rotation*CFrame.new(HalfSize*BoundingBoxPoint).p
-
-			if Point.x > Sides[1] then Sides[1] = Point.x end
-			if Point.x < Sides[2] then Sides[2] = Point.x end
-			if Point.y > Sides[3] then Sides[3] = Point.y end
-			if Point.y < Sides[4] then Sides[4] = Point.y end
-			if Point.z > Sides[5] then Sides[5] = Point.z end
-			if Point.z < Sides[6] then Sides[6] = Point.z end
-		end
-	end
-
-	-- Size, CFrame
-	return Vector3.new(Sides[1]-Sides[2],Sides[3]-Sides[4],Sides[5]-Sides[6]),
-	       RelativeTo:toWorldSpace(CFrame.new((Sides[1]+Sides[2])/2,(Sides[3]+Sides[4])/2,(Sides[5]+Sides[6])/2))
-end
 
 --- Encodes a cframe in JSON
 function lib.EncodeCFrame(cframe)
@@ -72,10 +37,6 @@ do
 	end
 
 	lib.AxisAngleInterpolate = AxisAngleInterpolate
-	lib.axisAngleInterpolate = AxisAngleInterpolate
-
-	lib.FastSlerp = AxisAngleInterpolate
-	lib.fastSlerp = AxisAngleInterpolate
 end
 
 --- Function factory. Returns a function that will transform all Objects (in the table sent) to the new position, relative to center
