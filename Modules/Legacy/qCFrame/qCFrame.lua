@@ -13,7 +13,7 @@ local BOUNDING_BOX_POINTS = { -- Bouding box posiitions.
 	Vector3.new( 1, 1, 1);
 }
 
-local function GetBoundingBox(Objects, RelativeTo)
+function lib.GetBoundingBox(Objects, RelativeTo)
 	RelativeTo = RelativeTo or CFrame.new()
 	local Sides = {-math.huge;math.huge;-math.huge;math.huge;-math.huge;math.huge}
 
@@ -34,17 +34,16 @@ local function GetBoundingBox(Objects, RelativeTo)
 	end
 
 	-- Size, CFrame
-	return Vector3.new(Sides[1]-Sides[2],Sides[3]-Sides[4],Sides[5]-Sides[6]), 
+	return Vector3.new(Sides[1]-Sides[2],Sides[3]-Sides[4],Sides[5]-Sides[6]),
 	       RelativeTo:toWorldSpace(CFrame.new((Sides[1]+Sides[2])/2,(Sides[3]+Sides[4])/2,(Sides[5]+Sides[6])/2))
 end
-lib.GetBoundingBox = GetBoundingBox
 
---- Encodes a CFrameValue in JSON
-function lib.EncodeCFrame(CFrameValue)
-	return HttpService:JSONEncode({ CFrameValue:components() })
+--- Encodes a cframe in JSON
+function lib.EncodeCFrame(cframe)
+	return HttpService:JSONEncode({ cframe:components() })
 end
 
---- Decode's a previously encoded CFrameValue.
+--- Decode's a previously encoded cframe.
 function lib.DecodeCFrame(Data)
 	if Data then
 		local DecodedData = HttpService:JSONDecode(Data)
@@ -79,48 +78,36 @@ do
 	lib.fastSlerp = AxisAngleInterpolate
 end
 
-local toObjectSpace = CFrame.new().toObjectSpace
-local toWorldSpace  = CFrame.new().toWorldSpace
-
-
 --- Function factory. Returns a function that will transform all Objects (in the table sent) to the new position, relative to center
 -- @param Objects the objects to transform, should be an an array. Should only be BaseParts. Should be nonempty
 -- @param Center CFrame, the center of the objects. Suggested that it is either the model's GetPrimaryPartCFrame() or one of the Object's CFrame.
 -- @return The transformer function
-
 -- The model is transformed so the "Center"'s CFrame is now the new NewLocation. It respects rotation.
 -- An example would be the "Seat" of a car. If you transform the "Seat" to be the CFrame of a Player's Torso, the seat will be moved
 -- to the new location, and the rest of the car will follow, that is to say, it will move relative to the cframe.
-
 -- If relative positions change relative to the center, and these new changes are to be respected, the transformer must be reconstructed.
-function lib.MakeModelTransformer(objects, Center)
+function lib.MakeModelTransformer(parts, center)
 	local relative = {}
 
-	for _, Part in pairs(objects) do
-		relative[Part] = toObjectSpace(Center, Part.CFrame)
+	for _, part in pairs(parts) do
+		relative[part] = center:toObjectSpace(part.CFrame)
 	end
 
-	return function(NewLocation)
-		--- Transforms the model to the NewLocation
-		-- @param NewLocation A new CFrame to transform the model to.
-
-		for Part, Position in pairs(relative) do
-			Part.CFrame = toWorldSpace(NewLocation, Position)
+	--- Transforms the model to the newCenter
+	-- @param newCenter A new CFrame to transform the model to.
+	return function(newCenter)
+		for part, Position in pairs(relative) do
+			part.CFrame = newCenter:toWorldSpace(Position)
 		end
 	end
 end
 
-local pointToObjectSpace = CFrame.new().pointToObjectSpace
-lib.pointToObjectSpace = pointToObjectSpace
-lib.PointToObjectSpace = pointToObjectSpace
+--- Return's whether a point is inside of a part.
+-- @param part The part to check. May also be a table with a .Size and .CFrame value in it.
+function lib.PointInsidePart(part, Point)
+	local PartSize = part.Size/2
+	local RelativePosition = part.CFrame:pointToObjectSpace(Point)
 
-function lib.PointInsidePart(Part, Point)
-	--- Return's whether a point is inside of a part.
-	-- @param Part The part to check. May also be a table with a .Size and .CFrame value in it.
-
-	local PartSize = Part.Size/2
-	local RelativePosition = Part.CFrame:pointToObjectSpace(Point)
-	--print(RelativePosition, PartSize)
 	if not (RelativePosition.X >= -PartSize.X and RelativePosition.X <= PartSize.X) then
 		return false
 	elseif not (RelativePosition.Y >= -PartSize.Y and RelativePosition.Y <= PartSize.Y) then
@@ -135,52 +122,44 @@ end
 --- Weld's 2 parts together
 -- @param Part0 The first part
 -- @param Part1 The second part (Dependent part most of the time).
--- @param [JointType] The type of joint. Defaults to weld.
--- @param [WeldParent] Parent of the weld, Defaults to Part0 (so GC is better).
+-- @param[opt="Weld"] jointType The type of joint.
+-- @param[opt=Part0] parent Parent of the weld, Defaults to Part0 (so GC is better).
 -- @return The weld created.
-local function WeldTogether(Part0, Part1, JointType, WeldParent)
-	JointType = JointType or "Weld"
+function lib.WeldTogether(part0, part1, jointType, parent)
+	local weld = Instance.new(jointType or "Weld")
+	weld.Part0 = part0
+	weld.Part1 = part1
+	weld.C0 = CFrame.new()
+	weld.C1 = part1.CFrame:toObjectSpace(part0.CFrame)
+	weld.Parent = parent or part0
 
-	local NewWeld = Instance.new(JointType)
-	NewWeld.Part0  = Part0
-	NewWeld.Part1  = Part1
-	NewWeld.C0     = CFrame.new()--Part0.CFrame:inverse()
-	NewWeld.C1     = Part1.CFrame:toObjectSpace(Part0.CFrame) --Part1.CFrame:inverse() * Part0.CFrame-- Part1.CFrame:inverse()
-	NewWeld.Parent = WeldParent or Part0
-
-	return NewWeld
+	return weld
 end
-lib.WeldTogether = WeldTogether
 
+---
 -- @param Parts The Parts to weld. Should be anchored to prevent really horrible results.
 -- @param MainPart The part to weld the model to (can be in the model).
--- @param [JointType] The type of joint. Defaults to weld. 
--- @parm DoNotUnanchor Boolean, if true, will not unachor the model after cmopletion.
-local function WeldParts(Parts, MainPart, JointType, DoNotUnanchor)
-
-	for _, Part in pairs(Parts) do
-		if Part ~= MainPart then
-			WeldTogether(MainPart, Part, JointType, MainPart)
+-- @param[opt="Weld"] jointType The type of joint
+-- @tparam[opt=false] boolean doNotUnanchor, if true, will not unachor the model after cmopletion.
+function lib.WeldParts(parts, mainPart, jointType, doNotUnanchor)
+	for _, part in pairs(parts) do
+		if part ~= mainPart then
+			lib.WeldTogether(mainPart, part, jointType, mainPart)
 		end
 	end
 
-	if not DoNotUnanchor then
-		for _, Part in pairs(Parts) do
-			Part.Anchored = false
+	if not doNotUnanchor then
+		for _, part in pairs(parts) do
+			part.Anchored = false
 		end
-		MainPart.Anchored = false
+		mainPart.Anchored = false
 	end
 end
-lib.WeldParts = WeldParts
 
-local function GetSurfaceNormal(Part, Vector)
-	--[[
-		CirrusGeometry.getSurfaceNormal(part, point)
-		Returns unit vector of the surface normal given a point on the surface of part
-	--]]
-
+--- Returns unit vector of the surface normal given a point on the surface of part
+function lib.GetSurfaceNormal(Part, Vector)
 	local Percent = Part.CFrame:toObjectSpace(CFrame.new(Vector)).p / ((Part.Size  - Vector3.new(0.02, 0.02, 0.02))/ 2)
-	local ab      = Vector3.new(math.abs(Percent.X), math.abs(Percent.Y), math.abs(Percent.Z))
+	local ab = Vector3.new(math.abs(Percent.X), math.abs(Percent.Y), math.abs(Percent.Z))
 	local normal  = Vector3.new(0, 1, 0)
 
 	if Part:IsA("Part") and (Part.Shape == Enum.PartType.Ball or Part.Shape == Enum.PartType.Cylinder) then
@@ -196,70 +175,57 @@ local function GetSurfaceNormal(Part, Vector)
 	end
 	return normal
 end
-lib.GetSurfaceNormal = GetSurfaceNormal
 
-local function GetRightVector(CFrameValue)
-	--- Get's the right vector of a CFrame Value
-	-- @param CFrameValue A CFrame, of which the vector will be retrieved
-	-- @return The right vector of the CFrame
-
-	local _,_,_,r4,_,_,r7,_,_,r10,_,_ = CFrameValue:components()
+--- Get's the right vector of a CFrame Value
+-- @param cframe A CFrame, of which the vector will be retrieved
+-- @return The right vector of the CFrame
+function lib.GetRightVector(cframe)
+	local _,_,_,r4,_,_,r7,_,_,r10,_,_ = cframe:components()
 	return Vector3.new(r4,r7,r10)
 end
-lib.GetRightVector = GetRightVector
 
-local function GetLeftVector(CFrameValue)
-	--- Get's the left vector of a CFrame Value
-	-- @param CFrameValue A CFrame, of which the vector will be retrieved
-	-- @return The left vector of the CFrame
-
-	local _,_,_,r4,_,_,r7,_,_,r10,_,_ = CFrameValue:components()
+--- Get's the left vector of a CFrame Value
+-- @param cframe A CFrame, of which the vector will be retrieved
+-- @return The left vector of the CFrame
+function lib.GetLeftVector(cframe)
+	local _,_,_,r4,_,_,r7,_,_,r10,_,_ = cframe:components()
 	return Vector3.new(-r4,-r7,-r10)
 end
-lib.GetLeftVector = GetLeftVector
 
-local function GetTopVector(CFrameValue)
-	--- Get's the top vector of a CFrame Value
-	-- @param CFrameValue A CFrame, of which the vector will be retrieved
-	-- @return The top vector of the CFrame
-
-	local _,_,_,_,r5,_,_,r8,_,_,r11,_ = CFrameValue:components()
+--- Get's the top vector of a CFrame Value
+-- @param cframe A CFrame, of which the vector will be retrieved
+-- @return The top vector of the CFrame
+function lib.GetTopVector(cframe)
+	local _,_,_,_,r5,_,_,r8,_,_,r11,_ = cframe:components()
 	return Vector3.new(r5,r8,r11)
 end
-lib.GetTopVector = GetTopVector
 
-local function GetBottomVector(CFrameValue)
-	--- Get's the bottom vector of a CFrame Value
-	-- @param CFrameValue A CFrame, of which the vector will be retrieved
-	-- @return The bottom vector of the CFrame
-
-	local _,_,_,_,r5,_,_,r8,_,_,r11,_ = CFrameValue:components()
+--- Get's the bottom vector of a CFrame Value
+-- @param cframe A CFrame, of which the vector will be retrieved
+-- @return The bottom vector of the CFrame
+function lib.GetBottomVector(cframe)
+	local _,_,_,_,r5,_,_,r8,_,_,r11,_ = cframe:components()
 	return Vector3.new(-r5,-r8,-r11)
 end
-lib.GetBottomVector = GetBottomVector
 
-local function GetBackVector(CFrameValue)
-	--- Get's the back vector of a CFrame Value
-	-- @param CFrameValue A CFrame, of which the vector will be retrieved
-	-- @return The back vector of the CFrame
-
-	local _,_,_,_,_,r6,_,_,r9,_,_,r12 = CFrameValue:components()
+--- Get's the back vector of a CFrame Value
+-- @param cframe A CFrame, of which the vector will be retrieved
+-- @return The back vector of the CFrame
+function lib.GetBackVector(cframe)
+	local _,_,_,_,_,r6,_,_,r9,_,_,r12 = cframe:components()
 	return Vector3.new(r6,r9,r12)
 end
-lib.GetBackVector = GetBackVector
 
-local function GetFrontVector(CFrameValue)
-	--- Get's the front vector of a CFrame Value
-	-- @param CFrameValue A CFrame, of which the vector will be retrieved
-	-- @return The front vector of the CFrame
-
-	local _,_,_,_,_,r6,_,_,r9,_,_,r12 = CFrameValue:components()
+--- Get's the front vector of a CFrame Value
+-- @param cframe A CFrame, of which the vector will be retrieved
+-- @return The front vector of the CFrame
+function lib.GetFrontVector(cframe)
+	local _,_,_,_,_,r6,_,_,r9,_,_,r12 = cframe:components()
 	return Vector3.new(-r6,-r9,-r12)
 end
-lib.GetFrontVector = GetFrontVector
 
-local function GetCFrameFromTopBack(CFrameAt, Top, Back)
-	--- Get's the CFrame fromt he "top back" vector. or something
+--- Get's the CFrame fromt he "top back" vector. or something
+function lib.GetCFrameFromTopBack(CFrameAt, Top, Back)
 
 	local Right = Top:Cross(Back) -- Get's the "right" cframe lookvector.
 	return CFrame.new(CFrameAt.x, CFrameAt.y, CFrameAt.z,
@@ -268,21 +234,19 @@ local function GetCFrameFromTopBack(CFrameAt, Top, Back)
 		Right.z, Top.z, Back.z
 	)
 end
-lib.GetCFrameFromTopBack = GetCFrameFromTopBack
 
-function lib.GetRotationInXZPlane(CFrameValue)
-	--- Get's the rotation in the XZ plane (global).
+--- Get's the rotation in the XZ plane (global).
+function lib.GetRotationInXZPlane(cframe)
+	local back = lib.GetBackVector(cframe)
 
-	local Back = GetBackVector(CFrameValue)
-	return GetCFrameFromTopBack(CFrameValue.p,
-		Vector3.new(0,1,0), -- Top lookVector (straight up)
-		Vector3.new(Back.x, 0, Back.z).unit -- Right facing direction (removed Y axis.)
+	return lib.GetCFrameFromTopBack(cframe.p,
+		Vector3.new(0, 1, 0),
+		Vector3.new(back.x, 0, back.z).unit
 	)
 end
 
 --- Find's a faces coordanate given it's size and RelativePosition.
-function lib.lib.FindFaceFromCoord(Size, RelativePosition)
-
+function lib.FindFaceFromCoord(Size, RelativePosition)
 	local pa, pb = -Size/2, Size/2
 	local dx = math.min(math.abs(RelativePosition.x - pa.x), math.abs(RelativePosition.x - pb.x))
 	local dy = math.min(math.abs(RelativePosition.y - pa.y), math.abs(RelativePosition.y - pb.y))
@@ -321,29 +285,23 @@ function lib.GetCFrameRoll(angle)
 	return CFrame.Angles(0, 0, angle)
 end
 
-local function GetPitchFromLookVector(Vector)
-	-- Returns pitch of a Vector
-
+--- Returns pitch of a Vector
+function lib.GetPitchFromLookVector(Vector)
 	return -math.asin(Vector.Y) + math.pi/2
 end
-lib.GetPitchFromLookVector = GetPitchFromLookVector
 
-local function GetYawFromLookVector(Vector)
-	-- Returns yaw of a Vector
-
+--- Returns yaw of a Vector
+function lib.GetYawFromLookVector(Vector)
 	return -math.atan2(Vector.Z, Vector.X) - math.pi/2
 end
-lib.GetYawFromLookVector = GetYawFromLookVector
 
-local function GetRollFromCFrame(CFrameValue)
-	-- Returns roll of a CFrame
-
-	local RollDifferance = CFrame.new(CFrameValue.p, CFrameValue.p + CFrameValue.lookVector):toObjectSpace(CFrameValue)
-	local Vector = GetRightVector(RollDifferance)
+--- Returns roll of a CFrame
+function lib.GetRollFromCFrame(cframe)
+	local RollDifferance = CFrame.new(cframe.p, cframe.p + cframe.lookVector):toObjectSpace(cframe)
+	local Vector = lib.GetRightVector(RollDifferance)
 
 	return math.atan2(Vector.Y, Vector.X)
 end
-lib.GetRollFromCFrame = GetRollFromCFrame
 
 
 --- Return's the slope of the surface a character is walking upon.
@@ -353,8 +311,7 @@ lib.GetRollFromCFrame = GetRollFromCFrame
 -- 		0 radians should be level
 --		math.pi/2 radians should be straight up and down?
 -- If it's past that, I'm not sure how it happened.
-local function GetSlopeRelativeToGravity(Part, Position)
-
+function lib.GetSlopeRelativeToGravity(Part, Position)
 	local Face = lib.FindFaceFromCoord(Part.Size, Part.CFrame:toObjectSpace(CFrame.new(Position)))
 	if Face then
 		local SlopeDirection = ((Part.CFrame - Part.Position) * Vector3.FromNormalId(Face)).unit
@@ -368,7 +325,6 @@ local function GetSlopeRelativeToGravity(Part, Position)
 		return nil
 	end
 end
-lib.GetSlopeRelativeToGravity = GetSlopeRelativeToGravity
 
 --- Return's the slope of the surface a character is walking upon relative to their direction.
 -- @param Part The part the ray found
@@ -377,7 +333,7 @@ lib.GetSlopeRelativeToGravity = GetSlopeRelativeToGravity
 -- 		0 radians should be level
 --		math.pi/2 radians should be straight up and down?
 -- If it's past that, I'm not sure how it happened.
-local function GetSlopeRelativeToVector(Part, Position, Vector)
+function lib.GetSlopeRelativeToVector(Part, Position, Vector)
 	local Face = lib.FindFaceFromCoord(Part.Size, Part.CFrame:toObjectSpace(CFrame.new(Position)))
 	if Face then
 		local SlopeDirection = ((Part.CFrame - Part.Position) * Vector3.FromNormalId(Face)).unit
@@ -389,7 +345,6 @@ local function GetSlopeRelativeToVector(Part, Position, Vector)
 		return nil
 	end
 end
-lib.GetSlopeRelativeToVector = GetSlopeRelativeToVector
 
 
 --- Creates a new CFrame based upon another CFrame, a Vector to look at, and a time (t) to scale [0, 1]
@@ -397,13 +352,12 @@ lib.GetSlopeRelativeToVector = GetSlopeRelativeToVector
 -- @param c The CFrame (base)
 -- @param v The vector to look at. Target.
 -- @param t The spherical interpolation between c and v (target).
-local function LookCFrame(c,v,t)
+function lib.LookCFrame(c,v,t)
 	local t,v=t and t/2 or 0.5,(c:inverse()*v).unit
 	local an=math.abs(v.z)<1 and math.acos(-v.z)
 	local l=an and (math.sin(t*an)*v-Vector3.new(0,0,math.sin((1-t)*an)))/math.sin(an)
 	return l and c*CFrame.new(0,0,0,l.y,-l.x,0,-l.z) or c
 end
-lib.LookCFrame = LookCFrame
 
 do
 	local Dot = Vector3.new().Dot
