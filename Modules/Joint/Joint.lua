@@ -26,9 +26,7 @@ end
 -- @param[opt="Weld"] jointType The type of joint
 function lib.WeldParts(parts, mainPart, jointType)
 	for _, part in pairs(parts) do
-		if part ~= mainPart then
-			lib.Weld(mainPart, part, jointType, mainPart)
-		end
+		lib.Weld(mainPart, part, jointType, mainPart)
 	end
 end
 
