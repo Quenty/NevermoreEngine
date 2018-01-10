@@ -24,7 +24,7 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
 
 	local humanoidParts = {}
 	for _, item in pairs(humanoid:GetDesendants()) do
-		if item:IsA("basePart") then
+		if item:IsA("BasePart") then
 			table.insert(humanoidParts, item)
 		end
 	end
@@ -161,10 +161,10 @@ function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 		local humanoid = part.Parent:FindFirstChildOfClass("humanoid")
 		if humanoid then
 			if not touchingHumanoids[humanoid] then
-				local player, character = CharacterUtil.GetPlayerFromCharacter(humanoid)
+				local player = CharacterUtil.GetPlayerFromCharacter(humanoid)
 				touchingHumanoids[humanoid] = {
 					Humanoid = humanoid;
-					Character = character;
+					Character = player.Character;
 					Player = player;
 					Touching = {part}
 				}
