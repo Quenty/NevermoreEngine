@@ -128,11 +128,11 @@ end
 
 ---
 -- Resolves a promise
--- @treturn nil
+-- @return self
 function Promise:Resolve(value)
 	if self == value then
 		self:Reject("TypeError: Resolved to self")
-		return
+		return self
 	end
 
 	if _isPromise(value) then
@@ -141,21 +141,22 @@ function Promise:Resolve(value)
 		end, function(...)
 			self:Reject(...)
 		end)
-		return
+		return self
 	end
 
 	-- Thenable like objects
 	if type(value) == "table" and type(value.Then) == "function" then
 		value:Then(self:_getResolveReject())
-		return
+		return self
 	end
 
 	self:Fulfill(value)
+	return self
 end
 
 --- Fulfills the promise with the value
 -- @param ... Params to fulfill with
--- @treturn nil
+-- @return self
 function Promise:Fulfill(...)
 	if not self:IsPending() then
 		return
@@ -163,11 +164,12 @@ function Promise:Fulfill(...)
 
 	self._fulfilled = {...}
 	self:_endPending()
+	return self
 end
 
 --- Rejects the promise with the value given
 -- @param ... Params to reject with
--- @treturn nil
+-- @return self
 function Promise:Reject(...)
 	if not self:IsPending() then
 		return
@@ -175,6 +177,7 @@ function Promise:Reject(...)
 
 	self._rejected = {...}
 	self:_endPending()
+	return self
 end
 
 --- Handlers when promise is fulfilled/rejected
