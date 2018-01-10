@@ -1,3 +1,6 @@
+--- An expensive way to spawn a function
+-- @module FastSpawn
+
 return function(func, ...)
 	assert(type(func) == "function")
 
@@ -7,6 +10,6 @@ return function(func, ...)
 		func(unpack(args))
 	end)
 
-	bindable:Fire(...)
+	bindable:Fire()
 	bindable:Destroy()
 end
