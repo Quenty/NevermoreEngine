@@ -50,7 +50,7 @@ function LightingManager.new()
 	return self
 end
 
-function LightingManager:TweenProperties(PropertyTable, Time)
+function LightingManager:TweenProperties(propertyTable, time)
 	error("Not implemented. Please override.")
 end
 
@@ -78,50 +78,50 @@ local NumberValues = {
 	["Intensity"] = true;
 }
 
-function LightingManager:TweenOnItem(Parent, PropertyTable, Time)
-	Time = Time or 0
+function LightingManager:_tweenOnItem(parent, propertyTable, time)
+	time = time or 0
 
 	local TweenColor3Table = {}
 	local DoTweenColor3 = false
 	local TweenNumberTable = {}
 	local DoTweenNumber = false
 
-	for PropertyName, Value in pairs(PropertyTable) do
-		if type(Value) == "table" then
-			local Item = Parent:FindFirstChild(PropertyName)
+	for PropertyName, value in pairs(propertyTable) do
+		if type(value) == "table" then
+			local Item = parent:FindFirstChild(PropertyName)
 			if Item then
-				self:TweenOnItem(Item, Value)
+				self:_tweenOnItem(Item, value)
 			else
 				warn(("[LightingManager] - No child with name of '%s'"):format(PropertyName))
 			end
 		elseif Color3Values[PropertyName] then
-			TweenColor3Table[PropertyName] = Value
+			TweenColor3Table[PropertyName] = value
 			DoTweenColor3 = true
 		elseif NumberValues[PropertyName] then
-			TweenNumberTable[PropertyName] = Value
+			TweenNumberTable[PropertyName] = value
 			DoTweenNumber = true
 		elseif BooleanValues[PropertyName] then
-			Lighting[PropertyName] = Value
+			Lighting[PropertyName] = value
 		elseif PropertyName == "TimeOfDay" then
-			TweenTimeOfDay(Parent.TimeOfDay, Value, Time)
+			TweenTimeOfDay(parent.TimeOfDay, value, time)
 		else
 			warn("[LightingManager] - No property with the value " .. PropertyName .. " that is tweenable")
 		end
 	end
 
-	if DoTweenColor3 and Time > 0 then
-		qGUI.TweenColor3(Parent, TweenColor3Table, Time, true)
+	if DoTweenColor3 and time > 0 then
+		qGUI.TweenColor3(parent, TweenColor3Table, time, true)
 	else
-		for Property, Value in pairs(TweenColor3Table) do
-			Parent[Property] = Value
+		for property, value in pairs(TweenColor3Table) do
+			parent[property] = value
 		end
 	end
 
-	if DoTweenNumber and Time > 0 then
-		qGUI.TweenTransparency(Parent, TweenNumberTable, Time, true)
+	if DoTweenNumber and time > 0 then
+		qGUI.TweenTransparency(parent, TweenNumberTable, time, true)
 	else
-		for Property, Value in pairs(TweenNumberTable) do
-			Parent[Property] = Value
+		for property, value in pairs(TweenNumberTable) do
+			parent[property] = value
 		end
 	end
 end

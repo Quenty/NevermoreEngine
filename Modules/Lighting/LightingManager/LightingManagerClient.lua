@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Lighting = game:GetService("Lighting")
+local HttpService = game:GetService("HttpService")
 
 local LightingManager = require("LightingManager")
 local Table = require("Table")
@@ -16,131 +17,56 @@ LightingManagerClient.ClassName = "LightingManagerClient"
 function LightingManagerClient.new()
 	local self = setmetatable(LightingManager.new(), LightingManagerClient)
 
-	self.Stack = {}
+	self._stack = {}
 
 	return self
 end
 
-function LightingManagerClient:WithRemoteEvent(RemoteEvent)
-	assert(not self.RemoteEvent)
+function LightingManagerClient:WithRemoteEvent(remoteEvent)
+	assert(not self._remoteEvent)
 
-	self.RemoteEvent = RemoteEvent or error("No RemoteEvent")
+	self._remoteEvent = remoteEvent or error("No remoteEvent")
 
-	local ServerData = {
-		PropertyTable = {};
-		Name = "ServerData";
-	}
-	table.insert(self.Stack, 1, ServerData)
-
-	self.RemoteEvent.OnClientEvent:Connect(function(PropertyTable, Time)
-		assert(type(PropertyTable) == "table")
-		assert(type(Time) == "number")
-
-		ServerData.PropertyTable = PropertyTable
-
-		self:Update(Time)
+	self._remoteEvent.OnClientEvent:Connect(function(propertyTable, time)
+		self:AddTween(propertyTable, time, "ServerData")
 	end)
 
 	return self
 end
 
-function LightingManagerClient:Update(Time)
-	Time = Time or 0
+-- @param[opt=0] time
+-- @param[opt] key
+function LightingManagerClient:AddTween(propertyTable, time, key)
+	assert(type(propertyTable) == "table", "Property table must be a table")
+	time = time or 0
+	key = key or HttpService:GenerateGUID(true)
 
-	local PropertyTable = self:GetPropertyTable(self.CachedCurrentTargets)
-	local DeltaTable, CurrentValues = self:GetDesiredTweens(PropertyTable, self.CachedCurrentTargets)
-	self.CachedCurrentTargets = CurrentValues
+	self:RemoveTween(key, nil, true)
 
-	self:TweenOnItem(Lighting, DeltaTable, Time)
-
-	if #self.Stack >= 4 then
-		warn("[LightingManagerClient] - Stack is sized greater than 4, may want to remove!")
-	end
-end
-
-function LightingManagerClient:GetDesiredTweens(PropertyTable, CachedCurrentTargets)
-	local DeltaTable = {}
-
-	local function Recurse(DeltaTable, CurrentValueTable, ItemToCopy)
-		for Property, Value in pairs(ItemToCopy) do
-			if type(Value) == "table" then
-				DeltaTable[Property] = DeltaTable[Property] or {}
-				CurrentValueTable[Property] = CurrentValueTable[Property] or {}
-
-				Recurse(DeltaTable[Property], CurrentValueTable[Property], Value)
-			else
-				if CurrentValueTable[Property] ~= Value then
-					DeltaTable[Property] = Value
-					CurrentValueTable[Property] = Value
-				end
-			end
-		end
-	end
-
-	local CurrentValues = Table.DeepCopy(CachedCurrentTargets or {})
-	Recurse(DeltaTable, CurrentValues, PropertyTable)
-
-	return DeltaTable, CurrentValues
-end
-
-function LightingManagerClient:GetPropertyTable()
-	-- Not that fast, that's for sure...
-
-	local function Recurse(PropertyTable, ItemToCopy)		
-		for Property, Value in pairs(ItemToCopy) do
-			if type(Value) == "table" then
-				PropertyTable[Property] = PropertyTable[Property] or {}
-
-				assert(type(PropertyTable[Property]) == "table")
-
-				Recurse(PropertyTable[Property], Value)
-			else
-				if PropertyTable[Property] == nil then
-					--print("Comparing", Property, CurrentTargets[Property], Value)
-					PropertyTable[Property] = Value
-				end
-			end
-		end
-	end
-
-	local PropertyTable = {}
-
-	for i=#self.Stack, 1, -1 do
-		local Data = self.Stack[i]
-		if Data.PropertyTable then
-			Recurse(PropertyTable, Data.PropertyTable)
-		else
-			error("[LightingManagerClient] - Bad item on stack! No property data!")
-		end
-	end
-
-	return PropertyTable
-end
-
-function LightingManagerClient:AddTween(Name, PropertyTable, Time)
-	assert(type(PropertyTable) == "table")
-
-	self:RemoveTween(Name, nil, true)
-
-	table.insert(self.Stack, {
-		Name = Name;
-		PropertyTable = PropertyTable;
+	table.insert(self._stack, {
+		Key = key;
+		PropertyTable = propertyTable;
 	})
 
-	self:Update(Time)
+	self:_update(time)
 
 	return function()
-		self:RemoveTween(Name, Time)
+		self:RemoveTween(key, time)
 	end
 end
 
-function LightingManagerClient:RemoveTween(Name, Time, DoNotUpdate)
-	local Index = self:GetTweenIndex(Name)
-	if Index then
-		table.remove(self.Stack, Index)
+-- @param[opt=0] time
+-- @param[opt=false] doNotUpdate
+function LightingManagerClient:RemoveTween(key, time, doNotUpdate)
+	assert(key, "key is required")
+	time = time or 0
 
-		if not DoNotUpdate then
-			self:Update(Time)
+	local index = self:GetTweenIndex(key)
+	if index then
+		table.remove(self._stack, index)
+
+		if not doNotUpdate then
+			self:_update(time)
 		end
 
 		return true
@@ -149,12 +75,86 @@ function LightingManagerClient:RemoveTween(Name, Time, DoNotUpdate)
 	return false
 end
 
-function LightingManagerClient:GetTweenIndex(Name)
-	assert(type(Name) == "string")
+function LightingManagerClient:_update(time)
+	time = time or 0
 
-	for Index, Item in pairs(self.Stack) do
-		if Item.Name == Name then
-			return Index
+	local propertyTable = self:_getPropertyTable(self._cachedCurrentTargets)
+	local deltaTable, currentValues = self:_getDesiredTweens(propertyTable, self._cachedCurrentTargets)
+	self._cachedCurrentTargets = currentValues
+
+	self:_tweenOnItem(Lighting, deltaTable, time)
+
+	if #self._stack >= 4 then
+		warn("[LightingManagerClient] - Stack is sized greater than 4, may want to remove!")
+	end
+end
+
+
+function LightingManagerClient:_getDesiredTweens(propertyTable, cachedCurrentTargets)
+	local function recurse(deltaTable, valueTable, itemToCopy)
+		for property, value in pairs(itemToCopy) do
+			if type(value) == "table" then
+				deltaTable[property] = deltaTable[property] or {}
+				valueTable[property] = valueTable[property] or {}
+
+				recurse(deltaTable[property], valueTable[property], value)
+			else
+				if valueTable[property] ~= value then
+					deltaTable[property] = value
+					valueTable[property] = value
+				end
+			end
+		end
+	end
+
+	local deltaTable = {}
+	local currentValues = Table.DeepCopy(cachedCurrentTargets or {})
+	recurse(deltaTable, currentValues, propertyTable)
+
+	return deltaTable, currentValues
+end
+
+--- Not that fast, that's for sure...
+function LightingManagerClient:_getPropertyTable()
+	local function recurse(propertyTable, itemToCopy)
+		for property, value in pairs(itemToCopy) do
+			if type(value) == "table" then
+				propertyTable[property] = propertyTable[property] or {}
+
+				assert(type(propertyTable[property]) == "table")
+
+				recurse(propertyTable[property], value)
+			else
+				if propertyTable[property] == nil then
+					--print("Comparing", property, CurrentTargets[property], value)
+					propertyTable[property] = value
+				end
+			end
+		end
+	end
+
+	local propertyTable = {}
+
+	for i=#self._stack, 1, -1 do
+		local data = self._stack[i]
+		if data.PropertyTable then
+			recurse(propertyTable, data.PropertyTable)
+		else
+			error("[LightingManagerClient] - Bad item on stack! No property data!")
+		end
+	end
+
+	return propertyTable
+end
+
+
+
+function LightingManagerClient:GetTweenIndex(key)
+	assert(type(key) == "string")
+
+	for index, item in pairs(self._stack) do
+		if item.Key == key then
+			return index
 		end
 	end
 
