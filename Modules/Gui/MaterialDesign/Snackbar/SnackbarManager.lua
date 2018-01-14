@@ -64,19 +64,6 @@ function SnackbarManager:MakeSnackbar(text, options)
 	return NewSnackbar
 end
 
---- Initializes a remoteEvent on the client to listen to new requests from the server to show a snackbar.
--- Optional for regular use
-function SnackbarManager:WithSnackbarRemoteEvent(remoteEvent)
-	assert(self._screenGui, "Must initialize PlayerGui before initializing remoteEvent")
-
-	self._remoteEvent = remoteEvent or error("No remoteEvent")
-	self._remoteEvent.OnClientEvent:Connect(function(Text, Options)
-		self:MakeSnackbar(Text, Options)
-	end)
-
-	return self
-end
-
 --- Cleanup existing snackbar
 function SnackbarManager:_showSnackbar(snackbar)
 	assert(snackbar, "Must send a snackbar")
