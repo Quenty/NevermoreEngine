@@ -3,6 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local Players = game:GetService("Players")
+
 local WIND_SPEED = 10
 
 local sin = math.sin
@@ -40,13 +42,13 @@ local function MakeParticleEngineServer()
 	end
 	Engine.ParticleNew = ParticleNew
 
-	RemoteEvent.OnServerEvent:Connect(function(Player, p)
+	RemoteEvent.OnServerEvent:Connect(function(sender, p)
 		-- print("Server -- New particle")
 		p.Global = nil
 
-		for _, PlayerX in pairs(game.Players:GetPlayers()) do
-			if PlayerX ~= Player then
-				RemoteEvent:FireClient(PlayerX, p)
+		for _, player in pairs(Players:GetPlayers()) do
+			if player ~= sender then
+				RemoteEvent:FireClient(player, p)
 			end
 		end
 	end)
@@ -91,8 +93,8 @@ local function RealMakeEngine(Screen)
 
 	local Time = tick()
 
-	local Player         = game.Players.LocalPlayer
-	local RemoteEvent    = require.GetRemoteEvent("ParticleEventDistributor")
+	local Player  = Players.LocalPlayer
+	local RemoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
 
 	-- Screen = Screen or Instance.new("ScreenGui", Player.PlayerGui)
 
