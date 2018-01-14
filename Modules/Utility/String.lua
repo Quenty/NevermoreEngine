@@ -19,6 +19,10 @@ function lib.ToCamelCase(str)
 	return str
 end
 
+function lib.ToPrivateCase(str)
+	return "_" .. str:sub(1, 1):lower() .. str:sub(2, #str)
+end
+
 -- Only trims the front of the string...
 function lib.TrimFront(str, pattern)
 	pattern = pattern or "%s";
