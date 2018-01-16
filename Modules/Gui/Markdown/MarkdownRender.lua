@@ -9,6 +9,7 @@ MarkdownRender.__index = MarkdownRender
 MarkdownRender.ClassName = "MarkdownRender"
 MarkdownRender.SpaceAfterParagraph = 10
 MarkdownRender.SpaceAfterHeader = 5
+MarkdownRender.SpaceBetweenList = 2
 MarkdownRender.TextSize = 18
 MarkdownRender.Indent = 30
 MarkdownRender.TextColor3 = Color3.fromRGB(56, 56, 56)
@@ -41,8 +42,8 @@ function MarkdownRender:Render(data)
 		if type(item) == "string" then
 			gui = self:_renderParagraph(item)
 			gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
-
 			height = height + gui.Size.Y.Offset
+
 			if index ~= #data then
 				height = height + self.SpaceAfterParagraph
 			end
@@ -50,10 +51,15 @@ function MarkdownRender:Render(data)
 			if item.Type == "List" then
 				gui = self:_renderList(item)
 				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
-
 				height = height + gui.Size.Y.Offset
-				if not (type(data[index+1]) == "table" and data[index+1].Type == "List" and data[index+1].Level ~= item.Level) then
-					height = height + self.SpaceAfterParagraph
+
+				local nextIsNestedList = (type(data[index+1]) == "table" and data[index+1].Type == "List" and data[index+1].Level ~= item.Level)
+				if index ~= #data  then
+					if nextIsNestedList then
+						height = height + self.SpaceBetweenList
+					else
+						height = height + self.SpaceAfterParagraph
+					end
 				end
 			elseif item.Type == "Header" then
 				gui = self:_renderHeader(item)
@@ -173,7 +179,10 @@ function MarkdownRender:_renderList(listData)
 		bullet.Position = UDim2.new(0, -self.Indent/2, 0, self.TextSize/2 + 1)
 		bullet.Parent = textLabel
 
-		height = height + textLabel.Size.Y.Offset + 2
+		height = height + textLabel.Size.Y.Offset
+		if index ~= #listData then
+			height = height + self.SpaceBetweenList
+		end
 	end
 
 	frame.Size = UDim2.new(frame.Size.X, UDim.new(0, height))
