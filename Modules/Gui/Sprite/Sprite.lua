@@ -6,11 +6,12 @@ Sprite.ClassName = "Sprite"
 Sprite.__index = Sprite
 
 function Sprite.new(data)
-	local self = setmetatable(data, Sprite)
-
+	assert(data.Texture)
 	assert(data.Size)
 	assert(data.Position)
 	assert(data.Name)
+
+	local self = setmetatable(data, Sprite)
 
 	return self
 end
@@ -28,7 +29,7 @@ function Sprite:Get(instanceType)
 	gui.Name = self.Name
 	gui.BackgroundTransparency = 1
 	gui.BorderSizePixel = 1
-	gui.Image = self._texture
+	gui.Image = self.Texture
 
 	self:Style(gui)
 

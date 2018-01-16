@@ -22,6 +22,7 @@ function Spritesheet:AddSprite(index, position, size)
 	assert(not self._sprites[index])
 
 	local sprite = Sprite.new({
+		Texture = self._texture;
 		Position = position,
 		Size = size,
 		Name = tostring(index)
