@@ -24,22 +24,22 @@ function lib.GetAlivePlayerHumanoid(player)
 	return humanoid
 end
 
-function lib.GetAlivePlayerTorso(player)
+function lib.GetAlivePlayerRootPart(player)
 	local humanoid = lib.GetPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
 	end
 
-	return humanoid.Torso
+	return humanoid.RootPart
 end
 
-function lib.GetPlayerTorso(player)
+function lib.GetPlayerRootPart(player)
 	local humanoid = lib.GetPlayerHumanoid(player)
 	if not humanoid then
 		return nil
 	end
 
-	return humanoid.Torso
+	return humanoid.RootPart
 end
 
 --- Returns the Player and Character that a descendent is part of, if it is part of one.
