@@ -9,15 +9,12 @@ local module = {}
 
 --- Adds the GenerateWith API to the class
 -- @tparam table class
--- @tparam[opt] table staticResources If provided, these resources are added to the class automatically
+-- @tparam table staticResources These resources are added to the class automatically
 function module:Add(class, staticResources)
 	assert(class)
+	assert(staticResources)
 
-	class.GenerateWith = self.GenerateWith
-
-	if staticResources then
-		class:GenerateWith(staticResources)
-	end
+	self.GenerateWith(class, staticResources)
 end
 
 --- Generates resources
