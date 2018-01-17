@@ -83,18 +83,6 @@ function ActionManager:GetAction(name)
 	return self._actions[name]
 end
 
-function ActionManager:CreateAction(name, actionData)
-	local action = BaseAction.new(name)
-
-	if actionData then
-		action:WithActionData(actionData)
-	end
-
-	self:AddAction(action)
-
-	return action
-end
-
 function ActionManager:GetActions()
 	local list = {}
 

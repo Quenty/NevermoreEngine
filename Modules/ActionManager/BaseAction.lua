@@ -15,11 +15,12 @@ BaseAction.ClassName = "BaseAction"
 
 EnabledMixin:Add(BaseAction)
 
-function BaseAction.new(name)
+function BaseAction.new(actionData)
+	assert(type(actionData) == "table")
 	local self = setmetatable({}, BaseAction)
 
 	self._maid = Maid.new()
-	self._name = name or error("No name")
+	self._name = actionData.Name or error("No name")
 	self._contextActionKey = ("%s_ContextAction"):format(tostring(self._name))
 	self._activateData = nil -- Data to be fired with the Activated event
 
@@ -51,6 +52,8 @@ function BaseAction.new(name)
 		self:_updateShortcuts()
 	end))
 
+	self:_withActionData(actionData)
+
 
 	return self
 end
@@ -59,7 +62,7 @@ function BaseAction:GetName()
 	return self._name
 end
 
-function BaseAction:WithActionData(actionData)
+function BaseAction:_withActionData(actionData)
 	self._actionData = actionData or error("No actionData")
 
 	self:_updateShortcuts()
@@ -72,18 +75,20 @@ function BaseAction:_updateShortcuts()
 		return
 	end
 
-	local Shortcuts = self._actionData.Shortcuts
+	local shortcuts = self._actionData.Shortcuts
 
-	if Shortcuts and #Shortcuts > 0 then
-		if self:IsEnabled() then
-			ContextActionService:BindAction(self._contextActionKey, function(Name, UserInputState, InputObject)
-				if UserInputState == Enum.UserInputState.Begin then
-					self:ToggleActivate()
-				end
-			end, false, unpack(Shortcuts))
-		else
-			ContextActionService:UnbindAction(self._contextActionKey)
-		end
+	if not (shortcuts and #shortcuts > 0) then
+		return
+	end
+
+	if self:IsEnabled() then
+		ContextActionService:BindAction(self._contextActionKey, function(Name, UserInputState, InputObject)
+			if UserInputState == Enum.UserInputState.Begin then
+				self:ToggleActivate()
+			end
+		end, false, unpack(shortcuts))
+	else
+		ContextActionService:UnbindAction(self._contextActionKey)
 	end
 end
 
