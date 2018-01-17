@@ -20,7 +20,7 @@ function RoundedBackingBuilder:CreateBacking(gui)
 	backing.ImageColor3 = gui.BackgroundColor3
 	backing.ScaleType = Enum.ScaleType.Slice
 	backing.BackgroundTransparency = 1
-	backing.ZIndex = gui.ZIndex - 1
+	backing.ZIndex = math.max(2, gui.ZIndex - 1)
 	backing.Parent = gui
 
 	gui.BackgroundTransparency = 1
@@ -64,7 +64,6 @@ function RoundedBackingBuilder:CreateBottomBacking(gui)
 
 	return backing
 end
-
 
 function RoundedBackingBuilder:CreateShadow(backing)
 	local shadow = Instance.new("ImageLabel")
