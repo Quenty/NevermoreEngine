@@ -17,6 +17,7 @@ EnabledMixin:Add(BaseAction)
 
 function BaseAction.new(actionData)
 	assert(type(actionData) == "table")
+
 	local self = setmetatable({}, BaseAction)
 
 	self._maid = Maid.new()

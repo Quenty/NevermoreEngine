@@ -5,7 +5,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local ContextActionService = game:GetService("ContextActionService")
 
-local BaseAction = require("BaseAction")
 local ValueObject = require("ValueObject")
 local Signal = require("Signal")
 local EnabledMixin = require("EnabledMixin")
