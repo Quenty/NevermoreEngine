@@ -7,10 +7,10 @@ local WaitForChildPromise = {}
 function WaitForChildPromise.new(parent, childName, timeOut)
 	timeOut = timeOut or 5
 
-	return Promise.new(function(fulfill, reject)
+	return Promise.new(function(resolve, reject)
 		local result = parent:WaitForChild(childName, timeOut)
 		if result then
-			fulfill(result)
+			resolve(result)
 		else
 			reject("timed out")
 		end

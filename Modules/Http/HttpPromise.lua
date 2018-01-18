@@ -15,7 +15,7 @@ function HttpPromise.Method(methodName, url, ...)
 
 	local Args = {...}
 
-	return Promise.new(function(fulfill, reject)
+	return Promise.new(function(resolve, reject)
 		local result
 
 		local success, err = pcall(function()
@@ -23,9 +23,9 @@ function HttpPromise.Method(methodName, url, ...)
 		end)
 		if not success then
 			warn(("[HttpPromise] - Failed request '%s'"):format(url), err)
-			reject(err)
+			return reject(err)
 		else
-			fulfill(result)
+			return resolve(result)
 		end
 	end)
 end
@@ -34,33 +34,32 @@ function HttpPromise.Get(...)
 	return HttpPromise.Method("GetAsync", ...)
 end
 
-function HttpPromise.Post(Url, Data, HttpContentType, ...)
-	if type(Data) == "table" and HttpContentType == Enum.HttpContentType.ApplicationJson then
-		Data = HttpService:JSONEncode(Data)
+function HttpPromise.Post(url, data, httpContentType, ...)
+	if type(data) == "table" and httpContentType == Enum.HttpContentType.ApplicationJson then
+		data = HttpService:JSONEncode(data)
 	end
-	return HttpPromise.Method("PostAsync", Url, Data, HttpContentType, ...)
+	return HttpPromise.Method("PostAsync", url, data, httpContentType, ...)
 end
 
 function HttpPromise.Json(...)
-	return HttpPromise.Get(...):Then(function(Result)
+	return HttpPromise.Get(...):Then(function(result)
 
 		-- Decode
-		return Promise.new(function(Fulfill, Reject)
-			local Decoded
-			local Success, Error = pcall(function()
-				Decoded = HttpService:JSONDecode(Result)
+		return Promise.new(function(resolve, reject)
+			local decoded
+			local Success, err = pcall(function()
+				decoded = HttpService:JSONDecode(result)
 			end)
 
 			if not Success then
-				Reject(Error)
-			elseif Decoded then
-				Fulfill(Decoded)
+				return reject(err)
+			elseif decoded then
+				return resolve(decoded)
 			else
-				Reject("Decoded nothing")
+				return reject("decoded nothing")
 			end
 		end)
 	end)
 end
-
 
 return HttpPromise
