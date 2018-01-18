@@ -26,16 +26,15 @@ end
 local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
-Promise.catchErrors = false -- A+ compliance if true
+Promise.CatchErrors = false -- A+ compliance if true
 
 --- Construct a new promise
 -- @constructor Promise.new()
 -- @param Value, default nil
 -- @treturn Promise
-function Promise.new(value, catchErrors)
+function Promise.new(value)
 	local self = setmetatable({}, Promise)
 
-	self.catchErrors = catchErrors
 	self._pendingMaid = Maid.new()
 	self:_promisify(value)
 
@@ -245,7 +244,7 @@ function Promise:_promisfyYieldingFunction(yieldingFunction)
 	maid:GiveTask(bindable)
 	maid:GiveTask(bindable.Event:Connect(function()
 		maid:DoCleaning()
-		if self.catchErrors then
+		if self.CatchErrors then
 			local results = self:_executeFunc(self, yieldingFunction, {self:_getResolveReject()})
 			if self:IsPending() then
 				self:Resolve(results)
@@ -281,7 +280,7 @@ function Promise:_getResolveReject()
 end
 
 function Promise:_executeFunc(returnPromise, func, args)
-	if not self.catchErrors then
+	if not self.CatchErrors then
 		return {func(unpack(args))}
 	end
 
