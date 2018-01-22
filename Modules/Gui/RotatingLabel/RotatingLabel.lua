@@ -88,7 +88,7 @@ function RotatingLabel:__index(index)
 	elseif index == "TotalWidth" then
 		return #self.Text * self.Width
 	elseif index == "Width" then
-		return self._Width
+		return self._width
 	elseif index == "Transparency" or index == "Damper" or index == "Speed" then
 		return self["_" .. index:lower()]
 	elseif index == "TextXAlignment" then
@@ -165,7 +165,7 @@ function RotatingLabel:__newindex(index, value)
 
 		self:_beginUpdate()
 	elseif index == "Width" then
-		self._Width = value
+		self._width = value
 
 		for index, label in pairs(self._labels) do
 			label.Gui.Position = self:_getLabelPosition(index)
