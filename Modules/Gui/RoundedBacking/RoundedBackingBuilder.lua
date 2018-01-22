@@ -11,6 +11,13 @@ function RoundedBackingBuilder.new()
 	return self
 end
 
+function RoundedBackingBuilder:Create(gui)
+	local backing = self:CreateBacking(gui)
+	self:CreateShadow(backing)
+
+	return backing
+end
+
 function RoundedBackingBuilder:CreateBacking(gui)
 	local backing = Instance.new("ImageLabel")
 	backing.Name = "Backing"
@@ -54,13 +61,12 @@ function RoundedBackingBuilder:CreateRightBacking(gui)
 	return backing
 end
 
-
 --- Only bottom two corners are rounded
 function RoundedBackingBuilder:CreateBottomBacking(gui)
 	local backing = self:CreateBacking(gui)
-	backing.ImageRectOffset = Vector2.new(0, 4)
 	backing.ImageRectSize = Vector2.new(20, 16)
-	backing.SliceCenter = Rect.new(4, 4, 16, 16)
+	backing.ImageRectOffset = Vector2.new(0, 4)
+	backing.SliceCenter = Rect.new(4, 4, 12, 12)
 
 	return backing
 end
@@ -82,13 +88,5 @@ function RoundedBackingBuilder:CreateShadow(backing)
 
 	return shadow
 end
-
-function RoundedBackingBuilder:Create(gui)
-	local backing = self:CreateBacking(gui)
-	self:CreateShadow(backing)
-
-	return backing
-end
-
 
 return RoundedBackingBuilder
