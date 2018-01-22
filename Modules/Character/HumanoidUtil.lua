@@ -4,7 +4,7 @@
 
 local lib = {}
 
---- Retrieves a humanomid from a descendant (Players only).
+--- Retrieves a humanoid from a descendant (Players only).
 -- @param descendant Child of a humanoid model, like a limb
 -- @return Humanoid
 function lib.GetHumanoid(descendant)
