@@ -8,94 +8,93 @@ local RunService = game:GetService("RunService")
 
 local RotatingCharacterBuilder = require("RotatingCharacterBuilder")
 
-
 local RotatingLabel = {}
 RotatingLabel.ClassName = "RotatingLabel"
-RotatingLabel._Text = ""
-RotatingLabel._Speed = 15
-RotatingLabel._Damper = 0.85
-RotatingLabel._Transparency = 0
-RotatingLabel._Width = 0.5 -- A scaler of UDim2.
-RotatingLabel._TextXAlignment = "Left"
+RotatingLabel._text = ""
+RotatingLabel._speed = 15
+RotatingLabel._damper = 0.85
+RotatingLabel._transparency = 0
+RotatingLabel._width = 0.5 -- A scaler of UDim2.
+RotatingLabel._textXAlignment = "Left"
 
 function RotatingLabel.new()
 	local self = setmetatable({}, RotatingLabel)
 
-	self.Labels = setmetatable({}, {
-		__index = function(Labels, Index)
-			if Index == "Remove" then
-				return function(_, Index)
-					assert(rawget(Labels, Index), "There is no label at index" .. Index)
-					rawget(Labels, Index):Destroy()
-					rawset(Labels, Index, nil)
+	self._labels = setmetatable({}, {
+		__index = function(labels, index)
+			if index == "Remove" then
+				return function(_, index)
+					assert(rawget(labels, index), "There is no label at index" .. index)
+					rawget(labels, index):Destroy()
+					rawset(labels, index, nil)
 				end
-			elseif Index == "Get" then
-				return function(_, Index)
+			elseif index == "Get" then
+				return function(_, index)
 					-- @return The current label, or a newly constructed one
 
-					if rawget(Labels, Index) then
-						return rawget(Labels, Index)
+					if rawget(labels, index) then
+						return rawget(labels, index)
 					else
-						local NewLabel = RotatingCharacterBuilder.new()
-							:WithTemplate(self.Template)
-							:Generate(self.Container)
+						local newLabel = RotatingCharacterBuilder.new()
+							:WithTemplate(self._template)
+							:Generate(self._container)
 							:WithCharacter(" ")
 							:Create()
 
-						NewLabel.Gui.Position = self:_getLabelPosition(Index)
+						newLabel.Gui.Position = self:_getLabelPosition(index)
 
-						for _, PropertyName in pairs({"Transparency", "Damper", "Speed"}) do
-							if NewLabel[PropertyName] ~= self[PropertyName] then
-								NewLabel[PropertyName] = self[PropertyName]
+						for _, propertyName in pairs({"Transparency", "Damper", "Speed"}) do
+							if newLabel[propertyName] ~= self[propertyName] then
+								newLabel[propertyName] = self[propertyName]
 							end
 						end
 
-						rawset(Labels, Index, NewLabel)
-						return NewLabel
+						rawset(labels, index, newLabel)
+						return newLabel
 					end
 				end
 			else
-				return rawget(Labels, Index)
-				-- error(Index .. " is not a valid member")
+				return rawget(labels, index)
+				-- error(index .. " is not a valid member")
 			end
 		end;
 	});
 
-	self.BindKey = "RotatingLabel" .. tostring(self)
+	self._bindKey = "RotatingLabel" .. tostring(self)
 
 	return self
 end
 
-function RotatingLabel:_getLabelPosition(Index)
+function RotatingLabel:_getLabelPosition(index)
 	if self.TextXAlignment == "Left" then
-		return UDim2.new((Index-1)*self.Width, 0, 0, 0)
+		return UDim2.new((index-1)*self.Width, 0, 0, 0)
 	else
-		return UDim2.new(-self.TotalWidth + (Index-1)*self.Width, 0, 0, 0)
+		return UDim2.new(-self.TotalWidth + (index-1)*self.Width, 0, 0, 0)
 	end
 end
 
-function RotatingLabel:SetGui(Gui)
-	self.Gui = Gui or error("No GUI")
-	self.Container = self.Gui.Container
+function RotatingLabel:SetGui(gui)
+	self.Gui = gui or error("No GUI")
+	self._container = self.Gui.Container
 end
 
-function RotatingLabel:SetTemplate(Template)
-	self.Template = Template or error("No GUI")
+function RotatingLabel:SetTemplate(template)
+	self._template = template or error("No GUI")
 end
 
-function RotatingLabel:__index(Index)
-	if Index == "Text" then
-		return self._Text
-	elseif Index == "TotalWidth" then
+function RotatingLabel:__index(index)
+	if index == "Text" then
+		return self._text
+	elseif index == "TotalWidth" then
 		return #self.Text * self.Width
-	elseif Index == "Width" then
+	elseif index == "Width" then
 		return self._Width
-	elseif Index == "Transparency" or Index == "Damper" or Index == "Speed" then
-		return self["_" .. Index]
-	elseif Index == "TextXAlignment" then
-		return self._TextXAlignment
+	elseif index == "Transparency" or index == "Damper" or index == "Speed" then
+		return self["_" .. index:lower()]
+	elseif index == "TextXAlignment" then
+		return self._textXAlignment
 	else
-		return RotatingLabel[Index]
+		return RotatingLabel[index]
 	end
 end
 
@@ -115,116 +114,115 @@ end
 	RotatingLabel.TextXAlignment
 		Sets the alignment on the X axis. Cannot be Center.
 ]]
-function RotatingLabel:__newindex(Index, Value)
-	if Index == "Text" then
-		if type(Value) == "number" then
-			Value = tostring(Value)
+function RotatingLabel:__newindex(index, value)
+	if index == "Text" then
+		if type(value) == "number" then
+			value = tostring(value)
 		end
 
-		assert(type(Value) == "string", "Text must be a string, got " .. type(Value))
-
+		assert(type(value) == "string", "Text must be a string, got " .. type(value))
 
 		if self.TextXAlignment == "Right" then
 			-- Shifts existing labels over in the stack so when we add more they
-			local Delta = #Value - #self.Text
+			local Delta = #value - #self.Text
 
-			local Labels = {}
+			local labels = {}
 
-			for Index, Label in pairs(self.Labels) do
-				local NewIndex = Index+Delta
-				Labels[NewIndex] = Label
+			for index, label in pairs(self._labels) do
+				local NewIndex = index+Delta
+				labels[NewIndex] = label
 
 				-- Clean up
-				if NewIndex < 1 or NewIndex > #Value then
-					Label.TargetCharacter = " "
+				if NewIndex < 1 or NewIndex > #value then
+					label.TargetCharacter = " "
 				end
 
-				self.Labels[Index] = nil
+				self._labels[index] = nil
 			end
 
-			for Index, Label in pairs(Labels) do
-				self.Labels[Index] = Label
+			for index, label in pairs(labels) do
+				self._labels[index] = label
 			end
 		else
 			-- Clean up past characters
 
-			for Index = #Value+1, #self.Text do
-				if self.Labels[Index] then
-					self.Labels[Index].TargetCharacter = " "
+			for index = #value+1, #self.Text do
+				if self._labels[index] then
+					self._labels[index].TargetCharacter = " "
 				end
 			end
 		end
 
-		self._Text = Value
+		self._text = value
 
-		for Index = 1, #self.Text do
-			self.Labels:Get(Index).TargetCharacter = self.Text:sub(Index, Index)
+		for index = 1, #self.Text do
+			self._labels:Get(index).TargetCharacter = self.Text:sub(index, index)
 		end
 
-		for Index, Label in pairs(self.Labels) do
-			Label.Gui.Position = self:_getLabelPosition(Index)
+		for index, label in pairs(self._labels) do
+			label.Gui.Position = self:_getLabelPosition(index)
 		end
 
-		self:BeginUpdate()
-	elseif Index == "Width" then
-		self._Width = Value
+		self:_beginUpdate()
+	elseif index == "Width" then
+		self._Width = value
 
-		for Index, Label in pairs(self.Labels) do
-			Label.Gui.Position = self:_getLabelPosition(Index)
+		for index, label in pairs(self._labels) do
+			label.Gui.Position = self:_getLabelPosition(index)
 		end
-	elseif Index == "Transparency" or Index == "Damper" or Index == "Speed" then
-		self["_" .. Index] = Value
-		for _, Label in pairs(self.Labels) do
-			Label[Index] = self[Index]
+	elseif index == "Transparency" or index == "Damper" or index == "Speed" then
+		self["_" .. index:lower()] = value
+		for _, label in pairs(self._labels) do
+			label[index] = self[index]
 		end
-	elseif Index == "TextXAlignment" then
-		assert(Value == "Left" or Value == "Right", "Value must be \"Left\" or \"Right\"")
+	elseif index == "TextXAlignment" then
+		assert(value == "Left" or value == "Right", "value must be \"Left\" or \"Right\"")
 
-		if Value == "Left" then
-			self.Container.Position = UDim2.new(0, 0, 0, 0)
+		if value == "Left" then
+			self._container.Position = UDim2.new(0, 0, 0, 0)
 		else
-			self.Container.Position = UDim2.new(1, 0, 0, 0)
+			self._container.Position = UDim2.new(1, 0, 0, 0)
 		end
 
-		self._TextXAlignment = Value
-		for Index, Label in pairs(self.Labels) do
-			Label.Gui.Position = self:_getLabelPosition(Index)
+		self._textXAlignment = value
+		for index, label in pairs(self._labels) do
+			label.Gui.Position = self:_getLabelPosition(index)
 		end
 	else
-		rawset(self, Index, Value)
+		rawset(self, index, value)
 	end
 end
 
 -- @return IsDoneUpdating
 function RotatingLabel:UpdateRender()
-	local IsDone = true
+	local isDone = true
 
-	for Index, Label in pairs(self.Labels) do
-		if Label:UpdateRender() then
-			if Label.TargetCharacter == " " then
-				self.Labels:Remove(Index)
+	for index, label in pairs(self._labels) do
+		if label:UpdateRender() then
+			if label.TargetCharacter == " " then
+				self._labels:Remove(index)
 			else
-				Label.Value = Label.Target
-				Label:UpdateRender()
+				label.Value = label.Target
+				label:UpdateRender()
 			end
-		else -- Label is sitll animating
-			IsDone = false
+		else -- label is sitll animating
+			isDone = false
 		end
 	end
 
-	return IsDone
+	return isDone
 end
 
 function RotatingLabel:_stopUpdate()
-	RunService:UnbindFromRenderStep(self.BindKey)
-	self.Bound = false
+	RunService:UnbindFromRenderStep(self._bindKey)
+	self._bound = false
 end
 
-function RotatingLabel:BeginUpdate()
-	if not self.Bound then
-		self.Bound = true
+function RotatingLabel:_beginUpdate()
+	if not self._bound then
+		self._bound = true
 
-		RunService:BindToRenderStep(self.BindKey, 2000, function()
+		RunService:BindToRenderStep(self._bindKey, 2000, function()
 			if self:UpdateRender() then
 				self:_stopUpdate()
 			end
@@ -234,15 +232,15 @@ end
 
 function RotatingLabel:Destroy()
 	self:_stopUpdate()
-	self.BindKey = nil
+	self._bindKey = nil
 
-	for Index, _ in pairs(self.Labels) do
-		self.Labels:Remove(Index)
+	for index, _ in pairs(self._labels) do
+		self._labels:Remove(index)
 	end
-	self.Labels = nil
+	self._labels = nil
 
 	self.Gui:Destroy()
-	self.Template:Destroy()
+	self._template:Destroy()
 
 	setmetatable(self, nil)
 end
