@@ -136,7 +136,11 @@ function ScrollingFrame:_getVelocityTracker(strength)
 		local elapsed = tick() - lastUpdate
 		local delta = lastPos - pos
 
-		self._model.Velocity = self._model.Velocity - (delta / (0.0001 + elapsed)) * strength
+		if elapsed == 0 then
+			elapsed = 0.03
+		end
+
+		self._model.Velocity = self._model.Velocity - (delta / elapsed) * strength
 		lastPos = pos
 		lastUpdate = tick()
 	end
