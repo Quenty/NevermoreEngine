@@ -211,7 +211,7 @@ function GitHub:Install(Link, Parent, RoutineList)
 	end
 
 	if not Website then Website = "https://github.com/" end
-	Directory = Directory and ("/" .. Directory) or "" -- :gsub("^//", "/")
+	Directory = Directory and ("/" .. Directory):gsub("^//", "/") or ""
 
 	-- Threads
 	local Routines = RoutineList or {false}
@@ -268,5 +268,5 @@ function GitHub:Install(Link, Parent, RoutineList)
 end
 
 GitHub:Install("https://github.com/Quenty/NevermoreEngine/tree/version2/Modules", game:GetService("ServerScriptService")).Name = "Nevermore"
-GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/App/Nevermore.lua", game:GetService("ReplicatedStorage"))
+GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/App/Nevermore.lua").Parent = game:GetService("ReplicatedStorage")
 HttpService.HttpEnabled = ...
