@@ -1,7 +1,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
 
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputServic")
+local UserInputService = game:GetService("UserInputService")
 
 -- Load snackbar manager
 local SnackbarManager = require("SnackbarManager").new()
