@@ -23,9 +23,9 @@ function Spritesheet:AddSprite(index, position, size)
 
 	local sprite = Sprite.new({
 		Texture = self._texture;
-		Position = position,
-		Size = size,
-		Name = tostring(index)
+		Position = position;
+		Size = size;
+		Name = tostring(index);
 	})
 
 	self._sprites[index] = sprite
