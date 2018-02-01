@@ -20,6 +20,16 @@ function lib.LerpNumber(low, high, percent)
 	return low + ((high - low) * percent)
 end
 
+--- Solving for angle across from C
+function lib.LawOfCosines(A, B, C)
+	local l = (A*A + B*B - C*C) / (2 * A * B)
+	local a = math.acos(l)
+	if a ~= a then
+		return nil
+	end
+	return a
+end
+
 --- Round the given number to given precision
 function lib.Round(number, base)
 	base = base or 1
