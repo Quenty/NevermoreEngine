@@ -9,6 +9,8 @@ local UserInputService = game:GetService("UserInputService")
 
 local Maid = require("Maid")
 local ScrollModel = require("ScrollModel")
+local SCROLL_TYPE = require("SCROLL_TYPE")
+local Table = require("Table")
 
 local ScrollingFrame = {}
 ScrollingFrame.ClassName = "ScrollingFrame"
@@ -22,6 +24,7 @@ function ScrollingFrame.new(gui)
 	self._maid = Maid.new()
 	self.Gui = gui or error("No Gui")
 	self._container = self.Gui.Parent or error("No container")
+	self._scrollType = SCROLL_TYPE.Vertical;
 
 	self._scrollbars = {}
 	self._model = ScrollModel.new()
@@ -45,13 +48,26 @@ function ScrollingFrame.new(gui)
 	return self
 end
 
+--- Sets the scroll type for the frame
+function ScrollingFrame:SetScrollType(scrollType)
+	assert(Table.Contains(SCROLL_TYPE, scrollType))
+	self._scrollType = scrollType
+end
+
 function ScrollingFrame:AddScrollbar(scrollbar)
 	assert(scrollbar)
-
 	scrollbar:SetScrollingFrame(self)
 
 	table.insert(self._scrollbars, scrollbar)
-	self._maid:GiveTask(scrollbar)
+	self._maid[scrollbar] = scrollbar
+end
+
+function ScrollingFrame:RemoveScrollbar(scrollbar)
+	local index = Table.GetIndex(self._scrollbars, scrollbar)
+	if index then
+		table.remove(self._scrollbars, index)
+		self._maid[scrollbar] = nil
+	end
 end
 
 --- Scrolls to the position in pixels offset
@@ -78,12 +94,19 @@ function ScrollingFrame:GetModel()
 end
 
 function ScrollingFrame:_updateScrollerSize()
-	self._model.TotalContentLength = self.Gui.AbsoluteSize.y
-	self._model.ViewSize = self._container.AbsoluteSize.y
+	self._model.TotalContentLength = self.Gui.AbsoluteSize[self._scrollType.Direction]
+	self._model.ViewSize = self._container.AbsoluteSize[self._scrollType.Direction]
 end
 
 function ScrollingFrame:_updateRender()
-	self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new(0, self._model.BoundedRenderPosition))
+	if self._scrollType == SCROLL_TYPE.Vertical then
+		self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new(0, self._model.BoundedRenderPosition))
+	elseif self._scrollType == SCROLL_TYPE.Horizontal then
+		self.Gui.Position = UDim2.new(UDim.new(0, self._model.BoundedRenderPosition), self.Gui.Position.Y)
+	else
+		error("[ScrollingFrame] - Bad ScrollType")
+	end
+
 	for _, scrollbar in pairs(self._scrollbars) do
 		scrollbar:UpdateRender()
 	end
@@ -152,7 +175,7 @@ function ScrollingFrame:_getInputProcessor(inputBeganObject)
 	local originalPos = inputBeganObject.Position
 
 	return function(inputObject)
-		local distance = (inputObject.Position - originalPos).y
+		local distance = (inputObject.Position - originalPos)[self._scrollType.Direction]
 		local pos = startPos - distance
 		self._model.Position = pos
 		self._model.Target = pos
@@ -247,8 +270,9 @@ function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganOb
 
 	maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-			local offset = (inputObject.Position - startPosition).y
-			local percent = offset / (scrollbarContainer.AbsoluteSize.Y * (1 - self._model.ContentScrollPercentSize))
+			local direction = self._scrollType.Direction
+			local offset = (inputObject.Position - startPosition)[direction]
+			local percent = offset / (scrollbarContainer.AbsoluteSize[direction] * (1 - self._model.ContentScrollPercentSize))
 			self._model.ContentScrollPercent = startPercent + percent
 			self._model.TargetContentScrollPercent = self._model.ContentScrollPercent
 
@@ -267,7 +291,6 @@ function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganOb
 
 	return maid
 end
-
 
 function ScrollingFrame:Destroy()
 	self._maid:DoCleaning()

@@ -4,7 +4,9 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
+local SCROLL_TYPE = require("SCROLL_TYPE")
 local Signal = require("Signal")
+local Table = require("Table")
 
 local Scrollbar = {}
 Scrollbar.ClassName = "Scrollbar"
@@ -18,13 +20,14 @@ function Scrollbar.new(gui)
 
 	self._maid = Maid.new()
 	self._container = self.Gui.Parent or error("No container")
+	self._scrollType = SCROLL_TYPE.Vertical
 
 	return self
 end
 
-function Scrollbar.fromContainer(container)
+function Scrollbar.fromContainer(container, scrollType)
 	local gui = Instance.new("ImageButton")
-	gui.Size = UDim2.new(1, 0, 0, 100)
+	gui.Size = UDim2.new(1, 0, 1, 0)
 	gui.Name = "ScrollBar"
 	gui.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
 	gui.BorderSizePixel = 0
@@ -37,14 +40,18 @@ function Scrollbar.fromContainer(container)
 	return Scrollbar.new(gui)
 end
 
+function Scrollbar:SetScrollType(scrollType)
+	assert(Table.Contains(SCROLL_TYPE, scrollType))
+	self._scrollType = scrollType
+end
+
 function Scrollbar:SetScrollingFrame(scrollingFrame)
 	self._scrollingFrame = scrollingFrame or error("No scrollingFrame")
 	self._model = self._scrollingFrame:GetModel()
 
 	self._maid:GiveTask(self.Gui.InputBegan:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-			local maid = self._scrollingFrame:StartScrollbarScrolling(self._container, inputObject)
-			self._maid._updateMaid = maid
+			self._maid._updateMaid = self._scrollingFrame:StartScrollbarScrolling(self._container, inputObject)
 		end
 	end))
 
@@ -54,11 +61,17 @@ end
 function Scrollbar:UpdateRender()
 	if self._model.TotalContentLength > self._model.ViewSize then
 		local percentSize = self._model.RenderedContentScrollPercentSize
+		local pos = (1-percentSize) * self._model.RenderedContentScrollPercent
 
-		self.Gui.Size = UDim2.new(self.Gui.Size.X, UDim.new(percentSize, 0))
-
-		local posY = (1-percentSize) * self._model.RenderedContentScrollPercent
-		self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new(posY, 0))
+		if self._scrollType == SCROLL_TYPE.Vertical then
+			self.Gui.Size = UDim2.new(self.Gui.Size.X, UDim.new(percentSize, 0))
+			self.Gui.Position = UDim2.new(self.Gui.Position.X, UDim.new(pos, 0))
+		elseif self._scrollType == SCROLL_TYPE.Horizontal then
+			self.Gui.Size = UDim2.new(UDim.new(percentSize, 0), self.Gui.Size.Y)
+			self.Gui.Position = UDim2.new(UDim.new(pos, 0), self.Gui.Position.Y)
+		else
+			error("[Scrollbar] - Bad ScrollType")
+		end
 
 		self.Gui.Visible = true
 	else
