@@ -58,6 +58,7 @@ end
 -- @param task An item to clean
 -- @treturn number taskId
 function Maid:GiveTask(task)
+	assert(task)
 	local taskId = #self._tasks+1
 	self[taskId] = task
 	return taskId
