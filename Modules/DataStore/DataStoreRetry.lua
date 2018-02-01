@@ -20,7 +20,7 @@ local function DataStoreRetry(DataStoreFunction)
 		if not Success then
 			warn(("[DataStoreRetry] - Datastore failure '%s'. Retrying!"):format(tostring(Error)))
 			if not RunService:IsStudio() then
-				wait(1)
+				wait(0.75 + 0.5*math.random()) -- Apply jitter to help with scaling
 			end
 		end
 	until Tries == DATASTORE_RETRIES or Success
