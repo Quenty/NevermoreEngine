@@ -17,7 +17,6 @@ function Signal.new()
 
 	self._bindableEvent = Instance.new("BindableEvent")
 	self._argData = nil
-	self._argCount = nil
 
 	return self
 end
@@ -28,20 +27,20 @@ end
 -- @treturn nil
 function Signal:Fire(...)
 	self._argData = {...}
-	self._argCount = select("#", ...)
 	self._bindableEvent:Fire()
+	self._argData = nil
 end
 
 --- Connect a new handler to the event. Returns a connection object that can be disconnected.
 -- @tparam function handler Function handler called with arguments passed when `:Fire(...)` is called
 -- @treturn Connection Connection object that can be disconnected
 function Signal:Connect(handler)
-	if not (typeof(handler) == "function") then
+	if not (type(handler) == "function") then
 		error(("connect(%s)"):format(typeof(handler)), 2)
 	end
 
 	return self._bindableEvent.Event:Connect(function()
-		handler(unpack(self._argData, 1, self._argCount))
+		handler(unpack(self._argData))
 	end)
 end
 
@@ -50,7 +49,7 @@ end
 function Signal:Wait()
 	self._bindableEvent.Event:Wait()
 	assert(self._argData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-	return unpack(self._argData, 1, self._argCount)
+	return unpack(self._argData)
 end
 
 --- Disconnects all connected events to the signal. Voids the signal as unusable.
