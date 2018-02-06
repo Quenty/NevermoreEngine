@@ -117,7 +117,7 @@ function CameraStack:GetNewStateBelow()
 end
 
 --- Retrieves the index of a state
--- @tparam CameraState State
+-- @tparam CameraState state
 -- @treturn number Index of state
 -- @treturn nil If non on stack
 function CameraStack:GetIndex(state)
@@ -129,7 +129,7 @@ function CameraStack:GetIndex(state)
 end
 
 --- Removes the state from the stack
--- @tparam CameraState State
+-- @tparam CameraState state
 -- @treturn nil
 function CameraStack:Remove(state)
 	local index = self:GetIndex(state)
