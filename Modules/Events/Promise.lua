@@ -6,18 +6,18 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Maid = require("Maid")
 
-local function _isSignal(Value)
-	if typeof(Value) == "RBXScriptSignal" then
+local function _isSignal(value)
+	if typeof(value) == "RBXScriptSignal" then
 		return true
-	elseif type(Value) == "table" and type(Value.Connect) == "function" then
+	elseif type(value) == "table" and type(value.Connect) == "function" then
 		return true
 	end
 
 	return false
 end
 
-local function _isPromise(Value)
-	if type(Value) == "table" and Value.ClassName == "Promise" then
+local function _isPromise(value)
+	if type(value) == "table" and value.ClassName == "Promise" then
 		return true
 	end
 	return false
@@ -30,7 +30,7 @@ Promise.CatchErrors = false -- A+ compliance if true
 
 --- Construct a new promise
 -- @constructor Promise.new()
--- @param Value, default nil
+-- @param value, default nil
 -- @treturn Promise
 function Promise.new(value)
 	local self = setmetatable({}, Promise)
@@ -43,7 +43,7 @@ end
 
 --- Returns the value of the first promise resolved
 -- @constructor First
--- @tparam Array(Promise) Promises
+-- @tparam Array(Promise) promises
 -- @treturn Promise Promise that resolves with first result
 function Promise.First(promises)
 	local returnPromise = Promise.new()
