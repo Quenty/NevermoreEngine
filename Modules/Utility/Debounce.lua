@@ -1,4 +1,7 @@
 --- Debounce a existing function by timeout
+-- @module Debounce
+
+---
 -- @tparam number timeout
 -- @tparam function func
 -- @treturn function
