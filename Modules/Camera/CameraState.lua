@@ -30,18 +30,16 @@ function CameraState:__newindex(Index, Value)
 	end
 end
 
-
 --- Builds a new camera stack
 -- @constructor
--- @param[opt=nil] Cam
+-- @param[opt=nil] camera
 -- @treturn CameraState
-function CameraState.new(Cam)
+function CameraState.new(camera)
 	local self = setmetatable({}, CameraState)
 
-	if Cam then
-		self.FieldOfView = Cam.FieldOfView
-
-		self.CFrame = Cam.CFrame
+	if camera then
+		self.FieldOfView = camera.FieldOfView
+		self.CFrame = camera.CFrame
 	end
 
 	return self
@@ -61,61 +59,57 @@ end
 
 
 --- Adds two camera states together
--- @tparam CameraState Other
-function CameraState:__add(Other)
-	local New = CameraState.new(self)
-	New.FieldOfView = self.FieldOfView + Other.FieldOfView
-	New.Position = New.Position + Other.Position
-	New.Quaterion = self.Quaterion*Other.Quaterion
+-- @tparam CameraState other
+function CameraState:__add(other)
+	local cameraState = CameraState.new(self)
+	cameraState.FieldOfView = self.FieldOfView + other.FieldOfView
+	cameraState.Position = cameraState.Position + other.Position
+	cameraState.Quaterion = self.Quaterion*other.Quaterion
 
-	return New
+	return cameraState
 end
 
 --- Subtract the camera state from another
--- @tparam CameraState Other
-function CameraState:__sub(Other)
-	local New = CameraState.new(self)
-	New.FieldOfView = self.FieldOfView - Other.FieldOfView
-	New.Position = New.Position - Other.Position
-	New.Quaterion = self.Quaterion/Other.Quaterion
-
-	return New
+-- @tparam CameraState other
+function CameraState:__sub(other)
+	local cameraState = CameraState.new(self)
+	cameraState.FieldOfView = self.FieldOfView - other.FieldOfView
+	cameraState.Position = cameraState.Position - other.Position
+	cameraState.Quaterion = self.Quaterion/other.Quaterion
+	return cameraState
 end
 
 --- Inverts camera state
 function CameraState:__unm()
-	local New = CameraState.new(self)
-	New.FieldOfView = -self.FieldOfView
-	New.Position = -self.Position
-	New.Quaterion = -self.Quaterion
-
-	return New
+	local cameraState = CameraState.new(self)
+	cameraState.FieldOfView = -self.FieldOfView
+	cameraState.Position = -self.Position
+	cameraState.Quaterion = -self.Quaterion
+	return cameraState
 end
 
 --- Multiply camera state by percent effect
--- @tparam number Other
-function CameraState:__mul(Other)
-	local New = CameraState.new(self)
+-- @tparam number other
+function CameraState:__mul(other)
+	local cameraState = CameraState.new(self)
 
-	if type(Other) == "number" then
-		New.FieldOfView = self.FieldOfView * Other
-		New.Quaterion = self.Quaterion^Other
-		New.Position = self.Position * Other
+	if type(other) == "number" then
+		cameraState.FieldOfView = self.FieldOfView * other
+		cameraState.Quaterion = self.Quaterion^other
+		cameraState.Position = self.Position * other
 	else
 		error("Invalid other")
 	end
 
-	return New
+	return cameraState
 end
 
---- Set another camera state. Typically used to set workspace.CurrentCamera's state to match this camera's state
+--- Set another camera state. Typically used to set Workspace.CurrentCamera's state to match this camera's state
 -- @tparam Camera CameraState A CameraState to set, also accepts a Roblox Camera
 -- @treturn nil
-function CameraState:Set(CameraState)
-	CameraState = CameraState or workspace.CurrentCamera
-
-	CameraState.FieldOfView = self.FieldOfView
-	CameraState.CFrame = self.CFrame
+function CameraState:Set(camera)
+	camera.FieldOfView = self.FieldOfView
+	camera.CFrame = self.CFrame
 end
 
 return CameraState

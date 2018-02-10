@@ -3,6 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local Workspace = game:GetService("Workspace")
+
 local ScreenSpace = require("ScreenSpace")
 
 local ModelRender3D = {}
@@ -63,7 +65,7 @@ function ModelRender3D:GetPrimaryCFrame()
 
 		local Position = ScreenSpace.ScreenToWorld(FrameCenter.X, FrameCenter.Y, Depth)
 
-		local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame
+		local AdorneeCFrame = Workspace.CurrentCamera.CoordinateFrame
 			* (CFrame.new(Position, Vector3.new(0, 0, 0)) * self.RelativeRotation)
 
 		return AdorneeCFrame

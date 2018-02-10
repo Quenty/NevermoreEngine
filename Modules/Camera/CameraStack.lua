@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
@@ -35,7 +36,7 @@ function CameraStack.new()
 
 		local state = self:GetTopState()
 		if state and state ~= self._defaultCamera then
-			state:Set(workspace.CurrentCamera)
+			state:Set(Workspace.CurrentCamera)
 		end
 
 		debug.profileend()

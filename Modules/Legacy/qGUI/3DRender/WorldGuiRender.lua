@@ -3,6 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local Workspace = game:GetService("Workspace")
+
 local ScreenSpace = require("ScreenSpace")
 
 local WorldGuiRender = {}
@@ -13,7 +15,7 @@ function WorldGuiRender.new()
 	local self = setmetatable({}, WorldGuiRender)
 
 	self._depth = -10 -- studs
-	self._renderParent = workspace.CurrentCamera
+	self._renderParent = Workspace.CurrentCamera
 
 	return self
 end
@@ -95,7 +97,7 @@ function WorldGuiRender:GetPrimaryCFrame()
 	local frameCenter = self._fakeFrame.AbsolutePosition + size/2
 	local position = ScreenSpace.ScreenToWorldByWidthDepth(frameCenter.X, frameCenter.Y, size.X, self._depth)
 
-	return workspace.CurrentCamera.CFrame *
+	return Workspace.CurrentCamera.CFrame *
           CFrame.new(position) * -- Transform by camera coordinates
           CFrame.new(0, 0, -self._part.Size.Z/2) -- And take out the part size factor.
 end

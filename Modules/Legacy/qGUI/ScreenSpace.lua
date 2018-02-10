@@ -1,10 +1,12 @@
 ---
 -- @module ScreenSpace
 
+local Workspace = game:GetService("Workspace")
+
 local ScreenSpace = {}
 
 function ScreenSpace.ViewSizeX()
-	local x = workspace.CurrentCamera.ViewportSize.X--PlayerMouse.ViewSizeX
+	local x = Workspace.CurrentCamera.ViewportSize.X
 	if x == 0 then
 		return 1024
 	else
@@ -13,7 +15,7 @@ function ScreenSpace.ViewSizeX()
 end
 
 function ScreenSpace.ViewSizeY()
-	local y = workspace.CurrentCamera.ViewportSize.Y--PlayerMouse.ViewSizeY
+	local y = Workspace.CurrentCamera.ViewportSize.Y
 	if y == 0 then
 		return 768
 	else
@@ -29,66 +31,67 @@ end
 
 -- ScreenSpace -> WorldSpace. Raw function taking a screen position and a depth and
 -- converting it into a world position.
-function ScreenSpace.ScreenToWorld(x, y, Depth)
+function ScreenSpace.ScreenToWorld(x, y, depth)
 	y = y + 34
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor     = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor     = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor     = aspectRatio*hfactor
-	--
+
 	local xf, yf = x/ScreenSpace.ViewSizeX()*2 - 1, y/ScreenSpace.ViewSizeY()*2 - 1
-	local xpos = xf * -wfactor * Depth
-	local ypos = yf *  hfactor * Depth
-	--
-	return Vector3.new(xpos, ypos, Depth)
+	local xpos = xf * -wfactor * depth
+	local ypos = yf *  hfactor * depth
+
+	return Vector3.new(xpos, ypos, depth)
 end
 
 -- ScreenSize -> WorldSize
 function ScreenSpace.ScreenWidthToWorldWidth(ScreenWidth, depth)
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx = ScreenSpace.ViewSizeX()
-	--
+
 	return -(ScreenWidth / sx) * 2 * wfactor * depth
 end
 
 function ScreenSpace.ScreenHeightToWorldHeight(ScreenHeight, depth)
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local sy = ScreenSpace.ViewSizeY()
-	--
+
 	return -(ScreenHeight / sy) * 2 * hfactor * depth
 end
 
 -- WorldSize -> ScreenSize
 function ScreenSpace.WorldWidthToScreenWidth(worldWidth, depth)
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx = ScreenSpace.ViewSizeX()
-	--
+
 	return -(worldWidth * sx) / (2 * wfactor * depth)
 end
+
 function ScreenSpace.WorldHeightToScreenHeight(worldHeight, depth)
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local sy = ScreenSpace.ViewSizeY()
-	--
+
 	return -(worldHeight * sy) / (2 * hfactor * depth)
 end
 
--- WorldSize + ScreenSize -> Depth needed
+-- WorldSize + ScreenSize -> depth needed
 function ScreenSpace.GetDepthForWidth(screenWidth, worldWidth)
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx, _ = ScreenSpace.ViewSizeX(), ScreenSpace.ViewSizeY()
-	--
+
 	return -(sx * worldWidth) / (screenWidth * 2 * wfactor)
 end
 
 function ScreenSpace.GetDepthForHeight(screenHeight, worldHeight)
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local sy = ScreenSpace.ViewSizeY()
-	--
+
 	return -(sy * worldHeight) / (screenHeight * 2 * hfactor)
 end
 
@@ -97,16 +100,16 @@ end
 -- at that depth.
 function ScreenSpace.ScreenToWorldByHeightDepth(x, y, screenHeight, depth)
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx, sy = ScreenSpace.ViewSizeX(), ScreenSpace.ViewSizeY()
-	--
+
 	local worldHeight = -(screenHeight/sy) * 2 * hfactor * depth
-	--
+
 	local xf, yf = x/sx*2 - 1, y/sy*2 - 1
 	local xpos = xf * -wfactor * depth
 	local ypos = yf *  hfactor * depth
-	--
+
 	return Vector3.new(xpos, ypos, depth), worldHeight
 end
 
@@ -116,16 +119,16 @@ end
 function ScreenSpace.ScreenToWorldByWidthDepth(x, y, screenWidth, depth)
 	y = y + 34
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx, sy = ScreenSpace.ViewSizeX(), ScreenSpace.ViewSizeY()
-	--
+
 	local worldWidth = (screenWidth/sx) * 2 * -wfactor * depth
-	--
+
 	local xf, yf = x/sx*2 - 1, y/sy*2 - 1
 	local xpos = xf * -wfactor * depth
 	local ypos = yf *  hfactor * depth
-	--
+
 	return Vector3.new(xpos, ypos, depth), worldWidth
 end
 
@@ -134,16 +137,16 @@ end
 -- put that object at to satisfy those.
 function ScreenSpace.ScreenToWorldByHeight(x, y, screenHeight, worldHeight)
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx, sy = ScreenSpace.ViewSizeX(), ScreenSpace.ViewSizeY()
-	--
+
 	local depth = - (sy * worldHeight) / (screenHeight * 2 * hfactor)
-	--
+
 	local xf, yf = x/sx*2 - 1, y/sy*2 - 1
 	local xpos = xf * -wfactor * depth
 	local ypos = yf *  hfactor * depth
-	--
+
 	return Vector3.new(xpos, ypos, depth)
 end
 
@@ -152,16 +155,16 @@ end
 -- put that object at to satisfy those.
 function ScreenSpace.ScreenToWorldByWidth(x, y, screenWidth, worldWidth)
 	local aspectRatio = ScreenSpace.AspectRatio()
-	local hfactor = math.tan(math.rad(workspace.CurrentCamera.FieldOfView)/2)
+	local hfactor = math.tan(math.rad(Workspace.CurrentCamera.FieldOfView)/2)
 	local wfactor = aspectRatio*hfactor
 	local sx, sy = ScreenSpace.ViewSizeX(), ScreenSpace.ViewSizeY()
-	--
+
 	local depth = - (sx * worldWidth) / (screenWidth * 2 * wfactor)
-	--
+
 	local xf, yf = x/sx*2 - 1, y/sy*2 - 1
 	local xpos = xf * -wfactor * depth
 	local ypos = yf *  hfactor * depth
-	--
+
 	return Vector3.new(xpos, ypos, depth)
 end
 
@@ -171,10 +174,10 @@ function ScreenSpace.GetAdorneeData(Frame, Part)
 	local FrameAbsoluteSize = Frame.AbsoluteSize
 	local FrameCenter = Frame.AbsolutePosition + FrameAbsoluteSize/2 -- Center of the frame.
 
-	local Depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, Part.Size.X)
+	local depth = ScreenSpace.GetDepthForWidth(FrameAbsoluteSize.X, Part.Size.X)
 
-	local Position = ScreenSpace.ScreenToWorld(FrameCenter.X, FrameCenter.Y, Depth)
-	local AdorneeCFrame = workspace.CurrentCamera.CoordinateFrame *
+	local Position = ScreenSpace.ScreenToWorld(FrameCenter.X, FrameCenter.Y, depth)
+	local AdorneeCFrame = Workspace.CurrentCamera.CoordinateFrame *
 	                      CFrame.new(Position) * -- Transform by camera coordinates
 	                      CFrame.new(0, 0, -Part.Size.Z/2) -- And take out the part size factor.
 

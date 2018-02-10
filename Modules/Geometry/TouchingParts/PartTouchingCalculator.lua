@@ -4,6 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CollectionService = game:GetService("CollectionService")
+local Workspace = game:GetService("Workspace")
 
 local BoundingBox = require("BoundingBox")
 local CharacterUtil = require("CharacterUtil")
@@ -88,7 +89,7 @@ function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, pad
 	dummyPart.CFrame = rotation
 	dummyPart.Anchored = false
 	dummyPart.CanCollide = true
-	dummyPart.Parent = workspace
+	dummyPart.Parent = Workspace
 
 	return dummyPart
 end
@@ -146,7 +147,7 @@ function PartTouchingCalculator:GetTouching(basePart, padding)
 	part.CanCollide = true
 	part.Transparency = 0.1
 	part.Material = Enum.Material.SmoothPlastic
-	part.Parent = workspace
+	part.Parent = Workspace
 
 	local touching = part:GetTouchingParts()
 	part:Destroy()
@@ -181,8 +182,5 @@ function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 
 	return list
 end
-
-
-
 
 return PartTouchingCalculator

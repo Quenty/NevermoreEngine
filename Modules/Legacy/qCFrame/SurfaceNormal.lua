@@ -1,6 +1,8 @@
 --By xXxMoNkEyMaNxXx
 -- Modified by Quenty
 
+local Workspace = game:GetService("Workspace")
+
 local lib = {}
 
 -- SurfaceNormal.lua
@@ -8,7 +10,7 @@ local lib = {}
 --By xXxMoNkEyMaNxXx
 local sqrt=math.sqrt
 
-local Terrain=workspace.Terrain
+local Terrain=Workspace.Terrain
 local GetCell=Terrain.GetCell
 local CellCenterToWorld=Terrain.CellCenterToWorld
 local WorldToCellPreferSolid=Terrain.WorldToCellPreferSolid
@@ -212,7 +214,7 @@ local function GetSurfaceIdFromNormalRelativeToCFrame(RotMatrix, SurfaceNormal)
 	local X, Y, Z, RightX, UpX, BackX, 
 	               RightY, UpY, BackY, 
 	               RightZ, UpZ, BackZ = RotMatrix:components()
-	
+
 	local RightVector = Vector3.new(RightX, RightY, RightZ)
 	local LeftVector = -RightVector
 	local UpVector = Vector3.new(UpX, UpY, UpZ)
@@ -271,21 +273,21 @@ local function Coplanar(PlaneOne, PlaneTwo)
 
 end
 --[[
-local Terrain=workspace.Terrain
+local Terrain=Workspace.Terrain
 local GetCell=Terrain.GetCell
 local CellCenterToWorld=Terrain.CellCenterToWorld
 local WorldToCellPreferSolid=Terrain.WorldToCellPreferSolid
- 
+
 local vec3=Vector3.new
 local IdentityVector=vec3()
 local dot=IdentityVector.Dot
 local cross=IdentityVector.Cross
- 
+
 local mat3=CFrame.new
 local IdentityCFrame=mat3()
 local ptos=IdentityCFrame.pointToObjectSpace
 local vtws=IdentityCFrame.vectorToWorldSpace
- 
+
 --Returns:
 --Index of closest plane to p
 --Distance to surface from p
@@ -301,14 +303,14 @@ local function ClosestNormalVector(p,planes)
 	end
 	return best_i,best_d
 end
- 
+
 --Part geometry data
 local UnitaryConvexPlaneMeshes={--I realized that I could make each component of the normal vector dependent on every component of the size using matrices (genius!)
 	WedgePart={{vec3(0,-1,0),vec3(0,-0.5,0)},{vec3(0,0,1),vec3(0,0,0.5)},{mat3(0,0,0, 0,0,0, 0,0,1, 0,-1,0),vec3(0,0,0)},{vec3(1,0,0),vec3(0.5,0,0)},{vec3(-1,0,0),vec3(-0.5,0,0)}},
 	CornerWedgePart={{vec3(0,-1,0),vec3(0,-0.5,0)},{vec3(1,0,0),vec3(0.5,0,0)},{vec3(0,0,-1),vec3(0,0,-0.5)},{mat3(0,0,0, 0,-1,0, 1,0,0, 0,0,0),vec3(0,0,0)},{mat3(0,0,0, 0,0,0, 0,0,1, 0,1,0),vec3(0,0,0)}},
 	Part={{vec3(1,0,0),vec3(0.5,0,0)},{vec3(0,1,0),vec3(0,0.5,0)},{vec3(0,0,1),vec3(0,0,0.5)},{vec3(-1,0,0),vec3(-0.5,0,0)},{vec3(0,-1,0),vec3(0,-0.5,0)},{vec3(0,0,-1),vec3(0,0,-0.5)}}
 }
- 
+
 --Terrain geometry data
 local TerrainCellSize=vec3(4,4,4)--Support arbitrary stuff BECAUSE I CAN
 local TerrainCellOrientations={
@@ -324,7 +326,7 @@ local TerrainCellBlockUnitaryConvexPlaneMeshes={
 	{{vec3(1,0,0),vec3(0.5,0,0)},{vec3(0,1,0),vec3(0,0.5,0)},{vec3(0,0,1),vec3(0,0,0.5)},{vec3(-1,0,0),vec3(-0.5,0,0)},{vec3(0,-1,0),vec3(0,-0.5,0)},{vec3(0,0,-1),vec3(0,0,-0.5)},{mat3(0,0,0, 0,-1,-1, 1,0,1, 1,1,0),vec3(-0.5,0.5,0.5)/3}},
 	{{vec3(1,0,0),vec3(0.5,0,0)},{vec3(0,1,0),vec3(0,0.5,0)},{vec3(0,-1,0),vec3(0,-0.5,0)},{vec3(0,0,-1),vec3(0,0,-0.5)},{mat3(0,0,0, 0,0,-1, 0,0,0, 1,0,0),vec3(0,0,0)}}
 }
- 
+
 local function NormalVector(part, point)
 	--- Returns a unit vector3 of the surface normal
 	-- @param Part the part to check

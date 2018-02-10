@@ -4,6 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
 
 local WIND_SPEED = 10
 
@@ -122,7 +123,7 @@ local function RealMakeEngine(Screen)
 		PlaneSizeY  = 2*tan(Camera.FieldOfView*0.0087266462599716)
 		PlaneSizeX  = PlaneSizeY*ScreenSizeX/ScreenSizeY
 	end
-	ParticleUpdateScreenInformation(workspace.CurrentCamera)
+	ParticleUpdateScreenInformation(Workspace.CurrentCamera)
 
 	local function SetScreen(NewScreen)
 		assert(NewScreen, "Must be a screen!")
@@ -168,7 +169,7 @@ local function RealMakeEngine(Screen)
 					Vec = Vec * (999/Mag)
 				end
 
-				if workspace:FindPartOnRay(ray(c,Vec),Player.Character, true) then
+				if Workspace:FindPartOnRay(ray(c,Vec),Player.Character, true) then
 					Visible = false
 				end
 			end
@@ -270,8 +271,6 @@ local function RealMakeEngine(Screen)
 	end
 	Engine.ParticleRemove = ParticleRemove
 
-	local workspace = workspace
-
 	--- Handles both priority and regular particles
 	local function HandleParticleUpdate(Camera, CameraInverse, Frame, Particle, t, dt)
 		if Particle.LifeTime - t <= 0 then
@@ -295,7 +294,7 @@ local function RealMakeEngine(Screen)
 					Displacement = Displacement * (999/Distance)
 				end
 
-				local hit, position, normal, material = workspace:FindPartOnRay(ray(OldPosition, Displacement), Player.Character, true)
+				local hit, position, normal, material = Workspace:FindPartOnRay(ray(OldPosition, Displacement), Player.Character, true)
 				if hit then
 					if type(Particle.RemoveOnCollision) == "function" then
 						if not Particle.RemoveOnCollision(Particle, hit, position, normal, material) then
@@ -316,7 +315,7 @@ local function RealMakeEngine(Screen)
 	-- Should be in a loop, so no need for debounce
 	-- _G.AverageProcessTime=0
 	local function ParticleUpdate()
-		local Camera = workspace.CurrentCamera
+		local Camera = Workspace.CurrentCamera
 
 		AddNewParticles()
 		ParticleUpdateScreenInformation(Camera)

@@ -3,6 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local Workspace = game:GetService("Workspace")
+
 local Table = require("Table")
 
 local Raycaster = {}
@@ -77,7 +79,7 @@ end
 
 function Raycaster:_tryCast(ray)
 	local ignoreList = Table.Copy(self.IgnoreList)
-	local part, position, normal, material = workspace:FindPartOnRayWithIgnoreList(
+	local part, position, normal, material = Workspace:FindPartOnRayWithIgnoreList(
 		ray, ignoreList, false, self._ignoreWater)
 
 	if not part then

@@ -1,10 +1,15 @@
+---
+-- @module Draw
+
+local Workspace = game:GetService("Workspace")
+
 local lib = {}
 
 --- Draws a ray for debugging
 -- @param ray The ray to draw
 function lib.Ray(ray, color, parent, meshDiameter, diameter)
 	color = color or Color3.new(1, 0, 0)
-	parent = parent or workspace.CurrentCamera
+	parent = parent or Workspace.CurrentCamera
 	meshDiameter = meshDiameter or 0.2
 	diameter = diameter or 0.2
 
@@ -23,7 +28,6 @@ function lib.Ray(ray, color, parent, meshDiameter, diameter)
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.5
 
-
 	local mesh = Instance.new("SpecialMesh")
 	mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(meshDiameter, 0, meshDiameter) / diameter
 	mesh.parent = part
@@ -38,7 +42,7 @@ end
 function lib.Point(vector3, color, parent, diameter)
 	assert(vector3)
 	color = color or Color3.new(1, 0, 0)
-	parent = parent or workspace.CurrentCamera
+	parent = parent or Workspace.CurrentCamera
 	diameter = diameter or 1
 
 	local part = Instance.new("Part")

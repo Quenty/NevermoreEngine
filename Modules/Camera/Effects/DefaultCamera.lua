@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
@@ -28,14 +29,14 @@ end
 
 function DefaultCamera:BindToRenderStep()
 	RunService:BindToRenderStep("DefaultCamera_Preupdate", Enum.RenderPriority.Camera.Value-1, function()
-		self._cameraState:Set()
+		self._cameraState:Set(Workspace.CurrentCamera)
 	end)
 
 	RunService:BindToRenderStep("DefaultCamera_PostUpdate", Enum.RenderPriority.Camera.Value+1, function()
-		self._cameraState = CameraState.new(workspace.CurrentCamera)
+		self._cameraState = CameraState.new(Workspace.CurrentCamera)
 	end)
 
-	self._cameraState = CameraState.new(workspace.CurrentCamera)
+	self._cameraState = CameraState.new(Workspace.CurrentCamera)
 end
 
 function DefaultCamera:UnbindFromRenderStep()
@@ -43,11 +44,11 @@ function DefaultCamera:UnbindFromRenderStep()
 	RunService:UnbindFromRenderStep("DefaultCamera_PostUpdate")
 end
 
-function DefaultCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function DefaultCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		return rawget(self, "_cameraState")
 	else
-		return DefaultCamera[Index]
+		return DefaultCamera[index]
 	end
 end
 
