@@ -21,20 +21,19 @@ local lib = {}
 
 --- Required for networking....
 local function MakeParticleEngineServer()
-
 	local Engine = {}
 
 	local RemoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
 
 	local function ParticleNew(p) -- PropertiesTable
-		p.Position      = p.Position or error("No Position Yo")
-		p.Velocity      = p.Velocity or v3()
-		p.Size          = p.Size or v2(0.2,0.2)
-		p.Bloom         = p.Bloom or v2(0,0)
-		p.Gravity       = p.Gravity or v3()
-		p.LifeTime      = p.LifeTime;
-		p.Color         = p.Color or Color3.new(1,1,1)
-		p.Transparency  = p.Transparency or 0.5
+		p.Position = p.Position or error("No Position Yo")
+		p.Velocity = p.Velocity or v3()
+		p.Size = p.Size or v2(0.2,0.2)
+		p.Bloom = p.Bloom or v2(0,0)
+		p.Gravity = p.Gravity or v3()
+		p.LifeTime = p.LifeTime;
+		p.Color = p.Color or Color3.new(1,1,1)
+		p.Transparency = p.Transparency or 0.5
 
 		RemoteEvent:FireAllClients(p)
 
@@ -93,10 +92,8 @@ local function RealMakeEngine(Screen)
 
 	local Time = tick()
 
-	local Player  = Players.LocalPlayer
+	local Player = Players.LocalPlayer
 	local RemoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
-
-	-- Screen = Screen or Instance.new("ScreenGui", Player.PlayerGui)
 
 	local ParticleFrames = {}
 
@@ -142,7 +139,7 @@ local function RealMakeEngine(Screen)
 
 	local function ParticleUpdateProperties(f,p,dt)--Frame,ParticleProperties,ChangeInTime,Time
 		p.Position = p.Position+p.Velocity*dt
-		local w    = p.WindResistance and (ParticleWind(p.Position)*WIND_SPEED-p.Velocity)*p.WindResistance or v3()
+		local w = p.WindResistance and (ParticleWind(p.Position)*WIND_SPEED-p.Velocity)*p.WindResistance or v3()
 		p.Velocity = p.Velocity+(p.Gravity+w)*dt
 	end
 
@@ -298,10 +295,10 @@ local function RealMakeEngine(Screen)
 					Displacement = Displacement * (999/Distance)
 				end
 
-				local Hit, Position = workspace:FindPartOnRay(ray(OldPosition, Displacement), Player.Character, true)
-				if Hit then
+				local hit, position, normal, material = workspace:FindPartOnRay(ray(OldPosition, Displacement), Player.Character, true)
+				if hit then
 					if type(Particle.RemoveOnCollision) == "function" then
-						if not Particle.RemoveOnCollision(Particle, Hit, Position) then
+						if not Particle.RemoveOnCollision(Particle, hit, position, normal, material) then
 							ParticleRemove(Particle)
 						end
 					else
