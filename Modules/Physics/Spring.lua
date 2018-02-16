@@ -35,83 +35,100 @@ API:
 
 	Spring:TimeSkip(number DeltaTime)
 		Instantly skips the spring forwards by that amount of time
-	Spring:Impulse(number/Vector3 Velocity)
+	Spring:Impulse(number/Vector3 velocity)
 		Impulses the spring, increasing velocity by the amount given
 ]]
 
 
 local Spring = {}
 
--- @param Initial A number or Vector3 (anything with * number and addition/subtraction defined)
-function Spring.new(Initial)
+--- Creates a new spring
+-- @param initial A number or Vector3 (anything with * number and addition/subtraction defined)
+function Spring.new(initial)
 	local self = setmetatable({}, Spring)
 
-	local Target = Initial or 0
+	local target = initial or 0
 	rawset(self, "_time0", tick())
-	rawset(self, "_position0", Target)
-	rawset(self, "_velocity0", 0*Target)
-	rawset(self, "_target", Target)
+	rawset(self, "_position0", target)
+	rawset(self, "_velocity0", 0*target)
+	rawset(self, "_target", target)
 	rawset(self, "_damper", 1)
 	rawset(self, "_speed", 1)
 
 	return self
 end
 
-function Spring:__index(Index)
-	if Spring[Index] then
-		return Spring[Index]
-	elseif Index == "Value" or Index == "Position" or Index == "p" then
-		local Position, _ = self:PositionVelocity(tick())
-		return Position
-	elseif Index == "Velocity" or Index == "v" then
-		local _, Velocity = self:PositionVelocity(tick())
-		return Velocity
-	elseif Index == "Target" or Index == "t" then
+--- Impulse the spring with a change in velocity
+-- @param velocity The velocity to impulse with
+function Spring:Impulse(velocity)
+	self.Velocity = self.Velocity + velocity
+end
+
+--- Skip forwards in time
+-- @param delta Time to skip forwards
+function Spring:TimeSkip(delta)
+	local time = tick()
+	local position, velocity = self:_positionVelocity(time+delta)
+	rawset(self, "_position0", position)
+	rawset(self, "_velocity0", velocity)
+	rawset(self, "_time0", time)
+end
+
+function Spring:__index(index)
+	if Spring[index] then
+		return Spring[index]
+	elseif index == "Value" or index == "Position" or index == "p" then
+		local position, _ = self:_positionVelocity(tick())
+		return position
+	elseif index == "Velocity" or index == "v" then
+		local _, velocity = self:_positionVelocity(tick())
+		return velocity
+	elseif index == "Target" or index == "t" then
 		return rawget(self, "_target")
-	elseif Index == "Damper" or Index == "d" then
+	elseif index == "Damper" or index == "d" then
 		return rawget(self, "_damper")
-	elseif Index == "Speed" or Index == "s" then
+	elseif index == "Speed" or index == "s" then
 		return rawget(self, "_speed")
 	else
-		error(("'%s' is not a valid member of Spring"):format(tostring(Index)), 2)
+		error(("'%s' is not a valid member of Spring"):format(tostring(index)), 2)
 	end
 end
 
-function Spring:__newindex(Index, Value)
-	local Time = tick()
+function Spring:__newindex(index, value)
+	local time = tick()
 
-	if Index == "Value" or Index == "Position" or Index == "p" then
-		local _, Velocity = self:PositionVelocity(Time)
-		rawset(self, "_position0", Value)
-		rawset(self, "_velocity0", Velocity)
-	elseif Index == "Velocity" or Index == "v" then
-		local Position, _ = self:PositionVelocity(Time)
-		rawset(self, "_position0", Position)
-		rawset(self, "_velocity0", Value)
-	elseif Index == "Target" or Index == "t" then
-		local Position, Velocity = self:PositionVelocity(Time)
-		rawset(self, "_position0", Position)
-		rawset(self, "_velocity0", Velocity)
-		rawset(self, "_target", Value)
-	elseif Index == "Damper" or Index == "d" then
-		local Position, Velocity = self:PositionVelocity(Time)
-		rawset(self, "_position0", Position)
-		rawset(self, "_velocity0", Velocity)
-		rawset(self, "_damper", math.clamp(Value, 0, 1))
-	elseif Index == "Speed" or Index == "s" then
-		local Position, Velocity = self:PositionVelocity(Time)
-		rawset(self, "_position0", Position)
-		rawset(self, "_velocity0", Velocity)
-		rawset(self, "_speed", Value < 0 and 0 or Value)
+	if index == "Value" or index == "Position" or index == "p" then
+		local _, velocity = self:_positionVelocity(time)
+		rawset(self, "_position0", value)
+		rawset(self, "_velocity0", velocity)
+	elseif index == "Velocity" or index == "v" then
+		local position, _ = self:_positionVelocity(time)
+		rawset(self, "_position0", position)
+		rawset(self, "_velocity0", value)
+	elseif index == "Target" or index == "t" then
+		local position, velocity = self:_positionVelocity(time)
+		rawset(self, "_position0", position)
+		rawset(self, "_velocity0", velocity)
+		rawset(self, "_target", value)
+	elseif index == "Damper" or index == "d" then
+		local position, velocity = self:_positionVelocity(time)
+		rawset(self, "_position0", position)
+		rawset(self, "_velocity0", velocity)
+		rawset(self, "_damper", math.clamp(value, 0, 1))
+	elseif index == "Speed" or index == "s" then
+		local position, velocity = self:_positionVelocity(time)
+		rawset(self, "_position0", position)
+		rawset(self, "_velocity0", velocity)
+		rawset(self, "_speed", value < 0 and 0 or value)
 	else
-		error(("'%s' is not a valid member of Spring"):format(tostring(Index)), 2)
+		error(("'%s' is not a valid member of Spring"):format(tostring(index)), 2)
 	end
 
-	rawset(self, "_time0", Time)
+	rawset(self, "_time0", time)
 end
 
-function Spring:PositionVelocity(Time)
-	local dt = Time - rawget(self, "_time0")
+function Spring:_positionVelocity(time)
+	local dt = time - rawget(self, "_time0")
 	local p0 = rawget(self, "_position0")
 	local v0 = rawget(self, "_velocity0")
 	local t = rawget(self, "_target")
@@ -135,18 +152,6 @@ function Spring:PositionVelocity(Time)
 		return t+(c0+c1*s*dt)/e,
 		       s*(c1-c0-c1*s*dt)/e
 	end
-end
-
-function Spring:Impulse(Velocity)
-	self.Velocity = self.Velocity + Velocity
-end
-
-function Spring:TimeSkip(Delta)
-	local Time = tick()
-	local Position, Velocity = self:PositionVelocity(Time+Delta)
-	rawset(self, "_position0", Position)
-	rawset(self, "_velocity0", Velocity)
-	rawset(self, "_time0", Time)
 end
 
 return Spring
