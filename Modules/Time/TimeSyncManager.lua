@@ -10,18 +10,17 @@ local MasterClock = {}
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
 
-function MasterClock.new(SyncEvent, DelayedRequestFunction)
+function MasterClock.new(remoteEvent, remoteFunction)
 	local self = setmetatable({}, MasterClock)
 
-	self.SyncEvent = SyncEvent
-	self.DelayedRequestFunction = DelayedRequestFunction or error("No DelayedRequestFunction")
+	self._remoteEvent = remoteEvent or error("No remoteEvent")
+	self._remoteFunction = remoteFunction or error("No remoteFunction")
 
-	function self.DelayedRequestFunction.OnServerInvoke(Player, TimeThree)
-		return self:_handleDelayRequest(TimeThree)
+	self._remoteFunction.OnServerInvoke = function(player, timeThree)
+		return self:_handleDelayRequest(timeThree)
 	end
-
-	self.SyncEvent.OnServerEvent:Connect(function(Player)
-		 self.SyncEvent:FireClient(Player, self:GetTime())
+	self._remoteEvent.OnServerEvent:Connect(function(player)
+		 self._remoteEvent:FireClient(player, self:GetTime())
 	end)
 
 	spawn(function()
@@ -48,34 +47,34 @@ end
 
 --- Starts the sync process with all slave clocks.
 function MasterClock:Sync()
-	local TimeOne = self:GetTime()
-    self.SyncEvent:FireAllClients(TimeOne)
+	local timeOne = self:GetTime()
+    self._remoteEvent:FireAllClients(timeOne)
 end
 
 --- Client sends back message to get the SM_Difference.
--- @return SlaveMasterDifference
-function MasterClock:_handleDelayRequest(TimeThree)
+-- @return slaveMasterDifference
+function MasterClock:_handleDelayRequest(timeThree)
     local TimeFour = self:GetTime()
-    return TimeFour - TimeThree -- -Offset + SM Delay
+    return TimeFour - timeThree -- -offset + SM Delay
 end
 
 
 local SlaveClock = {}
 SlaveClock.__index = SlaveClock
 SlaveClock.ClassName = "SlaveClock"
-SlaveClock.Offset = -1 -- Set uncalculated values to -1
+SlaveClock._offset = -1 -- Set uncalculated values to -1
 
-function SlaveClock.new(SyncEvent, DelayedRequestFunction)
+function SlaveClock.new(remoteEvent, remoteFunction)
 	local self = setmetatable({}, SlaveClock)
 
-	self.SyncEvent = SyncEvent
-	self.DelayedRequestFunction = DelayedRequestFunction
+	self._remoteEvent = remoteEvent or error("No remoteEvent")
+	self._remoteFunction = remoteFunction or error("No remoteFunction")
 
-	self.SyncEvent.OnClientEvent:Connect(function(TimeOne)
-		self:_handleSyncEvent(TimeOne)
+	self._remoteEvent.OnClientEvent:Connect(function(timeOne)
+		self:_handleSyncEvent(timeOne)
 	end)
 
-	self.SyncEvent:FireServer() -- Request server to syncronize with us
+	self._remoteEvent:FireServer() -- Request server to syncronize with us
 
 	return self
 end
@@ -85,23 +84,23 @@ function SlaveClock:GetTime()
 		warn("[SlaveClock][GetTime] - Slave clock is not yet synced")
 	end
 
-	return self:_getLocalTime() - self.Offset
+	return self:_getLocalTime() - self._offset
 end
 
 function SlaveClock:IsSynced()
-	return self.Offset ~= -1
+	return self._offset ~= -1
 end
 
 function SlaveClock:_getLocalTime()
     return tick()
 end
 
-function SlaveClock:_handleSyncEvent(TimeOne)
-    local TimeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately.
-    local MasterSlaveDifference = TimeTwo - TimeOne -- We have Offst + MS Delay
+function SlaveClock:_handleSyncEvent(timeOne)
+    local timeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately.
+    local masterSlaveDifference = timeTwo - timeOne -- We have Offst + MS Delay
 
-    local TimeThree = self:_getLocalTime()
-    local SlaveMasterDifference = self:_sendDelayRequest(TimeThree)
+    local timeThree = self:_getLocalTime()
+    local slaveMasterDifference = self:_sendDelayRequest(timeThree)
 
     --[[ From explination link.
         The result is that we have the following two equations:
@@ -121,15 +120,15 @@ function SlaveClock:_handleSyncEvent(TimeOne)
         one_way_delay = (MSDelay + SMDelay) / 2
     ]]
 
-    local Offset = (MasterSlaveDifference - SlaveMasterDifference)/2
-    local OneWayDelay = (MasterSlaveDifference + SlaveMasterDifference)/2
+    local offset = (masterSlaveDifference - slaveMasterDifference)/2
+    local oneWayDelay = (masterSlaveDifference + slaveMasterDifference)/2
 
-    self.Offset = Offset -- Estimated difference between server/client
-    self.OneWayDelay = OneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
+    self._offset = offset -- Estimated difference between server/client
+    self._pneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
 end
 
-function SlaveClock:_sendDelayRequest(TimeThree)
-	return self.DelayedRequestFunction:InvokeServer(TimeThree)
+function SlaveClock:_sendDelayRequest(timeThree)
+	return self._remoteFunction:InvokeServer(timeThree)
 end
 
 
@@ -137,17 +136,17 @@ end
 local function BuildClock()
 	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-	local SyncEvent = require.GetRemoteEvent("TimeSyncEvent")
-	local DelayedRequestFunction = require.GetRemoteFunction("DelayedRequestEvent")
+	local remoteEvent = require.GetRemoteEvent("TimeSyncEvent")
+	local remoteFunction = require.GetRemoteFunction("DelayedRequestEvent")
 
 	if RunService:IsClient() and RunService:IsServer() then -- Solo test mode
-		local Clock = MasterClock.new(SyncEvent, DelayedRequestFunction)
-		SyncEvent.OnClientEvent:Connect(function() end)
-		return Clock
+		local clock = MasterClock.new(remoteEvent, remoteFunction)
+		remoteEvent.OnClientEvent:Connect(function() end)
+		return clock
 	elseif RunService:IsClient() then
-		return SlaveClock.new(SyncEvent, DelayedRequestFunction)
+		return SlaveClock.new(remoteEvent, remoteFunction)
 	else
-		return MasterClock.new(SyncEvent, DelayedRequestFunction)
+		return MasterClock.new(remoteEvent, remoteFunction)
 	end
 end
 
