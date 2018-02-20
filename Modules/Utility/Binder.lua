@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
-local FastSpawn = require("FastSpawn")
+local fastSpawn = require("fastSpawn")
 
 local Binder = {}
 Binder.__index = Binder
@@ -20,7 +20,7 @@ function Binder.new(tagName, class)
     self._class = class or error("No class")
 
     for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
-        FastSpawn(function()
+        fastSpawn(function()
             self:_add(inst)
         end)
     end

@@ -1,11 +1,11 @@
---- Debounce a existing function by timeout
--- @module Debounce
+--- debounce a existing function by timeout
+-- @module debounce
 
 ---
 -- @tparam number timeout
 -- @tparam function func
 -- @treturn function
-local function Debounce(timeout, func)
+local function debounce(timeout, func)
 	assert(type(timeout) == "number")
 	assert(type(func) == "function")
 
@@ -23,4 +23,4 @@ local function Debounce(timeout, func)
 	end
 end
 
-return Debounce
+return debounce
