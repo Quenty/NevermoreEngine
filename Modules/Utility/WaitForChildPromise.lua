@@ -12,7 +12,7 @@ function WaitForChildPromise.new(parent, childName, timeOut)
 		if result then
 			resolve(result)
 		else
-			reject("timed out")
+			reject("Timed out")
 		end
 	end)
 end
