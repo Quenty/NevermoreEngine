@@ -9,71 +9,122 @@ local ModelAppearance = {}
 ModelAppearance.ClassName = "ModelAppearance"
 ModelAppearance.__index = ModelAppearance
 
-function ModelAppearance.new(parts)
+function ModelAppearance.new(model)
 	local self = setmetatable({}, ModelAppearance)
 
 	self._parts = {}
-	for _, part in pairs(parts) do
-		self._parts[part] = {
-			Transparency = part.Transparency;
-			Color = part.Color;
-			Material = part.Material;
-			CanCollide = part.CanCollide;
-		}
+	self._interactions = {}
+	self._seats = {}
 
-		if part:IsA("Seat") or part:IsA("VehicleSeat") then
-			self._parts[part].IsSeat = true
-			self._parts[part].Disabled = part.Disabled
+	for _, part in pairs(model:GetDescendants()) do
+		if part:IsA("BasePart") then
+			self._parts[part] = {
+				Transparency = part.Transparency;
+				Color = part.Color;
+				Material = part.Material;
+				CanCollide = part.CanCollide;
+			}
+
+			if part:IsA("Seat") or part:IsA("VehicleSeat") then
+				self._seats[part] = part
+			end
+		elseif part:IsA("ClickDetector") or part:IsA("BodyMover") then
+			table.insert(self._interactions, part)
 		end
 	end
+
 
 	return self
 end
 
+function ModelAppearance:DisableInteractions()
+	for _, item in pairs(self._interactions) do
+		item:Destroy()
+	end
+	self._interactions = {}
+	for seat, _ in pairs(self._seats) do
+		seat.Disabled = true
+	end
+
+	self:SetCanCollide(false)
+end
+
 function ModelAppearance:SetCanCollide(canCollide)
+	assert(type(canCollide) == "boolean")
+
+	if self._canCollide == canCollide then
+		return
+	end
+
+	self._canCollide = canCollide
 	for part, properties in pairs(self._parts) do
 		part.CanCollide = properties.CanCollide and canCollide
-		if properties.IsSeat then
-			if canCollide then
-				part.Disabled = properties.Disabled
-			else
-				part.Disabled = true
-			end
-		end
+
 	end
 end
 
 function ModelAppearance:SetTransparency(transparency)
+	if self._transparency == transparency then
+		return
+	end
+
+	self._transparency = transparency
 	for part, properties in pairs(self._parts) do
 		part.Transparency = qMath.MapNumber(transparency, 0, 1, properties.Transparency, 1)
 	end
 end
 
 function ModelAppearance:ResetTransparency()
+	if not self._transparency then
+		return
+	end
+
+	self._transparency = nil
 	for part, properties in pairs(self._parts) do
 		part.Transparency = properties.Transparency
 	end
 end
 
 function ModelAppearance:SetColor(color)
+	assert(typeof(color) == "Color3")
+
+	if self._color == color then
+		return
+	end
+
+	self._color = color
 	for part, _ in pairs(self._parts) do
 		part.Color = color
 	end
 end
 
 function ModelAppearance:ResetColor()
+	if not self._color then
+		return
+	end
+
+	self._color = nil
 	for part, properties in pairs(self._parts) do
 		part.Color = properties.Color
 	end
 end
 
 function ModelAppearance:ResetMaterial()
+	if not self._material then
+		return
+	end
+
+	self._material = nil
 	for part, properties in pairs(self._parts) do
 		part.Material = properties.Material
 	end
 end
 
 function ModelAppearance:SetMaterial(material)
+	if self._material == material then
+		return
+	end
+
 	for part, _ in pairs(self._parts) do
 		part.Material = material
 	end
