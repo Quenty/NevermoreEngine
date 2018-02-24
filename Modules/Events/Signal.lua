@@ -17,6 +17,7 @@ function Signal.new()
 
 	self._bindableEvent = Instance.new("BindableEvent")
 	self._argData = nil
+	self._argCount = nil -- Prevent edge case of :Fire("A", nil) --> "A" instead of "A", nil
 
 	return self
 end
@@ -27,8 +28,10 @@ end
 -- @treturn nil
 function Signal:Fire(...)
 	self._argData = {...}
+	self._argCount = select("#", ...)
 	self._bindableEvent:Fire()
 	self._argData = nil
+	self._argCount = nil
 end
 
 --- Connect a new handler to the event. Returns a connection object that can be disconnected.
@@ -40,7 +43,7 @@ function Signal:Connect(handler)
 	end
 
 	return self._bindableEvent.Event:Connect(function()
-		handler(unpack(self._argData))
+		handler(unpack(self._argData, 1, self._argCount))
 	end)
 end
 
@@ -49,7 +52,7 @@ end
 function Signal:Wait()
 	self._bindableEvent.Event:Wait()
 	assert(self._argData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-	return unpack(self._argData)
+	return unpack(self._argData, 1, self._argCount)
 end
 
 --- Disconnects all connected events to the signal. Voids the signal as unusable.
