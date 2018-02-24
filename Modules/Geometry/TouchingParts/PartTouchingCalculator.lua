@@ -24,14 +24,14 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
 	assert(parts, "Must have parts")
 
 	local humanoidParts = {}
-	for _, item in pairs(humanoid:GetDesendants()) do
+	for _, item in pairs(humanoid.Parent:GetDescendants()) do
 		if item:IsA("BasePart") then
 			table.insert(humanoidParts, item)
 		end
 	end
 
 	if #humanoidParts == 0 then
-		warn("[BoatPlacer][CheckIfTouchingHumanoid] - #parts == 0, retrieved from humanoid")
+		warn("[PartTouchingCalculator.CheckIfTouchingHumanoid] - #humanoidParts == 0!")
 		return false
 	end
 
@@ -159,7 +159,7 @@ function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 	local touchingHumanoids = {}
 
 	for _, part in pairs(touchingList) do
-		local humanoid = part.Parent:FindFirstChildOfClass("humanoid")
+		local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
 		if humanoid then
 			if not touchingHumanoids[humanoid] then
 				local player = CharacterUtil.GetPlayerFromCharacter(humanoid)
