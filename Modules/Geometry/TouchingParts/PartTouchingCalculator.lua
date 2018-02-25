@@ -165,9 +165,9 @@ function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 				local player = CharacterUtil.GetPlayerFromCharacter(humanoid)
 				touchingHumanoids[humanoid] = {
 					Humanoid = humanoid;
-					Character = player.Character;
-					Player = player;
-					Touching = {part}
+					Character = player and player.Character; -- May be nil
+					Player = player; -- May be nil
+					Touching = { part };
 				}
 			else
 				table.insert(touchingHumanoids[humanoid].Touching, part)
