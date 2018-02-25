@@ -118,8 +118,8 @@ function Snackbar.new(Parent, Text, Options)
 
 		self._whileActiveMaid:GiveTask(button.MouseButton1Click:Connect(function()
 			if Options.CallToAction.OnClick then
-				Options.CallToAction.OnClick()
 				self:Dismiss()
+				Options.CallToAction.OnClick()
 			end
 		end))
 

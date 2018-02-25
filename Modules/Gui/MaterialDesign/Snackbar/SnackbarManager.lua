@@ -50,7 +50,7 @@ end
 		options = {
 			CallToAction = {
 				Text = "Action";
-				OnClick = function() end);
+				OnClick = function() end;
 			};
 		};
 ]]

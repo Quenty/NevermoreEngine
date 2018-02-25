@@ -105,30 +105,30 @@ function DraggableSnackbar:StartTrack(X, Y)
 	end
 	self.DragOffset = 0
 
-	local LocalDraggingCoroutine
-	LocalDraggingCoroutine = coroutine.create(function()
-		while self._draggingCoroutine == LocalDraggingCoroutine do
+	local localDraggingCoroutine
+	localDraggingCoroutine = coroutine.create(function()
+		while self._draggingCoroutine == localDraggingCoroutine do
 			self:Track()
 			RunService.Stepped:Wait()
 		end
 	end)
-	self._draggingCoroutine = LocalDraggingCoroutine
+	self._draggingCoroutine = localDraggingCoroutine
 
 	self._whileActiveMaid.DraggingEnded = UserInputService.InputEnded:Connect(function(InputObject)
-		if self._draggingCoroutine == LocalDraggingCoroutine then
+		if self._draggingCoroutine == localDraggingCoroutine then
 			if InputObject.UserInputType.Name == "MouseButton1" then
 				self:EndTrack()
 			end
 		else
-			warn("[DraggableSnackbar] - InputEnded fire, but DraggingCoroutine was not the LocalDraggingCoroutine")
+			warn("[DraggableSnackbar] - InputEnded fire, but DraggingCoroutine was not the localDraggingCoroutine")
 		end
 	end)
 
 	self._whileActiveMaid.TouchDraggingEnded = UserInputService.TouchEnded:Connect(function(InputObject)
-		if self._draggingCoroutine == LocalDraggingCoroutine then
+		if self._draggingCoroutine == localDraggingCoroutine then
 			self:EndTrack()
 		else
-			warn("[DraggableSnackbar] - TouchEnded fire, but DraggingCoroutine was not the LocalDraggingCoroutine")
+			warn("[DraggableSnackbar] - TouchEnded fire, but DraggingCoroutine was not the localDraggingCoroutine")
 		end
 	end)
 
@@ -221,7 +221,7 @@ function DraggableSnackbar:Dismiss()
 			end
 		end
 	else
-		error("[DraggableSnackbar] - Cannot dismiss, already hidden")
+		warn("[DraggableSnackbar] - Cannot dismiss, already hidden")
 	end
 end
 
