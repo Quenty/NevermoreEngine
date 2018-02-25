@@ -96,6 +96,7 @@ end
 function BaseAction:GetData()
 	return self._actionData
 end
+
 function BaseAction:GetFABData()
 	if not self._actionData then
 		return nil
