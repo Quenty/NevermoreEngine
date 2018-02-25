@@ -36,14 +36,18 @@ end
 function Raycaster:FindPartOnRay(ray)
 	assert(typeof(ray) == "Ray")
 
+	local ignoreList = Table.Copy(self._ignoreList)
 	local casts = self.MaxCasts
 	while casts > 0 do
-		local result = self:_tryCast(ray)
+		local result = self:_tryCast(ray, ignoreList)
 		if result then
 			return result
 		end
 		casts = casts - 1
 	end
+
+	warn("Ran out of casts")
+	return nil
 end
 
 function Raycaster:__index(index)
@@ -77,8 +81,7 @@ function Raycaster:__newindex(index, value)
 	end
 end
 
-function Raycaster:_tryCast(ray)
-	local ignoreList = Table.Copy(self.IgnoreList)
+function Raycaster:_tryCast(ray, ignoreList)
 	local part, position, normal, material = Workspace:FindPartOnRayWithIgnoreList(
 		ray, ignoreList, false, self._ignoreWater)
 
