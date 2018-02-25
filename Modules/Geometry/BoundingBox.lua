@@ -53,7 +53,7 @@ function lib.GetBoundingBox(data, relativeTo)
 	end
 
 	local size = Vector3.new(sides[1]-sides[2], sides[3]-sides[4], sides[5]-sides[6])
-	local cframe = relativeTo:toWorldSpace(CFrame.new((sides[1]+sides[2])/2, (sides[3]+sides[4])/2, (sides[5]+sides[6])/2))
+	local cframe = CFrame.new((sides[1]+sides[2])/2, (sides[3]+sides[4])/2, (sides[5]+sides[6])/2)
 
 	return size, cframe
 end
