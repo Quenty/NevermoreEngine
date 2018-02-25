@@ -1,52 +1,52 @@
 --- Although we have run service, for PlaySolo mode, It's useful to initialize classes with
 -- their own internal state of server or client
--- @module IsServerMixin
+-- @module IsClientMixin
 
 local RunService = game:GetService("RunService")
 
 local module = {}
 
---- Adds the IsServerMixin to the class
+--- Adds the IsClientMixin to the class
 function module:Add(class)
 	assert(class)
 	assert(not class.IsServer)
 	assert(not class.IsClient)
-	assert(not class.InitIsServerMixin)
+	assert(not class.InitIsClientMixin)
 
 	class.IsServer = self.IsServer
 	class.IsClient = self.IsClient
-	class.InitIsServerMixin = self.InitIsServerMixin
+	class.InitIsClientMixin = self.InitIsClientMixin
 end
 
 --- Initializes the mixin
--- @tparam boolean isServer
-function module:InitIsServerMixin(isServer)
-	assert(type(isServer) == "boolean")
+-- @tparam boolean isClient
+function module:InitIsClientMixin(isClient)
+	assert(type(isClient) == "boolean")
 
 	-- Sanity check
-	if isServer then
-		assert(RunService:IsServer(), "Can only initialize isServer on server")
-	else
+	if isClient then
 		assert(RunService:IsClient(), "Can only initialize isClient on client")
+	else
+		assert(RunService:IsServer(), "Can only initialize isServer on server")
 	end
 
-	self._isServer = isServer
+	self._isClient = isClient
 end
 
 ---
 -- @treturn boolean true, if server
 function module:IsServer()
-	assert(type(self._isServer) == "boolean", "Uninitialized")
+	assert(type(self._isClient) == "boolean", "Uninitialized")
 
-	return self._isServer
+	return not self._isClient
 end
 
 ---
 -- @treturn boolean true, if client
 function module:IsClient()
-	assert(type(self._isServer) == "boolean", "Uninitialized")
+	assert(type(self._isClient) == "boolean", "Uninitialized")
 
-	return not self._isServer
+	return self._isClient
 end
 
 return module
