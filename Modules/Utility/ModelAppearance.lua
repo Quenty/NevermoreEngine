@@ -125,6 +125,7 @@ function ModelAppearance:SetMaterial(material)
 		return
 	end
 
+	self._material = material
 	for part, _ in pairs(self._parts) do
 		part.Material = material
 	end
