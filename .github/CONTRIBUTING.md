@@ -32,7 +32,7 @@ Sample:
 --- Documentation goes first
 -- @classmod ClassName
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("NevermoreEngine"))
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 
 ```
