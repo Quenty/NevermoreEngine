@@ -3,7 +3,7 @@ Here's an example of using Nevermore
 
 ```lua
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("NevermoreEngine"))
+local LoadCustomLibrary = require(ReplicatedStorage:WaitForChild("Nevermore"))
 
 
 -- Do actual things
