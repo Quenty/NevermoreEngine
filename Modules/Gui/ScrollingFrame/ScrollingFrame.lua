@@ -108,7 +108,11 @@ function ScrollingFrame:_updateRender()
 	end
 
 	for _, scrollbar in pairs(self._scrollbars) do
-		scrollbar:UpdateRender()
+		if scrollbar.Destroy then
+			scrollbar:UpdateRender()
+		else
+			warn("[ScrollingFrame] - Scrollbar is destroyed")
+		end
 	end
 end
 
