@@ -23,6 +23,11 @@ end
 --- Forcefully unseats the humanoid. Useful when teleporting humanoid
 function lib.ForceUnseatHumanoid(humanoid)
 	if humanoid.SeatPart then
+		local weld = humanoid.SeatPart:FindFirstChild("SeatWeld")
+		if weld then
+			weld:Destroy()
+		end
+
 		humanoid.SeatPart:Sit(nil)
 	end
 	humanoid.Sit = false
