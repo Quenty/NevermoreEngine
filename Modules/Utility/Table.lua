@@ -15,6 +15,17 @@ function lib.Append(target, source)
 	return target
 end
 
+--- Converts a table to a list
+-- @taparm table tab Table to convert to a list
+-- @treturn list
+function lib.ToList(tab)
+	local list = {}
+	for _, item in pairs(tab) do
+		table.insert(list, item)
+	end
+	return list
+end
+
 --- Counts the number of items in `tab`.
 -- Useful since `__len` on table in Lua 5.2 returns just the array length.
 -- @tparam table tab Table to count
