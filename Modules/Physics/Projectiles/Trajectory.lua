@@ -1,19 +1,22 @@
---- Utility function for estimating low/high arcs of projectiles
+--- Utility function for estimating low and high arcs of projectiles. Solves for bullet
+-- drop given
 
---- Returns two possible paths from Origin to Target where the magnitude of the initial velocity is InitialVelocity
--- @param Origin vector3 Origin
--- @param Target vector3 Target
--- @param InitialVelocity number
--- @param GravityForce is a positive number
--- @return tuple(vector3 LowTrajector, vector3 HighTrajectory)
-local function Trajectory(Origin, Target, InitialVelocity, GravityForce)
-	local g = -GravityForce
-	local ox,oy,oz=Origin.x,Origin.y,Origin.z
-	local rx,rz=Target.x-ox,Target.z-oz
+--- Returns two possible paths from origin to target where the magnitude of the initial velocity is initialVelocity
+-- @tparam Vector3 origin Origin the the bullet
+-- @tparam Vector3 target Target for the bullet
+-- @tparam number initialVelocity Magnitude of the initial velocity
+-- @tparam number gravityForce Force of the gravity
+-- @treturn[opt] vector3 lowTrajectory Initial velocity for a low trajectory arc
+-- @treturn[opt] vector3 highTrajectory Initial velocity for a high trajectory arc
+-- @treturn[opt] vector3 fallbackTrajectory Trajectory directly at target as afallback
+local function trajectory(origin, target, initialVelocity, gravityForce)
+	local g = -gravityForce
+	local ox,oy,oz=origin.x,origin.y,origin.z
+	local rx,rz=target.x-ox,target.z-oz
 	local tx2=rx*rx+rz*rz
-	local ty=Target.y-oy
+	local ty=target.y-oy
 	if tx2>0 then
-		local v2=InitialVelocity*InitialVelocity
+		local v2=initialVelocity*initialVelocity
 
 		local c0=tx2/(2*(tx2+ty*ty))
 		local c1=g*ty+v2
@@ -33,12 +36,12 @@ local function Trajectory(Origin, Target, InitialVelocity, GravityForce)
 
 			return v0,v1
 		else
-			return nil, nil, Vector3.new(rx, (tx2^0.5), rz).unit * InitialVelocity
+			return nil, nil, Vector3.new(rx, (tx2^0.5), rz).unit * initialVelocity
 		end
 	else
-		local v=Vector3.new(0,InitialVelocity*(ty>0 and 1 or ty<0 and -1 or 0),0)
+		local v=Vector3.new(0,initialVelocity*(ty>0 and 1 or ty<0 and -1 or 0),0)
 		return v,v
 	end
 end
 
-return Trajectory
+return trajectory
