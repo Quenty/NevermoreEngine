@@ -27,7 +27,7 @@ end
 
 function ScreenCover:SetScreenGui(screenGui)
 	self._screenGui = screenGui or error("No screenGui")
-
+	self._maid:GiveTask(self._screenGui)
 	self._maid:GiveTask(self._screenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 		self:_updateSize()
 	end))
