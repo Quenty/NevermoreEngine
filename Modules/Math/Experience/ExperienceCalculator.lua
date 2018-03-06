@@ -38,9 +38,9 @@ function lib.GetExperienceForNextLevel(currentExperience)
 	end
 
 	local currentLevel = lib.GetLevelFromExperience(currentExperience)
-	local experieneRequired = lib.GetExperienceRequiredForNextLevel(currentLevel)
+	local experienceRequired = lib.GetExperienceRequiredForNextLevel(currentLevel)
 
-	return experieneRequired - currentExperience
+	return experienceRequired - currentExperience
 end
 
 --- Calculates subtotal experience
