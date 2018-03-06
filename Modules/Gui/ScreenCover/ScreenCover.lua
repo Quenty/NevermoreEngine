@@ -18,16 +18,22 @@ function ScreenCover.new(gui)
 
 	self.Gui = gui or error("No gui")
 	self.Done = Signal.new()
-	self.Maid = Maid.new()
+	self._maid = Maid.new()
 
 	self._builder = ScreenCoverHelperBuilder.new(gui)
 
-	self.Maid:GiveTask(self.Gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+	return self
+end
+
+function ScreenCover:SetScreenGui(screenGui)
+	self._screenGui = screenGui or error("No screenGui")
+
+	self._maid:GiveTask(self._screenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 		self:_updateSize()
 	end))
 	self:_updateSize()
 
-	return self
+	self.Gui.Parent = self._screenGui
 end
 
 function ScreenCover:Show(playbackTime)
@@ -50,8 +56,10 @@ end
 
 --- Force size constraint to fill whole screen
 function ScreenCover:_updateSize()
-	local absoluteSize = self.Gui.AbsoluteSize
-	if absoluteSize.X < absoluteSize.Y then
+	assert(self._screenGui)
+
+	local absoluteSize = self._screenGui.AbsoluteSize
+	if absoluteSize.X > absoluteSize.Y then
 		self.Gui.SizeConstraint = Enum.SizeConstraint.RelativeXX
 	else
 		self.Gui.SizeConstraint = Enum.SizeConstraint.RelativeYY
@@ -98,7 +106,7 @@ end
 
 function ScreenCover:_showSquares(squareDataList, playbackTime)
 	local maid = Maid.new()
-	self.Maid.animMaid = maid
+	self._maid.animMaid = maid
 
 	local tweenTime = playbackTime/(#squareDataList)*8
 	local squarePlaybackTime = (playbackTime - tweenTime)
@@ -137,7 +145,7 @@ end
 
 function ScreenCover:_hideSquares(squareDataList, playbackTime)
 	local maid = Maid.new()
-	self.Maid.animMaid = maid
+	self._maid.animMaid = maid
 
 	local tweenTime = playbackTime/(#squareDataList)*4
 	local squarePlaybackTime = (playbackTime - tweenTime)
@@ -185,8 +193,8 @@ function ScreenCover:_hideSquares(squareDataList, playbackTime)
 end
 
 function ScreenCover:Destroy()
-	self.Maid:DoCleaning()
-	self.Maid = nil
+	self._maid:DoCleaning()
+	self._maid = nil
 end
 
 return ScreenCover

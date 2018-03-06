@@ -43,7 +43,7 @@ function ScreenCoverBuilder:Create(options)
 	frame.Parent = screenGui
 
 	local cover = ScreenCover.new(frame)
-	cover.Maid:GiveTask(screenGui)
+	cover:SetScreenGui(screenGui)
 
 	screenGui.Parent = self._playerGui
 
