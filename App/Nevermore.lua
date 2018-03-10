@@ -15,49 +15,50 @@ assert(script.Name == "Nevermore", "Invalid script name. For Nevermore to work c
 assert(script.Parent == ReplicatedStorage, "Invalid parent. For Nevermore to work correctly, it should be " ..
 	"a ModuleScript named \"Nevermore\" parented to ReplicatedStorage")
 
---- Handles yielded operations by caching the retrieval process
-local function handleRetrieving(retrieving, func, argument)
-	assert(type(retrieving) == "table", "Error: retrieving must be a table")
-	assert(type(func) == "function", "Error: func must be a function")
+local AsyncMemoizer = {}
+AsyncMemoizer.ClassName = "AsyncMemoizer"
+AsyncMemoizer.__index = AsyncMemoizer
 
-	local bindableEvent = Instance.new("BindableEvent")
-	local result
-	retrieving[argument] = function()
-		if result ~= nil and result then
-			return result
-		end
+--- Caches single argument of an asyncronious function
+function AsyncMemoizer.new(func)
+	assert(type(func) == "function", "func must be a function")
+	local self = setmetatable({}, AsyncMemoizer)
 
-		bindableEvent.Event:Wait()
-		return result
-	end
+	self._func = func
+	self._cache = {}
+	self._pending = {}
 
-	result = func(argument)
-	assert(result ~= nil, "result cannot be nil")
-	retrieving[argument] = nil
-	bindableEvent:Fire()
-	bindableEvent:Destroy()
-
-	return result
+	return self
 end
 
---- Caches single argument, single output only
-local function asyncCache(func)
-	assert(type(func) == "function", "Error: func must be a userdata")
-
-	local cache = {}
-	local retrieving = {}
-
-	return function(argument)
-		assert(argument ~= nil, "Error: ARgument ")
-		if cache[argument] ~= nil then
-			return cache[argument]
-		elseif retrieving[argument] then
-			return retrieving[argument]()
-		else
-			cache[argument] = handleRetrieving(retrieving, func, argument)
-			return cache[argument]
-		end
+function AsyncMemoizer:_pend(arg)
+	if self._pending[arg] then
+		self._pending[arg].Event:Wait()
+		return self._cache[arg]
 	end
+
+	self._pending[arg] = Instance.new("BindableEvent")
+
+	local result = self._func(arg)
+	assert(result ~= nil, "result cannot be nil")
+
+	self._cache[arg] = result
+
+	self._pending[arg]:Fire()
+	self._pending[arg]:Destroy()
+	self._pending[arg] = nil
+
+	return self._cache[arg]
+end
+
+--- Call the function and get the result. May yield.
+-- @return result
+function AsyncMemoizer:__call(arg)
+	if self._cache[arg] then
+		return self._cache[arg]
+	end
+
+	return self:_pend(arg)
 end
 
 --- Retrieves an instance from a parent
@@ -182,20 +183,20 @@ local lib = {}
 -- @function LoadLibrary
 -- @tparam Variant LibraryName Can either be a ModuleScript or string
 -- @treturn Variant Library
-lib.LoadLibrary = asyncCache(debugLoading(getLibraryLoader(libCache)))
+lib.LoadLibrary = AsyncMemoizer.new(debugLoading(getLibraryLoader(libCache)))
 lib.require = lib.LoadLibrary
 
 --- Get a remote event
 -- @function GetRemoteEvent
 -- @tparam string RemoteEventName
 -- @treturn RemoteEvent RemoteEvent
-lib.GetRemoteEvent = asyncCache(retrieve(getSubFolder("RemoteEvents"), "RemoteEvent"))
+lib.GetRemoteEvent = AsyncMemoizer.new(retrieve(getSubFolder("RemoteEvents"), "RemoteEvent"))
 
 --- Get a remote function
 -- @function GetRemoteFunction
 -- @tparam string RemoteFunctionName
 -- @treturn RemoteFunction RemoteFunction
-lib.GetRemoteFunction = asyncCache(retrieve(getSubFolder("RemoteFunctions"), "RemoteFunction"))
+lib.GetRemoteFunction = AsyncMemoizer.new(retrieve(getSubFolder("RemoteFunctions"), "RemoteFunction"))
 
 setmetatable(lib, {
 	__call = function(self, ...)
