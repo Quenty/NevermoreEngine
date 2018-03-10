@@ -71,9 +71,9 @@ function Promise.All(promises)
 	local allFulfilled = true
 
 	local function Syncronize(index, isFullfilled)
-		return function(Value)
+		return function(value)
 			allFulfilled = allFulfilled and isFullfilled
-			results[index] = Value
+			results[index] = value
 			remainingCount = remainingCount - 1
 			if remainingCount == 0 then
 				local method = allFulfilled and "Fulfill" or "Reject"
