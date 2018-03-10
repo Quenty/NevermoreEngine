@@ -32,6 +32,10 @@ function AsyncMemoizer.new(func)
 end
 
 function AsyncMemoizer:_pend(arg)
+	if self._cache[arg] ~= nil then
+		return self._cache[arg]
+	end
+
 	if self._pending[arg] then
 		self._pending[arg].Event:Wait()
 		return self._cache[arg]
@@ -48,16 +52,12 @@ function AsyncMemoizer:_pend(arg)
 	self._pending[arg]:Destroy()
 	self._pending[arg] = nil
 
-	return self._cache[arg]
+	return result
 end
 
 --- Call the function and get the result. May yield.
 -- @return result
 function AsyncMemoizer:__call(arg)
-	if self._cache[arg] then
-		return self._cache[arg]
-	end
-
 	return self:_pend(arg)
 end
 
