@@ -28,7 +28,9 @@ function AsyncMemoizer.new(func)
 	self._cache = {}
 	self._pending = {}
 
-	return self
+	return function(arg)
+		return self:_pend(arg)
+	end
 end
 
 function AsyncMemoizer:_pend(arg)
@@ -53,12 +55,6 @@ function AsyncMemoizer:_pend(arg)
 	self._pending[arg] = nil
 
 	return result
-end
-
---- Call the function and get the result. May yield.
--- @return result
-function AsyncMemoizer:__call(arg)
-	return self:_pend(arg)
 end
 
 --- Retrieves an instance from a parent
