@@ -16,7 +16,7 @@ local function _isSignal(value)
 	return false
 end
 
-local function _isPromise(value)
+local function IsPromise(value)
 	if type(value) == "table" and value.ClassName == "Promise" then
 		return true
 	end
@@ -27,6 +27,7 @@ local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
 Promise.CatchErrors = false -- A+ compliance if true
+Promise.IsPromise = IsPromise
 
 --- Construct a new promise
 -- @constructor Promise.new()
@@ -61,7 +62,8 @@ function Promise.First(promises)
 	return returnPromise
 end
 
----
+--- Executes all promises. If any fails, the result will be rejected. However, it yields until
+--  every promise is complete
 -- @constructor First
 -- @treturn Promise
 function Promise.All(promises)
@@ -70,7 +72,7 @@ function Promise.All(promises)
 	local results = {}
 	local allFulfilled = true
 
-	local function Syncronize(index, isFullfilled)
+	local function syncronize(index, isFullfilled)
 		return function(value)
 			allFulfilled = allFulfilled and isFullfilled
 			results[index] = value
@@ -83,7 +85,11 @@ function Promise.All(promises)
 	end
 
 	for index, promise in pairs(promises) do
-		promise:Then(Syncronize(index, true), Syncronize(index, false))
+		promise:Then(syncronize(index, true), syncronize(index, false))
+	end
+
+	if #promises == 0 then
+		returnPromise:Fulfill()
 	end
 
 	return returnPromise
@@ -93,6 +99,14 @@ end
 -- @treturn bool True if pending, false otherwise
 function Promise:IsPending()
 	return self._pendingMaid ~= nil
+end
+
+function Promise:IsFulfilled()
+	return self._fulfilled ~= nil
+end
+
+function Promise:IsRejected()
+	return self._rejected ~= nil
 end
 
 --- Yield until the promise is complete
@@ -134,7 +148,7 @@ function Promise:Resolve(value)
 		return self
 	end
 
-	if _isPromise(value) then
+	if IsPromise(value) then
 		value:Then(function(...)
 			self:Fulfill(...)
 		end, function(...)
