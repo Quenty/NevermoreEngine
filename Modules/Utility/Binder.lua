@@ -24,6 +24,7 @@ function Binder.new(tagName, class)
             self:_add(inst)
         end)
     end
+
     self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(inst)
         self:_add(inst)
     end))
@@ -34,11 +35,20 @@ function Binder.new(tagName, class)
     return self
 end
 
+function Binder:Bind(inst)
+    CollectionService:AddTag(inst, self._tagName)
+    return self:Get(inst)
+end
+
 function Binder:Get(inst)
     return self._maid[inst]
 end
 
 function Binder:_add(inst)
+	if self._maid[inst] then
+		return
+	end
+
     if type(self._class) == "function" then
         self._maid[inst] = self._class(inst)
     elseif self._class.Create then
