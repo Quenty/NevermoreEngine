@@ -59,13 +59,13 @@ function Snackbar.new(Parent, Text, Options)
 		)
 	}
 
-	for _, Item in pairs(self.ShadowImages) do
-		Item.ImageTransparency = 0.74
-		Item.ZIndex = Gui.ZIndex - 2
+	for _, item in pairs(self.ShadowImages) do
+		item.ImageTransparency = 0.74
+		item.ZIndex = Gui.ZIndex - 2
 	end
 
-	for _, Item in pairs(self.BackgroundImages) do
-		Item.ZIndex = Gui.ZIndex - 1
+	for _, item in pairs(self.BackgroundImages) do
+		item.ZIndex = Gui.ZIndex - 1
 	end
 
 	local TextLabel = Instance.new("TextLabel")
@@ -164,11 +164,11 @@ function Snackbar:Dismiss()
 end
 
 function Snackbar:SetBackgroundTransparency(Transparency)
-	for _, Item in pairs(self.BackgroundImages) do
-		Item.ImageTransparency = Transparency
+	for _, item in pairs(self.BackgroundImages) do
+		item.ImageTransparency = Transparency
 	end
-	for _, Item in pairs(self.ShadowImages) do
-		Item.ImageTransparency = qMath.MapNumber(Transparency, 0, 1, 0.74, 1)
+	for _, item in pairs(self.ShadowImages) do
+		item.ImageTransparency = qMath.MapNumber(Transparency, 0, 1, 0.74, 1)
 	end
 end
 
@@ -181,15 +181,15 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 			self._callToActionButton.TextTransparency = PercentFaded
 		end
 	else
-		local NewProperties = {
+		local newProperties = {
 			ImageTransparency = 1;
 		}
 
-		for _, Item in pairs(self.BackgroundImages) do
-			qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+		for _, item in pairs(self.BackgroundImages) do
+			qGUI.TweenTransparency(item, newProperties, self.FadeTime, true)
 		end
-		for _, Item in pairs(self.ShadowImages) do
-			qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+		for _, item in pairs(self.ShadowImages) do
+			qGUI.TweenTransparency(item, newProperties, self.FadeTime, true)
 		end
 
 		qGUI.TweenTransparency(self._textLabel, {
@@ -217,20 +217,20 @@ function Snackbar:FadeInTransparency(PercentFaded)
 	else
 		-- Should be an ease-in-out transparency fade.
 		do
-			local NewProperties = {
+			local newProperties = {
 				ImageTransparency = 0;
 			}
-			for _, Item in pairs(self.BackgroundImages) do
-				qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+			for _, item in pairs(self.BackgroundImages) do
+				qGUI.TweenTransparency(item, newProperties, self.FadeTime, true)
 			end
 		end
 
 		do
-			local NewProperties = {
+			local newProperties = {
 				ImageTransparency = 0.74;
 			}
-			for _, Item in pairs(self.ShadowImages) do
-				qGUI.TweenTransparency(Item, NewProperties, self.FadeTime, true)
+			for _, item in pairs(self.ShadowImages) do
+				qGUI.TweenTransparency(item, newProperties, self.FadeTime, true)
 			end
 		end
 

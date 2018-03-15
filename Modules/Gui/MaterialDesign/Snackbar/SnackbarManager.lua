@@ -58,10 +58,10 @@ function SnackbarManager:MakeSnackbar(text, options)
 	assert(self._screenGui, "Must call :WithPlayerGui(PlayerGui) bofore use")
 	assert(type(text) == "string", "text must be a string")
 
-	local NewSnackbar = DraggableSnackbar.new(self._screenGui, text, true, options)
-	self:_showSnackbar(NewSnackbar)
+	local snackbar = DraggableSnackbar.new(self._screenGui, text, true, options)
+	self:_showSnackbar(snackbar)
 
-	return NewSnackbar
+	return snackbar
 end
 
 --- Cleanup existing snackbar
