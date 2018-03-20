@@ -81,7 +81,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 	local FolderCount = 0
 	local Folders = {}
 
-	for Link in GetAsync(Link):gmatch("<tr class=\"js%-navigation%-item\">.-<a href=\"(.-)\" class=\"js%-navigation%-open\".-</tr>") do
+	for Link in GetAsync(Link):gmatch("<tr class=\"js%-navigation%-item\">.-<a class=\"js%-navigation%-open\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</tr>") do
 		if Link:find("/[^/]+/[^/]+/tree") then
 			FolderCount = FolderCount + 1
 			Folders[FolderCount] = Link
