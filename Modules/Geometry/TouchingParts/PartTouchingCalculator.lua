@@ -73,11 +73,10 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
 	return returnValue
 end
 
-
 function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, padding)
 	relativeTo = relativeTo or CFrame.new()
 
-	local size, rotation = BoundingBox.GetPartsBoundingBox(parts, relativeTo)
+	local size, position = BoundingBox.GetPartsBoundingBox(parts, relativeTo)
 
 	if padding then
 		size = size + Vector3.new(padding, padding, padding)
@@ -86,7 +85,7 @@ function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, pad
 	local dummyPart = Instance.new("Part")
 	dummyPart.Name = "CollisionDetection"
 	dummyPart.Size = size
-	dummyPart.CFrame = rotation
+	dummyPart.CFrame = relativeTo + relativeTo:vectorToWorldSpace(position)
 	dummyPart.Anchored = false
 	dummyPart.CanCollide = true
 	dummyPart.Parent = Workspace
