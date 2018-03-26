@@ -29,23 +29,40 @@ end
 function module:GetMouseOverBoolValue(gui)
 	local maid = Maid.new()
 
-	local boolValue = Instance.new("BoolValue")
-	boolValue.Value = false
-	maid:GiveTask(boolValue)
+	local mouseOver = Instance.new("BoolValue")
+	mouseOver.Value = false
+	maid:GiveTask(mouseOver)
 
 	maid:GiveTask(gui.InputBegan:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-			boolValue.Value = true
+			mouseOver.Value = true
+		elseif inputObject.UserInputType == Enum.UserInputType.Touch then
+			-- Touch and hold counts as mouse over
+			local touchMaid = Maid.new()
+			maid[inputObject] = touchMaid
+
+			touchMaid:GiveTask(gui.InputEnded:Connect(function(endInputObject)
+				if endInputObject == inputObject then
+					maid[inputObject] = nil
+					mouseOver.Value = false
+				end
+			end))
+
+			delay(0.2, function()
+				if maid[inputObject] then
+					mouseOver.Value = true
+				end
+			end)
 		end
 	end))
 
 	maid:GiveTask(gui.InputEnded:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-			boolValue.Value = false
+			mouseOver.Value = false
 		end
 	end))
 
-	return maid, boolValue
+	return maid, mouseOver
 end
 
 function module:_getMouseOverTweenProperties(gui)
