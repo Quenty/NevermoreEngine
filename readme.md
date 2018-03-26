@@ -30,7 +30,7 @@ local h = game:GetService("HttpService") local e = h.HttpEnabled h.HttpEnabled =
 See [quenty.github.io/api/](http://quenty.github.io/api/) for API documentation.
 
 ## Usage
-See [quenty.github.io/api/](http://quenty.github.io/api/topics/usage.md.html) for examples and usage documentation.
+See [quenty.github.io/api/](http://quenty.github.io/api/topics/02_usage.md.html) for examples and usage documentation.
 
 ## Community
 
