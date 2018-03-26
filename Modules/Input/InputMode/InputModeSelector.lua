@@ -4,74 +4,87 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local INPUT_MODES = require("INPUT_MODES")
 local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 
 local InputModeSelector = {}
-InputModeSelector.__index = InputModeSelector
 InputModeSelector.ClassName = "InputModeSelector"
+InputModeSelector.INPUT_MODES = INPUT_MODES
+InputModeSelector.DEFAULT_MODES = {
+	INPUT_MODES.Gamepads,
+	INPUT_MODES.Keyboard,
+	INPUT_MODES.Touch
+}
 
-function InputModeSelector.new(inputModeList, updateBindFunction)
+function InputModeSelector.new(inputModes)
 	local self = setmetatable({}, InputModeSelector)
 
 	self._maid = Maid.new()
-	self.MostRecentMode = ValueObject.new()
 
-	if inputModeList then
-		self:WithInputModeList(inputModeList)
-	end
+	self._activeMode = ValueObject.new()
+	self.Changed = self._activeMode.Changed
 
-	if updateBindFunction then
-		self:BindUpdate(updateBindFunction)
+	self._maid:GiveTask(self._activeMode)
+
+	for _, inputMode in pairs(inputModes or InputModeSelector.DEFAULT_MODES) do
+		self:_addInputMode(inputMode)
 	end
 
 	return self
 end
 
-function InputModeSelector:BindUpdate(updateBindFunction)
-	local bindMaid = Maid.new()
-	self._maid[updateBindFunction] = bindMaid
+function InputModeSelector:__index(index)
+	if index == "Value" then
+		return rawget(self, "_activeMode").Value
+	elseif InputModeSelector[index] then
+		return InputModeSelector[index]
+	else
+		local value = rawget(self, index)
+		if value then
+			return value
+		else
+			error(("[InputModeSelector] - Bad index '%s'"):format(tostring(index)))
+		end
+	end
+end
 
-	local function HandleChange(NewMode, OldMode)
-		bindMaid.CurrentMaid = nil
+function InputModeSelector:Bind(updateBindFunction)
+	local maid = Maid.new()
+	self._maid[updateBindFunction] = maid
 
-		if NewMode then
-			local maid = Maid.new()
-			bindMaid.CurrentMaid = maid
+	local function onChange(newMode, oldMode)
+		maid._modeMaid = nil
 
-			updateBindFunction(NewMode, maid)
+		if newMode then
+			local modeMaid = Maid.new()
+			maid._modeMaid = modeMaid
+			updateBindFunction(newMode, modeMaid)
 		end
 	end
 
-	bindMaid.Changed = self.MostRecentMode.Changed:Connect(HandleChange)
-	HandleChange(self.MostRecentMode.Value)
+	maid:GiveTask(self._activeMode.Changed:Connect(onChange))
+	onChange(self._activeMode.Value, nil)
 
 	return self
 end
 
-function InputModeSelector:WithInputModeList(inputModeList)
-	local mostRecentInputMode = nil
-	local mostRecentTime = -math.huge
+function InputModeSelector:_addInputMode(inputMode)
+	assert(not self._maid[inputMode])
 
-	for _, inputModeState in pairs(inputModeList) do
-		if inputModeState:GetLastEnabledTime() > mostRecentTime then
-			mostRecentTime = inputModeState:GetLastEnabledTime()
-			mostRecentInputMode = inputModeState
-		end
+	self._maid[inputMode] = inputMode.Enabled:Connect(function()
+		self._activeMode.Value = inputMode
+	end)
 
-		self._maid[inputModeState] = inputModeState.Enabled:Connect(function()
-			self.MostRecentMode.Value = inputModeState
-		end)
+	if not self._activeMode.Value then
+		self._activeMode.Value = inputMode
+	elseif inputMode:GetLastEnabledTime() > self._activeMode.Value:GetLastEnabledTime() then
+		self._activeMode.Value = inputMode
 	end
-
-	self.MostRecentMode.Value = mostRecentInputMode
-
-	return self
 end
 
 function InputModeSelector:Destroy()
 	self._maid:DoCleaning()
 end
-
 
 return InputModeSelector

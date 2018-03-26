@@ -1,40 +1,29 @@
 --- Holds input states for Keyboard, Mouse, et cetera. Mostly useful for providing UI input hints to the user by
 -- identifying the most recent input state provided.
--- @classmod InputModes
+-- @module INPUT_MODES
 
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local InputMode = require("InputMode")
-local InputModeSelector = require("InputModeSelector")
 local InputModeProcessor = require("InputModeProcessor")
 local Maid = require("Maid")
 
 --[[
 
 API:
-	InputModes.Keyboard
+	INPUT_MODES.Keyboard
 		Returns an input state for keyboard
-	InputModes.Mouse
+	INPUT_MODES.Mouse
 		Returns an input state for Mouse
-	InputModes.Touch
+	INPUT_MODES.Touch
 		Returns an input state for Touch
-	InputModes.Gamepad
+	INPUT_MODES.Gamepad
 		Returns an input state for Gamepad
-
-	InputModes:BindToSelector(function updateFunction)
-		Binds a function to a selector, where the updateFunction is called
-		immediately with the current best state between Gamepad, Mouse, and
-		Touch. Returns the InputModeSelector to
-
-		void updateFunction(NewState, OldState)
-			Called immediately after binding, and then after every change.
-
-		Returns the selector which should be cleaned up with a call of :Destroy()
 ]]
 
-local InputModes = setmetatable({}, {
+local INPUT_MODES = setmetatable({}, {
 	__index = function(self, key)
 		error(("'%s' is not a valid InputMode"):format(tostring(key)))
 	end;
@@ -42,20 +31,7 @@ local InputModes = setmetatable({}, {
 
 ---
 -- @field
-InputModes.THUMBSTICK_DEADZONE = 0.14
-
----
--- @param updateFunction Function(NewMode, Maid)
-function InputModes:BindToSelector(updateFunction)
-	local new = InputModeSelector.new({
-		InputModes.Gamepads,
-		InputModes.Mouse,
-		InputModes.Touch
-	}, updateFunction)
-
-	return new
-end
-
+INPUT_MODES.THUMBSTICK_DEADZONE = 0.14
 
 do
 	local KEYBOARD = "KeypadZero,KeypadOne,KeypadTwo,KeypadThree,KeypadFour,KeypadFive,KeypadSix,KeypadSeven,KeypadEight,"
@@ -65,7 +41,7 @@ do
 
 	--- Keyboard InputMode
 	-- @field
-	InputModes.Keyboard = InputMode.new("Keyboard")
+	INPUT_MODES.Keyboard = InputMode.new("Keyboard")
 		:AddKeys("Keyboard", Enum.UserInputType) -- Incase we miss anything
 		:AddKeys("Backspace,Tab,Clear,Return,Pause,Escape,Space,QuotedDouble,Hash,Dollar,Percent,Ampersand,Quote,"
 			.. "LeftParenthesis,RightParenthesis,Asterisk,Plus,Comma,Minus,Period,Slash,Zero,One,Two,Three,Four,Five,Six,Seven,"
@@ -80,28 +56,28 @@ do
 		:AddKeys(ARROW_KEYS)
 
 	if UserInputService.KeyboardEnabled then
-		InputModes.Keyboard:Enable()
+		INPUT_MODES.Keyboard:Enable()
 	end
 end
 
 do
 	--- Mouse InputMode
 	-- @field
-	InputModes.Mouse = InputMode.new("Mouse"):AddKeys("MouseButton1,MouseButton2,MouseButton3,MouseWheel,MouseMovement",
+	INPUT_MODES.Mouse = InputMode.new("Mouse"):AddKeys("MouseButton1,MouseButton2,MouseButton3,MouseWheel,MouseMovement",
 		Enum.UserInputType)
 
 	if UserInputService.MouseEnabled then
-		InputModes.Mouse:Enable()
+		INPUT_MODES.Mouse:Enable()
 	end
 end
 
 do
 	--- Touch InputMode
 	-- @field
-	InputModes.Touch = InputMode.new("Touch"):AddKeys("Touch", Enum.UserInputType)
+	INPUT_MODES.Touch = InputMode.new("Touch"):AddKeys("Touch", Enum.UserInputType)
 
 	if UserInputService.TouchEnabled then
-		InputModes.Touch:Enable()
+		INPUT_MODES.Touch:Enable()
 	end
 end
 
@@ -113,17 +89,17 @@ do
 
 	--- Gamepad InputMode
 	-- @field
-	InputModes.Gamepads = InputMode.new("Gamepad")
+	INPUT_MODES.Gamepads = InputMode.new("Gamepad")
 		:AddKeys(GAMEPAD_THUMBSTICKS, Enum.KeyCode)
 		:AddKeys(GAMEPAD_BUTTONS, Enum.KeyCode)
 		:AddKeys(GAMEPAD_TRIGGERS, Enum.KeyCode)
 		:AddKeys("Gamepad1,Gamepad2,Gamepad3,Gamepad4,Gamepad5,Gamepad6,Gamepad7,Gamepad8", Enum.UserInputType)
 
 	if UserInputService.GamepadEnabled then
-		InputModes.Gamepads:Enable()
+		INPUT_MODES.Gamepads:Enable()
 	end
 	if GuiService:IsTenFootInterface() then
-		InputModes.Gamepads:Enable()
+		INPUT_MODES.Gamepads:Enable()
 	end
 end
 
@@ -131,24 +107,24 @@ end
 -- @local
 local function bindProcessor()
 	local inputProcessor = InputModeProcessor.new()
-		:AddState(InputModes.Keyboard)
-		:AddState(InputModes.Gamepads)
-		:AddState(InputModes.Mouse)
-		:AddState(InputModes.Touch)
-
-	local maid = Maid.new()
+		:AddState(INPUT_MODES.Keyboard)
+		:AddState(INPUT_MODES.Gamepads)
+		:AddState(INPUT_MODES.Mouse)
+		:AddState(INPUT_MODES.Touch)
 
 	UserInputService.InputBegan:Connect(function(inputObject)
 		inputProcessor:Evaluate(inputObject)
 	end)
 
+	local maid = Maid.new()
+
 	UserInputService.GamepadConnected:Connect(function(gamepad)
-		InputModes.Gamepads:Enable()
+		INPUT_MODES.Gamepads:Enable()
 
 		-- Bind thumbsticks
-		maid.InputChanged = UserInputService.InputChanged:Connect(function(inputObject)
+		maid._inputChanged = UserInputService.InputChanged:Connect(function(inputObject)
 			if inputObject.KeyCode.Name:find("Thumbstick") then
-				if inputObject.Position.magnitude > InputModes.THUMBSTICK_DEADZONE then
+				if inputObject.Position.magnitude > INPUT_MODES.THUMBSTICK_DEADZONE then
 					inputProcessor:Evaluate(inputObject)
 				end
 			end
@@ -157,13 +133,13 @@ local function bindProcessor()
 
 	UserInputService.GamepadDisconnected:Connect(function(gamepad)
 		-- TODO: Stop assuming state is mouse/keyboard
-		InputModes.Mouse:Enable()
-		InputModes.Keyboard:Enable()
+		INPUT_MODES.Mouse:Enable()
+		INPUT_MODES.Keyboard:Enable()
 
-		maid.InputChanged = nil
+		maid._inputChanged = nil
 	end)
 end
 
 bindProcessor()
 
-return InputModes
+return INPUT_MODES
