@@ -39,8 +39,8 @@ function Raycaster:FindPartOnRay(ray)
 	local ignoreList = Table.Copy(self._ignoreList)
 	local casts = self.MaxCasts
 	while casts > 0 do
-		local result = self:_tryCast(ray, ignoreList)
-		if result then
+		local ok, result = self:_tryCast(ray, ignoreList)
+		if ok then
 			return result
 		end
 		casts = casts - 1
@@ -86,7 +86,7 @@ function Raycaster:_tryCast(ray, ignoreList)
 		ray, ignoreList, false, self._ignoreWater)
 
 	if not part then
-		return nil
+		return true, nil
 	end
 
 	local data = {
@@ -99,10 +99,10 @@ function Raycaster:_tryCast(ray, ignoreList)
 	local filter = self.Filter
 	if filter and filter(data) then
 		table.insert(ignoreList, part)
-		return nil
+		return false, nil
 	end
 
-	return data
+	return true, data
 end
 
 return Raycaster
