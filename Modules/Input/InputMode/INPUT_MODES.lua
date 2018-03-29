@@ -21,6 +21,7 @@ API:
 		Returns an input state for Touch
 	INPUT_MODES.Gamepad
 		Returns an input state for Gamepad
+	INPUT_MODES.KeyboardAndMouse
 ]]
 
 local INPUT_MODES = setmetatable({}, {
@@ -72,6 +73,18 @@ do
 end
 
 do
+	--- KeyboardAndMouse InputMode
+	-- @field
+	INPUT_MODES.KeyboardAndMouse = InputMode.new("KeyboardAndMouse")
+		:AddInputMode(INPUT_MODES.Mouse)
+		:AddInputMode(INPUT_MODES.Keyboard)
+
+	if UserInputService.KeyboardEnabled and UserInputService.MouseEnabled then
+		INPUT_MODES.KeyboardAndMouse:Enable()
+	end
+end
+
+do
 	--- Touch InputMode
 	-- @field
 	INPUT_MODES.Touch = InputMode.new("Touch"):AddKeys("Touch", Enum.UserInputType)
@@ -111,6 +124,7 @@ local function bindProcessor()
 		:AddState(INPUT_MODES.Gamepads)
 		:AddState(INPUT_MODES.Mouse)
 		:AddState(INPUT_MODES.Touch)
+		:AddState(INPUT_MODES.KeyboardAndMouse)
 
 	UserInputService.InputBegan:Connect(function(inputObject)
 		inputProcessor:Evaluate(inputObject)

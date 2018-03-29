@@ -28,6 +28,7 @@ function InputMode:GetLastEnabledTime()
 	return self._lastEnabled
 end
 
+---
 -- @param Keys A string for ease of use, or a table of keys
 -- @param [EnumSet] The enum set to pull from. Defaults to KeyCode.
 function InputMode:AddKeys(keys, enumSet)
@@ -49,6 +50,13 @@ function InputMode:AddKeys(keys, enumSet)
 		self._valid[key] = true
 	end
 
+	return self
+end
+
+function InputMode:AddInputMode(inputMode)
+	for key, _ in pairs(inputMode._valid) do
+		self._valid[key] = true
+	end
 	return self
 end
 
