@@ -71,6 +71,14 @@ function RoundedBackingBuilder:CreateBottomBacking(gui)
 	return backing
 end
 
+function RoundedBackingBuilder:CreateTopShadow(backing)
+	local shadow = self:CreateShadow(backing)
+	shadow.ImageRectSize = Vector2.new(80, 64)
+	shadow.SliceCenter = Rect.new(16, 16, 64, 64)
+
+	return shadow
+end
+
 function RoundedBackingBuilder:CreateShadow(backing)
 	local shadow = Instance.new("ImageLabel")
 	shadow.Name = "Shadow"
