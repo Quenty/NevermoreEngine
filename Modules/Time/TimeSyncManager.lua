@@ -82,6 +82,7 @@ end
 function SlaveClock:GetTime()
 	if not self:IsSynced() then
 		warn("[SlaveClock][GetTime] - Slave clock is not yet synced")
+		return self:_getLocalTime()
 	end
 
 	return self:_getLocalTime() - self._offset
@@ -133,7 +134,7 @@ end
 
 
 --- Return a singleton
-local function BuildClock()
+local function buildClock()
 	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 	local remoteEvent = require.GetRemoteEvent("TimeSyncEvent")
@@ -150,4 +151,4 @@ local function BuildClock()
 	end
 end
 
-return BuildClock()
+return buildClock()
