@@ -224,13 +224,13 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 		local processInput = self:_getInputProcessor(inputBeganObject)
 
 		if inputBeganObject.UserInputType == Enum.UserInputType.MouseButton1 then
-			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, GameProcessed)
+			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, gameProcessed)
 				if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 					totalScrollDistance = totalScrollDistance + math.abs(processInput(inputObject))
 				end
 			end))
 		elseif inputBeganObject.UserInputType == Enum.UserInputType.Touch then
-			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, GameProcessed)
+			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, gameProcessed)
 				if inputObject.UserInputType == Enum.UserInputType.Touch then
 					totalScrollDistance = totalScrollDistance + math.abs(processInput(inputObject))
 				end
@@ -248,7 +248,7 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 			end
 		end)
 
-		maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, GameProcessed)
+		maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, gameProcessed)
 			if inputObject == inputBeganObject then
 				self:StopDrag()
 			end
