@@ -5,9 +5,9 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Maid = require("Maid")
 local CameraStack = require("CameraStack")
 local FadeBetweenCamera = require("FadeBetweenCamera")
+local Maid = require("Maid")
 
 local CameraStateTweener = {}
 CameraStateTweener.ClassName = "CameraStateTweener"

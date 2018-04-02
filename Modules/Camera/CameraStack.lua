@@ -7,9 +7,9 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
+local CustomCameraEffect = require("CustomCameraEffect")
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
-local CustomCameraEffect = require("CustomCameraEffect")
 
 assert(RunService:IsClient(), "[CameraStack] - Only require CameraStack on client")
 
