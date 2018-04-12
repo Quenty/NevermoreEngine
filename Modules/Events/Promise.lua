@@ -16,7 +16,7 @@ local function _isSignal(value)
 	return false
 end
 
-local function IsPromise(value)
+local function isPromise(value)
 	if type(value) == "table" and value.ClassName == "Promise" then
 		return true
 	end
@@ -27,7 +27,7 @@ local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
 Promise.CatchErrors = false -- A+ compliance if true
-Promise.IsPromise = IsPromise
+Promise.IsPromise = isPromise
 
 --- Construct a new promise
 -- @constructor Promise.new()
@@ -148,7 +148,7 @@ function Promise:Resolve(value)
 		return self
 	end
 
-	if IsPromise(value) then
+	if isPromise(value) then
 		value:Then(function(...)
 			self:Fulfill(...)
 		end, function(...)
@@ -259,9 +259,9 @@ function Promise:_promisfyYieldingFunction(yieldingFunction)
 	maid:GiveTask(bindable.Event:Connect(function()
 		maid:DoCleaning()
 		if self.CatchErrors then
-			local results = self:_executeFunc(self, yieldingFunction, {self:_getResolveReject()})
+			local resultList = self:_executeFunc(self, yieldingFunction, {self:_getResolveReject()})
 			if self:IsPending() then
-				self:Resolve(results)
+				self:Resolve(unpack(resultList))
 			end
 		else
 			self:Resolve(yieldingFunction(self:_getResolveReject()))
@@ -298,36 +298,36 @@ function Promise:_executeFunc(returnPromise, func, args)
 		return {func(unpack(args))}
 	end
 
-	local results
+	local resultList
 	local success, err = pcall(function()
-		results = {func(unpack())}
+		resultList = {func(unpack())}
 	end)
 	if not success then
 		returnPromise:Reject(err)
 	end
-	return results
+	return resultList
 end
 
 function Promise:_executeThen(returnPromise, onFulfilled, onRejected)
-	local results
+	local resultList
 	if self._fulfilled then
 		if type(onFulfilled) ~= "function" then
 			return returnPromise:Fulfill(unpack(self._fulfilled))
 		end
 
-		results = self:_executeFunc(returnPromise, onFulfilled, self._fulfilled)
+		resultList = self:_executeFunc(returnPromise, onFulfilled, self._fulfilled)
 	elseif self._rejected then
 		if type(onRejected) ~= "function" then
 			return returnPromise:Reject(unpack(self._rejected))
 		end
 
-		results = self:_executeFunc(returnPromise, onRejected, self._rejected)
+		resultList = self:_executeFunc(returnPromise, onRejected, self._rejected)
 	else
 		error("Internal error, cannot execute while pending")
 	end
 
-	if results and #results > 0 then
-		returnPromise:Resolve(results[1])
+	if resultList and #resultList > 0 then
+		returnPromise:Resolve(resultList[1])
 	end
 end
 
