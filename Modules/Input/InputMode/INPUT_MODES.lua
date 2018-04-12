@@ -111,6 +111,9 @@ do
 	if UserInputService.GamepadEnabled then
 		INPUT_MODES.Gamepads:Enable()
 	end
+	if #UserInputService:GetConnectedGamepads() > 0 then
+		INPUT_MODES.Gamepads:Enable()
+	end
 	if GuiService:IsTenFootInterface() then
 		INPUT_MODES.Gamepads:Enable()
 	end
