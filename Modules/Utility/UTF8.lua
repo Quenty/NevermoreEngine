@@ -1,9 +1,22 @@
 --- UTF8 utility functions
---
 
 local lib = {}
 
-local UPPER_MAP = {
+function lib.Upper(str)
+	local UPPER_MAP = lib.UPPER_MAP
+	str = str:upper()
+	local newStr = ""
+	for start, stop in utf8.graphemes(str) do
+		local chr = str:sub(start, stop)
+		if UPPER_MAP[chr] then
+			chr = UPPER_MAP[chr]
+		end
+		newStr = newStr .. chr
+	end
+	return newStr
+end
+
+lib.UPPER_MAP = {
 	['à'] = 'À',
 	['á'] = 'Á',
 	['â'] = 'Â',
@@ -108,18 +121,5 @@ local UPPER_MAP = {
 	['ƣ'] = 'Ƣ',
 	['ơ'] = 'Ơ',
 }
-
-function lib.Upper(str)
-	str = str:upper()
-	local newStr = ""
-	for start, stop in utf8.graphemes(str) do
-		local chr = str:sub(start, stop)
-		if UPPER_MAP[chr] then
-			chr = UPPER_MAP[chr]
-		end
-		newStr = newStr .. chr
-	end
-	return newStr
-end
 
 return lib
