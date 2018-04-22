@@ -142,7 +142,16 @@ end
 ---
 -- Resolves a promise
 -- @return self
-function Promise:Resolve(value)
+function Promise:Resolve(...)
+	local valueLength = select("#", ...)
+
+	-- Treat tuples as an array under A+ compliance
+	if valueLength > 1 then
+		self:Fulfill(...)
+		return self
+	end
+
+	local value = ...
 	if self == value then
 		self:Reject("TypeError: Resolved to self")
 		return self
@@ -327,7 +336,7 @@ function Promise:_executeThen(returnPromise, onFulfilled, onRejected)
 	end
 
 	if resultList and #resultList > 0 then
-		returnPromise:Resolve(resultList[1])
+		returnPromise:Resolve(unpack(resultList))
 	end
 end
 
