@@ -38,6 +38,7 @@ function BaseAction.new(actionData)
 			local actionMaid = Maid.new()
 			self._maid._actionMaid = actionMaid
 			self.Activated:Fire(actionMaid, unpack(self._activateData))
+			self._activateData = nil
 		else
 			self._maid._actionMaid = nil
 			self.Deactivated:Fire()
