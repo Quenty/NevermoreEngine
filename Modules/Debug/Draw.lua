@@ -11,7 +11,7 @@ function lib.SetColor(color)
 end
 
 function lib.SetRandomColor()
-	lib.SetColor(Color3.new(math.random(), math.random(), math.random()))
+	lib.SetColor(Color3.fromHSV(math.random(), 0.5+0.5*math.random(), 1))
 end
 
 --- Draws a ray for debugging
