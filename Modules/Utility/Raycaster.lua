@@ -1,11 +1,7 @@
 --- Repeats raycasting attempts while ignoring items via a filter function
 -- @classmod Raycaster
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
 local Workspace = game:GetService("Workspace")
-
-local Table = require("Table")
 
 local Raycaster = {}
 Raycaster.ClassName = "Raycaster"
@@ -36,7 +32,11 @@ end
 function Raycaster:FindPartOnRay(ray)
 	assert(typeof(ray) == "Ray")
 
-	local ignoreList = Table.Copy(self._ignoreList)
+	local ignoreList = {}
+	for key, value in pairs(rawget(self, "_ignoreList")) do
+		ignoreList[key] = value
+	end
+
 	local casts = self.MaxCasts
 	while casts > 0 do
 		local ok, result = self:_tryCast(ray, ignoreList)
