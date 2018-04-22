@@ -32,7 +32,7 @@ function module:InitEnabledMixin(maid)
 	self._enabledMaidReference = maid
 
 	self._enabled = false
-	self.EnabledChanged = Signal.new()
+	self.EnabledChanged = Signal.new() -- :Fire(isEnabled, doNotAnimate, enabledMaid)
 	self._enabledMaidReference:GiveTask(self.EnabledChanged)
 end
 
@@ -57,7 +57,7 @@ function module:SetEnabled(isEnabled, doNotAnimate)
 		local enabledMaid = Maid.new()
 		self._enabledMaidReference._enabledMaid = enabledMaid
 
-		self.EnabledChanged:Fire(isEnabled, enabledMaid)
+		self.EnabledChanged:Fire(isEnabled, doNotAnimate, enabledMaid)
 	end
 end
 
