@@ -78,14 +78,19 @@ function BaseAction:_updateShortcuts()
 	end
 
 	local shortcuts = self._actionData.Shortcuts
-
 	if not (shortcuts and #shortcuts > 0) then
 		return
 	end
 
 	if self:IsEnabled() then
-		ContextActionService:BindAction(self._contextActionKey, function(Name, UserInputState, InputObject)
-			if UserInputState == Enum.UserInputState.Begin then
+		ContextActionService:BindAction(self._contextActionKey, function(actionName, userInputState, inputObject)
+			if userInputState == Enum.UserInputState.Begin then
+				if self._actionData.CanActivateShortcutCallback then
+					if not self._actionData.CanActivateShortcutCallback() then
+						return
+					end
+				end
+
 				self:ToggleActivate()
 			end
 		end, false, unpack(shortcuts))
