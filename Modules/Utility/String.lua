@@ -36,6 +36,12 @@ function lib.CheckNumOfCharacterInString(str, char)
 	end
 	return count
 end
+
+--- Checks if a string is empty or nil
+function lib.IsEmptyOrWhitespaceOrNil(str)
+	return type(str) ~= "string" or str == "" or lib.IsWhitespace(str)
+end
+
 --- Returns whether or not text is whitespace
 function lib.IsWhitespace(str)
 	return string.match(str, "[%s]+") == str
@@ -43,7 +49,6 @@ end
 
 --- Converts text to have a ... after it if it's too long.
 function lib.ElipseLimit(str, characterLimit)
-
 	if #str > characterLimit then
 		str = str:sub(1, characterLimit-3).."..."
 	end
