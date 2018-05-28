@@ -15,6 +15,21 @@ function lib.Append(target, source)
 	return target
 end
 
+--- Shallow merges two tables without modifying either
+-- @tparam table orig original table
+-- @tparam table new new table
+-- @treturn table
+function lib.Merge(orig, new)
+	local tab = {}
+	for key, val in pairs(orig) do
+		tab[key] = val
+	end
+	for key, val in pairs(new) do
+		tab[key] = val
+	end
+	return tab
+end
+
 --- Converts a table to a list
 -- @taparm table tab Table to convert to a list
 -- @treturn list
