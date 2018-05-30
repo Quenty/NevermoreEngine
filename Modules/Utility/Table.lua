@@ -31,7 +31,7 @@ function lib.Merge(orig, new)
 end
 
 --- Converts a table to a list
--- @taparm table tab Table to convert to a list
+-- @tparam table tab Table to convert to a list
 -- @treturn list
 function lib.ToList(tab)
 	local list = {}

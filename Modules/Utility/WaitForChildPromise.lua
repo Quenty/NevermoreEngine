@@ -1,9 +1,13 @@
+--- Warps the WaitForChild API with a promise
+-- @module WaitForChildPromise
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Promise = require("Promise")
 
 local WaitForChildPromise = {}
 
+--- Wraps the :WaitForChild API with a promise
 function WaitForChildPromise.new(parent, childName, timeOut)
 	timeOut = timeOut or 5
 

@@ -1,4 +1,5 @@
 --- UTF8 utility functions
+-- @module UTF8
 
 local lib = {}
 

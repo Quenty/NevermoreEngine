@@ -105,7 +105,7 @@ function CameraState:__mul(other)
 end
 
 --- Set another camera state. Typically used to set Workspace.CurrentCamera's state to match this camera's state
--- @tparam Camera CameraState A CameraState to set, also accepts a Roblox Camera
+-- @tparam Camera camera A CameraState to set, also accepts a Roblox Camera
 -- @treturn nil
 function CameraState:Set(camera)
 	camera.FieldOfView = self.FieldOfView
