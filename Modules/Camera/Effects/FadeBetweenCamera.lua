@@ -26,57 +26,56 @@ function FadeBetweenCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function FadeBetweenCamera:__newindex(Index, Value)
-	if Index == "Damper" then
+function FadeBetweenCamera:__newindex(index, Value)
+	if index == "Damper" then
 		self.Spring.Damper = Value
-	elseif Index == "Value" then
+	elseif index == "Value" then
 		self.Spring.Value = Value
-	elseif Index == "Speed" then
+	elseif index == "Speed" then
 		self.Spring.Speed = Value
-	elseif Index == "Target" then
+	elseif index == "Target" then
 		self.Spring.Target = Value
-	elseif Index == "Velocity" then
+	elseif index == "Velocity" then
 		self.Spring.Velocity = Value
-	elseif Index == "Spring" or Index == "CameraA" or Index == "CameraB" then
-		rawset(self, Index, Value)
+	elseif index == "Spring" or index == "CameraA" or index == "CameraB" then
+		rawset(self, index, Value)
 	else
-		error(Index .. " is not a valid member of fading camera")
+		error(index .. " is not a valid member of fading camera")
 	end
 end
 
+function FadeBetweenCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
+		local value = self.Spring.Value
 
-function FadeBetweenCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		local Value = self.Spring.Value
-
-		if math.abs(Value - 1) <= 1e-4 then
+		if math.abs(value - 1) <= 1e-4 then
 			return self.CameraStateB
-		elseif math.abs(Value) <= 1e-4 then
+		elseif math.abs(value) <= 1e-4 then
 			return self.CameraStateA
 		else
-			local StateA = self.CameraStateA
-			local StateB = self.CameraStateB
+			local stateA = self.CameraStateA
+			local stateB = self.CameraStateB
 
-			return StateA + (StateB - StateA)*Value
+			return stateA + (stateB - stateA)*value
 		end
-	elseif Index == "CameraStateA" then
+	elseif index == "CameraStateA" then
 		return self.CameraA.CameraState or self.CameraA
-	elseif Index == "CameraStateB" then
+	elseif index == "CameraStateB" then
 		return self.CameraB.CameraState or self.CameraB
-	elseif Index == "Damper" then
+	elseif index == "Damper" then
 		return self.Spring.Damper
-	elseif Index == "Value" then
+	elseif index == "Value" then
 		return self.Spring.Value
-	elseif Index == "Speed" then
+	elseif index == "Speed" then
 		return self.Spring.Speed
-	elseif Index == "Target" then
+	elseif index == "Target" then
 		return self.Spring.Target
-	elseif Index == "Velocity" then
+	elseif index == "Velocity" then
 		return self.Spring.Velocity
-	elseif Index == "HasReachedTarget" then
+	elseif index == "HasReachedTarget" then
 		return math.abs(self.Value - self.Target) < 1e-4 and math.abs(self.Velocity) < 1e-4
 	else
-		return FadeBetweenCamera[Index]
+		return FadeBetweenCamera[index]
 	end
 end
 
