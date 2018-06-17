@@ -1,4 +1,4 @@
----
+--- Provides a wrapper around HttpService with a promise API
 -- @module HttpPromise
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
@@ -9,6 +9,8 @@ local Promise = require("Promise")
 
 local HttpPromise = {}
 
+---
+-- @tparam {'PostAsync' | 'GetAsync'} methodName Method to send with
 function HttpPromise.Method(methodName, url, ...)
 	assert(type(methodName) == "string")
 	assert(type(url) == "string")
@@ -30,6 +32,7 @@ function HttpPromise.Method(methodName, url, ...)
 	end)
 end
 
+-- @tparam {string} url 
 function HttpPromise.Get(...)
 	return HttpPromise.Method("GetAsync", ...)
 end
