@@ -103,7 +103,7 @@ function CameraStack:GetNewStateBelow()
 		if index then
 			local below = self._stack[index-1]
 			if below then
-				return below.CameraState
+				return below.CameraState or below
 			else
 				warn("[CameraStack] - Could not get state below, found current state. Returning default.")
 				return self._stack[1].CameraState
