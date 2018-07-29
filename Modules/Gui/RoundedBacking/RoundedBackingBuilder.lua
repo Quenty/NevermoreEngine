@@ -5,8 +5,17 @@ local RoundedBackingBuilder = {}
 RoundedBackingBuilder.__index = RoundedBackingBuilder
 RoundedBackingBuilder.ClassName = "RoundedBackingBuilder"
 
-function RoundedBackingBuilder.new()
+--- Initializes a new RoundedBackingBuilder
+-- @param options Options to set
+-- {
+--     sibling = true; -- If true, assumes sibling mode in the ScreenGui, defaults to true
+-- }
+function RoundedBackingBuilder.new(options)
 	local self = setmetatable({}, RoundedBackingBuilder)
+
+	self._options = options or {
+		sibling = true;
+	}
 
 	return self
 end
@@ -27,7 +36,11 @@ function RoundedBackingBuilder:CreateBacking(gui)
 	backing.ImageColor3 = gui.BackgroundColor3
 	backing.ScaleType = Enum.ScaleType.Slice
 	backing.BackgroundTransparency = 1
-	backing.ZIndex = math.max(2, gui.ZIndex - 1)
+	if self._options.sibling then
+		backing.ZIndex = -1
+	else
+		backing.ZIndex = gui.ZIndex - 1
+	end
 	backing.Parent = gui
 
 	gui.BackgroundTransparency = 1
