@@ -1,4 +1,4 @@
----
+--- Debug drawing library useful for debugging 3D abstractions
 -- @module Draw
 
 local Workspace = game:GetService("Workspace")
@@ -6,16 +6,23 @@ local Workspace = game:GetService("Workspace")
 local lib = {}
 lib._defaultColor = Color3.new(1, 0, 0)
 
+--- Sets the lib's drawing color
+-- @tparam {Color3} color The color to set
 function lib.SetColor(color)
 	lib._defaultColor = color
 end
 
+--- Sets the draw library to use a random color
 function lib.SetRandomColor()
 	lib.SetColor(Color3.fromHSV(math.random(), 0.5+0.5*math.random(), 1))
 end
 
 --- Draws a ray for debugging
 -- @param ray The ray to draw
+-- @tparam[opt] {color3} color The color to draw in
+-- @tparam[opt] {Instance} parent
+-- @tparam[opt] {number} diameter
+-- @tparam[opt] {number} meshDiameter
 function lib.Ray(ray, color, parent, meshDiameter, diameter)
 	color = color or lib._defaultColor
 	parent = parent or Workspace.CurrentCamera
@@ -39,15 +46,18 @@ function lib.Ray(ray, color, parent, meshDiameter, diameter)
 
 	local mesh = Instance.new("SpecialMesh")
 	mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(meshDiameter, 0, meshDiameter) / diameter
-	mesh.parent = part
+	mesh.Parent = part
 
-	part.parent = parent
+	part.Parent = parent
 
 	return part
 end
 
 --- Draws a point for debugging
--- @param vector3 Point to draw
+-- @tparam {Vector3} vector3 Point to draw
+-- @tparam[opt] {color3} color The color to draw in
+-- @tparam[opt] {Instance} parent
+-- @tparam[opt] {number} diameter
 function lib.Point(vector3, color, parent, diameter)
 	assert(vector3)
 	color = color or lib._defaultColor
