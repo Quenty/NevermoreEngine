@@ -35,7 +35,11 @@ function CoreGuiEnabler.new()
 		end
 	end
 
+	self.TopbarEnabledState = Instance.new("BoolValue")
+	self.TopbarEnabledState.Value = false
+
 	self:AddState("TopbarEnabled", function(isEnabled)
+		self.TopbarEnabledState.Value = isEnabled
 		local success, err = pcall(function()
 			StarterGui:SetCore("TopbarEnabled", isEnabled)
 		end)
