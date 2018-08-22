@@ -36,21 +36,9 @@ end
 function lib.ToList(tab)
 	local list = {}
 	for _, item in pairs(tab) do
-		table.insert(list, item)
+		list[#list+1] = item
 	end
 	return list
-end
-
---- Counts the number of items in `tab`.
--- Useful since `__len` on table in Lua 5.2 returns just the array length.
--- @tparam table tab Table to count
--- @treturn number count
-function lib.Count(tab)
-	local count = 0
-	for _, _ in pairs(tab) do
-		count = count + 1
-	end
-	return count
 end
 
 --- Copies a table, but not deep.
@@ -167,10 +155,10 @@ end
 function lib.ReadOnly(table)
 	return setmetatable(table, {
 		__index = function(self, index)
-			error(("Bad index '%s'"):format(tostring(index)), 2)
+			error(("Bad index %q"):format(tostring(index)), 2)
 		end;
 		__newindex = function(self, index, value)
-			error(("Bad index '%s'"):format(tostring(index)), 2)
+			error(("Bad index %q"):format(tostring(index)), 2)
 		end;
 	})
 end
