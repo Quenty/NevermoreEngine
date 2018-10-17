@@ -7,14 +7,11 @@ local ContextActionService = game:GetService("ContextActionService")
 
 local ValueObject = require("ValueObject")
 local Signal = require("Signal")
-local EnabledMixin = require("EnabledMixin")
 local Maid = require("Maid")
 
 local ActionManager = setmetatable({}, {})
 ActionManager.__index = ActionManager
 ActionManager.ClassName = "ActionManager"
-
-EnabledMixin:Add(ActionManager)
 
 function ActionManager.new()
 	local self = setmetatable({}, ActionManager)
@@ -25,21 +22,12 @@ function ActionManager.new()
 	self.ActiveAction = ValueObject.new()
 	self._maid:GiveTask(self.ActiveAction)
 
-	self.ActionAdded = Signal.new() -- :Fire(Action)
+	self.ActionAdded = Signal.new() -- :Fire(action)
 
-	self:InitEnabledMixin()
-
-	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(Tool)
+	-- Stop actions while tool is in play
+	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(tool)
 		self:StopCurrentAction()
 	end)
-
-	self._maid:GiveTask(self.EnabledChanged:Connect(function(isEnabled)
-		self:StopCurrentAction()
-
-		for _, action in pairs(self._actions) do
-			action:SetEnabled(isEnabled)
-		end
-	end))
 
 	self._maid:GiveTask(self.ActiveAction.Changed:Connect(function(value, oldValue)
 		local maid = Maid.new()
@@ -101,8 +89,6 @@ function ActionManager:AddAction(action)
 	end
 
 	self._actions[name] = action
-
-	action:SetEnabled(self:IsEnabled())
 
 	self._maid:GiveTask(action.Activated:Connect(function()
 		self.ActiveAction.Value = action
