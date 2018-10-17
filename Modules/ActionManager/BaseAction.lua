@@ -103,22 +103,6 @@ function BaseAction:GetData()
 	return self._actionData
 end
 
-function BaseAction:GetFABData()
-	if not self._actionData then
-		return nil
-	end
-
-	local FABData = self._actionData.FABData
-
-	if FABData then
-		return setmetatable({
-			Name = self._name;
-		}, {__index = FABData})
-	else
-		return nil
-	end
-end
-
 function BaseAction:ToggleActivate(...)
 	self._activateData = {...}
 
