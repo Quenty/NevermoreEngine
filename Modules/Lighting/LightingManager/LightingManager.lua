@@ -88,7 +88,6 @@ function LightingManager:TweenProperties(propertyTable)
 	end
 
 	return function()
-		print("Removing tweens")
 		for object, _ in pairs(objects) do
 			self._objectTweenManager:RemoveTween(key, object)
 		end
