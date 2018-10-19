@@ -29,7 +29,16 @@ function PlayerThumbnails:GetUserThumbnail(userId, thumbnailType, thumbnailSize)
 		local tries = 0
 		repeat
 			tries = tries + 1
-			local content, isReady = Players:GetUserThumbnailAsync(userId, thumbnailType, thumbnailSize)
+			local content, isReady
+			local ok, err = pcall(function()
+				content, isReady = Players:GetUserThumbnailAsync(userId, thumbnailType, thumbnailSize)
+			end)
+
+			-- Don't retry if we immediately error (timeout exceptions!)
+			if not ok then
+				return reject(err)
+			end
+
 			if isReady then
 				return resolve(content)
 			else
