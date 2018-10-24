@@ -30,6 +30,9 @@ function lib.Merge(orig, new)
 	return tab
 end
 
+--- Swaps keys with vvalues, overwriting additional values if duplicated
+-- @tparam table orig original table
+-- @treturn table
 function lib.SwapKeyValue(orig)
 	local tab = {}
 	for key, val in pairs(orig) do
