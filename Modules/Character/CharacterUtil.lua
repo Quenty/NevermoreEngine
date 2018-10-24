@@ -42,6 +42,13 @@ function lib.GetPlayerRootPart(player)
 	return humanoid.RootPart
 end
 
+function lib.UnequipTools(player)
+	local humanoid = lib.GetPlayerHumanoid(player)
+	if humanoid then
+		humanoid:UnequipTools()
+	end
+end
+
 --- Returns the Player and Character that a descendent is part of, if it is part of one.
 -- @param descendant A child of the potential character.
 -- @treturn Player player

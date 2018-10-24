@@ -3,9 +3,13 @@
 -- Keys are additive, so if you have more than 1 disabled, it's ok.
 -- @module CoreGuiEnabler
 
-local StarterGui = game:GetService("StarterGui")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
 local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
+
+local CharacterUtil = require("CharacterUtil")
 
 local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
@@ -18,13 +22,7 @@ function CoreGuiEnabler.new()
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
-
-		local localPlayer = Players.LocalPlayer
-		local character = localPlayer and localPlayer.Character
-		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-		if humanoid and humanoid:IsDescendantOf(game) then -- Make sure humanoid is in game so we can unequip tools
-			humanoid:UnequipTools()
-		end
+		CharacterUtil.UnequipTools(Players.LocalPlayer)
 	end)
 
 	for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
