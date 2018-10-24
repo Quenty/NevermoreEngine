@@ -49,6 +49,7 @@ end
 
 function PropertyTweenerStack:_updateBaseTweener()
 	local topTween
+	local count = 0
 	for _, tween in pairs(self._tweens) do
 		if not topTween then
 			topTween = tween
@@ -57,6 +58,12 @@ function PropertyTweenerStack:_updateBaseTweener()
 		elseif tween.Priority == topTween.Priority and tween.AddTime > topTween.AddTime then
 			topTween = tween
 		end
+		count = count + 1
+	end
+
+	-- Notify perfomrance issues
+	if count > 10 then
+		warn("[PropertyTweenerStack] - PropertyTweenerStack is of size " .. tostring(count) .. "!")
 	end
 
 	if topTween then

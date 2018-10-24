@@ -40,9 +40,15 @@ end
 function Color3PropertyTweener:Update()
 	local current = self._currentState.Value
 	local h, s, v = current.x, current.y, current.z
+
+	local stillUpdating = (current - self._currentState.Target).magnitude >= 1e-3
+	if not stillUpdating then
+		local target = self._currentState.Target
+		h, s, v = target.x, target.y, target.z
+	end
 	self._object[self._property] = Color3.fromHSV(h, s, v)
 
-	return (current - self._currentState.Target).magnitude >= 1e-3
+	return stillUpdating
 end
 
 return Color3PropertyTweener

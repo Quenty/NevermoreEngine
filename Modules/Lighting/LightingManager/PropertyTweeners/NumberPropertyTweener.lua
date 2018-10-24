@@ -30,9 +30,14 @@ end
 
 function NumberPropertyTweener:Update()
 	local current = self._currentState.Value
-	self._object[self._property] = current
 
-	return math.abs(current - self._currentState.Target) >= 1e-3
+	local stillUpdating = math.abs(current - self._currentState.Target) >= 1e-3
+	if not stillUpdating then
+		current = self._currentState.Target
+	end
+
+	self._object[self._property] = current
+	return stillUpdating
 end
 
 return NumberPropertyTweener

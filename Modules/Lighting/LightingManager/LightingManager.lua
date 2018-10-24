@@ -5,6 +5,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local ObjectTweenManager = require("ObjectTweenManager")
 local Lighting = game:GetService("Lighting")
+local HttpService = game:GetService("HttpService")
 
 local LightingManager = {}
 LightingManager.__index = LightingManager
@@ -71,7 +72,7 @@ function LightingManager:TweenProperties(propertyTable)
 	assert(propertyTable.Objects)
 	assert(propertyTable.Priority)
 
-	local key = propertyTable.Id
+	local key = propertyTable.Id .. HttpService:GenerateGUID()
 	local priority = propertyTable.Priority
 
 	local objects = {}
