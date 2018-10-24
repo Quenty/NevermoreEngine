@@ -22,8 +22,10 @@ ValueObject.ClassName = "ValueObject"
 --- Constructs a new value object
 -- @constructor
 -- @treturn ValueObject
-function ValueObject.new()
+function ValueObject.new(baseValue)
 	local self = {}
+
+	rawset(self, "_value", baseValue)
 
 	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid)
 
