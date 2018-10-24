@@ -30,6 +30,14 @@ function lib.Merge(orig, new)
 	return tab
 end
 
+function lib.SwapKeyValue(orig)
+	local tab = {}
+	for key, val in pairs(orig) do
+		tab[val] = key
+	end
+	return tab
+end
+
 --- Converts a table to a list
 -- @tparam table tab Table to convert to a list
 -- @treturn list
