@@ -19,6 +19,13 @@ function lib.ToCamelCase(str)
 	return str
 end
 
+function lib.ToLowerCamelCase(str)
+	str = str:lower()
+	str = str:gsub("[ _](%a)", string.upper)
+	str = str:gsub("^%a", string.lower)
+	return str
+end
+
 function lib.ToPrivateCase(str)
 	return "_" .. str:sub(1, 1):lower() .. str:sub(2, #str)
 end
