@@ -1,4 +1,4 @@
----
+--- Data model for sprite sheets
 -- @classmod Spritesheet
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
