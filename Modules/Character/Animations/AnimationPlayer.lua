@@ -11,13 +11,13 @@ AnimationPlayer.ClassName = "AnimationPlayer"
 
 --- Constructs a new animation player
 -- @constructor
--- @tparam Humanoid Humanoid
-function AnimationPlayer.new(Humanoid)
+-- @tparam humanoid humanoid
+function AnimationPlayer.new(humanoid)
 	local self = setmetatable({}, AnimationPlayer)
 
-	self.Humanoid = Humanoid or error("No Humanoid")
-	self.Tracks = {}
-	self.FadeTime = 0.4 -- Default
+	self._humanoid = humanoid or error("No humanoid")
+	self._tracks = {}
+	self._fadeTime = 0.4 -- Default
 
 	self.TrackPlayed = Signal.new()
 
@@ -25,75 +25,75 @@ function AnimationPlayer.new(Humanoid)
 end
 
 --- Adds an animation to use
-function AnimationPlayer:WithAnimation(Animation)
-	self.Tracks[Animation.Name] = self.Humanoid:LoadAnimation(Animation)
+function AnimationPlayer:WithAnimation(animation)
+	self._tracks[animation.Name] = self._humanoid:LoadAnimation(animation)
 
 	return self
 end
 
 --- Adds an animation to play
-function AnimationPlayer:AddAnimation(Name, AnimationId)
-	local Animation = Instance.new("Animation")
+function AnimationPlayer:AddAnimation(name, animationId)
+	local animation = Instance.new("Animation")
 
-	if tonumber(AnimationId) then
-		Animation.AnimationId = "http://www.roblox.com/Asset?ID=" .. tonumber(AnimationId) or error("No AnimationId")
+	if tonumber(animationId) then
+		animation.AnimationId = "http://www.roblox.com/Asset?ID=" .. tonumber(animationId) or error("No animationId")
 	else
-		Animation.AnimationId = AnimationId
+		animation.AnimationId = animationId
 	end
 
-	Animation.Name = Name or error("No name")
+	animation.Name = name or error("No name")
 
-	return self:WithAnimation(Animation)
+	return self:WithAnimation(animation)
 end
 
 --- Returns a track in the player
-function AnimationPlayer:GetTrack(TrackName)
-	return self.Tracks[TrackName] or error("Track does not exist")
+function AnimationPlayer:GetTrack(trackName)
+	return self._tracks[trackName] or error("Track does not exist")
 end
 
 ---Plays a track
--- @tparam string TrackName Name of the track to play
--- @tparam[opt=0.4] number FadeTime How much time it will take to transition into the animation.	
+-- @tparam string trackName Name of the track to play
+-- @tparam[opt=0.4] number fadeTime How much time it will take to transition into the animation.
 -- @tparam[opt=1] number Weight Acts as a multiplier for the offsets and rotations of the playing animation
-	-- This parameter is extremely unstable. 
+	-- This parameter is extremely unstable.
 	-- Any parameter higher than 1.5 will result in very shaky motion, and any parameter higher '
 	-- than 2 will almost always result in NAN errors. Use with caution.
--- @tparam[opt=1] number Speed The time scale of the animation.	
-	-- Setting this to 2 will make the animation 2x faster, and setting it to 0.5 will make it 
+-- @tparam[opt=1] number Speed The time scale of the animation.
+	-- Setting this to 2 will make the animation 2x faster, and setting it to 0.5 will make it
 	-- run 2x slower.
--- @tparam[opt=0.4] number StopFadeTime
-function AnimationPlayer:PlayTrack(TrackName, FadeTime, Weight, Speed, StopFadeTime)
-	FadeTime = FadeTime or self.FadeTime
-	local Track = self:GetTrack(TrackName)
+-- @tparam[opt=0.4] number stopFadeTime
+function AnimationPlayer:PlayTrack(trackName, fadeTime, weight, speed, stopFadeTime)
+	fadeTime = fadeTime or self._fadeTime
+	local track = self:GetTrack(trackName)
 
-	if not Track.IsPlaying then
-		self.TrackPlayed:Fire(TrackName, FadeTime, Weight, Speed, StopFadeTime)
+	if not track.IsPlaying then
+		self.TrackPlayed:Fire(trackName, fadeTime, weight, speed, stopFadeTime)
 
-		self:StopAllTracks(StopFadeTime or FadeTime)
-		Track:Play(FadeTime, Weight, Speed)
+		self:StopAllTracks(stopFadeTime or fadeTime)
+		track:Play(fadeTime, weight, speed)
 	end
 
-	return Track
+	return track
 end
 
 --- Stops a track from being played
--- @tparam string TrackName
--- @tparam[opt=0.4] number FadeTime
+-- @tparam string trackName
+-- @tparam[opt=0.4] number fadeTime
 -- @treturn AnimationTrack
-function AnimationPlayer:StopTrack(TrackName, FadeTime)
-	FadeTime = FadeTime or self.FadeTime
+function AnimationPlayer:StopTrack(trackName, fadeTime)
+	fadeTime = fadeTime or self._fadeTime
 
-	local Track = self:GetTrack(TrackName)
+	local track = self:GetTrack(trackName)
 
-	Track:Stop(FadeTime)
+	track:Stop(fadeTime)
 
-	return Track
+	return track
 end
 
 --- Stops all tracks playing
-function AnimationPlayer:StopAllTracks(FadeTime)
-	for TrackName, _ in pairs(self.Tracks) do
-		self:StopTrack(TrackName, FadeTime)
+function AnimationPlayer:StopAllTracks(fadeTime)
+	for trackName, _ in pairs(self._tracks) do
+		self:StopTrack(trackName, fadeTime)
 	end
 end
 
