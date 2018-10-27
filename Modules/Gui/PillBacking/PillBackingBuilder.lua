@@ -38,6 +38,12 @@ function PillBackingBuilder:Create(gui, options)
 	pillBacking.Size = UDim2.new(1 - diameter.Scale, -diameter.Offset, 1, 0)
 	pillBacking.ZIndex = options.ZIndex
 
+	-- Prevent negative sizes (for circles)
+	local sizeConstraint = Instance.new("UISizeConstraint")
+	sizeConstraint.MaxSize = Vector2.new(math.huge, math.huge)
+	sizeConstraint.MinSize = Vector2.new(0, 0)
+	sizeConstraint.Parent = pillBacking
+
 	local left = self:_createLeft(options)
 	local right = self:_createRight(options)
 	right.Parent = pillBacking
@@ -62,6 +68,12 @@ function PillBackingBuilder:CreateShadow(gui, options)
 	shadow.Position = UDim2.new(UDim.new(0.5, 0), UDim.new(0.5, 0) + self.SHADOW_OFFSET_Y)
 	shadow.Size = UDim2.new(1 - diameter.Scale, -diameter.Offset, 2, 0)
 	shadow.ZIndex = options.ShadowZIndex
+
+	-- Prevent negative sizes (for circles)
+	local sizeConstraint = Instance.new("UISizeConstraint")
+	sizeConstraint.MaxSize = Vector2.new(math.huge, math.huge)
+	sizeConstraint.MinSize = Vector2.new(0, 0)
+	sizeConstraint.Parent = shadow
 
 	local left = self:_createLeftShadow(options)
 	local right = self:_createRightShadow(options)
