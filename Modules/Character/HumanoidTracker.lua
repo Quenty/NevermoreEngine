@@ -18,11 +18,11 @@ function HumanoidTracker.new(player)
 	self._player = player or error("No player")
 	self._maid = Maid.new()
 
-	--- Tracks the current character humanooid
+	--- Tracks the current character humanoid, may be nil
 	self.Humanoid = ValueObject.new()
 	self._maid:GiveTask(self.Humanoid)
 
-	--- Tracks the alive humanoid
+	--- Tracks the alive humanoid, may be nil
 	self.AliveHumanoid = ValueObject.new()
 	self._maid:GiveTask(self.AliveHumanoid)
 
