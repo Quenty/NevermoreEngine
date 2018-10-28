@@ -22,7 +22,9 @@ Snackbar.Position = UDim2.new(1, -10, 1, -10 - Snackbar.Height)
 Snackbar.FadeTime = 0.16
 Snackbar.CornerRadius = 2--24
 
-function Snackbar.new(Parent, Text, Options)
+local DEFAULT_TEXT_COLOR = Color3.fromRGB(78, 205, 196)
+
+function Snackbar.new(Parent, Text, options)
 	local self = setmetatable({}, Snackbar)
 
 	local Gui = Instance.new("ImageButton")
@@ -88,16 +90,14 @@ function Snackbar.new(Parent, Text, Options)
 	self._whileActiveMaid = Maid.new()
 	self.Gui.Parent = Parent
 
-	local CallToActionText
-	if Options and Options.CallToAction then
-		if type(Options.CallToAction) == "string" then
-			CallToActionText = Options.CallToAction
+	local callToActionText
+	if options and options.CallToAction then
+		if type(options.CallToAction) == "string" then
+			callToActionText = options.CallToAction
 		else
-			CallToActionText = tostring(Options.CallToAction.Text)
+			callToActionText = tostring(options.CallToAction.Text)
 		end
-		CallToActionText = CallToActionText:upper()
-
-		local DefaultTextColor3 = Color3.fromRGB(78, 205, 196)
+		callToActionText = callToActionText:upper()
 
 		local button = Instance.new("TextButton")
 		button.Name = "CallToActionButton"
@@ -105,11 +105,11 @@ function Snackbar.new(Parent, Text, Options)
 		button.BackgroundTransparency = 1
 		button.Position = UDim2.new(1, -self.TextWidthOffset, 0.5, 0)
 		button.Size = UDim2.new(0.5, 0, 0.8, 0)
-		button.Text = CallToActionText
+		button.Text = callToActionText
 		button.Font = Enum.Font.SourceSans
 		button.FontSize = TextLabel.FontSize
 		button.TextXAlignment = Enum.TextXAlignment.Right
-		button.TextColor3 = DefaultTextColor3
+		button.TextColor3 = DEFAULT_TEXT_COLOR
 		button.ZIndex = Gui.ZIndex
 		button.Parent = Gui
 
@@ -117,42 +117,42 @@ function Snackbar.new(Parent, Text, Options)
 		button.Size = UDim2.new(UDim.new(0, button.TextBounds.X), button.Size.Y)
 
 		self._whileActiveMaid:GiveTask(button.MouseButton1Click:Connect(function()
-			if Options.CallToAction.OnClick then
+			if options.CallToAction.OnClick then
 				self:Dismiss()
-				Options.CallToAction.OnClick()
+				options.CallToAction.OnClick()
 			end
 		end))
 
 		self._whileActiveMaid:GiveTask(button.MouseEnter:Connect(function()
-			button.TextColor3 = DefaultTextColor3:lerp(Color3.new(0, 0, 0), 0.2)
+			button.TextColor3 = DEFAULT_TEXT_COLOR:lerp(Color3.new(0, 0, 0), 0.2)
 		end))
 
 		self._whileActiveMaid:GiveTask(button.MouseLeave:Connect(function()
-			button.TextColor3 = DefaultTextColor3
+			button.TextColor3 = DEFAULT_TEXT_COLOR
 		end))
 
 		self._callToActionButton = button
 	end
 
 
-	local Width = self._textLabel.TextBounds.X + self.TextWidthOffset*2
+	local width = self._textLabel.TextBounds.X + self.TextWidthOffset*2
 	if self._callToActionButton then
-		Width = Width + self._callToActionButton.Size.X.Offset + self.TextWidthOffset*2
+		width = width + self._callToActionButton.Size.X.Offset + self.TextWidthOffset*2
 	end
 
-	if Width < self.MinimumWidth then
-		Width = self.MinimumWidth
-	elseif Width > self.MaximumWidth then
-		Width = self.MaximumWidth
+	if width < self.MinimumWidth then
+		width = self.MinimumWidth
+	elseif width > self.MaximumWidth then
+		width = self.MaximumWidth
 	end
 
-	if CallToActionText then
+	if callToActionText then
 		self._textLabel.Text = Text
 	end
 
-	self.Gui.Size = UDim2.new(0, Width, 0, self.Height)
+	self.Gui.Size = UDim2.new(0, width, 0, self.Height)
 
-	self.Position = self.Position + UDim2.new(0, -Width, 0, 0)
+	self.Position = self.Position + UDim2.new(0, -width, 0, 0)
 	self.Gui.Position = self.Position
 	self.AbsolutePosition = self.Gui.AbsolutePosition
 
