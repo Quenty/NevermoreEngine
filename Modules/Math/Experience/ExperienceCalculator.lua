@@ -47,7 +47,6 @@ end
 -- @tparam number currentExperience Current experience of player
 -- @treturn number Achieved of next level
 -- @treturn number Total required for next level
--- @treturn number Percent
 function lib.GetSubExperience(currentExperience)
 	if currentExperience - 1 == currentExperience then -- math.huge
 		return 1, 1, 1
@@ -61,9 +60,8 @@ function lib.GetSubExperience(currentExperience)
 
 	local achievedOfNext = currentExperience - xpForCurrentLevel
 	local subTotalRequired = experienceRequired - xpForCurrentLevel
-	local percent = achievedOfNext/subTotalRequired
 
-	return achievedOfNext, subTotalRequired, percent
+	return achievedOfNext, subTotalRequired
 end
 
 return lib
