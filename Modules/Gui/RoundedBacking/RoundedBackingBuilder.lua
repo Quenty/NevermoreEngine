@@ -4,6 +4,7 @@
 local RoundedBackingBuilder = {}
 RoundedBackingBuilder.__index = RoundedBackingBuilder
 RoundedBackingBuilder.ClassName = "RoundedBackingBuilder"
+RoundedBackingBuilder.DEFAULT_SHADOW_TRANSPARENCY = 0.7
 
 --- Initializes a new RoundedBackingBuilder
 -- @param options Options to set
@@ -103,7 +104,7 @@ function RoundedBackingBuilder:CreateShadow(backing)
 	shadow.ImageColor3 = Color3.new(0, 0, 0)
 	shadow.ScaleType = Enum.ScaleType.Slice
 	shadow.BackgroundTransparency = 1
-	shadow.ImageTransparency = 0.7
+	shadow.ImageTransparency = RoundedBackingBuilder.DEFAULT_SHADOW_TRANSPARENCY
 	shadow.ZIndex = backing.ZIndex - 1
 	shadow.Parent = backing.Parent
 
