@@ -89,6 +89,7 @@ function PillBackingBuilder:CreateCircle(gui, options)
 	options = self:_configureOptions(gui, options)
 	local circle = self:_createCircle(options)
 
+	circle.ImageTransparency = gui.BackgroundTransparency
 	gui.BackgroundTransparency = 1
 	circle.Parent = gui
 
