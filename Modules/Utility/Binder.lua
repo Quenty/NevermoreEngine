@@ -37,6 +37,10 @@ function Binder.new(tagName, class)
 	return self
 end
 
+function Binder:GetTagName()
+	return self._tagName
+end
+
 function Binder:GetAll()
 	local all = {}
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
@@ -48,6 +52,10 @@ end
 function Binder:Bind(inst)
 	CollectionService:AddTag(inst, self._tagName)
 	return self:Get(inst)
+end
+
+function Binder:Unbind(inst)
+	CollectionService:RemoveTag(inst, self._tagName)
 end
 
 function Binder:Get(inst)
