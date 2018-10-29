@@ -21,4 +21,11 @@ function WaitForChildPromise.new(parent, childName, timeOut)
 	end)
 end
 
+function WaitForChildPromise.infinite(parent, childName)
+	return Promise.new(function(resolve, reject)
+		return parent:WaitForChild(childName)
+	end)
+end
+
+
 return WaitForChildPromise
