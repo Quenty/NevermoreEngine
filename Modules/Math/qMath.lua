@@ -31,17 +31,17 @@ function lib.LawOfCosines(A, B, C)
 end
 
 --- Round the given number to given precision
-function lib.Round(number, base)
-	base = base or 1
-	return (math.floor((number/base)+0.5)*base)
+function lib.Round(number, precision)
+	precision = precision or 1
+	return (math.floor((number/precision)+0.5)*precision)
 end
 
-function lib.RoundUp(number, base)
-	return math.ceil(number/base) * base
+function lib.RoundUp(number, precision)
+	return math.ceil(number/precision) * precision
 end
 
-function lib.RoundDown(number, base)
-	return math.floor(number/base) * base
+function lib.RoundDown(number, precision)
+	return math.floor(number/precision) * precision
 end
 
 return lib
