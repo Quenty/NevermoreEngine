@@ -12,11 +12,11 @@ SmoothPositionCamera.ClassName = "SmoothPositionCamera"
 SmoothPositionCamera._FocusCamera = nil
 SmoothPositionCamera._OriginCamera = nil
 
-function SmoothPositionCamera.new(BaseCamera)
+function SmoothPositionCamera.new(baseCamera)
 	local self = setmetatable({}, SmoothPositionCamera)
 
 	self.Spring = Spring.new(Vector3.new())
-	self.BaseCamera = BaseCamera or error("Must have BaseCamera")
+	self.BaseCamera = baseCamera or error("Must have BaseCamera")
 	self.Speed = 10
 
 	return self
@@ -58,14 +58,14 @@ end
 
 function SmoothPositionCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		local BaseCameraState = self.BaseCameraState
+		local baseCameraState = self.BaseCameraState
 
-		local State = CameraState.new()
-		State.FieldOfView = BaseCameraState.FieldOfView
-		State.CoordinateFrame = BaseCameraState.CoordinateFrame
-		State.Position = self.Position
+		local state = CameraState.new()
+		state.FieldOfView = baseCameraState.FieldOfView
+		state.CoordinateFrame = baseCameraState.CoordinateFrame
+		state.Position = self.Position
 
-		return State
+		return state
 	elseif Index == "Position" then
 		self:InternalUpdate()
 		return self.Spring.Position
