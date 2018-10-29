@@ -2,24 +2,27 @@
 -- Uses formulas from stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
 -- @module ExperienceCalculator
 
-local EXPERIENCE_FACTOR = 200
-
 local lib = {}
+lib._experienceFactor = 200
+
+function lib.SetExperienceFactor(factor)
+	lib._experienceFactor = factor
+end
 
 --- Gets the current level from experience
 -- @tparam number experience Current experience
 -- @treturn number The level the player should be
-function lib.GetLevelFromExperience(experience)
+function lib.GetLevel(experience)
 	return math.floor(
-		(EXPERIENCE_FACTOR + math.sqrt(EXPERIENCE_FACTOR*EXPERIENCE_FACTOR - 4*EXPERIENCE_FACTOR*(-experience)))
-		/(2*EXPERIENCE_FACTOR))
+		(lib._experienceFactor + math.sqrt(lib._experienceFactor*lib._experienceFactor - 4*lib._experienceFactor*(-experience)))
+		/(2*lib._experienceFactor))
 end
 
 --- Given a current level, return the experience required for the next one
 -- @tparam number currentLevel The current level the player is
 -- @treturn number Experience required for next level
 function lib.GetExperienceRequiredForNextLevel(currentLevel)
-	return EXPERIENCE_FACTOR*(currentLevel*(1+currentLevel))
+	return lib._experienceFactor*(currentLevel*(1+currentLevel))
 end
 
 --- Gets experience required for a current level
@@ -37,7 +40,7 @@ function lib.GetExperienceForNextLevel(currentExperience)
 		return 0
 	end
 
-	local currentLevel = lib.GetLevelFromExperience(currentExperience)
+	local currentLevel = lib.GetLevel(currentExperience)
 	local experienceRequired = lib.GetExperienceRequiredForNextLevel(currentLevel)
 
 	return experienceRequired - currentExperience
@@ -52,11 +55,11 @@ function lib.GetSubExperience(currentExperience)
 		return 1, 1, 1
 	end
 
-	local currentLevel = lib.GetLevelFromExperience(currentExperience)
+	local currentLevel = lib.GetLevel(currentExperience)
 	local lastLevel = currentLevel-1
 
-	local xpForCurrentLevel = EXPERIENCE_FACTOR*(lastLevel*(1+lastLevel))
-	local experienceRequired = EXPERIENCE_FACTOR*(currentLevel*(1+currentLevel))
+	local xpForCurrentLevel = lib._experienceFactor*(lastLevel*(1+lastLevel))
+	local experienceRequired = lib._experienceFactor*(currentLevel*(1+currentLevel))
 
 	local achievedOfNext = currentExperience - xpForCurrentLevel
 	local subTotalRequired = experienceRequired - xpForCurrentLevel
