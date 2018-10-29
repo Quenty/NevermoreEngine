@@ -3,6 +3,7 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
@@ -50,6 +51,10 @@ function Binder:GetAll()
 end
 
 function Binder:Bind(inst)
+	if RunService:IsClient() then
+		warn("[Binder] - Bindings done on the client! Will be disrupted upon server replication!")
+	end
+
 	CollectionService:AddTag(inst, self._tagName)
 	return self:Get(inst)
 end
