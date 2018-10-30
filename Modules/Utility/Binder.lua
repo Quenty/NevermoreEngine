@@ -7,7 +7,7 @@ local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
-local fastSpawn = require("fastSpawn")
+local fastSpawn = require("FastSpawn")
 
 local Binder = {}
 Binder.__index = Binder
