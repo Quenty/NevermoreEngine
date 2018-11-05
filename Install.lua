@@ -270,3 +270,4 @@ end
 GitHub:Install("https://github.com/Quenty/NevermoreEngine/tree/version2/Modules", game:GetService("ServerScriptService")).Name = "Nevermore"
 GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/App/Nevermore.lua").Parent = game:GetService("ReplicatedStorage")
 HttpService.HttpEnabled = ...
+print("NevermoreEngine installed.")
