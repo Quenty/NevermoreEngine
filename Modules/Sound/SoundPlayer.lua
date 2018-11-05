@@ -13,28 +13,28 @@ local Table = require("Table")
 local SoundPlayer = {}
 SoundPlayer.ClassName = "SoundPlayer"
 
-function SoundPlayer.new(Folder, ParentSoundPlayer)
+function SoundPlayer.new(folder, parentSoundPlayer)
 	local self = setmetatable({}, SoundPlayer)
 
-	self.Children = {}
-	self.Maid = Maid.new()
-	self.Folder = Folder or error("No folder")
-	self.ParentSoundPlayer = ParentSoundPlayer
+	self._children = {}
+	self._maid = Maid.new()
+	self._folder = folder or error("No folder")
+	self._parentSoundPlayer = parentSoundPlayer
 
-	self.SoundMap = {}
-	self.Sounds = setmetatable({}, {__newindex = function(this, Index, Value)
-		assert(typeof(Value) == "Instance" and Value:IsA("Sound"))
-		rawset(this, Index, Value)
-		self.SoundMap[Value.Name:lower()] = Value
+	self._soundMap = {}
+	self.Sounds = setmetatable({}, {__newindex = function(this, index, value)
+		assert(typeof(value) == "Instance" and value:IsA("Sound"))
+		rawset(this, index, value)
+		self._soundMap[value.Name:lower()] = value
 	end})
 
-	if self.ParentSoundPlayer then
+	if self._parentSoundPlayer then
 		-- Make sure only the second layer has a sound group? Hacky.
-		if self.ParentSoundPlayer:GetSoundGroup() then
-			self.SoundGroup = self.ParentSoundPlayer:GetSoundGroup()
+		if self._parentSoundPlayer:GetSoundGroup() then
+			self.SoundGroup = self._parentSoundPlayer:GetSoundGroup()
 		else
 			self.SoundGroup = Instance.new("SoundGroup")
-			self.SoundGroup.Name = Folder.Name
+			self.SoundGroup.Name = folder.Name
 			self.SoundGroup.Volume = 1
 			self.SoundGroup.Parent = SoundService
 		end
@@ -42,15 +42,15 @@ function SoundPlayer.new(Folder, ParentSoundPlayer)
 
 
 	if self.SoundGroup then
-		for _, Item in pairs(self.Folder:GetDescendants()) do
-			if Item:IsA("Sound") then
-				self.Sounds[#self.Sounds+1] = Item
+		for _, item in pairs(self._folder:GetDescendants()) do
+			if item:IsA("Sound") then
+				self.Sounds[#self.Sounds+1] = item
 			end
 		end
 
-		self.Maid.DescendantAdded = self.Folder.DescendantAdded:Connect(function(Item)
-			if Item:IsA("Sound") then
-				self.Sounds[#self.Sounds+1] = Item
+		self._maid.DescendantAdded = self._folder.DescendantAdded:Connect(function(item)
+			if item:IsA("Sound") then
+				self.Sounds[#self.Sounds+1] = item
 			end
 		end)
 	end
@@ -59,30 +59,30 @@ function SoundPlayer.new(Folder, ParentSoundPlayer)
 end
 
 function SoundPlayer:GetName()
-	return self.Folder.Name
+	return self._folder.Name
 end
 
-function SoundPlayer:__index(Index)
-	if SoundPlayer[Index] then
-		return SoundPlayer[Index]
-	elseif Index == "ParentSoundPlayer" or Index == "SoundGroup" or Index == "CurrentMusicName" then
+function SoundPlayer:__index(index)
+	if SoundPlayer[index] then
+		return SoundPlayer[index]
+	elseif index == "ParentSoundPlayer" or index == "SoundGroup" or index == "CurrentMusicName" then
 		return nil
-	elseif Index == "Children" then
-		error("[SoundPlayer] Should never get to this point. Tried to index children!")
-	elseif self.Children[Index] then
-		return self.Children[Index]
-	elseif type(Index) == "string" then
-		local Folder = self.Folder:FindFirstChild(Index)
-		if Folder and Folder:IsA("Folder") then
-			local NewPlayer = SoundPlayer.new(Folder, self)
-			self.Children[Index] = NewPlayer
+	elseif index == "Children" then
+		error("[SoundPlayer] - Should never get to this point. Tried to index children!")
+	elseif self._children[index] then
+		return self._children[index]
+	elseif type(index) == "string" then
+		local folder = self._folder:FindFirstChild(index)
+		if folder and folder:IsA("Folder") then
+			local newPlayer = SoundPlayer.new(folder, self)
+			self._children[index] = newPlayer
 
-			return NewPlayer
+			return newPlayer
 		else
-			error(("[SoundPlayer] Bad index '%s.%s' does not exist"):format(self.Folder:GetFullName(), tostring(Index)))
+			error(("[SoundPlayer] - Bad index '%s.%s' does not exist"):format(self._folder:GetFullName(), tostring(index)))
 		end
 	else
-		error(("[SoundPlayer] Bad index '%s' on sound player"):format(tostring(Index)))
+		error(("[SoundPlayer] - Bad index '%s' on sound player"):format(tostring(index)))
 	end
 
 	return self
@@ -92,172 +92,170 @@ function SoundPlayer:GetSoundGroup()
 	return self.SoundGroup
 end
 
-function SoundPlayer:GetNewSound(SoundName, Parent)
+function SoundPlayer:GetNewSound(soundName, parent)
 	assert(self.SoundGroup, "Sound player needs sound group to function")
 
-	Parent = Parent or self.SoundGroup
+	parent = parent or self.SoundGroup
 
-	assert(typeof(Parent) == "Instance")
+	assert(typeof(parent) == "Instance")
 
-	local Sound
-	if type(SoundName) == "string" then
-		local SoundObject = self.SoundMap[SoundName:lower()]
+	local sound
+	if type(soundName) == "string" then
+		local SoundObject = self._soundMap[soundName:lower()]
 		if SoundObject then
-			Sound = SoundObject:Clone()
+			sound = SoundObject:Clone()
 		end
-	elseif typeof(SoundName) == "Instance" and SoundName:IsA("Sound") then
-		Sound = SoundName:Clone()
+	elseif typeof(soundName) == "Instance" and soundName:IsA("Sound") then
+		sound = soundName:Clone()
 	end
 
-	if not Sound then
-		warn(("[SoundPlayer] - Unable to get new sound from argument '%s'"):format(tostring(SoundName)))
+	if not sound then
+		warn(("[SoundPlayer] - Unable to get new sound from argument '%s'"):format(tostring(soundName)))
 		return nil
 	end
 
-	Sound.SoundGroup = Parent:IsA("SoundGroup") and Parent or self.SoundGroup
-	Sound.Parent = Parent
+	sound.SoundGroup = parent:IsA("SoundGroup") and parent or self.SoundGroup
+	sound.Parent = parent
 
-	return Sound
+	return sound
 end
 
-function SoundPlayer:PlaySound(SoundName, Parent)
-	local Sound = self:GetNewSound(SoundName, Parent)
-	if not Sound then
-		warn(("[SoundPlayer] - Unable to find sound '%s'"):format(tostring(SoundName)))
+function SoundPlayer:PlaySound(soundName, parent)
+	local sound = self:GetNewSound(soundName, parent)
+	if not sound then
+		warn(("[SoundPlayer] - Unable to find sound '%s'"):format(tostring(soundName)))
 		return false
 	end
 
-	Sound.Looped = false
-	Sound:Play()
+	sound.Looped = false
+	sound:Play()
 
-	Debris:AddItem(Sound, Sound.TimeLength+0.1)
+	Debris:AddItem(sound, sound.TimeLength+0.1)
 
-	return Sound
+	return sound
 end
 
-function SoundPlayer:PlayRandom(MethodName, Parent, PlayOptions)
-	assert(type(Parent) == "nil" or typeof(Parent) == "Instance")
+function SoundPlayer:PlayRandom(methodName, parent, PlayOptions)
+	assert(type(parent) == "nil" or typeof(parent) == "Instance")
 
-	MethodName = MethodName or "PlaySound"
+	methodName = methodName or "PlaySound"
 
-	local Options = self.Sounds
-	if MethodName == "PlayMusic" then
+	local options = self.Sounds
+	if methodName == "PlayMusic" then
 		-- Inject loop options into the music options
 		PlayOptions = PlayOptions or {}
 		PlayOptions.LoopOptions = PlayOptions.LoopOptions or self.Sounds -- Show options if we need looping
 	end
 
-	if #Options == 1 then
-		return self[MethodName](self, Options[1], Parent, PlayOptions)
-	elseif #Options <= 1 then
-		warn(("[SoundPlayer] - No options to play random sound for '%s'"):format(tostring(self.Folder)))
+	if #options == 1 then
+		return self[methodName](self, options[1], parent, PlayOptions)
+	elseif #options <= 1 then
+		warn(("[SoundPlayer] - No options to play random sound for '%s'"):format(tostring(self._folder)))
 		return false
 	end
 
-	return self[MethodName](self, Options[math.random(#Options)], Parent, PlayOptions)
+	return self[methodName](self, options[math.random(#options)], parent, PlayOptions)
 end
 
-function SoundPlayer:PlayRandomMusic(Parent, Options)
-	self:PlayRandom("PlayMusic", Parent, Options)
+function SoundPlayer:PlayRandomMusic(parent, options)
+	self:PlayRandom("PlayMusic", parent, options)
 end
 
-function SoundPlayer:PlayMusic(SoundName, Parent, Options)
-	Options = Options or {}
+function SoundPlayer:PlayMusic(soundName, parent, options)
+	options = options or {}
 
-	if self.CurrentMusicName == tostring(SoundName) then
+	if self._currentMusicName == tostring(soundName) then
 		return false, "Already playing"
 	end
 
 	self:StopMusic()
 
-	local Sound = self:GetNewSound(SoundName, Parent)
-	if not Sound then
-		warn(("[SoundPlayer] - Unable to find music '%s'"):format(tostring(SoundName)))
+	local sound = self:GetNewSound(soundName, parent)
+	if not sound then
+		warn(("[SoundPlayer] - Unable to find music '%s'"):format(tostring(soundName)))
 		return false
 	end
 
-	Sound.Looped = true
-	Sound:Play()
+	sound.Looped = true
+	sound:Play()
 
-	if Options.FadeInTime and Options.FadeInTime > 0 then
-		local Original = Sound.Volume
-		Sound.Volume = 0
-		qGUI.TweenTransparency(Sound, {Volume = Original}, Options.FadeInTime)
+	if options.FadeInTime and options.FadeInTime > 0 then
+		local Original = sound.Volume
+		sound.Volume = 0
+		qGUI.TweenTransparency(sound, {Volume = Original}, options.FadeInTime)
 	end
 
 
 
 	local maid = Maid.new()
-	self.CurrentMusicName = Sound.Name
+	self._currentMusicName = sound.Name
 	maid.Cleanup = function()
-		self.CurrentMusicName = nil
-		if Options.FadeOutTime == 0 then
-			Sound:Stop()
-			Sound:Destroy()
+		self._currentMusicName = nil
+		if options.FadeOutTime == 0 then
+			sound:Stop()
+			sound:Destroy()
 		else
-			qGUI.TweenTransparency(Sound, {Volume = 0}, Options.FadeOutTime or 0.5)
+			qGUI.TweenTransparency(sound, {Volume = 0}, options.FadeOutTime or 0.5)
 			delay(1, function()
-				Sound:Stop()
-				Sound:Destroy()
+				sound:Stop()
+				sound:Destroy()
 			end)
 		end
 	end
 
 	-- If we have LoopOptions then we need to stop the current music after 1 play and pick a new piece of unplayed music
-	if Options.LoopOptions then
+	if options.LoopOptions then
+		maid.DidLoop = sound.DidLoop:Connect(function(soundId, loopCount)
+			if loopCount > 0 then
 
-
-		maid.DidLoop = Sound.DidLoop:Connect(function(SoundId, LoopCount)
-			if LoopCount > 0 then
-
-				local NewOptions = Table.DeepCopy(Options)
-				NewOptions.UsedOptions = NewOptions.UsedOptions or {}
+				local newOptions = Table.DeepCopy(options)
+				newOptions.UsedOptions = newOptions.UsedOptions or {}
 
 				-- Note the current opion as used
-				NewOptions.UsedOptions[tostring(SoundName)] = true
+				newOptions.UsedOptions[tostring(soundName)] = true
 
 				-- Identify available
-				local Available = {}
-				for _, Item in pairs(NewOptions.LoopOptions) do
-					if not NewOptions.UsedOptions[tostring(Item)] then
-						table.insert(Available, Item)
+				local available = {}
+				for _, item in pairs(newOptions.LoopOptions) do
+					if not newOptions.UsedOptions[tostring(item)] then
+						table.insert(available, item)
 					end
 				end
 
 				-- If we have no more options left, reset the queue
-				if #Available <= 0 then
-					NewOptions.UsedOptions = {}
-					Available = Table.DeepCopy(NewOptions.LoopOptions)
+				if #available <= 0 then
+					newOptions.UsedOptions = {}
+					available = Table.DeepCopy(newOptions.LoopOptions)
 				end
 
-				if #Available <= 0 then
+				if #available <= 0 then
 					warn("[SoundPlayer] - Somehow there are no options in LoopOptions")
 					maid.DidLoop = nil
 					return nil
 				end
 
 				-- Make sure to stop current music immediately (no point in letting it loop)
-				Sound:Stop()
+				sound:Stop()
 
 				-- Start new music immediately
-				NewOptions.FadeInTime = 0
+				newOptions.FadeInTime = 0
 
 				-- Pick next random sound
-				local Option = Available[math.random(#Available)]
-				self:PlayMusic(Option, Parent, NewOptions)
+				local option = available[math.random(#available)]
+				self:PlayMusic(option, parent, newOptions)
 			end
 		end)
 	end
 
-	self.Maid.Music = maid
+	self._maid.Music = maid
 
-	return Sound
+	return sound
 end
 
 function SoundPlayer:StopMusic()
-	self.Maid.Music = nil
-	for _, Child in pairs(self.Children) do
-		Child:StopMusic()
+	self._maid.Music = nil
+	for _, child in pairs(self._children) do
+		child:StopMusic()
 	end
 end
 
