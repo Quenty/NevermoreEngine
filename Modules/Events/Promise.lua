@@ -42,57 +42,12 @@ function Promise.new(value)
 	return self
 end
 
---- Returns the value of the first promise resolved
--- @constructor First
--- @tparam Array(Promise) promises
--- @treturn Promise Promise that resolves with first result
-function Promise.First(promises)
-	local returnPromise = Promise.new()
-
-	local function syncronize(method)
-		return function(...)
-			returnPromise[method](returnPromise, ...)
-		end
-	end
-
-	for _, promise in pairs(promises) do
-		promise:Then(syncronize("Fulfill"), syncronize("Reject"))
-	end
-
-	return returnPromise
+function Promise.resolved(...)
+	return Promise.new():Resolve(...)
 end
 
---- Executes all promises. If any fails, the result will be rejected. However, it yields until
---  every promise is complete
--- @constructor First
--- @treturn Promise
-function Promise.All(promises)
-	local remainingCount = #promises
-	local returnPromise = Promise.new()
-	local results = {}
-	local allFulfilled = true
-
-	local function syncronize(index, isFullfilled)
-		return function(value)
-			allFulfilled = allFulfilled and isFullfilled
-			results[index] = value
-			remainingCount = remainingCount - 1
-			if remainingCount == 0 then
-				local method = allFulfilled and "Fulfill" or "Reject"
-				returnPromise[method](returnPromise, unpack(results))
-			end
-		end
-	end
-
-	for index, promise in pairs(promises) do
-		promise:Then(syncronize(index, true), syncronize(index, false))
-	end
-
-	if #promises == 0 then
-		returnPromise:Fulfill()
-	end
-
-	return returnPromise
+function Promise.rejected(...)
+	return Promise.new():Reject(...)
 end
 
 --- Returns whether or not the promise is pending
@@ -202,7 +157,8 @@ function Promise:Reject(...)
 	return self
 end
 
---- Handlers when promise is fulfilled/rejected
+--- Handlers when promise is fulfilled/rejected. It takes up to two arguments, callback functions
+-- for the success and failure cases of the Promise
 -- @tparam[opt=nil] function onFulfilled Called when fulfilled with parameters
 -- @tparam[opt=nil] function onRejected Called when rejected with parameters
 -- @treturn Promise
@@ -218,6 +174,10 @@ function Promise:Then(onFulfilled, onRejected)
 	end
 
 	return returnPromise
+end
+
+function Promise:Finally(func)
+	return self:Then(func, func)
 end
 
 --- Catch errors from the promise
