@@ -17,28 +17,10 @@ function SnackbarManager.new()
 	return self
 end
 
---- Set snackbar manager PlayerGui and construct a screenGui to use
-function SnackbarManager:WithPlayerGui(playerGui)
-	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = "Snackbar_ScreenGui"
-	screenGui.DisplayOrder = 10
-	screenGui.Parent = playerGui
-
-	return self:_withScreenGui(screenGui)
-end
-
 --- Sets the screenGui to use
-function SnackbarManager:_withScreenGui(screenGui)
+function SnackbarManager:WithScreenGui(screenGui)
 	self._screenGui = screenGui or error("No screenGui")
 
-	return self
-end
-
---- Sets the DisplayOrder of the screenGui
-function SnackbarManager:WithDisplayOrder(displayOrder)
-	assert(self._screenGui)
-
-	self._screenGui.DisplayOrder = displayOrder or error("No DisplayOrder")
 	return self
 end
 
