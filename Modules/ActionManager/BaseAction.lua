@@ -34,30 +34,38 @@ function BaseAction.new(actionData)
 	self:InitEnabledMixin()
 
 	self._maid:GiveTask(self.IsActivatedValue.Changed:Connect(function()
-		if self.IsActivatedValue.Value then
-			local actionMaid = Maid.new()
-			self._maid._actionMaid = actionMaid
-			self.Activated:Fire(actionMaid, unpack(self._activateData))
-			self._activateData = nil
-		else
-			self._maid._actionMaid = nil
-			self.Deactivated:Fire()
-		end
+		self:_handleIsActiveValueChanged()
 	end))
 
 	-- Prevent being activated when disabled
-	self._maid:GiveTask(self.EnabledChanged:Connect(function(IsEnabled)
-		if not IsEnabled then
-			self:Deactivate()
-		end
-
-		self:_updateShortcuts()
+	self._maid:GiveTask(self.EnabledChanged:Connect(function(isEnabled)
+		self:_handleEnabledChanged(isEnabled)
 	end))
 
 	self:_withActionData(actionData)
 
 
 	return self
+end
+
+function BaseAction:_handleEnabledChanged(isEnabled)
+	if not isEnabled then
+		self:Deactivate()
+	end
+
+	self:_updateShortcuts()
+end
+
+function BaseAction:_handleIsActiveValueChanged()
+	if self.IsActivatedValue.Value then
+		local actionMaid = Maid.new()
+		self._maid._actionMaid = actionMaid
+		self.Activated:Fire(actionMaid, unpack(self._activateData))
+		self._activateData = nil
+	else
+		self._maid._actionMaid = nil
+		self.Deactivated:Fire()
+	end
 end
 
 function BaseAction:GetName()
