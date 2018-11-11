@@ -81,7 +81,7 @@ end
 
 function SlaveClock:GetTime()
 	if not self:IsSynced() then
-		warn("[SlaveClock][GetTime] - Slave clock is not yet synced")
+		warn("[SlaveClock.GetTime] - Slave clock is not yet synced")
 		return self:_getLocalTime()
 	end
 
