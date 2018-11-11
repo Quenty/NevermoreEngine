@@ -30,8 +30,8 @@ function Signal:Fire(...)
 	self._argData = {...}
 	self._argCount = select("#", ...)
 	self._bindableEvent:Fire()
-	self._argData = nil
-	self._argCount = nil
+	-- self._argData = nil
+	-- self._argCount = nil
 end
 
 --- Connect a new handler to the event. Returns a connection object that can be disconnected.
