@@ -3,7 +3,7 @@
 
 local lib = {}
 
-function lib.Upper(str)
+function lib.upper(str)
 	local UPPER_MAP = lib.UPPER_MAP
 	str = str:upper()
 	local newStr = ""
@@ -11,6 +11,20 @@ function lib.Upper(str)
 		local chr = str:sub(start, stop)
 		if UPPER_MAP[chr] then
 			chr = UPPER_MAP[chr]
+		end
+		newStr = newStr .. chr
+	end
+	return newStr
+end
+
+function lib.lower(str)
+	local LOWER_MAP = lib.LOWER_MAP
+	str = str:lower()
+	local newStr = ""
+	for start, stop in utf8.graphemes(str) do
+		local chr = str:sub(start, stop)
+		if LOWER_MAP[chr] then
+			chr = LOWER_MAP[chr]
 		end
 		newStr = newStr .. chr
 	end
@@ -122,5 +136,10 @@ lib.UPPER_MAP = {
 	['ƣ'] = 'Ƣ',
 	['ơ'] = 'Ơ',
 }
+
+lib.LOWER_MAP = {}
+for key, val in pairs(lib.UPPER_MAP) do
+	lib.LOWER_MAP[val] = key
+end
 
 return lib
