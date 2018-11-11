@@ -37,7 +37,7 @@ function ScrollingFrame.new(gui)
 		self:_freeScroll(true)
 	end))
 
-	self._maid:GiveTask(self.Gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function(Property)
+	self._maid:GiveTask(self.Gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 		self:_updateScrollerSize()
 		self:_freeScroll(true)
 	end))
