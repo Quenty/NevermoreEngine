@@ -186,4 +186,17 @@ function lib.ReadOnly(table)
 	})
 end
 
+--- Recursively sets the table as ReadOnly
+-- @tparam table table Table to error on indexing
+-- @treturn table table The same table
+function lib.DeepReadOnly(table)
+	for _, item in pairs(table) do
+		if type(item) == "table" then
+			lib.DeepReadOnly(item)
+		end
+	end
+
+	return lib.ReadOnly(table)
+end
+
 return lib
