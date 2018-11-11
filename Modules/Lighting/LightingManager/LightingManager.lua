@@ -100,4 +100,4 @@ function LightingManager:Destroy()
 	setmetatable(self, nil)
 end
 
-return LightingManager
+return LightingManager.new()
