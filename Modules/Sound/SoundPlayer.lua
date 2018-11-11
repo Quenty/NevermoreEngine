@@ -19,7 +19,7 @@ function SoundPlayer.new(folder, parentSoundPlayer)
 	self._children = {}
 	self._maid = Maid.new()
 	self._folder = folder or error("No folder")
-	self._parentSoundPlayer = parentSoundPlayer
+	self.ParentSoundPlayer = parentSoundPlayer
 
 	self._soundMap = {}
 	self.Sounds = setmetatable({}, {__newindex = function(this, index, value)
@@ -28,10 +28,10 @@ function SoundPlayer.new(folder, parentSoundPlayer)
 		self._soundMap[value.Name:lower()] = value
 	end})
 
-	if self._parentSoundPlayer then
+	if self.ParentSoundPlayer then
 		-- Make sure only the second layer has a sound group? Hacky.
-		if self._parentSoundPlayer:GetSoundGroup() then
-			self.SoundGroup = self._parentSoundPlayer:GetSoundGroup()
+		if self.ParentSoundPlayer:GetSoundGroup() then
+			self.SoundGroup = self.ParentSoundPlayer:GetSoundGroup()
 		else
 			self.SoundGroup = Instance.new("SoundGroup")
 			self.SoundGroup.Name = folder.Name
@@ -164,7 +164,7 @@ end
 function SoundPlayer:PlayMusic(soundName, parent, options)
 	options = options or {}
 
-	if self._currentMusicName == tostring(soundName) then
+	if self.CurrentMusicName == tostring(soundName) then
 		return false, "Already playing"
 	end
 
@@ -188,9 +188,9 @@ function SoundPlayer:PlayMusic(soundName, parent, options)
 
 
 	local maid = Maid.new()
-	self._currentMusicName = sound.Name
+	self.CurrentMusicName = sound.Name
 	maid.Cleanup = function()
-		self._currentMusicName = nil
+		self.CurrentMusicName = nil
 		if options.FadeOutTime == 0 then
 			sound:Stop()
 			sound:Destroy()
