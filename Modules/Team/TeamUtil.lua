@@ -1,5 +1,5 @@
 --- Team utility methods
--- @module Team
+-- @module TeamUtil
 
 local lib = {}
 
