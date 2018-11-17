@@ -60,7 +60,7 @@
 #               end
               </ul>
 #           end
-  
+
             <!-- Module usage -->
 #           if module.usage then
               <h4>Usage:</h3>
@@ -96,7 +96,7 @@
 #                         if item.retgroups then
 #                           local groups = item.retgroups
 #                           for i, group in ldoc.ipairs(groups) do
-#                             for r in group:iter() do 
+#                             for r in group:iter() do
 #                               local type, ctypes = item:return_type(r)
 #                               local returnType = ldoc.typename(type)
 #                               if returnType ~= '' then
@@ -125,11 +125,11 @@
 #                                 local paramtype = item:type_of_param(p)
 #                                 local tp = ldoc.typename(paramtype)
 #                                 local def = item:default_of_param(p)
-    
+
 #                                 if tp ~= '' then
                                     <span class="api-value-type"><a href="">$(tp)</a></span>
 #                                 end
-    
+
                                   <span class="api-argument-name">$(name)</span><!--
 #                                 if def and def ~= true then
                                    --> = <span class="api-value">$(def)</span><!--
@@ -139,7 +139,7 @@
                                   --><p>TODO: HANDLE SUBLIST</p><!--
 #                               end
                               --></span><!--
-#                           end  
+#                           end
                             --> )
                           </span>
 #                       end
@@ -168,9 +168,9 @@
                 </table>
 #             end
 #           end
-        
+
           <!-- Raw content -->
-          <!-- Currently works for both Functions and Tables. The params field either contains 
+          <!-- Currently works for both Functions and Tables. The params field either contains
           function parameters or table fields.
           -->
           <div class="member-descriptions">
@@ -208,7 +208,7 @@
 #                       if item.retgroups then
 #                         local groups = item.retgroups
 #                         for i, group in ldoc.ipairs(groups) do
-#                           for r in group:iter() do 
+#                           for r in group:iter() do
 #                             local type, ctypes = item:return_type(r)
 #                             local returnType = ldoc.typename(type)
 #                             if returnType ~= '' then
@@ -219,7 +219,7 @@
 #                       end -- end if
                       </span>
 #                   end
-                    
+
                     <!-- Icon -->
                     <span class="api-$(kind:lower())-icon"></span>
 
@@ -271,7 +271,7 @@
                               --><p>TODO: HANDLE SUBLIST</p><!--
 #                           end
                           --></span><!--
-#                       end  
+#                       end
                         --> )
                       </span>
 #                   end
@@ -287,7 +287,7 @@
                     <!-- TODO: Insert custom tags here -->
                     <p>Custom tags are not supported</p>
 #                 end
-                  
+
                   <!-- Params -->
 #                 if show_parms and item.params and #item.params > 0 and not is_field then
 #                   local subnames = module.kinds:type_of(item).subnames
@@ -335,14 +335,14 @@
 #                     end
                     </ul>
 #                 end
-                  
+
                   <!-- Returns -->
-#                 if show_return and item.retgroups then 
+#                 if show_return and item.retgroups then
 #                   local groups = item.retgroups
                     <h4>Returns</h4>
                     <ul class="parameter-list">
 #                     for i, group in ldoc.ipairs(groups) do
-#                       for r in group:iter() do 
+#                       for r in group:iter() do
 #                         local type, ctypes = item:return_type(r)
 #                         local returnType = ldoc.typename(type)
                           <li>
