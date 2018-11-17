@@ -9,7 +9,7 @@
 -- @treturn[opt] vector3 lowTrajectory Initial velocity for a low trajectory arc
 -- @treturn[opt] vector3 highTrajectory Initial velocity for a high trajectory arc
 -- @treturn[opt] vector3 fallbackTrajectory Trajectory directly at target as afallback
-local function trajectory(origin, target, initialVelocity, gravityForce)
+return function(origin, target, initialVelocity, gravityForce)
 	local g = -gravityForce
 	local ox,oy,oz=origin.x,origin.y,origin.z
 	local rx,rz=target.x-ox,target.z-oz
@@ -43,5 +43,3 @@ local function trajectory(origin, target, initialVelocity, gravityForce)
 		return v,v
 	end
 end
-
-return trajectory
