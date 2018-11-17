@@ -84,14 +84,17 @@ function Binder:Bind(inst)
 end
 
 function Binder:Unbind(inst)
+	assert(typeof(inst) == "Instance")
 	CollectionService:RemoveTag(inst, self._tagName)
 end
 
 function Binder:Get(inst)
+	assert(typeof(inst) == "Instance")
 	return self._maid[inst]
 end
 
 function Binder:_add(inst)
+	assert(typeof(inst) == "Instance")
 	if self._loading[inst] then
 		return
 	end
