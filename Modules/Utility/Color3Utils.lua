@@ -7,7 +7,7 @@ local lib = {}
 -- as the darkest dark, and 1 as the whitest white
 -- @tparam {Color3} color The Color3 to check
 -- @treturn A scalar from 0 to 1 with 0 as the darkest dark, and 1 as the whitest white
--- @see https://www.w3.org/TR/WCAG20/#relativeluminancedef
+-- See https://www.w3.org/TR/WCAG20/#relativeluminancedef
 function lib.GetRelativeLuminance(color)
 	local components = { color.r, color.g, color.b }
 	local vals = {}
@@ -26,7 +26,7 @@ end
 -- relative luminance as a metric.
 -- @tparam {Color3} color The Color3 to check
 -- @treturn {boolean} True if the text should be black, false if it should be good
--- @see https://stackoverflow.com/questions/3942878/
+-- See https://stackoverflow.com/questions/3942878/
 function lib.TextShouldBeBlack(color)
 	return lib.GetRelativeLuminance(color) > 0.179
 end

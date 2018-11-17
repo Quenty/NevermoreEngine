@@ -1,5 +1,5 @@
 --- Warps the WaitForChild API with a promise
--- @function promiseChild
+-- @module promiseChild
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

@@ -15,7 +15,7 @@ CameraStateTweener.__index = CameraStateTweener
 
 --- Constructs a new camera state tweener
 -- @tparam ICameraEffect cameraEffect A camera effect
--- @tparam[opt=20] number Speed that the camera tweener tweens at
+-- @tparam[opt=20] number speed that the camera tweener tweens at
 function CameraStateTweener.new(cameraEffect, speed)
 	local self = setmetatable({}, CameraStateTweener)
 

@@ -54,11 +54,11 @@ end
 ---Plays a track
 -- @tparam string trackName Name of the track to play
 -- @tparam[opt=0.4] number fadeTime How much time it will take to transition into the animation.
--- @tparam[opt=1] number Weight Acts as a multiplier for the offsets and rotations of the playing animation
+-- @tparam[opt=1] number weight Acts as a multiplier for the offsets and rotations of the playing animation
 	-- This parameter is extremely unstable.
 	-- Any parameter higher than 1.5 will result in very shaky motion, and any parameter higher '
 	-- than 2 will almost always result in NAN errors. Use with caution.
--- @tparam[opt=1] number Speed The time scale of the animation.
+-- @tparam[opt=1] number speed The time scale of the animation.
 	-- Setting this to 2 will make the animation 2x faster, and setting it to 0.5 will make it
 	-- run 2x slower.
 -- @tparam[opt=0.4] number stopFadeTime
