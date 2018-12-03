@@ -35,6 +35,10 @@ function TeamTracker.new(player)
 	return self
 end
 
+function TeamTracker:GetPlayer()
+	return self._player
+end
+
 function TeamTracker:_updateCurrentTeam()
 	if self._player.Neutral then
 		self.CurrentTeam.Value = nil
