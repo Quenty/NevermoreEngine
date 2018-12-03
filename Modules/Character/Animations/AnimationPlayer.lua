@@ -1,4 +1,5 @@
---- Makes playing and loading tracks into a humanoid easy
+--- The AnimationPlayer makes playing and loading tracks into a humanoid easy, providing an interface to
+-- playback animations by name instead of resolving a reference to the actual animation.
 -- @classmod AnimationPlayer
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
@@ -9,9 +10,10 @@ local AnimationPlayer = {}
 AnimationPlayer.__index = AnimationPlayer
 AnimationPlayer.ClassName = "AnimationPlayer"
 
---- Constructs a new animation player
+--- Constructs a new animation player for the given humanoid.
 -- @constructor
--- @tparam humanoid humanoid
+-- @tparam Humanoid humanoid The humanoid to construct the animation player with. The humanoid will have animations
+-- loaded in on them.
 function AnimationPlayer.new(humanoid)
 	local self = setmetatable({}, AnimationPlayer)
 
@@ -24,7 +26,9 @@ function AnimationPlayer.new(humanoid)
 	return self
 end
 
---- Adds an animation to use
+--- Adds an animation to use, storing the animation by the name property. The animation will be loaded
+-- into the humanoids.
+-- @param animation The animation to add.
 function AnimationPlayer:WithAnimation(animation)
 	self._tracks[animation.Name] = self._humanoid:LoadAnimation(animation)
 
@@ -51,7 +55,7 @@ function AnimationPlayer:GetTrack(trackName)
 	return self._tracks[trackName] or error("Track does not exist")
 end
 
----Plays a track
+--- Plays a track
 -- @tparam string trackName Name of the track to play
 -- @tparam[opt=0.4] number fadeTime How much time it will take to transition into the animation.
 -- @tparam[opt=1] number weight Acts as a multiplier for the offsets and rotations of the playing animation
@@ -97,7 +101,7 @@ function AnimationPlayer:StopAllTracks(fadeTime)
 	end
 end
 
----
+--- Deconstructs the animation player, stopping all tracks
 function AnimationPlayer:Destroy()
 	self:StopAllTracks()
 	setmetatable(self, nil)
