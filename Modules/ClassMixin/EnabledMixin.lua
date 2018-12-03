@@ -6,9 +6,9 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Maid = require("Maid")
 local Signal = require("Signal")
 
-local module = {}
+local EnabledMixin = {}
 
-function module:Add(class)
+function EnabledMixin:Add(class)
 	assert(class)
 	assert(not class.Enable)
 	assert(not class.Disable)
@@ -24,8 +24,8 @@ function module:Add(class)
 	class.InitEnabledMixin = self.InitEnabledMixin
 end
 
--- Initialize module
-function module:InitEnabledMixin(maid)
+-- Initialize EnabledMixin
+function EnabledMixin:InitEnabledMixin(maid)
 	maid = maid or self._maid
 	assert(maid, "Must have maid")
 
@@ -36,19 +36,19 @@ function module:InitEnabledMixin(maid)
 	self._enabledMaidReference:GiveTask(self.EnabledChanged)
 end
 
-function module:IsEnabled()
+function EnabledMixin:IsEnabled()
 	return self._enabled
 end
 
-function module:Enable(doNotAnimate)
+function EnabledMixin:Enable(doNotAnimate)
 	self:SetEnabled(true, doNotAnimate)
 end
 
-function module:Disable(doNotAnimate)
+function EnabledMixin:Disable(doNotAnimate)
 	self:SetEnabled(false, doNotAnimate)
 end
 
-function module:SetEnabled(isEnabled, doNotAnimate)
+function EnabledMixin:SetEnabled(isEnabled, doNotAnimate)
 	assert(type(isEnabled) == "boolean")
 
 	if self._enabled ~= isEnabled then
@@ -61,4 +61,4 @@ function module:SetEnabled(isEnabled, doNotAnimate)
 	end
 end
 
-return module
+return EnabledMixin

@@ -6,9 +6,9 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Maid = require("Maid")
 local ButtonUtils = require("ButtonUtils")
 
-local module = {}
+local MouseOverMixin = {}
 
-function module:Add(class)
+function MouseOverMixin:Add(class)
 	assert(class)
 	assert(not class.GetMouseOverColor)
 
@@ -17,7 +17,7 @@ function module:Add(class)
 	class._getMouseOverTweenProperties = self._getMouseOverTweenProperties
 end
 
-function module:GetMouseOverBoolValue(gui)
+function MouseOverMixin:GetMouseOverBoolValue(gui)
 	local maid = Maid.new()
 
 	local mouseOver = Instance.new("BoolValue")
@@ -56,7 +56,7 @@ function module:GetMouseOverBoolValue(gui)
 	return maid, mouseOver
 end
 
-function module:_getMouseOverTweenProperties(gui)
+function MouseOverMixin:_getMouseOverTweenProperties(gui)
 	if gui:IsA("ImageButton") then
 		return {
 			ImageColor3 = ButtonUtils.GetMouseOverColor(gui.ImageColor3);
@@ -69,7 +69,7 @@ function module:_getMouseOverTweenProperties(gui)
 	end
 end
 
-function module:AddMouseOverEffect(gui, tweenProperties)
+function MouseOverMixin:AddMouseOverEffect(gui, tweenProperties)
 	tweenProperties = tweenProperties or ButtonUtils._getMouseOverTweenProperties(gui)
 
 	if gui:IsA("GuiButton") then
@@ -95,4 +95,4 @@ function module:AddMouseOverEffect(gui, tweenProperties)
 	return boolValue
 end
 
-return module
+return MouseOverMixin

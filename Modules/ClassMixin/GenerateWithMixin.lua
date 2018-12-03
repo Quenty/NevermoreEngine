@@ -5,12 +5,12 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local String = require("String")
 
-local module = {}
+local GenerateWithMixin = {}
 
 --- Adds the GenerateWith API to the class
 -- @tparam table class
 -- @tparam table staticResources These resources are added to the class automatically
-function module:Add(class, staticResources)
+function GenerateWithMixin:Add(class, staticResources)
 	assert(class)
 	assert(staticResources)
 
@@ -19,7 +19,7 @@ end
 
 --- Generates resources
 -- @tparam table resources Resources to add
-function module.GenerateWith(class, resources)
+function GenerateWithMixin.GenerateWith(class, resources)
 	assert(type(resources) == "table")
 
 	for _, resourceName in ipairs(resources) do
@@ -39,4 +39,4 @@ function module.GenerateWith(class, resources)
 	return class
 end
 
-return module
+return GenerateWithMixin

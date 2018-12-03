@@ -1,10 +1,10 @@
 --- Generic IsA interface for Lua classes.
 -- @module IsAMixin
 
-local module = {}
+local IsAMixin = {}
 
 --- Adds the IsA function to a class and all descendants
-function module:Add(class)
+function IsAMixin:Add(class)
 	assert(not class.IsA, "class already has an IsA method")
 	assert(not class.CustomIsA, "class already has an CustomIsA method")
 	assert(class.ClassName, "class needs a ClassName")
@@ -15,7 +15,7 @@ end
 
 --- Using the .ClassName property, returns whether or not a component is
 --  a class
-function module:IsA(className)
+function IsAMixin:IsA(className)
 
 	assert(type(className) == "string", "className must be a string")
 
@@ -30,4 +30,4 @@ function module:IsA(className)
 	return false
 end
 
-return module
+return IsAMixin

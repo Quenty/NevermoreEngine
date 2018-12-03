@@ -4,10 +4,10 @@
 
 local RunService = game:GetService("RunService")
 
-local module = {}
+local IsClientMixin = {}
 
 --- Adds the IsClientMixin to the class
-function module:Add(class)
+function IsClientMixin:Add(class)
 	assert(class)
 	assert(not class.IsServer)
 	assert(not class.IsClient)
@@ -20,7 +20,7 @@ end
 
 --- Initializes the mixin
 -- @tparam boolean isClient
-function module:InitIsClientMixin(isClient)
+function IsClientMixin:InitIsClientMixin(isClient)
 	assert(type(isClient) == "boolean")
 
 	-- Sanity check
@@ -35,7 +35,7 @@ end
 
 ---
 -- @treturn boolean true, if server
-function module:IsServer()
+function IsClientMixin:IsServer()
 	assert(type(self._isClient) == "boolean", "Uninitialized")
 
 	return not self._isClient
@@ -43,10 +43,10 @@ end
 
 ---
 -- @treturn boolean true, if client
-function module:IsClient()
+function IsClientMixin:IsClient()
 	assert(type(self._isClient) == "boolean", "Uninitialized")
 
 	return self._isClient
 end
 
-return module
+return IsClientMixin
