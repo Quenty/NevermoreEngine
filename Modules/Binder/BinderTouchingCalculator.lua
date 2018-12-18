@@ -21,15 +21,18 @@ function BinderTouchingCalculator:GetTouchingClass(binder, touchingList)
 	local touching = {}
 
 	for _, part in pairs(touchingList) do
-		local class = BinderUtil.FindFirstAncestor(self._propBinder)
-		if not touching[class] then
-
-			touching[class] = {
-				Class = class;
-				Touching = { part };
-			}
-		else
-			table.insert(touching[class].Touching, part)
+		local object = BinderUtil.FindFirstAncestor(binder, part)
+		if object then
+			if not touching[object] then
+				touching[object] = {
+					Object = object;
+					Touching = {
+						part
+					};
+				}
+			else
+				table.insert(touching[object].Touching, part)
+			end
 		end
 	end
 
