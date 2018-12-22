@@ -5,7 +5,6 @@ local HttpService = game:GetService("HttpService")
 
 local lib = {}
 
-local DEFAULT_SOURCE = ""
 local DEFAULT_CONTEXT = ""
 
 --- Recursively iterates through the object to construct strings and add it to the localization table
@@ -22,7 +21,9 @@ local function recurseAdd(localizationTable, localeId, baseKey, object)
 		if type(value) == "table" then
 			recurseAdd(localizationTable, localeId, key, value)
 		elseif type(value) == "string" then
-			localizationTable:SetEntryValue(key, DEFAULT_SOURCE, DEFAULT_CONTEXT, localeId, value)
+			-- Set source to also be key so {my_variable:transate} also translates, since Roblox uses source instead of
+			-- the key -_-
+			localizationTable:SetEntryValue(key, key, DEFAULT_CONTEXT, localeId, value)
 		else
 			error("Bad type for value in '" .. key .. "'.")
 		end
