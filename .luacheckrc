@@ -1,5 +1,6 @@
 local empty = {}
 local read_write = { read_only = false }
+local read_write_class = { read_only = false, other_fields = true }
 local read_only = { read_only = true }
 
 local function def_fields(field_list)
@@ -12,21 +13,33 @@ local function def_fields(field_list)
    return { fields = fields }
 end
 
+local enum = def_fields({"Value", "Name"})
+
+local function def_enum(field_list)
+   local fields = {}
+
+   for _, field in ipairs(field_list) do
+      fields[field] = enum
+   end
+
+   return { fields = fields }
+end
+
 stds.roblox = {
     globals = {
         script = {
-            readonly = true,
+            other_fields = true,
             fields = {
                 Source = read_write;
                 GetHash = read_write;
                 Disabled = read_write;
                 LinkedSource = read_write;
-                CurrentEditor = read_write;
+                CurrentEditor = read_write_class;
                 Archivable = read_write;
-                ClassName = read_write;
-                DataCost = read_write;
+                ClassName = read_only;
+                DataCost = read_only;
                 Name = read_write;
-                Parent = read_write;
+                Parent = read_write_class;
                 RobloxLocked = read_write;
                 ClearAllChildren = read_write;
                 Clone = read_write;
@@ -55,20 +68,20 @@ stds.roblox = {
             }
         },
         game = {
-            readonly = true,
+            other_fields = true,
             fields = {
-                CreatorId = read_write;
-                CreatorType = read_write;
-                GameId = read_write;
-                GearGenreSetting = read_write;
-                Genre = read_write;
-                IsSFFlagsLoaded = read_write;
-                JobId = read_write;
-                PlaceId = read_write;
-                PlaceVersion = read_write;
-                PrivateServerId = read_write;
-                PrivateServerOwnerId = read_write;
-                Workspace = read_write;
+                CreatorId = read_only;
+                CreatorType = read_only;
+                GameId = read_only;
+                GearGenreSetting = read_only;
+                Genre = read_only;
+                IsSFFlagsLoaded = read_only;
+                JobId = read_only;
+                PlaceId = read_only;
+                PlaceVersion = read_only;
+                PrivateServerId = read_only;
+                PrivateServerOwnerId = read_only;
+                Workspace = read_only;
                 BindToClose = read_write;
                 GetJobIntervalPeakFraction = read_write;
                 GetJobTimePeakFraction = read_write;
@@ -96,10 +109,90 @@ stds.roblox = {
                 ServiceAdded = read_write;
                 ServiceRemoving = read_write;
                 Archivable = read_write;
-                ClassName = read_write;
-                DataCost = read_write;
+                ClassName = read_only;
+                DataCost = read_only;
                 Name = read_write;
-                Parent = read_write;
+                Parent = read_write_class;
+                RobloxLocked = read_write;
+                ClearAllChildren = read_write;
+                Clone = read_write;
+                Destroy = read_write;
+                FindFirstAncestor = read_write;
+                FindFirstAncestorOfClass = read_write;
+                FindFirstAncestorWhichIsA = read_write;
+                FindFirstChild = read_write;
+                FindFirstChildOfClass = read_write;
+                FindFirstChildWhichIsA = read_write;
+                GetChildren = read_write;
+                GetDebugId = read_write;
+                GetDescendants = read_write;
+                GetFullName = read_write;
+                GetPropertyChangedSignal = read_write;
+                IsA = read_write;
+                IsAncestorOf = read_write;
+                IsDescendantOf = read_write;
+                WaitForChild = read_write;
+                AncestryChanged = read_write;
+                Changed = read_write;
+                ChildAdded = read_write;
+                ChildRemoved = read_write;
+                DescendantAdded = read_write;
+                DescendantRemoving = read_write;
+            }
+        },
+        workspace = {
+            other_fields = true,
+            fields = {
+                AllowThirdPartySales = read_write;
+                AutoJointsMode = read_write;
+                CurrentCamera = read_write_class;
+                DistributedGameTime = read_write;
+                FallenPartsDestroyHeight = read_write;
+                FilteringEnabled = read_write;
+                Gravity = read_write;
+                PGSPhysicsSolverEnabled = read_write;
+                StreamingEnabled = read_write;
+                StreamingMinRadius = read_write;
+                StreamingTargetRadius = read_write;
+                TemporaryLegacyPhysicsSolverOverride = read_write;
+                Terrain = read_only;
+                BreakJoints = read_write;
+                ExperimentalSolverIsEnabled = read_write;
+                FindPartOnRay = read_write;
+                FindPartOnRayWithIgnoreList = read_write;
+                FindPartOnRayWithWhitelist = read_write;
+                FindPartsInRegion3 = read_write;
+                FindPartsInRegion3WithIgnoreList = read_write;
+                FindPartsInRegion3WithWhiteList = read_write;
+                GetNumAwakeParts = read_write;
+                GetPhysicsAnalyzerBreakOnIssue = read_write;
+                GetPhysicsAnalyzerIssue = read_write;
+                GetPhysicsThrottling = read_write;
+                GetRealPhysicsFPS = read_write;
+                IsRegion3Empty = read_write;
+                IsRegion3EmptyWithIgnoreList = read_write;
+                JoinToOutsiders = read_write;
+                MakeJoints = read_write;
+                PGSIsEnabled = read_write;
+                SetPhysicsAnalyzerBreakOnIssue = read_write;
+                SetPhysicsThrottleEnabled = read_write;
+                UnjoinFromOutsiders = read_write;
+                ZoomToExtents = read_write;
+                PhysicsAnalyzerIssuesFound = read_write;
+                PrimaryPart = read_write_class;
+                BreakJoints = read_write;
+                GetBoundingBox = read_write;
+                GetExtentsSize = read_write;
+                GetPrimaryPartCFrame = read_write;
+                MakeJoints = read_write;
+                MoveTo = read_write;
+                SetPrimaryPartCFrame = read_write;
+                TranslateBy = read_write;
+                Archivable = read_write;
+                ClassName = read_only;
+                DataCost = read_only;
+                Name = read_write;
+                Parent = read_write_class;
                 RobloxLocked = read_write;
                 ClearAllChildren = read_write;
                 Clone = read_write;
@@ -147,6 +240,9 @@ stds.roblox = {
             "tanh", "huge", "pi"}),
 
         debug = def_fields({"traceback", "profilebegin", "profileend"}),
+
+        utf8 = def_fields({"char", "codes", "codepoint", "len", "offset", "graphemes",
+            "nfcnormalize", "nfdnormalize", "charpattern"}),
 
         -- Types
         Axes = def_fields({"new"}),
@@ -207,58 +303,57 @@ stds.roblox = {
         Enum = {
             readonly = true,
             fields = {
-                ActionType = def_fields({"Nothing", "Pause", "Lose", "Draw", "Win"}),
-                ActuatorRelativeTo = def_fields({"Attachment0", "Attachment1", "World"}),
-                ActuatorType = def_fields({"None", "Motor", "Servo"}),
-                AnimationPriority = def_fields({"Idle", "Movement", "Action", "Core"}),
-                AppShellActionType = def_fields({"None", "OpenApp", "TapChatTab",
+                ActionType = def_enum({"Nothing", "Pause", "Lose", "Draw", "Win"}),
+                ActuatorRelativeTo = def_enum({"Attachment0", "Attachment1", "World"}),
+                ActuatorType = def_enum({"None", "Motor", "Servo"}),
+                AnimationPriority = def_enum({"Idle", "Movement", "Action", "Core"}),
+                AppShellActionType = def_enum({"None", "OpenApp", "TapChatTab",
                     "TapConversationEntry", "TapAvatarTab", "ReadConversation", "TapGamePageTab",
                     "TapHomePageTab", "GamePageLoaded", "HomePageLoaded", "AvatarEditorPageLoaded"}),
-                AspectType = def_fields({"FitWithinMaxSize", "ScaleWithParentSize"}),
-                AssetType = def_fields({"Image", "TeeShirt", "Audio", "Mesh", "Lua", "Hat",
-                    "Place", "Model", "Shirt", "Pants", "Decal", "Head", "Face", "Gear", "Badge",
+                AspectType = def_enum({"FitWithinMaxSize", "ScaleWithParentSize"}),
+                AssetType = def_enum({"Image", "TeeShirt", "Audio", "Mesh", "Lua", "Hat", "Place",
+                    "Model", "Shirt", "Pants", "Decal", "Head", "Face", "Gear", "Badge",
                     "Animation", "Torso", "RightArm", "LeftArm", "LeftLeg", "RightLeg", "Package",
                     "GamePass", "Plugin", "MeshPart", "HairAccessory", "FaceAccessory",
                     "NeckAccessory", "ShoulderAccessory", "FrontAccessory", "BackAccessory",
                     "WaistAccessory", "ClimbAnimation", "DeathAnimation", "FallAnimation",
                     "IdleAnimation", "JumpAnimation", "RunAnimation", "SwimAnimation",
                     "WalkAnimation", "PoseAnimation", "EarAccessory", "EyeAccessory"}),
-                AutoJointsMode = def_fields({"Default", "Explicit", "LegacyImplicit"}),
-                AvatarContextMenuOption = def_fields({"Friend", "Chat", "Emote"}),
-                AvatarJointPositionType = def_fields({"Fixed", "ArtistIntent"}),
-                Axis = def_fields({"X", "Y", "Z"}),
-                BinType = def_fields({"Script", "GameTool", "Grab", "Clone", "Hammer"}),
-                BodyPart = def_fields({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg",
-                    "RightLeg"}),
-                BodyPartR15 = def_fields({"Head", "UpperTorso", "LowerTorso", "LeftFoot",
+                AutoJointsMode = def_enum({"Default", "Explicit", "LegacyImplicit"}),
+                AvatarContextMenuOption = def_enum({"Friend", "Chat", "Emote"}),
+                AvatarJointPositionType = def_enum({"Fixed", "ArtistIntent"}),
+                Axis = def_enum({"X", "Y", "Z"}),
+                BinType = def_enum({"Script", "GameTool", "Grab", "Clone", "Hammer"}),
+                BodyPart = def_enum({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}),
+                BodyPartR15 = def_enum({"Head", "UpperTorso", "LowerTorso", "LeftFoot",
                     "LeftLowerLeg", "LeftUpperLeg", "RightFoot", "RightLowerLeg", "RightUpperLeg",
                     "LeftHand", "LeftLowerArm", "LeftUpperArm", "RightHand", "RightLowerArm",
                     "RightUpperArm", "RootPart", "Unknown"}),
-                Button = def_fields({"Jump", "Dismount"}),
-                ButtonStyle = def_fields({"Custom", "RobloxButtonDefault", "RobloxButton",
+                Button = def_enum({"Jump", "Dismount"}),
+                ButtonStyle = def_enum({"Custom", "RobloxButtonDefault", "RobloxButton",
                     "RobloxRoundButton", "RobloxRoundDefaultButton", "RobloxRoundDropdownButton"}),
-                CameraMode = def_fields({"Classic", "LockFirstPerson"}),
-                CameraPanMode = def_fields({"Classic", "EdgeBump"}),
-                CameraType = def_fields({"Fixed", "Watch", "Attach", "Track", "Follow", "Custom",
+                CameraMode = def_enum({"Classic", "LockFirstPerson"}),
+                CameraPanMode = def_enum({"Classic", "EdgeBump"}),
+                CameraType = def_enum({"Fixed", "Watch", "Attach", "Track", "Follow", "Custom",
                     "Scriptable", "Orbital"}),
-                CellBlock = def_fields({"Solid", "VerticalWedge", "CornerWedge",
+                CellBlock = def_enum({"Solid", "VerticalWedge", "CornerWedge",
                     "InverseCornerWedge", "HorizontalWedge"}),
-                CellMaterial = def_fields({"Empty", "Grass", "Sand", "Brick", "Granite", "Asphalt",
+                CellMaterial = def_enum({"Empty", "Grass", "Sand", "Brick", "Granite", "Asphalt",
                     "Iron", "Aluminum", "Gold", "WoodPlank", "WoodLog", "Gravel", "CinderBlock",
                     "MossyStone", "Cement", "RedPlastic", "BluePlastic", "Water"}),
-                CellOrientation = def_fields({"NegZ", "X", "Z", "NegX"}),
-                CenterDialogType = def_fields({"UnsolicitedDialog", "PlayerInitiatedDialog",
+                CellOrientation = def_enum({"NegZ", "X", "Z", "NegX"}),
+                CenterDialogType = def_enum({"UnsolicitedDialog", "PlayerInitiatedDialog",
                     "ModalDialog", "QuitDialog"}),
-                ChatCallbackType = def_fields({"OnCreatingChatWindow", "OnClientSendingMessage",
+                ChatCallbackType = def_enum({"OnCreatingChatWindow", "OnClientSendingMessage",
                     "OnClientFormattingMessage", "OnServerReceivingMessage"}),
-                ChatColor = def_fields({"Blue", "Green", "Red", "White"}),
-                ChatMode = def_fields({"Menu", "TextAndMenu"}),
-                ChatPrivacyMode = def_fields({"AllUsers", "NoOne", "Friends"}),
-                ChatStyle = def_fields({"Classic", "Bubble", "ClassicAndBubble"}),
-                CollisionFidelity = def_fields({"Default", "Hull", "Box"}),
-                ComputerCameraMovementMode = def_fields({"Default", "Follow", "Classic", "Orbital"}),
-                ComputerMovementMode = def_fields({"Default", "KeyboardMouse", "ClickToMove"}),
-                ConnectionError = def_fields({"OK", "DisconnectErrors", "DisconnectBadhash",
+                ChatColor = def_enum({"Blue", "Green", "Red", "White"}),
+                ChatMode = def_enum({"Menu", "TextAndMenu"}),
+                ChatPrivacyMode = def_enum({"AllUsers", "NoOne", "Friends"}),
+                ChatStyle = def_enum({"Classic", "Bubble", "ClassicAndBubble"}),
+                CollisionFidelity = def_enum({"Default", "Hull", "Box"}),
+                ComputerCameraMovementMode = def_enum({"Default", "Follow", "Classic", "Orbital"}),
+                ComputerMovementMode = def_enum({"Default", "KeyboardMouse", "ClickToMove"}),
+                ConnectionError = def_enum({"OK", "DisconnectErrors", "DisconnectBadhash",
                     "DisconnectSecurityKeyMismatch", "DisconnectNewSecurityKeyMismatch",
                     "DisconnectProtocolMismatch", "DisconnectReceivePacketError",
                     "DisconnectReceivePacketStreamError", "DisconnectSendPacketError",
@@ -277,98 +372,98 @@ stds.roblox = {
                     "TeleportFailure", "TeleportGameNotFound", "TeleportGameEnded",
                     "TeleportGameFull", "TeleportUnauthorized", "TeleportFlooded",
                     "TeleportIsTeleporting"}),
-                ConnectionState = def_fields({"Connected", "Disconnected"}),
-                ContextActionPriority = def_fields({"Low", "Medium", "Default", "High"}),
-                ContextActionResult = def_fields({"Pass", "Sink"}),
-                ControlMode = def_fields({"MouseLockSwitch", "Classic"}),
-                CoreGuiType = def_fields({"PlayerList", "Health", "Backpack", "Chat", "All"}),
-                CreatorType = def_fields({"User", "Group"}),
-                CurrencyType = def_fields({"Default", "Robux", "Tix"}),
-                CustomCameraMode = def_fields({"Default", "Follow", "Classic"}),
-                DataStoreRequestType = def_fields({"GetAsync", "SetIncrementAsync", "UpdateAsync",
+                ConnectionState = def_enum({"Connected", "Disconnected"}),
+                ContextActionPriority = def_enum({"Low", "Medium", "Default", "High"}),
+                ContextActionResult = def_enum({"Pass", "Sink"}),
+                ControlMode = def_enum({"MouseLockSwitch", "Classic"}),
+                CoreGuiType = def_enum({"PlayerList", "Health", "Backpack", "Chat", "All"}),
+                CreatorType = def_enum({"User", "Group"}),
+                CurrencyType = def_enum({"Default", "Robux", "Tix"}),
+                CustomCameraMode = def_enum({"Default", "Follow", "Classic"}),
+                DataStoreRequestType = def_enum({"GetAsync", "SetIncrementAsync", "UpdateAsync",
                     "GetSortedAsync", "SetIncrementSortedAsync", "OnUpdate"}),
-                DevCameraOcclusionMode = def_fields({"Zoom", "Invisicam"}),
-                DevComputerCameraMovementMode = def_fields({"UserChoice", "Classic", "Follow",
+                DevCameraOcclusionMode = def_enum({"Zoom", "Invisicam"}),
+                DevComputerCameraMovementMode = def_enum({"UserChoice", "Classic", "Follow",
                     "Orbital"}),
-                DevComputerMovementMode = def_fields({"UserChoice", "KeyboardMouse", "ClickToMove",
+                DevComputerMovementMode = def_enum({"UserChoice", "KeyboardMouse", "ClickToMove",
                     "Scriptable"}),
-                DevTouchCameraMovementMode = def_fields({"UserChoice", "Classic", "Follow",
+                DevTouchCameraMovementMode = def_enum({"UserChoice", "Classic", "Follow",
                     "Orbital"}),
-                DevTouchMovementMode = def_fields({"UserChoice", "Thumbstick", "DPad", "Thumbpad",
+                DevTouchMovementMode = def_enum({"UserChoice", "Thumbstick", "DPad", "Thumbpad",
                     "ClickToMove", "Scriptable", "DynamicThumbstick"}),
-                DeveloperMemoryTag = def_fields({"Internal", "HttpCache", "Instances", "Signals",
+                DeveloperMemoryTag = def_enum({"Internal", "HttpCache", "Instances", "Signals",
                     "LuaHeap", "Script", "PhysicsCollision", "PhysicsParts", "GraphicsSolidModels",
                     "GraphicsMeshParts", "GraphicsParticles", "GraphicsParts",
                     "GraphicsSpatialHash", "GraphicsTerrain", "GraphicsTexture",
                     "GraphicsTextureCharacter", "Sounds", "StreamingSounds", "TerrainVoxels",
                     "Gui", "Animation", "Navigation"}),
-                DialogBehaviorType = def_fields({"SinglePlayer", "MultiplePlayers"}),
-                DialogPurpose = def_fields({"Quest", "Help", "Shop"}),
-                DialogTone = def_fields({"Neutral", "Friendly", "Enemy"}),
-                DominantAxis = def_fields({"Width", "Height"}),
-                EasingDirection = def_fields({"In", "Out", "InOut"}),
-                EasingStyle = def_fields({"Linear", "Sine", "Back", "Quad", "Quart", "Quint",
+                DialogBehaviorType = def_enum({"SinglePlayer", "MultiplePlayers"}),
+                DialogPurpose = def_enum({"Quest", "Help", "Shop"}),
+                DialogTone = def_enum({"Neutral", "Friendly", "Enemy"}),
+                DominantAxis = def_enum({"Width", "Height"}),
+                EasingDirection = def_enum({"In", "Out", "InOut"}),
+                EasingStyle = def_enum({"Linear", "Sine", "Back", "Quad", "Quart", "Quint",
                     "Bounce", "Elastic"}),
-                ElasticBehavior = def_fields({"WhenScrollable", "Always", "Never"}),
-                EnviromentalPhysicsThrottle = def_fields({"DefaultAuto", "Disabled", "Always",
+                ElasticBehavior = def_enum({"WhenScrollable", "Always", "Never"}),
+                EnviromentalPhysicsThrottle = def_enum({"DefaultAuto", "Disabled", "Always",
                     "Skip2", "Skip4", "Skip8", "Skip16"}),
-                ErrorReporting = def_fields({"DontReport", "Prompt", "Report"}),
-                ExplosionType = def_fields({"NoCraters", "Craters", "CratersAndDebris"}),
-                FillDirection = def_fields({"Horizontal", "Vertical"}),
-                FilterResult = def_fields({"Rejected", "Accepted"}),
-                Font = def_fields({"Legacy", "Arial", "ArialBold", "SourceSans", "SourceSansBold",
+                ErrorReporting = def_enum({"DontReport", "Prompt", "Report"}),
+                ExplosionType = def_enum({"NoCraters", "Craters", "CratersAndDebris"}),
+                FillDirection = def_enum({"Horizontal", "Vertical"}),
+                FilterResult = def_enum({"Rejected", "Accepted"}),
+                Font = def_enum({"Legacy", "Arial", "ArialBold", "SourceSans", "SourceSansBold",
                     "SourceSansSemibold", "SourceSansLight", "SourceSansItalic", "Bodoni",
                     "Garamond", "Cartoon", "Code", "Highway", "SciFi", "Arcade", "Fantasy",
-                    "Antique"}),
-                FontSize = def_fields({"Size8", "Size9", "Size10", "Size11", "Size12", "Size14",
+                    "Antique", "Gotham", "GothamSemibold", "GothamBold", "GothamBlack"}),
+                FontSize = def_enum({"Size8", "Size9", "Size10", "Size11", "Size12", "Size14",
                     "Size18", "Size24", "Size36", "Size48", "Size28", "Size32", "Size42", "Size60",
                     "Size96"}),
-                FormFactor = def_fields({"Symmetric", "Brick", "Plate", "Custom"}),
-                FrameStyle = def_fields({"Custom", "ChatBlue", "RobloxSquare", "RobloxRound",
+                FormFactor = def_enum({"Symmetric", "Brick", "Plate", "Custom"}),
+                FrameStyle = def_enum({"Custom", "ChatBlue", "RobloxSquare", "RobloxRound",
                     "ChatGreen", "ChatRed", "DropShadow"}),
-                FramerateManagerMode = def_fields({"Automatic", "On", "Off"}),
-                FriendRequestEvent = def_fields({"Issue", "Revoke", "Accept", "Deny"}),
-                FriendStatus = def_fields({"Unknown", "NotFriend", "Friend", "FriendRequestSent",
+                FramerateManagerMode = def_enum({"Automatic", "On", "Off"}),
+                FriendRequestEvent = def_enum({"Issue", "Revoke", "Accept", "Deny"}),
+                FriendStatus = def_enum({"Unknown", "NotFriend", "Friend", "FriendRequestSent",
                     "FriendRequestReceived"}),
-                FunctionalTestResult = def_fields({"Passed", "Warning", "Error"}),
-                GameAvatarType = def_fields({"R6", "R15", "PlayerChoice"}),
-                GearGenreSetting = def_fields({"AllGenres", "MatchingGenreOnly"}),
-                GearType = def_fields({"MeleeWeapons", "RangedWeapons", "Explosives", "PowerUps",
+                FunctionalTestResult = def_enum({"Passed", "Warning", "Error"}),
+                GameAvatarType = def_enum({"R6", "R15", "PlayerChoice"}),
+                GearGenreSetting = def_enum({"AllGenres", "MatchingGenreOnly"}),
+                GearType = def_enum({"MeleeWeapons", "RangedWeapons", "Explosives", "PowerUps",
                     "NavigationEnhancers", "MusicalInstruments", "SocialItems", "BuildingTools",
                     "Transport"}),
-                Genre = def_fields({"All", "TownAndCity", "Fantasy", "SciFi", "Ninja", "Scary",
+                Genre = def_enum({"All", "TownAndCity", "Fantasy", "SciFi", "Ninja", "Scary",
                     "Pirate", "Adventure", "Sports", "Funny", "WildWest", "War", "SkatePark",
                     "Tutorial"}),
-                GraphicsMode = def_fields({"Automatic", "Direct3D9", "Direct3D11", "OpenGL",
-                    "Metal", "Vulkan", "NoGraphics"}),
-                HandlesStyle = def_fields({"Resize", "Movement"}),
-                HorizontalAlignment = def_fields({"Center", "Left", "Right"}),
-                HoverAnimateSpeed = def_fields({"VerySlow", "Slow", "Medium", "Fast", "VeryFast"}),
-                HttpCachePolicy = def_fields({"None", "Full", "DataOnly", "Default",
+                GraphicsMode = def_enum({"Automatic", "Direct3D9", "Direct3D11", "OpenGL", "Metal",
+                    "Vulkan", "NoGraphics"}),
+                HandlesStyle = def_enum({"Resize", "Movement"}),
+                HorizontalAlignment = def_enum({"Center", "Left", "Right"}),
+                HoverAnimateSpeed = def_enum({"VerySlow", "Slow", "Medium", "Fast", "VeryFast"}),
+                HttpCachePolicy = def_enum({"None", "Full", "DataOnly", "Default",
                     "InternalRedirectRefresh"}),
-                HttpContentType = def_fields({"ApplicationJson", "ApplicationXml",
+                HttpContentType = def_enum({"ApplicationJson", "ApplicationXml",
                     "ApplicationUrlEncoded", "TextPlain", "TextXml"}),
-                HttpError = def_fields({"OK", "InvalidUrl", "DnsResolve", "ConnectFail",
+                HttpError = def_enum({"OK", "InvalidUrl", "DnsResolve", "ConnectFail",
                     "OutOfMemory", "TimedOut", "TooManyRedirects", "InvalidRedirect", "NetFail",
                     "Aborted", "SslConnectFail", "Unknown"}),
-                HttpRequestType = def_fields({"Default", "MarketplaceService", "Players", "Chat",
+                HttpRequestType = def_enum({"Default", "MarketplaceService", "Players", "Chat",
                     "Avatar", "Analytics"}),
-                HumanoidDisplayDistanceType = def_fields({"Viewer", "Subject", "None"}),
-                HumanoidHealthDisplayType = def_fields({"DisplayWhenDamaged", "AlwaysOn",
+                HumanoidDisplayDistanceType = def_enum({"Viewer", "Subject", "None"}),
+                HumanoidHealthDisplayType = def_enum({"DisplayWhenDamaged", "AlwaysOn",
                     "AlwaysOff"}),
-                HumanoidRigType = def_fields({"R6", "R15"}),
-                HumanoidStateType = def_fields({"FallingDown", "Running", "RunningNoPhysics",
+                HumanoidRigType = def_enum({"R6", "R15"}),
+                HumanoidStateType = def_enum({"FallingDown", "Running", "RunningNoPhysics",
                     "Climbing", "StrafingNoPhysics", "Ragdoll", "GettingUp", "Jumping", "Landed",
                     "Flying", "Freefall", "Seated", "PlatformStanding", "Dead", "Swimming",
                     "Physics", "None"}),
-                InOut = def_fields({"Edge", "Inset", "Center"}),
-                InfoType = def_fields({"Asset", "Product", "GamePass"}),
-                InitialDockState = def_fields({"Top", "Bottom", "Left", "Right", "Float"}),
-                InputType = def_fields({"NoInput", "Constant", "Sin"}),
-                JointCreationMode = def_fields({"All", "Surface", "None"}),
-                JointType = def_fields({"None", "Rotate", "RotateP", "RotateV", "Glue", "Weld",
+                InOut = def_enum({"Edge", "Inset", "Center"}),
+                InfoType = def_enum({"Asset", "Product", "GamePass"}),
+                InitialDockState = def_enum({"Top", "Bottom", "Left", "Right", "Float"}),
+                InputType = def_enum({"NoInput", "Constant", "Sin"}),
+                JointCreationMode = def_enum({"All", "Surface", "None"}),
+                JointType = def_enum({"None", "Rotate", "RotateP", "RotateV", "Glue", "Weld",
                     "Snap"}),
-                KeyCode = def_fields({"Unknown", "Backspace", "Tab", "Clear", "Return", "Pause",
+                KeyCode = def_enum({"Unknown", "Backspace", "Tab", "Clear", "Return", "Pause",
                     "Escape", "Space", "QuotedDouble", "Hash", "Dollar", "Percent", "Ampersand",
                     "Quote", "LeftParenthesis", "RightParenthesis", "Asterisk", "Plus", "Comma",
                     "Minus", "Period", "Slash", "Zero", "One", "Two", "Three", "Four", "Five",
@@ -403,92 +498,90 @@ stds.roblox = {
                     "ButtonB", "ButtonR1", "ButtonL1", "ButtonR2", "ButtonL2", "ButtonR3",
                     "ButtonL3", "ButtonStart", "ButtonSelect", "DPadLeft", "DPadRight", "DPadUp",
                     "DPadDown", "Thumbstick1", "Thumbstick2"}),
-                KeywordFilterType = def_fields({"Include", "Exclude"}),
-                Language = def_fields({"Default"}),
-                LeftRight = def_fields({"Left", "Center", "Right"}),
-                LevelOfDetailSetting = def_fields({"High", "Medium", "Low"}),
-                Limb = def_fields({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg",
+                KeywordFilterType = def_enum({"Include", "Exclude"}),
+                Language = def_enum({"Default"}),
+                LeftRight = def_enum({"Left", "Center", "Right"}),
+                LevelOfDetailSetting = def_enum({"High", "Medium", "Low"}),
+                Limb = def_enum({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg",
                     "Unknown"}),
-                ListDisplayMode = def_fields({"Horizontal", "Vertical"}),
-                ListenerType = def_fields({"Camera", "CFrame", "ObjectPosition", "ObjectCFrame"}),
-                Material = def_fields({"Plastic", "Wood", "Slate", "Concrete", "CorrodedMetal",
+                ListDisplayMode = def_enum({"Horizontal", "Vertical"}),
+                ListenerType = def_enum({"Camera", "CFrame", "ObjectPosition", "ObjectCFrame"}),
+                Material = def_enum({"Plastic", "Wood", "Slate", "Concrete", "CorrodedMetal",
                     "DiamondPlate", "Foil", "Grass", "Ice", "Marble", "Granite", "Brick", "Pebble",
                     "Sand", "Fabric", "SmoothPlastic", "Metal", "WoodPlanks", "Cobblestone", "Air",
                     "Water", "Rock", "Glacier", "Snow", "Sandstone", "Mud", "Basalt", "Ground",
                     "CrackedLava", "Neon", "Glass", "Asphalt", "LeafyGrass", "Salt", "Limestone",
                     "Pavement"}),
-                MembershipType = def_fields({"None", "BuildersClub", "TurboBuildersClub",
+                MembershipType = def_enum({"None", "BuildersClub", "TurboBuildersClub",
                     "OutrageousBuildersClub"}),
-                MeshType = def_fields({"Head", "Torso", "Wedge", "Prism", "Pyramid",
-                    "ParallelRamp", "RightAngleRamp", "CornerWedge", "Brick", "Sphere", "Cylinder",
-                    "FileMesh"}),
-                MessageType = def_fields({"MessageOutput", "MessageInfo", "MessageWarning",
+                MeshType = def_enum({"Head", "Torso", "Wedge", "Prism", "Pyramid", "ParallelRamp",
+                    "RightAngleRamp", "CornerWedge", "Brick", "Sphere", "Cylinder", "FileMesh"}),
+                MessageType = def_enum({"MessageOutput", "MessageInfo", "MessageWarning",
                     "MessageError"}),
-                MouseBehavior = def_fields({"Default", "LockCenter", "LockCurrentPosition"}),
-                MoveState = def_fields({"Stopped", "Coasting", "Pushing", "Stopping", "AirFree"}),
-                NameOcclusion = def_fields({"OccludeAll", "EnemyOcclusion", "NoOcclusion"}),
-                NetworkOwnership = def_fields({"Automatic", "Manual", "OnContact"}),
-                NormalId = def_fields({"Top", "Bottom", "Back", "Front", "Right", "Left"}),
-                OutputLayoutMode = def_fields({"Horizontal", "Vertical"}),
-                OverrideMouseIconBehavior = def_fields({"None", "ForceShow", "ForceHide"}),
-                PacketPriority = def_fields({"IMMEDIATE_PRIORITY", "HIGH_PRIORITY",
+                MouseBehavior = def_enum({"Default", "LockCenter", "LockCurrentPosition"}),
+                MoveState = def_enum({"Stopped", "Coasting", "Pushing", "Stopping", "AirFree"}),
+                NameOcclusion = def_enum({"OccludeAll", "EnemyOcclusion", "NoOcclusion"}),
+                NetworkOwnership = def_enum({"Automatic", "Manual", "OnContact"}),
+                NormalId = def_enum({"Top", "Bottom", "Back", "Front", "Right", "Left"}),
+                OutputLayoutMode = def_enum({"Horizontal", "Vertical"}),
+                OverrideMouseIconBehavior = def_enum({"None", "ForceShow", "ForceHide"}),
+                PacketPriority = def_enum({"IMMEDIATE_PRIORITY", "HIGH_PRIORITY",
                     "MEDIUM_PRIORITY", "LOW_PRIORITY"}),
-                PartType = def_fields({"Ball", "Block", "Cylinder"}),
-                PathStatus = def_fields({"Success", "ClosestNoPath", "ClosestOutOfRange",
+                PartType = def_enum({"Ball", "Block", "Cylinder"}),
+                PathStatus = def_enum({"Success", "ClosestNoPath", "ClosestOutOfRange",
                     "FailStartNotEmpty", "FailFinishNotEmpty", "NoPath"}),
-                PathWaypointAction = def_fields({"Walk", "Jump"}),
-                PermissionLevelShown = def_fields({"Game", "RobloxGame", "RobloxScript", "Studio",
+                PathWaypointAction = def_enum({"Walk", "Jump"}),
+                PermissionLevelShown = def_enum({"Game", "RobloxGame", "RobloxScript", "Studio",
                     "Roblox"}),
-                Platform = def_fields({"Windows", "OSX", "IOS", "Android", "XBoxOne", "PS4", "PS3",
+                Platform = def_enum({"Windows", "OSX", "IOS", "Android", "XBoxOne", "PS4", "PS3",
                     "XBox360", "WiiU", "NX", "Ouya", "AndroidTV", "Chromecast", "Linux", "SteamOS",
                     "WebOS", "DOS", "BeOS", "UWP", "None"}),
-                PlaybackState = def_fields({"Begin", "Delayed", "Playing", "Paused", "Completed",
+                PlaybackState = def_enum({"Begin", "Delayed", "Playing", "Paused", "Completed",
                     "Cancelled"}),
-                PlayerActions = def_fields({"CharacterForward", "CharacterBackward",
-                    "CharacterLeft", "CharacterRight", "CharacterJump"}),
-                PlayerChatType = def_fields({"All", "Team", "Whisper"}),
-                PoseEasingDirection = def_fields({"Out", "InOut", "In"}),
-                PoseEasingStyle = def_fields({"Linear", "Constant", "Elastic", "Cubic", "Bounce"}),
-                PrivilegeType = def_fields({"Owner", "Admin", "Member", "Visitor", "Banned"}),
-                ProductPurchaseDecision = def_fields({"NotProcessedYet", "PurchaseGranted"}),
-                QualityLevel = def_fields({"Automatic", "Level01", "Level02", "Level03", "Level04",
+                PlayerActions = def_enum({"CharacterForward", "CharacterBackward", "CharacterLeft",
+                    "CharacterRight", "CharacterJump"}),
+                PlayerChatType = def_enum({"All", "Team", "Whisper"}),
+                PoseEasingDirection = def_enum({"Out", "InOut", "In"}),
+                PoseEasingStyle = def_enum({"Linear", "Constant", "Elastic", "Cubic", "Bounce"}),
+                PrivilegeType = def_enum({"Owner", "Admin", "Member", "Visitor", "Banned"}),
+                ProductPurchaseDecision = def_enum({"NotProcessedYet", "PurchaseGranted"}),
+                QualityLevel = def_enum({"Automatic", "Level01", "Level02", "Level03", "Level04",
                     "Level05", "Level06", "Level07", "Level08", "Level09", "Level10", "Level11",
                     "Level12", "Level13", "Level14", "Level15", "Level16", "Level17", "Level18",
                     "Level19", "Level20", "Level21"}),
-                R15CollisionType = def_fields({"OuterBox", "InnerBox"}),
-                RenderFidelity = def_fields({"Automatic", "Precise"}),
-                RenderPriority = def_fields({"First", "Input", "Camera", "Character", "Last"}),
-                RenderingTestComparisonMethod = def_fields({"psnr", "diff"}),
-                ReverbType = def_fields({"NoReverb", "GenericReverb", "PaddedCell", "Room",
+                R15CollisionType = def_enum({"OuterBox", "InnerBox"}),
+                RenderFidelity = def_enum({"Automatic", "Precise"}),
+                RenderPriority = def_enum({"First", "Input", "Camera", "Character", "Last"}),
+                RenderingTestComparisonMethod = def_enum({"psnr", "diff"}),
+                ReverbType = def_enum({"NoReverb", "GenericReverb", "PaddedCell", "Room",
                     "Bathroom", "LivingRoom", "StoneRoom", "Auditorium", "ConcertHall", "Cave",
                     "Arena", "Hangar", "CarpettedHallway", "Hallway", "StoneCorridor", "Alley",
                     "Forest", "City", "Mountains", "Quarry", "Plain", "ParkingLot", "SewerPipe",
                     "UnderWater"}),
-                RibbonTool = def_fields({"Select", "Scale", "Rotate", "Move", "Transform",
+                RibbonTool = def_enum({"Select", "Scale", "Rotate", "Move", "Transform",
                     "ColorPicker", "MaterialPicker", "Group", "Ungroup", "None"}),
-                RollOffMode = def_fields({"Inverse", "Linear", "InverseTapered", "LinearSquare"}),
-                RotationType = def_fields({"MovementRelative", "CameraRelative"}),
-                RuntimeUndoBehavior = def_fields({"Aggregate", "Snapshot", "Hybrid"}),
-                SaveFilter = def_fields({"SaveAll", "SaveWorld", "SaveGame"}),
-                SavedQualitySetting = def_fields({"Automatic", "QualityLevel1", "QualityLevel2",
+                RollOffMode = def_enum({"Inverse", "Linear", "InverseTapered", "LinearSquare"}),
+                RotationType = def_enum({"MovementRelative", "CameraRelative"}),
+                RuntimeUndoBehavior = def_enum({"Aggregate", "Snapshot", "Hybrid"}),
+                SaveFilter = def_enum({"SaveAll", "SaveWorld", "SaveGame"}),
+                SavedQualitySetting = def_enum({"Automatic", "QualityLevel1", "QualityLevel2",
                     "QualityLevel3", "QualityLevel4", "QualityLevel5", "QualityLevel6",
                     "QualityLevel7", "QualityLevel8", "QualityLevel9", "QualityLevel10"}),
-                ScaleType = def_fields({"Stretch", "Slice", "Tile", "Fit", "Crop"}),
-                ScreenOrientation = def_fields({"LandscapeLeft", "LandscapeRight",
-                    "LandscapeSensor", "Portrait", "Sensor"}),
-                ScrollBarInset = def_fields({"None", "ScrollBar", "Always"}),
-                ScrollingDirection = def_fields({"X", "Y", "XY"}),
-                ServerAudioBehavior = def_fields({"Enabled", "Muted", "OnlineGame"}),
-                SizeConstraint = def_fields({"RelativeXY", "RelativeXX", "RelativeYY"}),
-                SortOrder = def_fields({"LayoutOrder", "Name", "Custom"}),
-                SoundType = def_fields({"NoSound", "Boing", "Bomb", "Break", "Click", "Clock",
+                ScaleType = def_enum({"Stretch", "Slice", "Tile", "Fit", "Crop"}),
+                ScreenOrientation = def_enum({"LandscapeLeft", "LandscapeRight", "LandscapeSensor",
+                    "Portrait", "Sensor"}),
+                ScrollBarInset = def_enum({"None", "ScrollBar", "Always"}),
+                ScrollingDirection = def_enum({"X", "Y", "XY"}),
+                ServerAudioBehavior = def_enum({"Enabled", "Muted", "OnlineGame"}),
+                SizeConstraint = def_enum({"RelativeXY", "RelativeXX", "RelativeYY"}),
+                SortOrder = def_enum({"LayoutOrder", "Name", "Custom"}),
+                SoundType = def_enum({"NoSound", "Boing", "Bomb", "Break", "Click", "Clock",
                     "Slingshot", "Page", "Ping", "Snap", "Splat", "Step", "StepOn", "Swoosh",
                     "Victory"}),
-                SpecialKey = def_fields({"Insert", "Home", "End", "PageUp", "PageDown",
-                    "ChatHotkey"}),
-                StartCorner = def_fields({"TopLeft", "TopRight", "BottomLeft", "BottomRight"}),
-                Status = def_fields({"Poison", "Confusion"}),
-                StudioStyleGuideColor = def_fields({"MainBackground", "Titlebar", "Dropdown",
+                SpecialKey = def_enum({"Insert", "Home", "End", "PageUp", "PageDown", "ChatHotkey"}),
+                StartCorner = def_enum({"TopLeft", "TopRight", "BottomLeft", "BottomRight"}),
+                Status = def_enum({"Poison", "Confusion"}),
+                StudioStyleGuideColor = def_enum({"MainBackground", "Titlebar", "Dropdown",
                     "Tooltip", "Notification", "ScrollBar", "ScrollBarBackground", "TabBar", "Tab",
                     "RibbonTab", "RibbonTabTopBar", "Button", "MainButton", "RibbonButton",
                     "ViewPortBackground", "InputFieldBackground", "Item", "TableItem",
@@ -511,87 +604,87 @@ stds.roblox = {
                     "DiffFilePathBorder", "Separator", "ButtonBorder", "ButtonText",
                     "InputFieldBorder", "CheckedFieldBackground", "CheckedFieldBorder",
                     "CheckedFieldIndicator", "HeaderSection", "Midlight", "StatusBar"}),
-                StudioStyleGuideModifier = def_fields({"Default", "Selected", "Pressed",
-                    "Disabled", "Hover"}),
-                Style = def_fields({"AlternatingSupports", "BridgeStyleSupports", "NoSupports"}),
-                SurfaceConstraint = def_fields({"None", "Hinge", "SteppingMotor", "Motor"}),
-                SurfaceType = def_fields({"Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal",
+                StudioStyleGuideModifier = def_enum({"Default", "Selected", "Pressed", "Disabled",
+                    "Hover"}),
+                Style = def_enum({"AlternatingSupports", "BridgeStyleSupports", "NoSupports"}),
+                SurfaceConstraint = def_enum({"None", "Hinge", "SteppingMotor", "Motor"}),
+                SurfaceType = def_enum({"Smooth", "Glue", "Weld", "Studs", "Inlet", "Universal",
                     "Hinge", "Motor", "SteppingMotor", "SmoothNoOutlines"}),
-                SwipeDirection = def_fields({"Right", "Left", "Up", "Down", "None"}),
-                TableMajorAxis = def_fields({"RowMajor", "ColumnMajor"}),
-                Technology = def_fields({"Legacy", "Voxel"}),
-                TeleportResult = def_fields({"Success", "Failure", "GameNotFound", "GameEnded",
+                SwipeDirection = def_enum({"Right", "Left", "Up", "Down", "None"}),
+                TableMajorAxis = def_enum({"RowMajor", "ColumnMajor"}),
+                Technology = def_enum({"Legacy", "Voxel"}),
+                TeleportResult = def_enum({"Success", "Failure", "GameNotFound", "GameEnded",
                     "GameFull", "Unauthorized", "Flooded", "IsTeleporting"}),
-                TeleportState = def_fields({"RequestedFromServer", "Started", "WaitingForServer",
+                TeleportState = def_enum({"RequestedFromServer", "Started", "WaitingForServer",
                     "Failed", "InProgress"}),
-                TeleportType = def_fields({"ToPlace", "ToInstance", "ToReservedServer"}),
-                TextFilterContext = def_fields({"PublicChat", "PrivateChat"}),
-                TextTruncate = def_fields({"None", "AtEnd"}),
-                TextXAlignment = def_fields({"Left", "Center", "Right"}),
-                TextYAlignment = def_fields({"Top", "Center", "Bottom"}),
-                TextureMode = def_fields({"Stretch", "Wrap", "Static"}),
-                TextureQueryType = def_fields({"NonHumanoid", "NonHumanoidOrphaned", "Humanoid",
+                TeleportType = def_enum({"ToPlace", "ToInstance", "ToReservedServer"}),
+                TextFilterContext = def_enum({"PublicChat", "PrivateChat"}),
+                TextTruncate = def_enum({"None", "AtEnd"}),
+                TextXAlignment = def_enum({"Left", "Center", "Right"}),
+                TextYAlignment = def_enum({"Top", "Center", "Bottom"}),
+                TextureMode = def_enum({"Stretch", "Wrap", "Static"}),
+                TextureQueryType = def_enum({"NonHumanoid", "NonHumanoidOrphaned", "Humanoid",
                     "HumanoidOrphaned"}),
-                ThreadPoolConfig = def_fields({"Auto", "PerCore1", "PerCore2", "PerCore3",
+                ThreadPoolConfig = def_enum({"Auto", "PerCore1", "PerCore2", "PerCore3",
                     "PerCore4", "Threads1", "Threads2", "Threads3", "Threads4", "Threads8",
                     "Threads16"}),
-                ThrottlingPriority = def_fields({"Extreme", "ElevatedOnServer", "Default"}),
-                ThumbnailSize = def_fields({"Size48x48", "Size180x180", "Size420x420", "Size60x60",
+                ThrottlingPriority = def_enum({"Extreme", "ElevatedOnServer", "Default"}),
+                ThumbnailSize = def_enum({"Size48x48", "Size180x180", "Size420x420", "Size60x60",
                     "Size100x100", "Size150x150", "Size352x352"}),
-                ThumbnailType = def_fields({"HeadShot", "AvatarBust", "AvatarThumbnail"}),
-                TickCountSampleMethod = def_fields({"Fast", "Benchmark", "Precise"}),
-                TopBottom = def_fields({"Top", "Center", "Bottom"}),
-                TouchCameraMovementMode = def_fields({"Default", "Follow", "Classic", "Orbital"}),
-                TouchMovementMode = def_fields({"Default", "Thumbstick", "DPad", "Thumbpad",
+                ThumbnailType = def_enum({"HeadShot", "AvatarBust", "AvatarThumbnail"}),
+                TickCountSampleMethod = def_enum({"Fast", "Benchmark", "Precise"}),
+                TopBottom = def_enum({"Top", "Center", "Bottom"}),
+                TouchCameraMovementMode = def_enum({"Default", "Follow", "Classic", "Orbital"}),
+                TouchMovementMode = def_enum({"Default", "Thumbstick", "DPad", "Thumbpad",
                     "ClickToMove", "DynamicThumbstick"}),
-                TweenStatus = def_fields({"Canceled", "Completed"}),
-                UITheme = def_fields({"Light", "Dark"}),
-                UiMessageType = def_fields({"UiMessageError", "UiMessageInfo"}),
-                UploadSetting = def_fields({"Never", "Ask", "Always"}),
-                UserCFrame = def_fields({"Head", "LeftHand", "RightHand"}),
-                UserInputState = def_fields({"Begin", "Change", "End", "Cancel", "None"}),
-                UserInputType = def_fields({"MouseButton1", "MouseButton2", "MouseButton3",
+                TweenStatus = def_enum({"Canceled", "Completed"}),
+                UITheme = def_enum({"Light", "Dark"}),
+                UiMessageType = def_enum({"UiMessageError", "UiMessageInfo"}),
+                UploadSetting = def_enum({"Never", "Ask", "Always"}),
+                UserCFrame = def_enum({"Head", "LeftHand", "RightHand"}),
+                UserInputState = def_enum({"Begin", "Change", "End", "Cancel", "None"}),
+                UserInputType = def_enum({"MouseButton1", "MouseButton2", "MouseButton3",
                     "MouseWheel", "MouseMovement", "Touch", "Keyboard", "Focus", "Accelerometer",
                     "Gyro", "Gamepad1", "Gamepad2", "Gamepad3", "Gamepad4", "Gamepad5", "Gamepad6",
                     "Gamepad7", "Gamepad8", "TextInput", "None"}),
-                VRTouchpad = def_fields({"Left", "Right"}),
-                VRTouchpadMode = def_fields({"Touch", "VirtualThumbstick", "ABXY"}),
-                VerticalAlignment = def_fields({"Center", "Top", "Bottom"}),
-                VerticalScrollBarPosition = def_fields({"Left", "Right"}),
-                VibrationMotor = def_fields({"Large", "Small", "LeftTrigger", "RightTrigger",
+                VRTouchpad = def_enum({"Left", "Right"}),
+                VRTouchpadMode = def_enum({"Touch", "VirtualThumbstick", "ABXY"}),
+                VerticalAlignment = def_enum({"Center", "Top", "Bottom"}),
+                VerticalScrollBarPosition = def_enum({"Left", "Right"}),
+                VibrationMotor = def_enum({"Large", "Small", "LeftTrigger", "RightTrigger",
                     "LeftHand", "RightHand"}),
-                VideoQualitySettings = def_fields({"LowResolution", "MediumResolution",
+                VideoQualitySettings = def_enum({"LowResolution", "MediumResolution",
                     "HighResolution"}),
-                VirtualInputMode = def_fields({"Recording", "Playing", "None"}),
-                WaterDirection = def_fields({"NegX", "X", "NegY", "Y", "NegZ", "Z"}),
-                WaterForce = def_fields({"None", "Small", "Medium", "Strong", "Max"}),
-                ZIndexBehavior = def_fields({"Global", "Sibling"}),
+                VirtualInputMode = def_enum({"Recording", "Playing", "None"}),
+                WaterDirection = def_enum({"NegX", "X", "NegY", "Y", "NegZ", "Z"}),
+                WaterForce = def_enum({"None", "Small", "Medium", "Strong", "Max"}),
+                ZIndexBehavior = def_enum({"Global", "Sibling"}),
             }
         }
     },
 }
 
 stds.testez = {
-	read_globals = {
-		"describe",
-		"it", "itFOCUS", "itSKIP",
-		"FOCUS", "SKIP", "HACK_NO_XPCALL",
-		"expect",
-	}
+    read_globals = {
+        "describe",
+        "it", "itFOCUS", "itSKIP",
+        "FOCUS", "SKIP", "HACK_NO_XPCALL",
+        "expect",
+    }
 }
 
 stds.plugin = {
-	read_globals = {
-		"plugin",
-	}
+    read_globals = {
+        "plugin",
+    }
 }
 
 ignore = {
-	"212", -- unused arguments
+    "212", -- unused arguments
 }
 
 std = "lua51+roblox"
 
 files["**/*.spec.lua"] = {
-	std = "+testez",
+    std = "+testez",
 }
