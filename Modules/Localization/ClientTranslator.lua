@@ -29,6 +29,7 @@ function ClientTranslatorFacade.new()
 		PseudoLocalize.addToLocalizationTable(localizationTable, "qlp-pls")
 	end
 
+	self._englishTranslator = localizationTable:GetTranslator("en-US")
 	self._clientTranslator = LocalizationService:GetTranslatorForPlayer(Players.LocalPlayer)
 
 	return self
@@ -43,17 +44,29 @@ function ClientTranslatorFacade:FormatByKey(key, ...)
 		result = self._clientTranslator:FormatByKey(key, unpack(data))
 	end)
 
-	if not ok then
-		if err then
-			warn(err)
-		else
-			warn("Failed to localize '" .. key .. "'")
-		end
-
-		return key
+	if ok and not err then
+		return result
 	end
 
-	return result
+	if err then
+		warn(err)
+	else
+		warn("Failed to localize '" .. key .. "'")
+	end
+
+	-- Fallback to English
+	if self._clientTranslator.LocaleId ~= self._englishTranslator.LocaleId then
+		-- Ignore results as we know this may error
+		pcall(function()
+			result = self._englishTranslator:FormatByKey(key, unpack(data))
+		end)
+
+		if ok and not err then
+			return result
+		end
+	end
+
+	return key
 end
 
 return ClientTranslatorFacade.new()
