@@ -57,7 +57,7 @@ function ClientTranslatorFacade:FormatByKey(key, ...)
 	-- Fallback to English
 	if self._clientTranslator.LocaleId ~= self._englishTranslator.LocaleId then
 		-- Ignore results as we know this may error
-		pcall(function()
+		ok, err = pcall(function()
 			result = self._englishTranslator:FormatByKey(key, unpack(data))
 		end)
 
