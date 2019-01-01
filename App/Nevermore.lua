@@ -122,11 +122,47 @@ local function getLibraryCache(repositoryFolder)
 	return libCache
 end
 
-local function replicateRepository(replicationFolder, libCache)
-	for name, library in pairs(libCache) do
-		if not name:lower():find("server") then
-			library.Parent = replicationFolder
+local ReplicateMode = {
+	BOTH = 0;
+	SERVER = 1;
+	CLIENT = 2;
+}
+local function doReplicate(name, library, topParent)
+	if name:lower():find("server") then
+		return ReplicateMode.SERVER
+	elseif name:lower():find("client") then
+		return ReplicateMode.CLIENT
+	end
+
+	local parent = library.Parent
+	while parent and parent ~= topParent do
+		local parentName = parent.Name:lower()
+		if parentName:find("server") then
+			return ReplicateMode.SERVER
+		elseif parentName:find("client") then
+			return ReplicateMode.CLIENT
 		end
+		parent = parent.Parent
+	end
+
+	return ReplicateMode.BOTH
+end
+
+local function replicateRepository(replicationFolder, libCache, topParent)
+	local toRemove = {}
+	for name, library in pairs(libCache) do
+		local mode = doReplicate(name, library, topParent)
+		if mode == ReplicateMode.BOTH then
+			library.Parent = replicationFolder
+		elseif mode == ReplicateMode.CLIENT then
+			library.Parent = replicationFolder
+			table.insert(toRemove, name)
+		end
+	end
+
+	-- Remove client-only libraries
+	for _, name in pairs(toRemove) do
+		toRemove[name] = nil
 	end
 end
 
@@ -136,11 +172,11 @@ local function debugLoading(func)
 
 	return function(module, ...)
 		count = count + 1
-		local LibraryID = count
-		local StartTime = tick()
+		local libraryID = count
+		local startTime = tick()
 
 		if DEBUG_MODE then
-			print(("\t"):rep(depth), LibraryID, "Loading: ", module)
+			print(("\t"):rep(depth), libraryID, "Loading: ", module)
 			depth = depth + 1
 		end
 
@@ -148,7 +184,7 @@ local function debugLoading(func)
 
 		if DEBUG_MODE then
 			depth = depth - 1
-			print(("\t"):rep(depth), LibraryID, "Done loading: ", module, "in", tick() - StartTime)
+			print(("\t"):rep(depth), libraryID, "Done loading: ", module, "in", tick() - startTime)
 		end
 
 		return result
@@ -173,7 +209,7 @@ local getSubFolder = retrieve(resourceFolder, "Folder")
 local repositoryFolder = getRepository(getSubFolder)
 local libCache = getLibraryCache(repositoryFolder)
 if RunService:IsServer() and not RunService:IsClient() then -- Don't move in SoloTestMode
-	replicateRepository(getSubFolder("Modules"), libCache)
+	replicateRepository(getSubFolder("Modules"), libCache, repositoryFolder)
 end
 
 local lib = {}
