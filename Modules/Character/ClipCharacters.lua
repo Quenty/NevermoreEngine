@@ -17,12 +17,12 @@ ClipCharacters.CollisionGroupName = "ClipCharacters"
 -- @constructor
 -- @treturn nil
 function ClipCharacters.initServer()
-	local GroupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
+	local groupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.CollisionGroupName, "Default", false)
 
-	local RemoteFunction = require.GetRemoteFunction("GetClipCharactersId")
-	function RemoteFunction.OnServerInvoke(Player)
-		return GroupId
+	local remoteFunction = require.GetRemoteFunction("GetClipCharactersId")
+	function remoteFunction.OnServerInvoke(player)
+		return groupId
 	end
 end
 
@@ -32,99 +32,99 @@ end
 function ClipCharacters.new()
 	local self = setmetatable({}, ClipCharacters)
 
-	self.RemoteFunction = require.GetRemoteFunction("GetClipCharactersId")
+	self._remoteFunction = require.GetRemoteFunction("GetClipCharactersId")
 
-	self.Maid = Maid.new()
-	self:BindUpdatesYielding()
+	self._maid = Maid.new()
+	self:_bindUpdatesYielding()
 
 	return self
 end
 
-function ClipCharacters:_onDescendantAdded(OriginalTable, Descendant)
-	if not OriginalTable[Descendant] and Descendant:IsA("BasePart") then
-		OriginalTable[Descendant] = Descendant.CollisionGroupId
-		Descendant.CollisionGroupId = self.CollisionGroupId
+function ClipCharacters:_onDescendantAdded(originalTable, descendant)
+	if not originalTable[descendant] and descendant:IsA("BasePart") then
+		originalTable[descendant] = descendant.CollisionGroupId
+		descendant.CollisionGroupId = self._collisionGroupId
 	end
 end
 
-function ClipCharacters:_onDescendantRemoving(OriginalTable, Descendant)
-	if OriginalTable[Descendant] then
-		Descendant.CollisionGroupId = OriginalTable[Descendant]
-		OriginalTable[Descendant] = nil
+function ClipCharacters:_onDescendantRemoving(originalTable, descendant)
+	if originalTable[descendant] then
+		descendant.CollisionGroupId = originalTable[descendant]
+		originalTable[descendant] = nil
 	end
 end
 
-function ClipCharacters:_onCharacterAdd(PlayerMaid, Character)
+function ClipCharacters:_onCharacterAdd(playerMaid, character)
 	local maid = Maid.new()
 
-	local OriginalTable = {}
+	local originalTable = {}
 
-	maid:GiveTask(Character.DescendantAdded:Connect(function(Descendant)
-		self:_onDescendantAdded(OriginalTable, Descendant)
+	maid:GiveTask(character.DescendantAdded:Connect(function(descendant)
+		self:_onDescendantAdded(originalTable, descendant)
 	end))
 
-	maid:GiveTask(Character.DescendantRemoving:Connect(function(Descendant)
-		self:_onDescendantRemoving(OriginalTable, Descendant)
+	maid:GiveTask(character.DescendantRemoving:Connect(function(descendant)
+		self:_onDescendantRemoving(originalTable, descendant)
 	end))
 
 	-- Cleanup
 	maid:GiveTask(function()
-		for Descendant, _ in pairs(OriginalTable) do
-			self:_onDescendantRemoving(OriginalTable, Descendant)
+		for descendant, _ in pairs(originalTable) do
+			self:_onDescendantRemoving(originalTable, descendant)
 		end
 	end)
 
 	-- Initialize
-	for _, Descendant in pairs(Character:GetDescendants()) do
-		self:_onDescendantAdded(OriginalTable, Descendant)
+	for _, descendant in pairs(character:GetDescendants()) do
+		self:_onDescendantAdded(originalTable, descendant)
 	end
 
-	PlayerMaid.CharacterMaid = maid
+	playerMaid._characterMaid = maid
 end
 
-function ClipCharacters:_onPlayerAdded(Player)
-	if Player == Players.LocalPlayer then
+function ClipCharacters:_onPlayerAdded(player)
+	if player == Players.LocalPlayer then
 		return
 	end
 
 	local maid = Maid.new()
 
-	maid:GiveTask(Player.CharacterAdded:Connect(function(Character)
-		self:_onCharacterAdd(maid, Character)
+	maid:GiveTask(player.CharacterAdded:Connect(function(character)
+		self:_onCharacterAdd(maid, character)
 	end))
 
-	if Player.Character then
-		self:_onCharacterAdd(maid, Player.Character)
+	if player.Character then
+		self:_onCharacterAdd(maid, player.Character)
 	end
 
-	self.Maid[Player] = maid
+	self._maid[player] = maid
 end
 
-function ClipCharacters:BindUpdatesYielding()
-	self.CollisionGroupId = self.RemoteFunction:InvokeServer()
+function ClipCharacters:_bindUpdatesYielding()
+	self._collisionGroupId = self._remoteFunction:InvokeServer()
 
-	if not self.CollisionGroupId then
-		warn("[ClipCharacters] - No self.CollisionGroupId")
+	if not self._collisionGroupId then
+		warn("[ClipCharacters] - No self._collisionGroupId")
 	end
 
-	for _, Player in pairs(Players:GetPlayers()) do
-		self:_onPlayerAdded(Player)
+	for _, player in pairs(Players:GetPlayers()) do
+		self:_onPlayerAdded(player)
 	end
 
-	self.Maid:GiveTask(Players.PlayerAdded:Connect(function(Player)
-		self:_onPlayerAdded(Player)
+	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
+		self:_onPlayerAdded(player)
 	end))
 
-	self.Maid:GiveTask(Players.PlayerRemoving:Connect(function(Player)
-		self.Maid[Player] = nil
+	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+		self._maid[player] = nil
 	end))
 end
 
 --- Stop clipping on client
 -- @treturn nil
 function ClipCharacters:Destroy()
-	self.Maid:DoCleaning()
-	self.Maid = nil
+	self._maid:DoCleaning()
+	self._maid = nil
 
 	setmetatable({}, nil)
 end
