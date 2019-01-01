@@ -18,4 +18,15 @@ function BinderUtil.FindFirstAncestor(binder, child)
 	return nil
 end
 
+function BinderUtil.GetChildren(binder, parent)
+	local objects = {}
+	for _, item in pairs(parent:GetChildren()) do
+		local obj = binder:Get(item)
+		if obj then
+			table.insert(objects, obj)
+		end
+	end
+	return objects
+end
+
 return BinderUtil
