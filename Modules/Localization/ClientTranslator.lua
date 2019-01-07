@@ -30,7 +30,7 @@ function ClientTranslatorFacade.new()
 	end
 
 	self._englishTranslator = localizationTable:GetTranslator("en-US")
-	self._clientTranslator = LocalizationService:GetTranslatorForPlayer(Players.LocalPlayer)
+	self._clientTranslator = LocalizationService:GetTranslatorForPlayerAsync(Players.LocalPlayer)
 
 	return self
 end
