@@ -10,33 +10,72 @@ local RunService = game:GetService("RunService")
 
 local JsonToLocalizationTable = require("JsonToLocalizationTable")
 local PseudoLocalize = require("PseudoLocalize")
+local Promise = require("Promise")
 
 assert(RunService:IsClient(), "ClientTranslator can only be required on client")
 
 local ClientTranslatorFacade = {}
-ClientTranslatorFacade.__index = ClientTranslatorFacade
-ClientTranslatorFacade.ClassName = "ClientTranslatorFacade"
 
 --- Initializes a new instance of the ClientTranslatorFacade
-function ClientTranslatorFacade.new()
-	local self = setmetatable({}, ClientTranslatorFacade)
-
+--  Must be called before usage
+function ClientTranslatorFacade:Init()
 	local localizationTable = JsonToLocalizationTable.loadFolder(ReplicatedStorage:WaitForChild("i18n"))
 	localizationTable.Name = "JSONTranslationTable"
 	localizationTable.Parent = LocalizationService
 
 	if RunService:IsStudio() then
-		PseudoLocalize.addToLocalizationTable(localizationTable, "qlp-pls")
+		PseudoLocalize.addToLocalizationTable(localizationTable, "qlp-pls", "en")
 	end
 
-	self._englishTranslator = localizationTable:GetTranslator("en-US")
-	self._clientTranslator = LocalizationService:GetTranslatorForPlayerAsync(Players.LocalPlayer)
+	self._englishTranslator = localizationTable:GetTranslator("en")
+
+	local asyncTranslatorPromise = Promise.new(function(resolve, reject)
+		local translator = nil
+		local ok, err = pcall(function()
+			translator = LocalizationService:GetTranslatorForPlayerAsync(Players.LocalPlayer)
+		end)
+
+		if not ok then
+			reject(err or "Failed to GetTranslatorForPlayerAsync")
+			return
+		end
+
+		if translator then
+			resolve(translator)
+			return
+		end
+
+		reject("Translator was not returned")
+		return
+	end)
+
+	-- Give longer in non-studio mode
+	local timeout = 20
+	if RunService:IsStudio() then
+		timeout = 0.5
+	end
+
+	delay(timeout, function()
+		if not asyncTranslatorPromise:IsPending() then
+			return
+		end
+		warn(("[ERR][ClientTranslatorFacade] - GetTranslatorForPlayerAsync is still pending after %f, using local table")
+			:format(timeout))
+		local translator = LocalizationService:GetTranslatorForPlayer(Players.LocalPlayer)
+		asyncTranslatorPromise:Fulfill(translator)
+	end)
+
+	self._clientTranslator = asyncTranslatorPromise:Wait()
+	assert(self._clientTranslator)
+
+	print("Done loading")
 
 	return self
 end
 
 --- @{inheritDoc}
 function ClientTranslatorFacade:FormatByKey(key, ...)
+	assert(self._clientTranslator)
 	assert(type(key) == "string", "Key must be a string")
 	local data = {...}
 	local result
@@ -69,4 +108,4 @@ function ClientTranslatorFacade:FormatByKey(key, ...)
 	return key
 end
 
-return ClientTranslatorFacade.new()
+return ClientTranslatorFacade

@@ -35,7 +35,7 @@ end
 -- @tparam[opt="en-us"] {string} preferredFromLocale Preferred from locale
 function lib.addToLocalizationTable(localizationTable, preferredLocaleId, preferredFromLocale)
 	local localeId = preferredLocaleId or "qlp-pls"
-	local fromLocale = preferredFromLocale or "en-us"
+	local fromLocale = preferredFromLocale or "en"
 
 	local entries = localizationTable:GetEntries()
 	for _, entry in pairs(entries) do
