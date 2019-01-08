@@ -23,12 +23,12 @@ local function recurseAdd(localizationTable, localeId, baseKey, object)
 			-- the key -_-
 			local source = key
 			local context = ""
-			if localeId == "en-US" then
+			if localeId == "en" then
 				context = ("Originally in English as %q. This entry is generated from JSON and has a unique key."):format(value)
 			end
 
 			localizationTable:SetEntryValue(key, source, context, localeId, value)
-			if localeId == "en-US" then
+			if localeId == "en" then
 				localizationTable:SetEntryExample(key, source, context, value)
 			end
 		else
