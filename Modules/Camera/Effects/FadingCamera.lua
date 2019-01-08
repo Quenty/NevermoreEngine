@@ -25,39 +25,39 @@ function FadingCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function FadingCamera:__newindex(Index, Value)
-	if Index == "Damper" then
-		self.Spring.Damper = Value
-	elseif Index == "Value" then
-		self.Spring.Value = Value
-	elseif Index == "Speed" then
-		self.Spring.Speed = Value
-	elseif Index == "Target" then
-		self.Spring.Target = Value
-	elseif Index == "Spring" or Index == "Camera" then
-		rawset(self, Index, Value)
+function FadingCamera:__newindex(index, value)
+	if index == "Damper" then
+		self.Spring.Damper = value
+	elseif index == "value" then
+		self.Spring.Value = value
+	elseif index == "Speed" then
+		self.Spring.Speed = value
+	elseif index == "Target" then
+		self.Spring.Target = value
+	elseif index == "Spring" or index == "Camera" then
+		rawset(self, index, value)
 	else
-		error(Index .. " is not a valid member of fading camera")
+		error(index .. " is not a valid member of fading camera")
 	end
 end
 
-function FadingCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function FadingCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		return (self.Camera.CameraState or self.Camera) * self.Spring.Value
-	elseif Index == "Damper" then
+	elseif index == "Damper" then
 		return self.Spring.Damper
-	elseif Index == "Value" then
+	elseif index == "value" then
 		return self.Spring.Value
-	elseif Index == "Speed" then
+	elseif index == "Speed" then
 		return self.Spring.Speed
-	elseif Index == "Target" then
+	elseif index == "Target" then
 		return self.Spring.Target
-	elseif Index == "Velocity" then
+	elseif index == "Velocity" then
 		return self.Spring.Velocity
-	elseif Index == "HasReachedTarget" then
+	elseif index == "HasReachedTarget" then
 		return math.abs(self.Value - self.Target) < 1e-4 and math.abs(self.Velocity) < 1e-4
 	else
-		return FadingCamera[Index]
+		return FadingCamera[index]
 	end
 end
 

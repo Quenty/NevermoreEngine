@@ -42,7 +42,7 @@ function PushCamera:RotateXY(XYRotateVector)
 end
 
 function PushCamera:StopRotateBack()
-	self.CoordinateFrame = self.CoordinateFrame
+	self.CFrame = self.CFrame
 end
 
 --- Resets to default position automatically
@@ -50,70 +50,70 @@ function PushCamera:Reset()
 	self.LastUpdateTime = 0
 end
 
-function PushCamera:__newindex(Index, Value)
-	if Index == "CoordinateFrame" then
-		local XZRotation = GetRotationInXZPlane(Value)
+function PushCamera:__newindex(index, value)
+	if index == "CFrame" then
+		local XZRotation = GetRotationInXZPlane(value)
 		self.AngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(Value).lookVector.y
+		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
 		self.AngleY = math.asin(YRotation)
-	elseif Index == "DefaultCoordinateFrame" then
-		local XZRotation = GetRotationInXZPlane(Value)
+	elseif index == "DefaultCFrame" then
+		local XZRotation = GetRotationInXZPlane(value)
 		self.DefaultAngleXZ0 = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(Value).lookVector.y
+		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
 		self.AngleY = math.asin(YRotation)
-	elseif Index == "AngleY" then
-		self._AngleY = math.clamp(Value, self.MinY, self.MaxY)
-	elseif Index == "AngleX" or Index == "AngleXZ" then
+	elseif index == "AngleY" then
+		self._AngleY = math.clamp(value, self.MinY, self.MaxY)
+	elseif index == "AngleX" or index == "AngleXZ" then
 		self.LastUpdateTime = tick()
-		self._AngleXZ0 = Value
-	elseif Index == "MaxY" then
-		assert(Value > self.MinY, "MaxY must be greater than MinY")
-		self._MaxY = Value
+		self._AngleXZ0 = value
+	elseif index == "MaxY" then
+		assert(value > self.MinY, "MaxY must be greater than MinY")
+		self._MaxY = value
 		self.AngleY = self.AngleY -- Reclamp value
-	elseif Index == "MinY" then
-		assert(Value < self.MinY, "MinY must be less than MeeeaxY")
-		self._MaxY = Value
+	elseif index == "MinY" then
+		assert(value < self.MinY, "MinY must be less than MeeeaxY")
+		self._MaxY = value
 		self.AngleY = self.AngleY -- Reclamp value
-	elseif Index == "LastUpdateTime" then
-		self._LastUpdateTime = Value
-	elseif PushCamera[Index] ~= nil then
-		rawset(self, Index, Value)
+	elseif index == "LastUpdateTime" then
+		self._LastUpdateTime = value
+	elseif PushCamera[index] ~= nil then
+		rawset(self, index, value)
 	else
-		error(Index .. " is not a valid member or PushCamera")
+		error(index .. " is not a valid member or PushCamera")
 	end
 end
 
-function PushCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function PushCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		local State = CameraState.new()
-		State.CoordinateFrame = self.CoordinateFrame
+		State.CFrame = self.CFrame
 		return State
-	elseif Index == "LastUpdateTime" then
+	elseif index == "LastUpdateTime" then
 		return self._LastUpdateTime
-	elseif Index == "LookVector" then
+	elseif index == "LookVector" then
 		return self.Rotation.lookVector
-	elseif Index == "CoordinateFrame" then
+	elseif index == "CFrame" then
 		return CFrame.Angles(0, self.AngleXZ, 0) * CFrame.Angles(self.AngleY, 0, 0)
-	elseif Index == "AngleY" then
+	elseif index == "AngleY" then
 		return self._AngleY
-	elseif Index == "PushBackDelta" then
+	elseif index == "PushBackDelta" then
 		return tick() - self.LastUpdateTime - self.PushBackAfter
-	elseif Index == "PercentFaded" then
+	elseif index == "PercentFaded" then
 		-- How far in we are to the animation. Starts at 0 upon update and goes slowly to 1.
 		return math.clamp(self.PushBackDelta / self.FadeBackTime, 0, 1)
-	elseif Index == "PercentFadedCurved" then
+	elseif index == "PercentFadedCurved" then
 		-- A curved value of PercentFaded
 		return self.PercentFaded ^ 2
-	elseif Index == "AngleX" or Index == "AngleXZ" then
+	elseif index == "AngleX" or index == "AngleXZ" then
 		return LerpNumber(self._AngleXZ0, self.DefaultAngleXZ0, self.PercentFadedCurved)
-	elseif Index == "MaxY" then
+	elseif index == "MaxY" then
 		return self._MaxY
-	elseif Index == "MinY" then
+	elseif index == "MinY" then
 		return self._MinY
 	else
-		return PushCamera[Index]
+		return PushCamera[index]
 	end
 end
 

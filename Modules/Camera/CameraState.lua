@@ -11,22 +11,22 @@ CameraState.FieldOfView = 0
 CameraState.Quaterion = QuaternionObject.new()
 CameraState.Position = Vector3.new()
 
-function CameraState:__index(Index)
-	if Index == "CFrame" or Index == "CoordinateFrame" then
+function CameraState:__index(index)
+	if index == "CFrame" then
 		return QuaternionObject.toCFrame(self.Quaterion, self.Position)
 	else
-		return CameraState[Index]
+		return CameraState[index]
 	end
 end
 
-function CameraState:__newindex(Index, Value)
-	if Index == "CFrame" or Index == "CoordinateFrame" then
+function CameraState:__newindex(index, Value)
+	if index == "CFrame" then
 		rawset(self, "Position", Value.p)
 		rawset(self, "Quaterion", QuaternionObject.fromCFrame(Value))
-	elseif Index == "FieldOfView" or Index == "Position" or Index == "Quaterion" then
-		rawset(self, Index, Value)
+	elseif index == "FieldOfView" or index == "Position" or index == "Quaterion" then
+		rawset(self, index, Value)
 	else
-		error(("'%s' is not a valid index of CameraState"):format(tostring(Index)))
+		error(("'%s' is not a valid index of CameraState"):format(tostring(index)))
 	end
 end
 

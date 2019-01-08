@@ -26,19 +26,19 @@ function SmoothPositionCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function SmoothPositionCamera:__newindex(Index, Value)
-	if Index == "BaseCamera" then
-		rawset(self, "_" .. Index, Value)
+function SmoothPositionCamera:__newindex(index, value)
+	if index == "BaseCamera" then
+		rawset(self, "_" .. index, value)
 		self.Spring.Target = self.BaseCamera.CameraState.Position
 		self.Spring.Position = self.Spring.Target
 		self.Spring.Velocity = Vector3.new(0, 0, 0)
-	elseif Index == "LastUpdateTime" or Index == "Spring" then
-		rawset(self, Index, Value)
-	elseif Index == "Speed" or Index == "Damper" or Index == "Velocity" or Index == "Position" then
+	elseif index == "LastUpdateTime" or index == "Spring" then
+		rawset(self, index, value)
+	elseif index == "Speed" or index == "Damper" or index == "Velocity" or index == "Position" then
 		self:InternalUpdate()
-		self.Spring[Index] = Value
+		self.Spring[index] = value
 	else
-		error(Index .. " is not a valid member of SmoothPositionCamera")
+		error(index .. " is not a valid member of SmoothPositionCamera")
 	end
 end
 
@@ -56,29 +56,29 @@ function SmoothPositionCamera:InternalUpdate()
 	end
 end
 
-function SmoothPositionCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function SmoothPositionCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		local baseCameraState = self.BaseCameraState
 
 		local state = CameraState.new()
 		state.FieldOfView = baseCameraState.FieldOfView
-		state.CoordinateFrame = baseCameraState.CoordinateFrame
+		state.CFrame = baseCameraState.CFrame
 		state.Position = self.Position
 
 		return state
-	elseif Index == "Position" then
+	elseif index == "Position" then
 		self:InternalUpdate()
 		return self.Spring.Position
-	elseif Index == "Speed" or Index == "Damper" or Index == "Velocity" then
-		return self.Spring[Index]
-	elseif Index == "Target" then
+	elseif index == "Speed" or index == "Damper" or index == "Velocity" then
+		return self.Spring[index]
+	elseif index == "Target" then
 		return self.BaseCameraState.Position
-	elseif Index == "BaseCameraState" then
+	elseif index == "BaseCameraState" then
 		return self.BaseCamera.CameraState or self.BaseCamera
-	elseif Index == "BaseCamera" then
-		return rawget(self, "_" .. Index) or error("Internal error: Index does not exist")
+	elseif index == "BaseCamera" then
+		return rawget(self, "_" .. index) or error("Internal error: index does not exist")
 	else
-		return SmoothPositionCamera[Index]
+		return SmoothPositionCamera[index]
 	end
 end
 

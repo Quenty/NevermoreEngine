@@ -42,13 +42,13 @@ function SmoothRotatedCamera:RotateXY(xyRotateVector)
 end
 
 function SmoothRotatedCamera:__newindex(index, value)
-	if index == "CoordinateFrame" or index == "CFrame" then
+	if index == "CFrame" then
 		local XZRotation = qCFrame.GetRotationInXZPlane(value)
 		self.AngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
 
 		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
 		self.AngleY = math.asin(YRotation)
-	elseif index == "TargetCoordinateFrame" or index == "TargetCFrame" then
+	elseif index == "TargetCFrame" then
 		local XZRotation = qCFrame.GetRotationInXZPlane(value)
 		self.TargetAngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
 
@@ -101,13 +101,13 @@ end
 function SmoothRotatedCamera:__index(index)
 	if index == "State" or index == "CameraState" or index == "Camera" then
 		local State = CameraState.new()
-		State.CoordinateFrame = self.CoordinateFrame
+		State.CFrame = self.CFrame
 		return State
 	elseif index == "LookVector" then
 		return self.Rotation.lookVector
-	elseif index == "CoordinateFrame" or index == "CFrame" then
+	elseif index == "CFrame" then
 		return CFrame.Angles(0, self.RenderAngleXZ, 0) * CFrame.Angles(self.RenderAngleY, 0, 0)
-	elseif index == "TargetCoordinateFrame" or index == "TargetCFrame" then
+	elseif index == "TargetCFrame" then
 		return CFrame.Angles(0, self.TargetAngleXZ, 0) * CFrame.Angles(self.TargetAngleY, 0, 0)
 	elseif index == "RenderAngleY" then
 		local angle = self.AngleY

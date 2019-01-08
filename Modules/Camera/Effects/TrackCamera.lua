@@ -50,9 +50,9 @@ function TrackCamera:__index(Index)
 
 		if CameraSubject then
 			if CameraSubject:IsA("Model") then
-				State.CoordinateFrame = CameraSubject:GetPrimaryPartCFrame()
+				State.CFrame = CameraSubject:GetPrimaryPartCFrame()
 			elseif CameraSubject:IsA("BasePart") then
-				State.CoordinateFrame = CameraSubject.CFrame
+				State.CFrame = CameraSubject.CFrame
 			end
 		end
 

@@ -21,11 +21,11 @@ function InverseFader:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function InverseFader:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function InverseFader:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		return (self.Camera.CameraState or self.Camera)*(1-self.Fader.Value)
 	else
-		return InverseFader[Index]
+		return InverseFader[index]
 	end
 end
 

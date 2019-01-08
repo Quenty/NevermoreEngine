@@ -162,7 +162,7 @@ local function RealMakeEngine(Screen)
 			local Visible = true
 
 			if p.Occlusion then
-				local c=Camera.CoordinateFrame.p
+				local c=Camera.CFrame.p
 				local Vec = p.Position-c
 				local Mag = Vec.magnitude
 				if Mag > 999 then
@@ -324,7 +324,7 @@ local function RealMakeEngine(Screen)
 		local dt=t-Time
 		Time=t
 
-		local CameraInverse = Camera.CoordinateFrame:inverse()
+		local CameraInverse = Camera.CFrame:inverse()
 
 		for Index = 1, MaxParticles do
 			local Particle = Particles[Index]

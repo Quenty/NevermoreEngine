@@ -31,36 +31,36 @@ function LagPointCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function LagPointCamera:__newindex(Index, Value)
-	if Index == "FocusCamera" then
-		rawset(self, "_" .. Index, Value)
+function LagPointCamera:__newindex(index, value)
+	if index == "FocusCamera" then
+		rawset(self, "_" .. index, value)
 		self.FocusSpring.Target = self.FocusCamera.CameraState.Position
 		self.FocusSpring.Position = self.FocusSpring.Target
 		self.FocusSpring.Velocity = Vector3.new(0, 0, 0)
-	elseif Index == "OriginCamera" then
-		rawset(self, "_" .. Index, Value)
-	elseif Index == "LastFocusUpdate" or Index == "FocusSpring" then
-		rawset(self, Index, Value)
-	elseif Index == "Speed" or Index == "Damper" or Index == "Velocity" then
-		self.FocusSpring[Index] = Value
+	elseif index == "OriginCamera" then
+		rawset(self, "_" .. index, value)
+	elseif index == "LastFocusUpdate" or index == "FocusSpring" then
+		rawset(self, index, value)
+	elseif index == "Speed" or index == "Damper" or index == "Velocity" then
+		self.FocusSpring[index] = value
 	else
-		error(Index .. " is not a valid member of LagPointCamera")
+		error(index .. " is not a valid member of LagPointCamera")
 	end
 end
 
-function LagPointCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function LagPointCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		local Origin, FocusPosition = self.Origin, self.FocusPosition
 
 		local State = CameraState.new()
 		State.FieldOfView = Origin.FieldOfView + self.FocusCamera.CameraState.FieldOfView
 
-		State.CoordinateFrame = CFrame.new(
+		State.CFrame = CFrame.new(
 			Origin.Position,
 			FocusPosition)
 
 		return State
-	elseif Index == "FocusPosition" then
+	elseif index == "FocusPosition" then
 		local Delta
 		if self.LastFocusUpdate then
 			Delta = tick() - self.LastFocusUpdate
@@ -74,14 +74,14 @@ function LagPointCamera:__index(Index)
 		end
 
 		return self.FocusSpring.Position
-	elseif Index == "Speed" or Index == "Damper" or Index == "Velocity" then
-		return self.FocusSpring[Index]
-	elseif Index == "Origin" then
+	elseif index == "Speed" or index == "Damper" or index == "Velocity" then
+		return self.FocusSpring[index]
+	elseif index == "Origin" then
 		return self.OriginCamera.CameraState
-	elseif Index == "FocusCamera" or Index == "OriginCamera" then
-		return rawget(self, "_" .. Index) or error("Internal error: Index does not exist")
+	elseif index == "FocusCamera" or index == "OriginCamera" then
+		return rawget(self, "_" .. index) or error("Internal error: index does not exist")
 	else
-		return LagPointCamera[Index]
+		return LagPointCamera[index]
 	end
 end
 

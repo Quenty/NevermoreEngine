@@ -38,15 +38,15 @@ function HeartbeatCamera:ForceUpdateCache()
 	self.CurrentStateCache = self.Camera.CameraState
 end
 
-function HeartbeatCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
+function HeartbeatCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
 		return self.CurrentStateCache
-	elseif Index == "Focus" then
+	elseif index == "Focus" then
 		return self.FocusCamera.CameraState
-	elseif Index == "Origin" then
+	elseif index == "Origin" then
 		return self.OriginCamera.CameraState
 	else
-		return HeartbeatCamera[Index]
+		return HeartbeatCamera[index]
 	end
 end
 

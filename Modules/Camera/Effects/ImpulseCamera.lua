@@ -46,7 +46,7 @@ function ImpulseCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
 		local State = CameraState.new()
 		local Value = self.Spring.Value
-		State.CoordinateFrame = CFrame.Angles(0, Value.y, 0) * CFrame.Angles(Value.x, 0, 0) * CFrame.Angles(0, 0, Value.z)
+		State.CFrame = CFrame.Angles(0, Value.y, 0) * CFrame.Angles(Value.x, 0, 0) * CFrame.Angles(0, 0, Value.z)
 		return State
 	elseif Index == "Damper" then
 		return self.Spring.Damper

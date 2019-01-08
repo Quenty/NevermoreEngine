@@ -26,10 +26,10 @@ end
 function XZPlaneLockCamera:__index(Index)
 	if Index == "State" or Index == "CameraState" or Index == "Camera" then
 		local State = self.Camera.CameraState or self.Camera
-		local XZRotation = GetRotationInXZPlane(State.CoordinateFrame)
+		local XZRotation = GetRotationInXZPlane(State.CFrame)
 
 		local NewState = CameraState.new()
-		NewState.CoordinateFrame = XZRotation
+		NewState.CFrame = XZRotation
 		NewState.FieldOfView = State.FieldOfView
 
 		return NewState

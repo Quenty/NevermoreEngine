@@ -41,7 +41,7 @@ function PointCamera:__index(Index)
 		local State = CameraState.new()
 		State.FieldOfView = Origin.FieldOfView + Focus.FieldOfView
 
-		State.CoordinateFrame = CFrame.new(
+		State.CFrame = CFrame.new(
 			Origin.Position,
 			Focus.Position)
 

@@ -21,7 +21,7 @@ end
 ---
 -- @param mode Mode to set
 -- If "World", then it just adds positions.
--- If "Relative", then it moves position relative to cameraA's CoordinateFrame.
+-- If "Relative", then it moves position relative to cameraA's CFrame.
 function SummedCamera:SetMode(mode)
 	assert(mode == "World" or mode == "Relative")
 	self._mode = mode
@@ -56,7 +56,7 @@ function SummedCamera:__index(index)
 			local StateB = self.CameraBState
 
 			local Result = StateA + StateB
-			Result.Position = StateA.CoordinateFrame * StateB.Position
+			Result.Position = StateA.CFrame * StateB.Position
 			return Result
 		end
 	elseif index == "CameraAState" then
