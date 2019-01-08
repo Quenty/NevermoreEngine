@@ -73,7 +73,6 @@ function Promise:Wait()
 	else
 		local result
 		local bindable = Instance.new("BindableEvent")
-		self._pendingMaid:GiveTask(bindable)
 
 		self:Then(function(...)
 			result = {...}
