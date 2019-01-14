@@ -69,24 +69,24 @@ function Promise:Wait()
 	if self._fulfilled then
 		return unpack(self._fulfilled)
 	elseif self._rejected then
-		return unpack(self._rejected)
+		return error(tostring(self._rejected[1]), 2)
 	else
 		local result
 		local bindable = Instance.new("BindableEvent")
 
 		self:Then(function(...)
 			result = {...}
-			bindable:Fire(true)
+			bindable:Fire()
 		end, function(...)
 			result = {...}
-			bindable:Fire(false)
+			bindable:Fire()
 		end)
 
-		local ok = bindable.Event:Wait()
+		bindable.Event:Wait()
 		bindable:Destroy()
 
-		if not ok then
-			error(tostring(result[1]), 2)
+		if self:IsRejected() then
+			return error(tostring(result[1]), 2)
 		end
 
 		return unpack(result)
