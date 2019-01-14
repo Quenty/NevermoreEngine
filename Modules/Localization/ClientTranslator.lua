@@ -41,6 +41,7 @@ function ClientTranslatorFacade:Init()
 		end
 
 		if translator then
+			assert(typeof(translator) == "Instance")
 			resolve(translator)
 			return
 		end
@@ -59,23 +60,26 @@ function ClientTranslatorFacade:Init()
 		if not asyncTranslatorPromise:IsPending() then
 			return
 		end
-		warn(("[ERR][ClientTranslatorFacade] - GetTranslatorForPlayerAsync is still pending after %f, using local table")
+		asyncTranslatorPromise:Reject(
+			("GetTranslatorForPlayerAsync is still pending after %f, using local table")
 			:format(timeout))
-		local translator = LocalizationService:GetTranslatorForPlayer(Players.LocalPlayer)
-		asyncTranslatorPromise:Fulfill(translator)
 	end)
 
-	self._clientTranslator = asyncTranslatorPromise:Wait()
-	assert(self._clientTranslator)
+	local finalPromise = asyncTranslatorPromise:Catch(function(err)
+		warn(("[ERR][ClientTranslatorFacade] - %s"):format(tostring(err)))
+		local translator = LocalizationService:GetTranslatorForPlayer(Players.LocalPlayer)
+		return translator
+	end)
 
-	print("Done loading")
+	self._clientTranslator = finalPromise:Wait()
+	assert(typeof(self._clientTranslator) == "Instance")
 
 	return self
 end
 
 --- @{inheritDoc}
 function ClientTranslatorFacade:FormatByKey(key, ...)
-	assert(self._clientTranslator)
+	assert(self._clientTranslator, "ClientTranslator is not initialized")
 	assert(type(key) == "string", "Key must be a string")
 	local data = {...}
 	local result
