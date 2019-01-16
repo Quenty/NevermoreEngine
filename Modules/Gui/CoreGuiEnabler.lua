@@ -72,8 +72,8 @@ function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
 	end
 
 	self._states[key] = setmetatable({}, {
-		__newindex = function(self, Index, Value)
-			rawset(realState, Index, Value)
+		__newindex = function(_, index, value)
+			rawset(realState, index, value)
 
 			local newState = isEnabled()
 			if lastState ~= newState then
