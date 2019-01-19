@@ -44,7 +44,7 @@ function Binder:GetClassAddedSignal()
 		return self._classAddedSignal
 	end
 
-	self._classAddedSignal = Signal.new() -- :fire(class)
+	self._classAddedSignal = Signal.new() -- :fire(class, inst)
 	self._maid:GiveTask(self._classAddedSignal)
 	return self._classAddedSignal
 end
@@ -54,7 +54,7 @@ function Binder:GetClassRemovingSignal()
 		return self._classRemovingSignal
 	end
 
-	self._classRemovingSignal = Signal.new() -- :fire(class)
+	self._classRemovingSignal = Signal.new() -- :fire(class, inst)
 	self._maid:GiveTask(self._classRemovingSignal)
 
 	return self._classRemovingSignal
@@ -110,14 +110,14 @@ function Binder:_add(inst)
 	end
 
 	if self._classAddedSignal then
-		self._classAddedSignal:Fire(self._maid[inst])
+		self._classAddedSignal:Fire(self._maid[inst], inst)
 	end
 end
 
 function Binder:_remove(inst)
 	local class = self._maid[inst]
 	if class and self._classRemovingSignal then
-		self._classRemovingSignal:Fire(class)
+		self._classRemovingSignal:Fire(class, inst)
 	end
 
 	self._maid[inst] = nil
