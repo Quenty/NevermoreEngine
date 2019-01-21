@@ -17,7 +17,7 @@ function Color3PropertyTweener.new(object, property)
 
 	local color = self._object[self._property]
 	if typeof(color) ~= "Color3" then
-		error(("Bad property '%s', expected Color3, got '%s"):format(self._property, typeof(color)))
+		error(("Bad property %q, expected Color3, got %q"):format(self._property, typeof(color)))
 	end
 	local h, s, v = Color3.toHSV(color)
 	self._currentState = Spring.new(Vector3.new(h, s, v))
@@ -41,7 +41,7 @@ function Color3PropertyTweener:Update()
 	local current = self._currentState.Value
 	local h, s, v = current.x, current.y, current.z
 
-	local stillUpdating = (current - self._currentState.Target).magnitude >= 1e-3
+	local stillUpdating = (current - self._currentState.Target).Magnitude >= 1e-3
 	if not stillUpdating then
 		local target = self._currentState.Target
 		h, s, v = target.x, target.y, target.z
