@@ -167,8 +167,6 @@ stds.roblox = {
                 FindPartsInRegion3WithIgnoreList = read_write;
                 FindPartsInRegion3WithWhiteList = read_write;
                 GetNumAwakeParts = read_write;
-                GetPhysicsAnalyzerBreakOnIssue = read_write;
-                GetPhysicsAnalyzerIssue = read_write;
                 GetPhysicsThrottling = read_write;
                 GetRealPhysicsFPS = read_write;
                 IsRegion3Empty = read_write;
@@ -176,11 +174,9 @@ stds.roblox = {
                 JoinToOutsiders = read_write;
                 MakeJoints = read_write;
                 PGSIsEnabled = read_write;
-                SetPhysicsAnalyzerBreakOnIssue = read_write;
                 SetPhysicsThrottleEnabled = read_write;
                 UnjoinFromOutsiders = read_write;
                 ZoomToExtents = read_write;
-                PhysicsAnalyzerIssuesFound = read_write;
                 PrimaryPart = read_write_class;
                 BreakJoints = read_write;
                 GetBoundingBox = read_write;
@@ -255,7 +251,7 @@ stds.roblox = {
         CFrame = def_fields({"new", "fromEulerAnglesXYZ", "Angles", "fromOrientation",
             "fromAxisAngle", "fromMatrix"}),
 
-        Color3 = def_fields({"new", "fromRGB", "fromHSV"}),
+        Color3 = def_fields({"new", "fromRGB", "fromHSV", "toHSV"}),
 
         ColorSequence = def_fields({"new"}),
 
