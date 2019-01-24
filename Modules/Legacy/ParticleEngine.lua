@@ -24,7 +24,7 @@ local lib = {}
 local function MakeParticleEngineServer()
 	local Engine = {}
 
-	local RemoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
+	local remoteEvent = require.GetremoteEvent("ParticleEventDistributor")
 
 	local function ParticleNew(p) -- PropertiesTable
 		p.Position = p.Position or error("No Position Yo")
@@ -36,19 +36,19 @@ local function MakeParticleEngineServer()
 		p.Color = p.Color or Color3.new(1,1,1)
 		p.Transparency = p.Transparency or 0.5
 
-		RemoteEvent:FireAllClients(p)
+		remoteEvent:FireAllClients(p)
 
 		return p
 	end
 	Engine.ParticleNew = ParticleNew
 
-	RemoteEvent.OnServerEvent:Connect(function(sender, p)
+	remoteEvent.OnServerEvent:Connect(function(sender, p)
 		-- print("Server -- New particle")
 		p.Global = nil
 
 		for _, player in pairs(Players:GetPlayers()) do
 			if player ~= sender then
-				RemoteEvent:FireClient(player, p)
+				remoteEvent:FireClient(player, p)
 			end
 		end
 	end)
@@ -94,7 +94,7 @@ local function RealMakeEngine(Screen)
 	local Time = tick()
 
 	local Player = Players.LocalPlayer
-	local RemoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
+	local remoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
 
 	local ParticleFrames = {}
 
@@ -164,7 +164,7 @@ local function RealMakeEngine(Screen)
 			if p.Occlusion then
 				local c=Camera.CFrame.p
 				local Vec = p.Position-c
-				local Mag = Vec.magnitude
+				local Mag = Vec.Magnitude
 				if Mag > 999 then
 					Vec = Vec * (999/Mag)
 				end
@@ -288,7 +288,7 @@ local function RealMakeEngine(Screen)
 
 			if Particle.RemoveOnCollision then
 				local Displacement = Particle.Position - OldPosition
-				local Distance = Displacement.magnitude
+				local Distance = Displacement.Magnitude
 
 				if Distance > 999 then
 					Displacement = Displacement * (999/Distance)
@@ -352,22 +352,21 @@ local function RealMakeEngine(Screen)
 	Engine.ParticleUpdate = ParticleUpdate
 
 	local function ParticleNew(p)--PropertiesTable
-		p.Position      = p.Position or v3()
-		p.Velocity      = p.Velocity or v3()
-		p.Size          = p.Size or v2(0.2,0.2)
-		p.Bloom         = p.Bloom or v2()
+		p.Position = p.Position or v3()
+		p.Velocity = p.Velocity or v3()
+		p.Size = p.Size or v2(0.2,0.2)
+		p.Bloom = p.Bloom or v2()
 		p.TablePosition = 1
-		p.Gravity       = p.Gravity or v3()
-		p.Color         = p.Color or Color3.new(1,1,1)
-		p.Transparency  = p.Transparency or 0.5
-
+		p.Gravity = p.Gravity or v3()
+		p.Color = p.Color or Color3.new(1,1,1)
+		p.Transparency = p.Transparency or 0.5
 
 		if p.Global then
 			p.Global = nil
 			local Function, RemoveOnCollision = p.Function, p.RemoveOnCollision
 			p.Function, p.RemoveOnCollision = nil, (p.RemoveOnCollision and true or nil)
 
-			RemoteEvent:FireServer(p)
+			remoteEvent:FireServer(p)
 
 			p.Function, p.RemoveOnCollision = Function, RemoveOnCollision
 		end
@@ -375,7 +374,7 @@ local function RealMakeEngine(Screen)
 		p.LifeTime      = p.LifeTime and p.LifeTime+tick()
 		NewParticles[#NewParticles+1] = p
 	end
-	RemoteEvent.OnClientEvent:Connect(ParticleNew)
+	remoteEvent.OnClientEvent:Connect(ParticleNew)
 	Engine.ParticleNew = ParticleNew
 
 	return Engine
