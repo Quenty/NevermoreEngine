@@ -43,7 +43,7 @@ function ValueObject:__index(index)
 	elseif index == "_value" then
 		return nil -- Edge case
 	else
-		error(("'%s' is not a member of ValueObject"):format(tostring(index)))
+		error(("%q is not a member of ValueObject"):format(tostring(index)))
 	end
 end
 
@@ -58,7 +58,7 @@ function ValueObject:__newindex(index, value)
 			self.Changed:Fire(value, previous, maid)
 		end
 	else
-		error(("'%s' is not a member of ValueObject"):format(tostring(index)))
+		error(("%q is not a member of ValueObject"):format(tostring(index)))
 	end
 end
 

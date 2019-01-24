@@ -34,7 +34,7 @@ function ObjectTweener:RemoveTween(key)
 		end
 	end
 
-	for property, _ in pairs(to_remove) do
+	for property in pairs(to_remove) do
 		self:_removePropertyTweener(property)
 	end
 end
@@ -84,7 +84,7 @@ function ObjectTweener:_getPropertyTweener(property, value)
 
 	local current_val = self._object[property]
 	if typeof(current_val) ~= typeof(value) then
-		error(("Bad type for property '%s' passed in, expected '%s', got '%s'")
+		error(("Bad type for property %q passed in, expected %q, got %q")
 			:format(property, typeof(current_val), typeof(value)))
 	end
 
@@ -94,7 +94,7 @@ function ObjectTweener:_getPropertyTweener(property, value)
 	elseif typeof(current_val) == "Color3" then
 		base_tweener = Color3PropertyTweener.new(self._object, property)
 	else
-		error(("Bad property type! '%s'"):format(type(value)))
+		error(("Bad property type! %q"):format(type(value)))
 	end
 
 	if DEFAULT_SPEEDS[property] then

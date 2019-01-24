@@ -24,7 +24,7 @@ function HttpPromise.Method(methodName, url, ...)
 			result = HttpService[methodName](HttpService, url, unpack(Args))
 		end)
 		if not success then
-			warn(("[HttpPromise] - Failed request '%s'"):format(url), err)
+			warn(("[HttpPromise] - Failed request %q"):format(url), err)
 			return reject(err)
 		else
 			return resolve(result)

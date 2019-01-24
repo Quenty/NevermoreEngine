@@ -178,10 +178,10 @@ end
 function lib.ReadOnly(table)
 	return setmetatable(table, {
 		__index = function(self, index)
-			error(("Bad index '%s'"):format(tostring(index)), 2)
+			error(("Bad index %q"):format(tostring(index)), 2)
 		end;
 		__newindex = function(self, index, value)
-			error(("Bad index '%s'"):format(tostring(index)), 2)
+			error(("Bad index %q"):format(tostring(index)), 2)
 		end;
 	})
 end

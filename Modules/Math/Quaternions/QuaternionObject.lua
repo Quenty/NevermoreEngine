@@ -7,12 +7,9 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Quaternion = require("Quaternion")
 
 local type=type
-local getmetatable=getmetatable
-local setmetatable=setmetatable
 
 local pi=math.pi
 local tau=2*pi
-local sqrt=math.sqrt
 local atan2=math.atan2
 local exp,log=math.exp,math.log
 local cos,sin=math.cos,math.sin
@@ -140,11 +137,11 @@ local function pow(q0,q1)
 		local mm=w0*w0+vv
 		if mm>0 then
 			if vv>0 then
-				local m=sqrt(mm)
-				local s=acos(w0/m)/sqrt(vv)
+				local m=mm^0.5
+				local s=acos(w0/m)/vv^0.5
 				w0,x0,y0,z0=log(m),x0*s,y0*s,z0*s
 			else
-				w0,x0,y0,z0=0.5*log(mm),0,0,0
+				w0,x0,y0,z0=log(mm)/2,0,0,0
 			end
 		else
 			w0,x0,y0,z0=-math.huge,0,0,0
@@ -154,7 +151,7 @@ local function pow(q0,q1)
 		local x,y,z=w0*x1+x0*w1+y0*z1-z0*y1,w0*y1-x0*z1+y0*w1+z0*x1,w0*z1+x0*y1-y0*x1+z0*w1
 		local vv=x*x+y*y+z*z
 		if vv>0 then
-			local v=sqrt(vv)
+			local v=vv^0.5
 			local s=m*sin(v)/v
 			return new(m*cos(v),x*s,y*s,z*s)
 		else
@@ -164,8 +161,8 @@ local function pow(q0,q1)
 		local w,x,y,z=q0.w,q0.x,q0.y,q0.z
 		local vv=x*x+y*y+z*z
 		if vv>0 then
-			local v=sqrt(vv)
-			local m=(w*w+vv)^(0.5*q1)
+			local v=vv^0.5
+			local m=(w*w+vv)^(q1/2)
 			local theta=q1*atan2(v,w)
 			local s=m*sin(theta)/v
 			return new(m*cos(theta),x*s,y*s,z*s)
@@ -184,7 +181,7 @@ local function pow(q0,q1)
 			local m=q0^w
 			local vv=x*x+y*y+z*z
 			if vv>0 then
-				local v=sqrt(vv)
+				local v=vv^0.5
 				local s=m*sin(v)/v
 				return new(m*cos(v),x*s,y*s,z*s)
 			else
@@ -195,7 +192,7 @@ local function pow(q0,q1)
 			local vv=x*x+y*y+z*z
 			local mc,ms=m*cos(pi*w),m*sin(pi*w)
 			if vv>0 then
-				local v=sqrt(vv)
+				local v=vv^0.5
 				local c,s=cos(v),sin(v)/v
 				local vc,vs=mc*s,ms*c*0.57735026918962576450914878050196
 				return new(mc*c-ms*s,vc*x+vs,vc*y+vs,vc*z+vs)--This is probably TERRIBLY wrong, but raising a negative number to the power of a quaternion is ill-defined in the first place.
@@ -216,7 +213,7 @@ metatable.__pow=pow
 Q.pow=pow
 local function length(q)
 	local w,x,y,z=q.w,q.x,q.y,q.z
-	return sqrt(w*w+x*x+y*y+z*z)
+	return (w*w+x*x+y*y+z*z)^0.5
 end
 metatable.__len=length
 Q.length=length
@@ -234,11 +231,11 @@ local function Qlog(q)
 	local mm=w*w+vv
 	if mm>0 then
 		if vv>0 then
-			local m=sqrt(mm)
-			local s=acos(w/m)/sqrt(vv)
+			local m=mm^0.5
+			local s=acos(w/m)/vv^0.5
 			return new(log(m),x*s,y*s,z*s)
 		else
-			return new(0.5*log(mm))--lim v->0 x/v*acos(a/sqrt(a*a+v*v))=0 when a is positive
+			return new(log(mm)/2)--lim v->0 x/v*acos(a/(a*a+v*v)^0.5)=0 when a is positive
 		end
 	else
 		return new(-math.huge)
@@ -251,7 +248,7 @@ local function Qexp(q)
 	local x,y,z=q.x,q.y,q.z
 	local vv=x*x+y*y+z*z
 	if vv>0 then
-		local v=sqrt(vv)
+		local v=vv^0.5
 		local s=m*sin(v)/v
 		return new(m*cos(v),x*s,y*s,z*s)
 	else
@@ -264,7 +261,7 @@ local function Qnormalize(q)
 	local w,x,y,z=q.w,q.x,q.y,q.z
 	local mm=w*w+x*x+y*y+z*z
 	if mm>0 then
-		local m=sqrt(mm)
+		local m=mm^0.5
 		return new(w/m,x/m,y/m,z/m)
 	else
 		return new()
@@ -277,9 +274,9 @@ local function Qsqrt(q)
 	local w,x,y,z=q.w,q.x,q.y,q.z
 	local vv=x*x+y*y+z*z
 	if vv>0 then
-		local m=sqrt(w*w+vv)
-		local s=sqrt((m-w)/(2*vv))
-		return new(sqrt((m+w)/2),x*s,y*s,z*s)
+		local m=(w*w+vv)^0.5
+		local s=((m-w)/(2*vv))^0.5
+		return new(((m+w)/2)^0.5,x*s,y*s,z*s)
 	else
 		return new((w*w)^0.25)
 	end

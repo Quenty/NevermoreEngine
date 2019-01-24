@@ -14,7 +14,7 @@ function lib.Weld(part0, part1, jointType, parent)
 	weld.Part0 = part0
 	weld.Part1 = part1
 	weld.C0 = CFrame.new()
-	weld.C1 = part1.CFrame:toObjectSpace(part0.CFrame)
+	weld.C1 = part1.CFrame:ToObjectSpace(part0.CFrame)
 	weld.Parent = parent or part0
 
 	return weld

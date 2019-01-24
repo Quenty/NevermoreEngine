@@ -26,7 +26,7 @@ function lib.GetOrCreateMesh(part)
 			mesh.Parent = part
 			return mesh
 		else
-			warn(("Unsupported part shape '%s'"):format(tostring(part.Shape)))
+			warn(("Unsupported part shape %q"):format(tostring(part.Shape)))
 			return nil
 		end
 	elseif part:IsA("VehicleSeat") or part:IsA("Seat") then
