@@ -56,7 +56,7 @@ function ProjectilePhysics:__index(index)
 	elseif index == "Age" then
 		return TimeSyncManager:GetTime() - rawget(self, "_time0")
 	else
-		error(("'%s' is not a valid member of ProjectilePhysics"):format(tostring(index)), 2)
+		error(("%q is not a valid member of ProjectilePhysics"):format(tostring(index)), 2)
 	end
 end
 
@@ -76,7 +76,7 @@ function ProjectilePhysics:__newindex(index, value)
 		rawset(self, "_velocity0", velocity)
 		rawset(self, "_acceleration", value)
 	else
-		error(("'%s' is not a valid member of ProjectilePhysics"):format(tostring(index)), 2)
+		error(("%q is not a valid member of ProjectilePhysics"):format(tostring(index)), 2)
 	end
 	rawset(self, "_time0", time)
 end
