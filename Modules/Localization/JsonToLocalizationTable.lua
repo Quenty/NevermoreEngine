@@ -19,18 +19,14 @@ local function recurseAdd(localizationTable, localeId, baseKey, object)
 		if type(value) == "table" then
 			recurseAdd(localizationTable, localeId, key, value)
 		elseif type(value) == "string" then
-			-- Set source to also be key so {my_variable:transate} also translates, since Roblox uses source instead of
-			-- the key -_-
-			local source = key
+			local source = ""
 			local context = ""
+
 			if localeId == "en" then
-				context = ("Originally in English as %q. This entry is generated from JSON and has a unique key."):format(value)
+				source = value
 			end
 
 			localizationTable:SetEntryValue(key, source, context, localeId, value)
-			if localeId == "en" then
-				localizationTable:SetEntryExample(key, source, context, value)
-			end
 		else
 			error("Bad type for value in '" .. key .. "'.")
 		end
