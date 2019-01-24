@@ -1,92 +1,73 @@
--- PartGeometry.lua
+--- Gives out part geoemtry
+-- @module PartGeometry
 -- @author xLEGOx, modified by quenty
--- Gives out part geoemtry
+-- @see http://www.roblox.com/Stravant-MultiMove-item?id=166786055
 
--- From http://www.roblox.com/Stravant-MultiMove-item?id=166786055
+local Workspace = game:GetService("Workspace")
 
 local lib = {}
 
-
----- This one is from 
+---- This one is from
 --- http://www.roblox.com/Stravant-GapFill-item?id=165687726
 local function rightVector(cf)
     local _,_,_,r4,_,_,r7,_,_,r10,_,_ = cf:components()
     return Vector3.new(r4,r7,r10)
 end
-local function leftVector(cf)
-    local _,_,_,r4,_,_,r7,_,_,r10,_,_ = cf:components()
-    return Vector3.new(-r4,-r7,-r10)
-end
+
 local function topVector(cf)
     local _,_,_,_,r5,_,_,r8,_,_,r11,_ = cf:components()
     return Vector3.new(r5,r8,r11)
-end
-local function bottomVector(cf)
-    local _,_,_,_,r5,_,_,r8,_,_,r11,_ = cf:components()
-    return Vector3.new(-r5,-r8,-r11)
 end
 local function backVector(cf)
     local _,_,_,_,_,r6,_,_,r9,_,_,r12 = cf:components()
     return Vector3.new(r6,r9,r12)
 end
-local function frontVector(cf)
-    local _,_,_,_,_,r6,_,_,r9,_,_,r12 = cf:components()
-    return Vector3.new(-r6,-r9,-r12)
-end
-function CFrameFromTopBack(at, top, back)
-    local right = top:Cross(back)
-    return CFrame.new(at.x, at.y, at.z,
-                      right.x, top.x, back.x,
-                      right.y, top.y, back.y,
-                      right.z, top.z, back.z)
+
+local function IsSmoothPart(part)
+    return part:IsA("Part") and (part.Shape == Enum.PartType.Ball)
 end
 
-function IsSmoothPart(part)
-    return part:IsA('Part') and (part.Shape == Enum.PartType.Ball)
-end
-
-local UniformScale = Vector3.new(1, 1, 1)
-function GetShape(part)
-    local mesh;
+local UNIFORM_SCALE = Vector3.new(1, 1, 1)
+local function GetShape(part)
     for _, ch in pairs(part:GetChildren()) do
-        if ch:IsA('SpecialMesh') then
+        if ch:IsA("SpecialMesh") then
             local scale = ch.Scale
             if ch.MeshType == Enum.MeshType.Brick then
-                return 'Brick', scale
+                return "Brick", scale
             elseif ch.MeshType == Enum.MeshType.CornerWedge then
-                return 'CornerWedge', scale
+                return "CornerWedge", scale
             elseif ch.MeshType == Enum.MeshType.Cylinder then
-                return 'Round', scale
+                return "Round", scale
             elseif ch.MeshType == Enum.MeshType.Wedge then
-                return 'Wedge', scale
+                return "Wedge", scale
             elseif ch.MeshType == Enum.MeshType.Sphere then
-                return 'Round', scale
+                return "Round", scale
             else
-                --spawn(function() 
+                --spawn(function()
                 warn("PartGeometry: Unsupported Mesh Type `" .. ch.MeshType.Name .. "`, treating as a normal brick.")
                -- end)
             end
         end
     end
-    if part:IsA('WedgePart') then
-        return 'Wedge', UniformScale
-    elseif part:IsA('CornerWedgePart') then
-        return 'CornerWedge', UniformScale
-    elseif part:IsA('Terrain') then
-        return 'Terrain', UniformScale
-    elseif part:IsA('TrussPart') then
-        return 'Brick', UniformScale
+    if part:IsA("WedgePart") then
+        return "Wedge", UNIFORM_SCALE
+    elseif part:IsA("CornerWedgePart") then
+        return "CornerWedge", UNIFORM_SCALE
+    elseif part:IsA("Terrain") then
+        return "Terrain", UNIFORM_SCALE
+    elseif part:IsA("TrussPart") then
+        return "Brick", UNIFORM_SCALE
     elseif part:IsA("UnionOperation") or part:IsA("MeshPart") then
-        -- Yeah, can't do too much about this. :/
-        return 'Brick', UniformScale
+        -- Yeah, can"t do too much about this. :/
+        return "Brick", UNIFORM_SCALE
     else
         -- BasePart
         if part.Shape == Enum.PartType.Ball then
-            return 'Round', UniformScale
+            return "Round", UNIFORM_SCALE
         elseif part.Shape == Enum.PartType.Cylinder then
-            return 'Round', UniformScale
+            return "Round", UNIFORM_SCALE
         elseif part.Shape == Enum.PartType.Block then
-            return 'Brick', UniformScale
+            return "Brick", UNIFORM_SCALE
         else
             assert(false, "Unreachable")
         end
@@ -94,10 +75,8 @@ function GetShape(part)
 end
 
 --Abondon hope, all ye who enter:
-function GetGeometry(part, hit, cframeOverride)
+local function GetGeometry(part, hit, cframeOverride)
     local cf = cframeOverride or part.CFrame
-
-    local cf = part.CFrame
     local pos = cf.p
     --
     local sx = part.Size.x/2
@@ -108,9 +87,9 @@ function GetGeometry(part, hit, cframeOverride)
     local yvec = topVector(cf)
     local zvec = backVector(cf)
     --
-    local verts, edges, faces;
+    local verts, edges, faces
     --
-    local vertexMargin;
+    local vertexMargin
     --
     local shape, scale = GetShape(part)
     --
@@ -118,7 +97,7 @@ function GetGeometry(part, hit, cframeOverride)
     sy = sy * scale.Y
     sz = sz * scale.Z
     --
-    if shape == 'Brick' then
+    if shape == "Brick" then
         --8 vertices
         verts = {
             pos +xvec*sx  +yvec*sy  +zvec*sz, --top 4
@@ -157,7 +136,7 @@ function GetGeometry(part, hit, cframeOverride)
             {verts[1],  zvec, xvec, {verts[1], verts[3], verts[7], verts[5]}}, --back
             {verts[2], -zvec, xvec, {verts[2], verts[4], verts[8], verts[6]}}, --front
         }
-    elseif shape == 'Round' then
+    elseif shape == "Round" then
         -- just have one face and vertex, at the hit pos
         verts = { hit }
         edges = {} --edge can be selected as the normal of the face if the user needs it
@@ -166,7 +145,7 @@ function GetGeometry(part, hit, cframeOverride)
         faces = {
             {hit, norm, norm2, {}}
         }
-    elseif shape == 'CornerWedge' then
+    elseif shape == "CornerWedge" then
         local slantVec1 = ( zvec*sy + yvec*sz).unit
         local slantVec2 = (-xvec*sy + yvec*sx).unit
         -- 5 verts
@@ -203,7 +182,7 @@ function GetGeometry(part, hit, cframeOverride)
             {verts[1],  slantVec2, zvec, {verts[1], verts[5], verts[4]}},
         }
 
-    elseif shape == 'Wedge' then
+    elseif shape == "Wedge" then
         local slantVec = (-zvec*sy + yvec*sz).unit
         --6 vertices
         verts = {
@@ -238,10 +217,10 @@ function GetGeometry(part, hit, cframeOverride)
             {verts[1],  zvec, xvec, {verts[1], verts[2], verts[5], verts[3]}}, --back
             {verts[2], slantVec, slantVec:Cross(xvec), {verts[2], verts[1], verts[4], verts[6]}}, --slanted
         }
-    elseif shape == 'Terrain' then
-        local cellPos = game.Workspace.Terrain:WorldToCellPreferSolid(hit)
-        local mat, block, orient = game.Workspace.Terrain:GetCell(cellPos.x, cellPos.y, cellPos.z)
-        local pos = game.Workspace.Terrain:CellCenterToWorld(cellPos.x, cellPos.y, cellPos.z)
+    elseif shape == "Terrain" then
+        local cellPos = Workspace.Terrain:WorldToCellPreferSolid(hit)
+        local mat, block, orient = Workspace.Terrain:GetCell(cellPos.x, cellPos.y, cellPos.z)
+        local pos = Workspace.Terrain:CellCenterToWorld(cellPos.x, cellPos.y, cellPos.z)
         --
         vertexMargin = 4
         --
@@ -465,7 +444,7 @@ function GetGeometry(part, hit, cframeOverride)
     --
     local geomId = 0
     --
-    for i, dat in pairs(faces) do
+    for _, dat in pairs(faces) do
         geomId = geomId + 1
         dat.id = geomId
         dat.point = dat[1]
@@ -473,20 +452,20 @@ function GetGeometry(part, hit, cframeOverride)
         dat.direction = dat[3]
         dat.vertices = dat[4]
         dat.part = part
-        dat.type = 'Face'
+        dat.type = "Face"
         --avoid Event bug (if both keys + indicies are present keys are discarded when passing tables)
         dat[1], dat[2], dat[3], dat[4] = nil, nil, nil, nil
     end
-    for i, dat in pairs(edges) do
+    for _, dat in pairs(edges) do
         geomId = geomId + 1
         dat.id = geomId
         dat.a, dat.b = dat[1], dat[2]
         dat.direction = (dat.b-dat.a).unit
-        dat.length = (dat.b-dat.a).magnitude
+        dat.length = (dat.b-dat.a).Magnitude
         dat.edgeMargin = dat[3]
         dat.part = part
         dat.vertexMargin = geometry.vertexMargin
-        dat.type = 'Edge'
+        dat.type = "Edge"
         --avoid Event bug (if both keys + indicies are present keys are discarded when passing tables)
         dat[1], dat[2], dat[3] = nil, nil, nil
     end
@@ -496,7 +475,7 @@ function GetGeometry(part, hit, cframeOverride)
             position = dat;
             id = geomId;
             ignoreUnlessNeeded = IsSmoothPart(part);
-            type = 'Vertex';
+            type = "Vertex";
         }
     end
     --
@@ -511,9 +490,8 @@ end
 lib.getNormal = getNormal
 
 local function close(a, b)
-    return (a - b).magnitude < 0.001
+    return (a - b).Magnitude < 0.001
 end
 lib.close = close
-
 
 return lib
