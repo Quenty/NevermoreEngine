@@ -1,4 +1,4 @@
----
+--- Quaternion data type
 -- @module Quaternion
 -- @author xXxMoNkEyMaNxXx
 

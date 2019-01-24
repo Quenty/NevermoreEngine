@@ -1,4 +1,4 @@
----
+--- Quaternion data type object
 -- @author xXxMoNkEyMaNxXx
 -- @classmod Quaternion
 
@@ -6,14 +6,11 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Quaternion = require("Quaternion")
 
-local type=type
-
-local pi=math.pi
-local tau=2*pi
-local atan2=math.atan2
-local exp,log=math.exp,math.log
-local cos,sin=math.cos,math.sin
-local acos,asin=math.acos,math.asin
+local pi = math.pi
+local atan2 = math.atan2
+local exp, log = math.exp, math.log
+local cos, sin = math.cos, math.sin
+local acos = math.acos
 
 local function TYPE(x)
 	local xMet=getmetatable(x)
