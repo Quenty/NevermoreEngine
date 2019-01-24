@@ -3,18 +3,16 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local RunService = game:GetService("RunService")
+assert(RunService:IsClient())
+
 local DraggableSnackbar = require("DraggableSnackbar")
 
 local SnackbarManager = {}
-SnackbarManager.ClassName = "SnackbarManager"
-SnackbarManager.__index = SnackbarManager
 
-function SnackbarManager.new()
-	local self = setmetatable({}, SnackbarManager)
-
+function SnackbarManager:Init(screenGui)
 	self._currentSnackbar = nil
-
-	return self
+	self:WithScreenGui(screenGui)
 end
 
 --- Sets the screenGui to use
@@ -37,7 +35,6 @@ end
 		};
 ]]
 function SnackbarManager:MakeSnackbar(text, options)
-	assert(self._screenGui, "Must call :WithPlayerGui(PlayerGui) bofore use")
 	assert(type(text) == "string", "text must be a string")
 
 	local snackbar = DraggableSnackbar.new(self._screenGui, text, true, options)
