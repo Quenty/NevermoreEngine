@@ -90,7 +90,7 @@ function Spring:__index(index)
 	elseif index == "Speed" or index == "s" then
 		return rawget(self, "_speed")
 	else
-		error(("'%s' is not a valid member of Spring"):format(tostring(index)), 2)
+		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
 	end
 end
 
@@ -121,7 +121,7 @@ function Spring:__newindex(index, value)
 		rawset(self, "_velocity0", velocity)
 		rawset(self, "_speed", value < 0 and 0 or value)
 	else
-		error(("'%s' is not a valid member of Spring"):format(tostring(index)), 2)
+		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
 	end
 
 	rawset(self, "_time0", time)

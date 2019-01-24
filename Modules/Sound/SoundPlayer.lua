@@ -82,7 +82,7 @@ function SoundPlayer:__index(index)
 			error(("[SoundPlayer] - Bad index '%s.%s' does not exist"):format(self._folder:GetFullName(), tostring(index)))
 		end
 	else
-		error(("[SoundPlayer] - Bad index '%s' on sound player"):format(tostring(index)))
+		error(("[SoundPlayer] - Bad index %q on sound player"):format(tostring(index)))
 	end
 
 	return self
@@ -110,7 +110,7 @@ function SoundPlayer:GetNewSound(soundName, parent)
 	end
 
 	if not sound then
-		warn(("[SoundPlayer] - Unable to get new sound from argument '%s'"):format(tostring(soundName)))
+		warn(("[SoundPlayer] - Unable to get new sound from argument %q"):format(tostring(soundName)))
 		return nil
 	end
 
@@ -123,7 +123,7 @@ end
 function SoundPlayer:PlaySound(soundName, parent)
 	local sound = self:GetNewSound(soundName, parent)
 	if not sound then
-		warn(("[SoundPlayer] - Unable to find sound '%s'"):format(tostring(soundName)))
+		warn(("[SoundPlayer] - Unable to find sound %q"):format(tostring(soundName)))
 		return false
 	end
 
@@ -150,7 +150,7 @@ function SoundPlayer:PlayRandom(methodName, parent, PlayOptions)
 	if #options == 1 then
 		return self[methodName](self, options[1], parent, PlayOptions)
 	elseif #options <= 1 then
-		warn(("[SoundPlayer] - No options to play random sound for '%s'"):format(tostring(self._folder)))
+		warn(("[SoundPlayer] - No options to play random sound for %q"):format(tostring(self._folder)))
 		return false
 	end
 
@@ -172,7 +172,7 @@ function SoundPlayer:PlayMusic(soundName, parent, options)
 
 	local sound = self:GetNewSound(soundName, parent)
 	if not sound then
-		warn(("[SoundPlayer] - Unable to find music '%s'"):format(tostring(soundName)))
+		warn(("[SoundPlayer] - Unable to find music %q"):format(tostring(soundName)))
 		return false
 	end
 

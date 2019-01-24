@@ -62,7 +62,7 @@ function Raycaster:__index(index)
 	elseif Raycaster[index] then
 		return Raycaster[index]
 	else
-		error(("Unknown index '%s'"):format(tostring(index)))
+		error(("Unknown index %q"):format(tostring(index)))
 	end
 end
 
@@ -77,7 +77,7 @@ function Raycaster:__newindex(index, value)
 		assert(type(value) == "function")
 		rawset(self, "_filter", value)
 	else
-		error(("Unknown index '%s'"):format(tostring(index)))
+		error(("Unknown index %q"):format(tostring(index)))
 	end
 end
 
