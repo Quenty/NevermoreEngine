@@ -21,13 +21,15 @@ local ray = Ray.new
 
 local lib = {}
 
+--- 3000 if you have a good computer
+local MAX_PARTICLES = 400
+
 local function RealMakeEngine(Screen)
 	assert(Screen, "Need screen")
 
-	local Engine = {}
-	Engine.Active = true
+	local self = {}
+	self.Active = true
 
-	local MAX_PARTICLES = 400 --lol 3000 if you have a good computer lol.
 
 	--[[
 	To generate a new particle
@@ -94,7 +96,7 @@ local function RealMakeEngine(Screen)
 		Screen = NewScreen
 		print("[ParticleEngine] - NewScreen: " .. Screen:GetFullName())
 	end
-	Engine.SetScreen = SetScreen
+	self.SetScreen = SetScreen
 
 	local function ParticleWind(p)--Position
 		local xy,yz,zx=p.x+p.y,p.y+p.z,p.z+p.x
@@ -176,11 +178,11 @@ local function RealMakeEngine(Screen)
 		local ParticleSize = #Particles
 
 		for Index = 1, #Removing do
-			local Particle = Removing[Index]
+			local particle = Removing[Index]
 
-			if Particle.TablePosition then
-				if Particle.Priority then
-					local Index = Particle.TablePosition
+			if particle.TablePosition then
+				if particle.Priority then
+					local Index = particle.TablePosition
 					while Index < PrioritiySize do
 						Priority[Index] = Priority[Index + 1]
 						Priority[Index].TablePosition = Index
@@ -189,11 +191,11 @@ local function RealMakeEngine(Screen)
 					Priority[PrioritiySize] = nil
 					PrioritiySize = PrioritiySize - 1
 
-					Particle.Frame:Destroy()
-					Particle.Frame = nil
-					Particle.TablePosition = nil
+					particle.Frame:Destroy()
+					particle.Frame = nil
+					particle.TablePosition = nil
 				else
-					local Index = Particle.TablePosition
+					local Index = particle.TablePosition
 					while Index < ParticleSize do
 						Particles[Index] = Particles[Index + 1]
 						Particles[Index].TablePosition = Index
@@ -202,37 +204,28 @@ local function RealMakeEngine(Screen)
 					Particles[ParticleSize] = nil
 					ParticleSize = ParticleSize - 1
 
-					Particle.TablePosition = nil
+					particle.TablePosition = nil
 				end
 			end
 		end
 
 		for Index = 1, #WorkingOn do
-			local Particle = WorkingOn[Index]
-			if Particle.Priority then
-				Particle.Frame = NewParticle("_PriorityParticle")
+			local particle = WorkingOn[Index]
+			if particle.Priority then
+				particle.Frame = NewParticle("_PriorityParticle")
 
-				Priority[#Priority+1] = Particle
+				Priority[#Priority+1] = particle
 			else
-				insert(Particles, 1, Particle)
+				insert(Particles, 1, particle)
 				Particles[MAX_PARTICLES] = nil
 			end
-
-			--[[local LastParticle = Particles[MAX_PARTICLES]
-			if LastParticle then
-				if LastParticle.Frame then
-					LastParticle.Frame:Destroy()
-					LastParticle.Frame = nil
-				end
-				Particles[MAX_PARTICLES] = nil
-			end--]]
 		end
 	end
 
 	local function ParticleRemove(p)
 		RemovingParticles[#RemovingParticles+1] = p
 	end
-	Engine.ParticleRemove = ParticleRemove
+	self.ParticleRemove = ParticleRemove
 
 	--- Handles both priority and regular particles
 	local function HandleParticleUpdate(Camera, CameraInverse, Frame, Particle, t, dt)
@@ -312,7 +305,7 @@ local function RealMakeEngine(Screen)
 		-- _G.AverageProcessTime=_G.AverageProcessTime*0.95+(tick()-t)*0.05
 		-- print(#Priority)
 	end
-	Engine.ParticleUpdate = ParticleUpdate
+	self.ParticleUpdate = ParticleUpdate
 
 	local function ParticleNew(p)--PropertiesTable
 		p.Position = p.Position or v3()
@@ -338,9 +331,9 @@ local function RealMakeEngine(Screen)
 		NewParticles[#NewParticles+1] = p
 	end
 	remoteEvent.OnClientEvent:Connect(ParticleNew)
-	Engine.ParticleNew = ParticleNew
+	self.ParticleNew = ParticleNew
 
-	return Engine
+	return self
 end
 
 local Engine
