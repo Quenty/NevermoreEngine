@@ -18,45 +18,8 @@ local v2 = Vector2.new
 local ud2 = UDim2.new
 local tick = tick
 local ray = Ray.new
+
 local lib = {}
-
---- Required for networking....
-local function MakeParticleEngineServer()
-	local Engine = {}
-
-	local remoteEvent = require.GetremoteEvent("ParticleEventDistributor")
-
-	local function ParticleNew(p) -- PropertiesTable
-		p.Position = p.Position or error("No Position Yo")
-		p.Velocity = p.Velocity or v3()
-		p.Size = p.Size or v2(0.2,0.2)
-		p.Bloom = p.Bloom or v2(0,0)
-		p.Gravity = p.Gravity or v3()
-		p.LifeTime = p.LifeTime;
-		p.Color = p.Color or Color3.new(1,1,1)
-		p.Transparency = p.Transparency or 0.5
-
-		remoteEvent:FireAllClients(p)
-
-		return p
-	end
-	Engine.ParticleNew = ParticleNew
-
-	remoteEvent.OnServerEvent:Connect(function(sender, p)
-		-- print("Server -- New particle")
-		p.Global = nil
-
-		for _, player in pairs(Players:GetPlayers()) do
-			if player ~= sender then
-				remoteEvent:FireClient(player, p)
-			end
-		end
-	end)
-
-	return Engine
-end
-lib.MakeParticleEngineServer = MakeParticleEngineServer
-
 
 local function RealMakeEngine(Screen)
 	assert(Screen, "Need screen")
@@ -64,7 +27,7 @@ local function RealMakeEngine(Screen)
 	local Engine = {}
 	Engine.Active = true
 
-	local MaxParticles = 400 --lol 3000 if you have a good computer lol.
+	local MAX_PARTICLES = 400 --lol 3000 if you have a good computer lol.
 
 	--[[
 	To generate a new particle
@@ -113,7 +76,7 @@ local function RealMakeEngine(Screen)
 	end
 
 	--Generate the GUIs
-	for Index=1, MaxParticles do
+	for Index=1, MAX_PARTICLES do
 		ParticleFrames[Index] = NewParticle("_Particle")
 	end
 
@@ -252,16 +215,16 @@ local function RealMakeEngine(Screen)
 				Priority[#Priority+1] = Particle
 			else
 				insert(Particles, 1, Particle)
-				Particles[MaxParticles] = nil
+				Particles[MAX_PARTICLES] = nil
 			end
 
-			--[[local LastParticle = Particles[MaxParticles]
+			--[[local LastParticle = Particles[MAX_PARTICLES]
 			if LastParticle then
 				if LastParticle.Frame then
 					LastParticle.Frame:Destroy()
 					LastParticle.Frame = nil
 				end
-				Particles[MaxParticles] = nil
+				Particles[MAX_PARTICLES] = nil
 			end--]]
 		end
 	end
@@ -326,7 +289,7 @@ local function RealMakeEngine(Screen)
 
 		local CameraInverse = Camera.CFrame:inverse()
 
-		for Index = 1, MaxParticles do
+		for Index = 1, MAX_PARTICLES do
 			local Particle = Particles[Index]
 			local Frame = ParticleFrames[Index]
 
