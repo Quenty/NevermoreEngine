@@ -1,4 +1,4 @@
----
+--- Rotation model for gamepad controls
 -- @classmod GamepadRotateModel
 -- @author Quenty
 
@@ -31,7 +31,7 @@ do
 	-- the larger K is the more straight/linear the curve gets
 	local k = 0.35
 	local lowerK = 0.8
-	function GamepadRotateModel:SCurveTranform(t)
+	function GamepadRotateModel:_sCurveTranform(t)
 		t = math.clamp(t, -1, 1)
 		if t >= 0 then
 			return (k*t) / (k - t + 1)
@@ -40,26 +40,26 @@ do
 	end
 end
 
-function GamepadRotateModel:ToSCurveSpace(t)
+function GamepadRotateModel:_toSCurveSpace(t)
 	return (1 + self.DEADZONE) * (2*math.abs(t) - 1) - self.DEADZONE
 end
 
-function GamepadRotateModel:FromSCurveSpace(t)
+function GamepadRotateModel:_fromSCurveSpace(t)
 	return t/2 + 0.5
 end
 
-function GamepadRotateModel:GamepadLinearToCurve(ThumbstickPosition)
+function GamepadRotateModel:_gamepadLinearToCurve(ThumbstickPosition)
 	local function OnAxis(AxisValue)
-		local Sign = math.sign(AxisValue)
-		local Point = self:FromSCurveSpace(self:SCurveTranform(self:ToSCurveSpace(math.abs(AxisValue))))
-		return math.clamp(Point * Sign, -1, 1)
+		local sign = math.sign(AxisValue)
+		local point = self:_fromSCurveSpace(self:_sCurveTranform(self:_toSCurveSpace(math.abs(AxisValue))))
+		return math.clamp(point * sign, -1, 1)
 	end
 	return Vector2.new(OnAxis(ThumbstickPosition.x), OnAxis(ThumbstickPosition.y))
 end
 
 function GamepadRotateModel:OutOfDeadzone(inputObject)
-	local StickOffset = inputObject.Position
-	return StickOffset.magnitude >= self.DEADZONE
+	local stickOffset = inputObject.Position
+	return stickOffset.Magnitude >= self.DEADZONE
 end
 
 function GamepadRotateModel:GetThumbstickDeltaAngle()
@@ -88,12 +88,12 @@ function GamepadRotateModel:HandleThumbstickInput(inputObject)
 		self._lastInputObject = inputObject
 
 
-		local StickOffset = self._lastInputObject.Position
-		StickOffset = Vector2.new(StickOffset.x, -StickOffset.y)  -- Invert axis!
+		local stickOffset = self._lastInputObject.Position
+		stickOffset = Vector2.new(stickOffset.x, -stickOffset.y)  -- Invert axis!
 
-		local AdjustedStickOffset = self:GamepadLinearToCurve(StickOffset)
-		self.RampVelocityX.t = AdjustedStickOffset.x * self.SpeedMultiplier.x
-		self.RampVelocityY.t = AdjustedStickOffset.y * self.SpeedMultiplier.y
+		local adjustedStickOffset = self:_gamepadLinearToCurve(stickOffset)
+		self.RampVelocityX.t = adjustedStickOffset.x * self.SpeedMultiplier.x
+		self.RampVelocityY.t = adjustedStickOffset.y * self.SpeedMultiplier.y
 
 		self.IsRotating.Value = true
 	else
