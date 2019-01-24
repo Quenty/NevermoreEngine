@@ -86,7 +86,7 @@ function InputImageLibrary:_pickSheet(index, preferredStyle, preferredPlatform)
 		end
 	end
 
-	warn("[InputImageLibrary] - Unable to find sprite for " .. tostring(index) .. " type " .. typeof(index))
+	warn("[InputImageLibrary] - Unable to find sprite for", tostring(index), "type", typeof(index))
 
 	return nil
 end
