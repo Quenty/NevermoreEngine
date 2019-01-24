@@ -13,6 +13,10 @@ function DebounceTimer.new(length)
 	return self
 end
 
+function DebounceTimer:SetLength(length)
+	self._length = length or error("No length")
+end
+
 function DebounceTimer:Restart()
 	self._startTime = tick()
 end
@@ -26,7 +30,7 @@ function DebounceTimer:IsDone()
 		return true
 	end
 
-	return (tick() - self._startTime) <= self._length
+	return (tick() - self._startTime) >= self._length
 end
 
 return DebounceTimer
