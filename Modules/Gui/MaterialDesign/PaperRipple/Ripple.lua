@@ -18,13 +18,13 @@ function Ripple.new(Gui)
 	local self = setmetatable({}, Ripple)
 
 	self.Gui = Gui
-	self.Container = self.Gui.Parent or error("No container")
+	self._container = self.Gui.Parent or error("No container")
 
-	self.InitialPosition = self.Container.AbsoluteSize / 2
+	self.InitialPosition = self._container.AbsoluteSize / 2
 	self.TargetPosition = self.InitialPosition
 
 	self.InitialTransparency = Gui.ImageTransparency
-	self.TargetRadius = self.Container.AbsoluteSize.magnitude
+	self.TargetRadius = self._container.AbsoluteSize.Magnitude
 
 	-- NOTE: In order to begin, one should call ":Down()"
 	self:Draw()
@@ -83,13 +83,13 @@ end
 
 --- Makes the ripple target the center of the container.
 function Ripple:TargetCenter()
-	self:SetTargetPosition(self.Container.AbsoluteSize / 2)
+	self:SetTargetPosition(self._container.AbsoluteSize / 2)
 end
 
 --- Returns the container of the ripple.
 -- @return The GUI container of the ripple.
 function Ripple:GetContainer()
-	return self.Container
+	return self._container
 end
 
 --- Sets the ink color (of the ripple). Assuming the image is white w/ 0 alpha to get best results
@@ -213,10 +213,8 @@ end
 --- Determines the larger of two container sizes
 -- @return Number, the larger size.
 function Ripple:GetLargestContainerSize()
-
-	local Container = self.Container
-
-	return math.max(Container.AbsoluteSize.X, Container.AbsoluteSize.Y)
+	local container = self._container
+	return math.max(container.AbsoluteSize.X, container.AbsoluteSize.Y)
 end
 
 --- Updates the ripple draw state.
