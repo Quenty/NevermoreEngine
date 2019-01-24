@@ -1,4 +1,3 @@
-## Usage
 Here's an example of using Nevermore
 
 ```lua
