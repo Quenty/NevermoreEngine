@@ -40,7 +40,7 @@ function lib.Ray(ray, color, parent, meshDiameter, diameter)
 	part.Color = color
 	part.Name = "DebugRay"
 	part.Shape = Enum.PartType.Cylinder
-	part.Size = Vector3.new(1 * diameter, ray.Direction.magnitude, 1 * diameter)
+	part.Size = Vector3.new(1 * diameter, ray.Direction.Magnitude, 1 * diameter)
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.5
 

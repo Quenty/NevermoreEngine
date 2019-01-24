@@ -141,7 +141,7 @@ local function bindProcessor()
 		-- Bind thumbsticks
 		maid._inputChanged = UserInputService.InputChanged:Connect(function(inputObject)
 			if inputObject.KeyCode.Name:find("Thumbstick") then
-				if inputObject.Position.magnitude > INPUT_MODES.THUMBSTICK_DEADZONE then
+				if inputObject.Position.Magnitude > INPUT_MODES.THUMBSTICK_DEADZONE then
 					inputProcessor:Evaluate(inputObject)
 				end
 			end
