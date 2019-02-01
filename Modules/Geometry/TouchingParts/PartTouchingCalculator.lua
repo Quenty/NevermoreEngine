@@ -134,8 +134,8 @@ function PartTouchingCalculator:GetTouching(basePart, padding)
 		part = basePart:Clone()
 
 		-- Remove all tags
-		for _, Tag in pairs(CollectionService:GetTags(part)) do
-			CollectionService:RemoveTag(part, Tag)
+		for _, tag in pairs(CollectionService:GetTags(part)) do
+			CollectionService:RemoveTag(part, tag)
 		end
 
 		part:ClearAllChildren()
