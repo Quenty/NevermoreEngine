@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 local ParticleEngineServer = {}
 
 function ParticleEngineServer:Init()
-	self._remoteEvent = require.GetremoteEvent("ParticleEventDistributor")
+	self._remoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
 
 	self._remoteEvent.OnServerEvent:Connect(function(player, particle)
 		self:_replicate(player, particle)
