@@ -137,8 +137,9 @@ function PartTouchingCalculator:GetTouching(basePart, padding)
 		for _, Tag in pairs(CollectionService:GetTags(part)) do
 			CollectionService:RemoveTag(part, Tag)
 		end
+
+		part:ClearAllChildren()
 	end
-	part:ClearAllChildren()
 
 	part.Size = basePart.Size + Vector3.new(padding, padding, padding)
 	part.CFrame = basePart.CFrame
