@@ -1,7 +1,7 @@
 --- debounce a existing function by timeout
 -- @module debounce
 
----
+--- Provides a debounce function call on an operation
 -- @tparam number timeout
 -- @tparam function func
 -- @treturn function
