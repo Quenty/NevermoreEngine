@@ -1,0 +1,37 @@
+site_name: Nevermore Reference
+site_url: https://quenty.github.io/nevermore/
+repo_name: quenty/devstore
+repo_url: https://github.com/quenty/nevermoreengine
+
+theme:
+  name: material
+  palette:
+    primary: 'Light Blue'
+    accent: 'Light Blue'
+docs_dir: 'Doc'
+pages:
+  - Home: index.md
+  - Manual:
+    - Getting started: Manual/getting_started.md
+    - Adding modules: Manual/adding_modules.md
+    - Usage: Manual/usage.md
+    - Using with Rojo: Manual/with_rojo.md
+  - API Reference:
+    - Humanoid:
+      - AnimationPlayer: api/classes/AnimationPlayer.html
+      - CharacterPromiseUtil: api/modules/CharacterPromiseUtil.html
+    - Gui:
+      - ButtonUtils: api/modules/ButtonUtils.html
+    - Camera:
+      - CameraStack: api/modules/CameraStack.html
+    - Util:
+      - Binder: api/classes/Binder.html
+      - fastSpawn: api/modules/FastSpawn.html
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.superfences

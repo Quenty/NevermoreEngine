@@ -7,8 +7,7 @@ Nevermore is a ModuleScript loader for Roblox, and loads modules by name. Neverm
 ]]
 
 file = {'../Modules/Events', '../App', '../Modules/Character', '../Modules/DataStore', '../Modules/Camera', '../Modules/Utility'}
-topics = 'Manual'
-format = 'markdown'
+--format = 'markdown'
 examples = 'Examples'
 
 -- Style options
@@ -21,7 +20,6 @@ not_luadoc=true
 dir = 'api'
 
 -- Custom template
-style = 'Style'
 template ='Style'
 
 
