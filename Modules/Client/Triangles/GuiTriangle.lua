@@ -1,4 +1,4 @@
----
+--- Gui triangle rendering class
 -- @classmod GuiTriangle
 -- http://wiki.roblox.com/index.php?title=2D_triangles
 
@@ -7,7 +7,7 @@ GuiTriangle.__index = GuiTriangle
 GuiTriangle.ClassName = "GuiTriangle"
 GuiTriangle.ExtraPixels = 2
 
-function GuiTriangle.new(Parent)
+function GuiTriangle.new(parent)
 	local self = setmetatable({}, GuiTriangle)
 
 	self.ta = Instance.new("ImageLabel")
@@ -16,7 +16,7 @@ function GuiTriangle.new(Parent)
 
 	self.tb = self.ta:Clone()
 
-	self:SetParent(Parent)
+	self:SetParent(parent)
 	self.a = UDim2.new()
 	self.b = UDim2.new()
 	self.c = UDim2.new()
@@ -24,9 +24,9 @@ function GuiTriangle.new(Parent)
 	return self
 end
 
-function GuiTriangle:SetParent(Parent)
-	self.ta.Parent = Parent
-	self.tb.Parent = Parent
+function GuiTriangle:SetParent(parent)
+	self.ta.Parent = parent
+	self.tb.Parent = parent
 end
 
 function GuiTriangle:Show()
