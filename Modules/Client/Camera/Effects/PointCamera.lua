@@ -9,7 +9,7 @@ local SummedCamera = require("SummedCamera")
 local PointCamera = {}
 PointCamera.ClassName = "PointCamera"
 
----
+--- Initializes a new PointCamera
 -- @constructor
 -- @param originCamera A camera to use
 -- @param focusCamera The Camera to look at.
@@ -26,32 +26,29 @@ function PointCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function PointCamera:__newindex(Index, Value)
-	if Index == "OriginCamera" or Index == "FocusCamera" then
-		rawset(self, Index, Value)
+function PointCamera:__newindex(index, value)
+	if index == "OriginCamera" or index == "FocusCamera" then
+		rawset(self, index, value)
 	else
-		error(Index .. " is not a valid member of PointCamera")
+		error(index .. " is not a valid member of PointCamera")
 	end
 end
 
-function PointCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		local Origin, Focus = self.Origin, self.Focus
+function PointCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
+		local origin, focus = self.Origin, self.Focus
 
-		local State = CameraState.new()
-		State.FieldOfView = Origin.FieldOfView + Focus.FieldOfView
+		local state = CameraState.new()
+		state.FieldOfView = origin.FieldOfView + focus.FieldOfView
+		state.CFrame = CFrame.new(origin.Position, focus.Position)
 
-		State.CFrame = CFrame.new(
-			Origin.Position,
-			Focus.Position)
-
-		return State
-	elseif Index == "Focus" then
+		return state
+	elseif index == "Focus" then
 		return self.FocusCamera.CameraState
-	elseif Index == "Origin" then
+	elseif index == "Origin" then
 		return self.OriginCamera.CameraState
 	else
-		return PointCamera[Index]
+		return PointCamera[index]
 	end
 end
 
