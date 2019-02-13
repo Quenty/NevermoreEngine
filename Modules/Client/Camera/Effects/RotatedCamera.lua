@@ -6,9 +6,8 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
+local getRotationInXZPlane = require("getRotationInXZPlane")
 local SummedCamera = require("SummedCamera")
-local qCFrame = require("qCFrame")
-local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 
 local RotatedCamera = {}
 RotatedCamera.ClassName = "RotatedCamera"
@@ -30,19 +29,19 @@ function RotatedCamera:__add(other)
 end
 
 ---
--- @param XYRotateVector Vector2, the delta rotation to apply
-function RotatedCamera:RotateXY(XYRotateVector)
-	self.AngleX = self.AngleX + XYRotateVector.x
-	self.AngleY = self.AngleY + XYRotateVector.y
+-- @param xzrotvector Vector2, the delta rotation to apply
+function RotatedCamera:RotateXY(xzrotvector)
+	self.AngleX = self.AngleX + xzrotvector.x
+	self.AngleY = self.AngleY + xzrotvector.y
 end
 
 function RotatedCamera:__newindex(index, value)
 	if index == "CFrame" then
-		local XZRotation = GetRotationInXZPlane(value)
-		self.AngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
+		local zxrot = getRotationInXZPlane(value)
+		self.AngleXZ = math.atan2(zxrot.lookVector.x, zxrot.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
-		self.AngleY = math.asin(YRotation)
+		local yrot = zxrot:toObjectSpace(value).lookVector.y
+		self.AngleY = math.asin(yrot)
 	elseif index == "AngleY" then
 		self._AngleY = math.clamp(value, self.MinY, self.MaxY)
 	elseif index == "AngleX" or index == "AngleXZ" then

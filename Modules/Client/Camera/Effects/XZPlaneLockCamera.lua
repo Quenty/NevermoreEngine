@@ -5,16 +5,15 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
-local qCFrame = require("qCFrame")
-local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
+local getRotationInXZPlane = require("getRotationInXZPlane")
 
 local XZPlaneLockCamera = {}
 XZPlaneLockCamera.ClassName = "XZPlaneLockCamera"
 
-function XZPlaneLockCamera.new(Camera)
+function XZPlaneLockCamera.new(camera)
 	local self = setmetatable({}, XZPlaneLockCamera)
 
-	self.Camera = Camera or error("No camera")
+	self.Camera = camera or error("No camera")
 
 	return self
 end
@@ -23,18 +22,18 @@ function XZPlaneLockCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function XZPlaneLockCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		local State = self.Camera.CameraState or self.Camera
-		local XZRotation = GetRotationInXZPlane(State.CFrame)
+function XZPlaneLockCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
+		local state = self.Camera.CameraState or self.Camera
+		local xzrot = getRotationInXZPlane(state.CFrame)
 
-		local NewState = CameraState.new()
-		NewState.CFrame = XZRotation
-		NewState.FieldOfView = State.FieldOfView
+		local newState = CameraState.new()
+		newState.CFrame = xzrot
+		newState.FieldOfView = state.FieldOfView
 
-		return NewState
+		return newState
 	else
-		return XZPlaneLockCamera[Index]
+		return XZPlaneLockCamera[index]
 	end
 end
 

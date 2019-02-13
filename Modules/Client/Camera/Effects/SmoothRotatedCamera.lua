@@ -6,9 +6,9 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
-local SummedCamera = require("SummedCamera")
-local qCFrame = require("qCFrame")
+local getRotationInXZPlane = require("getRotationInXZPlane")
 local Spring = require("Spring")
+local SummedCamera = require("SummedCamera")
 
 local SmoothRotatedCamera = {}
 SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
@@ -43,17 +43,17 @@ end
 
 function SmoothRotatedCamera:__newindex(index, value)
 	if index == "CFrame" then
-		local XZRotation = qCFrame.GetRotationInXZPlane(value)
-		self.AngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
+		local xzrot = getRotationInXZPlane(value)
+		self.AngleXZ = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
-		self.AngleY = math.asin(YRotation)
+		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		self.AngleY = math.asin(yrot)
 	elseif index == "TargetCFrame" then
-		local XZRotation = qCFrame.GetRotationInXZPlane(value)
-		self.TargetAngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
+		local xzrot = getRotationInXZPlane(value)
+		self.TargetAngleXZ = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
-		self.TargetAngleY = math.asin(YRotation)
+		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		self.TargetAngleY = math.asin(yrot)
 	elseif index == "AngleY" then
 		self.SpringY.Value = value
 	elseif index == "AngleX" or index == "AngleXZ" then

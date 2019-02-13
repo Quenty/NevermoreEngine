@@ -5,11 +5,10 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraState = require("CameraState")
-local SummedCamera = require("SummedCamera")
+local getRotationInXZPlane = require("getRotationInXZPlane")
 local qMath = require("qMath")
-local qCFrame = require("qCFrame")
+local SummedCamera = require("SummedCamera")
 
-local GetRotationInXZPlane = qCFrame.GetRotationInXZPlane
 local LerpNumber = qMath.LerpNumber
 
 local PushCamera = {}
@@ -35,10 +34,10 @@ function PushCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 ---
--- @param XYRotateVector Vector2, the delta rotation to apply
-function PushCamera:RotateXY(XYRotateVector)
-	self.AngleX = self.AngleX + XYRotateVector.x
-	self.AngleY = self.AngleY + XYRotateVector.y
+-- @param xzrotVector Vector2, the delta rotation to apply
+function PushCamera:RotateXY(xzrotVector)
+	self.AngleX = self.AngleX + xzrotVector.x
+	self.AngleY = self.AngleY + xzrotVector.y
 end
 
 function PushCamera:StopRotateBack()
@@ -52,17 +51,17 @@ end
 
 function PushCamera:__newindex(index, value)
 	if index == "CFrame" then
-		local XZRotation = GetRotationInXZPlane(value)
-		self.AngleXZ = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
+		local xzrot = getRotationInXZPlane(value)
+		self.AngleXZ = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
-		self.AngleY = math.asin(YRotation)
+		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		self.AngleY = math.asin(yrot)
 	elseif index == "DefaultCFrame" then
-		local XZRotation = GetRotationInXZPlane(value)
-		self.DefaultAngleXZ0 = math.atan2(XZRotation.lookVector.x, XZRotation.lookVector.z) + math.pi
+		local xzrot = getRotationInXZPlane(value)
+		self.DefaultAngleXZ0 = math.atan2(xzrot.lookVector.x, xzrot.lookVector.z) + math.pi
 
-		local YRotation = XZRotation:toObjectSpace(value).lookVector.y
-		self.AngleY = math.asin(YRotation)
+		local yrot = xzrot:toObjectSpace(value).lookVector.y
+		self.AngleY = math.asin(yrot)
 	elseif index == "AngleY" then
 		self._AngleY = math.clamp(value, self.MinY, self.MaxY)
 	elseif index == "AngleX" or index == "AngleXZ" then
