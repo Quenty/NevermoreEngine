@@ -12,11 +12,11 @@ TrackCamera.FieldOfView = 0
 
 --- Make new track camera
 -- @constructor
--- @param[opt] CameraSubject The CameraSubject to look at. A ROBLOX part of ROBLOX model
-function TrackCamera.new(CameraSubject)
+-- @param[opt] cameraSubject The CameraSubject to look at. A Roblox part of Roblox model
+function TrackCamera.new(cameraSubject)
 	local self = setmetatable({}, TrackCamera)
 
-	self.CameraSubject = CameraSubject
+	self.CameraSubject = cameraSubject
 
 	return self
 end
@@ -25,40 +25,40 @@ function TrackCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function TrackCamera:__newindex(Index, Value)
-	if Index == "CameraSubject" then
-		assert(type(Value) == "userdata" or type(Value) == "nil",
-			"CameraSubject must be a ROBLOX Model or ROBLOX Part or nil")
+function TrackCamera:__newindex(index, value)
+	if index == "CameraSubject" then
+		assert(type(value) == "userdata" or type(value) == "nil",
+			"CameraSubject must be a Roblox Model or Roblox Part or nil")
 
-		if type(Value) == "userdata" then
-			assert(Value:IsA("Model") or Value:IsA("BasePart"), "CameraSubject must be a Model or BasePart")
+		if type(value) == "userdata" then
+			assert(value:IsA("Model") or value:IsA("BasePart"), "CameraSubject must be a Model or BasePart")
 		end
 
-		rawset(self, Index, Value)
-	elseif Index == "FieldOfView" then
-		rawset(self, Index, Value)
+		rawset(self, index, value)
+	elseif index == "FieldOfView" then
+		rawset(self, index, value)
 	else
-		error(Index .. " is not a valid member of TrackCamera")
+		error(index .. " is not a valid member of TrackCamera")
 	end
 end
 
-function TrackCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		local CameraSubject = self.CameraSubject
-		local State = CameraState.new()
-		State.FieldOfView = self.FieldOfView
+function TrackCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
+		local cameraSubject = self.CameraSubject
+		local state = CameraState.new()
+		state.FieldOfView = self.FieldOfView
 
-		if CameraSubject then
-			if CameraSubject:IsA("Model") then
-				State.CFrame = CameraSubject:GetPrimaryPartCFrame()
-			elseif CameraSubject:IsA("BasePart") then
-				State.CFrame = CameraSubject.CFrame
+		if cameraSubject then
+			if cameraSubject:IsA("Model") then
+				state.CFrame = cameraSubject:GetPrimaryPartCFrame()
+			elseif cameraSubject:IsA("BasePart") then
+				state.CFrame = cameraSubject.CFrame
 			end
 		end
 
-		return State
+		return state
 	else
-		return TrackCamera[Index]
+		return TrackCamera[index]
 	end
 end
 
