@@ -80,9 +80,9 @@ function InputImageLibrary:_pickSheet(index, preferredStyle, preferredPlatform)
 
 	-- otherwise search (repeats preferred :/ )
 	for _, platformSheets in pairs(self._spritesheets) do
-		local sheet = findSheet(platformSheets)
-		if sheet then
-			return sheet
+		local foundSheet = findSheet(platformSheets)
+		if foundSheet then
+			return foundSheet
 		end
 	end
 
