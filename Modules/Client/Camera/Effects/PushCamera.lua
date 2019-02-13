@@ -15,13 +15,13 @@ local PushCamera = {}
 PushCamera.ClassName = "PushCamera"
 
 -- Max/Min aim up and down
-PushCamera._MaxY = math.rad(80)
-PushCamera._MinY = math.rad(-80)
-PushCamera._AngleXZ0 = 0 -- Initial
-PushCamera._AngleY = 0
+PushCamera._maxY = math.rad(80)
+PushCamera._minY = math.rad(-80)
+PushCamera._angleXZ0 = 0 -- Initial
+PushCamera._angleY = 0
 PushCamera.FadeBackTime = 0.5
 PushCamera.DefaultAngleXZ0 = 0
-PushCamera._LastUpdateTime = -1
+PushCamera._lastUpdateTime = -1
 PushCamera.PushBackAfter = 0.5
 
 function PushCamera.new()
@@ -63,20 +63,20 @@ function PushCamera:__newindex(index, value)
 		local yrot = xzrot:toObjectSpace(value).lookVector.y
 		self.AngleY = math.asin(yrot)
 	elseif index == "AngleY" then
-		self._AngleY = math.clamp(value, self.MinY, self.MaxY)
+		self._angleY = math.clamp(value, self.MinY, self.MaxY)
 	elseif index == "AngleX" or index == "AngleXZ" then
 		self.LastUpdateTime = tick()
-		self._AngleXZ0 = value
+		self._angleXZ0 = value
 	elseif index == "MaxY" then
 		assert(value > self.MinY, "MaxY must be greater than MinY")
-		self._MaxY = value
+		self._maxY = value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif index == "MinY" then
 		assert(value < self.MinY, "MinY must be less than MeeeaxY")
-		self._MaxY = value
+		self._maxY = value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif index == "LastUpdateTime" then
-		self._LastUpdateTime = value
+		self._lastUpdateTime = value
 	elseif PushCamera[index] ~= nil then
 		rawset(self, index, value)
 	else
@@ -90,13 +90,13 @@ function PushCamera:__index(index)
 		State.CFrame = self.CFrame
 		return State
 	elseif index == "LastUpdateTime" then
-		return self._LastUpdateTime
+		return self._lastUpdateTime
 	elseif index == "LookVector" then
 		return self.Rotation.lookVector
 	elseif index == "CFrame" then
 		return CFrame.Angles(0, self.AngleXZ, 0) * CFrame.Angles(self.AngleY, 0, 0)
 	elseif index == "AngleY" then
-		return self._AngleY
+		return self._angleY
 	elseif index == "PushBackDelta" then
 		return tick() - self.LastUpdateTime - self.PushBackAfter
 	elseif index == "PercentFaded" then
@@ -106,11 +106,11 @@ function PushCamera:__index(index)
 		-- A curved value of PercentFaded
 		return self.PercentFaded ^ 2
 	elseif index == "AngleX" or index == "AngleXZ" then
-		return LerpNumber(self._AngleXZ0, self.DefaultAngleXZ0, self.PercentFadedCurved)
+		return LerpNumber(self._angleXZ0, self.DefaultAngleXZ0, self.PercentFadedCurved)
 	elseif index == "MaxY" then
-		return self._MaxY
+		return self._maxY
 	elseif index == "MinY" then
-		return self._MinY
+		return self._minY
 	else
 		return PushCamera[index]
 	end
