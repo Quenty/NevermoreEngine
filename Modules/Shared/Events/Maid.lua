@@ -64,6 +64,11 @@ function Maid:GiveTask(task)
 	return taskId
 end
 
+function Maid:GivePromise(promise)
+	self:GiveTask(promise)
+	return promise
+end
+
 --- Cleans up all tasks.
 -- @alias Destroy
 function Maid:DoCleaning()
