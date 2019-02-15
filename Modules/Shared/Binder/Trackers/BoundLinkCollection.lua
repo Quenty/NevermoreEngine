@@ -1,6 +1,6 @@
 --- Handles searching for bound objects following links (object values) under a parent
 -- with a specific name.
--- @classmod BinderLinkTracker
+-- @classmod BoundLinkCollection
 -- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
@@ -8,12 +8,12 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Maid = require("Maid")
 local Signal = require("Signal")
 
-local BinderLinkTracker = {}
-BinderLinkTracker.ClassName = "BinderLinkTracker"
-BinderLinkTracker.__index = BinderLinkTracker
+local BoundLinkCollection = {}
+BoundLinkCollection.ClassName = "BoundLinkCollection"
+BoundLinkCollection.__index = BoundLinkCollection
 
-function BinderLinkTracker.new(binder, linkName, parent)
-	local self = setmetatable({}, BinderLinkTracker)
+function BoundLinkCollection.new(binder, linkName, parent)
+	local self = setmetatable({}, BoundLinkCollection)
 
 	self._maid = Maid.new()
 
@@ -40,11 +40,11 @@ function BinderLinkTracker.new(binder, linkName, parent)
 	return self
 end
 
-function BinderLinkTracker:HasClass(class)
+function BoundLinkCollection:HasClass(class)
 	return self._classes[class]
 end
 
-function BinderLinkTracker:GetClasses()
+function BoundLinkCollection:GetClasses()
 	local list = {}
 	for class, _ in pairs(self._classes) do
 		table.insert(list, class)
@@ -52,11 +52,11 @@ function BinderLinkTracker:GetClasses()
 	return list
 end
 
-function BinderLinkTracker:HasClass(class)
+function BoundLinkCollection:HasClass(class)
 	return self._classes[class] ~= nil
 end
 
-function BinderLinkTracker:TrackParent(parent)
+function BoundLinkCollection:TrackParent(parent)
 	assert(parent)
 
 	self._maid:GiveTask(parent.ChildAdded:Connect(function(child)
@@ -76,11 +76,11 @@ function BinderLinkTracker:TrackParent(parent)
 	end
 end
 
-function BinderLinkTracker:_removeLink(objValue)
+function BoundLinkCollection:_removeLink(objValue)
 	self._maid[objValue] = nil
 end
 
-function BinderLinkTracker:_handleNewLink(objValue)
+function BoundLinkCollection:_handleNewLink(objValue)
 	local maid = Maid.new()
 
 	maid:GiveTask(objValue.Changed:Connect(function()
@@ -96,7 +96,7 @@ function BinderLinkTracker:_handleNewLink(objValue)
 	self:_handleLinkChanged(objValue)
 end
 
-function BinderLinkTracker:_handleLinkChanged(objValue)
+function BoundLinkCollection:_handleLinkChanged(objValue)
 	self:_removeLinkCanidates(objValue)
 
 	if objValue.Value then
@@ -104,7 +104,7 @@ function BinderLinkTracker:_handleLinkChanged(objValue)
 	end
 end
 
-function BinderLinkTracker:_removeLinkCanidates(objValue)
+function BoundLinkCollection:_removeLinkCanidates(objValue)
 	local canidate = self._linkCanidate[objValue]
 	if not canidate then
 		return
@@ -113,7 +113,7 @@ function BinderLinkTracker:_removeLinkCanidates(objValue)
 	self._linkCanidate[objValue] = nil
 
 	if not self._canidates[canidate] then
-		error("[BinderLinkTracker] - Got link canidate that isn''t real. This shouldn't happen.")
+		error("[BoundLinkCollection] - Got link canidate that isn''t real. This shouldn't happen.")
 		return
 	end
 
@@ -125,7 +125,7 @@ function BinderLinkTracker:_removeLinkCanidates(objValue)
 	end
 end
 
-function BinderLinkTracker:_removeCanidate(canidate)
+function BoundLinkCollection:_removeCanidate(canidate)
 	self._canidates[canidate] = nil
 
 	local class = self._binder:Get(canidate)
@@ -136,7 +136,7 @@ function BinderLinkTracker:_removeCanidate(canidate)
 	self:_removeClass(class)
 end
 
-function BinderLinkTracker:_addCanidate(objValue, canidate)
+function BoundLinkCollection:_addCanidate(objValue, canidate)
 	assert(not self._linkCanidate[objValue], "Should not have existing canidate set for link")
 
 	self._linkCanidate[objValue] = canidate
@@ -153,7 +153,7 @@ function BinderLinkTracker:_addCanidate(objValue, canidate)
 	self:_addClass(class)
 end
 
-function BinderLinkTracker:_removeClass(class)
+function BoundLinkCollection:_removeClass(class)
 	if not self._classes[class] then
 		return
 	end
@@ -162,7 +162,7 @@ function BinderLinkTracker:_removeClass(class)
 	self.ClassRemoved:Fire(class)
 end
 
-function BinderLinkTracker:_addClass(class)
+function BoundLinkCollection:_addClass(class)
 	if self._classes[class] then
 		return
 	end
@@ -171,7 +171,7 @@ function BinderLinkTracker:_addClass(class)
 	self.ClassAdded:Fire(class)
 end
 
-function BinderLinkTracker:_handleNewClassBound(class, inst)
+function BoundLinkCollection:_handleNewClassBound(class, inst)
 	if not self._canidates[inst] then
 		return
 	end
@@ -179,9 +179,9 @@ function BinderLinkTracker:_handleNewClassBound(class, inst)
 	self:_addClass(class)
 end
 
-function BinderLinkTracker:Destroy()
+function BoundLinkCollection:Destroy()
 	self._maid:Destroy()
 	setmetatable(self, nil)
 end
 
-return BinderLinkTracker
+return BoundLinkCollection
