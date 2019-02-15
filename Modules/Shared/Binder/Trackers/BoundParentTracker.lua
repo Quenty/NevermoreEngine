@@ -1,18 +1,17 @@
 --- Tracks a parent bound to a specific binder
--- @classmod BinderTracker
--- @author Quenty
+-- @classmod BoundParentTracker
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
 
-local BinderTracker = setmetatable({}, BaseObject)
-BinderTracker.ClassName = "BinderTracker"
-BinderTracker.__index = BinderTracker
+local BoundParentTracker = setmetatable({}, BaseObject)
+BoundParentTracker.ClassName = "BoundParentTracker"
+BoundParentTracker.__index = BoundParentTracker
 
-function BinderTracker.new(binder, child)
-	local self = setmetatable(BaseObject.new(), BinderTracker)
+function BoundParentTracker.new(binder, child)
+	local self = setmetatable(BaseObject.new(), BoundParentTracker)
 
 	self._child = child or error("No child")
 	self._binder = binder or error("No binder")
@@ -37,7 +36,7 @@ function BinderTracker.new(binder, child)
 	return self
 end
 
-function BinderTracker:_update()
+function BoundParentTracker:_update()
 	local parent = self._child.Parent
 	if not parent then
 		self.Class.Value = nil
@@ -47,4 +46,4 @@ function BinderTracker:_update()
 	self.Class.Value = self._binder:Get(parent)
 end
 
-return BinderTracker
+return BoundParentTracker
