@@ -3,7 +3,7 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local qMath = require("qMath")
+local Math = require("Math")
 
 local ModelAppearance = {}
 ModelAppearance.ClassName = "ModelAppearance"
@@ -70,7 +70,7 @@ function ModelAppearance:SetTransparency(transparency)
 
 	self._transparency = transparency
 	for part, properties in pairs(self._parts) do
-		part.Transparency = qMath.MapNumber(transparency, 0, 1, properties.Transparency, 1)
+		part.Transparency = Math.MapNumber(transparency, 0, 1, properties.Transparency, 1)
 	end
 end
 

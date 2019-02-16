@@ -3,15 +3,15 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local qMath = require("qMath")
+local Math = require("Math")
 local Spring = require("Spring")
-
-local MapNumber = qMath.MapNumber
 
 local RotatingCharacter = {}
 RotatingCharacter.ClassName = "RotatingCharacter"
 RotatingCharacter._Transparency = 0
-RotatingCharacter.SpaceCode = 96 -- The key to use (ASCII) that acts as a space. So we get animations that move to this as a hidden value..
+
+-- The key to use (ASCII) that acts as a space. So we get animations that move to this as a hidden value.
+RotatingCharacter.SpaceCode = 96
 
 function RotatingCharacter.new(Gui)
 	local self = setmetatable({}, RotatingCharacter)
@@ -60,7 +60,7 @@ function RotatingCharacter:__index(Index)
 		local Default = (self.Position % 1)
 
 		-- Adjust transparency upwards based upon velocity
-		Default = MapNumber(Default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
+		Default = Math.MapNumber(Default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
 
 		local Modifier = (1 - self.Transparency)
 
@@ -94,7 +94,7 @@ function RotatingCharacter:__newindex(Index, Value)
 		for _, Data in pairs(self.TransparencyList) do
 			local Transparency = TransparencyMap[Data.Gui] or error("Gui not in transparency map");
 			for PropertyName, DefaultValue in pairs(Data.Default) do
-				Data.Gui[PropertyName] = MapNumber(Transparency, 0, 1, DefaultValue, 1)
+				Data.Gui[PropertyName] = Math.MapNumber(Transparency, 0, 1, DefaultValue, 1)
 			end
 		end
 	else

@@ -8,7 +8,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local qGUI = require("qGUI")
 local Maid = require("Maid")
-local qMath = require("qMath")
+local Math = require("Math")
 
 -- Base clase, not functional
 local Snackbar = {}
@@ -168,14 +168,14 @@ function Snackbar:SetBackgroundTransparency(Transparency)
 		item.ImageTransparency = Transparency
 	end
 	for _, item in pairs(self.ShadowImages) do
-		item.ImageTransparency = qMath.MapNumber(Transparency, 0, 1, 0.74, 1)
+		item.ImageTransparency = Math.MapNumber(Transparency, 0, 1, 0.74, 1)
 	end
 end
 
 function Snackbar:FadeOutTransparency(PercentFaded)
 	if PercentFaded then
-		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 0, 1))
-		self._textLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 0.13, 1)
+		self:SetBackgroundTransparency(Math.MapNumber(PercentFaded, 0, 1, 0, 1))
+		self._textLabel.TextTransparency = Math.MapNumber(PercentFaded, 0, 1, 0.13, 1)
 
 		if self._callToActionButton then
 			self._callToActionButton.TextTransparency = PercentFaded
@@ -207,9 +207,9 @@ end
 --- Will animate unless given PercentFaded
 function Snackbar:FadeInTransparency(PercentFaded)
 	if PercentFaded then
-		-- self.Gui.BackgroundTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0)
-		self:SetBackgroundTransparency(qMath.MapNumber(PercentFaded, 0, 1, 1, 0))
-		self._textLabel.TextTransparency = qMath.MapNumber(PercentFaded, 0, 1, 1, 0.13)
+		-- self.Gui.BackgroundTransparency = Math.MapNumber(PercentFaded, 0, 1, 1, 0)
+		self:SetBackgroundTransparency(Math.MapNumber(PercentFaded, 0, 1, 1, 0))
+		self._textLabel.TextTransparency = Math.MapNumber(PercentFaded, 0, 1, 1, 0.13)
 
 		if self._callToActionButton then
 			self._callToActionButton.TextTransparency = PercentFaded

@@ -6,10 +6,8 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local CameraState = require("CameraState")
 local getRotationInXZPlane = require("getRotationInXZPlane")
-local qMath = require("qMath")
+local Math = require("Math")
 local SummedCamera = require("SummedCamera")
-
-local LerpNumber = qMath.LerpNumber
 
 local PushCamera = {}
 PushCamera.ClassName = "PushCamera"
@@ -106,7 +104,7 @@ function PushCamera:__index(index)
 		-- A curved value of PercentFaded
 		return self.PercentFaded ^ 2
 	elseif index == "AngleX" or index == "AngleXZ" then
-		return LerpNumber(self._angleXZ0, self.DefaultAngleXZ0, self.PercentFadedCurved)
+		return Math.LerpNumber(self._angleXZ0, self.DefaultAngleXZ0, self.PercentFadedCurved)
 	elseif index == "MaxY" then
 		return self._maxY
 	elseif index == "MinY" then
