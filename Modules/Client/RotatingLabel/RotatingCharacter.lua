@@ -8,104 +8,112 @@ local Spring = require("Spring")
 
 local RotatingCharacter = {}
 RotatingCharacter.ClassName = "RotatingCharacter"
-RotatingCharacter._Transparency = 0
+RotatingCharacter._transparency = 0
 
 -- The key to use (ASCII) that acts as a space. So we get animations that move to this as a hidden value.
-RotatingCharacter.SpaceCode = 96
+local SPACE_CODE = 96
+local SPRING_VALUES = {
+	Target = true;
+	Velocity = true;
+	Speed = true;
+	Position = true;
+	Value = true;
+	Damper = true;
+}
 
 function RotatingCharacter.new(Gui)
 	local self = setmetatable({}, RotatingCharacter)
 
 	self.Gui = Gui
-	self.Label = self.Gui.Label
-	self.LabelTwo = self.Label.SecondLabel
 
-	self.Spring = Spring.new(0)
+	self._label = self.Gui.Label
+	self._labelTwo = self._label.SecondLabel
+	self._spring = Spring.new(0)
 
 	self.TargetCharacter = " "
 	self.Character = self.TargetCharacter
 
 	self.TransparencyList = setmetatable({}, {
-		__newindex = function(transparencyList, Index, Value)
-			rawset(transparencyList, Index, {
-				Gui = Value;
+		__newindex = function(transparencyList, index, value)
+			rawset(transparencyList, index, {
+				Gui = value;
 				Default = {
-					TextTransparency = Value.TextTransparency;
-					TextStrokeTransparency = Value.TextStrokeTransparency;
+					TextTransparency = value.TextTransparency;
+					TextStrokeTransparency = value.TextStrokeTransparency;
 				};
 			})
 		end;
 	})
-	self.TransparencyList[1] = self.Label
-	self.TransparencyList[2] = self.LabelTwo
+	self.TransparencyList[1] = self._label
+	self.TransparencyList[2] = self._labelTwo
 	self.Transparency = self.Transparency -- Force update
 
 	return self
 end
 
-function RotatingCharacter:__index(Index)
-	if Index == "Character" then
-		return self:IntToChar(self.Value)
-	elseif Index == "IsDoneAnimating" then
+function RotatingCharacter:__index(index)
+	if index == "Character" then
+		return self:_intToChar(self.Value)
+	elseif index == "IsDoneAnimating" then
 		return math.abs(self.Velocity) < 0.05 and math.abs(self.Target - self.Value) < 0.05
-	elseif Index == "NextCharacter" then
-		return self:IntToChar(self.Value+1) -- For rendering purposes.
-	elseif Index == "Target" or Index == "Velocity" or Index == "Speed" or Index == "Position" or Index == "Value" or Index == "Damper" then
-		return self.Spring[Index]
-	elseif Index == "TargetCharacter" then
-		return self:IntToChar(self.Target)
-	elseif Index == "Transparency" then
-		return self._Transparency
-	elseif Index == "TransparencyMap" then
-		local Default = (self.Position % 1)
+	elseif index == "NextCharacter" then
+		return self:_intToChar(self.Value+1) -- For rendering purposes.
+	elseif SPRING_VALUES[index] then
+		return self._spring[index]
+	elseif index == "TargetCharacter" then
+		return self:_intToChar(self.Target)
+	elseif index == "Transparency" then
+		return self._transparency
+	elseif index == "TransparencyMap" then
+		local default = (self.Position % 1)
 
 		-- Adjust transparency upwards based upon velocity
-		Default = Math.MapNumber(Default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
+		default = Math.MapNumber(default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
 
-		local Modifier = (1 - self.Transparency)
+		local modifier = (1 - self.Transparency)
 
 		return {
-			[self.Label] = Default*Modifier;
-			[self.LabelTwo] = (1 - Default)*Modifier;
+			[self._label] = default*modifier;
+			[self._labelTwo] = (1 - default)*modifier;
 		}
 	else
-		return RotatingCharacter[Index]
+		return RotatingCharacter[index]
 	end
 end
 
-function RotatingCharacter:__newindex(Index, Value)
-	if Index == "Character" then
-		assert(#Value == 1, "Character must be length 1 (at) " .. #Value)
-		self.Value = self:CharToInt(Value)
-	elseif Index == "TargetCharacter" then
-		assert(#Value == 1, "Character must be length 1 (at) " .. #Value)
-		self.Target = self:CharToInt(Value)
-	elseif Index == "Target" or Index == "Velocity" or Index == "Speed" or Index == "Position" or Index == "Value" or Index == "Damper" then
-		self.Spring[Index] = Value
-	elseif Index == "Transparency" then
-		self._Transparency = Value
+function RotatingCharacter:__newindex(index, value)
+	if index == "Character" then
+		assert(#value == 1, "Character must be length 1 (at) " .. #value)
+		self.Value = self:CharToInt(value)
+	elseif index == "TargetCharacter" then
+		assert(#value == 1, "Character must be length 1 (at) " .. #value)
+		self.Target = self:CharToInt(value)
+	elseif SPRING_VALUES[index] then
+		self._spring[index] = value
+	elseif index == "Transparency" then
+		self._transparency = value
 
 		-- We need to call this because if transparency updates and we hit past "IsDoneAnimating" but not past
 		-- actual position updates, the TransparencyMap is wrong.
 		self:UpdatePositionRender()
 
-		local TransparencyMap = self.TransparencyMap
+		local transparencyMap = self.TransparencyMap
 
-		for _, Data in pairs(self.TransparencyList) do
-			local Transparency = TransparencyMap[Data.Gui] or error("Gui not in transparency map");
-			for PropertyName, DefaultValue in pairs(Data.Default) do
-				Data.Gui[PropertyName] = Math.MapNumber(Transparency, 0, 1, DefaultValue, 1)
+		for _, data in pairs(self.TransparencyList) do
+			local transparency = transparencyMap[data.Gui] or error("Gui not in transparency map");
+			for property, propValue in pairs(data.Default) do
+				data.Gui[property] = Math.MapNumber(transparency, 0, 1, propValue, 1)
 			end
 		end
 	else
-		rawset(self, Index, Value)
+		rawset(self, index, value)
 	end
 end
 
 function RotatingCharacter:UpdatePositionRender()
-	self.Label.Text = self.Character
-	self.LabelTwo.Text = self.NextCharacter
-	self.Label.Position = UDim2.new(0, 0, -(self.Position % 1), 0)
+	self._label.Text = self.Character
+	self._labelTwo.Text = self.NextCharacter
+	self._label.Position = UDim2.new(0, 0, -(self.Position % 1), 0)
 end
 
 function RotatingCharacter:UpdateRender()
@@ -115,19 +123,18 @@ function RotatingCharacter:UpdateRender()
 	return self.IsDoneAnimating
 end
 
-function RotatingCharacter:IntToChar(Value)
-	Value = math.floor(Value)
-	return Value == self.SpaceCode and " " or string.char(Value)
+function RotatingCharacter:_intToChar(value)
+	value = math.floor(value)
+	return value == SPACE_CODE and " " or string.char(value)
 end
 
-function RotatingCharacter:CharToInt(Char)
-	return Char == " " and self.SpaceCode or string.byte(Char)
+function RotatingCharacter:CharToInt(char)
+	return char == " " and SPACE_CODE or string.byte(char)
 end
 
 function RotatingCharacter:Destroy()
 	self.Gui:Destroy()
 	self.Gui = nil
-
 	setmetatable(self, nil)
 end
 
