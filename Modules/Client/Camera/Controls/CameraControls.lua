@@ -113,13 +113,13 @@ function CameraControls:_getVelocityTracker(strength, startVelocity)
 	local velocity = startVelocity
 
 	return {
-		Update = function(self, delta)
+		Update = function(this, delta)
 			local elapsed = tick() - lastUpdate
 			lastUpdate = tick()
 			velocity = velocity / (2^(elapsed/strength)) + (delta / (0.0001 + elapsed)) * strength
 		end;
-		GetVelocity = function(self)
-			self:Update(startVelocity*0)
+		GetVelocity = function(this)
+			this:Update(startVelocity*0)
 			return velocity
 		end;
 	}
@@ -289,7 +289,7 @@ function CameraControls:Enable()
 			self:_handleThumbstickInput(inputObject)
 		end, false, Enum.KeyCode.Thumbstick2)
 
-		self._maid:GiveTask(UserInputService.TouchPinch:Connect(function(touchPositions, scale, velocity, userInputState, gameProcessed)
+		self._maid:GiveTask(UserInputService.TouchPinch:Connect(function(touchPositions, scale, velocity, userInputState)
 			self:_handleTouchPinch(scale, velocity, userInputState)
 		end))
 

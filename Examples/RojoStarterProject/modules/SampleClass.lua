@@ -1,6 +1,5 @@
 --- Sample class with Nevermore
 -- @classmod SampleClass
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
