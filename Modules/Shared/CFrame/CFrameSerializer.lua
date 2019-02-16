@@ -41,10 +41,10 @@ function lib.OutputRotationAzure(cf)
 	return {px, py, pz, azumith, roll, elevation}
 end
 
-function lib.ReadRotationAzure(Table)
-	local azumith = Table[4]
-	local roll = Table[5] --Buffer:ReadSigned(21)
-	local elevation = Table[6] --Buffer:ReadSigned(21)
+function lib.ReadRotationAzure(data)
+	local azumith = data[4]
+	local roll = data[5] --Buffer:ReadSigned(21)
+	local elevation = data[6] --Buffer:ReadSigned(21)
 	--
 	azumith = PI * (azumith/bitSize22)
 	roll = PI * (roll/bitSize21)
@@ -55,7 +55,7 @@ function lib.ReadRotationAzure(Table)
 	--rot = rot * Angles(0, 0, roll)
 	local rot = Angles(0, azumith, 0) * Angles(elevation, 0, roll)
 	--
-	return rot + Vector3.new(Table[1], Table[2], Table[3]) --, azumith, roll, elevation}
+	return rot + Vector3.new(data[1], data[2], data[3]) --, azumith, roll, elevation}
 end
 
 return lib
