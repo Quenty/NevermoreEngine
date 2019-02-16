@@ -42,6 +42,10 @@ function Promise.new(value)
 	return self
 end
 
+function Promise.fulfilled(...)
+	return Promise.new():Fulfill(...)
+end
+
 function Promise.resolved(...)
 	return Promise.new():Resolve(...)
 end
