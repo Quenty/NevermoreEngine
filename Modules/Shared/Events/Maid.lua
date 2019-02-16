@@ -65,7 +65,13 @@ function Maid:GiveTask(task)
 end
 
 function Maid:GivePromise(promise)
-	self:GiveTask(promise)
+	local id = self:GiveTask(promise)
+
+	-- Ensure GC
+	promise:Finally(function()
+		self[id] = nil
+	end)
+
 	return promise
 end
 
