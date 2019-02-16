@@ -168,14 +168,14 @@ function Snackbar:SetBackgroundTransparency(Transparency)
 		item.ImageTransparency = Transparency
 	end
 	for _, item in pairs(self.ShadowImages) do
-		item.ImageTransparency = Math.MapNumber(Transparency, 0, 1, 0.74, 1)
+		item.ImageTransparency = Math.map(Transparency, 0, 1, 0.74, 1)
 	end
 end
 
 function Snackbar:FadeOutTransparency(PercentFaded)
 	if PercentFaded then
-		self:SetBackgroundTransparency(Math.MapNumber(PercentFaded, 0, 1, 0, 1))
-		self._textLabel.TextTransparency = Math.MapNumber(PercentFaded, 0, 1, 0.13, 1)
+		self:SetBackgroundTransparency(Math.map(PercentFaded, 0, 1, 0, 1))
+		self._textLabel.TextTransparency = Math.map(PercentFaded, 0, 1, 0.13, 1)
 
 		if self._callToActionButton then
 			self._callToActionButton.TextTransparency = PercentFaded
@@ -207,9 +207,9 @@ end
 --- Will animate unless given PercentFaded
 function Snackbar:FadeInTransparency(PercentFaded)
 	if PercentFaded then
-		-- self.Gui.BackgroundTransparency = Math.MapNumber(PercentFaded, 0, 1, 1, 0)
-		self:SetBackgroundTransparency(Math.MapNumber(PercentFaded, 0, 1, 1, 0))
-		self._textLabel.TextTransparency = Math.MapNumber(PercentFaded, 0, 1, 1, 0.13)
+		-- self.Gui.BackgroundTransparency = Math.map(PercentFaded, 0, 1, 1, 0)
+		self:SetBackgroundTransparency(Math.map(PercentFaded, 0, 1, 1, 0))
+		self._textLabel.TextTransparency = Math.map(PercentFaded, 0, 1, 1, 0.13)
 
 		if self._callToActionButton then
 			self._callToActionButton.TextTransparency = PercentFaded

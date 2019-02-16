@@ -70,7 +70,7 @@ function ModelAppearance:SetTransparency(transparency)
 
 	self._transparency = transparency
 	for part, properties in pairs(self._parts) do
-		part.Transparency = Math.MapNumber(transparency, 0, 1, properties.Transparency, 1)
+		part.Transparency = Math.map(transparency, 0, 1, properties.Transparency, 1)
 	end
 end
 

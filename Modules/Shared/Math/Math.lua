@@ -4,23 +4,26 @@
 local Math = {}
 
 --- Maps a number from one range to another
--- Make sure old range is not 0
-function Math.MapNumber(value, min, max, newMin, newMax)
-	return (((value - min) * (newMax - newMin)) / (max - min)) + newMin
+function Math.map(num, min0, max0, min1, max1)
+	if max0 == min0 then
+		error("Range of zero")
+	end
+
+	return (((num - min0)*(max1 - min1)) / (max0 - min0)) + min1
 end
 
 --- Interpolates betweeen two numbers, given an percent
--- @tparam {number} low A number, the first one, should be less than high
--- @tparam {number} high A number, the second one, should be greater than high
--- @tparam {number} percent The percent, a number in the range [0, 1], that will be used to define
---              how interpolated it is between ValueOne And high
--- @treturn {number} The lerped number.
-function Math.LerpNumber(low, high, percent)
-	return low + ((high - low) * percent)
+-- @tparam {number} num0 Number
+-- @tparam {number} num1 Second number
+-- @tparam {number} percent The percent, a number in the range that will be used to define
+--              how interpolated it is between num0 and num1
+-- @treturn {number} The interpolated
+function Math.lerp(num0, num1, percent)
+	return num0 + ((num1 - num0) * percent)
 end
 
 --- Solving for angle across from c
-function Math.LawOfCosines(a, b, c)
+function Math.lawOfCosines(a, b, c)
 	local l = (a*a + b*b - c*c) / (2 * a * b)
 	local angle = math.acos(l)
 	if angle ~= angle then

@@ -68,7 +68,7 @@ function RotatingCharacter:__index(index)
 		local default = (self.Position % 1)
 
 		-- Adjust transparency upwards based upon velocity
-		default = Math.MapNumber(default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
+		default = Math.map(default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
 
 		local modifier = (1 - self.Transparency)
 
@@ -102,7 +102,7 @@ function RotatingCharacter:__newindex(index, value)
 		for _, data in pairs(self.TransparencyList) do
 			local transparency = transparencyMap[data.Gui] or error("Gui not in transparency map");
 			for property, propValue in pairs(data.Default) do
-				data.Gui[property] = Math.MapNumber(transparency, 0, 1, propValue, 1)
+				data.Gui[property] = Math.map(transparency, 0, 1, propValue, 1)
 			end
 		end
 	else

@@ -104,7 +104,7 @@ function PushCamera:__index(index)
 		-- A curved value of PercentFaded
 		return self.PercentFaded ^ 2
 	elseif index == "AngleX" or index == "AngleXZ" then
-		return Math.LerpNumber(self._angleXZ0, self.DefaultAngleXZ0, self.PercentFadedCurved)
+		return Math.lerp(self._angleXZ0, self.DefaultAngleXZ0, self.PercentFadedCurved)
 	elseif index == "MaxY" then
 		return self._maxY
 	elseif index == "MinY" then
