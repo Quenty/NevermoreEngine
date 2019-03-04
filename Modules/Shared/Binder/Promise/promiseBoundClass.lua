@@ -1,4 +1,4 @@
----
+--- Utility function to promise a bound class on an object
 -- @function promiseBoundClass
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
