@@ -23,6 +23,7 @@ function BoundChildCollection.new(binder, parent)
 	self.ClassRemoved = Signal.new() -- :Fire(class)
 
 	self._classes = {} -- [class] = true
+	self._size = 0
 
 	self._maid:GiveTask(self._binder:GetClassAddedSignal():Connect(function(...)
 		self:_handleNewClassBound(...)
@@ -40,6 +41,10 @@ end
 -- @return true if the class exists, nil otherwise
 function BoundChildCollection:HasClass(class)
 	return self._classes[class]
+end
+
+function BoundChildCollection:GetSize()
+	return self._size
 end
 
 --- Returns the raw classes variable as [class] = true
@@ -105,6 +110,7 @@ function BoundChildCollection:_addClass(class, doNotFire)
 	end
 
 	self._classes[class] = true
+	self._size = self._size + 1
 	if not doNotFire then
 		self.ClassAdded:Fire(class)
 	end
@@ -116,6 +122,7 @@ function BoundChildCollection:_removeClass(class)
 	end
 
 	self._classes[class] = nil
+	self._size = self._size - 1
 	self.ClassRemoved:Fire(class)
 end
 
