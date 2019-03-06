@@ -23,6 +23,21 @@ function Binder.new(tagName, class)
 
 	self._loading = setmetatable({}, {__mode = "kv"})
 
+	delay(5, function()
+		if not self._loaded then
+			warn("Binder is not loaded. Call :Init() on it!")
+		end
+	end)
+
+	return self
+end
+
+function Binder:Init()
+	if self._loaded then
+		return
+	end
+	self._loaded = true
+
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
 		fastSpawn(function()
 			self:_add(inst)
@@ -35,8 +50,6 @@ function Binder.new(tagName, class)
 	self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(self._tagName):Connect(function(inst)
 		self:_remove(inst)
 	end))
-
-	return self
 end
 
 function Binder:GetClassAddedSignal()
