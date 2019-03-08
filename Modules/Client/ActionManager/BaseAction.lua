@@ -117,7 +117,7 @@ function BaseAction:ToggleActivate(...)
 	if self:IsEnabled() then
 		self.IsActivatedValue.Value = not (self.IsActivatedValue.Value)
 	else
-		warn("[BaseAction][ToggleActivate] - Not activating, not enabled")
+		warn("[BaseAction.ToggleActivate] - Not activating, not enabled")
 		self.IsActivatedValue.Value = false
 	end
 end
@@ -137,7 +137,7 @@ function BaseAction:Activate(...)
 	if self:IsEnabled() then
 		self.IsActivatedValue.Value = true
 	else
-		warn(("[%s][Activate] - Not activating. Disabled!"):format(self:GetName()))
+		warn(("[%s.Activate] - Not activating. Disabled!"):format(self:GetName()))
 	end
 end
 
