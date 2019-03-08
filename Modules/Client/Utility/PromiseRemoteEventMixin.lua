@@ -24,7 +24,7 @@ function PromiseRemoteEventMixin:PromiseRemoteEvent()
 	end
 
 	self._remoteEventPromise = promiseChild(self._obj, self._remoteEventName)
-	self._maid:GiveTask(self._remoteEventPromise)
+	self._maid:GivePromise(self._remoteEventPromise)
 
 	return self._remoteEventPromise
 end
