@@ -33,7 +33,7 @@ end
 
 function Spritesheet:GetSprite(index)
 	if not index then
-		warn("[Spritesheet][GetSprite] - Image name cannot be nil")
+		warn("[Spritesheet.GetSprite] - Image name cannot be nil")
 		return nil
 	end
 
