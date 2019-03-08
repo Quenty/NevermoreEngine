@@ -12,6 +12,7 @@ function lib.Trim(str, pattern)
 	return (str:gsub("^"..pattern.."*(.-)"..pattern.."*$", "%1"))
 end
 
+--- Sets it to UpperCamelCase
 function lib.ToCamelCase(str)
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
