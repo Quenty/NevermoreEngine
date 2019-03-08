@@ -54,8 +54,8 @@ end
 --- Client sends back message to get the SM_Difference.
 -- @return slaveMasterDifference
 function MasterClock:_handleDelayRequest(timeThree)
-    local TimeFour = self:GetTime()
-    return TimeFour - timeThree -- -offset + SM Delay
+    local timeFour = self:GetTime()
+    return timeFour - timeThree -- -offset + SM Delay
 end
 
 
@@ -81,7 +81,7 @@ end
 
 function SlaveClock:GetTime()
 	if not self:IsSynced() then
-		warn("[SlaveClock.GetTime] - Slave clock is not yet synced")
+		warn("[SlaveClock.GetTime] - Slave clock is not yet synced", debug.traceback())
 		return self:_getLocalTime()
 	end
 
