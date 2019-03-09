@@ -1,12 +1,11 @@
 --- General character utility code.
 -- @module CharacterUtil
--- @alias lib
 
 local Players = game:GetService("Players")
 
-local lib = {}
+local CharacterUtil = {}
 
-function lib.GetPlayerHumanoid(player)
+function CharacterUtil.GetPlayerHumanoid(player)
 	local character = player.Character
 	if not character then
 		return nil
@@ -15,8 +14,8 @@ function lib.GetPlayerHumanoid(player)
 	return character:FindFirstChildOfClass("Humanoid")
 end
 
-function lib.GetAlivePlayerHumanoid(player)
-	local humanoid = lib.GetPlayerHumanoid(player)
+function CharacterUtil.GetAlivePlayerHumanoid(player)
+	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
 	end
@@ -24,8 +23,8 @@ function lib.GetAlivePlayerHumanoid(player)
 	return humanoid
 end
 
-function lib.GetAlivePlayerRootPart(player)
-	local humanoid = lib.GetPlayerHumanoid(player)
+function CharacterUtil.GetAlivePlayerRootPart(player)
+	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
 	end
@@ -33,8 +32,8 @@ function lib.GetAlivePlayerRootPart(player)
 	return humanoid.RootPart
 end
 
-function lib.GetPlayerRootPart(player)
-	local humanoid = lib.GetPlayerHumanoid(player)
+function CharacterUtil.GetPlayerRootPart(player)
+	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
 	if not humanoid then
 		return nil
 	end
@@ -42,8 +41,8 @@ function lib.GetPlayerRootPart(player)
 	return humanoid.RootPart
 end
 
-function lib.UnequipTools(player)
-	local humanoid = lib.GetPlayerHumanoid(player)
+function CharacterUtil.UnequipTools(player)
+	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
 	if humanoid then
 		humanoid:UnequipTools()
 	end
@@ -53,7 +52,7 @@ end
 -- @param descendant A child of the potential character.
 -- @treturn Player player
 -- @treturn Character charcater
-function lib.GetPlayerFromCharacter(descendant)
+function CharacterUtil.GetPlayerFromCharacter(descendant)
 	local character = descendant
 	local player = Players:GetPlayerFromCharacter(character)
 
@@ -69,4 +68,4 @@ function lib.GetPlayerFromCharacter(descendant)
 	return player
 end
 
-return lib
+return CharacterUtil
