@@ -60,6 +60,7 @@ local function asyncCache(func)
 	end
 end
 
+
 --- Retrieves an instance from a parent
 local function retrieve(parent, className)
 	assert(type(className) == "string", "Error: className must be a string")
@@ -215,30 +216,17 @@ end
 local lib = {}
 
 --- Load a library
--- @function LoadLibrary
+-- @function require
 -- @tparam Variant LibraryName Can either be a ModuleScript or string
 -- @treturn Variant Library
-lib.LoadLibrary = asyncCache(debugLoading(getLibraryLoader(libCache)))
-lib.require = lib.LoadLibrary
-
---- Get a remote event
--- @function GetRemoteEvent
--- @tparam string RemoteEventName
--- @treturn RemoteEvent RemoteEvent
-lib.GetRemoteEvent = asyncCache(retrieve(getSubFolder("RemoteEvents"), "RemoteEvent"))
-
---- Get a remote function
--- @function GetRemoteFunction
--- @tparam string RemoteFunctionName
--- @treturn RemoteFunction RemoteFunction
-lib.GetRemoteFunction = asyncCache(retrieve(getSubFolder("RemoteFunctions"), "RemoteFunction"))
+lib.require = asyncCache(debugLoading(getLibraryLoader(libCache)))
 
 setmetatable(lib, {
 	__call = function(self, ...)
-		return self.LoadLibrary(...)
+		return lib.require(...)
 	end;
 	__index = function(self, index)
-		return lib.LoadLibrary(index)
+		return lib.require(index)
 	end;
 })
 
