@@ -17,6 +17,8 @@ function lib.ToCamelCase(str)
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
 	str = str:gsub("^%a", string.upper)
+	str = str:gsub("%p", "")
+
 	return str
 end
 
@@ -24,6 +26,8 @@ function lib.ToLowerCamelCase(str)
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
 	str = str:gsub("^%a", string.lower)
+	str = str:gsub("%p", "")
+
 	return str
 end
 
