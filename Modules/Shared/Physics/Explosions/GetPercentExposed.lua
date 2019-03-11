@@ -18,23 +18,18 @@ local function getRandomUnitVector()
 end
 
 --- Searches for percent exposure of all parts given
--- @param parts Whitelist parts to search for
 -- @tparam Vector3 point point to search
 -- @tparam number Radius
 -- @return A table mapping parts to to percent exposure
-function lib.Search(parts, point, radius)
+function lib.Search(point, radius)
 	local hits = {}
-	for _, part in pairs(parts) do
-		hits[part] = 0
-	end
-
 	local totalHits = 0
 	for _=1, lib.RAY_COUNT do
 		local ray = Ray.new(point, getRandomUnitVector() * radius)
-		local part = Workspace:FindPartOnRayWithWhitelist(ray, parts, true) -- Ignore water
+		local part = Workspace:FindPartOnRay(ray, true) -- Ignore water
 		if part then
 			totalHits = totalHits + 1
-			hits[part] = hits[part] + 1
+			hits[part] = (hits[part] or 0) + 1
 		end
 	end
 
