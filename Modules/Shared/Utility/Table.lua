@@ -30,6 +30,21 @@ function lib.Merge(orig, new)
 	return tab
 end
 
+--- Shallow merges two lists without modifying either
+-- @tparam table orig original table
+-- @tparam table new new table
+-- @treturn table
+function lib.MergeLists(orig, new)
+	local tab = {}
+	for _, val in pairs(orig) do
+		table.insert(tab, val)
+	end
+	for _, val in pairs(new) do
+		table.insert(tab, val)
+	end
+	return tab
+end
+
 --- Swaps keys with vvalues, overwriting additional values if duplicated
 -- @tparam table orig original table
 -- @treturn table
