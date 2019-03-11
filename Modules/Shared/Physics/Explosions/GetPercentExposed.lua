@@ -26,7 +26,7 @@ function lib.Search(point, radius)
 	local totalHits = 0
 	for _=1, lib.RAY_COUNT do
 		local ray = Ray.new(point, getRandomUnitVector() * radius)
-		local part = Workspace:FindPartOnRay(ray, true) -- Ignore water
+		local part = Workspace:FindPartOnRay(ray, nil, true) -- Ignore water
 		if part then
 			totalHits = totalHits + 1
 			hits[part] = (hits[part] or 0) + 1
