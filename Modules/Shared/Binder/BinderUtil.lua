@@ -19,6 +19,9 @@ function BinderUtil.FindFirstAncestor(binder, child)
 end
 
 function BinderUtil.GetChildren(binder, parent)
+	assert(type(binder) == "table", "Binder must be binder")
+	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
+
 	local objects = {}
 	for _, item in pairs(parent:GetChildren()) do
 		local obj = binder:Get(item)
