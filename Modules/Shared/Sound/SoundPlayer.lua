@@ -101,9 +101,9 @@ function SoundPlayer:GetNewSound(soundName, parent)
 
 	local sound
 	if type(soundName) == "string" then
-		local SoundObject = self._soundMap[soundName:lower()]
-		if SoundObject then
-			sound = SoundObject:Clone()
+		local soundObject = self._soundMap[soundName:lower()]
+		if soundObject then
+			sound = soundObject:Clone()
 		end
 	elseif typeof(soundName) == "Instance" and soundName:IsA("Sound") then
 		sound = soundName:Clone()
