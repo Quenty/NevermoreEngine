@@ -53,6 +53,12 @@ function ProjectilePhysics:__index(index)
 		return velocity
 	elseif index == "Acceleration" then
 		return rawget(self, "_acceleration")
+	elseif index == "StartTime" then
+		return rawget(self, "_time0")
+	elseif index == "StartPosition" then
+		return rawget(self, "_position0")
+	elseif index == "StartVelocity" then
+		return rawget(self, "_velocity0")
 	elseif index == "Age" then
 		return TimeSyncManager:GetTime() - rawget(self, "_time0")
 	else
