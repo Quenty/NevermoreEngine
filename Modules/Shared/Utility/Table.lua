@@ -214,4 +214,13 @@ function lib.DeepReadOnly(table)
 	return lib.ReadOnly(table)
 end
 
+--- Quickly removes the value at index index in table table
+-- @tparam table table Table to remove value from.
+-- @tparam any index Index to remove from the table.
+function lib.FastRemove(table, index)
+	local size = #table
+	table[index] = table[size]
+	table[size] = nil
+end
+
 return lib
