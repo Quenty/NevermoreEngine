@@ -93,7 +93,7 @@ function CameraControls:_handleTouchPinch(scale, velocity, userInputState)
 				self._zoomedCamera.TargetZoom = self._startZoomScale*1/scale
 				self._zoomedCamera.Zoom = self._zoomedCamera.TargetZoom
 			else
-				warn("No self._startZoomScale")
+				warn("[CameraControls._handleTouchPinch] - No self._startZoomScale")
 			end
 		end
 	end
