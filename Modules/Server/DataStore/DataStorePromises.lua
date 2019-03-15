@@ -46,5 +46,19 @@ function DataStorePromises.UpdateAsync(datastore, key, updateFunc)
 	end)
 end
 
+function DataStorePromises.SetAsync(datastore, key, value)
+	assert(datastore)
+	assert(type(key) == "string")
+
+	return Promise.new(function(resolve, reject)
+		local ok, err = pcall(function()
+			datastore:SetAsync(key, value)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		return resolve(true)
+	end)
+end
 
 return DataStorePromises
