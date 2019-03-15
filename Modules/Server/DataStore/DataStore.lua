@@ -6,7 +6,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local DataStoreStage = require("DataStoreStage")
 local DataStorePromises = require("DataStorePromises")
 local Promise = require("Promise")
-local Table = require("Table")
 local Maid = require("Maid")
 local Signal = require("Signal")
 
