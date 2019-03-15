@@ -75,8 +75,8 @@ end
 function DataStore:_saveData(writer)
 	local maid = Maid.new()
 
-	local promise;
-	promise = DataStorePromises.UpdateAsync(self._robloxDataStore, self._key, function(data)
+	local promise
+	promise = maid:GivePromise(DataStorePromises.UpdateAsync(self._robloxDataStore, self._key, function(data)
 		if promise:IsRejected() then
 			-- Cancel if we're already overwritten
 			return nil
@@ -88,9 +88,10 @@ function DataStore:_saveData(writer)
 
 		return data
 	end):Catch(function(err)
+		-- Might be caused by Maid rejecting state
 		warn("[DataStore] - Failed to UpdateAsync data", err)
-	end)
-	maid:GivePromise(promise)
+		return Promise.rejected(err)
+	end))
 
 	self._maid._saveMaid = maid
 
