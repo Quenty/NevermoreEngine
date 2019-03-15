@@ -3,64 +3,67 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local BaseObject = require("BaseObject")
+local DataStoreStage = require("DataStoreStage")
 local DataStorePromises = require("DataStorePromises")
 local Promise = require("Promise")
 local Table = require("Table")
 local Maid = require("Maid")
 local Signal = require("Signal")
 
-local DataStore = setmetatable({}, BaseObject)
+local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
 DataStore.__index = DataStore
 
 function DataStore.new(dataStore, key)
-	local self = setmetatable(BaseObject.new(), DataStore)
+	local self = setmetatable(DataStoreStage.new(), DataStore)
 
 	self._key = key or error("No key")
 	self._dataStore = dataStore or error("No dataStore")
-	self._writers = {}
 
 	self.Saving = Signal.new() -- :Fire(promise)
 
 	return self
 end
 
-function DataStore:IsLoadSuccessful()
-	return self._promiseData and self._promiseData:IsFulfilled()
+function DataStore:DidLoadFail()
+	if not self._loadPromise then
+		return false
+	end
+
+	if self._loadPromise:IsRejected() then
+		return true
+	end
+
+	return false
 end
 
 function DataStore:PromiseLoadSuccessful()
-	return self._maid:GivePromise(self:_promiseData()):Then(function(data)
+	return self._maid:GivePromise(self:_promiseLoad()):Then(function()
 		return true
+	end):Catch(function()
+		return false
 	end)
 end
 
-function DataStore:AddWriteCallback(name, func)
-	assert(type(name) == "string")
-	assert(type(func) == "function")
-	assert(not self._writers[name])
-
-	self._writers[name] = func
-end
-
+-- Saves all stored data
 function DataStore:Save()
-	if not self:IsLoadSuccessful() then
+	if self:DidLoadFail() then
 		warn("[DataStore] - Not saving, failed to load")
 		return Promise.rejected("Load not successful, not saving")
 	end
 
-	local data = {}
-
-	for name, writer in pairs(self._writers) do
-		data[name] = writer()
+	if not self:HasWritableData() then
+		-- Nothing to save, don't update anything
+		print("[DataStore.Save] - Not saving, nothing staged")
+		return Promise.fulfilled(nil)
 	end
 
-	return self:_saveData(data)
+	return self:_saveData(self:GetNewWriter())
 end
 
+-- Loads data. This returns the originally loaded data.
 function DataStore:Load(name, defaultValue)
-	return self:_promiseData()
+	return self:_promiseLoad()
 		:Then(function(data)
 			if data[name] == nil then
 				return defaultValue
@@ -70,12 +73,9 @@ function DataStore:Load(name, defaultValue)
 		end)
 end
 
-function DataStore:_saveData(saveDataRaw)
-	assert(type(saveDataRaw) == "table")
-
+function DataStore:_saveData(writer)
 	local maid = Maid.new()
 
-	local saveDataCopy = Table.DeepCopy(saveDataRaw)
 	local promise;
 	promise = DataStorePromises.UpdateAsync(self._dataStore, self._key, function(data)
 		if promise:IsRejected() then
@@ -83,15 +83,15 @@ function DataStore:_saveData(saveDataRaw)
 			return nil
 		end
 
-		for key, value in pairs(saveDataCopy) do
-			data[key] = value
-		end
+		data = data or {}
+
+		writer:WriteMerge(data)
 
 		return data
 	end):Catch(function(err)
 		warn("[DataStore] - Failed to UpdateAsync data", err)
 	end)
-	maid:GivePromise(self._promiseData)
+	maid:GivePromise(promise)
 
 	self._maid._saveMaid = maid
 
@@ -100,12 +100,12 @@ function DataStore:_saveData(saveDataRaw)
 	return promise
 end
 
-function DataStore:_promiseData(breakCache)
-	if self._promiseData and (not breakCache) then
-		return self._promiseData
+function DataStore:_promiseLoad()
+	if self._loadPromise then
+		return self._loadPromise
 	end
 
-	self._promiseData = DataStorePromises.GetAsync(self._dataStore, self._key):Then(function(data)
+	self._loadPromise = DataStorePromises.GetAsync(self._dataStore, self._key):Then(function(data)
 		if data == nil then
 			return {}
 		elseif type(data) == "table" then
@@ -116,9 +116,9 @@ function DataStore:_promiseData(breakCache)
 	end):Catch(function(err)
 		warn("[DataStore] - Failed to GetAsync data", err)
 	end)
-	self._maid:GivePromise(self._promiseData)
+	self._maid:GivePromise(self._loadPromise)
 
-	return self._promiseData
+	return self._loadPromise
 end
 
 return DataStore
