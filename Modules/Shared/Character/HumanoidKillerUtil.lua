@@ -3,11 +3,7 @@
 
 local HumanoidKillerUtil = {}
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
 local Debris = game:GetService("Debris")
-
-local CharacterUtil = require("CharacterUtil")
 
 -- For legacy reasons we use creator tag
 local TAG_NAME = "creator"
@@ -31,17 +27,6 @@ function HumanoidKillerUtil.TagKiller(humanoid, attacker)
 	Debris:Add(creator, TAG_LIFETIME)
 
 	return creator
-end
-
-function HumanoidKillerUtil.GetKillerOfPlayer(player)
-	assert(typeof(player) == "Instance")
-
-	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
-	if not humanoid then
-		return nil
-	end
-
-	return HumanoidKillerUtil.GetKillerOfHumanoid(humanoid)
 end
 
 function HumanoidKillerUtil.GetKillerOfHumanoid(humanoid)
