@@ -4,9 +4,10 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Maid = require("Maid")
-local ValueObject = require("ValueObject")
 local fastSpawn = require("fastSpawn")
+local Maid = require("Maid")
+local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local HumanoidTracker = {}
 HumanoidTracker.ClassName = "HumanoidTracker"
@@ -38,6 +39,8 @@ function HumanoidTracker.new(player)
 		fastSpawn(self._handleCharacter, self, self._player.Character)
 	end
 
+	self.HumanoidDied = Signal.new()
+	self._maid:GiveTask(self.HumanoidDied)
 
 	return self
 end
@@ -78,6 +81,7 @@ function HumanoidTracker:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
 
 	maid:GiveTask(newHumanoid.Died:Connect(function()
 		self.AliveHumanoid.Value = nil
+		self.HumanoidDied:Fire(newHumanoid)
 	end))
 end
 
