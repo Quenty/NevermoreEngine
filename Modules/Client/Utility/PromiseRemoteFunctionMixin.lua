@@ -19,14 +19,7 @@ end
 
 -- Initialize PromiseRemoteFunctionMixin
 function PromiseRemoteFunctionMixin:PromiseRemoteFunction()
-	if self._remoteEventPromise then
-		return self._remoteEventPromise
-	end
-
-	self._remoteEventPromise = promiseChild(self._obj, self._remoteFunctionName)
-	self._maid:GiveTask(self._remoteEventPromise)
-
-	return self._remoteEventPromise
+	return self._maid:GivePromise(promiseChild(self._obj, self._remoteFunctionName))
 end
 
 
