@@ -39,7 +39,7 @@ function DataStoreStage:GetSubStore(name)
 	end
 
 	if self._takenKeys[name] then
-		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
+		error(("[DataStoreStage.GetSubStore] - Already have a writer for %q"):format(name))
 	end
 
 	local newStore = DataStoreStage.new()
@@ -88,9 +88,9 @@ function DataStoreStage:GetNewWriter()
 		writer:SetRawData(self._dataToSave)
 	end
 
-	for name, child in pairs(self._stores) do
-		if child:HasWritableData() then
-			writer:AddWriter(name, child:GetNewWriter())
+	for name, store in pairs(self._stores) do
+		if store:HasWritableData() then
+			writer:AddWriter(name, store:GetNewWriter())
 		end
 	end
 

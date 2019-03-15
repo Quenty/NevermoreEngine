@@ -9,6 +9,8 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 local Signal = require("Signal")
 
+local DEBUG_WRITING = false
+
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
 DataStore.__index = DataStore
@@ -75,23 +77,25 @@ end
 function DataStore:_saveData(writer)
 	local maid = Maid.new()
 
-	local promise
-	promise = maid:GivePromise(DataStorePromises.UpdateAsync(self._robloxDataStore, self._key, function(data)
+	local promise = Promise.new()
+	promise:Resolve(maid:GivePromise(DataStorePromises.UpdateAsync(self._robloxDataStore, self._key, function(data)
 		if promise:IsRejected() then
-			-- Cancel if we're already overwritten
+			-- Cancel if we have another request
 			return nil
 		end
 
-		data = data or {}
+		data = writer:WriteMerge(data or {})
 
-		writer:WriteMerge(data)
+		if DEBUG_WRITING then
+			print("Writing", game:GetService("HttpService"):JSONEncode(data))
+		end
 
 		return data
 	end):Catch(function(err)
 		-- Might be caused by Maid rejecting state
 		warn("[DataStore] - Failed to UpdateAsync data", err)
 		return Promise.rejected(err)
-	end))
+	end)))
 
 	self._maid._saveMaid = maid
 

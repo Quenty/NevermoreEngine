@@ -46,6 +46,8 @@ function DataStoreWriter:WriteMerge(original)
 
 		original[key] = writer:WriteMerge(original[key])
 	end
+
+	return original
 end
 
 return DataStoreWriter
