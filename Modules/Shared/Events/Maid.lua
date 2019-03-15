@@ -65,14 +65,19 @@ function Maid:GiveTask(task)
 end
 
 function Maid:GivePromise(promise)
-	local id = self:GiveTask(promise)
+	if not promise:IsPending() then
+		return promise
+	end
+
+	local newPromise = promise.resolved(promise)
+	local id = self:GiveTask(newPromise)
 
 	-- Ensure GC
-	promise:Finally(function()
+	newPromise:Finally(function()
 		self[id] = nil
 	end)
 
-	return promise
+	return newPromise
 end
 
 --- Cleans up all tasks.
