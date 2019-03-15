@@ -34,7 +34,7 @@ function PlayerDataStoreManager.new(datastore, keyGenerator)
 	end))
 
 	game:BindToClose(function()
-		self:PromiseFinish():Wait()
+		self:PromiseAllSaves():Wait()
 	end)
 
 	return self
@@ -53,11 +53,11 @@ function PlayerDataStoreManager:GetDataStore(player)
 	return self:_createDataStore(player)
 end
 
-function PlayerDataStoreManager:PromiseFinish()
+function PlayerDataStoreManager:PromiseAllSaves()
 	for player, _ in pairs(self._datastores) do
 		self:_removePlayerDataStore(player)
 	end
-	return PromiseUtils.all(self._pendingSaves:GetAll())
+	return self._maid:GivePromise(PromiseUtils.all(self._pendingSaves:GetAll()))
 end
 
 function PlayerDataStoreManager:_createDataStore(player)
@@ -89,6 +89,10 @@ function PlayerDataStoreManager:_removePlayerDataStore(player)
 	-- Prevent double removal or additional issues
 	self._datastores[player] = nil
 	self._maid._savingConns[player] = nil
+end
+
+function PlayerDataStoreManager:_getKey(player)
+	return self._keyGenerator(player)
 end
 
 return PlayerDataStoreManager
