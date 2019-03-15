@@ -26,8 +26,8 @@ function PlayerDataStoreManager.new(datastore, keyGenerator)
 
 	self._datastores = {} -- [player] = datastore
 	self._removing = {} -- [player] = true
-
 	self._pendingSaves = PendingPromiseTracker.new()
+	self._removingCallbacks = {} -- [func, ...]
 
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
 		self:_removePlayerDataStore(player)
@@ -38,6 +38,11 @@ function PlayerDataStoreManager.new(datastore, keyGenerator)
 	end)
 
 	return self
+end
+
+--- Adds a callback to be called before save on removal
+function PlayerDataStoreManager:AddRemovingCallback(callback)
+	table.insert(self._removingCallbacks, callback)
 end
 
 function PlayerDataStoreManager:GetDataStore(player)
@@ -81,6 +86,11 @@ function PlayerDataStoreManager:_removePlayerDataStore(player)
 	end
 
 	self._removing[player] = true
+
+	for _, func in pairs(self._removingCallbacks) do
+		func(player)
+	end
+
 	datastore:Save():Finally(function()
 		datastore:Destroy()
 		self._removing[player] = nil
