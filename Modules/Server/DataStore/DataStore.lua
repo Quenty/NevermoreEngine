@@ -4,7 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local BaseObject = require("BaseObject")
-local DatastorePromises = require("DatastorePromises")
+local DataStorePromises = require("DataStorePromises")
 local Promise = require("Promise")
 local Table = require("Table")
 local Maid = require("Maid")
@@ -77,7 +77,7 @@ function DataStore:_saveData(saveDataRaw)
 
 	local saveDataCopy = Table.DeepCopy(saveDataRaw)
 	local promise;
-	promise = DatastorePromises.UpdateAsync(self._dataStore, self._key, function(data)
+	promise = DataStorePromises.UpdateAsync(self._dataStore, self._key, function(data)
 		if promise:IsRejected() then
 			-- Cancel if we're already overwritten
 			return nil
@@ -105,7 +105,7 @@ function DataStore:_promiseData(breakCache)
 		return self._promiseData
 	end
 
-	self._promiseData = DatastorePromises.GetAsync(self._dataStore, self._key):Then(function(data)
+	self._promiseData = DataStorePromises.GetAsync(self._dataStore, self._key):Then(function(data)
 		if data == nil then
 			return {}
 		elseif type(data) == "table" then
