@@ -13,11 +13,11 @@ local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
 DataStore.__index = DataStore
 
-function DataStore.new(dataStore, key)
+function DataStore.new(robloxDataStore, key)
 	local self = setmetatable(DataStoreStage.new(), DataStore)
 
 	self._key = key or error("No key")
-	self._dataStore = dataStore or error("No dataStore")
+	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 
 	self.Saving = Signal.new() -- :Fire(promise)
 
@@ -76,7 +76,7 @@ function DataStore:_saveData(writer)
 	local maid = Maid.new()
 
 	local promise;
-	promise = DataStorePromises.UpdateAsync(self._dataStore, self._key, function(data)
+	promise = DataStorePromises.UpdateAsync(self._robloxDataStore, self._key, function(data)
 		if promise:IsRejected() then
 			-- Cancel if we're already overwritten
 			return nil
@@ -104,7 +104,7 @@ function DataStore:_promiseLoad()
 		return self._loadPromise
 	end
 
-	self._loadPromise = DataStorePromises.GetAsync(self._dataStore, self._key):Then(function(data)
+	self._loadPromise = DataStorePromises.GetAsync(self._robloxDataStore, self._key):Then(function(data)
 		if data == nil then
 			return {}
 		elseif type(data) == "table" then

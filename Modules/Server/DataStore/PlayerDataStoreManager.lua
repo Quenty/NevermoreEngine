@@ -16,10 +16,10 @@ PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
 PlayerDataStoreManager.__index = PlayerDataStoreManager
 
 -- @param [keyGenerator] Function that takes in a player, and outputs a key
-function PlayerDataStoreManager.new(datastore, keyGenerator)
+function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
 	local self = setmetatable(BaseObject.new(), PlayerDataStoreManager)
 
-	self._datastore = datastore or error("No datastore")
+	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 	self._keyGenerator = keyGenerator or error("No keyGenerator")
 
 	self._maid._savingConns = Maid.new()
@@ -34,7 +34,9 @@ function PlayerDataStoreManager.new(datastore, keyGenerator)
 	end))
 
 	game:BindToClose(function()
+		local startTime = tick()
 		self:PromiseAllSaves():Wait()
+		print("Saving took", tick() - startTime)
 	end)
 
 	return self
@@ -68,7 +70,7 @@ end
 function PlayerDataStoreManager:_createDataStore(player)
 	assert(not self._datastores[player])
 
-	local datastore = DataStore.new(self._datastores, self:_getKey(player))
+	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(player))
 
 	self._maid._savingConns[player] = datastore.Saving:Connect(function(promise)
 		self._pendingSaves:Add(promise)

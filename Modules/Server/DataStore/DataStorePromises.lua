@@ -7,34 +7,31 @@ local Promise = require("Promise")
 
 local DataStorePromises = {}
 
-function DataStorePromises.GetAsync(datastore, key)
-	assert(datastore)
+function DataStorePromises.GetAsync(robloxDataStore, key)
+	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 
 	return Promise.new(function(resolve, reject)
 		local result = nil
 		local ok, err = pcall(function()
-			result = datastore:GetAsync(key)
+			result = robloxDataStore:GetAsync(key)
 		end)
 		if not ok then
 			return reject(err)
-		end
-		if not result then
-			return reject("No result loaded")
 		end
 		return resolve(result)
 	end)
 end
 
-function DataStorePromises.UpdateAsync(datastore, key, updateFunc)
-	assert(datastore)
+function DataStorePromises.UpdateAsync(robloxDataStore, key, updateFunc)
+	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 	assert(type(updateFunc) == "function")
 
 	return Promise.new(function(resolve, reject)
 		local result = nil
 		local ok, err = pcall(function()
-			result = { datastore:UpdateAsync(key, updateFunc) }
+			result = { robloxDataStore:UpdateAsync(key, updateFunc) }
 		end)
 		if not ok then
 			return reject(err)
@@ -46,13 +43,13 @@ function DataStorePromises.UpdateAsync(datastore, key, updateFunc)
 	end)
 end
 
-function DataStorePromises.SetAsync(datastore, key, value)
-	assert(datastore)
+function DataStorePromises.SetAsync(robloxDataStore, key, value)
+	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 
 	return Promise.new(function(resolve, reject)
 		local ok, err = pcall(function()
-			datastore:SetAsync(key, value)
+			robloxDataStore:SetAsync(key, value)
 		end)
 		if not ok then
 			return reject(err)
