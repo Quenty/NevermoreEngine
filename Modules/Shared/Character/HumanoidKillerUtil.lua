@@ -24,7 +24,7 @@ function HumanoidKillerUtil.TagKiller(humanoid, attacker)
 	creator.Value = attacker
 	creator.Parent = humanoid
 
-	Debris:Add(creator, TAG_LIFETIME)
+	Debris:AddItem(creator, TAG_LIFETIME)
 
 	return creator
 end
