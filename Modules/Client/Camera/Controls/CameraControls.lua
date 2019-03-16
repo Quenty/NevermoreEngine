@@ -56,6 +56,8 @@ end
 
 function CameraControls:SetZoomedCamera(ZoomedCamera)
 	self._zoomedCamera = ZoomedCamera or error()
+	self._startZoomScale = self._zoomedCamera.Zoom
+
 	return self
 end
 
