@@ -102,7 +102,7 @@ function Binder:Unbind(inst)
 end
 
 function Binder:Get(inst)
-	assert(typeof(inst) == "Instance")
+	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 	return self._maid[inst]
 end
 
