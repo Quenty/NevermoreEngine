@@ -48,7 +48,7 @@ local function asyncCache(func)
 	local retrieving = {}
 
 	return function(argument)
-		assert(argument ~= nil, "Error: ARgument ")
+		assert(argument ~= nil, "Error: Argument")
 		if cache[argument] ~= nil then
 			return cache[argument]
 		elseif retrieving[argument] then
