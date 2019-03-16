@@ -6,16 +6,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Maid = require("Maid")
 
-local function _isSignal(value)
-	if typeof(value) == "RBXScriptSignal" then
-		return true
-	elseif type(value) == "table" and type(value.Connect) == "function" then
-		return true
-	end
-
-	return false
-end
-
 local function isPromise(value)
 	if type(value) == "table" and value.ClassName == "Promise" then
 		return true
@@ -201,21 +191,7 @@ end
 function Promise:_promisify(value)
 	if type(value) == "function" then
 		self:_promisfyYieldingFunction(value)
-	elseif _isSignal(value) then
-		self:_promisfySignal(value)
 	end
-end
-
-function Promise:_promisfySignal(signal)
-	if not self._pendingMaid then
-		return
-	end
-
-	self._pendingMaid:GiveTask(signal:Connect(function(...)
-		self:Fulfill(...)
-	end))
-
-	return
 end
 
 function Promise:_promisfyYieldingFunction(yieldingFunction)
