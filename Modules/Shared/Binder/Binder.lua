@@ -86,9 +86,16 @@ function Binder:GetAll()
 	return all
 end
 
+-- Using this acknowledges that we're intentionally binding on a safe client object,
+-- i.e. one without replication.
+function Binder:BindClient(inst)
+	CollectionService:AddTag(inst, self._tagName)
+	return self:Get(inst)
+end
+
 function Binder:Bind(inst)
 	if RunService:IsClient() then
-		warn(("[Binder] - Bindings '%s' done on the client! Will be disrupted upon server replication!")
+		warn(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication!")
 			:format(self._tagName))
 	end
 
