@@ -164,18 +164,21 @@ function Promise:Reject(...)
 	if self._uncaughtException then
 		spawn(function()
 			if self._uncaughtException then
-				warn(("Uncaught exception in promise\n\n%s\n\n%s"):format(tostring(self._rejected[1]), self._source))
+				warn(("[Promise] - Uncaught exception in promise\n\n%s\n\n%s"):format(tostring(self._rejected[1]), self._source))
 			end
 		end)
 	end
 end
 
 --- Handlers when promise is fulfilled/rejected. It takes up to two arguments, callback functions
--- for the success and failure cases of the Promise
+-- for the success and failure cases of the Promise. May return the same promise if certain behavior
+-- is met.
 -- @tparam[opt=nil] function onFulfilled Called when fulfilled with parameters
 -- @tparam[opt=nil] function onRejected Called when rejected with parameters
 -- @treturn Promise
 function Promise:Then(onFulfilled, onRejected)
+	self._uncaughtException = false
+
 	if self._pendingExecuteList then
 		local promise = Promise.new()
 		table.insert(self._pendingExecuteList, {
@@ -240,17 +243,12 @@ function Promise:_executeThen(promise2, onFulfilled, onRejected)
 			end
 			-- Technically undefined behavior from A+, but we'll resolve to nil like ES6 promises
 			promise2:Resolve(onRejected(unpack(self._rejected, 1, self._valuesLength)))
-			self._uncaughtException = false
 
 			return promise2
 		else
 			-- Promise2 Rejects with promise1 (self) value
 			if promise2 then
-				if promise2._pendingExecuteList then
-					-- We already expect this promise to warn, no need for promise2 to spawn another thread for it
-					promise2._uncaughtException = false
-					promise2:Reject(unpack(self._rejected, 1, self._valuesLength))
-				end
+				promise2:Reject(unpack(self._rejected, 1, self._valuesLength))
 
 				return promise2
 			else
