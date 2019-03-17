@@ -11,6 +11,10 @@ local Signal = require("Signal")
 
 local DEBUG_WRITING = false
 
+local AUTO_SAVE_TIME = 180
+local CHECK_DIVISION = 15
+local JITTER = 20 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
+
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
 DataStore.__index = DataStore
@@ -22,6 +26,30 @@ function DataStore.new(robloxDataStore, key)
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 
 	self.Saving = Signal.new() -- :Fire(promise)
+
+	spawn(function()
+		while self.Destroy do
+			for _=1, CHECK_DIVISION do
+				wait(AUTO_SAVE_TIME/CHECK_DIVISION)
+				if not self.Destroy then
+					break
+				end
+			end
+
+			if not self.Destroy then
+				break
+			end
+
+			-- Apply additional jitter on auto-save
+			wait(math.random(1, JITTER))
+
+			if not self.Destroy then
+				break
+			end
+
+			self:Save()
+		end
+	end)
 
 	return self
 end

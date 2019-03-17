@@ -47,7 +47,7 @@ function PlayerDataStoreManager:AddRemovingCallback(callback)
 	table.insert(self._removingCallbacks, callback)
 end
 
---- Callable to allow manual GC so things can properly clean up. 
+--- Callable to allow manual GC so things can properly clean up.
 -- This can be used to pre-emptively cleanup players.
 function PlayerDataStoreManager:RemovePlayerDataStore(player)
 	self:_removePlayerDataStore(player)
