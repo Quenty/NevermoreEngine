@@ -11,10 +11,6 @@ function DataStorePromises.GetAsync(robloxDataStore, key)
 	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 
-	if true then
-		return Promise.rejected("Fake Error")
-	end
-
 	return Promise.spawn(function(resolve, reject)
 		local result = nil
 		local ok, err = pcall(function()
