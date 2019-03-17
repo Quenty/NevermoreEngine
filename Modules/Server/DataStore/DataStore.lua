@@ -41,7 +41,7 @@ end
 function DataStore:PromiseLoadSuccessful()
 	return self._maid:GivePromise(self:_promiseLoad()):Then(function()
 		return true
-	end):Catch(function()
+	end, function()
 		return false
 	end)
 end
@@ -91,7 +91,7 @@ function DataStore:_saveData(writer)
 		end
 
 		return data
-	end):Catch(function(err)
+	end, function(err)
 		-- Might be caused by Maid rejecting state
 		warn("[DataStore] - Failed to UpdateAsync data", err)
 		return Promise.rejected(err)
@@ -109,19 +109,20 @@ function DataStore:_promiseLoad()
 		return self._loadPromise
 	end
 
-	self._loadPromise = self._maid:GivePromise(DataStorePromises.GetAsync(self._robloxDataStore, self._key):Then(function(data)
-		if data == nil then
-			return {}
-		elseif type(data) == "table" then
-			return data
-		else
-			return Promise.rejected("Failed to load data. Wrong type '" .. type(data) .. "'")
-		end
-	end)):Catch(function(err)
-		-- Log:
-		warn("[DataStore] - Failed to GetAsync data", err)
-		return Promise.rejected(err)
-	end)
+	self._loadPromise = self._maid:GivePromise(DataStorePromises.GetAsync(self._robloxDataStore, self._key)
+		:Then(function(data)
+			if data == nil then
+				return {}
+			elseif type(data) == "table" then
+				return data
+			else
+				return Promise.rejected("Failed to load data. Wrong type '" .. type(data) .. "'")
+			end
+		end, function(err)
+			-- Log:
+			warn("[DataStore] - Failed to GetAsync data", err)
+			return Promise.rejected(err)
+		end))
 
 	return self._loadPromise
 end
