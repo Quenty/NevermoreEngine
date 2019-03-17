@@ -11,7 +11,11 @@ function DataStorePromises.GetAsync(robloxDataStore, key)
 	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 
-	return Promise.new(function(resolve, reject)
+	if true then
+		return Promise.rejected("Fake Error")
+	end
+
+	return Promise.spawn(function(resolve, reject)
 		local result = nil
 		local ok, err = pcall(function()
 			result = robloxDataStore:GetAsync(key)
@@ -28,7 +32,7 @@ function DataStorePromises.UpdateAsync(robloxDataStore, key, updateFunc)
 	assert(type(key) == "string")
 	assert(type(updateFunc) == "function")
 
-	return Promise.new(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local result = nil
 		local ok, err = pcall(function()
 			result = { robloxDataStore:UpdateAsync(key, updateFunc) }
@@ -47,7 +51,7 @@ function DataStorePromises.SetAsync(robloxDataStore, key, value)
 	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 
-	return Promise.new(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
 			robloxDataStore:SetAsync(key, value)
 		end)

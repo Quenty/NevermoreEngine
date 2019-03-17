@@ -16,7 +16,7 @@ return function(binder, inst)
 	local promise = Promise.new()
 	maid:GiveTask(binder:GetClassAddedSignal():Connect(function(classAdded, instance)
 		if instance == inst then
-			promise:Fulfill(classAdded)
+			promise:Resolve(classAdded)
 		end
 	end))
 

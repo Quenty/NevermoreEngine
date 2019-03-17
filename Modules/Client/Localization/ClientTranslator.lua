@@ -29,7 +29,7 @@ function ClientTranslatorFacade:Init()
 
 	self._englishTranslator = localizationTable:GetTranslator("en")
 
-	local asyncTranslatorPromise = Promise.new(function(resolve, reject)
+	local asyncTranslatorPromise = Promise.spawn(function(resolve, reject)
 		local translator = nil
 		local ok, err = pcall(function()
 			translator = LocalizationService:GetTranslatorForPlayerAsync(Players.LocalPlayer)

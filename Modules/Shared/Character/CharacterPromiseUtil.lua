@@ -17,7 +17,7 @@ function lib.PromiseRootPart(humanoid)
 	local promise = Promise.new()
 
 	if humanoid.RootPart then
-		promise:Fulfill(humanoid.RootPart)
+		promise:Resolve(humanoid.RootPart)
 		return promise
 	end
 
@@ -30,7 +30,7 @@ function lib.PromiseRootPart(humanoid)
 		end
 
 		if rootPart and promise:IsPending() then
-			promise:Fulfill(rootPart)
+			promise:Resolve(rootPart)
 		end
 	end)
 

@@ -21,7 +21,7 @@ function lib.race(promises)
 	end
 
 	for _, promise in pairs(promises) do
-		promise:Then(syncronize("Fulfill"), syncronize("Reject"))
+		promise:Then(syncronize("Resolve"), syncronize("Reject"))
 	end
 
 	return returnPromise
@@ -43,7 +43,7 @@ function lib.all(promises)
 			results[index] = value
 			remainingCount = remainingCount - 1
 			if remainingCount == 0 then
-				local method = allFulfilled and "Fulfill" or "Reject"
+				local method = allFulfilled and "Resolve" or "Reject"
 				returnPromise[method](returnPromise, unpack(results))
 			end
 		end
@@ -54,7 +54,7 @@ function lib.all(promises)
 	end
 
 	if #promises == 0 then
-		returnPromise:Fulfill()
+		returnPromise:Resolve()
 	end
 
 	return returnPromise

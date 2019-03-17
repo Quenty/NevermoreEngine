@@ -25,7 +25,7 @@ function PlayerThumbnails:GetUserThumbnail(userId, thumbnailType, thumbnailSize)
 	assert(thumbnailSize)
 
 	local promise
-	promise = Promise.new(function(resolve, reject)
+	promise = Promise.spawn(function(resolve, reject)
 		local tries = 0
 		repeat
 			tries = tries + 1

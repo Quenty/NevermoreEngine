@@ -20,13 +20,13 @@ return function(binder, objValue)
 	maid:GiveTask(objValue.Changed:Connect(function()
 		local class = binder:Get(objValue.Value)
 		if class then
-			promise:Fulfill(class)
+			promise:Resolve(class)
 		end
 	end))
 
 	maid:GiveTask(binder:GetClassAddedSignal():Connect(function(class, instance)
 		if instance == objValue.Value then
-			promise:Fulfill(class)
+			promise:Resolve(class)
 		end
 	end))
 

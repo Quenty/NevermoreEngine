@@ -13,7 +13,7 @@ function MarketplaceUtil.PromisePlayerOwnsAsset(player, assetId)
 	assert(typeof(player) == "Instance")
 	assert(type(assetId) == "number")
 
-	return Promise.new(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
 			result = MarketplaceService:PlayerOwnsAsset(player, assetId)

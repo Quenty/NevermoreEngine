@@ -9,10 +9,10 @@ local Promise = require("Promise")
 return function(parent, name, timeOut)
 	local result = parent:FindFirstChild(name)
 	if result then
-		return Promise.fulfilled(result)
+		return Promise.resolved(result)
 	end
 
-	return Promise.new(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local child = parent:WaitForChild(name, timeOut)
 
 		if child then

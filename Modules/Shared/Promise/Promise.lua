@@ -4,50 +4,59 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Maid = require("Maid")
+local fastSpawn = require("fastSpawn")
 
 local function isPromise(value)
-	if type(value) == "table" and value.ClassName == "Promise" then
-		return true
-	end
-	return false
+	return type(value) == "table" and value.ClassName == "Promise"
 end
 
 local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
-Promise.CatchErrors = false -- A+ compliance if true
 Promise.IsPromise = isPromise
 
 --- Construct a new promise
 -- @constructor Promise.new()
--- @param value, default nil
 -- @treturn Promise
-function Promise.new(value)
+function Promise.new(func)
 	local self = setmetatable({}, Promise)
 
-	self._pendingMaid = Maid.new()
-	self:_promisify(value)
+	self._pendingExecuteList = {}
+	self._uncaughtException = true
+	self._source = debug.traceback()
+
+	if type(func) == "function" then
+		func(self:_getResolveReject())
+	end
 
 	return self
 end
 
-function Promise.fulfilled(...)
-	return Promise.new():Fulfill(...)
+--- Initializes a new promise with the given function in a fastSpawn wrapper
+function Promise.spawn(func)
+	local self = Promise.new()
+
+	fastSpawn(func, self:_getResolveReject())
+
+	return self
 end
 
 function Promise.resolved(...)
-	return Promise.new():Resolve(...)
+	local promise = Promise.new()
+	promise:Resolve(...)
+	return promise
 end
 
 function Promise.rejected(...)
-	return Promise.new():Reject(...)
+	local promise = Promise.new()
+	promise:Reject(...)
+	return promise
 end
 
 --- Returns whether or not the promise is pending
 -- @treturn bool True if pending, false otherwise
 function Promise:IsPending()
-	return self._pendingMaid ~= nil
+	return self._pendingExecuteList ~= nil
 end
 
 function Promise:IsFulfilled()
@@ -61,93 +70,104 @@ end
 --- Yield until the promise is complete
 function Promise:Wait()
 	if self._fulfilled then
-		return unpack(self._fulfilled)
+		return unpack(self._fulfilled, 1, self._valuesLength)
 	elseif self._rejected then
 		return error(tostring(self._rejected[1]), 2)
 	else
-		local result
 		local bindable = Instance.new("BindableEvent")
 
-		self:Then(function(...)
-			result = {...}
+		self:Then(function()
 			bindable:Fire()
-		end, function(...)
-			result = {...}
+		end, function()
 			bindable:Fire()
 		end)
 
 		bindable.Event:Wait()
 		bindable:Destroy()
 
-		if self:IsRejected() then
-			return error(tostring(result[1]), 2)
+		if self._rejected then
+			return error(tostring(self._rejected[1]), 2)
+		else
+			return unpack(self._fulfilled, 1, self._valuesLength)
 		end
-
-		return unpack(result)
 	end
 end
 
----
+--- Promise resolution procedure
 -- Resolves a promise
 -- @return self
 function Promise:Resolve(...)
-	local valueLength = select("#", ...)
-
-	-- Treat tuples as an array under A+ compliance
-	if valueLength > 1 then
-		self:Fulfill(...)
-		return self
-	end
-
-	local value = ...
-	if self == value then
-		self:Reject("TypeError: Resolved to self")
-		return self
-	end
-
-	if isPromise(value) then
-		value:Then(function(...)
-			self:Fulfill(...)
-		end, function(...)
-			self:Reject(...)
-		end)
-		return self
-	end
-
-	-- Thenable like objects
-	if type(value) == "table" and type(value.Then) == "function" then
-		value:Then(self:_getResolveReject())
-		return self
-	end
-
-	self:Fulfill(value)
-	return self
-end
-
---- Fulfills the promise with the value
--- @param ... Params to fulfill with
--- @return self
-function Promise:Fulfill(...)
-	if not self:IsPending() then
+	if not self._pendingExecuteList then
 		return
 	end
 
+	if self == (...) then
+		self:Reject("TypeError: Resolved to self")
+	elseif isPromise(...) then
+		if select("#", ...) > 1 then
+			local message = ("When resolving a promise, extra arguments are discarded! See:\n\n%s")
+				:format(self._source)
+			warn(message)
+		end
+
+		local promise2 = (...)
+		if promise2._pendingExecuteList then
+			promise2:Then(self:_getResolveReject())
+		elseif promise2._rejected then
+			self:Reject(unpack(promise2._rejected, 1, promise2._valuesLength))
+		elseif promise2._fulfilled then
+			self:_fulfill(unpack(promise2._fulfilled, 1, promise2._valuesLength))
+		else
+			error("[Promise.Resolve] - Bad promise2 state")
+		end
+	else -- TODO: Handle thenable promises
+		self:_fulfill(...)
+	end
+end
+
+--- Fulfills the promise with the value
+-- @param ... Params to _fulfill with
+-- @return self
+function Promise:_fulfill(...)
+	if not self._pendingExecuteList then
+		return
+	end
+
+	self._valuesLength = select("#", ...)
 	self._fulfilled = {...}
-	self:_endPending()
-	return self
+
+	local list = self._pendingExecuteList
+	self._pendingExecuteList = nil
+	for _, data in pairs(list) do
+		self:_executeThen(data.promise, data.onFulfilled, data.onRejected)
+	end
 end
 
 --- Rejects the promise with the value given
 -- @param ... Params to reject with
 -- @return self
 function Promise:Reject(...)
-	if not self:IsPending() then
+	if not self._pendingExecuteList then
 		return
 	end
 
+	self._valuesLength = select("#", ...)
 	self._rejected = {...}
-	self:_endPending()
-	return self
+
+	local list = self._pendingExecuteList
+	self._pendingExecuteList = nil
+	for _, data in pairs(list) do
+		self:_executeThen(data.promise, data.onFulfilled, data.onRejected)
+	end
+
+	-- Check for uncaught exceptions
+	if self._uncaughtException then
+		spawn(function()
+			if self._uncaughtException then
+				warn(("Uncaught exception in promise\n\n%s\n\n%s"):format(tostring(self._rejected[1]), self._source))
+			end
+		end)
+	end
 end
 
 --- Handlers when promise is fulfilled/rejected. It takes up to two arguments, callback functions
@@ -156,17 +176,17 @@ end
 -- @tparam[opt=nil] function onRejected Called when rejected with parameters
 -- @treturn Promise
 function Promise:Then(onFulfilled, onRejected)
-	local returnPromise = Promise.new()
-
-	if self._pendingMaid then
-		self._pendingMaid:GiveTask(function()
-			self:_executeThen(returnPromise, onFulfilled, onRejected)
-		end)
+	if self._pendingExecuteList then
+		local promise = Promise.new()
+		table.insert(self._pendingExecuteList, {
+			promise = promise,
+			onFulfilled = onFulfilled,
+			onRejected = onRejected,
+		})
+		return promise
 	else
-		self:_executeThen(returnPromise, onFulfilled, onRejected)
+		return self:_executeThen(nil, onFulfilled, onRejected)
 	end
-
-	return returnPromise
 end
 
 function Promise:Finally(func)
@@ -186,103 +206,60 @@ function Promise:Destroy()
 	self:Reject()
 end
 
---- Modifies values into promises
--- @local
-function Promise:_promisify(value)
-	if type(value) == "function" then
-		self:_promisfyYieldingFunction(value)
-	end
-end
-
-function Promise:_promisfyYieldingFunction(yieldingFunction)
-	if not self._pendingMaid then
-		return
-	end
-
-	local maid = Maid.new()
-
-	-- Hack to spawn new thread fast
-	local bindable = Instance.new("BindableEvent")
-	maid:GiveTask(bindable)
-	maid:GiveTask(bindable.Event:Connect(function()
-		maid:DoCleaning()
-		if self.CatchErrors then
-			local resultList = self:_executeFunc(self, yieldingFunction, {self:_getResolveReject()})
-			if self:IsPending() then
-				self:Resolve(unpack(resultList))
-			end
-		else
-			self:Resolve(yieldingFunction(self:_getResolveReject()))
-		end
-	end))
-	self._pendingMaid:GiveTask(maid)
-	bindable:Fire()
-end
-
 function Promise:_getResolveReject()
-	local called = false
-
-	local function resolvePromise(...)
-		if called then
-			return
-		end
-		called = true
+	return function(...)
 		self:Resolve(...)
-	end
-
-	local function rejectPromise(...)
-		if called then
-			return
-		end
-		called = true
+	end, function(...)
 		self:Reject(...)
 	end
-
-	return resolvePromise, rejectPromise
 end
 
-function Promise:_executeFunc(returnPromise, func, args)
-	if not self.CatchErrors then
-		return {func(unpack(args))}
-	end
-
-	local resultList
-	local success, err = pcall(function()
-		resultList = {func(unpack())}
-	end)
-	if not success then
-		returnPromise:Reject(err)
-	end
-	return resultList
-end
-
-function Promise:_executeThen(returnPromise, onFulfilled, onRejected)
-	local resultList
+-- @param promise2 May be nil. If it is, then we have the option to return self
+function Promise:_executeThen(promise2, onFulfilled, onRejected)
 	if self._fulfilled then
-		if type(onFulfilled) ~= "function" then
-			return returnPromise:Fulfill(unpack(self._fulfilled))
+		if type(onFulfilled) == "function" then
+			if not promise2 then
+				promise2 = Promise.new()
+			end
+			-- Technically undefined behavior from A+, but we'll resolve to nil like ES6 promises
+			promise2:Resolve(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
+			return promise2
+		else
+			-- Promise2 Fulfills with promise1 (self) value
+			if promise2 then
+				promise2:_fulfill(unpack(self._fulfilled, 1, self._valuesLength))
+				return promise2
+			else
+				return self
+			end
 		end
-
-		resultList = self:_executeFunc(returnPromise, onFulfilled, self._fulfilled)
 	elseif self._rejected then
-		if type(onRejected) ~= "function" then
-			return returnPromise:Reject(unpack(self._rejected))
+		if type(onRejected) == "function" then
+			if not promise2 then
+				promise2 = Promise.new()
+			end
+			-- Technically undefined behavior from A+, but we'll resolve to nil like ES6 promises
+			promise2:Resolve(onRejected(unpack(self._rejected, 1, self._valuesLength)))
+			self._uncaughtException = false
+
+			return promise2
+		else
+			-- Promise2 Rejects with promise1 (self) value
+			if promise2 then
+				if promise2._pendingExecuteList then
+					-- We already expect this promise to warn, no need for promise2 to spawn another thread for it
+					promise2._uncaughtException = false
+					promise2:Reject(unpack(self._rejected, 1, self._valuesLength))
+				end
+
+				return promise2
+			else
+				return self
+			end
 		end
-
-		resultList = self:_executeFunc(returnPromise, onRejected, self._rejected)
 	else
-		error("Internal error, cannot execute while pending")
+		error("Internal error: still pending")
 	end
-
-	if resultList and #resultList > 0 then
-		returnPromise:Resolve(unpack(resultList))
-	end
-end
-
-function Promise:_endPending()
-	local maid = self._pendingMaid
-	self._pendingMaid = nil
-	maid:DoCleaning()
 end
 
 return Promise

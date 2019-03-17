@@ -17,13 +17,13 @@ function HttpPromise.Method(methodName, url, ...)
 
 	local Args = {...}
 
-	return Promise.new(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local result
 
-		local success, err = pcall(function()
+		local ok, err = pcall(function()
 			result = HttpService[methodName](HttpService, url, unpack(Args))
 		end)
-		if not success then
+		if not ok then
 			warn(("[HttpPromise] - Failed request %q"):format(url), err)
 			return reject(err)
 		else
@@ -32,7 +32,7 @@ function HttpPromise.Method(methodName, url, ...)
 	end)
 end
 
--- @tparam {string} url 
+-- @tparam {string} url
 function HttpPromise.Get(...)
 	return HttpPromise.Method("GetAsync", ...)
 end
@@ -50,11 +50,11 @@ function HttpPromise.Json(...)
 		-- Decode
 		return Promise.new(function(resolve, reject)
 			local decoded
-			local Success, err = pcall(function()
+			local ok, err = xpcall(function()
 				decoded = HttpService:JSONDecode(result)
 			end)
 
-			if not Success then
+			if not ok then
 				return reject(err)
 			elseif decoded then
 				return resolve(decoded)

@@ -56,7 +56,7 @@ function DataStore:Save()
 	if not self:HasWritableData() then
 		-- Nothing to save, don't update anything
 		print("[DataStore.Save] - Not saving, nothing staged")
-		return Promise.fulfilled(nil)
+		return Promise.resolved(nil)
 	end
 
 	return self:_saveData(self:GetNewWriter())
@@ -109,7 +109,7 @@ function DataStore:_promiseLoad()
 		return self._loadPromise
 	end
 
-	self._loadPromise = DataStorePromises.GetAsync(self._robloxDataStore, self._key):Then(function(data)
+	self._loadPromise = self._maid:GivePromise(DataStorePromises.GetAsync(self._robloxDataStore, self._key):Then(function(data)
 		if data == nil then
 			return {}
 		elseif type(data) == "table" then
@@ -117,10 +117,11 @@ function DataStore:_promiseLoad()
 		else
 			return Promise.rejected("Failed to load data. Wrong type '" .. type(data) .. "'")
 		end
-	end):Catch(function(err)
+	end)):Catch(function(err)
+		-- Log:
 		warn("[DataStore] - Failed to GetAsync data", err)
+		return Promise.rejected(err)
 	end)
-	self._maid:GivePromise(self._loadPromise)
 
 	return self._loadPromise
 end
