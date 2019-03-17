@@ -114,8 +114,10 @@ function Promise:Resolve(...)
 		if promise2._pendingExecuteList then
 			promise2:Then(self:_getResolveReject())
 		elseif promise2._rejected then
+			promise2._uncaughtException = false
 			self:Reject(unpack(promise2._rejected, 1, promise2._valuesLength))
 		elseif promise2._fulfilled then
+			promise2._uncaughtException = false
 			self:_fulfill(unpack(promise2._fulfilled, 1, promise2._valuesLength))
 		else
 			error("[Promise.Resolve] - Bad promise2 state")
