@@ -14,6 +14,12 @@ PlayerBinder.__index = PlayerBinder
 function PlayerBinder.new(tag, class)
 	local self = setmetatable(Binder.new(tag, class), PlayerBinder)
 
+	return self
+end
+
+function PlayerBinder:Init()
+	local results = { getmetatable(PlayerBinder).Init(self) }
+
 	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
 		self:Bind(player)
 	end))
@@ -21,7 +27,7 @@ function PlayerBinder.new(tag, class)
 		self:Bind(item)
 	end
 
-	return self
+	return unpack(results)
 end
 
 return PlayerBinder
