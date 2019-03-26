@@ -7,61 +7,62 @@ local HttpService = game:GetService("HttpService")
 
 local Promise = require("Promise")
 
+local DEBUG_REQUEST = true
+
 local HttpPromise = {}
 
----
--- @tparam {'PostAsync' | 'GetAsync'} methodName Method to send with
-function HttpPromise.Method(methodName, url, ...)
-	assert(type(methodName) == "string")
-	assert(type(url) == "string")
-
-	local Args = {...}
+function HttpPromise.Request(request)
+	if DEBUG_REQUEST then
+		print("Sending request", HttpService:JSONEncode(request))
+	end
 
 	return Promise.spawn(function(resolve, reject)
-		local result
-
+		local response
 		local ok, err = pcall(function()
-			result = HttpService[methodName](HttpService, url, unpack(Args))
+			response = HttpService:RequestAsync(request)
 		end)
-		if not ok then
-			warn(("[HttpPromise] - Failed request %q"):format(url), err)
-			return reject(err)
-		else
-			return resolve(result)
+
+		if DEBUG_REQUEST then
+			print(("Got %d %s %s"):format(response.StatusCode, request.Method, request.Url), response.Body)
 		end
+
+		if not ok then
+			reject(err)
+			return
+		end
+
+		if not response.Success then
+			reject(response)
+			return
+		end
+
+		resolve(response)
+		return
 	end)
 end
 
--- @tparam {string} url
-function HttpPromise.Get(...)
-	return HttpPromise.Method("GetAsync", ...)
-end
-
-function HttpPromise.Post(url, data, httpContentType, ...)
-	if type(data) == "table" and httpContentType == Enum.HttpContentType.ApplicationJson then
-		data = HttpService:JSONEncode(data)
+function HttpPromise.DecodeJson(response)
+	assert(response)
+	if type(response.Body) ~= "string" then
+		return Promise.rejected("Body is not of type string")
 	end
-	return HttpPromise.Method("PostAsync", url, data, httpContentType, ...)
-end
 
-function HttpPromise.Json(...)
-	return HttpPromise.Get(...):Then(function(result)
-
-		-- Decode
-		return Promise.new(function(resolve, reject)
-			local decoded
-			local ok, err = xpcall(function()
-				decoded = HttpService:JSONDecode(result)
-			end)
-
-			if not ok then
-				return reject(err)
-			elseif decoded then
-				return resolve(decoded)
-			else
-				return reject("decoded nothing")
-			end
+	return Promise.new(function(resolve, reject)
+		local decoded
+		local ok, err = pcall(function()
+			decoded = HttpService:JSONDecode(response.Body)
 		end)
+
+		if not ok then
+			reject(err)
+			return
+		elseif decoded then
+			resolve(decoded)
+			return
+		else
+			reject("decoded nothing")
+			return
+		end
 	end)
 end
 
