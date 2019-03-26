@@ -54,15 +54,15 @@ function CameraControls.new()
 	return self
 end
 
-function CameraControls:SetZoomedCamera(ZoomedCamera)
-	self._zoomedCamera = ZoomedCamera or error()
+function CameraControls:SetZoomedCamera(zoomedCamera)
+	self._zoomedCamera = zoomedCamera or error()
 	self._startZoomScale = self._zoomedCamera.Zoom
 
 	return self
 end
 
-function CameraControls:SetRotatedCamera(RotatedCamera)
-	self._rotatedCamera = RotatedCamera or error()
+function CameraControls:SetRotatedCamera(rotatedCamera)
+	self._rotatedCamera = rotatedCamera or error()
 	return self
 end
 
