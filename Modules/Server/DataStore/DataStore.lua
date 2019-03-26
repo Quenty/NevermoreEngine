@@ -3,15 +3,16 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local DataStoreStage = require("DataStoreStage")
+local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStorePromises = require("DataStorePromises")
-local Promise = require("Promise")
+local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local Signal = require("Signal")
 
-local DEBUG_WRITING = false
+local DEBUG_WRITING = true
 
-local AUTO_SAVE_TIME = 180
+local AUTO_SAVE_TIME = 60*5
 local CHECK_DIVISION = 15
 local JITTER = 20 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
 
@@ -113,9 +114,10 @@ function DataStore:_saveData(writer)
 		end
 
 		data = writer:WriteMerge(data or {})
+		assert(data ~= DataStoreDeleteToken, "Cannot delete from UpdateAsync")
 
 		if DEBUG_WRITING then
-			print("Writing", game:GetService("HttpService"):JSONEncode(data))
+			print("[DataStore] - Writing", game:GetService("HttpService"):JSONEncode(data))
 		end
 
 		return data

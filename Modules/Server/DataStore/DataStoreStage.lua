@@ -9,6 +9,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local BaseObject = require("BaseObject")
 local Table = require("Table")
 local DataStoreWriter = require("DataStoreWriter")
+local DataStoreDeleteToken = require("DataStoreDeleteToken")
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -23,9 +24,21 @@ function DataStoreStage.new()
 	return self
 end
 
+function DataStoreStage:Delete(name)
+	if self._takenKeys[name] then
+		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
+	end
+
+	self:_doStore(name, nil)
+end
+
 function DataStoreStage:Store(name, value)
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
+	end
+
+	if value == nil then
+		value = DataStoreDeleteToken
 	end
 
 	self:_doStore(name, value)
@@ -103,7 +116,9 @@ function DataStoreStage:_doStore(name, value)
 	assert(value ~= nil)
 
 	local newValue
-	if type(value) == "Table" then
+	if value == DataStoreDeleteToken then
+		newValue = DataStoreDeleteToken
+	elseif type(value) == "Table" then
 		newValue = Table.DeepCopy(value)
 	else
 		newValue = value

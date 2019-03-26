@@ -4,6 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Table = require("Table")
+local DataStoreDeleteToken = require("DataStoreDeleteToken")
 
 local DataStoreWriter = {}
 DataStoreWriter.ClassName = "DataStoreWriter"
@@ -35,7 +36,11 @@ function DataStoreWriter:WriteMerge(original)
 	original = original or {}
 
 	for key, value in pairs(self._rawSetData) do
-		original[key] = value
+		if value == DataStoreDeleteToken then
+			original[key] = nil
+		else
+			original[key] = value
+		end
 	end
 
 	for key, writer in pairs(self._writers) do
@@ -44,7 +49,12 @@ function DataStoreWriter:WriteMerge(original)
 				:format(tostring(key)))
 		end
 
-		original[key] = writer:WriteMerge(original[key])
+		local result = writer:WriteMerge(original[key])
+		if result == DataStoreDeleteToken then
+			original[key] = nil
+		else
+			original[key] = result
+		end
 	end
 
 	return original

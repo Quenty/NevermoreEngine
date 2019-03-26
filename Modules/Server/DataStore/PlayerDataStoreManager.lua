@@ -4,6 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local DataStore = require("DataStore")
@@ -30,16 +31,29 @@ function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
 	self._removingCallbacks = {} -- [func, ...]
 
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+		if self._disableSavingInStudio then
+			return
+		end
+
 		self:_removePlayerDataStore(player)
 	end))
 
 	game:BindToClose(function()
-		local startTime = tick()
+		if self._disableSavingInStudio then
+			return
+		end
+
 		self:PromiseAllSaves():Wait()
-		print("Saving took", tick() - startTime)
 	end)
 
 	return self
+end
+
+--- For if you want to disable saving in studio for faster close time!
+function PlayerDataStoreManager:DisableSaveOnCloseStudio()
+	assert(RunService:IsStudio())
+
+	self._disableSavingInStudio = true
 end
 
 --- Adds a callback to be called before save on removal
@@ -54,6 +68,9 @@ function PlayerDataStoreManager:RemovePlayerDataStore(player)
 end
 
 function PlayerDataStoreManager:GetDataStore(player)
+	assert(typeof(player) == "Instance")
+	assert(player:IsA("Player"))
+
 	if self._removing[player] then
 		warn("[PlayerDataStoreManager.GetDataStore] - Called GetDataStore while player is removing, cannot retrieve")
 		return nil
@@ -88,6 +105,9 @@ function PlayerDataStoreManager:_createDataStore(player)
 end
 
 function PlayerDataStoreManager:_removePlayerDataStore(player)
+	assert(typeof(player) == "Instance")
+	assert(player:IsA("Player"))
+
 	local datastore = self._datastores[player]
 	if not datastore then
 		return
