@@ -163,7 +163,7 @@ function Promise:Reject(...)
 	end
 
 	-- Check for uncaught exceptions
-	if self._uncaughtException then
+	if self._uncaughtException and self._valuesLength > 0 then
 		spawn(function()
 			if self._uncaughtException then
 				warn(("[Promise] - Uncaught exception in promise\n\n%s\n\n%s"):format(tostring(self._rejected[1]), self._source))
