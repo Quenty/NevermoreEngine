@@ -12,13 +12,17 @@ return function(parent, name, timeOut)
 		return Promise.resolved(result)
 	end
 
-	return Promise.spawn(function(resolve, reject)
-		local child = parent:WaitForChild(name, timeOut)
+	return Promise.new(function(resolve, reject)
+		-- Cheaper to do spawn() here than fastSpawn, and we aren't going to get the
+		-- resource for another tick anyway
+		spawn(function()
+			local child = parent:WaitForChild(name, timeOut)
 
-		if child then
-			resolve(child)
-		else
-			reject("Timed out")
-		end
+			if child then
+				resolve(child)
+			else
+				reject("Timed out")
+			end
+		end)
 	end)
 end
