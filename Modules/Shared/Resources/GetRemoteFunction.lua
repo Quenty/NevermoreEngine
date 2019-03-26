@@ -18,7 +18,7 @@ if RunService:IsServer() then
 			storage.Parent = ReplicatedStorage
 		end
 
-		local func = ReplicatedStorage:FindFirstChild(name)
+		local func = storage:FindFirstChild(name)
 		if func then
 			return func
 		end

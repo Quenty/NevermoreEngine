@@ -18,7 +18,7 @@ if RunService:IsServer() then
 			storage.Parent = ReplicatedStorage
 		end
 
-		local event = ReplicatedStorage:FindFirstChild(name)
+		local event = storage:FindFirstChild(name)
 		if event then
 			return event
 		end
