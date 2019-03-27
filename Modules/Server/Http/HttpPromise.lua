@@ -41,6 +41,16 @@ function HttpPromise.Request(request)
 	end)
 end
 
+function HttpPromise.LogFailedRequests(...)
+	for _, item in pairs({...}) do
+		if type(item) == "string" then
+			warn(item)
+		elseif type(item) == "table" and type(item.StatusCode) == "number" then
+			warn(("Failed request %d"):format(item.StatusCode, tostring(item.Body)))
+		end
+	end
+end
+
 function HttpPromise.DecodeJson(response)
 	assert(response)
 	if type(response.Body) ~= "string" then
