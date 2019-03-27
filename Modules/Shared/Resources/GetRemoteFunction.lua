@@ -1,20 +1,21 @@
 --- Provides getting remote events
 -- @function GetRemoteFunction
--- @author Quenty
 
-local RunService = game:GetService("RunService")
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
-local STORAGE_NAME = "RemoteFunctions"
+local ResourceConstants = require("ResourceConstants")
 
 if RunService:IsServer() then
 	return function(name)
 		assert(type(name) == "string")
 
-		local storage = ReplicatedStorage:FindFirstChild(STORAGE_NAME)
+		local storage = ReplicatedStorage:FindFirstChild(ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME)
 		if not storage then
 			storage = Instance.new("Folder")
-			storage.Name = STORAGE_NAME
+			storage.Name = ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME
 			storage.Parent = ReplicatedStorage
 		end
 
@@ -33,6 +34,6 @@ else -- RunService:IsClient()
 	return function(name)
 		assert(type(name) == "string")
 
-		return ReplicatedStorage:WaitForChild(STORAGE_NAME):WaitForChild(name)
+		return ReplicatedStorage:WaitForChild(ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME):WaitForChild(name)
 	end
 end
