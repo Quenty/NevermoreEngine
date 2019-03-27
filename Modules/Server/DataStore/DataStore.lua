@@ -10,7 +10,7 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local Signal = require("Signal")
 
-local DEBUG_WRITING = true
+local DEBUG_WRITING = false
 
 local AUTO_SAVE_TIME = 60*5
 local CHECK_DIVISION = 15
