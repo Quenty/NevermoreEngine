@@ -7,7 +7,8 @@ local HttpService = game:GetService("HttpService")
 
 local Promise = require("Promise")
 
-local DEBUG_REQUEST = true
+local DEBUG_REQUEST = false
+local DEBUG_RESPONSE = true
 
 local HttpPromise = {}
 
@@ -22,8 +23,8 @@ function HttpPromise.Request(request)
 			response = HttpService:RequestAsync(request)
 		end)
 
-		if DEBUG_REQUEST then
-			print(("Got %d %s %s"):format(response.StatusCode, request.Method, request.Url), response.Body)
+		if DEBUG_RESPONSE then
+			print(("Response: %d %s %s"):format(response.StatusCode, request.Method, request.Url), response.Body)
 		end
 
 		if not ok then
