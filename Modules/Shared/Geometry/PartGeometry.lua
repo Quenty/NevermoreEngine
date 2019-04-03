@@ -60,6 +60,8 @@ local function GetShape(part)
     elseif part:IsA("UnionOperation") or part:IsA("MeshPart") then
         -- Yeah, can"t do too much about this. :/
         return "Brick", UNIFORM_SCALE
+    elseif part:IsA("VehicleSeat") then
+        return "Brick", UNIFORM_SCALE
     else
         -- BasePart
         if part.Shape == Enum.PartType.Ball then
