@@ -8,7 +8,7 @@ local HttpService = game:GetService("HttpService")
 local Promise = require("Promise")
 
 local DEBUG_REQUEST = false
-local DEBUG_RESPONSE = true
+local DEBUG_RESPONSE = false
 
 local HttpPromise = {}
 
