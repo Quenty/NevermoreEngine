@@ -17,7 +17,7 @@ function BinderTouchingCalculator.new()
 	return self
 end
 
-function BinderTouchingCalculator:GetTouchingClass(binder, touchingList)
+function BinderTouchingCalculator:GetTouchingClass(binder, touchingList, ignoreObject)
 	local touching = {}
 
 	for _, part in pairs(touchingList) do
@@ -34,6 +34,10 @@ function BinderTouchingCalculator:GetTouchingClass(binder, touchingList)
 				table.insert(touching[object].Touching, part)
 			end
 		end
+	end
+
+	if ignoreObject then
+		touching[ignoreObject] = nil
 	end
 
 	local list = {}
