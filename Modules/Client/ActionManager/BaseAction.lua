@@ -26,10 +26,14 @@ function BaseAction.new(actionData)
 	self._activateData = nil -- Data to be fired with the Activated event
 
 	self.Activated = Signal.new() -- :Fire(actionMaid, ... (activateData))
+	self._maid:GiveTask(self.Activated)
+
 	self.Deactivated = Signal.new() -- :Fire()
+	self._maid:GiveTask(self.Deactivated)
 
 	self.IsActivatedValue = Instance.new("BoolValue")
 	self.IsActivatedValue.Value = false
+	self._maid:GiveTask(self.IsActivatedValue)
 
 	self:InitEnabledMixin()
 
@@ -125,7 +129,6 @@ end
 function BaseAction:IsActive()
 	return self.IsActivatedValue.Value
 end
-
 
 function BaseAction:Deactivate()
 	self.IsActivatedValue.Value = false

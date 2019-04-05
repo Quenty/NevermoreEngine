@@ -45,7 +45,7 @@ function ActionManager.new()
 
 		-- Immediately deactivate
 		if value and not value.IsActivatedValue.Value then
-			warn("Immediate deactiation")
+			warn(("[ActionManager.ActiveAction.Changed] - Immediate deactivation of %q"):format(tostring(value:GetName())))
 			self.ActiveAction.Value = nil
 		end
 	end))
