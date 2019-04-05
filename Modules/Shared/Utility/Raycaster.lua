@@ -16,15 +16,15 @@ function Raycaster.new()
 	return self
 end
 
-function Raycaster:Ignore(value)
+function Raycaster:Ignore(tableOrInstance)
 	local ignoreList = self.IgnoreList
-	if typeof(value) == "Instance" then
-		table.insert(ignoreList, value)
+	if typeof(tableOrInstance) == "Instance" then
+		table.insert(ignoreList, tableOrInstance)
 		return
 	end
 
-	assert(type(value) == "table")
-	for _, item in pairs(value) do
+	assert(type(tableOrInstance) == "table")
+	for _, item in pairs(tableOrInstance) do
 		table.insert(ignoreList, item)
 	end
 end
