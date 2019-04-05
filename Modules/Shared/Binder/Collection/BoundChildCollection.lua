@@ -18,9 +18,11 @@ function BoundChildCollection.new(binder, parent)
 
 	--- Fires on class addition
 	self.ClassAdded = Signal.new() -- :Fire(class)
+	self._maid:GiveTask(self.ClassAdded)
 
 	--- Fires on class removal
 	self.ClassRemoved = Signal.new() -- :Fire(class)
+	self._maid:GiveTask(self.ClassRemoved)
 
 	self._classes = {} -- [class] = true
 	self._size = 0
