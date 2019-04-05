@@ -73,7 +73,6 @@ function Binder:GetClassRemovingSignal()
 	return self._classRemovingSignal
 end
 
-
 function Binder:GetTag()
 	return self._tagName
 end
