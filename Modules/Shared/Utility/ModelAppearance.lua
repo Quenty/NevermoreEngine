@@ -36,6 +36,7 @@ function ModelAppearance.new(model)
 	return self
 end
 
+-- Destructive, cannot be reverted
 function ModelAppearance:DisableInteractions()
 	for _, item in pairs(self._interactions) do
 		item:Destroy()
