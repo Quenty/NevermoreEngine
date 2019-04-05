@@ -33,7 +33,6 @@ function ModelAppearance.new(model)
 		end
 	end
 
-
 	return self
 end
 
@@ -59,8 +58,11 @@ function ModelAppearance:SetCanCollide(canCollide)
 	self._canCollide = canCollide
 	for part, properties in pairs(self._parts) do
 		part.CanCollide = properties.CanCollide and canCollide
-
 	end
+end
+
+function ModelAppearance:ResetCanCollide(canCollide)
+	self:SetCanCollide(true)
 end
 
 function ModelAppearance:SetTransparency(transparency)
