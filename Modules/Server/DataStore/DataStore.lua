@@ -84,7 +84,9 @@ function DataStore:Save()
 
 	if not self:HasWritableData() then
 		-- Nothing to save, don't update anything
-		print("[DataStore.Save] - Not saving, nothing staged")
+		if DEBUG_WRITING then
+			print("[DataStore.Save] - Not saving, nothing staged")
+		end
 		return Promise.resolved(nil)
 	end
 
