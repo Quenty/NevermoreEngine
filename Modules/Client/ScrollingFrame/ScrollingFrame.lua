@@ -214,6 +214,11 @@ function ScrollingFrame:BindInput(gui, options)
 end
 
 function ScrollingFrame:StartScrolling(inputBeganObject, options)
+	if inputBeganObject.UserInputState ~= Enum.UserInputState.Begin then
+		-- Touch events moving into GUIs occur sometimes
+		return
+	end
+
 	if inputBeganObject.UserInputType == Enum.UserInputType.MouseButton1
 		or inputBeganObject.UserInputType == Enum.UserInputType.Touch then
 
