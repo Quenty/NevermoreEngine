@@ -15,13 +15,34 @@ local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
 DataStoreStage.__index = DataStoreStage
 
-function DataStoreStage.new()
+function DataStoreStage.new(loadName, loadParent)
 	local self = setmetatable(BaseObject.new(), DataStoreStage)
+
+	-- LoadParent is optional, used for loading
+	self._loadName = loadName
+	self._loadParent = loadParent
 
 	self._takenKeys = {} -- [name] = true
 	self._stores = {}
 
 	return self
+end
+
+function DataStoreStage:Load(name, defaultValue)
+	if not self._loadParent then
+		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
+	end
+	if not self._loadName then
+		error("[DataStoreStage.Load] - Failed to load, no loadName!")
+	end
+
+	return self._loadParent:Load(self._loadName, {}):Then(function(data)
+		if data[name] == nil then
+			return defaultValue
+		else
+			return data[name]
+		end
+	end)
 end
 
 function DataStoreStage:Delete(name)
@@ -55,7 +76,7 @@ function DataStoreStage:GetSubStore(name)
 		error(("[DataStoreStage.GetSubStore] - Already have a writer for %q"):format(name))
 	end
 
-	local newStore = DataStoreStage.new()
+	local newStore = DataStoreStage.new(name, self)
 	self._takenKeys[name] = true
 	self._maid:GiveTask(newStore)
 
