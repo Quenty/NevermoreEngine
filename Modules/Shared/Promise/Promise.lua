@@ -10,6 +10,9 @@ local function isPromise(value)
 	return type(value) == "table" and value.ClassName == "Promise"
 end
 
+-- Turns out debug.traceback() is slow
+local ENABLE_TRACEBACK = false
+
 local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
@@ -19,11 +22,11 @@ Promise.IsPromise = isPromise
 -- @constructor Promise.new()
 -- @treturn Promise
 function Promise.new(func)
-	local self = setmetatable({}, Promise)
-
-	self._pendingExecuteList = {}
-	self._uncaughtException = true
-	self._source = debug.traceback()
+	local self = setmetatable({
+		_pendingExecuteList = {};
+		_uncaughtException = true;
+		_source = ENABLE_TRACEBACK and debug.traceback() or "";
+	}, Promise)
 
 	if type(func) == "function" then
 		func(self:_getResolveReject())
@@ -183,11 +186,11 @@ function Promise:Then(onFulfilled, onRejected)
 
 	if self._pendingExecuteList then
 		local promise = Promise.new()
-		table.insert(self._pendingExecuteList, {
+		self._pendingExecuteList[#self._pendingExecuteList + 1] = {
 			promise = promise,
 			onFulfilled = onFulfilled,
 			onRejected = onRejected,
-		})
+		}
 		return promise
 	else
 		return self:_executeThen(nil, onFulfilled, onRejected)
