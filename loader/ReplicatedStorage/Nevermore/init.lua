@@ -129,12 +129,6 @@ local ReplicateMode = {
 	CLIENT = 2;
 }
 local function doReplicate(name, library, topParent)
-	if name:lower():find("server") then
-		return ReplicateMode.SERVER
-	elseif name:lower():find("client") then
-		return ReplicateMode.CLIENT
-	end
-
 	local parent = library.Parent
 	while parent and parent ~= topParent do
 		local parentName = parent.Name:lower()
