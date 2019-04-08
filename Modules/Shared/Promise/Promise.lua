@@ -104,10 +104,13 @@ function Promise:Resolve(...)
 		return
 	end
 
-	if self == (...) then
+	local len = select("#", ...)
+	if len == 0 then
+		self:_fulfill({}, 0)
+	elseif self == (...) then
 		self:Reject("TypeError: Resolved to self")
 	elseif isPromise(...) then
-		if select("#", ...) > 1 then
+		if len > 1 then
 			local message = ("When resolving a promise, extra arguments are discarded! See:\n\n%s")
 				:format(self._source)
 			warn(message)
@@ -121,30 +124,30 @@ function Promise:Resolve(...)
 			self:Reject(unpack(promise2._rejected, 1, promise2._valuesLength))
 		elseif promise2._fulfilled then
 			promise2._uncaughtException = false
-			self:_fulfill(unpack(promise2._fulfilled, 1, promise2._valuesLength))
+			self:_fulfill(promise2._fulfilled, promise2._valuesLength)
 		else
 			error("[Promise.Resolve] - Bad promise2 state")
 		end
 	else -- TODO: Handle thenable promises
-		self:_fulfill(...)
+		self:_fulfill({...}, len)
 	end
 end
 
 --- Fulfills the promise with the value
 -- @param ... Params to _fulfill with
 -- @return self
-function Promise:_fulfill(...)
+function Promise:_fulfill(values, valuesLength)
 	if not self._pendingExecuteList then
 		return
 	end
 
-	self._valuesLength = select("#", ...)
-	self._fulfilled = {...}
+	self._fulfilled = values
+	self._valuesLength = valuesLength
 
 	local list = self._pendingExecuteList
 	self._pendingExecuteList = nil
 	for _, data in pairs(list) do
-		self:_executeThen(data.promise, data.onFulfilled, data.onRejected)
+		self:_executeThen(unpack(data))
 	end
 end
 
@@ -152,17 +155,21 @@ end
 -- @param ... Params to reject with
 -- @return self
 function Promise:Reject(...)
+	self:_reject({...}, select("#", ...))
+end
+
+function Promise:_reject(values, valuesLength)
 	if not self._pendingExecuteList then
 		return
 	end
 
-	self._valuesLength = select("#", ...)
-	self._rejected = {...}
+	self._rejected = values
+	self._valuesLength = valuesLength
 
 	local list = self._pendingExecuteList
 	self._pendingExecuteList = nil
 	for _, data in pairs(list) do
-		self:_executeThen(data.promise, data.onFulfilled, data.onRejected)
+		self:_executeThen(unpack(data))
 	end
 
 	-- Check for uncaught exceptions
@@ -186,11 +193,7 @@ function Promise:Then(onFulfilled, onRejected)
 
 	if self._pendingExecuteList then
 		local promise = Promise.new()
-		self._pendingExecuteList[#self._pendingExecuteList + 1] = {
-			promise = promise,
-			onFulfilled = onFulfilled,
-			onRejected = onRejected,
-		}
+		self._pendingExecuteList[#self._pendingExecuteList + 1] = { promise, onFulfilled, onRejected }
 		return promise
 	else
 		return self:_executeThen(nil, onFulfilled, onRejected)
@@ -211,7 +214,7 @@ end
 -- Utility left for Maid task
 -- @treturn nil
 function Promise:Destroy()
-	self:Reject()
+	self:_reject({}, 0)
 end
 
 function Promise:_getResolveReject()
@@ -235,7 +238,7 @@ function Promise:_executeThen(promise2, onFulfilled, onRejected)
 		else
 			-- Promise2 Fulfills with promise1 (self) value
 			if promise2 then
-				promise2:_fulfill(unpack(self._fulfilled, 1, self._valuesLength))
+				promise2:_fulfill(self._fulfilled, self._valuesLength)
 				return promise2
 			else
 				return self
@@ -253,7 +256,7 @@ function Promise:_executeThen(promise2, onFulfilled, onRejected)
 		else
 			-- Promise2 Rejects with promise1 (self) value
 			if promise2 then
-				promise2:Reject(unpack(self._rejected, 1, self._valuesLength))
+				promise2:_reject(self._rejected, self._valuesLength)
 
 				return promise2
 			else
