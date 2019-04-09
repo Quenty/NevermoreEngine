@@ -27,9 +27,9 @@ function ValueObject.new(baseValue)
 
 	rawset(self, "_value", baseValue)
 
-	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid)
-
 	self._maid = Maid.new()
+
+	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid)
 	self._maid:GiveTask(self.Changed)
 
 	return setmetatable(self, ValueObject)
