@@ -1,4 +1,4 @@
---- Bounding box utilties
+--- Bounding box utilties. Prefer model:GetBoundingBox() in most cases. However, sometimes grouping isn't possible.
 -- @classmod BoundingBox
 
 local lib = {}
