@@ -14,14 +14,14 @@ LagPointCamera._OriginCamera = nil
 
 ---
 -- @constructor
--- @param OriginCamera A camera to use
--- @param FocusCamera The Camera to look at.
-function LagPointCamera.new(OriginCamera, FocusCamera)
+-- @param originCamera A camera to use
+-- @param focusCamera The Camera to look at.
+function LagPointCamera.new(originCamera, focusCamera)
 	local self = setmetatable({}, LagPointCamera)
 
 	self.FocusSpring = Spring.new(Vector3.new())
-	self.OriginCamera = OriginCamera or error("Must have OriginCamera")
-	self.FocusCamera = FocusCamera or error("Must have FocusCamera")
+	self.OriginCamera = originCamera or error("Must have originCamera")
+	self.FocusCamera = focusCamera or error("Must have focusCamera")
 	self.Speed = 10
 
 	return self
@@ -50,27 +50,24 @@ end
 
 function LagPointCamera:__index(index)
 	if index == "State" or index == "CameraState" or index == "Camera" then
-		local Origin, FocusPosition = self.Origin, self.FocusPosition
+		local origin, focusPosition = self.Origin, self.FocusPosition
 
-		local State = CameraState.new()
-		State.FieldOfView = Origin.FieldOfView + self.FocusCamera.CameraState.FieldOfView
+		local state = CameraState.new()
+		state.FieldOfView = origin.FieldOfView + self.FocusCamera.CameraState.FieldOfView
+		state.CFrame = CFrame.new(origin.Position, focusPosition)
 
-		State.CFrame = CFrame.new(
-			Origin.Position,
-			FocusPosition)
-
-		return State
+		return state
 	elseif index == "FocusPosition" then
-		local Delta
+		local delta
 		if self.LastFocusUpdate then
-			Delta = tick() - self.LastFocusUpdate
+			delta = tick() - self.LastFocusUpdate
 		end
 
 		self.LastFocusUpdate = tick()
 		self.FocusSpring.Target = self.FocusCamera.CameraState.Position
 
-		if Delta then
-			self.FocusSpring:TimeSkip(Delta)
+		if delta then
+			self.FocusSpring:TimeSkip(delta)
 		end
 
 		return self.FocusSpring.Position
