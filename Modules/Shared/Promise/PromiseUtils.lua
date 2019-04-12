@@ -44,7 +44,7 @@ function lib.all(promises)
 			remainingCount = remainingCount - 1
 			if remainingCount == 0 then
 				local method = allFulfilled and "Resolve" or "Reject"
-				returnPromise[method](returnPromise, unpack(results))
+				returnPromise[method](returnPromise, unpack(results, 1, #promises))
 			end
 		end
 	end
