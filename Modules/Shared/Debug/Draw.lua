@@ -2,6 +2,7 @@
 -- @module Draw
 
 local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
 
 local lib = {}
 lib._defaultColor = Color3.new(1, 0, 0)
@@ -25,7 +26,7 @@ end
 -- @tparam[opt] {number} meshDiameter
 function lib.Ray(ray, color, parent, meshDiameter, diameter)
 	color = color or lib._defaultColor
-	parent = parent or Workspace.CurrentCamera
+	parent = parent or lib._getDefaultParent()
 	meshDiameter = meshDiameter or 0.2
 	diameter = diameter or 0.2
 
@@ -61,7 +62,7 @@ end
 function lib.Point(vector3, color, parent, diameter)
 	assert(vector3)
 	color = color or lib._defaultColor
-	parent = parent or Workspace.CurrentCamera
+	parent = parent or lib._getDefaultParent()
 	diameter = diameter or 1
 
 	local part = Instance.new("Part")
@@ -96,7 +97,7 @@ function lib.Box(cframe, size, color)
 	cframe = typeof(cframe) == "Vector3" and CFrame.new(cframe) or cframe
 
 	local part = Instance.new("Part")
-	part.Color= color
+	part.Color = color
 	part.Name = "DebugPart"
 	part.Anchored = true
 	part.CanCollide = false
@@ -106,9 +107,13 @@ function lib.Box(cframe, size, color)
 	part.Transparency = 0.5
 	part.Size = size
 	part.CFrame = cframe
-	part.Parent = Workspace.CurrentCamera
+	part.Parent = lib._getDefaultParent()
 
 	return part
+end
+
+function lib._getDefaultParent()
+	return RunService:IsServer() and Workspace or Workspace.CurrentCamera
 end
 
 return lib
