@@ -44,15 +44,86 @@ CameraControls.ClassName = "CameraControls"
 CameraControls.MOUSE_SENSITIVITY = Vector2.new(math.pi*4, math.pi*1.9)
 CameraControls._dragBeginTypes = { Enum.UserInputType.MouseButton2, Enum.UserInputType.Touch }
 
-function CameraControls.new()
+function CameraControls.new(zoomCamera, rotatedCamera)
 	local self = setmetatable({}, CameraControls)
 
 	self._enabled = false
 	self._key = tostring(self) .. "CameraControls"
 	self._gamepadRotateModel = GamepadRotateModel.new()
 
+	if zoomCamera then
+		self:SetZoomedCamera(zoomCamera)
+	end
+	if rotatedCamera then
+		self:SetRotatedCamera(rotatedCamera)
+	end
+
 	return self
 end
+
+function CameraControls:IsEnabled()
+	return self._enabled
+end
+
+
+function CameraControls:Enable()
+	if self._enabled then
+		return
+	end
+
+	assert(not self._maid)
+	self._enabled = true
+
+	self._maid = Maid.new()
+
+	self._maid:GiveTask(self._gamepadRotateModel.IsRotating.Changed:Connect(function()
+		if self._gamepadRotateModel.IsRotating.Value then
+			self:_handleGamepadRotateStart()
+		else
+			self:_handleGamepadRotateStop()
+		end
+	end))
+
+	ContextActionService:BindAction(self._key, function(actionName, userInputState, inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.MouseWheel then
+			self:_handleMouseWheel(inputObject)
+		end
+	end, false, Enum.UserInputType.MouseWheel)
+
+	ContextActionService:BindAction(self._key .. "Drag", function(actionName, userInputState, inputObject)
+		if userInputState == Enum.UserInputState.Begin then
+			self:_beginDrag(inputObject)
+		end
+	end, false, unpack(self._dragBeginTypes))
+
+	ContextActionService:BindAction(self._key .. "Rotate", function(actionName, userInputState, inputObject)
+		self:_handleThumbstickInput(inputObject)
+	end, false, Enum.KeyCode.Thumbstick2)
+
+	self._maid:GiveTask(UserInputService.TouchPinch:Connect(function(touchPositions, scale, velocity, userInputState)
+		self:_handleTouchPinch(scale, velocity, userInputState)
+	end))
+
+	self._maid:GiveTask(function()
+		ContextActionService:UnbindAction(self._key)
+		ContextActionService:UnbindAction(self._key .. "Drag")
+		ContextActionService:UnbindAction(self._key .. "Rotate")
+	end)
+end
+
+function CameraControls:Disable()
+	if not self._enabled then
+		return
+	end
+
+	self._enabled = false
+
+	self._maid:DoCleaning()
+	self._maid = nil
+
+	self._lastMousePosition = nil
+end
+
 
 function CameraControls:SetZoomedCamera(zoomedCamera)
 	self._zoomedCamera = zoomedCamera or error()
@@ -154,7 +225,7 @@ function CameraControls:_handleThumbstickInput(inputObject)
 	self._gamepadRotateModel:HandleThumbstickInput(inputObject)
 end
 
-function CameraControls:BeginDrag(beginInputObject)
+function CameraControls:_beginDrag(beginInputObject)
 	if not self._rotatedCamera then
 		self._maid._dragMaid = nil
 		return
@@ -216,15 +287,9 @@ function CameraControls:_endDrag()
 	self._maid._dragMaid = nil
 end
 
-function CameraControls:IsEnabled()
-	return self._enabled
-end
 
-function CameraControls:GetKey()
-	return self._key
-end
 
-function CameraControls:HandleGamepadRotateStop()
+function CameraControls:_handleGamepadRotateStop()
 	if self._rotVelocityTracker then
 		self:_applyRotVelocityTracker(self._rotVelocityTracker)
 		self._rotVelocityTracker = nil
@@ -233,7 +298,7 @@ function CameraControls:HandleGamepadRotateStop()
 	self._maid._dragMaid = nil
 end
 
-function CameraControls:HandleGamepadRotateStart()
+function CameraControls:_handleGamepadRotateStart()
 	if not self._rotatedCamera then
 		self._maid._dragMaid = nil
 		return
@@ -258,60 +323,6 @@ function CameraControls:HandleGamepadRotateStart()
 	end))
 
 	self._maid._dragMaid = maid
-end
-
-function CameraControls:Enable()
-	if not self._enabled then
-		assert(not self._maid)
-		self._enabled = true
-
-		self._maid = Maid.new()
-
-		self._maid:GiveTask(self._gamepadRotateModel.IsRotating.Changed:Connect(function()
-			if self._gamepadRotateModel.IsRotating.Value then
-				self:HandleGamepadRotateStart()
-			else
-				self:HandleGamepadRotateStop()
-			end
-		end))
-
-		ContextActionService:BindAction(self._key, function(actionName, userInputState, inputObject)
-			if inputObject.UserInputType == Enum.UserInputType.MouseWheel then
-				self:_handleMouseWheel(inputObject)
-			end
-		end, false, Enum.UserInputType.MouseWheel)
-
-		ContextActionService:BindAction(self._key .. "Drag", function(actionName, userInputState, inputObject)
-			if userInputState == Enum.UserInputState.Begin then
-				self:BeginDrag(inputObject)
-			end
-		end, false, unpack(self._dragBeginTypes))
-
-		ContextActionService:BindAction(self._key .. "Rotate", function(actionName, userInputState, inputObject)
-			self:_handleThumbstickInput(inputObject)
-		end, false, Enum.KeyCode.Thumbstick2)
-
-		self._maid:GiveTask(UserInputService.TouchPinch:Connect(function(touchPositions, scale, velocity, userInputState)
-			self:_handleTouchPinch(scale, velocity, userInputState)
-		end))
-
-		self._maid:GiveTask(function()
-			ContextActionService:UnbindAction(self._key)
-			ContextActionService:UnbindAction(self._key .. "Drag")
-			ContextActionService:UnbindAction(self._key .. "Rotate")
-		end)
-	end
-end
-
-function CameraControls:Disable()
-	if self._enabled then
-		self._enabled = false
-
-		self._maid:DoCleaning()
-		self._maid = nil
-
-		self._lastMousePosition = nil
-	end
 end
 
 function CameraControls:Destroy()
