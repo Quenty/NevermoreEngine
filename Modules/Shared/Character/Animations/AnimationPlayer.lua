@@ -89,7 +89,9 @@ function AnimationPlayer:StopTrack(trackName, fadeTime)
 
 	local track = self:GetTrack(trackName)
 
-	track:Stop(fadeTime)
+	if track.IsPlaying then
+		track:Stop(fadeTime)
+	end
 
 	return track
 end
