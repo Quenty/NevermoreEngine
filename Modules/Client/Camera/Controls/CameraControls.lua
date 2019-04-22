@@ -61,10 +61,13 @@ function CameraControls.new(zoomCamera, rotatedCamera)
 	return self
 end
 
+function CameraControls:GetKey()
+	return self._key
+end
+
 function CameraControls:IsEnabled()
 	return self._enabled
 end
-
 
 function CameraControls:Enable()
 	if self._enabled then
