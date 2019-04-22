@@ -28,7 +28,7 @@ function BoundParentTracker.new(binder, child)
 	end))
 
 	-- Perform update
-	self._maid:GiveTask(self._child.AncestryChanged:Connect(function()
+	self._maid:GiveTask(self._child:GetPropertyChangedSignal("Parent"):Connect(function()
 		self:_update()
 	end))
 	self:_update()
