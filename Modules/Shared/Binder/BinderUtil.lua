@@ -3,7 +3,7 @@
 
 local BinderUtil = {}
 
-function BinderUtil.FindFirstAncestor(binder, child)
+function BinderUtil.findFirstAncestor(binder, child)
 	assert(binder)
 	assert(typeof(child) == "Instance")
 
@@ -18,7 +18,7 @@ function BinderUtil.FindFirstAncestor(binder, child)
 	return nil
 end
 
-function BinderUtil.GetChildren(binder, parent)
+function BinderUtil.getChildren(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 

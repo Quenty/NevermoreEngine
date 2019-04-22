@@ -21,7 +21,7 @@ function BinderTouchingCalculator:GetTouchingClass(binder, touchingList, ignoreO
 	local touching = {}
 
 	for _, part in pairs(touchingList) do
-		local object = BinderUtil.FindFirstAncestor(binder, part)
+		local object = BinderUtil.findFirstAncestor(binder, part)
 		if object then
 			if not touching[object] then
 				touching[object] = {
