@@ -95,7 +95,7 @@ function CameraControls:Enable()
 
 	ContextActionService:BindAction(self._key .. "Drag", function(actionName, userInputState, inputObject)
 		if userInputState == Enum.UserInputState.Begin then
-			self:_beginDrag(inputObject)
+			self:BeginDrag(inputObject)
 		end
 	end, false, unpack(self._dragBeginTypes))
 
@@ -127,6 +127,40 @@ function CameraControls:Disable()
 	self._lastMousePosition = nil
 end
 
+function CameraControls:BeginDrag(beginInputObject)
+	if not self._rotatedCamera then
+		self._maid._dragMaid = nil
+		return
+	end
+
+	local maid = Maid.new()
+
+	self._lastMousePosition = beginInputObject.Position
+	local isMouse = beginInputObject.UserInputType.Name:find("Mouse")
+	if isMouse then
+		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
+	end
+
+	maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, GameProcessed)
+		if inputObject == beginInputObject then
+			self:_endDrag()
+		end
+	end))
+
+	maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
+		if isMouse and inputObject.UserInputType == Enum.UserInputType.MouseMovement
+			or inputObject == beginInputObject then
+
+			self:_handleMouseMovement(inputObject)
+		end
+	end))
+
+	if self._rotatedCamera.ClassName == "SmoothRotatedCamera" then
+		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.new())
+	end
+
+	self._maid._dragMaid = maid
+end
 
 function CameraControls:SetZoomedCamera(zoomedCamera)
 	self._zoomedCamera = zoomedCamera or error()
@@ -226,41 +260,6 @@ end
 
 function CameraControls:_handleThumbstickInput(inputObject)
 	self._gamepadRotateModel:HandleThumbstickInput(inputObject)
-end
-
-function CameraControls:_beginDrag(beginInputObject)
-	if not self._rotatedCamera then
-		self._maid._dragMaid = nil
-		return
-	end
-
-	local maid = Maid.new()
-
-	self._lastMousePosition = beginInputObject.Position
-	local isMouse = beginInputObject.UserInputType.Name:find("Mouse")
-	if isMouse then
-		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
-	end
-
-	maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, GameProcessed)
-		if inputObject == beginInputObject then
-			self:_endDrag()
-		end
-	end))
-
-	maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
-		if isMouse and inputObject.UserInputType == Enum.UserInputType.MouseMovement
-			or inputObject == beginInputObject then
-
-			self:_handleMouseMovement(inputObject)
-		end
-	end))
-
-	if self._rotatedCamera.ClassName == "SmoothRotatedCamera" then
-		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.new())
-	end
-
-	self._maid._dragMaid = maid
 end
 
 function CameraControls:_applyRotVelocityTracker(rotVelocityTracker)
