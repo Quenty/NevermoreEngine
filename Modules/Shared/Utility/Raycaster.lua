@@ -6,12 +6,16 @@ local Workspace = game:GetService("Workspace")
 local Raycaster = {}
 Raycaster.ClassName = "Raycaster"
 
-function Raycaster.new()
+function Raycaster.new(filterFunction)
 	local self = setmetatable({
 		_ignoreWater = false,
 		_maxCasts = 5,
 		_ignoreList = {},
 	}, Raycaster)
+
+	if filterFunction then
+		self.Filter = filterFunction
+	end
 
 	return self
 end
