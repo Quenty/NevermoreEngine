@@ -9,11 +9,5 @@
 
 !ModuleList.txt
 
-/TestScripts
-/DataConverters
-/_Archive
-
 Exported.rbxm
-ProjectPlanning.lua
-AxisCameraEngine.lua
 AccelTween.lua
