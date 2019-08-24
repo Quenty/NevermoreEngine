@@ -42,7 +42,6 @@ function CameraStateTweener:Show(doNotAnimate)
 	self:SetTarget(1, doNotAnimate)
 end
 
-
 function CameraStateTweener:Hide(doNotAnimate)
 	self:SetTarget(0, doNotAnimate)
 end
