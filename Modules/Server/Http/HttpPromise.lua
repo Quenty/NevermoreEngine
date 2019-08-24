@@ -47,7 +47,7 @@ function HttpPromise.LogFailedRequests(...)
 		if type(item) == "string" then
 			warn(item)
 		elseif type(item) == "table" and type(item.StatusCode) == "number" then
-			warn(("Failed request %d"):format(item.StatusCode, tostring(item.Body)))
+			warn(("Failed request %d %q"):format(item.StatusCode, tostring(item.Body)))
 		end
 	end
 end
