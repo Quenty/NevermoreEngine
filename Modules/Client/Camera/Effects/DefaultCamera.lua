@@ -23,6 +23,10 @@ function DefaultCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
+function DefaultCamera:OverrideGlobalFieldOfView(fieldOfView)
+	self._cameraState.FieldOfView = fieldOfView
+end
+
 function DefaultCamera:OverrideCameraState(cameraState)
 	self._cameraState = cameraState or error("No CameraState")
 end
