@@ -18,6 +18,17 @@ function BinderUtil.findFirstAncestor(binder, child)
 	return nil
 end
 
+function BinderUtil.findFirstChild(binder, parent)
+	for _, child in pairs(parent:GetChildren()) do
+		local class = binder:Get(child)
+		if class then
+			return class
+		end
+	end
+
+	return nil
+end
+
 function BinderUtil.getChildren(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
