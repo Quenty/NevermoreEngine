@@ -27,11 +27,12 @@ end
 
 function TrackCamera:__newindex(index, value)
 	if index == "CameraSubject" then
-		assert(type(value) == "userdata" or type(value) == "nil",
+		assert(typeof(value) == "Instance" or type(value) == "nil",
 			"CameraSubject must be a Roblox Model or Roblox Part or nil")
 
-		if type(value) == "userdata" then
-			assert(value:IsA("Model") or value:IsA("BasePart"), "CameraSubject must be a Model or BasePart")
+		if typeof(value) == "Instance" then
+			assert(value:IsA("Model") or value:IsA("BasePart") or value:IsA("Humanoid"),
+				"CameraSubject must be a Model, BasePart or Humanoid")
 		end
 
 		rawset(self, index, value)
@@ -53,6 +54,12 @@ function TrackCamera:__index(index)
 				state.CFrame = cameraSubject:GetPrimaryPartCFrame()
 			elseif cameraSubject:IsA("BasePart") then
 				state.CFrame = cameraSubject.CFrame
+			elseif cameraSubject:IsA("Humanoid") then
+				if cameraSubject.RootPart then
+					state.CFrame = cameraSubject.RootPart.CFrame
+				elseif cameraSubject.Parent and cameraSubject.Parent:IsA("Model") then
+					state.CFrame = cameraSubject:GetPrimaryPartCFrame()
+				end
 			end
 		end
 
