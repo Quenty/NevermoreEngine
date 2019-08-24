@@ -137,8 +137,11 @@ end
 local function buildClock()
 	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-	local remoteEvent = require.GetRemoteEvent("TimeSyncEvent")
-	local remoteFunction = require.GetRemoteFunction("DelayedRequestEvent")
+	local GetRemoteEvent = require("GetRemoteEvent")
+	local GetRemoteFunction = require("GetRemoteFunction")
+
+	local remoteEvent = GetRemoteEvent("TimeSyncEvent")
+	local remoteFunction = GetRemoteFunction("DelayedRequestEvent")
 
 	if RunService:IsClient() and RunService:IsServer() then -- Solo test mode
 		local clock = MasterClock.new(remoteEvent, remoteFunction)
