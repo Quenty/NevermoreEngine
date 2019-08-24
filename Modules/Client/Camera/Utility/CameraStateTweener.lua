@@ -1,11 +1,11 @@
---- Makes transitions between states easier. Uses the `CameraStack` to tween in and
+--- Makes transitions between states easier. Uses the `CameraStackService` to tween in and
 -- out a new camera state Call `:Show()` and `:Hide()` to do so, and make sure to
 -- call `:Destroy()` after usage
 -- @classmod CameraStateTweener
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local CameraStack = require("CameraStack")
+local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera = require("FadeBetweenCamera")
 local Maid = require("Maid")
 
@@ -20,19 +20,19 @@ function CameraStateTweener.new(cameraEffect, speed)
 	local self = setmetatable({}, CameraStateTweener)
 
 	self._maid = Maid.new()
-	local cameraBelow, assign = CameraStack:GetNewStateBelow()
+	local cameraBelow, assign = CameraStackService:GetNewStateBelow()
 	self._cameraBelow = cameraBelow
 	self._fadeBetween = FadeBetweenCamera.new(cameraBelow, cameraEffect)
 	assign(self._fadeBetween)
 
-	CameraStack:Add(self._fadeBetween)
+	CameraStackService:Add(self._fadeBetween)
 
 	self._fadeBetween.Speed = speed or 20
 	self._fadeBetween.Target = 0
 	self._fadeBetween.Value = 0
 
 	self._maid:GiveTask(function()
-		CameraStack:Remove(self._fadeBetween)
+		CameraStackService:Remove(self._fadeBetween)
 	end)
 
 	return self

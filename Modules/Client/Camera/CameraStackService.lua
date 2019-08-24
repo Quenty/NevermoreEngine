@@ -1,6 +1,6 @@
 --- Holds camera states and allows for the last camera state to be retrieved. Also
 -- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
--- @module CameraStack
+-- @module CameraStackService
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -11,15 +11,11 @@ local CustomCameraEffect = require("CustomCameraEffect")
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
 
-assert(RunService:IsClient(), "[CameraStack] - Only require CameraStack on client")
+assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackService on client")
 
-local CameraStack = {}
-CameraStack.__index = CameraStack
-CameraStack.ClassName = "CameraStack"
+local CameraStackService = {}
 
-function CameraStack.new()
-	local self = setmetatable({}, CameraStack)
-
+function CameraStackService:Init()
 	self._stack = {}
 
 	-- Initialize default cameras
@@ -41,13 +37,13 @@ function CameraStack.new()
 
 		debug.profileend()
 	end)
-
-	return self
 end
 
 --- Outputs the camera stack
 -- @treturn nil
-function CameraStack:PrintCameraStack()
+function CameraStackService:PrintCameraStack()
+	assert(self._stack, "Stack is not initialized yet")
+
 	for _, value in pairs(self._stack) do
 		print(tostring(type(value) == "table" and value.ClassName or tostring(value)))
 	end
@@ -55,28 +51,30 @@ end
 
 --- Returns the default camera
 -- @treturn SummedCamera DefaultCamera + ImpulseCamera
-function CameraStack:GetDefaultCamera()
-	return self._defaultCamera
+function CameraStackService:GetDefaultCamera()
+	return self._defaultCamera or error()
 end
 
 --- Returns the impulse camera. Useful for adding camera shake
 -- @treturn ImpulseCamera
-function CameraStack:GetImpulseCamera()
-	return self._impulseCamera
+function CameraStackService:GetImpulseCamera()
+	return self._impulseCamera or error()
 end
 
 --- Returns the default camera without any impulse cameras
 -- @treturn DefaultCamera
-function CameraStack:GetRawDefaultCamera()
-	return self._rawDefaultCamera
+function CameraStackService:GetRawDefaultCamera()
+	return self._rawDefaultCamera or error()
 end
 
 --- Retrieves the top state off the stack
 -- @treturn[1] CameraState
 -- @treturn[2] nil
-function CameraStack:GetTopState()
+function CameraStackService:GetTopState()
+	assert(self._stack, "Stack is not initialized yet")
+
 	if #self._stack > 10 then
-		warn(("[CameraStack] - Stack is bigger than 10 in camerastack (%d)"):format(#self._stack))
+		warn(("[CameraStackService] - Stack is bigger than 10 in camerastackService (%d)"):format(#self._stack))
 	end
 	local topState = self._stack[#self._stack]
 
@@ -85,17 +83,19 @@ function CameraStack:GetTopState()
 		if state then
 			return state
 		else
-			warn("[CameraStack] - No top state!")
+			warn("[CameraStackService] - No top state!")
 		end
 	else
-		warn("[CameraStack] - Bad type on top of stack")
+		warn("[CameraStackService] - Bad type on top of stack")
 	end
 end
 
 --- Returns a new camera state that retrieves the state below its set state
 -- @treturn[1] CustomCameraEffect
 -- @treturn[1] NewStateToUse
-function CameraStack:GetNewStateBelow()
+function CameraStackService:GetNewStateBelow()
+	assert(self._stack, "Stack is not initialized yet")
+
 	local _stateToUse = nil
 
 	return CustomCameraEffect.new(function()
@@ -105,11 +105,11 @@ function CameraStack:GetNewStateBelow()
 			if below then
 				return below.CameraState or below
 			else
-				warn("[CameraStack] - Could not get state below, found current state. Returning default.")
+				warn("[CameraStackService] - Could not get state below, found current state. Returning default.")
 				return self._stack[1].CameraState
 			end
 		else
-			warn("[CameraStack] - Could not get state, returning default")
+			warn("[CameraStackService] - Could not get state, returning default")
 			return self._stack[1].CameraState
 		end
 	end), function(newStateToUse)
@@ -121,7 +121,9 @@ end
 -- @tparam CameraState state
 -- @treturn number Index of state
 -- @treturn nil If non on stack
-function CameraStack:GetIndex(state)
+function CameraStackService:GetIndex(state)
+	assert(self._stack, "Stack is not initialized yet")
+
 	for index, value in pairs(self._stack) do
 		if value == state then
 			return index
@@ -132,7 +134,9 @@ end
 --- Removes the state from the stack
 -- @tparam CameraState state
 -- @treturn nil
-function CameraStack:Remove(state)
+function CameraStackService:Remove(state)
+	assert(self._stack, "Stack is not initialized yet")
+
 	local index = self:GetIndex(state)
 
 	if index then
@@ -143,8 +147,10 @@ end
 --- Adds a state to the stack
 -- @tparam CameraState state
 -- @treturn nil
-function CameraStack:Add(state)
+function CameraStackService:Add(state)
+	assert(self._stack, "Stack is not initialized yet")
+
 	table.insert(self._stack, state)
 end
 
-return CameraStack.new()
+return CameraStackService
