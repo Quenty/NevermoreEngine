@@ -32,27 +32,27 @@ function SmoothPositionCamera:__newindex(index, value)
 		self.Spring.Target = self.BaseCamera.CameraState.Position
 		self.Spring.Position = self.Spring.Target
 		self.Spring.Velocity = Vector3.new(0, 0, 0)
-	elseif index == "LastUpdateTime" or index == "Spring" then
+	elseif index == "_lastUpdateTime" or index == "Spring" then
 		rawset(self, index, value)
 	elseif index == "Speed" or index == "Damper" or index == "Velocity" or index == "Position" then
-		self:InternalUpdate()
+		self:_internalUpdate()
 		self.Spring[index] = value
 	else
 		error(index .. " is not a valid member of SmoothPositionCamera")
 	end
 end
 
-function SmoothPositionCamera:InternalUpdate()
-	local Delta
-	if self.LastUpdateTime then
-		Delta = tick() - self.LastUpdateTime
+function SmoothPositionCamera:_internalUpdate()
+	local delta
+	if self._lastUpdateTime then
+		delta = tick() - self._lastUpdateTime
 	end
 
-	self.LastUpdateTime = tick()
+	self._lastUpdateTime = tick()
 	self.Spring.Target = self.BaseCameraState.Position
 
-	if Delta then
-		self.Spring:TimeSkip(Delta)
+	if delta then
+		self.Spring:TimeSkip(delta)
 	end
 end
 
@@ -67,7 +67,7 @@ function SmoothPositionCamera:__index(index)
 
 		return state
 	elseif index == "Position" then
-		self:InternalUpdate()
+		self:_internalUpdate()
 		return self.Spring.Position
 	elseif index == "Speed" or index == "Damper" or index == "Velocity" then
 		return self.Spring[index]
