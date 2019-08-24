@@ -7,6 +7,9 @@ local PhysicsService = game:GetService("PhysicsService")
 local Players = game:GetService("Players")
 
 local Maid = require("Maid")
+local GetRemoteFunction = require("GetRemoteFunction")
+
+local REMOTE_FUNCTION_NAME = "GetClipCharactersId"
 
 local ClipCharacters = {}
 ClipCharacters.ClassName = "ClipCharacters"
@@ -20,7 +23,7 @@ function ClipCharacters.initServer()
 	local groupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.CollisionGroupName, "Default", false)
 
-	local remoteFunction = require.GetRemoteFunction("GetClipCharactersId")
+	local remoteFunction = GetRemoteFunction(REMOTE_FUNCTION_NAME)
 	function remoteFunction.OnServerInvoke(player)
 		return groupId
 	end
@@ -32,7 +35,7 @@ end
 function ClipCharacters.new()
 	local self = setmetatable({}, ClipCharacters)
 
-	self._remoteFunction = require.GetRemoteFunction("GetClipCharactersId")
+	self._remoteFunction = GetRemoteFunction(REMOTE_FUNCTION_NAME)
 
 	self._maid = Maid.new()
 	self:_bindUpdatesYielding()
