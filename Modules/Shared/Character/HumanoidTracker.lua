@@ -81,7 +81,11 @@ function HumanoidTracker:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
 
 	maid:GiveTask(newHumanoid.Died:Connect(function()
 		self.AliveHumanoid.Value = nil
-		self.HumanoidDied:Fire(newHumanoid)
+
+		-- AliveHumanoid changing may proc .Destroy method
+		if self.Destroy then
+			self.HumanoidDied:Fire(newHumanoid)
+		end
 	end))
 end
 
