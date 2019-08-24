@@ -26,19 +26,19 @@ function FadeBetweenCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function FadeBetweenCamera:__newindex(index, Value)
+function FadeBetweenCamera:__newindex(index, value)
 	if index == "Damper" then
-		self.Spring.Damper = Value
+		self.Spring.Damper = value
 	elseif index == "Value" then
-		self.Spring.Value = Value
+		self.Spring.Value = value
 	elseif index == "Speed" then
-		self.Spring.Speed = Value
+		self.Spring.Speed = value
 	elseif index == "Target" then
-		self.Spring.Target = Value
+		self.Spring.Target = value
 	elseif index == "Velocity" then
-		self.Spring.Velocity = Value
+		self.Spring.Velocity = value
 	elseif index == "Spring" or index == "CameraA" or index == "CameraB" then
-		rawset(self, index, Value)
+		rawset(self, index, value)
 	else
 		error(index .. " is not a valid member of fading camera")
 	end

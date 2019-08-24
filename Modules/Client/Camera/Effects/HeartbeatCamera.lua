@@ -14,10 +14,10 @@ local HeartbeatCamera = {}
 HeartbeatCamera.ClassName = "HeartbeatCamera"
 HeartbeatCamera.ProfileName = "HeartbeatCamera"
 
-function HeartbeatCamera.new(Camera)
+function HeartbeatCamera.new(camera)
 	local self = setmetatable({}, HeartbeatCamera)
 
-	self.Camera = Camera or error("No camera")
+	self.Camera = camera or error("No camera")
 	self.Maid = Maid.new()
 
 	self.CurrentStateCache = self.Camera.CameraState or error("Camera state returned null")

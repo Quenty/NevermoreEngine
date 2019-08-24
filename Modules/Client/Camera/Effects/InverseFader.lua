@@ -8,11 +8,11 @@ local SummedCamera = require("SummedCamera")
 local InverseFader = {}
 InverseFader.ClassName = "InverseFader"
 
-function InverseFader.new(Camera, Fader)
+function InverseFader.new(camera, fader)
 	local self = setmetatable({}, InverseFader)
 
-	self.Camera = Camera or error()
-	self.Fader = Fader or error()
+	self._camera = camera or error()
+	self._fader = fader or error()
 
 	return self
 end
@@ -23,7 +23,7 @@ end
 
 function InverseFader:__index(index)
 	if index == "State" or index == "CameraState" or index == "Camera" then
-		return (self.Camera.CameraState or self.Camera)*(1-self.Fader.Value)
+		return (self._camera.CameraState or self._camera)*(1-self._fader.Value)
 	else
 		return InverseFader[index]
 	end

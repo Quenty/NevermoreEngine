@@ -26,15 +26,15 @@ function ImpulseCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function ImpulseCamera:__newindex(Index, Value)
-	if Index == "Damper" then
-		self.Spring.Damper = Value
-	elseif Index == "Speed" then
-		self.Spring.Speed = Value
-	elseif Index == "Spring" then
-		rawset(self, Index, Value)
+function ImpulseCamera:__newindex(index, value)
+	if index == "Damper" then
+		self.Spring.Damper = value
+	elseif index == "Speed" then
+		self.Spring.Speed = value
+	elseif index == "Spring" then
+		rawset(self, index, value)
 	else
-		error(Index .. " is not a valid member of impulse camera")
+		error(index .. " is not a valid member of impulse camera")
 	end
 end
 
@@ -42,18 +42,18 @@ function ImpulseCamera:Impulse(Velocity)
 	self.Spring:Impulse(Velocity)
 end
 
-function ImpulseCamera:__index(Index)
-	if Index == "State" or Index == "CameraState" or Index == "Camera" then
-		local State = CameraState.new()
-		local Value = self.Spring.Value
-		State.CFrame = CFrame.Angles(0, Value.y, 0) * CFrame.Angles(Value.x, 0, 0) * CFrame.Angles(0, 0, Value.z)
-		return State
-	elseif Index == "Damper" then
+function ImpulseCamera:__index(index)
+	if index == "State" or index == "CameraState" or index == "Camera" then
+		local state = CameraState.new()
+		local value = self.Spring.Value
+		state.CFrame = CFrame.Angles(0, value.y, 0) * CFrame.Angles(value.x, 0, 0) * CFrame.Angles(0, 0, value.z)
+		return state
+	elseif index == "Damper" then
 		return self.Spring.Damper
-	elseif Index == "Speed" then
+	elseif index == "Speed" then
 		return self.Spring.Speed
 	else
-		return ImpulseCamera[Index]
+		return ImpulseCamera[index]
 	end
 end
 
