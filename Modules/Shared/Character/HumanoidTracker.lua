@@ -1,6 +1,5 @@
 --- Tracks a player's character's humanoid
 -- @classmod HumanoidTracker
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

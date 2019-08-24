@@ -1,6 +1,5 @@
 --- Utility functions involving the root part
 -- @module RootPartUtil
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

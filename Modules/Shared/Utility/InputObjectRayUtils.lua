@@ -1,6 +1,5 @@
 --- Utility functions for constructing rays from input objects
 -- @module InputObjectRayUtils
--- @author Quenty
 
 local Workspace = game:GetService("Workspace")
 

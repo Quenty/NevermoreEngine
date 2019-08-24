@@ -1,6 +1,5 @@
 --- Provides utility for editing buttons
 -- @module ButtonUtils
--- @author Quenty
 
 local lib = {}
 

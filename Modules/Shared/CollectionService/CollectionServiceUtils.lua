@@ -1,6 +1,5 @@
 --- Utility functions for use with collection service tags
 -- @module CollectionServiceUtils
--- @author Quenty
 
 local CollectionService = game:GetService("CollectionService")
 

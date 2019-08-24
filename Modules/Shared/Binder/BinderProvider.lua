@@ -1,6 +1,5 @@
 --- Provides a basis for binders that can be retrieved anywhere
 -- @classmod BinderProvider
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

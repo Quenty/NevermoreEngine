@@ -1,6 +1,6 @@
 --- A better EasyConfiguration system.
 -- @classmod EasyConfiguration
--- @author Quenty
+-- @deprecated It's recommend you don't use this sort of easy configuration system
 
 local EasyConfiguration = {}
 EasyConfiguration.ClassName = "EasyConfiguration"
