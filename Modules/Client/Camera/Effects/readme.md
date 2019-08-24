@@ -1,5 +1,5 @@
 ### Camera State
-Camera state is an immutable camera system used for camera interpolation. Designed to make camera effects easy, it trades some efficiency and speed for making a not confusing camera system.
+CameraState is an immutable camera system used for camera interpolation. Designed to make camera effects easy, it trades some efficiency and speed for making a not confusing camera system.
 
 Camera state stores internal state of Coordinate frames as quaternions. This means that the classic lerp equation. Operations have been overridden to make this easier to work with.
 
@@ -21,9 +21,8 @@ Indexing the CameraEffect should return the current camera state. This means tha
 
 This will return a `CameraState`
 
-
-### Specific effects
-This is an indication of some specific effects. Doesn't include all of them.
+!!! warning
+	Note that eventually we plan to deprecate everything but .CameraState
 
 #### DefaultCamera
 This class tracks the current camera ROBLOX uses and lets it maintain how it operates using a `BindToRenderStep` trick.
