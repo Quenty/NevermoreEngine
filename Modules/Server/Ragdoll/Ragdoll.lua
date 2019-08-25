@@ -18,7 +18,7 @@ function Ragdoll.new(humanoid)
 	self:StopAnimations()
 
 	self._maid:GiveTask(function()
-		self._obj:ChangeState(Enum.HumanoidStateType.Running)
+		self._obj:ChangeState(Enum.HumanoidStateType.GettingUp)
 	end)
 
 	self:_setupRootPart()
