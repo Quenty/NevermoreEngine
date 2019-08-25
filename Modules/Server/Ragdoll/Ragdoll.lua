@@ -44,7 +44,29 @@ function Ragdoll.new(humanoid)
 		end)
 	end
 
+	-- After joints have been removed
+	self:_setupHead()
+
 	return self
+end
+
+function Ragdoll:_setupHead()
+	local model = self._obj.Parent
+	if not model then
+		return
+	end
+
+	local head = model:FindFirstChild("Head")
+	if not head then
+		return
+	end
+
+	local originalSize = head.Size
+	head.Size = Vector3.new(1, 1, 1)
+
+	self._maid:GiveTask(function()
+		head.Size = originalSize
+	end)
 end
 
 function Ragdoll:_setupRootPart()

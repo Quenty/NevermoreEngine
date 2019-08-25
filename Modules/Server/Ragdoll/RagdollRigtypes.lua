@@ -12,7 +12,7 @@ local HEAD_LIMITS = {
 local LOWER_TORSO_LIMITS = {
 	UpperAngle = 5;
 	TwistLowerAngle = -30;
-	TwistUpperAngle = 175;
+	TwistUpperAngle = 60;
 }
 
 local HAND_FOOT_LIMITS = {
@@ -34,15 +34,15 @@ local KNEE_LIMITS = {
 }
 
 local SHOULDER_LIMITS = {
-	UpperAngle = 120;
+	UpperAngle = 60;
 	TwistLowerAngle = -60;
 	TwistUpperAngle = 175;
 }
 
 local HIP_LIMITS = {
-	UpperAngle = 60;
+	UpperAngle = 40;
 	TwistLowerAngle = -5;
-	TwistUpperAngle = 90;
+	TwistUpperAngle = 150;
 }
 
 local R6_HEAD_LIMITS = {
@@ -282,11 +282,13 @@ function RagdollRigtypes.getR15NoCollisions(model)
 	addPair({"LowerTorso", "LeftUpperArm"})
 	addPair({"LeftUpperArm", "LeftLowerArm"})
 	addPair({"LeftLowerArm", "LeftHand"})
+	addPair({"LeftUpperArm", "LeftHand"})
 
 	addPair({"UpperTorso", "RightUpperArm"})
 	addPair({"LowerTorso", "RightUpperArm"})
 	addPair({"RightUpperArm", "RightLowerArm"})
 	addPair({"RightLowerArm", "RightHand"})
+	addPair({"RightUpperArm", "RightHand"})
 
 	addPair({"LeftUpperLeg", "RightUpperLeg"})
 
@@ -294,11 +296,28 @@ function RagdollRigtypes.getR15NoCollisions(model)
 	addPair({"LowerTorso", "RightUpperLeg"})
 	addPair({"RightUpperLeg", "RightLowerLeg"})
 	addPair({"RightLowerLeg", "RightFoot"})
+	addPair({"RightUpperLeg", "RightFoot"})
 
 	addPair({"UpperTorso", "LeftUpperLeg"})
 	addPair({"LowerTorso", "LeftUpperLeg"})
 	addPair({"LeftUpperLeg", "LeftLowerLeg"})
 	addPair({"LeftLowerLeg", "LeftFoot"})
+	addPair({"LeftUpperLeg", "LeftFoot"})
+
+	-- Support weird R15 rigs
+	addPair({"UpperTorso", "LeftLowerLeg"})
+	addPair({"UpperTorso", "RightLowerLeg"})
+	addPair({"LowerTorso", "LeftLowerLeg"})
+	addPair({"LowerTorso", "RightLowerLeg"})
+
+	addPair({"UpperTorso", "LeftLowerArm"})
+	addPair({"UpperTorso", "RightLowerArm"})
+
+	local upperTorso = model:FindFirstChild("UpperTorso")
+	if upperTorso and upperTorso.Size.x <= 1.5 then
+		addPair({"Head", "LeftUpperArm"})
+		addPair({"Head", "RightUpperArm"})
+	end
 
 	return list
 end

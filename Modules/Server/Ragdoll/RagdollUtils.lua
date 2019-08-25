@@ -44,15 +44,6 @@ function RagdollUtils.createBallJoints(humanoid)
 			constraint.TwistLimitsEnabled = true
 			constraint.TwistLowerAngle = objects.limits.TwistLowerAngle
 			constraint.TwistUpperAngle = objects.limits.TwistUpperAngle
-
-			-- if parent.Name == "Head" then
-			-- 	constraint.LimitsEnabled = true
-			-- 	constraint.UpperAngle = 60
-			-- 	constraint.TwistLimitsEnabled = true
-			-- 	constraint.TwistLowerAngle = -60
-			-- 	constraint.TwistUpperAngle = 60
-			-- end
-
 			constraint.Parent = parent
 			table.insert(joints, constraint)
 		end
