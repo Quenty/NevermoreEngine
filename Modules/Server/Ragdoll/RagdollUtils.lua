@@ -1,4 +1,4 @@
---- Utility mehtods for ragdolling
+--- Utility mehtods for ragdolling. See Ragdoll.lua and RagdollClient.lua for implementation details
 -- @module RagdollUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
