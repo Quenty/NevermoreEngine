@@ -81,12 +81,12 @@ function AnimationPlayer:PlayAnimationGroup(setName, fadeTime)
 
 	local function handleKeyframeReached(keyframeName)
 		if keyframeName == "End" then
-			local track = self:PlayTrack(selector().animationName, 0.15)
+			local track = self:_playTrack(selector().animationName, 0.15)
 			self._maid._keyframeReached = track.KeyframeReached:Connect(handleKeyframeReached)
 		end
 	end
 
-	local track = self:PlayTrack(selector().animationName, fadeTime)
+	local track = self:_playTrack(selector().animationName, fadeTime)
 
 	self._maid._keyframeReached = track.KeyframeReached:Connect(handleKeyframeReached)
 end
@@ -138,6 +138,11 @@ function AnimationPlayer:GetTrack(trackName)
 	return self._tracks[trackName] or error("Track does not exist")
 end
 
+function AnimationPlayer:PlayTrack(...)
+	self._maid._keyframeReached = nil
+	return self:_playTrack(...)
+end
+
 --- Plays a track
 -- @tparam string trackName Name of the track to play
 -- @tparam[opt=0.4] number fadeTime How much time it will take to transition into the animation.
@@ -149,7 +154,7 @@ end
 	-- Setting this to 2 will make the animation 2x faster, and setting it to 0.5 will make it
 	-- run 2x slower.
 -- @tparam[opt=0.4] number stopFadeTime
-function AnimationPlayer:PlayTrack(trackName, fadeTime, weight, speed, stopFadeTime)
+function AnimationPlayer:_playTrack(trackName, fadeTime, weight, speed, stopFadeTime)
 	fadeTime = fadeTime or self._fadeTime
 	local track = self:GetTrack(trackName)
 
