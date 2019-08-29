@@ -91,7 +91,7 @@ function IKServiceClient:GetAimDirection(humanoid)
 		local angle = math.acos(relative.Z)
 
 
-		if angle < math.pi/3 then
+		if angle < math.rad(60) then
 			multiplier = -multiplier
 		end
 	end

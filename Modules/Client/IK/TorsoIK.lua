@@ -23,25 +23,25 @@ function TorsoIK.new(lowerTorso, upperTorso, waist, neck)
 	self._waist = waist or error("No waist")
 	self._neck = neck or error("No neck")
 
-	self._waistYCalculator = IKAngleCalculator.new(16)
-	self._waistYCalculator.Min = math.pi/15
-	self._waistYCalculator.BounceRange = math.pi/2
-	self._waistYCalculator.BounceAmount = math.pi/10
+	self._waistYCalculator = IKAngleCalculator.new(40)
+	self._waistYCalculator.Min = math.rad(12)
+	self._waistYCalculator.BounceRange = math.rad(90)
+	self._waistYCalculator.BounceAmount = math.rad(18)
 
-	self._waistZCalculator = IKAngleCalculator.new(16)
-	self._waistZCalculator.Min = math.pi/20
-	self._waistZCalculator.BounceRange = math.pi/5
-	self._waistZCalculator.BounceAmount = math.pi/20
+	self._waistZCalculator = IKAngleCalculator.new(30)
+	self._waistZCalculator.Min = math.rad(25)
+	self._waistZCalculator.BounceRange = math.rad(9)
+	self._waistZCalculator.BounceAmount = math.rad(9)
 
-	self.HeadYCalculator = IKAngleCalculator.new(24)
-	self.HeadYCalculator.Min = math.pi/8
-	self.HeadYCalculator.BounceRange = math.pi/8
-	self.HeadYCalculator.BounceAmount = math.pi/8
+	self.HeadYCalculator = IKAngleCalculator.new(60)
+	self.HeadYCalculator.Min = math.rad(30)
+	self.HeadYCalculator.BounceRange = math.rad(30)
+	self.HeadYCalculator.BounceAmount = math.rad(30)
 
 	self.HeadZCalculator = IKAngleCalculator.new(24)
-	self.HeadZCalculator.Min = math.pi/20
-	self.HeadZCalculator.BounceRange = math.pi/3
-	self.HeadZCalculator.BounceAmount = math.pi/8
+	self.HeadZCalculator.Min = math.rad(15)
+	self.HeadZCalculator.BounceRange = math.rad(30)
+	self.HeadZCalculator.BounceAmount = math.rad(20)
 
 	return self
 end
