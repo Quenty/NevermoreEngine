@@ -147,13 +147,13 @@ end
 local function Stringify(table, indent, output)
 	output = output or tostring(table)
 	indent = indent or 0
-	for Index, Value in pairs(table) do
-		local FormattedText = "\n" .. string.rep("  ", indent) .. tostring(Index) .. ": "
-		if type(Value) == "table" then
-			output = output .. FormattedText
-			output = Stringify(Value, Index + 1, output)
+	for key, value in pairs(table) do
+		local formattedText = "\n" .. string.rep("  ", indent) .. tostring(key) .. ": "
+		if type(value) == "table" then
+			output = output .. formattedText
+			output = Stringify(value, indent + 1, output)
 		else
-			output = output .. FormattedText .. tostring(Value)
+			output = output .. formattedText .. tostring(value)
 		end
 	end
 	return output
