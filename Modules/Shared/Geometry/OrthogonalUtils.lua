@@ -3,6 +3,17 @@
 
 local OrthogonalUtils = {}
 
+function OrthogonalUtils.decomposeCFrameToVectors(cframe)
+	return  {
+		cframe.LookVector, -- front
+		-cframe.LookVector,
+		cframe.RightVector,
+		-cframe.RightVector,
+		cframe.UpVector,
+		-cframe.UpVector,
+	}
+end
+
 function OrthogonalUtils.getClosestVector(options, unitVector)
 	local best = nil
 	local bestAngle = -math.huge
@@ -17,16 +28,8 @@ function OrthogonalUtils.getClosestVector(options, unitVector)
 	return best
 end
 
-function OrthogonalUtils.snapCFrameTo(cframe, snapTo)
-	local options = {
-		snapTo.LookVector, -- front
-		-snapTo.LookVector,
-		snapTo.RightVector,
-		-snapTo.RightVector,
-		snapTo.UpVector,
-		-snapTo.UpVector,
-	}
-
+function OrthogonalUtils.snapCFrameTo(cframe, snapToCFrame)
+	local options = OrthogonalUtils.decomposeCFrameToVectors(cframe)
 	local rightVector = OrthogonalUtils.getClosestVector(options, cframe.RightVector)
 	local upVector = OrthogonalUtils.getClosestVector(options, cframe.UpVector)
 
