@@ -8,10 +8,13 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
 local CameraStackService = require("CameraStackService")
+local IKAimPositionPriorites = require("IKAimPositionPriorites")
 local IKConstants = require("IKConstants")
 local IKRig = require("IKRig")
 local Maid = require("Maid")
 local promiseChild = require("promiseChild")
+
+local MAX_AGE_FOR_AIM_DATA = 0.2
 
 local IKServiceClient = {}
 
@@ -52,17 +55,26 @@ end
 
 --- Exposed API for guns and other things to start setting aim position
 --- which will override for a limited time
-function IKServiceClient:SetAimPosition(position)
+function IKServiceClient:SetAimPosition(position, optionalPriority)
+	optionalPriority = optionalPriority or IKAimPositionPriorites.DEFAULT
+
+	if self._aimData and (tick() - self._aimData.TimeStamp) < MAX_AGE_FOR_AIM_DATA then
+		if self._aimData.Priority > optionalPriority then
+			return -- Don't overwrite
+		end
+	end
+
 	self._aimData = {
+		Priority = optionalPriority;
 		Position = position;
 		TimeStamp = tick();
 	}
 
-	return self
+	return
 end
 
 function IKServiceClient:GetAimDirection(humanoid)
-	if self._aimData and (tick() - self._aimData.TimeStamp) < 0.2 then
+	if self._aimData and (tick() - self._aimData.TimeStamp) < MAX_AGE_FOR_AIM_DATA then
 			-- If we have aim data within the last 0.2 seconds start pointing at that
 		return self._aimData.Position
 	end

@@ -104,6 +104,17 @@ end
 
 function Binder:Unbind(inst)
 	assert(typeof(inst) == "Instance")
+
+	if RunService:IsClient() then
+		warn(("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication!")
+			:format(self._tagName))
+	end
+
+	CollectionService:RemoveTag(inst, self._tagName)
+end
+
+function Binder:UnbindClient(inst)
+	assert(typeof(inst) == "Instance")
 	CollectionService:RemoveTag(inst, self._tagName)
 end
 
