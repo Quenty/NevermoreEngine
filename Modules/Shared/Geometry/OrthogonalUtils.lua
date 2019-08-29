@@ -29,7 +29,7 @@ function OrthogonalUtils.getClosestVector(options, unitVector)
 end
 
 function OrthogonalUtils.snapCFrameTo(cframe, snapToCFrame)
-	local options = OrthogonalUtils.decomposeCFrameToVectors(cframe)
+	local options = OrthogonalUtils.decomposeCFrameToVectors(snapToCFrame)
 	local rightVector = OrthogonalUtils.getClosestVector(options, cframe.RightVector)
 	local upVector = OrthogonalUtils.getClosestVector(options, cframe.UpVector)
 
