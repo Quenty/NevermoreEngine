@@ -5,8 +5,9 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Signal = require("Signal")
+local BaseObject = require("BaseObject")
 
-local AnimationPlayer = {}
+local AnimationPlayer = setmetatable({}, BaseObject)
 AnimationPlayer.__index = AnimationPlayer
 AnimationPlayer.ClassName = "AnimationPlayer"
 
@@ -15,13 +16,19 @@ AnimationPlayer.ClassName = "AnimationPlayer"
 -- @tparam Humanoid humanoid The humanoid to construct the animation player with. The humanoid will have animations
 -- loaded in on them.
 function AnimationPlayer.new(humanoid)
-	local self = setmetatable({}, AnimationPlayer)
+	local self = setmetatable(BaseObject.new(), AnimationPlayer)
 
 	self._humanoid = humanoid or error("No humanoid")
 	self._tracks = {}
+	self._animationGroups = {}
 	self._fadeTime = 0.4 -- Default
 
 	self.TrackPlayed = Signal.new()
+	self._maid:GiveTask(self.TrackPlayed)
+
+	self._maid:GiveTask(function()
+		self:StopAllTracks()
+	end)
 
 	return self
 end
@@ -30,9 +37,85 @@ end
 -- into the humanoids.
 -- @param animation The animation to add.
 function AnimationPlayer:WithAnimation(animation)
+	if self._tracks[animation.Name] then
+		error(("[AnimationPlayer.WithAnimation] - Animation with name %q is already added"):format(tostring(animation.Name)))
+	end
+
 	self._tracks[animation.Name] = self._humanoid:LoadAnimation(animation)
 
 	return self
+end
+
+function AnimationPlayer:AddAnimationGroup(baseName, animationData)
+	if self._animationGroups[baseName] then
+		error(("[AnimationPlayer.WithAnimation] - AnimationGroup with name %q is already added"):format(tostring(baseName)))
+	end
+
+	local animations = {}
+	for index, animation in pairs(animationData) do
+		assert(animation.id)
+		assert(animation.weight)
+
+		local animationName = baseName .. tostring(index)
+
+		table.insert(animations, {
+			animationName = animationName;
+			weight = animation.weight;
+		})
+
+		self:AddAnimation(animationName, animation.id)
+	end
+
+	assert(#animations > 0)
+	self._animationGroups[baseName] = animations
+end
+
+function AnimationPlayer:PlayAnimationGroup(setName, fadeTime)
+	local animationGroup = self._animationGroups[setName]
+	if not animationGroup then
+		warn(("[AnimationPlayer] - No animation set with name %q"):format(tostring(setName)))
+		return
+	end
+
+	local selector = self:_buildAnimationSelector(animationGroup)
+
+	local function handleKeyframeReached(keyframeName)
+		if keyframeName == "End" then
+			local track = self:PlayTrack(selector().animationName, 0.15)
+			self._maid._keyframeReached = track.KeyframeReached:Connect(handleKeyframeReached)
+		end
+	end
+
+	local track = self:PlayTrack(selector().animationName, fadeTime)
+
+	self._maid._keyframeReached = track.KeyframeReached:Connect(handleKeyframeReached)
+end
+
+function AnimationPlayer:_buildAnimationSelector(animationGroup)
+	assert(#animationGroup > 1)
+
+	local totalWeight = 0
+	for _, animationData in pairs(animationGroup) do
+		totalWeight = totalWeight + animationData.weight
+	end
+
+	assert(totalWeight ~= 0)
+
+	return function()
+		local selection = math.random()
+
+		local total = 0
+		for _, option in pairs(animationGroup) do
+			local threshold = total + option.weight/totalWeight
+			total = total + threshold
+
+			if selection <= threshold then
+				return option
+			end
+		end
+
+		error(("[AnimationPlayer] - Failed to find a selection with option at %d"):format(selection))
+	end
 end
 
 --- Adds an animation to play
@@ -101,12 +184,6 @@ function AnimationPlayer:StopAllTracks(fadeTime)
 	for trackName, _ in pairs(self._tracks) do
 		self:StopTrack(trackName, fadeTime)
 	end
-end
-
---- Deconstructs the animation player, stopping all tracks
-function AnimationPlayer:Destroy()
-	self:StopAllTracks()
-	setmetatable(self, nil)
 end
 
 return AnimationPlayer
