@@ -157,7 +157,7 @@ local function replicateRepository(replicationFolder, libCache, topParent)
 
 	-- Remove client-only libraries
 	for _, name in pairs(toRemove) do
-		toRemove[name] = nil
+		libCache[name] = nil
 	end
 end
 
