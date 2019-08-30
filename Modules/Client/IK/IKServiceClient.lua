@@ -38,6 +38,8 @@ function IKServiceClient:Init()
 end
 
 function IKServiceClient:GetRig(humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
+
 	if not self:_isValid(humanoid) then
 		return nil
 	end

@@ -12,14 +12,12 @@ IKRightGripAttachment.__index = IKRightGripAttachment
 function IKRightGripAttachment.new(obj)
 	local self = setmetatable(GripAttachment.new(obj), IKRightGripAttachment)
 
-	local rig = self:GetIKRig()
-	if rig then
-		self._maid:GivePromise(self._ikRig:PromiseRightArm()):Then(function(rightArm)
+	self:PromiseIKRig()
+		:Then(function(ikRig)
+			return self._maid:GivePromise(ikRig:PromiseRightArm())
+		end):Then(function(rightArm)
 			self._maid:GiveTask(rightArm:Grip(self._obj, self:GetPriority()))
 		end)
-	else
-		warn("[IKRightGripAttachment.new] - Failed to find rig")
-	end
 
 	return self
 end
