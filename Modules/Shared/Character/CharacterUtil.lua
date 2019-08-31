@@ -51,7 +51,7 @@ end
 --- Returns the Player and Character that a descendent is part of, if it is part of one.
 -- @param descendant A child of the potential character.
 -- @treturn Player player
--- @treturn Character charcater
+-- @treturn Character character
 function CharacterUtil.GetPlayerFromCharacter(descendant)
 	local character = descendant
 	local player = Players:GetPlayerFromCharacter(character)
