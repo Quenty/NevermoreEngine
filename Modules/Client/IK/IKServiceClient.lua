@@ -207,6 +207,7 @@ end
 
 function IKServiceClient:_isValid(humanoid)
 	return humanoid:IsDescendantOf(game)
+		and humanoid.RootPart
 		and humanoid:GetState() ~= Enum.HumanoidStateType.Dead
 end
 
@@ -227,7 +228,7 @@ function IKServiceClient:_update()
 				lastUpdateTime = 0
 			end
 
-			local rootPosition = humanoid.RootPart and humanoid.RootPart.Position
+			local rootPosition = humanoid.RootPart.Position
 			local distance = (camPosition - rootPosition).Magnitude
 			local updateRate
 
