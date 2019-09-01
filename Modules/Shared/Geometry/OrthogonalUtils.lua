@@ -33,6 +33,9 @@ function OrthogonalUtils.snapCFrameTo(cframe, snapToCFrame)
 	local rightVector = OrthogonalUtils.getClosestVector(options, cframe.RightVector)
 	local upVector = OrthogonalUtils.getClosestVector(options, cframe.UpVector)
 
+	assert(rightVector, "Failed to find rightVector")
+	assert(upVector, "Failed to find upVector")
+
 	return CFrame.fromMatrix(cframe.Position, rightVector, upVector)
 end
 
