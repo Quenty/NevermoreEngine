@@ -50,7 +50,7 @@ function Raycaster:FindPartOnRay(ray)
 		casts = casts - 1
 	end
 
-	warn("[Raycaster.FindPartOnRay] - Ran out of casts")
+	warn("[Raycaster.FindPartOnRay] - Ran out of casts. \n" .. debug.traceback())
 	return nil
 end
 
