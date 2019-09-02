@@ -73,11 +73,11 @@ function TorsoIK:Point(position)
 
 	local waist = self._waist
 	local offset = (self._lowerTorso.CFrame * waist.C0):pointToObjectSpace(position)
-	self._waistYCalculator.Target = math.atan2(-offset.X, -offset.Z)
-	self._waistZCalculator.Target = math.atan2(offset.Y, -offset.Z)
+	self._waistYCalculator.Target = math.atan2(-offset.X, -offset.Z)/2
+	self._waistZCalculator.Target = math.atan2(offset.Y, -offset.Z)/2
 
-	self.HeadYCalculator.Target = math.atan2(-offset.X, -offset.Z)
-	self.HeadZCalculator.Target = math.atan2(offset.Y, -offset.Z)
+	self.HeadYCalculator.Target = math.atan2(-offset.X, -offset.Z)/2
+	self.HeadZCalculator.Target = math.atan2(offset.Y, -offset.Z)/2
 
 	self.Pointed:Fire(self._target)
 end
