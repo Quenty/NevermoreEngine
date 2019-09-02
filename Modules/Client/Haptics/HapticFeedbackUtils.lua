@@ -1,6 +1,5 @@
----
+--- Clean up utils a bit
 -- @module HapticFeedbackUtils
--- @author Quenty
 
 local HapticService = game:GetService("HapticService")
 
@@ -21,12 +20,10 @@ function HapticFeedbackUtils.setSmallVibration(userInputType, amplitude)
 	assert(typeof(amplitude) == "number")
 
 	if not HapticService:IsVibrationSupported(userInputType) then
-		print(1, userInputType)
 		return false
 	end
 
 	if not HapticService:IsMotorSupported(userInputType, Enum.VibrationMotor.Small) then
-		print(2)
 		return false
 	end
 
