@@ -1,13 +1,13 @@
 --- Provide a variety of utility Table operations
 -- @module Table
 
-local lib = {}
+local Table = {}
 
 --- Concats `target` with `source`
 -- @tparam table target Table to append to
 -- @tparam table source Table read from
 -- @treturn table parameter table
-function lib.Append(target, source)
+function Table.Append(target, source)
 	for _, value in pairs(source) do
 		target[#target+1] = value
 	end
@@ -19,7 +19,7 @@ end
 -- @tparam table orig original table
 -- @tparam table new new table
 -- @treturn table
-function lib.Merge(orig, new)
+function Table.Merge(orig, new)
 	local tab = {}
 	for key, val in pairs(orig) do
 		tab[key] = val
@@ -34,7 +34,7 @@ end
 -- @tparam table orig original table
 -- @tparam table new new table
 -- @treturn table
-function lib.MergeLists(orig, new)
+function Table.MergeLists(orig, new)
 	local tab = {}
 	for _, val in pairs(orig) do
 		table.insert(tab, val)
@@ -48,7 +48,7 @@ end
 --- Swaps keys with vvalues, overwriting additional values if duplicated
 -- @tparam table orig original table
 -- @treturn table
-function lib.SwapKeyValue(orig)
+function Table.SwapKeyValue(orig)
 	local tab = {}
 	for key, val in pairs(orig) do
 		tab[val] = key
@@ -59,7 +59,7 @@ end
 --- Converts a table to a list
 -- @tparam table tab Table to convert to a list
 -- @treturn list
-function lib.ToList(tab)
+function Table.ToList(tab)
 	local list = {}
 	for _, item in pairs(tab) do
 		table.insert(list, item)
@@ -71,7 +71,7 @@ end
 -- Useful since `__len` on table in Lua 5.2 returns just the array length.
 -- @tparam table tab Table to count
 -- @treturn number count
-function lib.Count(tab)
+function Table.Count(tab)
 	local count = 0
 	for _, _ in pairs(tab) do
 		count = count + 1
@@ -82,7 +82,7 @@ end
 --- Copies a table, but not deep.
 -- @tparam table target Table to copy
 -- @treturn table New table
-function lib.Copy(target)
+function Table.Copy(target)
 	local new = {}
 	for key, value in pairs(target) do
 		new[key] = value
@@ -91,7 +91,7 @@ function lib.Copy(target)
 end
 
 --- Deep copies a table including metatables
--- @function lib.DeepCopy
+-- @function Table.DeepCopy
 -- @tparam table table Table to deep copy
 -- @treturn table New table
 local function DeepCopy(target)
@@ -105,10 +105,10 @@ local function DeepCopy(target)
 		return target
 	end
 end
-lib.DeepCopy = DeepCopy
+Table.DeepCopy = DeepCopy
 
 --- Overwrites a table's value
--- @function lib.DeepOverwrite
+-- @function Table.DeepOverwrite
 -- @tparam table target Target table
 -- @tparam table source Table to read from
 -- @treturn table target
@@ -122,14 +122,14 @@ local function DeepOverwrite(target, source)
 	end
 	return target
 end
-lib.DeepOverwrite = DeepOverwrite
+Table.DeepOverwrite = DeepOverwrite
 
 --- Gets an index by value, returning `nil` if no index is found.
 -- @tparam table haystack to search in
 -- @param needle Value to search for
 -- @return The index of the value, if found
 -- @treturn nil if not found
-function lib.GetIndex(haystack, needle)
+function Table.GetIndex(haystack, needle)
 	for index, item in pairs(haystack) do
 		if needle == item then
 			return index
@@ -139,7 +139,7 @@ function lib.GetIndex(haystack, needle)
 end
 
 --- Recursively prints the table. Does not handle recursive tables.
--- @function lib.Stringify
+-- @function Table.Stringify
 -- @tparam table table Table to stringify
 -- @tparam[opt=0] number indent Indent level
 -- @tparam[opt=""] string output Output string, used recursively
@@ -158,13 +158,13 @@ local function Stringify(table, indent, output)
 	end
 	return output
 end
-lib.Stringify = Stringify
+Table.Stringify = Stringify
 
 --- Returns whether `value` is within `table`
 -- @tparam table table to search in for value
 -- @param value Value to search for
 -- @treturn boolean `true` if within, `false` otherwise
-function lib.Contains(table, value)
+function Table.Contains(table, value)
 	for _, item in pairs(table) do
 		if item == value then
 			return true
@@ -178,7 +178,7 @@ end
 -- @tparam table target Table to overwite
 -- @tparam table source Source table to read from
 -- @treturn table target
-function lib.Overwrite(target, source)
+function Table.Overwrite(target, source)
 	for index, item in pairs(source) do
 		target[index] = item
 	end
@@ -190,7 +190,7 @@ end
 -- indexing a nil value
 -- @tparam table table Table to error on indexing
 -- @treturn table table The same table
-function lib.ReadOnly(table)
+function Table.ReadOnly(table)
 	return setmetatable(table, {
 		__index = function(self, index)
 			error(("Bad index %q"):format(tostring(index)), 2)
@@ -204,14 +204,14 @@ end
 --- Recursively sets the table as ReadOnly
 -- @tparam table table Table to error on indexing
 -- @treturn table table The same table
-function lib.DeepReadOnly(table)
+function Table.DeepReadOnly(table)
 	for _, item in pairs(table) do
 		if type(item) == "table" then
-			lib.DeepReadOnly(item)
+			Table.DeepReadOnly(item)
 		end
 	end
 
-	return lib.ReadOnly(table)
+	return Table.ReadOnly(table)
 end
 
-return lib
+return Table
