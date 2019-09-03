@@ -136,11 +136,12 @@ function IKRig:_promiseNewTorso()
 	end
 
 	return self._maid:GivePromise(PromiseUtils.all({
+			promiseChild(self._character, "HumanoidRootPart");
 			promiseChild(self._character, "LowerTorso");
 			promiseChild(self._character, "UpperTorso");
 			promiseChild(self._character, "Head");
 		}))
-		:Then(function(lowerTorso, upperTorso, head)
+		:Then(function(rootPart, lowerTorso, upperTorso, head)
 			if not lowerTorso:IsA("BasePart") then
 				return Promise.rejected("LowerTorso is not a BasePart")
 			end
@@ -152,14 +153,15 @@ function IKRig:_promiseNewTorso()
 			end
 
 			return self._maid:GivePromise(PromiseUtils.all({
+				Promise.resolved(rootPart);
 				Promise.resolved(lowerTorso);
 				Promise.resolved(upperTorso);
 				promiseChild(upperTorso, "Waist");
 				promiseChild(head, "Neck");
 			}))
 		end)
-		:Then(function(lowerTorso, upperTorso, waist, neck)
-			local newIk = TorsoIK.new(lowerTorso, upperTorso, waist, neck)
+		:Then(function(rootPart, lowerTorso, upperTorso, waist, neck)
+			local newIk = TorsoIK.new(rootPart, lowerTorso, upperTorso, waist, neck)
 			self._maid:GiveTask(newIk)
 
 			table.insert(self._ikTargets, 1, newIk)
