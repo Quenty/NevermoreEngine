@@ -1,8 +1,6 @@
 --- Utilties for IK system
 -- @module IKUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
 local IKUtils = {}
 
 function IKUtils.getDampenedAngleClamp(maxAngle, dampenAreaAngle, dampenAreaFactor)
