@@ -25,6 +25,13 @@ function PathfindingUtils.promiseComputeAsync(path, start, finish)
 	end)
 end
 
+function PathfindingUtils.promiseCheckOcclusion(path, startIndex)
+	return Promise.spawn(function(resolve, reject)
+		resolve(path:CheckOcclusionAsync(startIndex))
+	end)
+
+end
+
 function PathfindingUtils.visualizePath(path)
 	local maid = Maid.new()
 
