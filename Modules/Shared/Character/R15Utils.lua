@@ -24,6 +24,15 @@ function R15Utils.getRightShoulderRigAttachment(character)
 	return R15Utils.searchForRigAttachment(character, "UpperTorso", "RightShoulderRigAttachment")
 end
 
+function R15Utils.getExpectedRootPartYOffset(humanoid)
+	local rootPart = humanoid.RootPart
+	if not rootPart then
+		return nil
+	end
+
+	return humanoid.HipHeight + rootPart.Size.Y/2
+end
+
 function R15Utils.getRigLength(character, partName, rigAttachment0, rigAttachment1)
 	local attachment0 = R15Utils.searchForRigAttachment(character, partName, rigAttachment0)
 	if not attachment0 then
