@@ -3,7 +3,7 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local AnimationUtils = require("AnimationUtils")
+local AnimationTrackUtils = require("AnimationTrackUtils")
 
 local AnimationGroupUtils = {}
 
@@ -17,7 +17,7 @@ function AnimationGroupUtils.createdWeightedTracks(humanoid, weightedAnimationLi
 		assert(weightedAnimation.weight)
 
 		table.insert(tracks, AnimationGroupUtils.createdWeightedTrack(
-			AnimationUtils.loadAnimationFromId(humanoid, weightedAnimation.animationId),
+			AnimationTrackUtils.loadAnimationFromId(humanoid, weightedAnimation.animationId),
 			weightedAnimation.weight))
 	end
 	return tracks
