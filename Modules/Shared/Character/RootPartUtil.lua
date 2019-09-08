@@ -32,7 +32,10 @@ function RootPartUtil.promiseRootPart(humanoid)
 	end)
 
 	delay(MAX_YIELD_TIME, function()
-		promise:Reject("Timed out")
+		if promise:IsPending() then
+			warn("[RootPartUtil.promiseRootPart] - TImed out on root part", debug.traceback())
+			promise:Reject("Timed out")
+		end
 	end)
 
 	maid:GiveTask(humanoid.AncestryChanged:Connect(function()
