@@ -20,7 +20,6 @@ function MouseShiftLockService:Init()
 		local cameraModuleScript = playerModuleScript:WaitForChild("CameraModule")
 
 		local mouseLockControllerScript = cameraModuleScript:WaitForChild("MouseLockController")
-		self._cursorImage = mouseLockControllerScript:WaitForChild("CursorImage")
 		self._boundKeys = mouseLockControllerScript:WaitForChild("BoundKeys")
 		self._lastBoundKeyValues = self._boundKeys.Value
 
@@ -68,21 +67,19 @@ end
 function MouseShiftLockService:_updateEnable()
 	local cameras = self._playerModule:GetCameras()
 	local cameraController = cameras.activeCameraController
+	local mouseLockController = cameras.activeMouseLockController
 
 	self._boundKeys.Value = self._lastBoundKeyValues
 	if self._wasMouseLockEnabled then
-		-- Fix icon again
-		local mouse = Players.LocalPlayer:GetMouse()
-		mouse.Icon = self._cursorImage.Value
-
 		cameraController:SetIsMouseLocked(self._wasMouseLockEnabled)
+		mouseLockController:OnMouseLockToggled()
 	end
 end
 
 function MouseShiftLockService:_updateDisable()
 	local cameras = self._playerModule:GetCameras()
 	local cameraController = cameras.activeCameraController
-
+	local mouseLockController = cameras.activeMouseLockController
 
 	if #self._boundKeys.Value > 0 then
 		self._lastBoundKeyValues = self._boundKeys.Value
@@ -91,12 +88,9 @@ function MouseShiftLockService:_updateDisable()
 	self._wasMouseLockEnabled = cameraController:GetIsMouseLocked()
 	self._boundKeys.Value = ""
 
-	cameraController:SetIsMouseLocked(false)
-
 	if self._wasMouseLockEnabled then
-		-- Reset icon because the camera module doesn't do this properly
-		local mouse = Players.LocalPlayer:GetMouse()
-		mouse.Icon = ""
+		cameraController:SetIsMouseLocked(false)
+		mouseLockController:OnMouseLockToggled()
 	end
 end
 
