@@ -2,7 +2,7 @@
 --  In the future, use Roblox's orthogonal angle format.
 -- @module CFrameSerializer
 
-local lib = {}
+local CFrameSerializer = {}
 
 local atan2 = math.atan2
 local floor = math.floor
@@ -16,7 +16,7 @@ end
 local bitSize22 = (2^21-1)
 local bitSize21 = (2^20-1)
 
-function lib.OutputRotationAzure(cf)
+function CFrameSerializer.OutputRotationAzure(cf)
 	local lookVector = cf.lookVector
 	local azumith = atan2(-lookVector.X, -lookVector.Z)
 	local ybase = (lookVector.X^2 + lookVector.Z^2)^0.5
@@ -41,7 +41,7 @@ function lib.OutputRotationAzure(cf)
 	return {px, py, pz, azumith, roll, elevation}
 end
 
-function lib.ReadRotationAzure(data)
+function CFrameSerializer.ReadRotationAzure(data)
 	local azumith = data[4]
 	local roll = data[5] --Buffer:ReadSigned(21)
 	local elevation = data[6] --Buffer:ReadSigned(21)
@@ -58,4 +58,4 @@ function lib.ReadRotationAzure(data)
 	return rot + Vector3.new(data[1], data[2], data[3]) --, azumith, roll, elevation}
 end
 
-return lib
+return CFrameSerializer
