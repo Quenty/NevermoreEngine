@@ -10,7 +10,6 @@ local ValueObject = require("ValueObject")
 
 local InputModeSelector = {}
 InputModeSelector.ClassName = "InputModeSelector"
-InputModeSelector.INPUT_MODES = INPUT_MODES
 InputModeSelector.DEFAULT_MODES = {
 	INPUT_MODES.Gamepads,
 	INPUT_MODES.Keyboard,
@@ -23,15 +22,19 @@ function InputModeSelector.new(inputModes)
 	self._maid = Maid.new()
 
 	self._activeMode = ValueObject.new()
-	self.Changed = self._activeMode.Changed
-
 	self._maid:GiveTask(self._activeMode)
+
+	self.Changed = self._activeMode.Changed
 
 	for _, inputMode in pairs(inputModes or InputModeSelector.DEFAULT_MODES) do
 		self:_addInputMode(inputMode)
 	end
 
 	return self
+end
+
+function InputModeSelector:GetActiveMode()
+	return rawget(self, "_activeMode").Value
 end
 
 function InputModeSelector:__index(index)

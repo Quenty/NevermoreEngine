@@ -5,16 +5,14 @@ local InputModeProcessor = {}
 InputModeProcessor.__index = InputModeProcessor
 InputModeProcessor.ClassName = InputModeProcessor
 
-function InputModeProcessor.new()
+function InputModeProcessor.new(states)
 	local self = setmetatable({}, InputModeProcessor)
 
 	self._inputModes = {}
 
-	return self
-end
-
-function InputModeProcessor:AddState(state)
-	self._inputModes[#self._inputModes+1] = state or error("No state")
+	for _, state in pairs(states) do
+		self._inputModes[#self._inputModes+1] = state
+	end
 
 	return self
 end
