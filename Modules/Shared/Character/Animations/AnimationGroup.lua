@@ -46,7 +46,7 @@ function AnimationGroup:_playNewTrack(transitionTime)
 	local trackData = AnimationGroupUtils.selectFromWeightedTracks(self._weightedTracks)
 	local track = trackData.track or error("No track")
 
-	if self._currentTrack == track then
+	if self._currentTrack == track and self._currentTrack.IsPlaying then
 		return
 	end
 
