@@ -22,7 +22,7 @@ function RootPartUtil.promiseRootPart(humanoid)
 
 	spawn(function()
 		while not humanoid.RootPart and promise:IsPending() do
-			wait()
+			wait(0.05)
 		end
 		if humanoid.RootPart then
 			promise:Resolve(humanoid.RootPart)
