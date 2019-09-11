@@ -3,7 +3,7 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local TimeSyncManager = require("TimeSyncManager")
+local TimeSyncService = require("TimeSyncService")
 
 local ProjectilePhysics = {}
 ProjectilePhysics.ClassName = "ProjectilePhysics"
@@ -13,10 +13,11 @@ function ProjectilePhysics.new(initial)
 
 	local self = setmetatable({}, ProjectilePhysics)
 
+	rawset(self, "_clock", TimeSyncService:WaitForSyncedClock())
 	rawset(self, "_position0", initial)
 	rawset(self, "_velocity0", 0*initial)
 	rawset(self, "_acceleration", 0*initial)
-	rawset(self, "_time0", TimeSyncManager:GetTime())
+	rawset(self, "_time0", self._clock:GetTime())
 
 	return self
 end
@@ -26,7 +27,7 @@ function ProjectilePhysics:Impulse(velocity)
 end
 
 function ProjectilePhysics:TimeSkip(delta)
-	local time = TimeSyncManager:GetTime()
+	local time = self._clock:GetTime()
 	local position, velocity = self:_positionVelocity(time+delta)
 	rawset(self, "_position0", position)
 	rawset(self, "_velocity0", velocity)
@@ -41,7 +42,7 @@ function ProjectilePhysics:SetData(startTime, position0, velocity0, acceleration
 end
 
 function ProjectilePhysics:__index(index)
-	local time = TimeSyncManager:GetTime()
+	local time = self._clock:GetTime()
 
 	if ProjectilePhysics[index] then
 		return ProjectilePhysics[index]
@@ -60,14 +61,14 @@ function ProjectilePhysics:__index(index)
 	elseif index == "StartVelocity" then
 		return rawget(self, "_velocity0")
 	elseif index == "Age" then
-		return TimeSyncManager:GetTime() - rawget(self, "_time0")
+		return self._clock:GetTime() - rawget(self, "_time0")
 	else
 		error(("%q is not a valid member of ProjectilePhysics"):format(tostring(index)), 2)
 	end
 end
 
 function ProjectilePhysics:__newindex(index, value)
-	local time = TimeSyncManager:GetTime()
+	local time = self._clock:GetTime()
 	if index == "Position" then
 		local _, velocity = self:_positionVelocity(time)
 		rawset(self, "_position0", value)
