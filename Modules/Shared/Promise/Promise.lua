@@ -45,12 +45,32 @@ function Promise.spawn(func)
 end
 
 function Promise.resolved(...)
+	if select("#", ...) == 1 and isPromise(...) then
+		local promise = (...)
+
+		-- Resolving to promise that is already resolved. Just return the promise!
+		if not promise._pendingExecuteList then
+			promise._uncaughtException = false
+			return promise
+		end
+	end
+
 	local promise = Promise.new()
 	promise:Resolve(...)
 	return promise
 end
 
 function Promise.rejected(...)
+	if select("#", ...) == 1 and isPromise(...) then
+		local promise = (...)
+
+		-- Resolving to promise that is already resolved. Just return the promise!
+		if not promise._pendingExecuteList then
+			promise._uncaughtException = false
+			return promise
+		end
+	end
+
 	local promise = Promise.new()
 	promise:Reject(...)
 	return promise
