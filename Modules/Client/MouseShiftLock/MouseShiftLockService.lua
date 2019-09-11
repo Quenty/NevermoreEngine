@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
 local Promise = require("Promise")
 
@@ -14,7 +15,26 @@ function MouseShiftLockService:Init()
 	self._enabled = Instance.new("BoolValue")
 	self._enabled.Value = true
 
-	self._promiseReady = Promise.spawn(function(resolve, reject)
+	self._promiseReady = self:_buildPromiseReady()
+
+	self._promiseReady:Then(function()
+		self._enabled.Changed:Connect(function()
+			self:_update()
+		end)
+
+		if not self._enabled.Value then
+			self:_update()
+		end
+	end)
+end
+
+function MouseShiftLockService:_buildPromiseReady()
+	if not UserInputService.MouseEnabled then
+		-- TODO: Handle mouse being plugged in later
+		return Promise.rejected()
+	end
+
+	return Promise.spawn(function(resolve, reject)
 		local playerScripts = Players.LocalPlayer:WaitForChild("PlayerScripts")
 		local playerModuleScript = playerScripts:WaitForChild("PlayerModule")
 		local cameraModuleScript = playerModuleScript:WaitForChild("CameraModule")
@@ -33,17 +53,6 @@ function MouseShiftLockService:Init()
 
 		resolve()
 	end)
-
-	self._promiseReady:Then(function()
-		self._enabled.Changed:Connect(function()
-			self:_update()
-		end)
-
-		if not self._enabled.Value then
-			self:_update()
-		end
-	end)
-
 end
 
 function MouseShiftLockService:EnableShiftLock()
