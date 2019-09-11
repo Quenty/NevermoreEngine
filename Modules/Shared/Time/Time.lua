@@ -3,11 +3,13 @@
 
 local Time = {}
 
+-- luacheck: push ignore 631
 local MONTH_NAMES        = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 local MONTH_NAMES_SHORT  = {"Jan",     "Feb",      "Mar",   "Apr",   "May", "Jun",  "Jul",  "Aug",    "Sep",       "Oct",     "Nov",      "Dec"}
 local DAYS_IN_MONTH      = { 31,        28,         31,      30,      31,    30,     31,     31,       30,          31,       30,         31}
 local DAYS_OF_WEEK       = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 local DAYS_OF_WEEK_SHORT = {"Sun",    "Mon",    "Tues",    "Weds",      "Thurs",    "Fri",    "Sat"}
+-- luacheck: pop
 
 --- Returns a Days in months table for the given year
 function Time.getDaysMonthTable(year)
