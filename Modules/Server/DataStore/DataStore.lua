@@ -94,13 +94,13 @@ function DataStore:Save()
 end
 
 -- Loads data. This returns the originally loaded data.
-function DataStore:Load(name, defaultValue)
+function DataStore:Load(keyName, defaultValue)
 	return self:_promiseLoad()
 		:Then(function(data)
-			if data[name] == nil then
+			if data[keyName] == nil then
 				return defaultValue
 			else
-				return data[name]
+				return data[keyName]
 			end
 		end)
 end
