@@ -320,6 +320,7 @@ local function loadStats(slotStore)
 	local moneyValue = Instance.new("IntValue")
 	moneyValue.Name = "money"
 	moneyValue.Value = 0
+	moneyValue.Parent = leaderboard
 
 	slotStore:Load("money", 0):Then(function(money)
 		moneyValue.Value = money
