@@ -13,6 +13,7 @@ local IKConstants = require("IKConstants")
 local IKRig = require("IKRig")
 local Maid = require("Maid")
 local promiseChild = require("promiseChild")
+local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 
 local MAX_AGE_FOR_AIM_DATA = 0.2
 
@@ -25,16 +26,19 @@ function IKServiceClient:Init()
 	self._rigMetadata = setmetatable({}, {__mode = 'k'})
 	self._rigs = {}
 
-	self._maid._stepped = RunService.Stepped:Connect(function()
-		self:_update()
+	self._maid:GivePromise(PromiseGetRemoteEvent(IKConstants.REMOTE_EVENT_NAME)):Then(function(remoteEvent)
+		self._remoteEvent = remoteEvent or error("No remoteEvent")
+
+		self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(...)
+			self:_handleClientEvent(...)
+		end))
+
+		self:_setupLocalPlayer()
+
+		self._maid:GiveTask(RunService.Stepped:Connect(function()
+			self:_update()
+		end))
 	end)
-
-	self:_setupLocalPlayer()
-
-	self._remoteEvent = require.GetRemoteEvent(IKConstants.REMOTE_EVENT_NAME)
-	self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(...)
-		self:_handleClientEvent(...)
-	end))
 end
 
 function IKServiceClient:GetRig(humanoid)
