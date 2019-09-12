@@ -1,14 +1,14 @@
 --- Utility methods for Roblox Color3 values
 -- @module Color3Utils
 
-local lib = {}
+local Color3Utils = {}
 
 --- Luminance as per W3 per sRGB colorspace normalized with 0
 -- as the darkest dark, and 1 as the whitest white
 -- @tparam {Color3} color The Color3 to check
 -- @treturn A scalar from 0 to 1 with 0 as the darkest dark, and 1 as the whitest white
 -- See https://www.w3.org/TR/WCAG20/#relativeluminancedef
-function lib.GetRelativeLuminance(color)
+function Color3Utils.getRelativeLuminance(color)
 	local components = { color.r, color.g, color.b }
 	local vals = {}
 	for i, val in pairs(components) do
@@ -27,8 +27,35 @@ end
 -- @tparam {Color3} color The Color3 to check
 -- @treturn {boolean} True if the text should be black, false if it should be good
 -- See https://stackoverflow.com/questions/3942878/
-function lib.TextShouldBeBlack(color)
-	return lib.GetRelativeLuminance(color) > 0.179
+function Color3Utils.textShouldBeBlack(color)
+	return Color3Utils.getRelativeLuminance(color) > 0.179
 end
 
-return lib
+function Color3Utils.scaleValue(color3, percent)
+	local h, s, v = Color3.toHSV(color3)
+	return Color3.fromHSV(h, s, percent*v)
+end
+
+function Color3Utils.setValue(color3, value)
+	local h, s, _ = Color3.toHSV(color3)
+	return Color3.fromHSV(h, s, value)
+end
+
+function Color3Utils.setHue(color3, hue)
+	local _, s, v = Color3.toHSV(color3)
+	return Color3.fromHSV(hue, s, v)
+end
+
+
+function Color3Utils.scaleSaturation(color3, percent)
+	local h, s, v = Color3.toHSV(color3)
+	return Color3.fromHSV(h, percent*s, v)
+end
+
+function Color3Utils.setSaturation(color3, saturation)
+	local h, _, v = Color3.toHSV(color3)
+	return Color3.fromHSV(h, saturation, v)
+end
+
+
+return Color3Utils
