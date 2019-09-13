@@ -19,21 +19,20 @@ function CollectionServiceUtils.findFirstAncestor(tagName, child)
 	return nil
 end
 
-function CollectionServiceUtils.findNearestPartWithTag(tagName, basePart)
+function CollectionServiceUtils.findNearestPartWithTag(tagName, position)
 	assert(type(tagName) == "string")
-	assert(typeof(basePart) == "Instance" and basePart:IsA("BasePart"))
+	assert(typeof(position) == "Vector3")
 
 	local taggedInstances = CollectionService:GetTagged(tagName)
 	local length = #taggedInstances
 	if length > 0 then
 		local currentDistance = math.huge
 		local foundPart = nil
-		local basePosition = basePart.Position
 
 		for index = 1, length do
 			local child = taggedInstances[index]
 			if child:IsA("BasePart") then
-				local magnitude = (child.Position - basePosition).Magnitude
+				local magnitude = (child.Position - position).Magnitude
 				if magnitude < currentDistance then
 					currentDistance = magnitude
 					foundPart = child
