@@ -7,7 +7,7 @@ local Promise = require("Promise")
 
 local DataStorePromises = {}
 
-function DataStorePromises.GetAsync(robloxDataStore, key)
+function DataStorePromises.getAsync(robloxDataStore, key)
 	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 
@@ -23,7 +23,7 @@ function DataStorePromises.GetAsync(robloxDataStore, key)
 	end)
 end
 
-function DataStorePromises.UpdateAsync(robloxDataStore, key, updateFunc)
+function DataStorePromises.updateAsync(robloxDataStore, key, updateFunc)
 	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 	assert(type(updateFunc) == "function")
@@ -43,13 +43,28 @@ function DataStorePromises.UpdateAsync(robloxDataStore, key, updateFunc)
 	end)
 end
 
-function DataStorePromises.SetAsync(robloxDataStore, key, value)
+function DataStorePromises.setAsync(robloxDataStore, key, value)
 	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
 			robloxDataStore:SetAsync(key, value)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		return resolve(true)
+	end)
+end
+
+function DataStorePromises.removeAsync(robloxDataStore, key)
+	assert(typeof(robloxDataStore) == "Instance")
+	assert(type(key) == "string")
+
+	return Promise.spawn(function(resolve, reject)
+		local ok, err = pcall(function()
+			robloxDataStore:RemoveAsync(key)
 		end)
 		if not ok then
 			return reject(err)

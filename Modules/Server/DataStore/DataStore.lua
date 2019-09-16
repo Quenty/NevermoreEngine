@@ -109,7 +109,7 @@ function DataStore:_saveData(writer)
 	local maid = Maid.new()
 
 	local promise = Promise.new()
-	promise:Resolve(maid:GivePromise(DataStorePromises.UpdateAsync(self._robloxDataStore, self._key, function(data)
+	promise:Resolve(maid:GivePromise(DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(data)
 		if promise:IsRejected() then
 			-- Cancel if we have another request
 			return nil
@@ -141,7 +141,7 @@ function DataStore:_promiseLoad()
 		return self._loadPromise
 	end
 
-	self._loadPromise = self._maid:GivePromise(DataStorePromises.GetAsync(self._robloxDataStore, self._key)
+	self._loadPromise = self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key)
 		:Then(function(data)
 			if data == nil then
 				return {}
