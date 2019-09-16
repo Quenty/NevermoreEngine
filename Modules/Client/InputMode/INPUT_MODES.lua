@@ -196,6 +196,18 @@ InputModes.Touch = InputMode.new("Touch", {
 	Enum.UserInputType.Touch;
 })
 
+InputModes.DPad = InputMode.new("DPad", {
+	Enum.KeyCode.DPadLeft;
+	Enum.KeyCode.DPadRight;
+	Enum.KeyCode.DPadUp;
+	Enum.KeyCode.DPadDown;
+})
+
+InputModes.Thumbsticks = InputMode.new("Thumbsticks", {
+	Enum.KeyCode.Thumbstick1;
+	Enum.KeyCode.Thumbstick2;
+})
+
 InputModes.Gamepads = InputMode.new("Gamepads", {
 	Enum.UserInputType.Gamepad1;
 	Enum.UserInputType.Gamepad2;
@@ -256,6 +268,8 @@ local function bindProcessor()
 		InputModes.ArrowKeys;
 		InputModes.WASD;
 		InputModes.KeyboardAndMouse;
+		InputModes.DPad;
+		-- Don't add InputModes.Thumbsticks, we handle it seperately
 	})
 
 	UserInputService.InputBegan:Connect(function(inputObject)
@@ -270,6 +284,7 @@ local function bindProcessor()
 
 			if inputObject.Position.magnitude > InputModes.THUMBSTICK_DEADZONE then
 				inputProcessor:Evaluate(inputObject)
+				InputModes.Thumbsticks:Enable()
 			end
 		else
 			inputProcessor:Evaluate(inputObject)
@@ -278,7 +293,6 @@ local function bindProcessor()
 
 	UserInputService.GamepadConnected:Connect(function(gamepad)
 		InputModes.Gamepads:Enable()
-
 	end)
 
 	UserInputService.GamepadDisconnected:Connect(function(gamepad)
