@@ -208,7 +208,7 @@ function PillBackingBuilder:_createPillShadow(options)
 end
 
 function PillBackingBuilder:_configureOptions(gui, options)
-	assert(gui)
+	assert(gui, "Must pass in GUI")
 
 	options = Table.Copy(options or self._options)
 	options.ZIndex = options.ZIndex or gui.ZIndex
