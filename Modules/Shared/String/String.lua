@@ -22,6 +22,10 @@ function lib.ToCamelCase(str)
 	return str
 end
 
+function lib.UppercaseFirstLetter(str)
+	return str:gsub("^%a", string.upper)
+end
+
 function lib.ToLowerCamelCase(str)
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
