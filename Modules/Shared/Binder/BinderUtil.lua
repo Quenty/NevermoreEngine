@@ -43,4 +43,39 @@ function BinderUtil.getChildren(binder, parent)
 	return objects
 end
 
+function BinderUtil.getChildrenOfBinders(binders, parent)
+	assert(type(binders) == "table", "binders must be binder")
+	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
+
+	local objects = {}
+	for _, item in pairs(parent:GetChildren()) do
+		for _, binder in pairs(binders) do
+			local obj = binder:Get(item)
+			if obj then
+				table.insert(objects, obj)
+			end
+		end
+	end
+	return objects
+end
+
+function BinderUtil.getLinkedChildren(binder, linkName, parent)
+	local seen = {}
+	local objects = {}
+	for _, item in pairs(parent:GetChildren()) do
+		if item.Name == linkName and item:IsA("ObjectValue") and item.Value then
+			local obj = binder:Get(item.Value)
+			if obj then
+				if not seen[obj] then
+					seen[obj] = true
+					table.insert(objects, obj)
+				else
+					warn(("[BinderUtil.getLinkedChildren] - Double linked children at %q"):format(item:GetFullName()))
+				end
+			end
+		end
+	end
+	return objects
+end
+
 return BinderUtil
