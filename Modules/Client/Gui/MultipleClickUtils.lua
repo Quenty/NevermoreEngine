@@ -5,7 +5,6 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Signal = require("Signal")
-local InputObjectUtils = require("InputObjectUtils")
 
 local MultipleClickUtils = {}
 
@@ -36,7 +35,7 @@ function MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
 		end
 
 		if lastInputObject
-			and InputObjectUtils.isSameInputObject(inputObject, lastInputObject)
+			and inputObject.UserInputType == lastInputObject.UserInputType
 			and (tick() - lastInputTime) <= TIME_TO_CLICK_AGAIN then
 
 			inputCount = inputCount + 1
