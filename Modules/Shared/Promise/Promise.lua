@@ -12,6 +12,8 @@ end
 
 -- Turns out debug.traceback() is slow
 local ENABLE_TRACEBACK = false
+local _emptyRejectedPromise = nil
+local _emptyFulfilledPromise = nil
 
 local Promise = {}
 Promise.ClassName = "Promise"
@@ -45,7 +47,12 @@ function Promise.spawn(func)
 end
 
 function Promise.resolved(...)
-	if select("#", ...) == 1 and isPromise(...) then
+	local n = select("#", ...)
+	if n == 0 then
+		-- Reuse promise here to save on calls to Promise.resolved()
+		assert(_emptyFulfilledPromise)
+		return _emptyFulfilledPromise
+	elseif n == 1 and isPromise(...) then
 		local promise = (...)
 
 		-- Resolving to promise that is already resolved. Just return the promise!
@@ -61,14 +68,11 @@ function Promise.resolved(...)
 end
 
 function Promise.rejected(...)
-	if select("#", ...) == 1 and isPromise(...) then
-		local promise = (...)
-
-		-- Resolving to promise that is already resolved. Just return the promise!
-		if not promise._pendingExecuteList then
-			promise._uncaughtException = false
-			return promise
-		end
+	local n = select("#", ...)
+	if n == 0 then
+		-- Reuse promise here to save on calls to Promise.rejected()
+		assert(_emptyRejectedPromise)
+		return _emptyRejectedPromise
 	end
 
 	local promise = Promise.new()
@@ -287,5 +291,12 @@ function Promise:_executeThen(promise2, onFulfilled, onRejected)
 		error("Internal error: still pending")
 	end
 end
+
+-- Initialize promise values
+_emptyFulfilledPromise = Promise.new()
+_emptyFulfilledPromise:Resolve()
+
+_emptyRejectedPromise = Promise.new()
+_emptyRejectedPromise:Reject()
 
 return Promise
