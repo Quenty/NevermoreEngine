@@ -5,6 +5,8 @@ local RoundedBackingBuilder = {}
 RoundedBackingBuilder.__index = RoundedBackingBuilder
 RoundedBackingBuilder.ClassName = "RoundedBackingBuilder"
 RoundedBackingBuilder.DEFAULT_SHADOW_TRANSPARENCY = 0.7
+RoundedBackingBuilder.BACKING_ASSET_ID = "rbxassetid://735637144"
+RoundedBackingBuilder.SHADOW_ASSET_ID = "rbxassetid://735644155"
 
 --- Initializes a new RoundedBackingBuilder
 -- @param options Options to set
@@ -32,7 +34,7 @@ function RoundedBackingBuilder:CreateBacking(gui)
 	local backing = Instance.new("ImageLabel")
 	backing.Name = "Backing"
 	backing.Size = UDim2.new(1, 0, 1, 0)
-	backing.Image = "rbxassetid://735637144"
+	backing.Image = self.BACKING_ASSET_ID
 	backing.SliceCenter = Rect.new(4, 4, 16, 16)
 	backing.ImageColor3 = gui.BackgroundColor3
 	backing.ScaleType = Enum.ScaleType.Slice
@@ -99,7 +101,7 @@ function RoundedBackingBuilder:CreateShadow(backing)
 	shadow.Size = UDim2.new(1, 6, 1, 6)
 	shadow.AnchorPoint = Vector2.new(0.5, 0.5)
 	shadow.Position = UDim2.new(0.5, 0, 0.5, 1)
-	shadow.Image = "rbxassetid://735644155"
+	shadow.Image = self.SHADOW_ASSET_ID
 	shadow.SliceCenter = Rect.new(16, 16, 64, 64)
 	shadow.ImageColor3 = Color3.new(0, 0, 0)
 	shadow.ScaleType = Enum.ScaleType.Slice
