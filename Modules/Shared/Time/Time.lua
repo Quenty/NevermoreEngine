@@ -1,4 +1,5 @@
 --- Library handles time based parsing / operations. Untested. Based off of PHP's time system.
+-- Note: This library is out of date, and does not necessarily work. I recommend using os.time()
 -- @module Time
 
 local Time = {}
