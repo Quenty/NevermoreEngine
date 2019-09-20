@@ -51,7 +51,7 @@ function Raycaster:FindPartOnRay(ray)
 		casts = casts - 1
 	end
 
-	warn("[Raycaster.FindPartOnRay] - Ran out of casts. \n" .. debug.traceback())
+	warn(("[Raycaster.FindPartOnRay] - Cast %d times, ran out of casts\n%s"):format(self.MaxCasts, debug.traceback()))
 	return nil
 end
 
