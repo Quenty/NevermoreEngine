@@ -28,7 +28,7 @@ local MyOtherModule = require(script.MyOtherModule)
 ```
 ]]
 
-local REPLICATION_FOLDER_NAME = "_ReplicationFolder"
+local REPLICATION_FOLDER_NAME = "_replicationFolder"
 
 --- Set this value to nil if you don't want to load modules by default
 local SERVER_SCRIPT_SERVICE_MODULES = "Nevermore"
