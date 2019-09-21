@@ -23,22 +23,22 @@ Using this loader does not require the large amount of libraries associated with
 	* Modules parented to other modules will not be moved or loadable by name
 
 3) Use the module loader
-	```lua
-	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-	```
+```lua
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+```
 
 4) Require by name or instance. This will detect auto-cyclic issues
-	```lua
-	local MyModule = require("MyModule")
-	local MyOtherModule = require(script.MyOtherModule)
-	```
+```lua
+local MyModule = require("MyModule")
+local MyOtherModule = require(script.MyOtherModule)
+```
 
 ## Loading the loader
 
 You will need to require the module. I use this code to require it. You can rename Nevermore, but all the
 references to it will need to be renamed.
 
-```
+```lua
 -- Grab the require from the ModuleScript
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 ```
@@ -46,7 +46,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 I know some people have legacy loading systems that use `_G` or `_shared`. You may easily replace
 these systems by storing Nevermore in `_G` or `_shared`.
 
-```
+```lua
 _G.myModuleLoader = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 _G.myModuleLoader["MyModule"] -- Loads module
@@ -70,7 +70,7 @@ require(script.Parent.MyModule)
 
 Loading by name is the main feature.
 
-```
+```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local MyModule = require("MyModule")
@@ -80,14 +80,14 @@ local MyModule = require("MyModule")
 
 You can also load libraries by name. If they aren't there, it will error.
 
-```
+```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local MyModule = require.MyModule
 ```
 
 You can also use this syntax if you want
-```
+```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local MyModule = require["MyModule"
@@ -124,7 +124,7 @@ You can also add new repositories to Nevermore, to require by name!
 
 ### Adding from parent
 You can add modules by parent like this:
-```
+```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 require:AddModulesFromParent(ReplicatedStorage:WaitForChild("ClientModules"))
@@ -136,7 +136,7 @@ and submodules willl not be loaded. Also, on the server, client/shared modules w
 
 ### Adding individual modules
 
-```
+```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 require:AddModulesFromParent(ReplicatedStorage:WaitForChild("ClientModules"))
