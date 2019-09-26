@@ -61,6 +61,10 @@ end
 -- @tparam[opt] {number} diameter
 function Draw.point(vector3, color, parent, diameter)
 	assert(vector3)
+	if typeof(vector3) == "CFrame" then
+		vector3 = vector3.p
+	end
+
 	color = color or Draw._defaultColor
 	parent = parent or Draw._getDefaultParent()
 	diameter = diameter or 1

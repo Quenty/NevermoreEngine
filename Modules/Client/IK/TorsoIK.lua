@@ -22,7 +22,7 @@ local headZClamper = IKUtils.getDampenedAngleClamp(
 		math.rad(60),
 		math.rad(15))
 
-local ROOT_PART_TO_WAIST_DIST_ESTIMATE = -1
+local OFFSET_Y = 0.5
 
 local TorsoIK = setmetatable({}, BaseObject)
 TorsoIK.__index = TorsoIK
@@ -94,7 +94,7 @@ function TorsoIK:Point(position)
 	self._target = position
 
 	local baseCFrame = self._rootPart.CFrame
-		* CFrame.new(0, ROOT_PART_TO_WAIST_DIST_ESTIMATE, 0)
+		* CFrame.new(0, OFFSET_Y, 0)
 
 	local offsetWaistY = baseCFrame:pointToObjectSpace(self._target)
 	self._waistY.t = waistYClamper(math.atan2(-offsetWaistY.X, -offsetWaistY.Z))

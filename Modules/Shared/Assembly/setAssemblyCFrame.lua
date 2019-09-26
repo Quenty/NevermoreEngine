@@ -13,6 +13,4 @@ return function(primaryPart, cframe)
 	for _, part in pairs(getFullAssembly(primaryPart)) do
 		part.CFrame = cframe:toWorldSpace(primaryPartCFrame:toObjectSpace(part.CFrame))
 	end
-
-	primaryPart.CFrame = cframe
 end
