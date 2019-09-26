@@ -12,7 +12,6 @@ local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
 local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
-local Signal = require("Signal")
 
 local IKRigClient = setmetatable({}, IKRigBase)
 IKRigClient.ClassName = "IKRigClient"
@@ -22,9 +21,6 @@ require("PromiseRemoteEventMixin"):Add(IKRigClient, IKConstants.REMOTE_EVENT_NAM
 
 function IKRigClient.new(humanoid)
 	local self = setmetatable(IKRigBase.new(humanoid), IKRigClient)
-
-	self.Updated = Signal.new()
-	self._maid:GiveTask(self.Updated)
 
 	self:PromiseRemoteEvent():Then(function(remoteEvent)
 		self._remoteEvent = remoteEvent or error("No remoteEvent")
