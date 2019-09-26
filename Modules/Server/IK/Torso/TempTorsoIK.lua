@@ -1,6 +1,5 @@
 ---
 -- @classmod TempTorsoIK
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

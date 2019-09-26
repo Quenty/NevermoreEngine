@@ -18,21 +18,8 @@ function IKServiceClient:Init()
 	self._maid = Maid.new()
 	self._ikRigBinder = Binder.new(IKConstants.COLLECTION_SERVICE_TAG, require("IKRigClient"))
 
-	-- Bind metadata
-	self._rigMetadata = {}
-	self._maid:GiveTask(self._ikRigBinder:GetClassAddedSignal():Connect(function(class)
-		self._rigMetadata[class] = 0
-	end))
-	self._maid:GiveTask(self._ikRigBinder:GetClassRemovingSignal():Connect(function(class)
-		self._rigMetadata[class] = nil
-	end))
-
-	for _, class in pairs(self._ikRigBinder:GetAll()) do
-		self._rigMetadata[class] = 0
-	end
-
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
-		self:_update()
+		self:_updateStepped()
 	end))
 
 	self._ikRigBinder:Init()
@@ -68,7 +55,7 @@ function IKServiceClient:GetLocalPlayerRig()
 	return IKRigUtils.getPlayerIKRig(self._ikRigBinder, Players.LocalPlayer)
 end
 
-function IKServiceClient:_update()
+function IKServiceClient:_updateStepped()
 	debug.profilebegin("IKUpdate")
 
 	local localAimer = self:GetLocalAimer()
@@ -84,18 +71,15 @@ function IKServiceClient:_update()
 		local position = rig:GetPositionOrNil()
 
 		if position then
-			local lastUpdateTime = self._rigMetadata[rig]
+			local lastUpdateTime = rig:GetLastUpdateTime()
 			local distance = (camPosition - position).Magnitude
 			local timeBeforeNextUpdate = IKRigUtils.getTimeBeforeNextUpdate(distance)
 
 			if (tick() - lastUpdateTime) >= timeBeforeNextUpdate then
-				lastUpdateTime = tick()
 				rig:Update() -- Update actual rig
 			else
 				rig:UpdateTransformOnly()
 			end
-
-			self._rigMetadata[rig] = lastUpdateTime
 		end
 
 		debug.profileend()

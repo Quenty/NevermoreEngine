@@ -1,5 +1,5 @@
 --- Torso resources for IK
--- @classmod TorsoIK
+-- @classmod TorsoIKBase
 -- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
@@ -9,12 +9,12 @@ local TorsoIKUtils = require("TorsoIKUtils")
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
 
-local TorsoIK = setmetatable({}, BaseObject)
-TorsoIK.__index = TorsoIK
-TorsoIK.ClassName = "TorsoIK"
+local TorsoIKBase = setmetatable({}, BaseObject)
+TorsoIKBase.__index = TorsoIKBase
+TorsoIKBase.ClassName = "TorsoIKBase"
 
-function TorsoIK.new(rootPart, lowerTorso, upperTorso, waist, neck)
-	local self = setmetatable(BaseObject.new(), TorsoIK)
+function TorsoIKBase.new(rootPart, lowerTorso, upperTorso, waist, neck)
+	local self = setmetatable(BaseObject.new(), TorsoIKBase)
 
 	self.Pointed = Signal.new() -- :Fire(position)
 	self._maid:GiveTask(self.Pointed)
@@ -40,7 +40,7 @@ function TorsoIK.new(rootPart, lowerTorso, upperTorso, waist, neck)
 	return self
 end
 
-function TorsoIK:UpdateTransformOnly()
+function TorsoIKBase:UpdateTransformOnly()
 	if not self._relWaistTransform or not self._relNeckTransform then
 		return
 	end
@@ -62,7 +62,7 @@ function TorsoIK:UpdateTransformOnly()
 	self._lastNeckTransform = self._neck.Transform -- NOTE: Have to read this from the weld, otherwise comparison is off
 end
 
-function TorsoIK:Update()
+function TorsoIKBase:Update()
 	self._relWaistTransform = CFrame.Angles(0, self._waistY.p, 0)
 		* CFrame.Angles(self._waistZ.p, 0, 0)
 	self._relNeckTransform = CFrame.Angles(0, self._headY.p, 0)
@@ -71,11 +71,11 @@ function TorsoIK:Update()
 	self:UpdateTransformOnly()
 end
 
-function TorsoIK:GetTarget()
+function TorsoIKBase:GetTarget()
 	return self._target -- May return nil
 end
 
-function TorsoIK:Point(position)
+function TorsoIKBase:Point(position)
 	self._target = position
 
 	local waistY, headY, waistZ, headZ = TorsoIKUtils.getTargetAngles(self._rootPart, position)
@@ -89,7 +89,7 @@ function TorsoIK:Point(position)
 end
 
 --- Helper method used for other IK
-function TorsoIK:GetTargetUpperTorsoCFrame()
+function TorsoIKBase:GetTargetUpperTorsoCFrame()
 	local waist = self._waist
 
 	local estimated_transform = self._lastValidWaistTransform
@@ -99,8 +99,8 @@ function TorsoIK:GetTargetUpperTorsoCFrame()
 	return self._lowerTorso.CFrame * waist.C0 * estimated_transform * waist.C1:inverse()
 end
 
-function TorsoIK:GetUpperTorsoCFrame()
+function TorsoIKBase:GetUpperTorsoCFrame()
 	return self._upperTorso.CFrame
 end
 
-return TorsoIK
+return TorsoIKBase

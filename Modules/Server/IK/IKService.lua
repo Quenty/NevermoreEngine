@@ -4,12 +4,15 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local CharacterUtil = require("CharacterUtil")
 local IKConstants = require("IKConstants")
 local Binder = require("Binder")
 local Maid = require("Maid")
 local HumanoidTracker = require("HumanoidTracker")
+
+local SERVER_UPDATE_RATE = 1/10
 
 local IKService = {}
 
@@ -30,6 +33,10 @@ function IKService:Init()
 	for _, player in pairs(Players:GetPlayers()) do
 		self:_handlePlayer(player)
 	end
+
+	self._maid:GiveTask(RunService.Stepped:Connect(function()
+		self:_updateStepped()
+	end))
 end
 
 function IKService:GetRig(humanoid)
@@ -88,6 +95,24 @@ function IKService:_handlePlayer(player)
 	end
 
 	self._maid[player] = maid
+end
+
+function IKService:_updateStepped()
+	debug.profilebegin("IKUpdateServer")
+
+	for _, rig in pairs(self._ikRigBinder:GetAll()) do
+		debug.profilebegin("RigUpdateServer")
+
+		local lastUpdateTime = rig:GetLastUpdateTime()
+		if (tick() - lastUpdateTime) >= SERVER_UPDATE_RATE then
+			rig:Update() -- Update actual rig
+		else
+			rig:UpdateTransformOnly()
+		end
+
+		debug.profileend()
+	end
+	debug.profileend()
 end
 
 return IKService

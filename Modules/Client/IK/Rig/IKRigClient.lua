@@ -6,32 +6,25 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Players = game:GetService("Players")
 
 local ArmIK = require("ArmIK")
-local BaseObject = require("BaseObject")
-local CharacterUtil = require("CharacterUtil")
+local IKRigBase = require("IKRigBase")
 local IKConstants = require("IKConstants")
 local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
 local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local Signal = require("Signal")
-local TorsoIKClient = require("TorsoIKClient")
 
-local IKRigClient = setmetatable({}, BaseObject)
+local IKRigClient = setmetatable({}, IKRigBase)
 IKRigClient.ClassName = "IKRigClient"
 IKRigClient.__index = IKRigClient
 
 require("PromiseRemoteEventMixin"):Add(IKRigClient, IKConstants.REMOTE_EVENT_NAME)
 
 function IKRigClient.new(humanoid)
-	local self = setmetatable(BaseObject.new(humanoid), IKRigClient)
+	local self = setmetatable(IKRigBase.new(humanoid), IKRigClient)
 
 	self.Updated = Signal.new()
 	self._maid:GiveTask(self.Updated)
-
-	self._obj = humanoid or error("No humanoid")
-	self._character = humanoid.Parent or error("No character")
-
-	self._ikTargets = {}
 
 	self:PromiseRemoteEvent():Then(function(remoteEvent)
 		self._remoteEvent = remoteEvent or error("No remoteEvent")
@@ -54,49 +47,6 @@ function IKRigClient:GetPositionOrNil()
 	end
 
 	return rootPart.Position
-end
-
-function IKRigClient:GetPlayer()
-	return CharacterUtil.GetPlayerFromCharacter(self._obj)
-end
-
-function IKRigClient:GetHumanoid()
-	return self._obj
-end
-
-function IKRigClient:Update()
-	self.Updated:Fire()
-
-	for _, item in pairs(self._ikTargets) do
-		item:Update()
-	end
-end
-
-function IKRigClient:UpdateTransformOnly()
-	for _, item in pairs(self._ikTargets) do
-		item:UpdateTransformOnly()
-	end
-end
-
-function IKRigClient:PromiseTorso()
-	if self._torsoPromise then
-		return Promise.resolved(self._torsoPromise)
-	end
-
-	self._torsoPromise = self:_promiseNewTorso()
-	return Promise.resolved(self._torsoPromise)
-end
-
-function IKRigClient:GetTorso()
-	if not self._torsoPromise then
-		self:PromiseTorso()
-	end
-
-	if self._torsoPromise:IsFulfilled() then
-		return self._torsoPromise:Wait()
-	else
-		return nil
-	end
 end
 
 function IKRigClient:PromiseLeftArm()
@@ -180,44 +130,5 @@ function IKRigClient:_promiseNewArm(armName)
 		end)
 end
 
-function IKRigClient:_promiseNewTorso()
-	if self._obj.RigType ~= Enum.HumanoidRigType.R15 then
-		return Promise.rejected("Rig is not HumanoidRigType.R15")
-	end
-
-	return self._maid:GivePromise(PromiseUtils.all({
-			promiseChild(self._character, "HumanoidRootPart");
-			promiseChild(self._character, "LowerTorso");
-			promiseChild(self._character, "UpperTorso");
-			promiseChild(self._character, "Head");
-		}))
-		:Then(function(rootPart, lowerTorso, upperTorso, head)
-			if not lowerTorso:IsA("BasePart") then
-				return Promise.rejected("LowerTorso is not a BasePart")
-			end
-			if not upperTorso:IsA("BasePart") then
-				return Promise.rejected("UpperTorso is not a BasePart")
-			end
-			if not head:IsA("BasePart") then
-				return Promise.rejected("Head is not a BasePart")
-			end
-
-			return self._maid:GivePromise(PromiseUtils.all({
-				Promise.resolved(rootPart);
-				Promise.resolved(lowerTorso);
-				Promise.resolved(upperTorso);
-				promiseChild(upperTorso, "Waist");
-				promiseChild(head, "Neck");
-			}))
-		end)
-		:Then(function(rootPart, lowerTorso, upperTorso, waist, neck)
-			local newIk = TorsoIKClient.new(rootPart, lowerTorso, upperTorso, waist, neck)
-			self._maid:GiveTask(newIk)
-
-			table.insert(self._ikTargets, 1, newIk)
-
-			return newIk
-		end)
-end
 
 return IKRigClient

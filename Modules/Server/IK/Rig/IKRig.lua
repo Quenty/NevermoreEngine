@@ -6,17 +6,17 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Players = game:GetService("Players")
 
-local BaseObject = require("BaseObject")
+local IKRigBase = require("IKRigBase")
 local IKConstants = require("IKConstants")
 local CharacterUtil = require("CharacterUtil")
 local TempTorsoIK = require("TempTorsoIK")
 
-local IKRig = setmetatable({}, BaseObject)
+local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
 IKRig.__index = IKRig
 
 function IKRig.new(humanoid)
-	local self = setmetatable(BaseObject.new(humanoid), IKRig)
+	local self = setmetatable(IKRigBase.new(humanoid), IKRig)
 
 	self._remoteEvent = Instance.new("RemoteEvent")
 	self._remoteEvent.Name = IKConstants.REMOTE_EVENT_NAME
@@ -32,10 +32,6 @@ function IKRig.new(humanoid)
 	return self
 end
 
-function IKRig:GetHumanoid()
-	return self._obj
-end
-
 function IKRig:GetTarget()
 	return self._target
 end
@@ -49,6 +45,12 @@ function IKRig:SetRigTarget(target)
 	assert(typeof(target) == "Vector3")
 
 	self._target = target
+
+	local torso = self:GetTorso()
+	if torso then
+		torso:Point(self._target)
+	end
+
 	self._remoteEvent:FireAllClients(target)
 end
 
@@ -57,6 +59,11 @@ function IKRig:_onServerEvent(player, target)
 	assert(typeof(target) == "Vector3")
 
 	self._target = target
+
+	local torso = self:GetTorso()
+	if torso then
+		torso:Point(self._target)
+	end
 
 	-- Do replication
 	for _, other in pairs(Players:GetPlayers()) do
