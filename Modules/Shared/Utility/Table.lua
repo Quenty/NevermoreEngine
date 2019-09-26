@@ -94,13 +94,19 @@ end
 -- @function Table.DeepCopy
 -- @tparam table table Table to deep copy
 -- @treturn table New table
-local function DeepCopy(target)
+local function DeepCopy(target, _context)
+	_context = _context or  {}
+	if _context[target] then
+		return _context[target]
+	end
+
 	if type(target) == "table" then
 		local new = {}
+		_context[target] = new
 		for index, value in pairs(target) do
-			new[DeepCopy(index)] = DeepCopy(value)
+			new[DeepCopy(index, _context)] = DeepCopy(value, _context)
 		end
-		return setmetatable(new, DeepCopy(getmetatable(target)))
+		return setmetatable(new, DeepCopy(getmetatable(target), _context))
 	else
 		return target
 	end
