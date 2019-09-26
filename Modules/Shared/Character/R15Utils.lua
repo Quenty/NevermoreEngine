@@ -16,6 +16,28 @@ function R15Utils.getUpperTorso(character)
 	return character:FindFirstChild("UpperTorso")
 end
 
+function R15Utils.getLowerTorso(character)
+	return character:FindFirstChild("LowerTorso")
+end
+
+function R15Utils.getWaistJoint(character)
+	local upperTorso = R15Utils.getUpperTorso(character)
+	if not upperTorso then
+		return nil
+	end
+
+	return upperTorso:FindFirstChild("Waist")
+end
+
+function R15Utils.getNeckJoint(character)
+	local head = character:FindFirstChild("Head")
+	if not head then
+		return nil
+	end
+
+	return head:FindFirstChild("Neck")
+end
+
 function R15Utils.getLeftShoulderRigAttachment(character)
 	return R15Utils.searchForRigAttachment(character, "UpperTorso", "LeftShoulderRigAttachment")
 end

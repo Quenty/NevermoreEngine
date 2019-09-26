@@ -14,7 +14,7 @@ local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local Signal = require("Signal")
-local TorsoIK = require("TorsoIK")
+local TorsoIKClient = require("TorsoIKClient")
 
 local IKRigClient = setmetatable({}, BaseObject)
 IKRigClient.ClassName = "IKRigClient"
@@ -211,7 +211,7 @@ function IKRigClient:_promiseNewTorso()
 			}))
 		end)
 		:Then(function(rootPart, lowerTorso, upperTorso, waist, neck)
-			local newIk = TorsoIK.new(rootPart, lowerTorso, upperTorso, waist, neck)
+			local newIk = TorsoIKClient.new(rootPart, lowerTorso, upperTorso, waist, neck)
 			self._maid:GiveTask(newIk)
 
 			table.insert(self._ikTargets, 1, newIk)
