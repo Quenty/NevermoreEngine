@@ -10,7 +10,7 @@ local Workspace = game:GetService("Workspace")
 local CameraStackService = require("CameraStackService")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
 local IKConstants = require("IKConstants")
-local IKRig = require("IKRig")
+local IKRigClient = require("IKRigClient")
 local Maid = require("Maid")
 local promiseChild = require("promiseChild")
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
@@ -52,7 +52,7 @@ function IKServiceClient:GetRig(humanoid)
 		return self._rigs[humanoid]
 	end
 
-	local rig = IKRig.new(humanoid)
+	local rig = IKRigClient.new(humanoid)
 	self._rigs[humanoid] = rig
 	self._maid[humanoid] = rig
 

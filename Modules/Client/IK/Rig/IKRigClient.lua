@@ -1,5 +1,5 @@
 --- Handles IK rigging for a humanoid
--- @classmod IKRig
+-- @classmod IKRigClient
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -11,12 +11,12 @@ local TorsoIK = require("TorsoIK")
 local ArmIK = require("ArmIK")
 local Signal = require("Signal")
 
-local IKRig = setmetatable({}, BaseObject)
-IKRig.ClassName = "IKRig"
-IKRig.__index = IKRig
+local IKRigClient = setmetatable({}, BaseObject)
+IKRigClient.ClassName = "IKRigClient"
+IKRigClient.__index = IKRigClient
 
-function IKRig.new(humanoid)
-	local self = setmetatable(BaseObject.new(), IKRig)
+function IKRigClient.new(humanoid)
+	local self = setmetatable(BaseObject.new(), IKRigClient)
 
 	self.Updated = Signal.new()
 	self._maid:GiveTask(self.Updated)
@@ -29,11 +29,11 @@ function IKRig.new(humanoid)
 	return self
 end
 
-function IKRig:GetHumanoid()
+function IKRigClient:GetHumanoid()
 	return self._humanoid
 end
 
-function IKRig:Update()
+function IKRigClient:Update()
 	self.Updated:Fire()
 
 	for _, item in pairs(self._ikTargets) do
@@ -41,13 +41,13 @@ function IKRig:Update()
 	end
 end
 
-function IKRig:UpdateTransformOnly()
+function IKRigClient:UpdateTransformOnly()
 	for _, item in pairs(self._ikTargets) do
 		item:UpdateTransformOnly()
 	end
 end
 
-function IKRig:PromiseTorso()
+function IKRigClient:PromiseTorso()
 	if self._torsoPromise then
 		return Promise.resolved(self._torsoPromise)
 	end
@@ -56,7 +56,7 @@ function IKRig:PromiseTorso()
 	return Promise.resolved(self._torsoPromise)
 end
 
-function IKRig:GetTorso()
+function IKRigClient:GetTorso()
 	if not self._torsoPromise then
 		self:PromiseTorso()
 	end
@@ -68,7 +68,7 @@ function IKRig:GetTorso()
 	end
 end
 
-function IKRig:PromiseLeftArm()
+function IKRigClient:PromiseLeftArm()
 	if self._leftArmPromise then
 		return Promise.resolved(self._leftArmPromise)
 	end
@@ -76,7 +76,7 @@ function IKRig:PromiseLeftArm()
 	return Promise.resolved(self._leftArmPromise)
 end
 
-function IKRig:GetLeftArm()
+function IKRigClient:GetLeftArm()
 	if self._leftArmPromise:IsFulfilled() then
 		return self._leftArmPromise:Wait()
 	else
@@ -84,7 +84,7 @@ function IKRig:GetLeftArm()
 	end
 end
 
-function IKRig:PromiseRightArm()
+function IKRigClient:PromiseRightArm()
 	if self._rightArmPromise then
 		return Promise.resolved(self._rightArmPromise)
 	end
@@ -92,7 +92,7 @@ function IKRig:PromiseRightArm()
 	return Promise.resolved(self._rightArmPromise)
 end
 
-function IKRig:GetRightArm()
+function IKRigClient:GetRightArm()
 	if self._rightArmPromise:IsFulfilled() then
 		return self._rightArmPromise:Wait()
 	else
@@ -100,7 +100,7 @@ function IKRig:GetRightArm()
 	end
 end
 
-function IKRig:_promiseNewArm(armName)
+function IKRigClient:_promiseNewArm(armName)
 	assert(armName == "Left" or armName == "Right")
 
 	if self._humanoid.RigType ~= Enum.HumanoidRigType.R15 then
@@ -130,7 +130,7 @@ function IKRig:_promiseNewArm(armName)
 		end)
 end
 
-function IKRig:_promiseNewTorso()
+function IKRigClient:_promiseNewTorso()
 	if self._humanoid.RigType ~= Enum.HumanoidRigType.R15 then
 		return Promise.rejected("Rig is not HumanoidRigType.R15")
 	end
@@ -170,4 +170,4 @@ function IKRig:_promiseNewTorso()
 		end)
 end
 
-return IKRig
+return IKRigClient
