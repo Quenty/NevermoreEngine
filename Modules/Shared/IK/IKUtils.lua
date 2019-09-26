@@ -20,5 +20,4 @@ function IKUtils.getDampenedAngleClamp(maxAngle, dampenAreaAngle, dampenAreaFact
 	end
 end
 
-
 return IKUtils

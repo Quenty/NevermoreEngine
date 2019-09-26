@@ -5,24 +5,9 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local AccelTween = require("AccelTween")
-local IKUtils = require("IKUtils")
+local TorsoIKUtils = require("TorsoIKUtils")
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
-
-local waistYClamper = IKUtils.getDampenedAngleClamp(
-		math.rad(45),
-		math.rad(15))
-local waistZClamper = IKUtils.getDampenedAngleClamp(
-		math.rad(20),
-		math.rad(10))
-local headYClamper = IKUtils.getDampenedAngleClamp(
-		math.rad(90),
-		math.rad(30))
-local headZClamper = IKUtils.getDampenedAngleClamp(
-		math.rad(60),
-		math.rad(15))
-
-local OFFSET_Y = 0.5
 
 local TorsoIK = setmetatable({}, BaseObject)
 TorsoIK.__index = TorsoIK
@@ -93,29 +78,12 @@ end
 function TorsoIK:Point(position)
 	self._target = position
 
-	local baseCFrame = self._rootPart.CFrame
-		* CFrame.new(0, OFFSET_Y, 0)
+	local waistY, headY, waistZ, headZ = TorsoIKUtils.getTargetAngles(self._rootPart, position)
 
-	local offsetWaistY = baseCFrame:pointToObjectSpace(self._target)
-	self._waistY.t = waistYClamper(math.atan2(-offsetWaistY.X, -offsetWaistY.Z))
-
-	local relativeToWaistY = baseCFrame
-		* CFrame.Angles(0, self._waistY.t, 0)
-
-	local headOffsetY = relativeToWaistY:pointToObjectSpace(self._target)
-	self._headY.t = headYClamper(math.atan2(-headOffsetY.X, -headOffsetY.Z))
-
-	local relativeToHeadY = relativeToWaistY
-		* CFrame.Angles(0, self._headY.t, 0)
-
-	local offsetWaistZ = relativeToHeadY:pointToObjectSpace(self._target)
-	self._waistZ.t = waistZClamper(math.atan2(offsetWaistZ.Y, -offsetWaistZ.Z))
-
-	local relativeToEverything = relativeToHeadY
-		* CFrame.Angles(0, 0, self._waistZ.t)
-
-	local headOffsetZ = relativeToEverything:pointToObjectSpace(self._target)
-	self._headZ.t = headZClamper(math.atan2(headOffsetZ.Y, -headOffsetZ.Z))
+	self._waistY.t = waistY
+	self._headY.t = headY
+	self._waistZ.t = waistZ
+	self._headZ.t = headZ
 
 	self.Pointed:Fire(self._target)
 end
