@@ -4,8 +4,26 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Promise = require("Promise")
+local DataStoreService = game:GetService("DataStoreService")
 
 local DataStorePromises = {}
+
+function DataStorePromises.promiseDataStore(name, scope)
+	assert(type(name) == "string")
+	assert(type(scope) == "string")
+
+	return Promise.new(function(resolve, reject)
+		local result = nil
+		local ok, err = pcall(function()
+			result = DataStoreService:GetDataStore(name, scope)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		return resolve(result)
+	end)
+
+end
 
 function DataStorePromises.getAsync(robloxDataStore, key)
 	assert(typeof(robloxDataStore) == "Instance")
