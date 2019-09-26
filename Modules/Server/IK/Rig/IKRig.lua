@@ -9,7 +9,6 @@ local Players = game:GetService("Players")
 local IKRigBase = require("IKRigBase")
 local IKConstants = require("IKConstants")
 local CharacterUtil = require("CharacterUtil")
-local TempTorsoIK = require("TempTorsoIK")
 
 local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
@@ -34,11 +33,6 @@ end
 
 function IKRig:GetTarget()
 	return self._target
-end
-
---- Intended for use on IK positioning on the server, to get accurate torso positions for a tiny bit
-function IKRig:GetTemporaryTorsoIK()
-	return TempTorsoIK.new(self)
 end
 
 function IKRig:SetRigTarget(target)
