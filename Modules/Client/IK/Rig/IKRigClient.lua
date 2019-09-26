@@ -3,34 +3,65 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local BaseObject = require("BaseObject")
-local promiseChild = require("promiseChild")
-local Promise = require("Promise")
-local PromiseUtils = require("PromiseUtils")
-local TorsoIK = require("TorsoIK")
+local Players = game:GetService("Players")
+
 local ArmIK = require("ArmIK")
+local BaseObject = require("BaseObject")
+local CharacterUtil = require("CharacterUtil")
+local IKConstants = require("IKConstants")
+local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
+local Promise = require("Promise")
+local promiseChild = require("promiseChild")
+local PromiseUtils = require("PromiseUtils")
 local Signal = require("Signal")
+local TorsoIK = require("TorsoIK")
 
 local IKRigClient = setmetatable({}, BaseObject)
 IKRigClient.ClassName = "IKRigClient"
 IKRigClient.__index = IKRigClient
 
+require("PromiseRemoteEventMixin"):Add(IKRigClient, IKConstants.REMOTE_EVENT_NAME)
+
 function IKRigClient.new(humanoid)
-	local self = setmetatable(BaseObject.new(), IKRigClient)
+	local self = setmetatable(BaseObject.new(humanoid), IKRigClient)
 
 	self.Updated = Signal.new()
 	self._maid:GiveTask(self.Updated)
 
-	self._humanoid = humanoid or error("No humanoid")
+	self._obj = humanoid or error("No humanoid")
 	self._character = humanoid.Parent or error("No character")
 
 	self._ikTargets = {}
 
+	self:PromiseRemoteEvent():Then(function(remoteEvent)
+		self._remoteEvent = remoteEvent or error("No remoteEvent")
+		self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(...)
+			self:_handleRemoteEventClient(...)
+		end))
+
+		if self:GetPlayer() == Players.LocalPlayer then
+			self:_setupLocalPlayer(self._remoteEvent)
+		end
+	end)
+
 	return self
 end
 
+function IKRigClient:GetPositionOrNil()
+	local rootPart = self._obj.RootPart
+	if not rootPart then
+		return nil
+	end
+
+	return rootPart.Position
+end
+
+function IKRigClient:GetPlayer()
+	return CharacterUtil.GetPlayerFromCharacter(self._obj)
+end
+
 function IKRigClient:GetHumanoid()
-	return self._humanoid
+	return self._obj
 end
 
 function IKRigClient:Update()
@@ -100,10 +131,29 @@ function IKRigClient:GetRightArm()
 	end
 end
 
+function IKRigClient:GetLocalPlayerAimer()
+	return self._aimer
+end
+
+function IKRigClient:_handleRemoteEventClient(newTarget)
+	assert(typeof(newTarget) == "Vector3")
+
+	local torso = self:GetTorso()
+
+	if torso then
+		torso:Point(newTarget)
+	end
+end
+
+function IKRigClient:_setupLocalPlayer(remoteEvent)
+	self._aimer = IKRigAimerLocalPlayer.new(self, remoteEvent)
+	self._maid:GiveTask(self._aimer)
+end
+
 function IKRigClient:_promiseNewArm(armName)
 	assert(armName == "Left" or armName == "Right")
 
-	if self._humanoid.RigType ~= Enum.HumanoidRigType.R15 then
+	if self._obj.RigType ~= Enum.HumanoidRigType.R15 then
 		return Promise.rejected("Rig is not HumanoidRigType.R15")
 	end
 
@@ -131,7 +181,7 @@ function IKRigClient:_promiseNewArm(armName)
 end
 
 function IKRigClient:_promiseNewTorso()
-	if self._humanoid.RigType ~= Enum.HumanoidRigType.R15 then
+	if self._obj.RigType ~= Enum.HumanoidRigType.R15 then
 		return Promise.rejected("Rig is not HumanoidRigType.R15")
 	end
 

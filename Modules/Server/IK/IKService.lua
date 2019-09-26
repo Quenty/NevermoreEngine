@@ -6,16 +6,53 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Players = game:GetService("Players")
 
 local CharacterUtil = require("CharacterUtil")
-local GetRemoteEvent = require("GetRemoteEvent")
 local IKConstants = require("IKConstants")
+local Binder = require("Binder")
+local Maid = require("Maid")
+local HumanoidTracker = require("HumanoidTracker")
 
 local IKService = {}
 
 function IKService:Init()
-	self._remoteEvent = GetRemoteEvent(IKConstants.REMOTE_EVENT_NAME)
-	self._remoteEvent.OnServerEvent:Connect(function(...)
-		self:_onServerEvent(...)
-	end)
+	self._maid = Maid.new()
+
+	self._ikRigBinder = Binder.new(IKConstants.COLLECTION_SERVICE_TAG, require("IKRig"))
+	self._ikRigBinder:Init()
+
+	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
+		self:_handlePlayer(player)
+	end))
+
+	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+		self:_handlePlayerRemoving(player)
+	end))
+
+	for _, player in pairs(Players:GetPlayers()) do
+		self:_handlePlayer(player)
+	end
+end
+
+function IKService:GetRig(humanoid)
+	return self._ikRigBinder:Bind(humanoid)
+end
+
+function IKService:RemoveRig(humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
+
+	self._ikRigBinder:Unbind(humanoid)
+end
+
+function IKService:UpdateServerRigTarget(humanoid, target)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
+	assert(typeof(target) == "Vector3")
+
+	local serverRig = self._ikRigBinder:Bind(humanoid)
+	if not serverRig then
+		warn("[IKService.UpdateServerRigTarget] - No serverRig")
+		return
+	end
+
+	serverRig:SetRigTarget(target)
 end
 
 function IKService:_onServerEvent(player, target)
@@ -25,26 +62,32 @@ function IKService:_onServerEvent(player, target)
 	if not humanoid then
 		return
 	end
+end
 
-	-- Do replication
-	for _, other in pairs(Players:GetPlayers()) do
-		if other ~= player then
-			self._remoteEvent:FireClient(other, "UpdateRig", humanoid, target)
+function IKService:_handlePlayerRemoving(player)
+	self._maid[player] = nil
+end
+
+function IKService:_handlePlayer(player)
+	local maid = Maid.new()
+
+	local humanoidTracker = HumanoidTracker.new(player)
+	maid:GiveTask(humanoidTracker)
+
+	maid:GiveTask(humanoidTracker.AliveHumanoid.Changed:Connect(function(new, old)
+		if old then
+			self._ikRigBinder:Unbind(old)
 		end
+		if new then
+			self._ikRigBinder:Bind(new)
+		end
+	end))
+
+	if humanoidTracker.AliveHumanoid.Value then
+		self._ikRigBinder:Bind(humanoidTracker.AliveHumanoid.Value)
 	end
-end
 
-function IKService:RemoveServerRig(humanoid)
-	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
-
-	self._remoteEvent:FireAllClients("RemoveRig", humanoid)
-end
-
-function IKService:UpdateServerRigTarget(humanoid, target)
-	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
-	assert(typeof(target) == "Vector3")
-
-	self._remoteEvent:FireAllClients("UpdateRig", humanoid, target)
+	self._maid[player] = maid
 end
 
 return IKService
