@@ -73,6 +73,11 @@ function Octree:KNearestNeighborsSearch(position, k, radius)
 	return knearest, knearestDist2
 end
 
+function Octree:CreateLowestSubRegion(px, py, pz)
+	local region = self:_createRegion(px, py, pz)
+	return OctreeRegionUtils.createSubRegionAtDepth(region, px, py, pz, self._maxDepth)
+end
+
 function Octree:_radiusSearch(px, py, pz, radiusSquared)
 	local objectsFound = {}
 	local nodeDistances2 = {}
@@ -95,11 +100,6 @@ function Octree:_radiusSearch(px, py, pz, radiusSquared)
 	end
 
 	return objectsFound, nodeDistances2
-end
-
-function Octree:CreateLowestSubRegion(px, py, pz)
-	local region = self:_createRegion(px, py, pz)
-	return OctreeRegionUtils.createSubRegionAtDepth(region, px, py, pz, self._maxDepth)
 end
 
 function Octree:_getDeepistRegion(px, py, pz, maxDepth)
