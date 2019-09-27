@@ -3,8 +3,9 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local RunService = game:GetService("RunService")
+
 local BaseObject = require("BaseObject")
-local IKServiceClient = require("IKServiceClient")
 local promiseChild = require("promiseChild")
 local promisePropertyValue = require("promisePropertyValue")
 local GripAttachmentConstants = require("GripAttachmentConstants")
@@ -31,6 +32,13 @@ function GripAttachment:PromiseIKRig()
 		return self._ikRigPromise
 	end
 
+	local ikService
+	if RunService:IsServer() then
+		ikService = require("IKService")
+	else
+		ikService = require("IKServiceClient")
+	end
+
 	local promiseHumanoidLink = self._maid:GivePromise(promiseChild(self._obj, GripAttachmentConstants.HUMANOID_LINK_NAME))
 
 	self._ikRigPromise = promiseHumanoidLink
@@ -43,7 +51,7 @@ function GripAttachment:PromiseIKRig()
 				return Promise.rejected("Humanoid in link is not a humanoid")
 			end
 
-			local rig = IKServiceClient:GetRig(humanoid)
+			local rig = ikService:GetRig(humanoid)
 			if not rig then
 				return Promise.rejected("No rig found for humanoid!")
 			end

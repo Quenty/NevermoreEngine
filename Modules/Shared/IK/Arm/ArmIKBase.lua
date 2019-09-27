@@ -1,5 +1,5 @@
 --- Provides IK for a given arm
--- @classmod ArmIK
+-- @classmod ArmIKBase
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -8,12 +8,12 @@ local Math = require("Math")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 
-local ArmIK = setmetatable({}, BaseObject)
-ArmIK.ClassName = "ArmIK"
-ArmIK.__index = ArmIK
+local ArmIKBase = setmetatable({}, BaseObject)
+ArmIKBase.ClassName = "ArmIKBase"
+ArmIKBase.__index = ArmIKBase
 
-function ArmIK.new(gripAttachment, shoulder, elbow, wrist)
-	local self = setmetatable(BaseObject.new(), ArmIK)
+function ArmIKBase.new(gripAttachment, shoulder, elbow, wrist)
+	local self = setmetatable(BaseObject.new(), ArmIKBase)
 
 	self._gripAttachment = gripAttachment or error("No gripAttachment")
 	self._shoulder = shoulder or error("No shoulder")
@@ -25,7 +25,7 @@ function ArmIK.new(gripAttachment, shoulder, elbow, wrist)
 	return self
 end
 
-function ArmIK:Grip(attachment, priority)
+function ArmIKBase:Grip(attachment, priority)
 	local gripData = {
 		attachment = attachment;
 		priority = priority;
@@ -45,7 +45,7 @@ function ArmIK:Grip(attachment, priority)
 	end
 end
 
-function ArmIK:_stopGrip(grip)
+function ArmIKBase:_stopGrip(grip)
 	for index, value in pairs(self._grips) do
 		if value == grip then
 			table.remove(self._grips, index)
@@ -55,7 +55,7 @@ function ArmIK:_stopGrip(grip)
 end
 
 -- Sets transform
-function ArmIK:UpdateTransformOnly()
+function ArmIKBase:UpdateTransformOnly()
 	if not self._grips[1] then
 		return
 	end
@@ -67,7 +67,7 @@ function ArmIK:UpdateTransformOnly()
 	self._elbow.Transform = self._elbowTransform
 end
 
-function ArmIK:Update()
+function ArmIKBase:Update()
 	self:_updatePoint()
 
 	local offsetValue = self._offset
@@ -86,7 +86,7 @@ function ArmIK:Update()
 	self:UpdateTransformOnly()
 end
 
-function ArmIK:_updatePoint()
+function ArmIKBase:_updatePoint()
 	local grip = self._grips[1]
 	if not grip then
 		self:_clear()
@@ -96,13 +96,13 @@ function ArmIK:_updatePoint()
 	self:_calculatePoint(grip.attachment.WorldPosition)
 end
 
-function ArmIK:_clear()
+function ArmIKBase:_clear()
 	self._offset = nil
 	self._elbowTransform = nil
 	self._shoulderTransform = nil
 end
 
-function ArmIK:_calculatePoint(targetPositionWorld)
+function ArmIKBase:_calculatePoint(targetPositionWorld)
 	local shoulder = self._shoulder
 	local elbow = self._elbow
 	local wrist = self._wrist
@@ -141,4 +141,4 @@ function ArmIK:_calculatePoint(targetPositionWorld)
 	self._offset = offset.unit * d
 end
 
-return ArmIK
+return ArmIKBase
