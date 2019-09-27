@@ -24,9 +24,11 @@ return function(originPart)
 		for _, joint in pairs(part:GetJoints()) do
 			local part0
 			local part1
-			if joint:IsA("Constraint") and not IGNORE_CONSTRAINT_SET[joint.ClassName] then
-				part0 = joint.Attachment0.Parent
-				part1 = joint.Attachment1.Parent
+			if joint:IsA("Constraint") then
+				if not IGNORE_CONSTRAINT_SET[joint.ClassName] then
+					part0 = joint.Attachment0.Parent
+					part1 = joint.Attachment1.Parent
+				end
 			else
 				part0 = joint.Part0
 				part1 = joint.Part1
