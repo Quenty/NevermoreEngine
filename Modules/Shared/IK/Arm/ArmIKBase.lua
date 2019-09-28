@@ -5,6 +5,8 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local BaseObject = require("BaseObject")
 local Math = require("Math")
+local IKResourceUtils = require("IKResourceUtils")
+local IKResource = require("IKResource")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 
@@ -12,15 +14,55 @@ local ArmIKBase = setmetatable({}, BaseObject)
 ArmIKBase.ClassName = "ArmIKBase"
 ArmIKBase.__index = ArmIKBase
 
-function ArmIKBase.new(gripAttachment, shoulder, elbow, wrist)
+function ArmIKBase.new(humanoid, armName)
 	local self = setmetatable(BaseObject.new(), ArmIKBase)
 
-	self._gripAttachment = gripAttachment or error("No gripAttachment")
-	self._shoulder = shoulder or error("No shoulder")
-	self._elbow = elbow or error("No elbow")
-	self._wrist = wrist or error("No wrist")
+	self._humanoid = humanoid or error("No humanoid")
 
 	self._grips = {}
+
+	self._resources = IKResource.new(IKResourceUtils.createResource({
+		name = "Character";
+		robloxName = self._humanoid.Parent.Name;
+		children = {
+			IKResourceUtils.createResource({
+				name = "UpperArm";
+				robloxName = armName .. "UpperArm";
+				children = {
+					IKResourceUtils.createResource({
+						name = "Shoulder";
+						robloxName = armName .. "Shoulder";
+					});
+				};
+			});
+			IKResourceUtils.createResource({
+				name = "LowerArm";
+				robloxName = armName .. "LowerArm";
+				children = {
+					IKResourceUtils.createResource({
+						name = "Elbow";
+						robloxName = armName .. "Elbow";
+					});
+				};
+			});
+			IKResourceUtils.createResource({
+				name = "Hand";
+				robloxName = armName .. "Hand";
+				children = {
+					IKResourceUtils.createResource({
+						name = "Wrist";
+						robloxName = armName .. "Wrist";
+					});
+					IKResourceUtils.createResource({
+						name = "HandGripAttachment";
+						robloxName = armName .. "GripAttachment";
+					});
+				};
+			});
+		}
+	}))
+	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
+	self._maid:GiveTask(self._resources)
 
 	return self
 end
@@ -62,38 +104,44 @@ function ArmIKBase:UpdateTransformOnly()
 	if not self._shoulderTransform or not self._elbowTransform then
 		return
 	end
-
-	self._shoulder.Transform = self._shoulderTransform
-	self._elbow.Transform = self._elbowTransform
-end
-
-function ArmIKBase:Update()
-	self:_updatePoint()
-
-	local offsetValue = self._offset
-	if not (offsetValue and offsetValue.Magnitude > 0) then
+	if not self._resources:IsReady() then
 		return
 	end
 
-	local shoulderXAngle = self._shoulderXAngle
-	local elbowXAngle = self._elbowXAngle
+	local shoulder = self._resources:Get("Shoulder")
+	local elbow = self._resources:Get("Elbow")
 
-	local yrot = CFrame.new(Vector3.new(), offsetValue)
+	shoulder.Transform = self._shoulderTransform
+	elbow.Transform = self._elbowTransform
+end
 
-	self._shoulderTransform = (yrot * CFA_90X * CFrame.Angles(shoulderXAngle, 0, 0)) --:inverse()
-	self._elbowTransform = CFrame.Angles(elbowXAngle, 0, 0)
+function ArmIKBase:Update()
+	if self:_updatePoint() then
+		local shoulderXAngle = self._shoulderXAngle
+		local elbowXAngle = self._elbowXAngle
 
-	self:UpdateTransformOnly()
+		local yrot = CFrame.new(Vector3.new(), self._offset)
+
+		self._shoulderTransform = (yrot * CFA_90X * CFrame.Angles(shoulderXAngle, 0, 0)) --:inverse()
+		self._elbowTransform = CFrame.Angles(elbowXAngle, 0, 0)
+
+		self:UpdateTransformOnly()
+	end
 end
 
 function ArmIKBase:_updatePoint()
 	local grip = self._grips[1]
 	if not grip then
 		self:_clear()
-		return
+		return false
 	end
 
-	self:_calculatePoint(grip.attachment.WorldPosition)
+	if not self:_calculatePoint(grip.attachment.WorldPosition) then
+		self:_clear()
+		return false
+	end
+
+	return true
 end
 
 function ArmIKBase:_clear()
@@ -103,9 +151,14 @@ function ArmIKBase:_clear()
 end
 
 function ArmIKBase:_calculatePoint(targetPositionWorld)
-	local shoulder = self._shoulder
-	local elbow = self._elbow
-	local wrist = self._wrist
+	if not self._resources:IsReady() then
+		return false
+	end
+
+	local shoulder = self._resources:Get("Shoulder")
+	local elbow = self._resources:Get("Elbow")
+	local wrist = self._resources:Get("Wrist")
+	local gripAttachment = self._resources:Get("HandGripAttachment")
 
 	local base = shoulder.Part0.CFrame * shoulder.C0
 	local elbowCFrame = elbow.Part0.CFrame * elbow.C0
@@ -114,7 +167,7 @@ function ArmIKBase:_calculatePoint(targetPositionWorld)
 	local r0 = (base.p - elbowCFrame.p).Magnitude
 	local r1 = (elbowCFrame.p - wristCFrame.p).Magnitude
 
-	r1 = r1 + (self._gripAttachment.WorldPosition - wristCFrame.p).Magnitude
+	r1 = r1 + (gripAttachment.WorldPosition - wristCFrame.p).Magnitude
 
 	local offset = base:pointToObjectSpace(targetPositionWorld)
 	local d = offset.Magnitude
@@ -123,11 +176,15 @@ function ArmIKBase:_calculatePoint(targetPositionWorld)
 		d = r0 + r1
 	end
 
+	if d == 0 then
+		return false
+	end
+
 	local baseAngle = Math.lawOfCosines(r0, d, r1)
 	local elbowAngle = Math.lawOfCosines(r1, r0, d) -- Solve for angle across from d
 
 	if not (baseAngle and elbowAngle) then
-		return
+		return false
 	end
 
 	elbowAngle = (elbowAngle - math.pi)
@@ -139,6 +196,8 @@ function ArmIKBase:_calculatePoint(targetPositionWorld)
 	self._elbowXAngle = -elbowAngle
 
 	self._offset = offset.unit * d
+
+	return true
 end
 
 return ArmIKBase

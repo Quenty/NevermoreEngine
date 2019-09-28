@@ -12,6 +12,7 @@ local PromiseUtils = require("PromiseUtils")
 local CharacterUtil = require("CharacterUtil")
 local Signal = require("Signal")
 local ArmIKBase = require("ArmIKBase")
+local ArmFABRIKBase = require("ArmFABRIKBase")
 
 local IKRigBase = setmetatable({}, BaseObject)
 IKRigBase.ClassName = "IKRigBase"
@@ -80,11 +81,11 @@ function IKRigBase:GetTorso()
 end
 
 function IKRigBase:PromiseLeftArm()
-	if self._leftArmPromise then
-		return Promise.resolved(self._leftArmPromise)
+	if self._leftArm then
+		return Promise.resolved(self._leftArm)
 	end
-	self._leftArmPromise = self:_promiseNewArm("Left")
-	return Promise.resolved(self._leftArmPromise)
+	self._leftArm = self:_getNewArm("Left")
+	return Promise.resolved(self._leftArm)
 end
 
 function IKRigBase:GetLeftArm()
@@ -96,11 +97,11 @@ function IKRigBase:GetLeftArm()
 end
 
 function IKRigBase:PromiseRightArm()
-	if self._rightArmPromise then
-		return Promise.resolved(self._rightArmPromise)
+	if self._rightArm then
+		return Promise.resolved(self._rightArm)
 	end
-	self._rightArmPromise = self:_promiseNewArm("Right")
-	return Promise.resolved(self._rightArmPromise)
+	self._rightArm = self:_getNewArm("Right")
+	return Promise.resolved(self._rightArm)
 end
 
 function IKRigBase:GetRightArm()
@@ -111,34 +112,17 @@ function IKRigBase:GetRightArm()
 	end
 end
 
-function IKRigBase:_promiseNewArm(armName)
+function IKRigBase:_getNewArm(armName)
 	assert(armName == "Left" or armName == "Right")
 
 	if self._obj.RigType ~= Enum.HumanoidRigType.R15 then
 		return Promise.rejected("Rig is not HumanoidRigType.R15")
 	end
 
-	return self._maid:GivePromise(PromiseUtils.all({
-			promiseChild(self._character, armName .. "Hand");
-			promiseChild(self._character, armName .. "UpperArm");
-			promiseChild(self._character, armName .. "LowerArm");
-		}))
-		:Then(function(hand, upperArm, lowerArm)
-			return self._maid:GivePromise(PromiseUtils.all({
-				promiseChild(hand, armName .. "GripAttachment");
-				promiseChild(upperArm, armName .. "Shoulder");
-				promiseChild(lowerArm, armName .. "Elbow");
-				promiseChild(hand, armName .. "Wrist");
-			}))
-		end)
-		:Then(function(gripAttachment, shoulder, elbow, wrist)
-			local newIk = ArmIKBase.new(gripAttachment, shoulder, elbow, wrist)
-			self._maid:GiveTask(newIk)
+	local newIk = ArmIKBase.new(self._obj, armName)
+	table.insert(self._ikTargets, newIk)
 
-			table.insert(self._ikTargets, newIk)
-
-			return newIk
-		end)
+	return newIk
 end
 
 function IKRigBase:_promiseNewTorso()
