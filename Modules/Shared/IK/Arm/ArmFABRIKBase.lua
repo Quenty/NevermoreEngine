@@ -118,11 +118,11 @@ function ArmFABRIKBase:Grip(attachment, priority)
 	}
 
 	local i = 1
-	while self._grips[i] and self._grips[i].priority < priority do
+	while self._grips[i] and self._grips[i].priority > priority do
 		i = i + 1
 	end
 
-	table.insert(self._grips, gripData)
+	table.insert(self._grips, i, gripData)
 
 	return function()
 		if self.Destroy then
@@ -189,10 +189,7 @@ function ArmFABRIKBase:_clear()
 end
 
 function ArmFABRIKBase:_calculateTransforms(worldPosition)
-	local upperShoulderRigAttachment = self._resources:Get("UpperTorsoShoulderRigAttachment")
-
-	local baseCFrame = upperShoulderRigAttachment.WorldCFrame
-
+	local baseCFrame = self:_getBaseCFrame()
 	local relTarget = baseCFrame:pointToObjectSpace(worldPosition)
 
 	self._chain:SetTarget(relTarget)
@@ -207,6 +204,8 @@ function ArmFABRIKBase:_calculateTransforms(worldPosition)
 			self._maid[_ .. "pt"] = require("Draw").point(baseCFrame:pointToWorldSpace(item), nil, nil, 0.1)
 		end
 
+		self._drawer:CFrame(baseCFrame, workspace)
+
 		-- self._drawer:CFrame(baseCFrame * bones[1]:GetAlignedCFrame(), workspace)
 		-- self._drawer:CFrame(baseCFrame * bones[2]:GetAlignedCFrame(), workspace)
 	end
@@ -215,33 +214,48 @@ function ArmFABRIKBase:_calculateTransforms(worldPosition)
 		return attachment1.CFrame:inverse() * attachment2.CFrame
 	end
 
-	local function getBoneCFrame(bone, worldCFrame)
-		local alignedCFrameWorld = baseCFrame:toWorldSpace(bone:GetAlignedCFrame())
-		local relative = worldCFrame:toObjectSpace(alignedCFrameWorld)
+	local function getBoneCFrame(bone, worldCFrame, targetAttachmentRelativeToBoneCFrame)
+		local alignedCFrame = bone:GetAlignedCFrame()
 
-		-- self._drawer:CFrame(alignedCFrameWorld, workspace)
+		local relativeOffset = alignedCFrame:vectorToWorldSpace(targetAttachmentRelativeToBoneCFrame * Vector3.new(1, 1, 0))
+
+		local alignedCFrameWorld = baseCFrame:toWorldSpace(bone:GetAlignedOffsetCFrame(-relativeOffset))
+		local relative = worldCFrame:toObjectSpace(alignedCFrameWorld)
 
 		return relative - relative.p
 	end
 
+	local upperShoulderRigAttachment = self._resources:Get("UpperTorsoShoulderRigAttachment")
+
 	local shoulderCFrame = upperShoulderRigAttachment.WorldCFrame
-	local shoulderTransform = getBoneCFrame(bones[1], shoulderCFrame) * CFA_90X
-	local elbowCFrame = shoulderCFrame * shoulderTransform
-			* projectCFrame(
+	local upperArmProjection = projectCFrame(
 				self._resources:Get("UpperArmShoulderRigAttachment"),
 				self._resources:Get("UpperArmElbowRigAttachment"))
+	local shoulderTransform = getBoneCFrame(bones[1], shoulderCFrame, (CFA_90X * upperArmProjection).p) * CFA_90X
 
-	local elbowTransform = getBoneCFrame(bones[2], elbowCFrame) * CFA_90X
-	local wristCFrame = elbowCFrame * elbowTransform
-			* projectCFrame(
+	local elbowCFrame = shoulderCFrame * shoulderTransform * upperArmProjection
+	local lowerArmProjection = projectCFrame(
 				self._resources:Get("LowerArmElbowRigAttachment"),
 				self._resources:Get("LowerArmWristRigAttachment"))
+	local elbowTransform = getBoneCFrame(bones[2], elbowCFrame, (CFA_90X * lowerArmProjection).p) * CFA_90X
+	local wristCFrame = elbowCFrame * elbowTransform * lowerArmProjection
 
-	local wristTransform = getBoneCFrame(bones[3], wristCFrame) * CFA_90X
+	local handProjection = projectCFrame(
+				self._resources:Get("HandWristRigAttachment"),
+				self._resources:Get("HandGripAttachment"))
+	local wristTransform = getBoneCFrame(bones[3], wristCFrame, (CFA_90X * handProjection).p) * CFA_90X
 
 	self._shoulderTransform = shoulderTransform
 	self._elbowTransform = elbowTransform
 	self._wristTransform = wristTransform
+end
+
+function ArmFABRIKBase:_getBaseCFrame()
+	-- snapshot our system as is
+	local upperShoulderRigAttachment = self._resources:Get("UpperTorsoShoulderRigAttachment")
+	local baseCFrame = upperShoulderRigAttachment.WorldCFrame
+
+	return baseCFrame
 end
 
 function ArmFABRIKBase:_rebuildChain()
@@ -249,9 +263,7 @@ function ArmFABRIKBase:_rebuildChain()
 		return
 	end
 
-	-- snapshot our system as is
-	local upperShoulderRigAttachment = self._resources:Get("UpperTorsoShoulderRigAttachment")
-	local baseCFrame = upperShoulderRigAttachment.WorldCFrame
+	local baseCFrame = self:_getBaseCFrame()
 
 	local points = FABRIKUtils.pointsFromAttachment(baseCFrame, {
 		{

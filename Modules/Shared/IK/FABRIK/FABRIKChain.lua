@@ -106,8 +106,6 @@ function FABRIKChain:IterBone(bone, vtxA, vtxB, target, lastCF)
 
 		local rVector = lastCF:VectorToObjectSpace(newPoint - vtxA.Point)
 		lastCF = lastCF * getRotationBetween(UNIT_NZ, rVector.Unit, lastCF.RightVector)
-
-		bone.AlignedCFrame = lastCF
 	end
 
 	vtxB.Point = newPoint
