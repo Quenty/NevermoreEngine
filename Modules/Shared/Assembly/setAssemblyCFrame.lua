@@ -10,15 +10,13 @@ return function(primaryPart, cframe)
 	assert(typeof(cframe) == "CFrame")
 
 	local primaryPartCFrame = primaryPart.CFrame
-	local roots = {}
+
+	local parts = {}
 	for _, part in pairs(getFullAssembly(primaryPart)) do
-		local rootPart = part:GetRootPart()
-		if not roots[rootPart] then
-			roots[rootPart] = primaryPartCFrame:toObjectSpace(part.CFrame)
-		end
+		parts[part] = primaryPartCFrame:toObjectSpace(part.CFrame)
 	end
 
-	for root, relCFrame in pairs(roots) do
-		root.CFrame = cframe:toWorldSpace(relCFrame)
+	for part, relCFrame in pairs(parts) do
+		part.CFrame = cframe:toWorldSpace(relCFrame)
 	end
 end
