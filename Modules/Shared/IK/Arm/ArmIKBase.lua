@@ -75,11 +75,11 @@ function ArmIKBase:Grip(attachment, priority)
 	}
 
 	local i = 1
-	while self._grips[i] and self._grips[i].priority < priority do
+	while self._grips[i] and self._grips[i].priority > priority do
 		i = i + 1
 	end
 
-	table.insert(self._grips, gripData)
+	table.insert(self._grips, i, gripData)
 
 	return function()
 		if self.Destroy then
