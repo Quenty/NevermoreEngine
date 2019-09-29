@@ -197,18 +197,19 @@ function ArmFABRIKBase:_calculateTransforms(worldPosition)
 
 	local bones = self._chain:GetBones()
 
-	if game:GetService("RunService"):IsClient() then
-		self._drawer = self._drawer or require("Drawer").new()
-		self._drawer:Clear()
-		for _, item in pairs(self._chain:GetPoints()) do
-			self._maid[_ .. "pt"] = require("Draw").point(baseCFrame:pointToWorldSpace(item), nil, nil, 0.1)
-		end
+	-- if game:GetService("RunService"):IsClient() then
+	-- 	self._drawer = self._drawer or require("Drawer").new()
+	-- 	self._drawer:Clear()
+	-- 	for _, item in pairs(self._chain:GetPoints()) do
+	-- 		self._maid[_ .. "pt"] = require("Draw").point(baseCFrame:pointToWorldSpace(item), nil, nil, 0.1)
+	-- 	end
 
-		self._drawer:CFrame(baseCFrame, workspace)
+	-- 	-- self._drawer:CFrame(baseCFrame, workspace)
 
-		-- self._drawer:CFrame(baseCFrame * bones[1]:GetAlignedCFrame(), workspace)
-		-- self._drawer:CFrame(baseCFrame * bones[2]:GetAlignedCFrame(), workspace)
-	end
+	-- 	-- self._drawer:CFrame(baseCFrame * bones[1]:GetCFrame(), workspace)
+	-- 	-- self._drawer:CFrame(baseCFrame * bones[2]:GetCFrame(), workspace)
+	-- 	-- self._drawer:CFrame(baseCFrame * bones[3]:GetCFrame(), workspace)
+	-- end
 
 	local function projectCFrame(attachment1, attachment2)
 		return attachment1.CFrame:inverse() * attachment2.CFrame
@@ -221,6 +222,11 @@ function ArmFABRIKBase:_calculateTransforms(worldPosition)
 
 		local alignedCFrameWorld = baseCFrame:toWorldSpace(bone:GetAlignedOffsetCFrame(-relativeOffset))
 		local relative = worldCFrame:toObjectSpace(alignedCFrameWorld)
+
+		-- do
+		-- 	local rel = baseCFrame * bone:GetCFrame()
+		-- 	self._drawer:CFrame(rel - rel.p + worldCFrame.p, workspace)
+		-- end
 
 		return relative - relative.p
 	end
@@ -281,8 +287,9 @@ function ArmFABRIKBase:_rebuildChain()
 	})
 
 	local chain = FABRIKChain.fromPointsConstraints(CFrame.new(), points, {
-		-- FABRIKConstraint.new(math.rad(45), math.rad(45), math.rad(45), math.rad(45));
-		-- FABRIKConstraint.new(math.rad(45), math.rad(45), math.rad(1), math.rad(1));
+		-- FABRIKConstraint.new(math.rad(1), math.rad(1), math.rad(1), math.rad(1));
+		-- FABRIKConstraint.new(math.rad(1), math.rad(1), math.rad(1), math.rad(1));
+		-- FABRIKConstraint.new(math.rad(1), math.rad(1), math.rad(1), math.rad(1));
 	})
 
 	self._chain = chain
