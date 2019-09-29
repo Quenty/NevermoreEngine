@@ -119,7 +119,7 @@ function IKRigBase:_getNewArm(armName)
 		return Promise.rejected("Rig is not HumanoidRigType.R15")
 	end
 
-	local newIk = ArmIKBase.new(self._obj, armName)
+	local newIk = ArmFABRIKBase.new(self._obj, armName)
 	table.insert(self._ikTargets, newIk)
 
 	return newIk

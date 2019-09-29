@@ -1,172 +1,172 @@
--- FABRIK Chain for inverse kinematics
--- @author EgoMoose
+---
+-- @classmod FABRIKChain
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local FABRIKVertex = require("FABRIKVertex")
+local FABRIKBone = require("FABRIKBone")
+
+local UNIT_NZ = Vector3.new(0, 0, -1)
+local BREAK_COUNT = 10
+
+--
 
 local FABRIKChain = {}
 FABRIKChain.__index = FABRIKChain
 
--- table sum function
-local function sum(t)
-	local s = 0
-	for _, value in ipairs(t) do
-		s = s + value
-	end
-	return s
+--
+
+local function lerp(a, b, t)
+	return (1-t)*a + t*b
 end
 
-function FABRIKChain.new(joints)
+local function getRotationBetween(u, v, axis)
+	local dot, uxv = u:Dot(v), u:Cross(v)
+	if (dot < -0.99999) then return CFrame.fromAxisAngle(axis, math.pi) end
+	return CFrame.new(0, 0, 0, uxv.x, uxv.y, uxv.z, 1 + dot)
+end
+
+--
+
+function FABRIKChain.new(bones)
 	local self = setmetatable({}, FABRIKChain)
 
-	local lengths = {}
-	for i = 1, #joints - 1 do
-		lengths[i] = (joints[i] - joints[i+1]).magnitude
+	local length = 0
+	for i = 1, #bones do
+		length = length + bones[i].Length
 	end
 
-	-- public
-	self._joints = joints
-
-	self._target = nil
-	self._n = #joints
+	self._originCF = bones[1].CFrame
+	self._bones = bones
+	self._target = bones[#bones].VertexB.Point
+	self._length = length
 	self._tolerance = 0.1
-	self._lengths = lengths
-	self._origin = CFrame.new(joints[1])
-	self._totallength = sum(lengths)
-
-	-- rotation constraints
-	self.constrained = false
-	self.left = math.rad(89)
-	self.right = math.rad(89)
-	self.up = math.rad(89)
-	self.down = math.rad(89)
 
 	return self
 end
+
+function FABRIKChain.fromPointsConstraints(originCF, points, constraints)
+	local vertices = {}
+
+	for i = 1, #points do
+		vertices[i] = FABRIKVertex.new(points[i])
+	end
+
+	local bones = {}
+	local lastCF = originCF
+
+	for i = 1, #vertices - 1 do
+		local cur = vertices[i]
+		local nxt = vertices[i+1]
+
+		bones[i] = FABRIKBone.new(cur, nxt, lastCF, constraints[i])
+
+		local vector = nxt.Point - cur.Point
+		local rVector = lastCF:VectorToObjectSpace(vector)
+		lastCF = lastCF * getRotationBetween(UNIT_NZ, rVector.Unit, lastCF.RightVector)
+	end
+
+	return FABRIKChain.new(bones)
+end
+
+--
 
 function FABRIKChain:SetTarget(target)
 	self._target = target
 end
 
-function FABRIKChain:GetJoints()
-	return self._joints
+function FABRIKChain:GetBones()
+	return self._bones
 end
 
-function FABRIKChain:GetLengths()
-	return self._lengths
+function FABRIKChain:GetPoints()
+	local points = {}
+	local bones = self._bones
+	for i = 1, #bones do
+		table.insert(points, bones[i].VertexA.Point)
+	end
+	table.insert(points, bones[#bones].VertexB.Point)
+	return points
 end
 
--- this is the hardest part of the code so I super commented it!
-function FABRIKChain:Constrain(calc, line, cf)
-	local scalar = calc:Dot(line) / line.magnitude
-	local proj = scalar * line.unit
+function FABRIKChain:IterBone(bone, vtxA, vtxB, target, lastCF)
+	local realLength = (target - vtxA.Point).Magnitude
+	local lerpPercent = bone.Length / realLength
 
-	-- get axis that are closest
-	local ups = {
-		cf:vectorToWorldSpace(Vector3.FromNormalId(Enum.NormalId.Top)),
-		cf:vectorToWorldSpace(Vector3.FromNormalId(Enum.NormalId.Bottom))
-	}
+	local newPoint = lerp(vtxA.Point, target, lerpPercent)
 
-	local rights = {
-		cf:vectorToWorldSpace(Vector3.FromNormalId(Enum.NormalId.Right)),
-		cf:vectorToWorldSpace(Vector3.FromNormalId(Enum.NormalId.Left))
-	}
+	if (lastCF) then
+		bone.CFrame = lastCF
 
-	table.sort(ups, function(a, b) return (a - calc).magnitude < (b - calc).magnitude end)
-	table.sort(rights, function(a, b) return (a - calc).magnitude < (b - calc).magnitude end)
+		if (bone.Constraint) then
+			local boneCF = bone:GetCFrame()
+			local lPoint = bone.Constraint:Constrain(boneCF:PointToObjectSpace(newPoint), bone.Length)
+			newPoint = boneCF * lPoint
+		end
 
-	local upvec = ups[1]
-	local rightvec = rights[1]
+		local rVector = lastCF:VectorToObjectSpace(newPoint - vtxA.Point)
+		lastCF = lastCF * getRotationBetween(UNIT_NZ, rVector.Unit, lastCF.RightVector)
 
-	-- get the vector from the projection to the calculated vector
-	local adjust = calc - proj
-	if scalar < 0 then
-		-- if we're below the cone flip the projection vector
-		proj = -proj
+		bone.AlignedCFrame = lastCF
 	end
 
-	-- get the 2D components
-	local xaspect = adjust:Dot(rightvec)
-	local yaspect = adjust:Dot(upvec)
+	vtxB.Point = newPoint
 
-	-- get the cross section of the cone
-	local left = -(proj.magnitude * math.tan(self.left))
-	local right = proj.magnitude * math.tan(self.right)
-	local up = proj.magnitude * math.tan(self.up)
-	local down = -(proj.magnitude * math.tan(self.down))
-
-	-- find the quadrant
-	local xbound = xaspect >= 0 and right or left
-	local ybound = yaspect >= 0 and up or down
-
-	local f = calc
-	-- check if in 2D point lies in the ellipse
-	local ellipse = xaspect^2/xbound^2 + yaspect^2/ybound^2
-	local inbounds = ellipse <= 1 and scalar >= 0
-
-	if not inbounds then
-		-- get the angle of our out of ellipse point
-		local a = math.atan2(yaspect, xaspect)
-		-- find nearest point
-		local x = xbound * math.cos(a)
-		local y = ybound * math.sin(a)
-		-- convert back to 3D
-		f = (proj + rightvec * x + upvec * y).unit * calc.magnitude
-	end
-
-	-- return our final vector
-	return f
-end
-
-function FABRIKChain:Backward()
-	-- Backward reaching set end effector as target
-	self._joints[self._n] = self._target
-	for i = self._n - 1, 1, -1 do
-		local r = (self._joints[i+1] - self._joints[i])
-		local l = self._lengths[i] / r.magnitude
-		-- find new joint position
-		local pos = (1 - l) * self._joints[i+1] + l * self._joints[i]
-		self._joints[i] = pos
-	end
+	return lastCF
 end
 
 function FABRIKChain:Forward()
-	-- Forward reaching set root at initial position
-	self._joints[1] = self._origin.p
-	local coneVec = (self._joints[2] - self._joints[1]).unit
-	for i = 1, self._n - 1 do
-		local r = (self._joints[i+1] - self._joints[i])
-		local l = self._lengths[i] / r.magnitude
-		-- setup matrix
-		local cf = CFrame.new(self._joints[i], self._joints[i] + coneVec)
-		-- find new joint position
-		local pos = (1 - l) * self._joints[i] + l * self._joints[i+1]
-		local t = self:Constrain(pos - self._joints[i], coneVec, cf)
-		self._joints[i+1] = self.constrained and self._joints[i] + t or pos
-		coneVec = self._joints[i+1] - self._joints[i]
+	local bones = self._bones
+	local lastCF = self._originCF
+
+	bones[1].VertexA.Point = lastCF.p
+	for i = 1, #bones do
+		local bone = bones[i]
+		lastCF = self:IterBone(bone, bone.VertexA, bone.VertexB, bone.VertexB.Point, lastCF)
 	end
 end
 
+function FABRIKChain:Backward()
+	local bones = self._bones
+
+	bones[#bones].VertexB.Point = self._target
+	for i = #bones, 1, -1 do
+		local bone = bones[i]
+		self:IterBone(bone, bone.VertexB, bone.VertexA, bone.VertexA.Point, nil)
+	end
+end
+
+
 function FABRIKChain:Solve()
-	local distance = (self._joints[1] - self._target).magnitude
-	if distance > self._totallength then
-		-- target is out of reach
-		for i = 1, self._n - 1 do
-			local r = (self._target - self._joints[i]).magnitude
-			local l = self._lengths[i] / r
-			-- find new joint position
-			self._joints[i+1] = (1 - l) * self._joints[i] + l * self._target
+	local bones = self._bones
+	local target = self._target
+
+	local distance = (self._originCF.p - target).Magnitude
+	if (distance >= self._length) then
+		local lastCF = bones[1].CFrame
+		for i = 1, #bones do
+			local bone = bones[i]
+			lastCF = self:IterBone(bone, bone.VertexA, bone.VertexB, target, lastCF)
 		end
 	else
-		-- target is in reach
-		local bcount = 0
-		local dif = (self._joints[self._n] - self._target).magnitude
-		while dif > self._tolerance do
+		local break_count = 0
+		local nBones = #bones
+		local difference = (bones[nBones].VertexB.Point - target).Magnitude
+
+		while (difference > self._tolerance) do
 			self:Backward()
 			self:Forward()
-			dif = (self._joints[self._n] - self._target).magnitude
-			-- break if it's taking too long so the game doesn't freeze
-			bcount = bcount + 1
-			if bcount > 10 then break end
+
+			difference = (bones[nBones].VertexB.Point - target).Magnitude
+
+			break_count = break_count + 1
+			if (break_count >= BREAK_COUNT) then
+				break
+			end
 		end
 	end
 end
+
+--
 
 return FABRIKChain

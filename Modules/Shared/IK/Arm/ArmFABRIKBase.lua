@@ -8,7 +8,8 @@ local IKResource = require("IKResource")
 local IKResourceUtils = require("IKResourceUtils")
 local FABRIKUtils = require("FABRIKUtils")
 local FABRIKChain = require("FABRIKChain")
-local Math = require("Math")
+local FABRIKConstraint = require("FABRIKConstraint")
+local IKAimPositionPriorites = require("IKAimPositionPriorites")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 
@@ -83,7 +84,7 @@ function ArmFABRIKBase.new(humanoid, armName)
 				robloxName = armName .. "Hand";
 				children = {
 					IKResourceUtils.createResource({
-						name = "HandWrist";
+						name = "Wrist";
 						robloxName = armName .. "Wrist";
 					});
 					IKResourceUtils.createResource({
@@ -113,7 +114,7 @@ end
 function ArmFABRIKBase:Grip(attachment, priority)
 	local gripData = {
 		attachment = attachment;
-		priority = priority;
+		priority = priority or IKAimPositionPriorites.DEFAULT;
 	}
 
 	local i = 1
@@ -144,7 +145,7 @@ function ArmFABRIKBase:UpdateTransformOnly()
 	if not self._grips[1] then
 		return
 	end
-	if not self._shoulderTransform or not self._elbowTransform then
+	if not (self._shoulderTransform and self._elbowTransform and self._wristTransform) then
 		return
 	end
 	if not self._resources:IsReady() then
@@ -153,8 +154,11 @@ function ArmFABRIKBase:UpdateTransformOnly()
 
 	local shoulder = self._resources:Get("Shoulder")
 	local elbow = self._resources:Get("Elbow")
+	local wrist = self._resources:Get("Wrist")
+
 	shoulder.Transform = self._shoulderTransform
 	elbow.Transform = self._elbowTransform
+	wrist.Transform = self._wristTransform
 end
 
 function ArmFABRIKBase:Update()
@@ -186,15 +190,58 @@ end
 
 function ArmFABRIKBase:_calculateTransforms(worldPosition)
 	local upperShoulderRigAttachment = self._resources:Get("UpperTorsoShoulderRigAttachment")
+
 	local baseCFrame = upperShoulderRigAttachment.WorldCFrame
 
-	local relative = baseCFrame:pointToObjectSpace(worldPosition)
+	local relTarget = baseCFrame:pointToObjectSpace(worldPosition)
 
-	self._chain:SetTarget(relative)
+	self._chain:SetTarget(relTarget)
 	self._chain:Solve()
 
-	local joints = self._chain:GetJoints()
-	local lengths = self._chain:GetLengths()
+	local bones = self._chain:GetBones()
+
+	if game:GetService("RunService"):IsClient() then
+		self._drawer = self._drawer or require("Drawer").new()
+		self._drawer:Clear()
+		for _, item in pairs(self._chain:GetPoints()) do
+			self._maid[_ .. "pt"] = require("Draw").point(baseCFrame:pointToWorldSpace(item), nil, nil, 0.1)
+		end
+
+		-- self._drawer:CFrame(baseCFrame * bones[1]:GetAlignedCFrame(), workspace)
+		-- self._drawer:CFrame(baseCFrame * bones[2]:GetAlignedCFrame(), workspace)
+	end
+
+	local function projectCFrame(attachment1, attachment2)
+		return attachment1.CFrame:inverse() * attachment2.CFrame
+	end
+
+	local function getBoneCFrame(bone, worldCFrame)
+		local alignedCFrameWorld = baseCFrame:toWorldSpace(bone:GetAlignedCFrame())
+		local relative = worldCFrame:toObjectSpace(alignedCFrameWorld)
+
+		-- self._drawer:CFrame(alignedCFrameWorld, workspace)
+
+		return relative - relative.p
+	end
+
+	local shoulderCFrame = upperShoulderRigAttachment.WorldCFrame
+	local shoulderTransform = getBoneCFrame(bones[1], shoulderCFrame) * CFA_90X
+	local elbowCFrame = shoulderCFrame * shoulderTransform
+			* projectCFrame(
+				self._resources:Get("UpperArmShoulderRigAttachment"),
+				self._resources:Get("UpperArmElbowRigAttachment"))
+
+	local elbowTransform = getBoneCFrame(bones[2], elbowCFrame) * CFA_90X
+	local wristCFrame = elbowCFrame * elbowTransform
+			* projectCFrame(
+				self._resources:Get("LowerArmElbowRigAttachment"),
+				self._resources:Get("LowerArmWristRigAttachment"))
+
+	local wristTransform = getBoneCFrame(bones[3], wristCFrame) * CFA_90X
+
+	self._shoulderTransform = shoulderTransform
+	self._elbowTransform = elbowTransform
+	self._wristTransform = wristTransform
 end
 
 function ArmFABRIKBase:_rebuildChain()
@@ -206,7 +253,7 @@ function ArmFABRIKBase:_rebuildChain()
 	local upperShoulderRigAttachment = self._resources:Get("UpperTorsoShoulderRigAttachment")
 	local baseCFrame = upperShoulderRigAttachment.WorldCFrame
 
-	local points = FABRIKUtils.pointsFromAttachments(baseCFrame, {
+	local points = FABRIKUtils.pointsFromAttachment(baseCFrame, {
 		{
 			self._resources:Get("UpperArmShoulderRigAttachment");
 			self._resources:Get("UpperArmElbowRigAttachment");
@@ -221,12 +268,10 @@ function ArmFABRIKBase:_rebuildChain()
 		};
 	})
 
-	local chain = FABRIKChain.new(points)
-	chain.constrained = false
-	chain.left = math.rad(40);
-	chain.right = math.rad(40);
-	chain.up = math.rad(40);
-	chain.down = math.rad(40);
+	local chain = FABRIKChain.fromPointsConstraints(CFrame.new(), points, {
+		-- FABRIKConstraint.new(math.rad(45), math.rad(45), math.rad(45), math.rad(45));
+		-- FABRIKConstraint.new(math.rad(45), math.rad(45), math.rad(1), math.rad(1));
+	})
 
 	self._chain = chain
 end

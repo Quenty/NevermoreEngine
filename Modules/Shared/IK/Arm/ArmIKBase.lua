@@ -7,6 +7,7 @@ local BaseObject = require("BaseObject")
 local Math = require("Math")
 local IKResourceUtils = require("IKResourceUtils")
 local IKResource = require("IKResource")
+local IKAimPositionPriorites = require("IKAimPositionPriorites")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 
@@ -70,7 +71,7 @@ end
 function ArmIKBase:Grip(attachment, priority)
 	local gripData = {
 		attachment = attachment;
-		priority = priority;
+		priority = priority or IKAimPositionPriorites.DEFAULT;
 	}
 
 	local i = 1

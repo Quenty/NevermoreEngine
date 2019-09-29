@@ -1,14 +1,15 @@
 ---
 -- @module FABRIKUtils
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local FABRIKBone = require("FABRIKBone")
 
 local FABRIKUtils = {}
 
 -- Constructs the points from attachment, relative to their rig parts groups, and ignoring any transforms.
 -- Relative to the relativeCFrame
-function FABRIKUtils.pointsFromAttachments(relativeCFrame, attachmentGroupsPerPart)
+function FABRIKUtils.pointsFromAttachment(relativeCFrame, attachmentGroupsPerPart)
 	local points = {}
 
 	local lastAttachmentCFrame
