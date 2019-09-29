@@ -46,8 +46,8 @@ end
 function FABRIKConstraint.new(left, right, up, down, twistLeft, twistRight)
 	local self = setmetatable({}, FABRIKConstraint)
 
-	self.Left = left
-	self.Right = right
+	self.Left = math.pi*2 - left
+	self.Right = math.pi*2 - right
 	self.Up = up
 	self.Down = down
 
@@ -57,7 +57,7 @@ end
 --
 
 function FABRIKConstraint:Constrain(lpoint, length)
-	local z = math.abs(lpoint.z)
+	local z = length
 	local w = z * (lpoint.x >= 0 and math.cos(self.Right) or math.cos(self.Left))
 	local h = z * (lpoint.y >= 0 and math.sin(self.Up) or math.sin(self.Down))
 	local isInEllipse = inEllipse(lpoint, w, h)
