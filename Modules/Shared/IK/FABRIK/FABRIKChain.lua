@@ -7,7 +7,8 @@ local FABRIKVertex = require("FABRIKVertex")
 local FABRIKBone = require("FABRIKBone")
 
 local UNIT_NZ = Vector3.new(0, 0, -1)
-local BREAK_COUNT = 10
+local BREAK_COUNT = 20
+local TOLERANCE = 0.02
 
 --
 
@@ -40,12 +41,11 @@ function FABRIKChain.new(bones)
 	self._bones = bones
 	self._target = bones[#bones].VertexB.Point
 	self._length = length
-	self._tolerance = 0.1
 
 	return self
 end
 
-function FABRIKChain.fromPointsConstraints(originCF, points, constraints)
+function FABRIKChain.fromPointsConstraints(originCF, points, constraints, offsets)
 	local vertices = {}
 
 	for i = 1, #points do
@@ -59,7 +59,7 @@ function FABRIKChain.fromPointsConstraints(originCF, points, constraints)
 		local cur = vertices[i]
 		local nxt = vertices[i+1]
 
-		bones[i] = FABRIKBone.new(cur, nxt, lastCF, constraints[i])
+		bones[i] = FABRIKBone.new(cur, nxt, lastCF, constraints[i], offsets[i])
 
 		local vector = nxt.Point - cur.Point
 		local rVector = lastCF:VectorToObjectSpace(vector)
@@ -89,18 +89,26 @@ function FABRIKChain:GetPoints()
 	return points
 end
 
-function FABRIKChain:IterBone(bone, vtxA, vtxB, target, lastCF)
+function FABRIKChain:IterBone(bone, vtxA, vtxB, target, lastCF, targetNotReachable)
 	local realLength = (target - vtxA.Point).Magnitude
 	local lerpPercent = bone.Length / realLength
 
 	local newPoint = lerp(vtxA.Point, target, lerpPercent)
+
+	if bone.VectorOffset then
+		local relOffset = newPoint - vtxA.Point
+		local mag = relOffset.magnitude
+		relOffset = relOffset + (lastCF or bone:GetCFrame()):vectorToWorldSpace(bone.VectorOffset)
+		relOffset = relOffset.unit * mag
+		newPoint = vtxA.Point + relOffset
+	end
 
 	if (lastCF) then
 		bone.CFrame = lastCF
 
 		if (bone.Constraint) then
 			local boneCF = bone:GetCFrame()
-			local lPoint = bone.Constraint:Constrain(boneCF:PointToObjectSpace(newPoint), bone.Length)
+			local lPoint = bone.Constraint:Constrain(boneCF:PointToObjectSpace(newPoint), bone.Length, targetNotReachable)
 			newPoint = boneCF * lPoint
 		end
 
@@ -144,14 +152,14 @@ function FABRIKChain:Solve()
 		local lastCF = bones[1].CFrame
 		for i = 1, #bones do
 			local bone = bones[i]
-			lastCF = self:IterBone(bone, bone.VertexA, bone.VertexB, target, lastCF)
+			lastCF = self:IterBone(bone, bone.VertexA, bone.VertexB, target, lastCF, true)
 		end
 	else
 		local break_count = 0
 		local nBones = #bones
 		local difference = (bones[nBones].VertexB.Point - target).Magnitude
 
-		while (difference > self._tolerance) do
+		while (difference > TOLERANCE) do
 			self:Backward()
 			self:Forward()
 

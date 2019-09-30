@@ -7,10 +7,15 @@ local FABRIKBone = require("FABRIKBone")
 
 local FABRIKUtils = {}
 
+local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
+local EPSILON = 1e-3
+
 -- Constructs the points from attachment, relative to their rig parts groups, and ignoring any transforms.
 -- Relative to the relativeCFrame
 function FABRIKUtils.pointsFromAttachment(relativeCFrame, attachmentGroupsPerPart)
 	local points = {}
+	local offsets = {}
+	local totalOffset = Vector3.new()
 
 	local lastAttachmentCFrame
 	for index, group in pairs(attachmentGroupsPerPart) do
@@ -32,10 +37,17 @@ function FABRIKUtils.pointsFromAttachment(relativeCFrame, attachmentGroupsPerPar
 			table.insert(points, relativeCFrame:pointToObjectSpace(partCFrame:pointToWorldSpace(second.Position)))
 		end
 
+		-- HACK FOR ARMS, gets relative CFrame so we can have offsets proper
+		local offset = (CFA_90X*(first.CFrame:inverse() * second.CFrame)).p
+		offset = offset*Vector3.new(1, 1, 0)
+		if offset.magnitude >= EPSILON then
+			table.insert(offsets, offset)
+		end
+
 		lastAttachmentCFrame = second.WorldCFrame
 	end
 
-	return points
+	return points, offsets
 end
 
 return FABRIKUtils

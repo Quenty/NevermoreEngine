@@ -13,13 +13,14 @@ local FABRIKBone = {}
 FABRIKBone.ClassName = "FABRIKBone"
 FABRIKBone.__index = FABRIKBone
 
-function FABRIKBone.new(vtxA, vtxB, cf, constraint)
+function FABRIKBone.new(vtxA, vtxB, cf, constraint, vectorOffset)
 	local self = setmetatable({}, FABRIKBone)
 
 	self.VertexA = vtxA
 	self.VertexB = vtxB
 	self.Length = (vtxA.Point - vtxB.Point).Magnitude
 	self.CFrame = cf
+	self.VectorOffset = vectorOffset or nil
 	self.AlignedCFrame = cf
 	self.Constraint = constraint
 
@@ -31,16 +32,23 @@ function FABRIKBone:GetCFrame()
 end
 
 function FABRIKBone:GetAlignedCFrame()
-	local lastCF = self.CFrame
+	local cframe = self.CFrame
 	local newPoint = self.VertexB.Point
-	local rVector = lastCF:VectorToObjectSpace(newPoint - self.VertexA.Point)
-	local alignedCFrame = lastCF * getRotationBetween(UNIT_NZ, rVector.Unit, lastCF.RightVector)
+	local origin = self.VertexA.Point
+
+	-- if self.VectorOffset then
+	-- 	origin = origin + cframe:vectorToWorldSpace(self.VectorOffset)
+	-- end
+
+	local rVector = cframe:VectorToObjectSpace(newPoint - origin)
+	local alignedCFrame = cframe * getRotationBetween(UNIT_NZ, rVector.Unit, cframe.RightVector)
 
 	return alignedCFrame
 end
 
 function FABRIKBone:GetAlignedOffsetCFrame(offset)
 	local lastCF = self.CFrame
+
 	local newPoint = self.VertexB.Point + offset
 	local rVector = lastCF:VectorToObjectSpace(newPoint - self.VertexA.Point)
 	local alignedCFrame = lastCF * getRotationBetween(UNIT_NZ, rVector.Unit, lastCF.RightVector)
