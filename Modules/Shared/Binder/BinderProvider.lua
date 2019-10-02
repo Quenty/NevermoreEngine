@@ -32,7 +32,7 @@ function BinderProvider:__index(index)
 		return BinderProvider[index]
 	end
 
-	error(("'%s' Not a valid index"):format(tostring(index)))
+	error(("%q Not a valid index"):format(tostring(index)))
 end
 
 function BinderProvider:AfterInit()
