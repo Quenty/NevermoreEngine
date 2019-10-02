@@ -8,22 +8,57 @@ local AccelTween = require("AccelTween")
 local TorsoIKUtils = require("TorsoIKUtils")
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
+local IKResource = require("IKResource")
+local IKResourceUtils = require("IKResourceUtils")
 
 local TorsoIKBase = setmetatable({}, BaseObject)
 TorsoIKBase.__index = TorsoIKBase
 TorsoIKBase.ClassName = "TorsoIKBase"
 
-function TorsoIKBase.new(rootPart, lowerTorso, upperTorso, waist, neck)
+function TorsoIKBase.new(humanoid)
 	local self = setmetatable(BaseObject.new(), TorsoIKBase)
+
+	self._humanoid = humanoid or error("No humanoid")
 
 	self.Pointed = Signal.new() -- :Fire(position)
 	self._maid:GiveTask(self.Pointed)
 
-	self._rootPart = rootPart or error("No rootPart")
-	self._lowerTorso = lowerTorso or error("No lowerTorso")
-	self._upperTorso = upperTorso or error("No upperTorso")
-	self._waist = waist or error("No waist")
-	self._neck = neck or error("No neck")
+	self._resources = IKResource.new(IKResourceUtils.createResource({
+		name = "Character";
+		robloxName = self._humanoid.Parent.Name;
+		children = {
+			IKResourceUtils.createResource({
+				name = "RootPart";
+				robloxName = "HumanoidRootPart";
+			});
+			IKResourceUtils.createResource({
+				name = "LowerTorso";
+				robloxName = "LowerTorso";
+			});
+			IKResourceUtils.createResource({
+				name = "UpperTorso";
+				robloxName = "UpperTorso";
+				children = {
+					IKResourceUtils.createResource({
+						name = "Waist";
+						robloxName = "Waist";
+					});
+				};
+			});
+			IKResourceUtils.createResource({
+				name = "Head";
+				robloxName = "Head";
+				children = {
+					IKResourceUtils.createResource({
+						name = "Neck";
+						robloxName = "Neck";
+					});
+				};
+			});
+		}
+	}))
+	self._maid:GiveTask(self._resources)
+	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
 
 	self._waistY = AccelTween.new(40)
 	self._waistZ = AccelTween.new(30)
@@ -31,11 +66,16 @@ function TorsoIKBase.new(rootPart, lowerTorso, upperTorso, waist, neck)
 	self._headY = AccelTween.new(60)
 	self._headZ = AccelTween.new(40)
 
-	self._lastValidWaistTransform = self._waist.Transform
-	self._lastWaistTransform = self._waist.Transform
+	self._maid:GiveTask(self._resources.ReadyChanged:Connect(function()
+		if self._resources:IsReady() then
+			self:_recordLastValidTransforms()
+			self:_updatePoint()
+		end
+	end))
 
-	self._lastValidNeckTransform = self._neck.Transform
-	self._lastNeckTransform = self._neck.Transform
+	if self._resources:IsReady() then
+		self:_recordLastValidTransforms()
+	end
 
 	return self
 end
@@ -44,22 +84,40 @@ function TorsoIKBase:UpdateTransformOnly()
 	if not self._relWaistTransform or not self._relNeckTransform then
 		return
 	end
+	if not self._resources:IsReady() then
+		return
+	end
+
+	local waist = self._resources:Get("Waist")
+	local neck = self._resources:Get("Neck")
 
 	-- Waist:
-	local currentWaistTransform = self._waist.Transform
+	local currentWaistTransform = waist.Transform
 	if self._lastWaistTransform ~= currentWaistTransform then
 		self._lastValidWaistTransform = currentWaistTransform
 	end
-	self._waist.Transform = self._lastValidWaistTransform * self._relWaistTransform
-	self._lastWaistTransform = self._waist.Transform -- NOTE: Have to read this from the weld, otherwise comparison is off
+	waist.Transform = self._lastValidWaistTransform * self._relWaistTransform
+	self._lastWaistTransform = waist.Transform -- NOTE: Have to read this from the weld, otherwise comparison is off
 
 	-- Neck:
-	local currentNeckTransform = self._neck.Transform
+	local currentNeckTransform = neck.Transform
 	if self._lastNeckTransform ~= currentNeckTransform then
 		self._lastValidNeckTransform = currentNeckTransform
 	end
-	self._neck.Transform = self._lastValidNeckTransform * self._relNeckTransform
-	self._lastNeckTransform = self._neck.Transform -- NOTE: Have to read this from the weld, otherwise comparison is off
+	neck.Transform = self._lastValidNeckTransform * self._relNeckTransform
+	self._lastNeckTransform = neck.Transform -- NOTE: Have to read this from the weld, otherwise comparison is off
+end
+
+function TorsoIKBase:_recordLastValidTransforms()
+	assert(self._resources:IsReady())
+	local waist = self._resources:Get("Waist")
+	local neck = self._resources:Get("Neck")
+
+	self._lastValidWaistTransform = waist.Transform
+	self._lastWaistTransform = waist.Transform
+
+	self._lastValidNeckTransform = neck.Transform
+	self._lastNeckTransform = neck.Transform
 end
 
 function TorsoIKBase:Update()
@@ -78,29 +136,56 @@ end
 function TorsoIKBase:Point(position)
 	self._target = position
 
-	local waistY, headY, waistZ, headZ = TorsoIKUtils.getTargetAngles(self._rootPart, position)
-
-	self._waistY.t = waistY
-	self._headY.t = headY
-	self._waistZ.t = waistZ
-	self._headZ.t = headZ
+	if self._resources:IsReady() then
+		self:_updatePoint()
+	end
 
 	self.Pointed:Fire(self._target)
 end
 
+function TorsoIKBase:_updatePoint()
+	assert(self._resources:IsReady())
+
+	if self._target then
+		local rootPart = self._resources:Get("RootPart")
+		local waistY, headY, waistZ, headZ = TorsoIKUtils.getTargetAngles(rootPart, self._target)
+
+		self._waistY.t = waistY
+		self._headY.t = headY
+		self._waistZ.t = waistZ
+		self._headZ.t = headZ
+	else
+		self._waistY.t = 0
+		self._headY.t = 0
+		self._waistZ.t = 0
+		self._headZ.t = 0
+	end
+end
+
 --- Helper method used for other IK
 function TorsoIKBase:GetTargetUpperTorsoCFrame()
-	local waist = self._waist
+	if not self._resources:IsReady() then
+		return nil
+	end
+
+	local waist = self._resources:Get("Waist")
+	local lowerTorso = self._resources:Get("LowerTorso")
 
 	local estimated_transform = self._lastValidWaistTransform
 		* CFrame.Angles(0, self._waistYCalculator.Target, 0)
 		* CFrame.Angles(self._waistZCalculator.Target, 0, 0)
 
-	return self._lowerTorso.CFrame * waist.C0 * estimated_transform * waist.C1:inverse()
+	return lowerTorso.CFrame * waist.C0 * estimated_transform * waist.C1:inverse()
 end
 
 function TorsoIKBase:GetUpperTorsoCFrame()
-	return self._upperTorso.CFrame
+	if not self._resources:IsReady() then
+		return nil
+	end
+
+	local lowerTorso = self._resources:Get("LowerTorso")
+
+	return lowerTorso.CFrame
 end
 
 return TorsoIKBase

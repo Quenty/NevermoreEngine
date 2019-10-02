@@ -62,8 +62,8 @@ function ArmIKBase.new(humanoid, armName)
 			});
 		}
 	}))
-	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
 	self._maid:GiveTask(self._resources)
+	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
 
 	return self
 end
