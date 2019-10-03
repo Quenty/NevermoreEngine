@@ -14,7 +14,7 @@ RoduxActionFactory.ClassName = "RoduxActionFactory"
 function RoduxActionFactory.new(actionName, typeTable)
 	local self = setmetatable({}, RoduxActionFactory)
 
-	assert(typeTable)
+	typeTable = typeTable or {}
 
 	self._actionName = actionName or error("No actionName")
 	self._validator = t.strictInterface(
@@ -30,9 +30,18 @@ function RoduxActionFactory:__call(...)
 end
 
 function RoduxActionFactory:Create(action)
-	local actionWithType = Table.Merge(action, {
-		type = self._actionName;
-	})
+	local actionWithType
+	if action then
+		assert(type(action) == "table", "Action must be a table")
+
+		actionWithType = Table.Merge(action, {
+			type = self._actionName;
+		})
+	else
+		actionWithType = {
+			type = self._actionName;
+		}
+	end
 
 	local ok, err = self._validator(actionWithType)
 	if not ok then
