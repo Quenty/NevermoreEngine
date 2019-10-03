@@ -9,11 +9,18 @@ local InputObjectRayUtils = {}
 
 function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance)
 	assert(inputObject)
+	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position, distance)
+end
+
+function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, distance, offset)
+	assert(inputObject)
+	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position + offset, distance)
+end
+
+function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance)
 	distance = distance or DEFAULT_RAY_DISTANCE
 
-	local position = inputObject.Position
 	local baseRay = Workspace.CurrentCamera:ScreenPointToRay(position.X, position.Y)
-
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
