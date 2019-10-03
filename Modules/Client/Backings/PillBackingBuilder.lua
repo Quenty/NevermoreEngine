@@ -55,6 +55,79 @@ function PillBackingBuilder:Create(gui, options)
 	return pillBacking
 end
 
+function PillBackingBuilder:CreateSingle(gui, options)
+	options = self:_configureOptions(gui, options)
+
+	local pillBacking = Instance.new("ImageLabel")
+	pillBacking.AnchorPoint = Vector2.new(0.5, 0.5)
+	pillBacking.ImageColor3 = options.BackgroundColor3
+	pillBacking.BorderSizePixel = 0
+	pillBacking.Name = "PillBacking"
+	pillBacking.Position = UDim2.new(0.5, 0, 0.5, 0)
+	pillBacking.Size = UDim2.new(1, 0, 1, 0)
+	pillBacking.ZIndex = options.ZIndex
+	pillBacking.ScaleType = Enum.ScaleType.Slice
+	pillBacking.SliceCenter = Rect.new(128, 128, 128, 128)
+	pillBacking.Image = self.CIRCLE_IMAGE_ID
+
+	gui.BackgroundTransparency = 1
+	pillBacking.Parent = gui
+
+	return gui
+end
+
+function PillBackingBuilder:CreateSingle(gui, options)
+	options = self:_configureOptions(gui, options)
+
+	local pillBacking = Instance.new("ImageLabel")
+	pillBacking.AnchorPoint = Vector2.new(0.5, 0.5)
+	pillBacking.BackgroundTransparency = 1
+	pillBacking.ImageColor3 = options.BackgroundColor3
+	pillBacking.BorderSizePixel = 0
+	pillBacking.Name = "PillBacking"
+	pillBacking.Position = UDim2.new(0.5, 0, 0.5, 0)
+	pillBacking.Size = UDim2.new(1, 0, 1, 0)
+	pillBacking.ZIndex = options.ZIndex
+	pillBacking.ScaleType = Enum.ScaleType.Slice
+	pillBacking.SliceCenter = Rect.new(
+		self.CIRCLE_SIZE.x/2, self.CIRCLE_SIZE.x/2, self.CIRCLE_SIZE.y/2, self.CIRCLE_SIZE.y/2)
+	pillBacking.Image = self.CIRCLE_IMAGE_ID
+
+	gui.BackgroundTransparency = 1
+	pillBacking.Parent = gui
+
+	return pillBacking
+end
+
+function PillBackingBuilder:CreateSingleShadow(gui, options)
+	options = self:_configureOptions(gui, options)
+
+	local diameter = gui.Size.Y
+	local width = gui.Size.X
+
+	local addedScale = 0
+	if width.Scale ~= 0 then
+		addedScale = diameter.Scale/width.Scale/2
+	end
+
+	local shadow = Instance.new("ImageLabel")
+	shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+	shadow.BackgroundTransparency = 1
+	shadow.BorderSizePixel = 0
+	shadow.ImageTransparency = self.SHADOW_TRANSPARENCY
+	shadow.Name = "PillShadow"
+	shadow.Position = UDim2.new(UDim.new(0.5, 0), UDim.new(0.5, 0) + self.SHADOW_OFFSET_Y)
+	shadow.Size = UDim2.new(1 + addedScale, diameter.Offset/2, 2, 0)
+	shadow.ZIndex = options.ShadowZIndex
+	shadow.ScaleType = Enum.ScaleType.Slice
+	shadow.SliceCenter = Rect.new(self.SHADOW_SIZE.x/2, self.SHADOW_SIZE.x/2, self.SHADOW_SIZE.y/2, self.SHADOW_SIZE.y/2)
+	shadow.Image = self.SHADOW_IMAGE_ID
+
+	shadow.Parent = gui
+
+	return shadow
+end
+
 function PillBackingBuilder:CreateShadow(gui, options)
 	options = self:_configureOptions(gui, options)
 	local diameter = gui.Size.Y
