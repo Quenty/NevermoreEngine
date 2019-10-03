@@ -16,10 +16,12 @@ function RoduxActionFactory.new(actionName, typeTable)
 
 	typeTable = typeTable or {}
 
-	self._actionName = actionName or error("No actionName")
+	assert(type(actionName) == "string", "Action name must be string, and is required")
+
+	self._actionName = actionName
 	self._validator = t.strictInterface(
 		Table.Merge({
-			type = t.literal(actionName),
+			type = t.literal(self._actionName),
 		}, typeTable))
 
 	return self
@@ -27,6 +29,14 @@ end
 
 function RoduxActionFactory:__call(...)
 	return self:Create(...)
+end
+
+function RoduxActionFactory:CreateDispatcher(dispatch)
+	assert(type(dispatch) == "function")
+
+	return function(...)
+		return dispatch(self:Create(...))
+	end
 end
 
 function RoduxActionFactory:Create(action)
@@ -38,6 +48,8 @@ function RoduxActionFactory:Create(action)
 			type = self._actionName;
 		})
 	else
+		assert(action == nil, "Action must be nil or table")
+
 		actionWithType = {
 			type = self._actionName;
 		}
