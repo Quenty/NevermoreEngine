@@ -5,18 +5,17 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local getFullAssembly = require("getFullAssembly")
 
-return function(primaryPart, cframe)
-	assert(typeof(primaryPart) == "Instance")
-	assert(typeof(cframe) == "CFrame")
+return function(originParts, relativeTo, newCFrame)
+	assert(typeof(originParts) == "Instance" or typeof(originParts) == "table")
+	assert(typeof(relativeTo) == "CFrame")
+	assert(typeof(newCFrame) == "CFrame")
 
-	local primaryPartCFrame = primaryPart.CFrame
-
-	local parts = {}
-	for _, part in pairs(getFullAssembly(primaryPart)) do
-		parts[part] = primaryPartCFrame:toObjectSpace(part.CFrame)
+	local target = {}
+	for _, part in pairs(getFullAssembly(originParts)) do
+		target[part] = relativeTo:toObjectSpace(part.CFrame)
 	end
 
-	for part, relCFrame in pairs(parts) do
-		part.CFrame = cframe:toWorldSpace(relCFrame)
+	for part, relCFrame in pairs(target) do
+		part.CFrame = newCFrame:toWorldSpace(relCFrame)
 	end
 end

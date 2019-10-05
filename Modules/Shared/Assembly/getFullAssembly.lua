@@ -10,12 +10,42 @@ local IGNORE_CONSTRAINT_SET = {
 	["Torque"] = true;
 }
 
-return function(originPart)
-	local result = { originPart }
+return function(originParts)
+	local startingTable
+	if type(originParts) == "table" then
+		assert(#originParts > 0)
+		startingTable = originParts
+	elseif typeof(originParts) == "Instance" then
+		startingTable = { originParts }
+	else
+		error("Bad argument for originParts")
+	end
+
+	local result = {}
 	local checked = {
-		[originPart] = true;
 		[Workspace.Terrain] = true;
 	}
+
+	for _, item in pairs(startingTable) do
+		if item:IsA("BasePart") then
+			if not checked[item] then
+				checked[item] = true
+				table.insert(result, item)
+			end
+		elseif item:IsA("Model") then
+			for _, child in pairs(item:GetDescendants()) do
+				if child:IsA("BasePart") then
+					if not checked[child] then
+						checked[child] = true
+						table.insert(result, child)
+					end
+				end
+			end
+		else
+			error("Bad item type in starting table")
+		end
+	end
+
 	local connectionChecked = {}
 
 	local index = 1
