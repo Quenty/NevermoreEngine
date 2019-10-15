@@ -78,4 +78,19 @@ function BinderUtil.getLinkedChildren(binder, linkName, parent)
 	return objects
 end
 
+function BinderUtil.getDescendants(binder, parent)
+	assert(type(binder) == "table", "Binder must be binder")
+	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
+
+	local objects = {}
+	for _, item in pairs(parent:GetDescendants()) do
+		local obj = binder:Get(item)
+		if obj then
+			table.insert(objects, obj)
+		end
+	end
+	return objects
+end
+
+
 return BinderUtil
