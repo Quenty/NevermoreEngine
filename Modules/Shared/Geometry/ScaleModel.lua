@@ -1,70 +1,99 @@
 ---
 -- @module ScaleModel
 
-local lib = {}
+local ScaleModel = {}
 
-local MINIMUM_SIZES = {
+local CLASS_NAME_TO_MIN_SIZE = {
 	["TrussPart"] = Vector3.new(2, 2, 2);
 	["UnionOperation"]  = Vector3.new(0, 0, 0);
 }
 
---- Scales a group of parts around a centroid
--- @param parts Table of parts, the parts to scale
--- @param Scale The scale to scale by
--- @param Centroid Vector3, the center to scale by
-function lib.Scale(parts, scale, Centroid)
-	for _, Object in pairs(parts) do
-		if Object:IsA("BasePart") then
+local MIN_PART_SIZE = Vector3.new(0.05, 0.05, 0.05)
 
-			local MinSize = MINIMUM_SIZES[Object.ClassName] or Vector3.new(0.05, 0.05, 0.05)
+function ScaleModel.scalePartSize(part, scale)
+	local partSize = part.Size
 
-			local ObjectOffset = Object.Position - Centroid
-			local ObjectRotation = Object.CFrame - Object.CFrame.p
+	local mesh = part:FindFirstChildWhichIsA("DataModelMesh")
+	local renderedSize
+	if mesh then
+		renderedSize = partSize * mesh.Scale
+	else
+		renderedSize = part.Size
+	end
 
-			local FoundMesh = Object:FindFirstChildWhichIsA("DataModelMesh")
-			local TrueSize = FoundMesh and Object.Size * FoundMesh.Scale or Object.Size
-			local NewSize = TrueSize * scale
+	local newRenderSize = renderedSize * scale
+	local newPartSize = newRenderSize
 
-			if not Object:IsA("TrussPart") and not Object:IsA("UnionOperation") then
-				if NewSize.X < MinSize.X or NewSize.Y < MinSize.Y or NewSize.Z < MinSize.Z then
-					if not FoundMesh then
-						FoundMesh = Instance.new("SpecialMesh", Object)
+	local minSize = CLASS_NAME_TO_MIN_SIZE[part.ClassName] or MIN_PART_SIZE
 
-						if Object:IsA("WedgePart") then
-							FoundMesh.MeshType = "Wedge"
-						elseif Object:IsA("CornerWedgePart") then
-							FoundMesh.MeshType = "CornerWedge"
+	if newPartSize.X < minSize.X
+		or newPartSize.Y < minSize.Y
+		or newPartSize.Z < minSize.Z then
 
-						elseif Object:IsA("Part") then
+		newPartSize = Vector3.new(
+			math.max(newPartSize.X, minSize.X),
+			math.max(newPartSize.Y, minSize.Y),
+			math.max(newPartSize.Z, minSize.Z))
 
-							if Object.Shape.Name == "Ball" then
-								FoundMesh.MeshType = "Sphere"
-							elseif Object.Shape.Name == "Cylinder" then
-								FoundMesh.MeshType = "Cylinder"
-							else
-								FoundMesh.MeshType = "Brick"
-							end
-						else
-							FoundMesh.MeshType = "Brick"
-						end
-					end
-				end
-			end
+		-- We need a mesh for scaling (hopefully)
+		mesh = ScaleModel.createMeshFromPart(part)
+	end
 
-			Object.Size = NewSize
+	part.Size = newPartSize
 
-			if FoundMesh then
-				FoundMesh.Scale = NewSize / Object.Size
-				FoundMesh.Offset = FoundMesh.Offset * scale
-
-				-- if FoundMesh.Scale == Vector3.new(1, 1, 1) and FoundMesh.Offset == Vector3.new(0, 0, 0) then
-				-- 	FoundMesh:Destroy()
-				-- end
-			end
-
-			Object.CFrame = CFrame.new(Centroid + (ObjectOffset * scale)) * ObjectRotation
-		end
+	if mesh then
+		mesh.Scale = newRenderSize/newPartSize
+		mesh.Offset = mesh.Offset * scale
 	end
 end
 
-return lib
+function ScaleModel.scalePart(part, scale, centroid)
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"))
+
+	local partPosition = part.Position
+	local partCFrame = part.CFrame
+
+	local offset = partPosition - centroid
+	local rotation = partCFrame - partPosition
+
+	ScaleModel.scalePartSize(part, scale)
+	part.CFrame = CFrame.new(centroid + (offset * scale)) * rotation
+end
+
+--- Scales a group of parts around a centroid
+-- @param parts Table of parts, the parts to scale
+-- @param Scale The scale to scale by
+-- @param centroid Vector3, the center to scale by
+function ScaleModel.scale(parts, scale, centroid)
+	for _, part in pairs(parts) do
+		ScaleModel.scalePart(part, scale, centroid)
+	end
+end
+
+function ScaleModel.createMeshFromPart(part)
+	if part:IsA("WedgePart") then
+		local mesh = Instance.new("SpecialMesh")
+		mesh.MeshType = Enum.MeshType.Wedge
+		return mesh
+	elseif part:IsA("CornerWedgePart") then
+		local mesh = Instance.new("SpecialMesh")
+		mesh.MeshType = Enum.MeshType.CornerWedge
+		return mesh
+	elseif part:IsA("Part") then
+		local mesh = Instance.new("SpecialMesh")
+
+		if part.Shape.Name == "Ball" then
+			mesh.MeshType = Enum.MeshType.Sphere
+		elseif part.Shape.Name == "Cylinder" then
+			mesh.MeshType = Enum.MeshType.Cylinder
+		else
+			mesh.MeshType = Enum.MeshType.Brick
+		end
+
+		return mesh
+	else
+		return nil
+	end
+end
+
+return ScaleModel
