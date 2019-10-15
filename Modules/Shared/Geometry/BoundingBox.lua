@@ -7,14 +7,14 @@ function BoundingBox.GetPartsBoundingBox(parts, relativeTo)
 	return BoundingBox.GetBoundingBox(parts, relativeTo)
 end
 
-function BoundingBox.GetModelBoundingBox(model)
+function BoundingBox.GetModelBoundingBox(model, relativeTo)
 	local parts = {}
 	for _, item in pairs(model:GetDescendants()) do
 		if item:IsA("BasePart") then
 			table.insert(parts, item)
 		end
 	end
-	return BoundingBox.GetPartsBoundingBox(parts)
+	return BoundingBox.GetPartsBoundingBox(parts, relativeTo)
 end
 
 --- Gets a boundingBox for the given data
