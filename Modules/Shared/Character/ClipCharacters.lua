@@ -14,14 +14,14 @@ local REMOTE_FUNCTION_NAME = "GetClipCharactersId"
 local ClipCharacters = {}
 ClipCharacters.ClassName = "ClipCharacters"
 ClipCharacters.__index = ClipCharacters
-ClipCharacters.CollisionGroupName = "ClipCharacters"
+ClipCharacters.COLLISION_GROUP_NAME = "ClipCharacters"
 
 --- Initialize on server
 -- @constructor
 -- @treturn nil
 function ClipCharacters.initServer()
-	local groupId = PhysicsService:CreateCollisionGroup(ClipCharacters.CollisionGroupName)
-	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.CollisionGroupName, "Default", false)
+	local groupId = PhysicsService:CreateCollisionGroup(ClipCharacters.COLLISION_GROUP_NAME)
+	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.COLLISION_GROUP_NAME, "Default", false)
 
 	local remoteFunction = GetRemoteFunction(REMOTE_FUNCTION_NAME)
 	function remoteFunction.OnServerInvoke(player)

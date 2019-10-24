@@ -3,7 +3,7 @@
 
 local HttpService = game:GetService("HttpService")
 
-local lib = {}
+local JsonToLocalizationTable = {}
 
 --- Recursively iterates through the object to construct strings and add it to the localization table
 -- @param localeId The localizationid to add
@@ -36,7 +36,7 @@ end
 --- Extracts the locale from the name
 -- @param name The name to parse
 -- @return The locale
-function lib.localeFromName(name)
+function JsonToLocalizationTable.localeFromName(name)
 	if name:sub(-5) == ".json" then
 		return name:sub(1, #name-5)
 	else
@@ -46,12 +46,12 @@ end
 
 --- Loads a folder into a localization table
 -- @parm folder A Roblox folder with StringValues containing JSON, named with the localization in mind
-function lib.loadFolder(folder)
+function JsonToLocalizationTable.loadFolder(folder)
 	local localizationTable = Instance.new("LocalizationTable")
 	for _, item in pairs(folder:GetChildren()) do
 		if item:IsA("StringValue") then
-			local localeId = lib.localeFromName(item.Name)
-			lib.addJsonToTable(localizationTable, localeId, item.Value)
+			local localeId = JsonToLocalizationTable.localeFromName(item.Name)
+			JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, item.Value)
 		end
 	end
 	return localizationTable
@@ -61,10 +61,10 @@ end
 -- @param localizationTable The localization table to add to
 -- @param localeId The localeId to use
 -- @param json The json to add with
-function lib.addJsonToTable(localizationTable, localeId, json)
+function JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, json)
 	local object = HttpService:JSONDecode(json)
 	recurseAdd(localizationTable, localeId, "", object)
 end
 
-return lib
+return JsonToLocalizationTable
 

@@ -1,13 +1,13 @@
 --- General humanoid utility code.
 -- @module HumanoidUtil
--- @alias lib
+-- @alias HumanoidUtil
 
-local lib = {}
+local HumanoidUtil = {}
 
 --- Retrieves a humanoid from a descendant (Players only).
 -- @param descendant Child of a humanoid model, like a limb
 -- @return Humanoid
-function lib.GetHumanoid(descendant)
+function HumanoidUtil.GetHumanoid(descendant)
 	local character = descendant
 	while character do
 		local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -21,7 +21,7 @@ function lib.GetHumanoid(descendant)
 end
 
 --- Forcefully unseats the humanoid. Useful when teleporting humanoid
-function lib.ForceUnseatHumanoid(humanoid)
+function HumanoidUtil.ForceUnseatHumanoid(humanoid)
 	if humanoid.SeatPart then
 		local weld = humanoid.SeatPart:FindFirstChild("SeatWeld")
 		if weld then
@@ -33,4 +33,4 @@ function lib.ForceUnseatHumanoid(humanoid)
 	humanoid.Sit = false
 end
 
-return lib
+return HumanoidUtil

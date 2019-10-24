@@ -7,8 +7,8 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 
 return function(binder, inst)
-	assert(binder)
-	assert(typeof(inst) == "Instance")
+	assert(type(binder) == "table", "'binder' must be table")
+	assert(typeof(inst) == "Instance", "'inst' must be instance")
 
 	local class = binder:Get(inst)
 	if class then

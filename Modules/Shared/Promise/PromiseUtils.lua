@@ -5,13 +5,13 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Promise = require("Promise")
 
-local lib = {}
+local PromiseUtils = {}
 
 --- Returns the value of the first promise resolved
 -- @constructor First
 -- @tparam Array(Promise) promises
 -- @treturn Promise Promise that resolves with first result
-function lib.race(promises)
+function PromiseUtils.race(promises)
 	local returnPromise = Promise.new()
 
 	local function syncronize(method)
@@ -31,7 +31,7 @@ end
 --  every promise is complete
 -- @constructor First
 -- @treturn Promise
-function lib.all(promises)
+function PromiseUtils.all(promises)
 	local remainingCount = #promises
 	local returnPromise = Promise.new()
 	local results = {}
@@ -60,4 +60,4 @@ function lib.all(promises)
 	return returnPromise
 end
 
-return lib
+return PromiseUtils

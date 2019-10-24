@@ -1,6 +1,6 @@
 --- Holds input states for Keyboard, Mouse, et cetera. Mostly useful for providing UI input hints to the user by
 -- identifying the most recent input state provided.
--- @module INPUT_MODES
+-- @module InputModes
 
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
@@ -8,155 +8,299 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local InputMode = require("InputMode")
 local InputModeProcessor = require("InputModeProcessor")
-local Maid = require("Maid")
+local Table = require("Table")
 
---[[
+local InputModes = {
+	THUMBSTICK_DEADZONE = 0.14
+}
 
-API:
-	INPUT_MODES.Keyboard
-		Returns an input state for keyboard
-	INPUT_MODES.Mouse
-		Returns an input state for Mouse
-	INPUT_MODES.Touch
-		Returns an input state for Touch
-	INPUT_MODES.Gamepad
-		Returns an input state for Gamepad
-	INPUT_MODES.KeyboardAndMouse
-]]
-
-local INPUT_MODES = setmetatable({}, {
-	__index = function(self, key)
-		error(("'%s' is not a valid InputMode"):format(tostring(key)))
-	end;
+InputModes.Keypad = InputMode.new("Keypad", {
+	Enum.KeyCode.KeypadZero;
+	Enum.KeyCode.KeypadOne;
+	Enum.KeyCode.KeypadTwo;
+	Enum.KeyCode.KeypadThree;
+	Enum.KeyCode.KeypadFour;
+	Enum.KeyCode.KeypadFive;
+	Enum.KeyCode.KeypadSix;
+	Enum.KeyCode.KeypadSeven;
+	Enum.KeyCode.KeypadEight;
+	Enum.KeyCode.KeypadNine;
+	Enum.KeyCode.KeypadPeriod;
+	Enum.KeyCode.KeypadDivide;
+	Enum.KeyCode.KeypadMultiply;
+	Enum.KeyCode.KeypadMinus;
+	Enum.KeyCode.KeypadPlus;
+	Enum.KeyCode.KeypadEnter;
+	Enum.KeyCode.KeypadEquals;
 })
 
----
--- @field
-INPUT_MODES.THUMBSTICK_DEADZONE = 0.14
+InputModes.Keyboard = InputMode.new("Keyboard", {
+	Enum.UserInputType.Keyboard;
 
-do
-	local KEYBOARD = "KeypadZero,KeypadOne,KeypadTwo,KeypadThree,KeypadFour,KeypadFive,KeypadSix,KeypadSeven,KeypadEight,"
-		.. "KeypadNine,KeypadPeriod,KeypadDivide,KeypadMultiply,KeypadMinus,KeypadPlus,KeypadEnter,KeypadEquals"
-	local ALPHABET = "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"
-	local ARROW_KEYS = "Left,Right,Up,Down"
+	-- Other input modes
+	InputModes.Keypad;
 
-	--- Keyboard InputMode
-	-- @field
-	INPUT_MODES.Keyboard = InputMode.new("Keyboard")
-		:AddKeys("Keyboard", Enum.UserInputType) -- Incase we miss anything
-		:AddKeys("Backspace,Tab,Clear,Return,Pause,Escape,Space,QuotedDouble,Hash,Dollar,Percent,Ampersand,Quote,"
-			.. "LeftParenthesis,RightParenthesis,Asterisk,Plus,Comma,Minus,Period,Slash,Zero,One,Two,Three,Four,Five,Six,Seven,"
-			.. "Eight,Nine,Colon,Semicolon,LessThan,Equals,GreaterThan,Question,At,LeftBracket,BackSlash,RightBracket,Caret,"
-			.. "Underscore,Backquote", Enum.KeyCode)
-		:AddKeys(ALPHABET, Enum.KeyCode)
-		:AddKeys("LeftCurly,Pipe,RightCurly,Tilde,Delete,Insert,Home,End,PageUp,PageDown,F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,F11,"
-			.. "F12,F13,F14", Enum.KeyCode)
-		:AddKeys("NumLock,CapsLock,ScrollLock,RightShift,LeftShift,RightControl,LeftControl,RightAlt,LeftAlt,RightMeta,"
-			.. "LeftMeta,LeftSuper,RightSuper,Mode,Compose,Help,Print,SysReq,Break", Enum.KeyCode)
-		:AddKeys(KEYBOARD, Enum.KeyCode)
-		:AddKeys(ARROW_KEYS)
+	-- Valid KeyCodes for input binding
+	Enum.KeyCode.Backspace;
+	Enum.KeyCode.Tab;
+	Enum.KeyCode.Clear;
+	Enum.KeyCode.Return;
+	Enum.KeyCode.Pause;
+	Enum.KeyCode.Escape;
+	Enum.KeyCode.Space;
+	Enum.KeyCode.QuotedDouble;
+	Enum.KeyCode.Hash;
+	Enum.KeyCode.Dollar;
+	Enum.KeyCode.Percent;
+	Enum.KeyCode.Ampersand;
+	Enum.KeyCode.Quote;
+	Enum.KeyCode.LeftParenthesis;
+	Enum.KeyCode.RightParenthesis;
+	Enum.KeyCode.Asterisk;
+	Enum.KeyCode.Plus;
+	Enum.KeyCode.Comma;
+	Enum.KeyCode.Minus;
+	Enum.KeyCode.Period;
+	Enum.KeyCode.Slash;
+	Enum.KeyCode.Zero;
+	Enum.KeyCode.One;
+	Enum.KeyCode.Two;
+	Enum.KeyCode.Three;
+	Enum.KeyCode.Four;
+	Enum.KeyCode.Five;
+	Enum.KeyCode.Six;
+	Enum.KeyCode.Seven;
+	Enum.KeyCode.Eight;
+	Enum.KeyCode.Nine;
+	Enum.KeyCode.Colon;
+	Enum.KeyCode.Semicolon;
+	Enum.KeyCode.LessThan;
+	Enum.KeyCode.Equals;
+	Enum.KeyCode.GreaterThan;
+	Enum.KeyCode.Question;
+	Enum.KeyCode.At;
+	Enum.KeyCode.LeftBracket;
+	Enum.KeyCode.BackSlash;
+	Enum.KeyCode.RightBracket;
+	Enum.KeyCode.Caret;
+	Enum.KeyCode.Underscore;
+	Enum.KeyCode.Backquote;
+	Enum.KeyCode.A;
+	Enum.KeyCode.B;
+	Enum.KeyCode.C;
+	Enum.KeyCode.D;
+	Enum.KeyCode.E;
+	Enum.KeyCode.F;
+	Enum.KeyCode.G;
+	Enum.KeyCode.H;
+	Enum.KeyCode.I;
+	Enum.KeyCode.J;
+	Enum.KeyCode.K;
+	Enum.KeyCode.L;
+	Enum.KeyCode.M;
+	Enum.KeyCode.N;
+	Enum.KeyCode.O;
+	Enum.KeyCode.P;
+	Enum.KeyCode.Q;
+	Enum.KeyCode.R;
+	Enum.KeyCode.S;
+	Enum.KeyCode.T;
+	Enum.KeyCode.U;
+	Enum.KeyCode.V;
+	Enum.KeyCode.W;
+	Enum.KeyCode.X;
+	Enum.KeyCode.Y;
+	Enum.KeyCode.Z;
+	Enum.KeyCode.LeftCurly;
+	Enum.KeyCode.Pipe;
+	Enum.KeyCode.RightCurly;
+	Enum.KeyCode.Tilde;
+	Enum.KeyCode.Delete;
+	Enum.KeyCode.Up;
+	Enum.KeyCode.Down;
+	Enum.KeyCode.Right;
+	Enum.KeyCode.Left;
+	Enum.KeyCode.Insert;
+	Enum.KeyCode.Home;
+	Enum.KeyCode.End;
+	Enum.KeyCode.PageUp;
+	Enum.KeyCode.PageDown;
+	Enum.KeyCode.F1;
+	Enum.KeyCode.F2;
+	Enum.KeyCode.F3;
+	Enum.KeyCode.F4;
+	Enum.KeyCode.F5;
+	Enum.KeyCode.F6;
+	Enum.KeyCode.F7;
+	Enum.KeyCode.F8;
+	Enum.KeyCode.F9;
+	Enum.KeyCode.F10;
+	Enum.KeyCode.F11;
+	Enum.KeyCode.F12;
+	Enum.KeyCode.F13;
+	Enum.KeyCode.F14;
+	Enum.KeyCode.F15;
+	Enum.KeyCode.NumLock;
+	Enum.KeyCode.CapsLock;
+	Enum.KeyCode.ScrollLock;
+	Enum.KeyCode.RightShift;
+	Enum.KeyCode.LeftShift;
+	Enum.KeyCode.RightControl;
+	Enum.KeyCode.LeftControl;
+	Enum.KeyCode.RightAlt;
+	Enum.KeyCode.LeftAlt;
+	Enum.KeyCode.RightMeta;
+	Enum.KeyCode.LeftMeta;
+	Enum.KeyCode.LeftSuper;
+	Enum.KeyCode.RightSuper;
+	Enum.KeyCode.Mode;
+	Enum.KeyCode.Compose;
+	Enum.KeyCode.Help;
+	Enum.KeyCode.Print;
+	Enum.KeyCode.SysReq;
+	Enum.KeyCode.Break;
+	Enum.KeyCode.Menu;
+	Enum.KeyCode.Power;
+	Enum.KeyCode.Euro;
+	Enum.KeyCode.Undo;
+})
 
-	if UserInputService.KeyboardEnabled then
-		INPUT_MODES.Keyboard:Enable()
-	end
-end
+InputModes.ArrowKeys = InputMode.new("ArrowKeys", {
+	Enum.KeyCode.Left;
+	Enum.KeyCode.Right;
+	Enum.KeyCode.Up;
+	Enum.KeyCode.Down;
+})
 
-do
-	--- Mouse InputMode
-	-- @field
-	INPUT_MODES.Mouse = InputMode.new("Mouse"):AddKeys("MouseButton1,MouseButton2,MouseButton3,MouseWheel,MouseMovement",
-		Enum.UserInputType)
+InputModes.WASD = InputMode.new("WASD", {
+	Enum.KeyCode.W;
+	Enum.KeyCode.A;
+	Enum.KeyCode.S;
+	Enum.KeyCode.D;
+})
 
+InputModes.Mouse = InputMode.new("Mouse", {
+	Enum.UserInputType.MouseButton1;
+	Enum.UserInputType.MouseButton2;
+	Enum.UserInputType.MouseButton3;
+	Enum.UserInputType.MouseWheel;
+	Enum.UserInputType.MouseMovement;
+})
+
+InputModes.KeyboardAndMouse = InputMode.new("KeyboardAndMouse", {
+	InputModes.Mouse;
+	InputModes.Keyboard;
+})
+
+InputModes.Touch = InputMode.new("Touch", {
+	Enum.UserInputType.Touch;
+})
+
+InputModes.DPad = InputMode.new("DPad", {
+	Enum.KeyCode.DPadLeft;
+	Enum.KeyCode.DPadRight;
+	Enum.KeyCode.DPadUp;
+	Enum.KeyCode.DPadDown;
+})
+
+InputModes.Thumbsticks = InputMode.new("Thumbsticks", {
+	Enum.KeyCode.Thumbstick1;
+	Enum.KeyCode.Thumbstick2;
+})
+
+InputModes.Gamepads = InputMode.new("Gamepads", {
+	Enum.UserInputType.Gamepad1;
+	Enum.UserInputType.Gamepad2;
+	Enum.UserInputType.Gamepad3;
+	Enum.UserInputType.Gamepad4;
+	Enum.UserInputType.Gamepad5;
+	Enum.UserInputType.Gamepad6;
+	Enum.UserInputType.Gamepad7;
+	Enum.UserInputType.Gamepad8;
+
+	-- Valid KeyCodes for input binding
+	Enum.KeyCode.ButtonX;
+	Enum.KeyCode.ButtonY;
+	Enum.KeyCode.ButtonA;
+	Enum.KeyCode.ButtonB;
+	Enum.KeyCode.ButtonR1;
+	Enum.KeyCode.ButtonL1;
+	Enum.KeyCode.ButtonR2;
+	Enum.KeyCode.ButtonL2;
+	Enum.KeyCode.ButtonR3;
+	Enum.KeyCode.ButtonL3;
+	Enum.KeyCode.ButtonStart;
+	Enum.KeyCode.ButtonSelect;
+	Enum.KeyCode.DPadLeft;
+	Enum.KeyCode.DPadRight;
+	Enum.KeyCode.DPadUp;
+	Enum.KeyCode.DPadDown;
+})
+
+
+local function triggerEnabled()
 	if UserInputService.MouseEnabled then
-		INPUT_MODES.Mouse:Enable()
+		InputModes.Mouse:Enable()
 	end
-end
-
-do
-	--- KeyboardAndMouse InputMode
-	-- @field
-	INPUT_MODES.KeyboardAndMouse = InputMode.new("KeyboardAndMouse")
-		:AddInputMode(INPUT_MODES.Mouse)
-		:AddInputMode(INPUT_MODES.Keyboard)
-
-	if UserInputService.KeyboardEnabled and UserInputService.MouseEnabled then
-		INPUT_MODES.KeyboardAndMouse:Enable()
-	end
-end
-
-do
-	--- Touch InputMode
-	-- @field
-	INPUT_MODES.Touch = InputMode.new("Touch"):AddKeys("Touch", Enum.UserInputType)
-
 	if UserInputService.TouchEnabled then
-		INPUT_MODES.Touch:Enable()
+		InputModes.Touch:Enable()
+	end
+	if UserInputService.KeyboardEnabled then
+		InputModes.Keyboard:Enable()
+	end
+	if UserInputService.KeyboardEnabled and UserInputService.MouseEnabled then
+		InputModes.KeyboardAndMouse:Enable()
+	end
+	if UserInputService.GamepadEnabled
+		or #UserInputService:GetConnectedGamepads() > 0
+		or GuiService:IsTenFootInterface() then
+		InputModes.Gamepads:Enable()
 	end
 end
 
-do
-	local GAMEPAD_THUMBSTICKS = "Thumbstick1,Thumbstick2"
-	local GAMEPAD_TRIGGERS = "ButtonR2,ButtonL2,ButtonR1,ButtonL1"
-	local GAMEPAD_BUTTONS = "ButtonA,ButtonB,ButtonX,ButtonY,ButtonR3,ButtonL3,ButtonStart,ButtonSelect,DPadLeft,"
-		.. "DPadRight,DPadUp,DPadDown"
-
-	--- Gamepad InputMode
-	-- @field
-	INPUT_MODES.Gamepads = InputMode.new("Gamepad")
-		:AddKeys(GAMEPAD_THUMBSTICKS, Enum.KeyCode)
-		:AddKeys(GAMEPAD_BUTTONS, Enum.KeyCode)
-		:AddKeys(GAMEPAD_TRIGGERS, Enum.KeyCode)
-		:AddKeys("Gamepad1,Gamepad2,Gamepad3,Gamepad4,Gamepad5,Gamepad6,Gamepad7,Gamepad8", Enum.UserInputType)
-
-	if UserInputService.GamepadEnabled then
-		INPUT_MODES.Gamepads:Enable()
-	end
-	if #UserInputService:GetConnectedGamepads() > 0 then
-		INPUT_MODES.Gamepads:Enable()
-	end
-	if GuiService:IsTenFootInterface() then
-		INPUT_MODES.Gamepads:Enable()
-	end
-end
-
---- Construct Processor
--- @local
 local function bindProcessor()
-	local inputProcessor = InputModeProcessor.new()
-		:AddState(INPUT_MODES.Keyboard)
-		:AddState(INPUT_MODES.Gamepads)
-		:AddState(INPUT_MODES.Mouse)
-		:AddState(INPUT_MODES.Touch)
-		:AddState(INPUT_MODES.KeyboardAndMouse)
+	local inputProcessor = InputModeProcessor.new({
+		InputModes.Keypad;
+		InputModes.Keyboard;
+		InputModes.Gamepads;
+		InputModes.Mouse;
+		InputModes.Touch;
+		InputModes.ArrowKeys;
+		InputModes.WASD;
+		InputModes.KeyboardAndMouse;
+		InputModes.DPad;
+		-- Don't add InputModes.Thumbsticks, we handle it seperately
+	})
 
 	UserInputService.InputBegan:Connect(function(inputObject)
 		inputProcessor:Evaluate(inputObject)
 	end)
+	UserInputService.InputEnded:Connect(function(inputObject)
+		inputProcessor:Evaluate(inputObject)
+	end)
+	UserInputService.InputChanged:Connect(function(inputObject)
+		if inputObject.KeyCode == Enum.KeyCode.Thumbstick1
+			or inputObject.KeyCode == Enum.KeyCode.Thumbstick2 then
 
-	local maid = Maid.new()
+			if inputObject.Position.magnitude > InputModes.THUMBSTICK_DEADZONE then
+				inputProcessor:Evaluate(inputObject)
+				InputModes.Thumbsticks:Enable()
+			end
+		else
+			inputProcessor:Evaluate(inputObject)
+		end
+	end)
 
 	UserInputService.GamepadConnected:Connect(function(gamepad)
-		INPUT_MODES.Gamepads:Enable()
-
-		-- Bind thumbsticks
-		maid._inputChanged = UserInputService.InputChanged:Connect(function(inputObject)
-			if inputObject.KeyCode.Name:find("Thumbstick") then
-				if inputObject.Position.Magnitude > INPUT_MODES.THUMBSTICK_DEADZONE then
-					inputProcessor:Evaluate(inputObject)
-				end
-			end
-		end)
+		InputModes.Gamepads:Enable()
 	end)
 
 	UserInputService.GamepadDisconnected:Connect(function(gamepad)
-		-- TODO: Stop assuming state is mouse/keyboard
-		INPUT_MODES.Mouse:Enable()
-		INPUT_MODES.Keyboard:Enable()
-
-		maid._inputChanged = nil
+		triggerEnabled()
 	end)
 end
 
 bindProcessor()
+triggerEnabled()
 
-return INPUT_MODES
+return Table.ReadOnly(InputModes)

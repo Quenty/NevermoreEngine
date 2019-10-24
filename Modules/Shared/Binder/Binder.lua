@@ -124,7 +124,7 @@ function Binder:Get(inst)
 end
 
 function Binder:_add(inst)
-	assert(typeof(inst) == "Instance")
+	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 	if self._loading[inst] then
 		return
 	end

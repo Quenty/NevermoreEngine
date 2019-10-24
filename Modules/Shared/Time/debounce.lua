@@ -5,19 +5,20 @@
 -- @tparam number timeout
 -- @tparam function func
 -- @treturn function
-local function debounce(timeout, func)
-	assert(type(timeout) == "number")
+local function debounce(timeoutInSeconds, func)
+	assert(type(timeoutInSeconds) == "number")
 	assert(type(func) == "function")
 
 	local key = 1
 	return function(...)
 		key = key + 1
 		local localKey = key
+		local n = select("#", ...)
 		local args = {...}
 
-		delay(timeout, function()
+		delay(timeoutInSeconds, function()
 			if key == localKey then
-				func(unpack(args))
+				func(unpack(args, 1, n))
 			end
 		end)
 	end

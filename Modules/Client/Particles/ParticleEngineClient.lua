@@ -7,6 +7,8 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 
+local GetRemoteEvent = require("GetRemoteEvent")
+
 local sin = math.sin
 local sqrt = math.sqrt
 local atan2 = math.atan2
@@ -31,7 +33,7 @@ local function newFrame(name)
 end
 
 function ParticleEngineClient:Init(screen)
-	self._remoteEvent = require.GetRemoteEvent("ParticleEventDistributor")
+	self._remoteEvent = GetRemoteEvent("ParticleEventDistributor")
 	self._screen = screen or error("No screen")
 	self._player = Players.LocalPlayer or error("No LocalPlayer")
 

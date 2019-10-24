@@ -6,5 +6,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Table = require("Table")
 
 return Table.ReadOnly({
-	REMOTE_EVENT_NAME = "IKRemoteEvent";
+	REMOTE_EVENT_NAME = "IKRigRemoteEvent";
+	COLLECTION_SERVICE_TAG = "IKRig";
 })

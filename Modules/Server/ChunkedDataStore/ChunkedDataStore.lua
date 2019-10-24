@@ -31,7 +31,7 @@ function ChunkDataStore:WriteEntry(largeString)
 	for chunk in ChunkUtils.chunkStr(largeString, CHUNK_SIZE) do
 		local key = HttpService:GenerateGUID(false)
 		table.insert(keys, key)
-		table.insert(promises, DataStorePromises.SetAsync(self._datastore, key, chunk))
+		table.insert(promises, DataStorePromises.setAsync(self._datastore, key, chunk))
 	end
 
 	return PromiseUtils.all(promises):Then(function(...)
@@ -91,7 +91,7 @@ function ChunkDataStore:_loadChunk(key)
 		return Promise.rejected("Key is not a string")
 	end
 
-	return DataStorePromises.GetAsync(self._datastore, key)
+	return DataStorePromises.getAsync(self._datastore, key)
 end
 
 return ChunkDataStore
