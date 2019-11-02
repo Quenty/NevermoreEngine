@@ -289,6 +289,20 @@ end)
 
 There is an additional utility class that is `DataStorePromises`. These can be used without the regular API system if you need quick access.
 
+Finally, DataStore's have a Saving signal you can listen to. Note that this only exists on the top-level datastore, and substores do not have a notion of being
+flushed to Roblox's datastore system.
+
+```lua
+dataStore.Saving:Connect(function(savingFinishedPromise)
+	print("Svaing to Roblox DataStore")
+	savingFinishedPromise:Then(function()
+		print("Done flushing save to the Roblox Datastore")
+	end):Catch(function()
+		print("Failed to flush to Roblox datastore")
+	end)
+end)
+```
+
 ## Debugging storing behavior
 You can see what is actually being saved to Roblox by turning on the flag `DEBUG_WRITING = true` in the DataStore.lua file.
 

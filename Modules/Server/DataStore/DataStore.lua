@@ -27,6 +27,7 @@ function DataStore.new(robloxDataStore, key)
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 
 	self.Saving = Signal.new() -- :Fire(promise)
+	self._maid:GiveTask(self.Saving)
 
 	spawn(function()
 		while self.Destroy do
