@@ -272,5 +272,21 @@ local init = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/vers
 init.Name = "Nevermore"
 init.Parent = game:GetService("ReplicatedStorage")
 
+local moduleScriptUtils = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptUtils.lua")
+moduleScriptUtils.Name = "ModuleScriptUtils"
+moduleScriptUtils.Parent = init
+
+local moduleScriptUtils = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptUtils.lua")
+moduleScriptUtils.Name = "ModuleScriptUtils"
+moduleScriptUtils.Parent = init
+
+local replicationUtils = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ReplicationUtils.lua")
+replicationUtils.Name = "ReplicationUtils"
+replicationUtils.Parent = init
+
+local moduleScriptLoader = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptLoader.lua")
+moduleScriptLoader.Name = "ModuleScriptLoader"
+moduleScriptLoader.Parent = init
+
 HttpService.HttpEnabled = ...
 print("NevermoreEngine installed.")
