@@ -172,8 +172,8 @@ function TorsoIKBase:GetTargetUpperTorsoCFrame()
 	local lowerTorso = self._resources:Get("LowerTorso")
 
 	local estimated_transform = self._lastValidWaistTransform
-		* CFrame.Angles(0, self._waistYCalculator.Target, 0)
-		* CFrame.Angles(self._waistZCalculator.Target, 0, 0)
+		* CFrame.Angles(0, self._waistY.t, 0)
+		* CFrame.Angles(self._waistZ.t, 0, 0)
 
 	return lowerTorso.CFrame * waist.C0 * estimated_transform * waist.C1:inverse()
 end
