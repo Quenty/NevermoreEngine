@@ -12,11 +12,14 @@ function ThrottledFunction.new(timeoutInSeconds, func)
 	self._timeout = timeoutInSeconds or error("No timeoutInSeconds")
 	self._func = func or error("No func")
 
+	self._lastArgs = nil
+	self._lastArgsN = nil
+
 	return self
 end
 
 function ThrottledFunction:Call(...)
-	if self._nextCallPoint <= tick() then
+	if self._nextCallPoint <= tick() and (not self._lastArgs) then
 		self._nextCallPoint = tick() + self._timeout
 		self._func(...)
 		return
@@ -29,7 +32,7 @@ function ThrottledFunction:Call(...)
 	self._lastArgsN = select("#", ...)
 
 	if not prevLastArgs then
-		delay(tick() - self._nextCallPoint, function()
+		delay(self._nextCallPoint - tick(), function()
 			self:_executeThrottled()
 		end)
 	end
