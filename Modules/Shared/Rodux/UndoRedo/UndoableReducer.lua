@@ -5,7 +5,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Table = require("Table")
 
-local HISTORY_LIMIT = 5
+local HISTORY_LIMIT = 50
 
 local function insert(state, reduced)
 	local start = math.max(1, #state.past - HISTORY_LIMIT + 2)
