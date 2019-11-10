@@ -22,6 +22,18 @@ function Octree.new()
 	return self
 end
 
+function Octree:GetAllNodes()
+	local options = {}
+
+	for _, region in pairs(self._regions) do
+		for node, _ in pairs(region.nodes) do
+			options[#options+1] = node
+		end
+	end
+
+	return options
+end
+
 function Octree:CreateNode(position, object)
 	assert(typeof(position) == "Vector3")
 	assert(object)

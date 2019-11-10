@@ -43,7 +43,7 @@ function OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parent, parentIndex)
 		parent = parent;
 		depth = parent and (parent.depth + 1) or 1;
 		parentIndex = parentIndex;
-		nodes = {}; -- [node] = true
+		nodes = {}; -- [node] = true (contains subchild nodes too)
 		node_count = 0;
 	}
 
