@@ -188,7 +188,7 @@ playerData:Load("money", 0):Then(function(money)
 	playerMoneyValue.Value = money
 	playerData:StoreOnValueChange("money", playerMoneyValue) -- Enable saving now that we've loaded in
 end):Catch(function(err)
-	warn("Failed to lood data store")
+	warn("Failed to load data store")
 end)
 
 ```
