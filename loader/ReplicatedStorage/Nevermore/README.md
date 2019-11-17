@@ -9,7 +9,7 @@
 	* Does not load in submodules so libraries can be used
 * Allows you to load in other modules after initialization!
 
-## Using Nevermore's library laoder
+## Using Nevermore's library loader
 
 Using Nevermore is really simple. You can either keep the name Nevermore, or customize components here.
 
