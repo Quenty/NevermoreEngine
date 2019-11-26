@@ -2,13 +2,13 @@
 --  actual translations available
 -- @module PseudoLocalize
 
-local lib = {}
+local PseudoLocalize = {}
 
 --- Translates a line into pseudo text while maintaining params
 -- @tparam {string} line The line to translate
 -- @return The translated line
-function lib.pseudoLocalize(line)
-	local charMap = lib.PseudoCharacterMap
+function PseudoLocalize.pseudoLocalize(line)
+	local charMap = PseudoLocalize.PSEUDO_CHARACTER_MAP
 	local out = ""
 	local isParam = false
 
@@ -33,7 +33,7 @@ end
 --- Parses a localization table and adds a pseudo localized locale to the table
 -- @tparam[opt="qlp-pls"] {string} preferredLocaleId Preferred locale to use
 -- @tparam[opt="en-us"] {string} preferredFromLocale Preferred from locale
-function lib.addToLocalizationTable(localizationTable, preferredLocaleId, preferredFromLocale)
+function PseudoLocalize.addToLocalizationTable(localizationTable, preferredLocaleId, preferredFromLocale)
 	local localeId = preferredLocaleId or "qlp-pls"
 	local fromLocale = preferredFromLocale or "en"
 
@@ -42,7 +42,7 @@ function lib.addToLocalizationTable(localizationTable, preferredLocaleId, prefer
 		if not entry.Values[localeId] then
 			local line = entry.Values[fromLocale]
 			if line then
-				entry.Values[localeId] = lib.pseudoLocalize(line)
+				entry.Values[localeId] = PseudoLocalize.pseudoLocalize(line)
 			else
 				warn(("[PseudoLocalize.addToLocalizationTable] - No entry in key %q for locale %q")
 					:format(entry.Key, fromLocale))
@@ -54,7 +54,7 @@ function lib.addToLocalizationTable(localizationTable, preferredLocaleId, prefer
 end
 
 --- Mapping of English characters to pseudo localized characters
-lib.PseudoCharacterMap = {
+PseudoLocalize.PSEUDO_CHARACTER_MAP = {
     ["a"] = "á";
     ["b"] = "β";
     ["c"] = "ç";
@@ -109,4 +109,4 @@ lib.PseudoCharacterMap = {
     ["Z"] = "Z";
 }
 
-return lib
+return PseudoLocalize

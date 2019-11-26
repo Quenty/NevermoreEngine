@@ -10,10 +10,20 @@ InputImageLibrary.__index = InputImageLibrary
 function InputImageLibrary.new(parentFolder)
 	local self = setmetatable({}, InputImageLibrary)
 
-	self._spritesheets = {}
+	self._spritesheets = {} -- [platform][style] = sheet
 	self:_loadSpriteSheets(parentFolder)
 
 	return self
+end
+
+function InputImageLibrary:GetPreloadAssetIds()
+	local assets = {}
+	for _, platformSheets in pairs(self._spritesheets) do
+		for _, sheet in pairs(platformSheets) do
+			table.insert(assets, sheet:GetPreloadAssetId())
+		end
+	end
+	return assets
 end
 
 function InputImageLibrary:_loadSpriteSheets(parentFolder)

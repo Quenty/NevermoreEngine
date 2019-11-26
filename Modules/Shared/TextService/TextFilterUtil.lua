@@ -1,6 +1,5 @@
----
+--- Utility functions for filtering text
 -- @module TextFilterUtil
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

@@ -1,6 +1,5 @@
 --- Rotation model for gamepad controls
 -- @classmod GamepadRotateModel
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

@@ -1,6 +1,5 @@
 --- Extends PartTouchingCalculator with generic binder stuff
 -- @classmod BinderTouchingCalculator
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

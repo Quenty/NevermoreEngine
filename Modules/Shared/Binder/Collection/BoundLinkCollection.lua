@@ -1,7 +1,6 @@
 --- Handles searching for bound objects following links (object values) under a parent
 -- with a specific name.
 -- @classmod BoundLinkCollection
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

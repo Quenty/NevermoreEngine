@@ -12,7 +12,7 @@ local DEBUG_RESPONSE = false
 
 local HttpPromise = {}
 
-function HttpPromise.Request(request)
+function HttpPromise.request(request)
 	if DEBUG_REQUEST then
 		print("Sending request", HttpService:JSONEncode(request))
 	end
@@ -42,17 +42,17 @@ function HttpPromise.Request(request)
 	end)
 end
 
-function HttpPromise.LogFailedRequests(...)
+function HttpPromise.logFailedRequests(...)
 	for _, item in pairs({...}) do
 		if type(item) == "string" then
 			warn(item)
 		elseif type(item) == "table" and type(item.StatusCode) == "number" then
-			warn(("Failed request %d"):format(item.StatusCode, tostring(item.Body)))
+			warn(("Failed request %d %q"):format(item.StatusCode, tostring(item.Body)))
 		end
 	end
 end
 
-function HttpPromise.DecodeJson(response)
+function HttpPromise.decodeJson(response)
 	assert(response)
 	if type(response.Body) ~= "string" then
 		return Promise.rejected("Body is not of type string")

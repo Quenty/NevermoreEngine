@@ -9,7 +9,7 @@ local InputMode = {}
 InputMode.__index = InputMode
 InputMode.ClassName = "InputMode"
 
-function InputMode.new(name)
+function InputMode.new(name, typesAndInputModes)
 	local self = setmetatable({}, InputMode)
 
 	self._lastEnabled = 0
@@ -21,6 +21,8 @@ function InputMode.new(name)
 	-- @signal Enabled
 	self.Enabled = Signal.new()
 
+	self:_addValidTypesFromTable(typesAndInputModes)
+
 	return self
 end
 
@@ -28,36 +30,22 @@ function InputMode:GetLastEnabledTime()
 	return self._lastEnabled
 end
 
----
--- @param Keys A string for ease of use, or a table of keys
--- @param [EnumSet] The enum set to pull from. Defaults to KeyCode.
-function InputMode:AddKeys(keys, enumSet)
-	enumSet = enumSet or Enum.KeyCode
-
-	if type(keys) == "string" then
-		local newKeys = {}
-		for key in keys:gmatch("%w+") do
-			table.insert(newKeys, key)
-		end
-		keys = newKeys
-	end
-
+function InputMode:_addValidTypesFromTable(keys)
 	for _, key in pairs(keys) do
-		if type(key) == "string" then
-			key = enumSet[key]
+		if typeof(key) == "EnumItem" then
+			self._valid[key] = true
+		elseif type(key) == "table" then
+			self:_addInputMode(key)
 		end
-
-		self._valid[key] = true
 	end
-
-	return self
 end
 
-function InputMode:AddInputMode(inputMode)
+function InputMode:_addInputMode(inputMode)
+	assert(inputMode.ClassName == "InputMode")
+
 	for key, _ in pairs(inputMode._valid) do
 		self._valid[key] = true
 	end
-	return self
 end
 
 function InputMode:GetKeys()
@@ -84,7 +72,9 @@ end
 
 --- Evaluates the input object, and if it's valid, enables the mode
 function InputMode:Evaluate(inputObject)
-	if self:IsValid(inputObject.UserInputType) or self:IsValid(inputObject.KeyCode) then
+	if self._valid[inputObject.UserInputType]
+		or self._valid[inputObject.KeyCode] then
+
 		self:Enable()
 	end
 end

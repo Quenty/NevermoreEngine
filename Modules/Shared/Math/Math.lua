@@ -36,8 +36,11 @@ end
 -- @tparam {number} number
 -- @tparam[opt=1] {number} precision
 function Math.round(number, precision)
-	precision = precision or 1
-	return (math.floor((number/precision)+0.5)*precision)
+	if precision then
+		return math.floor((number/precision) + 0.5) * precision
+	else
+		return math.floor(number + 0.5)
+	end
 end
 
 function Math.roundUp(number, precision)

@@ -21,15 +21,16 @@ function Raycaster.new(filterFunction)
 end
 
 function Raycaster:Ignore(tableOrInstance)
-	local ignoreList = self.IgnoreList
 	if typeof(tableOrInstance) == "Instance" then
-		table.insert(ignoreList, tableOrInstance)
+		table.insert(self.IgnoreList, tableOrInstance)
 		return
-	end
-
-	assert(type(tableOrInstance) == "table")
-	for _, item in pairs(tableOrInstance) do
-		table.insert(ignoreList, item)
+	elseif type(tableOrInstance) == "table" then
+		local ignoreList = self.IgnoreList
+		for _, item in pairs(tableOrInstance) do
+			table.insert(ignoreList, item)
+		end
+	else
+		error(("[Raycaster.Ignore] - Bad arg type %q"):format(type(tableOrInstance)))
 	end
 end
 
@@ -50,7 +51,7 @@ function Raycaster:FindPartOnRay(ray)
 		casts = casts - 1
 	end
 
-	warn("[Raycaster.FindPartOnRay] - Ran out of casts")
+	warn(("[Raycaster.FindPartOnRay] - Cast %d times, ran out of casts\n%s"):format(self.MaxCasts, debug.traceback()))
 	return nil
 end
 

@@ -4,29 +4,29 @@
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 
-local lib = {}
-lib._defaultColor = Color3.new(1, 0, 0)
+local Draw = {}
+Draw._defaultColor = Color3.new(1, 0, 0)
 
---- Sets the lib's drawing color
+--- Sets the Draw's drawing color
 -- @tparam {Color3} color The color to set
-function lib.SetColor(color)
-	lib._defaultColor = color
+function Draw.setColor(color)
+	Draw._defaultColor = color
 end
 
---- Sets the draw library to use a random color
-function lib.SetRandomColor()
-	lib.SetColor(Color3.fromHSV(math.random(), 0.5+0.5*math.random(), 1))
+--- Sets the Draw library to use a random color
+function Draw.setRandomColor()
+	Draw.setColor(Color3.fromHSV(math.random(), 0.5+0.5*math.random(), 1))
 end
 
 --- Draws a ray for debugging
--- @param ray The ray to draw
--- @tparam[opt] {color3} color The color to draw in
+-- @param ray The ray to Draw
+-- @tparam[opt] {color3} color The color to Draw in
 -- @tparam[opt] {Instance} parent
 -- @tparam[opt] {number} diameter
 -- @tparam[opt] {number} meshDiameter
-function lib.Ray(ray, color, parent, meshDiameter, diameter)
-	color = color or lib._defaultColor
-	parent = parent or lib._getDefaultParent()
+function Draw.ray(ray, color, parent, meshDiameter, diameter)
+	color = color or Draw._defaultColor
+	parent = parent or Draw._getDefaultParent()
 	meshDiameter = meshDiameter or 0.2
 	diameter = diameter or 0.2
 
@@ -55,14 +55,18 @@ function lib.Ray(ray, color, parent, meshDiameter, diameter)
 end
 
 --- Draws a point for debugging
--- @tparam {Vector3} vector3 Point to draw
--- @tparam[opt] {color3} color The color to draw in
+-- @tparam {Vector3} vector3 Point to Draw
+-- @tparam[opt] {color3} color The color to Draw in
 -- @tparam[opt] {Instance} parent
 -- @tparam[opt] {number} diameter
-function lib.Point(vector3, color, parent, diameter)
+function Draw.point(vector3, color, parent, diameter)
 	assert(vector3)
-	color = color or lib._defaultColor
-	parent = parent or lib._getDefaultParent()
+	if typeof(vector3) == "CFrame" then
+		vector3 = vector3.p
+	end
+
+	color = color or Draw._defaultColor
+	parent = parent or Draw._getDefaultParent()
 	diameter = diameter or 1
 
 	local part = Instance.new("Part")
@@ -92,8 +96,8 @@ function lib.Point(vector3, color, parent, diameter)
 	return part
 end
 
-function lib.Box(cframe, size, color)
-	color = color or lib._defaultColor
+function Draw.box(cframe, size, color)
+	color = color or Draw._defaultColor
 	cframe = typeof(cframe) == "Vector3" and CFrame.new(cframe) or cframe
 
 	local part = Instance.new("Part")
@@ -107,13 +111,13 @@ function lib.Box(cframe, size, color)
 	part.Transparency = 0.5
 	part.Size = size
 	part.CFrame = cframe
-	part.Parent = lib._getDefaultParent()
+	part.Parent = Draw._getDefaultParent()
 
 	return part
 end
 
-function lib._getDefaultParent()
+function Draw._getDefaultParent()
 	return RunService:IsServer() and Workspace or Workspace.CurrentCamera
 end
 
-return lib
+return Draw

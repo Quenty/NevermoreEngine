@@ -1,6 +1,5 @@
 --- Provides a basis for binders that can be retrieved anywhere
 -- @classmod BinderProvider
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -33,7 +32,7 @@ function BinderProvider:__index(index)
 		return BinderProvider[index]
 	end
 
-	error(("'%s' Not a valid index"):format(tostring(index)))
+	error(("%q Not a valid index"):format(tostring(index)))
 end
 
 function BinderProvider:AfterInit()

@@ -1,6 +1,5 @@
 --- Tracks a player's character's humanoid
 -- @classmod HumanoidTracker
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -81,7 +80,11 @@ function HumanoidTracker:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
 
 	maid:GiveTask(newHumanoid.Died:Connect(function()
 		self.AliveHumanoid.Value = nil
-		self.HumanoidDied:Fire(newHumanoid)
+
+		-- AliveHumanoid changing may proc .Destroy method
+		if self.Destroy then
+			self.HumanoidDied:Fire(newHumanoid)
+		end
 	end))
 end
 

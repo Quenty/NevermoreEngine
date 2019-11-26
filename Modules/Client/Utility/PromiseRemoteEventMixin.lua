@@ -1,6 +1,5 @@
 --- Intended for classes that extend BaseObject only
 -- @module PromiseRemoteEventMixin
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

@@ -1,7 +1,6 @@
 --- Utility for Roblox character objects that involve promises.
 -- @see Promise
 -- @module CharacterPromiseUtil
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

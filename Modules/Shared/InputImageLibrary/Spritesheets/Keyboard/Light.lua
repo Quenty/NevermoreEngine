@@ -1,5 +1,4 @@
 --- Generated KeyboardLight with Python
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 

@@ -18,6 +18,10 @@ function Spritesheet.new(texture)
 	return self
 end
 
+function Spritesheet:GetPreloadAssetId()
+	return self._texture
+end
+
 function Spritesheet:AddSprite(index, position, size)
 	assert(not self._sprites[index])
 

@@ -1,20 +1,20 @@
 --- Bounding box utilties. Prefer model:GetBoundingBox() in most cases. However, sometimes grouping isn't possible.
 -- @classmod BoundingBox
 
-local lib = {}
+local BoundingBox = {}
 
-function lib.GetPartsBoundingBox(parts, relativeTo)
-	return lib.GetBoundingBox(parts, relativeTo)
+function BoundingBox.GetPartsBoundingBox(parts, relativeTo)
+	return BoundingBox.GetBoundingBox(parts, relativeTo)
 end
 
-function lib.GetModelBoundingBox(model)
+function BoundingBox.GetModelBoundingBox(model, relativeTo)
 	local parts = {}
 	for _, item in pairs(model:GetDescendants()) do
 		if item:IsA("BasePart") then
 			table.insert(parts, item)
 		end
 	end
-	return lib.GetPartsBoundingBox(parts)
+	return BoundingBox.GetPartsBoundingBox(parts, relativeTo)
 end
 
 --- Gets a boundingBox for the given data
@@ -23,7 +23,7 @@ end
 -- @treturn Vector3 Size
 -- @treturn Position position
 -- https://gist.github.com/zeux/1a67e8930df782d5474276e218831e22
-function lib.GetBoundingBox(data, relativeTo)
+function BoundingBox.GetBoundingBox(data, relativeTo)
 	relativeTo = relativeTo or CFrame.new()
 	local abs = math.abs
 	local inf = math.huge
@@ -57,4 +57,4 @@ function lib.GetBoundingBox(data, relativeTo)
 	return size, position
 end
 
-return lib
+return BoundingBox

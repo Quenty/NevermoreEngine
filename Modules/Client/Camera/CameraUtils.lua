@@ -1,6 +1,5 @@
 --- Utility methods for cameras
 -- @module CameraUtils
--- @author Quenty
 
 local CameraUtils = {}
 

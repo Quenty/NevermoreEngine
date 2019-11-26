@@ -7,6 +7,9 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 
 return function(binder, inst)
+	assert(type(binder) == "table", "'binder' must be table")
+	assert(typeof(inst) == "Instance", "'inst' must be instance")
+
 	local class = binder:Get(inst)
 	if class then
 		return Promise.resolved(class)
@@ -19,6 +22,13 @@ return function(binder, inst)
 			promise:Resolve(classAdded)
 		end
 	end))
+
+	delay(5, function()
+		if promise:IsPending() then
+			warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n")
+				:format(inst:GetFullName(), binder:GetTag()))
+		end
+	end)
 
 	promise:Finally(function()
 		maid:Destroy()

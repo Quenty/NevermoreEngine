@@ -9,7 +9,7 @@ function lib.Trim(str, pattern)
 	-- When we find the first non space character defined by ^%s
 	-- we yank out anything in between that and the end of the string
 	-- Everything else is replaced with %1 which is essentially nothing
-	return (str:gsub("^"..pattern.."*(.-)"..pattern.."*$", "%1"))
+	return str:gsub("^"..pattern.."*(.-)"..pattern.."*$", "%1")
 end
 
 --- Sets it to UpperCamelCase
@@ -20,6 +20,10 @@ function lib.ToCamelCase(str)
 	str = str:gsub("%p", "")
 
 	return str
+end
+
+function lib.UppercaseFirstLetter(str)
+	return str:gsub("^%a", string.upper)
 end
 
 function lib.ToLowerCamelCase(str)
