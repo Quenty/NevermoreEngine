@@ -83,10 +83,10 @@ function PushCamera:__newindex(index, value)
 end
 
 function PushCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
-		local State = CameraState.new()
-		State.CFrame = self.CFrame
-		return State
+	if index == "CameraState" then
+		local state = CameraState.new()
+		state.CFrame = self.CFrame
+		return state
 	elseif index == "LastUpdateTime" then
 		return self._lastUpdateTime
 	elseif index == "LookVector" then

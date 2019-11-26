@@ -48,7 +48,7 @@ function SummedCamera:__sub(camera)
 end
 
 function SummedCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		if self._mode == "World" then
 			return self.CameraAState + self.CameraBState
 		else

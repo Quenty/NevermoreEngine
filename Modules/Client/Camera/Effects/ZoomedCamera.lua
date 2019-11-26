@@ -16,8 +16,8 @@ local SummedCamera = require("SummedCamera")
 
 local ZoomedCamera = {}
 ZoomedCamera.ClassName = "ZoomedCamera"
-ZoomedCamera._MaxZoom = 100
-ZoomedCamera._MinZoom = 0.5
+ZoomedCamera._maxZoom = 100
+ZoomedCamera._minZoom = 0.5
 ZoomedCamera._zoom = 10
 
 function ZoomedCamera.new()
@@ -44,12 +44,12 @@ function ZoomedCamera:__newindex(index, value)
 	elseif index == "MaxZoom" then
 		assert(value > self.MinZoom, "MaxZoom can't be less than MinZoom")
 
-		self._MaxZoom = value
+		self._maxZoom = value
 		self.Zoom = self.Zoom -- Reset the zoom with new constraints.
 	elseif index == "MinZoom" then
 		assert(value < self.MaxZoom, "MinZoom can't be greater than MinZoom")
 
-		self._MinZoom = value
+		self._minZoom = value
 		self.Zoom = self.Zoom -- Reset the zoom with new constraints.
 	else
 		rawset(self, index, value)
@@ -57,16 +57,16 @@ function ZoomedCamera:__newindex(index, value)
 end
 
 function ZoomedCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
-		local State = CameraState.new()
-		State.Position = Vector3.new(0, 0, self.Zoom)
-		return State
+	if index == "CameraState" then
+		local state = CameraState.new()
+		state.Position = Vector3.new(0, 0, self.Zoom)
+		return state
 	elseif index == "Zoom" or index == "TargetZoom" then
 		return self._zoom
 	elseif index == "MaxZoom" then
-		return self._MaxZoom
+		return self._maxZoom
 	elseif index == "MinZoom" then
-		return self._MinZoom
+		return self._minZoom
 	else
 		return ZoomedCamera[index]
 	end

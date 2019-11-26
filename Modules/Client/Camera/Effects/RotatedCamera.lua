@@ -13,10 +13,10 @@ local RotatedCamera = {}
 RotatedCamera.ClassName = "RotatedCamera"
 
 -- Max/Min aim up and down
-RotatedCamera._MaxY = math.rad(80)
-RotatedCamera._MinY = math.rad(-80)
-RotatedCamera._AngleXZ = 0
-RotatedCamera._AngleY = 0
+RotatedCamera._maxY = math.rad(80)
+RotatedCamera._minY = math.rad(-80)
+RotatedCamera._angleXZ = 0
+RotatedCamera._angleY = 0
 
 function RotatedCamera.new()
 	local self = setmetatable({}, RotatedCamera)
@@ -43,16 +43,16 @@ function RotatedCamera:__newindex(index, value)
 		local yrot = zxrot:toObjectSpace(value).lookVector.y
 		self.AngleY = math.asin(yrot)
 	elseif index == "AngleY" then
-		self._AngleY = math.clamp(value, self.MinY, self.MaxY)
+		self._angleY = math.clamp(value, self.MinY, self.MaxY)
 	elseif index == "AngleX" or index == "AngleXZ" then
-		self._AngleXZ = value
+		self._angleXZ = value
 	elseif index == "MaxY" then
 		assert(value >= self.MinY, "MaxY must be greater than MinY")
-		self._MaxY = value
+		self._maxY = value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif index == "MinY" then
 		assert(value <= self.MaxY, "MinY must be less than MaxY")
-		self._MinY = value
+		self._minY = value
 		self.AngleY = self.AngleY -- Reclamp value
 	elseif RotatedCamera[index] ~= nil then
 		rawset(self, index, value)
@@ -62,7 +62,7 @@ function RotatedCamera:__newindex(index, value)
 end
 
 function RotatedCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		local State = CameraState.new()
 		State.CFrame = self.CFrame
 		return State
@@ -71,13 +71,13 @@ function RotatedCamera:__index(index)
 	elseif index == "CFrame" then
 		return CFrame.Angles(0, self.AngleXZ, 0) * CFrame.Angles(self.AngleY, 0, 0)
 	elseif index == "AngleY" then
-		return self._AngleY
+		return self._angleY
 	elseif index == "AngleX" or index == "AngleXZ" then
-		return self._AngleXZ
+		return self._angleXZ
 	elseif index == "MaxY" then
-		return self._MaxY
+		return self._maxY
 	elseif index == "MinY" then
-		return self._MinY
+		return self._minY
 	else
 		return RotatedCamera[index]
 	end

@@ -13,7 +13,9 @@ Current Camera Effects have the following API available. Adding new effects mean
 Returns a new Summed camera and adds the two effects together. This is used for combining effects
 
 #### `.CameraState`
-Indexing the CameraEffect should return the current camera state. This means that state is easy to index. The following will also always work
+Indexing the CameraEffect should return the current camera state. This means that state is easy to index.
+
+In previous versions, the following will also work. However, this is no longer true.
 
 * `.State`
 * `.CameraState`

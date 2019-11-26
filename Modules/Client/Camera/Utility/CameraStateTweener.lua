@@ -20,6 +20,7 @@ function CameraStateTweener.new(cameraEffect, speed)
 	local self = setmetatable({}, CameraStateTweener)
 
 	self._maid = Maid.new()
+
 	local cameraBelow, assign = CameraStack:GetNewStateBelow()
 	self._cameraBelow = cameraBelow
 	self._fadeBetween = FadeBetweenCamera.new(cameraBelow, cameraEffect)

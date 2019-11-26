@@ -35,7 +35,7 @@ function PointCamera:__newindex(index, value)
 end
 
 function PointCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		local origin, focus = self.Origin, self.Focus
 
 		local state = CameraState.new()

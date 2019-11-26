@@ -23,7 +23,7 @@ function CustomCameraEffect:__add(other)
 end
 
 function CustomCameraEffect:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		return self._getCurrentStateFunc()
 	else
 		return CustomCameraEffect[index]

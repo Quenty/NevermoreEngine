@@ -27,12 +27,9 @@ end
 
 function TrackCamera:__newindex(index, value)
 	if index == "CameraSubject" then
-		assert(type(value) == "userdata" or type(value) == "nil",
-			"CameraSubject must be a Roblox Model or Roblox Part or nil")
-
-		if type(value) == "userdata" then
-			assert(value:IsA("Model") or value:IsA("BasePart"), "CameraSubject must be a Model or BasePart")
-		end
+		assert(typeof(value) == "Instance" and
+			(value:IsA("BasePart") or value:IsA("Model") or value:IsA("Attachment"))
+			"CameraSubject must be a Roblox Model, Roblox Part, Attachment, or nil")
 
 		rawset(self, index, value)
 	elseif index == "FieldOfView" then
@@ -43,16 +40,21 @@ function TrackCamera:__newindex(index, value)
 end
 
 function TrackCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
-		local cameraSubject = self.CameraSubject
+	if index == "CameraState" then
+
 		local state = CameraState.new()
 		state.FieldOfView = self.FieldOfView
 
+		local cameraSubject = self.CameraSubject
 		if cameraSubject then
 			if cameraSubject:IsA("Model") then
 				state.CFrame = cameraSubject:GetPrimaryPartCFrame()
 			elseif cameraSubject:IsA("BasePart") then
 				state.CFrame = cameraSubject.CFrame
+			elseif cameraSubject:IsA("Attachment") then
+				state.CFrame = cameraSubject.WorldCFrame
+			else
+				error("Bad cameraSubject")
 			end
 		end
 

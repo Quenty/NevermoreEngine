@@ -42,7 +42,7 @@ function FadingCamera:__newindex(index, value)
 end
 
 function FadingCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		return (self.Camera.CameraState or self.Camera) * self.Spring.Value
 	elseif index == "Damper" then
 		return self.Spring.Damper
