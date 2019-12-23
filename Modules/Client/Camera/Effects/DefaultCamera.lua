@@ -49,7 +49,7 @@ function DefaultCamera:UnbindFromRenderStep()
 end
 
 function DefaultCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		return rawget(self, "_cameraState")
 	else
 		return DefaultCamera[index]

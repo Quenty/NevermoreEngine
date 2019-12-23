@@ -88,6 +88,11 @@ end
 -- Using this acknowledges that we're intentionally binding on a safe client object,
 -- i.e. one without replication.
 function Binder:BindClient(inst)
+	if not RunService:IsClient() then
+		warn(("[Binder.BindClient] - Bindings '%s' done on the server! Will be replicated!")
+			:format(self._tagName))
+	end
+
 	CollectionService:AddTag(inst, self._tagName)
 	return self:Get(inst)
 end

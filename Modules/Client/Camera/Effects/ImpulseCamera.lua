@@ -12,14 +12,20 @@ local ImpulseCamera = {}
 ImpulseCamera.ClassName = "ImpulseCamera"
 
 function ImpulseCamera.new()
-	local self = setmetatable({}, ImpulseCamera)
+	local self = setmetatable({
+		_spring = Spring.new(Vector3.new(0, 0, 0))
+	}, ImpulseCamera)
 
-	self.Spring = Spring.new(Vector3.new())
-
-	self.Damper = 0.5
-	self.Speed = 20
+	self._spring.Damper = 0.5
+	self._spring.Speed = 20
 
 	return self
+end
+
+function ImpulseCamera:Impulse(velocity)
+	assert(typeof(velocity) == "Vector3")
+
+	self._spring:Impulse(velocity)
 end
 
 function ImpulseCamera:__add(other)
@@ -28,30 +34,32 @@ end
 
 function ImpulseCamera:__newindex(index, value)
 	if index == "Damper" then
-		self.Spring.Damper = value
+		assert(type(value) == "number")
+		self._spring.Damper = value
 	elseif index == "Speed" then
-		self.Spring.Speed = value
-	elseif index == "Spring" then
-		rawset(self, index, value)
+		assert(type(value) == "number")
+		self._spring.Speed = value
 	else
-		error(index .. " is not a valid member of impulse camera")
+		error(("%q is not a valid member of impulse camera"):format(tostring(index)))
 	end
 end
 
-function ImpulseCamera:Impulse(Velocity)
-	self.Spring:Impulse(Velocity)
-end
-
 function ImpulseCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
-		local state = CameraState.new()
-		local value = self.Spring.Value
-		state.CFrame = CFrame.Angles(0, value.y, 0) * CFrame.Angles(value.x, 0, 0) * CFrame.Angles(0, 0, value.z)
-		return state
+	if index == "CameraState" then
+		local newState = CameraState.new()
+
+		local position = self._spring.Value
+		newState.CFrame = CFrame.Angles(0, position.y, 0)
+			* CFrame.Angles(position.x, 0, 0)
+			* CFrame.Angles(0, 0, position.z)
+
+		return newState
 	elseif index == "Damper" then
-		return self.Spring.Damper
+		return self._spring.Damper
 	elseif index == "Speed" then
-		return self.Spring.Speed
+		return self._spring.Speed
+	elseif index == "Spring" then
+		return self._spring
 	else
 		return ImpulseCamera[index]
 	end

@@ -17,15 +17,15 @@ HeartbeatCamera.ProfileName = "HeartbeatCamera"
 function HeartbeatCamera.new(camera)
 	local self = setmetatable({}, HeartbeatCamera)
 
-	self.Camera = camera or error("No camera")
-	self.Maid = Maid.new()
+	self._camera = camera or error("No camera")
+	self._maid = Maid.new()
 
-	self.CurrentStateCache = self.Camera.CameraState or error("Camera state returned null")
-	self.Maid.Heartbeat = RunService.Heartbeat:Connect(function()
+	self._currentStateCache = self._camera.CameraState or error("Camera state returned null")
+	self._maid:GiveTask(RunService.Heartbeat:Connect(function()
 		debug.profilebegin(self.ProfileName)
-		self.CurrentStateCache = self.Camera.CameraState or error("Camera state returned null")
+		self._currentStateCache = self._camera.CameraState or error("Camera state returned null")
 		debug.profileend()
-	end)
+	end))
 
 	return self
 end
@@ -35,23 +35,19 @@ function HeartbeatCamera:__add(other)
 end
 
 function HeartbeatCamera:ForceUpdateCache()
-	self.CurrentStateCache = self.Camera.CameraState
+	self._currentStateCache = self._camera.CameraState
 end
 
 function HeartbeatCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
-		return self.CurrentStateCache
-	elseif index == "Focus" then
-		return self.FocusCamera.CameraState
-	elseif index == "Origin" then
-		return self.OriginCamera.CameraState
+	if index == "CameraState" then
+		return self._currentStateCache
 	else
 		return HeartbeatCamera[index]
 	end
 end
 
 function HeartbeatCamera:Destroy()
-	self.Maid:DoCleaning()
+	self._maid:DoCleaning()
 end
 
 return HeartbeatCamera

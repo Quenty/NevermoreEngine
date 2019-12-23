@@ -40,7 +40,6 @@ function SmoothZoomedCamera:Impulse(value)
 	self.Spring:Impulse(value)
 end
 
-
 function SmoothZoomedCamera:__newindex(index, value)
 	if index == "TargetZoom" or index == "Target" then
 		local target = math.clamp(value, self.MinZoom, self.MaxZoom)
@@ -77,7 +76,7 @@ function SmoothZoomedCamera:__newindex(index, value)
 end
 
 function SmoothZoomedCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		local state = CameraState.new()
 		state.Position = Vector3.new(0, 0, self.Zoom)
 		return state

@@ -14,9 +14,9 @@ local SmoothRotatedCamera = {}
 SmoothRotatedCamera.ClassName = "SmoothRotatedCamera"
 
 -- Max/Min aim up and down
-SmoothRotatedCamera._MaxY = math.rad(80)
-SmoothRotatedCamera._MinY = math.rad(-80)
-SmoothRotatedCamera._ZoomGiveY = math.rad(5) -- Only on th
+SmoothRotatedCamera._maxY = math.rad(80)
+SmoothRotatedCamera._minY = math.rad(-80)
+SmoothRotatedCamera._zoomGiveY = math.rad(5) -- Only on th
 
 function SmoothRotatedCamera.new()
 	local self = setmetatable({}, SmoothRotatedCamera)
@@ -64,10 +64,10 @@ function SmoothRotatedCamera:__newindex(index, value)
 		self.SpringX.Target = value
 	elseif index == "MaxY" then
 		assert(value >= self.MinY, "MaxY must be greater than MinY")
-		self._MaxY = value
+		self._maxY = value
 	elseif index == "MinY" then
 		assert(value <= self.MaxY, "MinY must be less than MaxY")
-		self._MinY = value
+		self._minY = value
 	elseif index == "SpeedAngleX" or index == "SpeedAngleXZ" then
 		self.SpringX.Speed = value
 	elseif index == "SpeedAngleY" then
@@ -76,7 +76,7 @@ function SmoothRotatedCamera:__newindex(index, value)
 		self.SpeedAngleX = value
 		self.SpeedAngleY = value
 	elseif index == "ZoomGiveY" then
-		self._ZoomGiveY = value
+		self._zoomGiveY = value
 	elseif SmoothRotatedCamera[index] ~= nil or index == "SpringX" or index == "SpringY" then
 		rawset(self, index, value)
 	else
@@ -99,7 +99,7 @@ function SmoothRotatedCamera:GetPastBounds(angle)
 end
 
 function SmoothRotatedCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		local State = CameraState.new()
 		State.CFrame = self.CFrame
 		return State
@@ -136,11 +136,11 @@ function SmoothRotatedCamera:__index(index)
 	elseif index == "SpeedAngleY" then
 		return self.SpringX.Speed
 	elseif index == "MaxY" then
-		return self._MaxY
+		return self._maxY
 	elseif index == "MinY" then
-		return self._MinY
+		return self._minY
 	elseif index == "ZoomGiveY" then
-		return self._ZoomGiveY
+		return self._zoomGiveY
 	else
 		return SmoothRotatedCamera[index]
 	end

@@ -9,8 +9,6 @@ local Spring = require("Spring")
 
 local SmoothPositionCamera = {}
 SmoothPositionCamera.ClassName = "SmoothPositionCamera"
-SmoothPositionCamera._FocusCamera = nil
-SmoothPositionCamera._OriginCamera = nil
 
 function SmoothPositionCamera.new(baseCamera)
 	local self = setmetatable({}, SmoothPositionCamera)
@@ -42,22 +40,8 @@ function SmoothPositionCamera:__newindex(index, value)
 	end
 end
 
-function SmoothPositionCamera:_internalUpdate()
-	local delta
-	if self._lastUpdateTime then
-		delta = tick() - self._lastUpdateTime
-	end
-
-	self._lastUpdateTime = tick()
-	self.Spring.Target = self.BaseCameraState.Position
-
-	if delta then
-		self.Spring:TimeSkip(delta)
-	end
-end
-
 function SmoothPositionCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		local baseCameraState = self.BaseCameraState
 
 		local state = CameraState.new()
@@ -79,6 +63,20 @@ function SmoothPositionCamera:__index(index)
 		return rawget(self, "_" .. index) or error("Internal error: index does not exist")
 	else
 		return SmoothPositionCamera[index]
+	end
+end
+
+function SmoothPositionCamera:_internalUpdate()
+	local delta
+	if self._lastUpdateTime then
+		delta = tick() - self._lastUpdateTime
+	end
+
+	self._lastUpdateTime = tick()
+	self.Spring.Target = self.BaseCameraState.Position
+
+	if delta then
+		self.Spring:TimeSkip(delta)
 	end
 end
 

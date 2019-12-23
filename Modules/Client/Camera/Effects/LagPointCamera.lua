@@ -49,7 +49,7 @@ function LagPointCamera:__newindex(index, value)
 end
 
 function LagPointCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
+	if index == "CameraState" then
 		local origin, focusPosition = self.Origin, self.FocusPosition
 
 		local state = CameraState.new()

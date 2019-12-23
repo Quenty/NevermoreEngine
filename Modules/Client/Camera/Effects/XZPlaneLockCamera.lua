@@ -13,7 +13,7 @@ XZPlaneLockCamera.ClassName = "XZPlaneLockCamera"
 function XZPlaneLockCamera.new(camera)
 	local self = setmetatable({}, XZPlaneLockCamera)
 
-	self.Camera = camera or error("No camera")
+	self._camera = camera or error("No camera")
 
 	return self
 end
@@ -23,8 +23,8 @@ function XZPlaneLockCamera:__add(other)
 end
 
 function XZPlaneLockCamera:__index(index)
-	if index == "State" or index == "CameraState" or index == "Camera" then
-		local state = self.Camera.CameraState or self.Camera
+	if index == "CameraState" then
+		local state = self._camera.CameraState or self._camera
 		local xzrot = getRotationInXZPlane(state.CFrame)
 
 		local newState = CameraState.new()
