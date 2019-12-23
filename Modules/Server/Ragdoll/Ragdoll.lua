@@ -3,6 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local Workspace = game:GetService("Workspace")
+
 local RagdollBase = require("RagdollBase")
 local RagdollUtils = require("RagdollUtils")
 
@@ -36,7 +38,7 @@ function Ragdoll.new(humanoid)
 		motor.Parent = nil
 
 		self._maid:GiveTask(function()
-			if originalParent:IsDescendantOf(workspace) then
+			if originalParent:IsDescendantOf(Workspace) then
 				motor.Parent = originalParent
 			else
 				motor:Destroy()
