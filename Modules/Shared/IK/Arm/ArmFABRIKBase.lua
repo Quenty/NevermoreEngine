@@ -3,6 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local Workspace = game:GetService("Workspace")
+
 local BaseObject = require("BaseObject")
 local IKResource = require("IKResource")
 local IKResourceUtils = require("IKResourceUtils")
@@ -209,11 +211,11 @@ function ArmFABRIKBase:_calculateTransforms(worldPosition)
 		-- self._resources:Get("Hand").Transparency = 0.7
 		-- self._resources:Get("UpperArm").Transparency = 0.7
 		-- self._resources:Get("LowerArm").Transparency = 0.7
-	-- 	-- self._drawer:CFrame(baseCFrame, workspace)
+	-- 	-- self._drawer:CFrame(baseCFrame, Workspace)
 
-	-- 	-- self._drawer:CFrame(baseCFrame * bones[1]:GetCFrame(), workspace)
-	-- 	-- self._drawer:CFrame(baseCFrame * bones[2]:GetCFrame(), workspace)
-	-- 	-- self._drawer:CFrame(baseCFrame * bones[3]:GetCFrame(), workspace)
+	-- 	-- self._drawer:CFrame(baseCFrame * bones[1]:GetCFrame(), Workspace)
+	-- 	-- self._drawer:CFrame(baseCFrame * bones[2]:GetCFrame(), Workspace)
+	-- 	-- self._drawer:CFrame(baseCFrame * bones[3]:GetCFrame(), Workspace)
 	end
 
 	local function projectCFrame(attachment1, attachment2)
@@ -230,7 +232,7 @@ function ArmFABRIKBase:_calculateTransforms(worldPosition)
 
 		if self._drawer then
 			local rel = baseCFrame * bone:GetCFrame()
-			self._drawer:CFrame(rel - rel.p + worldCFrame.p, workspace)
+			self._drawer:CFrame(rel - rel.p + worldCFrame.p, Workspace)
 		end
 
 		return relative - relative.p
