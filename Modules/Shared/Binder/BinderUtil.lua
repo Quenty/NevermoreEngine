@@ -4,8 +4,8 @@
 local BinderUtil = {}
 
 function BinderUtil.findFirstAncestor(binder, child)
-	assert(binder)
-	assert(typeof(child) == "Instance")
+	assert(type(binder) == "table", "Binder must be binder")
+	assert(typeof(child) == "Instance", "Child parameter must be instance")
 
 	local current = child.Parent
 	while current do
@@ -19,6 +19,9 @@ function BinderUtil.findFirstAncestor(binder, child)
 end
 
 function BinderUtil.findFirstChild(binder, parent)
+	assert(type(binder) == "table", "Binder must be binder")
+	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
+
 	for _, child in pairs(parent:GetChildren()) do
 		local class = binder:Get(child)
 		if class then
