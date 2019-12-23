@@ -114,11 +114,6 @@ function Octree:_radiusSearch(px, py, pz, radiusSquared)
 	return objectsFound, nodeDistances2
 end
 
-function Octree:_getDeepistRegion(px, py, pz, maxDepth)
-	local region = self:_getRegion(px, py, pz)
-	return OctreeRegionUtils.getDeepestRegion(region, px, py, pz, maxDepth)
-end
-
 function Octree:_getRegion(px, py, pz)
 	local cx, cy, cz = self:_getRegionCellIndex(px, py, pz)
 	local index = self:_getRegionIndex(cx, cy, cz)
