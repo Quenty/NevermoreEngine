@@ -34,17 +34,17 @@ function TimeSyncService:Init()
 end
 
 function TimeSyncService:IsSynced()
-	assert(self._clockPromise)
+	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return self._clockPromise:IsFulfilled()
 end
 
 function TimeSyncService:WaitForSyncedClock()
-	assert(self._clockPromise)
+	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return self._clockPromise:Wait()
 end
 
 function TimeSyncService:GetSyncedClock()
-	assert(self._clockPromise)
+	assert(self._clockPromise, "TimeSyncService is not initialized")
 	if self._clockPromise:IsFulfilled() then
 		return self._clockPromise:Wait()
 	end
@@ -53,7 +53,7 @@ function TimeSyncService:GetSyncedClock()
 end
 
 function TimeSyncService:PromiseSyncedClock()
-	assert(self._clockPromise)
+	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return Promise.resolved(self._clockPromise)
 end
 
