@@ -9,7 +9,7 @@ local Promise = require("Promise")
 
 local JSONUtils = {}
 
-function JSONUtils.PromiseJSONDecode(str)
+function JSONUtils.promiseJSONDecode(str)
 	if type(str) ~= "string" then
 		return Promise.rejected(str)
 	end
