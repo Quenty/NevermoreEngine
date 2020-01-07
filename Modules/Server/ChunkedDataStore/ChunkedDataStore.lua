@@ -25,6 +25,8 @@ function ChunkDataStore.new(datastore)
 end
 
 function ChunkDataStore:WriteEntry(largeString)
+	assert(type(largeString) == "string")
+
 	local promises = {}
 	local keys = {}
 
@@ -77,7 +79,7 @@ function ChunkDataStore:_decodeChunksToStr(chunks, expectedSize)
 		local total = table.concat(chunks, "")
 
 		if #total ~= expectedSize then
-			reject(("Combined chunks is %d, expectd %d"):format(#total, expectedSize))
+			reject(("Combined chunks is %d, expected %d"):format(#total, expectedSize))
 			return
 		end
 
