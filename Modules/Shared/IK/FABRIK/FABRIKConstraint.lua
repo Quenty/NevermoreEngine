@@ -17,7 +17,8 @@ end
 
 local function constrainEllipse(isInEllipse, p, a, b)
 	local px, py = math.abs(p.x), math.abs(p.y)
-	local t, x, y = isInEllipse and math.atan2(py, px) or PI4
+	local t = isInEllipse and math.atan2(py, px) or PI4
+	local x, y
 
 	for _ = 1, 4 do
 		local ct, st = math.cos(t), math.sin(t)
