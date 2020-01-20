@@ -46,27 +46,32 @@ function DataStoreStage:Load(name, defaultValue)
 	end
 
 	return self._loadParent:Load(self._loadName, {}):Then(function(data)
-		if self._dataToSave and self._dataToSave[name] ~= nil then
-			if self._dataToSave[name] == DataStoreDeleteToken then
-				return defaultValue
-			else
-				return self._dataToSave[name]
-			end
-		elseif self._stores[name] then
-			if self._stores[name]:HasWritableData() then
-				local writer = self._stores[name]:GetNewWriter()
-				local original = Table.DeepCopy(data[name] or {})
-				writer:WriteMerge(original)
-				return original
-			end
-		end
+		return self:_afterLoadGetAndApplyStagedData(name, data, defaultValue)
+	end)
+end
 
-		if data[name] == nil then
+-- Protected!
+function DataStoreStage:_afterLoadGetAndApplyStagedData(name, data, defaultValue)
+	if self._dataToSave and self._dataToSave[name] ~= nil then
+		if self._dataToSave[name] == DataStoreDeleteToken then
 			return defaultValue
 		else
-			return data[name]
+			return self._dataToSave[name]
 		end
-	end)
+	elseif self._stores[name] then
+		if self._stores[name]:HasWritableData() then
+			local writer = self._stores[name]:GetNewWriter()
+			local original = Table.DeepCopy(data[name] or {})
+			writer:WriteMerge(original)
+			return original
+		end
+	end
+
+	if data[name] == nil then
+		return defaultValue
+	else
+		return data[name]
+	end
 end
 
 function DataStoreStage:Delete(name)
@@ -163,7 +168,7 @@ function DataStoreStage:_doStore(name, value)
 	local newValue
 	if value == DataStoreDeleteToken then
 		newValue = DataStoreDeleteToken
-	elseif type(value) == "Table" then
+	elseif type(value) == "table" then
 		newValue = Table.DeepCopy(value)
 	else
 		newValue = value
