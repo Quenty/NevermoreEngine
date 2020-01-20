@@ -98,11 +98,7 @@ end
 function DataStore:Load(keyName, defaultValue)
 	return self:_promiseLoad()
 		:Then(function(data)
-			if data[keyName] == nil then
-				return defaultValue
-			else
-				return data[keyName]
-			end
+			return self:_afterLoadGetAndApplyStagedData(keyName, data, defaultValue)
 		end)
 end
 
