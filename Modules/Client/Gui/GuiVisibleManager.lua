@@ -38,6 +38,25 @@ function GuiVisibleManager.new(promiseNewPane, maxHideTime)
 	return self
 end
 
+function GuiVisibleManager:BindToBoolValue(boolValue)
+	assert(boolValue, "Must have boolValue")
+	assert(not self._boundBoolValue, "Already bound")
+
+	self._boundBoolValue = boolValue
+
+	self._maid:GiveTask(self._boundBoolValue.Changed:Connect(function()
+		if self._boundBoolValue.Value then
+			self._maid._boundShowHandle = self:CreateShowHandle()
+		else
+			self._maid._boundShowHandle = nil
+		end
+	end))
+
+	if self._boundBoolValue.Value then
+		self._maid._boundShowHandle = self:CreateShowHandle()
+	end
+end
+
 function GuiVisibleManager:SetPreferredTheme(theme)
 	assert(theme == "Light" or theme == "Dark")
 
