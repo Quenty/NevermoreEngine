@@ -6,6 +6,7 @@
 	<a href="https://discord.gg/mhtGUS8">
 		<img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
 	</a>
+	[![Actions Status](https://github.com/Quenty/Nevermore/workflows/luacheck/badge.svg)](https://github.com/Quenty/Nevermore/actions)
 </div>
 
 <div align="center">
@@ -15,9 +16,9 @@
 <div>&nbsp;</div>
 
 ## About
-Nevermore is a ModuleScript loader for Roblox, and loads modules by name. Nevermore is designed to make code more portable. Nevermore comes with a variety of utility libraries. These libraries are used on both the client and server and are useful for a variety of things. 
+Nevermore is a ModuleScript loader for Roblox, and loads modules by name. Nevermore is designed to make code more portable. Nevermore comes with a variety of utility libraries. These libraries are used on both the client and server and are useful for a variety of things.
 
-Nevermore follows both functional and OOP programming paradigms. However, many modules return classes, and may require more advance Lua knowledge to use. 
+Nevermore follows both functional and OOP programming paradigms. However, many modules return classes, and may require more advance Lua knowledge to use.
 
 ## Get Nevermore
 To install Nevermore, paste the following code into your command bar in Roblox Studio!
