@@ -6,8 +6,8 @@
 	<a href="https://discord.gg/mhtGUS8">
 		<img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
 	</a>
-	<a href="https://github.com/Quenty/Nevermore/actions">
-		<img src="https://github.com/Quenty/Nevermore/workflows/luacheck/badge.svg" alt="Actions Status" />
+	<a href="https://github.com/Quenty/NevermoreEngine/actions">
+		<img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
 	</a>
 </div>
 
