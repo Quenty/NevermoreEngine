@@ -6,7 +6,9 @@
 	<a href="https://discord.gg/mhtGUS8">
 		<img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
 	</a>
-	[![Actions Status](https://github.com/Quenty/Nevermore/workflows/luacheck/badge.svg)](https://github.com/Quenty/Nevermore/actions)
+	<a href="https://github.com/Quenty/Nevermore/actions">
+		<img src="https://github.com/Quenty/Nevermore/workflows/luacheck/badge.svg" alt="Actions Status" />
+	</a>
 </div>
 
 <div align="center">
