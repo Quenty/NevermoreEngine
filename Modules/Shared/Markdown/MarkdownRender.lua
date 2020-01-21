@@ -53,7 +53,10 @@ function MarkdownRender:Render(data)
 				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
 				height = height + gui.Size.Y.Offset
 
-				local nextIsNestedList = (type(data[index+1]) == "table" and data[index+1].Type == "List" and data[index+1].Level ~= item.Level)
+				local nextIsNestedList = (type(data[index+1]) == "table"
+					and data[index+1].Type == "List"
+					and data[index+1].Level ~= item.Level)
+
 				if index ~= #data  then
 					if nextIsNestedList then
 						height = height + self.SpaceBetweenList

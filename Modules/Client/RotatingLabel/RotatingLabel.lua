@@ -21,14 +21,14 @@ function RotatingLabel.new()
 	local self = setmetatable({}, RotatingLabel)
 
 	self._labels = setmetatable({}, {
-		__index = function(labels, index)
-			if index == "Remove" then
+		__index = function(labels, labelsIndex)
+			if labelsIndex == "Remove" then
 				return function(_, index)
 					assert(rawget(labels, index), "There is no label at index" .. index)
 					rawget(labels, index):Destroy()
 					rawset(labels, index, nil)
 				end
-			elseif index == "Get" then
+			elseif labelsIndex == "Get" then
 				return function(_, index)
 					-- @return The current label, or a newly constructed one
 
@@ -54,7 +54,7 @@ function RotatingLabel.new()
 					end
 				end
 			else
-				return rawget(labels, index)
+				return rawget(labels, labelsIndex)
 				-- error(index .. " is not a valid member")
 			end
 		end;
@@ -114,8 +114,8 @@ end
 	RotatingLabel.TextXAlignment
 		Sets the alignment on the X axis. Cannot be Center.
 ]]
-function RotatingLabel:__newindex(index, value)
-	if index == "Text" then
+function RotatingLabel:__newindex(topindex, value)
+	if topindex == "Text" then
 		if type(value) == "number" then
 			value = tostring(value)
 		end
@@ -164,18 +164,18 @@ function RotatingLabel:__newindex(index, value)
 		end
 
 		self:_beginUpdate()
-	elseif index == "Width" then
+	elseif topindex == "Width" then
 		self._width = value
 
 		for index, label in pairs(self._labels) do
 			label.Gui.Position = self:_getLabelPosition(index)
 		end
-	elseif index == "Transparency" or index == "Damper" or index == "Speed" then
-		self["_" .. index:lower()] = value
+	elseif topindex == "Transparency" or topindex == "Damper" or topindex == "Speed" then
+		self["_" .. topindex:lower()] = value
 		for _, label in pairs(self._labels) do
-			label[index] = self[index]
+			label[topindex] = self[topindex]
 		end
-	elseif index == "TextXAlignment" then
+	elseif topindex == "TextXAlignment" then
 		assert(value == "Left" or value == "Right", "value must be \"Left\" or \"Right\"")
 
 		if value == "Left" then
@@ -189,7 +189,7 @@ function RotatingLabel:__newindex(index, value)
 			label.Gui.Position = self:_getLabelPosition(index)
 		end
 	else
-		rawset(self, index, value)
+		rawset(self, topindex, value)
 	end
 end
 

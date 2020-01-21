@@ -70,7 +70,8 @@ function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
 		end
 	end
 
-	error(("[AnimationGroupUtils.selectFromWeightedTracks] - Failed to find a selection with option at %d"):format(selection))
+	error(("[AnimationGroupUtils.selectFromWeightedTracks] - Failed to find a selection with option at %d")
+		:format(selection))
 	return nil
 end
 

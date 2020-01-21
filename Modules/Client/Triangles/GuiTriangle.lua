@@ -81,7 +81,9 @@ function GuiTriangle:UpdateRender()
 		{longest = (b - a), other = (c - a), position = a};
 	}
 
-	table.sort(edges, function(a, b) return a.longest.Magnitude > b.longest.Magnitude end)
+	table.sort(edges, function(edge0, edge1)
+		return edge0.longest.Magnitude > edge1.longest.Magnitude
+	end)
 
 	local edge = edges[1]
 	edge.angle = math.acos(dotv2(edge.longest.unit, edge.other.unit))

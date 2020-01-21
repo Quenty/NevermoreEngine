@@ -64,7 +64,7 @@ function FABRIKConstraint:Constrain(lpoint, length)
 	local isInEllipse = inEllipse(lpoint, w, h)
 
 	if (lpoint.z >= 0) then
-		local x, y, z = lpoint.x, lpoint.y, -lpoint.z
+		local x, y, _ = lpoint.x, lpoint.y, -lpoint.z
 		if (x == 0 and y == 0) then
 			return Vector3.new(0, h, z)
 		else

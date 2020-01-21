@@ -3,4 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local SampleClass = require("SampleClass")
+
 print("Server loaded")
+
+SampleClass.new()

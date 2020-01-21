@@ -65,10 +65,7 @@ function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
 	local lastState = true
 
 	local function isEnabled()
-		for _, _ in pairs(realState) do
-			return false
-		end
-		return true
+		return next(realState) == nil
 	end
 
 	self._states[key] = setmetatable({}, {

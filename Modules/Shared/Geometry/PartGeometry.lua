@@ -221,21 +221,21 @@ local function GetGeometry(part, hit, cframeOverride)
         }
     elseif shape == "Terrain" then
         local cellPos = Workspace.Terrain:WorldToCellPreferSolid(hit)
-        local mat, block, orient = Workspace.Terrain:GetCell(cellPos.x, cellPos.y, cellPos.z)
-        local pos = Workspace.Terrain:CellCenterToWorld(cellPos.x, cellPos.y, cellPos.z)
+        local _, block, _ = Workspace.Terrain:GetCell(cellPos.x, cellPos.y, cellPos.z)
+        -- local pos = Workspace.Terrain:CellCenterToWorld(cellPos.x, cellPos.y, cellPos.z)
         --
         vertexMargin = 4
         --
-        local orientToNumberMap = {
-            [Enum.CellOrientation.NegZ] = 0;
-            [Enum.CellOrientation.X]    = 1;
-            [Enum.CellOrientation.Z]    = 2;
-            [Enum.CellOrientation.NegX] = 3;
-        }
+        -- local orientToNumberMap = {
+        --     [Enum.CellOrientation.NegZ] = 0;
+        --     [Enum.CellOrientation.X]    = 1;
+        --     [Enum.CellOrientation.Z]    = 2;
+        --     [Enum.CellOrientation.NegX] = 3;
+        -- }
         --
-        local xvec = CFrame.Angles(0, math.pi/2*(orientToNumberMap[orient]-1), 0).lookVector
-        local yvec = Vector3.new(0, 1, 0)
-        local zvec = xvec:Cross(yvec)
+        -- local xvec = CFrame.Angles(0, math.pi/2*(orientToNumberMap[orient]-1), 0).lookVector
+        -- local yvec = Vector3.new(0, 1, 0)
+        -- local zvec = xvec:Cross(yvec)
         --
         if block == Enum.CellBlock.Solid then
             --8 vertices

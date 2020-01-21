@@ -125,7 +125,9 @@ function OctreeRegionUtils.removeNode(lowestSubregion, node)
 end
 
 -- See basic algorithm:
+-- luacheck: push ignore
 -- https://github.com/PointCloudLibrary/pcl/blob/29f192af57a3e7bdde6ff490669b211d8148378f/octree/include/pcl/octree/impl/octree_search.hpp#L309
+-- luacheck: pop
 function OctreeRegionUtils.getNeighborsWithinRadius(
 		region, radiusSquared, px, py, pz, objectsFound, nodeDistances2, maxDepth)
 	assert(maxDepth)

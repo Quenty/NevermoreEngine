@@ -69,6 +69,7 @@ function SoundPlayer:__index(index)
 		return nil
 	elseif index == "Children" then
 		error("[SoundPlayer] - Should never get to this point. Tried to index children!")
+		return nil
 	elseif self._children[index] then
 		return self._children[index]
 	elseif type(index) == "string" then
@@ -80,12 +81,12 @@ function SoundPlayer:__index(index)
 			return newPlayer
 		else
 			error(("[SoundPlayer] - Bad index '%s.%s' does not exist"):format(self._folder:GetFullName(), tostring(index)))
+			return nil
 		end
 	else
 		error(("[SoundPlayer] - Bad index %q on sound player"):format(tostring(index)))
+		return nil
 	end
-
-	return self
 end
 
 function SoundPlayer:GetSoundGroup()

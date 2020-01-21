@@ -106,8 +106,14 @@ local function div(q0,q1)
 	if t0=="quaternion" and t1=="quaternion" then
 		local w0,x0,y0,z0,w1,x1,y1,z1=q0.w,q0.x,q0.y,q0.z,q1.w,q1.x,q1.y,q1.z
 		local m1=w1*w1+x1*x1+y1*y1+z1*z1
-		if m1>0 then--This is the quaternion that gets you from q1 to q0 from q1: mul(inv(q1),q0).  (quaternion division is actually ambiguous)
-			return new((w1*w0+x1*x0+y1*y0+z1*z0)/m1,(w1*x0-x1*w0-y1*z0+z1*y0)/m1,(w1*y0+x1*z0-y1*w0-z1*x0)/m1,(w1*z0-x1*y0+y1*x0-z1*w0)/m1)
+		if m1>0 then
+			-- This is the quaternion that gets you from q1 to q0 from q1: mul(inv(q1),q0).
+			-- (quaternion division is actually ambiguous)
+			return new(
+				(w1*w0+x1*x0+y1*y0+z1*z0)/m1,
+				(w1*x0-x1*w0-y1*z0+z1*y0)/m1,
+				(w1*y0+x1*z0-y1*w0-z1*x0)/m1,
+				(w1*z0-x1*y0+y1*x0-z1*w0)/m1)
 		else
 			return new(0)
 		end
@@ -146,7 +152,7 @@ local function pow(q0,q1)
 		local w1,x1,y1,z1=q1.w,q1.x,q1.y,q1.z
 		local m=exp(w0*w1-x0*x1-y0*y1-z0*z1)
 		local x,y,z=w0*x1+x0*w1+y0*z1-z0*y1,w0*y1-x0*z1+y0*w1+z0*x1,w0*z1+x0*y1-y0*x1+z0*w1
-		local vv=x*x+y*y+z*z
+		vv=x*x+y*y+z*z
 		if vv>0 then
 			local v=vv^0.5
 			local s=m*sin(v)/v
@@ -192,7 +198,9 @@ local function pow(q0,q1)
 				local v=vv^0.5
 				local c,s=cos(v),sin(v)/v
 				local vc,vs=mc*s,ms*c*0.57735026918962576450914878050196
-				return new(mc*c-ms*s,vc*x+vs,vc*y+vs,vc*z+vs)--This is probably TERRIBLY wrong, but raising a negative number to the power of a quaternion is ill-defined in the first place.
+				-- This is probably TERRIBLY wrong, but raising a negative number to the power of a quaternion is ill-defined in the
+				-- first place.
+				return new(mc*c-ms*s,vc*x+vs,vc*y+vs,vc*z+vs)
 			else
 				--- No idea why this is broken! Weird edge case!
 				warn("Hitting weird quaternion edge case!")

@@ -14,7 +14,8 @@ end
 -- @treturn number The level the player should be
 function lib.GetLevel(experience)
 	return math.floor(
-		(lib._experienceFactor + math.sqrt(lib._experienceFactor*lib._experienceFactor - 4*lib._experienceFactor*(-experience)))
+		(lib._experienceFactor
+			+ math.sqrt(lib._experienceFactor*lib._experienceFactor - 4*lib._experienceFactor*(-experience)))
 		/(2*lib._experienceFactor))
 end
 

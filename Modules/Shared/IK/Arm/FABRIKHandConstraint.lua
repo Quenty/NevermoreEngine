@@ -2,8 +2,6 @@
 -- @classmod FABRIKHandConstraint
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
 local FABRIKHandConstraint = {}
 FABRIKHandConstraint.ClassName = "FABRIKHandConstraint"
 FABRIKHandConstraint.__index = FABRIKHandConstraint

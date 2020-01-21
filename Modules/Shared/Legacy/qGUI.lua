@@ -170,12 +170,13 @@ end
 --                      setup so {Index = NewValue} that is, for example,
 --                      {TextTransparency = 1}.
 -- @param Time The amount of time to spend transitioning.
-local TweenTransparency, StopTransparencyTween = MakePropertyTweener(function(Gui, Percent, StartProperties, NewProperties)
-	for Index, EndValue in next, NewProperties do
-		local StartProperty = StartProperties[Index]
-		Gui[Index] = StartProperty + (EndValue - StartProperty) * Percent
-	end
-end)
+local TweenTransparency, StopTransparencyTween = MakePropertyTweener(
+	function(Gui, Percent, StartProperties, NewProperties)
+		for Index, EndValue in next, NewProperties do
+			local StartProperty = StartProperties[Index]
+			Gui[Index] = StartProperty + (EndValue - StartProperty) * Percent
+		end
+	end)
 
 lib.TweenTransparency = TweenTransparency
 lib.StopTransparencyTween = StopTransparencyTween
@@ -195,7 +196,11 @@ local TweenColor3, StopColor3Tween do
 	end
 
 	local function LerpColor3(ColorOne, ColorTwo, Alpha)
-		return Color3.new(LerpNumber(ColorOne.r, ColorTwo.r, Alpha), LerpNumber(ColorOne.g, ColorTwo.g, Alpha), LerpNumber(ColorOne.b, ColorTwo.b, Alpha))
+		return Color3.new(
+			LerpNumber(ColorOne.r, ColorTwo.r, Alpha),
+			LerpNumber(ColorOne.g, ColorTwo.g, Alpha),
+			LerpNumber(ColorOne.b, ColorTwo.b, Alpha)
+		)
 	end
 
 	TweenColor3, StopColor3Tween = MakePropertyTweener(function(Gui, Percent, StartProperties, NewProperties)
@@ -303,7 +308,8 @@ lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	Properties = Properties or {}
 	Type = Type or "ImageLabel"
-	local TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight = AddTexturedWindowTemplate(Frame, Radius, Type)
+	local TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
+		= AddTexturedWindowTemplate(Frame, Radius, Type)
 
 	Middle.Size = UDim2.new(1, -Radius*2, 1, -Radius*2) -- Fix middle...
 	Middle.Position = UDim2.new(0, Radius, 0, Radius)
@@ -330,7 +336,9 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	MiddleBottom.ZIndex = Frame.ZIndex
 	MiddleBottom.Parent = Frame
 
-	for _, Item in pairs({TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom}) do
+	for _, Item in pairs(
+		{TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom}
+	) do
 		for Property, Value in pairs(Properties) do
 			Item[Property] = Value
 		end

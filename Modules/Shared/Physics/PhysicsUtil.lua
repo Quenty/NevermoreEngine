@@ -88,11 +88,12 @@ function PhysicsUtil.BodyMomentOfInertia(parts, axis, origin)
 	return TotalBodyInertia
 end
 
---- Applies a force to a ROBLOX body
+--- Applies a force to a Roblox body
 -- @param force the force vector to apply
 -- @param forcePosition The position that the force is to be applied from (World vector).
 --
--- It should be noted that setting the velocity to one part of a connected part on ROBLOX sets the velocity of the whole physics model.
+-- It should be noted that setting the velocity to one part of a connected part on Roblox sets
+-- the velocity of the whole physics model.
 -- http://xboxforums.create.msdn.com/forums/p/34179/196459.aspx
 -- http://www.cs.cmu.edu/~baraff/sigcourse/notesd1.pdf
 function PhysicsUtil.ApplyForce(part, force, forcePosition)
@@ -105,7 +106,13 @@ function PhysicsUtil.ApplyForce(part, force, forcePosition)
 	local Torque = Offset:Cross(force)
 
 	local MomentOfInertia = PhysicsUtil.BodyMomentOfInertia(parts, Torque, CenterOfMass)
-	local RotAcceleration = MomentOfInertia ~= 0 and Torque/MomentOfInertia or Vector3.new(0, 0, 0) -- We cannot divide by 0
+	local RotAcceleration
+	if MomentOfInertia ~= 0 then
+		RotAcceleration = Torque/MomentOfInertia
+	else
+		RotAcceleration = Vector3.new(0, 0, 0) -- We cannot divide by 0
+	end
+
 	local acceleration = force/mass
 
 	part.RotVelocity = part.RotVelocity + RotAcceleration

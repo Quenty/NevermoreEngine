@@ -2,8 +2,6 @@
 -- @classmod FABRIKShoulderConstraint
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
 local FABRIKShoulderConstraint = {}
 FABRIKShoulderConstraint.ClassName = "FABRIKShoulderConstraint"
 FABRIKShoulderConstraint.__index = FABRIKShoulderConstraint

@@ -25,7 +25,9 @@ function GamepadRotateModel.new()
 end
 
 do
+	-- luacheck: push ignore
 	-- See: https://github.com/Roblox/Core-Scripts/blob/cad3a477e39b93ecafdd610b1d8b89d239ab18e2/PlayerScripts/StarterPlayerScripts/CameraScript/RootCamera.lua#L395
+	-- luacheck: pop
 	-- K is a tunable parameter that changes the shape of the S-curve
 	-- the larger K is the more straight/linear the curve gets
 	local k = 0.35

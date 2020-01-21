@@ -1,10 +1,6 @@
 ---
 -- @module FABRIKUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
-local FABRIKBone = require("FABRIKBone")
-
 local FABRIKUtils = {}
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
@@ -15,7 +11,6 @@ local EPSILON = 1e-3
 function FABRIKUtils.pointsFromAttachment(relativeCFrame, attachmentGroupsPerPart)
 	local points = {}
 	local offsets = {}
-	local totalOffset = Vector3.new()
 
 	local lastAttachmentCFrame
 	for index, group in pairs(attachmentGroupsPerPart) do

@@ -95,11 +95,6 @@ WEDGE.Material = Enum.Material.SmoothPlastic
 WEDGE.Anchored = true
 WEDGE.CanCollide = false
 
-local MESH = Instance.new("SpecialMesh")
-MESH.MeshType = Enum.MeshType.Wedge
-MESH.Scale = Vector3.new(1, 1, 1)
---MESH.Parent = WEDGE
-
 local PART = Instance.new("Part")
 PART.Size = Vector3.new(.5, .5, .5)
 PART.Anchored = true

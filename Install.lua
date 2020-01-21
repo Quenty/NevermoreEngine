@@ -27,8 +27,6 @@ local HttpService = game:GetService("HttpService")
 -- Module
 local GitHub = {}
 
-local DataSources = {}
-
 -- Helper Functions
 local ScriptTypes = {
 	[""] = "ModuleScript";
@@ -56,8 +54,9 @@ local function GetAsync(...)
 		OpenGetRequests = OpenGetRequests + 1
 		require(script.Parent.UI):CreateSnackbar(Data)
 		repeat
-			local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-		until Success and not Data:find("Http requests are not enabled") or require(script.Parent.UI):CreateSnackbar(Data) or not wait(1)
+			Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
+		until Success and not Data:find("Http requests are not enabled")
+			or require(script.Parent.UI):CreateSnackbar(Data) or not wait(1)
 		OpenGetRequests = 0
 		return GetAsync(...)
 	else
@@ -66,7 +65,6 @@ local function GetAsync(...)
 end
 
 local function GiveSourceToScript(Link, Script)
-	DataSources[Script] = Link
 	Script.Source = GetAsync(Link)
 end
 
@@ -81,12 +79,16 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 	local FolderCount = 0
 	local Folders = {}
 
-	for Link in GetAsync(Link):gmatch("<tr class=\"js%-navigation%-item\">.-<a class=\"js%-navigation%-open\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</tr>") do
-		if Link:find("/[^/]+/[^/]+/tree") then
+	-- luacheck: push ignore
+	local MATCH_STRING = "<tr class=\"js%-navigation%-item\">.-<a class=\"js%-navigation%-open\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</tr>"
+	-- luacheck: pop ignore
+
+	for found_link in GetAsync(Link):gmatch(MATCH_STRING) do
+		if found_link:find("/[^/]+/[^/]+/tree") then
 			FolderCount = FolderCount + 1
 			Folders[FolderCount] = Link
-		elseif Link:find("/[^/]+/[^/]+/blob.+%.lua$") then
-			local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
+		elseif found_link:find("/[^/]+/[^/]+/blob.+%.lua$") then
+			local ScriptName, ScriptClass = found_link:match("([%w-_%%]+)%.?(%l*)%.lua$")
 
 			if ScriptName:lower() ~= "install" then
 				if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
@@ -96,11 +98,11 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 					for a = ScriptCount, 2, -1 do
 						Scripts[a] = Scripts[a - 1]
 					end
-					Scripts[1] = Link
+					Scripts[1] = found_link
 					MainExists = true
 				else
 					ScriptCount = ScriptCount + 1
-					Scripts[ScriptCount] = Link
+					Scripts[ScriptCount] = found_link
 				end
 			end
 		end
@@ -140,7 +142,6 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 						Parent, Generated = GetFirstChild(Parent, FolderName, "Folder")
 						if Generated then
 							if not Routines[1] then Routines[1] = Parent end
-							DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 2 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
 						end
 					end
 				end
@@ -221,14 +222,21 @@ function GitHub:Install(Link, Parent, RoutineList)
 	local Garbage
 
 	if ScriptName then
-		Link = "https://raw.githubusercontent.com/" .. Organization .. "/" .. Repository .. "/" .. (Tree or "master") .. Directory
+		Link = "https://raw.githubusercontent.com/" .. Organization .. "/"
+			.. Repository .. "/" .. (Tree or "master") .. Directory
+
 		local Source = GetAsync(Link)
-		local Script = GetFirstChild(Parent and not RoutineList and Repository ~= ScriptName and Parent.Name ~= ScriptName and GetFirstChild(Parent, Repository, "Folder") or Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or "mod"])
-		DataSources[Script] = Link
+		local Script = GetFirstChild(
+			Parent and not RoutineList and Repository ~= ScriptName and Parent.Name ~= ScriptName
+				and GetFirstChild(Parent, Repository, "Folder") or Parent,
+			ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode),
+			ScriptTypes[ScriptClass or "mod"])
+
 		if not Routines[1] then Routines[1] = Script end
 		Script.Source = Source
 	elseif Repository then
-		Link = Website .. Organization .. "/" .. Repository .. ((Tree or Directory ~= "") and ("/tree/" .. (Tree or "master") .. Directory) or "")
+		Link = Website .. Organization .. "/" .. Repository ..
+			((Tree or Directory ~= "") and ("/tree/" .. (Tree or "master") .. Directory) or "")
 		if not Parent then Parent, Garbage = Instance.new("Folder"), true end
 		coroutine.resume(coroutine.create(InstallRepo), Link, 1, Parent, Routines) -- "/" .. Repository .. Directory
 	elseif Organization then
@@ -238,9 +246,10 @@ function GitHub:Install(Link, Parent, RoutineList)
 
 		if not Routines[1] then Routines[1] = Object end
 
-		for Link, Data in Data:gmatch('<a href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository">(.-)</div>') do
-			if not Data:match("Forked from") and not Link:find("Plugin") then
-				GitHub:Install(Link, Object, Routines)
+		for ParsedLink, ParsedData in Data:gmatch(
+			'<a href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository">(.-)</div>') do
+			if not ParsedData:match("Forked from") and not ParsedLink:find("Plugin") then
+				GitHub:Install(ParsedLink, Object, Routines)
 			end
 		end
 	end
@@ -262,29 +271,32 @@ function GitHub:Install(Link, Parent, RoutineList)
 			Object.Parent = nil
 			Parent:Destroy()
 		end
-		DataSources[Object] = Link
 		return Object
 	end
 end
 
-GitHub:Install("https://github.com/Quenty/NevermoreEngine/tree/version2/Modules", game:GetService("ServerScriptService")).Name = "Nevermore"
-local init = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/init.lua")
+GitHub:Install(
+	"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
+	game:GetService("ServerScriptService")
+).Name = "Nevermore"
+
+local init = GitHub:Install(
+	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/init.lua")
 init.Name = "Nevermore"
 init.Parent = game:GetService("ReplicatedStorage")
 
-local moduleScriptUtils = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptUtils.lua")
+local moduleScriptUtils = GitHub:Install(
+	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptUtils.lua")
 moduleScriptUtils.Name = "ModuleScriptUtils"
 moduleScriptUtils.Parent = init
 
-local moduleScriptUtils = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptUtils.lua")
-moduleScriptUtils.Name = "ModuleScriptUtils"
-moduleScriptUtils.Parent = init
-
-local replicationUtils = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ReplicationUtils.lua")
+local replicationUtils = GitHub:Install(
+	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ReplicationUtils.lua")
 replicationUtils.Name = "ReplicationUtils"
 replicationUtils.Parent = init
 
-local moduleScriptLoader = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptLoader.lua")
+local moduleScriptLoader = GitHub:Install(
+	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptLoader.lua")
 moduleScriptLoader.Name = "ModuleScriptLoader"
 moduleScriptLoader.Parent = init
 
