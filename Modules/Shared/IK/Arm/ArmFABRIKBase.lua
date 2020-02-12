@@ -204,8 +204,8 @@ function ArmFABRIKBase:_calculateTransforms(worldPosition)
 	if game:GetService("RunService"):IsClient() then
 		self._drawer = self._drawer or require("Drawer").new()
 		self._drawer:Clear()
-		for _, item in pairs(self._chain:GetPoints()) do
-			self._maid[_ .. "pt"] = require("Draw").point(baseCFrame:pointToWorldSpace(item), nil, nil, 0.1)
+		for key, item in pairs(self._chain:GetPoints()) do
+			self._maid[key .. "pt"] = require("Draw").point(baseCFrame:pointToWorldSpace(item), nil, nil, 0.1)
 		end
 
 		-- self._resources:Get("Hand").Transparency = 0.7
