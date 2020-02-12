@@ -27,6 +27,10 @@ function RoduxActionFactory.new(actionName, typeTable)
 	return self
 end
 
+function RoduxActionFactory:GetType()
+	return self._actionName
+end
+
 function RoduxActionFactory:__call(...)
 	return self:Create(...)
 end
