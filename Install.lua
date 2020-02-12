@@ -3,6 +3,9 @@
 -- function GitHub:Install(Link, Parent)
 --		@returns <Folder/LuaSourceContainer> from Link found starting at Link into Parent
 
+-- TODO: This script needs to be refactored
+-- luacheck: push ignore
+
 local function GetFirstChild(Parent, Name, Class)
 	if Parent then -- GetFirstChildWithNameOfClass
 		local Objects = Parent:GetChildren()
@@ -26,6 +29,8 @@ local HttpService = game:GetService("HttpService")
 
 -- Module
 local GitHub = {}
+
+local DataSources = {}
 
 -- Helper Functions
 local ScriptTypes = {
@@ -54,9 +59,8 @@ local function GetAsync(...)
 		OpenGetRequests = OpenGetRequests + 1
 		require(script.Parent.UI):CreateSnackbar(Data)
 		repeat
-			Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-		until Success and not Data:find("Http requests are not enabled")
-			or require(script.Parent.UI):CreateSnackbar(Data) or not wait(1)
+			local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
+		until Success and not Data:find("Http requests are not enabled") or require(script.Parent.UI):CreateSnackbar(Data) or not wait(1)
 		OpenGetRequests = 0
 		return GetAsync(...)
 	else
@@ -65,6 +69,7 @@ local function GetAsync(...)
 end
 
 local function GiveSourceToScript(Link, Script)
+	DataSources[Script] = Link
 	Script.Source = GetAsync(Link)
 end
 
@@ -79,16 +84,12 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 	local FolderCount = 0
 	local Folders = {}
 
-	-- luacheck: push ignore
-	local MATCH_STRING = "<tr class=\"js%-navigation%-item\">.-<a class=\"js%-navigation%-open\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</tr>"
-	-- luacheck: pop ignore
-
-	for found_link in GetAsync(Link):gmatch(MATCH_STRING) do
-		if found_link:find("/[^/]+/[^/]+/tree") then
+	for Link in GetAsync(Link):gmatch("<tr class=\"js%-navigation%-item\">.-<a class=\"js%-navigation%-open\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</tr>") do
+		if Link:find("/[^/]+/[^/]+/tree") then
 			FolderCount = FolderCount + 1
 			Folders[FolderCount] = Link
-		elseif found_link:find("/[^/]+/[^/]+/blob.+%.lua$") then
-			local ScriptName, ScriptClass = found_link:match("([%w-_%%]+)%.?(%l*)%.lua$")
+		elseif Link:find("/[^/]+/[^/]+/blob.+%.lua$") then
+			local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
 
 			if ScriptName:lower() ~= "install" then
 				if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
@@ -98,11 +99,11 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 					for a = ScriptCount, 2, -1 do
 						Scripts[a] = Scripts[a - 1]
 					end
-					Scripts[1] = found_link
+					Scripts[1] = Link
 					MainExists = true
 				else
 					ScriptCount = ScriptCount + 1
-					Scripts[ScriptCount] = found_link
+					Scripts[ScriptCount] = Link
 				end
 			end
 		end
@@ -142,6 +143,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 						Parent, Generated = GetFirstChild(Parent, FolderName, "Folder")
 						if Generated then
 							if not Routines[1] then Routines[1] = Parent end
+							DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 2 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
 						end
 					end
 				end
@@ -222,21 +224,14 @@ function GitHub:Install(Link, Parent, RoutineList)
 	local Garbage
 
 	if ScriptName then
-		Link = "https://raw.githubusercontent.com/" .. Organization .. "/"
-			.. Repository .. "/" .. (Tree or "master") .. Directory
-
+		Link = "https://raw.githubusercontent.com/" .. Organization .. "/" .. Repository .. "/" .. (Tree or "master") .. Directory
 		local Source = GetAsync(Link)
-		local Script = GetFirstChild(
-			Parent and not RoutineList and Repository ~= ScriptName and Parent.Name ~= ScriptName
-				and GetFirstChild(Parent, Repository, "Folder") or Parent,
-			ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode),
-			ScriptTypes[ScriptClass or "mod"])
-
+		local Script = GetFirstChild(Parent and not RoutineList and Repository ~= ScriptName and Parent.Name ~= ScriptName and GetFirstChild(Parent, Repository, "Folder") or Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or "mod"])
+		DataSources[Script] = Link
 		if not Routines[1] then Routines[1] = Script end
 		Script.Source = Source
 	elseif Repository then
-		Link = Website .. Organization .. "/" .. Repository ..
-			((Tree or Directory ~= "") and ("/tree/" .. (Tree or "master") .. Directory) or "")
+		Link = Website .. Organization .. "/" .. Repository .. ((Tree or Directory ~= "") and ("/tree/" .. (Tree or "master") .. Directory) or "")
 		if not Parent then Parent, Garbage = Instance.new("Folder"), true end
 		coroutine.resume(coroutine.create(InstallRepo), Link, 1, Parent, Routines) -- "/" .. Repository .. Directory
 	elseif Organization then
@@ -246,10 +241,9 @@ function GitHub:Install(Link, Parent, RoutineList)
 
 		if not Routines[1] then Routines[1] = Object end
 
-		for ParsedLink, ParsedData in Data:gmatch(
-			'<a href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository">(.-)</div>') do
-			if not ParsedData:match("Forked from") and not ParsedLink:find("Plugin") then
-				GitHub:Install(ParsedLink, Object, Routines)
+		for Link, Data in Data:gmatch('<a href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository">(.-)</div>') do
+			if not Data:match("Forked from") and not Link:find("Plugin") then
+				GitHub:Install(Link, Object, Routines)
 			end
 		end
 	end
@@ -271,9 +265,12 @@ function GitHub:Install(Link, Parent, RoutineList)
 			Object.Parent = nil
 			Parent:Destroy()
 		end
+		DataSources[Object] = Link
 		return Object
 	end
 end
+
+-- luacheck: pop ignore
 
 GitHub:Install(
 	"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
@@ -301,4 +298,5 @@ moduleScriptLoader.Name = "ModuleScriptLoader"
 moduleScriptLoader.Parent = init
 
 HttpService.HttpEnabled = ...
+
 print("NevermoreEngine installed.")
