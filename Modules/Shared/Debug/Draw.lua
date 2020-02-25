@@ -37,6 +37,7 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	part.Archivable = false
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.CanCollide = false
+	part.CastShadow = false
 	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(math.pi/2, 0, 0)
 	part.Color = color
 	part.Name = "DebugRay"
@@ -74,6 +75,7 @@ function Draw.point(vector3, color, parent, diameter)
 	part.Archivable = false
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.CanCollide = false
+	part.CastShadow = false
 	part.CFrame = CFrame.new(vector3)
 	part.Color = color
 	part.Name = "DebugPoint"
@@ -105,6 +107,7 @@ function Draw.box(cframe, size, color)
 	part.Name = "DebugPart"
 	part.Anchored = true
 	part.CanCollide = false
+	part.CastShadow = false
 	part.Archivable = false
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.TopSurface = Enum.SurfaceType.Smooth
