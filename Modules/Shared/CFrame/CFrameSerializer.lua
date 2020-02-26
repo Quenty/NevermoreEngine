@@ -16,7 +16,7 @@ end
 local bitSize22 = (2^21-1)
 local bitSize21 = (2^20-1)
 
-function CFrameSerializer.OutputRotationAzure(cf)
+function CFrameSerializer.outputRotationAzure(cf)
 	local lookVector = cf.lookVector
 	local azumith = atan2(-lookVector.X, -lookVector.Z)
 	local ybase = (lookVector.X^2 + lookVector.Z^2)^0.5
@@ -41,7 +41,11 @@ function CFrameSerializer.OutputRotationAzure(cf)
 	return {px, py, pz, azumith, roll, elevation}
 end
 
-function CFrameSerializer.ReadRotationAzure(data)
+function CFrameSerializer.readPosition(data)
+	return Vector3.new(data[1], data[2], data[3])
+end
+
+function CFrameSerializer.readRotationAzure(data)
 	local azumith = data[4]
 	local roll = data[5] --Buffer:ReadSigned(21)
 	local elevation = data[6] --Buffer:ReadSigned(21)
