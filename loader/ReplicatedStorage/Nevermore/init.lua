@@ -40,8 +40,10 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ModuleScriptLoader = require(script:WaitForChild("ModuleScriptLoader"))
 local ReplicationUtils = require(script:WaitForChild("ReplicationUtils"))
 
-if RunService:IsServer() and RunService:IsClient() then
-	warn("Warning: Loading all modules in PlaySolo. It's recommended you use accurate play solo.")
+if RunService:IsServer() and RunService:IsClient() or (not RunService:IsRunning()) then
+	if not RunService:IsRunning() then
+		warn("Warning: Loading all modules in PlaySolo. It's recommended you use accurate play solo.")
+	end
 
 	local loader = ModuleScriptLoader.new({
 		-- Allowed modules
