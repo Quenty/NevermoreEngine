@@ -41,7 +41,7 @@ local ModuleScriptLoader = require(script:WaitForChild("ModuleScriptLoader"))
 local ReplicationUtils = require(script:WaitForChild("ReplicationUtils"))
 
 if RunService:IsServer() and RunService:IsClient() or (not RunService:IsRunning()) then
-	if not RunService:IsRunning() then
+	if RunService:IsRunning() then
 		warn("Warning: Loading all modules in PlaySolo. It's recommended you use accurate play solo.")
 	end
 
