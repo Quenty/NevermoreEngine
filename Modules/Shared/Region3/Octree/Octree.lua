@@ -49,18 +49,16 @@ function Octree:RadiusSearch(position, radius)
 	assert(typeof(position) == "Vector3")
 	assert(type(radius) == "number")
 
-	local radiusSquared = radius*radius
 	local px, py, pz = position.x, position.y, position.z
-	return self:_radiusSearch(px, py, pz, radiusSquared)
+	return self:_radiusSearch(px, py, pz, radius)
 end
 
 function Octree:KNearestNeighborsSearch(position, k, radius)
 	assert(typeof(position) == "Vector3")
 	assert(type(radius) == "number")
 
-	local radiusSquared = radius*radius
 	local px, py, pz = position.x, position.y, position.z
-	local objects, nodeDistances2 = self:_radiusSearch(px, py, pz, radiusSquared)
+	local objects, nodeDistances2 = self:_radiusSearch(px, py, pz, radius)
 
 	local sortable = {}
 	for index, dist2 in pairs(nodeDistances2) do
@@ -90,14 +88,12 @@ function Octree:CreateLowestSubRegion(px, py, pz)
 	return OctreeRegionUtils.createSubRegionAtDepth(region, px, py, pz, self._maxDepth)
 end
 
-function Octree:_radiusSearch(px, py, pz, radiusSquared)
+function Octree:_radiusSearch(px, py, pz, radius)
 	local objectsFound = {}
 	local nodeDistances2 = {}
 
-	local regionDiameter = self._maxRegionSize[1]
-	local regionDiameterSquared = regionDiameter*regionDiameter
-	local searchRadius = regionDiameterSquared/4 + radiusSquared + math.sqrt((regionDiameterSquared)*radiusSquared)
-		- EPSILON
+	local diameter = self._maxRegionSize[1]
+	local searchRadiusSquared = OctreeRegionUtils.getSearchRadiusSquared(radius, diameter, EPSILON)
 
 	for _, region in pairs(self._regions) do
 		local rpos = region.position
@@ -105,9 +101,9 @@ function Octree:_radiusSearch(px, py, pz, radiusSquared)
 		local ox, oy, oz = px - rpx, py - rpy, pz - rpz
 		local dist2 = ox*ox + oy*oy + oz*oz
 
-		if dist2 <= searchRadius then
+		if dist2 <= searchRadiusSquared then
 			OctreeRegionUtils.getNeighborsWithinRadius(
-				region, radiusSquared, px, py, pz, objectsFound, nodeDistances2, self._maxDepth)
+				region, radius, px, py, pz, objectsFound, nodeDistances2, self._maxDepth)
 		end
 	end
 

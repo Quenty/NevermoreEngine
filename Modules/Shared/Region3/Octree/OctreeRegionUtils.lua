@@ -6,6 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Draw = require("Draw")
 
 local EPSILON = 1e-6
+local SQRT_3_OVER_2 = math.sqrt(3)/2
 
 local OctreeRegionUtils = {}
 
@@ -124,18 +125,24 @@ function OctreeRegionUtils.removeNode(lowestSubregion, node)
 	end
 end
 
+function OctreeRegionUtils.getSearchRadiusSquared(radius, diameter, epsilon)
+	local diagonal = SQRT_3_OVER_2*diameter
+	local searchRadius = radius + diagonal
+	return searchRadius*searchRadius + epsilon
+end
+
 -- See basic algorithm:
 -- luacheck: push ignore
 -- https://github.com/PointCloudLibrary/pcl/blob/29f192af57a3e7bdde6ff490669b211d8148378f/octree/include/pcl/octree/impl/octree_search.hpp#L309
 -- luacheck: pop
 function OctreeRegionUtils.getNeighborsWithinRadius(
-		region, radiusSquared, px, py, pz, objectsFound, nodeDistances2, maxDepth)
+		region, radius, px, py, pz, objectsFound, nodeDistances2, maxDepth)
 	assert(maxDepth)
 
-	local diameter = region.size[1]
-	local squaredDiameter = diameter*diameter
-	local childDiameter = squaredDiameter / 4
-	local searchRadius = childDiameter + radiusSquared + math.sqrt(squaredDiameter*radiusSquared) - EPSILON
+	local childDiameter = region.size[1]/2
+	local searchRadiusSquared = OctreeRegionUtils.getSearchRadiusSquared(radius, childDiameter, EPSILON)
+
+	local radiusSquared = radius*radius
 
 	-- for each child
 	for _, childRegion in pairs(region.subRegions) do
@@ -146,7 +153,7 @@ function OctreeRegionUtils.getNeighborsWithinRadius(
 		local dist2 = ox*ox + oy*oy + oz*oz
 
 		-- within search radius
-		if dist2 <= searchRadius then
+		if dist2 <= searchRadiusSquared then
 			if childRegion.depth == maxDepth then
 				for node, _ in pairs(childRegion.nodes) do
 					local npx, npy, npz = node:GetRawPosition()
@@ -159,7 +166,7 @@ function OctreeRegionUtils.getNeighborsWithinRadius(
 				end
 			else
 				OctreeRegionUtils.getNeighborsWithinRadius(
-					childRegion, radiusSquared, px, py, pz, objectsFound, nodeDistances2, maxDepth)
+					childRegion, radius, px, py, pz, objectsFound, nodeDistances2, maxDepth)
 			end
 		end
 	end
