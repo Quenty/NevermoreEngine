@@ -10,21 +10,26 @@ local OverriddenProperty = setmetatable({}, BaseObject)
 OverriddenProperty.ClassName = "OverriddenProperty"
 OverriddenProperty.__index = OverriddenProperty
 
+---
+-- @param[opt=nil] replicateRate Optional replication rate and callback
+-- @param[opt=nil] replicateCallback
 function OverriddenProperty.new(robloxInstance, propertyName, replicateRate, replicateCallback)
 	local self = setmetatable(BaseObject.new(robloxInstance), OverriddenProperty)
 
 	assert(typeof(robloxInstance) == "Instance")
 	assert(type(propertyName) == "string")
-	assert(type(replicateRate) == "number")
-	assert(type(replicateCallback) == "function")
 
 	self._disconnectCount = 0
-	self._replicateCallback = replicateCallback or error("No replicateCallback")
 	self._propertyName = propertyName or error("No propertyName")
 	self._value = self._obj[self._propertyName]
 
-	self._throttledExecuteReplicate = ThrottledFunction.new(replicateRate, self._replicateCallback)
-	self._maid:GiveTask(self._throttledExecuteReplicate)
+	if replicateRate ~= nil then
+		assert(type(replicateRate) == "number")
+		assert(type(replicateCallback) == "function")
+
+		self._throttledExecuteReplicate = ThrottledFunction.new(replicateRate, replicateCallback)
+		self._maid:GiveTask(self._throttledExecuteReplicate)
+	end
 
 	self:_updateListenBinding()
 
@@ -46,7 +51,7 @@ function OverriddenProperty:_executeSet(doReplicate)
 	self:_pushDisconnectChange()
 	self._obj[self._propertyName] = self._value
 
-	if doReplicate then
+	if doReplicate and self._throttledExecuteReplicate then
 		self._throttledExecuteReplicate:Call(self._value)
 	end
 
