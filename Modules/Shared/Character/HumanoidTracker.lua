@@ -7,6 +7,7 @@ local fastSpawn = require("fastSpawn")
 local Maid = require("Maid")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
+local Promise = require("Promise")
 
 local HumanoidTracker = {}
 HumanoidTracker.ClassName = "HumanoidTracker"
@@ -42,6 +43,32 @@ function HumanoidTracker.new(player)
 	self._maid:GiveTask(self.HumanoidDied)
 
 	return self
+end
+
+function HumanoidTracker:PromiseNextHumanoid()
+	if self.Humanoid.Value then
+		return Promise.resolved(self.Humanoid.Value)
+	end
+
+	if self._maid._nextHumanoidPromise then
+		return self._maid._nextHumanoidPromise
+	end
+
+	local promise = Promise.new()
+
+	local conn = self.Humanoid.Changed:Connect(function(newValue)
+		if newValue then
+			promise:Resolve(newValue)
+		end
+	end)
+
+	promise:Finally(function()
+		conn:Disconnect()
+	end)
+
+	self._maid._nextHumanoidPromise = promise
+
+	return promise
 end
 
 function HumanoidTracker:_handleCharacter(character)
