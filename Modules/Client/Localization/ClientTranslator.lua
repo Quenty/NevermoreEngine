@@ -4,8 +4,8 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local LocalizationService = game:GetService("LocalizationService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local JsonToLocalizationTable = require("JsonToLocalizationTable")
@@ -81,6 +81,7 @@ end
 function ClientTranslatorFacade:FormatByKey(key, ...)
 	assert(self._clientTranslator, "ClientTranslator is not initialized")
 	assert(type(key) == "string", "Key must be a string")
+
 	local data = {...}
 	local result
 	local ok, err = pcall(function()
