@@ -18,8 +18,8 @@ IKRigBase.__index = IKRigBase
 function IKRigBase.new(humanoid)
 	local self = setmetatable(BaseObject.new(humanoid), IKRigBase)
 
-	self.Updated = Signal.new()
-	self._maid:GiveTask(self.Updated)
+	self.Updating = Signal.new()
+	self._maid:GiveTask(self.Updating)
 
 	self._ikTargets = {}
 	self._character = humanoid.Parent or error("No character")
@@ -43,7 +43,7 @@ end
 
 function IKRigBase:Update()
 	self._lastUpdateTime = tick()
-	self.Updated:Fire()
+	self.Updating:Fire()
 
 	for _, item in pairs(self._ikTargets) do
 		item:Update()
