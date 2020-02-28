@@ -11,6 +11,7 @@ local IKConstants = require("IKConstants")
 local Binder = require("Binder")
 local Maid = require("Maid")
 local HumanoidTracker = require("HumanoidTracker")
+local promiseBoundClass = require("promiseBoundClass")
 
 local SERVER_UPDATE_RATE = 1/10
 
@@ -41,6 +42,15 @@ end
 
 function IKService:GetRig(humanoid)
 	return self._ikRigBinder:Bind(humanoid)
+end
+
+function IKService:PromiseRig(maid, humanoid)
+	assert(maid)
+	assert(typeof(humanoid) == "Instance")
+
+	local promise = promiseBoundClass(self._ikRigBinder, humanoid)
+	maid:GiveTask(promise)
+	return promise
 end
 
 function IKService:RemoveRig(humanoid)

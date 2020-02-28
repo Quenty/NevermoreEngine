@@ -11,6 +11,7 @@ local IKConstants = require("IKConstants")
 local Maid = require("Maid")
 local Binder = require("Binder")
 local IKRigUtils = require("IKRigUtils")
+local promiseBoundClass = require("promiseBoundClass")
 
 local IKServiceClient = {}
 
@@ -23,6 +24,15 @@ function IKServiceClient:Init()
 	end))
 
 	self._ikRigBinder:Init()
+end
+
+function IKServiceClient:PromiseRig(maid, humanoid)
+	assert(maid)
+	assert(typeof(humanoid) == "Instance")
+
+	local promise = promiseBoundClass(self._ikRigBinder, humanoid)
+	maid:GiveTask(promise)
+	return promise
 end
 
 function IKServiceClient:GetRig(humanoid)
