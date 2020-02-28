@@ -76,7 +76,16 @@ end
 function MouseShiftLockService:_updateEnable()
 	local cameras = self._playerModule:GetCameras()
 	local cameraController = cameras.activeCameraController
+	if not cameraController then
+		warn("[MouseShiftLockService._updateEnable] - No activeCameraController")
+		return
+	end
+
 	local mouseLockController = cameras.activeMouseLockController
+	if not mouseLockController then
+		warn("[MouseShiftLockService._updateEnable] - No activeMouseLockController")
+		return
+	end
 
 	self._boundKeys.Value = self._lastBoundKeyValues
 	if self._wasMouseLockEnabled then
@@ -88,7 +97,16 @@ end
 function MouseShiftLockService:_updateDisable()
 	local cameras = self._playerModule:GetCameras()
 	local cameraController = cameras.activeCameraController
+	if not cameraController then
+		warn("[MouseShiftLockService._updateDisable] - No activeCameraController")
+		return
+	end
+
 	local mouseLockController = cameras.activeMouseLockController
+	if not mouseLockController then
+		warn("[MouseShiftLockService._updateDisable] - No activeMouseLockController")
+		return
+	end
 
 	if #self._boundKeys.Value > 0 then
 		self._lastBoundKeyValues = self._boundKeys.Value
