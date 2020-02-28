@@ -4,15 +4,16 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CharacterUtil = require("CharacterUtil")
+local Math = require("Math")
 
 local IKRigUtils = {}
 
 function IKRigUtils.getTimeBeforeNextUpdate(distance)
 	local updateRate
-	if distance < 50 then
+	if distance < 128 then
 		updateRate = 0
-	elseif distance < 300 then
-		updateRate = 0.5 * ((distance-50)/250)
+	elseif distance < 256 then
+		updateRate = 0.5 * Math.map(distance, 128, 256, 0, 1)
 	else
 		updateRate = 0.5
 	end
