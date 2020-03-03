@@ -20,7 +20,7 @@ function RagdollClient.new(humanoid)
 
 	self:_setupState()
 
-	local player = CharacterUtil.GetPlayerFromCharacter(self._obj)
+	local player = CharacterUtil.getPlayerFromCharacter(self._obj)
 	if player == Players.LocalPlayer then
 		self:_setupCamera()
 		self:_setupShake()

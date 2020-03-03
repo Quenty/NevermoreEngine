@@ -35,14 +35,14 @@ function EquippedTracker.new(tool)
 end
 
 function EquippedTracker:_update()
-	local player = CharacterUtil.GetPlayerFromCharacter(self._tool)
+	local player = CharacterUtil.getPlayerFromCharacter(self._tool)
 	if not player then
 		self._maid._diedConn = nil
 		self.Player.Value = nil
 		return
 	end
 
-	local humanoid = CharacterUtil.GetAlivePlayerHumanoid(player)
+	local humanoid = CharacterUtil.getAlivePlayerHumanoid(player)
 	if not humanoid then
 		self._maid._diedConn = nil
 		self.Player.Value = nil

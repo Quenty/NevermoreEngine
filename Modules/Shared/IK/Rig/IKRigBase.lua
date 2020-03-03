@@ -34,7 +34,7 @@ function IKRigBase:GetLastUpdateTime()
 end
 
 function IKRigBase:GetPlayer()
-	return CharacterUtil.GetPlayerFromCharacter(self._obj)
+	return CharacterUtil.getPlayerFromCharacter(self._obj)
 end
 
 function IKRigBase:GetHumanoid()

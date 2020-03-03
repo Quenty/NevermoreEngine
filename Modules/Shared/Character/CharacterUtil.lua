@@ -5,7 +5,7 @@ local Players = game:GetService("Players")
 
 local CharacterUtil = {}
 
-function CharacterUtil.GetPlayerHumanoid(player)
+function CharacterUtil.getPlayerHumanoid(player)
 	local character = player.Character
 	if not character then
 		return nil
@@ -14,8 +14,8 @@ function CharacterUtil.GetPlayerHumanoid(player)
 	return character:FindFirstChildOfClass("Humanoid")
 end
 
-function CharacterUtil.GetAlivePlayerHumanoid(player)
-	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
+function CharacterUtil.getAlivePlayerHumanoid(player)
+	local humanoid = CharacterUtil.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
 	end
@@ -23,8 +23,8 @@ function CharacterUtil.GetAlivePlayerHumanoid(player)
 	return humanoid
 end
 
-function CharacterUtil.GetAlivePlayerRootPart(player)
-	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
+function CharacterUtil.getAlivePlayerRootPart(player)
+	local humanoid = CharacterUtil.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
 	end
@@ -32,8 +32,8 @@ function CharacterUtil.GetAlivePlayerRootPart(player)
 	return humanoid.RootPart
 end
 
-function CharacterUtil.GetPlayerRootPart(player)
-	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
+function CharacterUtil.getPlayerRootPart(player)
+	local humanoid = CharacterUtil.getPlayerHumanoid(player)
 	if not humanoid then
 		return nil
 	end
@@ -41,8 +41,8 @@ function CharacterUtil.GetPlayerRootPart(player)
 	return humanoid.RootPart
 end
 
-function CharacterUtil.UnequipTools(player)
-	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
+function CharacterUtil.unequipTools(player)
+	local humanoid = CharacterUtil.getPlayerHumanoid(player)
 	if humanoid then
 		humanoid:UnequipTools()
 	end
@@ -52,7 +52,7 @@ end
 -- @param descendant A child of the potential character.
 -- @treturn Player player
 -- @treturn Character character
-function CharacterUtil.GetPlayerFromCharacter(descendant)
+function CharacterUtil.getPlayerFromCharacter(descendant)
 	local character = descendant
 	local player = Players:GetPlayerFromCharacter(character)
 

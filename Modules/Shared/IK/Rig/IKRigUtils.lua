@@ -21,7 +21,7 @@ function IKRigUtils.getTimeBeforeNextUpdate(distance)
 end
 
 function IKRigUtils.getPlayerIKRig(binder, player)
-	local humanoid = CharacterUtil.GetPlayerHumanoid(player)
+	local humanoid = CharacterUtil.getPlayerHumanoid(player)
 	if not humanoid then
 		return nil
 	end

@@ -49,7 +49,7 @@ function IKRig:SetRigTarget(target)
 end
 
 function IKRig:_onServerEvent(player, target)
-	assert(player == CharacterUtil.GetPlayerFromCharacter(self._obj))
+	assert(player == CharacterUtil.getPlayerFromCharacter(self._obj))
 	assert(typeof(target) == "Vector3")
 
 	self._target = target

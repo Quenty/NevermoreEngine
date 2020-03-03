@@ -162,7 +162,7 @@ function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 		local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
 		if humanoid then
 			if not touchingHumanoids[humanoid] then
-				local player = CharacterUtil.GetPlayerFromCharacter(humanoid)
+				local player = CharacterUtil.getPlayerFromCharacter(humanoid)
 				touchingHumanoids[humanoid] = {
 					Humanoid = humanoid;
 					Character = player and player.Character; -- May be nil

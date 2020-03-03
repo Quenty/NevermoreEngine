@@ -22,7 +22,7 @@ function CoreGuiEnabler.new()
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
-		CharacterUtil.UnequipTools(Players.LocalPlayer)
+		CharacterUtil.unequipTools(Players.LocalPlayer)
 	end)
 
 	for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do

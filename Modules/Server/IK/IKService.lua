@@ -75,7 +75,7 @@ end
 function IKService:_onServerEvent(player, target)
 	assert(typeof(target) == "Vector3")
 
-	local humanoid = CharacterUtil.GetAlivePlayerHumanoid(player)
+	local humanoid = CharacterUtil.getAlivePlayerHumanoid(player)
 	if not humanoid then
 		return
 	end
