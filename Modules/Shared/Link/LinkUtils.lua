@@ -8,27 +8,31 @@ local promiseChild = require("promiseChild")
 
 local LinkUtils = {}
 
-function LinkUtils.createLink(name, from, to)
-	assert(type(name) == "string")
+function LinkUtils.createLink(linkName, from, to)
+	assert(type(linkName) == "string")
 	assert(typeof(from) == "Instance")
 	assert(typeof(to) == "Instance")
 
 	local objectValue = Instance.new("ObjectValue")
-	objectValue.Name = name
+	objectValue.Name = linkName
 	objectValue.Value = to
 	objectValue.Parent = from
 
 	return objectValue
 end
 
-function LinkUtils.getAllLinkValues(name, from)
-	assert(type(name) == "string")
+function LinkUtils.getAllLinkValues(linkName, from)
+	assert(type(linkName) == "string")
 	assert(typeof(from) == "Instance")
 
 	local linkValues = {}
+
 	for _, item in pairs(from:GetChildren()) do
-		if item.Name == name and item.Value then
-			table.insert(linkValues, item.Value)
+		if item.Name == linkName then
+			local value = item.Value
+			if value then
+				table.insert(linkValues, value)
+			end
 		end
 	end
 
@@ -36,13 +40,13 @@ function LinkUtils.getAllLinkValues(name, from)
 end
 
 
-function LinkUtils.getAllLinks(name, from)
-	assert(type(name) == "string")
+function LinkUtils.getAllLinks(linkName, from)
+	assert(type(linkName) == "string")
 	assert(typeof(from) == "Instance")
 
 	local links = {}
 	for _, item in pairs(from:GetChildren()) do
-		if item.Name == name then
+		if item.Name == linkName then
 			table.insert(links, item)
 		end
 	end
@@ -50,11 +54,11 @@ function LinkUtils.getAllLinks(name, from)
 	return links
 end
 
-function LinkUtils.getLinkValue(name, from)
-	assert(type(name) == "string")
+function LinkUtils.getLinkValue(linkName, from)
+	assert(type(linkName) == "string")
 	assert(typeof(from) == "Instance")
 
-	local objectValue = from:FindFirstChild(name)
+	local objectValue = from:FindFirstChild(linkName)
 	if not objectValue then
 		return nil
 	end
