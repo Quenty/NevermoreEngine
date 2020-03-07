@@ -51,7 +51,7 @@ local OpenGetRequests = 0
 local function GetAsync(...)
 	repeat until OpenGetRequests == 0 or not wait()
 	local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-	
+
 	if Success then
 		return Data
 	elseif Data:find("HTTP 429", 1, true) or Data:find("Number of requests exceeded limit", 1, true) then
@@ -69,7 +69,7 @@ local function GetAsync(...)
 		warn(Data, (...))
 		return ""
 	elseif Data:find("HttpError: SslConnectFail", 1, true) then
-		local t = math.random(3, 10)
+		local t = math.random(2, 5)
 		warn("HttpError: SslConnectFail error on " .. tostring((...)) .. " trying again in " .. t .. " seconds.")
 		wait(t)
 		return GetAsync(...)
@@ -93,9 +93,9 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 
 	local FolderCount = 0
 	local Folders = {}
-	
+
 	local Data = GetAsync(Link)
-	local ShouldSkip = false	
+	local ShouldSkip = false
 	local _, StatsGraph = Data:find("d-flex repository-lang-stats-graph", 1, true)
 
 	if StatsGraph then
@@ -109,10 +109,10 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 				Folders[FolderCount] = Link
 			elseif Link:find("/[^/]+/[^/]+/blob.+%.lua$") then
 				local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
-	
+
 				if ScriptName:lower() ~= "install" and ScriptClass ~= "ignore" and ScriptClass ~= "spec" and ScriptName:lower() ~= "spec" then
 					if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
-	
+
 					if ScriptName == "_" or ScriptName:lower() == "main" or ScriptName:lower() == "init" then
 						ScriptCount = ScriptCount + 1
 						for a = ScriptCount, 2, -1 do
@@ -154,17 +154,17 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 			if Count > Directory then
 				Directory = Directory + 1
 				if (Parent and Parent.Name) ~= FolderName and "Modules" ~= FolderName then
-					local Success, Service = pcall(game.GetService, game, FolderName)
-					if FolderName ~= "Lighting" and Success and Service then
-						Parent = Service
-					else
-						local Generated
-						Parent, Generated = GetFirstChild(Parent, FolderName, "Folder")
-						if Generated then
-							if not Routines[1] then Routines[1] = Parent end
-							DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 2 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
-						end
+					-- local Success, Service = pcall(game.GetService, game, FolderName)
+					-- if FolderName ~= "Lighting" and Success and Service then
+					-- 	Parent = Service
+					-- else
+					local Generated
+					Parent, Generated = GetFirstChild(Parent, FolderName, "Folder")
+					if Generated then
+						if not Routines[1] then Routines[1] = Parent end
+						DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 2 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
 					end
+					-- end
 				end
 			end
 		end
@@ -233,7 +233,7 @@ function GitHub:Install(Link, Parent, RoutineList)
 	end
 
 	if ScriptName and (ScriptName == "_" or ScriptName:lower() == "main" or ScriptName:lower() == "init") then
-		return GitHub:Install("https://github.com/" .. Organization .. "/" .. Repository .. "/tree/master/" .. Directory:gsub("/[^/]+$", ""), Parent, RoutineList)
+		return GitHub:Install("https://github.com/" .. Organization .. "/" .. Repository .. "/tree/" .. (Tree or "master") .. "/" .. Directory:gsub("/[^/]+$", ""):gsub("^/", ""), Parent, RoutineList)
 	end
 
 	if not Website then Website = "https://github.com/" end
@@ -263,7 +263,7 @@ function GitHub:Install(Link, Parent, RoutineList)
 		local Object = GetFirstChild(Parent, Organization, "Folder")
 
 		if not Routines[1] then Routines[1] = Object end
-		
+
 		for Link, Data in Data:gmatch('href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository"(.-)</div>') do
 			--if not Data:find("Forked from", 1, true) and not Link:find("Plugin", 1, true) and not Link:find(".github.io", 1, true) then
 				GitHub:Install(Link, Object, Routines)
@@ -294,31 +294,34 @@ function GitHub:Install(Link, Parent, RoutineList)
 end
 
 -- luacheck: pop ignore
+print("Installing NevermoreEngine...")
 
-GitHub:Install(
-	"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
-	game:GetService("ServerScriptService")
-).Name = "Nevermore"
+local threadsCompleted = table.create(2, false)
 
-local init = GitHub:Install(
-	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/init.lua")
-init.Name = "Nevermore"
-init.Parent = game:GetService("ReplicatedStorage")
+spawn(function()
+	GitHub:Install(
+		"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
+		game:GetService("ServerScriptService")
+	)
+	threadsCompleted[1] = true
+end)
 
-local moduleScriptUtils = GitHub:Install(
-	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptUtils.lua")
-moduleScriptUtils.Name = "ModuleScriptUtils"
-moduleScriptUtils.Parent = init
+spawn(function()
+	local init = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/init.lua")
+	init.Nevermore.Nevermore.Parent = game:GetService("ReplicatedStorage")
+	init:Destroy()
+	threadsCompleted[2] = true
+end)
 
-local replicationUtils = GitHub:Install(
-	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ReplicationUtils.lua")
-replicationUtils.Name = "ReplicationUtils"
-replicationUtils.Parent = init
-
-local moduleScriptLoader = GitHub:Install(
-	"https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/ModuleScriptLoader.lua")
-moduleScriptLoader.Name = "ModuleScriptLoader"
-moduleScriptLoader.Parent = init
+repeat
+	wait()
+	local finished = true
+	for _, thread in pairs(threadsCompleted) do
+		if not thread then
+			finished = false
+		end
+	end
+until finished
 
 HttpService.HttpEnabled = ...
 
