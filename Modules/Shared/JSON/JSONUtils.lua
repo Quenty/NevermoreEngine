@@ -11,7 +11,7 @@ local JSONUtils = {}
 
 function JSONUtils.promiseJSONDecode(str)
 	if type(str) ~= "string" then
-		return Promise.rejected(str)
+		return Promise.rejected("Not a string")
 	end
 
 	return Promise.new(function(resolve, reject)
