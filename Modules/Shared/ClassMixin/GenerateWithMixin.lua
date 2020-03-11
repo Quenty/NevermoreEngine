@@ -14,12 +14,12 @@ function GenerateWithMixin:Add(class, staticResources)
 	assert(class)
 	assert(staticResources)
 
-	self.GenerateWith(class, staticResources)
+	self._generateWith(class, staticResources)
 end
 
 --- Generates resources
 -- @tparam table resources Resources to add
-function GenerateWithMixin.GenerateWith(class, resources)
+function GenerateWithMixin._generateWith(class, resources)
 	assert(type(resources) == "table")
 
 	for _, resourceName in ipairs(resources) do
