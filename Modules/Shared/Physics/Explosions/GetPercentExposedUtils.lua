@@ -3,8 +3,8 @@
 
 local Workspace = game:GetService("Workspace")
 
-local lib = {}
-lib.RAY_COUNT = 314
+local GetPercentExposed = {}
+GetPercentExposed.RAY_COUNT = 314
 
 --- Equal distribution unit vectors around a sphere
 local function getRandomUnitVector()
@@ -21,10 +21,11 @@ end
 -- @tparam Vector3 point point to search
 -- @tparam number Radius
 -- @return A table mapping parts to to percent exposure
-function lib.Search(point, radius)
+function GetPercentExposed.search(point, radius)
 	local hits = {}
 	local totalHits = 0
-	for _=1, lib.RAY_COUNT do
+
+	for _=1, GetPercentExposed.RAY_COUNT do
 		local ray = Ray.new(point, getRandomUnitVector() * radius)
 		local part = Workspace:FindPartOnRay(ray, nil, true) -- Ignore water
 		if part then
@@ -38,11 +39,11 @@ function lib.Search(point, radius)
 	end
 
 	for part, count in pairs(hits) do
-		hits[part] = count / lib.RAY_COUNT
+		hits[part] = count / GetPercentExposed.RAY_COUNT
 	end
 
 	return hits
 end
 
 
-return lib
+return GetPercentExposed
