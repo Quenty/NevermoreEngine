@@ -1,7 +1,7 @@
 --- Tags and retrieves killer
--- @module HumanoidKillerUtil
+-- @module HumanoidKillerUtils
 
-local HumanoidKillerUtil = {}
+local HumanoidKillerUtils = {}
 
 local Debris = game:GetService("Debris")
 
@@ -9,7 +9,7 @@ local Debris = game:GetService("Debris")
 local TAG_NAME = "creator"
 local TAG_LIFETIME = 1
 
-function HumanoidKillerUtil.TagKiller(humanoid, attacker)
+function HumanoidKillerUtils.tagKiller(humanoid, attacker)
 	assert(typeof(humanoid) == "Instance")
 	assert(typeof(attacker) == "Instance")
 
@@ -29,7 +29,7 @@ function HumanoidKillerUtil.TagKiller(humanoid, attacker)
 	return creator
 end
 
-function HumanoidKillerUtil.GetKillerOfHumanoid(humanoid)
+function HumanoidKillerUtils.getKillerOfHumanoid(humanoid)
 	assert(typeof(humanoid) == "Instance")
 
 	local creator = humanoid:FindFirstChild("creator")
@@ -57,4 +57,4 @@ function HumanoidKillerUtil.GetKillerOfHumanoid(humanoid)
 	return killer
 end
 
-return HumanoidKillerUtil
+return HumanoidKillerUtils
