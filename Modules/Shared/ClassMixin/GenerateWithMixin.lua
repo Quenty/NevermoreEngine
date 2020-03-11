@@ -23,7 +23,7 @@ function GenerateWithMixin.GenerateWith(class, resources)
 	assert(type(resources) == "table")
 
 	for _, resourceName in ipairs(resources) do
-		local storeName = String.ToPrivateCase(resourceName)
+		local storeName = String.toPrivateCase(resourceName)
 
 		class[("With%s"):format(resourceName)] = function(self, resource)
 			self[storeName] = resource or error(("Failed to set '%s', %s"):format(resourceName, tostring(resource)))

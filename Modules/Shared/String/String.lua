@@ -1,9 +1,9 @@
 --- This module provides utility functions for strings
 -- @module String
 
-local lib = {}
+local String = {}
 
-function lib.Trim(str, pattern)
+function String.trim(str, pattern)
 	pattern = pattern or "%s";
 	-- %S is whitespaces
 	-- When we find the first non space character defined by ^%s
@@ -13,7 +13,7 @@ function lib.Trim(str, pattern)
 end
 
 --- Sets it to UpperCamelCase
-function lib.ToCamelCase(str)
+function String.toCamelCase(str)
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
 	str = str:gsub("^%a", string.upper)
@@ -22,11 +22,11 @@ function lib.ToCamelCase(str)
 	return str
 end
 
-function lib.UppercaseFirstLetter(str)
+function String.uppercaseFirstLetter(str)
 	return str:gsub("^%a", string.upper)
 end
 
-function lib.ToLowerCamelCase(str)
+function String.toLowerCamelCase(str)
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
 	str = str:gsub("^%a", string.lower)
@@ -35,17 +35,17 @@ function lib.ToLowerCamelCase(str)
 	return str
 end
 
-function lib.ToPrivateCase(str)
+function String.toPrivateCase(str)
 	return "_" .. str:sub(1, 1):lower() .. str:sub(2, #str)
 end
 
 -- Only trims the front of the string...
-function lib.TrimFront(str, pattern)
+function String.trimFront(str, pattern)
 	pattern = pattern or "%s";
 	return (str:gsub("^"..pattern.."*(.-)"..pattern.."*", "%1"))
 end
 
-function lib.CheckNumOfCharacterInString(str, char)
+function String.checkNumOfCharacterInString(str, char)
 	local count = 0
 	for _ in string.gmatch(str, char) do
 		count = count + 1
@@ -54,24 +54,24 @@ function lib.CheckNumOfCharacterInString(str, char)
 end
 
 --- Checks if a string is empty or nil
-function lib.IsEmptyOrWhitespaceOrNil(str)
-	return type(str) ~= "string" or str == "" or lib.IsWhitespace(str)
+function String.isEmptyOrWhitespaceOrNil(str)
+	return type(str) ~= "string" or str == "" or String.isWhitespace(str)
 end
 
 --- Returns whether or not text is whitespace
-function lib.IsWhitespace(str)
+function String.isWhitespace(str)
 	return string.match(str, "[%s]+") == str
 end
 
 --- Converts text to have a ... after it if it's too long.
-function lib.ElipseLimit(str, characterLimit)
+function String.elipseLimit(str, characterLimit)
 	if #str > characterLimit then
 		str = str:sub(1, characterLimit-3).."..."
 	end
 	return str
 end
 
-function lib.AddCommas(number)
+function String.addCommas(number)
 	if type(number) == "number" then
 		number = tostring(number)
 	end
@@ -85,4 +85,4 @@ function lib.AddCommas(number)
 	return number
 end
 
-return lib
+return String

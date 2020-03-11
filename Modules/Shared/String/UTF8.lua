@@ -1,10 +1,10 @@
 --- UTF8 utility functions
 -- @module UTF8
 
-local lib = {}
+local UTF8 = {}
 
-function lib.upper(str)
-	local UPPER_MAP = lib.UPPER_MAP
+function UTF8.upper(str)
+	local UPPER_MAP = UTF8.UPPER_MAP
 	str = str:upper()
 	local newStr = ""
 	for start, stop in utf8.graphemes(str) do
@@ -17,8 +17,8 @@ function lib.upper(str)
 	return newStr
 end
 
-function lib.lower(str)
-	local LOWER_MAP = lib.LOWER_MAP
+function UTF8.lower(str)
+	local LOWER_MAP = UTF8.LOWER_MAP
 	str = str:lower()
 	local newStr = ""
 	for start, stop in utf8.graphemes(str) do
@@ -31,7 +31,7 @@ function lib.lower(str)
 	return newStr
 end
 
-lib.UPPER_MAP = {
+UTF8.UPPER_MAP = {
 	['à'] = 'À',
 	['á'] = 'Á',
 	['â'] = 'Â',
@@ -137,9 +137,9 @@ lib.UPPER_MAP = {
 	['ơ'] = 'Ơ',
 }
 
-lib.LOWER_MAP = {}
-for key, val in pairs(lib.UPPER_MAP) do
-	lib.LOWER_MAP[val] = key
+UTF8.LOWER_MAP = {}
+for key, val in pairs(UTF8.UPPER_MAP) do
+	UTF8.LOWER_MAP[val] = key
 end
 
-return lib
+return UTF8
