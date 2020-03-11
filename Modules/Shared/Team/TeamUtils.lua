@@ -1,9 +1,9 @@
 --- Team utility methods
--- @module TeamUtil
+-- @module TeamUtils
 
-local lib = {}
+local TeamUtils = {}
 
-function lib.AreTeamMates(playerA, playerB)
+function TeamUtils.areTeamMates(playerA, playerB)
 	if playerA.Neutral or playerB.Neutral then
 		return false
 	end
@@ -13,4 +13,4 @@ function lib.AreTeamMates(playerA, playerB)
 	return playerA.Team == playerB.Team
 end
 
-return lib
+return TeamUtils
