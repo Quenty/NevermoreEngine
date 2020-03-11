@@ -9,7 +9,7 @@ local Promise = require("Promise")
 
 local TextFilterUtils = {}
 
-function TextFilterUtils.GetNonChatStringForBroadcastAsync(string, userId)
+function TextFilterUtils.getNonChatStringForBroadcastAsync(string, userId)
 	local text = nil
 	local ok, err = pcall(function()
 		local result = TextService:FilterStringAsync(string, userId)
@@ -27,7 +27,7 @@ function TextFilterUtils.GetNonChatStringForBroadcastAsync(string, userId)
 	return text
 end
 
-function TextFilterUtils.PromiseNonChatStringForBroadcast(string, userId)
+function TextFilterUtils.promiseNonChatStringForBroadcast(string, userId)
 	assert(type(string) == "string")
 	assert(type(userId) == "number")
 
