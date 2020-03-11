@@ -3,7 +3,7 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local CharacterUtil = require("CharacterUtil")
+local CharacterUtils = require("CharacterUtils")
 local Math = require("Math")
 
 local IKRigUtils = {}
@@ -21,7 +21,7 @@ function IKRigUtils.getTimeBeforeNextUpdate(distance)
 end
 
 function IKRigUtils.getPlayerIKRig(binder, player)
-	local humanoid = CharacterUtil.getPlayerHumanoid(player)
+	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid then
 		return nil
 	end

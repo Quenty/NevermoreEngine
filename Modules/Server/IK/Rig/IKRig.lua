@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 
 local IKRigBase = require("IKRigBase")
 local IKConstants = require("IKConstants")
-local CharacterUtil = require("CharacterUtil")
+local CharacterUtils = require("CharacterUtils")
 
 local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
@@ -49,7 +49,7 @@ function IKRig:SetRigTarget(target)
 end
 
 function IKRig:_onServerEvent(player, target)
-	assert(player == CharacterUtil.getPlayerFromCharacter(self._obj))
+	assert(player == CharacterUtils.getPlayerFromCharacter(self._obj))
 	assert(typeof(target) == "Vector3")
 
 	self._target = target

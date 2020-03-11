@@ -7,7 +7,7 @@ local CollectionService = game:GetService("CollectionService")
 local Workspace = game:GetService("Workspace")
 
 local BoundingBoxUtils = require("BoundingBoxUtils")
-local CharacterUtil = require("CharacterUtil")
+local CharacterUtils = require("CharacterUtils")
 
 local PartTouchingCalculator = {}
 PartTouchingCalculator.__index = PartTouchingCalculator
@@ -162,7 +162,7 @@ function PartTouchingCalculator:GetTouchingHumanoids(touchingList)
 		local humanoid = part.Parent:FindFirstChildOfClass("Humanoid")
 		if humanoid then
 			if not touchingHumanoids[humanoid] then
-				local player = CharacterUtil.getPlayerFromCharacter(humanoid)
+				local player = CharacterUtils.getPlayerFromCharacter(humanoid)
 				touchingHumanoids[humanoid] = {
 					Humanoid = humanoid;
 					Character = player and player.Character; -- May be nil

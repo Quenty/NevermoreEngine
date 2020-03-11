@@ -4,7 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
-local CharacterUtil = require("CharacterUtil")
+local CharacterUtils = require("CharacterUtils")
 local ValueObject = require("ValueObject")
 
 local EquippedTracker = {}
@@ -35,14 +35,14 @@ function EquippedTracker.new(tool)
 end
 
 function EquippedTracker:_update()
-	local player = CharacterUtil.getPlayerFromCharacter(self._tool)
+	local player = CharacterUtils.getPlayerFromCharacter(self._tool)
 	if not player then
 		self._maid._diedConn = nil
 		self.Player.Value = nil
 		return
 	end
 
-	local humanoid = CharacterUtil.getAlivePlayerHumanoid(player)
+	local humanoid = CharacterUtils.getAlivePlayerHumanoid(player)
 	if not humanoid then
 		self._maid._diedConn = nil
 		self.Player.Value = nil

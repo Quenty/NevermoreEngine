@@ -1,11 +1,11 @@
 --- General character utility code.
--- @module CharacterUtil
+-- @module CharacterUtils
 
 local Players = game:GetService("Players")
 
-local CharacterUtil = {}
+local CharacterUtils = {}
 
-function CharacterUtil.getPlayerHumanoid(player)
+function CharacterUtils.getPlayerHumanoid(player)
 	local character = player.Character
 	if not character then
 		return nil
@@ -14,8 +14,8 @@ function CharacterUtil.getPlayerHumanoid(player)
 	return character:FindFirstChildOfClass("Humanoid")
 end
 
-function CharacterUtil.getAlivePlayerHumanoid(player)
-	local humanoid = CharacterUtil.getPlayerHumanoid(player)
+function CharacterUtils.getAlivePlayerHumanoid(player)
+	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
 	end
@@ -23,8 +23,8 @@ function CharacterUtil.getAlivePlayerHumanoid(player)
 	return humanoid
 end
 
-function CharacterUtil.getAlivePlayerRootPart(player)
-	local humanoid = CharacterUtil.getPlayerHumanoid(player)
+function CharacterUtils.getAlivePlayerRootPart(player)
+	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
 		return nil
 	end
@@ -32,8 +32,8 @@ function CharacterUtil.getAlivePlayerRootPart(player)
 	return humanoid.RootPart
 end
 
-function CharacterUtil.getPlayerRootPart(player)
-	local humanoid = CharacterUtil.getPlayerHumanoid(player)
+function CharacterUtils.getPlayerRootPart(player)
+	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid then
 		return nil
 	end
@@ -41,8 +41,8 @@ function CharacterUtil.getPlayerRootPart(player)
 	return humanoid.RootPart
 end
 
-function CharacterUtil.unequipTools(player)
-	local humanoid = CharacterUtil.getPlayerHumanoid(player)
+function CharacterUtils.unequipTools(player)
+	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if humanoid then
 		humanoid:UnequipTools()
 	end
@@ -52,7 +52,7 @@ end
 -- @param descendant A child of the potential character.
 -- @treturn Player player
 -- @treturn Character character
-function CharacterUtil.getPlayerFromCharacter(descendant)
+function CharacterUtils.getPlayerFromCharacter(descendant)
 	local character = descendant
 	local player = Players:GetPlayerFromCharacter(character)
 
@@ -68,4 +68,4 @@ function CharacterUtil.getPlayerFromCharacter(descendant)
 	return player
 end
 
-return CharacterUtil
+return CharacterUtils

@@ -9,7 +9,7 @@ local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 
-local CharacterUtil = require("CharacterUtil")
+local CharacterUtils = require("CharacterUtils")
 
 local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
@@ -22,7 +22,7 @@ function CoreGuiEnabler.new()
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
-		CharacterUtil.unequipTools(Players.LocalPlayer)
+		CharacterUtils.unequipTools(Players.LocalPlayer)
 	end)
 
 	for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do

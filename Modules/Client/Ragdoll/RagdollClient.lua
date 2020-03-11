@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
 local RagdollBase = require("RagdollBase")
-local CharacterUtil = require("CharacterUtil")
+local CharacterUtils = require("CharacterUtils")
 local HapticFeedbackUtils = require("HapticFeedbackUtils")
 
 local RagdollClient = setmetatable({}, RagdollBase)
@@ -20,7 +20,7 @@ function RagdollClient.new(humanoid)
 
 	self:_setupState()
 
-	local player = CharacterUtil.getPlayerFromCharacter(self._obj)
+	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player == Players.LocalPlayer then
 		self:_setupCamera()
 		self:_setupShake()

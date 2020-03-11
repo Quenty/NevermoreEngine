@@ -7,7 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local BaseObject = require("BaseObject")
 local TorsoIKBase = require("TorsoIKBase")
 local Promise = require("Promise")
-local CharacterUtil = require("CharacterUtil")
+local CharacterUtils = require("CharacterUtils")
 local Signal = require("Signal")
 local ArmIKBase = require("ArmIKBase")
 
@@ -34,7 +34,7 @@ function IKRigBase:GetLastUpdateTime()
 end
 
 function IKRigBase:GetPlayer()
-	return CharacterUtil.getPlayerFromCharacter(self._obj)
+	return CharacterUtils.getPlayerFromCharacter(self._obj)
 end
 
 function IKRigBase:GetHumanoid()
