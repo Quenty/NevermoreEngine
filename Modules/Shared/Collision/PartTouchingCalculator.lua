@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local CollectionService = game:GetService("CollectionService")
 local Workspace = game:GetService("Workspace")
 
-local BoundingBox = require("BoundingBox")
+local BoundingBoxUtils = require("BoundingBoxUtils")
 local CharacterUtil = require("CharacterUtil")
 
 local PartTouchingCalculator = {}
@@ -76,7 +76,7 @@ end
 function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, padding)
 	relativeTo = relativeTo or CFrame.new()
 
-	local size, position = BoundingBox.GetPartsBoundingBox(parts, relativeTo)
+	local size, position = BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
 
 	if padding then
 		size = size + Vector3.new(padding, padding, padding)
