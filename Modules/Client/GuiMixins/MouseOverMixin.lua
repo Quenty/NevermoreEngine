@@ -59,12 +59,12 @@ end
 function MouseOverMixin:_getMouseOverTweenProperties(gui)
 	if gui:IsA("ImageButton") then
 		return {
-			ImageColor3 = ButtonUtils.GetMouseOverColor(gui.ImageColor3);
-			BackgroundColor3 = ButtonUtils.GetMouseOverColor(gui.BackgroundColor3);
+			ImageColor3 = ButtonUtils.getMouseOverColor(gui.ImageColor3);
+			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3);
 		}
 	else
 		return {
-			BackgroundColor3 = ButtonUtils.GetMouseOverColor(gui.BackgroundColor3);
+			BackgroundColor3 = ButtonUtils.getMouseOverColor(gui.BackgroundColor3);
 		}
 	end
 end
@@ -76,7 +76,7 @@ function MouseOverMixin:AddMouseOverEffect(gui, tweenProperties)
 		gui.AutoButtonColor = false
 	end
 
-	local maid, boolValue = ButtonUtils.GetMouseOverBoolValue(gui)
+	local maid, boolValue = ButtonUtils.getMouseOverBoolValue(gui)
 	local original = {}
 	for property, _ in pairs(tweenProperties) do
 		original[property] = gui[property]
