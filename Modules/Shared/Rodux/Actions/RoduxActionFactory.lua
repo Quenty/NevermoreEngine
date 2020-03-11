@@ -20,7 +20,7 @@ function RoduxActionFactory.new(actionName, typeTable)
 
 	self._actionName = actionName
 	self._validator = t.strictInterface(
-		Table.Merge({
+		Table.merge({
 			type = t.literal(self._actionName),
 		}, typeTable))
 
@@ -48,7 +48,7 @@ function RoduxActionFactory:Create(action)
 	if action then
 		assert(type(action) == "table", "Action must be a table")
 
-		actionWithType = Table.Merge(action, {
+		actionWithType = Table.merge(action, {
 			type = self._actionName;
 		})
 	else

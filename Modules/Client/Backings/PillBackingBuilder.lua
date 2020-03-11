@@ -283,7 +283,7 @@ end
 function PillBackingBuilder:_configureOptions(gui, options)
 	assert(gui, "Must pass in GUI")
 
-	options = Table.Copy(options or self._options)
+	options = Table.copy(options or self._options)
 	options.ZIndex = options.ZIndex or gui.ZIndex
 	options.ShadowZIndex = options.ShadowZIndex or options.ZIndex - 1
 	options.BackgroundColor3 = options.BackgroundColor3 or gui.BackgroundColor3

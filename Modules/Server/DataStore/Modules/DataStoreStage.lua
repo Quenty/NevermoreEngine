@@ -61,7 +61,7 @@ function DataStoreStage:_afterLoadGetAndApplyStagedData(name, data, defaultValue
 	elseif self._stores[name] then
 		if self._stores[name]:HasWritableData() then
 			local writer = self._stores[name]:GetNewWriter()
-			local original = Table.DeepCopy(data[name] or {})
+			local original = Table.deepCopy(data[name] or {})
 			writer:WriteMerge(original)
 			return original
 		end
@@ -169,7 +169,7 @@ function DataStoreStage:_doStore(name, value)
 	if value == DataStoreDeleteToken then
 		newValue = DataStoreDeleteToken
 	elseif type(value) == "table" then
-		newValue = Table.DeepCopy(value)
+		newValue = Table.deepCopy(value)
 	else
 		newValue = value
 	end

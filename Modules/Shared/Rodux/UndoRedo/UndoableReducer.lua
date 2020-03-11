@@ -39,7 +39,7 @@ return function(reducer)
 			return {
 				past = newPast;
 				present = state.past[#state.past];
-				future = Table.MergeLists(state.future, { state.present });
+				future = Table.mergeLists(state.future, { state.present });
 			}
 		end;
 		redo = function(state, action)
@@ -53,7 +53,7 @@ return function(reducer)
 			end
 
 			return {
-				past = Table.MergeLists(state.past, { state.present });
+				past = Table.mergeLists(state.past, { state.present });
 				present = state.future[#state.future];
 				future = newFuture;
 			}

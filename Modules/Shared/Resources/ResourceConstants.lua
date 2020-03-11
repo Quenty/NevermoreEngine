@@ -5,7 +5,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Table = require("Table")
 
-return Table.ReadOnly({
+return Table.readonly({
 	REMOTE_EVENT_STORAGE_NAME = "RemoteEvents";
 	REMOTE_FUNCTION_STORAGE_NAME = "RemoteFunctions";
 })

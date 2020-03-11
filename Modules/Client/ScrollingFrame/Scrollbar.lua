@@ -41,7 +41,7 @@ function Scrollbar.fromContainer(container, scrollType)
 end
 
 function Scrollbar:SetScrollType(scrollType)
-	assert(Table.Contains(SCROLL_TYPE, scrollType))
+	assert(Table.contains(SCROLL_TYPE, scrollType))
 	self._scrollType = scrollType
 end
 

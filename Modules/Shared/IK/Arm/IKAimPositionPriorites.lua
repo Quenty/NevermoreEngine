@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Table = require("Table")
 
-return Table.ReadOnly({
+return Table.readonly({
 	DEFAULT = 0;
 	LOW = 1000;
 	MEDIUM = 3000;

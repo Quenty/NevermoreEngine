@@ -209,7 +209,7 @@ function SoundPlayer:PlayMusic(soundName, parent, options)
 		maid.DidLoop = sound.DidLoop:Connect(function(soundId, loopCount)
 			if loopCount > 0 then
 
-				local newOptions = Table.DeepCopy(options)
+				local newOptions = Table.deepCopy(options)
 				newOptions.UsedOptions = newOptions.UsedOptions or {}
 
 				-- Note the current opion as used
@@ -226,7 +226,7 @@ function SoundPlayer:PlayMusic(soundName, parent, options)
 				-- If we have no more options left, reset the queue
 				if #available <= 0 then
 					newOptions.UsedOptions = {}
-					available = Table.DeepCopy(newOptions.LoopOptions)
+					available = Table.deepCopy(newOptions.LoopOptions)
 				end
 
 				if #available <= 0 then

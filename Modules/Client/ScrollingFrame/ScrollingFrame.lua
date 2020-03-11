@@ -50,7 +50,7 @@ end
 
 --- Sets the scroll type for the frame
 function ScrollingFrame:SetScrollType(scrollType)
-	assert(Table.Contains(SCROLL_TYPE, scrollType))
+	assert(Table.contains(SCROLL_TYPE, scrollType))
 	self._scrollType = scrollType
 end
 
@@ -63,7 +63,7 @@ function ScrollingFrame:AddScrollbar(scrollbar)
 end
 
 function ScrollingFrame:RemoveScrollbar(scrollbar)
-	local index = Table.GetIndex(self._scrollbars, scrollbar)
+	local index = Table.getIndex(self._scrollbars, scrollbar)
 	if index then
 		table.remove(self._scrollbars, index)
 		self._maid[scrollbar] = nil

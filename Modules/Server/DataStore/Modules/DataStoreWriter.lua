@@ -20,7 +20,7 @@ function DataStoreWriter.new()
 end
 
 function DataStoreWriter:SetRawData(data)
-	self._rawSetData = Table.DeepCopy(data)
+	self._rawSetData = Table.deepCopy(data)
 end
 
 function DataStoreWriter:AddWriter(name, value)

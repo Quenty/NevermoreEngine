@@ -47,7 +47,7 @@ function RoduxActions:CreateReducer(initialState, handlers)
 
 			assert(validator:Validate(action))
 
-			return handler(state, Table.ReadOnly(Table.Copy(action)))
+			return handler(state, Table.readonly(Table.copy(action)))
 		end
 
 		return state

@@ -133,7 +133,7 @@ end
 function PaperRipple:RemoveRipple(ripple)
 	assert(ripple, "Must send ripple")
 
-	local index = Table.GetIndex(self._ripples, ripple) or error("ripple does not exist")
+	local index = Table.getIndex(self._ripples, ripple) or error("ripple does not exist")
 	ripple:Destroy()
 
 	table.remove(self._ripples, index)
