@@ -4,7 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local PartTouchingCalculator = require("PartTouchingCalculator")
-local BinderUtil = require("BinderUtil")
+local BinderUtils = require("BinderUtils")
 
 local BinderTouchingCalculator = setmetatable({}, PartTouchingCalculator)
 BinderTouchingCalculator.ClassName = "BinderTouchingCalculator"
@@ -20,7 +20,7 @@ function BinderTouchingCalculator:GetTouchingClass(binder, touchingList, ignoreO
 	local touching = {}
 
 	for _, part in pairs(touchingList) do
-		local object = BinderUtil.findFirstAncestor(binder, part)
+		local object = BinderUtils.findFirstAncestor(binder, part)
 		if object then
 			if not touching[object] then
 				touching[object] = {

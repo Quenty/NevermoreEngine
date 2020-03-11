@@ -5,7 +5,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
-local BinderUtil = require("BinderUtil")
+local BinderUtils = require("BinderUtils")
 
 local BoundAncestorTracker = setmetatable({}, BaseObject)
 BoundAncestorTracker.ClassName = "BoundAncestorTracker"
@@ -50,7 +50,7 @@ function BoundAncestorTracker:_update()
 		return
 	end
 
-	self.Class.Value = BinderUtil.findFirstAncestor(self._binder, parent)
+	self.Class.Value = BinderUtils.findFirstAncestor(self._binder, parent)
 end
 
 return BoundAncestorTracker
