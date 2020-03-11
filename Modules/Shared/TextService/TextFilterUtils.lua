@@ -1,5 +1,5 @@
 --- Utility functions for filtering text
--- @module TextFilterUtil
+-- @module TextFilterUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -7,9 +7,9 @@ local TextService = game:GetService("TextService")
 
 local Promise = require("Promise")
 
-local TextFilterUtil = {}
+local TextFilterUtils = {}
 
-function TextFilterUtil.GetNonChatStringForBroadcastAsync(string, userId)
+function TextFilterUtils.GetNonChatStringForBroadcastAsync(string, userId)
 	local text = nil
 	local ok, err = pcall(function()
 		local result = TextService:FilterStringAsync(string, userId)
@@ -27,12 +27,12 @@ function TextFilterUtil.GetNonChatStringForBroadcastAsync(string, userId)
 	return text
 end
 
-function TextFilterUtil.PromiseNonChatStringForBroadcast(string, userId)
+function TextFilterUtils.PromiseNonChatStringForBroadcast(string, userId)
 	assert(type(string) == "string")
 	assert(type(userId) == "number")
 
 	local promise = Promise.spawn(function(resolve, reject)
-		local text, err = TextFilterUtil.GetNonChatStringForBroadcastAsync(string, userId)
+		local text, err = TextFilterUtils.GetNonChatStringForBroadcastAsync(string, userId)
 		if not text then
 			return reject(err or "Pcall failed")
 		end
@@ -46,4 +46,4 @@ function TextFilterUtil.PromiseNonChatStringForBroadcast(string, userId)
 	return promise
 end
 
-return TextFilterUtil
+return TextFilterUtils
