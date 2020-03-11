@@ -38,6 +38,15 @@ function R15Utils.getNeckJoint(character)
 	return head:FindFirstChild("Neck")
 end
 
+
+function R15Utils.getLeftGripAttachment(character)
+	return R15Utils.searchForRigAttachment(character, "LeftHand", "LeftGripAttachment")
+end
+
+function R15Utils.getRightGripAttachment(character)
+	return R15Utils.searchForRigAttachment(character, "RightHand", "RightGripAttachment")
+end
+
 function R15Utils.getLeftShoulderRigAttachment(character)
 	return R15Utils.searchForRigAttachment(character, "UpperTorso", "LeftShoulderRigAttachment")
 end
