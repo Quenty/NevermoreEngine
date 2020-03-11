@@ -1,10 +1,10 @@
 --- Mesh utility methods
--- @module MeshUtil
+-- @module MeshUtils
 
-local lib = {}
+local MeshUtils = {}
 
 --- Get or create a mesh for a part
-function lib.GetOrCreateMesh(part)
+function MeshUtils.getOrCreateMesh(part)
 	local dataModelMesh = part:FindFirstChildWhichIsA("DataModelMesh")
 	if dataModelMesh then
 		return dataModelMesh
@@ -50,4 +50,4 @@ function lib.GetOrCreateMesh(part)
 	end
 end
 
-return lib
+return MeshUtils
