@@ -7,12 +7,12 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Promise = require("Promise")
 local fastSpawn = require("fastSpawn")
 
-local lib = {}
+local CharacterPromiseUtil = {}
 
 --- Given a humanoid creates a promise that will resolve once the `Humanoid.RootPart` property
 -- resolves properly.
 -- @param humanoid The humanoid to resolve for the root part
-function lib.PromiseRootPart(humanoid)
+function CharacterPromiseUtil.promiseRootPart(humanoid)
 	local promise = Promise.new()
 
 	if humanoid.RootPart then
@@ -36,4 +36,4 @@ function lib.PromiseRootPart(humanoid)
 	return promise
 end
 
-return lib
+return CharacterPromiseUtil

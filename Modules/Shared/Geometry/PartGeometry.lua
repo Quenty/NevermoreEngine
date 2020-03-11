@@ -5,7 +5,7 @@
 
 local Workspace = game:GetService("Workspace")
 
-local lib = {}
+local PartGeometry = {}
 
 ---- This one is from
 --- http://www.roblox.com/Stravant-GapFill-item?id=165687726
@@ -77,7 +77,7 @@ local function GetShape(part)
 end
 
 --Abondon hope, all ye who enter:
-local function GetGeometry(part, hit, cframeOverride)
+function PartGeometry.getGeometry(part, hit, cframeOverride)
     local cf = cframeOverride or part.CFrame
     local pos = cf.p
     --
@@ -484,16 +484,14 @@ local function GetGeometry(part, hit, cframeOverride)
     return geometry
 end
 
-lib.GetGeometry = GetGeometry
-
 local function getNormal(face)
     return face.normal
 end
-lib.getNormal = getNormal
+PartGeometry.getNormal = getNormal
 
 local function close(a, b)
     return (a - b).Magnitude < 0.001
 end
-lib.close = close
+PartGeometry.close = close
 
-return lib
+return PartGeometry
