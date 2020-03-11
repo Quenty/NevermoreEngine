@@ -4,6 +4,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local CollectionService = game:GetService("CollectionService")
+
 local LinkUtils = require("LinkUtils")
 
 local BoundLinkUtils = {}
@@ -51,17 +53,41 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 	assert(type(methodName) == "string")
 	assert(type(args) == "table")
 
-	local classes = BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
+	local tagged = {}
+	for _, item in pairs(binders) do
+		tagged[item:GetTag()] = item
+	end
+
 	local called = {}
 
-	for _, class in pairs(classes) do
-		if class[methodName] then
-			if not called[class] then
-				class[methodName](class, unpack(args))
-				called[class] = true
-			else
-				warn("[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class")
-			end
+	local function callForTag(value, tag)
+		local binder = tagged[tag]
+		if not binder then
+			return
+		end
+
+		local class = binder:Get(value)
+		if not class then
+			return
+		end
+
+		if not class[methodName] then
+			warn(("BoundLinkUtils.callMethodOnLinkedClasses] - Class doesn't have method %q"):format(methodName))
+			return
+		end
+
+		if called[class] then
+			warn("[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class")
+			return
+		end
+
+		called[class] = true
+		class[methodName](class, unpack(args))
+	end
+
+	for _, value in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
+		for _, tag in pairs(CollectionService:GetTags(value)) do
+			callForTag(value, tag)
 		end
 	end
 end
