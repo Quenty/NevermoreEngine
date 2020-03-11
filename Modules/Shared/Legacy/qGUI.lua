@@ -3,9 +3,9 @@
 
 local RunService = game:GetService("RunService")
 
-local lib = {}
+local qGUI = {}
 
-function lib.PointInBounds(Frame, X, Y)
+function qGUI.PointInBounds(Frame, X, Y)
 	local TopBound = Frame.AbsolutePosition.Y
 	local BottomBound = Frame.AbsolutePosition.Y + Frame.AbsoluteSize.Y
 	local LeftBound = Frame.AbsolutePosition.X
@@ -18,8 +18,8 @@ function lib.PointInBounds(Frame, X, Y)
 	end
 end
 
-function lib.MouseOver(Mouse, Frame)
-	return lib.PointInBounds(Frame, Mouse.X, Mouse.Y)
+function qGUI.MouseOver(Mouse, Frame)
+	return qGUI.PointInBounds(Frame, Mouse.X, Mouse.Y)
 end
 
 -- @param UpdateFunction()
@@ -178,8 +178,8 @@ local TweenTransparency, StopTransparencyTween = MakePropertyTweener(
 		end
 	end)
 
-lib.TweenTransparency = TweenTransparency
-lib.StopTransparencyTween = StopTransparencyTween
+qGUI.TweenTransparency = TweenTransparency
+qGUI.StopTransparencyTween = StopTransparencyTween
 
 
 --- TweenColor3(Gui, NewProperties, Time)
@@ -211,8 +211,8 @@ local TweenColor3, StopColor3Tween do
 	end)
 end
 
-lib.TweenColor3 = TweenColor3
-lib.StopColor3Tween = StopColor3Tween
+qGUI.TweenColor3 = TweenColor3
+qGUI.StopColor3Tween = StopColor3Tween
 
 --- Makes a 'Textured' window...  9Scale thingy?
 local function AddTexturedWindowTemplate(Frame, Radius, Type)
@@ -297,7 +297,7 @@ local function AddTexturedWindowTemplate(Frame, Radius, Type)
 
 	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight
 end
-lib.AddTexturedWindowTemplate = AddTexturedWindowTemplate
+qGUI.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 
 --- Makes a NinePatch in the frame, with the image.
 -- @param Frame The frame to texturize
@@ -360,7 +360,7 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 
 	return TopLeft, TopRight, BottomLeft, BottomRight, Middle, MiddleLeft, MiddleRight, MiddleTop, MiddleBottom
 end
-lib.AddNinePatch = AddNinePatch
+qGUI.AddNinePatch = AddNinePatch
 
 local function BackWithRoundedRectangle(Frame, Radius, Color)
 	Color = Color or Color3.new(1, 1, 1);
@@ -369,6 +369,6 @@ local function BackWithRoundedRectangle(Frame, Radius, Color)
 		ImageColor3 = Color;
 	})
 end
-lib.BackWithRoundedRectangle = BackWithRoundedRectangle
+qGUI.BackWithRoundedRectangle = BackWithRoundedRectangle
 
-return lib
+return qGUI
