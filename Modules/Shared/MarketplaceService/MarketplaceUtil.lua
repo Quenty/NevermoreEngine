@@ -9,7 +9,7 @@ local Promise = require("Promise")
 
 local MarketplaceUtil = {}
 
-function MarketplaceUtil.PromisePlayerOwnsAsset(player, assetId)
+function MarketplaceUtil.promisePlayerOwnsAsset(player, assetId)
 	assert(typeof(player) == "Instance")
 	assert(type(assetId) == "number")
 
@@ -28,7 +28,7 @@ function MarketplaceUtil.PromisePlayerOwnsAsset(player, assetId)
 	end)
 end
 
-function MarketplaceUtil.PromiseUserOwnsGamePass(player, gamePassId)
+function MarketplaceUtil.promiseUserOwnsGamePass(player, gamePassId)
 	assert(typeof(player) == "Instance")
 	assert(type(gamePassId) == "number")
 
