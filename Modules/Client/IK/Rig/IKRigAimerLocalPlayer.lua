@@ -24,8 +24,13 @@ function IKRigAimerLocalPlayer.new(ikRig, remoteEvent)
 	self._lastUpdate = 0
 	self._lastReplication = 0
 	self._aimData = nil
+	self._noVertical = false
 
 	return self
+end
+
+function IKRigAimerLocalPlayer:SetNoVertical(noVertical)
+	self._noVertical = noVertical
 end
 
 function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
@@ -69,7 +74,13 @@ function IKRigAimerLocalPlayer:GetAimDirection()
 		end
 	end
 
-	return cameraCFrame.p + cameraCFrame.lookVector * multiplier
+	local direction = cameraCFrame.lookVector * multiplier
+
+	if self._noVertical then
+		direction = direction * Vector3.new(1, 0, 1)
+	end
+
+	return cameraCFrame.p + direction
 end
 
 
