@@ -53,6 +53,10 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 	assert(type(methodName) == "string")
 	assert(type(args) == "table")
 
+	if not next(binders) then
+		return
+	end
+
 	local tagged = {}
 	for _, item in pairs(binders) do
 		tagged[item:GetTag()] = item
