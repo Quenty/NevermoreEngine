@@ -76,12 +76,11 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 		end
 
 		if not class[methodName] then
-			warn(("BoundLinkUtils.callMethodOnLinkedClasses] - Class doesn't have method %q"):format(methodName))
 			return
 		end
 
 		if called[class] then
-			warn("[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class")
+			warn(("[BoundLinkUtils.callMethodOnLinkedClasses] - Double-linked class %q for method %q"):format(tag, methodName))
 			return
 		end
 
