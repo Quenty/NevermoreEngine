@@ -1,9 +1,9 @@
 --- Utility methods for binders
--- @module BinderUtilss
+-- @module BinderUtils
 
-local BinderUtilss = {}
+local BinderUtils = {}
 
-function BinderUtilss.findFirstAncestor(binder, child)
+function BinderUtils.findFirstAncestor(binder, child)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(child) == "Instance", "Child parameter must be instance")
 
@@ -18,7 +18,7 @@ function BinderUtilss.findFirstAncestor(binder, child)
 	return nil
 end
 
-function BinderUtilss.findFirstChild(binder, parent)
+function BinderUtils.findFirstChild(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -32,7 +32,7 @@ function BinderUtilss.findFirstChild(binder, parent)
 	return nil
 end
 
-function BinderUtilss.getChildren(binder, parent)
+function BinderUtils.getChildren(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -46,7 +46,7 @@ function BinderUtilss.getChildren(binder, parent)
 	return objects
 end
 
-function BinderUtilss.getChildrenOfBinders(binders, parent)
+function BinderUtils.getChildrenOfBinders(binders, parent)
 	assert(type(binders) == "table", "binders must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -62,7 +62,7 @@ function BinderUtilss.getChildrenOfBinders(binders, parent)
 	return objects
 end
 
-function BinderUtilss.getLinkedChildren(binder, linkName, parent)
+function BinderUtils.getLinkedChildren(binder, linkName, parent)
 	local seen = {}
 	local objects = {}
 	for _, item in pairs(parent:GetChildren()) do
@@ -73,7 +73,7 @@ function BinderUtilss.getLinkedChildren(binder, linkName, parent)
 					seen[obj] = true
 					table.insert(objects, obj)
 				else
-					warn(("[BinderUtilss.getLinkedChildren] - Double linked children at %q"):format(item:GetFullName()))
+					warn(("[BinderUtils.getLinkedChildren] - Double linked children at %q"):format(item:GetFullName()))
 				end
 			end
 		end
@@ -81,7 +81,7 @@ function BinderUtilss.getLinkedChildren(binder, linkName, parent)
 	return objects
 end
 
-function BinderUtilss.getDescendants(binder, parent)
+function BinderUtils.getDescendants(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
@@ -96,4 +96,4 @@ function BinderUtilss.getDescendants(binder, parent)
 end
 
 
-return BinderUtilss
+return BinderUtils
