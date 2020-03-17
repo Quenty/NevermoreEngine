@@ -32,7 +32,7 @@ function TextFilterUtils.promiseNonChatStringForBroadcast(string, userId)
 	assert(type(userId) == "number")
 
 	local promise = Promise.spawn(function(resolve, reject)
-		local text, err = TextFilterUtils.GetNonChatStringForBroadcastAsync(string, userId)
+		local text, err = TextFilterUtils.getNonChatStringForBroadcastAsync(string, userId)
 		if not text then
 			return reject(err or "Pcall failed")
 		end
