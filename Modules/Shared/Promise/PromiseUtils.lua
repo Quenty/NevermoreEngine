@@ -11,7 +11,7 @@ local PromiseUtils = {}
 -- @constructor First
 -- @tparam Array(Promise) promises
 -- @treturn Promise Promise that resolves with first result
-function PromiseUtils.race(promises)
+function PromiseUtils.any(promises)
 	local returnPromise = Promise.new()
 
 	local function syncronize(method)
