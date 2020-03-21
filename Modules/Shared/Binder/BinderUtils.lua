@@ -1,6 +1,8 @@
 --- Utility methods for binders
 -- @module BinderUtils
 
+local CollectionService = game:GetService("CollectionService")
+
 local BinderUtils = {}
 
 function BinderUtils.findFirstAncestor(binder, child)
@@ -47,18 +49,28 @@ function BinderUtils.getChildren(binder, parent)
 end
 
 function BinderUtils.getChildrenOfBinders(binders, parent)
-	assert(type(binders) == "table", "binders must be binder")
+	assert(type(binders) == "table", "binders must be a table of binders")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
 
+	local tags = {}
+	for _, binder in pairs(binders) do
+		tags[binder:GetTag()] = binder
+	end
+
 	local objects = {}
-	for _, item in pairs(parent:GetChildren()) do
-		for _, binder in pairs(binders) do
-			local obj = binder:Get(item)
-			if obj then
-				table.insert(objects, obj)
+
+	for _, instance in pairs(parent:GetChildren()) do
+		for _, tag in pairs(CollectionService:GetTags(instance)) do
+			local binder = tags[tag]
+			if binder then
+				local obj = binder:Get(instance)
+				if obj then
+					table.insert(objects, obj)
+				end
 			end
 		end
 	end
+
 	return objects
 end
 
