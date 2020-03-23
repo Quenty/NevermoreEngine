@@ -120,6 +120,16 @@ function Promise:Wait()
 	end
 end
 
+function Promise:GetResults()
+	if self._rejected then
+		return false, unpack(self._rejected, 1, self._valuesLength)
+	elseif self._fulfilled then
+		return true, unpack(self._fulfilled, 1, self._valuesLength)
+	else
+		error("Still pending")
+	end
+end
+
 --- Promise resolution procedure
 -- Resolves a promise
 -- @return self

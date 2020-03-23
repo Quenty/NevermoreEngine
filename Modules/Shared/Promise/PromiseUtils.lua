@@ -60,4 +60,21 @@ function PromiseUtils.all(promises)
 	return returnPromise
 end
 
+function PromiseUtils.invert(promise)
+	if promise:IsPending() then
+		return promise:Then(function(...)
+			return Promise.rejected(...)
+		end, function(...)
+			return Promise.resolved(...)
+		end)
+	else
+		local results = {promise:GetResults()}
+		if results[1] then
+			return Promise.rejected(unpack(results, 2))
+		else
+			return Promise.resolved(unpack(results, 2))
+		end
+	end
+end
+
 return PromiseUtils
