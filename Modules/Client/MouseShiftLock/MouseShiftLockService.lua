@@ -6,6 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local StarterPlayer = game:GetService("StarterPlayer")
 
 local Promise = require("Promise")
 
@@ -14,6 +15,10 @@ local MouseShiftLockService = {}
 function MouseShiftLockService:Init()
 	self._enabled = Instance.new("BoolValue")
 	self._enabled.Value = true
+
+	if not StarterPlayer.EnableMouseLockOption then
+		return
+	end
 
 	self._promiseReady = self:_buildPromiseReady()
 
