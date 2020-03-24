@@ -4,12 +4,14 @@
 local String = {}
 
 function String.trim(str, pattern)
-	pattern = pattern or "%s";
-	-- %S is whitespaces
-	-- When we find the first non space character defined by ^%s
-	-- we yank out anything in between that and the end of the string
-	-- Everything else is replaced with %1 which is essentially nothing
-	return str:gsub("^"..pattern.."*(.-)"..pattern.."*$", "%1")
+	if not pattern then
+		return str:match("^%s*(.-)%s*$")
+	else
+		-- When we find the first non space character defined by ^%s
+		-- we yank out anything in between that and the end of the string
+		-- Everything else is replaced with %1 which is essentially nothing
+		return str:match("^"..pattern.."*(.-)"..pattern.."*$")
+	end
 end
 
 --- Sets it to UpperCamelCase
