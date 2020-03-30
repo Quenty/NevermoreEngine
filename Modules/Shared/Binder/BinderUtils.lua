@@ -48,15 +48,21 @@ function BinderUtils.getChildren(binder, parent)
 	return objects
 end
 
-function BinderUtils.getChildrenOfBinders(binders, parent)
-	assert(type(binders) == "table", "binders must be a table of binders")
-	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
+function BinderUtils.mapBinderListToTable(bindersList)
+	assert(type(bindersList) == "table", "bindersList must be a table of binders")
 
 	local tags = {}
-	for _, binder in pairs(binders) do
+	for _, binder in pairs(bindersList) do
 		tags[binder:GetTag()] = binder
 	end
+	return tags
+end
 
+function BinderUtils.getChildrenOfBinders(bindersList, parent)
+	assert(type(bindersList) == "table", "bindersList must be a table of binders")
+	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
+
+	local tags = BinderUtils.mapBinderListToTable(bindersList)
 	local objects = {}
 
 	for _, instance in pairs(parent:GetChildren()) do
