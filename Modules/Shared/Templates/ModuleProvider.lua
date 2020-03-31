@@ -1,20 +1,16 @@
---- Provides modules behind
+--- Creates a service that provides modules from a parent module, either by name, or by list!
 -- @classmod ModuleProvider
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
-local BaseObject = require("BaseObject")
-
-local ModuleProvider = setmetatable({}, BaseObject)
+local ModuleProvider = {}
 ModuleProvider.ClassName = "ModuleProvider"
 ModuleProvider.__index = ModuleProvider
 
-function ModuleProvider.new(parent, checker, process)
-	local self = setmetatable(BaseObject.new(), ModuleProvider)
+function ModuleProvider.new(parent, checkModule, initModule)
+	local self = setmetatable({}, ModuleProvider)
 
 	self._parent = parent or error("No parent")
-	self._checker = checker or error("No checker")
-	self._process = process or error("No process")
+	self._checkModule = checkModule or error("No checkModule")
+	self._initModule = initModule or error("No initModule")
 
 	return self
 end
@@ -25,26 +21,32 @@ function ModuleProvider:Init()
 	self._modulesList = {}
 	self._registry = {}
 
-	self:_processParent(self._parent)
+	self:_processFolder(self._parent)
+
+	for _, _module in pairs(self._modulesList) do
+		self._initModule(_module)
+	end
 end
 
-
 function ModuleProvider:GetModules()
-	assert(self._modulesList)
+	assert(self._modulesList, "Not initialized yet")
 
 	return self._modulesList
 end
 
 function ModuleProvider:GetFromName(name)
+	assert(self._registry, "Not initialized yet")
+	assert(type(name) == "string")
+
 	return self._registry[name]
 end
 
-function ModuleProvider:_processParent(parent)
-	for _, moduleScript in pairs(parent:GetChildren()) do
+function ModuleProvider:_processFolder(folder)
+	for _, moduleScript in pairs(folder:GetChildren()) do
 		if moduleScript:IsA("ModuleScript") then
 			self:_addToRegistery(moduleScript)
 		else
-			self:_processParent(moduleScript)
+			self:_processFolder(moduleScript)
 		end
 	end
 end
@@ -56,13 +58,13 @@ function ModuleProvider:_addToRegistery(moduleScript)
 	end
 
 	local _module = require(moduleScript)
-	local ok, err = self._checker(_module)
+
+	local ok, err = self._checkModule(_module)
 	if not ok then
-		error(("[ModuleProvider._addToRegistery] - Bad module %q due to %q")
-			:format(moduleScript.Name, tostring(err)))
+		error(("[ModuleProvider] - Bad module %q - %q")
+			:format(moduleScript:GetFullName(), tostring(err)))
 	end
 
-	self._process(_module)
 	table.insert(self._modulesList, _module)
 
 	self._registry[moduleScript.Name] = require(moduleScript)
