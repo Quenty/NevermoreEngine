@@ -136,16 +136,26 @@ function Binder:_add(inst)
 
 	self._loading[inst] = true
 
+	local result
 	if type(self._class) == "function" then
-		self._maid[inst] = self._class(inst)
+		result = self._class(inst)
 	elseif self._class.Create then
-		self._maid[inst] = self._class:Create(inst)
+		result = self._class:Create(inst)
 	else
-		self._maid[inst] = self._class.new(inst)
+		result = self._class.new(inst)
 	end
 
+	if not self._loading[inst] then
+		-- Got GCed in the process of loading?!
+		warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!")
+			:format(inst:GetFullName(), tostring(self._class.ClassName)))
+		return
+	end
+
+	self._maid[inst] = result
+
 	if self._classAddedSignal then
-		self._classAddedSignal:Fire(self._maid[inst], inst)
+		self._classAddedSignal:Fire(result, inst)
 	end
 end
 
