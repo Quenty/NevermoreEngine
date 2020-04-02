@@ -53,11 +53,17 @@ end
 
 function ModuleProvider:_addToRegistery(moduleScript)
 	if self._registry[moduleScript.Name] then
-		error(("[BehaviorNodeClassRegistery._addToRegistery] - Duplicate %q in registery")
+		error(("[ModuleProvider._addToRegistery] - Duplicate %q in registery")
 			:format(moduleScript.Name))
 	end
 
-	local _module = require(moduleScript)
+	local _module
+	xpcall(function()
+		_module = require(moduleScript)
+	end, function(err)
+		error(("[ModuleProvider._addToRegistery] - Failed to load %q due to %q")
+			:format(moduleScript:GetFullName(), tostring(err)))
+	end)
 
 	local ok, err = self._checkModule(_module)
 	if not ok then
