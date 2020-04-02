@@ -14,14 +14,16 @@ local PromiseUtils = {}
 function PromiseUtils.any(promises)
 	local returnPromise = Promise.new()
 
-	local function syncronize(method)
-		return function(...)
-			returnPromise[method](returnPromise, ...)
-		end
+	local function resolve(...)
+		returnPromise:Resolve(...)
+	end
+
+	local function reject(...)
+		returnPromise:Reject(...)
 	end
 
 	for _, promise in pairs(promises) do
-		promise:Then(syncronize("Resolve"), syncronize("Reject"))
+		promise:Then(resolve, reject)
 	end
 
 	return returnPromise
@@ -32,6 +34,10 @@ end
 -- @constructor First
 -- @treturn Promise
 function PromiseUtils.all(promises)
+	if #promises == 0 then
+		return Promise.resolved()
+	end
+
 	local remainingCount = #promises
 	local returnPromise = Promise.new()
 	local results = {}
@@ -51,10 +57,6 @@ function PromiseUtils.all(promises)
 
 	for index, promise in pairs(promises) do
 		promise:Then(syncronize(index, true), syncronize(index, false))
-	end
-
-	if #promises == 0 then
-		returnPromise:Resolve()
 	end
 
 	return returnPromise
