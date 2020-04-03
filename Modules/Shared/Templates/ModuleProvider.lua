@@ -5,12 +5,13 @@ local ModuleProvider = {}
 ModuleProvider.ClassName = "ModuleProvider"
 ModuleProvider.__index = ModuleProvider
 
-function ModuleProvider.new(parent, checkModule, initModule)
+function ModuleProvider.new(parent, checkModule, initModule, sortList)
 	local self = setmetatable({}, ModuleProvider)
 
 	self._parent = parent or error("No parent")
 	self._checkModule = checkModule or error("No checkModule")
 	self._initModule = initModule or error("No initModule")
+	self._sortList = sortList
 
 	return self
 end
@@ -22,6 +23,10 @@ function ModuleProvider:Init()
 	self._registry = {}
 
 	self:_processFolder(self._parent)
+
+	if self._sortList then
+		self._sortList(self._modulesList)
+	end
 
 	for _, _module in pairs(self._modulesList) do
 		self._initModule(_module)
