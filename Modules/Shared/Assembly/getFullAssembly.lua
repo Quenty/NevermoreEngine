@@ -41,6 +41,16 @@ return function(originParts)
 					end
 				end
 			end
+		elseif item:IsA("Accessory") then
+			local handle = item:FindFirstChildWhichIsA("BasePart")
+			if handle then
+				if not checked[handle] then
+					checked[handle] = true
+					table.insert(result, handle)
+				end
+			else
+				warn("[getFullAssembly] - No handle in accessory")
+			end
 		else
 			error("Bad item type in starting table")
 		end
