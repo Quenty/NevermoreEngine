@@ -15,14 +15,17 @@ assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackSe
 
 local CameraStackService = {}
 
-function CameraStackService:Init()
+function CameraStackService:Init(doNotUseDefaultCamera)
 	self._stack = {}
 
 	-- Initialize default cameras
 	self._rawDefaultCamera = DefaultCamera.new()
 	self._impulseCamera = ImpulseCamera.new()
 	self._defaultCamera = (self._rawDefaultCamera + self._impulseCamera):SetMode("Relative")
-	self._rawDefaultCamera:BindToRenderStep()
+
+	if not doNotUseDefaultCamera then
+		self._rawDefaultCamera:BindToRenderStep()
+	end
 
 	-- Add camera to stack
 	self:Add(self._defaultCamera)
