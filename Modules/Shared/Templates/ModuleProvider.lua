@@ -8,9 +8,15 @@ ModuleProvider.__index = ModuleProvider
 function ModuleProvider.new(parent, checkModule, initModule, sortList)
 	local self = setmetatable({}, ModuleProvider)
 
+	assert(typeof(parent) == "Instance")
+	assert(checkModule == nil or type(checkModule) == "function")
+	assert(initModule == nil or type(initModule) == "function")
+	assert(sortList == nil or type(sortList) == "function")
+
 	self._parent = parent or error("No parent")
-	self._checkModule = checkModule or error("No checkModule")
-	self._initModule = initModule or error("No initModule")
+
+	self._initModule = initModule
+	self._checkModule = checkModule
 	self._sortList = sortList
 
 	return self
@@ -28,8 +34,10 @@ function ModuleProvider:Init()
 		self._sortList(self._modulesList)
 	end
 
-	for _, _module in pairs(self._modulesList) do
-		self._initModule(_module)
+	if self._initModule then
+		for _, _module in pairs(self._modulesList) do
+			self._initModule(_module)
+		end
 	end
 end
 
@@ -70,10 +78,12 @@ function ModuleProvider:_addToRegistery(moduleScript)
 			:format(moduleScript:GetFullName(), tostring(err)))
 	end)
 
-	local ok, err = self._checkModule(_module)
-	if not ok then
-		error(("[ModuleProvider] - Bad module %q - %q")
-			:format(moduleScript:GetFullName(), tostring(err)))
+	if self._checkModule then
+		local ok, err = self._checkModule(_module)
+		if not ok then
+			error(("[ModuleProvider] - Bad module %q - %q")
+				:format(moduleScript:GetFullName(), tostring(err)))
+		end
 	end
 
 	table.insert(self._modulesList, _module)
