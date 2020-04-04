@@ -19,12 +19,12 @@ function IsAMixin:IsA(className)
 
 	assert(type(className) == "string", "className must be a string")
 
-	local CurrentMetatable = getmetatable(self)
-	while CurrentMetatable do
-		if CurrentMetatable.ClassName == className then
+	local currentMetatable = getmetatable(self)
+	while currentMetatable do
+		if currentMetatable.ClassName == className then
 			return true
 		end
-		CurrentMetatable = getmetatable(CurrentMetatable)
+		currentMetatable = getmetatable(currentMetatable)
 	end
 
 	return false
