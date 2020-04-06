@@ -18,7 +18,7 @@ local IKServiceClient = {}
 function IKServiceClient:Init()
 	self._maid = Maid.new()
 	self._ikRigBinder = Binder.new(IKConstants.COLLECTION_SERVICE_TAG, require("IKRigClient"))
-	self._noVerticalLocal = false
+	self._noDefaultIK = false
 
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
 		self:_updateStepped()
@@ -53,8 +53,8 @@ function IKServiceClient:SetAimPosition(position, optionalPriority)
 	aimer:SetAimPosition(position, optionalPriority)
 end
 
-function IKServiceClient:SetNoVerticalLocal(noVertical)
-	self._noVerticalLocal = noVertical
+function IKServiceClient:SetNoDefaultIK(noDefaultIK)
+	self._noDefaultIK = noDefaultIK
 end
 
 function IKServiceClient:GetLocalAimer()
@@ -75,7 +75,7 @@ function IKServiceClient:_updateStepped()
 
 	local localAimer = self:GetLocalAimer()
 	if localAimer then
-		localAimer:SetNoVertical(self._noVerticalLocal)
+		localAimer:SetNoDefaultIK(self._noDefaultIK)
 		localAimer:UpdateStepped()
 	end
 

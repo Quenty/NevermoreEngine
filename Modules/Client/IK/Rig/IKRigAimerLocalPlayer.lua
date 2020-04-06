@@ -24,13 +24,13 @@ function IKRigAimerLocalPlayer.new(ikRig, remoteEvent)
 	self._lastUpdate = 0
 	self._lastReplication = 0
 	self._aimData = nil
-	self._noVertical = false
+	self._noDefault = false
 
 	return self
 end
 
-function IKRigAimerLocalPlayer:SetNoVertical(noVertical)
-	self._noVertical = noVertical
+function IKRigAimerLocalPlayer:SetNoDefaultIK(noDefault)
+	self._noDefault = noDefault
 end
 
 function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
@@ -55,6 +55,10 @@ function IKRigAimerLocalPlayer:GetAimDirection()
 		return self._aimData.position
 	end
 
+	if self._noDefault then
+		return nil
+	end
+
 	local humanoid = self._ikRig:GetHumanoid()
 
 	local cameraCFrame = CameraStackService:GetRawDefaultCamera().CameraState.CFrame
@@ -68,17 +72,12 @@ function IKRigAimerLocalPlayer:GetAimDirection()
 		-- Angle between forward vector of character and the camera (only Y axis)
 		local angle = math.acos(relative.Z)
 
-
 		if angle < math.rad(60) then
 			multiplier = -multiplier
 		end
 	end
 
 	local direction = cameraCFrame.lookVector * multiplier
-
-	if self._noVertical then
-		direction = direction * Vector3.new(1, 0, 1)
-	end
 
 	return cameraCFrame.p + direction
 end
@@ -88,9 +87,10 @@ function IKRigAimerLocalPlayer:UpdateStepped()
 	if (tick() - self._lastUpdate) <= 0.05 then
 		return
 	end
-	self._lastUpdate = tick()
 
 	local aimDirection = self:GetAimDirection()
+
+	self._lastUpdate = tick()
 	local torso = self._ikRig:GetTorso()
 	if torso then
 		torso:Point(aimDirection)
