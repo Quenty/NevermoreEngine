@@ -52,12 +52,12 @@ function SummedCamera:__index(index)
 		if self._mode == "World" then
 			return self.CameraAState + self.CameraBState
 		else
-			local StateA = self.CameraAState
-			local StateB = self.CameraBState
+			local stateA = self.CameraAState
+			local stateB = self.CameraBState
 
-			local Result = StateA + StateB
-			Result.Position = StateA.CFrame * StateB.Position
-			return Result
+			local result = stateA + stateB
+			result.Position = stateA.CFrame * stateB.Position
+			return result
 		end
 	elseif index == "CameraAState" then
 		return self._cameraA.CameraState or self._cameraA

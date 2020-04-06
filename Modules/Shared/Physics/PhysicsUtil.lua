@@ -101,21 +101,21 @@ function PhysicsUtil.ApplyForce(part, force, forcePosition)
 
 	forcePosition = forcePosition or part.Position
 
-	local CenterOfMass, mass = PhysicsUtil.GetCenterOfMass(parts)
-	local Offset = (CenterOfMass - forcePosition)
-	local Torque = Offset:Cross(force)
+	local centerOfMass, mass = PhysicsUtil.GetCenterOfMass(parts)
+	local offset = (centerOfMass - forcePosition)
+	local torque = offset:Cross(force)
 
-	local MomentOfInertia = PhysicsUtil.BodyMomentOfInertia(parts, Torque, CenterOfMass)
-	local RotAcceleration
-	if MomentOfInertia ~= 0 then
-		RotAcceleration = Torque/MomentOfInertia
+	local momentOfInertia = PhysicsUtil.BodyMomentOfInertia(parts, torque, centerOfMass)
+	local rotAcceleration
+	if momentOfInertia ~= 0 then
+		rotAcceleration = torque/momentOfInertia
 	else
-		RotAcceleration = Vector3.new(0, 0, 0) -- We cannot divide by 0
+		rotAcceleration = Vector3.new(0, 0, 0) -- We cannot divide by 0
 	end
 
 	local acceleration = force/mass
 
-	part.RotVelocity = part.RotVelocity + RotAcceleration
+	part.RotVelocity = part.RotVelocity + rotAcceleration
 	part.Velocity = part.Velocity + acceleration
 end
 
