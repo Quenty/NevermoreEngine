@@ -3,13 +3,19 @@
 
 local InputObjectUtils = {}
 
-local SAME_BASED_UPON_TYPE = {
+local MOUSE_USER_INPUT_TYPES = {
 	[Enum.UserInputType.MouseButton1] = true;
 	[Enum.UserInputType.MouseButton2] = true;
 	[Enum.UserInputType.MouseButton3] = true;
 	[Enum.UserInputType.MouseWheel] = true;
 	[Enum.UserInputType.MouseMovement] = true;
 }
+
+function InputObjectUtils.isMouseUserInputType(userInputType)
+	assert(typeof(userInputType) == "EnumItem")
+
+	return MOUSE_USER_INPUT_TYPES[userInputType]
+end
 
 function InputObjectUtils.isSameInputObject(inputObject, otherInputObject)
 	assert(inputObject)
@@ -19,7 +25,7 @@ function InputObjectUtils.isSameInputObject(inputObject, otherInputObject)
 		return true
 	end
 
-	if SAME_BASED_UPON_TYPE[inputObject.UserInputType] then
+	if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
 		return inputObject.UserInputType == otherInputObject.UserInputType
 	end
 
