@@ -23,7 +23,14 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 	self._impulseCamera = ImpulseCamera.new()
 	self._defaultCamera = (self._rawDefaultCamera + self._impulseCamera):SetMode("Relative")
 
-	if not doNotUseDefaultCamera then
+	if doNotUseDefaultCamera then
+		Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+
+		-- TODO: Handle camera deleted too!
+		Workspace.CurrentCamera:GetPropertyChangedSignal("CameraType"):Connect(function()
+			Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+		end)
+	else
 		self._rawDefaultCamera:BindToRenderStep()
 	end
 
