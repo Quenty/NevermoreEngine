@@ -1,4 +1,4 @@
---- BaseObject
+--- A BaseObject basically just adds the :Destroy() interface, and a _maid, along with an optional object it references.
 -- @classmod BaseObject
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
