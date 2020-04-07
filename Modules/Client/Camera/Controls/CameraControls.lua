@@ -3,12 +3,13 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local Maid = require("Maid")
 local GamepadRotateModel = require("GamepadRotateModel")
+local InputObjectUtils = require("InputObjectUtils")
 
 --- Stolen directly from ROBLOX's core scripts.
 -- Looks like a simple integrator.
@@ -136,7 +137,7 @@ function CameraControls:BeginDrag(beginInputObject)
 	local maid = Maid.new()
 
 	self._lastMousePosition = beginInputObject.Position
-	local isMouse = beginInputObject.UserInputType.Name:find("Mouse")
+	local isMouse = InputObjectUtils.isMouseUserInputType(beginInputObject.UserInputType)
 	if isMouse then
 		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
 	end

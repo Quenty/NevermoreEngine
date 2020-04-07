@@ -16,6 +16,8 @@ DefaultCamera.ClassName = "DefaultCamera"
 function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)
 
+	self._cameraState = CameraState.new(Workspace.CurrentCamera)
+
 	return self
 end
 

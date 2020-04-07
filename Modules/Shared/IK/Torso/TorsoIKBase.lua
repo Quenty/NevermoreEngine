@@ -20,7 +20,7 @@ function TorsoIKBase.new(humanoid)
 
 	self._humanoid = humanoid or error("No humanoid")
 
-	self.Pointed = Signal.new() -- :Fire(position)
+	self.Pointed = Signal.new() -- :Fire(position | nil)
 	self._maid:GiveTask(self.Pointed)
 
 	self._resources = IKResource.new(IKResourceUtils.createResource({

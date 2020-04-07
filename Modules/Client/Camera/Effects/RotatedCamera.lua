@@ -63,9 +63,9 @@ end
 
 function RotatedCamera:__index(index)
 	if index == "CameraState" then
-		local State = CameraState.new()
-		State.CFrame = self.CFrame
-		return State
+		local state = CameraState.new()
+		state.CFrame = self.CFrame
+		return state
 	elseif index == "LookVector" then
 		return self.Rotation.lookVector
 	elseif index == "CFrame" then

@@ -36,7 +36,7 @@ function IKRig:GetTarget()
 end
 
 function IKRig:SetRigTarget(target)
-	assert(typeof(target) == "Vector3")
+	assert(typeof(target) == "Vector3" or target == nil)
 
 	self._target = target
 
@@ -50,7 +50,7 @@ end
 
 function IKRig:_onServerEvent(player, target)
 	assert(player == CharacterUtils.getPlayerFromCharacter(self._obj))
-	assert(typeof(target) == "Vector3")
+	assert(typeof(target) == "Vector3" or target == nil)
 
 	self._target = target
 
@@ -62,7 +62,7 @@ function IKRig:_onServerEvent(player, target)
 	-- Do replication
 	for _, other in pairs(Players:GetPlayers()) do
 		if other ~= player then
-			self._remoteEvent:FireClient(other, target)
+			self._remoteEvent:FireClient(other, target) -- target may nil
 		end
 	end
 end

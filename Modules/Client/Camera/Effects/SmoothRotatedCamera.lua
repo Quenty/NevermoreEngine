@@ -100,9 +100,9 @@ end
 
 function SmoothRotatedCamera:__index(index)
 	if index == "CameraState" then
-		local State = CameraState.new()
-		State.CFrame = self.CFrame
-		return State
+		local state = CameraState.new()
+		state.CFrame = self.CFrame
+		return state
 	elseif index == "LookVector" then
 		return self.Rotation.lookVector
 	elseif index == "CFrame" then
@@ -111,15 +111,15 @@ function SmoothRotatedCamera:__index(index)
 		return CFrame.Angles(0, self.TargetAngleXZ, 0) * CFrame.Angles(self.TargetAngleY, 0, 0)
 	elseif index == "RenderAngleY" then
 		local angle = self.AngleY
-		local Past = self:GetPastBounds(angle)
+		local past = self:GetPastBounds(angle)
 
-		local TimesOverBounds = math.abs(Past) / self.ZoomGiveY
-		local Scale = (1 - 0.25 ^ math.abs(TimesOverBounds))
+		local timesOverBounds = math.abs(past) / self.ZoomGiveY
+		local scale = (1 - 0.25 ^ math.abs(timesOverBounds))
 
-		if Past < 0 then
-			return self.MinY - self.ZoomGiveY*Scale
-		elseif Past > 0 then
-			return self.MaxY + self.ZoomGiveY*Scale
+		if past < 0 then
+			return self.MinY - self.ZoomGiveY*scale
+		elseif past > 0 then
+			return self.MaxY + self.ZoomGiveY*scale
 		else
 			return angle
 		end

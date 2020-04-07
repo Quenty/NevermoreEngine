@@ -14,12 +14,12 @@ local Binder = {}
 Binder.__index = Binder
 Binder.ClassName = "Binder"
 
-function Binder.new(tagName, class)
+function Binder.new(tagName, constructor)
 	local self = setmetatable({}, Binder)
 
 	self._maid = Maid.new()
 	self._tagName = tagName or error("No tagName")
-	self._class = class or error("No class")
+	self._constructor = constructor or error("No constructor")
 
 	self._loading = setmetatable({}, {__mode = "kv"})
 
@@ -50,6 +50,10 @@ function Binder:Init()
 	self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(self._tagName):Connect(function(inst)
 		self:_remove(inst)
 	end))
+end
+
+function Binder:GetConstructor()
+	return self._constructor
 end
 
 function Binder:GetClassAddedSignal()
@@ -136,16 +140,28 @@ function Binder:_add(inst)
 
 	self._loading[inst] = true
 
-	if type(self._class) == "function" then
-		self._maid[inst] = self._class(inst)
-	elseif self._class.Create then
-		self._maid[inst] = self._class:Create(inst)
+	local result
+	if type(self._constructor) == "function" then
+		result = self._constructor(inst)
+	elseif self._constructor.Create then
+		result = self._constructor:Create(inst)
 	else
-		self._maid[inst] = self._class.new(inst)
+		result = self._constructor.new(inst)
 	end
 
+	if not self._loading[inst] then
+		-- Got GCed in the process of loading?!
+		warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!")
+			:format(
+				inst:GetFullName(),
+				tostring(type(self._constructor) == "table" and self._constructor.ClassName or self._constructor)))
+		return
+	end
+
+	self._maid[inst] = result
+
 	if self._classAddedSignal then
-		self._classAddedSignal:Fire(self._maid[inst], inst)
+		self._classAddedSignal:Fire(result, inst)
 	end
 end
 

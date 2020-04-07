@@ -18,7 +18,10 @@ local _emptyFulfilledPromise = nil
 local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
-Promise.IsPromise = isPromise
+
+--- Determines whether a value is a promise or not
+-- @function isPromise
+Promise.isPromise = isPromise
 
 --- Construct a new promise
 -- @constructor Promise.new()
@@ -117,16 +120,6 @@ function Promise:Wait()
 		else
 			return unpack(self._fulfilled, 1, self._valuesLength)
 		end
-	end
-end
-
-function Promise:GetResults()
-	if self._rejected then
-		return false, unpack(self._rejected, 1, self._valuesLength)
-	elseif self._fulfilled then
-		return true, unpack(self._fulfilled, 1, self._valuesLength)
-	else
-		error("Still pending")
 	end
 end
 
@@ -249,6 +242,16 @@ end
 -- @treturn nil
 function Promise:Destroy()
 	self:_reject({}, 0)
+end
+
+function Promise:GetResults()
+	if self._rejected then
+		return false, unpack(self._rejected, 1, self._valuesLength)
+	elseif self._fulfilled then
+		return true, unpack(self._fulfilled, 1, self._valuesLength)
+	else
+		error("Still pending")
+	end
 end
 
 function Promise:_getResolveReject()

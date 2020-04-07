@@ -30,6 +30,30 @@ function Table.merge(orig, new)
 	return _table
 end
 
+--- Creates a copy of the table, but shuffled using fisher-yates shuffle
+-- @tparam table orig A new table to copy
+-- @tparam[opt=nil] A random to use when shuffling
+function Table.shuffledCopy(orig, random)
+	local tbl = {}
+	for i=1, #orig do
+		tbl[i] = orig[i]
+	end
+
+	if random then
+		for i = #tbl, 2, -1 do
+			local j = random:NextInteger(1, i)
+			tbl[i], tbl[j] = tbl[j], tbl[i]
+		end
+	else
+		for i = #tbl, 2, -1 do
+			local j = math.random(i)
+			tbl[i], tbl[j] = tbl[j], tbl[i]
+		end
+	end
+
+	return tbl
+end
+
 --- Shallow merges two lists without modifying either
 -- @tparam table orig original table
 -- @tparam table new new table
