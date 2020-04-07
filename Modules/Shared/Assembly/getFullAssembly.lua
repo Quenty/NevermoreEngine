@@ -41,7 +41,7 @@ return function(originParts)
 					end
 				end
 			end
-		elseif item:IsA("Accessory") then
+		elseif item:IsA("Accessory") or item:IsA("Clothing") then
 			local handle = item:FindFirstChildWhichIsA("BasePart")
 			if handle then
 				if not checked[handle] then
