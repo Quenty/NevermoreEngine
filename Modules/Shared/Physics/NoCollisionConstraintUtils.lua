@@ -12,7 +12,6 @@ function NoCollisionConstraintUtils.create(part0, part1)
 	local noCollision = Instance.new("NoCollisionConstraint")
 	noCollision.Part0 = part0
 	noCollision.Part1 = part1
-	noCollision.Parent = part0
 
 	return noCollision
 end
