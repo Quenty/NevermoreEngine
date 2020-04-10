@@ -5,6 +5,8 @@ local NetworkOwnerService = {}
 
 local WEAK_METATABLE = { __mode = "kv" }
 
+local SERVER_FLAG = "server"
+
 function NetworkOwnerService:Init()
 	self._partOwnerData = setmetatable({}, { __mode="k" })
 end
@@ -12,7 +14,11 @@ end
 function NetworkOwnerService:AddSetNetworkOwnerHandle(part, player)
 	assert(self._partOwnerData, "Not initialized")
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"))
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil)
+
+	if player == nil then
+		player = SERVER_FLAG
+	end
 
 	-- wrap in table so we have unique value
 	local data = {
@@ -78,15 +84,23 @@ function NetworkOwnerService:UpdateOwner(part)
 
 	-- Prefer last set
 	local player = ownerDataStack[#ownerDataStack].player
+	if player == SERVER_FLAG then
+		player = nil
+	end
+
 	self:_setNetworkOwner(part, player)
 end
 
 function NetworkOwnerService:_setNetworkOwner(part, player)
-	assert(player)
-
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerService] - Cannot set network ownership:", err)
+		return
+	end
+
+	-- Avoid swapping owner if we can
+	if (part:GetNetworkOwner() == player) and
+		not part:GetNetworkOwnershipAuto() then
 		return
 	end
 
@@ -97,6 +111,11 @@ function NetworkOwnerService:_setNetworkOwnershipAuto(part)
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerService] - Cannot set network ownership:", err)
+		return
+	end
+
+	-- Try not to swap owner if we can
+	if not part:GetNetworkOwnershipAuto() then
 		return
 	end
 
