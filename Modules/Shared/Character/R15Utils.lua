@@ -38,21 +38,24 @@ function R15Utils.getNeckJoint(character)
 	return head:FindFirstChild("Neck")
 end
 
-
-function R15Utils.getLeftGripAttachment(character)
-	return R15Utils.searchForRigAttachment(character, "LeftHand", "LeftGripAttachment")
+function R15Utils.getShoulderRigAttachment(character, side)
+	if side == "Left"  then
+		return R15Utils.searchForRigAttachment(character, "UpperTorso", "LeftShoulderRigAttachment")
+	elseif side == "Right" then
+		return R15Utils.searchForRigAttachment(character, "UpperTorso", "RightShoulderRigAttachment")
+	else
+		error("Bad side")
+	end
 end
 
-function R15Utils.getRightGripAttachment(character)
-	return R15Utils.searchForRigAttachment(character, "RightHand", "RightGripAttachment")
-end
-
-function R15Utils.getLeftShoulderRigAttachment(character)
-	return R15Utils.searchForRigAttachment(character, "UpperTorso", "LeftShoulderRigAttachment")
-end
-
-function R15Utils.getRightShoulderRigAttachment(character)
-	return R15Utils.searchForRigAttachment(character, "UpperTorso", "RightShoulderRigAttachment")
+function R15Utils.getGripAttachment(character, side)
+	if side == "Left"  then
+		return R15Utils.searchForRigAttachment(character, "LeftHand", "LeftGripAttachment")
+	elseif side == "Right" then
+		return R15Utils.searchForRigAttachment(character, "RightHand", "RightGripAttachment")
+	else
+		error("Bad side")
+	end
 end
 
 function R15Utils.getExpectedRootPartYOffset(humanoid)
@@ -91,43 +94,41 @@ function R15Utils.addLengthsOrNil(lengths)
 	return total
 end
 
-function R15Utils.getLeftUpperArmRigLength(character)
-	return R15Utils.getRigLength(character, "LeftUpperArm", "LeftShoulderRigAttachment", "LeftElbowRigAttachment")
+function R15Utils.getUpperArmRigLength(character, side)
+	if side == "Left" then
+		return R15Utils.getRigLength(character, "LeftUpperArm", "LeftShoulderRigAttachment", "LeftElbowRigAttachment")
+	elseif side == "Right" then
+		return R15Utils.getRigLength(character, "RightUpperArm", "RightShoulderRigAttachment", "RightElbowRigAttachment")
+	else
+		error("Bad side")
+	end
 end
 
-function R15Utils.getLeftLowerArmRigLength(character)
-	return R15Utils.getRigLength(character, "LeftLowerArm", "LeftElbowRigAttachment", "LeftWristRigAttachment")
+function R15Utils.getLowerArmRigLength(character, side)
+	if side == "Left" then
+		return R15Utils.getRigLength(character, "LeftLowerArm", "LeftElbowRigAttachment", "LeftWristRigAttachment")
+	elseif side == "Right" then
+		return R15Utils.getRigLength(character, "RightLowerArm", "RightElbowRigAttachment", "RightWristRigAttachment")
+	else
+		error("Bad side")
+	end
 end
 
-function R15Utils.getLeftWristToGripLength(character)
-	return R15Utils.getRigLength(character, "LeftHand", "LeftWristRigAttachment", "LeftGripAttachment")
+function R15Utils.getWristToGripLength(character, side)
+	if side == "Left" then
+		return R15Utils.getRigLength(character, "LeftHand", "LeftWristRigAttachment", "LeftGripAttachment")
+	elseif side == "Right" then
+		return R15Utils.getRigLength(character, "RightHand", "RightWristRigAttachment", "RightGripAttachment")
+	else
+		error("Bad side")
+	end
 end
 
-function R15Utils.getLeftArmRigToGripLength(character)
+function R15Utils.getArmRigToGripLength(character, side)
 	return R15Utils.addLengthsOrNil({
-		R15Utils.getLeftUpperArmRigLength(character),
-		R15Utils.getLeftLowerArmRigLength(character),
-		R15Utils.getLeftWristToGripLength(character)
-	})
-end
-
-function R15Utils.getRightUpperArmRigLength(character)
-	return R15Utils.getRigLength(character, "RightUpperArm", "RightShoulderRigAttachment", "RightElbowRigAttachment")
-end
-
-function R15Utils.getRightLowerArmRigLength(character)
-	return R15Utils.getRigLength(character, "RightLowerArm", "RightElbowRigAttachment", "RightWristRigAttachment")
-end
-
-function R15Utils.getRightWristToGripLength(character)
-	return R15Utils.getRigLength(character, "RightHand", "RightWristRigAttachment", "RightGripAttachment")
-end
-
-function R15Utils.getRightArmRigToGripLength(character)
-	return R15Utils.addLengthsOrNil({
-		R15Utils.getRightUpperArmRigLength(character),
-		R15Utils.getRightLowerArmRigLength(character),
-		R15Utils.getRightWristToGripLength(character)
+		R15Utils.getUpperArmRigLength(character, side),
+		R15Utils.getLowerArmRigLength(character, side),
+		R15Utils.getWristToGripLength(character, side)
 	})
 end
 
