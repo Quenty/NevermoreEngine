@@ -2,6 +2,10 @@
 -- @module NoCollisionConstraintUtils
 -- @author Quenty
 
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local getMechanismParts = require("getMechanismParts")
+
 local NoCollisionConstraintUtils = {}
 
 function NoCollisionConstraintUtils.create(part0, part1)
@@ -21,6 +25,10 @@ function NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1)
 		end
 	end
 	return collisionConstraints
+end
+
+function NoCollisionConstraintUtils.createBetweenMechanisms(adornee0, adornee1)
+	return NoCollisionConstraintUtils.createBetweenPartsLists(getMechanismParts(adornee0), getMechanismParts(adornee1))
 end
 
 return NoCollisionConstraintUtils
