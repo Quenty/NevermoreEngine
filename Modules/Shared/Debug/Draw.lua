@@ -35,16 +35,35 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	local part = Instance.new("Part")
 	part.Anchored = true
 	part.Archivable = false
-	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.CanCollide = false
 	part.CastShadow = false
 	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(math.pi/2, 0, 0)
 	part.Color = color
 	part.Name = "DebugRay"
 	part.Shape = Enum.PartType.Cylinder
-	part.Size = Vector3.new(1 * diameter, ray.Direction.Magnitude, 1 * diameter)
+	part.Size = Vector3.new(diameter, ray.Direction.Magnitude, diameter)
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.5
+
+	local rotatedPart = Instance.new("Part")
+	rotatedPart.Anchored = true
+	rotatedPart.Archivable = false
+	rotatedPart.CanCollide = false
+	rotatedPart.CastShadow = false
+	rotatedPart.CFrame = CFrame.new(ray.Origin, ray.Origin + ray.Direction)
+	rotatedPart.Transparency = 1
+	rotatedPart.Size = Vector3.new(1, 1, 1)
+	rotatedPart.Parent = part
+
+	local lineHandleAdornment = Instance.new("LineHandleAdornment")
+	lineHandleAdornment.Length = ray.Direction.Magnitude
+	lineHandleAdornment.Thickness = 5*diameter
+	lineHandleAdornment.ZIndex = 2
+	lineHandleAdornment.Color3 = color
+	lineHandleAdornment.AlwaysOnTop = true
+	lineHandleAdornment.Transparency = 0
+	lineHandleAdornment.Adornee = rotatedPart
+	lineHandleAdornment.Parent = rotatedPart
 
 	local mesh = Instance.new("SpecialMesh")
 	mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(meshDiameter, 0, meshDiameter) / diameter
