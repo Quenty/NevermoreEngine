@@ -7,6 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local CollectionService = game:GetService("CollectionService")
 
 local LinkUtils = require("LinkUtils")
+local BinderUtils = require("BinderUtils")
 
 local BoundLinkUtils = {}
 
@@ -34,15 +35,21 @@ function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
 		return {}
 	end
 
+	local tags = BinderUtils.mapBinderListToTable(binders)
 	local classes = {}
-	for _, value in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
-		for _, binder in pairs(binders) do
-			local class = binder:Get(value)
-			if class then
-				table.insert(classes, class)
+
+	for _, instance in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
+		for _, tag in pairs(CollectionService:GetTags(instance)) do
+			local binder = tags[tag]
+			if binder then
+				local obj = binder:Get(instance)
+				if obj then
+					table.insert(classes, obj)
+				end
 			end
 		end
 	end
+
 	return classes
 end
 
@@ -57,15 +64,12 @@ function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, metho
 		return
 	end
 
-	local tagged = {}
-	for _, item in pairs(binders) do
-		tagged[item:GetTag()] = item
-	end
+	local tags = BinderUtils.mapBinderListToTable(binders)
 
 	local called = {}
 
 	local function callForTag(value, tag)
-		local binder = tagged[tag]
+		local binder = tags[tag]
 		if not binder then
 			return
 		end
