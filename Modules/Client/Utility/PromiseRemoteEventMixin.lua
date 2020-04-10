@@ -21,5 +21,4 @@ function PromiseRemoteEventMixin:PromiseRemoteEvent()
 	return self._maid:GivePromise(promiseChild(self._obj, self._remoteEventName))
 end
 
-
 return PromiseRemoteEventMixin
