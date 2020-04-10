@@ -13,8 +13,7 @@ local function round(n)
 	return floor(n + 0.5)
 end
 
-local bitSize22 = (2^21-1)
-local bitSize21 = (2^20-1)
+local PRECISION = 10000
 
 function CFrameSerializer.outputRotationAzure(cf)
 	local lookVector = cf.lookVector
@@ -26,18 +25,18 @@ function CFrameSerializer.outputRotationAzure(cf)
 	local _, _, roll = (withoutRoll:inverse()*cf):toEulerAnglesXYZ()
 
 	-- Atan2 -> in the range [-pi, pi]
-	azumith   = round((azumith   /  PI   ) * bitSize22)
-	roll      = round((roll      /  PI   ) * bitSize21)
-	elevation = round((elevation / (PI/2)) * bitSize21)
+	azumith   = round((azumith   /  PI   ) * PRECISION)
+	roll      = round((roll      /  PI   ) * PRECISION)
+	elevation = round((elevation / (PI/2)) * PRECISION)
 	--
 	--[[Buffer:WriteSigned(22, azumith)
 	Buffer:WriteSigned(21, roll)
 	Buffer:WriteSigned(21, elevation)--]]
 
 	local px, py, pz = cf.x, cf.y, cf.z
-	px = round(px * 128) / 128
-	py = round(py * 128) / 128
-	pz = round(pz * 128) / 128
+	px = round(px * 128)
+	py = round(py * 128)
+	pz = round(pz * 128)
 	return {px, py, pz, azumith, roll, elevation}
 end
 
@@ -50,16 +49,16 @@ function CFrameSerializer.readRotationAzure(data)
 	local roll = data[5] --Buffer:ReadSigned(21)
 	local elevation = data[6] --Buffer:ReadSigned(21)
 	--
-	azumith = PI * (azumith/bitSize22)
-	roll = PI * (roll/bitSize21)
-	elevation = (PI/2) * (elevation/bitSize21)
+	azumith = PI * (azumith/PRECISION)
+	roll = PI * (roll/PRECISION)
+	elevation = (PI/2) * (elevation/PRECISION)
 	--
 	--local rot = Angles(0, azumith, 0)
 	--rot = rot * Angles(elevation, 0, 0)
 	--rot = rot * Angles(0, 0, roll)
 	local rot = Angles(0, azumith, 0) * Angles(elevation, 0, roll)
 	--
-	return rot + Vector3.new(data[1], data[2], data[3]) --, azumith, roll, elevation}
+	return rot + Vector3.new(data[1]/128, data[2]/128, data[3]/128) --, azumith, roll, elevation}
 end
 
 return CFrameSerializer
