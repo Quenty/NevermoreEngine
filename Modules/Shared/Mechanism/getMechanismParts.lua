@@ -1,5 +1,5 @@
---- Gets the full assembly of a part
--- @module getFullAssembly
+--- Gets the full mechanism from parts
+-- @module getMechanismParts
 -- https://devforum.roblox.com/t/getting-all-parts-in-a-mechanism-one-part-in-each-assembly/101344/4
 
 local Workspace = game:GetService("Workspace")

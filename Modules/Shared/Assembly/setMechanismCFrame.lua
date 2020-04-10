@@ -1,9 +1,9 @@
---- Gets the full assembly of a part
--- @module setAssemblyCFrame
+--- Sets a mechanisms cframe
+-- @module setMechanismCFrame
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local getFullAssembly = require("getFullAssembly")
+local getMechanismParts = require("getMechanismParts")
 
 return function(originParts, relativeTo, newCFrame)
 	assert(typeof(originParts) == "Instance" or typeof(originParts) == "table")
@@ -11,7 +11,7 @@ return function(originParts, relativeTo, newCFrame)
 	assert(typeof(newCFrame) == "CFrame")
 
 	local target = {}
-	for _, part in pairs(getFullAssembly(originParts)) do
+	for _, part in pairs(getMechanismParts(originParts)) do
 		target[part] = relativeTo:toObjectSpace(part.CFrame)
 	end
 
