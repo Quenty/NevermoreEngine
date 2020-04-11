@@ -2,6 +2,8 @@
 -- @classmod Promise
 -- See: https://promisesaplus.com/
 
+local RunService = game:GetService("RunService")
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local fastSpawn = require("fastSpawn")
@@ -201,11 +203,15 @@ function Promise:_reject(values, valuesLength)
 
 	-- Check for uncaught exceptions
 	if self._uncaughtException and self._valuesLength > 0 then
-		spawn(function()
+		coroutine.resume(coroutine.create(function()
+			-- Yield to end of frame, giving control back to Roblox.
+			-- This is the equivalent of giving something back to a task manager.
+			RunService.Heartbeat:Wait()
+
 			if self._uncaughtException then
 				warn(("[Promise] - Uncaught exception in promise\n\n%s\n\n%s"):format(tostring(self._rejected[1]), self._source))
 			end
-		end)
+		end))
 	end
 end
 
