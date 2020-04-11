@@ -1,19 +1,19 @@
 --- General physics library for use on Roblox
--- @module PhysicsUtil
+-- @module PhysicsUtils
 
 local Workspace = game:GetService("Workspace")
 
-local PhysicsUtil = {}
-PhysicsUtil.WATER_DENSITY = 1 -- (mass/volume)
+local PhysicsUtils = {}
+PhysicsUtils.WATER_DENSITY = 1 -- (mass/volume)
 
 --- Retrieves all connected parts of a part, plus the connected part
-function PhysicsUtil.GetConnectedParts(part)
+function PhysicsUtils.getConnectedParts(part)
 	local parts = part:GetConnectedParts(true)
 	parts[#parts+1] = part
 	return parts
 end
 
-function PhysicsUtil.GetMass(parts)
+function PhysicsUtils.getMass(parts)
 	local mass = 0
 	for _, part in pairs(parts) do
 		mass = mass + part:GetMass()
@@ -22,7 +22,7 @@ function PhysicsUtil.GetMass(parts)
 end
 
 --- Estimate buoyancy contributed by parts
-function PhysicsUtil.EstimateBuoyancyContribution(parts)
+function PhysicsUtils.estimateBuoyancyContribution(parts)
 	local totalMass = 0
 	local totalVolumeApplicable = 0
 	local totalFloat = 0
@@ -34,7 +34,7 @@ function PhysicsUtil.EstimateBuoyancyContribution(parts)
 
 		if part.CanCollide then
 			local volume = part.Size.X*part.Size.Y*part.Size.Z
-			totalFloat = totalFloat + volume*PhysicsUtil.WATER_DENSITY*Workspace.Gravity
+			totalFloat = totalFloat + volume*PhysicsUtils.WATER_DENSITY*Workspace.Gravity
 			totalVolumeApplicable = totalVolumeApplicable + volume
 		end
 	end
@@ -44,7 +44,7 @@ end
 
 --- Return's the world vector center of mass.
 -- Lots of help from Hippalectryon :D
-function PhysicsUtil.GetCenterOfMass(parts)
+function PhysicsUtils.getCenterOfMass(parts)
 	local mass = 0
 	local weightedSum = Vector3.new(0, 0, 0)
 
@@ -61,7 +61,7 @@ end
 -- @param part part
 -- @param axis the axis
 -- @param origin the origin of the axis
-function PhysicsUtil.MomentOfInertia(part, axis, origin)
+function PhysicsUtils.momentOfInertia(part, axis, origin)
 	local PartSize = part.Size
 	local mass  = part:GetMass()
 	local Radius  = (part.Position - origin):Cross(axis)
@@ -77,12 +77,12 @@ end
 -- @param parts The parts to use
 -- @param axis the axis to use (Should be torque, or offset cross force)
 -- @param origin The origin of the axis (should be center of mass of the parts)
-function PhysicsUtil.BodyMomentOfInertia(parts, axis, origin)
+function PhysicsUtils.bodyMomentOfInertia(parts, axis, origin)
 
 	local TotalBodyInertia = 0
 
 	for _, part in pairs(parts) do
-		TotalBodyInertia = TotalBodyInertia + PhysicsUtil.MomentOfInertia(part, axis, origin)
+		TotalBodyInertia = TotalBodyInertia + PhysicsUtils.MomentOfInertia(part, axis, origin)
 	end
 
 	return TotalBodyInertia
@@ -96,16 +96,16 @@ end
 -- the velocity of the whole physics model.
 -- http://xboxforums.create.msdn.com/forums/p/34179/196459.aspx
 -- http://www.cs.cmu.edu/~baraff/sigcourse/notesd1.pdf
-function PhysicsUtil.ApplyForce(part, force, forcePosition)
-	local parts = PhysicsUtil.GetConnectedParts(part)
+function PhysicsUtils.applyForce(part, force, forcePosition)
+	local parts = PhysicsUtils.GetConnectedParts(part)
 
 	forcePosition = forcePosition or part.Position
 
-	local centerOfMass, mass = PhysicsUtil.GetCenterOfMass(parts)
+	local centerOfMass, mass = PhysicsUtils.GetCenterOfMass(parts)
 	local offset = (centerOfMass - forcePosition)
 	local torque = offset:Cross(force)
 
-	local momentOfInertia = PhysicsUtil.BodyMomentOfInertia(parts, torque, centerOfMass)
+	local momentOfInertia = PhysicsUtils.BodyMomentOfInertia(parts, torque, centerOfMass)
 	local rotAcceleration
 	if momentOfInertia ~= 0 then
 		rotAcceleration = torque/momentOfInertia
@@ -121,12 +121,12 @@ end
 
 --- Accelerates a part utilizing newton's laws. emittingPart is the part it's emitted from.
 -- force = mass * acceleration
-function PhysicsUtil.AcceleratePart(part, emittingPart, acceleration)
+function PhysicsUtils.acceleratePart(part, emittingPart, acceleration)
 	local force = acceleration * part:GetMass()
-	local Position = part.Position
+	local position = part.Position
 
-	PhysicsUtil.ApplyForce(part, force, Position)
-	PhysicsUtil.ApplyForce(emittingPart, -force, Position)
+	PhysicsUtils.applyForce(part, force, position)
+	PhysicsUtils.applyForce(emittingPart, -force, position)
 end
 
-return PhysicsUtil
+return PhysicsUtils
