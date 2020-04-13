@@ -26,7 +26,7 @@ function NetworkOwnerService:AddSetNetworkOwnerHandle(part, player)
 	}
 
 	self:_addOwnerData(part, data)
-	self:UpdateOwner(part)
+	self:_updateOwner(part)
 
 	-- closure keeps a reference to part, so we can set _partOwnerData to __mode="k"
 	return function()
@@ -35,7 +35,7 @@ function NetworkOwnerService:AddSetNetworkOwnerHandle(part, player)
 			return
 		end
 
-		self:UpdateOwner(part)
+		self:_updateOwner(part)
 	end
 end
 
@@ -75,7 +75,7 @@ function NetworkOwnerService:_removeOwner(part, toRemove)
 	return false
 end
 
-function NetworkOwnerService:UpdateOwner(part)
+function NetworkOwnerService:_updateOwner(part)
 	local ownerDataStack = self._partOwnerData[part]
 	if not ownerDataStack then
 		self:_setNetworkOwnershipAuto(part)
@@ -98,12 +98,6 @@ function NetworkOwnerService:_setNetworkOwner(part, player)
 		return
 	end
 
-	-- Avoid swapping owner if we can
-	if (part:GetNetworkOwner() == player) and
-		not part:GetNetworkOwnershipAuto() then
-		return
-	end
-
 	part:SetNetworkOwner(player)
 end
 
@@ -111,11 +105,6 @@ function NetworkOwnerService:_setNetworkOwnershipAuto(part)
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerService] - Cannot set network ownership:", err)
-		return
-	end
-
-	-- Try not to swap owner if we can
-	if not part:GetNetworkOwnershipAuto() then
 		return
 	end
 
