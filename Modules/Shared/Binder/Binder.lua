@@ -18,8 +18,8 @@ function Binder.new(tagName, constructor)
 	local self = setmetatable({}, Binder)
 
 	self._maid = Maid.new()
-	self._tagName = tagName or error("No tagName")
-	self._constructor = constructor or error("No constructor")
+	self._tagName = tagName or error("Bad argument 'tagName', expected string")
+	self._constructor = constructor or error("Bad argument 'constructor', expected table or function")
 
 	self._loading = setmetatable({}, {__mode = "kv"})
 
