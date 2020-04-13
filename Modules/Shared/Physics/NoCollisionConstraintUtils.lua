@@ -1,10 +1,10 @@
 ---
 -- @module NoCollisionConstraintUtils
--- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local getMechanismParts = require("getMechanismParts")
+local Maid = require("Maid")
 
 local NoCollisionConstraintUtils = {}
 
@@ -14,6 +14,16 @@ function NoCollisionConstraintUtils.create(part0, part1)
 	noCollision.Part1 = part1
 
 	return noCollision
+end
+
+function NoCollisionConstraintUtils.tempNoCollision(parts0, parts1)
+	local maid = Maid.new()
+
+	for _, item in pairs(NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1)) do
+		maid:GiveTask(item)
+	end
+
+	return maid
 end
 
 function NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1)
