@@ -61,6 +61,14 @@ function IKResource:Get(descendantName)
 end
 
 function IKResource:GetInstance()
+	if self._data.isLink then
+		if self._instance then
+			return self._instance.Value
+		else
+			return nil
+		end
+	end
+
 	return self._instance
 end
 
@@ -80,6 +88,14 @@ function IKResource:SetInstance(instance)
 		else
 			self:_clearChildren()
 		end
+	end
+
+	if instance and self._data.isLink then
+		assert(instance:IsA("ObjectValue"))
+
+		self._maid:GiveTask(instance.Changed:Connect(function()
+			self:_updateReady()
+		end))
 	end
 
 	self._maid._instanceMaid = maid
@@ -161,6 +177,12 @@ end
 function IKResource:_calculateIsReady()
 	if not self._instance then
 		return false
+	end
+
+	if self._data.isLink then
+		if not self._instance.Value then
+			return false
+		end
 	end
 
 	for _, child in pairs(self._childResourceMap) do
