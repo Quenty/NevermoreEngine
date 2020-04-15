@@ -71,13 +71,15 @@ function LinkUtils.promiseLinkValue(maid, linkName, from)
 	assert(type(linkName) == "string")
 	assert(typeof(from) == "Instance")
 
-	return promiseChild(from, linkName)
-		:Then(function(objectValue)
-			local promise = promisePropertyValue(objectValue, "Value")
-			maid:GiveTask(promise)
+	local childPromise = promiseChild(from, linkName)
+	maid:GiveTask(childPromise)
 
-			return promise
-		end)
+	return childPromise:Then(function(objectValue)
+		local promise = promisePropertyValue(objectValue, "Value")
+		maid:GiveTask(promise)
+
+		return promise
+	end)
 end
 
 return LinkUtils
