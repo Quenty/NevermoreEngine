@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Promise = require("Promise")
+local Signal = require("Signal")
 
 local CancelToken = {}
 CancelToken.ClassName = "CancelToken"
@@ -16,6 +17,13 @@ function CancelToken.new(executor)
 	assert(type(executor) == "function")
 
 	self.PromiseCancelled = Promise.new()
+
+	self.Cancelled = Signal.new()
+
+	self.PromiseCancelled:Then(function()
+		self.Cancelled:Fire()
+		self.Cancelled:Destroy()
+	end)
 
 	executor(function()
 		self:_cancel()
