@@ -160,6 +160,8 @@ Table.deepOverwrite = deepOverwrite
 -- @return The index of the value, if found
 -- @treturn nil if not found
 function Table.getIndex(haystack, needle)
+	assert(needle ~= nil, "Needle cannot be nil")
+
 	for index, item in pairs(haystack) do
 		if needle == item then
 			return index
