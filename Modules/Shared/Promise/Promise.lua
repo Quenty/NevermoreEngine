@@ -31,7 +31,7 @@ Promise.isPromise = isPromise
 function Promise.new(func)
 	local self = setmetatable({
 		_pendingExecuteList = {};
-		_uncaughtException = true;
+		_unconsumedException = true;
 		_source = ENABLE_TRACEBACK and debug.traceback() or "";
 	}, Promise)
 
@@ -46,6 +46,7 @@ end
 function Promise.spawn(func)
 	local self = Promise.new()
 
+	-- Just the function part of the resolve/reject protocol!
 	fastSpawn(func, self:_getResolveReject())
 
 	return self
@@ -55,14 +56,12 @@ function Promise.resolved(...)
 	local n = select("#", ...)
 	if n == 0 then
 		-- Reuse promise here to save on calls to Promise.resolved()
-		assert(_emptyFulfilledPromise)
 		return _emptyFulfilledPromise
 	elseif n == 1 and isPromise(...) then
 		local promise = (...)
 
 		-- Resolving to promise that is already resolved. Just return the promise!
 		if not promise._pendingExecuteList then
-			promise._uncaughtException = false
 			return promise
 		end
 	end
@@ -76,12 +75,11 @@ function Promise.rejected(...)
 	local n = select("#", ...)
 	if n == 0 then
 		-- Reuse promise here to save on calls to Promise.rejected()
-		assert(_emptyRejectedPromise)
 		return _emptyRejectedPromise
 	end
 
 	local promise = Promise.new()
-	promise:Reject(...)
+	promise:_reject({...}, n)
 	return promise
 end
 
@@ -146,18 +144,41 @@ function Promise:Resolve(...)
 		end
 
 		local promise2 = (...)
-		if promise2._pendingExecuteList then
-			promise2:Then(self:_getResolveReject())
-		elseif promise2._rejected then
-			promise2._uncaughtException = false
-			self:Reject(unpack(promise2._rejected, 1, promise2._valuesLength))
-		elseif promise2._fulfilled then
-			promise2._uncaughtException = false
+		if promise2._pendingExecuteList then -- pending
+			promise2._pendingExecuteList[#promise2._pendingExecuteList + 1] = {
+				function(...)
+					self:Resolve(...)
+				end,
+				function(...)
+					-- Still need to verify at this point that we're pending!
+					if self._pendingExecuteList then
+						promise2._unconsumedException = false
+						self:_reject({...}, select("#", ...))
+					end
+				end,
+				nil
+			}
+		elseif promise2._rejected then -- rejected
+			promise2._unconsumedException = false
+			self:_reject(promise2._rejected, promise2._valuesLength)
+		elseif promise2._fulfilled then -- fulfilled
 			self:_fulfill(promise2._fulfilled, promise2._valuesLength)
 		else
 			error("[Promise.Resolve] - Bad promise2 state")
 		end
-	else -- TODO: Handle thenable promises
+	elseif type(...) == "function" then
+		if len > 1 then
+			local message = ("When resolving a function, extra arguments are discarded! See:\n\n%s")
+				:format(self._source)
+			warn(message)
+		end
+
+		local func = {...}
+		func(self:_getResolveReject())
+	else
+		-- TODO: Handle thenable promises!
+		-- Problem: Lua has :andThen() and also :Then() as two methods in promise
+		-- implementations.
 		self:_fulfill({...}, len)
 	end
 end
@@ -202,34 +223,71 @@ function Promise:_reject(values, valuesLength)
 	end
 
 	-- Check for uncaught exceptions
-	if self._uncaughtException and self._valuesLength > 0 then
+	if self._unconsumedException and self._valuesLength > 0 then
 		coroutine.resume(coroutine.create(function()
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
 			RunService.Heartbeat:Wait()
 
-			if self._uncaughtException then
+			if self._unconsumedException then
 				warn(("[Promise] - Uncaught exception in promise\n\n%s\n\n%s"):format(tostring(self._rejected[1]), self._source))
 			end
 		end))
 	end
 end
 
---- Handlers when promise is fulfilled/rejected. It takes up to two arguments, callback functions
+--- Handlers if/when promise is fulfilled/rejected. It takes up to two arguments, callback functions
 -- for the success and failure cases of the Promise. May return the same promise if certain behavior
 -- is met.
--- @tparam[opt=nil] function onFulfilled Called when fulfilled with parameters
--- @tparam[opt=nil] function onRejected Called when rejected with parameters
+-- NOTE: We do not comply with 2.2.4 (onFulfilled or onRejected must not be called until the execution context stack
+-- contains only platform code). This means promises may stack overflow, however, it also makes promises a lot cheaper
+-- @tparam[opt=nil] function onFulfilled Called if/when fulfilled with parameters
+	-- If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their
+	-- originating calls to then.
+-- @tparam[opt=nil] function onRejected Called if/when rejected with parameters
+	-- If/when promise is rejected, all respective onRejected callbacks must execute in the order of their
+	-- originating calls to then.
 -- @treturn Promise
 function Promise:Then(onFulfilled, onRejected)
-	self._uncaughtException = false
+	if type(onRejected) == "function" then
+		self._unconsumedException = false
+	end
 
 	if self._pendingExecuteList then
 		local promise = Promise.new()
-		self._pendingExecuteList[#self._pendingExecuteList + 1] = { promise, onFulfilled, onRejected }
+		self._pendingExecuteList[#self._pendingExecuteList + 1] = { onFulfilled, onRejected, promise }
 		return promise
 	else
-		return self:_executeThen(nil, onFulfilled, onRejected)
+		return self:_executeThen(onFulfilled, onRejected, nil)
+	end
+end
+
+-- Like then, but the value passed down the chain is the resolved value of the promise, not
+-- the value returned from onFulfilled or onRejected
+-- Will still yield for the result if a promise is returned, but will discard the result.
+function Promise:Tap(onFulfilled, onRejected)
+	-- Run immediately like then, but we return something safer!
+	local result = self:Then(onFulfilled, onRejected)
+	if result == self then
+		return result
+	end
+
+	-- Most of the time we can just return the same
+	-- promise. But sometimes we need to yield
+	-- for the result to finish, and then resolve that result to a new result
+	if result._fulfilled then
+		return self
+	elseif result._rejected then
+		return self
+	elseif result._pendingExecuteList then
+		-- Definitely the most expensive case, might be able to make this better over time
+		local function returnSelf()
+			return self
+		end
+
+		return result:Then(returnSelf, returnSelf)
+	else
+		error("Bad result state")
 	end
 end
 
@@ -239,8 +297,8 @@ end
 
 --- Catch errors from the promise
 -- @treturn Promise
-function Promise:Catch(func)
-	return self:Then(nil, func)
+function Promise:Catch(onRejected)
+	return self:Then(nil, onRejected)
 end
 
 --- Rejects the current promise.
@@ -264,14 +322,16 @@ function Promise:_getResolveReject()
 	return function(...)
 		self:Resolve(...)
 	end, function(...)
-		self:Reject(...)
+		self:_reject({...}, select("#", ...))
 	end
 end
 
 -- @param promise2 May be nil. If it is, then we have the option to return self
-function Promise:_executeThen(promise2, onFulfilled, onRejected)
+function Promise:_executeThen(onFulfilled, onRejected, promise2)
 	if self._fulfilled then
 		if type(onFulfilled) == "function" then
+			-- If either onFulfilled or onRejected returns a value x, run
+			-- the Promise Resolution Procedure [[Resolve]](promise2, x).
 			if not promise2 then
 				promise2 = Promise.new()
 			end
@@ -279,7 +339,9 @@ function Promise:_executeThen(promise2, onFulfilled, onRejected)
 			promise2:Resolve(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
 			return promise2
 		else
-			-- Promise2 Fulfills with promise1 (self) value
+			-- If onFulfilled is not a function, it must be ignored.
+			-- If onFulfilled is not a function and promise1 is fulfilled,
+			-- promise2 must be fulfilled with the same value as promise1.
 			if promise2 then
 				promise2:_fulfill(self._fulfilled, self._valuesLength)
 				return promise2
@@ -297,7 +359,9 @@ function Promise:_executeThen(promise2, onFulfilled, onRejected)
 
 			return promise2
 		else
-			-- Promise2 Rejects with promise1 (self) value
+			-- If onRejected is not a function, it must be ignored.
+			-- If onRejected is not a function and promise1 is rejected, promise2 must be
+			-- rejected with the same reason as promise1.
 			if promise2 then
 				promise2:_reject(self._rejected, self._valuesLength)
 
@@ -313,9 +377,9 @@ end
 
 -- Initialize promise values
 _emptyFulfilledPromise = Promise.new()
-_emptyFulfilledPromise:Resolve()
+_emptyFulfilledPromise:_fulfill({}, 0)
 
 _emptyRejectedPromise = Promise.new()
-_emptyRejectedPromise:Reject()
+_emptyRejectedPromise:_reject({}, 0)
 
 return Promise
