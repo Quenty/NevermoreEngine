@@ -38,6 +38,30 @@ function R15Utils.getNeckJoint(character)
 	return head:FindFirstChild("Neck")
 end
 
+function R15Utils.getHand(character, side)
+	return character:FindFirstChild(R15Utils.getHandName(side))
+end
+
+function R15Utils.getHandName(side)
+	if side == "Left" then
+		return "LeftHand"
+	elseif side == "Right" then
+		return "RightHand"
+	else
+		error("Bad side")
+	end
+end
+
+function R15Utils.getGripAttachmentName(side)
+	if side == "Left" then
+		return "LeftGripAttachment"
+	elseif side == "Right" then
+		return "RightGripAttachment"
+	else
+		error("Bad side")
+	end
+end
+
 function R15Utils.getShoulderRigAttachment(character, side)
 	if side == "Left"  then
 		return R15Utils.searchForRigAttachment(character, "UpperTorso", "LeftShoulderRigAttachment")
