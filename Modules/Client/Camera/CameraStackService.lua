@@ -141,6 +141,10 @@ function CameraStackService:GetIndex(state)
 	end
 end
 
+function CameraStackService:GetStack()
+	return self._stack
+end
+
 --- Removes the state from the stack
 -- @tparam CameraState state
 -- @treturn nil
