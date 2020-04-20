@@ -4,13 +4,21 @@
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 
+local Terrain = Workspace.Terrain
+
+local ORIGINAL_DEFAULT_COLOR = Color3.new(1, 0, 0)
+
 local Draw = {}
-Draw._defaultColor = Color3.new(1, 0, 0)
+Draw._defaultColor = ORIGINAL_DEFAULT_COLOR
 
 --- Sets the Draw's drawing color
 -- @tparam {Color3} color The color to set
 function Draw.setColor(color)
 	Draw._defaultColor = color
+end
+
+function Draw.resetColor()
+	Draw._defaultColor = ORIGINAL_DEFAULT_COLOR
 end
 
 --- Sets the Draw library to use a random color
@@ -33,6 +41,7 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	local rayCenter = ray.Origin + ray.Direction/2
 
 	local part = Instance.new("Part")
+	part.Material = Enum.Material.ForceField
 	part.Anchored = true
 	part.Archivable = false
 	part.CanCollide = false
@@ -58,7 +67,7 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	local lineHandleAdornment = Instance.new("LineHandleAdornment")
 	lineHandleAdornment.Length = ray.Direction.Magnitude
 	lineHandleAdornment.Thickness = 5*diameter
-	lineHandleAdornment.ZIndex = 2
+	lineHandleAdornment.ZIndex = 3
 	lineHandleAdornment.Color3 = color
 	lineHandleAdornment.AlwaysOnTop = true
 	lineHandleAdornment.Transparency = 0
@@ -90,6 +99,7 @@ function Draw.point(vector3, color, parent, diameter)
 	diameter = diameter or 1
 
 	local part = Instance.new("Part")
+	part.Material = Enum.Material.ForceField
 	part.Anchored = true
 	part.Archivable = false
 	part.BottomSurface = Enum.SurfaceType.Smooth
@@ -109,7 +119,7 @@ function Draw.point(vector3, color, parent, diameter)
 	sphereHandle.Color3 = color
 	sphereHandle.AlwaysOnTop = true
 	sphereHandle.Adornee = part
-	sphereHandle.ZIndex = 1
+	sphereHandle.ZIndex = 2
 	sphereHandle.Parent = part
 
 	part.Parent = parent
@@ -118,11 +128,14 @@ function Draw.point(vector3, color, parent, diameter)
 end
 
 function Draw.box(cframe, size, color)
+	assert(typeof(size) == "Vector3")
+
 	color = color or Draw._defaultColor
 	cframe = typeof(cframe) == "Vector3" and CFrame.new(cframe) or cframe
 
 	local part = Instance.new("Part")
 	part.Color = color
+	part.Material = Enum.Material.ForceField
 	part.Name = "DebugPart"
 	part.Anchored = true
 	part.CanCollide = false
@@ -130,12 +143,38 @@ function Draw.box(cframe, size, color)
 	part.Archivable = false
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.TopSurface = Enum.SurfaceType.Smooth
-	part.Transparency = 0.5
+	part.Transparency = 0.75
 	part.Size = size
 	part.CFrame = cframe
+
+	local boxHandleAdornment = Instance.new("BoxHandleAdornment")
+	boxHandleAdornment.Adornee = part
+	boxHandleAdornment.Size = size
+	boxHandleAdornment.Color3 = color
+	boxHandleAdornment.AlwaysOnTop = true
+	boxHandleAdornment.Transparency = 0.75
+	boxHandleAdornment.ZIndex = 1
+	boxHandleAdornment.Parent = part
+
 	part.Parent = Draw._getDefaultParent()
 
 	return part
+end
+
+function Draw.terrainCell(position, color)
+	local size = Vector3.new(4, 4, 4)
+
+	local solidCell = Terrain:WorldToCell(position)
+	local terrainPosition = Terrain:CellCenterToWorld(solidCell.x, solidCell.y, solidCell.z)
+
+	local part = Draw.box(CFrame.new(terrainPosition), size, color)
+	part.Name = "DebugTerrainCell"
+
+	return part
+end
+
+function Draw.vector(position, direction, color)
+	return Draw.ray(Ray.new(position, direction), color)
 end
 
 function Draw._getDefaultParent()
