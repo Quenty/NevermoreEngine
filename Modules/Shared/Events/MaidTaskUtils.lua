@@ -16,6 +16,8 @@ function MaidTaskUtils.delayed(time, task)
 				task:Disconnect()
 			elseif task.Destroy then
 				task:Destroy()
+			else
+				error("Bad task")
 			end
 		end)
 	end
