@@ -161,6 +161,10 @@ function Draw.box(cframe, size, color)
 	return part
 end
 
+function Draw.region3(region3, color)
+	return Draw.box(region3.CFrame, region3.Size, color)
+end
+
 function Draw.terrainCell(position, color)
 	local size = Vector3.new(4, 4, 4)
 
