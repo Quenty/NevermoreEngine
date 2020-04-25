@@ -9,6 +9,22 @@ local Promise = require("Promise")
 
 local JSONUtils = {}
 
+function JSONUtils.jsonDecode(str)
+	if type(str) ~= "string" then
+		return false, nil, "Not a string"
+	end
+
+	local decoded
+	local ok, err = pcall(function()
+		decoded = HttpService:JSONDecode(str)
+	end)
+	if not ok then
+		return false, nil, err
+	end
+
+	return true, decoded
+end
+
 function JSONUtils.promiseJSONDecode(str)
 	if type(str) ~= "string" then
 		return Promise.rejected("Not a string")
@@ -23,11 +39,8 @@ function JSONUtils.promiseJSONDecode(str)
 		if not ok then
 			reject(err)
 			return
-		elseif decoded then
-			resolve(decoded)
-			return
 		else
-			reject("Failed to decode any value")
+			resolve(decoded) -- May resolve to nil, but this is ok
 			return
 		end
 	end)
