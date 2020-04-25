@@ -14,6 +14,7 @@ function BinderProvider.new(initMethod)
 
 	-- Pretty sure this is a bad idea
 	self.BindersAddedPromise = Promise.new()
+	self.AfterInitPromise = Promise.new()
 
 	self._initMethod = initMethod or error("No initMethod")
 	self._afterInit = false
@@ -24,7 +25,16 @@ end
 
 function BinderProvider:Init()
 	self:_initMethod(self)
-	self.BindersAddedPromise:Resolve(true)
+	self.BindersAddedPromise:Resolve()
+end
+
+function BinderProvider:AfterInit()
+	self._afterInit = true
+	for _, binder in pairs(self._binders) do
+		binder:Init()
+	end
+
+	self.AfterInitPromise:Resolve()
 end
 
 function BinderProvider:__index(index)
@@ -35,12 +45,7 @@ function BinderProvider:__index(index)
 	error(("%q Not a valid index"):format(tostring(index)))
 end
 
-function BinderProvider:AfterInit()
-	self._afterInit = true
-	for _, binder in pairs(self._binders) do
-		binder:Init()
-	end
-end
+
 
 function BinderProvider:Get(tagName)
 	assert(type(tagName) == "string", "tagName must be a string")

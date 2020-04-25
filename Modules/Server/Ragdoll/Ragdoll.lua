@@ -3,87 +3,62 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Workspace = game:GetService("Workspace")
-
-local RagdollBase = require("RagdollBase")
+local BaseObject = require("BaseObject")
+local CharacterUtils = require("CharacterUtils")
+local RagdollRigging = require("RagdollRigging")
+local RagdollConstants = require("RagdollConstants")
 local RagdollUtils = require("RagdollUtils")
 
-local Ragdoll = setmetatable({}, RagdollBase)
+local Ragdoll = setmetatable({}, BaseObject)
 Ragdoll.ClassName = "Ragdoll"
 Ragdoll.__index = Ragdoll
 
 function Ragdoll.new(humanoid)
-	local self = setmetatable(RagdollBase.new(humanoid), Ragdoll)
+	local self = setmetatable(BaseObject.new(humanoid), Ragdoll)
 
 	self._obj.BreakJointsOnDeath = false
-	self._obj:ChangeState(Enum.HumanoidStateType.Physics)
-	self:StopAnimations()
 
-	self._maid:GiveTask(function()
-		self._obj:ChangeState(Enum.HumanoidStateType.GettingUp)
-	end)
-
-	self:_setupRootPart()
-
-	for _, balljoint in pairs(RagdollUtils.createBallJoints(self._obj)) do
-		self._maid:GiveTask(balljoint)
+	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
+	if player then
+		self._remoteEvent = self._obj:FindFirstChild(RagdollConstants.RAGDOLL_REMOTE_EVENT)
+		if self._remoteEvent then
+			self._maid._remoteEventConn = self._remoteEvent.OnServerEvent:Connect(function()
+				self._maid._remoteEventConn = nil
+				self:_ragdoll()
+			end)
+		else
+			warn("[Ragdoll] - Must setup Ragdollable before ragdolling client character")
+		end
+	else
+		-- NPC
+		self:_ragdoll()
 	end
-
-	for _, noCollision in pairs(RagdollUtils.createNoCollision(self._obj)) do
-		self._maid:GiveTask(noCollision)
-	end
-
-	for _, motor in pairs(RagdollUtils.getMotors(self._obj)) do
-		local originalParent = motor.Parent
-		motor.Parent = nil
-
-		self._maid:GiveTask(function()
-			if originalParent:IsDescendantOf(Workspace) then
-				motor.Parent = originalParent
-			else
-				motor:Destroy()
-			end
-		end)
-	end
-
-	-- After joints have been removed
-	self:_setupHead()
 
 	return self
 end
 
-function Ragdoll:_setupHead()
-	local model = self._obj.Parent
-	if not model then
-		return
-	end
+function Ragdoll:_ragdoll()
+	-- This will reset friction too
+	RagdollRigging.createRagdollJoints(self._obj.Parent, self._obj.RigType)
 
-	local head = model:FindFirstChild("Head")
-	if not head then
-		return
-	end
+	self:_setupMotors()
+	self._maid:GiveTask(RagdollUtils.setupState(self._obj))
+	self._maid:GiveTask(RagdollUtils.setupHead(self._obj))
+end
 
-	local originalSize = head.Size
-	head.Size = Vector3.new(1, 1, 1)
+function Ragdoll:_setupMotors()
+	local motors = RagdollRigging.disableMotors(self._obj.Parent, self._obj.RigType)
+	local animator = self._obj:FindFirstChildWhichIsA("Animator")
+	if animator then
+		animator:ApplyJointVelocities(motors)
+	end
 
 	self._maid:GiveTask(function()
-		head.Size = originalSize
+		for _, motor in pairs(motors) do
+			motor.Enabled = true
+		end
 	end)
 end
 
-function Ragdoll:_setupRootPart()
-	local rootPart = self._obj.RootPart
-	if not rootPart then
-		return
-	end
-
-	rootPart.Massless = true
-	rootPart.CanCollide = false
-
-	self._maid:GiveTask(function()
-		rootPart.Massless = false
-		rootPart.CanCollide = true
-	end)
-end
 
 return Ragdoll
