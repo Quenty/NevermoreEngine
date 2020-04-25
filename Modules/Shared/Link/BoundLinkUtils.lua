@@ -12,9 +12,9 @@ local BinderUtils = require("BinderUtils")
 local BoundLinkUtils = {}
 
 function BoundLinkUtils.getBoundLinkValues(binder, linkName, from)
-	assert(type(binder) == "table")
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
+	assert(type(binder) == "table", "Bad binder")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad froM")
 
 	local classes = {}
 	for _, value in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
