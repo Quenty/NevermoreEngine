@@ -7,5 +7,4 @@ local Table = require("Table")
 
 return Table.readonly({
 	RAGDOLL_REMOTE_EVENT = "RagdollRemoteEvent";
-	TRANSPARENT_AFTER_TIME = 4;
 })
