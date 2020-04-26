@@ -69,8 +69,8 @@ function OctreeRegionUtils.addNode(lowestSubregion, node)
 end
 
 function OctreeRegionUtils.moveNode(fromLowest, toLowest, node)
-	assert(fromLowest.depth == toLowest.depth)
-	assert(fromLowest ~= toLowest)
+	assert(fromLowest.depth == toLowest.depth, "fromLowest.depth ~= toLowest.depth")
+	assert(fromLowest ~= toLowest, "fromLowest == toLowest")
 
 	local currentFrom = fromLowest
 	local currentTo = toLowest
@@ -172,7 +172,7 @@ function OctreeRegionUtils.getNeighborsWithinRadius(
 	end
 end
 
-function OctreeRegionUtils.createSubRegionAtDepth(region, px, py, pz, maxDepth)
+function OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, maxDepth)
 	local current = region
 	for _ = region.depth, maxDepth do
 		local index = OctreeRegionUtils.getSubRegionIndex(current, px, py, pz)
@@ -214,13 +214,14 @@ function OctreeRegionUtils.createSubRegion(parentRegion, parentIndex)
 	return OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parentRegion, parentIndex)
 end
 
-function OctreeRegionUtils.inRegion(region, px, py, pz)
+-- Consider regions to be range [px, y)
+function OctreeRegionUtils.inRegionBounds(region, px, py, pz)
 	local lowerBounds = region.lowerBounds
 	local upperBounds = region.upperBounds
 	return (
-		px >= lowerBounds[1] and px <= upperBounds[1] and
-		py >= lowerBounds[2] and py <= upperBounds[2] and
-		pz >= lowerBounds[3] and pz <= upperBounds[3]
+		px >= lowerBounds[1] and px < upperBounds[1] and
+		py >= lowerBounds[2] and py < upperBounds[2] and
+		pz >= lowerBounds[3] and pz < upperBounds[3]
 	)
 end
 

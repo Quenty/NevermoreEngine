@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local OctreeRegionUtils = require("OctreeRegionUtils")
 local OctreeNode = require("OctreeNode")
 
-local EPSILON = 1e-6
+local EPSILON = 1e-9
 
 local Octree = {}
 Octree.ClassName = "Octree"
@@ -83,9 +83,9 @@ function Octree:KNearestNeighborsSearch(position, k, radius)
 	return knearest, knearestDist2
 end
 
-function Octree:CreateLowestSubRegion(px, py, pz)
-	local region = self:_createRegion(px, py, pz)
-	return OctreeRegionUtils.createSubRegionAtDepth(region, px, py, pz, self._maxDepth)
+function Octree:GetOrCreateLowestSubRegion(px, py, pz)
+	local region = self:_getOrCreateRegion(px, py, pz)
+	return OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, self._maxDepth)
 end
 
 function Octree:_radiusSearch(px, py, pz, radius)
@@ -116,7 +116,7 @@ function Octree:_getRegion(px, py, pz)
 	return self._regions[index]
 end
 
-function Octree:_createRegion(px, py, pz)
+function Octree:_getOrCreateRegion(px, py, pz)
 	local cx, cy, cz = self:_getRegionCellIndex(px, py, pz)
 
 	local index = self:_getRegionIndex(cx, cy, cz)
@@ -136,9 +136,10 @@ function Octree:_createRegion(px, py, pz)
 end
 
 function Octree:_getRegionCellIndex(px, py, pz)
-	return math.floor(px / self._maxRegionSize[1] + 0.5),
-		math.floor(py / self._maxRegionSize[2] + 0.5),
-		math.floor(pz / self._maxRegionSize[3] + 0.5)
+	-- Consider regions to be range [px, y)
+	return math.floor(px / self._maxRegionSize[1] + 0.5 - EPSILON),
+		math.floor(py / self._maxRegionSize[2] + 0.5 - EPSILON),
+		math.floor(pz / self._maxRegionSize[3] + 0.5 - EPSILON)
 end
 
 --- spooky, will this collide?

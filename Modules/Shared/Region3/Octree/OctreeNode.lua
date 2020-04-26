@@ -54,12 +54,12 @@ function OctreeNode:SetPosition(position)
 	self._position = position
 
 	if self._currentLowestRegion then
-		if OctreeRegionUtils.inRegion(self._currentLowestRegion, px, py, pz) then
+		if OctreeRegionUtils.inRegionBounds(self._currentLowestRegion, px, py, pz) then
 			return
 		end
 	end
 
-	local newLowestRegion = self._octree:CreateLowestSubRegion(px, py, pz)
+	local newLowestRegion = self._octree:GetOrCreateLowestSubRegion(px, py, pz)
 
 	if self._currentLowestRegion then
 		OctreeRegionUtils.moveNode(self._currentLowestRegion, newLowestRegion, self)
