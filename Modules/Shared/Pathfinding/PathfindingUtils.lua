@@ -16,12 +16,7 @@ function PathfindingUtils.promiseComputeAsync(path, start, finish)
 
 	return Promise.spawn(function(resolve, reject)
 		path:ComputeAsync(start, finish)
-
-		if path.Status == Enum.PathStatus.Success then
-			resolve(path.Status)
-		else
-			reject(path.Status)
-		end
+		resolve(path)
 	end)
 end
 
@@ -35,13 +30,23 @@ end
 function PathfindingUtils.visualizePath(path)
 	local maid = Maid.new()
 
-	for _, waypoint in pairs(path:GetWaypoints()) do
+	local parent = Instance.new("Folder")
+	parent.Name = "PathVisualization"
+	maid:GiveTask(parent)
+
+	for index, waypoint in pairs(path:GetWaypoints()) do
 		if waypoint.Action == Enum.PathWaypointAction.Walk then
-			maid:GiveTask(Draw.point(waypoint.Position, Color3.new(0.5, 1, 0.5)))
+			local point = Draw.point(waypoint.Position, Color3.new(0.5, 1, 0.5), parent)
+			point.Name = ("%03d_WalkPoint"):format(index)
+			maid:GiveTask(point)
 		elseif waypoint.Action == Enum.PathWaypointAction.Jump then
-			maid:GiveTask(Draw.point(waypoint.Position, Color3.new(0.5, 0.5, 1)))
+			local point = Draw.point(waypoint.Position, Color3.new(0.5, 0.5, 1), parent)
+			point.Name = ("%03d_JumpPoint"):format(index)
+			maid:GiveTask(point)
 		end
 	end
+
+	parent.Parent = Draw.getDefaultParent()
 
 	return maid
 end
