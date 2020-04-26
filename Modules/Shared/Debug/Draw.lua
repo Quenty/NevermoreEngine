@@ -34,7 +34,7 @@ end
 -- @tparam[opt] {number} meshDiameter
 function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	color = color or Draw._defaultColor
-	parent = parent or Draw._getDefaultParent()
+	parent = parent or Draw.getDefaultParent()
 	meshDiameter = meshDiameter or 0.2
 	diameter = diameter or 0.2
 
@@ -95,7 +95,7 @@ function Draw.point(vector3, color, parent, diameter)
 	end
 
 	color = color or Draw._defaultColor
-	parent = parent or Draw._getDefaultParent()
+	parent = parent or Draw.getDefaultParent()
 	diameter = diameter or 1
 
 	local part = Instance.new("Part")
@@ -156,7 +156,7 @@ function Draw.box(cframe, size, color)
 	boxHandleAdornment.ZIndex = 1
 	boxHandleAdornment.Parent = part
 
-	part.Parent = Draw._getDefaultParent()
+	part.Parent = Draw.getDefaultParent()
 
 	return part
 end
@@ -181,7 +181,7 @@ function Draw.vector(position, direction, color)
 	return Draw.ray(Ray.new(position, direction), color)
 end
 
-function Draw._getDefaultParent()
+function Draw.getDefaultParent()
 	return RunService:IsServer() and Workspace or Workspace.CurrentCamera
 end
 
