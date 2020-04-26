@@ -22,7 +22,7 @@ function OctreeNode.new(octree, object)
 end
 
 function OctreeNode:KNearestNeighborsSearch(k, radius)
-	return self._octree:RadiusSearch(self._position, k, radius)
+	return self._octree:KNearestNeighborsSearch(self._position, k, radius)
 end
 
 function OctreeNode:GetObject()
