@@ -14,7 +14,7 @@ function HumanoidUtils.getHumanoid(descendant)
 		if humanoid then
 			return humanoid
 		end
-		character = character.Parent
+		character = character:FindFirstAncestorOfClass("Model")
 	end
 
 	return nil
