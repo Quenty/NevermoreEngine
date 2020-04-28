@@ -7,6 +7,16 @@ local Draw = require("Draw")
 
 local EPSILON = 1e-6
 local SQRT_3_OVER_2 = math.sqrt(3)/2
+local SUB_REGION_POSITION_OFFSET = {
+	{ 0.25, 0.25, -0.25 };
+	{ -0.25, 0.25, -0.25 };
+	{ 0.25, 0.25, 0.25 };
+	{ -0.25, 0.25, 0.25 };
+	{ 0.25, -0.25, -0.25 };
+	{ -0.25, -0.25, -0.25 };
+	{ 0.25, -0.25, 0.25 };
+	{ -0.25, -0.25, 0.25 };
+}
 
 local OctreeRegionUtils = {}
 
@@ -190,17 +200,6 @@ function OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, maxDe
 	return current
 end
 
-local SUB_REGION_POSITION_OFFSET = {
-	{ 0.25, 0.25, -0.25 };
-	{ -0.25, 0.25, -0.25 };
-	{ 0.25, 0.25, 0.25 };
-	{ -0.25, 0.25, 0.25 };
-	{ 0.25, -0.25, -0.25 };
-	{ -0.25, -0.25, -0.25 };
-	{ 0.25, -0.25, 0.25 };
-	{ -0.25, -0.25, 0.25 };
-}
-
 function OctreeRegionUtils.createSubRegion(parentRegion, parentIndex)
 	local size = parentRegion.size
 	local position = parentRegion.position
@@ -219,9 +218,9 @@ function OctreeRegionUtils.inRegionBounds(region, px, py, pz)
 	local lowerBounds = region.lowerBounds
 	local upperBounds = region.upperBounds
 	return (
-		px >= lowerBounds[1] and px < upperBounds[1] and
-		py >= lowerBounds[2] and py < upperBounds[2] and
-		pz >= lowerBounds[3] and pz < upperBounds[3]
+		px >= lowerBounds[1] and px <= upperBounds[1] and
+		py >= lowerBounds[2] and py <= upperBounds[2] and
+		pz >= lowerBounds[3] and pz <= upperBounds[3]
 	)
 end
 
@@ -235,6 +234,76 @@ function OctreeRegionUtils.getSubRegionIndex(region, px, py, pz)
 		index = index + 2
 	end
 	return index
+end
+
+--- This definitely collides
+-- https://stackoverflow.com/questions/5928725/hashing-2d-3d-and-nd-vectors
+function OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
+	-- Normally you would modulus this to hash table size, but we want as flat of a structure as possible
+	return cx * 73856093, cy*19351301, cz*83492791
+end
+
+function OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
+	return math.floor(px / maxRegionSize[1] + 0.5),
+		math.floor(py / maxRegionSize[2] + 0.5),
+		math.floor(pz / maxRegionSize[3] + 0.5)
+end
+
+function OctreeRegionUtils.getTopLevelRegionPosition(maxRegionSize, cx, cy, cz)
+	return maxRegionSize[1] * cx,
+		maxRegionSize[2] * cy,
+		maxRegionSize[3] * cz
+end
+
+function OctreeRegionUtils.areEqualTopRegions(region, rpx, rpy, rpz)
+	local position = region.position
+	return position[1] == rpx
+		and position[2] == rpy
+		and position[3] == rpz
+end
+
+function OctreeRegionUtils.findRegion(regionHashMap, maxRegionSize, px, py, pz)
+	local cx, cy, cz = OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
+	local hash = OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
+
+	local regionList = regionHashMap[hash]
+	if not regionList then
+		return nil
+	end
+
+	local rpx, rpy, rpz = OctreeRegionUtils.getTopLevelRegionPosition(maxRegionSize, cx, cy, cz)
+	for _, region in pairs(regionList) do
+		if OctreeRegionUtils.areEqualTopRegions(region, rpx, rpy, rpz) then
+			return region
+		end
+	end
+
+	return nil
+end
+
+function OctreeRegionUtils.getOrCreateRegion(regionHashMap, maxRegionSize, px, py, pz)
+	local cx, cy, cz = OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
+	local hash = OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
+
+	local regionList = regionHashMap[hash]
+	if not regionList then
+		regionList = {}
+		regionHashMap[hash] = regionList
+	end
+
+	local rpx, rpy, rpz = OctreeRegionUtils.getTopLevelRegionPosition(maxRegionSize, cx, cy, cz)
+	for _, region in pairs(regionList) do
+		if OctreeRegionUtils.areEqualTopRegions(region, rpx, rpy, rpz) then
+			return region
+		end
+	end
+
+	local region = OctreeRegionUtils.create(
+		rpx, rpy, rpz,
+		maxRegionSize[1], maxRegionSize[2], maxRegionSize[3])
+	table.insert(regionList, region)
+
+	return region
 end
 
 return OctreeRegionUtils
