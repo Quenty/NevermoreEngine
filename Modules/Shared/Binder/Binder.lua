@@ -21,6 +21,7 @@ function Binder.new(tagName, constructor)
 	self._tagName = tagName or error("Bad argument 'tagName', expected string")
 	self._constructor = constructor or error("Bad argument 'constructor', expected table or function")
 
+	self._allSet = {}
 	self._loading = setmetatable({}, {__mode = "kv"})
 
 	delay(5, function()
@@ -83,10 +84,15 @@ end
 
 function Binder:GetAll()
 	local all = {}
-	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
-		table.insert(all, self._maid[inst])
+	for class, _ in pairs(self._allSet) do
+		all[#all+1] = class
 	end
 	return all
+end
+
+-- NOTE: Do not mutate this set directly
+function Binder:GetAllSet()
+	return self._allSet
 end
 
 -- Using this acknowledges that we're intentionally binding on a safe client object,
@@ -158,6 +164,7 @@ function Binder:_add(inst)
 		return
 	end
 
+	self._allSet[result] = true
 	self._maid[inst] = result
 
 	if self._classAddedSignal then
@@ -167,8 +174,11 @@ end
 
 function Binder:_remove(inst)
 	local class = self._maid[inst]
-	if class and self._classRemovingSignal then
-		self._classRemovingSignal:Fire(class, inst)
+	if class then
+		self._allSet[class] = nil
+		if self._classRemovingSignal then
+			self._classRemovingSignal:Fire(class, inst)
+		end
 	end
 
 	self._maid[inst] = nil
