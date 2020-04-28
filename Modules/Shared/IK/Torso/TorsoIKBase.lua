@@ -60,11 +60,11 @@ function TorsoIKBase.new(humanoid)
 	self._maid:GiveTask(self._resources)
 	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
 
-	self._waistY = AccelTween.new(40)
-	self._waistZ = AccelTween.new(30)
+	self._waistY = AccelTween.new(20)
+	self._waistZ = AccelTween.new(15)
 
-	self._headY = AccelTween.new(60)
-	self._headZ = AccelTween.new(40)
+	self._headY = AccelTween.new(30)
+	self._headZ = AccelTween.new(20)
 
 	self._maid:GiveTask(self._resources.ReadyChanged:Connect(function()
 		if self._resources:IsReady() then
