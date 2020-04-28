@@ -44,4 +44,5 @@ function RagdollUtils.setupHead(humanoid)
 		head.Size = originalSize
 	end
 end
+
 return RagdollUtils
