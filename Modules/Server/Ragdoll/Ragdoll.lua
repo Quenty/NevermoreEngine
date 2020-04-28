@@ -8,6 +8,7 @@ local CharacterUtils = require("CharacterUtils")
 local RagdollRigging = require("RagdollRigging")
 local RagdollConstants = require("RagdollConstants")
 local RagdollUtils = require("RagdollUtils")
+local HumanoidAnimatorUtils = require("HumanoidAnimatorUtils")
 
 local Ragdoll = setmetatable({}, BaseObject)
 Ragdoll.ClassName = "Ragdoll"
@@ -44,6 +45,9 @@ function Ragdoll:_ragdoll()
 	self:_setupMotors()
 	self._maid:GiveTask(RagdollUtils.setupState(self._obj))
 	self._maid:GiveTask(RagdollUtils.setupHead(self._obj))
+
+	-- Do this after we setup motors
+	HumanoidAnimatorUtils.stopAnimations(self._obj)
 end
 
 function Ragdoll:_setupMotors()

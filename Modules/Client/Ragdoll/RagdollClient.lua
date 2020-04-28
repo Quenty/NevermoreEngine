@@ -6,12 +6,15 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
+local BaseObject = require("BaseObject")
+local CameraStackService = require("CameraStackService")
 local CharacterUtils = require("CharacterUtils")
 local HapticFeedbackUtils = require("HapticFeedbackUtils")
-local BaseObject = require("BaseObject")
-local RagdollRigging = require("RagdollRigging")
+local HumanoidAnimatorUtils = require("HumanoidAnimatorUtils")
 local RagdollConstants = require("RagdollConstants")
+local RagdollRigging = require("RagdollRigging")
 local RagdollUtils = require("RagdollUtils")
 
 local RagdollClient = setmetatable({}, BaseObject)
@@ -26,13 +29,48 @@ function RagdollClient.new(humanoid)
 		self._obj.BreakJointsOnDeath = false
 
 		self:_setupPhysicsLocal()
+
 		self._maid:GiveTask(RagdollUtils.setupState(self._obj))
 		self._maid:GiveTask(RagdollUtils.setupHead(self._obj))
 
 		self:_setupHapticFeedback()
+
+		self:_setupCameraShake(CameraStackService:GetImpulseCamera())
+
+		-- Do this after we setup motors
+		HumanoidAnimatorUtils.stopAnimations(humanoid)
+
+		self._maid:GiveTask(RunService.Stepped:Connect(function()
+			HumanoidAnimatorUtils.stopAnimations(humanoid)
+		end))
 	end
 
 	return self
+end
+
+-- TODO: Move out of this open source module
+function RagdollClient:_setupCameraShake(impulseCamera)
+	impulseCamera:Impulse(Vector3.new(5*(math.random()-0.5), 0, 0))
+
+	local head = self._obj.Parent:FindFirstChild("Head")
+	if not head then
+		return
+	end
+
+	local lastVelocity = head.Velocity
+	self._maid:GiveTask(RunService.RenderStepped:Connect(function()
+
+		local cameraCFrame = Workspace.CurrentCamera.CFrame
+
+		local velocity = head.Velocity
+
+		local dVelocity = velocity - lastVelocity
+		if dVelocity.magnitude >= 0 then
+			impulseCamera:Impulse(cameraCFrame:vectorToObjectSpace(-0.1*cameraCFrame.lookVector:Cross(dVelocity)))
+		end
+
+		lastVelocity = velocity
+	end))
 end
 
 function RagdollClient:_setupPhysicsLocal()

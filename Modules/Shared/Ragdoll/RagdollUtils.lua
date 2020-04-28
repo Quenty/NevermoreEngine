@@ -26,16 +26,6 @@ function RagdollUtils.setupState(humanoid)
 	return maid
 end
 
-function RagdollUtils.setupRootPart(humanoid)
-	local rootPart = humanoid.RootPart
-	if not rootPart then
-		return EMPTY_FUNCTION
-	end
-
-	rootPart.CanCollide = true
-	rootPart.Massless = true
-end
-
 function RagdollUtils.setupHead(humanoid)
 	local model = humanoid.Parent
 	if not model then
@@ -54,6 +44,4 @@ function RagdollUtils.setupHead(humanoid)
 		head.Size = originalSize
 	end
 end
-
-
 return RagdollUtils
