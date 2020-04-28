@@ -8,7 +8,7 @@ GetPercentExposed.RAY_COUNT = 314
 
 --- Equal distribution unit vectors around a sphere
 local function getRandomUnitVector()
-	local s = 2*math.random()
+	local s = 2*(math.random()-0.5)
 	local t = 6.2831853071796*math.random()
 	local rx = s
 	local m = (1-s*s)^0.5
