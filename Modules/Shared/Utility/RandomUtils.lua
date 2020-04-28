@@ -13,4 +13,29 @@ function RandomUtils.choice(list)
 		return list[math.random(1, #list)]
 	end
 end
+
+--- Creates a copy of the table, but shuffled using fisher-yates shuffle
+-- @tparam table orig A new table to copy
+-- @tparam[opt=nil] A random to use when shuffling
+function RandomUtils.shuffledCopy(orig, random)
+	local tbl = {}
+	for i=1, #orig do
+		tbl[i] = orig[i]
+	end
+
+	if random then
+		for i = #tbl, 2, -1 do
+			local j = random:NextInteger(1, i)
+			tbl[i], tbl[j] = tbl[j], tbl[i]
+		end
+	else
+		for i = #tbl, 2, -1 do
+			local j = math.random(i)
+			tbl[i], tbl[j] = tbl[j], tbl[i]
+		end
+	end
+
+	return tbl
+end
+
 return RandomUtils
