@@ -57,4 +57,17 @@ function BoundingBoxUtils.getBoundingBox(data, relativeTo)
 	return size, position
 end
 
+function BoundingBoxUtils.inBoundingBox(cframe, size, testPosition)
+	local relative = cframe:pointToObjectSpace(testPosition)
+	local hsx, hsy, hsz = size.X/2, size.Y/2, size.Z/2
+
+	local rx, ry, rz = relative.x, relative.y, relative.z
+	return rx >= -hsx
+		and rx <= hsx
+		and ry >= -hsy
+		and ry <= hsy
+		and rz >= -hsz
+		and rz <= hsz
+end
+
 return BoundingBoxUtils
