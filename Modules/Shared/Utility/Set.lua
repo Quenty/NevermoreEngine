@@ -14,4 +14,20 @@ function Set.fromTableValue(tab)
 	return set
 end
 
+function Set.toList(set)
+	local list = {}
+
+	for value, _ in pairs(set) do
+		table.insert(list, value)
+	end
+
+	return list
+end
+
+function Set.differenceUpdate(set, otherSet)
+	for value, _ in pairs(otherSet) do
+		set[value] = nil
+	end
+end
+
 return Set
