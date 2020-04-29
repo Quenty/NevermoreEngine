@@ -37,6 +37,7 @@ stds.roblox = {
                 Disabled = read_write;
                 LinkedSource = read_write;
                 CurrentEditor = read_write_class;
+                IsDifferentFromFileSystem = read_write;
                 Archivable = read_write;
                 ClassName = read_only;
                 Name = read_write;
@@ -193,8 +194,10 @@ stds.roblox = {
                 FindPartsInRegion3 = read_write;
                 FindPartsInRegion3WithIgnoreList = read_write;
                 FindPartsInRegion3WithWhiteList = read_write;
+                IKMoveTo = read_write;
                 IsRegion3Empty = read_write;
                 IsRegion3EmptyWithIgnoreList = read_write;
+                Raycast = read_write;
                 PrimaryPart = read_write_class;
                 BreakJoints = read_write;
                 GetBoundingBox = read_write;
@@ -259,6 +262,11 @@ stds.roblox = {
             "noise", "pow", "rad", "random", "randomseed", "sign", "sin", "sinh", "sqrt", "tan",
             "tanh", "huge", "pi"}),
 
+        table = def_fields({"concat", "foreach", "foreachi", "getn", "insert", "remove", "sort",
+            "pack", "unpack", "move", "create", "find"}),
+
+        os = def_fields({"time", "difftime", "date"}),
+
         debug = def_fields({"traceback", "profilebegin", "profileend"}),
 
         utf8 = def_fields({"char", "codes", "codepoint", "len", "offset", "graphemes",
@@ -266,6 +274,9 @@ stds.roblox = {
 
         bit32 = def_fields({"arshift", "band", "bnot", "bor", "btest", "bxor", "extract",
             "replace", "lrotate", "lshift", "rrotate", "rshift"}),
+
+        string = def_fields({"byte", "char", "find", "format", "gmatch", "gsub", "len", "lower",
+            "match", "rep", "reverse", "split"}),
 
         -- Types
         Axes = def_fields({"new"}),
@@ -312,7 +323,7 @@ stds.roblox = {
 
         UDim = def_fields({"new"}),
 
-        UDim2 = def_fields({"new"}),
+        UDim2 = def_fields({"new", "fromScale", "fromOffset"}),
 
         Vector2 = def_fields({"new"}),
 
@@ -330,6 +341,7 @@ stds.roblox = {
                 ActuatorRelativeTo = def_enum({"Attachment0", "Attachment1", "World"}),
                 ActuatorType = def_enum({"None", "Motor", "Servo"}),
                 AlignType = def_enum({"Parallel", "Perpendicular"}),
+                AlphaMode = def_enum({"Overlay", "Transparency"}),
                 AnimationPriority = def_enum({"Idle", "Movement", "Action", "Core"}),
                 AppShellActionType = def_enum({"None", "OpenApp", "TapChatTab",
                     "TapConversationEntry", "TapAvatarTab", "ReadConversation", "TapGamePageTab",
@@ -377,7 +389,8 @@ stds.roblox = {
                 ChatMode = def_enum({"Menu", "TextAndMenu"}),
                 ChatPrivacyMode = def_enum({"AllUsers", "NoOne", "Friends"}),
                 ChatStyle = def_enum({"Classic", "Bubble", "ClassicAndBubble"}),
-                CollisionFidelity = def_enum({"Default", "Hull", "Box"}),
+                CollisionFidelity = def_enum({"Default", "Hull", "Box",
+                    "PreciseConvexDecomposition"}),
                 ComputerCameraMovementMode = def_enum({"Default", "Follow", "Classic", "Orbital",
                     "CameraToggle"}),
                 ComputerMovementMode = def_enum({"Default", "KeyboardMouse", "ClickToMove"}),
@@ -412,7 +425,6 @@ stds.roblox = {
                 CustomCameraMode = def_enum({"Default", "Follow", "Classic"}),
                 DataStoreRequestType = def_enum({"GetAsync", "SetIncrementAsync", "UpdateAsync",
                     "GetSortedAsync", "SetIncrementSortedAsync", "OnUpdate"}),
-                DateTimeKind = def_enum({"Utc", "Local"}),
                 DevCameraOcclusionMode = def_enum({"Zoom", "Invisicam"}),
                 DevComputerCameraMovementMode = def_enum({"UserChoice", "Classic", "Follow",
                     "Orbital", "CameraToggle"}),
@@ -433,7 +445,8 @@ stds.roblox = {
                 DialogPurpose = def_enum({"Quest", "Help", "Shop"}),
                 DialogTone = def_enum({"Neutral", "Friendly", "Enemy"}),
                 DominantAxis = def_enum({"Width", "Height"}),
-                DraftStatusCode = def_enum({"OK", "DraftOutdated", "ScriptRemoved"}),
+                DraftStatusCode = def_enum({"OK", "DraftOutdated", "ScriptRemoved",
+                    "DraftCommitted"}),
                 EasingDirection = def_enum({"In", "Out", "InOut"}),
                 EasingStyle = def_enum({"Linear", "Sine", "Back", "Quad", "Quart", "Quint",
                     "Bounce", "Elastic", "Exponential", "Circular", "Cubic"}),
@@ -489,6 +502,8 @@ stds.roblox = {
                     "Climbing", "StrafingNoPhysics", "Ragdoll", "GettingUp", "Jumping", "Landed",
                     "Flying", "Freefall", "Seated", "PlatformStanding", "Dead", "Swimming",
                     "Physics", "None"}),
+                IKCollisionsMode = def_enum({"NoCollisions", "OtherMechanismsAnchored",
+                    "IncludeContactedMechanisms"}),
                 InOut = def_enum({"Edge", "Inset", "Center"}),
                 InfoType = def_enum({"Asset", "Product", "GamePass", "Subscription", "Bundle"}),
                 InitialDockState = def_enum({"Top", "Bottom", "Left", "Right", "Float"}),
@@ -532,7 +547,8 @@ stds.roblox = {
                     "DPadDown", "Thumbstick1", "Thumbstick2"}),
                 KeywordFilterType = def_enum({"Include", "Exclude"}),
                 Language = def_enum({"Default"}),
-                LanguagePreference = def_enum({"SystemDefault", "English", "SimplifiedChinese"}),
+                LanguagePreference = def_enum({"SystemDefault", "English", "SimplifiedChinese",
+                    "Korean"}),
                 LeftRight = def_enum({"Left", "Center", "Right"}),
                 LevelOfDetailSetting = def_enum({"High", "Medium", "Low"}),
                 Limb = def_enum({"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg",
@@ -584,6 +600,7 @@ stds.roblox = {
                     "Level12", "Level13", "Level14", "Level15", "Level16", "Level17", "Level18",
                     "Level19", "Level20", "Level21"}),
                 R15CollisionType = def_enum({"OuterBox", "InnerBox"}),
+                RaycastFilterType = def_enum({"Blacklist", "Whitelist"}),
                 RenderFidelity = def_enum({"Automatic", "Precise"}),
                 RenderPriority = def_enum({"First", "Input", "Camera", "Character", "Last"}),
                 RenderingTestComparisonMethod = def_enum({"psnr", "diff"}),
@@ -632,19 +649,18 @@ stds.roblox = {
                     "ScriptFindSelectionBackground", "ScriptMatchingWordSelectionBackground",
                     "ScriptOperator", "ScriptNumber", "ScriptString", "ScriptComment",
                     "ScriptPreprocessor", "ScriptKeyword", "ScriptBuiltInFunction",
-                    "ScriptWarning", "ScriptError", "DebuggerCurrentLine", "DebuggerErrorLine",
-                    "DiffFilePathText", "DiffTextHunkInfo", "DiffTextNoChange", "DiffTextAddition",
-                    "DiffTextDeletion", "DiffTextSeparatorBackground",
-                    "DiffTextNoChangeBackground", "DiffTextAdditionBackground",
-                    "DiffTextDeletionBackground", "DiffLineNum", "DiffLineNumSeparatorBackground",
-                    "DiffLineNumNoChangeBackground", "DiffLineNumAdditionBackground",
-                    "DiffLineNumDeletionBackground", "DiffFilePathBackground",
-                    "DiffFilePathBorder", "Separator", "ButtonBorder", "ButtonText",
-                    "InputFieldBorder", "CheckedFieldBackground", "CheckedFieldBorder",
-                    "CheckedFieldIndicator", "HeaderSection", "Midlight", "StatusBar",
-                    "DialogButton", "DialogButtonText", "DialogButtonBorder", "DialogMainButton",
-                    "DialogMainButtonText", "Merge3HighlightOriginal", "Merge3HighlightMine",
-                    "Merge3HighlightTheirs"}),
+                    "ScriptWarning", "ScriptError", "ScriptWhitespace", "DebuggerCurrentLine",
+                    "DebuggerErrorLine", "DiffFilePathText", "DiffTextHunkInfo",
+                    "DiffTextNoChange", "DiffTextAddition", "DiffTextDeletion",
+                    "DiffTextSeparatorBackground", "DiffTextNoChangeBackground",
+                    "DiffTextAdditionBackground", "DiffTextDeletionBackground", "DiffLineNum",
+                    "DiffLineNumSeparatorBackground", "DiffLineNumNoChangeBackground",
+                    "DiffLineNumAdditionBackground", "DiffLineNumDeletionBackground",
+                    "DiffFilePathBackground", "DiffFilePathBorder", "Separator", "ButtonBorder",
+                    "ButtonText", "InputFieldBorder", "CheckedFieldBackground",
+                    "CheckedFieldBorder", "CheckedFieldIndicator", "HeaderSection", "Midlight",
+                    "StatusBar", "DialogButton", "DialogButtonText", "DialogButtonBorder",
+                    "DialogMainButton", "DialogMainButtonText"}),
                 StudioStyleGuideModifier = def_enum({"Default", "Selected", "Pressed", "Disabled",
                     "Hover"}),
                 Style = def_enum({"AlternatingSupports", "BridgeStyleSupports", "NoSupports"}),
