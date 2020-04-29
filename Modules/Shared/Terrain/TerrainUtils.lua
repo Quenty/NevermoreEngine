@@ -10,7 +10,7 @@ local Vector3int16Utils = require("Vector3int16Utils")
 local TerrainUtils = {}
 
 function TerrainUtils.getTerrainRegion3(position, size, resolution)
-	return Region3Utils.createRegion3FromPositionSize(position, size)
+	return Region3Utils.fromPositionSize(position, size)
 		:ExpandToGrid(resolution)
 end
 
