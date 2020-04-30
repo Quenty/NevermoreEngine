@@ -29,7 +29,7 @@ function BoundLinkConnectionUtils.connectToParentLinksBoundClass(object, linkNam
 	assert(type(callback) == "function")
 
 	return BoundLinkConnectionUtils.connectToParent(object, function(maid, parent)
-		maid:GiveTask(BoundLinkConnectionUtils.connectToLinksBoundClass(parent, linkName, binder, callback))
+		maid:GiveTask(BoundLinkConnectionUtils.connectToLinksValueBoundClass(parent, linkName, binder, callback))
 	end)
 end
 
@@ -67,13 +67,13 @@ function BoundLinkConnectionUtils.connectToBoundChildren(parent, binder, callbac
 	end)
 end
 
-function BoundLinkConnectionUtils.connectToLinksBoundClass(parent, linkName, binder, callback)
+function BoundLinkConnectionUtils.connectToLinksValueBoundClass(parent, linkName, binder, callback)
 	assert(typeof(parent) == "Instance")
 	assert(type(linkName) == "string")
 	assert(binder)
 	assert(type(callback) == "function")
 
-	return BoundLinkConnectionUtils.connectToLinks(parent, linkName, function(maid, linkValue)
+	return BoundLinkConnectionUtils.connectToLinksValue(parent, linkName, function(maid, linkValue)
 		maid:GiveTask(BoundLinkConnectionUtils.connectToBoundClass(binder, linkValue, callback))
 	end)
 end
@@ -84,11 +84,11 @@ function BoundLinkConnectionUtils.connectToParentLinks(object, linkName, callbac
 	assert(type(callback) == "function")
 
 	return BoundLinkConnectionUtils.connectToParent(object, function(maid, parent)
-		maid:GiveTask(BoundLinkConnectionUtils.connectToLinks(parent, linkName, callback))
+		maid:GiveTask(BoundLinkConnectionUtils.connectToLinksValue(parent, linkName, callback))
 	end)
 end
 
-function BoundLinkConnectionUtils.connectToLinks(parent, linkName, callback)
+function BoundLinkConnectionUtils.connectToLinksValue(parent, linkName, callback)
 	assert(typeof(parent) == "Instance")
 	assert(type(linkName) == "string")
 	assert(typeof(callback) == "function")
