@@ -14,6 +14,8 @@ function Set.fromTableValue(tab)
 	return set
 end
 
+Set.fromList = Set.fromTableValue
+
 function Set.toList(set)
 	local list = {}
 
