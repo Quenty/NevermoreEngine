@@ -45,8 +45,6 @@ function BinderProvider:__index(index)
 	error(("%q Not a valid index"):format(tostring(index)))
 end
 
-
-
 function BinderProvider:Get(tagName)
 	assert(type(tagName) == "string", "tagName must be a string")
 	return rawget(self, tagName)

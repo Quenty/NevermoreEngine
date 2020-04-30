@@ -21,8 +21,10 @@ function Binder.new(tagName, constructor)
 	self._tagName = tagName or error("Bad argument 'tagName', expected string")
 	self._constructor = constructor or error("Bad argument 'constructor', expected table or function")
 
-	self._allSet = {}
+	self._allClassSet = {} -- [class] = true
 	self._loading = setmetatable({}, {__mode = "kv"})
+
+	self._listeners = {} -- [inst] = callback
 
 	delay(5, function()
 		if not self._loaded then
@@ -57,6 +59,22 @@ function Binder:GetConstructor()
 	return self._constructor
 end
 
+function Binder:ConnectClassChangedSignal(inst, callback)
+	self._listeners[inst] = self._listeners[inst] or {}
+	self._listeners[inst][callback] = true
+
+	return function()
+		if not self._listeners[inst] then
+			return
+		end
+
+		self._listeners[inst][callback] = nil
+		if not next(self._listeners[inst]) then
+			self._listeners[inst] = nil
+		end
+	end
+end
+
 function Binder:GetClassAddedSignal()
 	if self._classAddedSignal then
 		return self._classAddedSignal
@@ -84,7 +102,7 @@ end
 
 function Binder:GetAll()
 	local all = {}
-	for class, _ in pairs(self._allSet) do
+	for class, _ in pairs(self._allClassSet) do
 		all[#all+1] = class
 	end
 	return all
@@ -92,7 +110,7 @@ end
 
 -- NOTE: Do not mutate this set directly
 function Binder:GetAllSet()
-	return self._allSet
+	return self._allClassSet
 end
 
 -- Using this acknowledges that we're intentionally binding on a safe client object,
@@ -164,8 +182,14 @@ function Binder:_add(inst)
 		return
 	end
 
-	self._allSet[result] = true
+	self._allClassSet[result] = true
 	self._maid[inst] = result
+
+	if self._listeners[inst] then
+		for callback, _ in pairs(self._listeners[inst]) do
+			fastSpawn(callback, result)
+		end
+	end
 
 	if self._classAddedSignal then
 		self._classAddedSignal:Fire(result, inst)
@@ -175,13 +199,18 @@ end
 function Binder:_remove(inst)
 	local class = self._maid[inst]
 	if class then
-		self._allSet[class] = nil
+		if self._listeners[inst] then
+			for callback, _ in pairs(self._listeners[inst]) do
+				fastSpawn(callback, nil)
+			end
+		end
 		if self._classRemovingSignal then
 			self._classRemovingSignal:Fire(class, inst)
 		end
+		self._allClassSet[class] = nil
+		self._maid[inst] = nil
 	end
 
-	self._maid[inst] = nil
 	self._loading[inst] = nil
 end
 
