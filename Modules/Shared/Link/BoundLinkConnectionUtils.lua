@@ -22,18 +22,52 @@ function BoundLinkConnectionUtils.connectToParent(object, callback)
 	return maid
 end
 
-function BoundLinkConnectionUtils.connectToBoundParentLinks(object, linkName, binder, callback)
+function BoundLinkConnectionUtils.connectToParentLinksBoundClass(object, linkName, binder, callback)
 	assert(typeof(object) == "Instance")
 	assert(type(linkName) == "string")
 	assert(binder)
 	assert(type(callback) == "function")
 
 	return BoundLinkConnectionUtils.connectToParent(object, function(maid, parent)
-		maid:GiveTask(BoundLinkConnectionUtils.connectToBoundLinks(parent, linkName, binder, callback))
+		maid:GiveTask(BoundLinkConnectionUtils.connectToLinksBoundClass(parent, linkName, binder, callback))
 	end)
 end
 
-function BoundLinkConnectionUtils.connectToBoundLinks(parent, linkName, binder, callback)
+function BoundLinkConnectionUtils.connectToChildren(parent, callback)
+	assert(typeof(parent) == "Instance")
+	assert(typeof(callback) == "function")
+
+	local topMaid = Maid.new()
+
+	local function handleChildAdded(child)
+		if topMaid[child] then
+			return -- shouldn't happen, but we'll be paranoid
+		end
+
+		local maid = Maid.new()
+		topMaid[child] = maid
+		callback(topMaid, child)
+	end
+
+	topMaid:GiveTask(parent.ChildAdded:Connect(handleChildAdded))
+	topMaid:GiveTask(parent.ChildRemoved:Connect(function(child)
+		topMaid[child] = nil
+	end))
+
+	for _, child in pairs(parent:GetChildren()) do
+		handleChildAdded(child)
+	end
+
+	return topMaid
+end
+
+function BoundLinkConnectionUtils.connectToBoundChildren(parent, binder, callback)
+	return BoundLinkConnectionUtils.connectToChildren(parent, function(maid, child)
+		maid:GiveTask(BoundLinkConnectionUtils.connectToBoundClass(binder, child, callback))
+	end)
+end
+
+function BoundLinkConnectionUtils.connectToLinksBoundClass(parent, linkName, binder, callback)
 	assert(typeof(parent) == "Instance")
 	assert(type(linkName) == "string")
 	assert(binder)
