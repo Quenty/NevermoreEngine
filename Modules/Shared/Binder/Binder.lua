@@ -21,8 +21,9 @@ function Binder.new(tagName, constructor)
 	self._tagName = tagName or error("Bad argument 'tagName', expected string")
 	self._constructor = constructor or error("Bad argument 'constructor', expected table or function")
 
+	self._instToClass = {} -- [inst] = class
 	self._allClassSet = {} -- [class] = true
-	self._loading = setmetatable({}, {__mode = "kv"})
+	self._pendingInstSet = {} -- [inst] = true
 
 	self._listeners = {} -- [inst] = callback
 
@@ -153,28 +154,36 @@ end
 
 function Binder:Get(inst)
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
-	return self._maid[inst]
+	return self._instToClass[inst]
 end
 
 function Binder:_add(inst)
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
-	if self._loading[inst] then
+
+	if self._instToClass[inst] then
+		-- https://devforum.roblox.com/t/double-firing-of-collectionservice-getinstanceaddedsignal-when-applying-tag/244235
 		return
 	end
 
-	self._loading[inst] = true
-
-	local result
-	if type(self._constructor) == "function" then
-		result = self._constructor(inst)
-	elseif self._constructor.Create then
-		result = self._constructor:Create(inst)
-	else
-		result = self._constructor.new(inst)
+	if self._pendingInstSet[inst] == true then
+		warn("[Binder._add] - Reentered add. Still loading, probably caused by error in constructor.")
+		return
 	end
 
-	if not self._loading[inst] then
+	self._pendingInstSet[inst] = true
+
+	local class
+	if type(self._constructor) == "function" then
+		class = self._constructor(inst)
+	elseif self._constructor.Create then
+		class = self._constructor:Create(inst)
+	else
+		class = self._constructor.new(inst)
+	end
+
+	if self._pendingInstSet[inst] ~= true then
 		-- Got GCed in the process of loading?!
+		-- Constructor probably yields. Yikes.
 		warn(("[Binder._add] - Failed to load instance %q of %q, removed while loading!")
 			:format(
 				inst:GetFullName(),
@@ -182,39 +191,72 @@ function Binder:_add(inst)
 		return
 	end
 
-	self._allClassSet[result] = true
-	self._maid[inst] = result
+	self._pendingInstSet[inst] = nil
 
-	if self._listeners[inst] then
+	if not (type(class) == "table" and type(class.Destroy) == "function") then
+		warn("[Binder._add] - Bad class constructed")
+		return
+	end
+
+	assert(self._instToClass[inst] == nil, "Overwrote")
+
+	-- Add to state
+	self._allClassSet[class] = true
+	self._instToClass[inst] = class
+
+	-- Fire events
+	local listeners = self._listeners[inst]
+	if listeners then
 		for callback, _ in pairs(self._listeners[inst]) do
-			fastSpawn(callback, result)
+			fastSpawn(callback, class)
 		end
 	end
 
 	if self._classAddedSignal then
-		self._classAddedSignal:Fire(result, inst)
+		self._classAddedSignal:Fire(class, inst)
 	end
 end
 
 function Binder:_remove(inst)
-	local class = self._maid[inst]
-	if class then
-		if self._listeners[inst] then
-			for callback, _ in pairs(self._listeners[inst]) do
-				fastSpawn(callback, nil)
-			end
-		end
-		if self._classRemovingSignal then
-			self._classRemovingSignal:Fire(class, inst)
-		end
-		self._allClassSet[class] = nil
-		self._maid[inst] = nil
+	self._pendingInstSet[inst] = nil
+
+	local class = self._instToClass[inst]
+	if class == nil then
+		return
 	end
 
-	self._loading[inst] = nil
+	-- Fire off events
+	local listeners = self._listeners[inst]
+	if listeners then
+		for callback, _ in pairs(listeners) do
+			fastSpawn(callback, nil)
+		end
+	end
+	if self._classRemovingSignal then
+		self._classRemovingSignal:Fire(class, inst)
+	end
+
+	-- Clean up state
+	self._instToClass[inst] = nil
+	self._allClassSet[class] = nil
+
+	-- Destroy class
+	if class.Destroy then
+		class:Destroy()
+	else
+		warn(("[Binder._remove] - Class %q no longer has destroy, something destroyed it!")
+			:format(tostring(self._tagName)))
+	end
 end
 
 function Binder:Destroy()
+	local index, class = next(self._instToClass)
+	while class ~= nil do
+		self:_remove(class)
+		assert(self._instToClass[index] == nil)
+	end
+
+	-- Disconnect events
 	self._maid:DoCleaning()
 end
 
