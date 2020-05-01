@@ -7,13 +7,14 @@ local Maid = require("Maid")
 
 local BoundLinkConnectionUtils = {}
 
+-- TODO: Move this somewhere else? (ConnectionUtils?)
 function BoundLinkConnectionUtils.connectToParent(object, callback)
-	assert(typeof(object) == "Instance")
-	assert(type(callback) == "function")
+	assert(typeof(object) == "Instance", "Bad 'object' instance")
+	assert(type(callback) == "function", "Bad 'callback' function")
 
 	local maid = Maid.new()
 
-	local handleParentChanged = BoundLinkConnectionUtils.makeChangedHandlerWith(maid, callback)
+	local handleParentChanged = BoundLinkConnectionUtils._makeChangedHandlerWith(maid, callback)
 	maid:GiveTask(object:GetPropertyChangedSignal("Parent"):Connect(function()
 		handleParentChanged(object.Parent)
 	end))
@@ -23,10 +24,10 @@ function BoundLinkConnectionUtils.connectToParent(object, callback)
 end
 
 function BoundLinkConnectionUtils.connectToParentLinksBoundClass(object, linkName, binder, callback)
-	assert(typeof(object) == "Instance")
-	assert(type(linkName) == "string")
-	assert(binder)
-	assert(type(callback) == "function")
+	assert(typeof(object) == "Instance", "Bad 'object' instance")
+	assert(type(linkName) == "string", "Bad 'linkName' string")
+	assert(binder, "Bad 'binder' binder")
+	assert(type(callback) == "function", "Bad 'callback' function")
 
 	return BoundLinkConnectionUtils.connectToParent(object, function(maid, parent)
 		maid:GiveTask(BoundLinkConnectionUtils.connectToLinksValueBoundClass(parent, linkName, binder, callback))
@@ -34,8 +35,8 @@ function BoundLinkConnectionUtils.connectToParentLinksBoundClass(object, linkNam
 end
 
 function BoundLinkConnectionUtils.connectToChildren(parent, callback)
-	assert(typeof(parent) == "Instance")
-	assert(typeof(callback) == "function")
+	assert(typeof(parent) == "Instance", "Bad 'parent' instance")
+	assert(typeof(callback) == "function", "Bad 'callback' function")
 
 	local topMaid = Maid.new()
 
@@ -62,16 +63,20 @@ function BoundLinkConnectionUtils.connectToChildren(parent, callback)
 end
 
 function BoundLinkConnectionUtils.connectToBoundChildren(parent, binder, callback)
+	assert(typeof(parent) == "Instance", "Bad 'parent' instance")
+	assert(binder, "Bad 'binder' binder")
+	assert(type(callback) == "function", "Bad 'callback' instance")
+
 	return BoundLinkConnectionUtils.connectToChildren(parent, function(maid, child)
 		maid:GiveTask(BoundLinkConnectionUtils.connectToBoundClass(binder, child, callback))
 	end)
 end
 
 function BoundLinkConnectionUtils.connectToLinksValueBoundClass(parent, linkName, binder, callback)
-	assert(typeof(parent) == "Instance")
-	assert(type(linkName) == "string")
-	assert(binder)
-	assert(type(callback) == "function")
+	assert(typeof(parent) == "Instance", "Bad 'parent' instance")
+	assert(type(linkName) == "string", "Bad 'linkName' string")
+	assert(binder, "Bad 'binder' binder")
+	assert(type(callback) == "function", "Bad 'callback' instance")
 
 	return BoundLinkConnectionUtils.connectToLinksValue(parent, linkName, function(maid, linkValue)
 		maid:GiveTask(BoundLinkConnectionUtils.connectToBoundClass(binder, linkValue, callback))
@@ -79,19 +84,20 @@ function BoundLinkConnectionUtils.connectToLinksValueBoundClass(parent, linkName
 end
 
 function BoundLinkConnectionUtils.connectToParentLinks(object, linkName, callback)
-	assert(typeof(object) == "Instance")
-	assert(type(linkName) == "string")
-	assert(type(callback) == "function")
+	assert(typeof(object) == "Instance", "Bad 'object' instance")
+	assert(type(linkName) == "string", "Bad 'linkName' name")
+	assert(type(callback) == "function", "Bad 'callback' function")
 
 	return BoundLinkConnectionUtils.connectToParent(object, function(maid, parent)
 		maid:GiveTask(BoundLinkConnectionUtils.connectToLinksValue(parent, linkName, callback))
 	end)
 end
 
+-- @param callback callback(maid, linkValue, link)
 function BoundLinkConnectionUtils.connectToLinksValue(parent, linkName, callback)
-	assert(typeof(parent) == "Instance")
-	assert(type(linkName) == "string")
-	assert(typeof(callback) == "function")
+	assert(typeof(parent) == "Instance", "Bad 'parent' instance")
+	assert(type(linkName) == "string", "Bad 'linkName' instance")
+	assert(typeof(callback) == "function", "Bad 'callback' function")
 
 	local maid = Maid.new()
 
@@ -119,37 +125,51 @@ function BoundLinkConnectionUtils.connectToLinksValue(parent, linkName, callback
 end
 
 function BoundLinkConnectionUtils.connectToLinkValue(link, callback)
-	assert(typeof(link) == "Instance")
-	assert(typeof(callback) == "function")
+	assert(typeof(link) == "Instance", "Bad 'link' instance")
+	assert(typeof(callback) == "function", "Bad 'callback' function")
 
 	local maid = Maid.new()
 
-	local handleLinkChanged = BoundLinkConnectionUtils.makeChangedHandlerWith(maid, callback)
+	local handleLinkChanged = BoundLinkConnectionUtils._makeChangedHandlerWith(maid, callback)
 	maid:GiveTask(link:GetPropertyChangedSignal("Value"):Connect(function()
-		handleLinkChanged(link.Value)
+		handleLinkChanged(link.Value, link)
 	end))
-	handleLinkChanged(link.Value)
+	handleLinkChanged(link.Value, link)
 
 	return maid
 end
 
 function BoundLinkConnectionUtils.connectToBoundClass(binder, instance, callback)
-	assert(binder)
-	assert(typeof(instance) == "Instance")
-	assert(typeof(callback) == "function")
+	assert(binder, "Bad 'binder' binder")
+	assert(typeof(instance) == "Instance", "Bad 'instance' instance")
+	assert(typeof(callback) == "function", "Bad 'callback' function")
 
 	local maid = Maid.new()
 
-	local handleClassChanged = BoundLinkConnectionUtils.makeChangedHandlerWith(maid, callback)
+	local handleClassChanged = BoundLinkConnectionUtils._makeChangedHandlerWith(maid, callback)
 	maid:GiveTask(binder:ConnectClassChangedSignal(instance, handleClassChanged))
 	handleClassChanged(binder:Get(instance))
 
 	return maid
 end
 
-function BoundLinkConnectionUtils.makeChangedHandlerWith(topMaid, callback)
-	assert(topMaid)
-	assert(type(callback) == "function")
+function BoundLinkConnectionUtils.connectToBoundClasses(bindersList, instance, callback)
+	assert(bindersList, "Bad 'bindersList' list")
+	assert(typeof(instance) == "Instance", "Bad 'instance' instance")
+	assert(typeof(callback) == "function", "Bad 'callback' function")
+
+	local maid = Maid.new()
+
+	for _, binder in pairs(bindersList) do
+		maid:GiveTask(BoundLinkConnectionUtils.connectToBoundClass(binder, instance, callback))
+	end
+
+	return maid
+end
+
+function BoundLinkConnectionUtils._makeChangedHandlerWith(topMaid, callback)
+	assert(topMaid, "Bad 'topMaid' maid")
+	assert(type(callback) == "function", "Bad 'callback' function")
 
 	return function(value, ...)
 		if value ~= nil then
@@ -160,20 +180,6 @@ function BoundLinkConnectionUtils.makeChangedHandlerWith(topMaid, callback)
 			topMaid._callbackMaid = nil
 		end
 	end
-end
-
-function BoundLinkConnectionUtils.connectToBoundClasses(binders, instance, callback)
-	assert(binders)
-	assert(typeof(instance) == "Instance")
-	assert(typeof(callback) == "function")
-
-	local maid = Maid.new()
-
-	for _, binder in pairs(binders) do
-		maid:GiveTask(BoundLinkConnectionUtils.connectToBoundClass(binder, instance, callback))
-	end
-
-	return maid
 end
 
 return BoundLinkConnectionUtils

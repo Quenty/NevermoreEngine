@@ -11,7 +11,7 @@ local BinderUtils = require("BinderUtils")
 
 local BoundLinkUtils = {}
 
-function BoundLinkUtils.getBoundLinkValues(binder, linkName, from)
+function BoundLinkUtils.getLinkClasses(binder, linkName, from)
 	assert(type(binder) == "table", "Bad binder")
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad froM")
@@ -54,11 +54,11 @@ function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
 end
 
 function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, methodName, args)
-	assert(type(binders) == "table")
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
-	assert(type(methodName) == "string")
-	assert(type(args) == "table")
+	assert(type(binders) == "table", "Bad arg 'binders'")
+	assert(type(linkName) == "string", "Bad arg 'linkName'")
+	assert(typeof(from) == "Instance", "Bad arg 'from'")
+	assert(type(methodName) == "string", "Bad arg 'methodName'")
+	assert(type(args) == "table", "Bad arg 'args'")
 
 	if not next(binders) then
 		return
