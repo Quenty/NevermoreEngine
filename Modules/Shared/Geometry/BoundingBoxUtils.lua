@@ -17,6 +17,21 @@ function BoundingBoxUtils.getModelBoundingBox(model, relativeTo)
 	return BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
 end
 
+function BoundingBoxUtils.axisAlignedBoxSize(cframe, size)
+	local inv = cframe:inverse()
+
+	local wx = size*inv.XVector
+	local wy = size*inv.YVector
+	local wz = size*inv.ZVector
+
+	return Vector3.new(
+		math.abs(wx.x) + math.abs(wx.y) + math.abs(wx.z),
+		math.abs(wy.x) + math.abs(wy.y) + math.abs(wy.z),
+		math.abs(wz.x) + math.abs(wz.y) + math.abs(wz.z)
+	)
+end
+
+
 --- Gets a boundingBox for the given data
 -- @param data List of things with both Size and CFrame
 -- @tparam[opt=CFrame.new()] relativeTo
