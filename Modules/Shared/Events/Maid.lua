@@ -56,19 +56,24 @@ function Maid:__newindex(index, newTask)
 end
 
 --- Same as indexing, but uses an incremented number as a key.
--- @param task An item to clean
--- @treturn number taskId
-function Maid:GiveTask(task)
-	assert(task, "Task cannot be false or nil")
+-- @param tasks Item(s) to clean
+-- @treturn table taskId(s)
+function Maid:GiveTask(...)
+	local taskIds = {}
 
-	local taskId = #self._tasks+1
-	self[taskId] = task
+	for task in pairs({...}) do
+		assert(task, "Task cannot be false or nil")
 
-	if type(task) == "table" and (not task.Destroy) then
-		warn("[Maid.GiveTask] - Gave table task without .Destroy\n\n" .. debug.traceback())
+		local taskId = #self._tasks+1
+		table.insert(taskIds, taskId)
+		self[taskId] = task
+
+		if type(task) == "table" and (not task.Destroy) then
+			warn("[Maid.GiveTask] - Gave table task without .Destroy\n\n" .. debug.traceback())
+		end
 	end
 
-	return taskId
+	return taskIds
 end
 
 function Maid:GivePromise(promise)
