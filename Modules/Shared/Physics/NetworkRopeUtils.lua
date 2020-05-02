@@ -36,7 +36,7 @@ function NetworkRopeUtils.hintSharedMechanism(part0, part1)
 	ropeConstraint.Thickness = 0.25
 	ropeConstraint.Visible = false
 	ropeConstraint.Enabled = true
-	ropeConstraint.Length = 10000
+	ropeConstraint.Length = 100000
 	ropeConstraint.Attachment0 = attachment0
 	ropeConstraint.Attachment1 = attachment1
 	ropeConstraint.Parent = part0
