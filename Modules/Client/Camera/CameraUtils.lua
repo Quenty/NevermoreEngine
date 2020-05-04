@@ -20,4 +20,9 @@ function CameraUtils.fitBoundingBoxToCamera(size, fov, aspectRatio)
 	return radius / math.sin(halfMinFov)
 end
 
+function CameraUtils.isOnScreen(camera, position)
+	local _, onScreen = camera:WorldToScreenPoint(position)
+	return onScreen
+end
+
 return CameraUtils

@@ -4,63 +4,24 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local AccelTween = require("AccelTween")
+local BaseObject = require("BaseObject")
+local CameraGamepadInputUtils = require("CameraGamepadInputUtils")
 
-local GamepadRotateModel = {}
+local GamepadRotateModel = setmetatable({}, BaseObject)
 GamepadRotateModel.__index = GamepadRotateModel
 GamepadRotateModel.ClassName = "GamepadRotateModel"
 
 function GamepadRotateModel.new()
-	local self = setmetatable({}, GamepadRotateModel)
+	local self = setmetatable(BaseObject.new(), GamepadRotateModel)
 
-	self.DEADZONE = 0.1
-	self.SpeedMultiplier = Vector2.new(0.1, 0.1)
-
-	self.RampVelocityX = AccelTween.new(5)
-	self.RampVelocityY = AccelTween.new(5)
+	self._rampVelocityX = AccelTween.new(25)
+	self._rampVelocityY = AccelTween.new(25)
 
 	self.IsRotating = Instance.new("BoolValue")
 	self.IsRotating.Value = false
+	self._maid:GiveTask(self.IsRotating)
 
 	return self
-end
-
-do
-	-- luacheck: push ignore
-	-- See: https://github.com/Roblox/Core-Scripts/blob/cad3a477e39b93ecafdd610b1d8b89d239ab18e2/PlayerScripts/StarterPlayerScripts/CameraScript/RootCamera.lua#L395
-	-- luacheck: pop
-	-- K is a tunable parameter that changes the shape of the S-curve
-	-- the larger K is the more straight/linear the curve gets
-	local k = 0.35
-	local lowerK = 0.8
-	function GamepadRotateModel:_sCurveTranform(t)
-		t = math.clamp(t, -1, 1)
-		if t >= 0 then
-			return (k*t) / (k - t + 1)
-		end
-		return -((lowerK*-t) / (lowerK + t + 1))
-	end
-end
-
-function GamepadRotateModel:_toSCurveSpace(t)
-	return (1 + self.DEADZONE) * (2*math.abs(t) - 1) - self.DEADZONE
-end
-
-function GamepadRotateModel:_fromSCurveSpace(t)
-	return t/2 + 0.5
-end
-
-function GamepadRotateModel:_gamepadLinearToCurve(ThumbstickPosition)
-	local function OnAxis(AxisValue)
-		local sign = math.sign(AxisValue)
-		local point = self:_fromSCurveSpace(self:_sCurveTranform(self:_toSCurveSpace(math.abs(AxisValue))))
-		return math.clamp(point * sign, -1, 1)
-	end
-	return Vector2.new(OnAxis(ThumbstickPosition.x), OnAxis(ThumbstickPosition.y))
-end
-
-function GamepadRotateModel:OutOfDeadzone(inputObject)
-	local stickOffset = inputObject.Position
-	return stickOffset.Magnitude >= self.DEADZONE
 end
 
 function GamepadRotateModel:GetThumbstickDeltaAngle()
@@ -68,33 +29,30 @@ function GamepadRotateModel:GetThumbstickDeltaAngle()
 		return Vector2.new()
 	end
 
-	return Vector2.new(self.RampVelocityX.p, self.RampVelocityY.p)
+	return Vector2.new(self._rampVelocityX.p, self._rampVelocityY.p)
 end
 
 function GamepadRotateModel:StopRotate()
 	self._lastInputObject = nil
-	self.RampVelocityX.t = 0
-	self.RampVelocityX.p = self.RampVelocityX.t
+	self._rampVelocityX.t = 0
+	self._rampVelocityX.p = self._rampVelocityX.t
 
-	self.RampVelocityY.t = 0
-	self.RampVelocityY.p = self.RampVelocityY.t
+	self._rampVelocityY.t = 0
+	self._rampVelocityY.p = self._rampVelocityY.t
 
 	self.IsRotating.Value = false
 end
 
 function GamepadRotateModel:HandleThumbstickInput(inputObject)
-	local outOfDeadZone = self:OutOfDeadzone(inputObject)
-
-	if outOfDeadZone then
+	if CameraGamepadInputUtils.outOfDeadZone(inputObject) then
 		self._lastInputObject = inputObject
-
 
 		local stickOffset = self._lastInputObject.Position
 		stickOffset = Vector2.new(stickOffset.x, -stickOffset.y)  -- Invert axis!
 
-		local adjustedStickOffset = self:_gamepadLinearToCurve(stickOffset)
-		self.RampVelocityX.t = adjustedStickOffset.x * self.SpeedMultiplier.x
-		self.RampVelocityY.t = adjustedStickOffset.y * self.SpeedMultiplier.y
+		local adjustedStickOffset = CameraGamepadInputUtils.gamepadLinearToCurve(stickOffset)
+		self._rampVelocityX.t = adjustedStickOffset.x
+		self._rampVelocityY.t = adjustedStickOffset.y
 
 		self.IsRotating.Value = true
 	else

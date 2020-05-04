@@ -50,7 +50,9 @@ function CameraControls.new(zoomCamera, rotatedCamera)
 
 	self._enabled = false
 	self._key = tostring(self) .. "CameraControls"
+
 	self._gamepadRotateModel = GamepadRotateModel.new()
+	self._maid:GiveTask(self._gamepadRotateModel)
 
 	if zoomCamera then
 		self:SetZoomedCamera(zoomCamera)
@@ -290,8 +292,6 @@ function CameraControls:_endDrag()
 	self._maid._dragMaid = nil
 end
 
-
-
 function CameraControls:_handleGamepadRotateStop()
 	if self._rotVelocityTracker then
 		self:_applyRotVelocityTracker(self._rotVelocityTracker)
@@ -313,15 +313,15 @@ function CameraControls:_handleGamepadRotateStart()
 		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.new())
 	end
 
-	maid:GiveTask(RunService.Heartbeat:Connect(function()
-		local DeltaAngle = self._gamepadRotateModel:GetThumbstickDeltaAngle()
+	maid:GiveTask(RunService.Stepped:Connect(function()
+		local deltaAngle = 0.1*self._gamepadRotateModel:GetThumbstickDeltaAngle()
 
 		if self._rotatedCamera then
-			self._rotatedCamera:RotateXY(DeltaAngle)
+			self._rotatedCamera:RotateXY(deltaAngle)
 		end
 
 		if self._rotVelocityTracker then
-			self._rotVelocityTracker:Update(DeltaAngle)
+			self._rotVelocityTracker:Update(deltaAngle)
 		end
 	end))
 
