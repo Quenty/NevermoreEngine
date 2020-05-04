@@ -4,6 +4,25 @@
 
 local Set = {}
 
+function Set.union(set, otherSet)
+	local newSet = {}
+	for key, _ in pairs(set) do
+		newSet[key] = true
+	end
+	for key, _ in pairs(otherSet) do
+		newSet[key] = true
+	end
+	return newSet
+end
+
+function Set.copy(set)
+	local newSet = {}
+	for key, _ in pairs(set) do
+		newSet[key] = true
+	end
+	return newSet
+end
+
 function Set.fromTableValue(tab)
 	local set = {}
 
