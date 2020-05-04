@@ -48,7 +48,7 @@ function GamepadRotateModel:HandleThumbstickInput(inputObject)
 		self._lastInputObject = inputObject
 
 		local stickOffset = self._lastInputObject.Position
-		stickOffset = Vector2.new(stickOffset.x, -stickOffset.y)  -- Invert axis!
+		stickOffset = Vector2.new(-stickOffset.x, stickOffset.y)  -- Invert axis!
 
 		local adjustedStickOffset = CameraGamepadInputUtils.gamepadLinearToCurve(stickOffset)
 		self._rampVelocityX.t = adjustedStickOffset.x
