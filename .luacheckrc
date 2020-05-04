@@ -198,6 +198,7 @@ stds.roblox = {
                 IsRegion3Empty = read_write;
                 IsRegion3EmptyWithIgnoreList = read_write;
                 Raycast = read_write;
+                SetInsertPoint = read_write;
                 PrimaryPart = read_write_class;
                 BreakJoints = read_write;
                 GetBoundingBox = read_write;
@@ -255,6 +256,7 @@ stds.roblox = {
         version = empty;
         wait = empty;
         warn = empty;
+        UserSettings = empty;
 
         -- Libraries
         math = def_fields({"abs", "acos", "asin", "atan", "atan2", "ceil", "clamp", "cos", "cosh",
