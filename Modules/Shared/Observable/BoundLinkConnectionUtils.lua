@@ -4,6 +4,8 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
+local CharacterUtils = require("CharacterUtils")
+local observeProperty = require("observeProperty")
 
 local BoundLinkConnectionUtils = {}
 
@@ -12,13 +14,23 @@ function BoundLinkConnectionUtils.connectToParent(object, callback)
 	assert(typeof(object) == "Instance", "Bad 'object' instance")
 	assert(type(callback) == "function", "Bad 'callback' function")
 
+	return observeProperty(object, "Parent", callback)
+end
+
+-- TODO: Move somewhere else
+function BoundLinkConnectionUtils.connectToGetPlayerFromCharacter(object, callback)
+	assert(typeof(object) == "Instance", "Bad 'object' instance")
+	assert(type(callback) == "function", "Bad 'callback' function")
+
 	local maid = Maid.new()
 
-	local handleParentChanged = BoundLinkConnectionUtils._makeChangedHandlerWith(maid, callback)
-	maid:GiveTask(object:GetPropertyChangedSignal("Parent"):Connect(function()
-		handleParentChanged(object.Parent)
+	-- Assume character doesn't change after being assigned (i.e. ancestry is aligned with setting)
+
+	local handleChanged = BoundLinkConnectionUtils._makeChangedHandlerWithNoCheck(maid, callback)
+	maid:GiveTask(object.AncestryChanged:Connect(function()
+		handleChanged(CharacterUtils.getPlayerFromCharacter(object))
 	end))
-	handleParentChanged(object.Parent)
+	handleChanged(CharacterUtils.getPlayerFromCharacter(object))
 
 	return maid
 end
@@ -147,7 +159,7 @@ function BoundLinkConnectionUtils.connectToBoundClass(binder, instance, callback
 	local maid = Maid.new()
 
 	local handleClassChanged = BoundLinkConnectionUtils._makeChangedHandlerWith(maid, callback)
-	maid:GiveTask(binder:ConnectClassChangedSignal(instance, handleClassChanged))
+	maid:GiveTask(binder:ObserveInstance(instance, handleClassChanged))
 	handleClassChanged(binder:Get(instance))
 
 	return maid
@@ -178,8 +190,21 @@ function BoundLinkConnectionUtils._makeChangedHandlerWith(topMaid, callback)
 			callback(maid, value, ...)
 		else
 			topMaid._callbackMaid = nil
+			-- TODO: Call callback
 		end
 	end
 end
+
+function BoundLinkConnectionUtils._makeChangedHandlerWithNoCheck(topMaid, callback)
+	assert(topMaid, "Bad 'topMaid' maid")
+	assert(type(callback) == "function", "Bad 'callback' function")
+
+	return function(value, ...)
+		local maid = Maid.new()
+		topMaid._callbackMaid = maid
+		callback(maid, value, ...)
+	end
+end
+
 
 return BoundLinkConnectionUtils

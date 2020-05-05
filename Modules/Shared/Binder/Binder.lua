@@ -60,7 +60,7 @@ function Binder:GetConstructor()
 	return self._constructor
 end
 
-function Binder:ConnectClassChangedSignal(inst, callback)
+function Binder:ObserveInstance(inst, callback)
 	self._listeners[inst] = self._listeners[inst] or {}
 	self._listeners[inst][callback] = true
 

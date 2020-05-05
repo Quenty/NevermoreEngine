@@ -10,11 +10,9 @@ Maid.ClassName = "Maid"
 -- @constructor Maid.new()
 -- @treturn Maid
 function Maid.new()
-	local self = {}
-
-	self._tasks = {}
-
-	return setmetatable(self, Maid)
+	return setmetatable({
+		_tasks = {}
+	}, Maid)
 end
 
 --- Returns Maid[key] if not part of Maid metatable
@@ -27,7 +25,8 @@ function Maid:__index(index)
 	end
 end
 
---- Add a task to clean up
+--- Add a task to clean up. Tasks given to a maid will be cleaned when
+--  maid[index] is set to a different value.
 -- @usage
 -- Maid[key] = (function)         Adds a task to perform
 -- Maid[key] = (event connection) Manages an event connection
@@ -42,6 +41,11 @@ function Maid:__newindex(index, newTask)
 
 	local tasks = self._tasks
 	local oldTask = tasks[index]
+
+	if oldTask == newTask then
+		return
+	end
+
 	tasks[index] = newTask
 
 	if oldTask then

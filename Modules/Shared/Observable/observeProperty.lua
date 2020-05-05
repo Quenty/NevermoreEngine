@@ -1,12 +1,12 @@
 --- Binds a property of a Roblox action to a callback
--- @function bindProperty
+-- @function observeProperty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
 local fastSpawn = require("fastSpawn")
 
-local function bindProperty(obj, valueName, callback)
+local function observeProperty(obj, valueName, callback)
 	assert(typeof(obj) == "Instance")
 	assert(type(valueName) == "string")
 	assert(type(callback) == "function")
@@ -37,4 +37,4 @@ local function bindProperty(obj, valueName, callback)
 	return baseMaid
 end
 
-return bindProperty
+return observeProperty
