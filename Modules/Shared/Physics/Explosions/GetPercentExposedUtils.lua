@@ -1,21 +1,14 @@
 --- Identify parts that are potentially exposed to an explosion using a random vector raycasting
 -- @module GetPercentExposed
 
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
 local Workspace = game:GetService("Workspace")
+
+local RandomVector3Utils = require("RandomVector3Utils")
 
 local GetPercentExposed = {}
 GetPercentExposed.RAY_COUNT = 314
-
---- Equal distribution unit vectors around a sphere
-local function getRandomUnitVector()
-	local s = 2*(math.random()-0.5)
-	local t = 6.2831853071796*math.random()
-	local rx = s
-	local m = (1-s*s)^0.5
-	local ry = m*math.cos(t)
-	local rz = m*math.sin(t)
-	return Vector3.new(rx,ry,rz)
-end
 
 --- Searches for percent exposure of all parts given
 -- @tparam Vector3 point point to search
@@ -26,7 +19,7 @@ function GetPercentExposed.search(point, radius)
 	local totalHits = 0
 
 	for _=1, GetPercentExposed.RAY_COUNT do
-		local ray = Ray.new(point, getRandomUnitVector() * radius)
+		local ray = Ray.new(point, RandomVector3Utils.getRandomUnitVector() * radius)
 		local part = Workspace:FindPartOnRay(ray, nil, true) -- Ignore water
 		if part then
 			totalHits = totalHits + 1
