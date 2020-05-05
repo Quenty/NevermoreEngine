@@ -4,14 +4,24 @@
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
-return function(priority, _function)
+return function(priority, callback)
 	assert(type(priority) == "number")
-	assert(type(_function) == "function")
+	assert(type(callback) == "function")
 
 	local key = HttpService:GenerateGUID(false) .. "_onRenderStepFrame"
+	local unbound = false
 
 	RunService:BindToRenderStep(key, priority, function()
-		RunService:UnbindFromRenderStep(key)
-		_function()
+		if not unbound then -- Probably not needed
+			RunService:UnbindFromRenderStep(key)
+			callback()
+		end
 	end)
+
+	return function()
+		if not unbound then
+			RunService:UnbindFromRenderStep(key)
+			unbound = true
+		end
+	end
 end
