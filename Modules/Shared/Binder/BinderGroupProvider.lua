@@ -38,7 +38,7 @@ function BinderGroupProvider:Add(groupName, binderGroup)
 	assert(type(groupName) == "string")
 	assert(type(binderGroup) == "table")
 	assert(not self._afterInit, "Already inited")
-	assert(not self:Get(groupName))
+	assert(not self:Get(groupName), "Duplicate groupName")
 
 	table.insert(self._binderGroups, binderGroup)
 	self[groupName] = binderGroup
