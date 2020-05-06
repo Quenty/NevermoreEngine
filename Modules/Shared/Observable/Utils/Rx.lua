@@ -501,4 +501,15 @@ function Rx.take(number)
 	end
 end
 
+-- https://rxjs-dev.firebaseapp.com/api/index/function/defer
+-- https://netbasal.com/getting-to-know-the-defer-observable-in-rxjs-a16f092d8c09
+function Rx.defer(observableFactory)
+	return Observable.new(function(fire, fail, complete)
+		local observable = observableFactory()
+		assert(Observable.isObservable(observable))
+
+		return observable:Subscribe(fire, fail, complete)
+	end)
+end
+
 return Rx
