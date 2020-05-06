@@ -98,12 +98,16 @@ local V3_LEFT = Vector3.new(-1, 0, 0)
 -- to be going down the limb. the waist and neck joints attachments actually have the same problem
 -- of non-ideal axis orientation, but it's not as noticable there since the limits for natural
 -- motion are tighter for those joints anyway.
+
+-- luacheck: push ignore
 local R15_ADDITIONAL_ATTACHMENTS = {
 	{"UpperTorso", "RightShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_RIGHT, V3_UP), "RightShoulderRigAttachment"},
 	{"RightUpperArm", "RightShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_DOWN, V3_RIGHT), "RightShoulderRigAttachment"},
 	{"UpperTorso", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_LEFT, V3_UP), "LeftShoulderRigAttachment"},
 	{"LeftUpperArm", "LeftShoulderRagdollAttachment", CFrame.fromMatrix(V3_ZERO, V3_DOWN, V3_LEFT), "LeftShoulderRigAttachment"},
 }
+-- luacheck: pop
+
 -- { { Part0 name (parent), Part1 name (child, parent of joint), attachmentName, limits }, ... }
 local R15_RAGDOLL_RIG = {
 	{"UpperTorso", "Head", "NeckRigAttachment", HEAD_LIMITS},
