@@ -67,7 +67,7 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 
 	local function fail(...)
 		if hasCleaned then
-			warn("[Observable.fail] - Already cleaned up")
+			warn("[Observable.fail] - Already cleaned up", self._source)
 			return
 		elseif not state then
 			state = "fail"
@@ -77,13 +77,13 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 				failCallback(...)
 			end
 		elseif state == "cancelled" then
-			warn("[Observable.fail] - Already cancelled")
+			warn("[Observable.fail] - Already cancelled", self._source)
 		end
 	end
 
 	local function complete()
 		if hasCleaned then
-			warn("[Observable.complete] - Already cleaned up")
+			warn("[Observable.complete] - Already cleaned up", self._source)
 			return
 		elseif not state then
 			state = "complete"
@@ -93,7 +93,7 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 				completeCallback()
 			end
 		elseif state == "cancelled" then
-			warn("[Observable.complete] - Already cancelled")
+			warn("[Observable.complete] - Already cancelled", self._source)
 		end
 	end
 
@@ -103,13 +103,13 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 		elseif not state then
 			fireCallback(...)
 		elseif state == "cancelled" then
-			warn("[Observable.fire] - Already cancelled")
+			warn("[Observable.fire] - Already cancelled", self._source)
 		end
 	end
 
 	cleanup = self._onSubscribe(fire, fail, complete)
 	if not (cleanup == nil or MaidTaskUtils.isValidTask(cleanup)) then
-		error("Bad cleanup functin")
+		error("Bad cleanup function", self._source)
 	end
 
 	-- Whoops. We've already GCed
