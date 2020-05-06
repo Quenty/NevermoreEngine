@@ -46,7 +46,7 @@ function RxInstanceUtils.observeChildLeft(child, parent)
 end
 
 -- Returns children as a stream, initialized with current players
-function RxInstanceUtils.observeChildren(parent, predicate)
+function RxInstanceUtils.observeChildren(parent)
 	assert(typeof(parent) == "Instance")
 
 	return Rx.fromSignal(parent.ChildAdded)
