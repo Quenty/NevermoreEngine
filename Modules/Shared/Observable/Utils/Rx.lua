@@ -6,19 +6,27 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Observable = require("Observable")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local Symbol = require("Symbol")
-local fastSpawn = require("fastSpawn")
 
-local RX_NOT_SET = Symbol.named("rxNotSet")
-local EMPTY_FUNCTION = function() end
+local UNSET_VALUE = Symbol.named("unsetValue")
 
-local Rx = {}
+local Rx = {
+	EMPTY = Observable.new(function(fire, fail, complete)
+		complete()
+		return nil
+	end);
+	NEVER = Observable.new(function(fire, fail, complete)
+		return nil
+	end);
+}
 
 function Rx.pipe(transformers)
 	assert(type(transformers) == "table")
 	for index, transformer in pairs(transformers) do
 		if type(transformer) ~= "function" then
-			error(("Bad transform of type %q at index %q"):format(type(transformer), tostring(index)))
+			error(("[Rx.pipe] Bad pipe value of type %q at index %q, expected function")
+				:format(type(transformer), tostring(index)))
 		end
 	end
 
@@ -39,249 +47,189 @@ function Rx.pipe(transformers)
 	end
 end
 
-function Rx.transformToFunction(transformer)
-	assert(type(transformer) == "function")
-
-	return function(callback, ...)
-		assert(type(callback) == "function")
-
-		local observable = transformer(Rx.of(...))
-		assert(observable)
-		return observable:Subscribe(callback)
-	end
-end
-
-function Rx.mergeInput(transformer)
-	assert(type(transformer) == "function");
-
-	return function(source)
-		return Observable.new(function(fire)
-			return source:Subscribe(function(...)
-				-- on subscription to the source we transform with the spy for the given values
-				local sourceValues = table.pack(...)
-
-				local spy = Observable.new(function(spyFire)
-					-- spy sends seen values
-					return spyFire(table.unpack(sourceValues, 1, sourceValues.n))
-				end)
-
-				-- Observe results from the transofmred
-				local observed = transformer(spy)
-				assert(observed)
-				assert(observed.Subscribe)
-
-				return observed:Subscribe(function(value)
-					-- Observed values go first, then the sourceValues
-					return fire(value, table.unpack(sourceValues, 1, sourceValues.n))
-				end)
-			end)
-		end)
-	end;
-end
-
--- Pushes the result of the transformer to the end of the tuple stack
--- but continues to pass along the value.
--- Doesn't switch, so you can get multiple fast!
-function Rx.appendLastInput(transformer)
-	assert(transformer)
-
-	return function(source)
-		return Observable.new(function(fire)
-			local lastInput = RX_NOT_SET
-			local spy = Observable.new(function(spyFire)
-				return source:Subscribe(function(...)
-					lastInput = table.pack(...)
-					return spyFire(...)
-				end)
-			end)
-
-			local observable = transformer(spy)
-			assert(observable)
-			assert(observable.Subscribe)
-
-			return observable:Subscribe(function(...)
-				return fire(..., table.unpack(lastInput, 1, lastInput.n))
-			end)
-		end)
-	end
-end
-
--- function Rx.withLatestFrom(observable)
--- 	return function(source)
--- 		return Observable.new(function(fire)
--- 			local maid = Maid.new()
-
--- 			local lastFrom = RX_NOT_SET
-
--- 			-- Subscribe first to this incase we have an instant value
--- 			maid:GiveTask(observable:Subscribe(function(value)
--- 				lastFrom = value
--- 				return EMPTY_FUNCTION
--- 			end))
-
--- 			maid:GiveTask(source:Subscribe(function(value)
--- 				if lastFrom == RX_NOT_SET then
--- 					return EMPTY_FUNCTION
--- 				end
-
--- 				return fire(value, lastFrom)
--- 			end))
-
--- 			return maid
--- 		end)
--- 	end
--- end
-
--- function Rx.withLatestFrom(observable)
--- 	return function(source)
--- 		return Observable.new(function(fire)
--- 			local maid = Maid.new()
-
--- 			local lastFrom = RX_NOT_SET
-
--- 			-- Subscribe first to this incase we have an instant value
--- 			maid:GiveTask(observable:Subscribe(function(value)
--- 				lastFrom = value
--- 				return function()
--- 					-- TODO: Handle this properly and clean up the subscription
--- 					-- below...
--- 				end;
--- 			end))
-
--- 			maid:GiveTask(source:Subscribe(function(value)
--- 				if lastFrom == RX_NOT_SET then
--- 					return EMPTY_FUNCTION
--- 				end
-
--- 				return fire(value, lastFrom)
--- 			end))
-
--- 			return maid
--- 		end)
--- 	end
--- end
-
-function Rx.combineLatest(transformers)
-	assert(type(transformers) == "table")
-	for _, transformer in pairs(transformers) do
-		assert(type(transformer) == "function")
-	end
-
-	return function(source)
-		local observers = {}
-		for key, transformer in pairs(transformers) do
-			observers[key] = transformer(source)
-		end
-
-		return Observable.new(function(fire)
-			local maid = Maid.new()
-
-			local latest = {}
-			for key, _ in pairs(observers) do
-				latest[key] = RX_NOT_SET
-			end
-
-			local function fireIfAllSet()
-				for _, item in pairs(latest) do
-					if item == RX_NOT_SET then
-						return
-					end
-				end
-
-				maid._lastFire = fire(unpack(latest))
-			end
-
-			for key, observer in pairs(observers) do
-				maid:GiveTask(observer:Subscribe(function(value)
-					latest[key] = value
-					fireIfAllSet()
-				end))
-			end
-
-			return maid
-		end)
-	end
-end
-
+-- http://reactivex.io/documentation/operators/just.html
 function Rx.of(...)
 	local args = table.pack(...)
 
-	return Observable.new(function(fire)
+	return Observable.new(function(fire, fail, complete)
+		for i=1, args.n do
+			fire(args[i])
+		end
+
+		complete()
+	end)
+end
+
+-- http://reactivex.io/documentation/operators/from.html
+function Rx.from(item)
+	if Promise.isPromise(item) then
+		return Rx.fromPromise(item)
+	elseif type(item) == "table" then
+		return Rx.of(unpack(item))
+	else
+		-- TODO: Iterator?
+		error("[Rx.from] - cannot convert")
+	end
+end
+
+function Rx.merge(observables)
+	assert(type(observables) == "table")
+
+	for _, item in pairs(observables) do
+		assert(Observable.isObservable(item), "Not an observable")
+	end
+
+	return Observable.new(function(fire, fail, complete)
 		local maid = Maid.new()
 
-		for i=1, args.n do
-			maid[i] = fire(args[i])
+		for _, observable in pairs(observables) do
+			maid:GiveTask(observable:Subscribe(fire, fail, complete))
 		end
 
 		return maid
 	end)
 end
 
--- function Rx.when(transformer)
--- 	return function(source)
--- 		return Observable.new(function(fireReal)
--- 			local lastFiredWith = RX_NOT_SET
--- 			local ourFire = nil
+function Rx.fromSignal(event)
+	return Observable.new(function(fire, fail, complete)
+		local maid = Maid.new()
+		maid:GiveTask(event:Connect(fire))
+		maid:GiveTask(complete)
+		return maid
+	end)
+end
 
--- 			local spy = Observable.new(function(fire)
--- 				return source:Subscribe(function(...)
--- 					lastFiredWith = table.pack(...)
--- 					return fire(...)
--- 				end)
--- 			end)
+function Rx.fromPromise(promise)
+	assert(Promise.isPromise(promise))
 
--- 			local requirementObservable = transformer(spy)
+	return Observable.new(function(fire, fail, complete)
+		if promise:IsFulfilled() then
+			fire(promise:Wait())
+			complete()
+			return nil
+		end
 
--- 			return requirementObservable:Subscribe(function(...)
--- 				if lastFiredWith == RX_NOT_SET then
--- 					-- Guess some external event occured here
--- 					return EMPTY_FUNCTION
--- 				end
+		local maid = Maid.new()
 
--- 				-- We discard the "..." results and return with the spy lastFiredWith
--- 				return fireReal(table.unpack(lastFiredWith, 1, lastFiredWith.n))
--- 			end)
--- 		end)
--- 	end
--- end
+		local pending = true
+		maid:GiveTask(function()
+			pending = false
+		end)
 
-function Rx.tap(onFiring)
-	assert(onFiring)
+		promise:Then(
+			function(...)
+				if pending then
+					fire(...)
+					complete()
+				end
+			end,
+			function(...)
+				if not pending then
+					fail(...)
+					complete()
+				end
+			end)
+
+		return maid
+	end)
+end
+
+function Rx.tap(firingCallback)
+	assert(type(firingCallback) == "function")
 
 	return function(source)
-		return Observable.new(function(fire)
+		return Observable.new(function(fire, fail, complete)
 			return source:Subscribe(function(...)
-				local maid = Maid.new()
-				maid._onFiring = onFiring(...) -- could be nil (what if we pass print in!?)
-				maid:GiveTask(fire(...))
-				return maid
-			end)
+				firingCallback(...)
+				fire(...)
+			end, fail, complete)
 		end)
 	end
 end
 
-function Rx.filter(predicate)
-	assert(type(predicate) == "function")
-
+-- http://reactivex.io/documentation/operators/start.html
+function Rx.start(callback)
 	return function(source)
-		return source:Lift(function(fire, ...)
-			local maid = Maid.new()
+		return Observable.new(function(fire, fail, complete)
+			fire(callback())
 
-			if predicate(...) then
-				maid._firedMaid = fire(...)
+			return source:Subscribe(fire, fail, complete)
+		end)
+	end
+end
+
+-- Like start, but also from (list!)
+function Rx.startFrom(callback)
+	assert(type(callback) == "function")
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			for _, value in pairs(callback()) do
+				fire(value)
 			end
 
-			return maid
+			return source:Subscribe(fire, fail, complete)
 		end)
 	end
 end
 
-function Rx.map(project)
-	assert(type(project) == "function")
+function Rx.startWith(values)
+	assert(type(values) == "table")
 
 	return function(source)
-		return source:Lift(function(fire, ...)
-			return fire(project(...))
+		return Observable.new(function(fire, fail, complete)
+			for _, item in pairs(values) do
+				fire(item)
+			end
+
+			return source:Subscribe(fire, fail, complete)
+		end)
+	end
+end
+
+-- http://reactivex.io/documentation/operators/filter.html
+function Rx.where(predicate)
+	assert(type(predicate) == "function", "Bad predicate callback")
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			return source:Subscribe(
+				function(...)
+					local maid = Maid.new()
+
+					if predicate(...) then
+						fire(...)
+					end
+
+					return maid
+				end,
+				fail,
+				complete
+			)
+		end)
+	end
+end
+
+-- https://rxjs.dev/api/operators/mapTo
+function Rx.mapTo(...)
+	local args = table.pack(...)
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			return source:Subscribe(function()
+				fire(table.unpack(args, 1, args.n))
+			end, fail, complete)
+		end)
+	end
+end
+
+-- http://reactivex.io/documentation/operators/map.html
+function Rx.map(project)
+	assert(type(project) == "function", "Bad project callback")
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			return source:Subscribe(function(...)
+				fire(project(...))
+			end, fail, complete)
 		end)
 	end
 end
@@ -289,86 +237,98 @@ end
 -- Merges higher order observables together
 function Rx.mergeAll()
 	return function(source)
-		return Observable.new(function(fire)
-			return source:Subscribe(function(observable)
-				assert(type(observable) == "table")
-				assert(type(observable.Subscribe) == "function")
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
 
-				return observable:Subscribe(fire)
-			end)
+			local pendingCount = 0
+			local topComplete = false
+
+			maid:GiveTask(source:Subscribe(
+				function(observable)
+					assert(Observable.isObservable(observable))
+
+					pendingCount = pendingCount + 1
+
+					maid:GiveTask(observable:Subscribe(
+						fire, -- Merge each inner observable
+						fail, -- Emit failure automatically
+						function()
+							pendingCount = pendingCount - 1
+							if pendingCount == 0 and topComplete then
+								complete()
+								maid:DoCleaning()
+							end
+						end))
+				end,
+				function(...)
+					fail(...) -- Also reflect failures up to the top!
+					maid:DoCleaning()
+				end,
+				function()
+					topComplete = true
+				end))
+
+			return maid
 		end)
 	end
 end
 
-function Rx.switchMapTo(observable)
-	assert(observable, "Bad observable")
-	assert(observable.Subscribe, "Bad observable")
-
+-- Merges higher order observables together
+-- https://rxjs.dev/api/operators/switchAll
+function Rx.switchAll()
 	return function(source)
-		return source:Lift(function(fire, value)
-			-- Resubscribe
-			return observable:Subscribe(fire)
+		return Observable.new(function(fire, fail, complete)
+			local outerMaid = Maid.new()
+			local topComplete = false
+			local insideComplete = false
+			local currentInside = nil
+
+			outerMaid:GiveTask(source:Subscribe(
+				function(observable)
+					assert(Observable.isObservable(observable))
+
+					insideComplete = false
+					currentInside = observable
+					outerMaid._current = nil
+
+					local maid = Maid.new()
+					maid:GiveTask(observable:Subscribe(
+						fire, -- Merge each inner observable
+						function(...)
+							if currentInside == observable then
+								fail(...)
+							end
+						end, -- Emit failure automatically
+						function()
+							if currentInside == observable then
+								insideComplete = true
+								if insideComplete and topComplete then
+									complete()
+									outerMaid:DoCleaning()
+								end
+							end
+						end))
+
+					outerMaid._current = maid
+				end,
+				function(...)
+					fail(...) -- Also reflect failures up to the top!
+					outerMaid:DoCleaning()
+				end,
+				function()
+					topComplete = true
+					if insideComplete and topComplete then
+						complete()
+						outerMaid:DoCleaning()
+					end
+				end))
+
+			return outerMaid
 		end)
 	end
 end
 
-function Rx.switchMap(project)
-	assert(type(project) == "function")
-
-	return function(source)
-		return source:Lift(function(fire, ...)
-			local observable = project(...)
-			assert(observable, "Project returned bad value")
-			assert(observable.Subscribe, "Project returned bad value")
-
-			-- Resubscribe
-			return observable:Subscribe(fire)
-		end)
-	end
-end
-
-function Rx.interval(seconds)
-	assert(type(seconds) == "number")
-
-	return Observable.new(function(fire)
-		local count = 0
-		local alive = true
-
-		delay(seconds, function()
-			while alive do
-				fire(count)
-				count = count + 1
-				wait(seconds)
-			end
-		end)
-
-		return function()
-			alive = false
-		end
-	end)
-end
-
-function Rx.scan(accumulator, seed)
-	assert(type(accumulator) == "function")
-
-	return function(source)
-		return Observable.new(function(fire)
-			local current = seed
-			return source:Subscribe(function(value)
-				current = accumulator(current, value)
-				fire(current)
-			end)
-		end)
-	end
-end
-
-function Rx.mergeScan(accumulator, seed)
-	return Rx.pipe({
-		Rx.scan(accumulator, seed);
-		Rx.mergeAll();
-	})
-end
-
+-- Sort of equivalent of promise.then()
 function Rx.flatMap(project)
 	return Rx.pipe({
 		Rx.map(project);
@@ -376,141 +336,132 @@ function Rx.flatMap(project)
 	})
 end
 
-function Rx.observeProperty(propertyName)
-	assert(type(propertyName) == "string")
+function Rx.switchMap(project)
+	return Rx.pipe({
+		Rx.map(project);
+		Rx.switchAll();
+	})
+end
+
+function Rx.takeUntil(notifier)
+	assert(Observable.isObservable(notifier))
 
 	return function(source)
-		return source:Lift(function(fire, instance, ...)
-			if typeof(instance) ~= "Instance" then
-				warn("[Rx.observeProperty] - Cannot observeProperty of non-instance")
-				return EMPTY_FUNCTION
-			end
-
+		return Observable.new(function(fire, fail, complete)
 			local maid = Maid.new()
-			local otherArgs = table.pack(...)
+			local cancelled = false
 
-			local function handlePropertyChanged()
-				local value = instance[propertyName]
-				if value ~= nil then
-					maid._fireEvent = fire(value, table.unpack(otherArgs, 1, otherArgs.n))
-				else
-					maid._fireEvent = nil
-				end
+			local function cancel()
+				maid:DoCleaning()
+				cancelled = true
 			end
 
-			maid:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(handlePropertyChanged))
-			handlePropertyChanged()
+			-- Any value emitted will cancel (complete without any values allows all values to pass)
+			maid:GiveTask(notifier:Subscribe(cancel, cancel))
+
+			-- Cancelled immediately? Oh boy.
+			if cancelled then
+				maid:DoCleaning()
+				return nil
+			end
+
+			-- Subscribe!
+			maid:GiveTask(source:Subscribe(fire, fail, complete))
 
 			return maid
 		end)
 	end
 end
 
-function Rx.requirePropertyValue(propertyName, expectedValue)
-	assert(type(propertyName) == "string")
+function Rx.packed(...)
+	local args = table.pack(...)
 
-	return function(source)
-		return source:Lift(function(fire, instance, ...)
-			if typeof(instance) ~= "Instance" then
-				warn("[Rx.requirePropertyValue] - Cannot requirePropertyValue of non-instance")
-				return EMPTY_FUNCTION
+	return Observable.new(function(fire, fail, complete)
+		fire(unpack(args, 1, args.n))
+		complete()
+	end)
+end
+
+function Rx.unpacked(observable)
+	assert(Observable.isObservable(observable))
+
+	return Observable.new(function(fire, fail, complete)
+		return observable:Subscribe(function(value)
+			if type(value) == "table" then
+				fire(unpack(value))
+			else
+				warn(("[Rx.unpacked] - Observable didn't return a table got type %q")
+					:format(type(value)))
 			end
+		end, fail, complete)
+	end)
+end
 
-			local maid = Maid.new()
-			local otherArgs = table.pack(...)
+function Rx.combineLatest(observables)
+	assert(observables)
 
-			local function handlePropertyChanged()
-				if instance[propertyName] == expectedValue then
-					maid._fireEvent = fire(instance, table.unpack(otherArgs, 1, otherArgs.n))
-				else
-					maid._fireEvent = nil
+	return Observable.new(function(fire, fail, complete)
+		if not next(observables) then
+			complete()
+			return
+		end
+
+		local maid = Maid.new()
+		local pending = 0
+
+		local latest = {}
+		for key, _ in pairs(observables) do
+			pending = pending + 1
+			latest[key] = UNSET_VALUE
+		end
+
+		local function fireIfAllSet()
+			for _, item in pairs(latest) do
+				if item == UNSET_VALUE then
+					return
 				end
 			end
 
-			maid:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(handlePropertyChanged))
-			handlePropertyChanged()
+			fire(unpack(latest))
+		end
 
-			return maid
-		end)
-	end
-end
-
-function Rx.observeBoundClass(binder)
-	assert(binder)
-
-	return function(source)
-		return source:Lift(function(fire, instance, ...)
-			if typeof(instance) ~= "Instance" then
-				return EMPTY_FUNCTION
-			end
-
-			local maid = Maid.new()
-			local otherArgs = table.pack(...)
-
-			maid:GiveTask(binder:ObserveInstance(instance, function(class)
-				if class then
-					maid._fireEvent = fire(class, table.unpack(otherArgs, 1, otherArgs.n))
-				else
-					maid._fireEvent = nil
-				end
-			end))
-
-			local class = binder:Get(instance)
-			if class then
-				maid._fireEvent = fire(class, table.unpack(otherArgs, 1, otherArgs.n))
-			end
-
-			return maid
-		end)
-	end
-end
-
-function Rx.wrapMaid()
-	return function(source)
-		return source:Lift(function(fire, ...)
-			local maid = Maid.new()
-			maid._fireEvent = fire(maid, ...)
-			return maid
-		end)
-	end
-end
-
-function Rx.observeChildrenOfClass(className)
-	assert(typeof(className) == "string")
-
-	return function(source)
-		return Observable.new(function(fire)
-			return source:Subscribe(function(instance, ...)
-				if typeof(instance) ~= "Instance" then
-					return EMPTY_FUNCTION
-				end
-
-				local maid = Maid.new()
-				local otherArgs = table.pack(...)
-
-				local function handleChildAdded(child)
-					if not child:IsA(className) then
-						return
+		for key, observer in pairs(observables) do
+			maid:GiveTask(observer:Subscribe(
+				function(value)
+					latest[key] = value
+					fireIfAllSet()
+				end,
+				function(...)
+					pending = pending - 1
+					fail(...)
+				end,
+				function()
+					pending = pending - 1
+					if pending == 0 then
+						complete()
 					end
-
-					fastSpawn(function()
-						maid[child] = fire(child, table.unpack(otherArgs, 1, otherArgs.n))
-					end)
-				end
-
-				maid:GiveTask(instance.ChildAdded:Connect(handleChildAdded))
-				maid:GiveTask(instance.ChildRemoved:Connect(function(child)
-					maid[child] = nil
 				end))
+		end
 
-				for _, child in pairs(instance:GetChildren()) do
-					handleChildAdded(child)
-				end
+		return maid
+	end)
+end
 
-				return maid
-			end)
-		end)
-	end
+-- http://reactivex.io/documentation/operators/using.html
+function Rx.using(resourceFactory, observableFactory)
+	return Observable.new(function(fire, fail, complete)
+		local maid = Maid.new()
+
+		local resource = resourceFactory()
+		maid:GiveTask(resource)
+
+		local observable = observableFactory(resource)
+		assert(Observable.isObservable(observable))
+
+		maid:GiveTask(observable:Subscribe(fire, fail, complete))
+
+		return maid
+	end)
 end
 
 return Rx
