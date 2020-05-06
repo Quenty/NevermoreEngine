@@ -8,6 +8,7 @@ local Observable = require("Observable")
 local Maid = require("Maid")
 local Promise = require("Promise")
 local Symbol = require("Symbol")
+local Table = require("Table")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -140,15 +141,32 @@ function Rx.fromPromise(promise)
 end
 
 -- https://rxjs-dev.firebaseapp.com/api/operators/tap
-function Rx.tap(firingCallback)
-	assert(type(firingCallback) == "function")
+function Rx.tap(onFire, onError, onComplete)
+	assert(type(onFire) == "function" or onFire == nil)
+	assert(type(onError) == "function" or onError == nil)
+	assert(type(onComplete) == "function" or onComplete == nil)
 
 	return function(source)
 		return Observable.new(function(fire, fail, complete)
-			return source:Subscribe(function(...)
-				firingCallback(...)
-				fire(...)
-			end, fail, complete)
+			return source:Subscribe(
+				function(...)
+					if onFire then
+						onFire(...)
+					end
+					fire(...)
+				end,
+				function(...)
+					if onError then
+						onError(...)
+					end
+					error(...)
+				end,
+				function(...)
+					if onComplete then
+						onComplete(...)
+					end
+					onComplete(...)
+				end)
 		end)
 	end
 end
@@ -252,16 +270,26 @@ function Rx.mergeAll()
 
 					pendingCount = pendingCount + 1
 
-					maid:GiveTask(observable:Subscribe(
+					local innerMaid = Maid.new()
+
+					innerMaid:GiveTask(observable:Subscribe(
 						fire, -- Merge each inner observable
 						fail, -- Emit failure automatically
 						function()
+							innerMaid:DoCleaning()
 							pendingCount = pendingCount - 1
 							if pendingCount == 0 and topComplete then
 								complete()
 								maid:DoCleaning()
 							end
 						end))
+
+					local key = maid:GiveTask(innerMaid)
+
+					-- Cleanup
+					innerMaid:GiveTask(function()
+						maid[key] = nil
+					end)
 				end,
 				function(...)
 					fail(...) -- Also reflect failures up to the top!
@@ -364,7 +392,7 @@ function Rx.takeUntil(notifier)
 			end
 
 			-- Any value emitted will cancel (complete without any values allows all values to pass)
-			maid:GiveTask(notifier:Subscribe(cancel, cancel))
+			maid:GiveTask(notifier:Subscribe(cancel, cancel, nil))
 
 			-- Cancelled immediately? Oh boy.
 			if cancelled then
@@ -404,8 +432,54 @@ function Rx.unpacked(observable)
 	end)
 end
 
+-- http://reactivex.io/documentation/operators/do.html
+-- https://rxjs-dev.firebaseapp.com/api/operators/finalize
+-- https://github.com/ReactiveX/rxjs/blob/master/src/internal/operators/finalize.ts
+function Rx.finalize(finalizerCallback)
+	assert(type(finalizerCallback) == "function")
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(fire, fail, complete))
+			maid:GiveTask(finalizerCallback)
+
+			return maid
+		end)
+	end
+end
+
+-- https://rxjs.dev/api/operators/combineAll
+function Rx.combineAll()
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local observables = {}
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(
+				function(value)
+					assert(Observable.isObservable(value))
+
+					table.insert(observables, value)
+				end,
+				fail,
+				function()
+					maid:GiveTask(Rx.combineLatest(observables))
+						:Subscribe(fire, fail, complete)
+				end))
+
+			return maid
+		end)
+	end
+end
+
 function Rx.combineLatest(observables)
-	assert(observables)
+	assert(type(observables) == "table")
+
+	for _, observable in pairs(observables) do
+		assert(Observable.isObservable(observable))
+	end
 
 	return Observable.new(function(fire, fail, complete)
 		if not next(observables) then
@@ -429,7 +503,7 @@ function Rx.combineLatest(observables)
 				end
 			end
 
-			fire(unpack(latest))
+			fire(Table.copy(latest))
 		end
 
 		for key, observer in pairs(observables) do
@@ -515,6 +589,44 @@ function Rx.defer(observableFactory)
 
 		return observable:Subscribe(fire, fail, complete)
 	end)
+end
+
+-- https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom
+-- https://medium.com/js-in-action/rxjs-nosy-combinelatest-vs-selfish-withlatestfrom-a957e1af42bf
+function Rx.withLatestFrom(inputObservables)
+	assert(inputObservables)
+
+	for _, observable in pairs(inputObservables) do
+		assert(Observable.isObservable(observable))
+	end
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			local latest = {}
+
+			for key, observable in pairs(inputObservables) do
+				latest[key] = UNSET_VALUE
+
+				maid:GiveTask(observable:Subscribe(function(value)
+					latest[key] = value
+				end, nil, nil))
+			end
+
+			maid:GiveTask(source:Subscribe(function(value)
+				for _, item in pairs(latest) do
+					if item == UNSET_VALUE then
+						return
+					end
+				end
+
+				fire({value, unpack(latest)})
+			end, fail, complete))
+
+			return maid
+		end)
+	end
 end
 
 return Rx
