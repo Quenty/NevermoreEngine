@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Observable = require("Observable")
 local Maid = require("Maid")
-
+local Rx = require("Rx"0)
 local RxBinderUtils = {}
 
 function RxBinderUtils.observeBoundClass(binder, instance)
@@ -28,6 +28,16 @@ function RxBinderUtils.observeBoundClass(binder, instance)
 
 		return maid
 	end)
+end
+
+function RxBinderUtils.observeBoundClassObservers(binders, instance)
+	local observers = {}
+
+	for _, binder in pairs(binders) do
+		table.insert(observers, RxBinderUtils.observeBoundClass(binder, instance))
+	end
+
+	return Rx.from(observables)
 end
 
 return RxBinderUtils
