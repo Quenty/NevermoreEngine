@@ -96,8 +96,9 @@ end
 function Rx.fromSignal(event)
 	return Observable.new(function(fire, fail, complete)
 		local maid = Maid.new()
+		-- This stream never completes or fails!
 		maid:GiveTask(event:Connect(fire))
-		maid:GiveTask(complete)
+
 		return maid
 	end)
 end
@@ -268,6 +269,10 @@ function Rx.mergeAll()
 				end,
 				function()
 					topComplete = true
+					if pendingCount == 0 then
+						complete()
+						maid:DoCleaning()
+					end
 				end))
 
 			return maid
