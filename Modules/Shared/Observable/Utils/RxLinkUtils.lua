@@ -9,29 +9,29 @@ local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxLinkUtils = {}
 
--- Only emits valid links
-function RxLinkUtils.observeValidLinks(linkName, parent)
+-- Emits a stream of streams. Each stream either has a valid link, or a non-valid link
+function RxLinkUtils.streamLinkObservers(linkName, parent)
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(parent) == "Instance")
 
 	return RxInstanceUtils.observeChildren(parent)
 		:Pipe({
-			Rx.flatMap(function(link)
-				if not link:IsA("ObjectValue") then
-					return Rx.EMPTY
-				end
-
-				return Rx.combineLatest({
-					Rx.of(link);
+			RxInstanceUtils.whereIsAClass("ObjectValue");
+			-- one to many
+			Rx.map(function(link)
+				return Rx.unpacked(Rx.combineLatest({
 					RxInstanceUtils.observeProperty(link, "Name");
 					RxInstanceUtils.observeProperty(link, "Value");
+				})):Pipe({
+					Rx.takeUntil(RxInstanceUtils.observeChildLeft(link, parent));
+					Rx.map(function(name, value)
+						if name == linkName and value then
+							return link, value
+						else
+							return nil, nil
+						end
+					end);
 				})
-			end);
-			Rx.where(function(link, name, value)
-				return (name == linkName) and (value ~= nil)
-			end);
-			Rx.map(function(link, name, value)
-				return link, value
 			end);
 		})
 end

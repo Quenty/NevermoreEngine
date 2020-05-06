@@ -70,5 +70,31 @@ function RxMaidUtils.maidWhilePending()
 	end
 end
 
+function RxMaidUtils.uniqueMaid()
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local outerMaid = Maid.new()
+
+			outerMaid:GiveTask(source:Subscribe(
+				function(...)
+					outerMaid._unique = nil
+					local maid = Maid.new()
+					outerMaid._unique = maid
+					fire(maid, ...)
+				end,
+				function(...)
+					fail(...)
+					outerMaid:DoCleaning()
+				end,
+				function()
+					complete()
+					outerMaid:DoCleaning()
+				end))
+
+			return outerMaid
+		end)
+	end
+end
+
 
 return RxMaidUtils
