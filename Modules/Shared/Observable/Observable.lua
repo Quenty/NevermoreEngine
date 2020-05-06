@@ -25,7 +25,7 @@ function Observable.new(onSubscribe)
 end
 
 function Observable:Pipe(transformers)
-	assert(type(transformers) == "table")
+	assert(type(transformers) == "table", "Bad transformers")
 
 	local current = self
 	for _, transformer in pairs(transformers) do
@@ -83,7 +83,7 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 
 	local function complete()
 		if hasCleaned then
-			warn("[Observable.complete] - Already cleaned up", self._source)
+			-- warn("[Observable.complete] - Already cleaned up", self._source)
 			return
 		elseif not state then
 			state = "complete"
