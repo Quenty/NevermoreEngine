@@ -21,6 +21,7 @@ local Rx = {
 	end);
 }
 
+-- https://rxjs-dev.firebaseapp.com/api/index/function/pipe
 function Rx.pipe(transformers)
 	assert(type(transformers) == "table")
 	for index, transformer in pairs(transformers) do
@@ -72,6 +73,7 @@ function Rx.from(item)
 	end
 end
 
+-- https://rxjs-dev.firebaseapp.com/api/operators/merge
 function Rx.merge(observables)
 	assert(type(observables) == "table")
 
@@ -90,6 +92,7 @@ function Rx.merge(observables)
 	end)
 end
 
+-- https://rxjs-dev.firebaseapp.com/api/index/function/fromEvent
 function Rx.fromSignal(event)
 	return Observable.new(function(fire, fail, complete)
 		local maid = Maid.new()
@@ -99,6 +102,7 @@ function Rx.fromSignal(event)
 	end)
 end
 
+-- https://rxjs-dev.firebaseapp.com/api/index/function/from
 function Rx.fromPromise(promise)
 	assert(Promise.isPromise(promise))
 
@@ -134,6 +138,7 @@ function Rx.fromPromise(promise)
 	end)
 end
 
+-- https://rxjs-dev.firebaseapp.com/api/operators/tap
 function Rx.tap(firingCallback)
 	assert(type(firingCallback) == "function")
 
@@ -172,6 +177,7 @@ function Rx.startFrom(callback)
 	end
 end
 
+-- https://rxjs-dev.firebaseapp.com/api/operators/startWith
 function Rx.startWith(values)
 	assert(type(values) == "table")
 
@@ -194,13 +200,9 @@ function Rx.where(predicate)
 		return Observable.new(function(fire, fail, complete)
 			return source:Subscribe(
 				function(...)
-					local maid = Maid.new()
-
 					if predicate(...) then
 						fire(...)
 					end
-
-					return maid
 				end,
 				fail,
 				complete
@@ -462,6 +464,41 @@ function Rx.using(resourceFactory, observableFactory)
 
 		return maid
 	end)
+end
+
+-- https://rxjs.dev/api/operators/take
+function Rx.take(number)
+	assert(type(number) == "number")
+	assert(number >= 0)
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			if number == 0 then
+				complete()
+				return nil
+			end
+
+			local taken = 0
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(function(...)
+				if taken >= number then
+					warn("[Rx.take] - Still getting values past subscription")
+					return
+				end
+
+
+				taken = taken + 1
+				fire(...)
+
+				if taken == number then
+					complete()
+				end
+			end, fail, complete))
+
+			return maid
+		end)
+	end
 end
 
 return Rx

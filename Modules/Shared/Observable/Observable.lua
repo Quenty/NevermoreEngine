@@ -24,6 +24,19 @@ function Observable.new(onSubscribe)
 	}, Observable)
 end
 
+function Observable:Pipe(transformers)
+	assert(type(transformers) == "table")
+
+	local current = self
+	for _, transformer in pairs(transformers) do
+		assert(type(transformer) == "function")
+		current = transformer(current)
+		assert(Observable.isObservable(current))
+	end
+
+	return current
+end
+
 --- Subscribes immediately, fireCallback may return
 -- a maid to cleanup!
 -- @param fireCallback(value) => cleanup
@@ -42,6 +55,10 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 			return
 		end
 
+		fireCallback = nil
+		failCallback = nil
+		completeCallback = nil
+
 		hasCleaned = true
 		if cleanup ~= nil then
 			MaidTaskUtils.doTask(cleanup)
@@ -49,7 +66,10 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 	end
 
 	local function fail(...)
-		if not state then
+		if hasCleaned then
+			warn("[Observable.fail] - Already cleaned up")
+			return
+		elseif not state then
 			state = "fail"
 			doCleanup()
 
@@ -62,7 +82,10 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 	end
 
 	local function complete()
-		if not state then
+		if hasCleaned then
+			warn("[Observable.complete] - Already cleaned up")
+			return
+		elseif not state then
 			state = "complete"
 			doCleanup()
 
@@ -75,7 +98,9 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 	end
 
 	local function fire(...)
-		if not state then
+		if hasCleaned then
+			return
+		elseif not state then
 			fireCallback(...)
 		elseif state == "cancelled" then
 			warn("[Observable.fire] - Already cancelled")
@@ -95,19 +120,6 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 	end
 
 	return doCleanup
-end
-
-function Observable:Pipe(transformers)
-	assert(type(transformers) == "table")
-
-	local current = self
-	for _, transformer in pairs(transformers) do
-		assert(type(transformer) == "function")
-		current = transformer(current)
-		assert(Observable.isObservable(current))
-	end
-
-	return current
 end
 
 return Observable
