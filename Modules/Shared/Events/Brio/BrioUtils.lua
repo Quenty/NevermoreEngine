@@ -9,6 +9,22 @@ local Brio = require("Brio")
 
 local BrioUtils = {}
 
+function BrioUtils.clone(brio)
+	assert(brio)
+
+	if brio:IsDead() then
+		return Brio.DEAD
+	end
+
+	local newBrio = Brio.new(brio:GetValue())
+
+	newBrio:ToMaid():GiveTask(brio.Died:Connect(function()
+		newBrio:Kill()
+	end))
+
+	return newBrio
+end
+
 function BrioUtils.first(brios, ...)
 	for _, brio in pairs(brios) do
 		if brio:IsDead() then
@@ -30,19 +46,6 @@ function BrioUtils.first(brios, ...)
 	end))
 
 	return topBrio
-end
-
-function BrioUtils.toMaid(brio)
-	assert(Brio.isBrio(brio))
-	assert(not brio:IsDead())
-
-	local maid = Maid.new()
-
-	maid:GiveTask(brio.Died:Connect(function()
-		maid:DoCleaning()
-	end))
-
-	return maid
 end
 
 -- Makes a brio that is limited by the lifetime of its parent (but could be shorter)
@@ -77,8 +80,8 @@ function BrioUtils.extend(brio, ...)
 end
 
 function BrioUtils.merge(brio, otherBrio)
-	assert(Brio.isBrio(brio))
-	assert(Brio.isBrio(otherBrio))
+	assert(Brio.isBrio(brio), "Not a brio")
+	assert(Brio.isBrio(otherBrio), "Not a brio")
 
 	if brio:IsDead() or otherBrio:IsDead() then
 		return Brio.DEAD

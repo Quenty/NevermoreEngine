@@ -4,10 +4,11 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local BrioUtils = require("BrioUtils")
 local Observable = require("Observable")
 local Brio = require("Brio")
 local Rx = require("Rx")
+local Maid = require("Maid")
+local BrioUtils = require("BrioUtils")
 
 local RxBrioUtils = {}
 
@@ -21,7 +22,7 @@ function RxBrioUtils.completeOnDeath(brio, observable)
 			return
 		end
 
-		local maid = BrioUtils.toMaid(brio)
+		local maid = brio:ToMaid()
 
 		maid:GiveTask(complete)
 		maid:GiveTask(observable:Subscribe(fire, fail, complete))
@@ -44,6 +45,25 @@ function RxBrioUtils.mapBrio(project)
 		assert(Observable.isObservable(observable), "Not an observable")
 
 		return RxBrioUtils.completeOnDeath(brio, observable)
+	end
+end
+
+function RxBrioUtils.onlyLastBrioSurvives()
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(function(brio)
+				assert(Brio.isBrio(brio), "Not a brio")
+
+				local wrapperBrio = BrioUtils.clone(brio)
+				maid._lastBrio = wrapperBrio
+
+				return wrapperBrio
+			end, fail, complete))
+
+			return maid
+		end)
 	end
 end
 
