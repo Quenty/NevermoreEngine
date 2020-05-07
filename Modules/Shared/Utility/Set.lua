@@ -15,6 +15,16 @@ function Set.union(set, otherSet)
 	return newSet
 end
 
+function Set.intersection(set, otherSet)
+	local newSet = {}
+	for key, _ in pairs(set) do
+		if otherSet[key] then
+			newSet[key] = true
+		end
+	end
+	return newSet
+end
+
 function Set.copy(set)
 	local newSet = {}
 	for key, _ in pairs(set) do
