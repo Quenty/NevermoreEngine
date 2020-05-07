@@ -211,6 +211,32 @@ function Rx.startWith(values)
 	end
 end
 
+-- https://www.learnrxjs.io/learn-rxjs/operators/combination/endwith
+function Rx.endWith(values)
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(
+				fire,
+				function(...)
+					for _, item in pairs(values) do
+						fire(item)
+					end
+					fail(...)
+				end),
+				function()
+					for _, item in pairs(values) do
+						fire(item)
+					end
+					complete()
+				end)
+
+			return maid
+		end)
+	end
+end
+
 -- http://reactivex.io/documentation/operators/filter.html
 function Rx.where(predicate)
 	assert(type(predicate) == "function", "Bad predicate callback")
@@ -364,11 +390,68 @@ function Rx.switchAll()
 end
 
 -- Sort of equivalent of promise.then()
-function Rx.flatMap(project)
-	return Rx.pipe({
-		Rx.map(project);
-		Rx.mergeAll();
-	})
+function Rx.flatMap(project, resultSelector)
+	assert(type(project) == "function")
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			local pendingCount = 0
+			local topComplete = false
+
+			maid:GiveTask(source:Subscribe(
+				function(...)
+					local outerValue = ...
+
+					local observable = project(...)
+					assert(Observable.isObservable(observable), "Bad observable from project")
+
+					pendingCount = pendingCount + 1
+
+					local innerMaid = Maid.new()
+
+					innerMaid:GiveTask(observable:Subscribe(
+						function(...)
+							-- Merge each inner observable
+							if resultSelector then
+								fire(resultSelector(outerValue, ...))
+							else
+								fire(...)
+							end
+						end,
+						fail, -- Emit failure automatically
+						function()
+							innerMaid:DoCleaning()
+							pendingCount = pendingCount - 1
+							if pendingCount == 0 and topComplete then
+								complete()
+								maid:DoCleaning()
+							end
+						end))
+
+					local key = maid:GiveTask(innerMaid)
+
+					-- Cleanup
+					innerMaid:GiveTask(function()
+						maid[key] = nil
+					end)
+				end,
+				function(...)
+					fail(...) -- Also reflect failures up to the top!
+					maid:DoCleaning()
+				end,
+				function()
+					topComplete = true
+					if pendingCount == 0 then
+						complete()
+						maid:DoCleaning()
+					end
+				end))
+
+			return maid
+		end)
+	end
 end
 
 function Rx.switchMap(project)
@@ -497,8 +580,8 @@ function Rx.combineLatest(observables)
 		end
 
 		local function fireIfAllSet()
-			for _, item in pairs(latest) do
-				if item == UNSET_VALUE then
+			for _, value in pairs(latest) do
+				if value == UNSET_VALUE then
 					return
 				end
 			end
