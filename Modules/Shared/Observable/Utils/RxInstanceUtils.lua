@@ -4,69 +4,51 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Rx = require("Rx")
 local Observable = require("Observable")
 local Maid = require("Maid")
+local Brio = require("Brio")
 
 local RxInstanceUtils = {}
 
-function RxInstanceUtils.whereIsAClass(className)
-	return Rx.where(function(object)
-		return typeof(object) == "Instance" and object:IsA(className)
-	end);
-end
-
-function RxInstanceUtils.observeChildLeft(child, parent)
-	assert(typeof(child) == "Instance")
-	assert(typeof(parent) == "Instance")
-	assert(child.Parent == parent)
+function RxInstanceUtils.observeProperty(instance, property)
+	assert(typeof(instance) == "Instance")
+	assert(type(property) == "string")
 
 	return Observable.new(function(fire, fail, complete)
-		if child.Parent ~= parent then
-			fire(true)
-			complete()
-			return nil
-		else
-			local maid = Maid.new()
-			local completed = false
+		local maid = Maid.new()
 
-			maid:GiveTask(child:GetPropertyChangedSignal("Parent"):Connect(function()
-				assert(not completed, "Already complete, somehow didn't GC")
+		maid:GiveTask(instance:GetPropertyChangedSignal(property):Connect(function()
+			fire(instance[property])
+		end))
+		fire(instance[property])
 
-				if child.Parent ~= parent then -- Sometimes we get re-entrance
-					completed = true
-					fire(true)
-					complete()
-				end
-			end))
-
-			return maid
-		end
+		return maid
 	end)
 end
 
--- Returns children as a stream, initialized with current players
-function RxInstanceUtils.observeChildren(parent)
+function RxInstanceUtils.observeChildrenBrio(parent)
 	assert(typeof(parent) == "Instance")
 
-	return Rx.fromSignal(parent.ChildAdded)
-		:Pipe({
-			Rx.startFrom(function()
-				return parent:GetChildren()
-			end);
-		})
-end
+	return Observable.new(function(fire, fail, complete)
+		local maid = Maid.new()
 
-function RxInstanceUtils.observeProperty(instance, propertyName)
-	assert(typeof(instance) == "Instance")
-	assert(type(propertyName) == "string")
+		maid:GiveTask(parent.ChildAdded:Connect(function(child)
+			local value = Brio.new(child)
+			maid[child] = value
+			fire(value)
+		end))
+		maid:GiveTask(parent.ChildRemoved:Connect(function(child)
+			maid[child] = nil
+		end))
 
-	return Rx.fromSignal(instance:GetPropertyChangedSignal(propertyName))
-		:Pipe({
-			Rx.start(function()
-				return instance[propertyName]
-			end);
-		})
+		for _, child in pairs(parent:GetChildren()) do
+			local value = Brio.new(child)
+			maid[child] = value
+			fire(value)
+		end
+
+		return maid
+	end)
 end
 
 return RxInstanceUtils

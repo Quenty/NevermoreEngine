@@ -4,40 +4,76 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Observable = require("Observable")
+local Brio = require("Brio")
 local Maid = require("Maid")
-local Rx = require("Rx"0)
+local Observable = require("Observable")
+local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
+local RxBrioUtils = require("RxBrioUtils")
+
 local RxBinderUtils = {}
 
-function RxBinderUtils.observeBoundClass(binder, instance)
+function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
+	assert(binder)
+	assert(typeof(instance) == "Instance")
+
+	return RxInstanceUtils.observeChildrenBrio(instance)
+		:Pipe({
+			Rx.flatMap(RxBrioUtils.mapBrio(function(child)
+				return RxBinderUtils.observeBoundClassBrio(binder, child)
+			end));
+		})
+end
+
+function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
+	assert(binders)
+	assert(typeof(instance) == "Instance")
+
+	return RxInstanceUtils.observeChildrenBrio(instance)
+		:Pipe({
+			Rx.flatMap(RxBrioUtils.mapBrio(function(child)
+				return RxBinderUtils.observeBoundClassesBrio(binders, child)
+			end))
+		})
+end
+
+
+function RxBinderUtils.observeBoundClassBrio(binder, instance)
 	assert(type(binder) == "table")
 	assert(typeof(instance) == "Instance")
 
 	return Observable.new(function(fire, fail, complete)
 		local maid = Maid.new()
 
-		maid:GiveTask(binder:ObserveInstance(instance, function(class)
+		local function handleClassChanged(class)
 			if class then
-				fire(class)
-			else
-				fire(nil)
-			end
-		end))
+				local brio = Brio.new(class)
+				maid._lastBrio = brio
 
-		fire(binder:Get(instance))
+				fire(brio)
+			else
+				maid._lastBrio = nil
+			end
+		end
+
+		maid:GiveTask(binder:ObserveInstance(instance, handleClassChanged))
+		handleClassChanged(binder:Get(instance))
 
 		return maid
 	end)
 end
 
-function RxBinderUtils.observeBoundClassObservers(binders, instance)
-	local observers = {}
+function RxBinderUtils.observeBoundClassesBrio(binders, instance)
+	assert(binders)
+	assert(typeof(instance) == "Instance")
+
+	local observables = {}
 
 	for _, binder in pairs(binders) do
-		table.insert(observers, RxBinderUtils.observeBoundClass(binder, instance))
+		table.insert(observables, RxBinderUtils.observeBoundClassBrio(binder, instance))
 	end
 
-	return Rx.from(observables)
+	return Rx.mergeAll()(Rx.of(observables))
 end
 
 return RxBinderUtils

@@ -6,34 +6,59 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local Observable = require("Observable")
+local Maid = require("Maid")
+local Brio = require("Brio")
+local RxBrioUtils = require("RxBrioUtils")
 
 local RxLinkUtils = {}
 
--- Emits a stream of streams. Each stream either has a valid link, or a non-valid link
-function RxLinkUtils.streamLinkObservers(linkName, parent)
-	assert(type(linkName) == "string", "Bad linkName")
+-- Emits valid links
+function RxLinkUtils.observeValidLinksBrio(linkName, parent)
+	assert(type(linkName) == "string")
 	assert(typeof(parent) == "Instance")
 
-	return RxInstanceUtils.observeChildren(parent)
+	return RxInstanceUtils.observeChildrenBrio(parent)
 		:Pipe({
-			RxInstanceUtils.whereIsAClass("ObjectValue");
-			-- one to many
-			Rx.map(function(link)
-				return Rx.unpacked(Rx.combineLatest({
-					RxInstanceUtils.observeProperty(link, "Name");
-					RxInstanceUtils.observeProperty(link, "Value");
-				})):Pipe({
-					Rx.takeUntil(RxInstanceUtils.observeChildLeft(link, parent));
-					Rx.map(function(name, value)
-						if name == linkName and value then
-							return link, value
-						else
-							return nil, nil
-						end
-					end);
-				})
+			Rx.flatMap(function(brio)
+				local instance = brio:GetValue()
+				if not instance:IsA("ObjectValue") then
+					return Rx.EMPTY
+				end
+
+				return RxBrioUtils.completeOnDeath(brio, RxLinkUtils.observeValidityBrio(linkName, instance))
 			end);
 		})
 end
+
+function RxLinkUtils.observeValidityBrio(linkName, link)
+	assert(typeof(link) == "Instance" and link:IsA("ObjectValue"))
+	assert(type(linkName) == "string")
+
+	return Observable.new(function(fire, fail, complete)
+		local maid = Maid.new()
+
+		local function updateValidity()
+			if not (link.Name == linkName) and link.Value then
+				maid._lastValid = nil
+				return
+			end
+
+			local newValid = Brio.new(link, link.Value)
+			maid._lastValid = newValid
+
+			fire(newValid)
+		end
+
+		maid:GiveTask(link:GetPropertyChangedSignal("Value")
+			:Connect(updateValidity))
+		maid:GiveTask(link:GetPropertyChangedSignal("Name")
+			:Connect(updateValidity))
+		updateValidity()
+
+		return maid
+	end)
+end
+
 
 return RxLinkUtils
