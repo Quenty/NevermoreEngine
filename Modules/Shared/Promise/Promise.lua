@@ -145,6 +145,7 @@ function Promise:Resolve(...)
 
 		local promise2 = (...)
 		if promise2._pendingExecuteList then -- pending
+			promise2._unconsumedException = false
 			promise2._pendingExecuteList[#promise2._pendingExecuteList + 1] = {
 				function(...)
 					self:Resolve(...)
@@ -152,7 +153,6 @@ function Promise:Resolve(...)
 				function(...)
 					-- Still need to verify at this point that we're pending!
 					if self._pendingExecuteList then
-						promise2._unconsumedException = false
 						self:_reject({...}, select("#", ...))
 					end
 				end,
