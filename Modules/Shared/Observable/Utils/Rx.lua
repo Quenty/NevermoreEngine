@@ -561,7 +561,7 @@ function Rx.combineLatest(observables)
 	assert(type(observables) == "table")
 
 	for _, observable in pairs(observables) do
-		assert(Observable.isObservable(observable))
+		assert(Observable.isObservable(observable), "Not an observable")
 	end
 
 	return Observable.new(function(fire, fail, complete)

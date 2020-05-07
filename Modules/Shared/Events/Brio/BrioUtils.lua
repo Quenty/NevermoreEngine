@@ -33,6 +33,7 @@ function BrioUtils.first(brios, ...)
 end
 
 function BrioUtils.toMaid(brio)
+	assert(Brio.isBrio(brio))
 	assert(not brio:IsDead())
 
 	local maid = Maid.new()
@@ -76,6 +77,9 @@ function BrioUtils.extend(brio, ...)
 end
 
 function BrioUtils.merge(brio, otherBrio)
+	assert(Brio.isBrio(brio))
+	assert(Brio.isBrio(otherBrio))
+
 	if brio:IsDead() or otherBrio:IsDead() then
 		return Brio.DEAD
 	end

@@ -12,8 +12,8 @@ local Rx = require("Rx")
 local RxBrioUtils = {}
 
 function RxBrioUtils.completeOnDeath(brio, observable)
-	assert(brio)
-	assert(observable)
+	assert(Brio.isBrio(brio))
+	assert(Observable.isObservable(observable))
 
 	return Observable.new(function(fire, fail, complete)
 		if brio:IsDead() then

@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local MaidTaskUtils = require("MaidTaskUtils")
 
-local ENABLE_STACK_TRACING = true
+local ENABLE_STACK_TRACING = false
 
 local Observable = {}
 Observable.ClassName = "Observable"
