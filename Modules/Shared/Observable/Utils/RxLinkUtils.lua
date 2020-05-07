@@ -39,14 +39,13 @@ function RxLinkUtils.observeValidityBrio(linkName, link)
 		local maid = Maid.new()
 
 		local function updateValidity()
-			if not (link.Name == linkName) and link.Value then
+			if not ((link.Name == linkName) and link.Value) then
 				maid._lastValid = nil
 				return
 			end
 
 			local newValid = Brio.new(link, link.Value)
 			maid._lastValid = newValid
-
 			fire(newValid)
 		end
 
