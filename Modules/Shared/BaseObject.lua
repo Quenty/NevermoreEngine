@@ -19,7 +19,12 @@ function BaseObject.new(obj)
 end
 
 function BaseObject:Destroy()
+	local startTime = tick()
 	self._maid:DoCleaning()
+	if tick() - startTime >= 0.001 then
+		warn(("[BaseObject.Destroy] - Took %f ms to clean up %s")
+			:format(tick() - startTime, tostring(self.ClassName)))
+	end
 	setmetatable(self, nil)
 end
 
