@@ -34,7 +34,7 @@ function RxBrioUtils.mapBrio(project)
 	assert(type(project) == "function")
 
 	return function(brio)
-		assert(Brio.isBrio(brio))
+		assert(Brio.isBrio(brio), "Not a brio")
 
 		if brio:IsDead() then
 			return Rx.EMPTY

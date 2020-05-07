@@ -292,7 +292,7 @@ function Rx.mergeAll()
 
 			maid:GiveTask(source:Subscribe(
 				function(observable)
-					assert(Observable.isObservable(observable))
+					assert(Observable.isObservable(observable), "Not an observable")
 
 					pendingCount = pendingCount + 1
 
@@ -710,6 +710,22 @@ function Rx.withLatestFrom(inputObservables)
 			return maid
 		end)
 	end
+end
+
+-- https://rxjs-dev.firebaseapp.com/api/operators/scan
+function Rx.scan(accumulator, seed)
+	assert(type(accumulator) == "function")
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local current = seed
+
+			return source:Subscribe(function(value)
+				current = accumulator(current, value)
+				fire(current)
+			end, fail, complete)
+		end)
+	end;
 end
 
 return Rx

@@ -37,6 +37,19 @@ function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
 		})
 end
 
+function RxBinderUtils.observeBoundClass(binder, instance)
+	assert(type(binder) == "table")
+	assert(typeof(instance) == "Instance")
+
+	return Observable.new(function(fire, fail, complete)
+		local maid = Maid.new()
+
+		maid:GiveTask(binder:ObserveInstance(instance, fire))
+		fire(binder:Get(instance))
+
+		return maid
+	end)
+end
 
 function RxBinderUtils.observeBoundClassBrio(binder, instance)
 	assert(type(binder) == "table")
@@ -73,7 +86,9 @@ function RxBinderUtils.observeBoundClassesBrio(binders, instance)
 		table.insert(observables, RxBinderUtils.observeBoundClassBrio(binder, instance))
 	end
 
-	return Rx.mergeAll()(Rx.of(observables))
+	return Rx.of(unpack(observables)):Pipe({
+		Rx.mergeAll();
+	})
 end
 
 return RxBinderUtils
