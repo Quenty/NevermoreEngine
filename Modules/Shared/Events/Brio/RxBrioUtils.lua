@@ -59,7 +59,7 @@ function RxBrioUtils.onlyLastBrioSurvives()
 				local wrapperBrio = BrioUtils.clone(brio)
 				maid._lastBrio = wrapperBrio
 
-				return wrapperBrio
+				fire(wrapperBrio)
 			end, fail, complete))
 
 			return maid
