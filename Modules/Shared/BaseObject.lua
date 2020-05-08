@@ -21,10 +21,14 @@ end
 function BaseObject:Destroy()
 	local startTime = tick()
 	self._maid:DoCleaning()
-	if tick() - startTime >= 0.001 then
+
+	-- This could emit events, which could cause bad startTime
+	-- but we'll take this risk over getting the ClassName
+	if tick() - startTime >= 0.0001 then
 		warn(("[BaseObject.Destroy] - Took %f ms to clean up %s")
-			:format(tick() - startTime, tostring(self.ClassName)))
+			:format((tick() - startTime)*1000, tostring(self.ClassName)))
 	end
+
 	setmetatable(self, nil)
 end
 
