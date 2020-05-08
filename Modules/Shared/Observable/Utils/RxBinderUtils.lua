@@ -10,8 +10,22 @@ local Observable = require("Observable")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxBrioUtils = require("RxBrioUtils")
+local RxLinkUtils = require("RxLinkUtils")
 
 local RxBinderUtils = {}
+
+function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
+	assert(linkName)
+	assert(parent)
+	assert(binder)
+
+	return RxLinkUtils.observeValidLinksBrio(linkName, parent)
+		:Pipe({
+			Rx.flatMap(RxBrioUtils.mapBrio(function(link, linkValue)
+				return RxBinderUtils.observeBoundClassBrio(binder, linkValue)
+			end));
+		});
+end
 
 function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
 	assert(binder)
@@ -21,7 +35,7 @@ function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
 		:Pipe({
 			Rx.flatMap(RxBrioUtils.mapBrio(function(child)
 				return RxBinderUtils.observeBoundClassBrio(binder, child)
-			end));
+			end))
 		})
 end
 

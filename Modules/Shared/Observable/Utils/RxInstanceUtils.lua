@@ -26,6 +26,32 @@ function RxInstanceUtils.observeProperty(instance, property)
 	end)
 end
 
+-- FIres once, and then completes
+function RxInstanceUtils.observeParentChangeFrom(child, parent)
+	assert(child)
+	assert(parent)
+	assert(child.Parent == parent)
+
+	return Observable.new(function(fire, fail, complete)
+		if child.Parent ~= parent then
+			fire()
+			complete()
+			return
+		end
+
+		local maid = Maid.new()
+
+		maid:GiveTask(child:GetPropertyChangedSignal("Parent"):Connect(function()
+			if child.Parent ~= parent then
+				fire()
+				complete()
+			end
+		end))
+
+		return maid
+	end)
+end
+
 function RxInstanceUtils.observeChildrenBrio(parent)
 	assert(typeof(parent) == "Instance")
 
