@@ -15,6 +15,10 @@ function Maid.new()
 	}, Maid)
 end
 
+function Maid.isMaid(value)
+	return type(value) == "table" and value.ClassName == "Maid"
+end
+
 --- Returns Maid[key] if not part of Maid metatable
 -- @return Maid[key] value
 function Maid:__index(index)

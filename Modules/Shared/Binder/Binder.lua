@@ -36,6 +36,10 @@ function Binder.new(tagName, constructor)
 	return self
 end
 
+function Binder.isBinder(value)
+	return type(value) == "table" and value.ClassName == "Binder"
+end
+
 function Binder:Init()
 	if self._loaded then
 		return
