@@ -39,10 +39,8 @@ end
 
 --- Subscribes immediately, fireCallback may return
 -- a maid to cleanup!
--- @param fireCallback(value) => cleanup
+-- @param[opt=nil] fireCallback(value)
 function Observable:Subscribe(fireCallback, failCallback, completeCallback)
-	assert(type(fireCallback) == "function")
-
 	-- Closures can replace an object ;)
 
 	local state = nil
@@ -101,7 +99,9 @@ function Observable:Subscribe(fireCallback, failCallback, completeCallback)
 		if hasCleaned then
 			return
 		elseif not state then
-			fireCallback(...)
+			if fireCallback then
+				fireCallback(...)
+			end
 		elseif state == "cancelled" then
 			warn("[Observable.fire] - Already cancelled", self._source)
 		end
