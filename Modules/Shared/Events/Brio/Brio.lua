@@ -82,6 +82,8 @@ function Brio:Destroy()
 end
 Brio.Kill = Brio.Destroy
 
-Brio.DEAD = Brio.new():Destroy()
+-- Setup dead
+Brio.DEAD = Brio.new()
+Brio.DEAD:Kill()
 
 return Brio
