@@ -54,7 +54,12 @@ function RxBrioUtils.onlyLastBrioSurvives()
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(function(brio)
-				assert(Brio.isBrio(brio), "Not a brio")
+				if not Brio.isBrio(brio) then
+					warn(("[RxBrioUtils.onlyLastBrioSurvives] - Not a brio, %q"):format(tostring(brio)))
+					maid._lastBrio = nil
+					fail("Not a brio")
+					return
+				end
 
 				local wrapperBrio = BrioUtils.clone(brio)
 				maid._lastBrio = wrapperBrio
