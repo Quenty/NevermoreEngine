@@ -31,6 +31,8 @@ function RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		})
 end
 
+-- Fires off everytime the link is reconfigured into a valid link
+-- Fires with link, linkValue
 function RxLinkUtils.observeValidityBrio(linkName, link)
 	assert(typeof(link) == "Instance" and link:IsA("ObjectValue"))
 	assert(type(linkName) == "string")
