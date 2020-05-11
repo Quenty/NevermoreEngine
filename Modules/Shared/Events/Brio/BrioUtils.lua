@@ -25,6 +25,16 @@ function BrioUtils.clone(brio)
 	return newBrio
 end
 
+function BrioUtils.aliveOnly(brios)
+	local alive = {}
+	for _, item in pairs(brios) do
+		if not item:IsDead() then
+			table.insert(alive, item)
+		end
+	end
+	return alive
+end
+
 function BrioUtils.first(brios, ...)
 	for _, brio in pairs(brios) do
 		if brio:IsDead() then
