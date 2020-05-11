@@ -9,6 +9,7 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local Symbol = require("Symbol")
 local Table = require("Table")
+local ThrottledFunction = require("ThrottledFunction")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -725,7 +726,30 @@ function Rx.scan(accumulator, seed)
 				fire(current)
 			end, fail, complete)
 		end)
-	end;
+	end
+end
+
+-- https://rxjs-dev.firebaseapp.com/api/operators/debounceTime
+-- @param throttleConfig { leading = true; trailing = true; }
+function Rx.throttleTime(duration, throttleConfig)
+	assert(type(duration) == "number")
+	assert(type(throttleConfig) == "table" or throttleConfig == nil)
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			local throttledFunction = ThrottledFunction.new(duration, fire)
+			throttledFunction:ConfigureOrError(throttleConfig)
+
+			maid:GiveTask(throttledFunction)
+			maid:GiveTask(source:Subscribe(function(...)
+				throttledFunction:Call(...)
+			end, fail, complete))
+
+			return maid
+		end)
+	end
 end
 
 return Rx
