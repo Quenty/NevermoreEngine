@@ -41,6 +41,9 @@ end
 -- a maid to cleanup!
 -- @param[opt=nil] fireCallback(value)
 function Observable:Subscribe(fireCallback, failCallback, completeCallback)
+	assert(type(fireCallback) == "function" or fireCallback == nil)
+	assert(type(failCallback) == "function" or failCallback == nil)
+	assert(type(completeCallback) == "function" or completeCallback == nil)
 	-- Closures can replace an object ;)
 
 	local state = nil
