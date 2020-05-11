@@ -15,6 +15,12 @@ function Set.union(set, otherSet)
 	return newSet
 end
 
+function Set.unionUpdate(set, otherSet)
+	for key, _ in pairs(otherSet) do
+		set[key] = true
+	end
+end
+
 function Set.intersection(set, otherSet)
 	local newSet = {}
 	for key, _ in pairs(set) do
