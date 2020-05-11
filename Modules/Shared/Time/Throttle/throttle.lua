@@ -9,11 +9,13 @@ local ThrottledFunction = require("ThrottledFunction")
 -- @tparam number timeout
 -- @tparam function func
 -- @treturn function
-local function throttle(timeoutInSeconds, func)
+local function throttle(timeoutInSeconds, func, throttleConfig)
 	assert(type(timeoutInSeconds) == "number")
 	assert(type(func) == "function")
 
 	local throttled = ThrottledFunction.new(timeoutInSeconds, func)
+	throttled:ConfigureOrError(throttleConfig)
+
 	return function(...)
 		throttled:Call(...)
 	end
