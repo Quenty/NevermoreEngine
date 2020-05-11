@@ -7,6 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local VRService = game:GetService("VRService")
+local HttpService = game:GetService("HttpService")
 
 local CustomCameraEffect = require("CustomCameraEffect")
 local DefaultCamera = require("DefaultCamera")
@@ -18,6 +19,7 @@ local CameraStackService = {}
 
 function CameraStackService:Init(doNotUseDefaultCamera)
 	self._stack = {}
+	self._disabledSet = {}
 
 	-- Initialize default cameras
 	self._rawDefaultCamera = DefaultCamera.new()
@@ -41,7 +43,7 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 	RunService:BindToRenderStep("CameraStackUpdateInternal", Enum.RenderPriority.Camera.Value + 75, function()
 		debug.profilebegin("CameraStackUpdate")
 
-		if VRService.VREnabled then
+		if VRService.VREnabled or next(self._disabledSet) then
 			return
 		end
 
@@ -52,6 +54,16 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 
 		debug.profileend()
 	end)
+end
+
+function CameraStackService:PushDisable()
+	local disabledKey = HttpService:GenerateGUID(false)
+
+	self._disabledSet[disabledKey] = true
+
+	return function()
+		self._disabledSet[disabledKey] = nil
+	end
 end
 
 --- Outputs the camera stack
