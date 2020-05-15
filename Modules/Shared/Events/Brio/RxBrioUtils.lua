@@ -33,7 +33,7 @@ end
 
 -- This can't be cheap. Consider deeply if you want this or not.
 function RxBrioUtils.reduceToAliveList(selectFromBrio)
-	assert(type(selectFromBrio) == "function")
+	assert(type(selectFromBrio) == "function", "Bad selectFromBrio")
 
 	return function(source)
 		return Observable.new(function(fire, fail, complete)

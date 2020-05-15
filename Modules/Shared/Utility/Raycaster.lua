@@ -6,15 +6,16 @@ local Workspace = game:GetService("Workspace")
 local Raycaster = {}
 Raycaster.ClassName = "Raycaster"
 
-function Raycaster.new(filterFunction)
+-- @param doIgnoreFunction(data) Returns true to ignore
+function Raycaster.new(doIgnoreFunction)
 	local self = setmetatable({
 		_ignoreWater = false,
 		_maxCasts = 5,
 		_ignoreList = {},
 	}, Raycaster)
 
-	if filterFunction then
-		self.Filter = filterFunction
+	if doIgnoreFunction then
+		self.Filter = doIgnoreFunction
 	end
 
 	return self
