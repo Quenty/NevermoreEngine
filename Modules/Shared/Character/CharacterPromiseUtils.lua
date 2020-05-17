@@ -37,3 +37,4 @@ function CharacterPromiseUtil.promiseRootPart(humanoid)
 end
 
 return CharacterPromiseUtil
+
