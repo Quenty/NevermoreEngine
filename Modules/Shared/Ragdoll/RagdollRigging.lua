@@ -7,7 +7,7 @@ local REFERENCE_GRAVITY = 196.2
 
 -- ReferenceMass values from mass of child part. Used to normalized "stiffness" for differently
 -- sized avatars (with different mass).
-local DEFAULT_MAX_FRICTION_TORQUE = 1 --500
+local DEFAULT_MAX_FRICTION_TORQUE = 0.5 --500
 
 local HEAD_LIMITS = {
 	UpperAngle = 45,
