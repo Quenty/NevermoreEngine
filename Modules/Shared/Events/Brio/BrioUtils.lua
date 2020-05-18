@@ -35,6 +35,26 @@ function BrioUtils.aliveOnly(brios)
 	return alive
 end
 
+function BrioUtils.flatten(brioTable)
+	local newValue = {}
+	local brios = {}
+
+	for key, brio in pairs(brioTable) do
+		if Brio.isBrio(brio) then
+			if brio:IsDead() then
+				return Brio.DEAD
+			else
+				table.insert(brios, brio)
+				newValue[key] = brio:GetValue()
+			end
+		else
+			newValue[key] = brio
+		end
+	end
+
+	return BrioUtils.first(brios, newValue)
+end
+
 function BrioUtils.first(brios, ...)
 	for _, brio in pairs(brios) do
 		if brio:IsDead() then

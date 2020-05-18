@@ -4,11 +4,9 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Rx = require("Rx")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
-local RxBrioUtils = require("RxBrioUtils")
 
 local RxInstanceUtils = {}
 
@@ -55,19 +53,49 @@ function RxInstanceUtils.observeValidPropertyBrio(instance, property, predicate)
 end
 
 function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
-	assert(parent)
-	assert(className)
-	assert(name)
+	assert(typeof(parent) == "Instance")
+	assert(type(className) == "string")
+	assert(type(name) == "string")
 
-	return RxInstanceUtils.observeChildrenBrio(parent, function(child)
-		return child:IsA(className)
-	end):Pipe({
-		Rx.switchMap(RxBrioUtils.mapBrio(function(child)
-			return RxInstanceUtils.observeValidPropertyBrio(child, "Name", function(childName)
-				return childName == name
-			end)
-		end));
-	})
+	return Observable.new(function(fire, fail, complete)
+		local topMaid = Maid.new()
+
+		local function handleChild(child)
+			if not child:IsA(className) then
+				return
+			end
+
+			local maid = Maid.new()
+
+			local function handleNameChanged()
+				if child.Name == name then
+					local brio = Brio.new(child)
+					maid._brio = brio
+					topMaid._lastBrio = brio
+
+					fire(brio)
+				else
+					maid._brio = nil
+				end
+			end
+
+			maid:GiveTask(child:GetPropertyChangedSignal("Name"):Connect(handleNameChanged))
+			handleNameChanged()
+
+			topMaid[child] = maid
+		end
+
+		topMaid:GiveTask(parent.ChildAdded:Connect(handleChild))
+		topMaid:GiveTask(parent.ChildRemoved:Connect(function(child)
+			topMaid[child] = nil
+		end))
+
+		for _, child in pairs(parent:GetChildren()) do
+			handleChild(child)
+		end
+
+		return topMaid
+	end)
 end
 
 

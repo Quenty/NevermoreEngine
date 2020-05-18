@@ -102,6 +102,75 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 	end
 end
 
+function RxBrioUtils.toBrio()
+	return Rx.map(function(result)
+		if Brio.isBrio(result) then
+			return result
+		end
+
+		return Brio.new(result)
+	end)
+end
+
+-- Unpacks the brio, and then repacks it. Ignored items
+-- still invalidate the previous brio
+function RxBrioUtils.filter(predicate)
+	assert(type(predicate) == "function")
+
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(function(brio)
+				maid._lastBrio = nil
+
+				if Brio.isBrio(brio) then
+					if brio:IsDead() then
+						return
+					end
+
+					if predicate(brio:GetValue()) then
+						local newBrio = BrioUtils.clone(brio)
+						maid._lastBrio = newBrio
+						fire(newBrio)
+					end
+				else
+					if predicate(brio) then
+						local newBrio = Brio.new(brio)
+						maid._lastBrio = newBrio
+						fire(newBrio)
+					end
+				end
+			end, fail, complete))
+
+			return maid
+		end)
+
+	end
+end
+
+function RxBrioUtils.combineLatest(observables)
+	assert(type(observables) == "table")
+
+	return Rx.combineLatest(observables)
+		:Pipe({
+			Rx.map(BrioUtils.flatten);
+			RxBrioUtils.onlyLastBrioSurvives();
+		})
+end
+
+function RxBrioUtils.flatMap(project, resultSelector)
+	assert(type(project) == "function")
+
+	return Rx.flatMap(RxBrioUtils.mapBrio(project), resultSelector)
+end
+
+function RxBrioUtils.switchMap(project, resultSelector)
+	assert(type(project) == "function")
+
+	return Rx.switchMap(RxBrioUtils.mapBrio(project), resultSelector)
+end
+
 function RxBrioUtils.mapBrio(project)
 	assert(type(project) == "function")
 
