@@ -45,17 +45,16 @@ local Spring = {}
 --- Creates a new spring
 -- @param initial A number or Vector3 (anything with * number and addition/subtraction defined)
 function Spring.new(initial)
-	local self = setmetatable({}, Spring)
-
 	local target = initial or 0
-	rawset(self, "_time0", tick())
-	rawset(self, "_position0", target)
-	rawset(self, "_velocity0", 0*target)
-	rawset(self, "_target", target)
-	rawset(self, "_damper", 1)
-	rawset(self, "_speed", 1)
 
-	return self
+	return setmetatable({
+		_time0 = tick();
+		_position0 = target;
+		_velocity0 = 0*target;
+		_target = target;
+		_damper = 1;
+		_speed = 1;
+	}, Spring)
 end
 
 --- Impulse the spring with a change in velocity
@@ -139,11 +138,11 @@ function Spring:_positionVelocity(time)
 	if s == 0 then
 		return p0, 0
 	elseif d<1 then
-		local c	 = (1-d*d)^0.5
+		local c = (1-d*d)^0.5
 		local c1 = (v0/s+d*c0)/c
 		local co = math.cos(c*s*dt)
 		local si = math.sin(c*s*dt)
-		local e  = 2.718281828459045^(d*s*dt)
+		local e = 2.718281828459045^(d*s*dt)
 		return t+(c0*co+c1*si)/e,
 		       s*((c*c1-d*c0)*co-(c*c0+d*c1)*si)/e
 	else
