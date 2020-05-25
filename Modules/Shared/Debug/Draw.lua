@@ -33,6 +33,8 @@ end
 -- @tparam[opt] {number} diameter
 -- @tparam[opt] {number} meshDiameter
 function Draw.ray(ray, color, parent, meshDiameter, diameter)
+	assert(typeof(ray) == "Ray")
+
 	color = color or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
 	meshDiameter = meshDiameter or 0.2
@@ -89,7 +91,8 @@ end
 -- @tparam[opt] {Instance} parent
 -- @tparam[opt] {number} diameter
 function Draw.point(vector3, color, parent, diameter)
-	assert(vector3)
+	assert(typeof(vector3) == "Vector3")
+
 	if typeof(vector3) == "CFrame" then
 		vector3 = vector3.p
 	end
