@@ -70,22 +70,22 @@ function Snackbar.new(Parent, Text, options)
 		item.ZIndex = Gui.ZIndex - 1
 	end
 
-	local TextLabel = Instance.new("TextLabel")
-	TextLabel.Size = UDim2.new(1, -self.TextWidthOffset*2, 0, 16)
-	TextLabel.Position = UDim2.new(0, self.TextWidthOffset, 0, 16)
-	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-	TextLabel.TextYAlignment = Enum.TextYAlignment.Center
-	TextLabel.Name = "SnackbarLabel"
-	TextLabel.TextTransparency = 0.87
-	TextLabel.TextColor3 = Color3.new(1, 1, 1)
-	TextLabel.BackgroundTransparency = 1
-	TextLabel.BorderSizePixel = 0
-	TextLabel.Font = Enum.Font.SourceSans
-	TextLabel.Text = Text
-	TextLabel.FontSize = Enum.FontSize.Size18
-	TextLabel.ZIndex = Gui.ZIndex-1
-	TextLabel.Parent = Gui
-	self._textLabel = TextLabel
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, -self.TextWidthOffset*2, 0, 16)
+	textLabel.Position = UDim2.new(0, self.TextWidthOffset, 0, 16)
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel.TextYAlignment = Enum.TextYAlignment.Center
+	textLabel.Name = "SnackbarLabel"
+	textLabel.TextTransparency = 0.87
+	textLabel.TextColor3 = Color3.new(1, 1, 1)
+	textLabel.BackgroundTransparency = 1
+	textLabel.BorderSizePixel = 0
+	textLabel.Font = Enum.Font.SourceSans
+	textLabel.Text = Text
+	textLabel.FontSize = Enum.FontSize.Size18
+	textLabel.ZIndex = Gui.ZIndex-1
+	textLabel.Parent = Gui
+	self._textLabel = textLabel
 
 	self._whileActiveMaid = Maid.new()
 	self.Gui.Parent = Parent
@@ -107,7 +107,7 @@ function Snackbar.new(Parent, Text, options)
 		button.Size = UDim2.new(0.5, 0, 0.8, 0)
 		button.Text = callToActionText
 		button.Font = Enum.Font.SourceSans
-		button.FontSize = TextLabel.FontSize
+		button.FontSize = textLabel.FontSize
 		button.TextXAlignment = Enum.TextXAlignment.Right
 		button.TextColor3 = DEFAULT_TEXT_COLOR
 		button.ZIndex = Gui.ZIndex
