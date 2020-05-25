@@ -21,9 +21,9 @@ function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
 
 	return RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		:Pipe({
-			Rx.flatMap(RxBrioUtils.mapBrio(function(link, linkValue)
+			RxBrioUtils.flatMap(function(link, linkValue)
 				return RxBinderUtils.observeBoundClassBrio(binder, linkValue)
-			end));
+			end);
 		});
 end
 
@@ -33,9 +33,9 @@ function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
 		:Pipe({
-			Rx.flatMap(RxBrioUtils.mapBrio(function(child)
+			RxBrioUtils.flatMap(function(child)
 				return RxBinderUtils.observeBoundClassBrio(binder, child)
-			end))
+			end);
 		})
 end
 
@@ -45,9 +45,9 @@ function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
 		:Pipe({
-			Rx.flatMap(RxBrioUtils.mapBrio(function(child)
+			RxBrioUtils.flatMap(function(child)
 				return RxBinderUtils.observeBoundClassesBrio(binders, child)
-			end))
+			end);
 		})
 end
 
