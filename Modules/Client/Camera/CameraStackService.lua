@@ -94,6 +94,10 @@ function CameraStackService:GetRawDefaultCamera()
 	return self._rawDefaultCamera or error()
 end
 
+function CameraStackService:GetTopCamera()
+	return self._stack[#self._stack]
+end
+
 --- Retrieves the top state off the stack
 -- @treturn[1] CameraState
 -- @treturn[2] nil

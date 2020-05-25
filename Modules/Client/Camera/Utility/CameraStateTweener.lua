@@ -40,6 +40,10 @@ function CameraStateTweener.new(cameraEffect, speed)
 	return self
 end
 
+function CameraStateTweener:GetPercentVisible()
+	return self._fadeBetween.Value
+end
+
 function CameraStateTweener:Show(doNotAnimate)
 	self:SetTarget(1, doNotAnimate)
 end
