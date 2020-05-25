@@ -18,8 +18,8 @@ function IKGripBase.new(objectValue)
 
 	self._attachment = self._obj.Parent
 
-	assert(self._obj:IsA("ObjectValue"))
-	assert(self._attachment:IsA("Attachment"))
+	assert(self._obj:IsA("ObjectValue"), "Not an object value")
+	assert(self._attachment:IsA("Attachment"), "Not parented to an attachment")
 
 	return self
 end
