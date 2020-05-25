@@ -94,7 +94,7 @@ end
 function NetworkOwnerService:_setNetworkOwner(part, player)
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
-		warn("[NetworkOwnerService] - Cannot set network ownership:", err)
+		warn("[NetworkOwnerService] - Cannot set network ownership:", err, part:GetFullName())
 		return
 	end
 
@@ -104,7 +104,7 @@ end
 function NetworkOwnerService:_setNetworkOwnershipAuto(part)
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
-		warn("[NetworkOwnerService] - Cannot set network ownership:", err)
+		warn("[NetworkOwnerService] - Cannot set network ownership:", err, part:GetFullName())
 		return
 	end
 
