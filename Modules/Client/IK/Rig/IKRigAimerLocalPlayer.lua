@@ -33,6 +33,7 @@ function IKRigAimerLocalPlayer:SetNoDefaultIK(noDefault)
 	self._noDefault = noDefault
 end
 
+-- @param position May be nil
 function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
 	optionalPriority = optionalPriority or IKAimPositionPriorites.DEFAULT
 
@@ -44,7 +45,7 @@ function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
 
 	self._aimData = {
 		priority = optionalPriority;
-		position = position;
+		position = position; -- May be nil
 		timeStamp = tick();
 	}
 end
@@ -52,7 +53,7 @@ end
 function IKRigAimerLocalPlayer:GetAimDirection()
 	if self._aimData and (tick() - self._aimData.timeStamp) < MAX_AGE_FOR_AIM_DATA then
 			-- If we have aim data within the last 0.2 seconds start pointing at that
-		return self._aimData.position
+		return self._aimData.position -- May be nil
 	end
 
 	if self._noDefault then

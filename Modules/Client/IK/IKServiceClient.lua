@@ -43,7 +43,8 @@ function IKServiceClient:GetRig(humanoid)
 end
 
 --- Exposed API for guns and other things to start setting aim position
---- which will override for a limited time
+--- which will override for a limited time.
+-- @param position May be nil to set no position
 function IKServiceClient:SetAimPosition(position, optionalPriority)
 	local aimer = self:GetLocalAimer()
 	if not aimer then
