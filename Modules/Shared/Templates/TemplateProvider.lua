@@ -1,6 +1,8 @@
 --- Base of a template retrieval system
 -- @classmod TemplateProvider
 
+local RunService = game:GetService("RunService")
+
 local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
 TemplateProvider.__index = TemplateProvider
@@ -22,16 +24,20 @@ function TemplateProvider:Init()
 end
 
 function TemplateProvider:IsAvailable(templateName)
+	self:_verifyInit()
+
 	return self._registry[templateName] ~= nil
 end
 
 function TemplateProvider:Get(templateName)
+	self:_verifyInit()
 	assert(type(templateName) == "string", "templateName must be a string")
 
 	return self._registry[templateName]
 end
 
 function TemplateProvider:Clone(templateName)
+	self:_verifyInit()
 	local template = self._registry[templateName]
 	if not template then
 		error(("[TemplateProvider.Clone] - Cannot provide %q"):format(tostring(templateName)))
@@ -43,6 +49,21 @@ function TemplateProvider:Clone(templateName)
 		newItem.Name = templateName:sub(1, -#("Template") - 1)
 	end
 	return newItem
+end
+
+function TemplateProvider:GetContainer()
+	return self._parent
+end
+
+function TemplateProvider:_verifyInit()
+	if self._registry then
+		return
+	end
+
+	if (not RunService:IsRunning()) then
+		-- Initialize for hoarcecat!
+		self:Init()
+	end
 end
 
 function TemplateProvider:_processFolder(folder)
