@@ -17,7 +17,7 @@ function Sprite.new(data)
 end
 
 function Sprite:Style(gui)
-	gui.Size = UDim2.new(0, self.Size.X, 0, self.Size.Y)
+	gui.Image = self.Texture
 	gui.ImageRectOffset = self.Position
 	gui.ImageRectSize = self.Size
 
@@ -26,10 +26,10 @@ end
 
 function Sprite:Get(instanceType)
 	local gui = Instance.new(instanceType)
+	gui.Size = UDim2.new(0, self.Size.X, 0, self.Size.Y)
 	gui.Name = self.Name
 	gui.BackgroundTransparency = 1
 	gui.BorderSizePixel = 1
-	gui.Image = self.Texture
 
 	self:Style(gui)
 
