@@ -102,6 +102,38 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 	end
 end
 
+function RxBrioUtils.reemitLastBrioOnDeath()
+	return function(source)
+		return Observable.new(function(fire, fail, complete)
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(function(brio)
+				maid._conn = nil
+
+				if not Brio.isBrio(brio) then
+					warn(("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q"):format(tostring(brio)))
+					fail("Not a brio")
+					return
+				end
+
+				if brio:IsDead() then
+					fire(brio)
+					return
+				end
+
+				-- Setup conn!
+				maid._conn = brio.Died:Connect(function()
+					fire(brio)
+				end)
+
+				fire(brio)
+			end, fail, complete))
+
+			return maid
+		end)
+	end
+end
+
 function RxBrioUtils.toBrio()
 	return Rx.map(function(result)
 		if Brio.isBrio(result) then
