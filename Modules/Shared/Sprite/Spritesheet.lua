@@ -57,5 +57,4 @@ function Spritesheet:HasSprite(index)
 	return self:GetSprite(index) ~= nil
 end
 
-
 return Spritesheet
