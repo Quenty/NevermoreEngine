@@ -33,18 +33,9 @@ function CoreGuiEnabler.new()
 		end
 	end
 
-	self.TopbarEnabledState = Instance.new("BoolValue")
-	self.TopbarEnabledState.Value = false
-
-	self:AddState("TopbarEnabled", function(isEnabled)
-		self.TopbarEnabledState.Value = isEnabled
-		local success, err = pcall(function()
-			StarterGui:SetCore("TopbarEnabled", isEnabled)
-		end)
-		if not success then
-			warn("Failed to set topbar", err)
-		end
-	end)
+	self:_addStarterGuiState("TopbarEnabled")
+	self:_addStarterGuiState("BadgesNotificationsActive")
+	self:_addStarterGuiState("PointsNotificationsActive")
 
 	self:AddState("ModalEnabled", function(isEnabled)
 		UserInputService.ModalEnabled = not isEnabled
@@ -55,6 +46,22 @@ function CoreGuiEnabler.new()
 	end)
 
 	return self
+end
+
+function CoreGuiEnabler:_addStarterGuiState(stateName)
+	local boolValueName = stateName .. "State"
+	self[boolValueName] = Instance.new("BoolValue")
+	self[boolValueName].Value = false
+
+	self:AddState(stateName, function(isEnabled)
+		self[boolValueName].Value = isEnabled
+		local success, err = pcall(function()
+			StarterGui:SetCore(stateName, isEnabled)
+		end)
+		if not success then
+			warn("Failed to set core", err)
+		end
+	end)
 end
 
 function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
