@@ -137,17 +137,17 @@ function Spring:_positionVelocity(time)
 	local c0 = p0-t
 	if s == 0 then
 		return p0, 0
-	elseif d<1 then
-		local c = (1-d*d)^0.5
+	elseif d < 1 then
+		local c	= math.sqrt(1-d*d)
 		local c1 = (v0/s+d*c0)/c
 		local co = math.cos(c*s*dt)
 		local si = math.sin(c*s*dt)
-		local e = 2.718281828459045^(d*s*dt)
+		local e = math.exp(d*s*dt)
 		return t+(c0*co+c1*si)/e,
 		       s*((c*c1-d*c0)*co-(c*c0+d*c1)*si)/e
 	else
 		local c1 = v0/s+c0
-		local e  = 2.718281828459045^(s*dt)
+		local e = math.exp(s*dt)
 		return t+(c0+c1*s*dt)/e,
 		       s*(c1-c0-c1*s*dt)/e
 	end
