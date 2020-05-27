@@ -79,8 +79,13 @@ end
 
 --- @{inheritDoc}
 function ClientTranslatorFacade:FormatByKey(key, ...)
-	assert(self._clientTranslator, "ClientTranslator is not initialized")
 	assert(type(key) == "string", "Key must be a string")
+
+	if not RunService:IsRunning() then
+		return key
+	end
+
+	assert(self._clientTranslator, "ClientTranslator is not initialized")
 
 	local data = {...}
 	local result
