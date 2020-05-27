@@ -1,37 +1,36 @@
+--- Generated XboxOneLight with Python
+-- @author Quenty
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Spritesheet = require("Spritesheet")
 
-local Light = setmetatable({}, Spritesheet)
-Light.ClassName = "Light"
-Light.__index = Light
+local XboxOneLight = setmetatable({}, Spritesheet)
+XboxOneLight.ClassName = "XboxOneLight"
+XboxOneLight.__index = XboxOneLight
 
-function Light.new()
-	local self = setmetatable(Spritesheet.new("rbxassetid://408462759"), Light)
+function XboxOneLight.new()
+	local self = setmetatable(Spritesheet.new("rbxassetid://5091006627"), XboxOneLight)
 
-	self:AddSprite("ButtonX", Vector2.new(318, 481), Vector2.new(95, 95))
-	self:AddSprite("ButtonY", Vector2.new(500, 587), Vector2.new(95, 95))
-	self:AddSprite("ButtonA", Vector2.new(308, 587), Vector2.new(95, 95))
-	self:AddSprite("ButtonB", Vector2.new(510, 481), Vector2.new(95, 95))
-	self:AddSprite("ButtonR1", Vector2.new(0, 416), Vector2.new(115, 64))
-	self:AddSprite("ButtonL1", Vector2.new(116, 416), Vector2.new(115, 64))
-	self:AddSprite("ButtonR2", Vector2.new(616, 0), Vector2.new(105, 115))
-	self:AddSprite("ButtonL2", Vector2.new(616, 328), Vector2.new(105, 115))
-	self:AddSprite("ButtonR3", Vector2.new(616, 550), Vector2.new(105, 105))
-	self:AddSprite("ButtonL3", Vector2.new(616, 116), Vector2.new(105, 105))
-	self:AddSprite("ButtonSelect", Vector2.new(404, 587), Vector2.new(95, 95))
-	self:AddSprite("DPadLeft", Vector2.new(616, 444), Vector2.new(105, 105))
-	self:AddSprite("DPadRight", Vector2.new(0, 587), Vector2.new(105, 105))
-	self:AddSprite("DPadUp", Vector2.new(616, 222), Vector2.new(105, 105))
-	self:AddSprite("DPadDown", Vector2.new(212, 481), Vector2.new(105, 105))
-	self:AddSprite("Thumbstick1", Vector2.new(0, 481), Vector2.new(105, 105))
-	self:AddSprite("Thumbstick2", Vector2.new(106, 587), Vector2.new(105, 105))
-	self:AddSprite("DPad", Vector2.new(106, 481), Vector2.new(105, 105))
-	self:AddSprite("Controller", Vector2.new(0, 0), Vector2.new(615, 415))
-	self:AddSprite("RotateThumbstick1", Vector2.new(414, 481), Vector2.new(95, 95))
-	self:AddSprite("RotateThumbstick2", Vector2.new(212, 587), Vector2.new(95, 95))
+	self:AddSprite("DPad", Vector2.new(0, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonA, Vector2.new(100, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonB, Vector2.new(200, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonL1, Vector2.new(300, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonL2, Vector2.new(400, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonR1, Vector2.new(500, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonR2, Vector2.new(600, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonSelect, Vector2.new(700, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonX, Vector2.new(800, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.ButtonY, Vector2.new(900, 0), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.DPadDown, Vector2.new(0, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.DPadLeft, Vector2.new(100, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.DPadRight, Vector2.new(200, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.DPadUp, Vector2.new(300, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.L, Vector2.new(400, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.Menu, Vector2.new(500, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.R, Vector2.new(600, 100), Vector2.new(100, 100))
 
 	return self
 end
 
-return Light
+return XboxOneLight
