@@ -5,6 +5,17 @@ local NumberSequenceUtils = {}
 
 local EPSILON = 1e-3
 
+function NumberSequenceUtils.scale(sequence, scale)
+	local waypoints = {}
+
+	local keypoints = sequence.Keypoints
+	for _, keypoint in pairs(keypoints) do
+		table.insert(waypoints, NumberSequenceKeypoint.new(keypoint.Time, keypoint.Value*scale, keypoint.Envelope*scale))
+	end
+
+	return NumberSequence.new(waypoints)
+end
+
 function NumberSequenceUtils.stripe(
 	stripes, backgroundTransparency, strikeTransparency, percentStripeThickness, percentOffset)
 	percentOffset = percentOffset or 0.5
