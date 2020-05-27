@@ -8,6 +8,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local getRotationInXZPlane = require("getRotationInXZPlane")
 
+local ZERO_VECTOR = Vector3.new(0, 0, 0)
 local LEFT = Vector3.new(-1, 0, 0)
 local DIRECTION_INPUT_MAPS = {
 	[Enum.KeyCode.Left] = LEFT;
@@ -17,13 +18,17 @@ local DIRECTION_INPUT_MAPS = {
 local HumanoidMoveDirectionUtils = {}
 
 function HumanoidMoveDirectionUtils.getRelativeMoveDirection(cameraCFrame, humanoid)
+	if UserInputService:GetFocusedTextBox() then
+		return ZERO_VECTOR
+	end
+
 	local moveDirection = humanoid.MoveDirection
 	local flatCameraCFrame = getRotationInXZPlane(cameraCFrame)
 
 	local relative = flatCameraCFrame:vectorToObjectSpace(moveDirection)
 
 	-- Compensate for lack of camera movement in left/right arrow keys
-	local direction = Vector3.new(0, 0, 0)
+	local direction = ZERO_VECTOR
 	for keycode, add in pairs(DIRECTION_INPUT_MAPS) do
 		if UserInputService:IsKeyDown(keycode) then
 			direction = direction + add
