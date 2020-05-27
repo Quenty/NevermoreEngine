@@ -4,7 +4,6 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Maid = require("Maid")
-local CharacterUtils = require("CharacterUtils")
 local observeProperty = require("observeProperty")
 
 local BoundLinkConnectionUtils = {}
@@ -15,24 +14,6 @@ function BoundLinkConnectionUtils.connectToParent(object, callback)
 	assert(type(callback) == "function", "Bad 'callback' function")
 
 	return observeProperty(object, "Parent", callback)
-end
-
--- TODO: Move somewhere else
-function BoundLinkConnectionUtils.connectToGetPlayerFromCharacter(object, callback)
-	assert(typeof(object) == "Instance", "Bad 'object' instance")
-	assert(type(callback) == "function", "Bad 'callback' function")
-
-	local maid = Maid.new()
-
-	-- Assume character doesn't change after being assigned (i.e. ancestry is aligned with setting)
-
-	local handleChanged = BoundLinkConnectionUtils._makeChangedHandlerWithNoCheck(maid, callback)
-	maid:GiveTask(object.AncestryChanged:Connect(function()
-		handleChanged(CharacterUtils.getPlayerFromCharacter(object))
-	end))
-	handleChanged(CharacterUtils.getPlayerFromCharacter(object))
-
-	return maid
 end
 
 function BoundLinkConnectionUtils.connectToParentLinksBoundClass(object, linkName, binder, callback)
