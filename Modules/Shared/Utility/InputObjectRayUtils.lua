@@ -24,6 +24,14 @@ function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance)
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
+function InputObjectRayUtils.cameraRayFromViewportPosition(position, distance)
+	distance = distance or DEFAULT_RAY_DISTANCE
+
+	local baseRay = Workspace.CurrentCamera:ViewportPointToRay(position.X, position.Y)
+	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
+end
+
+
 -- Generates a circle of rays including the center ray
 function InputObjectRayUtils.generateCircleRays(ray, count, radius)
 	local rays = { }
