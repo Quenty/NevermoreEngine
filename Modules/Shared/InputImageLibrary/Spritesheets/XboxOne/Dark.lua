@@ -26,8 +26,8 @@ function XboxOneDark.new()
 	self:AddSprite(Enum.KeyCode.DPadRight, Vector2.new(200, 100), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.DPadUp, Vector2.new(300, 100), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.Menu, Vector2.new(400, 100), Vector2.new(100, 100))
-	self:AddSprite(Enum.KeyCode.Thumbstick1, Vector2.new(500, 100), Vector2.new(100, 100))
-	self:AddSprite(Enum.KeyCode.Thumbstick2, Vector2.new(600, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.Thumbstick2, Vector2.new(500, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.Thumbstick1, Vector2.new(600, 100), Vector2.new(100, 100))
 
 	return self
 end

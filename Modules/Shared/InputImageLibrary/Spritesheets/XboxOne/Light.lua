@@ -10,7 +10,7 @@ XboxOneLight.ClassName = "XboxOneLight"
 XboxOneLight.__index = XboxOneLight
 
 function XboxOneLight.new()
-	local self = setmetatable(Spritesheet.new("rbxassetid://5091006627"), XboxOneLight)
+	local self = setmetatable(Spritesheet.new("rbxassetid://5104051626"), XboxOneLight)
 
 	self:AddSprite("DPad", Vector2.new(0, 0), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.ButtonA, Vector2.new(100, 0), Vector2.new(100, 100))
@@ -26,9 +26,9 @@ function XboxOneLight.new()
 	self:AddSprite(Enum.KeyCode.DPadLeft, Vector2.new(100, 100), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.DPadRight, Vector2.new(200, 100), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.DPadUp, Vector2.new(300, 100), Vector2.new(100, 100))
-	self:AddSprite(Enum.KeyCode.L, Vector2.new(400, 100), Vector2.new(100, 100))
-	self:AddSprite(Enum.KeyCode.Menu, Vector2.new(500, 100), Vector2.new(100, 100))
-	self:AddSprite(Enum.KeyCode.R, Vector2.new(600, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.Menu, Vector2.new(400, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.Thumbstick1, Vector2.new(500, 100), Vector2.new(100, 100))
+	self:AddSprite(Enum.KeyCode.Thumbstick2, Vector2.new(600, 100), Vector2.new(100, 100))
 
 	return self
 end
