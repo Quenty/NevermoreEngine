@@ -3,6 +3,7 @@
 
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local TextService = game:GetService("TextService")
 
 local Terrain = Workspace.Terrain
 
@@ -83,6 +84,90 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	part.Parent = parent
 
 	return part
+end
+
+function Draw.text(adornee, text, color)
+	if typeof(adornee) == "Vector3" then
+		local attachment = Instance.new("Attachment")
+		attachment.WorldPosition = adornee
+		attachment.Parent = Terrain
+		attachment.Name = "DebugTextAttachment"
+
+		Draw._textOnAdornee(attachment, text, color)
+
+		return attachment
+	elseif typeof(adornee) == "Instance" then
+		return Draw._textOnAdornee(adornee, text, color)
+	else
+		error("Bad adornee")
+	end
+end
+
+function Draw._textOnAdornee(adornee, text, color)
+	text = tostring(text)
+
+	local TEXT_HEIGHT_STUDS = 2
+	local PADDING_PERCENT_OF_LINE_HEIGHT = 0.5
+
+	local billboardGui = Instance.new("BillboardGui")
+	billboardGui.Name = "DebugBillboardGui"
+	billboardGui.SizeOffset =  Vector2.new(0, 0.5)
+	billboardGui.ExtentsOffset = Vector3.new(0, 1, 0)
+	billboardGui.AlwaysOnTop = true
+	billboardGui.Adornee = adornee
+	billboardGui.StudsOffset = Vector3.new(0, 0, 0.01)
+
+	local background = Instance.new("Frame")
+	background.Name = "Background"
+	background.Size = UDim2.new(1, 0, 1, 0)
+	background.Position = UDim2.new(0.5, 0, 1, 0)
+	background.AnchorPoint = Vector2.new(0.5, 1)
+	background.BackgroundTransparency = 0.3
+	background.BorderSizePixel = 0
+	background.BackgroundColor3 = color or Draw._defaultColor
+	background.Parent = billboardGui
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Text = tostring(text)
+	textLabel.TextScaled = true
+	textLabel.TextSize = 32
+	textLabel.Font = Enum.Font.GothamSemibold
+	textLabel.BackgroundTransparency = 1
+	textLabel.BorderSizePixel = 0
+	textLabel.TextColor3 = Color3.new(1, 1, 1)
+	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.Parent = background
+
+	local textSize = TextService:GetTextSize(
+		textLabel.Text,
+		textLabel.TextSize,
+		textLabel.Font,
+		Vector2.new(1024, 1e6))
+
+	local lines = textSize.y/textLabel.TextSize
+
+	local paddingOffset = textLabel.TextSize*PADDING_PERCENT_OF_LINE_HEIGHT
+	local paddedHeight = textSize.y + 2*paddingOffset
+	local paddedWidth = textSize.x + 2*paddingOffset
+	local aspectRatio = paddedWidth/paddedHeight
+
+	local uiAspectRatio = Instance.new("UIAspectRatioConstraint")
+	uiAspectRatio.AspectRatio = aspectRatio
+	uiAspectRatio.Parent = background
+
+	local uiPadding = Instance.new("UIPadding")
+	uiPadding.PaddingBottom = UDim.new(paddingOffset/paddedHeight, 0)
+	uiPadding.PaddingTop = UDim.new(paddingOffset/paddedHeight, 0)
+	uiPadding.PaddingLeft = UDim.new(paddingOffset/paddedWidth, 0)
+	uiPadding.PaddingRight = UDim.new(paddingOffset/paddedWidth, 0)
+	uiPadding.Parent = background
+
+	local height = lines*TEXT_HEIGHT_STUDS * TEXT_HEIGHT_STUDS*PADDING_PERCENT_OF_LINE_HEIGHT
+
+	billboardGui.Size = UDim2.new(height*aspectRatio, 0, height, 0)
+	billboardGui.Parent = adornee
+
+	return billboardGui
 end
 
 --- Draws a point for debugging
