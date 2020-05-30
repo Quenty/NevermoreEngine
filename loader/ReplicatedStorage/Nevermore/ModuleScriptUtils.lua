@@ -35,7 +35,7 @@ function ModuleScriptUtils.detectCyclicalRequires(_require)
 
 		if loading[_module] then
 			local cycle = ModuleScriptUtils.getCyclicalStateFromStack(stack, loading[_module])
-			warn(('Warning: Cyclical require possible on %q.\nCycle: %s')
+			warn(('Warning: Cyclical require on %q.\nCycle: %s')
 				:format( _module:GetFullName(), cycle))
 			return _require(_module)
 		end
