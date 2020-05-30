@@ -28,7 +28,7 @@ function LinkUtils.getAllLinkValues(linkName, from)
 	local linkValues = {}
 
 	for _, item in pairs(from:GetChildren()) do
-		if item.Name == linkName then
+		if item:IsA("ObjectValue") and item.Name == linkName then
 			local value = item.Value
 			if value then
 				table.insert(linkValues, value)
@@ -46,7 +46,7 @@ function LinkUtils.getAllLinks(linkName, from)
 
 	local links = {}
 	for _, item in pairs(from:GetChildren()) do
-		if item.Name == linkName then
+		if item:IsA("ObjectValue") and item.Name == linkName then
 			table.insert(links, item)
 		end
 	end
@@ -60,6 +60,12 @@ function LinkUtils.getLinkValue(linkName, from)
 
 	local objectValue = from:FindFirstChild(linkName)
 	if not objectValue then
+		return nil
+	end
+
+	if not objectValue:IsA("ObjectValue") then
+		warn(("[LinkUtils.getLinkValue] - Bad link %q not an object value, from %q")
+			:format(objectValue:GetFullName(), from:GetFullName()))
 		return nil
 	end
 
