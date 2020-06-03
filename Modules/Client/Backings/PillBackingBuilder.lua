@@ -129,7 +129,7 @@ function PillBackingBuilder:CreateSingleShadow(gui, options)
 	shadow.BorderSizePixel = 0
 	shadow.ImageTransparency = self.SHADOW_TRANSPARENCY
 	shadow.Name = "PillShadow"
-	shadow.Position = UDim2.new(UDim.new(0.5, 0), UDim.new(0.5, 0) + self.SHADOW_OFFSET_Y)
+	shadow.Position = UDim2.new(0.5, 0, 0.5, self.SHADOW_OFFSET_Y)
 	shadow.Size = UDim2.new(1 + addedScale, diameter.Offset/2, 2, 0)
 	shadow.ZIndex = options.ShadowZIndex
 	shadow.ScaleType = Enum.ScaleType.Slice
