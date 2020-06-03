@@ -26,6 +26,7 @@ function RxInstanceUtils.observeProperty(instance, property)
 	end)
 end
 
+-- Returns a brio of the property value
 function RxInstanceUtils.observeValidPropertyBrio(instance, property, predicate)
 	assert(typeof(instance) == "Instance")
 	assert(type(property) == "string")

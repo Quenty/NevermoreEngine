@@ -44,6 +44,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				subscribed = false
 			end)
 			local aliveBrios = {}
+			local fired = false
 
 			local function updateBrios()
 				if not subscribed then -- No work if we don't need to.
@@ -62,6 +63,7 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				local newBrio = BrioUtils.first(aliveBrios, values)
 				topMaid._lastBrio = newBrio
 
+				fired = true
 				fire(newBrio)
 			end
 
@@ -96,6 +98,11 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 
 				handleNewBrio(brio)
 			end, fail, complete))
+
+			-- Make sure we emit an empty list if we discover nothing
+			if not fired then
+				updateBrios()
+			end
 
 			return topMaid
 		end)
