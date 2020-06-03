@@ -24,7 +24,7 @@ function BaseObject:Destroy()
 
 	-- This could emit events, which could cause bad startTime
 	-- but we'll take this risk over getting the ClassName
-	if tick() - startTime >= 0.001 then
+	if tick() - startTime >= 0.01 then
 		warn(("[BaseObject.Destroy] - Took %f ms to clean up %s")
 			:format((tick() - startTime)*1000, tostring(self.ClassName)))
 	end
