@@ -7,6 +7,17 @@ function BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
 	return BoundingBoxUtils.getBoundingBox(parts, relativeTo)
 end
 
+-- https://devforum.roblox.com/t/finding-the-closest-vector3-point-on-a-part-from-the-character/130679/2
+function BoundingBoxUtils.clampPointToBoundingBox(cframe, size, point)
+	local transform = cframe:pointToObjectSpace(point) -- transform into local space
+	local halfSize = size * 0.5
+	return cframe * Vector3.new( -- Clamp & transform into world space
+		math.clamp(transform.x, -halfSize.x, halfSize.x),
+		math.clamp(transform.y, -halfSize.y, halfSize.y),
+		math.clamp(transform.z, -halfSize.z, halfSize.z)
+	), cframe.p
+end
+
 function BoundingBoxUtils.getModelBoundingBox(model, relativeTo)
 	local parts = {}
 	for _, item in pairs(model:GetDescendants()) do
