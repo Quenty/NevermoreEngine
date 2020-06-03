@@ -27,7 +27,13 @@ function ValueBaseUtils.getValue(parent, instanceType, name, default)
 
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
-		return foundChild.Value
+		if foundChild:IsA(instanceType) then
+			return foundChild.Value
+		else
+			warn(("[ValueBaseUtils.getValue] - Value of type %q of name %q is of type %q in %s instead")
+				:format(instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+			return nil
+		end
 	else
 		return default
 	end
