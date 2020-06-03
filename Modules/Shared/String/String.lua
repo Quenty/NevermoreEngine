@@ -73,6 +73,14 @@ function String.elipseLimit(str, characterLimit)
 	return str
 end
 
+function String.removePostfix(str, postfix)
+	if str:sub(-#(postfix)) == postfix then
+		return str:sub(1, -#(postfix) - 1)
+	else
+		return str
+	end
+end
+
 function String.addCommas(number)
 	if type(number) == "number" then
 		number = tostring(number)

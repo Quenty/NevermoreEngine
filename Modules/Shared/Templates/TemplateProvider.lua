@@ -1,7 +1,11 @@
 --- Base of a template retrieval system
 -- @classmod TemplateProvider
 
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
 local RunService = game:GetService("RunService")
+
+local String = require("String")
 
 local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
@@ -45,9 +49,7 @@ function TemplateProvider:Clone(templateName)
 	end
 
 	local newItem = template:Clone()
-	if templateName:sub(-#("Template")) == "Template" then
-		newItem.Name = templateName:sub(1, -#("Template") - 1)
-	end
+	newItem.Name = String.removePostfix(templateName, "Template")
 	return newItem
 end
 
