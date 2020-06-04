@@ -24,7 +24,6 @@ Anything may "kill" a brio by calling :Destroy() or :Kill().
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Signal = require("Signal")
 local Maid = require("Maid")
 
 local Brio = {}
@@ -38,8 +37,20 @@ end
 function Brio.new(...) -- Wrap
 	return setmetatable({
 		_values = table.pack(...);
-		Died = Signal.new(); -- :Fire()
 	}, Brio)
+end
+
+function Brio:GetDiedSignal()
+	if self:IsDead() then
+		error("Already dead")
+	end
+
+	if self._diedEvent then
+		return self._diedEvent.Event
+	end
+
+	self._diedEvent = Instance.new("BindableEvent")
+	return self._diedEvent.Event
 end
 
 function Brio:IsDead()
@@ -57,7 +68,7 @@ function Brio:ToMaid()
 
 	local maid = Maid.new()
 
-	maid:GiveTask(self.Died:Connect(function()
+	maid:GiveTask(self:GetDiedSignal():Connect(function()
 		maid:DoCleaning()
 	end))
 
@@ -76,9 +87,12 @@ function Brio:Destroy()
 	end
 
 	self._values = nil
-	self.Died:Fire()
-	self.Died:Destroy()
-	self.Died = nil
+
+	if self._diedEvent then
+		self._diedEvent:Fire()
+		self._diedEvent:Destroy()
+		self._diedEvent = nil
+	end
 end
 Brio.Kill = Brio.Destroy
 

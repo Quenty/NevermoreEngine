@@ -14,12 +14,11 @@ local ThrottledFunction = require("ThrottledFunction")
 local UNSET_VALUE = Symbol.named("unsetValue")
 
 local Rx = {
-	EMPTY = Observable.new(function(fire, fail, complete)
-		complete()
-		return nil
+	EMPTY = Observable.new(function(sub)
+		sub:Complete()
 	end);
-	NEVER = Observable.new(function(fire, fail, complete)
-		return nil
+	NEVER = Observable.new(function(sub)
+
 	end);
 }
 
@@ -54,12 +53,12 @@ end
 function Rx.of(...)
 	local args = table.pack(...)
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		for i=1, args.n do
-			fire(args[i])
+			sub:Fire(args[i])
 		end
 
-		complete()
+		sub:Complete()
 	end)
 end
 
@@ -83,11 +82,11 @@ function Rx.merge(observables)
 		assert(Observable.isObservable(item), "Not an observable")
 	end
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		for _, observable in pairs(observables) do
-			maid:GiveTask(observable:Subscribe(fire, fail, complete))
+			maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
 		end
 
 		return maid
@@ -96,10 +95,12 @@ end
 
 -- https://rxjs-dev.firebaseapp.com/api/index/function/fromEvent
 function Rx.fromSignal(event)
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 		-- This stream never completes or fails!
-		maid:GiveTask(event:Connect(fire))
+		maid:GiveTask(event:Connect(function(...)
+			sub:Fire(...)
+		end))
 
 		return maid
 	end)
@@ -109,10 +110,10 @@ end
 function Rx.fromPromise(promise)
 	assert(Promise.isPromise(promise))
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		if promise:IsFulfilled() then
-			fire(promise:Wait())
-			complete()
+			sub:Fire(promise:Wait())
+			sub:Complete()
 			return nil
 		end
 
@@ -126,14 +127,14 @@ function Rx.fromPromise(promise)
 		promise:Then(
 			function(...)
 				if pending then
-					fire(...)
-					complete()
+					sub:Fire(...)
+					sub:Complete()
 				end
 			end,
 			function(...)
 				if not pending then
-					fail(...)
-					complete()
+					sub:Fail(...)
+					sub:Complete()
 				end
 			end)
 
@@ -148,13 +149,13 @@ function Rx.tap(onFire, onError, onComplete)
 	assert(type(onComplete) == "function" or onComplete == nil)
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			return source:Subscribe(
 				function(...)
 					if onFire then
 						onFire(...)
 					end
-					fire(...)
+					sub:Fire(...)
 				end,
 				function(...)
 					if onError then
@@ -175,10 +176,10 @@ end
 -- http://reactivex.io/documentation/operators/start.html
 function Rx.start(callback)
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
-			fire(callback())
+		return Observable.new(function(sub)
+			sub:Fire(callback())
 
-			return source:Subscribe(fire, fail, complete)
+			return source:Subscribe(sub:GetFireFailComplete())
 		end)
 	end
 end
@@ -187,12 +188,12 @@ end
 function Rx.startFrom(callback)
 	assert(type(callback) == "function")
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			for _, value in pairs(callback()) do
-				fire(value)
+				sub:Fire(value)
 			end
 
-			return source:Subscribe(fire, fail, complete)
+			return source:Subscribe(sub:GetFireFailComplete())
 		end)
 	end
 end
@@ -202,12 +203,12 @@ function Rx.startWith(values)
 	assert(type(values) == "table")
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			for _, item in pairs(values) do
-				fire(item)
+				sub:Fire(item)
 			end
 
-			return source:Subscribe(fire, fail, complete)
+			return source:Subscribe(sub:GetFireFailComplete())
 		end)
 	end
 end
@@ -215,22 +216,24 @@ end
 -- https://www.learnrxjs.io/learn-rxjs/operators/combination/endwith
 function Rx.endWith(values)
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(
-				fire,
+				function(...)
+					sub:Fire(...)
+				end,
 				function(...)
 					for _, item in pairs(values) do
-						fire(item)
+						sub:Fire(item)
 					end
-					fail(...)
+					sub:Fail(...)
 				end),
 				function()
 					for _, item in pairs(values) do
-						fire(item)
+						sub:Fire(item)
 					end
-					complete()
+					sub:Complete()
 				end)
 
 			return maid
@@ -243,15 +246,14 @@ function Rx.where(predicate)
 	assert(type(predicate) == "function", "Bad predicate callback")
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			return source:Subscribe(
 				function(...)
 					if predicate(...) then
-						fire(...)
+						sub:Fire(...)
 					end
 				end,
-				fail,
-				complete
+				sub:GetFailComplete()
 			)
 		end)
 	end
@@ -261,10 +263,10 @@ end
 function Rx.mapTo(...)
 	local args = table.pack(...)
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			return source:Subscribe(function()
-				fire(table.unpack(args, 1, args.n))
-			end, fail, complete)
+				sub:Fire(table.unpack(args, 1, args.n))
+			end, sub:GetFailComplete())
 		end)
 	end
 end
@@ -274,10 +276,10 @@ function Rx.map(project)
 	assert(type(project) == "function", "Bad project callback")
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			return source:Subscribe(function(...)
-				fire(project(...))
-			end, fail, complete)
+				sub:Fire(project(...))
+			end, sub:GetFailComplete())
 		end)
 	end
 end
@@ -285,7 +287,7 @@ end
 -- Merges higher order observables together
 function Rx.mergeAll()
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local maid = Maid.new()
 
 			local pendingCount = 0
@@ -300,13 +302,19 @@ function Rx.mergeAll()
 					local innerMaid = Maid.new()
 
 					innerMaid:GiveTask(observable:Subscribe(
-						fire, -- Merge each inner observable
-						fail, -- Emit failure automatically
+						function(...)
+							-- Merge each inner observable
+							sub:Fire(...)
+						end,
+						function(...)
+							-- Emit failure automatically
+							sub:Fail(...)
+						end,
 						function()
 							innerMaid:DoCleaning()
 							pendingCount = pendingCount - 1
 							if pendingCount == 0 and topComplete then
-								complete()
+								sub:Complete()
 								maid:DoCleaning()
 							end
 						end))
@@ -319,13 +327,13 @@ function Rx.mergeAll()
 					end)
 				end,
 				function(...)
-					fail(...) -- Also reflect failures up to the top!
+					sub:Fail(...) -- Also reflect failures up to the top!
 					maid:DoCleaning()
 				end,
 				function()
 					topComplete = true
 					if pendingCount == 0 then
-						complete()
+						sub:Complete()
 						maid:DoCleaning()
 					end
 				end))
@@ -339,7 +347,7 @@ end
 -- https://rxjs.dev/api/operators/switchAll
 function Rx.switchAll()
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local outerMaid = Maid.new()
 			local topComplete = false
 			local insideComplete = false
@@ -355,17 +363,19 @@ function Rx.switchAll()
 
 					local maid = Maid.new()
 					maid:GiveTask(observable:Subscribe(
-						fire, -- Merge each inner observable
+						function(...)
+							sub:Fire(...)
+						end, -- Merge each inner observable
 						function(...)
 							if currentInside == observable then
-								fail(...)
+								sub:Fail(...)
 							end
 						end, -- Emit failure automatically
 						function()
 							if currentInside == observable then
 								insideComplete = true
 								if insideComplete and topComplete then
-									complete()
+									sub:Complete()
 									outerMaid:DoCleaning()
 								end
 							end
@@ -374,13 +384,13 @@ function Rx.switchAll()
 					outerMaid._current = maid
 				end,
 				function(...)
-					fail(...) -- Also reflect failures up to the top!
+					sub:Fail(...) -- Also reflect failures up to the top!
 					outerMaid:DoCleaning()
 				end,
 				function()
 					topComplete = true
 					if insideComplete and topComplete then
-						complete()
+						sub:Complete()
 						outerMaid:DoCleaning()
 					end
 				end))
@@ -395,7 +405,7 @@ function Rx.flatMap(project, resultSelector)
 	assert(type(project) == "function")
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local maid = Maid.new()
 
 			local pendingCount = 0
@@ -416,17 +426,19 @@ function Rx.flatMap(project, resultSelector)
 						function(...)
 							-- Merge each inner observable
 							if resultSelector then
-								fire(resultSelector(outerValue, ...))
+								sub:Fire(resultSelector(outerValue, ...))
 							else
-								fire(...)
+								sub:Fire(...)
 							end
 						end,
-						fail, -- Emit failure automatically
+						function(...)
+							sub:Fail(...)
+						end, -- Emit failure automatically
 						function()
 							innerMaid:DoCleaning()
 							pendingCount = pendingCount - 1
 							if pendingCount == 0 and topComplete then
-								complete()
+								sub:Complete()
 								maid:DoCleaning()
 							end
 						end))
@@ -439,13 +451,13 @@ function Rx.flatMap(project, resultSelector)
 					end)
 				end,
 				function(...)
-					fail(...) -- Also reflect failures up to the top!
+					sub:Fail(...) -- Also reflect failures up to the top!
 					maid:DoCleaning()
 				end,
 				function()
 					topComplete = true
 					if pendingCount == 0 then
-						complete()
+						sub:Complete()
 						maid:DoCleaning()
 					end
 				end))
@@ -466,7 +478,7 @@ function Rx.takeUntil(notifier)
 	assert(Observable.isObservable(notifier))
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local maid = Maid.new()
 			local cancelled = false
 
@@ -485,7 +497,7 @@ function Rx.takeUntil(notifier)
 			end
 
 			-- Subscribe!
-			maid:GiveTask(source:Subscribe(fire, fail, complete))
+			maid:GiveTask(source:Subscribe(sub:GetFireFailComplete()))
 
 			return maid
 		end)
@@ -495,24 +507,24 @@ end
 function Rx.packed(...)
 	local args = table.pack(...)
 
-	return Observable.new(function(fire, fail, complete)
-		fire(unpack(args, 1, args.n))
-		complete()
+	return Observable.new(function(sub)
+		sub:Fire(unpack(args, 1, args.n))
+		sub:Complete()
 	end)
 end
 
 function Rx.unpacked(observable)
 	assert(Observable.isObservable(observable))
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		return observable:Subscribe(function(value)
 			if type(value) == "table" then
-				fire(unpack(value))
+				sub:Fire(unpack(value))
 			else
 				warn(("[Rx.unpacked] - Observable didn't return a table got type %q")
 					:format(type(value)))
 			end
-		end, fail, complete)
+		end, sub:GetFailComplete())
 	end)
 end
 
@@ -523,10 +535,10 @@ function Rx.finalize(finalizerCallback)
 	assert(type(finalizerCallback) == "function")
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			maid:GiveTask(source:Subscribe(fire, fail, complete))
+			maid:GiveTask(source:Subscribe(sub:GetFireFailComplete()))
 			maid:GiveTask(finalizerCallback)
 
 			return maid
@@ -537,9 +549,14 @@ end
 -- https://rxjs.dev/api/operators/combineAll
 function Rx.combineAll()
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local observables = {}
 			local maid = Maid.new()
+
+			local alive = true
+			maid:GiveTask(function()
+				alive = false
+			end)
 
 			maid:GiveTask(source:Subscribe(
 				function(value)
@@ -547,11 +564,17 @@ function Rx.combineAll()
 
 					table.insert(observables, value)
 				end,
-				fail,
+				function(...)
+					sub:Fail(...)
+				end),
 				function()
+					if not alive then
+						return
+					end
+
 					maid:GiveTask(Rx.combineLatest(observables))
-						:Subscribe(fire, fail, complete)
-				end))
+						:Subscribe(sub:GetFireFailComplete())
+				end)
 
 			return maid
 		end)
@@ -565,9 +588,9 @@ function Rx.combineLatest(observables)
 		assert(Observable.isObservable(observable), "Not an observable")
 	end
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		if not next(observables) then
-			complete()
+			sub:Complete()
 			return
 		end
 
@@ -587,7 +610,7 @@ function Rx.combineLatest(observables)
 				end
 			end
 
-			fire(Table.copy(latest))
+			sub:Fire(Table.copy(latest))
 		end
 
 		for key, observer in pairs(observables) do
@@ -598,12 +621,12 @@ function Rx.combineLatest(observables)
 				end,
 				function(...)
 					pending = pending - 1
-					fail(...)
+					sub:Fail(...)
 				end,
 				function()
 					pending = pending - 1
 					if pending == 0 then
-						complete()
+						sub:Complete()
 					end
 				end))
 		end
@@ -614,7 +637,7 @@ end
 
 -- http://reactivex.io/documentation/operators/using.html
 function Rx.using(resourceFactory, observableFactory)
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		local resource = resourceFactory()
@@ -623,7 +646,7 @@ function Rx.using(resourceFactory, observableFactory)
 		local observable = observableFactory(resource)
 		assert(Observable.isObservable(observable))
 
-		maid:GiveTask(observable:Subscribe(fire, fail, complete))
+		maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
 
 		return maid
 	end)
@@ -635,9 +658,9 @@ function Rx.take(number)
 	assert(number >= 0)
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			if number == 0 then
-				complete()
+				sub:Complete()
 				return nil
 			end
 
@@ -652,12 +675,12 @@ function Rx.take(number)
 
 
 				taken = taken + 1
-				fire(...)
+				sub:Fire(...)
 
 				if taken == number then
-					complete()
+					sub:Complete()
 				end
-			end, fail, complete))
+			end, sub:GetFailComplete()))
 
 			return maid
 		end)
@@ -667,11 +690,11 @@ end
 -- https://rxjs-dev.firebaseapp.com/api/index/function/defer
 -- https://netbasal.com/getting-to-know-the-defer-observable-in-rxjs-a16f092d8c09
 function Rx.defer(observableFactory)
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local observable = observableFactory()
 		assert(Observable.isObservable(observable))
 
-		return observable:Subscribe(fire, fail, complete)
+		return observable:Subscribe(sub:GetFireFailComplete())
 	end)
 end
 
@@ -685,7 +708,7 @@ function Rx.withLatestFrom(inputObservables)
 	end
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local maid = Maid.new()
 
 			local latest = {}
@@ -705,8 +728,8 @@ function Rx.withLatestFrom(inputObservables)
 					end
 				end
 
-				fire({value, unpack(latest)})
-			end, fail, complete))
+				sub:Fire({value, unpack(latest)})
+			end, sub:GetFailComplete()))
 
 			return maid
 		end)
@@ -718,13 +741,13 @@ function Rx.scan(accumulator, seed)
 	assert(type(accumulator) == "function")
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local current = seed
 
 			return source:Subscribe(function(value)
 				current = accumulator(current, value)
-				fire(current)
-			end, fail, complete)
+				sub:Fire(current)
+			end, sub:GetFailComplete())
 		end)
 	end
 end
@@ -736,16 +759,18 @@ function Rx.throttleTime(duration, throttleConfig)
 	assert(type(throttleConfig) == "table" or throttleConfig == nil)
 
 	return function(source)
-		return Observable.new(function(fire, fail, complete)
+		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			local throttledFunction = ThrottledFunction.new(duration, fire)
+			local throttledFunction = ThrottledFunction.new(duration, function(...)
+				sub:Fire(...)
+			end)
 			throttledFunction:ConfigureOrError(throttleConfig)
 
 			maid:GiveTask(throttledFunction)
 			maid:GiveTask(source:Subscribe(function(...)
 				throttledFunction:Call(...)
-			end, fail, complete))
+			end, sub:GetFailComplete()))
 
 			return maid
 		end)

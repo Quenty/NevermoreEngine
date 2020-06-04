@@ -14,13 +14,13 @@ function RxInstanceUtils.observeProperty(instance, property)
 	assert(typeof(instance) == "Instance")
 	assert(type(property) == "string")
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		maid:GiveTask(instance:GetPropertyChangedSignal(property):Connect(function()
-			fire(instance[property])
+			sub:Fire(instance[property])
 		end))
-		fire(instance[property])
+		sub:Fire(instance[property])
 
 		return maid
 	end)
@@ -32,7 +32,7 @@ function RxInstanceUtils.observeValidPropertyBrio(instance, property, predicate)
 	assert(type(property) == "string")
 	assert(type(predicate) == "function" or predicate == nil)
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		local function handlePropertyChanged()
@@ -42,7 +42,7 @@ function RxInstanceUtils.observeValidPropertyBrio(instance, property, predicate)
 			if not predicate or predicate(propertyValue) then
 				local brio = Brio.new(instance[property])
 				maid._property = brio
-				fire(brio)
+				sub:Fire(brio)
 			end
 		end
 
@@ -58,7 +58,7 @@ function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 	assert(type(className) == "string")
 	assert(type(name) == "string")
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local topMaid = Maid.new()
 
 		local function handleChild(child)
@@ -74,7 +74,7 @@ function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 					maid._brio = brio
 					topMaid._lastBrio = brio
 
-					fire(brio)
+					sub:Fire(brio)
 				else
 					maid._brio = nil
 				end
@@ -103,14 +103,14 @@ function RxInstanceUtils.observeChildrenBrio(parent, predicate)
 	assert(typeof(parent) == "Instance")
 	assert(type(predicate) == "function" or predicate == nil)
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		local function handleChild(child)
 			if not predicate or predicate(child) then
 				local value = Brio.new(child)
 				maid[child] = value
-				fire(value)
+				sub:Fire(value)
 			end
 		end
 

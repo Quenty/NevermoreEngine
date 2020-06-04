@@ -18,7 +18,7 @@ function BrioUtils.clone(brio)
 
 	local newBrio = Brio.new(brio:GetValue())
 
-	newBrio:ToMaid():GiveTask(brio.Died:Connect(function()
+	newBrio:ToMaid():GiveTask(brio:GetDiedSignal():Connect(function()
 		newBrio:Kill()
 	end))
 
@@ -27,12 +27,21 @@ end
 
 function BrioUtils.aliveOnly(brios)
 	local alive = {}
-	for _, item in pairs(brios) do
-		if not item:IsDead() then
-			table.insert(alive, item)
+	for _, brio in pairs(brios) do
+		if not brio:IsDead() then
+			table.insert(alive, brio)
 		end
 	end
 	return alive
+end
+
+function BrioUtils.firstAlive(brios)
+	for _, brio in pairs(brios) do
+		if not brio:IsDead() then
+			return brio
+		end
+	end
+	return nil
 end
 
 function BrioUtils.flatten(brioTable)
@@ -66,12 +75,12 @@ function BrioUtils.first(brios, ...)
 	local topBrio = Brio.new(...)
 
 	for _, brio in pairs(brios) do
-		maid:GiveTask(brio.Died:Connect(function()
+		maid:GiveTask(brio:GetDiedSignal():Connect(function()
 			topBrio:Kill()
 		end))
 	end
 
-	maid:GiveTask(topBrio.Died:Connect(function()
+	maid:GiveTask(topBrio:GetDiedSignal():Connect(function()
 		maid:DoCleaning()
 	end))
 
@@ -98,11 +107,11 @@ function BrioUtils.extend(brio, ...)
 	local maid = Maid.new()
 	local newBrio = Brio.new(unpack(current, 1, values.n + otherValues.n))
 
-	maid:GiveTask(brio.Died:Connect(function()
+	maid:GiveTask(brio:GetDiedSignal():Connect(function()
 		newBrio:Kill()
 	end))
 
-	maid:GiveTask(newBrio.Died:Connect(function()
+	maid:GiveTask(newBrio:GetDiedSignal():Connect(function()
 		maid:DoCleaning()
 	end))
 
@@ -131,14 +140,14 @@ function BrioUtils.merge(brio, otherBrio)
 	local maid = Maid.new()
 	local newBrio = Brio.new(unpack(current, 1, values.n + otherValues.n))
 
-	maid:GiveTask(brio.Died:Connect(function()
+	maid:GiveTask(brio:GetDiedSignal():Connect(function()
 		newBrio:Kill()
 	end))
-	maid:GiveTask(otherBrio.Died:Connect(function()
+	maid:GiveTask(otherBrio:GetDiedSignal():Connect(function()
 		newBrio:Kill()
 	end))
 
-	maid:GiveTask(newBrio.Died:Connect(function()
+	maid:GiveTask(newBrio:GetDiedSignal():Connect(function()
 		maid:DoCleaning()
 	end))
 

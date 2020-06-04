@@ -58,16 +58,12 @@ function BinderUtils.mapBinderListToTable(bindersList)
 	return tags
 end
 
-function BinderUtils.getChildrenOfBinders(bindersList, parent)
-	assert(type(bindersList) == "table", "bindersList must be a table of binders")
-	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
-
-	local tags = BinderUtils.mapBinderListToTable(bindersList)
+function BinderUtils.getMappedFromList(tagsMap, instanceList)
 	local objects = {}
 
-	for _, instance in pairs(parent:GetChildren()) do
+	for _, instance in pairs(instanceList) do
 		for _, tag in pairs(CollectionService:GetTags(instance)) do
-			local binder = tags[tag]
+			local binder = tagsMap[tag]
 			if binder then
 				local obj = binder:Get(instance)
 				if obj then
@@ -78,6 +74,14 @@ function BinderUtils.getChildrenOfBinders(bindersList, parent)
 	end
 
 	return objects
+end
+
+function BinderUtils.getChildrenOfBinders(bindersList, parent)
+	assert(type(bindersList) == "table", "bindersList must be a table of binders")
+	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
+
+	local tagsMap = BinderUtils.mapBinderListToTable(bindersList)
+	return BinderUtils.getMappedFromList(tagsMap, parent:GetChildren())
 end
 
 function BinderUtils.getLinkedChildren(binder, linkName, parent)

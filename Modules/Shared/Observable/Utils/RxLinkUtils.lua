@@ -37,7 +37,7 @@ function RxLinkUtils.observeValidityBrio(linkName, link)
 	assert(typeof(link) == "Instance" and link:IsA("ObjectValue"))
 	assert(type(linkName) == "string")
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		local function updateValidity()
@@ -48,7 +48,7 @@ function RxLinkUtils.observeValidityBrio(linkName, link)
 
 			local newValid = Brio.new(link, link.Value)
 			maid._lastValid = newValid
-			fire(newValid)
+			sub:Fire(newValid)
 		end
 
 		maid:GiveTask(link:GetPropertyChangedSignal("Value")

@@ -55,11 +55,13 @@ function RxBinderUtils.observeBoundClass(binder, instance)
 	assert(type(binder) == "table")
 	assert(typeof(instance) == "Instance")
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GiveTask(binder:ObserveInstance(instance, fire))
-		fire(binder:Get(instance))
+		maid:GiveTask(binder:ObserveInstance(instance, function(...)
+			sub:Fire(...)
+		end))
+		sub:Fire(binder:Get(instance))
 
 		return maid
 	end)
@@ -69,7 +71,7 @@ function RxBinderUtils.observeBoundClassBrio(binder, instance)
 	assert(type(binder) == "table")
 	assert(typeof(instance) == "Instance")
 
-	return Observable.new(function(fire, fail, complete)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		local function handleClassChanged(class)
@@ -77,7 +79,7 @@ function RxBinderUtils.observeBoundClassBrio(binder, instance)
 				local brio = Brio.new(class)
 				maid._lastBrio = brio
 
-				fire(brio)
+				sub:Fire(brio)
 			else
 				maid._lastBrio = nil
 			end
