@@ -332,12 +332,22 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 		if type(onFulfilled) == "function" then
 			-- If either onFulfilled or onRejected returns a value x, run
 			-- the Promise Resolution Procedure [[Resolve]](promise2, x).
-			if not promise2 then
-				promise2 = Promise.new()
+			if promise2 then
+				promise2:Resolve(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
+				return promise2
+			else
+				local results = table.pack(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
+				if results.n == 0 then
+					return _emptyFulfilledPromise
+				elseif results.n == 1 and isPromise(results[1]) then
+					return results[1]
+				else
+					local promise = Promise.new()
+					-- Technically undefined behavior from A+, but we'll resolve to nil like ES6 promises
+					promise:Resolve(table.unpack(results, 1, results.n))
+					return promise
+				end
 			end
-			-- Technically undefined behavior from A+, but we'll resolve to nil like ES6 promises
-			promise2:Resolve(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
-			return promise2
 		else
 			-- If onFulfilled is not a function, it must be ignored.
 			-- If onFulfilled is not a function and promise1 is fulfilled,
@@ -351,13 +361,24 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 		end
 	elseif self._rejected then
 		if type(onRejected) == "function" then
-			if not promise2 then
-				promise2 = Promise.new()
+			-- If either onFulfilled or onRejected returns a value x, run
+			-- the Promise Resolution Procedure [[Resolve]](promise2, x).
+			if promise2 then
+				promise2:Resolve(onRejected(unpack(self._rejected, 1, self._valuesLength)))
+				return promise2
+			else
+				local results = table.pack(onRejected(unpack(self._rejected, 1, self._valuesLength)))
+				if results.n == 0 then
+					return _emptyFulfilledPromise
+				elseif results.n == 1 and isPromise(results[1]) then
+					return results[1]
+				else
+					local promise = Promise.new()
+					-- Technically undefined behavior from A+, but we'll resolve to nil like ES6 promises
+					promise:Resolve(table.unpack(results, 1, results.n))
+					return promise
+				end
 			end
-			-- Technically undefined behavior from A+, but we'll resolve to nil like ES6 promises
-			promise2:Resolve(onRejected(unpack(self._rejected, 1, self._valuesLength)))
-
-			return promise2
 		else
 			-- If onRejected is not a function, it must be ignored.
 			-- If onRejected is not a function and promise1 is rejected, promise2 must be
