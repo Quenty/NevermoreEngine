@@ -57,8 +57,13 @@ function FadeBetweenCamera:__index(index)
 		else
 			local stateA = self.CameraStateA
 			local stateB = self.CameraStateB
+			local delta = stateB - stateA
 
-			return stateA + (stateB - stateA)*value
+			if delta.Quaterion.w < 0 then
+				delta.Quaterion = -delta.Quaterion
+			end
+
+			return stateA + delta*value
 		end
 	elseif index == "CameraStateA" then
 		return self.CameraA.CameraState or self.CameraA
