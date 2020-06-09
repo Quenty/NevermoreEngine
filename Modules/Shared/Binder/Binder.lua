@@ -7,7 +7,6 @@ local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
-local fastSpawn = require("fastSpawn")
 local Signal = require("Signal")
 
 local Binder = {}
@@ -46,11 +45,18 @@ function Binder:Init()
 	end
 	self._loaded = true
 
+	local bindable = Instance.new("BindableEvent")
+
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
-		fastSpawn(function()
+		local conn = bindable.Event:Connect(function()
 			self:_add(inst)
 		end)
+
+		bindable:Fire()
+		conn:Disconnect()
 	end
+
+	bindable:Destroy()
 
 	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(inst)
 		self:_add(inst)
@@ -211,9 +217,18 @@ function Binder:_add(inst)
 	-- Fire events
 	local listeners = self._listeners[inst]
 	if listeners then
-		for callback, _ in pairs(self._listeners[inst]) do
-			fastSpawn(callback, class)
+		local bindable = Instance.new("BindableEvent")
+
+		for callback, _ in pairs(listeners) do
+			local conn = bindable.Event:Connect(function()
+				callback(class)
+			end)
+
+			bindable:Fire()
+			conn:Disconnect()
 		end
+
+		bindable:Destroy()
 	end
 
 	if self._classAddedSignal then
@@ -232,9 +247,18 @@ function Binder:_remove(inst)
 	-- Fire off events
 	local listeners = self._listeners[inst]
 	if listeners then
+		local bindable = Instance.new("BindableEvent")
+
 		for callback, _ in pairs(listeners) do
-			fastSpawn(callback, nil)
+			local conn = bindable.Event:Connect(function()
+				callback(nil)
+			end)
+
+			bindable:Fire()
+			conn:Disconnect()
 		end
+
+		bindable:Destroy()
 	end
 	if self._classRemovingSignal then
 		self._classRemovingSignal:Fire(class, inst)
