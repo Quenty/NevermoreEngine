@@ -160,6 +160,9 @@ function ArmIKBase:_calculatePoint(targetPositionWorld)
 	local elbow = self._resources:Get("Elbow")
 	local wrist = self._resources:Get("Wrist")
 	local gripAttachment = self._resources:Get("HandGripAttachment")
+	if not (shoulder.Part0 and elbow.Part0 and elbow.Part1) then
+		return false
+	end
 
 	local base = shoulder.Part0.CFrame * shoulder.C0
 	local elbowCFrame = elbow.Part0.CFrame * elbow.C0
