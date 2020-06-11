@@ -5,7 +5,10 @@
 local CircleUtils = {}
 
 -- https://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
+-- Note: target should be within 0 and circumference
 function CircleUtils.updatePositionToSmallestDistOnCircle(position, target, circumference)
+	assert(target >= 0 and target <= circumference, "Target must be between 0 and circumference")
+
 	if math.abs(position - target) <= math.pi then
 		-- No need to force spring update
 		return position
