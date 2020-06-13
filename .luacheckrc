@@ -92,6 +92,7 @@ stds.roblox = {
                 DefineFastFlag = read_write;
                 DefineFastInt = read_write;
                 DefineFastString = read_write;
+                GetEngineFeature = read_write;
                 GetFastFlag = read_write;
                 GetFastInt = read_write;
                 GetFastString = read_write;
@@ -177,6 +178,8 @@ stds.roblox = {
                 TemporaryLegacyPhysicsSolverOverride = read_write;
                 Terrain = read_only;
                 BreakJoints = read_write;
+                CalculateJumpDistance = read_write;
+                CalculateJumpHeight = read_write;
                 CalculateJumpPower = read_write;
                 ExperimentalSolverIsEnabled = read_write;
                 GetNumAwakeParts = read_write;
@@ -188,6 +191,8 @@ stds.roblox = {
                 SetPhysicsThrottleEnabled = read_write;
                 UnjoinFromOutsiders = read_write;
                 ZoomToExtents = read_write;
+                ArePartsTouchingOthers = read_write;
+                BulkMoveTo = read_write;
                 FindPartOnRay = read_write;
                 FindPartOnRayWithIgnoreList = read_write;
                 FindPartOnRayWithWhitelist = read_write;
@@ -315,6 +320,8 @@ stds.roblox = {
 
         Ray = def_fields({"new"}),
 
+        RaycastParams = def_fields({"new"}),
+
         Rect = def_fields({"new"}),
 
         Region3 = def_fields({"new"}),
@@ -339,6 +346,8 @@ stds.roblox = {
         Enum = {
             readonly = true,
             fields = {
+                ABTestLoadingStatus = def_enum({"None", "Pending", "Initialized", "Error",
+                    "TimedOut", "ShutOff"}),
                 ActionType = def_enum({"Nothing", "Pause", "Lose", "Draw", "Win"}),
                 ActuatorRelativeTo = def_enum({"Attachment0", "Attachment1", "World"}),
                 ActuatorType = def_enum({"None", "Motor", "Servo"}),
@@ -358,7 +367,8 @@ stds.roblox = {
                     "WaistAccessory", "ClimbAnimation", "DeathAnimation", "FallAnimation",
                     "IdleAnimation", "JumpAnimation", "RunAnimation", "SwimAnimation",
                     "WalkAnimation", "PoseAnimation", "EarAccessory", "EyeAccessory",
-                    "EmoteAnimation"}),
+                    "EmoteAnimation", "Video"}),
+                AutoIndentRule = def_enum({"Off", "Absolute", "Relative"}),
                 AvatarContextMenuOption = def_enum({"Friend", "Chat", "Emote", "InspectMenu"}),
                 AvatarJointPositionType = def_enum({"Fixed", "ArtistIntent"}),
                 Axis = def_enum({"X", "Y", "Z"}),
@@ -370,6 +380,7 @@ stds.roblox = {
                     "RightUpperArm", "RootPart", "Unknown"}),
                 BorderMode = def_enum({"Outline", "Middle", "Inset"}),
                 BreakReason = def_enum({"Other", "Error", "UserBreakpoint", "SpecialBreakpoint"}),
+                BulkMoveMode = def_enum({"FireAllEvents", "FireCFrameChanged", "FireNoEvents"}),
                 Button = def_enum({"Jump", "Dismount"}),
                 ButtonStyle = def_enum({"Custom", "RobloxButtonDefault", "RobloxButton",
                     "RobloxRoundButton", "RobloxRoundDefaultButton", "RobloxRoundDropdownButton"}),
@@ -492,7 +503,7 @@ stds.roblox = {
                     "ApplicationUrlEncoded", "TextPlain", "TextXml"}),
                 HttpError = def_enum({"OK", "InvalidUrl", "DnsResolve", "ConnectFail",
                     "OutOfMemory", "TimedOut", "TooManyRedirects", "InvalidRedirect", "NetFail",
-                    "Aborted", "SslConnectFail", "Unknown"}),
+                    "Aborted", "SslConnectFail", "SslVerificationFail", "Unknown"}),
                 HttpRequestType = def_enum({"Default", "MarketplaceService", "Players", "Chat",
                     "Avatar", "Analytics", "Localization"}),
                 HumanoidCollisionType = def_enum({"OuterBox", "InnerBox"}),
@@ -651,9 +662,9 @@ stds.roblox = {
                     "ScriptFindSelectionBackground", "ScriptMatchingWordSelectionBackground",
                     "ScriptOperator", "ScriptNumber", "ScriptString", "ScriptComment",
                     "ScriptPreprocessor", "ScriptKeyword", "ScriptBuiltInFunction",
-                    "ScriptWarning", "ScriptError", "ScriptWhitespace", "DebuggerCurrentLine",
-                    "DebuggerErrorLine", "DiffFilePathText", "DiffTextHunkInfo",
-                    "DiffTextNoChange", "DiffTextAddition", "DiffTextDeletion",
+                    "ScriptWarning", "ScriptError", "ScriptWhitespace", "ScriptRuler",
+                    "DebuggerCurrentLine", "DebuggerErrorLine", "DiffFilePathText",
+                    "DiffTextHunkInfo", "DiffTextNoChange", "DiffTextAddition", "DiffTextDeletion",
                     "DiffTextSeparatorBackground", "DiffTextNoChangeBackground",
                     "DiffTextAdditionBackground", "DiffTextDeletionBackground", "DiffLineNum",
                     "DiffLineNumSeparatorBackground", "DiffLineNumNoChangeBackground",
