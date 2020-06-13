@@ -68,9 +68,9 @@ end
 function Spring:TimeSkip(delta)
 	local time = tick()
 	local position, velocity = self:_positionVelocity(time+delta)
-	rawset(self, "_position0", position)
-	rawset(self, "_velocity0", velocity)
-	rawset(self, "_time0", time)
+	self._position0 = position
+	self._velocity0 = velocity
+	self._time0 = time
 end
 
 function Spring:__index(index)
@@ -83,11 +83,11 @@ function Spring:__index(index)
 		local _, velocity = self:_positionVelocity(tick())
 		return velocity
 	elseif index == "Target" or index == "t" then
-		return rawget(self, "_target")
+		return self._target
 	elseif index == "Damper" or index == "d" then
-		return rawget(self, "_damper")
+		return self._damper
 	elseif index == "Speed" or index == "s" then
-		return rawget(self, "_speed")
+		return self._speed
 	else
 		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
 	end
@@ -98,59 +98,71 @@ function Spring:__newindex(index, value)
 
 	if index == "Value" or index == "Position" or index == "p" then
 		local _, velocity = self:_positionVelocity(time)
-		rawset(self, "_position0", value)
-		rawset(self, "_velocity0", velocity)
+		self._position0 = value
+		self._velocity0 = velocity
 	elseif index == "Velocity" or index == "v" then
 		local position, _ = self:_positionVelocity(time)
-		rawset(self, "_position0", position)
-		rawset(self, "_velocity0", value)
+		self._position0 = position
+		self._velocity0 = value
 	elseif index == "Target" or index == "t" then
 		local position, velocity = self:_positionVelocity(time)
-		rawset(self, "_position0", position)
-		rawset(self, "_velocity0", velocity)
-		rawset(self, "_target", value)
+		self._position0 = position
+		self._velocity0 = velocity
+		self._target = value
 	elseif index == "Damper" or index == "d" then
 		local position, velocity = self:_positionVelocity(time)
-		rawset(self, "_position0", position)
-		rawset(self, "_velocity0", velocity)
-		rawset(self, "_damper", math.clamp(value, 0, 1))
+		self._position0 = position
+		self._velocity0 = velocity
+		self._damper = math.clamp(value, 0, 1)
 	elseif index == "Speed" or index == "s" then
 		local position, velocity = self:_positionVelocity(time)
-		rawset(self, "_position0", position)
-		rawset(self, "_velocity0", velocity)
-		rawset(self, "_speed", value < 0 and 0 or value)
+		self._position0 = position
+		self._velocity0 = velocity
+		self._speed = value < 0 and 0 or value
 	else
 		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
 	end
 
-	rawset(self, "_time0", time)
+	self._time0 = time
 end
 
 function Spring:_positionVelocity(time)
-	local dt = time - rawget(self, "_time0")
-	local p0 = rawget(self, "_position0")
-	local v0 = rawget(self, "_velocity0")
-	local t = rawget(self, "_target")
-	local d = rawget(self, "_damper")
-	local s = rawget(self, "_speed")
+	local p0 = self._position0
+	local v0 = self._velocity0
+	local p1 = self._target
+	local d = self._damper
+	local s = self._speed
 
-	local c0 = p0-t
-	if s == 0 then
-		return p0, 0
-	elseif d < 1 then
-		local c	= math.sqrt(1-d*d)
-		local c1 = (v0/s+d*c0)/c
-		local co = math.cos(c*s*dt)
-		local si = math.sin(c*s*dt)
-		local e = math.exp(d*s*dt)
-		return t+(c0*co+c1*si)/e,
-		       s*((c*c1-d*c0)*co-(c*c0+d*c1)*si)/e
+	local t = s*(time - self._time0)
+	local d2 = d*d
+
+	local h, si, co
+	if d2 < 1 then
+		h = math.sqrt(1 - d2)
+		local ep = math.exp(-d*t)/h
+		co, si = ep*math.cos(h*t), ep*math.sin(h*t)
+	elseif d2 == 1 then
+		h = 1
+		local ep = math.exp(-d*t)/h
+		co, si = ep, ep*t
 	else
-		local c1 = v0/s+c0
-		local e = math.exp(s*dt)
-		return t+(c0+c1*s*dt)/e,
-		       s*(c1-c0-c1*s*dt)/e
+		h = math.sqrt(d2 - 1)
+		local u = math.exp((-d + h)*t)/(2*h)
+		local v = math.exp((-d - h)*t)/(2*h)
+		co, si = u + v, u - v
 	end
+
+	local a0 = h*co + d*si
+	local a1 = 1 - (h*co + d*si)
+	local a2 = si/s
+
+	local b0 = -s*si
+	local b1 = s*si
+	local b2 = h*co - d*si
+
+	return
+		a0*p0 + a1*p1 + a2*v0,
+		b0*p0 + b1*p1 + b2*v0
 end
 
 return Spring

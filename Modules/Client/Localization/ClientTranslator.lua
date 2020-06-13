@@ -82,7 +82,7 @@ function ClientTranslatorFacade:FormatByKey(key, ...)
 	assert(type(key) == "string", "Key must be a string")
 
 	if not RunService:IsRunning() then
-		return key
+		return self:_formatByKeyTestMode(key, ...)
 	end
 
 	assert(self._clientTranslator, "ClientTranslator is not initialized")
@@ -113,6 +113,36 @@ function ClientTranslatorFacade:FormatByKey(key, ...)
 		if ok and not err then
 			return result
 		end
+	end
+
+	return key
+end
+
+function ClientTranslatorFacade:_formatByKeyTestMode(key, ...)
+	local i18n = ReplicatedStorage:FindFirstChild("i18n")
+	if not i18n then
+		return key
+	end
+
+	local data = {...}
+
+	local localizationTable = JsonToLocalizationTable.loadFolder(i18n)
+
+	-- Can't read LocalizationService.ForcePlayModeRobloxLocaleId :(
+	local translator = localizationTable:GetTranslator("en")
+	local result
+	local ok, err = pcall(function()
+		result = translator:FormatByKey(key, unpack(data))
+	end)
+
+	if ok and not err then
+		return result
+	end
+
+	if err then
+		warn(err)
+	else
+		warn("Failed to localize '" .. key .. "'")
 	end
 
 	return key

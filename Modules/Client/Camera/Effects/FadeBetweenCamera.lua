@@ -5,6 +5,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Spring = require("Spring")
 local SummedCamera = require("SummedCamera")
+local FieldOfViewUtils = require("FieldOfViewUtils")
 
 local EPSILON = 1e-4
 
@@ -63,7 +64,10 @@ function FadeBetweenCamera:__index(index)
 				delta.Quaterion = -delta.Quaterion
 			end
 
-			return stateA + delta*value
+			local newState = stateA + delta*value
+			newState.FieldOfView = FieldOfViewUtils.lerpInHeightSpace(stateA.FieldOfView, stateB.FieldOfView, value)
+
+			return newState
 		end
 	elseif index == "CameraStateA" then
 		return self.CameraA.CameraState or self.CameraA
