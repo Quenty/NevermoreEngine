@@ -1,8 +1,5 @@
 ---
 -- @module NumberRangeUtils
--- @author Quenty
-
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local NumberRangeUtils = {}
 
