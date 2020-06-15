@@ -51,8 +51,8 @@ function CameraControls.new(zoomCamera, rotatedCamera)
 	self._enabled = false
 	self._key = tostring(self) .. "CameraControls"
 
+	-- Destroyed below
 	self._gamepadRotateModel = GamepadRotateModel.new()
-	self._maid:GiveTask(self._gamepadRotateModel)
 
 	if zoomCamera then
 		self:SetZoomedCamera(zoomCamera)
@@ -329,6 +329,8 @@ function CameraControls:_handleGamepadRotateStart()
 end
 
 function CameraControls:Destroy()
+	self._gamepadRotateModel:Destroy()
+
 	self:Disable()
 	setmetatable(self, nil)
 end

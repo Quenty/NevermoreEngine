@@ -66,6 +66,8 @@ function TemplateProvider:_verifyInit()
 		-- Initialize for hoarcecat!
 		self:Init()
 	end
+
+	assert(self._registry, "TemplateProvider is not initialized")
 end
 
 function TemplateProvider:_processFolder(folder)
