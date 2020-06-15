@@ -79,4 +79,20 @@ function PromiseUtils.invert(promise)
 	end
 end
 
+function PromiseUtils.fromSignal(signal)
+	local promise = Promise.new()
+	local conn
+
+	promise:Finally(function()
+		conn:Disconnect()
+		conn = nil
+	end)
+
+	conn = signal:Connect(function(...)
+		promise:Resolve(...)
+	end)
+
+	return promise
+end
+
 return PromiseUtils
