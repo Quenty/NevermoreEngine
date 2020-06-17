@@ -23,6 +23,27 @@ function BinderProvider.new(initMethod)
 	return self
 end
 
+function BinderProvider:PromiseBinder(binderName)
+	if self.BindersAddedPromise:IsFulfilled() then
+		local binder = self:Get(binderName)
+		if binder then
+			return Promise.resolved(binder)
+		else
+			return Promise.rejected()
+		end
+	end
+
+	return self.BindersAddedPromise
+		:Then(function()
+			local binder = self:Get(binderName)
+			if binder then
+				return binder
+			else
+				return Promise.rejected()
+			end
+		end)
+end
+
 function BinderProvider:Init()
 	self:_initMethod(self)
 	self.BindersAddedPromise:Resolve()
