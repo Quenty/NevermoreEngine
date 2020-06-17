@@ -215,6 +215,36 @@ function Draw.point(vector3, color, parent, diameter)
 	return part
 end
 
+function Draw.cframe(cframe)
+	local model = Instance.new("Model")
+	model.Name = "DebugCFrame"
+
+	local position = cframe.p
+	Draw.point(position, nil, model, 0.1)
+
+	local xRay = Draw.ray(Ray.new(
+		position,
+		cframe.XVector
+	), Color3.new(0.75, 0.25, 0.25), model, 0.1)
+	xRay.Name = "XVector"
+
+	local yRay = Draw.ray(Ray.new(
+		position,
+		cframe.YVector
+	), Color3.new(0.25, 0.75, 0.25), model, 0.1)
+	yRay.Name = "YVector"
+
+	local zRay = Draw.ray(Ray.new(
+		position,
+		cframe.ZVector
+	), Color3.new(0.25, 0.25, 0.75), model, 0.1)
+	zRay.Name = "ZVector"
+
+	model.Parent = Draw.getDefaultParent()
+
+	return model
+end
+
 function Draw.box(cframe, size, color)
 	assert(typeof(size) == "Vector3")
 
