@@ -19,7 +19,8 @@ return function(cframe)
 
 	local right = top:Cross(back)
 
-	return CFrame.new(cframe.x, cframe.y, cframe.z,
+	return CFrame.new(
+		cframe.x, cframe.y, cframe.z,
 		right.x, top.x, back.x,
 		right.y, top.y, back.y,
 		right.z, top.z, back.z
