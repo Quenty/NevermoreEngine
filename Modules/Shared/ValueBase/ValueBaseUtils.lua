@@ -39,5 +39,4 @@ function ValueBaseUtils.getValue(parent, instanceType, name, default)
 	end
 end
 
-
 return ValueBaseUtils

@@ -14,7 +14,14 @@ function ContentProviderUtils.promisePreload(contentIdList)
 	assert(type(contentIdList) == "table")
 
 	return Promise.spawn(function(resolve, reject)
-		ContentProvider:PreloadAsync(contentIdList)
+		local ok, err = pcall(function()
+			ContentProvider:PreloadAsync(contentIdList)
+		end)
+
+		if not ok then
+			return reject(err)
+		end
+
 		resolve()
 	end)
 end
