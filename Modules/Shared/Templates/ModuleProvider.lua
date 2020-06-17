@@ -26,6 +26,7 @@ function ModuleProvider:Init()
 	assert(not self._modulesList)
 
 	self._modulesList = {}
+	self._moduleScriptToModule = {}
 	self._registry = {}
 
 	self:_processFolder(self._parent)
@@ -35,10 +36,12 @@ function ModuleProvider:Init()
 	end
 
 	if self._initModule then
-		for _, _module in pairs(self._modulesList) do
-			self._initModule(_module)
+		for moduleScript, _module in pairs(self._moduleScriptToModule) do
+			self._initModule(_module, moduleScript)
 		end
 	end
+
+	self._moduleScriptToModule = nil
 end
 
 function ModuleProvider:GetModules()
@@ -79,7 +82,7 @@ function ModuleProvider:_addToRegistery(moduleScript)
 	end)
 
 	if self._checkModule then
-		local ok, err = self._checkModule(_module)
+		local ok, err = self._checkModule(_module, moduleScript)
 		if not ok then
 			error(("[ModuleProvider] - Bad module %q - %q")
 				:format(moduleScript:GetFullName(), tostring(err)))
@@ -87,8 +90,8 @@ function ModuleProvider:_addToRegistery(moduleScript)
 	end
 
 	table.insert(self._modulesList, _module)
-
-	self._registry[moduleScript.Name] = require(moduleScript)
+	self._moduleScriptToModule[moduleScript] = _module
+	self._registry[moduleScript.Name] = _module
 end
 
 return ModuleProvider
