@@ -3,27 +3,31 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Maid = require("Maid")
 local fastSpawn = require("fastSpawn")
+local Maid = require("Maid")
+local Symbol = require("Symbol")
 
-local function observeProperty(obj, valueName, callback)
+local EMPTY_SYMBOL = Symbol.named("emptySymbol")
+
+local function observeProperty(obj, propertyName, callback)
 	assert(typeof(obj) == "Instance")
-	assert(type(valueName) == "string")
+	assert(type(propertyName) == "string")
 	assert(type(callback) == "function")
 
 	local baseMaid = Maid.new()
-	local previous = nil
+	local previous = EMPTY_SYMBOL
 
 	local function firePropertyChanged(value)
 		previous = value
-		local maid = Maid.new()
-		baseMaid._valueMaid = maid
 
-		callback(maid, value, previous)
+		local maid = Maid.new()
+		baseMaid._current = maid
+
+		callback(maid, value)
 	end
 
-	baseMaid:GiveTask(obj:GetPropertyChangedSignal(valueName):Connect(function()
-		local value = obj[valueName]
+	baseMaid:GiveTask(obj:GetPropertyChangedSignal(propertyName):Connect(function()
+		local value = obj[propertyName]
 		if value ~= previous then
 			firePropertyChanged(value)
 		end
@@ -31,7 +35,7 @@ local function observeProperty(obj, valueName, callback)
 
 	-- Safety first!
 	fastSpawn(function()
-		firePropertyChanged(obj[valueName])
+		firePropertyChanged(obj[propertyName])
 	end)
 
 	return baseMaid
