@@ -123,6 +123,32 @@ function Promise:Wait()
 	end
 end
 
+function Promise:Yield()
+	if self._fulfilled then
+		return true, unpack(self._fulfilled, 1, self._valuesLength)
+	elseif self._rejected then
+		return false, unpack(self._rejected, 1, self._valuesLength)
+	else
+		local bindable = Instance.new("BindableEvent")
+
+		self:Then(function()
+			bindable:Fire()
+		end, function()
+			bindable:Fire()
+		end)
+
+		bindable.Event:Wait()
+		bindable:Destroy()
+
+		if self._fulfilled then
+			return true, unpack(self._fulfilled, 1, self._valuesLength)
+		elseif self._rejected then
+			return false, unpack(self._rejected, 1, self._valuesLength)
+		end
+	end
+end
+
+
 --- Promise resolution procedure
 -- Resolves a promise
 -- @return self
