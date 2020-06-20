@@ -18,13 +18,19 @@ function BoundingBoxUtils.clampPointToBoundingBox(cframe, size, point)
 	), cframe.p
 end
 
-function BoundingBoxUtils.getModelBoundingBox(model, relativeTo)
+-- @return size, position
+function BoundingBoxUtils.getChildrenBoundingBox(parent, relativeTo)
 	local parts = {}
-	for _, item in pairs(model:GetDescendants()) do
+	for _, item in pairs(parent:GetDescendants()) do
 		if item:IsA("BasePart") then
 			table.insert(parts, item)
 		end
 	end
+
+	if not next(parts) then
+		return nil, nil
+	end
+
 	return BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
 end
 
