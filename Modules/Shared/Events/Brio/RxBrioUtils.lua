@@ -34,8 +34,6 @@ function RxBrioUtils.completeOnDeath(brio, observable)
 end
 
 function RxBrioUtils.emitWhileAllDead(valueToEmitWhileAllDead)
-	assert(valueToEmitWhileAllDead)
-
 	return function(source)
 		return Observable.new(function(sub)
 			local topMaid = Maid.new()
