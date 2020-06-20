@@ -5,12 +5,17 @@
 local ValueBaseUtils = {}
 
 function ValueBaseUtils.setValue(parent, instanceType, name, value)
-	assert(typeof(parent) == "Instance")
-	assert(type(instanceType) == "string")
-	assert(type(name) == "string")
+	assert(typeof(parent) == "Instance", "Bad argument 'parent'")
+	assert(type(instanceType) == "string", "Bad argument 'instanceType'")
+	assert(type(name) == "string", "Bad argument 'name'")
 
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
+		if not foundChild:IsA(instanceType) then
+			warn(("[ValueBaseUtils.setValue] - Value of type %q of name %q is of type %q in %s instead")
+				:format(instanceType, name, foundChild.ClassName, foundChild:GetFullName()))
+		end
+
 		foundChild.Value = value
 	else
 		local newChild = Instance.new(instanceType)
@@ -21,9 +26,9 @@ function ValueBaseUtils.setValue(parent, instanceType, name, value)
 end
 
 function ValueBaseUtils.getValue(parent, instanceType, name, default)
-	assert(typeof(parent) == "Instance")
-	assert(type(instanceType) == "string")
-	assert(type(name) == "string")
+	assert(typeof(parent) == "Instance", "Bad argument 'parent'")
+	assert(type(instanceType) == "string", "Bad argument 'instanceType'")
+	assert(type(name) == "string", "Bad argument 'name'")
 
 	local foundChild = parent:FindFirstChild(name)
 	if foundChild then
