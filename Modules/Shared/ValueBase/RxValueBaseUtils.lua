@@ -9,7 +9,7 @@ local RxBrioUtils = require("RxBrioUtils")
 
 local RxValueBaseUtils = {}
 
-function RxValueBaseUtils.observeChildValue(parent, className, name)
+function RxValueBaseUtils.observe(parent, className, name)
 	return RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 		:Pipe({
 			RxBrioUtils.switchMap(function(child)
