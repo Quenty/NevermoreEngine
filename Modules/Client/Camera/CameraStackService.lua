@@ -79,19 +79,19 @@ end
 --- Returns the default camera
 -- @treturn SummedCamera DefaultCamera + ImpulseCamera
 function CameraStackService:GetDefaultCamera()
-	return self._defaultCamera or error()
+	return self._defaultCamera or error("No defaultCamera")
 end
 
 --- Returns the impulse camera. Useful for adding camera shake
 -- @treturn ImpulseCamera
 function CameraStackService:GetImpulseCamera()
-	return self._impulseCamera or error()
+	return self._impulseCamera or error("No impulseCamera")
 end
 
 --- Returns the default camera without any impulse cameras
 -- @treturn DefaultCamera
 function CameraStackService:GetRawDefaultCamera()
-	return self._rawDefaultCamera or error()
+	return self._rawDefaultCamera or error("No rawDefaultCamera")
 end
 
 function CameraStackService:GetTopCamera()
@@ -125,23 +125,23 @@ end
 -- @treturn[1] CustomCameraEffect
 -- @treturn[1] NewStateToUse
 function CameraStackService:GetNewStateBelow()
-	assert(self._stack, "Stack is not initialized yet")
+	local stack = assert(self._stack, "Stack is not initialized yet")
 
 	local _stateToUse = nil
 
 	return CustomCameraEffect.new(function()
-		local index = self:GetIndex(_stateToUse)
+		local index = table.find(stack, _stateToUse)
 		if index then
-			local below = self._stack[index-1]
+			local below = stack[index-1]
 			if below then
 				return below.CameraState or below
 			else
 				warn("[CameraStackService] - Could not get state below, found current state. Returning default.")
-				return self._stack[1].CameraState
+				return stack[1].CameraState
 			end
 		else
 			warn("[CameraStackService] - Could not get state, returning default")
-			return self._stack[1].CameraState
+			return stack[1].CameraState
 		end
 	end), function(newStateToUse)
 		_stateToUse = newStateToUse
@@ -153,13 +153,7 @@ end
 -- @treturn number Index of state
 -- @treturn nil If non on stack
 function CameraStackService:GetIndex(state)
-	assert(self._stack, "Stack is not initialized yet")
-
-	for index, value in pairs(self._stack) do
-		if value == state then
-			return index
-		end
-	end
+	return table.find(assert(self._stack, "Stack is not initialized yet"), state)
 end
 
 function CameraStackService:GetStack()
@@ -170,10 +164,7 @@ end
 -- @tparam CameraState state
 -- @treturn nil
 function CameraStackService:Remove(state)
-	assert(self._stack, "Stack is not initialized yet")
-
-	local index = self:GetIndex(state)
-
+	local index = table.find(assert(self._stack, "Stack is not initialized yet"), state)
 	if index then
 		table.remove(self._stack, index)
 	end
@@ -183,9 +174,7 @@ end
 -- @tparam CameraState state
 -- @treturn nil
 function CameraStackService:Add(state)
-	assert(self._stack, "Stack is not initialized yet")
-
-	table.insert(self._stack, state)
+	table.insert(assert(self._stack, "Stack is not initialized yet"), state)
 end
 
 return CameraStackService
