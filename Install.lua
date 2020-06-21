@@ -302,7 +302,7 @@ spawn(function()
 	GitHub:Install(
 		"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
 		game:GetService("ServerScriptService")
-	)
+	).Name = "Nevermore"
 	threadsCompleted[1] = true
 end)
 
