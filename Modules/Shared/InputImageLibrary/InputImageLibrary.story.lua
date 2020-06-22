@@ -7,27 +7,42 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local InputImageLibrary = require("InputImageLibrary")
 local Maid = require("Maid")
 local UIPaddingUtils = require("UIPaddingUtils")
+local UICornerUtils = require("UICornerUtils")
+local String = require("String")
 
 local XBOX = {
-	Enum.KeyCode.ButtonX;
-	Enum.KeyCode.ButtonY;
 	Enum.KeyCode.ButtonA;
 	Enum.KeyCode.ButtonB;
-	Enum.KeyCode.ButtonR1;
+	Enum.KeyCode.ButtonX;
+	Enum.KeyCode.ButtonY;
 	Enum.KeyCode.ButtonL1;
-	Enum.KeyCode.ButtonR2;
 	Enum.KeyCode.ButtonL2;
-	Enum.KeyCode.Thumbstick1;
-	Enum.KeyCode.Thumbstick2;
-	-- Enum.KeyCode.ButtonStart;
-	-- Enum.KeyCode.ButtonSelect;
+	Enum.KeyCode.ButtonR1;
+	Enum.KeyCode.ButtonR2;
+	Enum.KeyCode.Menu;
+	Enum.KeyCode.ButtonSelect;
 	Enum.KeyCode.DPadLeft;
 	Enum.KeyCode.DPadRight;
 	Enum.KeyCode.DPadUp;
 	Enum.KeyCode.DPadDown;
+	Enum.KeyCode.Thumbstick1;
+	Enum.KeyCode.Thumbstick2;
+	"DPad";
 }
 
 local KEYBOARD = {
+	Enum.KeyCode.Left;
+	Enum.KeyCode.Right;
+	Enum.KeyCode.Up;
+	Enum.KeyCode.Down;
+	Enum.KeyCode.Space;
+	Enum.KeyCode.Backspace;
+	Enum.KeyCode.LeftControl;
+	Enum.KeyCode.Tab;
+	Enum.KeyCode.Return;
+	Enum.KeyCode.Delete;
+	Enum.KeyCode.Backspace;
+
 	Enum.KeyCode.A;
 	Enum.KeyCode.B;
 	Enum.KeyCode.C;
@@ -67,18 +82,30 @@ local KEYBOARD = {
 	Enum.KeyCode.Nine;
 }
 
+local MOUSE = {
+	Enum.UserInputType.MouseButton1;
+	Enum.UserInputType.MouseButton3;
+	Enum.UserInputType.MouseWheel;
+	Enum.UserInputType.MouseButton2;
+	Enum.UserInputType.MouseMovement;
+}
+
 local function create(keyCode, theme, parent)
 	local container = Instance.new("Frame")
 	container.BorderSizePixel = 0
 	container.Size = UDim2.new(1, 0, 1, 0)
 
+	UICornerUtils.fromOffset(8, container)
+
 	local padding = UIPaddingUtils.fromUDim(UDim.new(0, 5))
 	padding.Parent = container
 
 	local phaseTextLabel = Instance.new("TextLabel")
-	phaseTextLabel.Text = ("%s"):format(keyCode.Name)
-	phaseTextLabel.TextSize = 13
-	phaseTextLabel.Font = Enum.Font.GothamSemibold
+	phaseTextLabel.Text =String.removePrefix(type(keyCode) == "string" and keyCode or keyCode.Name, "Mouse")
+	phaseTextLabel.TextSize = 20
+	phaseTextLabel.TextTruncate = Enum.TextTruncate.AtEnd
+	phaseTextLabel.Font = Enum.Font.Highway
+	phaseTextLabel.TextColor3 = Color3.new(0.1, 0.1, 0.1)
 	phaseTextLabel.Size = UDim2.new(1, 0, 0, 30)
 	phaseTextLabel.AnchorPoint = Vector2.new(0.5, 0)
 	phaseTextLabel.Position = UDim2.new(0.5, 0, 0, 0)
@@ -97,19 +124,21 @@ local function create(keyCode, theme, parent)
 end
 
 local function makeTitle(title, parent)
-	local phaseTextLabel = Instance.new("TextLabel")
-	phaseTextLabel.Text = title
-	phaseTextLabel.TextSize = 24
-	phaseTextLabel.Font = Enum.Font.GothamBlack
-	phaseTextLabel.Size = UDim2.new(1, -10, 0, 40)
-	phaseTextLabel.AnchorPoint = Vector2.new(0.5, 0)
-	phaseTextLabel.Position = UDim2.new(0.5, 0, 0, 0)
-	phaseTextLabel.TextWrapped = true
-	phaseTextLabel.BackgroundTransparency = 1
-	phaseTextLabel.LayoutOrder = 2
-	phaseTextLabel.Parent = parent
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Text = title
+	titleLabel.TextSize = 24
+	titleLabel.TextColor3 = Color3.new(0, 0, 0)
+	titleLabel.TextColor3 = Color3.new(0.1, 0.1, 0.1)
+	titleLabel.Font = Enum.Font.Highway
+	titleLabel.Size = UDim2.new(1, -10, 0, 40)
+	titleLabel.AnchorPoint = Vector2.new(0.5, 0)
+	titleLabel.Position = UDim2.new(0.5, 0, 0, 0)
+	titleLabel.TextWrapped = true
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.LayoutOrder = 2
+	titleLabel.Parent = parent
 
-	return phaseTextLabel
+	return titleLabel
 end
 
 local function makeSection(keycodes, theme, parent)
@@ -143,6 +172,7 @@ return function(target)
 	scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
 	scrollingFrame.CanvasSize = UDim2.new(1, 0, 5, 0)
 	scrollingFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+	scrollingFrame.BackgroundTransparency = 0
 	scrollingFrame.BorderSizePixel = 0
 	maid:GiveTask(scrollingFrame)
 
@@ -157,6 +187,12 @@ return function(target)
 		layoutOrder = layoutOrder + 1
 		item.LayoutOrder = layoutOrder
 	end
+
+	add(makeTitle("Mouse Light", scrollingFrame))
+	add(makeSection(MOUSE, "Light", scrollingFrame))
+
+	add(makeTitle("Mouse Dark", scrollingFrame))
+	add(makeSection(MOUSE, "Dark", scrollingFrame))
 
 	add(makeTitle("XBox Dark", scrollingFrame))
 	add(makeSection(XBOX, "Dark", scrollingFrame))
