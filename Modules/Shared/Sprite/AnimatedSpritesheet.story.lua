@@ -7,6 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local AnimatedSpritesheet = require("AnimatedSpritesheet")
 local AnimatedSpritesheetPlayer = require("AnimatedSpritesheetPlayer")
 local Maid = require("Maid")
+local UICornerUtils = require("UICornerUtils")
 
 local function makeLabel(maid, sheet, target)
 	local size = sheet:GetSpriteSize()
@@ -17,6 +18,8 @@ local function makeLabel(maid, sheet, target)
 	imageLabel.Size = UDim2.fromOffset(size.x, size.y)
 	imageLabel.BorderSizePixel = 0
 	maid:GiveTask(imageLabel)
+
+	UICornerUtils.fromOffset(8, imageLabel)
 
 	local player = AnimatedSpritesheetPlayer.new(imageLabel, sheet)
 	maid:GiveTask(player)

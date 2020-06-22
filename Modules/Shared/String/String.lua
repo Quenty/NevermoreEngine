@@ -73,8 +73,16 @@ function String.elipseLimit(str, characterLimit)
 	return str
 end
 
+function String.removePrefix(str, prefix)
+	if str:sub(1, #prefix) == prefix then
+		return str:sub(#prefix + 1)
+	else
+		return str
+	end
+end
+
 function String.removePostfix(str, postfix)
-	if str:sub(-#(postfix)) == postfix then
+	if str:sub(-#postfix) == postfix then
 		return str:sub(1, -#(postfix) - 1)
 	else
 		return str
