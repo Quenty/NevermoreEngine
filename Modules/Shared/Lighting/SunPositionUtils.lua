@@ -19,7 +19,7 @@ end
 
 function SunPositionUtils.getDirection(azimuthRad, altitudeRad, north)
 	local cframe = (CFrame.Angles(0, azimuthRad, 0) * CFrame.Angles(altitudeRad, 0, 0))
-	return cframe:vectorToWorldSpace(NORTH)
+	return cframe:vectorToWorldSpace(north or NORTH)
 end
 
 return SunPositionUtils
