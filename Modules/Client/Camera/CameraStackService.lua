@@ -6,7 +6,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local VRService = game:GetService("VRService")
 local HttpService = game:GetService("HttpService")
 
 local CustomCameraEffect = require("CustomCameraEffect")
@@ -43,7 +42,7 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 	RunService:BindToRenderStep("CameraStackUpdateInternal", Enum.RenderPriority.Camera.Value + 75, function()
 		debug.profilebegin("CameraStackUpdate")
 
-		if VRService.VREnabled or next(self._disabledSet) then
+		if next(self._disabledSet) then
 			return
 		end
 
