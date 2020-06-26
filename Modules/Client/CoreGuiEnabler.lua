@@ -10,6 +10,7 @@ local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 
 local CharacterUtils = require("CharacterUtils")
+local Maid = require("Maid")
 
 local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
@@ -17,6 +18,8 @@ CoreGuiEnabler.ClassName = "CoreGuiEnabler"
 
 function CoreGuiEnabler.new()
 	local self = setmetatable({}, CoreGuiEnabler)
+
+	self._maid = Maid.new()
 
 	self._states = {}
 
@@ -42,7 +45,14 @@ function CoreGuiEnabler.new()
 	end)
 
 	self:AddState("MouseIconEnabled", function(isEnabled)
-		UserInputService.MouseIconEnabled = isEnabled
+		if isEnabled then
+			UserInputService.MouseIconEnabled = isEnabled
+		else
+			UserInputService.MouseIconEnabled = false
+			self._maid:GiveTask(UserInputService:GetPropertyChangedSignal("MouseIconEnabled"):Connect(function()
+				UserInputService.MouseIconEnabled = false
+			end))
+		end
 	end)
 
 	return self
