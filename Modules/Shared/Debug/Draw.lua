@@ -300,6 +300,10 @@ function Draw.vector(position, direction, color)
 end
 
 function Draw.getDefaultParent()
+	if not RunService:IsRunning() then
+		return Workspace.CurrentCamera
+	end
+
 	return RunService:IsServer() and Workspace or Workspace.CurrentCamera
 end
 
