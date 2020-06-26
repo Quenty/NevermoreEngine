@@ -11,6 +11,7 @@ local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreWriter = require("DataStoreWriter")
 local Promise = require("Promise")
 local Table = require("Table")
+local Signal = require("Signal")
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -27,6 +28,16 @@ function DataStoreStage.new(loadName, loadParent)
 	self._stores = {} -- [name] = dataSubStore
 
 	return self
+end
+
+function DataStoreStage:GetTopLevelDataStoredSignal()
+	if self._topLevelStoreSignal then
+		return self._topLevelStoreSignal
+	end
+
+	self._topLevelStoreSignal = Signal.new()
+	self._maid:GiveTask(self._topLevelStoreSignal)
+	return self._topLevelStoreSignal
 end
 
 function DataStoreStage:Load(name, defaultValue)
@@ -79,7 +90,7 @@ function DataStoreStage:Delete(name)
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
 	end
 
-	self:_doStore(name, nil)
+	self:_doStore(name, DataStoreDeleteToken)
 end
 
 function DataStoreStage:Store(name, value)
@@ -179,6 +190,9 @@ function DataStoreStage:_doStore(name, value)
 	end
 
 	self._dataToSave[name] = newValue
+	if self._topLevelStoreSignal then
+		self._topLevelStoreSignal:Fire()
+	end
 end
 
 
