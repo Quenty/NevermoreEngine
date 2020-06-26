@@ -16,7 +16,12 @@ function CFrameUtils.lookAt(position, target, upVector)
 end
 
 function CFrameUtils.fromUpRight(position, upVector, rightVector)
-    local forwardVector = rightVector:Cross(upVector).Unit
+    local forwardVector = rightVector:Cross(upVector)
+    if forwardVector.magnitude == 0 then
+		return nil
+    end
+
+    forwardVector = forwardVector.Unit
     local rightVector2 = forwardVector:Cross(upVector)
 
     return CFrame.fromMatrix(position, rightVector2, upVector)
