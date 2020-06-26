@@ -13,8 +13,7 @@ local function throttle(timeoutInSeconds, func, throttleConfig)
 	assert(type(timeoutInSeconds) == "number")
 	assert(type(func) == "function")
 
-	local throttled = ThrottledFunction.new(timeoutInSeconds, func)
-	throttled:ConfigureOrError(throttleConfig)
+	local throttled = ThrottledFunction.new(timeoutInSeconds, func, throttleConfig)
 
 	return function(...)
 		throttled:Call(...)

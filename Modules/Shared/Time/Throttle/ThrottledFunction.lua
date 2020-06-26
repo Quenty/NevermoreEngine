@@ -8,92 +8,89 @@ ThrottledFunction.__index = ThrottledFunction
 function ThrottledFunction.new(timeoutInSeconds, func, config)
 	local self = setmetatable({}, ThrottledFunction)
 
-	self._nextCallPoint = 0
+	self._nextCallTimeStamp = 0
 	self._timeout = timeoutInSeconds or error("No timeoutInSeconds")
 	self._func = func or error("No func")
 
-	self._lastArgs = nil
-	self._lastArgsN = nil
+	self._trailingValue = nil
 
-	self._callLeadingEnabled = true
-	self._callTrailingEnabled = true
+	self._callLeading = true
+	self._callTrailing = true
+
+	self:_configureOrError(config)
 
 	return self
 end
 
-function ThrottledFunction:ConfigureOrError(throttleConfig)
-	if type(throttleConfig) == "table" then
-		if type(throttleConfig.leading) == "boolean" then
-			self:SetLeadingEnabled(throttleConfig.leading)
-		elseif throttleConfig.leading ~= nil then
-			error("Bad throttleConfigleading value")
-		end
-
-		if type(throttleConfig.trailing) == "boolean" then
-			self:SetTrailingEnabled(throttleConfig.trailing)
-		elseif throttleConfig.trailing ~= nil then
-			error("Bad throttleConfig.trailing value")
-		end
-	elseif throttleConfig ~= nil then
-		error("Bad throttleConfig")
-	end
-end
-
-function ThrottledFunction:SetLeadingEnabled(leadingEnabled)
-	assert(type(leadingEnabled) == "boolean")
-	self._callLeadingEnabled = leadingEnabled
-end
-
-function ThrottledFunction:SetTrailingEnabled(trailingEnabled)
-	assert(type(trailingEnabled) == "boolean")
-	self._callTrailingEnabled = trailingEnabled
-end
-
 function ThrottledFunction:Call(...)
-	if self._nextCallPoint <= tick() and (not self._lastArgs) then
-		-- Call leading
-		self._nextCallPoint = tick() + self._timeout
-		if self._callLeadingEnabled then
+	if self._trailingValue then
+		-- Update the next value to be dispatched
+		self._trailingValue = table.pack(...)
+	elseif tick() >= self._nextCallTimeStamp then
+		if self._callLeading then
+			-- Dispatch immediately
+			self._nextCallTimeStamp = tick() + self._timeout
 			self._func(...)
+		elseif self._callTrailing then
+			-- Schedule for trailing at exactly timeout
+			self._trailingValue = table.pack(...)
+			delay(self._timeout, function()
+				if self.Destroy then
+					self:_dispatch()
+				end
+			end)
+		else
+			error("[ThrottledFunction.Cleanup] - Trailing and leading are both disabled")
 		end
-		return
-	end
-
-	-- We need to defer calling...
-	local prevLastArgs = self._lastArgs
-
-	self._lastArgs = {...}
-	self._lastArgsN = select("#", ...)
-
-	if not prevLastArgs then
-		-- Call trailing
-		delay(self._nextCallPoint - tick(), function()
-			self:_executeThrottled()
+	else
+		-- As long as either leading or trailing are set to true, we are good
+		local remainingTime = tick() - self._nextCallTimeStamp
+		self._trailingValue = table.pack(...)
+		delay(remainingTime, function()
+			if self.Destroy then
+				self:_dispatch()
+			end
 		end)
 	end
 end
 
-function ThrottledFunction:_executeThrottled()
-	local args, n = self._lastArgs, self._lastArgsN
-	self._lastArgs = nil
-	self._lastArgsN = nil
-	self._nextCallPoint = tick() + self._timeout
-	if not args then
+function ThrottledFunction:_dispatch()
+	self._nextCallTimeStamp = tick() + self._timeout
+
+	local trailingValue = self._trailingValue
+	if trailingValue then
+		-- Clear before call so we are in valid state!
+		self._trailingValue = nil
+		self._func(unpack(trailingValue, 1, trailingValue.n))
+	end
+end
+
+function ThrottledFunction:_configureOrError(throttleConfig)
+	if throttleConfig == nil then
 		return
 	end
 
-	if self._callTrailingEnabled then
-		self._func(unpack(args, 1, n))
-	end
-end
+	assert(type(throttleConfig) == "table")
 
-function ThrottledFunction:Cancel()
-	self._lastArgs = nil
-	self._lastArgsN = nil
+	for key, value in pairs(throttleConfig) do
+		assert(type(value) == "boolean")
+
+		if key == "leading" then
+			self._callLeading = value
+		elseif key == "trailing" then
+			self._callTrailing = value
+		else
+			error(("Bad key %q in config"):format(tostring(key)))
+		end
+	end
+
+	assert(self._callLeading or self._callTrailing, "Cannot configure both leading and trailing disabled")
 end
 
 function ThrottledFunction:Destroy()
-	self:Cancel()
+	self._trailingValue = nil
+	self._func = nil
+	setmetatable(self, nil)
 end
 
 return ThrottledFunction

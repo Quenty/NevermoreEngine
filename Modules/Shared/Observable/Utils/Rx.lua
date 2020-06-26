@@ -754,6 +754,7 @@ end
 
 -- https://rxjs-dev.firebaseapp.com/api/operators/debounceTime
 -- @param throttleConfig { leading = true; trailing = true; }
+-- Note that on complete, the last item is not included, for now, unlike the existing version in rxjs.
 function Rx.throttleTime(duration, throttleConfig)
 	assert(type(duration) == "number")
 	assert(type(throttleConfig) == "table" or throttleConfig == nil)
@@ -764,8 +765,7 @@ function Rx.throttleTime(duration, throttleConfig)
 
 			local throttledFunction = ThrottledFunction.new(duration, function(...)
 				sub:Fire(...)
-			end)
-			throttledFunction:ConfigureOrError(throttleConfig)
+			end, throttleConfig)
 
 			maid:GiveTask(throttledFunction)
 			maid:GiveTask(source:Subscribe(function(...)
