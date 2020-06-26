@@ -95,4 +95,24 @@ function PromiseUtils.fromSignal(signal)
 	return promise
 end
 
+function PromiseUtils.timeout(timeoutTime, fromPromise)
+	assert(type(timeoutTime) == "number")
+	assert(fromPromise)
+
+	if not fromPromise:IsPending() then
+		return fromPromise
+	end
+
+	local promise = Promise.new()
+
+	promise:Resolve(fromPromise)
+
+	delay(timeoutTime, function()
+		promise:Reject()
+	end)
+
+	return promise
+
+end
+
 return PromiseUtils
