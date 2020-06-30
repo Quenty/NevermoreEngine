@@ -34,7 +34,7 @@ API:
 		Sets the spring speed, defaults to 1
 
 	Spring:TimeSkip(number DeltaTime)
-		Instantly skips the spring forwards by that amount of time
+		Instantly skips the spring forwards by that amount of now
 	Spring:Impulse(number/Vector3 velocity)
 		Impulses the spring, increasing velocity by the amount given
 ]]
@@ -63,14 +63,14 @@ function Spring:Impulse(velocity)
 	self.Velocity = self.Velocity + velocity
 end
 
---- Skip forwards in time
--- @param delta Time to skip forwards
+--- Skip forwards in now
+-- @param delta now to skip forwards
 function Spring:TimeSkip(delta)
-	local time = tick()
-	local position, velocity = self:_positionVelocity(time+delta)
+	local now = tick()
+	local position, velocity = self:_positionVelocity(now+delta)
 	self._position0 = position
 	self._velocity0 = velocity
-	self._time0 = time
+	self._time0 = now
 end
 
 function Spring:__index(index)
@@ -94,28 +94,28 @@ function Spring:__index(index)
 end
 
 function Spring:__newindex(index, value)
-	local time = tick()
+	local now = tick()
 
 	if index == "Value" or index == "Position" or index == "p" then
-		local _, velocity = self:_positionVelocity(time)
+		local _, velocity = self:_positionVelocity(now)
 		self._position0 = value
 		self._velocity0 = velocity
 	elseif index == "Velocity" or index == "v" then
-		local position, _ = self:_positionVelocity(time)
+		local position, _ = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = value
 	elseif index == "Target" or index == "t" then
-		local position, velocity = self:_positionVelocity(time)
+		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
 		self._target = value
 	elseif index == "Damper" or index == "d" then
-		local position, velocity = self:_positionVelocity(time)
+		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
 		self._damper = math.clamp(value, 0, 1)
 	elseif index == "Speed" or index == "s" then
-		local position, velocity = self:_positionVelocity(time)
+		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
 		self._speed = value < 0 and 0 or value
@@ -123,17 +123,17 @@ function Spring:__newindex(index, value)
 		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
 	end
 
-	self._time0 = time
+	self._time0 = now
 end
 
-function Spring:_positionVelocity(time)
+function Spring:_positionVelocity(now)
 	local p0 = self._position0
 	local v0 = self._velocity0
 	local p1 = self._target
 	local d = self._damper
 	local s = self._speed
 
-	local t = s*(time - self._time0)
+	local t = s*(now - self._time0)
 	local d2 = d*d
 
 	local h, si, co
