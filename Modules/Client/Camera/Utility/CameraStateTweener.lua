@@ -52,6 +52,10 @@ function CameraStateTweener:Hide(doNotAnimate)
 	self:SetTarget(0, doNotAnimate)
 end
 
+function CameraStateTweener:IsFinishedHiding()
+	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 0
+end
+
 function CameraStateTweener:Finish(doNotAnimate, callback)
 	self:Hide(doNotAnimate)
 
