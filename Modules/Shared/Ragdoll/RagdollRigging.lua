@@ -426,10 +426,10 @@ function RagdollRigging.disableMotors(model, rigType)
 	return motors
 end
 
-function RagdollRigging.disableParticleEmittersAndFadeOut(character, duration)
+function RagdollRigging.disableParticleEmittersAndFadeOutYielding(character, duration)
 	if RunService:IsServer() then
 		-- This causes a lot of unnecesarry replicated property changes
-		error("disableParticleEmittersAndFadeOut should not be called on the server.", 2)
+		error("disableParticleEmittersAndFadeOutYielding should not be called on the server.", 2)
 	end
 
 	local descendants = character:GetDescendants()
