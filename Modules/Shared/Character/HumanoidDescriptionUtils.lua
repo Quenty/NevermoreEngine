@@ -7,6 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Players = game:GetService("Players")
 
 local Promise = require("Promise")
+local InsertServiceUtils = require("InsertServiceUtils")
 
 local HumanoidDescriptionUtils = {}
 
@@ -45,6 +46,33 @@ function HumanoidDescriptionUtils.promiseHumanoidDescriptionFromUserId(userId)
 		assert(typeof(description) == "Instance")
 		resolve(description)
 	end)
+end
+
+function HumanoidDescriptionUtils.getAssetIdsFromString(assetString)
+	if assetString == "" then
+		return {}
+	end
+
+	local assetIds = {}
+	for _, assetIdStr in pairs(string.split(assetString, ",")) do
+		local num = tonumber(assetIdStr)
+		if num then
+			table.insert(assetIds, num)
+		elseif assetIdStr ~= "" then
+			warn(("[HumanoidDescriptionUtils/getAssetIdsFromString] - Failed to convert %q to assetId")
+				:format(assetIdStr))
+		end
+	end
+
+	return assetIds
+end
+
+function HumanoidDescriptionUtils.getAssetPromisesFromString(assetString)
+	local promises = {}
+	for _, assetId in pairs(HumanoidDescriptionUtils.getAssetIdsFromString(assetString)) do
+		table.insert(promises, InsertServiceUtils.promiseAsset(assetId))
+	end
+	return promises
 end
 
 return HumanoidDescriptionUtils
