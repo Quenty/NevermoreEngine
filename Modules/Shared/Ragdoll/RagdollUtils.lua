@@ -10,9 +10,9 @@ local RagdollUtils = {}
 local EMPTY_FUNCTION = function() end
 
 function RagdollUtils.setupState(humanoid)
-	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-
 	local maid = Maid.new()
+
+	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 
 	maid:GiveTask(function()
 		maid:DoCleaning() -- GC other events
