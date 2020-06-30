@@ -1,6 +1,6 @@
 --- Reimplementation of Player:GetUserThumbnailAsync but as a promise with
 --  retry logic
--- @module PlayerThumbnails
+-- @module PlayerThumbnailUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -8,21 +8,14 @@ local Players = game:GetService("Players")
 
 local Promise = require("Promise")
 
-local PlayerThumbnails = {}
-PlayerThumbnails.ThumbnailPollerName = "PlayerThumbnails"
-PlayerThumbnails.__index = PlayerThumbnails
-PlayerThumbnails.MAX_TRIES = 5
+local MAX_TRIES = 5
 
-function PlayerThumbnails.new()
-	local self = setmetatable({}, PlayerThumbnails)
+local PlayerThumbnailUtils = {}
 
-	return self
-end
-
-function PlayerThumbnails:GetUserThumbnail(userId, thumbnailType, thumbnailSize)
-	assert(userId)
-	assert(thumbnailType)
-	assert(thumbnailSize)
+function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbnailSize)
+	assert(type(userId) == "number")
+	thumbnailType = thumbnailType or Enum.ThumbnailType.HeadShot
+	thumbnailSize = thumbnailSize or Enum.ThumbnailSize.Size100x100
 
 	local promise
 	promise = Promise.spawn(function(resolve, reject)
@@ -44,12 +37,11 @@ function PlayerThumbnails:GetUserThumbnail(userId, thumbnailType, thumbnailSize)
 			else
 				wait(0.05)
 			end
-		until tries >= self.MAX_TRIES or (not promise:IsPending())
+		until tries >= MAX_TRIES or (not promise:IsPending())
 		reject()
 	end)
 
 	return promise
 end
 
-
-return PlayerThumbnails.new()
+return PlayerThumbnailUtils
