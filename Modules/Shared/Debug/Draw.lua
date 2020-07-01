@@ -104,8 +104,6 @@ function Draw.text(adornee, text, color)
 end
 
 function Draw._textOnAdornee(adornee, text, color)
-	text = tostring(text)
-
 	local TEXT_HEIGHT_STUDS = 2
 	local PADDING_PERCENT_OF_LINE_HEIGHT = 0.5
 
@@ -131,12 +129,17 @@ function Draw._textOnAdornee(adornee, text, color)
 	textLabel.Text = tostring(text)
 	textLabel.TextScaled = true
 	textLabel.TextSize = 32
-	textLabel.Font = Enum.Font.GothamSemibold
 	textLabel.BackgroundTransparency = 1
 	textLabel.BorderSizePixel = 0
 	textLabel.TextColor3 = Color3.new(1, 1, 1)
 	textLabel.Size = UDim2.new(1, 0, 1, 0)
 	textLabel.Parent = background
+
+	if tonumber(text) then
+		textLabel.Font = Enum.Font.Code
+	else
+		textLabel.Font = Enum.Font.GothamSemibold
+	end
 
 	local textSize = TextService:GetTextSize(
 		textLabel.Text,
@@ -161,6 +164,10 @@ function Draw._textOnAdornee(adornee, text, color)
 	uiPadding.PaddingLeft = UDim.new(paddingOffset/paddedWidth, 0)
 	uiPadding.PaddingRight = UDim.new(paddingOffset/paddedWidth, 0)
 	uiPadding.Parent = background
+
+	local uiCorner = Instance.new("UICorner")
+	uiCorner.CornerRadius = UDim.new(paddingOffset/paddedHeight/2, 0)
+	uiCorner.Parent = background
 
 	local height = lines*TEXT_HEIGHT_STUDS * TEXT_HEIGHT_STUDS*PADDING_PERCENT_OF_LINE_HEIGHT
 
