@@ -18,6 +18,14 @@ function UIPaddingUtils.getTotalPadding(uiPadding)
 		uiPadding.PaddingBottom + uiPadding.PaddingTop)
 end
 
+function UIPaddingUtils.getTotalAbsolutePadding(uiPadding, absoluteSize)
+	local padding = UIPaddingUtils.getTotalPadding(uiPadding)
+	return Vector2.new(
+		padding.X.Offset + padding.X.Scale*absoluteSize.x,
+		padding.Y.Offset + padding.Y.Scale*absoluteSize.Y
+	)
+end
+
 function UIPaddingUtils.getHorizontalPadding(uiPadding)
 	return uiPadding.PaddingLeft + uiPadding.PaddingRight
 end
