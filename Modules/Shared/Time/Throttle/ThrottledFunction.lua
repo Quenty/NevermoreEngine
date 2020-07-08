@@ -26,7 +26,7 @@ function ThrottledFunction:Call(...)
 	if self._trailingValue then
 		-- Update the next value to be dispatched
 		self._trailingValue = table.pack(...)
-	elseif tick() >= self._nextCallTimeStamp then
+	elseif self._nextCallTimeStamp <= tick() then
 		if self._callLeading then
 			-- Dispatch immediately
 			self._nextCallTimeStamp = tick() + self._timeout
@@ -42,10 +42,11 @@ function ThrottledFunction:Call(...)
 		else
 			error("[ThrottledFunction.Cleanup] - Trailing and leading are both disabled")
 		end
-	else
+	elseif self._callLeading or self._callTrailing then
 		-- As long as either leading or trailing are set to true, we are good
-		local remainingTime = tick() - self._nextCallTimeStamp
+		local remainingTime = self._nextCallTimeStamp - tick()
 		self._trailingValue = table.pack(...)
+
 		delay(remainingTime, function()
 			if self.Destroy then
 				self:_dispatch()
