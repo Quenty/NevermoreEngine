@@ -139,6 +139,6 @@ and submodules willl not be loaded. Also, on the server, client/shared modules w
 ```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-require:AddModulesFromParent(ReplicatedStorage:WaitForChild("ClientModules"))
+require:AddModule(ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("SnackbarManager"))
 ```
 
