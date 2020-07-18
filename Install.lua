@@ -1,5 +1,6 @@
 -- GitHub Installer
 -- @author Validark
+-- @source https://gist.github.com/Validark/333c0d1d551ef6021bcc161067d4d1dd
 
 local Promise do
 	--[[
