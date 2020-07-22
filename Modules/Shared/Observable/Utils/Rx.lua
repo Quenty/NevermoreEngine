@@ -213,6 +213,30 @@ function Rx.startWith(values)
 	end
 end
 
+function Rx.defaultsToNil()
+	return function(source)
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			local fired = false
+
+			maid:GiveTask(source:Subscribe(
+				function(...)
+					fired = true
+					sub:Fire(...)
+				end,
+				sub:GetFailComplete()))
+
+			if not fired then
+				sub:Fire(nil)
+			end
+
+			return maid
+		end)
+	end
+end
+
+
 -- https://www.learnrxjs.io/learn-rxjs/operators/combination/endwith
 function Rx.endWith(values)
 	return function(source)
