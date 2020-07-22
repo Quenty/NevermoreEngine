@@ -259,6 +259,28 @@ function Rx.where(predicate)
 	end
 end
 
+-- http://reactivex.io/documentation/operators/distinct.html
+function Rx.distinct()
+	return function(source)
+		return Observable.new(function(sub)
+			local last = UNSET_VALUE
+
+			return source:Subscribe(
+				function(value)
+					-- TODO: Support tuples
+					if last == value then
+						return
+					end
+
+					last = value
+					sub:Fire(last)
+				end,
+				sub:GetFailComplete()
+			)
+		end)
+	end
+end
+
 -- https://rxjs.dev/api/operators/mapTo
 function Rx.mapTo(...)
 	local args = table.pack(...)

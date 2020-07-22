@@ -5,6 +5,8 @@
 -- Roblox's deep copy method parses to a non-lua table compatable format.
 -- @classmod Signal
 
+local ENABLE_TRACEBACK = false
+
 local Signal = {}
 Signal.__index = Signal
 Signal.ClassName = "Signal"
@@ -19,6 +21,8 @@ function Signal.new()
 	self._argData = nil
 	self._argCount = nil -- Prevent edge case of :Fire("A", nil) --> "A" instead of "A", nil
 
+	self._source = ENABLE_TRACEBACK and debug.traceback() or ""
+
 	return self
 end
 
@@ -27,6 +31,11 @@ end
 -- @param ... Variable arguments to pass to handler
 -- @treturn nil
 function Signal:Fire(...)
+	if not self._bindableEvent then
+		warn(("Signal is already destroyed. %s"):format(self._source))
+		return
+	end
+
 	self._argData = {...}
 	self._argCount = select("#", ...)
 	self._bindableEvent:Fire()
@@ -65,6 +74,8 @@ function Signal:Destroy()
 
 	self._argData = nil
 	self._argCount = nil
+
+	setmetatable(self, nil)
 end
 
 return Signal
