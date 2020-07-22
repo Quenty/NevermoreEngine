@@ -281,6 +281,7 @@ function RxBrioUtils.filter(predicate)
 	end
 end
 
+-- Flattens all the brios in the combineLatest
 function RxBrioUtils.combineLatest(observables)
 	assert(type(observables) == "table")
 
