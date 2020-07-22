@@ -43,14 +43,14 @@ end
 --- Starts the sync process with all slave clocks.
 function MasterClock:_forceSync()
 	local timeOne = self:GetTime()
-    self._remoteEvent:FireAllClients(timeOne)
+	self._remoteEvent:FireAllClients(timeOne)
 end
 
 --- Client sends back message to get the SM_Difference.
 -- @return slaveMasterDifference
 function MasterClock:_handleDelayRequest(timeThree)
-    local timeFour = self:GetTime()
-    return timeFour - timeThree -- -offset + SM Delay
+	local timeFour = self:GetTime()
+	return timeFour - timeThree -- -offset + SM Delay
 end
 
 return MasterClock

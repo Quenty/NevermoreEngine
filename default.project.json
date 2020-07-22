@@ -1,6 +1,18 @@
 {
-  "name": "Nevermore",
-  "tree": {
-    "$path": "Modules"
-  }
+	"name": "Nevermore",
+	"tree": {
+		"$className": "DataModel",
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"Nevermore": {
+				"$path": "Modules"
+			}
+		},
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"Nevermore": {
+				"$path": "loader/ReplicatedStorage/Nevermore"
+			}
+		}
+	}
 }
