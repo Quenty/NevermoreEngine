@@ -10,8 +10,8 @@ local ThrottledFunction = require("ThrottledFunction")
 -- @tparam function func
 -- @treturn function
 local function throttle(timeoutInSeconds, func, throttleConfig)
-	assert(type(timeoutInSeconds) == "number")
-	assert(type(func) == "function")
+	assert(type(timeoutInSeconds) == "number", "timeoutInSeconds is not a number")
+	assert(type(func) == "function", "func is not a function")
 
 	local throttled = ThrottledFunction.new(timeoutInSeconds, func, throttleConfig)
 

@@ -50,8 +50,6 @@ end
 
 -- TODO: Move out of this open source module
 function RagdollClient:_setupCameraShake(impulseCamera)
-	impulseCamera:Impulse(Vector3.new(5*(math.random()-0.5), 0, 0))
-
 	local head = self._obj.Parent:FindFirstChild("Head")
 	if not head then
 		return
@@ -59,11 +57,9 @@ function RagdollClient:_setupCameraShake(impulseCamera)
 
 	local lastVelocity = head.Velocity
 	self._maid:GiveTask(RunService.RenderStepped:Connect(function()
-
 		local cameraCFrame = Workspace.CurrentCamera.CFrame
 
 		local velocity = head.Velocity
-
 		local dVelocity = velocity - lastVelocity
 		if dVelocity.magnitude >= 0 then
 			impulseCamera:Impulse(cameraCFrame:vectorToObjectSpace(-0.1*cameraCFrame.lookVector:Cross(dVelocity)))

@@ -18,14 +18,14 @@ function SlaveClock.new(remoteEvent, remoteFunction)
 
 	self._remoteEvent:FireServer() -- Request server to syncronize with us
 
-    self._syncedBindable = Instance.new("BindableEvent")
-    self.SyncedEvent = self._syncedBindable.Event
+	self._syncedBindable = Instance.new("BindableEvent")
+	self.SyncedEvent = self._syncedBindable.Event
 
 	return self
 end
 
 function SlaveClock:TickToSyncedTime(syncedTime)
-    return syncedTime - self._offset
+	return syncedTime - self._offset
 end
 
 function SlaveClock:GetTime()
@@ -41,42 +41,42 @@ function SlaveClock:IsSynced()
 end
 
 function SlaveClock:_getLocalTime()
-    -- NOTE: Do not change this without changing :TickToSyncedTime
-    return tick()
+	-- NOTE: Do not change this without changing :TickToSyncedTime
+	return tick()
 end
 
 function SlaveClock:_handleSyncEventAsync(timeOne)
-    local timeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately.
-    local masterSlaveDifference = timeTwo - timeOne -- We have Offst + MS Delay
+	local timeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately.
+	local masterSlaveDifference = timeTwo - timeOne -- We have Offst + MS Delay
 
-    local timeThree = self:_getLocalTime()
-    local slaveMasterDifference = self:_sendDelayRequestAsync(timeThree)
+	local timeThree = self:_getLocalTime()
+	local slaveMasterDifference = self:_sendDelayRequestAsync(timeThree)
 
-    --[[ From explination link.
-        The result is that we have the following two equations:
-        MS_difference = offset + MS delay
-        SM_difference = ?offset + SM delay
+	--[[ From explination link.
+		The result is that we have the following two equations:
+		MS_difference = offset + MS delay
+		SM_difference = ?offset + SM delay
 
-        With two measured quantities:
-        MS_difference = 90 minutes
-        SM_difference = ?20 minutes
+		With two measured quantities:
+		MS_difference = 90 minutes
+		SM_difference = ?20 minutes
 
-        And three unknowns:
-        offset , MS delay, and SM delay
+		And three unknowns:
+		offset , MS delay, and SM delay
 
-        Rearrange the equations according to the tutorial.
-        -- Assuming this: MS delay = SM delay = one_way_delay
+		Rearrange the equations according to the tutorial.
+		-- Assuming this: MS delay = SM delay = one_way_delay
 
-        one_way_delay = (MSDelay + SMDelay) / 2
-    ]]
+		one_way_delay = (MSDelay + SMDelay) / 2
+	]]
 
-    local offset = (masterSlaveDifference - slaveMasterDifference)/2
-    local oneWayDelay = (masterSlaveDifference + slaveMasterDifference)/2
+	local offset = (masterSlaveDifference - slaveMasterDifference)/2
+	local oneWayDelay = (masterSlaveDifference + slaveMasterDifference)/2
 
-    self._offset = offset -- Estimated difference between server/client
-    self._pneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
+	self._offset = offset -- Estimated difference between server/client
+	self._pneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
 
-    self._syncedBindable:Fire()
+	self._syncedBindable:Fire()
 end
 
 function SlaveClock:_sendDelayRequestAsync(timeThree)
