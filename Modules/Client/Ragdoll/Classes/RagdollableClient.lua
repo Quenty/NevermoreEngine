@@ -66,14 +66,14 @@ end
 function RagdollableClient:_ragdollLocal()
 	local maid = Maid.new()
 
-	if self._localPlayerRemoteEvent then
-		-- Hopefully these are already created. Intent here is to reset friction.
-		RagdollRigging.createRagdollJoints(self._obj.Parent, self._obj.RigType)
+	-- Really hard to infer whether or not we're the network owner, so we just try to do this for every single one.
 
-		maid:GiveTask(RagdollUtils.setupState(self._obj))
-		maid:GiveTask(RagdollUtils.setupMotors(self._obj))
-		maid:GiveTask(RagdollUtils.setupHead(self._obj))
-	end
+	-- Hopefully these are already created. Intent here is to reset friction.
+	RagdollRigging.createRagdollJoints(self._obj.Parent, self._obj.RigType)
+
+	maid:GiveTask(RagdollUtils.setupState(self._obj))
+	maid:GiveTask(RagdollUtils.setupMotors(self._obj))
+	maid:GiveTask(RagdollUtils.setupHead(self._obj))
 
 	-- Do this after we setup motors
 	HumanoidAnimatorUtils.stopAnimations(self._obj, 0)
