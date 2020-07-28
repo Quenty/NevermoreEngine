@@ -18,6 +18,15 @@ function BoundingBoxUtils.clampPointToBoundingBox(cframe, size, point)
 	), cframe.p
 end
 
+function BoundingBoxUtils.pushPointToLieOnBoundingBox(cframe, size, point)
+	local transform = cframe:pointToObjectSpace(point) -- transform into local space
+	local halfSize = size * 0.5
+	local x = transform.x < 0 and -halfSize.x or halfSize.x
+	local y = transform.y < 0 and -halfSize.y or halfSize.y
+	local z = transform.z < 0 and -halfSize.z or halfSize.z
+	return cframe * Vector3.new(x, y, z), cframe.p
+end
+
 -- @return size, position
 function BoundingBoxUtils.getChildrenBoundingBox(parent, relativeTo)
 	local parts = {}
