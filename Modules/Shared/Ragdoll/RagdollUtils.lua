@@ -161,7 +161,7 @@ function RagdollUtils.setupHead(humanoid)
 	end
 
 	if specialMesh.MeshType ~= Enum.MeshType.Head then
-		return
+		return EMPTY_FUNCTION
 	end
 
 	local maid = Maid.new()
