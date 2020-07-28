@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 
 local SoundPromiseUtils = {}
 
@@ -28,6 +29,14 @@ function SoundPromiseUtils.promiseLoaded(sound)
 	end)
 
 	return promise
+end
+
+function SoundPromiseUtils.promiseAllSoundsLoaded(sounds)
+	local promises = {}
+	for _, sound in pairs(sounds) do
+		table.insert(promises, SoundPromiseUtils.promiseLoaded(sound))
+	end
+	return PromiseUtils.all(promises)
 end
 
 return SoundPromiseUtils

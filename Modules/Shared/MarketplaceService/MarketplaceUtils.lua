@@ -1,5 +1,5 @@
 --- Provides utility methods for MarketplaceService
--- @module MarketplaceUtil
+-- @module MarketplaceUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
@@ -7,35 +7,36 @@ local MarketplaceService = game:GetService("MarketplaceService")
 
 local Promise = require("Promise")
 
-local MarketplaceUtil = {}
+local MarketplaceUtils = {}
 
-function MarketplaceUtil.promisePlayerOwnsAsset(player, assetId)
-	assert(typeof(player) == "Instance")
+function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 	assert(type(assetId) == "number")
+	assert(typeof(infoType) == "EnumItem")
 
 	return Promise.spawn(function(resolve, reject)
-		local result
+		-- We hope this caches
+		local productInfo
 		local ok, err = pcall(function()
-			result = MarketplaceService:PlayerOwnsAsset(player, assetId)
+			productInfo = MarketplaceService:GetProductInfo(assetId, infoType)
 		end)
 		if not ok then
 			return reject(err)
 		end
-		if type(result) ~= "boolean" then
-			return reject("Bad result type")
+		if type(productInfo) ~= "table" then
+			return reject("Bad productInfo type")
 		end
-		return resolve(result)
+		return resolve(productInfo)
 	end)
 end
 
-function MarketplaceUtil.promiseUserOwnsGamePass(player, gamePassId)
-	assert(typeof(player) == "Instance")
+function MarketplaceUtils.promiseUserOwnsGamePass(userId, gamePassId)
+	assert(typeof(userId) == "number")
 	assert(type(gamePassId) == "number")
 
 	return Promise.spawn(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
-			result = MarketplaceService:UserOwnsGamePassAsync(player, gamePassId)
+			result = MarketplaceService:UserOwnsGamePassAsync(userId, gamePassId)
 		end)
 		if not ok then
 			return reject(err)
@@ -47,4 +48,4 @@ function MarketplaceUtil.promiseUserOwnsGamePass(player, gamePassId)
 	end)
 end
 
-return MarketplaceUtil
+return MarketplaceUtils

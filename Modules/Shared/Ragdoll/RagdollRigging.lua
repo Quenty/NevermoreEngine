@@ -253,6 +253,10 @@ local function createRigJoints(parts, rig)
 				if not constraint then
 					constraint = Instance.new("BallSocketConstraint")
 					constraint.Name = BALL_SOCKET_NAME
+
+					if RunService:IsClient() then
+						warn(("[RagdollRigging] - Creating BallSocketConstraint %q"))
+					end
 				end
 				constraint.Attachment0 = a0
 				constraint.Attachment1 = a1
@@ -294,6 +298,10 @@ local function createAdditionalAttachments(parts, attachments)
 					attachment.Name = attachmentName
 					attachment.CFrame = cframe
 					attachment.Parent = part
+
+					if RunService:IsClient() then
+						warn(("[RagdollRigging] - Creating attachment %q"):format(attachmentName))
+					end
 				else
 					attachment.CFrame = cframe
 				end
@@ -352,6 +360,9 @@ local function createNoCollides(parts, noCollides)
 			local constraint = table.remove(reusables)
 			if not constraint then
 				constraint = Instance.new("NoCollisionConstraint")
+				if RunService:IsClient() then
+					warn(("[RagdollRigging] - Creating NoCollisionConstraint %q"))
+				end
 			end
 			constraint.Name = NO_COLLIDE_NAME
 			constraint.Part0 = part0

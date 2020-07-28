@@ -93,6 +93,20 @@ function DataStoreStage:Delete(name)
 	self:_doStore(name, DataStoreDeleteToken)
 end
 
+function DataStoreStage:Wipe()
+	return self._loadParent:Load(self._loadName, {})
+		:Then(function(data)
+			for key, _ in pairs(data) do
+				if self._stores[key] then
+					self._stores[key]:Wipe()
+				else
+					self:_doStore(key, DataStoreDeleteToken)
+				end
+			end
+		end)
+end
+
+
 function DataStoreStage:Store(name, value)
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))

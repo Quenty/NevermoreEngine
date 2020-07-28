@@ -14,9 +14,9 @@ function HumanoidAnimatorUtils.getOrCreateAnimator(humanoid)
 	return animator
 end
 
-function HumanoidAnimatorUtils.stopAnimations(humanoid)
+function HumanoidAnimatorUtils.stopAnimations(humanoid, fadeTime)
 	for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
-		track:Stop()
+		track:Stop(fadeTime)
 	end
 end
 

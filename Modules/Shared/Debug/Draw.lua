@@ -226,7 +226,7 @@ function Draw.cframe(cframe)
 	local model = Instance.new("Model")
 	model.Name = "DebugCFrame"
 
-	local position = cframe.p
+	local position = cframe.Position
 	Draw.point(position, nil, model, 0.1)
 
 	local xRay = Draw.ray(Ray.new(

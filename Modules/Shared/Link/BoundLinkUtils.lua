@@ -11,6 +11,19 @@ local BinderUtils = require("BinderUtils")
 
 local BoundLinkUtils = {}
 
+function BoundLinkUtils.getLinkClass(binder, linkName, from)
+	assert(type(binder) == "table", "Bad binder")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad froM")
+
+	local linkValue = LinkUtils.getLinkValue(linkName, from)
+	if not linkValue then
+		return nil
+	end
+
+	return binder:Get(linkValue)
+end
+
 function BoundLinkUtils.getLinkClasses(binder, linkName, from)
 	assert(type(binder) == "table", "Bad binder")
 	assert(type(linkName) == "string", "Bad linkName")

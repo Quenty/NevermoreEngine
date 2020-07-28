@@ -99,6 +99,15 @@ function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 	end)
 end
 
+function RxInstanceUtils.observeChildrenOfClassBrio(parent, className)
+	assert(typeof(parent) == "Instance")
+	assert(type(className) == "string")
+
+	return RxInstanceUtils.observeChildrenBrio(parent, function(child)
+		return child:IsA(className)
+	end)
+end
+
 function RxInstanceUtils.observeChildrenBrio(parent, predicate)
 	assert(typeof(parent) == "Instance")
 	assert(type(predicate) == "function" or predicate == nil)

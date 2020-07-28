@@ -70,6 +70,7 @@ function Binder:GetConstructor()
 	return self._constructor
 end
 
+-- Fired when added, and then after removal, but before destroy!
 function Binder:ObserveInstance(inst, callback)
 	self._listeners[inst] = self._listeners[inst] or {}
 	self._listeners[inst][callback] = true
@@ -245,6 +246,15 @@ function Binder:_remove(inst)
 	end
 
 	-- Fire off events
+	if self._classRemovingSignal then
+		self._classRemovingSignal:Fire(class, inst)
+	end
+
+	-- Clean up state
+	self._instToClass[inst] = nil
+	self._allClassSet[class] = nil
+
+	-- Fire listener here
 	local listeners = self._listeners[inst]
 	if listeners then
 		local bindable = Instance.new("BindableEvent")
@@ -260,13 +270,6 @@ function Binder:_remove(inst)
 
 		bindable:Destroy()
 	end
-	if self._classRemovingSignal then
-		self._classRemovingSignal:Fire(class, inst)
-	end
-
-	-- Clean up state
-	self._instToClass[inst] = nil
-	self._allClassSet[class] = nil
 
 	-- Destroy class
 	if class.Destroy then
