@@ -37,8 +37,8 @@ function Octree:GetAllNodes()
 end
 
 function Octree:CreateNode(position, object)
-	assert(typeof(position) == "Vector3")
-	assert(object)
+	assert(typeof(position) == "Vector3", "Bad position value")
+	assert(object, "Bad object value")
 
 	local node = OctreeNode.new(self, object)
 
