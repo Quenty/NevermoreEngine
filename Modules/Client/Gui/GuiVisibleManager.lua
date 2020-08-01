@@ -35,7 +35,14 @@ function GuiVisibleManager.new(promiseNewPane, maxHideTime)
 		self:_onPaneVisibleChanged()
 	end))
 
+	self.PaneVisibleChanged = self._paneVisible.Changed
+
 	return self
+end
+
+
+function GuiVisibleManager:IsVisible()
+	return self._paneVisible.Value
 end
 
 function GuiVisibleManager:BindToBoolValue(boolValue)
@@ -111,16 +118,17 @@ end
 
 function GuiVisibleManager:_handleNewPane(maid, pane)
 	assert(pane.SetVisible)
-	assert(pane.SetPreferredTheme)
 	assert(self._maid._paneMaid == maid)
 
 	maid:GiveTask(pane)
 
-	-- Theming
-	pane:SetPreferredTheme(self._theme.Value)
-	maid:GiveTask(self._theme.Changed:Connect(function()
+	if pane.SetPreferredTheme then
+		-- Theming
 		pane:SetPreferredTheme(self._theme.Value)
-	end))
+		maid:GiveTask(self._theme.Changed:Connect(function()
+			pane:SetPreferredTheme(self._theme.Value)
+		end))
+	end
 
 	local function updateVisible()
 		if self._paneVisible.Value then
