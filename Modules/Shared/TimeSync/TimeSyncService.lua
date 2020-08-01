@@ -23,27 +23,41 @@ function TimeSyncService:Init()
 
 	self._clockPromise = Promise.new()
 
-	if RunService:IsServer() then
+	if not RunService:IsRunning() then
+		error("Cannot initialize in test mode")
+	elseif RunService:IsServer() then
 		self._clockPromise:Resolve(self:_buildMasterClock())
-	end
-
-	if RunService:IsClient() then
+	elseif RunService:IsClient() then
 		-- This also handles play solo edgecase where
 		self._clockPromise:Resolve(self:_promiseSlaveClock())
+	else
+		error("Bad RunService state")
 	end
 end
 
 function TimeSyncService:IsSynced()
+	if not RunService:IsRunning() then
+		return true
+	end
+
 	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return self._clockPromise:IsFulfilled()
 end
 
 function TimeSyncService:WaitForSyncedClock()
+	if not RunService:IsRunning() then
+		return self:_buildMockClock()
+	end
+
 	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return self._clockPromise:Wait()
 end
 
 function TimeSyncService:GetSyncedClock()
+	if not RunService:IsRunning() then
+		return self:_buildMockClock()
+	end
+
 	assert(self._clockPromise, "TimeSyncService is not initialized")
 	if self._clockPromise:IsFulfilled() then
 		return self._clockPromise:Wait()
@@ -53,8 +67,26 @@ function TimeSyncService:GetSyncedClock()
 end
 
 function TimeSyncService:PromiseSyncedClock()
+	if not RunService:IsRunning() then
+		return Promise.resolved(self:_buildMockClock())
+	end
+
 	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return Promise.resolved(self._clockPromise)
+end
+
+function TimeSyncService:_buildMockClock()
+	local mock = {}
+
+	function mock.IsSynced(_self)
+		return true
+	end
+
+	function mock.GetTime(_self)
+		return tick()
+	end
+
+	return mock
 end
 
 function TimeSyncService:_buildMasterClock()
