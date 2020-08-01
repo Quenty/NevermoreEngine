@@ -18,9 +18,7 @@ function HumanoidTeleportUtils.identifySafePosition(position, raycaster)
 		raycaster = Raycaster.new()
 		raycaster.MaxCasts = 10
 		raycaster.Filter = function(hitData)
-			if not hitData.Part.CanCollide then
-				return false
-			end
+			return not hitData.Part.CanCollide
 		end
 	end
 
