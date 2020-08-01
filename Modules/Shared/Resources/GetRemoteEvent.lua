@@ -8,7 +8,14 @@ local RunService = game:GetService("RunService")
 
 local ResourceConstants = require("ResourceConstants")
 
-if RunService:IsServer() then
+if not RunService:IsRunning() then
+	return function(name)
+		local event = Instance.new("RemoteEvent")
+		event.Name = "Mock" .. name
+
+		return event
+	end
+elseif RunService:IsServer() then
 	return function(name)
 		assert(type(name) == "string")
 

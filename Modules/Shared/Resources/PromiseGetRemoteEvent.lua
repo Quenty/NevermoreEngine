@@ -10,7 +10,12 @@ local GetRemoteEvent = require("GetRemoteEvent")
 local Promise = require("Promise")
 local ResourceConstants = require("ResourceConstants")
 
-if RunService:IsServer() then
+if not RunService:IsRunning() then
+	-- Handle testing
+	return function(name)
+		return Promise.resolved(GetRemoteEvent(name))
+	end
+elseif RunService:IsServer() then
 	return function(name)
 		return Promise.resolved(GetRemoteEvent(name))
 	end
