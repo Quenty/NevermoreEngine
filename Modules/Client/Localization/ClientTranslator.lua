@@ -126,7 +126,14 @@ function ClientTranslatorFacade:_formatByKeyTestMode(key, ...)
 
 	local data = {...}
 
-	local localizationTable = JsonToLocalizationTable.loadFolder(i18n)
+	local localizationTable
+	if self._localizationTable then
+		-- Cache localizaiton table, because it can take 10-20ms to load.
+		localizationTable = self._localizationTable
+	else
+		localizationTable = JsonToLocalizationTable.loadFolder(i18n)
+		self._localizationTable = localizationTable
+	end
 
 	-- Can't read LocalizationService.ForcePlayModeRobloxLocaleId :(
 	local translator = localizationTable:GetTranslator("en")
