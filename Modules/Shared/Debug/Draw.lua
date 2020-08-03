@@ -302,8 +302,8 @@ function Draw.terrainCell(position, color)
 	return part
 end
 
-function Draw.vector(position, direction, color)
-	return Draw.ray(Ray.new(position, direction), color)
+function Draw.vector(position, direction, color, parent, meshDiameter)
+	return Draw.ray(Ray.new(position, direction), color, parent, meshDiameter)
 end
 
 function Draw.getDefaultParent()
