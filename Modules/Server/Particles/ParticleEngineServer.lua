@@ -6,11 +6,12 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Players = game:GetService("Players")
 
 local GetRemoteEvent = require("GetRemoteEvent")
+local ParticleEngineConstants = require("ParticleEngineConstants")
 
 local ParticleEngineServer = {}
 
 function ParticleEngineServer:Init()
-	self._remoteEvent = GetRemoteEvent("ParticleEventDistributor")
+	self._remoteEvent = GetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME)
 
 	self._remoteEvent.OnServerEvent:Connect(function(player, particle)
 		self:_replicate(player, particle)
