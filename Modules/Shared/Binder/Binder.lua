@@ -205,7 +205,7 @@ function Binder:_add(inst)
 	self._pendingInstSet[inst] = nil
 
 	if not (type(class) == "table" and type(class.Destroy) == "function") then
-		warn("[Binder._add] - Bad class constructed")
+		warn(("[Binder._add] - Bad class constructed for tag %q"):format(self._tagName))
 		return
 	end
 
