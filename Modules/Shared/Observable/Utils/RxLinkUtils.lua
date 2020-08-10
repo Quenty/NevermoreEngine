@@ -13,7 +13,7 @@ local RxBrioUtils = require("RxBrioUtils")
 
 local RxLinkUtils = {}
 
--- Emits valid links
+-- Emits valid links in format Brio.new(link, linkValue)
 function RxLinkUtils.observeValidLinksBrio(linkName, parent)
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(parent) == "Instance", "Bad parent")
