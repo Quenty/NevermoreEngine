@@ -121,6 +121,15 @@ function AdorneeUtils.getPartPosition(adornee)
 	return part.Position
 end
 
+function AdorneeUtils.getPartVelocity(adornee)
+	local part = AdorneeUtils.getPart(adornee)
+	if not part then
+		return nil
+	end
+
+	return part.Velocity
+end
+
 function AdorneeUtils.getPart(adornee)
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
