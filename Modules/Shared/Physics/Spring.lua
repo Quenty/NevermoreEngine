@@ -44,11 +44,12 @@ local Spring = {}
 
 --- Creates a new spring
 -- @param initial A number or Vector3 (anything with * number and addition/subtraction defined)
-function Spring.new(initial)
+function Spring.new(initial, clock)
 	local target = initial or 0
-
+	clock = clock or tick
 	return setmetatable({
-		_time0 = tick();
+		_clock = clock;
+		_time0 = clock();
 		_position0 = target;
 		_velocity0 = 0*target;
 		_target = target;
@@ -66,7 +67,7 @@ end
 --- Skip forwards in now
 -- @param delta now to skip forwards
 function Spring:TimeSkip(delta)
-	local now = tick()
+	local now = self._clock()
 	local position, velocity = self:_positionVelocity(now+delta)
 	self._position0 = position
 	self._velocity0 = velocity
@@ -77,10 +78,10 @@ function Spring:__index(index)
 	if Spring[index] then
 		return Spring[index]
 	elseif index == "Value" or index == "Position" or index == "p" then
-		local position, _ = self:_positionVelocity(tick())
+		local position, _ = self:_positionVelocity(self._clock())
 		return position
 	elseif index == "Velocity" or index == "v" then
-		local _, velocity = self:_positionVelocity(tick())
+		local _, velocity = self:_positionVelocity(self._clock())
 		return velocity
 	elseif index == "Target" or index == "t" then
 		return self._target
@@ -88,42 +89,53 @@ function Spring:__index(index)
 		return self._damper
 	elseif index == "Speed" or index == "s" then
 		return self._speed
+	elseif index == "Clock" then
+		return self._clock
 	else
 		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
 	end
 end
 
 function Spring:__newindex(index, value)
-	local now = tick()
+	local now = self._clock()
 
 	if index == "Value" or index == "Position" or index == "p" then
 		local _, velocity = self:_positionVelocity(now)
 		self._position0 = value
 		self._velocity0 = velocity
+		self._time0 = now
 	elseif index == "Velocity" or index == "v" then
 		local position, _ = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = value
+		self._time0 = now
 	elseif index == "Target" or index == "t" then
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
 		self._target = value
+		self._time0 = now
 	elseif index == "Damper" or index == "d" then
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
 		self._damper = math.clamp(value, 0, 1)
+		self._time0 = now
 	elseif index == "Speed" or index == "s" then
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
 		self._speed = value < 0 and 0 or value
+		self._time0 = now
+	elseif index == "Clock" then
+		local position, velocity = self:_positionVelocity(now)
+		self._position0 = position
+		self._velocity0 = velocity
+		self._clock = value
+		self._time0 = value()
 	else
 		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
 	end
-
-	self._time0 = now
 end
 
 function Spring:_positionVelocity(now)
