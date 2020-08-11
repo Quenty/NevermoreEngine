@@ -80,6 +80,10 @@ function GuiVisibleManager:CreateShowHandle()
 
 	return {
 		Destroy = function()
+			if not self.Destroy then
+				return
+			end
+
 			if self._showHandles[key] then
 				self._showHandles[key] = nil
 				self:_updatePaneVisible()
