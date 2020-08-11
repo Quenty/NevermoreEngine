@@ -101,6 +101,7 @@ end
 
 --- Cleans up all tasks.
 -- @alias Destroy
+-- @alias doCleaning
 function Maid:DoCleaning()
 	local tasks = self._tasks
 
@@ -132,15 +133,19 @@ end
 -- @alias destroy
 Maid.Destroy = Maid.DoCleaning
 
---- Alias for Destroy
+--- Alias for Destroy()
 -- @function destroy
 Maid.destroy = Maid.Destroy
 
---- Alias for GiveTask
+-- Alias for DoCleaning()
+-- @function doCleaning
+Maid.doCleaning = Maid.DoCleaning
+
+--- Alias for GiveTask()
 -- @function giveTask
 Maid.giveTask = Maid.GiveTask
 
---- Alias for GivePromise
+--- Alias for GivePromise()
 -- @function givePromise
 Maid.givePromise = Maid.GivePromise
 
