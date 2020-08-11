@@ -66,6 +66,7 @@ end
 --- Same as indexing, but uses an incremented number as a key.
 -- @param task An item to clean
 -- @treturn number taskId
+-- @alias giveTask
 function Maid:GiveTask(task)
 	if not task then
 		error("Task cannot be false or nil", 2)
@@ -81,6 +82,7 @@ function Maid:GiveTask(task)
 	return taskId
 end
 
+-- @alias givePromise
 function Maid:GivePromise(promise)
 	if not promise:IsPending() then
 		return promise
@@ -127,6 +129,19 @@ end
 
 --- Alias for DoCleaning()
 -- @function Destroy
+-- @alias destroy
 Maid.Destroy = Maid.DoCleaning
+
+--- Alias for Destroy
+-- @function destroy
+Maid.destroy = Maid.Destroy
+
+--- Alias for GiveTask
+-- @function giveTask
+Maid.giveTask = Maid.GiveTask
+
+--- Alias for GivePromise
+-- @function givePromise
+Maid.givePromise = Maid.GivePromise
 
 return Maid

@@ -15,7 +15,7 @@ TemplateProvider.__index = TemplateProvider
 function TemplateProvider.new(parent)
 	local self = setmetatable({}, TemplateProvider)
 
-	assert(typeof(parent) == "Instance")
+	assert(typeof(parent) == "Instance" or type(parent) == "function")
 
 	self._parent = parent or error("No parent")
 
@@ -24,7 +24,17 @@ end
 
 function TemplateProvider:Init()
 	self._registry = {}
-	self:_processFolder(self._parent)
+
+	if typeof(self._parent) == "Instance" then
+		self._container = self._parent
+		self:_processFolder(self._parent)
+	elseif type(self._parent) == "function" then
+		self._container = self._parent()
+		assert(typeof(self._container) == "Instance")
+		self:_processFolder(self._container)
+	else
+		error("Bad self._parent")
+	end
 end
 
 function TemplateProvider:IsAvailable(templateName)
@@ -38,6 +48,17 @@ function TemplateProvider:Get(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
 
 	return self._registry[templateName]
+end
+
+function TemplateProvider:GetAll()
+	self:_verifyInit()
+
+	local list = {}
+	for _, item in pairs(self._registry) do
+		table.insert(list, item)
+	end
+
+	return list
 end
 
 function TemplateProvider:Clone(templateName)
@@ -54,7 +75,9 @@ function TemplateProvider:Clone(templateName)
 end
 
 function TemplateProvider:GetContainer()
-	return self._parent
+	self:_verifyInit()
+
+	return self._container
 end
 
 function TemplateProvider:_verifyInit()
