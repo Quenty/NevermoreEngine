@@ -27,4 +27,13 @@ function CFrameUtils.fromUpRight(position, upVector, rightVector)
     return CFrame.fromMatrix(position, rightVector2, upVector)
 end
 
+function CFrameUtils.scalePosition(cframe, scale)
+    if scale == 1 then
+        return cframe
+    else
+        local position = cframe.p
+        return cframe - position + position*scale
+    end
+end
+
 return CFrameUtils

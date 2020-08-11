@@ -7,14 +7,8 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 
-local GetRemoteEvent = require("GetRemoteEvent")
-
-local sin = math.sin
-local sqrt = math.sqrt
-local atan2 = math.atan2
-local v2 = Vector2.new
-local v3 = Vector3.new
-local ud2 = UDim2.new
+local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
+local ParticleEngineConstants = require("ParticleEngineConstants")
 
 local ParticleEngineClient = {}
 
@@ -33,13 +27,16 @@ local function newFrame(name)
 end
 
 function ParticleEngineClient:Init(screen)
-	self._remoteEvent = GetRemoteEvent("ParticleEventDistributor")
+	PromiseGetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME):Then(function(remoteEvent)
+		self._remoteEvent = remoteEvent
+
+		self._remoteEvent.OnClientEvent:Connect(function(...)
+			self:ParticleNew(...)
+		end)
+	end)
+
 	self._screen = screen or error("No screen")
 	self._player = Players.LocalPlayer or error("No LocalPlayer")
-
-	self._remoteEvent.OnClientEvent:Connect(function(...)
-		self:ParticleNew(...)
-	end)
 
 	self._lastUpdateTime = tick()
 	self._particleCount = 0
@@ -51,7 +48,7 @@ function ParticleEngineClient:Init(screen)
 	end
 
 	RunService.Heartbeat:Connect(function()
-		debug.profilebegin("ParticleUpdate")
+		debug.profilebegin("particleUpdate")
 		self:_update()
 		debug.profileend()
 	end)
@@ -95,8 +92,8 @@ function ParticleEngineClient:Add(p)
 
 	p.Position = p.Position or Vector3.new()
 	p.Velocity = p.Velocity or Vector3.new()
-	p.Size = p.Size or v2(0.2,0.2)
-	p.Bloom = p.Bloom or v2()
+	p.Size = p.Size or Vector2.new(0.2,0.2)
+	p.Bloom = p.Bloom or Vector2.new()
 	p.Gravity = p.Gravity or Vector3.new()
 	p.Color = p.Color or Color3.new(1,1,1)
 	p.Transparency = p.Transparency or 0.5
@@ -108,7 +105,11 @@ function ParticleEngineClient:Add(p)
 		p.Function = nil
 		p.RemoveOnCollision = p.RemoveOnCollision and true or nil
 
-		self._remoteEvent:FireServer(p)
+		if self._remoteEvent then
+			self._remoteEvent:FireServer(p)
+		else
+			warn("No self._remoteEvent")
+		end
 
 		p.Function = func
 		p.RemoveOnCollision = removeOnCollision
@@ -128,10 +129,10 @@ end
 -- @param p Position
 local function particleWind(t, p)
 	local xy,yz,zx=p.x+p.y,p.y+p.z,p.z+p.x
-	return v3(
-		(sin(yz+t*2)+sin(yz+t))/2+sin((yz+t)/10)/2,
-		(sin(zx+t*2)+sin(zx+t))/2+sin((zx+t)/10)/2,
-		(sin(xy+t*2)+sin(xy+t))/2+sin((xy+t)/10)/2
+	return Vector3.new(
+		(math.sin(yz+t*2)+math.sin(yz+t))/2+math.sin((yz+t)/10)/2,
+		(math.sin(zx+t*2)+math.sin(zx+t))/2+math.sin((zx+t)/10)/2,
+		(math.sin(xy+t*2)+math.sin(xy+t))/2+math.sin((xy+t)/10)/2
 	)
 end
 
@@ -144,7 +145,7 @@ function ParticleEngineClient:_updatePosVel(p, dt, t)
 	if p.WindResistance then
 		wind = (particleWind(t, p.Position)*self._windSpeed - p.Velocity)*p.WindResistance
 	else
-		wind = v3()
+		wind = Vector3.new()
 	end
 
 	p.Velocity = p.Velocity + (p.Gravity + wind)*dt
@@ -264,8 +265,8 @@ function ParticleEngineClient:_particleRender(cameraPosition, cameraInverse, fra
 	local preSizeY = -particle.Size.y/rp.z*self._screenSizeY/self._planeSizeY
 	local sx = -particle.Size.x/rp.z*self._screenSizeY/self._planeSizeY + b.x
 	local rppx,rppy = px-lsp.x,py-lsp.y
-	local sy = preSizeY+sqrt(rppx*rppx+rppy*rppy) + b.y
-	particle._lastScreenPosition = v2(px, py)
+	local sy = preSizeY+math.sqrt(rppx*rppx+rppy*rppy) + b.y
+	particle._lastScreenPosition = Vector2.new(px, py)
 
 	if particle.Occlusion then
 		local vec = particle.Position-cameraPosition
@@ -279,9 +280,9 @@ function ParticleEngineClient:_particleRender(cameraPosition, cameraInverse, fra
 		end
 	end
 
-	frame.Position = ud2(0, (px+lsp.x-sx)/2, 0, (py+lsp.y-sy)/2)
-	frame.Size = ud2(0, sx, 0,sy)
-	frame.Rotation = 90+atan2(rppy,rppx)*57.295779513082
+	frame.Position = UDim2.new(0, (px+lsp.x-sx)/2, 0, (py+lsp.y-sy)/2)
+	frame.Size = UDim2.new(0, sx, 0,sy)
+	frame.Rotation = 90+math.atan2(rppy,rppx)*57.295779513082
 	frame.BackgroundColor3 = particle.Color
 	frame.BackgroundTransparency = bgt+(1-bgt)*(1 - preSizeY/sy)
 

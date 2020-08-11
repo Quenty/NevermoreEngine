@@ -4,13 +4,17 @@
 
 local RandomUtils = {}
 
-function RandomUtils.choice(list)
+function RandomUtils.choice(list, random)
 	if #list == 0 then
 		return nil
 	elseif #list == 1 then
 		return list[1]
 	else
-		return list[math.random(1, #list)]
+		if random then
+			return list[random:NextInteger(1, #list)]
+		else
+			return list[math.random(1, #list)]
+		end
 	end
 end
 
