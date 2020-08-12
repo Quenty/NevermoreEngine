@@ -22,4 +22,9 @@ function SpringUtils.animating(spring, epsilon)
 	end
 end
 
+-- Add to spring position to adjust for velocity of target. May have to set clock to time().
+function SpringUtils.getVelocityAdjustment(position, velocity, dampen, speed)
+	return velocity*(2*dampen/speed)
+end
+
 return SpringUtils
