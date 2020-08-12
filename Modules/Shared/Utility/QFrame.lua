@@ -23,6 +23,10 @@ end
 
 function QFrame.fromCFrameClosestTo(cframe, closestTo)
 	local w, x, y, z = Quaternion.QuaternionFromCFrame(cframe)
+	if not w then
+		return nil
+	end
+
 	local dot = w*closestTo.w + x*closestTo.x + y*closestTo.y + z*closestTo.z
 
 	if dot < 0 then
