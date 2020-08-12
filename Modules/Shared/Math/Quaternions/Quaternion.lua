@@ -98,6 +98,8 @@ local function QuaternionFromCFrame(cf)
 			local s=sqrt(1-m00-m11+m22)
 			local recip=0.5/s
 			return (m10-m01)*recip,(m02+m20)*recip,(m21+m12)*recip,0.5*s
+		else
+			return nil,nil,nil,nil
 		end
 	end
 end
