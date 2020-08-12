@@ -17,6 +17,8 @@ PillBackingBuilder.PILL_SHADOW_SIZE = Vector2.new(256, 128)
 PillBackingBuilder.SHADOW_OFFSET_Y = UDim.new(0.05, 0)
 PillBackingBuilder.SHADOW_TRANSPARENCY = 0.85
 
+local SLICE_SCALE_DEFAULT = 1024 -- Arbitrary large number to scale against so we're always a pill
+
 function PillBackingBuilder.new(options)
 	local self = setmetatable({}, PillBackingBuilder)
 
@@ -38,6 +40,7 @@ function PillBackingBuilder:CreateSingle(gui, options)
 	pillBacking.Size = UDim2.new(1, 0, 1, 0)
 	pillBacking.ZIndex = options.ZIndex
 	pillBacking.ScaleType = Enum.ScaleType.Slice
+	pillBacking.SliceScale = SLICE_SCALE_DEFAULT
 	pillBacking.SliceCenter = Rect.new(
 		self.CIRCLE_SIZE.x/2, self.CIRCLE_SIZE.x/2, self.CIRCLE_SIZE.y/2, self.CIRCLE_SIZE.y/2)
 	pillBacking.Image = self.CIRCLE_IMAGE_ID
@@ -124,6 +127,7 @@ function PillBackingBuilder:CreateSingleShadow(gui, options)
 	end
 
 	local shadow = Instance.new("ImageLabel")
+	shadow.SliceScale = SLICE_SCALE_DEFAULT
 	shadow.AnchorPoint = Vector2.new(0.5, 0.5)
 	shadow.BackgroundTransparency = 1
 	shadow.BorderSizePixel = 0
@@ -186,6 +190,7 @@ end
 function PillBackingBuilder:CreateCircleShadow(gui, options)
 	options = self:_configureOptions(gui, options)
 	local shadow = Instance.new("ImageLabel")
+	shadow.SliceScale = SLICE_SCALE_DEFAULT
 	shadow.AnchorPoint = Vector2.new(0.5, 0.5)
 	shadow.BackgroundTransparency = 1
 	shadow.Image = self.SHADOW_IMAGE_ID
