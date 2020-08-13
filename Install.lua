@@ -1,328 +1,777 @@
--- Universal Github Installer
--- @see Validark
--- function GitHub:Install(Link, Parent)
---		@returns <Folder/LuaSourceContainer> from Link found starting at Link into Parent
+-- GitHub Installer
+-- @author Validark
+-- @source https://gist.github.com/Validark/333c0d1d551ef6021bcc161067d4d1dd
 
--- TODO: This script needs to be refactored
--- luacheck: push ignore
-
-local function GetFirstChild(Parent, Name, Class)
-	if Parent then -- GetFirstChildWithNameOfClass
-		local Objects = Parent:GetChildren()
-		for a = 1, #Objects do
-			local Object = Objects[a]
-			if Object.Name == Name and Object.ClassName == Class then
-				return Object
+local Promise do
+	--[[
+		An implementation of Promises similar to Promise/A+.
+		Forked from LPGhatguy/roblox-lua-promise, modified for roblox-ts.
+	]]
+	
+	local PROMISE_DEBUG = false
+	
+	--[[
+		Packs a number of arguments into a table and returns its length.
+	
+		Used to cajole varargs without dropping sparse values.
+	]]
+	local function pack(...)
+		local len = select("#", ...)
+	
+		return len, { ... }
+	end
+	
+	--[[
+		wpcallPacked is a version of xpcall that:
+		* Returns the length of the result first
+		* Returns the result packed into a table
+		* Passes extra arguments through to the passed function; xpcall doesn't
+		* Issues a warning if PROMISE_DEBUG is enabled
+	]]
+	local function wpcallPacked(f, ...)
+		local argsLength, args = pack(...)
+	
+		local body = function()
+			return f(unpack(args, 1, argsLength))
+		end
+	
+		local resultLength, result = pack(xpcall(body, debug.traceback))
+	
+		-- If promise debugging is on, warn whenever a pcall fails.
+		-- This is useful for debugging issues within the Promise implementation
+		-- itself.
+		if PROMISE_DEBUG and not result[1] then
+			warn(result[2])
+		end
+	
+		return resultLength, result
+	end
+	
+	--[[
+		Creates a function that invokes a callback with correct error handling and
+		resolution mechanisms.
+	]]
+	local function createAdvancer(callback, resolve, reject)
+		return function(...)
+			local resultLength, result = wpcallPacked(callback, ...)
+			local ok = result[1]
+	
+			if ok then
+				resolve(unpack(result, 2, resultLength))
+			else
+				reject(unpack(result, 2, resultLength))
 			end
 		end
 	end
-
-	local Child = Instance.new(Class)
-	Child.Name = Name
-	Child.Parent = Parent
-	return Child, true
-end
-
--- Services
-local HttpService = game:GetService("HttpService")
-
--- Module
-local GitHub = {}
-
-local DataSources = {}
-
--- Helper Functions
-local ScriptTypes = {
-	[""] = "ModuleScript";
-	["local"] = "LocalScript";
-	["module"] = "ModuleScript";
-	["mod"] = "ModuleScript";
-	["loc"] = "LocalScript";
-	["server"] = "Script";
-	["client"] = "LocalScript";
-}
-
-local function UrlDecode(Character)
-	return string.char(tonumber(Character, 16))
-end
-
-local OpenGetRequests = 0
-
-local function GetAsync(...)
-	repeat until OpenGetRequests == 0 or not wait()
-	local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-
-	if Success then
-		return Data
-	elseif Data:find("HTTP 429", 1, true) or Data:find("Number of requests exceeded limit", 1, true) then
-		wait(math.random(5))
-		warn("Too many requests")
-		return GetAsync(...)
-	elseif Data:find("Http requests are not enabled", 1, true) then
-		OpenGetRequests = OpenGetRequests + 1
-		repeat
-			local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-		until Success and not Data:find("Http requests are not enabled", 1, true) or not wait(1)
-		OpenGetRequests = 0
-		return GetAsync(...)
-	elseif Data:find("HTTP 503", 1, true) then
-		warn(Data, (...))
-		return ""
-	elseif Data:find("HttpError: SslConnectFail", 1, true) then
-		local t = math.random(2, 5)
-		warn("HttpError: SslConnectFail error on " .. tostring((...)) .. " trying again in " .. t .. " seconds.")
-		wait(t)
-		return GetAsync(...)
-	else
-		error(Data .. (...), 0)
+	
+	local function isEmpty(t)
+		return next(t) == nil
 	end
-end
-
-local function GiveSourceToScript(Link, Script)
-	DataSources[Script] = Link
-	Script.Source = GetAsync(Link)
-end
-
-local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
-	local Value = #Routines + 1
-	Routines[Value] = false
-	local MainExists
-
-	local ScriptCount = 0
-	local Scripts = {}
-
-	local FolderCount = 0
-	local Folders = {}
-
-	local Data = GetAsync(Link)
-	local ShouldSkip = false
-	local _, StatsGraph = Data:find("d-flex repository-lang-stats-graph", 1, true)
-
-	if StatsGraph then
-		ShouldSkip = Data:sub(StatsGraph + 1, (Data:find("</div>", StatsGraph, true) or 0 / 0) - 1):find("%ALua%A") == nil
+	
+	local function createSymbol(name)
+		assert(type(name) == "string", "createSymbol requires `name` to be a string.")
+	
+		local symbol = newproxy(true)
+	
+		getmetatable(symbol).__tostring = function()
+			return ("Symbol(%s)"):format(name)
+		end
+	
+		return symbol
 	end
-
-	if not ShouldSkip then
-		for Link in Data:gmatch("<tr class=\"js%-navigation%-item%s*\">.-<a class=\"js%-navigation%-open%s*\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</tr>") do
-			if Link:find("/[^/]+/[^/]+/tree") then
-				FolderCount = FolderCount + 1
-				Folders[FolderCount] = Link
-			elseif Link:find("/[^/]+/[^/]+/blob.+%.lua$") then
-				local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
-
-				if ScriptName:lower() ~= "install" and ScriptClass ~= "ignore" and ScriptClass ~= "spec" and ScriptName:lower() ~= "spec" then
-					if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
-
-					if ScriptName == "_" or ScriptName:lower() == "main" or ScriptName:lower() == "init" then
-						ScriptCount = ScriptCount + 1
-						for a = ScriptCount, 2, -1 do
-							Scripts[a] = Scripts[a - 1]
-						end
-						Scripts[1] = Link
-						MainExists = true
-					else
-						ScriptCount = ScriptCount + 1
-						Scripts[ScriptCount] = Link
-					end
+	
+	local PromiseMarker = createSymbol("PromiseMarker")
+	
+	Promise = {}
+	Promise.prototype = {}
+	Promise.__index = Promise.prototype
+	
+	Promise.Status = {
+		Started = createSymbol("Started"),
+		Resolved = createSymbol("Resolved"),
+		Rejected = createSymbol("Rejected"),
+		Cancelled = createSymbol("Cancelled"),
+	}
+	
+	--[[
+		Constructs a new Promise with the given initializing callback.
+	
+		This is generally only called when directly wrapping a non-promise API into
+		a promise-based version.
+	
+		The callback will receive 'resolve' and 'reject' methods, used to start
+		invoking the promise chain.
+	
+		For example:
+	
+			local function get(url)
+				return Promise.new(function(resolve, reject)
+					spawn(function()
+						resolve(HttpService:GetAsync(url))
+					end)
+				end)
+			end
+	
+			get("https://google.com")
+				:andThen(function(stuff)
+					print("Got some stuff!", stuff)
+				end)
+	
+		Second parameter, parent, is used internally for tracking the "parent" in a
+		promise chain. External code shouldn't need to worry about this.
+	]]
+	function Promise.new(callback, parent)
+		if parent ~= nil and not Promise.is(parent) then
+			error("Argument #2 to Promise.new must be a promise or nil", 2)
+		end
+	
+		local self = {
+			-- Used to locate where a promise was created
+			_source = debug.traceback(),
+	
+			-- A tag to identify us as a promise
+			[PromiseMarker] = true,
+	
+			_status = Promise.Status.Started,
+	
+			-- A table containing a list of all results, whether success or failure.
+			-- Only valid if _status is set to something besides Started
+			_values = nil,
+	
+			-- Lua doesn't like sparse arrays very much, so we explicitly store the
+			-- length of _values to handle middle nils.
+			_valuesLength = -1,
+	
+			-- If an error occurs with no observers, this will be set.
+			_unhandledRejection = false,
+	
+			-- Queues representing functions we should invoke when we update!
+			_queuedResolve = {},
+			_queuedReject = {},
+			_queuedFinally = {},
+	
+			-- The function to run when/if this promise is cancelled.
+			_cancellationHook = nil,
+	
+			-- The "parent" of this promise in a promise chain. Required for
+			-- cancellation propagation.
+			_parent = parent,
+	
+			-- The number of consumers attached to this promise. This is needed so that
+			-- we don't propagate promise cancellations when there are still uncancelled
+			-- consumers.
+			_numConsumers = 0,
+		}
+	
+		setmetatable(self, Promise)
+	
+		local function resolve(...)
+			self:_resolve(...)
+		end
+	
+		local function reject(...)
+			self:_reject(...)
+		end
+	
+		local function onCancel(cancellationHook)
+			assert(type(cancellationHook) == "function", "onCancel must be called with a function as its first argument.")
+	
+			if self._status == Promise.Status.Cancelled then
+				cancellationHook()
+			else
+				self._cancellationHook = cancellationHook
+			end
+		end
+	
+		local _, result = wpcallPacked(callback, resolve, reject, onCancel)
+		local ok = result[1]
+		local err = result[2]
+	
+		if not ok and self._status == Promise.Status.Started then
+			reject(err)
+		end
+	
+		return self
+	end
+	
+	--[[
+		Fast spawn: Spawns a thread with predictable timing.
+		Runs immediately instead of first cycle being deferred.
+	]]
+	function Promise.spawn(callback, ...)
+		local spawnBindable = Instance.new("BindableEvent")
+		local args = { ... }
+		local length = select("#", ...)
+		spawnBindable.Event:Connect(function()
+			callback(unpack(args, 1, length))
+		end)
+		spawnBindable:Fire()
+		spawnBindable:Destroy()
+	end
+	
+	--[[
+		Create a promise that represents the immediately resolved value.
+	]]
+	function Promise.resolve(value)
+		return Promise.new(function(resolve)
+			resolve(value)
+		end)
+	end
+	
+	--[[
+		Create a promise that represents the immediately rejected value.
+	]]
+	function Promise.reject(value)
+		return Promise.new(function(_, reject)
+			reject(value)
+		end)
+	end
+	
+	--[[
+		Returns a new promise that:
+			* is resolved when all input promises resolve
+			* is rejected if ANY input promises reject
+	]]
+	function Promise.all(promises)
+		if type(promises) ~= "table" then
+			error("Please pass a list of promises to Promise.all", 2)
+		end
+	
+		-- If there are no values then return an already resolved promise.
+		if #promises == 0 then
+			return Promise.resolve({})
+		end
+	
+		-- We need to check that each value is a promise here so that we can produce
+		-- a proper error rather than a rejected promise with our error.
+		for i = 1, #promises do
+			if not Promise.is(promises[i]) then
+				error(("Non-promise value passed into Promise.all at index #%d"):format(i), 2)
+			end
+		end
+	
+		return Promise.new(function(resolve, reject)
+			-- An array to contain our resolved values from the given promises.
+			local resolvedValues = {}
+	
+			-- Keep a count of resolved promises because just checking the resolved
+			-- values length wouldn't account for promises that resolve with nil.
+			local resolvedCount = 0
+	
+			-- Called when a single value is resolved and resolves if all are done.
+			local function resolveOne(i, ...)
+				resolvedValues[i] = ...
+				resolvedCount = resolvedCount + 1
+	
+				if resolvedCount == #promises then
+					resolve(resolvedValues)
 				end
 			end
-		end
-	end
-
-	if ScriptCount > 0 then
-		local ScriptLink = Scripts[1]
-		local ScriptName, ScriptClass = ScriptLink:match("([%w-_%%]+)%.?(%l*)%.lua$")
-		ScriptName = ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode)
-		local Sub = Link:sub(19)
-		local Link = Sub:gsub("^(/[^/]+/[^/]+)/tree/[^/]+", "%1", 1)
-		local LastFolder = Link:match("[^/]+$")
-		LastFolder = LastFolder:match("^RBX%-(.-)%-Library$") or LastFolder
-
-		if MainExists then
-			local Directory = LastFolder:gsub("%%(%x%x)", UrlDecode)
-			ScriptName, ScriptClass = Directory:match("([%w-_%%]+)%.?(%l*)%.lua$")
-			if not ScriptName then ScriptName = Directory:match("^RBX%-(.-)%-Library$") or Directory end
-			if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
-		end
-
-		-- if MainExists or ScriptCount ~= 1 or ScriptName ~= (LastFolder:match("^RBX%-(.-)%-Library$") or LastFolder) then
-		if MainExists then Directory = Directory + 2 end -- :gsub("[^/]+$", "", 1) end
-		local Count = 0
-
-		local function LocateFolder(FolderName)
-			Count = Count + 1
-			if Count > Directory then
-				Directory = Directory + 1
-				if (Parent and Parent.Name) ~= FolderName and "Modules" ~= FolderName then
-					-- local Success, Service = pcall(game.GetService, game, FolderName)
-					-- if FolderName ~= "Lighting" and Success and Service then
-					-- 	Parent = Service
-					-- else
-					local Generated
-					Parent, Generated = GetFirstChild(Parent, FolderName, "Folder")
-					if Generated then
-						if not Routines[1] then Routines[1] = Parent end
-						DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 2 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
+	
+			-- We can assume the values inside `promises` are all promises since we
+			-- checked above.
+			for i = 1, #promises do
+				promises[i]:andThen(
+					function(...)
+						resolveOne(i, ...)
+					end,
+					function(...)
+						reject(...)
 					end
-					-- end
+				)
+			end
+		end)
+	end
+	
+	--[[
+		Is the given object a Promise instance?
+	]]
+	function Promise.is(object)
+		if type(object) ~= "table" then
+			return false
+		end
+	
+		return object[PromiseMarker] == true
+	end
+	
+	function Promise.prototype:getStatus()
+		return self._status
+	end
+	
+	function Promise.prototype:isRejected()
+		return self._status == Promise.Status.Rejected
+	end
+	
+	function Promise.prototype:isResolved()
+		return self._status == Promise.Status.Resolved
+	end
+	
+	function Promise.prototype:isPending()
+		return self._status == Promise.Status.Started
+	end
+	
+	function Promise.prototype:isCancelled()
+		return self._status == Promise.Status.Cancelled
+	end
+	
+	--[[
+		Creates a new promise that receives the result of this promise.
+	
+		The given callbacks are invoked depending on that result.
+	]]
+	function Promise.prototype:andThen(successHandler, failureHandler)
+		self._unhandledRejection = false
+		self._numConsumers = self._numConsumers + 1
+	
+		-- Create a new promise to follow this part of the chain
+		return Promise.new(function(resolve, reject)
+			-- Our default callbacks just pass values onto the next promise.
+			-- This lets success and failure cascade correctly!
+	
+			local successCallback = resolve
+			if successHandler then
+				successCallback = createAdvancer(successHandler, resolve, reject)
+			end
+	
+			local failureCallback = reject
+			if failureHandler then
+				failureCallback = createAdvancer(failureHandler, resolve, reject)
+			end
+	
+			if self._status == Promise.Status.Started then
+				-- If we haven't resolved yet, put ourselves into the queue
+				table.insert(self._queuedResolve, successCallback)
+				table.insert(self._queuedReject, failureCallback)
+			elseif self._status == Promise.Status.Resolved then
+				-- This promise has already resolved! Trigger success immediately.
+				successCallback(unpack(self._values, 1, self._valuesLength))
+			elseif self._status == Promise.Status.Rejected then
+				-- This promise died a terrible death! Trigger failure immediately.
+				failureCallback(unpack(self._values, 1, self._valuesLength))
+			elseif self._status == Promise.Status.Cancelled then
+				-- We don't want to call the success handler or the failure handler,
+				-- we just reject this promise outright.
+				reject("Promise is cancelled")
+			end
+		end, self)
+	end
+	
+	--[[
+		Used to catch any errors that may have occurred in the promise.
+	]]
+	function Promise.prototype:catch(failureCallback)
+		return self:andThen(nil, failureCallback)
+	end
+	
+	--[[
+		Cancels the promise, disallowing it from rejecting or resolving, and calls
+		the cancellation hook if provided.
+	]]
+	function Promise.prototype:cancel()
+		if self._status ~= Promise.Status.Started then
+			return
+		end
+	
+		self._status = Promise.Status.Cancelled
+	
+		if self._cancellationHook then
+			self._cancellationHook()
+		end
+	
+		if self._parent then
+			self._parent:_consumerCancelled()
+		end
+	
+		self:_finalize()
+	end
+	
+	--[[
+		Used to decrease the number of consumers by 1, and if there are no more,
+		cancel this promise.
+	]]
+	function Promise.prototype:_consumerCancelled()
+		self._numConsumers = self._numConsumers - 1
+	
+		if self._numConsumers <= 0 then
+			self:cancel()
+		end
+	end
+	
+	--[[
+		Used to set a handler for when the promise resolves, rejects, or is
+		cancelled. Returns a new promise chained from this promise.
+	]]
+	function Promise.prototype:finally(finallyHandler)
+		self._numConsumers = self._numConsumers + 1
+	
+		-- Return a promise chained off of this promise
+		return Promise.new(function(resolve, reject)
+			local finallyCallback = resolve
+			if finallyHandler then
+				finallyCallback = createAdvancer(finallyHandler, resolve, reject)
+			end
+	
+			if self._status == Promise.Status.Started then
+				-- The promise is not settled, so queue this.
+				table.insert(self._queuedFinally, finallyCallback)
+			else
+				-- The promise already settled or was cancelled, run the callback now.
+				finallyCallback()
+			end
+		end, self)
+	end
+	
+	--[[
+		Yield until the promise is completed.
+	
+		This matches the execution model of normal Roblox functions.
+	]]
+	function Promise.prototype:await()
+		self._unhandledRejection = false
+	
+		if self._status == Promise.Status.Started then
+			local result
+			local resultLength
+			local bindable = Instance.new("BindableEvent")
+	
+			self:andThen(
+				function(...)
+					resultLength, result = pack(...)
+					bindable:Fire(true)
+				end,
+				function(...)
+					resultLength, result = pack(...)
+					bindable:Fire(false)
 				end
+			)
+			self:finally(function()
+				bindable:Fire(nil)
+			end)
+	
+			local ok = bindable.Event:Wait()
+			bindable:Destroy()
+	
+			if ok == nil then
+				-- If cancelled, we return nil.
+				return nil
 			end
+	
+			return ok, unpack(result, 1, resultLength)
+		elseif self._status == Promise.Status.Resolved then
+			return true, unpack(self._values, 1, self._valuesLength)
+		elseif self._status == Promise.Status.Rejected then
+			return false, unpack(self._values, 1, self._valuesLength)
 		end
-
-		Link:gsub("[^/]+$", ""):gsub("[^/]+", LocateFolder)
-
-		if MainExists or ScriptCount ~= 1 or ScriptName ~= LastFolder then
-			LocateFolder(LastFolder)
-		end
-
-		local Script = GetFirstChild(Parent, ScriptName, ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"] or "ModuleScript")
-		if not Routines[1] then Routines[1] = Script end
-		coroutine.resume(coroutine.create(GiveSourceToScript), "https://raw.githubusercontent.com" .. ScriptLink:gsub("(/[^/]+/[^/]+/)blob/", "%1", 1), Script)
-
-		if MainExists then
-			Parent = Script
-		end
-
-		for a = 2, ScriptCount do
-			local Link = Scripts[a]
-			local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
-			local Script = GetFirstChild(Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"] or "ModuleScript")
-			coroutine.resume(coroutine.create(GiveSourceToScript), "https://raw.githubusercontent.com" .. Link:gsub("(/[^/]+/[^/]+/)blob/", "%1", 1), Script)
-		end
+	
+		-- If the promise is cancelled, fall through to nil.
+		return nil
 	end
-
-	for a = 1, FolderCount do
-		local Link = Folders[a]
-		coroutine.resume(coroutine.create(InstallRepo), "https://github.com" .. Link, Directory, Parent, Routines, TypesSpecified)
+	
+	--[[
+		Intended for use in tests.
+	
+		Similar to await(), but instead of yielding if the promise is unresolved,
+		_unwrap will throw. This indicates an assumption that a promise has
+		resolved.
+	]]
+	function Promise.prototype:_unwrap()
+		if self._status == Promise.Status.Started then
+			error("Promise has not resolved or rejected.", 2)
+		end
+	
+		local success = self._status == Promise.Status.Resolved
+	
+		return success, unpack(self._values, 1, self._valuesLength)
 	end
-
-	Routines[Value] = true
-end
-
-function GitHub:Install(Link, Parent, RoutineList)
-	-- Installs Link into Parent
-
-	if Link:byte(-1) == 47 then --gsub("/$", "")
-		Link = Link:sub(1, -2)
-	end
-
-	-- Extract Link Data
-	local Organization, Repository, Tree, ScriptName, ScriptClass
-	local Website, Directory = Link:match("^(https://[raw%.]*github[usercontent]*%.com/)(.+)")
-	Organization, Directory = (Directory or Link):match("^/?([%w-_%.]+)/?(.*)")
-	Repository, Directory = Directory:match("^([%w-_%.]+)/?(.*)")
-
-	if Website == "https://raw.githubusercontent.com/" then
-		if Directory then
-			Tree, Directory = Directory:match("^([^/]+)/(.+)")
-			if Directory then
-				ScriptName, ScriptClass = Directory:match("([%w-_%%]+)%.?(%l*)%.lua$")
+	
+	function Promise.prototype:_resolve(...)
+		if self._status ~= Promise.Status.Started then
+			return
+		end
+	
+		-- If the resolved value was a Promise, we chain onto it!
+		if Promise.is((...)) then
+			-- Without this warning, arguments sometimes mysteriously disappear
+			if select("#", ...) > 1 then
+				local message = (
+					"When returning a Promise from andThen, extra arguments are " ..
+					"discarded! See:\n\n%s"
+				):format(
+					self._source
+				)
+				warn(message)
 			end
+	
+			(...):andThen(
+				function(...)
+					self:_resolve(...)
+				end,
+				function(...)
+					self:_reject(...)
+				end
+			)
+	
+			return
 		end
-	elseif Directory then
-		local a, b = Directory:find("^[tb][rl][eo][eb]/[^/]+")
-		if a and b then
-			Tree, Directory = Directory:sub(6, b), Directory:sub(b + 1)
-			if Directory == "" then Directory = nil end
-			if Directory and Link:find("blob", 1, true) then
-				ScriptName, ScriptClass = Directory:match("([%w-_%%]+)%.?(%l*)%.lua$")
+	
+		self._status = Promise.Status.Resolved
+		self._valuesLength, self._values = pack(...)
+	
+		-- We assume that these callbacks will not throw errors.
+		for _, callback in ipairs(self._queuedResolve) do
+			callback(...)
+		end
+	
+		self:_finalize()
+	end
+	
+	function Promise.prototype:_reject(...)
+		if self._status ~= Promise.Status.Started then
+			return
+		end
+	
+		self._status = Promise.Status.Rejected
+		self._valuesLength, self._values = pack(...)
+	
+		-- If there are any rejection handlers, call those!
+		if not isEmpty(self._queuedReject) then
+			-- We assume that these callbacks will not throw errors.
+			for _, callback in ipairs(self._queuedReject) do
+				callback(...)
 			end
 		else
-			Directory = nil
-		end
-	end
-
-	if ScriptName and (ScriptName == "_" or ScriptName:lower() == "main" or ScriptName:lower() == "init") then
-		return GitHub:Install("https://github.com/" .. Organization .. "/" .. Repository .. "/tree/" .. (Tree or "master") .. "/" .. Directory:gsub("/[^/]+$", ""):gsub("^/", ""), Parent, RoutineList)
-	end
-
-	if not Website then Website = "https://github.com/" end
-	Directory = Directory and ("/" .. Directory):gsub("^//", "/") or ""
-
-	-- Threads
-	local Routines = RoutineList or {false}
-	local Value = #Routines + 1
-	Routines[Value] = false
-
-	local Garbage
-
-	if ScriptName then
-		Link = "https://raw.githubusercontent.com/" .. Organization .. "/" .. Repository .. "/" .. (Tree or "master") .. Directory
-		local Source = GetAsync(Link)
-		local Script = GetFirstChild(Parent and not RoutineList and Repository ~= ScriptName and Parent.Name ~= ScriptName and Parent.Name ~= Repository and GetFirstChild(Parent, Repository, "Folder") or Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or "mod"] or "ModuleScript")
-		DataSources[Script] = Link
-		if not Routines[1] then Routines[1] = Script end
-		Script.Source = Source
-	elseif Repository then
-		Link = Website .. Organization .. "/" .. Repository .. ((Tree or Directory ~= "") and ("/tree/" .. (Tree or "master") .. Directory) or "")
-		if not Parent then Parent, Garbage = Instance.new("Folder"), true end
-		coroutine.resume(coroutine.create(InstallRepo), Link, 1, Parent, Routines) -- "/" .. Repository .. Directory
-	elseif Organization then
-		Link = Website .. Organization
-		local Data = GetAsync(Link .. "?tab=repositories")
-		local Object = GetFirstChild(Parent, Organization, "Folder")
-
-		if not Routines[1] then Routines[1] = Object end
-
-		for Link, Data in Data:gmatch('href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository"(.-)</div>') do
-			--if not Data:find("Forked from", 1, true) and not Link:find("Plugin", 1, true) and not Link:find(".github.io", 1, true) then
-				GitHub:Install(Link, Object, Routines)
-			--end
-		end
-	end
-
-	Routines[Value] = true
-
-	if not RoutineList then
-		repeat
-			local Done = 0
-			local Count = #Routines
-			for a = 1, Count do
-				if Routines[a] then
-					Done = Done + 1
+			-- At this point, no one was able to observe the error.
+			-- An error handler might still be attached if the error occurred
+			-- synchronously. We'll wait one tick, and if there are still no
+			-- observers, then we should put a message in the console.
+	
+			self._unhandledRejection = true
+			local err = tostring((...))
+	
+			spawn(function()
+				-- Someone observed the error, hooray!
+				if not self._unhandledRejection then
+					return
 				end
-			end
-		until Done == Count or not wait()
-		local Object = Routines[1]
-		if Garbage then
-			Object.Parent = nil
-			Parent:Destroy()
+	
+				-- Build a reasonable message
+				local message = ("Unhandled promise rejection:\n\n%s\n\n%s"):format(
+					err,
+					self._source
+				)
+				warn(message)
+			end)
 		end
-		DataSources[Object] = Link
-		return Object
+	
+		self:_finalize()
+	end
+	
+	--[[
+		Calls any :finally handlers. We need this to be a separate method and
+		queue because we must call all of the finally callbacks upon a success,
+		failure, *and* cancellation.
+	]]
+	function Promise.prototype:_finalize()
+		for _, callback in ipairs(self._queuedFinally) do
+			-- Purposefully not passing values to callbacks here, as it could be the
+			-- resolved values, or rejected errors. If the developer needs the values,
+			-- they should use :andThen or :catch explicitly.
+			callback()
+		end
 	end
 end
 
--- luacheck: pop ignore
-print("Installing NevermoreEngine...")
+-- Helper functions
+local TS = {}
 
-local threadsCompleted = table.create(2, false)
+function TS.string_endsWith(str1, str2, pos)
+	local n1 = #str1
+	local n2 = #str2
 
-spawn(function()
-	GitHub:Install(
-		"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
-		game:GetService("ServerScriptService")
-	)
-	threadsCompleted[1] = true
-end)
-
-spawn(function()
-	local init = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/init.lua")
-	init.Nevermore.Nevermore.Parent = game:GetService("ReplicatedStorage")
-	init:Destroy()
-	threadsCompleted[2] = true
-end)
-
-repeat
-	wait()
-	local finished = true
-	for _, thread in pairs(threadsCompleted) do
-		if not thread then
-			finished = false
-		end
+	if pos == nil then
+		pos = n1
+	elseif pos ~= pos then
+		pos = 0
+	else
+		pos = math.clamp(pos, 0, n1)
 	end
-until finished
 
-HttpService.HttpEnabled = ...
+	local start = pos - n2 + 1;
+	return start > 0 and string.sub(str1, start, pos) == str2
+end
 
-print("NevermoreEngine installed.")
+function TS.async(callback)
+	return function(...)
+		local n = select("#", ...)
+		local args = { ... }
+		return Promise.new(function(resolve, reject)
+			coroutine.wrap(function()
+				local ok, result = pcall(callback, unpack(args, 1, n))
+				if ok then
+					resolve(result)
+				else
+					reject(result)
+				end
+			end)()
+		end)
+	end
+end
+
+-- Main logic
+-- Compiled with https://roblox-ts.github.io v0.3.2
+-- July 18, 2020
+
+local instantiateTree;
+local HttpService = game:GetService("HttpService");
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local wasHttpEnabled = ...
+
+local getRequest = TS.async(function(url, nocache, headers)
+	return HttpService:GetAsync(url, nocache, headers);
+end);
+
+local getRefs = TS.async(function(_0)
+	local owner = _0.owner;
+	local repository = _0.repository;
+	local branch = _0.branch;
+	if branch == nil then branch = "master"; end;
+	return getRequest("https://api.github.com/repos/" .. owner .. "/" .. repository .. "/git/refs/heads/" .. branch):andThen(function(str)
+		return HttpService:JSONDecode(str);
+	end);
+end);
+
+local getRepoTree = TS.async(function(data)
+	return getRefs(data):andThen(function(_0)
+		return getRequest("https://api.github.com/repos/" .. data.owner .. "/" .. data.repository .. "/git/trees/" .. _0.object.sha .. "?recursive=true");
+	end):andThen(function(str)
+		return HttpService:JSONDecode(str);
+	end);
+end);
+
+local getProcessedRepoTree = TS.async(function(referenceData)
+	return getRepoTree(referenceData):andThen(function(_0)
+		local tree = _0.tree;
+		local owner = referenceData.owner;
+		local repository = referenceData.repository;
+		local branch = referenceData.branch;
+		if branch == nil then branch = "master"; end;
+		local map = {};
+		for _2 = 1, #tree do
+			local _1 = tree[_2];
+			local path = _1.path;
+			local myType = _1.type;
+			local items = {};
+			for item in string.gmatch(path, "[^/]+") do
+				items[#items + 1] = item;
+			end;
+			local _3 = #items;
+			local last = items[_3];
+			items[_3] = nil;
+			local current = map;
+			for _4 = 1, #items do
+				local item = items[_4];
+				local nextItem = current[item];
+				if (nextItem == nil) or (type(nextItem) == "string") then
+					error("Houston, we have a problem!");
+				end;
+				current = nextItem;
+			end;
+			repeat
+				if myType == "tree" then
+					current[last] = {};
+					break;
+				end;
+				if myType == "blob" then
+					current[last] = "https://raw.githubusercontent.com/" .. owner .. "/" .. repository .. "/" .. branch .. "/" .. path;
+					break;
+				end;
+				if myType == "commit" then
+					break;
+				end;
+			until true;
+		end;
+		return map;
+	end);
+end);
+local scriptExtensions = { { ".spec.lua", "" }, { ".spec.server.lua", "" }, { ".spec.client.lua", "" }, { ".server.lua", "Script" }, { ".script.lua", "Script" }, { ".client.lua", "LocalScript" }, { ".loc.lua", "LocalScript" }, { ".local.lua", "LocalScript" }, { ".mod.lua", "ModuleScript" }, { ".module.lua", "ModuleScript" }, { ".lua", "ModuleScript" } };
+local function instantiateScript(link, name, scriptType, parent)
+	local script = Instance.new(scriptType);
+	script.Name = name;
+	script.Parent = parent;
+	getRequest(link):andThen(function(source)
+		script.Source = source
+	end);
+	return script;
+end;
+function instantiateTree(tree, parent)
+	if parent == nil then parent = Instance.new("Folder"); end;
+	for name, link in pairs(tree) do
+		if type(link) == "string" then
+			for _1 = 1, #scriptExtensions do
+				local _0 = scriptExtensions[_1];
+				local scriptExtension = _0[1];
+				local scriptType = _0[2];
+				if (TS.string_endsWith(link, scriptExtension)) and (scriptType ~= "" and scriptType) then
+					local _2 = -#scriptExtension;
+					if _2 < 0 then _2 = _2 - 1; end;
+					instantiateScript(link, string.sub(name, 1, _2), scriptType, parent);
+					break;
+				end;
+			end;
+		else
+			local repoMap = link;
+			local folder;
+			for _1 = 1, #scriptExtensions do
+				local _0 = scriptExtensions[_1];
+				local scriptExtension = _0[1];
+				local scriptType = _0[2];
+				local repoName = "init" .. scriptExtension;
+				local initFile = repoMap[repoName];
+				if (type(initFile) == "string") and (scriptType ~= "" and scriptType) then
+					if folder then
+						error("Found multiple init files?");
+					end;
+					repoMap[repoName] = nil;
+					folder = instantiateScript(initFile, name, scriptType, parent);
+				end;
+			end;
+			if folder == nil then
+				folder = Instance.new("Folder");
+				folder.Name = name;
+				folder.Parent = parent;
+			end;
+			instantiateTree(repoMap, folder);
+			if (folder:IsA("Folder")) and (#folder:GetChildren() == 0) then
+				folder:Destroy();
+			end;
+		end;
+	end;
+	return parent;
+end;
+
+getProcessedRepoTree({
+	owner = "Quenty";
+	repository = "NevermoreEngine";
+	branch = "version2";
+}):andThen(function(tree)
+	local current = tree["loader"];
+	if (current ~= "" and current) and (not (type(current) == "string")) then
+		current = current["ReplicatedStorage"];
+		if (current ~= "" and current) and (not (type(current) == "string")) then
+			local _0 = instantiateTree(current):GetChildren();
+			for _1 = 1, #_0 do
+				local child = _0[_1];
+				child.Parent = ReplicatedStorage;
+			end;
+		end;
+	end;
+	current = tree["Modules"];
+	if (current ~= "" and current) and (not (type(current) == "string")) then
+		local modules = instantiateTree(current);
+		modules.Name = "Nevermore";
+		modules.Parent = ServerScriptService;
+	end;
+	HttpService.HttpEnabled = wasHttpEnabled;
+	print "Installed Nevermore!";
+end);
