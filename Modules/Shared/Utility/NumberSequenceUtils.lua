@@ -16,7 +16,9 @@ function NumberSequenceUtils.scale(sequence, scale)
 	return NumberSequence.new(waypoints)
 end
 
-function NumberSequenceUtils.stripe(stripes, backgroundTransparency, stripeTransparency, percentStripeThickness, percentOffset)
+function NumberSequenceUtils.stripe(
+	stripes, backgroundTransparency, stripeTransparency, percentStripeThickness, percentOffset)
+
 	percentOffset = percentOffset or 0
 	percentStripeThickness = math.clamp(percentStripeThickness or 0.5, 0, 1)
 
