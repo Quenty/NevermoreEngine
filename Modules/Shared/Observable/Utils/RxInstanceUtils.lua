@@ -136,4 +136,36 @@ function RxInstanceUtils.observeChildrenBrio(parent, predicate)
 	end)
 end
 
+function RxInstanceUtils.observeDescendants(parent, predicate)
+	assert(typeof(parent) == "Instance")
+	assert(type(predicate) == "function" or predicate == nil)
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+		local added = {}
+
+		local function handleDescendant(child)
+			if not predicate or predicate(child) then
+				added[child] = true
+				sub:Fire(child, true)
+			end
+		end
+
+		maid:GiveTask(parent.DescendantAdded:Connect(handleDescendant))
+		maid:GiveTask(parent.DescendantRemoving:Connect(function(child)
+			if added[child] then
+				added[child] = nil
+				sub:Fire(child, false)
+			end
+		end))
+
+		for _, descendant in pairs(parent:GetDescendants()) do
+			handleDescendant(descendant)
+		end
+
+		return maid
+	end)
+end
+
+
 return RxInstanceUtils
