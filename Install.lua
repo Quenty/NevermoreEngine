@@ -103,7 +103,7 @@ local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
 	end
 
 	if not ShouldSkip then
-		for Link in Data:gmatch("<tr class=\"js%-navigation%-item%s*\">.-<a class=\"js%-navigation%-open%s*\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</tr>") do
+		for Link in Data:gmatch("<span class=\"css%-truncate css%-truncate%-target d%-block width%-fit\"><a class=\"js%-navigation%-open link%-gray%-dark\" title=\"[^\"]+\" id=\"[^\"]+\"%s*href=\"([^\"]+)\".-</span>") do
 			if Link:find("/[^/]+/[^/]+/tree") then
 				FolderCount = FolderCount + 1
 				Folders[FolderCount] = Link
