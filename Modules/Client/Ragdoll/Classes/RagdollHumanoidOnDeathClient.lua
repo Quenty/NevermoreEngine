@@ -16,8 +16,8 @@ local RagdollHumanoidOnDeathClient = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeathClient.ClassName = "RagdollHumanoidOnDeathClient"
 RagdollHumanoidOnDeathClient.__index = RagdollHumanoidOnDeathClient
 
-function RagdollHumanoidOnDeathClient.new(humanid)
-	local self = setmetatable(BaseObject.new(humanid), RagdollHumanoidOnDeathClient)
+function RagdollHumanoidOnDeathClient.new(humanoid)
+	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeathClient)
 
 	self._maid:GiveTask(self._obj.Died:Connect(function()
 		self:_handleDeath(self._obj)
