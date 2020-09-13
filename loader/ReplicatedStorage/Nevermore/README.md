@@ -90,10 +90,10 @@ You can also use this syntax if you want
 ```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local MyModule = require["MyModule"
+local MyModule = require["MyModule"]
 ```
 
-By default, modules parented in ServerScriptService.Modules will be loaded
+By default, modules parented in ServerScriptService.Modules will be loaded.
 
 ## Cyclic detection
 
@@ -132,7 +132,7 @@ require:AddModulesFromParent(ReplicatedStorage:WaitForChild("ClientModules"))
 
 Note that until you add this, the loader will error if you try to load these modules! Note that
 this system follows the replication behavior! So server modules will not be available on the client,
-and submodules willl not be loaded. Also, on the server, client/shared modules will be replicated.
+and submodules will not be loaded. Also, on the server, client/shared modules will be replicated.
 
 ### Adding individual modules
 
