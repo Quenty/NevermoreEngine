@@ -52,10 +52,14 @@ function RagdollUtils.setupState(humanoid)
 		rootPart.CFrame = upperTorso.CFrame
 	end
 
-	maid:GiveTask(function()
+	function maid:Stop()
 		maid:DoCleaning() -- GC other events
 		teleportRootPartToUpperTorso()
 		humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+	end
+
+	maid:GiveTask(function()
+		maid:Stop()
 	end)
 
 	maid:GiveTask(humanoid.StateChanged:Connect(updateState))
