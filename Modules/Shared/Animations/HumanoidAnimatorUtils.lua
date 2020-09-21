@@ -16,7 +16,11 @@ end
 
 function HumanoidAnimatorUtils.stopAnimations(humanoid, fadeTime)
 	for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
-		track:Stop(fadeTime)
+		if fadeTime == nil then
+			track:Stop()
+		else
+			track:Stop(fadeTime)
+		end
 	end
 end
 
