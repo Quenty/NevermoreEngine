@@ -17,6 +17,8 @@ function ModuleScriptUtils.requireByName(_require, lookupTable)
 			else
 				error("Error: Library '" .. tostring(_module) .. "' does not exist.", 2)
 			end
+		elseif type(_module) == "number" then
+			return require(_module)
 		else
 			error(("Error: module must be a string or ModuleScript, got '%s' for '%s'")
 				:format(typeof(_module), tostring(_module)))
