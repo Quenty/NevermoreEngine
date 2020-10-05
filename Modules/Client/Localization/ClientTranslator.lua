@@ -12,8 +12,6 @@ local JsonToLocalizationTable = require("JsonToLocalizationTable")
 local PseudoLocalize = require("PseudoLocalize")
 local Promise = require("Promise")
 
-assert(RunService:IsClient(), "ClientTranslator can only be required on client")
-
 local ClientTranslatorFacade = {}
 
 --- Initializes a new instance of the ClientTranslatorFacade
