@@ -76,6 +76,22 @@ function DataStorePromises.setAsync(robloxDataStore, key, value)
 	end)
 end
 
+function DataStorePromises.promiseIncrementAsync(robloxDataStore, key, delta)
+	assert(typeof(robloxDataStore) == "Instance")
+	assert(type(key) == "string")
+	assert(type(delta) == "number" or delta == nil)
+
+	return Promise.spawn(function(resolve, reject)
+		local ok, err = pcall(function()
+			robloxDataStore:IncrementAsync(key, delta)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		return resolve(true)
+	end)
+end
+
 function DataStorePromises.removeAsync(robloxDataStore, key)
 	assert(typeof(robloxDataStore) == "Instance")
 	assert(type(key) == "string")

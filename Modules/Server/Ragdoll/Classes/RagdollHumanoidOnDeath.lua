@@ -14,8 +14,10 @@ RagdollHumanoidOnDeath.__index = RagdollHumanoidOnDeath
 function RagdollHumanoidOnDeath.new(humanid)
 	local self = setmetatable(BaseObject.new(humanid), RagdollHumanoidOnDeath)
 
-	self._maid:GiveTask(self._obj.Died:Connect(function()
-		RagdollBindersServer.Ragdoll:Bind(self._obj)
+	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("Health"):Connect(function()
+		if self._obj.Health <= 0 then
+			RagdollBindersServer.Ragdoll:Bind(self._obj)
+		end
 	end))
 
 	return self
