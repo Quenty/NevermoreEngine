@@ -11,12 +11,14 @@ function ModuleScriptUtils.requireByName(_require, lookupTable)
 	return function(_module)
 		if typeof(_module)  == "Instance" and _module:IsA("ModuleScript") then
 			return _require(_module)
-		elseif type(_module) == "string"then
+		elseif type(_module) == "string" then
 			if lookupTable[_module] then
 				return _require(lookupTable[_module])
 			else
 				error("Error: Library '" .. tostring(_module) .. "' does not exist.", 2)
 			end
+		elseif type(_module) == "number" then
+			return _require(_module)
 		else
 			error(("Error: module must be a string or ModuleScript, got '%s' for '%s'")
 				:format(typeof(_module), tostring(_module)))
@@ -31,12 +33,12 @@ function ModuleScriptUtils.detectCyclicalRequires(_require)
 	local loading = {}
 
 	return function(_module, ...)
-		assert(typeof(_module) == "Instance")
+		assert(typeof(_module) == "Instance" or type(_module) == "number")
 
 		if loading[_module] then
 			local cycle = ModuleScriptUtils.getCyclicalStateFromStack(stack, loading[_module])
 			warn(('Warning: Cyclical require on %q.\nCycle: %s')
-				:format( _module:GetFullName(), cycle))
+				:format(ModuleScriptUtils.getModuleFullName(_module), cycle))
 			return _require(_module)
 		end
 
@@ -52,12 +54,33 @@ function ModuleScriptUtils.detectCyclicalRequires(_require)
 	end
 end
 
+function ModuleScriptUtils.getModuleName(_module)
+	if type(_module) == "number" then
+		return ("Module(%d)"):format(_module)
+	elseif typeof(_module) == "Instance" then
+		return _module.Name
+	else
+		error("Bad module type")
+	end
+end
+
+function ModuleScriptUtils.getModuleFullName(_module)
+	if type(_module) == "number" then
+		return ("Module(%d)"):format(_module)
+	elseif typeof(_module) == "Instance" then
+		return _module:GetFullName()
+	else
+		error("Bad module type")
+	end
+end
+
+
 function ModuleScriptUtils.getCyclicalStateFromStack(stack, depth)
 	local str = ""
 	for i=depth, #stack do
-		str = str .. stack[i].Name .. " -> "
+		str = str .. ModuleScriptUtils.getModuleName(stack[i]) .. " -> "
 	end
-	return str .. stack[depth].Name
+	return str .. ModuleScriptUtils.getModuleName(stack[depth])
 end
 
 return ModuleScriptUtils
