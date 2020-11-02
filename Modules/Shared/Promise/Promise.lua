@@ -256,7 +256,13 @@ function Promise:_reject(values, valuesLength)
 			RunService.Heartbeat:Wait()
 
 			if self._unconsumedException then
-				warn(("[Promise] - Uncaught exception in promise\n\n%s\n\n%s"):format(tostring(self._rejected[1]), self._source))
+				if ENABLE_TRACEBACK then
+					warn(("[Promise] - Uncaught exception in promise\n\n%q\n\n%s")
+						:format(tostring(self._rejected[1]), self._source))
+				else
+					warn(("[Promise] - Uncaught exception in promise: %q")
+						:format(tostring(self._rejected[1])))
+				end
 			end
 		end))
 	end
