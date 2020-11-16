@@ -170,7 +170,7 @@ function RagdollUtils.setupHead(humanoid)
 	maid:GivePromise(promiseChild(humanoid, "HumanoidDescription"))
 		:Then(function(humanoidDescription)
 			local headScale = humanoidDescription.HeadScale
-			
+
 			local function updateHeadSize()
 				head.Size = Vector3.new(0.97052631578947, 0.97052631578947, 0.94842105263158)*headScale
 			end
