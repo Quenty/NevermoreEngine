@@ -27,6 +27,12 @@ function RandomUtils.shuffledCopy(orig, random)
 		tbl[i] = orig[i]
 	end
 
+	RandomUtils.shuffle(tbl, random)
+
+	return tbl
+end
+
+function RandomUtils.shuffle(tbl, random)
 	if random then
 		for i = #tbl, 2, -1 do
 			local j = random:NextInteger(1, i)
@@ -38,8 +44,6 @@ function RandomUtils.shuffledCopy(orig, random)
 			tbl[i], tbl[j] = tbl[j], tbl[i]
 		end
 	end
-
-	return tbl
 end
 
 return RandomUtils
