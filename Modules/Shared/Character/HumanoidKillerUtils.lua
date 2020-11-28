@@ -33,10 +33,11 @@ function HumanoidKillerUtils.tagKiller(humanoid, attacker)
 	return creator
 end
 
+-- killer must be a player
 function HumanoidKillerUtils.getKillerOfHumanoid(humanoid)
 	assert(typeof(humanoid) == "Instance")
 
-	local creator = humanoid:FindFirstChild("creator")
+	local creator = humanoid:FindFirstChild(TAG_NAME)
 	if not creator then
 		return nil
 	end
