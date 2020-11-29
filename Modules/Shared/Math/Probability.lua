@@ -3,10 +3,6 @@
 
 local Probability = {}
 
-function Probability.uniform(min, max)
-
-end
-
 --- Normal curve. [-1, 1]
 function Probability.boxMuller()
     return math.sqrt(-2 * math.log(math.random())) * math.cos(2 * math.pi * math.random()) / 2
