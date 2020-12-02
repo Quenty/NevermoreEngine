@@ -49,7 +49,7 @@ end
 -- @parm folder A Roblox folder with StringValues containing JSON, named with the localization in mind
 function JsonToLocalizationTable.loadFolder(folder)
 	local localizationTable = Instance.new("LocalizationTable")
-	for _, item in pairs(folder:GetChildren()) do
+	for _, item in pairs(folder:GetDescendants()) do
 		if item:IsA("StringValue") then
 			local localeId = JsonToLocalizationTable.localeFromName(item.Name)
 			JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, item.Value)
