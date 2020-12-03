@@ -194,19 +194,21 @@ function Table.overwrite(target, source)
 	return target
 end
 
+local function errorOnIndex(self, index)
+	error(("Bad index %q"):format(tostring(index)), 2)
+end
+
+local READ_ONLY_METATABLE = {
+	__index = errorOnIndex;
+	__newindex = errorOnIndex;
+}
+
 --- Sets a metatable on a table such that it errors when
 -- indexing a nil value
 -- @tparam table _table Table to error on indexing
 -- @treturn table _table The same table
 function Table.readonly(_table)
-	return setmetatable(_table, {
-		__index = function(self, index)
-			error(("Bad index %q"):format(tostring(index)), 2)
-		end;
-		__newindex = function(self, index, value)
-			error(("Bad index %q"):format(tostring(index)), 2)
-		end;
-	})
+	return setmetatable(_table, READ_ONLY_METATABLE)
 end
 
 --- Recursively sets the table as ReadOnly

@@ -6,6 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Promise = require("Promise")
 local fastSpawn = require("fastSpawn")
+local Maid = require("Maid")
 
 local CharacterPromiseUtil = {}
 
@@ -34,6 +35,30 @@ function CharacterPromiseUtil.promiseRootPart(humanoid)
 	end)
 
 	return promise
+end
+
+function CharacterPromiseUtil.promiseCharacter(player)
+	assert(typeof(player) == "Instance")
+
+	local promise = Promise.new()
+
+	if player.Character then
+		promise:Resolve(player.Character)
+		return promise
+	end
+
+	local maid = Maid.new()
+
+	maid:GiveTask(player.CharacterAdded:Connect(function(character)
+		promise:Resolve(character)
+	end))
+
+	promise:Finally(function()
+		maid:DoCleaning()
+	end)
+
+	return promise
+
 end
 
 return CharacterPromiseUtil

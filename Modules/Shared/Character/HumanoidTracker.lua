@@ -31,13 +31,11 @@ function HumanoidTracker.new(player)
 		self:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
 	end))
 
-	self._maid:GiveTask(self._player.CharacterAdded:Connect(function(character)
-		self:_handleCharacter(character)
+	self._maid:GiveTask(self._player:GetPropertyChangedSignal("Character"):Connect(function()
+		self:_onCharacterChanged()
 	end))
 
-	if self._player.Character then
-		fastSpawn(self._handleCharacter, self, self._player.Character)
-	end
+	fastSpawn(self._onCharacterChanged, self)
 
 	self.HumanoidDied = Signal.new()
 	self._maid:GiveTask(self.HumanoidDied)
@@ -71,13 +69,19 @@ function HumanoidTracker:PromiseNextHumanoid()
 	return promise
 end
 
-function HumanoidTracker:_handleCharacter(character)
+function HumanoidTracker:_onCharacterChanged()
 	local maid = Maid.new()
 	self._maid._characterMaid = maid
 
+	local character = self._player.Character
+	if not character then
+		self.Humanoid.Value = nil
+		return
+	end
+
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
 	if humanoid then
-		self.Humanoid.Value = humanoid
+		self.Humanoid.Value = humanoid -- TODO: Track if this humanoid goes away
 		return
 	end
 
@@ -87,7 +91,7 @@ function HumanoidTracker:_handleCharacter(character)
 	maid._childAdded = character.ChildAdded:Connect(function(child)
 		if child:IsA("Humanoid") then
 			maid._childAdded = nil
-			self.Humanoid.Value = child
+			self.Humanoid.Value = child -- TODO: Track if this humanoid goes away
 		end
 	end)
 end

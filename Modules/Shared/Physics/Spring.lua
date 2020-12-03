@@ -44,6 +44,7 @@ local Spring = {}
 
 --- Creates a new spring
 -- @param initial A number or Vector3 (anything with * number and addition/subtraction defined)
+-- @param[opt=tick] clock function to use to update spring
 function Spring.new(initial, clock)
 	local target = initial or 0
 	clock = clock or tick
