@@ -16,7 +16,7 @@ function Observable.isObservable(item)
 	return type(item) == "table" and item.ClassName == "Observable"
 end
 
--- @param onSubscribe(fire)
+-- @param onSubscribe(subscription)
 function Observable.new(onSubscribe)
 	assert(type(onSubscribe) == "function")
 
