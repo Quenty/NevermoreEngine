@@ -1,5 +1,5 @@
 ---
--- @classmod CharacterTransparency
+-- @classmod FirstPersonCharacterTransparency
 -- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
@@ -7,12 +7,12 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local BaseObject = require("BaseObject")
 local TransparencyService = require("TransparencyService")
 
-local CharacterTransparency = setmetatable({}, BaseObject)
-CharacterTransparency.ClassName = "CharacterTransparency"
-CharacterTransparency.__index = CharacterTransparency
+local FirstPersonCharacterTransparency = setmetatable({}, BaseObject)
+FirstPersonCharacterTransparency.ClassName = "FirstPersonCharacterTransparency"
+FirstPersonCharacterTransparency.__index = FirstPersonCharacterTransparency
 
-function CharacterTransparency.new(humanoid)
-	local self = setmetatable(BaseObject.new(humanoid), CharacterTransparency)
+function FirstPersonCharacterTransparency.new(humanoid)
+	local self = setmetatable(BaseObject.new(humanoid), FirstPersonCharacterTransparency)
 
 	self._humanoid = humanoid or error("No humanoid")
 	self._character = self._humanoid.Parent or error("No character")
@@ -21,7 +21,7 @@ function CharacterTransparency.new(humanoid)
 	self._transparency = 0
 
 	-- Listen to parts
-	for _, part in pairs(humanoid.Parent:GetDescendants()) do
+	for _, part in pairs(self._character:GetDescendants()) do
 		self:_handlePartAdded(part)
 	end
 
@@ -40,7 +40,7 @@ function CharacterTransparency.new(humanoid)
 	return self
 end
 
-function CharacterTransparency:SetTransparency(transparency)
+function FirstPersonCharacterTransparency:SetTransparency(transparency)
 	assert(type(transparency) == "number")
 
 	if transparency >= 0.999 then
@@ -56,17 +56,17 @@ function CharacterTransparency:SetTransparency(transparency)
 	self._transparency = transparency
 
 	for part, _ in pairs(self._parts) do
-		TransparencyService:SetTransparency(self, part, transparency)
+		TransparencyService:SetTransparency(self, part, self._transparency)
 	end
 end
 
-function CharacterTransparency:_reset()
+function FirstPersonCharacterTransparency:_reset()
 	for part, _ in pairs(self._parts) do
-		TransparencyService:SetTransparency(self, part)
+		TransparencyService:ResetTransparency(self, part)
 	end
 end
 
-function CharacterTransparency:_shouldAddPart(part)
+function FirstPersonCharacterTransparency:_shouldAddPart(part)
 	if not part:IsA("BasePart") then
 		return false
 	end
@@ -75,7 +75,7 @@ function CharacterTransparency:_shouldAddPart(part)
 		or part.Name ~= "Head"
 end
 
-function CharacterTransparency:_handlePartAdded(part)
+function FirstPersonCharacterTransparency:_handlePartAdded(part)
 	if self:_shouldAddPart(part) then
 		self._parts[part] = true
 		if self._transparency then
@@ -84,11 +84,11 @@ function CharacterTransparency:_handlePartAdded(part)
 	end
 end
 
-function CharacterTransparency:_handlePartRemoving(part)
+function FirstPersonCharacterTransparency:_handlePartRemoving(part)
 	if part:IsA("BasePart") then
 		self._parts[part] = nil
-		TransparencyService:SetTransparency(self, part)
+		TransparencyService:ResetTransparency(self, part)
 	end
 end
 
-return CharacterTransparency
+return FirstPersonCharacterTransparency
