@@ -4,6 +4,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local RunService = game:GetService("RunService")
+
 local Maid = require("Maid")
 local LoremIpsumUtils = require("LoremIpsumUtils")
 local UIPaddingUtils = require("UIPaddingUtils")
@@ -91,34 +93,31 @@ local function makeHorizontalSection(factory)
 	return container
 end
 
-return function(target)
+local function generate(target)
 	local maid = Maid.new()
 
-	local scrollingFrame = Instance.new("ScrollingFrame")
-	scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
-	scrollingFrame.CanvasSize = UDim2.new(1, 0, 5, 0)
-	scrollingFrame.BackgroundColor3 = Color3.new(1, 1, 1)
-	scrollingFrame.BackgroundTransparency = 0
-	scrollingFrame.BorderSizePixel = 0
-	maid:GiveTask(scrollingFrame)
+	local container = Instance.new("Frame")
+	container.BackgroundTransparency = 1
+	container.Size = UDim2.new(1, 0, 1, 0)
+	maid:GiveTask(container)
 
 	local uiListLayout = Instance.new("UIListLayout")
 	uiListLayout.Padding = UDim.new(0, 5)
 	uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	uiListLayout.Parent = scrollingFrame
+	uiListLayout.Parent = container
 
 	local padding = 10
 	local maxWidth = target.AbsoluteSize.x - padding*2
 
 	local uiPadding = UIPaddingUtils.fromUDim(UDim.new(0, padding))
-	uiPadding.Parent = scrollingFrame
+	uiPadding.Parent = container
 
 	local layoutOrder = 1
 	local function add(item)
 		layoutOrder = layoutOrder + 1
 		item.LayoutOrder = layoutOrder
-		item.Parent = scrollingFrame
+		item.Parent = container
 	end
 
 	add(makeTitle("Sentences"))
@@ -134,10 +133,35 @@ return function(target)
 	end))
 
 	add(makeTitle("Paragraph"))
-	add(showText(LoremIpsumUtils.paragraph(), maxWidth, 20))
+	add(showText(LoremIpsumUtils.paragraph(5), maxWidth, 20))
 
 	add(makeTitle("Document"))
 	add(showText(LoremIpsumUtils.document(), maxWidth, 20))
+
+	container.Parent = target
+
+	return maid
+end
+
+return function(target)
+	local maid = Maid.new()
+
+	local scrollingFrame = Instance.new("ScrollingFrame")
+	scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+	scrollingFrame.CanvasSize = UDim2.new(1, 0, 5, 0)
+	scrollingFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+	scrollingFrame.BackgroundTransparency = 0
+	scrollingFrame.BorderSizePixel = 0
+	maid:GiveTask(scrollingFrame)
+
+	local nextGenTime = 0
+
+	maid:GiveTask(RunService.RenderStepped:Connect(function()
+		if nextGenTime <= os.clock() then
+			maid._current = generate(scrollingFrame)
+			nextGenTime = os.clock() + 1
+		end
+	end))
 
 	scrollingFrame.Parent = target
 
