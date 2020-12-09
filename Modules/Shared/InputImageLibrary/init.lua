@@ -3,6 +3,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+local SUPRESS_UNFOUND_IMAGE_WARNING = true
+
 local InputImageLibrary = {}
 InputImageLibrary.ClassName = "InputImageLibrary"
 InputImageLibrary.__index = InputImageLibrary
@@ -96,7 +98,9 @@ function InputImageLibrary:_pickSheet(index, preferredStyle, preferredPlatform)
 		end
 	end
 
-	warn("[InputImageLibrary] - Unable to find sprite for", tostring(index), "type", typeof(index))
+	if not SUPRESS_UNFOUND_IMAGE_WARNING then
+		warn("[InputImageLibrary] - Unable to find sprite for", tostring(index), "type", typeof(index))
+	end
 
 	return nil
 end
