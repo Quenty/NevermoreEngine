@@ -3,6 +3,7 @@
 
 local IKGripUtils = {}
 
+-- Parent to the attachment we want the humanoid to grip
 function IKGripUtils.create(binder, humanoid)
 	assert(binder)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
