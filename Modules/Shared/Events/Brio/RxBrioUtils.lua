@@ -12,6 +12,16 @@ local BrioUtils = require("BrioUtils")
 
 local RxBrioUtils = {}
 
+function RxBrioUtils.toBrio()
+	return Rx.map(function(result)
+		if Brio.isBrio(result) then
+			return result
+		end
+
+		return Brio.new(result)
+	end)
+end
+
 function RxBrioUtils.completeOnDeath(brio, observable)
 	assert(Brio.isBrio(brio))
 	assert(Observable.isObservable(observable))
@@ -233,16 +243,6 @@ function RxBrioUtils.reemitLastBrioOnDeath()
 			return maid
 		end)
 	end
-end
-
-function RxBrioUtils.toBrio()
-	return Rx.map(function(result)
-		if Brio.isBrio(result) then
-			return result
-		end
-
-		return Brio.new(result)
-	end)
 end
 
 -- Unpacks the brio, and then repacks it. Ignored items
