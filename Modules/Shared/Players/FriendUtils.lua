@@ -4,7 +4,6 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
-local StudioService = game:GetService("StudioService")
 
 local Promise = require("Promise")
 
@@ -81,6 +80,7 @@ function FriendUtils.promiseStudioServiceUserId()
 		local userId
 		local ok, err = pcall(function()
 			-- only works from a plugin. Good news is, a story is a plugin.
+			local StudioService = game:GetService("StudioService")
 			userId = StudioService:GetUserId()
 		end)
 
