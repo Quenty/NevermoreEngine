@@ -63,6 +63,7 @@ local function resolvePlane(basis, points, norms)
 	end
 end
 
+
 local goldenAngle = (3 - 5^0.5)*math.pi
 
 -- uses -y as the direction

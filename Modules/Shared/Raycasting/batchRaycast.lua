@@ -1,4 +1,3 @@
-
 local function batchRaycast(
 	originList, directionList,
 	ignoreListWorkingEnvironment,
@@ -11,7 +10,7 @@ local function batchRaycast(
 	params.FilterDescendantsInstances = ignoreListWorkingEnvironment
 	params.IgnoreWater = true
 
-	for i = 1, #originList do
+	for i in next, originList do
 		local origin = originList[i]
 		local direction = directionList[i]
 		local target--we'll use these later maybe
