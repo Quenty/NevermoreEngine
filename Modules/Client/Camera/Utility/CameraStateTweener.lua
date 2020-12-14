@@ -23,6 +23,7 @@ function CameraStateTweener.new(cameraEffect, speed)
 
 	local cameraBelow, assign = CameraStackService:GetNewStateBelow()
 
+	self._cameraEffect = cameraEffect
 	self._cameraBelow = cameraBelow
 	self._fadeBetween = FadeBetweenCamera.new(cameraBelow, cameraEffect)
 	assign(self._fadeBetween)
@@ -69,6 +70,10 @@ function CameraStateTweener:Finish(doNotAnimate, callback)
 			callback()
 		end)
 	end
+end
+
+function CameraStateTweener:GetCameraEffect()
+	return self._cameraEffect
 end
 
 function CameraStateTweener:GetCameraBelow()
