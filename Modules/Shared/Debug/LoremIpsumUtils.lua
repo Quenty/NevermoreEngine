@@ -43,6 +43,22 @@ function LoremIpsumUtils.username(random)
 	end
 end
 
+function LoremIpsumUtils.words(numWords, random)
+	local output = ""
+
+	for w = 1, numWords do
+		local word = RandomUtils.choice(WORDS, random)
+
+		if w == 1 then
+			output = output .. String.uppercaseFirstLetter(word)
+		else
+			output = output .. " " .. word
+		end
+	end
+
+	return output
+end
+
 function LoremIpsumUtils.sentence(numWords, random)
 	random = random or Random.new()
 	numWords = numWords or random:NextInteger(6, 12)

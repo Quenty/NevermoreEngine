@@ -11,8 +11,17 @@ function SpringUtils.animating(spring, epsilon)
 
 	local position = spring.Position
 	local target = spring.Target
-	local animating = math.abs(spring.Position - spring.Target) > epsilon
-		or math.abs(spring.Velocity) > epsilon
+
+	local animating
+	if type(target) == "number" then
+		animating = math.abs(spring.Position - spring.Target) > epsilon
+			or math.abs(spring.Velocity) > epsilon
+	elseif typeof(target) == "Vector3" then
+		animating = (spring.Position - spring.Target).magnitude > epsilon
+			or spring.Velocity.magnitude  > epsilon
+	else
+		error("Unknown type")
+	end
 
 	if animating then
 		return true, position

@@ -30,6 +30,11 @@ function StepUtils.bindToRenderStep(update)
 			return
 		end
 
+		-- Avoid reentrance, if update() triggers another connection, we'll already be connected.
+		if conn and conn.Connected then
+			return
+		end
+
 		-- Usually contains just the self arg!
 		local args = {...}
 
