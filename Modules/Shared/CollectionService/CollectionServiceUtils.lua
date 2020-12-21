@@ -19,5 +19,10 @@ function CollectionServiceUtils.findFirstAncestor(tagName, child)
 	return nil
 end
 
+function CollectionServiceUtils.removeAllTags(instance)
+	for _, tag in pairs(CollectionService:GetTags(instance)) do
+		CollectionService:RemoveTag(instance, tag)
+	end
+end
 
 return CollectionServiceUtils

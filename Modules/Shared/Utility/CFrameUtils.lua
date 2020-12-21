@@ -15,6 +15,23 @@ function CFrameUtils.lookAt(position, target, upVector)
     return CFrame.fromMatrix(position, rightVector, upVector2)
 end
 
+--returns a CFrame which is minimally rotated from cframe such that
+-- returnedCFrame:VectorToWorldSpace(localAxis) = worldGoal
+function CFrameUtils.redirectLocalAxis(cframe, localAxis, worldGoal)
+    local localGoal = cframe:VectorToObjectSpace(worldGoal)
+    local m = localAxis.magnitude*localGoal.magnitude
+    local d = localAxis:Dot(localGoal)
+    local c = localAxis:Cross(localGoal)
+    local R = CFrame.new(0, 0, 0, c.x, c.y, c.z, d + m)
+
+    if R == R then
+        return cframe*R
+    else
+        return cframe
+    end
+end
+
+
 function CFrameUtils.fromUpRight(position, upVector, rightVector)
     local forwardVector = rightVector:Cross(upVector)
     if forwardVector.magnitude == 0 then

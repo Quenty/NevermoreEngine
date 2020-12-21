@@ -8,6 +8,7 @@ local Players = game:GetService("Players")
 
 local Promise = require("Promise")
 local InsertServiceUtils = require("InsertServiceUtils")
+local PlayersServicePromises = require("PlayersServicePromises")
 
 local HumanoidDescriptionUtils = {}
 
@@ -27,13 +28,27 @@ function HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
 	end)
 end
 
-function HumanoidDescriptionUtils.promiseHumanoidDescriptionFromUserId(userId)
+function HumanoidDescriptionUtils.promiseApplyFromUserName(humanoid, userName)
+	return HumanoidDescriptionUtils.promiseFromUserName(userName)
+		:Then(function(description)
+			return HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
+		end)
+end
+
+function HumanoidDescriptionUtils.promiseFromUserName(userName)
+	return PlayersServicePromises.promiseUserIdFromName(userName)
+		:Then(function(userId)
+			return HumanoidDescriptionUtils.promiseFromUserId(userId)
+		end)
+end
+
+function HumanoidDescriptionUtils.promiseFromUserId(userId)
 	assert(type(userId) == "number")
 
 	return Promise.spawn(function(resolve, reject)
 		local description = nil
 		local ok, err = pcall(function()
-			description = Players:getHumanoidDescriptionFromUserId(userId)
+			description = Players:GetHumanoidDescriptionFromUserId(userId)
 		end)
 		if not ok then
 			reject(err)

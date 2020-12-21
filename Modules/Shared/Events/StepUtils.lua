@@ -2,6 +2,7 @@
 -- @module StepUtils
 -- @author Quenty
 
+local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
 local StepUtils = {}
@@ -29,6 +30,11 @@ function StepUtils.bindToRenderStep(update)
 			return
 		end
 
+		-- Avoid reentrance, if update() triggers another connection, we'll already be connected.
+		if conn and conn.Connected then
+			return
+		end
+
 		-- Usually contains just the self arg!
 		local args = {...}
 
@@ -41,6 +47,24 @@ function StepUtils.bindToRenderStep(update)
 	end
 
 	return connect, disconnect
+end
+
+function StepUtils.onceAtRenderPriority(priority, func)
+	assert(type(priority) == "number")
+	assert(type(func) == "function")
+
+	local key = ("StepUtils.onceAtPriority_%s"):format(HttpService:GenerateGUID(false))
+
+	local function cleanup()
+		RunService:UnbindFromRenderStep(key)
+	end
+
+	RunService:BindToRenderStep(key, priority, function()
+		cleanup()
+		func()
+	end)
+
+	return cleanup
 end
 
 return StepUtils
