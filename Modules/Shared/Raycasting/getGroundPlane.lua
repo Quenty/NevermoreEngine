@@ -3,8 +3,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local batchRaycast = require("batchRaycast")
 
 local function resolvePlane(basis, points, norms)
-	local n = #points
-
 	--[[
 	xx xz xc   u   xy
 	xz zz zc x v = yz
