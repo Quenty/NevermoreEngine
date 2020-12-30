@@ -45,10 +45,10 @@ local function resolvePlane(basis, points, norms)
 	local uSum = 0
 	local vSum = 0
 	for i = 1, n do
-		local n = basis:vectorToObjectSpace(norms[i])
-		local x = n.x
-		local y = n.y
-		local z = n.z
+		local norm = basis:vectorToObjectSpace(norms[i])
+		local x = norm.x
+		local y = norm.y
+		local z = norm.z
 		uSum = uSum - x/y
 		vSum = vSum - z/y
 	end
