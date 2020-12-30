@@ -128,7 +128,9 @@ function DataStore:_saveData(writer)
 
 	self._maid._saveMaid = maid
 
-	self.Saving:Fire(promise)
+	if self.Saving.Destroy then
+		self.Saving:Fire(promise)
+	end
 
 	return promise
 end
