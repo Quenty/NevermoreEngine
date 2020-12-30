@@ -46,4 +46,39 @@ function RandomUtils.shuffle(tbl, random)
 	end
 end
 
+function RandomUtils.weightedChoice(list, weights, random)
+	if #list == 0 then
+		return nil
+	elseif #list == 1 then
+		return list[1]
+	else
+		local total = 0
+		for i=1, #list do
+			assert(type(weights[i]) == "number")
+			total = total + weights[i]
+		end
+
+		local randomNum
+		if random then
+			randomNum = random:NextNumber()
+		else
+			randomNum = math.random()
+		end
+
+		local totalSum = 0
+
+		for i=1, #list do
+			totalSum = totalSum + weights[i]
+			local threshold = totalSum/total
+			if randomNum <= threshold then
+				return list[i]
+			end
+		end
+
+		-- we shouldn't get here, but if we do, pick the last one
+		warn("[RandomUtils.weightedChoice] - Failed to reach threshold! Algorithm is wrong!")
+		return list[#list]
+	end
+end
+
 return RandomUtils
