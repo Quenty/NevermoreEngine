@@ -1,5 +1,5 @@
 ---
--- @module GenericPermissionProviderConstants
+-- @module PermissionProviderConstants
 -- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
@@ -7,6 +7,8 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Table = require("Table")
 
 return Table.readonly({
-	REMOTE_FUNCTION_NAME = "GenericPermissionProviderConstantsRemoteFunction";
+	DEFAULT_REMOTE_FUNCTION_NAME = "PermissionProviderDefaultRemoteFunction";
+
+	-- types
 	GROUP_RANK_CONFIG_TYPE = "GroupRankConfigType";
 })
