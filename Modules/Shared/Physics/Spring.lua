@@ -37,6 +37,9 @@ API:
 		Instantly skips the spring forwards by that amount of now
 	Spring:Impulse(number/Vector3 velocity)
 		Impulses the spring, increasing velocity by the amount given
+
+Visualization (by Defaultio):
+	https://www.desmos.com/calculator/hn2i9shxbz
 ]]
 
 
