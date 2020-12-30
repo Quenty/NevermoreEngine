@@ -9,9 +9,19 @@ local Promise = require("Promise")
 
 local FriendUtils = {}
 
-function FriendUtils.promiseAllStudioFriends(limitMaxFriends)
-	return FriendUtils.promiseCurrentStudioUserId(limitMaxFriends)
+function FriendUtils.promiseAllStudioFriends()
+	return FriendUtils.promiseCurrentStudioUserId()
 		:Then(FriendUtils.promiseAllFriends)
+end
+
+function FriendUtils.onlineFriends(friends)
+	local onlineFriends = {}
+	for _, friend in pairs(friends) do
+		if friend.IsOnline then
+			table.insert(onlineFriends, friend)
+		end
+	end
+	return onlineFriends
 end
 
 -- @param[opt=nil] limitMaxFriends
