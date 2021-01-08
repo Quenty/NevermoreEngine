@@ -4,6 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local TextService = game:GetService("TextService")
+local Chat = game:GetService("Chat")
 
 local Promise = require("Promise")
 
@@ -19,6 +20,26 @@ function TextFilterUtils.promiseNonChatStringForBroadcast(str, fromUserId, textC
 		str,
 		fromUserId,
 		textContext)
+end
+
+function TextFilterUtils.promiseLegacyChatFilter(playerFrom, text)
+	assert(typeof(playerFrom) == "Instance" and playerFrom:IsA("Player"))
+	assert(type(text) == "string")
+
+	return Promise.spawn(function(resolve, reject)
+		local filteredText
+		local ok, err = pcall(function()
+			filteredText = Chat:FilterStringForBroadcast(text, playerFrom)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		if type(filteredText) ~= "string" then
+			return reject("Not a string")
+		end
+
+		return resolve(filteredText)
+	end)
 end
 
 function TextFilterUtils.promiseNonChatStringForUserAsync(str, fromUserId, toUserId, textContext)
