@@ -1,5 +1,5 @@
 --- Utility functions involving the root part
--- @module RootPartUtilss
+-- @module RootPartUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
