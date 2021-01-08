@@ -12,47 +12,67 @@ local TextFilterServiceConstants = require("TextFilterServiceConstants")
 
 local TextFilterServiceClient = {}
 
-function TextFilterServiceClient:PromisePreviewFilterForBroadcast(text)
+function TextFilterServiceClient:PromiseNonChatStringForUser(text, fromUserId)
+	assert(type(text) == "string")
+	assert(type(fromUserId) == "number")
+
+	return self:_promiseInvokeRemoteFunction(
+		TextFilterServiceConstants.REQUEST_NON_CHAT_STRING_FOR_USER,
+		text,
+		fromUserId)
+end
+
+function TextFilterServiceClient:PromiseNonChatStringForBroadcast(text, fromUserId)
+	assert(type(text) == "string")
+	assert(type(fromUserId) == "number")
+
+	return self:_promiseInvokeRemoteFunction(
+		TextFilterServiceConstants.REQUEST_NON_CHAT_STRING_FOR_BROADCAST,
+		text,
+		fromUserId)
+end
+
+function TextFilterServiceClient:PromisePreviewNonChatStringForBroadcast(text)
 	assert(type(text) == "string")
 
-	-- For testing!
+	return self:_promiseInvokeRemoteFunction(
+		TextFilterServiceConstants.REQUEST_PREVIEW_NON_CHAT_STRING_FOR_BROADCAST,
+		text)
+end
+
+function TextFilterServiceClient:_promiseInvokeRemoteFunction(request, text, ...)
+	assert(type(request) == "string")
+	assert(type(text) == "string")
+
+	local args = table.pack(...)
+
 	if not RunService:IsRunning() then
-		text = text:gsub("[fF][uU][cC][kK]", "####")
-		return Promise.spawn(function(resolve, reject)
-			-- Simulate testing
-			delay(0.5, function()
-				resolve(text)
-			end)
-		end)
+		return self:_fakeTestFilter(text)
 	end
 
-	local promise = Promise.new()
-
-	promise:Resolve(self:_promiseRemoteFunction()
+	return self:_promiseRemoteFunction()
 		:Then(function(remoteFunction)
-			if promise:IsRejected() then
-				return Promise.rejected()
-			end
-
 			return Promise.spawn(function(resolve, reject)
-				local result
+				local resultOk, result
 				local ok, err = pcall(function()
-					result = remoteFunction:InvokeServer(text)
+					resultOk, result = remoteFunction:InvokeServer(request, text, table.unpack(args, 1, args.n))
 				end)
 
 				if not ok then
 					return reject(err)
 				end
 
+				if not resultOk then
+					return reject(result or "Failed to get a valid result from server")
+				end
+
 				if type(result) ~= "string" then
-					return reject(err)
+					return reject(err or result or "Failed to get string result from server")
 				end
 
 				return resolve(result)
 			end)
-		end))
-
-	return promise
+		end)
 end
 
 function TextFilterServiceClient:_promiseRemoteFunction()
@@ -62,6 +82,17 @@ function TextFilterServiceClient:_promiseRemoteFunction()
 
 	self._remoteFunctionPromise = PromiseGetRemoteFunction(TextFilterServiceConstants.REMOTE_FUNCTION_NAME)
 	return self._remoteFunctionPromise
+end
+
+function TextFilterServiceClient:_fakeTestFilter(text)
+	text = text:gsub("[fF][uU][cC][kK]", "####")
+
+	return Promise.spawn(function(resolve, reject)
+		-- Simulate testing
+		delay(0.5, function()
+			resolve(text)
+		end)
+	end)
 end
 
 return TextFilterServiceClient
