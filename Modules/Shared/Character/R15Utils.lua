@@ -42,6 +42,25 @@ function R15Utils.getHand(character, side)
 	return character:FindFirstChild(R15Utils.getHandName(side))
 end
 
+function R15Utils.getGripWeld(character, side)
+	local rightHand = R15Utils.getHand(character, side)
+	if rightHand then
+		return rightHand:FindFirstChild(R15Utils.getGripWeldName(side))
+	else
+		return nil
+	end
+end
+
+function R15Utils.getGripWeldName(side)
+	if side == "Left" then
+		return "LeftGrip"
+	elseif side == "Right" then
+		return "RightGrip"
+	else
+		error("Bad side")
+	end
+end
+
 function R15Utils.getHandName(side)
 	if side == "Left" then
 		return "LeftHand"
