@@ -106,7 +106,6 @@ function DataStoreStage:Wipe()
 		end)
 end
 
-
 function DataStoreStage:Store(name, value)
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
