@@ -24,6 +24,21 @@ function FriendUtils.onlineFriends(friends)
 	return onlineFriends
 end
 
+function FriendUtils.friendsNotInGame(friends)
+	local userIdsInGame = {}
+	for _, player in pairs(Players:GetPlayers()) do
+		userIdsInGame[player.UserId] = true
+	end
+
+	local onlineFriends = {}
+	for _, friend in pairs(friends) do
+		if not userIdsInGame[friend.Id] then
+			table.insert(onlineFriends, friend)
+		end
+	end
+	return onlineFriends
+end
+
 -- @param[opt=nil] limitMaxFriends
 function FriendUtils.promiseAllFriends(userId, limitMaxFriends)
 	assert(userId)
