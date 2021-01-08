@@ -30,6 +30,14 @@ function Table.merge(orig, new)
 	return _table
 end
 
+function Table.values(_table)
+	local new = {}
+	for _, val in pairs(_table) do
+		table.insert(new, val)
+	end
+	return new
+end
+
 --- Shallow merges two lists without modifying either
 -- @tparam table orig original table
 -- @tparam table new new table
@@ -192,6 +200,14 @@ function Table.overwrite(target, source)
 	end
 
 	return target
+end
+
+function Table.take(_table, count)
+	local newTable = {}
+	for i=1, math.min(#_table, count) do
+		newTable[i] = _table[i]
+	end
+	return newTable
 end
 
 local function errorOnIndex(self, index)
