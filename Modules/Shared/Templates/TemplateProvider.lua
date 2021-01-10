@@ -23,6 +23,7 @@ function TemplateProvider.new(parent)
 end
 
 function TemplateProvider:Init()
+	assert(not self._registry, "Already initialized")
 	self._registry = {}
 
 	if typeof(self._parent) == "Instance" then

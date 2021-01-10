@@ -9,7 +9,9 @@ local StepUtils = {}
 
 -- update should return true while it needs to update
 function StepUtils.bindToRenderStep(update)
-	assert(type(update) == "function")
+	if type(update) ~= "function" then
+		error(("update must be of type function, got %q"):format(type(update)))
+	end
 
 	local conn = nil
 	local function disconnect()

@@ -1,16 +1,16 @@
 --- Utility functions involving the root part
--- @module RootPartUtil
+-- @module RootPartUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Promise = require("Promise")
 local Maid = require("Maid")
 
-local RootPartUtil = {}
+local RootPartUtilss = {}
 
 local MAX_YIELD_TIME = 60
 
-function RootPartUtil.promiseRootPart(humanoid)
+function RootPartUtilss.promiseRootPart(humanoid)
 	if humanoid.RootPart then
 		return Promise.resolved(humanoid.RootPart)
 	end
@@ -33,7 +33,7 @@ function RootPartUtil.promiseRootPart(humanoid)
 
 	delay(MAX_YIELD_TIME, function()
 		if promise:IsPending() then
-			warn("[RootPartUtil.promiseRootPart] - TImed out on root part", debug.traceback())
+			warn("[RootPartUtilss.promiseRootPart] - TImed out on root part", debug.traceback())
 			promise:Reject("Timed out")
 		end
 	end)
@@ -55,4 +55,4 @@ function RootPartUtil.promiseRootPart(humanoid)
 	return promise
 end
 
-return RootPartUtil
+return RootPartUtilss

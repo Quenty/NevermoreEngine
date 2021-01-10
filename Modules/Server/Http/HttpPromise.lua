@@ -42,6 +42,18 @@ function HttpPromise.request(request)
 	end)
 end
 
+function HttpPromise.json(request)
+	if type(request) == "string" then
+		request = {
+			Method = "GET";
+			Url = request;
+		}
+	end
+
+	return HttpPromise.request(request)
+		:Then(HttpPromise.decodeJson)
+end
+
 function HttpPromise.logFailedRequests(...)
 	for _, item in pairs({...}) do
 		if type(item) == "string" then
@@ -55,7 +67,7 @@ end
 function HttpPromise.decodeJson(response)
 	assert(response)
 	if type(response.Body) ~= "string" then
-		return Promise.rejected("Body is not of type string")
+		return Promise.rejected(("Body is not of type string, but says %q"):format(tostring(response.Body)))
 	end
 
 	return Promise.new(function(resolve, reject)

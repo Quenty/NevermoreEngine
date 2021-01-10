@@ -32,6 +32,22 @@ function CancelToken.new(executor)
 	return self
 end
 
+local EMPTY_FUNCTION = function() end
+
+function CancelToken.fromMaid(maid)
+	local token = CancelToken.new(EMPTY_FUNCTION)
+
+	local taskId = maid:GiveTask(function()
+		token:_cancel()
+	end)
+
+	token.PromiseCancelled:Then(function()
+		maid[taskId] = nil
+	end)
+
+	return token
+end
+
 function CancelToken:ErrorIfCancelled()
 	if not self.PromiseCancelled:IsPending() then
 		error("[CancelToken.ErrorIfCancelled] - Cancelled")

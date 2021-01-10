@@ -34,7 +34,7 @@ end
 -- @tparam[opt] {number} diameter
 -- @tparam[opt] {number} meshDiameter
 function Draw.ray(ray, color, parent, meshDiameter, diameter)
-	assert(typeof(ray) == "Ray")
+	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
 
 	color = color or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()

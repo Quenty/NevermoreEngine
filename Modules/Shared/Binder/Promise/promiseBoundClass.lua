@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Promise = require("Promise")
 local Maid = require("Maid")
 
-return function(binder, inst)
+return function(binder, inst, cancelToken)
 	assert(type(binder) == "table", "'binder' must be table")
 	assert(typeof(inst) == "Instance", "'inst' must be instance")
 
@@ -17,6 +17,14 @@ return function(binder, inst)
 
 	local maid = Maid.new()
 	local promise = Promise.new()
+
+	if cancelToken then
+		cancelToken:ErrorIfCancelled()
+		maid:GivePromise(cancelToken.PromiseCancelled):Then(function()
+			promise:Reject()
+		end)
+	end
+
 	maid:GiveTask(binder:GetClassAddedSignal():Connect(function(classAdded, instance)
 		if instance == inst then
 			promise:Resolve(classAdded)

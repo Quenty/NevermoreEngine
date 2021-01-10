@@ -27,6 +27,13 @@ function AdorneeUtils.getCenter(adornee)
 		else
 			return nil
 		end
+	elseif adornee:IsA("Tool") then
+		local handle = adornee:FindFirstChild("Handle")
+		if handle and handle:IsA("BasePart") then
+			return handle.Position
+		else
+			return nil
+		end
 	else
 		return nil
 	end
@@ -147,6 +154,13 @@ function AdorneeUtils.getPart(adornee)
 		return adornee.RootPart
 	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
 		return adornee:FindFirstChildWhichIsA("BasePart")
+	elseif adornee:IsA("Tool") then
+		local handle = adornee:FindFirstChild("Handle")
+		if handle and handle:IsA("BasePart") then
+			return handle
+		else
+			return nil
+		end
 	else
 		return nil
 	end
@@ -165,6 +179,13 @@ function AdorneeUtils.getRenderAdornee(adornee)
 		return adornee.Parent
 	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
 		return adornee:FindFirstChildWhichIsA("BasePart")
+	elseif adornee:IsA("Tool") then
+		local handle = adornee:FindFirstChild("Handle")
+		if handle and handle:IsA("BasePart") then
+			return handle
+		else
+			return nil
+		end
 	else
 		return nil
 	end
