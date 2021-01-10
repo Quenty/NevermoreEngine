@@ -67,4 +67,21 @@ function ValueBaseUtils.getValue(parent, instanceType, name, default)
 	end
 end
 
+function ValueBaseUtils.createGetSet(instanceType, name)
+	assert(type(instanceType) == "string", "Bad argument 'instanceType'")
+	assert(type(name) == "string", "Bad argument 'name'")
+
+	return function(parent, defaultValue)
+		assert(typeof(parent) == "Instance", "Bad argument 'parent'")
+
+		return ValueBaseUtils.getValue(parent, instanceType, name, defaultValue)
+	end, function(parent, value)
+		assert(typeof(parent) == "Instance", "Bad argument 'parent'")
+
+		return ValueBaseUtils.setValue(parent, instanceType, name, value)
+	end, function(parent, defaultValue)
+		return ValueBaseUtils.getOrCreateValue(parent, instanceType, name, defaultValue)
+	end
+end
+
 return ValueBaseUtils
