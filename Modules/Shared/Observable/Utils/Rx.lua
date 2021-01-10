@@ -213,7 +213,7 @@ function Rx.startWith(values)
 	end
 end
 
-function Rx.defaultsToNil()
+function Rx.defaultsTo(value)
 	return function(source)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
@@ -228,7 +228,7 @@ function Rx.defaultsToNil()
 				sub:GetFailComplete()))
 
 			if not fired then
-				sub:Fire(nil)
+				sub:Fire(value)
 			end
 
 			return maid
@@ -236,6 +236,7 @@ function Rx.defaultsToNil()
 	end
 end
 
+Rx.defaultsToNil = Rx.defaultsTo(nil)
 
 -- https://www.learnrxjs.io/learn-rxjs/operators/combination/endwith
 function Rx.endWith(values)
@@ -621,6 +622,47 @@ function Rx.combineAll()
 					maid:GiveTask(Rx.combineLatest(observables))
 						:Subscribe(sub:GetFireFailComplete())
 				end)
+
+			return maid
+		end)
+	end
+end
+
+-- NOTE: Untested
+function Rx.catchError(callback)
+	assert(type(callback) == "function")
+
+	return function(source)
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			-- Yikes, let's hope event ordering is good
+			local alive = true
+			maid:GiveTask(function()
+				alive = false
+			end)
+
+			maid:GiveTask(source:Subscribe(
+				function(...)
+					sub:Fire(...)
+				end,
+				function(...)
+					if not alive then
+						-- if we failed because maid was cancelled, then we'll get called here?
+						-- I think.
+						return
+					end
+
+					-- at this point, we can only have one error, so we need to subscribe to the result
+					-- and continue the observiable
+					local observable = callback(...)
+					assert(Observable.isObservable(observable))
+
+					maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
+				end,
+				function()
+					sub:Complete()
+				end));
 
 			return maid
 		end)

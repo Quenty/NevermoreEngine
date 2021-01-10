@@ -7,11 +7,11 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
-
+local Rx = require("Rx")
 local RxInstanceUtils = {}
 
 function RxInstanceUtils.observeProperty(instance, property)
-	assert(typeof(instance) == "Instance")
+	assert(typeof(instance) == "Instance", "Not an instance")
 	assert(type(property) == "string")
 
 	return Observable.new(function(sub)
@@ -24,6 +24,14 @@ function RxInstanceUtils.observeProperty(instance, property)
 
 		return maid
 	end)
+end
+
+function RxInstanceUtils.observeAncestry(instance)
+	local startWithParent = Rx.start(function()
+		return instance, instance.Parent
+	end)
+
+	return startWithParent(Rx.fromSignal(instance.AncestryChanged))
 end
 
 -- Returns a brio of the property value
