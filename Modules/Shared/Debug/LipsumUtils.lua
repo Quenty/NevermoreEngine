@@ -1,18 +1,18 @@
 --- Helpers generate test text for a variety of situations.
--- @module LoremIpsumUtils
+-- @module LipsumUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local RandomUtils = require("RandomUtils")
 local String = require("String")
 
-local LoremIpsumUtils = {}
+local LipsumUtils = {}
 
 local WORDS = {
 	"lorem", "ipsum", "dolor", "sit", "amet", "consectetuer", "adipiscing", "elit", "sed", "diam", "nonummy",
 	"nibh", "euismod", "tincidunt", "ut", "laoreet", "dolore", "magna", "aliquam", "erat"}
 
-function LoremIpsumUtils.username(random)
+function LipsumUtils.username(random)
 	random = random or Random.new()
 
 	local word = RandomUtils.choice(WORDS, random)
@@ -43,7 +43,11 @@ function LoremIpsumUtils.username(random)
 	end
 end
 
-function LoremIpsumUtils.words(numWords, random)
+function LipsumUtils.word(random)
+	return LipsumUtils.words(1, random)
+end
+
+function LipsumUtils.words(numWords, random)
 	local output = ""
 
 	for w = 1, numWords do
@@ -59,7 +63,7 @@ function LoremIpsumUtils.words(numWords, random)
 	return output
 end
 
-function LoremIpsumUtils.sentence(numWords, random)
+function LipsumUtils.sentence(numWords, random)
 	random = random or Random.new()
 	numWords = numWords or random:NextInteger(6, 12)
 
@@ -88,11 +92,11 @@ function LoremIpsumUtils.sentence(numWords, random)
 	return output
 end
 
-function LoremIpsumUtils.paragraph(numSentences, createSentence, random)
+function LipsumUtils.paragraph(numSentences, createSentence, random)
 	random = random or Random.new()
 	numSentences = numSentences or random:NextInteger(5, 15)
 	createSentence = createSentence or function()
-		return LoremIpsumUtils.sentence(nil, random)
+		return LipsumUtils.sentence(nil, random)
 	end
 
 	local output = ""
@@ -106,11 +110,11 @@ function LoremIpsumUtils.paragraph(numSentences, createSentence, random)
 	return output
 end
 
-function LoremIpsumUtils.document(numParagraphs, createParagraph, random)
+function LipsumUtils.document(numParagraphs, createParagraph, random)
 	random = random or Random.new()
 	numParagraphs = numParagraphs or 5
 	createParagraph = createParagraph or function()
-		return LoremIpsumUtils.paragraph(nil, nil, random)
+		return LipsumUtils.paragraph(nil, nil, random)
 	end
 
 	local output = ""
@@ -124,4 +128,4 @@ function LoremIpsumUtils.document(numParagraphs, createParagraph, random)
 	return output
 end
 
-return LoremIpsumUtils
+return LipsumUtils

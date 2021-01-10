@@ -1,5 +1,5 @@
 ---
--- @module LoremIpsumUtils.story
+-- @module LipsumUtils.story
 -- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
@@ -7,7 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
-local LoremIpsumUtils = require("LoremIpsumUtils")
+local LipsumUtils = require("LipsumUtils")
 local UIPaddingUtils = require("UIPaddingUtils")
 local TextServiceUtils = require("TextServiceUtils")
 local UICornerUtils = require("UICornerUtils")
@@ -122,21 +122,21 @@ local function generate(target)
 
 	add(makeTitle("Sentences"))
 	for _=1, 5 do
-		add(showText(LoremIpsumUtils.sentence(), maxWidth))
+		add(showText(LipsumUtils.sentence(), maxWidth))
 	end
 
 	add(makeTitle("Usernames"))
 	add(makeHorizontalSection(function(addToSection)
 		for _=1, 10 do
-			addToSection(showText(LoremIpsumUtils.username(), maxWidth))
+			addToSection(showText(LipsumUtils.username(), maxWidth))
 		end
 	end))
 
 	add(makeTitle("Paragraph"))
-	add(showText(LoremIpsumUtils.paragraph(5), maxWidth, 20))
+	add(showText(LipsumUtils.paragraph(5), maxWidth, 20))
 
 	add(makeTitle("Document"))
-	add(showText(LoremIpsumUtils.document(), maxWidth, 20))
+	add(showText(LipsumUtils.document(), maxWidth, 20))
 
 	container.Parent = target
 
