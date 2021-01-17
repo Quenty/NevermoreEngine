@@ -19,7 +19,7 @@ function StateStack.new()
 
 	self._stateStack = {}
 
-	self.Changed = self._state.Changed
+	self.Changed = self._state.Changed -- :Fire(newState)
 
 	return self
 end
