@@ -22,7 +22,7 @@ function ClientTranslatorFacade:Init()
 	localizationTable.Parent = LocalizationService
 
 	if RunService:IsStudio() then
-		PseudoLocalize.addToLocalizationTable(localizationTable, "qlp-pls", "en")
+		PseudoLocalize.addToLocalizationTable(localizationTable, nil, "en")
 	end
 
 	self._englishTranslator = localizationTable:GetTranslator("en")
