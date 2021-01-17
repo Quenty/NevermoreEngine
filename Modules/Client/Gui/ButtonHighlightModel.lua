@@ -4,11 +4,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local UserInputService = game:GetService("UserInputService")
-
 local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
-local HapticFeedbackUtils = require("HapticFeedbackUtils")
 local StepUtils = require("StepUtils")
 
 local ButtonHighlightModel = setmetatable({}, BaseObject)
@@ -73,7 +70,6 @@ function ButtonHighlightModel.new(button, onUpdate)
 	end))
 
 	self._maid:GiveTask(self._obj.SelectionGained:Connect(function()
-		HapticFeedbackUtils.smallVibrate(UserInputService:GetLastInputType(), nil, 0.25)
 		self.IsSelected.Value = true
 	end))
 
