@@ -173,7 +173,7 @@ function RotatingLabel:__newindex(topindex, value)
 	elseif topindex == "Transparency" or topindex == "Damper" or topindex == "Speed" then
 		self["_" .. topindex:lower()] = value
 		for _, label in pairs(self._labels) do
-			label[topindex] = self[topindex]
+			label[topindex] = value
 		end
 	elseif topindex == "TextXAlignment" then
 		assert(value == "Left" or value == "Right", "value must be \"Left\" or \"Right\"")

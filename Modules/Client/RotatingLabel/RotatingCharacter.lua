@@ -5,6 +5,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Math = require("Math")
 local Spring = require("Spring")
+local SpringUtils = require("SpringUtils")
 
 local RotatingCharacter = {}
 RotatingCharacter.ClassName = "RotatingCharacter"
@@ -29,6 +30,9 @@ function RotatingCharacter.new(Gui)
 	self._label = self.Gui.Label
 	self._labelTwo = self._label.SecondLabel
 	self._spring = Spring.new(0)
+
+	self._label.TextXAlignment = Enum.TextXAlignment.Left
+	self._labelTwo.TextXAlignment = Enum.TextXAlignment.Left -- hack
 
 	self.TargetCharacter = " "
 	self.Character = self.TargetCharacter
@@ -55,9 +59,12 @@ function RotatingCharacter:__index(index)
 	if index == "Character" then
 		return self:_intToChar(self.Value)
 	elseif index == "IsDoneAnimating" then
-		return math.abs(self.Velocity) < 0.05 and math.abs(self.Target - self.Value) < 0.05
+		return not SpringUtils.animating(self._spring)
 	elseif index == "NextCharacter" then
 		return self:_intToChar(self.Value+1) -- For rendering purposes.
+	elseif index == "Position" then
+		local _, position = SpringUtils.animating(self._spring)
+		return position
 	elseif SPRING_VALUES[index] then
 		return self._spring[index]
 	elseif index == "TargetCharacter" then
@@ -70,11 +77,11 @@ function RotatingCharacter:__index(index)
 		-- Adjust transparency upwards based upon velocity
 		default = Math.map(default, 0, 1, math.clamp(math.abs(self.Velocity*2/self.Speed), 0, 0.25), 1)
 
-		local modifier = (1 - self.Transparency)
+		local transparency = self.Transparency
 
 		return {
-			[self._label] = default*modifier;
-			[self._labelTwo] = (1 - default)*modifier;
+			[self._label] = Math.map(default, 0, 1, transparency, 1);
+			[self._labelTwo] = Math.map(default, 1, 0, transparency, 1);
 		}
 	else
 		return RotatingCharacter[index]
@@ -94,7 +101,7 @@ function RotatingCharacter:__newindex(index, value)
 		self._transparency = value
 
 		-- We need to call this because if transparency updates and we hit past "IsDoneAnimating" but not past
-		-- actual position updates, the TransparencyMap is wrong.
+		-- actual d updates, the TransparencyMap is wrong.
 		self:UpdatePositionRender()
 
 		local transparencyMap = self.TransparencyMap
