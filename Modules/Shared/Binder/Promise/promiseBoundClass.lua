@@ -25,8 +25,8 @@ return function(binder, inst, cancelToken)
 		end)
 	end
 
-	maid:GiveTask(binder:GetClassAddedSignal():Connect(function(classAdded, instance)
-		if instance == inst then
+	maid:GiveTask(binder:ObserveInstance(inst, function(classAdded)
+		if classAdded then
 			promise:Resolve(classAdded)
 		end
 	end))
