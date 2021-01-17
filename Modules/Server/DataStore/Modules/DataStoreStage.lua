@@ -40,6 +40,14 @@ function DataStoreStage:GetTopLevelDataStoredSignal()
 	return self._topLevelStoreSignal
 end
 
+function DataStoreStage:GetFullPath()
+	if self._loadParent then
+		return self._loadParent:GetFullPath() .. "." .. tostring(self._loadName)
+	else
+		return tostring(self._loadName)
+	end
+end
+
 function DataStoreStage:Load(name, defaultValue)
 	if not self._loadParent then
 		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
@@ -186,7 +194,7 @@ end
 
 -- Stores the data for overwrite.
 function DataStoreStage:_doStore(name, value)
-	assert(type(name) == "string")
+	assert(type(name) == "string" or type(name) == "number")
 	assert(value ~= nil)
 
 	local newValue

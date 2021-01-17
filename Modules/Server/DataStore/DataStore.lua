@@ -56,6 +56,10 @@ function DataStore.new(robloxDataStore, key)
 	return self
 end
 
+function DataStore:GetFullPath()
+	return ("RobloxDataStore@%s"):format(self._key)
+end
+
 function DataStore:DidLoadFail()
 	if not self._loadPromise then
 		return false
