@@ -180,6 +180,7 @@ stds.roblox = {
                 StreamingPauseMode = read_write;
                 StreamingTargetRadius = read_write;
                 Terrain = read_only;
+                TouchesUseCollisionGroups = read_write;
                 BreakJoints = read_write;
                 CalculateJumpDistance = read_write;
                 CalculateJumpHeight = read_write;
@@ -191,6 +192,7 @@ stds.roblox = {
                 JoinToOutsiders = read_write;
                 MakeJoints = read_write;
                 PGSIsEnabled = read_write;
+                SetMeshPartHeads = read_write;
                 SetPhysicsThrottleEnabled = read_write;
                 UnjoinFromOutsiders = read_write;
                 ZoomToExtents = read_write;
@@ -268,9 +270,9 @@ stds.roblox = {
 
         -- Libraries
         math = def_fields({"abs", "acos", "asin", "atan", "atan2", "ceil", "clamp", "cos", "cosh",
-            "deg", "exp", "floor", "fmod", "frexp", "ldexp", "log", "log10", "max", "min", "modf",
-            "noise", "pow", "rad", "random", "randomseed", "sign", "sin", "sinh", "sqrt", "tan",
-            "tanh", "huge", "pi"}),
+            "deg", "exp", "floor", "fmod", "frexp", "huge", "ldexp", "log", "log10", "max", "min",
+            "modf", "noise", "pi", "pow", "rad", "random", "randomseed", "round", "sign", "sin",
+            "sinh", "sqrt", "tan", "tanh"}),
 
         table = def_fields({"concat", "foreach", "foreachi", "getn", "insert", "remove", "sort",
             "pack", "unpack", "move", "create", "find"}),
@@ -358,7 +360,7 @@ stds.roblox = {
                 AlignType = def_enum({"Parallel", "Perpendicular"}),
                 AlphaMode = def_enum({"Overlay", "Transparency"}),
                 AnalyticsEconomyAction = def_enum({"Default", "Acquire", "Spend"}),
-                AnalyticsLogLevel = def_enum({"Trace", "Debug", "Infomation", "Warning", "Error",
+                AnalyticsLogLevel = def_enum({"Trace", "Debug", "Information", "Warning", "Error",
                     "Fatal"}),
                 AnalyticsProgressionStatus = def_enum({"Default", "Begin", "Complete", "Abandon",
                     "Fail"}),
@@ -366,6 +368,8 @@ stds.roblox = {
                 AppShellActionType = def_enum({"None", "OpenApp", "TapChatTab",
                     "TapConversationEntry", "TapAvatarTab", "ReadConversation", "TapGamePageTab",
                     "TapHomePageTab", "GamePageLoaded", "HomePageLoaded", "AvatarEditorPageLoaded"}),
+                AppShellFeature = def_enum({"None", "Chat", "AvatarEditor", "GamePage", "HomePage",
+                    "More", "Landing"}),
                 AppUpdateStatus = def_enum({"Unknown", "NotSupported", "Failed", "NotAvailable",
                     "Available"}),
                 AspectType = def_enum({"FitWithinMaxSize", "ScaleWithParentSize"}),
@@ -785,8 +789,8 @@ stds.roblox = {
                 VirtualInputMode = def_enum({"Recording", "Playing", "None"}),
                 WaterDirection = def_enum({"NegX", "X", "NegY", "Y", "NegZ", "Z"}),
                 WaterForce = def_enum({"None", "Small", "Medium", "Strong", "Max"}),
-                WrapLayerDebugMode = def_enum({"None", "BindedCage", "LayerCage",
-                    "BindedCageAndLinks", "Reference"}),
+                WrapLayerDebugMode = def_enum({"None", "BoundCage", "LayerCage",
+                    "BoundCageAndLinks", "Reference"}),
                 WrapTargetDebugMode = def_enum({"None", "TargetCage"}),
                 ZIndexBehavior = def_enum({"Global", "Sibling"}),
             }
