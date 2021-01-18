@@ -132,7 +132,7 @@ function Rx.fromPromise(promise)
 				end
 			end,
 			function(...)
-				if not pending then
+				if pending then
 					sub:Fail(...)
 					sub:Complete()
 				end
