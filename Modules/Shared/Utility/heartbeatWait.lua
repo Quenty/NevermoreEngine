@@ -10,7 +10,7 @@ return function(waitTime)
 	assert(waitTime > 0)
 
 	local startTime = tick()
-	while (tick() - startTime) >= waitTime do
+	while (tick() - startTime) < waitTime do
 		heartbeat:Wait()
 	end
 
