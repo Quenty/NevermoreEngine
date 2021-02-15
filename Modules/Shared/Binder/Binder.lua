@@ -55,7 +55,7 @@ function Binder.new(tagName, constructor)
 
 	delay(5, function()
 		if not self._loaded then
-			warn("Binder is not loaded. Call :Init() on it!")
+			warn(("Binder %q is not loaded. Call :Init() on it!"):format(self._tagName))
 		end
 	end)
 
