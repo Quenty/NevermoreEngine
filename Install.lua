@@ -48,9 +48,26 @@ end
 
 local OpenGetRequests = 0
 
+local function GetRequest(Url, NoCache, Headers)
+	Headers = Headers or {}
+	if NoCache then
+		Headers["Cache-Control"] = "no-cache"
+	end
+
+	local ResponseDictionary = HttpService:RequestAsync({
+		Url = Url;
+		Method = "GET";
+		Headers = Headers;
+	})
+
+	if ResponseDictionary and ResponseDictionary.Success then
+		return ResponseDictionary.Body
+	end
+end
+
 local function GetAsync(...)
 	repeat until OpenGetRequests == 0 or not wait()
-	local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
+	local Success, Data = pcall(GetRequest, ...)
 
 	if Success then
 		return Data
@@ -61,7 +78,7 @@ local function GetAsync(...)
 	elseif Data:find("Http requests are not enabled", 1, true) then
 		OpenGetRequests = OpenGetRequests + 1
 		repeat
-			local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
+			local Success, Data = pcall(GetRequest, ...)
 		until Success and not Data:find("Http requests are not enabled", 1, true) or not wait(1)
 		OpenGetRequests = 0
 		return GetAsync(...)
@@ -302,7 +319,7 @@ spawn(function()
 	GitHub:Install(
 		"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
 		game:GetService("ServerScriptService")
-	)
+	).Name = "Nevermore"
 	threadsCompleted[1] = true
 end)
 
