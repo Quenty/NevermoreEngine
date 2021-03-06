@@ -1,328 +1,381 @@
--- Universal Github Installer
--- @see Validark
--- function GitHub:Install(Link, Parent)
---		@returns <Folder/LuaSourceContainer> from Link found starting at Link into Parent
+-- Nevermore installer script
+--
+-- Reads Github html and then reifies the structure into Roblox instances.
+-- Makes assumptions based upon the name of the files as-to what type it is.
+-- Generally follows the rojo standard format for client/server.
+--
+-- @script Install.lua
+-- @author Quenty
 
--- TODO: This script needs to be refactored
--- luacheck: push ignore
+-- luacheck: no max line length
 
-local function GetFirstChild(Parent, Name, Class)
-	if Parent then -- GetFirstChildWithNameOfClass
-		local Objects = Parent:GetChildren()
-		for a = 1, #Objects do
-			local Object = Objects[a]
-			if Object.Name == Name and Object.ClassName == Class then
-				return Object
-			end
-		end
-	end
-
-	local Child = Instance.new(Class)
-	Child.Name = Name
-	Child.Parent = Parent
-	return Child, true
-end
-
--- Services
 local HttpService = game:GetService("HttpService")
 
--- Module
-local GitHub = {}
+local Table = {}
+do
+	local function errorOnIndex(self, index)
+		error(("Bad index %q"):format(tostring(index)), 2)
+	end
 
-local DataSources = {}
+	local READ_ONLY_METATABLE = {
+		__index = errorOnIndex;
+		__newindex = errorOnIndex;
+	}
 
--- Helper Functions
-local ScriptTypes = {
-	[""] = "ModuleScript";
-	["local"] = "LocalScript";
-	["module"] = "ModuleScript";
-	["mod"] = "ModuleScript";
-	["loc"] = "LocalScript";
-	["server"] = "Script";
-	["client"] = "LocalScript";
-}
+	function Table.readonly(_table)
+		return setmetatable(_table, READ_ONLY_METATABLE)
+	end
 
-local function UrlDecode(Character)
-	return string.char(tonumber(Character, 16))
-end
-
-local OpenGetRequests = 0
-
-local function GetAsync(...)
-	repeat until OpenGetRequests == 0 or not wait()
-	local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-
-	if Success then
-		return Data
-	elseif Data:find("HTTP 429", 1, true) or Data:find("Number of requests exceeded limit", 1, true) then
-		wait(math.random(5))
-		warn("Too many requests")
-		return GetAsync(...)
-	elseif Data:find("Http requests are not enabled", 1, true) then
-		OpenGetRequests = OpenGetRequests + 1
-		repeat
-			local Success, Data = pcall(HttpService.GetAsync, HttpService, ...)
-		until Success and not Data:find("Http requests are not enabled", 1, true) or not wait(1)
-		OpenGetRequests = 0
-		return GetAsync(...)
-	elseif Data:find("HTTP 503", 1, true) then
-		warn(Data, (...))
-		return ""
-	elseif Data:find("HttpError: SslConnectFail", 1, true) then
-		local t = math.random(2, 5)
-		warn("HttpError: SslConnectFail error on " .. tostring((...)) .. " trying again in " .. t .. " seconds.")
-		wait(t)
-		return GetAsync(...)
-	else
-		error(Data .. (...), 0)
+	function Table.merge(orig, new)
+		local _table = {}
+		for key, val in pairs(orig) do
+			_table[key] = val
+		end
+		for key, val in pairs(new) do
+			_table[key] = val
+		end
+		return _table
 	end
 end
 
-local function GiveSourceToScript(Link, Script)
-	DataSources[Script] = Link
-	Script.Source = GetAsync(Link)
-end
+local Http = {}
+do
+	function Http.getAsync(url)
+		local response = HttpService:RequestAsync({
+			Url = url;
+			Method = "GET";
+		})
 
-local function InstallRepo(Link, Directory, Parent, Routines, TypesSpecified)
-	local Value = #Routines + 1
-	Routines[Value] = false
-	local MainExists
-
-	local ScriptCount = 0
-	local Scripts = {}
-
-	local FolderCount = 0
-	local Folders = {}
-
-	local Data = GetAsync(Link)
-	local ShouldSkip = false
-	local _, StatsGraph = Data:find("d-flex repository-lang-stats-graph", 1, true)
-
-	if StatsGraph then
-		ShouldSkip = Data:sub(StatsGraph + 1, (Data:find("</div>", StatsGraph, true) or 0 / 0) - 1):find("%ALua%A") == nil
-	end
-
-	if not ShouldSkip then
-		for Link in Data:gmatch("<span class=\"css%-truncate css%-truncate%-target d%-block width%-fit\"><a class=\"js%-navigation%-open link%-gray%-dark\" title=\"[^\"]+\" %s*href=\"([^\"]+)\".-</span>") do
-			if Link:find("/[^/]+/[^/]+/tree") then
-				FolderCount = FolderCount + 1
-				Folders[FolderCount] = Link
-			elseif Link:find("/[^/]+/[^/]+/blob.+%.lua$") then
-				local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
-
-				if ScriptName:lower() ~= "install" and ScriptClass ~= "ignore" and ScriptClass ~= "spec" and ScriptName:lower() ~= "spec" then
-					if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
-
-					if ScriptName == "_" or ScriptName:lower() == "main" or ScriptName:lower() == "init" then
-						ScriptCount = ScriptCount + 1
-						for a = ScriptCount, 2, -1 do
-							Scripts[a] = Scripts[a - 1]
-						end
-						Scripts[1] = Link
-						MainExists = true
-					else
-						ScriptCount = ScriptCount + 1
-						Scripts[ScriptCount] = Link
-					end
-				end
-			end
-		end
-	end
-
-	if ScriptCount > 0 then
-		local ScriptLink = Scripts[1]
-		local ScriptName, ScriptClass = ScriptLink:match("([%w-_%%]+)%.?(%l*)%.lua$")
-		ScriptName = ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode)
-		local Sub = Link:sub(19)
-		local Link = Sub:gsub("^(/[^/]+/[^/]+)/tree/[^/]+", "%1", 1)
-		local LastFolder = Link:match("[^/]+$")
-		LastFolder = LastFolder:match("^RBX%-(.-)%-Library$") or LastFolder
-
-		if MainExists then
-			local Directory = LastFolder:gsub("%%(%x%x)", UrlDecode)
-			ScriptName, ScriptClass = Directory:match("([%w-_%%]+)%.?(%l*)%.lua$")
-			if not ScriptName then ScriptName = Directory:match("^RBX%-(.-)%-Library$") or Directory end
-			if ScriptClass == "mod" or ScriptClass == "module" then TypesSpecified = true end
-		end
-
-		-- if MainExists or ScriptCount ~= 1 or ScriptName ~= (LastFolder:match("^RBX%-(.-)%-Library$") or LastFolder) then
-		if MainExists then Directory = Directory + 2 end -- :gsub("[^/]+$", "", 1) end
-		local Count = 0
-
-		local function LocateFolder(FolderName)
-			Count = Count + 1
-			if Count > Directory then
-				Directory = Directory + 1
-				if (Parent and Parent.Name) ~= FolderName and "Modules" ~= FolderName then
-					-- local Success, Service = pcall(game.GetService, game, FolderName)
-					-- if FolderName ~= "Lighting" and Success and Service then
-					-- 	Parent = Service
-					-- else
-					local Generated
-					Parent, Generated = GetFirstChild(Parent, FolderName, "Folder")
-					if Generated then
-						if not Routines[1] then Routines[1] = Parent end
-						DataSources[Parent] = "https://github.com" .. (Sub:match(("/[^/]+"):rep(Directory > 2 and Directory + 2 or Directory)) or warn("[1]", Sub, Directory > 1 and Directory + 2 or Directory) or "")
-					end
-					-- end
-				end
-			end
-		end
-
-		Link:gsub("[^/]+$", ""):gsub("[^/]+", LocateFolder)
-
-		if MainExists or ScriptCount ~= 1 or ScriptName ~= LastFolder then
-			LocateFolder(LastFolder)
-		end
-
-		local Script = GetFirstChild(Parent, ScriptName, ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"] or "ModuleScript")
-		if not Routines[1] then Routines[1] = Script end
-		coroutine.resume(coroutine.create(GiveSourceToScript), "https://raw.githubusercontent.com" .. ScriptLink:gsub("(/[^/]+/[^/]+/)blob/", "%1", 1), Script)
-
-		if MainExists then
-			Parent = Script
-		end
-
-		for a = 2, ScriptCount do
-			local Link = Scripts[a]
-			local ScriptName, ScriptClass = Link:match("([%w-_%%]+)%.?(%l*)%.lua$")
-			local Script = GetFirstChild(Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or TypesSpecified and "" or "mod"] or "ModuleScript")
-			coroutine.resume(coroutine.create(GiveSourceToScript), "https://raw.githubusercontent.com" .. Link:gsub("(/[^/]+/[^/]+/)blob/", "%1", 1), Script)
-		end
-	end
-
-	for a = 1, FolderCount do
-		local Link = Folders[a]
-		coroutine.resume(coroutine.create(InstallRepo), "https://github.com" .. Link, Directory, Parent, Routines, TypesSpecified)
-	end
-
-	Routines[Value] = true
-end
-
-function GitHub:Install(Link, Parent, RoutineList)
-	-- Installs Link into Parent
-
-	if Link:byte(-1) == 47 then --gsub("/$", "")
-		Link = Link:sub(1, -2)
-	end
-
-	-- Extract Link Data
-	local Organization, Repository, Tree, ScriptName, ScriptClass
-	local Website, Directory = Link:match("^(https://[raw%.]*github[usercontent]*%.com/)(.+)")
-	Organization, Directory = (Directory or Link):match("^/?([%w-_%.]+)/?(.*)")
-	Repository, Directory = Directory:match("^([%w-_%.]+)/?(.*)")
-
-	if Website == "https://raw.githubusercontent.com/" then
-		if Directory then
-			Tree, Directory = Directory:match("^([^/]+)/(.+)")
-			if Directory then
-				ScriptName, ScriptClass = Directory:match("([%w-_%%]+)%.?(%l*)%.lua$")
-			end
-		end
-	elseif Directory then
-		local a, b = Directory:find("^[tb][rl][eo][eb]/[^/]+")
-		if a and b then
-			Tree, Directory = Directory:sub(6, b), Directory:sub(b + 1)
-			if Directory == "" then Directory = nil end
-			if Directory and Link:find("blob", 1, true) then
-				ScriptName, ScriptClass = Directory:match("([%w-_%%]+)%.?(%l*)%.lua$")
-			end
+		if response.Success then
+			return response.Body
 		else
-			Directory = nil
+			warn(("%d - %q - While retrieving %q"):format(response.StatusCode, response.StatusMessage, url))
+			return nil
 		end
-	end
-
-	if ScriptName and (ScriptName == "_" or ScriptName:lower() == "main" or ScriptName:lower() == "init") then
-		return GitHub:Install("https://github.com/" .. Organization .. "/" .. Repository .. "/tree/" .. (Tree or "master") .. "/" .. Directory:gsub("/[^/]+$", ""):gsub("^/", ""), Parent, RoutineList)
-	end
-
-	if not Website then Website = "https://github.com/" end
-	Directory = Directory and ("/" .. Directory):gsub("^//", "/") or ""
-
-	-- Threads
-	local Routines = RoutineList or {false}
-	local Value = #Routines + 1
-	Routines[Value] = false
-
-	local Garbage
-
-	if ScriptName then
-		Link = "https://raw.githubusercontent.com/" .. Organization .. "/" .. Repository .. "/" .. (Tree or "master") .. Directory
-		local Source = GetAsync(Link)
-		local Script = GetFirstChild(Parent and not RoutineList and Repository ~= ScriptName and Parent.Name ~= ScriptName and Parent.Name ~= Repository and GetFirstChild(Parent, Repository, "Folder") or Parent, ScriptName:gsub("Library$", "", 1):gsub("%%(%x%x)", UrlDecode), ScriptTypes[ScriptClass or "mod"] or "ModuleScript")
-		DataSources[Script] = Link
-		if not Routines[1] then Routines[1] = Script end
-		Script.Source = Source
-	elseif Repository then
-		Link = Website .. Organization .. "/" .. Repository .. ((Tree or Directory ~= "") and ("/tree/" .. (Tree or "master") .. Directory) or "")
-		if not Parent then Parent, Garbage = Instance.new("Folder"), true end
-		coroutine.resume(coroutine.create(InstallRepo), Link, 1, Parent, Routines) -- "/" .. Repository .. Directory
-	elseif Organization then
-		Link = Website .. Organization
-		local Data = GetAsync(Link .. "?tab=repositories")
-		local Object = GetFirstChild(Parent, Organization, "Folder")
-
-		if not Routines[1] then Routines[1] = Object end
-
-		for Link, Data in Data:gmatch('href="(/' .. Organization .. '/[^/]+)" itemprop="name codeRepository"(.-)</div>') do
-			--if not Data:find("Forked from", 1, true) and not Link:find("Plugin", 1, true) and not Link:find(".github.io", 1, true) then
-				GitHub:Install(Link, Object, Routines)
-			--end
-		end
-	end
-
-	Routines[Value] = true
-
-	if not RoutineList then
-		repeat
-			local Done = 0
-			local Count = #Routines
-			for a = 1, Count do
-				if Routines[a] then
-					Done = Done + 1
-				end
-			end
-		until Done == Count or not wait()
-		local Object = Routines[1]
-		if Garbage then
-			Object.Parent = nil
-			Parent:Destroy()
-		end
-		DataSources[Object] = Link
-		return Object
 	end
 end
 
--- luacheck: pop ignore
-print("Installing NevermoreEngine...")
+local String = {}
+do
+	--- Escapes a lua pattern
+	function String.escapeAll(pattern)
+		-- The following characters escaped: ( ) . % + - * ? [ ^ $
+		local UNSAFE_CHARACTERS_MATCH = "[%(%)%.%%%+%-%*%?%[%^%$]"
+		local result = pattern:gsub(UNSAFE_CHARACTERS_MATCH, "%%%1")
+		return result
+	end
 
-local threadsCompleted = table.create(2, false)
+	--- Only escapes the percent
+	function String.escapePercent(pattern)
+		local UNSAFE_CHARACTERS_MATCH = "%%"
+		local result = pattern:gsub(UNSAFE_CHARACTERS_MATCH, "%%%1")
+		return result
+	end
 
-spawn(function()
-	GitHub:Install(
-		"https://github.com/Quenty/NevermoreEngine/tree/version2/Modules",
-		game:GetService("ServerScriptService")
-	)
-	threadsCompleted[1] = true
-end)
+	-- Takes a very simple HTML set and tries to transform it into a safe pattern to capture
+	function String.patternFromExample(example, captures)
+		local pattern = String.escapeAll(example)
 
-spawn(function()
-	local init = GitHub:Install("https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/init.lua")
-	init.Nevermore.Nevermore.Parent = game:GetService("ReplicatedStorage")
-	init:Destroy()
-	threadsCompleted[2] = true
-end)
+		for sample, capture in pairs(captures) do
+			pattern = pattern:gsub(String.escapeAll(sample), String.escapePercent(capture))
+		end
 
-repeat
-	wait()
-	local finished = true
-	for _, thread in pairs(threadsCompleted) do
-		if not thread then
-			finished = false
+		return pattern
+	end
+
+	function String.endsWith(str, postfix)
+		return str:sub(-#postfix) == postfix
+	end
+
+	function String.startsWith(str, prefix)
+		return str:sub(1, #prefix) == prefix
+	end
+
+	function String.withoutPrefix(str, prefix)
+		if String.startsWith(str, prefix) then
+			return str:sub(#prefix + 1)
+		else
+			return str
 		end
 	end
-until finished
 
-HttpService.HttpEnabled = ...
+	function String.withoutPostfix(str, postfix)
+		if String.endsWith(str, postfix) then
+			return str:sub(1, -#postfix - 1)
+		else
+			return str
+		end
+	end
+end
 
-print("NevermoreEngine installed.")
+local ENTRY_TYPES = Table.readonly({
+	Script = "Script";
+	ModuleScript = "ModuleScript";
+	LocalScript = "LocalScript";
+	Folder = "Folder";
+	Markdown = "Markdown";
+})
+
+local EntryUtils = {}
+do
+	function EntryUtils.classifyByName(name)
+		if String.endsWith(name, ".client.lua") then
+			return ENTRY_TYPES.LocalScript
+		elseif String.endsWith(name, ".server.lua") then
+			return ENTRY_TYPES.Script
+		elseif String.endsWith(name, ".lua") then
+			return ENTRY_TYPES.ModuleScript
+		elseif String.endsWith(name, ".md") then
+			return ENTRY_TYPES.Markdown
+		else
+			return ENTRY_TYPES.Folder
+		end
+	end
+
+	function EntryUtils.getNameFromClass(name, entryType)
+		if entryType == ENTRY_TYPES.LocalScript then
+			return String.withoutPostfix(name, ".client.lua")
+		elseif entryType == ENTRY_TYPES.Script then
+			return String.withoutPostfix(name, ".server.lua")
+		elseif entryType == ENTRY_TYPES.ModuleScript then
+			return String.withoutPostfix(name, ".lua")
+		elseif entryType == ENTRY_TYPES.Markdown then
+			return String.withoutPostfix(name, ".md")
+		elseif entryType == ENTRY_TYPES.Folder then
+			return name
+		else
+			error("Unknown entryType")
+		end
+	end
+
+	function EntryUtils.create(className, name, canonicalPath, children)
+		assert(className)
+		assert(name)
+		assert(canonicalPath)
+
+		return Table.readonly({
+			className = className;
+			name = name;
+			canonicalPath = canonicalPath;
+			children = children or {};
+			properties = {};
+		})
+	end
+
+	function EntryUtils.mount(parent, entry)
+		assert(typeof(parent) == "Instance")
+		assert(type(entry) == "table")
+		assert(type(entry.name) == "string")
+
+		-- No way to mount markdown files
+		if entry.className == ENTRY_TYPES.Markdown then
+			return
+		end
+
+		local childrenToForward = {}
+
+		local function addChildren(from)
+			for _, item in pairs(from:GetChildren()) do
+				table.insert(childrenToForward, item)
+			end
+		end
+
+		local found
+		for _, item in pairs(parent:GetChildren()) do
+			if item.Name == entry.name then
+				if not found then
+					found = item
+				else
+					warn(("[EntryUtils.mount] - Duplicate of %q")
+						:format(item:GetFullName()))
+					addChildren(item)
+					item:Remove()
+				end
+			end
+		end
+
+		if found and (not found:IsA(entry.className)) then
+			warn(("[EntryUtils.mount] - Changing %q from type %q to type %q")
+						:format(found:GetFullName(), found.ClassName, entry.className))
+			addChildren(found)
+			found:Remove()
+			found = nil
+		end
+
+		if not found then
+			found = Instance.new(entry.className)
+			found.Name = entry.name
+		end
+
+		for property, value in pairs(entry.properties) do
+			found[property] = value
+		end
+
+		for _, item in pairs(childrenToForward) do
+			item.Parent = found
+		end
+
+		for _, childEntry in pairs(entry.children) do
+			EntryUtils.mount(found, childEntry)
+		end
+
+		found.Parent = parent
+
+		return found
+	end
+end
+
+local ParseUtils = {}
+do
+	local EMPTY_ITERATOR = coroutine.wrap(function() end)
+	local CONTENTS_PATTERN = String.patternFromExample([[<span class="css-truncate css-truncate-target d-block width-fit"><a class="js-navigation-open link-gray-dark" title="Server" data-pjax="#repo-content-pjax-container" href="/Quenty/NevermoreEngine/tree/version2/Modules/Server">Server</a></span>]], {
+		["\"Server\""] = "\"([^\"]+)\"",
+		[">Server<"] = ">[^<]+<",
+		["\"/Quenty/NevermoreEngine/tree/version2/Modules/Server\""] = "\"[^\"]+\"",
+		[" "] = "%s+"
+	})
+
+	function ParseUtils.parseContents(body, pattern)
+		assert(pattern)
+
+		if not body then
+			return EMPTY_ITERATOR
+		end
+
+		return body:gmatch(pattern)
+	end
+
+	function ParseUtils.readContentsAsync(url)
+		local body = Http.getAsync(url)
+
+		return ParseUtils.parseContents(body, CONTENTS_PATTERN)
+	end
+
+	function ParseUtils.readEntriesAsync(url, basePath)
+		assert(url)
+		assert(basePath)
+
+		local entries = {}
+
+		for fileName in ParseUtils.readContentsAsync(url) do
+			local className = EntryUtils.classifyByName(fileName)
+			local name = EntryUtils.getNameFromClass(fileName, className)
+			local path = basePath .. "/" .. fileName
+			table.insert(entries, EntryUtils.create(className, name, path))
+		end
+
+		return entries
+	end
+
+	function ParseUtils.replaceEntryWithTopLevelChild(entry)
+		if entry.className ~= ENTRY_TYPES.Folder then
+			return
+		end
+
+		local index = nil
+		for childIndex, child in pairs(entry.children) do
+			if child.name == "init" then
+				if not index then
+					index = childIndex
+				else
+					warn("[ParseUtils.replaceEntryWithTopLevelChild] - Multiple top level children named 'init'. Using first.")
+				end
+			end
+		end
+
+		if not index then
+			return
+		end
+
+		local child = assert(entry.children[index])
+		table.remove(entry.children, index)
+
+		entry.className = child.className
+		entry.canonicalPath = child.canonicalPath
+		entry.properties = Table.merge(entry.properties, child.properties)
+	end
+
+	function ParseUtils.shouldRetrieveSource(entry)
+		return entry.className == ENTRY_TYPES.Script
+			or entry.className == ENTRY_TYPES.ModuleScript
+			or entry.className == ENTRY_TYPES.LocalScript
+	end
+
+	function ParseUtils.fillScriptSourcesAsync(baseUrl, entry)
+		if ParseUtils.shouldRetrieveSource(entry) then
+			local url = baseUrl .. entry.canonicalPath
+			print(("Retrieving source %q"):format(url))
+
+			local body = Http.getAsync(url)
+
+			if not body then
+				warn(("[ParseUtils.fillScriptSourcesAsync] - Failed to find source of %q at %q")
+					:format(entry.name, url))
+				return
+			end
+
+			entry.properties["Source"] = body
+		end
+
+		for _, childEntry in pairs(entry.children) do
+			-- Recurse!
+			ParseUtils.fillScriptSourcesAsync(baseUrl, childEntry)
+		end
+	end
+
+	function ParseUtils.fillFoldersAsync(url, entry)
+		print(("Retrieving %q"):format(url))
+
+		entry.children = ParseUtils.readEntriesAsync(url, entry.canonicalPath)
+
+		ParseUtils.replaceEntryWithTopLevelChild(entry)
+
+		for _, childEntry in pairs(entry.children) do
+			if childEntry.className == ENTRY_TYPES.Folder then
+				-- Recurse!
+				ParseUtils.fillFoldersAsync(
+					url .. "/" .. childEntry.name,
+					childEntry)
+			end
+		end
+	end
+
+	function ParseUtils.githubContentFromUrl(url)
+		if not String.startsWith(url, "https://github.com/") then
+			error("Not a github URL")
+			return
+		end
+
+		local stripped = String.withoutPrefix(url, "https://github.com/")
+
+		-- also remove random /tree/
+		-- pattern: username/repository/tree/...
+		stripped = stripped:gsub("^(%w+/%w+)/tree/(.*)$", "%1/%2")
+		return "https://raw.githubusercontent.com/" .. stripped
+	end
+end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+-- Mount loader
+do
+	local url = "https://github.com/Quenty/NevermoreEngine/tree/version2/loader/ReplicatedStorage/Nevermore"
+	local entry = EntryUtils.create("Folder", "Nevermore", "")
+	ParseUtils.fillFoldersAsync(url, entry)
+	ParseUtils.fillScriptSourcesAsync(ParseUtils.githubContentFromUrl(url), entry)
+	EntryUtils.mount(ReplicatedStorage, entry)
+end
+
+-- Mount libraries
+do
+	local url = "https://github.com/Quenty/NevermoreEngine/tree/version2/Modules"
+	local entry = EntryUtils.create("Folder", "Core", "")
+	local fullEntry = EntryUtils.create("Folder", "Nevermore", "", { entry })
+
+	ParseUtils.fillFoldersAsync(url, entry)
+	ParseUtils.fillScriptSourcesAsync(ParseUtils.githubContentFromUrl(url), entry)
+	EntryUtils.mount(ServerScriptService, fullEntry)
+end
+
+print("Done installing Nevermore")
