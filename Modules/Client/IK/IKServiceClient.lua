@@ -68,6 +68,8 @@ function IKServiceClient:GetLocalAimer()
 end
 
 function IKServiceClient:GetLocalPlayerRig()
+	assert(self._ikRigBinder, "Not initialize")
+
 	return IKRigUtils.getPlayerIKRig(self._ikRigBinder, Players.LocalPlayer)
 end
 
