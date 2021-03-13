@@ -1,6 +1,10 @@
 --- Groups binders together
 -- @classmod BinderGroup
 
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local Binder = require("Binder")
+
 local BinderGroup = {}
 BinderGroup.ClassName = "BinderGroup"
 BinderGroup.__index = BinderGroup
@@ -28,6 +32,8 @@ function BinderGroup:AddList(binders)
 end
 
 function BinderGroup:Add(binder)
+	assert(Binder.isBinder(binder))
+
 	if self._validateConstructor then
 		assert(self._validateConstructor(binder:GetConstructor()))
 	end
@@ -38,10 +44,12 @@ function BinderGroup:Add(binder)
 	end
 
 	self._bindersByTag[tag] = binder
-	table.insert(self._binders, self._bindersByTag)
+	table.insert(self._binders, binder)
 end
 
 function BinderGroup:GetBinders()
+	assert(self._binders, "No self._binders")
+
 	return self._binders
 end
 
