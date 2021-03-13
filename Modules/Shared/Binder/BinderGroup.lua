@@ -9,16 +9,25 @@ function BinderGroup.new(binders, validateConstructor)
 	local self = setmetatable({}, BinderGroup)
 
 	self._binders = binders or error("No binders")
+	self._validateConstructor = validateConstructor
 
 	-- Assume to be using osyris's typechecking library,
 	-- we have an optional constructor to validate binder classes.
-	if validateConstructor then
+	if self._validateConstructor then
 		for _, binder in pairs(self._binders) do
-			assert(validateConstructor(binder:GetConstructor()))
+			assert(self._validateConstructor(binder:GetConstructor()))
 		end
 	end
 
 	return self
+end
+
+function BinderGroup:Add(binder)
+	if self._validateConstructor then
+		assert(self._validateConstructor(binder:GetConstructor()))
+	end
+
+	table.insert(self._binders, binder)
 end
 
 function BinderGroup:GetBinders()
