@@ -22,8 +22,8 @@ function PlayerHumanoidBinder.new(tag, class)
 	return self
 end
 
-function PlayerHumanoidBinder:Init()
-	local results = { getmetatable(PlayerHumanoidBinder).Init(self) }
+function PlayerHumanoidBinder:Start()
+	local results = { getmetatable(PlayerHumanoidBinder).Start(self) }
 
 	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
 		self:_handlePlayerAdded(player)

@@ -12,9 +12,15 @@ local ScoredActionPicker = require("ScoredActionPicker")
 local ScoredActionService = {}
 
 function ScoredActionService:Init()
+	assert(not self._scoredActionPickers, "Already initialize")
+
 	self._scoredActionPickers = {}
 	self._addedMaps = {}
 	self._count = 0
+end
+
+function ScoredActionService:Start()
+	assert(self._scoredActionPickers, "Not initialize")
 
 	RunService.Stepped:Connect(function()
 		-- TODO: Push to end of frame so we don't delay input by a frame?

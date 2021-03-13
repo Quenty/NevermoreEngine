@@ -10,7 +10,7 @@ function BinderGroupProvider.new(initMethod)
 
 	self._initMethod = initMethod or error("No initMethod")
 
-	self._afterInit = false
+	self._init = false
 	self._binderGroups = {}
 
 	return self
@@ -18,7 +18,7 @@ end
 
 function BinderGroupProvider:Init()
 	self:_initMethod(self)
-	self._afterInit = true
+	self._init = true
 end
 
 function BinderGroupProvider:__index(index)
@@ -37,7 +37,7 @@ end
 function BinderGroupProvider:Add(groupName, binderGroup)
 	assert(type(groupName) == "string")
 	assert(type(binderGroup) == "table")
-	assert(not self._afterInit, "Already inited")
+	assert(not self._init, "Already initialized")
 	assert(not self:Get(groupName), "Duplicate groupName")
 
 	table.insert(self._binderGroups, binderGroup)
