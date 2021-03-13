@@ -18,10 +18,14 @@ local SERVER_UPDATE_RATE = 1/10
 local IKService = {}
 
 function IKService:Init()
-	self._maid = Maid.new()
+	assert(not self._maid, "Already initialized")
 
+	self._maid = Maid.new()
 	self._ikRigBinder = Binder.new(IKConstants.COLLECTION_SERVICE_TAG, require("IKRig"))
-	self._ikRigBinder:Init()
+end
+
+function IKService:Start()
+	assert(self._maid, "Not initialized")
 
 	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
 		self:_handlePlayer(player)
@@ -34,6 +38,8 @@ function IKService:Init()
 	for _, player in pairs(Players:GetPlayers()) do
 		self:_handlePlayer(player)
 	end
+
+	self._ikRigBinder:Start()
 
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
 		self:_updateStepped()
