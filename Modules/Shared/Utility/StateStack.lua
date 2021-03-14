@@ -35,7 +35,9 @@ function StateStack:PushState()
 	self:_updateState()
 
 	return function()
-		self:_popState(data)
+		if self.Destroy then
+			self:_popState(data)
+		end
 	end
 end
 

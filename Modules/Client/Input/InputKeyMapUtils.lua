@@ -24,7 +24,7 @@ end
 
 --- Converts keymap into ContextActionService friendly types
 function InputKeyMapUtils.getInputTypesForActionBinding(inputKeyMapList)
-	assert(type(inputKeyMapList) == "table", "inputKeyMap must be a table")
+	assert(type(inputKeyMapList) == "table", "inputKeyMapList must be a table")
 	local types = {}
 
 	for _, inputKeyMap in pairs(inputKeyMapList) do
@@ -39,6 +39,34 @@ function InputKeyMapUtils.getInputTypesForActionBinding(inputKeyMapList)
 	end
 
 	return types
+end
+
+function InputKeyMapUtils.getInputTypeSetForMode(inputKeyMapList, inputMode)
+	assert(type(inputKeyMapList) == "table", "inputKeyMapList must be a table")
+
+	local results = {}
+
+	for _, inputKeyMap in pairs(inputKeyMapList) do
+		if inputKeyMap.inputMode == inputMode then
+			for _, inputType in pairs(inputKeyMap.inputTypes) do
+				results[inputType] = true
+			end
+		end
+	end
+
+	return results
+end
+
+
+function InputKeyMapUtils.getInputModes(inputKeyMapList)
+	assert(type(inputKeyMapList) == "table", "inputKeyMapList must be a table")
+
+	local modes = {}
+	for _, inputKeyMap in pairs(inputKeyMapList) do
+		table.insert(modes, assert(inputKeyMap.inputMode))
+	end
+
+	return modes
 end
 
 function InputKeyMapUtils.isTouchButton(inputKeyMapList)
