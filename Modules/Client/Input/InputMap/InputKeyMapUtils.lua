@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Set = require("Set")
+local Table = require("Table")
 
 local InputKeyMapUtils = {}
 
@@ -12,10 +13,10 @@ function InputKeyMapUtils.createKeyMap(inputMode, inputTypes)
 	assert(type(inputMode) == "table")
 	assert(type(inputTypes) == "table")
 
-	return {
+	return Table.readonly({
 		inputMode = inputMode;
 		inputTypes = inputTypes;
-	}
+	})
 end
 
 function InputKeyMapUtils.getInputTypesSetForActionBinding(inputKeyMapList)
@@ -39,6 +40,26 @@ function InputKeyMapUtils.getInputTypesForActionBinding(inputKeyMapList)
 	end
 
 	return types
+end
+
+function InputKeyMapUtils.getInputTypeListForMode(inputKeyMapList, inputMode)
+	assert(type(inputKeyMapList) == "table", "inputKeyMapList must be a table")
+
+	local results = {}
+	local seen = {}
+
+	for _, inputKeyMap in pairs(inputKeyMapList) do
+		if inputKeyMap.inputMode == inputMode then
+			for _, inputType in pairs(inputKeyMap.inputTypes) do
+				if not seen then
+					seen[inputType] = true
+					table.insert(results, inputType)
+				end
+			end
+		end
+	end
+
+	return results
 end
 
 function InputKeyMapUtils.getInputTypeSetForMode(inputKeyMapList, inputMode)
