@@ -69,4 +69,32 @@ function StepUtils.onceAtRenderPriority(priority, func)
 	return cleanup
 end
 
+function StepUtils.onceAtStepped(func)
+	return StepUtils.onceAtEvent(RunService.Stepped, func)
+end
+
+function StepUtils.onceAtRenderStepped(func)
+	return StepUtils.onceAtEvent(RunService.RenderStepped, func)
+end
+
+function StepUtils.onceAtEvent(event, func)
+	assert(type(func) == "function")
+
+	local conn
+	local function cleanup()
+		if conn then
+			conn:Disconnect()
+			conn = nil
+		end
+	end
+
+	conn = event:Connect(function(...)
+		cleanup()
+		func(...)
+	end)
+
+	return cleanup
+end
+
+
 return StepUtils

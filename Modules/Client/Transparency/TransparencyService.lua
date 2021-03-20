@@ -9,6 +9,8 @@ local Math = require("Math")
 local TransparencyService = {}
 
 function TransparencyService:Init()
+	assert(not self._properties, "Already initialized")
+
 	self._properties = {
 		Transparency = setmetatable({}, {__mode = "k"});
 		LocalTransparencyModifier = setmetatable({}, {__mode = "k"})
@@ -16,10 +18,14 @@ function TransparencyService:Init()
 end
 
 function TransparencyService:SetTransparency(key, part, transparency)
+	assert(self._properties, "Not initialized")
+
 	self:_set(key, part, "Transparency", transparency)
 end
 
 function TransparencyService:SetLocalTransparencyModifier(key, part, transparency)
+	assert(self._properties, "Not initialized")
+
 	self:_set(key, part, "LocalTransparencyModifier", transparency)
 end
 
@@ -73,11 +79,15 @@ function TransparencyService:_set(key, part, property, newValue)
 end
 
 function TransparencyService:ResetLocalTransparencyModifier(key, part)
+	assert(self._properties, "Not initialized")
+
 	self:SetLocalTransparencyModifier(key, part, nil)
 end
 
 
 function TransparencyService:ResetTransparency(key, part)
+	assert(self._properties, "Not initialized")
+
 	self:SetTransparency(key, part, nil)
 end
 

@@ -7,24 +7,30 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 
-local IKConstants = require("IKConstants")
-local Maid = require("Maid")
 local Binder = require("Binder")
+local IKConstants = require("IKConstants")
 local IKRigUtils = require("IKRigUtils")
+local Maid = require("Maid")
 local promiseBoundClass = require("promiseBoundClass")
 
 local IKServiceClient = {}
 
 function IKServiceClient:Init()
+	assert(not self._maid, "Already initialized")
+
 	self._maid = Maid.new()
 	self._ikRigBinder = Binder.new(IKConstants.COLLECTION_SERVICE_TAG, require("IKRigClient"))
 	self._noDefaultIK = false
+end
+
+function IKServiceClient:Start()
+	assert(self._maid, "Not initialized")
 
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
 		self:_updateStepped()
 	end))
 
-	self._ikRigBinder:Init()
+	self._ikRigBinder:Start()
 end
 
 function IKServiceClient:PromiseRig(maid, humanoid)
@@ -68,6 +74,8 @@ function IKServiceClient:GetLocalAimer()
 end
 
 function IKServiceClient:GetLocalPlayerRig()
+	assert(self._ikRigBinder, "Not initialize")
+
 	return IKRigUtils.getPlayerIKRig(self._ikRigBinder, Players.LocalPlayer)
 end
 

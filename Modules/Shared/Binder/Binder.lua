@@ -28,7 +28,7 @@ end
 
 -- bind to every instance with tag of "TagName"!
 local binder = Binder.new("TagName", MyClass)
-binder:Init() -- listens for new instances and connects events
+binder:Start() -- listens for new instances and connects events
 ]]
 
 local Binder = {}
@@ -55,7 +55,7 @@ function Binder.new(tagName, constructor)
 
 	delay(5, function()
 		if not self._loaded then
-			warn("Binder is not loaded. Call :Init() on it!")
+			warn(("Binder %q is not loaded. Call :Start() on it!"):format(self._tagName))
 		end
 	end)
 
@@ -70,7 +70,7 @@ function Binder.isBinder(value)
 end
 
 --- Listens for new instances and connects to the GetInstanceAddedSignal() and removed signal!
-function Binder:Init()
+function Binder:Start()
 	if self._loaded then
 		return
 	end
@@ -96,7 +96,6 @@ function Binder:Init()
 		self:_remove(inst)
 	end))
 end
-
 
 -- Returns the tag name that the binder has
 function Binder:GetTag()
