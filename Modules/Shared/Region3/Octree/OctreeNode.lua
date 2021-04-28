@@ -32,6 +32,10 @@ function OctreeNode:GetPosition()
 	return self._position
 end
 
+function OctreeNode:GetRawPosition()
+	return self._px, self._py, self._pz
+end
+
 function OctreeNode:SetPosition(position)
 	if self._position == position then
 		return
