@@ -1,8 +1,10 @@
 --- Octree implementation
 -- @classmod Octree
 
-local OctreeRegionUtils = require(script.OctreeRegionUtils)
-local OctreeNode = require(script.OctreeNode)
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local OctreeRegionUtils = require("OctreeRegionUtils")
+local OctreeNode = require("OctreeNode")
 
 local EPSILON = 1e-9
 
