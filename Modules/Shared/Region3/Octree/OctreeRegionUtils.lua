@@ -165,12 +165,9 @@ function OctreeRegionUtils.getNeighborsWithinRadius(region, radius, px, py, pz, 
 	-- for each child
 	for _, childRegion in pairs(region.subRegions) do
 		local cposition = childRegion.position
-		local ox = px - cposition[1]
-		local oy = py - cposition[2]
-		local oz = pz - cposition[3]
 
 		-- within search radius
-		if ox*ox + oy*oy + oz*oz <= searchRadiusSquared then
+		if (px - cposition[1])^2 + (py - cposition[2])^2 + (pz - cposition[3])^2 <= searchRadiusSquared then
 			if childRegion.depth == maxDepth then
 				for node in pairs(childRegion.nodes) do
 					local ndist2 = (px - node._px)^2 + (py - node._py)^2 + (pz - node._pz)^2
