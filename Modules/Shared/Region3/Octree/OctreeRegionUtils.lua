@@ -209,14 +209,17 @@ function OctreeRegionUtils.createSubRegion(parentRegion, parentIndex)
 	local position = parentRegion.position
 	local multiplier = SUB_REGION_POSITION_OFFSET[parentIndex]
 
+	local sizeX = size[1]
+	local sizeY = size[2]
+	local sizeZ = size[3]
 	return OctreeRegionUtils.create(
-		position[1] + multiplier[1]*size[1],
-		position[2] + multiplier[2]*size[2],
-		position[3] + multiplier[3]*size[3],
+		position[1] + multiplier[1]*sizeX,
+		position[2] + multiplier[2]*sizeY,
+		position[3] + multiplier[3]*sizeZ,
 
-		size[1] * 0.5,
-		size[2] * 0.5,
-		size[3] * 0.5,
+		sizeX * 0.5,
+		sizeY * 0.5,
+		sizeZ * 0.5,
 
 		parentRegion, parentIndex
 	)
@@ -244,14 +247,14 @@ function OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
 end
 function OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
 	return math.floor(px / maxRegionSize[1] + 0.5),
-		math.floor(py / maxRegionSize[2] + 0.5),
-		math.floor(pz / maxRegionSize[3] + 0.5)
+		   math.floor(py / maxRegionSize[2] + 0.5),
+		   math.floor(pz / maxRegionSize[3] + 0.5)
 end
 
 function OctreeRegionUtils.getTopLevelRegionPosition(maxRegionSize, cx, cy, cz)
 	return maxRegionSize[1] * cx,
-		maxRegionSize[2] * cy,
-		maxRegionSize[3] * cz
+		   maxRegionSize[2] * cy,
+		   maxRegionSize[3] * cz
 end
 
 function OctreeRegionUtils.areEqualTopRegions(region, rpx, rpy, rpz)
