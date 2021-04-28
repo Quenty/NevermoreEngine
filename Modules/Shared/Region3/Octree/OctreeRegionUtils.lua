@@ -150,7 +150,7 @@ end
 
 function OctreeRegionUtils.getSearchRadiusSquared(radius, diameter, epsilon)
 	-- calculating directly is faster as Luau folds the expressions.
-	return (radius + SQRT_3_OVER_2*diameter)*(radius + SQRT_3_OVER_2*diameter) + epsilon
+	return (radius + SQRT_3_OVER_2*diameter)^2 + epsilon
 end
 
 -- See basic algorithm:
