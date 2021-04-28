@@ -1,6 +1,10 @@
 --- Octree implementation
 -- @module OctreeRegionUtils
 
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local Draw = require("Draw")
+
 local EPSILON = 1e-6
 local SQRT_3_OVER_2 = math.sqrt(3)/2
 local SUB_REGION_POSITION_OFFSET = {
@@ -15,6 +19,19 @@ local SUB_REGION_POSITION_OFFSET = {
 }
 
 local OctreeRegionUtils = {}
+
+function OctreeRegionUtils.visualize(region)
+	local size = region.size
+	local position = region.position
+	local sx, sy, sz = size[1], size[2], size[3]
+	local px, py, pz = position[1], position[2], position[3]
+
+	local box = Draw.box(Vector3.new(px, py, pz), Vector3.new(sx, sy, sz))
+	box.Transparency = 0.9
+	box.Name = "OctreeRegion_" .. tostring(region.depth)
+
+	return box
+end
 
 function OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parent, parentIndex)
 	local hsx, hsy, hsz = sx * 0.5, sy * 0.5, sz * 0.5

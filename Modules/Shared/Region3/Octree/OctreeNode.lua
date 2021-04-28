@@ -1,125 +1,78 @@
---- Octree implementation
--- @classmod Octree
+--- Basic node interacting with the octree
+-- @classmod OctreeNode
+local OctreeRegionUtils = require(script.Parent.OctreeRegionUtils)
 
-local OctreeRegionUtils = require(script.OctreeRegionUtils)
-local OctreeNode = require(script.OctreeNode)
+local OctreeNode = {}
+OctreeNode.ClassName = "OctreeNode"
+OctreeNode.__index = OctreeNode
 
-local EPSILON = 1e-9
-
-local Octree = {}
-Octree.ClassName = "Octree"
-Octree.__index = Octree
-
-function Octree.new()
-	-- code might look uglier, but is faster
+function OctreeNode.new(octree, object)
 	return setmetatable({
-		_maxRegionSize = {512, 512, 512}, -- these should all be the same number
-		_maxDepth = 4,
-		_regionHashMap = {}
-	}, Octree)
+		_octree = octree or error("No octree"),
+		_object = object or error("No object"),
+
+		_currentLowestRegion = nil,
+		_position = nil
+	}, OctreeNode)
 end
 
-function Octree:ClearNodes()
-	self._maxRegionSize = {512, 512, 512} -- these should all be the same number
-	self._maxDepth = 4
-	-- table.clear is better for this usecase
-	table.clear(self._regionHashMap)
+function OctreeNode:KNearestNeighborsSearch(k, radius)
+	return self._octree:KNearestNeighborsSearch(self._position, k, radius)
 end
 
-function Octree:GetAllNodes()
-	local options = {}
+function OctreeNode:GetObject()
+	return self._object
+end
 
-	for _, regionList in pairs(self._regionHashMap) do
-		for _, region in pairs(regionList) do
-			for node, _ in pairs(region.nodes) do
-				table.insert(options, node)
-			end
+function OctreeNode:RadiusSearch(radius)
+	return self._octree:RadiusSearch(self._position, radius)
+end
+
+function OctreeNode:GetPosition()
+	return self._position
+end
+
+function OctreeNode:SetPosition(position)
+	if self._position == position then
+		return
+	end
+
+	local px = position.x
+	local py = position.y
+	local pz = position.z
+
+	self._px = px
+	self._py = py
+	self._pz = pz
+	self._position = position
+
+	local currentLowestRegion = self._currentLowestRegion
+	if currentLowestRegion then
+		if OctreeRegionUtils.inRegionBounds(currentLowestRegion, px, py, pz) then
+			return
 		end
 	end
 
-	return options
-end
+	local newLowestRegion = self._octree:GetOrCreateLowestSubRegion(px, py, pz)
 
-function Octree:CreateNode(position, object)
-	assert(typeof(position) == "Vector3", "Bad position value")
-	assert(object, "Bad object value")
+	-- Sanity check for debugging
+	-- if not OctreeRegionUtils.inRegionBounds(newLowestRegion, px, py, pz) then
+	-- 	error("[OctreeNode.SetPosition] newLowestRegion is not in region bounds!")
+	-- end
 
-	local node = OctreeNode.new(self, object)
-
-	node:SetPosition(position)
-	return node
-end
-
-function Octree:RadiusSearch(position, radius)
-	assert(typeof(position) == "Vector3")
-	assert(type(radius) == "number")
-
-	return self:_radiusSearch(position.X, position.Y, position.Z, radius)
-end
-
-function Octree:KNearestNeighborsSearch(position, k, radius)
-	assert(typeof(position) == "Vector3")
-	assert(type(radius) == "number")
-
-	local objects, nodeDistances2 = self:_radiusSearch(position.x, position.y, position.z, radius)
-
-	local sortable = {}
-	for index, dist2 in pairs(nodeDistances2) do
-		table.insert(sortable, {
-			dist2 = dist2;
-			index = index;
-		})
+	if currentLowestRegion then
+		OctreeRegionUtils.moveNode(currentLowestRegion, newLowestRegion, self)
+	else
+		OctreeRegionUtils.addNode(newLowestRegion, self)
 	end
+	self._currentLowestRegion = newLowestRegion
+end
 
-	table.sort(sortable, function(a, b)
-		return a.dist2 < b.dist2
-	end)
-
-	local knearest = {}
-	local knearestDist2 = {}
-	for i = 1, math.min(#sortable, k) do
-		local sorted = sortable[i]
-		-- table.insert is better
-		table.insert(knearestDist2, sorted.dist2)
-		table.insert(knearest, objects[sorted.index])
+function OctreeNode:Destroy()
+	local currentLowestRegion = self._currentLowestRegion
+	if currentLowestRegion then
+		OctreeRegionUtils.removeNode(currentLowestRegion, self)
 	end
-
-	return knearest, knearestDist2
 end
 
-function Octree:GetOrCreateLowestSubRegion(px, py, pz)
-	return OctreeRegionUtils.getOrCreateSubRegionAtDepth(self:_getOrCreateRegion(px, py, pz), px, py, pz, self._maxDepth)
-end
-
-function Octree:_radiusSearch(px, py, pz, radius)
-	local objectsFound = {}
-	local nodeDistances2 = {}
-
-	local maxDepth = self._maxDepth
-	local searchRadiusSquared = OctreeRegionUtils.getSearchRadiusSquared(radius, self._maxRegionSize[1], EPSILON)
-
-	--debug.profilebegin('_regionHashMap loop')
-	for _, regionList in pairs(self._regionHashMap) do
-		for _, region in pairs(regionList) do
-			local rpos = region.position
-
-			-- ^2 is faster than localizing and performing x*x
-			if (px - rpos[1])^2 + (py - rpos[2])^2 + (pz - rpos[3])^2 <= searchRadiusSquared then
-				OctreeRegionUtils.getNeighborsWithinRadius(region, radius, px, py, pz, objectsFound, nodeDistances2, maxDepth)
-			end
-		end
-	end
-	--debug.profileend()
-
-	return objectsFound, nodeDistances2
-end
-
-function Octree:_getRegion(px, py, pz)
-	return OctreeRegionUtils.findRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
-end
-
-function Octree:_getOrCreateRegion(px, py, pz)
-	return OctreeRegionUtils.getOrCreateRegion(self._regionHashMap, self._maxRegionSize, px, py, pz)
-end
-
-return Octree
+return OctreeNode
