@@ -241,10 +241,10 @@ end
 
 --- This definitely collides
 -- https://stackoverflow.com/questions/5928725/hashing-2d-3d-and-nd-vectors
---function OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
+function OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
 	-- Normally you would modulus this to hash table size, but we want as flat of a structure as possible
---	return cx * 73856093 + cy*19351301 + cz*83492791
---end
+	return cx * 73856093 + cy*19351301 + cz*83492791
+end
 
 function OctreeRegionUtils.findRegion(regionHashMap, maxRegionSize, px, py, pz)
 	local maxSizeX = maxRegionSize[1]

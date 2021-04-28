@@ -1,6 +1,8 @@
 --- Basic node interacting with the octree
 -- @classmod OctreeNode
-local OctreeRegionUtils = require(script.Parent.OctreeRegionUtils)
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local OctreeRegionUtils = require("OctreeRegionUtils")
 
 local OctreeNode = {}
 OctreeNode.ClassName = "OctreeNode"
