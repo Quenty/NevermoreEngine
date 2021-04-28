@@ -245,6 +245,24 @@ function OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
 	-- Normally you would modulus this to hash table size, but we want as flat of a structure as possible
 	return cx * 73856093 + cy*19351301 + cz*83492791
 end
+function OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
+	return math.floor(px / maxRegionSize[1] + 0.5),
+		math.floor(py / maxRegionSize[2] + 0.5),
+		math.floor(pz / maxRegionSize[3] + 0.5)
+end
+
+function OctreeRegionUtils.getTopLevelRegionPosition(maxRegionSize, cx, cy, cz)
+	return maxRegionSize[1] * cx,
+		maxRegionSize[2] * cy,
+		maxRegionSize[3] * cz
+end
+
+function OctreeRegionUtils.areEqualTopRegions(region, rpx, rpy, rpz)
+	local position = region.position
+	return position[1] == rpx
+		and position[2] == rpy
+		and position[3] == rpz
+end
 
 function OctreeRegionUtils.findRegion(regionHashMap, maxRegionSize, px, py, pz)
 	local maxSizeX = maxRegionSize[1]
