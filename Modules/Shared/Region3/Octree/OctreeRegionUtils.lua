@@ -34,7 +34,9 @@ function OctreeRegionUtils.visualize(region)
 end
 
 function OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parent, parentIndex)
-	local hsx, hsy, hsz = sx * 0.5, sy * 0.5, sz * 0.5
+	local hsx = sx * 0.5
+	local hsy = sy * 0.5
+	local hsz = sz * 0.5
 
 	local region = {
 		subRegions = {
@@ -163,14 +165,15 @@ function OctreeRegionUtils.getNeighborsWithinRadius(region, radius, px, py, pz, 
 	-- for each child
 	for _, childRegion in pairs(region.subRegions) do
 		local cposition = childRegion.position
-		local ox, oy, oz = px - cposition[1], py - cposition[2], pz - cposition[3]
+		local ox = px - cposition[1]
+		local oy = py - cposition[2]
+		local oz = pz - cposition[3]
 
 		-- within search radius
 		if ox*ox + oy*oy + oz*oz <= searchRadiusSquared then
 			if childRegion.depth == maxDepth then
 				for node in pairs(childRegion.nodes) do
-					local nox, noy, noz = px - node._px, py - node._py, pz - node._pz
-					local ndist2 = nox*nox + noy*noy + noz*noz
+					local ndist2 = (px - node._px)^2 + (py - node._py)^2 + (pz - node._pz)^2
 
 					if ndist2 <= radiusSquared then
 						table.insert(objectsFound, node._object)
