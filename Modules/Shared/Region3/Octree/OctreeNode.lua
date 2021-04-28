@@ -1,5 +1,6 @@
 --- Basic node interacting with the octree
 -- @classmod OctreeNode
+
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local OctreeRegionUtils = require("OctreeRegionUtils")
