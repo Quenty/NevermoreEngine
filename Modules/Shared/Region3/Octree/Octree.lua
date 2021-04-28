@@ -24,6 +24,8 @@ function Octree:ClearNodes()
 	self._maxRegionSize = { 512, 512, 512 } -- these should all be the same number
 	self._maxDepth = 4
 	table.clear(self._regionHashMap)
+
+	return self
 end
 
 function Octree:GetAllNodes()
