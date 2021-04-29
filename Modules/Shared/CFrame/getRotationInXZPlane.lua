@@ -8,7 +8,7 @@ return function(cframe)
 	local _,_,_,
 	      _,_,zx,
 	      _,_,_,
-	      _,_,zz = cframe:components()
+	      _,_,zz = cframe:GetComponents()
 
 	local back = Vector3.new(zx, 0, zz).unit
 	if back ~= back then
@@ -19,9 +19,9 @@ return function(cframe)
 	local right = top:Cross(back)
 
 	return CFrame.new(
-		cframe.x, cframe.y, cframe.z,
-		right.x, top.x, back.x,
-		right.y, top.y, back.y,
-		right.z, top.z, back.z
+		cframe.X, cframe.Y, cframe.Z,
+		right.X, top.X, back.X,
+		right.Y, top.Y, back.Y,
+		right.Z, top.Z, back.Z
 	)
 end

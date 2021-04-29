@@ -16,13 +16,13 @@ end
 local PRECISION = 10000
 
 function CFrameSerializer.outputRotationAzure(cf)
-	local lookVector = cf.lookVector
+	local lookVector = cf.LookVector
 	local azumith = atan2(-lookVector.X, -lookVector.Z)
 	local ybase = (lookVector.X^2 + lookVector.Z^2)^0.5
 	local elevation = atan2(lookVector.Y, ybase)
 
-	local withoutRoll = Angles(0, azumith, 0) * Angles(elevation, 0, 0) + cf.p
-	local _, _, roll = (withoutRoll:inverse()*cf):toEulerAnglesXYZ()
+	local withoutRoll = Angles(0, azumith, 0) * Angles(elevation, 0, 0) + cf.Position
+	local _, _, roll = (withoutRoll:Inverse()*cf):ToEulerAnglesXYZ()
 
 	-- Atan2 -> in the range [-pi, pi]
 	azumith   = round((azumith   /  PI   ) * PRECISION)
@@ -33,7 +33,7 @@ function CFrameSerializer.outputRotationAzure(cf)
 	Buffer:WriteSigned(21, roll)
 	Buffer:WriteSigned(21, elevation)--]]
 
-	local px, py, pz = cf.x, cf.y, cf.z
+	local px, py, pz = cf.X, cf.Y, cf.Z
 	px = round(px * 128)
 	py = round(py * 128)
 	pz = round(pz * 128)

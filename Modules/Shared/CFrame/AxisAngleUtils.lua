@@ -4,7 +4,7 @@
 local AxisAngleUtils = {}
 
 function AxisAngleUtils.toCFrame(axisAngle, position)
-    local angle = axisAngle.magnitude
+    local angle = axisAngle.Magnitude
     local cframe = CFrame.fromAxisAngle(axisAngle, angle)
 
     if cframe ~= cframe then
@@ -24,15 +24,15 @@ function AxisAngleUtils.toCFrame(axisAngle, position)
 end
 
 function AxisAngleUtils.fromCFrame(cframe)
-    local axis, angle = cframe:toAxisAngle()
+    local axis, angle = cframe:ToAxisAngle()
     local axisAngle = angle*axis
 
     if axisAngle ~= axisAngle then
         -- warn("[AxisAngleUtils.fromCFrame] - axisAngle is NAN")
-        return Vector3.new(0, 0, 0), cframe.p
+        return Vector3.new(0, 0, 0), cframe.Position
     end
 
-    return axisAngle, cframe.p
+    return axisAngle, cframe.Position
 end
 
 return AxisAngleUtils
