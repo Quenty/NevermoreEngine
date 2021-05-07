@@ -9,6 +9,13 @@ local StepUtils = {}
 
 -- update should return true while it needs to update
 function StepUtils.bindToRenderStep(update)
+	return StepUtils.bindToSignal(RunService.RenderStepped, update)
+end
+
+function StepUtils.bindToSignal(signal, update)
+	if typeof(signal) ~= "RBXScriptSignal" then
+		error("signal must be of type RBXScriptSignal")
+	end
 	if type(update) ~= "function" then
 		error(("update must be of type function, got %q"):format(type(update)))
 	end
@@ -41,7 +48,7 @@ function StepUtils.bindToRenderStep(update)
 		local args = {...}
 
 		-- Bind to render stepped
-		conn = RunService.RenderStepped:Connect(function()
+		conn = signal:Connect(function()
 			if not update(unpack(args)) then
 				disconnect()
 			end
