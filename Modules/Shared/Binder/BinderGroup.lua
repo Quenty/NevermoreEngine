@@ -4,6 +4,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Binder = require("Binder")
+local Signal = require("Signal")
 
 local BinderGroup = {}
 BinderGroup.ClassName = "BinderGroup"
@@ -15,6 +16,8 @@ function BinderGroup.new(binders, validateConstructor)
 	self._binders = {}
 	self._bindersByTag = {}
 	self._validateConstructor = validateConstructor
+
+	self.BinderAdded = Signal.new()
 
 	self:AddList(binders)
 
@@ -45,6 +48,8 @@ function BinderGroup:Add(binder)
 
 	self._bindersByTag[tag] = binder
 	table.insert(self._binders, binder)
+
+	self.BinderAdded:Fire(binder)
 end
 
 function BinderGroup:GetBinders()
