@@ -25,6 +25,13 @@ function BinderProvider.new(initMethod)
 	return self
 end
 
+--- Retrieves whether or not its a binder provider
+-- @param value
+-- @return true or false, whether or not it is a value
+function BinderProvider.isBinderProvider(value)
+	return type(value) == "table" and value.ClassName == "BinderProvider"
+end
+
 function BinderProvider:PromiseBinder(binderName)
 	if self._bindersAddedPromise:IsFulfilled() then
 		local binder = self:Get(binderName)

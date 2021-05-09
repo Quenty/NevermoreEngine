@@ -12,7 +12,7 @@ local RagdollUtils = require("RagdollUtils")
 local HumanoidAnimatorUtils = require("HumanoidAnimatorUtils")
 local Maid = require("Maid")
 local RagdollBindersServer = require("RagdollBindersServer")
-local AttributeUtils = require("AttributeUtils")
+-- local AttributeUtils = require("AttributeUtils")
 
 local Ragdollable = setmetatable({}, BaseObject)
 Ragdollable.ClassName = "Ragdollable"
@@ -46,7 +46,7 @@ function Ragdollable.new(humanoid)
 	end
 
 	-- For fast debugging
-	self._maid:GiveTask(AttributeUtils.bindToBinder(self._obj, "Ragdoll", RagdollBindersServer.Ragdoll))
+	-- self._maid:GiveTask(AttributeUtils.bindToBinder(self._obj, "Ragdoll", RagdollBindersServer.Ragdoll))
 
 	return self
 end

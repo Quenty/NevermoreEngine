@@ -209,8 +209,8 @@ end
 -- NOTE: Do not assume that a bound object will be retrieved
 function Binder:Bind(inst)
 	if RunService:IsClient() then
-		warn(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication!")
-			:format(self._tagName))
+		warn(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s")
+			:format(self._tagName, debug.traceback()))
 	end
 
 	CollectionService:AddTag(inst, self._tagName)
@@ -222,8 +222,8 @@ function Binder:Unbind(inst)
 	assert(typeof(inst) == "Instance")
 
 	if RunService:IsClient() then
-		warn(("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication!")
-			:format(self._tagName))
+		warn(("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication! %s")
+			:format(self._tagName, debug.traceback()))
 	end
 
 	CollectionService:RemoveTag(inst, self._tagName)

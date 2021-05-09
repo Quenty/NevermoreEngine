@@ -17,10 +17,6 @@ function ScoredActionService:Init()
 	assert(not self._provider, "Already initialize")
 
 	self._provider = ScoredActionPickerProvider.new()
-end
-
-function ScoredActionService:Start()
-	assert(self._provider, "Not initialize")
 
 	RunService.Stepped:Connect(function()
 		-- TODO: Push to end of frame so we don't delay input by a frame?

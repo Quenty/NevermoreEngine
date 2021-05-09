@@ -10,44 +10,48 @@ local Maid = require("Maid")
 
 local AttributeUtils = {}
 
-function AttributeUtils.bindToBinder(inst, attributeName, binder)
+function AttributeUtils.bindToBinder(instance, attributeName, binder)
 	assert(binder)
-	assert(typeof(inst) == "Instance")
+	assert(typeof(instance) == "Instance")
 	assert(type(attributeName) == "string")
 
 	local maid = Maid.new()
 
 	local function syncAttribute()
-		if inst:GetAttribute(attributeName) then
+		if instance:GetAttribute(attributeName) then
 			if RunService:IsClient() then
-				binder:BindClient(inst)
+				binder:BindClient(instance)
 			else
-				binder:Bind(inst)
+				binder:Bind(instance)
 			end
 		else
-			binder:Unbind(inst)
+			if RunService:IsClient() then
+				binder:UnbindClient(instance)
+			else
+				binder:Unbind(instance)
+			end
 		end
 	end
-	maid:GiveTask(inst:GetAttributeChangedSignal(attributeName):Connect(syncAttribute))
+	maid:GiveTask(instance:GetAttributeChangedSignal(attributeName):Connect(syncAttribute))
 
 	local function syncBoundClass()
-		if binder:Get(inst) then
-			inst:SetAttribute(attributeName, true)
+		if binder:Get(instance) then
+			instance:SetAttribute(attributeName, true)
 		else
-			inst:SetAttribute(attributeName, false)
+			instance:SetAttribute(attributeName, false)
 		end
 	end
-	maid:GiveTask(binder:ObserveInstance(inst, syncBoundClass))
+	maid:GiveTask(binder:ObserveInstance(instance, syncBoundClass))
 
-	if binder:Get(inst) or inst:GetAttribute(attributeName) then
-		inst:SetAttribute(attributeName, true)
+	if binder:Get(instance) or instance:GetAttribute(attributeName) then
+		instance:SetAttribute(attributeName, true)
 		if RunService:IsClient() then
-			binder:BindClient(inst)
+			binder:BindClient(instance)
 		else
-			binder:Bind(inst)
+			binder:Bind(instance)
 		end
 	else
-		inst:SetAttribute(attributeName, false)
+		instance:SetAttribute(attributeName, false)
 		-- no need to bind
 	end
 
@@ -57,7 +61,7 @@ function AttributeUtils.bindToBinder(inst, attributeName, binder)
 		maid:DoCleaning()
 
 		-- Cleanup
-		inst:SetAttribute(attributeName, nil)
+		instance:SetAttribute(attributeName, nil)
 	end)
 
 	return maid

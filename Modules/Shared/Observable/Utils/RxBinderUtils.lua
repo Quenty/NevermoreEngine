@@ -107,4 +107,31 @@ function RxBinderUtils.observeBoundClassesBrio(binders, instance)
 	})
 end
 
+
+function RxBinderUtils.observeAllBrio(binder)
+	assert(type(binder) == "table")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local function handleNewClass(class)
+			local brio = Brio.new(class)
+			maid[class] = brio
+
+			sub:Fire(brio)
+		end
+
+		maid:GiveTask(binder:GetClassAddedSignal():Connect(handleNewClass))
+		maid:GiveTask(binder:GetClassRemovingSignal():Connect(function(class)
+			maid[class] = nil
+		end))
+
+		for class, _ in pairs(binder:GetAllSet()) do
+			handleNewClass(class)
+		end
+
+		return maid
+	end)
+end
+
 return RxBinderUtils
