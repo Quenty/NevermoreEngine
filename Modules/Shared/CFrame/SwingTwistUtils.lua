@@ -11,7 +11,7 @@ function SwingTwistUtils.swingTwist(cf, direction)
 
     -- (v . d)*d, plug into CFrame quaternion constructor with w it will solve rest for us
 	local proj = v:Dot(direction)*direction
-    local twist = CFrame.new(0, 0, 0, proj.x, proj.y, proj.z, w)
+    local twist = CFrame.new(0, 0, 0, proj.X, proj.Y, proj.Z, w)
 
     -- cf = swing * twist, thus...
 	local swing = cf * twist:Inverse()
@@ -23,7 +23,7 @@ function SwingTwistUtils.twistAngle(cf, direction)
     local axis, theta = cf:ToAxisAngle()
     local w, v = math.cos(theta/2),  math.sin(theta/2)*axis
 	local proj = v:Dot(direction)*direction
-    local twist = CFrame.new(0, 0, 0, proj.x, proj.y, proj.z, w)
+    local twist = CFrame.new(0, 0, 0, proj.X, proj.Y, proj.Z, w)
     local _, nTheta = twist:ToAxisAngle()
     return math.sign(v:Dot(direction))*nTheta
 end
