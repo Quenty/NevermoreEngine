@@ -35,12 +35,9 @@ function RagdollUtils.setupState(humanoid)
 		end
 
 		local rootPart = humanoid.RootPart
-		if not rootPart then
-			return
-		end
-
 		local character = humanoid.Parent
-		if not character then
+		
+		if not rootPart or not character then
 			return
 		end
 
@@ -142,28 +139,18 @@ function RagdollUtils.setupHead(humanoid)
 	end
 
 	local head = model:FindFirstChild("Head")
-	if not head then
-		return EMPTY_FUNCTION
-	end
-
-	if head:IsA("MeshPart") then
+	if not head or head:IsA("MeshPart") then
 		return EMPTY_FUNCTION
 	end
 
 	local originalSizeValue = head:FindFirstChild("OriginalSize")
-	if not originalSizeValue then
-		return EMPTY_FUNCTION
-	end
-
+	
 	local specialMesh = head:FindFirstChildWhichIsA("SpecialMesh")
-	if not specialMesh then
+	
+	if not originalSizeValue or not specialMesh or specialMesh.MeshType ~= Enum.MeshType.Head then
 		return EMPTY_FUNCTION
 	end
-
-	if specialMesh.MeshType ~= Enum.MeshType.Head then
-		return EMPTY_FUNCTION
-	end
-
+	
 	local maid = Maid.new()
 
 	-- More accurate physics for heads! Heads start at 2,1,1
