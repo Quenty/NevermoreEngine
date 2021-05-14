@@ -183,9 +183,10 @@ end
 -- @tparam[opt] {Instance} parent
 -- @tparam[opt] {number} diameter
 function Draw.point(vector3, color, parent, diameter)
-	assert(typeof(vector3) == "Vector3")
+	local vector3Type = typeof(vector3)
+	assert(vector3Type == "Vector3" or vector3Type == "CFrame")
 
-	if typeof(vector3) == "CFrame" then
+	if vector3Type == "CFrame" then
 		vector3 = vector3.p
 	end
 
