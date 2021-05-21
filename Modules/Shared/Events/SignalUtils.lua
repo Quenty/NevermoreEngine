@@ -9,6 +9,10 @@ function SignalUtils.onNext(event, _function)
 
 	local conn
 	conn = event:Connect(function(...)
+		if conn.Connected then
+			return -- Multiple events got queued
+		end
+
 		conn:Disconnect()
 		_function(...)
 	end)
