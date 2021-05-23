@@ -6,8 +6,8 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Spring = require("Spring")
 local SummedCamera = require("SummedCamera")
 local FieldOfViewUtils = require("FieldOfViewUtils")
-
-local EPSILON = 1e-4
+local SpringUtils = require("SpringUtils")
+local QFrame = require("QFrame")
 
 local FadeBetweenCamera = {}
 FadeBetweenCamera.ClassName = "FadeBetweenCamera"
@@ -49,23 +49,28 @@ end
 
 function FadeBetweenCamera:__index(index)
 	if index == "CameraState" then
-		local value = self._spring.Value
-
-		if math.abs(value - 1) <= EPSILON then
-			return self.CameraStateB
-		elseif math.abs(value) <= EPSILON then
+		local _, t = SpringUtils.animating(self._spring)
+		if t == 0 then
 			return self.CameraStateA
+		elseif t == 1 then
+			return self.CameraStateB
 		else
-			local stateA = self.CameraStateA
-			local stateB = self.CameraStateB
-			local delta = stateB - stateA
+			local a = self.CameraStateA
+			local b = self.CameraStateB
 
-			if delta.Quaterion.w < 0 then
-				delta.Quaterion = -delta.Quaterion
+			-- We do the position this way because 0^-1 is undefined
+			local linear = a.Position + (b.Position - a.Position)*t
+			local delta = (b*(a^-1))
+
+			local deltaQFrame = delta.QFrame
+			if deltaQFrame.W < 0 then
+				delta.QFrame = QFrame.new(
+					deltaQFrame.x, deltaQFrame.y, deltaQFrame.z, deltaQFrame.W, deltaQFrame.X, deltaQFrame.Y, deltaQFrame.Z)
 			end
 
-			local newState = stateA + delta*value
-			newState.FieldOfView = FieldOfViewUtils.lerpInHeightSpace(stateA.FieldOfView, stateB.FieldOfView, value)
+			local newState = delta^t*a
+			newState.FieldOfView = FieldOfViewUtils.lerpInHeightSpace(a.FieldOfView, b.FieldOfView, t)
+			newState.Position = linear
 
 			return newState
 		end
@@ -76,15 +81,22 @@ function FadeBetweenCamera:__index(index)
 	elseif index == "Damper" then
 		return self._spring.Damper
 	elseif index == "Value" then
-		return self._spring.Value
+		local _, t = SpringUtils.animating(self._spring)
+		return t
 	elseif index == "Speed" then
 		return self._spring.Speed
 	elseif index == "Target" then
 		return self._spring.Target
 	elseif index == "Velocity" then
-		return self._spring.Velocity
+		local animating = SpringUtils.animating(self._spring)
+		if animating then
+			return self._spring.Velocity
+		else
+			return Vector3.new(0, 0, 0)
+		end
 	elseif index == "HasReachedTarget" then
-		return math.abs(self.Value - self.Target) < EPSILON and math.abs(self.Velocity) < EPSILON
+		local animating = SpringUtils.animating(self._spring)
+		return not animating
 	elseif index == "Spring" then
 		return self._spring
 	else
