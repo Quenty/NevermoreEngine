@@ -88,7 +88,8 @@ function QFrame.__div(a, b)
 end
 
 function QFrame.__eq(a, b)
-	error("Use isNAN")
+	return a.x == b.x and a.y == b.y and a.z == b.z
+		and a.W == b.W and a.X == b.X and a.Y == b.Y and a.Z == b.Z
 end
 
 return QFrame
