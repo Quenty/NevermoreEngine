@@ -3,105 +3,124 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local QuaternionObject = require("QuaternionObject")
+local QFrame = require("QFrame")
 
 local CameraState = {}
 CameraState.ClassName = "CameraState"
-CameraState.FieldOfView = 0
-CameraState.Quaterion = QuaternionObject.new()
-CameraState.Position = Vector3.new()
 
-function CameraState:__index(index)
-	if index == "CFrame" then
-		return QuaternionObject.toCFrame(self.Quaterion, self.Position)
-	else
-		return CameraState[index]
-	end
+function CameraState.isCameraState(value)
+	return getmetatable(value) == CameraState
 end
-
-function CameraState:__newindex(index, Value)
-	if index == "CFrame" then
-		rawset(self, "Position", Value.p)
-		rawset(self, "Quaterion", QuaternionObject.fromCFrame(Value))
-	elseif index == "FieldOfView" or index == "Position" or index == "Quaterion" then
-		rawset(self, index, Value)
-	else
-		error(("'%s' is not a valid index of CameraState"):format(tostring(index)))
-	end
-end
-
 --- Builds a new camera stack
 -- @constructor
 -- @param[opt=nil] camera
 -- @treturn CameraState
-function CameraState.new(camera)
+function CameraState.new(qFrame, fieldOfView)
 	local self = setmetatable({}, CameraState)
 
-	if camera then
-		self.FieldOfView = camera.FieldOfView
-		self.CFrame = camera.CFrame
+	if typeof(qFrame) == "Instance" then
+		assert(not fieldOfView)
+
+		self.FieldOfView = qFrame.FieldOfView
+		self.QFrame = QFrame.fromCFrameClosestTo(qFrame.CFrame, QFrame.new())
+	elseif CameraState.isCameraState(qFrame) then
+		assert(not fieldOfView)
+
+		-- Assume it's a CameraState
+		self.FieldOfView = assert(qFrame.FieldOfView)
+		self.QFrame = assert(qFrame.QFrame)
+	elseif QFrame.isQFrame(qFrame) then
+		assert(type(fieldOfView) == "number")
+
+		self.FieldOfView = fieldOfView
+		self.QFrame = qFrame
+	else
+		assert(not qFrame)
+
+		self.FieldOfView = 0
+		self.QFrame = QFrame.new()
 	end
 
 	return self
 end
 
---- Current FieldOfView
--- @tfield number FieldOfView
+function CameraState:__index(index)
+	if index == "CFrame" then
+		if not QFrame.toCFrame(self.QFrame) then
+			print(self.QFrame)
+			return CFrame.new()
+		end
 
---- Current CFrame
--- @tfield CFrame CFrame
-
---- Current Position
--- @tfield Vector3 Position
-
---- Quaternion representation of the rotation of the CameraState
--- @tfield Quaterion Quaternion
-
-
---- Adds two camera states together
--- @tparam CameraState other
-function CameraState:__add(other)
-	local cameraState = CameraState.new(self)
-	cameraState.FieldOfView = self.FieldOfView + other.FieldOfView
-	cameraState.Position = cameraState.Position + other.Position
-	cameraState.Quaterion = self.Quaterion*other.Quaterion
-
-	return cameraState
-end
-
---- Subtract the camera state from another
--- @tparam CameraState other
-function CameraState:__sub(other)
-	local cameraState = CameraState.new(self)
-	cameraState.FieldOfView = self.FieldOfView - other.FieldOfView
-	cameraState.Position = cameraState.Position - other.Position
-	cameraState.Quaterion = self.Quaterion/other.Quaterion
-	return cameraState
-end
-
---- Inverts camera state
-function CameraState:__unm()
-	local cameraState = CameraState.new(self)
-	cameraState.FieldOfView = -self.FieldOfView
-	cameraState.Position = -self.Position
-	cameraState.Quaterion = -self.Quaterion
-	return cameraState
-end
-
---- Multiply camera state by percent effect
--- @tparam number other
-function CameraState:__mul(other)
-	local cameraState = CameraState.new(self)
-
-	if type(other) == "number" then
-		cameraState.FieldOfView = self.FieldOfView * other
-		cameraState.Quaterion = self.Quaterion^other
-		cameraState.Position = self.Position * other
+		return QFrame.toCFrame(self.QFrame)
+	elseif index == "Position" then
+		return QFrame.toPosition(self.QFrame)
 	else
-		error("Invalid other")
+		return CameraState[index]
 	end
+end
 
-	return cameraState
+function CameraState:__newindex(index, value)
+	if index == "CFrame" then
+		assert(typeof(value) == "CFrame")
+		local qFrame = QFrame.fromCFrameClosestTo(value, self.QFrame)
+		assert(qFrame) -- Yikes if this fails, but it occurs
+		rawset(self, "QFrame", qFrame)
+	elseif index == "Position" then
+		assert(typeof(value) == "Vector3")
+
+		local qFrame = self.QFrame
+		rawset(self, "QFrame", QFrame.new(value.x, value.y, value.z, qFrame.W, qFrame.X, qFrame.Y, qFrame.Z))
+	elseif index == "FieldOfView" or index == "QFrame" then
+		rawset(self, index, value)
+	else
+		error(("'%s' is not a valid index of CameraState"):format(tostring(index)))
+	end
+end
+
+function CameraState.__add(a, b)
+	assert(CameraState.isCameraState(a) and CameraState.isCameraState(b),
+		"CameraState + non-CameraState attempted")
+
+	return CameraState.new(a.QFrame + b.QFrame, a.FieldOfView + b.FieldOfView)
+end
+
+function CameraState.__sub(a, b)
+	assert(CameraState.isCameraState(a) and CameraState.isCameraState(b),
+		"CameraState - non-CameraState attempted")
+
+	return CameraState.new(a.QFrame - b.QFrame, a.FieldOfView - b.FieldOfView)
+end
+
+function CameraState.__unm(a)
+	return CameraState.new(-a.QFrame, -a.FieldOfView)
+end
+
+function CameraState.__mul(a, b)
+	if type(a) == "number" and CameraState.isCameraState(b) then
+		return CameraState.new(a*b.QFrame, a*b.FieldOfView)
+	elseif CameraState.isCameraState(b) and type(b) == "number" then
+		return CameraState.new(a.QFrame*b, a.FieldOfView*b)
+	elseif CameraState.isCameraState(a) and CameraState.isCameraState(b) then
+		return CameraState.new(a.QFrame*b.QFrame, a.FieldOfView*b.FieldOfView)
+	else
+		error("CameraState * non-CameraState attempted")
+	end
+end
+
+function CameraState.__div(a, b)
+	if CameraState.isCameraState(a) and type(b) == "number" then
+		return CameraState.new(a.QFrame/b, a.FieldOfView/b)
+	else
+		error("CameraState * non-CameraState attempted")
+	end
+end
+
+function CameraState.__pow(a, b)
+	if CameraState.isCameraState(a) and type(b) == "number" then
+		return CameraState.new(a.QFrame^b, a.FieldOfView^b)
+	else
+		error("CameraState ^ non-CameraState attempted")
+	end
 end
 
 --- Set another camera state. Typically used to set Workspace.CurrentCamera's state to match this camera's state
