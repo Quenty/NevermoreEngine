@@ -47,7 +47,7 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 		end
 
 		local state = self:GetTopState()
-		if state and state ~= self._defaultCamera then
+		if state then
 			state:Set(Workspace.CurrentCamera)
 		end
 
