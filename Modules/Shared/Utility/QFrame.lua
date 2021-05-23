@@ -46,9 +46,13 @@ function QFrame.toPosition(self)
 	return Vector3.new(self.x, self.y, self.z)
 end
 
+function QFrame.isQFrame(value)
+	return getmetatable(value) == QFrame
+end
+
 function QFrame.isNAN(a)
 	return a.x == a.x and a.y == a.y and a.z == a.z
-	and a.W == a.W and a.X == a.X and a.Y == a.Y and a.Z == a.Z
+		and a.W == a.W and a.X == a.X and a.Y == a.Y and a.Z == a.Z
 end
 
 function QFrame.__unm(a)
@@ -56,24 +60,56 @@ function QFrame.__unm(a)
 end
 
 function QFrame.__add(a, b)
-	assert(getmetatable(a) == QFrame and getmetatable(b) == QFrame,
+	assert(QFrame.isQFrame(a) and QFrame.isQFrame(b),
 		"QFrame + non-QFrame attempted")
 
 	return QFrame.new(a.x + b.x, a.y + b.y, a.z + b.z, a.W + b.W, a.X + b.X, a.Y + b.Y, a.Z + b.Z)
 end
 
 function QFrame.__sub(a, b)
-	assert(getmetatable(a) == QFrame and getmetatable(b) == QFrame,
+	assert(QFrame.isQFrame(a) and QFrame.isQFrame(b),
 		"QFrame - non-QFrame attempted")
 
 	return QFrame.new(a.x - b.x, a.y - b.y, a.z - b.z, a.W - b.W, a.X - b.X, a.Y - b.Y, a.Z - b.Z)
 end
 
+function QFrame.__pow(a, b)
+	assert(QFrame.isQFrame(a) and type(b) == "number")
+
+	local w, x, y, z = a.W, a.X, a.Y, a.Z
+	local vv = x*x + y*y + z*z
+
+	if vv > 0 then
+		local v = math.sqrt(vv)
+		local m = (w*w+vv)^(b/2)
+		local theta = b*math.atan2(v,w)
+		local s = m*math.sin(theta)/v
+		return QFrame.new(a.x^b, a.y^b, a.z^b, m*math.cos(theta), x*s, y*s, z*s)
+	else
+		if w < 0 then
+			local m = (-w)^b
+			local s = m*math.sin(math.pi*b)*0.57735026918962576450914878050196--3^-0.5
+			return QFrame.new(a.x^b, a.y^b, a.z^b, m*math.cos(math.pi*b), s, s, s)
+		else
+			return QFrame.new(a.x^b, a.y^b, a.z^b, w^b, 0, 0, 0)
+		end
+	end
+end
+
 function QFrame.__mul(a, b)
-	if type(a) == "number" then
+	if type(a) == "number" and QFrame.isQFrame(b) then
 		return QFrame.new(a*b.x, a*b.y, a*b.z, a*b.W, a*b.X, a*b.Y, a*b.Z)
-	elseif type(b) == "number" then
+	elseif QFrame.isQFrame(a) and type(b) == "number" then
 		return QFrame.new(a.x*b, a.y*b, a.z*b, a.W*b, a.X*b, a.Y*b, a.Z*b)
+	elseif QFrame.isQFrame(a) and QFrame.isQFrame(b) then
+		return QFrame.new(
+			a.x*b.x,
+			a.y*b.y,
+			a.z*b.z,
+			a.W*b.W - a.X*b.X - a.Y*b.Y - a.Z*b.Z,
+			a.W*b.X + a.X*b.W + a.Y*b.Z - a.Z*b.Y,
+			a.W*b.Y - a.X*b.Z + a.Y*b.W + a.Z*b.X,
+			a.W*b.Z + a.X*b.Y - a.Y*b.X + a.Z*b.W)
 	else
 		error("QFrame * non-QFrame attempted")
 	end
