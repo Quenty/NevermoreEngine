@@ -307,12 +307,13 @@ function Binder:_add(inst)
 		local bindable = Instance.new("BindableEvent")
 
 		for callback, _ in pairs(listeners) do
-			local conn = bindable.Event:Connect(function()
+			local conn
+			conn = bindable.Event:Connect(function()
+				conn:Disconnect()
 				callback(class)
 			end)
 
 			bindable:Fire()
-			conn:Disconnect()
 		end
 
 		bindable:Destroy()
