@@ -79,12 +79,13 @@ function Binder:Start()
 	local bindable = Instance.new("BindableEvent")
 
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
-		local conn = bindable.Event:Connect(function()
+		local conn
+		conn = bindable.Event:Connect(function()
 			self:_add(inst)
+			conn:Disconnect()
 		end)
 
 		bindable:Fire()
-		conn:Disconnect()
 	end
 
 	bindable:Destroy()
