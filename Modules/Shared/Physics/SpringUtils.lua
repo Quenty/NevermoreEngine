@@ -18,7 +18,7 @@ function SpringUtils.animating(spring, epsilon)
 			or math.abs(spring.Velocity) > epsilon
 	elseif typeof(target) == "Vector3" then
 		animating = (spring.Position - spring.Target).magnitude > epsilon
-			or spring.Velocity.magnitude  > epsilon
+			or spring.Velocity.magnitude > epsilon
 	else
 		error("Unknown type")
 	end
