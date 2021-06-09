@@ -7,7 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Maid = require("Maid")
 local QFrame = require("QFrame")
 local CameraStoryUtils = require("CameraStoryUtils")
-local CubicSplineLib = require("CubicSplineLib")
+local CubicSplineUtils = require("CubicSplineUtils")
 
 return function(target)
 	local maid = Maid.new()
@@ -78,26 +78,25 @@ return function(target)
 
 		end
 
-		local a = a
 		local b = getFinish(t)
 
 		local result = exp((1 - t)*log(a*b^-1))*b
 		return result
 	end, Color3.new(1, 0.5, 1))
 
-	-- setup(function(t)
-	-- 	local node0 = CubicSplineLib.newSplineNode(0, a, QFrame.new())
-	-- 	local node1 = CubicSplineLib.newSplineNode(1, getFinish(t), QFrame.new())
+	setup(function(t)
+		local node0 = CubicSplineUtils.newSplineNode(0, a, QFrame.new())
+		local node1 = CubicSplineUtils.newSplineNode(1, getFinish(t), QFrame.new())
 
-	-- 	if t <= node0.t then
-	-- 		return node0.p
-	-- 	elseif t >= node1.t then
-	-- 		return node1.p
-	-- 	end
+		if t <= node0.t then
+			return node0.p
+		elseif t >= node1.t then
+			return node1.p
+		end
 
-	-- 	local newNode = CubicSplineLib.tweenSplineNodes(node0, node1, t)
-	-- 	return newNode.p
-	-- end, Color3.new(0.5, 1, 1))
+		local newNode = CubicSplineUtils.tweenSplineNodes(node0, node1, t)
+		return newNode.p
+	end, Color3.new(0.5, 1, 1))
 
 	return function()
 		maid:DoCleaning()
