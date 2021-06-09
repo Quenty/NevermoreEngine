@@ -4,103 +4,100 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local RunService = game:GetService("RunService")
-
 local Maid = require("Maid")
 local QFrame = require("QFrame")
-local InsertServiceUtils = require("InsertServiceUtils")
-
-local function reflectCamera(maid, topCamera)
-	local camera = Instance.new("Camera")
-	camera.Name = "ReflectedCamera"
-	maid:GiveTask(camera)
-
-	local function update()
-		camera.FieldOfView = topCamera.FieldOfView
-		camera.CFrame = topCamera.CFrame
-	end
-	maid:GiveTask(topCamera:GetPropertyChangedSignal("CFrame"):Connect(update))
-	maid:GiveTask(topCamera:GetPropertyChangedSignal("FieldOfView"):Connect(update))
-
-	update()
-
-	return camera
-end
+local CameraStoryUtils = require("CameraStoryUtils")
+local CubicSplineLib = require("CubicSplineLib")
 
 return function(target)
 	local maid = Maid.new()
 
-	local viewPortFrame = Instance.new("ViewportFrame")
-	viewPortFrame.ZIndex = 0
-	viewPortFrame.BorderSizePixel = 0
-	viewPortFrame.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
-	viewPortFrame.Size = UDim2.new(1, 0, 1, 0)
-	maid:GiveTask(viewPortFrame)
-
-	local reflectedCamera = reflectCamera(maid, workspace.CurrentCamera)
-	reflectedCamera.Parent = viewPortFrame
-	viewPortFrame.CurrentCamera = reflectedCamera
+	local viewportFrame = CameraStoryUtils.setupViewportFrame(maid, target)
 
 	local cameraCFrame = workspace.CurrentCamera.CFrame
-	local startQFrame = QFrame.fromCFrameClosestTo(
+	local a = QFrame.fromCFrameClosestTo(
 		CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25),
 		QFrame.new())
-	local endQFrame = QFrame.fromCFrameClosestTo(
-		CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 + 10*cameraCFrame.RightVector)
-			* CFrame.Angles(math.pi/3, 2*math.pi/3, 0),
-		QFrame.new())
 
-	local function setup(interpolate, color)
-		maid:GivePromise(InsertServiceUtils.promiseAsset(182451181)):Then(function(model)
-			maid:GiveTask(model)
 
-			local crate = model:GetChildren()[1]
-			if not crate then
-				return
-			end
+	local setup = CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, -1, 2, 4, function(qFrame)
+		return QFrame.toCFrame(qFrame)
+	end)
 
-			for _, item in pairs(crate:GetDescendants()) do
-				if item:IsA("BasePart") then
-					item.Color = color
-					item.Transparency = 0.5
-				end
-			end
+	local function getFinish(t)
+		local root = CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 + 10*cameraCFrame.RightVector)
+			* CFrame.Angles(math.pi/3, 2*math.pi/3, 0)
 
-			crate.Parent = viewPortFrame
-
-			local PERIOD = 1
-			maid:GiveTask(RunService.RenderStepped:Connect(function()
-				local t = (os.clock()/PERIOD % 2/PERIOD)*PERIOD
-				if t >= 1 then
-					t = 1 - (t % 1)
-				end
-
-				t = t*3 - 1
-
-				local qFrame = interpolate(t)
-				crate:SetPrimaryPartCFrame(QFrame.toCFrame(qFrame))
-			end))
-
-			viewPortFrame.Parent = target
-		end)
+		return QFrame.fromCFrameClosestTo(
+			root * CFrame.Angles(0, math.pi*t/3, 0),
+			QFrame.new())
 	end
 
 	setup(function(t)
-		return endQFrame
+		return getFinish(t)
 	end, Color3.new(1, 0.5, 0.5))
 
 	setup(function(t)
-		return startQFrame
+		return a
 	end, Color3.new(0.5, 1, 0.5))
 
-	setup(function(t)
-		return (1 - t)*startQFrame + t*endQFrame
-	end, Color3.new(0.25, 0.25, 0.25))
+	-- setup(function(t)
+	-- 	return (1 - t)*a + t*getFinish(t)
+	-- end, Color3.new(0.25, 0.25, 0.25))
 
 	setup(function(t)
-		local result = ((endQFrame*(startQFrame^-1))^t)*startQFrame
+		return QFrame.fromCFrameClosestTo(QFrame.toCFrame(a):Lerp(QFrame.toCFrame(getFinish(t)), t), QFrame.new())
+	end, Color3.new(0.75, 0.75, 0.75))
+
+	local function slerp(q0, q1, t)
+		local delta = q1*(q0^-1)
+		if delta.W < 0 then
+			delta = QFrame.new(delta.x, delta.y, delta.z, -delta.W, -delta.X, -delta.Y, -delta.Z)
+		end
+
+		return(delta^t)*q0
+	end
+
+	setup(function(t)
+		local result = slerp(a, getFinish(t), t)
 		return result
 	end, Color3.new(0.5, 0.5, 1))
+
+	setup(function(t)
+		if t <= 0 then
+			return a
+		elseif t >= 1 then
+			return getFinish(t)
+		end
+
+		local function exp(q)
+
+		end
+
+		local function log()
+
+		end
+
+		local a = a
+		local b = getFinish(t)
+
+		local result = exp((1 - t)*log(a*b^-1))*b
+		return result
+	end, Color3.new(1, 0.5, 1))
+
+	-- setup(function(t)
+	-- 	local node0 = CubicSplineLib.newSplineNode(0, a, QFrame.new())
+	-- 	local node1 = CubicSplineLib.newSplineNode(1, getFinish(t), QFrame.new())
+
+	-- 	if t <= node0.t then
+	-- 		return node0.p
+	-- 	elseif t >= node1.t then
+	-- 		return node1.p
+	-- 	end
+
+	-- 	local newNode = CubicSplineLib.tweenSplineNodes(node0, node1, t)
+	-- 	return newNode.p
+	-- end, Color3.new(0.5, 1, 1))
 
 	return function()
 		maid:DoCleaning()
