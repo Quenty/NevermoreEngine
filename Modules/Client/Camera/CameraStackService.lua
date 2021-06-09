@@ -149,7 +149,7 @@ function CameraStackService:GetNewStateBelow()
 				return self._stack[1].CameraState
 			end
 		else
-			warn("[CameraStackService] - Could not get state, returning default")
+			warn(("[CameraStackService] - Could not get state from %q, returning default"):format(tostring(_stateToUse)))
 			return self._stack[1].CameraState
 		end
 	end), function(newStateToUse)
