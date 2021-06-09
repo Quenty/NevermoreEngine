@@ -1,23 +1,26 @@
 --- Add another layer of effects that can be faded in/out
--- @classmod FadeBetweenCamera
+-- @classmod FadeBetweenCamera3
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Spring = require("Spring")
 local SummedCamera = require("SummedCamera")
-local FieldOfViewUtils = require("FieldOfViewUtils")
 local SpringUtils = require("SpringUtils")
 local QFrame = require("QFrame")
+local FieldOfViewUtils = require("FieldOfViewUtils")
+local CameraState = require("CameraState")
+local CameraFrame = require("CameraFrame")
+local CubicSplineUtils = require("CubicSplineUtils")
 
-local FadeBetweenCamera = {}
-FadeBetweenCamera.ClassName = "FadeBetweenCamera"
+local FadeBetweenCamera3 = {}
+FadeBetweenCamera3.ClassName = "FadeBetweenCamera3"
 
-function FadeBetweenCamera.new(cameraA, cameraB)
+function FadeBetweenCamera3.new(cameraA, cameraB)
 	local self = setmetatable({
 		_spring = Spring.new(0);
 		CameraA = cameraA or error("No cameraA");
 		CameraB = cameraB or error("No cameraB");
-	}, FadeBetweenCamera)
+	}, FadeBetweenCamera3)
 
 	self.Damper = 1
 	self.Speed = 15
@@ -25,11 +28,11 @@ function FadeBetweenCamera.new(cameraA, cameraB)
 	return self
 end
 
-function FadeBetweenCamera:__add(other)
+function FadeBetweenCamera3:__add(other)
 	return SummedCamera.new(self, other)
 end
 
-function FadeBetweenCamera:__newindex(index, value)
+function FadeBetweenCamera3:__newindex(index, value)
 	if index == "Damper" then
 		self._spring.Damper = value
 	elseif index == "Value" then
@@ -43,11 +46,11 @@ function FadeBetweenCamera:__newindex(index, value)
 	elseif index == "CameraA" or index == "CameraB" then
 		rawset(self, index, value)
 	else
-		error(("%q is not a valid member of FadeBetweenCamera"):format(tostring(index)))
+		error(("%q is not a valid member of FadeBetweenCamera3"):format(tostring(index)))
 	end
 end
 
-function FadeBetweenCamera:__index(index)
+function FadeBetweenCamera3:__index(index)
 	if index == "CameraState" then
 		local _, t = SpringUtils.animating(self._spring)
 		if t == 0 then
@@ -55,24 +58,37 @@ function FadeBetweenCamera:__index(index)
 		elseif t == 1 then
 			return self.CameraStateB
 		else
-			local a = self.CameraStateA
-			local b = self.CameraStateB
+			local stateA = self.CameraStateA
+			local stateB = self.CameraStateB
+
+			local frameA = stateA.CameraFrame
+			local frameB = stateB.CameraFrame
+
+			local dist = (frameA.Position - frameB.Position).magnitude
+
+			local node0 = CubicSplineUtils.newSplineNode(0, frameA.Position,
+				stateA.CameraFrameDerivative.Position + frameA.CFrame.lookVector*dist*0.3)
+			local node1 = CubicSplineUtils.newSplineNode(1, frameB.Position,
+				stateB.CameraFrameDerivative.Position + frameB.CFrame.lookVector*dist*0.3)
 
 			-- We do the position this way because 0^-1 is undefined
-			local linear = a.Position + (b.Position - a.Position)*t
-			local delta = (b*(a^-1))
+			--stateA.Position + (stateB.Position - stateA.Position)*t
+			local newNode = CubicSplineUtils.tweenSplineNodes(node0, node1, t)
+			local delta = (frameB*(frameA^-1))
 
 			local deltaQFrame = delta.QFrame
 			if deltaQFrame.W < 0 then
 				delta.QFrame = QFrame.new(
-					deltaQFrame.x, deltaQFrame.y, deltaQFrame.z, deltaQFrame.W, deltaQFrame.X, deltaQFrame.Y, deltaQFrame.Z)
+					deltaQFrame.x, deltaQFrame.y, deltaQFrame.z, -deltaQFrame.W, -deltaQFrame.X, -deltaQFrame.Y, -deltaQFrame.Z)
 			end
 
-			local newState = delta^t*a
-			newState.FieldOfView = FieldOfViewUtils.lerpInHeightSpace(a.FieldOfView, b.FieldOfView, t)
-			newState.Position = linear
+			local newState = delta^t*frameA
+			newState.FieldOfView = FieldOfViewUtils.lerpInHeightSpace(frameA.FieldOfView, frameB.FieldOfView, t)
+			newState.Position = newNode.p
 
-			return newState
+			-- require("Draw").point(newState.Position)
+
+			return CameraState.new(newState, CameraFrame.new(QFrame.fromVector3(newNode.v, QFrame.new())))
 		end
 	elseif index == "CameraStateA" then
 		return self.CameraA.CameraState or self.CameraA
@@ -99,9 +115,11 @@ function FadeBetweenCamera:__index(index)
 		return not animating
 	elseif index == "Spring" then
 		return self._spring
+	elseif FadeBetweenCamera3[index] then
+		return FadeBetweenCamera3[index]
 	else
-		return FadeBetweenCamera[index]
+		error(("%q is not a valid member of FadeBetweenCamera3"):format(tostring(index)))
 	end
 end
 
-return FadeBetweenCamera
+return FadeBetweenCamera3

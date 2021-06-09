@@ -6,7 +6,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local CameraStackService = require("CameraStackService")
-local FadeBetweenCamera = require("FadeBetweenCamera")
+local FadeBetweenCamera3 = require("FadeBetweenCamera3")
 local Maid = require("Maid")
 
 local CameraStateTweener = {}
@@ -25,7 +25,7 @@ function CameraStateTweener.new(cameraEffect, speed)
 
 	self._cameraEffect = cameraEffect
 	self._cameraBelow = cameraBelow
-	self._fadeBetween = FadeBetweenCamera.new(cameraBelow, cameraEffect)
+	self._fadeBetween = FadeBetweenCamera3.new(cameraBelow, cameraEffect)
 	assign(self._fadeBetween)
 
 	CameraStackService:Add(self._fadeBetween)
