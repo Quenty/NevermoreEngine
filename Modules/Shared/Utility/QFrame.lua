@@ -17,7 +17,14 @@ function QFrame.new(x, y, z, W, X, Y, Z)
 	return self
 end
 
+function QFrame.isQFrame(value)
+	return getmetatable(value) == QFrame
+end
+
 function QFrame.fromCFrameClosestTo(cframe, closestTo)
+	assert(typeof(cframe) == "CFrame")
+	assert(QFrame.isQFrame(closestTo))
+
 	local axis, angle = cframe:toAxisAngle()
 	local W = math.cos(angle/2)
 	local X = math.sin(angle/2)*axis.x
@@ -33,6 +40,13 @@ function QFrame.fromCFrameClosestTo(cframe, closestTo)
 	return QFrame.new(cframe.x, cframe.y, cframe.z, W, X, Y, Z)
 end
 
+function QFrame.fromVector3(vector, qFrame)
+	assert(typeof(vector) == "Vector3")
+	assert(QFrame.isQFrame(qFrame))
+
+	return QFrame.new(vector.x, vector.y, vector.z, qFrame.W, qFrame.X, qFrame.Y, qFrame.Z)
+end
+
 function QFrame.toCFrame(self)
 	local cframe = CFrame.new(self.x, self.y, self.z, self.X, self.Y, self.Z, self.W)
 	if cframe == cframe then
@@ -44,10 +58,6 @@ end
 
 function QFrame.toPosition(self)
 	return Vector3.new(self.x, self.y, self.z)
-end
-
-function QFrame.isQFrame(value)
-	return getmetatable(value) == QFrame
 end
 
 function QFrame.isNAN(a)
