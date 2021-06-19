@@ -18,7 +18,7 @@ function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbn
 	thumbnailSize = thumbnailSize or Enum.ThumbnailSize.Size100x100
 
 	local promise
-	promise = Promise.spawn(function(resolve, reject)
+	promise = Promise.defer(function(resolve, reject)
 		local tries = 0
 		repeat
 			tries = tries + 1

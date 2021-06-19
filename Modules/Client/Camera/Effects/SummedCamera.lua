@@ -1,6 +1,12 @@
 --- Add two cameras together
 -- @classmod SummedCamera
 
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local QFrame = require("QFrame")
+local CameraState = require("CameraState")
+local CameraFrame = require("CameraFrame")
+
 local SummedCamera = {}
 SummedCamera.ClassName = "SummedCamera"
 
@@ -50,13 +56,26 @@ end
 function SummedCamera:__index(index)
 	if index == "CameraState" then
 		if self._mode == "World" then
-			return self.CameraAState + self.CameraBState
+			-- TODO: fix this
+			-- return self.CameraAState + self.CameraBState
+			error("not implemented")
 		else
-			local stateA = self.CameraAState
-			local stateB = self.CameraBState
+			local a = self.CameraAState
+			local b = self.CameraBState
 
-			local result = stateA + stateB
-			result.Position = stateA.CFrame * stateB.Position
+			local newQFrame = QFrame.fromCFrameClosestTo(a.CFrame*b.CFrame, a.CameraFrame.QFrame)
+			local cameraFrame = CameraFrame.new(newQFrame, a.FieldOfView + b.FieldOfView)
+
+			-- TODO: compute derivative velocity more correctly of this non-linear thing
+			local newQFrameVelocity = QFrame.fromCFrameClosestTo(
+				a.CameraFrameDerivative.CFrame*b.CameraFrameDerivative.CFrame,
+				a.CameraFrameDerivative.QFrame)
+			local cameraFrameVelocity = CameraFrame.new(newQFrameVelocity,
+				a.CameraFrameDerivative.FieldOfView + b.CameraFrameDerivative.FieldOfView)
+
+			local result = CameraState.new(cameraFrame, cameraFrameVelocity)
+			-- result.CFrame =
+			-- result.Position = a.CFrame * b.Position
 			return result
 		end
 	elseif index == "CameraAState" then

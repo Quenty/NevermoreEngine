@@ -151,9 +151,7 @@ function CameraControls:BeginDrag(beginInputObject)
 	end))
 
 	maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject)
-		if isMouse and inputObject.UserInputType == Enum.UserInputType.MouseMovement
-			or inputObject == beginInputObject then
-
+		if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) or inputObject == beginInputObject then
 			self:_handleMouseMovement(inputObject)
 		end
 	end))
@@ -238,12 +236,12 @@ function CameraControls:_getVelocityTracker(strength, startVelocity)
 	}
 end
 
-function CameraControls:_handleMouseMovement(inputObject, isMouse)
+function CameraControls:_handleMouseMovement(inputObject)
 	if self._lastMousePosition then
 		if self._rotatedCamera then
 			-- This calculation may seem weird, but either .Position updates (if it's locked), or .Delta updates (if it's not).
 			local delta
-			if isMouse then
+			if InputObjectUtils.isMouseUserInputType(inputObject.UserInputType) then
 				delta = -inputObject.Delta + self._lastMousePosition - inputObject.Position
 			else
 				delta = -inputObject.Delta

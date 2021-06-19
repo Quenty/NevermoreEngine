@@ -183,11 +183,11 @@ end
 -- @tparam[opt] {Instance} parent
 -- @tparam[opt] {number} diameter
 function Draw.point(vector3, color, parent, diameter)
-	assert(typeof(vector3) == "Vector3")
-
 	if typeof(vector3) == "CFrame" then
 		vector3 = vector3.p
 	end
+
+	assert(typeof(vector3) == "Vector3")
 
 	color = color or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
@@ -218,6 +218,18 @@ function Draw.point(vector3, color, parent, diameter)
 	sphereHandle.Parent = part
 
 	part.Parent = parent
+
+	return part
+end
+
+function Draw.labelledPoint(vector3, label, color, parent)
+	if typeof(vector3) == "CFrame" then
+		vector3 = vector3.p
+	end
+
+	local part = Draw.point(vector3, color, parent)
+
+	Draw.text(part, label, color)
 
 	return part
 end
