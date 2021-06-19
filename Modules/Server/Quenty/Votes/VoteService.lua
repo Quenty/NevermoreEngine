@@ -7,7 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local HttpPromise = require("HttpPromise")
 local Promise = require("Promise")
 local Maid = require("Maid")
-local fastSpawn = require("fastSpawn")
+local deferred = require("deferred")
 
 local UPDATE_RATE = 15
 
@@ -44,7 +44,7 @@ function VoteService:_startUpdateAsNeeded()
 	self._downVotes = Instance.new("IntValue")
 	self._downVotes.Value = 0
 
-	fastSpawn(function()
+	deferred(function()
 		while true do
 			self:_update()
 			wait(UPDATE_RATE)

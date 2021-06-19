@@ -3,7 +3,6 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local fastSpawn = require("fastSpawn")
 local Maid = require("Maid")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
@@ -28,17 +27,23 @@ function HumanoidTracker.new(player)
 	self._maid:GiveTask(self.AliveHumanoid)
 
 	self._maid:GiveTask(self.Humanoid.Changed:Connect(function(newHumanoid, oldHumanoid, maid)
+		if not self.Destroy then
+			return
+		end
 		self:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
 	end))
 
 	self._maid:GiveTask(self._player:GetPropertyChangedSignal("Character"):Connect(function()
+		if not self.Destroy then
+			return
+		end
 		self:_onCharacterChanged()
 	end))
 
-	fastSpawn(self._onCharacterChanged, self)
-
 	self.HumanoidDied = Signal.new()
 	self._maid:GiveTask(self.HumanoidDied)
+
+	self:_onCharacterChanged()
 
 	return self
 end
@@ -109,7 +114,15 @@ function HumanoidTracker:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
 
 	self.AliveHumanoid.Value = newHumanoid
 
+	local alive = true
+	maid:GiveTask(function()
+		alive = false
+	end)
 	maid:GiveTask(newHumanoid.Died:Connect(function()
+		if not alive then
+			return
+		end
+
 		self.AliveHumanoid.Value = nil
 
 		-- AliveHumanoid changing may proc .Destroy method

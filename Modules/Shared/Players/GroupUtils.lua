@@ -14,7 +14,7 @@ function GroupUtils.promiseRankInGroup(player, groupId)
 	assert(typeof(player) == "Instance" and player:IsA("Player"))
 	assert(type(groupId) == "number")
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local rank = nil
 		local ok, err = pcall(function()
 			rank = player:GetRankInGroup(groupId)
@@ -35,7 +35,7 @@ end
 function GroupUtils.promiseGroupInfo(groupId)
 	assert(groupId)
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local groupInfo = nil
 		local ok, err = pcall(function()
 			groupInfo = GroupService:GetGroupInfoAsync(groupId)

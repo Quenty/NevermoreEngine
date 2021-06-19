@@ -13,7 +13,7 @@ function RemoteFunctionUtils.promiseInvokeServer(remoteFunction, ...)
 
 	local args = table.pack(...)
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local results
 		local ok, err = pcall(function()
 			results = table.pack(remoteFunction:InvokeServer(table.unpack(args, 1, args.n)))

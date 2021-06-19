@@ -13,7 +13,7 @@ function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 	assert(type(assetId) == "number")
 	assert(typeof(infoType) == "EnumItem")
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		-- We hope this caches
 		local productInfo
 		local ok, err = pcall(function()
@@ -33,7 +33,7 @@ function MarketplaceUtils.promiseUserOwnsGamePass(userId, gamePassId)
 	assert(typeof(userId) == "number")
 	assert(type(gamePassId) == "number")
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
 			result = MarketplaceService:UserOwnsGamePassAsync(userId, gamePassId)
@@ -53,7 +53,7 @@ function MarketplaceUtils.promisePlayerOwnsAsset(player, assetId)
 	assert(typeof(player) == "Instance")
 	assert(type(assetId) == "number")
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
 			result = MarketplaceService:PlayerOwnsAsset(player, assetId)

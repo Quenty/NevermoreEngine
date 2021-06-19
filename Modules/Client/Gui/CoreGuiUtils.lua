@@ -16,7 +16,7 @@ function CoreGuiUtils.promiseRetrySetCore(tries, initialWaitTime, ...)
 	local args = {...}
 	local n = select("#", ...)
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local waitTime = initialWaitTime
 
 		local ok, err
