@@ -13,7 +13,7 @@ return function(parent, name, timeOut)
 	end
 
 	return Promise.new(function(resolve, reject)
-		-- Cheaper to do spawn() here than fastSpawn, and we aren't going to get the
+		-- Cheaper to do spawn() here than deferred, and we aren't going to get the
 		-- resource for another tick anyway
 		spawn(function()
 			local child = parent:WaitForChild(name, timeOut)

@@ -6,7 +6,7 @@ local RunService = game:GetService("RunService")
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local fastSpawn = require("fastSpawn")
+local deferred = require("deferred")
 
 local function isPromise(value)
 	return type(value) == "table" and value.ClassName == "Promise"
@@ -42,12 +42,12 @@ function Promise.new(func)
 	return self
 end
 
---- Initializes a new promise with the given function in a fastSpawn wrapper
-function Promise.spawn(func)
+--- Initializes a new promise with the given function in a deferred wrapper
+function Promise.defer(func)
 	local self = Promise.new()
 
 	-- Just the function part of the resolve/reject protocol!
-	fastSpawn(func, self:_getResolveReject())
+	deferred(func, self:_getResolveReject())
 
 	return self
 end

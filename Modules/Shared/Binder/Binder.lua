@@ -8,7 +8,7 @@ local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
 local Signal = require("Signal")
-
+local promiseBoundClass = require("promiseBoundClass")
 --[[
 @usage
 
@@ -252,6 +252,11 @@ end
 function Binder:Get(inst)
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 	return self._instToClass[inst]
+end
+
+function Binder:Promise(inst, cancelToken)
+	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
+	return promiseBoundClass(self, inst, cancelToken)
 end
 
 function Binder:_add(inst)

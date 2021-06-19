@@ -13,7 +13,7 @@ function StreamingUtils.promiseStreamAround(player, position, timeOut)
 	assert(typeof(position) == "Vector3")
 	assert(type(timeOut) == "number" or timeOut == nil)
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()
 			player:RequestStreamAroundAsync(position, timeOut)
 		end)

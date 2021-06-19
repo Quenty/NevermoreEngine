@@ -39,7 +39,7 @@ function MouseShiftLockService:_buildPromiseReady()
 		return Promise.rejected()
 	end
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local playerScripts = Players.LocalPlayer:WaitForChild("PlayerScripts")
 		local playerModuleScript = playerScripts:WaitForChild("PlayerModule")
 		local cameraModuleScript = playerModuleScript:WaitForChild("CameraModule")
