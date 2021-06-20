@@ -52,7 +52,7 @@ function TextFilterServiceClient:_promiseInvokeRemoteFunction(request, text, ...
 
 	return self:_promiseRemoteFunction()
 		:Then(function(remoteFunction)
-			return Promise.spawn(function(resolve, reject)
+			return Promise.defer(function(resolve, reject)
 				local resultOk, result
 				local ok, err = pcall(function()
 					resultOk, result = remoteFunction:InvokeServer(request, text, table.unpack(args, 1, args.n))
@@ -87,7 +87,7 @@ end
 function TextFilterServiceClient:_fakeTestFilter(text)
 	text = text:gsub("[fF][uU][cC][kK]", "####")
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		-- Simulate testing
 		delay(0.5, function()
 			resolve(text)

@@ -8,7 +8,7 @@ local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
 local Signal = require("Signal")
-
+local promiseBoundClass = require("promiseBoundClass")
 --[[
 @usage
 
@@ -254,6 +254,11 @@ function Binder:Get(inst)
 	return self._instToClass[inst]
 end
 
+function Binder:Promise(inst, cancelToken)
+	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
+	return promiseBoundClass(self, inst, cancelToken)
+end
+
 function Binder:_add(inst)
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 
@@ -307,12 +312,13 @@ function Binder:_add(inst)
 		local bindable = Instance.new("BindableEvent")
 
 		for callback, _ in pairs(listeners) do
-			local conn = bindable.Event:Connect(function()
+			local conn
+			conn = bindable.Event:Connect(function()
+				conn:Disconnect()
 				callback(class)
 			end)
 
 			bindable:Fire()
-			conn:Disconnect()
 		end
 
 		bindable:Destroy()

@@ -14,7 +14,7 @@ local SocialServiceUtils = {}
 function SocialServiceUtils.promiseCanSendGameInvite(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"))
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local canSend
 		local ok, err = pcall(function()
 			canSend = SocialService:CanSendGameInviteAsync(player)
@@ -32,7 +32,7 @@ function SocialServiceUtils.promisePromptGameInvite(player)
 
 	local maid = Maid.new()
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		maid:GiveTask(SocialService.GameInvitePromptClosed:Connect(function(closingPlayer)
 			if closingPlayer == player then
 				resolve(player)

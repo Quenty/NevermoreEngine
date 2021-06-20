@@ -5,7 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Promise = require("Promise")
-local fastSpawn = require("fastSpawn")
+local deferred = require("deferred")
 local Maid = require("Maid")
 
 local CharacterPromiseUtil = {}
@@ -22,7 +22,7 @@ function CharacterPromiseUtil.promiseRootPart(humanoid)
 	end
 
 	-- humanoid:GetPropertyChangedSignal("RootPart") does not fire
-	fastSpawn(function()
+	deferred(function()
 		local rootPart = humanoid.RootPart
 		while not rootPart and promise:IsPending() do
 			wait(0.05)

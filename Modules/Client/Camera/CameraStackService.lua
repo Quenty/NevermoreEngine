@@ -47,7 +47,7 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 		end
 
 		local state = self:GetTopState()
-		if state and state ~= self._defaultCamera then
+		if state then
 			state:Set(Workspace.CurrentCamera)
 		end
 
@@ -149,7 +149,7 @@ function CameraStackService:GetNewStateBelow()
 				return self._stack[1].CameraState
 			end
 		else
-			warn("[CameraStackService] - Could not get state, returning default")
+			warn(("[CameraStackService] - Could not get state from %q, returning default"):format(tostring(_stateToUse)))
 			return self._stack[1].CameraState
 		end
 	end), function(newStateToUse)
