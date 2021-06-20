@@ -4,7 +4,8 @@
 
 local MetricUtils = {}
 
-local STUDS_PER_METER = 3.57
+-- Source: https://devforum.roblox.com/t/studs-to-metre-conversion/555264/2
+local NORMAL_STUDS_PER_METER = 1 / 0.28
 
 local SPEED_OF_SOUND_IN_METERS_PER_SECOND = 343
 
