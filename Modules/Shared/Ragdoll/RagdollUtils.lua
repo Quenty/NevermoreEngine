@@ -10,6 +10,8 @@ local Maid = require("Maid")
 local promiseChild = require("promiseChild")
 local RagdollRigging = require("RagdollRigging")
 local CharacterUtils = require("CharacterUtils")
+local RxValueBaseUtils = require("RxValueBaseUtils")
+local RagdollConstants = require("RagdollConstants")
 
 local RagdollUtils = {}
 
@@ -111,7 +113,41 @@ function RagdollUtils.setupMotors(humanoid)
 	-- be creating a new, seperate network ownership unit that we would have to wait for the server
 	-- to assign us network ownership of before we would start simulating and replicating physics
 	-- data for it, creating an additional round trip hitch on our end for our own character.
-	local motors = RagdollRigging.disableMotors(character, rigType)
+	local motors = RagdollRigging.getMotors(character, rigType)
+
+	local maid = Maid.new()
+
+	local function updateMotor(motor)
+		if motor:GetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME) then
+			motor.Enabled = true
+		else
+			motor.Enabled = false
+		end
+	end
+
+	-- Disable all regular joints:
+	for _, motor in pairs(motors) do
+		maid:GiveTask(motor:GetAttributeChangedSignal(RagdollConstants.IS_MOTOR_ANIMATED_NAME)
+			:Connect(function()
+				updateMotor(motor)
+			end))
+		updateMotor(motor)
+
+		maid:GiveTask(function()
+			motor.Enabled = true
+		end)
+	end
+
+	-- Set the root part to non-collide
+	local rootPart = character.PrimaryPart or character:FindFirstChild("HumanoidRootPart")
+	if rootPart and rootPart:IsA("BasePart") then
+		rootPart.CanCollide = false
+	end
+
+	local head = character:FindFirstChild("Head")
+	if head and head:IsA("BasePart") then
+		head.CanCollide = true
+	end
 
 	-- Apply velocities from animation to the child parts to mantain visual momentum.
 	--
@@ -129,9 +165,7 @@ function RagdollUtils.setupMotors(humanoid)
 	end
 
 	return function()
-		for _, motor in pairs(motors) do
-			motor.Enabled = true
-		end
+		maid:DoCleaning()
 	end
 end
 
@@ -164,22 +198,23 @@ function RagdollUtils.setupHead(humanoid)
 		return EMPTY_FUNCTION
 	end
 
+	-- More accurate physics for heads! Heads start at 2,1,1 (at least they used to)
 	local maid = Maid.new()
+	local lastHeadScale
 
-	-- More accurate physics for heads! Heads start at 2,1,1
-	maid:GivePromise(promiseChild(humanoid, "HeadScale"))
-		:Then(function(headScale)
-			local function updateHeadSize()
-				head.Size = Vector3.new(1, 1, 1)*headScale.Value
-			end
+	maid:GiveTask(RxValueBaseUtils.observe(humanoid, "NumberValue", "HeadScale")
+		:Subscribe(function(headScale)
+			lastHeadScale = headScale
 
-			maid:GiveTask(headScale.Changed:Connect(updateHeadSize))
-			updateHeadSize()
+			head.Size = Vector3.new(1, 1, 1)*headScale
+		end))
 
-			maid:GiveTask(function()
-				head.Size = originalSizeValue.Value*headScale.Value
-			end)
-		end)
+	-- Cleanup and reset head scale
+	maid:GiveTask(function()
+		if lastHeadScale then
+			head.Size = originalSizeValue.Value*lastHeadScale
+		end
+	end)
 
 	return maid
 end
