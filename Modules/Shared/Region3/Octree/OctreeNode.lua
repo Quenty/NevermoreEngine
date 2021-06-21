@@ -10,15 +10,13 @@ OctreeNode.ClassName = "OctreeNode"
 OctreeNode.__index = OctreeNode
 
 function OctreeNode.new(octree, object)
-	local self = setmetatable({}, OctreeNode)
+	return setmetatable({
+		_octree = octree or error("No octree"),
+		_object = object or error("No object"),
 
-	self._octree = octree or error("No octree")
-	self._object = object or error("No object")
-
-	self._currentLowestRegion = nil
-	self._position = nil
-
-	return self
+		_currentLowestRegion = nil,
+		_position = nil
+	}, OctreeNode)
 end
 
 function OctreeNode:KNearestNeighborsSearch(k, radius)
@@ -46,15 +44,18 @@ function OctreeNode:SetPosition(position)
 		return
 	end
 
-	local px, py, pz = position.x, position.y, position.z
+	local px = position.x
+	local py = position.y
+	local pz = position.z
 
 	self._px = px
 	self._py = py
 	self._pz = pz
 	self._position = position
 
-	if self._currentLowestRegion then
-		if OctreeRegionUtils.inRegionBounds(self._currentLowestRegion, px, py, pz) then
+	local currentLowestRegion = self._currentLowestRegion
+	if currentLowestRegion then
+		if OctreeRegionUtils.inRegionBounds(currentLowestRegion, px, py, pz) then
 			return
 		end
 	end
@@ -66,18 +67,18 @@ function OctreeNode:SetPosition(position)
 	-- 	error("[OctreeNode.SetPosition] newLowestRegion is not in region bounds!")
 	-- end
 
-	if self._currentLowestRegion then
-		OctreeRegionUtils.moveNode(self._currentLowestRegion, newLowestRegion, self)
+	if currentLowestRegion then
+		OctreeRegionUtils.moveNode(currentLowestRegion, newLowestRegion, self)
 	else
 		OctreeRegionUtils.addNode(newLowestRegion, self)
 	end
-
 	self._currentLowestRegion = newLowestRegion
 end
 
 function OctreeNode:Destroy()
-	if self._currentLowestRegion then
-		OctreeRegionUtils.removeNode(self._currentLowestRegion, self)
+	local currentLowestRegion = self._currentLowestRegion
+	if currentLowestRegion then
+		OctreeRegionUtils.removeNode(currentLowestRegion, self)
 	end
 end
 
