@@ -167,17 +167,19 @@ function RagdollUtils.setupHead(humanoid)
 	local maid = Maid.new()
 
 	-- More accurate physics for heads! Heads start at 2,1,1
-	maid:GivePromise(promiseChild(humanoid, "HeadScale"))
-		:Then(function(headScale)
+	maid:GivePromise(promiseChild(humanoid, "HumanoidDescription"))
+		:Then(function(humanoidDescription)
+			local headScale = humanoidDescription.HeadScale
+
 			local function updateHeadSize()
-				head.Size = Vector3.new(1, 1, 1)*headScale.Value
+				head.Size = Vector3.new(0.97052631578947, 0.97052631578947, 0.94842105263158)*headScale
 			end
 
-			maid:GiveTask(headScale.Changed:Connect(updateHeadSize))
+			maid:GiveTask(humanoidDescription:GetPropertyChangedSignal("HeadScale"):Connect(updateHeadSize))
 			updateHeadSize()
 
 			maid:GiveTask(function()
-				head.Size = originalSizeValue.Value*headScale.Value
+				head.Size = originalSizeValue.Value*headScale
 			end)
 		end)
 
