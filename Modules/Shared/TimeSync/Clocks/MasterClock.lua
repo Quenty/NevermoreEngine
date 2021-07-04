@@ -18,12 +18,13 @@ function MasterClock.new(remoteEvent, remoteFunction)
 		 self._remoteEvent:FireClient(player, self:GetTime())
 	end)
 
-	spawn(function()
+	local syncCoroutine = coroutine.wrap(function()
 		while true do
 			wait(5)
 			self:_forceSync()
 		end
 	end)
+	syncCoroutine()
 
 	return self
 end
