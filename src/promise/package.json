@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/promise",
+  "version": "0.0.1",
+  "description": "Promise implementation for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "promise"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/promise/"
+  },
+  "dependencies": {
+    "@quenty/deferred": "~0.0.1",
+    "@quenty/maid": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
