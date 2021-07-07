@@ -1,5 +1,27 @@
-## Features
+# Nevermore Loader
+A simple module loader for Roblox
+<div align="center">
+	<a href="http://quenty.github.io/api/">
+		<img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+	</a>
+	<a href="https://discord.gg/mhtGUS8">
+		<img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+	</a>
+	<a href="https://github.com/Quenty/NevermoreEngine/actions">
+		<img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+	</a>
+</div>
 
+## Installation with NPM
+
+Install via NPM like this:
+```
+npm install @quenty/loader --save
+```
+
+And then we need to specifically map this loader 
+
+## Features
 * Load by name instead of instance (i.e. `require("MyModuleName")`)
 * Detects cyclical requirements in module scripts
 * Can also load by indexing (i.e. `require["MyModuleName"]`)

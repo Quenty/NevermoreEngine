@@ -360,7 +360,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 -- Mount loader
 do
-	local url = "https://github.com/Quenty/NevermoreEngine/tree/version2/loader/ReplicatedStorage/Nevermore"
+	local url = "https://github.com/Quenty/NevermoreEngine/tree/version2/src/loader"
 	local entry = EntryUtils.create("Folder", "Nevermore", "")
 	ParseUtils.fillFoldersAsync(url, entry)
 	ParseUtils.fillScriptSourcesAsync(ParseUtils.githubContentFromUrl(url), entry)
