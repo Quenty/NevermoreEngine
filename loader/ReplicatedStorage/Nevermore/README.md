@@ -135,10 +135,10 @@ this system follows the replication behavior! So server modules will not be avai
 and submodules will not be loaded. Also, on the server, client/shared modules will be replicated.
 
 ### Adding individual modules
-
+You can also add individual modules like this:
 ```lua
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-require:AddModulesFromParent(ReplicatedStorage:WaitForChild("ClientModules"))
+require:AddModule(ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("MyModule"))
 ```
 
