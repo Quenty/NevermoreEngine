@@ -1,0 +1,37 @@
+{
+  "name": "@quenty/datastore",
+  "version": "0.0.2",
+  "description": "Quenty's Datastore implementation for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "datastore",
+    "database"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/datastore/"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "~0.0.2",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/promise": "~0.0.1",
+    "@quenty/symbol": "~0.0.0",
+    "@quenty/table": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
