@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/remoting",
+  "version": "0.0.2",
+  "description": "Global remoting retrieval system for Roblox (RemoteFunctions/RemoteEvents)",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "remote-event",
+    "remote-function"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/remoting/"
+  },
+  "dependencies": {
+    "@quenty/promise": "~0.0.1",
+    "@quenty/table": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
