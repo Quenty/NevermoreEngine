@@ -81,6 +81,22 @@ function Maid:GiveTask(task)
 	return taskId
 end
 
+function Maid:GiveBrio(brio)
+	if brio:IsDead() then
+		return brio
+	end
+
+	local id = self:GiveTask(function()
+		brio:Kill()
+	end)
+
+	brio:GetDiedSignal():Connect(function()
+		self[id] = nil
+	end)
+
+	return id
+end
+
 function Maid:GivePromise(promise)
 	if not promise:IsPending() then
 		return promise
