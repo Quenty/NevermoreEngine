@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/textserviceutils",
+  "version": "0.0.0",
+  "description": "textserviceutils ",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "textserviceutils",
+    "sizing",
+    "gui"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/textserviceutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
