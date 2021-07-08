@@ -4,11 +4,11 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Observable = require("Observable")
 local Brio = require("Brio")
-local Rx = require("Rx")
-local Maid = require("Maid")
 local BrioUtils = require("BrioUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
 
 local RxBrioUtils = {}
 
