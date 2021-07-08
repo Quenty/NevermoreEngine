@@ -1,4 +1,4 @@
----
+--- Stack of values that allows multiple systems to enable or disable a state
 -- @classmod StateStack
 -- @author Quenty
 
