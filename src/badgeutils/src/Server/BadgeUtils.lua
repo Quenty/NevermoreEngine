@@ -1,4 +1,4 @@
----
+--- Utility functions involving badges on Roblox
 -- @module BadgeUtils
 -- @author Quenty
 
