@@ -1,0 +1,29 @@
+{
+  "name": "@quenty/acceltween",
+  "version": "0.0.0",
+  "description": "AccelTween implementation for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "spring"
+  ],
+  "contributors": [
+    "Quenty",
+    "AxisAngles"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/acceltween/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
