@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/teamtracker",
+  "version": "0.0.0",
+  "description": "Tracks a player's current team, since the Team property is unreliable",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Team"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/teamtracker/"
+  },
+  "dependencies": {
+    "@quenty/maid": "~0.0.2",
+    "@quenty/valueobject": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
