@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/humanoidmovedirectionutils",
+  "version": "0.0.0",
+  "description": "Ever wanted to not rewrite all of Roblox's input systems! Well, now you can with this slight hack!",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Character"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/humanoidmovedirectionutils/"
+  },
+  "dependencies": {
+    "@quenty/cframeutils": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
