@@ -1,4 +1,4 @@
----
+--- Utility functions wrapping SocialService with promises
 -- @module SocialServiceUtils
 -- @author Quenty
 
