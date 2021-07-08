@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/httppromise",
+  "version": "0.0.0",
+  "description": "HttpPromise - Wrapper functions around http requests in Roblox.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "http",
+    "post",
+    "promise"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/httppromise/"
+  },
+  "dependencies": {
+    "@quenty/promise": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
