@@ -1,3 +1,6 @@
+---
+-- @module CubicTweenUtils
+
 local CubicTweenUtils = {}
 
 --cosstants to be multiplied as p0*a0 + v0*a1 + p1*a2 + v1*a3
