@@ -1,4 +1,4 @@
---- To work like value objects in ROBLOX and track a single item,
+--- To work like value objects in Roblox and track a single item,
 -- with `.Changed` events
 -- @classmod ValueObject
 
