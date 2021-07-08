@@ -1,0 +1,44 @@
+{
+  "name": "@quenty/ik",
+  "version": "0.0.3",
+  "description": "Inverse Kinematics for characters on Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ik",
+    "character"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/ik/"
+  },
+  "dependencies": {
+    "@quenty/acceltween": "~0.0.0",
+    "@quenty/baseobject": "~0.0.2",
+    "@quenty/binder": "~0.0.0",
+    "@quenty/camera": "~0.0.1",
+    "@quenty/characterutils": "~0.0.0",
+    "@quenty/humanoidtracker": "~0.0.1",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/math": "~0.0.0",
+    "@quenty/promise": "~0.0.1",
+    "@quenty/remoting": "~0.0.2",
+    "@quenty/signal": "~0.0.0",
+    "@quenty/table": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
