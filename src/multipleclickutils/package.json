@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/multipleclickutils",
+  "version": "0.0.0",
+  "description": "Utility library for detecting multiple clicks or taps. Not good UX, but good for opening up a debug menus",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Gui",
+    "Buttons"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/multipleclickutils/"
+  },
+  "dependencies": {
+    "@quenty/signal": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
