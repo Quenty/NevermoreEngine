@@ -11,31 +11,29 @@ function TemplateContainerUtils.reparentFromWorkspaceIfNeeded(parent, name)
 	assert(typeof(parent) == "Instance")
 	assert(type(name) == "string")
 
-	return function()
-		local workspaceContainer = Workspace:FindFirstChild(name)
-		local parentedContainer = parent:FindFirstChild(name)
-		if workspaceContainer then
-			if parentedContainer then
-				error(("Duplicate container in %q and %q"):format(
-					workspaceContainer:GetFullName(),
-					parentedContainer:GetFullName()))
-			end
-
-			-- Reparent
-			if RunService:IsRunning() then
-				workspaceContainer.Parent = parent
-			end
-
-			return workspaceContainer
+	local workspaceContainer = Workspace:FindFirstChild(name)
+	local parentedContainer = parent:FindFirstChild(name)
+	if workspaceContainer then
+		if parentedContainer then
+			error(("Duplicate container in %q and %q"):format(
+				workspaceContainer:GetFullName(),
+				parentedContainer:GetFullName()))
 		end
 
-		if not parentedContainer then
-			error(("No template container with name %q in %q")
-				:format(parent:GetFullName(), name))
+		-- Reparent
+		if RunService:IsRunning() then
+			workspaceContainer.Parent = parent
 		end
 
-		return parentedContainer
+		return workspaceContainer
 	end
+
+	if not parentedContainer then
+		error(("No template container with name %q in %q")
+			:format(parent:GetFullName(), name))
+	end
+
+	return parentedContainer
 end
 
 return TemplateContainerUtils

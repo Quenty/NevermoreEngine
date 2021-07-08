@@ -127,7 +127,8 @@ function HintScoringUtils.scoreAdornee(
 	maxViewRadius,
 	maxTriggerRadius,
 	maxViewAngle,
-	maxTriggerAngle)
+	maxTriggerAngle,
+	isLineOfSightRequired)
 	assert(maxTriggerAngle)
 
 	-- local center = AdorneeUtils.getCenter(adornee)
@@ -157,7 +158,12 @@ function HintScoringUtils.scoreAdornee(
 	end
 
 	if not closestPoint then
-		return false
+		if isLineOfSightRequired then
+			return false
+		else
+			-- just pretend like we're here, and all good
+			closestPoint = boundingBoxPoint
+		end
 	end
 
 	-- if (boundingBoxPoint - humanoidCenter).magnitude <= (closestPoint - humanoidCenter).magnitude then

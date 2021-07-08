@@ -8,6 +8,8 @@ local Math = require("Math")
 local IKResourceUtils = require("IKResourceUtils")
 local IKResource = require("IKResource")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
+local Maid = require("Maid")
+local RagdollConstants = require("RagdollConstants")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 
@@ -65,6 +67,15 @@ function ArmIKBase.new(humanoid, armName)
 	self._maid:GiveTask(self._resources)
 	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
 
+	self._gripping = Instance.new("BoolValue")
+	self._gripping.Value = false
+	self._maid:GiveTask(self._gripping)
+
+	self._maid:GiveTask(self._gripping.Changed:Connect(function()
+		self:_updateMotorsEnabled()
+	end))
+	self:_updateMotorsEnabled()
+
 	return self
 end
 
@@ -80,6 +91,7 @@ function ArmIKBase:Grip(attachment, priority)
 	end
 
 	table.insert(self._grips, i, gripData)
+	self._gripping.Value = true
 
 	return function()
 		if self.Destroy then
@@ -94,6 +106,10 @@ function ArmIKBase:_stopGrip(grip)
 			table.remove(self._grips, index)
 			break
 		end
+	end
+
+	if not next(self._grips) then
+		self._gripping.Value = false
 	end
 end
 
@@ -202,6 +218,47 @@ function ArmIKBase:_calculatePoint(targetPositionWorld)
 	self._offset = offset.unit * d
 
 	return true
+end
+
+function ArmIKBase:_updateMotorsEnabled()
+	self._maid._gripMaid = nil
+
+	if not self._gripping.Value then
+		return
+	end
+
+	local gripMaid = Maid.new()
+
+	gripMaid:GiveTask(self._resources.ReadyChanged:Connect(function()
+		gripMaid._attributes = self:_setAttributes()
+	end))
+	gripMaid._attributes = self:_setAttributes()
+
+	self._maid._gripMaid = gripMaid
+end
+
+function ArmIKBase:_setAttributes()
+	if not self._resources:IsReady() then
+		return nil
+	end
+
+	local maid = Maid.new()
+
+	local shoulder = self._resources:Get("Shoulder")
+	local elbow = self._resources:Get("Elbow")
+	local wrist = self._resources:Get("Wrist")
+
+	shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, true)
+	elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, true)
+	wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, true)
+
+	maid:GiveTask(function()
+		shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, false)
+		elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, false)
+		wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, false)
+	end)
+
+	return maid
 end
 
 return ArmIKBase
