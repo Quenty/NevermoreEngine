@@ -1,0 +1,31 @@
+{
+  "name": "@quenty/brio",
+  "version": "0.0.1",
+  "description": "Brios wrap an object and either are alive or dead",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "event",
+    "brio"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/brio/"
+  },
+  "dependencies": {
+    "@quenty/maid": "~0.0.2",
+    "@quenty/rx": "~0.0.1"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
