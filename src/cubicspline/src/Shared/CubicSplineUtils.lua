@@ -1,3 +1,6 @@
+---
+-- @module CublicSplineUtils
+
 local CubicSplineUtils = {}
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))

@@ -1,0 +1,35 @@
+{
+  "name": "@quenty/cubicspline",
+  "version": "0.0.0",
+  "description": "Cubic Spline implementation for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "spline",
+    "cubic-spline"
+  ],
+  "contributors": [
+    "AxisAngles",
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/cubicspline/"
+  },
+  "dependencies": {
+    "@quenty/binarysearch": "~0.0.0",
+    "@quenty/linearsystemssolver": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
