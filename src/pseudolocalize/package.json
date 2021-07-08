@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/pseudolocalize",
+  "version": "0.0.0",
+  "description": "Pseudo localizes text. Useful for verifying translation without having actual translations available",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Localization"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/pseudolocalize/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
