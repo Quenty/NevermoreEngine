@@ -4,11 +4,11 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Maid = require("Maid")
 local CameraFrame = require("CameraFrame")
-local QFrame = require("QFrame")
-local CubicSplineLib = require("CubicSplineLib")
 local CameraStoryUtils = require("CameraStoryUtils")
+local CubicSplineLib = require("CubicSplineLib")
+local Maid = require("Maid")
+local QFrame = require("QFrame")
 
 return function(target)
 	local maid = Maid.new()

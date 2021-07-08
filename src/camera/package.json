@@ -1,0 +1,42 @@
+{
+  "name": "@quenty/camera",
+  "version": "0.0.1",
+  "description": "Quenty's camera system for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "camera"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/camera/"
+  },
+  "dependencies": {
+    "@quenty/acceltween": "~0.0.0",
+    "@quenty/cframeutils": "~0.0.0",
+    "@quenty/cubicspline": "~0.0.0",
+    "@quenty/inputobjectutils": "~0.0.1",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/math": "~0.0.0",
+    "@quenty/qframe": "~0.0.0",
+    "@quenty/spring": "~0.0.0"
+  },
+  "devDependencies": {
+    "@quenty/camerastoryutils": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
