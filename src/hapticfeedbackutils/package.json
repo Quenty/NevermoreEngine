@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/hapticfeedbackutils",
+  "version": "0.0.0",
+  "description": "Utility functions involving haptic feedback on gamepads for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "haptics",
+    "gamepad",
+    "xbox"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/hapticfeedbackutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,4 +1,4 @@
---- Clean up utils a bit
+--- Utility functions involving haptic feedback on gamepads
 -- @module HapticFeedbackUtils
 
 local HapticService = game:GetService("HapticService")
