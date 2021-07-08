@@ -135,7 +135,7 @@ birdBinder:GetClassAddedSignal():Connect(function(bird)
 end)
 
 -- Load all birds
-birdBinder:Init()
+birdBinder:Start()
 ]]
 function Binder:GetClassAddedSignal()
 	if self._classAddedSignal then
@@ -171,7 +171,7 @@ RunService.Stepped:Connect(function()
 	end
 end)
 
-birdBinder:Init()
+birdBinder:Start()
 ]]
 --- Returns all of the classes in a new table
 function Binder:GetAll()
@@ -195,7 +195,7 @@ RunService.Stepped:Connect(function()
 	end
 end)
 
-birdBinder:Init()
+birdBinder:Start()
 ]]
 --- Faster method to get all items in a binder
 -- NOTE: Do not mutate this set directly

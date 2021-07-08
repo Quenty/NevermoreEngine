@@ -4,11 +4,12 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local RxBinderGroupUtils = {}
 local RxBinderUtils = require("RxBinderUtils")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Rx = require("Rx")
+
+local RxBinderGroupUtils = {}
 
 function RxBinderGroupUtils.observeBinders(binderGroup)
 	assert(type(binderGroup) == "table")
