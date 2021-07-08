@@ -1,0 +1,40 @@
+{
+  "name": "@quenty/binder",
+  "version": "0.0.2",
+  "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "binder"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/binder/"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "~0.0.2",
+    "@quenty/brio": "~0.0.0",
+    "@quenty/instanceutils": "~0.0.0",
+    "@quenty/linkutils": "~0.0.1",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/promise": "~0.0.1",
+    "@quenty/rx": "~0.0.1",
+    "@quenty/signal": "~0.0.0",
+    "@quenty/valueobject": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

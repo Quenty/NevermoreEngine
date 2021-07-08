@@ -1,0 +1,6 @@
+{
+  "name": "Binder",
+  "tree": {
+    "$path": "src"
+  }
+}

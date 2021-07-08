@@ -8,8 +8,8 @@ local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
-local RxInstanceUtils = require("RxInstanceUtils")
 local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 local RxLinkUtils = require("RxLinkUtils")
 
 local RxBinderUtils = {}
