@@ -5,6 +5,7 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
+
 local HumanoidTracker = require("HumanoidTracker")
 
 local HumanoidTrackerService = {}
