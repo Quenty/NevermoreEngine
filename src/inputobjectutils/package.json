@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/inputobjectutils",
+  "version": "0.0.3",
+  "description": "Provides utility functions involving input objects",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "input"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/inputobjectutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
