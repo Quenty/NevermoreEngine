@@ -1,0 +1,37 @@
+{
+  "name": "@quenty/timesyncservice",
+  "version": "0.0.0",
+  "description": "Quenty's TimeSyncService keeps time synchronized between all clients and the server",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "timesyncservice",
+    "time"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/timesyncservice/"
+  },
+  "dependencies": {
+    "@quenty/maid": "~0.0.2",
+    "@quenty/promise": "~0.0.1",
+    "@quenty/remoting": "~0.0.2",
+    "@quenty/signal": "~0.0.0",
+    "@quenty/table": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
