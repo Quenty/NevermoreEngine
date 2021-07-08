@@ -4,8 +4,8 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Observable = require("Observable")
 local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
 local Symbol = require("Symbol")
 local Table = require("Table")
