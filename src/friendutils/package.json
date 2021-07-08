@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/friendutils",
+  "version": "0.0.0",
+  "description": "Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Players"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/friendutils/"
+  },
+  "dependencies": {
+    "@quenty/promise": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
