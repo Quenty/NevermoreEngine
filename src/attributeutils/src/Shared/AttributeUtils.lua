@@ -1,4 +1,4 @@
----
+--- Provides utility functions to work with attributes in Roblox
 -- @module AttributeUtils
 -- @author Quenty
 
