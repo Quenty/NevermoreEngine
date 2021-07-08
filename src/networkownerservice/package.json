@@ -1,0 +1,29 @@
+{
+  "name": "@quenty/networkownerservice",
+  "version": "0.0.1",
+  "description": "NetworkOwnerService - Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "network",
+    "network-owner"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/networkownerservice/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
