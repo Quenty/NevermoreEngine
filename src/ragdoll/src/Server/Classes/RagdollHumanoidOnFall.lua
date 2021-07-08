@@ -5,9 +5,9 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local BaseObject = require("BaseObject")
-local RagdollBindersServer = require("RagdollBindersServer")
 local BindableRagdollHumanoidOnFall = require("BindableRagdollHumanoidOnFall")
 local CharacterUtils = require("CharacterUtils")
+local RagdollBindersServer = require("RagdollBindersServer")
 local RagdollHumanoidOnFallConstants = require("RagdollHumanoidOnFallConstants")
 
 local RagdollHumanoidOnFall = setmetatable({}, BaseObject)

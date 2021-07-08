@@ -1,0 +1,40 @@
+{
+  "name": "@quenty/ragdoll",
+  "version": "0.0.0",
+  "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ragdoll"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/ragdoll/"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "~0.0.2",
+    "@quenty/binder": "~0.0.0",
+    "@quenty/camera": "^0.0.1",
+    "@quenty/characterutils": "~0.0.0",
+    "@quenty/hapticfeedbackutils": "^0.0.0",
+    "@quenty/humanoidanimatorutils": "~0.0.0",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/promise": "~0.0.1",
+    "@quenty/table": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

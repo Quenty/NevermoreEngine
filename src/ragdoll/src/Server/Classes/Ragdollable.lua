@@ -4,15 +4,15 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
+-- local AttributeUtils = require("AttributeUtils")
 local BaseObject = require("BaseObject")
-local RagdollRigging = require("RagdollRigging")
-local RagdollableConstants = require("RagdollableConstants")
 local CharacterUtils = require("CharacterUtils")
-local RagdollUtils = require("RagdollUtils")
 local HumanoidAnimatorUtils = require("HumanoidAnimatorUtils")
 local Maid = require("Maid")
+local RagdollableConstants = require("RagdollableConstants")
 local RagdollBindersServer = require("RagdollBindersServer")
--- local AttributeUtils = require("AttributeUtils")
+local RagdollRigging = require("RagdollRigging")
+local RagdollUtils = require("RagdollUtils")
 
 local Ragdollable = setmetatable({}, BaseObject)
 Ragdollable.ClassName = "Ragdollable"
