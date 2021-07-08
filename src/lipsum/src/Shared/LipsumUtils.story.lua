@@ -6,11 +6,11 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local RunService = game:GetService("RunService")
 
-local Maid = require("Maid")
 local LipsumUtils = require("LipsumUtils")
-local UIPaddingUtils = require("UIPaddingUtils")
+local Maid = require("Maid")
 local TextServiceUtils = require("TextServiceUtils")
 local UICornerUtils = require("UICornerUtils")
+local UIPaddingUtils = require("UIPaddingUtils")
 
 local function showText(text, maxWidth, padding)
 	assert(type(text) == "string")
