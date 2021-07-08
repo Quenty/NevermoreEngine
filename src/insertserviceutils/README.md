@@ -12,6 +12,8 @@
 </div>
 Utility functions to make inserting things from insert service easier. Especially useful in Roblox Studio when we want to be running stories with Hoarcekat. Note this only works from the server.
 
+Note this only works from the server.
+
 ## Installation
 ```
 npm install @quenty/insertserviceutils --save
