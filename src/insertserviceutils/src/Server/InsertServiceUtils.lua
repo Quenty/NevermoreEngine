@@ -4,12 +4,13 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local Promise = require("Promise")
-
 local InsertService = game:GetService("InsertService")
+
+local Promise = require("Promise")
 
 local InsertServiceUtils = {}
 
+--- Promises the resulting asset is inserted from insert service, or a rejection
 function InsertServiceUtils.promiseAsset(assetId)
 	assert(type(assetId) == "number")
 
@@ -33,4 +34,5 @@ function InsertServiceUtils.promiseAsset(assetId)
 		resolve(result)
 	end)
 end
+
 return InsertServiceUtils
