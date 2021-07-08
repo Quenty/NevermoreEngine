@@ -12,6 +12,7 @@ CameraState.ClassName = "CameraState"
 function CameraState.isCameraState(value)
 	return getmetatable(value) == CameraState
 end
+
 --- Builds a new camera stack
 -- @constructor
 -- @param[opt=nil] camera

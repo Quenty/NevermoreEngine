@@ -6,7 +6,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local Math = require("Math")
 
-
 local FieldOfViewUtils = {}
 
 function FieldOfViewUtils.fovToHeight(fov)
