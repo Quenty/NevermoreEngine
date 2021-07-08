@@ -1,3 +1,6 @@
+---
+-- @module LinearSystemsSolverUtils
+
 local LinearSystemsSolverUtils = {}
 
 --[[
