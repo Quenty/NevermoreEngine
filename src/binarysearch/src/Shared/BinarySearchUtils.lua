@@ -1,3 +1,6 @@
+---
+-- @module BinarySearchUtils
+
 local BinarySearchUtils = {}
 
 --[[
