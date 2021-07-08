@@ -1,0 +1,35 @@
+{
+  "name": "@quenty/rx",
+  "version": "0.0.1",
+  "description": "Quenty's reactive library for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "event",
+    "rx",
+    "observable"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/rx/"
+  },
+  "dependencies": {
+    "@quenty/maid": "~0.0.2",
+    "@quenty/signal": "~0.0.0",
+    "@quenty/symbol": "~0.0.0",
+    "@quenty/table": "~0.0.0",
+    "@quenty/throttle": "~0.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
