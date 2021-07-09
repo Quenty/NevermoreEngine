@@ -1,4 +1,4 @@
----
+--- Utility functions involving sounds and their state
 -- @module SoundPromiseUtils
 -- @author Quenty
 
