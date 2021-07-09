@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/streamingutils",
+  "version": "0.0.0",
+  "description": "Provides utilities for working with Roblox's streaming system",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Streaming",
+    "Promises"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/streamingutils/"
+  },
+  "dependencies": {
+    "@quenty/promise": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
