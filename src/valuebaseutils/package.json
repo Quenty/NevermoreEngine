@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/valuebaseutils",
+  "version": "0.0.0",
+  "description": "Provides utilities for working with valuesbase objects, like IntValue or ObjectValue in Roblox.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ValueBase"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/valuebaseutils/"
+  },
+  "dependencies": {
+    "@quenty/brio": "~0.0.1",
+    "@quenty/instanceutils": "~0.0.0",
+    "@quenty/promise": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
