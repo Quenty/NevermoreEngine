@@ -3,9 +3,6 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local RunService = game:GetService("RunService")
-assert(RunService:IsClient())
-
 local DraggableSnackbar = require("DraggableSnackbar")
 
 local SnackbarManager = {}
