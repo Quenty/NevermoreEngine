@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/vector3int16utils",
+  "version": "0.0.0",
+  "description": "Module for working with Vector3int16",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Vector"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/vector3int16utils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
