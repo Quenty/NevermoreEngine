@@ -1,4 +1,4 @@
----
+--- Provides utilities for working with Roblox's streaming system
 -- @module StreamingUtils
 -- @author Quenty
 
