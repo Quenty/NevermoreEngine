@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/sunpositionutils",
+  "version": "0.0.0",
+  "description": "Utility to position the sun",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Lighting"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/sunpositionutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
