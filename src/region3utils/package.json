@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/region3utils",
+  "version": "0.0.0",
+  "description": "Utility methods for Region3",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Region3"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/region3utils/"
+  },
+  "dependencies": {
+    "@quenty/boundingboxutils": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
