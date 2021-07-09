@@ -1,4 +1,5 @@
----
+--- Provides utility functions to make it easy to work with network owners
+-- @seealso NetworkOwnerService
 -- @module NetworkOwnerUtils
 -- @author Quenty
 
