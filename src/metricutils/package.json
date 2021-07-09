@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/metricutils",
+  "version": "0.0.0",
+  "description": "Provides ways to convert to or from metric",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Metric"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/metricutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
