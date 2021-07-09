@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/localizedtextutils",
+  "version": "0.0.0",
+  "description": "Localized text utils which changes translationKey structures to shared locations",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Localization"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/localizedtextutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
