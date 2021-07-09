@@ -1,4 +1,4 @@
----
+--- Help manage the visibility of GUIs while only constructing the Gui while visible
 -- @classmod GuiVisibleManager
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
