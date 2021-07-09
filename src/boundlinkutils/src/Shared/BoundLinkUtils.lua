@@ -1,4 +1,4 @@
----
+--- Utility functions involving binders and links
 -- @module BoundLinkUtils
 -- @author Quenty
 
