@@ -1,4 +1,6 @@
----
+--- Utility to get touching parts on a Roblox part.
+-- This acts as a performance-friendly way to query
+-- Roblox's spatial tree.
 -- @module TouchingPartUtils
 -- @author Quenty
 

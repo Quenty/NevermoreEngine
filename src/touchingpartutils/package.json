@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/touchingpartutils",
+  "version": "0.0.0",
+  "description": "Utility to get touching parts on a Roblox part. This acts as a performance-friendly way to query Roblox's spatial tree.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Collision"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/touchingpartutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
