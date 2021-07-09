@@ -1,4 +1,4 @@
----
+--- Utility functions to work with the CoreGui
 -- @module CoreGuiUtils
 -- @author Quenty
 
