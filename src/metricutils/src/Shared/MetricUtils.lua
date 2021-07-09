@@ -1,4 +1,4 @@
----
+--- Provides ways to convert to or from metric
 -- @module MetricUtils
 -- @author Quenty
 
