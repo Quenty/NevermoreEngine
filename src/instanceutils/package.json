@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/instanceutils",
+  "version": "0.0.0",
+  "description": "Utility functions involving instances in Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Rx",
+    "Instance"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/instanceutils/"
+  },
+  "dependencies": {
+    "@quenty/brio": "~0.0.1",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/rx": "~0.0.1"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
