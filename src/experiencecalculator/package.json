@@ -1,0 +1,29 @@
+{
+  "name": "@quenty/experiencecalculator",
+  "version": "0.0.0",
+  "description": "Calculate experience on an exponential curve and perform relevant calculations Uses formulas from stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Math",
+    "Experience"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/experiencecalculator/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
