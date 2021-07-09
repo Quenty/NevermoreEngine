@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/cancellabledelay",
+  "version": "0.0.0",
+  "description": "cancellableDelay a delay that can be cancelled",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Time"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/cancellabledelay/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
