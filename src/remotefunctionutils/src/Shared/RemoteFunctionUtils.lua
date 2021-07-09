@@ -1,4 +1,4 @@
----
+--- Utility functions to wrap invoking a remote function with a promise
 -- @module RemoteFunctionUtils
 -- @author Quenty
 
