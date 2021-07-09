@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/axisangleutils",
+  "version": "0.0.0",
+  "description": "Utility functions for axis angles.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "CFrame"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/axisangleutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
