@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/collectionserviceutils",
+  "version": "0.0.0",
+  "description": "Utility functions for use with collection service tags",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "CollectionService"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/collectionserviceutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
