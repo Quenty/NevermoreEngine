@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/quaternion",
+  "version": "0.0.0",
+  "description": "Quaternion data type",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Math",
+    "Quaternions"
+  ],
+  "contributors": [
+    "Quenty",
+    "xXxMoNkEyMaNxXx"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/quaternion/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
