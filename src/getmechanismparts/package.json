@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/getmechanismparts",
+  "version": "0.0.0",
+  "description": "Gets the full mechanism from parts",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Mechanism"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/getmechanismparts/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
