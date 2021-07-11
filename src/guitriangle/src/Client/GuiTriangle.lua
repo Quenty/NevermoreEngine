@@ -1,4 +1,4 @@
---- Gui triangle rendering class
+--- 2D Gui triangle rendering class
 -- @classmod GuiTriangle
 -- http://wiki.roblox.com/index.php?title=2D_triangles
 
@@ -10,28 +10,28 @@ GuiTriangle.ExtraPixels = 2
 function GuiTriangle.new(parent)
 	local self = setmetatable({}, GuiTriangle)
 
-	self.ta = Instance.new("ImageLabel")
-	self.ta.BackgroundTransparency = 1
-	self.ta.BorderSizePixel = 0
+	self._ta = Instance.new("ImageLabel")
+	self._ta.BackgroundTransparency = 1
+	self._ta.BorderSizePixel = 0
 
-	self.tb = self.ta:Clone()
+	self._tb = self._ta:Clone()
 
 	self:SetParent(parent)
-	self.a = UDim2.new()
-	self.b = UDim2.new()
-	self.c = UDim2.new()
+	self._a = UDim2.new()
+	self._b = UDim2.new()
+	self._c = UDim2.new()
 
 	return self
 end
 
 function GuiTriangle:SetParent(parent)
-	self.ta.Parent = parent
-	self.tb.Parent = parent
+	self._ta.Parent = parent
+	self._tb.Parent = parent
 end
 
 function GuiTriangle:Show()
-	self.ta.Visible = true
-	self.tb.Visible = true
+	self._ta.Visible = true
+	self._tb.Visible = true
 end
 
 function GuiTriangle:Set(a, b, c)
@@ -41,8 +41,8 @@ function GuiTriangle:Set(a, b, c)
 end
 
 function GuiTriangle:Hide()
-	self.ta.Visible = false
-	self.tb.Visible = false
+	self._ta.Visible = false
+	self._tb.Visible = false
 end
 
 local function dotv2(a, b)
@@ -56,22 +56,22 @@ local function rotateV2(vec, angle)
 end
 
 function GuiTriangle:SetA(a)
-	self.a = a or error("Expected Vector2")
+	self._a = a or error("Expected Vector2")
 	return self
 end
 
 function GuiTriangle:SetB(b)
-	self.b = b or error("Expected Vector2")
+	self._b = b or error("Expected Vector2")
 	return self
 end
 
 function GuiTriangle:SetC(c)
-	self.c = c or error("Expected Vector2")
+	self._c = c or error("Expected Vector2")
 	return self
 end
 
 function GuiTriangle:UpdateRender()
-	local a, b, c = self.a, self.b, self.c
+	local a, b, c = self._a, self._b, self._c
 
 	local extra = self.ExtraPixels
 
@@ -109,7 +109,7 @@ function GuiTriangle:UpdateRender()
 	tlc1 = center1 + rotateV2(tlc1 - center1, rotation)
 	tlc2 = center2 + rotateV2(tlc2 - center2, rotation)
 
-	local ta, tb = self.ta, self.tb
+	local ta, tb = self._ta, self._tb
 	ta.Image = "rbxassetid://319692171"
 	tb.Image = "rbxassetid://319692151"
 	ta.Position = UDim2.new(0, tlc1.x, 0, tlc1.y)
@@ -123,11 +123,11 @@ end
 function GuiTriangle:Destroy()
 	setmetatable(self, nil)
 
-	self.ta:Destroy()
-	self.ta = nil
+	self._ta:Destroy()
+	self._ta = nil
 
-	self.tb:Destroy()
-	self.tb = nil
+	self._tb:Destroy()
+	self._tb = nil
 end
 
 return GuiTriangle
