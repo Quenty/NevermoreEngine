@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/color3serializationutils",
+  "version": "0.0.0",
+  "description": "Utility functions to help serialize Color3 values",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Serialization"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/color3serializationutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
