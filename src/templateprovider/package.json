@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/templateprovider",
+  "version": "0.0.0",
+  "description": "Base of a template retrieval system",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Templates"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/templateprovider/"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "~0.0.2",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/string": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
