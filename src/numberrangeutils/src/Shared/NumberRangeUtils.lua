@@ -1,4 +1,4 @@
----
+--- Utility functions involving the NumberRange structure in Roblox
 -- @module NumberRangeUtils
 
 local NumberRangeUtils = {}
