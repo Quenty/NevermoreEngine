@@ -1,4 +1,4 @@
----
+--- Utilities involving pathfinding in Roblox
 -- @module PathfindingUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
