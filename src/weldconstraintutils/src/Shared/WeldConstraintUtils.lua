@@ -1,4 +1,4 @@
----
+--- Utility functions to create WeldConstraint objects in Roblox
 -- @module WeldConstraintUtils
 -- @author Quenty
 
