@@ -1,4 +1,4 @@
----
+--- Utility functions involving NumberSequences on Roblox
 -- @module NumberSequenceUtils
 
 local NumberSequenceUtils = {}
