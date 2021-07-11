@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/playersservicepromises",
+  "version": "0.0.0",
+  "description": "Utility methods for async methods in Players service",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Player",
+    "Promises"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/playersservicepromises/"
+  },
+  "dependencies": {
+    "@quenty/promise": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
