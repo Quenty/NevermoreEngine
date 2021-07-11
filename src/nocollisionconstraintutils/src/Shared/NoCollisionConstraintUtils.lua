@@ -1,4 +1,4 @@
----
+--- Utility functions to create and manipulate NoCollisionConstraints between Roblox objects
 -- @module NoCollisionConstraintUtils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
