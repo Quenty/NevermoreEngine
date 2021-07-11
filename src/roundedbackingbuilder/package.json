@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/roundedbackingbuilder",
+  "version": "0.0.0",
+  "description": "Construct a rounded backing with a shadow",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Backings"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/roundedbackingbuilder/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
