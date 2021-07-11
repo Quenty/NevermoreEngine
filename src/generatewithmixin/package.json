@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/generatewithmixin",
+  "version": "0.0.0",
+  "description": "Simple mixin to generate code for a class",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ClassMixin"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/generatewithmixin/"
+  },
+  "dependencies": {
+    "@quenty/string": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
