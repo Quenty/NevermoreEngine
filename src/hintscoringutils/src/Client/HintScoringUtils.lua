@@ -1,4 +1,5 @@
----
+--- Utility functions that let you score a proximity prompt (i.e. a Hint)
+-- based upon its relation to a character in 3D space.
 -- @module HintScoringUtils
 -- @author Quenty
 
