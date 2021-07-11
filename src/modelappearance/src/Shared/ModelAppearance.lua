@@ -1,4 +1,5 @@
---- Control appearance of model being placed
+--- Allows the appearance of a model to be overridden. Most commonly used when
+-- placing down an object in a building game.
 -- @classmod ModelAppearance
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
