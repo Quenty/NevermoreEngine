@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/bezierutils",
+  "version": "0.0.0",
+  "description": "Make interpolation curves like CSS A good place to generate and test these out: http://cubic-bezier.com/ Based upon https://gist.github.com/gre/1926947#file-keyspline-js",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Math",
+    "Bezier",
+    "Spline"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/bezierutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
