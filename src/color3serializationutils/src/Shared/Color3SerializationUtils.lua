@@ -1,4 +1,4 @@
----
+--- Utility functions to help serialize Color3 values
 -- @module Color3SerializationUtils
 -- @author Quenty
 
