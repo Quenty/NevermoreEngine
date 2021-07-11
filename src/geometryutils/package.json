@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/geometryutils",
+  "version": "0.0.0",
+  "description": "Utility functions involving 3D and 2D geometry",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Math"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/geometryutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
