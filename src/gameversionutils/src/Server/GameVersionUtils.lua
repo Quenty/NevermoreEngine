@@ -1,4 +1,4 @@
----
+--- Utility functions to automatically detect the version a game is running at
 -- @module GameVersionUtils
 -- @author Quenty
 
