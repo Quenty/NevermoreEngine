@@ -1,0 +1,6 @@
+{
+  "name": "ApplyTagToTaggedChildren",
+  "tree": {
+    "$path": "src"
+  }
+}
