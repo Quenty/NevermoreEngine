@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/debounce",
+  "version": "0.0.0",
+  "description": "debounce a existing function by timeout",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Time"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/debounce/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
