@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/playerbinder",
+  "version": "0.0.0",
+  "description": "Binds the given class to each player in the game",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Player"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/playerbinder/"
+  },
+  "dependencies": {
+    "@quenty/binder": "~0.0.2"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
