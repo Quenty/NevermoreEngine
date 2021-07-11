@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/color3utils",
+  "version": "0.0.0",
+  "description": "Utility methods for Roblox Color3 values",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Utility"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/color3utils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
