@@ -1,3 +1,6 @@
+--- Batch raycast utility function
+-- @function batchRaycast
+
 local function batchRaycast(
 	originList, directionList,
 	ignoreListWorkingEnvironment,
