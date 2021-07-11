@@ -1,4 +1,6 @@
----
+--- Class that while constructed apply a tag to any children of the parent it is given, assuming that class has the required tag.
+-- This lets you bridge tag systems since CollectionService is used as an interop model between many
+-- components in scripts.
 -- @classmod ApplyTagToTaggedChildren
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
