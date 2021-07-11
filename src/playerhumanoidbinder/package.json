@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/playerhumanoidbinder",
+  "version": "0.0.0",
+  "description": "Binder that will automatically bind to each player's humanoid",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Player"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/playerhumanoidbinder/"
+  },
+  "dependencies": {
+    "@quenty/binder": "~0.0.2",
+    "@quenty/humanoidtracker": "~0.0.1",
+    "@quenty/maid": "~0.0.2"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

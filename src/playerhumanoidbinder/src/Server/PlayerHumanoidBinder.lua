@@ -1,10 +1,11 @@
----
+--- Binder that will automatically bind to each player's humanoid
 -- @classmod PlayerHumanoidBinder
 -- @author Quenty
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local Players = game:GetService("Players")
+
 local Binder = require("Binder")
 local Maid = require("Maid")
 local HumanoidTracker = require("HumanoidTracker")

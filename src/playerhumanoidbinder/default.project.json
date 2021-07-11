@@ -1,0 +1,6 @@
+{
+  "name": "PlayerHumanoidBinder",
+  "tree": {
+    "$path": "src"
+  }
+}
