@@ -1,4 +1,4 @@
---- Utility methods for R15
+--- Utility methods for R15 Characters
 -- @module R15Utils
 
 local R15Utils = {}

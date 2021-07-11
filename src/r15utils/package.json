@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/r15utils",
+  "version": "0.0.0",
+  "description": "Utility methods for R15",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Character"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/r15utils/"
+  },
+  "dependencies": {
+    "@quenty/brio": "~0.0.1",
+    "@quenty/instanceutils": "~0.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
