@@ -1,14 +1,12 @@
 {
-  "name": "@quenty/textfilterservice",
-  "version": "0.0.3",
-  "description": "textfilterservice ",
+  "name": "@quenty/textfilterutils",
+  "version": "0.0.0",
+  "description": "Utility functions for filtering text",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "TextFilterService",
-    "filtering",
-    "text"
+    "TextService"
   ],
   "contributors": [
     "Quenty"
@@ -17,12 +15,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/textfilterservice/"
+    "directory": "src/textfilterutils/"
   },
   "dependencies": {
-    "@quenty/remoting": "~0.0.1",
-    "@quenty/table": "~0.0.0",
-    "@quenty/textfilterutils": "~0.0.0"
+    "@quenty/promise": "~0.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "~0.0.2"
