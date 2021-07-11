@@ -1,4 +1,4 @@
----
+--- Maps a number to a set of inputs. Useful for shortcut codes in menus.
 -- @module NumberToInputKeyUtils
 -- @author Quenty
 
