@@ -1,4 +1,5 @@
----
+--- Provides animations for anything tagged with "AnimationContainer" and from a folder named "Animations"
+-- in ReplicatedStorage.
 -- @classmod AnimationProvider
 -- @author Quenty
 
