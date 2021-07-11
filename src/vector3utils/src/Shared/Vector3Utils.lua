@@ -1,4 +1,4 @@
----
+--- Utilities involving Vector3 objects in Roblox
 -- @module Vector3Utils
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))

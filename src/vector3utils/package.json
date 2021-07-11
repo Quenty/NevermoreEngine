@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/vector3utils",
+  "version": "0.0.1",
+  "description": "Utilities involving Vector3 objects in Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Vector"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/vector3utils/"
+  },
+  "dependencies": {
+    "@quenty/math": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
