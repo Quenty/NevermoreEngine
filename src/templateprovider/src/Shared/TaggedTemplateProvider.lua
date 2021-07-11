@@ -1,4 +1,4 @@
----
+--- Like a template provider, but it also reparents and retrieves tagged objects
 -- @classmod TaggedTemplateProvider
 -- @author Quenty
 
