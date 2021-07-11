@@ -1,4 +1,4 @@
----
+--- Handles actions involving HumanoidDescription objects, including loading character appearance.
 -- @module HumanoidDescriptionUtils
 -- @author Quenty
 
