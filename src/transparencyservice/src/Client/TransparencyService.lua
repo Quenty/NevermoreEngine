@@ -1,4 +1,6 @@
----
+--- Service that orchistrates transparency setting from multiple colliding sources
+-- and handle the transparency appropriately. This means that 2 systems can work with
+-- transparency without knowing about each other.
 -- @module TransparencyService
 -- @author Quenty
 

@@ -1,0 +1,32 @@
+{
+  "name": "@quenty/transparencyservice",
+  "version": "0.0.0",
+  "description": "Service that orchistrates transparency setting from multiple colliding sources and handle the transparency appropriately. This means that 2 systems can work with transparency without knowing about each other.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Transparency"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/transparencyservice/"
+  },
+  "dependencies": {
+    "@quenty/math": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -4,10 +4,10 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local BaseObject = require("BaseObject")
-local TransparencyService = require("TransparencyService")
 local AccelTween = require("AccelTween")
+local BaseObject = require("BaseObject")
 local StepUtils = require("StepUtils")
+local TransparencyService = require("TransparencyService")
 
 local ModelTransparencyEffect = setmetatable({}, BaseObject)
 ModelTransparencyEffect.ClassName = "ModelTransparencyEffect"
