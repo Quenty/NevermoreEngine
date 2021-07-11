@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/firstpersoncharactertransparency",
+  "version": "0.0.0",
+  "description": "Allows transparency to manually be controlled for a character in first-person mode",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Transparency",
+    "Character"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/firstpersoncharactertransparency/"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "~0.0.2",
+    "@quenty/transparencyservice": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

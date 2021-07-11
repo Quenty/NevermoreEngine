@@ -1,4 +1,5 @@
----
+--- Allows transparency to manually be controlled for a character in first-person
+-- mode
 -- @classmod FirstPersonCharacterTransparency
 -- @author Quenty
 
