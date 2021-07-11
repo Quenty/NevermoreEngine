@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/getpercentexposedutils",
+  "version": "0.0.0",
+  "description": "Identify parts that are potentially exposed to an explosion using a random vector raycasting",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Physics",
+    "Explosions"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/getpercentexposedutils/"
+  },
+  "dependencies": {
+    "@quenty/vector3utils": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
