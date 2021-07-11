@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/numbertoinputkeyutils",
+  "version": "0.0.0",
+  "description": "Maps a number to a set of inputs. Useful for shortcut codes in menus.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "InputMode"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/numbertoinputkeyutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
