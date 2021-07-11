@@ -1,0 +1,36 @@
+{
+  "name": "@quenty/racketingropeconstraint",
+  "version": "0.0.0",
+  "description": "Tries to racket a rope constraint back down to a reasonable length",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Physics",
+    "Constraints",
+    "RopeConstraint"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "ssrc/racketingropeconstraint/"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "~0.0.2",
+    "@quenty/overriddenproperty": "~0.0.0",
+    "@quenty/promise": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

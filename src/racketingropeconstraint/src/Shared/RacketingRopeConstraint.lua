@@ -1,4 +1,4 @@
---- Tries to racket back down to a reasonable length
+--- Tries to racket a rope constraint back down to a reasonable length
 -- @classmod RacketingRopeConstraint
 -- @author Quenty
 
