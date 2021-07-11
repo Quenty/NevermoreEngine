@@ -1,4 +1,4 @@
----
+--- Utility functions for Color sequences in Roblox.
 -- @module ColorSequenceUtils
 
 local ColorSequenceUtils = {}
