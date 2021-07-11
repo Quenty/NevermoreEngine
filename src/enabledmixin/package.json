@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/enabledmixin",
+  "version": "0.0.0",
+  "description": "Adds Enabled/Disabled state to class",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ClassMixin"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/enabledmixin/"
+  },
+  "dependencies": {
+    "@quenty/maid": "~0.0.2",
+    "@quenty/signal": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
