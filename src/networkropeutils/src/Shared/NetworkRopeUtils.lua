@@ -1,4 +1,5 @@
----
+--- Utility function to create network ropes which hint to Roblox that two assemblies
+--  should be considered to be owned by the same network owner.
 -- @module NetworkRopeUtils
 -- @author Quenty
 
