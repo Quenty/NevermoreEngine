@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/jumpbuttonutils",
+  "version": "0.0.0",
+  "description": "Utility functions to deal with Roblox's mobile jump button and its position",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Input"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/jumpbuttonutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
