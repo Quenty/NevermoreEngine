@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/inputkeymaputils",
+  "version": "0.0.0",
+  "description": "Utility methods for input map",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Input",
+    "InputMap"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/inputkeymaputils/"
+  },
+  "dependencies": {
+    "@quenty/table": "~0.0.0"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
