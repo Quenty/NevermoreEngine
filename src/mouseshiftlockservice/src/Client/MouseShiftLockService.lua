@@ -1,4 +1,4 @@
----
+--- Utility service to enable or disable mouse shift lock on the fly on Roblox.
 -- @module MouseShiftLockService
 -- See: https://devforum.roblox.com/t/custom-center-locked-mouse-camera-control-toggle/205323
 
