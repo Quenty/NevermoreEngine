@@ -1,0 +1,35 @@
+{
+  "name": "@quenty/pathfindingutils",
+  "version": "0.0.0",
+  "description": "Utilities involving pathfinding in Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Pathfinding",
+    "Promises"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/pathfindingutils/"
+  },
+  "dependencies": {
+    "@quenty/draw": "~0.0.0",
+    "@quenty/maid": "~0.0.2",
+    "@quenty/promise": "~0.0.1"
+  },
+  "peerDependencies": {
+    "@quenty/loader": "~0.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
