@@ -1,0 +1,28 @@
+{
+  "name": "@quenty/isamixin",
+  "version": "0.0.0",
+  "description": "Generic IsA interface for Lua classes.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ClassMixin"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/isamixin/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
