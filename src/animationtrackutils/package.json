@@ -1,0 +1,29 @@
+{
+  "name": "@quenty/animationtrackutils",
+  "version": "0.0.0",
+  "description": "Utility functions for animations",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Character",
+    "Animations"
+  ],
+  "contributors": [
+    "Quenty"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/animationtrackutils/"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
