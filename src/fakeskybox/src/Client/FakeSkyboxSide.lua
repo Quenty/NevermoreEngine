@@ -1,3 +1,6 @@
+---
+-- @module FakeSkyboxSide
+
 local FakeSkyboxSide = {}
 FakeSkyboxSide.__index = FakeSkyboxSide
 FakeSkyboxSide.ClassName = "FakeSkyboxSide"
