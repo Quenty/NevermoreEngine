@@ -1,4 +1,4 @@
----
+--- Utility functions to deal with Roblox's mobile jump button and its position
 -- @module JumpButtonUtils
 -- @author Quenty
 
