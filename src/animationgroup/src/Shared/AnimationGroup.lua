@@ -1,4 +1,6 @@
----
+--- A group of weighted tracks that can be played back with weighted probability.
+-- The closest example to this is the idle animation that looks around at a 1:10
+-- ratio when you're standing still in default Roblox animation script.
 -- @classmod AnimationGroup
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
