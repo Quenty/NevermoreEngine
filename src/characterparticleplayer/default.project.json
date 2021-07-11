@@ -1,0 +1,6 @@
+{
+  "name": "ParticlePlayer",
+  "tree": {
+    "$path": "src"
+  }
+}
