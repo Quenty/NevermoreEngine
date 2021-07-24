@@ -66,6 +66,9 @@ Calls a method for each linked class for each binder, given the method name and 
 
 ## Changelog
 
+## 0.0.1
+- Remove duplicate HasClass implementation
+
 ## 0.0.0
 - Initial commit
 - Add documentation
