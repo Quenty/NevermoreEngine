@@ -4,11 +4,11 @@
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
 local BaseObject = require("BaseObject")
-local Math = require("Math")
-local IKResourceUtils = require("IKResourceUtils")
-local IKResource = require("IKResource")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
+local IKResource = require("IKResource")
+local IKResourceUtils = require("IKResourceUtils")
 local Maid = require("Maid")
+local Math = require("Math")
 local RagdollConstants = require("RagdollConstants")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)

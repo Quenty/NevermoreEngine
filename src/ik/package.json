@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ik",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Inverse Kinematics for characters on Roblox",
   "keywords": [
     "Roblox",
@@ -28,6 +28,7 @@
     "@quenty/maid": "~0.0.2",
     "@quenty/math": "~0.0.0",
     "@quenty/promise": "~0.0.1",
+    "@quenty/ragdoll": "~0.0.1",
     "@quenty/remoting": "~0.0.2",
     "@quenty/signal": "~0.0.0",
     "@quenty/table": "~0.0.0"
