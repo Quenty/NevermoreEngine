@@ -23,3 +23,11 @@ Usage is designed to be simple.
 
 ### `Vector3int16Utils.fromVector3(vector3)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

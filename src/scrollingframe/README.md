@@ -55,3 +55,11 @@ Binds input to a specific GUI
 
 ### `ScrollingFrame:Destroy()`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

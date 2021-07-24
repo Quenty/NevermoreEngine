@@ -1,6 +1,6 @@
 {
   "name": "@quenty/hapticfeedbackutils",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Utility functions involving haptic feedback on gamepads for Roblox",
   "keywords": [
     "Roblox",

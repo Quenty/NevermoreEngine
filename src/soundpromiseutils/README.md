@@ -25,3 +25,11 @@ Usage is designed to be simple.
 
 ### `SoundPromiseUtils.promiseAllSoundsLoaded(sounds)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

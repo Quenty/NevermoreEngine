@@ -29,3 +29,11 @@ Usage is designed to be simple.
 
 ### `TerrainUtils.getCornerint16(region3, resolution)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

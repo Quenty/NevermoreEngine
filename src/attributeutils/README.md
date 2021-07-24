@@ -23,3 +23,11 @@ Usage is designed to be simple.
 
 ### `AttributeUtils.bindToBinder(instance, attributeName, binder)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

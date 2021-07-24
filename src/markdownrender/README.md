@@ -34,3 +34,11 @@ Creates a new markdown render
 ### `MarkdownRender:Render(data)`
 Renders the data in the given Gui
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

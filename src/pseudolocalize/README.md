@@ -1,14 +1,14 @@
 ## PseudoLocalize
 <div align="center">
-	<a href="http://quenty.github.io/api/">
-		<img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
-	</a>
-	<a href="https://discord.gg/mhtGUS8">
-		<img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
-	</a>
-	<a href="https://github.com/Quenty/NevermoreEngine/actions">
-		<img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
-	</a>
+  <a href="http://quenty.github.io/api/">
+    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  </a>
+  <a href="https://discord.gg/mhtGUS8">
+    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+  </a>
+  <a href="https://github.com/Quenty/NevermoreEngine/actions">
+    <img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+  </a>
 </div>
 
 Pseudo localizes text. Useful for verifying translation without having actual translations available
@@ -27,3 +27,11 @@ Translates a line into pseudo text while maintaining params
 ### `PseudoLocalize.addToLocalizationTable(localizationTable, preferredLocaleId, preferredFromLocale)`
 Parses a localization table and adds a pseudo localized locale to the table
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

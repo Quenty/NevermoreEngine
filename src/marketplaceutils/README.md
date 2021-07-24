@@ -27,3 +27,11 @@ Usage is designed to be simple.
 
 ### `MarketplaceUtils.promisePlayerOwnsAsset(player, assetId)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

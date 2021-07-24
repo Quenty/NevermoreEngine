@@ -34,3 +34,11 @@ npm install @quenty/instanceutils --save
 
 ### `RxInstanceUtils.observeDescendants(parent, predicate)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

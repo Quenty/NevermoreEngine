@@ -1,6 +1,22 @@
 ## Camera
+<div align="center">
+  <a href="http://quenty.github.io/api/">
+    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  </a>
+  <a href="https://discord.gg/mhtGUS8">
+    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+  </a>
+  <a href="https://github.com/Quenty/NevermoreEngine/actions">
+    <img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+  </a>
+</div>
 
 CameraStackService provides a camera stack of objects that can report a camera state. This allows a composable camera system for a variety of situations that arise, and lets systems interop with each other
+
+## Installation
+```
+npm install @quenty/camera --save
+```
 
 ## Features
 
@@ -53,3 +69,11 @@ This class takes two arguments and returns the summation of the two
 This classes allows the effects of a camera to be faded / varied based upon a spring
 
 * Starts at 0 percent effect
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

@@ -23,3 +23,11 @@ Usage is designed to be simple.
 
 ### `StreamingUtils.promiseStreamAround(player, position, timeOut)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

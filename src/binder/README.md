@@ -13,6 +13,11 @@
 
 Binders bind a class to Roblox Instance
 
+## Installation
+```
+npm install @quenty/binder --save
+```
+
 ## Usage
 
 ```lua

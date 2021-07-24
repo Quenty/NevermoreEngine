@@ -30,3 +30,11 @@ delay(1, function()
     cancel() -- cancel
 end)
 ```
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

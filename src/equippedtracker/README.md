@@ -30,3 +30,11 @@ Signal that fires when the player changes
 
 ### `EquippedTracker.Player.Value`
 Current equipped player value
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

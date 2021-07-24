@@ -1,14 +1,14 @@
 ## NetworkOwnerService
 <div align="center">
-	<a href="http://quenty.github.io/api/">
-		<img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
-	</a>
-	<a href="https://discord.gg/mhtGUS8">
-		<img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
-	</a>
-	<a href="https://github.com/Quenty/NevermoreEngine/actions">
-		<img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
-	</a>
+  <a href="http://quenty.github.io/api/">
+    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  </a>
+  <a href="https://discord.gg/mhtGUS8">
+    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+  </a>
+  <a href="https://github.com/Quenty/NevermoreEngine/actions">
+    <img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+  </a>
 </div>
 
 NetworkOwnerService - Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set
@@ -45,3 +45,10 @@ delay(5, function()
 	handle() -- stop forcing network ownership to be the server, now we're back to nil
 end)
 ```
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

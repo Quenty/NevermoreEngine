@@ -1,6 +1,6 @@
 {
   "name": "@quenty/deferred",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "deferred (otherwise known as fastSpawn) implementation for Roblox",
   "keywords": [
     "Roblox",

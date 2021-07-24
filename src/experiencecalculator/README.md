@@ -38,3 +38,11 @@ Gets experience left to earn required for next level
 ### `ExperienceCalculator.getSubExperience(currentExperience)`
 Calculates subtotal experience
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

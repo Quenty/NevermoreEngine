@@ -23,3 +23,11 @@ Usage is designed to be simple.
 
 ### `BadgeUtils.promiseAwardBadge(player, badgeId)`
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

@@ -1,6 +1,22 @@
 ## Brio
+<div align="center">
+  <a href="http://quenty.github.io/api/">
+    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  </a>
+  <a href="https://discord.gg/mhtGUS8">
+    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+  </a>
+  <a href="https://github.com/Quenty/NevermoreEngine/actions">
+    <img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+  </a>
+</div>
 
 Brios wrap a value and provide the following constraints
+
+## Installation
+```
+npm install @quenty/brio --save
+```
 
 - Can be in 2 states, dead or alive
 - While alive, can retrieve values

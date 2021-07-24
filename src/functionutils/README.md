@@ -24,3 +24,11 @@ Usage is designed to be simple.
 ### `FunctionUtils.bind(self, func)`
 Binds the "self" variable to the function as the first argument
 
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit

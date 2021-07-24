@@ -1,6 +1,22 @@
 # Quenty's DataStore System
+<div align="center">
+  <a href="http://quenty.github.io/api/">
+    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  </a>
+  <a href="https://discord.gg/mhtGUS8">
+    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+  </a>
+  <a href="https://github.com/Quenty/NevermoreEngine/actions">
+    <img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+  </a>
+</div>
 
 This system is a reliable datastore system designed with promises and asyncronious code in mind, and has been tested on several games. Underlying this system are several key design points.
+
+## Installation
+```
+npm install @quenty/datastore --save
+```
 
 * Minimize usage of the read and write datastore APIs so that API limits can be safely used
 	* This means combining several datastore entries into one store. Instead of having 1 entry for gold, and 1 entry for money, this system combines the overall entries together into a table, while providing an API that is acceptable to use and acts as if you had entries for each one.
@@ -362,3 +378,11 @@ for _, player in pairs(Players:GetPlayers()) do
 	handlePlayerAdded(player)
 end
 ```
+
+## Changelog
+
+### 0.0.1
+Added documentation
+
+### 0.0.0
+Initial commit
