@@ -29,7 +29,7 @@ Usage is designed to be simple.
 
 ### `HintScoringUtils.clampToBoundingBox(adornee, humanoidCenter)`
 
-### `HintScoringUtils.scoreAdornee(`
+### `HintScoringUtils.scoreAdornee(adornee, raycaster, humanoidCenter, humanoidLookVector, maxViewRadius, maxTriggerRadius, maxViewAngle, maxTriggerAngle, isLineOfSightRequired)`
 
 ### `HintScoringUtils.scoreDist(distance, maxViewDistance, maxTriggerRadius)`
 
@@ -37,6 +37,9 @@ Usage is designed to be simple.
 
 
 ## Changelog
+
+### 0.0.1
+Added isLineOfSightRequired to scoreAdornee
 
 ### 0.0.0
 Initial commit
