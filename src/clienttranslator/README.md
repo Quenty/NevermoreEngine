@@ -65,6 +65,9 @@ Works the same way that Roblox's ClientTranslator:FormatByKey functions. However
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

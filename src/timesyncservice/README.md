@@ -25,6 +25,9 @@ npm install @quenty/timesyncservice --save
 * Use the same module for server and client
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

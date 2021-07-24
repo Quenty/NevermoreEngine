@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cubicspline",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Cubic Spline implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -20,11 +20,11 @@
     "directory": "src/cubicspline/"
   },
   "dependencies": {
-    "@quenty/binarysearch": "~0.0.0",
-    "@quenty/linearsystemssolver": "~0.0.0"
+    "@quenty/binarysearch": "^1.0.0",
+    "@quenty/linearsystemssolver": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

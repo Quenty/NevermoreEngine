@@ -72,6 +72,9 @@ This classes allows the effects of a camera to be faded / varied based upon a sp
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

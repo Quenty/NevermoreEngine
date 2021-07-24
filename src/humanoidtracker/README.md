@@ -13,6 +13,9 @@
 
 Tracks a player's character's humanoid
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/humanoidtracker --save

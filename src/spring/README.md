@@ -59,6 +59,9 @@ by Defaultio: https://www.desmos.com/calculator/hn2i9shxbz
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

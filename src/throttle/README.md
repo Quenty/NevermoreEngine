@@ -13,6 +13,9 @@
 
 A throttle implementation for Roblox
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/throttle --save

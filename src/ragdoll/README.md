@@ -20,6 +20,9 @@ npm install @quenty/ragdoll --save
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added support for IK while ragdoll
 

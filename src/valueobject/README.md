@@ -25,6 +25,9 @@ npm install @quenty/valueobject --save
 * Automatically fires with a maid that exists for the lifetime of the value
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

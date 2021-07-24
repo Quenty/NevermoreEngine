@@ -45,5 +45,8 @@ Only bottom two corners are rounded
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

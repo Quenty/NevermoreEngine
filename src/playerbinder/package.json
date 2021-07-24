@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerbinder",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Binds the given class to each player in the game",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/playerbinder/"
   },
   "dependencies": {
-    "@quenty/binder": "~0.0.2"
+    "@quenty/binder": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

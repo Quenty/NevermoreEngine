@@ -1,6 +1,6 @@
 {
   "name": "@quenty/binder",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
   "keywords": [
     "Roblox",
@@ -18,18 +18,18 @@
     "directory": "src/binder/"
   },
   "dependencies": {
-    "@quenty/baseobject": "~0.0.2",
-    "@quenty/brio": "~0.0.0",
-    "@quenty/instanceutils": "~0.0.0",
-    "@quenty/linkutils": "~0.0.1",
-    "@quenty/maid": "~0.0.2",
-    "@quenty/promise": "~0.0.1",
-    "@quenty/rx": "~0.0.1",
-    "@quenty/signal": "~0.0.0",
-    "@quenty/valueobject": "~0.0.0"
+    "@quenty/baseobject": "^1.0.0",
+    "@quenty/brio": "^1.0.0",
+    "@quenty/instanceutils": "^1.0.0",
+    "@quenty/linkutils": "^1.0.0",
+    "@quenty/maid": "^1.0.0",
+    "@quenty/promise": "^1.0.0",
+    "@quenty/rx": "^1.0.0",
+    "@quenty/signal": "^1.0.0",
+    "@quenty/valueobject": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

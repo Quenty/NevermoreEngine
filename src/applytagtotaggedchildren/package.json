@@ -1,6 +1,6 @@
 {
   "name": "@quenty/applytagtotaggedchildren",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Class that while constructed apply a tag to any children of the parent it is given, assuming that class has the required tag. This lets you bridge tag systems since CollectionService is used as an interop model between many components in scripts.",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/applytagtotaggedchildren/"
   },
   "dependencies": {
-    "@quenty/baseobject": "~0.0.2"
+    "@quenty/baseobject": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/hintscoringutils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Utility functions that let you score a proximity prompt (i.e. a Hint) based upon its relation to a character in 3D space.",
   "keywords": [
     "Roblox",
@@ -19,17 +19,17 @@
     "directory": "src/hintscoringutils/"
   },
   "dependencies": {
-    "@quenty/adorneeutils": "~0.0.0",
-    "@quenty/boundingboxutils": "~0.0.1",
-    "@quenty/camera": "~0.0.0",
-    "@quenty/draw": "~0.0.0",
-    "@quenty/maid": "~0.0.2",
-    "@quenty/math": "~0.0.0",
-    "@quenty/region3utils": "~0.0.0",
-    "@quenty/vector3utils": "~0.0.1"
+    "@quenty/adorneeutils": "^1.0.0",
+    "@quenty/boundingboxutils": "^1.0.0",
+    "@quenty/camera": "^1.0.0",
+    "@quenty/draw": "^1.0.0",
+    "@quenty/maid": "^1.0.0",
+    "@quenty/math": "^1.0.0",
+    "@quenty/region3utils": "^1.0.0",
+    "@quenty/vector3utils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

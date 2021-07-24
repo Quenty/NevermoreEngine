@@ -13,6 +13,9 @@
 
 Utility functions involving haptic feedback on gamepads
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/hapticfeedbackutils --save

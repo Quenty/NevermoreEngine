@@ -1,6 +1,6 @@
 {
   "name": "@quenty/vector3utils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Utilities involving Vector3 objects in Roblox",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/vector3utils/"
   },
   "dependencies": {
-    "@quenty/math": "~0.0.0"
+    "@quenty/math": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

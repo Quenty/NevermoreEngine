@@ -27,6 +27,9 @@ Binds the "self" variable to the function as the first argument
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

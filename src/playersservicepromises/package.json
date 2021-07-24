@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playersservicepromises",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Utility methods for async methods in Players service",
   "keywords": [
     "Roblox",
@@ -19,10 +19,10 @@
     "directory": "src/playersservicepromises/"
   },
   "dependencies": {
-    "@quenty/promise": "~0.0.1"
+    "@quenty/promise": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

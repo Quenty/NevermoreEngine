@@ -1,6 +1,6 @@
 {
   "name": "@quenty/region3int16utils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Module for working with Region3int16",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/region3int16utils/"
   },
   "dependencies": {
-    "@quenty/vector3int16utils": "~0.0.0"
+    "@quenty/vector3int16utils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

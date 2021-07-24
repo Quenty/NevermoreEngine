@@ -40,5 +40,8 @@ Returns whether or not the text should be black using
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

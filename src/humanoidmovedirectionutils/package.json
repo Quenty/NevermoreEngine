@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidmovedirectionutils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Ever wanted to not rewrite all of Roblox's input systems! Well, now you can with this slight hack!",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/humanoidmovedirectionutils/"
   },
   "dependencies": {
-    "@quenty/cframeutils": "~0.0.0"
+    "@quenty/cframeutils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

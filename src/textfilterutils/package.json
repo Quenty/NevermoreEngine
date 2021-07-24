@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textfilterutils",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Utility functions for filtering text",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/textfilterutils/"
   },
   "dependencies": {
-    "@quenty/promise": "~0.0.1"
+    "@quenty/promise": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

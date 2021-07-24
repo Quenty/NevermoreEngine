@@ -1,6 +1,6 @@
 {
   "name": "@quenty/boundingboxutils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Bounding box utilties. Prefer model:GetBoundingBox() in most cases. However, sometimes grouping isn't possible.",
   "keywords": [
     "Roblox",

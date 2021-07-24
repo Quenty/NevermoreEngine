@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bezierutils",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Make interpolation curves like CSS A good place to generate and test these out: http://cubic-bezier.com/ Based upon https://gist.github.com/gre/1926947#file-keyspline-js",
   "keywords": [
     "Roblox",

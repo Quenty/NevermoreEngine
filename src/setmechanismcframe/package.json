@@ -1,6 +1,6 @@
 {
   "name": "@quenty/setmechanismcframe",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Sets a mechanisms cframe",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/setmechanismcframe/"
   },
   "dependencies": {
-    "@quenty/getmechanismparts": "~0.0.0"
+    "@quenty/getmechanismparts": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

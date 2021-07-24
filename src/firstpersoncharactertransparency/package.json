@@ -1,6 +1,6 @@
 {
   "name": "@quenty/firstpersoncharactertransparency",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Allows transparency to manually be controlled for a character in first-person mode",
   "keywords": [
     "Roblox",
@@ -19,11 +19,11 @@
     "directory": "src/firstpersoncharactertransparency/"
   },
   "dependencies": {
-    "@quenty/baseobject": "~0.0.2",
-    "@quenty/transparencyservice": "~0.0.0"
+    "@quenty/baseobject": "^1.0.0",
+    "@quenty/transparencyservice": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

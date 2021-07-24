@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clipcharacters",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Clip characters locally on the client of other clients so they don't interfer with physics.",
   "keywords": [
     "Roblox",
@@ -18,11 +18,11 @@
     "directory": "src/clipcharacters/"
   },
   "dependencies": {
-    "@quenty/maid": "~0.0.2",
-    "@quenty/remoting": "~0.0.2"
+    "@quenty/maid": "^1.0.0",
+    "@quenty/remoting": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

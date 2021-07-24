@@ -21,5 +21,8 @@ npm install @quenty/getgroundplane --save
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

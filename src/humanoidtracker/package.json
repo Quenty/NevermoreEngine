@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidtracker",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "HumanoidTracker for Roblox - Tracks a player's character's humanoid",
   "keywords": [
     "Roblox",
@@ -18,13 +18,13 @@
     "directory": "src/humanoidtracker/"
   },
   "dependencies": {
-    "@quenty/maid": "~0.0.2",
-    "@quenty/promise": "~0.0.1",
-    "@quenty/signal": "~0.0.0",
-    "@quenty/valueobject": "~0.0.0"
+    "@quenty/maid": "^1.0.0",
+    "@quenty/promise": "^1.0.0",
+    "@quenty/signal": "^1.0.0",
+    "@quenty/valueobject": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

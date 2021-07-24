@@ -1,6 +1,6 @@
 {
   "name": "@quenty/animationprovider",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Provides animations for anything tagged with \"AnimationContainer\" and from a folder named \"Animations\" in ReplicatedStorage.",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/animationprovider/"
   },
   "dependencies": {
-    "@quenty/templateprovider": "~0.0.0"
+    "@quenty/templateprovider": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

@@ -13,6 +13,9 @@
 
 Cubic spline tweening utilities
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/cubicspline --save

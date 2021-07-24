@@ -20,6 +20,9 @@ npm install @quenty/rx --save
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1 
 Moved all of the Rx utility libraries out of this and into their seperate packages
 

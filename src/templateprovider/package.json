@@ -1,6 +1,6 @@
 {
   "name": "@quenty/templateprovider",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Base of a template retrieval system",
   "keywords": [
     "Roblox",
@@ -18,12 +18,12 @@
     "directory": "src/templateprovider/"
   },
   "dependencies": {
-    "@quenty/baseobject": "~0.0.2",
-    "@quenty/maid": "~0.0.2",
-    "@quenty/string": "~0.0.0"
+    "@quenty/baseobject": "^1.0.0",
+    "@quenty/maid": "^1.0.0",
+    "@quenty/string": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

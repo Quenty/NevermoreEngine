@@ -37,6 +37,9 @@ system and output get destroyed in the process
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

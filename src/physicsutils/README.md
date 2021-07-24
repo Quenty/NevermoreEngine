@@ -46,5 +46,8 @@ Accelerates a part utilizing newton's laws. emittingPart is the part it's emitte
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

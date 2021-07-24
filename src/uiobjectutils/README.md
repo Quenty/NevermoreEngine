@@ -13,6 +13,9 @@
 
 Utility functions to make working with UI a little bit nicer in Roblox
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/uiobjectutils --save

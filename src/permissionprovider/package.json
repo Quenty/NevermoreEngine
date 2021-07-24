@@ -1,6 +1,6 @@
 {
   "name": "@quenty/permissionprovider",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Permission provider for Roblox, including authenticating against group membership",
   "keywords": [
     "Roblox",
@@ -18,14 +18,14 @@
     "directory": "src/permissionprovider/"
   },
   "dependencies": {
-    "@quenty/baseobject": "~0.0.2",
-    "@quenty/grouputils": "~0.0.0",
-    "@quenty/promise": "~0.0.1",
-    "@quenty/remoting": "~0.0.2",
-    "@quenty/table": "~0.0.0"
+    "@quenty/baseobject": "^1.0.0",
+    "@quenty/grouputils": "^1.0.0",
+    "@quenty/promise": "^1.0.0",
+    "@quenty/remoting": "^1.0.0",
+    "@quenty/table": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

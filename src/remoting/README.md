@@ -24,6 +24,9 @@ npm install @quenty/remoting --save
 * Always safe-to-use remotes if acquired
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

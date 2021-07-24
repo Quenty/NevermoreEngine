@@ -30,5 +30,8 @@ Using the .ClassName property, returns whether or not a component is
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

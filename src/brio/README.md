@@ -58,6 +58,9 @@ Anything may "kill" a brio by calling :Destroy() or :Kill().
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 - Added RxBrioUtils to brio
 - Updated documentation

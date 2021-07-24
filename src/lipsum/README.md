@@ -47,6 +47,9 @@ print(LipsumUtils.document(3)) --> Document with 3 paragraphs
 ```
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

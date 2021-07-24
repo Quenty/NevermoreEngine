@@ -1,6 +1,6 @@
 {
   "name": "@quenty/grouputils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Group utility functions for Roblox",
   "keywords": [
     "Roblox",
@@ -19,10 +19,10 @@
     "directory": "src/grouputils/"
   },
   "dependencies": {
-    "@quenty/promise": "~0.0.1"
+    "@quenty/promise": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

@@ -27,5 +27,8 @@ Get or create a mesh for a part
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

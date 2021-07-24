@@ -1,6 +1,6 @@
 {
   "name": "@quenty/lipsum",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "A Lorem Ipsum generator in Roblox",
   "keywords": [
     "Roblox",
@@ -20,16 +20,16 @@
     "directory": "src/lipsum/"
   },
   "dependencies": {
-    "@quenty/randomutils": "~0.0.0",
-    "@quenty/string": "~0.0.0"
+    "@quenty/randomutils": "^1.0.0",
+    "@quenty/string": "^1.0.0"
   },
   "devDependencies": {
-    "@quenty/maid": "~0.0.2",
-    "@quenty/textserviceutils": "~0.0.0",
-    "@quenty/uiobjectutils": "~0.0.0"
+    "@quenty/maid": "^1.0.0",
+    "@quenty/textserviceutils": "^1.0.0",
+    "@quenty/uiobjectutils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

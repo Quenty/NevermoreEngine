@@ -30,6 +30,9 @@ Parses a localization table and adds a pseudo localized locale to the table
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

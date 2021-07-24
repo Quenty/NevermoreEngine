@@ -13,6 +13,9 @@
 
 Provides utility functions surrounding CFrame in Roblox.
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/cframeutils --save

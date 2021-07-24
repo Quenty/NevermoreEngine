@@ -1,6 +1,6 @@
 {
   "name": "@quenty/octree",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Octree implementation for Roblox - fast spatial queries",
   "keywords": [
     "Roblox",
@@ -19,10 +19,10 @@
     "directory": "src/octree/"
   },
   "dependencies": {
-    "@quenty/draw": "~0.0.0"
+    "@quenty/draw": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

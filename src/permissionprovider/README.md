@@ -13,6 +13,9 @@
 
 Utility permission provider system for Roblox
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/permissionprovider --save

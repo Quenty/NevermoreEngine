@@ -13,6 +13,9 @@
 
 Utility functions to help with 3D stories using viewport frames
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/camerastoryutils --save

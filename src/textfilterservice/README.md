@@ -13,6 +13,9 @@
 
 Utility service that provides text filtering to the client
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/textfilterservice --save

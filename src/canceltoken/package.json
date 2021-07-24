@@ -1,6 +1,6 @@
 {
   "name": "@quenty/canceltoken",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Cancellation tokens for Roblox Lua",
   "keywords": [
     "Roblox",
@@ -19,11 +19,11 @@
     "directory": "src/canceltoken/"
   },
   "dependencies": {
-    "@quenty/promise": "~0.0.1",
-    "@quenty/signal": "~0.0.0"
+    "@quenty/promise": "^1.0.0",
+    "@quenty/signal": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

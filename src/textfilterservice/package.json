@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textfilterservice",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "textfilterservice ",
   "keywords": [
     "Roblox",
@@ -20,12 +20,12 @@
     "directory": "src/textfilterservice/"
   },
   "dependencies": {
-    "@quenty/remoting": "~0.0.1",
-    "@quenty/table": "~0.0.0",
-    "@quenty/textfilterutils": "~0.0.0"
+    "@quenty/remoting": "^1.0.0",
+    "@quenty/table": "^1.0.0",
+    "@quenty/textfilterutils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

@@ -24,6 +24,9 @@ npm install @quenty/promise --save
 * Optimized for performance
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

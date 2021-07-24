@@ -1,6 +1,6 @@
 {
   "name": "@quenty/particleengine",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Adds GUI based particle engine to Roblox",
   "keywords": [
     "Roblox",
@@ -19,11 +19,11 @@
     "directory": "src/optional/"
   },
   "dependencies": {
-    "@quenty/remoting": "~0.0.2",
-    "@quenty/table": "~0.0.0"
+    "@quenty/remoting": "^1.0.0",
+    "@quenty/table": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

@@ -13,6 +13,9 @@
 
 This module provides utility functions for strings
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/string --save

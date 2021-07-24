@@ -28,6 +28,9 @@ This allows us to pass Lua objects around through a signal without reserializati
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

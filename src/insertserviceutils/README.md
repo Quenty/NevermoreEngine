@@ -26,6 +26,9 @@ Promises the resulting asset is inserted from insert service, or a rejection
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

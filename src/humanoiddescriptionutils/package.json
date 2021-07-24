@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoiddescriptionutils",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Handles actions involving HumanoidDescription objects, including loading character appearance.",
   "keywords": [
     "Roblox",
@@ -18,12 +18,12 @@
     "directory": "src/humanoiddescriptionutils/"
   },
   "dependencies": {
-    "@quenty/insertserviceutils": "~0.0.0",
-    "@quenty/playersservicepromises": "~0.0.0",
-    "@quenty/promise": "~0.0.1"
+    "@quenty/insertserviceutils": "^1.0.0",
+    "@quenty/playersservicepromises": "^1.0.0",
+    "@quenty/promise": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

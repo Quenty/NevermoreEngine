@@ -1,6 +1,6 @@
 {
   "name": "@quenty/region3utils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Utility methods for Region3",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/region3utils/"
   },
   "dependencies": {
-    "@quenty/boundingboxutils": "~0.0.0"
+    "@quenty/boundingboxutils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

@@ -87,5 +87,8 @@ Returns a Days in months table for the given year
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

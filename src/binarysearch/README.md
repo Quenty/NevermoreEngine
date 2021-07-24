@@ -13,6 +13,9 @@
 
 Binary search implementation for Roblox in pure Lua
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/binarysearch --save

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/transparencyservice",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Service that orchistrates transparency setting from multiple colliding sources and handle the transparency appropriately. This means that 2 systems can work with transparency without knowing about each other.",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/transparencyservice/"
   },
   "dependencies": {
-    "@quenty/math": "~0.0.0"
+    "@quenty/math": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

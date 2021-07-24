@@ -1,6 +1,6 @@
 {
   "name": "@quenty/modelappearance",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Allows the appearance of a model to be overridden. Most commonly used when placing down an object in a building game.",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/modelappearance/"
   },
   "dependencies": {
-    "@quenty/math": "~0.0.0"
+    "@quenty/math": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

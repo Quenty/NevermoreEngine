@@ -23,6 +23,9 @@ npm install @quenty/sprites --save
 * Animated sprite sheet and player
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

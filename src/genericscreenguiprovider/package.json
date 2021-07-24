@@ -1,6 +1,6 @@
 {
   "name": "@quenty/genericscreenguiprovider",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Providers screenGuis with a given display order for easy use",
   "keywords": [
     "Roblox",
@@ -17,11 +17,11 @@
     "directory": "src/genericscreenguiprovider/"
   },
   "dependencies": {
-    "@quenty/string": "~0.0.0",
-    "@quenty/uiobjectutils": "~0.0.0"
+    "@quenty/string": "^1.0.0",
+    "@quenty/uiobjectutils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

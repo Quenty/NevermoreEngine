@@ -21,6 +21,9 @@ npm install @quenty/particleengine --save
 However, historically, this library was created before such particle systems were available for use.
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.1
 Added documentation
 

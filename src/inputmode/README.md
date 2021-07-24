@@ -88,5 +88,8 @@ Evaluates the input object, and if it's valid, enables the mode
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

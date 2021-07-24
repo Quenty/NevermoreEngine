@@ -13,6 +13,9 @@
 
 UTF8 utility library to convert text to be upper or lower case.
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/utf8 --save

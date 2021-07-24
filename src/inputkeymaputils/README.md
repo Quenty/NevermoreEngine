@@ -41,5 +41,8 @@ Converts keymap into ContextActionService friendly types
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

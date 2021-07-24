@@ -60,5 +60,8 @@ Utility functions to work with pillbackings. This can make animations a lot easi
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

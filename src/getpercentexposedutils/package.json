@@ -1,6 +1,6 @@
 {
   "name": "@quenty/getpercentexposedutils",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Identify parts that are potentially exposed to an explosion using a random vector raycasting",
   "keywords": [
     "Roblox",
@@ -19,10 +19,10 @@
     "directory": "src/getpercentexposedutils/"
   },
   "dependencies": {
-    "@quenty/vector3utils": "~0.0.1"
+    "@quenty/vector3utils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

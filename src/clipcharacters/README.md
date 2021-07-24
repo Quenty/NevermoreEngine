@@ -33,5 +33,8 @@ Stop clipping on client
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

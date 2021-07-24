@@ -13,6 +13,9 @@
 
 Utility functions that wrap JSON functions in the HttpService.
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/jsonutils --save

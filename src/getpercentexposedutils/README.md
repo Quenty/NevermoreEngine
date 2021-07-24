@@ -27,5 +27,8 @@ Searches for percent exposure of all parts given
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ### 0.0.0
 Initial commit

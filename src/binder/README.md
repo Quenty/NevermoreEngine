@@ -122,6 +122,9 @@ Cleans up all bound classes, and disconnects all events
 
 ## Changelog
 
+### 1.0.0
+Initial release
+
 ## 0.0.2
 
 - Removed BoundLinkCollection and promiseBoundLinkedClass (moved to `@quenty/boundlinkutils`)

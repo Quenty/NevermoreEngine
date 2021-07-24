@@ -1,6 +1,6 @@
 {
   "name": "@quenty/terrainutils",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Utility functions for manipulating terrain",
   "keywords": [
     "Roblox",
@@ -18,12 +18,12 @@
     "directory": "src/terrainutils/"
   },
   "dependencies": {
-    "@quenty/region3int16utils": "~0.0.0",
-    "@quenty/region3utils": "~0.0.0",
-    "@quenty/vector3int16utils": "~0.0.0"
+    "@quenty/region3int16utils": "^1.0.0",
+    "@quenty/region3utils": "^1.0.0",
+    "@quenty/vector3int16utils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

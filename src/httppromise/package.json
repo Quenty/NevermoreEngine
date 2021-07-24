@@ -1,6 +1,6 @@
 {
   "name": "@quenty/httppromise",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "HttpPromise - Wrapper functions around http requests in Roblox.",
   "keywords": [
     "Roblox",
@@ -20,10 +20,10 @@
     "directory": "src/httppromise/"
   },
   "dependencies": {
-    "@quenty/promise": "~0.0.1"
+    "@quenty/promise": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

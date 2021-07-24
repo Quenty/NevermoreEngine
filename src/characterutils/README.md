@@ -13,6 +13,9 @@
 
 Provides utility functions for working with Roblox characters. These make some much-repeated actions much easier to access and operate.
 ## Changelog
+
+### 1.0.0
+Initial release
 ## Installation
 ```
 npm install @quenty/characterutils --save

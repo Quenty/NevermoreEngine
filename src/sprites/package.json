@@ -1,6 +1,6 @@
 {
   "name": "@quenty/sprites",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Spritesheet utility for Roblox including a built-in InputImageLibrary",
   "keywords": [
     "Roblox",
@@ -19,11 +19,11 @@
     "directory": "src/sprites/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^0.0.1",
-    "@quenty/maid": "^0.0.1"
+    "@quenty/baseobject": "^1.0.0",
+    "@quenty/maid": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "^0.0.1"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

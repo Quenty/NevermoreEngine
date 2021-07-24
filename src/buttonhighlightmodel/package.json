@@ -1,6 +1,6 @@
 {
   "name": "@quenty/buttonhighlightmodel",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Contains model information for the current button",
   "keywords": [
     "Roblox",
@@ -19,12 +19,12 @@
     "directory": "src/buttonhighlightmodel/"
   },
   "dependencies": {
-    "@quenty/acceltween": "~0.0.0",
-    "@quenty/baseobject": "~0.0.2",
-    "@quenty/steputils": "~0.0.0"
+    "@quenty/acceltween": "^1.0.0",
+    "@quenty/baseobject": "^1.0.0",
+    "@quenty/steputils": "^1.0.0"
   },
   "peerDependencies": {
-    "@quenty/loader": "~0.0.2"
+    "@quenty/loader": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
