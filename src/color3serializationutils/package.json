@@ -17,8 +17,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/color3serializationutils/"
   },
-  "dependencies": {},
-  "peerDependencies": {},
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },

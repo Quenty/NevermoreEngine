@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@quenty/animationtrackutils": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/baseobject": "^1.0.0"
+    "@quenty/baseobject": "^1.0.0",
+    "@quenty/maid": "^1.0.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -17,8 +17,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/color3utils/"
   },
-  "dependencies": {},
-  "peerDependencies": {},
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },

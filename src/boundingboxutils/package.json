@@ -17,8 +17,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/boundingboxutils/"
   },
-  "dependencies": {},
-  "peerDependencies": {},
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },

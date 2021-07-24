@@ -18,8 +18,8 @@
     "directory": "src/nocollisionconstraintutils/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.0",
-    "@quenty/getmechanismparts": "^1.0.0"
+    "@quenty/getmechanismparts": "^1.0.0",
+    "@quenty/maid": "^1.0.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

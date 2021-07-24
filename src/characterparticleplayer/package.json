@@ -18,8 +18,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/characterparticleplayer/"
   },
-  "dependencies": {},
-  "peerDependencies": {},
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },

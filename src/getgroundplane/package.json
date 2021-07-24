@@ -17,7 +17,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/getgroundplane/"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"
   },

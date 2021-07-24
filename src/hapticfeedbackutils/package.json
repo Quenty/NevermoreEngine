@@ -19,8 +19,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/hapticfeedbackutils/"
   },
-  "dependencies": {},
-  "peerDependencies": {},
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },

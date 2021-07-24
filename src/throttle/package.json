@@ -18,7 +18,6 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/throttle/"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"
   },
