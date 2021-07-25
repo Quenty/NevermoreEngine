@@ -1,6 +1,10 @@
 {
-  "name": "Nevermore",
+  "name": "@quenty/nevermore",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git"
+  },
   "devDependencies": {
     "lerna": "^4.0.0"
   }

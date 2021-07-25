@@ -23,6 +23,7 @@
     "@quenty/maid": "^1.0.1",
     "@quenty/signal": "^1.0.1",
     "@quenty/symbol": "^1.0.1",
+    "@quenty/promise": "^1.0.1",
     "@quenty/table": "^1.0.1",
     "@quenty/throttle": "^1.0.1"
   },

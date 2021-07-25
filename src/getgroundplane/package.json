@@ -20,6 +20,9 @@
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"
   },
+  "devDependencies": {
+    "@quenty/loader": "^1.0.0"
+  },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },

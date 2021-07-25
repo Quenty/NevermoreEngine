@@ -19,6 +19,7 @@
     "directory": "src/valueobject/"
   },
   "dependencies": {
+    "@quenty/brio": "^1.0.1",
     "@quenty/maid": "^1.0.1",
     "@quenty/rx": "^1.0.1",
     "@quenty/signal": "^1.0.1"
