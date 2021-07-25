@@ -26,7 +26,8 @@
     "@quenty/humanoidanimatorutils": "^1.0.0",
     "@quenty/maid": "^1.0.0",
     "@quenty/promise": "^1.0.0",
-    "@quenty/table": "^1.0.0"
+    "@quenty/table": "^1.0.0",
+    "@quenty/rx": "^1.0.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

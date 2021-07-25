@@ -20,6 +20,9 @@ npm install @quenty/ragdoll --save
 
 ## Changelog
 
+### 1.0.1
+Fix ragdoll binders
+
 ### 1.0.0
 Initial release
 
