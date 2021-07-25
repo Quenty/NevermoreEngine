@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camera",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Quenty's camera system for Roblox",
   "keywords": [
     "Roblox",
@@ -18,17 +18,17 @@
     "directory": "src/camera/"
   },
   "dependencies": {
-    "@quenty/acceltween": "^1.0.1",
-    "@quenty/cframeutils": "^1.0.1",
-    "@quenty/cubicspline": "^1.0.1",
-    "@quenty/inputobjectutils": "^1.0.1",
-    "@quenty/maid": "^1.0.1",
-    "@quenty/math": "^1.0.1",
-    "@quenty/qframe": "^1.0.1",
-    "@quenty/spring": "^1.0.1"
+    "@quenty/acceltween": "^1.0.2",
+    "@quenty/cframeutils": "^1.0.2",
+    "@quenty/cubicspline": "^1.0.2",
+    "@quenty/inputobjectutils": "^1.0.2",
+    "@quenty/maid": "^1.0.2",
+    "@quenty/math": "^1.0.2",
+    "@quenty/qframe": "^1.0.2",
+    "@quenty/spring": "^1.0.2"
   },
   "devDependencies": {
-    "@quenty/camerastoryutils": "^1.0.1"
+    "@quenty/camerastoryutils": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

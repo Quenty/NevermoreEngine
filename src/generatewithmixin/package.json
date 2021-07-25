@@ -1,6 +1,6 @@
 {
   "name": "@quenty/generatewithmixin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Simple mixin to generate code for a class",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/generatewithmixin/"
   },
   "dependencies": {
-    "@quenty/string": "^1.0.1"
+    "@quenty/string": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

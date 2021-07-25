@@ -1,6 +1,6 @@
 {
   "name": "@quenty/sprites",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Spritesheet utility for Roblox including a built-in InputImageLibrary",
   "keywords": [
     "Roblox",
@@ -19,8 +19,8 @@
     "directory": "src/sprites/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.1",
-    "@quenty/maid": "^1.0.1"
+    "@quenty/baseobject": "^1.0.2",
+    "@quenty/maid": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

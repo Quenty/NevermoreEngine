@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cancellabledelay",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "cancellableDelay a delay that can be cancelled",
   "keywords": [
     "Roblox",

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/boundlinkutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utility functions involving binders and links",
   "keywords": [
     "Roblox",
@@ -18,11 +18,11 @@
     "directory": "src/boundlinkutils/"
   },
   "dependencies": {
-    "@quenty/binder": "^1.0.1",
-    "@quenty/linkutils": "^1.0.1",
-    "@quenty/maid": "^1.0.1",
-    "@quenty/promise": "^1.0.1",
-    "@quenty/signal": "^1.0.1"
+    "@quenty/binder": "^1.0.2",
+    "@quenty/linkutils": "^1.0.2",
+    "@quenty/maid": "^1.0.2",
+    "@quenty/promise": "^1.0.2",
+    "@quenty/signal": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

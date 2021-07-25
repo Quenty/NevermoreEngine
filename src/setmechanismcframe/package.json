@@ -1,6 +1,6 @@
 {
   "name": "@quenty/setmechanismcframe",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sets a mechanisms cframe",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/setmechanismcframe/"
   },
   "dependencies": {
-    "@quenty/getmechanismparts": "^1.0.1"
+    "@quenty/getmechanismparts": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

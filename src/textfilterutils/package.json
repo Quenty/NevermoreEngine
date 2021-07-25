@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textfilterutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utility functions for filtering text",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/textfilterutils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.1"
+    "@quenty/promise": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

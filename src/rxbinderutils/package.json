@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rxbinderutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Reactive extensions for binders",
   "keywords": [
     "Roblox",
@@ -19,12 +19,12 @@
     "directory": "src/binder/"
   },
   "dependencies": {
-    "@quenty/binder": "^1.0.1",
-    "@quenty/brio": "^1.0.1",
-    "@quenty/instanceutils": "^1.0.1",
-    "@quenty/linkutils": "^1.0.1",
-    "@quenty/maid": "^1.0.1",
-    "@quenty/rx": "^1.0.1"
+    "@quenty/binder": "^1.0.2",
+    "@quenty/brio": "^1.0.2",
+    "@quenty/instanceutils": "^1.0.2",
+    "@quenty/linkutils": "^1.0.2",
+    "@quenty/maid": "^1.0.2",
+    "@quenty/rx": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/transparencyservice",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Service that orchistrates transparency setting from multiple colliding sources and handle the transparency appropriately. This means that 2 systems can work with transparency without knowing about each other.",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/transparencyservice/"
   },
   "dependencies": {
-    "@quenty/math": "^1.0.1"
+    "@quenty/math": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

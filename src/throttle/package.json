@@ -1,6 +1,6 @@
 {
   "name": "@quenty/throttle",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Adds the throttle function to Roblox",
   "keywords": [
     "Roblox",
@@ -22,7 +22,7 @@
     "@quenty/loader": "^1.0.1"
   },
   "devDependencies": {
-    "@quenty/loader": "^1.0.1"
+    "@quenty/loader": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

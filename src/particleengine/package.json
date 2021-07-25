@@ -1,6 +1,6 @@
 {
   "name": "@quenty/particleengine",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Adds GUI based particle engine to Roblox",
   "keywords": [
     "Roblox",
@@ -19,8 +19,8 @@
     "directory": "src/optional/"
   },
   "dependencies": {
-    "@quenty/remoting": "^1.0.1",
-    "@quenty/table": "^1.0.1"
+    "@quenty/remoting": "^1.0.2",
+    "@quenty/table": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

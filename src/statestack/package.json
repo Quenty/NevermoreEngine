@@ -1,6 +1,6 @@
 {
   "name": "@quenty/statestack",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Stack of values that allows multiple systems to enable or disable a state",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/statestack/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.1"
+    "@quenty/baseobject": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

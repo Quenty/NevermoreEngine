@@ -1,6 +1,6 @@
 {
   "name": "@quenty/terrainutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utility functions for manipulating terrain",
   "keywords": [
     "Roblox",
@@ -18,9 +18,9 @@
     "directory": "src/terrainutils/"
   },
   "dependencies": {
-    "@quenty/region3int16utils": "^1.0.1",
-    "@quenty/region3utils": "^1.0.1",
-    "@quenty/vector3int16utils": "^1.0.1"
+    "@quenty/region3int16utils": "^1.0.2",
+    "@quenty/region3utils": "^1.0.2",
+    "@quenty/vector3int16utils": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

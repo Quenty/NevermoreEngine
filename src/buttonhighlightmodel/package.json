@@ -1,6 +1,6 @@
 {
   "name": "@quenty/buttonhighlightmodel",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Contains model information for the current button",
   "keywords": [
     "Roblox",
@@ -19,9 +19,9 @@
     "directory": "src/buttonhighlightmodel/"
   },
   "dependencies": {
-    "@quenty/acceltween": "^1.0.1",
-    "@quenty/baseobject": "^1.0.1",
-    "@quenty/steputils": "^1.0.1"
+    "@quenty/acceltween": "^1.0.2",
+    "@quenty/baseobject": "^1.0.2",
+    "@quenty/steputils": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

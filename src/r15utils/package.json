@@ -1,6 +1,6 @@
 {
   "name": "@quenty/r15utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utility methods for R15",
   "keywords": [
     "Roblox",
@@ -18,8 +18,8 @@
     "directory": "src/r15utils/"
   },
   "dependencies": {
-    "@quenty/brio": "^1.0.1",
-    "@quenty/instanceutils": "^1.0.1"
+    "@quenty/brio": "^1.0.2",
+    "@quenty/instanceutils": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

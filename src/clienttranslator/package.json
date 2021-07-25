@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clienttranslator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Gets local translator for player",
   "keywords": [
     "Roblox",
@@ -18,8 +18,8 @@
     "directory": "src/clienttranslator/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.1",
-    "@quenty/pseudolocalize": "^1.0.1"
+    "@quenty/promise": "^1.0.2",
+    "@quenty/pseudolocalize": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

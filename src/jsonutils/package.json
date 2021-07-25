@@ -1,6 +1,6 @@
 {
   "name": "@quenty/jsonutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "JSON utility functions for Roblox Lua",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/jsonutils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.1"
+    "@quenty/promise": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

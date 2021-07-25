@@ -1,6 +1,6 @@
 {
   "name": "@quenty/streamingutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Provides utilities for working with Roblox's streaming system",
   "keywords": [
     "Roblox",
@@ -19,7 +19,7 @@
     "directory": "src/streamingutils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.1"
+    "@quenty/promise": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

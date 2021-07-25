@@ -1,6 +1,6 @@
 {
   "name": "@quenty/brio",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Brios wrap an object and either are alive or dead",
   "keywords": [
     "Roblox",
@@ -19,8 +19,8 @@
     "directory": "src/brio/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.1",
-    "@quenty/rx": "^1.0.1"
+    "@quenty/maid": "^1.0.2",
+    "@quenty/rx": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

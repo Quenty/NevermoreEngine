@@ -1,6 +1,6 @@
 {
   "name": "@quenty/enabledmixin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Adds Enabled/Disabled state to class",
   "keywords": [
     "Roblox",
@@ -18,8 +18,8 @@
     "directory": "src/enabledmixin/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.1",
-    "@quenty/signal": "^1.0.1"
+    "@quenty/maid": "^1.0.2",
+    "@quenty/signal": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

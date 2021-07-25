@@ -1,6 +1,6 @@
 {
   "name": "@quenty/characterutils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CharacterUtils",
   "keywords": [
     "Roblox",
@@ -18,9 +18,9 @@
     "directory": "src/characterutils/"
   },
   "dependencies": {
-    "@quenty/deferred": "^1.0.1",
-    "@quenty/maid": "^1.0.1",
-    "@quenty/promise": "^1.0.1"
+    "@quenty/deferred": "^1.0.2",
+    "@quenty/maid": "^1.0.2",
+    "@quenty/promise": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

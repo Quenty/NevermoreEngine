@@ -1,6 +1,6 @@
 {
   "name": "@quenty/getgroundplane",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Function that uses raycasting to determine the groundplane in Roblox",
   "keywords": [
     "Roblox",
@@ -21,7 +21,7 @@
     "@quenty/loader": "^1.0.0"
   },
   "devDependencies": {
-    "@quenty/loader": "^1.0.0"
+    "@quenty/loader": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

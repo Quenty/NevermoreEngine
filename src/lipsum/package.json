@@ -1,6 +1,6 @@
 {
   "name": "@quenty/lipsum",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Lorem Ipsum generator in Roblox",
   "keywords": [
     "Roblox",
@@ -20,13 +20,13 @@
     "directory": "src/lipsum/"
   },
   "dependencies": {
-    "@quenty/randomutils": "^1.0.1",
-    "@quenty/string": "^1.0.1"
+    "@quenty/randomutils": "^1.0.2",
+    "@quenty/string": "^1.0.2"
   },
   "devDependencies": {
-    "@quenty/maid": "^1.0.1",
-    "@quenty/textserviceutils": "^1.0.1",
-    "@quenty/uiobjectutils": "^1.0.1"
+    "@quenty/maid": "^1.0.2",
+    "@quenty/textserviceutils": "^1.0.2",
+    "@quenty/uiobjectutils": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

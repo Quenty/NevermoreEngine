@@ -1,6 +1,6 @@
 {
   "name": "@quenty/guivisiblemanager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Help manage the visibility of GUIs while only constructing the Gui while visible",
   "keywords": [
     "Roblox",
@@ -18,9 +18,9 @@
     "directory": "src/guivisiblemanager/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.1",
-    "@quenty/cancellabledelay": "^1.0.1",
-    "@quenty/maid": "^1.0.1"
+    "@quenty/baseobject": "^1.0.2",
+    "@quenty/cancellabledelay": "^1.0.2",
+    "@quenty/maid": "^1.0.2"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"
