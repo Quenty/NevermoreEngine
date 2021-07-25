@@ -1,12 +1,13 @@
 {
-  "name": "@quenty/binder",
+  "name": "@quenty/rxbinderutils",
   "version": "1.0.1",
-  "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
+  "description": "Reactive extensions for binders",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "binder"
+    "binder",
+    "rx"
   ],
   "contributors": [
     "Quenty"
@@ -18,14 +19,12 @@
     "directory": "src/binder/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.1",
+    "@quenty/binder": "^1.0.1",
     "@quenty/brio": "^1.0.1",
     "@quenty/instanceutils": "^1.0.1",
     "@quenty/linkutils": "^1.0.1",
     "@quenty/maid": "^1.0.1",
-    "@quenty/promise": "^1.0.1",
-    "@quenty/signal": "^1.0.1",
-    "@quenty/valueobject": "^1.0.1"
+    "@quenty/rx": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

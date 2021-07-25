@@ -1,0 +1,12 @@
+{
+  "name": "RxBinderUtils",
+  "tree": {
+    "$className": "Folder",
+    "src": {
+      "$path": "src"
+    },
+    "node_modules": {
+      "$path": "node_modules"
+    }
+  }
+}

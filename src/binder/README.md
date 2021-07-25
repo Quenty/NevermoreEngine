@@ -122,6 +122,10 @@ Cleans up all bound classes, and disconnects all events
 
 ## Changelog
 
+### 1.0.2
+- Remove RxBinderUtils
+- Remove RxBinderGroupUtils
+
 ### 1.0.0
 Initial release
 
