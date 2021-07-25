@@ -19,7 +19,10 @@
     "directory": "src/throttle/"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+    "@quenty/loader": "^1.0.1"
+  },
+  "devDependencies": {
+    "@quenty/loader": "^1.0.1"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
