@@ -1,6 +1,6 @@
 {
   "name": "@quenty/pathfindingutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utilities involving pathfinding in Roblox",
   "keywords": [
     "Roblox",
@@ -19,9 +19,9 @@
     "directory": "src/pathfindingutils/"
   },
   "dependencies": {
-    "@quenty/draw": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/promise": "^1.0.0"
+    "@quenty/draw": "^1.0.1",
+    "@quenty/maid": "^1.0.1",
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

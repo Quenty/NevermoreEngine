@@ -1,6 +1,6 @@
 {
   "name": "@quenty/firstpersoncharactertransparency",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Allows transparency to manually be controlled for a character in first-person mode",
   "keywords": [
     "Roblox",
@@ -19,8 +19,8 @@
     "directory": "src/firstpersoncharactertransparency/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.0",
-    "@quenty/transparencyservice": "^1.0.0"
+    "@quenty/baseobject": "^1.0.1",
+    "@quenty/transparencyservice": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

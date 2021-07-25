@@ -1,6 +1,6 @@
 {
   "name": "@quenty/friendutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/friendutils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.0"
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

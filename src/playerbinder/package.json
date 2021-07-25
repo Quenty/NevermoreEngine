@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerbinder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Binds the given class to each player in the game",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/playerbinder/"
   },
   "dependencies": {
-    "@quenty/binder": "^1.0.0"
+    "@quenty/binder": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

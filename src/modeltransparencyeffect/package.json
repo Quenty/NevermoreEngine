@@ -1,6 +1,6 @@
 {
   "name": "@quenty/modeltransparencyeffect",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Allows a model to have transparent set locally on the client",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/modeltransparencyeffect/"
   },
   "dependencies": {
-    "@quenty/acceltween": "^1.0.0",
-    "@quenty/baseobject": "^1.0.0",
-    "@quenty/steputils": "^1.0.0",
-    "@quenty/transparencyservice": "^1.0.0"
+    "@quenty/acceltween": "^1.0.1",
+    "@quenty/baseobject": "^1.0.1",
+    "@quenty/steputils": "^1.0.1",
+    "@quenty/transparencyservice": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

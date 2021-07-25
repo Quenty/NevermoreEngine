@@ -1,6 +1,6 @@
 {
   "name": "@quenty/actionmanager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Holds single toggleable actions (like a tool system)",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/actionmanager/"
   },
   "dependencies": {
-    "@quenty/enabledmixin": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/signal": "^1.0.0",
-    "@quenty/valueobject": "^1.0.0"
+    "@quenty/enabledmixin": "^1.0.1",
+    "@quenty/maid": "^1.0.1",
+    "@quenty/signal": "^1.0.1",
+    "@quenty/valueobject": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

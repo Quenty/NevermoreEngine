@@ -1,6 +1,6 @@
 {
   "name": "@quenty/parttouchingcalculator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Determines if parts are touching or not",
   "keywords": [
     "Roblox",
@@ -18,10 +18,10 @@
     "directory": "src/parttouchingcalculator/"
   },
   "dependencies": {
-    "@quenty/binder": "^1.0.0",
-    "@quenty/boundingboxutils": "^1.0.0",
-    "@quenty/characterutils": "^1.0.0",
-    "@quenty/qgui": "^1.0.0"
+    "@quenty/binder": "^1.0.1",
+    "@quenty/boundingboxutils": "^1.0.1",
+    "@quenty/characterutils": "^1.0.1",
+    "@quenty/qgui": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

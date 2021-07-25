@@ -1,6 +1,6 @@
 {
   "name": "@quenty/instanceutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility functions involving instances in Roblox",
   "keywords": [
     "Roblox",
@@ -19,9 +19,9 @@
     "directory": "src/instanceutils/"
   },
   "dependencies": {
-    "@quenty/brio": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/rx": "^1.0.0"
+    "@quenty/brio": "^1.0.1",
+    "@quenty/maid": "^1.0.1",
+    "@quenty/rx": "^1.0.1"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

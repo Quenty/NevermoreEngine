@@ -1,6 +1,6 @@
 {
   "name": "@quenty/mouseovermixin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mouse over mixin for general utility button mouse over effects",
   "keywords": [
     "Roblox",
@@ -19,8 +19,8 @@
     "directory": "src/mouseovermixin/"
   },
   "dependencies": {
-    "@quenty/buttonutils": "^1.0.0",
-    "@quenty/maid": "^1.0.0"
+    "@quenty/buttonutils": "^1.0.1",
+    "@quenty/maid": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

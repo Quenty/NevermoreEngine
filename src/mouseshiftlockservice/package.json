@@ -1,6 +1,6 @@
 {
   "name": "@quenty/mouseshiftlockservice",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility service to enable or disable mouse shift lock on the fly on Roblox.",
   "keywords": [
     "Roblox",
@@ -20,7 +20,7 @@
     "directory": "src/mouseshiftlockservice/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.0"
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

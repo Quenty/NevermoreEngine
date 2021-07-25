@@ -1,6 +1,6 @@
 {
   "name": "@quenty/pillbacking",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Builds a pill backing for Guis. Substitute for UICorner object.",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/pillbacking/"
   },
   "dependencies": {
-    "@quenty/table": "^1.0.0"
+    "@quenty/table": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

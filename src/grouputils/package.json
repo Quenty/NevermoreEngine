@@ -1,6 +1,6 @@
 {
   "name": "@quenty/grouputils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Group utility functions for Roblox",
   "keywords": [
     "Roblox",
@@ -19,7 +19,7 @@
     "directory": "src/grouputils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.0"
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

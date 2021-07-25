@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -18,16 +18,16 @@
     "directory": "src/ragdoll/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.0",
-    "@quenty/binder": "^1.0.0",
-    "@quenty/camera": "^1.0.0",
-    "@quenty/characterutils": "^1.0.0",
-    "@quenty/hapticfeedbackutils": "^1.0.0",
-    "@quenty/humanoidanimatorutils": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/promise": "^1.0.0",
-    "@quenty/table": "^1.0.0",
-    "@quenty/rx": "^1.0.0"
+    "@quenty/baseobject": "^1.0.1",
+    "@quenty/binder": "^1.0.1",
+    "@quenty/camera": "^1.0.1",
+    "@quenty/characterutils": "^1.0.1",
+    "@quenty/hapticfeedbackutils": "^1.0.1",
+    "@quenty/humanoidanimatorutils": "^1.0.1",
+    "@quenty/maid": "^1.0.1",
+    "@quenty/promise": "^1.0.1",
+    "@quenty/rx": "^1.0.1",
+    "@quenty/table": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

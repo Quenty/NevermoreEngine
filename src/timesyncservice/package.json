@@ -1,6 +1,6 @@
 {
   "name": "@quenty/timesyncservice",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Quenty's TimeSyncService keeps time synchronized between all clients and the server",
   "keywords": [
     "Roblox",
@@ -19,11 +19,11 @@
     "directory": "src/timesyncservice/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.0",
-    "@quenty/promise": "^1.0.0",
-    "@quenty/remoting": "^1.0.0",
-    "@quenty/signal": "^1.0.0",
-    "@quenty/table": "^1.0.0"
+    "@quenty/maid": "^1.0.1",
+    "@quenty/promise": "^1.0.1",
+    "@quenty/remoting": "^1.0.1",
+    "@quenty/signal": "^1.0.1",
+    "@quenty/table": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

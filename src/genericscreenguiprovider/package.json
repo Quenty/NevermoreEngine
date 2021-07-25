@@ -1,6 +1,6 @@
 {
   "name": "@quenty/genericscreenguiprovider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Providers screenGuis with a given display order for easy use",
   "keywords": [
     "Roblox",
@@ -17,8 +17,8 @@
     "directory": "src/genericscreenguiprovider/"
   },
   "dependencies": {
-    "@quenty/string": "^1.0.0",
-    "@quenty/uiobjectutils": "^1.0.0"
+    "@quenty/string": "^1.0.1",
+    "@quenty/uiobjectutils": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

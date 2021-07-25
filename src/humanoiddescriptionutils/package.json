@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoiddescriptionutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Handles actions involving HumanoidDescription objects, including loading character appearance.",
   "keywords": [
     "Roblox",
@@ -18,9 +18,9 @@
     "directory": "src/humanoiddescriptionutils/"
   },
   "dependencies": {
-    "@quenty/insertserviceutils": "^1.0.0",
-    "@quenty/playersservicepromises": "^1.0.0",
-    "@quenty/promise": "^1.0.0"
+    "@quenty/insertserviceutils": "^1.0.1",
+    "@quenty/playersservicepromises": "^1.0.1",
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

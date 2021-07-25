@@ -1,6 +1,6 @@
 {
   "name": "@quenty/coreguiutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility functions to work with the CoreGui",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/coreguiutils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.0"
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

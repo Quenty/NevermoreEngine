@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputkeymaputils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility methods for input map",
   "keywords": [
     "Roblox",
@@ -19,7 +19,7 @@
     "directory": "src/inputkeymaputils/"
   },
   "dependencies": {
-    "@quenty/table": "^1.0.0"
+    "@quenty/table": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

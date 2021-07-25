@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidteleportutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility for teleporting humanoids",
   "keywords": [
     "Roblox",
@@ -18,7 +18,7 @@
     "directory": "src/humanoidteleportutils/"
   },
   "dependencies": {
-    "@quenty/raycaster": "^1.0.0"
+    "@quenty/raycaster": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

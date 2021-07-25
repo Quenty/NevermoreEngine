@@ -1,6 +1,6 @@
 {
   "name": "@quenty/socialserviceutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility functions wrapping SocialService with promises",
   "keywords": [
     "Roblox",
@@ -19,8 +19,8 @@
     "directory": "src/socialserviceutils/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.0",
-    "@quenty/promise": "^1.0.0"
+    "@quenty/maid": "^1.0.1",
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

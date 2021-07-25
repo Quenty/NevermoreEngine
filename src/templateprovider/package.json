@@ -1,6 +1,6 @@
 {
   "name": "@quenty/templateprovider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Base of a template retrieval system",
   "keywords": [
     "Roblox",
@@ -18,9 +18,9 @@
     "directory": "src/templateprovider/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/string": "^1.0.0"
+    "@quenty/baseobject": "^1.0.1",
+    "@quenty/maid": "^1.0.1",
+    "@quenty/string": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

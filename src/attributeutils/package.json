@@ -1,6 +1,6 @@
 {
   "name": "@quenty/attributeutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Provides utility functions to work with attributes in Roblox",
   "keywords": [
     "Roblox",
@@ -18,8 +18,8 @@
     "directory": "src/attributeutils/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.0",
-    "@quenty/rx": "^1.0.0"
+    "@quenty/maid": "^1.0.1",
+    "@quenty/rx": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textfilterservice",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "textfilterservice ",
   "keywords": [
     "Roblox",
@@ -20,9 +20,9 @@
     "directory": "src/textfilterservice/"
   },
   "dependencies": {
-    "@quenty/remoting": "^1.0.0",
-    "@quenty/table": "^1.0.0",
-    "@quenty/textfilterutils": "^1.0.0"
+    "@quenty/remoting": "^1.0.1",
+    "@quenty/table": "^1.0.1",
+    "@quenty/textfilterutils": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

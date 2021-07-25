@@ -1,6 +1,6 @@
 {
   "name": "@quenty/preferredparentutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Handles logic for creating a \"preferred\" parent container or erroring if it already exists",
   "keywords": [
     "Roblox",

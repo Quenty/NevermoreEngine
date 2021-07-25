@@ -1,6 +1,6 @@
 {
   "name": "@quenty/insertserviceutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "InsertServiceUtils to make loading models via insert service easy",
   "keywords": [
     "Roblox",
@@ -17,7 +17,7 @@
     "directory": "src/insertserviceutils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.0"
+    "@quenty/promise": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

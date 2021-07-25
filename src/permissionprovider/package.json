@@ -1,6 +1,6 @@
 {
   "name": "@quenty/permissionprovider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Permission provider for Roblox, including authenticating against group membership",
   "keywords": [
     "Roblox",
@@ -18,11 +18,11 @@
     "directory": "src/permissionprovider/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.0",
-    "@quenty/grouputils": "^1.0.0",
-    "@quenty/promise": "^1.0.0",
-    "@quenty/remoting": "^1.0.0",
-    "@quenty/table": "^1.0.0"
+    "@quenty/baseobject": "^1.0.1",
+    "@quenty/grouputils": "^1.0.1",
+    "@quenty/promise": "^1.0.1",
+    "@quenty/remoting": "^1.0.1",
+    "@quenty/table": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

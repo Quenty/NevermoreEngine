@@ -1,6 +1,6 @@
 {
   "name": "@quenty/scoredactionservice",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Scores actions and picks the highest rated one every frame",
   "keywords": [
     "Roblox",
@@ -19,14 +19,14 @@
     "directory": "src/scoredactionservice/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.0",
-    "@quenty/inputkeymaputils": "^1.0.0",
-    "@quenty/inputmode": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/signal": "^1.0.0",
-    "@quenty/statestack": "^1.0.0",
-    "@quenty/table": "^1.0.0",
-    "@quenty/valueobject": "^1.0.0"
+    "@quenty/baseobject": "^1.0.1",
+    "@quenty/inputkeymaputils": "^1.0.1",
+    "@quenty/inputmode": "^1.0.1",
+    "@quenty/maid": "^1.0.1",
+    "@quenty/signal": "^1.0.1",
+    "@quenty/statestack": "^1.0.1",
+    "@quenty/table": "^1.0.1",
+    "@quenty/valueobject": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

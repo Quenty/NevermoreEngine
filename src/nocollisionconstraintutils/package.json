@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nocollisionconstraintutils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility functions to create and manipulate NoCollisionConstraints between Roblox objects",
   "keywords": [
     "Roblox",
@@ -18,8 +18,8 @@
     "directory": "src/nocollisionconstraintutils/"
   },
   "dependencies": {
-    "@quenty/getmechanismparts": "^1.0.0",
-    "@quenty/maid": "^1.0.0"
+    "@quenty/getmechanismparts": "^1.0.1",
+    "@quenty/maid": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

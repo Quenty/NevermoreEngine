@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ik",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Inverse Kinematics for characters on Roblox",
   "keywords": [
     "Roblox",
@@ -19,19 +19,19 @@
     "directory": "src/ik/"
   },
   "dependencies": {
-    "@quenty/acceltween": "^1.0.0",
-    "@quenty/baseobject": "^1.0.0",
-    "@quenty/binder": "^1.0.0",
-    "@quenty/camera": "^1.0.0",
-    "@quenty/characterutils": "^1.0.0",
-    "@quenty/humanoidtracker": "^1.0.0",
-    "@quenty/maid": "^1.0.0",
-    "@quenty/math": "^1.0.0",
-    "@quenty/promise": "^1.0.0",
-    "@quenty/ragdoll": "^1.0.0",
-    "@quenty/remoting": "^1.0.0",
-    "@quenty/signal": "^1.0.0",
-    "@quenty/table": "^1.0.0"
+    "@quenty/acceltween": "^1.0.1",
+    "@quenty/baseobject": "^1.0.1",
+    "@quenty/binder": "^1.0.1",
+    "@quenty/camera": "^1.0.1",
+    "@quenty/characterutils": "^1.0.1",
+    "@quenty/humanoidtracker": "^1.0.1",
+    "@quenty/maid": "^1.0.1",
+    "@quenty/math": "^1.0.1",
+    "@quenty/promise": "^1.0.1",
+    "@quenty/ragdoll": "^1.0.1",
+    "@quenty/remoting": "^1.0.1",
+    "@quenty/signal": "^1.0.1",
+    "@quenty/table": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"
