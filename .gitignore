@@ -1,16 +1,8 @@
-*.sublime-project
 *.sublime-workspace
-*.jar
-*.rbxm
-*.bat
-*.jar
-*.rbxl
-*.txt
-
-Exported.rbxm
 
 # NPM
 **/node_modules/**
-
-# Optional npm cache directory
 .npm
+
+# Tests
+out
