@@ -26,8 +26,10 @@
     "@quenty/humanoidanimatorutils": "^1.0.1",
     "@quenty/maid": "^1.0.1",
     "@quenty/promise": "^1.0.1",
+    "@quenty/remoting": "^1.0.1",
     "@quenty/rx": "^1.0.1",
-    "@quenty/table": "^1.0.1"
+    "@quenty/table": "^1.0.1",
+    "@quenty/valuebaseutils": "^1.0.1"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"
