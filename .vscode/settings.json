@@ -1,0 +1,9 @@
+{
+    "files.exclude": {
+        "*.sublime-workspace": true,
+        "node_modules": true,
+        "out": true,
+        "roblox.toml": true
+    },
+    "Lua.diagnostics.enable": false
+}

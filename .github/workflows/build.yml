@@ -1,0 +1,47 @@
+name: Build
+on: [push]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: Roblox/setup-foreman@v1
+        with:
+          version: "^1.0.0"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate standard library
+        run: selene generate-roblox-std
+
+      - name: Run Selene
+        run: selene src
+
+      - name: Run Luacheck
+        uses: Roang-zero1/factorio-mod-luacheck@master
+        with:
+          luacheckrc_url: https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/.luacheckrc
+
+  release:
+    needs: lint
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "Setup Node"
+        uses: actions/setup-node@v2
+        env:
+          NPM_TOKEN: '' # https://github.com/JS-DevTools/npm-publish/issues/15
+        with:
+          node-version: "12"
+
+      - run: npm ci
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx auto shipit
