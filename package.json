@@ -6,6 +6,33 @@
     "url": "https://github.com/Quenty/NevermoreEngine.git"
   },
   "devDependencies": {
+    "@auto-it/all-contributors": "^10.30.0",
+    "@auto-it/conventional-commits": "^10.30.0",
+    "@auto-it/first-time-contributor": "^10.30.0",
+    "@auto-it/npm": "^10.30.0",
+    "@auto-it/released": "^10.30.0",
+    "auto": "^10.30.0",
     "lerna": "^4.0.0"
+  },
+  "workspaces": [
+    "./src/*"
+  ],
+  "scripts": {
+    "release": "auto shipit"
+  },
+  "author": "James Onnen <rbxquenty@gmail.com>",
+  "auto": {
+    "plugins": [
+      "npm",
+      "all-contributors",
+      [
+        "conventional-commits",
+        {
+          "defaultReleaseType": "patch"
+        }
+      ],
+      "first-time-contributor",
+      "released"
+    ]
   }
 }

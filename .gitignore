@@ -1,8 +1,6 @@
 *.sublime-workspace
-
-# NPM
-**/node_modules/**
-.npm
-
-# Tests
+*.rbxl.lock
+node_modules
 out
+roblox.toml
+.env

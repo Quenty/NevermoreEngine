@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
-    <img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+    <img src="https://github.com/Quenty/NevermoreEngine/workflows/lint/badge.svg" alt="Actions Status" />
   </a>
 </div>
 Utility functions to make inserting things from insert service easier. Especially useful in Roblox Studio when we want to be running stories with Hoarcekat. Note this only works from the server.

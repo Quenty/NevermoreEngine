@@ -51,8 +51,8 @@ def build_test(package_path, package_name):
     }
   }
 
-  if os.path.isdir(os.path.join(package_path, "node_modules")):
-    project_json["tree"]["ServerScriptService"]["Nevermore"]["Dependencies"] = {
+  if os.path.isdir(os.path.join(package_path, "node_modules", "@quenty")):
+    project_json["tree"]["ServerScriptService"]["Nevermore"]["@quenty"] = {
       "$path": f"{rel_package_path}/node_modules/@quenty"
     }
 

@@ -2,5 +2,15 @@
   "packages": [
     "src/*"
   ],
-  "version": "1.0.2"
+  "command": {
+    "publish": {
+      "verifyAccess": false
+    },
+    "version": {
+      "conventionalCommits": true,
+      "createRelease": "github",
+      "message": "chore(release): %s [skip ci]"
+    }
+  },
+  "version": "independent"
 }
