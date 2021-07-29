@@ -17,7 +17,7 @@ BindableRagdollHumanoidOnFall.__index = BindableRagdollHumanoidOnFall
 function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 	local self = setmetatable(BaseObject.new(humanoid), BindableRagdollHumanoidOnFall)
 
-	self._ragdollBinder = assert(ragdollBinder)
+	self._ragdollBinder = assert(ragdollBinder, "Bad ragdollBinder")
 
 	self.ShouldRagdoll = Instance.new("BoolValue")
 	self.ShouldRagdoll.Value = false

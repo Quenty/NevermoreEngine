@@ -60,7 +60,7 @@ function Ragdollable:_onRagdollChangedForNPC()
 end
 
 function Ragdollable:_handleServerEvent(player, state)
-	assert(self._player == player)
+	assert(self._player == player, "Bad player")
 
 	if state then
 		RagdollBindersServer.Ragdoll:Bind(self._obj)

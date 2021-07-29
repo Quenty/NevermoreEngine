@@ -46,7 +46,6 @@ function Color3Utils.setHue(color3, hue)
 	return Color3.fromHSV(hue, s, v)
 end
 
-
 function Color3Utils.scaleSaturation(color3, percent)
 	local h, s, v = Color3.toHSV(color3)
 	return Color3.fromHSV(h, percent*s, v)
@@ -56,6 +55,5 @@ function Color3Utils.setSaturation(color3, saturation)
 	local h, _, v = Color3.toHSV(color3)
 	return Color3.fromHSV(h, saturation, v)
 end
-
 
 return Color3Utils

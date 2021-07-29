@@ -22,7 +22,7 @@ function ScoredActionPicker.new()
 	self._currentPreferred = ValueObject.new()
 	self._maid:GiveTask(self._currentPreferred)
 
-	self._maid:GiveTask(self._currentPreferred.Changed:Connect(function(new, old, maid)
+	self._maid:GiveTask(self._currentPreferred.Changed:Connect(function(new, _, maid)
 		if new then
 			maid:GiveTask(new:PushPreferred())
 		end
@@ -73,13 +73,13 @@ function ScoredActionPicker:_tryGetValidPreferredAction(action)
 end
 
 function ScoredActionPicker:AddAction(action)
-	assert(type(action) == "table")
+	assert(type(action) == "table", "Bad action")
 
 	self._actionSet[action] = true
 end
 
 function ScoredActionPicker:RemoveAction(action)
-	assert(type(action) == "table")
+	assert(type(action) == "table", "Bad action")
 
 	if self._currentPreferred.Value == action then
 		self._currentPreferred.Value = nil

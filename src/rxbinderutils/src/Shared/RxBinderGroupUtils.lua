@@ -12,7 +12,7 @@ local Rx = require("Rx")
 local RxBinderGroupUtils = {}
 
 function RxBinderGroupUtils.observeBinders(binderGroup)
-	assert(type(binderGroup) == "table")
+	assert(type(binderGroup) == "table", "Bad binderGroup")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -31,7 +31,7 @@ function RxBinderGroupUtils.observeBinders(binderGroup)
 end
 
 function RxBinderGroupUtils.observeAllClassesBrio(binderGroup)
-	assert(type(binderGroup) == "table")
+	assert(type(binderGroup) == "table", "Bad binderGroup")
 
 	return RxBinderGroupUtils.observeBinders(binderGroup)
 		:Pipe({

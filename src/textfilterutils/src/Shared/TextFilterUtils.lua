@@ -11,9 +11,9 @@ local Promise = require("Promise")
 local TextFilterUtils = {}
 
 function TextFilterUtils.promiseNonChatStringForBroadcast(str, fromUserId, textContext)
-	assert(type(str) == "string")
-	assert(type(fromUserId) == "number")
-	assert(typeof(textContext) == "EnumItem")
+	assert(type(str) == "string", "Bad str")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
+	assert(typeof(textContext) == "EnumItem", "Bad textContext")
 
 	return TextFilterUtils._promiseTextResult(
 		TextFilterUtils.getNonChatStringForBroadcastAsync,
@@ -23,8 +23,8 @@ function TextFilterUtils.promiseNonChatStringForBroadcast(str, fromUserId, textC
 end
 
 function TextFilterUtils.promiseLegacyChatFilter(playerFrom, text)
-	assert(typeof(playerFrom) == "Instance" and playerFrom:IsA("Player"))
-	assert(type(text) == "string")
+	assert(typeof(playerFrom) == "Instance" and playerFrom:IsA("Player"), "Bad playerFrom")
+	assert(type(text) == "string", "Bad text")
 
 	return Promise.defer(function(resolve, reject)
 		local filteredText
@@ -43,10 +43,10 @@ function TextFilterUtils.promiseLegacyChatFilter(playerFrom, text)
 end
 
 function TextFilterUtils.promiseNonChatStringForUserAsync(str, fromUserId, toUserId, textContext)
-	assert(type(str) == "string")
-	assert(type(fromUserId) == "number")
-	assert(type(toUserId) == "number")
-	assert(typeof(textContext) == "EnumItem")
+	assert(type(str) == "string", "Bad str")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
+	assert(type(toUserId) == "number", "Bad toUserId")
+	assert(typeof(textContext) == "EnumItem", "Bad textContext")
 
 	return TextFilterUtils._promiseTextResult(
 		TextFilterUtils.getNonChatStringForUserAsync,
@@ -57,9 +57,9 @@ function TextFilterUtils.promiseNonChatStringForUserAsync(str, fromUserId, toUse
 end
 
 function TextFilterUtils.getNonChatStringForBroadcastAsync(str, fromUserId, textContext)
-	assert(type(str) == "string")
-	assert(type(fromUserId) == "number")
-	assert(typeof(textContext) == "EnumItem")
+	assert(type(str) == "string", "Bad str")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
+	assert(typeof(textContext) == "EnumItem", "Bad textContext")
 
 	local text = nil
 	local ok, err = pcall(function()
@@ -79,10 +79,10 @@ function TextFilterUtils.getNonChatStringForBroadcastAsync(str, fromUserId, text
 end
 
 function TextFilterUtils.getNonChatStringForUserAsync(str, fromUserId, toUserId, textContext)
-	assert(type(str) == "string")
-	assert(type(fromUserId) == "number")
-	assert(type(toUserId) == "number")
-	assert(typeof(textContext) == "EnumItem")
+	assert(type(str) == "string", "Bad str")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
+	assert(type(toUserId) == "number", "Bad toUserId")
+	assert(typeof(textContext) == "EnumItem", "Bad textContext")
 
 	local text = nil
 	local ok, err = pcall(function()

@@ -127,7 +127,7 @@ function DataStoreStage:Store(name, value)
 end
 
 function DataStoreStage:GetSubStore(name)
-	assert(type(name) == "string")
+	assert(type(name) == "string", "Bad name")
 
 	if self._stores[name] then
 		return self._stores[name]
@@ -147,8 +147,8 @@ function DataStoreStage:GetSubStore(name)
 end
 
 function DataStoreStage:StoreOnValueChange(name, valueObj)
-	assert(type(name) == "string")
-	assert(typeof(valueObj) == "Instance")
+	assert(type(name) == "string", "Bad name")
+	assert(typeof(valueObj) == "Instance", "Bad valueObj")
 
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
@@ -194,8 +194,8 @@ end
 
 -- Stores the data for overwrite.
 function DataStoreStage:_doStore(name, value)
-	assert(type(name) == "string" or type(name) == "number")
-	assert(value ~= nil)
+	assert(type(name) == "string" or type(name) == "number", "Bad name")
+	assert(value ~= nil, "Bad value")
 
 	local newValue
 	if value == DataStoreDeleteToken then

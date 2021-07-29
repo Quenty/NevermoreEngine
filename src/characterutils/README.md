@@ -14,6 +14,9 @@
 Provides utility functions for working with Roblox characters. These make some much-repeated actions much easier to access and operate.
 ## Changelog
 
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.0
 Initial release
 ## Installation

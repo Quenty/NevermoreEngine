@@ -28,7 +28,7 @@ end
 function TrackCamera:__newindex(index, value)
 	if index == "CameraSubject" then
 		assert(typeof(value) == "Instance" and
-			(value:IsA("BasePart") or value:IsA("Model") or value:IsA("Attachment") or value:IsA("Humanoid"))
+			(value:IsA("BasePart") or value:IsA("Model") or value:IsA("Attachment") or value:IsA("Humanoid")),
 			"CameraSubject must be a Roblox Model, Roblox Part, Attachment, Humanoid, or nil")
 
 		rawset(self, index, value)

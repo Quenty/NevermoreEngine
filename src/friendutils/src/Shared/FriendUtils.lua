@@ -41,11 +41,11 @@ end
 
 -- @param[opt=nil] limitMaxFriends
 function FriendUtils.promiseAllFriends(userId, limitMaxFriends)
-	assert(userId)
+	assert(userId, "Bad userId")
 
 	return FriendUtils.promiseFriendPages(userId)
 		:Then(function(pages)
-			return Promise.defer(function(resolve, reject)
+			return Promise.defer(function(resolve, _)
 				local users = {}
 
 				for userData in FriendUtils.iterateFriendsYielding(pages) do
@@ -63,7 +63,7 @@ function FriendUtils.promiseAllFriends(userId, limitMaxFriends)
 end
 
 function FriendUtils.promiseFriendPages(userId)
-	assert(type(userId) == "number")
+	assert(type(userId) == "number", "Bad userId")
 
 	return Promise.defer(function(resolve, reject)
 		local pages
@@ -81,14 +81,14 @@ function FriendUtils.promiseFriendPages(userId)
 end
 
 function FriendUtils.iterateFriendsYielding(pages)
-	assert(pages)
+	assert(pages, "Bad pages")
 
 	return coroutine.wrap(function()
 		while true do
 			for _, userData in pairs(pages:GetCurrentPage()) do
-				assert(type(userData.Id) == "number")
-				assert(type(userData.Username) == "string")
-				assert(type(userData.IsOnline) == "boolean")
+				assert(type(userData.Id) == "number", "Bad userData.Id")
+				assert(type(userData.Username) == "string", "Bad userData.Username")
+				assert(type(userData.IsOnline) == "boolean", "Bad userData.IsOnline")
 
 				coroutine.yield(userData)
 			end
@@ -122,6 +122,8 @@ end
 function FriendUtils.promiseCurrentStudioUserId()
 	return FriendUtils.promiseStudioServiceUserId()
 		:Catch(function(...)
+			warn(...)
+
 			-- this is in team create!
 			local player = Players:FindFirstChildWhichIsA("Player")
 			if player then

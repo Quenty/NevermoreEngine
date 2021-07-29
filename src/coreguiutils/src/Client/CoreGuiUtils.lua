@@ -11,7 +11,8 @@ local Promise = require("Promise")
 local CoreGuiUtils = {}
 
 function CoreGuiUtils.promiseRetrySetCore(tries, initialWaitTime, ...)
-	assert(type(tries) == "number")
+	assert(type(tries) == "number", "Bad tries")
+	assert(type(initialWaitTime) == "number", "Bad initialWaitTime")
 
 	local args = {...}
 	local n = select("#", ...)

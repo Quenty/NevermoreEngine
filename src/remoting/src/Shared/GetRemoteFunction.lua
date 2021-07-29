@@ -17,7 +17,7 @@ if not RunService:IsRunning() then
 	end
 elseif RunService:IsServer() then
 	return function(name)
-		assert(type(name) == "string")
+		assert(type(name) == "string", "Bad name")
 
 		local storage = ReplicatedStorage:FindFirstChild(ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME)
 		if not storage then
@@ -39,7 +39,7 @@ elseif RunService:IsServer() then
 	end
 else -- RunService:IsClient()
 	return function(name)
-		assert(type(name) == "string")
+		assert(type(name) == "string", "Bad name")
 
 		return ReplicatedStorage:WaitForChild(ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME):WaitForChild(name)
 	end

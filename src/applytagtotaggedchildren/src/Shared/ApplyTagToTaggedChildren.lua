@@ -1,4 +1,5 @@
---- Class that while constructed apply a tag to any children of the parent it is given, assuming that class has the required tag.
+--- Class that while constructed apply a tag to any children of the parent it is given, assuming that
+-- class has the required tag.
 -- This lets you bridge tag systems since CollectionService is used as an interop model between many
 -- components in scripts.
 -- @classmod ApplyTagToTaggedChildren
@@ -20,7 +21,7 @@ function ApplyTagToTaggedChildren.new(parent, tag, requiredTag)
 	self._requiredTag = requiredTag or error("No requiredTag")
 	self._tag = tag or error("No tag")
 
-	assert(self._requiredTag ~= self._tag)
+	assert(self._requiredTag ~= self._tag, "Bad requiredTag")
 
 	self._tagged = {}
 

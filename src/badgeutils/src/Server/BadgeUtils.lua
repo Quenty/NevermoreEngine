@@ -11,8 +11,8 @@ local Promise = require("Promise")
 local BadgeUtils = {}
 
 function BadgeUtils.promiseAwardBadge(player, badgeId)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
-	assert(type(badgeId) == "number")
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(badgeId) == "number", "Bad badgeId")
 
 	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()

@@ -37,6 +37,9 @@ system and output get destroyed in the process
 
 ## Changelog
 
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.0
 Initial release
 

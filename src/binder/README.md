@@ -122,6 +122,11 @@ Cleans up all bound classes, and disconnects all events
 
 ## Changelog
 
+## Changelog
+
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.2
 - Remove RxBinderUtils
 - Remove RxBinderGroupUtils

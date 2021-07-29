@@ -59,8 +59,8 @@ function StepUtils.bindToSignal(signal, update)
 end
 
 function StepUtils.onceAtRenderPriority(priority, func)
-	assert(type(priority) == "number")
-	assert(type(func) == "function")
+	assert(type(priority) == "number", "Bad priority")
+	assert(type(func) == "function", "Bad func")
 
 	local key = ("StepUtils.onceAtPriority_%s"):format(HttpService:GenerateGUID(false))
 
@@ -85,7 +85,7 @@ function StepUtils.onceAtRenderStepped(func)
 end
 
 function StepUtils.onceAtEvent(event, func)
-	assert(type(func) == "function")
+	assert(type(func) == "function", "Bad func")
 
 	local conn
 	local function cleanup()

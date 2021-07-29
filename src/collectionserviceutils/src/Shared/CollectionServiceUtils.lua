@@ -6,8 +6,8 @@ local CollectionService = game:GetService("CollectionService")
 local CollectionServiceUtils = {}
 
 function CollectionServiceUtils.findFirstAncestor(tagName, child)
-	assert(type(tagName) == "string")
-	assert(typeof(child) == "Instance")
+	assert(type(tagName) == "string", "Bad tagName")
+	assert(typeof(child) == "Instance", "Bad child")
 
 	local current = child.Parent
 	while current do
@@ -20,6 +20,8 @@ function CollectionServiceUtils.findFirstAncestor(tagName, child)
 end
 
 function CollectionServiceUtils.removeAllTags(instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
 	for _, tag in pairs(CollectionService:GetTags(instance)) do
 		CollectionService:RemoveTag(instance, tag)
 	end

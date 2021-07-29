@@ -10,9 +10,9 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxR15Utils = {}
 
 function RxR15Utils.observeRigAttachmentBrio(character, partName, attachmentName)
-	assert(typeof(character) == "Instance")
-	assert(type(partName) == "string")
-	assert(type(attachmentName) == "string")
+	assert(typeof(character) == "Instance", "Bad character")
+	assert(type(partName) == "string", "Bad partName")
+	assert(type(attachmentName) == "string", "Bad attachmentName")
 
 	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName)
 		:Pipe({

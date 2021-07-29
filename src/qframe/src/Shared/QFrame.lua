@@ -22,8 +22,8 @@ function QFrame.isQFrame(value)
 end
 
 function QFrame.fromCFrameClosestTo(cframe, closestTo)
-	assert(typeof(cframe) == "CFrame")
-	assert(QFrame.isQFrame(closestTo))
+	assert(typeof(cframe) == "CFrame", "Bad cframe")
+	assert(QFrame.isQFrame(closestTo), "Bad closestTo")
 
 	local axis, angle = cframe:toAxisAngle()
 	local W = math.cos(angle/2)
@@ -41,7 +41,7 @@ function QFrame.fromCFrameClosestTo(cframe, closestTo)
 end
 
 function QFrame.fromVector3(vector, qFrame)
-	assert(typeof(vector) == "Vector3")
+	assert(typeof(vector) == "Vector3", "Bad vector")
 	assert(QFrame.isQFrame(qFrame))
 
 	return QFrame.new(vector.x, vector.y, vector.z, qFrame.W, qFrame.X, qFrame.Y, qFrame.Z)
@@ -84,7 +84,7 @@ function QFrame.__sub(a, b)
 end
 
 function QFrame.__pow(a, b)
-	assert(QFrame.isQFrame(a) and type(b) == "number")
+	assert(QFrame.isQFrame(a) and type(b) == "number", "Bad a or b")
 
 	local w, x, y, z = a.W, a.X, a.Y, a.Z
 	local vv = x*x + y*y + z*z

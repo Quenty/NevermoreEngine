@@ -248,7 +248,7 @@ end
 -- Unpacks the brio, and then repacks it. Ignored items
 -- still invalidate the previous brio
 function RxBrioUtils.filter(predicate)
-	assert(type(predicate) == "function")
+	assert(type(predicate) == "function", "Bad predicate")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -283,7 +283,7 @@ end
 
 -- Flattens all the brios in the combineLatest
 function RxBrioUtils.combineLatest(observables)
-	assert(type(observables) == "table")
+	assert(type(observables) == "table", "Bad observables")
 
 	return Rx.combineLatest(observables)
 		:Pipe({
@@ -293,19 +293,19 @@ function RxBrioUtils.combineLatest(observables)
 end
 
 function RxBrioUtils.flatMap(project, resultSelector)
-	assert(type(project) == "function")
+	assert(type(project) == "function", "Bad project")
 
 	return Rx.flatMap(RxBrioUtils.mapBrio(project), resultSelector)
 end
 
 function RxBrioUtils.switchMap(project, resultSelector)
-	assert(type(project) == "function")
+	assert(type(project) == "function", "Bad project")
 
 	return Rx.switchMap(RxBrioUtils.mapBrio(project), resultSelector)
 end
 
 function RxBrioUtils.mapBrio(project)
-	assert(type(project) == "function")
+	assert(type(project) == "function", "Bad project")
 
 	return function(brio)
 		assert(Brio.isBrio(brio), "Not a brio")

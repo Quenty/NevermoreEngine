@@ -7,7 +7,6 @@ local BezierUtils = {}
 
 -- Same as CSS transition thing.
 function BezierUtils.createBezierFactory(p1x, p1y, p2x, p2y)
-
 	assert(p1x, "[BezierUtils.createBezierFactory] - Need p1x to construct a Bezier Factory")
 	assert(p1y, "[BezierUtils.createBezierFactory] - Need p1y to construct a Bezier Factory")
 	assert(p2x, "[BezierUtils.createBezierFactory] - Need p2x to construct a Bezier Factory")

@@ -7,7 +7,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Maid = require("Maid")
 local FadeBetweenCamera = require("FadeBetweenCamera")
 
-return function(target)
+return function(_)
 	local maid = Maid.new()
 
 	local fadeBetweenCamera = FadeBetweenCamera.new()

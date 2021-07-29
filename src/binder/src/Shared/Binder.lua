@@ -219,7 +219,7 @@ end
 
 -- Unbinds the instance by removing the tag
 function Binder:Unbind(inst)
-	assert(typeof(inst) == "Instance")
+	assert(typeof(inst) == "Instance", "Bad inst'")
 
 	if RunService:IsClient() then
 		warn(("[Binder.Bind] - Unbinding '%s' done on the client! Might be disrupted upon server replication! %s")
@@ -244,7 +244,7 @@ end
 
 -- See Unbind(), acknowledges risk of doing this on the client.
 function Binder:UnbindClient(inst)
-	assert(typeof(inst) == "Instance")
+	assert(typeof(inst) == "Instance", "Bad inst")
 	CollectionService:RemoveTag(inst, self._tagName)
 end
 
@@ -377,7 +377,7 @@ function Binder:Destroy()
 	local index, class = next(self._instToClass)
 	while class ~= nil do
 		self:_remove(class)
-		assert(self._instToClass[index] == nil)
+		assert(self._instToClass[index] == nil, "Failed to remove")
 
 		index, class = next(self._instToClass)
 	end

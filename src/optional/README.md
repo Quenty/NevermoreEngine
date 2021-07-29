@@ -21,6 +21,9 @@ Errors are still preserved because Roblox reports errors of module scripts regar
 execution context.
 ## Changelog
 
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.0
 Initial release
 

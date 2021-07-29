@@ -3,14 +3,14 @@
 -- @module deferred
 
 return function(func, ...)
-	assert(type(func) == "function")
+	assert(type(func) == "function", "Bad func")
 
 	local args = table.pack(...)
 
 	local bindable = Instance.new("BindableEvent")
 	bindable.Event:Connect(function()
 		bindable:Destroy()
-		func(table.unpack(args))
+		func(table.unpack(args, 1, args.n))
 	end)
 	bindable:Fire()
 end

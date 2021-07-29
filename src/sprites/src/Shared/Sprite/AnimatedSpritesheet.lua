@@ -13,13 +13,12 @@ AnimatedSpritesheet.__index = AnimatedSpritesheet
 function AnimatedSpritesheet.new(options)
 	local self = setmetatable(Spritesheet.new(options.texture), AnimatedSpritesheet)
 
-	self._options = options or error("No options")
-
-	assert(self._options.texture)
-	assert(self._options.frames)
-	assert(self._options.spritesPerRow)
-	assert(self._options.spriteSize)
-	assert(self._options.framesPerSecond)
+	self._options = assert(options, "Bad options")
+	assert(self._options.texture, "Bad options.texture")
+	assert(self._options.frames, "Bad options.frames")
+	assert(self._options.spritesPerRow, "Bad options.spritesPerRow")
+	assert(self._options.spriteSize, "Bad options.spriteSize")
+	assert(self._options.framesPerSecond, "Bad options.framesPerSecond")
 
 	for i=0, options.frames do
 		local x = i % options.spritesPerRow

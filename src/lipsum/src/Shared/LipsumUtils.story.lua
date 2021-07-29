@@ -13,8 +13,8 @@ local UICornerUtils = require("UICornerUtils")
 local UIPaddingUtils = require("UIPaddingUtils")
 
 local function showText(text, maxWidth, padding)
-	assert(type(text) == "string")
-	assert(maxWidth)
+	assert(type(text) == "string", "Bad text")
+	assert(maxWidth, "Bad maxWidth")
 	padding = padding or 10
 
 	local container = Instance.new("Frame")
@@ -77,7 +77,7 @@ local function makeHorizontalSection(factory)
 	local maxHeight = 0
 	local layoutOrder = 1
 	local function add(item)
-		assert(item)
+		assert(item, "Bad item")
 
 		layoutOrder = layoutOrder + 1
 		item.LayoutOrder = layoutOrder

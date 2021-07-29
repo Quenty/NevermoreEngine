@@ -6,8 +6,8 @@
 -- @tparam function func
 -- @treturn function
 local function debounce(timeoutInSeconds, func)
-	assert(type(timeoutInSeconds) == "number")
-	assert(type(func) == "function")
+	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
+	assert(type(func) == "function", "Bad func")
 
 	local key = 1
 	return function(...)

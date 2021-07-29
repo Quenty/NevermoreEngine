@@ -28,8 +28,8 @@ function TextFilterService:_handleServerInvoke(...)
 end
 
 function TextFilterService:_turnRequestToPromise(player, request, ...)
-	assert(player)
-	assert(type(request) == "string")
+	assert(player, "Bad player")
+	assert(type(request) == "string", "Bad request")
 
 	if request == TextFilterServiceConstants.REQUEST_NON_CHAT_STRING_FOR_USER then
 		return self:_promiseNonChatStringForUser(player, ...)
@@ -43,16 +43,16 @@ function TextFilterService:_turnRequestToPromise(player, request, ...)
 end
 
 function TextFilterService:_promiseNonChatStringForUser(player, text, fromUserId)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
-	assert(type(text) == "string")
-	assert(type(fromUserId) == "number")
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(text) == "string", "Bad text")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
 
 	return TextFilterUtils.promiseNonChatStringForUserAsync(
 			text,
 			fromUserId,
 			player.UserId,
 			Enum.TextFilterContext.PublicChat)
-		:Catch(function(err)
+		:Catch(function(_)
 			-- Error occurs due to player having left the game, but we still need to display their text, so let's fallback
 			-- to this text
 			return TextFilterUtils.promiseLegacyChatFilter(player, text)
@@ -60,15 +60,15 @@ function TextFilterService:_promiseNonChatStringForUser(player, text, fromUserId
 end
 
 function TextFilterService:_promiseNonChatStringForBroadcast(player, text, fromUserId)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
-	assert(type(text) == "string")
-	assert(type(fromUserId) == "number")
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(text) == "string", "Bad text")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
 
 	return TextFilterUtils.promiseNonChatStringForBroadcast(
 			text,
 			fromUserId,
 			Enum.TextFilterContext.PublicChat)
-		:Catch(function(err)
+		:Catch(function(_)
 			-- Error occurs due to player having left the game, but we still need to display their text, so let's fallback
 			-- to this text
 			return TextFilterUtils.promiseLegacyChatFilter(player, text)
@@ -76,8 +76,8 @@ function TextFilterService:_promiseNonChatStringForBroadcast(player, text, fromU
 end
 
 function TextFilterService:_promisePreviewNonChatStringForBroadcast(player, text)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
-	assert(type(text) == "string")
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(text) == "string", "Bad text")
 
 	-- Use the old legacy API to show preview
 	return TextFilterUtils.promiseLegacyChatFilter(player, text)

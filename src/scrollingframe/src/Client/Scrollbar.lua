@@ -12,7 +12,7 @@ local Scrollbar = {}
 Scrollbar.ClassName = "Scrollbar"
 Scrollbar.__index = Scrollbar
 
-function Scrollbar.new(gui)
+function Scrollbar.new(gui, scrollType)
 	local self = setmetatable({}, Scrollbar)
 
 	self.Gui = gui or error("No gui")
@@ -20,7 +20,7 @@ function Scrollbar.new(gui)
 
 	self._maid = Maid.new()
 	self._container = self.Gui.Parent or error("No container")
-	self._scrollType = SCROLL_TYPE.Vertical
+	self._scrollType = scrollType or SCROLL_TYPE.Vertical
 
 	return self
 end
@@ -37,7 +37,7 @@ function Scrollbar.fromContainer(container, scrollType)
 	gui.ZIndex = container.ZIndex
 	gui.Parent = container
 
-	return Scrollbar.new(gui)
+	return Scrollbar.new(gui, scrollType)
 end
 
 function Scrollbar:SetScrollType(scrollType)

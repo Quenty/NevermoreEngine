@@ -16,16 +16,16 @@ OverriddenProperty.__index = OverriddenProperty
 function OverriddenProperty.new(robloxInstance, propertyName, replicateRate, replicateCallback)
 	local self = setmetatable(BaseObject.new(robloxInstance), OverriddenProperty)
 
-	assert(typeof(robloxInstance) == "Instance")
-	assert(type(propertyName) == "string")
+	assert(typeof(robloxInstance) == "Instance", "Bad robloxInstance")
+	assert(type(propertyName) == "string", "Bad propertyName")
 
 	self._disconnectCount = 0
 	self._propertyName = propertyName or error("No propertyName")
 	self._value = self._obj[self._propertyName]
 
 	if replicateRate ~= nil then
-		assert(type(replicateRate) == "number")
-		assert(type(replicateCallback) == "function")
+		assert(type(replicateRate) == "number", "Bad replicateRate")
+		assert(type(replicateCallback) == "function", "Bad replicateCallback")
 
 		self._throttledExecuteReplicate = ThrottledFunction.new(replicateRate, replicateCallback)
 		self._maid:GiveTask(self._throttledExecuteReplicate)
@@ -37,7 +37,7 @@ function OverriddenProperty.new(robloxInstance, propertyName, replicateRate, rep
 end
 
 function OverriddenProperty:Set(value)
-	assert(typeof(value) == typeof(self._value))
+	assert(typeof(value) == typeof(self._value), "Bad value")
 
 	self._value = value
 	self:_executeSet(true)

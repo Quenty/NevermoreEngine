@@ -28,7 +28,7 @@ function BoundAncestorTracker.new(binder, child)
 		end
 	end))
 
-	self._maid:GiveTask(self._binder:GetClassAddedSignal():Connect(function(class, instance)
+	self._maid:GiveTask(self._binder:GetClassAddedSignal():Connect(function(_, instance)
 		if self._child:IsDescendantOf(instance) then
 			self:_update()
 		end

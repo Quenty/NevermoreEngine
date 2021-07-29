@@ -14,8 +14,8 @@ local NETWORK_OWNER_ROPE_TAG = "NetworkRopeUtilCreatedObject"
 local NetworkRopeUtils = {}
 
 function NetworkRopeUtils.hintSharedMechanism(part0, part1)
-	assert(typeof(part0) == "Instance")
-	assert(typeof(part1) == "Instance")
+	assert(typeof(part0) == "Instance", "Bad part0")
+	assert(typeof(part1) == "Instance", "Bad part1")
 
 	local maid = Maid.new()
 

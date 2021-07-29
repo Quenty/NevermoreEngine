@@ -9,12 +9,12 @@ local Signal = require("Signal")
 local EnabledMixin = {}
 
 function EnabledMixin:Add(class)
-	assert(class)
-	assert(not class.Enable)
-	assert(not class.Disable)
-	assert(not class.SetEnabled)
-	assert(not class.IsEnabled)
-	assert(not class.InitEnabledMixin)
+	assert(class, "Bad class")
+	assert(not class.Enable, "class.Enable already defined")
+	assert(not class.Disable, "class.Disable already defined")
+	assert(not class.SetEnabled, "class.SetEnabled already defined")
+	assert(not class.IsEnabled, "class.IsEnabled already defined")
+	assert(not class.InitEnabledMixin, "class.InitEnabledMixin already defined")
 
 	-- Inject methods
 	class.IsEnabled = self.IsEnabled
@@ -49,7 +49,7 @@ function EnabledMixin:Disable(doNotAnimate)
 end
 
 function EnabledMixin:SetEnabled(isEnabled, doNotAnimate)
-	assert(type(isEnabled) == "boolean")
+	assert(type(isEnabled) == "boolean", "Bad isEnabled")
 
 	if self._enabled ~= isEnabled then
 		self._enabled = isEnabled

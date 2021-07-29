@@ -43,7 +43,7 @@ end
 -- Big number is more important. At -math.huge
 -- we won't ever set preferred
 function ScoredAction:SetScore(score)
-	assert(type(score) == "number")
+	assert(type(score) == "number", "Bad score")
 
 	self._score = score
 end

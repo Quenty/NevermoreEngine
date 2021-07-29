@@ -36,7 +36,7 @@ function IKRig:GetTarget()
 end
 
 function IKRig:SetRigTarget(target)
-	assert(typeof(target) == "Vector3" or target == nil)
+	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
 	self._target = target
 
@@ -49,8 +49,8 @@ function IKRig:SetRigTarget(target)
 end
 
 function IKRig:_onServerEvent(player, target)
-	assert(player == CharacterUtils.getPlayerFromCharacter(self._obj))
-	assert(typeof(target) == "Vector3" or target == nil)
+	assert(player == CharacterUtils.getPlayerFromCharacter(self._obj), "Bad player")
+	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
 	self._target = target
 

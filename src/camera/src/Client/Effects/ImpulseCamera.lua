@@ -23,7 +23,7 @@ function ImpulseCamera.new()
 end
 
 function ImpulseCamera:Impulse(velocity)
-	assert(typeof(velocity) == "Vector3")
+	assert(typeof(velocity) == "Vector3", "Bad velocity")
 
 	self._spring:Impulse(velocity)
 end
@@ -34,10 +34,10 @@ end
 
 function ImpulseCamera:__newindex(index, value)
 	if index == "Damper" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 		self._spring.Damper = value
 	elseif index == "Speed" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 		self._spring.Speed = value
 	else
 		error(("%q is not a valid member of impulse camera"):format(tostring(index)))

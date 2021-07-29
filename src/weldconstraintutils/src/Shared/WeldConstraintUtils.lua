@@ -5,8 +5,9 @@
 local WeldConstraintUtils = {}
 
 function WeldConstraintUtils.namedBetween(name, part0, part1, parent)
-	assert(typeof(part0) == "Instance")
-	assert(typeof(part1) == "Instance")
+	assert(type(name) == "string", "Bad name")
+	assert(typeof(part0) == "Instance", "Bad part0")
+	assert(typeof(part1) == "Instance", "Bad part1")
 
 	if part0:IsA("Terrain") or part1:IsA("Terrain") then
 		-- Terrain likes to remove welds when it deforms for non-touching parts
@@ -29,8 +30,9 @@ function WeldConstraintUtils.namedBetween(name, part0, part1, parent)
 end
 
 function WeldConstraintUtils.namedBetweenForceWeldConstraint(name, part0, part1, parent)
-	assert(typeof(part0) == "Instance")
-	assert(typeof(part1) == "Instance")
+	assert(type(name) == "string", "Bad name")
+	assert(typeof(part0) == "Instance", "Bad part0")
+	assert(typeof(part1) == "Instance", "Bad part1")
 
 	-- Roblox weld constraints very buggy!
 	-- https://devforum.roblox.com/t/weld-constraint-behaves-differently-on-server-compared-to-client/445036

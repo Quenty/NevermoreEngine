@@ -10,7 +10,7 @@ local Brio = require("Brio")
 local BrioUtils = {}
 
 function BrioUtils.clone(brio)
-	assert(brio)
+	assert(brio, "Bad brio")
 
 	if brio:IsDead() then
 		return Brio.DEAD

@@ -17,13 +17,13 @@ function HapticFeedbackUtils.smallVibrate(userInputType, length, amplitude)
 end
 
 function HapticFeedbackUtils.setSmallVibration(userInputType, amplitude)
-	assert(type(amplitude) == "number")
+	assert(type(amplitude) == "number", "Bad amplitude")
 
 	return HapticFeedbackUtils.setVibrationMotor(userInputType, Enum.VibrationMotor.Small, amplitude)
 end
 
 function HapticFeedbackUtils.setVibrationMotor(userInputType, vibrationMotor, amplitude, ...)
-	assert(type(amplitude) == "number")
+	assert(type(amplitude) == "number", "Bad amplitude")
 
 	if not HapticService:IsVibrationSupported(userInputType) then
 		return false

@@ -42,7 +42,7 @@ function FirstPersonCharacterTransparency.new(humanoid)
 end
 
 function FirstPersonCharacterTransparency:SetTransparency(transparency)
-	assert(type(transparency) == "number")
+	assert(type(transparency) == "number", "Bad transparency")
 
 	if transparency >= 0.999 then
 		transparency = 1

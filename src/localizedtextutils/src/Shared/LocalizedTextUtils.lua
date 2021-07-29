@@ -4,8 +4,8 @@
 local LocalizedTextUtils = {}
 
 function LocalizedTextUtils.create(translationKey, translationArgs)
-	assert(type(translationKey) == "string")
-	assert(type(translationArgs) == "table" or translationArgs == nil)
+	assert(type(translationKey) == "string", "Bad translationKey")
+	assert(type(translationArgs) == "table" or translationArgs == nil, "Bad translationArgs")
 
 	return {
 		translationKey = translationKey;
@@ -21,9 +21,9 @@ function LocalizedTextUtils.isLocalizedText(data)
 end
 
 function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, translationArgs)
-	assert(translator)
-	assert(translationKey)
-	assert(translationArgs)
+	assert(translator, "Bad translator")
+	assert(translationKey, "Bad translationKey")
+	assert(translationArgs, "Bad translationArgs")
 
 	local formattedArgs = {}
 	for name, value in pairs(translationArgs) do
@@ -45,7 +45,7 @@ function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, tra
 end
 
 function LocalizedTextUtils.localizedTextToString(translator, localizedText)
-	assert(translator)
+	assert(translator, "Bad translator")
 	assert(localizedText, "No localizedText")
 	assert(localizedText.translationKey, "No translationKey")
 	assert(localizedText.translationArgs, "No translationArgs")

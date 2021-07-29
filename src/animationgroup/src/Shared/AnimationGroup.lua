@@ -18,8 +18,8 @@ function AnimationGroup.new(weightedTracks)
 
 	self._weightedTracks = weightedTracks or error("No tracksWithWeight")
 	for _, animation in pairs(self._weightedTracks) do
-		assert(animation.track)
-		assert(animation.weight)
+		assert(animation.track, "Bad animation.track")
+		assert(animation.weight, "Bad animation.weight")
 	end
 
 	self._maid:GiveTask(function()

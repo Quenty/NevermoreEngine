@@ -12,7 +12,7 @@ local Maid = require("Maid")
 local SocialServiceUtils = {}
 
 function SocialServiceUtils.promiseCanSendGameInvite(player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return Promise.defer(function(resolve, reject)
 		local canSend
@@ -28,7 +28,7 @@ function SocialServiceUtils.promiseCanSendGameInvite(player)
 end
 
 function SocialServiceUtils.promisePromptGameInvite(player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	local maid = Maid.new()
 

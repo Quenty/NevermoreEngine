@@ -96,8 +96,8 @@ function PromiseUtils.fromSignal(signal)
 end
 
 function PromiseUtils.timeout(timeoutTime, fromPromise)
-	assert(type(timeoutTime) == "number")
-	assert(fromPromise)
+	assert(type(timeoutTime) == "number", "Bad timeoutTime")
+	assert(fromPromise, "Bad fromPromise")
 
 	if not fromPromise:IsPending() then
 		return fromPromise

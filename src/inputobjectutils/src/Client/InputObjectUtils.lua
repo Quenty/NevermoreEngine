@@ -12,14 +12,14 @@ local MOUSE_USER_INPUT_TYPES = {
 }
 
 function InputObjectUtils.isMouseUserInputType(userInputType)
-	assert(typeof(userInputType) == "EnumItem")
+	assert(typeof(userInputType) == "EnumItem", "Bad userInputType")
 
 	return MOUSE_USER_INPUT_TYPES[userInputType]
 end
 
 function InputObjectUtils.isSameInputObject(inputObject, otherInputObject)
-	assert(inputObject)
-	assert(otherInputObject)
+	assert(inputObject, "Bad inputObject")
+	assert(otherInputObject, "Bad otherInputObject")
 
 	if inputObject == otherInputObject then -- Handles touched events for same finger
 		return true

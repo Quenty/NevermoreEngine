@@ -93,7 +93,7 @@ function IKRigBase:GetRightArm()
 end
 
 function IKRigBase:_getNewArm(armName)
-	assert(armName == "Left" or armName == "Right")
+	assert(armName == "Left" or armName == "Right", "Bad armName")
 
 	if self._obj.RigType ~= Enum.HumanoidRigType.R15 then
 		return Promise.rejected("Rig is not HumanoidRigType.R15")

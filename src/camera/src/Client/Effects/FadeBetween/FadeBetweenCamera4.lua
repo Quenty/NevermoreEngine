@@ -29,25 +29,25 @@ end
 
 function FadeBetweenCamera4:__newindex(index, value)
 	if index == "Value" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 
 		local _, position = SpringUtils.animating(self._spring)
 		self._state0, self._position0 = self:_computeCameraState(position)
 		self._spring.p = value
 	elseif index == "Target" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 
 		local _, position = SpringUtils.animating(self._spring)
 		self._state0, self._position0 = self:_computeCameraState(position)
 		self._spring.t = value
 	elseif index == "Speed" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 
 		local _, position = SpringUtils.animating(self._spring)
 		self._state0, self._position0 = self:_computeCameraState(position)
 		self._spring.s = value
 	elseif index == "CameraA" or index == "CameraB" then
-		assert(type(value) ~= "nil")
+		assert(type(value) ~= "nil", "Bad value")
 
 		local _, position = SpringUtils.animating(self._spring)
 		self._state0, self._position0 = self:_computeCameraState(position)

@@ -11,7 +11,7 @@ local ContentProviderUtils = {}
 
 -- Note: If strings are passed in, it only preloads textures, and will preload meshes, but only to http client.
 function ContentProviderUtils.promisePreload(contentIdList)
-	assert(type(contentIdList) == "table")
+	assert(type(contentIdList) == "table", "Bad contentIdList")
 
 	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()

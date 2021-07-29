@@ -37,14 +37,14 @@ end
 
 function CameraFrame:__newindex(index, value)
 	if index == "CFrame" then
-		assert(typeof(value) == "CFrame")
+		assert(typeof(value) == "CFrame", "Bad value")
 
 		local qFrame = QFrame.fromCFrameClosestTo(value, self.QFrame)
-		assert(qFrame) -- Yikes if this fails, but it occurs
+		assert(qFrame, "Failed to convert") -- Yikes if this fails, but it occurs
 
 		rawset(self, "QFrame", qFrame)
 	elseif index == "Position" then
-		assert(typeof(value) == "Vector3")
+		assert(typeof(value) == "Vector3", "Bad value")
 
 		local q = self.QFrame
 		rawset(self, "QFrame", QFrame.new(value.x, value.y, value.z, q.W, q.X, q.Y, q.Z))

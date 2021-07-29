@@ -2,8 +2,8 @@
 -- @module debounce
 
 local function cancellableDelay(timeoutInSeconds, func, ...)
-	assert(type(timeoutInSeconds) == "number")
-	assert(type(func) == "function")
+	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
+	assert(type(func) == "function", "Bad func")
 
 	local n = select("#", ...)
 	local args = {...}

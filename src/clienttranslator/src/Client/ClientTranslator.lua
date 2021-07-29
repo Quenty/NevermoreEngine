@@ -39,7 +39,7 @@ function ClientTranslatorFacade:Init()
 		end
 
 		if translator then
-			assert(typeof(translator) == "Instance")
+			assert(typeof(translator) == "Instance", "Bad translator")
 			resolve(translator)
 			return
 		end
@@ -70,7 +70,7 @@ function ClientTranslatorFacade:Init()
 	end)
 
 	self._clientTranslator = finalPromise:Wait()
-	assert(typeof(self._clientTranslator) == "Instance")
+	assert(typeof(self._clientTranslator) == "Instance", "Bad clientTranslator result")
 
 	return self
 end

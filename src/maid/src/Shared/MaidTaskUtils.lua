@@ -23,8 +23,8 @@ function MaidTaskUtils.doTask(task)
 end
 
 function MaidTaskUtils.delayed(time, task)
-	assert(type(time) == "number")
-	assert(task ~= nil)
+	assert(type(time) == "number", "Bad time")
+	assert(MaidTaskUtils.isValidTask(task), "Bad task")
 
 	return function()
 		delay(time, function()

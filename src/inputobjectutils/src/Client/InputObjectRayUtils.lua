@@ -8,12 +8,14 @@ local DEFAULT_RAY_DISTANCE = 1000
 local InputObjectRayUtils = {}
 
 function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance)
-	assert(inputObject)
+	assert(inputObject, "Bad inputObject")
+
 	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position, distance)
 end
 
 function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, distance, offset)
-	assert(inputObject)
+	assert(inputObject, "Bad inputObject")
+
 	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position + offset, distance)
 end
 

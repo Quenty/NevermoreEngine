@@ -14,6 +14,9 @@
 Provides utility functions surrounding CFrame in Roblox.
 ## Changelog
 
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.0
 Initial release
 ## Installation

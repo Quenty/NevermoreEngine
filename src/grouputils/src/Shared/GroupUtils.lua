@@ -11,8 +11,8 @@ local Promise = require("Promise")
 local GroupUtils = {}
 
 function GroupUtils.promiseRankInGroup(player, groupId)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
-	assert(type(groupId) == "number")
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(groupId) == "number", "Bad groupId")
 
 	return Promise.defer(function(resolve, reject)
 		local rank = nil
@@ -33,7 +33,7 @@ function GroupUtils.promiseRankInGroup(player, groupId)
 end
 
 function GroupUtils.promiseGroupInfo(groupId)
-	assert(groupId)
+	assert(groupId, "Bad groupId")
 
 	return Promise.defer(function(resolve, reject)
 		local groupInfo = nil
@@ -54,8 +54,8 @@ function GroupUtils.promiseGroupInfo(groupId)
 end
 
 function GroupUtils.promiseGroupRoleInfo(groupId, rankId)
-	assert(groupId)
-	assert(rankId)
+	assert(groupId, "Bad groupId")
+	assert(rankId, "Bad rankId")
 
 	return GroupUtils.promiseGroupInfo(groupId)
 		:Then(function(groupInfo)

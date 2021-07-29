@@ -20,6 +20,11 @@ npm install @quenty/ragdoll --save
 
 ## Changelog
 
+## Changelog
+
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.1
 Fix ragdoll binders
 

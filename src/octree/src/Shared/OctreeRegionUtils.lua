@@ -66,7 +66,7 @@ function OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parent, parentIndex)
 end
 
 function OctreeRegionUtils.addNode(lowestSubregion, node)
-	assert(node)
+	assert(node, "Bad node")
 
 	local current = lowestSubregion
 	while current do
@@ -87,23 +87,23 @@ function OctreeRegionUtils.moveNode(fromLowest, toLowest, node)
 	while currentFrom ~= currentTo do
 		-- remove from current
 		do
-			assert(currentFrom.nodes[node])
-			assert(currentFrom.node_count > 0)
+			assert(currentFrom.nodes[node], "Not in currentFrom")
+			assert(currentFrom.node_count > 0, "No nodes in currentFrom")
 
 			currentFrom.nodes[node] = nil
 			currentFrom.node_count = currentFrom.node_count - 1
 
 			-- remove subregion!
 			if currentFrom.node_count <= 0 and currentFrom.parentIndex then
-				assert(currentFrom.parent)
-				assert(currentFrom.parent.subRegions[currentFrom.parentIndex] == currentFrom)
+				assert(currentFrom.parent, "Bad currentFrom.parent")
+				assert(currentFrom.parent.subRegions[currentFrom.parentIndex] == currentFrom, "Not in subregion")
 				currentFrom.parent.subRegions[currentFrom.parentIndex] = nil
 			end
 		end
 
 		-- add to new
 		do
-			assert(not currentTo.nodes[node])
+			assert(not currentTo.nodes[node], "Failed to add")
 			currentTo.nodes[node] = node
 			currentTo.node_count = currentTo.node_count + 1
 		end
@@ -114,20 +114,20 @@ function OctreeRegionUtils.moveNode(fromLowest, toLowest, node)
 end
 
 function OctreeRegionUtils.removeNode(lowestSubregion, node)
-	assert(node)
+	assert(node, "Bad node")
 
 	local current = lowestSubregion
 	while current do
-		assert(current.nodes[node])
-		assert(current.node_count > 0)
+		assert(current.nodes[node], "Not in current")
+		assert(current.node_count > 0, "Current has bad node count")
 
 		current.nodes[node] = nil
 		current.node_count = current.node_count - 1
 
 		-- remove subregion!
 		if current.node_count <= 0 and current.parentIndex then
-			assert(current.parent)
-			assert(current.parent.subRegions[current.parentIndex] == current)
+			assert(current.parent, "No parent")
+			assert(current.parent.subRegions[current.parentIndex] == current, "Not in subregion")
 			current.parent.subRegions[current.parentIndex] = nil
 		end
 
@@ -147,7 +147,7 @@ end
 -- luacheck: pop
 function OctreeRegionUtils.getNeighborsWithinRadius(
 		region, radius, px, py, pz, objectsFound, nodeDistances2, maxDepth)
-	assert(maxDepth)
+	assert(maxDepth, "Bad maxDepth")
 
 	local childDiameter = region.size[1]/2
 	local searchRadiusSquared = OctreeRegionUtils.getSearchRadiusSquared(radius, childDiameter, EPSILON)

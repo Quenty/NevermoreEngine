@@ -41,7 +41,7 @@ function InputMode:_addValidTypesFromTable(keys)
 end
 
 function InputMode:_addInputMode(inputMode)
-	assert(inputMode.ClassName == "InputMode")
+	assert(inputMode.ClassName == "InputMode", "bad inputMode")
 
 	for key, _ in pairs(inputMode._valid) do
 		self._valid[key] = true

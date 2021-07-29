@@ -10,7 +10,7 @@ local Promise = require("Promise")
 local PlayersServicePromises = {}
 
 function PlayersServicePromises.promiseUserIdFromName(name)
-	assert(type(name) == "string")
+	assert(type(name) == "string", "Bad name")
 
 	return Promise.defer(function(resolve, reject)
 		local userId

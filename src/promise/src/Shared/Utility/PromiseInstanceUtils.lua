@@ -16,7 +16,7 @@ function PromiseInstanceUtils.promiseRemoved(instance)
 
 	local promise = Promise.new()
 
-	maid:GiveTask(instance.AncestryChanged:Connect(function(child, parent)
+	maid:GiveTask(instance.AncestryChanged:Connect(function(_, parent)
 		if not parent then
 			promise:Resolve()
 		end

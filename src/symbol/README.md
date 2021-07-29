@@ -22,6 +22,9 @@ Symbols have the type 'userdata', but when printed to the console, the name of t
 
 ## Changelog
 
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.0
 Initial release
 

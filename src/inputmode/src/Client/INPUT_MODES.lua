@@ -292,11 +292,11 @@ local function bindProcessor()
 		end
 	end)
 
-	UserInputService.GamepadConnected:Connect(function(gamepad)
+	UserInputService.GamepadConnected:Connect(function(_)
 		INPUT_MODES.Gamepads:Enable()
 	end)
 
-	UserInputService.GamepadDisconnected:Connect(function(gamepad)
+	UserInputService.GamepadDisconnected:Connect(function(_)
 		triggerEnabled()
 	end)
 end

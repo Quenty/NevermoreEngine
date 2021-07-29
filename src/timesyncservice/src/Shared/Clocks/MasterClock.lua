@@ -11,7 +11,7 @@ function MasterClock.new(remoteEvent, remoteFunction)
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteFunction = remoteFunction or error("No remoteFunction")
 
-	self._remoteFunction.OnServerInvoke = function(player, timeThree)
+	self._remoteFunction.OnServerInvoke = function(_, timeThree)
 		return self:_handleDelayRequest(timeThree)
 	end
 	self._remoteEvent.OnServerEvent:Connect(function(player)

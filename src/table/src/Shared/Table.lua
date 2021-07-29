@@ -210,7 +210,7 @@ function Table.take(_table, count)
 	return newTable
 end
 
-local function errorOnIndex(self, index)
+local function errorOnIndex(_, index)
 	error(("Bad index %q"):format(tostring(index)), 2)
 end
 

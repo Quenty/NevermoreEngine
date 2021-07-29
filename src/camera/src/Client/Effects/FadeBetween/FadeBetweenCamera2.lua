@@ -27,7 +27,7 @@ end
 
 function FadeBetweenCamera2:__newindex(index, value)
 	if index == "Value" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 
 		if self._position0 ~= value then
 			local now = os.clock()
@@ -35,7 +35,7 @@ function FadeBetweenCamera2:__newindex(index, value)
 			self._time0 = now
 		end
 	elseif index == "Target" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 		if self._target ~= value then
 			local now = os.clock()
 			self._state0, self._position0 = self:_computeCameraState(self:_computeDoneProportion(now))
@@ -43,7 +43,7 @@ function FadeBetweenCamera2:__newindex(index, value)
 			self._target = value
 		end
 	elseif index == "Speed" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 
 		if self._speed ~= value then
 			local now = os.clock()

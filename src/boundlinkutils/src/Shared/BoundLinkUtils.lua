@@ -27,7 +27,7 @@ end
 function BoundLinkUtils.getLinkClasses(binder, linkName, from)
 	assert(type(binder) == "table", "Bad binder")
 	assert(type(linkName) == "string", "Bad linkName")
-	assert(typeof(from) == "Instance", "Bad froM")
+	assert(typeof(from) == "Instance", "Bad from")
 
 	local classes = {}
 	for _, value in pairs(LinkUtils.getAllLinkValues(linkName, from)) do
@@ -40,9 +40,9 @@ function BoundLinkUtils.getLinkClasses(binder, linkName, from)
 end
 
 function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
-	assert(type(binders) == "table")
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
+	assert(type(binders) == "table", "Bad binders")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad from")
 
 	if not next(binders) then
 		return {}

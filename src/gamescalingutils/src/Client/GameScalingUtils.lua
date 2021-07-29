@@ -7,7 +7,7 @@ local GuiService = game:GetService("GuiService")
 local GameScalingUtils = {}
 
 function GameScalingUtils.getUIScale(screenAbsoluteSize)
-	assert(typeof(screenAbsoluteSize) == "Vector2")
+	assert(typeof(screenAbsoluteSize) == "Vector2", "Bad screenAbsoluteSize")
 	local smallestAxis = math.min(screenAbsoluteSize.x, screenAbsoluteSize.y)
 	local height = screenAbsoluteSize.y
 
@@ -27,7 +27,7 @@ function GameScalingUtils.getUIScale(screenAbsoluteSize)
 end
 
 function GameScalingUtils.getDialogPadding(screenAbsoluteSize)
-	assert(typeof(screenAbsoluteSize) == "Vector2")
+	assert(typeof(screenAbsoluteSize) == "Vector2", "Bad screenAbsoluteSize")
 	local smallestAxis = math.min(screenAbsoluteSize.x, screenAbsoluteSize.y)
 
 	if smallestAxis <= 300 then

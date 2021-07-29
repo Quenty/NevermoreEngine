@@ -16,7 +16,7 @@ BaseAction.ClassName = "BaseAction"
 EnabledMixin:Add(BaseAction)
 
 function BaseAction.new(actionData)
-	assert(type(actionData) == "table")
+	assert(type(actionData) == "table", "Bad actionData")
 
 	local self = setmetatable({}, BaseAction)
 
@@ -95,7 +95,7 @@ function BaseAction:_updateShortcuts()
 	end
 
 	if self:IsEnabled() then
-		ContextActionService:BindAction(self._contextActionKey, function(actionName, userInputState, inputObject)
+		ContextActionService:BindAction(self._contextActionKey, function(_, userInputState, _)
 			if userInputState == Enum.UserInputState.Begin then
 				if self._actionData.CanActivateShortcutCallback then
 					if not self._actionData.CanActivateShortcutCallback() then

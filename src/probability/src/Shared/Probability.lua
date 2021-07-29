@@ -13,7 +13,7 @@ function Probability.normal(mean, standardDeviation)
 end
 
 function Probability.boundedNormal(mean, standardDeviation, hardMin, hardMax)
-	return math.clamp(Probability.normal(mean, standardDeviation), hardMax, hardMax)
+	return math.clamp(Probability.normal(mean, standardDeviation), hardMin, hardMax)
 end
 
 return Probability

@@ -14,7 +14,7 @@ local NUMBERS = {
 	[8] = { Enum.KeyCode.Eight; Enum.KeyCode.KeypadEight; };
 	[9] = { Enum.KeyCode.Nine; Enum.KeyCode.KeypadNine; };
 }
-df
+
 local NumberToInputKeyUtils = {}
 
 function NumberToInputKeyUtils.getInputsForNumber(number)

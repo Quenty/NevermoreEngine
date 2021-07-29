@@ -51,8 +51,8 @@ function IKService:GetRig(humanoid)
 end
 
 function IKService:PromiseRig(maid, humanoid)
-	assert(maid)
-	assert(typeof(humanoid) == "Instance")
+	assert(maid, "Bad maid")
+	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
 	local promise = promiseBoundClass(self._ikRigBinder, humanoid)
 	maid:GiveTask(promise)
@@ -60,14 +60,14 @@ function IKService:PromiseRig(maid, humanoid)
 end
 
 function IKService:RemoveRig(humanoid)
-	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	self._ikRigBinder:Unbind(humanoid)
 end
 
 function IKService:UpdateServerRigTarget(humanoid, target)
-	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
-	assert(typeof(target) == "Vector3")
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+	assert(typeof(target) == "Vector3", "Bad target")
 
 	local serverRig = self._ikRigBinder:Bind(humanoid)
 	if not serverRig then
@@ -79,7 +79,7 @@ function IKService:UpdateServerRigTarget(humanoid, target)
 end
 
 function IKService:_onServerEvent(player, target)
-	assert(typeof(target) == "Vector3")
+	assert(typeof(target) == "Vector3", "Bad target")
 
 	local humanoid = CharacterUtils.getAlivePlayerHumanoid(player)
 	if not humanoid then

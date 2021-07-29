@@ -13,8 +13,8 @@ local PlayersServicePromises = require("PlayersServicePromises")
 local HumanoidDescriptionUtils = {}
 
 function HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
-	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
-	assert(typeof(description) == "Instance" and description:IsA("HumanoidDescription"))
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+	assert(typeof(description) == "Instance" and description:IsA("HumanoidDescription"), "Bad description")
 
 	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()
@@ -43,7 +43,7 @@ function HumanoidDescriptionUtils.promiseFromUserName(userName)
 end
 
 function HumanoidDescriptionUtils.promiseFromUserId(userId)
-	assert(type(userId) == "number")
+	assert(type(userId) == "number", "Bad userId")
 
 	return Promise.defer(function(resolve, reject)
 		local description = nil
@@ -58,7 +58,7 @@ function HumanoidDescriptionUtils.promiseFromUserId(userId)
 			reject("API failed to return a description")
 			return
 		end
-		assert(typeof(description) == "Instance")
+		assert(typeof(description) == "Instance", "Bad description")
 		resolve(description)
 	end)
 end

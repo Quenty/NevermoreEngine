@@ -13,7 +13,7 @@ local IGNORE_CONSTRAINT_SET = {
 return function(originParts)
 	local startingTable
 	if type(originParts) == "table" then
-		assert(#originParts > 0)
+		assert(#originParts > 0, "Bad originParts")
 		startingTable = originParts
 	elseif typeof(originParts) == "Instance" then
 		startingTable = { originParts }

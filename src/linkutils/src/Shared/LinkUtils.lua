@@ -9,9 +9,9 @@ local promiseChild = require("promiseChild")
 local LinkUtils = {}
 
 function LinkUtils.createLink(linkName, from, to)
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
-	assert(typeof(to) == "Instance")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad from")
+	assert(typeof(to) == "Instance", "Bad to")
 
 	local objectValue = Instance.new("ObjectValue")
 	objectValue.Name = linkName
@@ -22,8 +22,8 @@ function LinkUtils.createLink(linkName, from, to)
 end
 
 function LinkUtils.getAllLinkValues(linkName, from)
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad from")
 
 	local linkValues = {}
 
@@ -41,8 +41,8 @@ end
 
 
 function LinkUtils.getAllLinks(linkName, from)
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad from")
 
 	local links = {}
 	for _, item in pairs(from:GetChildren()) do
@@ -55,8 +55,8 @@ function LinkUtils.getAllLinks(linkName, from)
 end
 
 function LinkUtils.getLinkValue(linkName, from)
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad from")
 
 	local objectValue = from:FindFirstChild(linkName)
 	if not objectValue then
@@ -73,9 +73,9 @@ function LinkUtils.getLinkValue(linkName, from)
 end
 
 function LinkUtils.promiseLinkValue(maid, linkName, from)
-	assert(maid)
-	assert(type(linkName) == "string")
-	assert(typeof(from) == "Instance")
+	assert(maid, "Bad maid")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad from")
 
 	local childPromise = promiseChild(from, linkName)
 	maid:GiveTask(childPromise)

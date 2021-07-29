@@ -52,7 +52,7 @@ function BoundLinkCollection:HasClass(class)
 end
 
 function BoundLinkCollection:TrackParent(parent)
-	assert(parent)
+	assert(parent, "Bad parent")
 
 	self._maid:GiveTask(parent.ChildAdded:Connect(function(child)
 		if child:IsA("ObjectValue") and child.Name == self._linkName then

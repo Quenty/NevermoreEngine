@@ -10,9 +10,9 @@ function AnimationTrackUtils.loadAnimationFromId(humanoid, animationId)
 end
 
 function AnimationTrackUtils.setWeightTargetIfNotSet(track, weight, fadeTime)
-	assert(track)
-	assert(weight)
-	assert(fadeTime)
+	assert(track, "Bad track")
+	assert(weight, "Bad weight")
+	assert(fadeTime, "Bad fadeTime")
 
 	if track.WeightTarget ~= weight then
 		track:AdjustWeight(weight, fadeTime)

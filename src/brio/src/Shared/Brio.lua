@@ -76,7 +76,7 @@ function Brio:ToMaid()
 end
 
 function Brio:GetValue()
-	assert(self._values)
+	assert(self._values, "Bad brio state")
 
 	return unpack(self._values, 1, self._values.n)
 end

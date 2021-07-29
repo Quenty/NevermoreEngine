@@ -10,8 +10,8 @@ local Table = require("Table")
 local InputKeyMapUtils = {}
 
 function InputKeyMapUtils.createKeyMap(inputMode, inputTypes)
-	assert(type(inputMode) == "table")
-	assert(type(inputTypes) == "table")
+	assert(type(inputMode) == "table", "Bad inputMode")
+	assert(type(inputTypes) == "table", "Bad inputTypes")
 
 	return Table.readonly({
 		inputMode = inputMode;
@@ -29,8 +29,8 @@ function InputKeyMapUtils.getInputTypesForActionBinding(inputKeyMapList)
 	local types = {}
 
 	for _, inputKeyMap in pairs(inputKeyMapList) do
-		assert(inputKeyMap.inputMode)
-		assert(inputKeyMap.inputTypes)
+		assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode")
+		assert(inputKeyMap.inputTypes, "Bad inputKeyMap.inputTypes")
 
 		for _, _type in pairs(inputKeyMap.inputTypes) do
 			if typeof(_type) == "EnumItem" then
@@ -84,7 +84,7 @@ function InputKeyMapUtils.getInputModes(inputKeyMapList)
 
 	local modes = {}
 	for _, inputKeyMap in pairs(inputKeyMapList) do
-		table.insert(modes, assert(inputKeyMap.inputMode))
+		table.insert(modes, assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode"))
 	end
 
 	return modes
@@ -92,8 +92,8 @@ end
 
 function InputKeyMapUtils.isTouchButton(inputKeyMapList)
 	for _, inputKeyMap in pairs(inputKeyMapList) do
-		assert(inputKeyMap.inputMode)
-		assert(inputKeyMap.inputTypes)
+		assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode")
+		assert(inputKeyMap.inputTypes, "Bad inputKeyMap.inputTypes")
 
 		for _, _type in pairs(inputKeyMap.inputTypes) do
 			if _type == "TouchButton" then
@@ -109,8 +109,8 @@ function InputKeyMapUtils.isTapInWorld(inputKeyMapList)
 	assert(type(inputKeyMapList) == "table", "inputKeyMap must be a table")
 
 	for _, inputKeyMap in pairs(inputKeyMapList) do
-		assert(inputKeyMap.inputMode)
-		assert(inputKeyMap.inputTypes)
+		assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode")
+		assert(inputKeyMap.inputTypes, "Bad inputKeyMap.inputTypes")
 
 		for _, _type in pairs(inputKeyMap.inputTypes) do
 			if _type == "Tap" then

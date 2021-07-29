@@ -48,16 +48,16 @@ function Octree:CreateNode(position, object)
 end
 
 function Octree:RadiusSearch(position, radius)
-	assert(typeof(position) == "Vector3")
-	assert(type(radius) == "number")
+	assert(typeof(position) == "Vector3", "Bad position")
+	assert(type(radius) == "number", "Bad radius")
 
 	local px, py, pz = position.x, position.y, position.z
 	return self:_radiusSearch(px, py, pz, radius)
 end
 
 function Octree:KNearestNeighborsSearch(position, k, radius)
-	assert(typeof(position) == "Vector3")
-	assert(type(radius) == "number")
+	assert(typeof(position) == "Vector3", "Bad position")
+	assert(type(radius) == "number", "Bad radius")
 
 	local px, py, pz = position.x, position.y, position.z
 	local objects, nodeDistances2 = self:_radiusSearch(px, py, pz, radius)

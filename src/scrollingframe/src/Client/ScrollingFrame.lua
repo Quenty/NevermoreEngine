@@ -55,7 +55,7 @@ function ScrollingFrame:SetScrollType(scrollType)
 end
 
 function ScrollingFrame:AddScrollbar(scrollbar)
-	assert(scrollbar)
+	assert(scrollbar, "Bad scrollbar")
 	scrollbar:SetScrollingFrame(self)
 
 	table.insert(self._scrollbars, scrollbar)
@@ -229,13 +229,13 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 		local processInput = self:_getInputProcessor(inputBeganObject)
 
 		if inputBeganObject.UserInputType == Enum.UserInputType.MouseButton1 then
-			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, gameProcessed)
+			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, _)
 				if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
 					totalScrollDistance = totalScrollDistance + math.abs(processInput(inputObject))
 				end
 			end))
 		elseif inputBeganObject.UserInputType == Enum.UserInputType.Touch then
-			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, gameProcessed)
+			maid:GiveTask(UserInputService.InputChanged:Connect(function(inputObject, _)
 				if inputObject.UserInputType == Enum.UserInputType.Touch then
 					totalScrollDistance = totalScrollDistance + math.abs(processInput(inputObject))
 				end
@@ -253,7 +253,7 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 			end
 		end)
 
-		maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, gameProcessed)
+		maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, _)
 			if inputObject == inputBeganObject then
 				self:StopDrag()
 			end
@@ -268,8 +268,8 @@ function ScrollingFrame:StartScrolling(inputBeganObject, options)
 end
 
 function ScrollingFrame:StartScrollbarScrolling(scrollbarContainer, inputBeganObject)
-	assert(scrollbarContainer)
-	assert(inputBeganObject)
+	assert(scrollbarContainer, "Bad scrollbarContainer")
+	assert(inputBeganObject, "Bad inputBeganObject")
 
 	local maid = Maid.new()
 

@@ -1,4 +1,4 @@
----
+--- Binary search implementation for Roblox in pure Lua
 -- @module BinarySearchUtils
 
 local BinarySearchUtils = {}

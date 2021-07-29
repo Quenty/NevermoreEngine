@@ -18,7 +18,7 @@ function SoundPromiseUtils.promiseLoaded(sound)
 
 	local conn
 
-	conn = sound.Loaded:Connect(function(value)
+	conn = sound.Loaded:Connect(function()
 		if sound.IsLoaded then
 			promise:Resolve()
 		end

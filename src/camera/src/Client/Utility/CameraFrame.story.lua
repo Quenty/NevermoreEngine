@@ -28,11 +28,11 @@ return function(target)
 		return cameraFrame.CFrame
 	end)
 
-	setup(function(t)
+	setup(function(_)
 		return b
 	end, Color3.new(1, 0.5, 0.5))
 
-	setup(function(t)
+	setup(function(_)
 		return a
 	end, Color3.new(0.5, 1, 0.5))
 

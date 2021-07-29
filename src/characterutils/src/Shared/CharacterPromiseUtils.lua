@@ -38,7 +38,7 @@ function CharacterPromiseUtil.promiseRootPart(humanoid)
 end
 
 function CharacterPromiseUtil.promiseCharacter(player)
-	assert(typeof(player) == "Instance")
+	assert(typeof(player) == "Instance", "Bad player")
 
 	local promise = Promise.new()
 

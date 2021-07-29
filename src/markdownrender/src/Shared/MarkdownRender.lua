@@ -163,7 +163,7 @@ function MarkdownRender:_getBullet(level)
 end
 
 function MarkdownRender:_renderList(listData)
-	assert(type(listData.Level) == "number" and listData.Level > 0)
+	assert(type(listData.Level) == "number" and listData.Level > 0, "Bad listData")
 
 	local frame = self:_getFrame()
 	frame.Name = ("List_%d"):format(listData.Level)

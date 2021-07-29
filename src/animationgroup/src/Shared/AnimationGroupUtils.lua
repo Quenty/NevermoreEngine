@@ -8,13 +8,13 @@ local AnimationTrackUtils = require("AnimationTrackUtils")
 local AnimationGroupUtils = {}
 
 function AnimationGroupUtils.createdWeightedTracks(humanoid, weightedAnimationList)
-	assert(humanoid)
-	assert(weightedAnimationList)
+	assert(humanoid, "Bad humanoid")
+	assert(weightedAnimationList, "Bad weightedAnimationList")
 
 	local tracks = {}
 	for _, weightedAnimation in pairs(weightedAnimationList) do
-		assert(weightedAnimation.animationId)
-		assert(weightedAnimation.weight)
+		assert(weightedAnimation.animationId, "Bad weightedAnimation.animationId")
+		assert(weightedAnimation.weight, "Bad weightedAnimation.weight")
 
 		table.insert(tracks, AnimationGroupUtils.createdWeightedTrack(
 			AnimationTrackUtils.loadAnimationFromId(humanoid, weightedAnimation.animationId),
@@ -24,8 +24,8 @@ function AnimationGroupUtils.createdWeightedTracks(humanoid, weightedAnimationLi
 end
 
 function AnimationGroupUtils.createdWeightedAnimation(animationId, weight)
-	assert(type(animationId) == "string")
-	assert(type(weight) == "number")
+	assert(type(animationId) == "string", "Bad animationId")
+	assert(type(weight) == "number", "Bad weight")
 
 	return {
 		animationId = animationId;
@@ -34,8 +34,8 @@ function AnimationGroupUtils.createdWeightedAnimation(animationId, weight)
 end
 
 function AnimationGroupUtils.createdWeightedTrack(track, weight)
-	assert(typeof(track) == "Instance" and track:IsA("AnimationTrack"))
-	assert(type(weight) == "number")
+	assert(typeof(track) == "Instance" and track:IsA("AnimationTrack"), "Bad track")
+	assert(type(weight) == "number", "Bad weight")
 
 	return {
 		track = track;
@@ -44,8 +44,8 @@ function AnimationGroupUtils.createdWeightedTrack(track, weight)
 end
 
 function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
-	assert(type(weightedTracks) == "table")
-	assert(#weightedTracks > 0)
+	assert(type(weightedTracks) == "table", "Bad weightedTracks")
+	assert(#weightedTracks > 0, "Bad weightedTracks")
 
 	if #weightedTracks == 1 then
 		return weightedTracks[1]

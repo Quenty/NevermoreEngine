@@ -5,8 +5,8 @@
 local ModuleScriptUtils = {}
 
 function ModuleScriptUtils.requireByName(_require, lookupTable)
-	assert(type(_require) == "function")
-	assert(type(lookupTable) == "table")
+	assert(type(_require) == "function", "Bad _require")
+	assert(type(lookupTable) == "table", "Bad lookupTable")
 
 	return function(_module)
 		if typeof(_module)  == "Instance" and _module:IsA("ModuleScript") then
@@ -27,13 +27,13 @@ function ModuleScriptUtils.requireByName(_require, lookupTable)
 end
 
 function ModuleScriptUtils.detectCyclicalRequires(_require)
-	assert(type(_require) == "function")
+	assert(type(_require) == "function", "Bad _require")
 
 	local stack = {}
 	local loading = {}
 
 	return function(_module, ...)
-		assert(typeof(_module) == "Instance" or type(_module) == "number")
+		assert(typeof(_module) == "Instance" or type(_module) == "number", "Bad _module")
 
 		if loading[_module] then
 			local cycle = ModuleScriptUtils.getCyclicalStateFromStack(stack, loading[_module])
@@ -48,7 +48,7 @@ function ModuleScriptUtils.detectCyclicalRequires(_require)
 		local result = _require(_module, ...)
 		loading[_module] = nil
 
-		assert(table.remove(stack) == _module)
+		assert(table.remove(stack) == _module, "Bad removal")
 
 		return result
 	end

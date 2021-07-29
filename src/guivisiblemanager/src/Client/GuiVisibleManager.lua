@@ -65,7 +65,7 @@ function GuiVisibleManager:BindToBoolValue(boolValue)
 end
 
 function GuiVisibleManager:SetPreferredTheme(theme)
-	assert(theme == "Light" or theme == "Dark")
+	assert(theme == "Light" or theme == "Dark", "Bad theme")
 
 	self._theme.Value = theme
 end
@@ -102,7 +102,7 @@ function GuiVisibleManager:_onPaneVisibleChanged()
 	end
 
 	if not self._paneVisible.Value then
-		assert(not self._maid._paneMaid)
+		assert(not self._maid._paneMaid, "_paneMaid is gone")
 		return
 	end
 
@@ -121,8 +121,8 @@ function GuiVisibleManager:_onPaneVisibleChanged()
 end
 
 function GuiVisibleManager:_handleNewPane(maid, pane)
-	assert(pane.SetVisible)
-	assert(self._maid._paneMaid == maid)
+	assert(pane.SetVisible, "No SetVisible on self, already destroyed")
+	assert(self._maid._paneMaid == maid, "Bad maid")
 
 	maid:GiveTask(pane)
 

@@ -18,7 +18,7 @@ end
 
 -- @param onSubscribe(subscription)
 function Observable.new(onSubscribe)
-	assert(type(onSubscribe) == "function")
+	assert(type(onSubscribe) == "function", "Bad onSubscribe")
 
 	return setmetatable({
 		_source = ENABLE_STACK_TRACING and debug.traceback() or "";
@@ -31,7 +31,7 @@ function Observable:Pipe(transformers)
 
 	local current = self
 	for _, transformer in pairs(transformers) do
-		assert(type(transformer) == "function")
+		assert(type(transformer) == "function", "Bad transformer")
 		current = transformer(current)
 		assert(Observable.isObservable(current))
 	end

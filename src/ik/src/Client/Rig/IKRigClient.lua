@@ -46,7 +46,7 @@ function IKRigClient:GetLocalPlayerAimer()
 end
 
 function IKRigClient:_handleRemoteEventClient(newTarget)
-	assert(typeof(newTarget) == "Vector3" or newTarget == nil)
+	assert(typeof(newTarget) == "Vector3" or newTarget == nil, "Bad newTarget")
 
 	local torso = self:GetTorso()
 
