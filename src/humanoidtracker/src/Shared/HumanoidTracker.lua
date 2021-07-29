@@ -101,7 +101,7 @@ function HumanoidTracker:_onCharacterChanged()
 	end)
 end
 
-function HumanoidTracker:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
+function HumanoidTracker:_handleHumanoidChanged(newHumanoid, _, maid)
 	if not newHumanoid then
 		self.AliveHumanoid.Value = nil
 		return

@@ -68,7 +68,7 @@ end
 
 -- Adds a new container to the provider for provision of assets
 function TemplateProvider:AddContainer(container)
-	assert(typeof(container) == "Instance")
+	assert(typeof(container) == "Instance", "Bad container")
 
 	if self._containersToInitializeSet then
 		self._containersToInitializeSet[container] = true
@@ -125,7 +125,7 @@ function TemplateProvider:_verifyInit()
 		return
 	end
 
-	if (not RunService:IsRunning()) then
+	if not RunService:IsRunning() then
 		-- Initialize for hoarcecat!
 		self:Init()
 	end
@@ -138,7 +138,7 @@ function TemplateProvider:_transformParent(getParent)
 		return getParent
 	elseif type(getParent) == "function" then
 		local container = getParent()
-		assert(typeof(container) == "Instance")
+		assert(typeof(container) == "Instance", "Bad container")
 		return container
 	else
 		error("Bad getParent type")

@@ -13,8 +13,8 @@ local TextFilterServiceConstants = require("TextFilterServiceConstants")
 local TextFilterServiceClient = {}
 
 function TextFilterServiceClient:PromiseNonChatStringForUser(text, fromUserId)
-	assert(type(text) == "string")
-	assert(type(fromUserId) == "number")
+	assert(type(text) == "string", "Bad text")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
 
 	return self:_promiseInvokeRemoteFunction(
 		TextFilterServiceConstants.REQUEST_NON_CHAT_STRING_FOR_USER,
@@ -23,8 +23,8 @@ function TextFilterServiceClient:PromiseNonChatStringForUser(text, fromUserId)
 end
 
 function TextFilterServiceClient:PromiseNonChatStringForBroadcast(text, fromUserId)
-	assert(type(text) == "string")
-	assert(type(fromUserId) == "number")
+	assert(type(text) == "string", "Bad text")
+	assert(type(fromUserId) == "number", "Bad fromUserId")
 
 	return self:_promiseInvokeRemoteFunction(
 		TextFilterServiceConstants.REQUEST_NON_CHAT_STRING_FOR_BROADCAST,
@@ -33,7 +33,7 @@ function TextFilterServiceClient:PromiseNonChatStringForBroadcast(text, fromUser
 end
 
 function TextFilterServiceClient:PromisePreviewNonChatStringForBroadcast(text)
-	assert(type(text) == "string")
+	assert(type(text) == "string", "Bad text")
 
 	return self:_promiseInvokeRemoteFunction(
 		TextFilterServiceConstants.REQUEST_PREVIEW_NON_CHAT_STRING_FOR_BROADCAST,
@@ -41,8 +41,8 @@ function TextFilterServiceClient:PromisePreviewNonChatStringForBroadcast(text)
 end
 
 function TextFilterServiceClient:_promiseInvokeRemoteFunction(request, text, ...)
-	assert(type(request) == "string")
-	assert(type(text) == "string")
+	assert(type(request) == "string", "Bad request")
+	assert(type(text) == "string", "Bad text")
 
 	local args = table.pack(...)
 
@@ -87,7 +87,7 @@ end
 function TextFilterServiceClient:_fakeTestFilter(text)
 	text = text:gsub("[fF][uU][cC][kK]", "####")
 
-	return Promise.defer(function(resolve, reject)
+	return Promise.defer(function(resolve, _)
 		-- Simulate testing
 		delay(0.5, function()
 			resolve(text)

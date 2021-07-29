@@ -143,7 +143,7 @@ lib.BezierAngularV = BezierAngularV
 --Regular tweening
 local TweenData={}
 local Tweens=setmetatable({},{
-	__index=function(self,i)
+	__index=function(_,i)
 		local data=TweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -156,10 +156,11 @@ local Tweens=setmetatable({},{
 			end
 		end
 	end,
-	__newindex=function(self,i,v)
+	__newindex=function(_,i,v)
 		local data=TweenData[i]
 		if data then
-			local timeNow,t0,t1,x0,x1,v0,v1=tick(),data.t0,data.t1
+			local timeNow,t0,t1=tick(),data.t0,data.t1
+			local x0,x1,v0,v1
 			if timeNow>t0 and timeNow<t1 then
 				local dt=t1-t0
 				local t=(timeNow-t0)/dt
@@ -191,7 +192,7 @@ lib.Tweens = Tweens
 --Quaternion tweening
 local QuaternionTweenData={}
 local QuaternionTweens=setmetatable({},{
-	__index=function(self,i)
+	__index=function(_,i)
 		local data=QuaternionTweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -204,10 +205,11 @@ local QuaternionTweens=setmetatable({},{
 			end
 		end
 	end,
-	__newindex=function(self,i,v)
+	__newindex=function(_,i,v)
 		local data=QuaternionTweenData[i]
 		if data then
-			local timeNow,t0,t1,q0,q1,w0,w1=tick(),data.t0,data.t1
+			local timeNow,t0,t1=tick(),data.t0,data.t1
+			local q0,q1,w0,w1
 			if timeNow>t0 and timeNow<t1 then
 				local dt=t1-t0
 				local t=(timeNow-t0)/dt
@@ -244,7 +246,7 @@ lib.QuaternionTweens = QuaternionTweens
 --CFrame tweening
 local CFrameTweenData={}
 local CFrameTweens=setmetatable({},{
-	__index=function(self,i)
+	__index=function(_,i)
 		local data=CFrameTweenData[i]
 		if data then
 			local timeNow,t0,t1=tick(),data.t0,data.t1
@@ -259,10 +261,11 @@ local CFrameTweens=setmetatable({},{
 			end
 		end
 	end,
-	__newindex=function(self,i,v)
+	__newindex=function(_,i,v)
 		local data=CFrameTweenData[i]
 		if data then
-			local timeNow,t0,t1,x0,x1,v0,v1,q0,q1,w0,w1=tick(),data.t0,data.t1
+			local timeNow,t0,t1=tick(),data.t0,data.t1
+			local x0,x1,v0,v1,q0,q1,w0,w1
 			if timeNow>t0 and timeNow<t1 then
 				local dt=t1-t0
 				local t=(timeNow-t0)/dt

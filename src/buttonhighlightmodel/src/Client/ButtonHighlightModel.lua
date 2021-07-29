@@ -13,7 +13,7 @@ ButtonHighlightModel.ClassName = "ButtonHighlightModel"
 ButtonHighlightModel.__index = ButtonHighlightModel
 
 function ButtonHighlightModel.new(button, onUpdate)
-	local self = setmetatable(BaseObject.new(assert(button)), ButtonHighlightModel)
+	local self = setmetatable(BaseObject.new(assert(button, "Bad button")), ButtonHighlightModel)
 
 	self._onUpdate = assert(onUpdate, "No onUpdate")
 
@@ -122,13 +122,13 @@ function ButtonHighlightModel:SetKeyDown(isKeyDown)
 end
 
 function ButtonHighlightModel:SetInteractionEnabled(interactionEnabled)
-	assert(type(interactionEnabled) == "boolean")
+	assert(type(interactionEnabled) == "boolean", "Bad interactionEnabled")
 
 	self.InteractionEnabled.Value = interactionEnabled
 end
 
 function ButtonHighlightModel:SetIsChoosen(isChoosen)
-	assert(type(isChoosen) == "boolean")
+	assert(type(isChoosen) == "boolean", "Bad isChoosen")
 
 	self._isChoosen.Value = isChoosen
 end

@@ -68,8 +68,8 @@ function PlayerDataStoreManager:RemovePlayerDataStore(player)
 end
 
 function PlayerDataStoreManager:GetDataStore(player)
-	assert(typeof(player) == "Instance")
-	assert(player:IsA("Player"))
+	assert(typeof(player) == "Instance", "Bad player")
+	assert(player:IsA("Player"), "Bad player")
 
 	if self._removing[player] then
 		warn("[PlayerDataStoreManager.GetDataStore] - Called GetDataStore while player is removing, cannot retrieve")
@@ -91,7 +91,7 @@ function PlayerDataStoreManager:PromiseAllSaves()
 end
 
 function PlayerDataStoreManager:_createDataStore(player)
-	assert(not self._datastores[player])
+	assert(not self._datastores[player], "Bad player")
 
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(player))
 
@@ -105,8 +105,8 @@ function PlayerDataStoreManager:_createDataStore(player)
 end
 
 function PlayerDataStoreManager:_removePlayerDataStore(player)
-	assert(typeof(player) == "Instance")
-	assert(player:IsA("Player"))
+	assert(typeof(player) == "Instance", "Bad player")
+	assert(player:IsA("Player"), "Bad player")
 
 	local datastore = self._datastores[player]
 	if not datastore then

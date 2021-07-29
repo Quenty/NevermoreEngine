@@ -8,10 +8,10 @@ ModuleProvider.__index = ModuleProvider
 function ModuleProvider.new(parent, checkModule, initModule, sortList)
 	local self = setmetatable({}, ModuleProvider)
 
-	assert(typeof(parent) == "Instance")
-	assert(checkModule == nil or type(checkModule) == "function")
-	assert(initModule == nil or type(initModule) == "function")
-	assert(sortList == nil or type(sortList) == "function")
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(checkModule == nil or type(checkModule) == "function", "Bad checkModule")
+	assert(initModule == nil or type(initModule) == "function", "Bad initModule")
+	assert(sortList == nil or type(sortList) == "function", "Bad sortList")
 
 	self._parent = parent or error("No parent")
 
@@ -23,7 +23,7 @@ function ModuleProvider.new(parent, checkModule, initModule, sortList)
 end
 
 function ModuleProvider:Init()
-	assert(not self._modulesList)
+	assert(not self._modulesList, "Already initialized")
 
 	self._modulesList = {}
 	self._moduleScriptToModule = {}
@@ -52,7 +52,7 @@ end
 
 function ModuleProvider:GetFromName(name)
 	assert(self._registry, "Not initialized yet")
-	assert(type(name) == "string")
+	assert(type(name) == "string", "Bad name")
 
 	return self._registry[name]
 end

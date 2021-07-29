@@ -23,12 +23,12 @@ function DataStoreWriter:SetRawData(data)
 	self._rawSetData = Table.deepCopy(data)
 end
 
-function DataStoreWriter:AddWriter(name, value)
-	assert(type(name) == "string")
-	assert(not self._writers[name])
-	assert(value)
+function DataStoreWriter:AddWriter(name, writer)
+	assert(type(name) == "string", "Bad name")
+	assert(not self._writers[name], "Writer already exists for name")
+	assert(writer, "Bad writer")
 
-	self._writers[name] = value
+	self._writers[name] = writer
 end
 
 -- Do merge here

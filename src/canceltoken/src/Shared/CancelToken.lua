@@ -14,7 +14,7 @@ CancelToken.__index = CancelToken
 function CancelToken.new(executor)
 	local self = setmetatable({}, CancelToken)
 
-	assert(type(executor) == "function")
+	assert(type(executor) == "function", "Bad executor")
 
 	self.PromiseCancelled = Promise.new()
 

@@ -11,9 +11,9 @@ local Maid = require("Maid")
 local AttributeUtils = {}
 
 function AttributeUtils.bindToBinder(instance, attributeName, binder)
-	assert(binder)
-	assert(typeof(instance) == "Instance")
-	assert(type(attributeName) == "string")
+	assert(binder, "Bad binder")
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(attributeName) == "string", "Bad attributeName")
 
 	local maid = Maid.new()
 

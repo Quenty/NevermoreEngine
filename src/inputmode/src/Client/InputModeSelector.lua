@@ -56,7 +56,7 @@ function InputModeSelector:Bind(updateBindFunction)
 	local maid = Maid.new()
 	self._maid[updateBindFunction] = maid
 
-	local function onChange(newMode, oldMode)
+	local function onChange(newMode, _)
 		maid._modeMaid = nil
 
 		if newMode then
@@ -73,15 +73,14 @@ function InputModeSelector:Bind(updateBindFunction)
 end
 
 function InputModeSelector:_addInputMode(inputMode)
-	assert(not self._maid[inputMode])
+	assert(not self._maid[inputMode], "Bad inputMode")
 
 	self._maid[inputMode] = inputMode.Enabled:Connect(function()
 		self._activeMode.Value = inputMode
 	end)
 
-	if not self._activeMode.Value then
-		self._activeMode.Value = inputMode
-	elseif inputMode:GetLastEnabledTime() > self._activeMode.Value:GetLastEnabledTime() then
+	if not self._activeMode.Value
+		or inputMode:GetLastEnabledTime() > self._activeMode.Value:GetLastEnabledTime() then
 		self._activeMode.Value = inputMode
 	end
 end

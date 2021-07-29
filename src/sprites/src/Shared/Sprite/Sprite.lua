@@ -6,10 +6,10 @@ Sprite.ClassName = "Sprite"
 Sprite.__index = Sprite
 
 function Sprite.new(data)
-	assert(data.Texture)
-	assert(data.Size)
-	assert(data.Position)
-	assert(data.Name)
+	assert(data.Texture, "Bad data")
+	assert(data.Size, "Bad data")
+	assert(data.Position, "Bad data")
+	assert(data.Name, "Bad data")
 
 	local self = setmetatable(data, Sprite)
 

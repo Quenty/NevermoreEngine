@@ -51,7 +51,7 @@ function ModelAppearance:DisableInteractions()
 end
 
 function ModelAppearance:SetCanCollide(canCollide)
-	assert(type(canCollide) == "boolean")
+	assert(type(canCollide) == "boolean", "Bad canCollide")
 
 	if self._canCollide == canCollide then
 		return
@@ -63,7 +63,7 @@ function ModelAppearance:SetCanCollide(canCollide)
 	end
 end
 
-function ModelAppearance:ResetCanCollide(canCollide)
+function ModelAppearance:ResetCanCollide()
 	self:SetCanCollide(true)
 end
 
@@ -90,7 +90,7 @@ function ModelAppearance:ResetTransparency()
 end
 
 function ModelAppearance:SetColor(color)
-	assert(typeof(color) == "Color3")
+	assert(typeof(color) == "Color3", "Bad color")
 
 	if self._color == color then
 		return

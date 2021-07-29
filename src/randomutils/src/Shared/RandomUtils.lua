@@ -54,7 +54,7 @@ function RandomUtils.weightedChoice(list, weights, random)
 	else
 		local total = 0
 		for i=1, #list do
-			assert(type(weights[i]) == "number")
+			assert(type(weights[i]) == "number", "Bad weights")
 			total = total + weights[i]
 		end
 

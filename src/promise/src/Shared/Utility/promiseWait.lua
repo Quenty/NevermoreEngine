@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Promise = require("Promise")
 
 return function(time)
-	return Promise.new(function(resolve, reject)
+	return Promise.new(function(resolve, _)
 		delay(time, function()
 			resolve()
 		end)

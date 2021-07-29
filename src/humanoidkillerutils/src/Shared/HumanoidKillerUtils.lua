@@ -18,8 +18,8 @@ function HumanoidKillerUtils.untagKiller(humanoid)
 end
 
 function HumanoidKillerUtils.tagKiller(humanoid, attacker)
-	assert(typeof(humanoid) == "Instance")
-	assert(typeof(attacker) == "Instance")
+	assert(typeof(humanoid) == "Instance", "Bad humanoid")
+	assert(typeof(attacker) == "Instance", "Bad attacker")
 
 	HumanoidKillerUtils.untagKiller(humanoid)
 
@@ -35,7 +35,7 @@ end
 
 -- killer must be a player
 function HumanoidKillerUtils.getKillerOfHumanoid(humanoid)
-	assert(typeof(humanoid) == "Instance")
+	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
 	local creator = humanoid:FindFirstChild(TAG_NAME)
 	if not creator then

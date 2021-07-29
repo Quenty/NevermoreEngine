@@ -71,10 +71,10 @@ function ThrottledFunction:_configureOrError(throttleConfig)
 		return
 	end
 
-	assert(type(throttleConfig) == "table")
+	assert(type(throttleConfig) == "table", "Bad throttleConfig")
 
 	for key, value in pairs(throttleConfig) do
-		assert(type(value) == "boolean")
+		assert(type(value) == "boolean", "Bad throttleConfig entry")
 
 		if key == "leading" then
 			self._callLeading = value

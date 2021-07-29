@@ -19,8 +19,8 @@ function MultipleClickUtils.getDoubleClickSignal(maid, gui)
 end
 
 function MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
-	assert(maid)
-	assert(typeof(gui) == "Instance")
+	assert(maid, "Bad maid")
+	assert(typeof(gui) == "Instance", "Bad gui")
 
 	local signal = Signal.new()
 	maid:GiveTask(signal)

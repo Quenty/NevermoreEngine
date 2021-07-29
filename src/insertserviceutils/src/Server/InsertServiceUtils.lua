@@ -12,7 +12,7 @@ local InsertServiceUtils = {}
 
 --- Promises the resulting asset is inserted from insert service, or a rejection
 function InsertServiceUtils.promiseAsset(assetId)
-	assert(type(assetId) == "number")
+	assert(type(assetId) == "number", "Bad assetId")
 
 	if assetId == 0 then
 		return Promise.rejected()

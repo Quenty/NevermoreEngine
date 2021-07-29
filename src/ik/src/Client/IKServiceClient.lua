@@ -34,8 +34,8 @@ function IKServiceClient:Start()
 end
 
 function IKServiceClient:PromiseRig(maid, humanoid)
-	assert(maid)
-	assert(typeof(humanoid) == "Instance")
+	assert(maid, "Bad maid")
+	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
 	local promise = promiseBoundClass(self._ikRigBinder, humanoid)
 	maid:GiveTask(promise)
@@ -43,7 +43,7 @@ function IKServiceClient:PromiseRig(maid, humanoid)
 end
 
 function IKServiceClient:GetRig(humanoid)
-	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"))
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._ikRigBinder:Get(humanoid)
 end

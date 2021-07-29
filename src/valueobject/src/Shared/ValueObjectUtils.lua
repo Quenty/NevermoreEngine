@@ -21,7 +21,7 @@ function ValueObjectUtils.syncValue(from, to)
 end
 
 function ValueObjectUtils.observeValue(valueObject)
-	assert(valueObject)
+	assert(valueObject, "Bad valueObject")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -37,7 +37,7 @@ function ValueObjectUtils.observeValue(valueObject)
 end
 
 function ValueObjectUtils.observeValueBrio(valueObject)
-	assert(valueObject)
+	assert(valueObject, "Bad valueObject")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()

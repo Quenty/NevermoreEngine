@@ -10,18 +10,18 @@ local Maid = require("Maid")
 local PathfindingUtils = {}
 
 function PathfindingUtils.promiseComputeAsync(path, start, finish)
-	assert(path)
-	assert(start)
-	assert(finish)
+	assert(path, "Bad path")
+	assert(start, "Bad start")
+	assert(finish, "Bad finish")
 
-	return Promise.defer(function(resolve, reject)
+	return Promise.defer(function(resolve, _)
 		path:ComputeAsync(start, finish)
 		resolve(path)
 	end)
 end
 
 function PathfindingUtils.promiseCheckOcclusion(path, startIndex)
-	return Promise.defer(function(resolve, reject)
+	return Promise.defer(function(resolve, _)
 		resolve(path:CheckOcclusionAsync(startIndex))
 	end)
 

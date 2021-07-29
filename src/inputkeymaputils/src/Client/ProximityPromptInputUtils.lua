@@ -10,6 +10,8 @@ local INPUT_MODES = require("INPUT_MODES")
 local ProximityPromptInputUtils = {}
 
 function ProximityPromptInputUtils.inputKeyMapFromPrompt(prompt)
+	assert(typeof(prompt) == "Instance", "Bad prompt")
+
 	return {
 		InputKeyMapUtils.createKeyMap(INPUT_MODES.Gamepads, { prompt.GamepadKeyCode });
 		InputKeyMapUtils.createKeyMap(INPUT_MODES.Keyboard, { prompt.KeyboardKeyCode })
@@ -17,8 +19,11 @@ function ProximityPromptInputUtils.inputKeyMapFromPrompt(prompt)
 end
 
 function ProximityPromptInputUtils.configurePromptFromInputKeyMap(prompt, inputKeyMapList)
-	local keyboard = ProximityPromptInputUtils.getFirstInputKeyCode(prompt, inputKeyMapList, INPUT_MODES.Keyboard)
-	local gamepad = ProximityPromptInputUtils.getFirstInputKeyCode(prompt, inputKeyMapList, INPUT_MODES.Gamepads)
+	assert(typeof(prompt) == "Instance", "Bad prompt")
+	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
+
+	local keyboard = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, INPUT_MODES.Keyboard)
+	local gamepad = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, INPUT_MODES.Gamepads)
 
 	if keyboard then
 		prompt.KeyboardKeyCode = keyboard
@@ -29,7 +34,10 @@ function ProximityPromptInputUtils.configurePromptFromInputKeyMap(prompt, inputK
 	end
 end
 
-function ProximityPromptInputUtils.getFirstInputKeyCode(prompt, inputKeyMapList, inputMode)
+function ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, inputMode)
+	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
+	assert(inputMode, "Bad inputMode")
+
 	for _, item in pairs(inputKeyMapList) do
 		for _, entry in pairs(item.inputTypes) do
 			if typeof(entry) == "EnumItem"

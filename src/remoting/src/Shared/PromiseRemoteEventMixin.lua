@@ -8,9 +8,9 @@ local promiseChild = require("promiseChild")
 local PromiseRemoteEventMixin = {}
 
 function PromiseRemoteEventMixin:Add(class, remoteEventName)
-	assert(remoteEventName)
-	assert(not class.PromiseRemoteEventMixin)
-	assert(not class._remoteEventName)
+	assert(remoteEventName, "Bad remoteEventName")
+	assert(not class.PromiseRemoteEventMixin, "Class already has PromiseRemoteEventMixin defined")
+	assert(not class._remoteEventName, "Class already has _remoteEventName defined")
 
 	class.PromiseRemoteEvent = self.PromiseRemoteEvent
 	class._remoteEventName = remoteEventName

@@ -31,6 +31,10 @@ Normal curve. [-1, 1]
 
 ## Changelog
 
+### 1.0.3
+- Fixed Probability.boundedNormal
+- Resolved linting issues
+
 ### 1.0.0
 Initial release
 

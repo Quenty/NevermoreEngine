@@ -10,8 +10,8 @@ local Promise = require("Promise")
 local MarketplaceUtils = {}
 
 function MarketplaceUtils.promiseProductInfo(assetId, infoType)
-	assert(type(assetId) == "number")
-	assert(typeof(infoType) == "EnumItem")
+	assert(type(assetId) == "number", "Bad assetId")
+	assert(typeof(infoType) == "EnumItem", "Bad infoType")
 
 	return Promise.defer(function(resolve, reject)
 		-- We hope this caches
@@ -30,8 +30,8 @@ function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 end
 
 function MarketplaceUtils.promiseUserOwnsGamePass(userId, gamePassId)
-	assert(typeof(userId) == "number")
-	assert(type(gamePassId) == "number")
+	assert(typeof(userId) == "number", "Bad userId")
+	assert(type(gamePassId) == "number", "Bad gamePassId")
 
 	return Promise.defer(function(resolve, reject)
 		local result
@@ -50,8 +50,8 @@ end
 
 -- Such as a hat or some other item!
 function MarketplaceUtils.promisePlayerOwnsAsset(player, assetId)
-	assert(typeof(player) == "Instance")
-	assert(type(assetId) == "number")
+	assert(typeof(player) == "Instance", "Bad player")
+	assert(type(assetId) == "number", "Bad assetId")
 
 	return Promise.defer(function(resolve, reject)
 		local result

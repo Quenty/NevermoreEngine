@@ -28,7 +28,7 @@ end
 
 --inputType is most likely an enum, but could be a string!
 function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
-	assert(inputType)
+	assert(inputType, "Bad inputType")
 
 	if self._scoredActionPickers[inputType] then
 		return self._scoredActionPickers[inputType]

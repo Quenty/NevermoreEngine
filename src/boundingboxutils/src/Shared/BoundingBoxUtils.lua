@@ -84,13 +84,25 @@ function BoundingBoxUtils.getBoundingBox(data, relativeTo)
 		local wsy = 0.5 * (abs(R10) * sx + abs(R11) * sy + abs(R12) * sz)
 		local wsz = 0.5 * (abs(R20) * sx + abs(R21) * sy + abs(R22) * sz)
 
-		if minx > x - wsx then minx = x - wsx end
-		if miny > y - wsy then miny = y - wsy end
-		if minz > z - wsz then minz = z - wsz end
+		if minx > x - wsx then
+			minx = x - wsx
+		end
+		if miny > y - wsy then
+			miny = y - wsy
+		end
+		if minz > z - wsz then
+			minz = z - wsz
+		end
 
-		if maxx < x + wsx then maxx = x + wsx end
-		if maxy < y + wsy then maxy = y + wsy end
-		if maxz < z + wsz then maxz = z + wsz end
+		if maxx < x + wsx then
+			maxx = x + wsx
+		end
+		if maxy < y + wsy then
+			maxy = y + wsy
+		end
+		if maxz < z + wsz then
+			maxz = z + wsz
+		end
 	end
 
 	local size = Vector3.new(maxx-minx, maxy-miny, maxz-minz)

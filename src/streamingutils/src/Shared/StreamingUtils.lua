@@ -9,9 +9,9 @@ local Promise = require("Promise")
 local StreamingUtils = {}
 
 function StreamingUtils.promiseStreamAround(player, position, timeOut)
-	assert(typeof(player) == "Instance")
-	assert(typeof(position) == "Vector3")
-	assert(type(timeOut) == "number" or timeOut == nil)
+	assert(typeof(player) == "Instance", "Bad player")
+	assert(typeof(position) == "Vector3", "Bad position")
+	assert(type(timeOut) == "number" or timeOut == nil, "Bad timeOut")
 
 	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()

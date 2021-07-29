@@ -18,9 +18,9 @@ local stateTypes = {
 }
 
 function Subscription.new(fireCallback, failCallback, completeCallback, onSubscribe)
-	assert(type(fireCallback) == "function" or fireCallback == nil)
-	assert(type(failCallback) == "function" or failCallback == nil)
-	assert(type(completeCallback) == "function" or completeCallback == nil)
+	assert(type(fireCallback) == "function" or fireCallback == nil, "Bad fireCallback")
+	assert(type(failCallback) == "function" or failCallback == nil, "Bad failCallback")
+	assert(type(completeCallback) == "function" or completeCallback == nil, "Bad completeCallback")
 
 	return setmetatable({
 		_state = stateTypes.PENDING;
@@ -87,8 +87,8 @@ function Subscription:Complete()
 end
 
 function Subscription:_giveCleanup(task)
-	assert(task)
-	assert(not self._cleanupTask)
+	assert(task, "Bad task")
+	assert(not self._cleanupTask, "Already have _cleanupTask")
 
 	if self._state ~= stateTypes.PENDING then
 		MaidTaskUtils.doTask(task)

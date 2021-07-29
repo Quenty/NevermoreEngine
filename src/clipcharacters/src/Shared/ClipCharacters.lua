@@ -24,7 +24,7 @@ function ClipCharacters.initServer()
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.COLLISION_GROUP_NAME, "Default", false)
 
 	local remoteFunction = GetRemoteFunction(REMOTE_FUNCTION_NAME)
-	remoteFunction.OnServerInvoke = function(player)
+	remoteFunction.OnServerInvoke = function(_)
 		return groupId
 	end
 end

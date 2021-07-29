@@ -16,7 +16,7 @@ TaggedTemplateProvider.__index = TaggedTemplateProvider
 function TaggedTemplateProvider.new(containerTagName)
 	local self = setmetatable(TemplateProvider.new(), TaggedTemplateProvider)
 
-	assert(type(containerTagName) == "string")
+	assert(type(containerTagName) == "string", "Bad containerTagName")
 
 	-- We prefer a default tag name so test scripts can still read assets for testing
 	self._tagsToInitializeSet = { [containerTagName] = true }
@@ -38,7 +38,7 @@ function TaggedTemplateProvider:Init()
 end
 
 function TaggedTemplateProvider:AddContainersFromTag(containerTagName)
-	assert(type(containerTagName) == "string")
+	assert(type(containerTagName) == "string", "Bad containerTagName")
 
 	if self._tagsToInitializeSet then
 		self._tagsToInitializeSet[containerTagName] = true

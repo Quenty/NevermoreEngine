@@ -17,9 +17,9 @@ function Color3SerializationUtils.isSerializedColor3(color3)
 end
 
 function Color3SerializationUtils.fromRGB(r, g, b)
-	assert(type(r) == "number")
-	assert(type(g) == "number")
-	assert(type(b) == "number")
+	assert(type(r) == "number", "Bad r")
+	assert(type(g) == "number", "Bad g")
+	assert(type(b) == "number", "Bad b")
 
 	return {
 		r,
@@ -29,8 +29,8 @@ function Color3SerializationUtils.fromRGB(r, g, b)
 end
 
 function Color3SerializationUtils.deserialize(color3)
-	assert(type(color3) == "table")
-	assert(#color3 == 3)
+	assert(type(color3) == "table", "Bad color3")
+	assert(#color3 == 3, "Bad color3")
 
 	return Color3.fromRGB(color3[1], color3[2], color3[3])
 end

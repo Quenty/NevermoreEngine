@@ -21,7 +21,7 @@ function IKRigUtils.getTimeBeforeNextUpdate(distance)
 end
 
 function IKRigUtils.getPlayerIKRig(binder, player)
-	assert(binder)
+	assert(binder, "Bad binder")
 
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid then

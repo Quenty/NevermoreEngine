@@ -11,6 +11,8 @@ local ParticleEngineConstants = require("ParticleEngineConstants")
 local ParticleEngineServer = {}
 
 function ParticleEngineServer:Init()
+	assert(not self._remoteEvent, "Already initialized")
+
 	self._remoteEvent = GetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME)
 
 	self._remoteEvent.OnServerEvent:Connect(function(player, particle)
@@ -30,7 +32,7 @@ end
 
 -- @param p PropertiesTable
 function ParticleEngineServer:ParticleNew(p)
-	assert(self._remoteEvent)
+	assert(self._remoteEvent, "Not initialized")
 
 	p.Position = p.Position or error("No Position")
 	p.Velocity = p.Velocity or Vector3.new()

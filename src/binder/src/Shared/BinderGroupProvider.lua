@@ -46,8 +46,8 @@ function BinderGroupProvider:Get(tagName)
 end
 
 function BinderGroupProvider:Add(groupName, binderGroup)
-	assert(type(groupName) == "string")
-	assert(type(binderGroup) == "table")
+	assert(type(groupName) == "string", "Bad groupName")
+	assert(type(binderGroup) == "table", "Bad binderGroup")
 	assert(not self._init, "Already initialized")
 	assert(not self:Get(groupName), "Duplicate groupName")
 

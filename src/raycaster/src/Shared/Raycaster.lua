@@ -36,7 +36,7 @@ function Raycaster:Ignore(tableOrInstance)
 end
 
 function Raycaster:FindPartOnRay(ray)
-	assert(typeof(ray) == "Ray")
+	assert(typeof(ray) == "Ray", "Bad ray")
 
 	local ignoreList = {}
 	for key, value in pairs(rawget(self, "_ignoreList")) do
@@ -74,13 +74,13 @@ end
 
 function Raycaster:__newindex(index, value)
 	if index == "IgnoreWater" then
-		assert(type(value) == "boolean")
+		assert(type(value) == "boolean", "Bad value")
 		rawset(self, "_ignoreWater", value)
 	elseif index == "MaxCasts" then
-		assert(type(value) == "number")
+		assert(type(value) == "number", "Bad value")
 		rawset(self, "_maxCasts", value)
 	elseif index == "Filter" then
-		assert(type(value) == "function")
+		assert(type(value) == "function", "Bad value")
 		rawset(self, "_filter", value)
 	else
 		error(("Unknown index %q"):format(tostring(index)))

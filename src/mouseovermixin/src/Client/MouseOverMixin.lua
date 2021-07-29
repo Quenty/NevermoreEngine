@@ -9,8 +9,8 @@ local ButtonUtils = require("ButtonUtils")
 local MouseOverMixin = {}
 
 function MouseOverMixin:Add(class)
-	assert(class)
-	assert(not class.GetMouseOverColor)
+	assert(class, "Bad class")
+	assert(not class.GetMouseOverColor, "Class already has GetMouseOverColor")
 
 	class.GetMouseOverBoolValue = self.GetMouseOverBoolValue
 	class.AddMouseOverEffect = self.AddMouseOverEffect

@@ -25,11 +25,11 @@ function ActionManager.new()
 	self.ActionAdded = Signal.new() -- :Fire(action)
 
 	-- Stop actions while tool is in play
-	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(tool)
+	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(_)
 		self:StopCurrentAction()
 	end)
 
-	self._maid:GiveTask(self.ActiveAction.Changed:Connect(function(value, oldValue)
+	self._maid:GiveTask(self.ActiveAction.Changed:Connect(function(value, _)
 		local maid = Maid.new()
 		if value then
 			maid:GiveTask(function()

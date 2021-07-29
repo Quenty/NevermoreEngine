@@ -13,8 +13,8 @@ end
 
 function NetworkOwnerService:AddSetNetworkOwnerHandle(part, player)
 	assert(self._partOwnerData, "Not initialized")
-	assert(typeof(part) == "Instance" and part:IsA("BasePart"))
-	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil)
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 
 	if player == nil then
 		player = SERVER_FLAG

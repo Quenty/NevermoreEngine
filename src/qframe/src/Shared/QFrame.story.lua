@@ -37,7 +37,7 @@ return function(target)
 		return getFinish(t)
 	end, Color3.new(1, 0.5, 0.5))
 
-	setup(function(t)
+	setup(function(_)
 		return a
 	end, Color3.new(0.5, 1, 0.5))
 
@@ -62,27 +62,6 @@ return function(target)
 		local result = slerp(a, getFinish(t), t)
 		return result
 	end, Color3.new(0.5, 0.5, 1))
-
-	setup(function(t)
-		if t <= 0 then
-			return a
-		elseif t >= 1 then
-			return getFinish(t)
-		end
-
-		local function exp(q)
-
-		end
-
-		local function log()
-
-		end
-
-		local b = getFinish(t)
-
-		local result = exp((1 - t)*log(a*b^-1))*b
-		return result
-	end, Color3.new(1, 0.5, 1))
 
 	setup(function(t)
 		local node0 = CubicSplineUtils.newSplineNode(0, a, QFrame.new())

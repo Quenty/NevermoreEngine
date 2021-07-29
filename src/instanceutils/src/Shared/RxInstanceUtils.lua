@@ -11,17 +11,17 @@ local Rx = require("Rx")
 
 local RxInstanceUtils = {}
 
-function RxInstanceUtils.observeProperty(instance, property)
+function RxInstanceUtils.observeProperty(instance, propertyName)
 	assert(typeof(instance) == "Instance", "Not an instance")
-	assert(type(property) == "string")
+	assert(type(propertyName) == "string", "Bad propertyName")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GiveTask(instance:GetPropertyChangedSignal(property):Connect(function()
-			sub:Fire(instance[property])
+		maid:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(function()
+			sub:Fire(instance[propertyName])
 		end))
-		sub:Fire(instance[property])
+		sub:Fire(instance[propertyName])
 
 		return maid
 	end)
@@ -37,9 +37,9 @@ end
 
 -- Returns a brio of the property value
 function RxInstanceUtils.observePropertyBrio(instance, property, predicate)
-	assert(typeof(instance) == "Instance")
-	assert(type(property) == "string")
-	assert(type(predicate) == "function" or predicate == nil)
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(property) == "string", "Bad property")
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -63,9 +63,9 @@ function RxInstanceUtils.observePropertyBrio(instance, property, predicate)
 end
 
 function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
-	assert(typeof(parent) == "Instance")
-	assert(type(className) == "string")
-	assert(type(name) == "string")
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(className) == "string", "Bad className")
+	assert(type(name) == "string", "Bad name")
 
 	return Observable.new(function(sub)
 		local topMaid = Maid.new()
@@ -109,8 +109,8 @@ function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 end
 
 function RxInstanceUtils.observeChildrenOfClassBrio(parent, className)
-	assert(typeof(parent) == "Instance")
-	assert(type(className) == "string")
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(className) == "string", "Bad className")
 
 	return RxInstanceUtils.observeChildrenBrio(parent, function(child)
 		return child:IsA(className)
@@ -118,8 +118,8 @@ function RxInstanceUtils.observeChildrenOfClassBrio(parent, className)
 end
 
 function RxInstanceUtils.observeChildrenBrio(parent, predicate)
-	assert(typeof(parent) == "Instance")
-	assert(type(predicate) == "function" or predicate == nil)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -146,8 +146,8 @@ function RxInstanceUtils.observeChildrenBrio(parent, predicate)
 end
 
 function RxInstanceUtils.observeDescendants(parent, predicate)
-	assert(typeof(parent) == "Instance")
-	assert(type(predicate) == "function" or predicate == nil)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()

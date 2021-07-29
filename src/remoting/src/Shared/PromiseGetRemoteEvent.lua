@@ -21,7 +21,7 @@ elseif RunService:IsServer() then
 	end
 else -- RunService:IsClient()
 	return function(name)
-		assert(type(name) == "string")
+		assert(type(name) == "string", "Bad name")
 
 		local storage = ReplicatedStorage:FindFirstChild(ResourceConstants.REMOTE_EVENT_STORAGE_NAME)
 		if storage then
@@ -31,7 +31,7 @@ else -- RunService:IsClient()
 			end
 		end
 
-		return Promise.defer(function(resolve, reject)
+		return Promise.defer(function(resolve, _)
 			resolve(GetRemoteEvent(name))
 		end)
 	end

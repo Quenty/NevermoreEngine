@@ -34,7 +34,7 @@ function BasicPane.new(gui)
 end
 
 function BasicPane:SetVisible(isVisible, doNotAnimate)
-	assert(type(isVisible) == "boolean")
+	assert(type(isVisible) == "boolean", "Bad isVisible")
 
 	if self._visible ~= isVisible then
 		self._visible = isVisible

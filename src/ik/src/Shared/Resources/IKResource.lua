@@ -13,9 +13,9 @@ IKResource.__index = IKResource
 function IKResource.new(data)
 	local self = setmetatable(BaseObject.new(), IKResource)
 
-	self._data = data or error("No data")
-	assert(data.name)
-	assert(data.robloxName)
+	self._data = assert(data, "Bad data")
+	assert(data.name, "Bad data.name")
+	assert(data.robloxName, "Bad data.robloxName")
 
 	self._instance = nil
 	self._childResourceMap = {} -- [robloxName] = { data = data; ikResource = ikResource }
@@ -121,12 +121,12 @@ end
 
 function IKResource:_addResource(ikResource)
 	local data = ikResource:GetData()
-	assert(data.name)
-	assert(data.robloxName)
+	assert(data.name, "Bad data.name")
+	assert(data.robloxName, "Bad data.robloxName")
 
-	assert(type(data.robloxName) == "string")
-	assert(not self._childResourceMap[data.robloxName])
-	assert(not self._descendantLookupMap[data.name])
+	assert(type(data.robloxName) == "string", "Bad data.robloxName")
+	assert(not self._childResourceMap[data.robloxName], "Data already exists")
+	assert(not self._descendantLookupMap[data.name], "Data already exists")
 
 	self._childResourceMap[data.robloxName] = ikResource
 

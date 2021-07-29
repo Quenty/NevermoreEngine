@@ -187,7 +187,7 @@ function Draw.point(vector3, color, parent, diameter)
 		vector3 = vector3.p
 	end
 
-	assert(typeof(vector3) == "Vector3")
+	assert(typeof(vector3) == "Vector3", "Bad vector3")
 
 	color = color or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
@@ -265,7 +265,7 @@ function Draw.cframe(cframe)
 end
 
 function Draw.box(cframe, size, color)
-	assert(typeof(size) == "Vector3")
+	assert(typeof(size) == "Vector3", "Bad size")
 
 	color = color or Draw._defaultColor
 	cframe = typeof(cframe) == "Vector3" and CFrame.new(cframe) or cframe

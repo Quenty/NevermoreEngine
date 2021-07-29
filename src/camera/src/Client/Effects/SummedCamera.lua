@@ -29,7 +29,7 @@ end
 -- If "World", then it just adds positions.
 -- If "Relative", then it moves position relative to cameraA's CFrame.
 function SummedCamera:SetMode(mode)
-	assert(mode == "World" or mode == "Relative")
+	assert(mode == "World" or mode == "Relative", "Bad mode")
 	self._mode = mode
 
 	return self

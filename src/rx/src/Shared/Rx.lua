@@ -17,14 +17,14 @@ local Rx = {
 	EMPTY = Observable.new(function(sub)
 		sub:Complete()
 	end);
-	NEVER = Observable.new(function(sub)
+	NEVER = Observable.new(function(_)
 
 	end);
 }
 
 -- https://rxjs-dev.firebaseapp.com/api/index/function/pipe
 function Rx.pipe(transformers)
-	assert(type(transformers) == "table")
+	assert(type(transformers) == "table", "Bad transformers")
 	for index, transformer in pairs(transformers) do
 		if type(transformer) ~= "function" then
 			error(("[Rx.pipe] Bad pipe value of type %q at index %q, expected function")
@@ -33,7 +33,7 @@ function Rx.pipe(transformers)
 	end
 
 	return function(source)
-		assert(source)
+		assert(source, "Bad source")
 
 		local current = source
 		for key, transformer in pairs(transformers) do
@@ -76,7 +76,7 @@ end
 
 -- https://rxjs-dev.firebaseapp.com/api/operators/merge
 function Rx.merge(observables)
-	assert(type(observables) == "table")
+	assert(type(observables) == "table", "Bad observables")
 
 	for _, item in pairs(observables) do
 		assert(Observable.isObservable(item), "Not an observable")
@@ -144,9 +144,9 @@ end
 
 -- https://rxjs-dev.firebaseapp.com/api/operators/tap
 function Rx.tap(onFire, onError, onComplete)
-	assert(type(onFire) == "function" or onFire == nil)
-	assert(type(onError) == "function" or onError == nil)
-	assert(type(onComplete) == "function" or onComplete == nil)
+	assert(type(onFire) == "function" or onFire == nil, "Bad onFire")
+	assert(type(onError) == "function" or onError == nil, "Bad onError")
+	assert(type(onComplete) == "function" or onComplete == nil, "Bad onComplete")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -186,7 +186,7 @@ end
 
 -- Like start, but also from (list!)
 function Rx.startFrom(callback)
-	assert(type(callback) == "function")
+	assert(type(callback) == "function", "Bad callback")
 	return function(source)
 		return Observable.new(function(sub)
 			for _, value in pairs(callback()) do
@@ -200,7 +200,7 @@ end
 
 -- https://rxjs-dev.firebaseapp.com/api/operators/startWith
 function Rx.startWith(values)
-	assert(type(values) == "table")
+	assert(type(values) == "table", "Bad values")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -449,7 +449,7 @@ end
 
 -- Sort of equivalent of promise.then()
 function Rx.flatMap(project, resultSelector)
-	assert(type(project) == "function")
+	assert(type(project) == "function", "Bad project")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -579,7 +579,7 @@ end
 -- https://rxjs-dev.firebaseapp.com/api/operators/finalize
 -- https://github.com/ReactiveX/rxjs/blob/master/src/internal/operators/finalize.ts
 function Rx.finalize(finalizerCallback)
-	assert(type(finalizerCallback) == "function")
+	assert(type(finalizerCallback) == "function", "Bad finalizerCallback")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -630,7 +630,7 @@ end
 
 -- NOTE: Untested
 function Rx.catchError(callback)
-	assert(type(callback) == "function")
+	assert(type(callback) == "function", "Bad callback")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -670,7 +670,7 @@ function Rx.catchError(callback)
 end
 
 function Rx.combineLatest(observables)
-	assert(type(observables) == "table")
+	assert(type(observables) == "table", "Bad observables")
 
 	for _, observable in pairs(observables) do
 		assert(Observable.isObservable(observable), "Not an observable")
@@ -742,8 +742,8 @@ end
 
 -- https://rxjs.dev/api/operators/take
 function Rx.take(number)
-	assert(type(number) == "number")
-	assert(number >= 0)
+	assert(type(number) == "number", "Bad number")
+	assert(number >= 0, "Bad number")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -789,7 +789,7 @@ end
 -- https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom
 -- https://medium.com/js-in-action/rxjs-nosy-combinelatest-vs-selfish-withlatestfrom-a957e1af42bf
 function Rx.withLatestFrom(inputObservables)
-	assert(inputObservables)
+	assert(inputObservables, "Bad inputObservables")
 
 	for _, observable in pairs(inputObservables) do
 		assert(Observable.isObservable(observable))
@@ -826,7 +826,7 @@ end
 
 -- https://rxjs-dev.firebaseapp.com/api/operators/scan
 function Rx.scan(accumulator, seed)
-	assert(type(accumulator) == "function")
+	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return function(source)
 		return Observable.new(function(sub)
@@ -844,8 +844,8 @@ end
 -- @param throttleConfig { leading = true; trailing = true; }
 -- Note that on complete, the last item is not included, for now, unlike the existing version in rxjs.
 function Rx.throttleTime(duration, throttleConfig)
-	assert(type(duration) == "number")
-	assert(type(throttleConfig) == "table" or throttleConfig == nil)
+	assert(type(duration) == "number", "Bad duration")
+	assert(type(throttleConfig) == "table" or throttleConfig == nil, "Bad throttleConfig")
 
 	return function(source)
 		return Observable.new(function(sub)

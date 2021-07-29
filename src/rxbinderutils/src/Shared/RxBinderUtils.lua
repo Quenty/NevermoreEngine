@@ -15,21 +15,21 @@ local RxLinkUtils = require("RxLinkUtils")
 local RxBinderUtils = {}
 
 function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
-	assert(linkName)
-	assert(parent)
-	assert(binder)
+	assert(linkName, "Bad linkName")
+	assert(parent, "Bad parent")
+	assert(binder, "Bad binder")
 
 	return RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		:Pipe({
-			RxBrioUtils.flatMap(function(link, linkValue)
+			RxBrioUtils.flatMap(function(_, linkValue)
 				return RxBinderUtils.observeBoundClassBrio(binder, linkValue)
 			end);
 		});
 end
 
 function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
-	assert(binder)
-	assert(typeof(instance) == "Instance")
+	assert(binder, "Bad binder")
+	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
 		:Pipe({
@@ -40,8 +40,8 @@ function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
 end
 
 function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
-	assert(binders)
-	assert(typeof(instance) == "Instance")
+	assert(binders, "Bad binders")
+	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
 		:Pipe({
@@ -52,8 +52,8 @@ function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
 end
 
 function RxBinderUtils.observeBoundClass(binder, instance)
-	assert(type(binder) == "table")
-	assert(typeof(instance) == "Instance")
+	assert(type(binder) == "table", "Bad binder")
+	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -68,8 +68,8 @@ function RxBinderUtils.observeBoundClass(binder, instance)
 end
 
 function RxBinderUtils.observeBoundClassBrio(binder, instance)
-	assert(type(binder) == "table")
-	assert(typeof(instance) == "Instance")
+	assert(type(binder) == "table", "Bad binder")
+	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -93,8 +93,8 @@ function RxBinderUtils.observeBoundClassBrio(binder, instance)
 end
 
 function RxBinderUtils.observeBoundClassesBrio(binders, instance)
-	assert(binders)
-	assert(typeof(instance) == "Instance")
+	assert(binders, "Bad binders")
+	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local observables = {}
 
@@ -109,7 +109,7 @@ end
 
 
 function RxBinderUtils.observeAllBrio(binder)
-	assert(type(binder) == "table")
+	assert(type(binder) == "table", "Bad binder")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()

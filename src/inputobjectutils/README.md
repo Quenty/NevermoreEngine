@@ -39,6 +39,9 @@ Generates a circle of rays including the center ray
 
 ## Changelog
 
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.0
 Initial release
 

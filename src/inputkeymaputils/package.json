@@ -19,6 +19,7 @@
     "directory": "src/inputkeymaputils/"
   },
   "dependencies": {
+    "@quenty/inputmode": "^1.0.2",
     "@quenty/table": "^1.0.2"
   },
   "peerDependencies": {

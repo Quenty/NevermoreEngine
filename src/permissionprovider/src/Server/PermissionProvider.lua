@@ -21,10 +21,10 @@ function PermissionProvider.new(config)
 	local self = setmetatable(BaseObject.new(), PermissionProvider)
 
 
-	self._config = Table.readonly(assert(config))
+	self._config = Table.readonly(assert(config, "Bad config"))
 	assert(self._config.type == PermissionProviderConstants.GROUP_RANK_CONFIG_TYPE,
 		"Only one supported config type")
-	self._remoteFunctionName = assert(self._config.remoteFunctionName)
+	self._remoteFunctionName = assert(self._config.remoteFunctionName, "Bad config")
 
 	self._adminsCache = {} -- [userId] = true
 	self._creatorCache = {} -- [userId] = true
@@ -35,7 +35,7 @@ function PermissionProvider.new(config)
 end
 
 function PermissionProvider:Init()
-	assert(self._config)
+	assert(self._config, "Bad config")
 
 	self._remoteFunction = GetRemoteFunction(self._remoteFunctionName)
 	self._remoteFunction.OnServerInvoke = function(...)
@@ -68,21 +68,21 @@ end
 
 -- May return false if not loaded
 function PermissionProvider:IsCreator(player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._creatorCache[player.UserId]
 end
 
 -- May return false if not loaded
 function PermissionProvider:IsAdmin(player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return self._adminsCache[player.UserId]
 end
 
 function PermissionProvider:PromiseIsCreator(player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"))
-	assert(player:IsDescendantOf(game))
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(player:IsDescendantOf(game), "Bad player")
 
 	return self:_promiseRankInGroup(player)
 		:Then(function(rank)
@@ -116,7 +116,7 @@ function PermissionProvider:_onServerInvoke(player)
 end
 
 function PermissionProvider:_handlePlayer(player)
-	assert(player)
+	assert(player, "Bad player")
 
 	self:_promiseRankInGroup(player)
 		:Then(function(rank)
@@ -131,7 +131,7 @@ function PermissionProvider:_handlePlayer(player)
 end
 
 function PermissionProvider:_promiseRankInGroup(player)
-	assert(typeof(player) == "Instance")
+	assert(typeof(player) == "Instance", "Bad player")
 
 	if self._promiseRankPromisesCache[player.UserId] then
 		return self._promiseRankPromisesCache[player.UserId]

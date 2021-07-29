@@ -14,7 +14,7 @@ local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = GenericScreenGuiProvider
 
 function GenericScreenGuiProvider.new(orders)
-	assert(type(orders) == "table")
+	assert(type(orders) == "table", "Bad orders")
 
 	local self = setmetatable({
 		_order = orders;
@@ -31,7 +31,7 @@ function GenericScreenGuiProvider:__index(index)
 	error(("Bad index %q"):format(tostring(index)), 2)
 end
 
-function GenericScreenGuiProvider:__newindex(index, value)
+function GenericScreenGuiProvider:__newindex(index, _)
 	error(("Bad index %q"):format(tostring(index)), 2)
 end
 
@@ -59,15 +59,15 @@ function GenericScreenGuiProvider:Get(orderName)
 end
 
 function GenericScreenGuiProvider:GetDisplayOrder(orderName)
-	assert(type(orderName) == "string")
+	assert(type(orderName) == "string", "Bad orderName")
 	assert(self._order[orderName], ("No DisplayOrder with orderName '%s'"):format(tostring(orderName)))
 
 	return self._order[orderName]
 end
 
 function GenericScreenGuiProvider:SetupMockParent(target)
-	assert(not RunService:IsRunning())
-	assert(target)
+	assert(not RunService:IsRunning(), "Bad target")
+	assert(target, "Bad target")
 
 	rawset(self, "_mockParent", target)
 
@@ -79,7 +79,7 @@ function GenericScreenGuiProvider:SetupMockParent(target)
 end
 
 function GenericScreenGuiProvider:_mockScreenGui(orderName)
-	assert(type(orderName) == "string")
+	assert(type(orderName) == "string", "Bad orderName")
 	assert(rawget(self, "_mockParent"), "No _mockParent set")
 
 	local displayOrder = self:GetDisplayOrder(orderName)

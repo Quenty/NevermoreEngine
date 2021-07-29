@@ -8,8 +8,8 @@ local Promise = require("Promise")
 -- NOTE: To use properly please make sure to reject the promise for proper GC if the object requiring
 -- this value is GCed.
 return function(instance, propertyName)
-	assert(typeof(instance) == "Instance")
-	assert(type(propertyName) == "string")
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(propertyName) == "string", "Bad propertyName")
 
 	local result = instance[propertyName]
 	if result then

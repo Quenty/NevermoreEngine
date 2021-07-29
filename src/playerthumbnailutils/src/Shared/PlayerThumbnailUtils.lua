@@ -13,7 +13,7 @@ local MAX_TRIES = 5
 local PlayerThumbnailUtils = {}
 
 function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbnailSize)
-	assert(type(userId) == "number")
+	assert(type(userId) == "number", "Bad userId")
 	thumbnailType = thumbnailType or Enum.ThumbnailType.HeadShot
 	thumbnailSize = thumbnailSize or Enum.ThumbnailSize.Size100x100
 

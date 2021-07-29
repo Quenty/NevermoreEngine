@@ -20,7 +20,7 @@ function PartTouchingCalculator.new()
 end
 
 function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
-	assert(humanoid)
+	assert(humanoid, "Bad humanoid")
 	assert(parts, "Must have parts")
 
 	local humanoidParts = {}

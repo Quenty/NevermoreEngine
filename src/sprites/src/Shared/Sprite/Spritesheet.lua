@@ -23,7 +23,7 @@ function Spritesheet:GetPreloadAssetId()
 end
 
 function Spritesheet:AddSprite(index, position, size)
-	assert(not self._sprites[index])
+	assert(not self._sprites[index], "Already exists")
 
 	local sprite = Sprite.new({
 		Texture = self._texture;

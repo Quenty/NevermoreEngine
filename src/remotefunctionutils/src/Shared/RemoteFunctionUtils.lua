@@ -9,7 +9,7 @@ local Promise = require("Promise")
 local RemoteFunctionUtils = {}
 
 function RemoteFunctionUtils.promiseInvokeServer(remoteFunction, ...)
-	assert(typeof(remoteFunction) == "Instance" and remoteFunction:IsA("RemoteFunction"))
+	assert(typeof(remoteFunction) == "Instance" and remoteFunction:IsA("RemoteFunction"), "Bad remoteFunction")
 
 	local args = table.pack(...)
 

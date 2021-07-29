@@ -25,7 +25,7 @@ function BinderGroup.new(binders, validateConstructor)
 end
 
 function BinderGroup:AddList(binders)
-	assert(type(binders) == "table")
+	assert(type(binders) == "table", "Bad binders")
 
 	-- Assume to be using osyris's typechecking library,
 	-- we have an optional constructor to validate binder classes.

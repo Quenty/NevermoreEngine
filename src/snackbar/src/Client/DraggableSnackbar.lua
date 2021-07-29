@@ -114,9 +114,9 @@ function DraggableSnackbar:StartTrack(X, Y)
 	end)
 	self._draggingCoroutine = localDraggingCoroutine
 
-	self._whileActiveMaid.DraggingEnded = UserInputService.InputEnded:Connect(function(InputObject)
+	self._whileActiveMaid.DraggingEnded = UserInputService.InputEnded:Connect(function(inputObject)
 		if self._draggingCoroutine == localDraggingCoroutine then
-			if InputObject.UserInputType.Name == "MouseButton1" then
+			if inputObject.UserInputType.Name == "MouseButton1" then
 				self:EndTrack()
 			end
 		else
@@ -124,7 +124,7 @@ function DraggableSnackbar:StartTrack(X, Y)
 		end
 	end)
 
-	self._whileActiveMaid.TouchDraggingEnded = UserInputService.TouchEnded:Connect(function(InputObject)
+	self._whileActiveMaid.TouchDraggingEnded = UserInputService.TouchEnded:Connect(function(_)
 		if self._draggingCoroutine == localDraggingCoroutine then
 			self:EndTrack()
 		else
@@ -191,7 +191,7 @@ end
 
 function DraggableSnackbar:Dismiss()
 	if self._visible then
-		if (self._draggingCoroutine) then
+		if self._draggingCoroutine then
 			self._shouldDismiss = true
 		else
 			self._visible = false

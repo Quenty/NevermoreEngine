@@ -66,6 +66,9 @@ Calls a method for each linked class for each binder, given the method name and 
 
 ## Changelog
 
+### 1.0.3
+- Added linting via selene and fixed code to respect linting
+
 ### 1.0.0
 Initial release
 

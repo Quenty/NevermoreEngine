@@ -43,7 +43,7 @@ function HintScoringUtils.getHumanoidPositionDirection(humanoid)
 end
 
 function HintScoringUtils.getAdorneeInRegionSet(position, radius, ignoreList, getAdorneeFunction)
-	assert(type(getAdorneeFunction) == "function")
+	assert(type(getAdorneeFunction) == "function", "Bad getAdorneeFunction")
 
 	local region3 = Region3Utils.fromRadius(position, radius)
 	local adorneesSet = {}
@@ -60,12 +60,12 @@ end
 
 if DEBUG_ENABLED then
 	function HintScoringUtils.debugScore(adornee, score)
-		assert(adornee)
+		assert(adornee, "Bad adornee")
 
 		debugMaid:GiveTask(Draw.text(AdorneeUtils.getCenter(adornee), ("%0.6f"):format(score)))
 	end
 else
-	function HintScoringUtils.debugScore(adornee, score)
+	function HintScoringUtils.debugScore(_, _)
 		-- nothing
 	end
 end
@@ -130,7 +130,7 @@ function HintScoringUtils.scoreAdornee(
 	maxViewAngle,
 	maxTriggerAngle,
 	isLineOfSightRequired)
-	assert(maxTriggerAngle)
+	assert(maxTriggerAngle, "Bad maxTriggerAngle")
 
 	-- local center = AdorneeUtils.getCenter(adornee)
 	-- if not center then
@@ -199,7 +199,7 @@ function HintScoringUtils.scoreAdornee(
 end
 
 function HintScoringUtils.scoreDist(distance, maxViewDistance, maxTriggerRadius)
-	assert(maxViewDistance >= maxTriggerRadius)
+	assert(maxViewDistance >= maxTriggerRadius, "maxViewDistance < maxTriggerRadius")
 
 	if distance > maxViewDistance then
 		return false
@@ -214,7 +214,7 @@ function HintScoringUtils.scoreDist(distance, maxViewDistance, maxTriggerRadius)
 end
 
 function HintScoringUtils.scoreAngle(angle, maxViewAngle, maxTriggerAngle)
-	assert(maxViewAngle >= maxTriggerAngle)
+	assert(maxViewAngle >= maxTriggerAngle, "maxViewDistance < maxTriggerRadius")
 
 	if angle > maxViewAngle then
 		return false

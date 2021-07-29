@@ -21,7 +21,8 @@ end
 -- framePosition is top left corner
 -- returns position, relativePosition, normal
 function UICornerUtils.clampPositionToFrame(framePosition, frameSize, radius, point)
-	assert(radius > 0)
+	assert(radius > 0, "Bad radius")
+	assert(point, "Bad point")
 
 	local px, py = point.x, point.y
 

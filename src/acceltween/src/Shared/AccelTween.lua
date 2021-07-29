@@ -109,7 +109,7 @@ function AccelTween:_setstate(newpos, newvel, newaccel, newtarg)
 
 	if self._accel*self._accel < 1e-8 then
 		self._t0, self._y0, self._a0 = 0, pos, 0
-		self._t1, self._y1, self._a1 = 1/0, targ, 0
+		self._t1, self._y1, self._a1 = math.huge, targ, 0
 	else
 		local conda = targ < pos
 		local condb = vel < 0

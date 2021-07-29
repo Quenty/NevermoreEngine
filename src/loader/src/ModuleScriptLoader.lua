@@ -25,7 +25,7 @@ function ModuleScriptLoader.new(loadableModes, scriptTypeParentMap)
 end
 
 function ModuleScriptLoader:AddModule(moduleScript)
-	assert(typeof(moduleScript) == "Instance" and moduleScript:IsA("ModuleScript"))
+	assert(typeof(moduleScript) == "Instance" and moduleScript:IsA("ModuleScript"), "Bad moduleScript")
 
 	local scriptType = ReplicationUtils.classifyModuleScriptType(moduleScript, nil)
 	local actionTaken = false

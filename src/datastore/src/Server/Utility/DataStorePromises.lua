@@ -9,8 +9,8 @@ local DataStoreService = game:GetService("DataStoreService")
 local DataStorePromises = {}
 
 function DataStorePromises.promiseDataStore(name, scope)
-	assert(type(name) == "string")
-	assert(type(scope) == "string")
+	assert(type(name) == "string", "Bad name")
+	assert(type(scope) == "string", "Bad scope")
 
 	return Promise.new(function(resolve, reject)
 		local result = nil
@@ -26,8 +26,8 @@ function DataStorePromises.promiseDataStore(name, scope)
 end
 
 function DataStorePromises.getAsync(robloxDataStore, key)
-	assert(typeof(robloxDataStore) == "Instance")
-	assert(type(key) == "string")
+	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(type(key) == "string", "Bad key")
 
 	return Promise.defer(function(resolve, reject)
 		local result = nil
@@ -42,9 +42,9 @@ function DataStorePromises.getAsync(robloxDataStore, key)
 end
 
 function DataStorePromises.updateAsync(robloxDataStore, key, updateFunc)
-	assert(typeof(robloxDataStore) == "Instance")
-	assert(type(key) == "string")
-	assert(type(updateFunc) == "function")
+	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(type(key) == "string", "Bad key")
+	assert(type(updateFunc) == "function", "Bad updateFunc")
 
 	return Promise.defer(function(resolve, reject)
 		local result = nil
@@ -62,8 +62,8 @@ function DataStorePromises.updateAsync(robloxDataStore, key, updateFunc)
 end
 
 function DataStorePromises.setAsync(robloxDataStore, key, value)
-	assert(typeof(robloxDataStore) == "Instance")
-	assert(type(key) == "string")
+	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(type(key) == "string", "Bad key")
 
 	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()
@@ -77,9 +77,9 @@ function DataStorePromises.setAsync(robloxDataStore, key, value)
 end
 
 function DataStorePromises.promiseIncrementAsync(robloxDataStore, key, delta)
-	assert(typeof(robloxDataStore) == "Instance")
-	assert(type(key) == "string")
-	assert(type(delta) == "number" or delta == nil)
+	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(type(key) == "string", "Bad key")
+	assert(type(delta) == "number" or delta == nil, "Bad delta")
 
 	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()
@@ -93,8 +93,8 @@ function DataStorePromises.promiseIncrementAsync(robloxDataStore, key, delta)
 end
 
 function DataStorePromises.removeAsync(robloxDataStore, key)
-	assert(typeof(robloxDataStore) == "Instance")
-	assert(type(key) == "string")
+	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(type(key) == "string", "Bad key")
 
 	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()

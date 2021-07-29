@@ -42,8 +42,8 @@ function RagdollHumanoidOnFall.new(humanoid)
 end
 
 function RagdollHumanoidOnFall:_handleServerEvent(player, value)
-	assert(player == self._player)
-	assert(typeof(value) == "boolean")
+	assert(player == self._player, "Bad player")
+	assert(typeof(value) == "boolean", "Bad value")
 
 	if value then
 		RagdollBindersServer.Ragdoll:Bind(self._obj)

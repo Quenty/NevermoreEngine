@@ -10,8 +10,8 @@ local Maid = require("Maid")
 local RxAttributeUtils = {}
 
 function RxAttributeUtils.observeAttribute(instance, attributeName)
-	assert(typeof(instance) == "Instance")
-	assert(type(attributeName) == "string")
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(attributeName) == "string", "Bad attributeName")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()

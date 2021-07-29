@@ -34,8 +34,8 @@ end
 -- Fires off everytime the link is reconfigured into a valid link
 -- Fires with link, linkValue
 function RxLinkUtils.observeValidityBrio(linkName, link)
-	assert(typeof(link) == "Instance" and link:IsA("ObjectValue"))
-	assert(type(linkName) == "string")
+	assert(typeof(link) == "Instance" and link:IsA("ObjectValue"), "Bad link")
+	assert(type(linkName) == "string", "Bad linkName")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()

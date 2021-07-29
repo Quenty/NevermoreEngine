@@ -6,6 +6,7 @@
 local NetworkOwnerUtils = {}
 
 function NetworkOwnerUtils.trySetNetworkOwner(part, player)
+	assert(part, "Bad part")
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerUtils.trySetNetworkOwner] - Cannot set network ownership", err)
@@ -16,7 +17,7 @@ function NetworkOwnerUtils.trySetNetworkOwner(part, player)
 end
 
 function NetworkOwnerUtils.getNetworkOwnerPlayer(part)
-	assert(part)
+	assert(part, "Bad part")
 
 	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part)
 	if not ok then
@@ -27,8 +28,8 @@ function NetworkOwnerUtils.getNetworkOwnerPlayer(part)
 end
 
 function NetworkOwnerUtils.isNetworkOwner(part, player)
-	assert(part)
-	assert(player)
+	assert(part, "Bad part")
+	assert(player, "Bad player")
 
 	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part, player)
 	if not ok then
@@ -39,6 +40,8 @@ function NetworkOwnerUtils.isNetworkOwner(part, player)
 end
 
 function NetworkOwnerUtils.isServerNetworkOwner(part)
+	assert(part, "Bad part")
+
 	local ok, owner = NetworkOwnerUtils.tryToGetNetworkOwner(part, part)
 	if not ok then
 		return false
@@ -48,6 +51,8 @@ function NetworkOwnerUtils.isServerNetworkOwner(part)
 end
 
 function NetworkOwnerUtils.tryToGetNetworkOwner(part)
+	assert(part, "Bad part")
+
 	local finished = false
 	local networkOwner = nil
 

@@ -16,7 +16,7 @@ local InputObjectUtils = require("InputObjectUtils")
 -- Called (zoom, zoomScale, 1) returns zoom
 local function rk4Integrator(position, velocity, t)
 	local direction = velocity < 0 and -1 or 1
-	local function acceleration(p, v)
+	local function acceleration(p, _)
 		local accel = direction * math.max(1, (p / 3.3) + 0.5)
 		return accel
 	end
@@ -77,7 +77,7 @@ function CameraControls:Enable()
 		return
 	end
 
-	assert(not self._maid)
+	assert(not self._maid, "Maid already defined")
 	self._enabled = true
 
 	self._maid = Maid.new()
@@ -90,23 +90,23 @@ function CameraControls:Enable()
 		end
 	end))
 
-	ContextActionService:BindAction(self._key, function(actionName, userInputState, inputObject)
+	ContextActionService:BindAction(self._key, function(_, _, inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseWheel then
 			self:_handleMouseWheel(inputObject)
 		end
 	end, false, Enum.UserInputType.MouseWheel)
 
-	ContextActionService:BindAction(self._key .. "Drag", function(actionName, userInputState, inputObject)
+	ContextActionService:BindAction(self._key .. "Drag", function(_, userInputState, inputObject)
 		if userInputState == Enum.UserInputState.Begin then
 			self:BeginDrag(inputObject)
 		end
 	end, false, unpack(self._dragBeginTypes))
 
-	ContextActionService:BindAction(self._key .. "Rotate", function(actionName, userInputState, inputObject)
+	ContextActionService:BindAction(self._key .. "Rotate", function(_, _, inputObject)
 		self:_handleThumbstickInput(inputObject)
 	end, false, Enum.KeyCode.Thumbstick2)
 
-	self._maid:GiveTask(UserInputService.TouchPinch:Connect(function(touchPositions, scale, velocity, userInputState)
+	self._maid:GiveTask(UserInputService.TouchPinch:Connect(function(_, scale, velocity, userInputState)
 		self:_handleTouchPinch(scale, velocity, userInputState)
 	end))
 
@@ -144,7 +144,7 @@ function CameraControls:BeginDrag(beginInputObject)
 		UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
 	end
 
-	maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, GameProcessed)
+	maid:GiveTask(UserInputService.InputEnded:Connect(function(inputObject, _)
 		if inputObject == beginInputObject then
 			self:_endDrag()
 		end
@@ -164,14 +164,14 @@ function CameraControls:BeginDrag(beginInputObject)
 end
 
 function CameraControls:SetZoomedCamera(zoomedCamera)
-	self._zoomedCamera = zoomedCamera or error()
+	self._zoomedCamera = assert(zoomedCamera, "Bad zoomedCamera")
 	self._startZoomScale = self._zoomedCamera.Zoom
 
 	return self
 end
 
 function CameraControls:SetRotatedCamera(rotatedCamera)
-	self._rotatedCamera = rotatedCamera or error()
+	self._rotatedCamera = assert(rotatedCamera, "Bad rotatedCamera")
 	return self
 end
 
@@ -224,7 +224,7 @@ function CameraControls:_getVelocityTracker(strength, startVelocity)
 	local velocity = startVelocity
 
 	return {
-		Update = function(this, delta)
+		Update = function(_, delta)
 			local elapsed = tick() - lastUpdate
 			lastUpdate = tick()
 			velocity = velocity / (2^(elapsed/strength)) + (delta / (0.0001 + elapsed)) * strength

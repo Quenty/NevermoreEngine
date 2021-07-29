@@ -8,10 +8,10 @@ local ReplicationUtils = {}
 
 local function readonly(table)
 	return setmetatable(table, {
-		__index = function(self, index)
+		__index = function(_, index)
 			error(("Bad index %q"):format(tostring(index)), 2)
 		end;
-		__newindex = function(self, index, value)
+		__newindex = function(_, index, _)
 			error(("Bad index %q"):format(tostring(index)), 2)
 		end;
 	})
@@ -42,9 +42,9 @@ function ReplicationUtils.classifyModuleScriptType(moduleScript, topParent)
 end
 
 function ReplicationUtils.reparentModulesOfScriptType(replicationMap, scriptType, newParent)
-	assert(type(replicationMap) == "table")
-	assert(type(scriptType) == "string")
-	assert(typeof(newParent) == "Instance")
+	assert(type(replicationMap) == "table", "Bad replicationMap")
+	assert(type(scriptType) == "string", "Bad scriptType")
+	assert(typeof(newParent) == "Instance", "Bad newParent")
 
 	for _, moduleScript in pairs(replicationMap[scriptType]) do
 		moduleScript.Parent = newParent
@@ -67,7 +67,7 @@ function ReplicationUtils.getReplicationMapForScript(child, parent)
 end
 
 function ReplicationUtils.getReplicationMapForParent(parent)
-	assert(typeof(parent) == "Instance")
+	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local replicationMap = {
 		[ReplicationUtils.ScriptType.SHARED] = {};
@@ -86,7 +86,7 @@ function ReplicationUtils.getReplicationMapForParent(parent)
 	return replicationMap
 end
 
-function ReplicationUtils.mergeModuleScriptIntoLookupTable(lookupTable, moduleScript, acceptableModes)
+function ReplicationUtils.mergeModuleScriptIntoLookupTable(lookupTable, moduleScript)
 	if lookupTable[moduleScript.Name] then
 		warn(("Warning: Duplicate name of %q already exists! Using first found!"):format(moduleScript.Name))
 	else
@@ -97,7 +97,7 @@ end
 function ReplicationUtils.mergeReplicationMapIntoLookupTable(lookupTable, replicationMap, acceptableModes)
 	for _, scriptType in pairs(acceptableModes) do
 		for _, moduleScript in pairs(replicationMap[scriptType]) do
-			ReplicationUtils.mergeModuleScriptIntoLookupTable(lookupTable, moduleScript, acceptableModes)
+			ReplicationUtils.mergeModuleScriptIntoLookupTable(lookupTable, moduleScript)
 		end
 	end
 end
@@ -110,8 +110,8 @@ ReplicationUtils.ScriptType = readonly({
 })
 
 function ReplicationUtils.isInTable(table, value)
-	assert(table)
-	assert(value)
+	assert(table, "Bad table")
+	assert(value, "Bad value")
 
 	for _, item in pairs(table) do
 		if item == value then
@@ -123,7 +123,7 @@ function ReplicationUtils.isInTable(table, value)
 end
 
 function ReplicationUtils.createReplicationFolder(name)
-	assert(type(name) == "string")
+	assert(type(name) == "string", "Bad name")
 	assert(not ReplicatedStorage:FindFirstChild(name), "Duplicate of _ReplicatedModules")
 
 	local clientFolder = Instance.new("Folder")

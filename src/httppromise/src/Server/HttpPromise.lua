@@ -65,7 +65,8 @@ function HttpPromise.logFailedRequests(...)
 end
 
 function HttpPromise.decodeJson(response)
-	assert(response)
+	assert(response, "Bad response")
+
 	if type(response.Body) ~= "string" then
 		return Promise.rejected(("Body is not of type string, but says %q"):format(tostring(response.Body)))
 	end

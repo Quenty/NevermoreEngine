@@ -12,7 +12,7 @@ local SEARCH_UP_TO = 40
 
 -- @param[opt=nil] raycaster Optional raycaster
 function HumanoidTeleportUtils.identifySafePosition(position, raycaster)
-	assert(typeof(position) == "Vector3")
+	assert(typeof(position) == "Vector3", "Bad position")
 
 	if not raycaster then
 		raycaster = Raycaster.new()

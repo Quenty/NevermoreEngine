@@ -14,7 +14,7 @@ EquippedTracker.__index = EquippedTracker
 function EquippedTracker.new(tool)
 	local self = setmetatable({}, EquippedTracker)
 
-	assert(tool and tool:IsA("Tool"))
+	assert(tool and tool:IsA("Tool"), "Bad tool")
 	self._tool = tool
 
 	self._maid = Maid.new()

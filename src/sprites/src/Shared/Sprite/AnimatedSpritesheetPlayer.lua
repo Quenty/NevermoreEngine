@@ -16,7 +16,7 @@ AnimatedSpritesheetPlayer.__index = AnimatedSpritesheetPlayer
 function AnimatedSpritesheetPlayer.new(imageLabel, spritesheet)
 	local self = setmetatable(BaseObject.new(spritesheet), AnimatedSpritesheetPlayer)
 
-	self._imageLabel = assert(imageLabel)
+	self._imageLabel = assert(imageLabel, "Bad imageLabel")
 
 	if spritesheet then
 		self:SetSheet(spritesheet)
@@ -26,7 +26,7 @@ function AnimatedSpritesheetPlayer.new(imageLabel, spritesheet)
 end
 
 function AnimatedSpritesheetPlayer:SetSheet(spritesheet)
-	assert(spritesheet)
+	assert(spritesheet, "Bad spritesheet")
 
 	self._spritesheet = spritesheet
 	self:_play()

@@ -49,7 +49,7 @@ end
 
 function ValueObject:__newindex(index, value)
 	if index == "Value" then
-		local previous = rawget(self, "_value", value)
+		local previous = rawget(self, "_value")
 		if previous ~= value then
 			rawset(self, "_value", value)
 

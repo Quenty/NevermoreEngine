@@ -8,8 +8,8 @@ local RunService = game:GetService("RunService")
 local TemplateContainerUtils = {}
 
 function TemplateContainerUtils.reparentFromWorkspaceIfNeeded(parent, name)
-	assert(typeof(parent) == "Instance")
-	assert(type(name) == "string")
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(name) == "string", "Bad name")
 
 	local workspaceContainer = Workspace:FindFirstChild(name)
 	local parentedContainer = parent:FindFirstChild(name)
