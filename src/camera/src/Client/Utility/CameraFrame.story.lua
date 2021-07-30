@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 
 local CameraFrame = require("CameraFrame")
 local CameraStoryUtils = require("CameraStoryUtils")
-local CubicSplineLib = require("CubicSplineLib")
+local CubicSplineUtils = require("CubicSplineUtils")
 local Maid = require("Maid")
 local QFrame = require("QFrame")
 
@@ -46,8 +46,8 @@ return function(target)
 	end, Color3.new(0.5, 0.5, 1))
 
 	setup(function(t)
-		local node0 = CubicSplineLib.newSplineNode(0, a, CameraFrame.new())
-		local node1 = CubicSplineLib.newSplineNode(1, b, CameraFrame.new())
+		local node0 = CubicSplineUtils.newSplineNode(0, a, CameraFrame.new())
+		local node1 = CubicSplineUtils.newSplineNode(1, b, CameraFrame.new())
 
 		if t <= node0.t then
 			return node0.p
@@ -55,7 +55,7 @@ return function(target)
 			return node1.p
 		end
 
-		local newNode = CubicSplineLib.tweenSplineNodes(node0, node1, t)
+		local newNode = CubicSplineUtils.tweenSplineNodes(node0, node1, t)
 		return newNode.p
 	end, Color3.new(0.5, 1, 1))
 	return function()
