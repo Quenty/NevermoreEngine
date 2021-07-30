@@ -1,0 +1,22 @@
+{
+  "name": "CameraTest",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Nevermore": {
+        "$path": "../node_modules/@quenty/loader"
+      }
+    },
+    "ServerScriptService": {
+      "Nevermore": {
+        "$className": "Folder",
+        "Camera": {
+          "$path": ".."
+        },
+        "@quenty": {
+          "$path": "../node_modules/@quenty"
+        }
+      }
+    }
+  }
+}

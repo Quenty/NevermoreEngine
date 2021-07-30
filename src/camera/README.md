@@ -74,6 +74,8 @@ This classes allows the effects of a camera to be faded / varied based upon a sp
 
 ### 1.0.3
 - Added linting via selene and fixed code to respect linting
+- Fixed dependencies upon CubicSplineUtils
+- Added test project
 
 ### 1.0.0
 Initial release
