@@ -10,7 +10,8 @@
     "quaternions"
   ],
   "contributors": [
-    "Quenty"
+    "Quenty",
+    "AxisAngles"
   ],
   "license": "MIT",
   "repository": {

@@ -22,6 +22,9 @@ npm install @quenty/qframe --save
 
 ### 1.0.3
 - Added linting via selene and fixed code to respect linting
+- Changed how pow and multiplication work such that `O*(O^-1*B*O)^t*O^-1 = B^t` with the help of Trey
+- Added AxisAngles (Trey) to contributors
+- Added test project
 
 ### 1.0.0
 Initial release

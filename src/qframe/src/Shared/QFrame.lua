@@ -86,24 +86,48 @@ end
 function QFrame.__pow(a, b)
 	assert(QFrame.isQFrame(a) and type(b) == "number", "Bad a or b")
 
-	local w, x, y, z = a.W, a.X, a.Y, a.Z
-	local vv = x*x + y*y + z*z
+	-- Center of mass agnostic power formula
+	-- It will move an object in the same arc regardless of where it's center is
+	-- O*(O^-1*B*O)^t*O^-1 = B^t
 
-	if vv > 0 then
-		local v = math.sqrt(vv)
-		local m = (w*w+vv)^(b/2)
-		local theta = b*math.atan2(v,w)
-		local s = m*math.sin(theta)/v
-		return QFrame.new(a.x^b, a.y^b, a.z^b, m*math.cos(theta), x*s, y*s, z*s)
-	else
-		if w < 0 then
-			local m = (-w)^b
-			local s = m*math.sin(math.pi*b)*0.57735026918962576450914878050196--3^-0.5
-			return QFrame.new(a.x^b, a.y^b, a.z^b, m*math.cos(math.pi*b), s, s, s)
-		else
-			return QFrame.new(a.x^b, a.y^b, a.z^b, w^b, 0, 0, 0)
-		end
+	local ax, ay, az = a.x, a.y, a.z
+	local aW, aX, aY, aZ = a.W, a.X, a.Y, a.Z
+
+	-- first let's power the quaternion
+	local aMag = math.sqrt(aW*aW + aX*aX + aY*aY + aZ*aZ)
+	local aIm = math.sqrt(aX*aX + aY*aY + aZ*aZ)
+	local cMag = aMag^b
+
+	if aIm <= 1e-8*aMag then
+		return QFrame.new(b*ax, b*ay, b*az, cMag, 0, 0, 0)
 	end
+
+	local rx = aX/aIm
+	local ry = aY/aIm
+	local rz = aZ/aIm
+
+	local cAng = b*math.atan2(aIm, aW)
+	local cCos = math.cos(cAng)
+	local cSin = math.sin(cAng)
+
+	local cW = cMag*cCos
+	local cX = cMag*cSin*rx
+	local cY = cMag*cSin*ry
+	local cZ = cMag*cSin*rz
+
+	-- now we power the position
+	local k = ax*rx + ay*ry + az*rz
+	local wx, wy, wz = k*rx, k*ry, k*rz
+	local ux, uy, uz = ax - wx, ay - wy, az - wz
+	local vx, vy, vz = ry*az - rz*ay, rz*ax - rx*az, rx*ay - ry*ax
+	local re = cSin*(aW/aIm*cCos + cSin)
+	local im = cSin*(aW/aIm*cSin - cCos)
+
+	local cx = re*ux + im*vx + b*wx
+	local cy = re*uy + im*vy + b*wy
+	local cz = re*uz + im*vz + b*wz
+
+	return QFrame.new(cx, cy, cz, cW, cX, cY, cZ)
 end
 
 function QFrame.__mul(a, b)
@@ -112,10 +136,15 @@ function QFrame.__mul(a, b)
 	elseif QFrame.isQFrame(a) and type(b) == "number" then
 		return QFrame.new(a.x*b, a.y*b, a.z*b, a.W*b, a.X*b, a.Y*b, a.Z*b)
 	elseif QFrame.isQFrame(a) and QFrame.isQFrame(b) then
+		local A2 = a.W*a.W + a.X*a.X + a.Y*a.Y + a.Z*a.Z
+
 		return QFrame.new(
-			a.x*b.x,
-			a.y*b.y,
-			a.z*b.z,
+			a.x + ((a.W*a.W + a.X*a.X - a.Y*a.Y - a.Z*a.Z)*b.x + 2*(a.X*a.Y - a.W*a.Z)*b.y + 2*(a.W*a.Y + a.X*a.Z)*b.z)
+				/A2,
+			a.y + (2*(a.X*a.Y + a.W*a.Z)*b.x + (a.W*a.W - a.X*a.X + a.Y*a.Y - a.Z*a.Z)*b.y + 2*(a.Y*a.Z - a.W*a.X)*b.z)
+				/A2,
+			a.z + (2*(a.X*a.Z - a.W*a.Y)*b.x + 2*(a.W*a.X + a.Y*a.Z)*b.y + (a.W*a.W - a.X*a.X - a.Y*a.Y + a.Z*a.Z)*b.z)
+				/A2,
 			a.W*b.W - a.X*b.X - a.Y*b.Y - a.Z*b.Z,
 			a.W*b.X + a.X*b.W + a.Y*b.Z - a.Z*b.Y,
 			a.W*b.Y - a.X*b.Z + a.Y*b.W + a.Z*b.X,
