@@ -12,6 +12,10 @@
     "Quenty",
     "AxisAngles"
   ],
+  "funding": {
+    "type" : "patreon",
+    "url" : "https://www.patreon.com/quenty"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
