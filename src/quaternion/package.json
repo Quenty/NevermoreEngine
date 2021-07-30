@@ -13,6 +13,10 @@
     "Quenty",
     "xXxMoNkEyMaNxXx"
   ],
+  "funding": {
+    "type" : "patreon",
+    "url" : "https://www.patreon.com/quenty"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
