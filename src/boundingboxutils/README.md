@@ -40,17 +40,3 @@ Gets a boundingBox for the given data
 
 ### `CompiledBoundingBoxUtils.compileBBox(cframe, size)`
 ### `CompiledBoundingBoxUtils.testPointBBox(pt, bbox)`
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added CompiledBoundingBoxUtil
-
-### 0.0.0
-Initial commit

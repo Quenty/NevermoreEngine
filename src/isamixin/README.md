@@ -27,14 +27,3 @@ Adds the IsA function to a class and all descendants
 ### `IsAMixin:IsA(className)`
 Using the .ClassName property, returns whether or not a component is
 
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.0
-Initial commit

@@ -22,16 +22,3 @@ npm install @quenty/promise --save
 * Heavily battle-tested
 * A+ compliant promises (excluding exceptions)
 * Optimized for performance
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

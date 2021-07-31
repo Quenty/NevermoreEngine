@@ -12,21 +12,3 @@
 </div>
 
 Tracks a player's character's humanoid
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-## Installation
-```
-npm install @quenty/humanoidtracker --save
-```
-
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

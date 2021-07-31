@@ -37,14 +37,3 @@ Returns whether or not the text should be black using
 
 ### `Color3Utils.setSaturation(color3, saturation)`
 
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.0
-Initial commit

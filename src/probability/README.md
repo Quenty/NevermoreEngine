@@ -28,15 +28,3 @@ Normal curve. [-1, 1]
 
 ### `Probability.boundedNormal(mean, standardDeviation, hardMin, hardMax)`
 
-
-## Changelog
-
-### 1.0.3
-- Fixed Probability.boundedNormal
-- Resolved linting issues
-
-### 1.0.0
-Initial release
-
-### 0.0.0
-Initial commit

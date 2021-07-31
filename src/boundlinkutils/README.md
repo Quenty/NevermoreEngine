@@ -63,18 +63,3 @@ Returns all classes for all binders, in a list
 
 ### `BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, methodName, args)`
 Calls a method for each linked class for each binder, given the method name and args
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-## 0.0.1
-- Remove duplicate HasClass implementation
-
-## 0.0.0
-- Initial commit
-- Add documentation

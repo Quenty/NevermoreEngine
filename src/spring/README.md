@@ -56,18 +56,3 @@ npm install @quenty/spring --save
 
 ## Visualization
 by Defaultio: https://www.desmos.com/calculator/hn2i9shxbz
-
-## Changelog
-
-### 1.0.3
-- SpringUtils.getVelocityAdjustment takes one less argument
-- This is a breaking change, but we aren't ready to individually package these packages yet so for now we violate semantic versioning
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

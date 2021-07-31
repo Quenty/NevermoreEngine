@@ -17,22 +17,3 @@ Provides a ragdoll system for Roblox with network interopability, ensuring no fl
 ```
 npm install @quenty/ragdoll --save
 ```
-
-## Changelog
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.1
-Fix ragdoll binders
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added support for IK while ragdoll
-
-### 0.0.0
-Initial commit

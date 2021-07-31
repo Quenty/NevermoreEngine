@@ -119,32 +119,3 @@ Returns a version of the clas
 
 ### `Binder:Destroy()`
 Cleans up all bound classes, and disconnects all events
-
-## Changelog
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.2
-- Remove RxBinderUtils
-- Remove RxBinderGroupUtils
-
-### 1.0.0
-Initial release
-
-## 0.0.2
-
-- Removed BoundLinkCollection and promiseBoundLinkedClass (moved to `@quenty/boundlinkutils`)
-
-## 0.0.1
-
-- Add RxBinderUtils
-- Add RxBinderGroupUtils
-- Add changelog
-- Add documentation
-
-## 0.0.0
-
-Initial commit

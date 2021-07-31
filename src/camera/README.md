@@ -69,19 +69,3 @@ This class takes two arguments and returns the summation of the two
 This classes allows the effects of a camera to be faded / varied based upon a spring
 
 * Starts at 0 percent effect
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-- Fixed dependencies upon CubicSplineUtils
-- Added test project
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

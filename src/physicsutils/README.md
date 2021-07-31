@@ -43,14 +43,3 @@ Given a connected body of parts, returns the moment of inertia of these parts
 ### `PhysicsUtils.acceleratePart(part, emittingPart, acceleration)`
 Accelerates a part utilizing newton's laws. emittingPart is the part it's emitted from.
 
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.0
-Initial commit

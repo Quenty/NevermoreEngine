@@ -38,19 +38,3 @@ Converts keymap into ContextActionService friendly types
 
 ### `InputKeyMapUtils.isTapInWorld(inputKeyMapList)`
 
-
-## Changelog
-
-### 1.0.3
-Technically this change is breaking, but no one is depending upon these packages yet
-
-- Fixed dependencies and linting
-- Added ProximityPromptInputUtils
-- Added type checking
-- Broke ProximityPromptInputUtils.getFirstInputKeyCode
-
-### 1.0.0
-Initial release
-
-### 0.0.0
-Initial commit
