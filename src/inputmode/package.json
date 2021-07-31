@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputmode",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Trace input mode state and trigger changes correctly",
   "keywords": [
     "Roblox",

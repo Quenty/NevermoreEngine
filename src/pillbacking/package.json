@@ -1,6 +1,6 @@
 {
   "name": "@quenty/pillbacking",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Builds a pill backing for Guis. Substitute for UICorner object.",
   "keywords": [
     "Roblox",

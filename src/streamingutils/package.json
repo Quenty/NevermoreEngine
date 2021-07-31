@@ -1,6 +1,6 @@
 {
   "name": "@quenty/streamingutils",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Provides utilities for working with Roblox's streaming system",
   "keywords": [
     "Roblox",
