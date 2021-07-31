@@ -1,6 +1,6 @@
 {
   "name": "@quenty/enabledmixin",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Adds Enabled/Disabled state to class",
   "keywords": [
     "Roblox",
