@@ -1,6 +1,6 @@
 {
   "name": "@quenty/raycaster",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Repeats raycasting attempts while ignoring items via a filter function",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {

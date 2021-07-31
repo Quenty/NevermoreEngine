@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ultrawidecontainerutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Creates a 1920x1080 scaling container to handle ultrawide monitors and screens in a reasonable way. This helps keep UI centered and available for ultrawide screens.",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {

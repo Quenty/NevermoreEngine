@@ -1,6 +1,6 @@
 {
   "name": "@quenty/racketingropeconstraint",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Tries to racket a rope constraint back down to a reasonable length",
   "keywords": [
     "Roblox",
@@ -14,8 +14,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -24,9 +24,9 @@
     "directory": "ssrc/racketingropeconstraint/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.2",
-    "@quenty/overriddenproperty": "^1.0.2",
-    "@quenty/promise": "^1.0.2"
+    "@quenty/baseobject": "^1.2.0",
+    "@quenty/overriddenproperty": "^1.2.0",
+    "@quenty/promise": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/setmechanismcframe",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Sets a mechanisms cframe",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,7 +22,7 @@
     "directory": "src/setmechanismcframe/"
   },
   "dependencies": {
-    "@quenty/getmechanismparts": "^1.0.2"
+    "@quenty/getmechanismparts": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

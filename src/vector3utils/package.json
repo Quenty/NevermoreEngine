@@ -1,6 +1,6 @@
 {
   "name": "@quenty/vector3utils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utilities involving Vector3 objects in Roblox",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,7 +22,7 @@
     "directory": "src/vector3utils/"
   },
   "dependencies": {
-    "@quenty/math": "^1.0.2"
+    "@quenty/math": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/steputils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Binds animations into step, where the animation only runs as needed",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {

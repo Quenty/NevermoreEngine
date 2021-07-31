@@ -1,6 +1,6 @@
 {
   "name": "@quenty/animationprovider",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Provides animations for anything tagged with \"AnimationContainer\" and from a folder named \"Animations\" in ReplicatedStorage.",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,7 +22,7 @@
     "directory": "src/animationprovider/"
   },
   "dependencies": {
-    "@quenty/templateprovider": "^1.0.2"
+    "@quenty/templateprovider": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

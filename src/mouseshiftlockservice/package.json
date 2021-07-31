@@ -1,6 +1,6 @@
 {
   "name": "@quenty/mouseshiftlockservice",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility service to enable or disable mouse shift lock on the fly on Roblox.",
   "keywords": [
     "Roblox",
@@ -14,8 +14,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -24,7 +24,7 @@
     "directory": "src/mouseshiftlockservice/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.2"
+    "@quenty/promise": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camera",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Quenty's camera system for Roblox",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,17 +22,17 @@
     "directory": "src/camera/"
   },
   "dependencies": {
-    "@quenty/acceltween": "^1.0.2",
-    "@quenty/cframeutils": "^1.0.2",
-    "@quenty/cubicspline": "^1.0.2",
-    "@quenty/inputobjectutils": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/math": "^1.0.2",
-    "@quenty/qframe": "^1.0.2",
-    "@quenty/spring": "^1.0.2"
+    "@quenty/acceltween": "^1.2.0",
+    "@quenty/cframeutils": "^1.2.0",
+    "@quenty/cubicspline": "^1.2.0",
+    "@quenty/inputobjectutils": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/math": "^1.2.0",
+    "@quenty/qframe": "^1.2.0",
+    "@quenty/spring": "^1.2.0"
   },
   "devDependencies": {
-    "@quenty/camerastoryutils": "^1.0.2"
+    "@quenty/camerastoryutils": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

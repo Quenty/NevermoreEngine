@@ -1,6 +1,6 @@
 {
   "name": "@quenty/baseobject",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "BaseObject implementation with Maid attached for Roblox",
   "keywords": [
     "Roblox",
@@ -11,8 +11,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -21,7 +21,7 @@
     "directory": "src/baseobject/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.2"
+    "@quenty/maid": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

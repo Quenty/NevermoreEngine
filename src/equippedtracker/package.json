@@ -1,6 +1,6 @@
 {
   "name": "@quenty/equippedtracker",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Tracks the equipped player of a tool",
   "keywords": [
     "Roblox",
@@ -13,8 +13,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -23,9 +23,9 @@
     "directory": "src/equippedtracker/"
   },
   "dependencies": {
-    "@quenty/characterutils": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/valueobject": "^1.0.2"
+    "@quenty/characterutils": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/valueobject": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

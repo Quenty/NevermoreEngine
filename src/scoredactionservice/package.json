@@ -1,6 +1,6 @@
 {
   "name": "@quenty/scoredactionservice",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Scores actions and picks the highest rated one every frame",
   "keywords": [
     "Roblox",
@@ -13,8 +13,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -23,14 +23,14 @@
     "directory": "src/scoredactionservice/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.2",
-    "@quenty/inputkeymaputils": "^1.0.2",
-    "@quenty/inputmode": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/signal": "^1.0.2",
-    "@quenty/statestack": "^1.0.2",
-    "@quenty/table": "^1.0.2",
-    "@quenty/valueobject": "^1.0.2"
+    "@quenty/baseobject": "^1.2.0",
+    "@quenty/inputkeymaputils": "^1.2.0",
+    "@quenty/inputmode": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/signal": "^1.2.0",
+    "@quenty/statestack": "^1.2.0",
+    "@quenty/table": "^1.2.0",
+    "@quenty/valueobject": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

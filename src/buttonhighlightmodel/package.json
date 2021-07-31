@@ -1,6 +1,6 @@
 {
   "name": "@quenty/buttonhighlightmodel",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Contains model information for the current button",
   "keywords": [
     "Roblox",
@@ -13,8 +13,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -23,9 +23,9 @@
     "directory": "src/buttonhighlightmodel/"
   },
   "dependencies": {
-    "@quenty/acceltween": "^1.0.2",
-    "@quenty/baseobject": "^1.0.2",
-    "@quenty/steputils": "^1.0.2"
+    "@quenty/acceltween": "^1.2.0",
+    "@quenty/baseobject": "^1.2.0",
+    "@quenty/steputils": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

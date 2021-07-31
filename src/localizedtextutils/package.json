@@ -1,6 +1,6 @@
 {
   "name": "@quenty/localizedtextutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Localized text utils which changes translationKey structures to shared locations",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {

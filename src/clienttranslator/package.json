@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clienttranslator",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Gets local translator for player",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,8 +22,8 @@
     "directory": "src/clienttranslator/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.2",
-    "@quenty/pseudolocalize": "^1.0.2"
+    "@quenty/promise": "^1.2.0",
+    "@quenty/pseudolocalize": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

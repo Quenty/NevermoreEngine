@@ -1,6 +1,6 @@
 {
   "name": "@quenty/teamtracker",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Tracks a player's current team, since the Team property is unreliable",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,8 +22,8 @@
     "directory": "src/teamtracker/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.2",
-    "@quenty/valueobject": "^1.0.2"
+    "@quenty/maid": "^1.2.0",
+    "@quenty/valueobject": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/region3utils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility methods for Region3",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,7 +22,7 @@
     "directory": "src/region3utils/"
   },
   "dependencies": {
-    "@quenty/boundingboxutils": "^1.0.2"
+    "@quenty/boundingboxutils": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

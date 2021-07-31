@@ -1,6 +1,6 @@
 {
   "name": "@quenty/snackbar",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Snackbars provide lightweight feedback on an operation at the base of the screen. They automatically disappear after a timeout or user interaction. There can only be one on the screen at a time.",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,9 +22,9 @@
     "directory": "src/snackbar/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.2",
-    "@quenty/math": "^1.0.2",
-    "@quenty/qgui": "^1.0.2"
+    "@quenty/maid": "^1.2.0",
+    "@quenty/math": "^1.2.0",
+    "@quenty/qgui": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

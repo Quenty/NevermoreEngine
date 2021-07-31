@@ -1,6 +1,6 @@
 {
   "name": "@quenty/scrollingframe",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Creates an inertia based scrolling frame that is animated and has inertia frames Alternative to a Roblox ScrollingFrame with inertia scrolling and complete control over behavior and style",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,10 +22,10 @@
     "directory": "src/scrollingframe/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.2",
-    "@quenty/signal": "^1.0.2",
-    "@quenty/spring": "^1.0.2",
-    "@quenty/table": "^1.0.2"
+    "@quenty/maid": "^1.2.0",
+    "@quenty/signal": "^1.2.0",
+    "@quenty/spring": "^1.2.0",
+    "@quenty/table": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

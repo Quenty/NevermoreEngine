@@ -1,6 +1,6 @@
 {
   "name": "@quenty/multipleclickutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility library for detecting multiple clicks or taps. Not good UX, but good for opening up a debug menus",
   "keywords": [
     "Roblox",
@@ -13,8 +13,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -23,7 +23,7 @@
     "directory": "src/multipleclickutils/"
   },
   "dependencies": {
-    "@quenty/signal": "^1.0.2"
+    "@quenty/signal": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

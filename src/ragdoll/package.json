@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,18 +22,18 @@
     "directory": "src/ragdoll/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.2",
-    "@quenty/binder": "^1.0.2",
-    "@quenty/camera": "^1.0.2",
-    "@quenty/characterutils": "^1.0.2",
-    "@quenty/hapticfeedbackutils": "^1.0.2",
-    "@quenty/humanoidanimatorutils": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/promise": "^1.0.2",
-    "@quenty/remoting": "^1.0.2",
-    "@quenty/rx": "^1.0.2",
-    "@quenty/table": "^1.0.2",
-    "@quenty/valuebaseutils": "^1.0.2"
+    "@quenty/baseobject": "^1.2.0",
+    "@quenty/binder": "^1.2.0",
+    "@quenty/camera": "^1.2.0",
+    "@quenty/characterutils": "^1.2.0",
+    "@quenty/hapticfeedbackutils": "^1.2.0",
+    "@quenty/humanoidanimatorutils": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/promise": "^1.2.0",
+    "@quenty/remoting": "^1.2.0",
+    "@quenty/rx": "^1.2.0",
+    "@quenty/table": "^1.2.0",
+    "@quenty/valuebaseutils": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

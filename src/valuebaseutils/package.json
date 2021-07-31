@@ -1,6 +1,6 @@
 {
   "name": "@quenty/valuebaseutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Provides utilities for working with valuesbase objects, like IntValue or ObjectValue in Roblox.",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,9 +22,9 @@
     "directory": "src/valuebaseutils/"
   },
   "dependencies": {
-    "@quenty/brio": "^1.0.2",
-    "@quenty/instanceutils": "^1.0.2",
-    "@quenty/promise": "^1.0.2"
+    "@quenty/brio": "^1.2.0",
+    "@quenty/instanceutils": "^1.2.0",
+    "@quenty/promise": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

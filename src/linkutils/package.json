@@ -1,6 +1,6 @@
 {
   "name": "@quenty/linkutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility functions for links. Links are object values pointing to other values!",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,10 +22,10 @@
     "directory": "src/linkutils/"
   },
   "dependencies": {
-    "@quenty/brio": "^1.0.2",
-    "@quenty/instanceutils": "^1.0.2",
-    "@quenty/promise": "^1.0.2",
-    "@quenty/rx": "^1.0.2"
+    "@quenty/brio": "^1.2.0",
+    "@quenty/instanceutils": "^1.2.0",
+    "@quenty/promise": "^1.2.0",
+    "@quenty/rx": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

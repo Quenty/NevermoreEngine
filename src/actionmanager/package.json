@@ -1,6 +1,6 @@
 {
   "name": "@quenty/actionmanager",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Holds single toggleable actions (like a tool system)",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,10 +22,10 @@
     "directory": "src/actionmanager/"
   },
   "dependencies": {
-    "@quenty/enabledmixin": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/signal": "^1.0.2",
-    "@quenty/valueobject": "^1.0.2"
+    "@quenty/enabledmixin": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/signal": "^1.2.0",
+    "@quenty/valueobject": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

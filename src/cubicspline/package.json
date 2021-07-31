@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cubicspline",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Cubic Spline implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -14,8 +14,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -24,8 +24,8 @@
     "directory": "src/cubicspline/"
   },
   "dependencies": {
-    "@quenty/binarysearch": "^1.0.2",
-    "@quenty/linearsystemssolver": "^1.0.2"
+    "@quenty/binarysearch": "^1.2.0",
+    "@quenty/linearsystemssolver": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

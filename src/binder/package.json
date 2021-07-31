@@ -1,6 +1,6 @@
 {
   "name": "@quenty/binder",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,14 +22,14 @@
     "directory": "src/binder/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.2",
-    "@quenty/brio": "^1.0.2",
-    "@quenty/instanceutils": "^1.0.2",
-    "@quenty/linkutils": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/promise": "^1.0.2",
-    "@quenty/signal": "^1.0.2",
-    "@quenty/valueobject": "^1.0.2"
+    "@quenty/baseobject": "^1.2.0",
+    "@quenty/brio": "^1.2.0",
+    "@quenty/instanceutils": "^1.2.0",
+    "@quenty/linkutils": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/promise": "^1.2.0",
+    "@quenty/signal": "^1.2.0",
+    "@quenty/valueobject": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/r15utils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility methods for R15",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,8 +22,8 @@
     "directory": "src/r15utils/"
   },
   "dependencies": {
-    "@quenty/brio": "^1.0.2",
-    "@quenty/instanceutils": "^1.0.2"
+    "@quenty/brio": "^1.2.0",
+    "@quenty/instanceutils": "^1.2.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

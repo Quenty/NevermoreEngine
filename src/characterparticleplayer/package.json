@@ -1,6 +1,6 @@
 {
   "name": "@quenty/characterparticleplayer",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Plays particle effects for players",
   "keywords": [
     "Roblox",
@@ -13,8 +13,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {

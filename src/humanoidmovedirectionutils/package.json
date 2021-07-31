@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidmovedirectionutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Ever wanted to not rewrite all of Roblox's input systems! Well, now you can with this slight hack!",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,7 +22,7 @@
     "directory": "src/humanoidmovedirectionutils/"
   },
   "dependencies": {
-    "@quenty/cframeutils": "^1.0.2"
+    "@quenty/cframeutils": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/basicpane",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Base UI object with visibility and a maid",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,8 +22,8 @@
     "directory": "src/basicpane/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.2",
-    "@quenty/signal": "^1.0.2"
+    "@quenty/maid": "^1.2.0",
+    "@quenty/signal": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

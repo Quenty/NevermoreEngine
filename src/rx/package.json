@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rx",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Quenty's reactive library for Roblox",
   "keywords": [
     "Roblox",
@@ -14,8 +14,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -24,12 +24,12 @@
     "directory": "src/rx/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.0.2",
-    "@quenty/promise": "^1.0.2",
-    "@quenty/signal": "^1.0.2",
-    "@quenty/symbol": "^1.0.2",
-    "@quenty/table": "^1.0.2",
-    "@quenty/throttle": "^1.0.2"
+    "@quenty/maid": "^1.2.0",
+    "@quenty/promise": "^1.2.0",
+    "@quenty/signal": "^1.2.0",
+    "@quenty/symbol": "^1.2.0",
+    "@quenty/table": "^1.2.0",
+    "@quenty/throttle": "^1.2.0"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

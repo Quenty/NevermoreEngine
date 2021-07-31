@@ -1,6 +1,6 @@
 {
   "name": "@quenty/statestack",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Stack of values that allows multiple systems to enable or disable a state",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,7 +22,7 @@
     "directory": "src/statestack/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.2"
+    "@quenty/baseobject": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

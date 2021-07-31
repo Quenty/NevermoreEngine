@@ -1,6 +1,6 @@
 {
   "name": "@quenty/datastore",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Quenty's Datastore implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -13,8 +13,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -23,11 +23,11 @@
     "directory": "src/datastore/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/promise": "^1.0.2",
-    "@quenty/symbol": "^1.0.2",
-    "@quenty/table": "^1.0.2"
+    "@quenty/baseobject": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/promise": "^1.2.0",
+    "@quenty/symbol": "^1.2.0",
+    "@quenty/table": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

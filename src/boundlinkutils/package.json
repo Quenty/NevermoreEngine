@@ -1,6 +1,6 @@
 {
   "name": "@quenty/boundlinkutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility functions involving binders and links",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -22,11 +22,11 @@
     "directory": "src/boundlinkutils/"
   },
   "dependencies": {
-    "@quenty/binder": "^1.0.2",
-    "@quenty/linkutils": "^1.0.2",
-    "@quenty/maid": "^1.0.2",
-    "@quenty/promise": "^1.0.2",
-    "@quenty/signal": "^1.0.2"
+    "@quenty/binder": "^1.2.0",
+    "@quenty/linkutils": "^1.2.0",
+    "@quenty/maid": "^1.2.0",
+    "@quenty/promise": "^1.2.0",
+    "@quenty/signal": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

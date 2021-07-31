@@ -1,6 +1,6 @@
 {
   "name": "@quenty/animationgroup",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A group of weighted tracks that can be played back with weighted probability. The closest example to this is the idle animation that looks around at a 1:10 ratio when you're standing still in default Roblox animation script.",
   "keywords": [
     "Roblox",
@@ -13,8 +13,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -23,9 +23,9 @@
     "directory": "src/animationgroup/"
   },
   "dependencies": {
-    "@quenty/animationtrackutils": "^1.0.2",
-    "@quenty/baseobject": "^1.0.2",
-    "@quenty/maid": "^1.0.2"
+    "@quenty/animationtrackutils": "^1.2.0",
+    "@quenty/baseobject": "^1.2.0",
+    "@quenty/maid": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

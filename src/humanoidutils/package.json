@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "General humanoid utility code.",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {

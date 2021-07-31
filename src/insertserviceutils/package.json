@@ -1,6 +1,6 @@
 {
   "name": "@quenty/insertserviceutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "InsertServiceUtils to make loading models via insert service easy",
   "keywords": [
     "Roblox",
@@ -11,8 +11,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
@@ -21,7 +21,7 @@
     "directory": "src/insertserviceutils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.0.2"
+    "@quenty/promise": "^1.2.0"
   },
   "peerDependencies": {
     "@quenty/loader": "^1.0.0"

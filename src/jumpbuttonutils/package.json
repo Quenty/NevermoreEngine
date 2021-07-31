@@ -1,6 +1,6 @@
 {
   "name": "@quenty/jumpbuttonutils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utility functions to deal with Roblox's mobile jump button and its position",
   "keywords": [
     "Roblox",
@@ -12,8 +12,8 @@
     "Quenty"
   ],
   "funding": {
-    "type" : "patreon",
-    "url" : "https://www.patreon.com/quenty"
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
   "license": "MIT",
   "repository": {
