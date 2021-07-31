@@ -38,17 +38,3 @@ Gets experience left to earn required for next level
 ### `ExperienceCalculator.getSubExperience(currentExperience)`
 Calculates subtotal experience
 
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

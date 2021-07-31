@@ -17,17 +17,3 @@ AdorneeUtils - Generic adornee functions to make attaching to objects in Roblox 
 ```
 npm install @quenty/adorneeutils --save
 ```
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

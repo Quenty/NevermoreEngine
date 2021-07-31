@@ -77,17 +77,3 @@ print(RandomUtils.weightedChoice(options, weights, random)) --> most likely "app
 -- Use the system random generator
 print(RandomUtils.weightedChoice(options, weights)) --> most likely "apples"
 ```
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

@@ -30,17 +30,3 @@ Usage is designed to be simple.
 ### `LinkUtils.getLinkValue(linkName, from)`
 
 ### `LinkUtils.promiseLinkValue(maid, linkName, from)`
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-- Added RxLinkUtils
-
-### 0.0.0
-Initial commit

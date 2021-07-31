@@ -57,14 +57,3 @@ Utility functions to work with pillbackings. This can make animations a lot easi
 ### `PillBackingUtils.setTransparency(backing, transparency)`
 
 ### `PillBackingUtils.setShadowTransparency(shadow, transparency)`
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.0
-Initial commit

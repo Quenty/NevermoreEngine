@@ -24,14 +24,3 @@ Usage is designed to be simple.
 ### `GetPercentExposed.search(point, radius, raycaster)`
 Searches for percent exposure of all parts given
 
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.0
-Initial commit

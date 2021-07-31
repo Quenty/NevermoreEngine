@@ -23,16 +23,3 @@ npm install @quenty/valueobject --save
 * Battle tested
 * Can take in a default value
 * Automatically fires with a maid that exists for the lifetime of the value
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

@@ -23,16 +23,3 @@ npm install @quenty/timesyncservice --save
 * Promise resolves only once the clock is synced
 * Battle tested across many Roblox games
 * Use the same module for server and client
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1
-Added documentation
-
-### 0.0.0
-Initial commit

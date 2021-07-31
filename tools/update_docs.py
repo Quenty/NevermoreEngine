@@ -80,7 +80,7 @@ badges = """<div align="center">
     <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
-    <img src="https://github.com/Quenty/NevermoreEngine/workflows/luacheck/badge.svg" alt="Actions Status" />
+    <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
   </a>
 </div>"""
 
@@ -99,6 +99,17 @@ npm install {package_data["name"]} --save
 ```
 """
 
+def remove_change_log(content):
+  if "## Changelog" not in content:
+    return content
+
+  lines = content.split("\n")
+  index = lines.index("## Changelog")
+
+  lines = lines[:index]
+
+  return "\n".join(lines)
+
 root = find_vcs_root(__file__)
 for readme_path in glob.glob(os.path.join(root, "src") + "/*/README.md"):
   packagejson_path = get_packagejson_path_for_readme(readme_path)
@@ -112,8 +123,8 @@ for readme_path in glob.glob(os.path.join(root, "src") + "/*/README.md"):
 
   content = original
   content = ensure_snippet(content, after_header, badges)
-  content = ensure_snippet(content, with_no_changelog, changelog)
   content = ensure_snippet(content, at_installation, get_installation_text(package_data))
+  content = remove_change_log(content)
 
   if content != original:
     package_version = package_version.bump_patch()
@@ -122,6 +133,6 @@ for readme_path in glob.glob(os.path.join(root, "src") + "/*/README.md"):
     with open(readme_path, "w") as file:
       file.write(content)
 
-    with open(packagejson_path, "w") as file:
-      package_data["version"] = str(package_version)
-      file.write(json.dumps(package_data, indent=2))
+    #with open(packagejson_path, "w") as file:
+    #  package_data["version"] = str(package_version)
+    # file.write(json.dumps(package_data, indent=2))

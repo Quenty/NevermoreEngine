@@ -17,17 +17,3 @@ A reactive library for Roblox that lets you program in the observable pattern
 ```
 npm install @quenty/rx --save
 ```
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.0
-Initial release
-
-### 0.0.1 
-Moved all of the Rx utility libraries out of this and into their seperate packages
-
-### 0.0.0
-Initial commit

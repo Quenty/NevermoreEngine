@@ -17,13 +17,3 @@ Reactive extensions for binders
 ```
 npm install @quenty/rxbinderutils --save
 ```
-
-## Changelog
-
-### 1.0.3
-- Added linting via selene and fixed code to respect linting
-
-### 1.0.1
-Initial release
-- Add RxBinderUtils
-- Add RxBinderGroupUtils
