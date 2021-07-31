@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
-    <img src="https://github.com/Quenty/NevermoreEngine/workflows/lint/badge.svg" alt="Actions Status" />
+    <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
   </a>
 </div>
 BaseObject implementation with Maid attached.
