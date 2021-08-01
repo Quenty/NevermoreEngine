@@ -35,17 +35,22 @@ Some setup is required. Init and Start both must be called.
 
 ```lua
 -- Server.lua
-require("IKService"):Init()
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("IKService"))
 
-require("IKService"):Start()
+serviceBag:Init()
+serviceBag:Start()
 ```
 
 ```lua
--- Client.lua
-require("CameraStackService"):Init()
-require("IKServiceClient"):Init()
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("IKServiceClient"))
 
-require("IKServiceClient"):Start()
+serviceBag:Init()
+serviceBag:Start()
+
+-- Configure
+serviceBag:GetService(require("IKServiceClient")):SetLookAround(true)
 ```
 
 ## Usage on the client
@@ -58,13 +63,13 @@ local IKServiceClient = require("IKServiceClient")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
 
 RunService.Stepped:Connect(function()
-	IKServiceClient:SetAimPosition(Vector3.new(0, 0, 0), IKAimPositionPriorites.HIGH)
+	serviceBag:GetService(IKServiceClient):SetAimPosition(Vector3.new(0, 0, 0), IKAimPositionPriorites.HIGH)
 end)
 ```
 
 ### Stopping the character from looking around
 ```lua
-require("IKServiceClient"):SetNoDefaultIK(true)
+require("IKServiceClient"):SetLookAround(false)
 ```
 
 ## Usage on the server
@@ -74,18 +79,13 @@ require("IKServiceClient"):SetNoDefaultIK(true)
 local IKService = require("IKService")
 
 -- Make the NPC look at a target
-IKService:UpdateServerRigTarget(workspace.NPC.Humanoid, Vector3.new(0, 0, 0))
+serviceBag:GetService(IKService):UpdateServerRigTarget(workspace.NPC.Humanoid, Vector3.new(0, 0, 0))
 ```
 
 ### Setting up hand grips (arm IK)
 ```lua
-local Binder = require("Binder")
-local IKGripUtils = require("IKGripUtils")
-
--- Create a new binder (do this in a binder provider preferably)
-local leftGripAttachmentBinder = Binder.new("IKLeftGrip", require("IKLeftGrip"))
-leftGripAttachmentBinder:Init()
-leftGripAttachmentBinder:Start()
+-- Get the binder
+local leftGripAttachmentBinder = serviceBag:GetService(require("IKBindersServer")).IKLeftGrip
 
 -- Setup sample grip
 local attachment = Instance.new("Attachment")

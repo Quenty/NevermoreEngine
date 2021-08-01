@@ -13,10 +13,11 @@ local IKGripBase = setmetatable({}, BaseObject)
 IKGripBase.ClassName = "IKGripBase"
 IKGripBase.__index = IKGripBase
 
-function IKGripBase.new(objectValue)
+function IKGripBase.new(objectValue, serviceBag)
 	local self = setmetatable(BaseObject.new(objectValue), IKGripBase)
 
 	self._attachment = self._obj.Parent
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	assert(self._obj:IsA("ObjectValue"), "Not an object value")
 	assert(self._attachment:IsA("Attachment"), "Not parented to an attachment")
@@ -39,9 +40,9 @@ function IKGripBase:PromiseIKRig()
 
 	local ikService
 	if RunService:IsServer() then
-		ikService = require("IKService")
+		ikService = self._serviceBag:GetService(require("IKService"))
 	else
-		ikService = require("IKServiceClient")
+		ikService = self._serviceBag:GetService(require("IKServiceClient"))
 	end
 
 	local promise = promisePropertyValue(self._obj, "Value")

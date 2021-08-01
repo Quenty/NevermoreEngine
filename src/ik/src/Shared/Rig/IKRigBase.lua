@@ -107,7 +107,8 @@ end
 
 function IKRigBase:_getNewTorso()
 	if self._obj.RigType ~= Enum.HumanoidRigType.R15 then
-		return Promise.rejected("Rig is not HumanoidRigType.R15")
+		warn("Rig is not HumanoidRigType.R15")
+		return nil
 	end
 
 	local newIk = TorsoIKBase.new(self._obj)

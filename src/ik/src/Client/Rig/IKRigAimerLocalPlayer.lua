@@ -15,22 +15,23 @@ local IKRigAimerLocalPlayer = setmetatable({}, BaseObject)
 IKRigAimerLocalPlayer.ClassName = "IKRigAimerLocalPlayer"
 IKRigAimerLocalPlayer.__index = IKRigAimerLocalPlayer
 
-function IKRigAimerLocalPlayer.new(ikRig, remoteEvent)
+function IKRigAimerLocalPlayer.new(serviceBag, ikRig, remoteEvent)
 	local self = setmetatable(BaseObject.new(), IKRigAimerLocalPlayer)
 
+	self._cameraStackService = serviceBag:GetService(CameraStackService)
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._ikRig = ikRig or error("No ikRig")
 
 	self._lastUpdate = 0
 	self._lastReplication = 0
 	self._aimData = nil
-	self._noDefault = false
+	self._lookAround = true
 
 	return self
 end
 
-function IKRigAimerLocalPlayer:SetNoDefaultIK(noDefault)
-	self._noDefault = noDefault
+function IKRigAimerLocalPlayer:SetLookAround(lookAround)
+	self._lookAround = lookAround
 end
 
 -- @param position May be nil
@@ -56,13 +57,13 @@ function IKRigAimerLocalPlayer:GetAimDirection()
 		return self._aimData.position -- May be nil
 	end
 
-	if self._noDefault then
+	if not self._lookAround then
 		return nil
 	end
 
 	local humanoid = self._ikRig:GetHumanoid()
 
-	local cameraCFrame = CameraStackService:GetRawDefaultCamera().CameraState.CFrame
+	local cameraCFrame = self._cameraStackService:GetRawDefaultCamera().CameraState.CFrame
 	local characterCFrame = humanoid.RootPart and humanoid.RootPart.CFrame
 	local multiplier = 1000
 

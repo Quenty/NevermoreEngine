@@ -7,5 +7,4 @@ local Table = require("Table")
 
 return Table.readonly({
 	REMOTE_EVENT_NAME = "IKRigRemoteEvent";
-	COLLECTION_SERVICE_TAG = "IKRig";
 })

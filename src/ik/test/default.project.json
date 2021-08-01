@@ -1,0 +1,32 @@
+{
+  "name": "IKTest",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Nevermore": {
+        "$path": "../node_modules/@quenty/loader"
+      }
+    },
+    "ServerScriptService": {
+      "Nevermore": {
+        "$className": "Folder",
+        "IK": {
+          "$path": ".."
+        },
+        "@quenty": {
+          "$path": "../node_modules/@quenty"
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

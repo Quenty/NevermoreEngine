@@ -7,8 +7,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local CharacterUtils = require("CharacterUtils")
-local IKConstants = require("IKConstants")
-local Binder = require("Binder")
+local IKBindersServer = require("IKBindersServer")
 local Maid = require("Maid")
 local HumanoidTracker = require("HumanoidTracker")
 local promiseBoundClass = require("promiseBoundClass")
@@ -17,11 +16,12 @@ local SERVER_UPDATE_RATE = 1/10
 
 local IKService = {}
 
-function IKService:Init()
+function IKService:Init(serviceBag)
 	assert(not self._maid, "Already initialized")
 
 	self._maid = Maid.new()
-	self._ikRigBinder = Binder.new(IKConstants.COLLECTION_SERVICE_TAG, require("IKRig"))
+
+	self._ikBinders = serviceBag:GetService(IKBindersServer)
 end
 
 function IKService:Start()
@@ -39,22 +39,20 @@ function IKService:Start()
 		self:_handlePlayer(player)
 	end
 
-	self._ikRigBinder:Start()
-
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
 		self:_updateStepped()
 	end))
 end
 
 function IKService:GetRig(humanoid)
-	return self._ikRigBinder:Bind(humanoid)
+	return self._ikBinders.IKRig:Bind(humanoid)
 end
 
 function IKService:PromiseRig(maid, humanoid)
 	assert(maid, "Bad maid")
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
-	local promise = promiseBoundClass(self._ikRigBinder, humanoid)
+	local promise = promiseBoundClass(self._ikBinders.IKRig, humanoid)
 	maid:GiveTask(promise)
 	return promise
 end
@@ -62,14 +60,14 @@ end
 function IKService:RemoveRig(humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
-	self._ikRigBinder:Unbind(humanoid)
+	self._ikBinders.IKRig:Unbind(humanoid)
 end
 
 function IKService:UpdateServerRigTarget(humanoid, target)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(target) == "Vector3", "Bad target")
 
-	local serverRig = self._ikRigBinder:Bind(humanoid)
+	local serverRig = self._ikBinders.IKRig:Bind(humanoid)
 	if not serverRig then
 		warn("[IKService.UpdateServerRigTarget] - No serverRig")
 		return
@@ -99,15 +97,15 @@ function IKService:_handlePlayer(player)
 
 	maid:GiveTask(humanoidTracker.AliveHumanoid.Changed:Connect(function(new, old)
 		if old then
-			self._ikRigBinder:Unbind(old)
+			self._ikBinders.IKRig:Unbind(old)
 		end
 		if new then
-			self._ikRigBinder:Bind(new)
+			self._ikBinders.IKRig:Bind(new)
 		end
 	end))
 
 	if humanoidTracker.AliveHumanoid.Value then
-		self._ikRigBinder:Bind(humanoidTracker.AliveHumanoid.Value)
+		self._ikBinders.IKRig:Bind(humanoidTracker.AliveHumanoid.Value)
 	end
 
 	self._maid[player] = maid
@@ -116,7 +114,7 @@ end
 function IKService:_updateStepped()
 	debug.profilebegin("IKUpdateServer")
 
-	for _, rig in pairs(self._ikRigBinder:GetAll()) do
+	for _, rig in pairs(self._ikBinders.IKRig:GetAll()) do
 		debug.profilebegin("RigUpdateServer")
 
 		local lastUpdateTime = rig:GetLastUpdateTime()
