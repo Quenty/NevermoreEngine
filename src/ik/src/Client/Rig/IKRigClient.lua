@@ -15,8 +15,10 @@ IKRigClient.__index = IKRigClient
 
 require("PromiseRemoteEventMixin"):Add(IKRigClient, IKConstants.REMOTE_EVENT_NAME)
 
-function IKRigClient.new(humanoid)
+function IKRigClient.new(humanoid, serviceBag)
 	local self = setmetatable(IKRigBase.new(humanoid), IKRigClient)
+
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self:PromiseRemoteEvent():Then(function(remoteEvent)
 		self._remoteEvent = remoteEvent or error("No remoteEvent")
@@ -56,7 +58,7 @@ function IKRigClient:_handleRemoteEventClient(newTarget)
 end
 
 function IKRigClient:_setupLocalPlayer(remoteEvent)
-	self._aimer = IKRigAimerLocalPlayer.new(self, remoteEvent)
+	self._aimer = IKRigAimerLocalPlayer.new(self._serviceBag, self, remoteEvent)
 	self._maid:GiveTask(self._aimer)
 end
 

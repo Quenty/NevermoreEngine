@@ -9,8 +9,8 @@ local IKRightGrip = setmetatable({}, IKGripBase)
 IKRightGrip.ClassName = "IKRightGrip"
 IKRightGrip.__index = IKRightGrip
 
-function IKRightGrip.new(objectValue)
-	local self = setmetatable(IKGripBase.new(objectValue), IKRightGrip)
+function IKRightGrip.new(objectValue, serviceBag)
+	local self = setmetatable(IKGripBase.new(objectValue, serviceBag), IKRightGrip)
 
 	self:PromiseIKRig()
 		:Then(function(ikRig)

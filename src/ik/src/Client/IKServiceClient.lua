@@ -7,20 +7,22 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 
-local Binder = require("Binder")
-local IKConstants = require("IKConstants")
+local CameraStackService = require("CameraStackService")
+local IKBindersClient = require("IKBindersClient")
 local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")
 local promiseBoundClass = require("promiseBoundClass")
 
 local IKServiceClient = {}
 
-function IKServiceClient:Init()
+function IKServiceClient:Init(serviceBag)
 	assert(not self._maid, "Already initialized")
 
 	self._maid = Maid.new()
-	self._ikRigBinder = Binder.new(IKConstants.COLLECTION_SERVICE_TAG, require("IKRigClient"))
-	self._noDefaultIK = false
+	self._lookAround = true
+
+	self._ikBinders = serviceBag:GetService(IKBindersClient)
+	serviceBag:GetService(CameraStackService)
 end
 
 function IKServiceClient:Start()
@@ -29,15 +31,13 @@ function IKServiceClient:Start()
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
 		self:_updateStepped()
 	end))
-
-	self._ikRigBinder:Start()
 end
 
 function IKServiceClient:PromiseRig(maid, humanoid)
 	assert(maid, "Bad maid")
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
-	local promise = promiseBoundClass(self._ikRigBinder, humanoid)
+	local promise = promiseBoundClass(self._ikBinders.IKRig, humanoid)
 	maid:GiveTask(promise)
 	return promise
 end
@@ -45,7 +45,7 @@ end
 function IKServiceClient:GetRig(humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
-	return self._ikRigBinder:Get(humanoid)
+	return self._ikBinders.IKRig:Get(humanoid)
 end
 
 --- Exposed API for guns and other things to start setting aim position
@@ -60,8 +60,8 @@ function IKServiceClient:SetAimPosition(position, optionalPriority)
 	aimer:SetAimPosition(position, optionalPriority)
 end
 
-function IKServiceClient:SetNoDefaultIK(noDefaultIK)
-	self._noDefaultIK = noDefaultIK
+function IKServiceClient:SetLookAround(lookAround)
+	self._lookAround = lookAround
 end
 
 function IKServiceClient:GetLocalAimer()
@@ -74,9 +74,9 @@ function IKServiceClient:GetLocalAimer()
 end
 
 function IKServiceClient:GetLocalPlayerRig()
-	assert(self._ikRigBinder, "Not initialize")
+	assert(self._ikBinders.IKRig, "Not initialize")
 
-	return IKRigUtils.getPlayerIKRig(self._ikRigBinder, Players.LocalPlayer)
+	return IKRigUtils.getPlayerIKRig(self._ikBinders.IKRig, Players.LocalPlayer)
 end
 
 function IKServiceClient:_updateStepped()
@@ -84,13 +84,13 @@ function IKServiceClient:_updateStepped()
 
 	local localAimer = self:GetLocalAimer()
 	if localAimer then
-		localAimer:SetNoDefaultIK(self._noDefaultIK)
+		localAimer:SetLookAround(self._lookAround)
 		localAimer:UpdateStepped()
 	end
 
 	local camPosition = Workspace.CurrentCamera.CFrame.p
 
-	for _, rig in pairs(self._ikRigBinder:GetAll()) do
+	for _, rig in pairs(self._ikBinders.IKRig:GetAll()) do
 		debug.profilebegin("RigUpdate")
 
 		local position = rig:GetPositionOrNil()
