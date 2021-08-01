@@ -40,7 +40,7 @@ Binder.ClassName = "Binder"
 -- @param tagName Name of the tag to bind to. This uses CollectionService's tag system
 -- @param constructor A constructor to create the new class. Comes in three flavors.
 -- @treturn Binder
-function Binder.new(tagName, constructor)
+function Binder.new(tagName, constructor, ...)
 	local self = setmetatable({}, Binder)
 
 	self._maid = Maid.new()
@@ -52,6 +52,7 @@ function Binder.new(tagName, constructor)
 	self._pendingInstSet = {} -- [inst] = true
 
 	self._listeners = {} -- [inst] = callback
+	self._args = {...}
 
 	delay(5, function()
 		if not self._loaded then
@@ -276,11 +277,11 @@ function Binder:_add(inst)
 
 	local class
 	if type(self._constructor) == "function" then
-		class = self._constructor(inst)
+		class = self._constructor(inst, unpack(self._args))
 	elseif self._constructor.Create then
-		class = self._constructor:Create(inst)
+		class = self._constructor:Create(inst, unpack(self._args))
 	else
-		class = self._constructor.new(inst)
+		class = self._constructor.new(inst, unpack(self._args))
 	end
 
 	if self._pendingInstSet[inst] ~= true then
