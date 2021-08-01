@@ -11,12 +11,15 @@ local HttpService = game:GetService("HttpService")
 local CustomCameraEffect = require("CustomCameraEffect")
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
+local ServiceBag = require("ServiceBag")
 
 assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackService on client")
 
 local CameraStackService = {}
 
-function CameraStackService:Init(doNotUseDefaultCamera)
+function CameraStackService:Init(serviceBag)
+	assert(ServiceBag.isServiceBag(serviceBag), "Not a valid service bag")
+
 	self._stack = {}
 	self._disabledSet = {}
 
@@ -25,7 +28,7 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 	self._impulseCamera = ImpulseCamera.new()
 	self._defaultCamera = (self._rawDefaultCamera + self._impulseCamera):SetMode("Relative")
 
-	if doNotUseDefaultCamera then
+	if self._doNotUseDefaultCamera then
 		Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
 
 		-- TODO: Handle camera deleted too!
@@ -53,6 +56,12 @@ function CameraStackService:Init(doNotUseDefaultCamera)
 
 		debug.profileend()
 	end)
+end
+
+function CameraStackService:SetDoNotUseDefaultCamera(doNotUseDefaultCamera)
+	assert(not self._stack, "Already initialized")
+
+	self._doNotUseDefaultCamera = doNotUseDefaultCamera
 end
 
 function CameraStackService:PushDisable()

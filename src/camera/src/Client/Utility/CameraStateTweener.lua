@@ -8,6 +8,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
 local Maid = require("Maid")
+local ServiceBag = require("ServiceBag")
 
 local CameraStateTweener = {}
 CameraStateTweener.ClassName = "CameraStateTweener"
@@ -16,26 +17,30 @@ CameraStateTweener.__index = CameraStateTweener
 --- Constructs a new camera state tweener
 -- @tparam ICameraEffect cameraEffect A camera effect
 -- @tparam[opt=20] number speed that the camera tweener tweens at
-function CameraStateTweener.new(cameraEffect, speed)
+function CameraStateTweener.new(serviceBag, cameraEffect, speed)
 	local self = setmetatable({}, CameraStateTweener)
+
+	assert(ServiceBag.isServiceBag(serviceBag), "No serviceBag")
+	assert(cameraEffect, "No cameraEffect")
 
 	self._maid = Maid.new()
 
-	local cameraBelow, assign = CameraStackService:GetNewStateBelow()
+	self._cameraStackService = serviceBag:GetService(CameraStackService)
+	local cameraBelow, assign = self._cameraStackService:GetNewStateBelow()
 
 	self._cameraEffect = cameraEffect
 	self._cameraBelow = cameraBelow
 	self._fadeBetween = FadeBetweenCamera3.new(cameraBelow, cameraEffect)
 	assign(self._fadeBetween)
 
-	CameraStackService:Add(self._fadeBetween)
+	self._cameraStackService:Add(self._fadeBetween)
 
 	self._fadeBetween.Speed = speed or 20
 	self._fadeBetween.Target = 0
 	self._fadeBetween.Value = 0
 
 	self._maid:GiveTask(function()
-		CameraStackService:Remove(self._fadeBetween)
+		self._cameraStackService:Remove(self._fadeBetween)
 	end)
 
 	return self
