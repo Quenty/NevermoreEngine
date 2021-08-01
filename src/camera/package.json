@@ -29,6 +29,7 @@
     "@quenty/maid": "^1.2.0",
     "@quenty/math": "^1.2.0",
     "@quenty/qframe": "^1.2.0",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/spring": "^1.2.0"
   },
   "devDependencies": {
