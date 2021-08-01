@@ -18,8 +18,10 @@ local Ragdollable = setmetatable({}, BaseObject)
 Ragdollable.ClassName = "Ragdollable"
 Ragdollable.__index = Ragdollable
 
-function Ragdollable.new(humanoid)
+function Ragdollable.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), Ragdollable)
+
+	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
 
 	self._obj.BreakJointsOnDeath = false
 	RagdollRigging.createRagdollJoints(self._obj.Parent, humanoid.RigType)
@@ -38,7 +40,7 @@ function Ragdollable.new(humanoid)
 		end))
 	else
 		-- NPC
-		self._maid:GiveTask(RagdollBindersServer.Ragdoll:ObserveInstance(self._obj, function()
+		self._maid:GiveTask(self._ragdollBinder:ObserveInstance(self._obj, function()
 			self:_onRagdollChangedForNPC()
 		end))
 
@@ -46,13 +48,13 @@ function Ragdollable.new(humanoid)
 	end
 
 	-- For fast debugging
-	-- self._maid:GiveTask(AttributeUtils.bindToBinder(self._obj, "Ragdoll", RagdollBindersServer.Ragdoll))
+	-- self._maid:GiveTask(AttributeUtils.bindToBinder(self._obj, "Ragdoll", self._ragdollBinder))
 
 	return self
 end
 
 function Ragdollable:_onRagdollChangedForNPC()
-	if RagdollBindersServer.Ragdoll:Get(self._obj) then
+	if self._ragdollBinder:Get(self._obj) then
 		self:_setRagdollEnabled(true)
 	else
 		self:_setRagdollEnabled(false)
@@ -63,9 +65,9 @@ function Ragdollable:_handleServerEvent(player, state)
 	assert(self._player == player, "Bad player")
 
 	if state then
-		RagdollBindersServer.Ragdoll:Bind(self._obj)
+		self._ragdollBinder:Bind(self._obj)
 	else
-		RagdollBindersServer.Ragdoll:Unbind(self._obj)
+		self._ragdollBinder:Unbind(self._obj)
 	end
 
 	self:_setRagdollEnabled(state)

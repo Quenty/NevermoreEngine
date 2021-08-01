@@ -22,8 +22,10 @@ RagdollableClient.__index = RagdollableClient
 
 require("PromiseRemoteEventMixin"):Add(RagdollableClient, RagdollableConstants.REMOTE_EVENT_NAME)
 
-function RagdollableClient.new(humanoid)
+function RagdollableClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollableClient)
+
+	self._ragdollBinder = serviceBag:GetService(RagdollBindersClient).Ragdoll
 
 	self._player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if self._player == Players.LocalPlayer then
@@ -34,7 +36,7 @@ function RagdollableClient.new(humanoid)
 		end)
 
 		-- For fast debugging
-		-- self._maid:GiveTask(AttributeUtils.bindToBinder(self._obj, "Ragdoll", RagdollBindersClient.Ragdoll))
+		-- self._maid:GiveTask(AttributeUtils.bindToBinder(self._obj, "Ragdoll", self._ragdollBinder))
 	else
 		self:_setupLocal()
 	end
@@ -43,14 +45,14 @@ function RagdollableClient.new(humanoid)
 end
 
 function RagdollableClient:_setupLocal()
-	self._maid:GiveTask(RagdollBindersClient.Ragdoll:ObserveInstance(self._obj, function()
+	self._maid:GiveTask(self._ragdollBinder:ObserveInstance(self._obj, function()
 		self:_onRagdollChanged()
 	end))
 	self:_onRagdollChanged()
 end
 
 function RagdollableClient:_onRagdollChanged()
-	if RagdollBindersClient.Ragdoll:Get(self._obj) then
+	if self._ragdollBinder:Get(self._obj) then
 		self._maid._ragdoll = self:_ragdollLocal()
 
 		if self._localPlayerRemoteEvent then

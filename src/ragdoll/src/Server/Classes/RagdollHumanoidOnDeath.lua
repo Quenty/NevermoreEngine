@@ -11,12 +11,14 @@ local RagdollHumanoidOnDeath = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeath.ClassName = "RagdollHumanoidOnDeath"
 RagdollHumanoidOnDeath.__index = RagdollHumanoidOnDeath
 
-function RagdollHumanoidOnDeath.new(humanid)
+function RagdollHumanoidOnDeath.new(humanid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanid), RagdollHumanoidOnDeath)
+
+	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
 
 	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("Health"):Connect(function()
 		if self._obj.Health <= 0 then
-			RagdollBindersServer.Ragdoll:Bind(self._obj)
+			self._ragdollBinder:Bind(self._obj)
 		end
 	end))
 

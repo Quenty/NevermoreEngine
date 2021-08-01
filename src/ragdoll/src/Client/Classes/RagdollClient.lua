@@ -17,13 +17,15 @@ local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
 RagdollClient.__index = RagdollClient
 
-function RagdollClient.new(humanoid)
+function RagdollClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollClient)
+
+	self._cameraStackService = serviceBag:GetService(CameraStackService)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player == Players.LocalPlayer then
 		self:_setupHapticFeedback()
-		self:_setupCameraShake(CameraStackService:GetImpulseCamera())
+		self:_setupCameraShake(self._cameraStackService:GetImpulseCamera())
 	end
 
 	return self

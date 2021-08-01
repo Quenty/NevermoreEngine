@@ -9,7 +9,7 @@ local Ragdoll = setmetatable({}, BaseObject)
 Ragdoll.ClassName = "Ragdoll"
 Ragdoll.__index = Ragdoll
 
-function Ragdoll.new(humanoid)
+function Ragdoll.new(humanoid, _serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), Ragdoll)
 
 	return self
