@@ -14,8 +14,10 @@ local RagdollHumanoidOnFall = setmetatable({}, BaseObject)
 RagdollHumanoidOnFall.ClassName = "RagdollHumanoidOnFall"
 RagdollHumanoidOnFall.__index = RagdollHumanoidOnFall
 
-function RagdollHumanoidOnFall.new(humanoid)
+function RagdollHumanoidOnFall.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFall)
+
+	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player then
@@ -30,7 +32,7 @@ function RagdollHumanoidOnFall.new(humanoid)
 			self:_handleServerEvent(...)
 		end))
 	else
-		self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, RagdollBindersServer.Ragdoll)
+		self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder)
 		self._maid:GiveTask(self._ragdollLogic)
 
 		self._maid:GiveTask(self._ragdollLogic.ShouldRagdoll.Changed:Connect(function()
@@ -46,18 +48,18 @@ function RagdollHumanoidOnFall:_handleServerEvent(player, value)
 	assert(typeof(value) == "boolean", "Bad value")
 
 	if value then
-		RagdollBindersServer.Ragdoll:Bind(self._obj)
+		self._ragdollBinder:Bind(self._obj)
 	else
-		RagdollBindersServer.Ragdoll:Unbind(self._obj)
+		self._ragdollBinder:Unbind(self._obj)
 	end
 end
 
 function RagdollHumanoidOnFall:_update()
 	if self._ragdollLogic.ShouldRagdoll.Value then
-		RagdollBindersServer.Ragdoll:Bind(self._obj)
+		self._ragdollBinder:Bind(self._obj)
 	else
 		if self._obj.Health > 0 then
-			RagdollBindersServer.Ragdoll:Unbind(self._obj)
+			self._ragdollBinder:Unbind(self._obj)
 		end
 	end
 end

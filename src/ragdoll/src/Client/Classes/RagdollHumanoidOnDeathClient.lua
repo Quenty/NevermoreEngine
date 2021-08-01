@@ -16,8 +16,10 @@ local RagdollHumanoidOnDeathClient = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeathClient.ClassName = "RagdollHumanoidOnDeathClient"
 RagdollHumanoidOnDeathClient.__index = RagdollHumanoidOnDeathClient
 
-function RagdollHumanoidOnDeathClient.new(humanoid)
+function RagdollHumanoidOnDeathClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeathClient)
+
+	self._ragdollBinder = serviceBag:GetService(RagdollBindersClient).Ragdoll
 
 	if self._obj:GetState() == Enum.HumanoidStateType.Dead then
 		self:_handleDeath()
@@ -39,7 +41,7 @@ function RagdollHumanoidOnDeathClient:_handleDeath()
 	self._maid._diedEvent = nil
 
 	if self:_getPlayer() == Players.LocalPlayer then
-		RagdollBindersClient.Ragdoll:BindClient(self._obj)
+		self._ragdollBinder:BindClient(self._obj)
 	end
 
 	local character = self._obj.Parent

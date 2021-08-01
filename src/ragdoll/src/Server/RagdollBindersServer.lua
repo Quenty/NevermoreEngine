@@ -7,10 +7,10 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local BinderProvider = require("BinderProvider")
 local Binder = require("Binder")
 
-return BinderProvider.new(function(self)
-	self:Add(Binder.new("Ragdoll", require("Ragdoll")))
-	self:Add(Binder.new("Ragdollable", require("Ragdollable")))
+return BinderProvider.new(function(self, serviceBag)
+	self:Add(Binder.new("Ragdoll", require("Ragdoll"), serviceBag))
+	self:Add(Binder.new("Ragdollable", require("Ragdollable"), serviceBag))
 
-	self:Add(Binder.new("RagdollHumanoidOnDeath", require("RagdollHumanoidOnDeath")))
-	self:Add(Binder.new("RagdollHumanoidOnFall", require("RagdollHumanoidOnFall")))
+	self:Add(Binder.new("RagdollHumanoidOnDeath", require("RagdollHumanoidOnDeath"), serviceBag))
+	self:Add(Binder.new("RagdollHumanoidOnFall", require("RagdollHumanoidOnFall"), serviceBag))
 end)
