@@ -11,8 +11,8 @@ local PlayerBinder = setmetatable({}, Binder)
 PlayerBinder.ClassName = "PlayerBinder"
 PlayerBinder.__index = PlayerBinder
 
-function PlayerBinder.new(tag, class)
-	local self = setmetatable(Binder.new(tag, class), PlayerBinder)
+function PlayerBinder.new(tag, class, ...)
+	local self = setmetatable(Binder.new(tag, class, ...), PlayerBinder)
 
 	return self
 end

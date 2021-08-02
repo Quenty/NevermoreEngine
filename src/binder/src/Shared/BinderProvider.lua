@@ -58,7 +58,7 @@ function BinderProvider:Init(...)
 	assert(not self._initialized, "Already initialized")
 
 	self._initialized = true
-	self:_initMethod(self, ...)
+	self._initMethod(self, ...)
 	self._bindersAddedPromise:Resolve()
 end
 

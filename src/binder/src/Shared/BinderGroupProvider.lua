@@ -26,7 +26,7 @@ function BinderGroupProvider:PromiseGroupsAdded()
 end
 
 function BinderGroupProvider:Init(...)
-	self:_initMethod(self, ...)
+	self._initMethod(self, ...)
 	self._init = true
 
 	self._groupsAddedPromise:Resolve()
