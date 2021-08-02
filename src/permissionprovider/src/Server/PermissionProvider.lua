@@ -20,7 +20,6 @@ PermissionProvider.ClassName = "PermissionProvider"
 function PermissionProvider.new(config)
 	local self = setmetatable(BaseObject.new(), PermissionProvider)
 
-
 	self._config = Table.readonly(assert(config, "Bad config"))
 	assert(self._config.type == PermissionProviderConstants.GROUP_RANK_CONFIG_TYPE,
 		"Only one supported config type")

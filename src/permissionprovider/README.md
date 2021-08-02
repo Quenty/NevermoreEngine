@@ -12,3 +12,22 @@
 </div>
 
 Utility permission provider system for Roblox
+
+## Usage
+
+```lua
+---
+-- @module PermissionService
+-- @author Quenty
+
+local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+local PermissionProvider = require("PermissionProvider")
+local PermissionProviderUtils = require("PermissionProviderUtils")
+
+return PermissionProvider.new(PermissionProviderUtils.createGroupRankConfig({
+  groupId = 8668163;
+  minAdminRequiredRank = 250;
+  minCreatorRequiredRank = 254;
+}))
+```
