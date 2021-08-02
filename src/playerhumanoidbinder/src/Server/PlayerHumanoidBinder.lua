@@ -14,8 +14,8 @@ local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
 PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 
-function PlayerHumanoidBinder.new(tag, class)
-	local self = setmetatable(Binder.new(tag, class), PlayerHumanoidBinder)
+function PlayerHumanoidBinder.new(tag, class, ...)
+	local self = setmetatable(Binder.new(tag, class, ...), PlayerHumanoidBinder)
 
 	self._playerMaid = Maid.new()
 	self._maid:GiveTask(self._playerMaid)
