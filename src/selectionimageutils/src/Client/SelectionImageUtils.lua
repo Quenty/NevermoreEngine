@@ -2,14 +2,16 @@
 -- @module SelectionImageUtils
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
-local DialogTemplatesClient = require("DialogTemplatesClient")
-
 local SelectionImageUtils = {}
 
 function SelectionImageUtils.overrideWithBlank(button)
-	local selectionImage = DialogTemplatesClient:Clone("BlankSelectionImageObjectTemplate")
+	local selectionImage = Instance.new("ImageLabel")
+	selectionImage.Image = ""
+	selectionImage.Size = UDim2.new(0, 100, 0, 100)
+	selectionImage.BackgroundTransparency = 1
+	selectionImage.BorderSizePixel = 0
+	selectionImage.Visible = true
+	selectionImage.Name = "SelectionImage"
 
 	button.SelectionImageObject = selectionImage
 
