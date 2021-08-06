@@ -1,6 +1,6 @@
 {
   "name": "@quenty/boundlinkutils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Utility functions involving binders and links",
   "keywords": [
     "Roblox",
@@ -22,7 +22,7 @@
     "directory": "src/boundlinkutils/"
   },
   "dependencies": {
-    "@quenty/binder": "^1.2.0",
+    "@quenty/binder": "^2.0.0",
     "@quenty/linkutils": "^1.2.0",
     "@quenty/maid": "^1.2.0",
     "@quenty/promise": "^1.2.0",

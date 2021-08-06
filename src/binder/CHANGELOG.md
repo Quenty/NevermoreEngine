@@ -1,31 +1,20 @@
-# v2.0.0 (Fri Aug 06 2021)
-
-#### 🚀 Enhancement
-
-- feat: Ensure that we can pass in the servicebag into inherited binders [#202](https://github.com/Quenty/NevermoreEngine/pull/202) ([@Quenty](https://github.com/Quenty))
-- feat: Support passing in servicebags into binder objects [#202](https://github.com/Quenty/NevermoreEngine/pull/202) ([@Quenty](https://github.com/Quenty))
-- feat: Binder passes in any amount of arguments into constructor [#202](https://github.com/Quenty/NevermoreEngine/pull/202) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- chore(release): Manually bump version \[skip ci\] [#201](https://github.com/Quenty/NevermoreEngine/pull/201) ([@Quenty](https://github.com/Quenty))
-- docs: Remove Changelog from README.md in favor of CHANGELOG.md which will be generated [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- fix: Adjust CI badge to show automatic build and release state [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- chore: Add funding field to package.json [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- fix: Fix selene linting [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- fix: Add CI and CD [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@1.2.0...@quenty/binder@2.0.0) (2021-08-06)
+
+
+### Features
+
+* Binder passes in any amount of arguments into constructor ([63f6ac1](https://github.com/Quenty/NevermoreEngine/commit/63f6ac1fea3e11d7c2f707a73c0fc377beab8018))
+* Ensure that we can pass in the servicebag into inherited binders ([dcb6921](https://github.com/Quenty/NevermoreEngine/commit/dcb69211ffeee5e5a0bc5cd31a090c0e95dd2f96))
+* Support passing in servicebags into binder objects ([9ae7381](https://github.com/Quenty/NevermoreEngine/commit/9ae7381a199ef61cf4dc55313d16c1d7bcee3fde))
+
+
+
+
 
 # 1.2.0 (2021-07-31)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "@quenty/baseobject": "^1.2.0",
-    "@quenty/binder": "^1.2.0",
-    "@quenty/camera": "^1.2.0",
+    "@quenty/binder": "^2.0.0",
+    "@quenty/camera": "^2.0.0",
     "@quenty/characterutils": "^1.2.0",
     "@quenty/hapticfeedbackutils": "^1.2.0",
     "@quenty/humanoidanimatorutils": "^1.2.0",

@@ -1,30 +1,15 @@
-# v2.0.0 (Fri Aug 06 2021)
-
-#### 💥 Breaking Change
-
-- feat!: Permission provider now has the following features: [#202](https://github.com/Quenty/NevermoreEngine/pull/202) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Add documentation to PermissionProvider [#202](https://github.com/Quenty/NevermoreEngine/pull/202) ([@Quenty](https://github.com/Quenty))
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- chore(release): Manually bump version \[skip ci\] [#201](https://github.com/Quenty/NevermoreEngine/pull/201) ([@Quenty](https://github.com/Quenty))
-- docs: Remove Changelog from README.md in favor of CHANGELOG.md which will be generated [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- fix: Adjust CI badge to show automatic build and release state [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- chore: Add funding field to package.json [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- fix: Fix selene linting [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-- fix: Add CI and CD [#199](https://github.com/Quenty/NevermoreEngine/pull/199) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@1.2.0...@quenty/permissionprovider@2.0.0) (2021-08-06)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
 
 # 1.2.0 (2021-07-31)
 
