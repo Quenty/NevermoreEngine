@@ -13,11 +13,13 @@ local InputListScoreHelper = require("InputListScoreHelper")
 
 local ScoredActionService = {}
 
-function ScoredActionService:Init()
+function ScoredActionService:Init(_serviceBag)
 	assert(not self._provider, "Already initialize")
 
 	self._provider = ScoredActionPickerProvider.new()
+end
 
+function ScoredActionService:Start()
 	RunService.Stepped:Connect(function()
 		-- TODO: Push to end of frame so we don't delay input by a frame?
 		self._provider:Update()
