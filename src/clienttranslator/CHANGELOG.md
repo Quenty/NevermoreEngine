@@ -1,3 +1,15 @@
+# v2.0.1 (Fri Aug 06 2021)
+
+#### 🐛 Bug Fix
+
+- fix: JSONTranslator fails to resolve to anything but english in run mode ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
