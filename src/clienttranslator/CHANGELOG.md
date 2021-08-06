@@ -1,19 +1,18 @@
-# v2.0.1 (Fri Aug 06 2021)
-
-#### 🐛 Bug Fix
-
-- fix: JSONTranslator fails to resolve to anything but english in run mode ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@2.0.0...@quenty/clienttranslator@2.0.1) (2021-08-06)
+
+
+### Bug Fixes
+
+* JSONTranslator fails to resolve to anything but english in run mode ([ec13f98](https://github.com/Quenty/NevermoreEngine/commit/ec13f98b196c4c91c82197677b303a278ef2bad4))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@1.2.0...@quenty/clienttranslator@2.0.0) (2021-08-06)
 
