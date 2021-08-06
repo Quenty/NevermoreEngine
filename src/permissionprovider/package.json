@@ -24,8 +24,9 @@
   "dependencies": {
     "@quenty/baseobject": "^1.2.0",
     "@quenty/grouputils": "^1.2.0",
-    "@quenty/promise": "^1.2.0",
+    "@quenty/promise": "^1.1.1-canary.38379e9.0",
     "@quenty/remoting": "^1.2.0",
+    "@quenty/servicebag": "^1.0.0-canary.202.2b2ee91.0",
     "@quenty/table": "^1.2.0"
   },
   "peerDependencies": {
