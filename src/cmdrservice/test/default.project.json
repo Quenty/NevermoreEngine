@@ -1,0 +1,35 @@
+{
+  "name": "CmdrServiceTest",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Nevermore": {
+        "$path": "../node_modules/@quenty/loader"
+      }
+    },
+    "ServerScriptService": {
+      "Nevermore": {
+        "$className": "Folder",
+        "CmdrService": {
+          "$path": ".."
+        },
+        "@quenty": {
+          "$path": "../node_modules/@quenty"
+        },
+        "@quentystudios": {
+          "$path": "../node_modules/@quentystudios"
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}
