@@ -11,4 +11,5 @@ return Table.readonly({
 
 	-- types
 	GROUP_RANK_CONFIG_TYPE = "GroupRankConfigType";
+	SINGLE_USER_CONFIG_TYPE = "SingleUserConfigType";
 })

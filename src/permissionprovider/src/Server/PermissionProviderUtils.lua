@@ -22,4 +22,28 @@ function PermissionProviderUtils.createGroupRankConfig(config)
 	}
 end
 
+function PermissionProviderUtils.createSingleUserConfig(config)
+	assert(type(config.userId) == "number", "Bad userId")
+
+	return {
+		type = PermissionProviderConstants.SINGLE_USER_CONFIG_TYPE;
+		userId = config.userId;
+		remoteFunctionName = config.remoteFunctionName or PermissionProviderConstants.DEFAULT_REMOTE_FUNCTION_NAME;
+	}
+end
+
+function PermissionProviderUtils.createConfigFromGame()
+	if game.CreatorType == Enum.CreatorType.Group then
+		return PermissionProviderUtils.createGroupRankConfig({
+			groupId = game.CreatorId;
+			minAdminRequiredRank = 254;
+			minCreatorRequiredRank = 255;
+		})
+	else
+		return PermissionProviderUtils.createSingleUserConfig({
+			userId = game.CreatorId;
+		})
+	end
+end
+
 return PermissionProviderUtils
