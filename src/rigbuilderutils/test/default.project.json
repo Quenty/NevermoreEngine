@@ -1,0 +1,22 @@
+{
+  "name": "RigBuilderTest",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Nevermore": {
+        "$path": "../node_modules/@quenty/loader"
+      }
+    },
+    "ServerScriptService": {
+      "Nevermore": {
+        "$className": "Folder",
+        "RigBuilder": {
+          "$path": ".."
+        },
+        "@quenty": {
+          "$path": "../node_modules/@quenty"
+        }
+      }
+    }
+  }
+}
