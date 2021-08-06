@@ -25,13 +25,14 @@ function JSONTranslator.new(parent)
 	-- Cache localizaiton table, because it can take 10-20ms to load.
 	self._localizationTable = JsonToLocalizationTable.loadFolder(self._parent)
 	self._localizationTable.Name = ("JSONTable_%s"):format(parent.Name)
+	self._localizationTable.Parent = LocalizationService
+
+	self._englishTranslator = self._localizationTable:GetTranslator("en")
 
 	if RunService:IsRunning() then
-		self._localizationTable.Parent = LocalizationService
-		self._englishTranslator = self._localizationTable:GetTranslator("en")
-		self._promiseTranslator = Promise.resolved(self._englishTranslator)
-	else
 		self._promiseTranslator = LocalizationServiceUtils.promiseTranslator(Players.LocalPlayer)
+	else
+		self._promiseTranslator = Promise.resolved(self._englishTranslator)
 	end
 
 	if RunService:IsStudio() then
@@ -99,7 +100,7 @@ function JSONTranslator:_getClientTranslatorOrError()
 	assert(self._promiseTranslator, "ClientTranslator is not initialized")
 
 	if self._promiseTranslator:IsFulfilled() then
-		return self._promiseTranslator:Wait()
+		return assert(self._promiseTranslator:Wait(), "Failed to get translator")
 	else
 		error("Translator is not yet acquired yet")
 		return nil
