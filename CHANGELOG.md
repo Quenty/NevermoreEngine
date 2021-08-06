@@ -1,5 +1,18 @@
 # (Fri Aug 06 2021)
 
+#### 🐛 Bug Fix
+
+- `@quenty/camera@2.0.1`, `@quenty/cmdrservice@1.0.1`, `@quenty/ik@2.0.1`, `@quenty/permissionprovider@2.0.1`
+  - fix: Fix version numbers locked to canary versions [#204](https://github.com/Quenty/NevermoreEngine/pull/204) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 06 2021)
+
 #### 💥 Breaking Change
 
 - `@quenty/cmdrservice@1.0.0`
