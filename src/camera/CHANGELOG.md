@@ -1,19 +1,18 @@
-# v2.0.1 (Fri Aug 06 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Fix version numbers locked to canary versions [#204](https://github.com/Quenty/NevermoreEngine/pull/204) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@2.0.0...@quenty/camera@2.0.1) (2021-08-06)
+
+
+### Bug Fixes
+
+* Fix version numbers locked to canary versions ([ce57664](https://github.com/Quenty/NevermoreEngine/commit/ce57664e1a084db7837d673526f3072ea7556f10))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@1.2.0...@quenty/camera@2.0.0) (2021-08-06)
 

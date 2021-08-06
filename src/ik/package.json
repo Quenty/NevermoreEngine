@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ik",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Inverse Kinematics for characters on Roblox",
   "keywords": [
     "Roblox",
@@ -26,13 +26,13 @@
     "@quenty/acceltween": "^1.2.0",
     "@quenty/baseobject": "^1.2.0",
     "@quenty/binder": "^2.0.0",
-    "@quenty/camera": "^2.0.0",
+    "@quenty/camera": "^2.0.1",
     "@quenty/characterutils": "^1.2.0",
     "@quenty/humanoidtracker": "^1.2.0",
     "@quenty/maid": "^1.2.0",
     "@quenty/math": "^1.2.0",
     "@quenty/promise": "^1.2.0",
-    "@quenty/ragdoll": "^2.0.0",
+    "@quenty/ragdoll": "^2.0.1",
     "@quenty/remoting": "^1.2.0",
     "@quenty/servicebag": "^1.0.0",
     "@quenty/signal": "^1.2.0",
