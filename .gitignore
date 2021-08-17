@@ -10,3 +10,6 @@
 !ModuleList.txt
 
 Exported.rbxm
+node_modules
+.env
+roblox.toml
