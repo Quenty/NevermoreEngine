@@ -23,11 +23,11 @@
     "directory": "src/services/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.2.0",
-    "@quenty/signal": "^1.2.0"
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/signal": "file:../signal"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+    "@quenty/loader": "file:../loader"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

@@ -21,10 +21,10 @@
     "directory": "src/baseobject/"
   },
   "dependencies": {
-    "@quenty/maid": "^1.2.0"
+    "@quenty/maid": "file:../maid"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+    "@quenty/loader": "file:../loader"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

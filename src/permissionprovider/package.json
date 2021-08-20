@@ -22,15 +22,15 @@
     "directory": "src/permissionprovider/"
   },
   "dependencies": {
-    "@quenty/baseobject": "^1.2.0",
-    "@quenty/grouputils": "^1.2.0",
-    "@quenty/promise": "^1.2.0",
-    "@quenty/remoting": "^1.2.0",
-    "@quenty/servicebag": "^1.0.0",
-    "@quenty/table": "^1.2.0"
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/grouputils": "file:../grouputils",
+    "@quenty/promise": "file:../promise",
+    "@quenty/remoting": "file:../remoting",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/table": "file:../table"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+    "@quenty/loader": "file:../loader"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

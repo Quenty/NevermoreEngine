@@ -22,14 +22,14 @@
     "directory": "src/cmdrservice/"
   },
   "dependencies": {
-    "@quenty/permissionprovider": "^2.0.1",
-    "@quenty/promise": "^1.2.0",
-    "@quenty/remoting": "^1.2.0",
-    "@quenty/servicebag": "^1.0.0",
+    "@quenty/permissionprovider": "../permissionprovider",
+    "@quenty/promise": "../promise",
+    "@quenty/remoting": "../remoting",
+    "@quenty/servicebag": "../servicebag",
     "@quentystudios/cmdr": "^1.8.4-quenty.1"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+    "@quenty/loader": "file:../loader"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"

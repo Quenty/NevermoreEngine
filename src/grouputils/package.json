@@ -23,10 +23,10 @@
     "directory": "src/grouputils/"
   },
   "dependencies": {
-    "@quenty/promise": "^1.2.0"
+    "@quenty/promise": "file:../promise"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+    "@quenty/loader": "file:../loader"
   },
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
