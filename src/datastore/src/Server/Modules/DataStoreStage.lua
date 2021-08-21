@@ -4,7 +4,7 @@
 -- The big cost here is that we may leave keys that can't be removed.
 -- @classmod DataStoreStage
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")

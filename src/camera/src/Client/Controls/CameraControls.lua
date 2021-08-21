@@ -1,7 +1,7 @@
 --- Interface between user input and camera controls
 -- @classmod CameraControls
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")

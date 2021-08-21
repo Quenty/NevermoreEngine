@@ -2,7 +2,7 @@
 -- @module RxAttributeUtils
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Observable = require("Observable")
 local Maid = require("Maid")

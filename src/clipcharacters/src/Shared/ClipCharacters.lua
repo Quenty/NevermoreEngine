@@ -1,7 +1,7 @@
 --- Clip characters locally on the client of other clients so they don't interfer with physics.
 -- @classmod ClipCharacters
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local PhysicsService = game:GetService("PhysicsService")
 local Players = game:GetService("Players")

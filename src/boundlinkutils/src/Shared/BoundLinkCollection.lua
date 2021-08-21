@@ -2,7 +2,7 @@
 -- with a specific name.
 -- @classmod BoundLinkCollection
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local Signal = require("Signal")

@@ -10,29 +10,29 @@
     "filtering",
     "text"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/textfilterservice/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/remoting": "^1.2.0",
-    "@quenty/table": "^1.2.0",
-    "@quenty/textfilterutils": "^1.2.0"
+    "@quenty/table": "file:../table",
+    "@quenty/textfilterutils": "file:../textfilterutils"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader",
+    "@quenty/remoting": "file:../remoting"
   },
   "publishConfig": {
     "access": "public"

@@ -1,7 +1,7 @@
 --- Guarantees that only one snackbar is visible at once
 -- @module SnackbarManager
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local DraggableSnackbar = require("DraggableSnackbar")
 

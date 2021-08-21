@@ -1,7 +1,7 @@
 --- Utility functions for filtering text
 -- @module TextFilterUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local TextService = game:GetService("TextService")
 local Chat = game:GetService("Chat")

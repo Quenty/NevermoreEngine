@@ -8,28 +8,28 @@
     "Lua",
     "Network"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/overriddenproperty/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/baseobject": "^1.2.0",
-    "@quenty/throttle": "^1.2.0"
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/throttle": "file:../throttle"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

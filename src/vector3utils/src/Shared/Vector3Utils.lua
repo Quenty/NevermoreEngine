@@ -1,7 +1,7 @@
 --- Utilities involving Vector3 objects in Roblox
 -- @module Vector3Utils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Math = require("Math")
 

@@ -8,30 +8,30 @@
     "Lua",
     "Collision"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/parttouchingcalculator/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/binder": "^2.0.0",
-    "@quenty/boundingboxutils": "^1.2.0",
-    "@quenty/characterutils": "^1.2.0",
-    "@quenty/qgui": "^1.2.0"
+    "@quenty/binder": "file:../binder",
+    "@quenty/boundingboxutils": "file:../boundingboxutils",
+    "@quenty/characterutils": "file:../characterutils",
+    "@quenty/qgui": "file:../qgui"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

@@ -1,7 +1,7 @@
 --- Provides a wrapper around HttpService with a promise API
 -- @module HttpPromise
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
 

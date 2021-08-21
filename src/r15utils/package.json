@@ -8,25 +8,25 @@
     "Lua",
     "Character"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/r15utils/"
   },
-  "dependencies": {
-    "@quenty/brio": "^1.2.0",
-    "@quenty/instanceutils": "^1.2.0"
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils"
   },
   "publishConfig": {
     "access": "public"

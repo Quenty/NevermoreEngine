@@ -2,7 +2,7 @@
 -- @classmod JSONTranslator
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
@@ -25,11 +25,12 @@ function JSONTranslator.new(parent)
 	-- Cache localizaiton table, because it can take 10-20ms to load.
 	self._localizationTable = JsonToLocalizationTable.loadFolder(self._parent)
 	self._localizationTable.Name = ("JSONTable_%s"):format(parent.Name)
-	self._localizationTable.Parent = LocalizationService
 
 	self._englishTranslator = self._localizationTable:GetTranslator("en")
+	self._fallbacks = {}
 
 	if RunService:IsRunning() then
+		self._localizationTable.Parent = LocalizationService
 		self._promiseTranslator = LocalizationServiceUtils.promiseTranslator(Players.LocalPlayer)
 	else
 		self._promiseTranslator = Promise.resolved(self._englishTranslator)
@@ -44,6 +45,14 @@ end
 
 function JSONTranslator:PromiseLoaded()
 	return self._promiseTranslator
+end
+
+--- Mostly just used for testing,
+function JSONTranslator:FallbackTo(translator)
+	assert(translator, "Bad translator")
+	assert(translator.FormatByKey, "Bad translator")
+
+	table.insert(self._fallbacks, translator)
 end
 
 function JSONTranslator:PromiseFormatByKey(key, args)
@@ -108,11 +117,6 @@ function JSONTranslator:_getClientTranslatorOrError()
 end
 
 function JSONTranslator:_formatByKeyTestMode(key, args)
-	local i18n = self._parent:FindFirstChild("i18n")
-	if not i18n then
-		return key
-	end
-
 	-- Can't read LocalizationService.ForcePlayModeRobloxLocaleId :(
 	local translator = self._localizationTable:GetTranslator("en")
 	local result
@@ -122,6 +126,13 @@ function JSONTranslator:_formatByKeyTestMode(key, args)
 
 	if ok and not err then
 		return result
+	end
+
+	for _, fallback in pairs(self._fallbacks) do
+		local value = fallback:FormatByKey(key, args)
+		if value then
+			return value
+		end
 	end
 
 	if err then

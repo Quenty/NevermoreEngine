@@ -1,7 +1,7 @@
 --- Character that rotates for animations
 -- @classmod RotatingCharacter
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Math = require("Math")
 local Spring = require("Spring")

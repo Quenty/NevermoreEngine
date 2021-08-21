@@ -3,7 +3,7 @@
 -- of potentially going deeep into a tree and getting invoked multiple times
 -- @classmod HeartbeatCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 

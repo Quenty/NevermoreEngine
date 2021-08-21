@@ -1,7 +1,7 @@
 --- Helpers generate test text for a variety of situations.
 -- @module LipsumUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local RandomUtils = require("RandomUtils")
 local String = require("String")

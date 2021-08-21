@@ -1,7 +1,7 @@
 --- Function that uses raycasting to determine the groundplane in Roblox
 -- @function getGroundPlane
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local batchRaycast = require("batchRaycast")
 

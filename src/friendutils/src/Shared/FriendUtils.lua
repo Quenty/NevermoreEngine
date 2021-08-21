@@ -1,7 +1,7 @@
 --- Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.
 -- @module FriendUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 

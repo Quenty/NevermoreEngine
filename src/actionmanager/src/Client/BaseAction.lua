@@ -1,7 +1,7 @@
 --- BaseAction state for Actionmanager
 -- @classmod BaseAction
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
 

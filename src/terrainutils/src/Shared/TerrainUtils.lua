@@ -1,7 +1,7 @@
 --- Utility functions for manipulating terrain
 -- @module TerrainUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Region3Utils = require("Region3Utils")
 local Region3int16Utils = require("Region3int16Utils")

@@ -1,7 +1,7 @@
 --- Input image library
 -- @module InputImageLibrary
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local SUPRESS_UNFOUND_IMAGE_WARNING = true
 

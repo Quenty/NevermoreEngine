@@ -2,7 +2,7 @@
 -- @module PermissionService
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local CreatorPermissionProvider = require("CreatorPermissionProvider")
 local GroupPermissionProvider = require("GroupPermissionProvider")

@@ -1,7 +1,7 @@
 {
-  "name": "QFrameTest",
+  "name": "qframetest",
   "tree": {
-    "$className": "DataModel",
+    "$className": "datamodel",
     "ReplicatedStorage": {
       "Nevermore": {
         "$path": "../node_modules/@quenty/loader"
@@ -9,12 +9,9 @@
     },
     "ServerScriptService": {
       "Nevermore": {
-        "$className": "Folder",
+        "$className": "folder",
         "QFrame": {
           "$path": ".."
-        },
-        "@quenty": {
-          "$path": "../node_modules/@quenty"
         }
       }
     }

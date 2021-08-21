@@ -2,7 +2,7 @@
 -- This same behavior is seen in Roblox vehicle seats
 -- @classmod PushCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local CameraState = require("CameraState")
 local getRotationInXZPlane = require("getRotationInXZPlane")

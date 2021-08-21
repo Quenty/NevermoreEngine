@@ -9,29 +9,29 @@
     "Gui",
     "Buttons"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/buttonhighlightmodel/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/acceltween": "^1.2.0",
-    "@quenty/baseobject": "^1.2.0",
-    "@quenty/steputils": "^1.2.0"
+    "@quenty/acceltween": "file:../acceltween",
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/steputils": "file:../steputils"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

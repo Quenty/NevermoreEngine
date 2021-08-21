@@ -9,27 +9,27 @@
     "event",
     "valueobject"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/valueobject/"
   },
-  "dependencies": {
-    "@quenty/brio": "^1.2.0",
-    "@quenty/maid": "^1.2.0",
-    "@quenty/rx": "^1.2.0",
-    "@quenty/signal": "^1.2.0"
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/brio": "file:../brio",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal"
   },
   "publishConfig": {
     "access": "public"

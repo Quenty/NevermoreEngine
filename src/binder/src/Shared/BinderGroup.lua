@@ -1,7 +1,7 @@
 --- Groups binders together
 -- @classmod BinderGroup
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Signal = require("Signal")

@@ -1,7 +1,7 @@
 --- A BaseObject basically just adds the :Destroy() interface, and a _maid, along with an optional object it references.
 -- @classmod BaseObject
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 

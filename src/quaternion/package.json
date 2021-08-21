@@ -9,23 +9,23 @@
     "Math",
     "Quaternions"
   ],
-  "contributors": [
-    "Quenty",
-    "xXxMoNkEyMaNxXx"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/quaternion/"
   },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
+  "license": "MIT",
+  "contributors": [
+    "Quenty",
+    "xXxMoNkEyMaNxXx"
+  ],
   "publishConfig": {
     "access": "public"
   }

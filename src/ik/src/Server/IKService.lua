@@ -1,7 +1,7 @@
 --- Handles the replication of inverse kinematics (IK) from clients to servers
 -- @classmod IKService
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")

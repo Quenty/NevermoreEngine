@@ -1,7 +1,7 @@
 --- Add another layer of effects that can be faded in/out
 -- @classmod FadingCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Spring = require("Spring")
 local SummedCamera = require("SummedCamera")

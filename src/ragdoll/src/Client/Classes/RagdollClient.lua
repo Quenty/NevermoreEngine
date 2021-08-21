@@ -1,7 +1,7 @@
 --- Client side ragdolling meant to be used with a binder
 -- @classmod RagdollClient
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")

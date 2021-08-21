@@ -1,7 +1,7 @@
 ---
 -- @classmod IKResource
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")

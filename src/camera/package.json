@@ -8,38 +8,38 @@
     "Lua",
     "camera"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/camera/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/acceltween": "^1.2.0",
-    "@quenty/cframeutils": "^1.2.0",
-    "@quenty/cubicspline": "^1.2.0",
-    "@quenty/inputobjectutils": "^1.2.0",
-    "@quenty/maid": "^1.2.0",
-    "@quenty/math": "^1.2.0",
-    "@quenty/qframe": "^1.2.0",
-    "@quenty/servicebag": "^1.0.0",
-    "@quenty/spring": "^1.2.0"
+    "@quenty/acceltween": "file:../acceltween",
+    "@quenty/cframeutils": "file:../cframeutils",
+    "@quenty/cubicspline": "file:../cubicspline",
+    "@quenty/inputobjectutils": "file:../inputobjectutils",
+    "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math",
+    "@quenty/qframe": "file:../qframe",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/spring": "file:../spring"
   },
   "devDependencies": {
-    "@quenty/camerastoryutils": "^1.2.0"
+    "@quenty/camerastoryutils": "file:../camerastoryutils"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

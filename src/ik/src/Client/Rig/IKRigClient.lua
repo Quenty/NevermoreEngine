@@ -1,7 +1,7 @@
 --- Handles IK rigging for a humanoid
 -- @classmod IKRigClient
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 

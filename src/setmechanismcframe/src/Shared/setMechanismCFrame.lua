@@ -1,7 +1,7 @@
 --- Sets a mechanisms cframe
 -- @module setMechanismCFrame
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local getMechanismParts = require("getMechanismParts")
 

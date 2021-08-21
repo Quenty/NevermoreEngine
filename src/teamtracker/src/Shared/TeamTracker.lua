@@ -1,7 +1,7 @@
 --- Tracks a player's current team, since the Team property is unreliable
 -- @classmod TeamTracker
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local ValueObject = require("ValueObject")

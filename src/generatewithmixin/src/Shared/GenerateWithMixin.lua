@@ -1,7 +1,7 @@
 --- Simple mixin to generate code for a class
 -- @module GenerateWithMixin
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local String = require("String")
 

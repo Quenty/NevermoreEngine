@@ -2,7 +2,7 @@
 -- @see Promise
 -- @module CharacterPromiseUtil
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
 local deferred = require("deferred")

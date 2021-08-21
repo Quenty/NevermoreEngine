@@ -1,7 +1,7 @@
 --- Provides a basis for binders that can be retrieved anywhere
 -- @classmod BinderProvider
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
 

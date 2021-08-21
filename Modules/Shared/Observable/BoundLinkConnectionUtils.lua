@@ -1,7 +1,7 @@
 --- Utility functions that callback with (maid, value) and guarantee cleanup of maid returning maid
 -- @module BoundLinkConnectionUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local observeProperty = require("observeProperty")

@@ -2,7 +2,7 @@
 -- This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme
 -- @classmod DefaultCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")

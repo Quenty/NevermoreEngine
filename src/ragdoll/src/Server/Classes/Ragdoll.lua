@@ -1,7 +1,7 @@
 --- Base class for ragdolls, meant to be used with binders
 -- @classmod Ragdoll
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 

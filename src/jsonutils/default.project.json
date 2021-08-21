@@ -1,5 +1,5 @@
 {
-  "name": "JSONUtils",
+  "name": "jsonutils",
   "tree": {
     "$path": "src"
   }

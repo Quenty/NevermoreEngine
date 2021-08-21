@@ -9,34 +9,34 @@
     "Input",
     "Scoring"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/scoredactionservice/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/baseobject": "^1.2.0",
-    "@quenty/inputkeymaputils": "^1.2.0",
-    "@quenty/inputmode": "^1.2.0",
-    "@quenty/maid": "^1.2.0",
-    "@quenty/signal": "^1.2.0",
-    "@quenty/statestack": "^1.2.0",
-    "@quenty/table": "^1.2.0",
-    "@quenty/valueobject": "^1.2.0"
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/inputkeymaputils": "file:../inputkeymaputils",
+    "@quenty/inputmode": "file:../inputmode",
+    "@quenty/maid": "file:../maid",
+    "@quenty/signal": "file:../signal",
+    "@quenty/statestack": "file:../statestack",
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

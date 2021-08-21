@@ -1,7 +1,8 @@
 --- Generated XboxOneLight with Python
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local parent = script:FindFirstAncestorWhichIsA("ModuleScript")
+local require = require(parent.Parent.loader).load(parent)
 
 local Spritesheet = require("Spritesheet")
 

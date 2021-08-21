@@ -2,7 +2,7 @@
 -- @module CmdrServiceClient
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -16,7 +16,9 @@ function CmdrServiceClient:Init(serviceBag)
 	assert(serviceBag, "No serviceBag")
 
 	self._permissionService = serviceBag:GetService(PermissionServiceClient)
+end
 
+function CmdrServiceClient:Start()
 	PromiseUtils.all({
 		self:PromiseCmdr(),
 		self._permissionService:PromisePermissionProvider()

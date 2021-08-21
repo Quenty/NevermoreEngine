@@ -2,10 +2,10 @@
 -- @script ClientMain
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
 
-local serviceBag = require("ServiceBag").new()
-serviceBag:GetService(require("CmdrServiceClient"))
+local serviceBag = require(packages.ServiceBag).new()
+serviceBag:GetService(require(packages.CmdrServiceClient))
 
 serviceBag:Init()
 serviceBag:Start()

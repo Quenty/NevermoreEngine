@@ -8,23 +8,23 @@
     "Lua",
     "binarysearch"
   ],
-  "contributors": [
-    "AxisAngles",
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/binarysearch/"
   },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
+  "license": "MIT",
+  "contributors": [
+    "AxisAngles",
+    "Quenty"
+  ],
   "publishConfig": {
     "access": "public"
   }

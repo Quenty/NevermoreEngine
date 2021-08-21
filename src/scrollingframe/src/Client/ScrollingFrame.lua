@@ -2,7 +2,7 @@
 -- Alternative to a Roblox ScrollingFrame with inertia scrolling and complete control over behavior and style
 -- @classmod ScrollingFrame
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")

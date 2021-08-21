@@ -5,7 +5,7 @@
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local InputMode = require("InputMode")
 local InputModeProcessor = require("InputModeProcessor")

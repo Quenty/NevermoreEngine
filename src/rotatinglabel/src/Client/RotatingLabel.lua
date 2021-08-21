@@ -2,7 +2,7 @@
 -- it rotates uniformly like an old clock, animating in a satisfying way
 -- @usage Construct with RotatingLabelBuilder.new(Template):Create()
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 

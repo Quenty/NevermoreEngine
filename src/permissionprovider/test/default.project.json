@@ -1,21 +1,10 @@
 {
-  "name": "PermissionProviderTest",
+  "name": "permissionprovidertest",
   "tree": {
     "$className": "DataModel",
-    "ReplicatedStorage": {
-      "Nevermore": {
-        "$path": "../node_modules/@quenty/loader"
-      }
-    },
     "ServerScriptService": {
-      "Nevermore": {
-        "$className": "Folder",
-        "PermissionProvider": {
-          "$path": ".."
-        },
-        "@quenty": {
-          "$path": "../node_modules/@quenty"
-        }
+      "permissionprovider": {
+        "$path": ".."
       },
       "Script": {
         "$path": "scripts/Server"

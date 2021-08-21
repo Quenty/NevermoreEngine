@@ -1,5 +1,5 @@
 {
-  "name": "ServiceProvider",
+  "name": "servicebag",
   "tree": {
     "$path": "src"
   }
