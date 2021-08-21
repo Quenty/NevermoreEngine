@@ -1,7 +1,7 @@
 --- Projectile physics used to syncronize state
 -- @classmod ProjectilePhysics
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local TimeSyncService = require("TimeSyncService")
 

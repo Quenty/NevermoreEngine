@@ -1,7 +1,7 @@
 --- Binds a property of a Roblox action to a callback
 -- @function observeProperty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local deferred = require("deferred")
 local Maid = require("Maid")

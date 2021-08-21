@@ -1,7 +1,7 @@
 --- Simple undo redo stack history
 -- @module UndoableReducer
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Table = require("Table")
 

@@ -1,7 +1,7 @@
 --- DataStore manager for player that automatically saves on player leave and game close
 -- @classmod PlayerDataStoreManager
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")

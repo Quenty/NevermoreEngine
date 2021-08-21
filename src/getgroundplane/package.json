@@ -8,27 +8,27 @@
     "Lua",
     "Raycasting"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/getgroundplane/"
   },
-  "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "devDependencies": {
-    "@quenty/loader": "^1.2.0"
+    "@quenty/loader": "file:../loader"
   },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  "peerDependencies": {
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

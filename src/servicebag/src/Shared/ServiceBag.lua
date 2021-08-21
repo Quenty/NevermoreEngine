@@ -2,7 +2,7 @@
 -- @classmod ServiceBag
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
@@ -35,6 +35,10 @@ function ServiceBag.isServiceBag(serviceBag)
 end
 
 function ServiceBag:GetService(serviceType)
+	if typeof(serviceType) == "Instance" then
+		serviceType = require(serviceType)
+	end
+
 	if self._services[serviceType] then
 		-- Ensure initialized if we're during inint phase
 		if self._servicesToInitialize and self._initializing then

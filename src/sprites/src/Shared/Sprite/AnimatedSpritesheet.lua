@@ -2,7 +2,7 @@
 -- @classmod AnimatedSpritesheet
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Spritesheet = require("Spritesheet")
 

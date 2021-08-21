@@ -3,7 +3,7 @@
 -- Intended to be used with a SummedCamera, relative.
 -- @classmod RotatedCamera
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local CameraState = require("CameraState")
 local getRotationInXZPlane = require("getRotationInXZPlane")

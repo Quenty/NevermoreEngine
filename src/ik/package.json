@@ -9,43 +9,43 @@
     "ik",
     "character"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/ik/"
   },
-  "dependencies": {
-    "@quenty/acceltween": "^1.2.0",
-    "@quenty/baseobject": "^1.2.0",
-    "@quenty/binder": "^2.0.0",
-    "@quenty/camera": "^2.0.1",
-    "@quenty/characterutils": "^1.2.0",
-    "@quenty/humanoidtracker": "^1.2.0",
-    "@quenty/maid": "^1.2.0",
-    "@quenty/math": "^1.2.0",
-    "@quenty/promise": "^1.2.0",
-    "@quenty/ragdoll": "^2.0.1",
-    "@quenty/remoting": "^1.2.0",
-    "@quenty/servicebag": "^1.0.0",
-    "@quenty/signal": "^1.2.0",
-    "@quenty/table": "^1.2.0"
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
   },
-  "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/acceltween": "file:../acceltween",
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/binder": "file:../binder",
+    "@quenty/camera": "file:../camera",
+    "@quenty/characterutils": "file:../characterutils",
+    "@quenty/humanoidtracker": "file:../humanoidtracker",
+    "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math",
+    "@quenty/promise": "file:../promise",
+    "@quenty/ragdoll": "file:../ragdoll",
+    "@quenty/remoting": "file:../remoting",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/signal": "file:../signal",
+    "@quenty/table": "file:../table"
   },
   "devDependencies": {
-    "@quenty/rigbuilderutils": "^1.0.0"
+    "@quenty/rigbuilderutils": "file:../rigbuilderutils"
   },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  "peerDependencies": {
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

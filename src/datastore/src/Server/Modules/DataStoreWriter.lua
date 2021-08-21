@@ -1,7 +1,7 @@
 --- Captures a snapshot of data to write and then merges it with the original
 -- @classmod DataStoreWriter
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Table = require("Table")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")

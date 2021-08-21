@@ -1,7 +1,7 @@
 --- Octree implementation
 -- @classmod Octree
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local OctreeRegionUtils = require("OctreeRegionUtils")
 local OctreeNode = require("OctreeNode")

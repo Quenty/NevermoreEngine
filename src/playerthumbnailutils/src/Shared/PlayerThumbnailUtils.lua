@@ -2,7 +2,7 @@
 --  retry logic
 -- @module PlayerThumbnailUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 

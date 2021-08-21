@@ -1,7 +1,7 @@
 --- Mouse over mixin for general utility button mouse over effects
 -- @module MouseOverMixin
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local ButtonUtils = require("ButtonUtils")

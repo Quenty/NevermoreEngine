@@ -1,5 +1,5 @@
 {
-  "name": "getGroundPlane",
+  "name": "getgroundplane",
   "tree": {
     "$path": "src"
   }

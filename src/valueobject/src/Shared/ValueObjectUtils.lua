@@ -1,7 +1,7 @@
 --- Utils that work with Roblox Value objects (and also ValueObject)
 -- @module ValueObjectUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local Brio = require("Brio")

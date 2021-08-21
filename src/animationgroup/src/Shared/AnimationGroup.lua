@@ -3,7 +3,7 @@
 -- ratio when you're standing still in default Roblox animation script.
 -- @classmod AnimationGroup
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local AnimationGroupUtils = require("AnimationGroupUtils")

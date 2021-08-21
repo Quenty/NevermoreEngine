@@ -2,7 +2,7 @@
 -- @module MouseShiftLockService
 -- See: https://devforum.roblox.com/t/custom-center-locked-mouse-camera-control-toggle/205323
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")

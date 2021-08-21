@@ -10,33 +10,33 @@
     "ipsum",
     "text"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/lipsum/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/randomutils": "^1.2.0",
-    "@quenty/string": "^1.2.0"
+    "@quenty/randomutils": "file:../randomutils",
+    "@quenty/string": "file:../string"
   },
   "devDependencies": {
-    "@quenty/maid": "^1.2.0",
-    "@quenty/textserviceutils": "^1.2.0",
-    "@quenty/uiobjectutils": "^1.2.0"
+    "@quenty/maid": "file:../maid",
+    "@quenty/textserviceutils": "file:../textserviceutils",
+    "@quenty/uiobjectutils": "file:../uiobjectutils"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

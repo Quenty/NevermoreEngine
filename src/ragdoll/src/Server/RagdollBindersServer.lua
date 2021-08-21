@@ -2,7 +2,7 @@
 -- @classmod RagdollBindersServer
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local BinderProvider = require("BinderProvider")
 local Binder = require("Binder")

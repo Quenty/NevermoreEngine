@@ -2,7 +2,7 @@
 -- @module RxBrioUtils
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
 local BrioUtils = require("BrioUtils")

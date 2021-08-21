@@ -1,5 +1,5 @@
 {
-  "name": "PlayerHumanoidBinder",
+  "name": "playerhumanoidbinder",
   "tree": {
     "$path": "src"
   }

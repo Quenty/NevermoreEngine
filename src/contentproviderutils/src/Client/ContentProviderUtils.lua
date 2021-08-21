@@ -1,7 +1,7 @@
 --- Utility functions to ensure that content is preloaded (wrapping calls in promises)
 -- @module ContentProviderUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local ContentProvider = game:GetService("ContentProvider")
 

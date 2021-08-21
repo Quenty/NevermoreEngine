@@ -2,7 +2,7 @@
 -- identify the best state from it
 -- @classmod InputModeSelector
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local INPUT_MODES = require("INPUT_MODES")
 local Maid = require("Maid")

@@ -2,7 +2,7 @@
 -- @classmod ScoredActionPicker
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Set = require("Set")
 local ValueObject = require("ValueObject")

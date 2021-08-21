@@ -1,7 +1,7 @@
 --- Module for working with Region3int16
 -- @module Region3int16Utils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Vector3int16Utils = require("Vector3int16Utils")
 

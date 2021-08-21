@@ -1,7 +1,7 @@
 --- Data container for the state of a camera.
 -- @classmod CameraState
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local QFrame = require("QFrame")
 local CameraFrame = require("CameraFrame")

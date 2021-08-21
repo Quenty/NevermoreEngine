@@ -1,7 +1,7 @@
 --- Bind class to Roblox Instance
 -- @classmod Binder
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")

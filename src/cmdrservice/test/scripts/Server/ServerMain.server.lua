@@ -2,19 +2,18 @@
 -- @script ServerMain
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
-local serviceBag = require("ServiceBag").new()
-serviceBag:GetService(require("CmdrService"))
+local LoaderUtils = require(ServerScriptService:FindFirstChild("LoaderUtils", true))
+
+local clientFolder, serverFolder, sharedFolder = LoaderUtils.toWallyFormat(ServerScriptService.cmdrservice)
+clientFolder.Parent = ReplicatedStorage
+sharedFolder.Parent = ReplicatedStorage
+serverFolder.Parent = ServerScriptService
+
+local serviceBag = require(serverFolder.ServiceBag).new()
+serviceBag:GetService(require(serverFolder.CmdrService))
 
 serviceBag:Init()
-
--- local PermissionProviderUtils = require("PermissionProviderUtils")
--- serviceBag:GetService(require("PermissionService"))
--- 	:SetProviderFromConfig(PermissionProviderUtils.createGroupRankConfig({
--- 		groupId = 5;
--- 		minAdminRequiredRank = 256;
--- 		minCreatorRequiredRank = 256;
--- 	}))
-
 serviceBag:Start()

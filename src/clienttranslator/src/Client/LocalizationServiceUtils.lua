@@ -2,7 +2,7 @@
 -- @module LocalizationServiceUtils
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local LocalizationService = game:GetService("LocalizationService")
 local RunService = game:GetService("RunService")

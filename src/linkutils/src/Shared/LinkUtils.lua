@@ -1,7 +1,7 @@
 --- Utility functions for links. Links are object values pointing to other values!
 -- @module LinkUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local promisePropertyValue = require("promisePropertyValue")
 local promiseChild = require("promiseChild")

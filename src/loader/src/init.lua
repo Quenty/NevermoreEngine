@@ -1,92 +1,60 @@
---- Nevermore module loader.
--- Used to simply module loading
--- @module Nevermore
-
---[[
-USAGE:
-
-See README.md
-https://github.com/Quenty/NevermoreEngine/blob/version2/loader/ReplicatedStorage/Nevermore/README.md
-
-In general usage is simple
-1) Put this script, and all of its children in ReplicatedStorage.Nevermore (or your preferred parent)
-
-2) Put a uniquely named module in appropriate parent
-* By default `ServerScriptService.Modules` and all submodules is loaded
-* Modules in folders named "Client" or "Server" will only be available on the Client or Server
-* Modules parented to other modules will not be moved or loadable by name
-
-3) Use the module loader
-```lua
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-```
-
-4) Require by name or instance. This will detect auto-cyclic issues
-```lua
-local MyModule = require("MyModule")
-local MyOtherModule = require(script.MyOtherModule)
-```
-]]
-
-local REPLICATION_FOLDER_NAME = "_replicationFolder"
-
---- Set this value to nil if you don't want to load modules by default
-local SERVER_SCRIPT_SERVICE_MODULES = "Nevermore"
+--- Loads things
+-- @module loader
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local RunService = game:GetService("RunService")
 
-local ModuleScriptLoader = require(script:WaitForChild("ModuleScriptLoader"))
-local ReplicationUtils = require(script:WaitForChild("ReplicationUtils"))
+local LegacyLoader = require(script.LegacyLoader)
+local StaticLegacyLoader = require(script.StaticLegacyLoader)
+local LoaderUtils = require(script.LoaderUtils)
 
-if RunService:IsServer() and RunService:IsClient() or (not RunService:IsRunning()) then
-	if RunService:IsRunning() then
-		warn("Warning: Loading all modules in PlaySolo. It's recommended you use accurate play solo.")
-	end
-
-	local loader = ModuleScriptLoader.new({
-		-- Allowed modules
-		ReplicationUtils.ScriptType.SHARED;
-		ReplicationUtils.ScriptType.SERVER;
-		ReplicationUtils.ScriptType.CLIENT;
-	})
-
-	if SERVER_SCRIPT_SERVICE_MODULES then
-		loader:AddModulesFromParent(ServerScriptService:WaitForChild(SERVER_SCRIPT_SERVICE_MODULES))
-	end
-
-	return loader
-elseif RunService:IsServer() then
-	local replicationFolder = ReplicationUtils.createReplicationFolder(REPLICATION_FOLDER_NAME)
-
-	local loader = ModuleScriptLoader.new(
-		{
-			-- Allowed modules
-			ReplicationUtils.ScriptType.SHARED;
-			ReplicationUtils.ScriptType.SERVER;
-		},
-		{
-			-- Replication map
-			[ReplicationUtils.ScriptType.CLIENT] = replicationFolder;
-			[ReplicationUtils.ScriptType.SHARED] = replicationFolder;
-		})
-
-	if SERVER_SCRIPT_SERVICE_MODULES then
-		loader:AddModulesFromParent(ServerScriptService:WaitForChild(SERVER_SCRIPT_SERVICE_MODULES))
-	end
-
-	return loader
-elseif RunService:IsClient() then
-	local loader = ModuleScriptLoader.new({
-		-- Allowed modules
-		ReplicationUtils.ScriptType.SHARED;
-		ReplicationUtils.ScriptType.CLIENT;
-	})
-
-	loader:AddModulesFromParent(ReplicatedStorage:WaitForChild(REPLICATION_FOLDER_NAME))
-
-	return loader
+local loader, metatable
+if RunService:IsRunning() then
+	loader = LegacyLoader.new(script)
+	metatable = {
+		__call = function(_self, value)
+			return loader:Require(value)
+		end;
+		__index = function(_self, key)
+			return loader:Require(key)
+		end;
+	}
 else
-	error("Error: Unknown state")
+	loader = StaticLegacyLoader.new()
+	metatable = {
+		__call = function(_self, value)
+			local env = getfenv(2)
+			return loader:Require(env.script, value)
+		end;
+		__index = function(_self, key)
+			local env = getfenv(2)
+			return loader:Require(env.script, key)
+		end;
+	}
 end
+
+local function bootstrapGame(packageFolder)
+	assert(RunService:IsRunning(), "Game must be running")
+
+	loader:Lock()
+
+	local clientFolder, serverFolder, sharedFolder = LoaderUtils.toWallyFormat(packageFolder)
+
+	clientFolder.Parent = ReplicatedStorage
+	sharedFolder.Parent = ReplicatedStorage
+	serverFolder.Parent = ServerScriptService
+
+	return serverFolder
+end
+
+local function handleLoad(moduleScript)
+	assert(typeof(moduleScript) == "Instance", "Bad moduleScript")
+
+	return loader:GetLoader(moduleScript)
+end
+
+return setmetatable({
+	load = handleLoad;
+	bootstrapGame = bootstrapGame;
+}, metatable)

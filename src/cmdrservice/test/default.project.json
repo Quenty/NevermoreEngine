@@ -1,5 +1,5 @@
 {
-  "name": "CmdrServiceTest",
+  "name": "cmdrservicetest",
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
@@ -8,17 +8,8 @@
       }
     },
     "ServerScriptService": {
-      "Nevermore": {
-        "$className": "Folder",
-        "CmdrService": {
-          "$path": ".."
-        },
-        "@quenty": {
-          "$path": "../node_modules/@quenty"
-        },
-        "@quentystudios": {
-          "$path": "../node_modules/@quentystudios"
-        }
+      "cmdrservice": {
+        "$path": ".."
       },
       "Script": {
         "$path": "scripts/Server"

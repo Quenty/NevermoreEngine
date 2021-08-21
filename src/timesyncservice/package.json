@@ -9,31 +9,31 @@
     "timesyncservice",
     "time"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/timesyncservice/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/maid": "^1.2.0",
-    "@quenty/promise": "^1.2.0",
-    "@quenty/remoting": "^1.2.0",
-    "@quenty/signal": "^1.2.0",
-    "@quenty/table": "^1.2.0"
+    "@quenty/maid": "file:../maid",
+    "@quenty/signal": "file:../signal",
+    "@quenty/table": "file:../table"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader",
+    "@quenty/promise": "file:../promise",
+    "@quenty/remoting": "file:../remoting"
   },
   "publishConfig": {
     "access": "public"

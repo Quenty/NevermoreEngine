@@ -1,7 +1,7 @@
 --- Basic node interacting with the octree
 -- @classmod OctreeNode
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local OctreeRegionUtils = require("OctreeRegionUtils")
 

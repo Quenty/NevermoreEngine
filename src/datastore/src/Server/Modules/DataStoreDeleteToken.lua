@@ -1,7 +1,7 @@
 --- Token to use for deleting
 -- @classmod DataStoreDeleteToken
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Symbol = require("Symbol")
 

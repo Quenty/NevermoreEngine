@@ -1,5 +1,5 @@
 {
-  "name": "IKTest",
+  "name": "iktest",
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
@@ -9,12 +9,9 @@
     },
     "ServerScriptService": {
       "Nevermore": {
-        "$className": "Folder",
+        "$className": "folder",
         "IK": {
           "$path": ".."
-        },
-        "@quenty": {
-          "$path": "../node_modules/@quenty"
         }
       },
       "Script": {

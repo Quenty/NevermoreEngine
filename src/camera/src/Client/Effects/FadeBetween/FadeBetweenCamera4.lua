@@ -2,7 +2,7 @@
 -- @classmod FadeBetweenCamera4
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local CubicSplineUtils = require("CubicSplineUtils")
 local CameraState = require("CameraState")

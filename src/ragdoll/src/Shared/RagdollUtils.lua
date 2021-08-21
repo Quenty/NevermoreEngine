@@ -1,7 +1,7 @@
 --- Utility mehtods for ragdolling. See Ragdoll.lua and RagdollClient.lua for implementation details
 -- @module RagdollUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")

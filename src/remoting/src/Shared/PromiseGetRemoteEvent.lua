@@ -1,7 +1,7 @@
 --- Retrieves a remote event as a promise
 -- @module PromiseGetRemoteEvent
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")

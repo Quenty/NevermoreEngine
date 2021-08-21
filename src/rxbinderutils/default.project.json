@@ -1,7 +1,7 @@
 {
-  "name": "RxBinderUtils",
+  "name": "rxbinderutils",
   "tree": {
-    "$className": "Folder",
+    "$classname": "folder",
     "src": {
       "$path": "src"
     },

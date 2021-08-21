@@ -1,7 +1,7 @@
 --- Determines if parts are touching or not
 -- @classmod PartTouchingCalculator
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local CollectionService = game:GetService("CollectionService")
 local Workspace = game:GetService("Workspace")

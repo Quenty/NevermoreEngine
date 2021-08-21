@@ -4,7 +4,7 @@
 -- components in scripts.
 -- @classmod ApplyTagToTaggedChildren
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local CollectionService = game:GetService("CollectionService")
 
@@ -32,7 +32,6 @@ function ApplyTagToTaggedChildren.new(parent, tag, requiredTag)
 	end)
 
 	self:_setup()
-
 
 	return self
 end

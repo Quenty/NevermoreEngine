@@ -1,7 +1,7 @@
 --- Sets properties on the client and then replicates them to the server
 -- @classmod OverriddenProperty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local ThrottledFunction = require("ThrottledFunction")

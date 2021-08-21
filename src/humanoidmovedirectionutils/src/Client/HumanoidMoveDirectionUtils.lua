@@ -2,7 +2,7 @@
 -- with this slight hack!
 -- @module HumanoidMoveDirectionUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local UserInputService = game:GetService("UserInputService")
 

@@ -3,7 +3,7 @@
 -- Keys are additive, so if you have more than 1 disabled, it's ok.
 -- @module CoreGuiEnabler
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")

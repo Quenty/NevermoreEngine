@@ -1,7 +1,7 @@
 --- Legacy code written by AxisAngles to simulate particles with Guis
 -- @module ParticleEngine
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")

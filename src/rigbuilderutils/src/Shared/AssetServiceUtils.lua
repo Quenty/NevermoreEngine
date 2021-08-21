@@ -2,7 +2,7 @@
 -- @module AssetServiceUtils
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local AssetService = game:GetService("AssetService")
 

@@ -1,7 +1,7 @@
 --- For effects that can be easily bound in scope
 -- @classmod CustomCameraEffect
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local SummedCamera = require("SummedCamera")
 

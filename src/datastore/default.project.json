@@ -1,5 +1,5 @@
 {
-  "name": "DataStore",
+  "name": "datastore",
   "tree": {
     "$path": "src"
   }

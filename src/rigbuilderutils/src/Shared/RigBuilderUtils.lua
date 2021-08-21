@@ -1,7 +1,7 @@
 ---
 -- @module RigBuilderUtils
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local InsertServiceUtils = require("InsertServiceUtils")
 local PromiseUtils = require("PromiseUtils")

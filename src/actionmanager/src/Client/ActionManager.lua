@@ -1,7 +1,7 @@
 --- Holds single toggleable actions (like a tool system)
 -- @classmod ActionManager
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
 

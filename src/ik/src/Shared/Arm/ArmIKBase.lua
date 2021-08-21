@@ -1,7 +1,7 @@
 --- Provides IK for a given arm
 -- @classmod ArmIKBase
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")

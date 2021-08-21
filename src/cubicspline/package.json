@@ -9,29 +9,29 @@
     "spline",
     "cubic-spline"
   ],
-  "contributors": [
-    "AxisAngles",
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/cubicspline/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "AxisAngles",
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/binarysearch": "^1.2.0",
-    "@quenty/linearsystemssolver": "^1.2.0"
+    "@quenty/binarysearch": "file:../binarysearch",
+    "@quenty/linearsystemssolver": "file:../linearsystemssolver"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

@@ -3,7 +3,7 @@
 -- @module HintScoringUtils
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")

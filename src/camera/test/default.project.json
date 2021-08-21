@@ -1,5 +1,5 @@
 {
-  "name": "CameraTest",
+  "name": "cameratest",
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
@@ -9,12 +9,9 @@
     },
     "ServerScriptService": {
       "Nevermore": {
-        "$className": "Folder",
+        "$className": "folder",
         "Camera": {
           "$path": ".."
-        },
-        "@quenty": {
-          "$path": "../node_modules/@quenty"
         }
       }
     }

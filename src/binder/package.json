@@ -8,34 +8,34 @@
     "Lua",
     "binder"
   ],
-  "contributors": [
-    "Quenty"
-  ],
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/quenty"
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "src/binder/"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
   "dependencies": {
-    "@quenty/baseobject": "^1.2.0",
-    "@quenty/brio": "^1.2.0",
-    "@quenty/instanceutils": "^1.2.0",
-    "@quenty/linkutils": "^1.2.0",
-    "@quenty/maid": "^1.2.0",
-    "@quenty/promise": "^1.2.0",
-    "@quenty/signal": "^1.2.0",
-    "@quenty/valueobject": "^1.2.0"
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/linkutils": "file:../linkutils",
+    "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/signal": "file:../signal",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "peerDependencies": {
-    "@quenty/loader": "^1.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

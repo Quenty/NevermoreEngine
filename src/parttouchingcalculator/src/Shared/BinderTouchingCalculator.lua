@@ -1,7 +1,7 @@
 --- Extends PartTouchingCalculator with generic binder stuff
 -- @classmod BinderTouchingCalculator
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(script.Parent.loader).load(script)
 
 local PartTouchingCalculator = require("PartTouchingCalculator")
 local BinderUtils = require("BinderUtils")
