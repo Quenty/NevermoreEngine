@@ -78,15 +78,6 @@ function IKService:UpdateServerRigTarget(humanoid, target)
 	serverRig:SetRigTarget(target)
 end
 
-function IKService:_onServerEvent(player, target)
-	assert(typeof(target) == "Vector3")
-
-	local humanoid = CharacterUtils.getAlivePlayerHumanoid(player)
-	if not humanoid then
-		return
-	end
-end
-
 function IKService:_handlePlayerRemoving(player)
 	self._maid[player] = nil
 end
