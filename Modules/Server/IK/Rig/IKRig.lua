@@ -52,6 +52,11 @@ function IKRig:_onServerEvent(player, target)
 	assert(player == CharacterUtils.getPlayerFromCharacter(self._obj))
 	assert(typeof(target) == "Vector3" or target == nil)
 
+	-- Guard against NaN
+	if target ~= target then
+		return
+	end
+
 	self._target = target
 
 	local torso = self:GetTorso()
