@@ -123,7 +123,7 @@ function Spring:__newindex(index, value)
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
-		self._damper = math.clamp(value, 0, 1)
+		self._damper = value
 		self._time0 = now
 	elseif index == "Speed" or index == "s" then
 		local position, velocity = self:_positionVelocity(now)
