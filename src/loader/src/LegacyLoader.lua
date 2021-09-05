@@ -23,7 +23,7 @@ function LegacyLoader.new(script)
 end
 
 function LegacyLoader:Lock()
-	assert(self._container, "Cannot bootstrap game when legacy loader was already used")
+	assert(not self._container, "Cannot bootstrap game when legacy loader was already used")
 	self._locked = true
 end
 
