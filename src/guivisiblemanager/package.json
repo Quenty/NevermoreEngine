@@ -1,6 +1,6 @@
 {
   "name": "@quenty/guivisiblemanager",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Help manage the visibility of GUIs while only constructing the Gui while visible",
   "keywords": [
     "Roblox",
@@ -30,7 +30,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

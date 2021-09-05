@@ -1,6 +1,6 @@
 {
   "name": "@quenty/qframe",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "CFrame representation as a quaternion for Roblox",
   "keywords": [
     "Roblox",
@@ -34,7 +34,6 @@
     "@quenty/cubicspline": "file:../cubicspline",
     "@quenty/maid": "file:../maid"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

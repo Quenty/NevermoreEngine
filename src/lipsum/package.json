@@ -1,6 +1,6 @@
 {
   "name": "@quenty/lipsum",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A Lorem Ipsum generator in Roblox",
   "keywords": [
     "Roblox",
@@ -36,7 +36,6 @@
     "@quenty/textserviceutils": "file:../textserviceutils",
     "@quenty/uiobjectutils": "file:../uiobjectutils"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

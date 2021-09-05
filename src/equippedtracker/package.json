@@ -1,6 +1,6 @@
 {
   "name": "@quenty/equippedtracker",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Tracks the equipped player of a tool",
   "keywords": [
     "Roblox",
@@ -31,7 +31,6 @@
     "@quenty/maid": "file:../maid",
     "@quenty/valueobject": "file:../valueobject"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

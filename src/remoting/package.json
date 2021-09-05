@@ -1,6 +1,6 @@
 {
   "name": "@quenty/remoting",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Global remoting retrieval system for Roblox (RemoteFunctions/RemoteEvents)",
   "keywords": [
     "Roblox",
@@ -30,7 +30,6 @@
     "@quenty/promise": "file:../promise",
     "@quenty/table": "file:../table"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

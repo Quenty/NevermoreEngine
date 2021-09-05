@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ik",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Inverse Kinematics for characters on Roblox",
   "keywords": [
     "Roblox",
@@ -45,7 +45,6 @@
   "devDependencies": {
     "@quenty/rigbuilderutils": "file:../rigbuilderutils"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

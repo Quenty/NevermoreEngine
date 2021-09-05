@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rxbinderutils",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Reactive extensions for binders",
   "keywords": [
     "Roblox",
@@ -34,7 +34,6 @@
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

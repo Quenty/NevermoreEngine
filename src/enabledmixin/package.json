@@ -1,6 +1,6 @@
 {
   "name": "@quenty/enabledmixin",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Adds Enabled/Disabled state to class",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/maid": "file:../maid",
     "@quenty/signal": "file:../signal"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

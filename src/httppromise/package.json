@@ -1,6 +1,6 @@
 {
   "name": "@quenty/httppromise",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "HttpPromise - Wrapper functions around http requests in Roblox.",
   "keywords": [
     "Roblox",
@@ -30,7 +30,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

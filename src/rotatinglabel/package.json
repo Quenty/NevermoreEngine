@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rotatinglabel",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A text label with most general properties of a textlabel, except when text is set, it rotates uniformly like an old clock, animating in a satisfying way",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/math": "file:../math",
     "@quenty/spring": "file:../spring"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/servicebag",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Service providing mechanisms for Nevermore",
   "keywords": [
     "Roblox",
@@ -30,7 +30,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/signal": "file:../signal"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/buttonhighlightmodel",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Contains model information for the current button",
   "keywords": [
     "Roblox",
@@ -31,7 +31,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/steputils": "file:../steputils"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/modelappearance",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Allows the appearance of a model to be overridden. Most commonly used when placing down an object in a building game.",
   "keywords": [
     "Roblox",
@@ -28,7 +28,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/math": "file:../math"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/vector3utils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Utilities involving Vector3 objects in Roblox",
   "keywords": [
     "Roblox",
@@ -28,7 +28,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/math": "file:../math"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

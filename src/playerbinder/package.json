@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerbinder",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Binds the given class to each player in the game",
   "keywords": [
     "Roblox",
@@ -28,7 +28,6 @@
     "@quenty/binder": "file:../binder",
     "@quenty/loader": "file:../loader"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

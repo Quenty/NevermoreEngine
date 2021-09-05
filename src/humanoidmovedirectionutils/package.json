@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidmovedirectionutils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Ever wanted to not rewrite all of Roblox's input systems! Well, now you can with this slight hack!",
   "keywords": [
     "Roblox",
@@ -28,7 +28,6 @@
     "@quenty/cframeutils": "file:../cframeutils",
     "@quenty/loader": "file:../loader"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

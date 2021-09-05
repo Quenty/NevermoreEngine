@@ -1,6 +1,6 @@
 {
   "name": "@quenty/templateprovider",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Base of a template retrieval system",
   "keywords": [
     "Roblox",
@@ -30,7 +30,6 @@
     "@quenty/maid": "file:../maid",
     "@quenty/string": "file:../string"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/racketingropeconstraint",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Tries to racket a rope constraint back down to a reasonable length",
   "keywords": [
     "Roblox",
@@ -32,7 +32,6 @@
     "@quenty/overriddenproperty": "file:../overriddenproperty",
     "@quenty/promise": "file:../promise"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

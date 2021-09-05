@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rigbuilderutils",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Utility functions for debugging, builds a Roblox character rig",
   "keywords": [
     "Roblox",
@@ -34,7 +34,6 @@
     "@quenty/camerastoryutils": "file:../camerastoryutils",
     "@quenty/maid": "file:../maid"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

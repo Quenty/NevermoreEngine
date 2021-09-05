@@ -1,6 +1,6 @@
 {
   "name": "@quenty/animationprovider",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Provides animations for anything tagged with \"AnimationContainer\" and from a folder named \"Animations\" in ReplicatedStorage.",
   "keywords": [
     "Roblox",
@@ -28,7 +28,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/templateprovider": "file:../templateprovider"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

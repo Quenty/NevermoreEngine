@@ -1,6 +1,6 @@
 {
   "name": "@quenty/modeltransparencyeffect",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Allows a model to have transparent set locally on the client",
   "keywords": [
     "Roblox",
@@ -31,7 +31,6 @@
     "@quenty/steputils": "file:../steputils",
     "@quenty/transparencyservice": "file:../transparencyservice"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

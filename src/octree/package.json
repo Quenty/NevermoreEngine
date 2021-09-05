@@ -1,6 +1,6 @@
 {
   "name": "@quenty/octree",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Octree implementation for Roblox - fast spatial queries",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/draw": "file:../draw",
     "@quenty/loader": "file:../loader"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

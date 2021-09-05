@@ -1,6 +1,6 @@
 {
   "name": "@quenty/permissionprovider",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Permission provider for Roblox, including authenticating against group membership",
   "keywords": [
     "Roblox",
@@ -33,7 +33,6 @@
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/table": "file:../table"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

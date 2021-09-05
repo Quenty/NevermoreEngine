@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundpromiseutils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Utility functions involving sounds and their state",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

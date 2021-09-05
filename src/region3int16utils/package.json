@@ -1,6 +1,6 @@
 {
   "name": "@quenty/region3int16utils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Module for working with Region3int16",
   "keywords": [
     "Roblox",
@@ -28,7 +28,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/vector3int16utils": "file:../vector3int16utils"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

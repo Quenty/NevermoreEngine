@@ -1,6 +1,6 @@
 {
   "name": "@quenty/throttle",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Adds the throttle function to Roblox",
   "keywords": [
     "Roblox",
@@ -31,7 +31,6 @@
   "devDependencies": {
     "@quenty/loader": "file:../loader"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

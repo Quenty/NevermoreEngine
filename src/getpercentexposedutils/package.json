@@ -1,6 +1,6 @@
 {
   "name": "@quenty/getpercentexposedutils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Identify parts that are potentially exposed to an explosion using a random vector raycasting",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/vector3utils": "file:../vector3utils"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

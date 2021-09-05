@@ -1,6 +1,6 @@
 {
   "name": "@quenty/overriddenproperty",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Sets properties on the client and then replicates them to the server",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/loader": "file:../loader",
     "@quenty/throttle": "file:../throttle"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

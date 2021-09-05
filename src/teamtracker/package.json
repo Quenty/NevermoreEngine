@@ -1,6 +1,6 @@
 {
   "name": "@quenty/teamtracker",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Tracks a player's current team, since the Team property is unreliable",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/maid": "file:../maid",
     "@quenty/valueobject": "file:../valueobject"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

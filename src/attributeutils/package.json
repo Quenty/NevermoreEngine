@@ -1,6 +1,6 @@
 {
   "name": "@quenty/attributeutils",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Provides utility functions to work with attributes in Roblox",
   "keywords": [
     "Roblox",
@@ -29,7 +29,6 @@
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

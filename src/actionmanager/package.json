@@ -1,6 +1,6 @@
 {
   "name": "@quenty/actionmanager",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Holds single toggleable actions (like a tool system)",
   "keywords": [
     "Roblox",
@@ -31,7 +31,6 @@
     "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

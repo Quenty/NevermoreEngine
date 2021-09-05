@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -39,7 +39,6 @@
     "@quenty/table": "file:../table",
     "@quenty/valuebaseutils": "file:../valuebaseutils"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

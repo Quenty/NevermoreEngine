@@ -1,6 +1,6 @@
 {
   "name": "@quenty/datastore",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Quenty's Datastore implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -33,7 +33,6 @@
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table"
   },
-  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }
