@@ -1,21 +1,20 @@
-# v2.1.0 (Sun Sep 05 2021)
-
-#### 🚀 Enhancement
-
-- fix: Ensure loader injects itself [#210](https://github.com/Quenty/NevermoreEngine/pull/210) ([@Quenty](https://github.com/Quenty))
-- fix: Discover top level module scripts [#210](https://github.com/Quenty/NevermoreEngine/pull/210) ([@Quenty](https://github.com/Quenty))
-- fix: Loader allows container [#210](https://github.com/Quenty/NevermoreEngine/pull/210) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@2.0.0...@quenty/loader@2.1.0) (2021-09-05)
+
+
+### Bug Fixes
+
+* Discover top level module scripts ([23fc167](https://github.com/Quenty/NevermoreEngine/commit/23fc1676f1140bb75e818e8aae0fb5fd514a5065))
+* Ensure loader injects itself ([b5d9a83](https://github.com/Quenty/NevermoreEngine/commit/b5d9a838d0c8cb4df83bf606eb56c69b64c75002))
+* Loader allows container ([988eefd](https://github.com/Quenty/NevermoreEngine/commit/988eefdfa26f4b547da829cf7ddf65a58747b7c8))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@1.2.0...@quenty/loader@2.0.0) (2021-09-05)
 
