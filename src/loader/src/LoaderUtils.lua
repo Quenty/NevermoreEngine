@@ -89,6 +89,8 @@ function LoaderUtils.discoverTopLevelPackages(packages, instance)
 		for _, item in pairs(instance:GetChildren()) do
 			if item:IsA("Folder") then
 				LoaderUtils.discoverTopLevelPackages(packages, item)
+			elseif item:IsA("ModuleScript") then
+				table.insert(packages, item)
 			end
 		end
 	end
