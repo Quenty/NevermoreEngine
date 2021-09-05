@@ -27,13 +27,12 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/remoting": "file:../remoting",
     "@quenty/table": "file:../table",
     "@quenty/textfilterutils": "file:../textfilterutils"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/remoting": "file:../remoting"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

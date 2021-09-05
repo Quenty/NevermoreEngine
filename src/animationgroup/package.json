@@ -27,12 +27,11 @@
   ],
   "dependencies": {
     "@quenty/animationtrackutils": "file:../animationtrackutils",
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid"
   },
-  "peerDependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

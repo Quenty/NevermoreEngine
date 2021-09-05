@@ -27,6 +27,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/loader": "file:../loader",
     "@quenty/randomutils": "file:../randomutils",
     "@quenty/string": "file:../string"
   },
@@ -35,9 +36,7 @@
     "@quenty/textserviceutils": "file:../textserviceutils",
     "@quenty/uiobjectutils": "file:../uiobjectutils"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

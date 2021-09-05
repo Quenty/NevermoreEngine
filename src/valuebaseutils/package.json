@@ -27,11 +27,10 @@
   "dependencies": {
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

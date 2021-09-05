@@ -26,12 +26,11 @@
   ],
   "dependencies": {
     "@quenty/acceltween": "file:../acceltween",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/signal": "file:../signal"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

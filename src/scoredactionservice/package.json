@@ -29,15 +29,14 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/inputkeymaputils": "file:../inputkeymaputils",
     "@quenty/inputmode": "file:../inputmode",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

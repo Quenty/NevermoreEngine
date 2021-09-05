@@ -25,11 +25,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/binder": "file:../binder"
-  },
-  "peerDependencies": {
+    "@quenty/binder": "file:../binder",
     "@quenty/loader": "file:../loader"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

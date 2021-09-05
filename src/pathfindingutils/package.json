@@ -27,12 +27,11 @@
   ],
   "dependencies": {
     "@quenty/draw": "file:../draw",
-    "@quenty/maid": "file:../maid"
-  },
-  "peerDependencies": {
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

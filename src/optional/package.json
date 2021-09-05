@@ -24,9 +24,10 @@
   "contributors": [
     "Quenty"
   ],
-  "peerDependencies": {
+  "dependencies": {
     "@quenty/loader": "file:../loader"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

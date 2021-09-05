@@ -25,16 +25,15 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/grouputils": "file:../grouputils",
-    "@quenty/table": "file:../table"
-  },
-  "peerDependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/grouputils": "file:../grouputils",
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/table": "file:../table"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

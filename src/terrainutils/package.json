@@ -25,13 +25,12 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/loader": "file:../loader",
     "@quenty/region3int16utils": "file:../region3int16utils",
     "@quenty/region3utils": "file:../region3utils",
     "@quenty/vector3int16utils": "file:../vector3int16utils"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

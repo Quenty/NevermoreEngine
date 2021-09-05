@@ -27,13 +27,12 @@
   "dependencies": {
     "@quenty/binder": "file:../binder",
     "@quenty/linkutils": "file:../linkutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/signal": "file:../signal"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

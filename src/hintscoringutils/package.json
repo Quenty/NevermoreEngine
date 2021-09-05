@@ -30,14 +30,13 @@
     "@quenty/boundingboxutils": "file:../boundingboxutils",
     "@quenty/camera": "file:../camera",
     "@quenty/draw": "file:../draw",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
     "@quenty/region3utils": "file:../region3utils",
     "@quenty/vector3utils": "file:../vector3utils"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -26,13 +26,12 @@
   ],
   "dependencies": {
     "@quenty/enabledmixin": "file:../enabledmixin",
-    "@quenty/maid": "file:../maid"
-  },
-  "peerDependencies": {
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

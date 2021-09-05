@@ -28,11 +28,10 @@
   ],
   "dependencies": {
     "@quenty/binarysearch": "file:../binarysearch",
-    "@quenty/linearsystemssolver": "file:../linearsystemssolver"
-  },
-  "peerDependencies": {
+    "@quenty/linearsystemssolver": "file:../linearsystemssolver",
     "@quenty/loader": "file:../loader"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }
