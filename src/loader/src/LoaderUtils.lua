@@ -27,6 +27,7 @@ function LoaderUtils.toWallyFormat(instance)
 
 	local topLevelPackages = {}
 	LoaderUtils.discoverTopLevelPackages(topLevelPackages, instance)
+	LoaderUtils.injectLoader(topLevelPackages)
 
 	local packageInfoList = {}
 	for _, folder in pairs(topLevelPackages) do
@@ -76,6 +77,17 @@ function LoaderUtils.isPackage(folder)
 	 end
 
 	 return false
+end
+
+function LoaderUtils.injectLoader(topLevelPackages)
+	for _, item in pairs(topLevelPackages) do
+		if item == loader then
+			return
+		end
+	end
+
+	-- We need the loader injected!
+	table.insert(topLevelPackages, loader)
 end
 
 function LoaderUtils.discoverTopLevelPackages(packages, instance)
