@@ -25,13 +25,12 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
     "@quenty/qgui": "file:../qgui"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

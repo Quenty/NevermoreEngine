@@ -29,14 +29,13 @@
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/linkutils": "file:../linkutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -25,11 +25,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/cframeutils": "file:../cframeutils"
-  },
-  "peerDependencies": {
+    "@quenty/cframeutils": "file:../cframeutils",
     "@quenty/loader": "file:../loader"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

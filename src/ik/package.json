@@ -32,6 +32,7 @@
     "@quenty/camera": "file:../camera",
     "@quenty/characterutils": "file:../characterutils",
     "@quenty/humanoidtracker": "file:../humanoidtracker",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
     "@quenty/promise": "file:../promise",
@@ -44,9 +45,7 @@
   "devDependencies": {
     "@quenty/rigbuilderutils": "file:../rigbuilderutils"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

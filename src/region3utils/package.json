@@ -25,11 +25,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/boundingboxutils": "file:../boundingboxutils"
-  },
-  "peerDependencies": {
+    "@quenty/boundingboxutils": "file:../boundingboxutils",
     "@quenty/loader": "file:../loader"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

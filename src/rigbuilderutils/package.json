@@ -27,15 +27,14 @@
   ],
   "dependencies": {
     "@quenty/insertserviceutils": "file:../insertserviceutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise"
   },
   "devDependencies": {
     "@quenty/camerastoryutils": "file:../camerastoryutils",
     "@quenty/maid": "file:../maid"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

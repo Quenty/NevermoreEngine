@@ -25,22 +25,21 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/binder": "file:../binder",
+    "@quenty/camera": "file:../camera",
     "@quenty/characterutils": "file:../characterutils",
     "@quenty/hapticfeedbackutils": "file:../hapticfeedbackutils",
     "@quenty/humanoidanimatorutils": "file:../humanoidanimatorutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
     "@quenty/table": "file:../table",
     "@quenty/valuebaseutils": "file:../valuebaseutils"
   },
-  "peerDependencies": {
-    "@quenty/baseobject": "file:../baseobject",
-    "@quenty/binder": "file:../binder",
-    "@quenty/camera": "file:../camera",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

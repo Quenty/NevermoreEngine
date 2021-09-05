@@ -26,11 +26,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/draw": "file:../draw"
-  },
-  "peerDependencies": {
+    "@quenty/draw": "file:../draw",
     "@quenty/loader": "file:../loader"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

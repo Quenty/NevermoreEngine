@@ -27,11 +27,10 @@
   ],
   "dependencies": {
     "@quenty/inputmode": "file:../inputmode",
+    "@quenty/loader": "file:../loader",
     "@quenty/table": "file:../table"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

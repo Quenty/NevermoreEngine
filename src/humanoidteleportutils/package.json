@@ -25,11 +25,10 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/loader": "file:../loader",
     "@quenty/raycaster": "file:../raycaster"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

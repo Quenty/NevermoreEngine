@@ -26,15 +26,14 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/remoting": "file:../remoting",
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

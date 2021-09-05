@@ -27,12 +27,11 @@
   ],
   "dependencies": {
     "@quenty/insertserviceutils": "file:../insertserviceutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/math": "file:../math",
     "@quenty/promise": "file:../promise"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

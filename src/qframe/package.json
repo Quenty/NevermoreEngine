@@ -26,14 +26,15 @@
     "Quenty",
     "AxisAngles"
   ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader"
+  },
   "devDependencies": {
     "@quenty/camerastoryutils": "file:../camerastoryutils",
     "@quenty/cubicspline": "file:../cubicspline",
     "@quenty/maid": "file:../maid"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

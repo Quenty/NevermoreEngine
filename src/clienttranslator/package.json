@@ -25,12 +25,11 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise",
     "@quenty/pseudolocalize": "file:../pseudolocalize"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

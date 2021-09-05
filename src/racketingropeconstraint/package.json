@@ -28,12 +28,11 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/loader": "file:../loader",
     "@quenty/overriddenproperty": "file:../overriddenproperty",
     "@quenty/promise": "file:../promise"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

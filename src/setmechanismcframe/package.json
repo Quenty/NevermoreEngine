@@ -25,11 +25,10 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/getmechanismparts": "file:../getmechanismparts"
-  },
-  "peerDependencies": {
+    "@quenty/getmechanismparts": "file:../getmechanismparts",
     "@quenty/loader": "file:../loader"
   },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -28,11 +28,10 @@
     "@quenty/binder": "file:../binder",
     "@quenty/boundingboxutils": "file:../boundingboxutils",
     "@quenty/characterutils": "file:../characterutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/qgui": "file:../qgui"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

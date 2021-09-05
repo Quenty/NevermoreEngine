@@ -26,12 +26,11 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/string": "file:../string"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }

@@ -24,13 +24,14 @@
   "contributors": [
     "Quenty"
   ],
-  "dependencies": {},
-  "peerDependencies": {
+  "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/permissionprovider": "file:../permissionprovider",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
-    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/servicebag": "file:../servicebag"
+  },
+  "peerDependencies": {
     "@quentystudios/cmdr": "^1.8.4-quenty.1"
   },
   "publishConfig": {

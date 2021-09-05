@@ -26,12 +26,11 @@
   ],
   "dependencies": {
     "@quenty/insertserviceutils": "file:../insertserviceutils",
+    "@quenty/loader": "file:../loader",
     "@quenty/playersservicepromises": "file:../playersservicepromises",
     "@quenty/promise": "file:../promise"
   },
-  "peerDependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "public"
   }
