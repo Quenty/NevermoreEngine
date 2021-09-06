@@ -9,8 +9,8 @@ local IKLeftGrip = setmetatable({}, IKGripBase)
 IKLeftGrip.ClassName = "IKLeftGrip"
 IKLeftGrip.__index = IKLeftGrip
 
-function IKLeftGrip.new(objectValue)
-	local self = setmetatable(IKGripBase.new(objectValue), IKLeftGrip)
+function IKLeftGrip.new(objectValue, serviceBag)
+	local self = setmetatable(IKGripBase.new(objectValue, serviceBag), IKLeftGrip)
 
 	self:PromiseIKRig()
 		:Then(function(ikRig)
