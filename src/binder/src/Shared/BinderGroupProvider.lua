@@ -26,10 +26,16 @@ function BinderGroupProvider:PromiseGroupsAdded()
 end
 
 function BinderGroupProvider:Init(...)
+	assert(not self._init, "Already initialized")
+
 	self._initMethod(self, ...)
 	self._init = true
 
 	self._groupsAddedPromise:Resolve()
+end
+
+function BinderGroupProvider:Start()
+	-- Do nothing
 end
 
 function BinderGroupProvider:__index(index)
