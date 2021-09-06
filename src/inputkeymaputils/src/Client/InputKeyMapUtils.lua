@@ -84,7 +84,8 @@ function InputKeyMapUtils.getInputModes(inputKeyMapList)
 
 	local modes = {}
 	for _, inputKeyMap in pairs(inputKeyMapList) do
-		table.insert(modes, assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode"))
+		local mode = assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode")
+		table.insert(modes, mode)
 	end
 
 	return modes
