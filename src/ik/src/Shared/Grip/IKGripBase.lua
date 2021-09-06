@@ -16,8 +16,8 @@ IKGripBase.__index = IKGripBase
 function IKGripBase.new(objectValue, serviceBag)
 	local self = setmetatable(BaseObject.new(objectValue), IKGripBase)
 
-	self._attachment = self._obj.Parent
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._attachment = self._obj.Parent
 
 	assert(self._obj:IsA("ObjectValue"), "Not an object value")
 	assert(self._attachment:IsA("Attachment"), "Not parented to an attachment")
