@@ -8,6 +8,8 @@ local WEAK_METATABLE = { __mode = "kv" }
 local SERVER_FLAG = "server"
 
 function NetworkOwnerService:Init()
+	assert(not self._partOwnerData, "Already initialized")
+
 	self._partOwnerData = setmetatable({}, { __mode="k" })
 end
 
