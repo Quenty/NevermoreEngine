@@ -11,6 +11,8 @@ local HumanoidTracker = require("HumanoidTracker")
 local HumanoidTrackerService = {}
 
 function HumanoidTrackerService:Init()
+	assert(not self._humanoidTracker, "Already initialized")
+
 	self._humanoidTracker = HumanoidTracker.new(Players.LocalPlayer)
 end
 
