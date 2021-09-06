@@ -1,12 +1,6 @@
 {
   "name": "rxbinderutils",
   "tree": {
-    "$classname": "folder",
-    "src": {
-      "$path": "src"
-    },
-    "node_modules": {
-      "$path": "node_modules"
-    }
+    "$path": "src"
   }
 }
