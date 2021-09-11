@@ -1,3 +1,56 @@
+# (Sat Sep 11 2021)
+
+#### 💥 Breaking Change
+
+- `@quenty/firstpersoncharactertransparency@3.0.0`
+  - fix: FirstPersonCharacterTransparency uses service bag [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/humanoidspeed@1.0.0`
+  - feat!: Add humanoid speed package [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/sounds@3.0.0`
+  - feat!: Add sound package, removing soundpromiseutils as a package [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- `@quenty/servicebag@3.0.0`, `@quenty/templateprovider@3.0.0`
+  - feat: Service bags now now create a prototype and use that, instead of allowing global access [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/hide@1.0.0`
+  - feat: Add hide service package [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/depthoffield@1.0.0`
+  - feat: Add DepthOfField service package [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/idleservice@1.0.0`
+  - feat: Add idleservice package [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/steputils@3.0.0`
+  - feat: Add new methods to StepUtils [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- chore: Remove dead code [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/loader@3.0.0`
+  - fix: Misc loading issues fixed, including loading injection and other issues [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/modeltransparencyeffect@3.0.0`
+  - fix: ModelTransparencyEffect works with new service bag [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/ik@4.0.0`
+  - fix: Retrieving ik components [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+  - fix: IKGrips [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/brio@3.0.0`
+  - fix: Brio passing arguments is safe [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/humanoidtracker@3.0.0`
+  - fix: Make sure HumanoidTrackerService cannot be initialized more than once [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/binder@4.0.0`
+  - fix: Allow BinderGroup to be initialized by the service bag [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/inputkeymaputils@3.0.0`
+  - fix: Turns out assert passes multiple arguments so this was bad code [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rxbinderutils@4.0.0`
+  - fix: Importing rxbinderutils now works [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+- `@quenty/networkownerservice@3.0.0`
+  - fix: Fix NetworkOwnerService initialization [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Sep 05 2021)
 
 #### 🚀 Enhancement
