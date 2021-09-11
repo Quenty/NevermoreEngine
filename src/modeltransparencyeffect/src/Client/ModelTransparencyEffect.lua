@@ -13,8 +13,15 @@ local ModelTransparencyEffect = setmetatable({}, BaseObject)
 ModelTransparencyEffect.ClassName = "ModelTransparencyEffect"
 ModelTransparencyEffect.__index = ModelTransparencyEffect
 
-function ModelTransparencyEffect.new(adornee, transparencyServiceMethodName)
+function ModelTransparencyEffect.new(serviceBag, adornee, transparencyServiceMethodName)
 	local self = setmetatable(BaseObject.new(adornee), ModelTransparencyEffect)
+
+	assert(serviceBag, "Bad serviceBag")
+	assert(adornee, "Bad adornee")
+	assert(type(transparencyServiceMethodName) == "string" or transparencyServiceMethodName == nil,
+			"Bad transparencyServiceMethodName")
+
+	self._transparencyService = serviceBag:GetService(TransparencyService)
 
 	self._transparency = AccelTween.new(20)
 	self._transparencyServiceMethodName = transparencyServiceMethodName or "SetTransparency"
@@ -58,7 +65,7 @@ function ModelTransparencyEffect:_update()
 	local transparency = self._transparency.p
 
 	for part, _ in pairs(self:_getParts()) do
-		TransparencyService[self._transparencyServiceMethodName](TransparencyService, self, part, transparency)
+		self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, transparency)
 	end
 
 	return self._transparency.rtime > 0
@@ -99,13 +106,13 @@ function ModelTransparencyEffect:_setupParts()
 	self._maid:GiveTask(self._obj.DescendantRemoving:Connect(function(child)
 		if self._parts[child] then
 			self._parts[child] = nil
-			TransparencyService[self._transparencyServiceMethodName](TransparencyService, self, child, nil)
+			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, child, nil)
 		end
 	end))
 
 	self._maid:GiveTask(function()
 		for part, _ in pairs(self._parts) do
-			TransparencyService[self._transparencyServiceMethodName](TransparencyService, self, part, nil)
+			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, nil)
 		end
 	end)
 end
