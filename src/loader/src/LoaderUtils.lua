@@ -81,7 +81,8 @@ end
 
 function LoaderUtils.injectLoader(topLevelPackages)
 	for _, item in pairs(topLevelPackages) do
-		if item == loader then
+		-- If we're underneath the hierachy or if we're in the actual item...
+		if item == loader or loader:IsDescendantOf(item) then
 			return
 		end
 	end
