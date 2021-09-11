@@ -55,13 +55,7 @@ function IKGripBase:PromiseIKRig()
 				return Promise.rejected()
 			end
 
-			local rig = ikService:GetRig(humanoid)
-			if not rig then
-				warn("[IKGripBase.PromiseIKRig] - No rig found for humanoid!")
-				return Promise.rejected()
-			end
-
-			return rig
+			return self._maid:GivePromise(ikService:PromiseRig(humanoid))
 		end)
 
 	return self._ikRigPromise

@@ -11,7 +11,6 @@ local CameraStackService = require("CameraStackService")
 local IKBindersClient = require("IKBindersClient")
 local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")
-local promiseBoundClass = require("promiseBoundClass")
 
 local IKServiceClient = {}
 
@@ -33,19 +32,16 @@ function IKServiceClient:Start()
 	end))
 end
 
-function IKServiceClient:PromiseRig(maid, humanoid)
-	assert(maid, "Bad maid")
-	assert(typeof(humanoid) == "Instance", "Bad humanoid")
-
-	local promise = promiseBoundClass(self._ikBinders.IKRig, humanoid)
-	maid:GiveTask(promise)
-	return promise
-end
-
 function IKServiceClient:GetRig(humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._ikBinders.IKRig:Get(humanoid)
+end
+
+function IKServiceClient:PromiseRig(humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
+	return self._ikBinders.IKRig:Promise(humanoid)
 end
 
 --- Exposed API for guns and other things to start setting aim position
