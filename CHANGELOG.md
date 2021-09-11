@@ -1,5 +1,18 @@
 # (Sat Sep 11 2021)
 
+#### 🐛 Bug Fix
+
+- `@quenty/sounds@3.0.1`
+  - fix: Fix soundutils [#212](https://github.com/Quenty/NevermoreEngine/pull/212) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Sep 11 2021)
+
 #### 💥 Breaking Change
 
 - `@quenty/firstpersoncharactertransparency@3.0.0`
