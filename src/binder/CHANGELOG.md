@@ -1,19 +1,18 @@
-# v4.0.0 (Sat Sep 11 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Allow BinderGroup to be initialized by the service bag [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@3.1.0...@quenty/binder@4.0.0) (2021-09-11)
+
+
+### Bug Fixes
+
+* Allow BinderGroup to be initialized by the service bag ([ac164fd](https://github.com/Quenty/NevermoreEngine/commit/ac164fdbd3f461844107840be09c26cb31f57460))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@3.0.0...@quenty/binder@3.1.0) (2021-09-05)
 

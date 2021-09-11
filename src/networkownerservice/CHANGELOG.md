@@ -1,19 +1,18 @@
-# v3.0.0 (Sat Sep 11 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Fix NetworkOwnerService initialization [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@2.0.0...@quenty/networkownerservice@3.0.0) (2021-09-11)
+
+
+### Bug Fixes
+
+* Fix NetworkOwnerService initialization ([e2c57d1](https://github.com/Quenty/NevermoreEngine/commit/e2c57d14847c31e98728d9df2d18c8351ded16c6))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@1.2.0...@quenty/networkownerservice@2.0.0) (2021-09-05)
 

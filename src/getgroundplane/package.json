@@ -1,6 +1,6 @@
 {
   "name": "@quenty/getgroundplane",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Function that uses raycasting to determine the groundplane in Roblox",
   "keywords": [
     "Roblox",

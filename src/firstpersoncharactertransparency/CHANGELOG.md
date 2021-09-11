@@ -1,19 +1,18 @@
-# v3.0.0 (Sat Sep 11 2021)
-
-#### 💥 Breaking Change
-
-- fix: FirstPersonCharacterTransparency uses service bag [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@2.1.0...@quenty/firstpersoncharactertransparency@3.0.0) (2021-09-11)
+
+
+### Bug Fixes
+
+* FirstPersonCharacterTransparency uses service bag ([f6a5264](https://github.com/Quenty/NevermoreEngine/commit/f6a5264715c11f0846b263efbe474c4e8fae39e3))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@2.0.0...@quenty/firstpersoncharactertransparency@2.1.0) (2021-09-05)
 

@@ -1,19 +1,18 @@
-# v3.0.0 (Sat Sep 11 2021)
-
-#### 🐛 Bug Fix
-
-- fix: ModelTransparencyEffect works with new service bag [#211](https://github.com/Quenty/NevermoreEngine/pull/211) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@2.1.0...@quenty/modeltransparencyeffect@3.0.0) (2021-09-11)
+
+
+### Bug Fixes
+
+* ModelTransparencyEffect works with new service bag ([e541fd0](https://github.com/Quenty/NevermoreEngine/commit/e541fd034d3a714156bc42d50baa4c7b1ee775b1))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@2.0.0...@quenty/modeltransparencyeffect@2.1.0) (2021-09-05)
 
