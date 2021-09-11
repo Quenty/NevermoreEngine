@@ -1,5 +1,5 @@
 {
-  "name": "@quenty/soundpromiseutils",
+  "name": "@quenty/sounds",
   "version": "2.1.0",
   "description": "Utility functions involving sounds and their state",
   "keywords": [
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/soundpromiseutils/"
+    "directory": "src/sounds/"
   },
   "funding": {
     "type": "patreon",
