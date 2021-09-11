@@ -1,0 +1,36 @@
+{
+  "name": "@quenty/hide",
+  "version": "0.0.0",
+  "description": "Utility system that leverages the binder system to hide authored objects. Centralized here for cross-system communication.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Authoring",
+    "Hide"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/hide/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/binder": "file:../binder",
+    "@quenty/loader": "file:../loader",
+    "@quenty/servicebag": "file:../servicebag"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
