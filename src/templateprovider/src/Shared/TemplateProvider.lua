@@ -5,39 +5,37 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local String = require("String")
 
-local TemplateProvider = setmetatable({}, BaseObject)
+local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
 TemplateProvider.__index = TemplateProvider
 
 -- @param[opt=nil] container
 function TemplateProvider.new(container)
-	local self = setmetatable(BaseObject.new(), TemplateProvider)
-
-	self._containersToInitializeSet = { }
+	local self = setmetatable({}, TemplateProvider)
 
 	if container then
-		self:AddContainer(container)
+		self._containersToInitializeSet = { [container] = true }
 	end
-
-	self._registry = {} -- [name] = rawTemplate
-	self._containersSet = {} -- [parent] = true
 
 	return self
 end
 
 -- Initializes the container provider
 function TemplateProvider:Init()
-	assert(self._containersToInitializeSet, "Already initialized")
+	assert(not self._initialized, "Already initialized")
 
-	local containers = self._containersToInitializeSet
-	self._containersToInitializeSet = nil
+	self._maid = Maid.new()
+	self._initialized = true
+	self._registry = {} -- [name] = rawTemplate
+	self._containersSet = {} -- [parent] = true
 
-	for container, _ in pairs(containers) do
-		self:AddContainer(container)
+	if self._containersToInitializeSet then
+		for container, _ in pairs(self._containersToInitializeSet) do
+			self:AddContainer(container)
+		end
 	end
 end
 
@@ -69,24 +67,19 @@ end
 -- Adds a new container to the provider for provision of assets
 function TemplateProvider:AddContainer(container)
 	assert(typeof(container) == "Instance", "Bad container")
+	assert(not self._containersSet[container], "Already added")
+	self:_verifyInit()
 
-	if self._containersToInitializeSet then
-		self._containersToInitializeSet[container] = true
-	else
-		assert(not self._containersSet[container], "Already added")
-
-		self._containersSet[container] = true
-		self._maid[container] = self:_loadFolder(container)
-	end
+	self._containersSet[container] = true
+	self._maid[container] = self:_loadFolder(container)
 end
 
 function TemplateProvider:RemoveContainer(container)
-	if self._containersToInitializeSet then
-		self._containersToInitializeSet[container] = nil
-	else
-		self._containersSet[container] = nil
-		self._maid[container] = nil
-	end
+	assert(typeof(container) == "Instance", "Bad container")
+	self:_verifyInit()
+
+	self._containersSet[container] = nil
+	self._maid[container] = nil
 end
 
 -- Returns whether or not a template is registered at the time
@@ -121,16 +114,12 @@ function TemplateProvider:GetContainers()
 end
 
 function TemplateProvider:_verifyInit()
-	if not self._containersToInitializeSet then
-		return
-	end
-
 	if not RunService:IsRunning() then
 		-- Initialize for hoarcecat!
 		self:Init()
 	end
 
-	assert(not self._containersToInitializeSet, "TemplateProvider is not initialized")
+	assert(self._initialized, "TemplateProvider is not initialized")
 end
 
 function TemplateProvider:_transformParent(getParent)
@@ -203,6 +192,10 @@ function TemplateProvider:_removeFromRegistry(child)
 	if self._registry[childName] == child then
 		self._registry[childName] = nil
 	end
+end
+
+function TemplateProvider:Destroy()
+	self._maid:DoCleaning()
 end
 
 return TemplateProvider
