@@ -4,7 +4,7 @@
 local RunService = game:GetService("RunService")
 
 return function(_function)
-	assert(type(_function) == "function")
+	assert(type(_function) == "function", "Bad _function")
 
 	local conn
 	conn = RunService.Stepped:Connect(function()
