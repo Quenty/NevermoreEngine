@@ -5,8 +5,8 @@ local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
 return function(priority, callback)
-	assert(type(priority) == "number")
-	assert(type(callback) == "function")
+	assert(type(priority) == "number", "Bad priority")
+	assert(type(callback) == "function", "Bad callback")
 
 	local key = HttpService:GenerateGUID(false) .. "_onRenderStepFrame"
 	local unbound = false
