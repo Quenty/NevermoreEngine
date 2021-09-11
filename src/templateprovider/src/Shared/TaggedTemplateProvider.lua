@@ -25,37 +25,33 @@ function TaggedTemplateProvider.new(containerTagName)
 end
 
 function TaggedTemplateProvider:Init()
-	assert(self._tagsToInitializeSet, "Already initialized")
+	assert(not self._maid, "Should not have a maid")
 
 	getmetatable(TaggedTemplateProvider).Init(self)
 
-	local tags = self._tagsToInitializeSet
-	self._tagsToInitializeSet = nil
+	assert(self._maid, "Should have a maid")
 
-	for tag, _ in pairs(tags) do
+	for tag, _ in pairs(self._tagsToInitializeSet) do
 		self:AddContainersFromTag(tag)
 	end
 end
 
 function TaggedTemplateProvider:AddContainersFromTag(containerTagName)
+	assert(self._maid, "Not initialized")
 	assert(type(containerTagName) == "string", "Bad containerTagName")
 
-	if self._tagsToInitializeSet then
-		self._tagsToInitializeSet[containerTagName] = true
-	else
-		if RunService:IsRunning() then
-			self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(containerTagName):Connect(function(inst)
-				self:AddContainer(inst)
-			end))
-
-			self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(containerTagName):Connect(function(inst)
-				self:RemoveContainer(inst)
-			end))
-		end
-
-		for _, inst in pairs(CollectionService:GetTagged(containerTagName)) do
+	if RunService:IsRunning() then
+		self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(containerTagName):Connect(function(inst)
 			self:AddContainer(inst)
-		end
+		end))
+
+		self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(containerTagName):Connect(function(inst)
+			self:RemoveContainer(inst)
+		end))
+	end
+
+	for _, inst in pairs(CollectionService:GetTagged(containerTagName)) do
+		self:AddContainer(inst)
 	end
 end
 

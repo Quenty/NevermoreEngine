@@ -39,12 +39,14 @@ function ServiceBag:GetService(serviceType)
 		serviceType = require(serviceType)
 	end
 
-	if self._services[serviceType] then
+	local service = self._services[serviceType]
+	if service then
 		-- Ensure initialized if we're during inint phase
 		if self._servicesToInitialize and self._initializing then
-			local index = table.find(self._servicesToInitialize, serviceType)
+			local index = table.find(self._servicesToInitialize, service)
 			if index then
-				local service = assert(table.remove(self._servicesToInitialize, index), "No service removed")
+				local foundService = assert(table.remove(self._servicesToInitialize, index), "No service removed")
+				assert(foundService == service, "foundService ~= service")
 				self:_initService(service)
 			end
 		end
@@ -90,21 +92,23 @@ function ServiceBag:Start()
 end
 
 --- Adds a service to this provider only
-function ServiceBag:_addService(service)
+function ServiceBag:_addService(serviceType)
 	assert(self._servicesToInitialize, "Already finished initializing, cannot add more services")
 
 	-- Already added
-	if self._services[service] then
+	if self._services[serviceType] then
 		return
 	end
 
-	self._services[service] = service
+	-- Construct a new version of this service so we're isolated
+	local service = setmetatable({}, { __index = serviceType })
+	self._services[serviceType] = service
 
 	if self._initializing then
 		-- let's initialize immediately
 		self:_initService(service)
 	else
-		table.insert(self._servicesToInitialize, service)
+		table.insert(self._servicesToInitialize, serviceType)
 	end
 end
 
