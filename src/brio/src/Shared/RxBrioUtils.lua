@@ -144,11 +144,13 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				if selectFromBrio then
 					for _, brio in pairs(aliveBrios) do
 						-- Hope for no side effects
-						table.insert(values, assert(selectFromBrio(brio:GetValue())))
+						local value = assert(selectFromBrio(brio:GetValue()), "Bad value")
+						table.insert(values, value)
 					end
 				else
 					for _, brio in pairs(aliveBrios) do
-						table.insert(values, assert(brio:GetValue()))
+						local value = assert(brio:GetValue())
+						table.insert(values, value)
 					end
 				end
 
