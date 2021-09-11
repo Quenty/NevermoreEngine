@@ -12,11 +12,12 @@ local FirstPersonCharacterTransparency = setmetatable({}, BaseObject)
 FirstPersonCharacterTransparency.ClassName = "FirstPersonCharacterTransparency"
 FirstPersonCharacterTransparency.__index = FirstPersonCharacterTransparency
 
-function FirstPersonCharacterTransparency.new(humanoid)
+function FirstPersonCharacterTransparency.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), FirstPersonCharacterTransparency)
 
 	self._humanoid = humanoid or error("No humanoid")
 	self._character = self._humanoid.Parent or error("No character")
+	self._transparencyService = serviceBag:GetService(TransparencyService)
 
 	self._parts = {}
 	self._transparency = 0
@@ -57,13 +58,13 @@ function FirstPersonCharacterTransparency:SetTransparency(transparency)
 	self._transparency = transparency
 
 	for part, _ in pairs(self._parts) do
-		TransparencyService:SetTransparency(self, part, self._transparency)
+		self._transparencyService:SetTransparency(self, part, self._transparency)
 	end
 end
 
 function FirstPersonCharacterTransparency:_reset()
 	for part, _ in pairs(self._parts) do
-		TransparencyService:ResetTransparency(self, part)
+		self._transparencyService:ResetTransparency(self, part)
 	end
 end
 
@@ -80,7 +81,7 @@ function FirstPersonCharacterTransparency:_handlePartAdded(part)
 	if self:_shouldAddPart(part) then
 		self._parts[part] = true
 		if self._transparency then
-			TransparencyService:SetTransparency(self, part, self._transparency)
+			self._transparencyService:SetTransparency(self, part, self._transparency)
 		end
 	end
 end
@@ -88,7 +89,7 @@ end
 function FirstPersonCharacterTransparency:_handlePartRemoving(part)
 	if part:IsA("BasePart") then
 		self._parts[part] = nil
-		TransparencyService:ResetTransparency(self, part)
+		self._transparencyService:ResetTransparency(self, part)
 	end
 end
 
