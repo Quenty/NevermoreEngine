@@ -2,6 +2,8 @@
 -- @module ScriptInfoUtils
 -- @author Quenty
 
+local CollectionService = game:GetService("CollectionService")
+
 local loader = script.Parent
 local Utils = require(script.Parent.Utils)
 
@@ -35,30 +37,6 @@ function ScriptInfoUtils.createScriptInfoLookup()
 		[ScriptInfoUtils.ModuleReplicationTypes.SHARED] = {};
 	})
 end
-
--- function ScriptInfoUtils.canMergeLookupInto(target, source, replicationMode)
--- 	assert(type(target) == "table", "Bad target")
-
--- 	for entryName, _ in pairs(source[replicationMode]) do
--- 		if target[replicationMode][entryName] then
--- 			return false
--- 		end
--- 	end
-
--- 	return true
--- end
-
--- function ScriptInfoUtils.mergeLookupInto(target, source, replicationMode)
--- 	assert(type(target) == "table", "Bad target")
-
--- 	for entryName, scriptInfo in pairs(source[replicationMode]) do
--- 		if target[replicationMode][entryName] then
--- 			error(("Duplicate entry %q"):format(entryName))
--- 		end
-
--- 		target[replicationMode][entryName] = scriptInfo
--- 	end
--- end
 
 function ScriptInfoUtils.getScriptInfoLookupForMode(scriptInfoLookup, replicationMode)
 	assert(type(scriptInfoLookup) == "table", "Bad scriptInfoLookup")
@@ -98,6 +76,22 @@ function ScriptInfoUtils.populateScriptInfoLookup(instance, scriptInfoLookup, la
 	end
 end
 
+local AVAILABLE_IN_SHARED = {
+	["HoldingBindersServer"] = true;
+	["HoldingBindersClient"] = true;
+	["IKService"] = true;
+	["IKServiceClient"] = true;
+}
+
+function ScriptInfoUtils.isAvailableInShared(scriptInfo)
+	if CollectionService:HasTag(scriptInfo.instance, "LinkToShared") then
+		return true
+	end
+
+	-- Hack because we can't tag things in Rojo yet
+	return AVAILABLE_IN_SHARED[scriptInfo.name]
+end
+
 function ScriptInfoUtils.addToInfoMap(scriptInfoLookup, scriptInfo)
 	assert(type(scriptInfoLookup) == "table", "Bad scriptInfoLookup")
 	assert(type(scriptInfo) == "table", "Bad scriptInfo")
@@ -113,6 +107,9 @@ function ScriptInfoUtils.addToInfoMap(scriptInfoLookup, scriptInfo)
 			scriptInfoLookup[ScriptInfoUtils.ModuleReplicationTypes.SERVER], scriptInfo)
 		ScriptInfoUtils.addToInfoMapForMode(
 			scriptInfoLookup[ScriptInfoUtils.ModuleReplicationTypes.CLIENT], scriptInfo)
+	elseif ScriptInfoUtils.isAvailableInShared(scriptInfo) then
+		ScriptInfoUtils.addToInfoMapForMode(
+			scriptInfoLookup[ScriptInfoUtils.ModuleReplicationTypes.SHARED], scriptInfo)
 	end
 end
 

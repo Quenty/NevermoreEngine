@@ -6,6 +6,7 @@ local Utils = require(script.Parent.Utils)
 local Queue = require(script.Parent.Queue)
 
 local GROUP_EACH_PACKAGE_INDIVIDUALLY = false
+local ALLOW_MULTIPLE_GROUPS = false
 
 local GroupInfoUtils = {}
 
@@ -43,11 +44,16 @@ function GroupInfoUtils.groupPackageInfos(packageInfoList, replicationMode)
 					table.insert(built, current)
 					current = GroupInfoUtils.createGroupInfo()
 				end
-			else
+			elseif ALLOW_MULTIPLE_GROUPS then
 				-- Create a new group
 				table.insert(built, current)
 				current = GroupInfoUtils.createGroupInfo()
 				GroupInfoUtils.addPackageInfoToGroup(current, packageInfo, replicationMode)
+			else
+				-- Force generate error
+				GroupInfoUtils.addPackageInfoToGroup(current, packageInfo, replicationMode)
+
+				error("Cannot add package to group")
 			end
 		end
 
