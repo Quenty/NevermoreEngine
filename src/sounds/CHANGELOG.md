@@ -1,19 +1,18 @@
-# v3.0.1 (Sat Sep 11 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Fix soundutils [#212](https://github.com/Quenty/NevermoreEngine/pull/212) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.0.0...@quenty/sounds@3.0.1) (2021-09-11)
+
+
+### Bug Fixes
+
+* Actually finish sounds package ([#212](https://github.com/Quenty/NevermoreEngine/issues/212)) ([35546e7](https://github.com/Quenty/NevermoreEngine/commit/35546e730546dd4ad6e0552bf113ad2fb095ca9d))
+
+
+
+
 
 # 3.0.0 (2021-09-11)
 
