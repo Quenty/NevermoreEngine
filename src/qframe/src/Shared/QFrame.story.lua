@@ -2,7 +2,7 @@
 -- @module QFrame.story
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 
 local Maid = require("Maid")
 local QFrame = require("QFrame")

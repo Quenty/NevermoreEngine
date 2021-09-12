@@ -2,7 +2,7 @@
 -- @module CameraFrame.story
 -- @author Quenty
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 
 local CameraFrame = require("CameraFrame")
 local CameraStoryUtils = require("CameraStoryUtils")
