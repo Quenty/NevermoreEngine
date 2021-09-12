@@ -111,7 +111,7 @@ function StaticLegacyLoader:_getPackageFolderLookup(instance)
 	elseif instance:IsA("Folder") then
 		return self:_getOrCreateLookup(instance)
 	else
-		warn(("Unknown instance in dependencyFolder - %q"):format(instance:GetFullName()))
+		warn(("Unknown instance %q (%s) in dependencyFolder - %q"):format(instance.Name, instance.ClassName, instance:GetFullName()))
 		return {}
 	end
 end

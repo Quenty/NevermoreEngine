@@ -6,7 +6,7 @@ local Utils = require(script.Parent.Utils)
 local Queue = require(script.Parent.Queue)
 
 local GROUP_EACH_PACKAGE_INDIVIDUALLY = false
-local ALLOW_MULTIPLE_GROUPS = false
+local ALLOW_MULTIPLE_GROUPS = true
 
 local GroupInfoUtils = {}
 
