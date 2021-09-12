@@ -28,6 +28,7 @@
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx"
   },

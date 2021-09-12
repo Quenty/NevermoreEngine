@@ -28,8 +28,9 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/binder": "file:../binder",
     "@quenty/characterutils": "file:../characterutils",
-    "@quenty/loader": "file:../../../Nevermore/src/loader",
+    "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise",
     "@quenty/table": "file:../table"
   },
