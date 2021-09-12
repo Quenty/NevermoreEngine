@@ -115,8 +115,10 @@ end
 
 function TemplateProvider:_verifyInit()
 	if not RunService:IsRunning() then
-		-- Initialize for hoarcecat!
-		self:Init()
+		if not self._initialized then
+			-- Initialize for hoarcecat!
+			self:Init()
+		end
 	end
 
 	assert(self._initialized, "TemplateProvider is not initialized")
