@@ -6,6 +6,8 @@ local Utils = require(script.Parent.Utils)
 local ScriptInfoUtils = require(script.Parent.ScriptInfoUtils)
 local Queue = require(script.Parent.Queue)
 
+local INCLUDE_IMPLICIT_DEPENDENCIES = true
+
 local PackageInfoUtils = {}
 
 function PackageInfoUtils.createPackageInfo(packageFolder, explicitDependencySet, scriptInfoLookup, fullName)
@@ -19,7 +21,7 @@ function PackageInfoUtils.createPackageInfo(packageFolder, explicitDependencySet
 		fullName = fullName;
 		instance = packageFolder;
 		explicitDependencySet = explicitDependencySet;
-		dependencySet = false; -- will be filled in later
+		dependencySet = false; -- will be filled in later, contains ALL expected dependencies
 		scriptInfoLookup = scriptInfoLookup;
 	})
 end
@@ -80,8 +82,10 @@ function PackageInfoUtils.computePackageDependencySet(packageInfo, implicitDepen
 	local dependencyNameMap = {}
 
 	-- Set implicit dependencies
-	for entry, _ in pairs(implicitDependencySet) do
-		dependencyNameMap[entry.name] = entry
+	if INCLUDE_IMPLICIT_DEPENDENCIES then
+		for entry, _ in pairs(implicitDependencySet) do
+			dependencyNameMap[entry.name] = entry
+		end
 	end
 
 	-- These override implicit ones
