@@ -30,6 +30,9 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid"
   },
+  "devDependencies": {
+    "@quenty/string": "file:../string"
+  },
   "publishConfig": {
     "access": "public"
   }

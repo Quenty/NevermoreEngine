@@ -26,7 +26,8 @@
   ],
   "dependencies": {
     "@quenty/brio": "file:../brio",
-    "@quenty/instanceutils": "file:../instanceutils"
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/loader": "file:../loader"
   },
   "publishConfig": {
     "access": "public"

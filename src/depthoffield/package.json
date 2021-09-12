@@ -27,6 +27,7 @@
   "dependencies": {
     "@quenty/acceltween": "file:../acceltween",
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/signal": "file:../signal",
     "@quenty/steputils": "file:../steputils",

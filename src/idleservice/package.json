@@ -29,6 +29,7 @@
   "dependencies": {
     "@quenty/humanoidtracker": "file:../humanoidtracker",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/ragdoll": "file:../ragdoll",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/statestack": "file:../statestack"

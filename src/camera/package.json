@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/acceltween": "file:../acceltween",
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/cframeutils": "file:../cframeutils",
     "@quenty/cubicspline": "file:../cubicspline",
     "@quenty/inputobjectutils": "file:../inputobjectutils",
