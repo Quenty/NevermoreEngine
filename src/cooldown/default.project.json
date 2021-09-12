@@ -1,0 +1,6 @@
+{
+  "name": "cooldown",
+  "tree": {
+    "$path": "src"
+  }
+}
