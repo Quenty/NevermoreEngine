@@ -46,7 +46,7 @@ function CameraStoryUtils.setupViewportFrame(maid, target)
 	return viewportFrame
 end
 
-function CameraStoryUtils.promiseCrate(maid, viewportFrame, color)
+function CameraStoryUtils.promiseCrate(maid, viewportFrame, properties)
 	return maid:GivePromise(InsertServiceUtils.promiseAsset(182451181)):Then(function(model)
 		maid:GiveTask(model)
 
@@ -55,10 +55,13 @@ function CameraStoryUtils.promiseCrate(maid, viewportFrame, color)
 			return Promise.rejected()
 		end
 
-		for _, item in pairs(crate:GetDescendants()) do
-			if item:IsA("BasePart") then
-				item.Color = color
-				item.Transparency = 0.5
+		if properties then
+			for _, item in pairs(crate:GetDescendants()) do
+				if item:IsA("BasePart") then
+					for property, value in pairs(properties) do
+						item[property] = value
+					end
+				end
 			end
 		end
 
@@ -80,7 +83,10 @@ function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high
 		assert(type(interpolate) == "function", "Bad interpolate")
 		assert(typeof(color) == "Color3", "Bad color")
 
-		maid:GivePromise(CameraStoryUtils.promiseCrate(maid, viewportFrame, color))
+		maid:GivePromise(CameraStoryUtils.promiseCrate(maid, viewportFrame, {
+			Color = color;
+			Transparency = 0.5
+		}))
 			:Then(function(crate)
 				maid:GiveTask(RunService.RenderStepped:Connect(function()
 					local t = (os.clock()/period % 2/period)*period
