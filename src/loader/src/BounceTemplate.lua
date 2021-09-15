@@ -2,4 +2,13 @@
 -- @module BounceTemplate
 -- @author Quenty
 
-return require(script.BounceTarget.Value)
+local function waitForValue(objectValue)
+	local value = objectValue.Value
+	if value then
+		return value
+	end
+
+	return objectValue.Changed:Wait()
+end
+
+return require(waitForValue(script:WaitForChild("BounceTarget")))
