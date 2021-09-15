@@ -110,37 +110,40 @@ function StaticLegacyLoader:_getPackageFolderLookup(instance)
 		end
 	elseif instance:IsA("Folder") then
 		return self:_getOrCreateLookup(instance)
+	elseif instance:IsA("ModuleScript") then
+		return self:_getOrCreateLookup(instance)
 	else
-		warn(("Unknown instance %q (%s) in dependencyFolder - %q"):format(instance.Name, instance.ClassName, instance:GetFullName()))
+		warn(("Unknown instance %q (%s) in dependencyFolder - %q")
+			:format(instance.Name, instance.ClassName, instance:GetFullName()))
 		return {}
 	end
 end
 
-function StaticLegacyLoader:_getOrCreateLookup(packageFolder)
-	assert(typeof(packageFolder) == "Instance", "Bad packageFolder")
+function StaticLegacyLoader:_getOrCreateLookup(packageFolderOrModuleScript)
+	assert(typeof(packageFolderOrModuleScript) == "Instance", "Bad packageFolderOrModuleScript")
 
-	if self._packageLookups[packageFolder] then
-		return self._packageLookups[packageFolder]
+	if self._packageLookups[packageFolderOrModuleScript] then
+		return self._packageLookups[packageFolderOrModuleScript]
 	end
 
 	local lookup = {}
 
-	local function search(instance)
-		for _, item in pairs(instance:GetChildren()) do
-			if item:IsA("Folder") then
-				if item.Name ~= ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
-					search(item)
-				end
-			elseif item:IsA("ModuleScript") then
-				lookup[item.Name] = item
+	self:_buildLookup(lookup, packageFolderOrModuleScript)
+
+	self._packageLookups[packageFolderOrModuleScript] = lookup
+	return lookup
+end
+
+function StaticLegacyLoader:_buildLookup(lookup, instance)
+	if instance:IsA("Folder") then
+		if instance.Name ~= ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
+			for _, item in pairs(instance:GetChildren()) do
+				self:_buildLookup(lookup, item)
 			end
 		end
+	elseif instance:IsA("ModuleScript") then
+		lookup[instance.Name] = instance
 	end
-
-	search(packageFolder)
-
-	self._packageLookups[packageFolder] = lookup
-	return lookup
 end
 
 function StaticLegacyLoader:_findPackageRoot(instance)
