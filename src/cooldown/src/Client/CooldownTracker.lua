@@ -17,6 +17,7 @@ function CooldownTracker.new(serviceBag, parent)
 	local self = setmetatable(BaseObject.new(parent), CooldownTracker)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	assert(parent, "No parent")
 
 	self.CurrentCooldown = ValueObject.new()
 	self._maid:GiveTask(self.CurrentCooldown)

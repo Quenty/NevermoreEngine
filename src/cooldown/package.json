@@ -25,12 +25,14 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
     "@quenty/servicebag": "file:../servicebag",
+    "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
     "@quenty/timesyncservice": "file:../timesyncservice",
     "@quenty/valueobject": "file:../valueobject"
