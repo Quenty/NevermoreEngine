@@ -67,6 +67,13 @@ function CameraStoryUtils.promiseCrate(maid, viewportFrame, properties)
 
 		crate.Parent = viewportFrame
 
+		local camera = viewportFrame.CurrentCamera
+		if camera then
+			local cameraCFrame = camera.CFrame
+			local cframe = CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25)
+			crate:SetPrimaryPartCFrame(cframe)
+		end
+
 		return Promise.resolved(crate)
 	end)
 end
