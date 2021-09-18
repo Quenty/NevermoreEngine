@@ -1,3 +1,15 @@
+# v3.0.1 (Sat Sep 18 2021)
+
+#### 🐛 Bug Fix
+
+- fix: Allow stories to be loaded into the actual package in question [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,29 @@
+# (Sat Sep 18 2021)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@3.0.1`
+  - fix: Handle deferred mode and loader in test mode in loader [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+  - fix: Better warnings in loader and also allow multiple groups [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cooldown@1.0.1`
+  - fix: Fix cooldown dependencies [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+  - chore: Add cooldown package [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+- `@quenty/camerastoryutils@3.0.1`
+  - fix: camera story parents relative to the camera [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+  - fix: Fix CameraStoryUtils [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+- `@quenty/templateprovider@3.0.1`
+  - fix: Prevent double initialization [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+- `@quenty/camera@4.0.1`, `@quenty/lipsum@3.0.1`, `@quenty/qframe@3.0.1`, `@quenty/rigbuilderutils@3.0.1`, `@quenty/sprites@3.0.1`
+  - fix: Allow stories to be loaded into the actual package in question [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+- `@quenty/brio@3.0.1`, `@quenty/camera@4.0.1`, `@quenty/datastore@3.0.1`, `@quenty/depthoffield@1.0.1`, `@quenty/hide@1.0.1`, `@quenty/humanoidspeed@1.0.1`, `@quenty/idleservice@1.0.1`, `@quenty/instanceutils@3.0.1`, `@quenty/linkutils@3.0.1`, `@quenty/r15utils@3.0.1`, `@quenty/rx@3.0.1`, `@quenty/sprites@3.0.1`, `@quenty/textfilterservice@3.0.1`, `@quenty/valueobject@3.0.1`
+  - fix: Fix undeclare package dependencies that prevented loading in certain situations [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Sep 11 2021)
 
 #### 🐛 Bug Fix
