@@ -4,6 +4,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
@@ -15,9 +16,9 @@ local RxLinkUtils = require("RxLinkUtils")
 local RxBinderUtils = {}
 
 function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
-	assert(linkName, "Bad linkName")
-	assert(parent, "Bad parent")
-	assert(binder, "Bad binder")
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(Binder.isBinder(binder), "Bad binder")
 
 	return RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		:Pipe({
@@ -28,7 +29,7 @@ function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
 end
 
 function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
-	assert(binder, "Bad binder")
+	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
@@ -40,7 +41,7 @@ function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
 end
 
 function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
-	assert(binders, "Bad binders")
+	assert(Binder.isBinder(binders), "Bad binders")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
@@ -93,7 +94,7 @@ function RxBinderUtils.observeBoundClassBrio(binder, instance)
 end
 
 function RxBinderUtils.observeBoundClassesBrio(binders, instance)
-	assert(binders, "Bad binders")
+	assert(Binder.isBinder(binders), "Bad binders")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local observables = {}
@@ -109,7 +110,7 @@ end
 
 
 function RxBinderUtils.observeAllBrio(binder)
-	assert(type(binder) == "table", "Bad binder")
+	assert(Binder.isBinder(binder), "Bad binder")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
