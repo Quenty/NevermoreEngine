@@ -22,4 +22,19 @@ function SoundUtils.playTemplate(templates, templateName)
 	return sound
 end
 
+function SoundUtils.playTemplateInParent(templates, templateName, parent)
+	local sound = templates:Clone(templateName)
+	sound.Archivable = false
+	sound.Parent = parent
+
+	sound:Play()
+
+	delay(sound.TimeLength + 0.05, function()
+		sound:Destroy()
+	end)
+
+	return sound
+end
+
+
 return SoundUtils
