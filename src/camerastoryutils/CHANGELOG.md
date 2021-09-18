@@ -1,20 +1,19 @@
-# v3.0.1 (Sat Sep 18 2021)
-
-#### 🐛 Bug Fix
-
-- fix: camera story parents relative to the camera [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
-- fix: Fix CameraStoryUtils [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@3.0.0...@quenty/camerastoryutils@3.0.1) (2021-09-18)
+
+
+### Bug Fixes
+
+* camera story parents relative to the camera ([edae4b2](https://github.com/Quenty/NevermoreEngine/commit/edae4b2a0f26fbef1d23860e5b06f2bffa17c414))
+* Fix CameraStoryUtils ([06d296e](https://github.com/Quenty/NevermoreEngine/commit/06d296eea64deea5d171f769d43ff67537b04ed5))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@2.1.0...@quenty/camerastoryutils@3.0.0) (2021-09-11)
 

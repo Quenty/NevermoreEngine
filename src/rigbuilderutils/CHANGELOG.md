@@ -1,19 +1,18 @@
-# v3.0.1 (Sat Sep 18 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Allow stories to be loaded into the actual package in question [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@3.0.0...@quenty/rigbuilderutils@3.0.1) (2021-09-18)
+
+
+### Bug Fixes
+
+* Allow stories to be loaded into the actual package in question ([941348a](https://github.com/Quenty/NevermoreEngine/commit/941348a6e59742adf4f3824403814679964ad87e))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@2.1.0...@quenty/rigbuilderutils@3.0.0) (2021-09-11)
 

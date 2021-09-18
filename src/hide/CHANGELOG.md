@@ -1,19 +1,18 @@
-# v1.0.1 (Sat Sep 18 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Fix undeclare package dependencies that prevented loading in certain situations [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@1.0.0...@quenty/hide@1.0.1) (2021-09-18)
+
+
+### Bug Fixes
+
+* Fix undeclare package dependencies that prevented loading in certain situations ([a8be7e0](https://github.com/Quenty/NevermoreEngine/commit/a8be7e06a06506a71257862429934e2ed0f6f56b))
+
+
+
+
 
 # 1.0.0 (2021-09-11)
 

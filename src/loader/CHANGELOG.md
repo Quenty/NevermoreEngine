@@ -1,20 +1,19 @@
-# v3.0.1 (Sat Sep 18 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Handle deferred mode and loader in test mode in loader [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
-- fix: Better warnings in loader and also allow multiple groups [#213](https://github.com/Quenty/NevermoreEngine/pull/213) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.0.0...@quenty/loader@3.0.1) (2021-09-18)
+
+
+### Bug Fixes
+
+* Better warnings in loader and also allow multiple groups ([7215ba4](https://github.com/Quenty/NevermoreEngine/commit/7215ba425e85bf5ad080d72f39d7645fa8e4fe06))
+* Handle deferred mode and loader in test mode in loader ([514cd90](https://github.com/Quenty/NevermoreEngine/commit/514cd9043d20b6d2f2c019e920b19212b0dc96af))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@2.1.0...@quenty/loader@3.0.0) (2021-09-11)
 
