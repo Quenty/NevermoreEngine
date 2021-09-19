@@ -40,6 +40,22 @@ function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
 		})
 end
 
+function RxBinderUtils.observeBoundParentClassBrio(binder, instance)
+	assert(Binder.isBinder(binder), "Bad binder")
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	return RxInstanceUtils.observePropertyBrio(instance, "Parent")
+		:Pipe({
+			RxBrioUtils.switchMap(function(child)
+				if child then
+					return RxBinderUtils.observeBoundClassBrio(binder, child)
+				else
+					return Rx.EMPTY
+				end
+			end);
+		})
+end
+
 function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
 	assert(Binder.isBinder(binders), "Bad binders")
 	assert(typeof(instance) == "Instance", "Bad instance")
