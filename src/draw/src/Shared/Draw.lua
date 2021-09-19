@@ -177,6 +177,10 @@ function Draw._textOnAdornee(adornee, text, color)
 	return billboardGui
 end
 
+function Draw.sphere(vector3, radius, color, parent)
+	return Draw.point(vector3, color, parent, radius*2)
+end
+
 --- Draws a point for debugging
 -- @tparam {Vector3} vector3 Point to Draw
 -- @tparam[opt] {color3} color The color to Draw in
