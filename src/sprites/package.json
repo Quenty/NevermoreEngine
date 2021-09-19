@@ -28,7 +28,8 @@
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/maid": "file:../maid",
+    "@quenty/uiobjectutils": "file:../uiobjectutils"
   },
   "devDependencies": {
     "@quenty/string": "file:../string"
