@@ -89,6 +89,10 @@ function String.removePostfix(str, postfix)
 	end
 end
 
+function String.endsWith(str, postfix)
+	return str:sub(-#postfix) == postfix
+end
+
 function String.addCommas(number)
 	if type(number) == "number" then
 		number = tostring(number)
