@@ -13,4 +13,5 @@ return BinderProvider.new(function(self, serviceBag)
 
 	self:Add(Binder.new("RagdollHumanoidOnDeath", require("RagdollHumanoidOnDeath"), serviceBag))
 	self:Add(Binder.new("RagdollHumanoidOnFall", require("RagdollHumanoidOnFall"), serviceBag))
+	self:Add(Binder.new("UnragdollAutomatically", require("UnragdollAutomatically"), serviceBag))
 end)
