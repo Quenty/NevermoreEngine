@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local ScoredActionPicker = require("ScoredActionPicker")
 local Table = require("Table")
+local TouchButtonScoredActionPicker = require("TouchButtonScoredActionPicker")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 
@@ -34,7 +35,13 @@ function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
 		return self._scoredActionPickers[inputType]
 	end
 
-	local picker = ScoredActionPicker.new()
+	local picker
+	if inputType == "TouchButton" then
+		picker = TouchButtonScoredActionPicker.new()
+	else
+		picker = ScoredActionPicker.new()
+	end
+
 	self._maid[inputType] = picker
 	self._scoredActionPickers[inputType] = picker
 

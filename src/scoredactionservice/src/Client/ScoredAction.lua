@@ -25,7 +25,7 @@ function ScoredAction.new()
 	self._preferredStack = StateStack.new()
 	self._maid:GiveTask(self._preferredStack)
 
-	self.PreferredChanged = self._preferredStack.Changed
+	self.PreferredChanged = self._preferredStack.Changed -- :Fire(newState)
 
 	self.Removing = Signal.new()
 	self._maid:GiveTask(function()
