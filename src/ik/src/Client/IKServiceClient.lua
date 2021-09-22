@@ -48,6 +48,11 @@ end
 --- which will override for a limited time.
 -- @param position May be nil to set no position
 function IKServiceClient:SetAimPosition(position, optionalPriority)
+	if position ~= position then
+		warn("[IKServiceClient.SetAimPosition] - position is NaN")
+		return
+	end
+
 	local aimer = self:GetLocalAimer()
 	if not aimer then
 		return
