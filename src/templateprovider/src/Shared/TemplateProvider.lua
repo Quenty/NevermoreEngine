@@ -4,6 +4,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 
 local Maid = require("Maid")
 local String = require("String")
@@ -16,8 +17,19 @@ TemplateProvider.__index = TemplateProvider
 function TemplateProvider.new(container)
 	local self = setmetatable({}, TemplateProvider)
 
-	if container then
+	if typeof(container) == "Instance" then
 		self._containersToInitializeSet = { [container] = true }
+	elseif typeof(container) == "table" then
+		self._containersToInitializeSet = {}
+		for _, item in pairs(container) do
+			assert(typeof(item) == "Instance", "Bad item in initialization set")
+			self._containersToInitializeSet[item] = true
+
+			-- For easy debugging/iteration loop
+			if item:IsDescendantOf(StarterGui) and item:IsA("ScreenGui") and RunService:IsRunning() then
+				item.Enabled = false
+			end
+		end
 	end
 
 	return self
