@@ -15,12 +15,12 @@ function CameraUtils.fitBoundingBoxToCamera(size, fovDeg, aspectRatio)
 end
 
 function CameraUtils.fitSphereToCamera(radius, fovDeg, aspectRatio)
-	local halfMinFov = 0.5 * math.rad(fovDeg)
+	local halfFov = 0.5 * math.rad(fovDeg)
 	if aspectRatio < 1 then
-		halfMinFov = math.atan(aspectRatio * math.tan(halfMinFov))
+		halfFov = math.atan(aspectRatio * math.tan(halfFov))
 	end
 
-	return radius / math.sin(halfMinFov)
+	return radius / math.sin(halfFov)
 end
 
 function CameraUtils.isOnScreen(camera, position)
