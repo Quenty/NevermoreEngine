@@ -1,19 +1,18 @@
-# v3.1.0 (Wed Sep 22 2021)
-
-#### 🚀 Enhancement
-
-- fix: Add specific behavior for templates in StarterGui [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@3.0.1...@quenty/templateprovider@3.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Add specific behavior for templates in StarterGui ([de85a35](https://github.com/Quenty/NevermoreEngine/commit/de85a35f24a326d91e5626f85196766a830e49d7))
+
+
+
+
 
 ## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@3.0.0...@quenty/templateprovider@3.0.1) (2021-09-18)
 

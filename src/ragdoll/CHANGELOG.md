@@ -1,19 +1,18 @@
-# v4.1.0 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add unragdoll automatically to ragdoll binders [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@4.0.1...@quenty/ragdoll@4.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Add unragdoll automatically to ragdoll binders ([0853d51](https://github.com/Quenty/NevermoreEngine/commit/0853d51e2e313e8379503c1fe51cc71a2fd5d3d1))
+
+
+
+
 
 ## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@4.0.0...@quenty/ragdoll@4.0.1) (2021-09-18)
 

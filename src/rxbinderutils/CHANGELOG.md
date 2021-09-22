@@ -1,20 +1,19 @@
-# v4.1.0 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add RxBinderUtils.observeBoundParentClassBrio(binder, instance) [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-- fix: Add better sanity checks on binder [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@4.0.1...@quenty/rxbinderutils@4.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Add better sanity checks on binder ([3d8792f](https://github.com/Quenty/NevermoreEngine/commit/3d8792f0af898e05ea938ddd63703c8b225c8c1e))
+* Add RxBinderUtils.observeBoundParentClassBrio(binder, instance) ([d2205a8](https://github.com/Quenty/NevermoreEngine/commit/d2205a8fca84d17ef771be749e93a193bddf8529))
+
+
+
+
 
 ## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@4.0.0...@quenty/rxbinderutils@4.0.1) (2021-09-18)
 

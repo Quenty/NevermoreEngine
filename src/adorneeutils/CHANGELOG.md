@@ -1,19 +1,18 @@
-# v2.1.0 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add attachment for bounding box in adornee utils [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeutils@2.0.0...@quenty/adorneeutils@2.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Add attachment for bounding box in adornee utils ([e2d2f25](https://github.com/Quenty/NevermoreEngine/commit/e2d2f25027ea5acb3f9caff47e2919f9577e6318))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeutils@1.2.0...@quenty/adorneeutils@2.0.0) (2021-09-05)
 

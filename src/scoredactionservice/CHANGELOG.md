@@ -1,19 +1,18 @@
-# v4.1.0 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Handle TouchButton actions and allow observation of input key map lists [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@4.0.1...@quenty/scoredactionservice@4.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Handle TouchButton actions and allow observation of input key map lists ([abc422c](https://github.com/Quenty/NevermoreEngine/commit/abc422c00e02c585f171ecc62c48bc3a67c39639))
+
+
+
+
 
 ## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@4.0.0...@quenty/scoredactionservice@4.0.1) (2021-09-18)
 

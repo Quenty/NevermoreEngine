@@ -1,19 +1,18 @@
-# v3.1.0 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add default attribute utils [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.0.1...@quenty/attributeutils@3.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Add default attribute utils ([4134bbf](https://github.com/Quenty/NevermoreEngine/commit/4134bbf5ba5a7bd393b11a43d878b3e5c72f4713))
+
+
+
+
 
 ## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.0.0...@quenty/attributeutils@3.0.1) (2021-09-18)
 

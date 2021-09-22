@@ -1,19 +1,18 @@
-# v3.1.0 (Wed Sep 22 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add ability to play sounds in parent [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.0.2...@quenty/sounds@3.1.0) (2021-09-22)
+
+
+### Features
+
+* Add ability to play sounds in parent ([c8275a3](https://github.com/Quenty/NevermoreEngine/commit/c8275a3e5589188e1545dd491ec3078bfd193876))
+
+
+
+
 
 ## [3.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.0.1...@quenty/sounds@3.0.2) (2021-09-18)
 

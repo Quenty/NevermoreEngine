@@ -1,19 +1,18 @@
-# v2.1.0 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add sphere to draw [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@2.0.0...@quenty/draw@2.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Add sphere to draw ([caa156d](https://github.com/Quenty/NevermoreEngine/commit/caa156def28dbae5c09bdfa6dc04885b212f78d1))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@1.2.0...@quenty/draw@2.0.0) (2021-09-05)
 

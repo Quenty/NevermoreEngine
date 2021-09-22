@@ -1,19 +1,18 @@
-# v2.1.0 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add new string feature [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@2.0.0...@quenty/string@2.1.0) (2021-09-22)
+
+
+### Bug Fixes
+
+* Add new string feature ([fc8d68c](https://github.com/Quenty/NevermoreEngine/commit/fc8d68c11b6cd7fc5dacc86f3229e81f481452f6))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@1.2.0...@quenty/string@2.0.0) (2021-09-05)
 
