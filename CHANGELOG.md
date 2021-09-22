@@ -1,5 +1,18 @@
 # (Wed Sep 22 2021)
 
+#### 🐛 Bug Fix
+
+- `@quenty/ik@4.1.1`
+  - fix: Prevent NaN values in the IK service [#215](https://github.com/Quenty/NevermoreEngine/pull/215) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Sep 22 2021)
+
 #### 🚀 Enhancement
 
 - `@quenty/templateprovider@3.1.0`
