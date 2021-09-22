@@ -1,3 +1,42 @@
+# (Wed Sep 22 2021)
+
+#### 🚀 Enhancement
+
+- `@quenty/templateprovider@3.1.0`
+  - fix: Add specific behavior for templates in StarterGui [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/sounds@3.1.0`
+  - feat: Add ability to play sounds in parent [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/camera@4.1.0`
+  - fix: Add test to CameraUtils [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/scoredactionservice@4.1.0`
+  - fix: Handle TouchButton actions and allow observation of input key map lists [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/spring@2.1.0`
+  - fix: Spring does not have clamped damper [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/attributeutils@3.1.0`
+  - fix: Add default attribute utils [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/sprites@3.1.0`
+  - fix: Make sure sprites have all dependencies listed [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rxbinderutils@4.1.0`
+  - fix: Add RxBinderUtils.observeBoundParentClassBrio(binder, instance) [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+  - fix: Add better sanity checks on binder [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/adorneeutils@2.1.0`
+  - fix: Add attachment for bounding box in adornee utils [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/ragdoll@4.1.0`
+  - fix: Add unragdoll automatically to ragdoll binders [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/draw@2.1.0`
+  - fix: Add sphere to draw [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+- `@quenty/string@2.1.0`
+  - fix: Add new string feature [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Sep 18 2021)
 
 #### 🐛 Bug Fix

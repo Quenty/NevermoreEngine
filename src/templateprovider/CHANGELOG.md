@@ -1,3 +1,15 @@
+# v3.1.0 (Wed Sep 22 2021)
+
+#### 🚀 Enhancement
+
+- fix: Add specific behavior for templates in StarterGui [#214](https://github.com/Quenty/NevermoreEngine/pull/214) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
