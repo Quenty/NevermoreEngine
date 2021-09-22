@@ -10,6 +10,7 @@ local ScoredAction = require("ScoredAction")
 local ScoredActionPickerProvider = require("ScoredActionPickerProvider")
 local Maid = require("Maid")
 local InputListScoreHelper = require("InputListScoreHelper")
+local Observable = require("Observable")
 
 local ScoredActionService = {}
 
@@ -45,6 +46,42 @@ function ScoredActionService:GetScoredAction(inputKeyMapList)
 	return scoredAction
 end
 
+-- This MUTATES state of the scored action service
+-- :Fire(scoredAction, inputKeyMapList)
+function ScoredActionService:ObserveNewFromInputKeyMapList(scoreValue)
+	assert(self._provider, "Not initialized")
+	assert(typeof(scoreValue) == "Instance" and scoreValue:IsA("NumberValue"), "Bad scoreValue")
 
+	-- It looks like we aren't capturing anything in this closure, but we're capturing `self`
+	return function(source)
+		return Observable.new(function(sub)
+			local topMaid = Maid.new()
+
+			local lastScoredAction
+			topMaid:GiveTask(source:Subscribe(function(inputKeyMapList)
+				assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
+
+				if lastScoredAction ~= inputKeyMapList then
+					lastScoredAction = inputKeyMapList
+
+					local maid = Maid.new()
+
+					local scoredAction = self:GetScoredAction(inputKeyMapList)
+					maid:GiveTask(scoredAction)
+
+					scoredAction:SetScore(scoreValue.Value)
+					maid:GiveTask(scoreValue.Changed:Connect(function()
+						scoredAction:SetScore(scoreValue.Value)
+					end))
+
+					topMaid._current = maid
+					sub:Fire(scoredAction, inputKeyMapList)
+				end
+			end, sub:GetFailComplete()))
+
+			return topMaid
+		end)
+	end
+end
 
 return ScoredActionService

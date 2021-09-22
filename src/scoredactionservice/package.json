@@ -31,6 +31,7 @@
     "@quenty/inputmode": "file:../inputmode",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
     "@quenty/table": "file:../table",
