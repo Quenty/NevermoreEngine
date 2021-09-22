@@ -6,7 +6,6 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local CharacterUtils = require("CharacterUtils")
 local IKBindersServer = require("IKBindersServer")
 local Maid = require("Maid")
 local HumanoidTracker = require("HumanoidTracker")
@@ -71,15 +70,6 @@ function IKService:UpdateServerRigTarget(humanoid, target)
 	end
 
 	serverRig:SetRigTarget(target)
-end
-
-function IKService:_onServerEvent(player, target)
-	assert(typeof(target) == "Vector3", "Bad target")
-
-	local humanoid = CharacterUtils.getAlivePlayerHumanoid(player)
-	if not humanoid then
-		return
-	end
 end
 
 function IKService:_handlePlayerRemoving(player)
