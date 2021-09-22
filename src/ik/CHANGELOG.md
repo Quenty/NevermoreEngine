@@ -1,19 +1,18 @@
-# v4.1.1 (Wed Sep 22 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Prevent NaN values in the IK service [#215](https://github.com/Quenty/NevermoreEngine/pull/215) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@4.1.0...@quenty/ik@4.1.1) (2021-09-22)
+
+
+### Bug Fixes
+
+* Prevent NaN values in the IK service ([#215](https://github.com/Quenty/NevermoreEngine/issues/215)) ([d9ff295](https://github.com/Quenty/NevermoreEngine/commit/d9ff295d7397418f196c9ab19b9d2bf8d7a85253))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@4.0.1...@quenty/ik@4.1.0) (2021-09-22)
 
