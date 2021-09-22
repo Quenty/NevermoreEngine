@@ -9,17 +9,24 @@ local Maid = require("Maid")
 
 local RxAttributeUtils = {}
 
-function RxAttributeUtils.observeAttribute(instance, attributeName)
+function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue)
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GiveTask(instance:GetAttributeChangedSignal(attributeName):Connect(function()
-			sub:Fire(instance:GetAttribute(attributeName))
-		end))
-		sub:Fire(instance:GetAttribute(attributeName))
+		local function update()
+			local value = instance:GetAttribute(attributeName)
+			if value == nil then
+				sub:Fire(defaultValue)
+			else
+				sub:Fire(value)
+			end
+		end
+
+		maid:GiveTask(instance:GetAttributeChangedSignal(attributeName):Connect(update))
+		update()
 
 		return maid
 	end)
