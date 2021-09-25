@@ -74,7 +74,7 @@ function SlaveClock:_handleSyncEventAsync(timeOne)
 	local oneWayDelay = (masterSlaveDifference + slaveMasterDifference)/2
 
 	self._offset = offset -- Estimated difference between server/client
-	self._pneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
+	self._oneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
 
 	self._syncedBindable:Fire()
 end
