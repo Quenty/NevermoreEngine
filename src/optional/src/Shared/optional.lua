@@ -2,8 +2,6 @@
 -- @function optional
 -- @author Quenty
 
-local require = require(script.Parent.loader).load(script)
-
 --[[
 Sets up require.optional("Name").
 
@@ -11,7 +9,8 @@ Errors are still preserved because Roblox reports errors of module scripts regar
 execution context.
 ]]
 
-return function(_module)
+return function(_require, _module)
+	assert(_require, "Bad _require function")
 	assert(type(_module) == "string"
 		or type(_module) == "number"
 		or (typeof(_module) == "Instance" and _module:IsA("ModuleScript")),
@@ -19,7 +18,7 @@ return function(_module)
 
 	local result
 	local ok, _ = pcall(function()
-		result = require(_module)
+		result = _require(_module)
 	end)
 
 	if not ok then
