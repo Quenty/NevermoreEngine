@@ -1,3 +1,16 @@
+# v3.1.0 (Sat Oct 02 2021)
+
+#### 🚀 Enhancement
+
+- fix: Update linting [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- feat: Handle slotted touch buttons so we can always position touch buttons in the same place [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

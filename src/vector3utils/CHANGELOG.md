@@ -1,3 +1,15 @@
+# v3.1.0 (Sat Oct 02 2021)
+
+#### 🚀 Enhancement
+
+- feat: Add another way to get the angle between vectors with more numeric stability [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

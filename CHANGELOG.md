@@ -1,3 +1,51 @@
+# (Sat Oct 02 2021)
+
+#### 🚀 Enhancement
+
+- `@quenty/inputkeymaputils@3.1.0`, `@quenty/rodux-actions@1.1.0`
+  - fix: Update linting [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/geometryutils@2.1.0`
+  - feat: Add ScaleModelUtils to the geometry [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/loader@3.1.0`
+  - feat: Loader performance optimizations [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/raycaster@2.1.0`
+  - feat: Add RaycastUtils [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/randomutils@2.1.0`
+  - feat: Add RandomUtils.guassuanRandom() and RandomUtils.randomUnitVector3 [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/inputkeymaputils@3.1.0`, `@quenty/scoredactionservice@4.2.0`
+  - feat: Handle slotted touch buttons so we can always position touch buttons in the same place [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/vector3utils@3.1.0`
+  - feat: Add another way to get the angle between vectors with more numeric stability [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/table@2.1.0`
+  - feat: Add Set.difference [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/safedestroy@1.1.0`
+  - feat: Add safeDestroy package [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rodux-actions@1.1.0`, `@quenty/rodux-undo@1.1.0`
+  - feat: Move rodux code to packages [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/draw@2.2.0`
+  - feat: Can update ray appearance for performance reasons [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/buttonhighlightmodel@3.1.0`
+  - feat: ButtonHighlightModel now handles touch inputs being down/over appropriately [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/insertserviceutils@3.1.0`, `@quenty/templateprovider@3.2.0`
+  - feat: Allow template provider to replicate assets from the cloud [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- chore: Remove heatbeatWait module since it's deprecated by the task.wait method. [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- fix: Upgrade luacheck to version-f5b685d4be894c8f [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/raycaster@2.1.0`
+  - chore: Add Trey (AxisAngle) to contributor list [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/camera@4.2.0`
+  - Register defaultcamera 1 step off so we can mess with the camera if we need to. [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+- `@quenty/optional@4.1.0`
+  - fix: Optional would fail with non-global load. Require loader to now pass in this value. [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Sep 22 2021)
 
 #### 🐛 Bug Fix
