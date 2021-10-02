@@ -81,4 +81,24 @@ function RandomUtils.weightedChoice(list, weights, random)
 	end
 end
 
+function RandomUtils.gaussianRandom(random)
+	local a, t
+	if random then
+		a = 2*math.pi*random:NextNumber()
+		t = random:NextNumber()
+	else
+		a = 2*math.pi*math.random()
+		t = math.random()
+	end
+
+	return math.sqrt(-2*math.log(1 - t))*math.cos(a)
+end
+
+function RandomUtils.randomUnitVector3(random)
+	return Vector3.new(
+		RandomUtils.gaussianRandom(random),
+		RandomUtils.gaussianRandom(random),
+		RandomUtils.gaussianRandom(random))
+end
+
 return RandomUtils
