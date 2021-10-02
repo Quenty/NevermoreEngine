@@ -8,6 +8,7 @@ local BaseObject = require("BaseObject")
 local ScoredActionPicker = require("ScoredActionPicker")
 local Table = require("Table")
 local TouchButtonScoredActionPicker = require("TouchButtonScoredActionPicker")
+local InputKeyMapUtils = require("InputKeyMapUtils")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 
@@ -18,21 +19,23 @@ ScoredActionPickerProvider.__index = ScoredActionPickerProvider
 function ScoredActionPickerProvider.new()
 	local self = setmetatable(BaseObject.new(), ScoredActionPickerProvider)
 
-	self._scoredActionPickers = {} -- [ category ] = picker
+	self._scoredActionPickers = {} -- [ key ] = picker
 
 	return self
 end
 
 function ScoredActionPickerProvider:FindPicker(inputType)
-	return self._scoredActionPickers[inputType]
+	local key = InputKeyMapUtils.getUniqueKeyForInputType(inputType)
+	return self._scoredActionPickers[key]
 end
 
 --inputType is most likely an enum, but could be a string!
 function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
 	assert(inputType, "Bad inputType")
+	local key = InputKeyMapUtils.getUniqueKeyForInputType(inputType)
 
-	if self._scoredActionPickers[inputType] then
-		return self._scoredActionPickers[inputType]
+	if self._scoredActionPickers[key] then
+		return self._scoredActionPickers[key]
 	end
 
 	local picker
@@ -42,8 +45,8 @@ function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
 		picker = ScoredActionPicker.new()
 	end
 
-	self._maid[inputType] = picker
-	self._scoredActionPickers[inputType] = picker
+	self._maid[key] = picker
+	self._scoredActionPickers[key] = picker
 
 	local amount = Table.count(self._scoredActionPickers)
 	if amount > MAX_ACTION_LIST_SIZE_BEFORE_WARN then
@@ -56,17 +59,17 @@ end
 
 function ScoredActionPickerProvider:Update()
 	local indexToRemove = {}
-	for index, picker in pairs(self._scoredActionPickers) do
+	for key, picker in pairs(self._scoredActionPickers) do
 		picker:Update()
 
 		if not picker:HasActions() then
-			table.insert(indexToRemove, index)
+			table.insert(indexToRemove, key)
 		end
 	end
 
-	for _, index in pairs(indexToRemove) do
-		self._scoredActionPickers[index] = nil
-		self._maid[index] = nil
+	for _, key in pairs(indexToRemove) do
+		self._scoredActionPickers[key] = nil
+		self._maid[key] = nil
 	end
 end
 

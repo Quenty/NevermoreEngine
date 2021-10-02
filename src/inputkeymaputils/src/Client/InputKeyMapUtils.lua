@@ -4,11 +4,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local Set = require("Set")
 local Table = require("Table")
 
 local InputKeyMapUtils = {}
 
+-- Should be called "createInputKeyMapList"
 function InputKeyMapUtils.createKeyMap(inputMode, inputTypes)
 	assert(type(inputMode) == "table", "Bad inputMode")
 	assert(type(inputTypes) == "table", "Bad inputTypes")
@@ -91,7 +94,51 @@ function InputKeyMapUtils.getInputModes(inputKeyMapList)
 	return modes
 end
 
-function InputKeyMapUtils.isTouchButton(inputKeyMapList)
+function InputKeyMapUtils.getSlottedTouchButtonData(inputKeyMapList)
+	local slottedTouchButtons = {}
+
+	for _, inputKeyMap in pairs(inputKeyMapList) do
+		assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode")
+		assert(inputKeyMap.inputTypes, "Bad inputKeyMap.inputTypes")
+
+		for _, touchButtonData in pairs(inputKeyMap.inputTypes) do
+			if InputKeyMapUtils.isSlottedTouchButton(touchButtonData) then
+				table.insert(slottedTouchButtons, {
+					slotId = touchButtonData.slotId;
+					inputMode = inputKeyMap.inputMode;
+				})
+			end
+		end
+	end
+
+	return slottedTouchButtons
+end
+
+function InputKeyMapUtils.isSlottedTouchButton(inputType)
+	return type(inputType) == "table" and inputType.type == "SlottedTouchButton"
+end
+
+-- Touch buttons should always show up in the same position
+-- We use the SlotId to determine which slot we should put these buttons in
+function InputKeyMapUtils.createSlottedTouchButton(slotId)
+	assert(slotId == "primary1" or slotId == "primary2" or slotId == "primary3" or slotId == "primary4", "Bad slotId")
+
+	return {
+		type = "SlottedTouchButton";
+		slotId = slotId;
+	}
+end
+
+function InputKeyMapUtils.getUniqueKeyForInputType(inputType)
+	if InputKeyMapUtils.isSlottedTouchButton(inputType) then
+		return inputType.slotId
+	else
+		return inputType
+	end
+end
+
+-- Only returns true if we're a Roblox touch button
+function InputKeyMapUtils.isRobloxTouchButton(inputKeyMapList)
 	for _, inputKeyMap in pairs(inputKeyMapList) do
 		assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode")
 		assert(inputKeyMap.inputTypes, "Bad inputKeyMap.inputTypes")
