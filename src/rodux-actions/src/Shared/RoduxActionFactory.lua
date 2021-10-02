@@ -36,7 +36,7 @@ function RoduxActionFactory:__call(...)
 end
 
 function RoduxActionFactory:CreateDispatcher(dispatch)
-	assert(type(dispatch) == "function")
+	assert(type(dispatch) == "function", "Bad dispatch function")
 
 	return function(...)
 		return dispatch(self:Create(...))

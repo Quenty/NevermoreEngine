@@ -4,8 +4,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local HttpService = game:GetService("HttpService")
-
 local Set = require("Set")
 local Table = require("Table")
 
