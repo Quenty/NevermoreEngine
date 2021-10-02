@@ -1,19 +1,18 @@
-# v3.1.0 (Sat Oct 02 2021)
-
-#### 🚀 Enhancement
-
-- feat: ButtonHighlightModel now handles touch inputs being down/over appropriately [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.0.1...@quenty/buttonhighlightmodel@3.1.0) (2021-10-02)
+
+
+### Features
+
+* ButtonHighlightModel now handles touch inputs being down/over appropriately ([4a13af4](https://github.com/Quenty/NevermoreEngine/commit/4a13af489e60d9938f524de853b7c7d0a99d0520))
+
+
+
+
 
 ## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.0.0...@quenty/buttonhighlightmodel@3.0.1) (2021-09-18)
 

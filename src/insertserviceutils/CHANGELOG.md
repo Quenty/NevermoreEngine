@@ -1,19 +1,18 @@
-# v3.1.0 (Sat Oct 02 2021)
-
-#### 🚀 Enhancement
-
-- feat: Allow template provider to replicate assets from the cloud [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/insertserviceutils@3.0.1...@quenty/insertserviceutils@3.1.0) (2021-10-02)
+
+
+### Features
+
+* Allow template provider to replicate assets from the cloud ([dbfab97](https://github.com/Quenty/NevermoreEngine/commit/dbfab97070945c19fc0d9fb8029db54d150f1a53))
+
+
+
+
 
 ## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/insertserviceutils@3.0.0...@quenty/insertserviceutils@3.0.1) (2021-09-18)
 

@@ -1,19 +1,18 @@
-# v3.1.0 (Sat Oct 02 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add another way to get the angle between vectors with more numeric stability [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@3.0.1...@quenty/vector3utils@3.1.0) (2021-10-02)
+
+
+### Features
+
+* Add another way to get the angle between vectors with more numeric stability ([3668639](https://github.com/Quenty/NevermoreEngine/commit/36686390e7d151ef439db47303a7fb63e554ede5))
+
+
+
+
 
 ## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@3.0.0...@quenty/vector3utils@3.0.1) (2021-09-18)
 

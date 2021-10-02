@@ -1,20 +1,23 @@
-# v3.1.0 (Sat Oct 02 2021)
-
-#### 🚀 Enhancement
-
-- fix: Update linting [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
-- feat: Handle slotted touch buttons so we can always position touch buttons in the same place [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@3.0.1...@quenty/inputkeymaputils@3.1.0) (2021-10-02)
+
+
+### Bug Fixes
+
+* Update linting ([2d2d3a2](https://github.com/Quenty/NevermoreEngine/commit/2d2d3a22ecebe84ed1334eb997118418ce4f00d5))
+
+
+### Features
+
+* Handle slotted touch buttons so we can always position touch buttons in the same place ([906ff14](https://github.com/Quenty/NevermoreEngine/commit/906ff14955894f5cfa8ec212910afd45ee364085))
+
+
+
+
 
 ## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@3.0.0...@quenty/inputkeymaputils@3.0.1) (2021-09-18)
 

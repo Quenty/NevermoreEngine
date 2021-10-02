@@ -1,19 +1,15 @@
-# v4.2.0 (Sat Oct 02 2021)
-
-#### 🐛 Bug Fix
-
-- Register defaultcamera 1 step off so we can mess with the camera if we need to. [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@4.1.0...@quenty/camera@4.2.0) (2021-10-02)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@4.0.1...@quenty/camera@4.1.0) (2021-09-22)
 

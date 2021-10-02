@@ -1,19 +1,18 @@
-# v2.1.0 (Sat Oct 02 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add ScaleModelUtils to the geometry [#216](https://github.com/Quenty/NevermoreEngine/pull/216) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.0.0...@quenty/geometryutils@2.1.0) (2021-10-02)
+
+
+### Features
+
+* Add ScaleModelUtils to the geometry ([8fa5f02](https://github.com/Quenty/NevermoreEngine/commit/8fa5f029b5cc0bdf0b696525b8444b2fa685a4fe))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@1.2.0...@quenty/geometryutils@2.0.0) (2021-09-05)
 
