@@ -34,7 +34,7 @@ Converts keymap into ContextActionService friendly types
 
 ### `InputKeyMapUtils.getInputModes(inputKeyMapList)`
 
-### `InputKeyMapUtils.isTouchButton(inputKeyMapList)`
+### `InputKeyMapUtils.isRobloxTouchButton(inputKeyMapList)`
 
 ### `InputKeyMapUtils.isTapInWorld(inputKeyMapList)`
 
