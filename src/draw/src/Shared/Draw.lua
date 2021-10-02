@@ -58,6 +58,7 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	part.Transparency = 0.5
 
 	local rotatedPart = Instance.new("Part")
+	rotatedPart.Name = "RotatedPart"
 	rotatedPart.Anchored = true
 	rotatedPart.Archivable = false
 	rotatedPart.CanCollide = false
@@ -68,6 +69,7 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	rotatedPart.Parent = part
 
 	local lineHandleAdornment = Instance.new("LineHandleAdornment")
+	lineHandleAdornment.Name = "DrawRayLineHandleAdornment"
 	lineHandleAdornment.Length = ray.Direction.Magnitude
 	lineHandleAdornment.Thickness = 5*diameter
 	lineHandleAdornment.ZIndex = 3
@@ -78,12 +80,36 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	lineHandleAdornment.Parent = rotatedPart
 
 	local mesh = Instance.new("SpecialMesh")
+	mesh.Name = "DrawRayMesh"
 	mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(meshDiameter, 0, meshDiameter) / diameter
 	mesh.Parent = part
 
 	part.Parent = parent
 
 	return part
+end
+
+function Draw.updateRay(part, ray, color)
+	color = color or part.Color
+
+	local diameter = part.Size.x
+	local rayCenter = ray.Origin + ray.Direction/2
+
+	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(math.pi/2, 0, 0)
+	part.Size = Vector3.new(diameter, ray.Direction.Magnitude, diameter)
+	part.Color = color
+
+	local rotatedPart = part:FindFirstChild("RotatedPart")
+	if rotatedPart then
+		rotatedPart.CFrame = CFrame.new(ray.Origin, ray.Origin + ray.Direction)
+	end
+
+	local lineHandleAdornment = rotatedPart and rotatedPart:FindFirstChild("DrawRayLineHandleAdornment")
+	if lineHandleAdornment then
+		lineHandleAdornment.Length = ray.Direction.Magnitude
+		lineHandleAdornment.Thickness = 5*diameter
+		lineHandleAdornment.Color3 = color
+	end
 end
 
 function Draw.text(adornee, text, color)
