@@ -26,7 +26,7 @@ end
 
 return function(reducer)
 	local actions = {
-		undo = function(state, action)
+		undo = function(state, _action)
 			if #state.past == 0 then
 				return state
 			end
@@ -42,7 +42,7 @@ return function(reducer)
 				future = Table.mergeLists(state.future, { state.present });
 			}
 		end;
-		redo = function(state, action)
+		redo = function(state, _action)
 			if #state.future == 0 then
 				return state
 			end
