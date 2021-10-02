@@ -67,4 +67,16 @@ function Set.differenceUpdate(set, otherSet)
 	end
 end
 
+function Set.difference(set, otherSet)
+	local newSet = {}
+	for key, _ in pairs(set) do
+		newSet[key] = true
+	end
+	for key, _ in pairs(otherSet) do
+		newSet[key] = nil
+	end
+	return newSet
+end
+
+
 return Set
