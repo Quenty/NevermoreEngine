@@ -1,7 +1,7 @@
 ---
--- @module ScaleModel
+-- @module ScaleModelUtils
 
-local ScaleModel = {}
+local ScaleModelUtils = {}
 
 local CLASS_NAME_TO_MIN_SIZE = {
 	["TrussPart"] = Vector3.new(2, 2, 2);
@@ -10,7 +10,7 @@ local CLASS_NAME_TO_MIN_SIZE = {
 
 local MIN_PART_SIZE = Vector3.new(0.05, 0.05, 0.05)
 
-function ScaleModel.scalePartSize(part, scale)
+function ScaleModelUtils.scalePartSize(part, scale)
 	local partSize = part.Size
 
 	local mesh = part:FindFirstChildWhichIsA("DataModelMesh")
@@ -36,7 +36,7 @@ function ScaleModel.scalePartSize(part, scale)
 			math.max(newPartSize.Z, minSize.Z))
 
 		-- We need a mesh for scaling (hopefully)
-		mesh = ScaleModel.createMeshFromPart(part)
+		mesh = ScaleModelUtils.createMeshFromPart(part)
 	end
 
 	part.Size = newPartSize
@@ -47,8 +47,8 @@ function ScaleModel.scalePartSize(part, scale)
 	end
 end
 
-function ScaleModel.scalePart(part, scale, centroid)
-	assert(typeof(part) == "Instance" and part:IsA("BasePart"))
+function ScaleModelUtils.scalePart(part, scale, centroid)
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 
 	local partPosition = part.Position
 	local partCFrame = part.CFrame
@@ -56,7 +56,7 @@ function ScaleModel.scalePart(part, scale, centroid)
 	local offset = partPosition - centroid
 	local rotation = partCFrame - partPosition
 
-	ScaleModel.scalePartSize(part, scale)
+	ScaleModelUtils.scalePartSize(part, scale)
 	part.CFrame = CFrame.new(centroid + (offset * scale)) * rotation
 end
 
@@ -64,13 +64,13 @@ end
 -- @param parts Table of parts, the parts to scale
 -- @param Scale The scale to scale by
 -- @param centroid Vector3, the center to scale by
-function ScaleModel.scale(parts, scale, centroid)
+function ScaleModelUtils.scale(parts, scale, centroid)
 	for _, part in pairs(parts) do
-		ScaleModel.scalePart(part, scale, centroid)
+		ScaleModelUtils.scalePart(part, scale, centroid)
 	end
 end
 
-function ScaleModel.createMeshFromPart(part)
+function ScaleModelUtils.createMeshFromPart(part)
 	if part:IsA("WedgePart") then
 		local mesh = Instance.new("SpecialMesh")
 		mesh.MeshType = Enum.MeshType.Wedge
@@ -96,4 +96,4 @@ function ScaleModel.createMeshFromPart(part)
 	end
 end
 
-return ScaleModel
+return ScaleModelUtils
