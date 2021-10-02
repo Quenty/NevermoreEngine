@@ -30,8 +30,9 @@ function LoaderUtils.toWallyFormat(instance)
 	LoaderUtils.injectLoader(topLevelPackages)
 
 	local packageInfoList = {}
+	local packageInfoMap = {}
 	for _, folder in pairs(topLevelPackages) do
-		local packageInfo = PackageInfoUtils.getOrCreatePackageInfo(folder, {}, "")
+		local packageInfo = PackageInfoUtils.getOrCreatePackageInfo(folder, packageInfoMap, "")
 		table.insert(packageInfoList, packageInfo)
 	end
 
@@ -119,7 +120,9 @@ function LoaderUtils.reifyGroupList(groupInfoList, publishSet, parent, replicati
 	folder.Name = "_Index"
 
 	for _, groupInfo in pairs(groupInfoList) do
-		LoaderUtils.reifyGroup(groupInfo, publishSet, folder, replicationMode)
+		if LoaderUtils.needToReify(groupInfo, replicationMode) then
+			LoaderUtils.reifyGroup(groupInfo, folder, replicationMode)
+		end
 	end
 
 	-- Publish
@@ -145,9 +148,18 @@ function LoaderUtils.getPublishPackageInfoSet(packageInfoList)
 	return packageInfoSet
 end
 
-function LoaderUtils.reifyGroup(groupInfo, publishSet, parent, replicationMode)
+function LoaderUtils.needToReify(groupInfo, replicationMode)
+	for _, scriptInfo in pairs(groupInfo.packageScriptInfoMap) do
+		if scriptInfo.replicationMode == replicationMode then
+			return true
+		end
+	end
+
+	return false
+end
+
+function LoaderUtils.reifyGroup(groupInfo, parent, replicationMode)
 	assert(type(groupInfo) == "table", "Bad groupInfo")
-	assert(type(publishSet) == "table", "Bad publishSet")
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(replicationMode) == "string", "Bad replicationMode")
 
@@ -167,8 +179,14 @@ function LoaderUtils.reifyGroup(groupInfo, publishSet, parent, replicationMode)
 				scriptInfo.instance.Parent = folder
 			end
 		else
-			local link = BounceTemplateUtils.create(scriptInfo.instance, scriptName)
-			link.Parent = folder
+			if scriptInfo.instance == loader then
+				local link = BounceTemplateUtils.create(scriptInfo.instance, scriptName)
+				link.Parent = folder
+			else
+				-- Turns out creating these links are a LOT faster than cloning a module script
+				local link = BounceTemplateUtils.createLink(scriptInfo.instance, scriptName)
+				link.Parent = folder
+			end
 		end
 	end
 
@@ -177,8 +195,14 @@ function LoaderUtils.reifyGroup(groupInfo, publishSet, parent, replicationMode)
 		assert(scriptInfo.name == scriptName, "Bad scriptInfo.name")
 
 		if not groupInfo.packageScriptInfoMap[scriptName] then
-			local link = BounceTemplateUtils.create(scriptInfo.instance, scriptName)
-			link.Parent = folder
+			if scriptInfo.instance == loader then
+				local link = BounceTemplateUtils.create(scriptInfo.instance, scriptName)
+				link.Parent = folder
+			else
+				-- Turns out creating these links are a LOT faster than cloning a module script
+				local link = BounceTemplateUtils.createLink(scriptInfo.instance, scriptName)
+				link.Parent = folder
+			end
 		end
 	end
 

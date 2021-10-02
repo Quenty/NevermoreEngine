@@ -17,7 +17,7 @@ function BounceTemplateUtils.getTarget(instance)
         return nil
     end
 
-    if CREATE_ONLY_LINK then
+    if instance:IsA("ObjectValue") then
         return instance.Value
     else
         local found = instance:FindFirstChild("BounceTarget")
@@ -35,12 +35,7 @@ function BounceTemplateUtils.create(target, linkName)
     assert(type(linkName) == "string", "Bad linkName")
 
     if CREATE_ONLY_LINK then
-        local objectValue = Instance.new("ObjectValue")
-        objectValue.Name = linkName
-        objectValue.Value = target
-        objectValue:SetAttribute("IsBounceTemplate", true)
-
-        return objectValue
+        return BounceTemplateUtils.createLink(target, linkName)
     end
 
     local copy = BounceTemplate:Clone()
@@ -53,6 +48,18 @@ function BounceTemplateUtils.create(target, linkName)
     objectValue.Parent = copy
 
     return copy
+end
+
+function BounceTemplateUtils.createLink(target, linkName)
+    assert(typeof(target) == "Instance", "Bad target")
+    assert(type(linkName) == "string", "Bad linkName")
+
+    local objectValue = Instance.new("ObjectValue")
+    objectValue.Name = linkName
+    objectValue.Value = target
+    objectValue:SetAttribute("IsBounceTemplate", true)
+
+    return objectValue
 end
 
 return BounceTemplateUtils

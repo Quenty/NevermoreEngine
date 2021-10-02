@@ -106,7 +106,8 @@ function PackageInfoUtils.computePackageDependencySet(packageInfo, implicitDepen
 end
 
 function PackageInfoUtils.getOrCreatePackageInfo(packageFolder, packageInfoMap, scope)
-	assert(typeof(packageFolder) == "Instance", "Bad packageFolder")
+	assert(typeof(packageFolder) == "Instance"
+		and (packageFolder:IsA("Folder") or packageFolder:IsA("ModuleScript")), "Bad packageFolder")
 	assert(type(packageInfoMap) == "table", "Bad packageInfoMap")
 	assert(type(scope) == "string", "Bad scope")
 
@@ -120,8 +121,7 @@ function PackageInfoUtils.getOrCreatePackageInfo(packageFolder, packageInfoMap, 
 		scriptInfoLookup,
 		ScriptInfoUtils.ModuleReplicationTypes.SHARED)
 
-	local explicitDependencySet = PackageInfoUtils.getExplicitPackageDependencySet(packageFolder, packageInfoMap)
-
+	local explicitDependencySet = {}
 	local fullName
 	if scope == "" then
 		fullName = packageFolder.Name
@@ -132,6 +132,10 @@ function PackageInfoUtils.getOrCreatePackageInfo(packageFolder, packageInfoMap, 
 	local packageInfo = PackageInfoUtils
 		.createPackageInfo(packageFolder, explicitDependencySet, scriptInfoLookup, fullName)
 	packageInfoMap[packageFolder] = packageInfo
+
+	-- Fill this after we've registered ourselves, in case we're somehow in a recursive dependency set
+	PackageInfoUtils.fillExplicitPackageDependencySet(explicitDependencySet, packageFolder, packageInfoMap)
+
 	return packageInfo
 end
 
@@ -182,11 +186,10 @@ end
 
 -- Explicit dependencies are dependencies that are are explicitly listed.
 -- These dependencies are available to this package and ANY dependent packages below
-function PackageInfoUtils.getExplicitPackageDependencySet(packageFolder, packageInfoMap)
+function PackageInfoUtils.fillExplicitPackageDependencySet(explicitDependencySet, packageFolder, packageInfoMap)
+	assert(type(explicitDependencySet) == "table", "Bad explicitDependencySet")
 	assert(typeof(packageFolder) == "Instance", "Bad packageFolder")
 	assert(type(packageInfoMap) == "table", "Bad packageInfoMap")
-
-	local explicitDependencySet = {}
 
 	for _, item in pairs(packageFolder:GetChildren()) do
 		if item:IsA("Folder") and item.Name == ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
@@ -195,8 +198,6 @@ function PackageInfoUtils.getExplicitPackageDependencySet(packageFolder, package
 			end
 		end
 	end
-
-	return explicitDependencySet
 end
 
 return PackageInfoUtils
