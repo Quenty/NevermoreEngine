@@ -22,7 +22,8 @@
   },
   "license": "MIT",
   "contributors": [
-    "Quenty"
+    "Quenty",
+    "AxisAngle"
   ],
   "publishConfig": {
     "access": "public"
