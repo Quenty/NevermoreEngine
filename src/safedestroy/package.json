@@ -1,0 +1,31 @@
+{
+  "name": "@quenty/safedestroy",
+  "version": "1.0.0",
+  "description": "Fixes an issue where you can't destroy already destroyed objects",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "safeDestroy"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/safedestroy/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {},
+  "publishConfig": {
+    "access": "public"
+  }
+}

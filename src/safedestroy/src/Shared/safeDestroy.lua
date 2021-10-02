@@ -4,7 +4,7 @@
 local PARENT_PROPERTY_LOCKED = "The Parent property of "
 
 return function(instance)
-	assert(typeof(instance) == "Instance")
+	assert(typeof(instance) == "Instance", "Bad instance")
 
 	xpcall(function()
 		instance:Destroy()
