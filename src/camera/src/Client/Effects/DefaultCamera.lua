@@ -34,11 +34,11 @@ function DefaultCamera:OverrideCameraState(cameraState)
 end
 
 function DefaultCamera:BindToRenderStep()
-	RunService:BindToRenderStep("DefaultCamera_Preupdate", Enum.RenderPriority.Camera.Value-1, function()
+	RunService:BindToRenderStep("DefaultCamera_Preupdate", Enum.RenderPriority.Camera.Value-2, function()
 		self._cameraState:Set(Workspace.CurrentCamera)
 	end)
 
-	RunService:BindToRenderStep("DefaultCamera_PostUpdate", Enum.RenderPriority.Camera.Value+1, function()
+	RunService:BindToRenderStep("DefaultCamera_PostUpdate", Enum.RenderPriority.Camera.Value+2, function()
 		self._cameraState = CameraState.new(Workspace.CurrentCamera)
 	end)
 
