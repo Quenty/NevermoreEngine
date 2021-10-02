@@ -15,12 +15,18 @@ function Vector3Utils.fromVector2XZ(vector2)
 	return Vector3.new(vector2.x, 0, vector2.y)
 end
 
-function Vector3Utils.getAngleRad(offsetUnit, lookVector)
-	if offsetUnit.magnitude == 0 then
+function Vector3Utils.getAngleRad(a, b)
+	if a.magnitude == 0 then
 		return nil
 	end
 
-	return math.acos(offsetUnit:Dot(lookVector))
+	return math.acos(a:Dot(b))
+end
+
+function Vector3Utils.angleBetweenVectors(a, b)
+	local u = b.magnitude*a
+	local v = a.magnitude*b
+	return 2*math.atan2((v - u).magnitude, (u + v).magnitude)
 end
 
 function Vector3Utils.round(vector3, amount)
