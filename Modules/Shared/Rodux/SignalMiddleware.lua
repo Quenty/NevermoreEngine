@@ -4,9 +4,9 @@
 local SignalMiddleware = {}
 
 function SignalMiddleware.fireOnDispatch(signal)
-	assert(signal)
+	assert(signal, "Bad signal")
 
-	return function(nextDispatch, store)
+	return function(nextDispatch, _store)
 		return function(action)
 			if signal.Destroy then
 				signal:Fire(action)

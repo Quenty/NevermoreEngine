@@ -1,0 +1,35 @@
+{
+  "name": "@quenty/rodux-actions",
+  "version": "1.0.0",
+  "description": "Action provider for rodux",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Rodux"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/rodux-actions/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/table": "file:../table",
+    "@quentystudios/t": "^1.2.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

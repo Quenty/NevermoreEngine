@@ -26,10 +26,10 @@ function RoduxActions:Init()
 end
 
 function RoduxActions:CreateReducer(initialState, handlers)
-	assert(type(handlers) == "table")
+	assert(type(handlers) == "table", "Bad handlers")
 
 	for actionType, func in pairs(handlers) do
-		assert(type(func) == "function")
+		assert(type(func) == "function", "Bad handler")
 		if not self:Get(actionType) then
 			error(("[RoduxActions.CreateReducer] - %q type is not registered"):format(tostring(actionType)), 2)
 		end
@@ -55,8 +55,8 @@ function RoduxActions:CreateReducer(initialState, handlers)
 end
 
 function RoduxActions:Validate(action)
-	assert(type(action) == "table")
-	assert(type(action.type) == "string")
+	assert(type(action) == "table","Bad action")
+	assert(type(action.type) == "string","Bad action")
 
 	local actionFactory = self:Get(action.type)
 	if not actionFactory then
