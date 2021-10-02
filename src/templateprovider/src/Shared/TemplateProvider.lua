@@ -8,28 +8,41 @@ local StarterGui = game:GetService("StarterGui")
 
 local Maid = require("Maid")
 local String = require("String")
+local InsertServiceUtils = require("InsertServiceUtils")
+local Promise = require("Promise")
 
 local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
 TemplateProvider.__index = TemplateProvider
 
 -- @param[opt=nil] container
-function TemplateProvider.new(container)
+function TemplateProvider.new(container, replicationParent)
 	local self = setmetatable({}, TemplateProvider)
 
-	if typeof(container) == "Instance" then
-		self._containersToInitializeSet = { [container] = true }
+	self._replicationParent = replicationParent
+	self._containersToInitializeSet = {}
+
+	if typeof(container) == "Instance" or type(container) == "number" then
+		self._containersToInitializeSet[container] = true
 	elseif typeof(container) == "table" then
-		self._containersToInitializeSet = {}
 		for _, item in pairs(container) do
-			assert(typeof(item) == "Instance", "Bad item in initialization set")
+			assert(typeof(item) == "Instance" or type(item) == "number", "Bad item in initialization set")
 			self._containersToInitializeSet[item] = true
 
 			-- For easy debugging/iteration loop
-			if item:IsDescendantOf(StarterGui) and item:IsA("ScreenGui") and RunService:IsRunning() then
+			if typeof(item) == "Instance"
+				and item:IsDescendantOf(StarterGui)
+				and item:IsA("ScreenGui")
+				and RunService:IsRunning() then
+
 				item.Enabled = false
 			end
 		end
+	end
+
+	-- Make sure to replicate our parent
+	if self._replicationParent then
+		self._containersToInitializeSet[self._replicationParent] = true
 	end
 
 	return self
@@ -42,13 +55,58 @@ function TemplateProvider:Init()
 	self._maid = Maid.new()
 	self._initialized = true
 	self._registry = {} -- [name] = rawTemplate
-	self._containersSet = {} -- [parent] = true
+	self._containersSet = {} -- [parentOrAssetId] = true
 
-	if self._containersToInitializeSet then
-		for container, _ in pairs(self._containersToInitializeSet) do
-			self:AddContainer(container)
-		end
+	self._promises = {} -- [name]  = Promise
+
+	for container, _ in pairs(self._containersToInitializeSet) do
+		self:AddContainer(container)
 	end
+end
+
+function TemplateProvider:PromiseClone(templateName)
+	assert(type(templateName) == "string", "templateName must be a string")
+
+	self:_verifyInit()
+
+	local template = self._registry[templateName]
+	if template then
+		return Promise.resolved(self:Clone(templateName))
+	end
+
+	if not self._promises[templateName] then
+		local promise = Promise.new()
+		self._promises[templateName] = promise
+
+		-- Make sure to clean up the promise afterwards
+		self._maid[promise] = promise
+		promise:Then(function()
+			self._maid[promise] = nil
+		end)
+
+		delay(5, function()
+			if promise:IsPending() then
+				warn(("[TemplateProvider.PromiseClone] - May fail to replicate template %q from cloud. %s")
+					:format(templateName, self:_getReplicationHint()))
+			end
+		end)
+	end
+
+	return self._promises[templateName]
+		:Then(function()
+			-- Get a new copy
+			return self:Clone(templateName)
+		end)
+end
+
+function TemplateProvider:_getReplicationHint()
+	local hint
+
+	if RunService:IsClient() then
+		hint = "Make sure the template provider is initialized on the server."
+	end
+
+	return hint
 end
 
 -- Clones the template. If it has a prefix of "Template" then it will remove it
@@ -78,12 +136,19 @@ end
 
 -- Adds a new container to the provider for provision of assets
 function TemplateProvider:AddContainer(container)
-	assert(typeof(container) == "Instance", "Bad container")
-	assert(not self._containersSet[container], "Already added")
+	assert(typeof(container) == "Instance" or type(container) == "number", "Bad container")
 	self:_verifyInit()
 
-	self._containersSet[container] = true
-	self._maid[container] = self:_loadFolder(container)
+	if not self._containersSet[container] then
+		self._containersSet[container] = true
+		if type(container) == "number" then
+			self._maid[container] = self:_loadCloudAsset(container)
+		elseif typeof(container) == "Instance" then
+			self._maid[container] = self:_loadFolder(container)
+		else
+			error("Unknown container type to load")
+		end
+	end
 end
 
 function TemplateProvider:RemoveContainer(container)
@@ -134,6 +199,28 @@ function TemplateProvider:_verifyInit()
 	end
 
 	assert(self._initialized, "TemplateProvider is not initialized")
+end
+
+function TemplateProvider:_loadCloudAsset(assetId)
+	assert(type(assetId) == "number", "Bad assetId")
+	local maid = Maid.new()
+
+	-- Load on server
+	if RunService:IsServer() or not RunService:IsRunning() then
+		maid:GivePromise(InsertServiceUtils.promiseAsset(assetId)):Then(function(result)
+			if RunService:IsRunning() then
+				for _, item in pairs(result:GetChildren()) do
+					-- Replicate in children
+					item.Parent = self._replicationParent
+				end
+			else
+				-- Load without parenting
+				maid:GiveTask(self:_loadFolder(result))
+			end
+		end)
+	end
+
+	return maid
 end
 
 function TemplateProvider:_transformParent(getParent)
@@ -198,6 +285,11 @@ function TemplateProvider:_addToRegistery(child)
 	end
 
 	self._registry[childName] = child
+
+	if self._promises[childName] then
+		self._promises[childName]:Resolve(child)
+		self._promises[childName] = nil
+	end
 end
 
 function TemplateProvider:_removeFromRegistry(child)

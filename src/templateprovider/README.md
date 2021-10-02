@@ -21,9 +21,13 @@ npm install @quenty/templateprovider --save
 ## Usage
 Usage is designed to be simple.
 
-### `TemplateProvider.new(container)`
+### `TemplateProvider.new(container, replicationParent)`
+
+If `replicationParent` is given then contents loaded from the cloud will be replicated to the replicationParent when on the server.
 
 ### `TemplateProvider:Init()`
+
+Initializes the template provider, downloading components and other things needed
 
 ### `TemplateProvider:Clone(templateName)`
 
