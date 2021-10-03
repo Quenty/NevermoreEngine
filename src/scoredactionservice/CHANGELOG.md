@@ -1,19 +1,18 @@
-# v4.2.1 (Sun Oct 03 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Fixes for deferred mode ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@4.2.0...@quenty/scoredactionservice@4.2.1) (2021-10-03)
+
+
+### Bug Fixes
+
+* Fixes for deferred mode ([4a3fd8c](https://github.com/Quenty/NevermoreEngine/commit/4a3fd8c50b03ecbb1d7d85e73a0984f427cd925d))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@4.1.0...@quenty/scoredactionservice@4.2.0) (2021-10-02)
 
