@@ -16,6 +16,11 @@ function ScoredActionUtils.connectToPreferred(scoredAction, callback)
 			local maid = Maid.new()
 			topMaid._preferredMaid = maid
 			callback(maid)
+
+			if topMaid._preferredMaid ~= maid then
+				warn("[ScoredActionUtils.connectToPreferred] - Already cleaned up while executing callback")
+				maid:DoCleaning()
+			end
 		else
 			topMaid._preferredMaid = nil
 		end

@@ -71,7 +71,9 @@ function ScoredActionService:ObserveNewFromInputKeyMapList(scoreValue)
 
 					scoredAction:SetScore(scoreValue.Value)
 					maid:GiveTask(scoreValue.Changed:Connect(function()
-						scoredAction:SetScore(scoreValue.Value)
+						if scoredAction.Destroy then
+							scoredAction:SetScore(scoreValue.Value)
+						end
 					end))
 
 					topMaid._current = maid

@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local Set = require("Set")
 local ValueObject = require("ValueObject")
 local BaseObject = require("BaseObject")
+local Maid = require("Maid")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 
@@ -22,10 +23,14 @@ function ScoredActionPicker.new()
 	self._currentPreferred = ValueObject.new()
 	self._maid:GiveTask(self._currentPreferred)
 
-	self._maid:GiveTask(self._currentPreferred.Changed:Connect(function(new, _, maid)
-		if new then
+	self._maid:GiveTask(self._currentPreferred.Changed:Connect(function(new, _)
+		local maid = Maid.new()
+
+		if new and new.Destroy and self.Destroy then
 			maid:GiveTask(new:PushPreferred())
 		end
+
+		self._maid._current = maid
 	end))
 
 	return self
