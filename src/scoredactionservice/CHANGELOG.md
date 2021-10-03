@@ -1,3 +1,15 @@
+# v4.2.1 (Sun Oct 03 2021)
+
+#### 🐛 Bug Fix
+
+- fix: Fixes for deferred mode ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

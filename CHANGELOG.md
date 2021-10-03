@@ -1,3 +1,17 @@
+# (Sun Oct 03 2021)
+
+#### 🐛 Bug Fix
+
+- fix: Upgrade foreman.toml and luacheck point ([@Quenty](https://github.com/Quenty))
+- `@quenty/scoredactionservice@4.2.1`
+  - fix: Fixes for deferred mode ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Oct 02 2021)
 
 #### 🚀 Enhancement
