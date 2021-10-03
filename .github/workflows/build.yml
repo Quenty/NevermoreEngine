@@ -20,7 +20,7 @@ jobs:
       - name: Run Luacheck
         uses: Roang-zero1/factorio-mod-luacheck@master
         with:
-          luacheckrc_url: https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/.luacheckrc
+          luacheckrc_url: https://raw.githubusercontent.com/Quenty/NevermoreEngine/main/.luacheckrc
 
   release:
     needs: lint
