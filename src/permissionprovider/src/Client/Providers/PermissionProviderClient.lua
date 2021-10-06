@@ -27,7 +27,7 @@ function PermissionProviderClient:PromiseIsAdmin()
 
 	self._cachedAdminPromise = self:_promiseRemoteFunction()
 		:Then(function(remoteFunction)
-			return Promise.defer(function(resolve, reject)
+			return Promise.spawn(function(resolve, reject)
 				local result = nil
 				local ok, err = pcall(function()
 					result = remoteFunction:InvokeServer()

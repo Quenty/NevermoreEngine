@@ -32,11 +32,11 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 		alive = false
 	end)
 
-	spawn(function()
-		wait(math.random()*FRAME_TIME) -- Apply jitter
+	task.spawn(function()
+		task.wait(math.random()*FRAME_TIME) -- Apply jitter
 		while alive do
 			self:_updateVelocity()
-			wait(FRAME_TIME)
+			task.wait(FRAME_TIME)
 		end
 	end)
 
@@ -73,15 +73,15 @@ end
 function BindableRagdollHumanoidOnFall:_ragdollFromFall()
 	self.ShouldRagdoll.Value = true
 
-	spawn(function()
+	task.spawn(function()
 		while self.Destroy
 			and self:_getLargestSpeedInRecords() >= 3
 			and self.ShouldRagdoll.Value do
-			wait()
+			task.wait(0.05)
 		end
 
 		if self.Destroy and self.ShouldRagdoll.Value then
-			wait(0.75)
+			task.wait(0.75)
 		end
 
 		if self.Destroy and self._obj.Health > 0 then

@@ -4,10 +4,6 @@
 
 local RunService = game:GetService("RunService")
 
-local require = require(script.Parent.loader).load(script)
-
-local deferred = require("deferred")
-
 local function isPromise(value)
 	return type(value) == "table" and value.ClassName == "Promise"
 end
@@ -43,11 +39,19 @@ function Promise.new(func)
 end
 
 --- Initializes a new promise with the given function in a deferred wrapper
+function Promise.spawn(func)
+	local self = Promise.new()
+
+	task.spawn(func, self:_getResolveReject())
+
+	return self
+end
+
 function Promise.defer(func)
 	local self = Promise.new()
 
 	-- Just the function part of the resolve/reject protocol!
-	deferred(func, self:_getResolveReject())
+	task.defer(func, self:_getResolveReject())
 
 	return self
 end

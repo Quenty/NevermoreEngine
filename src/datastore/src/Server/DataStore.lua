@@ -29,10 +29,10 @@ function DataStore.new(robloxDataStore, key)
 	self.Saving = Signal.new() -- :Fire(promise)
 	self._maid:GiveTask(self.Saving)
 
-	spawn(function()
+	task.spawn(function()
 		while self.Destroy do
 			for _=1, CHECK_DIVISION do
-				wait(AUTO_SAVE_TIME/CHECK_DIVISION)
+				task.wait(AUTO_SAVE_TIME/CHECK_DIVISION)
 				if not self.Destroy then
 					break
 				end
@@ -43,7 +43,7 @@ function DataStore.new(robloxDataStore, key)
 			end
 
 			-- Apply additional jitter on auto-save
-			wait(math.random(1, JITTER))
+			task.wait(math.random(1, JITTER))
 
 			if not self.Destroy then
 				break

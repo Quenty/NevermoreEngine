@@ -11,7 +11,7 @@ local Promise = require("Promise")
 local AssetServiceUtils = {}
 
 function AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId)
-	return Promise.defer(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
 			result = AssetService:GetAssetIdsForPackage(packageAssetId)

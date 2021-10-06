@@ -18,7 +18,7 @@ function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbn
 	thumbnailSize = thumbnailSize or Enum.ThumbnailSize.Size100x100
 
 	local promise
-	promise = Promise.defer(function(resolve, reject)
+	promise = Promise.spawn(function(resolve, reject)
 		local tries = 0
 		repeat
 			tries = tries + 1
@@ -35,7 +35,7 @@ function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbn
 			if isReady then
 				return resolve(content)
 			else
-				wait(0.05)
+				task.wait(0.05)
 			end
 		until tries >= MAX_TRIES or (not promise:IsPending())
 		reject()

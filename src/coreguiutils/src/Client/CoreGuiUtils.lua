@@ -17,7 +17,7 @@ function CoreGuiUtils.promiseRetrySetCore(tries, initialWaitTime, ...)
 	local args = {...}
 	local n = select("#", ...)
 
-	return Promise.defer(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local waitTime = initialWaitTime
 
 		local ok, err
@@ -26,7 +26,7 @@ function CoreGuiUtils.promiseRetrySetCore(tries, initialWaitTime, ...)
 			if ok then
 				return resolve()
 			else
-				wait(waitTime)
+				task.wait(waitTime)
 				-- Exponential backoff
 				waitTime = waitTime*2
 			end

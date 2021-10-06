@@ -70,7 +70,7 @@ function CameraStateTweener:Finish(doNotAnimate, callback)
 	else
 		spawn(function()
 			while not self._fadeBetween.HasReachedTarget do
-				wait(0.05)
+				task.wait(0.05)
 			end
 			callback()
 		end)

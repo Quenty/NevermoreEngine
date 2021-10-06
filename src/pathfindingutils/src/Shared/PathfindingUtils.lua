@@ -14,14 +14,14 @@ function PathfindingUtils.promiseComputeAsync(path, start, finish)
 	assert(start, "Bad start")
 	assert(finish, "Bad finish")
 
-	return Promise.defer(function(resolve, _)
+	return Promise.spawn(function(resolve, _)
 		path:ComputeAsync(start, finish)
 		resolve(path)
 	end)
 end
 
 function PathfindingUtils.promiseCheckOcclusion(path, startIndex)
-	return Promise.defer(function(resolve, _)
+	return Promise.spawn(function(resolve, _)
 		resolve(path:CheckOcclusionAsync(startIndex))
 	end)
 

@@ -12,7 +12,7 @@ local Promise = require("Promise")
 local LocalizationServiceUtils = {}
 
 function LocalizationServiceUtils.promiseTranslator(player)
-	local asyncTranslatorPromise = Promise.defer(function(resolve, reject)
+	local asyncTranslatorPromise = Promise.spawn(function(resolve, reject)
 		local translator = nil
 		local ok, err = pcall(function()
 			translator = LocalizationService:GetTranslatorForPlayerAsync(player)

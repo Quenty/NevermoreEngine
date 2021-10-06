@@ -5,7 +5,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
-local deferred = require("deferred")
 local Maid = require("Maid")
 
 local CharacterPromiseUtil = {}
@@ -22,10 +21,10 @@ function CharacterPromiseUtil.promiseRootPart(humanoid)
 	end
 
 	-- humanoid:GetPropertyChangedSignal("RootPart") does not fire
-	deferred(function()
+	task.spawn(function()
 		local rootPart = humanoid.RootPart
 		while not rootPart and promise:IsPending() do
-			wait(0.05)
+			task.wait(0.05)
 			rootPart = humanoid.RootPart
 		end
 
