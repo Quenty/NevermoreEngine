@@ -1,3 +1,15 @@
+# v3.1.1 (Wed Oct 06 2021)
+
+#### 🐛 Bug Fix
+
+- fix: Enforce service retrieve returning correct memory address and initializing a separate table [#217](https://github.com/Quenty/NevermoreEngine/pull/217) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

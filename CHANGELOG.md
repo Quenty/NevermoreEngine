@@ -1,3 +1,18 @@
+# (Wed Oct 06 2021)
+
+#### 🐛 Bug Fix
+
+- `@quenty/servicebag@3.1.1`
+  - fix: Enforce service retrieve returning correct memory address and initializing a separate table [#217](https://github.com/Quenty/NevermoreEngine/pull/217) ([@Quenty](https://github.com/Quenty))
+- `@quenty/badgeutils@3.1.1`, `@quenty/binder@4.1.1`, `@quenty/camera@4.2.1`, `@quenty/characterutils@3.1.1`, `@quenty/clienttranslator@4.1.1`, `@quenty/contentproviderutils@3.1.1`, `@quenty/coreguiutils@3.1.1`, `@quenty/datastore@3.1.1`, `@quenty/deferred@2.0.1`, `@quenty/friendutils@3.1.1`, `@quenty/grouputils@3.1.1`, `@quenty/httppromise@3.1.1`, `@quenty/humanoiddescriptionutils@3.1.1`, `@quenty/insertserviceutils@3.1.1`, `@quenty/maid@2.0.1`, `@quenty/marketplaceutils@3.1.1`, `@quenty/mouseshiftlockservice@3.1.1`, `@quenty/pathfindingutils@3.2.1`, `@quenty/permissionprovider@4.1.1`, `@quenty/playersservicepromises@3.1.1`, `@quenty/playerthumbnailutils@3.1.1`, `@quenty/promise@3.1.1`, `@quenty/ragdoll@4.2.1`, `@quenty/remotefunctionutils@3.1.1`, `@quenty/remoting@3.1.1`, `@quenty/rigbuilderutils@3.1.1`, `@quenty/socialserviceutils@3.1.1`, `@quenty/streamingutils@3.1.1`, `@quenty/textfilterservice@3.1.1`, `@quenty/textfilterutils@3.1.1`, `@quenty/timesyncservice@3.1.1`
+  - refactor: Switch to new task.spawn API library [#217](https://github.com/Quenty/NevermoreEngine/pull/217) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Oct 03 2021)
 
 #### 🐛 Bug Fix

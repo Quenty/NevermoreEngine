@@ -1,3 +1,15 @@
+# v4.1.1 (Wed Oct 06 2021)
+
+#### 🐛 Bug Fix
+
+- refactor: Switch to new task.spawn API library [#217](https://github.com/Quenty/NevermoreEngine/pull/217) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
