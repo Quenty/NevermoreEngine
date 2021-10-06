@@ -103,25 +103,25 @@ function Maid:DoCleaning()
 	local tasks = self._tasks
 
 	-- Disconnect all events first as we know this is safe
-	for index, task in pairs(tasks) do
-		if typeof(task) == "RBXScriptConnection" then
+	for index, job in pairs(tasks) do
+		if typeof(job) == "RBXScriptConnection" then
 			tasks[index] = nil
-			task:Disconnect()
+			job:Disconnect()
 		end
 	end
 
 	-- Clear out tasks table completely, even if clean up tasks add more tasks to the maid
-	local index, task = next(tasks)
-	while task ~= nil do
+	local index, job = next(tasks)
+	while job ~= nil do
 		tasks[index] = nil
-		if type(task) == "function" then
-			task()
-		elseif typeof(task) == "RBXScriptConnection" then
-			task:Disconnect()
-		elseif task.Destroy then
-			task:Destroy()
+		if type(job) == "function" then
+			job()
+		elseif typeof(job) == "RBXScriptConnection" then
+			job:Disconnect()
+		elseif job.Destroy then
+			job:Destroy()
 		end
-		index, task = next(tasks)
+		index, job = next(tasks)
 	end
 end
 

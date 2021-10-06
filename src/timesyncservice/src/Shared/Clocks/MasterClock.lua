@@ -18,9 +18,9 @@ function MasterClock.new(remoteEvent, remoteFunction)
 		 self._remoteEvent:FireClient(player, self:GetTime())
 	end)
 
-	spawn(function()
+	task.spawn(function()
 		while true do
-			wait(5)
+			task.wait(5)
 			self:_forceSync()
 		end
 	end)

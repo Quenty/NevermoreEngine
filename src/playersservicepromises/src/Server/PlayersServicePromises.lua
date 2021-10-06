@@ -12,7 +12,7 @@ local PlayersServicePromises = {}
 function PlayersServicePromises.promiseUserIdFromName(name)
 	assert(type(name) == "string", "Bad name")
 
-	return Promise.defer(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local userId
 		local ok, err = pcall(function()
 			userId = Players:GetUserIdFromNameAsync(name)

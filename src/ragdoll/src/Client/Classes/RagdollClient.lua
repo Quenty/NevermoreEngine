@@ -66,7 +66,7 @@ function RagdollClient:_setupHapticFeedback()
 	spawn(function()
 		for i=1, 0, -0.1 do
 			HapticFeedbackUtils.setSmallVibration(lastInputType, i)
-			wait(0.05)
+			task.wait(0.05)
 		end
 		HapticFeedbackUtils.setSmallVibration(lastInputType, 0)
 

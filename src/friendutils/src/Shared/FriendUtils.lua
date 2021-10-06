@@ -45,7 +45,7 @@ function FriendUtils.promiseAllFriends(userId, limitMaxFriends)
 
 	return FriendUtils.promiseFriendPages(userId)
 		:Then(function(pages)
-			return Promise.defer(function(resolve, _)
+			return Promise.spawn(function(resolve, _)
 				local users = {}
 
 				for userData in FriendUtils.iterateFriendsYielding(pages) do
@@ -65,7 +65,7 @@ end
 function FriendUtils.promiseFriendPages(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return Promise.defer(function(resolve, reject)
+	return Promise.spawn(function(resolve, reject)
 		local pages
 		local ok, err = pcall(function()
 			pages = Players:GetFriendsAsync(userId)

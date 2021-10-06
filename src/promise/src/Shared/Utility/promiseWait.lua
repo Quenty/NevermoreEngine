@@ -7,7 +7,7 @@ local Promise = require("Promise")
 
 return function(time)
 	return Promise.new(function(resolve, _)
-		delay(time, function()
+		task.delay(time, function()
 			resolve()
 		end)
 	end)

@@ -4,31 +4,31 @@
 
 local MaidTaskUtils = {}
 
-function MaidTaskUtils.isValidTask(task)
-	return type(task) == "function"
-		or typeof(task) == "RBXScriptConnection"
-		or type(task) == "table" and type(task.Destroy) == "function"
+function MaidTaskUtils.isValidTask(job)
+	return type(job) == "function"
+		or typeof(job) == "RBXScriptConnection"
+		or type(job) == "table" and type(job.Destroy) == "function"
 end
 
-function MaidTaskUtils.doTask(task)
-	if type(task) == "function" then
-		task()
-	elseif typeof(task) == "RBXScriptConnection" then
-		task:Disconnect()
-	elseif type(task) == "table" and type(task.Destroy) == "function" then
-		task:Destroy()
+function MaidTaskUtils.doTask(job)
+	if type(job) == "function" then
+		job()
+	elseif typeof(job) == "RBXScriptConnection" then
+		job:Disconnect()
+	elseif type(job) == "table" and type(job.Destroy) == "function" then
+		job:Destroy()
 	else
-		error("Bad task")
+		error("Bad job")
 	end
 end
 
-function MaidTaskUtils.delayed(time, task)
+function MaidTaskUtils.delayed(time, job)
 	assert(type(time) == "number", "Bad time")
-	assert(MaidTaskUtils.isValidTask(task), "Bad task")
+	assert(MaidTaskUtils.isValidTask(job), "Bad job")
 
 	return function()
-		delay(time, function()
-			MaidTaskUtils.doTask(task)
+		task.delay(time, function()
+			MaidTaskUtils.doTask(job)
 		end)
 	end
 end

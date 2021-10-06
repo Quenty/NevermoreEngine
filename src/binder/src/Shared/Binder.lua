@@ -77,18 +77,9 @@ function Binder:Start()
 	end
 	self._loaded = true
 
-	local bindable = Instance.new("BindableEvent")
-
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
-		local conn = bindable.Event:Connect(function()
-			self:_add(inst)
-		end)
-
-		bindable:Fire()
-		conn:Disconnect()
+		task.spawn(self._add, self, inst)
 	end
-
-	bindable:Destroy()
 
 	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(inst)
 		self:_add(inst)
@@ -310,19 +301,9 @@ function Binder:_add(inst)
 	-- Fire events
 	local listeners = self._listeners[inst]
 	if listeners then
-		local bindable = Instance.new("BindableEvent")
-
 		for callback, _ in pairs(listeners) do
-			local conn
-			conn = bindable.Event:Connect(function()
-				conn:Disconnect()
-				callback(class)
-			end)
-
-			bindable:Fire()
+			task.spawn(callback, class)
 		end
-
-		bindable:Destroy()
 	end
 
 	if self._classAddedSignal then
@@ -350,18 +331,9 @@ function Binder:_remove(inst)
 	-- Fire listener here
 	local listeners = self._listeners[inst]
 	if listeners then
-		local bindable = Instance.new("BindableEvent")
-
 		for callback, _ in pairs(listeners) do
-			local conn = bindable.Event:Connect(function()
-				callback(nil)
-			end)
-
-			bindable:Fire()
-			conn:Disconnect()
+			task.spawn(callback, nil)
 		end
-
-		bindable:Destroy()
 	end
 
 	-- Destroy class
