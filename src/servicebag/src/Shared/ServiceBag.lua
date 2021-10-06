@@ -18,10 +18,10 @@ function ServiceBag.new(parentProvider)
 	self._services = {}
 	self._parentProvider = parentProvider
 
-	self._servicesToInitialize = {}
+	self._serviceTypesToInitialize = {}
 	self._initializing = false
 
-	self._servicesToStart = {}
+	self._serviceTypesToStart = {}
 
 	self._destroying = Signal.new()
 	self._maid:GiveTask(self._destroying)
@@ -41,13 +41,13 @@ function ServiceBag:GetService(serviceType)
 
 	local service = self._services[serviceType]
 	if service then
-		-- Ensure initialized if we're during inint phase
-		if self._servicesToInitialize and self._initializing then
-			local index = table.find(self._servicesToInitialize, service)
+		-- Ensure initialized if we're during init phase
+		if self._serviceTypesToInitialize and self._initializing then
+			local index = table.find(self._serviceTypesToInitialize, service)
 			if index then
-				local foundService = assert(table.remove(self._servicesToInitialize, index), "No service removed")
-				assert(foundService == service, "foundService ~= service")
-				self:_initService(service)
+				local foundServiceType = assert(table.remove(self._serviceTypesToInitialize, index), "No service removed")
+				assert(foundServiceType == service, "foundServiceType ~= service")
+				self:_initService(foundServiceType)
 			end
 		end
 
@@ -59,41 +59,42 @@ function ServiceBag:GetService(serviceType)
 	end
 
 	-- Try to add the service if we're still initializing services
-	self:_addService(serviceType)
+	self:_addServiceType(serviceType)
 	return self._services[serviceType]
 end
 
 function ServiceBag:Init()
 	assert(not self._initializing, "Already initializing")
-	assert(self._servicesToInitialize, "Already initialized")
+	assert(self._serviceTypesToInitialize, "Already initialized")
 	self._initializing = true
 
-	while next(self._servicesToInitialize) do
-		local service = table.remove(self._servicesToInitialize)
-		self:_initService(service)
+	while next(self._serviceTypesToInitialize) do
+		local serviceType = table.remove(self._serviceTypesToInitialize)
+		self:_initService(serviceType)
 	end
 
-	self._servicesToInitialize = nil
+	self._serviceTypesToInitialize = nil
 	self._initializing = false
 end
 
 function ServiceBag:Start()
-	assert(self._servicesToStart, "Already started")
+	assert(self._serviceTypesToStart, "Already started")
 	assert(not self._initializing, "Still initializing")
 
-	while next(self._servicesToStart) do
-		local service = table.remove(self._servicesToStart)
+	while next(self._serviceTypesToStart) do
+		local serviceType = table.remove(self._serviceTypesToStart)
+		local service = assert(self._services[serviceType], "No service")
 		if service.Start then
 			service:Start()
 		end
 	end
 
-	self._servicesToStart = nil
+	self._serviceTypesToStart = nil
 end
 
 --- Adds a service to this provider only
-function ServiceBag:_addService(serviceType)
-	assert(self._servicesToInitialize, "Already finished initializing, cannot add more services")
+function ServiceBag:_addServiceType(serviceType)
+	assert(self._serviceTypesToInitialize, "Already finished initializing, cannot add more services")
 
 	-- Already added
 	if self._services[serviceType] then
@@ -106,18 +107,20 @@ function ServiceBag:_addService(serviceType)
 
 	if self._initializing then
 		-- let's initialize immediately
-		self:_initService(service)
+		self:_initService(serviceType)
 	else
-		table.insert(self._servicesToInitialize, serviceType)
+		table.insert(self._serviceTypesToInitialize, serviceType)
 	end
 end
 
-function ServiceBag:_initService(service)
+function ServiceBag:_initService(serviceType)
+	local service = assert(self._services[serviceType], "No service")
+
 	if service.Init then
 		service:Init(self)
 	end
 
-	table.insert(self._servicesToStart, service)
+	table.insert(self._serviceTypesToStart, serviceType)
 end
 
 function ServiceBag:CreateScope()
