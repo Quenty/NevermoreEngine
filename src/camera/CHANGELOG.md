@@ -1,19 +1,15 @@
-# v4.2.1 (Wed Oct 06 2021)
-
-#### 🐛 Bug Fix
-
-- refactor: Switch to new task.spawn API library [#217](https://github.com/Quenty/NevermoreEngine/pull/217) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@4.2.0...@quenty/camera@4.2.1) (2021-10-06)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@4.1.0...@quenty/camera@4.2.0) (2021-10-02)
 
