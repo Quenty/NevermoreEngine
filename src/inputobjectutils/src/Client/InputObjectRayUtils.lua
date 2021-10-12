@@ -7,29 +7,45 @@ local DEFAULT_RAY_DISTANCE = 1000
 
 local InputObjectRayUtils = {}
 
-function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance)
+function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance, offset, camera)
 	assert(inputObject, "Bad inputObject")
+	offset = offset or Vector3.new()
 
-	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position, distance)
+	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position + offset, distance, camera)
 end
 
-function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, distance, offset)
-	assert(inputObject, "Bad inputObject")
+function InputObjectRayUtils.cameraRayFromMouse(mouse, distance, offset, camera)
+	assert(mouse, "Bad mouse")
+	offset = offset or Vector3.new(0, 0, 0)
 
-	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position + offset, distance)
+	return InputObjectRayUtils.cameraRayFromScreenPosition(
+		Vector2.new(mouse.x + offset.x, mouse.y + offset.y),
+		distance,
+		camera)
 end
 
-function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance)
+function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, distance, offset, camera)
+	assert(inputObject, "Bad inputObject")
+
+	return InputObjectRayUtils.cameraRayFromScreenPosition(
+		inputObject.Position + offset,
+		distance,
+		camera)
+end
+
+function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance, camera)
 	distance = distance or DEFAULT_RAY_DISTANCE
+	camera = camera or Workspace.CurrentCamera
 
-	local baseRay = Workspace.CurrentCamera:ScreenPointToRay(position.X, position.Y)
+	local baseRay = camera:ScreenPointToRay(position.X, position.Y)
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
-function InputObjectRayUtils.cameraRayFromViewportPosition(position, distance)
+function InputObjectRayUtils.cameraRayFromViewportPosition(position, distance, camera)
 	distance = distance or DEFAULT_RAY_DISTANCE
+	camera = camera or Workspace.CurrentCamera
 
-	local baseRay = Workspace.CurrentCamera:ViewportPointToRay(position.X, position.Y)
+	local baseRay = camera:ViewportPointToRay(position.X, position.Y)
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
