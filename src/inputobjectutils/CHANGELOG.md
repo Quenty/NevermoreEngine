@@ -1,19 +1,18 @@
-# v2.0.1 (Wed Oct 13 2021)
-
-#### 🐛 Bug Fix
-
-- fix: InputObjectRayUtils allows the specification of the camera [#218](https://github.com/Quenty/NevermoreEngine/pull/218) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@2.0.0...@quenty/inputobjectutils@2.0.1) (2021-10-13)
+
+
+### Bug Fixes
+
+* InputObjectRayUtils allows the specification of the camera ([4956ef9](https://github.com/Quenty/NevermoreEngine/commit/4956ef91728c9a8f763dab565f56e439981b122f))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@1.2.0...@quenty/inputobjectutils@2.0.0) (2021-09-05)
 

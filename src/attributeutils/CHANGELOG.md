@@ -1,19 +1,18 @@
-# v3.2.2 (Wed Oct 13 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add AttributeValue class [#218](https://github.com/Quenty/NevermoreEngine/pull/218) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.2.1...@quenty/attributeutils@3.2.2) (2021-10-13)
+
+
+### Bug Fixes
+
+* Add AttributeValue class ([efc129d](https://github.com/Quenty/NevermoreEngine/commit/efc129d54282741671c05c6c56d84a74745e2b8b))
+
+
+
+
 
 ## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.2.0...@quenty/attributeutils@3.2.1) (2021-10-06)
 
