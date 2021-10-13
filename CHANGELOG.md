@@ -1,3 +1,18 @@
+# (Wed Oct 13 2021)
+
+#### 🐛 Bug Fix
+
+- `@quenty/inputobjectutils@2.0.1`
+  - fix: InputObjectRayUtils allows the specification of the camera [#218](https://github.com/Quenty/NevermoreEngine/pull/218) ([@Quenty](https://github.com/Quenty))
+- `@quenty/attributeutils@3.2.2`
+  - fix: Add AttributeValue class [#218](https://github.com/Quenty/NevermoreEngine/pull/218) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Oct 06 2021)
 
 #### 🐛 Bug Fix
