@@ -6,6 +6,7 @@ local CollectionService = game:GetService("CollectionService")
 
 local loader = script.Parent
 local Utils = require(script.Parent.Utils)
+local BounceTemplateUtils = require(script.Parent.BounceTemplateUtils)
 
 local ScriptInfoUtils = {}
 
@@ -54,22 +55,26 @@ function ScriptInfoUtils.populateScriptInfoLookup(instance, scriptInfoLookup, la
 		local replicationMode = ScriptInfoUtils.getFolderReplicationMode(instance.Name, lastReplicationMode)
 		if replicationMode ~= ScriptInfoUtils.ModuleReplicationTypes.IGNORE then
 			for _, item in pairs(instance:GetChildren()) do
-				if item:IsA("Folder") then
-					ScriptInfoUtils.populateScriptInfoLookup(item, scriptInfoLookup, replicationMode)
-				elseif item:IsA("ModuleScript") then
-					ScriptInfoUtils.addToInfoMap(scriptInfoLookup,
-						ScriptInfoUtils.createScriptInfo(item, item.Name, replicationMode))
+				if not BounceTemplateUtils.isBounceTemplate(item) then
+					if item:IsA("Folder") then
+						ScriptInfoUtils.populateScriptInfoLookup(item, scriptInfoLookup, replicationMode)
+					elseif item:IsA("ModuleScript") then
+						ScriptInfoUtils.addToInfoMap(scriptInfoLookup,
+							ScriptInfoUtils.createScriptInfo(item, item.Name, replicationMode))
+					end
 				end
 			end
 		end
 	elseif instance:IsA("ModuleScript") then
-		if instance == loader then
-			-- STRICT hack to support this module script as "loader" over "Nevermore" in replicated scenario
-			ScriptInfoUtils.addToInfoMap(scriptInfoLookup,
-				ScriptInfoUtils.createScriptInfo(instance, "loader", lastReplicationMode))
-		else
-			ScriptInfoUtils.addToInfoMap(scriptInfoLookup,
-				ScriptInfoUtils.createScriptInfo(instance, instance.Name, lastReplicationMode))
+		if not BounceTemplateUtils.isBounceTemplate(instance) then
+			if instance == loader then
+				-- STRICT hack to support this module script as "loader" over "Nevermore" in replicated scenario
+				ScriptInfoUtils.addToInfoMap(scriptInfoLookup,
+					ScriptInfoUtils.createScriptInfo(instance, "loader", lastReplicationMode))
+			else
+				ScriptInfoUtils.addToInfoMap(scriptInfoLookup,
+					ScriptInfoUtils.createScriptInfo(instance, instance.Name, lastReplicationMode))
+			end
 		end
 	elseif instance:IsA("ObjectValue") then
 		error("ObjectValue links are not supported at this time for retrieving inline module scripts")
@@ -98,7 +103,6 @@ function ScriptInfoUtils.addToInfoMap(scriptInfoLookup, scriptInfo)
 
 	local replicationMode = assert(scriptInfo.replicationMode, "Bad replicationMode")
 	local replicationMap = assert(scriptInfoLookup[replicationMode], "Bad replicationMode")
-
 
 	ScriptInfoUtils.addToInfoMapForMode(replicationMap, scriptInfo)
 
