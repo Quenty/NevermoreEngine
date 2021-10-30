@@ -7,6 +7,7 @@ local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
+local MaidTaskUtils = require("MaidTaskUtils")
 local Signal = require("Signal")
 local promiseBoundClass = require("promiseBoundClass")
 --[[
@@ -286,13 +287,9 @@ function Binder:_add(inst)
 	end
 
 	self._pendingInstSet[inst] = nil
-
-	if not (type(class) == "table" and type(class.Destroy) == "function") then
-		warn(("[Binder._add] - Bad class constructed for tag %q"):format(self._tagName))
-		return
-	end
-
 	assert(self._instToClass[inst] == nil, "Overwrote")
+
+	class = class or {}
 
 	-- Add to state
 	self._allClassSet[class] = true
@@ -336,12 +333,8 @@ function Binder:_remove(inst)
 		end
 	end
 
-	-- Destroy class
-	if class.Destroy then
-		class:Destroy()
-	else
-		warn(("[Binder._remove] - Class %q no longer has destroy, something destroyed it!")
-			:format(tostring(self._tagName)))
+	if MaidTaskUtils.isValidTask(class) then
+		MaidTaskUtils.doTask(class)
 	end
 end
 
