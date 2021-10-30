@@ -26,7 +26,7 @@ local MyClass = {}
 MyClass.__index = MyClass
 
 function MyClass.new(robloxInstance)
-	print("New tagged instance of ", robloxInstance")
+	print("New tagged instance of ", robloxInstance)
 	return setmetatable({}, MyClass)
 end
 
