@@ -1,5 +1,18 @@
 # (Sat Oct 30 2021)
 
+#### 🚀 Enhancement
+
+- `@quenty/binder@4.2.0`, `@quenty/brio@3.2.0`, `@quenty/instanceutils@3.2.0`, `@quenty/rx@3.2.0`
+  - feat: Add unit tests and other small features [#221](https://github.com/Quenty/NevermoreEngine/pull/221) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Oct 30 2021)
+
 #### 🐛 Bug Fix
 
 - `@quenty/loader@3.1.1`, `@quenty/networkownerservice@3.0.1`, `@quenty/playersservicepromises@3.1.2`, `@quenty/templateprovider@3.2.2`

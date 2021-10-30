@@ -1,3 +1,20 @@
+# v4.2.0 (Sat Oct 30 2021)
+
+#### 🚀 Enhancement
+
+- feat: Add unit tests and other small features [#221](https://github.com/Quenty/NevermoreEngine/pull/221) ([@Quenty](https://github.com/Quenty))
+- feat: Binder constructors may now return anything and it will attempt to clean it as required, but also it is fine for the function to just not do anything ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Update binder docs ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

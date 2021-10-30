@@ -1,3 +1,20 @@
+# v3.2.0 (Sat Oct 30 2021)
+
+#### 🚀 Enhancement
+
+- feat: Add unit tests and other small features [#221](https://github.com/Quenty/NevermoreEngine/pull/221) ([@Quenty](https://github.com/Quenty))
+- feat: combineLatest may also combine none-observables which are treated as raw values (for now). ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test: Add Rx.spec.lua tests ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

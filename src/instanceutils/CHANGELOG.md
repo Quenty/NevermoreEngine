@@ -1,3 +1,20 @@
+# v3.2.0 (Sat Oct 30 2021)
+
+#### 🚀 Enhancement
+
+- feat: Add unit tests and other small features [#221](https://github.com/Quenty/NevermoreEngine/pull/221) ([@Quenty](https://github.com/Quenty))
+- feat: RxInstanceUtils.observeProperty also outputs the instance it observed the property on as the second argument ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test: Add unit tests to cover combineLatest ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
