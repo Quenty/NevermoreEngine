@@ -19,9 +19,9 @@ function RxInstanceUtils.observeProperty(instance, propertyName)
 		local maid = Maid.new()
 
 		maid:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(function()
-			sub:Fire(instance[propertyName])
+			sub:Fire(instance[propertyName], instance)
 		end))
-		sub:Fire(instance[propertyName])
+		sub:Fire(instance[propertyName], instance)
 
 		return maid
 	end)
@@ -175,6 +175,5 @@ function RxInstanceUtils.observeDescendants(parent, predicate)
 		return maid
 	end)
 end
-
 
 return RxInstanceUtils

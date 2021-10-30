@@ -66,8 +66,10 @@ end
 
 function BrioUtils.first(brios, ...)
 	for _, brio in pairs(brios) do
-		if brio:IsDead() then
-			return Brio.DEAD
+		if Brio.isBrio(brio) then
+			if brio:IsDead() then
+				return Brio.DEAD
+			end
 		end
 	end
 
@@ -75,9 +77,11 @@ function BrioUtils.first(brios, ...)
 	local topBrio = Brio.new(...)
 
 	for _, brio in pairs(brios) do
-		maid:GiveTask(brio:GetDiedSignal():Connect(function()
-			topBrio:Kill()
-		end))
+		if Brio.isBrio(brio) then
+			maid:GiveTask(brio:GetDiedSignal():Connect(function()
+				topBrio:Kill()
+			end))
+		end
 	end
 
 	maid:GiveTask(topBrio:GetDiedSignal():Connect(function()

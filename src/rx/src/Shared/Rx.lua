@@ -96,13 +96,10 @@ end
 -- https://rxjs-dev.firebaseapp.com/api/index/function/fromEvent
 function Rx.fromSignal(event)
 	return Observable.new(function(sub)
-		local maid = Maid.new()
 		-- This stream never completes or fails!
-		maid:GiveTask(event:Connect(function(...)
+		return event:Connect(function(...)
 			sub:Fire(...)
-		end))
-
-		return maid
+		end)
 	end)
 end
 
@@ -593,8 +590,8 @@ function Rx.finalize(finalizerCallback)
 	end
 end
 
--- https://rxjs.dev/api/operators/combineAll
-function Rx.combineAll()
+-- https://rxjs.dev/api/operators/combineLatestAll
+function Rx.combineLatestAll()
 	return function(source)
 		return Observable.new(function(sub)
 			local observables = {}
@@ -627,6 +624,9 @@ function Rx.combineAll()
 		end)
 	end
 end
+
+-- This is for backwards compatability, and is deprecated
+Rx.combineAll = Rx.combineLatestAll
 
 -- NOTE: Untested
 function Rx.catchError(callback)
@@ -672,24 +672,26 @@ end
 function Rx.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
-	for _, observable in pairs(observables) do
-		assert(Observable.isObservable(observable), "Not an observable")
-	end
-
 	return Observable.new(function(sub)
-		if not next(observables) then
+		local pending = 0
+
+		local latest = {}
+		for key, value in pairs(observables) do
+			if Observable.isObservable(value) then
+				pending = pending + 1
+				latest[key] = UNSET_VALUE
+			else
+				latest[key] = value
+			end
+		end
+
+		if pending == 0 then
+			sub:Fire(latest)
 			sub:Complete()
 			return
 		end
 
 		local maid = Maid.new()
-		local pending = 0
-
-		local latest = {}
-		for key, _ in pairs(observables) do
-			pending = pending + 1
-			latest[key] = UNSET_VALUE
-		end
 
 		local function fireIfAllSet()
 			for _, value in pairs(latest) do
@@ -702,21 +704,23 @@ function Rx.combineLatest(observables)
 		end
 
 		for key, observer in pairs(observables) do
-			maid:GiveTask(observer:Subscribe(
-				function(value)
-					latest[key] = value
-					fireIfAllSet()
-				end,
-				function(...)
-					pending = pending - 1
-					sub:Fail(...)
-				end,
-				function()
-					pending = pending - 1
-					if pending == 0 then
-						sub:Complete()
-					end
-				end))
+			if Observable.isObservable(observer) then
+				maid:GiveTask(observer:Subscribe(
+					function(value)
+						latest[key] = value
+						fireIfAllSet()
+					end,
+					function(...)
+						pending = pending - 1
+						sub:Fail(...)
+					end,
+					function()
+						pending = pending - 1
+						if pending == 0 then
+							sub:Complete()
+						end
+					end))
+			end
 		end
 
 		return maid
@@ -779,8 +783,20 @@ end
 -- https://netbasal.com/getting-to-know-the-defer-observable-in-rxjs-a16f092d8c09
 function Rx.defer(observableFactory)
 	return Observable.new(function(sub)
-		local observable = observableFactory()
-		assert(Observable.isObservable(observable))
+		local observable
+		local ok, err = pcall(function()
+			observable = observableFactory()
+		end)
+
+		if not ok then
+			sub:Fail(err)
+			return
+		end
+
+		if not Observable.isObservable(observable) then
+			sub:Fail("Not an observable")
+			return
+		end
 
 		return observable:Subscribe(sub:GetFireFailComplete())
 	end)
