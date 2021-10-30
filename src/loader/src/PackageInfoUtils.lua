@@ -5,6 +5,7 @@
 local Utils = require(script.Parent.Utils)
 local ScriptInfoUtils = require(script.Parent.ScriptInfoUtils)
 local Queue = require(script.Parent.Queue)
+local BounceTemplateUtils = require(script.Parent.BounceTemplateUtils)
 
 local INCLUDE_IMPLICIT_DEPENDENCIES = true
 
@@ -170,6 +171,10 @@ function PackageInfoUtils.tryLoadPackageFromInstance(packageInfoList, packageInf
 	assert(type(packageInfoMap) == "table", "Bad packageInfoMap")
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(scope) == "string", "Bad scope")
+
+	if BounceTemplateUtils.isBounceTemplate(instance) then
+		return
+	end
 
 	if instance:IsA("Folder") or instance:IsA("ModuleScript") then
 		table.insert(packageInfoList, PackageInfoUtils.getOrCreatePackageInfo(instance, packageInfoMap, scope))

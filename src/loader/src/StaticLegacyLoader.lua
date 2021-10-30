@@ -105,7 +105,7 @@ function StaticLegacyLoader:_getPackageFolderLookup(instance)
 		if instance.Value then
 			return self:_getOrCreateLookup(instance.Value)
 		else
-			warn("Bad link in packageFolder")
+			warn("[StaticLegacyLoader] - Bad link in packageFolder")
 			return {}
 		end
 	elseif instance:IsA("Folder") then
@@ -171,13 +171,23 @@ function StaticLegacyLoader:_ensureFakeLoader(module)
 		return
 	end
 
+	-- NExusUnitTest
+	-- luacheck: ignore
+	-- selene: allow(undefined_variable)
+	local shouldBeArchivable = Load and true or false
+
 	-- Already have link
-	if parent:FindFirstChild("loader") then
+	local found = parent:FindFirstChild("loader")
+	if found then
+		if BounceTemplateUtils.isBounceTemplate(found) then
+			found.Archivable = shouldBeArchivable
+		end
+
 		return
 	end
 
 	local link = BounceTemplateUtils.create(loader, "loader")
-	link.Archivable = false -- Do not save this bad boy
+	link.Archivable = shouldBeArchivable
 	link.Parent = parent
 end
 
