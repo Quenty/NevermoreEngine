@@ -283,7 +283,8 @@ function RxBrioUtils.filter(predicate)
 	end
 end
 
--- Flattens all the brios in the combineLatest
+-- Flattens all the brios in one brio and combines them. Note that this method leads to
+-- gaps in the lifetime of the brio.
 function RxBrioUtils.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
@@ -306,6 +307,36 @@ function RxBrioUtils.switchMap(project, resultSelector)
 	return Rx.switchMap(RxBrioUtils.mapBrio(project), resultSelector)
 end
 
+--[[
+Works line combineLatest, but allow the transformation of a brio into an observable
+that emits the value, and then nil, on death.
+
+The issue here is this:
+
+1. Resources are found with combineLatest()
+2. One resource dies
+3. All resources are invalidated
+4. We still wanted to be able to use most of the resources
+
+With this method we are able to do this, as we'll re-emit a table with all resoruces
+except the invalidated one.
+]]
+function RxBrioUtils.flatCombineLatest(observables)
+	assert(type(observables) == "table", "Bad observables")
+
+	local newObservables = {}
+	for key, observable in pairs(observables) do
+		if Observable.isObservable(observable) then
+			newObservables[key] = RxBrioUtils.flattenToValueAndNil(observable)
+		else
+			newObservables[key] = observable
+		end
+	end
+
+	return Rx.combineLatest(newObservables)
+end
+
+-- Takes in a brio and returns an observable that completes ony
 function RxBrioUtils.mapBrio(project)
 	assert(type(project) == "function", "Bad project")
 
@@ -322,6 +353,41 @@ function RxBrioUtils.mapBrio(project)
 		return RxBrioUtils.completeOnDeath(brio, observable)
 	end
 end
+
+-- Transforms the brio into an observable that emits the initial value of the brio, and then another value on death
+function RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
+	if not Brio.isBrio(brio) then
+		return Rx.of(brio)
+	else
+		return Observable.new(function(sub)
+			if brio:IsDead() then
+				sub:Fire(emitOnDeathValue)
+				sub:Complete()
+			else
+				sub:Fire(brio:GetValue())
+
+				return brio:GetDiedSignal():Connect(function()
+					sub:Fire(emitOnDeathValue)
+					sub:Complete()
+				end)
+			end
+		end)
+	end
+end
+
+function RxBrioUtils.mapBrioToEmitOnDeathObservable(emitOnDeathValue)
+	return function(brio)
+		return RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
+	end
+end
+
+--- Takes in an observable of brios and returns an observable of the inner values that will also output
+-- nil if there is no other value for the brio
+function RxBrioUtils.emitOnDeath(emitOnDeathValue)
+	return Rx.switchMap(RxBrioUtils.mapBrioToEmitOnDeathObservable(emitOnDeathValue));
+end
+
+RxBrioUtils.flattenToValueAndNil = RxBrioUtils.emitOnDeath(nil)
 
 function RxBrioUtils.onlyLastBrioSurvives()
 	return function(source)
