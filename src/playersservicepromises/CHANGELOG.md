@@ -1,3 +1,16 @@
+# v3.1.2 (Sat Oct 30 2021)
+
+#### 🐛 Bug Fix
+
+- fix: Make minor fixes and allow unit testing via TestEz to be added [#220](https://github.com/Quenty/NevermoreEngine/pull/220) ([@Quenty](https://github.com/Quenty))
+- fix: PlayersServicePromises are available on server and client ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

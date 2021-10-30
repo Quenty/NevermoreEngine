@@ -1,3 +1,16 @@
+# (Sat Oct 30 2021)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@3.1.1`, `@quenty/networkownerservice@3.0.1`, `@quenty/playersservicepromises@3.1.2`, `@quenty/templateprovider@3.2.2`
+  - fix: Make minor fixes and allow unit testing via TestEz to be added [#220](https://github.com/Quenty/NevermoreEngine/pull/220) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Oct 13 2021)
 
 #### 🐛 Bug Fix
