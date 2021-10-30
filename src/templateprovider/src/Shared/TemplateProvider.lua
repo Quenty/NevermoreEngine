@@ -100,7 +100,7 @@ function TemplateProvider:PromiseClone(templateName)
 end
 
 function TemplateProvider:_getReplicationHint()
-	local hint
+	local hint = ""
 
 	if RunService:IsClient() then
 		hint = "Make sure the template provider is initialized on the server."
