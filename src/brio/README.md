@@ -38,6 +38,14 @@ resources.
 
 Anything may "kill" a brio by calling :Destroy() or :Kill().
 
+## Design philosophy
+
+Brios are designed to solve this issue where we emit an object with a lifetime associated with it from an Observable stream. This resource is only valid for some amount of time (for example, while the object is in the Roblox data model).
+
+In order to know how long we can keep this object/use it, we wrap the object with a Brio, which denotes the lifetime of the object.
+
+Modeling this with pure observables is very tricky because the subscriber will have to also monitor/emit a similar object with less clear conventions. For example  an observable that emits the object, and then nil on death. 
+
 ## API Surface
 
 ### `Brio.isBrio(value)`
