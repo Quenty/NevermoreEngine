@@ -14,6 +14,7 @@ function NetworkOwnerService:Init()
 end
 
 function NetworkOwnerService:AddSetNetworkOwnerHandle(part, player)
+	assert(self ~= NetworkOwnerService, "Make sure to retrieve NetworkOwnerService from a ServiceBag")
 	assert(self._partOwnerData, "Not initialized")
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
