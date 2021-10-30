@@ -1,25 +1,19 @@
-# v3.2.0 (Sat Oct 30 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add unit tests and other small features [#221](https://github.com/Quenty/NevermoreEngine/pull/221) ([@Quenty](https://github.com/Quenty))
-- feat: Update RxBrioUtils to allow the transformation of a brio into an observable that emits the value, and then nil, on death. This is like combineLatest. ([@Quenty](https://github.com/Quenty))
-- feat: BrioUtils.first allows no brios to be passed into the brio. This allows BrioUtils.flatten to accept non-brios as a result. ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Update BrioDocs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.1.2...@quenty/brio@3.2.0) (2021-10-30)
+
+
+### Features
+
+* BrioUtils.first allows no brios to be passed into the brio. This allows BrioUtils.flatten to accept non-brios as a result. ([6cf4bdf](https://github.com/Quenty/NevermoreEngine/commit/6cf4bdf504ace3dfcc37faa717363c4455be52aa))
+* Update RxBrioUtils to allow the transformation of a brio into an observable that emits the value, and then nil, on death. This is like combineLatest. ([86df73f](https://github.com/Quenty/NevermoreEngine/commit/86df73f529740a7785eafa4bcd51639e5e20574c))
+
+
+
+
 
 ## [3.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.1.1...@quenty/brio@3.1.2) (2021-10-30)
 
