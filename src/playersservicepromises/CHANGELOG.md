@@ -1,20 +1,18 @@
-# v3.1.2 (Sat Oct 30 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Make minor fixes and allow unit testing via TestEz to be added [#220](https://github.com/Quenty/NevermoreEngine/pull/220) ([@Quenty](https://github.com/Quenty))
-- fix: PlayersServicePromises are available on server and client ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playersservicepromises@3.1.1...@quenty/playersservicepromises@3.1.2) (2021-10-30)
+
+
+### Bug Fixes
+
+* PlayersServicePromises are available on server and client ([5d6b24a](https://github.com/Quenty/NevermoreEngine/commit/5d6b24a0a74ca4458209059464804680704be6c1))
+
+
+
+
 
 ## [3.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playersservicepromises@3.1.0...@quenty/playersservicepromises@3.1.1) (2021-10-06)
 

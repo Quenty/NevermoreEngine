@@ -1,20 +1,18 @@
-# v3.2.2 (Sat Oct 30 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Make minor fixes and allow unit testing via TestEz to be added [#220](https://github.com/Quenty/NevermoreEngine/pull/220) ([@Quenty](https://github.com/Quenty))
-- fix: TemplateProvider provides good errors on the server ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@3.2.1...@quenty/templateprovider@3.2.2) (2021-10-30)
+
+
+### Bug Fixes
+
+* TemplateProvider provides good errors on the server ([a3165c0](https://github.com/Quenty/NevermoreEngine/commit/a3165c034d1eb52186a81621563543b84209aaf8))
+
+
+
+
 
 ## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@3.2.0...@quenty/templateprovider@3.2.1) (2021-10-06)
 

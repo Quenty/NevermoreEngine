@@ -1,20 +1,18 @@
-# v3.0.1 (Sat Oct 30 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Make minor fixes and allow unit testing via TestEz to be added [#220](https://github.com/Quenty/NevermoreEngine/pull/220) ([@Quenty](https://github.com/Quenty))
-- fix: NetworkOwnerService provides good errors ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@3.0.0...@quenty/networkownerservice@3.0.1) (2021-10-30)
+
+
+### Bug Fixes
+
+* NetworkOwnerService provides good errors ([2f51dd6](https://github.com/Quenty/NevermoreEngine/commit/2f51dd606dc72095814fb53cf2ba625957791ed5))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/networkownerservice@2.0.0...@quenty/networkownerservice@3.0.0) (2021-09-11)
 

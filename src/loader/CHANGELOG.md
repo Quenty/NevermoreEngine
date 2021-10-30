@@ -1,20 +1,18 @@
-# v3.1.1 (Sat Oct 30 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Make minor fixes and allow unit testing via TestEz to be added [#220](https://github.com/Quenty/NevermoreEngine/pull/220) ([@Quenty](https://github.com/Quenty))
-- fix: Allow NexusUnitTest to load packages for unit testing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.1.0...@quenty/loader@3.1.1) (2021-10-30)
+
+
+### Bug Fixes
+
+* Allow NexusUnitTest to load packages for unit testing ([4ea04fa](https://github.com/Quenty/NevermoreEngine/commit/4ea04fa50d3908f71bd6f14a14ef4a74be6cdb00))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.0.1...@quenty/loader@3.1.0) (2021-10-02)
 

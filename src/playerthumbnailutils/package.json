@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerthumbnailutils",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Reimplementation of Player:GetUserThumbnailAsync but as a promise with retry logic",
   "keywords": [
     "Roblox",
