@@ -1,5 +1,20 @@
 # (Wed Nov 10 2021)
 
+#### 🚀 Enhancement
+
+- `@quenty/string@2.2.0`
+  - feat: Add string.startsWith [#224](https://github.com/Quenty/NevermoreEngine/pull/224) ([@Quenty](https://github.com/Quenty))
+- `@quenty/resetservice@1.1.0`
+  - feat: Add ResetService package [#224](https://github.com/Quenty/NevermoreEngine/pull/224) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Nov 10 2021)
+
 #### 🐛 Bug Fix
 
 - `@quenty/servicebag@3.1.3`

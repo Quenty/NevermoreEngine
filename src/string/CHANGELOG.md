@@ -1,3 +1,15 @@
+# v2.2.0 (Wed Nov 10 2021)
+
+#### 🚀 Enhancement
+
+- feat: Add string.startsWith [#224](https://github.com/Quenty/NevermoreEngine/pull/224) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
