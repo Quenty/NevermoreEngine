@@ -17,8 +17,6 @@ function AttributeValue.new(object, attributeName, defaultValue)
 		self._object:SetAttribute(rawget(self, "_attributeName"), defaultValue)
 	end
 
-	self.Changed = self._object:GetAttributeChangedSignal(self._attributeName)
-
 	return setmetatable(self, AttributeValue)
 end
 
@@ -31,6 +29,8 @@ function AttributeValue:__index(index)
 		else
 			return result
 		end
+	elseif index == "Changed" then
+		return self._object:GetAttributeChangedSignal(self._attributeName)
 	elseif AttributeValue[index] then
 		return AttributeValue[index]
 	else
