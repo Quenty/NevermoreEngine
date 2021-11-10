@@ -1,0 +1,37 @@
+{
+  "name": "@quenty/resetservice",
+  "version": "1.0.0",
+  "description": "Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Humanoid",
+    "Character"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/resetservice/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/coreguiutils": "file:../coreguiutils",
+    "@quenty/loader": "file:../loader",
+    "@quenty/remoting": "file:../remoting",
+    "@quenty/table": "file:../table"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
