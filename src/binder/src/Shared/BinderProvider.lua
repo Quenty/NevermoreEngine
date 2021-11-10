@@ -88,6 +88,7 @@ function BinderProvider:__index(index)
 		return BinderProvider[index]
 	end
 
+	assert(self._initialized, "Not initialized")
 	error(("%q Not a valid index"):format(tostring(index)))
 end
 
