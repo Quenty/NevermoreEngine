@@ -1,3 +1,20 @@
+# (Wed Nov 10 2021)
+
+#### 🐛 Bug Fix
+
+- `@quenty/servicebag@3.1.3`
+  - fix: Prevent double service initialization from occuring when retrieving service that has not yet been added to service bag [#223](https://github.com/Quenty/NevermoreEngine/pull/223) ([@Quenty](https://github.com/Quenty))
+- `@quenty/binder@4.2.1`
+  - fix: Better error messages [#223](https://github.com/Quenty/NevermoreEngine/pull/223) ([@Quenty](https://github.com/Quenty))
+- `@quenty/attributeutils@3.3.1`
+  - fix: Defer signal creation [#223](https://github.com/Quenty/NevermoreEngine/pull/223) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Oct 30 2021)
 
 #### 🚀 Enhancement
