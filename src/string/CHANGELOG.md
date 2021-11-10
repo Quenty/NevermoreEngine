@@ -1,19 +1,18 @@
-# v2.2.0 (Wed Nov 10 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add string.startsWith [#224](https://github.com/Quenty/NevermoreEngine/pull/224) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@2.1.0...@quenty/string@2.2.0) (2021-11-10)
+
+
+### Features
+
+* Add string.startsWith ([eb51da1](https://github.com/Quenty/NevermoreEngine/commit/eb51da1907f28bda5a843d7fa39fe4d9d9ce9938))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@2.0.0...@quenty/string@2.1.0) (2021-09-22)
 

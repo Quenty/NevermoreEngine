@@ -1,6 +1,6 @@
 {
   "name": "@quenty/sprites",
-  "version": "3.2.2",
+  "version": "3.3.0",
   "description": "Spritesheet utility for Roblox including a built-in InputImageLibrary",
   "keywords": [
     "Roblox",
