@@ -93,6 +93,10 @@ function String.endsWith(str, postfix)
 	return str:sub(-#postfix) == postfix
 end
 
+function String.startsWith(str, prefix)
+	return str:sub(1, #prefix) == prefix
+end
+
 function String.addCommas(number)
 	if type(number) == "number" then
 		number = tostring(number)
