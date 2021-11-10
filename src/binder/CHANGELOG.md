@@ -1,19 +1,18 @@
-# v4.2.1 (Wed Nov 10 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Better error messages [#223](https://github.com/Quenty/NevermoreEngine/pull/223) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.2.0...@quenty/binder@4.2.1) (2021-11-10)
+
+
+### Bug Fixes
+
+* Better error messages ([03bb58c](https://github.com/Quenty/NevermoreEngine/commit/03bb58c0b7461823dd2d61cd5281e55731e9a116))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.1.2...@quenty/binder@4.2.0) (2021-10-30)
 

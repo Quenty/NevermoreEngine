@@ -1,19 +1,18 @@
-# v3.3.1 (Wed Nov 10 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Defer signal creation [#223](https://github.com/Quenty/NevermoreEngine/pull/223) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.3.0...@quenty/attributeutils@3.3.1) (2021-11-10)
+
+
+### Bug Fixes
+
+* Defer signal creation ([8d52470](https://github.com/Quenty/NevermoreEngine/commit/8d52470cbafbd3815bd5e6fe397c7faed2d6f5bc))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.2.3...@quenty/attributeutils@3.3.0) (2021-10-30)
 

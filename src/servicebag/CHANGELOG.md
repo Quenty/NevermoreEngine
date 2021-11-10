@@ -1,19 +1,18 @@
-# v3.1.3 (Wed Nov 10 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Prevent double service initialization from occuring when retrieving service that has not yet been added to service bag [#223](https://github.com/Quenty/NevermoreEngine/pull/223) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.1.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.1.2...@quenty/servicebag@3.1.3) (2021-11-10)
+
+
+### Bug Fixes
+
+* Prevent double service initialization from occuring when retrieving service that has not yet been added to service bag ([e7d9915](https://github.com/Quenty/NevermoreEngine/commit/e7d99157a8d2de701cbe5261fd27b8eb2a30971f))
+
+
+
+
 
 ## [3.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.1.1...@quenty/servicebag@3.1.2) (2021-10-30)
 
