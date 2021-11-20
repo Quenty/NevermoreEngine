@@ -1,19 +1,18 @@
-# v3.2.0 (Sat Nov 20 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Support MacOS syncing [#225](https://github.com/Quenty/NevermoreEngine/pull/225) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@3.1.2...@quenty/streamingutils@3.2.0) (2021-11-20)
+
+
+### Bug Fixes
+
+* Support MacOS syncing ([#225](https://github.com/Quenty/NevermoreEngine/issues/225)) ([03f9183](https://github.com/Quenty/NevermoreEngine/commit/03f918392c6a5bdd33f8a17c38de371d1e06c67a))
+
+
+
+
 
 ## [3.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@3.1.1...@quenty/streamingutils@3.1.2) (2021-10-30)
 
