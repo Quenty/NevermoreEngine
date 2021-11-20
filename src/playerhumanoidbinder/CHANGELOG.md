@@ -1,3 +1,15 @@
+# v4.3.0 (Sat Nov 20 2021)
+
+#### 🐛 Bug Fix
+
+- fix: Support MacOS syncing [#225](https://github.com/Quenty/NevermoreEngine/pull/225) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

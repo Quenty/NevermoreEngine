@@ -1,3 +1,23 @@
+# (Sat Nov 20 2021)
+
+#### 🚀 Enhancement
+
+- `@quenty/string@2.3.0`
+  - feat: Add string.startsWith [#224](https://github.com/Quenty/NevermoreEngine/pull/224) ([@Quenty](https://github.com/Quenty))
+- `@quenty/resetservice@1.2.0`
+  - feat: Add ResetService package [#224](https://github.com/Quenty/NevermoreEngine/pull/224) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/actionmanager@3.3.0`, `@quenty/animationgroup@3.2.0`, `@quenty/animationprovider@3.4.0`, `@quenty/applytagtotaggedchildren@3.2.0`, `@quenty/attributeutils@3.4.0`, `@quenty/badgeutils@3.2.0`, `@quenty/baseobject@3.2.0`, `@quenty/basicpane@3.2.0`, `@quenty/binder@4.3.0`, `@quenty/boundlinkutils@4.3.0`, `@quenty/brio@3.3.0`, `@quenty/buttonhighlightmodel@3.2.0`, `@quenty/camera@4.3.0`, `@quenty/camerastoryutils@3.2.0`, `@quenty/canceltoken@3.2.0`, `@quenty/characterutils@3.2.0`, `@quenty/clienttranslator@4.2.0`, `@quenty/clipcharacters@3.2.0`, `@quenty/cmdrservice@3.2.0`, `@quenty/contentproviderutils@3.2.0`, `@quenty/cooldown@1.3.0`, `@quenty/coreguienabler@3.2.0`, `@quenty/coreguiutils@3.2.0`, `@quenty/cubicspline@3.2.0`, `@quenty/datastore@3.2.0`, `@quenty/depthoffield@1.3.0`, `@quenty/enabledmixin@3.2.0`, `@quenty/equippedtracker@3.3.0`, `@quenty/fakeskybox@3.2.0`, `@quenty/firstpersoncharactertransparency@3.2.0`, `@quenty/friendutils@3.2.0`, `@quenty/generatewithmixin@3.4.0`, `@quenty/genericscreenguiprovider@3.4.0`, `@quenty/getpercentexposedutils@3.2.0`, `@quenty/grouputils@3.2.0`, `@quenty/guivisiblemanager@3.2.0`, `@quenty/hide@1.3.0`, `@quenty/hintscoringutils@4.3.0`, `@quenty/httppromise@3.2.0`, `@quenty/humanoiddescriptionutils@3.2.0`, `@quenty/humanoidmovedirectionutils@3.2.0`, `@quenty/humanoidspeed@1.3.0`, `@quenty/humanoidteleportutils@3.2.0`, `@quenty/humanoidtracker@3.3.0`, `@quenty/idleservice@1.4.0`, `@quenty/ik@4.4.0`, `@quenty/inputkeymaputils@3.3.0`, `@quenty/inputmode@3.3.0`, `@quenty/insertserviceutils@3.2.0`, `@quenty/instanceutils@3.3.0`, `@quenty/jsonutils@3.2.0`, `@quenty/linkutils@3.3.0`, `@quenty/lipsum@3.4.0`, `@quenty/marketplaceutils@3.2.0`, `@quenty/modelappearance@3.2.0`, `@quenty/modeltransparencyeffect@3.2.0`, `@quenty/mouseovermixin@3.2.0`, `@quenty/mouseshiftlockservice@3.2.0`, `@quenty/multipleclickutils@3.2.0`, `@quenty/networkropeutils@3.2.0`, `@quenty/nocollisionconstraintutils@3.2.0`, `@quenty/octree@3.3.0`, `@quenty/optional@4.2.0`, `@quenty/overriddenproperty@3.2.0`, `@quenty/particleengine@3.2.0`, `@quenty/parttouchingcalculator@4.3.0`, `@quenty/pathfindingutils@3.3.0`, `@quenty/permissionprovider@4.2.0`, `@quenty/pillbacking@3.2.0`, `@quenty/playerbinder@4.3.0`, `@quenty/playerhumanoidbinder@4.3.0`, `@quenty/playersservicepromises@3.2.0`, `@quenty/playerthumbnailutils@3.2.0`, `@quenty/promise@3.2.0`, `@quenty/qframe@3.2.0`, `@quenty/quaternion@2.1.0`, `@quenty/r15utils@3.3.0`, `@quenty/racketingropeconstraint@3.2.0`, `@quenty/ragdoll@4.4.0`, `@quenty/region3int16utils@3.2.0`, `@quenty/region3utils@3.2.0`, `@quenty/remotefunctionutils@3.2.0`, `@quenty/remoting@3.2.0`, `@quenty/resetservice@1.2.0`, `@quenty/rigbuilderutils@3.2.0`, `@quenty/rodux-actions@1.2.0`, `@quenty/rodux-undo@1.2.0`, `@quenty/rotatinglabel@3.3.0`, `@quenty/rx@3.3.0`, `@quenty/rxbinderutils@4.4.0`, `@quenty/scoredactionservice@4.4.0`, `@quenty/scrollingframe@3.3.0`, `@quenty/servicebag@3.2.0`, `@quenty/setmechanismcframe@3.2.0`, `@quenty/snackbar@3.2.0`, `@quenty/socialserviceutils@3.2.0`, `@quenty/sounds@3.3.0`, `@quenty/sprites@3.4.0`, `@quenty/statestack@3.2.0`, `@quenty/streamingutils@3.2.0`, `@quenty/teamtracker@3.3.0`, `@quenty/templateprovider@3.4.0`, `@quenty/terrainutils@3.2.0`, `@quenty/textfilterservice@3.2.0`, `@quenty/textfilterutils@3.2.0`, `@quenty/throttle@3.2.0`, `@quenty/timesyncservice@3.2.0`, `@quenty/transparencyservice@3.2.0`, `@quenty/valuebaseutils@3.3.0`, `@quenty/valueobject@3.3.0`, `@quenty/vector3utils@3.2.0`
+  - fix: Support MacOS syncing [#225](https://github.com/Quenty/NevermoreEngine/pull/225) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Nov 10 2021)
 
 #### 🚀 Enhancement

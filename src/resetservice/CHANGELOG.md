@@ -1,3 +1,21 @@
+# v1.2.0 (Sat Nov 20 2021)
+
+#### 🚀 Enhancement
+
+- feat: Add ResetService package [#224](https://github.com/Quenty/NevermoreEngine/pull/224) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Support MacOS syncing [#225](https://github.com/Quenty/NevermoreEngine/pull/225) ([@Quenty](https://github.com/Quenty))
+- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
+- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
