@@ -17,6 +17,11 @@ function CooldownBase.new(obj, serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._timeSyncService = self._serviceBag:GetService(TimeSyncService)
 
+	self._maid:GivePromise(self._timeSyncService:PromiseSyncedClock())
+		:Then(function(syncedClock)
+			self._syncedClock = syncedClock
+		end)
+
 	return self
 end
 
@@ -26,7 +31,11 @@ function CooldownBase:GetTimePassed()
 		return nil
 	end
 
-	return self._timeSyncService:GetSyncedClock():GetTime() - startTime
+	if not self._syncedClock then
+		return nil
+	end
+
+	return self._syncedClock:GetTime() - startTime
 end
 
 function CooldownBase:GetTimeRemaining()
@@ -34,7 +43,12 @@ function CooldownBase:GetTimeRemaining()
 	if not endTime then
 		return nil
 	end
-	return endTime - self._timeSyncService:GetSyncedClock():GetTime()
+
+	if not self._syncedClock then
+		return nil
+	end
+
+	return endTime - self._syncedClock:GetTime()
 end
 
 function CooldownBase:GetEndTime()
