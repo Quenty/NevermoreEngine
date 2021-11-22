@@ -1,3 +1,19 @@
+# v3.2.1 (Mon Nov 22 2021)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@Boegie19](https://github.com/Boegie19), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: RemoteFunctionUtils.promiseInvokeServer [#228](https://github.com/Quenty/NevermoreEngine/pull/228) ([@Boegie19](https://github.com/Boegie19))
+
+#### Authors: 1
+
+- [@Boegie19](https://github.com/Boegie19)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

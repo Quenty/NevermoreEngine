@@ -1,3 +1,22 @@
+# (Mon Nov 22 2021)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@Boegie19](https://github.com/Boegie19), for all your work!
+
+#### 🐛 Bug Fix
+
+- ci: update to mesh syncing verson of rojo [#226](https://github.com/Quenty/NevermoreEngine/pull/226) ([@Quenty](https://github.com/Quenty))
+- `@quenty/remotefunctionutils@3.2.1`
+  - fix: RemoteFunctionUtils.promiseInvokeServer [#228](https://github.com/Quenty/NevermoreEngine/pull/228) ([@Boegie19](https://github.com/Boegie19))
+
+#### Authors: 2
+
+- [@Boegie19](https://github.com/Boegie19)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Nov 20 2021)
 
 #### 🚀 Enhancement
