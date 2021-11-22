@@ -115,4 +115,16 @@ function PromiseUtils.timeout(timeoutTime, fromPromise)
 
 end
 
+function PromiseUtils.retry(callback, times, ...)
+	local args, length = {...}, select("#", ...)
+
+	return callback(...):Catch(function(...)
+		if times > 0 then
+			return PromiseUtils.retry(callback, times - 1, unpack(args, 1, length)) 
+		else
+			return Promise.rejected(...)
+		end
+	end)
+end
+
 return PromiseUtils
