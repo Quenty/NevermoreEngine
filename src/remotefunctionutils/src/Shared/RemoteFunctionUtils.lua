@@ -27,7 +27,7 @@ function RemoteFunctionUtils.promiseInvokeServer(remoteFunction, ...)
 			return reject("Failed to get results somehow")
 		end
 
-		return resolve(table.pack(results, 1, results.n))
+		return resolve(table.unpack(results, 1, results.n))
 	end)
 end
 
