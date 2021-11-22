@@ -1,5 +1,18 @@
 # (Mon Nov 22 2021)
 
+#### 🚀 Enhancement
+
+- `@quenty/grouputils@3.3.0`
+  - feat: Added promiseRoleInGroup to GroupUtils [#227](https://github.com/Quenty/NevermoreEngine/pull/227) ([@Boegie19](https://github.com/Boegie19))
+
+#### Authors: 1
+
+- [@Boegie19](https://github.com/Boegie19)
+
+---
+
+# (Mon Nov 22 2021)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, null[@Boegie19](https://github.com/Boegie19), for all your work!
