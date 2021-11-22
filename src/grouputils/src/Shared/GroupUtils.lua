@@ -32,6 +32,28 @@ function GroupUtils.promiseRankInGroup(player, groupId)
 	end)
 end
 
+function GroupUtils.promiseRoleInGroup(player, groupId)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(groupId) == "number", "Bad groupId")
+
+	return Promise.spawn(function(resolve, reject)
+		local role = nil
+		local ok, err = pcall(function()
+			role = player:GetRoleInGroup(groupId)
+		end)
+
+		if not ok then
+			return reject(err)
+		end
+
+		if type(role) ~= "string" then
+			return reject("Role is not a string")
+		end
+
+		return resolve(role)
+	end)
+end
+
 function GroupUtils.promiseGroupInfo(groupId)
 	assert(groupId, "Bad groupId")
 
