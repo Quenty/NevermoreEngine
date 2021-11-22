@@ -140,7 +140,7 @@ function Binder:GetClassAddedSignal()
 	return self._classAddedSignal
 end
 
--- Returns a new signal that will fire whenever a class is removed from the binder
+-- Returns a new signal that will fire whenever a class is removing from the binder
 function Binder:GetClassRemovingSignal()
 	if self._classRemovingSignal then
 		return self._classRemovingSignal
@@ -150,6 +150,18 @@ function Binder:GetClassRemovingSignal()
 	self._maid:GiveTask(self._classRemovingSignal)
 
 	return self._classRemovingSignal
+end
+
+-- Returns a new signal that will fire whenever a class is removed from the binder
+function Binder:GetClassRemovedSignal()
+	if self._classRemovedSignal then
+		return self._classRemovedSignal
+	end
+
+	self._classRemovedSignal = Signal.new() -- :fire(class, inst)
+	self._maid:GiveTask(self._classRemovedSignal)
+
+	return self._classRemovedSignal
 end
 
 --[[
@@ -335,6 +347,11 @@ function Binder:_remove(inst)
 
 	if MaidTaskUtils.isValidTask(class) then
 		MaidTaskUtils.doTask(class)
+	end
+
+	-- Fire off events
+	if self._classRemovedSignal then
+		self._classRemovedSignal:Fire(class, inst)
 	end
 end
 
