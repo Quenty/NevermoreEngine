@@ -115,7 +115,7 @@ function PromiseUtils.timeout(timeoutTime, fromPromise)
 
 end
 
-function PromiseUtils.retry(callback, times,waitTimeBetweenRetys, ...)
+function PromiseUtils.retry(callback, times, waitTimeBetweenRetys, ...)
 	assert(type(callback) == "function", "Bad callback")
 	assert(type(times) == "number", "Bad times")
 	assert(type(waitTimeBetweenRetys) == "number", "Bad waitTime")
@@ -125,7 +125,7 @@ function PromiseUtils.retry(callback, times,waitTimeBetweenRetys, ...)
 	return callback(...):Catch(function(...)
 		if times > 0 then
 			task.wait(waitTimeBetweenRetys)
-			return PromiseUtils.retry(callback, times - 1,waitTimeBetweenRetys, unpack(args, 1, length)) 
+			return PromiseUtils.retry(callback, times - 1, waitTimeBetweenRetys, unpack(args, 1, length)) 
 		else
 			return Promise.rejected(...)
 		end
