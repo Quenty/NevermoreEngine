@@ -40,6 +40,8 @@ function ServiceBag:GetService(serviceType)
 		serviceType = require(serviceType)
 	end
 
+	assert(type(serviceType) == "table", "Bad serviceType definition")
+
 	local service = self._services[serviceType]
 	if service then
 		self:_ensureInitialization(serviceType)
