@@ -28,7 +28,11 @@ function CmdrServiceClient:Start()
 	})
 	:Then(function(cmdr, isAdmin)
 		if isAdmin then
+			cmdr:SetActivationUnlocksMouse(true)
 			cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
+
+			-- Default blink for debugging purposes
+			cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
 		else
 			cmdr:SetActivationKeys({})
 		end
