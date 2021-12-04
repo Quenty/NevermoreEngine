@@ -1,19 +1,18 @@
-# v1.3.1 (Sat Dec 04 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Cooldown can handle a synced clock not being synced [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@1.3.0...@quenty/cooldown@1.3.1) (2021-12-04)
+
+
+### Bug Fixes
+
+* Cooldown can handle a synced clock not being synced ([1fd7e41](https://github.com/Quenty/NevermoreEngine/commit/1fd7e41053816611551eb90d909eec09f39a71e9))
+
+
+
+
 
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@1.2.1...@quenty/cooldown@1.3.0) (2021-11-20)
 

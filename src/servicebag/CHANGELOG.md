@@ -1,19 +1,18 @@
-# v3.2.1 (Sat Dec 04 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Better error messages [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.2.0...@quenty/servicebag@3.2.1) (2021-12-04)
+
+
+### Bug Fixes
+
+* Better error messages ([80581dc](https://github.com/Quenty/NevermoreEngine/commit/80581dc1e7722459086e0888fc05fa596f557c11))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.1.3...@quenty/servicebag@3.2.0) (2021-11-20)
 

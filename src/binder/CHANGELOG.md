@@ -1,19 +1,18 @@
-# v4.3.1 (Sat Dec 04 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Add GetClassRemovedSignal() to Binder [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.3.0...@quenty/binder@4.3.1) (2021-12-04)
+
+
+### Bug Fixes
+
+* Add GetClassRemovedSignal() to Binder ([e6375af](https://github.com/Quenty/NevermoreEngine/commit/e6375afd1c7fba3f811625af8389a0fbc299e042))
+
+
+
+
 
 # [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.2.1...@quenty/binder@4.3.0) (2021-11-20)
 

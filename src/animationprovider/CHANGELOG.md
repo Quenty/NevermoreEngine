@@ -1,19 +1,18 @@
-# v3.4.1 (Sat Dec 04 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Do not search for the animation provider in replicated storage [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@3.4.0...@quenty/animationprovider@3.4.1) (2021-12-04)
+
+
+### Bug Fixes
+
+* Do not search for the animation provider in replicated storage ([082f72b](https://github.com/Quenty/NevermoreEngine/commit/082f72ba4d183845984e91168bc6a1ee09fe5874))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationprovider@3.3.0...@quenty/animationprovider@3.4.0) (2021-11-20)
 
