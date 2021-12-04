@@ -29,7 +29,8 @@
     "@quenty/permissionprovider": "file:../permissionprovider",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
-    "@quenty/servicebag": "file:../servicebag"
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/templateprovider": "file:../templateprovider"
   },
   "peerDependencies": {
     "@quentystudios/cmdr": "^1.8.4-quenty.1"

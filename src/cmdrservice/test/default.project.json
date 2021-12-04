@@ -1,12 +1,7 @@
 {
-  "name": "cmdrservicetest",
+  "name": "CmdrServiceTest",
   "tree": {
     "$className": "DataModel",
-    "ReplicatedStorage": {
-      "Nevermore": {
-        "$path": "../node_modules/@quenty/loader"
-      }
-    },
     "ServerScriptService": {
       "cmdrservice": {
         "$path": ".."
