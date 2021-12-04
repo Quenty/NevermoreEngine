@@ -1,3 +1,22 @@
+# (Sat Dec 04 2021)
+
+#### 🐛 Bug Fix
+
+- `@quenty/servicebag@3.2.1`
+  - fix: Better error messages [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
+- `@quenty/animationprovider@3.4.1`
+  - fix: Do not search for the animation provider in replicated storage [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
+- `@quenty/binder@4.3.1`
+  - fix: Add GetClassRemovedSignal() to Binder [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cooldown@1.3.1`
+  - fix: Cooldown can handle a synced clock not being synced [#230](https://github.com/Quenty/NevermoreEngine/pull/230) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Nov 22 2021)
 
 #### 🚀 Enhancement
