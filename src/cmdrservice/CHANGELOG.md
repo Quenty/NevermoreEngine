@@ -1,19 +1,18 @@
-# v3.4.0 (Sun Dec 05 2021)
-
-#### 🚀 Enhancement
-
-- feat: Make CmdrService allow dynamically binding commands [#231](https://github.com/Quenty/NevermoreEngine/pull/231) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.3.1...@quenty/cmdrservice@3.4.0) (2021-12-05)
+
+
+### Features
+
+* Make CmdrService allow dynamically binding commands ([d4a0de8](https://github.com/Quenty/NevermoreEngine/commit/d4a0de8ccb4b791185ab0020bb7efe23d71501de))
+
+
+
+
 
 ## [3.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.3.0...@quenty/cmdrservice@3.3.1) (2021-12-04)
 
