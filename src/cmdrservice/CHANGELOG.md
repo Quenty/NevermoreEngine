@@ -1,19 +1,18 @@
-# v3.5.0 (Thu Dec 09 2021)
-
-#### 🚀 Enhancement
-
-- feat: CmdrService allows access to cmdr via /cmdr for mobile access [#232](https://github.com/Quenty/NevermoreEngine/pull/232) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.4.0...@quenty/cmdrservice@3.5.0) (2021-12-09)
+
+
+### Features
+
+* CmdrService allows access to cmdr via /cmdr for mobile access ([ee9e233](https://github.com/Quenty/NevermoreEngine/commit/ee9e233862805bcbfc8c3c0a2698f405ba8c65cc))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.3.1...@quenty/cmdrservice@3.4.0) (2021-12-05)
 

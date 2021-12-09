@@ -1,19 +1,18 @@
-# v4.3.0 (Thu Dec 09 2021)
-
-#### 🚀 Enhancement
-
-- feat: JSONTranslator can take a table instead of a Roblox instance too [#232](https://github.com/Quenty/NevermoreEngine/pull/232) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.2.0...@quenty/clienttranslator@4.3.0) (2021-12-09)
+
+
+### Features
+
+* JSONTranslator can take a table instead of a Roblox instance too ([af92033](https://github.com/Quenty/NevermoreEngine/commit/af920336f3a66e16757659779d559b8b660c603c))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.1.2...@quenty/clienttranslator@4.2.0) (2021-11-20)
 
