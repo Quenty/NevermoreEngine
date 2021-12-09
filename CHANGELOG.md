@@ -1,3 +1,18 @@
+# (Thu Dec 09 2021)
+
+#### 🚀 Enhancement
+
+- `@quenty/cmdrservice@3.5.0`
+  - feat: CmdrService allows access to cmdr via /cmdr for mobile access [#232](https://github.com/Quenty/NevermoreEngine/pull/232) ([@Quenty](https://github.com/Quenty))
+- `@quenty/clienttranslator@4.3.0`
+  - feat: JSONTranslator can take a table instead of a Roblox instance too [#232](https://github.com/Quenty/NevermoreEngine/pull/232) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Dec 05 2021)
 
 #### 🚀 Enhancement

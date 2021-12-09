@@ -1,3 +1,15 @@
+# v4.3.0 (Thu Dec 09 2021)
+
+#### 🚀 Enhancement
+
+- feat: JSONTranslator can take a table instead of a Roblox instance too [#232](https://github.com/Quenty/NevermoreEngine/pull/232) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
