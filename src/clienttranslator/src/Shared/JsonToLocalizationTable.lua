@@ -61,6 +61,26 @@ function JsonToLocalizationTable.loadFolder(folder)
 	return localizationTable
 end
 
+function JsonToLocalizationTable.toLocalizationTable(first, second)
+	if typeof(first) == "Instance" then
+		local result = JsonToLocalizationTable.loadFolder(first)
+		result.Name = ("JSONTable_%s"):format(first.Name)
+		return result
+	elseif type(first) == "string" and type(second) == "table" then
+		local result = JsonToLocalizationTable.loadTable(first, second)
+		result.Name = "JSONTable"
+		return result
+	else
+		error("Bad args")
+	end
+end
+
+function JsonToLocalizationTable.loadTable(localeId, dataTable)
+	local localizationTable = Instance.new("LocalizationTable")
+	recurseAdd(localizationTable, localeId, "", dataTable)
+	return localizationTable
+end
+
 --- Adds json to a localization table
 -- @param localizationTable The localization table to add to
 -- @param localeId The localeId to use
