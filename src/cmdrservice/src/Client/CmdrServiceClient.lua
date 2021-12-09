@@ -1,24 +1,31 @@
----
+--- Loads cmdr on the client
 -- @module CmdrServiceClient
 -- @author Quenty
 
 local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local PermissionServiceClient = require("PermissionServiceClient")
+local Maid = require("Maid")
+local String = require("String")
 
 local CmdrServiceClient = {}
 
 function CmdrServiceClient:Init(serviceBag)
-	assert(serviceBag, "No serviceBag")
+	assert(not self._serviceBag, "Already initialized")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	self._maid = Maid.new()
 	self._permissionService = serviceBag:GetService(PermissionServiceClient)
 end
 
 function CmdrServiceClient:Start()
+	assert(self._serviceBag, "Not initialized")
+
 	PromiseUtils.all({
 		self:PromiseCmdr(),
 		self._permissionService:PromisePermissionProvider()
@@ -28,18 +35,31 @@ function CmdrServiceClient:Start()
 	})
 	:Then(function(cmdr, isAdmin)
 		if isAdmin then
-			cmdr:SetActivationUnlocksMouse(true)
-			cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
-
-			-- Default blink for debugging purposes
-			cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
+			self:_setBindings(cmdr)
 		else
 			cmdr:SetActivationKeys({})
 		end
 	end)
 end
 
+function CmdrServiceClient:_setBindings(cmdr)
+	cmdr:SetActivationUnlocksMouse(true)
+	cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
+
+	-- enable activation on mobile
+	self._maid:GiveTask(Players.LocalPlayer.Chatted:Connect(function(chat)
+		if String.startsWith(chat, "/cmdr") then
+			cmdr:Show()
+		end
+	end))
+
+	-- Default blink for debugging purposes
+	cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
+end
+
 function CmdrServiceClient:PromiseCmdr()
+	assert(self._serviceBag, "Not initialized")
+
 	if self._cmdrPromise then
 		return self._cmdrPromise
 	end
