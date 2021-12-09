@@ -17,15 +17,11 @@ local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
 JSONTranslator.__index = JSONTranslator
 
-function JSONTranslator.new(parent)
+function JSONTranslator.new(...)
 	local self = setmetatable({}, JSONTranslator)
 
-	self._parent = assert(parent, "No parent")
-
 	-- Cache localizaiton table, because it can take 10-20ms to load.
-	self._localizationTable = JsonToLocalizationTable.loadFolder(self._parent)
-	self._localizationTable.Name = ("JSONTable_%s"):format(parent.Name)
-
+	self._localizationTable = JsonToLocalizationTable.toLocalizationTable(...)
 	self._englishTranslator = self._localizationTable:GetTranslator("en")
 	self._fallbacks = {}
 
