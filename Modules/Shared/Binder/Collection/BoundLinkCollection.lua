@@ -39,10 +39,6 @@ function BoundLinkCollection.new(binder, linkName, parent)
 	return self
 end
 
-function BoundLinkCollection:HasClass(class)
-	return self._classes[class]
-end
-
 function BoundLinkCollection:GetClasses()
 	local list = {}
 	for class, _ in pairs(self._classes) do

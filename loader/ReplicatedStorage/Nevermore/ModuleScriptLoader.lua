@@ -51,14 +51,37 @@ end
 function ModuleScriptLoader:AddModulesFromParent(parent)
 	assert(typeof(parent) == "Instance", "Modules must be added from parent")
 
-	local replicationMap = ReplicationUtils.getReplicationMapForParent(parent)
+	do
+		local replicationMap = ReplicationUtils.getReplicationMapForParent(parent)
 
-	-- Merge into lookup table
-	ReplicationUtils.mergeReplicationMapIntoLookupTable(self._lookupTable, replicationMap, self._loadableScriptTypes)
+		-- Merge into lookup table
+		ReplicationUtils.mergeReplicationMapIntoLookupTable(self._lookupTable, replicationMap, self._loadableScriptTypes)
 
-	-- Do replication
-	for scriptType, replicationParent in pairs(self._scriptTypeReplicationParentMap) do
-		ReplicationUtils.reparentModulesOfScriptType(replicationMap, scriptType, replicationParent)
+		-- Do replication
+		for scriptType, replicationParent in pairs(self._scriptTypeReplicationParentMap) do
+			ReplicationUtils.reparentModulesOfScriptType(replicationMap, scriptType, replicationParent)
+		end
+	end
+
+	-- Observe lookup
+	local conn = parent.DescendantAdded:Connect(function(child)
+		if not child:IsA("ModuleScript") then
+			return
+		end
+
+		-- This is slow, unfortunately
+		local replicationMap = ReplicationUtils.getReplicationMapForScript(child, parent)
+		ReplicationUtils.mergeReplicationMapIntoLookupTable(self._lookupTable, replicationMap, self._loadableScriptTypes)
+
+		for scriptType, replicationParent in pairs(self._scriptTypeReplicationParentMap) do
+			ReplicationUtils.reparentModulesOfScriptType(replicationMap, scriptType, replicationParent)
+		end
+	end)
+
+	-- Cleanup function
+	return function()
+		conn:Disconnect()
+		-- TODO: Remove added items too
 	end
 end
 

@@ -51,6 +51,21 @@ function ReplicationUtils.reparentModulesOfScriptType(replicationMap, scriptType
 	end
 end
 
+function ReplicationUtils.getReplicationMapForScript(child, parent)
+	-- This is unfortunately slow
+
+	local replicationMap = {
+		[ReplicationUtils.ScriptType.SHARED] = {};
+		[ReplicationUtils.ScriptType.SERVER] = {};
+		[ReplicationUtils.ScriptType.CLIENT] = {};
+		[ReplicationUtils.ScriptType.SUBMODULE] = {};
+	}
+
+	local scriptType = ReplicationUtils.classifyModuleScriptType(child, parent)
+	table.insert(replicationMap[scriptType], child)
+	return replicationMap
+end
+
 function ReplicationUtils.getReplicationMapForParent(parent)
 	assert(typeof(parent) == "Instance")
 

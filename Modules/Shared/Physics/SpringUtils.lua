@@ -18,7 +18,7 @@ function SpringUtils.animating(spring, epsilon)
 			or math.abs(spring.Velocity) > epsilon
 	elseif typeof(target) == "Vector3" then
 		animating = (spring.Position - spring.Target).magnitude > epsilon
-			or spring.Velocity.magnitude  > epsilon
+			or spring.Velocity.magnitude > epsilon
 	else
 		error("Unknown type")
 	end
@@ -32,7 +32,7 @@ function SpringUtils.animating(spring, epsilon)
 end
 
 -- Add to spring position to adjust for velocity of target. May have to set clock to time().
-function SpringUtils.getVelocityAdjustment(position, velocity, dampen, speed)
+function SpringUtils.getVelocityAdjustment(velocity, dampen, speed)
 	return velocity*(2*dampen/speed)
 end
 

@@ -13,14 +13,14 @@ local RxValueBaseUtils = {}
 function RxValueBaseUtils.observe(parent, className, name, ...)
 	return RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 		:Pipe({
-			RxBrioUtils.switchMap(function(child)
-				return RxValueBaseUtils.observeValue(child)
+			RxBrioUtils.switchMap(function(valueObject)
+				return RxValueBaseUtils.observeValue(valueObject)
 			end)
 		})
 end
 
-function RxValueBaseUtils.observeValue(child)
-	return RxInstanceUtils.observeProperty(child, "Value")
+function RxValueBaseUtils.observeValue(valueObject)
+	return RxInstanceUtils.observeProperty(valueObject, "Value")
 end
 
 return RxValueBaseUtils

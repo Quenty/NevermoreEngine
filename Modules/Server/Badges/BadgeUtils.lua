@@ -14,7 +14,7 @@ function BadgeUtils.promiseAwardBadge(player, badgeId)
 	assert(typeof(player) == "Instance" and player:IsA("Player"))
 	assert(type(badgeId) == "number")
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local ok, err = pcall(function()
 			BadgeService:AwardBadge(player.UserId, badgeId)
 		end)

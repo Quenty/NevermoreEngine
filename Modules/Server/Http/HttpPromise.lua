@@ -17,7 +17,7 @@ function HttpPromise.request(request)
 		print("Sending request", HttpService:JSONEncode(request))
 	end
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local response
 		local ok, err = pcall(function()
 			response = HttpService:RequestAsync(request)

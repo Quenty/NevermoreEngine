@@ -31,7 +31,7 @@ else -- RunService:IsClient()
 			end
 		end
 
-		return Promise.spawn(function(resolve, reject)
+		return Promise.defer(function(resolve, reject)
 			resolve(GetRemoteEvent(name))
 		end)
 	end

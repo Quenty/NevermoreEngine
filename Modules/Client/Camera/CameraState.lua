@@ -3,106 +3,112 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local QuaternionObject = require("QuaternionObject")
+local QFrame = require("QFrame")
+local CameraFrame = require("CameraFrame")
 
 local CameraState = {}
 CameraState.ClassName = "CameraState"
-CameraState.FieldOfView = 0
-CameraState.Quaterion = QuaternionObject.new()
-CameraState.Position = Vector3.new()
+
+function CameraState.isCameraState(value)
+	return getmetatable(value) == CameraState
+end
+--- Builds a new camera stack
+-- @constructor
+-- @param[opt=nil] camera
+-- @treturn CameraState
+function CameraState.new(cameraFrame, cameraFrameDerivative)
+	local self = setmetatable({}, CameraState)
+
+	if typeof(cameraFrame) == "Instance" then
+		assert(cameraFrame:IsA("Camera"))
+
+		cameraFrame = CameraFrame.new(QFrame.fromCFrameClosestTo(cameraFrame.CFrame, QFrame.new()), cameraFrame.FieldOfView)
+	end
+
+	assert(CameraFrame.isCameraFrame(cameraFrame) or type(cameraFrame) == "nil")
+	assert(CameraFrame.isCameraFrame(cameraFrameDerivative) or type(cameraFrameDerivative) == "nil")
+
+	self.CameraFrame = cameraFrame or CameraFrame.new()
+	self.CameraFrameDerivative = cameraFrameDerivative or CameraFrame.new()
+
+	return self
+end
 
 function CameraState:__index(index)
 	if index == "CFrame" then
-		return QuaternionObject.toCFrame(self.Quaterion, self.Position)
+		return self.CameraFrame.CFrame
+	elseif index == "Position" then
+		return self.CameraFrame.Position
+	elseif index == "Velocity" then
+		return self.CameraFrameDerivative.Position
+	elseif index == "FieldOfView" then
+		return self.CameraFrame.FieldOfView
 	else
 		return CameraState[index]
 	end
 end
 
-function CameraState:__newindex(index, Value)
+function CameraState:__newindex(index, value)
 	if index == "CFrame" then
-		rawset(self, "Position", Value.p)
-		rawset(self, "Quaterion", QuaternionObject.fromCFrame(Value))
-	elseif index == "FieldOfView" or index == "Position" or index == "Quaterion" then
-		rawset(self, index, Value)
+		self.CameraFrame.CFrame = value
+	elseif index == "Position" then
+		self.CameraFrame.Position = value
+	elseif index == "Velocity" then
+		self.CameraFrameDerivative.Position = value
+	elseif index == "FieldOfView" then
+		self.CameraFrame.FieldOfView = value
+	elseif index == "CameraFrame" or index == "CameraFrameDerivative" then
+		rawset(self, index, value)
 	else
 		error(("'%s' is not a valid index of CameraState"):format(tostring(index)))
 	end
 end
 
---- Builds a new camera stack
--- @constructor
--- @param[opt=nil] camera
--- @treturn CameraState
-function CameraState.new(camera)
-	local self = setmetatable({}, CameraState)
+-- function CameraState.__add(a, b)
+-- 	assert(CameraState.isCameraState(a) and CameraState.isCameraState(b),
+-- 		"CameraState + non-CameraState attempted")
 
-	if camera then
-		self.FieldOfView = camera.FieldOfView
-		self.CFrame = camera.CFrame
-	end
+-- 	return CameraState.new(a.QFrame + b.QFrame, a.FieldOfView + b.FieldOfView)
+-- end
 
-	return self
-end
+-- function CameraState.__sub(a, b)
+-- 	assert(CameraState.isCameraState(a) and CameraState.isCameraState(b),
+-- 		"CameraState - non-CameraState attempted")
 
---- Current FieldOfView
--- @tfield number FieldOfView
+-- 	return CameraState.new(a.QFrame - b.QFrame, a.FieldOfView - b.FieldOfView)
+-- end
 
---- Current CFrame
--- @tfield CFrame CFrame
+-- function CameraState.__unm(a)
+-- 	return CameraState.new(-a.QFrame, -a.FieldOfView)
+-- end
 
---- Current Position
--- @tfield Vector3 Position
+-- function CameraState.__mul(a, b)
+-- 	if type(a) == "number" and CameraState.isCameraState(b) then
+-- 		return CameraState.new(a*b.QFrame, a*b.FieldOfView)
+-- 	elseif CameraState.isCameraState(b) and type(b) == "number" then
+-- 		return CameraState.new(a.QFrame*b, a.FieldOfView*b)
+-- 	elseif CameraState.isCameraState(a) and CameraState.isCameraState(b) then
+-- 		return CameraState.new(a.QFrame*b.QFrame, a.FieldOfView*b.FieldOfView)
+-- 	else
+-- 		error("CameraState * non-CameraState attempted")
+-- 	end
+-- end
 
---- Quaternion representation of the rotation of the CameraState
--- @tfield Quaterion Quaternion
+-- function CameraState.__div(a, b)
+-- 	if CameraState.isCameraState(a) and type(b) == "number" then
+-- 		return CameraState.new(a.QFrame/b, a.FieldOfView/b)
+-- 	else
+-- 		error("CameraState * non-CameraState attempted")
+-- 	end
+-- end
 
-
---- Adds two camera states together
--- @tparam CameraState other
-function CameraState:__add(other)
-	local cameraState = CameraState.new(self)
-	cameraState.FieldOfView = self.FieldOfView + other.FieldOfView
-	cameraState.Position = cameraState.Position + other.Position
-	cameraState.Quaterion = self.Quaterion*other.Quaterion
-
-	return cameraState
-end
-
---- Subtract the camera state from another
--- @tparam CameraState other
-function CameraState:__sub(other)
-	local cameraState = CameraState.new(self)
-	cameraState.FieldOfView = self.FieldOfView - other.FieldOfView
-	cameraState.Position = cameraState.Position - other.Position
-	cameraState.Quaterion = self.Quaterion/other.Quaterion
-	return cameraState
-end
-
---- Inverts camera state
-function CameraState:__unm()
-	local cameraState = CameraState.new(self)
-	cameraState.FieldOfView = -self.FieldOfView
-	cameraState.Position = -self.Position
-	cameraState.Quaterion = -self.Quaterion
-	return cameraState
-end
-
---- Multiply camera state by percent effect
--- @tparam number other
-function CameraState:__mul(other)
-	local cameraState = CameraState.new(self)
-
-	if type(other) == "number" then
-		cameraState.FieldOfView = self.FieldOfView * other
-		cameraState.Quaterion = self.Quaterion^other
-		cameraState.Position = self.Position * other
-	else
-		error("Invalid other")
-	end
-
-	return cameraState
-end
+-- function CameraState.__pow(a, b)
+-- 	if CameraState.isCameraState(a) and type(b) == "number" then
+-- 		return CameraState.new(a.QFrame^b, a.FieldOfView^b)
+-- 	else
+-- 		error("CameraState ^ non-CameraState attempted")
+-- 	end
+-- end
 
 --- Set another camera state. Typically used to set Workspace.CurrentCamera's state to match this camera's state
 -- @tparam Camera camera A CameraState to set, also accepts a Roblox Camera

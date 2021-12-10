@@ -26,7 +26,7 @@ function TextFilterUtils.promiseLegacyChatFilter(playerFrom, text)
 	assert(typeof(playerFrom) == "Instance" and playerFrom:IsA("Player"))
 	assert(type(text) == "string")
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local filteredText
 		local ok, err = pcall(function()
 			filteredText = Chat:FilterStringForBroadcast(text, playerFrom)
@@ -104,7 +104,7 @@ end
 function TextFilterUtils._promiseTextResult(getResult, ...)
 	local args = {...}
 
-	local promise = Promise.spawn(function(resolve, reject)
+	local promise = Promise.defer(function(resolve, reject)
 		local text, err = getResult(unpack(args))
 		if not text then
 			return reject(err or "Pcall failed")

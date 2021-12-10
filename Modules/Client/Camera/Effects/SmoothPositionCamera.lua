@@ -6,6 +6,8 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
 local Spring = require("Spring")
+local CameraFrame = require("CameraFrame")
+local QFrame = require("QFrame")
 
 local SmoothPositionCamera = {}
 SmoothPositionCamera.ClassName = "SmoothPositionCamera"
@@ -42,23 +44,25 @@ end
 
 function SmoothPositionCamera:__index(index)
 	if index == "CameraState" then
-		local baseCameraState = self.BaseCameraState
+		local baseCameraState = self.BaseCamera.CameraState
+		local baseCameraFrame = baseCameraState.CameraFrame
+		local baseCameraFrameDerivative = baseCameraState.CameraFrameDerivative
 
-		local state = CameraState.new()
-		state.FieldOfView = baseCameraState.FieldOfView
-		state.CFrame = baseCameraState.CFrame
-		state.Position = self.Position
+		local cameraFrame = CameraFrame.new(
+			QFrame.fromVector3(self.Position, baseCameraFrame.QFrame),
+			baseCameraFrame.FieldOfView)
+		local cameraFrameDerivative = CameraFrame.new(
+			QFrame.fromVector3(self.Velocity, baseCameraFrameDerivative.QFrame),
+			baseCameraFrameDerivative.FieldOfView)
 
-		return state
+		return CameraState.new(cameraFrame, cameraFrameDerivative)
 	elseif index == "Position" then
 		self:_internalUpdate()
 		return self.Spring.Position
 	elseif index == "Speed" or index == "Damper" or index == "Velocity" then
 		return self.Spring[index]
 	elseif index == "Target" then
-		return self.BaseCameraState.Position
-	elseif index == "BaseCameraState" then
-		return self.BaseCamera.CameraState or self.BaseCamera
+		return self.BaseCamera.CameraState.Position
 	elseif index == "BaseCamera" then
 		return rawget(self, "_" .. index) or error("Internal error: index does not exist")
 	else
@@ -73,7 +77,7 @@ function SmoothPositionCamera:_internalUpdate()
 	end
 
 	self._lastUpdateTime = tick()
-	self.Spring.Target = self.BaseCameraState.Position
+	self.Spring.Target = self.BaseCamera.CameraState.Position
 
 	if delta then
 		self.Spring:TimeSkip(delta)

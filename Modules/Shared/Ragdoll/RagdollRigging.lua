@@ -1,3 +1,6 @@
+---
+-- @module RagdollRigging
+
 local RunService = game:GetService("RunService")
 
 local RagdollRigging = {}
@@ -58,7 +61,7 @@ local SHOULDER_LIMITS = {
 	UpperAngle = 110,
 	TwistLowerAngle = -85,
 	TwistUpperAngle = 85,
-	FrictionTorque = 600,
+	FrictionTorque = 0,
 	ReferenceMass = 0.90918225049973,
 }
 
@@ -66,7 +69,7 @@ local HIP_LIMITS = {
 	UpperAngle = 40,
 	TwistLowerAngle = -5,
 	TwistUpperAngle = 80,
-	FrictionTorque = 600,
+	FrictionTorque = 0,
 	ReferenceMass = 1.9175016880035,
 }
 
@@ -372,19 +375,20 @@ local function createNoCollides(parts, noCollides)
 	end
 end
 
-local function disableMotorSet(model, motorSet)
+local function getMotorSet(model, motorSet)
 	local motors = {}
-	-- Destroy all regular joints:
-	for _, params in ipairs(motorSet) do
+
+	-- Disable all regular joints:
+	for _, params in pairs(motorSet) do
 		local part = model:FindFirstChild(params[2])
 		if part then
 			local motor = part:FindFirstChild(params[1])
 			if motor and motor:IsA("Motor6D") then
 				table.insert(motors, motor)
-				motor.Enabled = false
 			end
 		end
 	end
+
 	return motors
 end
 
@@ -414,24 +418,18 @@ function RagdollRigging.removeRagdollJoints(model)
 	end
 end
 
-function RagdollRigging.disableMotors(model, rigType)
+function RagdollRigging.getMotors(model, rigType)
 	-- Note: We intentionally do not disable the root joint so that the mechanism root of the
 	-- character stays consistent when we break joints on the client. This avoid the need for the client to wait
 	-- for re-assignment of network ownership of a new mechanism, which creates a visible hitch.
 
 	local motors
 	if rigType == Enum.HumanoidRigType.R6 then
-		motors = disableMotorSet(model, R6_MOTOR6DS)
+		motors = getMotorSet(model, R6_MOTOR6DS)
 	elseif rigType == Enum.HumanoidRigType.R15 then
-		motors = disableMotorSet(model, R15_MOTOR6DS)
+		motors = getMotorSet(model, R15_MOTOR6DS)
 	else
 		error("unknown rig type", 2)
-	end
-
-	-- Set the root part to non-collide
-	local rootPart = model.PrimaryPart or model:FindFirstChild("HumanoidRootPart")
-	if rootPart and rootPart:IsA("BasePart") then
-		rootPart.CanCollide = false
 	end
 
 	return motors

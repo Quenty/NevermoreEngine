@@ -17,7 +17,7 @@ function InsertServiceUtils.promiseAsset(assetId)
 		return Promise.rejected()
 	end
 
-	return Promise.spawn(function(resolve, reject)
+	return Promise.defer(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
 			result = InsertService:LoadAsset(assetId)

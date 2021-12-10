@@ -3,7 +3,7 @@
 
 local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
 
-local fastSpawn = require("fastSpawn")
+local deferred = require("deferred")
 local Maid = require("Maid")
 local Symbol = require("Symbol")
 
@@ -34,7 +34,7 @@ local function observeProperty(obj, propertyName, callback)
 	end))
 
 	-- Safety first!
-	fastSpawn(function()
+	deferred(function()
 		firePropertyChanged(obj[propertyName])
 	end)
 

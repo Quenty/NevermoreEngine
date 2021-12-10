@@ -47,10 +47,10 @@ local Spring = {}
 
 --- Creates a new spring
 -- @param initial A number or Vector3 (anything with * number and addition/subtraction defined)
--- @param[opt=tick] clock function to use to update spring
+-- @param[opt=os.clock] clock function to use to update spring
 function Spring.new(initial, clock)
 	local target = initial or 0
-	clock = clock or tick
+	clock = clock or os.clock
 	return setmetatable({
 		_clock = clock;
 		_time0 = clock();
@@ -123,7 +123,7 @@ function Spring:__newindex(index, value)
 		local position, velocity = self:_positionVelocity(now)
 		self._position0 = position
 		self._velocity0 = velocity
-		self._damper = math.clamp(value, 0, 1)
+		self._damper = value
 		self._time0 = now
 	elseif index == "Speed" or index == "s" then
 		local position, velocity = self:_positionVelocity(now)

@@ -6,7 +6,6 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local CharacterUtils = require("CharacterUtils")
 local IKConstants = require("IKConstants")
 local Binder = require("Binder")
 local Maid = require("Maid")
@@ -76,15 +75,6 @@ function IKService:UpdateServerRigTarget(humanoid, target)
 	end
 
 	serverRig:SetRigTarget(target)
-end
-
-function IKService:_onServerEvent(player, target)
-	assert(typeof(target) == "Vector3")
-
-	local humanoid = CharacterUtils.getAlivePlayerHumanoid(player)
-	if not humanoid then
-		return
-	end
 end
 
 function IKService:_handlePlayerRemoving(player)
