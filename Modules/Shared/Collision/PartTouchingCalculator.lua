@@ -74,7 +74,7 @@ function PartTouchingCalculator:CheckIfTouchingHumanoid(humanoid, parts)
 end
 
 function PartTouchingCalculator:GetCollidingPartFromParts(parts, relativeTo, padding)
-	relativeTo = relativeTo or CFrame.new()
+	relativeTo = relativeTo or CFrame.identity
 
 	local size, position = BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
 

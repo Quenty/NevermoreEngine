@@ -21,7 +21,7 @@ function WeldConstraintUtils.namedBetween(name, part0, part1, parent)
 	weld.Name = name
 	weld.Part0 = part0
 	weld.Part1 = part1
-	weld.C0 = CFrame.new()
+	weld.C0 = CFrame.identity
 	weld.C1 = part1.CFrame:ToObjectSpace(part0.CFrame)
 	weld.Parent = parent
 

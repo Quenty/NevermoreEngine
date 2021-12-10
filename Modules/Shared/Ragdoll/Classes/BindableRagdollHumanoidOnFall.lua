@@ -53,7 +53,7 @@ end
 function BindableRagdollHumanoidOnFall:_initLastVelocityRecords()
 	self._lastVelocityRecords = {}
 	for _ = 1, FRAMES_TO_EXAMINE + 1 do -- Add an extra frame because we remove before inserting
-		table.insert(self._lastVelocityRecords, Vector3.new())
+		table.insert(self._lastVelocityRecords, Vector3.zero)
 	end
 end
 
@@ -95,7 +95,7 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 
 	local rootPart = self._obj.RootPart
 	if not rootPart then
-		table.insert(self._lastVelocityRecords, Vector3.new())
+		table.insert(self._lastVelocityRecords, Vector3.zero)
 		return
 	end
 

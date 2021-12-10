@@ -12,7 +12,7 @@ XboxOneLight.__index = XboxOneLight
 function XboxOneLight.new()
 	local self = setmetatable(Spritesheet.new("rbxassetid://5104051626"), XboxOneLight)
 
-	self:AddSprite("DPad", Vector2.new(0, 0), Vector2.new(100, 100))
+	self:AddSprite("DPad", Vector2.zero, Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.ButtonA, Vector2.new(100, 0), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.ButtonB, Vector2.new(200, 0), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.ButtonL1, Vector2.new(300, 0), Vector2.new(100, 100))

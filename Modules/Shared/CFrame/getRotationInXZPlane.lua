@@ -15,7 +15,7 @@ return function(cframe)
 		return cframe -- we're looking straight down
 	end
 
-	local top = Vector3.new(0, 1, 0)
+	local top = Vector3.yAxis
 	local right = top:Cross(back)
 
 	return CFrame.new(

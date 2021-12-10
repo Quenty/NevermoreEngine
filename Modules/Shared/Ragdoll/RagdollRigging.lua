@@ -91,11 +91,11 @@ local R6_HIP_LIMITS = {
 	TwistUpperAngle = 80,
 }
 
-local V3_ZERO = Vector3.new()
-local V3_UP = Vector3.new(0, 1, 0)
-local V3_DOWN = Vector3.new(0, -1, 0)
-local V3_RIGHT = Vector3.new(1, 0, 0)
-local V3_LEFT = Vector3.new(-1, 0, 0)
+local V3_ZERO = Vector3.zero
+local V3_UP = Vector3.yAxis
+local V3_DOWN = -Vector3.yAxis
+local V3_RIGHT = Vector3.xAxis
+local V3_LEFT = -Vector3.xAxis
 
 -- To model shoulder cone and twist limits correctly we really need the primary axis of the UpperArm
 -- to be going down the limb. the waist and neck joints attachments actually have the same problem

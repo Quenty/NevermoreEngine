@@ -209,7 +209,7 @@ function MarkdownRender:_renderHeader(headerData)
 	underline.BackgroundTransparency = 0
 	underline.BackgroundColor3 = Color3.new(0.9, 0.9, 0.9)
 	underline.Size = UDim2.new(1, 0, 0, 1)
-	underline.AnchorPoint = Vector2.new(0, 1)
+	underline.AnchorPoint = Vector2.yAxis
 	underline.Position = UDim2.new(0, 0, 1, 0)
 	underline.Parent = label
 

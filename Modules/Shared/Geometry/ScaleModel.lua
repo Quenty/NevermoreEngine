@@ -5,7 +5,7 @@ local ScaleModel = {}
 
 local CLASS_NAME_TO_MIN_SIZE = {
 	["TrussPart"] = Vector3.new(2, 2, 2);
-	["UnionOperation"]  = Vector3.new(0, 0, 0);
+	["UnionOperation"]  = Vector3.zero;
 }
 
 local MIN_PART_SIZE = Vector3.new(0.05, 0.05, 0.05)

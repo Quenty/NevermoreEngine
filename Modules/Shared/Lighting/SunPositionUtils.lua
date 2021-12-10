@@ -4,7 +4,7 @@
 local SunPositionUtils = {}
 
 local EARTH_TILT = 23.5
-local NORTH = Vector3.new(0, 0, -1)
+local NORTH = -Vector3.zAxis
 
 function SunPositionUtils.getGeographicalLatitudeFromDirection(direction)
 	local angle = math.atan2(direction.z, math.sqrt(direction.x^2 + direction.y^2))

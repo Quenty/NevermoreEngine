@@ -137,7 +137,7 @@ function ArmIKBase:Update()
 		local shoulderXAngle = self._shoulderXAngle
 		local elbowXAngle = self._elbowXAngle
 
-		local yrot = CFrame.new(Vector3.new(), self._offset)
+		local yrot = CFrame.new(Vector3.zero, self._offset)
 
 		self._shoulderTransform = (yrot * CFA_90X * CFrame.Angles(shoulderXAngle, 0, 0)) --:inverse()
 		self._elbowTransform = CFrame.Angles(elbowXAngle, 0, 0)

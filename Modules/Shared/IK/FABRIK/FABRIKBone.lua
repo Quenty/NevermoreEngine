@@ -1,7 +1,7 @@
 ---
 -- @classmod FABRIKBone
 
-local UNIT_NZ = Vector3.new(0, 0, -1)
+local UNIT_NZ = -Vector3.zAxis
 
 local function getRotationBetween(u, v, axis)
 	local dot, uxv = u:Dot(v), u:Cross(v)

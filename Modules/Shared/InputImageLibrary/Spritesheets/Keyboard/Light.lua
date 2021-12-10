@@ -11,7 +11,7 @@ KeyboardLight.__index = KeyboardLight
 function KeyboardLight.new()
 	local self = setmetatable(Spritesheet.new("rbxassetid://1244653012"), KeyboardLight)
 
-	self:AddSprite("BackspaceAlt", Vector2.new(0, 0), Vector2.new(100, 100))
+	self:AddSprite("BackspaceAlt", Vector2.zero, Vector2.new(100, 100))
 	self:AddSprite("Command", Vector2.new(100, 0), Vector2.new(100, 100))
 	self:AddSprite("Eleven", Vector2.new(200, 0), Vector2.new(100, 100))
 	self:AddSprite(Enum.KeyCode.Return, Vector2.new(300, 0), Vector2.new(100, 100))

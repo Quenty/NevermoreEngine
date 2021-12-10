@@ -64,7 +64,7 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	rotatedPart.CastShadow = false
 	rotatedPart.CFrame = CFrame.new(ray.Origin, ray.Origin + ray.Direction)
 	rotatedPart.Transparency = 1
-	rotatedPart.Size = Vector3.new(1, 1, 1)
+	rotatedPart.Size = Vector3.one
 	rotatedPart.Parent = part
 
 	local lineHandleAdornment = Instance.new("LineHandleAdornment")
@@ -78,7 +78,7 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	lineHandleAdornment.Parent = rotatedPart
 
 	local mesh = Instance.new("SpecialMesh")
-	mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(meshDiameter, 0, meshDiameter) / diameter
+	mesh.Scale = Vector3.yAxis + Vector3.new(meshDiameter, 0, meshDiameter) / diameter
 	mesh.Parent = part
 
 	part.Parent = parent
@@ -110,7 +110,7 @@ function Draw._textOnAdornee(adornee, text, color)
 	local billboardGui = Instance.new("BillboardGui")
 	billboardGui.Name = "DebugBillboardGui"
 	billboardGui.SizeOffset =  Vector2.new(0, 0.5)
-	billboardGui.ExtentsOffset = Vector3.new(0, 1, 0)
+	billboardGui.ExtentsOffset = Vector3.yAxis
 	billboardGui.AlwaysOnTop = true
 	billboardGui.Adornee = adornee
 	billboardGui.StudsOffset = Vector3.new(0, 0, 0.01)
