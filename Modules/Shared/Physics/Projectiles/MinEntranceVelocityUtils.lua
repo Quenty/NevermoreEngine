@@ -14,7 +14,7 @@ function MinEntranceVelocityUtils.minimizeEntranceVelocity(origin, target, accel
 
 	local lowerTerm = math.sqrt(2 * accelDist * offsetDist)
 	if lowerTerm == 0 then
-		return Vector3.new(0, 0, 0)
+		return Vector3.zero
 	end
 
 	return (accelDist*offset - accel*offsetDist) / lowerTerm

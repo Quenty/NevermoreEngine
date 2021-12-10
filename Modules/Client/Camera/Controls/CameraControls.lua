@@ -157,7 +157,7 @@ function CameraControls:BeginDrag(beginInputObject)
 	end))
 
 	if self._rotatedCamera.ClassName == "SmoothRotatedCamera" then
-		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.new())
+		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.zero)
 	end
 
 	self._maid._dragMaid = maid
@@ -308,7 +308,7 @@ function CameraControls:_handleGamepadRotateStart()
 	local maid = Maid.new()
 
 	if self._rotatedCamera.ClassName == "SmoothRotatedCamera" then
-		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.new())
+		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.zero)
 	end
 
 	maid:GiveTask(RunService.Stepped:Connect(function()

@@ -6,7 +6,7 @@ local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Never
 local FABRIKVertex = require("FABRIKVertex")
 local FABRIKBone = require("FABRIKBone")
 
-local UNIT_NZ = Vector3.new(0, 0, -1)
+local UNIT_NZ = -Vector3.zAxis
 local BREAK_COUNT = 20
 local TOLERANCE = 0.02
 

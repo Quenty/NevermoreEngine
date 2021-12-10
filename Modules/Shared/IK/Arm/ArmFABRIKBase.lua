@@ -293,7 +293,7 @@ function ArmFABRIKBase:_rebuildChain()
 		};
 	})
 
-	local chain = FABRIKChain.fromPointsConstraints(CFrame.new(), points, {
+	local chain = FABRIKChain.fromPointsConstraints(CFrame.identity, points, {
 		FABRIKShoulderConstraint.new();
 		FABRIKElbowConstraint.new();
 		FABRIKHandConstraint.new();

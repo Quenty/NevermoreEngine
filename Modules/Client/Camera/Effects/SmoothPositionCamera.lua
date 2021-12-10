@@ -15,7 +15,7 @@ SmoothPositionCamera.ClassName = "SmoothPositionCamera"
 function SmoothPositionCamera.new(baseCamera)
 	local self = setmetatable({}, SmoothPositionCamera)
 
-	self.Spring = Spring.new(Vector3.new())
+	self.Spring = Spring.new(Vector3.zero)
 	self.BaseCamera = baseCamera or error("Must have BaseCamera")
 	self.Speed = 10
 
@@ -31,7 +31,7 @@ function SmoothPositionCamera:__newindex(index, value)
 		rawset(self, "_" .. index, value)
 		self.Spring.Target = self.BaseCamera.CameraState.Position
 		self.Spring.Position = self.Spring.Target
-		self.Spring.Velocity = Vector3.new(0, 0, 0)
+		self.Spring.Velocity = Vector3.zero
 	elseif index == "_lastUpdateTime" or index == "Spring" then
 		rawset(self, index, value)
 	elseif index == "Speed" or index == "Damper" or index == "Velocity" or index == "Position" then

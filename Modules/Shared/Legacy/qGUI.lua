@@ -350,7 +350,7 @@ local function AddNinePatch(Frame, Image, ImageSize, Radius, Type, Properties)
 	MiddleRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y/3)
 	BottomRight.ImageRectOffset = Vector2.new(ImageSize.X * (2/3), ImageSize.Y * (2/3))
 
-	--TopLeft.ImageRectOffset = Vector2.new(0, 0)
+	--TopLeft.ImageRectOffset = Vector2.zero
 	MiddleLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y/3)
 	BottomLeft.ImageRectOffset = Vector2.new(0, ImageSize.Y * (2/3))
 

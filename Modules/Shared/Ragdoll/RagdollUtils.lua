@@ -206,7 +206,7 @@ function RagdollUtils.setupHead(humanoid)
 		:Subscribe(function(headScale)
 			lastHeadScale = headScale
 
-			head.Size = Vector3.new(1, 1, 1)*headScale
+			head.Size = Vector3.one * headScale
 		end))
 
 	-- Cleanup and reset head scale

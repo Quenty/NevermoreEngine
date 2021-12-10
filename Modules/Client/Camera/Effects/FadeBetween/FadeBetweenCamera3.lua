@@ -108,7 +108,7 @@ function FadeBetweenCamera3:__index(index)
 		if animating then
 			return self._spring.Velocity
 		else
-			return Vector3.new(0, 0, 0)
+			return Vector3.zero
 		end
 	elseif index == "HasReachedTarget" then
 		local animating = SpringUtils.animating(self._spring)

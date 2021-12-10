@@ -13,7 +13,7 @@ function Joint.Weld(part0, part1, jointType, parent)
 	local weld = Instance.new(jointType or "Weld")
 	weld.Part0 = part0
 	weld.Part1 = part1
-	weld.C0 = CFrame.new()
+	weld.C0 = CFrame.identity
 	weld.C1 = part1.CFrame:ToObjectSpace(part0.CFrame)
 	weld.Parent = parent or part0
 

@@ -28,7 +28,7 @@ function HumanoidTeleportUtils.identifySafePosition(position, raycaster)
 		local hitData = raycaster:FindPartOnRay(Ray.new(origin, direction))
 
 		if not hitData then
-			local secondHit = raycaster:FindPartOnRay(Ray.new(origin+direction - Vector3.new(0, 1, 0), -direction))
+			local secondHit = raycaster:FindPartOnRay(Ray.new(origin+direction - Vector3.yAxis, -direction))
 
 			-- try to identify flat surface
 			if secondHit then

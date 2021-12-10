@@ -27,7 +27,7 @@ local function IsSmoothPart(part)
     return part:IsA("Part") and (part.Shape == Enum.PartType.Ball)
 end
 
-local UNIFORM_SCALE = Vector3.new(1, 1, 1)
+local UNIFORM_SCALE = Vector3.one
 local function GetShape(part)
     for _, ch in pairs(part:GetChildren()) do
         if ch:IsA("SpecialMesh") then
@@ -234,7 +234,7 @@ function PartGeometry.getGeometry(part, hit, cframeOverride)
         -- }
         --
         -- local xvec = CFrame.Angles(0, math.pi/2*(orientToNumberMap[orient]-1), 0).lookVector
-        -- local yvec = Vector3.new(0, 1, 0)
+        -- local yvec = Vector3.yAxis
         -- local zvec = xvec:Cross(yvec)
         --
         if block == Enum.CellBlock.Solid then

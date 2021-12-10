@@ -2,7 +2,7 @@
 -- @module CFrameUtils
 -- @author Quenty
 
-local UP = Vector3.new(0, 1, 0)
+local UP = Vector3.yAxis
 
 local CFrameUtils = {}
 
