@@ -1,19 +1,18 @@
-# v3.4.0 (Tue Dec 14 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add SoundUtils.playFromId(id) [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.3.0...@quenty/sounds@3.4.0) (2021-12-14)
+
+
+### Features
+
+* Add SoundUtils.playFromId(id) ([71b5c5b](https://github.com/Quenty/NevermoreEngine/commit/71b5c5b007fc4229b9c10adcbb20ad0c87227550))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.2.2...@quenty/sounds@3.3.0) (2021-11-20)
 

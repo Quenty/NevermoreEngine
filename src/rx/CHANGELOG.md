@@ -1,19 +1,15 @@
-# v3.4.0 (Tue Dec 14 2021)
-
-#### 🐛 Bug Fix
-
-- refactor: Syntax changes [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.3.0...@quenty/rx@3.4.0) (2021-12-14)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.2.0...@quenty/rx@3.3.0) (2021-11-20)
 

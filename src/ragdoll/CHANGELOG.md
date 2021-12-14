@@ -1,19 +1,18 @@
-# v4.5.0 (Tue Dec 14 2021)
-
-#### 🚀 Enhancement
-
-- feat: Ragdoll package automatically binds ragdollable and ragdoll humanoid on death [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@4.4.1...@quenty/ragdoll@4.5.0) (2021-12-14)
+
+
+### Features
+
+* Ragdoll package automatically binds ragdollable and ragdoll humanoid on death ([ff7bd05](https://github.com/Quenty/NevermoreEngine/commit/ff7bd0583afdbc03875c74b43600410607c88e70))
+
+
+
+
 
 ## [4.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@4.4.0...@quenty/ragdoll@4.4.1) (2021-12-04)
 

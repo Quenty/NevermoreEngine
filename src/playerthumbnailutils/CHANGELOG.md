@@ -1,19 +1,18 @@
-# v3.3.0 (Tue Dec 14 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add PlayerThumbnailUtils.promiseUserName(userId) [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@3.2.0...@quenty/playerthumbnailutils@3.3.0) (2021-12-14)
+
+
+### Features
+
+* Add PlayerThumbnailUtils.promiseUserName(userId) ([42a2ed7](https://github.com/Quenty/NevermoreEngine/commit/42a2ed77649d397f37e8d7eb6f20e9e3f77ec5f8))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@3.1.2...@quenty/playerthumbnailutils@3.2.0) (2021-11-20)
 

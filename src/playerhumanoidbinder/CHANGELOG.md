@@ -1,19 +1,18 @@
-# v4.4.0 (Tue Dec 14 2021)
-
-#### 🚀 Enhancement
-
-- feat: Can disabling tagging on PlayerHumanoidBinders [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@4.3.1...@quenty/playerhumanoidbinder@4.4.0) (2021-12-14)
+
+
+### Features
+
+* Can disabling tagging on PlayerHumanoidBinders ([3a27a5b](https://github.com/Quenty/NevermoreEngine/commit/3a27a5be7b0e39d26bb86c78316b7a29391c990b))
+
+
+
+
 
 ## [4.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@4.3.0...@quenty/playerhumanoidbinder@4.3.1) (2021-12-04)
 

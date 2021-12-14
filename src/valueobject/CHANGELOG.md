@@ -1,19 +1,18 @@
-# v3.4.0 (Tue Dec 14 2021)
-
-#### 🚀 Enhancement
-
-- feat: ValueObject does not fire .Changed on cleanup. [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@3.3.0...@quenty/valueobject@3.4.0) (2021-12-14)
+
+
+### Features
+
+* ValueObject does not fire .Changed on cleanup. ([ffd1a82](https://github.com/Quenty/NevermoreEngine/commit/ffd1a82e9db55891672a439285731dbf99d19ad1))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@3.2.0...@quenty/valueobject@3.3.0) (2021-11-20)
 
