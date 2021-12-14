@@ -44,4 +44,34 @@ function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbn
 	return promise
 end
 
+function PlayerThumbnailUtils.promiseUserName(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	local promise
+	promise = Promise.spawn(function(resolve, reject)
+		local tries = 0
+		repeat
+			tries = tries + 1
+			local name
+			local ok, err = pcall(function()
+				name = Players:GetNameFromUserIdAsync(userId)
+			end)
+
+			-- Don't retry if we immediately error (timeout exceptions!)
+			if not ok then
+				return reject(err)
+			end
+
+			if type(name) == "string" then
+				return resolve(name)
+			else
+				task.wait(0.05)
+			end
+		until tries >= MAX_TRIES or (not promise:IsPending())
+		reject()
+	end)
+
+	return promise
+end
+
 return PlayerThumbnailUtils
