@@ -54,8 +54,7 @@ function Subscription:Fail()
 end
 
 function Subscription:GetFireFailComplete()
-	return
-	function(...)
+	return function(...)
 		self:Fire(...)
 	end, function(...)
 		self:Fail(...)
