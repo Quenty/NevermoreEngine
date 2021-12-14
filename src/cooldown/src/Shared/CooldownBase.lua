@@ -48,7 +48,7 @@ function CooldownBase:GetTimeRemaining()
 		return nil
 	end
 
-	return endTime - self._syncedClock:GetTime()
+	return math.max(0, endTime - self._syncedClock:GetTime())
 end
 
 function CooldownBase:GetEndTime()

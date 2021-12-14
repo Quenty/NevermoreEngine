@@ -6,8 +6,8 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local CooldownBindersClient = require("CooldownBindersClient")
-local CooldownConstants = require("CooldownConstants")
 local ValueObject = require("ValueObject")
+local RxBinderUtils = require("RxBinderUtils")
 
 local CooldownTracker = setmetatable({}, BaseObject)
 CooldownTracker.ClassName = "CooldownTracker"
@@ -16,8 +16,10 @@ CooldownTracker.__index = CooldownTracker
 function CooldownTracker.new(serviceBag, parent)
 	local self = setmetatable(BaseObject.new(parent), CooldownTracker)
 
-	self._serviceBag = assert(serviceBag, "No serviceBag")
 	assert(parent, "No parent")
+
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._cooldownBinders = self._serviceBag:GetService(CooldownBindersClient)
 
 	self.CurrentCooldown = ValueObject.new()
 	self._maid:GiveTask(self.CurrentCooldown)
@@ -26,17 +28,23 @@ function CooldownTracker.new(serviceBag, parent)
 		self:_handleNewCooldown(...)
 	end))
 
-	self._maid:GiveTask(self._obj.ChildAdded:Connect(function(child)
-		self:_handleChild(child)
-	end))
+	self._maid:GiveTask(RxBinderUtils.observeBoundChildClassBrio(self._cooldownBinders.Cooldown, self._obj)
+		:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-	-- Do initial loading
-	do
-		local child = self._obj:FindFirstChild(CooldownConstants.COOLDOWN_NAME)
-		if child then
-			self:_handleChild(child)
-		end
-	end
+			-- TODO: Use stack (with multiple cooldowns)
+			local cooldown = brio:GetValue()
+			local maid = brio:ToMaid()
+			self.CurrentCooldown.Value = cooldown
+
+			maid:GiveTask(function()
+				if self.CurrentCooldown.Value == cooldown then
+					self.CurrentCooldown.Value = nil
+				end
+			end)
+		end))
 
 	return self
 end
@@ -48,12 +56,6 @@ function CooldownTracker:_handleNewCooldown(new, _old, maid)
 				self.CurrentCooldown.Value = nil
 			end
 		end))
-	end
-end
-
-function CooldownTracker:_handleChild(child)
-	if child.Name == CooldownConstants.COOLDOWN_NAME then
-		self.CurrentCooldown.Value = self._serviceBag:GetService(CooldownBindersClient).Cooldown:Get(child)
 	end
 end
 

@@ -23,7 +23,7 @@ function Cooldown.new(obj, serviceBag)
 	self._startTime.Parent = self._obj
 
 	-- Delay for cooldown time
-	delay(self._obj.Value, function()
+	task.delay(self._obj.Value, function()
 		if self.Destroy then
 			self._obj:Destroy()
 		end
