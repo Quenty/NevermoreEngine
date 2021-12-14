@@ -17,53 +17,87 @@ PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 function PlayerHumanoidBinder.new(tag, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerHumanoidBinder)
 
-	self._playerMaid = Maid.new()
-	self._maid:GiveTask(self._playerMaid)
+	self._maid = Maid.new()
+	self._maid:GiveTask(self._maid)
+
+	self._shouldTag = Instance.new("BoolValue")
+	self._shouldTag.Value = true
+	self._maid:GiveTask(self._shouldTag)
 
 	return self
+end
+
+function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag)
+	assert(type(shouldTag) == "boolean", "Bad shouldTag")
+	assert(self._shouldTag, "Missing self._shouldTag")
+
+	self._shouldTag.Value = shouldTag
 end
 
 function PlayerHumanoidBinder:Start()
 	local results = { getmetatable(PlayerHumanoidBinder).Start(self) }
 
-	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
-		self:_handlePlayerAdded(player)
+	self._maid:GiveTask(self._shouldTag.Changed:Connect(function()
+		self:_bindTagging(true)
 	end))
-	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
-		self:_handlePlayerRemoving(player)
-	end))
-
-	for _, item in pairs(Players:GetPlayers()) do
-		self:_handlePlayerAdded(item)
-	end
+	self:_bindTagging()
 
 	return unpack(results)
 end
 
-function PlayerHumanoidBinder:_handlePlayerAdded(player)
-	local maid = Maid.new()
-	self._playerMaid[player] = maid
+function PlayerHumanoidBinder:_bindTagging(doUnbinding)
+	if self._shouldTag.Value then
+		local maid = Maid.new()
 
-	local tracker = HumanoidTracker.new(player)
-	maid:GiveTask(tracker)
+		local playerMaid = Maid.new()
+		maid:GiveTask(playerMaid)
 
-	maid:GiveTask(tracker.Humanoid.Changed:Connect(function(newHumanoid)
-		if newHumanoid then
-			self:Bind(newHumanoid)
+		maid:GiveTask(Players.PlayerAdded:Connect(function(player)
+			self:_handlePlayerAdded(playerMaid, player)
+		end))
+		maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+			playerMaid[player] = nil
+		end))
+
+		for _, player in pairs(Players:GetPlayers()) do
+			self:_handlePlayerAdded(playerMaid, player)
 		end
-	end))
 
-	-- Bind humanoid
-	do
-		local currentHumanoid = tracker.Humanoid.Value
-		if currentHumanoid then
-			self:Bind(currentHumanoid)
+		self._maid._tagging = maid
+	else
+		self._maid._tagging = nil
+
+		if doUnbinding then
+			for _, player in pairs(Players:GetPlayers()) do
+				local character = player.Character
+				local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
+				if humanoid then
+					self:Unbind(humanoid)
+				end
+			end
 		end
 	end
 end
 
-function PlayerHumanoidBinder:_handlePlayerRemoving(player)
-	self._playerMaid[player] = nil
+function PlayerHumanoidBinder:_handlePlayerAdded(playerMaid, player)
+	local maid = Maid.new()
+
+	-- TODO: Use HumanoidTrackerService
+	local tracker = HumanoidTracker.new(player)
+	maid:GiveTask(tracker)
+
+	local function handleHumanoid(newHumanoid)
+		if newHumanoid then
+			self:Bind(newHumanoid)
+		end
+	end
+
+	maid:GiveTask(tracker.Humanoid.Changed:Connect(handleHumanoid))
+
+	-- Bind humanoid
+	handleHumanoid(tracker.Humanoid.Value)
+
+	playerMaid[player] = maid
 end
 
 
