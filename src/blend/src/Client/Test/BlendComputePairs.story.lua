@@ -4,8 +4,6 @@
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 
-local RunService = game:GetService("RunService")
-
 local Blend = require("Blend")
 local Maid = require("Maid")
 
