@@ -33,6 +33,7 @@
     "@quenty/humanoidanimatorutils": "file:../humanoidanimatorutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
