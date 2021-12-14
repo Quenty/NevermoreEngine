@@ -1,0 +1,21 @@
+{
+  "name": "BlendTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "vrhands": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}
