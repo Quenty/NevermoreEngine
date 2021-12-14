@@ -4,6 +4,10 @@
 
 local ValueBaseUtils = {}
 
+function ValueBaseUtils.isValueBase(instance)
+	return typeof(instance) == "Instance" and instance.ClassName:sub(-#"Value") == "Value"
+end
+
 function ValueBaseUtils.getOrCreateValue(parent, instanceType, name, defaultValue)
 	assert(typeof(parent) == "Instance", "Bad argument 'parent'")
 	assert(type(instanceType) == "string", "Bad argument 'instanceType'")

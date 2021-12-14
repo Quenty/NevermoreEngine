@@ -35,6 +35,10 @@ function ValueObject.new(baseValue)
 	return setmetatable(self, ValueObject)
 end
 
+function ValueObject.isValueObject(value)
+	return type(value) == "table" and getmetatable(value) == ValueObject
+end
+
 function ValueObject:__index(index)
 	if index == "Value" then
 		return self._value
@@ -54,8 +58,10 @@ function ValueObject:__newindex(index, value)
 			rawset(self, "_value", value)
 
 			local maid = Maid.new()
-			self._maid._valueMaid = maid
+
 			self.Changed:Fire(value, previous, maid)
+
+			self._maid._valueMaid = maid
 		end
 	else
 		error(("%q is not a member of ValueObject"):format(tostring(index)))
@@ -64,8 +70,9 @@ end
 
 --- Forces the value to be nil on cleanup, cleans up the Maid
 function ValueObject:Destroy()
-	self.Value = nil
+	rawset(self, "_value", nil)
 	self._maid:DoCleaning()
+	setmetatable(self, nil)
 end
 
 return ValueObject

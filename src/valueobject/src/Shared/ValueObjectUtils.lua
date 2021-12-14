@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 local Maid = require("Maid")
 local Brio = require("Brio")
 local Observable = require("Observable")
+local ValueObject = require("ValueObject")
 
 local ValueObjectUtils = {}
 
@@ -21,9 +22,15 @@ function ValueObjectUtils.syncValue(from, to)
 end
 
 function ValueObjectUtils.observeValue(valueObject)
-	assert(valueObject, "Bad valueObject")
+	assert(ValueObject.isValueObject(valueObject), "Bad valueObject")
 
 	return Observable.new(function(sub)
+		if not valueObject.Destroy then
+			warn("[ValueObjectUtils.observeValue] - Connecting to dead ValueObject")
+			-- No firing, we're dead
+			return
+		end
+
 		local maid = Maid.new()
 
 		maid:GiveTask(valueObject.Changed:Connect(function()
