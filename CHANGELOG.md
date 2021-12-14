@@ -1,3 +1,34 @@
+# (Tue Dec 14 2021)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@1.1.0`
+  - style: Fix linting [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+  - feat: Add initial Blend package, a declarative UI package like Fusion [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+- `@quenty/sounds@3.4.0`
+  - feat: Add SoundUtils.playFromId(id) [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+- `@quenty/valuebaseutils@3.4.0`, `@quenty/valueobject@3.4.0`
+  - feat: ValueObject does not fire .Changed on cleanup. [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+- `@quenty/ragdoll@4.5.0`
+  - feat: Ragdoll package automatically binds ragdollable and ragdoll humanoid on death [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+- `@quenty/playerhumanoidbinder@4.4.0`
+  - feat: Can disabling tagging on PlayerHumanoidBinders [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+- `@quenty/playerthumbnailutils@3.3.0`
+  - feat: Add PlayerThumbnailUtils.promiseUserName(userId) [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@3.4.0`
+  - refactor: Syntax changes [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cooldown@1.4.0`
+  - fix: Cooldown package uses RxBinderUtils to observe bound class changing properly [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Dec 09 2021)
 
 #### 🚀 Enhancement

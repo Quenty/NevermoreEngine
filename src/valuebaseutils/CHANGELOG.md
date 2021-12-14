@@ -1,3 +1,15 @@
+# v3.4.0 (Tue Dec 14 2021)
+
+#### 🚀 Enhancement
+
+- feat: ValueObject does not fire .Changed on cleanup. [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

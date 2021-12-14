@@ -1,3 +1,15 @@
+# v1.4.0 (Tue Dec 14 2021)
+
+#### 🐛 Bug Fix
+
+- fix: Cooldown package uses RxBinderUtils to observe bound class changing properly [#234](https://github.com/Quenty/NevermoreEngine/pull/234) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
