@@ -41,7 +41,7 @@ function Blend.New(className)
 				end
 			end
 
-			maid:GiveTask(Blend.applyProperties(instance, props))
+			maid:GiveTask(Blend.mount(instance, props))
 
 			sub:Fire(instance)
 
@@ -196,6 +196,7 @@ function Blend.Spring(source, speed, damper)
 		return spring
 	end
 
+	-- TODO: Centralize and cache
 	return Observable.new(function(sub)
 		local spring
 		local maid = Maid.new()
@@ -340,7 +341,7 @@ function Blend.addChildren(parent, value)
 	return nil
 end
 
-function Blend.applyProperties(instance, props)
+function Blend.mount(instance, props)
 	local maid = Maid.new()
 
 	local parent = nil
