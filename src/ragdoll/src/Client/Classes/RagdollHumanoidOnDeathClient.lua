@@ -45,7 +45,7 @@ function RagdollHumanoidOnDeathClient:_handleDeath()
 	end
 
 	local character = self._obj.Parent
-	delay(Players.RespawnTime - 0.5, function()
+	task.delay(Players.RespawnTime - 0.5, function()
 		if not character:IsDescendantOf(Workspace) then
 			return
 		end

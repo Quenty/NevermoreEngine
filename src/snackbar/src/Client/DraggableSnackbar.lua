@@ -89,7 +89,7 @@ function DraggableSnackbar:Show()
 		end))
 
 		--- Setup hide on dismissal
-		delay(self.Duration, function()
+		task.delay(self.Duration, function()
 			if self.Destroy and self._showId == LocalShowId and self._visible then
 				self:Dismiss()
 			end

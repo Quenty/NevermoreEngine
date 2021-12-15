@@ -39,7 +39,7 @@ function LocalizationServiceUtils.promiseTranslator(player)
 		timeout = 0.5
 	end
 
-	delay(timeout, function()
+	task.delay(timeout, function()
 		if not asyncTranslatorPromise:IsPending() then
 			return
 		end

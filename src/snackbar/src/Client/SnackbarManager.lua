@@ -59,7 +59,7 @@ function SnackbarManager:_showSnackbar(snackbar)
 
 		self._currentSnackbar = snackbar
 		if dismissedSnackbar then
-			delay(snackbar.FadeTime, function()
+			task.delay(snackbar.FadeTime, function()
 				if self._currentSnackbar == snackbar then
 					snackbar:Show()
 				end
