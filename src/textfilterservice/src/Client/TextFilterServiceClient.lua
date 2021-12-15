@@ -89,7 +89,7 @@ function TextFilterServiceClient:_fakeTestFilter(text)
 
 	return Promise.spawn(function(resolve, _)
 		-- Simulate testing
-		delay(0.5, function()
+		task.delay(0.5, function()
 			resolve(text)
 		end)
 	end)

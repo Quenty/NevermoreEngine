@@ -9,7 +9,7 @@ local function cancellableDelay(timeoutInSeconds, func, ...)
 	local args = {...}
 
 	local cancelled = false
-	delay(timeoutInSeconds, function()
+	task.delay(timeoutInSeconds, function()
 		if not cancelled then
 			func(unpack(args, 1, n))
 		end

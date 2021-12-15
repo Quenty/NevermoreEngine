@@ -10,7 +10,7 @@ function HapticFeedbackUtils.smallVibrate(userInputType, length, amplitude)
 	amplitude = amplitude or 1
 
 	if HapticFeedbackUtils.setSmallVibration(userInputType, amplitude) then
-		delay(length, function()
+		task.delay(length, function()
 			HapticFeedbackUtils.setSmallVibration(userInputType, 0)
 		end)
 	end
