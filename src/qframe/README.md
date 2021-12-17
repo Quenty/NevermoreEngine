@@ -17,3 +17,8 @@ CFrame representation as a quaternion
 ```
 npm install @quenty/qframe --save
 ```
+
+## Usage
+
+QFrames are CFrames but as quaternions. This lets them be put into a spring in a linear fashion. While you can't really treat a quaternion in a linear way, this is close enough.
+

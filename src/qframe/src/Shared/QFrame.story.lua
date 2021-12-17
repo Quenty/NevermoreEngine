@@ -16,16 +16,16 @@ return function(target)
 
 	local cameraCFrame = workspace.CurrentCamera.CFrame
 	local a = QFrame.fromCFrameClosestTo(
-		CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25),
+		CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 - 20*cameraCFrame.RightVector),
 		QFrame.new())
 
 
-	local setup = CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, -1, 2, 4, function(qFrame)
+	local setup = CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, -1, 2, 8, function(qFrame)
 		return QFrame.toCFrame(qFrame)
 	end)
 
 	local function getFinish(t)
-		local root = CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 + 10*cameraCFrame.RightVector)
+		local root = CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 + 20*cameraCFrame.RightVector)
 			* CFrame.Angles(math.pi/3, 2*math.pi/3, 0)
 
 		return QFrame.fromCFrameClosestTo(
@@ -47,7 +47,7 @@ return function(target)
 
 	setup(function(t)
 		return QFrame.fromCFrameClosestTo(QFrame.toCFrame(a):Lerp(QFrame.toCFrame(getFinish(t)), t), QFrame.new())
-	end, Color3.new(0.75, 0.75, 0.75))
+	end, Color3.new(0.75, 0.75, 0.75), "CFrame:Lerp()")
 
 	local function slerp(q0, q1, t)
 		local delta = q1*(q0^-1)
@@ -61,7 +61,7 @@ return function(target)
 	setup(function(t)
 		local result = slerp(a, getFinish(t), t)
 		return result
-	end, Color3.new(0.5, 0.5, 1))
+	end, Color3.new(0.5, 0.5, 1), "Quaternion Slerp")
 
 	setup(function(t)
 		local node0 = CubicSplineUtils.newSplineNode(0, a, QFrame.new())
@@ -75,7 +75,7 @@ return function(target)
 
 		local newNode = CubicSplineUtils.tweenSplineNodes(node0, node1, t)
 		return newNode.p
-	end, Color3.new(0.5, 1, 1))
+	end, Color3.new(0.5, 1, 1), "Cubic Spline")
 
 	return function()
 		maid:DoCleaning()
