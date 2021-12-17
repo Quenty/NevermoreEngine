@@ -8,6 +8,8 @@ local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
 local StepUtils = require("StepUtils")
 local Maid = require("Maid")
+local Blend = require("Blend")
+local Rx = require("Rx")
 
 local ButtonHighlightModel = setmetatable({}, BaseObject)
 ButtonHighlightModel.ClassName = "ButtonHighlightModel"
@@ -16,7 +18,7 @@ ButtonHighlightModel.__index = ButtonHighlightModel
 function ButtonHighlightModel.new(button, onUpdate)
 	local self = setmetatable(BaseObject.new(assert(button, "Bad button")), ButtonHighlightModel)
 
-	self._onUpdate = assert(onUpdate, "No onUpdate")
+	self._onUpdate = onUpdate
 
 	-- Readonly
 	self.InteractionEnabled = Instance.new("BoolValue")
@@ -33,18 +35,6 @@ function ButtonHighlightModel.new(button, onUpdate)
 	self.IsMouseOrTouchOver.Value = false
 	self._maid:GiveTask(self.IsMouseOrTouchOver)
 
-	self._percentHighlighted = AccelTween.new(200)
-	self._percentHighlighted.t = 0
-	self._percentHighlighted.p = 0
-
-	self._percentChoosen = AccelTween.new(200)
-	self._percentChoosen.t = 0
-	self._percentChoosen.p = 0
-
-	self._percentPress = AccelTween.new(200)
-	self._percentPress.t = 0
-	self._percentPress.p = 0
-
 	self._isMouseDown = Instance.new("BoolValue")
 	self._isMouseDown.Value = false
 	self._maid:GiveTask(self._isMouseDown)
@@ -53,9 +43,10 @@ function ButtonHighlightModel.new(button, onUpdate)
 	self._numFingerDown.Value = 0
 	self._maid:GiveTask(self._numFingerDown)
 
-	self._isChoosen = Instance.new("BoolValue")
-	self._isChoosen.Value = false
-	self._maid:GiveTask(self._isChoosen)
+	-- readonly
+	self.IsChoosen = Instance.new("BoolValue")
+	self.IsChoosen.Value = false
+	self._maid:GiveTask(self.IsChoosen)
 
 	self._isKeyDown = Instance.new("BoolValue")
 	self._isKeyDown.Value = false
@@ -65,7 +56,15 @@ function ButtonHighlightModel.new(button, onUpdate)
 	self._isMouseOver.Value = false
 	self._maid:GiveTask(self._isMouseOver)
 
-	self.StartAnimation, self._maid._stop = StepUtils.bindToRenderStep(self._update)
+	-- readonly
+	self.IsHighlighted = Instance.new("BoolValue")
+	self.IsHighlighted.Value = false
+	self._maid:GiveTask(self.IsHighlighted)
+
+	-- readonly
+	self.IsPressed = Instance.new("BoolValue")
+	self.IsPressed.Value = false
+	self._maid:GiveTask(self.IsPressed)
 
 	self._maid:GiveTask(self._obj.InputEnded:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
@@ -103,32 +102,91 @@ function ButtonHighlightModel.new(button, onUpdate)
 		end
 	end))
 
+	-- Legacy update stepping mode
+	if self._onUpdate then
+		self._percentHighlightedAccelTween = AccelTween.new(200)
+		self._percentHighlightedAccelTween.t = 0
+		self._percentHighlightedAccelTween.p = 0
+
+		self._maid:GiveTask(self.IsHighlighted.Changed:Connect(function()
+			self._percentHighlightedAccelTween.t = self.IsHighlighted.Value and 1 or 0
+			self:StartAnimation()
+		end))
+
+		self._percentChoosenAccelTween = AccelTween.new(200)
+		self._percentChoosenAccelTween.t = 0
+		self._percentChoosenAccelTween.p = 0
+
+		self._maid:GiveTask(self.IsChoosen.Changed:Connect(function()
+			self._percentChoosenAccelTween.t = self.IsChoosen.Value and 1 or 0
+			self:StartAnimation()
+		end))
+
+		self._percentPressAccelTween = AccelTween.new(200)
+		self._percentPressAccelTween.t = 0
+		self._percentPressAccelTween.p = 0
+
+		self._maid:GiveTask(self.IsPressed.Changed:Connect(function()
+			self._percentPressAccelTween.t = self.IsPressed.Value and 1 or 0
+			self:StartAnimation()
+		end))
+
+		self.StartAnimation, self._maid._stop = StepUtils.bindToRenderStep(self._update)
+		self:StartAnimation()
+	end
+
 	self._maid:GiveTask(self._isMouseOver.Changed:Connect(function()
-		self:_updatePercentHighlighted()
+		self:_updateTargets()
 	end))
 	self._maid:GiveTask(self._numFingerDown.Changed:Connect(function()
-		self:_updatePercentHighlighted()
+		self:_updateTargets()
 	end))
 
-	self._maid:GiveTask(self._isChoosen.Changed:Connect(function()
-		self:_updatePercentHighlighted()
+	self._maid:GiveTask(self.IsChoosen.Changed:Connect(function()
+		self:_updateTargets()
 	end))
 
 	self._maid:GiveTask(self._isKeyDown.Changed:Connect(function()
-		self:_updatePercentHighlighted()
+		self:_updateTargets()
 	end))
 
 	self._maid:GiveTask(self.IsSelected.Changed:Connect(function()
-		self:_updatePercentHighlighted()
+		self:_updateTargets()
 	end))
 
 	self._maid:GiveTask(self._isMouseDown.Changed:Connect(function()
-		self:_updatePercentHighlighted()
+		self:_updateTargets()
 	end))
-
-	self:_updatePercentHighlighted()
+	self:_updateTargets()
 
 	return self
+end
+
+function ButtonHighlightModel:ObservePercentPressed()
+	return Blend.AccelTween(Blend.toPropertyObservable(self.IsPressed)
+		:Pipe({
+			Rx.map(function(value)
+				return value and 1 or 0
+			end);
+		}), 200)
+end
+
+function ButtonHighlightModel:ObservePercentHiglighted()
+	return Blend.AccelTween(Blend.toPropertyObservable(self.IsHighlighted)
+		:Pipe({
+			Rx.map(function(value)
+				return value and 1 or 0
+			end);
+		}), 200)
+end
+
+function ButtonHighlightModel:ObservePercentChoosen()
+	return Blend.AccelTween(Blend.toPropertyObservable(self.IsChoosen)
+		:Pipe({
+			Rx.map(function(value)
+				return value and 1 or 0
+			end);
+		}), 200)
 end
 
 function ButtonHighlightModel:IsInteractionEnabled()
@@ -148,7 +206,7 @@ end
 function ButtonHighlightModel:SetIsChoosen(isChoosen)
 	assert(type(isChoosen) == "boolean", "Bad isChoosen")
 
-	self._isChoosen.Value = isChoosen
+	self.IsChoosen.Value = isChoosen
 end
 
 function ButtonHighlightModel:_trackTouch(inputObject)
@@ -177,25 +235,19 @@ function ButtonHighlightModel:_stopTouchTrack(inputObject)
 	self._maid[inputObject] = nil
 end
 
-function ButtonHighlightModel:_updatePercentHighlighted()
+function ButtonHighlightModel:_updateTargets()
 	self.IsMouseOrTouchOver.Value = self._isMouseOver.Value or self._numFingerDown.Value > 0
-
-	local shouldHighlight = self._isChoosen.Value
+	self.IsPressed.Value = (self._isMouseDown.Value or self._isKeyDown.Value or self._numFingerDown.Value > 0)
+	self.IsHighlighted.Value = self.IsChoosen.Value
 		or self.IsSelected.Value
 		or self._numFingerDown.Value > 0
 		or self._isKeyDown.Value
 		or self._isMouseOver.Value
 		or self._isMouseDown.Value
-
-	self._percentPress.t = (self._isMouseDown.Value or self._isKeyDown.Value or self._numFingerDown.Value > 0) and 1 or 0
-	self._percentChoosen.t = self._isChoosen.Value and 1 or 0
-	self._percentHighlighted.t = shouldHighlight and 1 or 0
-
-	self:StartAnimation()
 end
 
 function ButtonHighlightModel:_update()
-	return self._onUpdate(self._percentHighlighted, self._percentChoosen, self._percentPress)
+	return self._onUpdate(self._percentHighlightedAccelTween, self._percentChoosenAccelTween, self._percentPressAccelTween)
 end
 
 return ButtonHighlightModel

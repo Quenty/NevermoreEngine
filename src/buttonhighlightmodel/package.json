@@ -30,6 +30,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
     "@quenty/steputils": "file:../steputils"
   },
   "publishConfig": {
