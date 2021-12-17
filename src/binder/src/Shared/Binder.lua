@@ -357,12 +357,12 @@ end
 
 --- Cleans up all bound classes, and disconnects all events
 function Binder:Destroy()
-	local index, class = next(self._instToClass)
+	local inst, class = next(self._instToClass)
 	while class ~= nil do
-		self:_remove(class)
-		assert(self._instToClass[index] == nil, "Failed to remove")
+		self:_remove(inst)
+		assert(self._instToClass[inst] == nil, "Failed to remove")
 
-		index, class = next(self._instToClass)
+		inst, class = next(self._instToClass)
 	end
 
 	-- Disconnect events
