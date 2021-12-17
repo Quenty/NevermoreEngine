@@ -69,3 +69,46 @@ This class takes two arguments and returns the summation of the two
 This classes allows the effects of a camera to be faded / varied based upon a spring
 
 * Starts at 0 percent effect
+
+## Usage
+Here is sample usage of using just a subcomponent. Recommendation is to use full camera stack service.
+
+```lua
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local FadeBetweenCamera3 = require(modules.FadeBetweenCamera3)
+local CustomCameraEffect = require(modules.CustomCameraEffect)
+local CameraState = require(modules.CameraState)
+
+local defaultCamera = require(modules.DefaultCamera).new()
+defaultCamera:BindToRenderStep() -- capture roblox camera automatically
+
+local targetCamera = CustomCameraEffect.new(function()
+  local target = CameraState.new()
+  target.CFrame = CFrame.new(0, 100, 0)
+  target.FieldOfView = 70
+
+  return target
+end)
+
+local faded = FadeBetweenCamera3.new(defaultCamera, targetCamera)
+faded.Speed = 5
+
+RunService:BindToRenderStep("CameraStackUpdateInternal", Enum.RenderPriority.Camera.Value + 75, function()
+  faded.CameraState:Set(Workspace.CurrentCamera)
+end)
+
+-- Input
+local mouse = game.Players.LocalPlayer:GetMouse()
+local visible = false
+mouse.Button1Down:Connect(function()
+  visible = not visible
+  if visible then
+    faded.Target = 1
+  else
+    faded.Target = 0
+  end
+end)
+
+```

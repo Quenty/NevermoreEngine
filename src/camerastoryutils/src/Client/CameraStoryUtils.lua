@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
+local TextService = game:GetService("TextService")
 
 local InsertServiceUtils = require("InsertServiceUtils")
 local Promise = require("Promise")
@@ -33,7 +34,7 @@ function CameraStoryUtils.setupViewportFrame(maid, target)
 	local viewportFrame = Instance.new("ViewportFrame")
 	viewportFrame.ZIndex = 0
 	viewportFrame.BorderSizePixel = 0
-	viewportFrame.BackgroundColor3 = Color3.new(0.7, 0.7, 0.7)
+	viewportFrame.BackgroundColor3 = Color3.new(0.9, 0.9, 0.85)
 	viewportFrame.Size = UDim2.new(1, 0, 1, 0)
 	maid:GiveTask(viewportFrame)
 
@@ -86,15 +87,57 @@ function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high
 	assert(type(period) == "number", "Bad period")
 	assert(type(toCFrame) == "function", "Bad toCFrame")
 
-	return function(interpolate, color)
+	return function(interpolate, color, labelText, labelOffset)
 		assert(type(interpolate) == "function", "Bad interpolate")
 		assert(typeof(color) == "Color3", "Bad color")
+
+		labelOffset = labelOffset or Vector2.new(0, 0)
 
 		maid:GivePromise(CameraStoryUtils.promiseCrate(maid, viewportFrame, {
 			Color = color;
 			Transparency = 0.5
 		}))
 			:Then(function(crate)
+				local label
+				if labelText then
+					local h, s, _ = Color3.toHSV(color)
+					label = Instance.new("TextLabel")
+					label.AnchorPoint = Vector2.new(0.5, 0.5)
+					label.Text = labelText
+					label.BorderSizePixel = 0
+					label.BackgroundTransparency = 0.5
+					label.BackgroundColor3 = Color3.fromHSV(h, math.clamp(s/(s+0.1), 0, 1), 0.25)
+					label.TextColor3 = Color3.new(1, 1, 1)
+					label.Font = Enum.Font.FredokaOne
+					label.TextSize = 15
+					label.Parent = viewportFrame
+					label.Visible = false
+					maid:GiveTask(label)
+
+					local size = TextService:GetTextSize(labelText, label.TextSize, label.Font, Vector2.new(1e6, 1e6))
+						label.Size = UDim2.new(0, size.x + 20, 0, 20)
+
+					local uiCorner = Instance.new("UICorner")
+					uiCorner.CornerRadius = UDim.new(0.5, 0)
+					uiCorner.Parent = label
+					maid:GiveTask(label)
+				end
+
+				-- avoid floating point numbers from :SetPrimaryPartCFrame
+				local primaryPart, primaryCFrame
+				local relCFrame = {}
+				for _, part in pairs(crate:GetDescendants()) do
+					if part:IsA("BasePart") then
+						if primaryPart then
+							relCFrame[part] = primaryCFrame:toObjectSpace(part.CFrame)
+						else
+							primaryPart = part
+							primaryCFrame = part.CFrame
+							relCFrame[part] = CFrame.new()
+						end
+					end
+				end
+
 				maid:GiveTask(RunService.RenderStepped:Connect(function()
 					local t = (os.clock()/period % 2/period)*period
 					if t >= 1 then
@@ -105,7 +148,23 @@ function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high
 					t = math.clamp(t, low, high)
 
 					local cframe = toCFrame(interpolate(t))
-					crate:SetPrimaryPartCFrame(cframe)
+
+					if label then
+						local camera = viewportFrame.CurrentCamera
+						local pos = camera:WorldToViewportPoint(cframe.p)
+						local viewportSize = viewportFrame.AbsoluteSize
+						local aspectRatio = viewportSize.x/viewportSize.y
+						if pos.z > 0 then
+							label.Position = UDim2.new((pos.x - 0.5)/aspectRatio + 0.5, labelOffset.x, pos.y, 0 + labelOffset.y)
+							label.Visible = true
+						else
+							label.Visible = false
+						end
+					end
+
+					for part, rel in pairs(relCFrame) do
+						part.CFrame = cframe:toWorldSpace(rel)
+					end
 				end))
 			end)
 	end
