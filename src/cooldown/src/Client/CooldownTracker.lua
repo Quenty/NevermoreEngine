@@ -28,23 +28,27 @@ function CooldownTracker.new(serviceBag, parent)
 		self:_handleNewCooldown(...)
 	end))
 
-	self._maid:GiveTask(RxBinderUtils.observeBoundChildClassBrio(self._cooldownBinders.Cooldown, self._obj)
-		:Subscribe(function(brio)
-			if brio:IsDead() then
-				return
-			end
+	-- Handle not running
+	self._maid:GivePromise(self._cooldownBinders:PromiseBinder("Cooldown"))
+		:Then(function(cooldownBinder)
+			self._maid:GiveTask(RxBinderUtils.observeBoundChildClassBrio(cooldownBinder, self._obj)
+				:Subscribe(function(brio)
+					if brio:IsDead() then
+						return
+					end
 
-			-- TODO: Use stack (with multiple cooldowns)
-			local cooldown = brio:GetValue()
-			local maid = brio:ToMaid()
-			self.CurrentCooldown.Value = cooldown
+					-- TODO: Use stack (with multiple cooldowns)
+					local cooldown = brio:GetValue()
+					local maid = brio:ToMaid()
+					self.CurrentCooldown.Value = cooldown
 
-			maid:GiveTask(function()
-				if self.CurrentCooldown.Value == cooldown then
-					self.CurrentCooldown.Value = nil
-				end
-			end)
-		end))
+					maid:GiveTask(function()
+						if self.CurrentCooldown.Value == cooldown then
+							self.CurrentCooldown.Value = nil
+						end
+					end)
+				end))
+		end)
 
 	return self
 end
