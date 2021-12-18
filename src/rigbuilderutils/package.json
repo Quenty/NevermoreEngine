@@ -26,6 +26,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/humanoiddescriptionutils": "file:../humanoiddescriptionutils",
     "@quenty/insertserviceutils": "file:../insertserviceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise"

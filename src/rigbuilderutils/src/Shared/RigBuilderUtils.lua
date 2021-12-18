@@ -1,11 +1,16 @@
----
+--- Helps build player characters
 -- @module RigBuilderUtils
 
 local require = require(script.Parent.loader).load(script)
 
+local ServerScriptService = game:GetService("ServerScriptService")
+local HttpService = game:GetService("HttpService")
+
 local InsertServiceUtils = require("InsertServiceUtils")
 local PromiseUtils = require("PromiseUtils")
 local AssetServiceUtils = require("AssetServiceUtils")
+local Promise = require("Promise")
+local HumanoidDescriptionUtils = require("HumanoidDescriptionUtils")
 
 local RigBuilderUtils = {}
 
@@ -367,6 +372,33 @@ function RigBuilderUtils.promiseR15PackageRig(packageAssetId)
 		end)
 end
 
+function RigBuilderUtils.promiseR15Rig()
+	return InsertServiceUtils.promiseAsset(1664543044)
+		:Then(function(inserted)
+			local character = inserted:GetChildren()[1]
+			if not character then
+				return Promise.rejected("No character from model")
+			end
+
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
+			if humanoid then
+				humanoid:BuildRigFromAttachments()
+			end
+
+			local r15Head = character:FindFirstChild("Head")
+
+			local existingFace = r15Head:FindFirstChild("face") or r15Head:FindFirstChild("Face")
+			if existingFace == nil then
+				local face = Instance.new("Decal")
+				face.Name = "face"
+				face.Texture = "rbxasset://textures/face.png"
+				face.Parent = r15Head
+			end
+
+			return character
+		end)
+end
+
 function RigBuilderUtils.promiseR15ManRig()
 	return RigBuilderUtils.promiseR15PackageRig(86500185)
 end
@@ -377,6 +409,40 @@ end
 
 function RigBuilderUtils.promiseR15MeshRig()
 	return RigBuilderUtils.promiseR15PackageRig(27112438)
+end
+
+function RigBuilderUtils.promisePlayerRig(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return PromiseUtils.all({
+		RigBuilderUtils.promiseR15Rig(),
+		HumanoidDescriptionUtils.promiseFromUserId(userId)
+	}):Then(function(meshRig, humanoidDescription)
+		local humanoid = meshRig:FindFirstChildWhichIsA("Humanoid")
+		if not humanoid then
+			return Promise.rejected("No humanoid from rig builder")
+		end
+
+		meshRig.Archivable = false
+		local originalName = meshRig.Name
+
+		-- Hack! Apparently we need to parent this to the datamodel to apply the description
+		meshRig.Name = "RigBuilderUtils_LoadingHumanoid_" .. HttpService:GenerateGUID(false)
+		meshRig.Parent = ServerScriptService -- somewhere that does not replicate
+
+		return HumanoidDescriptionUtils.promiseApplyDescription(humanoid, humanoidDescription)
+			:Then(function()
+				meshRig.Parent = nil
+				meshRig.Archivable = true
+				meshRig.Name = originalName
+
+				return meshRig
+			end, function(...)
+				-- cleanup
+				meshRig:Destroy()
+				return Promise.rejected(...)
+			end)
+	end)
 end
 
 return RigBuilderUtils
