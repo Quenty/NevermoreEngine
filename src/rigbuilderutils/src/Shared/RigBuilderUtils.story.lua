@@ -4,6 +4,8 @@
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 
+local Workspace = game:GetService("Workspace")
+
 local Maid = require("Maid")
 local RigBuilderUtils = require("RigBuilderUtils")
 local CameraStoryUtils = require("CameraStoryUtils")
@@ -13,12 +15,12 @@ local function spawnRig(offset, maid, viewportFrame, rig)
 	maid:GiveTask(rig)
 
 	-- Is Roblox being weird about this? Yes.
-	rig.Parent = workspace
+	rig.Parent = Workspace
 	spawn(function()
 		rig.Parent = viewportFrame
 	end)
 
-	rig:SetPrimaryPartCFrame(workspace.CurrentCamera.CFrame
+	rig:SetPrimaryPartCFrame(Workspace.CurrentCamera.CFrame
 		* CFrame.new(0, 0, -15)
 		* CFrame.new(offset, 0, 0)
 		* CFrame.Angles(0, math.pi, 0))
@@ -37,6 +39,10 @@ return function(target)
 		RigBuilderUtils.promiseR15ManRig(),
 		RigBuilderUtils.promiseR15WomanRig(),
 		RigBuilderUtils.promiseR15MeshRig(),
+		RigBuilderUtils.promiseR15Rig(),
+		RigBuilderUtils.promisePlayerRig(4397833),
+		RigBuilderUtils.promisePlayerRig(9360463),
+		RigBuilderUtils.promisePlayerRig(676056)
 	}
 
 	for index, rig in pairs(rigs) do
