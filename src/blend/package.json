@@ -27,6 +27,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@quenty/acceltween": "file:../acceltween",
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
