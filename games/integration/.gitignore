@@ -1,0 +1,6 @@
+*.sublime-workspace
+*.rbxl.lock
+node_modules
+out
+roblox.toml
+.env

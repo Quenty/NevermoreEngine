@@ -1,0 +1,28 @@
+{
+  "name": "NevermoreIntegrationTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "integration": {
+        "$className": "Folder",
+        "game": {
+          "$path": "modules"
+        },
+        "packages": {
+          "$path": "node_modules"
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}
