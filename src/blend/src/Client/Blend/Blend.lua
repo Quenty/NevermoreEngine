@@ -19,6 +19,7 @@ local Symbol = require("Symbol")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 local ValueObjectUtils = require("ValueObjectUtils")
+local AccelTween = require("AccelTween")
 
 local Blend = {}
 
@@ -62,6 +63,8 @@ function Blend.Dynamic(...)
 			Rx.switchMap(function(promise, ...)
 				if Promise.isPromise(promise) then
 					return Rx.fromPromise(promise)
+				elseif Observable.isObservable(promise) then
+					return promise
 				else
 					return Rx.of(promise, ...)
 				end
@@ -170,6 +173,45 @@ function Blend.ComputedPairs(source, compute)
 	end
 end
 
+function Blend.AccelTween(source, acceleration)
+	local sourceObservable = Blend.toPropertyObservable(source) or Rx.of(source)
+	local accelerationObservable = Blend.toNumberObservable(acceleration)
+
+	local function createAccelTween(maid, initialValue)
+		local accelTween = AccelTween.new(initialValue)
+
+		if accelerationObservable then
+			maid:GiveTask(accelerationObservable:Subscribe(function(value)
+				assert(type(value) == "number", "Bad value")
+				accelTween.a = value
+			end))
+		end
+
+		return accelTween
+	end
+
+	-- TODO: Centralize and cache
+	return Observable.new(function(sub)
+		local accelTween
+		local maid = Maid.new()
+
+		local startAnimate, stopAnimate = StepUtils.bindToRenderStep(function()
+			sub:Fire(accelTween.p)
+			return accelTween.rtime > 0
+		end)
+
+		maid:GiveTask(stopAnimate)
+		maid:GiveTask(sourceObservable:Subscribe(function(value)
+			accelTween = accelTween or createAccelTween(maid, value)
+			accelTween.t = value
+			startAnimate()
+		end))
+
+		return maid
+	end)
+end
+
+
 function Blend.Spring(source, speed, damper)
 	local sourceObservable = Blend.toPropertyObservable(source) or Rx.of(source)
 	local speedObservable = Blend.toNumberObservable(speed)
@@ -203,14 +245,15 @@ function Blend.Spring(source, speed, damper)
 
 		local startAnimate, stopAnimate = StepUtils.bindToRenderStep(function()
 			local animating, position = SpringUtils.animating(spring)
-			sub:Fire(position)
+			sub:Fire(SpringUtils.fromLinearIfNeeded(position))
 			return animating
 		end)
 
 		maid:GiveTask(stopAnimate)
 		maid:GiveTask(sourceObservable:Subscribe(function(value)
-			spring = spring or createSpring(maid, value)
-			spring.t = value
+			local linearValue = SpringUtils.toLinearIfNeeded(value)
+			spring = spring or createSpring(maid, linearValue)
+			spring.t = SpringUtils.toLinearIfNeeded(value)
 			startAnimate()
 		end))
 
