@@ -2,7 +2,13 @@
 -- @module GameScalingUtils
 -- @author Quenty
 
+local require = require(script.Parent.loader).load(script)
+
 local GuiService = game:GetService("GuiService")
+
+local RxInstanceUtils = require("RxInstanceUtils")
+local Rx = require("Rx")
+local Blend = require("Blend")
 
 local GameScalingUtils = {}
 
@@ -24,6 +30,13 @@ function GameScalingUtils.getUIScale(screenAbsoluteSize)
 	else
 		return 0.6
 	end
+end
+
+function GameScalingUtils.observeUIScale(screenGui)
+	return Blend.Spring(RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize")
+		:Pipe({
+			Rx.map(GameScalingUtils.getUIScale)
+		}), 30)
 end
 
 function GameScalingUtils.getDialogPadding(screenAbsoluteSize)
