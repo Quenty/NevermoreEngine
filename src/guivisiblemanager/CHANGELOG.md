@@ -1,19 +1,21 @@
-# v4.0.0 (Sat Dec 18 2021)
-
-#### 💥 Breaking Change
-
-- feat!: Remove GuiVisibleManager:SetPreferredTheme() support [#236](https://github.com/Quenty/NevermoreEngine/pull/236) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@3.3.0...@quenty/guivisiblemanager@4.0.0) (2021-12-18)
+
+
+* feat!: Remove GuiVisibleManager:SetPreferredTheme() support ([4f8bcda](https://github.com/Quenty/NevermoreEngine/commit/4f8bcda59cac6d13d62123ceda15678076cb07f0))
+
+
+### BREAKING CHANGES
+
+* GuiVisibleManager:SetPreferredTheme() will no longer exist, and :SetPreferredTheme() will not be automatically called on new instances.
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@3.2.0...@quenty/guivisiblemanager@3.3.0) (2021-12-18)
 
