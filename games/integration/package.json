@@ -1,0 +1,48 @@
+{
+  "name": "@quenty/integration",
+  "version": "1.0.0",
+  "description": "Integration package Nevermore for testing",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "games/integration/"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/adorneeutils": "^2.1.0",
+    "@quenty/baseobject": "^3.2.0",
+    "@quenty/brio": "^3.4.0",
+    "@quenty/camera": "^4.3.1",
+    "@quenty/characterutils": "^3.2.0",
+    "@quenty/clienttranslator": "^4.3.0",
+    "@quenty/ik": "^4.5.0",
+    "@quenty/instanceutils": "^3.4.0",
+    "@quenty/loader": "^3.1.1",
+    "@quenty/maid": "^2.0.1",
+    "@quenty/octree": "^3.3.0",
+    "@quenty/playerhumanoidbinder": "^4.4.0",
+    "@quenty/promise": "^3.2.0",
+    "@quenty/ragdoll": "^4.5.0",
+    "@quenty/remoting": "^3.2.0",
+    "@quenty/rx": "^3.4.0",
+    "@quenty/rxbinderutils": "^4.5.0",
+    "@quenty/statestack": "^3.2.0",
+    "@quenty/table": "^2.1.0",
+    "@quenty/timesyncservice": "^3.2.0"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com/"
+  }
+}

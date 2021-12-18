@@ -1,0 +1,4 @@
+[tools]
+rojo = { source = "quenty/rojo", version = "=7.0.0-quenty-npm-canary.3" }
+run-in-roblox = { source = "rojo-rbx/run-in-roblox", version = "0.3.0" }
+selene = { source = "Kampfkarren/selene", version = "0.14.0" }
