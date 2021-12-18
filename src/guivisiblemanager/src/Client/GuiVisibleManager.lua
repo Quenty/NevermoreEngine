@@ -25,10 +25,6 @@ function GuiVisibleManager.new(promiseNewPane, maxHideTime)
 	self._paneVisible.Value = false
 	self._maid:GiveTask(self._paneVisible)
 
-	self._theme = Instance.new("StringValue")
-	self._theme.Value = "Light"
-	self._maid:GiveTask(self._theme)
-
 	self._showHandles = {}
 
 	self._maid:GiveTask(self._paneVisible.Changed:Connect(function()
@@ -62,12 +58,6 @@ function GuiVisibleManager:BindToBoolValue(boolValue)
 	if self._boundBoolValue.Value then
 		self._maid._boundShowHandle = self:CreateShowHandle()
 	end
-end
-
-function GuiVisibleManager:SetPreferredTheme(theme)
-	assert(theme == "Light" or theme == "Dark", "Bad theme")
-
-	self._theme.Value = theme
 end
 
 function GuiVisibleManager:CreateShowHandle()
@@ -125,14 +115,6 @@ function GuiVisibleManager:_handleNewPane(maid, pane)
 	assert(self._maid._paneMaid == maid, "Bad maid")
 
 	maid:GiveTask(pane)
-
-	if pane.SetPreferredTheme then
-		-- Theming
-		pane:SetPreferredTheme(self._theme.Value)
-		maid:GiveTask(self._theme.Changed:Connect(function()
-			pane:SetPreferredTheme(self._theme.Value)
-		end))
-	end
 
 	local function updateVisible()
 		if self._paneVisible.Value then
