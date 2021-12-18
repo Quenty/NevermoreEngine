@@ -5,6 +5,7 @@ local SunPositionUtils = {}
 
 local EARTH_TILT = 23.5
 local NORTH = Vector3.new(0, 0, -1)
+local ZAXIS = Vector3.new(0, 0, 1)
 
 function SunPositionUtils.getGeographicalLatitudeFromDirection(direction)
 	local angle = math.atan2(direction.z, math.sqrt(direction.x^2 + direction.y^2))
@@ -46,8 +47,8 @@ function SunPositionUtils.getSunPosition(clockTime, geoLatitude)
 	local latRad = math.rad(geoLatitude)
 	local sunOffset = -EARTHTILT * math.cos(math.pi * (dayOfYearOffset - HALFYEAR) / HALFYEAR) - latRad
 
-	local trueSunPosition = CFrame.fromAxisAngle(Vector3.zAxis:Cross(sunPosition), sunOffset) * sunPosition
-	local trueMoonPosition = CFrame.fromAxisAngle(Vector3.zAxis:Cross(moonPosition), sunOffset) * moonPosition
+	local trueSunPosition = CFrame.fromAxisAngle(ZAXIS:Cross(sunPosition), sunOffset) * sunPosition
+	local trueMoonPosition = CFrame.fromAxisAngle(ZAXIS:Cross(moonPosition), sunOffset) * moonPosition
 
 	return trueSunPosition, trueMoonPosition*Vector3.new(1, -1, 1)
 end
