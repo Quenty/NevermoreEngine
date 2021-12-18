@@ -1,5 +1,18 @@
 # (Sat Dec 18 2021)
 
+#### 💥 Breaking Change
+
+- `@quenty/guivisiblemanager@4.0.0`
+  - feat!: Remove GuiVisibleManager:SetPreferredTheme() support [#236](https://github.com/Quenty/NevermoreEngine/pull/236) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Dec 18 2021)
+
 #### 🚀 Enhancement
 
 - `@quenty/sunpositionutils@2.1.0`

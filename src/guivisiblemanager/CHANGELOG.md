@@ -1,3 +1,15 @@
+# v4.0.0 (Sat Dec 18 2021)
+
+#### 💥 Breaking Change
+
+- feat!: Remove GuiVisibleManager:SetPreferredTheme() support [#236](https://github.com/Quenty/NevermoreEngine/pull/236) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
