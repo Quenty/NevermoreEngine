@@ -1,3 +1,15 @@
+# v1.5.0 (Sat Dec 18 2021)
+
+#### 🚀 Enhancement
+
+- feat: Allow CooldownTracker to be initialized without the cooldown binders being initialized. [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

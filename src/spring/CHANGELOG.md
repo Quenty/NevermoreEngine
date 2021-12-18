@@ -1,3 +1,15 @@
+# v2.2.0 (Sat Dec 18 2021)
+
+#### 🚀 Enhancement
+
+- feat: Allow transformation of Color3 into a linear value for interpolation [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

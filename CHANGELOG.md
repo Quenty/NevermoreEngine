@@ -1,3 +1,44 @@
+# (Sat Dec 18 2021)
+
+#### 🚀 Enhancement
+
+- `@quenty/sunpositionutils@2.1.0`
+  - fix: Selene linting Vector3.zAxis [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+  - feat: Add SunPositionUtils.getSunPosition(clockTime, geoLatitude), SunPositionUtils.getClockTimeFromMoonDirection(direction), and SunPositionUtils.getGeographicalLatitudeFromMoonDirection [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cooldown@1.5.0`
+  - feat: Allow CooldownTracker to be initialized without the cooldown binders being initialized. [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rigbuilderutils@3.3.0`
+  - feat: Add RigBuilderUtils.promiseR15Rig() and RigBuilderUtils.promisePlayerRig(userId) [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/blend@1.2.0`
+  - feat: Allow Color3 spring manipulation, and AccelTween usage [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/gamescalingutils@2.1.0`
+  - feat: Add GameScalingUtils.observeUIScale() which lets the UI Scale be observed [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/buttonhighlightmodel@3.3.0`
+  - feat: ButtonHighlightModel can act as a model for Blend [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/camera@4.4.0`, `@quenty/camerastoryutils@3.3.0`, `@quenty/qframe@3.3.0`
+  - feat: Better camera explainability [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/spring@2.2.0`
+  - feat: Allow transformation of Color3 into a linear value for interpolation [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- chore: Add sample integration game [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- chore: Update copyright date [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/promise@3.3.0`
+  - fix: Use Promies.spawn() since task.spawn() is probably cheaper now [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/binder@4.5.0`
+  - fix: Binder was not deconstructing correctly on cleanup [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/blend@1.2.0`
+  - refactor: Rename Blend.applyProperties to Blend.mount [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cancellabledelay@2.1.0`, `@quenty/clienttranslator@4.4.0`, `@quenty/hapticfeedbackutils@2.1.0`, `@quenty/ragdoll@4.6.0`, `@quenty/snackbar@3.3.0`, `@quenty/textfilterservice@3.3.0`
+  - fix: use task.delay() instead of delay() [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Dec 14 2021)
 
 #### 🚀 Enhancement
