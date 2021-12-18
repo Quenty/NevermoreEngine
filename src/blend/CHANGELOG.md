@@ -1,23 +1,18 @@
-# v1.2.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- feat: Allow Color3 spring manipulation, and AccelTween usage [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Rename Blend.applyProperties to Blend.mount [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@1.1.0...@quenty/blend@1.2.0) (2021-12-18)
+
+
+### Features
+
+* Allow Color3 spring manipulation, and AccelTween usage ([3417923](https://github.com/Quenty/NevermoreEngine/commit/34179230b3b6bf957e1a363588370990735f8513))
+
+
+
+
 
 # 1.1.0 (2021-12-14)
 

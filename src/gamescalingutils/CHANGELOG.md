@@ -1,19 +1,18 @@
-# v2.1.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add GameScalingUtils.observeUIScale() which lets the UI Scale be observed [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@2.0.0...@quenty/gamescalingutils@2.1.0) (2021-12-18)
+
+
+### Features
+
+* Add GameScalingUtils.observeUIScale() which lets the UI Scale be observed ([1e2736f](https://github.com/Quenty/NevermoreEngine/commit/1e2736fca24ff7b6c68d3f3ed32a4f546c9a0189))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@1.2.0...@quenty/gamescalingutils@2.0.0) (2021-09-05)
 

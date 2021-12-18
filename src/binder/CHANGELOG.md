@@ -1,19 +1,18 @@
-# v4.5.0 (Sat Dec 18 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Binder was not deconstructing correctly on cleanup [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.4.0...@quenty/binder@4.5.0) (2021-12-18)
+
+
+### Bug Fixes
+
+* Binder was not deconstructing correctly on cleanup ([b6cd547](https://github.com/Quenty/NevermoreEngine/commit/b6cd54746457afe180ddda2f4d41731b29c144a5))
+
+
+
+
 
 # [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.3.1...@quenty/binder@4.4.0) (2021-12-14)
 

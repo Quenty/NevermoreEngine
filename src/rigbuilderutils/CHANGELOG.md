@@ -1,19 +1,18 @@
-# v3.3.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add RigBuilderUtils.promiseR15Rig() and RigBuilderUtils.promisePlayerRig(userId) [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@3.2.0...@quenty/rigbuilderutils@3.3.0) (2021-12-18)
+
+
+### Features
+
+* Add RigBuilderUtils.promiseR15Rig() and  RigBuilderUtils.promisePlayerRig(userId) ([93f8c5a](https://github.com/Quenty/NevermoreEngine/commit/93f8c5ab926c6a6effda7f1c66960f3f3c3ec88c))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@3.1.2...@quenty/rigbuilderutils@3.2.0) (2021-11-20)
 

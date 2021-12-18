@@ -1,20 +1,23 @@
-# v2.1.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- fix: Selene linting Vector3.zAxis [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-- feat: Add SunPositionUtils.getSunPosition(clockTime, geoLatitude), SunPositionUtils.getClockTimeFromMoonDirection(direction), and SunPositionUtils.getGeographicalLatitudeFromMoonDirection [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.0.0...@quenty/sunpositionutils@2.1.0) (2021-12-18)
+
+
+### Bug Fixes
+
+* Selene linting Vector3.zAxis ([6a24a62](https://github.com/Quenty/NevermoreEngine/commit/6a24a62975d92665b1291e3fbb8a1ea49ee4f69d))
+
+
+### Features
+
+* Add SunPositionUtils.getSunPosition(clockTime, geoLatitude), SunPositionUtils.getClockTimeFromMoonDirection(direction), and SunPositionUtils.getGeographicalLatitudeFromMoonDirection ([4adeb92](https://github.com/Quenty/NevermoreEngine/commit/4adeb92ecb6a9093062bd4659a8423d16f897454))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@1.2.0...@quenty/sunpositionutils@2.0.0) (2021-09-05)
 

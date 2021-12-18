@@ -1,19 +1,18 @@
-# v3.3.0 (Sat Dec 18 2021)
-
-#### 🐛 Bug Fix
-
-- fix: Use Promies.spawn() since task.spawn() is probably cheaper now [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@3.2.0...@quenty/promise@3.3.0) (2021-12-18)
+
+
+### Bug Fixes
+
+* Use Promies.spawn() since task.spawn() is probably cheaper now ([6a069c2](https://github.com/Quenty/NevermoreEngine/commit/6a069c2a1c99ca34f53af747a969d5f5c4044e84))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@3.1.2...@quenty/promise@3.2.0) (2021-11-20)
 

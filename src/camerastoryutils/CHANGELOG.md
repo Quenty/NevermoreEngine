@@ -1,19 +1,18 @@
-# v3.3.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- feat: Better camera explainability [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@3.2.0...@quenty/camerastoryutils@3.3.0) (2021-12-18)
+
+
+### Features
+
+* Better camera explainability ([4fd9016](https://github.com/Quenty/NevermoreEngine/commit/4fd9016f6914bf181e421753cbaca555394537d8))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@3.1.2...@quenty/camerastoryutils@3.2.0) (2021-11-20)
 

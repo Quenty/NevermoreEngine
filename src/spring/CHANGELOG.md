@@ -1,19 +1,18 @@
-# v2.2.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- feat: Allow transformation of Color3 into a linear value for interpolation [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@2.1.0...@quenty/spring@2.2.0) (2021-12-18)
+
+
+### Features
+
+* Allow transformation of Color3 into a linear value for interpolation ([a770697](https://github.com/Quenty/NevermoreEngine/commit/a7706970e4de8969bdd0f5a8b54e1803c89f9e87))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@2.0.0...@quenty/spring@2.1.0) (2021-09-22)
 

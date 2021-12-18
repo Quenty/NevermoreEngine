@@ -1,19 +1,18 @@
-# v1.5.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- feat: Allow CooldownTracker to be initialized without the cooldown binders being initialized. [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@1.4.0...@quenty/cooldown@1.5.0) (2021-12-18)
+
+
+### Features
+
+* Allow CooldownTracker to be initialized without the cooldown binders being initialized. ([77b2eaf](https://github.com/Quenty/NevermoreEngine/commit/77b2eaf1649e1b2786304ea0f23e21fd01e0e9da))
+
+
+
+
 
 # [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@1.3.1...@quenty/cooldown@1.4.0) (2021-12-14)
 

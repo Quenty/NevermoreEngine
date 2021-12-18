@@ -1,19 +1,18 @@
-# v3.3.0 (Sat Dec 18 2021)
-
-#### 🚀 Enhancement
-
-- feat: ButtonHighlightModel can act as a model for Blend [#235](https://github.com/Quenty/NevermoreEngine/pull/235) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.2.0...@quenty/buttonhighlightmodel@3.3.0) (2021-12-18)
+
+
+### Features
+
+* ButtonHighlightModel can act as a model for Blend ([d881413](https://github.com/Quenty/NevermoreEngine/commit/d88141307fe27a2976d9f93a70badab8b612df5e))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.1.2...@quenty/buttonhighlightmodel@3.2.0) (2021-11-20)
 
