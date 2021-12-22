@@ -7,6 +7,9 @@ AttributeValue.ClassName = "AttributeValue"
 AttributeValue.__index = AttributeValue
 
 function AttributeValue.new(object, attributeName, defaultValue)
+	assert(typeof(object) == "Instance", "Bad object")
+	assert(type(attributeName) == "string", "Bad attributeName")
+
 	local self = {
 		_object = object;
 		_attributeName = attributeName;
