@@ -9,6 +9,8 @@ local RunService = game:GetService("RunService")
 local BaseObject = require("BaseObject")
 local RagdollBindersServer = require("RagdollBindersServer")
 
+local UNRAGDOLL_AUTOMATIC_TIME = 2
+
 local UnragdollAutomatically = setmetatable({}, BaseObject)
 UnragdollAutomatically.ClassName = "UnragdollAutomatically"
 UnragdollAutomatically.__index = UnragdollAutomatically
@@ -31,7 +33,7 @@ function UnragdollAutomatically:_handleRagdollChanged()
 		self._ragdollTime = tick()
 
 		self._maid._conn = RunService.Stepped:Connect(function()
-			if tick() - self._ragdollTime >= 5 then
+			if tick() - self._ragdollTime >= UNRAGDOLL_AUTOMATIC_TIME then
 				if self._obj.Health > 0 then
 					self._ragdollBindersServer.Ragdoll:Unbind(self._obj)
 				end
