@@ -1,19 +1,18 @@
-# v3.0.0 (Wed Dec 22 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add spring support for UDim2 and UDim and Vector2 [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@2.2.0...@quenty/spring@3.0.0) (2021-12-22)
+
+
+### Features
+
+* Add spring support for UDim2 and UDim and Vector2 ([d1763d7](https://github.com/Quenty/NevermoreEngine/commit/d1763d7cdc65ad5df4bbe38897cd9a446bb61bb1))
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@2.1.0...@quenty/spring@2.2.0) (2021-12-18)
 

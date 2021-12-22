@@ -1,19 +1,18 @@
-# v4.0.0 (Wed Dec 22 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add better warnings [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.6.0...@quenty/attributeutils@4.0.0) (2021-12-22)
+
+
+### Features
+
+* Add better warnings ([77445eb](https://github.com/Quenty/NevermoreEngine/commit/77445eb0b7eb39c0f9b5fcf2b93868aa168bd618))
+
+
+
+
 
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@3.5.0...@quenty/attributeutils@3.6.0) (2021-12-18)
 

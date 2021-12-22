@@ -1,19 +1,18 @@
-# v3.0.0 (Wed Dec 22 2021)
-
-#### 🚀 Enhancement
-
-- feat: Add observeSizeForLabelProps [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@2.0.0...@quenty/textserviceutils@3.0.0) (2021-12-22)
+
+
+### Features
+
+* Add observeSizeForLabelProps ([1f8ab89](https://github.com/Quenty/NevermoreEngine/commit/1f8ab89745b45e61408f4a6c16f98a5dd847e017))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@1.2.0...@quenty/textserviceutils@2.0.0) (2021-09-05)
 
