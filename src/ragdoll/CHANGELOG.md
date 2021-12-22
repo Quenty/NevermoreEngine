@@ -1,3 +1,16 @@
+# v5.0.0 (Wed Dec 22 2021)
+
+#### 🚀 Enhancement
+
+- feat: Automatic ragdolling [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
+- feat: Adjust unragdoll logic [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,28 @@
+# (Wed Dec 22 2021)
+
+#### 💥 Breaking Change
+
+- `@quenty/guivisiblemanager@5.0.0`
+  - feat!: Remove GuiVisibleManager:SetPreferredTheme() support [#236](https://github.com/Quenty/NevermoreEngine/pull/236) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- `@quenty/spring@3.0.0`
+  - feat: Add spring support for UDim2 and UDim and Vector2 [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
+- `@quenty/textserviceutils@3.0.0`
+  - feat: Add observeSizeForLabelProps [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
+- `@quenty/ragdoll@5.0.0`
+  - feat: Automatic ragdolling [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
+  - feat: Adjust unragdoll logic [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
+- `@quenty/attributeutils@4.0.0`
+  - feat: Add better warnings [#237](https://github.com/Quenty/NevermoreEngine/pull/237) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Dec 18 2021)
 
 #### 💥 Breaking Change
