@@ -13,6 +13,10 @@ return BinderProvider.new(function(self, serviceBag)
 	self:Add(PlayerHumanoidBinder.new("Ragdollable", require("Ragdollable"), serviceBag))
 
 	self:Add(PlayerHumanoidBinder.new("RagdollHumanoidOnDeath", require("RagdollHumanoidOnDeath"), serviceBag))
-	self:Add(Binder.new("RagdollHumanoidOnFall", require("RagdollHumanoidOnFall"), serviceBag))
-	self:Add(Binder.new("UnragdollAutomatically", require("UnragdollAutomatically"), serviceBag))
+	self:Add(PlayerHumanoidBinder.new("RagdollHumanoidOnFall", require("RagdollHumanoidOnFall"), serviceBag))
+	self:Add(PlayerHumanoidBinder.new("UnragdollAutomatically", require("UnragdollAutomatically"), serviceBag))
+
+	self.RagdollHumanoidOnDeath:SetAutomaticTagging(true)
+	self.RagdollHumanoidOnFall:SetAutomaticTagging(true)
+	self.UnragdollAutomatically:SetAutomaticTagging(true)
 end)
