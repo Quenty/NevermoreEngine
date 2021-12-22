@@ -19,11 +19,14 @@ function SpringUtils.animating(spring, epsilon)
 	if type(target) == "number" then
 		animating = math.abs(spring.Position - spring.Target) > epsilon
 			or math.abs(spring.Velocity) > epsilon
-	elseif typeof(target) == "Vector3" or LinearValue.isLinear(target) then
-		animating = (spring.Position - spring.Target).magnitude > epsilon
-			or spring.Velocity.magnitude > epsilon
 	else
-		error("Unknown type")
+		local rbxtype = typeof(target)
+		if rbxtype == "Vector3" or rbxtype == "Vector2" or LinearValue.isLinear(target) then
+			animating = (spring.Position - spring.Target).magnitude > epsilon
+				or spring.Velocity.magnitude > epsilon
+		else
+			error("Unknown type")
+		end
 	end
 
 	if animating then
@@ -46,6 +49,10 @@ end
 function SpringUtils.toLinearIfNeeded(value)
 	if typeof(value) == "Color3" then
 		return LinearValue.new(Color3.new, {value.r, value.g, value.b})
+	elseif typeof(value) == "UDim2" then
+		return LinearValue.new(UDim2.new, {value.x.scale, value.x.offset, value.y.scale, value.y.offset})
+	elseif typeof(value) == "UDim" then
+		return LinearValue.new(UDim.new, {value.scale, value.offset})
 	else
 		return value
 	end
