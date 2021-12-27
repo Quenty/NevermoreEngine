@@ -1,8 +1,15 @@
---- Utilities involving orthogonal Vector3s
--- @module OrthogonalUtils
+--[=[
+	Utilities involving orthogonal Vector3s
+	@class OrthogonalUtils
+]=]
 
 local OrthogonalUtils = {}
 
+--[=[
+	Decompose the CFrame
+	@param cframe CFrame
+	return { Vector3 }
+]=]
 function OrthogonalUtils.decomposeCFrameToVectors(cframe)
 	return  {
 		cframe.LookVector, -- front
@@ -14,6 +21,13 @@ function OrthogonalUtils.decomposeCFrameToVectors(cframe)
 	}
 end
 
+--[=[
+	Gets the closest vectors to another vector.
+
+	@param options { Vector3 } -- normals
+	@param unitVector Vector3
+	return Vector3?
+]=]
 function OrthogonalUtils.getClosestVector(options, unitVector)
 	local best = nil
 	local bestAngle = -math.huge
@@ -28,6 +42,13 @@ function OrthogonalUtils.getClosestVector(options, unitVector)
 	return best
 end
 
+--[=[
+	Snaps a CFrame to another one
+
+	@param cframe CFrame
+	@param snapToCFrame CFrame
+	return CFrame
+]=]
 function OrthogonalUtils.snapCFrameTo(cframe, snapToCFrame)
 	local options = OrthogonalUtils.decomposeCFrameToVectors(snapToCFrame)
 	local rightVector = OrthogonalUtils.getClosestVector(options, cframe.RightVector)

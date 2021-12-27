@@ -1,10 +1,17 @@
---- General character utility code.
--- @module CharacterUtils
+--[=[
+	General character utility code.
+	@class CharacterUtils
+]=]
 
 local Players = game:GetService("Players")
 
 local CharacterUtils = {}
 
+--[=[
+	Gets a player's humanoid, if it exists
+	@param player Player
+	@return Humanoid? -- Nil if not found
+]=]
 function CharacterUtils.getPlayerHumanoid(player)
 	local character = player.Character
 	if not character then
@@ -14,6 +21,11 @@ function CharacterUtils.getPlayerHumanoid(player)
 	return character:FindFirstChildOfClass("Humanoid")
 end
 
+--[=[
+	Gets a player's humanoid, and ensures it is alive, otherwise returns nil
+	@param player Player
+	@return Humanoid? -- Nil if not found
+]=]
 function CharacterUtils.getAlivePlayerHumanoid(player)
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
@@ -23,6 +35,12 @@ function CharacterUtils.getAlivePlayerHumanoid(player)
 	return humanoid
 end
 
+--[=[
+	Gets a player's humanoid's rootPart, and ensures the humanoid is alive, otherwise
+	returns nil
+	@param player Player
+	@return BasePart? -- Nil if not found
+]=]
 function CharacterUtils.getAlivePlayerRootPart(player)
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid or humanoid.Health <= 0 then
@@ -32,6 +50,11 @@ function CharacterUtils.getAlivePlayerRootPart(player)
 	return humanoid.RootPart
 end
 
+--[=[
+	Gets a player's humanoid's rootPart otherwise returns nil
+	@param player Player
+	@return BasePart? -- Nil if not found
+]=]
 function CharacterUtils.getPlayerRootPart(player)
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if not humanoid then
@@ -41,6 +64,20 @@ function CharacterUtils.getPlayerRootPart(player)
 	return humanoid.RootPart
 end
 
+--[=[
+	Unequips all tools for a give player's humanomid, if the humanoid
+	exists
+
+	```lua
+	local Players = game:GetService("Players")
+
+	for _, player in pairs(Players:GetPlayers()) do
+		CharacterUtils.unequipTools(player)
+	end
+	```
+
+	@param player Player
+]=]
 function CharacterUtils.unequipTools(player)
 	local humanoid = CharacterUtils.getPlayerHumanoid(player)
 	if humanoid then
@@ -48,10 +85,27 @@ function CharacterUtils.unequipTools(player)
 	end
 end
 
---- Returns the Player and Character that a descendent is part of, if it is part of one.
--- @param descendant A child of the potential character.
--- @treturn Player player
--- @treturn Character character
+--[=[
+	Returns the player that a descendent is part of, if it is part of one.
+
+	```lua
+	script.Parent.Touched:Connect(function(inst)
+		local player = CharacterUtils.getPlayerFromCharacter(inst)
+		if player then
+			-- activate button!
+		end
+	end)
+	```
+
+	:::tip
+	This method is useful in a ton of different situations. For example, you can
+	use it on classes bound to a humanoid, to determine the player. You can also
+	use it to determine, upon touched events, if a part is part of a character.
+	:::
+
+	@param descendant Instance -- A child of the potential character.
+	@return Player? -- Nil if not found
+]=]
 function CharacterUtils.getPlayerFromCharacter(descendant)
 	local character = descendant
 	local player = Players:GetPlayerFromCharacter(character)

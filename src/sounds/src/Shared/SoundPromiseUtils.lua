@@ -1,6 +1,7 @@
---- Utility functions involving sounds and their state
--- @module SoundPromiseUtils
--- @author Quenty
+--[=[
+	Utility functions involving sounds and their state
+	@class SoundPromiseUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +10,11 @@ local PromiseUtils = require("PromiseUtils")
 
 local SoundPromiseUtils = {}
 
+--[=[
+	Promises that a sound is loaded
+	@param sound Sound
+	@return Promise
+]=]
 function SoundPromiseUtils.promiseLoaded(sound)
 	if sound.IsLoaded then
 		return Promise.resolved()
@@ -31,6 +37,11 @@ function SoundPromiseUtils.promiseLoaded(sound)
 	return promise
 end
 
+--[=[
+	Promises that all sounds are loaded
+	@param sounds { Sound }
+	@return Promise
+]=]
 function SoundPromiseUtils.promiseAllSoundsLoaded(sounds)
 	local promises = {}
 	for _, sound in pairs(sounds) do

@@ -1,6 +1,6 @@
----
--- @module TimeSyncUtils
--- @author Quenty
+--[=[
+	@class TimeSyncUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,6 +1,13 @@
---- A text label with most general properties of a textlabel, except when text is set,
--- it rotates uniformly like an old clock, animating in a satisfying way
--- @usage Construct with RotatingLabelBuilder.new(Template):Create()
+--[=[
+	A text label with most general properties of a textlabel, except when text is set,
+	it rotates uniformly like an old clock, animating in a satisfying way
+
+	``lua
+	RotatingLabelBuilder.new(Template):Create()
+	```
+
+	@class RotatingLabel
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -98,7 +105,7 @@ function RotatingLabel:__index(index)
 	end
 end
 
----
+--
 -- @usage
 --[[
 	RotatingLabel.Text = string

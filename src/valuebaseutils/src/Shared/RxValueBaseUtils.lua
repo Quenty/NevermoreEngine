@@ -1,6 +1,6 @@
----
--- @module RxValueBaseUtils
--- @author Quenty
+--[=[
+	@class RxValueBaseUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

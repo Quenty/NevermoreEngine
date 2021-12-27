@@ -1,5 +1,44 @@
---- Provides getting remote events
--- @function GetRemoteFunction
+--[=[
+	Provides getting named global [RemoteFunction] resources.
+
+	@class GetRemoteFunction
+]=]
+
+--[=[
+	Retrieves a global remote function from the store. On the server, it constructs a new one,
+	and on the client, it waits for it to exist.
+
+	:::tip
+	Consider using [PromiseGetRemoteFunction] for a non-yielding version
+	:::
+
+	```lua
+	-- server.lua
+	local GetRemoteFunction = require("GetRemoteFunction")
+
+	local remoteFunction = GetRemoteFunction("testing")
+	remoteFunction.OnServerInvoke = function(_player, text)
+		return "HI " .. tostring(text)
+	end
+
+	-- client.lua
+	local GetRemoteFunction = require("GetRemoteFunction")
+
+	local remoteFunction = GetRemoteFunction("testing")
+	print(remoteFunction:InvokeServer("Bob")) --> HI Bob
+	```
+
+	:::info
+	If the game is not running, then a mock remote event will be created
+	for use in testing.
+	:::
+
+	@yields
+	@function GetRemoteFunction
+	@within GetRemoteFunction
+	@param name string
+	@return RemoteFunction
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

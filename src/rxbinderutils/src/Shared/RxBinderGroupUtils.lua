@@ -1,6 +1,7 @@
----
--- @module RxBinderGroupUtils
--- @author Quenty
+--[=[
+	Rx utility methods involving [BinderGroup] API surface
+	@class RxBinderGroupUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,6 +12,11 @@ local Rx = require("Rx")
 
 local RxBinderGroupUtils = {}
 
+--[=[
+	Observes all binders in a binder group
+	@param binderGroup BinderGroup<T>
+	@return Observable<Binder<T>>
+]=]
 function RxBinderGroupUtils.observeBinders(binderGroup)
 	assert(type(binderGroup) == "table", "Bad binderGroup")
 
@@ -30,6 +36,11 @@ function RxBinderGroupUtils.observeBinders(binderGroup)
 
 end
 
+--[=[
+	Observes all classes in a given binder group.
+	@param binderGroup BinderGroup<T>
+	@return Observable<Brio<T>>
+]=]
 function RxBinderGroupUtils.observeAllClassesBrio(binderGroup)
 	assert(type(binderGroup) == "table", "Bad binderGroup")
 

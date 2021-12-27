@@ -1,6 +1,8 @@
----
--- @module ProximityPromptInputUtils
--- @author Quenty
+--[=[
+	Utility functions to configure a proximity prompt based upon the
+	input key map given.
+	@class ProximityPromptInputUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,12 @@ local INPUT_MODES = require("INPUT_MODES")
 
 local ProximityPromptInputUtils = {}
 
+--[=[
+	Creates an InputKeyMapList from a proximity prompt.
+
+	@param prompt ProximityPrompt
+	@return InputKeyMapList
+]=]
 function ProximityPromptInputUtils.inputKeyMapFromPrompt(prompt)
 	assert(typeof(prompt) == "Instance", "Bad prompt")
 
@@ -18,6 +26,13 @@ function ProximityPromptInputUtils.inputKeyMapFromPrompt(prompt)
 	}
 end
 
+
+--[=[
+	Sets the key codes for a proximity prompt to match an inputKeyMapList
+
+	@param prompt ProximityPrompt
+	@param inputKeyMapList InputKeyMapList
+]=]
 function ProximityPromptInputUtils.configurePromptFromInputKeyMap(prompt, inputKeyMapList)
 	assert(typeof(prompt) == "Instance", "Bad prompt")
 	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
@@ -34,6 +49,13 @@ function ProximityPromptInputUtils.configurePromptFromInputKeyMap(prompt, inputK
 	end
 end
 
+--[=[
+	Picks the first keyCode that matches the inputMode.
+
+	@param inputKeyMapList InputKeyMapList
+	@param inputMode InputMode
+	@return KeyCode?
+]=]
 function ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, inputMode)
 	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
 	assert(inputMode, "Bad inputMode")

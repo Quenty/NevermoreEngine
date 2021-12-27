@@ -1,5 +1,7 @@
---- Track a current part, whether it be a model or part
--- @classmod TrackCamera
+--[=[
+	Track a current part, whether it be a model or part
+	@class TrackCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,9 +12,12 @@ local TrackCamera = {}
 TrackCamera.ClassName = "TrackCamera"
 TrackCamera.FieldOfView = 0
 
---- Make new track camera
--- @constructor
--- @param[opt] cameraSubject The CameraSubject to look at. A Roblox part of Roblox model
+--[=[
+	Constructs a new TrackCamera
+
+	@param cameraSubject Instance? -- The CameraSubject to look at. A Roblox part of Roblox model
+	@return TrackCamera
+]=]
 function TrackCamera.new(cameraSubject)
 	local self = setmetatable({}, TrackCamera)
 
@@ -39,9 +44,25 @@ function TrackCamera:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within TrackCamera
+]=]
+--[=[
+	The current field of view.
+	@prop FieldOfView number
+	@within TrackCamera
+]=]
+--[=[
+	The current field of view.
+	@prop CameraSubject Instance
+	@within TrackCamera
+]=]
+
 function TrackCamera:__index(index)
 	if index == "CameraState" then
-
 		local state = CameraState.new()
 		state.FieldOfView = self.FieldOfView
 

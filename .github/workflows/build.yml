@@ -1,6 +1,21 @@
 name: Build
 on: [push]
 jobs:
+  check-moonwave-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: moonwave
+
+      - name: Extract moonwave
+        run: moonwave-extractor extract src
+
   lint:
     runs-on: ubuntu-latest
     steps:

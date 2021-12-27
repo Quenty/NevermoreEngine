@@ -1,6 +1,9 @@
---- Add another layer of effects over any other camera by allowing an "impulse"
--- to be applied. Good for shockwaves, camera shake, and recoil
--- @classmod ImpulseCamera
+--[=[
+	Add another layer of effects over any other camera by allowing an "impulse"
+	to be applied. Good for shockwaves, camera shake, and recoil.
+
+	@class ImpulseCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -22,6 +25,10 @@ function ImpulseCamera.new()
 	return self
 end
 
+--[=[
+	Applies an impulse to the camera, shaking it!
+	@param velocity Vector3
+]=]
 function ImpulseCamera:Impulse(velocity)
 	assert(typeof(velocity) == "Vector3", "Bad velocity")
 
@@ -44,6 +51,12 @@ function ImpulseCamera:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within DefaultCamera
+]=]
 function ImpulseCamera:__index(index)
 	if index == "CameraState" then
 		local newState = CameraState.new()

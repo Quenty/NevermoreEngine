@@ -1,9 +1,23 @@
---- CFrame representation as a quaternion
--- @module QFrame
+--[=[
+	CFrame representation as a quaternion. Alternative representation of a [CFrame].
+	@class QFrame
+]=]
 
 local QFrame = {}
 QFrame.__index = QFrame
 
+--[=[
+	Constructs a new QFrame
+
+	@param x number?
+	@param y number?
+	@param z number?
+	@param W number?
+	@param X number?
+	@param Y number?
+	@param Z number?
+	@return QFrame
+]=]
 function QFrame.new(x, y, z, W, X, Y, Z)
 	local self = setmetatable({}, QFrame)
 	self.x = x or 0
@@ -17,10 +31,21 @@ function QFrame.new(x, y, z, W, X, Y, Z)
 	return self
 end
 
+--[=[
+	Returns whether a value is a QFrame
+	@param value any
+	@return boolean
+]=]
 function QFrame.isQFrame(value)
 	return getmetatable(value) == QFrame
 end
 
+--[=[
+	Gets the QFrame closest to that CFrame
+	@param cframe CFrame
+	@param closestTo QFrame
+	@return QFrame
+]=]
 function QFrame.fromCFrameClosestTo(cframe, closestTo)
 	assert(typeof(cframe) == "CFrame", "Bad cframe")
 	assert(QFrame.isQFrame(closestTo), "Bad closestTo")
@@ -40,6 +65,12 @@ function QFrame.fromCFrameClosestTo(cframe, closestTo)
 	return QFrame.new(cframe.x, cframe.y, cframe.z, W, X, Y, Z)
 end
 
+--[=[
+	Constructs a QFrame from a position and another QFrame rotation.
+	@param vector Vector3
+	@param qFrame QFrame
+	@return QFrame
+]=]
 function QFrame.fromVector3(vector, qFrame)
 	assert(typeof(vector) == "Vector3", "Bad vector")
 	assert(QFrame.isQFrame(qFrame))
@@ -47,6 +78,11 @@ function QFrame.fromVector3(vector, qFrame)
 	return QFrame.new(vector.x, vector.y, vector.z, qFrame.W, qFrame.X, qFrame.Y, qFrame.Z)
 end
 
+--[=[
+	Converts the QFrame to a [CFrame]
+	@param self QFrame
+	@return CFrame
+]=]
 function QFrame.toCFrame(self)
 	local cframe = CFrame.new(self.x, self.y, self.z, self.X, self.Y, self.Z, self.W)
 	if cframe == cframe then
@@ -56,19 +92,40 @@ function QFrame.toCFrame(self)
 	end
 end
 
+--[=[
+	Converts the QFrame to a [Vector3] position
+	@param self QFrame
+	@return Vector3
+]=]
 function QFrame.toPosition(self)
 	return Vector3.new(self.x, self.y, self.z)
 end
 
+--[=[
+	Returns true if the QFrame contains a NaN value.
+	@param a QFrame
+	@return boolean
+]=]
 function QFrame.isNAN(a)
 	return a.x == a.x and a.y == a.y and a.z == a.z
 		and a.W == a.W and a.X == a.X and a.Y == a.Y and a.Z == a.Z
 end
 
+--[=[
+	Inverts the QFrame
+	@param a QFrame
+	@return QFrame
+]=]
 function QFrame.__unm(a)
 	return QFrame.new(-a.x, -a.y, -a.z, -a.W, -a.X, -a.Y, -a.Z)
 end
 
+--[=[
+	Adds the QFrames together
+	@param a QFrame
+	@param b QFrame
+	@return QFrame
+]=]
 function QFrame.__add(a, b)
 	assert(QFrame.isQFrame(a) and QFrame.isQFrame(b),
 		"QFrame + non-QFrame attempted")
@@ -76,6 +133,12 @@ function QFrame.__add(a, b)
 	return QFrame.new(a.x + b.x, a.y + b.y, a.z + b.z, a.W + b.W, a.X + b.X, a.Y + b.Y, a.Z + b.Z)
 end
 
+--[=[
+	Subtracts the QFrames together
+	@param a QFrame
+	@param b QFrame
+	@return QFrame
+]=]
 function QFrame.__sub(a, b)
 	assert(QFrame.isQFrame(a) and QFrame.isQFrame(b),
 		"QFrame - non-QFrame attempted")
@@ -83,6 +146,12 @@ function QFrame.__sub(a, b)
 	return QFrame.new(a.x - b.x, a.y - b.y, a.z - b.z, a.W - b.W, a.X - b.X, a.Y - b.Y, a.Z - b.Z)
 end
 
+--[=[
+	Takes the QFrame to the power, using quaternion power formula.
+	@param a QFrame
+	@param b number
+	@return QFrame
+]=]
 function QFrame.__pow(a, b)
 	assert(QFrame.isQFrame(a) and type(b) == "number", "Bad a or b")
 
@@ -130,6 +199,12 @@ function QFrame.__pow(a, b)
 	return QFrame.new(cx, cy, cz, cW, cX, cY, cZ)
 end
 
+--[=[
+	Multiplies the QFrames together
+	@param a QFrame | number
+	@param b QFrame | number
+	@return QFrame
+]=]
 function QFrame.__mul(a, b)
 	if type(a) == "number" and QFrame.isQFrame(b) then
 		return QFrame.new(a*b.x, a*b.y, a*b.z, a*b.W, a*b.X, a*b.Y, a*b.Z)
@@ -154,6 +229,12 @@ function QFrame.__mul(a, b)
 	end
 end
 
+--[=[
+	Divides the QFrame by the number
+	@param a QFrame
+	@param b number
+	@return QFrame
+]=]
 function QFrame.__div(a, b)
 	if type(b) == "number" then
 		return QFrame.new(a.x/b, a.y/b, a.z/b, a.W/b, a.X/b, a.Y/b, a.Z/b)
@@ -162,6 +243,12 @@ function QFrame.__div(a, b)
 	end
 end
 
+--[=[
+	Compares the QFrame for equality.
+	@param a QFrame
+	@param b QFrame
+	@return boolean
+]=]
 function QFrame.__eq(a, b)
 	return a.x == b.x and a.y == b.y and a.z == b.z
 		and a.W == b.W and a.X == b.X and a.Y == b.Y and a.Z == b.Z

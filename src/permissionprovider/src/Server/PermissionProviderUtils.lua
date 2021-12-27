@@ -1,6 +1,9 @@
----
--- @module PermissionProviderUtils
--- @author Quenty
+--[=[
+	Utility functions to provide/configure a permission. See [BasePermissionProvider] and [PermissionService].
+
+	@server
+	@class PermissionProviderUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -8,6 +11,11 @@ local PermissionProviderConstants = require("PermissionProviderConstants")
 
 local PermissionProviderUtils = {}
 
+--[=[
+	Creates a group rank config
+	@param config { groupId: number, minAdminRequiredRank: number, minCreatorRequiredRank: number }
+	@return table
+]=]
 function PermissionProviderUtils.createGroupRankConfig(config)
 	assert(type(config.groupId) == "number", "Bad groupId")
 	assert(type(config.minCreatorRequiredRank) == "number", "Bad minCreatorRequiredRank")
@@ -22,6 +30,11 @@ function PermissionProviderUtils.createGroupRankConfig(config)
 	}
 end
 
+--[=[
+	Creates a single user config
+	@param config { userId: number }
+	@return table
+]=]
 function PermissionProviderUtils.createSingleUserConfig(config)
 	assert(type(config.userId) == "number", "Bad userId")
 
@@ -32,6 +45,10 @@ function PermissionProviderUtils.createSingleUserConfig(config)
 	}
 end
 
+--[=[
+	Creates an automatic configuration from the game.
+	@return table
+]=]
 function PermissionProviderUtils.createConfigFromGame()
 	if game.CreatorType == Enum.CreatorType.Group then
 		return PermissionProviderUtils.createGroupRankConfig({

@@ -1,6 +1,7 @@
----
--- @module CameraStoryUtils
--- @author Quenty
+--[=[
+	Utility functions for hoacekat stories.
+	@class CameraStoryUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +14,12 @@ local Math = require("Math")
 
 local CameraStoryUtils = {}
 
+--[=[
+	Reflects the camera state to the original camera
+	@param maid Maid
+	@param topCamera Camera
+	@return Camera
+]=]
 function CameraStoryUtils.reflectCamera(maid, topCamera)
 	local camera = Instance.new("Camera")
 	camera.Name = "ReflectedCamera"
@@ -30,6 +37,12 @@ function CameraStoryUtils.reflectCamera(maid, topCamera)
 	return camera
 end
 
+--[=[
+	Sets up a viewport frame
+	@param maid Maid
+	@param target GuiBase
+	@return ViewportFrame
+]=]
 function CameraStoryUtils.setupViewportFrame(maid, target)
 	local viewportFrame = Instance.new("ViewportFrame")
 	viewportFrame.ZIndex = 0
@@ -47,6 +60,13 @@ function CameraStoryUtils.setupViewportFrame(maid, target)
 	return viewportFrame
 end
 
+--[=[
+	REturns a promise that resolves to a crate in front of the camera.
+	@param maid Maid
+	@param viewportFrame ViewportFrame
+	@param properties { [string}: any }
+	@return Promise<Instance>
+]=]
 function CameraStoryUtils.promiseCrate(maid, viewportFrame, properties)
 	return maid:GivePromise(InsertServiceUtils.promiseAsset(182451181)):Then(function(model)
 		maid:GiveTask(model)
@@ -79,6 +99,16 @@ function CameraStoryUtils.promiseCrate(maid, viewportFrame, properties)
 	end)
 end
 
+--[=[
+	Retrieves the interpolation
+	@param maid Maid
+	@param viewportFrame ViewportFrame
+	@param low number
+	@param high number
+	@param period number
+	@param toCFrame CFrame
+	@return (interpolate: function, color: Color3, label: string?, labelOffset: Vector2?) -> ()
+]=]
 function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high, period, toCFrame)
 	assert(maid, "Bad maid")
 	assert(viewportFrame, "Bad viewportFrame")

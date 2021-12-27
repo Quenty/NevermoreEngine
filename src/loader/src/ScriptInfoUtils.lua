@@ -1,6 +1,7 @@
----
--- @module ScriptInfoUtils
--- @author Quenty
+--[=[
+	@private
+	@class ScriptInfoUtils
+]=]
 
 local CollectionService = game:GetService("CollectionService")
 

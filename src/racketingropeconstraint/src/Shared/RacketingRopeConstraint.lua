@@ -1,6 +1,7 @@
---- Tries to racket a rope constraint back down to a reasonable length
--- @classmod RacketingRopeConstraint
--- @author Quenty
+--[=[
+	Tries to racket a rope constraint back down to a reasonable length. Use [RopeConstraint.WinchEnabled]
+	@class RacketingRopeConstraint
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

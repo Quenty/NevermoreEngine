@@ -1,5 +1,7 @@
---- Adds Enabled/Disabled state to class
--- @module EnabledMixin
+--[=[
+	Adds Enabled/Disabled state to class
+	@class EnabledMixin
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

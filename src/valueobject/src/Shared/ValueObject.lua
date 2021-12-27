@@ -1,6 +1,8 @@
---- To work like value objects in Roblox and track a single item,
--- with `.Changed` events
--- @classmod ValueObject
+--[=[
+	To work like value objects in Roblox and track a single item,
+	with `.Changed` events
+	@class ValueObject
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,18 +12,11 @@ local Maid = require("Maid")
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
 
---- The value of the ValueObject
--- @tfield Variant Value
-
---- Event fires when the value's object value change
--- @signal Changed
--- @tparam Variant newValue The new value
--- @tparam Variant oldValue The old value
-
-
---- Constructs a new value object
--- @constructor
--- @treturn ValueObject
+--[=[
+	Constructs a new value object
+	@param baseValue T
+	@return ValueObject
+]=]
 function ValueObject.new(baseValue)
 	local self = {}
 
@@ -35,10 +30,26 @@ function ValueObject.new(baseValue)
 	return setmetatable(self, ValueObject)
 end
 
+--[=[
+	Returns whether the object is a ValueObject class
+	@param value any
+	@return boolean
+]=]
 function ValueObject.isValueObject(value)
 	return type(value) == "table" and getmetatable(value) == ValueObject
 end
 
+--[=[
+	Event fires when the value's object value change
+	@prop Changed Signal<T> -- fires with oldValue, newValue
+	@within ValueObject
+]=]
+
+--[=[
+	The value of the ValueObject
+	@prop Value T
+	@within ValueObject
+]=]
 function ValueObject:__index(index)
 	if index == "Value" then
 		return self._value
@@ -68,7 +79,11 @@ function ValueObject:__newindex(index, value)
 	end
 end
 
---- Forces the value to be nil on cleanup, cleans up the Maid
+--[=[
+	Forces the value to be nil on cleanup, cleans up the Maid
+
+	Does not fire the event since 3.5.0
+]=]
 function ValueObject:Destroy()
 	rawset(self, "_value", nil)
 	self._maid:DoCleaning()

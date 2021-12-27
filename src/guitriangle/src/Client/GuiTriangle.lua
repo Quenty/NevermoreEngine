@@ -1,12 +1,19 @@
---- 2D Gui triangle rendering class
--- @classmod GuiTriangle
--- http://wiki.roblox.com/index.php?title=2D_triangles
+--[=[
+	2D Gui triangle rendering class.
+	See: http://wiki.roblox.com/index.php?title=2D_triangles
+
+	@class GuiTriangle
+]=]
 
 local GuiTriangle = {}
 GuiTriangle.__index = GuiTriangle
 GuiTriangle.ClassName = "GuiTriangle"
 GuiTriangle.ExtraPixels = 2
 
+--[=[
+	@param parent Instance
+	@return GuiTriangle
+]=]
 function GuiTriangle.new(parent)
 	local self = setmetatable({}, GuiTriangle)
 
@@ -17,29 +24,47 @@ function GuiTriangle.new(parent)
 	self._tb = self._ta:Clone()
 
 	self:SetParent(parent)
-	self._a = UDim2.new()
-	self._b = UDim2.new()
-	self._c = UDim2.new()
+	self._a = UDim2.new(0, 0, 0, 0)
+	self._b = UDim2.new(0, 0, 0, 0)
+	self._c = UDim2.new(0, 0, 0, 0)
 
 	return self
 end
 
+--[=[
+	@param parent Instance
+]=]
 function GuiTriangle:SetParent(parent)
 	self._ta.Parent = parent
 	self._tb.Parent = parent
 end
 
+--[=[
+	Shows the triangle
+]=]
 function GuiTriangle:Show()
 	self._ta.Visible = true
 	self._tb.Visible = true
 end
 
+--[=[
+	Sets the points to render
+	@param a Vector2
+	@param b Vector2
+	@param c Vector2
+	@return GuiTriangle -- self
+]=]
 function GuiTriangle:Set(a, b, c)
-	return self:SetA(a)
-		:SetB(b)
-		:SetC(c)
+	self:SetA(a)
+	self:SetB(b)
+	self:SetC(c)
+
+	return self
 end
 
+--[=[
+	Hides the triangle
+]=]
 function GuiTriangle:Hide()
 	self._ta.Visible = false
 	self._tb.Visible = false
@@ -55,21 +80,42 @@ local function rotateV2(vec, angle)
 	return Vector2.new(x, y)
 end
 
+--[=[
+	Sets the point
+	@param a Vector2
+	@return GuiTriangle -- self
+]=]
 function GuiTriangle:SetA(a)
-	self._a = a or error("Expected Vector2")
+	assert(typeof(a) == "Vector2", "Bad a")
+	self._a = a
 	return self
 end
 
+--[=[
+	Sets the point
+	@param b Vector2
+	@return GuiTriangle -- self
+]=]
 function GuiTriangle:SetB(b)
-	self._b = b or error("Expected Vector2")
+	assert(typeof(b) == "Vector2", "Bad b")
+	self._b = b
 	return self
 end
 
+--[=[
+	Sets the point
+	@param c Vector2
+	@return GuiTriangle -- self
+]=]
 function GuiTriangle:SetC(c)
-	self._c = c or error("Expected Vector2")
+	assert(typeof(c) == "Vector2", "Bad c")
+	self._c = c
 	return self
 end
 
+--[=[
+	Updates the render of the triangle.
+]=]
 function GuiTriangle:UpdateRender()
 	local a, b, c = self._a, self._b, self._c
 
@@ -120,6 +166,9 @@ function GuiTriangle:UpdateRender()
 	tb.Rotation = ta.Rotation
 end
 
+--[=[
+	Cleans up the triangle.
+]=]
 function GuiTriangle:Destroy()
 	setmetatable(self, nil)
 

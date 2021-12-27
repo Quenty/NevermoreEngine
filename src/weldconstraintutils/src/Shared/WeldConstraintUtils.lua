@@ -1,9 +1,31 @@
---- Utility functions to create WeldConstraint objects in Roblox
--- @module WeldConstraintUtils
--- @author Quenty
+--[=[
+	Utility functions to create WeldConstraint objects in Roblox.
+	@class WeldConstraintUtils
+]=]
 
 local WeldConstraintUtils = {}
 
+--[=[
+	Creates a new weld constraint between the given parts.
+
+	:::info
+	Actually generally defaults to a weld because the weld constraint system is buggy.
+	https://devforum.roblox.com/t/weld-constraint-behaves-differently-on-server-compared-to-client/445036
+	:::
+
+	:::info
+	We tend to create a weld constraint between parts and terrain, because terrain will remove welds when it
+	deforms for non-touching parts.
+
+	https://devforum.roblox.com/t/allow-way-to-prevent-terrain-after-deforming-from-removing-welds/631061
+	:::
+
+	@param name string
+	@param part0 BasePart
+	@param part1 BasePart
+	@param parent Instance? -- Optional
+	@return Weld | WeldConstraint
+]=]
 function WeldConstraintUtils.namedBetween(name, part0, part1, parent)
 	assert(type(name) == "string", "Bad name")
 	assert(typeof(part0) == "Instance", "Bad part0")
@@ -29,6 +51,20 @@ function WeldConstraintUtils.namedBetween(name, part0, part1, parent)
 	return weld
 end
 
+--[=[
+	Creates a new weld constraint between the given parts guaranteed.
+
+	:::info
+	This may not always work in ways you want, because Roblox is complicated. When in doubt, it is
+	recommend you use [WeldConstraintUtils.namedBetween] for all welding scenarios.
+	:::
+
+	@param name string
+	@param part0 BasePart
+	@param part1 BasePart
+	@param parent Instance? -- Optional
+	@return WeldConstraint
+]=]
 function WeldConstraintUtils.namedBetweenForceWeldConstraint(name, part0, part1, parent)
 	assert(type(name) == "string", "Bad name")
 	assert(typeof(part0) == "Instance", "Bad part0")

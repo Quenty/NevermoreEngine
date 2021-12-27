@@ -1,5 +1,7 @@
---- Utility functions for constructing rays from input objects
--- @module InputObjectRayUtils
+--[=[
+	Utility functions for constructing rays from input objects
+	@class InputObjectRayUtils
+]=]
 
 local Workspace = game:GetService("Workspace")
 
@@ -7,6 +9,14 @@ local DEFAULT_RAY_DISTANCE = 1000
 
 local InputObjectRayUtils = {}
 
+--[=[
+	Computes a camera ray from an inputObject
+	@param inputObject InputObject
+	@param distance number
+	@param offset Vector3? -- Optional
+	@param camera Camera? -- Optional
+	@return Ray
+]=]
 function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance, offset, camera)
 	assert(inputObject, "Bad inputObject")
 	offset = offset or Vector3.new()
@@ -14,6 +24,14 @@ function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance, off
 	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position + offset, distance, camera)
 end
 
+--[=[
+	Computes a camera ray from the mouse
+	@param mouse Mouse
+	@param distance number
+	@param offset Vector3? -- Optional
+	@param camera Camera? -- Optional
+	@return Ray
+]=]
 function InputObjectRayUtils.cameraRayFromMouse(mouse, distance, offset, camera)
 	assert(mouse, "Bad mouse")
 	offset = offset or Vector3.new(0, 0, 0)
@@ -24,6 +42,13 @@ function InputObjectRayUtils.cameraRayFromMouse(mouse, distance, offset, camera)
 		camera)
 end
 
+--[=[
+	@param inputObject InputObject
+	@param distance number? -- Optional
+	@param offset Vector3
+	@param camera Camera? -- Optional
+	@return Ray
+]=]
 function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, distance, offset, camera)
 	assert(inputObject, "Bad inputObject")
 
@@ -33,6 +58,12 @@ function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, dis
 		camera)
 end
 
+--[=[
+	@param position Vector3
+	@param distance number? -- Optional
+	@param camera Camera? -- Optional
+	@return Ray
+]=]
 function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance, camera)
 	distance = distance or DEFAULT_RAY_DISTANCE
 	camera = camera or Workspace.CurrentCamera
@@ -41,6 +72,12 @@ function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance, cam
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
+--[=[
+	@param position Vector3
+	@param distance number? -- Optional
+	@param camera Camera? -- Optional
+	@return Ray
+]=]
 function InputObjectRayUtils.cameraRayFromViewportPosition(position, distance, camera)
 	distance = distance or DEFAULT_RAY_DISTANCE
 	camera = camera or Workspace.CurrentCamera
@@ -49,8 +86,13 @@ function InputObjectRayUtils.cameraRayFromViewportPosition(position, distance, c
 	return Ray.new(baseRay.Origin, baseRay.Direction.unit * distance)
 end
 
-
--- Generates a circle of rays including the center ray
+--[=[
+	Generates a circle of rays including the center ray
+	@param ray Ray
+	@param count number
+	@param radius number
+	@return { Ray }
+]=]
 function InputObjectRayUtils.generateCircleRays(ray, count, radius)
 	local rays = { }
 

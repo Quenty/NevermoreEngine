@@ -1,6 +1,7 @@
----
--- @classmod AnimatedSpritesheetPlayer
--- @author Quenty
+--[=[
+	Plays an [AnimatedSpritesheet] for an given image label.
+	@class AnimatedSpritesheetPlayer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +14,12 @@ local AnimatedSpritesheetPlayer = setmetatable({}, BaseObject)
 AnimatedSpritesheetPlayer.ClassName = "AnimatedSpritesheetPlayer"
 AnimatedSpritesheetPlayer.__index = AnimatedSpritesheetPlayer
 
+--[=[
+	Constructs a new AnimatedSpritesheetPlayer
+	@param imageLabel ImageLabel
+	@param spritesheet AnimatedSpritesheet?
+	@return AnimatedSpritesheetPlayer
+]=]
 function AnimatedSpritesheetPlayer.new(imageLabel, spritesheet)
 	local self = setmetatable(BaseObject.new(spritesheet), AnimatedSpritesheetPlayer)
 
@@ -25,6 +32,10 @@ function AnimatedSpritesheetPlayer.new(imageLabel, spritesheet)
 	return self
 end
 
+--[=[
+	Sets the current sheet and starts play if needed
+	@param spritesheet AnimatedSpritesheet
+]=]
 function AnimatedSpritesheetPlayer:SetSheet(spritesheet)
 	assert(spritesheet, "Bad spritesheet")
 

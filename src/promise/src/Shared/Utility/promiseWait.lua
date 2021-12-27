@@ -1,5 +1,8 @@
---- Wraps the wait()/delay() API in a promise
--- @module promiseWait
+--[=[
+	Wraps the wait()/delay() API in a promise
+
+	@class promiseWait
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

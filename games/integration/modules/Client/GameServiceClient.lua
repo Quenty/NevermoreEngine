@@ -1,6 +1,6 @@
----
--- @module GameServiceClient
--- @author Quenty
+--[=[
+	@class GameServiceClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

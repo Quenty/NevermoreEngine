@@ -1,5 +1,7 @@
---- Holds single toggleable actions (like a tool system)
--- @classmod ActionManager
+--[=[
+	Holds single toggleable actions (like a tool system)
+	@class ActionManager
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

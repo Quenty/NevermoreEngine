@@ -1,5 +1,7 @@
---- Utilties for IK system
--- @module IKUtils
+--[=[
+	Utilties for IK system
+	@class IKUtils
+]=]
 
 local IKUtils = {}
 

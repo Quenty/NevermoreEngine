@@ -1,5 +1,7 @@
---- Data model for sprite sheets
--- @classmod Spritesheet
+--[=[
+	Data model for sprite sheets
+	@class Spritesheet
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,11 @@ local Spritesheet = {}
 Spritesheet.ClassName = "Spritesheet"
 Spritesheet.__index = Spritesheet
 
+--[=[
+	Constructs a new Spritesheet
+	@param texture string
+	@return Spritesheet
+]=]
 function Spritesheet.new(texture)
 	local self = setmetatable({}, Spritesheet)
 
@@ -18,10 +25,21 @@ function Spritesheet.new(texture)
 	return self
 end
 
+--[=[
+	Retrieves the preload asset ids to use
+	@return string
+]=]
 function Spritesheet:GetPreloadAssetId()
 	return self._texture
 end
 
+--[=[
+	@param index any
+	@param position Vector2
+	@param size Vector2
+
+	Adds a named sprite at the given index
+]=]
 function Spritesheet:AddSprite(index, position, size)
 	assert(not self._sprites[index], "Already exists")
 
@@ -35,6 +53,11 @@ function Spritesheet:AddSprite(index, position, size)
 	self._sprites[index] = sprite
 end
 
+--[=[
+	Retrieves the sprite for the given index
+	@param index any | EnumItem
+	@return Sprite?
+]=]
 function Spritesheet:GetSprite(index)
 	if not index then
 		warn("[Spritesheet.GetSprite] - Image name cannot be nil")
@@ -53,6 +76,11 @@ function Spritesheet:GetSprite(index)
 	return sprite
 end
 
+--[=[
+	Returns true if the sprite exists
+	@param index any | EnumItem
+	@return boolean
+]=]
 function Spritesheet:HasSprite(index)
 	return self:GetSprite(index) ~= nil
 end

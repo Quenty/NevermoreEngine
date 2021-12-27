@@ -1,11 +1,20 @@
---- Slave clock on the client
--- @classmod SlaveClock
+--[=[
+	Slave clock on the client
+	@class SlaveClock
+]=]
 
 local SlaveClock = {}
 SlaveClock.__index = SlaveClock
 SlaveClock.ClassName = "SlaveClock"
 SlaveClock._offset = -1 -- Set uncalculated values to -1
 
+--[=[
+	Constructs a new SlaveClock
+
+	@param remoteEvent RemoteEvent
+	@param remoteFunction RemoteFunction
+	@return SlaveClock
+]=]
 function SlaveClock.new(remoteEvent, remoteFunction)
 	local self = setmetatable({}, SlaveClock)
 
@@ -24,10 +33,19 @@ function SlaveClock.new(remoteEvent, remoteFunction)
 	return self
 end
 
+--[=[
+	Converts the syncedTime to the original tick value.
+	@param syncedTime number
+	@return number
+]=]
 function SlaveClock:TickToSyncedTime(syncedTime)
 	return syncedTime - self._offset
 end
 
+--[=[
+	Returns the sycncronized time
+	@return number
+]=]
 function SlaveClock:GetTime()
 	if not self:IsSynced() then
 		error("[SlaveClock.GetTime] - Slave clock is not yet synced")
@@ -36,6 +54,10 @@ function SlaveClock:GetTime()
 	return self:_getLocalTime() - self._offset
 end
 
+--[=[
+	Returns true if the manager has synced with the server
+	@return boolean
+]=]
 function SlaveClock:IsSynced()
 	return self._offset ~= -1
 end

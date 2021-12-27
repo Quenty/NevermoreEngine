@@ -1,6 +1,9 @@
---- Quaternion data type
--- @module Quaternion
--- @author xXxMoNkEyMaNxXx
+--[=[
+	Quaternion data type
+	Author: xXxMoNkEyMaNxXx
+
+	@class Quaternion
+]=]
 
 --[[
 God, grant me the serenity to accept the things I cannot change,

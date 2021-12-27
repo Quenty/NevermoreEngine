@@ -1,6 +1,9 @@
---- Renders the markdown
--- See: MarkdownParser
--- @classmod MarkdownRender
+--[=[
+	Renders the markdown
+	See: MarkdownParser
+
+	@class MarkdownRender
+]=]
 
 local TextService = game:GetService("TextService")
 
@@ -15,7 +18,7 @@ MarkdownRender.Indent = 30
 MarkdownRender.TextColor3 = Color3.fromRGB(56, 56, 56)
 MarkdownRender.MaxHeaderLevel = 3 -- h5 is the largest
 
---- Creates a new markdown render
+-- Creates a new markdown render
 -- @tparam GuiObject gui
 -- @tparam number width Width to render at
 function MarkdownRender.new(gui, width)
@@ -33,7 +36,7 @@ function MarkdownRender:WithOptions(options)
 
 	return self
 end
---- Renders the data in the given Gui
+-- Renders the data in the given Gui
 -- @param data Data from MarkdownParser
 function MarkdownRender:Render(data)
 	local height = 0
@@ -118,7 +121,7 @@ function MarkdownRender:_formatTextLabel(textLabel)
 	return textLabel
 end
 
---- Strip ending punctuation which screws with roblox's wordwrapping and .TextFits
+-- Strip ending punctuation which screws with roblox's wordwrapping and .TextFits
 function MarkdownRender:_renderParagraphLabel(label, text)
 	local labelWidth = label.Size.X.Scale*self._width + label.Size.X.Offset
 

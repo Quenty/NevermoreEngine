@@ -1,6 +1,7 @@
---- Represents a cooldown state with a time limit
--- @classmod Cooldown
--- @author Quenty
+--[=[
+	Represents a cooldown state with a time limit
+	@class Cooldown
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

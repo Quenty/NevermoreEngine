@@ -1,6 +1,8 @@
----
--- @classmod BasePermissionProvider
--- @author Quenty
+--[=[
+	Basic interface for providing permissions.
+	@server
+	@class BasePermissionProvider
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +14,12 @@ local BasePermissionProvider = setmetatable({}, BaseObject)
 BasePermissionProvider.ClassName = "BasePermissionProvider"
 BasePermissionProvider.__index = BasePermissionProvider
 
+--[=[
+	Initializes a new permission provider
+
+	@param config { remoteFunctionName: string }
+	@return BasePermissionProvider
+]=]
 function BasePermissionProvider.new(config)
 	local self = setmetatable(BaseObject.new(), BasePermissionProvider)
 
@@ -21,6 +29,9 @@ function BasePermissionProvider.new(config)
 	return self
 end
 
+--[=[
+	Starts the permission provider. Should be done via ServiceBag.
+]=]
 function BasePermissionProvider:Start()
 	assert(not self._remoteFunction, "No remoteFunction")
 
@@ -30,15 +41,38 @@ function BasePermissionProvider:Start()
 	end
 end
 
-function BasePermissionProvider:PromiseIsCreator(_player)
+--[=[
+	Returns whether the player is a creator.
+	@param player Player
+	@return Promise<boolean>
+]=]
+function BasePermissionProvider:PromiseIsCreator(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
 	error("Not implemented")
 end
 
-function BasePermissionProvider:PromiseIsAdmin(_player)
+--[=[
+	Returns whether the player is an admin.
+	@param player Player
+	@return Promise<boolean>
+]=]
+function BasePermissionProvider:PromiseIsAdmin(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
 	error("Not implemented")
 end
 
--- May return false if not loaded
+--[=[
+	Returns whether the player is a creator.
+
+	:::info
+	May return false if not loaded. Prefer using the promise version.
+	:::
+
+	@param player Player
+	@return boolean
+]=]
 function BasePermissionProvider:IsCreator(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
@@ -56,7 +90,16 @@ function BasePermissionProvider:IsCreator(player)
 	return result
 end
 
--- May return false if not loaded
+--[=[
+	Returns whether the player is an admin.
+
+	:::info
+	May return false if not loaded. Prefer using the promise version.
+	:::
+
+	@param player Player
+	@return boolean
+]=]
 function BasePermissionProvider:IsAdmin(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 

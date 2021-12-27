@@ -1,11 +1,28 @@
---- Helps play sounds on the client
--- @module SoundUtils
--- @author Quenty
+--[=[
+	Helps plays back sounds in the Roblox engine.
+
+	```lua
+	SoundUtils.playFromId("rbxassetid://4255432837") -- Plays a wooshing sound
+	```
+
+	@class SoundUtils
+]=]
 
 local SoundService = game:GetService("SoundService")
 
 local SoundUtils = {}
 
+--[=[
+	Plays back a template given the templateName.
+
+	:::tip
+	The sound will be automatically cleaned up after the sound is played.
+	:::
+
+	@param templates TemplateProvider
+	@param templateName string
+	@return Sound
+]=]
 function SoundUtils.playTemplate(templates, templateName)
 	assert(type(templates) == "table", "Bad templates")
 	assert(type(templateName) == "string", "Bad templateName")
@@ -22,6 +39,20 @@ function SoundUtils.playTemplate(templates, templateName)
 	return sound
 end
 
+--[=[
+	Plays back a template given asset id.
+
+	```lua
+	SoundUtils.playFromId("rbxassetid://4255432837") -- Plays a wooshing sound
+	```
+
+	:::tip
+	The sound will be automatically cleaned up after the sound is played.
+	:::
+
+	@param id string | number
+	@return Sound
+]=]
 function SoundUtils.playFromId(id)
 	local soundId = SoundUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
@@ -41,6 +72,11 @@ function SoundUtils.playFromId(id)
 	return sound
 end
 
+--[=[
+	Converts a string or number to a string for playback.
+	@param id string | number
+	@return string
+]=]
 function SoundUtils.toRbxAssetId(id)
 	if type(id) == "number" then
 		return ("rbxassetid://%d"):format(id)
@@ -49,6 +85,18 @@ function SoundUtils.toRbxAssetId(id)
 	end
 end
 
+--[=[
+	Plays back a sound template in a specific parent.
+
+	:::tip
+	The sound will be automatically cleaned up after the sound is played.
+	:::
+
+	@param templates TemplateProvider
+	@param templateName string
+	@param parent Instance
+	@return Sound
+]=]
 function SoundUtils.playTemplateInParent(templates, templateName, parent)
 	local sound = templates:Clone(templateName)
 	sound.Archivable = false
@@ -62,6 +110,5 @@ function SoundUtils.playTemplateInParent(templates, templateName, parent)
 
 	return sound
 end
-
 
 return SoundUtils

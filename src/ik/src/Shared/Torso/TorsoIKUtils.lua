@@ -1,5 +1,6 @@
----
--- @module TorsoIKUtils
+--[=[
+	@class TorsoIKUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

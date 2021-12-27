@@ -1,6 +1,10 @@
--- Hack to maintain default camera control by binding before and after the camera update cycle
--- This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme
--- @classmod DefaultCamera
+--[=[
+	Hack to maintain default camera control by binding before and after the camera update cycle
+	This allows other cameras to build off of the "default" camera while maintaining the same Roblox control scheme.
+
+	This camera is automatically setup by the [CameraStackService](/api/CameraStackService).
+	@class DefaultCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +17,11 @@ local SummedCamera = require("SummedCamera")
 local DefaultCamera = {}
 DefaultCamera.ClassName = "DefaultCamera"
 
+--[=[
+	Constructs a new DefaultCamera
+
+	@return DefaultCamera
+]=]
 function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)
 
@@ -25,6 +34,10 @@ function DefaultCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
+--[=[
+	Overrides the global field of view in the cached camera state
+	@param fieldOfView number
+]=]
 function DefaultCamera:OverrideGlobalFieldOfView(fieldOfView)
 	self._cameraState.FieldOfView = fieldOfView
 end
@@ -33,6 +46,13 @@ function DefaultCamera:OverrideCameraState(cameraState)
 	self._cameraState = cameraState or error("No CameraState")
 end
 
+--[=[
+	Binds the camera to RunService RenderStepped event.
+
+	:::tip
+	Be sure to call UnbindFromRenderStep when using this.
+	:::
+]=]
 function DefaultCamera:BindToRenderStep()
 	RunService:BindToRenderStep("DefaultCamera_Preupdate", Enum.RenderPriority.Camera.Value-2, function()
 		self._cameraState:Set(Workspace.CurrentCamera)
@@ -45,11 +65,20 @@ function DefaultCamera:BindToRenderStep()
 	self._cameraState = CameraState.new(Workspace.CurrentCamera)
 end
 
+--[=[
+	Unbinds the camera from the RunService
+]=]
 function DefaultCamera:UnbindFromRenderStep()
 	RunService:UnbindFromRenderStep("DefaultCamera_Preupdate")
 	RunService:UnbindFromRenderStep("DefaultCamera_PostUpdate")
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within DefaultCamera
+]=]
 function DefaultCamera:__index(index)
 	if index == "CameraState" then
 		return rawget(self, "_cameraState")

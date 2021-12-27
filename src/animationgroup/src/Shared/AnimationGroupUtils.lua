@@ -1,5 +1,9 @@
----
--- @module AnimationGroupUtils
+--[=[
+	An animation group is a group of animations, such as the idle animations that Roblox plays.
+	This utility functions are intended to help recreate a custom animation playback system with
+	weighted values.
+	@class AnimationGroupUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -7,6 +11,26 @@ local AnimationTrackUtils = require("AnimationTrackUtils")
 
 local AnimationGroupUtils = {}
 
+--[=[
+	@interface WeightedAnimation
+	.animationId string
+	.weight number
+	@within AnimationGroupUtils
+]=]
+
+--[=[
+	@interface WeightedTrack
+	.track Track
+	.weight number
+	@within AnimationGroupUtils
+]=]
+
+--[=[
+	Creates a new weighted track list.
+	@param humanoid Humanoid
+	@param weightedAnimationList { WeightedAnimation }
+	@return { WeightedTrack }
+]=]
 function AnimationGroupUtils.createdWeightedTracks(humanoid, weightedAnimationList)
 	assert(humanoid, "Bad humanoid")
 	assert(weightedAnimationList, "Bad weightedAnimationList")
@@ -23,6 +47,13 @@ function AnimationGroupUtils.createdWeightedTracks(humanoid, weightedAnimationLi
 	return tracks
 end
 
+--[=[
+	Creates a new weighted animation.
+
+	@param animationId string
+	@param weight number
+	@return WeightedAnimation
+]=]
 function AnimationGroupUtils.createdWeightedAnimation(animationId, weight)
 	assert(type(animationId) == "string", "Bad animationId")
 	assert(type(weight) == "number", "Bad weight")
@@ -33,6 +64,13 @@ function AnimationGroupUtils.createdWeightedAnimation(animationId, weight)
 	}
 end
 
+--[=[
+	Creates a new weighted track.
+
+	@param track Track
+	@param weight number
+	@return WeightedTrack
+]=]
 function AnimationGroupUtils.createdWeightedTrack(track, weight)
 	assert(typeof(track) == "Instance" and track:IsA("AnimationTrack"), "Bad track")
 	assert(type(weight) == "number", "Bad weight")
@@ -43,6 +81,12 @@ function AnimationGroupUtils.createdWeightedTrack(track, weight)
 	}
 end
 
+--[=[
+	Picks a weighted track for playback.
+
+	@param weightedTracks { WeightedTrack }
+	@return WeightedTrack?
+]=]
 function AnimationGroupUtils.selectFromWeightedTracks(weightedTracks)
 	assert(type(weightedTracks) == "table", "Bad weightedTracks")
 	assert(#weightedTracks > 0, "Bad weightedTracks")

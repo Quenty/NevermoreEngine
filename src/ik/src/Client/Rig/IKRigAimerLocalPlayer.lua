@@ -1,6 +1,10 @@
----
--- @classmod IKRigAimerLocalPlayer
--- @author Quenty
+--[=[
+	Handles repliation and aiming of the local player's character for
+	IK.
+
+	@client
+	@class IKRigAimerLocalPlayer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

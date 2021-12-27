@@ -1,6 +1,6 @@
----
--- @module ResetServiceConstants
--- @author Quenty
+--[=[
+	@class ResetServiceConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,7 +1,12 @@
---- Allows transparency to manually be controlled for a character in first-person
--- mode
--- @classmod FirstPersonCharacterTransparency
--- @author Quenty
+--[=[
+	Allows transparency to manually be controlled for a character in first-person mode.
+
+	:::tip
+	Make sure to initialize [TransparencyService] in the [ServiceBag] before using this.
+	:::
+
+	@class FirstPersonCharacterTransparency
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +17,12 @@ local FirstPersonCharacterTransparency = setmetatable({}, BaseObject)
 FirstPersonCharacterTransparency.ClassName = "FirstPersonCharacterTransparency"
 FirstPersonCharacterTransparency.__index = FirstPersonCharacterTransparency
 
+--[=[
+	Creates a new FirstPersonCharacterTransparency
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return FirstPersonCharacterTransparency
+]=]
 function FirstPersonCharacterTransparency.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), FirstPersonCharacterTransparency)
 
@@ -42,6 +53,10 @@ function FirstPersonCharacterTransparency.new(humanoid, serviceBag)
 	return self
 end
 
+--[=[
+	Sets the transparency
+	@param transparency number
+]=]
 function FirstPersonCharacterTransparency:SetTransparency(transparency)
 	assert(type(transparency) == "number", "Bad transparency")
 

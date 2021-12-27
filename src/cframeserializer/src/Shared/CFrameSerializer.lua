@@ -1,6 +1,9 @@
---- Optimized these functions for speed as well as preserving fidality.
---  In the future, use Roblox's orthogonal angle format.
--- @module CFrameSerializer
+--[=[
+	Optimized these functions for speed as well as preserving fidality.
+	In the future, use Roblox's orthogonal angle format.
+
+	@class CFrameSerializer
+]=]
 
 local CFrameSerializer = {}
 
@@ -15,6 +18,11 @@ end
 
 local PRECISION = 10000
 
+--[=[
+	Outputs the rotation
+	@param cf CFrame
+	@return { number, number, number, number, number, number }
+]=]
 function CFrameSerializer.outputRotationAzure(cf)
 	local lookVector = cf.LookVector
 	local azumith = atan2(-lookVector.X, -lookVector.Z)
@@ -40,10 +48,20 @@ function CFrameSerializer.outputRotationAzure(cf)
 	return {px, py, pz, azumith, roll, elevation}
 end
 
+--[=[
+	Returns the position
+	@param data { number, number, number, number, number, number }
+	@return Vector3
+]=]
 function CFrameSerializer.readPosition(data)
 	return Vector3.new(data[1], data[2], data[3])
 end
 
+--[=[
+	Returns the CFrame
+	@param data { number, number, number, number, number, number }
+	@return Vector3
+]=]
 function CFrameSerializer.readRotationAzure(data)
 	local azumith = data[4]
 	local roll = data[5] --Buffer:ReadSigned(21)

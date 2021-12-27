@@ -1,5 +1,7 @@
---- Binds the given class to each player in the game
--- @classmod PlayerBinder
+--[=[
+	Binds the given class to each player in the game
+	@class PlayerBinder
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,12 +13,23 @@ local PlayerBinder = setmetatable({}, Binder)
 PlayerBinder.ClassName = "PlayerBinder"
 PlayerBinder.__index = PlayerBinder
 
+--[=[
+	Returns a new PlayerBinder
+	@param tag string
+	@param class BinderContructor
+	@param ... any
+	@return PlayerBinder<T>
+]=]
 function PlayerBinder.new(tag, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerBinder)
 
 	return self
 end
 
+--[=[
+	Starts the binder. See [Binder.Start].
+	Should be done via a [ServiceBag].
+]=]
 function PlayerBinder:Start()
 	local results = { getmetatable(PlayerBinder).Start(self) }
 

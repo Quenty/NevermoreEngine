@@ -1,5 +1,7 @@
---- Utility functions for manipulating terrain
--- @module TerrainUtils
+--[=[
+	Utility functions for manipulating terrain
+	@class TerrainUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

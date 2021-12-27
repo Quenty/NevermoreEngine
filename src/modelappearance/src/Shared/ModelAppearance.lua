@@ -1,6 +1,9 @@
---- Allows the appearance of a model to be overridden. Most commonly used when
--- placing down an object in a building game.
--- @classmod ModelAppearance
+--[=[
+	Allows the appearance of a model to be overridden. Most commonly used when
+	placing down an object in a building game.
+
+	@class ModelAppearance
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

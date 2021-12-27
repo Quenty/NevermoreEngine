@@ -1,5 +1,7 @@
---- Utility methods for promise
--- @module PromiseUtils
+--[=[
+	Utility methods for promise
+	@class PromiseUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -7,10 +9,11 @@ local Promise = require("Promise")
 
 local PromiseUtils = {}
 
---- Returns the value of the first promise resolved
--- @constructor First
--- @tparam Array(Promise) promises
--- @treturn Promise Promise that resolves with first result
+--[=[
+	Returns the value of the first promise resolved
+	@param promises { Promise<T> }
+	@return Promise<T> -- Promise that resolves with first result
+]=]
 function PromiseUtils.any(promises)
 	local returnPromise = Promise.new()
 
@@ -29,10 +32,13 @@ function PromiseUtils.any(promises)
 	return returnPromise
 end
 
---- Executes all promises. If any fails, the result will be rejected. However, it yields until
---  every promise is complete
--- @constructor First
--- @treturn Promise
+--[=[
+	Executes all promises. If any fails, the result will be rejected. However, it yields until
+	every promise is complete.
+
+	@param promises { Promise<T> }
+	@return Promise<T>
+]=]
 function PromiseUtils.all(promises)
 	if #promises == 0 then
 		return Promise.resolved()
@@ -62,6 +68,13 @@ function PromiseUtils.all(promises)
 	return returnPromise
 end
 
+--[=[
+	Inverts the result of a promise, turning a resolved promise
+	into a rejected one, and a rejected one into a resolved one.
+
+	@param promise Promise<T>
+	@return Promise<T>
+]=]
 function PromiseUtils.invert(promise)
 	if promise:IsPending() then
 		return promise:Then(function(...)
@@ -79,6 +92,12 @@ function PromiseUtils.invert(promise)
 	end
 end
 
+--[=[
+	Creates a promise from a signal
+
+	@param signal Signal<T>
+	@return Promise<T>
+]=]
 function PromiseUtils.fromSignal(signal)
 	local promise = Promise.new()
 	local conn
@@ -95,6 +114,14 @@ function PromiseUtils.fromSignal(signal)
 	return promise
 end
 
+--[=[
+	Creates a new promise from the given promise that will
+	reject after the given `timeoutTime`
+
+	@param timeoutTime number
+	@param fromPromise Promise<T>
+	@return Promise<T>
+]=]
 function PromiseUtils.timeout(timeoutTime, fromPromise)
 	assert(type(timeoutTime) == "number", "Bad timeoutTime")
 	assert(fromPromise, "Bad fromPromise")
@@ -107,12 +134,11 @@ function PromiseUtils.timeout(timeoutTime, fromPromise)
 
 	promise:Resolve(fromPromise)
 
-	delay(timeoutTime, function()
+	task.delay(timeoutTime, function()
 		promise:Reject()
 	end)
 
 	return promise
-
 end
 
 return PromiseUtils

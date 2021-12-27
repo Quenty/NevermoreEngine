@@ -1,6 +1,9 @@
---- Handles searching for bound objects following links (object values) under a parent
--- with a specific name.
--- @classmod BoundLinkCollection
+--[=[
+	Handles searching for bound objects following links (object values) under a parent
+	with a specific name.
+
+	@class BoundLinkCollection
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,5 +1,7 @@
---- Utilities involving signals
--- @module SignalUtils
+--[=[
+	Utilities involving signals
+	@class SignalUtils
+]=]
 
 local SignalUtils = {}
 

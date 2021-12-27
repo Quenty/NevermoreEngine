@@ -1,6 +1,6 @@
----
--- @classmod FadeBetweenCamera4
--- @author Quenty
+--[=[
+	@class FadeBetweenCamera4
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +13,11 @@ local FadeBetweenCamera4 = {}
 FadeBetweenCamera4.ClassName = "FadeBetweenCamera4"
 FadeBetweenCamera4.__index = FadeBetweenCamera4
 
+--[=[
+	@param cameraA CameraLike
+	@param cameraB CameraLike
+	@return FadeBetweenCamera4
+]=]
 function FadeBetweenCamera4.new(cameraA, cameraB)
 	local self = setmetatable({
 		CameraA = cameraA or error("No cameraA");
@@ -57,6 +62,12 @@ function FadeBetweenCamera4:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within FadeBetweenCamera4
+]=]
 function FadeBetweenCamera4:__index(index)
 	if index == "CameraState" then
 		local _, value = SpringUtils.animating(self._spring)

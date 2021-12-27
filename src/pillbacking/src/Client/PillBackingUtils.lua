@@ -1,5 +1,7 @@
---- Utilities for working with pill backings
--- @module PillBackingUtils
+--[=[
+	Utilities for working with pill backings
+	@class PillBackingUtils
+]=]
 
 local PillBackingUtils = {}
 

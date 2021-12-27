@@ -1,10 +1,19 @@
---- Utility functions involving haptic feedback on gamepads
--- @module HapticFeedbackUtils
+--[=[
+	Utility functions involving haptic feedback on gamepads.
+	@class HapticFeedbackUtils
+]=]
 
 local HapticService = game:GetService("HapticService")
 
 local HapticFeedbackUtils = {}
 
+--[=[
+	Provides a small vibration.
+
+	@param userInputType UserInputType
+	@param length number
+	@param amplitude number
+]=]
 function HapticFeedbackUtils.smallVibrate(userInputType, length, amplitude)
 	length = length or 0.1
 	amplitude = amplitude or 1
@@ -16,12 +25,26 @@ function HapticFeedbackUtils.smallVibrate(userInputType, length, amplitude)
 	end
 end
 
+--[=[
+	Sets the small vibrators on the gamepad
+	@param userInputType UserInputType
+	@param amplitude number
+	@return boolean
+]=]
 function HapticFeedbackUtils.setSmallVibration(userInputType, amplitude)
 	assert(type(amplitude) == "number", "Bad amplitude")
 
 	return HapticFeedbackUtils.setVibrationMotor(userInputType, Enum.VibrationMotor.Small, amplitude)
 end
 
+--[=[
+	Sets the small vibrators on the gamepad
+	@param userInputType UserInputType
+	@param vibrationMotor VibrationMotor
+	@param amplitude number
+	@param ... number -- vibrationValues
+	@return boolean
+]=]
 function HapticFeedbackUtils.setVibrationMotor(userInputType, vibrationMotor, amplitude, ...)
 	assert(type(amplitude) == "number", "Bad amplitude")
 

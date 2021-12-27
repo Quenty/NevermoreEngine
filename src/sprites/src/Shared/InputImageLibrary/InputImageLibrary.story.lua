@@ -1,6 +1,6 @@
----
--- @module DialogSlider.story
--- @author Quenty
+--[[
+	@class InputImageLibrary.story
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

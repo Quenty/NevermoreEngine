@@ -1,5 +1,7 @@
---- Extends PartTouchingCalculator with generic binder stuff
--- @classmod BinderTouchingCalculator
+--[=[
+	Extends PartTouchingCalculator with generic binder stuff
+	@class BinderTouchingCalculator
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

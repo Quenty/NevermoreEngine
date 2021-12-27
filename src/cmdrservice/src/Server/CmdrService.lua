@@ -1,6 +1,9 @@
----
--- @module CmdrService
--- @author Quenty
+--[=[
+	Bridge to https://eryn.io/Cmdr/
+
+	Uses [PermissionService] to provide permissions.
+	@class CmdrService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -14,6 +17,10 @@ local CmdrService = {}
 
 local GLOBAL_REGISTRY = setmetatable({}, {__mode = "kv"})
 
+--[=[
+	Initializes the CmdrService. Should be done via [ServiceBag].
+	@param serviceBag ServiceBag
+]=]
 function CmdrService:Init(serviceBag)
 	assert(not self._cmdr, "Already initialized")
 
@@ -47,16 +54,28 @@ function CmdrService:Init(serviceBag)
 	GLOBAL_REGISTRY[self._serviceId] = self
 end
 
+--[=[
+	Starts the service. Should be done via [ServiceBag]
+]=]
 function CmdrService:Start()
 	self._cmdr:RegisterDefaultCommands()
 end
 
+--[=[
+	Returns cmdr
+	@return Promise<Cmdr>
+]=]
 function CmdrService:PromiseCmdr()
 	assert(self._cmdr, "Not initialized")
 
 	return Promise.resolved(self._cmdr)
 end
 
+--[=[
+	Registers a command into cmdr.
+	@param commandData table
+	@param execute (context: table, ... T)
+]=]
 function CmdrService:RegisterCommand(commandData, execute)
 	assert(self._cmdr, "Not initialized")
 	assert(commandData, "No commandData")

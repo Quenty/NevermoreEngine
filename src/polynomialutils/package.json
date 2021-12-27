@@ -1,7 +1,7 @@
 {
   "name": "@quenty/polynomialutils",
   "version": "2.0.0",
-  "description": "PolynomialUtils",
+  "description": "Solves polynomials of certain degrees.",
   "keywords": [
     "Roblox",
     "Nevermore",

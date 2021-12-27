@@ -1,6 +1,6 @@
----
--- @module InsertServiceUtils
--- @author Quenty
+--[=[
+	@class InsertServiceUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,7 +10,12 @@ local Promise = require("Promise")
 
 local InsertServiceUtils = {}
 
---- Promises the resulting asset is inserted from insert service, or a rejection
+--[=[
+	Promises the resulting asset is inserted from insert service, or a rejection
+
+	@param assetId number
+	@return Promise<Instance>
+]=]
 function InsertServiceUtils.promiseAsset(assetId)
 	assert(type(assetId) == "number", "Bad assetId")
 

@@ -1,5 +1,7 @@
---- Throttles execution of a functon. Does both leading, and following
--- @classmod ThrottledFunction
+--[=[
+	Throttles execution of a functon. Does both leading, and following
+	@class ThrottledFunction
+]=]
 
 local ThrottledFunction = {}
 ThrottledFunction.ClassName = "ThrottledFunction"

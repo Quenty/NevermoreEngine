@@ -1,5 +1,7 @@
---- Builds a pill backing for Guis
--- @classmod PillBackingBuilder
+--[=[
+	Builds a pill backing for Guis
+	@class PillBackingBuilder
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,6 +1,6 @@
----
--- @module IKAimPositionPriorites
--- @author Quenty
+--[=[
+	@class IKAimPositionPriorites
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

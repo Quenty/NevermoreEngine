@@ -1,6 +1,7 @@
----
--- @module PermissionProviderConstants
--- @author Quenty
+--[=[
+	Constants for the permission system
+	@class PermissionProviderConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

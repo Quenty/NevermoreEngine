@@ -1,5 +1,7 @@
---- Help manage the visibility of GUIs while only constructing the Gui while visible
--- @classmod GuiVisibleManager
+--[=[
+	Help manage the visibility of GUIs while only constructing the Gui while visible
+	@class GuiVisibleManager
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

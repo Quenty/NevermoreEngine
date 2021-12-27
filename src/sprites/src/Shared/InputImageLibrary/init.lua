@@ -1,5 +1,9 @@
---- Input image library
--- @module InputImageLibrary
+--[=[
+	InputImageLibrary with a variety of dark and light themed icons for inputs on keyboard, xbox, touched events,
+	mouse, and more.
+
+	@class InputImageLibrary
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -18,6 +22,11 @@ function InputImageLibrary.new(parentFolder)
 	return self
 end
 
+--[=[
+	Retrieves all the asset ids to preload
+
+	@return { string }
+]=]
 function InputImageLibrary:GetPreloadAssetIds()
 	local assets = {}
 	for _, platformSheets in pairs(self._spritesheets) do
@@ -39,8 +48,14 @@ function InputImageLibrary:_loadSpriteSheets(parentFolder)
 	end
 end
 
----
--- @treturn Sprite
+--[=[
+	Retrieves a sprite from the library
+
+	@param index number -- The sprite index to get
+	@param preferredStyle string -- The preferred style type to retrieve this in
+	@param preferredPlatform string -- The preferred platform to get the sprite for
+	@return Sprite
+]=]
 function InputImageLibrary:GetSprite(index, preferredStyle, preferredPlatform)
 	local sheet = self:_pickSheet(index, preferredStyle, preferredPlatform)
 	if sheet then

@@ -1,6 +1,7 @@
---- Provides utility functions to work with attributes in Roblox
--- @module AttributeUtils
--- @author Quenty
+--[=[
+	Provides utility functions to work with attributes in Roblox
+	@class AttributeUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,6 +11,15 @@ local Maid = require("Maid")
 
 local AttributeUtils = {}
 
+--[=[
+	Whenever the attribute is true, the binder will be bound, and when the
+	binder is bound, the attribute will be true.
+
+	@param instance Instance
+	@param attributeName string
+	@param binder Binder<T>
+	@return Maid
+]=]
 function AttributeUtils.bindToBinder(instance, attributeName, binder)
 	assert(binder, "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")

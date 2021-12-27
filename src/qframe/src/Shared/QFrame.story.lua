@@ -1,6 +1,6 @@
----
--- @module QFrame.story
--- @author Quenty
+--[[
+	@class QFrame.story
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

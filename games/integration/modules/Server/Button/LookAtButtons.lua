@@ -1,6 +1,7 @@
---- Makes the character look at nearby physical buttons
--- @classmod LookAtButtons
--- @author Quenty
+--[=[
+	Makes the character look at nearby physical buttons
+	@class LookAtButtons
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,6 +1,6 @@
----
--- @module ParticleEngineConstants
--- @author Quenty
+--[=[
+	@class ParticleEngineConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

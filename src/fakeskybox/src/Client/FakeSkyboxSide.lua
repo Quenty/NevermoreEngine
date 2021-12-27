@@ -1,5 +1,6 @@
----
--- @module FakeSkyboxSide
+--[=[
+	@class FakeSkyboxSide
+]=]
 
 local FakeSkyboxSide = {}
 FakeSkyboxSide.__index = FakeSkyboxSide

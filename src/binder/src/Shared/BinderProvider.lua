@@ -1,5 +1,7 @@
---- Provides a basis for binders that can be retrieved anywhere
--- @classmod BinderProvider
+--[=[
+	Provides a basis for binders that can be retrieved anywhere
+	@class BinderProvider
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,28 @@ local BinderProvider = {}
 BinderProvider.ClassName = "BinderProvider"
 BinderProvider.__index = BinderProvider
 
+--[=[
+	Constructs a new BinderProvider.
+
+	```lua
+	local serviceBag = ServiceBag.new()
+
+	-- Usually in a separate file!
+	local binderProvider = BinderProvider.new(function(self, serviceBag)
+		serviceBag:Add(Binder.new("Bird", require("Bird")))
+	end)
+
+	-- Retrieve binders
+	local binders = serviceBag:GetService(binderProvider)
+
+	-- Runs the game (including binders)
+	serviceBag:Init()
+	serviceBag:Start()
+	```
+
+	@param initMethod (self, serviceBag: ServiceBag)
+	@return BinderProvider
+]=]
 function BinderProvider.new(initMethod)
 	local self = setmetatable({}, BinderProvider)
 
@@ -25,13 +49,21 @@ function BinderProvider.new(initMethod)
 	return self
 end
 
---- Retrieves whether or not its a binder provider
--- @param value
--- @return true or false, whether or not it is a value
+--[=[
+	Retrieves whether or not its a binder provider
+	@param value any
+	@return boolean -- True if it is a binder provider
+]=]
 function BinderProvider.isBinderProvider(value)
 	return type(value) == "table" and value.ClassName == "BinderProvider"
 end
 
+--[=[
+	Resolves to the given binder given the binderName.
+
+	@param binderName string
+	@return Promise<Binder<T>>
+]=]
 function BinderProvider:PromiseBinder(binderName)
 	if self._bindersAddedPromise:IsFulfilled() then
 		local binder = self:Get(binderName)
@@ -53,7 +85,11 @@ function BinderProvider:PromiseBinder(binderName)
 		end)
 end
 
--- Initializes itself and all binders
+--[=[
+	Initializes itself and all binders
+
+	@param ... ServiceBag | any
+]=]
 function BinderProvider:Init(...)
 	assert(not self._initialized, "Already initialized")
 
@@ -62,15 +98,27 @@ function BinderProvider:Init(...)
 	self._bindersAddedPromise:Resolve()
 end
 
+--[=[
+	Returns a promise that will resolve once all binders are added.
+
+	@return Promise
+]=]
 function BinderProvider:PromiseBindersAdded()
 	return self._bindersAddedPromise
 end
 
+--[=[
+	Returns a promise that will resolve once all binders are started.
+
+	@return Promise
+]=]
 function BinderProvider:PromiseBindersStarted()
 	return self._startPromise
 end
 
--- Starts all of the binders
+--[=[
+	Starts all of the binders.
+]=]
 function BinderProvider:Start()
 	assert(self._initialized, "Not initialized")
 	assert(not self._started, "Already started")
@@ -92,11 +140,22 @@ function BinderProvider:__index(index)
 	error(("%q Not a valid index"):format(tostring(index)))
 end
 
+--[=[
+	Retrieves a binder given a tagName
+
+	@param tagName string
+	@return Binder<T>?
+]=]
 function BinderProvider:Get(tagName)
 	assert(type(tagName) == "string", "tagName must be a string")
 	return rawget(self, tagName)
 end
 
+--[=[
+	Adds a binder given a tag name.
+
+	@param binder Binder<T>
+]=]
 function BinderProvider:Add(binder)
 	assert(not self._started, "Already inited")
 	assert(not self:Get(binder:GetTag()), "Binder already exists")

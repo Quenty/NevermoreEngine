@@ -1,21 +1,25 @@
---- A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
--- @classmod qGui
+--[=[
+	A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
+	@class qGui
+]=]
 
 local RunService = game:GetService("RunService")
 
 local qGUI = {}
 
-function qGUI.PointInBounds(Frame, X, Y)
-	local TopBound = Frame.AbsolutePosition.Y
-	local BottomBound = Frame.AbsolutePosition.Y + Frame.AbsoluteSize.Y
-	local LeftBound = Frame.AbsolutePosition.X
-	local RightBound = Frame.AbsolutePosition.X + Frame.AbsoluteSize.X
+function qGUI.PointInBounds(frame, x, y)
+	local position = frame.AbsolutePosition
+	local size = frame.AbsoluteSize
 
-	if Y > TopBound and Y < BottomBound and X > LeftBound and X < RightBound then
-		return true
-	else
-		return false
-	end
+	local top = position.Y
+	local bottom = position.Y + size.Y
+	local left = position.X
+	local right = position.X + size.X
+
+	return y > top
+		and y < bottom
+		and x > left
+		and x < right
 end
 
 function qGUI.MouseOver(Mouse, Frame)
@@ -29,7 +33,7 @@ local function CreateYieldedUpdate(UpdateFunction)
 	local AnimationId = 0
 	local LastUpdatePoint = -1 -- If it's -1, no active thread.
 
-	--- Increments the AnimationId and returns a new UpdateFunction
+	-- Increments the AnimationId and returns a new UpdateFunction
 	-- to be bound into RenderStep
 	local function GetNewUpdateFunction(RenderStepKey)
 
@@ -39,7 +43,7 @@ local function CreateYieldedUpdate(UpdateFunction)
 		-- Note that we're now updating.
 		LastUpdatePoint = tick()
 
-		--- Intended to be called each RenderStep. Will unbind itself if the UpdateFunction fails
+		-- Intended to be called each RenderStep. Will unbind itself if the UpdateFunction fails
 		-- or a new update function is generated
 		return function()
 			LastUpdatePoint = tick()
@@ -54,7 +58,7 @@ local function CreateYieldedUpdate(UpdateFunction)
 		end
 	end
 
-	--- Calculates the time since the last update function was called
+	-- Calculates the time since the last update function was called
 	-- Used to determine if a new update function should be generated, since clients tend to
 	-- kill threads when local scripts are GCed
 	local function TimeSinceUpdate()
@@ -67,13 +71,13 @@ local function CreateYieldedUpdate(UpdateFunction)
 			or TimeSinceUpdate() > 0.1 -- In this case, our presumed active thread is dead.
 	end
 
-	--- Starts an update thread, potentialy removing the old one.
+	-- Starts an update thread, potentialy removing the old one.
 	local function StartNewThread()
 		local RenderStepKey = "TweenTransparencyOnGuis" .. tostring(UpdateFunction) .. tick()
 		RunService:BindToRenderStep(RenderStepKey, 2000, GetNewUpdateFunction(RenderStepKey))
 	end
 
-	--- Starts the tween
+	-- Starts the tween
 	return function()
 		if ShouldStartUpdate() then
 			StartNewThread()
@@ -81,7 +85,7 @@ local function CreateYieldedUpdate(UpdateFunction)
 	end
 end
 
---- Creates a tweener that only runs when it's updating with a set properties system.
+-- Creates a tweener that only runs when it's updating with a set properties system.
 -- @param function `SetProperties`
 	-- SetProperties(Gui, Percent, StartProperties, NewProperties)
 		-- @param Gui The Gui to set properties on
@@ -139,7 +143,7 @@ local function MakePropertyTweener(SetProperties)
 		return ShouldStop
 	end)
 
-	--- A tweening function to begin tweening on a Gui element
+	-- A tweening function to begin tweening on a Gui element
 	-- @param Gui The GUI to tween the Transparency's upon
 	-- @param NewProperties The properties to be changed. It will take the current
 	--                      properties and tween to the new ones. This table should be
@@ -163,7 +167,7 @@ local function MakePropertyTweener(SetProperties)
 end
 
 -- TweenTransparency(Gui, NewProperties, Time)
---- Tween's the Transparency values in a GUI,
+-- Tween's the Transparency values in a GUI,
 -- @param Gui The GUI to tween the Transparency's upon
 -- @param NewProperties The properties to be changed. It will take the current
 --                      properties and tween to the new ones. This table should be
@@ -182,8 +186,8 @@ qGUI.TweenTransparency = TweenTransparency
 qGUI.StopTransparencyTween = StopTransparencyTween
 
 
---- TweenColor3(Gui, NewProperties, Time)
---- Tween's the Color3 values in a GUI,
+-- TweenColor3(Gui, NewProperties, Time)
+-- Tween's the Color3 values in a GUI,
 -- @param Gui The GUI to tween the Color3's upon
 -- @param NewProperties The properties to be changed. It will take the current
 --                      properties and tween to the new ones. This table should be
@@ -214,7 +218,7 @@ end
 qGUI.TweenColor3 = TweenColor3
 qGUI.StopColor3Tween = StopColor3Tween
 
---- Makes a 'Textured' window...  9Scale thingy?
+-- Makes a 'Textured' window...  9Scale thingy?
 local function AddTexturedWindowTemplate(Frame, Radius, Type)
 	Type = Type or 'Frame'
 
@@ -299,7 +303,7 @@ local function AddTexturedWindowTemplate(Frame, Radius, Type)
 end
 qGUI.AddTexturedWindowTemplate = AddTexturedWindowTemplate
 
---- Makes a NinePatch in the frame, with the image.
+-- Makes a NinePatch in the frame, with the image.
 -- @param Frame The frame to texturize
 -- @param Radius the radius you want the image to be at
 -- @param Type The type (Class) that the frame should be, either an ImageLabel or an ImageButton

@@ -1,6 +1,7 @@
----
--- @module CameraTouchInputUtils
--- @author Quenty
+--[=[
+	Utility methods involving touch input and cameras.
+	@class CameraTouchInputUtils
+]=]
 
 local CameraTouchInputUtils = {}
 
@@ -15,8 +16,15 @@ local TOUCH_ADJUST_AREA_DOWN = math.rad(-15)
 local TOUCH_SENSITIVTY_ADJUST_MAX_Y = 2.1
 local TOUCH_SENSITIVTY_ADJUST_MIN_Y = 0.5
 
---- Adjusts the camera Y touch Sensitivity when moving away from the center and in the TOUCH_SENSITIVTY_ADJUST_AREA
--- Straight from Roblox's code
+--[=[
+	Adjusts the camera Y touch Sensitivity when moving away from the center and in the TOUCH_SENSITIVTY_ADJUST_AREA
+	Straight from Roblox's code
+
+	@param currPitchAngle number
+	@param sensitivity Vector2
+	@param delta Vector2
+	Return Vector2
+]=]
 function CameraTouchInputUtils.adjustTouchSensitivity(currPitchAngle, sensitivity, delta)
 	local multiplierY = TOUCH_SENSITIVTY_ADJUST_MAX_Y
 	if currPitchAngle > TOUCH_ADJUST_AREA_UP and delta.Y < 0 then

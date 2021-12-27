@@ -1,6 +1,18 @@
----
--- @classmod Subscription
--- @author Quenty
+--[=[
+	Subscriptions are used in the callback for an [Observable](/api/Observable). Standard usage
+	is as follows.
+
+	```lua
+	-- Constucts an observable which will emit a, b, c via a subscription
+	Observable.new(function(sub)
+		sub:Fire("a")
+		sub:Fire("b")
+		sub:Fire("c")
+		sub:Complete() -- ends stream
+	end)
+	```
+	@class Subscription
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -17,6 +29,15 @@ local stateTypes = {
 	CANCELLED = "cancelled";
 }
 
+--[=[
+	Constructs a new Subscription
+
+	@param fireCallback function?
+	@param failCallback function?
+	@param completeCallback function?
+	@param onSubscribe () -> MaidTask
+	@return Subscription
+]=]
 function Subscription.new(fireCallback, failCallback, completeCallback, onSubscribe)
 	assert(type(fireCallback) == "function" or fireCallback == nil, "Bad fireCallback")
 	assert(type(failCallback) == "function" or failCallback == nil, "Bad failCallback")
@@ -31,6 +52,11 @@ function Subscription.new(fireCallback, failCallback, completeCallback, onSubscr
 	}, Subscription)
 end
 
+--[=[
+	Fires the subscription
+
+	@param ... any
+]=]
 function Subscription:Fire(...)
 	if self._state == stateTypes.PENDING and self._fireCallback then
 		self._fireCallback(...)
@@ -39,6 +65,9 @@ function Subscription:Fire(...)
 	end
 end
 
+--[=[
+	Fails the subscription, preventing anything else from emitting.
+]=]
 function Subscription:Fail()
 	if self._state ~= stateTypes.PENDING then
 		return
@@ -53,6 +82,25 @@ function Subscription:Fail()
 	self:_doCleanup()
 end
 
+
+--[=[
+	Returns a tuple of fire, fail and complete functions which
+	can be chained into the the next subscription.
+
+	```lua
+	return function(source)
+		return Observable.new(function(sub)
+			sub:Fire("hi")
+
+			return source:Subscribe(sub:GetFireFailComplete())
+		end)
+	end
+	```
+
+	@return function
+	@return function
+	@return function
+]=]
 function Subscription:GetFireFailComplete()
 	return function(...)
 		self:Fire(...)
@@ -63,7 +111,23 @@ function Subscription:GetFireFailComplete()
 	end
 end
 
+--[=[
+	Returns a tuple of fail and complete functions which
+	can be chained into the the next subscription.
 
+	```lua
+	return function(source)
+		return Observable.new(function(sub)
+			return source:Subscribe(function(result)
+				sub:Fire(tostring(result))
+			end, sub:GetFailComplete()) -- Reuse is easy here!
+		end)
+	end
+	```
+
+	@return function
+	@return function
+]=]
 function Subscription:GetFailComplete()
 	return function(...)
 		self:Fail(...)
@@ -72,6 +136,10 @@ function Subscription:GetFailComplete()
 	end
 end
 
+--[=[
+	Completes the subscription, preventing anything else from being
+	emitted.
+]=]
 function Subscription:Complete()
 	if self._state ~= stateTypes.PENDING then
 		return
@@ -104,6 +172,14 @@ function Subscription:_doCleanup()
 	end
 end
 
+--[=[
+	Cleans up the subscription
+
+	:::tip
+	This will be invoked by the Observable automatically, and should not
+	be called within the usage of a subscription.
+	:::
+]=]
 function Subscription:Destroy()
 	if self._state == stateTypes.PENDING then
 		self._state = stateTypes.CANCELLED

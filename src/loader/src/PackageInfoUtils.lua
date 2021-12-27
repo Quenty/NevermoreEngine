@@ -1,6 +1,8 @@
---- Utility methods to build a virtual graph of the existing package information set
--- @module PackageInfoUtils
--- @author Quenty
+--[=[
+	Utility methods to build a virtual graph of the existing package information set
+	@private
+	@class PackageInfoUtils
+]=]
 
 local Utils = require(script.Parent.Utils)
 local ScriptInfoUtils = require(script.Parent.ScriptInfoUtils)

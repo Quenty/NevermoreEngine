@@ -1,6 +1,7 @@
----
--- @module LoaderUtils
--- @author Quenty
+--[=[
+	@private
+	@class LoaderUtils
+]=]
 
 local loader = script.Parent
 local BounceTemplateUtils = require(script.Parent.BounceTemplateUtils)

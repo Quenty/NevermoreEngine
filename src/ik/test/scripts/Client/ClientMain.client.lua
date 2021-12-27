@@ -1,6 +1,5 @@
---- Main injection point
+-- Main injection point
 -- @script ClientMain
--- @author Quenty
 
 local require = require(script.Parent.loader).load(script)
 

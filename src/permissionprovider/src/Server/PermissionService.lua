@@ -1,6 +1,26 @@
----
--- @module PermissionService
--- @author Quenty
+--[=[
+	Provides permissions for the game. See [BasePermissionProvider].
+
+	:::tip
+	Be sure to initialize the [PermissionServiceClient] on the client.
+	:::
+
+	```lua
+	local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
+
+	local PermissionProvider = require("PermissionProvider")
+	local PermissionProviderUtils = require("PermissionProviderUtils")
+
+	return PermissionProvider.new(PermissionProviderUtils.createGroupRankConfig({
+	  groupId = 8668163;
+	  minAdminRequiredRank = 250;
+	  minCreatorRequiredRank = 254;
+	}))
+	```
+
+	@server
+	@class PermissionService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +32,10 @@ local Promise = require("Promise")
 
 local PermissionService = {}
 
+--[=[
+	Initializes the service. Should be done via [ServiceBag].
+	@param _serviceBag ServiceBag
+]=]
 function PermissionService:Init(_serviceBag)
 	assert(not self._promise, "Already initialized")
 	assert(not self._provider, "Already have provider")
@@ -20,6 +44,12 @@ function PermissionService:Init(_serviceBag)
 	self._promise = Promise.new()
 end
 
+--[=[
+	Sets the provider from a config. See [PermissionProviderUtils.createGroupRankConfig]
+	and [PermissionProviderUtils.createSingleUserConfig].
+
+	@param config { type: string }
+]=]
 function PermissionService:SetProviderFromConfig(config)
 	assert(self._promise, "Not initialized")
 	assert(not self._provider, "Already have provider set")
@@ -33,6 +63,9 @@ function PermissionService:SetProviderFromConfig(config)
 	end
 end
 
+--[=[
+	Starts the permission service. Should be done via [ServiceBag].
+]=]
 function PermissionService:Start()
 	if not self._provider then
 		self:SetProviderFromConfig(PermissionProviderUtils.createConfigFromGame())
@@ -43,6 +76,10 @@ function PermissionService:Start()
 	self._promise:Resolve(self._provider)
 end
 
+--[=[
+	Returns the permission provider
+	@return Promise<BasePermissionProvider>
+]=]
 function PermissionService:PromisePermissionProvider()
 	assert(self._promise, "Not initialized")
 

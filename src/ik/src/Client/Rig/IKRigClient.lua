@@ -1,5 +1,7 @@
---- Handles IK rigging for a humanoid
--- @classmod IKRigClient
+--[=[
+	Handles IK rigging for a humanoid
+	@class IKRigClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -34,6 +36,11 @@ function IKRigClient.new(humanoid, serviceBag)
 	return self
 end
 
+--[=[
+	Retrieves where the IK rig's position is, if it exists
+
+	@return Vector3?
+]=]
 function IKRigClient:GetPositionOrNil()
 	local rootPart = self._obj.RootPart
 	if not rootPart then
@@ -43,6 +50,11 @@ function IKRigClient:GetPositionOrNil()
 	return rootPart.Position
 end
 
+--[=[
+	Retrieves the local player aimer if it exists
+
+	@return IKRigAimerLocalPlayer?
+]=]
 function IKRigClient:GetLocalPlayerAimer()
 	return self._aimer
 end

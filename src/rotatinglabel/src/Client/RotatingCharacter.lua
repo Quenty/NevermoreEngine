@@ -1,5 +1,7 @@
---- Character that rotates for animations
--- @classmod RotatingCharacter
+--[=[
+	Character that rotates for animations
+	@class RotatingCharacter
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

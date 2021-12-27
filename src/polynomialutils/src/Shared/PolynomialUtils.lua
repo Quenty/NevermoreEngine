@@ -1,8 +1,16 @@
---- PolynomialUtils
--- @module PolynomialUtils
+--[=[
+	PolynomialUtils
+	@class PolynomialUtils
+]=]
 
 local PolynomialUtils = {}
 
+--[=[
+    Solves a linear ordered equation
+    @param a number
+    @param b number
+    @return number?
+]=]
 function PolynomialUtils.solveOrderedRealLinear(a, b)
     local z = -b/a
     if z ~= z then
@@ -12,6 +20,15 @@ function PolynomialUtils.solveOrderedRealLinear(a, b)
     end
 end
 
+--[=[
+    Solves a quadratic polynomial
+
+    @param a number
+    @param b number
+    @param c number
+    @return number?
+    @return number?
+]=]
 function PolynomialUtils.solveOrderedRealQuadratic(a, b, c)
     local d = (b*b - 4*a*c)^0.5
     if d ~= d then

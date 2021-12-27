@@ -1,5 +1,7 @@
---- Rotation model for gamepad controls
--- @classmod GamepadRotateModel
+--[=[
+	Rotation model for gamepad controls
+	@class GamepadRotateModel
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

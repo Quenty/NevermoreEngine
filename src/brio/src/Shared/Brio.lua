@@ -1,26 +1,60 @@
---- Brios are wrap a value and provide the following constraints
---[[
-- Can be in 2 states, dead or alive
-- While alive, can retrieve values
-- While dead, retrieving values is forbidden
-- Died will fire once upon death
+--[=[
+	Brios wrap a value (or tuple of values) and are used to convey the lifetime of that
+	object. The brio is better than a maid, by providing the following constraints:
 
-Brios encapsulate the "lifetime" of a valid resource. Unlike a maid, they
-- Can only die once
-- Have less memory leaks
-- Cannot be reentered
+	- Can be in 2 states, dead or alive.
+	- While alive, can retrieve values.
+	- While dead, retrieving values is forbidden.
+	- Died will fire once upon death.
 
-Calling :Destroy() or :Kill() after death does nothing. Brios cannot be resurrected.
+	Brios encapsulate the "lifetime" of a valid resource. Unlike a maid, they
+	- Can only die once, ensuring duplicate calls never occur.
+	- Have less memory leaks. Memory leaks in maids can occur when use of the maid occurs
+	  after the cleanup of the maid has occured, in certain race conditions.
+	- Cannot be reentered, i.e. cannot retrieve values after death.
 
-Useful for downstream events where you want to emit a resource. Typically
-brios should be killed when their source is killed.
+	:::info
+	Calling `brio:Destroy()` or `brio:Kill()` after death does nothing. Brios cannot
+	be resurrected.
+	:::
 
-Brios are intended to be merged with downstream brios so create a chain of reliable
-resources.
+	Brios are useful for downstream events where you want to emit a resource. Typically
+	brios should be killed when their source is killed. Brios are intended to be merged
+	with downstream brios so create a chain of reliable resources.
 
-Anything may "kill" a brio by calling :Destroy() or :Kill().
-]]
--- @classmod Brio
+	```lua
+	local brio = Brio.new("a", "b")
+	print(brio:GetValue()) --> a b
+	print(brio:IsDead()) --> false
+
+	brio:GetDiedSignal():Connect(function()
+		print("Hello from signal!")
+	end)
+	brio:ToMaid():GiveTask(function()
+		print("Hello from maid cleanup!")
+	end)
+	brio:Kill()
+	--> Hello from signal!
+	--> Hello from maid cleanup!
+
+	print(brio:IsDead()) --> true
+	print(brio:GetValue()) --> ERROR: Brio is dead
+	```
+
+	## Design philosophy
+
+	Brios are designed to solve this issue where we emit an object with a lifetime associated with it from an
+	Observable stream. This resource is only valid for some amount of time (for example, while the object is
+	in the Roblox data model).
+
+	In order to know how long we can keep this object/use it, we wrap the object with a Brio, which denotes
+	 the lifetime of the object.
+
+	Modeling this with pure observables is very tricky because the subscriber will have to also monitor/emit
+	a similar object with less clear conventions. For example  an observable that emits the object, and then nil on death.
+
+	@class Brio
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -30,19 +64,60 @@ local Brio = {}
 Brio.ClassName = "Brio"
 Brio.__index = Brio
 
+--[=[
+	Returns whether a value is a Brio.
+
+	```lua
+	print(Brio.isBrio("yolo")) --> false
+	```
+	@param value any
+	@return boolean
+]=]
 function Brio.isBrio(value)
 	return type(value) == "table" and value.ClassName == "Brio"
 end
 
+--[=[
+	Constructs a new Brio.
+
+
+	```lua
+	local brio = Brio.new("a", "b")
+	print(brio:GetValue()) --> a b
+	```
+
+	@param ... any -- Brio values
+	@return Brio
+]=]
 function Brio.new(...) -- Wrap
 	return setmetatable({
 		_values = table.pack(...);
 	}, Brio)
 end
 
+--[=[
+	Gets a signal that will fire when the Brio dies. If the brio is already dead
+	calling this method will error.
+
+	:::info
+	Calling this while the brio is already dead will throw a error.
+	:::
+
+	```lua
+	local brio = Brio.new("a", "b")
+	brio:GetDiedSignal():Connect(function()
+		print("Brio died")
+	end)
+
+	brio:Kill() --> Brio died
+	brio:Kill() -- no output
+	```
+
+	@return Signal
+]=]
 function Brio:GetDiedSignal()
 	if self:IsDead() then
-		error("Already dead")
+		error("Brio is dead")
 	end
 
 	if self._diedEvent then
@@ -53,18 +128,58 @@ function Brio:GetDiedSignal()
 	return self._diedEvent.Event
 end
 
+--[=[
+	Returns true is the brio is dead.
+
+	```lua
+	local brio = Brio.new("a", "b")
+	print(brio:IsDead()) --> false
+
+	brio:Kill()
+
+	print(brio:IsDead()) --> true
+	```
+
+	@return boolean
+]=]
 function Brio:IsDead()
 	return self._values == nil
 end
 
+--[=[
+	Throws an error if the Brio is dead.
+
+	```lua
+	brio.DEAD:ErrorIfDead() --> ERROR: [Brio.ErrorIfDead] - Brio is dead
+	```
+]=]
 function Brio:ErrorIfDead()
 	if not self._values then
-		error("[CancelToken.ErrorIfDead] - Dead")
+		error("[Brio.ErrorIfDead] - Brio is dead")
 	end
 end
 
+--[=[
+	Constructs a new Maid which will clean up when the brio dies.
+	Will error if the Brio is dead.
+
+	:::info
+	Calling this while the brio is already dead will throw a error.
+	:::
+
+	```lua
+	local brio = Brio.new("a")
+	local maid = brio:ToMaid()
+	maid:GiveTask(function()
+		print("Cleaning up!")
+	end)
+	brio:Kill() --> Cleaning up!
+	```
+
+	@return Maid
+]=]
 function Brio:ToMaid()
-	assert(self._values ~= nil, "Dead")
+	assert(self._values ~= nil, "Brio is dead")
 
 	local maid = Maid.new()
 
@@ -75,12 +190,45 @@ function Brio:ToMaid()
 	return maid
 end
 
+--[=[
+	If the brio is not dead, will return the values unpacked from the brio.
+
+	:::info
+	Calling this while the brio is already dead will throw a error. Values should
+	not be used past the lifetime of the brio, and can be considered invalid.
+	:::
+
+	```lua
+	local brio = Brio.new("a", 1, 2)
+	print(brio:GetValue()) --> "a" 1 2
+	brio:Kill()
+
+	print(brio:GetValue()) --> ERROR: Brio is dead
+	```
+
+	@return any
+]=]
 function Brio:GetValue()
-	assert(self._values, "Bad brio state")
+	assert(self._values, "Brio is dead")
 
 	return unpack(self._values, 1, self._values.n)
 end
 
+--[=[
+	Kills the Brio.
+
+	:::info
+	You can call this multiple times and it will not error if the brio is dead.
+	:::
+
+	```lua
+	local brio = Brio.new("hi")
+	print(brio:GetValue()) --> "hi"
+	brio:Kill()
+
+	print(brio:GetValue()) --> ERROR: Brio is dead
+	```
+]=]
 function Brio:Destroy()
 	if not self._values then
 		return
@@ -94,9 +242,24 @@ function Brio:Destroy()
 		self._diedEvent = nil
 	end
 end
+
+--[=[
+	Alias for Destroy.
+	@method Kill
+	@within Brio
+]=]
 Brio.Kill = Brio.Destroy
 
--- Setup dead
+--[=[
+	An already dead brio which may be used for identity purposes.
+
+	```lua
+	print(Brio.DEAD:IsDead()) --> true
+	```
+
+	@prop DEAD Brio
+	@within Brio
+]=]
 Brio.DEAD = Brio.new()
 Brio.DEAD:Kill()
 

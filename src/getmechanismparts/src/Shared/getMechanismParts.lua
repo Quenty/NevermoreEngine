@@ -1,6 +1,7 @@
---- Gets the full mechanism from parts
--- @module getMechanismParts
--- https://devforum.roblox.com/t/getting-all-parts-in-a-mechanism-one-part-in-each-assembly/101344/4
+--[=[
+	Gets the full mechanism from parts. See [NoCollisionConstraintUtils].
+	@class getMechanismParts
+]=]
 
 local Workspace = game:GetService("Workspace")
 
@@ -10,6 +11,24 @@ local IGNORE_CONSTRAINT_SET = {
 	["Torque"] = true;
 }
 
+--[=[
+	Gets all parts in a mechanisms. A mechanism in Roblox is anything connected by joints,
+	constraints, and are all owned by network ownership.
+
+	:::info
+	Calling this class can be quite expensive.
+	:::
+
+	```lua
+	print(getMechanismParts({ workspace.Part })) --> "Part", "Blah"
+	```
+	See: https://devforum.roblox.com/t/getting-all-parts-in-a-mechanism-one-part-in-each-assembly/101344/4
+
+	@function getMechanismParts
+	@param originParts { BasePart }
+	@return { BasePart }
+	@within getMechanismParts
+]=]
 return function(originParts)
 	local startingTable
 	if type(originParts) == "table" then

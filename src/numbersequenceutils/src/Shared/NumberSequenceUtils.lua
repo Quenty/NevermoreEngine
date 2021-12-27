@@ -1,10 +1,17 @@
---- Utility functions involving NumberSequences on Roblox
--- @module NumberSequenceUtils
+--[=[
+	Utility functions involving NumberSequences on Roblox
+	@class NumberSequenceUtils
+]=]
 
 local NumberSequenceUtils = {}
 
 local EPSILON = 1e-3
 
+--[=[
+	Scales a number sequence
+	@param sequence NumberSequence
+	@param scale number
+]=]
 function NumberSequenceUtils.scale(sequence, scale)
 	local waypoints = {}
 
@@ -16,6 +23,16 @@ function NumberSequenceUtils.scale(sequence, scale)
 	return NumberSequence.new(waypoints)
 end
 
+--[=[
+	Generates a number sequence with stripes, which can be used in a variety of ways.
+
+	@param stripes number
+	@param backgroundTransparency number -- [0, 1]
+	@param stripeTransparency number -- [0, 1]
+	@param percentStripeThickness number -- [0, 1]
+	@param percentOffset number
+	@return NumberSequence
+]=]
 function NumberSequenceUtils.stripe(
 	stripes, backgroundTransparency, stripeTransparency, percentStripeThickness, percentOffset)
 

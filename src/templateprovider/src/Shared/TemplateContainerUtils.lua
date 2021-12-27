@@ -1,6 +1,7 @@
---- Utility functions for the TemplateProvider
--- @module TemplateContainerUtils
--- @author Quenty
+--[=[
+	Utility functions for the TemplateProvider
+	@class TemplateContainerUtils
+]=]
 
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")

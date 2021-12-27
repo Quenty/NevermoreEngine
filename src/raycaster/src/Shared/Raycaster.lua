@@ -1,12 +1,27 @@
---- Repeats raycasting attempts while ignoring items via a filter function
--- @classmod Raycaster
+--[=[
+	Repeats raycasting attempts while ignoring items via a filter function
+	@class Raycaster
+]=]
 
 local Workspace = game:GetService("Workspace")
 
 local Raycaster = {}
 Raycaster.ClassName = "Raycaster"
 
--- @param doIgnoreFunction(data) Returns true to ignore
+--[=[
+	Raycast data used by filter functions of the Raycaster.
+	@interface RaycastData
+	.Part Instance
+	.Position Vector3
+	.Normal Vector3
+	.Material Enum.Material
+	@within Raycaster
+]=]
+
+--[=[
+	Constructs a new Raycaster.
+	@param doIgnoreFunction (data: RaycastData) -> boolean -- Returns true to ignore
+]=]
 function Raycaster.new(doIgnoreFunction)
 	local self = setmetatable({
 		_ignoreWater = false,
@@ -21,6 +36,11 @@ function Raycaster.new(doIgnoreFunction)
 	return self
 end
 
+--[=[
+	Ignores the value
+
+	@param tableOrInstance Instance | { Instance }
+]=]
 function Raycaster:Ignore(tableOrInstance)
 	if typeof(tableOrInstance) == "Instance" then
 		table.insert(self.IgnoreList, tableOrInstance)
@@ -35,6 +55,11 @@ function Raycaster:Ignore(tableOrInstance)
 	end
 end
 
+--[=[
+	Repeats raycasts until exhausted attempts, or a result is found.
+	@param ray Ray
+	@return RaycastData?
+]=]
 function Raycaster:FindPartOnRay(ray)
 	assert(typeof(ray) == "Ray", "Bad ray")
 
@@ -56,6 +81,27 @@ function Raycaster:FindPartOnRay(ray)
 	return nil
 end
 
+--[=[
+	Current ignore list
+	@readonly
+	@prop IgnoreList { Instance }
+	@within Raycaster
+]=]
+--[=[
+	The current filter function
+	@prop Filter function
+	@within Raycaster
+]=]
+--[=[
+	Whether or not to ignore water
+	@prop IgnoreWater boolean
+	@within Raycaster
+]=]
+--[=[
+	Total number of casts allowed
+	@prop MaxCasts number
+	@within Raycaster
+]=]
 function Raycaster:__index(index)
 	if index == "IgnoreList" then
 		return rawget(self, "_ignoreList")

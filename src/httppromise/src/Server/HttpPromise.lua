@@ -1,5 +1,25 @@
---- Provides a wrapper around HttpService with a promise API
--- @module HttpPromise
+--[=[
+	Provides a wrapper around HttpService with a promise API
+
+	By combining functions in HttpPromise, we can get a generic request result in a very clean way.
+	```lua
+	local function logToDiscord(body)
+		return HttpPromise.request({
+			Headers = {
+				["Content-Type"] = "application/json";
+			};
+			Url = DISCORD_LOG_URL;
+			Body = HttpService:JSONEncode(data);
+			Method = "POST";
+		})
+		:Then(HttpPromise.decodeJson)
+		:Catch(HttpPromise.logFailedRequests)
+	end
+	```
+
+	@server
+	@class HttpPromise
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +32,23 @@ local DEBUG_RESPONSE = false
 
 local HttpPromise = {}
 
+--[=[
+	Decodes JSON from the response
+
+	```lua
+	local requestPromise = HttpPromise.request({
+		Headers = {
+			["Content-Type"] = "application/json";
+		};
+		Url = DISCORD_LOG_URL;
+		Body = HttpService:JSONEncode(data);
+		Method = "POST";
+	})
+	```
+
+	@param request table
+	@return Promise<table>
+]=]
 function HttpPromise.request(request)
 	if DEBUG_REQUEST then
 		print("Sending request", HttpService:JSONEncode(request))
@@ -42,6 +79,17 @@ function HttpPromise.request(request)
 	end)
 end
 
+--[=[
+	Makes a GET JSON request and then expects JSON as a result from said request
+
+	```lua
+	HttpPromise.json("https://quenty.org/banned/4397833/status")
+		:Then(print)
+	```
+
+	@param request table | string
+	@return Promise<table>
+]=]
 function HttpPromise.json(request)
 	if type(request) == "string" then
 		request = {
@@ -54,6 +102,16 @@ function HttpPromise.json(request)
 		:Then(HttpPromise.decodeJson)
 end
 
+--[=[
+	Logs failed requests and any errors retrieved
+
+	```lua
+	HttpPromise.json("https://quenty.org/banned/4397833/status")
+		:Catch(HttpPromise.logFailedRequests)
+	```
+
+	@param ... any -- A list of requests to retrieve. Meant to be used
+]=]
 function HttpPromise.logFailedRequests(...)
 	for _, item in pairs({...}) do
 		if type(item) == "string" then
@@ -64,6 +122,12 @@ function HttpPromise.logFailedRequests(...)
 	end
 end
 
+--[=[
+	Decodes JSON from the response
+
+	@param response { Body: string }
+	@return table
+]=]
 function HttpPromise.decodeJson(response)
 	assert(response, "Bad response")
 

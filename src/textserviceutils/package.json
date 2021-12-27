@@ -1,7 +1,7 @@
 {
   "name": "@quenty/textserviceutils",
   "version": "3.0.0",
-  "description": "textserviceutils ",
+  "description": "Holds utilities involving the Roblox TextService and text fitting to size.",
   "keywords": [
     "Roblox",
     "Nevermore",

@@ -1,5 +1,8 @@
---- Batch raycast utility function
--- @function batchRaycast
+--[=[
+	Batch raycast utility function
+	@private
+	@class batchRaycast
+]=]
 
 local function batchRaycast(
 	originList, directionList,

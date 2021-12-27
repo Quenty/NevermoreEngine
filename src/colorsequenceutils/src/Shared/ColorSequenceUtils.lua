@@ -1,10 +1,22 @@
---- Utility functions for Color sequences in Roblox.
--- @module ColorSequenceUtils
+--[=[
+	Utility functions for Color sequences in Roblox.
+	@class ColorSequenceUtils
+]=]
 
 local ColorSequenceUtils = {}
 
 local EPSILON = 1e-3
 
+--[=[
+	Makes stripes for color sequences.
+
+	@param stripes number
+	@param backgroundColor3 Color3
+	@param stripeColor3 Color3
+	@param percentStripeThickness number
+	@param percentOffset number
+	@return ColorSequence
+]=]
 function ColorSequenceUtils.stripe(stripes, backgroundColor3, stripeColor3, percentStripeThickness, percentOffset)
 	percentOffset = percentOffset or 0
 	percentStripeThickness = math.clamp(percentStripeThickness or 0.5, 0, 1)

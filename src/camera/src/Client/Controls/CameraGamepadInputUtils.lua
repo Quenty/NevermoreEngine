@@ -1,6 +1,6 @@
----
--- @module CameraGamepadInputUtils
--- @author Quenty
+--[=[
+	@class CameraGamepadInputUtils
+]=]
 
 local CameraGamepadInputUtils = {}
 

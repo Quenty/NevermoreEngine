@@ -1,5 +1,12 @@
---- Simple mixin to generate code for a class
--- @module GenerateWithMixin
+--[=[
+	Simple mixin to generate code for a class.
+
+	:::warning
+	Use of this class is discouraged.
+	:::
+
+	@class GenerateWithMixin
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -7,9 +14,11 @@ local String = require("String")
 
 local GenerateWithMixin = {}
 
---- Adds the GenerateWith API to the class
--- @tparam table class
--- @tparam table staticResources These resources are added to the class automatically
+--[=[
+	Adds the GenerateWith API to the class
+	@param class table
+	@param staticResources table -- These resources are added to the class automatically
+]=]
 function GenerateWithMixin:Add(class, staticResources)
 	assert(class, "Bad class")
 	assert(staticResources, "Bad staticResources")
@@ -17,8 +26,12 @@ function GenerateWithMixin:Add(class, staticResources)
 	self._generateWith(class, staticResources)
 end
 
---- Generates resources
--- @tparam table resources Resources to add
+--[=[
+	Generates resources
+	@private
+	@param class table -- Resources to add
+	@param resources { string }
+]=]
 function GenerateWithMixin._generateWith(class, resources)
 	assert(type(resources) == "table", "Bad resources")
 

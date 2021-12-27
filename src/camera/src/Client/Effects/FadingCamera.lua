@@ -1,5 +1,7 @@
---- Add another layer of effects that can be faded in/out
--- @classmod FadingCamera
+--[=[
+	Add another layer of effects that can be faded in/out
+	@class FadingCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,9 @@ local SummedCamera = require("SummedCamera")
 local FadingCamera = {}
 FadingCamera.ClassName = "FadingCamera"
 
+--[=[
+	@param camera CameraEffect
+]=]
 function FadingCamera.new(camera)
 	local self = setmetatable({}, FadingCamera)
 
@@ -41,6 +46,12 @@ function FadingCamera:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within FadingCamera
+]=]
 function FadingCamera:__index(index)
 	if index == "CameraState" then
 		return (self.Camera.CameraState or self.Camera) * self.Spring.Value

@@ -1,8 +1,10 @@
---- Snackbars provide lightweight feedback on an operation
--- at the base of the screen. They automatically disappear
--- after a timeout or user interaction. There can only be
--- one on the screen at a time.
--- @classmod Snackbar
+--[=[
+	Snackbars provide lightweight feedback on an operation
+	at the base of the screen. They automatically disappear
+	after a timeout or user interaction. There can only be
+	one on the screen at a time.
+	@class Snackbar
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -52,7 +54,7 @@ function Snackbar.new(Parent, Text, options)
 	ShadowContainer.Archivable = false
 	ShadowContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
 
-	--- Image is blurred at
+	-- Image is blurred at
 	self.ShadowImages = {
 		qGUI.AddNinePatch(ShadowContainer, "rbxassetid://191838004",
 			Vector2.new(150, 150),
@@ -204,7 +206,7 @@ function Snackbar:FadeOutTransparency(PercentFaded)
 	end
 end
 
---- Will animate unless given PercentFaded
+-- Will animate unless given PercentFaded
 function Snackbar:FadeInTransparency(PercentFaded)
 	if PercentFaded then
 		-- self.Gui.BackgroundTransparency = Math.map(PercentFaded, 0, 1, 1, 0)

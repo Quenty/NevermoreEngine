@@ -1,5 +1,8 @@
---- Utility methods to interactive with DataStores
--- @module DataStorePromises
+--[=[
+	Utility methods to interactive with Roblox datastores.
+	@server
+	@class DataStorePromises
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -8,6 +11,13 @@ local DataStoreService = game:GetService("DataStoreService")
 
 local DataStorePromises = {}
 
+--[=[
+	Promises a Roblox datastore object with the name and scope. Generally only fails
+	when you haven't published the place.
+	@param name string
+	@param scope string
+	@return Promise<DataStore>
+]=]
 function DataStorePromises.promiseDataStore(name, scope)
 	assert(type(name) == "string", "Bad name")
 	assert(type(scope) == "string", "Bad scope")
@@ -25,6 +35,12 @@ function DataStorePromises.promiseDataStore(name, scope)
 
 end
 
+--[=[
+	Wraps :GetAsync() in a promise
+	@param robloxDataStore DataStore
+	@param key string
+	@return Promise<T>
+]=]
 function DataStorePromises.getAsync(robloxDataStore, key)
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
@@ -40,6 +56,14 @@ function DataStorePromises.getAsync(robloxDataStore, key)
 		return resolve(result)
 	end)
 end
+
+--[=[
+	Wraps :UpdateAsync() in a promise
+	@param robloxDataStore DataStore
+	@param key string
+	@param updateFunc (T) -> T?
+	@return Promise<boolean>
+]=]
 
 function DataStorePromises.updateAsync(robloxDataStore, key, updateFunc)
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
@@ -61,6 +85,13 @@ function DataStorePromises.updateAsync(robloxDataStore, key, updateFunc)
 	end)
 end
 
+--[=[
+	Wraps :SetAsync() in a promise
+	@param robloxDataStore DataStore
+	@param key string
+	@param value string
+	@return Promise<boolean>
+]=]
 function DataStorePromises.setAsync(robloxDataStore, key, value)
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
@@ -76,6 +107,13 @@ function DataStorePromises.setAsync(robloxDataStore, key, value)
 	end)
 end
 
+--[=[
+	Wraps :IncrementAsync() in a promise
+	@param robloxDataStore DataStore
+	@param key string
+	@param delta number
+	@return Promise<boolean>
+]=]
 function DataStorePromises.promiseIncrementAsync(robloxDataStore, key, delta)
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
@@ -92,6 +130,12 @@ function DataStorePromises.promiseIncrementAsync(robloxDataStore, key, delta)
 	end)
 end
 
+--[=[
+	Wraps :RemoveAsync() in a promise
+	@param robloxDataStore DataStore
+	@param key string
+	@return Promise<boolean>
+]=]
 function DataStorePromises.removeAsync(robloxDataStore, key)
 	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")

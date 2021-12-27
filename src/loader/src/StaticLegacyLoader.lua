@@ -1,6 +1,7 @@
----
--- @classmod StaticLegacyLoader
--- @author Quenty
+--[=[
+	@private
+	@class StaticLegacyLoader
+]=]
 
 local loader = script.Parent
 local ScriptInfoUtils = require(script.Parent.ScriptInfoUtils)

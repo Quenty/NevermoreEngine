@@ -1,5 +1,7 @@
---- Left grip
--- @classmod IKLeftGrip
+--[=[
+	Left grip
+	@class IKLeftGrip
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

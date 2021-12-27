@@ -1,15 +1,20 @@
---- Utility to build a localization table from json, intended to be used with rojo. Can also handle Rojo json
--- objects turned into tables!
--- @module JsonToLocalizationTable
+--[=[
+	Utility to build a localization table from json, intended to be used with rojo. Can also handle Rojo json
+	objects turned into tables!
+
+	@class JsonToLocalizationTable
+]=]
 
 local HttpService = game:GetService("HttpService")
 
 local JsonToLocalizationTable = {}
 
---- Recursively iterates through the object to construct strings and add it to the localization table
--- @param localeId The localizationid to add
--- @param baseKey the key to add
--- @param object The value to iterate over
+--[[
+	Recursively iterates through the object to construct strings and add it to the localization table
+	@param localeId string -- The localizationid to add
+	@param baseKey string -- the key to add
+	@param object any -- The value to iterate over
+]]
 local function recurseAdd(localizationTable, localeId, baseKey, object)
 	if baseKey ~= "" then
 		baseKey = baseKey .. "."
@@ -34,9 +39,11 @@ local function recurseAdd(localizationTable, localeId, baseKey, object)
 	end
 end
 
---- Extracts the locale from the name
--- @param name The name to parse
--- @return The locale
+--[=[
+	Extracts the locale from the name
+	@param name string -- The name to parse
+	@return string -- The locale
+]=]
 function JsonToLocalizationTable.localeFromName(name)
 	if name:sub(-5) == ".json" then
 		return name:sub(1, #name-5)
@@ -45,8 +52,10 @@ function JsonToLocalizationTable.localeFromName(name)
 	end
 end
 
---- Loads a folder into a localization table
--- @parm folder A Roblox folder with StringValues containing JSON, named with the localization in mind
+--[=[
+	Loads a folder into a localization table
+	@param folder Folder -- A Roblox folder with StringValues containing JSON, named with the localization in mind
+]=]
 function JsonToLocalizationTable.loadFolder(folder)
 	local localizationTable = Instance.new("LocalizationTable")
 	for _, item in pairs(folder:GetDescendants()) do
@@ -61,6 +70,12 @@ function JsonToLocalizationTable.loadFolder(folder)
 	return localizationTable
 end
 
+--[=[
+	Extracts the locale from the folder, or a locale and table.
+	@param first Instance | string
+	@param second table?
+	@return LocalizationTable
+]=]
 function JsonToLocalizationTable.toLocalizationTable(first, second)
 	if typeof(first) == "Instance" then
 		local result = JsonToLocalizationTable.loadFolder(first)
@@ -75,16 +90,24 @@ function JsonToLocalizationTable.toLocalizationTable(first, second)
 	end
 end
 
+--[=[
+	Extracts the locale from the name
+	@param localeId string -- the defaultlocaleId
+	@param dataTable table -- Data table to load from
+	@return LocalizationTable
+]=]
 function JsonToLocalizationTable.loadTable(localeId, dataTable)
 	local localizationTable = Instance.new("LocalizationTable")
 	recurseAdd(localizationTable, localeId, "", dataTable)
 	return localizationTable
 end
 
---- Adds json to a localization table
--- @param localizationTable The localization table to add to
--- @param localeId The localeId to use
--- @param json The json to add with
+--[=[
+	Adds json to a localization table
+	@param localizationTable LocalizationTable -- The localization table to add to
+	@param localeId string -- The localeId to use
+	@param json string -- The json to add with
+]=]
 function JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, json)
 	local decodedTable = HttpService:JSONDecode(json)
 	recurseAdd(localizationTable, localeId, "", decodedTable)

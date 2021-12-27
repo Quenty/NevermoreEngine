@@ -1,6 +1,7 @@
---- Contains model information for the current button
--- @classmod ButtonHighlightModel
--- @author Quenty
+--[=[
+	Contains model information for the current button
+	@class ButtonHighlightModel
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -15,22 +16,40 @@ local ButtonHighlightModel = setmetatable({}, BaseObject)
 ButtonHighlightModel.ClassName = "ButtonHighlightModel"
 ButtonHighlightModel.__index = ButtonHighlightModel
 
+--[=[
+	A model that dictates the current state of a button.
+	@param button GuiBase
+	@param onUpdate function?
+	@return ButtonHighlightModel
+]=]
 function ButtonHighlightModel.new(button, onUpdate)
 	local self = setmetatable(BaseObject.new(assert(button, "Bad button")), ButtonHighlightModel)
 
 	self._onUpdate = onUpdate
 
-	-- Readonly
+--[=[
+	@prop InteractionEnabled BoolValue
+	@readonly
+	@within ButtonHighlightModel
+]=]
 	self.InteractionEnabled = Instance.new("BoolValue")
 	self.InteractionEnabled.Value = true
 	self._maid:GiveTask(self.InteractionEnabled)
 
-	-- readonly
+--[=[
+	@prop IsSelected BoolValue
+	@readonly
+	@within ButtonHighlightModel
+]=]
 	self.IsSelected = Instance.new("BoolValue")
 	self.IsSelected.Value = false
 	self._maid:GiveTask(self.IsSelected)
 
-	-- readonly
+--[=[
+	@prop IsMouseOrTouchOver BoolValue
+	@readonly
+	@within ButtonHighlightModel
+]=]
 	self.IsMouseOrTouchOver = Instance.new("BoolValue")
 	self.IsMouseOrTouchOver.Value = false
 	self._maid:GiveTask(self.IsMouseOrTouchOver)
@@ -43,7 +62,11 @@ function ButtonHighlightModel.new(button, onUpdate)
 	self._numFingerDown.Value = 0
 	self._maid:GiveTask(self._numFingerDown)
 
-	-- readonly
+--[=[
+	@prop IsChoosen BoolValue
+	@readonly
+	@within ButtonHighlightModel
+]=]
 	self.IsChoosen = Instance.new("BoolValue")
 	self.IsChoosen.Value = false
 	self._maid:GiveTask(self.IsChoosen)
@@ -56,12 +79,20 @@ function ButtonHighlightModel.new(button, onUpdate)
 	self._isMouseOver.Value = false
 	self._maid:GiveTask(self._isMouseOver)
 
-	-- readonly
+--[=[
+	@prop IsHighlighted BoolValue
+	@readonly
+	@within ButtonHighlightModel
+]=]
 	self.IsHighlighted = Instance.new("BoolValue")
 	self.IsHighlighted.Value = false
 	self._maid:GiveTask(self.IsHighlighted)
 
-	-- readonly
+--[=[
+	@prop IsPressed BoolValue
+	@readonly
+	@within ButtonHighlightModel
+]=]
 	self.IsPressed = Instance.new("BoolValue")
 	self.IsPressed.Value = false
 	self._maid:GiveTask(self.IsPressed)
@@ -162,6 +193,10 @@ function ButtonHighlightModel.new(button, onUpdate)
 	return self
 end
 
+--[=[
+	Observes how pressed down the button is
+	@return Observable<number>
+]=]
 function ButtonHighlightModel:ObservePercentPressed()
 	return Blend.AccelTween(Blend.toPropertyObservable(self.IsPressed)
 		:Pipe({
@@ -171,6 +206,10 @@ function ButtonHighlightModel:ObservePercentPressed()
 		}), 200)
 end
 
+--[=[
+	Observes how highlighted the button is
+	@return Observable<number>
+]=]
 function ButtonHighlightModel:ObservePercentHiglighted()
 	return Blend.AccelTween(Blend.toPropertyObservable(self.IsHighlighted)
 		:Pipe({
@@ -180,6 +219,10 @@ function ButtonHighlightModel:ObservePercentHiglighted()
 		}), 200)
 end
 
+--[=[
+	Observes how choosen the button is
+	@return Observable<number>
+]=]
 function ButtonHighlightModel:ObservePercentChoosen()
 	return Blend.AccelTween(Blend.toPropertyObservable(self.IsChoosen)
 		:Pipe({
@@ -189,20 +232,36 @@ function ButtonHighlightModel:ObservePercentChoosen()
 		}), 200)
 end
 
+--[=[
+	Observes interaction enabled
+	@return booloean
+]=]
 function ButtonHighlightModel:IsInteractionEnabled()
 	return self.InteractionEnabled.Value
 end
 
+--[=[
+	Sets whether a key is down
+	@param isKeyDown boolean
+]=]
 function ButtonHighlightModel:SetKeyDown(isKeyDown)
 	self._isKeyDown.Value = isKeyDown
 end
 
+--[=[
+	Sets whether interaction is enabled
+	@param interactionEnabled boolean
+]=]
 function ButtonHighlightModel:SetInteractionEnabled(interactionEnabled)
 	assert(type(interactionEnabled) == "boolean", "Bad interactionEnabled")
 
 	self.InteractionEnabled.Value = interactionEnabled
 end
 
+--[=[
+	Sets whether the model is choosen
+	@param isChoosen boolean
+]=]
 function ButtonHighlightModel:SetIsChoosen(isChoosen)
 	assert(type(isChoosen) == "boolean", "Bad isChoosen")
 

@@ -1,5 +1,7 @@
---- Determines if parts are touching or not
--- @classmod PartTouchingCalculator
+--[=[
+	Determines if parts are touching or not
+	@class PartTouchingCalculator
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +15,9 @@ local PartTouchingCalculator = {}
 PartTouchingCalculator.__index = PartTouchingCalculator
 PartTouchingCalculator.ClassName = "PartTouchingCalculator"
 
+--[=[
+	Constructs a new PartTouchingCalculator
+]=]
 function PartTouchingCalculator.new()
 	local self = setmetatable({}, PartTouchingCalculator)
 
@@ -101,7 +106,7 @@ function PartTouchingCalculator:GetTouchingBoundingBox(parts, relativeTo, paddin
 	return touching
 end
 
---- Expensive hull check on a list of parts (aggregating each parts touching list)
+-- Expensive hull check on a list of parts (aggregating each parts touching list)
 function PartTouchingCalculator:GetTouchingHull(parts, padding)
 	local hitParts = {}
 
@@ -119,9 +124,12 @@ function PartTouchingCalculator:GetTouchingHull(parts, padding)
 	return touching
 end
 
---- Retrieves parts touching a base part
--- @param basePart item to identify touching. Geometry matters
--- @param padding studs of padding around the part
+--[=[
+	Retrieves parts touching a base part
+	@param basePart BasePart -- item to identify touching. Geometry matters
+	@param padding number -- studs of padding around the part
+	@return { BasePart }
+]=]
 function PartTouchingCalculator:GetTouching(basePart, padding)
 	padding = padding or 2
 	local part

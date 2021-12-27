@@ -1,6 +1,16 @@
---- cancellableDelay a delay that can be cancelled
--- @module debounce
+--[=[
+	cancellableDelay a delay that can be cancelled
+	@class cancellabledelay
+]=]
 
+--[=[
+	@function cancellabledelay
+	@param timeoutInSeconds number
+	@param func function
+	@param ... any -- Args to pass into the function
+	@return function? -- Can be used to cancel
+	@within cancellabledelay
+]=]
 local function cancellableDelay(timeoutInSeconds, func, ...)
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
 	assert(type(func) == "function", "Bad func")

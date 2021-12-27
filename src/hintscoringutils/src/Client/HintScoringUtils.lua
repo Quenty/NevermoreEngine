@@ -1,7 +1,9 @@
---- Utility functions that let you score a proximity prompt (i.e. a Hint)
--- based upon its relation to a character in 3D space.
--- @module HintScoringUtils
--- @author Quenty
+--[=[
+	Utility functions that let you score a proximity prompt (i.e. a Hint)
+	based upon its relation to a character in 3D space.
+
+	@class HintScoringUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -32,6 +34,12 @@ end
 
 local HintScoringUtils = {}
 
+--[=[
+	Gets humanoid position and direction.
+	@param humanoid Humanoid
+	@return Vector3? -- Position
+	@return Vector3? -- LookVector
+]=]
 function HintScoringUtils.getHumanoidPositionDirection(humanoid)
 	local rootPart = humanoid.RootPart
 	if not rootPart then
@@ -42,6 +50,14 @@ function HintScoringUtils.getHumanoidPositionDirection(humanoid)
 	return rootCFrame.p, rootCFrame.lookVector
 end
 
+--[=[
+	Finds adornees in a region
+	@param position Vector3
+	@param radius number
+	@param ignoreList { Instance }
+	@param getAdorneeFunction (Instance) -> Instance?
+	@return { [Instance]: true }
+]=]
 function HintScoringUtils.getAdorneeInRegionSet(position, radius, ignoreList, getAdorneeFunction)
 	assert(type(getAdorneeFunction) == "function", "Bad getAdorneeFunction")
 
@@ -59,6 +75,11 @@ function HintScoringUtils.getAdorneeInRegionSet(position, radius, ignoreList, ge
 end
 
 if DEBUG_ENABLED then
+--[=[
+	Draws the score in debug mode
+	@param adornee Instance
+	@param score number
+]=]
 	function HintScoringUtils.debugScore(adornee, score)
 		assert(adornee, "Bad adornee")
 
@@ -70,6 +91,16 @@ else
 	end
 end
 
+--[=[
+	Raycasts to adornee
+
+	@param raycaster Raycaster
+	@param humanoidCenter Vector3
+	@param adornee Instance
+	@param closestBoundingBoxPoint Vector3
+	@param extraDistance number
+	@return Vector3 -- Hit position
+]=]
 function HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, closestBoundingBoxPoint, extraDistance)
 	local offset = closestBoundingBoxPoint - humanoidCenter
 	if offset.magnitude == 0 then
@@ -107,6 +138,19 @@ function HintScoringUtils.raycastToAdornee(raycaster, humanoidCenter, adornee, c
 	return hitData.Position
 end
 
+--[=[
+	Clamps the humanoid center to the adornee bounding box, finding the nearest point.
+
+	:::info
+	We do this because we want to raycast to the closest point on the adornee, which will
+	ensure we hit it, especially for larger adornees.
+	:::
+
+	@param adornee Instance
+	@param humanoidCenter Vector3
+	@return Vector3? -- clamped point
+	@return Vector3? -- center of bounding box
+]=]
 function HintScoringUtils.clampToBoundingBox(adornee, humanoidCenter)
 	if adornee:IsA("Attachment") then
 		return adornee.WorldPosition, adornee.WorldPosition
@@ -120,6 +164,19 @@ function HintScoringUtils.clampToBoundingBox(adornee, humanoidCenter)
 	return BoundingBoxUtils.clampPointToBoundingBox(cframe, size, humanoidCenter)
 end
 
+--[=[
+	Scores the adornee as a target for showing as a target in terms of priority.
+	@param adornee Instance
+	@param raycaster Raycaster
+	@param humanoidCenter Vector3
+	@param humanoidLookVector Vector3
+	@param maxViewRadius number
+	@param maxTriggerRadius number
+	@param maxViewAngle number
+	@param maxTriggerAngle number
+	@param isLineOfSightRequired boolean
+	@return boolean | number -- [0, 1]
+]=]
 function HintScoringUtils.scoreAdornee(
 	adornee,
 	raycaster,
@@ -198,6 +255,14 @@ function HintScoringUtils.scoreAdornee(
 	return (2*distScore + angleScore)/3
 end
 
+--[=[
+	Scores the distance based upon a variety of mechanics
+
+	@param distance number
+	@param maxViewDistance number
+	@param maxTriggerRadius number
+	@return number -- [0, 1]
+]=]
 function HintScoringUtils.scoreDist(distance, maxViewDistance, maxTriggerRadius)
 	assert(maxViewDistance >= maxTriggerRadius, "maxViewDistance < maxTriggerRadius")
 
@@ -213,6 +278,14 @@ function HintScoringUtils.scoreDist(distance, maxViewDistance, maxTriggerRadius)
 	return inverseDistProportion*inverseDistProportion
 end
 
+--[=[
+	Scores the angle based upon parameters
+
+	@param angle number
+	@param maxViewAngle number
+	@param maxTriggerAngle number
+	@return number -- [0, 1]
+]=]
 function HintScoringUtils.scoreAngle(angle, maxViewAngle, maxTriggerAngle)
 	assert(maxViewAngle >= maxTriggerAngle, "maxViewDistance < maxTriggerRadius")
 

@@ -1,5 +1,6 @@
----
--- @module IKRigUtils
+--[=[
+	@class IKRigUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

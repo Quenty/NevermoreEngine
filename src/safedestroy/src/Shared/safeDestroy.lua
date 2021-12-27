@@ -1,5 +1,7 @@
---- Fixes an issue where you can't destroy already destroyed objects
--- @function safeDestroy
+--[=[
+	Fixes an issue where you can't destroy already destroyed objects.
+	@class safeDestroy
+]=]
 
 local PARENT_PROPERTY_LOCKED = "The Parent property of "
 

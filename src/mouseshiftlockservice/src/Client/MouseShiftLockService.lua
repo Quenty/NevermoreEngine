@@ -1,6 +1,15 @@
---- Utility service to enable or disable mouse shift lock on the fly on Roblox.
--- @module MouseShiftLockService
--- See: https://devforum.roblox.com/t/custom-center-locked-mouse-camera-control-toggle/205323
+--[=[
+	Utility service to enable or disable mouse shift lock on the fly on Roblox.
+
+	See: https://devforum.roblox.com/t/custom-center-locked-mouse-camera-control-toggle/205323
+
+	```lua
+	local mouseShiftLockService = serviceBag:GetService(MouseShiftLockService)
+	mouseShiftLockService:DisableShiftLock()
+	```
+
+	@class MouseShiftLockService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,6 +20,10 @@ local StarterPlayer = game:GetService("StarterPlayer")
 local Promise = require("Promise")
 
 local MouseShiftLockService = {}
+
+--[=[
+	Initializes the mouse shift lock service. Should be done via [ServiceBag].
+]=]
 
 function MouseShiftLockService:Init()
 	self._enabled = Instance.new("BoolValue")
@@ -60,9 +73,16 @@ function MouseShiftLockService:_buildPromiseReady()
 	end)
 end
 
+--[=[
+	Enables mouse shift lock
+]=]
 function MouseShiftLockService:EnableShiftLock()
 	self._enabled.Value = true
 end
+
+--[=[
+	Disables mouse shift lock
+]=]
 
 function MouseShiftLockService:DisableShiftLock()
 	self._enabled.Value = false

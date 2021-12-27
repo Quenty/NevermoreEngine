@@ -1,6 +1,6 @@
----
--- @module DepthOfFieldService
--- @author Quenty
+--[=[
+	@class DepthOfFieldService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +13,10 @@ local ValueObject = require("ValueObject")
 
 local DepthOfFieldService = {}
 
+--[=[
+	Initializes the DepthOfFieldService. Should be done via [ServiceBag].
+	@param _serviceBag ServiceBag
+]=]
 function DepthOfFieldService:Init(_serviceBag)
 	self._maid = Maid.new()
 
@@ -48,6 +52,10 @@ function DepthOfFieldService:Init(_serviceBag)
 	self._modifierStack = {}
 end
 
+--[=[
+	Creates a new depth of field modifier
+	@return DepthOfFieldModifier
+]=]
 function DepthOfFieldService:CreateModifier()
 	local maid = Maid.new()
 

@@ -1,5 +1,7 @@
---- Tracks a parent bound to a specific binder
--- @classmod BoundAncestorTracker
+--[=[
+	Tracks a parent bound to a specific binder
+	@class BoundAncestorTracker
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,13 +13,26 @@ local BoundAncestorTracker = setmetatable({}, BaseObject)
 BoundAncestorTracker.ClassName = "BoundAncestorTracker"
 BoundAncestorTracker.__index = BoundAncestorTracker
 
+
+--[=[
+Constructs a new BoundAncestorTracker
+
+@param binder Binder<T>
+@param child Instance
+@return BoundAncestorTracker
+]=]
 function BoundAncestorTracker.new(binder, child)
 	local self = setmetatable(BaseObject.new(), BoundAncestorTracker)
 
 	self._child = child or error("No child")
 	self._binder = binder or error("No binder")
 
-	-- Bound value
+--[=[
+	@prop Class ValueObject<T>
+	@readonly
+	@within BoundAncestorTracker
+	Bound value
+]=]
 	self.Class = ValueObject.new()
 	self._maid:GiveTask(self.Class)
 

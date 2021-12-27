@@ -1,5 +1,7 @@
---- Provides a basis for binderGroups that can be retrieved anywhere
--- @classmod BinderGroupProvider
+--[=[
+	Provides a basis for binderGroups that can be retrieved anywhere
+	@class BinderGroupProvider
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,11 @@ local BinderGroupProvider = {}
 BinderGroupProvider.ClassName = "BinderGroupProvider"
 BinderGroupProvider.__index = BinderGroupProvider
 
+--[=[
+	Constructs a new BinderGroupProvider
+	@param initMethod (BinderGroupProvider) -> ()
+	@return BinderGroupProvider
+]=]
 function BinderGroupProvider.new(initMethod)
 	local self = setmetatable({}, BinderGroupProvider)
 
@@ -21,10 +28,18 @@ function BinderGroupProvider.new(initMethod)
 	return self
 end
 
+--[=[
+	Returns a promise that will resolve once groups are added.
+	@return Promise
+]=]
 function BinderGroupProvider:PromiseGroupsAdded()
 	return self._groupsAddedPromise
 end
 
+--[=[
+	Starts the binder provider. Should be called via ServiceBag.
+	@param ... ServiceBag | any
+]=]
 function BinderGroupProvider:Init(...)
 	assert(not self._init, "Already initialized")
 
@@ -34,6 +49,9 @@ function BinderGroupProvider:Init(...)
 	self._groupsAddedPromise:Resolve()
 end
 
+--[=[
+	Starts the binder provider. Should be called via ServiceBag.
+]=]
 function BinderGroupProvider:Start()
 	-- Do nothing
 end
@@ -46,11 +64,23 @@ function BinderGroupProvider:__index(index)
 	error(("%q Not a valid index"):format(tostring(index)))
 end
 
-function BinderGroupProvider:Get(tagName)
-	assert(type(tagName) == "string", "tagName must be a string")
-	return rawget(self, tagName)
+--[=[
+	Returns a binder group given the binderName
+
+	@param groupName string
+	@return BinderGroup?
+]=]
+function BinderGroupProvider:Get(groupName)
+	assert(type(groupName) == "string", "groupName must be a string")
+	return rawget(self, groupName)
 end
 
+--[=[
+	Adds a new group at the given name
+
+	@param groupName string
+	@param binderGroup BinderGroup
+]=]
 function BinderGroupProvider:Add(groupName, binderGroup)
 	assert(type(groupName) == "string", "Bad groupName")
 	assert(type(binderGroup) == "table", "Bad binderGroup")

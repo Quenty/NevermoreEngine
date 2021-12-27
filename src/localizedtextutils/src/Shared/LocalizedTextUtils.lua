@@ -1,8 +1,30 @@
---- Localized text utils which changes translationKey structures to shared locations
--- @module LocalizedTextUtils
+--[=[
+	Localized text utils which changes translationKey structures to shared locations
+	@class LocalizedTextUtils
+]=]
 
 local LocalizedTextUtils = {}
 
+--[=[
+	Valid translation args
+	@type TranslationArgs { [string]: LocalizedTextData | number | string }
+	@within LocalizedTextUtils
+]=]
+
+--[=[
+	Valid localized text data
+	@interface LocalizedTextData
+	.translationKey string
+	.translationArgs TranslationArgs
+	@within LocalizedTextUtils
+]=]
+
+--[=[
+	Creates a new localizedtextdata
+	@param translationKey string
+	@param translationArgs TranslationArgs
+	@return LocalizedTextData
+]=]
 function LocalizedTextUtils.create(translationKey, translationArgs)
 	assert(type(translationKey) == "string", "Bad translationKey")
 	assert(type(translationArgs) == "table" or translationArgs == nil, "Bad translationArgs")
@@ -13,6 +35,11 @@ function LocalizedTextUtils.create(translationKey, translationArgs)
 	}
 end
 
+--[=[
+	Returns whether the given argument is localized text
+	@param data any
+	@return boolean
+]=]
 function LocalizedTextUtils.isLocalizedText(data)
 	return type(data) == "table"
 		and type(data.translationKey) == "string"
@@ -20,6 +47,13 @@ function LocalizedTextUtils.isLocalizedText(data)
 			or data.translationArgs == nil)
 end
 
+--[=[
+	Recursively formats the translated text
+	@param translator Translator | JSONTranslator
+	@param translationKey string
+	@param translationArgs TranslationArgs
+	@return string
+]=]
 function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, translationArgs)
 	assert(translator, "Bad translator")
 	assert(translationKey, "Bad translationKey")
@@ -44,6 +78,12 @@ function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, tra
 	return translator:FormatByKey(translationKey, formattedArgs)
 end
 
+--[=[
+	Recursively formats the translated text
+	@param translator Translator | JSONTranslator
+	@param localizedText LocalizedTextData
+	@return string
+]=]
 function LocalizedTextUtils.localizedTextToString(translator, localizedText)
 	assert(translator, "Bad translator")
 	assert(localizedText, "No localizedText")

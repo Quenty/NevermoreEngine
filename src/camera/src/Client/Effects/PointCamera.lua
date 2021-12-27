@@ -1,5 +1,7 @@
---- Point a current element
--- @classmod PointCamera
+--[=[
+	Point a current element
+	@class PointCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,10 +11,12 @@ local SummedCamera = require("SummedCamera")
 local PointCamera = {}
 PointCamera.ClassName = "PointCamera"
 
---- Initializes a new PointCamera
--- @constructor
--- @param originCamera A camera to use
--- @param focusCamera The Camera to look at.
+--[=[
+	Initializes a new PointCamera
+
+	@param originCamera Camera -- A camera to use
+	@param focusCamera Camera -- The Camera to look at.
+]=]
 function PointCamera.new(originCamera, focusCamera)
 	local self = setmetatable({}, PointCamera)
 

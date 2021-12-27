@@ -1,5 +1,7 @@
---- Tracks a parent bound to a specific binder
--- @classmod BoundParentTracker
+--[=[
+	Tracks a parent bound to a specific binder
+	@class BoundParentTracker
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

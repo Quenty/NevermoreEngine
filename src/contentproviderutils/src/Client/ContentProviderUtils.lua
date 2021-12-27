@@ -1,5 +1,7 @@
---- Utility functions to ensure that content is preloaded (wrapping calls in promises)
--- @module ContentProviderUtils
+--[=[
+	Utility functions to ensure that content is preloaded (wrapping calls in promises)
+	@class ContentProviderUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,7 +11,15 @@ local Promise = require("Promise")
 
 local ContentProviderUtils = {}
 
--- Note: If strings are passed in, it only preloads textures, and will preload meshes, but only to http client.
+--[=[
+	Preloads assets
+	:::note
+	If strings are passed in, it only preloads textures, and will preload meshes, but only to http client.
+	:::
+
+	@param contentIdList { Instance | string }
+	@return Promise
+]=]
 function ContentProviderUtils.promisePreload(contentIdList)
 	assert(type(contentIdList) == "table", "Bad contentIdList")
 

@@ -1,10 +1,14 @@
---- Utility library for detecting multiple clicks or taps. Not good UX, but good for opening up a debug
--- menus
--- @module MultipleClickUtils
+--[=[
+	Utility library for detecting multiple clicks or taps. Not good UX, but good for opening up a debug
+	menus.
+
+	@class MultipleClickUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
+local Maid = require("Maid")
 
 local MultipleClickUtils = {}
 
@@ -14,12 +18,28 @@ local VALID_TYPES = {
 	[Enum.UserInputType.Touch] = true;
 }
 
+--[=[
+	Returns a signal that fires when the player clicks or taps on a Gui twice.
+
+	@param maid Maid
+	@param gui GuiBase
+	@return Signal<T>
+]=]
 function MultipleClickUtils.getDoubleClickSignal(maid, gui)
 	return MultipleClickUtils.getDoubleClickSignal(maid, gui, 2)
 end
 
+--[=[
+	Returns a signal that fires when the player clicks or taps on a Gui a certain amount
+	of times.
+
+	@param maid Maid
+	@param gui GuiBase
+	@param requiredCount number
+	@return Signal<T>
+]=]
 function MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
-	assert(maid, "Bad maid")
+	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(gui) == "Instance", "Bad gui")
 
 	local signal = Signal.new()

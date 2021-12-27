@@ -1,4 +1,4 @@
---- Main injection point
+-- Main injection point
 -- @script ServerMain
 -- @author Quenty
 

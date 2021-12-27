@@ -1,6 +1,7 @@
----
--- @module Blend
--- @author Quenty
+--[=[
+	Declarative UI system inspired by Fusion
+	@class Blend
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -25,6 +26,26 @@ local Blend = {}
 
 Blend.Children = Symbol.named("children")
 
+--[=[
+	Creates a new function which will return an observable that, given the props
+	in question, will construct a new instance and assign all props. This is the
+	equivalent of a pipe-able Rx command.
+
+	```lua
+	Blend.New "ScreenGui" {
+		Parent = game.Players.LocalPlayer.PlayerGui;
+		[Blend.Children] = {
+			Blend.New "Frame" {
+				Size = UDim2.new(1, 0, 1, 0);
+				BackgroundTransparency = 0.5;
+			};
+		};
+	};
+
+	@param className string
+	@return (props: { [string]: any; }) -> Observable<Instance>
+	```
+]=]
 function Blend.New(className)
 	assert(type(className) == "string", "Bad className")
 
@@ -51,6 +72,12 @@ function Blend.New(className)
 	end
 end
 
+--[=[
+	Creates a new Blend State which is actually just a ValueObject underneath.
+
+	@param defaultValue T
+	@return ValueObject<T>
+]=]
 function Blend.State(defaultValue)
 	return ValueObject.new(defaultValue)
 end
@@ -72,6 +99,32 @@ function Blend.Dynamic(...)
 		})
 end
 
+--[=[
+	Takes a list of variables and uses them to compute an observable that
+	will combine into any value. These variables can be any value, and if they
+	can be converted into an Observable, they will be, which will be used to compute
+	the value.
+
+	```lua
+	local verbState = Blend.State("hi")
+	local nameState = Blend.State("alice")
+
+	local computed = Blend.Computed(verbState, nameState, function(verb, name)
+		return verb .. " " .. name
+	end)
+
+	computed:Subscribe(function(sentence)
+		print(sentence)
+	end) --> "hi alice"
+
+	nameState.Value = "bob" --> "hi bob"
+	verbState.Value = "bye" --> "bye bob"
+	nameState.Value = "alice" --> "bye alice"
+	```
+
+	@param ... A series of convertable states, followed by a function at the end.
+	@return Observable<T>
+]=]
 function Blend.Computed(...)
 	local values = {...}
 	local n = select("#", ...)
@@ -106,6 +159,22 @@ function Blend.Computed(...)
 	end
 end
 
+--[=[
+	Short hand to register a propertyEvent changing
+
+	```lua
+	Blend.mount(workspace, {
+		[Blend.OnChange "Name"] = function(name)
+			print(name)
+		end;
+	}) --> Immediately will print "Workspace"
+
+	workspace.Name = "Hello" --> Prints "Hello"
+	```
+
+	@param propertyName string
+	@return (instance: Instance) -> Observable
+]=]
 function Blend.OnChange(propertyName)
 	assert(type(propertyName) == "string", "Bad propertyName")
 
@@ -114,6 +183,24 @@ function Blend.OnChange(propertyName)
 	end
 end
 
+--[=[
+	Short hand to register an event from the instance
+
+	```lua
+		Blend.mount(workspace, {
+			[Blend.OnEvent "ChildAdded"] = function(child)
+				print("Child added", child)
+			end;
+		})
+
+		local folder = Instance.new("Folder")
+		folder.Name = "Hi"
+		folder.Parent = workspace --> prints "Child added Hi"
+	```
+
+	@param eventName string
+	@return (instance: Instance) -> Observable
+]=]
 function Blend.OnEvent(eventName)
 	assert(type(eventName) == "string", "Bad eventName")
 
@@ -153,7 +240,7 @@ function Blend.ComputedPairs(source, compute)
 					local brio = Brio.new(result)
 					innerMaid:GiveTask(brio)
 
-					local cleanup = Blend.addChildren(parent, brio)
+					local cleanup = Blend.mountChildren(parent, brio)
 					if cleanup then
 						innerMaid:GiveTask(cleanup)
 					end
@@ -173,6 +260,13 @@ function Blend.ComputedPairs(source, compute)
 	end
 end
 
+--[=[
+	Like Blend.Spring, but for AccelTween
+
+	@param source any -- Source observable (or convertable)
+	@param acceleration any -- Source acceleration (or convertable)
+	@return Observable
+]=]
 function Blend.AccelTween(source, acceleration)
 	local sourceObservable = Blend.toPropertyObservable(source) or Rx.of(source)
 	local accelerationObservable = Blend.toNumberObservable(acceleration)
@@ -211,7 +305,27 @@ function Blend.AccelTween(source, acceleration)
 	end)
 end
 
+--[=[
+	Converts this arbitrary value into an observable that will initialize a spring
+	and interpolate it between values upon subscription.
 
+	```lua
+	local percentVisible = Blend.State(0)
+	local visibleSpring = Blend.Spring(percentVisible, 30)
+	local transparency = Blend.Computed(visibleSpring, function(percent)
+		return 1 - percent
+	end);
+
+	Blend.mount(frame, {
+		BackgroundTransparency = visibleSpring;
+	})
+	```
+
+	@param source any
+	@param speed any
+	@param damper any
+	@return Observable?
+]=]
 function Blend.Spring(source, speed, damper)
 	local sourceObservable = Blend.toPropertyObservable(source) or Rx.of(source)
 	local speedObservable = Blend.toNumberObservable(speed)
@@ -261,6 +375,12 @@ function Blend.Spring(source, speed, damper)
 	end)
 end
 
+--[=[
+	Converts this arbitrary value into an observable suitable for use in properties.
+
+	@param value any
+	@return Observable?
+]=]
 function Blend.toPropertyObservable(value)
 	if Observable.isObservable(value) then
 		return value
@@ -280,6 +400,12 @@ function Blend.toPropertyObservable(value)
 	return nil
 end
 
+--[=[
+	Converts this arbitrary value into an observable that emits numbers.
+
+	@param value number | any
+	@return Observable<number>?
+]=]
 function Blend.toNumberObservable(value)
 	if type(value) == "number" then
 		return Rx.of(value)
@@ -288,6 +414,12 @@ function Blend.toNumberObservable(value)
 	end
 end
 
+--[=[
+	Converts this arbitrary value into an observable that can be used to emit events.
+
+	@param value any
+	@return Observable?
+]=]
 function Blend.toEventObservable(value)
 	if Observable.isObservable(value) then
 		return value
@@ -298,6 +430,12 @@ function Blend.toEventObservable(value)
 	end
 end
 
+--[=[
+	Converts this arbitrary value into an event handler, which can be subscribed to
+
+	@param value any
+	@return function?
+]=]
 function Blend.toEventHandler(value)
 	if type(value) == "function" then
 		return value
@@ -319,7 +457,18 @@ function Blend.toEventHandler(value)
 	return nil
 end
 
-function Blend.addChildren(parent, value)
+--[=[
+	Mounts children to the parent and returns an object which will cleanup and delete
+	all children when removed.
+
+	Note that this effectively recursively mounts children and their values, which is
+	the heart of the reactive tree.
+
+	@param parent Instance
+	@param value any
+	@return MaidTask
+]=]
+function Blend.mountChildren(parent, value)
 	if typeof(value) == "Instance" then
 		value.Parent = parent
 
@@ -336,7 +485,7 @@ function Blend.addChildren(parent, value)
 			local maid = Maid.new()
 
 			-- Add for lifetime
-			local cleanup = Blend.addChildren(parent, value:GetValue())
+			local cleanup = Blend.mountChildren(parent, value:GetValue())
 			if cleanup then
 				maid:GiveTask(cleanup)
 			end
@@ -355,7 +504,7 @@ function Blend.addChildren(parent, value)
 				local maid = Maid.new()
 
 				maid:GiveTask(observable:Subscribe(function(result)
-					maid._current = Blend.addChildren(parent, result)
+					maid._current = Blend.mountChildren(parent, result)
 				end))
 
 				return maid
@@ -365,7 +514,7 @@ function Blend.addChildren(parent, value)
 				-- hope we're actually recursing over a nested table.
 				-- this allows us to add arrays into the blend.
 				for _, item in pairs(value) do
-					local cleanup = Blend.addChildren(parent, item)
+					local cleanup = Blend.mountChildren(parent, item)
 					if cleanup then
 						maid:GiveTask(cleanup)
 					end
@@ -384,6 +533,22 @@ function Blend.addChildren(parent, value)
 	return nil
 end
 
+--[=[
+	Mounts the instance to the props. This handles mounting children, and events.
+
+	The contract is that the props table is turned into observables. Note the following.
+
+	* Keys of strings are turned into properties
+		* If this can be turned into an observable, it will be used to subscribe to this event
+		* Otherwise, we assign directly
+	* Keys of functions are invoked on the instance in question
+		* If this returns an observable (or can be turned into one), we subscribe the event immediately
+	* If the key is [Blend.Children] then we invoke mountChildren on it
+
+	@param instance Instance
+	@param props table
+	@return Maid
+]=]
 function Blend.mount(instance, props)
 	local maid = Maid.new()
 
@@ -432,7 +597,7 @@ function Blend.mount(instance, props)
 
 	local childProp = props[Blend.Children]
 	if childProp then
-		local cleanup = Blend.addChildren(instance, childProp)
+		local cleanup = Blend.mountChildren(instance, childProp)
 		if cleanup then
 			maid:GiveTask(cleanup)
 		end

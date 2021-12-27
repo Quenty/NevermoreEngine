@@ -1,4 +1,7 @@
---- Generated Gestures with Python
+--[[
+	Generated Gestures with Python
+	@class Gestures
+]]
 
 local parent = script:FindFirstAncestorWhichIsA("ModuleScript")
 local require = require(parent.Parent.loader).load(parent)

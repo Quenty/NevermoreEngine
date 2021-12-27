@@ -1,6 +1,10 @@
----
--- @module RxBrioUtils
--- @author Quenty
+--[=[
+	Utility functions involving brios and rx. Brios encapsulate the lifetime of resources,
+	which could be expired by the time a subscription occurs. These functions allow us to
+	manipulate the state of these at a higher order.
+
+	@class RxBrioUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +16,11 @@ local Rx = require("Rx")
 
 local RxBrioUtils = {}
 
+--[=[
+	Takes a result and converts it to a brio if it is not one.
+
+	@return (source: Observable<Brio<T> | T>) -> Observable<Brio<T>>
+]=]
 function RxBrioUtils.toBrio()
 	return Rx.map(function(result)
 		if Brio.isBrio(result) then
@@ -22,6 +31,13 @@ function RxBrioUtils.toBrio()
 	end)
 end
 
+--[=[
+	Completes the observable on death
+
+	@param brio Brio
+	@param observable Observable<T>
+	@return Observable<T>
+]=]
 function RxBrioUtils.completeOnDeath(brio, observable)
 	assert(Brio.isBrio(brio))
 	assert(Observable.isObservable(observable))
@@ -43,6 +59,13 @@ function RxBrioUtils.completeOnDeath(brio, observable)
 	end)
 end
 
+--[=[
+	Whenever all returned brios are dead, emits this value wrapped
+	in a brio.
+
+	@param valueToEmitWhileAllDead T
+	@return (source: Observable<Brio<U>>) -> Observable<Brio<U | T>>
+]=]
 function RxBrioUtils.emitWhileAllDead(valueToEmitWhileAllDead)
 	return function(source)
 		return Observable.new(function(sub)
@@ -119,7 +142,12 @@ function RxBrioUtils.emitWhileAllDead(valueToEmitWhileAllDead)
 	end
 end
 
--- This can't be cheap. Consider deeply if you want this or not.
+--[=[
+	This can't be cheap. Consider deeply if you want this or not.
+
+	@param selectFromBrio ((value: T) -> U)?
+	@return (source: Observable<Brio<T>>) -> Observable<Brio{U}>
+]=]
 function RxBrioUtils.reduceToAliveList(selectFromBrio)
 	assert(type(selectFromBrio) == "function" or selectFromBrio == nil, "Bad selectFromBrio")
 
@@ -209,6 +237,11 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 	end
 end
 
+--[=[
+	Whenever the last brio dies, reemit it as a dead brio
+
+	@return (source Observable<Brio<T>>) -> Observable<Brio<T>>
+]=]
 function RxBrioUtils.reemitLastBrioOnDeath()
 	return function(source)
 		return Observable.new(function(sub)
@@ -247,8 +280,13 @@ function RxBrioUtils.reemitLastBrioOnDeath()
 	end
 end
 
--- Unpacks the brio, and then repacks it. Ignored items
--- still invalidate the previous brio
+--[=[
+	Unpacks the brio, and then repacks it. Ignored items
+	still invalidate the previous brio
+
+	@param predicate (T) -> boolean
+	@return (source: Observable<Brio<T>>) -> Observable<Brio<T>>
+]=]
 function RxBrioUtils.filter(predicate)
 	assert(type(predicate) == "function", "Bad predicate")
 
@@ -283,8 +321,13 @@ function RxBrioUtils.filter(predicate)
 	end
 end
 
--- Flattens all the brios in one brio and combines them. Note that this method leads to
--- gaps in the lifetime of the brio.
+--[=[
+	Flattens all the brios in one brio and combines them. Note that this method leads to
+	gaps in the lifetime of the brio.
+
+	@param observables { [any]: Observable<Brio<T>> | Observable<T> | T }
+	@return Observable<Brio<{ [any]: T }>>
+]=]
 function RxBrioUtils.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
@@ -295,32 +338,49 @@ function RxBrioUtils.combineLatest(observables)
 		})
 end
 
+--[=[
+	Flat map equivalent for brios
+
+	@param project (value: TBrio) -> TProject
+	@param resultSelector ((value: TProject) -> TResult)?
+	@return (source: Observable<Brio<TBrio>> -> Observable<Brio<TResult>>)
+]=]
 function RxBrioUtils.flatMap(project, resultSelector)
 	assert(type(project) == "function", "Bad project")
 
 	return Rx.flatMap(RxBrioUtils.mapBrio(project), resultSelector)
 end
 
+--[=[
+	Switch map but for Brio.
+
+	@param project (value: TBrio) -> TProject
+	@param resultSelector ((value: TProject) -> TResult)?
+	@return (source: Observable<Brio<TBrio>>) -> Observable<Brio<TResult>>
+]=]
 function RxBrioUtils.switchMap(project, resultSelector)
 	assert(type(project) == "function", "Bad project")
 
 	return Rx.switchMap(RxBrioUtils.mapBrio(project), resultSelector)
 end
 
---[[
-Works line combineLatest, but allow the transformation of a brio into an observable
-that emits the value, and then nil, on death.
+--[=[
+	Works line combineLatest, but allow the transformation of a brio into an observable
+	that emits the value, and then nil, on death.
 
-The issue here is this:
+	The issue here is this:
 
-1. Resources are found with combineLatest()
-2. One resource dies
-3. All resources are invalidated
-4. We still wanted to be able to use most of the resources
+	1. Resources are found with combineLatest()
+	2. One resource dies
+	3. All resources are invalidated
+	4. We still wanted to be able to use most of the resources
 
-With this method we are able to do this, as we'll re-emit a table with all resoruces
-except the invalidated one.
-]]
+	With this method we are able to do this, as we'll re-emit a table with all resoruces
+	except the invalidated one.
+
+	@param observables { [any]: Observable<Brio<T>> | Observable<T> | T }
+	@return Observable<Brio<{ [any]: T }>>
+]=]
 function RxBrioUtils.flatCombineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
@@ -336,7 +396,13 @@ function RxBrioUtils.flatCombineLatest(observables)
 	return Rx.combineLatest(newObservables)
 end
 
--- Takes in a brio and returns an observable that completes ony
+--[=[
+	Takes in a brio and returns an observable that emits the brio, and then completes
+	on death.
+
+	@param project (value: TBrio) -> TProject
+	@return (brio<TBrio>) -> Brio<TProject>
+]=]
 function RxBrioUtils.mapBrio(project)
 	assert(type(project) == "function", "Bad project")
 
@@ -354,7 +420,12 @@ function RxBrioUtils.mapBrio(project)
 	end
 end
 
--- Transforms the brio into an observable that emits the initial value of the brio, and then another value on death
+--[=[
+	Transforms the brio into an observable that emits the initial value of the brio, and then another value on death
+	@param brio Brio<T> | T
+	@param emitOnDeathValue U
+	@return Observable<T | U>
+]=]
 function RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
 	if not Brio.isBrio(brio) then
 		return Rx.of(brio)
@@ -375,20 +446,44 @@ function RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
 	end
 end
 
+--[=[
+	Returns a mapping function that emits the given value.
+
+	@param emitOnDeathValue U
+	@return (brio: Brio<T> | T) -> Observable<T | U>
+]=]
 function RxBrioUtils.mapBrioToEmitOnDeathObservable(emitOnDeathValue)
 	return function(brio)
 		return RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
 	end
 end
 
---- Takes in an observable of brios and returns an observable of the inner values that will also output
--- nil if there is no other value for the brio
+--[=[
+	Takes in an observable of brios and returns an observable of the inner values that will also output
+	nil if there is no other value for the brio.
+
+	@param emitOnDeathValue U
+	@return (source: Observable<Brio<T> | T>) -> Observable<T | U>
+]=]
 function RxBrioUtils.emitOnDeath(emitOnDeathValue)
 	return Rx.switchMap(RxBrioUtils.mapBrioToEmitOnDeathObservable(emitOnDeathValue));
 end
 
+--[=[
+	Flattens the observable to nil and the value
+
+	@function flattenToValueAndNil
+	@param source Observable<Brio<T> | T>
+	@return T | nil
+	@within RxBrioUtils
+]=]
 RxBrioUtils.flattenToValueAndNil = RxBrioUtils.emitOnDeath(nil)
 
+--[=[
+	Ensures only the last brio survives.
+
+	@return (source Observable<Brio<T>>) -> Observable<Brio<T>>
+]=]
 function RxBrioUtils.onlyLastBrioSurvives()
 	return function(source)
 		return Observable.new(function(sub)

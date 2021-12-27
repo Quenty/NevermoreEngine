@@ -1,6 +1,7 @@
---- Distributes the scored action to the correct providers based upon input mode
--- @classmod InputListScoreHelper
--- @author Quenty
+--[=[
+	Distributes the scored action to the correct providers based upon input mode
+	@class InputListScoreHelper
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

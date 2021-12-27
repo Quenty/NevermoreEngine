@@ -1,8 +1,19 @@
----
--- @module SphereUtils
+--[=[
+	Utility functions involving spheres
+	@class SphereUtils
+]=]
 
 local SphereUtils = {}
 
+--[=[
+	Determines whether the ray intersects with the sphere.
+
+	@param sphereCenter Vector3
+	@param sphereRadius number
+	@param rayOrigin Vector3
+	@param rayDirection Vector3
+	@return boolean
+]=]
 function SphereUtils.intersectsRay(
 	sphereCenter, sphereRadius,
 	rayOrigin, rayDirection

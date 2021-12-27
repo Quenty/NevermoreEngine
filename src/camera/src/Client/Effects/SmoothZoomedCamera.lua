@@ -1,7 +1,10 @@
---- Allow freedom of movement around a current place, much like the classic script works now.
--- Not intended to be use with the current character script
--- Intended to be used with a SummedCamera, relative.
--- @classmod SmoothZoomedCamera
+--[=[
+	Allow freedom of movement around a current place, much like the classic script works now.
+	Not intended to be use with the current character script
+	Intended to be used with a SummedCamera, relative.
+
+	@class SmoothZoomedCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

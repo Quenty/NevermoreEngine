@@ -1,5 +1,7 @@
---- Tracks a player's current team, since the Team property is unreliable
--- @classmod TeamTracker
+--[=[
+	Tracks a player's current team, since the Team property is unreliable
+	@class TeamTracker
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,5 +1,42 @@
---- Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set
--- @module NetworkOwnerService
+--[=[
+	Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set. Deduplicates network
+	ownership handles.
+
+	## Setup
+	```lua
+	-- Server.lua
+
+	local serviceBag = require("ServiceBag")
+	serviceBag:GetService(require("NetworkOwnerService"))
+
+	serviceBag:Init()
+	serviceBag:Start()
+	```
+
+	## Usage
+	```lua
+	local networkOwnerService = serviceBag:GetService(NetworkOwnerService)
+
+	-- Force this part to be owned by the server
+	local handle = networkOwnerService:AddSetNetworkOwnerHandle(workspace.Part, nil)
+
+	delay(2.5, function()
+		-- oh no, another function wants to set the network owner, guess we'll be owned by Quenty for a while
+		local handle = networkOwnerService:AddSetNetworkOwnerHandle(workspace.Part, Players.Quenty)
+
+		delay(1, function()
+			-- stop using quenty, guess we're back to the server now
+			handle()
+		end)
+	end)
+
+	delay(5, function()
+		handle() -- stop forcing network ownership to be the server, now we're back to nil
+	end)
+	```
+
+	@class NetworkOwnerService
+]=]
 
 local NetworkOwnerService = {}
 
@@ -7,12 +44,20 @@ local WEAK_METATABLE = { __mode = "kv" }
 
 local SERVER_FLAG = "server"
 
+--[=[
+	Initializes the NetworkOwnerService. Should be done via [ServiceBag].
+]=]
 function NetworkOwnerService:Init()
 	assert(not self._partOwnerData, "Already initialized")
 
 	self._partOwnerData = setmetatable({}, { __mode="k" })
 end
 
+--[=[
+	Tries to set the network owner handle to the given player.
+	@param part BasePart
+	@param player Player
+]=]
 function NetworkOwnerService:AddSetNetworkOwnerHandle(part, player)
 	assert(self ~= NetworkOwnerService, "Make sure to retrieve NetworkOwnerService from a ServiceBag")
 	assert(self._partOwnerData, "Not initialized")

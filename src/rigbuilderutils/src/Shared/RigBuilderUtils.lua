@@ -1,5 +1,7 @@
---- Helps build player characters
--- @module RigBuilderUtils
+--[=[
+	Helps build player characters or other humanoid rigs for use in a variety of situations.
+	@class RigBuilderUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -167,6 +169,10 @@ function RigBuilderUtils.createR6BaseRig()
 	return character
 end
 
+--[=[
+	Creates an R6 mesh rig
+	@return Instance
+]=]
 function RigBuilderUtils.createR6MeshRig()
 	local rig = RigBuilderUtils.createR6BaseRig()
 
@@ -203,6 +209,10 @@ function RigBuilderUtils.createR6MeshRig()
 	return rig
 end
 
+--[=[
+	Creates an R6 boy mesh rig
+	@return Instance
+]=]
 function RigBuilderUtils.createR6MeshBoyRig()
 	local rig = RigBuilderUtils.createR6BaseRig()
 
@@ -239,6 +249,10 @@ function RigBuilderUtils.createR6MeshBoyRig()
 	return rig
 end
 
+--[=[
+	Creates an R6 girl mesh rig
+	@return Instance
+]=]
 function RigBuilderUtils.createR6MeshGirlRig()
 	local rig = RigBuilderUtils.createR6BaseRig()
 
@@ -316,6 +330,11 @@ function RigBuilderUtils._createR15BaseRig()
 	return character, humanoid
 end
 
+--[=[
+	Creates an R15 rig from a package
+	@param packageAssetId number
+	@return Promise<Instance>
+]=]
 function RigBuilderUtils.promiseR15PackageRig(packageAssetId)
 	assert(type(packageAssetId) == "number", "Bad packageAssetId")
 
@@ -372,6 +391,10 @@ function RigBuilderUtils.promiseR15PackageRig(packageAssetId)
 		end)
 end
 
+--[=[
+	Creates a default R15 rig
+	@return Promise<Instance>
+]=]
 function RigBuilderUtils.promiseR15Rig()
 	return InsertServiceUtils.promiseAsset(1664543044)
 		:Then(function(inserted)
@@ -399,18 +422,35 @@ function RigBuilderUtils.promiseR15Rig()
 		end)
 end
 
+--[=[
+	Creates an R15 man rig
+	@return Promise<Instance>
+]=]
 function RigBuilderUtils.promiseR15ManRig()
 	return RigBuilderUtils.promiseR15PackageRig(86500185)
 end
 
+--[=[
+	Creates an R15 woman rig
+	@return Promise<Instance>
+]=]
 function RigBuilderUtils.promiseR15WomanRig()
 	return RigBuilderUtils.promiseR15PackageRig(86499905)
 end
 
+--[=[
+	Creates an R15 mesh rig
+	@return Promise<Instance>
+]=]
 function RigBuilderUtils.promiseR15MeshRig()
 	return RigBuilderUtils.promiseR15PackageRig(27112438)
 end
 
+--[=[
+	Creates an R15 rig dressed as a given player
+	@param userId number
+	@return Promise<Instance>
+]=]
 function RigBuilderUtils.promisePlayerRig(userId)
 	assert(type(userId) == "number", "Bad userId")
 

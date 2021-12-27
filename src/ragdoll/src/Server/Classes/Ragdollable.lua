@@ -1,6 +1,6 @@
----
--- @classmod Ragdollable
--- @author Quenty
+--[=[
+	@class Ragdollable
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

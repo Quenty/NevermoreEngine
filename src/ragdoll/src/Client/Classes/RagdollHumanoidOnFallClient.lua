@@ -1,6 +1,6 @@
----
--- @classmod RagdollHumanoidOnFallClient
--- @author Quenty
+--[=[
+	@class RagdollHumanoidOnFallClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

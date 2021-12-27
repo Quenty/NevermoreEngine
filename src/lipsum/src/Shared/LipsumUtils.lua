@@ -1,5 +1,7 @@
---- Helpers generate test text for a variety of situations.
--- @module LipsumUtils
+--[=[
+	Helpers generate test text for a variety of situations, in the standard Lorem-Ipsum utility system.
+	@class LipsumUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +14,16 @@ local WORDS = {
 	"lorem", "ipsum", "dolor", "sit", "amet", "consectetuer", "adipiscing", "elit", "sed", "diam", "nonummy",
 	"nibh", "euismod", "tincidunt", "ut", "laoreet", "dolore", "magna", "aliquam", "erat"}
 
+--[=[
+	Generates a random username.
+
+	```lua
+	print(LipsumUtils.username()) --> LoremIpsum23
+	```
+
+	@param random Random? -- Optional random
+	@return string
+]=]
 function LipsumUtils.username(random)
 	random = random or Random.new()
 
@@ -43,10 +55,31 @@ function LipsumUtils.username(random)
 	end
 end
 
+--[=[
+	Generates a random word.
+
+	```lua
+	print(LipsumUtils.word()) --> Lipsum
+	```
+
+	@param random Random? -- Optional random
+	@return string
+]=]
 function LipsumUtils.word(random)
 	return LipsumUtils.words(1, random)
 end
 
+--[=[
+	Generates a random set of words space-separated.
+
+	```lua
+	print(LipsumUtils.words(5)) --> 5 words
+	```
+
+	@param numWords number
+	@param random Random? -- Optional random
+	@return string
+]=]
 function LipsumUtils.words(numWords, random)
 	local output = ""
 
@@ -63,6 +96,17 @@ function LipsumUtils.words(numWords, random)
 	return output
 end
 
+--[=[
+	Generates a random sentence.
+
+	```lua
+	print(LipsumUtils.sentence(7)) --> Sentence with 7 words.
+	```
+
+	@param numWords number? -- Defaults to a random number 6 to 12.
+	@param random Random? -- Optional random
+	@return string
+]=]
 function LipsumUtils.sentence(numWords, random)
 	random = random or Random.new()
 	numWords = numWords or random:NextInteger(6, 12)
@@ -92,6 +136,18 @@ function LipsumUtils.sentence(numWords, random)
 	return output
 end
 
+--[=[
+	Generates a random paragraph.
+
+	```lua
+	print(LipsumUtils.paragraph(4)) --> Paragraph with 4 sentences.
+	```
+
+	@param numSentences number
+	@param createSentence (() -> string)? -- Optional createSentence
+	@param random Random? -- Optional random
+	@return string
+]=]
 function LipsumUtils.paragraph(numSentences, createSentence, random)
 	random = random or Random.new()
 	numSentences = numSentences or random:NextInteger(5, 15)
@@ -110,6 +166,16 @@ function LipsumUtils.paragraph(numSentences, createSentence, random)
 	return output
 end
 
+--[=[
+	```lua
+	print(LipsumUtils.document(3)) --> Document with 3 paragraphs
+	```
+
+	@param numParagraphs number
+	@param createParagraph (() -> string)? -- Optional createParagraph
+	@param random Random? -- Optional random
+	@return string
+]=]
 function LipsumUtils.document(numParagraphs, createParagraph, random)
 	random = random or Random.new()
 	numParagraphs = numParagraphs or 5

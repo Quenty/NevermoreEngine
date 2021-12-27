@@ -1,5 +1,9 @@
---- Simple rig component to point at attachments given
--- @classmod GripPointer
+--[=[
+	Simple rig component to point at attachments given
+
+	@client
+	@class GripPointer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

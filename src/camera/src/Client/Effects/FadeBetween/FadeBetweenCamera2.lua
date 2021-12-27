@@ -1,6 +1,6 @@
----
--- @classmod FadeBetweenCamera2
--- @author Quenty
+--[=[
+	@class FadeBetweenCamera2
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,6 +11,11 @@ local FadeBetweenCamera2 = {}
 FadeBetweenCamera2.ClassName = "FadeBetweenCamera2"
 FadeBetweenCamera2.__index = FadeBetweenCamera2
 
+--[=[
+	@param cameraA CameraLike
+	@param cameraB CameraLike
+	@return FadeBetweenCamera2
+]=]
 function FadeBetweenCamera2.new(cameraA, cameraB)
 	local self = setmetatable({
 		CameraA = cameraA or error("No cameraA");
@@ -61,6 +66,12 @@ function FadeBetweenCamera2:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within FadeBetweenCamera2
+]=]
 function FadeBetweenCamera2:__index(index)
 	if index == "CameraState" then
 		local state, _ = self:_computeCameraState(self:_computeDoneProportion(os.clock()))

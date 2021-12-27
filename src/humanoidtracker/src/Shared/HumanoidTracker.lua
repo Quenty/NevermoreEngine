@@ -1,5 +1,7 @@
---- Tracks a player's character's humanoid
--- @classmod HumanoidTracker
+--[=[
+	Tracks a player's character's humanoid
+	@class HumanoidTracker
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,17 +14,44 @@ local HumanoidTracker = {}
 HumanoidTracker.ClassName = "HumanoidTracker"
 HumanoidTracker.__index = HumanoidTracker
 
+--[=[
+	Current humanoid
+	@prop Humanoid ValueObject<Humanoid>
+	@within HumanoidTracker
+]=]
+
+--[=[
+	Current humanoid which is alive
+	@prop AliveHumanoid ValueObject<Humanoid>
+	@within HumanoidTracker
+]=]
+
+--[=[
+	Fires when the humanoid dies
+	@prop HumanoidDied Signal<Humanoid>
+	@within HumanoidTracker
+]=]
+
+--[=[
+	Tracks the player's current humanoid
+
+	:::tip
+	Be sure to clean up the tracker once you're done!
+	:::
+	@param player Player
+	@return HumanoidTracker
+]=]
 function HumanoidTracker.new(player)
 	local self = setmetatable({}, HumanoidTracker)
 
 	self._player = player or error("No player")
 	self._maid = Maid.new()
 
-	--- Tracks the current character humanoid, may be nil
+	-- Tracks the current character humanoid, may be nil
 	self.Humanoid = ValueObject.new()
 	self._maid:GiveTask(self.Humanoid)
 
-	--- Tracks the alive humanoid, may be nil
+	-- Tracks the alive humanoid, may be nil
 	self.AliveHumanoid = ValueObject.new()
 	self._maid:GiveTask(self.AliveHumanoid)
 
@@ -48,6 +77,13 @@ function HumanoidTracker.new(player)
 	return self
 end
 
+--[=[
+	Returns a promise that resolves when the next humanoid is found.
+	If a humanoid is already there, then returns a resolved promise
+	with that humanoid.
+
+	@return Promise<Humanoid>
+]=]
 function HumanoidTracker:PromiseNextHumanoid()
 	if self.Humanoid.Value then
 		return Promise.resolved(self.Humanoid.Value)
@@ -132,6 +168,9 @@ function HumanoidTracker:_handleHumanoidChanged(newHumanoid, _, maid)
 	end))
 end
 
+--[=[
+	Cleans up the humanoid tracker and sets the metatable to be nil.
+]=]
 function HumanoidTracker:Destroy()
 	self._maid:DoCleaning()
 	setmetatable(self, nil)

@@ -1,5 +1,7 @@
---- Sets properties on the client and then replicates them to the server
--- @classmod OverriddenProperty
+--[=[
+	Sets properties on the client and then replicates them to the server
+	@class OverriddenProperty
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,9 +12,15 @@ local OverriddenProperty = setmetatable({}, BaseObject)
 OverriddenProperty.ClassName = "OverriddenProperty"
 OverriddenProperty.__index = OverriddenProperty
 
----
--- @param[opt=nil] replicateRate Optional replication rate and callback
--- @param[opt=nil] replicateCallback
+--[=[
+	Constructs a new OverriddenProperty.
+
+	@param robloxInstance Instance
+	@param propertyName string
+	@param replicateRate number? -- Optional replication rate and callback
+	@param replicateCallback (T)?
+	@return OverriddenProperty
+]=]
 function OverriddenProperty.new(robloxInstance, propertyName, replicateRate, replicateCallback)
 	local self = setmetatable(BaseObject.new(robloxInstance), OverriddenProperty)
 
@@ -36,6 +44,11 @@ function OverriddenProperty.new(robloxInstance, propertyName, replicateRate, rep
 	return self
 end
 
+--[=[
+	Sets the property
+
+	@param value T
+]=]
 function OverriddenProperty:Set(value)
 	assert(typeof(value) == typeof(self._value), "Bad value")
 
@@ -43,6 +56,11 @@ function OverriddenProperty:Set(value)
 	self:_executeSet(true)
 end
 
+--[=[
+	Gets the property
+
+	@return T
+]=]
 function OverriddenProperty:Get()
 	return self._value
 end

@@ -1,5 +1,8 @@
---- Holds constants for resource retrieval
--- @module ResourceConstants
+--[=[
+	Holds constants for resource retrieval.
+	@class ResourceConstants
+	@private
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

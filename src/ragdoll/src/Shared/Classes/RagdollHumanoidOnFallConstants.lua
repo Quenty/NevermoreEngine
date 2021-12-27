@@ -1,5 +1,6 @@
----
--- @module RagdollHumanoidOnFallConstants
+--[=[
+	@class RagdollHumanoidOnFallConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

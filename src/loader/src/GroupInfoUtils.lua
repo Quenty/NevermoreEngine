@@ -1,6 +1,8 @@
----
--- @module GroupInfoUtils
--- @author Quenty
+--[=[
+	Nevermore loader utility library
+	@private
+	@class GroupInfoUtils
+]=]
 
 local Utils = require(script.Parent.Utils)
 local Queue = require(script.Parent.Queue)

@@ -1,5 +1,6 @@
----
--- @module IKResourceUtils
+--[=[
+	@class IKResourceUtils
+]=]
 
 local IKResourceUtils = {}
 

@@ -1,6 +1,6 @@
----
--- @classmod ScoredActionPickerProvider
--- @author Quenty
+--[=[
+	@class ScoredActionPickerProvider
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

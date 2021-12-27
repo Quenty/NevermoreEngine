@@ -1,8 +1,13 @@
---- Class that while constructed apply a tag to any children of the parent it is given, assuming that
--- class has the required tag.
--- This lets you bridge tag systems since CollectionService is used as an interop model between many
--- components in scripts.
--- @classmod ApplyTagToTaggedChildren
+--[=[
+
+	Class that while constructed apply a tag to any children of the parent it is given, assuming that
+	class has the required tag.
+
+	This lets you bridge tag systems since CollectionService is used as an interop model between many
+	components in scripts.
+
+	@class ApplyTagToTaggedChildren
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -14,6 +19,13 @@ local ApplyTagToTaggedChildren = setmetatable({}, BaseObject)
 ApplyTagToTaggedChildren.ClassName = "ApplyTagToTaggedChildren"
 ApplyTagToTaggedChildren.__index = ApplyTagToTaggedChildren
 
+--[=[
+	Creates a new ApplyTagToTaggedChildren.
+	@param parent Instance
+	@param tag string
+	@param requiredTag string
+	@return ApplyTagToTaggedChildren
+]=]
 function ApplyTagToTaggedChildren.new(parent, tag, requiredTag)
 	local self = setmetatable(BaseObject.new(), ApplyTagToTaggedChildren)
 

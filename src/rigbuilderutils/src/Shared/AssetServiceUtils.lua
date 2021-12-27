@@ -1,6 +1,7 @@
----
--- @module AssetServiceUtils
--- @author Quenty
+--[=[
+	Utility methods involving the AssetService
+	@class AssetServiceUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,6 +11,12 @@ local Promise = require("Promise")
 
 local AssetServiceUtils = {}
 
+--[=[
+	Retrieves the assetIds for a package
+
+	@param packageAssetId number
+	@return Promise<table>
+]=]
 function AssetServiceUtils.promiseAssetIdsForPackage(packageAssetId)
 	return Promise.spawn(function(resolve, reject)
 		local result

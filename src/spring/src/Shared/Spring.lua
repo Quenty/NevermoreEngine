@@ -1,53 +1,51 @@
---[[
-class Spring
+--[=[
+	A physical model of a spring, useful in many applications.
 
-Description:
-	A physical model of a spring, useful in many applications. Properties only evaluate
-	upon index making this model good for lazy applications
+	A spring is an object that will compute based upon Hooke's law. Properties only evaluate
+	upon index making this model good for lazy applications.
 
-API:
-	Spring = Spring.new(number position)
-		Creates a new spring in 1D
-	Spring = Spring.new(Vector3 position)
-		Creates a new spring in 3D
+	```lua
+	local RunService = game:GetService("RunService")
+	local UserInputService = game:GetService("UserInputService")
 
-	Spring.Position
-		Returns the current position
-	Spring.Velocity
-		Returns the current velocity
-	Spring.Target
-		Returns the target
-	Spring.Damper
-		Returns the damper
-	Spring.Speed
-		Returns the speed
+	local spring = Spring.new(Vector3.new(0, 0, 0))
 
-	Spring.Target = number/Vector3
-		Sets the target
-	Spring.Position = number/Vector3
-		Sets the position
-	Spring.Velocity = number/Vector3
-		Sets the velocity
-	Spring.Damper = number [-infinity, infinity]
-		Sets the spring damper, defaults to 1
-	Spring.Speed = number [0, infinity)
-		Sets the spring speed, defaults to 1
+	RunService.RenderStepped:Connect(function()
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+			spring.Target = Vector3.new(0, 0, 1)
+		else
+			spring.Target = Vector3.new(0, 0, 0)
+		end
 
-	Spring:TimeSkip(number DeltaTime)
-		Instantly skips the spring forwards by that amount of now
-	Spring:Impulse(number/Vector3 velocity)
-		Impulses the spring, increasing velocity by the amount given
+		print(spring.Position) -- A smoothed out version of the input keycode W
+	end)
+	```
 
-Visualization (by Defaultio):
+	A good visualization can be fond here, provided by Defaultio:
 	https://www.desmos.com/calculator/hn2i9shxbz
-]]
 
-
+	@class Spring
+]=]
 local Spring = {}
 
---- Creates a new spring
--- @param initial A number or Vector3 (anything with * number and addition/subtraction defined)
--- @param[opt=os.clock] clock function to use to update spring
+--[=[
+	Constructs a new Spring at the position and target specified, of type T.
+
+	```lua
+	-- Linear spring
+	local linearSpring = Spring.new(0)
+
+	-- Vector2 spring
+	local vector2Spring = Spring.new(Vector2.new(0, 0))
+
+	-- Vector3 spring
+	local vector3Spring = Spring.new(Vector3.new(0, 0, 0))
+	```
+
+	@param initial T -- The initial parameter is a number or Vector3 (anything with * number and addition/subtraction).
+	@param clock? () -> number -- The clock function is option, and is used to update the spring
+	@return Spring<T>
+]=]
 function Spring.new(initial, clock)
 	local target = initial or 0
 	clock = clock or os.clock
@@ -62,14 +60,22 @@ function Spring.new(initial, clock)
 	}, Spring)
 end
 
---- Impulse the spring with a change in velocity
--- @param velocity The velocity to impulse with
+--[=[
+	Impulses the spring, increasing velocity by the amount given. This is useful to make something shake,
+	like a Mac password box failing.
+
+	@param velocity T -- The velocity to impulse with
+	@return ()
+]=]
 function Spring:Impulse(velocity)
 	self.Velocity = self.Velocity + velocity
 end
 
---- Skip forwards in now
--- @param delta now to skip forwards
+--[=[
+	Instantly skips the spring forwards by that amount time
+	@param delta number--  Time to skip forwards
+	@return ()
+]=]
 function Spring:TimeSkip(delta)
 	local now = self._clock()
 	local position, velocity = self:_positionVelocity(now+delta)
@@ -78,6 +84,87 @@ function Spring:TimeSkip(delta)
 	self._time0 = now
 end
 
+--[=[
+	The current position at the given clock time. Assigning the position will change the spring to have that position.
+
+	```lua
+	local spring = Spring.new(0)
+	print(spring.Position) --> 0
+	```
+
+	@prop Position T
+	@within Spring
+]=]
+--[=[
+	Alias for [Spring.Position](/api/Spring#Position)
+
+	@prop p T
+	@within Spring
+]=]
+--[=[
+	The current velocity. Assigning the velocity will change the spring to have that velocity.
+
+	```lua
+	local spring = Spring.new(0)
+	print(spring.Velocity) --> 0
+	```
+
+	@prop Velocity T
+	@within Spring
+]=]
+--[=[
+	Alias for [Spring.Velocity](/api/Spring#Velocity)
+
+	@prop v T
+	@within Spring
+]=]
+--[=[
+	The current target. Assigning the target will change the spring to have that target.
+
+	```lua
+	local spring = Spring.new(0)
+	print(spring.Target) --> 0
+	```
+
+	@prop Target T
+	@within Spring
+]=]
+--[=[
+	Alias for [Spring.Target](/api/Spring#Target)
+	@prop t T
+	@within Spring
+]=]
+--[=[
+	The current damper, defaults to 1. At 1 the spring is critically damped. At less than 1, it
+	will be underdamped, and thus, bounce, and at over 1, it will be critically damped.
+
+	@prop Damper number
+	@within Spring
+]=]
+--[=[
+	Alias for [Spring.Damper](/api/Spring#Damper)
+
+	@prop d number
+	@within Spring
+]=]
+--[=[
+	The speed, defaults to 1, but should be between [0, infinity)
+
+	@prop Speed number
+	@within Spring
+]=]
+--[=[
+	Alias for [Spring.Speed](/api/Spring#Speed)
+
+	@prop s number
+	@within Spring
+]=]
+--[=[
+	The current clock object to syncronize the spring against.
+
+	@prop Clock () -> number
+	@within Spring
+]=]
 function Spring:__index(index)
 	if Spring[index] then
 		return Spring[index]

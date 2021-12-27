@@ -1,5 +1,7 @@
---- Renders touching parts from the PartTouchingCalculator
--- @classmod PartTouchingRenderer
+--[=[
+	Renders touching parts from the PartTouchingCalculator
+	@class PartTouchingRenderer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,7 +1,9 @@
---- Utility function to create network ropes which hint to Roblox that two assemblies
---  should be considered to be owned by the same network owner.
--- @module NetworkRopeUtils
--- @author Quenty
+--[=[
+	Utility function to create network ropes which hint to Roblox that two assemblies
+	should be considered to be owned by the same network owner.
+
+	@class NetworkRopeUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +15,14 @@ local NETWORK_OWNER_ROPE_TAG = "NetworkRopeUtilCreatedObject"
 
 local NetworkRopeUtils = {}
 
+--[=[
+	Hints that the two parts share a mechanism. This is sort of a physics hack since Roblox
+	will keep mechanisms on the same network owner.
+
+	@param part0 BasePart
+	@param part1 BasePart
+	@return Maid
+]=]
 function NetworkRopeUtils.hintSharedMechanism(part0, part1)
 	assert(typeof(part0) == "Instance", "Bad part0")
 	assert(typeof(part1) == "Instance", "Bad part1")
@@ -47,6 +57,10 @@ function NetworkRopeUtils.hintSharedMechanism(part0, part1)
 	return maid
 end
 
+--[=[
+	Removes all network owner hints from a given part
+	@param part Part
+]=]
 function NetworkRopeUtils.clearNetworkOwnerHints(part)
 	-- Preemptively clears the ownership of a part so we don't transfer ownership
 	-- accidently

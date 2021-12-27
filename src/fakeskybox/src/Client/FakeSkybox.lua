@@ -1,5 +1,7 @@
---- Allow transitions between skyboxes
--- @classmod FakeSkybox
+--[=[
+	Allow transitions between skyboxes
+	@class FakeSkybox
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -32,6 +34,11 @@ FakeSkybox.__index = FakeSkybox
 FakeSkybox.ClassName = "FakeSkybox"
 FakeSkybox._partSize = 1024
 
+--[=[
+	Creates a new FakeSkybox
+	@param skybox Skybox
+	@return FakeSkybox
+]=]
 function FakeSkybox.new(skybox)
 	local self = setmetatable({}, FakeSkybox)
 
@@ -63,7 +70,10 @@ function FakeSkybox.new(skybox)
 	return self
 end
 
-
+--[=[
+	@param partSize number
+	@return FakeSkybox -- self
+]=]
 function FakeSkybox:SetPartSize(partSize)
 	self._partSize = partSize or error("No partSize")
 
@@ -74,6 +84,9 @@ function FakeSkybox:SetPartSize(partSize)
 	return self
 end
 
+--[=[
+	@param doNotAnimate boolean
+]=]
 function FakeSkybox:Show(doNotAnimate)
 	if self._visible then
 		return
@@ -88,6 +101,9 @@ function FakeSkybox:Show(doNotAnimate)
 	self.VisibleChanged:Fire(self._visible, doNotAnimate)
 end
 
+--[=[
+	@param doNotAnimate boolean
+]=]
 function FakeSkybox:Hide(doNotAnimate)
 	if not self._visible then
 		return
@@ -102,6 +118,10 @@ function FakeSkybox:Hide(doNotAnimate)
 	self.VisibleChanged:Fire(self._visible, doNotAnimate)
 end
 
+--[=[
+	@param skybox Skybox
+	@return FakeSkybox -- self
+]=]
 function FakeSkybox:SetSkybox(skybox)
 	self._skybox = skybox or error("No skybox")
 
@@ -113,10 +133,18 @@ function FakeSkybox:SetSkybox(skybox)
 	return self
 end
 
+--[=[
+	Returns whether the skybox is visible.
+	@return boolean
+]=]
 function FakeSkybox:IsVisible()
 	return self._visible
 end
 
+--[=[
+	Updates the rendering
+	@param baseCFrame CFrame
+]=]
 function FakeSkybox:UpdateRender(baseCFrame)
 	local transparency = 1-self._percentVisible.p
 
@@ -126,6 +154,9 @@ function FakeSkybox:UpdateRender(baseCFrame)
 	end
 end
 
+--[=[
+	Cleans up the fake skybox
+]=]
 function FakeSkybox:Destroy()
 	self._maid:DoCleaning()
 	self._maid = nil

@@ -1,5 +1,7 @@
---- Client side ragdolling meant to be used with a binder
--- @classmod RagdollClient
+--[=[
+	Client side ragdolling meant to be used with a binder
+	@class RagdollClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

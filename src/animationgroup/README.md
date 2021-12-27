@@ -1,10 +1,10 @@
 ## AnimationGroup
 <div align="center">
-  <a href="http://quenty.github.io/api/">
-    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  <a href="http://quenty.github.io/NevermoreEngine/">
+    <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
   </a>
   <a href="https://discord.gg/mhtGUS8">
-    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+    <img src="https://img.shields.io/discord/385151591524597761?color=5865F2&label=discord&logo=discord&logoColor=white" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
@@ -13,17 +13,9 @@
 
 A group of weighted tracks that can be played back with weighted probability. The closest example to this is the idle animation that looks around at a 1:10 ratio when you're standing still in default Roblox animation script.
 
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/AnimationGroup">View docs →</a></div>
+
 ## Installation
 ```
 npm install @quenty/animationgroup --save
 ```
-
-## Usage
-Usage is designed to be simple.
-
-### `AnimationGroup.new(weightedTracks)`
-
-### `AnimationGroup:Play(transitionTime)`
-
-### `AnimationGroup:Stop(transitionTime)`
-

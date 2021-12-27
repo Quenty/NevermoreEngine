@@ -1,5 +1,9 @@
---- DataStore manager for player that automatically saves on player leave and game close
--- @classmod PlayerDataStoreManager
+--[=[
+	DataStore manager for player that automatically saves on player leave and game close.
+
+	@server
+	@class PlayerDataStoreManager
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -16,7 +20,12 @@ local PlayerDataStoreManager = setmetatable({}, BaseObject)
 PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
 PlayerDataStoreManager.__index = PlayerDataStoreManager
 
--- @param [keyGenerator] Function that takes in a player, and outputs a key
+--[=[
+	Constructs a new PlayerDataStoreManager.
+	@param robloxDataStore DataStore
+	@param keyGenerator (player) -> string -- Function that takes in a player, and outputs a key
+	@return PlayerDataStoreManager
+]=]
 function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
 	local self = setmetatable(BaseObject.new(), PlayerDataStoreManager)
 
@@ -49,24 +58,37 @@ function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
 	return self
 end
 
---- For if you want to disable saving in studio for faster close time!
+--[=[
+	For if you want to disable saving in studio for faster close time!
+]=]
 function PlayerDataStoreManager:DisableSaveOnCloseStudio()
 	assert(RunService:IsStudio())
 
 	self._disableSavingInStudio = true
 end
 
---- Adds a callback to be called before save on removal
+--[=[
+	Adds a callback to be called before save on removal
+	@param callback function
+]=]
 function PlayerDataStoreManager:AddRemovingCallback(callback)
 	table.insert(self._removingCallbacks, callback)
 end
 
---- Callable to allow manual GC so things can properly clean up.
--- This can be used to pre-emptively cleanup players.
+--[=[
+	Callable to allow manual GC so things can properly clean up.
+	This can be used to pre-emptively cleanup players.
+
+	@param player Player
+]=]
 function PlayerDataStoreManager:RemovePlayerDataStore(player)
 	self:_removePlayerDataStore(player)
 end
 
+--[=[
+	@param player Player
+	@return DataStore
+]=]
 function PlayerDataStoreManager:GetDataStore(player)
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(player:IsA("Player"), "Bad player")
@@ -83,6 +105,11 @@ function PlayerDataStoreManager:GetDataStore(player)
 	return self:_createDataStore(player)
 end
 
+--[=[
+	Removes all player data stores, and returns a promise that
+	resolves when all pending saves are saved.
+	@return Promise
+]=]
 function PlayerDataStoreManager:PromiseAllSaves()
 	for player, _ in pairs(self._datastores) do
 		self:_removePlayerDataStore(player)

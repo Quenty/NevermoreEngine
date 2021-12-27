@@ -1,5 +1,7 @@
---- Clip characters locally on the client of other clients so they don't interfer with physics.
--- @classmod ClipCharacters
+--[=[
+	Clip characters locally on the client of other clients so they don't interfer with physics.
+	@class ClipCharacters
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -16,9 +18,10 @@ ClipCharacters.ClassName = "ClipCharacters"
 ClipCharacters.__index = ClipCharacters
 ClipCharacters.COLLISION_GROUP_NAME = "ClipCharacters"
 
---- Initialize on server
--- @constructor
--- @treturn nil
+--[=[
+	Initialize on server
+	@server
+]=]
 function ClipCharacters.initServer()
 	local groupId = PhysicsService:CreateCollisionGroup(ClipCharacters.COLLISION_GROUP_NAME)
 	PhysicsService:CollisionGroupSetCollidable(ClipCharacters.COLLISION_GROUP_NAME, "Default", false)
@@ -29,9 +32,11 @@ function ClipCharacters.initServer()
 	end
 end
 
---- Initialize clipping on the client. Returns a new inst
--- @constructor
--- @treturn ClipCharacters
+--[=[
+	Initialize clipping on the client. Returns a new inst
+	@client
+	@return ClipCharacters
+]=]
 function ClipCharacters.new()
 	local self = setmetatable({}, ClipCharacters)
 
@@ -123,8 +128,9 @@ function ClipCharacters:_bindUpdatesYielding()
 	end))
 end
 
---- Stop clipping on client
--- @treturn nil
+--[=[
+	Stop clipping on client
+]=]
 function ClipCharacters:Destroy()
 	self._maid:DoCleaning()
 	self._maid = nil

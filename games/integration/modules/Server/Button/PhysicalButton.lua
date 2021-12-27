@@ -1,6 +1,6 @@
----
--- @classmod PhysicalButton
--- @author Quenty
+--[=[
+	@class PhysicalButton
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

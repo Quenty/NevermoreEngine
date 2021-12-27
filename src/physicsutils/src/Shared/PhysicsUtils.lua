@@ -1,18 +1,29 @@
---- General physics library for use on Roblox
--- @module PhysicsUtils
+--[=[
+	General physics library for use on Roblox
+	@class PhysicsUtils
+]=]
 
 local Workspace = game:GetService("Workspace")
 
 local PhysicsUtils = {}
 PhysicsUtils.WATER_DENSITY = 1 -- (mass/volume)
 
---- Retrieves all connected parts of a part, plus the connected part
+--[=[
+	Retrieves all connected parts of a part, plus the connected part.
+	@param part BasePart
+	@return { BasePart }
+]=]
 function PhysicsUtils.getConnectedParts(part)
 	local parts = part:GetConnectedParts(true)
 	parts[#parts+1] = part
 	return parts
 end
 
+--[=[
+	Retrieves mass of all parts
+	@param parts { BasePart }
+	@return number
+]=]
 function PhysicsUtils.getMass(parts)
 	local mass = 0
 	for _, part in pairs(parts) do
@@ -21,7 +32,13 @@ function PhysicsUtils.getMass(parts)
 	return mass
 end
 
---- Estimate buoyancy contributed by parts
+--[=[
+	Estimate buoyancy contributed by parts
+	@param parts { BasePart }
+	@return number -- buoyancy
+	@return number -- mass
+	@return number -- volume
+]=]
 function PhysicsUtils.estimateBuoyancyContribution(parts)
 	local totalMass = 0
 	local totalVolumeApplicable = 0
@@ -42,14 +59,17 @@ function PhysicsUtils.estimateBuoyancyContribution(parts)
 	return totalFloat, totalMass, totalVolumeApplicable
 end
 
---- Return's the world vector center of mass.
--- Lots of help from Hippalectryon :D
+--[=[
+	Return's the world vector center of mass.
+	@param parts { BasePart }
+	@return Vector3 -- position
+	@return number -- mass
+]=]
 function PhysicsUtils.getCenterOfMass(parts)
 	local mass = 0
 	local weightedSum = Vector3.new(0, 0, 0)
 
 	for _, part in pairs(parts) do
-		-- part.BrickColor = BrickColor.new("Bright yellow")
 		mass = mass + part:GetMass()
 		weightedSum = weightedSum + part:GetMass() * part.Position
 	end
@@ -57,10 +77,18 @@ function PhysicsUtils.getCenterOfMass(parts)
 	return weightedSum/mass, mass
 end
 
---- Calculates the moment of inertia of a solid cuboid. This is wrong for Roblox.
--- @param part part
--- @param axis the axis
--- @param origin the origin of the axis
+--[=[
+	Calculates the moment of inertia of a solid cuboid.
+
+	:::warning
+	This is wrong for Roblox. Roblox has hollow cuvoids as parts
+	:::
+
+	@param part BasePart
+	@param axis Vector3
+	@param origin Vector3
+	@return number
+]=]
 function PhysicsUtils.momentOfInertia(part, axis, origin)
 	local size = part.Size
 	local position = part.Position
@@ -76,10 +104,13 @@ function PhysicsUtils.momentOfInertia(part, axis, origin)
 	return ip+id
 end
 
---- Given a connected body of parts, returns the moment of inertia of these parts
--- @param parts The parts to use
--- @param axis the axis to use (Should be torque, or offset cross force)
--- @param origin The origin of the axis (should be center of mass of the parts)
+--[=[
+	Given a connected body of parts, returns the moment of inertia of these parts
+	@param parts The parts to use
+	@param axis the axis to use (Should be torque, or offset cross force)
+	@param origin The origin of the axis (should be center of mass of the parts)
+	@return number
+]=]
 function PhysicsUtils.bodyMomentOfInertia(parts, axis, origin)
 	local totalBodyInertia = 0
 
@@ -90,14 +121,23 @@ function PhysicsUtils.bodyMomentOfInertia(parts, axis, origin)
 	return totalBodyInertia
 end
 
---- Applies a force to a Roblox body
--- @param force the force vector to apply
--- @param forcePosition The position that the force is to be applied from (World vector).
---
--- It should be noted that setting the velocity to one part of a connected part on Roblox sets
--- the velocity of the whole physics model.
--- http://xboxforums.create.msdn.com/forums/p/34179/196459.aspx
--- http://www.cs.cmu.edu/~baraff/sigcourse/notesd1.pdf
+--[=[
+	Applies a force to a Roblox body.
+
+	:::tip
+	Roblox has :ApplyImpulse now as an API surface, so I recommend using that
+	instead.
+	:::
+
+	It should be noted that setting the velocity to one part of a connected part on Roblox sets
+	the velocity of the whole physics model.
+	http://xboxforums.create.msdn.com/forums/p/34179/196459.aspx
+	http://www.cs.cmu.edu/~baraff/sigcourse/notesd1.pdf
+
+	@param part BasePart
+	@param force Vector3 -- the force vector to apply
+	@param forcePosition Vector3 -- The position that the force is to be applied from (World vector).
+]=]
 function PhysicsUtils.applyForce(part, force, forcePosition)
 	local parts = PhysicsUtils.getConnectedParts(part)
 
@@ -121,8 +161,14 @@ function PhysicsUtils.applyForce(part, force, forcePosition)
 	part.Velocity = part.Velocity + acceleration
 end
 
---- Accelerates a part utilizing newton's laws. emittingPart is the part it's emitted from.
--- force = mass * acceleration
+--[=[
+	Accelerates a part utilizing newton's laws. emittingPart is the part it's emitted from.
+	force = mass * acceleration
+
+	@param part BasePart
+	@param emittingPart BasePart
+	@param acceleration Vector3
+]=]
 function PhysicsUtils.acceleratePart(part, emittingPart, acceleration)
 	local force = acceleration * part:GetMass()
 	local position = part.Position

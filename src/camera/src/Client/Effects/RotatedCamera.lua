@@ -1,7 +1,10 @@
---- Allow freedom of movement around a current place, much like the classic script works now.
--- Not intended to be use with the current character script. This is the rotation component.
--- Intended to be used with a SummedCamera, relative.
--- @classmod RotatedCamera
+--[=[
+	Allow freedom of movement around a current place, much like the classic script works now.
+	Not intended to be use with the current character script. This is the rotation component.
+	Intended to be used with a SummedCamera, relative.
+
+	@class RotatedCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -18,6 +21,10 @@ RotatedCamera._minY = math.rad(-80)
 RotatedCamera._angleXZ = 0
 RotatedCamera._angleY = 0
 
+--[=[
+	Constructs a new RotatedCamera
+	@return RotatedCamera
+]=]
 function RotatedCamera.new()
 	local self = setmetatable({}, RotatedCamera)
 
@@ -28,7 +35,6 @@ function RotatedCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
----
 -- @param xzrotvector Vector2, the delta rotation to apply
 function RotatedCamera:RotateXY(xzrotvector)
 	self.AngleX = self.AngleX + xzrotvector.x
@@ -61,6 +67,12 @@ function RotatedCamera:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within RotatedCamera
+]=]
 function RotatedCamera:__index(index)
 	if index == "CameraState" then
 		local state = CameraState.new()

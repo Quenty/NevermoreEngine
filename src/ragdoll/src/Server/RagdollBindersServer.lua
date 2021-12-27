@@ -1,6 +1,7 @@
---- Holds binders
--- @classmod RagdollBindersServer
--- @author Quenty
+--[=[
+	Holds binders
+	@class RagdollBindersServer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

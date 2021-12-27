@@ -1,5 +1,7 @@
---- Parses text into markdown
--- @classmod MarkdownParser
+--[=[
+	Parses text into markdown
+	@class MarkdownParser
+]=]
 
 local MarkdownParser = {}
 MarkdownParser.__index = MarkdownParser
@@ -124,7 +126,7 @@ function MarkdownParser:ParseParagraphs(oldLines)
 	return lines
 end
 
---- Parses the given text into a list of lines
+-- Parses the given text into a list of lines
 function MarkdownParser:Parse()
 	local lines = self:GetLines()
 

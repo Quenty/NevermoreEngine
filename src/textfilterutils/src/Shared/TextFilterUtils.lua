@@ -1,5 +1,7 @@
---- Utility functions for filtering text
--- @module TextFilterUtils
+--[=[
+	Utility functions for filtering text
+	@class TextFilterUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

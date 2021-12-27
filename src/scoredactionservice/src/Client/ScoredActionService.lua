@@ -1,6 +1,7 @@
---- Scores actions and picks the highest rated one every frame
--- @module ScoredActionService
--- @author Quenty
+--[=[
+	Scores actions and picks the highest rated one every frame
+	@class ScoredActionService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

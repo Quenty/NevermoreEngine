@@ -1,5 +1,7 @@
---- For effects that can be easily bound in scope
--- @classmod CustomCameraEffect
+--[=[
+	For effects that can be easily bound in scope
+	@class CustomCameraEffect
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -8,8 +10,11 @@ local SummedCamera = require("SummedCamera")
 local CustomCameraEffect = {}
 CustomCameraEffect.ClassName = "CustomCameraEffect"
 
---- Constructs a new custom camera effect
--- @tparam function getCurrentStateFunc to return a function state
+--[=[
+	Constructs a new custom camera effect
+	@param getCurrentStateFunc () -> CameraState -- Custom effect generator
+	@return CustomCameraEffect
+]=]
 function CustomCameraEffect.new(getCurrentStateFunc)
 	local self = setmetatable({}, CustomCameraEffect)
 
@@ -22,6 +27,12 @@ function CustomCameraEffect:__add(other)
 	return SummedCamera.new(self, other)
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within CustomCameraEffect
+]=]
 function CustomCameraEffect:__index(index)
 	if index == "CameraState" then
 		return self._getCurrentStateFunc()

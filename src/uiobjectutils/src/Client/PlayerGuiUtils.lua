@@ -1,6 +1,6 @@
----
--- @module PlayerGuiUtils
--- @author Quenty
+--[=[
+	@class PlayerGuiUtils
+]=]
 
 local Players = game:GetService("Players")
 

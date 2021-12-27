@@ -1,13 +1,33 @@
---- Bounding box utilties. Prefer model:GetBoundingBox() in most cases. However, sometimes grouping isn't possible.
--- @module BoundingBoxUtils
+--[=[
+	Bounding box utilties. Prefer model:GetBoundingBox() in most cases. However, sometimes grouping isn't possible.
+	@class BoundingBoxUtils
+]=]
 
 local BoundingBoxUtils = {}
 
+--[=[
+	Retrieves a bounding box for a given set of parts
+
+	@param parts { Instance | { { CFrame: CFrame, Size: Vector3 } }
+	@param relativeTo CFrame?
+	@return Vector3 -- size
+	@return Vector3 -- position
+]=]
 function BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
 	return BoundingBoxUtils.getBoundingBox(parts, relativeTo)
 end
 
--- https://devforum.roblox.com/t/finding-the-closest-vector3-point-on-a-part-from-the-character/130679/2
+--[=[
+	Clamps a point inside of a given bounding box
+
+	See: https://devforum.roblox.com/t/finding-the-closest-vector3-point-on-a-part-from-the-character/130679/2
+
+	@param cframe CFrame -- CFrame of bounding box
+	@param size Vector3 -- Size of bounding box
+	@param point Vector3 -- Point to transform
+	@return Vector3 -- Clamped point
+	@return Vector3 -- Center of bounding box
+]=]
 function BoundingBoxUtils.clampPointToBoundingBox(cframe, size, point)
 	local transform = cframe:pointToObjectSpace(point) -- transform into local space
 	local halfSize = size * 0.5
@@ -18,6 +38,14 @@ function BoundingBoxUtils.clampPointToBoundingBox(cframe, size, point)
 	), cframe.p
 end
 
+--[=[
+	Pushes a point to lie within the bounding box
+
+	@param cframe CFrame -- CFrame of bounding box
+	@param size Vector3 -- Size of bounding box
+	@param point Vector3 -- Point to transform
+	@return Vector3
+]=]
 function BoundingBoxUtils.pushPointToLieOnBoundingBox(cframe, size, point)
 	local transform = cframe:pointToObjectSpace(point) -- transform into local space
 	local halfSize = size * 0.5
@@ -27,7 +55,14 @@ function BoundingBoxUtils.pushPointToLieOnBoundingBox(cframe, size, point)
 	return cframe * Vector3.new(x, y, z), cframe.p
 end
 
--- @return size, position
+--[=[
+	Given a parent, retrieve the bounding box for this parent
+
+	@param parent Instance
+	@param relativeTo CFrame?
+	@return Vector3? -- size
+	@return Vector3? -- position
+]=]
 function BoundingBoxUtils.getChildrenBoundingBox(parent, relativeTo)
 	local parts = {}
 	for _, item in pairs(parent:GetDescendants()) do
@@ -43,6 +78,12 @@ function BoundingBoxUtils.getChildrenBoundingBox(parent, relativeTo)
 	return BoundingBoxUtils.getPartsBoundingBox(parts, relativeTo)
 end
 
+--[=[
+	Returns the size of an axis aligned bounding box for a given CFrame
+
+	@param cframe CFrame
+	@param size Vector3
+]=]
 function BoundingBoxUtils.axisAlignedBoxSize(cframe, size)
 	local inv = cframe:inverse()
 
@@ -58,12 +99,16 @@ function BoundingBoxUtils.axisAlignedBoxSize(cframe, size)
 end
 
 
---- Gets a boundingBox for the given data
--- @param data List of things with both Size and CFrame
--- @tparam[opt=CFrame.new()] relativeTo
--- @treturn Vector3 Size
--- @treturn Position position
--- https://gist.github.com/zeux/1a67e8930df782d5474276e218831e22
+--[=[
+	Gets a boundingBox for the given data.
+
+	See: https://gist.github.com/zeux/1a67e8930df782d5474276e218831e22
+
+	@param data Instance | { { CFrame: CFrame; Size: Vector3 } -- List of things with both Size and CFrame
+	@param relativeTo CFrame?
+	@return Vector3 -- size
+	@return Vector3 -- position
+]=]
 function BoundingBoxUtils.getBoundingBox(data, relativeTo)
 	relativeTo = relativeTo or CFrame.new()
 	local abs = math.abs
@@ -110,6 +155,14 @@ function BoundingBoxUtils.getBoundingBox(data, relativeTo)
 	return size, position
 end
 
+--[=[
+	Returns if a point is in a bounding box
+
+	@param cframe CFrame
+	@param size Vector3
+	@param testPosition Vector3
+	@return boolean
+]=]
 function BoundingBoxUtils.inBoundingBox(cframe, size, testPosition)
 	local relative = cframe:pointToObjectSpace(testPosition)
 	local hsx, hsy, hsz = size.X/2, size.Y/2, size.Z/2

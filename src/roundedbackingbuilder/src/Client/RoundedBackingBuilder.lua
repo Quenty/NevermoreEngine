@@ -1,5 +1,7 @@
---- Construct a rounded backing with a shadow
--- @classmod RoundedBackingBuilder
+--[=[
+	Construct a rounded backing with a shadow
+	@class RoundedBackingBuilder
+]=]
 
 local RoundedBackingBuilder = {}
 RoundedBackingBuilder.__index = RoundedBackingBuilder
@@ -8,7 +10,7 @@ RoundedBackingBuilder.DEFAULT_SHADOW_TRANSPARENCY = 0.7
 RoundedBackingBuilder.BACKING_ASSET_ID = "rbxassetid://735637144"
 RoundedBackingBuilder.SHADOW_ASSET_ID = "rbxassetid://735644155"
 
---- Initializes a new RoundedBackingBuilder
+-- Initializes a new RoundedBackingBuilder
 -- @param options Options to set
 -- {
 --     sibling = true; -- If true, assumes sibling mode in the ScreenGui, defaults to true
@@ -51,7 +53,7 @@ function RoundedBackingBuilder:CreateBacking(gui)
 	return backing
 end
 
---- Only top two corners are rounded
+-- Only top two corners are rounded
 function RoundedBackingBuilder:CreateTopBacking(gui)
 	local backing = self:CreateBacking(gui)
 	backing.ImageRectSize = Vector2.new(20, 16)
@@ -77,7 +79,7 @@ function RoundedBackingBuilder:CreateRightBacking(gui)
 	return backing
 end
 
---- Only bottom two corners are rounded
+-- Only bottom two corners are rounded
 function RoundedBackingBuilder:CreateBottomBacking(gui)
 	local backing = self:CreateBacking(gui)
 	backing.ImageRectSize = Vector2.new(20, 16)

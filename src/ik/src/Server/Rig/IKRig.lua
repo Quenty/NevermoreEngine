@@ -1,6 +1,8 @@
---- Serverside implementation of IKRig
--- @classmod IKRig
--- @author Quenty
+--[=[
+	Serverside implementation of IKRig
+	@server
+	@class IKRig
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -31,10 +33,20 @@ function IKRig.new(humanoid)
 	return self
 end
 
+--[=[
+	Returns where the rig is looking at
+
+	@return Vector3?
+]=]
 function IKRig:GetTarget()
 	return self._target
 end
 
+--[=[
+	Sets the IK Rig target and replicates it to the client
+
+	@param target Vector3?
+]=]
 function IKRig:SetRigTarget(target)
 	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 

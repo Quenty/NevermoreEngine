@@ -1,6 +1,9 @@
---- Like a rotated camera, except we end up pushing back to a default rotation.
--- This same behavior is seen in Roblox vehicle seats
--- @classmod PushCamera
+--[=[
+	Like a rotated camera, except we end up pushing back to a default rotation.
+	This same behavior is seen in Roblox vehicle seats
+
+	@class PushCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -22,6 +25,10 @@ PushCamera.DefaultAngleXZ0 = 0
 PushCamera._lastUpdateTime = -1
 PushCamera.PushBackAfter = 0.5
 
+--[=[
+	Constructs a new PushCamera
+	@return PushCamera
+]=]
 function PushCamera.new()
 	local self = setmetatable({}, PushCamera)
 
@@ -31,18 +38,24 @@ end
 function PushCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
----
+
 -- @param xzrotVector Vector2, the delta rotation to apply
 function PushCamera:RotateXY(xzrotVector)
 	self.AngleX = self.AngleX + xzrotVector.x
 	self.AngleY = self.AngleY + xzrotVector.y
 end
 
+--[=[
+	Prevents the rotation back. You need to call this
+	every frame you want to prevent rotation.
+]=]
 function PushCamera:StopRotateBack()
 	self.CFrame = self.CFrame
 end
 
---- Resets to default position automatically
+--[=[
+	Resets to default position automatically
+]=]
 function PushCamera:Reset()
 	self.LastUpdateTime = 0
 end
@@ -82,6 +95,12 @@ function PushCamera:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within PushCamera
+]=]
 function PushCamera:__index(index)
 	if index == "CameraState" then
 		local state = CameraState.new()

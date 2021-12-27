@@ -1,10 +1,21 @@
---- Utility function to get rotation in the XZ plane
--- @module getRotationInXZPlane
+--[=[
+	Utility function to get rotation in the XZ plane.
+	@class getRotationInXZPlane
+]=]
 
---- Get's the rotation in the XZ plane relative to the origin
--- @param cframe The CFrame
--- @return The CFrame in the XZ plane
-return function(cframe)
+--[=[
+	Computes the rotation in the XZ plane relative to the origin.
+
+	:::tip
+	This function can be used to "flatten" a rotation so we just get the XZ rotation, which
+	is the rotation you would see if we are looking directly top-down on the object.
+	:::
+
+	@param cframe CFrame
+	@return CFrame -- The CFrame in the XZ plane
+	@within getRotationInXZPlane
+]=]
+local function getRotationInXZPlane(cframe)
 	local _,_,_,
 	      _,_,zx,
 	      _,_,_,
@@ -25,3 +36,5 @@ return function(cframe)
 		right.Z, top.Z, back.Z
 	)
 end
+
+return getRotationInXZPlane

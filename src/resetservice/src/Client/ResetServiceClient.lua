@@ -1,6 +1,11 @@
---- Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly
--- @module ResetServiceClient
--- @author Quenty
+--[=[
+	Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly.
+
+	Automatically sets itself ot the ResetButtonCallback upon initialization.
+
+	@client
+	@class ResetServiceClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -15,6 +20,9 @@ local INITIAL_WAIT_TIME = 1
 
 local ResetServiceClient = {}
 
+--[=[
+	Initializes the reset service. Should be done via a [ServiceBag].
+]=]
 function ResetServiceClient:Init()
 	assert(not self._promiseRemoteEvent, "Already initialized")
 
@@ -31,6 +39,9 @@ function ResetServiceClient:Init()
 		end)
 end
 
+--[=[
+	Requests the player's character resets
+]=]
 function ResetServiceClient:RequestResetCharacter()
 	local character = Players.LocalPlayer.Character
 	if character then

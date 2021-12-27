@@ -1,5 +1,7 @@
---- Mouse over mixin for general utility button mouse over effects
--- @module MouseOverMixin
+--[=[
+	Mouse over mixin for general utility button mouse over effects
+	@class MouseOverMixin
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

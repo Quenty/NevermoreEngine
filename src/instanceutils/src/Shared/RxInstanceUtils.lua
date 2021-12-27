@@ -1,6 +1,14 @@
----
--- @module RxInstanceUtils
--- @author Quenty
+--[=[
+	Utility functions to observe the state of Roblox. This is a very powerful way to query
+	Roblox's state.
+
+	:::tip
+	Use RxInstanceUtils to program streaming enabled games, and make it easy to debug. This API surface
+	lets you use Roblox as a source-of-truth which is very valuable.
+	:::
+
+	@class RxInstanceUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,6 +19,13 @@ local Rx = require("Rx")
 
 local RxInstanceUtils = {}
 
+--[=[
+	Observes an instance's property
+
+	@param instance Instance
+	@param propertyName string
+	@return Observable<T>
+]=]
 function RxInstanceUtils.observeProperty(instance, propertyName)
 	assert(typeof(instance) == "Instance", "Not an instance")
 	assert(type(propertyName) == "string", "Bad propertyName")
@@ -27,6 +42,12 @@ function RxInstanceUtils.observeProperty(instance, propertyName)
 	end)
 end
 
+--[=[
+	Observes an instance's ancestry
+
+	@param instance Instance
+	@return Observable<Instance>
+]=]
 function RxInstanceUtils.observeAncestry(instance)
 	local startWithParent = Rx.start(function()
 		return instance, instance.Parent
@@ -35,10 +56,17 @@ function RxInstanceUtils.observeAncestry(instance)
 	return startWithParent(Rx.fromSignal(instance.AncestryChanged))
 end
 
--- Returns a brio of the property value
-function RxInstanceUtils.observePropertyBrio(instance, property, predicate)
+--[=[
+	Returns a brio of the property value
+
+	@param instance Instance
+	@param propertyName string
+	@param predicate ((value: T) -> boolean)? -- Optional filter
+	@return Observable<Brio<T>>
+]=]
+function RxInstanceUtils.observePropertyBrio(instance, propertyName, predicate)
 	assert(typeof(instance) == "Instance", "Bad instance")
-	assert(type(property) == "string", "Bad property")
+	assert(type(propertyName) == "string", "Bad propertyName")
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 
 	return Observable.new(function(sub)
@@ -47,21 +75,29 @@ function RxInstanceUtils.observePropertyBrio(instance, property, predicate)
 		local function handlePropertyChanged()
 			maid._property = nil
 
-			local propertyValue = instance[property]
+			local propertyValue = instance[propertyName]
 			if not predicate or predicate(propertyValue) then
-				local brio = Brio.new(instance[property])
+				local brio = Brio.new(instance[propertyName])
 				maid._property = brio
 				sub:Fire(brio)
 			end
 		end
 
-		maid:GiveTask(instance:GetPropertyChangedSignal(property):Connect(handlePropertyChanged))
+		maid:GiveTask(instance:GetPropertyChangedSignal(propertyName):Connect(handlePropertyChanged))
 		handlePropertyChanged()
 
 		return maid
 	end)
 end
 
+--[=[
+	Observes the last child with a specific name.
+
+	@param parent Instance
+	@param className string
+	@param name string
+	@return Observable<Brio<Instance>>
+]=]
 function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(className) == "string", "Bad className")
@@ -108,6 +144,13 @@ function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 	end)
 end
 
+--[=[
+	Observes all children of a specific class
+
+	@param parent Instance
+	@param className string
+	@return Observable<Instance>
+]=]
 function RxInstanceUtils.observeChildrenOfClassBrio(parent, className)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(className) == "string", "Bad className")
@@ -117,6 +160,13 @@ function RxInstanceUtils.observeChildrenOfClassBrio(parent, className)
 	end)
 end
 
+--[=[
+	Observes all children
+
+	@param parent Instance
+	@param predicate ((value: Instance) -> boolean)? -- Optional filter
+	@return Observable<Brio<Instance>>
+]=]
 function RxInstanceUtils.observeChildrenBrio(parent, predicate)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
@@ -145,6 +195,13 @@ function RxInstanceUtils.observeChildrenBrio(parent, predicate)
 	end)
 end
 
+--[=[
+	Observes all descendants that match a predicate
+
+	@param parent Instance
+	@param predicate ((value: Instance) -> boolean)? -- Optional filter
+	@return Observable<Brio<Instance>>
+]=]
 function RxInstanceUtils.observeDescendants(parent, predicate)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")

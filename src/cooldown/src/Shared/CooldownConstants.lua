@@ -1,6 +1,6 @@
----
--- @module CooldownConstants
--- @author Quenty
+--[=[
+	@class CooldownConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

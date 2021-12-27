@@ -1,5 +1,7 @@
---- Utility methods for async methods in Players service
--- @module PlayersServicePromises.lua
+--[=[
+	Utility methods for async methods in Players service
+	@class PlayersServicePromises
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,11 @@ local Promise = require("Promise")
 
 local PlayersServicePromises = {}
 
+--[=[
+	Promises the userId from a given name.
+	@param name string
+	@return Promise<UserId>
+]=]
 function PlayersServicePromises.promiseUserIdFromName(name)
 	assert(type(name) == "string", "Bad name")
 

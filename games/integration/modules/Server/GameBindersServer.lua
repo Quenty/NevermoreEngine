@@ -1,6 +1,6 @@
---- Holds binders
--- @classmod GameBindersServer
--- @author Quenty
+--[=[
+	@class GameBindersServer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

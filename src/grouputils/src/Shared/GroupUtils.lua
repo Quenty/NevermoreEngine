@@ -1,6 +1,7 @@
----
--- @module GroupUtils
--- @author Quenty
+--[=[
+	Helpful functions involving Roblox groups.
+	@class GroupUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,6 +11,13 @@ local Promise = require("Promise")
 
 local GroupUtils = {}
 
+--[=[
+	Retrieves the rank of the player in the group.
+
+	@param player Player
+	@param groupId number
+	@return Promise<number> -- Generally from 0 to 255
+]=]
 function GroupUtils.promiseRankInGroup(player, groupId)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(groupId) == "number", "Bad groupId")
@@ -32,6 +40,13 @@ function GroupUtils.promiseRankInGroup(player, groupId)
 	end)
 end
 
+--[=[
+	Retrieves the role of the player in the group.
+
+	@param player Player
+	@param groupId number
+	@return Promise<string>
+]=]
 function GroupUtils.promiseRoleInGroup(player, groupId)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(groupId) == "number", "Bad groupId")
@@ -54,6 +69,12 @@ function GroupUtils.promiseRoleInGroup(player, groupId)
 	end)
 end
 
+--[=[
+	Retrieves groupInfo about a group.
+
+	@param groupId number
+	@return Promise<table>
+]=]
 function GroupUtils.promiseGroupInfo(groupId)
 	assert(groupId, "Bad groupId")
 
@@ -75,6 +96,13 @@ function GroupUtils.promiseGroupInfo(groupId)
 	end)
 end
 
+--[=[
+	Retrieves group role info for a given rankId
+
+	@param groupId number
+	@param rankId number
+	@return Promise<table>
+]=]
 function GroupUtils.promiseGroupRoleInfo(groupId, rankId)
 	assert(groupId, "Bad groupId")
 	assert(rankId, "Bad rankId")

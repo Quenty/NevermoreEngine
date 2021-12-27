@@ -1,9 +1,16 @@
---- Utility functions to deal with Roblox's mobile jump button and its position
--- @module JumpButtonUtils
--- @author Quenty
+--[=[
+	Utility functions to deal with Roblox's mobile jump button and its position
+	@class JumpButtonUtils
+]=]
 
 local JumpButtonUtils = {}
 
+--[=[
+	Computes the jump button's position and size based upon Roblox's logic.
+	@param screenGuiAbsSize Vector2
+	@return Vector2 -- Position
+	@return number -- Width
+]=]
 function JumpButtonUtils.getJumpButtonPositionAndSize(screenGuiAbsSize)
 	local minAxis = math.min(screenGuiAbsSize.x, screenGuiAbsSize.y)
 

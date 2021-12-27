@@ -1,17 +1,55 @@
----
--- @classmod ServiceBag
--- @author Quenty
+--[=[
+	Service bags handle recursive initialization of services, and the
+	retrieval of services from a given source. This allows the composition
+	of services without the initialization of those services becoming a pain,
+	which makes refactoring downstream services very easy.
+
+	This also allows multiple copies of a service to exist at once, although
+	many services right now are not designed for this.
+
+	```lua
+	local serviceBag = ServiceBag.new()
+
+	serviceBag:GetService({
+		Init = function(self)
+			print("Service initialized")
+		end;
+	})
+	serviceBag:Init()
+	serviceBag:Start()
+	```
+
+	@class ServiceBag
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
 
+--[=[
+	@interface Service
+	.Init: function?
+	.Start: function?
+	.Destroy: function?
+	@within ServiceBag
+]=]
+
+--[=[
+	@type ServiceType Service | ModuleScript
+	@within ServiceBag
+]=]
+
 local ServiceBag = setmetatable({}, BaseObject)
 ServiceBag.ClassName = "ServiceBag"
 ServiceBag.__index = ServiceBag
 
--- parentProvider is optional
+--[=[
+	Constructs a new ServiceBag
+
+	@param parentProvider ServiceBag? -- Optional parent provider to find services in
+	@return ServiceBag
+]=]
 function ServiceBag.new(parentProvider)
 	local self = setmetatable(BaseObject.new(), ServiceBag)
 
@@ -30,11 +68,24 @@ function ServiceBag.new(parentProvider)
 	return self
 end
 
-function ServiceBag.isServiceBag(serviceBag)
-	return type(serviceBag) == "table"
-		and serviceBag.ClassName == "ServiceBag"
+--[=[
+	Returns whether the value is a serviceBag
+
+	@param value ServiceBag?
+	@return boolean
+]=]
+function ServiceBag.isServiceBag(value)
+	return type(value) == "table"
+		and value.ClassName == "ServiceBag"
 end
 
+--[=[
+	Retrieves the service, ensuring initialization if we are in
+	the initialization phase.
+
+	@param serviceType ServiceType
+	@return any
+]=]
 function ServiceBag:GetService(serviceType)
 	if typeof(serviceType) == "Instance" then
 		serviceType = require(serviceType)
@@ -58,6 +109,11 @@ function ServiceBag:GetService(serviceType)
 	end
 end
 
+--[=[
+	Returns whether the service bag has the service.
+	@param serviceType ServiceType
+	@return boolean
+]=]
 function ServiceBag:HasService(serviceType)
 	if self._services[serviceType] then
 		return true
@@ -66,6 +122,10 @@ function ServiceBag:HasService(serviceType)
 	end
 end
 
+--[=[
+	Initializes the service bag and ensures recursive initialization
+	can occur
+]=]
 function ServiceBag:Init()
 	assert(not self._initializing, "Already initializing")
 	assert(self._serviceTypesToInitializeSet, "Already initialized")
@@ -82,6 +142,9 @@ function ServiceBag:Init()
 	self._initializing = false
 end
 
+--[=[
+	Starts the service bag and all services
+]=]
 function ServiceBag:Start()
 	assert(self._serviceTypesToStart, "Already started")
 	assert(not self._initializing, "Still initializing")
@@ -97,6 +160,12 @@ function ServiceBag:Start()
 	self._serviceTypesToStart = nil
 end
 
+--[=[
+	Creates a scoped service bag, where services within the scope will not
+	be accessible outside of the scope.
+
+	@return ServiceBag
+]=]
 function ServiceBag:CreateScope()
 	local provider = ServiceBag.new(self)
 
@@ -111,7 +180,7 @@ function ServiceBag:CreateScope()
 	return provider
 end
 
---- Adds a service to this provider only
+-- Adds a service to this provider only
 function ServiceBag:_addServiceType(serviceType)
 	if not self._serviceTypesToInitializeSet then
 		error(("Already finished initializing, cannot add %q"):format(tostring(serviceType)))
@@ -156,7 +225,10 @@ function ServiceBag:_initService(serviceType)
 	table.insert(self._serviceTypesToStart, serviceType)
 end
 
-
+--[=[
+	Cleans up the service bag and all services that have been
+	initialized in the service bag.
+]=]
 function ServiceBag:Destroy()
 	local super = getmetatable(ServiceBag)
 

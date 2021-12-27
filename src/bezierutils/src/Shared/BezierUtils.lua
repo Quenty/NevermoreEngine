@@ -1,11 +1,30 @@
---- Make interpolation curves like CSS
--- A good place to generate and test these out: http://cubic-bezier.com/
--- Based upon https://gist.github.com/gre/1926947#file-keyspline-js
--- @module BezierUtils
+--[=[
+	Make interpolation curves like CSS
+
+	* A good place to generate and test these out: http://cubic-bezier.com/
+	* Based upon https://gist.github.com/gre/1926947#file-keyspline-js
+
+	```lua
+	local ease = BezierUtils.createBezierFactory(0.25, 0.1, 0.25, 1)
+	for i = 0, 1.05, 0.05 do
+		print(i, ":", ease(i))
+	end
+	```
+
+	@class BezierUtils
+]=]
 
 local BezierUtils = {}
 
--- Same as CSS transition thing.
+--[=[
+	Creates a new bezier factory which can smoothly translate between 0 to 1.
+
+	@param p1x number
+	@param p1y number
+	@param p2x number
+	@param p2y number
+	@return (aX: number) -> number
+]=]
 function BezierUtils.createBezierFactory(p1x, p1y, p2x, p2y)
 	assert(p1x, "[BezierUtils.createBezierFactory] - Need p1x to construct a Bezier Factory")
 	assert(p1y, "[BezierUtils.createBezierFactory] - Need p1y to construct a Bezier Factory")
@@ -57,12 +76,5 @@ function BezierUtils.createBezierFactory(p1x, p1y, p2x, p2y)
 		return calculateBezier(getTForX(aX), p1y, p2y)
 	end
 end
-
---[[ @usage
-local ease = BezierUtils.createBezierFactory(0.25, 0.1, 0.25, 1)
-for i = 0, 1.05, 0.05 do
-	print(i, ":", ease(i))
-end
---]]
 
 return BezierUtils

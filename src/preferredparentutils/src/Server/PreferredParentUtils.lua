@@ -1,7 +1,9 @@
---- Handles logic for creating a "preferred" parent container or erroring if
--- it already exists
--- @module PreferredParentUtils
+--[=[
+	Handles logic for creating a "preferred" parent container or erroring if
+	it already exists.
 
+	@class PreferredParentUtils
+]=]
 local PreferredParentUtils = {}
 
 function PreferredParentUtils.getPreferredParent(parent, name)

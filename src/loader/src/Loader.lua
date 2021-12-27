@@ -1,5 +1,9 @@
---- Loading logic
--- @module loader
+--[=[
+	Loading logic for Nevermore
+
+	@private
+	@class LoaderClass
+]=]
 
 local Loader = {}
 Loader.ClassName = "Loader"

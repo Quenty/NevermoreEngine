@@ -1,6 +1,6 @@
----
--- @module HumanoidTrackerService
--- @author Quenty
+--[=[
+	@class HumanoidTrackerService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

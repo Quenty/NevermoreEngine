@@ -1,10 +1,20 @@
---- Utility methods for binders
--- @module BinderUtils
+--[=[
+	Utility methods for the binder object.
+	@class BinderUtils
+]=]
 
 local CollectionService = game:GetService("CollectionService")
 
 local BinderUtils = {}
 
+--[=[
+	Finds the first ancestor that is bound with the current child.
+	Skips the child class, of course.
+
+	@param binder Binder<T>
+	@param child Instance
+	@return T?
+]=]
 function BinderUtils.findFirstAncestor(binder, child)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(child) == "Instance", "Child parameter must be instance")
@@ -20,6 +30,14 @@ function BinderUtils.findFirstAncestor(binder, child)
 	return nil
 end
 
+--[=[
+	Finds the first child bound with the given binder and returns
+	the bound class.
+
+	@param binder Binder<T>
+	@param parent Instance
+	@return T?
+]=]
 function BinderUtils.findFirstChild(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
@@ -34,6 +52,13 @@ function BinderUtils.findFirstChild(binder, parent)
 	return nil
 end
 
+--[=[
+	Gets all bound children of the given binder for the parent.
+
+	@param binder Binder<T>
+	@param parent Instance
+	@return {T}
+]=]
 function BinderUtils.getChildren(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
@@ -48,6 +73,16 @@ function BinderUtils.getChildren(binder, parent)
 	return objects
 end
 
+
+--[=[
+	Maps a list of binders into a look up table where the keys are
+	tags and the value is the binder.
+
+	Duplicates are overwritten by the last entry.
+
+	@param bindersList { Binder<any> }
+	@return { [string]: Binder<any> }
+]=]
 function BinderUtils.mapBinderListToTable(bindersList)
 	assert(type(bindersList) == "table", "bindersList must be a table of binders")
 
@@ -58,6 +93,19 @@ function BinderUtils.mapBinderListToTable(bindersList)
 	return tags
 end
 
+--[=[
+	Given a mapping of tags to binders, retrieves the bound values
+	from an instanceList by quering the list of :GetTags() instead
+	of iterating over each binder.
+
+	This lookup should be faster when there are potentially many
+	interaction points for a given tag map, but the actual bound
+	list should be low.
+
+	@param tagsMap { [string]: Binder<T> }
+	@param instanceList { Instance }
+	@return { T }
+]=]
 function BinderUtils.getMappedFromList(tagsMap, instanceList)
 	local objects = {}
 
@@ -76,6 +124,13 @@ function BinderUtils.getMappedFromList(tagsMap, instanceList)
 	return objects
 end
 
+--[=[
+	Given a list of binders retrieves all children bound with the given value.
+
+	@param bindersList { Binder<T> }
+	@param parent Instance
+	@return { T }
+]=]
 function BinderUtils.getChildrenOfBinders(bindersList, parent)
 	assert(type(bindersList) == "table", "bindersList must be a table of binders")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")
@@ -84,6 +139,14 @@ function BinderUtils.getChildrenOfBinders(bindersList, parent)
 	return BinderUtils.getMappedFromList(tagsMap, parent:GetChildren())
 end
 
+--[=[
+	Gets all the linked (via objectValues of name `linkName`) bound objects
+
+	@param binder Binder<T>
+	@param linkName string -- Name of the object values required
+	@param parent Instance
+	@return {T}
+]=]
 function BinderUtils.getLinkedChildren(binder, linkName, parent)
 	local seen = {}
 	local objects = {}
@@ -103,6 +166,13 @@ function BinderUtils.getLinkedChildren(binder, linkName, parent)
 	return objects
 end
 
+--[=[
+	Gets all bound descendants of the given binder for the parent.
+
+	@param binder Binder<T>
+	@param parent Instance
+	@return {T}
+]=]
 function BinderUtils.getDescendants(binder, parent)
 	assert(type(binder) == "table", "Binder must be binder")
 	assert(typeof(parent) == "Instance", "Parent parameter must be instance")

@@ -1,9 +1,15 @@
----
--- @module AdorneeUtils
--- @author Quenty
+--[=[
+	Utilities involving an "Adornee" effectively, any Roblox instance
+	@class AdorneeUtils
+]=]
 
 local AdorneeUtils = {}
 
+--[=[
+	Gets the center of the adornee
+	@param adornee Instance
+	@return Vector3?
+]=]
 function AdorneeUtils.getCenter(adornee)
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
@@ -39,6 +45,12 @@ function AdorneeUtils.getCenter(adornee)
 	end
 end
 
+--[=[
+	Gets the bounding box of the adornee
+	@param adornee Instance
+	@return CFrame?
+	@return Vector3?
+]=]
 function AdorneeUtils.getBoundingBox(adornee)
 	if adornee:IsA("Model") then
 		return adornee:GetBoundingBox()
@@ -49,6 +61,12 @@ function AdorneeUtils.getBoundingBox(adornee)
 	end
 end
 
+--[=[
+	Returns whether a part is a part of an adornee
+	@param adornee Instance
+	@param part BasePart
+	@return boolean
+]=]
 function AdorneeUtils.isPartOfAdornee(adornee, part)
 	assert(part:IsA("BasePart"))
 
@@ -63,6 +81,11 @@ function AdorneeUtils.isPartOfAdornee(adornee, part)
 	return adornee == part or part:IsDescendantOf(adornee)
 end
 
+--[=[
+	Retrieves all parts of an adornee
+	@param adornee Instance
+	@return { BasePart }
+]=]
 function AdorneeUtils.getParts(adornee)
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
@@ -89,6 +112,11 @@ function AdorneeUtils.getParts(adornee)
 	return parts
 end
 
+--[=[
+	Retrieves a size aligned the adornee's CFrame
+	@param adornee Instance
+	@return Vector3?
+]=]
 function AdorneeUtils.getAlignedSize(adornee)
 	if adornee:IsA("Model") then
 		return select(2, adornee:GetBoundingBox())
@@ -108,6 +136,11 @@ function AdorneeUtils.getAlignedSize(adornee)
 	return nil
 end
 
+--[=[
+	Retrieves this adornee's "part"'s CFrame.
+	@param adornee Instance
+	@return CFrame
+]=]
 function AdorneeUtils.getPartCFrame(adornee)
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
@@ -119,6 +152,11 @@ function AdorneeUtils.getPartCFrame(adornee)
 	return part.CFrame
 end
 
+--[=[
+	Retrieves this adornee's "part"'s position.
+	@param adornee Instance
+	@return Position
+]=]
 function AdorneeUtils.getPartPosition(adornee)
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
@@ -130,6 +168,11 @@ function AdorneeUtils.getPartPosition(adornee)
 	return part.Position
 end
 
+--[=[
+	Retrieves this adornee's "part"'s Velocity.
+	@param adornee Instance
+	@return Vector3
+]=]
 function AdorneeUtils.getPartVelocity(adornee)
 	local part = AdorneeUtils.getPart(adornee)
 	if not part then
@@ -139,6 +182,11 @@ function AdorneeUtils.getPartVelocity(adornee)
 	return part.Velocity
 end
 
+--[=[
+	Retrieves this adornee's part
+	@param adornee Instance
+	@return BasePart
+]=]
 function AdorneeUtils.getPart(adornee)
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 
@@ -168,6 +216,11 @@ function AdorneeUtils.getPart(adornee)
 	end
 end
 
+--[=[
+	Retrieves this adornee's part on which to attach a rendering instance to
+	@param adornee Instance
+	@return Instance
+]=]
 function AdorneeUtils.getRenderAdornee(adornee)
 	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
 

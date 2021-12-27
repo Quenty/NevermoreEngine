@@ -1,8 +1,17 @@
---- Utility methods for R15 Characters
--- @module R15Utils
+--[=[
+	Utility methods for R15 Characters
+	@class R15Utils
+]=]
 
 local R15Utils = {}
 
+--[=[
+	Searches the rig for an attachment
+	@param character Model
+	@param partName string
+	@param attachmentName string
+	@return Attachment?
+]=]
 function R15Utils.searchForRigAttachment(character, partName, attachmentName)
 	local part = character:FindFirstChild(partName)
 	if not part then
@@ -12,14 +21,29 @@ function R15Utils.searchForRigAttachment(character, partName, attachmentName)
 	return part:FindFirstChild(attachmentName)
 end
 
+--[=[
+	Retrieves the upper torso
+	@param character Model
+	@return BasePart?
+]=]
 function R15Utils.getUpperTorso(character)
 	return character:FindFirstChild("UpperTorso")
 end
 
+--[=[
+	Retrieves the lower torso
+	@param character Model
+	@return BasePart?
+]=]
 function R15Utils.getLowerTorso(character)
 	return character:FindFirstChild("LowerTorso")
 end
 
+--[=[
+	Retrieves the waist joint
+	@param character Model
+	@return Motor6D?
+]=]
 function R15Utils.getWaistJoint(character)
 	local upperTorso = R15Utils.getUpperTorso(character)
 	if not upperTorso then
@@ -29,6 +53,11 @@ function R15Utils.getWaistJoint(character)
 	return upperTorso:FindFirstChild("Waist")
 end
 
+--[=[
+	Retrieves the neck joint
+	@param character Model
+	@return Motor6D?
+]=]
 function R15Utils.getNeckJoint(character)
 	local head = character:FindFirstChild("Head")
 	if not head then
@@ -38,10 +67,22 @@ function R15Utils.getNeckJoint(character)
 	return head:FindFirstChild("Neck")
 end
 
+--[=[
+	Retrieves hand attachment
+	@param character Model
+	@param side "Left" | "Right"
+	@return Attachment?
+]=]
 function R15Utils.getHand(character, side)
 	return character:FindFirstChild(R15Utils.getHandName(side))
 end
 
+--[=[
+	Retrieves grip weld
+	@param character Model
+	@param side "Left" | "Right"
+	@return Motor6D?
+]=]
 function R15Utils.getGripWeld(character, side)
 	local rightHand = R15Utils.getHand(character, side)
 	if rightHand then
@@ -51,6 +92,11 @@ function R15Utils.getGripWeld(character, side)
 	end
 end
 
+--[=[
+	Retrieves grip weld name for a given side
+	@param side "Left" | "Right"
+	@return "LeftGrip" | "RightGrip"
+]=]
 function R15Utils.getGripWeldName(side)
 	if side == "Left" then
 		return "LeftGrip"
@@ -61,6 +107,11 @@ function R15Utils.getGripWeldName(side)
 	end
 end
 
+--[=[
+	Retrieves grip weld name for a given side
+	@param side "Left" | "Right"
+	@return "LeftHand" | "RightHand"
+]=]
 function R15Utils.getHandName(side)
 	if side == "Left" then
 		return "LeftHand"
@@ -71,6 +122,11 @@ function R15Utils.getHandName(side)
 	end
 end
 
+--[=[
+	Retrieves the grip attachment name
+	@param side "Left" | "Right"
+	@return "LeftGripAttachment" | "RightGripAttachment"
+]=]
 function R15Utils.getGripAttachmentName(side)
 	if side == "Left" then
 		return "LeftGripAttachment"
@@ -81,6 +137,12 @@ function R15Utils.getGripAttachmentName(side)
 	end
 end
 
+--[=[
+	Retrieves the shoulder rig attachment
+	@param character Model
+	@param side "Left" | "Right"
+	@return Attachment?
+]=]
 function R15Utils.getShoulderRigAttachment(character, side)
 	if side == "Left"  then
 		return R15Utils.searchForRigAttachment(character, "UpperTorso", "LeftShoulderRigAttachment")
@@ -91,6 +153,12 @@ function R15Utils.getShoulderRigAttachment(character, side)
 	end
 end
 
+--[=[
+	Retrieves the grip attachment for the given side
+	@param character Model
+	@param side "Left" | "Right"
+	@return Attachment?
+]=]
 function R15Utils.getGripAttachment(character, side)
 	if side == "Left"  then
 		return R15Utils.searchForRigAttachment(character, "LeftHand", "LeftGripAttachment")
@@ -101,6 +169,11 @@ function R15Utils.getGripAttachment(character, side)
 	end
 end
 
+--[=[
+	Retrieves the expected root part y offset for a humanoid
+	@param humanoid Humanoid
+	@return number?
+]=]
 function R15Utils.getExpectedRootPartYOffset(humanoid)
 	local rootPart = humanoid.RootPart
 	if not rootPart then
@@ -110,6 +183,14 @@ function R15Utils.getExpectedRootPartYOffset(humanoid)
 	return humanoid.HipHeight + rootPart.Size.Y/2
 end
 
+--[=[
+	Gets the length of a segment for a rig
+	@param character Model
+	@param partName string
+	@param rigAttachment0 string
+	@param rigAttachment1 string
+	@return number?
+]=]
 function R15Utils.getRigLength(character, partName, rigAttachment0, rigAttachment1)
 	local attachment0 = R15Utils.searchForRigAttachment(character, partName, rigAttachment0)
 	if not attachment0 then
@@ -124,6 +205,11 @@ function R15Utils.getRigLength(character, partName, rigAttachment0, rigAttachmen
 	return (attachment0.Position - attachment1.Position).magnitude
 end
 
+--[=[
+	Adds the lengths together
+	@param lengths { number? }
+	@return number?
+]=]
 function R15Utils.addLengthsOrNil(lengths)
 	local total = 0
 	for _, length in pairs(lengths) do
@@ -137,6 +223,12 @@ function R15Utils.addLengthsOrNil(lengths)
 	return total
 end
 
+--[=[
+	Retrieves the upper arm length for a character
+	@param character Model
+	@param side "Left" | "Right"
+	@return number?
+]=]
 function R15Utils.getUpperArmRigLength(character, side)
 	if side == "Left" then
 		return R15Utils.getRigLength(character, "LeftUpperArm", "LeftShoulderRigAttachment", "LeftElbowRigAttachment")
@@ -147,6 +239,12 @@ function R15Utils.getUpperArmRigLength(character, side)
 	end
 end
 
+--[=[
+	Retrieves the lower arm length for a character
+	@param character Model
+	@param side "Left" | "Right"
+	@return number?
+]=]
 function R15Utils.getLowerArmRigLength(character, side)
 	if side == "Left" then
 		return R15Utils.getRigLength(character, "LeftLowerArm", "LeftElbowRigAttachment", "LeftWristRigAttachment")
@@ -157,6 +255,12 @@ function R15Utils.getLowerArmRigLength(character, side)
 	end
 end
 
+--[=[
+	Retrieves the wrist to hand length
+	@param character Model
+	@param side "Left" | "Right"
+	@return number?
+]=]
 function R15Utils.getWristToGripLength(character, side)
 	if side == "Left" then
 		return R15Utils.getRigLength(character, "LeftHand", "LeftWristRigAttachment", "LeftGripAttachment")
@@ -167,6 +271,12 @@ function R15Utils.getWristToGripLength(character, side)
 	end
 end
 
+--[=[
+	Computes the length of an arm for a given character
+	@param character Model
+	@param side "Left" | "Right"
+	@return number?
+]=]
 function R15Utils.getArmRigToGripLength(character, side)
 	return R15Utils.addLengthsOrNil({
 		R15Utils.getUpperArmRigLength(character, side),

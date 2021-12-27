@@ -1,5 +1,7 @@
---- Lags the camera smoothly behind the position maintaining other components
--- @classmod SmoothPositionCamera
+--[=[
+	Lags the camera smoothly behind the position maintaining other components
+	@class SmoothPositionCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

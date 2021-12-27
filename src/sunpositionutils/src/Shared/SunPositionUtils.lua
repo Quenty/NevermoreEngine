@@ -1,6 +1,7 @@
---- Utility to position the sun
--- @module SunPositionUtils
-
+--[=[
+	Utility to position the sun
+	@class SunPositionUtils
+]=]
 local SunPositionUtils = {}
 
 local EARTH_TILT = 23.5

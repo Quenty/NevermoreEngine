@@ -1,5 +1,7 @@
---- Base class for ragdolls, meant to be used with binders
--- @classmod Ragdoll
+--[=[
+	Base class for ragdolls, meant to be used with binders
+	@class Ragdoll
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
