@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[63073],{81510:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CollectionServiceUtils","desc":"Utility functions for use with collection service tags","source":{"line":5,"path":"src/collectionserviceutils/src/Shared/CollectionServiceUtils.lua"}}')}}]);

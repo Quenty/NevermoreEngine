@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[89362],{67886:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GuiTriangle","desc":"2D Gui triangle rendering class\\n\\nSee: http://wiki.roblox.com/index.php?title=2D_triangles","source":{"line":8,"path":"src/guitriangle/src/Client/GuiTriangle.lua"}}')}}]);

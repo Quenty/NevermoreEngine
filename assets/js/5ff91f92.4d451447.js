@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[34241],{19166:function(t){t.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"JumpButtonUtils","desc":"Utility functions to deal with Roblox\'s mobile jump button and its position","source":{"line":5,"path":"src/jumpbuttonutils/src/Client/JumpButtonUtils.lua"}}')}}]);

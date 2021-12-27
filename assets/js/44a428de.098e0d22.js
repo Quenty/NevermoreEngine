@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[28791],{18886:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SwingTwistUtils","desc":"Authored by Egomoose, modified by Quenty","source":{"line":6,"path":"src/geometryutils/src/Shared/SwingTwistUtils.lua"}}')}}]);

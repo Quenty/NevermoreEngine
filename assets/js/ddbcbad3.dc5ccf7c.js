@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[17147],{93427:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PlayerBinder","desc":"Binds the given class to each player in the game","source":{"line":5,"path":"src/playerbinder/src/Server/PlayerBinder.lua"}}')}}]);

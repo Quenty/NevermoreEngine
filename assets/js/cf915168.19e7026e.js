@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[23230],{56007:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Spritesheet","desc":"Data model for sprite sheets","source":{"line":5,"path":"src/sprites/src/Shared/Sprite/Spritesheet.lua"}}')}}]);

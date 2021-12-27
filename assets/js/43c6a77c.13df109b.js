@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[35546],{19995:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Cooldown","desc":"Represents a cooldown state with a time limit","source":{"line":5,"path":"src/cooldown/src/Server/Cooldown.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[59439],{97708:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"StateStack","desc":"Stack of values that allows multiple systems to enable or disable a state","source":{"line":5,"path":"src/statestack/src/Shared/StateStack.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[72402],{79945:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"FadeBetweenCamera3","desc":"Add another layer of effects that can be faded in/out","source":{"line":5,"path":"src/camera/src/Client/Effects/FadeBetween/FadeBetweenCamera3.lua"}}')}}]);

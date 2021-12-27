@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[2305],{43304:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"promiseChild","desc":"Warps the WaitForChild API with a promise","source":{"line":5,"path":"src/promise/src/Shared/Utility/promiseChild.lua"}}')}}]);

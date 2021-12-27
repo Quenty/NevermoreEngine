@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[9324],{1362:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CameraFrame.story","desc":"","source":{"line":4,"path":"src/camera/src/Client/Utility/CameraFrame.story.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[90594],{80385:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"AnimatedSpritesheetPlayer","desc":"","source":{"line":4,"path":"src/sprites/src/Shared/Sprite/AnimatedSpritesheetPlayer.lua"}}')}}]);

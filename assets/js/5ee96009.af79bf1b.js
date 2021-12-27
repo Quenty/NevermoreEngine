@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[68786],{53160:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"LinkUtils","desc":"Utility functions for links. Links are object values pointing to other values!","source":{"line":5,"path":"src/linkutils/src/Shared/LinkUtils.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[28838],{76204:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PermissionProviderClient","desc":"","source":{"line":4,"path":"src/permissionprovider/src/Client/Providers/PermissionProviderClient.lua"}}')}}]);

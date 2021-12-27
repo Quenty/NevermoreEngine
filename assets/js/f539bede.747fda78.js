@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[97776],{20885:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"promiseBoundClass","desc":"Utility function to promise a bound class on an object","source":{"line":5,"path":"src/binder/src/Shared/Promise/promiseBoundClass.lua"}}')}}]);

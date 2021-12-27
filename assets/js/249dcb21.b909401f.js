@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[43564],{61377:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Gestures","desc":"Generated Gestures with Python","source":{"line":5,"path":"src/sprites/src/Shared/InputImageLibrary/Spritesheets/Guestures/All.lua"}}')}}]);

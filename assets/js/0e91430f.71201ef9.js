@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[30957],{15601:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollClient","desc":"Client side ragdolling meant to be used with a binder","source":{"line":5,"path":"src/ragdoll/src/Client/Classes/RagdollClient.lua"}}')}}]);

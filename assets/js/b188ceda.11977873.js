@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[34892],{75140:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"getGroundPlane","desc":"Function that uses raycasting to determine the groundplane in Roblox","source":{"line":5,"path":"src/getgroundplane/src/Shared/getGroundPlane.lua"}}')}}]);

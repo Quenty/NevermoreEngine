@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[60239],{73388:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"WeldConstraintUtils","desc":"Utility functions to create WeldConstraint objects in Roblox","source":{"line":5,"path":"src/weldconstraintutils/src/Shared/WeldConstraintUtils.lua"}}')}}]);

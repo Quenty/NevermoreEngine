@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[16188],{68853:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HumanoidKillerUtils","desc":"Tags and retrieves killer","source":{"line":5,"path":"src/humanoidkillerutils/src/Shared/HumanoidKillerUtils.lua"}}')}}]);

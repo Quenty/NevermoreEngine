@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[94854],{58390:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IKGripBase","desc":"Meant to be used with a binder","source":{"line":5,"path":"src/ik/src/Shared/Grip/IKGripBase.lua"}}')}}]);

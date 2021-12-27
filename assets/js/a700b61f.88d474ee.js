@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[81755],{47191:function(r){r.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GroupPermissionProvider","desc":"Provides permissions from a group","source":{"line":5,"path":"src/permissionprovider/src/Server/Providers/GroupPermissionProvider.lua"}}')}}]);

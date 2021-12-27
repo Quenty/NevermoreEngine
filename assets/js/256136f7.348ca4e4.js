@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[18303],{60730:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GetRemoteFunction","desc":"Provides getting remote functions","source":{"line":6,"path":"src/remoting/src/Shared/GetRemoteFunction.lua"}}')}}]);

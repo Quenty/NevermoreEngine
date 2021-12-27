@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[13358],{27586:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DataStoreDeleteToken","desc":"Token to use for deleting","source":{"line":5,"path":"src/datastore/src/Server/Modules/DataStoreDeleteToken.lua"}}')}}]);

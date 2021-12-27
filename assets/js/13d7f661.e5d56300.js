@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[21424],{69044:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"FriendUtils","desc":"Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.","source":{"line":5,"path":"src/friendutils/src/Shared/FriendUtils.lua"}}')}}]);

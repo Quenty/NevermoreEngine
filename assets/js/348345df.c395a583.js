@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[88768],{86309:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"StreamingUtils","desc":"Provides utilities for working with Roblox\'s streaming system","source":{"line":5,"path":"src/streamingutils/src/Shared/StreamingUtils.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[41582],{3316:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"QFrame","desc":"CFrame representation as a quaternion","source":{"line":5,"path":"src/qframe/src/Shared/QFrame.lua"}}')}}]);

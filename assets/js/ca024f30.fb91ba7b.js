@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[14131],{50308:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DataStoreWriter","desc":"Captures a snapshot of data to write and then merges it with the original","source":{"line":5,"path":"src/datastore/src/Server/Modules/DataStoreWriter.lua"}}')}}]);

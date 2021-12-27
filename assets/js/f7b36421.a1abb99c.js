@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[42951],{29930:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HumanoidSpeedBindersClient","desc":"Holds binders","source":{"line":5,"path":"src/humanoidspeed/src/Client/HumanoidSpeedBindersClient.lua"}}')}}]);

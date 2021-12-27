@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[60397],{74396:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PromiseRemoteEventMixin","desc":"Intended for classes that extend BaseObject only","source":{"line":5,"path":"src/remoting/src/Shared/PromiseRemoteEventMixin.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[23542],{78924:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ResetService","desc":"Handles reset requests since Roblox\'s reset system doesn\'t handle ragdolls correctly","source":{"line":5,"path":"src/resetservice/src/Server/ResetService.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[62681],{92067:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"LocalizedTextUtils","desc":"Localized text utils which changes translationKey structures to shared locations","source":{"line":5,"path":"src/localizedtextutils/src/Shared/LocalizedTextUtils.lua"}}')}}]);

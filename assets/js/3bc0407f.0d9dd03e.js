@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[52770],{86259:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollHumanoidOnDeathClient","desc":"Ragdolls the humanoid on death","source":{"line":5,"path":"src/ragdoll/src/Client/Classes/RagdollHumanoidOnDeathClient.lua"}}')}}]);
