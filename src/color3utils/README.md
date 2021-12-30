@@ -1,10 +1,10 @@
 ## Color3Utils
 <div align="center">
-  <a href="http://quenty.github.io/api/">
-    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  <a href="http://quenty.github.io/NevermoreEngine/">
+    <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
   </a>
   <a href="https://discord.gg/mhtGUS8">
-    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+    <img src="https://img.shields.io/discord/385151591524597761?color=5865F2&label=discord&logo=discord&logoColor=white" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
@@ -13,27 +13,9 @@
 
 Utility methods for Roblox Color3 values
 
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Color3Utils">View docs →</a></div>
+
 ## Installation
 ```
 npm install @quenty/color3utils --save
 ```
-
-## Usage
-Usage is designed to be simple.
-
-### `Color3Utils.getRelativeLuminance(color)`
-Luminance as per W3 per sRGB colorspace normalized with 0
-
-### `Color3Utils.textShouldBeBlack(color)`
-Returns whether or not the text should be black using
-
-### `Color3Utils.scaleValue(color3, percent)`
-
-### `Color3Utils.setValue(color3, value)`
-
-### `Color3Utils.setHue(color3, hue)`
-
-### `Color3Utils.scaleSaturation(color3, percent)`
-
-### `Color3Utils.setSaturation(color3, saturation)`
-

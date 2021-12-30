@@ -1,12 +1,20 @@
----
--- @module MinEntranceVelocityUtils
--- @author Quenty, AxisAngle
+--[=[
+	Class of functions that can be used to minimize entrance velocity of a projectile.
+	@class MinEntranceVelocityUtils
+]=]
 
 local MinEntranceVelocityUtils = {}
 
 local SQRT_2 = math.sqrt(2)
 
---- Determines the starting velocity to minimize the velocity at the target for a parabula
+--[=[
+	Determines the starting velocity to minimize the velocity at the target for a parabula
+
+	@param origin Vector3
+	@param target Vector3
+	@param accel Vector3
+	@return number
+]=]
 function MinEntranceVelocityUtils.minimizeEntranceVelocity(origin, target, accel)
 	local offset = target - origin
 	local accelDist = accel.magnitude
@@ -20,13 +28,37 @@ function MinEntranceVelocityUtils.minimizeEntranceVelocity(origin, target, accel
 	return (accelDist*offset - accel*offsetDist) / lowerTerm
 end
 
--- NOTE: This may only works for a minimizeEntranceVelocity
+--[=[
+	Computes the velocity the target will enter the target
+
+	:::note
+	This may only works for a minimizeEntranceVelocity
+	:::
+
+	@param velocity Vector3
+	@param origin Vector3
+	@param target Vector3
+	@param accel Vector3
+	@return Vector3
+]=]
 function MinEntranceVelocityUtils.computeEntranceVelocity(velocity, origin, target, accel)
 	local entranceTime = MinEntranceVelocityUtils.computeEntranceTime(velocity, origin, target, accel)
 	return accel*entranceTime + velocity
 end
 
--- NOTE: This may only works for a minimizeEntranceVelocity
+--[=[
+	Computes the time stamp the project enters the target
+
+	:::note
+	This may only works for a minimizeEntranceVelocity
+	:::
+
+	@param velocity Vector3
+	@param origin Vector3
+	@param target Vector3
+	@param accel Vector3
+	@return number
+]=]
 function MinEntranceVelocityUtils.computeEntranceTime(velocity, origin, target, accel)
 	local offset = target - origin
 	local aa = accel:Dot(accel)

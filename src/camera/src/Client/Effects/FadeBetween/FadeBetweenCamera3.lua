@@ -1,5 +1,7 @@
---- Add another layer of effects that can be faded in/out
--- @classmod FadeBetweenCamera3
+--[=[
+	Add another layer of effects that can be faded in/out
+	@class FadeBetweenCamera3
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -15,6 +17,11 @@ local CubicSplineUtils = require("CubicSplineUtils")
 local FadeBetweenCamera3 = {}
 FadeBetweenCamera3.ClassName = "FadeBetweenCamera3"
 
+--[=[
+	@param cameraA CameraLike
+	@param cameraB CameraLike
+	@return FadeBetweenCamera3
+]=]
 function FadeBetweenCamera3.new(cameraA, cameraB)
 	local self = setmetatable({
 		_spring = Spring.new(0);
@@ -50,6 +57,12 @@ function FadeBetweenCamera3:__newindex(index, value)
 	end
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within FadeBetweenCamera3
+]=]
 function FadeBetweenCamera3:__index(index)
 	if index == "CameraState" then
 		local _, t = SpringUtils.animating(self._spring)

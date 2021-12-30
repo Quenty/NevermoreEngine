@@ -1,6 +1,6 @@
----
--- @module CameraFrame.story
--- @author Quenty
+--[[
+	@class CameraFrame.story
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

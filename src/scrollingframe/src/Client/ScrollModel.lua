@@ -1,5 +1,7 @@
---- Scrolling model for scrolling frame
--- @module ScrollModel
+--[=[
+	Scrolling model for scrolling frame
+	@class ScrollModel
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

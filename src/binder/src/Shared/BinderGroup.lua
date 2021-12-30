@@ -1,5 +1,13 @@
---- Groups binders together
--- @classmod BinderGroup
+--[=[
+	Groups binders together into a list, and allows binders to be dynamically
+	added or removed.
+
+	Also allows their interface to be validated using a validation function.
+	This ensures that all added objects are the same type, so they can be used
+	for dynamic interactions.
+
+	@class BinderGroup
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,6 +18,13 @@ local BinderGroup = {}
 BinderGroup.ClassName = "BinderGroup"
 BinderGroup.__index = BinderGroup
 
+--[=[
+	Constructs a new BinderGroup
+
+	@param binders { Binder<T> } -- A list of binders that
+	@param validateConstructor (constructor: any) -> boolean -- Validates a binder matches T
+	@return BinderGroup<T>
+]=]
 function BinderGroup.new(binders, validateConstructor)
 	local self = setmetatable({}, BinderGroup)
 
@@ -24,6 +39,11 @@ function BinderGroup.new(binders, validateConstructor)
 	return self
 end
 
+--[=[
+	Adds a list of binders to the group.
+
+	@param binders { Binder<T> }
+]=]
 function BinderGroup:AddList(binders)
 	assert(type(binders) == "table", "Bad binders")
 
@@ -34,6 +54,11 @@ function BinderGroup:AddList(binders)
 	end
 end
 
+--[=[
+	Adds the specific binder to the list
+
+	@param binder Binder<T>
+]=]
 function BinderGroup:Add(binder)
 	assert(Binder.isBinder(binder))
 
@@ -52,6 +77,15 @@ function BinderGroup:Add(binder)
 	self.BinderAdded:Fire(binder)
 end
 
+--[=[
+	Returns a list of binders.
+
+	:::warning
+	Do not modify the list of binders returned here
+	:::
+
+	@return { T }
+]=]
 function BinderGroup:GetBinders()
 	assert(self._binders, "No self._binders")
 

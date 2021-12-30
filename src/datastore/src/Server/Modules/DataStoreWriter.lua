@@ -1,5 +1,8 @@
---- Captures a snapshot of data to write and then merges it with the original
--- @classmod DataStoreWriter
+--[=[
+	Captures a snapshot of data to write and then merges it with the original.
+	@server
+	@class DataStoreWriter
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,6 +13,11 @@ local DataStoreWriter = {}
 DataStoreWriter.ClassName = "DataStoreWriter"
 DataStoreWriter.__index = DataStoreWriter
 
+--[=[
+	Constructs a new DataStoreWriter. In general, you will not use this API directly.
+
+	@return DataStoreWriter
+]=]
 function DataStoreWriter.new()
 	local self = setmetatable({}, DataStoreWriter)
 
@@ -19,10 +27,19 @@ function DataStoreWriter.new()
 	return self
 end
 
+--[=[
+	Sets the ray data to write
+	@param data table
+]=]
 function DataStoreWriter:SetRawData(data)
 	self._rawSetData = Table.deepCopy(data)
 end
 
+--[=[
+	Adds a recursive child writer to use at the key `name`
+	@param name string
+	@param writer DataStoreWriter
+]=]
 function DataStoreWriter:AddWriter(name, writer)
 	assert(type(name) == "string", "Bad name")
 	assert(not self._writers[name], "Writer already exists for name")
@@ -31,7 +48,12 @@ function DataStoreWriter:AddWriter(name, writer)
 	self._writers[name] = writer
 end
 
--- Do merge here
+--[=[
+	Merges the new data into the original value
+
+	@param original table?
+	@return table -- The original table
+]=]
 function DataStoreWriter:WriteMerge(original)
 	original = original or {}
 

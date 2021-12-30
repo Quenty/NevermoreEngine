@@ -1,6 +1,7 @@
---- Handles cooldown on the client
--- @classmod CooldownClient
--- @author Quenty
+--[=[
+	Handles cooldown on the client
+	@class CooldownClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

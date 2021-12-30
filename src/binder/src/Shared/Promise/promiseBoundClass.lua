@@ -1,11 +1,22 @@
---- Utility function to promise a bound class on an object
--- @function promiseBoundClass
+--[=[
+	Utility function to promise a bound class on an object
+	@class promiseBoundClass
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
 local Maid = require("Maid")
 
+--[=[
+Returns a promise that resolves when the class is bound to the instance.
+@param binder Binder<T>
+@param inst Instance
+@param cancelToken CancelToken
+@return Promise<T>
+@function promiseBoundClass
+@within promiseBoundClass
+]=]
 return function(binder, inst, cancelToken)
 	assert(type(binder) == "table", "'binder' must be table")
 	assert(typeof(inst) == "Instance", "'inst' must be instance")

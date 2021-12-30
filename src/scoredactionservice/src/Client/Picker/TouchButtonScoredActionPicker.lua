@@ -1,6 +1,7 @@
---- We need to handle touch buttons separately because we may have as many of these as we want.
--- @classmod TouchButtonScoredActionPicker
--- @author Quenty
+--[=[
+	We need to handle touch buttons separately because we may have as many of these as we want.
+	@class TouchButtonScoredActionPicker
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

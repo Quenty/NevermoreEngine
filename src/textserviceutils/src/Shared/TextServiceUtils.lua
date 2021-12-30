@@ -1,6 +1,6 @@
----
--- @module TextServiceUtils
--- @author Quenty
+--[=[
+	@class TextServiceUtils
+]=]
 
 local TextService = game:GetService("TextService")
 

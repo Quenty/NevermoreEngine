@@ -1,7 +1,10 @@
---- A group of weighted tracks that can be played back with weighted probability.
--- The closest example to this is the idle animation that looks around at a 1:10
--- ratio when you're standing still in default Roblox animation script.
--- @classmod AnimationGroup
+--[=[
+	A group of weighted tracks that can be played back with weighted probability.
+	The closest example to this is the idle animation that looks around at a 1:10
+	ratio when you're standing still in default Roblox animation script.
+
+	@class AnimationGroup
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +16,10 @@ local AnimationGroup = setmetatable({}, BaseObject)
 AnimationGroup.ClassName = "AnimationGroup"
 AnimationGroup.__index = AnimationGroup
 
+--[=[
+	@param weightedTracks { WeightedTrack }
+	@return AnimationGroup
+]=]
 function AnimationGroup.new(weightedTracks)
 	local self = setmetatable(BaseObject.new(), AnimationGroup)
 
@@ -29,6 +36,10 @@ function AnimationGroup.new(weightedTracks)
 	return self
 end
 
+--[=[
+	Plays the animations
+	@param transitionTime number
+]=]
 function AnimationGroup:Play(transitionTime)
 	if self._currentTrack and self._currentTrack.IsPlaying then
 		return
@@ -36,7 +47,10 @@ function AnimationGroup:Play(transitionTime)
 
 	self:_playNewTrack(transitionTime)
 end
-
+--[=[
+	Stops the animations
+	@param transitionTime number
+]=]
 function AnimationGroup:Stop(transitionTime)
 	if self._currentTrack then
 		self._currentTrack:Stop(transitionTime)

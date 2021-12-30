@@ -1,5 +1,7 @@
---- Utils that work with Roblox Value objects (and also ValueObject)
--- @module ValueObjectUtils
+--[=[
+	Utils that work with Roblox Value objects (and also ValueObject)
+	@class ValueObjectUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

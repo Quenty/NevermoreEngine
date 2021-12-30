@@ -1,6 +1,7 @@
---- Holds binders
--- @classmod CooldownBindersServer
--- @author Quenty
+--[=[
+	Holds binders
+	@class CooldownBindersServer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,6 +1,6 @@
----
--- @module HumanoidSpeedConstants
--- @author Quenty
+--[=[
+	@class HumanoidSpeedConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

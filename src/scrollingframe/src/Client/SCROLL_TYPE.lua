@@ -1,5 +1,7 @@
---- ScrollType enum, determines scrolling behavior
--- @module ScrollType
+--[=[
+	ScrollType enum, determines scrolling behavior
+	@class ScrollType
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

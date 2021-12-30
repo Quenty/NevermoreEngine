@@ -1,6 +1,7 @@
---- Provides utilities for working with Roblox's streaming system
--- @module StreamingUtils
--- @author Quenty
+--[=[
+	Provides utilities for working with Roblox's streaming system
+	@class StreamingUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -8,6 +9,13 @@ local Promise = require("Promise")
 
 local StreamingUtils = {}
 
+--[=[
+	Promises to stream the area around the player at the given position.
+	@param player Player
+	@param position Vector3
+	@param timeOut number? -- Optional
+	@return Promise
+]=]
 function StreamingUtils.promiseStreamAround(player, position, timeOut)
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(typeof(position) == "Vector3", "Bad position")

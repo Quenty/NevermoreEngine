@@ -1,5 +1,7 @@
---- Constants for the character IK calculations
--- @module IKConstants
+--[=[
+	Constants for the character IK calculations
+	@class IKConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

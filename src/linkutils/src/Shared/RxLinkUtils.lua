@@ -1,6 +1,6 @@
----
--- @module RxLinkUtils
--- @author Quenty
+--[=[
+	@class RxLinkUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

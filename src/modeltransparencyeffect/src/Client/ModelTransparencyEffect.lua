@@ -1,6 +1,9 @@
---- Allows a model to have transparent set locally on the client
--- @classmod ModelTransparencyEffect
--- @author Quenty
+--[=[
+	Allows a model to have transparent set locally on the client
+
+	@client
+	@class ModelTransparencyEffect
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +16,12 @@ local ModelTransparencyEffect = setmetatable({}, BaseObject)
 ModelTransparencyEffect.ClassName = "ModelTransparencyEffect"
 ModelTransparencyEffect.__index = ModelTransparencyEffect
 
+--[=[
+	@param serviceBag ServiceBag
+	@param adornee Instance
+	@param transparencyServiceMethodName "SetTransparency" | "SetLocalTransparencyModifier" | nil
+	@return ModelTransparencyEffect
+]=]
 function ModelTransparencyEffect.new(serviceBag, adornee, transparencyServiceMethodName)
 	local self = setmetatable(BaseObject.new(adornee), ModelTransparencyEffect)
 
@@ -31,10 +40,19 @@ function ModelTransparencyEffect.new(serviceBag, adornee, transparencyServiceMet
 	return self
 end
 
+--[=[
+	Sets the acceleration
+	@param acceleration number
+]=]
 function ModelTransparencyEffect:SetAcceleration(acceleration)
 	self._transparency.a = acceleration
 end
 
+--[=[
+	Sets the transparency
+	@param transparency number
+	@param doNotAnimate boolean
+]=]
 function ModelTransparencyEffect:SetTransparency(transparency, doNotAnimate)
 	if self._transparency.t == transparency then
 		return
@@ -48,16 +66,29 @@ function ModelTransparencyEffect:SetTransparency(transparency, doNotAnimate)
 	self:_startAnimation()
 end
 
+--[=[
+	Returns true if animation is done
+	@return boolean
+]=]
 function ModelTransparencyEffect:IsDoneAnimating()
 	return self._transparency.rtime == 0
 end
 
+--[=[
+	Finishes the transparency animation, and then calls the callback to
+	finish the animation.
+	@param callback function
+]=]
 function ModelTransparencyEffect:FinishTransparencyAnimation(callback)
 	self:SetTransparency(0)
 
-	delay(self._transparency.rtime, function()
+	if self._transparency.rtime == 0 then
 		callback()
-	end)
+	else
+		task.delay(self._transparency.rtime, function()
+			callback()
+		end)
+	end
 end
 
 

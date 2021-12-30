@@ -1,5 +1,7 @@
---- Promises a property value
--- @module promisePropertyValue
+--[=[
+	Promises a property value
+	@class promisePropertyValue
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,42 +1,22 @@
---- Utility for Roblox character objects that involve promises.
--- @see Promise
--- @module CharacterPromiseUtil
+--[=[
+	Utility for Roblox character objects that involve promises.
+	@class CharacterPromiseUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Promise = require("Promise")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
-local CharacterPromiseUtil = {}
+local CharacterPromiseUtils = {}
 
---- Given a humanoid creates a promise that will resolve once the `Humanoid.RootPart` property
--- resolves properly.
--- @param humanoid The humanoid to resolve for the root part
-function CharacterPromiseUtil.promiseRootPart(humanoid)
-	local promise = Promise.new()
+--[=[
+	Returns a promise that will resolve once a character exists.
 
-	if humanoid.RootPart then
-		promise:Resolve(humanoid.RootPart)
-		return promise
-	end
-
-	-- humanoid:GetPropertyChangedSignal("RootPart") does not fire
-	task.spawn(function()
-		local rootPart = humanoid.RootPart
-		while not rootPart and promise:IsPending() do
-			task.wait(0.05)
-			rootPart = humanoid.RootPart
-		end
-
-		if rootPart and promise:IsPending() then
-			promise:Resolve(rootPart)
-		end
-	end)
-
-	return promise
-end
-
-function CharacterPromiseUtil.promiseCharacter(player)
+	@param player Player
+	@return Promise<Model>
+]=]
+function CharacterPromiseUtils.promiseCharacter(player)
 	assert(typeof(player) == "Instance", "Bad player")
 
 	local promise = Promise.new()
@@ -60,5 +40,5 @@ function CharacterPromiseUtil.promiseCharacter(player)
 
 end
 
-return CharacterPromiseUtil
+return CharacterPromiseUtils
 

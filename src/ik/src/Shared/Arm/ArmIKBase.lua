@@ -1,5 +1,7 @@
---- Provides IK for a given arm
--- @classmod ArmIKBase
+--[=[
+	Provides IK for a given arm
+	@class ArmIKBase
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

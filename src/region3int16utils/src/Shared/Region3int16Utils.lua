@@ -1,5 +1,7 @@
---- Module for working with Region3int16
--- @module Region3int16Utils
+--[=[
+	Module for working with Region3int16
+	@class Region3int16Utils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

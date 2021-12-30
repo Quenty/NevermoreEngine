@@ -1,13 +1,19 @@
---- Allow freedom of movement around a current place, much like the classic script works now.
--- Not intended to be use with the current character script
--- Intended to be used with a SummedCamera, relative.
--- @classmod ZoomedCamera
--- @usage
--- local Zoom = ZoomedCamera.new()
--- Zoom.Zoom = 30 -- Distance from original point
--- Zoom.MaxZoom = 100 -- max distance away
--- Zoom.MinZoom = 0.5 -- min distance away
--- Assigning .Zoom will automatically clamp
+--[=[
+	Allow freedom of movement around a current place, much like the classic script works now.
+	Not intended to be use with the current character script
+	Intended to be used with a SummedCamera, relative.
+
+	```lua
+	local zoom = ZoomedCamera.new()
+	zoom.Zoom = 30 -- Distance from original point
+	zoom.MaxZoom = 100 -- max distance away
+	zoom.MinZoom = 0.5 -- min distance away
+	```
+
+	Assigning .Zoom will automatically clamp
+
+	@class ZoomedCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,8 +1,17 @@
---- Utility functions for axis angles.
--- @module AxisAngleUtils
+--[=[
+	Utility functions for axis angles.
+	@class AxisAngleUtils
+]=]
 
 local AxisAngleUtils = {}
 
+--[=[
+    Converts an AxisAngle and position to a CFrame
+
+    @param axisAngle Vector3
+    @param position Vector3
+    @return CFrame
+]=]
 function AxisAngleUtils.toCFrame(axisAngle, position)
     local angle = axisAngle.Magnitude
     local cframe = CFrame.fromAxisAngle(axisAngle, angle)
@@ -23,6 +32,12 @@ function AxisAngleUtils.toCFrame(axisAngle, position)
     return cframe
 end
 
+--[=[
+    Converts a CFrame to an AxisAngle and position
+    @param cframe CFrame
+    @return Vector3 -- AxisAngle
+    @return Vector3 -- position
+]=]
 function AxisAngleUtils.fromCFrame(cframe)
     local axis, angle = cframe:ToAxisAngle()
     local axisAngle = angle*axis

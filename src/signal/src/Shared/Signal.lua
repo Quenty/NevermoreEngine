@@ -1,9 +1,33 @@
---- Lua-side duplication of the API of events on Roblox objects.
--- Signals are needed for to ensure that for local events objects are passed by
--- reference rather than by value where possible, as the BindableEvent objects
--- always pass signal arguments by value, meaning tables will be deep copied.
--- Roblox's deep copy method parses to a non-lua table compatable format.
--- @classmod Signal
+--[=[
+	Lua-side duplication of the API of events on Roblox objects.
+	Signals are needed for to ensure that for local events objects are passed by
+	reference rather than by value where possible, as the BindableEvent objects
+	always pass signal arguments by value, meaning tables will be deep copied.
+	Roblox's deep copy method parses to a non-lua table compatable format.
+
+	This class is designed to work both in deferred mode and in regular mode.
+	It follows whatever mode is set.
+
+	```lua
+	local signal = Signal.new()
+
+	local arg = {}
+
+	signal:Connect(function(value)
+		assert(arg == value, "Tables are preserved when firing a Signal")
+	end)
+
+	signal:Fire(arg)
+	```
+
+	:::info
+	Why this over a direct [BindableEvent]? Well, in this case, the signal
+	prevents Roblox from trying to serialize and desialize each table reference
+	fired through the BindableEvent.
+	:::
+
+	@class Signal
+]=]
 
 local HttpService = game:GetService("HttpService")
 
@@ -13,9 +37,10 @@ local Signal = {}
 Signal.__index = Signal
 Signal.ClassName = "Signal"
 
---- Constructs a new signal.
--- @constructor Signal.new()
--- @treturn Signal
+--[=[
+	Constructs a new signal.
+	@return Signal<T>
+]=]
 function Signal.new()
 	local self = setmetatable({}, Signal)
 
@@ -40,10 +65,10 @@ function Signal.new()
 	return self
 end
 
---- Fire the event with the given arguments. All handlers will be invoked. Handlers follow
--- Roblox signal conventions.
--- @param ... Variable arguments to pass to handler
--- @treturn nil
+--[=[
+	Fire the event with the given arguments. All handlers will be invoked. Handlers follow
+	@param ... T -- Variable arguments to pass to handler
+]=]
 function Signal:Fire(...)
 	if not self._bindableEvent then
 		warn(("Signal is already destroyed. %s"):format(self._source))
@@ -60,9 +85,11 @@ function Signal:Fire(...)
 	self._bindableEvent:Fire(key)
 end
 
---- Connect a new handler to the event. Returns a connection object that can be disconnected.
--- @tparam function handler Function handler called with arguments passed when `:Fire(...)` is called
--- @treturn Connection Connection object that can be disconnected
+--[=[
+	Connect a new handler to the event. Returns a connection object that can be disconnected.
+	@param handler (... T) -> () -- Function handler called when `:Fire(...)` is called
+	@return RBXScriptConnection
+]=]
 function Signal:Connect(handler)
 	if not (type(handler) == "function") then
 		error(("connect(%s)"):format(typeof(handler)), 2)
@@ -81,8 +108,11 @@ function Signal:Connect(handler)
 	end)
 end
 
---- Wait for fire to be called, and return the arguments it was given.
--- @treturn ... Variable arguments from connection
+--[=[
+	Wait for fire to be called, and return the arguments it was given.
+	@yields
+	@return T
+]=]
 function Signal:Wait()
 	local key = self._bindableEvent.Event:Wait()
 	local args = self._argMap[key]
@@ -94,8 +124,10 @@ function Signal:Wait()
 	end
 end
 
---- Disconnects all connected events to the signal. Voids the signal as unusable.
--- @treturn nil
+--[=[
+	Disconnects all connected events to the signal. Voids the signal as unusable.
+	Sets the metatable to nil.
+]=]
 function Signal:Destroy()
 	if self._bindableEvent then
 		-- This should disconnect all events, but in-flight events should still be

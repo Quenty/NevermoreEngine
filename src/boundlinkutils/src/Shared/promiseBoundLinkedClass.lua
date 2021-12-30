@@ -1,5 +1,9 @@
----
--- @function promiseBoundLinkedClass
+--[=[
+	Promise that returns an objectValue's value that has a bound
+	value to it.
+
+	@class promiseBoundLinkedClass
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

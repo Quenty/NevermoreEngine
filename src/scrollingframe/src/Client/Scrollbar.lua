@@ -1,5 +1,6 @@
----
--- @classmod Scrollbar
+--[=[
+	@class Scrollbar
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

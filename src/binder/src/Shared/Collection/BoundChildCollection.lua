@@ -1,5 +1,7 @@
---- Tracks child of type
--- @classmod BoundChildCollection
+--[=[
+	Tracks child of type of a binder.
+	@class BoundChildCollection
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,17 +12,31 @@ local BoundChildCollection = setmetatable({}, BaseObject)
 BoundChildCollection.ClassName = "BoundChildCollection"
 BoundChildCollection.__index = BoundChildCollection
 
+--[=[
+	Constructcs a new BoundChildCollection.
+	@param binder Binder<T>
+	@param parent Instance
+	@return BoundChildCollection<T>
+]=]
 function BoundChildCollection.new(binder, parent)
 	local self = setmetatable(BaseObject.new(), BoundChildCollection)
 
 	self._binder = binder or error("No binder")
 	self._parent = parent or error("No parent")
 
-	--- Fires on class addition
+--[=[
+	Fires on class addition
+	@prop ClassAdded Signal<T>
+	@within BoundChildCollection
+]=]
 	self.ClassAdded = Signal.new() -- :Fire(class)
 	self._maid:GiveTask(self.ClassAdded)
 
-	--- Fires on class removal
+--[=[
+	Fires on class removal
+	@prop ClassRemoved Signal<T>
+	@within BoundChildCollection
+]=]
 	self.ClassRemoved = Signal.new() -- :Fire(class)
 	self._maid:GiveTask(self.ClassRemoved)
 
@@ -39,24 +55,40 @@ function BoundChildCollection.new(binder, parent)
 	return self
 end
 
---- Returns whether the track has the class
--- @return true if the class exists, nil otherwise
+--[=[
+	Returns whether the track has the class
+	@param class T
+	@return boolean? -- true if the class exists, nil otherwise
+]=]
 function BoundChildCollection:HasClass(class)
 	return self._classes[class]
 end
 
+--[=[
+	Gets the size
+	@return number
+]=]
 function BoundChildCollection:GetSize()
 	return self._size
 end
 
---- Returns the raw classes variable as [class] = true
--- @return The set
+--[=[
+	Returns the raw classes variable as [class] = true.
+
+	:::warning
+	Do not modify the set
+	:::
+
+	@return { [T] = true } -- The set
+]=]
 function BoundChildCollection:GetSet()
 	return self._classes
 end
 
---- Slow than :GetSet(), but adds them in an ordered list
--- @return The list
+--[=[
+	Slow than :GetSet(), but adds them in an ordered list
+	@return { T }
+]=]
 function BoundChildCollection:GetClasses()
 	local list = {}
 	for class, _ in pairs(self._classes) do

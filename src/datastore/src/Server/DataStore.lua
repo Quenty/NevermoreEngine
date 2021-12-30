@@ -1,5 +1,28 @@
---- Wraps the datastore object to provide async cached loading and saving
--- @classmod DataStore
+--[=[
+	Wraps the datastore object to provide async cached loading and saving. See [DataStoreStage] for more API.
+
+	Has the following features
+	* Automatic save
+	* Jitter
+	* De-duplication (only updates data it needs)
+
+	```lua
+	local playerMoneyValue = Instance.new("IntValue")
+	playerMoneyValue.Value = 0
+
+	local dataStore = DataStore.new(DataStoreService:GetDataStore("test"), test-store")
+	dataStore:Load("money", 0):Then(function(money)
+		playerMoneyValue.Value = money
+		dataStore:StoreOnValueChange("money", playerMoneyValue)
+	end):Catch(function()
+		-- TODO: Notify player
+	end)
+
+	```
+
+	@server
+	@class DataStore
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -20,12 +43,22 @@ local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
 DataStore.__index = DataStore
 
+--[=[
+	Constructs a new DataStore. See [DataStoreStage] for more API.
+	@param robloxDataStore DataStore
+	@param key string
+]=]
 function DataStore.new(robloxDataStore, key)
 	local self = setmetatable(DataStoreStage.new(), DataStore)
 
 	self._key = key or error("No key")
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 
+--[=[
+	Prop that fires when saving. Promise will resolve once saving is complete.
+	@prop Saving Signal<Promise>
+	@within DataStore
+]=]
 	self.Saving = Signal.new() -- :Fire(promise)
 	self._maid:GiveTask(self.Saving)
 
@@ -56,10 +89,18 @@ function DataStore.new(robloxDataStore, key)
 	return self
 end
 
+--[=[
+	Returns the full path for the datastore
+	@return string
+]=]
 function DataStore:GetFullPath()
 	return ("RobloxDataStore@%s"):format(self._key)
 end
 
+--[=[
+	Returns whether the datastore failed.
+	@return boolean
+]=]
 function DataStore:DidLoadFail()
 	if not self._loadPromise then
 		return false
@@ -80,7 +121,10 @@ function DataStore:PromiseLoadSuccessful()
 	end)
 end
 
--- Saves all stored data
+--[=[
+	Saves all stored data.
+	@return Promise
+]=]
 function DataStore:Save()
 	if self:DidLoadFail() then
 		warn("[DataStore] - Not saving, failed to load")
@@ -98,7 +142,12 @@ function DataStore:Save()
 	return self:_saveData(self:GetNewWriter())
 end
 
--- Loads data. This returns the originally loaded data.
+--[=[
+	Loads data. This returns the originally loaded data.
+	@param keyName string
+	@param defaultValue any?
+	@return any?
+]=]
 function DataStore:Load(keyName, defaultValue)
 	return self:_promiseLoad()
 		:Then(function(data)

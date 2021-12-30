@@ -1,6 +1,7 @@
---- Helps track whether or not a player is idle and if so, then can show UI or other cute things
--- @module IdleService
--- @author Quenty
+--[=[
+	Helps track whether or not a player is idle and if so, then can show UI or other cute things
+	@class IdleService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,5 +1,7 @@
---- Creates a service that provides modules from a parent module, either by name, or by list!
--- @classmod ModuleProvider
+--[=[
+	Creates a service that provides modules from a parent module, either by name, or by list!
+	@class ModuleProvider
+]=]
 
 local ModuleProvider = {}
 ModuleProvider.ClassName = "ModuleProvider"

@@ -1,6 +1,7 @@
----
--- @module RxAttributeUtils
--- @author Quenty
+--[=[
+	Utility functions involving attributes.
+	@class RxAttributeUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +10,13 @@ local Maid = require("Maid")
 
 local RxAttributeUtils = {}
 
+--[=[
+	Observes an attribute on an instance.
+	@param instance Instance
+	@param attributeName string
+	@param defaultValue any?
+	@return Observable<any>
+]=]
 function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue)
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")

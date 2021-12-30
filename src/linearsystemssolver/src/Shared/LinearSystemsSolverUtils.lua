@@ -1,9 +1,11 @@
----
--- @module LinearSystemsSolverUtils
+--[=[
+	@class LinearSystemsSolverUtils
+]=]
 
 local LinearSystemsSolverUtils = {}
 
---[[
+--[=[
+	```
 	like this
 	[a  b | y]
 	[c  d | z]
@@ -16,10 +18,16 @@ local LinearSystemsSolverUtils = {}
 	mutOutput = {y, z}
 
 	returns solution {x0, x1}
+	```
 
-	system and output get destroyed in the process
-]]
+	:::warning
+	System and output get destroyed in the process
+	:::
 
+	@param mutSystem { { number } }
+	@param mutOutput { number }
+	@return { number }
+]=]
 function LinearSystemsSolverUtils.solve(mutSystem, mutOutput)
 	local n = #mutSystem
 
@@ -83,6 +91,13 @@ local function getValidRatio(num, den)
 	return num/den
 end
 
+--[=[
+	@param mutMainDiag table
+	@param mutUpperDiag table
+	@param mutLowerDiag table
+	@param mutOutput table
+	@return table
+]=]
 function LinearSystemsSolverUtils.solveTridiagonal(mutMainDiag, mutUpperDiag, mutLowerDiag, mutOutput)
 	local n = #mutMainDiag
 

@@ -1,10 +1,10 @@
 ## GenericScreenGuiProvider
 <div align="center">
-  <a href="http://quenty.github.io/api/">
-    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  <a href="http://quenty.github.io/NevermoreEngine/">
+    <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
   </a>
   <a href="https://discord.gg/mhtGUS8">
-    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+    <img src="https://img.shields.io/discord/385151591524597761?color=5865F2&label=discord&logo=discord&logoColor=white" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
@@ -13,44 +13,9 @@
 
 Providers screenGuis with a given display order for easy use
 
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/GenericScreenGuiProvider">View docs →</a></div>
+
 ## Installation
 ```
 npm install @quenty/genericscreenguiprovider --save
 ```
-
-## Usage
-Usage is designed to be simple.
-
-```lua
--- ScreenGuiProvider.lua
-
-
-return GenericScreenGuiProvider.new({
-  CLOCK = 5; -- Register layers here
-  BLAH = 8;
-  CHAT = 10;
-})
-```
-
-In a script that needs a new screen gui, do this:
-
-```lua
--- Load your games provider (see above for the registration)
-local screenGuiProvider = require("ScreenGuiProvider")
-
--- Yay, you now have a new screen gui
-local screenGui = screenGuiProvider:Get("CLOCK")
-gui.Parent = screenGui
-```
-
-## API
-
-### `GenericScreenGuiProvider.new(orders)`
-
-### `GenericScreenGuiProvider:Get(orderName)`
-Returns a new ScreenGui at DisplayOrder specified
-
-### `GenericScreenGuiProvider:GetDisplayOrder(orderName)`
-
-### `GenericScreenGuiProvider:SetupMockParent(target)`
-

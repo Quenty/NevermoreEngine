@@ -1,6 +1,7 @@
---- Retrieves CmdrTemplateProviderServer
--- @module CmdrTemplateProviderServer
--- @author Quenty
+--[=[
+	Retrieves CmdrTemplateProviderServer
+	@class CmdrTemplateProviderServer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

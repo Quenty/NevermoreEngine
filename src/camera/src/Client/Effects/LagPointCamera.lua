@@ -1,5 +1,7 @@
---- Point a current element but lag behind for a smoother experience
--- @classmod LagPointCamera
+--[=[
+	Point a current element but lag behind for a smoother experience
+	@class LagPointCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,7 +14,7 @@ LagPointCamera.ClassName = "LagPointCamera"
 LagPointCamera._FocusCamera = nil
 LagPointCamera._OriginCamera = nil
 
----
+--
 -- @constructor
 -- @param originCamera A camera to use
 -- @param focusCamera The Camera to look at.

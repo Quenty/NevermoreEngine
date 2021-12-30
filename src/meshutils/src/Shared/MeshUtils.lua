@@ -1,9 +1,16 @@
---- Mesh utility methods
--- @module MeshUtils
+--[=[
+	Mesh utility methods
+	@class MeshUtils
+]=]
 
 local MeshUtils = {}
 
---- Get or create a mesh for a part
+--[=[
+	Get or create a mesh object for a part
+
+	@param part BasePart
+	@return Mesh?
+]=]
 function MeshUtils.getOrCreateMesh(part)
 	local dataModelMesh = part:FindFirstChildWhichIsA("DataModelMesh")
 	if dataModelMesh then

@@ -1,0 +1,305 @@
+title = "Nevermore"
+gitRepoUrl = "https://github.com/Quenty/NevermoreEngine"
+gitSourceBranch = "main"
+projectName = "Nevermore"
+url = "https://quenty.github.io"
+tagline = "Quenty's reusable code for Roblox"
+
+[[navbar.items]]
+href = "https://discord.gg/mhtGUS8"
+label = "Discord"
+position = "right"
+
+[footer]
+copyright = "Copyright © 2014-2021 James Onnen."
+
+[docusaurus]
+url = "https://quenty.github.io"
+baseUrl = "/NevermoreEngine/"
+
+[home]
+enabled = true
+includeReadme = true
+
+[[home.features]]
+title = "Faster development"
+description = "Speed up Roblox development With Nevermore. With built in IK, Ragdoll, camera systems, and more, development has never been faster."
+
+[[home.features]]
+title = "Composable"
+description = "Libraries are modular! Modules are designed to compose both with Roblox and each other."
+
+[[home.features]]
+title = "Battle tested"
+description = "These libraries are old, and have been used in production for millions of game sessions"
+
+[[classOrder]]
+section = "Signal"
+classes = ["Signal", "SignalUtils"]
+
+[[classOrder]]
+section = "Maid"
+classes = ["Maid", "MaidTaskUtils"]
+
+[[classOrder]]
+section = "Promise"
+classes = ["Promise", "PromiseUtils", "PendingPromiseTracker", "promiseChild"]
+
+[[classOrder]]
+section = "Binder"
+classes = [
+	"Binder",
+	"BinderUtils",
+	"BinderGroupProvider",
+	"BinderGroup",
+	"BinderProvider",
+	"BoundParentTracker",
+	"BoundAncestorTracker",
+	"promiseBoundClass",
+	"BoundChildCollection"
+]
+
+[[classOrder]]
+section = "PlayerHumanoidBinder"
+classes = ["PlayerHumanoidBinder"]
+
+[[classOrder]]
+section = "PlayerBinder"
+classes = ["PlayerBinder"]
+
+[[classOrder]]
+section = "Draw"
+classes = ["Draw"]
+
+[[classOrder]]
+section = "Rx"
+classes = ["Rx", "Observable", "Subscription"]
+
+[[classOrder]]
+section = "RxBinderUtils"
+classes = ["RxBinderUtils", "RxBinderGroupUtils"]
+
+[[classOrder]]
+section = "Blend"
+classes = ["Blend"]
+
+[[classOrder]]
+section = "Brio"
+classes = ["Brio", "BrioUtils", "RxBrioUtils"]
+
+[[classOrder]]
+section = "DataStore"
+classes = [
+	"DataStore",
+	"PlayerDataStoreManager",
+	"DataStorePromises",
+	"DataStoreWriter",
+	"DataStoreStage",
+	"DataStoreDeleteToken"
+]
+
+[[classOrder]]
+section = "Octree"
+classes = [
+	"Octree",
+	"OctreeNode",
+	"OctreeRegionUtils"
+]
+
+[[classOrder]]
+section = "Spring"
+classes = ["Spring", "SpringUtils", "LinearValue"]
+
+[[classOrder]]
+section = "AccelTween"
+classes = ["AccelTween"]
+
+[[classOrder]]
+section = "ValueObject"
+classes = ["ValueObject", "ValueObjectUtils"]
+
+[[classOrder]]
+section = "ValueBaseUtils"
+classes = ["ValueBaseUtils", "RxValueBaseUtils"]
+
+[[classOrder]]
+section = "AttributeUtils"
+classes = ["AttributeUtils", "RxAttributeUtils", "AttributeValue"]
+
+[[classOrder]]
+section = "PhysicsUtils"
+classes = ["PhysicsUtils"]
+
+[[classOrder]]
+section = "PathfindingUtils"
+classes = ["PathfindingUtils"]
+
+[[classOrder]]
+section = "PartTouchingCalculator"
+classes = ["PartTouchingCalculator", "PartTouchingRenderer", "BinderTouchingCalculator"]
+
+[[classOrder]]
+section = "Remoting"
+classes = [
+	"GetRemoteEvent",
+	"GetRemoteFunction",
+	"PromiseGetRemoteEvent",
+	"PromiseGetRemoteFunction",
+	"PromiseRemoteEventMixin",
+	"PromiseRemoteFunctionMixin",
+]
+
+[[classOrder]]
+section = "IK"
+classes = [
+	"ArmIKBase",
+	"GripPointer",
+	"IKAimPositionPriorites",
+	"IKBindersClient",
+	"IKBindersServer",
+	"IKConstants",
+	"IKGripBase",
+	"IKGripUtils",
+	"IKLeftGrip",
+	"IKResource",
+	"IKResourceUtils",
+	"IKRig",
+	"IKRigBase",
+	"IKRigClient",
+	"IKRightGrip",
+	"IKService",
+	"IKServiceClient",
+	"IKUtils",
+	"IKRigUtils",
+	"TorsoIKBase",
+	"TorsoIKUtils",
+]
+
+[[classOrder]]
+section = "Table"
+classes = ["Table", "Set"]
+
+[[classOrder]]
+section = "QFrame"
+classes = ["QFrame"]
+
+[[classOrder]]
+section = "Math"
+classes = ["Math"]
+
+[[classOrder]]
+section = "SoundUtils"
+classes = ["SoundUtils", "SoundPromiseUtils"]
+
+[[classOrder]]
+section = "AdorneeUtils"
+classes = ["AdorneeUtils"]
+
+[[classOrder]]
+section = "Camera"
+classes = [
+	"CameraStackService",
+	"CameraFrame",
+	"CameraStateTweener",
+	"CameraState",
+	"CameraUtils",
+	"CameraControls",
+	"CameraGamepadInputUtils",
+	"GamepadRotateModel",
+	"FadeBetweenCamera",
+	"FadeBetweenCamera2",
+	"FadeBetweenCamera3",
+	"FadeBetweenCamera4",
+	"CameraEffectUtils",
+	"CustomCameraEffect",
+	"DefaultCamera",
+	"FadingCamera",
+	"HeartbeatCamera",
+	"ImpulseCamera",
+	"InverseFader",
+	"LagPointCamera",
+	"PointCamera",
+	"PushCamera",
+	"RotatedCamera",
+	"SmoothRotatedCamera",
+	"SmoothZoomedCamera",
+	"SummedCamera",
+	"TrackCamera",
+	"XZPlaneLockCamera",
+	"ZoomedCamera",
+	"CameraInputUtils",
+	"CameraTouchInputUtils",
+	"FieldOfViewUtils",
+]
+
+[[classOrder]]
+section = "InputMode"
+classes = ["InputMode", "InputModeProcessor", "InputModeSelector", "INPUT_MODES"]
+
+[[classOrder]]
+section = "Sprites"
+classes = [
+	"InputImageLibrary",
+	"Sprite",
+	"Spritesheet",
+	"AnimatedSpritesheet",
+	"AnimatedSpritesheetPlayer",
+]
+
+[[classOrder]]
+section = "ResetService"
+classes = [
+	"ResetService",
+	"ResetServiceClient",
+	"ResetServiceConstants",
+]
+
+[[classOrder]]
+section = "NumberSequenceUtils"
+classes = ["NumberSequenceUtils"]
+
+
+[[classOrder]]
+section = "NoCollisionConstraintUtils"
+classes = ["NoCollisionConstraintUtils"]
+
+[[classOrder]]
+section = "MultipleClickUtils"
+classes = ["MultipleClickUtils"]
+
+[[classOrder]]
+section = "RxInstanceUtils"
+classes = ["RxInstanceUtils"]
+
+[[classOrder]]
+section = "Hide"
+classes = [
+	"Hide",
+	"HideClient",
+	"HideBindersClient",
+	"HideBindersServer"
+]
+
+[[classOrder]]
+section = "GeometryUtils"
+classes = [
+	"CircleUtils",
+	"Line",
+	"OrthogonalUtils",
+	"PlaneUtils",
+	"ScaleModelUtils",
+	"SphereUtils",
+	"SwingTwistUtils"
+]
+
+[[classOrder]]
+section = "PermissionProvider"
+classes = [
+	"PermissionService",
+	"PermissionServiceClient",
+	"PermissionProviderUtils",
+	"PermissionProviderConstants",
+	"BasePermissionProvider",
+	"CreatorPermissionProvider",
+	"GroupPermissionProvider",
+]

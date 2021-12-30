@@ -1,5 +1,7 @@
---- Plays particle effects for players
--- @classmod ParticlePlayer
+--[=[
+	Plays particle effects for players
+	@class ParticlePlayer
+]=]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")

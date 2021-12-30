@@ -1,5 +1,7 @@
---- Utility methods for Region3
--- @module Region3Utils
+--[=[
+	Utility methods for Region3
+	@class Region3Utils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

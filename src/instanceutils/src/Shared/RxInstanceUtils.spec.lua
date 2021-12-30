@@ -1,5 +1,6 @@
----
--- @module RxInstanceUtils.spec.lua
+--[[
+	@class RxInstanceUtils.spec.lua
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

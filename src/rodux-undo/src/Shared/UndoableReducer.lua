@@ -1,5 +1,7 @@
---- Simple undo redo stack history
--- @module UndoableReducer
+--[=[
+	Simple undo redo stack history
+	@class UndoableReducer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

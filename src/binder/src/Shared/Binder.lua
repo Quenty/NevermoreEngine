@@ -1,5 +1,28 @@
---- Bind class to Roblox Instance
--- @classmod Binder
+--[=[
+	Bind class to Roblox Instance
+
+	```lua
+	-- Setup a class!
+	local MyClass = {}
+	MyClass.__index = MyClass
+
+	function MyClass.new(robloxInstance)
+		print("New tagged instance of ", robloxInstance)
+		return setmetatable({}, MyClass)
+	end
+
+	function MyClass:Destroy()
+		print("Cleaning up")
+		setmetatable(self, nil)
+	end
+
+	-- bind to every instance with tag of "TagName"!
+	local binder = Binder.new("TagName", MyClass)
+	binder:Start() -- listens for new instances and connects events
+	```
+
+	@class Binder
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,37 +33,37 @@ local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
 local Signal = require("Signal")
 local promiseBoundClass = require("promiseBoundClass")
---[[
-@usage
-
--- Setup a class!
-local MyClass = {}
-MyClass.__index = MyClass
-
-function MyClass.new(robloxInstance)
-	print("New tagged instance of ", robloxInstance)
-	return setmetatable({}, MyClass)
-end
-
-function MyClass:Destroy()
-	print("Cleaning up")
-	setmetatable(self, nil)
-end
-
--- bind to every instance with tag of "TagName"!
-local binder = Binder.new("TagName", MyClass)
-binder:Start() -- listens for new instances and connects events
-]]
 
 local Binder = {}
 Binder.__index = Binder
 Binder.ClassName = "Binder"
 
---- Creates a new binder object.
--- @constructor Binder.new(tagName, constructor)
--- @param tagName Name of the tag to bind to. This uses CollectionService's tag system
--- @param constructor A constructor to create the new class. Comes in three flavors.
--- @treturn Binder
+--[=[
+	Constructor for a binder
+	@type BinderContructor (Instance, ...: any) -> T | { new: (Instance, ...: any) } | { Create(self, Instance, ...: any) }
+	@within Binder
+]=]
+
+--[=[
+	Constructs a new binder object.
+
+	```lua
+	local binder = Binder.new("Bird", function(inst)
+		print("Wow, a new bird!", inst)
+
+		return {
+			Destroy = function()
+				print("Uh oh, the bird is gone!")
+			end;
+		}
+	end)
+	binder:Start()
+	```
+	@param tagName string -- Name of the tag to bind to. This uses CollectionService's tag system
+	@param constructor BinderContructor
+	@param ... any -- Variable arguments that will be passed into the constructor
+	@return Binder<T>
+]=]
 function Binder.new(tagName, constructor, ...)
 	local self = setmetatable({}, Binder)
 
@@ -55,7 +78,7 @@ function Binder.new(tagName, constructor, ...)
 	self._listeners = {} -- [inst] = callback
 	self._args = {...}
 
-	delay(5, function()
+	task.delay(5, function()
 		if not self._loaded then
 			warn(("Binder %q is not loaded. Call :Start() on it!"):format(self._tagName))
 		end
@@ -64,14 +87,19 @@ function Binder.new(tagName, constructor, ...)
 	return self
 end
 
---- Retrieves whether or not its a binder
--- @param value
--- @return true or false, whether or not it is a value
+--[=[
+	Retrieves whether or not the given value is a binder.
+
+	@param value any
+	@return boolean true or false, whether or not it is a value
+]=]
 function Binder.isBinder(value)
 	return type(value) == "table" and value.ClassName == "Binder"
 end
 
---- Listens for new instances and connects to the GetInstanceAddedSignal() and removed signal!
+--[=[
+	Listens for new instances and connects to the GetInstanceAddedSignal() and removed signal!
+]=]
 function Binder:Start()
 	if self._loaded then
 		return
@@ -90,17 +118,31 @@ function Binder:Start()
 	end))
 end
 
--- Returns the tag name that the binder has
+--[=[
+	Returns the tag name that the binder has.
+	@return string
+]=]
 function Binder:GetTag()
 	return self._tagName
 end
 
---- Returns whatever was set for the construtor. Used for meta-analysis of the binder, such as extracting new
+--[=[
+	Returns whatever was set for the construtor. Used for meta-analysis of
+	the binder, such as extracting if parameters are allowed.
+
+	@return BinderContructor
+]=]
 function Binder:GetConstructor()
 	return self._constructor
 end
 
--- Fired when added, and then after removal, but before destroy!
+--[=[
+	Fired when added, and then after removal, but before destroy!
+
+	@param inst Instance
+	@param callback function
+	@return function -- Cleanup function
+]=]
 function Binder:ObserveInstance(inst, callback)
 	self._listeners[inst] = self._listeners[inst] or {}
 	self._listeners[inst][callback] = true
@@ -117,19 +159,22 @@ function Binder:ObserveInstance(inst, callback)
 	end
 end
 
--- Returns a new signal that will fire whenever a class is bound to the binder
---[[
-@usage
+--[=[
+	Returns a new signal that will fire whenever a class is bound to the binder
 
-local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
+	```lua
+	local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
 
-birdBinder:GetClassAddedSignal():Connect(function(bird)
-	bird:Squack() -- Make the bird squack when it's first spawned
-end)
+	birdBinder:GetClassAddedSignal():Connect(function(bird)
+		bird:Squack() -- Make the bird squack when it's first spawned
+	end)
 
--- Load all birds
-birdBinder:Start()
-]]
+	-- Load all birds
+	birdBinder:Start()
+	```
+
+	@return Signal<T>
+]=]
 function Binder:GetClassAddedSignal()
 	if self._classAddedSignal then
 		return self._classAddedSignal
@@ -140,7 +185,11 @@ function Binder:GetClassAddedSignal()
 	return self._classAddedSignal
 end
 
--- Returns a new signal that will fire whenever a class is removing from the binder
+--[=[
+	Returns a new signal that will fire whenever a class is removing from the binder.
+
+	@return Signal<T>
+	]=]
 function Binder:GetClassRemovingSignal()
 	if self._classRemovingSignal then
 		return self._classRemovingSignal
@@ -152,7 +201,11 @@ function Binder:GetClassRemovingSignal()
 	return self._classRemovingSignal
 end
 
--- Returns a new signal that will fire whenever a class is removed from the binder
+--[=[
+	Returns a new signal that will fire whenever a class is removed from the binder.
+
+	@return Signal<T>
+]=]
 function Binder:GetClassRemovedSignal()
 	if self._classRemovedSignal then
 		return self._classRemovedSignal
@@ -164,21 +217,24 @@ function Binder:GetClassRemovedSignal()
 	return self._classRemovedSignal
 end
 
---[[
-@usage
+--[=[
+	Returns all of the classes in a new table.
 
-local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
+	```lua
+	local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
 
--- Update every bird every frame
-RunService.Stepped:Connect(function()
-	for _, bird in pairs(birdBinder:GetAll()) do
-		bird:Update()
-	end
-end)
+	-- Update every bird every frame
+	RunService.Stepped:Connect(function()
+		for _, bird in pairs(birdBinder:GetAll()) do
+			bird:Update()
+		end
+	end)
 
-birdBinder:Start()
-]]
---- Returns all of the classes in a new table
+	birdBinder:Start()
+	```
+
+	@return {T}
+]=]
 function Binder:GetAll()
 	local all = {}
 	for class, _ in pairs(self._allClassSet) do
@@ -188,30 +244,45 @@ function Binder:GetAll()
 end
 
 
---[[
-@usage
+--[=[
+	Faster method to get all items in a binder
 
-local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
+	```lua
+	local birdBinder = Binder.new("Bird", require("Bird")) -- Load bird into binder
 
--- Update every bird every frame
-RunService.Stepped:Connect(function()
-	for bird, _ in pairs(birdBinder:GetAllSet()) do
-		bird:Update()
-	end
-end)
+	-- Update every bird every frame
+	RunService.Stepped:Connect(function()
+		for bird, _ in pairs(birdBinder:GetAllSet()) do
+			bird:Update()
+		end
+	end)
 
-birdBinder:Start()
-]]
---- Faster method to get all items in a binder
--- NOTE: Do not mutate this set directly
+	birdBinder:Start()
+	```
+
+	:::warning
+	Do not mutate this set directly
+	:::
+
+	@return { [T]: boolean }
+]=]
 function Binder:GetAllSet()
 	return self._allClassSet
 end
 
---- Binds an instance to this binder using collection service and attempts
--- to return it if it's bound properly. See BinderUtils.promiseBoundClass() for a safe
--- way to retrieve it.
--- NOTE: Do not assume that a bound object will be retrieved
+--[=[
+	Binds an instance to this binder using collection service and attempts
+	to return it if it's bound properly. See BinderUtils.promiseBoundClass() for a safe
+	way to retrieve it.
+
+	:::warning
+	Do not assume that a bound object will be retrieved
+	:::
+
+	@server
+	@param inst Instance -- Instance to check
+	@return T? -- Bound class
+]=]
 function Binder:Bind(inst)
 	if RunService:IsClient() then
 		warn(("[Binder.Bind] - Bindings '%s' done on the client! Will be disrupted upon server replication! %s")
@@ -222,7 +293,12 @@ function Binder:Bind(inst)
 	return self:Get(inst)
 end
 
--- Unbinds the instance by removing the tag
+--[=[
+	Unbinds the instance by removing the tag.
+
+	@server
+	@param inst Instance -- Instance to unbind
+]=]
 function Binder:Unbind(inst)
 	assert(typeof(inst) == "Instance", "Bad inst'")
 
@@ -234,9 +310,16 @@ function Binder:Unbind(inst)
 	CollectionService:RemoveTag(inst, self._tagName)
 end
 
--- See :Bind(). Acknowledges the risk of doing this on the client.
--- Using this acknowledges that we're intentionally binding on a safe client object,
--- i.e. one without replication. If another tag is changed on this instance, this tag will be lost/changed.
+--[=[
+ See :Bind(). Acknowledges the risk of doing this on the client.
+
+ Using this acknowledges that we're intentionally binding on a safe client object,
+ i.e. one without replication. If another tag is changed on this instance, this tag will be lost/changed.
+
+ @client
+ @param inst Instance -- Instance to bind
+ @return T? -- Bound class (potentially)
+]=]
 function Binder:BindClient(inst)
 	if not RunService:IsClient() then
 		warn(("[Binder.BindClient] - Bindings '%s' done on the server! Will be replicated!")
@@ -247,18 +330,35 @@ function Binder:BindClient(inst)
 	return self:Get(inst)
 end
 
--- See Unbind(), acknowledges risk of doing this on the client.
+--[=[
+	See Unbind(), acknowledges risk of doing this on the client.
+
+	@client
+	@param inst Instance -- Instance to unbind
+]=]
 function Binder:UnbindClient(inst)
 	assert(typeof(inst) == "Instance", "Bad inst")
 	CollectionService:RemoveTag(inst, self._tagName)
 end
 
---- Returns a version of the clas
+--[=[
+	Returns a instance of the class that is bound to the instance given.
+
+	@param inst Instance -- Instance to check
+	@return T?
+]=]
 function Binder:Get(inst)
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 	return self._instToClass[inst]
 end
 
+--[=[
+	Returns a promise which will resolve when the instance is bound.
+
+	@param inst Instance -- Instance to check
+	@param cancelToken? CancelToken
+	@return Promise<T>
+]=]
 function Binder:Promise(inst, cancelToken)
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 	return promiseBoundClass(self, inst, cancelToken)
@@ -355,7 +455,9 @@ function Binder:_remove(inst)
 	end
 end
 
---- Cleans up all bound classes, and disconnects all events
+--[=[
+	Cleans up all bound classes, and disconnects all events.
+]=]
 function Binder:Destroy()
 	local inst, class = next(self._instToClass)
 	while class ~= nil do

@@ -1,6 +1,7 @@
---- Torso resources for IK
--- @classmod TorsoIKBase
--- @author Quenty
+--[=[
+	Torso resources for IK
+	@class TorsoIKBase
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -162,7 +163,10 @@ function TorsoIKBase:_updatePoint()
 	end
 end
 
---- Helper method used for other IK
+--[=[
+	Helper method used for other IK
+	@return CFrame?
+]=]
 function TorsoIKBase:GetTargetUpperTorsoCFrame()
 	if not self._resources:IsReady() then
 		return nil

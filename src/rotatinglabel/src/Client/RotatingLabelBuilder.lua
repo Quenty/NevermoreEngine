@@ -1,5 +1,12 @@
---- Builds a new RotatingLabel. See RotatingLabel for more details.
--- @classmod RotatingLabelBuilder
+--[=[
+	Builds a new RotatingLabel. See RotatingLabel for more details.
+
+	:::warning
+	This class is not really maintained or used anymore.
+	:::
+
+	@class RotatingLabelBuilder
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,7 +16,7 @@ local RotatingLabelBuilder = {}
 RotatingLabelBuilder.ClassName = "RotatingLabelBuilder"
 RotatingLabelBuilder.__index = RotatingLabelBuilder
 
---- Starts building a new rotating label with the template, if given
+-- Starts building a new rotating label with the template, if given
 function RotatingLabelBuilder.new(template)
 	local self = setmetatable({}, RotatingLabelBuilder)
 
@@ -20,7 +27,7 @@ function RotatingLabelBuilder.new(template)
 	return self
 end
 
---- Sets the tempate to use, the label will get those properties
+-- Sets the tempate to use, the label will get those properties
 function RotatingLabelBuilder:WithTemplate(template)
 	self._template = template
 
@@ -58,7 +65,7 @@ function RotatingLabelBuilder:WithGui(gui)
 	return self
 end
 
---- Creates the new label and returns it
+-- Creates the new label and returns it
 function RotatingLabelBuilder:Create()
 	self._label:UpdateRender()
 

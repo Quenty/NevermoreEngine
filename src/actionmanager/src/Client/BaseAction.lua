@@ -1,5 +1,7 @@
---- BaseAction state for Actionmanager
--- @classmod BaseAction
+--[=[
+	BaseAction state for Actionmanager
+	@class BaseAction
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

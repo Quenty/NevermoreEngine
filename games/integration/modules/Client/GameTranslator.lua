@@ -1,6 +1,6 @@
----
--- @classmod GameTranslator
--- @author Quenty
+--[=[
+	@class GameTranslator
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

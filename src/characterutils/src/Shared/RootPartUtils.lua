@@ -1,5 +1,7 @@
---- Utility functions involving the root part
--- @module RootPartUtils
+--[=[
+	Utility functions involving the root part
+	@class RootPartUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,6 +12,18 @@ local RootPartUtils = {}
 
 local MAX_YIELD_TIME = 60
 
+--[=[
+	Given a humanoid creates a promise that will resolve once the `Humanoid.RootPart` property
+	resolves properly.
+
+	:::info
+	This works around the fact that `humanoid:GetPropertyChangedSignal("RootPart")` does not fire
+	when the rootpart changes on a humanoid.
+	:::
+
+	@param humanoid Humanoid
+	@return Promise<BasePart>
+]=]
 function RootPartUtils.promiseRootPart(humanoid)
 	if humanoid.RootPart then
 		return Promise.resolved(humanoid.RootPart)
@@ -20,7 +34,7 @@ function RootPartUtils.promiseRootPart(humanoid)
 	local maid = Maid.new()
 	local promise = Promise.new()
 
-	spawn(function()
+	task.spawn(function()
 		while not humanoid.RootPart and promise:IsPending() do
 			task.wait(0.05)
 		end
@@ -31,7 +45,7 @@ function RootPartUtils.promiseRootPart(humanoid)
 		end
 	end)
 
-	delay(MAX_YIELD_TIME, function()
+	task.delay(MAX_YIELD_TIME, function()
 		if promise:IsPending() then
 			warn("[RootPartUtils.promiseRootPart] - TImed out on root part", debug.traceback())
 			promise:Reject("Timed out")

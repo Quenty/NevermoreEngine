@@ -1,5 +1,7 @@
---- Ragdolls the humanoid on fall
--- @classmod BindableRagdollHumanoidOnFall
+--[=[
+	Ragdolls the humanoid on fall
+	@class BindableRagdollHumanoidOnFall
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,5 +1,7 @@
---- Retrieves a remote event as a promise
--- @module PromiseGetRemoteEvent
+--[=[
+	Retrieves a remote event as a promise
+	@class PromiseGetRemoteEvent
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,6 +12,14 @@ local GetRemoteEvent = require("GetRemoteEvent")
 local Promise = require("Promise")
 local ResourceConstants = require("ResourceConstants")
 
+--[=[
+	Like [GetRemoteEvent] but in promise form.
+
+	@function PromiseGetRemoteEvent
+	@within PromiseGetRemoteEvent
+	@param name string
+	@return Promise<RemoteEvent>
+]=]
 if not RunService:IsRunning() then
 	-- Handle testing
 	return function(name)

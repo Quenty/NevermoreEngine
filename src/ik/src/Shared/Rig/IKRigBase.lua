@@ -1,6 +1,6 @@
----
--- @classmod IKRigBase
--- @author Quenty
+--[=[
+	@class IKRigBase
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

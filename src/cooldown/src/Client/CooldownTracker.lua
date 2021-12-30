@@ -1,6 +1,7 @@
---- Tracks current cooldown on an object
--- @classmod CooldownTracker
--- @author Quenty
+--[=[
+	Tracks current cooldown on an object
+	@class CooldownTracker
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

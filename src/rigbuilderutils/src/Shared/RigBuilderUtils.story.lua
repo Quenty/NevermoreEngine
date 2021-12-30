@@ -1,6 +1,6 @@
----
--- @module RigBuilderUtils.story
--- @author Quenty
+--[[
+	@class RigBuilderUtils.story
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

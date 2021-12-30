@@ -1,6 +1,9 @@
---- General utility for raycasting
--- @module RaycastUtils
--- @author Quenty, AxisAngle
+--[=[
+	General utility for raycasting
+	Author: Quenty, AxisAngle
+
+	@class RaycastUtils
+]=]
 
 local RaycastUtils = {}
 

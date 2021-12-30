@@ -1,17 +1,32 @@
---- Calculate experience on an exponential curve and perform relevant calculations
--- Uses formulas from stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
--- @module ExperienceCalculator
+--[=[
+	Calculate experience on an exponential curve and perform relevant calculations.
+
+	Uses formulas from https://stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
+
+	@class ExperienceCalculator
+]=]
 
 local ExperienceCalculator = {}
 ExperienceCalculator._experienceFactor = 200
 
+--[=[
+	Sets the global experience factor to be used across this library.
+
+	:::tip
+	This API is global, poorly designed and will be refactored at some point.
+	:::
+
+	@param factor number
+]=]
 function ExperienceCalculator.setExperienceFactor(factor)
 	ExperienceCalculator._experienceFactor = factor
 end
 
---- Gets the current level from experience
--- @tparam number experience Current experience
--- @treturn number The level the player should be
+--[=[
+	Gets the current level from experience.
+	@param experience number -- Current experience
+	@return number -- The level the player should be
+]=]
 function ExperienceCalculator.getLevel(experience)
 	local factor = ExperienceCalculator._experienceFactor
 	return math.floor(
@@ -20,23 +35,29 @@ function ExperienceCalculator.getLevel(experience)
 		/(2*factor))
 end
 
---- Given a current level, return the experience required for the next one
--- @tparam number currentLevel The current level the player is
--- @treturn number Experience required for next level
+--[=[
+	Given a current level, return the experience required for the next one.
+	@param currentLevel number -- The current level the player is
+	@return number -- Experience required for next level
+]=]
 function ExperienceCalculator.getExperienceRequiredForNextLevel(currentLevel)
 	return ExperienceCalculator._experienceFactor*(currentLevel*(1+currentLevel))
 end
 
---- Gets experience required for a current level
--- @tparam number level
--- @treturn number total experience required for a level
+--[=[
+	Gets experience required for a current level.
+	@param level number
+	@return number -- Total experience required for a level
+]=]
 function ExperienceCalculator.getExperienceRequiredForLevel(level)
 	return ExperienceCalculator.getExperienceRequiredForNextLevel(level - 1)
 end
 
---- Gets experience left to earn required for next level
--- @tparam number currentExperience Current experience of player
--- @treturn number experience Experience points left to earn for the player
+--[=[
+	Gets experience left to earn required for next level.
+	@param currentExperience number -- Current experience of player
+	@return number -- Experience points left to earn for the player
+]=]
 function ExperienceCalculator.getExperienceForNextLevel(currentExperience)
 	if currentExperience - 1 == currentExperience then -- math.huge
 		return 0
@@ -48,13 +69,15 @@ function ExperienceCalculator.getExperienceForNextLevel(currentExperience)
 	return experienceRequired - currentExperience
 end
 
---- Calculates subtotal experience
--- @tparam number currentExperience Current experience of player
--- @treturn number Achieved of next level
--- @treturn number Total required for next level
+--[=[
+	Calculates subtotal experience.
+	@param currentExperience number -- Current experience of player
+	@return number -- Achieved of next level
+	@return number -- Total required for next level
+]=]
 function ExperienceCalculator.getSubExperience(currentExperience)
 	if currentExperience - 1 == currentExperience then -- math.huge
-		return 1, 1, 1
+		return 1, 1
 	end
 
 	local currentLevel = ExperienceCalculator.getLevel(currentExperience)

@@ -1,5 +1,21 @@
---- Handles the replication of inverse kinematics (IK) from clients to servers
--- @classmod IKService
+--[=[
+	Handles the replication of inverse kinematics (IK) from clients to servers
+
+	* Supports animation playback on top of existing animations
+	* Battle-tested code
+	* Handles streaming enabled
+	* Supports NPCs
+	* Client-side animations scale with distance
+	* Client-side animations keep thinks silky
+
+	:::tip
+	Be sure to also initialize the client side service [IKServiceClient] on each
+	client to make sure the IK works.
+	:::
+
+	@server
+	@class IKService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -14,6 +30,19 @@ local SERVER_UPDATE_RATE = 1/10
 
 local IKService = {}
 
+--[=[
+	Initializes the IKService. Should be done via the ServiceBag.
+
+	```lua
+	local serviceBag = require("ServiceBag").new()
+	serviceBag:GetService(require("IKService"))
+
+	serviceBag:Init()
+	serviceBag:Start()
+	```
+
+	@param serviceBag ServiceBag
+]=]
 function IKService:Init(serviceBag)
 	assert(not self._maid, "Already initialized")
 
@@ -22,6 +51,9 @@ function IKService:Init(serviceBag)
 	self._ikBinders = serviceBag:GetService(IKBindersServer)
 end
 
+--[=[
+	Starts the IKService. Should be done via the ServiceBag.
+]=]
 function IKService:Start()
 	assert(self._maid, "Not initialized")
 
@@ -42,10 +74,20 @@ function IKService:Start()
 	end))
 end
 
+--[=[
+	Retrieves an IKRig. Binds the rig if it isn't already bound.
+	@param humanoid Humanoid
+	@return IKRig?
+]=]
 function IKService:GetRig(humanoid)
 	return self._ikBinders.IKRig:Bind(humanoid)
 end
 
+--[=[
+	Retrieves an IKRig. Binds the rig if it isn't already bound.
+	@param humanoid Humanoid
+	@return Promise<IKRig>
+]=]
 function IKService:PromiseRig(humanoid)
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
@@ -53,12 +95,29 @@ function IKService:PromiseRig(humanoid)
 	return self._ikBinders.IKRig:Promise(humanoid)
 end
 
+--[=[
+	Unbinds the rig from the humanoid.
+	@param humanoid Humanoid
+]=]
 function IKService:RemoveRig(humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	self._ikBinders.IKRig:Unbind(humanoid)
 end
 
+--[=[
+	Updates the ServerIKRig target for an NPC
+
+	```lua
+	local IKService = require("IKService")
+
+	-- Make the NPC look at a target
+	serviceBag:GetService(IKService):UpdateServerRigTarget(workspace.NPC.Humanoid, Vector3.new(0, 0, 0))
+	```
+
+	@param humanoid Humanoid
+	@param target Vector3?
+]=]
 function IKService:UpdateServerRigTarget(humanoid, target)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(target) == "Vector3", "Bad target")

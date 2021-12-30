@@ -1,5 +1,7 @@
---- Be the inverse of a fading camera (makes scaling in cameras easy).
--- @classmod InverseFader
+--[=[
+	Be the inverse of a fading camera (makes scaling in cameras easy).
+	@class InverseFader
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

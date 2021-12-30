@@ -1,6 +1,5 @@
---- Main injection point
+-- Main injection point
 -- @script ServerMain
--- @author Quenty
 
 local ServerScriptService = game:GetService("ServerScriptService")
 

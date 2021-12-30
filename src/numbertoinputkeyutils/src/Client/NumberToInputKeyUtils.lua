@@ -1,6 +1,7 @@
---- Maps a number to a set of inputs. Useful for shortcut codes in menus.
--- @module NumberToInputKeyUtils
--- @author Quenty
+--[=[
+	Maps a number to a set of inputs. Useful for shortcut codes in menus.
+	@class NumberToInputKeyUtils
+]=]
 
 local NUMBERS = {
 	[0] = { Enum.KeyCode.Zero; Enum.KeyCode.KeypadZero; };
@@ -17,6 +18,11 @@ local NUMBERS = {
 
 local NumberToInputKeyUtils = {}
 
+--[=[
+	Retrieves inputs for a given number.
+	@param number number
+	@return { Enum.KeyCode }
+]=]
 function NumberToInputKeyUtils.getInputsForNumber(number)
 	return NUMBERS[number]
 end

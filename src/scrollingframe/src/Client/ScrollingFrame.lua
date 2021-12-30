@@ -1,6 +1,10 @@
---- Creates an inertia based scrolling frame that is animated and has inertia frames
--- Alternative to a Roblox ScrollingFrame with inertia scrolling and complete control over behavior and style
--- @classmod ScrollingFrame
+--[=[
+	Creates an inertia based scrolling frame that is animated and has inertia frames
+	Alternative to a Roblox ScrollingFrame with inertia scrolling and complete control over behavior and style.
+
+	@deprecated 1.0.0
+	@class ScrollingFrame
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -16,8 +20,13 @@ local ScrollingFrame = {}
 ScrollingFrame.ClassName = "ScrollingFrame"
 ScrollingFrame.__index = ScrollingFrame
 
---- Creates a new ScrollingFrame which can be used. Prefer Container.Active = true so scroll wheel works.
--- Container should be in a Frame with ClipsDescendants = true
+--[=[
+	Creates a new ScrollingFrame which can be used. Prefer Container.Active = true so scroll wheel works.
+	Container should be in a Frame with ClipsDescendants = true
+
+	@param gui BaseGui -- Gui to use
+	@return ScrollingFrame
+]=]
 function ScrollingFrame.new(gui)
 	local self = setmetatable({}, ScrollingFrame)
 
@@ -48,7 +57,7 @@ function ScrollingFrame.new(gui)
 	return self
 end
 
---- Sets the scroll type for the frame
+-- Sets the scroll type for the frame
 function ScrollingFrame:SetScrollType(scrollType)
 	assert(Table.contains(SCROLL_TYPE, scrollType))
 	self._scrollType = scrollType
@@ -70,7 +79,7 @@ function ScrollingFrame:RemoveScrollbar(scrollbar)
 	end
 end
 
---- Scrolls to the position in pixels offset
+-- Scrolls to the position in pixels offset
 function ScrollingFrame:ScrollTo(position, doNotAnimate)
 	self._model.Target = position
 	if doNotAnimate then
@@ -79,12 +88,12 @@ function ScrollingFrame:ScrollTo(position, doNotAnimate)
 	end
 end
 
---- Scrolls to the top
+-- Scrolls to the top
 function ScrollingFrame:ScrollToTop(doNotAnimate)
 	self:ScrollTo(self._model.Min, doNotAnimate)
 end
 
---- Scrolls to the bottom
+-- Scrolls to the bottom
 function ScrollingFrame:ScrollToBottom(doNotAnimate)
 	self:ScrollTo(self._model.Max, doNotAnimate)
 end
@@ -130,7 +139,7 @@ function ScrollingFrame:StopDrag()
 	self:_freeScroll()
 end
 
---- Scrolls until model is at rest
+-- Scrolls until model is at rest
 function ScrollingFrame:_freeScroll(lowPriority)
 	if lowPriority and self._maid._updateMaid then
 		return
@@ -149,7 +158,7 @@ function ScrollingFrame:_freeScroll(lowPriority)
 	self._maid._updateMaid = maid
 end
 
----
+--
 -- @param[opt=1] strength
 function ScrollingFrame:_getVelocityTracker(strength)
 	strength = strength or 1
@@ -193,8 +202,8 @@ end
 
 
 
---- Binds input to a specific GUI
--- @treturn Maid maid to cleanup inputs
+-- Binds input to a specific GUI
+-- @return maid Maid -- To cleanup inputs
 function ScrollingFrame:BindInput(gui, options)
 	local maid = Maid.new()
 

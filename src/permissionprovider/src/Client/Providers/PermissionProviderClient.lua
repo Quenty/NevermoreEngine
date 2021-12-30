@@ -1,6 +1,9 @@
----
--- @module PermissionProviderClient
--- @author Quenty
+--[=[
+	Permission provider using the remote event. See [PermissionServiceClient].
+
+	@client
+	@class PermissionProviderClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -20,6 +23,10 @@ function PermissionProviderClient.new(remoteFunctionName)
 	return self
 end
 
+--[=[
+	Returns whether the local player is an admin.
+	@return Promise<boolean>
+]=]
 function PermissionProviderClient:PromiseIsAdmin()
 	if self._cachedAdminPromise then
 		return self._cachedAdminPromise

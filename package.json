@@ -12,7 +12,8 @@
     "@auto-it/npm": "^10.30.0",
     "@auto-it/released": "^10.30.0",
     "auto": "^10.30.0",
-    "lerna": "^4.0.0"
+    "lerna": "^4.0.0",
+    "moonwave": "^0.3.1"
   },
   "workspaces": [
     "./src/*"

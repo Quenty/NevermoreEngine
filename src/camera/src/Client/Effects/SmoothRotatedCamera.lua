@@ -1,7 +1,10 @@
---- Allow freedom of movement around a current place, much like the classic script works now.
--- Not intended to be use with the current character script. This is the rotation component.
--- Intended to be used with a SummedCamera, relative.
--- @classmod SmoothRotatedCamera
+--[=[
+	Allow freedom of movement around a current place, much like the classic script works now.
+	Not intended to be use with the current character script. This is the rotation component.
+	Intended to be used with a SummedCamera, relative.
+
+	@class SmoothRotatedCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -32,7 +35,6 @@ function SmoothRotatedCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
----
 -- @param xyRotateVector Vector2, the delta rotation to apply
 function SmoothRotatedCamera:RotateXY(xyRotateVector)
 	self.AngleX = self.AngleX + xyRotateVector.x

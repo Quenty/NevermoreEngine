@@ -1,10 +1,18 @@
---- Utility functions for use with collection service tags
--- @module CollectionServiceUtils
+--[=[
+	Utility functions for use with collection service tags
+	@class CollectionServiceUtils
+]=]
 
 local CollectionService = game:GetService("CollectionService")
 
 local CollectionServiceUtils = {}
 
+--[=[
+	Finds the first ancestor with the given tagName.
+	@param tagName string
+	@param child Instance
+	@return Instance?
+]=]
 function CollectionServiceUtils.findFirstAncestor(tagName, child)
 	assert(type(tagName) == "string", "Bad tagName")
 	assert(typeof(child) == "Instance", "Bad child")
@@ -19,6 +27,10 @@ function CollectionServiceUtils.findFirstAncestor(tagName, child)
 	return nil
 end
 
+--[=[
+	Removes all tags from an instance.
+	@param instance Instance
+]=]
 function CollectionServiceUtils.removeAllTags(instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 

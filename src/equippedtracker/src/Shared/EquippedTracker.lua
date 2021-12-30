@@ -1,16 +1,23 @@
---- Tracks the equipped player of a tool
--- @classmod EquippedTracker
+--[=[
+	Tracks the equipped player of a tool
+	@class EquippedTracker
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local Maid = require("Maid")
 local CharacterUtils = require("CharacterUtils")
+local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 
 local EquippedTracker = {}
 EquippedTracker.ClassName = "EquippedTracker"
 EquippedTracker.__index = EquippedTracker
 
+--[=[
+	Tracks the state of a tool being equipped
+	@param tool Tool
+	@return EquippedTracker
+]=]
 function EquippedTracker.new(tool)
 	local self = setmetatable({}, EquippedTracker)
 
@@ -19,7 +26,11 @@ function EquippedTracker.new(tool)
 
 	self._maid = Maid.new()
 
-	-- Tracks current equipped player who has an alive humanoid
+--[=[
+	Tracks current equipped player who has an alive humanoid
+	@prop Player ValueObject<Player>
+	@within EquippedTracker
+]=]
 	self.Player = ValueObject.new()
 	self._maid:GiveTask(self.Player)
 
@@ -55,6 +66,9 @@ function EquippedTracker:_update()
 	end)
 end
 
+--[=[
+	Cleans up the EquippedTracker
+]=]
 function EquippedTracker:Destroy()
 	self._maid:DoCleaning()
 	setmetatable(self, nil)

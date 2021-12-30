@@ -1,6 +1,6 @@
----
--- @module RagdollConstants
--- @author Quenty
+--[=[
+	@class RagdollConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

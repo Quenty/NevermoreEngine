@@ -1,5 +1,6 @@
----
--- @classmod IKResource
+--[=[
+	@class IKResource
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

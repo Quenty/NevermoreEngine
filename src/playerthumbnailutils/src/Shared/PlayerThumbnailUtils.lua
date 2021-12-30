@@ -1,6 +1,9 @@
---- Reimplementation of Player:GetUserThumbnailAsync but as a promise with
---  retry logic
--- @module PlayerThumbnailUtils
+--[=[
+	Reimplementation of Player:GetUserThumbnailAsync but as a promise with
+	retry logic.
+
+	@class PlayerThumbnailUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +15,19 @@ local MAX_TRIES = 5
 
 local PlayerThumbnailUtils = {}
 
+--[=[
+	Promises a user thumbnail with retry enabled.
+
+	```lua
+	PlayerThumbnailUtils.promiseUserThumbnail(4397833):Then(function(image)
+		imageLabel.Image = image
+	end)
+	```
+	@param userId number
+	@param thumbnailType ThumbnailType?
+	@param thumbnailSize ThumbnailSize?
+	@return Promise<string>
+]=]
 function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbnailSize)
 	assert(type(userId) == "number", "Bad userId")
 	thumbnailType = thumbnailType or Enum.ThumbnailType.HeadShot
@@ -44,6 +60,11 @@ function PlayerThumbnailUtils.promiseUserThumbnail(userId, thumbnailType, thumbn
 	return promise
 end
 
+--[=[
+	Promises a player userName with retries enabled.
+	@param userId number
+	@return Promise<string>
+]=]
 function PlayerThumbnailUtils.promiseUserName(userId)
 	assert(type(userId) == "number", "Bad userId")
 

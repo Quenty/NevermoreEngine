@@ -1,5 +1,41 @@
---- Provides getting remote events
--- @function GetRemoteEvent
+--[=[
+	Provides getting named global [RemoteEvent] resources.
+	@class GetRemoteEvent
+]=]
+
+--[=[
+	Retrieves a global remote event from the store. On the server, it constructs a new one,
+	and on the client, it waits for it to exist.
+
+	:::tip
+	Consider using [PromiseGetRemoteEvent] for a non-yielding version
+	:::
+
+	```lua
+	-- server.lua
+	local GetRemoteEvent = require("GetRemoteEvent")
+
+	local remoteEvent = GetRemoteEvent("testing")
+	remoteEvent.OnServerEvent:Connect(print)
+
+	-- client.lua
+	local GetRemoteEvent = require("GetRemoteEvent")
+
+	local remoteEvent = GetRemoteEvent("testing")
+	remoteEvent:FireServer("Hello") --> Hello (on the server)
+	```
+
+	:::info
+	If the game is not running, then a mock remote event will be created
+	for use in testing.
+	:::
+
+	@yields
+	@function GetRemoteEvent
+	@within GetRemoteEvent
+	@param name string
+	@return RemoteEvent
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

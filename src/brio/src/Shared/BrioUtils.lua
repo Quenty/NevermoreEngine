@@ -1,6 +1,7 @@
----
--- @module BrioUtils
--- @author Quenty
+--[=[
+	Utility functions affecting Brios.
+	@class BrioUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +10,13 @@ local Brio = require("Brio")
 
 local BrioUtils = {}
 
+--[=[
+	Clones a brio, such that it may be killed without affecting the original
+	brio.
+
+	@param brio Brio<T>
+	@return Brio<T>
+]=]
 function BrioUtils.clone(brio)
 	assert(brio, "Bad brio")
 
@@ -25,6 +33,12 @@ function BrioUtils.clone(brio)
 	return newBrio
 end
 
+--[=[
+	Returns a list of alive Brios only
+
+	@param brios {Brio<T>}
+	@return {Brio<T>}
+]=]
 function BrioUtils.aliveOnly(brios)
 	local alive = {}
 	for _, brio in pairs(brios) do
@@ -35,6 +49,12 @@ function BrioUtils.aliveOnly(brios)
 	return alive
 end
 
+--[=[
+	Returns the first alive Brio in a list
+
+	@param brios {Brio<T>}
+	@return Brio<T>
+]=]
 function BrioUtils.firstAlive(brios)
 	for _, brio in pairs(brios) do
 		if not brio:IsDead() then
@@ -44,6 +64,13 @@ function BrioUtils.firstAlive(brios)
 	return nil
 end
 
+--[=[
+	Given a list of brios of brios, flattens that list into a brio with
+	just one T value.
+
+	@param brioTable { any: Brio<Brio<T> | T>}
+	@return Brio<{T}>
+]=]
 function BrioUtils.flatten(brioTable)
 	local newValue = {}
 	local brios = {}
@@ -64,6 +91,14 @@ function BrioUtils.flatten(brioTable)
 	return BrioUtils.first(brios, newValue)
 end
 
+--[=[
+	Returns a brio that dies whenever the first Brio in the list
+	dies. The value of the Brio is the `...` value.
+
+	@param brios {Brio<T>}
+	@param ... U
+	@return Brio<U>
+]=]
 function BrioUtils.first(brios, ...)
 	for _, brio in pairs(brios) do
 		if Brio.isBrio(brio) then
@@ -91,8 +126,14 @@ function BrioUtils.first(brios, ...)
 	return topBrio
 end
 
--- Makes a brio that is limited by the lifetime of its parent (but could be shorter)
--- and has the new values given
+--[=[
+	Makes a brio that is limited by the lifetime of its parent (but could be shorter)
+	and has the new values given.
+
+	@param brio Brio<U>
+	@param ... T
+	@return Brio<T>
+]=]
 function BrioUtils.extend(brio, ...)
 	if brio:IsDead() then
 		return Brio.DEAD
@@ -122,6 +163,13 @@ function BrioUtils.extend(brio, ...)
 	return newBrio
 end
 
+--[=[
+	Merges the existing brio value with the other brio
+
+	@param brio Brio<{T}>
+	@param otherBrio Brio<{U}>
+	@return Brio<{T | U}>
+]=]
 function BrioUtils.merge(brio, otherBrio)
 	assert(Brio.isBrio(brio), "Not a brio")
 	assert(Brio.isBrio(otherBrio), "Not a brio")

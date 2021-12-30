@@ -1,6 +1,12 @@
---- Library handles time based parsing / operations. Untested. Based off of PHP's time system.
--- Note: This library is out of date, and does not necessarily work. I recommend using os.time()
--- @module Time
+--[=[
+	Library handles time based parsing / operations. Untested. Based off of PHP's time system.
+
+	:::note
+	This library is out of date, and does not necessarily work. I recommend using os.time()
+	:::
+
+	@class Time
+]=]
 
 local Time = {}
 
@@ -12,7 +18,11 @@ local DAYS_OF_WEEK       = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursda
 local DAYS_OF_WEEK_SHORT = {"Sun",    "Mon",    "Tues",    "Weds",      "Thurs",    "Fri",    "Sat"}
 -- luacheck: pop
 
---- Returns a Days in months table for the given year
+--[=[
+	Returns a Days in months table for the given year
+	@param year number
+	@return { [number]: number }
+]=]
 function Time.getDaysMonthTable(year)
 	local copy = {}
 	for key, value in pairs(DAYS_IN_MONTH) do
@@ -151,8 +161,10 @@ function Time.getDayOfTheWeekNameShort(currentTime)
 	return DAYS_OF_WEEK_SHORT[Time.getDayOfTheWeek(currentTime)]
 end
 
----
--- @return st, nd (Like 1st, 2nd)
+--[=[
+	@param number number
+	@return string (Like 1st, 2nd)
+]=]
 function Time.getOrdinalOfNumber(number)
 	local tenRemainder = number % 10
 	local hundredRemainder = number % 100

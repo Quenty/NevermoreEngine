@@ -1,6 +1,7 @@
--- Selects the most recent input mode and attempts to
--- identify the best state from it
--- @classmod InputModeSelector
+--[=[
+	Selects the most recent input mode and attempts to identify the best state from it.
+	@class InputModeSelector
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -16,6 +17,11 @@ InputModeSelector.DEFAULT_MODES = {
 	INPUT_MODES.Touch
 }
 
+--[=[
+	Constructs a new InputModeSelector
+	@param inputModes { InputMode }
+	@return InputModeSelector
+]=]
 function InputModeSelector.new(inputModes)
 	local self = setmetatable({}, InputModeSelector)
 
@@ -24,6 +30,11 @@ function InputModeSelector.new(inputModes)
 	self._activeMode = ValueObject.new()
 	self._maid:GiveTask(self._activeMode)
 
+--[=[
+	Event that fires whenever the active mode changes.
+	@prop Changed Signal<InputMode, InputMode> -- newMode, oldMode
+	@within InputModeSelector
+]=]
 	self.Changed = self._activeMode.Changed
 
 	for _, inputMode in pairs(inputModes or InputModeSelector.DEFAULT_MODES) do
@@ -33,10 +44,19 @@ function InputModeSelector.new(inputModes)
 	return self
 end
 
+--[=[
+	Returns the current active mode
+	@return InputMode
+]=]
 function InputModeSelector:GetActiveMode()
 	return rawget(self, "_activeMode").Value
 end
 
+--[=[
+	The current active input mode
+	@prop Value InputMode?
+	@within InputModeSelector
+]=]
 function InputModeSelector:__index(index)
 	if index == "Value" then
 		return rawget(self, "_activeMode").Value
@@ -52,6 +72,30 @@ function InputModeSelector:__index(index)
 	end
 end
 
+--[=[
+	Binds the updateBindFunction to the mode selector
+
+	```lua
+	local inputModeSelector = InputModeSelector.new({
+		INPUT_MODES.Mouse;
+		INPUT_MODES.Touch;
+	})
+
+	inputModeSelector:Bind(function(inputMode)
+		if inputMode == INPUT_MODES.Mouse then
+			print("Show mouse input hints")
+		elseif inputMode == INPUT_MODES.Touch then
+			print("Show touch input hints")
+		else
+			-- Unknown input mode
+			warn("Unknown input mode") -- should not occur
+		end
+	end)
+	```
+
+	@param updateBindFunction (newMode: InputMode, modeMaid: Maid) -> ()
+	@return InputModeSelector
+]=]
 function InputModeSelector:Bind(updateBindFunction)
 	local maid = Maid.new()
 	self._maid[updateBindFunction] = maid
@@ -85,8 +129,16 @@ function InputModeSelector:_addInputMode(inputMode)
 	end
 end
 
+--[=[
+	Cleans up the input mode selector.
+
+	:::info
+	This should be called whenever the mode selector is done being used.
+	:::
+]=]
 function InputModeSelector:Destroy()
 	self._maid:DoCleaning()
+	setmetatable(self, nil)
 end
 
 return InputModeSelector

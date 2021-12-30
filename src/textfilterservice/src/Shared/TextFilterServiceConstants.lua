@@ -1,6 +1,6 @@
----
--- @module TextFilterServiceConstants
--- @author Quenty
+--[=[
+	@class TextFilterServiceConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

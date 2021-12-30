@@ -1,5 +1,7 @@
---- Utility methods for JSON
--- @module JSONUtils
+--[=[
+	Utility methods for JSON
+	@class JSONUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,13 @@ local Promise = require("Promise")
 
 local JSONUtils = {}
 
+--[=[
+	Decodes JSON, or reports error.
+	@param str string
+	@return boolean
+	@return table? -- Result
+	@return string? -- Error
+]=]
 function JSONUtils.jsonDecode(str)
 	if type(str) ~= "string" then
 		return false, nil, "Not a string"
@@ -25,6 +34,11 @@ function JSONUtils.jsonDecode(str)
 	return true, decoded
 end
 
+--[=[
+	Decodes JSON, or reports error.
+	@param str string
+	@return Promise<table>
+]=]
 function JSONUtils.promiseJSONDecode(str)
 	if type(str) ~= "string" then
 		return Promise.rejected("Not a string")

@@ -1,5 +1,7 @@
---- Meant to be used with a binder
--- @classmod IKGripBase
+--[=[
+	Meant to be used with a binder
+	@class IKGripBase
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

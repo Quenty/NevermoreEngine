@@ -1,6 +1,6 @@
----
--- @module CameraInputUtils
--- @author Quenty
+--[=[
+	@class CameraInputUtils
+]=]
 
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 local Workspace = game:GetService("Workspace")

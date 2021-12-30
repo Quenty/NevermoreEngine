@@ -1,5 +1,7 @@
---- Guarantees that only one snackbar is visible at once
--- @module SnackbarManager
+--[=[
+	Guarantees that only one snackbar is visible at once
+	@class SnackbarManager
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -12,14 +14,19 @@ function SnackbarManager:Init(screenGui)
 	self:WithScreenGui(screenGui)
 end
 
---- Sets the screenGui to use
+--[=[
+	Sets the screenGui to use
+
+	@param screenGui ScreenGui
+	@return SnackbarManager
+]=]
 function SnackbarManager:WithScreenGui(screenGui)
 	self._screenGui = screenGui or error("No screenGui")
 
 	return self
 end
 
---- Automatically makes a snackbar and shows it
+-- Automatically makes a snackbar and shows it
 -- @param text to show
 -- @param[opt] options
 --[[
@@ -40,7 +47,6 @@ function SnackbarManager:MakeSnackbar(text, options)
 	return snackbar
 end
 
---- Cleanup existing snackbar
 function SnackbarManager:_showSnackbar(snackbar)
 	assert(snackbar, "Must send a snackbar")
 

@@ -1,6 +1,6 @@
----
--- @module LocalizationServiceUtils
--- @author Quenty
+--[=[
+	@class LocalizationServiceUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,6 +1,7 @@
----
--- @classmod CancelToken
--- @author Quenty
+--[=[
+	Cancellation token
+	@class CancelToken
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,6 +12,12 @@ local CancelToken = {}
 CancelToken.ClassName = "CancelToken"
 CancelToken.__index = CancelToken
 
+--[=[
+	Constructs a new CancelToken
+
+	@param executor (cancel: () -> ()) -> ()
+	@return CancelToken
+]=]
 function CancelToken.new(executor)
 	local self = setmetatable({}, CancelToken)
 
@@ -34,6 +41,12 @@ end
 
 local EMPTY_FUNCTION = function() end
 
+--[=[
+	Constructs a new CancelToken that cancels whenever the maid does.
+
+	@param maid Maid
+	@return CancelToken
+]=]
 function CancelToken.fromMaid(maid)
 	local token = CancelToken.new(EMPTY_FUNCTION)
 
@@ -48,12 +61,19 @@ function CancelToken.fromMaid(maid)
 	return token
 end
 
+--[=[
+	Errors if cancelled
+]=]
 function CancelToken:ErrorIfCancelled()
 	if not self.PromiseCancelled:IsPending() then
 		error("[CancelToken.ErrorIfCancelled] - Cancelled")
 	end
 end
 
+--[=[
+	Returns true if cancelled
+	@return boolean
+]=]
 function CancelToken:IsCancelled()
 	return self.PromiseCancelled:IsFulfilled()
 end

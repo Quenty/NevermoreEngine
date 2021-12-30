@@ -1,6 +1,9 @@
---- Manages speed
--- @classmod HumanoidSpeed
--- @author Quenty
+--[=[
+	Manages speed of a humanoid
+
+	@server
+	@class HumanoidSpeed
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +16,11 @@ local HumanoidSpeed = setmetatable({}, BaseObject)
 HumanoidSpeed.ClassName = "HumanoidSpeed"
 HumanoidSpeed.__index = HumanoidSpeed
 
+--[=[
+	Constructs a new HumanoidSpeed
+	@param humanoid Humanoid
+	@return HumanoidSpeed
+]=]
 function HumanoidSpeed.new(humanoid)
 	local self = setmetatable(BaseObject.new(humanoid), HumanoidSpeed)
 
@@ -33,11 +41,20 @@ function HumanoidSpeed.new(humanoid)
 	return self
 end
 
+--[=[
+	Sets the default speed for the humanoid
+	@param defaultSpeed number
+]=]
 function HumanoidSpeed:SetDefaultSpeed(defaultSpeed)
 	self._defaultSpeed = defaultSpeed
 	self:_update()
 end
 
+--[=[
+	Applies a speed multipler to the player's speed
+	@param multiplier number
+	@return function -- Cleanup function
+]=]
 function HumanoidSpeed:ApplySpeedMultiplier(multiplier)
 	assert(type(multiplier) == "number", "Bad multiplier")
 	assert(multiplier >= 0, "Bad multiplier")

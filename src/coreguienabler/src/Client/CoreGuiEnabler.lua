@@ -1,7 +1,19 @@
---- Key based CoreGuiEnabler, singleton
--- Use this class to load/unload CoreGuis / other GUIs, by disabling based upon keys
--- Keys are additive, so if you have more than 1 disabled, it's ok.
--- @module CoreGuiEnabler
+--[=[
+	Key based CoreGuiEnabler, singleton
+	Use this class to load/unload CoreGuis / other GUIs, by disabling based upon keys
+	Keys are additive, so if you have more than 1 disabled, it's ok.
+
+	```lua
+
+	local CoreGuiEnabler = require("CoreGuiEnabler")
+
+	-- Disable the backpack for 5 seconds
+	local cleanup = CoreGuiEnabler:Disable(newproxy(), Enum.CoreGuiType.Backpack)
+	task.delay(5, cleanup)
+	```
+
+	@class CoreGuiEnabler
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -74,9 +86,14 @@ function CoreGuiEnabler:_addStarterGuiState(stateName)
 	end)
 end
 
-function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
+--[=[
+	Adds a state that can be disabled or enabled.
+	@param coreGuiState string | CoreGuiType
+	@param coreGuiStateChangeFunc (isEnabled: boolean)
+]=]
+function CoreGuiEnabler:AddState(coreGuiState, coreGuiStateChangeFunc)
 	assert(type(coreGuiStateChangeFunc) == "function", "must have coreGuiStateChangeFunc as function")
-	assert(self._states[key] == nil, "state already exists")
+	assert(self._states[coreGuiState] == nil, "state already exists")
 
 	local realState = {}
 	local lastState = true
@@ -85,7 +102,7 @@ function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
 		return next(realState) == nil
 	end
 
-	self._states[key] = setmetatable({}, {
+	self._states[coreGuiState] = setmetatable({}, {
 		__newindex = function(_, index, value)
 			rawset(realState, index, value)
 
@@ -98,6 +115,12 @@ function CoreGuiEnabler:AddState(key, coreGuiStateChangeFunc)
 	})
 end
 
+--[=[
+	Disables a CoreGuiState
+	@param key any
+	@param coreGuiState string | CoreGuiType
+	@return function -- Callback function to re-enable the state
+]=]
 function CoreGuiEnabler:Disable(key, coreGuiState)
 	if not self._states[coreGuiState] then
 		error(("[CoreGuiEnabler] - State '%s' does not exist."):format(tostring(coreGuiState)))
@@ -110,6 +133,11 @@ function CoreGuiEnabler:Disable(key, coreGuiState)
 	end
 end
 
+--[=[
+	Enables a state for a given key
+	@param key any
+	@param coreGuiState string | CoreGuiType
+]=]
 function CoreGuiEnabler:Enable(key, coreGuiState)
 	if not self._states[coreGuiState] then
 		error(("[CoreGuiEnabler] - State '%s' does not exist."):format(tostring(coreGuiState)))

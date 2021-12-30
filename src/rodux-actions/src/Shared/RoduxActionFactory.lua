@@ -1,6 +1,6 @@
----
--- @classmod RoduxActionFactory
--- @author Quenty
+--[=[
+	@class RoduxActionFactory
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,5 +1,7 @@
---- Utilities involving pathfinding in Roblox
--- @module PathfindingUtils
+--[=[
+	Utilities involving pathfinding in Roblox
+	@class PathfindingUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,14 @@ local Maid = require("Maid")
 
 local PathfindingUtils = {}
 
+--[=[
+	Computes a path wrapped in a promise.
+
+	@param path Path
+	@param start Vector3
+	@param finish Vector3
+	@return Promise<Path>
+]=]
 function PathfindingUtils.promiseComputeAsync(path, start, finish)
 	assert(path, "Bad path")
 	assert(start, "Bad start")
@@ -20,13 +30,26 @@ function PathfindingUtils.promiseComputeAsync(path, start, finish)
 	end)
 end
 
+--[=[
+	Checks occlusion wrapped in a promise
+
+	@param path Path
+	@param startIndex number
+	@return Promise<number>
+]=]
 function PathfindingUtils.promiseCheckOcclusion(path, startIndex)
 	return Promise.spawn(function(resolve, _)
 		resolve(path:CheckOcclusionAsync(startIndex))
 	end)
-
 end
 
+--[=[
+	Visualizes the current waypoints in the path. Will put the visualization in
+	Draw libraries default parent.
+
+	@param path Path
+	@return MaidTask
+]=]
 function PathfindingUtils.visualizePath(path)
 	local maid = Maid.new()
 

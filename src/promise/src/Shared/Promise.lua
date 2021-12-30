@@ -1,12 +1,12 @@
---- Promises, but without error handling as this screws with stack traces, using Roblox signals
--- @classmod Promise
--- See: https://promisesaplus.com/
+--[=[
+	Promises, but without error handling as this screws with stack traces, using Roblox signals
+
+	See: https://promisesaplus.com/
+
+	@class Promise
+]=]
 
 local RunService = game:GetService("RunService")
-
-local function isPromise(value)
-	return type(value) == "table" and value.ClassName == "Promise"
-end
 
 -- Turns out debug.traceback() is slow
 local ENABLE_TRACEBACK = false
@@ -17,13 +17,27 @@ local Promise = {}
 Promise.ClassName = "Promise"
 Promise.__index = Promise
 
---- Determines whether a value is a promise or not
--- @function isPromise
-Promise.isPromise = isPromise
+--[=[
+	Determines whether a value is a promise or not.
 
---- Construct a new promise
--- @constructor Promise.new()
--- @treturn Promise
+	@param value any
+	@return boolean
+]=]
+function Promise.isPromise(value)
+	return type(value) == "table" and value.ClassName == "Promise"
+end
+
+--[=[
+	Constructs a new promise.
+
+	::warning
+	Do not yield within this func callback, as it will yield on the
+	main thread. This is a performance optimization.
+	::
+
+	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
+	@return Promise<T>
+]=]
 function Promise.new(func)
 	local self = setmetatable({
 		_pendingExecuteList = {};
@@ -38,7 +52,12 @@ function Promise.new(func)
 	return self
 end
 
---- Initializes a new promise with the given function in a deferred wrapper
+--[=[
+	Initializes a new promise with the given function in a deferred wrapper.
+
+	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
+	@return Promise<T>
+]=]
 function Promise.spawn(func)
 	local self = Promise.new()
 
@@ -47,6 +66,12 @@ function Promise.spawn(func)
 	return self
 end
 
+--[=[
+	Initializes a new promise with the given function in a deferred wrapper.
+
+	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
+	@return Promise<T>
+]=]
 function Promise.defer(func)
 	local self = Promise.new()
 
@@ -56,12 +81,18 @@ function Promise.defer(func)
 	return self
 end
 
+--[=[
+	Returns a resolved promise with the following values
+
+	@param ... Values to resolve to
+	@return Promise<T>
+]=]
 function Promise.resolved(...)
 	local n = select("#", ...)
 	if n == 0 then
 		-- Reuse promise here to save on calls to Promise.resolved()
 		return _emptyFulfilledPromise
-	elseif n == 1 and isPromise(...) then
+	elseif n == 1 and Promise.isPromise(...) then
 		local promise = (...)
 
 		-- Resolving to promise that is already resolved. Just return the promise!
@@ -75,6 +106,12 @@ function Promise.resolved(...)
 	return promise
 end
 
+--[=[
+	Returns a rejected promise with the following values
+
+	@param ... Values to reject to
+	@return Promise<T>
+]=]
 function Promise.rejected(...)
 	local n = select("#", ...)
 	if n == 0 then
@@ -87,21 +124,40 @@ function Promise.rejected(...)
 	return promise
 end
 
---- Returns whether or not the promise is pending
--- @treturn bool True if pending, false otherwise
+--[=[
+	Returns whether or not the promise is pending
+
+	@return bool -- True if pending, false otherwise
+]=]
 function Promise:IsPending()
 	return self._pendingExecuteList ~= nil
 end
 
+--[=[
+	Returns whether or not the promise is fulfilled
+
+	@return bool -- True if fulfilled
+]=]
 function Promise:IsFulfilled()
 	return self._fulfilled ~= nil
 end
 
+--[=[
+	Returns whether or not the promise is rejected
+
+	@return bool -- True if rejected
+]=]
 function Promise:IsRejected()
 	return self._rejected ~= nil
 end
 
---- Yield until the promise is complete
+--[=[
+	Yields until the promise is complete, and errors if an error
+	exists, otherwise returns the fulfilled results.
+
+	@yields
+	@return T
+]=]
 function Promise:Wait()
 	if self._fulfilled then
 		return unpack(self._fulfilled, 1, self._valuesLength)
@@ -127,6 +183,14 @@ function Promise:Wait()
 	end
 end
 
+
+--[=[
+	Yields until the promise is complete, then returns a boolean indicating
+	the result, followed by the values from the promise.
+
+	@yields
+	@return boolean, T
+]=]
 function Promise:Yield()
 	if self._fulfilled then
 		return true, unpack(self._fulfilled, 1, self._valuesLength)
@@ -153,9 +217,11 @@ function Promise:Yield()
 end
 
 
---- Promise resolution procedure
--- Resolves a promise
--- @return self
+--[=[
+	Promise resolution procedure, resolves the given values
+
+	@param ... T
+]=]
 function Promise:Resolve(...)
 	if not self._pendingExecuteList then
 		return
@@ -166,7 +232,7 @@ function Promise:Resolve(...)
 		self:_fulfill({}, 0)
 	elseif self == (...) then
 		self:Reject("TypeError: Resolved to self")
-	elseif isPromise(...) then
+	elseif Promise.isPromise(...) then
 		if len > 1 then
 			local message = ("When resolving a promise, extra arguments are discarded! See:\n\n%s")
 				:format(self._source)
@@ -213,9 +279,12 @@ function Promise:Resolve(...)
 	end
 end
 
---- Fulfills the promise with the value
--- @param ... Params to _fulfill with
--- @return self
+--[=[
+	Fulfills the promise with the value
+	@param values { T } -- Params to fulfil with
+	@param valuesLength number
+	@private
+]=]
 function Promise:_fulfill(values, valuesLength)
 	if not self._pendingExecuteList then
 		return
@@ -231,9 +300,10 @@ function Promise:_fulfill(values, valuesLength)
 	end
 end
 
---- Rejects the promise with the value given
--- @param ... Params to reject with
--- @return self
+--[=[
+	Rejects the promise with the values given
+	@param ... T -- Params to reject with
+]=]
 function Promise:Reject(...)
 	self:_reject({...}, select("#", ...))
 end
@@ -272,18 +342,26 @@ function Promise:_reject(values, valuesLength)
 	end
 end
 
---- Handlers if/when promise is fulfilled/rejected. It takes up to two arguments, callback functions
--- for the success and failure cases of the Promise. May return the same promise if certain behavior
--- is met.
--- NOTE: We do not comply with 2.2.4 (onFulfilled or onRejected must not be called until the execution context stack
--- contains only platform code). This means promises may stack overflow, however, it also makes promises a lot cheaper
--- @tparam[opt=nil] function onFulfilled Called if/when fulfilled with parameters
-	-- If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their
-	-- originating calls to then.
--- @tparam[opt=nil] function onRejected Called if/when rejected with parameters
-	-- If/when promise is rejected, all respective onRejected callbacks must execute in the order of their
-	-- originating calls to then.
--- @treturn Promise
+--[=[
+	Handlers if/when promise is fulfilled/rejected. It takes up to two arguments, callback functions
+	for the success and failure cases of the Promise. May return the same promise if certain behavior
+	is met.
+
+	:::info
+	We do not comply with 2.2.4 (onFulfilled or onRejected must not be called until the execution context stack
+	contains only platform code). This means promises may stack overflow, however, it also makes promises a lot cheaper
+	:::
+
+	If/when promise is rejected, all respective onRejected callbacks must execute in the order of their
+	originating calls to then.
+
+	If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their
+	originating calls to then.
+
+	@param onFulfilled function -- Called if/when fulfilled with parameters
+	@param onRejected function -- Called if/when rejected with parameters
+	@return Promise<T>
+]=]
 function Promise:Then(onFulfilled, onRejected)
 	if type(onRejected) == "function" then
 		self._unconsumedException = false
@@ -298,9 +376,16 @@ function Promise:Then(onFulfilled, onRejected)
 	end
 end
 
--- Like then, but the value passed down the chain is the resolved value of the promise, not
--- the value returned from onFulfilled or onRejected
--- Will still yield for the result if a promise is returned, but will discard the result.
+--[=[
+	Like then, but the value passed down the chain is the resolved value of the promise, not
+	the value returned from onFulfilled or onRejected
+
+	Will still yield for the result if a promise is returned, but will discard the result.
+
+	@param onFulfilled function
+	@param onRejected function
+	@return Promise<T> -- Returns self
+]=]
 function Promise:Tap(onFulfilled, onRejected)
 	-- Run immediately like then, but we return something safer!
 	local result = self:Then(onFulfilled, onRejected)
@@ -327,23 +412,36 @@ function Promise:Tap(onFulfilled, onRejected)
 	end
 end
 
+--[=[
+	Executes upon pending stop
+
+	@param func function
+	@return Promise<T>
+]=]
 function Promise:Finally(func)
 	return self:Then(func, func)
 end
 
---- Catch errors from the promise
--- @treturn Promise
+--[=[
+	Catch errors from the promise
+
+	@param onRejected function
+	@return Promise<T>
+]=]
 function Promise:Catch(onRejected)
 	return self:Then(nil, onRejected)
 end
 
---- Rejects the current promise.
--- Utility left for Maid task
--- @treturn nil
+--[=[
+	Rejects the current promise. Utility left for Maid task
+]=]
 function Promise:Destroy()
 	self:_reject({}, 0)
 end
 
+--[=[
+	Returns the results from the promise
+]=]
 function Promise:GetResults()
 	if self._rejected then
 		return false, unpack(self._rejected, 1, self._valuesLength)
@@ -375,7 +473,7 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 				local results = table.pack(onFulfilled(unpack(self._fulfilled, 1, self._valuesLength)))
 				if results.n == 0 then
 					return _emptyFulfilledPromise
-				elseif results.n == 1 and isPromise(results[1]) then
+				elseif results.n == 1 and Promise.isPromise(results[1]) then
 					return results[1]
 				else
 					local promise = Promise.new()
@@ -406,7 +504,7 @@ function Promise:_executeThen(onFulfilled, onRejected, promise2)
 				local results = table.pack(onRejected(unpack(self._rejected, 1, self._valuesLength)))
 				if results.n == 0 then
 					return _emptyFulfilledPromise
-				elseif results.n == 1 and isPromise(results[1]) then
+				elseif results.n == 1 and Promise.isPromise(results[1]) then
 					return results[1]
 				else
 					local promise = Promise.new()

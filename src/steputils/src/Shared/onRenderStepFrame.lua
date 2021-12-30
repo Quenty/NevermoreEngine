@@ -1,8 +1,18 @@
---- Executes code at a specific point in render step priority queue
--- @module onRenderStepFrame
+--[=[
+	Executes code at a specific point in render step priority queue
+	@class onRenderStepFrame
+]=]
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
+
+--[=[
+	Executes code at a specific point in render step priority queue.
+	@function onRenderStepFrame
+	@param priority number
+	@return MaidTask
+	@within onRenderStepFrame
+]=]
 
 return function(priority, callback)
 	assert(type(priority) == "number", "Bad priority")

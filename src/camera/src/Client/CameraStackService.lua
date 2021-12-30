@@ -1,6 +1,9 @@
---- Holds camera states and allows for the last camera state to be retrieved. Also
--- initializes an impulse and default camera as the bottom of the stack. Is a singleton.
--- @module CameraStackService
+--[=[
+	Holds camera states and allows for the last camera state to be retrieved. Also
+	initializes an impulse and default camera as the bottom of the stack. Is a singleton.
+
+	@class CameraStackService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -17,6 +20,10 @@ assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackSe
 
 local CameraStackService = {}
 
+--[=[
+	Initializes a new camera stack. Should be done via the ServiceBag.
+	@param serviceBag ServiceBag
+]=]
 function CameraStackService:Init(serviceBag)
 	assert(ServiceBag.isServiceBag(serviceBag), "Not a valid service bag")
 
@@ -58,12 +65,20 @@ function CameraStackService:Init(serviceBag)
 	end)
 end
 
+--[=[
+	Prevents the default camera from being used
+	@param doNotUseDefaultCamera boolean
+]=]
 function CameraStackService:SetDoNotUseDefaultCamera(doNotUseDefaultCamera)
 	assert(not self._stack, "Already initialized")
 
 	self._doNotUseDefaultCamera = doNotUseDefaultCamera
 end
 
+--[=[
+	Pushes a disable state onto the camera stack
+	@return function -- Function to cancel disable
+]=]
 function CameraStackService:PushDisable()
 	assert(self._stack, "Not initialized")
 
@@ -76,8 +91,9 @@ function CameraStackService:PushDisable()
 	end
 end
 
---- Outputs the camera stack
--- @treturn nil
+--[=[
+	Outputs the camera stack. Intended for diagnostics.
+]=]
 function CameraStackService:PrintCameraStack()
 	assert(self._stack, "Stack is not initialized yet")
 
@@ -86,39 +102,65 @@ function CameraStackService:PrintCameraStack()
 	end
 end
 
---- Returns the default camera
--- @treturn SummedCamera DefaultCamera + ImpulseCamera
+--[=[
+	Returns the default camera
+	@return SummedCamera -- DefaultCamera + ImpulseCamera
+]=]
 function CameraStackService:GetDefaultCamera()
 	assert(self._defaultCamera, "Not initialized")
 
 	return self._defaultCamera
 end
 
---- Returns the impulse camera. Useful for adding camera shake
--- @treturn ImpulseCamera
+--[=[
+	Returns the impulse camera. Useful for adding camera shake.
+
+	Shaking the camera:
+	```lua
+	self._cameraStackService:GetImpulseCamera():Impulse(Vector3.new(0.25, 0, 0.25*(math.random()-0.5)))
+	```
+
+	You can also sum the impulse camera into another effect to layer the shake on top of the effect
+	as desired.
+
+	```lua
+	-- Adding global custom camera shake to a custom camera effect
+	local customCameraEffect = ...
+	return (customCameraEffect + self._cameraStackService:GetImpulseCamera()):SetMode("Relative")
+	```
+
+	@return ImpulseCamera
+]=]
 function CameraStackService:GetImpulseCamera()
 	assert(self._impulseCamera, "Not initialized")
 
 	return self._impulseCamera
 end
 
---- Returns the default camera without any impulse cameras
--- @treturn DefaultCamera
+--[=[
+	Returns the default camera without any impulse cameras
+	@return DefaultCamera
+]=]
 function CameraStackService:GetRawDefaultCamera()
 	assert(self._rawDefaultCamera, "Not initialized")
 
 	return self._rawDefaultCamera
 end
 
+--[=[
+	Gets the camera current on the top of the stack
+	@return CameraEffect
+]=]
 function CameraStackService:GetTopCamera()
 	assert(self._stack, "Not initialized")
 
 	return self._stack[#self._stack]
 end
 
---- Retrieves the top state off the stack
--- @treturn[1] CameraState
--- @treturn[2] nil
+--[=[
+	Retrieves the top state off the stack at this time
+	@return CameraState?
+]=]
 function CameraStackService:GetTopState()
 	assert(self._stack, "Stack is not initialized yet")
 
@@ -139,9 +181,12 @@ function CameraStackService:GetTopState()
 	end
 end
 
---- Returns a new camera state that retrieves the state below its set state
--- @treturn[1] CustomCameraEffect
--- @treturn[1] NewStateToUse
+--[=[
+	Returns a new camera state that retrieves the state below its set state.
+
+	@return CustomCameraEffect -- Effect below
+	@return (CameraState) -> () -- Function to set the state
+]=]
 function CameraStackService:GetNewStateBelow()
 	assert(self._stack, "Stack is not initialized yet")
 
@@ -166,10 +211,12 @@ function CameraStackService:GetNewStateBelow()
 	end
 end
 
---- Retrieves the index of a state
--- @tparam CameraState state
--- @treturn number Index of state
--- @treturn nil If non on stack
+--[=[
+	Retrieves the index of a state
+	@param state CameraEffect
+	@return number? -- index
+
+]=]
 function CameraStackService:GetIndex(state)
 	assert(self._stack, "Stack is not initialized yet")
 
@@ -180,15 +227,25 @@ function CameraStackService:GetIndex(state)
 	end
 end
 
+--[=[
+	Returns the current stack.
+
+	:::warning
+	Do not modify this stack, this is the raw memory of the stack
+	:::
+
+	@return { CameraState<T> }
+]=]
 function CameraStackService:GetStack()
 	assert(self._stack, "Not initialized")
 
 	return self._stack
 end
 
---- Removes the state from the stack
--- @tparam CameraState state
--- @treturn nil
+--[=[
+	Removes the state from the stack
+	@param state CameraState
+]=]
 function CameraStackService:Remove(state)
 	assert(self._stack, "Stack is not initialized yet")
 
@@ -199,9 +256,10 @@ function CameraStackService:Remove(state)
 	end
 end
 
---- Adds a state to the stack
--- @tparam CameraState state
--- @treturn nil
+--[=[
+	Adds the state from the stack
+	@param state CameraState
+]=]
 function CameraStackService:Add(state)
 	assert(self._stack, "Stack is not initialized yet")
 

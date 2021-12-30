@@ -1,8 +1,15 @@
---- UTF8 utility functions
--- @module UTF8
+--[=[
+	UTF8 utility functions
+	@class UTF8
+]=]
 
 local UTF8 = {}
 
+--[=[
+	UTF8 uppercase
+	@param str string
+	@return string
+]=]
 function UTF8.upper(str)
 	local UPPER_MAP = UTF8.UPPER_MAP
 	str = str:upper()
@@ -17,6 +24,11 @@ function UTF8.upper(str)
 	return newStr
 end
 
+--[=[
+	UTF8 lowercase
+	@param str string
+	@return string
+]=]
 function UTF8.lower(str)
 	local LOWER_MAP = UTF8.LOWER_MAP
 	str = str:lower()
@@ -31,6 +43,11 @@ function UTF8.lower(str)
 	return newStr
 end
 
+--[=[
+	UTF8 lower to uppercase map
+	@prop UPPER_MAP { [string]: string }
+	@within UTF8
+]=]
 UTF8.UPPER_MAP = {
 	['à'] = 'À',
 	['á'] = 'Á',
@@ -137,6 +154,11 @@ UTF8.UPPER_MAP = {
 	['ơ'] = 'Ơ',
 }
 
+--[=[
+	UTF8 uppercase to lowercase map
+	@prop LOWER_MAP { [string]: string }
+	@within UTF8
+]=]
 UTF8.LOWER_MAP = {}
 for key, val in pairs(UTF8.UPPER_MAP) do
 	UTF8.LOWER_MAP[val] = key

@@ -1,5 +1,7 @@
----
--- @module CublicSplineUtils
+--[=[
+	Utility methods involving cubic splines.
+	@class CubicSplineUtils
+]=]
 
 local CubicSplineUtils = {}
 
@@ -9,6 +11,22 @@ local LinearSystemsSolverUtils = require("LinearSystemsSolverUtils")
 local BinarySearchUtils = require("BinarySearchUtils")
 local CubicTweenUtils = require("CubicTweenUtils")
 
+--[=[
+	A node that can be used as part of a cubic spline.
+	@interface CubicSplineNode
+	.t number
+	.p T
+	.v T
+	@within CubicSplineUtils
+]=]
+
+--[=[
+	Creates a new spline node.
+	@param t number
+	@param position T
+	@param velocity T
+	@return CubicSplineNode<T>
+]=]
 function CubicSplineUtils.newSplineNode(t, position, velocity)
 	return {
 		t = t;
@@ -17,6 +35,12 @@ function CubicSplineUtils.newSplineNode(t, position, velocity)
 	}
 end
 
+--[=[
+	Interpolates between the nodes at a given point.
+	@param nodeList { CubicSplineNode<T> } -- Should be sorted.
+	@param t number
+	@return CubicSplineNode<T>
+]=]
 function CubicSplineUtils.tween(nodeList, t)
 	local i0, i1 = BinarySearchUtils.spanSearchNodes(nodeList, "t", t)
 	local node0, node1 = nodeList[i0], nodeList[i1]
@@ -30,15 +54,27 @@ function CubicSplineUtils.tween(nodeList, t)
 	else
 		--error("CubicSplineUtils: No node to tween with")
 
-		--- Handle this case externally
+		-- Handle this case externally
 		return nil
 	end
 end
 
+--[=[
+	Clones a cubic spline.
+	@param node CubicSplineNode<T>
+	@return CubicSplineNode<T>
+]=]
 function CubicSplineUtils.cloneSplineNode(node)
 	return CubicSplineUtils.newSplineNode(node.t, node.p, node.v)
 end
 
+--[=[
+	Interpolates between 2 cubic spline nodes.
+	@param node0 CubicSplineNode<T>
+	@param node1 CubicSplineNode<T>
+	@param t number
+	@return CubicSplineNode<T>
+]=]
 function CubicSplineUtils.tweenSplineNodes(node0, node1, t)
 	local t0, t1 = node0.t, node1.t
 	local p0, p1 = node0.p, node1.p
@@ -53,6 +89,10 @@ function CubicSplineUtils.tweenSplineNodes(node0, node1, t)
 	return CubicSplineUtils.newSplineNode(t, p, v)
 end
 
+--[=[
+	Sorts a cubic spline nodme based upon the time stamp
+	@param nodeList { CubicSplineNode<T> }
+]=]
 function CubicSplineUtils.sort(nodeList)
 	return table.sort(nodeList, function(a, b)
 		return a.t < b.t
@@ -67,8 +107,15 @@ local function sumIndex(tab, index, value)
 	end
 end
 
+--[=[
+	For a given node list, populates the velocity values of the nodes.
+
+	@param nodeList { CubicSplineNode<T> }
+	@param i0 number?
+	@param i1 number?
+]=]
 function CubicSplineUtils.populateVelocities(nodeList, i0, i1)
-	--- Special case for single key frame in list
+	-- Special case for single key frame in list
 	if #nodeList <= 1 then
 		if nodeList[1] then
 			nodeList[1].v = 0*nodeList[1].v
@@ -85,7 +132,7 @@ function CubicSplineUtils.populateVelocities(nodeList, i0, i1)
 	local upperDiag = {}
 
 
-	--first pass
+	-- first pass
 	for i = i0, i1 do
 		local node = nodeList[i]
 		if node.optimize then
@@ -98,7 +145,7 @@ function CubicSplineUtils.populateVelocities(nodeList, i0, i1)
 		end
 	end
 
-	--second pass
+	-- second pass
 	for i = i0, i1 - 1 do
 		local node0 = nodeList[i]
 		local node1 = nodeList[i + 1]

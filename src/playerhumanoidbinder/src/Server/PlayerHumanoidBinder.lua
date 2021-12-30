@@ -1,6 +1,7 @@
---- Binder that will automatically bind to each player's humanoid
--- @classmod PlayerHumanoidBinder
--- @author Quenty
+--[=[
+	Binder that will automatically bind to each player's humanoid
+	@class PlayerHumanoidBinder
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -14,6 +15,13 @@ local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
 PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 
+--[=[
+	Returns a new PlayerHumanoidBinder
+	@param tag string
+	@param class BinderContructor
+	@param ... any
+	@return PlayerHumanoidBinder<T>
+]=]
 function PlayerHumanoidBinder.new(tag, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerHumanoidBinder)
 
@@ -27,6 +35,10 @@ function PlayerHumanoidBinder.new(tag, class, ...)
 	return self
 end
 
+--[=[
+	Sets whether tagging should be enabled
+	@param shouldTag boolean
+]=]
 function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag)
 	assert(type(shouldTag) == "boolean", "Bad shouldTag")
 	assert(self._shouldTag, "Missing self._shouldTag")
@@ -34,6 +46,10 @@ function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag)
 	self._shouldTag.Value = shouldTag
 end
 
+--[=[
+	Starts the binder. See [Binder.Start].
+	Should be done via a [ServiceBag].
+]=]
 function PlayerHumanoidBinder:Start()
 	local results = { getmetatable(PlayerHumanoidBinder).Start(self) }
 

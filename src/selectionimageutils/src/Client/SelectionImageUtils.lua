@@ -1,6 +1,7 @@
---- Provides a utility method to clearing selection images with blank values.
--- @module SelectionImageUtils
--- @author Quenty
+--[=[
+	Provides a utility method to clearing selection images with blank values.
+	@class SelectionImageUtils
+]=]
 
 local SelectionImageUtils = {}
 

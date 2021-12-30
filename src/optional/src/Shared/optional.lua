@@ -1,14 +1,26 @@
----
--- @function optional
--- @author Quenty
-
---[[
-Sets up require.optional("Name").
+--[=[
+Sets up `require.optional("Name")`.
 
 Errors are still preserved because Roblox reports errors of module scripts regardless of caller
 execution context.
-]]
 
+```lua
+local BasicPane = require.optional("BasicPane")
+```
+
+@class optional
+]=]
+
+--[=[
+	Optional require, if the instance does not exist, or errors while loading, then
+	nil is returned.
+
+	@function optional
+	@param _require function
+	@param _module string | number | Instance
+	@return T?
+	@within optional
+]=]
 return function(_require, _module)
 	assert(_require, "Bad _require function")
 	assert(type(_module) == "string"

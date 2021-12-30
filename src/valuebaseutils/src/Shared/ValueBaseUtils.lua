@@ -1,6 +1,7 @@
---- Provides utilities for working with valuesbase objects, like IntValue or ObjectValue in Roblox.
--- @module ValueBaseUtils
--- @author Quenty
+--[=[
+	Provides utilities for working with valuesbase objects, like IntValue or ObjectValue in Roblox.
+	@class ValueBaseUtils
+]=]
 
 local ValueBaseUtils = {}
 

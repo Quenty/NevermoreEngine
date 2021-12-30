@@ -1,5 +1,7 @@
---- Function that uses raycasting to determine the groundplane in Roblox
--- @function getGroundPlane
+--[=[
+	Function that uses raycasting to determine the groundplane in Roblox.
+	@class getGroundPlane
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -69,8 +71,26 @@ end
 
 local goldenAngle = (3 - 5^0.5)*math.pi
 
--- uses -y as the direction
--- ignoreFunc REALLY SHOULD NOT YIELD
+--[=[
+	Uses -y as the direction
+
+	Searchs for a groundPlane given a basis. Useful for planting a object
+	in 3D space on terrain.
+
+	:::warning
+	ignoreFunc REALLY SHOULD NOT YIELD
+	:::
+
+	@function getGroundPlane
+	@param basis Vector3
+	@param radius number
+	@param length number
+	@param sampleCount number
+	@param ignoreFunc (Instance) -> boolean
+	@return Vector3 -- position
+	@return Vector3 -- normal
+	@within getGroundPlane
+]=]
 local function getGroundPlane(
 	basis, radius, length, sampleCount,
 	ignoreList, ignoreFunc

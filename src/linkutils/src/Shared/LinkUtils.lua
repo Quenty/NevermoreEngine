@@ -1,5 +1,7 @@
---- Utility functions for links. Links are object values pointing to other values!
--- @module LinkUtils
+--[=[
+	Utility functions for links. Links are an [ObjectValue] pointing to something else!
+	@class LinkUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -8,6 +10,13 @@ local promiseChild = require("promiseChild")
 
 local LinkUtils = {}
 
+--[=[
+	Creates a new link with the given name.
+	@param linkName string
+	@param from Instance
+	@param to Instance
+	@return ObjectValue
+]=]
 function LinkUtils.createLink(linkName, from, to)
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")
@@ -21,6 +30,12 @@ function LinkUtils.createLink(linkName, from, to)
 	return objectValue
 end
 
+--[=[
+	Gets all link values, as long as the values are not nil.
+	@param linkName string
+	@param from Instance
+	@return { Instance }
+]=]
 function LinkUtils.getAllLinkValues(linkName, from)
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")
@@ -39,7 +54,12 @@ function LinkUtils.getAllLinkValues(linkName, from)
 	return linkValues
 end
 
-
+--[=[
+	Gets all links underneath an instance.
+	@param linkName string
+	@param from Instance
+	@return { ObjectValue }
+]=]
 function LinkUtils.getAllLinks(linkName, from)
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")
@@ -54,6 +74,12 @@ function LinkUtils.getAllLinks(linkName, from)
 	return links
 end
 
+--[=[
+	Gets the first links value
+	@param linkName string
+	@param from Instance
+	@return { Instance }
+]=]
 function LinkUtils.getLinkValue(linkName, from)
 	assert(type(linkName) == "string", "Bad linkName")
 	assert(typeof(from) == "Instance", "Bad from")
@@ -72,6 +98,13 @@ function LinkUtils.getLinkValue(linkName, from)
 	return objectValue.Value
 end
 
+--[=[
+	Promises the first link value that is truthy
+	@param maid Maid
+	@param linkName string
+	@param from Instance
+	@return Promise<Instance>
+]=]
 function LinkUtils.promiseLinkValue(maid, linkName, from)
 	assert(maid, "Bad maid")
 	assert(type(linkName) == "string", "Bad linkName")

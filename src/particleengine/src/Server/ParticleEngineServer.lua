@@ -1,5 +1,9 @@
---- Handles replication on the server side
--- @module ParticleEngineServer
+--[=[
+	Handles replication on the server side
+
+	@server
+	@class ParticleEngineServer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,6 +1,7 @@
---- Like a template provider, but it also reparents and retrieves tagged objects
--- @classmod TaggedTemplateProvider
--- @author Quenty
+--[=[
+	Like a template provider, but it also reparents and retrieves tagged objects
+	@class TaggedTemplateProvider
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

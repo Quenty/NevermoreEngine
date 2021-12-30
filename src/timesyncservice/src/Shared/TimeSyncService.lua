@@ -1,5 +1,7 @@
---- Syncronizes time
--- @module TimeSyncService
+--[=[
+	Syncronizes time
+	@class TimeSyncService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

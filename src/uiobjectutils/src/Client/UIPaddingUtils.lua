@@ -1,5 +1,7 @@
---- Utility functions for UI padding
--- @module UIPaddingUtils
+--[=[
+	Utility functions for UI padding
+	@class UIPaddingUtils
+]=]
 
 local UIPaddingUtils = {}
 

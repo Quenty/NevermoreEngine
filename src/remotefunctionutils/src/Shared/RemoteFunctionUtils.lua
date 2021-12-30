@@ -1,6 +1,7 @@
---- Utility functions to wrap invoking a remote function with a promise
--- @module RemoteFunctionUtils
--- @author Quenty
+--[=[
+	Utility functions to wrap invoking a remote function with a promise
+	@class RemoteFunctionUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -8,6 +9,12 @@ local Promise = require("Promise")
 
 local RemoteFunctionUtils = {}
 
+--[=[
+	Invokes the server with the remote function call.
+	@param remoteFunction RemoteFunction
+	@param ... any
+	@return Promise<T>
+]=]
 function RemoteFunctionUtils.promiseInvokeServer(remoteFunction, ...)
 	assert(typeof(remoteFunction) == "Instance" and remoteFunction:IsA("RemoteFunction"), "Bad remoteFunction")
 

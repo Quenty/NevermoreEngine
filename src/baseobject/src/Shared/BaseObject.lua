@@ -1,5 +1,7 @@
---- A BaseObject basically just adds the :Destroy() interface, and a _maid, along with an optional object it references.
--- @classmod BaseObject
+--[=[
+	A BaseObject basically just adds the :Destroy() interface, and a _maid, along with an optional object it references.
+	@class BaseObject
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,12 @@ local BaseObject = {}
 BaseObject.ClassName = "BaseObject"
 BaseObject.__index = BaseObject
 
+--[=[
+	Constructs a new BaseObject
+
+	@param obj? Instance
+	@return BaseObject
+]=]
 function BaseObject.new(obj)
 	local self = setmetatable({}, BaseObject)
 
@@ -18,17 +26,11 @@ function BaseObject.new(obj)
 	return self
 end
 
+--[=[
+	Cleans up the BaseObject and sets the metatable to nil
+]=]
 function BaseObject:Destroy()
-	-- local startTime = tick()
 	self._maid:DoCleaning()
-
-	-- This could emit events, which could cause bad startTime
-	-- but we'll take this risk over getting the ClassName
-	-- if tick() - startTime >= 0.01 then
-	-- 	warn(("[BaseObject.Destroy] - Took %f ms to clean up %s")
-	-- 		:format((tick() - startTime)*1000, tostring(self.ClassName)))
-	-- end
-
 	setmetatable(self, nil)
 end
 

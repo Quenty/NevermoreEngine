@@ -1,6 +1,8 @@
---- Ever wanted to not rewrite all of Roblox's input systems! Well, now you can
--- with this slight hack!
--- @module HumanoidMoveDirectionUtils
+--[=[
+	Ever wanted to not rewrite all of Roblox's input systems! Well, now you can with this slight hack!
+
+	@class HumanoidMoveDirectionUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -17,6 +19,15 @@ local DIRECTION_INPUT_MAPS = {
 
 local HumanoidMoveDirectionUtils = {}
 
+--[=[
+	Gets the relative move direction from the camera and the humanoid.
+
+	This is absolutely a hack.
+
+	@param cameraCFrame CFrame
+	@param humanoid Humanoid
+	@return Vector3
+]=]
 function HumanoidMoveDirectionUtils.getRelativeMoveDirection(cameraCFrame, humanoid)
 	if UserInputService:GetFocusedTextBox() then
 		return ZERO_VECTOR

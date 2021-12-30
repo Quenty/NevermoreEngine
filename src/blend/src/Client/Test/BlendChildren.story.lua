@@ -1,6 +1,6 @@
----
--- @module Blend.story
--- @author Quenty
+--[[
+	@class Blend.story
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

@@ -1,10 +1,17 @@
---- debounce a existing function by timeout
--- @function debounce
+--[=[
+	debounce a existing function by timeout
+	@class debounce
+]=]
 
---- Provides a debounce function call on an operation
--- @tparam number timeout
--- @tparam function func
--- @treturn function
+--[=[
+	Provides a debounce function call on an operation
+
+	@param timeoutInSeconds number
+	@param func function
+	@return (...) -> ()
+	@function debounce
+	@within debounce
+]=]
 local function debounce(timeoutInSeconds, func)
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
 	assert(type(func) == "function", "Bad func")
@@ -16,7 +23,7 @@ local function debounce(timeoutInSeconds, func)
 		local n = select("#", ...)
 		local args = {...}
 
-		delay(timeoutInSeconds, function()
+		task.delay(timeoutInSeconds, function()
 			if key == localKey then
 				func(unpack(args, 1, n))
 			end

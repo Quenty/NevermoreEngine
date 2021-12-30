@@ -1,5 +1,7 @@
---- Generated XboxOneLight with Python
--- @author Quenty
+--[[
+	Generated XboxOneLight with Python
+	@class XboxOneLight
+]]
 
 local parent = script:FindFirstAncestorWhichIsA("ModuleScript")
 local require = require(parent.Parent.loader).load(parent)

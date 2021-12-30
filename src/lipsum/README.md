@@ -1,10 +1,10 @@
 ## Lorem Ipsum Generator
 <div align="center">
-  <a href="http://quenty.github.io/api/">
-    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  <a href="http://quenty.github.io/NevermoreEngine/">
+    <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
   </a>
   <a href="https://discord.gg/mhtGUS8">
-    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+    <img src="https://img.shields.io/discord/385151591524597761?color=5865F2&label=discord&logo=discord&logoColor=white" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
@@ -13,35 +13,9 @@
 
 Lorem ipsum generator for Roblox. This package is designed to help with debugging!
 
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/LipsumUtils">View docs →</a></div>
+
 ## Installation
 ```
 npm install @quenty/lispum --save
-```
-
-## Usage
-Usage is designed to be very simple.
-
-### Usernames
-```lua
-print(LipsumUtils.username()) --> LoremIpsum23
-```
-
-### Words
-```lua
-print(LipsumUtils.words(5)) --> 5 words
-```
-
-### Sentences
-```lua
-print(LipsumUtils.sentence(7)) --> Sentence with 7 words.
-```
-
-### Paragraphs
-```lua
-print(LipsumUtils.paragraph(4)) --> Paragraph with 4 sentences.
-```
-
-### Documents
-```lua
-print(LipsumUtils.document(3)) --> Document with 3 paragraphs
 ```

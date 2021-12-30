@@ -1,5 +1,7 @@
---- Snackbar, but draggable
--- @classmod DraggableSnackbar
+--[=[
+	Snackbar, but draggable
+	@class DraggableSnackbar
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -21,7 +23,7 @@ DraggableSnackbar.Duration = 3
 -- By default the Snackbar will close automatically if the user types outside or presses the esc key.
 DraggableSnackbar.AutoCloseDisabled = false
 
---- Note that this will not show until :Show() is called
+-- Note that this will not show until :Show() is called
 -- @constructor
 -- @param [GCOnDismissal] If true, will destroy itself and GC after being dismissed. Defaults to true
 -- @param [Options] Table of optional values, adds call to actions, et cetera
@@ -88,7 +90,7 @@ function DraggableSnackbar:Show()
 			end
 		end))
 
-		--- Setup hide on dismissal
+		-- Setup hide on dismissal
 		task.delay(self.Duration, function()
 			if self.Destroy and self._showId == LocalShowId and self._visible then
 				self:Dismiss()

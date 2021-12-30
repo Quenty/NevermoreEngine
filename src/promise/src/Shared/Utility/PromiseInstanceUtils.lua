@@ -1,6 +1,6 @@
----
--- @module PromiseInstanceUtils
--- @author Quenty
+--[=[
+	@class PromiseInstanceUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +9,10 @@ local Maid = require("Maid")
 
 local PromiseInstanceUtils = {}
 
+--[=[
+	@param instance Instance
+	@return Promise
+]=]
 function PromiseInstanceUtils.promiseRemoved(instance)
 	assert(instance:IsDescendantOf(game))
 

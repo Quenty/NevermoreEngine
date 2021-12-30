@@ -1,6 +1,9 @@
----
--- @module GroupPermissionProvider
--- @author Quenty
+--[=[
+	Provides permissions from a group
+
+	@server
+	@class GroupPermissionProvider
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -15,6 +18,10 @@ local GroupPermissionProvider = setmetatable({}, BasePermissionProvider)
 GroupPermissionProvider.__index = GroupPermissionProvider
 GroupPermissionProvider.ClassName = "GroupPermissionProvider"
 
+--[=[
+	@param config table
+	@return GroupPermissionProvider
+]=]
 function GroupPermissionProvider.new(config)
 	local self = setmetatable(BasePermissionProvider.new(config), GroupPermissionProvider)
 
@@ -28,6 +35,9 @@ function GroupPermissionProvider.new(config)
 	return self
 end
 
+--[=[
+	Starts the permission provider. Should be done via ServiceBag.
+]=]
 function GroupPermissionProvider:Start()
 	assert(self._config, "Bad config")
 
@@ -57,6 +67,11 @@ function GroupPermissionProvider:Start()
 	return self
 end
 
+--[=[
+	Returns whether the player is a creator.
+	@param player Player
+	@return Promise<boolean>
+]=]
 function GroupPermissionProvider:PromiseIsCreator(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(player:IsDescendantOf(game), "Bad player")
@@ -71,6 +86,11 @@ function GroupPermissionProvider:PromiseIsCreator(player)
 		end)
 end
 
+--[=[
+	Returns whether the player is an admin.
+	@param player Player
+	@return Promise<boolean>
+]=]
 function GroupPermissionProvider:PromiseIsAdmin(player)
 	assert(player:IsDescendantOf(game))
 

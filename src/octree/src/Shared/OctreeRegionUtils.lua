@@ -1,5 +1,12 @@
---- Octree implementation
--- @module OctreeRegionUtils
+--[=[
+	Octree implementation utilities. Primarily this utility code
+	should not be used directly and should be considered private to
+	the library.
+
+	Use [Octree](/api/Octree) instead of this library directly.
+
+	@class OctreeRegionUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -20,6 +27,12 @@ local SUB_REGION_POSITION_OFFSET = {
 
 local OctreeRegionUtils = {}
 
+--[=[
+	Visualizes the octree region.
+
+	@param region OctreeRegion<T>
+	@return MaidTask
+]=]
 function OctreeRegionUtils.visualize(region)
 	local size = region.size
 	local position = region.position
@@ -33,6 +46,44 @@ function OctreeRegionUtils.visualize(region)
 	return box
 end
 
+--[=[
+	A Vector3 equivalent for octrees. This type is primarily internal and
+	used for faster access than a Vector3.
+
+	@type OctreeVector3 { [1]: number, [2]: number, [3]: number }
+	@within OctreeRegionUtils
+]=]
+
+--[=[
+	An internal region which stores the data.
+
+	@interface OctreeRegion<T>
+	.subRegions { OctreeRegion<T> }
+	.lowerBounds OctreeVector3
+	.upperBounds OctreeVector3
+	.position OctreeVector3
+	.size OctreeVector3
+	.parent OctreeRegion<T>?
+	.parentIndex number
+	.depth number
+	.nodes { OctreeNode<T> }
+	.node_count number
+	@within OctreeRegionUtils
+]=]
+
+--[=[
+	Creates a new OctreeRegion<T>
+
+	@param px number
+	@param py number
+	@param pz number
+	@param sx number
+	@param sy number
+	@param sz number
+	@param parent OctreeRegion<T>?
+	@param parentIndex number?
+	@return OctreeRegion<T>
+]=]
 function OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parent, parentIndex)
 	local hsx, hsy, hsz = sx/2, sy/2, sz/2
 
@@ -65,6 +116,11 @@ function OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parent, parentIndex)
 	return region
 end
 
+--[=[
+	Adds a node to the lowest subregion
+	@param lowestSubregion OctreeRegion<T>
+	@param node OctreeNode
+]=]
 function OctreeRegionUtils.addNode(lowestSubregion, node)
 	assert(node, "Bad node")
 
@@ -78,6 +134,13 @@ function OctreeRegionUtils.addNode(lowestSubregion, node)
 	end
 end
 
+--[=[
+	Moves a node from one region to another
+
+	@param fromLowest OctreeRegion<T>
+	@param toLowest OctreeRegion<T>
+	@param node OctreeNode
+]=]
 function OctreeRegionUtils.moveNode(fromLowest, toLowest, node)
 	assert(fromLowest.depth == toLowest.depth, "fromLowest.depth ~= toLowest.depth")
 	assert(fromLowest ~= toLowest, "fromLowest == toLowest")
@@ -113,6 +176,12 @@ function OctreeRegionUtils.moveNode(fromLowest, toLowest, node)
 	end
 end
 
+--[=[
+	Removes a node from the given region
+
+	@param lowestSubregion OctreeRegion<T>
+	@param node OctreeNode
+]=]
 function OctreeRegionUtils.removeNode(lowestSubregion, node)
 	assert(node, "Bad node")
 
@@ -135,18 +204,40 @@ function OctreeRegionUtils.removeNode(lowestSubregion, node)
 	end
 end
 
+
+--[=[
+	Retrieves the search radius for a given radius given the region
+	diameter
+
+	@param radius number
+	@param diameter number
+	@param epsilon number
+	@return number
+]=]
 function OctreeRegionUtils.getSearchRadiusSquared(radius, diameter, epsilon)
 	local diagonal = SQRT_3_OVER_2*diameter
 	local searchRadius = radius + diagonal
 	return searchRadius*searchRadius + epsilon
 end
 
--- See basic algorithm:
 -- luacheck: push ignore
--- https://github.com/PointCloudLibrary/pcl/blob/29f192af57a3e7bdde6ff490669b211d8148378f/octree/include/pcl/octree/impl/octree_search.hpp#L309
+--[=[
+	Adds all octree nod values to objectsFound
+
+	See basic algorithm:
+	https://github.com/PointCloudLibrary/pcl/blob/29f192af57a3e7bdde6ff490669b211d8148378f/octree/include/pcl/octree/impl/octree_search.hpp#L309
+
+	@param region OctreeRegion<T>
+	@param radius number
+	@param px number
+	@param py number
+	@param pz number
+	@param objectsFound { T }
+	@param nodeDistances2 { number }
+	@param maxDepth number
+]=]
+function OctreeRegionUtils.getNeighborsWithinRadius(region, radius, px, py, pz, objectsFound, nodeDistances2, maxDepth)
 -- luacheck: pop
-function OctreeRegionUtils.getNeighborsWithinRadius(
-		region, radius, px, py, pz, objectsFound, nodeDistances2, maxDepth)
 	assert(maxDepth, "Bad maxDepth")
 
 	local childDiameter = region.size[1]/2
@@ -182,6 +273,17 @@ function OctreeRegionUtils.getNeighborsWithinRadius(
 	end
 end
 
+--[=[
+	Recursively ensures that a subregion exists at a given depth, and returns
+	that region for usage.
+
+	@param region OctreeRegion<T> -- Top level region
+	@param px number
+	@param py number
+	@param pz number
+	@param maxDepth number
+	@return OctreeRegion<T>
+]=]
 function OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, maxDepth)
 	local current = region
 	for _ = region.depth, maxDepth do
@@ -200,6 +302,12 @@ function OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, maxDe
 	return current
 end
 
+--[=[
+	Creates a subregion for an octree.
+	@param parentRegion OctreeRegion<T>
+	@param parentIndex number
+	@return OctreeRegion<T>
+]=]
 function OctreeRegionUtils.createSubRegion(parentRegion, parentIndex)
 	local size = parentRegion.size
 	local position = parentRegion.position
@@ -213,7 +321,17 @@ function OctreeRegionUtils.createSubRegion(parentRegion, parentIndex)
 	return OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parentRegion, parentIndex)
 end
 
--- Consider regions to be range [px, y)
+--[=[
+	Computes whether a region is in bounds.
+
+	Consider regions to be range [px, y).
+
+	@param region OctreeRegion<T>
+	@param px number
+	@param py number
+	@param pz number
+	@return boolean
+]=]
 function OctreeRegionUtils.inRegionBounds(region, px, py, pz)
 	local lowerBounds = region.lowerBounds
 	local upperBounds = region.upperBounds
@@ -224,6 +342,15 @@ function OctreeRegionUtils.inRegionBounds(region, px, py, pz)
 	)
 end
 
+--[=[
+	Gets a subregion's internal index.
+
+	@param region OctreeRegion<T>
+	@param px number
+	@param py number
+	@param pz number
+	@return number
+]=]
 function OctreeRegionUtils.getSubRegionIndex(region, px, py, pz)
 	local index = px > region.position[1] and 1 or 2
 	if py <= region.position[2] then
@@ -236,25 +363,65 @@ function OctreeRegionUtils.getSubRegionIndex(region, px, py, pz)
 	return index
 end
 
---- This definitely collides
--- https://stackoverflow.com/questions/5928725/hashing-2d-3d-and-nd-vectors
+--[=[
+	This definitely collides fairly consistently
+
+	See: https://stackoverflow.com/questions/5928725/hashing-2d-3d-and-nd-vectors
+
+	@param cx number
+	@param cy number
+	@param cz number
+	@return number
+]=]
 function OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
 	-- Normally you would modulus this to hash table size, but we want as flat of a structure as possible
 	return cx * 73856093 + cy*19351301 + cz*83492791
 end
 
+--[=[
+	Computes the index for a top level cell given a position
+
+	@param maxRegionSize OctreeVector3
+	@param px number
+	@param py number
+	@param pz number
+	@return number -- rpx
+	@return number -- rpy
+	@return number -- rpz
+]=]
 function OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
 	return math.floor(px / maxRegionSize[1] + 0.5),
 		math.floor(py / maxRegionSize[2] + 0.5),
 		math.floor(pz / maxRegionSize[3] + 0.5)
 end
 
+--[=[
+	Computes a top-level region's position
+
+	@param maxRegionSize OctreeVector3
+	@param cx number
+	@param cy number
+	@param cz number
+	@return number
+	@return number
+	@return number
+]=]
 function OctreeRegionUtils.getTopLevelRegionPosition(maxRegionSize, cx, cy, cz)
 	return maxRegionSize[1] * cx,
 		maxRegionSize[2] * cy,
 		maxRegionSize[3] * cz
 end
 
+--[=[
+	Given a top-level region, returns if the region position are equal
+	to this region
+
+	@param region OctreeRegion<T>
+	@param rpx number
+	@param rpy number
+	@param rpz number
+	@return boolean
+]=]
 function OctreeRegionUtils.areEqualTopRegions(region, rpx, rpy, rpz)
 	local position = region.position
 	return position[1] == rpx
@@ -262,6 +429,16 @@ function OctreeRegionUtils.areEqualTopRegions(region, rpx, rpy, rpz)
 		and position[3] == rpz
 end
 
+--[=[
+	Given a world space position, finds the current region in the hashmap
+
+	@param regionHashMap { [number]: { OctreeRegion<T> } }
+	@param maxRegionSize OctreeVector3
+	@param px number
+	@param py number
+	@param pz number
+	@return OctreeRegion3?
+]=]
 function OctreeRegionUtils.findRegion(regionHashMap, maxRegionSize, px, py, pz)
 	local cx, cy, cz = OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
 	local hash = OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)
@@ -281,6 +458,16 @@ function OctreeRegionUtils.findRegion(regionHashMap, maxRegionSize, px, py, pz)
 	return nil
 end
 
+--[=[
+	Gets the current region for a position, or creates a new one.
+
+	@param regionHashMap { [number]: { OctreeRegion<T> } }
+	@param maxRegionSize OctreeVector3
+	@param px number
+	@param py number
+	@param pz number
+	@return OctreeRegion<T>
+]=]
 function OctreeRegionUtils.getOrCreateRegion(regionHashMap, maxRegionSize, px, py, pz)
 	local cx, cy, cz = OctreeRegionUtils.getTopLevelRegionCellIndex(maxRegionSize, px, py, pz)
 	local hash = OctreeRegionUtils.getTopLevelRegionHash(cx, cy, cz)

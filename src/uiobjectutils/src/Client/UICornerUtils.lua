@@ -1,6 +1,6 @@
----
--- @module UICornerUtils
--- @author Quenty
+--[=[
+	@class UICornerUtils
+]=]
 
 local UICornerUtils = {}
 

@@ -1,6 +1,7 @@
---- Loads cmdr on the client
--- @module CmdrServiceClient
--- @author Quenty
+--[=[
+	Loads cmdr on the client
+	@class CmdrServiceClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

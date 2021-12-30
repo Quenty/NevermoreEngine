@@ -1,5 +1,7 @@
---- Interface between user input and camera controls
--- @classmod CameraControls
+--[=[
+	Interface between user input and camera controls
+	@class CameraControls
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,7 +13,7 @@ local Maid = require("Maid")
 local GamepadRotateModel = require("GamepadRotateModel")
 local InputObjectUtils = require("InputObjectUtils")
 
---- Stolen directly from ROBLOX's core scripts.
+-- Stolen directly from ROBLOX's core scripts.
 -- Looks like a simple integrator.
 -- Called (zoom, zoomScale, 1) returns zoom
 local function rk4Integrator(position, velocity, t)
@@ -175,7 +177,7 @@ function CameraControls:SetRotatedCamera(rotatedCamera)
 	return self
 end
 
---- This code was the same algorithm used by ROBLOX. It makes it so you can zoom easier at further distances.
+-- This code was the same algorithm used by Roblox. It makes it so you can zoom easier at further distances.
 function CameraControls:_handleMouseWheel(inputObject)
 	if self._zoomedCamera then
 		local delta = math.clamp(-inputObject.Position.Z, -1, 1)*1.4
@@ -210,7 +212,7 @@ function CameraControls:_handleTouchPinch(scale, velocity, userInputState)
 	end
 end
 
---- This is also a ROBLOX algorithm. Not sure why screen resolution is locked like it is.
+-- This is also a Roblox algorithm. Not sure why screen resolution is locked like it is.
 function CameraControls:_mouseTranslationToAngle(translationVector)
 	local xTheta = (translationVector.x / 1920)
 	local yTheta = (translationVector.y / 1200)

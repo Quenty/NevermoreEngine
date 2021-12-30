@@ -1,6 +1,6 @@
----
--- @module TimeSyncConstants
--- @author Quenty
+--[=[
+	@class TimeSyncConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

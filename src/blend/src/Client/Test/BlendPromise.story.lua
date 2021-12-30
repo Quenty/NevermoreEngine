@@ -1,6 +1,6 @@
----
--- @module BlendTextbox.story
--- @author Quenty
+--[[
+	@class BlendTextbox.story
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

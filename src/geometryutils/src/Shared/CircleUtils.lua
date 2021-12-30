@@ -1,11 +1,18 @@
----
--- @module CircleUtils
--- @author Quenty
+--[=[
+	@class CircleUtils
+]=]
 
 local CircleUtils = {}
 
--- https://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
--- Note: target should be within 0 and circumference
+--[=[
+	https://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
+	Note: target should be within 0 and circumference
+
+	@param position number
+	@param target number
+	@param circumference number
+	@return number
+]=]
 function CircleUtils.updatePositionToSmallestDistOnCircle(position, target, circumference)
 	assert(target >= 0 and target <= circumference, "Target must be between 0 and circumference")
 

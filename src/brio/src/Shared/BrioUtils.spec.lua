@@ -1,5 +1,6 @@
----
--- @module RxBrioUtils.spec.lua
+--[[
+	Unit tests for BrioUtils.lua
+]]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

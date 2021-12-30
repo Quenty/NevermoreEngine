@@ -1,5 +1,25 @@
---- Debug drawing library useful for debugging 3D abstractions
--- @module Draw
+--[=[
+	Debug drawing library useful for debugging 3D abstractions. One of
+	the more useful utility libraries.
+
+	These functions are incredibly easy to invoke for quick debugging.
+	This can make debugging any sort of 3D geometry really easy.
+
+	```lua
+	-- A sample of a few API uses
+	Draw.point(Vector3.new(0, 0, 0))
+	Draw.terrainCell(Vector3.new(0, 0, 0))
+	Draw.cframe(CFrame.new(0, 10, 0))
+	Draw.text(Vector3.new(0, -10, 0), "Testing!")
+	```
+
+	:::tip
+	This library should not be used to render things in production for
+	normal players, as it is optimized for debug experience over performance.
+	:::
+
+	@class Draw
+]=]
 
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
@@ -12,27 +32,43 @@ local ORIGINAL_DEFAULT_COLOR = Color3.new(1, 0, 0)
 local Draw = {}
 Draw._defaultColor = ORIGINAL_DEFAULT_COLOR
 
---- Sets the Draw's drawing color
--- @tparam {Color3} color The color to set
+--[=[
+	Sets the Draw's drawing color.
+	@param color Color3 -- The color to set
+]=]
 function Draw.setColor(color)
 	Draw._defaultColor = color
 end
 
+--[=[
+	Resets the drawing color.
+]=]
 function Draw.resetColor()
 	Draw._defaultColor = ORIGINAL_DEFAULT_COLOR
 end
 
---- Sets the Draw library to use a random color
+--[=[
+	Sets the Draw library to use a random color.
+]=]
 function Draw.setRandomColor()
 	Draw.setColor(Color3.fromHSV(math.random(), 0.5+0.5*math.random(), 1))
 end
 
---- Draws a ray for debugging
--- @param ray The ray to Draw
--- @tparam[opt] {color3} color The color to Draw in
--- @tparam[opt] {Instance} parent
--- @tparam[opt] {number} diameter
--- @tparam[opt] {number} meshDiameter
+--[=[
+	Draws a ray for debugging.
+
+	```lua
+	local ray = Ray.new(Vector3.new(0, 0, 0), Vector3.new(0, 10, 0))
+	Draw.ray(ray)
+	```
+
+	@param ray Ray
+	@param color Color3? -- Optional color to draw in
+	@param parent Instance? -- Optional parent
+	@param diameter number? -- Optional diameter
+	@param meshDiameter number? -- Optional mesh diameter
+	@return BasePart
+]=]
 function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
 
@@ -89,6 +125,25 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	return part
 end
 
+--[=[
+	Updates the rendered ray to the new color and position.
+	Used for certain scenarios when updating a ray on
+	renderstepped would impact performance, even in debug mode.
+
+	```lua
+	local ray = Ray.new(Vector3.new(0, 0, 0), Vector3.new(0, 10, 0))
+	local drawn = Draw.ray(ray)
+
+	RunService.RenderStepped:Connect(function()
+		local newRay = Ray.new(Vector3.new(0, 0, 0), Vector3.new(0, 10*math.sin(os.clock()), 0))
+		Draw.updateRay(drawn, newRay Color3.new(1, 0.5, 0.5))
+	end)
+	```
+
+	@param part Ray part
+	@param ray Ray
+	@param color Color3
+]=]
 function Draw.updateRay(part, ray, color)
 	color = color or part.Color
 
@@ -112,6 +167,19 @@ function Draw.updateRay(part, ray, color)
 	end
 end
 
+--[=[
+	Render text in 3D for debugging. The text container will
+	be sized to fit the text.
+
+	```lua
+	Draw.text(Vector3.new(0, 10, 0), "Point")
+	```
+
+	@param adornee Instance | Vector3 -- Adornee to rener on
+	@param text string -- Text to render
+	@param color Color3? -- Optional color to render
+	@return Instance
+]=]
 function Draw.text(adornee, text, color)
 	if typeof(adornee) == "Vector3" then
 		local attachment = Instance.new("Attachment")
@@ -203,21 +271,44 @@ function Draw._textOnAdornee(adornee, text, color)
 	return billboardGui
 end
 
-function Draw.sphere(vector3, radius, color, parent)
-	return Draw.point(vector3, color, parent, radius*2)
+--[=[
+	Renders a sphere at the given point in 3D space.
+
+	```lua
+	Draw.sphere(Vector3.new(0, 10, 0), 10)
+	```
+
+	Great for debugging explosions and stuff.
+
+	@param position Vector3 -- Position of the sphere
+	@param radius number -- Radius of the sphere
+	@param color Color3? -- Optional color
+	@param parent Instance? -- Optional parent
+	@return BasePart
+]=]
+function Draw.sphere(position, radius, color, parent)
+	return Draw.point(position, color, parent, radius*2)
 end
 
---- Draws a point for debugging
--- @tparam {Vector3} vector3 Point to Draw
--- @tparam[opt] {color3} color The color to Draw in
--- @tparam[opt] {Instance} parent
--- @tparam[opt] {number} diameter
-function Draw.point(vector3, color, parent, diameter)
-	if typeof(vector3) == "CFrame" then
-		vector3 = vector3.p
+--[=[
+	Draws a point for debugging in 3D space.
+
+	```lua
+	Draw.point(Vector3.new(0, 25, 0), Color3.new(0.5, 1, 0.5))
+	```
+
+	@param position Vector3 | CFrame -- Point to Draw
+	@param color Color3? -- Optional color
+	@param parent Instance? -- Optional parent
+	@param diameter number? -- Optional diameter
+	@return BasePart
+]=]
+function Draw.point(position, color, parent, diameter)
+	if typeof(position) == "CFrame" then
+		position = position.p
 	end
 
-	assert(typeof(vector3) == "Vector3", "Bad vector3")
+	assert(typeof(position) == "Vector3", "Bad position")
 
 	color = color or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
@@ -230,7 +321,7 @@ function Draw.point(vector3, color, parent, diameter)
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.CanCollide = false
 	part.CastShadow = false
-	part.CFrame = CFrame.new(vector3)
+	part.CFrame = CFrame.new(position)
 	part.Color = color
 	part.Name = "DebugPoint"
 	part.Shape = Enum.PartType.Ball
@@ -252,18 +343,41 @@ function Draw.point(vector3, color, parent, diameter)
 	return part
 end
 
-function Draw.labelledPoint(vector3, label, color, parent)
-	if typeof(vector3) == "CFrame" then
-		vector3 = vector3.p
+--[=[
+	Renders a point with a label in 3D space.
+
+	```lua
+	Draw.labelledPoint(Vector3.new(0, 10, 0), "AI target")
+	```
+
+	@param position Vector3 | CFrame -- Position to render
+	@param label string -- Label to render on the point
+	@param color Color3? -- Optional color
+	@param parent Instance? -- Optional parent
+	@return BasePart
+]=]
+function Draw.labelledPoint(position, label, color, parent)
+	if typeof(position) == "CFrame" then
+		position = position.p
 	end
 
-	local part = Draw.point(vector3, color, parent)
+	local part = Draw.point(position, color, parent)
 
 	Draw.text(part, label, color)
 
 	return part
 end
 
+--[=[
+	Renders a CFrame in 3D space. Includes each axis.
+
+	```lua
+	Draw.cframe(CFrame.Angles(0, math.pi/8, 0))
+	```
+
+	@param cframe CFrame
+	@return Model
+]=]
 function Draw.cframe(cframe)
 	local model = Instance.new("Model")
 	model.Name = "DebugCFrame"
@@ -294,6 +408,17 @@ function Draw.cframe(cframe)
 	return model
 end
 
+--[=[
+	Renders a box in 3D space. Great for debugging bounding boxes.
+
+	```lua
+	Draw.box(Vector3.new(0, 5, 0), Vector3.new(10, 10, 10))
+	```
+	@param cframe CFrame | Vector3 -- CFrame of the box
+	@param size Vector3 -- Size of the box
+	@param color Color3 -- Optional Color3
+	@return BasePart
+]=]
 function Draw.box(cframe, size, color)
 	assert(typeof(size) == "Vector3", "Bad size")
 
@@ -328,10 +453,33 @@ function Draw.box(cframe, size, color)
 	return part
 end
 
+--[=[
+	Renders a region3 in 3D space.
+
+	```lua
+	Draw.region3(Region3.new(Vector3.new(0, 0, 0), Vector3.new(10, 10, 10)))
+	```
+
+	@param region3 Region3 -- Region3 to render
+	@param color Color3? -- Optional color3
+	@return BasePart
+]=]
 function Draw.region3(region3, color)
 	return Draw.box(region3.CFrame, region3.Size, color)
 end
 
+--[=[
+	Renders a terrain cell in 3D space. Snaps the position
+	to the nearest position.
+
+	```lua
+	Draw.terrainCell(Vector3.new(0, 0, 0))
+	```
+
+	@param position Vector3 -- World space position
+	@param color Color3? -- Optional color to render
+	@return BasePart
+]=]
 function Draw.terrainCell(position, color)
 	local size = Vector3.new(4, 4, 4)
 
@@ -344,16 +492,38 @@ function Draw.terrainCell(position, color)
 	return part
 end
 
+--[=[
+	Draws a vector in 3D space.
+
+	```lua
+	Draw.vector(Vector3.new(0, 0, 0), Vector3.new(0, 1, 0))
+	```
+
+	@param position Vector3 -- Position of the vector
+	@param direction Vector3 -- Direction of the vector. Determines length.
+	@param color Color3? -- Optional color
+	@param parent Instance? -- Optional instance
+	@param meshDiameter number? -- Optional diameter
+	@return BasePart
+]=]
 function Draw.vector(position, direction, color, parent, meshDiameter)
 	return Draw.ray(Ray.new(position, direction), color, parent, meshDiameter)
 end
 
+--[=[
+	Retrieves the default parent for the current execution context.
+	@return Instance
+]=]
 function Draw.getDefaultParent()
 	if not RunService:IsRunning() then
 		return Workspace.CurrentCamera
 	end
 
-	return RunService:IsServer() and Workspace or Workspace.CurrentCamera
+	if RunService:IsServer() then
+		return Workspace
+	else
+		return Workspace.CurrentCamera
+	end
 end
 
 return Draw

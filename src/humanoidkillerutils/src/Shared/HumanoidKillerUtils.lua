@@ -1,5 +1,11 @@
---- Tags and retrieves killer
--- @module HumanoidKillerUtils
+--[=[
+	Tags and retrieves killer. This is the old API surface to register KOs
+	in Roblox, and many legacy systems still use the creator tag. The contract
+	is that an object value pointing to the killer will be put in the humanoid, and
+	if it exists when the humanoid dies, then the killer is registered.
+
+	@class HumanoidKillerUtils
+]=]
 
 local HumanoidKillerUtils = {}
 
@@ -9,6 +15,10 @@ local Debris = game:GetService("Debris")
 local TAG_NAME = "creator"
 local TAG_LIFETIME = 1
 
+--[=[
+	Removes all killer tags
+	@param humanoid Humanoid
+]=]
 function HumanoidKillerUtils.untagKiller(humanoid)
 	for _, item in pairs(humanoid:GetChildren()) do
 		if item:IsA("ObjectValue") and item.Name == TAG_NAME then
@@ -17,6 +27,16 @@ function HumanoidKillerUtils.untagKiller(humanoid)
 	end
 end
 
+--[=[
+	Tags the killer with a source.
+
+	:::tip
+	Be sure to tag the killer before applying damage.
+	:::
+
+	@param humanoid Humanoid
+	@param attacker Player
+]=]
 function HumanoidKillerUtils.tagKiller(humanoid, attacker)
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 	assert(typeof(attacker) == "Instance", "Bad attacker")
@@ -33,7 +53,12 @@ function HumanoidKillerUtils.tagKiller(humanoid, attacker)
 	return creator
 end
 
--- killer must be a player
+--[=[
+	Killer must be a player
+
+	@param humanoid Humanoid
+	@return Player?
+]=]
 function HumanoidKillerUtils.getKillerOfHumanoid(humanoid)
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 

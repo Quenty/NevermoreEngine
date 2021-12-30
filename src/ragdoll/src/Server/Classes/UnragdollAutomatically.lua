@@ -1,6 +1,6 @@
----
--- @classmod UnragdollAutomatically
--- @author Quenty
+--[=[
+	@class UnragdollAutomatically
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

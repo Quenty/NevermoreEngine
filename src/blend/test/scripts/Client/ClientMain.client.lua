@@ -1,6 +1,4 @@
---- Main injection point
--- @script ClientMain
--- @author Quenty
+-- Main injection point
 
 local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
 

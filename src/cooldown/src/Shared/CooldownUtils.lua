@@ -1,6 +1,7 @@
---- Helper methods for cooldown
--- @module CooldownUtils
--- @author Quenty
+--[=[
+	Helper methods for cooldown
+	@class CooldownUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

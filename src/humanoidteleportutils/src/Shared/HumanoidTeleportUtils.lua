@@ -1,5 +1,7 @@
---- Utility for teleporting humanoids
--- @module HumanoidTeleportUtils
+--[=[
+	Utility for teleporting humanoids
+	@class HumanoidTeleportUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,7 +12,15 @@ local HumanoidTeleportUtils = {}
 local REQUIRED_SPACE = 7
 local SEARCH_UP_TO = 40
 
--- @param[opt=nil] raycaster Optional raycaster
+--[=[
+	Finds a safe position to teleport a humanoid. This searches some amount
+	around the position to try to ensure a free space for the humanoid.
+
+	@param position Position
+	@param raycaster Raycaster? -- Optional raycaster
+	@return boolean -- True if safe
+	@return Vector3? -- Position if we can hit it
+]=]
 function HumanoidTeleportUtils.identifySafePosition(position, raycaster)
 	assert(typeof(position) == "Vector3", "Bad position")
 
@@ -42,6 +52,20 @@ function HumanoidTeleportUtils.identifySafePosition(position, raycaster)
 	return false, position + Vector3.new(0, SEARCH_UP_TO, 0)
 end
 
+--[=[
+	Teleports a humanoid to a given location.
+
+	:::info
+	You should call this on the machine that has network ownership. For characters
+	owned by a player, this is generally the player who's character it is.
+
+	For NPCs, this should generally be the server.
+	:::
+
+	@param humanoid Humanoid
+	@param rootPart BasePart
+	@param position Vector3
+]=]
 function HumanoidTeleportUtils.teleportRootPart(humanoid, rootPart, position)
 	-- Calculate additional offset for teleportation
 	local offset = rootPart.Size.Y/2 + humanoid.HipHeight

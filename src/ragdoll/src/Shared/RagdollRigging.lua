@@ -1,5 +1,6 @@
----
--- @module RagdollRigging
+--[=[
+	@class RagdollRigging
+]=]
 
 local RunService = game:GetService("RunService")
 

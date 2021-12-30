@@ -1,12 +1,17 @@
---- Pseudo localizes text. Useful for verifying translation without having
---  actual translations available
--- @module PseudoLocalize
+--[=[
+    Pseudo localizes text. Useful for verifying translation without having
+    actual translations available
+
+    @class PseudoLocalize
+]=]
 
 local PseudoLocalize = {}
 
---- Translates a line into pseudo text while maintaining params
--- @tparam {string} line The line to translate
--- @return The translated line
+--[=[
+    Translates a line into pseudo text while maintaining params
+    @param line string -- The line to translate
+    @return string -- The translated line
+]=]
 function PseudoLocalize.pseudoLocalize(line)
 	local charMap = PseudoLocalize.PSEUDO_CHARACTER_MAP
 	local out = ""
@@ -30,9 +35,14 @@ function PseudoLocalize.pseudoLocalize(line)
 	return out
 end
 
---- Parses a localization table and adds a pseudo localized locale to the table
--- @tparam[opt="qlp-pls"] {string} preferredLocaleId Preferred locale to use
--- @tparam[opt="en-us"] {string} preferredFromLocale Preferred from locale
+--[=[
+    Parses a localization table and adds a pseudo localized locale to the table.
+
+    @param localizationTable LocalizationTable -- LocalizationTable to add to.
+    @param preferredLocaleId string? -- Preferred locale to use. Defaults to "qlp-pls"
+    @param preferredFromLocale string? -- Preferred from locale. Defaults to "en-us"
+    @return string -- The translated line
+]=]
 function PseudoLocalize.addToLocalizationTable(localizationTable, preferredLocaleId, preferredFromLocale)
 	local localeId = preferredLocaleId or "qlp-pls"
 	local fromLocale = preferredFromLocale or "en"
@@ -53,7 +63,12 @@ function PseudoLocalize.addToLocalizationTable(localizationTable, preferredLocal
 	localizationTable:SetEntries(entries)
 end
 
---- Mapping of English characters to pseudo localized characters
+--[=[
+    Mapping of English characters to pseudo localized characters.
+
+    @prop PSEUDO_CHARACTER_MAP { [string]: string }
+    @within PseudoLocalize
+]=]
 PseudoLocalize.PSEUDO_CHARACTER_MAP = {
     ["a"] = "á";
     ["b"] = "β";

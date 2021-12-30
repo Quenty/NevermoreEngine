@@ -1,5 +1,7 @@
---- Utility functions for surfaces
--- @module SurfaceUtils
+--[=[
+	Utility functions for surfaces
+	@class SurfaceUtils
+]=]
 
 local SurfaceUtils = {}
 
@@ -17,6 +19,17 @@ local function getTranstionBetween(v1, v2, pitchAxis)
 	return CFrame.fromAxisAngle(v1:Cross(v2), math.acos(dot))
 end
 
+--[=[
+	Finds a CFrame on the surface.
+
+	:::warning
+	This only works with Part objects that are rectangles.
+	:::
+
+	@param part Part
+	@param lnormal Vector3
+	@return CFrame
+]=]
 function SurfaceUtils.getSurfaceCFrame(part, lnormal)
 	local transition = getTranstionBetween(UP, lnormal, BACK)
 	return part.CFrame * transition * EXTRASPIN

@@ -1,6 +1,14 @@
----
--- @module Rx
--- @author Quenty
+--[=[
+	Observable rx library for Roblox by Quenty. This provides a variety of
+	composition classes to be used, and is the primary entry point for an
+	observable.
+
+	Most of these functions return either a function that takes in an
+	observable (curried for piping) or an [Observable](/api/Observable)
+	directly.
+
+	@class Rx
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -13,6 +21,19 @@ local ThrottledFunction = require("ThrottledFunction")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
+--[=[
+	An empty observable that completes immediately
+	@prop EMPTY Observable<()>
+	@readonly
+	@within Rx
+]=]
+
+--[=[
+	An observable that never completes.
+	@prop NEVER Observable<()>
+	@readonly
+	@within Rx
+]=]
 local Rx = {
 	EMPTY = Observable.new(function(sub)
 		sub:Complete()
@@ -22,7 +43,13 @@ local Rx = {
 	end);
 }
 
--- https://rxjs-dev.firebaseapp.com/api/index/function/pipe
+--[=[
+	Pipes the tranformers through each other
+	https://rxjs-dev.firebaseapp.com/api/index/function/pipe
+
+	@param transformers { Observable<any> }
+	@return (source: Observable<T>) -> Observable<U>
+]=]
 function Rx.pipe(transformers)
 	assert(type(transformers) == "table", "Bad transformers")
 	for index, transformer in pairs(transformers) do
@@ -49,7 +76,18 @@ function Rx.pipe(transformers)
 	end
 end
 
--- http://reactivex.io/documentation/operators/just.html
+--[=[
+	http://reactivex.io/documentation/operators/just.html
+
+	```lua
+	Rx.of(1, 2, 3):Subscribe(print, function()
+		print("Complete")
+	end)) --> 1, 2, 3, "Complete"
+	```
+
+	@param ... any -- Arguments to emit
+	@return Observable
+]=]
 function Rx.of(...)
 	local args = table.pack(...)
 
@@ -62,7 +100,13 @@ function Rx.of(...)
 	end)
 end
 
--- http://reactivex.io/documentation/operators/from.html
+--[=[
+	Converts an item
+	http://reactivex.io/documentation/operators/from.html
+
+	@param item Promise | table
+	@return Observable
+]=]
 function Rx.from(item)
 	if Promise.isPromise(item) then
 		return Rx.fromPromise(item)
@@ -74,7 +118,12 @@ function Rx.from(item)
 	end
 end
 
--- https://rxjs-dev.firebaseapp.com/api/operators/merge
+--[=[
+	https://rxjs-dev.firebaseapp.com/api/operators/merge
+
+	@param observables { Observable }
+	@return Observable
+]=]
 function Rx.merge(observables)
 	assert(type(observables) == "table", "Bad observables")
 
@@ -93,7 +142,13 @@ function Rx.merge(observables)
 	end)
 end
 
--- https://rxjs-dev.firebaseapp.com/api/index/function/fromEvent
+--[=[
+	Converts a Signal into an observable.
+	https://rxjs-dev.firebaseapp.com/api/index/function/fromEvent
+
+	@param event Signal<T>
+	@return Observable<T>
+]=]
 function Rx.fromSignal(event)
 	return Observable.new(function(sub)
 		-- This stream never completes or fails!
@@ -103,7 +158,13 @@ function Rx.fromSignal(event)
 	end)
 end
 
--- https://rxjs-dev.firebaseapp.com/api/index/function/from
+--[=[
+	Converts a Promise into an observable.
+	https://rxjs-dev.firebaseapp.com/api/index/function/from
+
+	@param promise Promise<T>
+	@return Observable<T>
+]=]
 function Rx.fromPromise(promise)
 	assert(Promise.isPromise(promise))
 
@@ -139,7 +200,17 @@ function Rx.fromPromise(promise)
 	end)
 end
 
--- https://rxjs-dev.firebaseapp.com/api/operators/tap
+--[=[
+	Taps into the observable and executes the onFire/onError/onComplete
+	commands.
+
+	https://rxjs-dev.firebaseapp.com/api/operators/tap
+
+	@param onFire function?
+	@param onError function?
+	@param onComplete function?
+	@return (source: Observable<T>) -> Observable<T>
+]=]
 function Rx.tap(onFire, onError, onComplete)
 	assert(type(onFire) == "function" or onFire == nil, "Bad onFire")
 	assert(type(onError) == "function" or onError == nil, "Bad onError")
@@ -170,7 +241,14 @@ function Rx.tap(onFire, onError, onComplete)
 	end
 end
 
--- http://reactivex.io/documentation/operators/start.html
+--[=[
+	Starts the observable with the given value from the callback
+
+	http://reactivex.io/documentation/operators/start.html
+
+	@param callback function
+	@return (source: Observable) -> Observable
+]=]
 function Rx.start(callback)
 	return function(source)
 		return Observable.new(function(sub)
@@ -181,7 +259,12 @@ function Rx.start(callback)
 	end
 end
 
--- Like start, but also from (list!)
+--[=[
+	Like start, but also from (list!)
+
+	@param callback () -> { T }
+	@return (source: Observable) -> Observable
+]=]
 function Rx.startFrom(callback)
 	assert(type(callback) == "function", "Bad callback")
 	return function(source)
@@ -195,7 +278,13 @@ function Rx.startFrom(callback)
 	end
 end
 
--- https://rxjs-dev.firebaseapp.com/api/operators/startWith
+--[=[
+	Starts with the given values
+	https://rxjs-dev.firebaseapp.com/api/operators/startWith
+
+	@param values { T }
+	@return (source: Observable) -> Observable
+]=]
 function Rx.startWith(values)
 	assert(type(values) == "table", "Bad values")
 
@@ -210,6 +299,18 @@ function Rx.startWith(values)
 	end
 end
 
+--[=[
+	Defaults the observable to a value if it isn't fired immediately
+
+	```lua
+	Rx.NEVER:Pipe({
+		Rx.defaultsTo("Hello")
+	}):Subscribe(print) --> Hello
+	```
+
+	@param value any
+	@return (source: Observable) -> Observable
+]=]
 function Rx.defaultsTo(value)
 	return function(source)
 		return Observable.new(function(sub)
@@ -233,9 +334,31 @@ function Rx.defaultsTo(value)
 	end
 end
 
+--[=[
+	Defaults the observable value to nil
+
+	```lua
+	Rx.NEVER:Pipe({
+		Rx.defaultsToNil
+	}):Subscribe(print) --> nil
+	```
+
+	Great for defaulting Roblox attributes and objects
+
+	@function defaultsToNil
+	@param source Observable
+	@return Observable
+	@within Rx
+]=]
 Rx.defaultsToNil = Rx.defaultsTo(nil)
 
--- https://www.learnrxjs.io/learn-rxjs/operators/combination/endwith
+--[=[
+	Ends the observable with these values before cancellation
+	https://www.learnrxjs.io/learn-rxjs/operators/combination/endwith
+
+	@param values { T }
+	@return (source: Observable) -> Observable
+]=]
 function Rx.endWith(values)
 	return function(source)
 		return Observable.new(function(sub)
@@ -263,7 +386,21 @@ function Rx.endWith(values)
 	end
 end
 
--- http://reactivex.io/documentation/operators/filter.html
+--[=[
+	http://reactivex.io/documentation/operators/filter.html
+
+	Filters out values
+
+	```lua
+	Rx.of(1, 2, 3, 4, 5):Pipe({
+		Rx.where(function(value)
+			return value % 2 == 0;
+		end)
+	}):Subscribe(print) --> 2, 4
+	```
+	@param predicate (value: T) -> boolean
+	@return (source: Observable<T>) -> Observable<T>
+]=]
 function Rx.where(predicate)
 	assert(type(predicate) == "function", "Bad predicate callback")
 
@@ -281,7 +418,18 @@ function Rx.where(predicate)
 	end
 end
 
--- http://reactivex.io/documentation/operators/distinct.html
+--[=[
+	Only takes distinct values from the observable stream.
+
+	http://reactivex.io/documentation/operators/distinct.html
+
+	```lua
+	Rx.of(1, 1, 2, 3, 3, 1):Pipe({
+		Rx.distinct();
+	}):Subscribe(print) --> 1, 2, 3, 1
+	```
+	@return (source: Observable<T>) -> Observable<T>
+]=]
 function Rx.distinct()
 	return function(source)
 		return Observable.new(function(sub)
@@ -303,7 +451,11 @@ function Rx.distinct()
 	end
 end
 
--- https://rxjs.dev/api/operators/mapTo
+--[=[
+	https://rxjs.dev/api/operators/mapTo
+	@param ... any -- The value to map each source value to.
+	@return (source: Observable<T>) -> Observable<T>
+]=]
 function Rx.mapTo(...)
 	local args = table.pack(...)
 	return function(source)
@@ -315,7 +467,22 @@ function Rx.mapTo(...)
 	end
 end
 
--- http://reactivex.io/documentation/operators/map.html
+--[=[
+	http://reactivex.io/documentation/operators/map.html
+
+	Maps one value to another
+
+	```lua
+	Rx.of(1, 2, 3, 4, 5):Pipe({
+		Rx.map(function(x)
+			return x + 1
+		end)
+	}):Subscribe(print) -> 2, 3, 4, 5, 6
+	```
+
+	@param project (T) -> U
+	@return (source: Observable<T>) -> Observable<U>
+]=]
 function Rx.map(project)
 	assert(type(project) == "function", "Bad project callback")
 
@@ -328,7 +495,23 @@ function Rx.map(project)
 	end
 end
 
--- Merges higher order observables together
+--[=[
+	Merges higher order observables together.
+
+	Basically, if you have an observable that is emitting an observable,
+	this subscribes to each emitted observable and combines them into a
+	single observable.
+
+	```lua
+	Rx.of(Rx.of(1, 2, 3), Rx.of(4))
+		:Pipe({
+			Rx.mergeAll();
+		})
+		:Subscribe(print) -> 1, 2, 3, 4
+	```
+
+	@return (source: Observable<Observable<T>>) -> Observable<T>
+]=]
 function Rx.mergeAll()
 	return function(source)
 		return Observable.new(function(sub)
@@ -387,8 +570,17 @@ function Rx.mergeAll()
 	end
 end
 
--- Merges higher order observables together
--- https://rxjs.dev/api/operators/switchAll
+--[=[
+	Merges higher order observables together
+
+	https://rxjs.dev/api/operators/switchAll
+
+	Works like mergeAll, where you subscribe to an observable which is
+	emitting observables. However, when another observable is emitted it
+	disconnects from the other observable and subscribes to that one.
+
+	@return (source: Observable<Observable<T>>) -> Observable<T>
+]=]
 function Rx.switchAll()
 	return function(source)
 		return Observable.new(function(sub)
@@ -444,7 +636,15 @@ function Rx.switchAll()
 	end
 end
 
--- Sort of equivalent of promise.then()
+--[=[
+	Sort of equivalent of promise.then()
+
+	This takes a stream of observables
+
+	@param project (value: T) -> Observable<U>
+	@param resultSelector ((value: T) -> U)?
+	@return (source: Observable<T>) -> Observable<U>
+]=]
 function Rx.flatMap(project, resultSelector)
 	assert(type(project) == "function", "Bad project")
 
@@ -548,6 +748,20 @@ function Rx.takeUntil(notifier)
 	end
 end
 
+--[=[
+	Returns an observable that takes in a tuple, and emits that tuple, then
+	completes.
+
+	```lua
+	Rx.packed("a", "b")
+		:Subscribe(function(first, second)
+			print(first, second) --> a, b
+		end)
+	```
+
+	@param ... any
+	@return Observable
+]=]
 function Rx.packed(...)
 	local args = table.pack(...)
 
@@ -557,6 +771,11 @@ function Rx.packed(...)
 	end)
 end
 
+--[=[
+	Unpacks the observables value if a table is received
+	@param observable Observable<{T}>
+	@return Observable<T>
+]=]
 function Rx.unpacked(observable)
 	assert(Observable.isObservable(observable))
 
@@ -572,9 +791,24 @@ function Rx.unpacked(observable)
 	end)
 end
 
--- http://reactivex.io/documentation/operators/do.html
--- https://rxjs-dev.firebaseapp.com/api/operators/finalize
--- https://github.com/ReactiveX/rxjs/blob/master/src/internal/operators/finalize.ts
+--[=[
+	Acts as a finalizer callback once the subscription is unsubscribed.
+
+	```lua
+		Rx.of("a", "b"):Pipe({
+			Rx.finalize(function()
+				print("Subscription done!")
+			end);
+		})
+	```
+
+	http://reactivex.io/documentation/operators/do.html
+	https://rxjs-dev.firebaseapp.com/api/operators/finalize
+	https://github.com/ReactiveX/rxjs/blob/master/src/internal/operators/finalize.ts
+
+	@param finalizerCallback () -> ()
+	@return (source: Observable<T>) -> Observable<T>
+]=]
 function Rx.finalize(finalizerCallback)
 	assert(type(finalizerCallback) == "function", "Bad finalizerCallback")
 
@@ -590,7 +824,16 @@ function Rx.finalize(finalizerCallback)
 	end
 end
 
--- https://rxjs.dev/api/operators/combineLatestAll
+--[=[
+	Given an observable that emits observables, emit an
+	observable that once the initial observable completes,
+	the latest values of each emitted observable will be
+	combined into an array that will be emitted.
+
+	https://rxjs.dev/api/operators/combineLatestAll
+
+	@return (source: Observable<Observable<T>>) -> Observable<{ T }>
+]=]
 function Rx.combineLatestAll()
 	return function(source)
 		return Observable.new(function(sub)
@@ -625,10 +868,29 @@ function Rx.combineLatestAll()
 	end
 end
 
--- This is for backwards compatability, and is deprecated
+--[=[
+	The same as combineLatestAll.
+
+	This is for backwards compatability, and is deprecated.
+
+	@function combineAll
+	@deprecated 1.0.0 -- Use Rx.combineLatestAll
+	@within Rx
+	@return (source: Observable<Observable<T>>) -> Observable<{ T }>
+]=]
 Rx.combineAll = Rx.combineLatestAll
 
--- NOTE: Untested
+--[=[
+	Catches an error, and allows another observable to be subscribed
+	in terms of handling the error.
+
+	:::warning
+	This method is not yet tested
+	:::
+
+	@param callback (error: TError) -> Observable<TErrorResult>
+	@return (source: Observable<T>) -> Observable<T | TErrorResult>
+]=]
 function Rx.catchError(callback)
 	assert(type(callback) == "function", "Bad callback")
 
@@ -669,6 +931,32 @@ function Rx.catchError(callback)
 	end
 end
 
+--[=[
+	One of the most useful functions this combines the latest values of
+	observables at each chance!
+
+	```lua
+	Rx.combineLatest({
+		child = Rx.fromSignal(Workspace.ChildAdded);
+		lastChildRemoved = Rx.fromSignal(Workspace.ChildRemoved);
+		value = 5;
+
+	}):Subscribe(function(data)
+		print(data.child) --> last child
+		print(data.lastChildRemoved) --> other value
+		print(data.value) --> 5
+	end)
+
+	```
+
+	:::tip
+	Note that the resulting observable will not emit until all input
+	observables are emitted.
+	:::
+
+	@param observables { [TKey]: Observable<TEmitted> | TEmitted }
+	@return Observable<{ [TKey]: TEmitted }>
+]=]
 function Rx.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
@@ -727,7 +1015,21 @@ function Rx.combineLatest(observables)
 	end)
 end
 
--- http://reactivex.io/documentation/operators/using.html
+--[=[
+	http://reactivex.io/documentation/operators/using.html
+
+	Each time a subscription occurs, the resource is constructed
+	and exists for the lifetime of the observation. The observableFactory
+	uses the resource for subscription.
+
+	:::note
+	Note from Quenty: I haven't found this that useful.
+	:::
+
+	@param resourceFactory () -> MaidTask
+	@param observableFactory (MaidTask) -> Observable<T>
+	@return Observable<T>
+]=]
 function Rx.using(resourceFactory, observableFactory)
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -744,7 +1046,13 @@ function Rx.using(resourceFactory, observableFactory)
 	end)
 end
 
--- https://rxjs.dev/api/operators/take
+--[=[
+	Takes n entries and then completes the observation.
+
+	https://rxjs.dev/api/operators/take
+	@param number number
+	@return (source: Observable<T>) -> Observable<T>
+]=]
 function Rx.take(number)
 	assert(type(number) == "number", "Bad number")
 	assert(number >= 0, "Bad number")
@@ -779,8 +1087,16 @@ function Rx.take(number)
 	end
 end
 
--- https://rxjs-dev.firebaseapp.com/api/index/function/defer
--- https://netbasal.com/getting-to-know-the-defer-observable-in-rxjs-a16f092d8c09
+--[=[
+	Defers the subscription and creation of the observable until the
+	actual subscription of the observable.
+
+	https://rxjs-dev.firebaseapp.com/api/index/function/defer
+	https://netbasal.com/getting-to-know-the-defer-observable-in-rxjs-a16f092d8c09
+
+	@param observableFactory () -> Observable<T>
+	@return Observable<T>
+]=]
 function Rx.defer(observableFactory)
 	return Observable.new(function(sub)
 		local observable
@@ -802,8 +1118,15 @@ function Rx.defer(observableFactory)
 	end)
 end
 
--- https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom
--- https://medium.com/js-in-action/rxjs-nosy-combinelatest-vs-selfish-withlatestfrom-a957e1af42bf
+--[=[
+	Honestly, I have not used this one much.
+
+	https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom
+	https://medium.com/js-in-action/rxjs-nosy-combinelatest-vs-selfish-withlatestfrom-a957e1af42bf
+
+	@param inputObservables {Observable<TInput>}
+	@return (source: Observable<T>) -> Observable<{T, ...TInput}>
+]=]
 function Rx.withLatestFrom(inputObservables)
 	assert(inputObservables, "Bad inputObservables")
 
@@ -840,7 +1163,13 @@ function Rx.withLatestFrom(inputObservables)
 	end
 end
 
--- https://rxjs-dev.firebaseapp.com/api/operators/scan
+--[=[
+	https://rxjs-dev.firebaseapp.com/api/operators/scan
+
+	@param accumulator (current: TSeed, value: TInput) -> TResult
+	@param seed TSeed
+	@return (source: Observable<TInput>) -> Observable<TResult>
+]=]
 function Rx.scan(accumulator, seed)
 	assert(type(accumulator) == "function", "Bad accumulator")
 
@@ -856,9 +1185,19 @@ function Rx.scan(accumulator, seed)
 	end
 end
 
--- https://rxjs-dev.firebaseapp.com/api/operators/debounceTime
--- @param throttleConfig { leading = true; trailing = true; }
--- Note that on complete, the last item is not included, for now, unlike the existing version in rxjs.
+--[=[
+	Throttles emission of observables.
+
+	https://rxjs-dev.firebaseapp.com/api/operators/debounceTime
+
+	:::note
+	Note that on complete, the last item is not included, for now, unlike the existing version in rxjs.
+	:::
+
+	@param duration number
+	@param throttleConfig { leading = true; trailing = true; }
+	@return (source: Observable) -> Observable
+]=]
 function Rx.throttleTime(duration, throttleConfig)
 	assert(type(duration) == "number", "Bad duration")
 	assert(type(throttleConfig) == "table" or throttleConfig == nil, "Bad throttleConfig")

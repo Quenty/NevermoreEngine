@@ -1,5 +1,9 @@
---- Legacy code written by AxisAngles to simulate particles with Guis
--- @module ParticleEngine
+--[=[
+	Legacy code written by AxisAngles to simulate particles with Guis
+
+	@client
+	@class ParticleEngineClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -56,7 +60,7 @@ function ParticleEngineClient:Init(screen)
 	return self
 end
 
---- Removes a particle
+-- Removes a particle
 function ParticleEngineClient:Remove(p)
 	if self._particles[p] then
 		self._particles[p] = nil
@@ -151,7 +155,7 @@ function ParticleEngineClient:_updatePosVel(p, dt, t)
 	p.Velocity = p.Velocity + (p.Gravity + wind)*dt
 end
 
---- Handles both priority and regular particles
+-- Handles both priority and regular particles
 -- @return boolean alive, true if still fine
 function ParticleEngineClient:_updateParticle(particle, t, dt)
 	if particle.LifeTime - t <= 0 then

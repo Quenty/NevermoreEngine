@@ -1,5 +1,7 @@
---- Add two cameras together
--- @classmod SummedCamera
+--[=[
+	Add two cameras together
+	@class SummedCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -10,10 +12,13 @@ local CameraFrame = require("CameraFrame")
 local SummedCamera = {}
 SummedCamera.ClassName = "SummedCamera"
 
---- Construct a new summed camera
--- @constructor
--- @param cameraA A CameraState or another CameraEffect to be used
--- @param cameraB A CameraState or another CameraEffect to be used
+--[=[
+	Construct a new summed camera
+
+	@param cameraA CameraEffect -- A CameraState or another CameraEffect to be used
+	@param cameraB CameraEffect -- A CameraState or another CameraEffect to be used
+	@return SummedCamera
+]=]
 function SummedCamera.new(cameraA, cameraB)
 	local self = setmetatable({}, SummedCamera)
 
@@ -24,10 +29,13 @@ function SummedCamera.new(cameraA, cameraB)
 	return self
 end
 
----
--- @param mode Mode to set
--- If "World", then it just adds positions.
--- If "Relative", then it moves position relative to cameraA's CFrame.
+--[=[
+	Sets the summation mode. If "World", then it just adds positions.
+	If "Relative", then it moves position relative to cameraA's CFrame.
+
+	@param mode "World" | "Relative" -- Mode to set
+	@return SummedCamera
+]=]
 function SummedCamera:SetMode(mode)
 	assert(mode == "World" or mode == "Relative", "Bad mode")
 	self._mode = mode

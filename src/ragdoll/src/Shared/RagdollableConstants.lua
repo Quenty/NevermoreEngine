@@ -1,5 +1,6 @@
----
--- @module RagdollableConstants
+--[=[
+	@class RagdollableConstants
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

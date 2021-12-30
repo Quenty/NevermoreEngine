@@ -1,5 +1,7 @@
---- Team utility methods
--- @module TeamUtils
+--[=[
+	Team utility methods
+	@class TeamUtils
+]=]
 
 local TeamUtils = {}
 

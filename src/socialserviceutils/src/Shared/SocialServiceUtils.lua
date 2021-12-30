@@ -1,6 +1,7 @@
---- Utility functions wrapping SocialService with promises
--- @module SocialServiceUtils
--- @author Quenty
+--[=[
+	Utility functions wrapping SocialService with promises
+	@class SocialServiceUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -11,6 +12,11 @@ local Maid = require("Maid")
 
 local SocialServiceUtils = {}
 
+--[=[
+	Wraps SocialService:CanSendGameInviteAsync(player)
+	@param player Player
+	@return Promise<boolean>
+]=]
 function SocialServiceUtils.promiseCanSendGameInvite(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
@@ -27,6 +33,12 @@ function SocialServiceUtils.promiseCanSendGameInvite(player)
 	end)
 end
 
+--[=[
+	Prompts the user to send an in-game invite and resolves once the prompt is closed.
+
+	@param player Player
+	@return Promise
+]=]
 function SocialServiceUtils.promisePromptGameInvite(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 

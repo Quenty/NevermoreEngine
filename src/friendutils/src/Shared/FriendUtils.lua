@@ -1,5 +1,7 @@
---- Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.
--- @module FriendUtils
+--[=[
+	Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.
+	@class FriendUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,11 +11,36 @@ local Promise = require("Promise")
 
 local FriendUtils = {}
 
+--[=[
+	@interface FriendData
+	.Id number -- The friend's UserId
+	.Username string -- The friend's username
+	.DisplayName string -- The display name of the friend.
+	.IsOnline bool -- If the friend is currently online
+	@within FriendUtils
+]=]
+
+--[=[
+	Returns the current studio users friends
+
+	```lua
+	FriendUtils.promiseAllStudioFriends()
+		:Then(function(studioFriends)
+			print(studioFriends)
+		end)
+	```
+	@return Promise<{ FriendData }>
+]=]
 function FriendUtils.promiseAllStudioFriends()
 	return FriendUtils.promiseCurrentStudioUserId()
 		:Then(FriendUtils.promiseAllFriends)
 end
 
+--[=[
+	Outputs a list of only online friends
+	@param friends { FriendData }
+	@return { FriendData }
+]=]
 function FriendUtils.onlineFriends(friends)
 	local onlineFriends = {}
 	for _, friend in pairs(friends) do
@@ -24,6 +51,11 @@ function FriendUtils.onlineFriends(friends)
 	return onlineFriends
 end
 
+--[=[
+	Outputs a list of only friends not in game
+	@param friends { FriendData }
+	@return { FriendData }
+]=]
 function FriendUtils.friendsNotInGame(friends)
 	local userIdsInGame = {}
 	for _, player in pairs(Players:GetPlayers()) do
@@ -39,7 +71,12 @@ function FriendUtils.friendsNotInGame(friends)
 	return onlineFriends
 end
 
--- @param[opt=nil] limitMaxFriends
+--[=[
+	Retrieves all friends.
+	@param userId number
+	@param limitMaxFriends number? -- Optional max friends
+	@return Promise<{ FriendData }>
+]=]
 function FriendUtils.promiseAllFriends(userId, limitMaxFriends)
 	assert(userId, "Bad userId")
 
@@ -62,6 +99,11 @@ function FriendUtils.promiseAllFriends(userId, limitMaxFriends)
 		end)
 end
 
+--[=[
+	Wraps [Players.GetFriendsAsync]
+	@param userId number
+	@return Promise<FriendPages>
+]=]
 function FriendUtils.promiseFriendPages(userId)
 	assert(type(userId) == "number", "Bad userId")
 
@@ -80,6 +122,11 @@ function FriendUtils.promiseFriendPages(userId)
 	end)
 end
 
+--[=[
+	Iterates over the current FriendPage and returns the next page
+	@param pages FriendPages
+	@return () => FrienData? -- Iterator
+]=]
 function FriendUtils.iterateFriendsYielding(pages)
 	assert(pages, "Bad pages")
 
@@ -100,6 +147,16 @@ function FriendUtils.iterateFriendsYielding(pages)
 	end)
 end
 
+--[=[
+	Gets the current studio user's user id.
+
+	:::tip
+	Consider using [FriendUtils.promiseCurrentStudioUserId] if you want this code
+	to work while the game is running or in team create. This is specific to [StudioService].
+	:::
+
+	@return Promise<number>
+]=]
 function FriendUtils.promiseStudioServiceUserId()
 	return Promise.new(function(resolve, reject)
 		local userId
@@ -119,6 +176,10 @@ function FriendUtils.promiseStudioServiceUserId()
 	end)
 end
 
+--[=[
+	Gets the current studio user's user id.
+	@return Promise<number>
+]=]
 function FriendUtils.promiseCurrentStudioUserId()
 	return FriendUtils.promiseStudioServiceUserId()
 		:Catch(function(...)

@@ -1,5 +1,7 @@
---- Sets a mechanisms cframe
--- @module setMechanismCFrame
+--[=[
+	Sets a mechanisms cframe
+	@class setMechanismCFrame
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,6 +1,7 @@
---- Base object for a cooldown. Provides calculation utilties.
--- @classmod CooldownBase
--- @author Quenty
+--[=[
+	Base object for a cooldown. Provides calculation utilties.
+	@class CooldownBase
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

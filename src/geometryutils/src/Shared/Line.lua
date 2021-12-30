@@ -1,12 +1,17 @@
----
--- @module Line
+--[=[
+	@class Line
+]=]
 
 local Line = {}
 
--- http://wiki.roblox.com/index.php?title=User:EgoMoose/Articles/3D_line_intersection
--- @param a Point
--- @param r Offset from a
-function Line.Intersect(a, r, b, s)
+--[=[
+	http://wiki.roblox.com/index.php?title=User:EgoMoose/Articles/3D_line_intersection
+	@param a Vector3
+	@param r Vector3 -- Offset from a
+	@param b Vector3
+	@param s Vector3
+]=]
+function Line.intersection(a, r, b, s)
 	local q = a - b;
 
 	local dotqr = q:Dot(r); -- same as: r:Dot(q)

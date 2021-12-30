@@ -1,6 +1,7 @@
---- Ragdolls the humanoid on death
--- @classmod RagdollHumanoidOnDeath
--- @author Quenty
+--[=[
+	Ragdolls the humanoid on death
+	@class RagdollHumanoidOnDeath
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

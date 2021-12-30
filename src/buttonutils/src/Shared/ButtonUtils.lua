@@ -1,11 +1,16 @@
---- Provides utility for editing buttons
--- @module ButtonUtils
+--[=[
+	Provides utility for editing buttons
+	@class ButtonUtils
+]=]
 
 local ButtonUtils = {}
 
---- Gets a tinted mouse over color
--- @tparam Color3 originalColor
--- @tparam[opt=1] number factor
+--[=[
+	Gets a tinted mouse over color
+	@param originalColor Color3
+	@param factor number? -- Defaults to 1
+	@return Color3
+]=]
 function ButtonUtils.getMouseOverColor(originalColor, factor)
 	factor = factor or 1
 	local h, s, v = Color3.toHSV(originalColor)

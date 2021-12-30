@@ -1,5 +1,7 @@
---- Lock camera to only XZPlane, preventing TrackerCameras from making players sick.
--- @classmod XZPlaneLockCamera
+--[=[
+	Lock camera to only XZPlane, preventing TrackerCameras from making players sick.
+	@class XZPlaneLockCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

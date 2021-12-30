@@ -1,6 +1,8 @@
---- Holds binders
--- @classmod IKBindersServer
--- @author Quenty
+--[=[
+	Holds binders
+	@server
+	@class IKBindersServer
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

@@ -1,5 +1,7 @@
---- Generic command definition template
--- @module CmdrCommandDefinitionTemplate
+--[=[
+	Generic command definition template
+	@class CmdrCommandDefinitionTemplate
+]=]
 
 local function waitForValue(objectValue)
 	local value = objectValue.Value

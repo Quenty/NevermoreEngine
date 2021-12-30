@@ -1,5 +1,7 @@
---- Base of a template retrieval system
--- @classmod TemplateProvider
+--[=[
+	Base of a template retrieval system
+	@class TemplateProvider
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

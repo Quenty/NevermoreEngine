@@ -1,4 +1,7 @@
---- Generated KeyboardLight with Python
+--[[
+	Generated KeyboardLight with Python
+	@class KeyboardLight
+]]
 
 local parent = script:FindFirstAncestorWhichIsA("ModuleScript")
 local require = require(parent.Parent.loader).load(parent)

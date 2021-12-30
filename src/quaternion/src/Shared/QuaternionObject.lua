@@ -1,6 +1,10 @@
---- Quaternion data type object
--- @author xXxMoNkEyMaNxXx
--- @classmod Quaternion
+--[=[
+	Quaternion data type object
+
+	Author: xXxMoNkEyMaNxXx
+
+	@class Quaternion
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -202,7 +206,7 @@ local function pow(q0,q1)
 				-- first place.
 				return new(mc*c-ms*s,vc*x+vs,vc*y+vs,vc*z+vs)
 			else
-				--- No idea why this is broken! Weird edge case!
+				-- No idea why this is broken! Weird edge case!
 				warn("Hitting weird quaternion edge case!")
 				return new(nil, nil, nil, nil)
 				--return new(c,s,s,s)

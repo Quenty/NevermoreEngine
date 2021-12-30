@@ -1,7 +1,10 @@
--- Update on heartbeat, must GC this camera state, unlike others. This
--- allows for camera effects to run on heartbeat and cache information once instead
--- of potentially going deeep into a tree and getting invoked multiple times
--- @classmod HeartbeatCamera
+--[=[
+	Update on heartbeat, must GC this camera state, unlike others. This
+	allows for camera effects to run on heartbeat and cache information once instead
+	of potentially going deeep into a tree and getting invoked multiple times
+
+	@class HeartbeatCamera
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -38,6 +41,12 @@ function HeartbeatCamera:ForceUpdateCache()
 	self._currentStateCache = self._camera.CameraState
 end
 
+--[=[
+	The current state.
+	@readonly
+	@prop CameraState CameraState
+	@within DefaultCamera
+]=]
 function HeartbeatCamera:__index(index)
 	if index == "CameraState" then
 		return self._currentStateCache

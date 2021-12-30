@@ -1,11 +1,19 @@
----
--- @classmod LinearValue
--- @author Quenty
+--[=[
+	Represents a value that can operate in linear space
 
+	@class LinearValue
+]=]
 local LinearValue = {}
 LinearValue.ClassName = "LinearValue"
 LinearValue.__index = LinearValue
 
+--[=[
+	Constructs a new LinearValue object.
+
+	@param constructor (number ...) -> T
+	@param values ({ number })
+	@return LinearValue<T>
+]=]
 function LinearValue.new(constructor, values)
 	return setmetatable({
 		_constructor = constructor;
@@ -13,10 +21,21 @@ function LinearValue.new(constructor, values)
 	}, LinearValue)
 end
 
+--[=[
+	Returns whether or not a value is a LinearValue object.
+
+	@param value any -- A value to check
+	@return boolean -- True if a linear value, false otherwise
+]=]
 function LinearValue.isLinear(value)
 	return type(value) == "table" and getmetatable(value) == LinearValue
 end
 
+--[=[
+	Converts the value back to the base value
+
+	@return T
+]=]
 function LinearValue:ToBaseValue()
 	return self._constructor(unpack(self._values))
 end
@@ -57,6 +76,11 @@ local function operation(func)
 	end
 end
 
+--[=[
+	Returns the magnitude of the linear value.
+
+	@return number -- The magnitude of the linear value.
+]=]
 function LinearValue:GetMagnitude()
 	local dot = 0
 	for i=1, #self._values do
@@ -66,6 +90,13 @@ function LinearValue:GetMagnitude()
 	return math.sqrt(dot)
 end
 
+--[=[
+	Returns the magnitude of the linear value.
+
+	@prop magnitude number
+	@readonly
+	@within LinearValue
+]=]
 function LinearValue:__index(key)
 	if LinearValue[key] then
 		return LinearValue[key]
@@ -91,6 +122,24 @@ end)
 LinearValue.__div = operation(function(a, b)
 	return a / b
 end)
+
+function LinearValue:__eq(a, b)
+	if LinearValue.isLinear(a) and LinearValue.isLinear(b) then
+		if #a._values ~= #b._values then
+			return false
+		end
+
+		for i=1, #a._values do
+			if a._values[i] ~= b._values[i] then
+				return false
+			end
+		end
+
+		return true
+	else
+		return false
+	end
+end
 
 
 return LinearValue

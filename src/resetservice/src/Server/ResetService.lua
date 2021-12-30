@@ -1,6 +1,8 @@
---- Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly
--- @module ResetService
--- @author Quenty
+--[=[
+	Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly
+	@server
+	@class ResetService
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,9 @@ local ResetServiceConstants = require("ResetServiceConstants")
 
 local ResetService = {}
 
+--[=[
+	Initializes the reset service. Should be done via a [ServiceBag].
+]=]
 function ResetService:Init()
 	assert(not self._remoteEvent, "Already initialized")
 

@@ -1,5 +1,6 @@
----
--- @classmod RotatingCharacterBuilder
+--[=[
+	@class RotatingCharacterBuilder
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

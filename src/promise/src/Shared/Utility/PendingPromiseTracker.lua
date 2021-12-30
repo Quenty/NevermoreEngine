@@ -1,5 +1,7 @@
---- Tracks pending promises
--- @classmod PendingPromiseTracker
+--[=[
+	Tracks pending promises
+	@class PendingPromiseTracker
+]=]
 
 local PendingPromiseTracker = {}
 PendingPromiseTracker.ClassName = "PendingPromiseTracker"

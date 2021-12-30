@@ -1,14 +1,22 @@
---- Utility function for estimating low and high arcs of projectiles. Solves for bullet
--- drop given
+--[=[
+	Utility function for estimating low and high arcs of projectiles. Solves for bullet
+	drop given
+	@class trajectory
+]=]
 
---- Returns two possible paths from origin to target where the magnitude of the initial velocity is initialVelocity
--- @tparam Vector3 origin Origin the the bullet
--- @tparam Vector3 target Target for the bullet
--- @tparam number initialVelocity Magnitude of the initial velocity
--- @tparam number gravityForce Force of the gravity
--- @treturn[opt] vector3 lowTrajectory Initial velocity for a low trajectory arc
--- @treturn[opt] vector3 highTrajectory Initial velocity for a high trajectory arc
--- @treturn[opt] vector3 fallbackTrajectory Trajectory directly at target as afallback
+--[=[
+	Returns two possible paths from origin to target where the magnitude of the initial velocity is initialVelocity
+
+	@function trajectory
+	@within trajectory
+	@param origin Vector3 -- Origin the the bullet
+	@param target Vector3 -- Target for the bullet
+	@param initialVelocity number -- Magnitude of the initial velocity
+	@param gravityForce number -- Force of the gravity
+	@return Vector3? -- lowTrajectory Initial velocity for a low trajectory arc
+	@return Vector3? -- highTrajectory Initial velocity for a high trajectory arc
+	@return Vector3? -- fallbackTrajectory Trajectory directly at target as afallback
+]=]
 return function(origin, target, initialVelocity, gravityForce)
 	local g = -gravityForce
 	local ox,oy,oz=origin.x,origin.y,origin.z

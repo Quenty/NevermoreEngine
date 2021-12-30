@@ -1,10 +1,10 @@
 ## Blend
 <div align="center">
-  <a href="http://quenty.github.io/api/">
-    <img src="https://img.shields.io/badge/docs-website-green.svg" alt="Documentation" />
+  <a href="http://quenty.github.io/NevermoreEngine/">
+    <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
   </a>
   <a href="https://discord.gg/mhtGUS8">
-    <img src="https://img.shields.io/badge/discord-nevermore-blue.svg" alt="Discord" />
+    <img src="https://img.shields.io/discord/385151591524597761?color=5865F2&label=discord&logo=discord&logoColor=white" alt="Discord" />
   </a>
   <a href="https://github.com/Quenty/NevermoreEngine/actions">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
@@ -12,6 +12,8 @@
 </div>
 
 Declarative UI system inspired by Fusion
+
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Blend">View docs →</a></div>
 
 ## Installation
 ```
@@ -25,48 +27,3 @@ This system is designed to be very similar to fusion, except that we do not havi
 * No global state
 * Extensible
 * No implicit reliance upon GC
-
-## Usage
-
-See files in src/Client/Test that are stories. Blend returns an observable that will create/return one instance.
-
-Note that subscribe function anchors everything into a maid/cleanup function that can be used to disconnect the whole tree.
-
-```lua
-local require = ... -- Nevermore import here
-local Blend = require("Blend")
-local Maid = require("Maid")
-
-local maid = Maid.new()
-
-local isVisible = Instance.new("BoolValue")
-isVisible.Value = false
-
-local percentVisible = Blend.Spring(Blend.Computed(isVisible, function(visible)
-  return visible and 1 or 0
-end), 35)
-
-local transparency = Blend.Computed(percentVisible, function(percent)
-  return 1 - percent
-end)
-
-maid:GiveTask((Blend.New "Frame" {
-  Size = UDim2.new(0.5, 0, 0.5, 0);
-  BackgroundColor3 = Color3.new(0.9, 0.9, 0.9);
-  AnchorPoint = Vector2.new(0.5, 0.5);
-  Position = UDim2.new(0.5, 0, 0.5, 0);
-  BackgroundTransparency = transparency;
-  Parent = parent; -- TODO: Assign parent
-
-  [Blend.Children] = {
-    Blend.New "UIScale" {
-      Scale = Blend.Computed(percentVisible, function(percent)
-        return 0.8 + 0.2*percent
-      end);
-    };
-    Blend.New "UICorner" {
-      CornerRadius = UDim.new(0.05, 0);
-    };
-  };
-}):Subscribe())
-```

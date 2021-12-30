@@ -1,8 +1,12 @@
---- Provides a data storage facility with an ability to get sub-stores. So you can write
--- directly to this store, overwriting all children, or you can have more partial control
--- at children level. This minimizes accidently overwriting.
--- The big cost here is that we may leave keys that can't be removed.
--- @classmod DataStoreStage
+--[=[
+	Provides a data storage facility with an ability to get sub-stores. So you can write
+	directly to this store, overwriting all children, or you can have more partial control
+	at children level. This minimizes accidently overwriting.
+	The big cost here is that we may leave keys that can't be removed.
+
+	@server
+	@class DataStoreStage
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -17,6 +21,13 @@ local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
 DataStoreStage.__index = DataStoreStage
 
+--[=[
+	Constructs a new DataStoreStage to load from. Prefer to use DataStore because this doesn't
+	have any way to retrieve this.
+	@param loadName string
+	@param loadParent DataStoreStage?
+	@return DataStoreStage
+]=]
 function DataStoreStage.new(loadName, loadParent)
 	local self = setmetatable(BaseObject.new(), DataStoreStage)
 
@@ -30,6 +41,10 @@ function DataStoreStage.new(loadName, loadParent)
 	return self
 end
 
+--[=[
+	Gets an event that will fire off whenever something is stored at this level
+	@return Signal
+]=]
 function DataStoreStage:GetTopLevelDataStoredSignal()
 	if self._topLevelStoreSignal then
 		return self._topLevelStoreSignal
@@ -40,6 +55,10 @@ function DataStoreStage:GetTopLevelDataStoredSignal()
 	return self._topLevelStoreSignal
 end
 
+--[=[
+	Retrieves the full path of this datastore stage for diagnostic purposes.
+	@return string
+]=]
 function DataStoreStage:GetFullPath()
 	if self._loadParent then
 		return self._loadParent:GetFullPath() .. "." .. tostring(self._loadName)
@@ -48,6 +67,12 @@ function DataStoreStage:GetFullPath()
 	end
 end
 
+--[=[
+	Loads the data at the `name`.
+	@param name string
+	@param defaultValue T?
+	@return Promise<T>
+]=]
 function DataStoreStage:Load(name, defaultValue)
 	if not self._loadParent then
 		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
@@ -93,6 +118,10 @@ function DataStoreStage:_afterLoadGetAndApplyStagedData(name, data, defaultValue
 	end
 end
 
+--[=[
+	Explicitely deletes data at the key
+	@param name string
+]=]
 function DataStoreStage:Delete(name)
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
@@ -101,6 +130,9 @@ function DataStoreStage:Delete(name)
 	self:_doStore(name, DataStoreDeleteToken)
 end
 
+--[=[
+	Queues up a wipe of all values. Data must load before it can be wiped.
+]=]
 function DataStoreStage:Wipe()
 	return self._loadParent:Load(self._loadName, {})
 		:Then(function(data)
@@ -126,6 +158,11 @@ function DataStoreStage:Store(name, value)
 	self:_doStore(name, value)
 end
 
+--[=[
+	Gets a sub-datastore that will write at the given name point
+	@param name string
+	@return DataStoreStage
+]=]
 function DataStoreStage:GetSubStore(name)
 	assert(type(name) == "string", "Bad name")
 
@@ -146,6 +183,12 @@ function DataStoreStage:GetSubStore(name)
 	return newStore
 end
 
+--[=[
+	Whenever the ValueObject changes, stores the resulting value in that entry.
+	@param name string
+	@param valueObj Instance -- ValueBase object to store on
+	@return MaidTask
+]=]
 function DataStoreStage:StoreOnValueChange(name, valueObj)
 	assert(type(name) == "string", "Bad name")
 	assert(typeof(valueObj) == "Instance", "Bad valueObj")
@@ -162,6 +205,10 @@ function DataStoreStage:StoreOnValueChange(name, valueObj)
 	return conn
 end
 
+--[=[
+	If these is data not yet written then this will return true
+	@return boolean
+]=]
 function DataStoreStage:HasWritableData()
 	if self._dataToSave then
 		return true
@@ -176,7 +223,10 @@ function DataStoreStage:HasWritableData()
 	return false
 end
 
---- Constructs a writer which provides a snapshot of the current data state to write
+--[=[
+	Constructs a writer which provides a snapshot of the current data state to write
+	@return DataStoreWriter
+]=]
 function DataStoreStage:GetNewWriter()
 	local writer = DataStoreWriter.new()
 	if self._dataToSave then

@@ -1,6 +1,7 @@
---- Utility functions involving binders and links
--- @module BoundLinkUtils
--- @author Quenty
+--[=[
+	Utility functions involving binders and links
+	@class BoundLinkUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

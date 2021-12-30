@@ -1,15 +1,23 @@
---- Binary search implementation for Roblox in pure Lua
--- @module BinarySearchUtils
+--[=[
+	Binary search implementation for Roblox in pure Lua
+	@class BinarySearchUtils
+]=]
 
 local BinarySearchUtils = {}
 
---[[
+--[=[
+	```
 	if t lands within the domain of two spans of time
 		t = 5
 		[3   5][5   7]
 		          ^ picks this one
-]]
+	```
 
+	@param list {T}
+	@param t number
+	@return number
+	@return number
+]=]
 function BinarySearchUtils.spanSearch(list, t)
 	local l = 1
 	local h = #list
@@ -37,6 +45,15 @@ function BinarySearchUtils.spanSearch(list, t)
 	return l, h
 end
 
+--[=[
+	Same as searching a span, but uses a list of nodes
+
+	@param list { TNode }
+	@param index string
+	@param t number
+	@return number
+	@return number
+]=]
 function BinarySearchUtils.spanSearchNodes(list, index, t)
 	local l = 1
 	local h = #list
@@ -64,7 +81,14 @@ function BinarySearchUtils.spanSearchNodes(list, index, t)
 	return l, h
 end
 
--- What a meme
+--[=[
+	Same as span search, but uses an indexFunc to retrieve the index
+	@param n number
+	@param indexFunc (number) -> number
+	@param t number
+	@return number
+	@return number
+]=]
 function BinarySearchUtils.spanSearchAnything(n, indexFunc, t)
 	local l = 1
 	local h = n

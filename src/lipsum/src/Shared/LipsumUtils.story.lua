@@ -1,6 +1,6 @@
----
--- @module LipsumUtils.story
--- @author Quenty
+--[=[
+	@class LipsumUtils.story
+]=]
 
 local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
 

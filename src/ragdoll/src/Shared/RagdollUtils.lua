@@ -1,5 +1,7 @@
---- Utility mehtods for ragdolling. See Ragdoll.lua and RagdollClient.lua for implementation details
--- @module RagdollUtils
+--[=[
+	Utility mehtods for ragdolling. See Ragdoll.lua and RagdollClient.lua for implementation details
+	@class RagdollUtils
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

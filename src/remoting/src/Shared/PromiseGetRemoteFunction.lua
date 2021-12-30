@@ -1,5 +1,7 @@
---- Retrieves a remote function as a promise
--- @module PromiseGetRemoteFunction
+--[=[
+	Retrieves a remote function as a promise
+	@class PromiseGetRemoteFunction
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -9,6 +11,15 @@ local RunService = game:GetService("RunService")
 local GetRemoteFunction = require("GetRemoteFunction")
 local Promise = require("Promise")
 local ResourceConstants = require("ResourceConstants")
+
+--[=[
+	Like [GetRemoteFunction] but in promise form.
+
+	@function PromiseGetRemoteFunction
+	@within PromiseGetRemoteFunction
+	@param name string
+	@return Promise<RemoteFunction>
+]=]
 
 if not RunService:IsRunning() then
 	-- Handle testing

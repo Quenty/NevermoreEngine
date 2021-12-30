@@ -1,6 +1,7 @@
----
--- @classmod JSONTranslator
--- @author Quenty
+--[=[
+	Utility function that loads a translator from a folder or a table.
+	@class JSONTranslator
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -17,6 +18,27 @@ local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
 JSONTranslator.__index = JSONTranslator
 
+--[=[
+	Constructs a new JSONTranslator from the given args.
+
+	```lua
+	local translator = JSONTranslator.new("en", {
+		actions = {
+			respawn = "Respawn {playerName}";
+		};
+	})
+
+	print(translator:FormatByKey("actions.respawn"), { playerName = "Quenty"}) --> Respawn Quenty
+	```
+
+	```lua
+	local translator = JSONTranslator.new(script)
+	-- assume there is an `en.json` underneath the script with valid JSON.
+	```
+
+	@param ... any
+	@return JSONTranslator
+]=]
 function JSONTranslator.new(...)
 	local self = setmetatable({}, JSONTranslator)
 
@@ -39,11 +61,21 @@ function JSONTranslator.new(...)
 	return self
 end
 
+--[=[
+	Returns a promise that will resolve once the translator is loaded from the cloud.
+	@return Promise
+]=]
 function JSONTranslator:PromiseLoaded()
 	return self._promiseTranslator
 end
 
---- Mostly just used for testing,
+--[=[
+	Makes the translator fall back to another translator if an entry cannot be found.
+
+	Mostly just used for testing.
+
+	@param translator JSONTranslator | Translator
+]=]
 function JSONTranslator:FallbackTo(translator)
 	assert(translator, "Bad translator")
 	assert(translator.FormatByKey, "Bad translator")
@@ -51,6 +83,12 @@ function JSONTranslator:FallbackTo(translator)
 	table.insert(self._fallbacks, translator)
 end
 
+--[=[
+	Formats the resulting entry by args.
+	@param key string
+	@param args table?
+	@return Promise<string>
+]=]
 function JSONTranslator:PromiseFormatByKey(key, args)
 	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(key) == "string", "Key must be a string")
@@ -60,7 +98,12 @@ function JSONTranslator:PromiseFormatByKey(key, args)
 	end)
 end
 
---- Blocking format until the cloud translations are loaded.
+--[=[
+	Formats or errors if the cloud translations are not loaded.
+	@param key string
+	@param args table?
+	@return string
+]=]
 function JSONTranslator:FormatByKey(key, args)
 	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(key) == "string", "Key must be a string")
@@ -140,6 +183,9 @@ function JSONTranslator:_formatByKeyTestMode(key, args)
 	return key
 end
 
+--[=[
+	Cleans up the translator and deletes the localization table if it exists.
+]=]
 function JSONTranslator:Destroy()
 	self._localizationTable:Destroy()
 	self._localizationTable = nil

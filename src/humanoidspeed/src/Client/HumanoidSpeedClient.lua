@@ -1,6 +1,9 @@
----
--- @classmod HumanoidSpeedClient
--- @author Quenty
+--[=[
+	Client version of the [HumanoidSpeed] class
+
+	@client
+	@class HumanoidSpeedClient
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -19,10 +22,18 @@ function HumanoidSpeedClient.new(humanoid)
 	return self
 end
 
+--[=[
+	Retrieves a promise that resolves speed value
+	@return Promise<Instance>
+]=]
 function HumanoidSpeedClient:PromiseSpeedValue()
 	return self._maid:GivePromise(promiseChild(self._obj , HumanoidSpeedConstants.SPEED_VALUE_NAME))
 end
 
+--[=[
+	Gets the player for this humanoid
+	@return Player?
+]=]
 function HumanoidSpeedClient:GetPlayer()
 	return CharacterUtils.getPlayerFromCharacter(self._obj)
 end

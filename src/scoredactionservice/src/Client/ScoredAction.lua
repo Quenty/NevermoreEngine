@@ -1,6 +1,6 @@
----
--- @classmod ScoredAction
--- @author Quenty
+--[=[
+	@class ScoredAction
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
