@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[34795],{9420:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"FakeSkybox","desc":"Allow transitions between skyboxes","source":{"line":5,"path":"src/fakeskybox/src/Client/FakeSkybox.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[54998],{14702:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RemoteFunctionUtils","desc":"Utility functions to wrap invoking a remote function with a promise","source":{"line":5,"path":"src/remotefunctionutils/src/Shared/RemoteFunctionUtils.lua"}}')}}]);

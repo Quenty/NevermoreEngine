@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[63782],{41706:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ResourceConstants","desc":"Holds constants for resource retrieval","source":{"line":5,"path":"src/remoting/src/Shared/ResourceConstants.lua"}}')}}]);

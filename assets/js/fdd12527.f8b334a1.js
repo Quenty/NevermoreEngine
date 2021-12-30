@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[39219],{74884:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SignalUtils","desc":"Utilities involving signals","source":{"line":5,"path":"src/signal/src/Shared/SignalUtils.lua"}}')}}]);

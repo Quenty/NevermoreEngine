@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[30713],{69982:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HideBindersServer","desc":"Holds binders","source":{"line":5,"path":"src/hide/src/Server/HideBindersServer.lua"}}')}}]);

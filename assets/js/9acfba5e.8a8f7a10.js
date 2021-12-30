@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[13716],{3939:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"NumberRangeUtils","desc":"Utility functions involving the NumberRange structure in Roblox","source":{"line":5,"path":"src/numberrangeutils/src/Shared/NumberRangeUtils.lua"}}')}}]);

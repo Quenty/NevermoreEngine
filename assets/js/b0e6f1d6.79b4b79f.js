@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[90383],{45923:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"onSteppedFrame","desc":"Executes code at a specific point in Roblox\'s engine","source":{"line":5,"path":"src/steputils/src/Shared/onSteppedFrame.lua"}}')}}]);

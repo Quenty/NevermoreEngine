@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[15571],{23018:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"AnimatedSpritesheet","desc":"","source":{"line":4,"path":"src/sprites/src/Shared/Sprite/AnimatedSpritesheet.lua"}}')}}]);

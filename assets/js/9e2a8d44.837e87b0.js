@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[92614],{28300:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollBindersServer","desc":"Holds binders","source":{"line":5,"path":"src/ragdoll/src/Server/RagdollBindersServer.lua"}}')}}]);

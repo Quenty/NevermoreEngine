@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[41477],{46427:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Color3SerializationUtils","desc":"Utility functions to help serialize Color3 values","source":{"line":5,"path":"src/color3serializationutils/src/Shared/Color3SerializationUtils.lua"}}')}}]);

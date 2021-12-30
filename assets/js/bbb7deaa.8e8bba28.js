@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[85238],{65095:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PromiseGetRemoteEvent","desc":"Retrieves a remote event as a promise","source":{"line":5,"path":"src/remoting/src/Shared/PromiseGetRemoteEvent.lua"}}')}}]);

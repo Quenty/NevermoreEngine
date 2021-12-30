@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[38447],{65474:function(c){c.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BinderTouchingCalculator","desc":"Extends PartTouchingCalculator with generic binder stuff","source":{"line":5,"path":"src/parttouchingcalculator/src/Shared/BinderTouchingCalculator.lua"}}')}}]);

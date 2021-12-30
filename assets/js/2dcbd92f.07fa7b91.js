@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[68729],{84820:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Vector3Utils","desc":"Utilities involving Vector3 objects in Roblox","source":{"line":5,"path":"src/vector3utils/src/Shared/Vector3Utils.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[4576],{62869:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"LipsumUtils","desc":"Helpers generate test text for a variety of situations.","source":{"line":5,"path":"src/lipsum/src/Shared/LipsumUtils.lua"}}')}}]);

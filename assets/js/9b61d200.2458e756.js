@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[76086],{77585:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RigBuilderUtils","desc":"Helps build player characters","source":{"line":5,"path":"src/rigbuilderutils/src/Shared/RigBuilderUtils.lua"}}')}}]);

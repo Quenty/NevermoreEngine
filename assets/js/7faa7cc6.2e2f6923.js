@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[15037],{1949:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DataStore","desc":"Wraps the datastore object to provide async cached loading and saving","source":{"line":5,"path":"src/datastore/src/Server/DataStore.lua"}}')}}]);

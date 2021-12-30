@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[46608],{64049:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SunPositionUtils","desc":"Utility to position the sun","source":{"line":5,"path":"src/sunpositionutils/src/Shared/SunPositionUtils.lua"}}')}}]);

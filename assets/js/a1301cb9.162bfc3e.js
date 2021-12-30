@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[97685],{65475:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"MarketplaceUtils","desc":"Provides utility methods for MarketplaceService","source":{"line":5,"path":"src/marketplaceutils/src/Shared/MarketplaceUtils.lua"}}')}}]);

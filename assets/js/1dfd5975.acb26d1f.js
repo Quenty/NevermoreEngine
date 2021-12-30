@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[96589],{47579:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"InputModeSelector","desc":"Selects the most recent input mode and attempts to identify the best state from it.","source":{"line":5,"path":"src/inputmode/src/Client/InputModeSelector.lua"}}')}}]);

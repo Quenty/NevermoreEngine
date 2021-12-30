@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[539],{13422:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HumanoidSpeedClient","desc":"","source":{"line":4,"path":"src/humanoidspeed/src/Client/HumanoidSpeedClient.lua"}}')}}]);

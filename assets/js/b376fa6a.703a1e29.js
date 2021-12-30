@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[556],{32939:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IKRigAimerLocalPlayer","desc":"Handles repliation and aiming of the local player\'s character for\\nIK.","realm":["Client"],"source":{"line":8,"path":"src/ik/src/Client/Rig/IKRigAimerLocalPlayer.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[62124],{2489:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HapticFeedbackUtils","desc":"Utility functions involving haptic feedback on gamepads","source":{"line":5,"path":"src/hapticfeedbackutils/src/Client/HapticFeedbackUtils.lua"}}')}}]);

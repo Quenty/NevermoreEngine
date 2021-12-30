@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[21716],{96810:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DataStorePromises","desc":"Utility methods to interactive with DataStores","source":{"line":5,"path":"src/datastore/src/Server/Utility/DataStorePromises.lua"}}')}}]);

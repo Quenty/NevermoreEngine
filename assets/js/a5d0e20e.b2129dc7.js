@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[63860],{32939:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IKRigAimerLocalPlayer","desc":"","source":{"line":4,"path":"src/ik/src/Client/Rig/IKRigAimerLocalPlayer.lua"}}')}}]);

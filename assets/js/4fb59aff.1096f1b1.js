@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[64613],{80801:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ModuleProvider","desc":"Creates a service that provides modules from a parent module, either by name, or by list!","source":{"line":5,"path":"src/templateprovider/src/Shared/ModuleProvider.lua"}}')}}]);

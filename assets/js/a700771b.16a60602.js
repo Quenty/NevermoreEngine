@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[95442],{87391:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TemplateProvider","desc":"Base of a template retrieval system","source":{"line":5,"path":"src/templateprovider/src/Shared/TemplateProvider.lua"}}')}}]);

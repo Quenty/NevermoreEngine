@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[79164],{67107:function(r){r.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CreatorPermissionProvider","desc":"Provides permissions from a single user creator","source":{"line":5,"path":"src/permissionprovider/src/Server/Providers/CreatorPermissionProvider.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[64668],{11791:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"OrthogonalUtils","desc":"Utilities involving orthogonal Vector3s","source":{"line":5,"path":"src/geometryutils/src/Shared/OrthogonalUtils.lua"}}')}}]);

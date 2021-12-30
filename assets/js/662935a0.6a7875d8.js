@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[99981],{82542:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"HumanoidTracker","desc":"Tracks a player\'s character\'s humanoid","source":{"line":5,"path":"src/humanoidtracker/src/Shared/HumanoidTracker.lua"}}')}}]);

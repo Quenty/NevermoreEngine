@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[68215],{55681:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"NumberToInputKeyUtils","desc":"Maps a number to a set of inputs. Useful for shortcut codes in menus.","source":{"line":5,"path":"src/numbertoinputkeyutils/src/Client/NumberToInputKeyUtils.lua"}}')}}]);

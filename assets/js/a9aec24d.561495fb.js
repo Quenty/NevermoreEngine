@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[2813],{39346:function(o){o.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CooldownBase","desc":"Base object for a cooldown. Provides calculation utilties.","source":{"line":5,"path":"src/cooldown/src/Shared/CooldownBase.lua"}}')}}]);

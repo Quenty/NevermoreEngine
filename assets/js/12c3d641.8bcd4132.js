@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[58076],{71555:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"XboxOneLight","desc":"Generated XboxOneLight with Python","source":{"line":5,"path":"src/sprites/src/Shared/InputImageLibrary/Spritesheets/XboxOne/Light.lua"}}')}}]);

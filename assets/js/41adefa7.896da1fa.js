@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[67309],{35166:function(t){t.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ButtonHighlightModel","desc":"Contains model information for the current button","source":{"line":5,"path":"src/buttonhighlightmodel/src/Client/ButtonHighlightModel.lua"}}')}}]);
