@@ -24,6 +24,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local ValueObject = require("ValueObject")
 
 local StateStack = setmetatable({}, BaseObject)
 StateStack.ClassName = "StateStack"
@@ -36,15 +37,14 @@ StateStack.__index = StateStack
 function StateStack.new()
 	local self = setmetatable(BaseObject.new(), StateStack)
 
-	self._state = Instance.new("BoolValue")
-	self._state.Value = false
+	self._state = ValueObject.new(false)
 	self._maid:GiveTask(self._state)
 
 	self._stateStack = {}
 
 --[=[
 	Fires with the new state
-	@prop Changed Signal<boolean>
+	@prop Changed Signal<T>
 	@within StateStack
 ]=]
 	self.Changed = self._state.Changed
@@ -54,7 +54,7 @@ end
 
 --[=[
 	Gets the current state
-	@return boolean
+	@return T
 ]=]
 function StateStack:GetState()
 	return self._state.Value
@@ -62,10 +62,15 @@ end
 
 --[=[
 	Pushes the current state onto the stack
+	@param state T?
 	@return function -- Cleanup function to invoke
 ]=]
-function StateStack:PushState()
-	local data = {}
+function StateStack:PushState(state)
+	if state == nil then
+		state = true
+	end
+
+	local data = { state }
 	table.insert(self._stateStack, data)
 
 	self:_updateState()
@@ -88,7 +93,16 @@ function StateStack:_popState(data)
 end
 
 function StateStack:_updateState()
-	self._state.Value = next(self._stateStack) ~= nil
+	local _, data = next(self._stateStack)
+	if data == nil then
+		if type(self._state.Value) == "boolean" then
+			self._state.Value = false
+		else
+			self._state.Value = nil
+		end
+	else
+		self._state.Value = data[1]
+	end
 end
 
 --[=[
