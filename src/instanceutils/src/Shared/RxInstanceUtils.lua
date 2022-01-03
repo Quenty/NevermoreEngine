@@ -27,8 +27,8 @@ local RxInstanceUtils = {}
 	@return Observable<T>
 ]=]
 function RxInstanceUtils.observeProperty(instance, propertyName)
-	assert(typeof(instance) == "Instance", "Not an instance")
-	assert(type(propertyName) == "string", "Bad propertyName")
+	assert(typeof(instance) == "Instance", "'instance' should be of type Instance")
+	assert(type(propertyName) == "string", "'propertyName' should be of type string")
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
