@@ -284,10 +284,11 @@ end
 	Unpacks the brio, and then repacks it. Ignored items
 	still invalidate the previous brio
 
+	@since 3.6.0
 	@param predicate (T) -> boolean
 	@return (source: Observable<Brio<T>>) -> Observable<Brio<T>>
 ]=]
-function RxBrioUtils.filter(predicate)
+function RxBrioUtils.where(predicate)
 	assert(type(predicate) == "function", "Bad predicate")
 
 	return function(source)
@@ -322,14 +323,28 @@ function RxBrioUtils.filter(predicate)
 end
 
 --[=[
+	Same as [RxBrioUtils.where]. Here to keep backwards compatability.
+
+	@deprecated 3.6.0 -- This method does not wrap the resulting value in a Brio, which can sometimes lead to leaks.
+	@function filter
+	@param predicate (T) -> boolean
+	@return (source: Observable<Brio<T>>) -> Observable<Brio<T>>
+	@within RxBrioUtils
+]=]
+RxBrioUtils.filter = RxBrioUtils.where
+
+--[=[
 	Flattens all the brios in one brio and combines them. Note that this method leads to
 	gaps in the lifetime of the brio.
 
+	@deprecated 3.6.0 -- This method does not wrap the resulting value in a Brio, which can sometimes lead to leaks.
 	@param observables { [any]: Observable<Brio<T>> | Observable<T> | T }
 	@return Observable<Brio<{ [any]: T }>>
 ]=]
 function RxBrioUtils.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
+
+	warn("[RxBrioUtils.combineLatest] - Deprecated since 3.6.0. Use RxBrioUtils.flatCombineLatest")
 
 	return Rx.combineLatest(observables)
 		:Pipe({
@@ -339,29 +354,70 @@ function RxBrioUtils.combineLatest(observables)
 end
 
 --[=[
-	Flat map equivalent for brios
+	Flat map equivalent for brios. The resulting observables will
+	be disconnected at the end of the brio.
 
+	@deprecated 3.6.0 -- This method does not wrap the resulting value in a Brio, which can sometimes lead to leaks.
 	@param project (value: TBrio) -> TProject
-	@param resultSelector ((value: TProject) -> TResult)?
-	@return (source: Observable<Brio<TBrio>> -> Observable<Brio<TResult>>)
+	@param resultSelector ((initial TBrio, value: TProject) -> TResult)?
+	@return (source: Observable<Brio<TBrio>> -> Observable<TResult>)
 ]=]
 function RxBrioUtils.flatMap(project, resultSelector)
 	assert(type(project) == "function", "Bad project")
+
+	warn("[RxBrioUtils.flatMap] - Deprecated since 3.6.0. Use RxBrioUtils.flatMapBrio")
 
 	return Rx.flatMap(RxBrioUtils.mapBrio(project), resultSelector)
 end
 
 --[=[
-	Switch map but for Brio.
+	Flat map equivalent for brios. The resulting observables will
+	be disconnected at the end of the brio.
 
-	@param project (value: TBrio) -> TProject
-	@param resultSelector ((value: TProject) -> TResult)?
-	@return (source: Observable<Brio<TBrio>>) -> Observable<Brio<TResult>>
+	Like [RxBrioUtils.flatMap], but emitted values are wrapped in brios.
+	The lifetime of this brio is limited by the lifetime of the
+	input brios, which are unwrapped and repackaged.
+
+	@since 3.6.0
+	@param project (value: TBrio) -> TProject | Brio<TProject>
+	@return (source: Observable<Brio<TBrio>> -> Observable<Brio<TResult>>)
 ]=]
-function RxBrioUtils.switchMap(project, resultSelector)
+function RxBrioUtils.flatMapBrio(project)
+	return Rx.flatMap(RxBrioUtils.mapBrioBrio(project))
+end
+
+--[=[
+	Switch map but for brios. The resulting observable will be
+	disconnected on the end of the brio's life.
+
+	@deprecated 3.6.0 -- This method does not wrap the resulting value in a Brio, which can sometimes lead to leaks.
+	@param project (value: TBrio) -> TProject
+	@return (source: Observable<Brio<TBrio>>) -> Observable<TResult>
+]=]
+function RxBrioUtils.switchMap(project)
 	assert(type(project) == "function", "Bad project")
 
-	return Rx.switchMap(RxBrioUtils.mapBrio(project), resultSelector)
+	warn("[RxBrioUtils.switchMap] - Deprecated since 3.6.0. Use RxBrioUtils.switchMapBrio")
+
+	return Rx.switchMap(RxBrioUtils.mapBrio(project))
+end
+
+--[=[
+	Switch map but for brios. The resulting observable will be
+	disconnected on the end of the brio's life.
+
+	Like [RxBrioUtils.switchMap] but emitted values are wrapped in brios.
+	The lifetime of this brio is limited by the lifetime of the
+	input brios, which are unwrapped and repackaged.
+
+	@since 3.6.0
+	@param project (value: TBrio) -> TProject | Brio<TProject>
+	@return (source: Observable<Brio<TBrio>>) -> Observable<Brio<TResult>>
+]=]
+function RxBrioUtils.switchMapBrio(project)
+	assert(type(project) == "function", "Bad project")
+
+	return Rx.switchMap(RxBrioUtils.mapBrioBrio(project))
 end
 
 --[=[
@@ -378,8 +434,9 @@ end
 	With this method we are able to do this, as we'll re-emit a table with all resoruces
 	except the invalidated one.
 
+	@since 3.6.0
 	@param observables { [any]: Observable<Brio<T>> | Observable<T> | T }
-	@return Observable<Brio<{ [any]: T }>>
+	@return Observable<{ [any]: T? }>
 ]=]
 function RxBrioUtils.flatCombineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
@@ -400,11 +457,14 @@ end
 	Takes in a brio and returns an observable that emits the brio, and then completes
 	on death.
 
+	@deprecated 3.6.0 -- This method does not wrap the resulting value in a Brio, which can sometimes lead to leaks.
 	@param project (value: TBrio) -> TProject
-	@return (brio<TBrio>) -> Brio<TProject>
+	@return (brio<TBrio>) -> TProject
 ]=]
 function RxBrioUtils.mapBrio(project)
 	assert(type(project) == "function", "Bad project")
+
+	warn("[RxBrioUtils.mapBrio] - Deprecated since 3.6.0. Use RxBrioUtils.mapBrioBrio")
 
 	return function(brio)
 		assert(Brio.isBrio(brio), "Not a brio")
@@ -417,6 +477,151 @@ function RxBrioUtils.mapBrio(project)
 		assert(Observable.isObservable(observable), "Not an observable")
 
 		return RxBrioUtils.completeOnDeath(brio, observable)
+	end
+end
+
+--[=[
+	Prepends the value onto the emitted brio
+	@since 3.6.0
+	@param ... T
+	@return (source: Observable<Brio<U>>) -> Observable<Brio<U | T>>
+]=]
+function RxBrioUtils.prepend(...)
+	local args = table.pack(...)
+
+	return Rx.map(function(brio)
+		assert(Brio.isBrio(brio), "Bad brio")
+
+		return BrioUtils.prepend(brio, table.unpack(args, 1, args.n))
+	end)
+end
+
+--[=[
+	Extends the value onto the emitted brio
+	@since 3.6.0
+	@param ... T
+	@return (source: Observable<Brio<U>>) -> Observable<Brio<U | T>>
+]=]
+function RxBrioUtils.extend(...)
+	local args = table.pack(...)
+
+	return Rx.map(function(brio)
+		assert(Brio.isBrio(brio), "Bad brio")
+
+		return BrioUtils.extend(brio, table.unpack(args, 1, args.n))
+	end)
+end
+
+--[=[
+	Maps the input brios to the output observables
+	@since 3.6.0
+	@param project project (Brio<T> | T) -> Brio<U> | U
+	@return (source: Observable<Brio<T> | T>) -> Observable<Brio<U>>
+]=]
+function RxBrioUtils.map(project)
+	return Rx.map(function(...)
+		local n = select("#", ...)
+		local brios = {}
+		local args
+
+		if n == 1 then
+			if Brio.isBrio(...) then
+				table.insert(brios, (...))
+				args = (...):GetPackedValues()
+			else
+				args = {[1] = ...}
+			end
+		else
+			args = {}
+			for index, item in pairs({...}) do
+				if Brio.isBrio(item) then
+					table.insert(brios, item)
+					args[index] = item:GetValue() -- we lose data here, but I think this is fine
+				else
+					args[index] = item
+				end
+			end
+			args.n = n
+		end
+
+		local results = table.pack(project(table.unpack(args, 1, args.n)))
+		if results.n == 1 then
+			if Brio.isBrio(results[1]) then
+				table.insert(brios, results[1])
+				return BrioUtils.first(brios, results:GetValue())
+			else
+				return BrioUtils.withOtherValues(brios, results[1])
+			end
+		else
+			local transformedResults = {}
+			for i=1, results.n do
+				local item = results[i]
+				if Brio.isBrio(item) then
+					table.insert(brios, item) -- add all subsequent brios into this table...
+					transformedResults[i] = item:GetValue()
+				else
+					transformedResults[i] = item
+				end
+			end
+
+			return BrioUtils.first(brios, table.unpack(transformedResults, 1, transformedResults.n))
+		end
+	end)
+end
+
+function RxBrioUtils._mapResult(brio)
+	return function(...)
+		local n = select("#", ...)
+		if n == 0 then
+			return BrioUtils.withOtherValues(brio)
+		elseif n == 1 then
+			if Brio.isBrio(...) then
+				return BrioUtils.first({brio, (...)}, (...):GetValue())
+			else
+				return BrioUtils.withOtherValues(brio, ...)
+			end
+		else
+			local brios = { brio }
+			local args = {}
+
+			for index, item in pairs({...}) do
+				if Brio.isBrio(item) then
+					table.insert(brios, item)
+					args[index] = item:GetValue() -- we lose data here, but I think this is fine
+				else
+					args[index] = item
+				end
+			end
+
+			return BrioUtils.first(brios, unpack(args, 1, n))
+		end
+	end
+end
+
+--[=[
+	Takes in a brio and returns an observable that emits the brio, and then completes
+	on death.
+
+	@since 3.6.0
+	@param project (value: TBrio) -> TProject | Brio<TProject>
+	@return (brio<TBrio>) -> Brio<TProject>
+]=]
+function RxBrioUtils.mapBrioBrio(project)
+	assert(type(project) == "function", "Bad project")
+
+	return function(brio)
+		assert(Brio.isBrio(brio), "Not a brio")
+
+		if brio:IsDead() then
+			return Rx.EMPTY
+		end
+
+		local observable = project(brio:GetValue())
+		assert(Observable.isObservable(observable), "Not an observable")
+
+		return RxBrioUtils.completeOnDeath(brio, observable):Pipe({
+			Rx.map(RxBrioUtils._mapResult(brio))
+		})
 	end
 end
 
@@ -507,5 +712,18 @@ function RxBrioUtils.onlyLastBrioSurvives()
 		end)
 	end
 end
+
+--[=[
+	Switches the result to a brio, and ensures only the last brio lives.
+
+	@since 3.6.0
+	@function switchToBrio
+	@return (source: Observable<T>) -> Observable<Brio<T>>
+	@within RxBrioUtils
+]=]
+RxBrioUtils.switchToBrio = Rx.pipe({
+	RxBrioUtils.toBrio();
+	RxBrioUtils.onlyLastBrioSurvives();
+})
 
 return RxBrioUtils
