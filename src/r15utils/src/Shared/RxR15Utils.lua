@@ -16,7 +16,7 @@ function RxR15Utils.observeRigAttachmentBrio(character, partName, attachmentName
 
 	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName)
 		:Pipe({
-			RxBrioUtils.switchMap(function(part)
+			RxBrioUtils.switchMapBrio(function(part)
 				return RxInstanceUtils.observeLastNamedChildBrio(part, "Attachment", attachmentName)
 			end);
 		})

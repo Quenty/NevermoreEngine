@@ -204,8 +204,13 @@ function RagdollUtils.setupHead(humanoid)
 	local maid = Maid.new()
 	local lastHeadScale
 
-	maid:GiveTask(RxValueBaseUtils.observe(humanoid, "NumberValue", "HeadScale")
-		:Subscribe(function(headScale)
+	maid:GiveTask(RxValueBaseUtils.observeBrio(humanoid, "NumberValue", "HeadScale")
+		:Subscribe(function(headScaleBrio)
+			if headScaleBrio:IsDead() then
+				return
+			end
+
+			local headScale = headScaleBrio:GetValue()
 			lastHeadScale = headScale
 
 			head.Size = Vector3.new(1, 1, 1)*headScale

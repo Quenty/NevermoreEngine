@@ -39,7 +39,7 @@ function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
 
 	return RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		:Pipe({
-			RxBrioUtils.flatMap(function(_, linkValue)
+			RxBrioUtils.flatMapBrio(function(_, linkValue)
 				return RxBinderUtils.observeBoundClassBrio(binder, linkValue)
 			end);
 		});
@@ -58,7 +58,7 @@ function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
 		:Pipe({
-			RxBrioUtils.flatMap(function(child)
+			RxBrioUtils.flatMapBrio(function(child)
 				return RxBinderUtils.observeBoundClassBrio(binder, child)
 			end);
 		})
@@ -77,7 +77,7 @@ function RxBinderUtils.observeBoundParentClassBrio(binder, instance)
 
 	return RxInstanceUtils.observePropertyBrio(instance, "Parent")
 		:Pipe({
-			RxBrioUtils.switchMap(function(child)
+			RxBrioUtils.switchMapBrio(function(child)
 				if child then
 					return RxBinderUtils.observeBoundClassBrio(binder, child)
 				else
@@ -95,12 +95,12 @@ end
 	@return Observable<Brio<T>>
 ]=]
 function RxBinderUtils.observeBoundChildClassesBrio(binders, instance)
-	assert(Binder.isBinder(binders), "Bad binders")
+	assert(type(binders) == "table", "Bad binders")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
 		:Pipe({
-			RxBrioUtils.flatMap(function(child)
+			RxBrioUtils.flatMapBrio(function(child)
 				return RxBinderUtils.observeBoundClassesBrio(binders, child)
 			end);
 		})
@@ -169,7 +169,7 @@ end
 	@return Observable<Brio<T>>
 ]=]
 function RxBinderUtils.observeBoundClassesBrio(binders, instance)
-	assert(Binder.isBinder(binders), "Bad binders")
+	assert(type(binders) == "table", "Bad binders")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	local observables = {}
