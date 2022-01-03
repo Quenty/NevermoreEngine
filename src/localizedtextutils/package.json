@@ -26,5 +26,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
   }
 }
