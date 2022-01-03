@@ -13,6 +13,10 @@ local JsonToLocalizationTable = require("JsonToLocalizationTable")
 local PseudoLocalize = require("PseudoLocalize")
 local LocalizationServiceUtils = require("LocalizationServiceUtils")
 local Promise = require("Promise")
+local Observable = require("Observable")
+local Maid = require("Maid")
+local Blend = require("Blend")
+local Rx = require("Rx")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
@@ -95,6 +99,45 @@ function JSONTranslator:PromiseFormatByKey(key, args)
 
 	return self._promiseTranslator:Then(function()
 		return self:FormatByKey(key, args)
+	end)
+end
+
+--[=[
+	Observes the translated value
+	@param key string
+	@param argData table? -- May have observables (or convertable to observables) in it.
+	@return Observable<string>
+]=]
+function JSONTranslator:ObserveFormatByKey(key, argData)
+	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
+	assert(type(key) == "string", "Key must be a string")
+
+	local argObservable
+	if argData then
+		local args = {}
+		for argKey, value in pairs(argData) do
+			args[argKey] = Blend.toPropertyObservable(value) or Rx.of(value)
+		end
+
+		argObservable = Rx.combineLatest(args)
+	else
+		argObservable = nil
+	end
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GivePromise(self._promiseTranslator:Then(function()
+			if argObservable then
+				maid:GiveTask(argObservable:Subscribe(function(args)
+					sub:Fire(self:FormatByKey(key, args))
+				end))
+			else
+				sub:Fire(self:FormatByKey(key, nil))
+			end
+		end))
+
+		return maid
 	end)
 end
 
