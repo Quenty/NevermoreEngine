@@ -229,13 +229,13 @@ function Rx.tap(onFire, onError, onComplete)
 					if onError then
 						onError(...)
 					end
-					error(...)
+					sub:Error(...)
 				end,
 				function(...)
 					if onComplete then
 						onComplete(...)
 					end
-					onComplete(...)
+					sub:Complete(...)
 				end)
 		end)
 	end
@@ -318,7 +318,7 @@ function Rx.defaultsTo(value)
 
 			local fired = false
 
-			maid:GiveTask(source:Subscribe(
+			sub:GiveTask(source:Subscribe(
 				function(...)
 					fired = true
 					sub:Fire(...)
@@ -591,7 +591,7 @@ function Rx.switchAll()
 
 			outerMaid:GiveTask(source:Subscribe(
 				function(observable)
-					assert(Observable.isObservable(observable))
+					assert(Observable.isObservable(observable), "Bad observable")
 
 					insideComplete = false
 					currentInside = observable
@@ -642,7 +642,7 @@ end
 	This takes a stream of observables
 
 	@param project (value: T) -> Observable<U>
-	@param resultSelector ((value: T) -> U)?
+	@param resultSelector ((initialValue: T, outputValue: U) -> U)?
 	@return (source: Observable<T>) -> Observable<U>
 ]=]
 function Rx.flatMap(project, resultSelector)
@@ -777,7 +777,7 @@ end
 	@return Observable<T>
 ]=]
 function Rx.unpacked(observable)
-	assert(Observable.isObservable(observable))
+	assert(Observable.isObservable(observable), "Bad observable")
 
 	return Observable.new(function(sub)
 		return observable:Subscribe(function(value)
@@ -918,7 +918,7 @@ function Rx.catchError(callback)
 					-- at this point, we can only have one error, so we need to subscribe to the result
 					-- and continue the observiable
 					local observable = callback(...)
-					assert(Observable.isObservable(observable))
+					assert(Observable.isObservable(observable), "Bad observable")
 
 					maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
 				end,
@@ -1038,7 +1038,7 @@ function Rx.using(resourceFactory, observableFactory)
 		maid:GiveTask(resource)
 
 		local observable = observableFactory(resource)
-		assert(Observable.isObservable(observable))
+		assert(Observable.isObservable(observable), "Bad observable")
 
 		maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
 
@@ -1131,7 +1131,7 @@ function Rx.withLatestFrom(inputObservables)
 	assert(inputObservables, "Bad inputObservables")
 
 	for _, observable in pairs(inputObservables) do
-		assert(Observable.isObservable(observable))
+		assert(Observable.isObservable(observable), "Bad observable")
 	end
 
 	return function(source)
@@ -1166,7 +1166,7 @@ end
 --[=[
 	https://rxjs-dev.firebaseapp.com/api/operators/scan
 
-	@param accumulator (current: TSeed, value: TInput) -> TResult
+	@param accumulator (current: TSeed, ...: TInput) -> TResult
 	@param seed TSeed
 	@return (source: Observable<TInput>) -> Observable<TResult>
 ]=]
@@ -1177,8 +1177,8 @@ function Rx.scan(accumulator, seed)
 		return Observable.new(function(sub)
 			local current = seed
 
-			return source:Subscribe(function(value)
-				current = accumulator(current, value)
+			return source:Subscribe(function(...)
+				current = accumulator(current, ...)
 				sub:Fire(current)
 			end, sub:GetFailComplete())
 		end)
