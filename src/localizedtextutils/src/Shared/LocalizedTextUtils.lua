@@ -112,7 +112,7 @@ end
 
 --[=[
 	Converts from JSON
-	@param localizedText LocalizedTextData
+	@param text string
 	@return LocalizedTextData?
 ]=]
 function LocalizedTextUtils.fromJSON(text)
