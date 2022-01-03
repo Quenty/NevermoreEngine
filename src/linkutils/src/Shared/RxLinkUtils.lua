@@ -15,8 +15,8 @@ local RxLinkUtils = {}
 
 -- Emits valid links in format Brio.new(link, linkValue)
 function RxLinkUtils.observeValidLinksBrio(linkName, parent)
-	assert(type(linkName) == "string", "Bad linkName")
-	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(linkName) == "string", "linkName should be 'string'")
+	assert(typeof(parent) == "Instance", "parent should be 'Instance'")
 
 	return RxInstanceUtils.observeChildrenBrio(parent)
 		:Pipe({
