@@ -94,7 +94,23 @@ end
 	@return boolean true or false, whether or not it is a value
 ]=]
 function Binder.isBinder(value)
-	return type(value) == "table" and value.ClassName == "Binder"
+	return type(value) == "table"
+		and type(value.Start) == "function"
+		and type(value.GetTag) == "function"
+		and type(value.GetConstructor) == "function"
+		and type(value.ObserveInstance) == "function"
+		and type(value.GetClassAddedSignal) == "function"
+		and type(value.GetClassRemovingSignal) == "function"
+		and type(value.GetClassRemovedSignal) == "function"
+		and type(value.GetAll) == "function"
+		and type(value.GetAllSet) == "function"
+		and type(value.Bind) == "function"
+		and type(value.Unbind) == "function"
+		and type(value.BindClient) == "function"
+		and type(value.UnbindClient) == "function"
+		and type(value.Get) == "function"
+		and type(value.Promise) == "function"
+		and type(value.Destroy) == "function"
 end
 
 --[=[
