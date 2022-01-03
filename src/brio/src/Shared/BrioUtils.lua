@@ -127,6 +127,30 @@ function BrioUtils.first(brios, ...)
 end
 
 --[=[
+	Clones a brio, such that it may be killed without affecting the original
+	brio.
+
+	@since 3.6.0
+	@param brio Brio<T>
+	@return Brio<T>
+]=]
+function BrioUtils.withOtherValues(brio, ...)
+	assert(brio, "Bad brio")
+
+	if brio:IsDead() then
+		return Brio.DEAD
+	end
+
+	local newBrio = Brio.new(...)
+
+	newBrio:ToMaid():GiveTask(brio:GetDiedSignal():Connect(function()
+		newBrio:Kill()
+	end))
+
+	return newBrio
+end
+
+--[=[
 	Makes a brio that is limited by the lifetime of its parent (but could be shorter)
 	and has the new values given.
 
@@ -147,6 +171,44 @@ function BrioUtils.extend(brio, ...)
 	local otherValues = table.pack(...)
 	for i=1, otherValues.n do
 		current[values.n+i] = otherValues[i]
+	end
+
+	local maid = Maid.new()
+	local newBrio = Brio.new(unpack(current, 1, values.n + otherValues.n))
+
+	maid:GiveTask(brio:GetDiedSignal():Connect(function()
+		newBrio:Kill()
+	end))
+
+	maid:GiveTask(newBrio:GetDiedSignal():Connect(function()
+		maid:DoCleaning()
+	end))
+
+	return newBrio
+end
+
+--[=[
+	Makes a brio that is limited by the lifetime of its parent (but could be shorter)
+	and has the new values given at the beginning of the result
+
+	@since 3.6.0
+	@param brio Brio<U>
+	@param ... T
+	@return Brio<T>
+]=]
+function BrioUtils.prepend(brio, ...)
+	if brio:IsDead() then
+		return Brio.DEAD
+	end
+
+	local values = brio._values
+	local current = {}
+	local otherValues = table.pack(...)
+	for i=1, otherValues.n do
+		current[i] = otherValues[i]
+	end
+	for i=1, values.n do
+		current[otherValues.n+i] = values[i]
 	end
 
 	local maid = Maid.new()

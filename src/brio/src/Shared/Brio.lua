@@ -80,7 +80,6 @@ end
 --[=[
 	Constructs a new Brio.
 
-
 	```lua
 	local brio = Brio.new("a", "b")
 	print(brio:GetValue()) --> a b
@@ -93,6 +92,22 @@ function Brio.new(...) -- Wrap
 	return setmetatable({
 		_values = table.pack(...);
 	}, Brio)
+end
+
+--[=[
+	Constructs a new brio that will cleanup afer the set amount of time
+
+	@since 3.6.0
+	@param time number
+	@param ... any -- Brio values
+	@return Brio
+]=]
+function Brio.delayed(time, ...)
+	local brio = Brio.new(...)
+	task.delay(time, function()
+		brio:Kill()
+	end)
+	return brio
 end
 
 --[=[
@@ -212,6 +227,18 @@ function Brio:GetValue()
 	assert(self._values, "Brio is dead")
 
 	return unpack(self._values, 1, self._values.n)
+end
+
+--[=[
+	Returns the packed values from table.pack() format
+
+	@since 3.6.0
+	@return { n: number, ... T }
+]=]
+function Brio:GetPackedValues()
+	assert(self._values, "Brio is dead")
+
+	return self._values
 end
 
 --[=[
