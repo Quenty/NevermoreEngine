@@ -38,6 +38,16 @@ Signal.__index = Signal
 Signal.ClassName = "Signal"
 
 --[=[
+	Returns whether a class is a signal
+	@param value any
+	@return boolean
+]=]
+function Signal.isSignal(value)
+	return type(value) == "table"
+		and getmetatable(value) == Signal
+end
+
+--[=[
 	Constructs a new signal.
 	@return Signal<T>
 ]=]
