@@ -1,15 +1,15 @@
 --[=[
 	cancellableDelay a delay that can be cancelled
-	@class cancellabledelay
+	@class cancellableDelay
 ]=]
 
 --[=[
-	@function cancellabledelay
+	@function cancellableDelay
 	@param timeoutInSeconds number
 	@param func function
 	@param ... any -- Args to pass into the function
 	@return function? -- Can be used to cancel
-	@within cancellabledelay
+	@within cancellableDelay
 ]=]
 local function cancellableDelay(timeoutInSeconds, func, ...)
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
