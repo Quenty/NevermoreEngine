@@ -13,6 +13,23 @@ BasicPane.__index = BasicPane
 BasicPane.ClassName = "BasicPane"
 
 --[=[
+	Returns whether the value is a basic pane
+	@param value any
+	@return boolean
+]=]
+function BasicPane.isBasicPane(value)
+	return type(value) == "table"
+		and Maid.isMaid(value._maid)
+		and Signal.isSignal(value.VisibleChanged)
+		and type(value.SetVisible) == "function"
+		and type(value.IsVisible) == "function"
+		and type(value.Show) == "function"
+		and type(value.Hide) == "function"
+		and type(value.Toggle) == "function"
+		and type(value.Destroy) == "function"
+end
+
+--[=[
 	Gui object which can be reparented or whatever
 
 	@prop Gui Instance?
