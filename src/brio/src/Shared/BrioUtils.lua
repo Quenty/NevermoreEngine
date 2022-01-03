@@ -132,7 +132,8 @@ end
 
 	@since 3.6.0
 	@param brio Brio<T>
-	@return Brio<T>
+	@param ... U
+	@return Brio<U>
 ]=]
 function BrioUtils.withOtherValues(brio, ...)
 	assert(brio, "Bad brio")
