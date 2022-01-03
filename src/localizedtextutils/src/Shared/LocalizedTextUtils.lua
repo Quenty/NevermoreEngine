@@ -3,6 +3,13 @@
 	@class LocalizedTextUtils
 ]=]
 
+local HttpService = game:GetService("HttpService")
+
+local require = require(script.Parent.loader).load(script)
+
+local RxAttributeUtils = require("RxAttributeUtils")
+local Rx = require("Rx")
+
 local LocalizedTextUtils = {}
 
 --[=[
@@ -48,16 +55,17 @@ function LocalizedTextUtils.isLocalizedText(data)
 end
 
 --[=[
-	Recursively formats the translated text
+	Recursively formats the translated text.
 	@param translator Translator | JSONTranslator
 	@param translationKey string
 	@param translationArgs TranslationArgs
+	@param extraArgs table?
 	@return string
 ]=]
-function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, translationArgs)
+function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, translationArgs, extraArgs)
 	assert(translator, "Bad translator")
-	assert(translationKey, "Bad translationKey")
-	assert(translationArgs, "Bad translationArgs")
+	assert(type(translationKey) == "string", "Bad translationKey")
+	assert(type(translationArgs) == "table", "Bad translationArgs")
 
 	local formattedArgs = {}
 	for name, value in pairs(translationArgs) do
@@ -66,12 +74,18 @@ function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, tra
 
 			if value.translationArgs then
 				formattedArgs[name] = LocalizedTextUtils
-					.formatByKeyRecursive(translator, value.translationKey, value.translationArgs)
+					.formatByKeyRecursive(translator, value.translationKey, value.translationArgs, extraArgs)
 			else
 				formattedArgs[name] = translator:FormatByKey(value.translationKey)
 			end
 		else
 			formattedArgs[name] = value
+		end
+	end
+
+	if extraArgs then
+		for key, value in pairs(extraArgs) do
+			formattedArgs[key] = value
 		end
 	end
 
@@ -82,18 +96,154 @@ end
 	Recursively formats the translated text
 	@param translator Translator | JSONTranslator
 	@param localizedText LocalizedTextData
+	@param extraArgs table?
 	@return string
 ]=]
-function LocalizedTextUtils.localizedTextToString(translator, localizedText)
+function LocalizedTextUtils.localizedTextToString(translator, localizedText, extraArgs)
 	assert(translator, "Bad translator")
-	assert(localizedText, "No localizedText")
-	assert(localizedText.translationKey, "No translationKey")
-	assert(localizedText.translationArgs, "No translationArgs")
+	assert(LocalizedTextUtils.isLocalizedText(localizedText), "No localizedText")
 
 	return LocalizedTextUtils.formatByKeyRecursive(
 		translator,
 		localizedText.translationKey,
-		localizedText.translationArgs)
+		localizedText.translationArgs,
+		extraArgs)
+end
+
+--[=[
+	Converts from JSON
+	@param localizedText LocalizedTextData
+	@return LocalizedTextData?
+]=]
+function LocalizedTextUtils.fromJSON(text)
+	assert(type(text) == "string", "Bad text")
+
+	local decoded
+	local ok = pcall(function()
+		decoded = HttpService:JSONDecode(text)
+	end)
+	if not ok then
+		return nil
+	end
+
+	return decoded
+end
+
+--[=[
+	Converts to JSON
+	@param localizedText LocalizedTextData
+	@return string?
+]=]
+function LocalizedTextUtils.toJSON(localizedText)
+	assert(LocalizedTextUtils.isLocalizedText(localizedText), "Bad localizedText")
+
+	local localized = HttpService:JSONEncode(localizedText)
+	return localized
+end
+
+--[=[
+	Sets the translation data as an attribute on an instance.
+	@param obj Instance
+	@param attributeName string
+	@param translationKey string
+	@param translationArgs TranslationArgs
+	@return LocalizedTextData
+]=]
+function LocalizedTextUtils.setFromAttribute(obj, attributeName, translationKey, translationArgs)
+	assert(typeof(obj) == "Instance", "Bad obj")
+	assert(type(attributeName) == "string", "Bad attributeName")
+
+	local localizedText = LocalizedTextUtils.create(translationKey, translationArgs)
+	obj:SetAttribute(attributeName, LocalizedTextUtils.toJSON(localizedText))
+end
+
+--[=[
+	Reads the data from the attribute
+	@param obj Instance
+	@param attributeName string
+	@return LocalizedTextData
+]=]
+function LocalizedTextUtils.getFromAttribute(obj, attributeName)
+	assert(typeof(obj) == "Instance", "Bad obj")
+	assert(type(attributeName) == "string", "Bad attributeName")
+
+	local value = obj:GetAttribute(attributeName)
+	if type(value) == "string" then
+		return LocalizedTextUtils.fromJSON(value)
+	end
+
+	return nil
+end
+
+--[=[
+	Gets the translation from a given object's attribute
+	@param translator Translator | JSONTranslator
+	@param obj Instance
+	@param attributeName string
+	@param extraArgs table?
+	@return string?
+]=]
+function LocalizedTextUtils.getTranslationFromAttribute(translator, obj, attributeName, extraArgs)
+	assert(translator, "Bad translator")
+	assert(typeof(obj) == "Instance", "Bad obj")
+	assert(type(attributeName) == "string", "Bad attributeName")
+
+	local data = LocalizedTextUtils.getFromAttribute(obj, attributeName)
+	if data then
+		return LocalizedTextUtils.localizedTextToString(translator, data, extraArgs)
+	else
+		return nil
+	end
+end
+
+--[=[
+	Ensures an attribute is defined if nothing is there
+	@param obj Instance
+	@param attributeName string
+	@param defaultTranslationKey string
+	@param defaultTranslationArgs table?
+]=]
+function LocalizedTextUtils.initializeAttribute(obj, attributeName, defaultTranslationKey, defaultTranslationArgs)
+	assert(typeof(obj) == "Instance", "Bad obj")
+	assert(type(attributeName) == "string", "Bad attributeName")
+	assert(type(defaultTranslationKey) == "string", "Bad defaultTranslationKey")
+	assert(type(defaultTranslationArgs) == "table", "Bad defaultTranslationArgs")
+
+	if LocalizedTextUtils.getFromAttribute(obj, attributeName) then
+		return
+	end
+
+	LocalizedTextUtils.setFromAttribute(obj, attributeName, defaultTranslationKey, defaultTranslationArgs)
+end
+
+--[=[
+	Returns the translated string from the given object
+	@param translator Translator | JSONTranslator
+	@param obj Instance
+	@param attributeName string
+	@param extraArgs table?
+	@return Observable<string?>
+]=]
+function LocalizedTextUtils.observeTranslation(translator, obj, attributeName, extraArgs)
+	assert(translator, "Bad translator")
+	assert(typeof(obj) == "Instance", "Bad obj")
+	assert(type(attributeName) == "string", "Bad attributeName")
+
+	return RxAttributeUtils.observeAttribute(obj, attributeName, nil)
+		:Pipe({
+			Rx.map(function(encodedText)
+				if type(encodedText) == "string" then
+					local localizedText = LocalizedTextUtils.fromJSON(encodedText)
+					if localizedText then
+						return LocalizedTextUtils.localizedTextToString(translator, localizedText, extraArgs)
+					else
+						return nil
+					end
+				else
+					return nil
+				end
+			end);
+		})
 end
 
 return LocalizedTextUtils
