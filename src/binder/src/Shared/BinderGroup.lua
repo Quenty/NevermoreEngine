@@ -60,7 +60,7 @@ end
 	@param binder Binder<T>
 ]=]
 function BinderGroup:Add(binder)
-	assert(Binder.isBinder(binder))
+	assert(Binder.isBinder(binder), "Binder is not a binder")
 
 	if self._validateConstructor then
 		assert(self._validateConstructor(binder:GetConstructor()))
