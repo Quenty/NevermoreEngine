@@ -8,6 +8,7 @@ local LocalizationService = game:GetService("LocalizationService")
 local RunService = game:GetService("RunService")
 
 local Promise = require("Promise")
+local ERROR_PUBLISH_REQUIRED = "Publishing the game is required to use GetTranslatorForPlayerAsync API."
 
 local LocalizationServiceUtils = {}
 
@@ -49,7 +50,9 @@ function LocalizationServiceUtils.promiseTranslator(player)
 	end)
 
 	return asyncTranslatorPromise:Catch(function(err)
-		warn(("[LocalizationServiceUtils.promiseTranslator] - %s"):format(tostring(err)))
+		if err ~= ERROR_PUBLISH_REQUIRED then
+			warn(("[LocalizationServiceUtils.promiseTranslator] - %s"):format(tostring(err)))
+		end
 
 		-- Fallback to just local stuff
 		local translator = LocalizationService:GetTranslatorForPlayer(player)
