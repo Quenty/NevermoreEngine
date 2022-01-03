@@ -77,4 +77,21 @@ function AttributeUtils.bindToBinder(instance, attributeName, binder)
 	return maid
 end
 
+--[=[
+	Initializes an attribute for a given instance
+
+	@param instance Instance
+	@param attributeName string
+	@param default any
+	@return any? -- The value of the attribute
+]=]
+function AttributeUtils.initAttribute(instance, attributeName, default)
+	local value = instance:GetAttribute(attributeName)
+	if value == nil then
+		instance:SetAttribute(attributeName, default)
+		value = default
+	end
+	return value
+end
+
 return AttributeUtils
