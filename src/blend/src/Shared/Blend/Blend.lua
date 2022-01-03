@@ -5,6 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AccelTween = require("AccelTween")
 local BlendDefaultProps = require("BlendDefaultProps")
 local Brio = require("Brio")
 local Maid = require("Maid")
@@ -13,18 +14,16 @@ local Promise = require("Promise")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local Signal = require("Signal")
 local Spring = require("Spring")
 local SpringUtils = require("SpringUtils")
 local StepUtils = require("StepUtils")
-local Symbol = require("Symbol")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 local ValueObjectUtils = require("ValueObjectUtils")
-local AccelTween = require("AccelTween")
+local MaidTaskUtils = require("MaidTaskUtils")
 
 local Blend = {}
-
-Blend.Children = Symbol.named("children")
 
 --[=[
 	Creates a new function which will return an observable that, given the props
@@ -56,6 +55,7 @@ function Blend.New(className)
 			local maid = Maid.new()
 
 			local instance = Instance.new(className)
+			-- maid:GiveTask(instance)
 
 			if defaults then
 				for key, value in pairs(defaults) do
@@ -209,12 +209,16 @@ function Blend.OnEvent(eventName)
 	end
 end
 
+--[=[
+	Similiar to Fusion's ComputedPairs, where the changes are cached, and the lifetime limited.
+	@param source Observable<T> | any
+	@param compute (key: any, value: any, innerMaid: Maid) -> Instance | Observable<Instance>
+	@return Observable<Brio<Instance>>
+]=]
 function Blend.ComputedPairs(source, compute)
 	local sourceObservable = Blend.toPropertyObservable(source) or Rx.of(source)
 
-	return function(parent)
-		assert(typeof(parent) == "Instance", "Bad parent")
-
+	return Observable.new(function(sub)
 		local cache = {}
 		local topMaid = Maid.new()
 
@@ -240,10 +244,7 @@ function Blend.ComputedPairs(source, compute)
 					local brio = Brio.new(result)
 					innerMaid:GiveTask(brio)
 
-					local cleanup = Blend.mountChildren(parent, brio)
-					if cleanup then
-						innerMaid:GiveTask(cleanup)
-					end
+					sub:Fire(brio)
 
 					maidForKeys[key] = innerMaid
 					cache[key] = value
@@ -254,10 +255,10 @@ function Blend.ComputedPairs(source, compute)
 				maidForKeys[key] = nil
 				cache[key] = nil
 			end
-		end))
+		end), sub:GetFailComplete())
 
 		return topMaid
-	end
+	end)
 end
 
 --[=[
@@ -390,7 +391,7 @@ function Blend.toPropertyObservable(value)
 			return RxValueBaseUtils.observeValue(value)
 		end
 	elseif type(value) == "table" then
-		if value.ClassName == "ValueObject" then
+		if ValueObject.isValueObject(value) then
 			return ValueObjectUtils.observeValue(value)
 		elseif Promise.isPromise(value) then
 			return Rx.fromPromise(value)
@@ -464,71 +465,244 @@ end
 	Note that this effectively recursively mounts children and their values, which is
 	the heart of the reactive tree.
 
+	```lua
+	Blend.New "ScreenGui" {
+		Parent = game.Players.LocalPlayer.PlayerGui;
+		[Blend.Children] = {
+			Blend.New "Frame" {
+				Size = UDim2.new(1, 0, 1, 0);
+				BackgroundTransparency = 0.5;
+			};
+		};
+	};
+	```
+
+	Rules:
+
+	* `{ Instance }` -Tables of instances are all parented to the parent
+	* Brio<Instance> will last for the lifetime of the brio
+	* Brio<Observable<Instance>> will last for the lifetime of the brio
+		* Brio<Signal<Instance>> will also act as above
+		* Brio<Promise<Instance>> will also act as above
+		* Brio<{ Instance } will also act as above
+	* Observable<Instance> will parent to the parent
+		* Signal<Instance> will act as Observable<Instance>
+		* ValueObject<Instance> will act as an Observable<Instance>
+		* Promise<Instance> will act as an Observable<Instance>
+	*  will parent all instances to the parent
+	* Observables may emit non-observables (in form of Computed/Dynamic)
+		* Observable<Brio<Instance>> will last for the lifetime of the brio, and parent the instance.
+		* Observable<Observable<Instance>> occurs when computed returns a value.
+	* ValueObject<Instance> will switch to the current value
+
+	Cleanup:
+	* Instances will be cleaned up on unsubscribe
+
 	@param parent Instance
 	@param value any
 	@return MaidTask
 ]=]
-function Blend.mountChildren(parent, value)
-	if typeof(value) == "Instance" then
-		value.Parent = parent
+function Blend.Children(parent, value)
+	assert(typeof(parent) == "Instance", "Bad parent")
 
-		-- ensure we cleanup the actual child
-		return value
+	local observe = Blend._observeChildren(value)
+	if observe then
+		return observe:Pipe({
+			Rx.tap(function(child)
+				child.Parent = parent;
+			end);
+		})
+	else
+		return Rx.EMPTY
+	end
+end
+
+--[=[
+	Ensures the computed version of a value is limited by lifetime instead
+	of multiple. Used in conjunction with [Blend.Children] and [Blend.Computed].
+
+	:::warning
+	In general, cosntructing new instances like this is a bad idea, so it's recommended against it.
+	:::
+
+	```lua
+	Blend.New "ScreenGui" {
+		Parent = game.Players.LocalPlayer.PlayerGui;
+		[Blend.Children] = {
+			Blend.Single(percentVisible, Blend.Computed(function()
+				-- you generally would not want to do this anyway because this reconstructs a new frame
+				-- every frame.
+
+				Blend.New "Frame" {
+					Size = UDim2.new(1, 0, 1, 0);
+					BackgroundTransparency = 0.5;
+				};
+			end)
+		};
+	};
+	```
+
+	@function Single
+	@param Observable<Instance | Brio<Instance>>
+	@return Observable<Brio<Instance>>
+	@within Blend
+]=]
+Blend.Single = require("RxBrioUtils").switchToBrio()
+
+--[=[
+	Observes children and ensures that the value is cleaned up
+	afterwards.
+	@param value any
+	@return Observable<Instance>
+]=]
+function Blend._observeChildren(value)
+	if typeof(value) == "Instance" then
+		-- Should be uncommon
+		return Observable.new(function(sub)
+			sub:Fire(value)
+			-- don't complete, as this would clean everything up
+			return value
+		end)
 	end
 
-	if type(value) == "table" then
-		if Brio.isBrio(value) then
+	if ValueObject.isValueObject(value) then
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			-- Switch instead of emitting every value.
+			local function update()
+				local result = value.Value
+				if typeof(result) == "Instance" then
+					maid._current = result
+					sub:Fire(result)
+					return
+				end
+
+				local observe = Blend._observeChildren(result)
+				if observe then
+					maid._current = nil
+
+					local doCleanup = false
+					local cleanup
+					cleanup = observe:Subscribe(function(inst)
+						sub:Fire(inst)
+					end, function(...)
+						sub:Fail(...)
+					end, function()
+						-- incase of immediate execution
+						doCleanup = true
+
+						-- Do not pass complete through to the end
+						if maid._current == cleanup then
+							maid._current = nil
+						end
+					end)
+
+					-- TODO: Complete when valueobject cleans up
+
+					if doCleanup then
+						if cleanup then
+							MaidTaskUtils.doCleanup(cleanup)
+						end
+					else
+						maid._current = cleanup
+					end
+
+					return
+				end
+
+				maid._current = nil
+			end
+			maid:GiveTask(value.Changed:Connect(update))
+			update()
+
+			return maid
+		end)
+	end
+
+	if Brio.isBrio(value) then
+		return Observable.new(function(sub)
 			if value:IsDead() then
 				return nil
 			end
 
-			local maid = Maid.new()
-
-			-- Add for lifetime
-			local cleanup = Blend.mountChildren(parent, value:GetValue())
-			if cleanup then
-				maid:GiveTask(cleanup)
-			end
-
-			-- Cleanup after death
-			maid:GiveTask(value:GetDiedSignal():Connect(function()
-				maid:DoCleaning()
-			end))
-
-			return maid
-		else
-			local observable = Blend.toPropertyObservable(value)
-			if observable then
-				-- observable of observables. we will keep these children alive
-				-- until the point that we emit a new observed value.
-				local maid = Maid.new()
-
-				maid:GiveTask(observable:Subscribe(function(result)
-					maid._current = Blend.mountChildren(parent, result)
-				end))
-
-				return maid
-			else
-				local maid = Maid.new()
-
-				-- hope we're actually recursing over a nested table.
-				-- this allows us to add arrays into the blend.
-				for _, item in pairs(value) do
-					local cleanup = Blend.mountChildren(parent, item)
-					if cleanup then
-						maid:GiveTask(cleanup)
-					end
-				end
+			local result = value:GetValue()
+			if typeof(result) == "Instance" then
+				local maid = value:ToMaid()
+				maid:GiveTask(result)
+				sub:Fire(result)
 
 				return maid
 			end
-		end
-	elseif type(value) == "function" then
-		-- hope we aren't iterating over a table
-		return value(parent)
+
+			local observe = Blend._observeChildren(result)
+			if observe then
+				local maid = value:ToMaid()
+
+				-- Subscription is for lifetime of brio, so we do
+				-- not need to specifically add these results to the maid, and
+				-- risk memory leak of the maid with a lot of items in it.
+				maid:GiveTask(observe:Subscribe(sub:GetFireFailComplete()))
+
+				return maid
+			end
+
+			warn(("Unknown type in brio %q"):format(typeof(value)))
+			return nil
+		end)
 	end
 
-	warn("[Blend] - Failed to convert result to children")
+	-- Handle like observable
+	if Promise.isPromise(value) then
+		value = Rx.fromPromise(value)
+	end
+
+	-- Handle like observable
+	if Signal.isSignal(value) or typeof(value) == "RBXScriptSignal" then
+		value = Rx.fromSignal(value)
+	end
+
+	if Observable.isObservable(value) then
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			value:Subscribe(function(result)
+				if typeof(result) == "Instance" then
+					-- lifetime of subscription
+					maid:GiveTask(result)
+					sub:Fire(result)
+					return
+				end
+
+				local observe = Blend._observeChildren(result)
+				if observe then
+					maid:GiveTask(observe:Subscribe(sub:GetFireFailComplete()))
+				else
+					warn(("Unknown type %q in observable"):format(typeof(result)))
+				end
+			end, sub:GetFailComplete())
+
+			return maid
+		end)
+	end
+
+	if type(value) == "table" and not getmetatable(value) then
+		local observables = {}
+		for key, item in pairs(value) do
+			local observe = Blend._observeChildren(item)
+			if observe then
+				table.insert(observables, observe)
+			else
+				warn(("Unknown %q of %q"):format(tostring(key), typeof(item)))
+			end
+		end
+
+		if next(observables) then
+			return Rx.merge(observables)
+		else
+			return nil
+		end
+	end
 
 	return nil
 end
@@ -542,6 +716,7 @@ end
 		* If this can be turned into an observable, it will be used to subscribe to this event
 		* Otherwise, we assign directly
 	* Keys of functions are invoked on the instance in question
+		* `(instance, value) -> Observable
 		* If this returns an observable (or can be turned into one), we subscribe the event immediately
 	* If the key is [Blend.Children] then we invoke mountChildren on it
 
@@ -553,6 +728,8 @@ function Blend.mount(instance, props)
 	local maid = Maid.new()
 
 	local parent = nil
+	local dependentObservables = {}
+
 	for key, value in pairs(props) do
 		if type(key) == "string" then
 			if key == "Parent" then
@@ -572,16 +749,21 @@ function Blend.mount(instance, props)
 				end
 			end
 		elseif type(key) == "function" then
-			local observable = Blend.toEventObservable(key(instance))
+			local observable = Blend.toEventObservable(key(instance, value))
 
 			if Observable.isObservable(observable) then
-				maid:GiveTask(observable:Subscribe(Blend.toEventHandler(value)))
+				table.insert(dependentObservables, {observable, value})
 			else
 				warn(("Unable to apply event listener %q"):format(tostring(key)))
 			end
-		elseif key ~= Blend.Children then
+		else
 			warn(("Unable to apply property %q"):format(tostring(key)))
 		end
+	end
+
+	-- Subscribe dependentObservables (which includes adding children)
+	for _, event in pairs(dependentObservables) do
+		maid:GiveTask(event[1]:Subscribe(Blend.toEventHandler(event[2])))
 	end
 
 	if parent then
@@ -592,14 +774,6 @@ function Blend.mount(instance, props)
 			end))
 		else
 			instance.Parent = parent
-		end
-	end
-
-	local childProp = props[Blend.Children]
-	if childProp then
-		local cleanup = Blend.mountChildren(instance, childProp)
-		if cleanup then
-			maid:GiveTask(cleanup)
 		end
 	end
 
