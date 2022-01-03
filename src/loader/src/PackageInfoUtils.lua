@@ -185,7 +185,7 @@ function PackageInfoUtils.tryLoadPackageFromInstance(packageInfoList, packageInf
 		if value and (value:IsA("Folder") or value:IsA("ModuleScript")) then
 			table.insert(packageInfoList, PackageInfoUtils.getOrCreatePackageInfo(value, packageInfoMap, scope))
 		else
-			warn(("Invalid %q ObjectValue in package linking to nothing cannot be resolved into package dependency\n\t-> %s")
+			error(("Invalid %q ObjectValue in package linking to nothing cannot be resolved into package dependency\n\t-> %s")
 				:format(instance.Name, instance:GetFullName()))
 		end
 	end
