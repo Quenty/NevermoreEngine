@@ -1,25 +1,18 @@
-# v2.1.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add Signal.isSignal(value) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- docs: Add documentation on SignalUtils [#239](https://github.com/Quenty/NevermoreEngine/pull/239) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.0.2...@quenty/signal@2.1.0) (2022-01-03)
+
+
+### Features
+
+* Add Signal.isSignal(value) ([b2810ea](https://github.com/Quenty/NevermoreEngine/commit/b2810ea593223a9fe220f5e475221683d837fe9d))
+
+
+
+
 
 ## [2.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.0.1...@quenty/signal@2.0.2) (2021-12-30)
 

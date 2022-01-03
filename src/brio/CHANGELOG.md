@@ -1,24 +1,23 @@
-# v3.6.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: Deprecate old brio commands and add new utility functions, including: [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix moonwave documentation [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.5.2...@quenty/brio@3.6.0) (2022-01-03)
+
+
+### Bug Fixes
+
+* Fix moonwave documentation ([f169457](https://github.com/Quenty/NevermoreEngine/commit/f1694578b1623ff1092113eb4effb7bcb4a23669))
+
+
+### Features
+
+* Deprecate old brio commands and add new utility functions, including: ([71418b2](https://github.com/Quenty/NevermoreEngine/commit/71418b28cb3b28ad033b5445c1172a96e5d4467f))
+
+
+
+
 
 ## [3.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.5.1...@quenty/brio@3.5.2) (2021-12-30)
 

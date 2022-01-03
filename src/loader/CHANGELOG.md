@@ -1,19 +1,18 @@
-# v3.2.0 (Mon Jan 03 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Better error messages [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.1.2...@quenty/loader@3.2.0) (2022-01-03)
+
+
+### Bug Fixes
+
+* Better error messages ([821f1ce](https://github.com/Quenty/NevermoreEngine/commit/821f1cefc9297c26c5aab2e414618de183857d21))
+
+
+
+
 
 ## [3.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.1.1...@quenty/loader@3.1.2) (2021-12-30)
 

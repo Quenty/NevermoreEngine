@@ -1,20 +1,19 @@
-# v4.5.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: Suppress localization warnings when game is not published [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-- feat: Add JSONTranslator:ObserveFormatByKey(key, argData) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.4.1...@quenty/clienttranslator@4.5.0) (2022-01-03)
+
+
+### Features
+
+* Add JSONTranslator:ObserveFormatByKey(key, argData) ([17bfe63](https://github.com/Quenty/NevermoreEngine/commit/17bfe63717da1ec0193dada00adb5fbe482ac6f6))
+* Suppress localization warnings when game is not published ([ff57f8c](https://github.com/Quenty/NevermoreEngine/commit/ff57f8cb6bb86e06869b9ca19f2703b5e1406f0e))
+
+
+
+
 
 ## [4.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.4.0...@quenty/clienttranslator@4.4.1) (2021-12-30)
 

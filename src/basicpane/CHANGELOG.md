@@ -1,23 +1,18 @@
-# v3.3.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add BasicPaneUtils and BasicPane.isBasicPane(value) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@3.2.2...@quenty/basicpane@3.3.0) (2022-01-03)
+
+
+### Features
+
+* Add BasicPaneUtils and BasicPane.isBasicPane(value) ([17eccbb](https://github.com/Quenty/NevermoreEngine/commit/17eccbb692ad80cc21f6ec9285ed7dd853ca4b3d))
+
+
+
+
 
 ## [3.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@3.2.1...@quenty/basicpane@3.2.2) (2021-12-30)
 

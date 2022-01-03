@@ -1,20 +1,18 @@
-# v4.6.0 (Mon Jan 03 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Binder.isBinder(binder) does not error on child classes [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.5.2...@quenty/binder@4.6.0) (2022-01-03)
+
+
+### Bug Fixes
+
+* Binder.isBinder(binder) does not error on child classes ([76f8bee](https://github.com/Quenty/NevermoreEngine/commit/76f8bee8898bd64c33695f828e64e99567e15abd))
+
+
+
+
 
 ## [4.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.5.1...@quenty/binder@4.5.2) (2021-12-30)
 

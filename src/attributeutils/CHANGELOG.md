@@ -1,23 +1,18 @@
-# v4.1.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add AttributeUtils.initAttribute(instance, attributeName, default) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.0.2...@quenty/attributeutils@4.1.0) (2022-01-03)
+
+
+### Features
+
+* Add AttributeUtils.initAttribute(instance, attributeName, default) ([557acad](https://github.com/Quenty/NevermoreEngine/commit/557acadf65f8ed3b4921463971078c62c766f90f))
+
+
+
+
 
 ## [4.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.0.1...@quenty/attributeutils@4.0.2) (2021-12-30)
 

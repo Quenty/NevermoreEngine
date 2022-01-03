@@ -1,20 +1,18 @@
-# v3.6.0 (Mon Jan 03 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Use new non-deprecated RxBrioUtils methods [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@3.5.2...@quenty/r15utils@3.6.0) (2022-01-03)
+
+
+### Bug Fixes
+
+* Use new non-deprecated RxBrioUtils methods ([64255b7](https://github.com/Quenty/NevermoreEngine/commit/64255b7e2a6100f0f0b48e0d51bbdcc543ed841a))
+
+
+
+
 
 ## [3.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@3.5.1...@quenty/r15utils@3.5.2) (2021-12-30)
 

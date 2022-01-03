@@ -1,23 +1,23 @@
-# v2.1.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add localization text utils changes, including.... [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix moonwave documentation [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@2.0.1...@quenty/localizedtextutils@2.1.0) (2022-01-03)
+
+
+### Bug Fixes
+
+* Fix moonwave documentation ([f169457](https://github.com/Quenty/NevermoreEngine/commit/f1694578b1623ff1092113eb4effb7bcb4a23669))
+
+
+### Features
+
+* Add localization text utils changes, including.... ([eb8f5f8](https://github.com/Quenty/NevermoreEngine/commit/eb8f5f8215e3c259624df554aae42b94977727ba))
+
+
+
+
 
 ## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@2.0.0...@quenty/localizedtextutils@2.0.1) (2021-12-30)
 

@@ -1,19 +1,18 @@
-# v3.3.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: StateStack can now have states beyond boolean. Note that it tries to preserve its old behavior [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@3.2.1...@quenty/statestack@3.3.0) (2022-01-03)
+
+
+### Features
+
+* StateStack can now have states beyond boolean. Note that it tries to preserve its old behavior ([2710986](https://github.com/Quenty/NevermoreEngine/commit/2710986cd9dcc6e73baf5b9279376e05bd6f82d5))
+
+
+
+
 
 ## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@3.2.0...@quenty/statestack@3.2.1) (2021-12-30)
 

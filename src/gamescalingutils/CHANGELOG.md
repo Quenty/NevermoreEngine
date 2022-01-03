@@ -1,19 +1,15 @@
-# v3.1.0 (Mon Jan 03 2022)
-
-#### 🐛 Bug Fix
-
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@3.0.2...@quenty/gamescalingutils@3.1.0) (2022-01-03)
+
+**Note:** Version bump only for package @quenty/gamescalingutils
+
+
+
+
 
 ## [3.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@3.0.1...@quenty/gamescalingutils@3.0.2) (2021-12-30)
 

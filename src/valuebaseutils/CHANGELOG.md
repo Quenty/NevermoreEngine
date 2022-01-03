@@ -1,23 +1,18 @@
-# v3.6.0 (Mon Jan 03 2022)
-
-#### 🚀 Enhancement
-
-- feat: Deprecate RxValueBaseUtils.observe and add RxValueBaseUtils.observeBrio [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@3.5.2...@quenty/valuebaseutils@3.6.0) (2022-01-03)
+
+
+### Features
+
+* Deprecate RxValueBaseUtils.observe and add RxValueBaseUtils.observeBrio ([2c18d19](https://github.com/Quenty/NevermoreEngine/commit/2c18d19bdd13fbdecefc6f474fad479a45e92559))
+
+
+
+
 
 ## [3.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@3.5.1...@quenty/valuebaseutils@3.5.2) (2021-12-30)
 

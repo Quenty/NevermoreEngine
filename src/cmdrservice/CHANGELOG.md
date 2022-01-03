@@ -1,20 +1,18 @@
-# v3.7.0 (Mon Jan 03 2022)
-
-#### 🐛 Bug Fix
-
-- fix: CmdrService declares string dependency required [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.6.2...@quenty/cmdrservice@3.7.0) (2022-01-03)
+
+
+### Bug Fixes
+
+* CmdrService declares string dependency required ([d7bef75](https://github.com/Quenty/NevermoreEngine/commit/d7bef754237f14853c9f5e29e662f52fd4a568f9))
+
+
+
+
 
 ## [3.6.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.6.1...@quenty/cmdrservice@3.6.2) (2021-12-30)
 

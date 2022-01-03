@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseovermixin@3.2.1...@quenty/mouseovermixin@3.3.0) (2022-01-03)
+
+**Note:** Version bump only for package @quenty/mouseovermixin
+
+
+
+
+
 ## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseovermixin@3.2.0...@quenty/mouseovermixin@3.2.1) (2021-12-30)
 
 **Note:** Version bump only for package @quenty/mouseovermixin

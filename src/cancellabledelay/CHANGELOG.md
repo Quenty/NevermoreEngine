@@ -1,19 +1,15 @@
-# v2.2.0 (Mon Jan 03 2022)
-
-#### 🐛 Bug Fix
-
-- docs: Fix documentation on cancellableDelay [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cancellabledelay@2.1.1...@quenty/cancellabledelay@2.2.0) (2022-01-03)
+
+**Note:** Version bump only for package @quenty/cancellabledelay
+
+
+
+
 
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cancellabledelay@2.1.0...@quenty/cancellabledelay@2.1.1) (2021-12-30)
 
