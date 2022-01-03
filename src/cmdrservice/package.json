@@ -30,6 +30,7 @@
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
     "@quenty/servicebag": "file:../servicebag",
+    "@quenty/string": "file:../string",
     "@quenty/templateprovider": "file:../templateprovider"
   },
   "peerDependencies": {
