@@ -56,4 +56,22 @@ function MetricUtils.studsPerSecondToMph(studsPerSecond)
 	return studsPerSecond/STUDS_PER_METER/1000*SECONDS_PER_HOUR*KPH_TO_MPH
 end
 
+--[=[
+	Convert mph to studs per a second
+	@param kph number
+	@return number -- studs per a second
+]=]
+function MetricUtils.kphToStudsPerSecond(kph)
+	return kph*STUDS_PER_METER*1000/SECONDS_PER_HOUR
+end
+
+--[=[
+	Convert mph to studs per a second
+	@param mph number
+	@return number  -- studs per a second
+]=]
+function MetricUtils.mphToStudsPerSecond(mph)
+	return mph*STUDS_PER_METER*1000/SECONDS_PER_HOUR/KPH_TO_MPH
+end
+
 return MetricUtils
