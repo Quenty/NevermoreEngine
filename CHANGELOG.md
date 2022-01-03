@@ -1,3 +1,61 @@
+# (Mon Jan 03 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/metricutils@2.1.0`
+  - feat: Add MetricUtils.kphToStudsPerSecond(kph) and MetricUtils.mphToStudsPerSecond(mph) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+  - feat: Add MetricUtils.studsPerSecondToKph(studsPerSecond) and MetricUtils.studsPerSecondToMph(studsPerSecond) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/observablecollection@1.1.0`
+  - feat: Add ObservableCollection package [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/statestack@3.3.0`
+  - feat: StateStack can now have states beyond boolean. Note that it tries to preserve its old behavior [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/signal@2.1.0`
+  - feat: Add Signal.isSignal(value) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/brio@3.6.0`
+  - feat: Deprecate old brio commands and add new utility functions, including: [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/localizedtextutils@2.1.0`
+  - feat: Add localization text utils changes, including.... [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/valuebaseutils@3.6.0`
+  - feat: Deprecate RxValueBaseUtils.observe and add RxValueBaseUtils.observeBrio [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/clienttranslator@4.5.0`
+  - feat: Suppress localization warnings when game is not published [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+  - feat: Add JSONTranslator:ObserveFormatByKey(key, argData) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/attributeutils@4.1.0`
+  - feat: Add AttributeUtils.initAttribute(instance, attributeName, default) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/basicpane@3.3.0`
+  - feat: Add BasicPaneUtils and BasicPane.isBasicPane(value) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/blend@2.1.0`
+  - feat: Blend now supports a more stable contract for adding children. [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/blend@2.1.0`
+  - fix: Blend.Single specification was wrong [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/brio@3.6.0`, `@quenty/localizedtextutils@2.1.0`
+  - fix: Fix moonwave documentation [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cmdrservice@3.7.0`
+  - fix: CmdrService declares string dependency required [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rx@3.6.0`
+  - fix: Fix Rx typing in documentation and provide better error messages. Also... [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/linkutils@3.6.0`, `@quenty/loader@3.2.0`
+  - fix: Better error messages [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/r15utils@3.6.0`, `@quenty/ragdoll@5.1.0`, `@quenty/rxbinderutils@4.7.0`
+  - fix: Use new non-deprecated RxBrioUtils methods [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/instanceutils@3.6.0`
+  - fix: Better error messages on RxInstanceUtils.observeProperty(instance, propertyName) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/binder@4.6.0`
+  - fix: Binder.isBinder(binder) does not error on child classes [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cancellabledelay@2.2.0`
+  - docs: Fix documentation on cancellableDelay [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- `@quenty/signal@2.1.0`
+  - docs: Add documentation on SignalUtils [#239](https://github.com/Quenty/NevermoreEngine/pull/239) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Dec 30 2021)
 
 #### 🐛 Bug Fix

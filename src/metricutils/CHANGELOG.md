@@ -1,3 +1,16 @@
+# v2.1.0 (Mon Jan 03 2022)
+
+#### 🚀 Enhancement
+
+- feat: Add MetricUtils.kphToStudsPerSecond(kph) and MetricUtils.mphToStudsPerSecond(mph) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- feat: Add MetricUtils.studsPerSecondToKph(studsPerSecond) and MetricUtils.studsPerSecondToMph(studsPerSecond) [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

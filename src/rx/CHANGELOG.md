@@ -1,3 +1,16 @@
+# v3.6.0 (Mon Jan 03 2022)
+
+#### 🐛 Bug Fix
+
+- fix: Fix Rx typing in documentation and provide better error messages. Also... [#241](https://github.com/Quenty/NevermoreEngine/pull/241) ([@Quenty](https://github.com/Quenty))
+- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

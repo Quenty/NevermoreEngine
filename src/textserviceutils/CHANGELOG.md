@@ -1,3 +1,15 @@
+# v3.1.0 (Mon Jan 03 2022)
+
+#### 🐛 Bug Fix
+
+- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
