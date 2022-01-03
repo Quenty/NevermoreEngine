@@ -22,6 +22,7 @@ local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 local ValueObjectUtils = require("ValueObjectUtils")
 local MaidTaskUtils = require("MaidTaskUtils")
+local RxBrioUtils = require("RxBrioUtils")
 
 local Blend = {}
 
@@ -547,7 +548,7 @@ end
 	@return Observable<Brio<Instance>>
 	@within Blend
 ]=]
-Blend.Single = require("RxBrioUtils").switchToBrio()
+Blend.Single = RxBrioUtils.switchToBrio
 
 --[=[
 	Observes children and ensures that the value is cleaned up
