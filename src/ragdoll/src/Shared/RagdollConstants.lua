@@ -1,4 +1,5 @@
 --[=[
+	Constants for the [Ragdoll] class.
 	@class RagdollConstants
 ]=]
 

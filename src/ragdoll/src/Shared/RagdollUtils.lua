@@ -1,5 +1,7 @@
 --[=[
-	Utility mehtods for ragdolling. See Ragdoll.lua and RagdollClient.lua for implementation details
+	Utility methods for ragdolling. See [Ragdoll] and [RagdollClient] which call into this class.
+	If you want to make ragdolls without binders, this class may work for you.
+
 	@class RagdollUtils
 ]=]
 
@@ -19,6 +21,12 @@ local RagdollUtils = {}
 
 local EMPTY_FUNCTION = function() end
 
+--[=[
+	Sets up state monitoring for when the humanoid changes to ensure ragdoll is smooth.
+
+	@param humanoid Humanoid
+	@return Maid
+]=]
 function RagdollUtils.setupState(humanoid)
 	local maid = Maid.new()
 
@@ -68,7 +76,17 @@ function RagdollUtils.setupState(humanoid)
 	return maid
 end
 
--- We need this on all clients/servers to override animations!
+--[=[
+	Prevents animations from being applied on the humanoid torso on both
+	the server and client.
+
+	:::note
+	We need this on all clients/servers to override animations!
+	:::
+
+	@param humanoid Humanoid
+	@return Maid
+]=]
 function RagdollUtils.preventAnimationTransformLoop(humanoid)
 	local maid = Maid.new()
 
@@ -95,6 +113,13 @@ function RagdollUtils.preventAnimationTransformLoop(humanoid)
 	return maid
 end
 
+--[=[
+	Sets up the motors so that ragdoll can go, applying velocities to the ragdoll.
+	This needs to occur on the network owner of the character first.
+
+	@param humanoid Humanoid
+	@return Maid
+]=]
 function RagdollUtils.setupMotors(humanoid)
 	local character = humanoid.Parent
 	local rigType = humanoid.RigType
@@ -171,6 +196,13 @@ function RagdollUtils.setupMotors(humanoid)
 	end
 end
 
+--[=[
+	If the head is not a mesh part, this resizes the head into a mesh part with correct
+	physics, and ensures the head scaling is correct.
+
+	@param humanoid Humanoid
+	@return MaidTask
+]=]
 function RagdollUtils.setupHead(humanoid)
 	local model = humanoid.Parent
 	if not model then

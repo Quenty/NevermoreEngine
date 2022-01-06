@@ -1,4 +1,6 @@
 --[=[
+	When a humanoid is tagged with this, it will unragdoll automatically.
+	@server
 	@class UnragdollAutomatically
 ]=]
 
@@ -15,6 +17,12 @@ local UnragdollAutomatically = setmetatable({}, BaseObject)
 UnragdollAutomatically.ClassName = "UnragdollAutomatically"
 UnragdollAutomatically.__index = UnragdollAutomatically
 
+--[=[
+	Constructs a new UnragdollAutomatically. Should be done via [Binder]. See [RagdollBindersServer].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return UnragdollAutomatically
+]=]
 function UnragdollAutomatically.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), UnragdollAutomatically)
 

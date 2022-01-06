@@ -1,5 +1,8 @@
 --[=[
-	Client side ragdolling meant to be used with a binder
+	Client side ragdolling meant to be used with a binder. See [RagdollBindersClient].
+	While a humanoid is bound with this class, it is ragdolled.
+
+	@client
 	@class RagdollClient
 ]=]
 
@@ -19,6 +22,12 @@ local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
 RagdollClient.__index = RagdollClient
 
+--[=[
+	Constructs a new RagdollClient. Should be done via [Binder]. See [RagdollBindersClient].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return RagdollClient
+]=]
 function RagdollClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollClient)
 

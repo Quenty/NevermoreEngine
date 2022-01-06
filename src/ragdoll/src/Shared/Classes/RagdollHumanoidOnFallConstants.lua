@@ -1,4 +1,5 @@
 --[=[
+	Constants for [RagdollHumanoidOnFall].
 	@class RagdollHumanoidOnFallConstants
 ]=]
 
