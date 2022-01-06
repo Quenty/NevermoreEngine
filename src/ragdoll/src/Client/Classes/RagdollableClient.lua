@@ -1,5 +1,5 @@
 --[=[
-	Should be bound via [RagdollBindersClient]. 
+	Should be bound via [RagdollBindersClient].
 
 	@client
 	@class RagdollableClient

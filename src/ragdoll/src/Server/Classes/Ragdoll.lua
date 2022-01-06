@@ -16,7 +16,7 @@
 	-- Disable ragdoll
 	ragdollBindersServer.Ragdoll:Unbind(humanoid)
 	```
-	
+
 	@class Ragdoll
 ]=]
 

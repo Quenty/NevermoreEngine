@@ -27,7 +27,7 @@ local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 return BinderProvider.new(function(self, serviceBag)
 --[=[
 	Apply this [Binder] to a humanoid to ragdoll it. Humanoid must already have [Ragdollable] defined.
-	
+
 	```lua
 	local ragdollBinder = serviceBag:GetService(RagdollBindersClient).Ragdoll
 
@@ -44,13 +44,13 @@ return BinderProvider.new(function(self, serviceBag)
 	You can also use [RxBinderUtils.observeBoundClass] to observe whether a humanoid is ragdolled using an [Observable].
 
 	:::info
-	Like any usage of [Observable], be sure to give the [Subscription] to a [Maid] (or call [Subscription.Destroy] on it) once
-	done with the event connection.
+	Like any usage of [Observable], be sure to give the [Subscription] to a [Maid] (or call
+	[Subscription.Destroy] on it) once done with the event connection.
 	:::
 
 	```lua
 	local maid = Maid.new()
-	
+
 	local ragdollBinder = serviceBag:GetService(RagdollBindersClient).Ragdoll
 	maid:GiveTask(RxBinderUtils.observeBoundClass(ragdollBinder, humanoid):Subscribe(function(ragdoll)
 		if ragdoll then
