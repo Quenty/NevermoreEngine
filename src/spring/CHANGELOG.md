@@ -1,3 +1,19 @@
+# v3.1.1 (Thu Jan 06 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, aku ([@aku-e](https://github.com/aku-e)), for all your work!
+
+#### 🐛 Bug Fix
+
+- docs: Fix typo in spring docs, "fond" --> "found" [#242](https://github.com/Quenty/NevermoreEngine/pull/242) ([@aku-e](https://github.com/aku-e))
+
+#### Authors: 1
+
+- aku ([@aku-e](https://github.com/aku-e))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

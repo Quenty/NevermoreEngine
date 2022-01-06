@@ -1,3 +1,20 @@
+# (Thu Jan 06 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, aku ([@aku-e](https://github.com/aku-e)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/spring@3.1.1`
+  - docs: Fix typo in spring docs, "fond" --> "found" [#242](https://github.com/Quenty/NevermoreEngine/pull/242) ([@aku-e](https://github.com/aku-e))
+
+#### Authors: 1
+
+- aku ([@aku-e](https://github.com/aku-e))
+
+---
+
 # (Mon Jan 03 2022)
 
 #### 🚀 Enhancement
