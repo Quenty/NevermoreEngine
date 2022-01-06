@@ -454,7 +454,7 @@ end
 --[=[
 	Disables all particle emitters and fades them out. Yields for the duration.
 
-	@yielding
+	@yields
 	@param character Model
 	@param duration number
 ]=]
@@ -489,7 +489,7 @@ end
 --[=[
 	Applies a sliding friction torque to the character making it stiffer and stiffer. Yields.
 
-	@yielding
+	@yields
 	@param character Model
 	@param duration number
 ]=]

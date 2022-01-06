@@ -19,8 +19,8 @@ RagdollHumanoidOnDeath.__index = RagdollHumanoidOnDeath
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnDeath
 ]=]
-function RagdollHumanoidOnDeath.new(humanid, serviceBag)
-	local self = setmetatable(BaseObject.new(humanid), RagdollHumanoidOnDeath)
+function RagdollHumanoidOnDeath.new(humanoid, serviceBag)
+	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeath)
 
 	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
 
