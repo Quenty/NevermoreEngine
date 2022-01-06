@@ -1,5 +1,5 @@
 --[=[
-	Ragdolls the humanoid on fall
+	Ragdolls the humanoid on fall. This is the base class.
 	@class BindableRagdollHumanoidOnFall
 ]=]
 
@@ -16,6 +16,12 @@ local BindableRagdollHumanoidOnFall = setmetatable({}, BaseObject)
 BindableRagdollHumanoidOnFall.ClassName = "BindableRagdollHumanoidOnFall"
 BindableRagdollHumanoidOnFall.__index = BindableRagdollHumanoidOnFall
 
+--[=[
+	Constructs a new BindableRagdollHumanoidOnFall.
+	@param humanoid Humanoid
+	@param ragdollBinder Binder<Ragdoll | RagdollClient>
+	@return BindableRagdollHumanoidOnFall
+]=]
 function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 	local self = setmetatable(BaseObject.new(humanoid), BindableRagdollHumanoidOnFall)
 

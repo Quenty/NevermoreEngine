@@ -1,4 +1,6 @@
 --[=[
+	Should be bound to any humanoid that is ragdollable. See [RagdollBindersServer].
+	@server
 	@class Ragdollable
 ]=]
 
@@ -18,6 +20,12 @@ local Ragdollable = setmetatable({}, BaseObject)
 Ragdollable.ClassName = "Ragdollable"
 Ragdollable.__index = Ragdollable
 
+--[=[
+	Constructs a new Ragdollable. Should be done via [Binder]. See [RagdollBindersServer].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return Ragdollable
+]=]
 function Ragdollable.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), Ragdollable)
 

@@ -1,4 +1,5 @@
 --[=[
+	Constants for the [Ragdollable] class.
 	@class RagdollableConstants
 ]=]
 

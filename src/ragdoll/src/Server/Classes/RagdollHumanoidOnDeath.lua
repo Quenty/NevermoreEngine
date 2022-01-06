@@ -1,5 +1,6 @@
 --[=[
-	Ragdolls the humanoid on death
+	Ragdolls the humanoid on death.
+	@server
 	@class RagdollHumanoidOnDeath
 ]=]
 
@@ -12,8 +13,14 @@ local RagdollHumanoidOnDeath = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeath.ClassName = "RagdollHumanoidOnDeath"
 RagdollHumanoidOnDeath.__index = RagdollHumanoidOnDeath
 
-function RagdollHumanoidOnDeath.new(humanid, serviceBag)
-	local self = setmetatable(BaseObject.new(humanid), RagdollHumanoidOnDeath)
+--[=[
+	Constructs a new RagdollHumanoidOnDeath. Should be done via [Binder]. See [RagdollBindersServer].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return RagdollHumanoidOnDeath
+]=]
+function RagdollHumanoidOnDeath.new(humanoid, serviceBag)
+	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeath)
 
 	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
 

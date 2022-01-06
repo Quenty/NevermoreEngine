@@ -1,4 +1,7 @@
 --[=[
+	Ragdolls the humanoid on death. Should be bound via [RagdollBindersClient].
+
+	@client
 	@class RagdollHumanoidOnFallClient
 ]=]
 
@@ -18,6 +21,12 @@ RagdollHumanoidOnFallClient.__index = RagdollHumanoidOnFallClient
 
 require("PromiseRemoteEventMixin"):Add(RagdollHumanoidOnFallClient, RagdollHumanoidOnFallConstants.REMOTE_EVENT_NAME)
 
+--[=[
+	Constructs a new RagdollHumanoidOnFallClient. Should be done via [Binder]. See [RagdollBindersClient].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return RagdollHumanoidOnFallClient
+]=]
 function RagdollHumanoidOnFallClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFallClient)
 

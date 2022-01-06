@@ -1,4 +1,5 @@
 --[=[
+	Rigging data for humaoid ragdolls.
 	@class RagdollRigging
 ]=]
 
@@ -393,6 +394,11 @@ local function getMotorSet(model, motorSet)
 	return motors
 end
 
+--[=[
+	Creates joints on a model for a given rig type.
+	@param model Model
+	@param rigType HumanoidRigType
+]=]
 function RagdollRigging.createRagdollJoints(model, rigType)
 	local parts = indexParts(model)
 	if rigType == Enum.HumanoidRigType.R6 then
@@ -408,6 +414,10 @@ function RagdollRigging.createRagdollJoints(model, rigType)
 	end
 end
 
+--[=[
+	Removes ragdoll joints for a given model
+	@param model Model
+]=]
 function RagdollRigging.removeRagdollJoints(model)
 	for _, descendant in pairs(model:GetDescendants()) do
 		-- Remove BallSockets and NoCollides, leave the additional Attachments
@@ -419,6 +429,11 @@ function RagdollRigging.removeRagdollJoints(model)
 	end
 end
 
+--[=[
+	Retrieves all joint motors for a given rigType
+	@param model Model
+	@param rigType HumanoidRigType
+]=]
 function RagdollRigging.getMotors(model, rigType)
 	-- Note: We intentionally do not disable the root joint so that the mechanism root of the
 	-- character stays consistent when we break joints on the client. This avoid the need for the client to wait
@@ -436,6 +451,13 @@ function RagdollRigging.getMotors(model, rigType)
 	return motors
 end
 
+--[=[
+	Disables all particle emitters and fades them out. Yields for the duration.
+
+	@yields
+	@param character Model
+	@param duration number
+]=]
 function RagdollRigging.disableParticleEmittersAndFadeOutYielding(character, duration)
 	if RunService:IsServer() then
 		-- This causes a lot of unnecesarry replicated property changes
@@ -464,6 +486,13 @@ function RagdollRigging.disableParticleEmittersAndFadeOutYielding(character, dur
 	end
 end
 
+--[=[
+	Applies a sliding friction torque to the character making it stiffer and stiffer. Yields.
+
+	@yields
+	@param character Model
+	@param duration number
+]=]
 function RagdollRigging.easeJointFriction(character, duration)
 	local descendants = character:GetDescendants()
 	-- { { joint, initial friction, end friction }, ... }

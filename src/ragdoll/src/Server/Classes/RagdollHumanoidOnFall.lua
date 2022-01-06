@@ -1,4 +1,8 @@
 --[=[
+	When a humanoid is bound with this, it will ragdoll upon falling. Recommended that you use
+	[UnragdollAutomatically] in conjunction with this.
+
+	@server
 	@class RagdollHumanoidOnFall
 ]=]
 
@@ -14,6 +18,12 @@ local RagdollHumanoidOnFall = setmetatable({}, BaseObject)
 RagdollHumanoidOnFall.ClassName = "RagdollHumanoidOnFall"
 RagdollHumanoidOnFall.__index = RagdollHumanoidOnFall
 
+--[=[
+	Constructs a new RagdollHumanoidOnFall. Should be done via [Binder]. See [RagdollBindersServer].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return RagdollHumanoidOnFall
+]=]
 function RagdollHumanoidOnFall.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFall)
 

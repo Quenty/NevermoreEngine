@@ -1,4 +1,7 @@
 --[=[
+	Should be bound via [RagdollBindersClient].
+
+	@client
 	@class RagdollableClient
 ]=]
 
@@ -22,6 +25,12 @@ RagdollableClient.__index = RagdollableClient
 
 require("PromiseRemoteEventMixin"):Add(RagdollableClient, RagdollableConstants.REMOTE_EVENT_NAME)
 
+--[=[
+	Constructs a new RagdollableClient. Should be done via [Binder]. See [RagdollBindersClient].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return RagdollableClient
+]=]
 function RagdollableClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollableClient)
 
