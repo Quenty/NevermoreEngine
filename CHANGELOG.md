@@ -1,5 +1,18 @@
 # (Thu Jan 06 2022)
 
+#### 🐛 Bug Fix
+
+- `@quenty/ragdoll@5.1.2`
+  - docs: Add documentation for ragdoll system [#243](https://github.com/Quenty/NevermoreEngine/pull/243) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jan 06 2022)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, aku ([@aku-e](https://github.com/aku-e)), for all your work!
