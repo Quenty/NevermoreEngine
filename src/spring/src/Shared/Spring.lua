@@ -21,7 +21,7 @@
 	end)
 	```
 
-	A good visualization can be fond here, provided by Defaultio:
+	A good visualization can be found here, provided by Defaultio:
 	https://www.desmos.com/calculator/hn2i9shxbz
 
 	@class Spring
