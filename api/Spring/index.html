@@ -26,7 +26,7 @@ RunService.RenderStepped:Connect(function()
 end)
 ```
 
-A good visualization can be fond here, provided by Defaultio:
+A good visualization can be found here, provided by Defaultio:
 https://www.desmos.com/calculator/hn2i9shxbz"><meta data-react-helmet="true" property="og:description" content="A physical model of a spring, useful in many applications.
 
 A spring is an object that will compute based upon Hooke&#x27;s law. Properties only evaluate
@@ -49,10 +49,10 @@ RunService.RenderStepped:Connect(function()
 end)
 ```
 
-A good visualization can be fond here, provided by Defaultio:
+A good visualization can be found here, provided by Defaultio:
 https://www.desmos.com/calculator/hn2i9shxbz"><meta data-react-helmet="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/Spring"><meta data-react-helmet="true" name="docusaurus_locale" content="en"><meta data-react-helmet="true" name="docusaurus_tag" content="default"><link data-react-helmet="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Spring"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Spring" hreflang="en"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Spring" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.fb20d3d5.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.473c8cf3.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.63399291.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.ac7d44d6.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.0b90b2b2.js" as="script">
 </head>
 <body>
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -78,7 +78,7 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
 <span class="token keyword">end</span><span class="token punctuation">)</span>
 </code></pre>
 <p>
-  A good visualization can be fond here, provided by Defaultio:
+  A good visualization can be found here, provided by Defaultio:
   <a href="https://www.desmos.com/calculator/hn2i9shxbz" target="_blank">https://www.desmos.com/calculator/hn2i9shxbz</a>
 </p>
 </div></header><h2 class="anchor anchorWithStickyNavbar_31ik" id="properties">Properties<a aria-hidden="true" class="hash-link" href="#properties" title="Direct link to heading">​</a></h2><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="Position"><code style="text-decoration:none">Position</code><a aria-hidden="true" class="hash-link" href="#Position" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/spring/src/Shared/Spring.lua#L98"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>Spring<!-- -->.<!-- -->Position<!-- -->:<!-- --> </code> <code class="blue_2Afy">T</code></div><div>
@@ -318,13 +318,13 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
     ],
     &quot;types&quot;: [],
     &quot;name&quot;: &quot;Spring&quot;,
-    &quot;desc&quot;: &quot;A physical model of a spring, useful in many applications.\n\nA spring is an object that will compute based upon Hooke&#x27;s law. Properties only evaluate\nupon index making this model good for lazy applications.\n\n```lua\nlocal RunService = game:GetService(\&quot;RunService\&quot;)\nlocal UserInputService = game:GetService(\&quot;UserInputService\&quot;)\n\nlocal spring = Spring.new(Vector3.new(0, 0, 0))\n\nRunService.RenderStepped:Connect(function()\n\tif UserInputService:IsKeyDown(Enum.KeyCode.W) then\n\t\tspring.Target = Vector3.new(0, 0, 1)\n\telse\n\t\tspring.Target = Vector3.new(0, 0, 0)\n\tend\n\n\tprint(spring.Position) -- A smoothed out version of the input keycode W\nend)\n```\n\nA good visualization can be fond here, provided by Defaultio:\nhttps://www.desmos.com/calculator/hn2i9shxbz&quot;,
+    &quot;desc&quot;: &quot;A physical model of a spring, useful in many applications.\n\nA spring is an object that will compute based upon Hooke&#x27;s law. Properties only evaluate\nupon index making this model good for lazy applications.\n\n```lua\nlocal RunService = game:GetService(\&quot;RunService\&quot;)\nlocal UserInputService = game:GetService(\&quot;UserInputService\&quot;)\n\nlocal spring = Spring.new(Vector3.new(0, 0, 0))\n\nRunService.RenderStepped:Connect(function()\n\tif UserInputService:IsKeyDown(Enum.KeyCode.W) then\n\t\tspring.Target = Vector3.new(0, 0, 1)\n\telse\n\t\tspring.Target = Vector3.new(0, 0, 0)\n\tend\n\n\tprint(spring.Position) -- A smoothed out version of the input keycode W\nend)\n```\n\nA good visualization can be found here, provided by Defaultio:\nhttps://www.desmos.com/calculator/hn2i9shxbz&quot;,
     &quot;source&quot;: {
         &quot;line&quot;: 29,
         &quot;path&quot;: &quot;src/spring/src/Shared/Spring.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#Clock" class="table-of-contents__link toc-highlight">Clock</a></li><li><a href="#d" class="table-of-contents__link toc-highlight">d</a></li><li><a href="#Damper" class="table-of-contents__link toc-highlight">Damper</a></li><li><a href="#p" class="table-of-contents__link toc-highlight">p</a></li><li><a href="#Position" class="table-of-contents__link toc-highlight">Position</a></li><li><a href="#s" class="table-of-contents__link toc-highlight">s</a></li><li><a href="#Speed" class="table-of-contents__link toc-highlight">Speed</a></li><li><a href="#t" class="table-of-contents__link toc-highlight">t</a></li><li><a href="#Target" class="table-of-contents__link toc-highlight">Target</a></li><li><a href="#v" class="table-of-contents__link toc-highlight">v</a></li><li><a href="#Velocity" class="table-of-contents__link toc-highlight">Velocity</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Impulse" class="table-of-contents__link toc-highlight">:Impulse</a></li><li><a href="#TimeSkip" class="table-of-contents__link toc-highlight">:TimeSkip</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2021 James Onnen.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.473c8cf3.js"></script>
-<script src="/NevermoreEngine/assets/js/main.63399291.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.ac7d44d6.js"></script>
+<script src="/NevermoreEngine/assets/js/main.0b90b2b2.js"></script>
 </body>
 </html>
