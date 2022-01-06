@@ -1,19 +1,15 @@
-# v5.1.2 (Thu Jan 06 2022)
-
-#### 🐛 Bug Fix
-
-- docs: Add documentation for ragdoll system [#243](https://github.com/Quenty/NevermoreEngine/pull/243) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [5.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.1.1...@quenty/ragdoll@5.1.2) (2022-01-06)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
 
 ## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.1.0...@quenty/ragdoll@5.1.1) (2022-01-06)
 
