@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[59340],{33739:function(l){l.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BindableRagdollHumanoidOnFall","desc":"Ragdolls the humanoid on fall","source":{"line":5,"path":"src/ragdoll/src/Shared/Classes/BindableRagdollHumanoidOnFall.lua"}}')}}]);
