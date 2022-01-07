@@ -53,8 +53,8 @@ function PermissionProviderUtils.createConfigFromGame()
 	if game.CreatorType == Enum.CreatorType.Group then
 		return PermissionProviderUtils.createGroupRankConfig({
 			groupId = game.CreatorId;
-			minAdminRequiredRank = 254;
-			minCreatorRequiredRank = 255;
+			minAdminRequiredRank = 250;
+			minCreatorRequiredRank = 254;
 		})
 	else
 		return PermissionProviderUtils.createSingleUserConfig({
