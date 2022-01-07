@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
@@ -24,6 +25,11 @@ function ValueObject.new(baseValue)
 
 	self._maid = Maid.new()
 
+--[=[
+	Event fires when the value's object value change
+	@prop Changed Signal<T> -- fires with oldValue, newValue
+	@within ValueObject
+]=]
 	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid)
 	self._maid:GiveTask(self.Changed)
 
@@ -40,10 +46,30 @@ function ValueObject.isValueObject(value)
 end
 
 --[=[
-	Event fires when the value's object value change
-	@prop Changed Signal<T> -- fires with oldValue, newValue
-	@within ValueObject
+	Observes the current value of the ValueObject
+	@return Observable<T>
 ]=]
+function ValueObject:Observe()
+	return Observable.new(function(sub)
+		if not self.Destroy then
+			warn("[ValueObject.observeValue] - Connecting to dead ValueObject")
+			-- No firing, we're dead
+			sub:Complete()
+			return
+		end
+
+		local maid = Maid.new()
+
+		maid:GiveTask(self.Changed:Connect(function()
+			sub:Fire(self.Value)
+		end))
+
+		sub:Fire(self.Value)
+
+		return maid
+	end)
+
+end
 
 --[=[
 	The value of the ValueObject

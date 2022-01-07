@@ -54,10 +54,18 @@ end
 
 --[=[
 	Gets the current state
-	@return T
+	@return T?
 ]=]
 function StateStack:GetState()
 	return self._state.Value
+end
+
+--[=[
+	Observes the current value of stack
+	@return Observable<T?>
+]=]
+function StateStack:Observe()
+	return self._state:Observe()
 end
 
 --[=[
