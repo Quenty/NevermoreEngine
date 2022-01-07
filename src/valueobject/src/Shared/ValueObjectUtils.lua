@@ -12,6 +12,12 @@ local ValueObject = require("ValueObject")
 
 local ValueObjectUtils = {}
 
+--[=[
+	Syncs the value from `from` to `to`.
+	@param from ValueObject<T>
+	@param to ValueObject<T>
+	@return MaidTask
+]=]
 function ValueObjectUtils.syncValue(from, to)
 	local maid = Maid.new()
 	to.Value = from.Value
@@ -23,6 +29,11 @@ function ValueObjectUtils.syncValue(from, to)
 	return maid
 end
 
+--[=[
+	Observes the current value of the ValueObject
+	@param valueObject ValueObject<T>
+	@return Observable<T>
+]=]
 function ValueObjectUtils.observeValue(valueObject)
 	assert(ValueObject.isValueObject(valueObject), "Bad valueObject")
 
@@ -30,6 +41,7 @@ function ValueObjectUtils.observeValue(valueObject)
 		if not valueObject.Destroy then
 			warn("[ValueObjectUtils.observeValue] - Connecting to dead ValueObject")
 			-- No firing, we're dead
+			sub:Complete()
 			return
 		end
 
@@ -45,6 +57,11 @@ function ValueObjectUtils.observeValue(valueObject)
 	end)
 end
 
+--[=[
+	Observes the current value of the ValueObject
+	@param valueObject ValueObject<T>
+	@return Observable<Brio<T>>
+]=]
 function ValueObjectUtils.observeValueBrio(valueObject)
 	assert(valueObject, "Bad valueObject")
 
