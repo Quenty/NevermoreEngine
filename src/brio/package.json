@@ -28,7 +28,8 @@
   "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx"
+    "@quenty/rx": "file:../rx",
+    "@quenty/statestack": "file:../statestack"
   },
   "publishConfig": {
     "access": "public"
