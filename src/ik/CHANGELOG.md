@@ -1,3 +1,15 @@
+# v5.2.0 (Fri Jan 07 2022)
+
+#### 🐛 Bug Fix
+
+- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

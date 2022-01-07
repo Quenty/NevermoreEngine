@@ -1,3 +1,43 @@
+# (Fri Jan 07 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/loader@3.3.0`
+  - fix: Centralize loader constants [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cooldown@1.7.0`
+  - feat: Cooldowns use attributes and can be cloned, API surface is cleaned up. [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/brio@3.7.0`
+  - feat: Add RxBrioUtils.createStateStack(observable) [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/statestack@3.4.0`, `@quenty/valueobject@3.7.0`
+  - feat: Add ValueObject:Observe() and StateStack:Observe() [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/attributeutils@4.2.0`
+  - feat: Add AttributeValue:Observe() [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/permissionprovider@4.6.0`
+  - fix: Permissions are lower. Technically this is a breaking change, but I don't think anyone is depending upon this API surface right now. [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/valueobject@3.7.0`
+  - docs: Add documentation to ValueObjectUtils [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rx@3.7.0`
+  - docs: Do not document Rx.spec [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/cmdrservice@3.8.0`
+  - fix: Fix dependencies of CmdrService [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/buttonhighlightmodel@3.5.0`
+  - fix: Fix dependencies [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/blend@2.2.0`
+  - fix: Blend does not complete all observables is a sub-observable completes [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/binder@4.7.0`
+  - fix: Binders initialize properly and provider better warnings [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+- `@quenty/ragdoll@5.2.0`
+  - docs: Add documentation for ragdoll system [#243](https://github.com/Quenty/NevermoreEngine/pull/243) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Jan 06 2022)
 
 #### 🐛 Bug Fix

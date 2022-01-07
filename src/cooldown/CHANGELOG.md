@@ -1,3 +1,15 @@
+# v1.7.0 (Fri Jan 07 2022)
+
+#### 🚀 Enhancement
+
+- feat: Cooldowns use attributes and can be cloned, API surface is cleaned up. [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

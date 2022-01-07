@@ -1,3 +1,15 @@
+# v2.2.0 (Fri Jan 07 2022)
+
+#### 🐛 Bug Fix
+
+- fix: Blend does not complete all observables is a sub-observable completes [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
