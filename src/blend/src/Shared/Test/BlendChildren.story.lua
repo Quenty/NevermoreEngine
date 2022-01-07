@@ -9,6 +9,7 @@ local RunService = game:GetService("RunService")
 local Blend = require("Blend")
 local Maid = require("Maid")
 local ValueObject = require("ValueObject")
+local Rx = require("Rx")
 
 return function(target)
 	local maid = Maid.new()
@@ -47,6 +48,23 @@ return function(target)
 
 		[Blend.Children] = {
 			uiCornerValueObject;
+
+			Rx.NEVER;
+			Rx.EMPTY;
+
+			{
+				Blend.Single(Blend.Computed(percentVisible, function(visible)
+					if visible <= 0.5 then
+						return nil
+					else
+						return Blend.New "Frame" {
+							Size = UDim2.new(0, 100, 0, 100);
+							BackgroundTransparency = 0.5;
+						}
+					end
+				end));
+
+			};
 
 			{
 				Blend.Single(Blend.Computed(percentVisible, function(visible)
