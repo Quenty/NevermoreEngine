@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/permissionprovider": "file:../permissionprovider",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
