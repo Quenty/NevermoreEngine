@@ -6,9 +6,7 @@
 
 local Utils = require(script.Parent.Utils)
 local Queue = require(script.Parent.Queue)
-
-local GROUP_EACH_PACKAGE_INDIVIDUALLY = false
-local ALLOW_MULTIPLE_GROUPS = true
+local LoaderConstants = require(script.Parent.LoaderConstants)
 
 local GroupInfoUtils = {}
 
@@ -42,11 +40,11 @@ function GroupInfoUtils.groupPackageInfos(packageInfoList, replicationMode)
 			if GroupInfoUtils.canAddPackageInfoToGroup(current, packageInfo, replicationMode) then
 				GroupInfoUtils.addPackageInfoToGroup(current, packageInfo, replicationMode)
 
-				if GROUP_EACH_PACKAGE_INDIVIDUALLY then
+				if LoaderConstants.GROUP_EACH_PACKAGE_INDIVIDUALLY then
 					table.insert(built, current)
 					current = GroupInfoUtils.createGroupInfo()
 				end
-			elseif ALLOW_MULTIPLE_GROUPS then
+			elseif LoaderConstants.ALLOW_MULTIPLE_GROUPS then
 				-- Create a new group
 				table.insert(built, current)
 				current = GroupInfoUtils.createGroupInfo()
