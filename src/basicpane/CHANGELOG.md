@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@3.3.0...@quenty/basicpane@3.4.0) (2022-01-07)
+
+**Note:** Version bump only for package @quenty/basicpane
+
+
+
+
+
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@3.2.2...@quenty/basicpane@3.3.0) (2022-01-03)
 
 

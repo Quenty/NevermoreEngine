@@ -1,19 +1,18 @@
-# v3.4.0 (Fri Jan 07 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add ValueObject:Observe() and StateStack:Observe() [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@3.3.0...@quenty/statestack@3.4.0) (2022-01-07)
+
+
+### Features
+
+* Add ValueObject:Observe() and StateStack:Observe() ([91af9f2](https://github.com/Quenty/NevermoreEngine/commit/91af9f25e41faddeaa2f02f31ddfb8b145d01068))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@3.2.1...@quenty/statestack@3.3.0) (2022-01-03)
 

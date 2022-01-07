@@ -1,19 +1,18 @@
-# v3.3.0 (Fri Jan 07 2022)
-
-#### 🚀 Enhancement
-
-- fix: Centralize loader constants [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.2.0...@quenty/loader@3.3.0) (2022-01-07)
+
+
+### Bug Fixes
+
+* Centralize loader constants ([2bfd287](https://github.com/Quenty/NevermoreEngine/commit/2bfd287a369a6cbcd307a0983f47d246f1bf32a4))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.1.2...@quenty/loader@3.2.0) (2022-01-03)
 

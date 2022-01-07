@@ -1,19 +1,18 @@
-# v1.7.0 (Fri Jan 07 2022)
-
-#### 🚀 Enhancement
-
-- feat: Cooldowns use attributes and can be cloned, API surface is cleaned up. [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@1.6.0...@quenty/cooldown@1.7.0) (2022-01-07)
+
+
+### Features
+
+* Cooldowns use attributes and can be cloned, API surface is cleaned up. ([9a2225f](https://github.com/Quenty/NevermoreEngine/commit/9a2225fc13f2ee2526c55afaa5007be9a7274118))
+
+
+
+
 
 # [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@1.5.2...@quenty/cooldown@1.6.0) (2022-01-03)
 

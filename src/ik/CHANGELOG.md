@@ -1,19 +1,15 @@
-# v5.2.0 (Fri Jan 07 2022)
-
-#### 🐛 Bug Fix
-
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@5.1.2...@quenty/ik@5.2.0) (2022-01-07)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
 
 ## [5.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@5.1.1...@quenty/ik@5.1.2) (2022-01-06)
 

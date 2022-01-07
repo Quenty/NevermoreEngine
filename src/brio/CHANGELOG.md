@@ -1,19 +1,18 @@
-# v3.7.0 (Fri Jan 07 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add RxBrioUtils.createStateStack(observable) [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.6.0...@quenty/brio@3.7.0) (2022-01-07)
+
+
+### Features
+
+* Add RxBrioUtils.createStateStack(observable) ([bbd4596](https://github.com/Quenty/NevermoreEngine/commit/bbd4596321f80b6f58715b54605d2f8d0e9b2008))
+
+
+
+
 
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.5.2...@quenty/brio@3.6.0) (2022-01-03)
 

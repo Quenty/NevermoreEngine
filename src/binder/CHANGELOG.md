@@ -1,19 +1,18 @@
-# v4.7.0 (Fri Jan 07 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Binders initialize properly and provider better warnings [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.6.0...@quenty/binder@4.7.0) (2022-01-07)
+
+
+### Bug Fixes
+
+* Binders initialize properly and provider better warnings ([93b6ab1](https://github.com/Quenty/NevermoreEngine/commit/93b6ab1d4f8380124c1a0b3d95b6274c58fd4b30))
+
+
+
+
 
 # [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.5.2...@quenty/binder@4.6.0) (2022-01-03)
 

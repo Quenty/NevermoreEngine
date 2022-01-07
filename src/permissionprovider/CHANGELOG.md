@@ -1,19 +1,18 @@
-# v4.6.0 (Fri Jan 07 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Permissions are lower. Technically this is a breaking change, but I don't think anyone is depending upon this API surface right now. [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@4.5.0...@quenty/permissionprovider@4.6.0) (2022-01-07)
+
+
+### Bug Fixes
+
+* Permissions are lower. Technically this is a breaking change, but I don't think anyone is depending upon this API surface right now. ([a48c62b](https://github.com/Quenty/NevermoreEngine/commit/a48c62b3695e1b51bb93d82182f86d41bb2474a8))
+
+
+
+
 
 # [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@4.4.2...@quenty/permissionprovider@4.5.0) (2022-01-03)
 

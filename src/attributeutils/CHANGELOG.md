@@ -1,19 +1,18 @@
-# v4.2.0 (Fri Jan 07 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add AttributeValue:Observe() [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.1.0...@quenty/attributeutils@4.2.0) (2022-01-07)
+
+
+### Features
+
+* Add AttributeValue:Observe() ([9ac9b8b](https://github.com/Quenty/NevermoreEngine/commit/9ac9b8b5293bf5d693778fad1020fa892d3c7ae7))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.0.2...@quenty/attributeutils@4.1.0) (2022-01-03)
 

@@ -1,19 +1,18 @@
-# v3.8.0 (Fri Jan 07 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies of CmdrService [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.7.0...@quenty/cmdrservice@3.8.0) (2022-01-07)
+
+
+### Bug Fixes
+
+* Fix dependencies of CmdrService ([cef2373](https://github.com/Quenty/NevermoreEngine/commit/cef2373a3e8a830232f4857050098a27e59fa480))
+
+
+
+
 
 # [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@3.6.2...@quenty/cmdrservice@3.7.0) (2022-01-03)
 

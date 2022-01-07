@@ -1,19 +1,15 @@
-# v3.7.0 (Fri Jan 07 2022)
-
-#### 🐛 Bug Fix
-
-- docs: Do not document Rx.spec [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.6.0...@quenty/rx@3.7.0) (2022-01-07)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
 
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.5.2...@quenty/rx@3.6.0) (2022-01-03)
 

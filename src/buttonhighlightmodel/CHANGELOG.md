@@ -1,19 +1,18 @@
-# v3.5.0 (Fri Jan 07 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies [#244](https://github.com/Quenty/NevermoreEngine/pull/244) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.4.0...@quenty/buttonhighlightmodel@3.5.0) (2022-01-07)
+
+
+### Bug Fixes
+
+* Fix dependencies ([ae91c7e](https://github.com/Quenty/NevermoreEngine/commit/ae91c7e8d7837ce73193ba75ba65c99c7eaeada4))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.3.2...@quenty/buttonhighlightmodel@3.4.0) (2022-01-03)
 
