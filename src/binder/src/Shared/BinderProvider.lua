@@ -36,15 +36,9 @@ BinderProvider.__index = BinderProvider
 function BinderProvider.new(initMethod)
 	local self = setmetatable({}, BinderProvider)
 
-	-- Pretty sure this is a bad idea
-	self._bindersAddedPromise = Promise.new()
-	self._startPromise = Promise.new()
-
 	self._initMethod = initMethod or error("No initMethod")
-
 	self._initialized = false
 	self._started = false
-	self._binders = {}
 
 	return self
 end
@@ -93,7 +87,13 @@ end
 function BinderProvider:Init(...)
 	assert(not self._initialized, "Already initialized")
 
+	self._binders = {}
 	self._initialized = true
+
+	-- Pretty sure this is a bad idea
+	self._bindersAddedPromise = Promise.new()
+	self._startPromise = Promise.new()
+
 	self._initMethod(self, ...)
 	self._bindersAddedPromise:Resolve()
 end
@@ -104,7 +104,7 @@ end
 	@return Promise
 ]=]
 function BinderProvider:PromiseBindersAdded()
-	return self._bindersAddedPromise
+	return assert(self._bindersAddedPromise, "Be sure to require via serviceBag")
 end
 
 --[=[
@@ -113,7 +113,7 @@ end
 	@return Promise
 ]=]
 function BinderProvider:PromiseBindersStarted()
-	return self._startPromise
+	return assert(self._startPromise, "Be sure to require via serviceBag")
 end
 
 --[=[
@@ -136,8 +136,7 @@ function BinderProvider:__index(index)
 		return BinderProvider[index]
 	end
 
-	assert(self._initialized, "Not initialized")
-	error(("%q Not a valid index"):format(tostring(index)))
+	error(("%q Not a valid binder"):format(tostring(index)))
 end
 
 --[=[
