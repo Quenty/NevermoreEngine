@@ -4,12 +4,11 @@
 	@class PackageInfoUtils
 ]=]
 
-local Utils = require(script.Parent.Utils)
-local ScriptInfoUtils = require(script.Parent.ScriptInfoUtils)
-local Queue = require(script.Parent.Queue)
 local BounceTemplateUtils = require(script.Parent.BounceTemplateUtils)
-
-local INCLUDE_IMPLICIT_DEPENDENCIES = true
+local LoaderConstants = require(script.Parent.LoaderConstants)
+local Queue = require(script.Parent.Queue)
+local ScriptInfoUtils = require(script.Parent.ScriptInfoUtils)
+local Utils = require(script.Parent.Utils)
 
 local PackageInfoUtils = {}
 
@@ -85,7 +84,7 @@ function PackageInfoUtils.computePackageDependencySet(packageInfo, implicitDepen
 	local dependencyNameMap = {}
 
 	-- Set implicit dependencies
-	if INCLUDE_IMPLICIT_DEPENDENCIES then
+	if LoaderConstants.INCLUDE_IMPLICIT_DEPENDENCIES then
 		for entry, _ in pairs(implicitDependencySet) do
 			dependencyNameMap[entry.name] = entry
 		end
