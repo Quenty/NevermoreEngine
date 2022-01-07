@@ -1,5 +1,5 @@
 --[=[
-	Holds binders
+	Holds binders for [Cooldown].
 	@class CooldownBindersServer
 ]=]
 
@@ -12,5 +12,9 @@ local TimeSyncService = require("TimeSyncService")
 return BinderProvider.new(function(self, serviceBag)
 	serviceBag:GetService(TimeSyncService)
 
+--[=[
+	@prop Cooldown Binder<Cooldown>
+	@within CooldownBindersServer
+]=]
 	self:Add(Binder.new("Cooldown", require("Cooldown"), serviceBag))
 end)
