@@ -145,7 +145,9 @@ function Blend.Computed(...)
 
 	if #args == 0 then
 		-- static value?
-		return Rx.start(compute)
+		return Observable.new(function(sub)
+			sub:Fire(compute())
+		end)
 	elseif #args == 1 then
 		return args[1]:Pipe({
 			Rx.map(compute)
@@ -643,12 +645,19 @@ function Blend._observeChildren(value)
 				-- Subscription is for lifetime of brio, so we do
 				-- not need to specifically add these results to the maid, and
 				-- risk memory leak of the maid with a lot of items in it.
-				maid:GiveTask(observe:Subscribe(sub:GetFireFailComplete()))
+				maid:GiveTask(observe:Subscribe(function(inst)
+					sub:Fire(inst)
+				end, function(...)
+					sub:Fail(...)
+				end, function()
+					-- completion should not result more than maid cleaning up
+					maid:DoCleaning()
+				end))
 
 				return maid
 			end
 
-			warn(("Unknown type in brio %q"):format(typeof(value)))
+			warn(("Unknown type in brio %q"):format(typeof(result)))
 			return nil
 		end)
 	end
@@ -676,12 +685,32 @@ function Blend._observeChildren(value)
 				end
 
 				local observe = Blend._observeChildren(result)
+
 				if observe then
-					maid:GiveTask(observe:Subscribe(sub:GetFireFailComplete()))
+					local innerMaid = Maid.new()
+
+					-- Note: I think this still memory leaks
+					innerMaid:GiveTask(observe:Subscribe(function(inst)
+						sub:Fire(inst)
+					end, function(...)
+						innerMaid:DoCleaning()
+						sub:Fail(...)
+					end, function()
+						innerMaid:DoCleaning()
+					end))
+
+					innerMaid:GiveTask(function()
+						maid[innerMaid] = nil
+					end)
+					maid[innerMaid] = innerMaid
 				else
-					warn(("Unknown type %q in observable"):format(typeof(result)))
+					warn(("Failed to convert %q into children"):format(tostring(result)))
 				end
-			end, sub:GetFailComplete())
+			end, function(...)
+				sub:Fire(...)
+			end, function()
+				-- Drop completion, other inner components may have completed.
+			end)
 
 			return maid
 		end)
@@ -694,7 +723,7 @@ function Blend._observeChildren(value)
 			if observe then
 				table.insert(observables, observe)
 			else
-				warn(("Unknown %q of %q"):format(tostring(key), typeof(item)))
+				warn(("Failed to convert [%s] %q into children"):format(tostring(key), tostring(item)))
 			end
 		end
 
