@@ -17,6 +17,10 @@
 	@class AttributeValue
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local RxAttributeUtils = require("RxAttributeUtils")
+
 local AttributeValue = {}
 AttributeValue.ClassName = "AttributeValue"
 AttributeValue.__index = AttributeValue
@@ -45,6 +49,14 @@ function AttributeValue.new(object, attributeName, defaultValue)
 	end
 
 	return setmetatable(self, AttributeValue)
+end
+
+--[=[
+	Observes an attribute on an instance.
+	@return Observable<any>
+]=]
+function AttributeValue:Observe()
+	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, self._defaultValue)
 end
 
 --[=[
