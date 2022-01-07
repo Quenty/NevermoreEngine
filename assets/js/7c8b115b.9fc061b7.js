@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[38153],{40153:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ValueObjectUtils","desc":"Utils that work with Roblox Value objects (and also ValueObject)","source":{"line":5,"path":"src/valueobject/src/Shared/ValueObjectUtils.lua"}}')}}]);

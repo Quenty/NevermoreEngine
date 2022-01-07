@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[18258],{22212:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CooldownBindersServer","desc":"Holds binders","source":{"line":5,"path":"src/cooldown/src/Server/CooldownBindersServer.lua"}}')}}]);
