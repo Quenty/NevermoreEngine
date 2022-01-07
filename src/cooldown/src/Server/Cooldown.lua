@@ -1,5 +1,7 @@
 --[=[
-	Represents a cooldown state with a time limit
+	Represents a cooldown state with a time limit. See [CooldownBase] for more API.
+
+	@server
 	@class Cooldown
 ]=]
 
@@ -8,33 +10,37 @@ local require = require(script.Parent.loader).load(script)
 local CooldownBase = require("CooldownBase")
 local TimeSyncService = require("TimeSyncService")
 local CooldownConstants = require("CooldownConstants")
+local AttributeUtils = require("AttributeUtils")
 
 local Cooldown = setmetatable({}, CooldownBase)
 Cooldown.ClassName = "Cooldown"
 Cooldown.__index = Cooldown
 
+--[=[
+	Constructs a new cooldown. Should be done via [CooldownBindersServer]. To create an
+	instance of this in Roblox, see [CooldownUtils.create].
+
+	@param obj NumberValue
+	@param serviceBag ServiceBag
+	@return Cooldown
+]=]
 function Cooldown.new(obj, serviceBag)
 	local self = setmetatable(CooldownBase.new(obj, serviceBag), Cooldown)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._startTime = Instance.new("NumberValue")
-	self._startTime.Name = CooldownConstants.COOLDOWN_START_TIME_NAME
-	self._startTime.Value = self._serviceBag:GetService(TimeSyncService):GetSyncedClock():GetTime()
-	self._startTime.Parent = self._obj
+	local now = self._serviceBag:GetService(TimeSyncService):GetSyncedClock():GetTime()
+	local startTime = AttributeUtils.initAttribute(self._obj, CooldownConstants.COOLDOWN_START_TIME_ATTRIBUTE, now)
 
 	-- Delay for cooldown time
-	task.delay(self._obj.Value, function()
+	-- TODO: Handle start tme changing
+	task.delay(self._obj.Value + startTime - now, function()
 		if self.Destroy then
 			self._obj:Destroy()
 		end
 	end)
 
 	return self
-end
-
-function Cooldown:GetStartTime()
-	return self._startTime.Value
 end
 
 return Cooldown
