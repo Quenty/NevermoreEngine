@@ -1,5 +1,7 @@
 --[=[
 	Help manage the visibility of GUIs while only constructing the Gui while visible
+
+	@client
 	@class GuiVisibleManager
 ]=]
 
@@ -15,8 +17,13 @@ local GuiVisibleManager = setmetatable({}, BaseObject)
 GuiVisibleManager.ClassName = "GuiVisibleManager"
 GuiVisibleManager.__index = GuiVisibleManager
 
--- @param promiseNewPane Returns a promise for a new pane.
--- @param[opt=1] maxHideTime
+--[=[
+	Constructs a new GuiVisibleManager.
+
+	@param promiseNewPane Promise<TPane> -- Returns a promise for a new pane.
+	@param maxHideTime number? -- Optional hide time
+	@return GuiVisibleManager
+]=]
 function GuiVisibleManager.new(promiseNewPane, maxHideTime)
 	local self = setmetatable(BaseObject.new(), GuiVisibleManager)
 
@@ -38,11 +45,20 @@ function GuiVisibleManager.new(promiseNewPane, maxHideTime)
 	return self
 end
 
-
+--[=[
+	Returns whether the Gui is visible.
+	@return boolean
+]=]
 function GuiVisibleManager:IsVisible()
 	return self._paneVisible.Value
 end
 
+--[=[
+	Binds visiblity to the bool value being true. There could be other ways
+	that the Gui is shown if this is not set.
+
+	@param boolValue BoolValue
+]=]
 function GuiVisibleManager:BindToBoolValue(boolValue)
 	assert(boolValue, "Must have boolValue")
 	assert(not self._boundBoolValue, "Already bound")
@@ -62,6 +78,11 @@ function GuiVisibleManager:BindToBoolValue(boolValue)
 	end
 end
 
+--[=[
+	Creates a handle that will force the gui to be rendered. Clean up the task
+	to stop the showing.
+	@return MaidTask
+]=]
 function GuiVisibleManager:CreateShowHandle()
 	assert(self._showHandles, "Not initialized yet")
 
@@ -138,6 +159,5 @@ function GuiVisibleManager:_handleNewPane(maid, pane)
 	maid:GiveTask(self._paneVisible.Changed:Connect(updateVisible))
 	updateVisible()
 end
-
 
 return GuiVisibleManager

@@ -1,7 +1,7 @@
---- Executes tests
--- @script execute_tests
--- @author Quenty
-
+--[=[
+	Executes tests
+	@class execute_tests
+]=]
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 

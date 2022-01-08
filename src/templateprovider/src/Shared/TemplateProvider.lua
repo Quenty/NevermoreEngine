@@ -1,5 +1,35 @@
 --[=[
-	Base of a template retrieval system
+	Base of a template retrieval system. Templates can be retrieved from Roblox, or from the cloud,
+	and then retrieved by name. Folders are ignored, so assets may be organized however you want.
+
+	Templates can repliate to client if desired.
+
+	```lua
+	-- shared/Templates.lua
+
+	return TemplateProvider.new(182451181, script) -- Load from Roblox cloud
+	```
+
+	```lua
+	-- Server
+	local serviceBag = ServiceBag.new()
+	local templates = serviceBag:GetService(packages.Templates)
+	serviceBag:Init()
+	serviceBag:Start()
+	```
+
+	```lua
+	-- Client
+	local serviceBag = ServiceBag.new()
+	local templates = serviceBag:GetService(packages.Templates)
+	serviceBag:Init()
+	serviceBag:Start()
+
+	templates:PromiseClone("Crate"):Then(function(crate)
+		print("Got crate from the cloud!")
+	end)
+	```
+
 	@class TemplateProvider
 ]=]
 
@@ -17,7 +47,11 @@ local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
 TemplateProvider.__index = TemplateProvider
 
--- @param[opt=nil] container
+--[=[
+	Constructs a new [TemplateProvider].
+	@param container Instance | table | number -- Value
+	@param replicationParent Instance? -- Place to replicate instances to.
+]=]
 function TemplateProvider.new(container, replicationParent)
 	local self = setmetatable({}, TemplateProvider)
 
@@ -50,7 +84,9 @@ function TemplateProvider.new(container, replicationParent)
 	return self
 end
 
--- Initializes the container provider
+--[=[
+	Initializes the container provider. Should be done via [ServiceBag].
+]=]
 function TemplateProvider:Init()
 	assert(not self._initialized, "Already initialized")
 
@@ -66,6 +102,11 @@ function TemplateProvider:Init()
 	end
 end
 
+--[=[
+	Promises to clone the template as soon as it exists.
+	@param templateName string
+	@return Promise<Instance>
+]=]
 function TemplateProvider:PromiseClone(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
 
@@ -86,7 +127,7 @@ function TemplateProvider:PromiseClone(templateName)
 			self._maid[promise] = nil
 		end)
 
-		delay(5, function()
+		task.delay(5, function()
 			if promise:IsPending() then
 				warn(("[TemplateProvider.PromiseClone] - May fail to replicate template %q from cloud. %s")
 					:format(templateName, self:_getReplicationHint()))
@@ -111,7 +152,16 @@ function TemplateProvider:_getReplicationHint()
 	return hint
 end
 
--- Clones the template. If it has a prefix of "Template" then it will remove it
+--[=[
+	Clones the template.
+
+	:::info
+	If the template name has a prefix of "Template" then it will remove it on the cloned instance.
+	:::
+
+	@param templateName string
+	@return Instance?
+]=]
 function TemplateProvider:Clone(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
 
@@ -128,7 +178,12 @@ function TemplateProvider:Clone(templateName)
 	return newItem
 end
 
--- Returns the raw template
+--[=[
+	Returns the raw template
+
+	@param templateName string
+	@return Instance?
+]=]
 function TemplateProvider:Get(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
 	self:_verifyInit()
@@ -136,7 +191,11 @@ function TemplateProvider:Get(templateName)
 	return self._registry[templateName]
 end
 
--- Adds a new container to the provider for provision of assets
+--[=[
+	Adds a new container to the provider for provision of assets.
+
+	@param container Instance | number
+]=]
 function TemplateProvider:AddContainer(container)
 	assert(typeof(container) == "Instance" or type(container) == "number", "Bad container")
 	self:_verifyInit()
@@ -153,6 +212,11 @@ function TemplateProvider:AddContainer(container)
 	end
 end
 
+--[=[
+	Removes a container from the provisioning set.
+
+	@param container Instance | number
+]=]
 function TemplateProvider:RemoveContainer(container)
 	assert(typeof(container) == "Instance", "Bad container")
 	self:_verifyInit()
@@ -161,7 +225,11 @@ function TemplateProvider:RemoveContainer(container)
 	self._maid[container] = nil
 end
 
--- Returns whether or not a template is registered at the time
+--[=[
+	Returns whether or not a template is registered at the time
+	@param templateName string
+	@return boolean
+]=]
 function TemplateProvider:IsAvailable(templateName)
 	assert(type(templateName) == "string", "templateName must be a string")
 	self:_verifyInit()
@@ -169,7 +237,11 @@ function TemplateProvider:IsAvailable(templateName)
 	return self._registry[templateName] ~= nil
 end
 
--- Returns all current registered items
+--[=[
+	Returns all current registered items.
+
+	@return { Instance }
+]=]
 function TemplateProvider:GetAll()
 	self:_verifyInit()
 
@@ -181,7 +253,11 @@ function TemplateProvider:GetAll()
 	return list
 end
 
--- Gets the container
+--[=[
+	Gets all current the containers.
+
+	@return { Instance | number }
+]=]
 function TemplateProvider:GetContainers()
 	self:_verifyInit()
 
@@ -302,6 +378,9 @@ function TemplateProvider:_removeFromRegistry(child)
 	end
 end
 
+--[=[
+	Cleans up the provider
+]=]
 function TemplateProvider:Destroy()
 	self._maid:DoCleaning()
 end

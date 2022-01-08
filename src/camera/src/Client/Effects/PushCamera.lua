@@ -39,7 +39,9 @@ function PushCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
--- @param xzrotVector Vector2, the delta rotation to apply
+--[=[
+	@param xzrotVector Vector2 -- The delta rotation to apply
+]=]
 function PushCamera:RotateXY(xzrotVector)
 	self.AngleX = self.AngleX + xzrotVector.x
 	self.AngleY = self.AngleY + xzrotVector.y

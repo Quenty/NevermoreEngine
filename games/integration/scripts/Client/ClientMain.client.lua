@@ -1,7 +1,6 @@
---- Main injection point
--- @script ClientMain
--- @author Quenty
-
+--[[
+	@class ClientMain
+]]
 local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
 
 local serviceBag = require(packages.ServiceBag).new()

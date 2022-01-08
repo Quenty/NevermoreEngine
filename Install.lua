@@ -1,19 +1,19 @@
--- Nevermore installer script
---
--- Reads Github html and then reifies the structure into Roblox instances.
--- Makes assumptions based upon the name of the files as-to what type it is.
--- Generally follows the rojo standard format for client/server.
---
--- @script Install.lua
--- @author Quenty
+--[=[
+	Nevermore installer script.
 
+	Reads Github html and then reifies the structure into Roblox instances.
+	Makes assumptions based upon the name of the files as-to what type it is.
+	Generally follows the rojo standard format for client/server.
+
+	@class Install.lua
+]=]
 -- luacheck: no max line length
 
 local HttpService = game:GetService("HttpService")
 
 local Table = {}
 do
-	local function errorOnIndex(self, index)
+	local function errorOnIndex(_self, index)
 		error(("Bad index %q"):format(tostring(index)), 2)
 	end
 
@@ -57,7 +57,7 @@ end
 
 local String = {}
 do
-	--- Escapes a lua pattern
+	-- Escapes a lua pattern
 	function String.escapeAll(pattern)
 		-- The following characters escaped: ( ) . % + - * ? [ ^ $
 		local UNSAFE_CHARACTERS_MATCH = "[%(%)%.%%%+%-%*%?%[%^%$]"
@@ -65,7 +65,7 @@ do
 		return result
 	end
 
-	--- Only escapes the percent
+	-- Only escapes the percent
 	function String.escapePercent(pattern)
 		local UNSAFE_CHARACTERS_MATCH = "%%"
 		local result = pattern:gsub(UNSAFE_CHARACTERS_MATCH, "%%%1")
@@ -149,9 +149,9 @@ do
 	end
 
 	function EntryUtils.create(className, name, canonicalPath, children)
-		assert(className)
-		assert(name)
-		assert(canonicalPath)
+		assert(className, "Bad className")
+		assert(name, "Bad name")
+		assert(canonicalPath, "Bad canonicalPath")
 
 		return Table.readonly({
 			className = className;
@@ -163,9 +163,9 @@ do
 	end
 
 	function EntryUtils.mount(parent, entry)
-		assert(typeof(parent) == "Instance")
-		assert(type(entry) == "table")
-		assert(type(entry.name) == "string")
+		assert(typeof(parent) == "Instance", "Bad parent")
+		assert(type(entry) == "table", "Bad entry")
+		assert(type(entry.name) == "string", "Bad entry.name")
 
 		-- No way to mount markdown files
 		if entry.className == ENTRY_TYPES.Markdown then
@@ -236,7 +236,7 @@ do
 	})
 
 	function ParseUtils.parseContents(body, pattern)
-		assert(pattern)
+		assert(pattern, "Bad pattern")
 
 		if not body then
 			return EMPTY_ITERATOR
@@ -252,8 +252,8 @@ do
 	end
 
 	function ParseUtils.readEntriesAsync(url, basePath)
-		assert(url)
-		assert(basePath)
+		assert(url, "Bad url")
+		assert(basePath, "Bad basePath")
 
 		local entries = {}
 
@@ -287,7 +287,7 @@ do
 			return
 		end
 
-		local child = assert(entry.children[index])
+		local child = assert(entry.children[index], "Bad child")
 		table.remove(entry.children, index)
 
 		entry.className = child.className

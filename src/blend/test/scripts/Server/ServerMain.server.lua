@@ -1,5 +1,6 @@
--- Main injection point
--- @script ServerMain
+--[[
+	@class ServerMain
+]]
 
 local ServerScriptService = game:GetService("ServerScriptService")
 

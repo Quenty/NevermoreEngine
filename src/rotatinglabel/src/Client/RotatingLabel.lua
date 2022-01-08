@@ -6,6 +6,10 @@
 	RotatingLabelBuilder.new(Template):Create()
 	```
 
+	:::warning
+	This API surface is pretty old and probably should not be used.
+	:::
+
 	@class RotatingLabel
 ]=]
 
@@ -105,22 +109,36 @@ function RotatingLabel:__index(index)
 	end
 end
 
---
--- @usage
---[[
-	RotatingLabel.Text = string
-		Sets the text label, which it will automatically update
-	RotatingLabel.Width = number
-		Sets the general width of each character
-	RotatingLabel.Transparency
-		Sets the transparency
-	RotatingLabel.Damper
-		Sets the damper of the underlying spring model
-	RotatingLabel.Speed
-		Sets the speed of the underlying spring model
-	RotatingLabel.TextXAlignment
-		Sets the alignment on the X axis. Cannot be Center.
-]]
+--[=[
+	Sets the text label, which it will automatically update
+	@prop Text string
+	@within RotatingLabel
+]=]
+--[=[
+	Sets the general width of each character
+	@prop Width number
+	@within RotatingLabel
+]=]
+--[=[
+	Sets the transparency
+	@prop Transparency number
+	@within RotatingLabel
+]=]
+--[=[
+	Sets the damper of the underlying spring model
+	@prop Damper number
+	@within RotatingLabel
+]=]
+--[=[
+	Sets the speed of the underlying spring model
+	@prop Speed number
+	@within RotatingLabel
+]=]
+--[=[
+	Sets the alignment on the X axis. Cannot be Center.
+	@prop TextXAlignment TextXAlignment
+	@within RotatingLabel
+]=]
 function RotatingLabel:__newindex(topindex, value)
 	if topindex == "Text" then
 		if type(value) == "number" then

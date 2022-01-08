@@ -1,14 +1,17 @@
---- Gives out part geoemtry
--- @module PartGeometry
--- @author xLEGOx, modified by quenty
--- @see http://www.roblox.com/Stravant-MultiMove-item?id=166786055
+--[[
+    Gives out part geoemtry
+    See: http://www.roblox.com/Stravant-MultiMove-item?id=166786055
+
+	Author: xLEGOx, modified by quenty
+    @class PartGeometry
+]]
 
 local Workspace = game:GetService("Workspace")
 
 local PartGeometry = {}
 
----- This one is from
---- http://www.roblox.com/Stravant-GapFill-item?id=165687726
+-- This one is from
+-- http://www.roblox.com/Stravant-GapFill-item?id=165687726
 local function rightVector(cf)
     local _,_,_,r4,_,_,r7,_,_,r10,_,_ = cf:components()
     return Vector3.new(r4,r7,r10)

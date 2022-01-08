@@ -1,6 +1,9 @@
 --[=[
-	Renders the markdown
-	See: MarkdownParser
+	Renders the markdown. See [MarkdownParser] for parsing.
+
+	:::warning
+	This API surface has not been touched for a while and may not be suitable for production.
+	:::
 
 	@class MarkdownRender
 ]=]
@@ -18,9 +21,12 @@ MarkdownRender.Indent = 30
 MarkdownRender.TextColor3 = Color3.fromRGB(56, 56, 56)
 MarkdownRender.MaxHeaderLevel = 3 -- h5 is the largest
 
--- Creates a new markdown render
--- @tparam GuiObject gui
--- @tparam number width Width to render at
+--[=[
+	Creates a new markdown render
+	@param gui GuiObject
+	@param width number -- Width to render at
+	@return MarkdownRender
+]=]
 function MarkdownRender.new(gui, width)
 	local self = setmetatable({}, MarkdownRender)
 
@@ -36,8 +42,11 @@ function MarkdownRender:WithOptions(options)
 
 	return self
 end
--- Renders the data in the given Gui
--- @param data Data from MarkdownParser
+
+--[=[
+	Renders the data in the given gui
+	@param data table -- Data from MarkdownParser.
+]=]
 function MarkdownRender:Render(data)
 	local height = 0
 	for index, item in pairs(data) do
