@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[23480],{3954:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RoundedBackingBuilder","desc":"Construct a rounded backing with a shadow","source":{"line":5,"path":"src/roundedbackingbuilder/src/Client/RoundedBackingBuilder.lua"}}')}}]);

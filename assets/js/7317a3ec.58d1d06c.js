@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[32329],{12122:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GuiVisibleManager","desc":"Help manage the visibility of GUIs while only constructing the Gui while visible","source":{"line":5,"path":"src/guivisiblemanager/src/Client/GuiVisibleManager.lua"}}')}}]);
