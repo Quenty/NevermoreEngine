@@ -1,5 +1,6 @@
--- Main injection point
--- @script ServerMain
+--[[
+	@class ServerMain
+]]
 
 local require = require(script.Parent.loader).load(script)
 

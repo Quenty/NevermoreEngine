@@ -35,7 +35,9 @@ function RotatedCamera:__add(other)
 	return SummedCamera.new(self, other)
 end
 
--- @param xzrotvector Vector2, the delta rotation to apply
+--[=[
+	@param xzrotvector Vector2 -- The delta rotation to apply
+]=]
 function RotatedCamera:RotateXY(xzrotvector)
 	self.AngleX = self.AngleX + xzrotvector.x
 	self.AngleY = self.AngleY + xzrotvector.y

@@ -14,10 +14,13 @@ LagPointCamera.ClassName = "LagPointCamera"
 LagPointCamera._FocusCamera = nil
 LagPointCamera._OriginCamera = nil
 
---
--- @constructor
--- @param originCamera A camera to use
--- @param focusCamera The Camera to look at.
+--[=[
+	Camera that lags behind the actual camera.
+
+	@param originCamera CameraEffect -- A camera to use
+	@param focusCamera CameraEffect -- The Camera to look at.
+	@return LagPointCamera
+]=]
 function LagPointCamera.new(originCamera, focusCamera)
 	local self = setmetatable({}, LagPointCamera)
 

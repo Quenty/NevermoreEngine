@@ -440,7 +440,14 @@ function Promise:Destroy()
 end
 
 --[=[
-	Returns the results from the promise
+	Returns the results from the promise.
+
+	:::warning
+	This API surface will error if the promise is still pending.
+	:::
+
+	@return boolean -- true if resolved, false otherwise.
+	@return any
 ]=]
 function Promise:GetResults()
 	if self._rejected then
@@ -460,7 +467,14 @@ function Promise:_getResolveReject()
 	end
 end
 
--- @param promise2 May be nil. If it is, then we have the option to return self
+--[=[
+	@private
+
+	@param onFulfilled function?
+	@param onRejected function?
+	@param promise2 Promise<T>? -- May be nil. If it is, then we have the option to return self
+	@return Promise
+]=]
 function Promise:_executeThen(onFulfilled, onRejected, promise2)
 	if self._fulfilled then
 		if type(onFulfilled) == "function" then

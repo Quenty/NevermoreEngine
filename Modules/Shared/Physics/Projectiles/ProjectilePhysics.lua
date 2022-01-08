@@ -1,5 +1,7 @@
---- Projectile physics used to syncronize state
--- @classmod ProjectilePhysics
+--[=[
+	Projectile physics used to syncronize state
+	@class ProjectilePhysics
+]=]
 
 local require = require(script.Parent.loader).load(script)
 

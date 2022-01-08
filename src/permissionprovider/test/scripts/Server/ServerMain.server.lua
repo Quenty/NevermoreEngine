@@ -1,6 +1,6 @@
--- Main injection point
--- @script ServerMain
--- @author Quenty
+--[[
+	@class ServerMain
+]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")

@@ -1,5 +1,5 @@
 --[=[
-	Construct a rounded backing with a shadow
+	Construct a rounded backing with a shadow.
 	@class RoundedBackingBuilder
 ]=]
 
@@ -10,11 +10,13 @@ RoundedBackingBuilder.DEFAULT_SHADOW_TRANSPARENCY = 0.7
 RoundedBackingBuilder.BACKING_ASSET_ID = "rbxassetid://735637144"
 RoundedBackingBuilder.SHADOW_ASSET_ID = "rbxassetid://735644155"
 
--- Initializes a new RoundedBackingBuilder
--- @param options Options to set
--- {
---     sibling = true; -- If true, assumes sibling mode in the ScreenGui, defaults to true
--- }
+--[=[
+	Initializes a new RoundedBackingBuilder
+
+	If `options.sibling` is true, assumes sibling mode in the ScreenGui, defaults to true.
+	@param options { sibling: boolean } -- Options to set
+	@return RoundedBackingBuilder
+]=]
 function RoundedBackingBuilder.new(options)
 	local self = setmetatable({}, RoundedBackingBuilder)
 

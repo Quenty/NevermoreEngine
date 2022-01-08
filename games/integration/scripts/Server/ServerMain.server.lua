@@ -1,7 +1,6 @@
---- Main injection point
--- @script ServerMain
--- @author Quenty
-
+--[[
+	@class ServerMain
+]]
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
