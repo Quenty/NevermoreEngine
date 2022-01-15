@@ -84,6 +84,8 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	part.Anchored = true
 	part.Archivable = false
 	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
 	part.CastShadow = false
 	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(math.pi/2, 0, 0)
 	part.Color = color
@@ -98,6 +100,8 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	rotatedPart.Anchored = true
 	rotatedPart.Archivable = false
 	rotatedPart.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
 	rotatedPart.CastShadow = false
 	rotatedPart.CFrame = CFrame.new(ray.Origin, ray.Origin + ray.Direction)
 	rotatedPart.Transparency = 1
@@ -320,6 +324,8 @@ function Draw.point(position, color, parent, diameter)
 	part.Archivable = false
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
 	part.CastShadow = false
 	part.CFrame = CFrame.new(position)
 	part.Color = color
@@ -431,6 +437,8 @@ function Draw.box(cframe, size, color)
 	part.Name = "DebugPart"
 	part.Anchored = true
 	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
 	part.CastShadow = false
 	part.Archivable = false
 	part.BottomSurface = Enum.SurfaceType.Smooth
