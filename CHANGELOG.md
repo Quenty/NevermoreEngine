@@ -1,3 +1,23 @@
+# (Sun Jan 16 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@Yuuwa0519](https://github.com/Yuuwa0519), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/draw@2.2.2`
+  - fix: Disabled CanTouch and CanQuery [#246](https://github.com/Quenty/NevermoreEngine/pull/246) ([@Yuuwa0519](https://github.com/Yuuwa0519))
+- `@quenty/blend@2.2.1`, `@quenty/camera@5.2.1`, `@quenty/cmdrservice@3.8.1`, `@quenty/guivisiblemanager@4.2.1`, `@quenty/ik@5.2.1`, `@quenty/lipsum@4.2.1`, `@quenty/markdownrender@2.0.2`, `@quenty/permissionprovider@4.6.1`, `@quenty/promise@3.5.1`, `@quenty/rotatinglabel@4.2.1`, `@quenty/roundedbackingbuilder@2.0.2`, `@quenty/scoredactionservice@4.8.1`, `@quenty/templateprovider@3.7.1`
+  - docs: Fix docs from old luadocs and make checking moonwave docs a lot faster [#245](https://github.com/Quenty/NevermoreEngine/pull/245) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@Yuuwa0519](https://github.com/Yuuwa0519)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jan 07 2022)
 
 #### 🚀 Enhancement
