@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@3.6.0...@quenty/grouputils@3.6.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+
+
+
+
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@3.5.0...@quenty/grouputils@3.6.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/grouputils

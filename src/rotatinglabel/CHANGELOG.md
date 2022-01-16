@@ -1,19 +1,15 @@
-# v4.2.1 (Sun Jan 16 2022)
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs from old luadocs and make checking moonwave docs a lot faster [#245](https://github.com/Quenty/NevermoreEngine/pull/245) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@4.2.0...@quenty/rotatinglabel@4.2.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/rotatinglabel
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rotatinglabel@4.1.1...@quenty/rotatinglabel@4.2.0) (2022-01-07)
 
