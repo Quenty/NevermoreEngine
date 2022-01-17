@@ -2,14 +2,14 @@
 	Stack of values that allows multiple systems to enable or disable a state.
 
 	```lua
-	local disabledStack = StateStack.new()
+	local disabledStack = StateStack.new(false)
 	print(disabledStack:GetState()) --> false
 
 	disabledStack.Changed:Connect(function()
 		print("From changed event we have state: ", disabledStack:GetState())
 	end)
 
-	local cancel = disabledStack:PushState() --> From changed event we have state: true
+	local cancel = disabledStack:PushState(true) --> From changed event we have state: true
 	print(disabledStack:GetState()) --> true
 
 	cancel()  --> From changed event we have state: true
@@ -32,12 +32,14 @@ StateStack.__index = StateStack
 
 --[=[
 	Constructs a new StateStack.
+	@param defaultValue any -- The default value to use for the statestack.
 	@return StateStack
 ]=]
-function StateStack.new()
+function StateStack.new(defaultValue)
 	local self = setmetatable(BaseObject.new(), StateStack)
 
-	self._state = ValueObject.new(false)
+	self._defaultValue = defaultValue
+	self._state = ValueObject.new(defaultValue)
 	self._maid:GiveTask(self._state)
 
 	self._stateStack = {}
@@ -50,6 +52,14 @@ function StateStack.new()
 	self.Changed = self._state.Changed
 
 	return self
+end
+
+--[=[
+	Gets the count of the stack
+	@return number
+]=]
+function StateStack:GetCount()
+	return #self._stateStack
 end
 
 --[=[
@@ -74,13 +84,8 @@ end
 	@return function -- Cleanup function to invoke
 ]=]
 function StateStack:PushState(state)
-	if state == nil then
-		state = true
-	end
-
 	local data = { state }
 	table.insert(self._stateStack, data)
-
 	self:_updateState()
 
 	return function()
@@ -101,15 +106,11 @@ function StateStack:_popState(data)
 end
 
 function StateStack:_updateState()
-	local _, data = next(self._stateStack)
-	if data == nil then
-		if type(self._state.Value) == "boolean" then
-			self._state.Value = false
-		else
-			self._state.Value = nil
-		end
+	local dataContainer = self._stateStack[#self._stateStack]
+	if dataContainer == nil then
+		self._state.Value = self._defaultValue
 	else
-		self._state.Value = data[1]
+		self._state.Value = dataContainer[1]
 	end
 end
 
