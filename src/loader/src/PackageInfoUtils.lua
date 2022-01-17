@@ -107,11 +107,11 @@ function PackageInfoUtils.computePackageDependencySet(packageInfo, implicitDepen
 	return dependencySet
 end
 
-function PackageInfoUtils.getOrCreatePackageInfo(packageFolder, packageInfoMap, scope)
-	assert(typeof(packageFolder) == "Instance"
-		and (packageFolder:IsA("Folder") or packageFolder:IsA("ModuleScript")), "Bad packageFolder")
+function PackageInfoUtils.getOrCreatePackageInfo(packageFolder, packageInfoMap, scope, defaultReplicationType)
+	assert(typeof(packageFolder) == "Instance", "Bad packageFolder")
 	assert(type(packageInfoMap) == "table", "Bad packageInfoMap")
 	assert(type(scope) == "string", "Bad scope")
+	assert(defaultReplicationType, "No defaultReplicationType")
 
 	if packageInfoMap[packageFolder] then
 		return packageInfoMap[packageFolder]
@@ -121,7 +121,7 @@ function PackageInfoUtils.getOrCreatePackageInfo(packageFolder, packageInfoMap, 
 	ScriptInfoUtils.populateScriptInfoLookup(
 		packageFolder,
 		scriptInfoLookup,
-		ScriptInfoUtils.ModuleReplicationTypes.SHARED)
+		defaultReplicationType)
 
 	local explicitDependencySet = {}
 	local fullName
@@ -136,14 +136,20 @@ function PackageInfoUtils.getOrCreatePackageInfo(packageFolder, packageInfoMap, 
 	packageInfoMap[packageFolder] = packageInfo
 
 	-- Fill this after we've registered ourselves, in case we're somehow in a recursive dependency set
-	PackageInfoUtils.fillExplicitPackageDependencySet(explicitDependencySet, packageFolder, packageInfoMap)
+	PackageInfoUtils.fillExplicitPackageDependencySet(
+		explicitDependencySet,
+		packageFolder,
+		packageInfoMap,
+		defaultReplicationType)
 
 	return packageInfo
 end
 
-function PackageInfoUtils.getPackageInfoListFromDependencyFolder(folder, packageInfoMap)
+function PackageInfoUtils.getPackageInfoListFromDependencyFolder(folder, packageInfoMap, defaultReplicationType)
 	assert(typeof(folder) == "Instance" and folder:IsA("Folder"), "Bad folder")
 	assert(type(packageInfoMap) == "table", "Bad packageInfoMap")
+	assert(defaultReplicationType, "No defaultReplicationType")
+
 
 	local packageInfoList = {}
 
@@ -154,10 +160,10 @@ function PackageInfoUtils.getPackageInfoListFromDependencyFolder(folder, package
 			if instance.Name:sub(1, 1) == "@" then
 				local scope = instance.Name
 				for _, child in pairs(instance:GetChildren()) do
-					PackageInfoUtils.tryLoadPackageFromInstance(packageInfoList, packageInfoMap, child, scope)
+					PackageInfoUtils.tryLoadPackageFromInstance(packageInfoList, packageInfoMap, child, scope, defaultReplicationType)
 				end
 			else
-				PackageInfoUtils.tryLoadPackageFromInstance(packageInfoList, packageInfoMap, instance, "")
+				PackageInfoUtils.tryLoadPackageFromInstance(packageInfoList, packageInfoMap, instance, "", defaultReplicationType)
 			end
 		else
 			warn(("Unknown instance in dependencyFolder - %q"):format(instance:GetFullName()))
@@ -167,22 +173,27 @@ function PackageInfoUtils.getPackageInfoListFromDependencyFolder(folder, package
 	return packageInfoList
 end
 
-function PackageInfoUtils.tryLoadPackageFromInstance(packageInfoList, packageInfoMap, instance, scope)
+function PackageInfoUtils.tryLoadPackageFromInstance(
+	packageInfoList, packageInfoMap, instance, scope, defaultReplicationType)
+
 	assert(type(packageInfoList) == "table", "Bad packageInfoList")
 	assert(type(packageInfoMap) == "table", "Bad packageInfoMap")
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(scope) == "string", "Bad scope")
+	assert(defaultReplicationType, "No defaultReplicationType")
 
 	if BounceTemplateUtils.isBounceTemplate(instance) then
 		return
 	end
 
 	if instance:IsA("Folder") or instance:IsA("ModuleScript") then
-		table.insert(packageInfoList, PackageInfoUtils.getOrCreatePackageInfo(instance, packageInfoMap, scope))
+		table.insert(packageInfoList, PackageInfoUtils.getOrCreatePackageInfo(
+			instance, packageInfoMap, scope, defaultReplicationType))
 	elseif instance:IsA("ObjectValue") then
 		local value = instance.Value
 		if value and (value:IsA("Folder") or value:IsA("ModuleScript")) then
-			table.insert(packageInfoList, PackageInfoUtils.getOrCreatePackageInfo(value, packageInfoMap, scope))
+			table.insert(packageInfoList, PackageInfoUtils.getOrCreatePackageInfo(
+				value, packageInfoMap, scope, defaultReplicationType))
 		else
 			error(("Invalid %q ObjectValue in package linking to nothing cannot be resolved into package dependency\n\t-> %s")
 				:format(instance.Name, instance:GetFullName()))
@@ -192,14 +203,22 @@ end
 
 -- Explicit dependencies are dependencies that are are explicitly listed.
 -- These dependencies are available to this package and ANY dependent packages below
-function PackageInfoUtils.fillExplicitPackageDependencySet(explicitDependencySet, packageFolder, packageInfoMap)
+function PackageInfoUtils.fillExplicitPackageDependencySet(
+	explicitDependencySet, packageFolder, packageInfoMap, defaultReplicationType)
+
 	assert(type(explicitDependencySet) == "table", "Bad explicitDependencySet")
 	assert(typeof(packageFolder) == "Instance", "Bad packageFolder")
 	assert(type(packageInfoMap) == "table", "Bad packageInfoMap")
+	assert(defaultReplicationType, "No defaultReplicationType")
 
 	for _, item in pairs(packageFolder:GetChildren()) do
 		if item:IsA("Folder") and item.Name == ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
-			for _, packageInfo in pairs(PackageInfoUtils.getPackageInfoListFromDependencyFolder(item, packageInfoMap)) do
+			local packageInfoList = PackageInfoUtils.getPackageInfoListFromDependencyFolder(
+				item,
+				packageInfoMap,
+				defaultReplicationType)
+
+			for _, packageInfo in pairs(packageInfoList) do
 				explicitDependencySet[packageInfo] = true
 			end
 		end
