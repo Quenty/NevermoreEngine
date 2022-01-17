@@ -1,20 +1,18 @@
-# v1.8.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Add tag list to hide package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@1.7.1...@quenty/hide@1.8.0) (2022-01-17)
+
+
+### Features
+
+* Add tag list to hide package ([638fe1b](https://github.com/Quenty/NevermoreEngine/commit/638fe1b6f2d5ed704821830431b782d4aa08311e))
+
+
+
+
 
 ## [1.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@1.7.0...@quenty/hide@1.7.1) (2022-01-16)
 

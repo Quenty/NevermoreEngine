@@ -1,24 +1,18 @@
-# v5.3.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Add RagdollService and suppress initialization race condition warnings in deferred mode ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs and add more details ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.2.1...@quenty/ragdoll@5.3.0) (2022-01-17)
+
+
+### Features
+
+* Add RagdollService and suppress initialization race condition warnings in deferred mode ([480a089](https://github.com/Quenty/NevermoreEngine/commit/480a0892f47fd5acbcb4e846bfb2dd93e207e681))
+
+
+
+
 
 ## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.2.0...@quenty/ragdoll@5.2.1) (2022-01-16)
 

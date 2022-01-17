@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2022-01-17)
+
+
+### Features
+
+* Add Viewport package to render viewports that can be interacted with ([42bb35d](https://github.com/Quenty/NevermoreEngine/commit/42bb35df9940df53c4f789c0f29712eb42b4371a))
+
+
+
+
+
 # v1.1.0 (Mon Jan 17 2022)
 
 #### 🚀 Enhancement

@@ -1,20 +1,18 @@
-# v3.5.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Support showing body parts in FirstPersonCharacterTransparency ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@3.4.0...@quenty/firstpersoncharactertransparency@3.5.0) (2022-01-17)
+
+
+### Features
+
+* Support showing body parts in FirstPersonCharacterTransparency ([25681b5](https://github.com/Quenty/NevermoreEngine/commit/25681b5ec44512c4d465c25a3a353d9df0bd12d0))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@3.3.0...@quenty/firstpersoncharactertransparency@3.4.0) (2022-01-07)
 

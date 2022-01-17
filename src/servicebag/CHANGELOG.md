@@ -1,20 +1,18 @@
-# v3.5.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Ensure services do not yield while initializing or starting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.4.0...@quenty/servicebag@3.5.0) (2022-01-17)
+
+
+### Features
+
+* Ensure services do not yield while initializing or starting ([f46f34e](https://github.com/Quenty/NevermoreEngine/commit/f46f34e56deecfa22b64eafeb7a3e965da2e6e8a))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.3.0...@quenty/servicebag@3.4.0) (2022-01-07)
 

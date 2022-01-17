@@ -1,24 +1,18 @@
-# v3.6.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Add optional PlayerDataStoreService to centralize datastore usage across submodules. ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs and add more details ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.5.1...@quenty/datastore@3.6.0) (2022-01-17)
+
+
+### Features
+
+* Add optional PlayerDataStoreService to centralize datastore usage across submodules. ([1c4349f](https://github.com/Quenty/NevermoreEngine/commit/1c4349fa3ed4ef59ed41117319057ca9e2bd6dfd))
+
+
+
+
 
 ## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.5.0...@quenty/datastore@3.5.1) (2022-01-16)
 

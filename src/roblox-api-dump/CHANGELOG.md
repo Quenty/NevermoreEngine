@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2022-01-17)
+
+
+### Features
+
+* Add RobloxApiDump package. This pulls in the API dump and allows querying of the API surface. ([c5bf337](https://github.com/Quenty/NevermoreEngine/commit/c5bf337d80016f47abac026f7ef0281aeb487e8d))
+
+
+
+
+
 # v1.1.0 (Mon Jan 17 2022)
 
 #### 🚀 Enhancement

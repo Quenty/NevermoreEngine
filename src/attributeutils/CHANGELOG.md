@@ -1,20 +1,18 @@
-# v4.3.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Add AttributeUtils.getAttribute method ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.2.1...@quenty/attributeutils@4.3.0) (2022-01-17)
+
+
+### Features
+
+* Add AttributeUtils.getAttribute method ([af2742f](https://github.com/Quenty/NevermoreEngine/commit/af2742f792a07c2409d7cac3bfec54e004a056b2))
+
+
+
+
 
 ## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.2.0...@quenty/attributeutils@4.2.1) (2022-01-16)
 

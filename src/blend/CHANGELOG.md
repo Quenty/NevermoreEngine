@@ -1,26 +1,19 @@
-# v2.3.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Add a SpringObject to blend, which is a much heavier object than a spring, but simplifies API usage significantly ([@Quenty](https://github.com/Quenty))
-- feat: Add Blend.Attached and fix children not being unsubscribed correctly (memory leak fix) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs and add more details ([@Quenty](https://github.com/Quenty))
-- refactor: Refactor BlendDefaultProps to not have a switch here ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.2.1...@quenty/blend@2.3.0) (2022-01-17)
+
+
+### Features
+
+* Add a SpringObject to blend, which is a much heavier object than a spring, but simplifies API usage significantly ([cb59db0](https://github.com/Quenty/NevermoreEngine/commit/cb59db0ed4297ecec842b0820a485e1aa0c8ad70))
+* Add Blend.Attached and fix children not being unsubscribed correctly (memory leak fix) ([f4fa4c2](https://github.com/Quenty/NevermoreEngine/commit/f4fa4c2ebce9be6e16a7ab1492afaf87fe81b8aa))
+
+
+
+
 
 ## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.2.0...@quenty/blend@2.2.1) (2022-01-16)
 

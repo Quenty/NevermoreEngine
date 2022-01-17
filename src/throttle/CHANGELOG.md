@@ -1,20 +1,18 @@
-# v3.5.0 (Mon Jan 17 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
-- feat: Add ability to call leading upon the first execution. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/throttle@3.4.0...@quenty/throttle@3.5.0) (2022-01-17)
+
+
+### Features
+
+* Add ability to call leading upon the first execution. ([621c8c8](https://github.com/Quenty/NevermoreEngine/commit/621c8c83bd760c7b75714721a87cb042bd64be54))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/throttle@3.3.0...@quenty/throttle@3.4.0) (2022-01-07)
 
