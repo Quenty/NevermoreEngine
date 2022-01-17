@@ -20,6 +20,10 @@ SpringObject.ClassName = "SpringObject"
 SpringObject.__index = SpringObject
 
 --[=[
+	Constructs a new SpringObject.
+	@param target T
+	@param speed number | Observable<number> | ValueObject<number> | NumberValue | any
+	@param damper number | Observable<number> | NumberValue | any
 	@return Spring<T>
 ]=]
 function SpringObject.new(target, speed, damper)
@@ -52,6 +56,11 @@ function SpringObject.new(target, speed, damper)
 	return self
 end
 
+--[=[
+	Returns whether an object is a SpringObject.
+	@param value any
+	@return boolean
+]=]
 function SpringObject.isSpringObject(value)
 	return type(value) == "table" and getmetatable(value) == SpringObject
 end
@@ -186,14 +195,6 @@ function SpringObject:__newindex(index, value)
 	end
 end
 
---[=[
-	Cleans up the BaseObject and sets the metatable to nil
-]=]
-function SpringObject:Destroy()
-	self._maid:DoCleaning()
-	setmetatable(self, nil)
-end
-
 function SpringObject:_getSpringForType(converted)
 	if rawget(self, "_currentSpring") == nil then
 		-- only happens on init
@@ -213,6 +214,14 @@ function SpringObject:_getSpringForType(converted)
 			return self._currentSpring
 		end
 	end
+end
+
+--[=[
+	Cleans up the BaseObject and sets the metatable to nil
+]=]
+function SpringObject:Destroy()
+	self._maid:DoCleaning()
+	setmetatable(self, nil)
 end
 
 return SpringObject

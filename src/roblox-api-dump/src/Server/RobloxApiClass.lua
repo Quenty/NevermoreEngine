@@ -82,6 +82,8 @@ function RobloxApiClass:PromiseSuperClass()
 end
 
 --[=[
+	Returns a promise that resolves whether this class is of a specific type.
+	@param className string
 	@return Promise<boolean>
 ]=]
 function RobloxApiClass:PromiseIsA(className)
@@ -93,6 +95,10 @@ function RobloxApiClass:PromiseIsA(className)
 end
 
 --[=[
+	Returns a promise that resolves whether this class is a descendant of another
+	specific class.
+
+	@param className string
 	@return Promise<boolean>
 ]=]
 function RobloxApiClass:PromiseIsDescendantOf(className)

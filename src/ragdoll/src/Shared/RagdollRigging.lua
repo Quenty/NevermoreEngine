@@ -393,6 +393,7 @@ end
 
 --[=[
 	Creates joints on a model for a given rig type.
+	@param create boolean -- True if we create the joints, false if we just configure.
 	@param model Model
 	@param rigType HumanoidRigType
 ]=]

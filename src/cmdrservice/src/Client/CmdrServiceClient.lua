@@ -1,5 +1,7 @@
 --[=[
-	Loads cmdr on the client
+	Loads cmdr on the client. See [CmdrService] for the server equivalent.
+
+	@client
 	@class CmdrServiceClient
 ]=]
 
@@ -17,6 +19,10 @@ local Promise = require("Promise")
 
 local CmdrServiceClient = {}
 
+--[=[
+	Starts the cmdr service on the client. Should be done via [ServiceBag].
+	@param serviceBag ServiceBag
+]=]
 function CmdrServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -25,6 +31,9 @@ function CmdrServiceClient:Init(serviceBag)
 	self._permissionService = serviceBag:GetService(PermissionServiceClient)
 end
 
+--[=[
+	Starts the service. Should be done via [ServiceBag].
+]=]
 function CmdrServiceClient:Start()
 	assert(self._serviceBag, "Not initialized")
 
@@ -59,6 +68,10 @@ function CmdrServiceClient:_setBindings(cmdr)
 	cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
 end
 
+--[=[
+	Retrieves the cmdr for the client.
+	@return Promise<CmdrClient>
+]=]
 function CmdrServiceClient:PromiseCmdr()
 	assert(self._serviceBag, "Not initialized")
 

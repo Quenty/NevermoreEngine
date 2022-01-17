@@ -1,41 +1,32 @@
 --[=[
 	Provides a means to, with both a continuous position and velocity,
 	accelerate from its current position to a target position in minimum time
-	given a maximum acceleration.
+	given a maximum acceleration. See [Spring] for another version of this.
 
 	Author: TreyReynolds/AxisAngles
-
-	API:
-		AccelTween = AccelTween.new(number maxaccel = 1)
-			maxaccel is the maximum acceleration applied to reach its target.
-
-		number AccelTween.p
-			Returns the current position.
-		number AccelTween.v
-			Returns the current velocity.
-		number AccelTween.a
-			Returns the maximum acceleration.
-		number AccelTween.t
-			Returns the target position.
-		number AccelTween.rtime
-			Returns the remaining time before the AccelTween attains the target.
-
-		AccelTween.p = number
-			Sets the current position.
-		AccelTween.v = number
-			Sets the current velocity.
-		AccelTween.a = number
-			Sets the maximum acceleration.
-		AccelTween.t = number
-			Sets the target position.
-		AccelTween.pt = number
-			Sets the current and target position, and sets the velocity to 0.
-
 	@class AccelTween
 ]=]
 
 local AccelTween = {}
 
+--[=[
+	Constructs a new AccelTween.
+
+	```lua
+	local accelTween = AccelTween.new(30)
+	accelTween.t = 1
+
+	conn = RunService.RenderStepped:Connect(function()
+		print(accelTween.p)
+	end)
+	task.delay(accelTween.rtime, function()
+		conn:Disconnect()
+	end)
+	```
+
+	@param maxaccel number? -- The maximum acceleration applied to reach its target. Defaults to 1
+	@return AccelTween
+]=]
 function AccelTween.new(maxaccel)
 	local self = setmetatable({
 		_accel = maxaccel or 1;
@@ -49,6 +40,43 @@ function AccelTween.new(maxaccel)
 
 	return self
 end
+
+--[=[
+	Gets and sets the current position of the AccelTween
+	@prop p number
+	@within AccelTween
+]=]
+
+--[=[
+	Gets and sets the current velocity of the AccelTween
+	@prop v number
+	@within AccelTween
+]=]
+
+--[=[
+	Gets and sets the maximum acceleration.
+	@prop a number
+	@within AccelTween
+]=]
+
+--[=[
+	Gets and sets the target position.
+	@prop t number
+	@within AccelTween
+]=]
+
+--[=[
+	Returns the remaining time before the AccelTween attains the target.
+	@readonly
+	@prop rtime number
+	@within AccelTween
+]=]
+
+--[=[
+	Sets the current and target position, and sets the velocity to 0.
+	@prop pt number
+	@within AccelTween
+]=]
 
 function AccelTween:__index(index)
 	if AccelTween[index] then

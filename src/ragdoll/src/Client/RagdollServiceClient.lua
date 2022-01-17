@@ -13,7 +13,8 @@ local Players = game:GetService("Players")
 local RagdollServiceClient = {}
 
 --[=[
-	Initializes the ragdoll service on the client.
+	Initializes the ragdoll service on the client. Should be done via [ServiceBag].
+	@param serviceBag ServiceBag
 ]=]
 function RagdollServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
@@ -24,11 +25,19 @@ function RagdollServiceClient:Init(serviceBag)
 	self._screenShakeEnabled = true
 end
 
+--[=[
+	Sets screen shake enabled for the local player
+	@param value boolelan
+]=]
 function RagdollServiceClient:SetScreenShakeEnabled(value)
 	assert(type(value) == "boolean", "Bad value")
 	Players.LocalPlayer:SetAttribute(RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE)
 end
 
+--[=[
+	Returns wheher screenshake is enabled.
+	@return boolean
+]=]
 function RagdollServiceClient:GetScreenShakeEnabled()
 	assert(self._serviceBag, "Not initialized")
 

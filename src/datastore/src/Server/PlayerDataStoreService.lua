@@ -44,7 +44,7 @@ end
 	Must be done before start and after init.
 	:::
 
-	@param dataStoreScope string
+	@param dataStoreName string
 ]=]
 function PlayerDataStoreService:SetDataStoreName(dataStoreName)
 	assert(type(dataStoreName) == "string", "Bad dataStoreName")
