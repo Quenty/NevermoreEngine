@@ -6,7 +6,36 @@
 ]=]
 local PreferredParentUtils = {}
 
+--[=[
+	@param parent Instance
+	@param name string
+	@return () -> Instance
+]=]
+function PreferredParentUtils.createPreferredParentRetriever(parent, name)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(name) == "string", "Bad name")
+
+	local cache
+	return function()
+		-- Ensure that we don't try to search for duplicates EVERY time.
+		if cache and cache.Parent == parent then
+			return cache
+		end
+
+		cache = PreferredParentUtils.getPreferredParent(parent, name)
+		return cache
+	end
+end
+
+--[=[
+	@param parent Instance
+	@param name string
+	@return Instance
+]=]
 function PreferredParentUtils.getPreferredParent(parent, name)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(name) == "string", "Bad name")
+
 	local found
 	for _, item in pairs(parent:GetChildren()) do
 		if item.Name == name then
