@@ -1,3 +1,20 @@
+# v4.0.0 (Mon Jan 17 2022)
+
+#### 💥 Breaking Change
+
+- feat: Make breaking changes to idle service and statestack. [#248](https://github.com/Quenty/NevermoreEngine/pull/248) ([@Quenty](https://github.com/Quenty))
+- feat!: BREAKING CHANGE: StateStack no longer allows nil PushState(), must push the value ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Fix docs for moonwave ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
