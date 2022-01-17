@@ -1,5 +1,7 @@
 --[=[
-	Helps track whether or not a player is idle and if so, then can show UI or other cute things
+	Helps track whether or not a player is idle and if so, then can show UI or other cute things.
+
+	@client
 	@class IdleServiceClient
 ]=]
 
@@ -11,13 +13,17 @@ local VRService = game:GetService("VRService")
 local HumanoidTrackerService = require("HumanoidTrackerService")
 local Maid = require("Maid")
 local RagdollBindersClient = require("RagdollBindersClient")
-local StateStack = require("StateStack")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local StateStack = require("StateStack")
 
 local IdleServiceClient = {}
 
 local STANDING_TIME_REQUIRED = 0.5
 
+--[=[
+	Initializes the idle service on the client. Should be done via [ServiceBag].
+	@param serviceBag ServiceBag
+]=]
 function IdleServiceClient:Init(serviceBag)
 	assert(not self._maid, "Already initialized")
 
@@ -45,6 +51,10 @@ function IdleServiceClient:Init(serviceBag)
 	self._maid:GiveTask(self._humanoidIdle)
 end
 
+--[=[
+	Starts idle service on the client. Should be done via [ServiceBag].
+	@param serviceBag ServiceBag
+]=]
 function IdleServiceClient:Start()
 	self._maid:GiveTask(self._humanoidIdle.Changed:Connect(function()
 		self:_updateShowIdleUI()
@@ -66,24 +76,44 @@ function IdleServiceClient:Start()
 	self:_updateShowIdleUI()
 end
 
+--[=[
+	Returns whether the humanoid is idle.
+	@return boolean
+]=]
 function IdleServiceClient:IsHumanoidIdle()
 	return self._humanoidIdle.Value
 end
 
+--[=[
+	Returns whether UI should be shown (if the humanoid is idle)
+	@return boolean
+]=]
 function IdleServiceClient:DoShowIdleUI()
 	return self._showIdleUI.Value
 end
 
+--[=[
+	Observes whether to show the the idle UI
+	@return Observable<boolean>
+]=]
 function IdleServiceClient:ObserveShowIdleUI()
 	return RxValueBaseUtils.observeValue(self._showIdleUI)
 end
 
+--[=[
+	Returns a show idle bool value.
+	@return BoolValue
+]=]
 function IdleServiceClient:GetShowIdleUIBoolValue()
 	assert(self._showIdleUI, "Not initialized")
 
 	return self._showIdleUI
 end
 
+--[=[
+	Pushes a disabling function that disables idle UI
+	@return boolean
+]=]
 function IdleServiceClient:PushDisable()
 	if not RunService:IsRunning() then
 		return function() end
@@ -111,14 +141,14 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 
 	local maid = Maid.new()
 
-	local lastMove = tick()
+	local lastMove = os.clock()
 
 	maid:GiveTask(function()
 		self._humanoidIdle.Value = false
 	end)
 
 	local function update()
-		if tick() - lastMove >= STANDING_TIME_REQUIRED then
+		if os.clock() - lastMove >= STANDING_TIME_REQUIRED then
 			self._humanoidIdle.Value = true
 		else
 			self._humanoidIdle.Value = false
@@ -126,17 +156,17 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 	end
 
 	maid:GiveTask(self._enabled.Changed:Connect(function()
-		lastMove = tick()
+		lastMove = os.clock()
 	end))
 
 	maid:GiveTask(RunService.Stepped:Connect(function()
 		local rootPart = humanoid.RootPart
 
 		if self._ragdollBindersClient.Ragdoll:Get(humanoid) then
-			lastMove = tick()
+			lastMove = os.clock()
 		elseif rootPart then
 			if rootPart.Velocity.magnitude > 2.5 then
-				lastMove = tick()
+				lastMove = os.clock()
 			end
 		end
 
