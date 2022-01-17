@@ -73,7 +73,7 @@ end
 
 --[=[
 	Instantly skips the spring forwards by that amount time
-	@param delta number--  Time to skip forwards
+	@param delta number -- Time to skip forwards
 	@return ()
 ]=]
 function Spring:TimeSkip(delta)
