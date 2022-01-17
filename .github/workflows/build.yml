@@ -20,11 +20,6 @@ jobs:
       - name: Run moonwave-extractor
         run: moonwave-extractor extract src
 
-      - name: Run Luacheck
-        uses: Roang-zero1/factorio-mod-luacheck@master
-        with:
-          luacheckrc_url: https://raw.githubusercontent.com/Quenty/NevermoreEngine/main/.luacheckrc
-
   release:
     needs: lint
     runs-on: ubuntu-latest

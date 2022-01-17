@@ -2,13 +2,7 @@ We'd love to have you help contribute to this project!
 
 ## Documentation
 
-Documentation is maintained using LDoc standards with a few caveats. 
-
-* Only document confusing components at this point
-* Certain classes are documented using a long-form style to clarify usage. See Signal.lua as an example
-
-### Guidelines
-* Do not include @author
+Documentation is maintained using moonwave.
 
 ## Coding style
 
@@ -29,10 +23,9 @@ Puts things in this order
 
 Sample:
 ```lua
---- Documentation goes first
--- @classmod ClassName
+--[=[
+	@class MyClass
+]=]
 
-local require = require(game:GetService("ReplicatedStorage"):WaitForChild("Nevermore"))
-
-
+local require = require(script.Parent.loader).load(script)
 ```
