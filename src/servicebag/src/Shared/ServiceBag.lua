@@ -152,8 +152,15 @@ function ServiceBag:Start()
 	while next(self._serviceTypesToStart) do
 		local serviceType = table.remove(self._serviceTypesToStart)
 		local service = assert(self._services[serviceType], "No service")
+
 		if service.Start then
-			service:Start()
+			local current
+			task.spawn(function()
+				current = coroutine.running()
+				service:Start()
+			end)
+
+			assert(coroutine.status(current) == "dead", "Starting service yielded")
 		end
 	end
 
@@ -219,7 +226,13 @@ function ServiceBag:_initService(serviceType)
 	local service = assert(self._services[serviceType], "No service")
 
 	if service.Init then
-		service:Init(self)
+		local current
+		task.spawn(function()
+			current = coroutine.running()
+			service:Init(self)
+		end)
+
+		assert(coroutine.status(current) == "dead", "Initializing service yielded")
 	end
 
 	table.insert(self._serviceTypesToStart, serviceType)
