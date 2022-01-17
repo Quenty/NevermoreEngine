@@ -13,6 +13,7 @@ local PromiseUtils = require("PromiseUtils")
 local PermissionServiceClient = require("PermissionServiceClient")
 local Maid = require("Maid")
 local String = require("String")
+local Promise = require("Promise")
 
 local CmdrServiceClient = {}
 
@@ -67,7 +68,10 @@ function CmdrServiceClient:PromiseCmdr()
 
 	self._cmdrPromise = promiseChild(ReplicatedStorage, "CmdrClient")
 		:Then(function(cmdClient)
-			return require(cmdClient)
+			return Promise.spawn(function(resolve, _reject)
+				-- Requiring cmdr can yield
+				return resolve(require(cmdClient))
+			end)
 		end)
 
 	return self._cmdrPromise
