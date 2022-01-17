@@ -18,6 +18,8 @@ local require = require(script.Parent.loader).load(script)
 
 local MaidTaskUtils = require("MaidTaskUtils")
 
+local ENABLE_STACK_TRACING = false
+
 local Subscription = {}
 Subscription.ClassName = "Subscription"
 Subscription.__index = Subscription
@@ -45,6 +47,7 @@ function Subscription.new(fireCallback, failCallback, completeCallback, onSubscr
 
 	return setmetatable({
 		_state = stateTypes.PENDING;
+		_source = ENABLE_STACK_TRACING and debug.traceback() or "";
 		_fireCallback = fireCallback;
 		_failCallback = failCallback;
 		_completeCallback = completeCallback;
@@ -58,10 +61,17 @@ end
 	@param ... any
 ]=]
 function Subscription:Fire(...)
-	if self._state == stateTypes.PENDING and self._fireCallback then
-		self._fireCallback(...)
+	if self._state == stateTypes.PENDING then
+		if self._fireCallback then
+			self._fireCallback(...)
+		end
 	elseif self._state == stateTypes.CANCELLED then
 		warn("[Subscription.Fire] - We are cancelled, but events are still being pushed")
+
+		if ENABLE_STACK_TRACING then
+			print(debug.traceback())
+			print(self._source)
+		end
 	end
 end
 
@@ -151,6 +161,14 @@ function Subscription:Complete()
 	end
 
 	self:_doCleanup()
+end
+
+--[=[
+	Returns whether the subscription is pending.
+	@return boolean
+]=]
+function Subscription:IsPending()
+	return self._state == stateTypes.PENDING
 end
 
 function Subscription:_giveCleanup(task)

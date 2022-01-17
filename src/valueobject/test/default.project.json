@@ -1,0 +1,11 @@
+{
+  "name": "ValueObject",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "valueobject": {
+        "$path": ".."
+      }
+    }
+  }
+}

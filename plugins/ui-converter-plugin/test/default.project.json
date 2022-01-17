@@ -1,0 +1,15 @@
+{
+  "name": "QuentyUIConverterPlugin",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "QuentyUIConverterPlugin": {
+        "$className": "Folder",
+        "QuentyUIConverterPlugin": {
+          "$path": ".."
+        }
+      }
+    }
+  }
+}

@@ -99,7 +99,7 @@ end
 ]=]
 function Maid:__newindex(index, newTask)
 	if Maid[index] ~= nil then
-		error(("'%s' is reserved"):format(tostring(index)), 2)
+		error(("Cannot use '%s' as a Maid key"):format(tostring(index)), 2)
 	end
 
 	local tasks = self._tasks

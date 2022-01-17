@@ -1,0 +1,49 @@
+{
+  "name": "@quenty/ui-converter-plugin",
+  "version": "1.0.0",
+  "description": "Converts UI into Blend API surfaces",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "plugins/ui-converter-plugin/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@boatbomber/highlighter": "github:Quenty/Highlighter",
+    "@elttob/fusion": "github:Quenty/Fusion",
+    "@quenty/baseobject": "file:../../src/baseobject",
+    "@quenty/basicpane": "file:../../src/basicpane",
+    "@quenty/blend": "file:../../src/blend",
+    "@quenty/collectionserviceutils": "file:../../src/collectionserviceutils",
+    "@quenty/instanceutils": "file:../../src/instanceutils",
+    "@quenty/loader": "file:../../src/loader",
+    "@quenty/maid": "file:../../src/maid",
+    "@quenty/math": "file:../../src/math",
+    "@quenty/promise": "file:../../src/promise",
+    "@quenty/roblox-api-dump": "file:../../src/roblox-api-dump",
+    "@quenty/rx": "file:../../src/rx",
+    "@quenty/servicebag": "file:../../src/servicebag",
+    "@quenty/signal": "file:../../src/signal",
+    "@quenty/string": "file:../../src/string",
+    "@quenty/valueobject": "file:../../src/valueobject",
+    "@quenty/viewport": "file:../../src/viewport"
+  }
+}

@@ -25,8 +25,8 @@ serviceBag:GetService(require(serverFolder.CmdrService)):RegisterCommand({
 	Group = "Admin";
 	Args = {
 		{
+			Name = "Players";
 			Type = "players";
-			Name = "players";
 			Description = "Victims";
 		},
 	};

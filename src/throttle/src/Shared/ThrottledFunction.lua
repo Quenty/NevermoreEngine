@@ -29,14 +29,15 @@ function ThrottledFunction:Call(...)
 		-- Update the next value to be dispatched
 		self._trailingValue = table.pack(...)
 	elseif self._nextCallTimeStamp <= tick() then
-		if self._callLeading then
+		if self._callLeading or self._callLeadingFirstTime then
+			self._callLeadingFirstTime = false
 			-- Dispatch immediately
 			self._nextCallTimeStamp = tick() + self._timeout
 			self._func(...)
 		elseif self._callTrailing then
 			-- Schedule for trailing at exactly timeout
 			self._trailingValue = table.pack(...)
-			delay(self._timeout, function()
+			task.delay(self._timeout, function()
 				if self.Destroy then
 					self:_dispatch()
 				end
@@ -44,12 +45,13 @@ function ThrottledFunction:Call(...)
 		else
 			error("[ThrottledFunction.Cleanup] - Trailing and leading are both disabled")
 		end
-	elseif self._callLeading or self._callTrailing then
+	elseif self._callLeading or self._callTrailing or self._callLeadingFirstTime then
+		self._callLeadingFirstTime = false
 		-- As long as either leading or trailing are set to true, we are good
 		local remainingTime = self._nextCallTimeStamp - tick()
 		self._trailingValue = table.pack(...)
 
-		delay(remainingTime, function()
+		task.delay(remainingTime, function()
 			if self.Destroy then
 				self:_dispatch()
 			end
@@ -82,6 +84,8 @@ function ThrottledFunction:_configureOrError(throttleConfig)
 			self._callLeading = value
 		elseif key == "trailing" then
 			self._callTrailing = value
+		elseif key == "leadingFirstTimeOnly" then
+			self._callLeadingFirstTime = value
 		else
 			error(("Bad key %q in config"):format(tostring(key)))
 		end

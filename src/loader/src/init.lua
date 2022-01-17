@@ -68,17 +68,39 @@ end
 	@within Loader
 ]=]
 local function bootstrapGame(packageFolder)
+	assert(typeof(packageFolder) == "Instance", "Bad instance")
 	assert(RunService:IsRunning(), "Game must be running")
 
 	loader:Lock()
 
-	local clientFolder, serverFolder, sharedFolder = LoaderUtils.toWallyFormat(packageFolder)
+	local clientFolder, serverFolder, sharedFolder = LoaderUtils.toWallyFormat(packageFolder, false)
 
 	clientFolder.Parent = ReplicatedStorage
 	sharedFolder.Parent = ReplicatedStorage
 	serverFolder.Parent = ServerScriptService
 
 	return serverFolder
+end
+
+local function bootstrapPlugin(packageFolder)
+	assert(typeof(packageFolder) == "Instance", "Bad instance")
+	loader = LegacyLoader.new(script)
+	loader:Lock()
+
+	local pluginFolder = LoaderUtils.toWallyFormat(packageFolder, true)
+	pluginFolder.Parent = packageFolder
+
+	return function(value)
+		if type(value) == "string" then
+			if pluginFolder:FindFirstChild(value) then
+				return require(pluginFolder:FindFirstChild(value))
+			end
+
+			error(("Unknown module %q"):format(tostring(value)))
+		else
+			return require(value)
+		end
+	end
 end
 
 --[=[
@@ -111,4 +133,5 @@ end
 return setmetatable({
 	load = handleLoad;
 	bootstrapGame = bootstrapGame;
+	bootstrapPlugin = bootstrapPlugin;
 }, metatable)

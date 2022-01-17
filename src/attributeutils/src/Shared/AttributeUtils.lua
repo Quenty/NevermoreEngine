@@ -86,11 +86,31 @@ end
 	@return any? -- The value of the attribute
 ]=]
 function AttributeUtils.initAttribute(instance, attributeName, default)
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(typeof(attributeName) == "string", "Bad attributeName")
+
 	local value = instance:GetAttribute(attributeName)
 	if value == nil then
 		instance:SetAttribute(attributeName, default)
 		value = default
 	end
+	return value
+end
+
+--[=[
+	Retrieves an attribute, and if it is nil, returns the default
+	instead.
+	@param instance Instance
+	@param attributeName string
+	@param default T?
+	@return T?
+]=]
+function AttributeUtils.getAttribute(instance, attributeName, default)
+	local value = instance:GetAttribute(attributeName)
+	if value == nil then
+		return default
+	end
+
 	return value
 end
 

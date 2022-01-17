@@ -12,11 +12,12 @@ return function()
 		local externalResult
 
 		it("should execute immediately", function()
-			observe:Subscribe(function(result)
+			local sub = observe:Subscribe(function(result)
 				externalResult = result
 			end)
 
 			expect(externalResult).to.be.a("table")
+			sub:Destroy()
 		end)
 	end)
 
@@ -25,12 +26,13 @@ return function()
 		local externalResult
 
 		it("should execute immediately", function()
-			observe:Subscribe(function(result)
+			local sub = observe:Subscribe(function(result)
 				externalResult = result
 			end)
 
 			expect(externalResult).to.be.a("table")
 			expect(externalResult.value).to.equal(5)
+			sub:Destroy()
 		end)
 	end)
 
@@ -39,12 +41,13 @@ return function()
 		local externalResult
 
 		it("should execute immediately", function()
-			observe:Subscribe(function(result)
+			local sub = observe:Subscribe(function(result)
 				externalResult = result
 			end)
 
 			expect(externalResult).to.be.a("table")
 			expect(externalResult.value).to.equal(5)
+			sub:Destroy()
 		end)
 	end)
 end
