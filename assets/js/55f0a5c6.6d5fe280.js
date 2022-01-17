@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[15561],{92870:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IdleService","desc":"Helps track whether or not a player is idle and if so, then can show UI or other cute things","source":{"line":5,"path":"src/idleservice/src/Client/IdleService.lua"}}')}}]);
