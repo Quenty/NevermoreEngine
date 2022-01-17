@@ -32,6 +32,7 @@ StateStack.__index = StateStack
 
 --[=[
 	Constructs a new StateStack.
+	@param defaultValue any -- The default value to use for the statestack.
 	@return StateStack
 ]=]
 function StateStack.new(defaultValue)

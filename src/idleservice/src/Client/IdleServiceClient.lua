@@ -53,7 +53,6 @@ end
 
 --[=[
 	Starts idle service on the client. Should be done via [ServiceBag].
-	@param serviceBag ServiceBag
 ]=]
 function IdleServiceClient:Start()
 	self._maid:GiveTask(self._humanoidIdle.Changed:Connect(function()
