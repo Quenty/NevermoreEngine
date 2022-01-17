@@ -1,0 +1,20 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBX19C7C1347F324CDCA1BA9CFA3BE35F7F">
+		<Properties>
+			<string name="Name">TagList</string>
+			<BinaryString name="Tags">VGFnRWRpdG9yVGFnQ29udGFpbmVy</BinaryString>
+		</Properties>
+		<Item class="Configuration" referent="RBX24A4637A43254D1F9975C9B31AA7F655">
+			<Properties>
+				<BinaryString name="AttributesSerialize"><![CDATA[BgAAAAsAAABBbHdheXNPblRvcAMABQAAAENvbG9yD0bkID3AWXM/7Ne3PggAAABEcmF3VHlw
+ZQIDAAAAQm94BQAAAEdyb3VwAgQAAABIaWRlBAAAAEljb24CCQAAAGVtb2ppOmV5ZQcAAABW
+aXNpYmxlAwE=]]></BinaryString>
+				<string name="Name">Hide</string>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>
