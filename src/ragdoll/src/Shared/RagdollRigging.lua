@@ -243,7 +243,7 @@ local function indexParts(model)
 	return parts
 end
 
-local function createRigJoints(parts, rig)
+local function configureRigJoints(create, parts, rig)
 	for _, params in ipairs(rig) do
 		local part0Name, part1Name, attachmentName, limits = unpack(params)
 		local part0 = parts[part0Name]
@@ -255,35 +255,34 @@ local function createRigJoints(parts, rig)
 				-- Our rigs only have one joint per part (connecting each part to it's parent part), so
 				-- we can re-use it if we have to re-rig that part again.
 				local constraint = part1:FindFirstChild(BALL_SOCKET_NAME)
-				if not constraint then
+				if constraint == nil and create then
 					constraint = Instance.new("BallSocketConstraint")
 					constraint.Name = BALL_SOCKET_NAME
-
-					if RunService:IsClient() then
-						warn(("[RagdollRigging] - Creating BallSocketConstraint %q"))
-					end
 				end
-				constraint.Attachment0 = a0
-				constraint.Attachment1 = a1
-				constraint.LimitsEnabled = true
-				constraint.UpperAngle = limits.UpperAngle
-				constraint.TwistLimitsEnabled = true
-				constraint.TwistLowerAngle = limits.TwistLowerAngle
-				constraint.TwistUpperAngle = limits.TwistUpperAngle
-				-- Scale constant torque limit for joint friction relative to gravity and the mass of
-				-- the body part.
-				local gravityScale = workspace.Gravity / REFERENCE_GRAVITY
-				local referenceMass = limits.ReferenceMass
-				local massScale = referenceMass and (part1:GetMass() / referenceMass) or 1
-				local maxTorque = limits.FrictionTorque or DEFAULT_MAX_FRICTION_TORQUE
-				constraint.MaxFrictionTorque = maxTorque * massScale * gravityScale
-				constraint.Parent = part1
+
+				if constraint then
+					constraint.Attachment0 = a0
+					constraint.Attachment1 = a1
+					constraint.LimitsEnabled = true
+					constraint.UpperAngle = limits.UpperAngle
+					constraint.TwistLimitsEnabled = true
+					constraint.TwistLowerAngle = limits.TwistLowerAngle
+					constraint.TwistUpperAngle = limits.TwistUpperAngle
+					-- Scale constant torque limit for joint friction relative to gravity and the mass of
+					-- the body part.
+					local gravityScale = workspace.Gravity / REFERENCE_GRAVITY
+					local referenceMass = limits.ReferenceMass
+					local massScale = referenceMass and (part1:GetMass() / referenceMass) or 1
+					local maxTorque = limits.FrictionTorque or DEFAULT_MAX_FRICTION_TORQUE
+					constraint.MaxFrictionTorque = maxTorque * massScale * gravityScale
+					constraint.Parent = part1
+				end
 			end
 		end
 	end
 end
 
-local function createAdditionalAttachments(parts, attachments)
+local function configureAdditionalAttachments(create, parts, attachments)
 	for _, attachmentParams in ipairs(attachments) do
 		local partName, attachmentName, cframe, baseAttachmentName = unpack(attachmentParams)
 		local part = parts[partName]
@@ -299,13 +298,11 @@ local function createAdditionalAttachments(parts, attachments)
 				end
 				-- The attachment names are unique within a part, so we can re-use
 				if not attachment then
-					attachment = Instance.new("Attachment")
-					attachment.Name = attachmentName
-					attachment.CFrame = cframe
-					attachment.Parent = part
-
-					if RunService:IsClient() then
-						warn(("[RagdollRigging] - Creating attachment %q"):format(attachmentName))
+					if create then
+						attachment = Instance.new("Attachment")
+						attachment.Name = attachmentName
+						attachment.CFrame = cframe
+						attachment.Parent = part
 					end
 				else
 					attachment.CFrame = cframe
@@ -315,7 +312,7 @@ local function createAdditionalAttachments(parts, attachments)
 	end
 end
 
-local function createNoCollides(parts, noCollides)
+local function configureNoCollides(create, parts, noCollides)
 	-- This one's trickier to handle for an already rigged character since a part will have multiple
 	-- NoCollide children with the same name. Having fewer unique names is better for
 	-- replication so we suck it up and deal with the complexity here.
@@ -363,16 +360,16 @@ local function createNoCollides(parts, noCollides)
 		local reusables = reusableNoCollides[part1]
 		for part0, _ in pairs(neededPart0s) do
 			local constraint = table.remove(reusables)
-			if not constraint then
+			if constraint == nil and create then
 				constraint = Instance.new("NoCollisionConstraint")
-				if RunService:IsClient() then
-					warn(("[RagdollRigging] - Creating NoCollisionConstraint %q"))
-				end
 			end
-			constraint.Name = NO_COLLIDE_NAME
-			constraint.Part0 = part0
-			constraint.Part1 = part1
-			constraint.Parent = part1
+
+			if constraint then
+				constraint.Name = NO_COLLIDE_NAME
+				constraint.Part0 = part0
+				constraint.Part1 = part1
+				constraint.Parent = part1
+			end
 		end
 	end
 end
@@ -399,16 +396,16 @@ end
 	@param model Model
 	@param rigType HumanoidRigType
 ]=]
-function RagdollRigging.createRagdollJoints(model, rigType)
+function RagdollRigging.configureRagdollJoints(create, model, rigType)
 	local parts = indexParts(model)
 	if rigType == Enum.HumanoidRigType.R6 then
-		createAdditionalAttachments(parts, R6_ADDITIONAL_ATTACHMENTS)
-		createRigJoints(parts, R6_RAGDOLL_RIG)
-		createNoCollides(parts, R6_NO_COLLIDES)
+		configureAdditionalAttachments(create, parts, R6_ADDITIONAL_ATTACHMENTS)
+		configureRigJoints(create, parts, R6_RAGDOLL_RIG)
+		configureNoCollides(create, parts, R6_NO_COLLIDES)
 	elseif rigType == Enum.HumanoidRigType.R15 then
-		createAdditionalAttachments(parts, R15_ADDITIONAL_ATTACHMENTS)
-		createRigJoints(parts, R15_RAGDOLL_RIG)
-		createNoCollides(parts, R15_NO_COLLIDES)
+		configureAdditionalAttachments(create, parts, R15_ADDITIONAL_ATTACHMENTS)
+		configureRigJoints(create, parts, R15_RAGDOLL_RIG)
+		configureNoCollides(create, parts, R15_NO_COLLIDES)
 	else
 		error("unknown rig type", 2)
 	end

@@ -11,7 +11,7 @@ function GameServiceClient:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("TimeSyncService"))
-	self._serviceBag:GetService(require("RagdollBindersClient"))
+	self._serviceBag:GetService(require("RagdollServiceClient"))
 	self._serviceBag:GetService(require("IKServiceClient"))
 	self._serviceBag:GetService(require("CameraStackService"))
 

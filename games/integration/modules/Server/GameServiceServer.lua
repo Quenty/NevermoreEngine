@@ -11,7 +11,7 @@ function GameServiceServer:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("TimeSyncService"))
-	self._serviceBag:GetService(require("RagdollBindersServer"))
+	self._serviceBag:GetService(require("RagdollService"))
 	self._serviceBag:GetService(require("IKService"))
 
 	-- Internal
