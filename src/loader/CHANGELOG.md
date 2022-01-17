@@ -1,3 +1,16 @@
+# v3.4.0 (Mon Jan 17 2022)
+
+#### 🚀 Enhancement
+
+- feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
+- feat: Allow plugins to be bootstrapped allowing access to both client and server code within the plugin. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

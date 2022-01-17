@@ -1,3 +1,16 @@
+# (Mon Jan 17 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.1.0`, `@quenty/actionmanager@3.8.0`, `@quenty/adorneeutils@2.2.0`, `@quenty/attributeutils@4.3.0`, `@quenty/blend@2.3.0`, `@quenty/brio@3.8.0`, `@quenty/cmdrservice@3.9.0`, `@quenty/datastore@3.6.0`, `@quenty/firstpersoncharactertransparency@3.5.0`, `@quenty/hide@1.8.0`, `@quenty/loader@3.4.0`, `@quenty/maid@2.1.0`, `@quenty/permissionprovider@4.7.0`, `@quenty/preferredparentutils@2.1.0`, `@quenty/ragdoll@5.3.0`, `@quenty/roblox-api-dump@1.1.0`, `@quenty/rx@3.8.0`, `@quenty/scoredactionservice@4.9.0`, `@quenty/servicebag@3.5.0`, `@quenty/sounds@3.8.0`, `@quenty/spring@3.3.0`, `@quenty/throttle@3.5.0`, `@quenty/valueobject@3.8.0`, `@quenty/viewport@1.1.0`
+  - feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jan 16 2022)
 
 :tada: This release contains work from a new contributor! :tada:
