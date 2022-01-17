@@ -40,7 +40,7 @@ end
 	@return StateStack<T>
 ]=]
 function RxBrioUtils.createStateStack(observable)
-	local stateStack = StateStack.new()
+	local stateStack = StateStack.new(nil)
 
 	stateStack._maid:GiveTask(observable:Subscribe(function(value)
 		assert(Brio.isBrio(value), "Observable must emit brio")
@@ -315,30 +315,18 @@ end
 ]=]
 function RxBrioUtils.where(predicate)
 	assert(type(predicate) == "function", "Bad predicate")
-
 	return function(source)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(function(brio)
-				maid._lastBrio = nil
+				assert(Brio.isBrio(brio), "Not a brio")
+				if brio:IsDead() then
+					return
+				end
 
-				if Brio.isBrio(brio) then
-					if brio:IsDead() then
-						return
-					end
-
-					if predicate(brio:GetValue()) then
-						local newBrio = BrioUtils.clone(brio)
-						maid._lastBrio = newBrio
-						sub:Fire(newBrio)
-					end
-				else
-					if predicate(brio) then
-						local newBrio = Brio.new(brio)
-						maid._lastBrio = newBrio
-						sub:Fire(newBrio)
-					end
+				if predicate(brio:GetValue()) then
+					sub:Fire(brio)
 				end
 			end, sub:GetFailComplete()))
 
@@ -570,27 +558,18 @@ function RxBrioUtils.map(project)
 		end
 
 		local results = table.pack(project(table.unpack(args, 1, args.n)))
-		if results.n == 1 then
-			if Brio.isBrio(results[1]) then
-				table.insert(brios, results[1])
-				return BrioUtils.first(brios, results:GetValue())
+		local transformedResults = {}
+		for i=1, results.n do
+			local item = results[i]
+			if Brio.isBrio(item) then
+				table.insert(brios, item) -- add all subsequent brios into this table...
+				transformedResults[i] = item:GetValue()
 			else
-				return BrioUtils.withOtherValues(brios, results[1])
+				transformedResults[i] = item
 			end
-		else
-			local transformedResults = {}
-			for i=1, results.n do
-				local item = results[i]
-				if Brio.isBrio(item) then
-					table.insert(brios, item) -- add all subsequent brios into this table...
-					transformedResults[i] = item:GetValue()
-				else
-					transformedResults[i] = item
-				end
-			end
-
-			return BrioUtils.first(brios, table.unpack(transformedResults, 1, transformedResults.n))
 		end
+
+		return BrioUtils.first(brios, table.unpack(transformedResults, 1, transformedResults.n))
 	end)
 end
 
@@ -666,7 +645,6 @@ function RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
 				sub:Complete()
 			else
 				sub:Fire(brio:GetValue())
-
 				return brio:GetDiedSignal():Connect(function()
 					sub:Fire(emitOnDeathValue)
 					sub:Complete()
