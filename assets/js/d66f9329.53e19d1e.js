@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[36985],{22529:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ActionManager","desc":"Holds single toggleable actions (like a tool system)","source":{"line":5,"path":"src/actionmanager/src/Client/ActionManager.lua"}}')}}]);

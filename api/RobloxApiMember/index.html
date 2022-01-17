@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="generator" content="Docusaurus v2.0.0-beta.9">
+<title data-react-helmet="true">RobloxApiMember | Nevermore</title><meta data-react-helmet="true" property="og:title" content="RobloxApiMember | Nevermore"><meta data-react-helmet="true" name="twitter:card" content="summary_large_image"><meta data-react-helmet="true" name="description" content="Represents a specific member of a class. This could be a property or event, or method, or callback."><meta data-react-helmet="true" property="og:description" content="Represents a specific member of a class. This could be a property or event, or method, or callback."><meta data-react-helmet="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/RobloxApiMember"><meta data-react-helmet="true" name="docusaurus_locale" content="en"><meta data-react-helmet="true" name="docusaurus_tag" content="default"><link data-react-helmet="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/RobloxApiMember"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/RobloxApiMember" hreflang="en"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/RobloxApiMember" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.fb20d3d5.css">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.2fc5537e.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.0c3e351e.js" as="script">
+</head>
+<body>
+<script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
+<div><a href="#" class="skipToContent_1oUP">Skip to main content</a></div><nav class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Navigation bar toggle" class="navbar__toggle clean-btn" type="button" tabindex="0"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/NevermoreEngine/"><b class="navbar__title">Nevermore</b></a><a class="navbar__item navbar__link" href="/NevermoreEngine/docs/intro">Docs</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/NevermoreEngine/api/">API</a><a class="navbar__item navbar__link" href="/NevermoreEngine/changelog">Changelog</a></div><div class="navbar__items navbar__items--right"><a href="https://discord.gg/mhtGUS8" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link"><span>Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a><a href="https://github.com/Quenty/NevermoreEngine" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link"><span>GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a><div class="toggle_71bT toggle_3Zt9 toggleDisabled_3cF-"><div class="toggleTrack_32Fl" role="button" tabindex="-1"><div class="toggleTrackCheck_3lV7"><span class="toggleIcon_O4iE">🌜</span></div><div class="toggleTrackX_S2yS"><span class="toggleIcon_O4iE">🌞</span></div><div class="toggleTrackThumb_xI_Z"></div></div><input type="checkbox" class="toggleScreenReader_28Tw" aria-label="Switch between dark and light mode"></div><div class="navbar__search"><span aria-label="expand searchbar" role="button" class="search-icon" tabindex="0"></span><input type="search" id="search_input_react" placeholder="Press S to Search..." aria-label="Search" class="navbar__search-input search-bar"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div class="main-wrapper docPageContainer_2Kz0"><div class="docPage_1bdk"><div class="docSidebarContainer_1ykS"><div class="sidebar_15mo"><nav class="menu thin-scrollbar menu_Bmed"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Acceltween</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Actionmanager</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Adorneeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sprites</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationgroup</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationtrackutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Applytagtotaggedchildren</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ik</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rigbuilderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Attributeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Axisangleutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Badgeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Baseobject</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Permissionprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Basicpane</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Bezierutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Binarysearch</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ragdoll</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Binder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Parttouchingcalculator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Blend</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Loader</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Boundlinkutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Boundingboxutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Brio</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Buttonhighlightmodel</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Buttonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cframeserializer</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cframeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Camera</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Camerastoryutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Canceltoken</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Characterutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Geometryutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Clipcharacters</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cmdrservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Collectionserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Color3serializationutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Color3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Colorsequenceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Contentproviderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cooldown</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Coreguienabler</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Coreguiutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cubicspline</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Datastore</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Debounce</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Depthoffield</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Snackbar</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Draw</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Enabledmixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Equippedtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Experiencecalculator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Fakeskybox</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Firstpersoncharactertransparency</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Friendutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Functionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gamescalingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gameversionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Generatewithmixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Genericscreenguiprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getpercentexposedutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Remoting</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Grouputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Guitriangle</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Guivisiblemanager</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hapticfeedbackutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hide</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hintscoringutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Httppromise</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidanimatorutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoiddescriptionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidkillerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidmovedirectionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidspeed</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidteleportutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputmode</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Idleservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputkeymaputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Scoredactionservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputobjectutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Insertserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Isamixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Clienttranslator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Jsonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Jumpbuttonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Linearsystemssolver</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Spring</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Linkutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Lipsum</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Localizedtextutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Maid</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Markdownrender</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Marketplaceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Timesyncservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Math</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Meshutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Metricutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Trajectory</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Modelappearance</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Modeltransparencyeffect</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Templateprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Mouseovermixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Mouseshiftlockservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Multipleclickutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkownerservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkownerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkropeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Nocollisionconstraintutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numberrangeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numbersequenceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numbertoinputkeyutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rx</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Observablecollection</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Octree</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Overriddenproperty</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Particleengine</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Characterparticleplayer</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pathfindingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Promise</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Physicsutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pillbacking</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerbinder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Uiobjectutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerhumanoidbinder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerthumbnailutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playersservicepromises</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Polynomialutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Preferredparentutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Probability</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pseudolocalize</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Qframe</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Quaternion</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">R15utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Racketingropeconstraint</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Randomutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Vector3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Raycaster</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Region3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Region3int16utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Remotefunctionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Resetservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><a class="menu__link menu__link--sublist menu__link--active" href="#">Roblox Api-dump</a><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/NevermoreEngine/api/RobloxApiClass">​Roblox​Api​Class</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/NevermoreEngine/api/RobloxApiDump">​Roblox​Api​Dump</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/NevermoreEngine/api/RobloxApiDumpConstants">​Roblox​Api​Dump​Constants</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/NevermoreEngine/api/RobloxApiMember">​Roblox​Api​Member</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/NevermoreEngine/api/RobloxApiUtils">​Roblox​Api​Utils</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rodux Actions</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rotatinglabel</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Roundedbackingbuilder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rxbinderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Instanceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Valuebaseutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Scrollingframe</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Selectionimageutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Servicebag</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Table</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Signal</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Socialserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sounds</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Statestack</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Steputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Streamingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">String</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sunpositionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Symbol</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Teamtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Teamutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Terrainutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textfilterservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textfilterutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Throttle</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Time</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Touchingpartutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Transparencyservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Utf8</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ultrawidecontainerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rodux Undo</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Valueobject</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Vector3int16utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Viewport</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Weldconstraintutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getgroundplane</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cancellabledelay</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Deferred</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getmechanismparts</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Optional</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Qgui</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Safedestroy</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Setmechanismcframe</a></li></ul></nav><button type="button" title="Collapse sidebar" aria-label="Collapse sidebar" class="button button--secondary button--outline collapseSidebarButton_1CGd"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_3E-R"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></div><main class="docMainContainer_28N5"><div class="container padding-vert--lg"><div class="row"><div class="col docItemCol_3WPG"><div class="docItemContainer_3XDu"><article><div class="member_qHIL markdown"><div class="tocCollapsible_1PrD theme-doc-toc-mobile tocMobile_3ryM"><button type="button" class="clean-btn tocCollapsibleButton_2O1e">On this page</button></div><header><h1 class="docTitle_1ddc" style="text-decoration:none"><span style="display:inline-block">Roblox</span><span style="display:inline-block">Api</span><span style="display:inline-block">Member</span></h1><div class="luaClassTags_2Zrs"></div><div>
+<p>Represents a specific member of a class. This could be a property or event, or method, or callback.</p>
+</div></header><h2 class="anchor anchorWithStickyNavbar_31ik" id="functions">Functions<a aria-hidden="true" class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="new"><code style="text-decoration:none">new</code><a aria-hidden="true" class="hash-link" href="#new" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L16"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->.</code><code class="green_3LnD">new</code><code>(</code><code>data<!-- -->: </code><code class="blue_2Afy">table</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/RobloxApiMember">RobloxApiMember</a></code></div><div>
+<p>
+  Constructs a new RobloxApiMember wrapping the data given. See <a href="/NevermoreEngine/api/RobloxApiDump#PromiseMembers">RobloxApiDump.PromiseMembers</a> to actually
+  construct this class.
+</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetName"><code style="text-decoration:none">GetName</code><a aria-hidden="true" class="hash-link" href="#GetName" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L61"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">GetName</code><code>(</code><code>) → </code><code class="blue_2Afy">string</code></div><div>
+<p>Gets the member name.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetCategory"><code style="text-decoration:none">GetCategory</code><a aria-hidden="true" class="hash-link" href="#GetCategory" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L70"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">GetCategory</code><code>(</code><code>) → </code><code class="blue_2Afy">string?</code></div><div>
+<p>Gets the member category.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsReadOnly"><code style="text-decoration:none">IsReadOnly</code><a aria-hidden="true" class="hash-link" href="#IsReadOnly" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L78"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsReadOnly</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Retrieves whether the API member is read only.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetMemberType"><code style="text-decoration:none">GetMemberType</code><a aria-hidden="true" class="hash-link" href="#GetMemberType" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L86"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">GetMemberType</code><code>(</code><code>) → </code><code class="blue_2Afy">string</code></div><div>
+<p>Retrieves the member type.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsEvent"><code style="text-decoration:none">IsEvent</code><a aria-hidden="true" class="hash-link" href="#IsEvent" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L95"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsEvent</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether the member is an event.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetRawData"><code style="text-decoration:none">GetRawData</code><a aria-hidden="true" class="hash-link" href="#GetRawData" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L103"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">GetRawData</code><code>(</code><code>) → </code><code class="blue_2Afy">table</code></div><div>
+<p>Retrieves the raw member data</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsWriteNotAccessibleSecurity"><code style="text-decoration:none">IsWriteNotAccessibleSecurity</code><a aria-hidden="true" class="hash-link" href="#IsWriteNotAccessibleSecurity" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L111"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsWriteNotAccessibleSecurity</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether this member has write NotAccessibleSecurity</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsReadNotAccessibleSecurity"><code style="text-decoration:none">IsReadNotAccessibleSecurity</code><a aria-hidden="true" class="hash-link" href="#IsReadNotAccessibleSecurity" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L119"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsReadNotAccessibleSecurity</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether this member has write NotAccessibleSecurity</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsWriteLocalUserSecurity"><code style="text-decoration:none">IsWriteLocalUserSecurity</code><a aria-hidden="true" class="hash-link" href="#IsWriteLocalUserSecurity" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L127"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsWriteLocalUserSecurity</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether this member has write LocalUserSecurity</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsReadLocalUserSecurity"><code style="text-decoration:none">IsReadLocalUserSecurity</code><a aria-hidden="true" class="hash-link" href="#IsReadLocalUserSecurity" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L135"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsReadLocalUserSecurity</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether this member has read LocalUserSecurity</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="CanSerializeSave"><code style="text-decoration:none">CanSerializeSave</code><a aria-hidden="true" class="hash-link" href="#CanSerializeSave" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L143"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">CanSerializeSave</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean?</code></div><div>
+<p>Returns whether this can serialize save</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="CanSerializeLoad"><code style="text-decoration:none">CanSerializeLoad</code><a aria-hidden="true" class="hash-link" href="#CanSerializeLoad" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L156"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">CanSerializeLoad</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean?</code></div><div>
+<p>Returns whether this can serialize save</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetWriteSecurity"><code style="text-decoration:none">GetWriteSecurity</code><a aria-hidden="true" class="hash-link" href="#GetWriteSecurity" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L169"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">GetWriteSecurity</code><code>(</code><code>) → </code><code class="blue_2Afy">string?</code></div><div>
+<p>Returns the member's write security as a string</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetReadSecurity"><code style="text-decoration:none">GetReadSecurity</code><a aria-hidden="true" class="hash-link" href="#GetReadSecurity" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L182"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">GetReadSecurity</code><code>(</code><code>) → </code><code class="blue_2Afy">string?</code></div><div>
+<p>Returns the member's read security as a string</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsProperty"><code style="text-decoration:none">IsProperty</code><a aria-hidden="true" class="hash-link" href="#IsProperty" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L195"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsProperty</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether the member is a property.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsFunction"><code style="text-decoration:none">IsFunction</code><a aria-hidden="true" class="hash-link" href="#IsFunction" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L203"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsFunction</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether the member is a function (i.e. method).</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsCallback"><code style="text-decoration:none">IsCallback</code><a aria-hidden="true" class="hash-link" href="#IsCallback" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L211"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsCallback</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether the member is a callback.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsNotScriptable"><code style="text-decoration:none">IsNotScriptable</code><a aria-hidden="true" class="hash-link" href="#IsNotScriptable" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L219"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsNotScriptable</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether a script can modify it.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsNotReplicated"><code style="text-decoration:none">IsNotReplicated</code><a aria-hidden="true" class="hash-link" href="#IsNotReplicated" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L227"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsNotReplicated</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether the member is not replicated.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsDeprecated"><code style="text-decoration:none">IsDeprecated</code><a aria-hidden="true" class="hash-link" href="#IsDeprecated" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L234"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsDeprecated</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Returns whether the member is deprecated..</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsHidden"><code style="text-decoration:none">IsHidden</code><a aria-hidden="true" class="hash-link" href="#IsHidden" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L242"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">IsHidden</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether this api member is hidden.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetTags"><code style="text-decoration:none">GetTags</code><a aria-hidden="true" class="hash-link" href="#GetTags" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L250"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">GetTags</code><code>(</code><code>) → </code><code class="purple__nFc">{</code><code class="blue_2Afy">string</code><code class="purple__nFc">}</code></div><div>
+<p>Returns a list of tags. Do not modify this list.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="HasTag"><code style="text-decoration:none">HasTag</code><a aria-hidden="true" class="hash-link" href="#HasTag" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/roblox-api-dump/src/Server/RobloxApiMember.lua#L259"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>RobloxApiMember<!-- -->:</code><code class="green_3LnD">HasTag</code><code>(</code><code>tagName<!-- -->: </code><code class="blue_2Afy">string</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Retrieves whether the member has a tag or not.</p>
+</div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
+    &quot;functions&quot;: [
+        {
+            &quot;name&quot;: &quot;new&quot;,
+            &quot;desc&quot;: &quot;Constructs a new RobloxApiMember wrapping the data given. See [RobloxApiDump.PromiseMembers] to actually\nconstruct this class.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;data&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;table&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;RobloxApiMember&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 16,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetName&quot;,
+            &quot;desc&quot;: &quot;Gets the member name.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 61,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetCategory&quot;,
+            &quot;desc&quot;: &quot;Gets the member category.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 70,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsReadOnly&quot;,
+            &quot;desc&quot;: &quot;Retrieves whether the API member is read only.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 78,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetMemberType&quot;,
+            &quot;desc&quot;: &quot;Retrieves the member type.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 86,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsEvent&quot;,
+            &quot;desc&quot;: &quot;Returns whether the member is an event.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 95,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetRawData&quot;,
+            &quot;desc&quot;: &quot;Retrieves the raw member data&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;table&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 103,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsWriteNotAccessibleSecurity&quot;,
+            &quot;desc&quot;: &quot;Returns whether this member has write NotAccessibleSecurity&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 111,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsReadNotAccessibleSecurity&quot;,
+            &quot;desc&quot;: &quot;Returns whether this member has write NotAccessibleSecurity&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 119,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsWriteLocalUserSecurity&quot;,
+            &quot;desc&quot;: &quot;Returns whether this member has write LocalUserSecurity&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 127,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsReadLocalUserSecurity&quot;,
+            &quot;desc&quot;: &quot;Returns whether this member has read LocalUserSecurity&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 135,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;CanSerializeSave&quot;,
+            &quot;desc&quot;: &quot;Returns whether this can serialize save&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 143,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;CanSerializeLoad&quot;,
+            &quot;desc&quot;: &quot;Returns whether this can serialize save&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 156,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetWriteSecurity&quot;,
+            &quot;desc&quot;: &quot;Returns the member&#x27;s write security as a string&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 169,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetReadSecurity&quot;,
+            &quot;desc&quot;: &quot;Returns the member&#x27;s read security as a string&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 182,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsProperty&quot;,
+            &quot;desc&quot;: &quot;Returns whether the member is a property.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 195,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsFunction&quot;,
+            &quot;desc&quot;: &quot;Returns whether the member is a function (i.e. method).&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 203,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsCallback&quot;,
+            &quot;desc&quot;: &quot;Returns whether the member is a callback.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 211,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsNotScriptable&quot;,
+            &quot;desc&quot;: &quot;Returns whether a script can modify it.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 219,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsNotReplicated&quot;,
+            &quot;desc&quot;: &quot;Returns whether the member is not replicated.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 227,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsDeprecated&quot;,
+            &quot;desc&quot;: &quot;Returns whether the member is deprecated..&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 234,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;IsHidden&quot;,
+            &quot;desc&quot;: &quot;Returns whether this api member is hidden.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 242,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;GetTags&quot;,
+            &quot;desc&quot;: &quot;Returns a list of tags. Do not modify this list.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;{string}&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 250,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;HasTag&quot;,
+            &quot;desc&quot;: &quot;Retrieves whether the member has a tag or not.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;tagName&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 259,
+                &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+            }
+        }
+    ],
+    &quot;properties&quot;: [],
+    &quot;types&quot;: [],
+    &quot;name&quot;: &quot;RobloxApiMember&quot;,
+    &quot;desc&quot;: &quot;Represents a specific member of a class. This could be a property or event, or method, or callback.&quot;,
+    &quot;source&quot;: {
+        &quot;line&quot;: 5,
+        &quot;path&quot;: &quot;src/roblox-api-dump/src/Server/RobloxApiMember.lua&quot;
+    }
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#CanSerializeLoad" class="table-of-contents__link toc-highlight">:CanSerializeLoad</a></li><li><a href="#CanSerializeSave" class="table-of-contents__link toc-highlight">:CanSerializeSave</a></li><li><a href="#GetCategory" class="table-of-contents__link toc-highlight">:GetCategory</a></li><li><a href="#GetMemberType" class="table-of-contents__link toc-highlight">:GetMemberType</a></li><li><a href="#GetName" class="table-of-contents__link toc-highlight">:GetName</a></li><li><a href="#GetRawData" class="table-of-contents__link toc-highlight">:GetRawData</a></li><li><a href="#GetReadSecurity" class="table-of-contents__link toc-highlight">:GetReadSecurity</a></li><li><a href="#GetTags" class="table-of-contents__link toc-highlight">:GetTags</a></li><li><a href="#GetWriteSecurity" class="table-of-contents__link toc-highlight">:GetWriteSecurity</a></li><li><a href="#HasTag" class="table-of-contents__link toc-highlight">:HasTag</a></li><li><a href="#IsCallback" class="table-of-contents__link toc-highlight">:IsCallback</a></li><li><a href="#IsDeprecated" class="table-of-contents__link toc-highlight">:IsDeprecated</a></li><li><a href="#IsEvent" class="table-of-contents__link toc-highlight">:IsEvent</a></li><li><a href="#IsFunction" class="table-of-contents__link toc-highlight">:IsFunction</a></li><li><a href="#IsHidden" class="table-of-contents__link toc-highlight">:IsHidden</a></li><li><a href="#IsNotReplicated" class="table-of-contents__link toc-highlight">:IsNotReplicated</a></li><li><a href="#IsNotScriptable" class="table-of-contents__link toc-highlight">:IsNotScriptable</a></li><li><a href="#IsProperty" class="table-of-contents__link toc-highlight">:IsProperty</a></li><li><a href="#IsReadLocalUserSecurity" class="table-of-contents__link toc-highlight">:IsReadLocalUserSecurity</a></li><li><a href="#IsReadNotAccessibleSecurity" class="table-of-contents__link toc-highlight">:IsReadNotAccessibleSecurity</a></li><li><a href="#IsReadOnly" class="table-of-contents__link toc-highlight">:IsReadOnly</a></li><li><a href="#IsWriteLocalUserSecurity" class="table-of-contents__link toc-highlight">:IsWriteLocalUserSecurity</a></li><li><a href="#IsWriteNotAccessibleSecurity" class="table-of-contents__link toc-highlight">:IsWriteNotAccessibleSecurity</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2021 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.2fc5537e.js"></script>
+<script src="/NevermoreEngine/assets/js/main.0c3e351e.js"></script>
+</body>
+</html>
