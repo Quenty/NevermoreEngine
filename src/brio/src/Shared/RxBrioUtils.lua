@@ -13,7 +13,6 @@ local BrioUtils = require("BrioUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
-local StateStack= require("StateStack")
 
 local RxBrioUtils = {}
 
@@ -30,30 +29,6 @@ function RxBrioUtils.toBrio()
 
 		return Brio.new(result)
 	end)
-end
-
---[=[
-	Creates a state stack from the brio's value. The state stack holds the last
-	value seen that is valid.
-
-	@param observable Observable<Brio<T>>
-	@return StateStack<T>
-]=]
-function RxBrioUtils.createStateStack(observable)
-	local stateStack = StateStack.new(nil)
-
-	stateStack._maid:GiveTask(observable:Subscribe(function(value)
-		assert(Brio.isBrio(value), "Observable must emit brio")
-
-		if value:IsDead() then
-			return
-		end
-
-		local maid = value:ToMaid()
-		maid:GiveTask(stateStack:PushState(value:GetValue()))
-	end))
-
-	return stateStack
 end
 
 --[=[
