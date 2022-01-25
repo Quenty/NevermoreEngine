@@ -1,0 +1,42 @@
+{
+  "name": "@quenty/gameconfig",
+  "version": "1.0.0",
+  "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/maid/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@quenty/badgeutils": "file:../badgeutils",
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/clienttranslator": "file:../clienttranslator",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/marketplaceutils": "file:../marketplaceutils",
+    "@quenty/remotefunctionutils": "file:../remotefunctionutils",
+    "@quenty/remoting": "file:../remoting",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/string": "file:../string",
+    "@quenty/table": "file:../table"
+  }
+}

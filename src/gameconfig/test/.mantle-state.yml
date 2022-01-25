@@ -1,0 +1,188 @@
+---
+version: "3"
+environments:
+  staging:
+    - id: experience_singleton
+      inputs:
+        experience:
+          groupId: 243718
+      outputs:
+        experience:
+          assetId: 3285671029
+          startPlaceId: 8632644929
+      dependencies: []
+    - id: productIcon_buyBadgeProduct
+      inputs:
+        productIcon:
+          filePath: assets/badges/badge.png
+          fileHash: fbc9e714fab254ff6afa2ee4479b2e452175b30119afaf8ff12055a9a02810a9
+      outputs:
+        productIcon:
+          assetId: 8632645043
+      dependencies:
+        - experience_singleton
+    - id: product_buyBadgeProduct
+      inputs:
+        product:
+          name: Buy a badge!
+          description: Buys you a whole badge for testing purposes!
+          price: 25
+      outputs:
+        product:
+          assetId: 1234655692
+          productId: 11367044
+      dependencies:
+        - experience_singleton
+        - productIcon_buyBadgeProduct
+    - id: place_start
+      inputs:
+        place:
+          isStart: true
+      outputs:
+        place:
+          assetId: 8632644929
+      dependencies:
+        - experience_singleton
+    - id: placeFile_start
+      inputs:
+        placeFile:
+          filePath: out/game.rbxlx
+          fileHash: f81e2d08d00c90b2f99baf756a5321421ef99cde546491ed4511df0403e5b686
+      outputs:
+        placeFile:
+          version: 2
+      dependencies:
+        - place_start
+    - id: placeConfiguration_start
+      inputs:
+        placeConfiguration:
+          name: Test Game Configuration
+          description: This is a test mantle game with a variety of interesting assets and stuff to test!
+          maxPlayerCount: 30
+          allowCopying: false
+          socialSlotType: Automatic
+          customSocialSlotsCount: ~
+      outputs: placeConfiguration
+      dependencies:
+        - place_start
+    - id: pass_happinessProduct
+      inputs:
+        pass:
+          name: Unlimited happiness
+          description: Buys you unlimited happiness.
+          price: 499
+          iconFilePath: assets/badges/badge.png
+      outputs:
+        pass:
+          assetId: 27825080
+          initialIconAssetId: 8632645589
+      dependencies:
+        - experience_singleton
+    - id: passIcon_happinessProduct
+      inputs:
+        passIcon:
+          filePath: assets/badges/badge.png
+          fileHash: fbc9e714fab254ff6afa2ee4479b2e452175b30119afaf8ff12055a9a02810a9
+      outputs:
+        passIcon:
+          assetId: 8632645589
+      dependencies:
+        - pass_happinessProduct
+    - id: experienceConfiguration_singleton
+      inputs:
+        experienceConfiguration:
+          genre: All
+          playableDevices:
+            - Computer
+            - Phone
+            - Tablet
+            - Console
+          isFriendsOnly: false
+          allowPrivateServers: true
+          privateServerPrice: 0
+          isForSale: false
+          price: ~
+          studioAccessToApisAllowed: true
+          permissions:
+            IsThirdPartyPurchaseAllowed: false
+            IsThirdPartyTeleportAllowed: false
+          universeAvatarType: MorphToR15
+          universeAnimationType: PlayerChoice
+          universeCollisionType: OuterBox
+          universeAvatarMinScales:
+            height: "0.9"
+            width: "0.7"
+            head: "0.95"
+            bodyType: "0"
+            proportion: "0"
+          universeAvatarMaxScales:
+            height: "1.05"
+            width: "1"
+            head: "1"
+            bodyType: "1"
+            proportion: "1"
+          universeAvatarAssetOverrides:
+            - assetTypeID: 18
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 17
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 27
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 29
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 28
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 30
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 31
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 2
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 11
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 12
+              isPlayerChoice: true
+              assetID: ~
+          isArchived: false
+      outputs: experienceConfiguration
+      dependencies:
+        - experience_singleton
+    - id: experienceActivation_singleton
+      inputs:
+        experienceActivation:
+          isActive: true
+      outputs: experienceActivation
+      dependencies:
+        - experience_singleton
+    - id: badge_alphaTester
+      inputs:
+        badge:
+          name: Alpha Tester!
+          description: You helped!
+          enabled: true
+          iconFilePath: assets/badges/badge.png
+      outputs:
+        badge:
+          assetId: 2124917286
+          initialIconAssetId: 8632645744
+      dependencies:
+        - experience_singleton
+    - id: badgeIcon_alphaTester
+      inputs:
+        badgeIcon:
+          filePath: assets/badges/badge.png
+          fileHash: fbc9e714fab254ff6afa2ee4479b2e452175b30119afaf8ff12055a9a02810a9
+      outputs:
+        badgeIcon:
+          assetId: 8632645744
+      dependencies:
+        - badge_alphaTester

@@ -1,0 +1,56 @@
+owner:
+  group: 243718
+payments: personal
+environments:
+  - name: production
+    branches: [main]
+    tagCommit: true
+    overrides:
+      experience:
+        configuration:
+          playability: public
+  - name: staging
+    branches: [users, users/*]
+    overrides:
+      places:
+        start:
+          configuration:
+            name: Test Game Configuration
+
+target:
+  experience:
+    configuration:
+      playableDevices: [computer, phone, tablet, console]
+      playability: public
+      privateServerPrice: 0
+      enableStudioAccessToApis: true
+    products:
+      buyBadgeProduct:
+        name: Buy a badge!
+        description: Buys you a whole badge for testing purposes!
+        icon: assets/badges/badge.png
+        price: 25
+
+    passes:
+      happinessProduct:
+        name: Unlimited happiness
+        description: Buys you unlimited happiness.
+        icon: assets/badges/badge.png
+        price: 499
+
+    badges:
+      alphaTester:
+        name: Alpha Tester!
+        description: You helped!
+        icon: assets/badges/badge.png
+        enabled: true
+
+    places:
+      start:
+        file: out/game.rbxlx
+        configuration:
+          name: Test Game Configuration
+          description: |-
+            This is a test mantle game with a variety of interesting assets and stuff to test!
+          maxPlayerCount: 30
+          serverFill: robloxOptimized

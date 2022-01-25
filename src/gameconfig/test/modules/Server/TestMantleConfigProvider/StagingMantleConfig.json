@@ -1,0 +1,54 @@
+{
+  "badgeIcon_alphaTester": {
+    "badgeIcon": {
+      "assetId": 8632645744
+    }
+  },
+  "badge_alphaTester": {
+    "badge": {
+      "assetId": 2124917286,
+      "initialIconAssetId": 8632645744
+    }
+  },
+  "experienceActivation_singleton": "experienceActivation",
+  "experienceConfiguration_singleton": "experienceConfiguration",
+  "experience_singleton": {
+    "experience": {
+      "assetId": 3285671029,
+      "startPlaceId": 8632644929
+    }
+  },
+  "passIcon_happinessProduct": {
+    "passIcon": {
+      "assetId": 8632645589
+    }
+  },
+  "pass_happinessProduct": {
+    "pass": {
+      "assetId": 27825080,
+      "initialIconAssetId": 8632645589
+    }
+  },
+  "placeConfiguration_start": "placeConfiguration",
+  "placeFile_start": {
+    "placeFile": {
+      "version": 2
+    }
+  },
+  "place_start": {
+    "place": {
+      "assetId": 8632644929
+    }
+  },
+  "productIcon_buyBadgeProduct": {
+    "productIcon": {
+      "assetId": 8632645043
+    }
+  },
+  "product_buyBadgeProduct": {
+    "product": {
+      "assetId": 1234655692,
+      "productId": 11367044
+    }
+  }
+}
