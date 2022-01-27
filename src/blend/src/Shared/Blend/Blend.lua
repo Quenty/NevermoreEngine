@@ -1,4 +1,3 @@
----@diagnostic disable: redefined-local
 --[=[
 	Declarative UI system inspired by Fusion
 	@class Blend
@@ -584,13 +583,17 @@ end
 	Blend.New "ScreenGui" {
 		Parent = game.Players.LocalPlayer.PlayerGui;
 		[Blend.Attributes] = {
-			Attribute1 = attribute;
+			Attribute1 = attribute; --can only read from state
 			Attribute2 = 123;
 		};
+		[Blend.OnAttributeChange "Attribute1"] = function(v) --allows for writing to state
+			if not v then return end
+			attribute.Value = v
+		end;
 	};
 	```
 	Cleanup:
-	* Attributes will be cleaned up on unsubscribe
+	* Attributes will be set to nil on unsubscribe
 
 	@param parent Instance
 	@param value any
@@ -599,21 +602,26 @@ end
 function Blend.Attributes(inst, value)
 	assert(typeof(inst) == "Instance", "Bad instance")
 	return Blend.ComputedPairs(value, function(attributeName, attributeValue, innerMaid)
+		assert(typeof(attributeName) == "string", "Attribute name is required to be a string")
 		local function getValue(v)
 			if type(v) == "table" then
 				if ValueObject.isValueObject(v) then
 					return getValue(v.Value)
 				elseif Brio.isBrio(v) then
+					innerMaid[attributeName] = v:GetDiedSignal():Connect(function()
+						inst:SetAttribute(attributeName, attributeValue)
+					end)
 					return getValue(v:GetValue())
 				end
 			else
 				return v
 			end
 		end
+		innerMaid[attributeName] = nil
 		inst:SetAttribute(attributeName, getValue(attributeValue))
-		innerMaid:GiveTask({Destroy = function(s)
+		innerMaid:GiveTask(function()
 			inst:SetAttribute(attributeName, nil)
-		end})
+		end)
 	end)
 end
 
