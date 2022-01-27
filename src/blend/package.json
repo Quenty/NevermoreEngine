@@ -21,7 +21,8 @@
   },
   "license": "MIT",
   "contributors": [
-    "Quenty"
+    "Quenty",
+    "Nightcycle"
   ],
   "publishConfig": {
     "access": "public"
@@ -39,6 +40,7 @@
     "@quenty/steputils": "file:../steputils",
     "@quenty/string": "file:../string",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
+    "@quenty/attributeutils": "^4.3.0",
     "@quenty/valueobject": "file:../valueobject"
   },
   "devDependencies": {

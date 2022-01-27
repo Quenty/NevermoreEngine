@@ -1,3 +1,4 @@
+---@diagnostic disable: redefined-local
 --[=[
 	Declarative UI system inspired by Fusion
 	@class Blend
@@ -14,6 +15,7 @@ local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local BrioUtils = require("BrioUtils")
+local RxAttributeUtils = require("RxAttributeUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Signal = require("Signal")
@@ -183,6 +185,31 @@ function Blend.OnChange(propertyName)
 
 	return function(instance)
 		return RxInstanceUtils.observeProperty(instance, propertyName)
+	end
+end
+
+
+--[=[
+	Short hand to register an attribute changing
+
+	```lua
+	Blend.mount(workspace, {
+		[Blend.OnAttributeChange "SurvivorCount"] = function(count)
+			print(count)
+		end;
+	}) --> Immediately will print nil
+
+	workspace:SetAttribute(5) --> Prints "5"
+	```
+
+	@param propertyName string
+	@return (instance: Instance) -> Observable
+]=]
+function Blend.OnAttributeChange(attributeName)
+	assert(type(attributeName) == "string", "Bad attributeName")
+
+	return function(instance)
+		return RxAttributeUtils.observeAttribute(instance, attributeName)
 	end
 end
 
@@ -546,6 +573,48 @@ function Blend.Children(parent, value)
 	else
 		return Rx.EMPTY
 	end
+end
+
+--[=[
+	Mounts attributes to the parent and returns an object which will cleanup and delete
+	all attributes when removed.
+
+	```lua
+	local attribute = Blend.State("abc")
+	Blend.New "ScreenGui" {
+		Parent = game.Players.LocalPlayer.PlayerGui;
+		[Blend.Attributes] = {
+			Attribute1 = attribute;
+			Attribute2 = 123;
+		};
+	};
+	```
+	Cleanup:
+	* Attributes will be cleaned up on unsubscribe
+
+	@param parent Instance
+	@param value any
+	@return MaidTask
+]=]
+function Blend.Attributes(inst, value)
+	assert(typeof(inst) == "Instance", "Bad instance")
+	return Blend.ComputedPairs(value, function(attributeName, attributeValue, innerMaid)
+		local function getValue(v)
+			if type(v) == "table" then
+				if ValueObject.isValueObject(v) then
+					return getValue(v.Value)
+				elseif Brio.isBrio(v) then
+					return getValue(v:GetValue())
+				end
+			else
+				return v
+			end
+		end
+		inst:SetAttribute(attributeName, getValue(attributeValue))
+		innerMaid:GiveTask({Destroy = function(s)
+			inst:SetAttribute(attributeName, nil)
+		end})
+	end)
 end
 
 --[=[
