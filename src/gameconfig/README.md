@@ -32,3 +32,6 @@ This configuration service is designed to serve as a general backing for selling
 * Retrieve-by-name
 * Add and remove assets dynamically
 * Mantle support
+
+## Specific design features
+* Easy for non-programmer to add asset for a specific game

@@ -160,6 +160,11 @@ function ObservableSet:Remove(item)
 	end
 end
 
+function ObservableSet:GetFirstItem()
+	local value = next(self._set)
+	return value
+end
+
 --[=[
 	Gets a list of all entries.
 	@return { T }

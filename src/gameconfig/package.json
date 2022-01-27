@@ -27,15 +27,24 @@
     "access": "public"
   },
   "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/badgeutils": "file:../badgeutils",
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/binder": "file:../binder",
     "@quenty/clienttranslator": "file:../clienttranslator",
+    "@quenty/cmdrservice": "file:../cmdrservice",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/marketplaceutils": "file:../marketplaceutils",
+    "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/preferredparentutils": "file:../preferredparentutils",
     "@quenty/remotefunctionutils": "file:../remotefunctionutils",
     "@quenty/remoting": "file:../remoting",
+    "@quenty/rx": "file:../rx",
+    "@quenty/rxbinderutils": "file:../rxbinderutils",
     "@quenty/servicebag": "file:../servicebag",
+    "@quenty/statestack": "file:../statestack",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table"
   }

@@ -14,3 +14,4 @@ serviceBag:GetService(packages.TestMantleConfigProvider)
 serviceBag:Init()
 serviceBag:Start()
 
+serviceBag:GetService(packages.GameConfigService):AddProductFromId("testAddProduct", 8508545861)

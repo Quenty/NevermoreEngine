@@ -4,19 +4,20 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local GameConfigService = require("GameConfigService")
-local GameConfig = require("GameConfig")
-local String = require("String")
-local GameConfigAssetDataUtils = require("GameConfigAssetDataUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local GameConfigBindersServer = require("GameConfigBindersServer")
+local GameConfigService = require("GameConfigService")
+local GameConfigUtils = require("GameConfigUtils")
+local String = require("String")
+local Maid = require("Maid")
 
-local MantleConfigProvider = setmetatable({}, BaseObject)
+local MantleConfigProvider = {}
 MantleConfigProvider.ClassName = "MantleConfigProvider"
 MantleConfigProvider.__index = MantleConfigProvider
 
 function MantleConfigProvider.new(container)
-	local self = setmetatable(BaseObject.new(), MantleConfigProvider)
+	local self = setmetatable({}, MantleConfigProvider)
 
 	self._container = assert(container, "No container")
 
@@ -26,6 +27,8 @@ end
 function MantleConfigProvider:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
+	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
+	self._maid = Maid.new()
 
 	for _, item in pairs(self._container:GetChildren()) do
 		if item:IsA("ModuleScript") then
@@ -41,8 +44,7 @@ function MantleConfigProvider:_loadConfig(item)
 		current = coroutine.running()
 		local data = require(item)
 		if type(data) == "table" then
-			local config = self:_parseDataToConfig(data)
-			self._gameConfigService:AddConfig(config)
+			self:_parseDataToConfig(data, item.Name)
 		end
 	end)
 
@@ -50,14 +52,15 @@ function MantleConfigProvider:_loadConfig(item)
 end
 
 
-function MantleConfigProvider:_parseDataToConfig(mantleConfigData)
+function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 	assert(type(mantleConfigData) == "table", "Bad mantleConfigData")
 
 	-- Just blind unpack these, we'll error if we can't find these.
-	local experienceId = mantleConfigData.experience_singleton.experience.assetId
-	assert(type(experienceId) == "number", "Failed to get experienceId")
+	local gameId = mantleConfigData.experience_singleton.experience.assetId
+	assert(type(gameId) == "number", "Failed to get gameId")
 
-	local gameConfig = GameConfig.new(experienceId)
+	local gameConfig = GameConfigUtils.create(self._gameConfigBindersServer.GameConfig, gameId)
+	gameConfig.Name = name
 
 	local function getIcon(mantleType, assetName)
 		local entryName = mantleType .. "Icon"
@@ -90,9 +93,8 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData)
 			return
 		end
 
-		local assetData = GameConfigAssetDataUtils.createAssetData(assetType, assetName, assetId, iconId)
-		local assetGroup = gameConfig:GetAssetGroup(assetType)
-		assetGroup:AddAssetData(assetData)
+		local asset = GameConfigAssetUtils.create(self._gameConfigBindersServer.GameConfigAsset, assetType, assetName, assetId)
+		asset.Parent = GameConfigUtils.getOrCreateAssetFolder(gameConfig, assetType)
 	end
 
 	for key, value in pairs(mantleConfigData) do
@@ -104,7 +106,14 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData)
 		end
 	end
 
+	gameConfig.Parent = self._gameConfigService:GetPreferredParent()
+	self._maid:GiveTask(gameConfig)
+
 	return gameConfig
+end
+
+function MantleConfigProvider:Destroy()
+	self._maid:DoCleaning()
 end
 
 
