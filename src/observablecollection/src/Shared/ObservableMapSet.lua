@@ -122,6 +122,11 @@ function ObservableMapSet:_removeFromObservableSet(key, entry)
 		return
 	end
 
+	-- This happens when we're cleaning up sometimes
+	if not set.Destroy then
+		return
+	end
+
 	if set:Contains(entry) then
 		set:Remove(entry)
 		if set:GetCount() == 0 then
@@ -138,7 +143,9 @@ function ObservableMapSet:_removeObservableSet(key)
 		-- Cleanup
 		self._maid[set] = nil
 
-		self.SetRemoved:Fire(key)
+		if self.SetRemoved.Destroy then
+			self.SetRemoved:Fire(key)
+		end
 	end
 end
 
