@@ -125,7 +125,7 @@ function ScriptInfoUtils.addToInfoMapForMode(replicationMap, scriptInfo)
 		warn(("Duplicate module %q in same package under same replication scope. Only using first one. \n- %q\n- %q")
 			:format(scriptInfo.name,
 				scriptInfo.instance:GetFullName(),
-				replicationMap[scriptInfo.name]:GetFullName()))
+				replicationMap[scriptInfo.name].instance:GetFullName()))
 		return
 	end
 
