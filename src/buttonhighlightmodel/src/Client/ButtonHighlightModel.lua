@@ -18,12 +18,12 @@ ButtonHighlightModel.__index = ButtonHighlightModel
 
 --[=[
 	A model that dictates the current state of a button.
-	@param button GuiBase
+	@param button? GuiBase
 	@param onUpdate function?
 	@return ButtonHighlightModel
 ]=]
 function ButtonHighlightModel.new(button, onUpdate)
-	local self = setmetatable(BaseObject.new(assert(button, "Bad button")), ButtonHighlightModel)
+	local self = setmetatable(BaseObject.new(), ButtonHighlightModel)
 
 	self._onUpdate = onUpdate
 
@@ -97,42 +97,6 @@ function ButtonHighlightModel.new(button, onUpdate)
 	self.IsPressed.Value = false
 	self._maid:GiveTask(self.IsPressed)
 
-	self._maid:GiveTask(self._obj.InputEnded:Connect(function(inputObject)
-		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-			self._isMouseOver.Value = false
-		end
-
-		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-			self._isMouseDown.Value = false
-		end
-
-		if inputObject.UserInputType == Enum.UserInputType.Touch then
-			self:_stopTouchTrack(inputObject)
-		end
-	end))
-
-	self._maid:GiveTask(self._obj.SelectionGained:Connect(function()
-		self.IsSelected.Value = true
-	end))
-
-	self._maid:GiveTask(self._obj.SelectionLost:Connect(function()
-		self.IsSelected.Value = false
-	end))
-
-	self._maid:GiveTask(self._obj.InputBegan:Connect(function(inputObject)
-		if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-			self._isMouseOver.Value = true
-		end
-
-		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-			self._isMouseDown.Value = true
-		end
-
-		if inputObject.UserInputType == Enum.UserInputType.Touch then
-			self:_trackTouch(inputObject)
-		end
-	end))
-
 	-- Legacy update stepping mode
 	if self._onUpdate then
 		self._percentHighlightedAccelTween = AccelTween.new(200)
@@ -190,7 +154,57 @@ function ButtonHighlightModel.new(button, onUpdate)
 	end))
 	self:_updateTargets()
 
+	if button then
+		self:SetButton(button)
+	end
+
 	return self
+end
+
+function ButtonHighlightModel:SetButton(button)
+	assert(typeof(button) == "Instance" or button == nil, "Bad button")
+
+	local maid = Maid.new()
+
+	if button then
+		maid:GiveTask(button.InputEnded:Connect(function(inputObject)
+			if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+				self._isMouseOver.Value = false
+			end
+
+			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+				self._isMouseDown.Value = false
+			end
+
+			if inputObject.UserInputType == Enum.UserInputType.Touch then
+				self:_stopTouchTrack(inputObject)
+			end
+		end))
+
+		maid:GiveTask(button.SelectionGained:Connect(function()
+			self.IsSelected.Value = true
+		end))
+
+		maid:GiveTask(button.SelectionLost:Connect(function()
+			self.IsSelected.Value = false
+		end))
+
+		maid:GiveTask(button.InputBegan:Connect(function(inputObject)
+			if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+				self._isMouseOver.Value = true
+			end
+
+			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+				self._isMouseDown.Value = true
+			end
+
+			if inputObject.UserInputType == Enum.UserInputType.Touch then
+				self:_trackTouch(inputObject)
+			end
+		end))
+	end
+
+	self._maid._buttonMaid = maid
 end
 
 --[=[
@@ -210,13 +224,21 @@ end
 	Observes how highlighted the button is
 	@return Observable<number>
 ]=]
-function ButtonHighlightModel:ObservePercentHiglighted()
-	return Blend.AccelTween(Blend.toPropertyObservable(self.IsHighlighted)
+function ButtonHighlightModel:ObservePercentHighlighted()
+	return Blend.AccelTween(self:ObservePercentHighlightedTarget(), 200)
+end
+
+--[=[
+	Observes target for how highlighted the button is
+	@return Observable<number>
+]=]
+function ButtonHighlightModel:ObservePercentHighlightedTarget()
+	return Blend.toPropertyObservable(self.IsHighlighted)
 		:Pipe({
 			Rx.map(function(value)
 				return value and 1 or 0
 			end);
-		}), 200)
+		})
 end
 
 --[=[
