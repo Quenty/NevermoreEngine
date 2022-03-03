@@ -56,7 +56,7 @@ end
 	@return Observable<any>
 ]=]
 function AttributeValue:Observe()
-	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, self._defaultValue)
+	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self, "_defaultValue"))
 end
 
 --[=[
