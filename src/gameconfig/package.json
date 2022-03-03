@@ -31,6 +31,7 @@
     "@quenty/badgeutils": "file:../badgeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
+    "@quenty/brio": "file:../brio",
     "@quenty/clienttranslator": "file:../clienttranslator",
     "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/instanceutils": "file:../instanceutils",

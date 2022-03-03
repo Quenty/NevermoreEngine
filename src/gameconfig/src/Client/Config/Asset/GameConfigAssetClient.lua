@@ -12,18 +12,28 @@ local GameConfigAssetClient = setmetatable({}, GameConfigAssetBase)
 GameConfigAssetClient.ClassName = "GameConfigAssetClient"
 GameConfigAssetClient.__index = GameConfigAssetClient
 
+--[=[
+	Constructs a new GameConfigAssetClient.
+	@param obj Instance
+	@param serviceBag ServiceBag
+	@return GameConfigAssetClient
+]=]
 function GameConfigAssetClient.new(obj, serviceBag)
 	local self = setmetatable(GameConfigAssetBase.new(obj), GameConfigAssetClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._configTranslator = self._serviceBag:GetService(GameConfigTranslator)
 
-	-- self._maid:GiveTask(self:ObserveTranslatedName():Subscribe(print))
-	-- self._maid:GiveTask(self:ObserveTranslatedDescription():Subscribe(print))
+	self._maid:GiveTask(self:ObserveTranslatedName():Subscribe())
+	self._maid:GiveTask(self:ObserveTranslatedDescription():Subscribe())
 
 	return self
 end
 
+--[=[
+	Observes the translated name
+	@return Observable<string>
+]=]
 function GameConfigAssetClient:ObserveTranslatedName()
 	-- TODO: Multicast
 
@@ -52,6 +62,10 @@ function GameConfigAssetClient:ObserveTranslatedName()
 	})
 end
 
+--[=[
+	Observes the translated description
+	@return Observable<string>
+]=]
 function GameConfigAssetClient:ObserveTranslatedDescription()
 	-- TODO: Multicast
 

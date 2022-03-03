@@ -9,6 +9,14 @@ local GameConfigAssetConstants = require("GameConfigAssetConstants")
 
 local GameConfigAssetUtils = {}
 
+--[=[
+	Creates a new game configuration
+	@param binder Binder<GameConfigAssetBase>
+	@param assetType GameConfigAssetType
+	@param assetKey string
+	@param assetId number
+	@return Instance
+]=]
 function GameConfigAssetUtils.create(binder, assetType, assetKey, assetId)
 	local asset = Instance.new("Folder")
 	asset.Name = assetKey

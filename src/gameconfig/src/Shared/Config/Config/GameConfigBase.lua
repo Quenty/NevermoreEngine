@@ -86,20 +86,26 @@ function GameConfigBase:GetAssetsOfTypeAndKey(assetType, assetKey)
 	return self._assetTypeToAssetKeyMappings[assetType]:GetListForKey(assetKey)
 end
 
+function GameConfigBase:GetAssetsOfTypeAndId(assetType, assetId)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(assetId) == "number", "Bad assetId")
+
+	return self._assetTypeToAssetIdMappings[assetType]:GetListForKey(assetId)
+end
+
 function GameConfigBase:ObserveAssetByTypeAndKeyBrio(assetType, assetKey)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
-	return self._assetTypeToAssetKeyMappings[assetType]:ObserveItemsForKeyBrio(assetType, assetKey)
+	return self._assetTypeToAssetKeyMappings[assetType]:ObserveItemsForKeyBrio(assetKey)
 end
 
 function GameConfigBase:ObserveAssetByTypeAndIdBrio(assetType, assetId)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
-	return self._assetTypeToAssetIdMappings[assetType]:ObserveItemsForKeyBrio(assetType, assetId)
+	return self._assetTypeToAssetIdMappings[assetType]:ObserveItemsForKeyBrio(assetId)
 end
-
 
 function GameConfigBase:ObserveAssetByIdBrio(assetId)
 	assert(type(assetId) == "number", "Bad assetId")

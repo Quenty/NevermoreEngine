@@ -24,6 +24,11 @@ npm install @quenty/gameconfig --save
 
 This configuration service is designed to serve as a general backing for selling things in games, even if those products are not written into a general package. For example, a "pay to use" system could be written without explicit knowledge of the game it will be used in, or even the thing the user is paying to use.
 
+
+## Design philosophy
+
+Configuration is done with data in Workspace, OR Mantle configs in code, OR code that writes to the Workspace. This allows for portable configurations that can be configured by someone outside of the system, as well as readable data from outside of the system.
+
 ## Features
 
 * Localization

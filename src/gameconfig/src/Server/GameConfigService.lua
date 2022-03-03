@@ -36,23 +36,23 @@ function GameConfigService:Init(serviceBag)
 	self._getPreferredParent = PreferredParentUtils.createPreferredParentRetriever(ReplicatedStorage, "GameConfigs")
 end
 
-function GameConfigService:AddBadgeFromId(assetKey, badgeId)
-	self:AddAssetFromId(GameConfigAssetTypes.BADGE, assetKey, badgeId)
+function GameConfigService:AddBadge(assetKey, badgeId)
+	self:AddAsset(GameConfigAssetTypes.BADGE, assetKey, badgeId)
 end
 
-function GameConfigService:AddProductFromId(assetKey, productId)
-	self:AddAssetFromId(GameConfigAssetTypes.PRODUCT, assetKey, productId)
+function GameConfigService:AddProduct(assetKey, productId)
+	self:AddAsset(GameConfigAssetTypes.PRODUCT, assetKey, productId)
 end
 
-function GameConfigService:AddPassFromId(assetKey, passId)
-	self:AddAssetFromId(GameConfigAssetTypes.PASS, assetKey, passId)
+function GameConfigService:AddPass(assetKey, passId)
+	self:AddAsset(GameConfigAssetTypes.PASS, assetKey, passId)
 end
 
-function GameConfigService:AddPlaceFromId(assetKey, placeId)
-	self:AddAssetFromId(GameConfigAssetTypes.PLACE, assetKey, placeId)
+function GameConfigService:AddPlace(assetKey, placeId)
+	self:AddAsset(GameConfigAssetTypes.PLACE, assetKey, placeId)
 end
 
-function GameConfigService:AddAssetFromId(assetType, assetKey, assetId)
+function GameConfigService:AddAsset(assetType, assetKey, assetId)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 	assert(type(assetId) == "number", "Bad assetId")
