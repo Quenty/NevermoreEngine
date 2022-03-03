@@ -1,5 +1,36 @@
 --[=[
-	Contains model information for the current button
+	Contains model information for the current button.
+
+	Usage with Blend!
+
+	```lua
+function Button.new()
+	local self = setmetatable(BaseObject.new(), Button)
+
+	-- Store the button model in the actual button so we can ensure it cleans up
+	-- this assumes only one render. We can also construct it in the Button.Render
+
+	self._buttonModel = ButtonHighlightModel.new()
+	self._maid:GiveTask(self._buttonModel)
+
+	return self
+end
+...
+
+function Button:Render()
+	...
+	return Blend.New "ImageButton" {
+		...
+		[Blend.Instance] = function(button)
+			self._buttonModel:SetButton(button)
+		end;
+		BackgroundTransparency = Blend.Computed(self._buttonModel:ObservePercentPressed(), function(pressed)
+			return 1 - pressed
+		end);
+	}
+end
+
+	```
 	@class ButtonHighlightModel
 ]=]
 
@@ -161,7 +192,11 @@ function ButtonHighlightModel.new(button, onUpdate)
 	return self
 end
 
-function ButtonHighlightModel:SetButton(button)
+--[=[
+	Sets the button for the highlight model.
+	@param button
+]=]
+function ButtonHighlightModel:SetButton(button: Instance)
 	assert(typeof(button) == "Instance" or button == nil, "Bad button")
 
 	local maid = Maid.new()
