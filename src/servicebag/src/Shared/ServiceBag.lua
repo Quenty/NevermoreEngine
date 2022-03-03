@@ -115,6 +115,10 @@ end
 	@return boolean
 ]=]
 function ServiceBag:HasService(serviceType)
+	if typeof(serviceType) == "Instance" then
+		serviceType = require(serviceType)
+	end
+
 	if self._services[serviceType] then
 		return true
 	else
