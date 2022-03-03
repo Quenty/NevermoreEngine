@@ -114,7 +114,7 @@ end
 	@return Observable<T?>
 ]=]
 function RxBinderUtils.observeBoundClass(binder, instance)
-	assert(type(binder) == "table", "Bad binder")
+	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return Observable.new(function(sub)
@@ -137,7 +137,7 @@ end
 	@return Observable<Brio<T>>
 ]=]
 function RxBinderUtils.observeBoundClassBrio(binder, instance)
-	assert(type(binder) == "table", "Bad binder")
+	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return Observable.new(function(sub)
