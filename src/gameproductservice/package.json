@@ -1,7 +1,7 @@
 {
   "name": "@quenty/gameproductservice",
   "version": "1.0.0",
-  "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
+  "description": "Generalized monetization system for handling products and purchases correctly.",
   "keywords": [
     "Roblox",
     "Nevermore",
