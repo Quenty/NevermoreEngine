@@ -28,6 +28,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
     "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
