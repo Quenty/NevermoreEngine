@@ -8,7 +8,7 @@ local NumberSequenceUtils = {}
 local EPSILON = 1e-3
 
 --[=[
-	Scales a number sequence
+	Scales a number sequence value by the set amount
 	@param sequence NumberSequence
 	@param scale number
 ]=]
