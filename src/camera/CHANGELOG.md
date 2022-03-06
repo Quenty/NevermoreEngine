@@ -1,3 +1,19 @@
+# v6.0.0 (Sun Mar 06 2022)
+
+#### 🚀 Enhancement
+
+- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: Using .Position ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

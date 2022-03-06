@@ -1,3 +1,21 @@
+# (Sun Mar 06 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/idleservice@4.0.0`, `@quenty/statestack@5.0.0`
+  - feat: Make breaking changes to idle service and statestack. [#248](https://github.com/Quenty/NevermoreEngine/pull/248) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@5.0.0`, `@quenty/badgeutils@4.0.0`, `@quenty/binder@5.0.0`, `@quenty/blend@3.0.0`, `@quenty/boundingboxutils@3.0.0`, `@quenty/brio@5.0.0`, `@quenty/buttonhighlightmodel@4.0.0`, `@quenty/camera@6.0.0`, `@quenty/cancellabledelay@3.0.0`, `@quenty/cframeserializer@3.0.0`, `@quenty/cframeutils@3.0.0`, `@quenty/clienttranslator@5.0.0`, `@quenty/cmdrservice@4.0.0`, `@quenty/datastore@4.0.0`, `@quenty/draw@3.0.0`, `@quenty/gameconfig@2.0.0`, `@quenty/gameproductservice@2.0.0`, `@quenty/hapticfeedbackutils@3.0.0`, `@quenty/hintscoringutils@6.0.0`, `@quenty/humanoidspeed@2.0.0`, `@quenty/ik@6.0.0`, `@quenty/loader@4.0.0`, `@quenty/localizedtextutils@3.0.0`, `@quenty/numbersequenceutils@3.0.0`, `@quenty/observablecollection@2.0.0`, `@quenty/particleengine@4.0.0`, `@quenty/promise@4.0.0`, `@quenty/ragdoll@6.0.0`, `@quenty/region3int16utils@4.0.0`, `@quenty/region3utils@4.0.0`, `@quenty/rx@4.0.0`, `@quenty/rxbinderutils@5.0.0`, `@quenty/servicebag@4.0.0`, `@quenty/sounds@4.0.0`, `@quenty/spring@4.0.0`, `@quenty/statestack@5.0.0`, `@quenty/terrainutils@4.0.0`, `@quenty/viewport@2.0.0`
+  - feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Jan 17 2022)
 
 #### 💥 Breaking Change
