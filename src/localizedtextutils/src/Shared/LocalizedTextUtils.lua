@@ -58,28 +58,30 @@ end
 	Recursively formats the translated text.
 	@param translator Translator | JSONTranslator
 	@param translationKey string
-	@param translationArgs TranslationArgs
+	@param translationArgs TranslationArgs?
 	@param extraArgs table?
 	@return string
 ]=]
 function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, translationArgs, extraArgs)
 	assert(translator, "Bad translator")
 	assert(type(translationKey) == "string", "Bad translationKey")
-	assert(type(translationArgs) == "table", "Bad translationArgs")
+	assert(type(translationArgs) == "table" or translationArgs == nil, "Bad translationArgs")
 
 	local formattedArgs = {}
-	for name, value in pairs(translationArgs) do
-		if type(value) == "table" then
-			assert(value.translationKey, "Table, but no translationKey")
+	if translationArgs then
+		for name, value in pairs(translationArgs) do
+			if type(value) == "table" then
+				assert(value.translationKey, "Table, but no translationKey")
 
-			if value.translationArgs then
-				formattedArgs[name] = LocalizedTextUtils
-					.formatByKeyRecursive(translator, value.translationKey, value.translationArgs, extraArgs)
+				if value.translationArgs then
+					formattedArgs[name] = LocalizedTextUtils
+						.formatByKeyRecursive(translator, value.translationKey, value.translationArgs, extraArgs)
+				else
+					formattedArgs[name] = translator:FormatByKey(value.translationKey)
+				end
 			else
-				formattedArgs[name] = translator:FormatByKey(value.translationKey)
+				formattedArgs[name] = value
 			end
-		else
-			formattedArgs[name] = value
 		end
 	end
 
@@ -90,6 +92,47 @@ function LocalizedTextUtils.formatByKeyRecursive(translator, translationKey, tra
 	end
 
 	return translator:FormatByKey(translationKey, formattedArgs)
+end
+
+--[=[
+	Observes the recursively formatted translated text.
+
+	@param translator Translator | JSONTranslator
+	@param translationKey string
+	@param translationArgs TranslationArgs?
+	@param extraArgs table?
+	@return Observable<string>
+]=]
+function LocalizedTextUtils.observeFormatByKeyRecursive(translator, translationKey, translationArgs, extraArgs)
+	assert(translator, "Bad translator")
+	assert(type(translationKey) == "string", "Bad translationKey")
+	assert(type(translationArgs) == "table" or translationArgs == nil, "Bad translationArgs")
+
+	local observableFormattedArgs = {}
+	if translationArgs then
+		for name, value in pairs(translationArgs) do
+			if type(value) == "table" then
+				assert(value.translationKey, "Table, but no translationKey")
+
+				if value.translationArgs then
+					observableFormattedArgs[name] = LocalizedTextUtils
+						.observeFormatByKeyRecursive(translator, value.translationKey, value.translationArgs, extraArgs)
+				else
+					observableFormattedArgs[name] = translator:ObserveFormatByKey(value.translationKey)
+				end
+			else
+				observableFormattedArgs[name] = value
+			end
+		end
+	end
+
+	if extraArgs then
+		for key, value in pairs(extraArgs) do
+			observableFormattedArgs[key] = value
+		end
+	end
+
+	return translator:ObserveFormatByKey(translationKey, observableFormattedArgs)
 end
 
 --[=[
@@ -231,16 +274,20 @@ function LocalizedTextUtils.observeTranslation(translator, obj, attributeName, e
 
 	return RxAttributeUtils.observeAttribute(obj, attributeName, nil)
 		:Pipe({
-			Rx.map(function(encodedText)
+			Rx.switchMap(function(encodedText)
 				if type(encodedText) == "string" then
 					local localizedText = LocalizedTextUtils.fromJSON(encodedText)
 					if localizedText then
-						return LocalizedTextUtils.localizedTextToString(translator, localizedText, extraArgs)
+						return LocalizedTextUtils.observeFormatByKeyRecursive(
+							translator,
+							localizedText.translationKey,
+							localizedText.translationArgs,
+							extraArgs)
 					else
-						return nil
+						return Rx.of(nil)
 					end
 				else
-					return nil
+					return Rx.of(nil)
 				end
 			end);
 		})

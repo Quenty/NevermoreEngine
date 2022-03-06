@@ -309,7 +309,7 @@ end
 ]=]
 function Draw.point(position, color, parent, diameter)
 	if typeof(position) == "CFrame" then
-		position = position.p
+		position = position.Position
 	end
 
 	assert(typeof(position) == "Vector3", "Bad position")
@@ -364,7 +364,7 @@ end
 ]=]
 function Draw.labelledPoint(position, label, color, parent)
 	if typeof(position) == "CFrame" then
-		position = position.p
+		position = position.Position
 	end
 
 	local part = Draw.point(position, color, parent)

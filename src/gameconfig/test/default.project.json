@@ -1,0 +1,27 @@
+{
+  "name": "GameConfigTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "gameconfig": {
+        "$className": "Folder",
+        "test": {
+          "$path": "modules"
+        },
+        "gameconfig": {
+          "$path": ".."
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

@@ -1298,4 +1298,38 @@ function Rx.throttleTime(duration, throttleConfig)
 	end
 end
 
+--[=[
+	Throttles emission of observables on the defer stack to the last emission.
+	@return (source: Observable) -> Observable
+]=]
+function Rx.throttleDefer()
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			local lastResult
+
+			maid:GiveTask(source:Subscribe(function(...)
+				if not lastResult then
+					lastResult = table.pack(...)
+
+					-- Queue up our result
+					task.defer(function()
+						local current = lastResult
+						lastResult = nil
+
+						sub:Fire(table.unpack(current, 1, current.n))
+					end)
+				else
+					lastResult = table.pack(...)
+				end
+			end, sub:GetFailComplete()))
+
+			return maid
+		end)
+	end
+end
+
 return Rx

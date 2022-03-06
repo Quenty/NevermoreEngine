@@ -1,0 +1,21 @@
+{
+  "name": "GameProductServiceTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "gameproduct": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

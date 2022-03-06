@@ -74,7 +74,7 @@ function SpringUtils.toLinearIfNeeded(value)
 	if typeof(value) == "Color3" then
 		return LinearValue.new(Color3.new, {value.r, value.g, value.b})
 	elseif typeof(value) == "UDim2" then
-		return LinearValue.new(UDim2.new, {value.x.scale, value.x.offset, value.y.scale, value.y.offset})
+		return LinearValue.new(UDim2.new, {value.X.Scale, value.X.Offset, value.Y.Scale, value.Y.Offset})
 	elseif typeof(value) == "UDim" then
 		return LinearValue.new(UDim.new, {value.scale, value.offset})
 	else

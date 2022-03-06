@@ -9,6 +9,7 @@
 ]=]
 
 local SoundService = game:GetService("SoundService")
+local RunService = game:GetService("RunService")
 
 local SoundUtils = {}
 
@@ -36,7 +37,11 @@ function SoundUtils.playFromId(id)
 	sound.Volume = 0.25
 	sound.Archivable = false
 
-	SoundService:PlayLocalSound(sound)
+	if RunService:IsClient() then
+		SoundService:PlayLocalSound(sound)
+	else
+		sound:Play()
+	end
 
 	task.delay(sound.TimeLength + 0.05, function()
 		sound:Destroy()

@@ -35,7 +35,7 @@ function BoundingBoxUtils.clampPointToBoundingBox(cframe, size, point)
 		math.clamp(transform.x, -halfSize.x, halfSize.x),
 		math.clamp(transform.y, -halfSize.y, halfSize.y),
 		math.clamp(transform.z, -halfSize.z, halfSize.z)
-	), cframe.p
+	), cframe.Position
 end
 
 --[=[
@@ -52,7 +52,7 @@ function BoundingBoxUtils.pushPointToLieOnBoundingBox(cframe, size, point)
 	local x = transform.x < 0 and -halfSize.x or halfSize.x
 	local y = transform.y < 0 and -halfSize.y or halfSize.y
 	local z = transform.z < 0 and -halfSize.z or halfSize.z
-	return cframe * Vector3.new(x, y, z), cframe.p
+	return cframe * Vector3.new(x, y, z), cframe.Position
 end
 
 --[=[

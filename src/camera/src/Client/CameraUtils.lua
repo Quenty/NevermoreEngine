@@ -12,7 +12,7 @@
 		local size = viewportFrame.AbsoluteSize
 		local aspectRatio = size.x/size.y
 		local dist = CameraUtils.fitBoundingBoxToCamera(size, camera.FieldOfView, aspectRatio)
-		camera.CFrame = cframe.p + CFrame.Angles(0, math.pi*os.clock() % math.pi, -math.pi/8)
+		camera.CFrame = cframe.Position + CFrame.Angles(0, math.pi*os.clock() % math.pi, -math.pi/8)
 			:vectorToWorldSpace(Vector3.new(0, 0, -dist))
 	end)
 	```

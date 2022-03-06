@@ -94,7 +94,14 @@ function SpringObject:ObserveOnSignal(signal)
 
 		return maid
 	end)
+end
 
+--[=[
+	Returns true when we're animating
+	@return boolean -- True if animating
+]=]
+function SpringObject:IsAnimating()
+	return (SpringUtils.animating(self._currentSpring))
 end
 
 --[=[

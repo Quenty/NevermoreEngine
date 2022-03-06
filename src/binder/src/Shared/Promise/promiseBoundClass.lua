@@ -42,7 +42,7 @@ return function(binder, inst, cancelToken)
 		end
 	end))
 
-	delay(5, function()
+	task.delay(5, function()
 		if promise:IsPending() then
 			warn(("[promiseBoundClass] - Infinite yield possible on %q for binder %q\n")
 				:format(inst:GetFullName(), binder:GetTag()))

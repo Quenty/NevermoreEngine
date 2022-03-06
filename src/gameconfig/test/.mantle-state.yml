@@ -1,0 +1,1388 @@
+---
+version: "3"
+environments:
+  staging:
+    - id: experience_singleton
+      inputs:
+        experience:
+          groupId: 243718
+      outputs:
+        experience:
+          assetId: 3285671029
+          startPlaceId: 8632644929
+      dependencies: []
+    - id: product_robux_99
+      inputs:
+        product:
+          name: 99 Robux
+          description: ""
+          price: 99
+      outputs:
+        product:
+          assetId: 1235158120
+          productId: 11420510
+      dependencies:
+        - experience_singleton
+    - id: product_robux_98
+      inputs:
+        product:
+          name: 98 Robux
+          description: ""
+          price: 98
+      outputs:
+        product:
+          assetId: 1235156648
+          productId: 11420252
+      dependencies:
+        - experience_singleton
+    - id: product_robux_97
+      inputs:
+        product:
+          name: 97 Robux
+          description: ""
+          price: 97
+      outputs:
+        product:
+          assetId: 1235156649
+          productId: 11420253
+      dependencies:
+        - experience_singleton
+    - id: product_robux_96
+      inputs:
+        product:
+          name: 96 Robux
+          description: ""
+          price: 96
+      outputs:
+        product:
+          assetId: 1235156651
+          productId: 11420254
+      dependencies:
+        - experience_singleton
+    - id: product_robux_95
+      inputs:
+        product:
+          name: 95 Robux
+          description: ""
+          price: 95
+      outputs:
+        product:
+          assetId: 1235156652
+          productId: 11420255
+      dependencies:
+        - experience_singleton
+    - id: product_robux_94
+      inputs:
+        product:
+          name: 94 Robux
+          description: ""
+          price: 94
+      outputs:
+        product:
+          assetId: 1235156654
+          productId: 11420256
+      dependencies:
+        - experience_singleton
+    - id: product_robux_93
+      inputs:
+        product:
+          name: 93 Robux
+          description: ""
+          price: 93
+      outputs:
+        product:
+          assetId: 1235156656
+          productId: 11420257
+      dependencies:
+        - experience_singleton
+    - id: product_robux_92
+      inputs:
+        product:
+          name: 92 Robux
+          description: ""
+          price: 92
+      outputs:
+        product:
+          assetId: 1235156658
+          productId: 11420258
+      dependencies:
+        - experience_singleton
+    - id: product_robux_91
+      inputs:
+        product:
+          name: 91 Robux
+          description: ""
+          price: 91
+      outputs:
+        product:
+          assetId: 1235156659
+          productId: 11420259
+      dependencies:
+        - experience_singleton
+    - id: product_robux_90
+      inputs:
+        product:
+          name: 90 Robux
+          description: ""
+          price: 90
+      outputs:
+        product:
+          assetId: 1235156661
+          productId: 11420260
+      dependencies:
+        - experience_singleton
+    - id: product_robux_9
+      inputs:
+        product:
+          name: 9 Robux
+          description: ""
+          price: 9
+      outputs:
+        product:
+          assetId: 1235156663
+          productId: 11420262
+      dependencies:
+        - experience_singleton
+    - id: product_robux_89
+      inputs:
+        product:
+          name: 89 Robux
+          description: ""
+          price: 89
+      outputs:
+        product:
+          assetId: 1235156665
+          productId: 11420264
+      dependencies:
+        - experience_singleton
+    - id: product_robux_88
+      inputs:
+        product:
+          name: 88 Robux
+          description: ""
+          price: 88
+      outputs:
+        product:
+          assetId: 1235156667
+          productId: 11420265
+      dependencies:
+        - experience_singleton
+    - id: product_robux_87
+      inputs:
+        product:
+          name: 87 Robux
+          description: ""
+          price: 87
+      outputs:
+        product:
+          assetId: 1235156668
+          productId: 11420266
+      dependencies:
+        - experience_singleton
+    - id: product_robux_86
+      inputs:
+        product:
+          name: 86 Robux
+          description: ""
+          price: 86
+      outputs:
+        product:
+          assetId: 1235156671
+          productId: 11420267
+      dependencies:
+        - experience_singleton
+    - id: product_robux_85
+      inputs:
+        product:
+          name: 85 Robux
+          description: ""
+          price: 85
+      outputs:
+        product:
+          assetId: 1235156672
+          productId: 11420268
+      dependencies:
+        - experience_singleton
+    - id: product_robux_84
+      inputs:
+        product:
+          name: 84 Robux
+          description: ""
+          price: 84
+      outputs:
+        product:
+          assetId: 1235156674
+          productId: 11420269
+      dependencies:
+        - experience_singleton
+    - id: product_robux_83
+      inputs:
+        product:
+          name: 83 Robux
+          description: ""
+          price: 83
+      outputs:
+        product:
+          assetId: 1235156676
+          productId: 11420270
+      dependencies:
+        - experience_singleton
+    - id: product_robux_82
+      inputs:
+        product:
+          name: 82 Robux
+          description: ""
+          price: 82
+      outputs:
+        product:
+          assetId: 1235156677
+          productId: 11420271
+      dependencies:
+        - experience_singleton
+    - id: product_robux_81
+      inputs:
+        product:
+          name: 81 Robux
+          description: ""
+          price: 81
+      outputs:
+        product:
+          assetId: 1235156678
+          productId: 11420272
+      dependencies:
+        - experience_singleton
+    - id: product_robux_80
+      inputs:
+        product:
+          name: 80 Robux
+          description: ""
+          price: 80
+      outputs:
+        product:
+          assetId: 1235156679
+          productId: 11420273
+      dependencies:
+        - experience_singleton
+    - id: product_robux_8
+      inputs:
+        product:
+          name: 8 Robux
+          description: ""
+          price: 8
+      outputs:
+        product:
+          assetId: 1235156681
+          productId: 11420274
+      dependencies:
+        - experience_singleton
+    - id: product_robux_79
+      inputs:
+        product:
+          name: 79 Robux
+          description: ""
+          price: 79
+      outputs:
+        product:
+          assetId: 1235156683
+          productId: 11420275
+      dependencies:
+        - experience_singleton
+    - id: product_robux_78
+      inputs:
+        product:
+          name: 78 Robux
+          description: ""
+          price: 78
+      outputs:
+        product:
+          assetId: 1235156686
+          productId: 11420276
+      dependencies:
+        - experience_singleton
+    - id: product_robux_77
+      inputs:
+        product:
+          name: 77 Robux
+          description: ""
+          price: 77
+      outputs:
+        product:
+          assetId: 1235156687
+          productId: 11420277
+      dependencies:
+        - experience_singleton
+    - id: product_robux_76
+      inputs:
+        product:
+          name: 76 Robux
+          description: ""
+          price: 76
+      outputs:
+        product:
+          assetId: 1235156689
+          productId: 11420278
+      dependencies:
+        - experience_singleton
+    - id: product_robux_75
+      inputs:
+        product:
+          name: 75 Robux
+          description: ""
+          price: 75
+      outputs:
+        product:
+          assetId: 1235156691
+          productId: 11420279
+      dependencies:
+        - experience_singleton
+    - id: product_robux_74
+      inputs:
+        product:
+          name: 74 Robux
+          description: ""
+          price: 74
+      outputs:
+        product:
+          assetId: 1235156695
+          productId: 11420281
+      dependencies:
+        - experience_singleton
+    - id: product_robux_73
+      inputs:
+        product:
+          name: 73 Robux
+          description: ""
+          price: 73
+      outputs:
+        product:
+          assetId: 1235156698
+          productId: 11420282
+      dependencies:
+        - experience_singleton
+    - id: product_robux_72
+      inputs:
+        product:
+          name: 72 Robux
+          description: ""
+          price: 72
+      outputs:
+        product:
+          assetId: 1235156702
+          productId: 11420283
+      dependencies:
+        - experience_singleton
+    - id: product_robux_71
+      inputs:
+        product:
+          name: 71 Robux
+          description: ""
+          price: 71
+      outputs:
+        product:
+          assetId: 1235156705
+          productId: 11420284
+      dependencies:
+        - experience_singleton
+    - id: product_robux_70
+      inputs:
+        product:
+          name: 70 Robux
+          description: ""
+          price: 70
+      outputs:
+        product:
+          assetId: 1235156708
+          productId: 11420285
+      dependencies:
+        - experience_singleton
+    - id: product_robux_7
+      inputs:
+        product:
+          name: 7 Robux
+          description: ""
+          price: 7
+      outputs:
+        product:
+          assetId: 1235156825
+          productId: 11420297
+      dependencies:
+        - experience_singleton
+    - id: product_robux_69
+      inputs:
+        product:
+          name: 69 Robux
+          description: ""
+          price: 69
+      outputs:
+        product:
+          assetId: 1235156710
+          productId: 11420286
+      dependencies:
+        - experience_singleton
+    - id: product_robux_68
+      inputs:
+        product:
+          name: 68 Robux
+          description: ""
+          price: 68
+      outputs:
+        product:
+          assetId: 1235156712
+          productId: 11420287
+      dependencies:
+        - experience_singleton
+    - id: product_robux_67
+      inputs:
+        product:
+          name: 67 Robux
+          description: ""
+          price: 67
+      outputs:
+        product:
+          assetId: 1235156826
+          productId: 11420298
+      dependencies:
+        - experience_singleton
+    - id: product_robux_66
+      inputs:
+        product:
+          name: 66 Robux
+          description: ""
+          price: 66
+      outputs:
+        product:
+          assetId: 1235156827
+          productId: 11420299
+      dependencies:
+        - experience_singleton
+    - id: product_robux_65
+      inputs:
+        product:
+          name: 65 Robux
+          description: ""
+          price: 65
+      outputs:
+        product:
+          assetId: 1235156828
+          productId: 11420300
+      dependencies:
+        - experience_singleton
+    - id: product_robux_64
+      inputs:
+        product:
+          name: 64 Robux
+          description: ""
+          price: 64
+      outputs:
+        product:
+          assetId: 1235156831
+          productId: 11420301
+      dependencies:
+        - experience_singleton
+    - id: product_robux_63
+      inputs:
+        product:
+          name: 63 Robux
+          description: ""
+          price: 63
+      outputs:
+        product:
+          assetId: 1235156714
+          productId: 11420288
+      dependencies:
+        - experience_singleton
+    - id: product_robux_62
+      inputs:
+        product:
+          name: 62 Robux
+          description: ""
+          price: 62
+      outputs:
+        product:
+          assetId: 1235156833
+          productId: 11420303
+      dependencies:
+        - experience_singleton
+    - id: product_robux_61
+      inputs:
+        product:
+          name: 61 Robux
+          description: ""
+          price: 61
+      outputs:
+        product:
+          assetId: 1235156834
+          productId: 11420304
+      dependencies:
+        - experience_singleton
+    - id: product_robux_60
+      inputs:
+        product:
+          name: 60 Robux
+          description: ""
+          price: 60
+      outputs:
+        product:
+          assetId: 1235156836
+          productId: 11420305
+      dependencies:
+        - experience_singleton
+    - id: product_robux_6
+      inputs:
+        product:
+          name: 6 Robux
+          description: ""
+          price: 6
+      outputs:
+        product:
+          assetId: 1235156837
+          productId: 11420306
+      dependencies:
+        - experience_singleton
+    - id: product_robux_59
+      inputs:
+        product:
+          name: 59 Robux
+          description: ""
+          price: 59
+      outputs:
+        product:
+          assetId: 1235158096
+          productId: 11420508
+      dependencies:
+        - experience_singleton
+    - id: product_robux_58
+      inputs:
+        product:
+          name: 58 Robux
+          description: ""
+          price: 58
+      outputs:
+        product:
+          assetId: 1235156841
+          productId: 11420309
+      dependencies:
+        - experience_singleton
+    - id: product_robux_57
+      inputs:
+        product:
+          name: 57 Robux
+          description: ""
+          price: 57
+      outputs:
+        product:
+          assetId: 1235156843
+          productId: 11420310
+      dependencies:
+        - experience_singleton
+    - id: product_robux_56
+      inputs:
+        product:
+          name: 56 Robux
+          description: ""
+          price: 56
+      outputs:
+        product:
+          assetId: 1235156845
+          productId: 11420312
+      dependencies:
+        - experience_singleton
+    - id: product_robux_55
+      inputs:
+        product:
+          name: 55 Robux
+          description: ""
+          price: 55
+      outputs:
+        product:
+          assetId: 1235158066
+          productId: 11420505
+      dependencies:
+        - experience_singleton
+    - id: product_robux_54
+      inputs:
+        product:
+          name: 54 Robux
+          description: ""
+          price: 54
+      outputs:
+        product:
+          assetId: 1235158068
+          productId: 11420506
+      dependencies:
+        - experience_singleton
+    - id: product_robux_53
+      inputs:
+        product:
+          name: 53 Robux
+          description: ""
+          price: 53
+      outputs:
+        product:
+          assetId: 1235156849
+          productId: 11420315
+      dependencies:
+        - experience_singleton
+    - id: product_robux_52
+      inputs:
+        product:
+          name: 52 Robux
+          description: ""
+          price: 52
+      outputs:
+        product:
+          assetId: 1235156850
+          productId: 11420316
+      dependencies:
+        - experience_singleton
+    - id: product_robux_51
+      inputs:
+        product:
+          name: 51 Robux
+          description: ""
+          price: 51
+      outputs:
+        product:
+          assetId: 1235156851
+          productId: 11420317
+      dependencies:
+        - experience_singleton
+    - id: product_robux_50
+      inputs:
+        product:
+          name: 50 Robux
+          description: ""
+          price: 50
+      outputs:
+        product:
+          assetId: 1235156853
+          productId: 11420318
+      dependencies:
+        - experience_singleton
+    - id: product_robux_5
+      inputs:
+        product:
+          name: 5 Robux
+          description: ""
+          price: 5
+      outputs:
+        product:
+          assetId: 1235156854
+          productId: 11420319
+      dependencies:
+        - experience_singleton
+    - id: product_robux_49
+      inputs:
+        product:
+          name: 49 Robux
+          description: ""
+          price: 49
+      outputs:
+        product:
+          assetId: 1235156857
+          productId: 11420320
+      dependencies:
+        - experience_singleton
+    - id: product_robux_48
+      inputs:
+        product:
+          name: 48 Robux
+          description: ""
+          price: 48
+      outputs:
+        product:
+          assetId: 1235156860
+          productId: 11420321
+      dependencies:
+        - experience_singleton
+    - id: product_robux_47
+      inputs:
+        product:
+          name: 47 Robux
+          description: ""
+          price: 47
+      outputs:
+        product:
+          assetId: 1235156861
+          productId: 11420322
+      dependencies:
+        - experience_singleton
+    - id: product_robux_46
+      inputs:
+        product:
+          name: 46 Robux
+          description: ""
+          price: 46
+      outputs:
+        product:
+          assetId: 1235156863
+          productId: 11420323
+      dependencies:
+        - experience_singleton
+    - id: product_robux_45
+      inputs:
+        product:
+          name: 45 Robux
+          description: ""
+          price: 45
+      outputs:
+        product:
+          assetId: 1235156864
+          productId: 11420324
+      dependencies:
+        - experience_singleton
+    - id: product_robux_44
+      inputs:
+        product:
+          name: 44 Robux
+          description: ""
+          price: 44
+      outputs:
+        product:
+          assetId: 1235158071
+          productId: 11420507
+      dependencies:
+        - experience_singleton
+    - id: product_robux_43
+      inputs:
+        product:
+          name: 43 Robux
+          description: ""
+          price: 43
+      outputs:
+        product:
+          assetId: 1235156868
+          productId: 11420326
+      dependencies:
+        - experience_singleton
+    - id: product_robux_42
+      inputs:
+        product:
+          name: 42 Robux
+          description: ""
+          price: 42
+      outputs:
+        product:
+          assetId: 1235156869
+          productId: 11420327
+      dependencies:
+        - experience_singleton
+    - id: product_robux_41
+      inputs:
+        product:
+          name: 41 Robux
+          description: ""
+          price: 41
+      outputs:
+        product:
+          assetId: 1235156870
+          productId: 11420328
+      dependencies:
+        - experience_singleton
+    - id: product_robux_40
+      inputs:
+        product:
+          name: 40 Robux
+          description: ""
+          price: 40
+      outputs:
+        product:
+          assetId: 1235158000
+          productId: 11420498
+      dependencies:
+        - experience_singleton
+    - id: product_robux_4
+      inputs:
+        product:
+          name: 4 Robux
+          description: ""
+          price: 4
+      outputs:
+        product:
+          assetId: 1235156874
+          productId: 11420330
+      dependencies:
+        - experience_singleton
+    - id: product_robux_39
+      inputs:
+        product:
+          name: 39 Robux
+          description: ""
+          price: 39
+      outputs:
+        product:
+          assetId: 1235156876
+          productId: 11420331
+      dependencies:
+        - experience_singleton
+    - id: product_robux_38
+      inputs:
+        product:
+          name: 38 Robux
+          description: ""
+          price: 38
+      outputs:
+        product:
+          assetId: 1235156879
+          productId: 11420332
+      dependencies:
+        - experience_singleton
+    - id: product_robux_37
+      inputs:
+        product:
+          name: 37 Robux
+          description: ""
+          price: 37
+      outputs:
+        product:
+          assetId: 1235156881
+          productId: 11420333
+      dependencies:
+        - experience_singleton
+    - id: product_robux_36
+      inputs:
+        product:
+          name: 36 Robux
+          description: ""
+          price: 36
+      outputs:
+        product:
+          assetId: 1235156965
+          productId: 11420339
+      dependencies:
+        - experience_singleton
+    - id: product_robux_35
+      inputs:
+        product:
+          name: 35 Robux
+          description: ""
+          price: 35
+      outputs:
+        product:
+          assetId: 1235156969
+          productId: 11420340
+      dependencies:
+        - experience_singleton
+    - id: product_robux_34
+      inputs:
+        product:
+          name: 34 Robux
+          description: ""
+          price: 34
+      outputs:
+        product:
+          assetId: 1235156972
+          productId: 11420341
+      dependencies:
+        - experience_singleton
+    - id: product_robux_33
+      inputs:
+        product:
+          name: 33 Robux
+          description: ""
+          price: 33
+      outputs:
+        product:
+          assetId: 1235156973
+          productId: 11420342
+      dependencies:
+        - experience_singleton
+    - id: product_robux_32
+      inputs:
+        product:
+          name: 32 Robux
+          description: ""
+          price: 32
+      outputs:
+        product:
+          assetId: 1235156975
+          productId: 11420343
+      dependencies:
+        - experience_singleton
+    - id: product_robux_31
+      inputs:
+        product:
+          name: 31 Robux
+          description: ""
+          price: 31
+      outputs:
+        product:
+          assetId: 1235156977
+          productId: 11420344
+      dependencies:
+        - experience_singleton
+    - id: product_robux_30
+      inputs:
+        product:
+          name: 30 Robux
+          description: ""
+          price: 30
+      outputs:
+        product:
+          assetId: 1235156980
+          productId: 11420345
+      dependencies:
+        - experience_singleton
+    - id: product_robux_3
+      inputs:
+        product:
+          name: 3 Robux
+          description: ""
+          price: 3
+      outputs:
+        product:
+          assetId: 1235156982
+          productId: 11420346
+      dependencies:
+        - experience_singleton
+    - id: product_robux_29
+      inputs:
+        product:
+          name: 29 Robux
+          description: ""
+          price: 29
+      outputs:
+        product:
+          assetId: 1235156983
+          productId: 11420347
+      dependencies:
+        - experience_singleton
+    - id: product_robux_28
+      inputs:
+        product:
+          name: 28 Robux
+          description: ""
+          price: 28
+      outputs:
+        product:
+          assetId: 1235156985
+          productId: 11420349
+      dependencies:
+        - experience_singleton
+    - id: product_robux_27
+      inputs:
+        product:
+          name: 27 Robux
+          description: ""
+          price: 27
+      outputs:
+        product:
+          assetId: 1235156987
+          productId: 11420351
+      dependencies:
+        - experience_singleton
+    - id: product_robux_26
+      inputs:
+        product:
+          name: 26 Robux
+          description: ""
+          price: 26
+      outputs:
+        product:
+          assetId: 1235156989
+          productId: 11420352
+      dependencies:
+        - experience_singleton
+    - id: product_robux_25
+      inputs:
+        product:
+          name: 25 Robux
+          description: ""
+          price: 25
+      outputs:
+        product:
+          assetId: 1235156990
+          productId: 11420353
+      dependencies:
+        - experience_singleton
+    - id: product_robux_24
+      inputs:
+        product:
+          name: 24 Robux
+          description: ""
+          price: 24
+      outputs:
+        product:
+          assetId: 1235158001
+          productId: 11420499
+      dependencies:
+        - experience_singleton
+    - id: product_robux_23
+      inputs:
+        product:
+          name: 23 Robux
+          description: ""
+          price: 23
+      outputs:
+        product:
+          assetId: 1235156993
+          productId: 11420355
+      dependencies:
+        - experience_singleton
+    - id: product_robux_22
+      inputs:
+        product:
+          name: 22 Robux
+          description: ""
+          price: 22
+      outputs:
+        product:
+          assetId: 1235156994
+          productId: 11420356
+      dependencies:
+        - experience_singleton
+    - id: product_robux_21
+      inputs:
+        product:
+          name: 21 Robux
+          description: ""
+          price: 21
+      outputs:
+        product:
+          assetId: 1235156996
+          productId: 11420357
+      dependencies:
+        - experience_singleton
+    - id: product_robux_20
+      inputs:
+        product:
+          name: 20 Robux
+          description: ""
+          price: 20
+      outputs:
+        product:
+          assetId: 1235156999
+          productId: 11420358
+      dependencies:
+        - experience_singleton
+    - id: product_robux_2
+      inputs:
+        product:
+          name: 2 Robux
+          description: ""
+          price: 2
+      outputs:
+        product:
+          assetId: 1235157000
+          productId: 11420359
+      dependencies:
+        - experience_singleton
+    - id: product_robux_19
+      inputs:
+        product:
+          name: 19 Robux
+          description: ""
+          price: 19
+      outputs:
+        product:
+          assetId: 1235157837
+          productId: 11420467
+      dependencies:
+        - experience_singleton
+    - id: product_robux_18
+      inputs:
+        product:
+          name: 18 Robux
+          description: ""
+          price: 18
+      outputs:
+        product:
+          assetId: 1235157003
+          productId: 11420360
+      dependencies:
+        - experience_singleton
+    - id: product_robux_17
+      inputs:
+        product:
+          name: 17 Robux
+          description: ""
+          price: 17
+      outputs:
+        product:
+          assetId: 1235157004
+          productId: 11420361
+      dependencies:
+        - experience_singleton
+    - id: product_robux_16
+      inputs:
+        product:
+          name: 16 Robux
+          description: ""
+          price: 16
+      outputs:
+        product:
+          assetId: 1235157006
+          productId: 11420362
+      dependencies:
+        - experience_singleton
+    - id: product_robux_15
+      inputs:
+        product:
+          name: 15 Robux
+          description: ""
+          price: 15
+      outputs:
+        product:
+          assetId: 1235157007
+          productId: 11420363
+      dependencies:
+        - experience_singleton
+    - id: product_robux_14
+      inputs:
+        product:
+          name: 14 Robux
+          description: ""
+          price: 14
+      outputs:
+        product:
+          assetId: 1235157008
+          productId: 11420364
+      dependencies:
+        - experience_singleton
+    - id: product_robux_13
+      inputs:
+        product:
+          name: 13 Robux
+          description: ""
+          price: 13
+      outputs:
+        product:
+          assetId: 1235157010
+          productId: 11420365
+      dependencies:
+        - experience_singleton
+    - id: product_robux_12
+      inputs:
+        product:
+          name: 12 Robux
+          description: ""
+          price: 12
+      outputs:
+        product:
+          assetId: 1235157011
+          productId: 11420366
+      dependencies:
+        - experience_singleton
+    - id: product_robux_11
+      inputs:
+        product:
+          name: 11 Robux
+          description: ""
+          price: 11
+      outputs:
+        product:
+          assetId: 1235157838
+          productId: 11420468
+      dependencies:
+        - experience_singleton
+    - id: product_robux_100
+      inputs:
+        product:
+          name: 100 Robux
+          description: ""
+          price: 100
+      outputs:
+        product:
+          assetId: 1235157841
+          productId: 11420469
+      dependencies:
+        - experience_singleton
+    - id: product_robux_10
+      inputs:
+        product:
+          name: 10 Robux
+          description: ""
+          price: 10
+      outputs:
+        product:
+          assetId: 1235157014
+          productId: 11420367
+      dependencies:
+        - experience_singleton
+    - id: product_robux_1
+      inputs:
+        product:
+          name: 1 Robux
+          description: ""
+          price: 1
+      outputs:
+        product:
+          assetId: 1235157842
+          productId: 11420470
+      dependencies:
+        - experience_singleton
+    - id: productIcon_buyBadgeProduct
+      inputs:
+        productIcon:
+          filePath: assets/badges/badge.png
+          fileHash: fbc9e714fab254ff6afa2ee4479b2e452175b30119afaf8ff12055a9a02810a9
+      outputs:
+        productIcon:
+          assetId: 8632645043
+      dependencies:
+        - experience_singleton
+    - id: product_buyBadgeProduct
+      inputs:
+        product:
+          name: Buy a badge!
+          description: Buys you a whole badge for testing purposes!
+          price: 25
+      outputs:
+        product:
+          assetId: 1234655692
+          productId: 11367044
+      dependencies:
+        - experience_singleton
+        - productIcon_buyBadgeProduct
+    - id: place_start
+      inputs:
+        place:
+          isStart: true
+      outputs:
+        place:
+          assetId: 8632644929
+      dependencies:
+        - experience_singleton
+    - id: placeFile_start
+      inputs:
+        placeFile:
+          filePath: out/game.rbxlx
+          fileHash: f81e2d08d00c90b2f99baf756a5321421ef99cde546491ed4511df0403e5b686
+      outputs:
+        placeFile:
+          version: 2
+      dependencies:
+        - place_start
+    - id: placeConfiguration_start
+      inputs:
+        placeConfiguration:
+          name: Test Game Configuration
+          description: This is a test mantle game with a variety of interesting assets and stuff to test!
+          maxPlayerCount: 30
+          allowCopying: false
+          socialSlotType: Automatic
+          customSocialSlotsCount: ~
+      outputs: placeConfiguration
+      dependencies:
+        - place_start
+    - id: pass_happinessProduct
+      inputs:
+        pass:
+          name: Unlimited happiness
+          description: Buys you unlimited happiness.
+          price: 499
+          iconFilePath: assets/badges/badge.png
+      outputs:
+        pass:
+          assetId: 27825080
+          initialIconAssetId: 8632645589
+      dependencies:
+        - experience_singleton
+    - id: passIcon_happinessProduct
+      inputs:
+        passIcon:
+          filePath: assets/badges/badge.png
+          fileHash: fbc9e714fab254ff6afa2ee4479b2e452175b30119afaf8ff12055a9a02810a9
+      outputs:
+        passIcon:
+          assetId: 8632645589
+      dependencies:
+        - pass_happinessProduct
+    - id: experienceConfiguration_singleton
+      inputs:
+        experienceConfiguration:
+          genre: All
+          playableDevices:
+            - Computer
+            - Phone
+            - Tablet
+            - Console
+          isFriendsOnly: false
+          allowPrivateServers: true
+          privateServerPrice: 0
+          isForSale: false
+          price: ~
+          studioAccessToApisAllowed: true
+          permissions:
+            IsThirdPartyPurchaseAllowed: false
+            IsThirdPartyTeleportAllowed: false
+          universeAvatarType: MorphToR15
+          universeAnimationType: PlayerChoice
+          universeCollisionType: OuterBox
+          universeAvatarMinScales:
+            height: "0.9"
+            width: "0.7"
+            head: "0.95"
+            bodyType: "0"
+            proportion: "0"
+          universeAvatarMaxScales:
+            height: "1.05"
+            width: "1"
+            head: "1"
+            bodyType: "1"
+            proportion: "1"
+          universeAvatarAssetOverrides:
+            - assetTypeID: 18
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 17
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 27
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 29
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 28
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 30
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 31
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 2
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 11
+              isPlayerChoice: true
+              assetID: ~
+            - assetTypeID: 12
+              isPlayerChoice: true
+              assetID: ~
+          isArchived: false
+      outputs: experienceConfiguration
+      dependencies:
+        - experience_singleton
+    - id: experienceActivation_singleton
+      inputs:
+        experienceActivation:
+          isActive: true
+      outputs: experienceActivation
+      dependencies:
+        - experience_singleton
+    - id: badge_alphaTester
+      inputs:
+        badge:
+          name: Alpha Tester!
+          description: You helped!
+          enabled: true
+          iconFilePath: assets/badges/badge.png
+      outputs:
+        badge:
+          assetId: 2124917286
+          initialIconAssetId: 8632645744
+      dependencies:
+        - experience_singleton
+    - id: badgeIcon_alphaTester
+      inputs:
+        badgeIcon:
+          filePath: assets/badges/badge.png
+          fileHash: fbc9e714fab254ff6afa2ee4479b2e452175b30119afaf8ff12055a9a02810a9
+      outputs:
+        badgeIcon:
+          assetId: 8632645744
+      dependencies:
+        - badge_alphaTester

@@ -38,6 +38,18 @@ function HapticFeedbackUtils.setSmallVibration(userInputType, amplitude)
 end
 
 --[=[
+	Sets the large vibrators on the gamepad
+	@param userInputType UserInputType
+	@param amplitude number
+	@return boolean
+]=]
+function HapticFeedbackUtils.setLargeVibration(userInputType, amplitude)
+	assert(type(amplitude) == "number", "Bad amplitude")
+
+	return HapticFeedbackUtils.setVibrationMotor(userInputType, Enum.VibrationMotor.Large, amplitude)
+end
+
+--[=[
 	Sets the small vibrators on the gamepad
 	@param userInputType UserInputType
 	@param vibrationMotor VibrationMotor

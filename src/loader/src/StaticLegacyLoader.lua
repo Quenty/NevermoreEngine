@@ -172,7 +172,7 @@ function StaticLegacyLoader:_ensureFakeLoader(module)
 		return
 	end
 
-	-- NExusUnitTest
+	-- NexusUnitTest
 	-- luacheck: ignore
 	-- selene: allow(undefined_variable)
 	local shouldBeArchivable = Load and true or false

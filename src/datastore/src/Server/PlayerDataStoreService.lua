@@ -85,7 +85,7 @@ end
 
 --[=[
 	Adds a removing callback to the manager.
-	@param callback function
+	@param callback function -- May return a promise
 	@return Promise
 ]=]
 function PlayerDataStoreService:PromiseAddRemovingCallback(callback)

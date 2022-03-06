@@ -54,7 +54,7 @@ end
 	@return Vector3
 ]=]
 function CFrameSerializer.readPosition(data)
-	return Vector3.new(data[1], data[2], data[3])
+	return Vector3.new(data[1]/128, data[2]/128, data[3]/128)
 end
 
 --[=[

@@ -56,7 +56,7 @@ function Blend.New(className)
 			local maid = Maid.new()
 
 			local instance = Instance.new(className)
-			-- maid:GiveTask(instance)
+			maid:GiveTask(instance)
 
 			if defaults then
 				for key, value in pairs(defaults) do
@@ -393,10 +393,14 @@ function Blend.Spring(source, speed, damper)
 
 		maid:GiveTask(stopAnimate)
 		maid:GiveTask(sourceObservable:Subscribe(function(value)
-			local linearValue = SpringUtils.toLinearIfNeeded(value)
-			spring = spring or createSpring(maid, linearValue)
-			spring.t = SpringUtils.toLinearIfNeeded(value)
-			startAnimate()
+			if value then
+				local linearValue = SpringUtils.toLinearIfNeeded(value)
+				spring = spring or createSpring(maid, linearValue)
+				spring.t = SpringUtils.toLinearIfNeeded(value)
+				startAnimate()
+			else
+				warn("Got nil value from emitted source")
+			end
 		end))
 
 		return maid

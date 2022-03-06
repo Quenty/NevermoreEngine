@@ -13,7 +13,6 @@ local BrioUtils = require("BrioUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
-local StateStack= require("StateStack")
 
 local RxBrioUtils = {}
 
@@ -30,30 +29,6 @@ function RxBrioUtils.toBrio()
 
 		return Brio.new(result)
 	end)
-end
-
---[=[
-	Creates a state stack from the brio's value. The state stack holds the last
-	value seen that is valid.
-
-	@param observable Observable<Brio<T>>
-	@return StateStack<T>
-]=]
-function RxBrioUtils.createStateStack(observable)
-	local stateStack = StateStack.new(nil)
-
-	stateStack._maid:GiveTask(observable:Subscribe(function(value)
-		assert(Brio.isBrio(value), "Observable must emit brio")
-
-		if value:IsDead() then
-			return
-		end
-
-		local maid = value:ToMaid()
-		maid:GiveTask(stateStack:PushState(value:GetValue()))
-	end))
-
-	return stateStack
 end
 
 --[=[
@@ -141,21 +116,23 @@ function RxBrioUtils.emitWhileAllDead(valueToEmitWhileAllDead)
 				updateBrios()
 			end
 
-			topMaid:GiveTask(source:Subscribe(function(brio)
-				if not Brio.isBrio(brio) then
-					warn(("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q"):format(tostring(brio)))
-					topMaid._lastBrio = nil
-					sub:Fail("Not a brio")
-					return
-				end
+			topMaid:GiveTask(source:Subscribe(
+				function(brio)
+					if not Brio.isBrio(brio) then
+						warn(("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q"):format(tostring(brio)))
+						topMaid._lastBrio = nil
+						sub:Fail("Not a brio")
+						return
+					end
 
-				handleNewBrio(brio)
-			end, function(...)
-				sub:Fail(...)
-			end,
-			function(...)
-				sub:Complete(...)
-			end))
+					handleNewBrio(brio)
+				end,
+				function(...)
+					sub:Fail(...)
+				end,
+				function(...)
+					sub:Complete(...)
+				end))
 
 			-- Make sure we emit an empty list if we discover nothing
 			if not fired then
@@ -235,22 +212,23 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				updateBrios()
 			end
 
-			topMaid:GiveTask(source:Subscribe(function(brio)
-				if not Brio.isBrio(brio) then
-					warn(("[RxBrioUtils.mergeToAliveList] - Not a brio, %q"):format(tostring(brio)))
-					topMaid._lastBrio = nil
-					sub:Fail("Not a brio")
-					return
-				end
+			topMaid:GiveTask(source:Subscribe(
+				function(brio)
+					if not Brio.isBrio(brio) then
+						warn(("[RxBrioUtils.mergeToAliveList] - Not a brio, %q"):format(tostring(brio)))
+						topMaid._lastBrio = nil
+						sub:Fail("Not a brio")
+						return
+					end
 
-				handleNewBrio(brio)
-			end,
-			function(...)
-				sub:Fail(...)
-			end,
-			function(...)
-				sub:Complete(...)
-			end))
+					handleNewBrio(brio)
+				end,
+				function(...)
+					sub:Fail(...)
+				end,
+				function(...)
+					sub:Complete(...)
+				end))
 
 			-- Make sure we emit an empty list if we discover nothing
 			if not fired then
@@ -272,33 +250,34 @@ function RxBrioUtils.reemitLastBrioOnDeath()
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			maid:GiveTask(source:Subscribe(function(brio)
-				maid._conn = nil
+			maid:GiveTask(source:Subscribe(
+				function(brio)
+					maid._conn = nil
 
-				if not Brio.isBrio(brio) then
-					warn(("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q"):format(tostring(brio)))
-					sub:Fail("Not a brio")
-					return
-				end
+					if not Brio.isBrio(brio) then
+						warn(("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q"):format(tostring(brio)))
+						sub:Fail("Not a brio")
+						return
+					end
 
-				if brio:IsDead() then
+					if brio:IsDead() then
+						sub:Fire(brio)
+						return
+					end
+
+					-- Setup conn!
+					maid._conn = brio:GetDiedSignal():Connect(function()
+						sub:Fire(brio)
+					end)
+
 					sub:Fire(brio)
-					return
-				end
-
-				-- Setup conn!
-				maid._conn = brio:GetDiedSignal():Connect(function()
-					sub:Fire(brio)
-				end)
-
-				sub:Fire(brio)
-			end,
-			function(...)
-				sub:Fail(...)
-			end,
-			function(...)
-				sub:Complete(...)
-			end))
+				end,
+				function(...)
+					sub:Fail(...)
+				end,
+				function(...)
+					sub:Complete(...)
+				end))
 
 			return maid
 		end)

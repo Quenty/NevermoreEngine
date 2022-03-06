@@ -1,0 +1,654 @@
+{
+  "badgeIcon_alphaTester": {
+    "badgeIcon": {
+      "assetId": 8632645744
+    }
+  },
+  "badge_alphaTester": {
+    "badge": {
+      "assetId": 2124917286,
+      "initialIconAssetId": 8632645744
+    }
+  },
+  "experienceActivation_singleton": "experienceActivation",
+  "experienceConfiguration_singleton": "experienceConfiguration",
+  "experience_singleton": {
+    "experience": {
+      "assetId": 3285671029,
+      "startPlaceId": 8632644929
+    }
+  },
+  "passIcon_happinessProduct": {
+    "passIcon": {
+      "assetId": 8632645589
+    }
+  },
+  "pass_happinessProduct": {
+    "pass": {
+      "assetId": 27825080,
+      "initialIconAssetId": 8632645589
+    }
+  },
+  "placeConfiguration_start": "placeConfiguration",
+  "placeFile_start": {
+    "placeFile": {
+      "version": 2
+    }
+  },
+  "place_start": {
+    "place": {
+      "assetId": 8632644929
+    }
+  },
+  "productIcon_buyBadgeProduct": {
+    "productIcon": {
+      "assetId": 8632645043
+    }
+  },
+  "product_buyBadgeProduct": {
+    "product": {
+      "assetId": 1234655692,
+      "productId": 11367044
+    }
+  },
+  "product_robux_1": {
+    "product": {
+      "assetId": 1235157842,
+      "productId": 11420470
+    }
+  },
+  "product_robux_10": {
+    "product": {
+      "assetId": 1235157014,
+      "productId": 11420367
+    }
+  },
+  "product_robux_100": {
+    "product": {
+      "assetId": 1235157841,
+      "productId": 11420469
+    }
+  },
+  "product_robux_11": {
+    "product": {
+      "assetId": 1235157838,
+      "productId": 11420468
+    }
+  },
+  "product_robux_12": {
+    "product": {
+      "assetId": 1235157011,
+      "productId": 11420366
+    }
+  },
+  "product_robux_13": {
+    "product": {
+      "assetId": 1235157010,
+      "productId": 11420365
+    }
+  },
+  "product_robux_14": {
+    "product": {
+      "assetId": 1235157008,
+      "productId": 11420364
+    }
+  },
+  "product_robux_15": {
+    "product": {
+      "assetId": 1235157007,
+      "productId": 11420363
+    }
+  },
+  "product_robux_16": {
+    "product": {
+      "assetId": 1235157006,
+      "productId": 11420362
+    }
+  },
+  "product_robux_17": {
+    "product": {
+      "assetId": 1235157004,
+      "productId": 11420361
+    }
+  },
+  "product_robux_18": {
+    "product": {
+      "assetId": 1235157003,
+      "productId": 11420360
+    }
+  },
+  "product_robux_19": {
+    "product": {
+      "assetId": 1235157837,
+      "productId": 11420467
+    }
+  },
+  "product_robux_2": {
+    "product": {
+      "assetId": 1235157000,
+      "productId": 11420359
+    }
+  },
+  "product_robux_20": {
+    "product": {
+      "assetId": 1235156999,
+      "productId": 11420358
+    }
+  },
+  "product_robux_21": {
+    "product": {
+      "assetId": 1235156996,
+      "productId": 11420357
+    }
+  },
+  "product_robux_22": {
+    "product": {
+      "assetId": 1235156994,
+      "productId": 11420356
+    }
+  },
+  "product_robux_23": {
+    "product": {
+      "assetId": 1235156993,
+      "productId": 11420355
+    }
+  },
+  "product_robux_24": {
+    "product": {
+      "assetId": 1235158001,
+      "productId": 11420499
+    }
+  },
+  "product_robux_25": {
+    "product": {
+      "assetId": 1235156990,
+      "productId": 11420353
+    }
+  },
+  "product_robux_26": {
+    "product": {
+      "assetId": 1235156989,
+      "productId": 11420352
+    }
+  },
+  "product_robux_27": {
+    "product": {
+      "assetId": 1235156987,
+      "productId": 11420351
+    }
+  },
+  "product_robux_28": {
+    "product": {
+      "assetId": 1235156985,
+      "productId": 11420349
+    }
+  },
+  "product_robux_29": {
+    "product": {
+      "assetId": 1235156983,
+      "productId": 11420347
+    }
+  },
+  "product_robux_3": {
+    "product": {
+      "assetId": 1235156982,
+      "productId": 11420346
+    }
+  },
+  "product_robux_30": {
+    "product": {
+      "assetId": 1235156980,
+      "productId": 11420345
+    }
+  },
+  "product_robux_31": {
+    "product": {
+      "assetId": 1235156977,
+      "productId": 11420344
+    }
+  },
+  "product_robux_32": {
+    "product": {
+      "assetId": 1235156975,
+      "productId": 11420343
+    }
+  },
+  "product_robux_33": {
+    "product": {
+      "assetId": 1235156973,
+      "productId": 11420342
+    }
+  },
+  "product_robux_34": {
+    "product": {
+      "assetId": 1235156972,
+      "productId": 11420341
+    }
+  },
+  "product_robux_35": {
+    "product": {
+      "assetId": 1235156969,
+      "productId": 11420340
+    }
+  },
+  "product_robux_36": {
+    "product": {
+      "assetId": 1235156965,
+      "productId": 11420339
+    }
+  },
+  "product_robux_37": {
+    "product": {
+      "assetId": 1235156881,
+      "productId": 11420333
+    }
+  },
+  "product_robux_38": {
+    "product": {
+      "assetId": 1235156879,
+      "productId": 11420332
+    }
+  },
+  "product_robux_39": {
+    "product": {
+      "assetId": 1235156876,
+      "productId": 11420331
+    }
+  },
+  "product_robux_4": {
+    "product": {
+      "assetId": 1235156874,
+      "productId": 11420330
+    }
+  },
+  "product_robux_40": {
+    "product": {
+      "assetId": 1235158000,
+      "productId": 11420498
+    }
+  },
+  "product_robux_41": {
+    "product": {
+      "assetId": 1235156870,
+      "productId": 11420328
+    }
+  },
+  "product_robux_42": {
+    "product": {
+      "assetId": 1235156869,
+      "productId": 11420327
+    }
+  },
+  "product_robux_43": {
+    "product": {
+      "assetId": 1235156868,
+      "productId": 11420326
+    }
+  },
+  "product_robux_44": {
+    "product": {
+      "assetId": 1235158071,
+      "productId": 11420507
+    }
+  },
+  "product_robux_45": {
+    "product": {
+      "assetId": 1235156864,
+      "productId": 11420324
+    }
+  },
+  "product_robux_46": {
+    "product": {
+      "assetId": 1235156863,
+      "productId": 11420323
+    }
+  },
+  "product_robux_47": {
+    "product": {
+      "assetId": 1235156861,
+      "productId": 11420322
+    }
+  },
+  "product_robux_48": {
+    "product": {
+      "assetId": 1235156860,
+      "productId": 11420321
+    }
+  },
+  "product_robux_49": {
+    "product": {
+      "assetId": 1235156857,
+      "productId": 11420320
+    }
+  },
+  "product_robux_5": {
+    "product": {
+      "assetId": 1235156854,
+      "productId": 11420319
+    }
+  },
+  "product_robux_50": {
+    "product": {
+      "assetId": 1235156853,
+      "productId": 11420318
+    }
+  },
+  "product_robux_51": {
+    "product": {
+      "assetId": 1235156851,
+      "productId": 11420317
+    }
+  },
+  "product_robux_52": {
+    "product": {
+      "assetId": 1235156850,
+      "productId": 11420316
+    }
+  },
+  "product_robux_53": {
+    "product": {
+      "assetId": 1235156849,
+      "productId": 11420315
+    }
+  },
+  "product_robux_54": {
+    "product": {
+      "assetId": 1235158068,
+      "productId": 11420506
+    }
+  },
+  "product_robux_55": {
+    "product": {
+      "assetId": 1235158066,
+      "productId": 11420505
+    }
+  },
+  "product_robux_56": {
+    "product": {
+      "assetId": 1235156845,
+      "productId": 11420312
+    }
+  },
+  "product_robux_57": {
+    "product": {
+      "assetId": 1235156843,
+      "productId": 11420310
+    }
+  },
+  "product_robux_58": {
+    "product": {
+      "assetId": 1235156841,
+      "productId": 11420309
+    }
+  },
+  "product_robux_59": {
+    "product": {
+      "assetId": 1235158096,
+      "productId": 11420508
+    }
+  },
+  "product_robux_6": {
+    "product": {
+      "assetId": 1235156837,
+      "productId": 11420306
+    }
+  },
+  "product_robux_60": {
+    "product": {
+      "assetId": 1235156836,
+      "productId": 11420305
+    }
+  },
+  "product_robux_61": {
+    "product": {
+      "assetId": 1235156834,
+      "productId": 11420304
+    }
+  },
+  "product_robux_62": {
+    "product": {
+      "assetId": 1235156833,
+      "productId": 11420303
+    }
+  },
+  "product_robux_63": {
+    "product": {
+      "assetId": 1235156714,
+      "productId": 11420288
+    }
+  },
+  "product_robux_64": {
+    "product": {
+      "assetId": 1235156831,
+      "productId": 11420301
+    }
+  },
+  "product_robux_65": {
+    "product": {
+      "assetId": 1235156828,
+      "productId": 11420300
+    }
+  },
+  "product_robux_66": {
+    "product": {
+      "assetId": 1235156827,
+      "productId": 11420299
+    }
+  },
+  "product_robux_67": {
+    "product": {
+      "assetId": 1235156826,
+      "productId": 11420298
+    }
+  },
+  "product_robux_68": {
+    "product": {
+      "assetId": 1235156712,
+      "productId": 11420287
+    }
+  },
+  "product_robux_69": {
+    "product": {
+      "assetId": 1235156710,
+      "productId": 11420286
+    }
+  },
+  "product_robux_7": {
+    "product": {
+      "assetId": 1235156825,
+      "productId": 11420297
+    }
+  },
+  "product_robux_70": {
+    "product": {
+      "assetId": 1235156708,
+      "productId": 11420285
+    }
+  },
+  "product_robux_71": {
+    "product": {
+      "assetId": 1235156705,
+      "productId": 11420284
+    }
+  },
+  "product_robux_72": {
+    "product": {
+      "assetId": 1235156702,
+      "productId": 11420283
+    }
+  },
+  "product_robux_73": {
+    "product": {
+      "assetId": 1235156698,
+      "productId": 11420282
+    }
+  },
+  "product_robux_74": {
+    "product": {
+      "assetId": 1235156695,
+      "productId": 11420281
+    }
+  },
+  "product_robux_75": {
+    "product": {
+      "assetId": 1235156691,
+      "productId": 11420279
+    }
+  },
+  "product_robux_76": {
+    "product": {
+      "assetId": 1235156689,
+      "productId": 11420278
+    }
+  },
+  "product_robux_77": {
+    "product": {
+      "assetId": 1235156687,
+      "productId": 11420277
+    }
+  },
+  "product_robux_78": {
+    "product": {
+      "assetId": 1235156686,
+      "productId": 11420276
+    }
+  },
+  "product_robux_79": {
+    "product": {
+      "assetId": 1235156683,
+      "productId": 11420275
+    }
+  },
+  "product_robux_8": {
+    "product": {
+      "assetId": 1235156681,
+      "productId": 11420274
+    }
+  },
+  "product_robux_80": {
+    "product": {
+      "assetId": 1235156679,
+      "productId": 11420273
+    }
+  },
+  "product_robux_81": {
+    "product": {
+      "assetId": 1235156678,
+      "productId": 11420272
+    }
+  },
+  "product_robux_82": {
+    "product": {
+      "assetId": 1235156677,
+      "productId": 11420271
+    }
+  },
+  "product_robux_83": {
+    "product": {
+      "assetId": 1235156676,
+      "productId": 11420270
+    }
+  },
+  "product_robux_84": {
+    "product": {
+      "assetId": 1235156674,
+      "productId": 11420269
+    }
+  },
+  "product_robux_85": {
+    "product": {
+      "assetId": 1235156672,
+      "productId": 11420268
+    }
+  },
+  "product_robux_86": {
+    "product": {
+      "assetId": 1235156671,
+      "productId": 11420267
+    }
+  },
+  "product_robux_87": {
+    "product": {
+      "assetId": 1235156668,
+      "productId": 11420266
+    }
+  },
+  "product_robux_88": {
+    "product": {
+      "assetId": 1235156667,
+      "productId": 11420265
+    }
+  },
+  "product_robux_89": {
+    "product": {
+      "assetId": 1235156665,
+      "productId": 11420264
+    }
+  },
+  "product_robux_9": {
+    "product": {
+      "assetId": 1235156663,
+      "productId": 11420262
+    }
+  },
+  "product_robux_90": {
+    "product": {
+      "assetId": 1235156661,
+      "productId": 11420260
+    }
+  },
+  "product_robux_91": {
+    "product": {
+      "assetId": 1235156659,
+      "productId": 11420259
+    }
+  },
+  "product_robux_92": {
+    "product": {
+      "assetId": 1235156658,
+      "productId": 11420258
+    }
+  },
+  "product_robux_93": {
+    "product": {
+      "assetId": 1235156656,
+      "productId": 11420257
+    }
+  },
+  "product_robux_94": {
+    "product": {
+      "assetId": 1235156654,
+      "productId": 11420256
+    }
+  },
+  "product_robux_95": {
+    "product": {
+      "assetId": 1235156652,
+      "productId": 11420255
+    }
+  },
+  "product_robux_96": {
+    "product": {
+      "assetId": 1235156651,
+      "productId": 11420254
+    }
+  },
+  "product_robux_97": {
+    "product": {
+      "assetId": 1235156649,
+      "productId": 11420253
+    }
+  },
+  "product_robux_98": {
+    "product": {
+      "assetId": 1235156648,
+      "productId": 11420252
+    }
+  },
+  "product_robux_99": {
+    "product": {
+      "assetId": 1235158120,
+      "productId": 11420510
+    }
+  }
+}

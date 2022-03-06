@@ -47,4 +47,28 @@ function RxStateStackUtils.topOfStack()
 	end
 end
 
+--[=[
+	Creates a state stack from the brio's value. The state stack holds the last
+	value seen that is valid.
+
+	@param observable Observable<Brio<T>>
+	@return StateStack<T>
+]=]
+function RxStateStackUtils.createStateStack(observable)
+	local stateStack = StateStack.new(nil)
+
+	stateStack._maid:GiveTask(observable:Subscribe(function(value)
+		assert(Brio.isBrio(value), "Observable must emit brio")
+
+		if value:IsDead() then
+			return
+		end
+
+		local maid = value:ToMaid()
+		maid:GiveTask(stateStack:PushState(value:GetValue()))
+	end))
+
+	return stateStack
+end
+
 return RxStateStackUtils

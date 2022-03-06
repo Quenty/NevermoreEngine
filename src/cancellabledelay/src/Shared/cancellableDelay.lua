@@ -1,5 +1,5 @@
 --[=[
-	cancellableDelay a delay that can be cancelled
+	A version of task.delay that can be cancelled. Soon to be useless.
 	@class cancellableDelay
 ]=]
 
@@ -15,18 +15,22 @@ local function cancellableDelay(timeoutInSeconds, func, ...)
 	assert(type(timeoutInSeconds) == "number", "Bad timeoutInSeconds")
 	assert(type(func) == "function", "Bad func")
 
-	local n = select("#", ...)
-	local args = {...}
+	local args = table.pack(...)
 
-	local cancelled = false
-	task.delay(timeoutInSeconds, function()
-		if not cancelled then
-			func(unpack(args, 1, n))
-		end
+	local running
+	task.spawn(function()
+		running = coroutine.running()
+		task.wait(timeoutInSeconds)
+		func(table.unpack(args, 1, args.n))
 	end)
 
 	return function()
-		cancelled = true
+		if running then
+			-- selene: allow(incorrect_standard_library_use)
+			coroutine.close(running)
+			running = nil
+			args = nil
+		end
 	end
 end
 
