@@ -74,7 +74,7 @@ end
 
 --[=[
 	Applies a speed additive to the player's speed
-	@param multiplier number
+	@param amount number
 	@return function -- Cleanup function
 ]=]
 function HumanoidSpeed:ApplySpeedAdditive(amount)
