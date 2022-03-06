@@ -4,33 +4,32 @@
 	Usage with Blend!
 
 	```lua
-function Button.new()
-	local self = setmetatable(BaseObject.new(), Button)
+	function Button.new()
+		local self = setmetatable(BaseObject.new(), Button)
 
-	-- Store the button model in the actual button so we can ensure it cleans up
-	-- this assumes only one render. We can also construct it in the Button.Render
+		-- Store the button model in the actual button so we can ensure it cleans up
+		-- this assumes only one render. We can also construct it in the Button.Render
 
-	self._buttonModel = ButtonHighlightModel.new()
-	self._maid:GiveTask(self._buttonModel)
+		self._buttonModel = ButtonHighlightModel.new()
+		self._maid:GiveTask(self._buttonModel)
 
-	return self
-end
-...
+		return self
+	end
 
-function Button:Render()
-	...
-	return Blend.New "ImageButton" {
+	function Button:Render()
 		...
-		[Blend.Instance] = function(button)
-			self._buttonModel:SetButton(button)
-		end;
-		BackgroundTransparency = Blend.Computed(self._buttonModel:ObservePercentPressed(), function(pressed)
-			return 1 - pressed
-		end);
-	}
-end
-
+		return Blend.New "ImageButton" {
+			...
+			[Blend.Instance] = function(button)
+				self._buttonModel:SetButton(button)
+			end;
+			BackgroundTransparency = Blend.Computed(self._buttonModel:ObservePercentPressed(), function(pressed)
+				return 1 - pressed
+			end);
+		}
+	end
 	```
+
 	@class ButtonHighlightModel
 ]=]
 

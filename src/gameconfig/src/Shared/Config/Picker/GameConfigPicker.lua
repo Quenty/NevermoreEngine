@@ -71,7 +71,7 @@ end
 	@param assetKey
 	@return Observable<Brio<GameConfigAssetBase>>
 ]=]
-function GameConfigPicker:ObserveActiveAssetOfAssetTypeAndKeyBrio(assetType: string, assetKey)
+function GameConfigPicker:ObserveActiveAssetOfAssetTypeAndKeyBrio(assetType: string, assetKey: string)
 	assert(type(assetKey) == "string", "Bad assetKey")
 
 	return self:ObserveActiveConfigsBrio(game.GameId)
@@ -198,7 +198,7 @@ end
 	@param assetType
 	@return { GameConfigAssetBase }
 ]=]
-function GameConfigPicker:GetAllActiveAssetsOfType(assetType)
+function GameConfigPicker:GetAllActiveAssetsOfType(assetType: string)
 	local assetList = {}
 	for _, gameConfig in pairs(self:GetActiveConfigs()) do
 		for _, gameConfigAsset in pairs(gameConfig:GetAssetsOfType(assetType)) do
@@ -208,13 +208,13 @@ function GameConfigPicker:GetAllActiveAssetsOfType(assetType)
 	return assetList
 end
 
-function GameConfigPicker:_observeConfigsForGameIdBrio(gameId)
+function GameConfigPicker:_observeConfigsForGameIdBrio(gameId: number)
 	assert(type(gameId) == "number", "Bad gameId")
 
 	return self._gameIdToConfigSet:ObserveItemsForKeyBrio(gameId)
 end
 
-function GameConfigPicker:_getConfigsForGameId(gameId)
+function GameConfigPicker:_getConfigsForGameId(gameId: number)
 	assert(type(gameId) == "number", "Bad gameId")
 
 	return self._gameIdToConfigSet:GetListForKey(gameId)

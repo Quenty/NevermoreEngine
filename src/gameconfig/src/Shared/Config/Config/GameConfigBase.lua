@@ -23,10 +23,10 @@ GameConfigBase.__index = GameConfigBase
 
 --[=[
 	Constructs a new game config.
-	@param experienceId number
+	@param folder
 	@return GameConfigBase
 ]=]
-function GameConfigBase.new(folder)
+function GameConfigBase.new(folder: Instance)
 	local self = setmetatable(BaseObject.new(folder), GameConfigBase)
 
 	AttributeUtils.initAttribute(self._obj, GameConfigConstants.GAME_ID_ATTRIBUTE, game.GameId)
@@ -69,62 +69,112 @@ function GameConfigBase.new(folder)
 	return self
 end
 
+--[=[
+	Gets the current folder
+	@return Instance
+]=]
 function GameConfigBase:GetFolder()
 	return self._obj
 end
 
-function GameConfigBase:GetAssetsOfType(assetType)
+--[=[
+	Returns an array of all the assets of that type underneath this config
+	@return { GameConfigAssetBase }
+]=]
+function GameConfigBase:GetAssetsOfType(assetType: string)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self._assetTypeToAssetConfig:GetListForKey(assetType)
 end
 
-function GameConfigBase:GetAssetsOfTypeAndKey(assetType, assetKey)
+--[=[
+	Returns an array of all the assets of that type underneath this config
+	@param assetType
+	@param assetKey
+	@return { GameConfigAssetBase }
+]=]
+function GameConfigBase:GetAssetsOfTypeAndKey(assetType: string, assetKey: string)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
 	return self._assetTypeToAssetKeyMappings[assetType]:GetListForKey(assetKey)
 end
 
-function GameConfigBase:GetAssetsOfTypeAndId(assetType, assetId)
+--[=[
+	Returns an array of all the assets of that type underneath this config
+	@param assetType
+	@param assetId
+	@return { GameConfigAssetBase }
+]=]
+function GameConfigBase:GetAssetsOfTypeAndId(assetType: string, assetId: number)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
 	return self._assetTypeToAssetIdMappings[assetType]:GetListForKey(assetId)
 end
 
-function GameConfigBase:ObserveAssetByTypeAndKeyBrio(assetType, assetKey)
+--[=[
+	Returns an observable matching these types and the key
+	@param assetType
+	@param assetKey
+	@return Observable<Brio<GameConfigAssetBase>>
+]=]
+function GameConfigBase:ObserveAssetByTypeAndKeyBrio(assetType: string, assetKey: string)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
 	return self._assetTypeToAssetKeyMappings[assetType]:ObserveItemsForKeyBrio(assetKey)
 end
 
-function GameConfigBase:ObserveAssetByTypeAndIdBrio(assetType, assetId)
+--[=[
+	Returns an observable matching these types and the id
+	@param assetType
+	@param assetId
+	@return Observable<Brio<GameConfigAssetBase>>
+]=]
+function GameConfigBase:ObserveAssetByTypeAndIdBrio(assetType: string, assetId: number)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
 	return self._assetTypeToAssetIdMappings[assetType]:ObserveItemsForKeyBrio(assetId)
 end
 
-function GameConfigBase:ObserveAssetByIdBrio(assetId)
+--[=[
+	Observes all matching assets of this id
+	@param assetId
+	@return Observable<Brio<GameConfigAssetBase>>
+]=]
+function GameConfigBase:ObserveAssetByIdBrio(assetId: number)
 	assert(type(assetId) == "number", "Bad assetId")
 
 	return self._assetIdToAssetConfig:ObserveItemsForKeyBrio(assetId)
 end
 
-function GameConfigBase:ObserveAssetByKeyBrio(assetKey)
+--[=[
+	Observes all matching assets of this key
+	@param assetKey
+	@return Observable<Brio<GameConfigAssetBase>>
+]=]
+function GameConfigBase:ObserveAssetByKeyBrio(assetKey: string)
 	assert(type(assetKey) == "string", "Bad assetKey")
 
 	return self._assetKeyToAssetConfig:ObserveItemsForKeyBrio(assetKey)
 end
 
-function GameConfigBase:ObserveAssetByTypeBrio(assetType)
+--[=[
+	Observes all matching assets of this type
+	@param assetType
+	@return Observable<Brio<GameConfigAssetBase>>
+]=]
+function GameConfigBase:ObserveAssetByTypeBrio(assetType: string)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self._assetTypeToAssetConfig:ObserveItemsForKeyBrio(assetType)
 end
 
+--[=[
+	Initializes the observation. Should be called by the class inheriting this object.
+]=]
 function GameConfigBase:InitObservation()
 	if self._setupObservation then
 		return
@@ -176,10 +226,18 @@ function GameConfigBase:GetGameId()
 	return AttributeUtils.getAttribute(self._obj, GameConfigConstants.GAME_ID_ATTRIBUTE, game.GameId)
 end
 
+--[=[
+	Returns this configuration's name
+	@return string
+]=]
 function GameConfigBase:GetConfigName()
 	return self._obj.Name
 end
 
+--[=[
+	Observes this configs name
+	@return Observable<string>
+]=]
 function GameConfigBase:ObserveConfigName()
 	return RxInstanceUtils.observeProperty(self._obj, "Name")
 end
