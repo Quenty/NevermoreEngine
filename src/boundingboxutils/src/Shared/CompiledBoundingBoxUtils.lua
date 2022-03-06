@@ -17,7 +17,7 @@ local CompiledBoundingBoxUtils = {}
 ]=]
 function CompiledBoundingBoxUtils.compileBBox(cframe, size)
 	return CFrame.fromMatrix(
-		cframe.p,
+		cframe.Position,
 		cframe.XVector/size.x,
 		cframe.YVector/size.y,
 		cframe.ZVector/size.z

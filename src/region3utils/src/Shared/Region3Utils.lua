@@ -15,7 +15,7 @@ function Region3Utils.fromPositionSize(position, size)
 end
 
 function Region3Utils.fromBox(cframe, size)
-	return Region3Utils.fromPositionSize(cframe.p, BoundingBoxUtils.axisAlignedBoxSize(cframe, size))
+	return Region3Utils.fromPositionSize(cframe.Position, BoundingBoxUtils.axisAlignedBoxSize(cframe, size))
 end
 
 function Region3Utils.fromRadius(position, radius)

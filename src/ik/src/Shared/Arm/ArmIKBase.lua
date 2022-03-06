@@ -186,10 +186,10 @@ function ArmIKBase:_calculatePoint(targetPositionWorld)
 	local elbowCFrame = elbow.Part0.CFrame * elbow.C0
 	local wristCFrame = elbow.Part1.CFrame * wrist.C0
 
-	local r0 = (base.p - elbowCFrame.p).Magnitude
-	local r1 = (elbowCFrame.p - wristCFrame.p).Magnitude
+	local r0 = (base.Position - elbowCFrame.Position).Magnitude
+	local r1 = (elbowCFrame.Position - wristCFrame.Position).Magnitude
 
-	r1 = r1 + (gripAttachment.WorldPosition - wristCFrame.p).Magnitude
+	r1 = r1 + (gripAttachment.WorldPosition - wristCFrame.Position).Magnitude
 
 	local offset = base:pointToObjectSpace(targetPositionWorld)
 	local d = offset.Magnitude

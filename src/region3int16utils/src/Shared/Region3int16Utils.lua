@@ -17,7 +17,7 @@ function Region3int16Utils.createRegion3int16FromPositionSize(position, size)
 end
 
 function Region3int16Utils.fromRegion3(region3)
-	return Region3int16Utils.createRegion3int16FromPositionSize(region3.CFrame.p, region3.Size)
+	return Region3int16Utils.createRegion3int16FromPositionSize(region3.CFrame.Position, region3.Size)
 end
 
 return Region3int16Utils

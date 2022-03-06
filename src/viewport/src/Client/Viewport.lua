@@ -185,7 +185,7 @@ function Viewport:Render(props)
 						end
 
 						local fit = CameraUtils.fitBoundingBoxToCamera(bbSize, fov, aspectRatio)
-						return CFrame.new(bbCFrame.p) * CFrame.Angles(0, rotationYaw, 0) * CFrame.Angles(rotationPitch, 0, 0) * CFrame.new(0, 0, fit)
+						return CFrame.new(bbCFrame.Position) * CFrame.Angles(0, rotationYaw, 0) * CFrame.Angles(rotationPitch, 0, 0) * CFrame.new(0, 0, fit)
 					end);
 			}
 		}

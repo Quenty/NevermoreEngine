@@ -109,7 +109,7 @@ function IKRigAimerLocalPlayer:GetAimDirection()
 
 	local direction = cameraCFrame.lookVector * multiplier
 
-	return cameraCFrame.p + direction
+	return cameraCFrame.Position + direction
 end
 
 --[=[

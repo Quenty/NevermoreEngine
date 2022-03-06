@@ -17,14 +17,14 @@ function TerrainUtils.getTerrainRegion3(position, size, resolution)
 end
 
 function TerrainUtils.getTerrainRegion3int16FromRegion3(region3, resolution)
-	local position = region3.CFrame.p/resolution
+	local position = region3.CFrame.Position/resolution
 	local size = region3.Size/resolution
 
 	return Region3int16Utils.createRegion3int16FromPositionSize(position, size)
 end
 
 function TerrainUtils.getCorner(region3)
-	local position = region3.CFrame.p
+	local position = region3.CFrame.Position
 	local halfSize = region3.Size/2
 
 	return position - halfSize

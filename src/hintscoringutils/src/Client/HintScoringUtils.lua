@@ -47,7 +47,7 @@ function HintScoringUtils.getHumanoidPositionDirection(humanoid)
 	end
 
 	local rootCFrame = rootPart.CFrame
-	return rootCFrame.p, rootCFrame.lookVector
+	return rootCFrame.Position, rootCFrame.lookVector
 end
 
 --[=[
