@@ -1,23 +1,15 @@
-# v3.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Using .Position ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@2.0.1...@quenty/boundingboxutils@3.0.0) (2022-03-06)
+
+**Note:** Version bump only for package @quenty/boundingboxutils
+
+
+
+
 
 ## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@2.0.0...@quenty/boundingboxutils@2.0.1) (2021-12-30)
 

@@ -1,23 +1,18 @@
-# v5.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: AttributeValue does not error when _defaultValue is nil ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.3.0...@quenty/attributeutils@5.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* AttributeValue does not error when _defaultValue is nil ([a55308b](https://github.com/Quenty/NevermoreEngine/commit/a55308b8a4b4eb7fc72efdc5a73e4a1790befd98))
+
+
+
+
 
 # [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.2.1...@quenty/attributeutils@4.3.0) (2022-01-17)
 

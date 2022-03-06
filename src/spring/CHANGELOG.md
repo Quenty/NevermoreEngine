@@ -1,23 +1,18 @@
-# v4.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Allow tweening of UDim2, previously this code errored ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@3.3.0...@quenty/spring@4.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Allow tweening of UDim2, previously this code errored ([3754694](https://github.com/Quenty/NevermoreEngine/commit/375469496d1b32fc27f947b43a9393edc52d72ad))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@3.2.0...@quenty/spring@3.3.0) (2022-01-17)
 

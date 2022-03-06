@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.0.0 (2022-03-06)
+
+
+### Features
+
+* Add GameProductService which will allow for generalized purchase handling across many systems ([439cd3b](https://github.com/Quenty/NevermoreEngine/commit/439cd3b1d33bb2dfcba8a9d2dfee8e9d53efee0b))
+
+
+
+
+
 # v2.0.0 (Sun Mar 06 2022)
 
 #### 🚀 Enhancement

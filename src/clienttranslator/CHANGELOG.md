@@ -1,20 +1,18 @@
-# v5.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-- feat: Rewrite gameconfig package to live-update and use binders ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.7.0...@quenty/clienttranslator@5.0.0) (2022-03-06)
+
+
+### Features
+
+* Rewrite gameconfig package to live-update and use binders ([430979d](https://github.com/Quenty/NevermoreEngine/commit/430979d74bffe712bd03c838be2caf4ac9395e79))
+
+
+
+
 
 # [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.6.1...@quenty/clienttranslator@4.7.0) (2022-01-17)
 

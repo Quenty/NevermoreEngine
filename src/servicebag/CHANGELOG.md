@@ -1,23 +1,18 @@
-# v4.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: ServiceBag:HasService allows for serviceType definitions that are instances ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.5.0...@quenty/servicebag@4.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* ServiceBag:HasService allows for serviceType definitions that are instances ([cf772a9](https://github.com/Quenty/NevermoreEngine/commit/cf772a9dfc17178dc90fb26c9e5a091f84d00a90))
+
+
+
+
 
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.4.0...@quenty/servicebag@3.5.0) (2022-01-17)
 

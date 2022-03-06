@@ -1,3 +1,21 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.0.0 (2022-03-06)
+
+
+### Features
+
+* Add baseline gameconfig package ([777ae75](https://github.com/Quenty/NevermoreEngine/commit/777ae75ed6cc0156b8f418508847b1fc28b398cd))
+* GameConfig is standardized and is fully usable ([89bd9fd](https://github.com/Quenty/NevermoreEngine/commit/89bd9fda11cfc0f9e85c3e65c10bf320ed6aeb48))
+* Rewrite gameconfig package to live-update and use binders ([430979d](https://github.com/Quenty/NevermoreEngine/commit/430979d74bffe712bd03c838be2caf4ac9395e79))
+
+
+
+
+
 # v2.0.0 (Sun Mar 06 2022)
 
 #### 🚀 Enhancement

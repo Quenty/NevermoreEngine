@@ -1,23 +1,18 @@
-# v4.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Return the promise transparently is we only have one promise ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@3.6.0...@quenty/promise@4.0.0) (2022-03-06)
+
+
+### Performance Improvements
+
+* Return the promise transparently is we only have one promise ([f717878](https://github.com/Quenty/NevermoreEngine/commit/f7178782904ed8fc425365bb0c41f3ffd63ab013))
+
+
+
+
 
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@3.5.1...@quenty/promise@3.6.0) (2022-01-17)
 

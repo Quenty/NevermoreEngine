@@ -1,32 +1,18 @@
-# v5.0.0 (Sun Mar 06 2022)
-
-#### 💥 Breaking Change
-
-- feat: Make breaking changes to idle service and statestack. [#248](https://github.com/Quenty/NevermoreEngine/pull/248) ([@Quenty](https://github.com/Quenty))
-- feat!: BREAKING CHANGE: StateStack no longer allows nil PushState(), must push the value ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: StateStack depends on Rx ([@Quenty](https://github.com/Quenty))
-- fix: Fix circular dependency, move createStateStack from Brio ([@Quenty](https://github.com/Quenty))
-- Bump independent versions \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- docs: Fix docs for moonwave ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@4.0.0...@quenty/statestack@5.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Fix circular dependency, move createStateStack from Brio ([9568dd7](https://github.com/Quenty/NevermoreEngine/commit/9568dd78272e487e17e9fb08034a58275838add9))
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@3.5.0...@quenty/statestack@4.0.0) (2022-01-17)
 

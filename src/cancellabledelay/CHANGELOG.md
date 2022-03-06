@@ -1,24 +1,18 @@
-# v3.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix linter ([@Quenty](https://github.com/Quenty))
-- perf: cancellableDelay is actually cancelled and does not leak memory ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cancellabledelay@2.2.0...@quenty/cancellabledelay@3.0.0) (2022-03-06)
+
+
+### Performance Improvements
+
+* cancellableDelay is actually cancelled and does not leak memory ([1cf3149](https://github.com/Quenty/NevermoreEngine/commit/1cf3149bdd29c412cc3378adacff285087aafd58))
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cancellabledelay@2.1.1...@quenty/cancellabledelay@2.2.0) (2022-01-03)
 

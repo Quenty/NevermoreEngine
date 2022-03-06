@@ -1,24 +1,18 @@
-# v4.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Make Roblox linter happy by tabbing in entries ([@Quenty](https://github.com/Quenty))
-- fix: Duplicate module info actually errors properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.4.0...@quenty/loader@4.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Duplicate module info actually errors properly ([d3d451f](https://github.com/Quenty/NevermoreEngine/commit/d3d451f24ecc3f6debeb802bd4de6b7276369403))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.3.0...@quenty/loader@3.4.0) (2022-01-17)
 

@@ -1,20 +1,18 @@
-# v4.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-- feat: Can add removing promises to datastore before save ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.6.0...@quenty/datastore@4.0.0) (2022-03-06)
+
+
+### Features
+
+* Can add removing promises to datastore before save ([653bef8](https://github.com/Quenty/NevermoreEngine/commit/653bef8717e4470cf94340e67ff69eab1b7269f6))
+
+
+
+
 
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.5.1...@quenty/datastore@3.6.0) (2022-01-17)
 

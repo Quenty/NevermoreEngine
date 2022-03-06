@@ -1,20 +1,18 @@
-# v5.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-- feat: Use task.delay() in promiseBoundClass ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.8.0...@quenty/binder@5.0.0) (2022-03-06)
+
+
+### Features
+
+* Use task.delay() in promiseBoundClass ([c30ce41](https://github.com/Quenty/NevermoreEngine/commit/c30ce41d49d149d70bf8e99723defd2ce379315a))
+
+
+
+
 
 # [4.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@4.7.1...@quenty/binder@4.8.0) (2022-01-17)
 

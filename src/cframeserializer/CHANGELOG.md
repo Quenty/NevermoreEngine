@@ -1,23 +1,18 @@
-# v3.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix CFrameSerialize.readPosition(), which would previously deserialize values inproperly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@2.0.1...@quenty/cframeserializer@3.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Fix CFrameSerialize.readPosition(), which would previously deserialize values inproperly ([2208f20](https://github.com/Quenty/NevermoreEngine/commit/2208f20f99e49a64efe621c28af8140db1af3ce5))
+
+
+
+
 
 ## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@2.0.0...@quenty/cframeserializer@2.0.1) (2021-12-30)
 

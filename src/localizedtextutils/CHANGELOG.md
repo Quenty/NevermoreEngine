@@ -1,20 +1,18 @@
-# v3.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-- feat: Add LocalizedTextUtils.observeFormatByKeyRecursive and ensure that observation can occur of observable translatable objects ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@2.3.0...@quenty/localizedtextutils@3.0.0) (2022-03-06)
+
+
+### Features
+
+* Add LocalizedTextUtils.observeFormatByKeyRecursive and ensure that observation can occur of observable translatable objects ([feca173](https://github.com/Quenty/NevermoreEngine/commit/feca17331b27013552c095f830387c789a954f89))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@2.2.1...@quenty/localizedtextutils@2.3.0) (2022-01-17)
 

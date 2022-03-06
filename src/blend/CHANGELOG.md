@@ -1,24 +1,23 @@
-# v3.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-- feat: Add SpringObject:IsAnimating() ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Instances from Blend.New are linked to lifetime of subscription without exception ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.3.0...@quenty/blend@3.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Instances from Blend.New are linked to lifetime of subscription without exception ([af282d2](https://github.com/Quenty/NevermoreEngine/commit/af282d264a0f06c2a94a5fd9c04ddbcb6cfbb7f1))
+
+
+### Features
+
+* Add SpringObject:IsAnimating() ([9e16f33](https://github.com/Quenty/NevermoreEngine/commit/9e16f33ebc6247f6cf65417b316485a181ce9900))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.2.1...@quenty/blend@2.3.0) (2022-01-17)
 

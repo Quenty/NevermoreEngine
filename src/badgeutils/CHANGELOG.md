@@ -1,20 +1,18 @@
-# v4.0.0 (Sun Mar 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
-- feat: Move BadgeUtils to shared, add API to get badge info ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@3.6.0...@quenty/badgeutils@4.0.0) (2022-03-06)
+
+
+### Features
+
+* Move BadgeUtils to shared, add API to get badge info ([f9fc12d](https://github.com/Quenty/NevermoreEngine/commit/f9fc12d9d465dbbb9345d216789a8faf98430172))
+
+
+
+
 
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@3.5.1...@quenty/badgeutils@3.6.0) (2022-01-17)
 
