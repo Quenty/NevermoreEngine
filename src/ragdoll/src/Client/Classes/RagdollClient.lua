@@ -53,7 +53,7 @@ function RagdollClient:_setupCameraShake(impulseCamera)
 	end
 
 	local lastVelocity = head.Velocity
-	self._maid:GiveTask(RunService.RenderStepped:Connect(function()
+	self._maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local cameraCFrame = Workspace.CurrentCamera.CFrame
 
 		local velocity = head.Velocity
@@ -79,7 +79,7 @@ function RagdollClient:_setupHapticFeedback()
 		alive = false
 	end)
 
-	spawn(function()
+	task.spawn(function()
 		for i=1, 0, -0.1 do
 			HapticFeedbackUtils.setSmallVibration(lastInputType, i)
 			task.wait(0.05)
