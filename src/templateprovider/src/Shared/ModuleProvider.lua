@@ -75,6 +75,13 @@ function ModuleProvider:_addToRegistery(moduleScript)
 			:format(moduleScript.Name))
 	end
 
+	if not moduleScript.Parent:FindFirstChild("loader") then
+		local fakeLoader = script.Parent.ModuleProviderFakeLoader:Clone()
+		fakeLoader.Name = "loader"
+		fakeLoader.Archivable = false
+		fakeLoader.Parent = moduleScript.Parent
+	end
+
 	local _module
 	xpcall(function()
 		_module = require(moduleScript)
