@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="generator" content="Docusaurus v2.0.0-beta.9">
+<title data-react-helmet="true">EloUtils | Nevermore</title><meta data-react-helmet="true" property="og:title" content="EloUtils | Nevermore"><meta data-react-helmet="true" name="twitter:card" content="summary_large_image"><meta data-react-helmet="true" name="description" content="Utilities to compute elo scores for players
+
+```lua
+local config = EloUtils.createConfig()
+
+local playerRating = 1400
+local opponentRating = 1800
+
+-- Update rating!
+playerRating, opponentRating = EloUtils.getNewScores(
+	config,
+	playerRating,
+	opponentRating,
+	{
+		EloUtils.Scores.WIN;
+	})
+
+-- New rankings!
+print(playerRating, opponentRating)
+```"><meta data-react-helmet="true" property="og:description" content="Utilities to compute elo scores for players
+
+```lua
+local config = EloUtils.createConfig()
+
+local playerRating = 1400
+local opponentRating = 1800
+
+-- Update rating!
+playerRating, opponentRating = EloUtils.getNewScores(
+	config,
+	playerRating,
+	opponentRating,
+	{
+		EloUtils.Scores.WIN;
+	})
+
+-- New rankings!
+print(playerRating, opponentRating)
+```"><meta data-react-helmet="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/EloUtils"><meta data-react-helmet="true" name="docusaurus_locale" content="en"><meta data-react-helmet="true" name="docusaurus_tag" content="default"><link data-react-helmet="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/EloUtils"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/EloUtils" hreflang="en"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/EloUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.fb20d3d5.css">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.9ae58ccd.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.90ff1764.js" as="script">
+</head>
+<body>
+<script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
+<div><a href="#" class="skipToContent_1oUP">Skip to main content</a></div><nav class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Navigation bar toggle" class="navbar__toggle clean-btn" type="button" tabindex="0"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/NevermoreEngine/"><b class="navbar__title">Nevermore</b></a><a class="navbar__item navbar__link" href="/NevermoreEngine/docs/intro">Docs</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/NevermoreEngine/api/">API</a><a class="navbar__item navbar__link" href="/NevermoreEngine/changelog">Changelog</a></div><div class="navbar__items navbar__items--right"><a href="https://discord.gg/mhtGUS8" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link"><span>Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a><a href="https://github.com/Quenty/NevermoreEngine" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link"><span>GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a><div class="toggle_71bT toggle_3Zt9 toggleDisabled_3cF-"><div class="toggleTrack_32Fl" role="button" tabindex="-1"><div class="toggleTrackCheck_3lV7"><span class="toggleIcon_O4iE">🌜</span></div><div class="toggleTrackX_S2yS"><span class="toggleIcon_O4iE">🌞</span></div><div class="toggleTrackThumb_xI_Z"></div></div><input type="checkbox" class="toggleScreenReader_28Tw" aria-label="Switch between dark and light mode"></div><div class="navbar__search"><span aria-label="expand searchbar" role="button" class="search-icon" tabindex="0"></span><input type="search" id="search_input_react" placeholder="Press S to Search..." aria-label="Search" class="navbar__search-input search-bar"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div class="main-wrapper docPageContainer_2Kz0"><div class="docPage_1bdk"><div class="docSidebarContainer_1ykS"><div class="sidebar_15mo"><nav class="menu thin-scrollbar menu_Bmed"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Acceltween</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Actionmanager</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Adorneeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sprites</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationgroup</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationtrackutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Applytagtotaggedchildren</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ik</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rigbuilderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Attributeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Axisangleutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Badgeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Baseobject</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Permissionprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Basicpane</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Bezierutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Binarysearch</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ragdoll</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Binder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Parttouchingcalculator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Blend</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Loader</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Boundlinkutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Boundingboxutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Brio</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Buttonhighlightmodel</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Buttonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cframeserializer</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cframeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Camera</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Camerastoryutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Canceltoken</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Characterutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Geometryutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Clipcharacters</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cmdrservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Collectionserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Color3serializationutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Color3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Colorsequenceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Contentproviderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cooldown</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Coreguienabler</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Coreguiutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cubicspline</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Datastore</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Debounce</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Depthoffield</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Snackbar</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Draw</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><a class="menu__link menu__link--sublist menu__link--active" href="#">Elo</a><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/NevermoreEngine/api/EloUtils">​Elo​Utils</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Enabledmixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Equippedtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Experiencecalculator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Fakeskybox</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Firstpersoncharactertransparency</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Friendutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Functionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gameconfig</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gameproductservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gamescalingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gameversionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Generatewithmixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Genericscreenguiprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getpercentexposedutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Remoting</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Grouputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Guitriangle</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Guivisiblemanager</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hapticfeedbackutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hide</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hintscoringutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Httppromise</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidanimatorutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoiddescriptionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidkillerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidmovedirectionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidspeed</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidteleportutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputmode</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Idleservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputkeymaputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Scoredactionservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputobjectutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Insertserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Isamixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Clienttranslator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Jsonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Jumpbuttonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Linearsystemssolver</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Spring</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Linkutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Lipsum</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Localizedtextutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Maid</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Markdownrender</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Marketplaceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Timesyncservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Math</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Meshutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Metricutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Trajectory</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Modelappearance</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Modeltransparencyeffect</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Templateprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Mouseovermixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Mouseshiftlockservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Multipleclickutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkownerservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkownerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkropeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Nocollisionconstraintutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numberrangeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numbersequenceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numbertoinputkeyutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rx</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Observablecollection</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Octree</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Overriddenproperty</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Particleengine</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Characterparticleplayer</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pathfindingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Promise</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Physicsutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pillbacking</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerbinder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Uiobjectutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerhumanoidbinder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerthumbnailutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playersservicepromises</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Polynomialutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Preferredparentutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Probability</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pseudolocalize</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Qframe</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Quaternion</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">R15utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Racketingropeconstraint</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Randomutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Vector3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Raycaster</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Region3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Region3int16utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Remotefunctionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Resetservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Roblox Api-dump</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rodux Actions</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rotatinglabel</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Roundedbackingbuilder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rxbinderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Instanceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Statestack</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Valuebaseutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Scrollingframe</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Selectionimageutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Servicebag</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Table</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Signal</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Socialserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sounds</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Spawning</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Steputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Streamingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">String</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sunpositionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Symbol</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Teamtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Teamutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Terrainutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textfilterservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textfilterutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Throttle</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Time</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Touchingpartutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Transparencyservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Utf8</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ultrawidecontainerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rodux Undo</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Valueobject</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Vector3int16utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Viewport</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Weldconstraintutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getgroundplane</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cancellabledelay</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Deferred</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getmechanismparts</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Optional</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Qgui</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Safedestroy</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Setmechanismcframe</a></li></ul></nav><button type="button" title="Collapse sidebar" aria-label="Collapse sidebar" class="button button--secondary button--outline collapseSidebarButton_1CGd"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_3E-R"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></div><main class="docMainContainer_28N5"><div class="container padding-vert--lg"><div class="row"><div class="col docItemCol_3WPG"><div class="docItemContainer_3XDu"><article><div class="member_qHIL markdown"><div class="tocCollapsible_1PrD theme-doc-toc-mobile tocMobile_3ryM"><button type="button" class="clean-btn tocCollapsibleButton_2O1e">On this page</button></div><header><h1 class="docTitle_1ddc" style="text-decoration:none"><span style="display:inline-block">Elo</span><span style="display:inline-block">Utils</span></h1><div class="luaClassTags_2Zrs"></div><div>
+<p>Utilities to compute elo scores for players</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> config <span class="token operator">=</span> EloUtils<span class="token punctuation">.</span><span class="token function">createConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">local</span> playerRating <span class="token operator">=</span> <span class="token number">1400</span>
+<span class="token keyword">local</span> opponentRating <span class="token operator">=</span> <span class="token number">1800</span>
+
+<span class="token comment">-- Update rating!</span>
+playerRating<span class="token punctuation">,</span> opponentRating <span class="token operator">=</span> EloUtils<span class="token punctuation">.</span><span class="token function">getNewScores</span><span class="token punctuation">(</span>
+	config<span class="token punctuation">,</span>
+	playerRating<span class="token punctuation">,</span>
+	opponentRating<span class="token punctuation">,</span>
+	<span class="token punctuation">{</span>
+		EloUtils<span class="token punctuation">.</span>Scores<span class="token punctuation">.</span>WIN<span class="token punctuation">;</span>
+	<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token comment">-- New rankings!</span>
+<span class="token function">print</span><span class="token punctuation">(</span>playerRating<span class="token punctuation">,</span> opponentRating<span class="token punctuation">)</span>
+</code></pre>
+</div></header><h2 class="anchor anchorWithStickyNavbar_31ik" id="types">Types<a aria-hidden="true" class="hash-link" href="#types" title="Direct link to heading">​</a></h2><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="EloConfig"><code style="text-decoration:none">EloConfig</code><a aria-hidden="true" class="hash-link" href="#EloConfig" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L45"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code class="purple__nFc">interface</code> <code>EloConfig<!-- --> <!-- -->{</code><div class="inset_2cJr"><div><code>factor<!-- -->: </code><code class="blue_2Afy">number</code></div><div><code>kfactor<!-- -->: </code><code class="blue_2Afy">number</code><code class="op_1JtD"> | </code><code class="blue_2Afy">function</code></div><div><code>initial<!-- -->: </code><code class="blue_2Afy">number</code></div><div><code>ratingFloor<!-- -->: </code><code class="blue_2Afy">number</code></div></div><code>}</code></div><div></div><h2 class="anchor anchorWithStickyNavbar_31ik" id="functions">Functions<a aria-hidden="true" class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="createConfig"><code style="text-decoration:none">createConfig</code><a aria-hidden="true" class="hash-link" href="#createConfig" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L51"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">createConfig</code><code>(</code><div class="inset_2cJr"><div><code>config<!-- -->: </code><code class="blue_2Afy">table?</code><span class="inlineDescription_17uy">-- <span>
+<p>Optional table with defaults</p>
+</span></span></div></div><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code></div><div>
+<p>Creates a new elo config.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="isEloConfig"><code style="text-decoration:none">isEloConfig</code><a aria-hidden="true" class="hash-link" href="#isEloConfig" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L68"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">isEloConfig</code><code>(</code><code>config<!-- -->: </code><code class="blue_2Afy">any</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Returns whether an object is an elo config</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getNewScores"><code style="text-decoration:none">getNewScores</code><a aria-hidden="true" class="hash-link" href="#getNewScores" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L82"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">getNewScores</code><code>(</code><div class="inset_2cJr"><div><code>config<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerRating<!-- -->: </code><code class="blue_2Afy">number</code><code>,</code></div><div><code>opponentRating<!-- -->: </code><code class="blue_2Afy">number</code><code>,</code></div><div><code>matchScores<!-- -->: </code><code class="purple__nFc">{</code><code class="blue_2Afy">number</code><code class="purple__nFc">}</code><span class="inlineDescription_17uy">-- <span>
+<p>0 for loss, 1 for win, 0.5 for draw.</p>
+</span></span></div></div><code>) → </code><code>(</code><div class="inset_2cJr"><div><code class="blue_2Afy">number</code><code>,</code><span class="inlineDescription_17uy">-- <span>
+<p>playerRating</p>
+</span></span></div><div><code class="blue_2Afy">number</code><span class="inlineDescription_17uy">-- <span>
+<p>opponentRating</p>
+</span></span></div></div><code>)</code></div><div>
+<p>Gets the new score for the player and opponent after a series of matches.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getNewScore"><code style="text-decoration:none">getNewScore</code><a aria-hidden="true" class="hash-link" href="#getNewScore" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L101"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">getNewScore</code><code>(</code><div class="inset_2cJr"><div><code>config<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerRating<!-- -->: </code><code class="blue_2Afy">number</code><code>,</code></div><div><code>opponentRating<!-- -->: </code><code class="blue_2Afy">number</code><code>,</code></div><div><code>matchScores<!-- -->: </code><code class="purple__nFc">{</code><code class="blue_2Afy">number</code><code class="purple__nFc">}</code><span class="inlineDescription_17uy">-- <span>
+<p>0 for loss, 1 for win, 0.5 for draw.</p>
+</span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Gets the new score for the player after a series of matches.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getExpected"><code style="text-decoration:none">getExpected</code><a aria-hidden="true" class="hash-link" href="#getExpected" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L122"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">getExpected</code><code>(</code><div class="inset_2cJr"><div><code>config<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerRating<!-- -->: </code><code class="blue_2Afy">number</code><code>,</code></div><div><code>opponentRating<!-- -->: </code><code class="blue_2Afy">number</code></div></div><code>) → </code><code class="blue_2Afy">number</code></div><div>
+<p>Compute expected score for a player vs. player given the rating.</p>
+<div class="admonition admonition-info alert alert--info">
+  <div class="admonition-heading">
+    <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16">
+          <path d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path>
+        </svg></span>info</h5>
+  </div>
+  <div class="admonition-content">
+    <p>A player's expected score is their probability of winning plus half their probability of drawing. Thus, an expected score of 0.75 could represent a 75% chance of winning, 25% chance of losing, and 0% chance of drawing</p>
+  </div>
+</div>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getScoreAdjustment"><code style="text-decoration:none">getScoreAdjustment</code><a aria-hidden="true" class="hash-link" href="#getScoreAdjustment" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L140"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">getScoreAdjustment</code><code>(</code><div class="inset_2cJr"><div><code>config<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerRating<!-- -->: </code><code class="blue_2Afy">number</code><code>,</code></div><div><code>opponentRating<!-- -->: </code><code class="blue_2Afy">number</code><code>,</code></div><div><code>matchScores<!-- -->: </code><code class="purple__nFc">{</code><code class="blue_2Afy">number</code><code class="purple__nFc">}</code><span class="inlineDescription_17uy">-- <span>
+<p>0 for loss, 1 for win, 0.5 for draw.</p>
+</span></span></div></div><code>) → </code><code class="blue_2Afy">number</code></div><div>
+<p>Gets the score adjustment for a given player's base.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="fromOpponentPerspective"><code style="text-decoration:none">fromOpponentPerspective</code><a aria-hidden="true" class="hash-link" href="#fromOpponentPerspective" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L163"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">fromOpponentPerspective</code><code>(</code><div class="inset_2cJr"><div><code>matchScores<!-- -->: </code><code class="purple__nFc">{</code><code class="blue_2Afy">number</code><code class="purple__nFc">}</code><span class="inlineDescription_17uy">-- <span>
+<p>0 for loss, 1 for win, 0.5 for draw.</p>
+</span></span></div></div><code>) → </code><code class="purple__nFc">{</code><code class="blue_2Afy">number</code><code class="purple__nFc">}</code></div><div>
+<p>Flips the scores for the opponent</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="standardKFactorFormula"><code style="text-decoration:none">standardKFactorFormula</code><a aria-hidden="true" class="hash-link" href="#standardKFactorFormula" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L181"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">standardKFactorFormula</code><code>(</code><code>rating<!-- -->: </code><code class="blue_2Afy">number</code><code>) → </code><code class="blue_2Afy">number</code></div><div>
+<p>Standard kfactor formula for use in the elo config.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="extractKFactor"><code style="text-decoration:none">extractKFactor</code><a aria-hidden="true" class="hash-link" href="#extractKFactor" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L198"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>EloUtils<!-- -->.</code><code class="green_3LnD">extractKFactor</code><code>(</code><div class="inset_2cJr"><div><code>config<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>rating<!-- -->: </code><code class="blue_2Afy">number</code></div></div><code>) → </code><code class="blue_2Afy">number</code></div><div>
+<p>Computes the kfactor for the given player from the rating</p>
+</div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
+    &quot;functions&quot;: [
+        {
+            &quot;name&quot;: &quot;createConfig&quot;,
+            &quot;desc&quot;: &quot;Creates a new elo config.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;config&quot;,
+                    &quot;desc&quot;: &quot;Optional table with defaults&quot;,
+                    &quot;lua_type&quot;: &quot;table?&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 51,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;isEloConfig&quot;,
+            &quot;desc&quot;: &quot;Returns whether an object is an elo config&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;config&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;any&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 68,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getNewScores&quot;,
+            &quot;desc&quot;: &quot;Gets the new score for the player and opponent after a series of matches.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;config&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;playerRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;opponentRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;matchScores&quot;,
+                    &quot;desc&quot;: &quot;0 for loss, 1 for win, 0.5 for draw.&quot;,
+                    &quot;lua_type&quot;: &quot;{ number }&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;playerRating&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;desc&quot;: &quot;opponentRating&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 82,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getNewScore&quot;,
+            &quot;desc&quot;: &quot;Gets the new score for the player after a series of matches.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;config&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;playerRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;opponentRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;matchScores&quot;,
+                    &quot;desc&quot;: &quot;0 for loss, 1 for win, 0.5 for draw.&quot;,
+                    &quot;lua_type&quot;: &quot;{ number }&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 101,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getExpected&quot;,
+            &quot;desc&quot;: &quot;Compute expected score for a player vs. player given the rating.\n\n:::info\nA player&#x27;s expected score is their probability of winning plus half their probability of drawing. Thus, an expected score of 0.75 could represent a 75% chance of winning, 25% chance of losing, and 0% chance of drawing\n:::&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;config&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;playerRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;opponentRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 122,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getScoreAdjustment&quot;,
+            &quot;desc&quot;: &quot;Gets the score adjustment for a given player&#x27;s base.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;config&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;playerRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;opponentRating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;matchScores&quot;,
+                    &quot;desc&quot;: &quot;0 for loss, 1 for win, 0.5 for draw.&quot;,
+                    &quot;lua_type&quot;: &quot;{ number }&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 140,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;fromOpponentPerspective&quot;,
+            &quot;desc&quot;: &quot;Flips the scores for the opponent&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;matchScores&quot;,
+                    &quot;desc&quot;: &quot;0 for loss, 1 for win, 0.5 for draw.&quot;,
+                    &quot;lua_type&quot;: &quot;{ number }&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;{ number }&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 163,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;standardKFactorFormula&quot;,
+            &quot;desc&quot;: &quot;Standard kfactor formula for use in the elo config.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;rating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 181,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;extractKFactor&quot;,
+            &quot;desc&quot;: &quot;Computes the kfactor for the given player from the rating&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;config&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;rating&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 198,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        }
+    ],
+    &quot;properties&quot;: [],
+    &quot;types&quot;: [
+        {
+            &quot;name&quot;: &quot;EloConfig&quot;,
+            &quot;desc&quot;: &quot;&quot;,
+            &quot;fields&quot;: [
+                {
+                    &quot;name&quot;: &quot;factor&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;,
+                    &quot;desc&quot;: &quot;&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;kfactor&quot;,
+                    &quot;lua_type&quot;: &quot;number | function&quot;,
+                    &quot;desc&quot;: &quot;&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;initial&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;,
+                    &quot;desc&quot;: &quot;&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;ratingFloor&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;,
+                    &quot;desc&quot;: &quot;&quot;
+                }
+            ],
+            &quot;source&quot;: {
+                &quot;line&quot;: 45,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        }
+    ],
+    &quot;name&quot;: &quot;EloUtils&quot;,
+    &quot;desc&quot;: &quot;Utilities to compute elo scores for players\n\n```lua\nlocal config = EloUtils.createConfig()\n\nlocal playerRating = 1400\nlocal opponentRating = 1800\n\n-- Update rating!\nplayerRating, opponentRating = EloUtils.getNewScores(\n\tconfig,\n\tplayerRating,\n\topponentRating,\n\t{\n\t\tEloUtils.Scores.WIN;\n\t})\n\n-- New rankings!\nprint(playerRating, opponentRating)\n```&quot;,
+    &quot;source&quot;: {
+        &quot;line&quot;: 24,
+        &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+    }
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a><ul><li><a href="#EloConfig" class="table-of-contents__link toc-highlight">EloConfig</a></li></ul></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#createConfig" class="table-of-contents__link toc-highlight">.createConfig</a></li><li><a href="#extractKFactor" class="table-of-contents__link toc-highlight">.extractKFactor</a></li><li><a href="#fromOpponentPerspective" class="table-of-contents__link toc-highlight">.fromOpponentPerspective</a></li><li><a href="#getExpected" class="table-of-contents__link toc-highlight">.getExpected</a></li><li><a href="#getNewScore" class="table-of-contents__link toc-highlight">.getNewScore</a></li><li><a href="#getNewScores" class="table-of-contents__link toc-highlight">.getNewScores</a></li><li><a href="#getScoreAdjustment" class="table-of-contents__link toc-highlight">.getScoreAdjustment</a></li><li><a href="#isEloConfig" class="table-of-contents__link toc-highlight">.isEloConfig</a></li><li><a href="#standardKFactorFormula" class="table-of-contents__link toc-highlight">.standardKFactorFormula</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2021 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.9ae58ccd.js"></script>
+<script src="/NevermoreEngine/assets/js/main.90ff1764.js"></script>
+</body>
+</html>
