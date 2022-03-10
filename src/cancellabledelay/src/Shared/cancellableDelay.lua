@@ -21,7 +21,10 @@ local function cancellableDelay(timeoutInSeconds, func, ...)
 	task.spawn(function()
 		running = coroutine.running()
 		task.wait(timeoutInSeconds)
-		func(table.unpack(args, 1, args.n))
+		local localArgs = args
+		running = nil
+		args = nil
+		func(table.unpack(localArgs, 1, localArgs.n))
 	end)
 
 	return function()
