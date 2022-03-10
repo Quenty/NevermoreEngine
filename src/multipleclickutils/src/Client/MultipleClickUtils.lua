@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local MultipleClickUtils = {}
 
@@ -19,14 +20,68 @@ local VALID_TYPES = {
 }
 
 --[=[
+	Observes a double click on the Gui
+	@param gui GuiBase
+	@return Observable<InputObject>
+]=]
+function MultipleClickUtils.observeDoubleClick(gui)
+	return MultipleClickUtils.observeMultipleClicks(gui, 2)
+end
+
+--[=[
 	Returns a signal that fires when the player clicks or taps on a Gui twice.
 
 	@param maid Maid
 	@param gui GuiBase
-	@return Signal<T>
+	@return Signal<InputObject>
 ]=]
 function MultipleClickUtils.getDoubleClickSignal(maid, gui)
 	return MultipleClickUtils.getDoubleClickSignal(maid, gui, 2)
+end
+
+--[=[
+	Observes multiple clicks click on the Gui
+
+	@param gui GuiBase
+	@param requiredCount number
+	@return Observable<InputObject>
+]=]
+function MultipleClickUtils.observeMultipleClicks(gui, requiredCount)
+	assert(typeof(gui) == "Instance", "Bad gui")
+	assert(type(requiredCount) == "number", "Bad requiredCount")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GiveTask(MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
+			:Connect(function(...)
+				sub:Fire(...)
+			end))
+
+		return maid
+	end)
+end
+
+--[=[
+	For use in Blend. Observes multiple clicks.
+
+	```lua
+	Blend.New "TextButton" {
+		[MultipleClickUtils.onMultipleClicks(3)] = function()
+			print("Clicked")
+		end;
+	};
+	```
+
+	@param requiredCount number
+	@return (gui: GuiBase) -> Observable<InputObject>
+]=]
+function MultipleClickUtils.onMultipleClicks(requiredCount)
+	assert(type(requiredCount) == "number", "Bad requiredCount")
+
+	return function(gui)
+		return MultipleClickUtils.observeMultipleClicks(gui, requiredCount)
+	end
 end
 
 --[=[
@@ -36,11 +91,12 @@ end
 	@param maid Maid
 	@param gui GuiBase
 	@param requiredCount number
-	@return Signal<T>
+	@return Signal<InputObject>
 ]=]
 function MultipleClickUtils.getMultipleClickSignal(maid, gui, requiredCount)
 	assert(Maid.isMaid(maid), "Bad maid")
 	assert(typeof(gui) == "Instance", "Bad gui")
+	assert(type(requiredCount) == "number", "Bad requiredCount")
 
 	local signal = Signal.new()
 	maid:GiveTask(signal)
