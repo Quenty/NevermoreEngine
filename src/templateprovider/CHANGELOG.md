@@ -1,23 +1,18 @@
-# v4.1.0 (Thu Mar 10 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Make ModuleProvider work with loader ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@4.0.0...@quenty/templateprovider@4.1.0) (2022-03-10)
+
+
+### Bug Fixes
+
+* Make ModuleProvider work with loader ([97361ba](https://github.com/Quenty/NevermoreEngine/commit/97361ba14b02f4a911846147980d3099a028ddc4))
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@3.8.0...@quenty/templateprovider@4.0.0) (2022-03-06)
 

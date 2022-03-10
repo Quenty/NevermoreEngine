@@ -1,23 +1,15 @@
-# v4.1.0 (Thu Mar 10 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Document TerrainUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/terrainutils@4.0.0...@quenty/terrainutils@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/terrainutils
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/terrainutils@3.5.0...@quenty/terrainutils@4.0.0) (2022-03-06)
 

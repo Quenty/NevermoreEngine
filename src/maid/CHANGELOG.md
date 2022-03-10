@@ -1,23 +1,15 @@
-# v2.2.0 (Thu Mar 10 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Remove luacheck comment at top of Maid ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.1.0...@quenty/maid@2.2.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/maid
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.0.2...@quenty/maid@2.1.0) (2022-01-17)
 

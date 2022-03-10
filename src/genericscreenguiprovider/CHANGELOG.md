@@ -1,20 +1,18 @@
-# v4.1.0 (Thu Mar 10 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObserveScreenGui(orderName) to GenericScreenGuiProvider ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@4.0.0...@quenty/genericscreenguiprovider@4.1.0) (2022-03-10)
+
+
+### Features
+
+* Add ObserveScreenGui(orderName) to GenericScreenGuiProvider ([9753dcc](https://github.com/Quenty/NevermoreEngine/commit/9753dcc02d4600d2706d8003cebb325ccfcde523))
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@3.7.0...@quenty/genericscreenguiprovider@4.0.0) (2022-03-06)
 

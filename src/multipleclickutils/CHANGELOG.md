@@ -1,20 +1,18 @@
-# v4.1.0 (Thu Mar 10 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
-- feat: Add MultipleClickUtils.observeMultipleClicks(gui, requiredCount) and MultipleClickUtils.observeDoubleClick(gui), add Blend support ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/multipleclickutils@4.0.0...@quenty/multipleclickutils@4.1.0) (2022-03-10)
+
+
+### Features
+
+* Add MultipleClickUtils.observeMultipleClicks(gui, requiredCount) and MultipleClickUtils.observeDoubleClick(gui), add Blend support ([5826c4a](https://github.com/Quenty/NevermoreEngine/commit/5826c4af61edcf18e8c925bc2e2d90db3c35211c))
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/multipleclickutils@3.5.0...@quenty/multipleclickutils@4.0.0) (2022-03-06)
 

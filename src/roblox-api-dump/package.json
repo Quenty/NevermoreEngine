@@ -1,6 +1,6 @@
 {
   "name": "@quenty/roblox-api-dump",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Utility functions for grabbing the Roblox API from the web",
   "keywords": [
     "Roblox",

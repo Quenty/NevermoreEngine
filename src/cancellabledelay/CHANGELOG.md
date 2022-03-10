@@ -1,23 +1,18 @@
-# v3.1.0 (Thu Mar 10 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix cancellation occuring when the resulting task yields ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cancellabledelay@3.0.0...@quenty/cancellabledelay@3.1.0) (2022-03-10)
+
+
+### Bug Fixes
+
+* Fix cancellation occuring when the resulting task yields ([d74eae8](https://github.com/Quenty/NevermoreEngine/commit/d74eae8faee15255ca66ca4b803312afe966acc4))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cancellabledelay@2.2.0...@quenty/cancellabledelay@3.0.0) (2022-03-06)
 
