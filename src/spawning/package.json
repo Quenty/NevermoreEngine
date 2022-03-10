@@ -1,13 +1,11 @@
 {
-  "name": "@quenty/multipleclickutils",
-  "version": "4.0.0",
-  "description": "Utility library for detecting multiple clicks or taps. Not good UX, but good for opening up a debug menus",
+  "name": "@quenty/spawning",
+  "version": "1.0.0",
+  "description": "Centralized spawning system",
   "keywords": [
     "Roblox",
     "Nevermore",
-    "Lua",
-    "Gui",
-    "Buttons"
+    "Lua"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -15,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/multipleclickutils/"
+    "directory": "src/spawning/"
   },
   "funding": {
     "type": "patreon",
@@ -26,10 +24,13 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/binder": "file:../binder",
+    "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal"
+    "@quenty/randomutils": "file:../randomutils",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quentystudios/t": "^1.2.5"
   },
   "publishConfig": {
     "access": "public"

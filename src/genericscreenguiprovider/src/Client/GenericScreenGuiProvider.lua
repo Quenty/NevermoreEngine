@@ -30,6 +30,7 @@ local RunService = game:GetService("RunService")
 
 local String = require("String")
 local PlayerGuiUtils = require("PlayerGuiUtils")
+local Blend = require("Blend")
 
 local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = GenericScreenGuiProvider
@@ -59,6 +60,26 @@ end
 
 function GenericScreenGuiProvider:__newindex(index, _)
 	error(("Bad index %q"):format(tostring(index)), 2)
+end
+
+--[=[
+	Returns a blend ScreenGui.
+	@param orderName string
+	@return Observable<Instance>
+]=]
+function GenericScreenGuiProvider:ObserveScreenGui(orderName)
+	if not RunService:IsRunning() then
+		return self:_observeMockScreenGui(orderName)
+	end
+
+	return Blend.New "ScreenGui" {
+		Name = String.toCamelCase(orderName);
+		ResetOnSpawn = false;
+		AutoLocalize = false;
+		DisplayOrder = self:GetDisplayOrder(orderName);
+		Parent = PlayerGuiUtils.getPlayerGui();
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+	}
 end
 
 --[=[
@@ -131,5 +152,21 @@ function GenericScreenGuiProvider:_mockScreenGui(orderName)
 
 	return mock
 end
+
+function GenericScreenGuiProvider:_observeMockScreenGui(orderName)
+	assert(type(orderName) == "string", "Bad orderName")
+	assert(rawget(self, "_mockParent"), "No _mockParent set")
+
+	local displayOrder = self:GetDisplayOrder(orderName)
+
+	return Blend.New "Frame" {
+		Size = UDim2.new(1, 0, 1, 0);
+		BackgroundTransparency = 1;
+		ZIndex = displayOrder;
+		Parent = rawget(self, "_mockParent");
+	};
+end
+
+
 
 return GenericScreenGuiProvider

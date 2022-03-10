@@ -30,6 +30,10 @@ function GameConfigServiceClient:Start()
 
 end
 
+--[=[
+	Retrieves the game configuration picker for the config service.
+	@return GameConfigPicker
+]=]
 function GameConfigServiceClient:GetConfigPicker()
 	return self._configPicker
 end
