@@ -24,6 +24,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
     "@quenty/string": "file:../string",
     "@quenty/uiobjectutils": "file:../uiobjectutils"
