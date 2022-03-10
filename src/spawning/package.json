@@ -1,0 +1,38 @@
+{
+  "name": "@quenty/spawning",
+  "version": "1.0.0",
+  "description": "Centralized spawning system",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/spawning/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/binder": "file:../binder",
+    "@quenty/cmdrservice": "file:../cmdrservice",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/randomutils": "file:../randomutils",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quentystudios/t": "^1.2.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
