@@ -1,3 +1,16 @@
+# (Thu Mar 10 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/cancellabledelay@3.1.0`, `@quenty/elo@1.1.0`, `@quenty/gameconfig@2.1.0`, `@quenty/genericscreenguiprovider@4.1.0`, `@quenty/hide@2.1.0`, `@quenty/maid@2.2.0`, `@quenty/multipleclickutils@4.1.0`, `@quenty/spawning@1.1.0`, `@quenty/templateprovider@4.1.0`, `@quenty/terrainutils@4.1.0`
+  - feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Mar 06 2022)
 
 #### 💥 Breaking Change

@@ -1,3 +1,19 @@
+# v3.1.0 (Thu Mar 10 2022)
+
+#### 🚀 Enhancement
+
+- feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix cancellation occuring when the resulting task yields ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
