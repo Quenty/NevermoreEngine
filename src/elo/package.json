@@ -1,0 +1,31 @@
+{
+  "name": "@quenty/elo",
+  "version": "1.0.0",
+  "description": "Elo rating utility library.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Elo",
+    "Ranked"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/elo/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
