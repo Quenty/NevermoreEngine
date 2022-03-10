@@ -1,4 +1,3 @@
--- luacheck: push ignore
 --[=[
 	Manages the cleaning of events and other things. Useful for
 	encapsulating state and make deconstructors easy.
