@@ -1,5 +1,7 @@
 --[=[
+	See [GameConfigBase] for API and [GameConfigService] for usage.
 	@class GameConfig
+	@server
 ]=]
 
 local require = require(script.Parent.loader).load(script)
