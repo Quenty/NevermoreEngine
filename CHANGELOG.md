@@ -1,3 +1,80 @@
+# (Thu Mar 10 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/cancellabledelay@3.1.0`, `@quenty/elo@1.1.0`, `@quenty/gameconfig@2.1.0`, `@quenty/genericscreenguiprovider@4.1.0`, `@quenty/hide@2.1.0`, `@quenty/maid@2.2.0`, `@quenty/multipleclickutils@4.1.0`, `@quenty/spawning@1.1.0`, `@quenty/templateprovider@4.1.0`, `@quenty/terrainutils@4.1.0`
+  - feat: Add elo package and a variety of other changes [#252](https://github.com/Quenty/NevermoreEngine/pull/252) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Mar 06 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/idleservice@4.0.0`, `@quenty/statestack@5.0.0`
+  - feat: Make breaking changes to idle service and statestack. [#248](https://github.com/Quenty/NevermoreEngine/pull/248) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@5.0.0`, `@quenty/badgeutils@4.0.0`, `@quenty/binder@5.0.0`, `@quenty/blend@3.0.0`, `@quenty/boundingboxutils@3.0.0`, `@quenty/brio@5.0.0`, `@quenty/buttonhighlightmodel@4.0.0`, `@quenty/camera@6.0.0`, `@quenty/cancellabledelay@3.0.0`, `@quenty/cframeserializer@3.0.0`, `@quenty/cframeutils@3.0.0`, `@quenty/clienttranslator@5.0.0`, `@quenty/cmdrservice@4.0.0`, `@quenty/datastore@4.0.0`, `@quenty/draw@3.0.0`, `@quenty/gameconfig@2.0.0`, `@quenty/gameproductservice@2.0.0`, `@quenty/hapticfeedbackutils@3.0.0`, `@quenty/hintscoringutils@6.0.0`, `@quenty/humanoidspeed@2.0.0`, `@quenty/ik@6.0.0`, `@quenty/loader@4.0.0`, `@quenty/localizedtextutils@3.0.0`, `@quenty/numbersequenceutils@3.0.0`, `@quenty/observablecollection@2.0.0`, `@quenty/particleengine@4.0.0`, `@quenty/promise@4.0.0`, `@quenty/ragdoll@6.0.0`, `@quenty/region3int16utils@4.0.0`, `@quenty/region3utils@4.0.0`, `@quenty/rx@4.0.0`, `@quenty/rxbinderutils@5.0.0`, `@quenty/servicebag@4.0.0`, `@quenty/sounds@4.0.0`, `@quenty/spring@4.0.0`, `@quenty/statestack@5.0.0`, `@quenty/terrainutils@4.0.0`, `@quenty/viewport@2.0.0`
+  - feat: Upgrade a variety of packages in a variety of ways [#251](https://github.com/Quenty/NevermoreEngine/pull/251) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jan 17 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/idleservice@3.0.0`, `@quenty/statestack@4.0.0`
+  - feat: Make breaking changes to idle service and statestack. [#248](https://github.com/Quenty/NevermoreEngine/pull/248) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jan 17 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.1.0`, `@quenty/actionmanager@3.8.0`, `@quenty/adorneeutils@2.2.0`, `@quenty/attributeutils@4.3.0`, `@quenty/blend@2.3.0`, `@quenty/brio@3.8.0`, `@quenty/cmdrservice@3.9.0`, `@quenty/datastore@3.6.0`, `@quenty/firstpersoncharactertransparency@3.5.0`, `@quenty/hide@1.8.0`, `@quenty/loader@3.4.0`, `@quenty/maid@2.1.0`, `@quenty/permissionprovider@4.7.0`, `@quenty/preferredparentutils@2.1.0`, `@quenty/ragdoll@5.3.0`, `@quenty/roblox-api-dump@1.1.0`, `@quenty/rx@3.8.0`, `@quenty/scoredactionservice@4.9.0`, `@quenty/servicebag@3.5.0`, `@quenty/sounds@3.8.0`, `@quenty/spring@3.3.0`, `@quenty/throttle@3.5.0`, `@quenty/valueobject@3.8.0`, `@quenty/viewport@1.1.0`
+  - feat: Add UI converter Plugin [#247](https://github.com/Quenty/NevermoreEngine/pull/247) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jan 16 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@Yuuwa0519](https://github.com/Yuuwa0519), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/draw@2.2.2`
+  - fix: Disabled CanTouch and CanQuery [#246](https://github.com/Quenty/NevermoreEngine/pull/246) ([@Yuuwa0519](https://github.com/Yuuwa0519))
+- `@quenty/blend@2.2.1`, `@quenty/camera@5.2.1`, `@quenty/cmdrservice@3.8.1`, `@quenty/guivisiblemanager@4.2.1`, `@quenty/ik@5.2.1`, `@quenty/lipsum@4.2.1`, `@quenty/markdownrender@2.0.2`, `@quenty/permissionprovider@4.6.1`, `@quenty/promise@3.5.1`, `@quenty/rotatinglabel@4.2.1`, `@quenty/roundedbackingbuilder@2.0.2`, `@quenty/scoredactionservice@4.8.1`, `@quenty/templateprovider@3.7.1`
+  - docs: Fix docs from old luadocs and make checking moonwave docs a lot faster [#245](https://github.com/Quenty/NevermoreEngine/pull/245) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@Yuuwa0519](https://github.com/Yuuwa0519)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jan 07 2022)
 
 #### 🚀 Enhancement

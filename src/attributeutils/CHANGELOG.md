@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@5.0.0...@quenty/attributeutils@5.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.3.0...@quenty/attributeutils@5.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* AttributeValue does not error when _defaultValue is nil ([a55308b](https://github.com/Quenty/NevermoreEngine/commit/a55308b8a4b4eb7fc72efdc5a73e4a1790befd98))
+
+
+
+
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.2.1...@quenty/attributeutils@4.3.0) (2022-01-17)
+
+
+### Features
+
+* Add AttributeUtils.getAttribute method ([af2742f](https://github.com/Quenty/NevermoreEngine/commit/af2742f792a07c2409d7cac3bfec54e004a056b2))
+
+
+
+
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.2.0...@quenty/attributeutils@4.2.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@4.1.0...@quenty/attributeutils@4.2.0) (2022-01-07)
 
 

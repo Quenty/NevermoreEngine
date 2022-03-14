@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.4.0...@quenty/loader@4.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Duplicate module info actually errors properly ([d3d451f](https://github.com/Quenty/NevermoreEngine/commit/d3d451f24ecc3f6debeb802bd4de6b7276369403))
+
+
+
+
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.3.0...@quenty/loader@3.4.0) (2022-01-17)
+
+
+### Features
+
+* Allow plugins to be bootstrapped allowing access to both client and server code within the plugin. ([6147051](https://github.com/Quenty/NevermoreEngine/commit/61470516702b7daa0ec020630556e7505e09aac1))
+
+
+
+
+
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@3.2.0...@quenty/loader@3.3.0) (2022-01-07)
 
 

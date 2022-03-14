@@ -83,8 +83,9 @@ function RagdollableClient:_ragdollLocal()
 
 	-- Really hard to infer whether or not we're the network owner, so we just try to do this for every single one.
 
-	-- Hopefully these are already created. Intent here is to reset friction.
-	RagdollRigging.createRagdollJoints(self._obj.Parent, self._obj.RigType)
+	-- Hopefully these are already created. Intent here is to reset friction. If not, the friction
+	-- should be good.
+	RagdollRigging.configureRagdollJoints(false, self._obj.Parent, self._obj.RigType)
 
 	maid:GiveTask(RagdollUtils.setupState(self._obj))
 	maid:GiveTask(RagdollUtils.setupMotors(self._obj))

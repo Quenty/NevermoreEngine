@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@4.0.0...@quenty/servicebag@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.5.0...@quenty/servicebag@4.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* ServiceBag:HasService allows for serviceType definitions that are instances ([cf772a9](https://github.com/Quenty/NevermoreEngine/commit/cf772a9dfc17178dc90fb26c9e5a091f84d00a90))
+
+
+
+
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.4.0...@quenty/servicebag@3.5.0) (2022-01-17)
+
+
+### Features
+
+* Ensure services do not yield while initializing or starting ([f46f34e](https://github.com/Quenty/NevermoreEngine/commit/f46f34e56deecfa22b64eafeb7a3e965da2e6e8a))
+
+
+
+
+
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@3.3.0...@quenty/servicebag@3.4.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/servicebag

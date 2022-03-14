@@ -36,12 +36,18 @@ end
 	Executes all promises. If any fails, the result will be rejected. However, it yields until
 	every promise is complete.
 
+	:::warning
+	Passing in a spare array (i.e. {nil, promise}) will result in undefined behavior here.
+	:::
+
 	@param promises { Promise<T> }
 	@return Promise<T>
 ]=]
 function PromiseUtils.all(promises)
 	if #promises == 0 then
 		return Promise.resolved()
+	elseif #promises == 1 then
+		return promises[1]
 	end
 
 	local remainingCount = #promises

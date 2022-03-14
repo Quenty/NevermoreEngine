@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@6.0.0...@quenty/ragdoll@6.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.3.0...@quenty/ragdoll@6.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Fix dependencies for Ragdoll ([c5aed82](https://github.com/Quenty/NevermoreEngine/commit/c5aed8203f21cf59742465372bc483381f15d419))
+
+
+### Performance Improvements
+
+* Use heartbeat for impulse for ragdoll (perf) ([fa5e36e](https://github.com/Quenty/NevermoreEngine/commit/fa5e36e5d689911575858d5a8a6b63e730f9dac0))
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.2.1...@quenty/ragdoll@5.3.0) (2022-01-17)
+
+
+### Features
+
+* Add RagdollService and suppress initialization race condition warnings in deferred mode ([480a089](https://github.com/Quenty/NevermoreEngine/commit/480a0892f47fd5acbcb4e846bfb2dd93e207e681))
+
+
+
+
+
+## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.2.0...@quenty/ragdoll@5.2.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@5.1.2...@quenty/ragdoll@5.2.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/ragdoll

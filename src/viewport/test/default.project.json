@@ -1,0 +1,11 @@
+{
+  "name": "ViewportTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "viewport": {
+        "$path": ".."
+      }
+    }
+  }
+}

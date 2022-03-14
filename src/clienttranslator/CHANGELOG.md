@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@5.0.0...@quenty/clienttranslator@5.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.7.0...@quenty/clienttranslator@5.0.0) (2022-03-06)
+
+
+### Features
+
+* Rewrite gameconfig package to live-update and use binders ([430979d](https://github.com/Quenty/NevermoreEngine/commit/430979d74bffe712bd03c838be2caf4ac9395e79))
+
+
+
+
+
+# [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.6.1...@quenty/clienttranslator@4.7.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+## [4.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.6.0...@quenty/clienttranslator@4.6.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
 # [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@4.5.1...@quenty/clienttranslator@4.6.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/clienttranslator

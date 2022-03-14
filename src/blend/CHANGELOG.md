@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@3.0.0...@quenty/blend@3.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.3.0...@quenty/blend@3.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Instances from Blend.New are linked to lifetime of subscription without exception ([af282d2](https://github.com/Quenty/NevermoreEngine/commit/af282d264a0f06c2a94a5fd9c04ddbcb6cfbb7f1))
+
+
+### Features
+
+* Add SpringObject:IsAnimating() ([9e16f33](https://github.com/Quenty/NevermoreEngine/commit/9e16f33ebc6247f6cf65417b316485a181ce9900))
+
+
+
+
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.2.1...@quenty/blend@2.3.0) (2022-01-17)
+
+
+### Features
+
+* Add a SpringObject to blend, which is a much heavier object than a spring, but simplifies API usage significantly ([cb59db0](https://github.com/Quenty/NevermoreEngine/commit/cb59db0ed4297ecec842b0820a485e1aa0c8ad70))
+* Add Blend.Attached and fix children not being unsubscribed correctly (memory leak fix) ([f4fa4c2](https://github.com/Quenty/NevermoreEngine/commit/f4fa4c2ebce9be6e16a7ab1492afaf87fe81b8aa))
+
+
+
+
+
+## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.2.0...@quenty/blend@2.2.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@2.1.1...@quenty/blend@2.2.0) (2022-01-07)
 
 

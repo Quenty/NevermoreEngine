@@ -16,6 +16,7 @@ local DataStoreWriter = require("DataStoreWriter")
 local Promise = require("Promise")
 local Table = require("Table")
 local Signal = require("Signal")
+local PromiseUtils = require("PromiseUtils")
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -35,10 +36,63 @@ function DataStoreStage.new(loadName, loadParent)
 	self._loadName = loadName
 	self._loadParent = loadParent
 
+	self._savingCallbacks = {} -- [func, ...]
 	self._takenKeys = {} -- [name] = true
 	self._stores = {} -- [name] = dataSubStore
 
 	return self
+end
+
+-- Also returns nil for speedyness
+function DataStoreStage:_promiseInvokeSavingCallbacks()
+	if not next(self._savingCallbacks) then
+		return nil
+	end
+
+	local removingPromises = {}
+	for _, func in pairs(self._savingCallbacks) do
+		local result = func()
+		if Promise.isPromise(result) then
+			table.insert(removingPromises, result)
+		end
+	end
+
+	for _, substore in pairs(self._stores) do
+		local promise = substore:_promiseInvokeSavingCallbacks()
+		if promise then
+			table.insert(removingPromises, promise)
+		end
+	end
+
+	return PromiseUtils.all(removingPromises)
+end
+
+--[=[
+	Adds a callback to be called before save. This may return a promise.
+	@param callback function -- May return a promise
+	@return function -- Call to remove
+]=]
+function DataStoreStage:AddSavingCallback(callback)
+	assert(type(callback) == "function", "Bad callback")
+
+	table.insert(self._savingCallbacks, callback)
+
+	return function()
+		self:RemoveSavingCallback(callback)
+	end
+end
+
+--[=[
+	Removes a saving callback from the data store stage
+	@param callback function
+]=]
+function DataStoreStage:RemoveSavingCallback(callback)
+	assert(type(callback) == "function", "Bad callback")
+
+	local index = table.find(self._savingCallbacks, callback)
+	if index then
+		table.remove(self._savingCallbacks, index)
+	end
 end
 
 --[=[

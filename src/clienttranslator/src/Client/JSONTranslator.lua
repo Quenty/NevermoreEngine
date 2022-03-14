@@ -65,6 +65,10 @@ function JSONTranslator.new(...)
 	return self
 end
 
+function JSONTranslator:GetLocalizationTable()
+	return self._localizationTable
+end
+
 --[=[
 	Returns a promise that will resolve once the translator is loaded from the cloud.
 	@return Promise

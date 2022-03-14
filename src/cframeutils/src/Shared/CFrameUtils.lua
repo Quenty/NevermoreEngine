@@ -105,7 +105,7 @@ function CFrameUtils.scalePosition(cframe, scale)
 	if scale == 1 then
 		return cframe
 	else
-		local position = cframe.p
+		local position = cframe.Position
 		return cframe - position + position*scale
 	end
 end

@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamtracker@4.0.0...@quenty/teamtracker@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/teamtracker
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamtracker@3.8.0...@quenty/teamtracker@4.0.0) (2022-03-06)
+
+**Note:** Version bump only for package @quenty/teamtracker
+
+
+
+
+
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamtracker@3.7.1...@quenty/teamtracker@3.8.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/teamtracker
+
+
+
+
+
+## [3.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamtracker@3.7.0...@quenty/teamtracker@3.7.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/teamtracker
+
+
+
+
+
 # [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamtracker@3.6.0...@quenty/teamtracker@3.7.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/teamtracker

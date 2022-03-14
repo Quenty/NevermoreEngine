@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@3.3.0...@quenty/spring@4.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Allow tweening of UDim2, previously this code errored ([3754694](https://github.com/Quenty/NevermoreEngine/commit/375469496d1b32fc27f947b43a9393edc52d72ad))
+
+
+
+
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@3.2.0...@quenty/spring@3.3.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/spring
+
+
+
+
+
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@3.1.1...@quenty/spring@3.2.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/spring

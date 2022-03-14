@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@4.0.0...@quenty/sounds@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.8.0...@quenty/sounds@4.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Support sound playback for non-local situations. On the server this will require the sound to be parented. ([1884237](https://github.com/Quenty/NevermoreEngine/commit/1884237120fbbb3c9b29032d995c132af381f16b))
+
+
+
+
+
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.7.1...@quenty/sounds@3.8.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
+## [3.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.7.0...@quenty/sounds@3.7.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/sounds
+
+
+
+
+
 # [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@3.6.0...@quenty/sounds@3.7.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/sounds

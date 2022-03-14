@@ -2,6 +2,7 @@
 	Bridge to https://eryn.io/Cmdr/
 
 	Uses [PermissionService] to provide permissions.
+	@server
 	@class CmdrService
 ]=]
 
@@ -116,23 +117,35 @@ function CmdrService:RegisterCommand(commandData, execute)
 	self._cmdr.Registry:RegisterCommand(commandScript, commandServerScript)
 end
 
-function CmdrService:__ExecuteCommand(id, ...)
-	assert(type(id) == "string", "Bad serviceId")
-	assert(self._cmdr, "Not initialized")
+--[=[
+	Private function used by the execution template to retrieve the execution function.
+	@param cmdrCommandId string
+	@param ... any
+	@private
+]=]
+function CmdrService:__executeCommand(cmdrCommandId, ...)
+	assert(type(cmdrCommandId) == "string", "Bad cmdrCommandId")
+	assert(self._cmdr, "CmdrService is not initialized yet")
 
-	local execute = self._executeData[id]
+	local execute = self._executeData[cmdrCommandId]
 	if not execute then
-		error(("[CmdrService] - No command definition for id %q"):format(tostring(id)))
+		error(("[CmdrService] - No command definition for cmdrCommandId %q"):format(tostring(cmdrCommandId)))
 	end
 
 	return execute(...)
 end
 
--- Global, but only intended for internal use
-function CmdrService:__GetServiceFromId(id)
-	assert(type(id) == "string", "Bad serviceId")
+--[=[
+	Global usage but only intended for internal use
 
-	return GLOBAL_REGISTRY[id]
+	@param cmdrServiceId string
+	@return CmdrService
+	@private
+]=]
+function CmdrService:__getServiceFromId(cmdrServiceId)
+	assert(type(cmdrServiceId) == "string", "Bad cmdrServiceId")
+
+	return GLOBAL_REGISTRY[cmdrServiceId]
 end
 
 return CmdrService

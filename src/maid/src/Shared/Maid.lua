@@ -1,4 +1,3 @@
--- luacheck: push ignore
 --[=[
 	Manages the cleaning of events and other things. Useful for
 	encapsulating state and make deconstructors easy.
@@ -99,7 +98,7 @@ end
 ]=]
 function Maid:__newindex(index, newTask)
 	if Maid[index] ~= nil then
-		error(("'%s' is reserved"):format(tostring(index)), 2)
+		error(("Cannot use '%s' as a Maid key"):format(tostring(index)), 2)
 	end
 
 	local tasks = self._tasks

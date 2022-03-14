@@ -225,7 +225,7 @@ function ParticleEngineClient:_updateRender()
 	self:_updateScreenInfo(camera)
 
 	local cameraInverse = camera.CFrame:inverse()
-	local cameraPosition = camera.CFrame.p
+	local cameraPosition = camera.CFrame.Position
 
 	local frameIndex, frame = next(self._particleFrames)
 	for particle in pairs(self._particles) do

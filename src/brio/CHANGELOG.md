@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@5.0.0...@quenty/brio@5.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@4.0.0...@quenty/brio@5.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Fix circular dependency, move createStateStack from Brio ([9568dd7](https://github.com/Quenty/NevermoreEngine/commit/9568dd78272e487e17e9fb08034a58275838add9))
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.8.0...@quenty/brio@4.0.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.7.1...@quenty/brio@3.8.0) (2022-01-17)
+
+
+### Bug Fixes
+
+* RxBrioUtils.map correctly maps for n == 1, and RxBrioUtils.where is not a switch map. ([56e3a3a](https://github.com/Quenty/NevermoreEngine/commit/56e3a3a06334a9ca86e02cbec38710b82c61b9f2))
+
+
+
+
+
+## [3.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.7.0...@quenty/brio@3.7.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
 # [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@3.6.0...@quenty/brio@3.7.0) (2022-01-07)
 
 

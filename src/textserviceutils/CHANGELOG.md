@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@4.0.0...@quenty/textserviceutils@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@3.3.0...@quenty/textserviceutils@4.0.0) (2022-03-06)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@3.2.1...@quenty/textserviceutils@3.3.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@3.2.0...@quenty/textserviceutils@3.2.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@3.1.1...@quenty/textserviceutils@3.2.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/textserviceutils

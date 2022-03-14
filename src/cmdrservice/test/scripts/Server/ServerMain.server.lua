@@ -2,31 +2,26 @@
 	@class ServerMain
 ]]
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local LoaderUtils = require(ServerScriptService:FindFirstChild("LoaderUtils", true))
+local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
+local packages = require(loader).bootstrapGame(ServerScriptService.cmdrservice)
 
-local clientFolder, serverFolder, sharedFolder = LoaderUtils.toWallyFormat(ServerScriptService.cmdrservice)
-clientFolder.Parent = ReplicatedStorage
-sharedFolder.Parent = ReplicatedStorage
-serverFolder.Parent = ServerScriptService
-
-local serviceBag = require(serverFolder.ServiceBag).new()
-serviceBag:GetService(require(serverFolder.CmdrService))
+local serviceBag = require(packages.ServiceBag).new()
+serviceBag:GetService(require(packages.CmdrService))
 
 serviceBag:Init()
 serviceBag:Start()
 
-serviceBag:GetService(require(serverFolder.CmdrService)):RegisterCommand({
+serviceBag:GetService(require(packages.CmdrService)):RegisterCommand({
 	Name = "explode";
 	Aliases = { "boom" };
 	Description = "Makes players explode";
 	Group = "Admin";
 	Args = {
 		{
+			Name = "Players";
 			Type = "players";
-			Name = "players";
 			Description = "Victims";
 		},
 	};

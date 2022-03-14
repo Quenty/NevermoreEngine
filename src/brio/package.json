@@ -1,6 +1,6 @@
 {
   "name": "@quenty/brio",
-  "version": "3.7.0",
+  "version": "5.1.0",
   "description": "Brios wrap an object and either are alive or dead",
   "keywords": [
     "Roblox",
@@ -28,8 +28,7 @@
   "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx",
-    "@quenty/statestack": "file:../statestack"
+    "@quenty/rx": "file:../rx"
   },
   "publishConfig": {
     "access": "public"

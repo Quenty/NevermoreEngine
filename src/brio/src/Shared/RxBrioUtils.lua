@@ -13,7 +13,6 @@ local BrioUtils = require("BrioUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
-local StateStack= require("StateStack")
 
 local RxBrioUtils = {}
 
@@ -30,30 +29,6 @@ function RxBrioUtils.toBrio()
 
 		return Brio.new(result)
 	end)
-end
-
---[=[
-	Creates a state stack from the brio's value. The state stack holds the last
-	value seen that is valid.
-
-	@param observable Observable<Brio<T>>
-	@return StateStack<T>
-]=]
-function RxBrioUtils.createStateStack(observable)
-	local stateStack = StateStack.new()
-
-	stateStack._maid:GiveTask(observable:Subscribe(function(value)
-		assert(Brio.isBrio(value), "Observable must emit brio")
-
-		if value:IsDead() then
-			return
-		end
-
-		local maid = value:ToMaid()
-		maid:GiveTask(stateStack:PushState(value:GetValue()))
-	end))
-
-	return stateStack
 end
 
 --[=[
@@ -141,21 +116,23 @@ function RxBrioUtils.emitWhileAllDead(valueToEmitWhileAllDead)
 				updateBrios()
 			end
 
-			topMaid:GiveTask(source:Subscribe(function(brio)
-				if not Brio.isBrio(brio) then
-					warn(("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q"):format(tostring(brio)))
-					topMaid._lastBrio = nil
-					sub:Fail("Not a brio")
-					return
-				end
+			topMaid:GiveTask(source:Subscribe(
+				function(brio)
+					if not Brio.isBrio(brio) then
+						warn(("[RxBrioUtils.emitWhileAllDead] - Not a brio, %q"):format(tostring(brio)))
+						topMaid._lastBrio = nil
+						sub:Fail("Not a brio")
+						return
+					end
 
-				handleNewBrio(brio)
-			end, function(...)
-				sub:Fail(...)
-			end,
-			function(...)
-				sub:Complete(...)
-			end))
+					handleNewBrio(brio)
+				end,
+				function(...)
+					sub:Fail(...)
+				end,
+				function(...)
+					sub:Complete(...)
+				end))
 
 			-- Make sure we emit an empty list if we discover nothing
 			if not fired then
@@ -235,22 +212,23 @@ function RxBrioUtils.reduceToAliveList(selectFromBrio)
 				updateBrios()
 			end
 
-			topMaid:GiveTask(source:Subscribe(function(brio)
-				if not Brio.isBrio(brio) then
-					warn(("[RxBrioUtils.mergeToAliveList] - Not a brio, %q"):format(tostring(brio)))
-					topMaid._lastBrio = nil
-					sub:Fail("Not a brio")
-					return
-				end
+			topMaid:GiveTask(source:Subscribe(
+				function(brio)
+					if not Brio.isBrio(brio) then
+						warn(("[RxBrioUtils.mergeToAliveList] - Not a brio, %q"):format(tostring(brio)))
+						topMaid._lastBrio = nil
+						sub:Fail("Not a brio")
+						return
+					end
 
-				handleNewBrio(brio)
-			end,
-			function(...)
-				sub:Fail(...)
-			end,
-			function(...)
-				sub:Complete(...)
-			end))
+					handleNewBrio(brio)
+				end,
+				function(...)
+					sub:Fail(...)
+				end,
+				function(...)
+					sub:Complete(...)
+				end))
 
 			-- Make sure we emit an empty list if we discover nothing
 			if not fired then
@@ -272,33 +250,34 @@ function RxBrioUtils.reemitLastBrioOnDeath()
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			maid:GiveTask(source:Subscribe(function(brio)
-				maid._conn = nil
+			maid:GiveTask(source:Subscribe(
+				function(brio)
+					maid._conn = nil
 
-				if not Brio.isBrio(brio) then
-					warn(("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q"):format(tostring(brio)))
-					sub:Fail("Not a brio")
-					return
-				end
+					if not Brio.isBrio(brio) then
+						warn(("[RxBrioUtils.reemitLastBrioOnDeath] - Not a brio, %q"):format(tostring(brio)))
+						sub:Fail("Not a brio")
+						return
+					end
 
-				if brio:IsDead() then
+					if brio:IsDead() then
+						sub:Fire(brio)
+						return
+					end
+
+					-- Setup conn!
+					maid._conn = brio:GetDiedSignal():Connect(function()
+						sub:Fire(brio)
+					end)
+
 					sub:Fire(brio)
-					return
-				end
-
-				-- Setup conn!
-				maid._conn = brio:GetDiedSignal():Connect(function()
-					sub:Fire(brio)
-				end)
-
-				sub:Fire(brio)
-			end,
-			function(...)
-				sub:Fail(...)
-			end,
-			function(...)
-				sub:Complete(...)
-			end))
+				end,
+				function(...)
+					sub:Fail(...)
+				end,
+				function(...)
+					sub:Complete(...)
+				end))
 
 			return maid
 		end)
@@ -315,30 +294,18 @@ end
 ]=]
 function RxBrioUtils.where(predicate)
 	assert(type(predicate) == "function", "Bad predicate")
-
 	return function(source)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(function(brio)
-				maid._lastBrio = nil
+				assert(Brio.isBrio(brio), "Not a brio")
+				if brio:IsDead() then
+					return
+				end
 
-				if Brio.isBrio(brio) then
-					if brio:IsDead() then
-						return
-					end
-
-					if predicate(brio:GetValue()) then
-						local newBrio = BrioUtils.clone(brio)
-						maid._lastBrio = newBrio
-						sub:Fire(newBrio)
-					end
-				else
-					if predicate(brio) then
-						local newBrio = Brio.new(brio)
-						maid._lastBrio = newBrio
-						sub:Fire(newBrio)
-					end
+				if predicate(brio:GetValue()) then
+					sub:Fire(brio)
 				end
 			end, sub:GetFailComplete()))
 
@@ -570,27 +537,18 @@ function RxBrioUtils.map(project)
 		end
 
 		local results = table.pack(project(table.unpack(args, 1, args.n)))
-		if results.n == 1 then
-			if Brio.isBrio(results[1]) then
-				table.insert(brios, results[1])
-				return BrioUtils.first(brios, results:GetValue())
+		local transformedResults = {}
+		for i=1, results.n do
+			local item = results[i]
+			if Brio.isBrio(item) then
+				table.insert(brios, item) -- add all subsequent brios into this table...
+				transformedResults[i] = item:GetValue()
 			else
-				return BrioUtils.withOtherValues(brios, results[1])
+				transformedResults[i] = item
 			end
-		else
-			local transformedResults = {}
-			for i=1, results.n do
-				local item = results[i]
-				if Brio.isBrio(item) then
-					table.insert(brios, item) -- add all subsequent brios into this table...
-					transformedResults[i] = item:GetValue()
-				else
-					transformedResults[i] = item
-				end
-			end
-
-			return BrioUtils.first(brios, table.unpack(transformedResults, 1, transformedResults.n))
 		end
+
+		return BrioUtils.first(brios, table.unpack(transformedResults, 1, transformedResults.n))
 	end)
 end
 
@@ -666,7 +624,6 @@ function RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
 				sub:Complete()
 			else
 				sub:Fire(brio:GetValue())
-
 				return brio:GetDiedSignal():Connect(function()
 					sub:Fire(emitOnDeathValue)
 					sub:Complete()

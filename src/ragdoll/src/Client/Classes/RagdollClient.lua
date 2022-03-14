@@ -17,6 +17,7 @@ local BaseObject = require("BaseObject")
 local CameraStackService = require("CameraStackService")
 local CharacterUtils = require("CharacterUtils")
 local HapticFeedbackUtils = require("HapticFeedbackUtils")
+local RagdollServiceClient = require("RagdollServiceClient")
 
 local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
@@ -31,7 +32,9 @@ RagdollClient.__index = RagdollClient
 function RagdollClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollClient)
 
-	self._cameraStackService = serviceBag:GetService(CameraStackService)
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._ragdollServiceClient = self._serviceBag:GetService(RagdollServiceClient)
+	self._cameraStackService = self._serviceBag:GetService(CameraStackService)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player == Players.LocalPlayer then
@@ -50,13 +53,15 @@ function RagdollClient:_setupCameraShake(impulseCamera)
 	end
 
 	local lastVelocity = head.Velocity
-	self._maid:GiveTask(RunService.RenderStepped:Connect(function()
+	self._maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local cameraCFrame = Workspace.CurrentCamera.CFrame
 
 		local velocity = head.Velocity
 		local dVelocity = velocity - lastVelocity
 		if dVelocity.magnitude >= 0 then
-			impulseCamera:Impulse(cameraCFrame:vectorToObjectSpace(-0.1*cameraCFrame.lookVector:Cross(dVelocity)))
+			if self._ragdollServiceClient:GetScreenShakeEnabled() then
+				impulseCamera:Impulse(cameraCFrame:vectorToObjectSpace(-0.1*cameraCFrame.lookVector:Cross(dVelocity)))
+			end
 		end
 
 		lastVelocity = velocity
@@ -74,7 +79,7 @@ function RagdollClient:_setupHapticFeedback()
 		alive = false
 	end)
 
-	spawn(function()
+	task.spawn(function()
 		for i=1, 0, -0.1 do
 			HapticFeedbackUtils.setSmallVibration(lastInputType, i)
 			task.wait(0.05)

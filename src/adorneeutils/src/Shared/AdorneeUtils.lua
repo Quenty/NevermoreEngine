@@ -1,5 +1,8 @@
 --[=[
-	Utilities involving an "Adornee" effectively, any Roblox instance
+	Utilities involving an "Adornee" effectively, any Roblox instance. This is an extremely
+	useful library to use as it lets you abstract applying effects to any Roblox instance
+	instead of specifically switching for different Roblox types.
+
 	@class AdorneeUtils
 ]=]
 

@@ -15,6 +15,7 @@ local DataStore = require("DataStore")
 local PromiseUtils = require("PromiseUtils")
 local PendingPromiseTracker = require("PendingPromiseTracker")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local PlayerDataStoreManager = setmetatable({}, BaseObject)
 PlayerDataStoreManager.ClassName = "PlayerDataStoreManager"
@@ -69,7 +70,7 @@ end
 
 --[=[
 	Adds a callback to be called before save on removal
-	@param callback function
+	@param callback function -- May return a promise
 ]=]
 function PlayerDataStoreManager:AddRemovingCallback(callback)
 	table.insert(self._removingCallbacks, callback)
@@ -142,14 +143,22 @@ function PlayerDataStoreManager:_removePlayerDataStore(player)
 
 	self._removing[player] = true
 
+	local removingPromises = {}
 	for _, func in pairs(self._removingCallbacks) do
-		func(player)
+		local result = func(player)
+		if Promise.isPromise(result) then
+			table.insert(removingPromises, result)
+		end
 	end
 
-	datastore:Save():Finally(function()
-		datastore:Destroy()
-		self._removing[player] = nil
-	end)
+	PromiseUtils.all(removingPromises)
+		:Then(function()
+			return datastore:Save()
+		end)
+		:Finally(function()
+			datastore:Destroy()
+			self._removing[player] = nil
+		end)
 
 	-- Prevent double removal or additional issues
 	self._datastores[player] = nil

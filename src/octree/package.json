@@ -1,6 +1,6 @@
 {
   "name": "@quenty/octree",
-  "version": "3.5.0",
+  "version": "4.0.0",
   "description": "Octree implementation for Roblox - fast spatial queries",
   "keywords": [
     "Roblox",

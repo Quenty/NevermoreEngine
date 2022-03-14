@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@5.0.0...@quenty/permissionprovider@5.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@4.7.0...@quenty/permissionprovider@5.0.0) (2022-03-06)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@4.6.1...@quenty/permissionprovider@4.7.0) (2022-01-17)
+
+
+### Features
+
+* Fix sample code for loading permissions ([b06421d](https://github.com/Quenty/NevermoreEngine/commit/b06421de84cceb85db1337f21d97cf00710f46a8))
+
+
+
+
+
+## [4.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@4.6.0...@quenty/permissionprovider@4.6.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
 # [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@4.5.0...@quenty/permissionprovider@4.6.0) (2022-01-07)
 
 

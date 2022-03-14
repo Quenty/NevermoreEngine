@@ -119,6 +119,37 @@ function Rx.from(item)
 end
 
 --[=[
+	Converts a promise to an observable.
+	@param observable Observable<T>
+	@param cancelToken CancelToken?
+	@return Promise<T>
+]=]
+function Rx.toPromise(observable, cancelToken)
+	local maid = Maid.new()
+
+	local promise = Promise.new(function(resolve, reject)
+		if cancelToken then
+			if cancelToken:IsCancelled() then
+				reject()
+				return
+			end
+
+			maid:GiveTask(cancelToken.Cancelled:Connect(function()
+				reject()
+			end))
+		end
+
+		maid:GiveTask(observable:Subscribe(resolve, reject, reject))
+	end)
+
+	promise:Finally(function()
+		maid:DoCleaning()
+	end)
+
+	return promise
+end
+
+--[=[
 	https://rxjs-dev.firebaseapp.com/api/operators/merge
 
 	@param observables { Observable }
@@ -217,6 +248,8 @@ function Rx.tap(onFire, onError, onComplete)
 	assert(type(onComplete) == "function" or onComplete == nil, "Bad onComplete")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			return source:Subscribe(
 				function(...)
@@ -251,6 +284,8 @@ end
 ]=]
 function Rx.start(callback)
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			sub:Fire(callback())
 
@@ -268,6 +303,8 @@ end
 function Rx.startFrom(callback)
 	assert(type(callback) == "function", "Bad callback")
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			for _, value in pairs(callback()) do
 				sub:Fire(value)
@@ -289,6 +326,8 @@ function Rx.startWith(values)
 	assert(type(values) == "table", "Bad values")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			for _, item in pairs(values) do
 				sub:Fire(item)
@@ -313,12 +352,14 @@ end
 ]=]
 function Rx.defaultsTo(value)
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
 			local fired = false
 
-			sub:GiveTask(source:Subscribe(
+			maid:GiveTask(source:Subscribe(
 				function(...)
 					fired = true
 					sub:Fire(...)
@@ -361,6 +402,8 @@ Rx.defaultsToNil = Rx.defaultsTo(nil)
 ]=]
 function Rx.endWith(values)
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
@@ -405,6 +448,8 @@ function Rx.where(predicate)
 	assert(type(predicate) == "function", "Bad predicate callback")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			return source:Subscribe(
 				function(...)
@@ -432,6 +477,8 @@ end
 ]=]
 function Rx.distinct()
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local last = UNSET_VALUE
 
@@ -459,6 +506,8 @@ end
 function Rx.mapTo(...)
 	local args = table.pack(...)
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			return source:Subscribe(function()
 				sub:Fire(table.unpack(args, 1, args.n))
@@ -487,6 +536,8 @@ function Rx.map(project)
 	assert(type(project) == "function", "Bad project callback")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			return source:Subscribe(function(...)
 				sub:Fire(project(...))
@@ -514,6 +565,8 @@ end
 ]=]
 function Rx.mergeAll()
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
@@ -583,22 +636,31 @@ end
 ]=]
 function Rx.switchAll()
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local outerMaid = Maid.new()
 			local topComplete = false
 			local insideComplete = false
 			local currentInside = nil
 
-			outerMaid:GiveTask(source:Subscribe(
+			outerMaid:GiveTask(function()
+				-- Ensure inner subscription is disconnected first. This prevents
+				-- the inner sub from firing while the outer is subscribed,
+				-- throwing a warning.
+				outerMaid._innerSub = nil
+				outerMaid._outerSuber = nil
+			end)
+
+			outerMaid._outerSuber = source:Subscribe(
 				function(observable)
 					assert(Observable.isObservable(observable), "Bad observable")
 
 					insideComplete = false
 					currentInside = observable
-					outerMaid._current = nil
+					outerMaid._innerSub = nil
 
-					local maid = Maid.new()
-					maid:GiveTask(observable:Subscribe(
+					outerMaid._innerSub = observable:Subscribe(
 						function(...)
 							sub:Fire(...)
 						end, -- Merge each inner observable
@@ -612,12 +674,10 @@ function Rx.switchAll()
 								insideComplete = true
 								if insideComplete and topComplete then
 									sub:Complete()
-									outerMaid:DoCleaning()
+									outerMaid:DoCleaning() -- Paranoid ensure cleanup.
 								end
 							end
-						end))
-
-					outerMaid._current = maid
+						end)
 				end,
 				function(...)
 					sub:Fail(...) -- Also reflect failures up to the top!
@@ -627,9 +687,9 @@ function Rx.switchAll()
 					topComplete = true
 					if insideComplete and topComplete then
 						sub:Complete()
-						outerMaid:DoCleaning()
+						outerMaid:DoCleaning() -- Paranoid ensure cleanup
 					end
-				end))
+				end)
 
 			return outerMaid
 		end)
@@ -649,6 +709,8 @@ function Rx.flatMap(project, resultSelector)
 	assert(type(project) == "function", "Bad project")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
@@ -722,6 +784,8 @@ function Rx.takeUntil(notifier)
 	assert(Observable.isObservable(notifier))
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 			local cancelled = false
@@ -813,6 +877,8 @@ function Rx.finalize(finalizerCallback)
 	assert(type(finalizerCallback) == "function", "Bad finalizerCallback")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
@@ -836,6 +902,8 @@ end
 ]=]
 function Rx.combineLatestAll()
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local observables = {}
 			local maid = Maid.new()
@@ -895,6 +963,8 @@ function Rx.catchError(callback)
 	assert(type(callback) == "function", "Bad callback")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
@@ -1058,6 +1128,8 @@ function Rx.take(number)
 	assert(number >= 0, "Bad number")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			if number == 0 then
 				sub:Complete()
@@ -1135,6 +1207,8 @@ function Rx.withLatestFrom(inputObservables)
 	end
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
@@ -1174,6 +1248,8 @@ function Rx.scan(accumulator, seed)
 	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local current = seed
 
@@ -1203,6 +1279,8 @@ function Rx.throttleTime(duration, throttleConfig)
 	assert(type(throttleConfig) == "table" or throttleConfig == nil, "Bad throttleConfig")
 
 	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
@@ -1213,6 +1291,40 @@ function Rx.throttleTime(duration, throttleConfig)
 			maid:GiveTask(throttledFunction)
 			maid:GiveTask(source:Subscribe(function(...)
 				throttledFunction:Call(...)
+			end, sub:GetFailComplete()))
+
+			return maid
+		end)
+	end
+end
+
+--[=[
+	Throttles emission of observables on the defer stack to the last emission.
+	@return (source: Observable) -> Observable
+]=]
+function Rx.throttleDefer()
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			local lastResult
+
+			maid:GiveTask(source:Subscribe(function(...)
+				if not lastResult then
+					lastResult = table.pack(...)
+
+					-- Queue up our result
+					task.defer(function()
+						local current = lastResult
+						lastResult = nil
+
+						sub:Fire(table.unpack(current, 1, current.n))
+					end)
+				else
+					lastResult = table.pack(...)
+				end
 			end, sub:GetFailComplete()))
 
 			return maid

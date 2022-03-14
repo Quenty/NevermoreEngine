@@ -29,3 +29,11 @@ Each package is designed to be synced into Roblox using [rojo](https://rojo.spac
 :::warning
 Right now you need a special version of Rojo to sync in the npm dependencies properly!
 :::
+
+## Custom version of rojo. Why?
+
+We have a custom version of rojo to support syncing in symlinks for development, mesh parts, and optional node_modules for dependencies.
+
+## Sample project
+
+See `games/integration` for a sample setup project.

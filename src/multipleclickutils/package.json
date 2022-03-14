@@ -1,6 +1,6 @@
 {
   "name": "@quenty/multipleclickutils",
-  "version": "3.4.0",
+  "version": "4.1.0",
   "description": "Utility library for detecting multiple clicks or taps. Not good UX, but good for opening up a debug menus",
   "keywords": [
     "Roblox",
@@ -28,6 +28,7 @@
   "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal"
   },
   "publishConfig": {

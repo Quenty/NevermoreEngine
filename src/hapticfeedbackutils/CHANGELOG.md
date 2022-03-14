@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hapticfeedbackutils@2.1.1...@quenty/hapticfeedbackutils@3.0.0) (2022-03-06)
+
+
+### Features
+
+* Add HapticFeedbackUtils.setLargeVibration(userInputType, amplitude) ([25c0b7a](https://github.com/Quenty/NevermoreEngine/commit/25c0b7a3d60db64362a7a151a9db729f7830bd16))
+
+
+
+
+
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hapticfeedbackutils@2.1.0...@quenty/hapticfeedbackutils@2.1.1) (2021-12-30)
 
 **Note:** Version bump only for package @quenty/hapticfeedbackutils

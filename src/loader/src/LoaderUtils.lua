@@ -23,8 +23,9 @@ LoaderUtils.IncludeBehavior = Utils.readonly({
 	INCLUDE_SHARED = "includeShared";
 })
 
-function LoaderUtils.toWallyFormat(instance)
+function LoaderUtils.toWallyFormat(instance, isPlugin)
 	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(isPlugin) == "boolean", "Bad isPlugin")
 
 	local topLevelPackages = {}
 	LoaderUtils.discoverTopLevelPackages(topLevelPackages, instance)
@@ -32,36 +33,54 @@ function LoaderUtils.toWallyFormat(instance)
 
 	local packageInfoList = {}
 	local packageInfoMap = {}
+	local defaultReplicationType = isPlugin
+		and ScriptInfoUtils.ModuleReplicationTypes.PLUGIN
+		or ScriptInfoUtils.ModuleReplicationTypes.SHARED
+
 	for _, folder in pairs(topLevelPackages) do
-		local packageInfo = PackageInfoUtils.getOrCreatePackageInfo(folder, packageInfoMap, "")
+		local packageInfo = PackageInfoUtils.getOrCreatePackageInfo(folder, packageInfoMap, "", defaultReplicationType)
 		table.insert(packageInfoList, packageInfo)
 	end
 
 	PackageInfoUtils.fillDependencySet(packageInfoList)
 
-	local clientGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
-		ScriptInfoUtils.ModuleReplicationTypes.CLIENT)
-	local serverGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
-		ScriptInfoUtils.ModuleReplicationTypes.SERVER)
-	local sharedGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
-		ScriptInfoUtils.ModuleReplicationTypes.SHARED)
+	if isPlugin then
+		local pluginGroup = GroupInfoUtils.groupPackageInfos(packageInfoList,
+			ScriptInfoUtils.ModuleReplicationTypes.PLUGIN)
 
-	local publishSet = LoaderUtils.getPublishPackageInfoSet(packageInfoList)
+		local publishSet = LoaderUtils.getPublishPackageInfoSet(packageInfoList)
 
-	local clientFolder = Instance.new("Folder")
-	clientFolder.Name = "Packages"
+		local pluginFolder = Instance.new("Folder")
+		pluginFolder.Name = "PluginPackages"
 
-	local sharedFolder = Instance.new("Folder")
-	sharedFolder.Name = "SharedPackages"
+		LoaderUtils.reifyGroupList(pluginGroup, publishSet, pluginFolder, ScriptInfoUtils.ModuleReplicationTypes.PLUGIN)
 
-	local serverFolder = Instance.new("Folder")
-	serverFolder.Name = "Packages"
+		return pluginFolder
+	else
+		local clientGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
+			ScriptInfoUtils.ModuleReplicationTypes.CLIENT)
+		local serverGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
+			ScriptInfoUtils.ModuleReplicationTypes.SERVER)
+		local sharedGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
+			ScriptInfoUtils.ModuleReplicationTypes.SHARED)
 
-	LoaderUtils.reifyGroupList(clientGroupList, publishSet, clientFolder, ScriptInfoUtils.ModuleReplicationTypes.CLIENT)
-	LoaderUtils.reifyGroupList(serverGroupList, publishSet, serverFolder, ScriptInfoUtils.ModuleReplicationTypes.SERVER)
-	LoaderUtils.reifyGroupList(sharedGroupList, publishSet, sharedFolder, ScriptInfoUtils.ModuleReplicationTypes.SHARED)
+		local publishSet = LoaderUtils.getPublishPackageInfoSet(packageInfoList)
 
-	return clientFolder, serverFolder, sharedFolder
+		local clientFolder = Instance.new("Folder")
+		clientFolder.Name = "Packages"
+
+		local sharedFolder = Instance.new("Folder")
+		sharedFolder.Name = "SharedPackages"
+
+		local serverFolder = Instance.new("Folder")
+		serverFolder.Name = "Packages"
+
+		LoaderUtils.reifyGroupList(clientGroupList, publishSet, clientFolder, ScriptInfoUtils.ModuleReplicationTypes.CLIENT)
+		LoaderUtils.reifyGroupList(serverGroupList, publishSet, serverFolder, ScriptInfoUtils.ModuleReplicationTypes.SERVER)
+		LoaderUtils.reifyGroupList(sharedGroupList, publishSet, sharedFolder, ScriptInfoUtils.ModuleReplicationTypes.SHARED)
+
+		return clientFolder, serverFolder, sharedFolder
+	end
 end
 
 function LoaderUtils.isPackage(folder)

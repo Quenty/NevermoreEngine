@@ -27,7 +27,7 @@ function ScoredAction.new()
 	self._createdTimeStamp = tick()
 
 
-	self._preferredStack = StateStack.new()
+	self._preferredStack = StateStack.new(false)
 	self._maid:GiveTask(self._preferredStack)
 
 --[=[
@@ -85,7 +85,7 @@ end
 	@return MaidTask
 ]=]
 function ScoredAction:PushPreferred()
-	return self._preferredStack:PushState()
+	return self._preferredStack:PushState(true)
 end
 
 return ScoredAction

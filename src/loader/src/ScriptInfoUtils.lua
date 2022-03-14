@@ -17,6 +17,7 @@ ScriptInfoUtils.ModuleReplicationTypes = Utils.readonly({
 	SERVER = "server";
 	SHARED = "shared";
 	IGNORE = "ignore";
+	PLUGIN = "plugin";
 })
 
 function ScriptInfoUtils.createScriptInfo(instance, name, replicationMode)
@@ -37,6 +38,7 @@ function ScriptInfoUtils.createScriptInfoLookup()
 		[ScriptInfoUtils.ModuleReplicationTypes.SERVER] = {}; -- [string name] = scriptInfo
 		[ScriptInfoUtils.ModuleReplicationTypes.CLIENT] = {};
 		[ScriptInfoUtils.ModuleReplicationTypes.SHARED] = {};
+		[ScriptInfoUtils.ModuleReplicationTypes.PLUGIN] = {};
 	})
 end
 
@@ -123,7 +125,7 @@ function ScriptInfoUtils.addToInfoMapForMode(replicationMap, scriptInfo)
 		warn(("Duplicate module %q in same package under same replication scope. Only using first one. \n- %q\n- %q")
 			:format(scriptInfo.name,
 				scriptInfo.instance:GetFullName(),
-				replicationMap[scriptInfo.name]:GetFullName()))
+				replicationMap[scriptInfo.name].instance:GetFullName()))
 		return
 	end
 
@@ -134,14 +136,17 @@ function ScriptInfoUtils.getFolderReplicationMode(folderName, lastReplicationMod
 	assert(type(folderName) == "string", "Bad folderName")
 	assert(type(lastReplicationMode) == "string", "Bad lastReplicationMode")
 
-	if folderName == "Shared" then
+	--Plugin always replicates further
+	if folderName == ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
+		return ScriptInfoUtils.ModuleReplicationTypes.IGNORE
+	elseif lastReplicationMode == ScriptInfoUtils.ModuleReplicationTypes.PLUGIN then
+		return lastReplicationMode
+	elseif folderName == "Shared" then
 		return ScriptInfoUtils.ModuleReplicationTypes.SHARED
 	elseif folderName == "Client" then
 		return ScriptInfoUtils.ModuleReplicationTypes.CLIENT
 	elseif folderName == "Server" then
 		return ScriptInfoUtils.ModuleReplicationTypes.SERVER
-	elseif folderName == ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
-		return ScriptInfoUtils.ModuleReplicationTypes.IGNORE
 	else
 		return lastReplicationMode
 	end

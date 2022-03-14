@@ -9,9 +9,11 @@ local AccelTween = require("AccelTween")
 local BlendDefaultProps = require("BlendDefaultProps")
 local Brio = require("Brio")
 local Maid = require("Maid")
+local MaidTaskUtils = require("MaidTaskUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
+local BrioUtils = require("BrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Signal = require("Signal")
@@ -21,8 +23,6 @@ local StepUtils = require("StepUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 local ValueObjectUtils = require("ValueObjectUtils")
-local MaidTaskUtils = require("MaidTaskUtils")
-local RxBrioUtils = require("RxBrioUtils")
 
 local Blend = {}
 
@@ -56,7 +56,7 @@ function Blend.New(className)
 			local maid = Maid.new()
 
 			local instance = Instance.new(className)
-			-- maid:GiveTask(instance)
+			maid:GiveTask(instance)
 
 			if defaults then
 				for key, value in pairs(defaults) do
@@ -114,9 +114,9 @@ end
 		return verb .. " " .. name
 	end)
 
-	computed:Subscribe(function(sentence)
+	maid:GiveTask(computed:Subscribe(function(sentence)
 		print(sentence)
-	end) --> "hi alice"
+	end)) --> "hi alice"
 
 	nameState.Value = "bob" --> "hi bob"
 	verbState.Value = "bye" --> "bye bob"
@@ -210,6 +210,30 @@ function Blend.OnEvent(eventName)
 	return function(instance)
 		return Rx.fromSignal(instance[eventName])
 	end
+end
+
+--[=[
+	Uses the constructor to attach a class or resource to the actual object
+	for the lifetime of the subscription of that object.
+	@param constructor T
+	@return (parent: Instance) -> Observable<T>
+]=]
+function Blend.Attached(constructor)
+	return function(parent)
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			local resource = constructor(parent)
+
+			if MaidTaskUtils.isValidTask(resource) then
+				maid:GiveTask(resource)
+			end
+
+			sub:Fire(resource)
+
+			return maid
+		end)
+	end;
 end
 
 --[=[
@@ -369,10 +393,14 @@ function Blend.Spring(source, speed, damper)
 
 		maid:GiveTask(stopAnimate)
 		maid:GiveTask(sourceObservable:Subscribe(function(value)
-			local linearValue = SpringUtils.toLinearIfNeeded(value)
-			spring = spring or createSpring(maid, linearValue)
-			spring.t = SpringUtils.toLinearIfNeeded(value)
-			startAnimate()
+			if value then
+				local linearValue = SpringUtils.toLinearIfNeeded(value)
+				spring = spring or createSpring(maid, linearValue)
+				spring.t = SpringUtils.toLinearIfNeeded(value)
+				startAnimate()
+			else
+				warn("Got nil value from emitted source")
+			end
 		end))
 
 		return maid
@@ -427,7 +455,7 @@ end
 function Blend.toEventObservable(value)
 	if Observable.isObservable(value) then
 		return value
-	elseif typeof(value) == "RBXScriptSignal" then
+	elseif typeof(value) == "RBXScriptSignal" or Signal.isSignal(value) then
 		return Rx.fromSignal(value)
 	else
 		return nil
@@ -451,7 +479,11 @@ function Blend.toEventHandler(value)
 			end
 		end
 	elseif type(value) == "table" then
-		if value.ClassName == "ValueObject" then
+		if Signal.isSignal(value) then
+			return function(...)
+				value:Fire(...)
+			end
+		elseif value.ClassName == "ValueObject" then
 			return function(result)
 				value.Value = result
 			end
@@ -521,6 +553,48 @@ function Blend.Children(parent, value)
 end
 
 --[=[
+	An event emitter that emits the instance that was actually created. This is
+	useful for a variety of things.
+
+	Using this to track an instance
+
+	```lua
+	local currentCamera = Blend.State()
+
+	return Blend.New "ViewportFrame" {
+		CurrentCamera = currentCamera;
+		[Blend.Children] = {
+			self._current;
+			Blend.New "Camera" {
+				[Blend.Instance] = currentCamera;
+			};
+		};
+	};
+	```
+
+	You can also use this to execute code against an instance.
+
+	```lua
+	return Blend.New "Frame" {
+		[Blend.Instance] = function(frame)
+			print("We got a new frame!")
+		end;
+	};
+	```
+
+	Note that if you subscribe twice to the resulting observable, the internal function
+	will execute twice.
+
+	@param parent Instance
+	@return Observable<Instance>
+]=]
+function Blend.Instance(parent)
+	return Observable.new(function(sub)
+		sub:Fire(parent)
+	end)
+end
+
+--[=[
 	Ensures the computed version of a value is limited by lifetime instead
 	of multiple. Used in conjunction with [Blend.Children] and [Blend.Computed].
 
@@ -532,7 +606,7 @@ end
 	Blend.New "ScreenGui" {
 		Parent = game.Players.LocalPlayer.PlayerGui;
 		[Blend.Children] = {
-			Blend.Single(percentVisible, Blend.Computed(function()
+			Blend.Single(Blend.Computed(percentVisible, function()
 				-- you generally would not want to do this anyway because this reconstructs a new frame
 				-- every frame.
 
@@ -550,7 +624,28 @@ end
 	@return Observable<Brio<Instance>>
 	@within Blend
 ]=]
-Blend.Single = RxBrioUtils.switchToBrio
+function Blend.Single(observable)
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GiveTask(observable:Subscribe(function(result)
+			if Brio.isBrio(result) then
+				local copy = BrioUtils.clone(result)
+				maid._current = copy
+				sub:Fire(copy)
+				return copy
+			end
+
+			local current = Brio.new(result)
+			maid._current = current
+			sub:Fire(current)
+
+			return current
+		end))
+
+		return maid
+	end)
+end
 
 --[=[
 	Observes children and ensures that the value is cleaned up
@@ -676,7 +771,7 @@ function Blend._observeChildren(value)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			value:Subscribe(function(result)
+			maid:GiveTask(value:Subscribe(function(result)
 				if typeof(result) == "Instance" then
 					-- lifetime of subscription
 					maid:GiveTask(result)
@@ -710,7 +805,7 @@ function Blend._observeChildren(value)
 				sub:Fire(...)
 			end, function()
 				-- Drop completion, other inner components may have completed.
-			end)
+			end))
 
 			return maid
 		end)

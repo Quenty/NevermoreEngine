@@ -15,9 +15,13 @@
 		sub:Complete() -- ends stream
 	end)
 
-	observable:Subscribe() --> Connected
-	observable:Subscribe() --> Connected
-	observable:Subscribe() --> Connected
+	local sub1 = observable:Subscribe() --> Connected
+	local sub2 = observable:Subscribe() --> Connected
+	local sub3 = observable:Subscribe() --> Connected
+
+	sub1:Destroy()
+	sub2:Destroy()
+	sub3:Destroy()
 	```
 
 	Note that emitted values may be observed like this

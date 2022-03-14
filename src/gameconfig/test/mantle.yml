@@ -1,0 +1,356 @@
+owner:
+  group: 243718
+payments: personal
+environments:
+  - name: production
+    branches: [main]
+    tagCommit: true
+    overrides:
+      experience:
+        configuration:
+          playability: public
+  - name: staging
+    branches: [users, users/*]
+    overrides:
+      places:
+        start:
+          configuration:
+            name: Test Game Configuration
+
+target:
+  experience:
+    configuration:
+      playableDevices: [computer, phone, tablet, console]
+      playability: public
+      privateServerPrice: 0
+      enableStudioAccessToApis: true
+    products:
+      buyBadgeProduct:
+        name: Buy a badge!
+        description: Buys you a whole badge for testing purposes!
+        icon: assets/badges/badge.png
+        price: 25
+
+      robux_1:
+        name: 1 Robux
+        price: 1
+      robux_2:
+        name: 2 Robux
+        price: 2
+      robux_3:
+        name: 3 Robux
+        price: 3
+      robux_4:
+        name: 4 Robux
+        price: 4
+      robux_5:
+        name: 5 Robux
+        price: 5
+      robux_6:
+        name: 6 Robux
+        price: 6
+      robux_7:
+        name: 7 Robux
+        price: 7
+      robux_8:
+        name: 8 Robux
+        price: 8
+      robux_9:
+        name: 9 Robux
+        price: 9
+      robux_10:
+        name: 10 Robux
+        price: 10
+      robux_11:
+        name: 11 Robux
+        price: 11
+      robux_12:
+        name: 12 Robux
+        price: 12
+      robux_13:
+        name: 13 Robux
+        price: 13
+      robux_14:
+        name: 14 Robux
+        price: 14
+      robux_15:
+        name: 15 Robux
+        price: 15
+      robux_16:
+        name: 16 Robux
+        price: 16
+      robux_17:
+        name: 17 Robux
+        price: 17
+      robux_18:
+        name: 18 Robux
+        price: 18
+      robux_19:
+        name: 19 Robux
+        price: 19
+      robux_20:
+        name: 20 Robux
+        price: 20
+      robux_21:
+        name: 21 Robux
+        price: 21
+      robux_22:
+        name: 22 Robux
+        price: 22
+      robux_23:
+        name: 23 Robux
+        price: 23
+      robux_24:
+        name: 24 Robux
+        price: 24
+      robux_25:
+        name: 25 Robux
+        price: 25
+      robux_26:
+        name: 26 Robux
+        price: 26
+      robux_27:
+        name: 27 Robux
+        price: 27
+      robux_28:
+        name: 28 Robux
+        price: 28
+      robux_29:
+        name: 29 Robux
+        price: 29
+      robux_30:
+        name: 30 Robux
+        price: 30
+      robux_31:
+        name: 31 Robux
+        price: 31
+      robux_32:
+        name: 32 Robux
+        price: 32
+      robux_33:
+        name: 33 Robux
+        price: 33
+      robux_34:
+        name: 34 Robux
+        price: 34
+      robux_35:
+        name: 35 Robux
+        price: 35
+      robux_36:
+        name: 36 Robux
+        price: 36
+      robux_37:
+        name: 37 Robux
+        price: 37
+      robux_38:
+        name: 38 Robux
+        price: 38
+      robux_39:
+        name: 39 Robux
+        price: 39
+      robux_40:
+        name: 40 Robux
+        price: 40
+      robux_41:
+        name: 41 Robux
+        price: 41
+      robux_42:
+        name: 42 Robux
+        price: 42
+      robux_43:
+        name: 43 Robux
+        price: 43
+      robux_44:
+        name: 44 Robux
+        price: 44
+      robux_45:
+        name: 45 Robux
+        price: 45
+      robux_46:
+        name: 46 Robux
+        price: 46
+      robux_47:
+        name: 47 Robux
+        price: 47
+      robux_48:
+        name: 48 Robux
+        price: 48
+      robux_49:
+        name: 49 Robux
+        price: 49
+      robux_50:
+        name: 50 Robux
+        price: 50
+      robux_51:
+        name: 51 Robux
+        price: 51
+      robux_52:
+        name: 52 Robux
+        price: 52
+      robux_53:
+        name: 53 Robux
+        price: 53
+      robux_54:
+        name: 54 Robux
+        price: 54
+      robux_55:
+        name: 55 Robux
+        price: 55
+      robux_56:
+        name: 56 Robux
+        price: 56
+      robux_57:
+        name: 57 Robux
+        price: 57
+      robux_58:
+        name: 58 Robux
+        price: 58
+      robux_59:
+        name: 59 Robux
+        price: 59
+      robux_60:
+        name: 60 Robux
+        price: 60
+      robux_61:
+        name: 61 Robux
+        price: 61
+      robux_62:
+        name: 62 Robux
+        price: 62
+      robux_63:
+        name: 63 Robux
+        price: 63
+      robux_64:
+        name: 64 Robux
+        price: 64
+      robux_65:
+        name: 65 Robux
+        price: 65
+      robux_66:
+        name: 66 Robux
+        price: 66
+      robux_67:
+        name: 67 Robux
+        price: 67
+      robux_68:
+        name: 68 Robux
+        price: 68
+      robux_69:
+        name: 69 Robux
+        price: 69
+      robux_70:
+        name: 70 Robux
+        price: 70
+      robux_71:
+        name: 71 Robux
+        price: 71
+      robux_72:
+        name: 72 Robux
+        price: 72
+      robux_73:
+        name: 73 Robux
+        price: 73
+      robux_74:
+        name: 74 Robux
+        price: 74
+      robux_75:
+        name: 75 Robux
+        price: 75
+      robux_76:
+        name: 76 Robux
+        price: 76
+      robux_77:
+        name: 77 Robux
+        price: 77
+      robux_78:
+        name: 78 Robux
+        price: 78
+      robux_79:
+        name: 79 Robux
+        price: 79
+      robux_80:
+        name: 80 Robux
+        price: 80
+      robux_81:
+        name: 81 Robux
+        price: 81
+      robux_82:
+        name: 82 Robux
+        price: 82
+      robux_83:
+        name: 83 Robux
+        price: 83
+      robux_84:
+        name: 84 Robux
+        price: 84
+      robux_85:
+        name: 85 Robux
+        price: 85
+      robux_86:
+        name: 86 Robux
+        price: 86
+      robux_87:
+        name: 87 Robux
+        price: 87
+      robux_88:
+        name: 88 Robux
+        price: 88
+      robux_89:
+        name: 89 Robux
+        price: 89
+      robux_90:
+        name: 90 Robux
+        price: 90
+      robux_91:
+        name: 91 Robux
+        price: 91
+      robux_92:
+        name: 92 Robux
+        price: 92
+      robux_93:
+        name: 93 Robux
+        price: 93
+      robux_94:
+        name: 94 Robux
+        price: 94
+      robux_95:
+        name: 95 Robux
+        price: 95
+      robux_96:
+        name: 96 Robux
+        price: 96
+      robux_97:
+        name: 97 Robux
+        price: 97
+      robux_98:
+        name: 98 Robux
+        price: 98
+      robux_99:
+        name: 99 Robux
+        price: 99
+      robux_100:
+        name: 100 Robux
+        price: 100
+    passes:
+      happinessProduct:
+        name: Unlimited happiness
+        description: Buys you unlimited happiness.
+        icon: assets/badges/badge.png
+        price: 499
+
+    badges:
+      alphaTester:
+        name: Alpha Tester!
+        description: You helped!
+        icon: assets/badges/badge.png
+        enabled: true
+
+    places:
+      start:
+        file: out/game.rbxlx
+        configuration:
+          name: Test Game Configuration
+          description: |-
+            This is a test mantle game with a variety of interesting assets and stuff to test!
+          maxPlayerCount: 30
+          serverFill: robloxOptimized

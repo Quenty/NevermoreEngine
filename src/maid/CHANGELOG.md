@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.1.0...@quenty/maid@2.2.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/maid
+
+
+
+
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.0.2...@quenty/maid@2.1.0) (2022-01-17)
+
+
+### Bug Fixes
+
+* Maid errors are better ([f2cd8dd](https://github.com/Quenty/NevermoreEngine/commit/f2cd8dd529aacca133b5d1c773cb19479fc581fe))
+
+
+
+
+
 ## [2.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.0.1...@quenty/maid@2.0.2) (2021-12-30)
 
 **Note:** Version bump only for package @quenty/maid

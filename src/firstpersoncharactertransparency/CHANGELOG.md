@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@4.0.0...@quenty/firstpersoncharactertransparency@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@3.5.0...@quenty/firstpersoncharactertransparency@4.0.0) (2022-03-06)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@3.4.0...@quenty/firstpersoncharactertransparency@3.5.0) (2022-01-17)
+
+
+### Features
+
+* Support showing body parts in FirstPersonCharacterTransparency ([25681b5](https://github.com/Quenty/NevermoreEngine/commit/25681b5ec44512c4d465c25a3a353d9df0bd12d0))
+
+
+
+
+
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@3.3.0...@quenty/firstpersoncharactertransparency@3.4.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/firstpersoncharactertransparency

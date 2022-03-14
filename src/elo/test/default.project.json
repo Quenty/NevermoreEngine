@@ -1,0 +1,11 @@
+{
+  "name": "EloTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "elo": {
+        "$path": ".."
+      }
+    }
+  }
+}

@@ -131,15 +131,24 @@ function DataStore:Save()
 		return Promise.rejected("Load not successful, not saving")
 	end
 
-	if not self:HasWritableData() then
-		-- Nothing to save, don't update anything
-		if DEBUG_WRITING then
-			print("[DataStore.Save] - Not saving, nothing staged")
-		end
-		return Promise.resolved(nil)
+	if DEBUG_WRITING then
+		print("[DataStore.Save] - Starting save routine")
 	end
 
-	return self:_saveData(self:GetNewWriter())
+	-- Avoid constructing promises for every callback down the datastore
+	-- upon save.
+	return (self:_promiseInvokeSavingCallbacks() or Promise.resolved())
+		:Then(function()
+			if not self:HasWritableData() then
+				-- Nothing to save, don't update anything
+				if DEBUG_WRITING then
+					print("[DataStore.Save] - Not saving, nothing staged")
+				end
+				return nil
+			else
+				return self:_saveData(self:GetNewWriter())
+			end
+		end)
 end
 
 --[=[

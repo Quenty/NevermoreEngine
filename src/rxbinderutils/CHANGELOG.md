@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@5.0.0...@quenty/rxbinderutils@5.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@4.9.0...@quenty/rxbinderutils@5.0.0) (2022-03-06)
+
+
+### Bug Fixes
+
+* Better errors when not passing a binder into RxBinderUtils ([9897377](https://github.com/Quenty/NevermoreEngine/commit/98973775e85db5fd2a49ddeb1bcbce949a35f43b))
+
+
+
+
+
+# [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@4.8.1...@quenty/rxbinderutils@4.9.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+## [4.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@4.8.0...@quenty/rxbinderutils@4.8.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
 # [4.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@4.7.0...@quenty/rxbinderutils@4.8.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/rxbinderutils

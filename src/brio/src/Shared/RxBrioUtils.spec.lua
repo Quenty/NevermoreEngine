@@ -13,12 +13,14 @@ return function()
 		it("should execute immediately", function()
 			local observe = RxBrioUtils.combineLatest({})
 			local brio
-			observe:Subscribe(function(result)
+			local sub = observe:Subscribe(function(result)
 				brio = result
 			end)
 			expect(brio).to.be.ok()
 			expect(Brio.isBrio(brio)).to.equal(true)
 			expect(brio:IsDead()).to.equal(true)
+
+			sub:Destroy()
 		end)
 	end)
 
@@ -32,7 +34,7 @@ return function()
 			})
 			local brio
 
-			observe:Subscribe(function(result)
+			local sub = observe:Subscribe(function(result)
 				brio = result
 			end)
 			expect(brio).to.be.ok()
@@ -40,6 +42,8 @@ return function()
 			expect(not brio:IsDead()).to.equal(true)
 			expect(brio:GetValue()).to.be.a("table")
 			expect(brio:GetValue().value).to.equal(5)
+
+			sub:Destroy()
 		end)
 	end)
 
@@ -60,7 +64,7 @@ return function()
 		local fireCount = 0
 
 		it("should execute immediately", function()
-			observe:Subscribe(function(result)
+			local sub = observe:Subscribe(function(result)
 				lastResult = result
 				fireCount = fireCount + 1
 			end)
@@ -69,6 +73,8 @@ return function()
 			expect(Brio.isBrio(lastResult)).to.equal(false)
 			expect(lastResult.value).to.equal(5)
 			expect(lastResult.otherValue).to.equal(25)
+
+			sub:Destroy()
 		end)
 
 		it("should reset when the brio is killed", function()

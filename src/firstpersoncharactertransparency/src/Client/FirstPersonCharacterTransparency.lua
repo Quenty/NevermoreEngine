@@ -26,12 +26,19 @@ FirstPersonCharacterTransparency.__index = FirstPersonCharacterTransparency
 function FirstPersonCharacterTransparency.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), FirstPersonCharacterTransparency)
 
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
 	self._humanoid = humanoid or error("No humanoid")
 	self._character = self._humanoid.Parent or error("No character")
-	self._transparencyService = serviceBag:GetService(TransparencyService)
+	self._transparencyService = self._serviceBag:GetService(TransparencyService)
 
-	self._parts = {}
+	self._otherParts = {}
+	self._bodyParts = {}
 	self._transparency = 0
+
+	self._shouldShowBodyParts = Instance.new("BoolValue")
+	self._shouldShowBodyParts.Value = true
+	self._maid:GiveTask(self._shouldShowBodyParts)
 
 	-- Listen to parts
 	for _, part in pairs(self._character:GetDescendants()) do
@@ -54,6 +61,17 @@ function FirstPersonCharacterTransparency.new(humanoid, serviceBag)
 end
 
 --[=[
+	Sets whether body parts should be shown.
+	@param shouldShowBodyParts boolean
+]=]
+function FirstPersonCharacterTransparency:SetShowBodyParts(shouldShowBodyParts)
+	assert(type(shouldShowBodyParts) == "boolean", "Bad shouldShowBodyParts")
+
+	self._shouldShowBodyParts.Value = shouldShowBodyParts
+	self:_updateRender()
+end
+
+--[=[
 	Sets the transparency
 	@param transparency number
 ]=]
@@ -72,38 +90,60 @@ function FirstPersonCharacterTransparency:SetTransparency(transparency)
 
 	self._transparency = transparency
 
-	for part, _ in pairs(self._parts) do
+	for part, _ in pairs(self._otherParts) do
 		self._transparencyService:SetTransparency(self, part, self._transparency)
+	end
+
+	local bodyTransparency = self:_getBodyTransparency()
+	for part, _ in pairs(self._bodyParts) do
+		self._transparencyService:SetTransparency(self, part, bodyTransparency)
+	end
+end
+
+function FirstPersonCharacterTransparency:_getBodyTransparency()
+	if self._shouldShowBodyParts.Value then
+		return nil
+	else
+		return self._transparency
 	end
 end
 
 function FirstPersonCharacterTransparency:_reset()
-	for part, _ in pairs(self._parts) do
+	for part, _ in pairs(self._otherParts) do
+		self._transparencyService:ResetTransparency(self, part)
+	end
+
+	for part, _ in pairs(self._bodyParts) do
 		self._transparencyService:ResetTransparency(self, part)
 	end
 end
 
-function FirstPersonCharacterTransparency:_shouldAddPart(part)
-	if not part:IsA("BasePart") then
-		return false
-	end
-
-	return part:FindFirstAncestorWhichIsA("Accessory")
-		or part.Name ~= "Head"
+function FirstPersonCharacterTransparency:_isBodyPart(part)
+	return not part:FindFirstAncestorWhichIsA("Accessory")
 end
 
 function FirstPersonCharacterTransparency:_handlePartAdded(part)
-	if self:_shouldAddPart(part) then
-		self._parts[part] = true
-		if self._transparency then
-			self._transparencyService:SetTransparency(self, part, self._transparency)
+	if part:IsA("BasePart") then
+		if self:_isBodyPart(part) then
+			local bodyTransparency = self:_getBodyTransparency()
+			if bodyTransparency then
+				self._transparencyService:SetTransparency(self, part, bodyTransparency)
+			end
+			self._bodyParts[part] = true
+		else
+			self._otherParts[part] = true
+
+			if self._transparency then
+				self._transparencyService:SetTransparency(self, part, self._transparency)
+			end
 		end
 	end
 end
 
 function FirstPersonCharacterTransparency:_handlePartRemoving(part)
 	if part:IsA("BasePart") then
-		self._parts[part] = nil
+		self._otherParts[part] = nil
+		self._bodyParts[part] = nil
 		self._transparencyService:ResetTransparency(self, part)
 	end
 end

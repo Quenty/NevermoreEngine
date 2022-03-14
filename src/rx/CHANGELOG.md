@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@4.0.0...@quenty/rx@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.8.0...@quenty/rx@4.0.0) (2022-03-06)
+
+
+### Features
+
+* Add Rx.throttleDefer() ([e0bdf7f](https://github.com/Quenty/NevermoreEngine/commit/e0bdf7f1220e66923fe275b323afd153d87f6351))
+
+
+
+
+
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.7.1...@quenty/rx@3.8.0) (2022-01-17)
+
+
+### Features
+
+* Add Rx.toPromise(observable, cancelToken) ([1237fb4](https://github.com/Quenty/NevermoreEngine/commit/1237fb4155bb9bcca94ffd5f618fcea60026f694))
+* Add stack tracing to subscription if desired, and check pending state ([6cf8bc6](https://github.com/Quenty/NevermoreEngine/commit/6cf8bc6ab5916a0a2c237a2552fd9901dca1a756))
+
+
+
+
+
+## [3.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.7.0...@quenty/rx@3.7.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
+
 # [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@3.6.0...@quenty/rx@3.7.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/rx

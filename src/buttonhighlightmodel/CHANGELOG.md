@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@4.0.0...@quenty/buttonhighlightmodel@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.6.0...@quenty/buttonhighlightmodel@4.0.0) (2022-03-06)
+
+
+### Features
+
+* ButtonHighlightModel can assign the button at any point which allows for use in Blend ([7010810](https://github.com/Quenty/NevermoreEngine/commit/701081083ddb40e9cb82df984594187386ab85df))
+
+
+
+
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.5.1...@quenty/buttonhighlightmodel@3.6.0) (2022-01-17)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
+
+## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.5.0...@quenty/buttonhighlightmodel@3.5.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
+
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@3.4.0...@quenty/buttonhighlightmodel@3.5.0) (2022-01-07)
 
 

@@ -32,7 +32,7 @@ function Ragdollable.new(humanoid, serviceBag)
 	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
 
 	self._obj.BreakJointsOnDeath = false
-	RagdollRigging.createRagdollJoints(self._obj.Parent, humanoid.RigType)
+	RagdollRigging.configureRagdollJoints(true, self._obj.Parent, humanoid.RigType)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player then
@@ -97,7 +97,7 @@ function Ragdollable:_enableServer()
 	local maid = Maid.new()
 
 	-- This will reset friction too
-	RagdollRigging.createRagdollJoints(self._obj.Parent, self._obj.RigType)
+	RagdollRigging.configureRagdollJoints(true, self._obj.Parent, self._obj.RigType)
 
 	maid:GiveTask(RagdollUtils.setupState(self._obj))
 	maid:GiveTask(RagdollUtils.setupMotors(self._obj))

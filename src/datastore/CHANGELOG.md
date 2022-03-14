@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@4.0.0...@quenty/datastore@4.1.0) (2022-03-10)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.6.0...@quenty/datastore@4.0.0) (2022-03-06)
+
+
+### Features
+
+* Can add removing promises to datastore before save ([653bef8](https://github.com/Quenty/NevermoreEngine/commit/653bef8717e4470cf94340e67ff69eab1b7269f6))
+
+
+
+
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.5.1...@quenty/datastore@3.6.0) (2022-01-17)
+
+
+### Features
+
+* Add optional PlayerDataStoreService to centralize datastore usage across submodules. ([1c4349f](https://github.com/Quenty/NevermoreEngine/commit/1c4349fa3ed4ef59ed41117319057ca9e2bd6dfd))
+
+
+
+
+
+## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.5.0...@quenty/datastore@3.5.1) (2022-01-16)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@3.4.0...@quenty/datastore@3.5.0) (2022-01-07)
 
 **Note:** Version bump only for package @quenty/datastore
