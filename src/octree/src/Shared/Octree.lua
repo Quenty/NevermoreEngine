@@ -26,6 +26,15 @@
 
 	Sometimes using Roblox's spatial hash using the region API is faster than using an octree. However,
 	for data that is centralized, or static, an octree can be a very efficient spatial query mechanism.
+
+	That said, it is totally fine to track the objects that DO move around using octree, as long as you 
+	apply proper optimizations. The main performance cost of doing this comes down to tracking and 
+	upating the position of the objects, which is fine if: 
+		1) You have a way to detect the movement without having to loop through all the moving 
+		objects to update the position
+		2) You can tolerate some inaccuracy with positions and smear this update
+		3) You have less than 1000 objects to track, in this case looping through everything 
+		shouldn't be too costly. 
 	:::
 
 	@class Octree
