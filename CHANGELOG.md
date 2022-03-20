@@ -1,3 +1,16 @@
+# (Sun Mar 20 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/octree@4.0.1`
+  - docs: Added tips about using octree for dynamic objects [#253](https://github.com/Quenty/NevermoreEngine/pull/253) ([@Yuuwa0519](https://github.com/Yuuwa0519))
+
+#### Authors: 1
+
+- [@Yuuwa0519](https://github.com/Yuuwa0519)
+
+---
+
 # (Thu Mar 10 2022)
 
 #### 🚀 Enhancement

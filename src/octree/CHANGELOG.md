@@ -1,3 +1,17 @@
+# v4.0.1 (Sun Mar 20 2022)
+
+#### 🐛 Bug Fix
+
+- docs: Added tips about using octree for dynamic objects [#253](https://github.com/Quenty/NevermoreEngine/pull/253) ([@Yuuwa0519](https://github.com/Yuuwa0519))
+- Update Octree.lua ([@Yuuwa0519](https://github.com/Yuuwa0519))
+- Merge branch 'Quenty:main' into main ([@Yuuwa0519](https://github.com/Yuuwa0519))
+
+#### Authors: 1
+
+- [@Yuuwa0519](https://github.com/Yuuwa0519)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
