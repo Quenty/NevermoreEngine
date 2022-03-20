@@ -27,6 +27,7 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
     "@quenty/inputkeymaputils": "file:../inputkeymaputils",
     "@quenty/inputmode": "file:../inputmode",
     "@quenty/loader": "file:../loader",

@@ -58,6 +58,13 @@ function ScoredAction:IsPreferred()
 end
 
 --[=[
+	@return Observable<boolean>
+]=]
+function ScoredAction:ObservePreferred()
+	return self._preferredStack:Observe()
+end
+
+--[=[
 	Sets the score
 
 	:::info
