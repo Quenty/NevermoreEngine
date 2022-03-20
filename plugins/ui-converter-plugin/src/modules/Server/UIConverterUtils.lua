@@ -79,7 +79,7 @@ function UIConverterUtils.toLuaComment(text)
 	end
 end
 
-function UIConverterUtils.toLuaPropertyString(value)
+function UIConverterUtils.toLuaPropertyString(value, debugHint)
 	local valueType = typeof(value)
 	if valueType == "string" then
 		local multiline = UIConverterUtils.toMultiLineEscape(value)
@@ -124,20 +124,20 @@ function UIConverterUtils.toLuaPropertyString(value)
 		end
 	elseif valueType == "Rect" then
 		return ("Rect.new(%s, %s)"):format(
-			UIConverterUtils.toLuaPropertyString(value.Min),
-			UIConverterUtils.toLuaPropertyString(value.Max))
+			UIConverterUtils.toLuaPropertyString(value.Min, debugHint),
+			UIConverterUtils.toLuaPropertyString(value.Max, debugHint))
 	elseif valueType == "ColorSequence" then
 		local keypoints = value.Keypoints
 		if #keypoints == 1 then
-			return ("ColorSequence.new(%s)"):format(UIConverterUtils.toLuaPropertyString(keypoints[1].Value))
+			return ("ColorSequence.new(%s)"):format(UIConverterUtils.toLuaPropertyString(keypoints[1].Value, debugHint))
 		elseif #keypoints == 2 and keypoints[1].Time == 0 and keypoints[2].Time == 1 then
 			return ("ColorSequence.new(%s, %s)"):format(
-				UIConverterUtils.toLuaPropertyString(value.Keypoints[1].Value),
-				UIConverterUtils.toLuaPropertyString(value.Keypoints[2].Value))
+				UIConverterUtils.toLuaPropertyString(value.Keypoints[1].Value, debugHint),
+				UIConverterUtils.toLuaPropertyString(value.Keypoints[2].Value, debugHint))
 		else
 			local strings = {}
 			for _, keypoint in pairs(keypoints) do
-				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint))
+				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint, debugHint))
 			end
 			return ("ColorSequence.new({%s\n})"):format(table.concat(strings, ","))
 		end
@@ -152,18 +152,18 @@ function UIConverterUtils.toLuaPropertyString(value)
 		else
 			local strings = {}
 			for _, keypoint in pairs(keypoints) do
-				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint))
+				table.insert(strings, "\n\t" .. UIConverterUtils.toLuaPropertyString(keypoint, debugHint))
 			end
 			return ("NumberSequence.new({%s\n})"):format(table.concat(strings, ","))
 		end
 	elseif valueType == "ColorSequenceKeypoint" then
 		return ("ColorSequenceKeypoint.new(%s, %s)"):format(
 			roundNumber(value.Time),
-			UIConverterUtils.toLuaPropertyString(value.Value))
+			UIConverterUtils.toLuaPropertyString(value.Value, debugHint))
 	elseif valueType == "NumberSequenceKeypoint" then
 		return ("NumberSequenceKeypoint.new(%s, %s)"):format(
 			roundNumber(value.Time),
-			UIConverterUtils.toLuaPropertyString(value.Value))
+			UIConverterUtils.toLuaPropertyString(value.Value, debugHint))
 	elseif valueType == "BrickColor" then
 		return ("BrickColor.new(%q)"):format(value.Name)
 	elseif valueType == "UDim" then
@@ -195,8 +195,11 @@ function UIConverterUtils.toLuaPropertyString(value)
 			return ("PhysicalProperties.new(%s, %s, %s, %s, %s)"):format(
 				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity, value.FrictionWeight, value.ElasticityWeight))
 		end
+	elseif valueType == "userdata" then
+		-- FontFace
+		warn(("Bad property type %s for %s - Cannot serialize."):format(valueType, debugHint and tostring(debugHint) or "?"))
 	else
-		error(("Unknown property type %s"):format(valueType))
+		error(("Unknown property type %s for %s"):format(valueType, debugHint and tostring(debugHint) or "?"))
 	end
 end
 
@@ -215,7 +218,7 @@ function UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
 			if typeof(value) == "Instance" then
 				data[key] = UIConverterUtils.getRefProperty(refLookupMap, value)
 			else
-				data[key] = UIConverterUtils.toLuaPropertyString(value)
+				data[key] = UIConverterUtils.toLuaPropertyString(value, key)
 			end
 		end
 	end

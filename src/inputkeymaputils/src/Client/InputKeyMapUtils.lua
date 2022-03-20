@@ -247,7 +247,11 @@ end
 	@return SlottedTouchButton
 ]=]
 function InputKeyMapUtils.createSlottedTouchButton(slotId)
-	assert(slotId == "primary1" or slotId == "primary2" or slotId == "primary3" or slotId == "primary4", "Bad slotId")
+	assert(slotId == "primary1"
+		or slotId == "primary2"
+		or slotId == "primary3"
+		or slotId == "primary4"
+		or slotId == "touchpad1", "Bad slotId")
 
 	return {
 		type = "SlottedTouchButton";
