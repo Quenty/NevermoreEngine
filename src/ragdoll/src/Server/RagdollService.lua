@@ -19,6 +19,28 @@ function RagdollService:Init(serviceBag)
 end
 
 --[=[
+	Sets whether ragdolls should ragdoll on fall.
+	@param ragdollOnFall boolean
+]=]
+function RagdollService:SetRagdollOnFall(ragdollOnFall)
+	assert(self._serviceBag, "Not initialized")
+	assert(type(ragdollOnFall) == "boolean", "Bad ragdollOnFall")
+
+	self._binders.RagdollHumanoidOnFall:SetAutomaticTagging(ragdollOnFall)
+end
+
+--[=[
+	Sets whether ragdolls should unragdoll automatically.
+	@param unragdollAutomatically boolean
+]=]
+function RagdollService:SetRagdollOnDeath(ragdollOnDeath)
+	assert(self._serviceBag, "Not initialized")
+	assert(type(ragdollOnDeath) == "boolean", "Bad ragdollOnDeath")
+
+	self._binders.RagdollHumanoidOnDeath:SetAutomaticTagging(ragdollOnDeath)
+end
+
+--[=[
 	Sets whether ragdolls should unragdoll automatically.
 	@param unragdollAutomatically boolean
 ]=]
