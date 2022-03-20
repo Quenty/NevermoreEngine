@@ -45,7 +45,7 @@ function IKServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
-	self._lookAround = true
+	self._lookAround = false
 
 	self._ikBinders = self._serviceBag:GetService(IKBindersClient)
 	self._serviceBag:GetService(CameraStackService)
