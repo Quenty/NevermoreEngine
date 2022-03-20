@@ -31,7 +31,7 @@ end
 
 --[=[
 	Sets whether ragdolls should unragdoll automatically.
-	@param unragdollAutomatically boolean
+	@param ragdollOnDeath boolean
 ]=]
 function RagdollService:SetRagdollOnDeath(ragdollOnDeath)
 	assert(self._serviceBag, "Not initialized")
