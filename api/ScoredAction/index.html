@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="generator" content="Docusaurus v2.0.0-beta.9">
 <title data-react-helmet="true">ScoredAction | Nevermore</title><meta data-react-helmet="true" property="og:title" content="ScoredAction | Nevermore"><meta data-react-helmet="true" name="twitter:card" content="summary_large_image"><meta data-react-helmet="true" name="description" content="An action that has a score, and may recieve priority from [ScoredActionService]"><meta data-react-helmet="true" property="og:description" content="An action that has a score, and may recieve priority from [ScoredActionService]"><meta data-react-helmet="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/ScoredAction"><meta data-react-helmet="true" name="docusaurus_locale" content="en"><meta data-react-helmet="true" name="docusaurus_tag" content="default"><link data-react-helmet="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/ScoredAction"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ScoredAction" hreflang="en"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ScoredAction" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.fb20d3d5.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.12bc9726.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.710c4631.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.68a866c0.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.8e279928.js" as="script">
 </head>
 <body>
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -16,7 +16,7 @@
 <p>Constructs a new ScoredAction. Should not be called directly. See <a href="/NevermoreEngine/api/ScoredActionService#GetScoredAction">ScoredActionService.GetScoredAction</a>.</p>
 </div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="IsPreferred"><code style="text-decoration:none">IsPreferred</code><a aria-hidden="true" class="hash-link" href="#IsPreferred" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L56"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">IsPreferred</code><code>(</code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
 <p>Returns whether the action is currently preferred</p>
-</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="SetScore"><code style="text-decoration:none">SetScore</code><a aria-hidden="true" class="hash-link" href="#SetScore" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L69"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">SetScore</code><code>(</code><code>score<!-- -->: </code><code class="blue_2Afy">number</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="ObservePreferred"><code style="text-decoration:none">ObservePreferred</code><a aria-hidden="true" class="hash-link" href="#ObservePreferred" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L63"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">ObservePreferred</code><code>(</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_1JtD">&lt;</code><code class="blue_2Afy">boolean</code><code class="op_1JtD">&gt;</code></div><div></div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="SetScore"><code style="text-decoration:none">SetScore</code><a aria-hidden="true" class="hash-link" href="#SetScore" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L76"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">SetScore</code><code>(</code><code>score<!-- -->: </code><code class="blue_2Afy">number</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Sets the score</p>
 <div class="admonition admonition-info alert alert--info">
   <div class="admonition-heading">
@@ -28,9 +28,9 @@
     <p>Big number is more important. At <code>-math.huge</code> we won't ever set preferred</p>
   </div>
 </div>
-</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetScore"><code style="text-decoration:none">GetScore</code><a aria-hidden="true" class="hash-link" href="#GetScore" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L79"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">GetScore</code><code>(</code><code>) → </code><code class="blue_2Afy">number</code></div><div>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="GetScore"><code style="text-decoration:none">GetScore</code><a aria-hidden="true" class="hash-link" href="#GetScore" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L86"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">GetScore</code><code>(</code><code>) → </code><code class="blue_2Afy">number</code></div><div>
 <p>Retrieves the score</p>
-</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="PushPreferred"><code style="text-decoration:none">PushPreferred</code><a aria-hidden="true" class="hash-link" href="#PushPreferred" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L87"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">PushPreferred</code><code>(</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="PushPreferred"><code style="text-decoration:none">PushPreferred</code><a aria-hidden="true" class="hash-link" href="#PushPreferred" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/scoredactionservice/src/Client/ScoredAction.lua#L94"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>ScoredAction<!-- -->:</code><code class="green_3LnD">PushPreferred</code><code>(</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
 <p>Pushes that we're preferred</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -67,6 +67,22 @@
             }
         },
         {
+            &quot;name&quot;: &quot;ObservePreferred&quot;,
+            &quot;desc&quot;: &quot;&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Observable&lt;boolean&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 63,
+                &quot;path&quot;: &quot;src/scoredactionservice/src/Client/ScoredAction.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;SetScore&quot;,
             &quot;desc&quot;: &quot;Sets the score\n\n:::info\nBig number is more important. At `-math.huge` we won&#x27;t ever set preferred\n:::&quot;,
             &quot;params&quot;: [
@@ -79,7 +95,7 @@
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 69,
+                &quot;line&quot;: 76,
                 &quot;path&quot;: &quot;src/scoredactionservice/src/Client/ScoredAction.lua&quot;
             }
         },
@@ -95,7 +111,7 @@
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 79,
+                &quot;line&quot;: 86,
                 &quot;path&quot;: &quot;src/scoredactionservice/src/Client/ScoredAction.lua&quot;
             }
         },
@@ -111,7 +127,7 @@
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 87,
+                &quot;line&quot;: 94,
                 &quot;path&quot;: &quot;src/scoredactionservice/src/Client/ScoredAction.lua&quot;
             }
         }
@@ -146,8 +162,8 @@
         &quot;line&quot;: 7,
         &quot;path&quot;: &quot;src/scoredactionservice/src/Client/ScoredAction.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#PreferredChanged" class="table-of-contents__link toc-highlight">PreferredChanged</a></li><li><a href="#Removing" class="table-of-contents__link toc-highlight">Removing</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#GetScore" class="table-of-contents__link toc-highlight">:GetScore</a></li><li><a href="#IsPreferred" class="table-of-contents__link toc-highlight">:IsPreferred</a></li><li><a href="#PushPreferred" class="table-of-contents__link toc-highlight">:PushPreferred</a></li><li><a href="#SetScore" class="table-of-contents__link toc-highlight">:SetScore</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2021 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.12bc9726.js"></script>
-<script src="/NevermoreEngine/assets/js/main.710c4631.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#PreferredChanged" class="table-of-contents__link toc-highlight">PreferredChanged</a></li><li><a href="#Removing" class="table-of-contents__link toc-highlight">Removing</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#GetScore" class="table-of-contents__link toc-highlight">:GetScore</a></li><li><a href="#IsPreferred" class="table-of-contents__link toc-highlight">:IsPreferred</a></li><li><a href="#ObservePreferred" class="table-of-contents__link toc-highlight">:ObservePreferred</a></li><li><a href="#PushPreferred" class="table-of-contents__link toc-highlight">:PushPreferred</a></li><li><a href="#SetScore" class="table-of-contents__link toc-highlight">:SetScore</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2021 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.68a866c0.js"></script>
+<script src="/NevermoreEngine/assets/js/main.8e279928.js"></script>
 </body>
 </html>

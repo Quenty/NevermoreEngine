@@ -79,8 +79,8 @@ ContextActionService:BindActionAtPriority(
 	Enum.ContextActionPriority.High.Value,
 	unpack(InputKeyMapUtils.getInputTypesForActionBinding(inputKeyMapList)))
 ```"><meta data-react-helmet="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/InputKeyMapUtils"><meta data-react-helmet="true" name="docusaurus_locale" content="en"><meta data-react-helmet="true" name="docusaurus_tag" content="default"><link data-react-helmet="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/InputKeyMapUtils"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/InputKeyMapUtils" hreflang="en"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/InputKeyMapUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.fb20d3d5.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.12bc9726.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.710c4631.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.68a866c0.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.8e279928.js" as="script">
 </head>
 <body>
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -155,15 +155,15 @@ ContextActionService<span class="token punctuation">:</span><span class="token f
   We use the SlotId to determine which slot we should put
   these buttons in.
 </p>
-</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getUniqueKeyForInputType"><code style="text-decoration:none">getUniqueKeyForInputType</code><a aria-hidden="true" class="hash-link" href="#getUniqueKeyForInputType" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/inputkeymaputils/src/Client/InputKeyMapUtils.lua#L266"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>InputKeyMapUtils<!-- -->.</code><code class="green_3LnD">getUniqueKeyForInputType</code><code>(</code><code>inputType<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/InputKeyMapUtils#InputType">InputType</a></code><code>) → </code><code class="blue_2Afy">any</code></div><div>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getUniqueKeyForInputType"><code style="text-decoration:none">getUniqueKeyForInputType</code><a aria-hidden="true" class="hash-link" href="#getUniqueKeyForInputType" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/inputkeymaputils/src/Client/InputKeyMapUtils.lua#L270"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>InputKeyMapUtils<!-- -->.</code><code class="green_3LnD">getUniqueKeyForInputType</code><code>(</code><code>inputType<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/InputKeyMapUtils#InputType">InputType</a></code><code>) → </code><code class="blue_2Afy">any</code></div><div>
 <p>
   Computes a unique id for an inputType which can be used
   in a set to deduplicate/compare the objects. Used to know
   when to exclude different types from each other.
 </p>
-</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="isRobloxTouchButton"><code style="text-decoration:none">isRobloxTouchButton</code><a aria-hidden="true" class="hash-link" href="#isRobloxTouchButton" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/inputkeymaputils/src/Client/InputKeyMapUtils.lua#L279"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>InputKeyMapUtils<!-- -->.</code><code class="green_3LnD">isRobloxTouchButton</code><code>(</code><code>inputKeyMapList<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/InputKeyMapUtils#InputKeyMapList">InputKeyMapList</a></code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="isRobloxTouchButton"><code style="text-decoration:none">isRobloxTouchButton</code><a aria-hidden="true" class="hash-link" href="#isRobloxTouchButton" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/inputkeymaputils/src/Client/InputKeyMapUtils.lua#L283"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>InputKeyMapUtils<!-- -->.</code><code class="green_3LnD">isRobloxTouchButton</code><code>(</code><code>inputKeyMapList<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/InputKeyMapUtils#InputKeyMapList">InputKeyMapList</a></code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
 <p>Only returns true if we're a Roblox touch button</p>
-</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="isTapInWorld"><code style="text-decoration:none">isTapInWorld</code><a aria-hidden="true" class="hash-link" href="#isTapInWorld" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/inputkeymaputils/src/Client/InputKeyMapUtils.lua#L299"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>InputKeyMapUtils<!-- -->.</code><code class="green_3LnD">isTapInWorld</code><code>(</code><code>inputKeyMapList<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/InputKeyMapUtils#InputKeyMapList">InputKeyMapList</a></code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="isTapInWorld"><code style="text-decoration:none">isTapInWorld</code><a aria-hidden="true" class="hash-link" href="#isTapInWorld" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/inputkeymaputils/src/Client/InputKeyMapUtils.lua#L303"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>InputKeyMapUtils<!-- -->.</code><code class="green_3LnD">isTapInWorld</code><code>(</code><code>inputKeyMapList<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/InputKeyMapUtils#InputKeyMapList">InputKeyMapList</a></code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
 <p>Whether this input type is a tap in the world input (for touched events)</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -398,7 +398,7 @@ ContextActionService<span class="token punctuation">:</span><span class="token f
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 266,
+                &quot;line&quot;: 270,
                 &quot;path&quot;: &quot;src/inputkeymaputils/src/Client/InputKeyMapUtils.lua&quot;
             }
         },
@@ -420,7 +420,7 @@ ContextActionService<span class="token punctuation">:</span><span class="token f
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 279,
+                &quot;line&quot;: 283,
                 &quot;path&quot;: &quot;src/inputkeymaputils/src/Client/InputKeyMapUtils.lua&quot;
             }
         },
@@ -442,7 +442,7 @@ ContextActionService<span class="token punctuation">:</span><span class="token f
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 299,
+                &quot;line&quot;: 303,
                 &quot;path&quot;: &quot;src/inputkeymaputils/src/Client/InputKeyMapUtils.lua&quot;
             }
         }
@@ -535,7 +535,7 @@ ContextActionService<span class="token punctuation">:</span><span class="token f
         &quot;path&quot;: &quot;src/inputkeymaputils/src/Client/InputKeyMapUtils.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a><ul><li><a href="#InputKeyMap" class="table-of-contents__link toc-highlight">InputKeyMap</a></li><li><a href="#InputKeyMapList" class="table-of-contents__link toc-highlight">InputKeyMapList</a></li><li><a href="#InputType" class="table-of-contents__link toc-highlight">InputType</a></li><li><a href="#SlottedTouchButton" class="table-of-contents__link toc-highlight">SlottedTouchButton</a></li><li><a href="#SlottedTouchButtonData" class="table-of-contents__link toc-highlight">SlottedTouchButtonData</a></li></ul></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#createKeyMap" class="table-of-contents__link toc-highlight">.createKeyMap</a></li><li><a href="#createSlottedTouchButton" class="table-of-contents__link toc-highlight">.createSlottedTouchButton</a></li><li><a href="#getInputModes" class="table-of-contents__link toc-highlight">.getInputModes</a></li><li><a href="#getInputTypeListForMode" class="table-of-contents__link toc-highlight">.getInputTypeListForMode</a></li><li><a href="#getInputTypeSetForMode" class="table-of-contents__link toc-highlight">.getInputTypeSetForMode</a></li><li><a href="#getInputTypesForActionBinding" class="table-of-contents__link toc-highlight">.getInputTypesForActionBinding</a></li><li><a href="#getInputTypesSetForActionBinding" class="table-of-contents__link toc-highlight">.getInputTypesSetForActionBinding</a></li><li><a href="#getSlottedTouchButtonData" class="table-of-contents__link toc-highlight">.getSlottedTouchButtonData</a></li><li><a href="#getUniqueKeyForInputType" class="table-of-contents__link toc-highlight">.getUniqueKeyForInputType</a></li><li><a href="#isRobloxTouchButton" class="table-of-contents__link toc-highlight">.isRobloxTouchButton</a></li><li><a href="#isSlottedTouchButton" class="table-of-contents__link toc-highlight">.isSlottedTouchButton</a></li><li><a href="#isTapInWorld" class="table-of-contents__link toc-highlight">.isTapInWorld</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2021 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.12bc9726.js"></script>
-<script src="/NevermoreEngine/assets/js/main.710c4631.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.68a866c0.js"></script>
+<script src="/NevermoreEngine/assets/js/main.8e279928.js"></script>
 </body>
 </html>
