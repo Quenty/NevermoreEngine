@@ -24,7 +24,7 @@ local Math = {}
 	@param max1 number
 	@return number
 ]=]
-function Math.map(num, min0, max0, min1, max1)
+function Math.map(num: number, min0: number, max0: number, min1: number, max1: number): number
 	if max0 == min0 then
 		error("Range of zero")
 	end
@@ -46,7 +46,7 @@ end
 	@param percent number -- The percent
 	@return number -- The interpolated
 ]=]
-function Math.lerp(num0, num1, percent)
+function Math.lerp(num0: number, num1: number, percent: number): number
 	return num0 + ((num1 - num0) * percent)
 end
 
@@ -58,7 +58,7 @@ end
 	@param c number
 	@return number? -- Returns nil if this cannot be solved for
 ]=]
-function Math.lawOfCosines(a, b, c)
+function Math.lawOfCosines(a: number, b: number, c: number): number?
 	local l = (a*a + b*b - c*c) / (2 * a * b)
 	local angle = math.acos(l)
 	if angle ~= angle then
@@ -78,7 +78,7 @@ end
 	@param precision number? -- Defaults to 1
 	@return number
 ]=]
-function Math.round(number, precision)
+function Math.round(number: number, precision: number?): number
 	if precision then
 		return math.floor((number/precision) + 0.5) * precision
 	else
@@ -93,7 +93,7 @@ end
 	@param precision number
 	@return number
 ]=]
-function Math.roundUp(number, precision)
+function Math.roundUp(number: number, precision: number): number
 	return math.ceil(number/precision) * precision
 end
 
@@ -104,7 +104,7 @@ end
 	@param precision number
 	@return number
 ]=]
-function Math.roundDown(number, precision)
+function Math.roundDown(number: number, precision: number): number
 	return math.floor(number/precision) * precision
 end
 

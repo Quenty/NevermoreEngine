@@ -2,5 +2,6 @@
 	"languageMode": "strict",
 	"lint": { "*": true },
 	"lintErrors": true,
+	"typeErrors": true,
 	"globals": []
 }
