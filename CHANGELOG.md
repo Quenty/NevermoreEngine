@@ -1,5 +1,18 @@
 # (Sun Mar 20 2022)
 
+#### 🚀 Enhancement
+
+- `@quenty/datastore@4.2.0`, `@quenty/gameconfig@2.2.0`, `@quenty/ik@6.2.0`, `@quenty/inputkeymaputils@4.2.0`, `@quenty/math@2.1.0`, `@quenty/ragdoll@6.2.0`, `@quenty/scoredactionservice@6.2.0`, `@quenty/sounds@4.2.0`, `@quenty/statestack@5.2.0`
+  - A variety of small updates and fixes [#255](https://github.com/Quenty/NevermoreEngine/pull/255) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Mar 20 2022)
+
 #### 🐛 Bug Fix
 
 - `@quenty/octree@4.0.1`
