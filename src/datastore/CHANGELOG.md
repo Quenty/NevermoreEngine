@@ -1,23 +1,15 @@
-# v4.2.0 (Sun Mar 20 2022)
-
-#### 🚀 Enhancement
-
-- A variety of small updates and fixes [#255](https://github.com/Quenty/NevermoreEngine/pull/255) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Sort inputs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@4.1.0...@quenty/datastore@4.2.0) (2022-03-20)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@4.0.0...@quenty/datastore@4.1.0) (2022-03-10)
 

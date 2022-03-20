@@ -1,20 +1,18 @@
-# v6.2.0 (Sun Mar 20 2022)
-
-#### 🚀 Enhancement
-
-- A variety of small updates and fixes [#255](https://github.com/Quenty/NevermoreEngine/pull/255) ([@Quenty](https://github.com/Quenty))
-- feat: Do not automatically enable looking around on the IK service ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@6.1.0...@quenty/ik@6.2.0) (2022-03-20)
+
+
+### Features
+
+* Do not automatically enable looking around on the IK service ([315a8c1](https://github.com/Quenty/NevermoreEngine/commit/315a8c1037cb407a55a15610370cde4cd10dc54a))
+
+
+
+
 
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@6.0.0...@quenty/ik@6.1.0) (2022-03-10)
 

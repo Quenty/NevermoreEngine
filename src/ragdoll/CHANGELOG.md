@@ -1,24 +1,18 @@
-# v6.2.0 (Sun Mar 20 2022)
-
-#### 🚀 Enhancement
-
-- A variety of small updates and fixes [#255](https://github.com/Quenty/NevermoreEngine/pull/255) ([@Quenty](https://github.com/Quenty))
-- feat: Allow Ragdoll to be configured via service directly ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix linting ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@6.1.0...@quenty/ragdoll@6.2.0) (2022-03-20)
+
+
+### Features
+
+* Allow Ragdoll to be configured via service directly ([aeac7d9](https://github.com/Quenty/NevermoreEngine/commit/aeac7d95cb42b0bc61a3174d5970d8a31156c670))
+
+
+
+
 
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@6.0.0...@quenty/ragdoll@6.1.0) (2022-03-10)
 

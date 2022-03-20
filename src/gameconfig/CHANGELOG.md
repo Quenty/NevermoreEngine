@@ -1,23 +1,18 @@
-# v2.2.0 (Sun Mar 20 2022)
-
-#### 🚀 Enhancement
-
-- A variety of small updates and fixes [#255](https://github.com/Quenty/NevermoreEngine/pull/255) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@2.1.0...@quenty/gameconfig@2.2.0) (2022-03-20)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([7072130](https://github.com/Quenty/NevermoreEngine/commit/7072130d36532d65db99b26b3d28ac768054e03e))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@2.0.0...@quenty/gameconfig@2.1.0) (2022-03-10)
 
