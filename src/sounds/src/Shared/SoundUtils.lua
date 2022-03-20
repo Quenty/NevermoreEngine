@@ -8,8 +8,12 @@
 	@class SoundUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
+
+local SoundPromiseUtils = require("SoundPromiseUtils")
 
 local SoundUtils = {}
 
@@ -43,11 +47,56 @@ function SoundUtils.playFromId(id)
 		sound:Play()
 	end
 
-	task.delay(sound.TimeLength + 0.05, function()
-		sound:Destroy()
-	end)
+	SoundUtils.removeAfterTimeLength(sound)
 
 	return sound
+end
+
+--[=[
+	Plays back a template given asset id in the parent
+
+	@param id string | number
+	@param parent Instance
+	@return Sound
+]=]
+function SoundUtils.playFromIdInParent(id, parent)
+	assert(typeof(parent) == "Instance", "Bad parent")
+
+	local soundId = SoundUtils.toRbxAssetId(id)
+	assert(type(soundId) == "string", "Bad id")
+
+	local sound = Instance.new("Sound")
+	sound.Name = ("Sound_%s"):format(soundId)
+	sound.SoundId = soundId
+	sound.Volume = 0.25
+	sound.Archivable = false
+	sound.Parent = parent
+
+	if not RunService:IsRunning() then
+		SoundService:PlayLocalSound(sound)
+	else
+		sound:Play()
+	end
+
+	SoundUtils.removeAfterTimeLength(sound)
+
+	return sound
+end
+
+--[=[
+	Loads the sound and then cleans up the sound after load.
+
+	@param sound Sound
+]=]
+function SoundUtils.removeAfterTimeLength(sound)
+	-- TODO: clean up on destroying
+	SoundPromiseUtils.promiseLoaded(sound):Then(function()
+		task.delay(sound.TimeLength + 0.05, function()
+			sound:Destroy()
+		end)
+	end, function()
+		sound:Destroy()
+	end)
 end
 
 --[=[
@@ -70,9 +119,7 @@ function SoundUtils.playTemplate(templates, templateName)
 
 	SoundService:PlayLocalSound(sound)
 
-	task.delay(sound.TimeLength + 0.05, function()
-		sound:Destroy()
-	end)
+	SoundUtils.removeAfterTimeLength(sound)
 
 	return sound
 end
@@ -109,9 +156,7 @@ function SoundUtils.playTemplateInParent(templates, templateName, parent)
 
 	sound:Play()
 
-	task.delay(sound.TimeLength + 0.05, function()
-		sound:Destroy()
-	end)
+	SoundUtils.removeAfterTimeLength(sound)
 
 	return sound
 end
