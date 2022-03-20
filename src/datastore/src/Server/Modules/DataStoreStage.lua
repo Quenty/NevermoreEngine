@@ -14,9 +14,9 @@ local BaseObject = require("BaseObject")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreWriter = require("DataStoreWriter")
 local Promise = require("Promise")
-local Table = require("Table")
-local Signal = require("Signal")
 local PromiseUtils = require("PromiseUtils")
+local Signal = require("Signal")
+local Table = require("Table")
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
