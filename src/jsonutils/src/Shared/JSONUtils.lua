@@ -35,6 +35,25 @@ function JSONUtils.jsonDecode(str)
 end
 
 --[=[
+	Encodes JSON, or reports error.
+	@param str string
+	@return boolean
+	@return table? -- Result
+	@return string? -- Error
+]=]
+function JSONUtils.jsonEncode(value)
+	local encoded
+	local ok, err = pcall(function()
+		encoded = HttpService:JSONEncode(value)
+	end)
+	if not ok then
+		return false, nil, err
+	end
+
+	return true, encoded
+end
+
+--[=[
 	Decodes JSON, or reports error.
 	@param str string
 	@return Promise<table>

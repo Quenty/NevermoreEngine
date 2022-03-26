@@ -1,0 +1,46 @@
+{
+  "name": "@quenty/rogue-properties",
+  "version": "1.0.0",
+  "description": "Roguelike properties which can be modified by external provides",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/rogue-properties/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/binder": "file:../binder",
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/jsonutils": "file:../jsonutils",
+    "@quenty/linkutils": "file:../linkutils",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
+    "@quenty/rxbinderutils": "file:../rxbinderutils",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/signal": "file:../signal",
+    "@quenty/table": "file:../table",
+    "@quenty/valuebaseutils": "file:../valuebaseutils",
+    "@quentystudios/t": "^1.2.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "RoguePropertiesTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "rogueproperties": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}
