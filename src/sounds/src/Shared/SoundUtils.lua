@@ -35,11 +35,7 @@ function SoundUtils.playFromId(id)
 	local soundId = SoundUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
 
-	local sound = Instance.new("Sound")
-	sound.Name = ("Sound_%s"):format(soundId)
-	sound.SoundId = soundId
-	sound.Volume = 0.25
-	sound.Archivable = false
+	local sound = SoundUtils.createSoundFromId(id)
 
 	if RunService:IsClient() then
 		SoundService:PlayLocalSound(sound)
@@ -48,6 +44,22 @@ function SoundUtils.playFromId(id)
 	end
 
 	SoundUtils.removeAfterTimeLength(sound)
+
+	return sound
+end
+
+--[=[
+	Creates a new sound object from the given id
+]=]
+function SoundUtils.createSoundFromId(id)
+	local soundId = SoundUtils.toRbxAssetId(id)
+	assert(type(soundId) == "string", "Bad id")
+
+	local sound = Instance.new("Sound")
+	sound.Name = ("Sound_%s"):format(soundId)
+	sound.SoundId = soundId
+	sound.Volume = 0.25
+	sound.Archivable = false
 
 	return sound
 end
@@ -62,14 +74,7 @@ end
 function SoundUtils.playFromIdInParent(id, parent)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
-	local soundId = SoundUtils.toRbxAssetId(id)
-	assert(type(soundId) == "string", "Bad id")
-
-	local sound = Instance.new("Sound")
-	sound.Name = ("Sound_%s"):format(soundId)
-	sound.SoundId = soundId
-	sound.Volume = 0.25
-	sound.Archivable = false
+	local sound = SoundUtils.createSoundFromId(id)
 	sound.Parent = parent
 
 	if not RunService:IsRunning() then
