@@ -156,7 +156,10 @@ function ObservableSet:Remove(item)
 	if self._set[item] then
 		self._countValue.Value = self._countValue.Value - 1
 		self._set[item] = nil
-		self.ItemRemoved:Fire(item)
+
+		if self.Destroy then
+			self.ItemRemoved:Fire(item)
+		end
 	end
 end
 
