@@ -10,7 +10,7 @@ local UTF8 = {}
 	@param str string
 	@return string
 ]=]
-function UTF8.upper(str)
+function UTF8.upper(str: string): string
 	local UPPER_MAP = UTF8.UPPER_MAP
 	str = str:upper()
 	local newStr = ""
@@ -29,7 +29,7 @@ end
 	@param str string
 	@return string
 ]=]
-function UTF8.lower(str)
+function UTF8.lower(str: string): string
 	local LOWER_MAP = UTF8.LOWER_MAP
 	str = str:lower()
 	local newStr = ""
