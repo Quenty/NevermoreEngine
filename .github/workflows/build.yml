@@ -38,7 +38,7 @@ jobs:
           cache-dependency-path: package.json # we don't have a package-lock.json so we'll use this instead...
           node-version: "12"
 
-      - run: npm install
+      - run: npm install --no-save
 
       - name: Create Release
         env:

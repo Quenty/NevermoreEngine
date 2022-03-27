@@ -24,7 +24,12 @@
   "author": "James Onnen <rbxquenty@gmail.com>",
   "auto": {
     "plugins": [
-      "npm",
+      [
+        "npm",
+        {
+          "forcePublish": false
+        }
+      ],
       "all-contributors",
       [
         "conventional-commits",
