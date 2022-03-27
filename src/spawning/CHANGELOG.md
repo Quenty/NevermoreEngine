@@ -1,24 +1,18 @@
-# v1.2.0 (Sun Mar 27 2022)
-
-#### 🚀 Enhancement
-
-- Add rogue properties and tie packages and remove package-lock.json [#256](https://github.com/Quenty/NevermoreEngine/pull/256) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Remove package-lock.json ([@Quenty](https://github.com/Quenty))
-- fix: Add initial package-locks to packages without them ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@1.1.0...@quenty/spawning@1.2.0) (2022-03-27)
+
+
+### Bug Fixes
+
+* Add initial package-locks to packages without them ([4ff9578](https://github.com/Quenty/NevermoreEngine/commit/4ff9578522d02d38d71a1c58d865a203a1c214f5))
+
+
+
+
 
 # 1.1.0 (2022-03-10)
 

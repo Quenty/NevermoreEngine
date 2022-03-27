@@ -1,25 +1,23 @@
-# v4.2.0 (Sun Mar 27 2022)
-
-#### 🚀 Enhancement
-
-- Add rogue properties and tie packages and remove package-lock.json [#256](https://github.com/Quenty/NevermoreEngine/pull/256) ([@Quenty](https://github.com/Quenty))
-- feat: Add RandomVector3Utils.getDirectedRandomUnitVector(direction: Vector3, angleRad: number): Vector3 ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Remove package-lock.json ([@Quenty](https://github.com/Quenty))
-- fix: Add types to core libraries ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@4.1.0...@quenty/vector3utils@4.2.0) (2022-03-27)
+
+
+### Bug Fixes
+
+* Add types to core libraries ([6e685b3](https://github.com/Quenty/NevermoreEngine/commit/6e685b3cfbcd3816d15962769a4310a1ec57fb7e))
+
+
+### Features
+
+* Add RandomVector3Utils.getDirectedRandomUnitVector(direction: Vector3, angleRad: number): Vector3 ([8c5e03a](https://github.com/Quenty/NevermoreEngine/commit/8c5e03a0917b2fdf978890dd508dfdcceca7643b))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@4.0.0...@quenty/vector3utils@4.1.0) (2022-03-20)
 

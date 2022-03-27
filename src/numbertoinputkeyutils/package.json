@@ -1,6 +1,6 @@
 {
   "name": "@quenty/numbertoinputkeyutils",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Maps a number to a set of inputs. Useful for shortcut codes in menus.",
   "keywords": [
     "Roblox",

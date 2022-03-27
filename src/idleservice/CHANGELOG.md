@@ -1,25 +1,18 @@
-# v4.3.0 (Sun Mar 27 2022)
-
-#### 🚀 Enhancement
-
-- Add rogue properties and tie packages and remove package-lock.json [#256](https://github.com/Quenty/NevermoreEngine/pull/256) ([@Quenty](https://github.com/Quenty))
-- feat: Add IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVisible) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs and style ([@Quenty](https://github.com/Quenty))
-- ci: Remove package-lock.json ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@4.2.0...@quenty/idleservice@4.3.0) (2022-03-27)
+
+
+### Features
+
+* Add IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVisible) ([4344d74](https://github.com/Quenty/NevermoreEngine/commit/4344d746bd7bfef378fdd6b0169e9a3241257563))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@4.1.0...@quenty/idleservice@4.2.0) (2022-03-20)
 

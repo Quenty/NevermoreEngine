@@ -1,23 +1,15 @@
-# v3.1.0 (Sun Mar 27 2022)
-
-#### 🚀 Enhancement
-
-- Add rogue properties and tie packages and remove package-lock.json [#256](https://github.com/Quenty/NevermoreEngine/pull/256) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Remove package-lock.json ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.0.1...@quenty/steputils@3.1.0) (2022-03-27)
+
+**Note:** Version bump only for package @quenty/steputils
+
+
+
+
 
 ## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.0.0...@quenty/steputils@3.0.1) (2021-12-30)
 

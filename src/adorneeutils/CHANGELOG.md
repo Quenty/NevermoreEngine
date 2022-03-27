@@ -1,23 +1,15 @@
-# v2.3.0 (Sun Mar 27 2022)
-
-#### 🚀 Enhancement
-
-- Add rogue properties and tie packages and remove package-lock.json [#256](https://github.com/Quenty/NevermoreEngine/pull/256) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Remove package-lock.json ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeutils@2.2.0...@quenty/adorneeutils@2.3.0) (2022-03-27)
+
+**Note:** Version bump only for package @quenty/adorneeutils
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeutils@2.1.1...@quenty/adorneeutils@2.2.0) (2022-01-17)
 
