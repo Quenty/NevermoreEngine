@@ -1,0 +1,21 @@
+{
+  "name": "ConditionTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "conditions": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "@quenty/conditions",
+  "version": "1.0.0",
+  "description": "Adornee based conditional system that is sufficiently generic to script gameplay.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Conditions",
+    "Rx"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/conditions/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
+    "@quenty/statestack": "file:../statestack",
+    "@quenty/tie": "file:../tie"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
