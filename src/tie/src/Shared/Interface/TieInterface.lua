@@ -42,7 +42,15 @@ function TieInterface:__index(index)
 	if member then
 		if member.ClassName == "TieMethodDefinition" then
 			local adornee = rawget(self, "_adornee")
-			return function(...)
+			return function(firstArg, ...)
+				if firstArg ~= self then
+					error(("Must call methods with self as first parameter (Hint use `%s:%s()` instead of `%s.%s()`)"):format(
+						definition:GetName(),
+						member:GetMemberName(),
+						definition:GetName(),
+						member:GetMemberName()))
+				end
+
 				local folder = adornee:FindFirstChild(definition:GetContainerName())
 				if not folder then
 					error("No folder")

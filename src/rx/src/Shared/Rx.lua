@@ -18,6 +18,7 @@ local Promise = require("Promise")
 local Symbol = require("Symbol")
 local Table = require("Table")
 local ThrottledFunction = require("ThrottledFunction")
+local cancellableDelay = require("cancellableDelay")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -256,7 +257,9 @@ function Rx.tap(onFire, onError, onComplete)
 					if onFire then
 						onFire(...)
 					end
-					sub:Fire(...)
+					if sub:IsPending() then
+						sub:Fire(...)
+					end
 				end,
 				function(...)
 					if onError then
@@ -1117,6 +1120,20 @@ function Rx.using(resourceFactory, observableFactory)
 end
 
 --[=[
+	Takes the first entry and terminates the observable. Equivalent to the following:
+
+	```lua
+	Rx.take(1)
+	```
+
+	https://reactivex.io/documentation/operators/first.html
+	@return (source: Observable<T>) -> Observable<T>
+]=]
+function Rx.first()
+	return Rx.take(1)
+end
+
+--[=[
 	Takes n entries and then completes the observation.
 
 	https://rxjs.dev/api/operators/take
@@ -1125,17 +1142,12 @@ end
 ]=]
 function Rx.take(number)
 	assert(type(number) == "number", "Bad number")
-	assert(number >= 0, "Bad number")
+	assert(number > 0, "Bad number")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			if number == 0 then
-				sub:Complete()
-				return nil
-			end
-
 			local taken = 0
 			local maid = Maid.new()
 
@@ -1145,11 +1157,10 @@ function Rx.take(number)
 					return
 				end
 
-
 				taken = taken + 1
 				sub:Fire(...)
 
-				if taken == number then
+				if taken >= number then
 					sub:Complete()
 				end
 			end, sub:GetFailComplete()))
@@ -1188,6 +1199,35 @@ function Rx.defer(observableFactory)
 
 		return observable:Subscribe(sub:GetFireFailComplete())
 	end)
+end
+
+--[=[
+	Shift the emissions from an Observable forward in time by a particular amount.
+
+	@param seconds number
+	@return (source: Observable<T>) -> Observable<T>
+]=]
+function Rx.delay(seconds)
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(function(...)
+				local args = table.pack(...)
+
+				maid[args] = cancellableDelay(seconds, function()
+					maid[args] = nil
+					sub:Fire(table.unpack(args, 1, args.n))
+				end)
+			end, sub:GetFailComplete()))
+
+			return maid
+		end)
+	end
 end
 
 --[=[
@@ -1320,7 +1360,9 @@ function Rx.throttleDefer()
 						local current = lastResult
 						lastResult = nil
 
-						sub:Fire(table.unpack(current, 1, current.n))
+						if sub:IsPending() then
+							sub:Fire(table.unpack(current, 1, current.n))
+						end
 					end)
 				else
 					lastResult = table.pack(...)
