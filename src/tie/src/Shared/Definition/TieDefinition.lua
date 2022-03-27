@@ -6,19 +6,20 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local Brio = require("Brio")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
+local String = require("String")
+local Symbol = require("Symbol")
+local Table = require("Table")
 local TieImplementation = require("TieImplementation")
 local TieInterface = require("TieInterface")
 local TieMethodDefinition = require("TieMethodDefinition")
-local TieSignalDefinition = require("TieSignalDefinition")
 local TiePropertyDefinition = require("TiePropertyDefinition")
-local String = require("String")
-local Table = require("Table")
-local RxInstanceUtils = require("RxInstanceUtils")
-local RxBrioUtils = require("RxBrioUtils")
-local Observable = require("Observable")
-local Maid = require("Maid")
-local Brio = require("Brio")
-local Symbol = require("Symbol")
+local TieSignalDefinition = require("TieSignalDefinition")
 local ValueObject = require("ValueObject")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
@@ -62,7 +63,7 @@ end
 	@param adornee Instance
 	@return boolean
 ]=]
-function TieDefinition:HasImplementation(adornee)
+function TieDefinition:HasImplementation(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local folder = adornee:FindFirstChild(self:GetContainerName())
@@ -74,10 +75,30 @@ function TieDefinition:HasImplementation(adornee)
 end
 
 --[=[
-	Observes a valid implementation
-
+	Observes whether the adornee implements the interface.
+	@param adornee Instance
+	@return Observable<boolean>>
 ]=]
-function TieDefinition:ObserveImplementationBrio(adornee)
+function TieDefinition:ObserveIsImplemented(adornee: Instance): boolean
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	return self:ObserveImplementationBrio(adornee)
+		:Pipe({
+			RxBrioUtils.map(function(result)
+				return result and true or false
+			end);
+			RxBrioUtils.emitOnDeath(false);
+			Rx.defaultsTo(false);
+			Rx.distinct();
+		})
+end
+
+--[=[
+	Observes a valid implementation wrapped in a brio if it exists.
+	@param adornee Instance
+	@return Observable<Brio<TieImplementation<T>>>
+]=]
+function TieDefinition:ObserveImplementationBrio(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return RxInstanceUtils.observeLastNamedChildBrio(adornee, "Folder", self:GetContainerName())
@@ -121,6 +142,10 @@ function TieDefinition:ObserveImplementationBrio(adornee)
 						update()
 					end))
 
+					for _, child in pairs(folder:GetChildren()) do
+						maid[child] = child:GetPropertyChangedSignal("Name"):Connect(update)
+					end
+
 					update()
 
 					return maid
@@ -137,7 +162,7 @@ end
 	@param implementer table -- Table with all interface values
 	@return TieImplementation<T>
 ]=]
-function TieDefinition:Implement(adornee, implementer)
+function TieDefinition:Implement(adornee: Instance, implementer)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(type(implementer) == "table", "Bad implementer")
 
@@ -153,7 +178,7 @@ end
 	@param adornee Instance -- Adornee to get interface on
 	@return TieInterface<T>
 ]=]
-function TieDefinition:Get(adornee)
+function TieDefinition:Get(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return TieInterface.new(self, adornee)

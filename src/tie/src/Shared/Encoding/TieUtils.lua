@@ -28,6 +28,30 @@ function TieUtils.encode(...)
 end
 
 --[=[
+	Encodes a given callback so it can be assigned to a BindableFunction
+	@param callback function
+]=]
+function TieUtils.encodeCallback(callback)
+	assert(type(callback) == "function", "Bad callback")
+
+	return function(...)
+		return TieUtils.encode(callback(TieUtils.decode(...)))
+	end
+end
+
+--[=[
+	Encodes a given callback so it can be assigned to a BindableFunction
+	@param bindableFunction BindableFunction
+	@param ... any
+	@return any
+]=]
+function TieUtils.invokeEncodedBindableFunction(bindableFunction, ...)
+	assert(typeof(bindableFunction) == "Instance" and bindableFunction:IsA("BindableFunction"), "Bad bindableFunction")
+
+	return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))
+end
+
+--[=[
 	Decodes arguments for Tie consumption.
 	@param ... any
 	@return ... any

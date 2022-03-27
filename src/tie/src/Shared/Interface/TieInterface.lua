@@ -7,8 +7,6 @@ local require = require(script.Parent.loader).load(script)
 local TieUtils = require("TieUtils")
 local TieSignalInterface = require("TieSignalInterface")
 local TiePropertyInterface = require("TiePropertyInterface")
-local RxBrioUtils = require("RxBrioUtils")
-local Rx = require("Rx")
 
 local TieInterface = {}
 TieInterface.ClassName = "TieInterface"
@@ -35,15 +33,7 @@ function TieInterface:ObserveIsImplemented()
 	local adornee = rawget(self, "_adornee")
 	local definition = rawget(self, "_definition")
 
-	return definition:ObserveImplementationBrio(adornee)
-		:Pipe({
-			RxBrioUtils.map(function(result)
-				return result and true or false
-			end);
-			RxBrioUtils.emitOnDeath(false);
-			Rx.defaultsTo(false);
-			Rx.distinct();
-		})
+	return definition:ObserveIsImplemented(adornee)
 end
 
 function TieInterface:__index(index)

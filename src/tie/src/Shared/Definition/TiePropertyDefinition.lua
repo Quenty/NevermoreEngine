@@ -10,7 +10,7 @@ local TiePropertyDefinition = setmetatable({}, BaseObject)
 TiePropertyDefinition.ClassName = "TiePropertyDefinition"
 TiePropertyDefinition.__index = TiePropertyDefinition
 
-function TiePropertyDefinition.new(tieDefinition, propertyName)
+function TiePropertyDefinition.new(tieDefinition, propertyName: string)
 	local self = setmetatable(BaseObject.new(), TiePropertyDefinition)
 
 	self._tieDefinition = assert(tieDefinition, "No tieDefinition")
@@ -23,7 +23,7 @@ function TiePropertyDefinition:GetTieDefinition()
 	return self._tieDefinition
 end
 
-function TiePropertyDefinition:GetMemberName()
+function TiePropertyDefinition:GetMemberName(): string
 	return self._propertyName
 end
 
