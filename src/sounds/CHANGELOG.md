@@ -1,3 +1,22 @@
+# v4.3.0 (Sun Mar 27 2022)
+
+#### 🚀 Enhancement
+
+- Add rogue properties and tie packages and remove package-lock.json [#256](https://github.com/Quenty/NevermoreEngine/pull/256) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Fix docs and style ([@Quenty](https://github.com/Quenty))
+- ci: Remove package-lock.json ([@Quenty](https://github.com/Quenty))
+- fix: Add initial package-locks to packages without them ([@Quenty](https://github.com/Quenty))
+- fix: Sounds can be played back from parents, and we can create sounds without playing them ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
