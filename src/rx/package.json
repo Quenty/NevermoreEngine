@@ -27,6 +27,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/cancellabledelay": "file:../cancellabledelay",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",

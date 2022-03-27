@@ -185,8 +185,9 @@ end
 
 function Subscription:_doCleanup()
 	if self._cleanupTask then
-		MaidTaskUtils.doTask(self._cleanupTask)
+		local task = self._cleanupTask
 		self._cleanupTask = nil
+		MaidTaskUtils.doTask(task)
 	end
 end
 

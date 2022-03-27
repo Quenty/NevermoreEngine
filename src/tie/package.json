@@ -1,0 +1,49 @@
+{
+  "name": "@quenty/tie",
+  "version": "1.0.0",
+  "description": "Tie allows interfaces to be defined between Lua OOP and Roblox objects.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Tie",
+    "OOP",
+    "API",
+    "Interface"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/tie/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
+    "@quenty/string": "file:../string",
+    "@quenty/symbol": "file:../symbol",
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
+  },
+  "devDependencies": {
+    "@quenty/promise": "file:../promise",
+    "@quenty/signal": "file:../signal"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

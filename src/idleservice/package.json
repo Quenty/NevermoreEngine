@@ -33,7 +33,8 @@
     "@quenty/ragdoll": "file:../ragdoll",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/statestack": "file:../statestack",
-    "@quenty/valuebaseutils": "file:../valuebaseutils"
+    "@quenty/valuebaseutils": "file:../valuebaseutils",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

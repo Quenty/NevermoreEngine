@@ -1,0 +1,27 @@
+{
+  "name": "TestTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "tie": {
+        "$className": "Folder",
+        "tie": {
+          "$path": ".."
+        },
+        "test": {
+          "$path": "modules"
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

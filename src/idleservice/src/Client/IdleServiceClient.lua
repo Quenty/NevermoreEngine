@@ -15,10 +15,13 @@ local Maid = require("Maid")
 local RagdollBindersClient = require("RagdollBindersClient")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local StateStack = require("StateStack")
+local ValueObject = require("ValueObject")
+local Rx = require("Rx")
 
 local IdleServiceClient = {}
 
 local STANDING_TIME_REQUIRED = 0.5
+local MOVE_DISTANCE_REQUIRED = 2.5
 
 --[=[
 	Initializes the idle service on the client. Should be done via [ServiceBag].
@@ -49,6 +52,9 @@ function IdleServiceClient:Init(serviceBag)
 	self._humanoidIdle = Instance.new("BoolValue")
 	self._humanoidIdle.Value = false
 	self._maid:GiveTask(self._humanoidIdle)
+
+	self._lastPosition = ValueObject.new(nil)
+	self._maid:GiveTask(self._lastPosition)
 end
 
 --[=[
@@ -76,11 +82,48 @@ function IdleServiceClient:Start()
 end
 
 --[=[
+	Observes a humanoid moving from the current position after a set amount of time. Can be used
+	to close a UI when the humanoid wanders too far.
+
+	@return Observable
+]=]
+function IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVisible: number)
+	assert(type(minimumTimeVisible) == "number", "Bad minimumTimeVisible")
+
+	return Rx.of(true):Pipe({
+		Rx.delay(minimumTimeVisible);
+		Rx.flatMap(function()
+			return self._lastPosition:Observe();
+		end);
+		Rx.where(function(value)
+			return value ~= nil
+		end);
+		Rx.first();
+		Rx.flatMap(function(initialPosition)
+			return self._lastPosition:Observe():Pipe({
+				Rx.where(function(position)
+					return position == nil or (initialPosition - position).magnitude >= MOVE_DISTANCE_REQUIRED
+				end)
+			})
+		end);
+		Rx.first();
+	})
+end
+
+--[=[
 	Returns whether the humanoid is idle.
 	@return boolean
 ]=]
 function IdleServiceClient:IsHumanoidIdle()
 	return self._humanoidIdle.Value
+end
+
+--[=[
+	observes if the humanoid is idle.
+	@return Observable<boolean>
+]=]
+function IdleServiceClient:ObserveHumanoidIdle()
+	return RxValueBaseUtils.observeValue(self._humanoidIdle)
 end
 
 --[=[
@@ -143,6 +186,7 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 	local lastMove = os.clock()
 
 	maid:GiveTask(function()
+		self._lastPosition.Value = nil
 		self._humanoidIdle.Value = false
 	end)
 
@@ -161,10 +205,14 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 	maid:GiveTask(RunService.Stepped:Connect(function()
 		local rootPart = humanoid.RootPart
 
+		if rootPart then
+			self._lastPosition.Value = rootPart.Position
+		end
+
 		if self._ragdollBindersClient.Ragdoll:Get(humanoid) then
 			lastMove = os.clock()
 		elseif rootPart then
-			if rootPart.Velocity.magnitude > 2.5 then
+			if rootPart.Velocity.magnitude > MOVE_DISTANCE_REQUIRED then
 				lastMove = os.clock()
 			end
 		end

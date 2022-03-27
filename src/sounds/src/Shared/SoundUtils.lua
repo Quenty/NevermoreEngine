@@ -31,15 +31,11 @@ local SoundUtils = {}
 	@param id string | number
 	@return Sound
 ]=]
-function SoundUtils.playFromId(id)
+function SoundUtils.playFromId(id: string | number): Sound
 	local soundId = SoundUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
 
-	local sound = Instance.new("Sound")
-	sound.Name = ("Sound_%s"):format(soundId)
-	sound.SoundId = soundId
-	sound.Volume = 0.25
-	sound.Archivable = false
+	local sound = SoundUtils.createSoundFromId(id)
 
 	if RunService:IsClient() then
 		SoundService:PlayLocalSound(sound)
@@ -53,15 +49,9 @@ function SoundUtils.playFromId(id)
 end
 
 --[=[
-	Plays back a template given asset id in the parent
-
-	@param id string | number
-	@param parent Instance
-	@return Sound
+	Creates a new sound object from the given id
 ]=]
-function SoundUtils.playFromIdInParent(id, parent)
-	assert(typeof(parent) == "Instance", "Bad parent")
-
+function SoundUtils.createSoundFromId(id: string | number): Sound
 	local soundId = SoundUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
 
@@ -70,6 +60,17 @@ function SoundUtils.playFromIdInParent(id, parent)
 	sound.SoundId = soundId
 	sound.Volume = 0.25
 	sound.Archivable = false
+
+	return sound
+end
+
+--[=[
+	Plays back a template given asset id in the parent
+]=]
+function SoundUtils.playFromIdInParent(id: string | number, parent: Instance): Sound
+	assert(typeof(parent) == "Instance", "Bad parent")
+
+	local sound = SoundUtils.createSoundFromId(id)
 	sound.Parent = parent
 
 	if not RunService:IsRunning() then
@@ -88,7 +89,7 @@ end
 
 	@param sound Sound
 ]=]
-function SoundUtils.removeAfterTimeLength(sound)
+function SoundUtils.removeAfterTimeLength(sound: Sound)
 	-- TODO: clean up on destroying
 	SoundPromiseUtils.promiseLoaded(sound):Then(function()
 		task.delay(sound.TimeLength + 0.05, function()
@@ -110,7 +111,7 @@ end
 	@param templateName string
 	@return Sound
 ]=]
-function SoundUtils.playTemplate(templates, templateName)
+function SoundUtils.playTemplate(templates, templateName: string)
 	assert(type(templates) == "table", "Bad templates")
 	assert(type(templateName) == "string", "Bad templateName")
 
@@ -126,10 +127,10 @@ end
 
 --[=[
 	Converts a string or number to a string for playback.
-	@param id string | number
-	@return string
+	@param id string? | number
+	@return string?
 ]=]
-function SoundUtils.toRbxAssetId(id)
+function SoundUtils.toRbxAssetId(id: string? | number): string
 	if type(id) == "number" then
 		return ("rbxassetid://%d"):format(id)
 	else
@@ -149,7 +150,7 @@ end
 	@param parent Instance
 	@return Sound
 ]=]
-function SoundUtils.playTemplateInParent(templates, templateName, parent)
+function SoundUtils.playTemplateInParent(templates, templateName: string, parent: Instance)
 	local sound = templates:Clone(templateName)
 	sound.Archivable = false
 	sound.Parent = parent

@@ -12,7 +12,7 @@ local String = {}
 	@param pattern string? -- Defaults to whitespace
 	@return string
 ]=]
-function String.trim(str, pattern)
+function String.trim(str: string, pattern: string?): string
 	if not pattern then
 		return str:match("^%s*(.-)%s*$")
 	else
@@ -28,7 +28,7 @@ end
 	@param str string
 	@return string
 ]=]
-function String.toCamelCase(str)
+function String.toCamelCase(str: string): string
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
 	str = str:gsub("^%a", string.upper)
@@ -43,7 +43,7 @@ end
 	@param str string
 	@return string
 ]=]
-function String.uppercaseFirstLetter(str)
+function String.uppercaseFirstLetter(str: string): string
 	return str:gsub("^%a", string.upper)
 end
 
@@ -52,7 +52,7 @@ end
 	@param str string
 	@return string
 ]=]
-function String.toLowerCamelCase(str)
+function String.toLowerCamelCase(str: string): string
 	str = str:lower()
 	str = str:gsub("[ _](%a)", string.upper)
 	str = str:gsub("^%a", string.lower)
@@ -66,7 +66,7 @@ end
 	@param str string
 	@return string
 ]=]
-function String.toPrivateCase(str)
+function String.toPrivateCase(str: string): string
 	return "_" .. str:sub(1, 1):lower() .. str:sub(2, #str)
 end
 
@@ -76,7 +76,7 @@ end
 	@param pattern string? -- Defaults to whitespace
 	@return string
 ]=]
-function String.trimFront(str, pattern)
+function String.trimFront(str: string, pattern: string?): string
 	pattern = pattern or "%s";
 	return (str:gsub("^"..pattern.."*(.-)"..pattern.."*", "%1"))
 end
@@ -92,7 +92,7 @@ end
 	@param char string
 	@return number
 ]=]
-function String.checkNumOfCharacterInString(str, char)
+function String.checkNumOfCharacterInString(str: string, char: string): number
 	local count = 0
 	for _ in string.gmatch(str, char) do
 		count = count + 1
@@ -105,7 +105,7 @@ end
 	@param str string
 	@return boolean
 ]=]
-function String.isEmptyOrWhitespaceOrNil(str)
+function String.isEmptyOrWhitespaceOrNil(str: string): boolean
 	return type(str) ~= "string" or str == "" or String.isWhitespace(str)
 end
 
@@ -114,7 +114,7 @@ end
 	@param str string
 	@return boolean
 ]=]
-function String.isWhitespace(str)
+function String.isWhitespace(str: string): boolean
 	return string.match(str, "[%s]+") == str
 end
 
@@ -124,7 +124,7 @@ end
 	@param characterLimit number
 	@return string
 ]=]
-function String.elipseLimit(str, characterLimit)
+function String.elipseLimit(str: string, characterLimit: number): string
 	if #str > characterLimit then
 		str = str:sub(1, characterLimit-3).."..."
 	end
@@ -137,7 +137,7 @@ end
 	@param prefix string
 	@return string
 ]=]
-function String.removePrefix(str, prefix)
+function String.removePrefix(str: string, prefix: string): string
 	if str:sub(1, #prefix) == prefix then
 		return str:sub(#prefix + 1)
 	else
@@ -151,7 +151,7 @@ end
 	@param postfix string
 	@return string
 ]=]
-function String.removePostfix(str, postfix)
+function String.removePostfix(str: string, postfix: string): string
 	if str:sub(-#postfix) == postfix then
 		return str:sub(1, -#(postfix) - 1)
 	else
@@ -165,7 +165,7 @@ end
 	@param postfix string
 	@return boolean
 ]=]
-function String.endsWith(str, postfix)
+function String.endsWith(str: string, postfix: string): boolean
 	return str:sub(-#postfix) == postfix
 end
 
@@ -175,7 +175,7 @@ end
 	@param prefix string
 	@return boolean
 ]=]
-function String.startsWith(str, prefix)
+function String.startsWith(str: string, prefix: string): boolean
 	return str:sub(1, #prefix) == prefix
 end
 
@@ -184,7 +184,7 @@ end
 	@param number string | number
 	@return string
 ]=]
-function String.addCommas(number)
+function String.addCommas(number: string | number): string
 	if type(number) == "number" then
 		number = tostring(number)
 	end

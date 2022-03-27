@@ -35,9 +35,10 @@ jobs:
         env:
           NPM_TOKEN: '' # https://github.com/JS-DevTools/npm-publish/issues/15
         with:
+          cache-dependency-path: package.json # we don't have a package-lock.json so we'll use this instead...
           node-version: "12"
 
-      - run: npm ci
+      - run: npm install --no-save
 
       - name: Create Release
         env:

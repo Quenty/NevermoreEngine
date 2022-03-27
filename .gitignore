@@ -5,3 +5,8 @@ out
 roblox.toml
 .env
 build
+
+# Normally it's a good idea to commit this. However, in this mono-repo scenario with linking
+# it adds a ton of noise and no real gain. Also we have seen no gains from reproducing
+# builds so we don't have a strict need for this right now.
+package-lock.json
