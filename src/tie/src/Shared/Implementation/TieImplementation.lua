@@ -59,9 +59,9 @@ function TieImplementation:_buildObjects()
 				bindableEvent:Fire(TieUtils.encode(...))
 			end))
 
-			self._maid:GiveTask(bindableEvent.Event:Connect(function(...)
+			-- self._maid:GiveTask(bindableEvent.Event:Connect(function(...)
 				-- TODO: Listen to the event and fire off our own event (if we aren't the source).
-			end))
+			-- end))
 
 			bindableEvent.Parent = folder
 		elseif memberDefinition.ClassName == "TiePropertyDefinition" then

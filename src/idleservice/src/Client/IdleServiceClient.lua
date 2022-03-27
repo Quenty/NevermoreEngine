@@ -87,7 +87,7 @@ end
 
 	@return Observable
 ]=]
-function IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVisible)
+function IdleServiceClient:ObserveHumanoidMoveFromCurrentPosition(minimumTimeVisible: number)
 	assert(type(minimumTimeVisible) == "number", "Bad minimumTimeVisible")
 
 	return Rx.of(true):Pipe({

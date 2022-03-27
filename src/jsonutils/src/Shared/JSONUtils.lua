@@ -36,7 +36,7 @@ end
 
 --[=[
 	Encodes JSON, or reports error.
-	@param str string
+	@param value any
 	@return boolean
 	@return table? -- Result
 	@return string? -- Error
