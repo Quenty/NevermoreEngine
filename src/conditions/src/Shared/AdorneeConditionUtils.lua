@@ -90,7 +90,7 @@ end
 	@param cancelToken CancelToken?
 	@return Promise<boolean>
 ]=]
-function AdorneeConditionUtils.promiseConditionsMet(conditionObj: BindableFunction, adornee: Instance, cancelToken)
+function AdorneeConditionUtils.promiseQueryConditionsMet(conditionObj: BindableFunction, adornee: Instance, cancelToken)
 	assert(typeof(conditionObj) == "Instance" and conditionObj:IsA("BindableFunction"), "Bad condition")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
