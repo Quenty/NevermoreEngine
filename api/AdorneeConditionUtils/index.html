@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="generator" content="Docusaurus v2.0.0-beta.9">
+<title data-react-helmet="true">AdorneeConditionUtils | Nevermore</title><meta data-react-helmet="true" property="og:title" content="AdorneeConditionUtils | Nevermore"><meta data-react-helmet="true" name="twitter:card" content="summary_large_image"><meta data-react-helmet="true" name="description" content="Utility library that defines a generalized interface for scriptable conditions. These conditions are rooted in [Rx] and
+can be scripted by a variety of systems. For example, we may have conditions on what ammo we can consume, or whether
+or not an action can be activated.
+
+This library provides an interface for this to happen in. Conditions are marshalled through a BindableFunction and
+must be defined on both the client and server. However, these conditions can be reactive. It would be very simple
+to create a condition that also just links to a bool value if conditions should be only on the server.
+
+```lua
+local conditionFolder = AdorneeConditionUtils.createConditionContainer()
+conditionFolder.Parent = workspace
+
+local orGroup = AdorneeConditionUtils.createOrConditionGroup()
+orGroup.Parent = conditionFolder
+
+AdorneeConditionUtils.createRequiredProperty(&quot;Name&quot;, &quot;Allowed&quot;).Parent = orGroup
+
+local andGroup = AdorneeConditionUtils.createAndConditionGroup()
+andGroup.Parent = orGroup
+
+AdorneeConditionUtils.createRequiredProperty(&quot;Name&quot;, &quot;Allow&quot;).Parent = andGroup
+AdorneeConditionUtils.createRequiredAttribute(&quot;IsEnabled&quot;, true).Parent = andGroup
+
+local testInst = Instance.new(&quot;Folder&quot;)
+testInst.Name = &quot;Deny&quot;
+testInst:SetAttribute(&quot;IsEnabled&quot;, false)
+testInst.Parent = workspace
+
+AdorneeConditionUtils.observeConditionsMet(conditionFolder, testInst):Subscribe(function(isAllowed)
+	print(&quot;Is allowed&quot;, isAllowed)
+end) --&gt; Is allowed false
+
+task.delay(0.1, function()
+	testInst.Name = &quot;Allowed&quot; --&gt; Is allowed true
+end)
+```"><meta data-react-helmet="true" property="og:description" content="Utility library that defines a generalized interface for scriptable conditions. These conditions are rooted in [Rx] and
+can be scripted by a variety of systems. For example, we may have conditions on what ammo we can consume, or whether
+or not an action can be activated.
+
+This library provides an interface for this to happen in. Conditions are marshalled through a BindableFunction and
+must be defined on both the client and server. However, these conditions can be reactive. It would be very simple
+to create a condition that also just links to a bool value if conditions should be only on the server.
+
+```lua
+local conditionFolder = AdorneeConditionUtils.createConditionContainer()
+conditionFolder.Parent = workspace
+
+local orGroup = AdorneeConditionUtils.createOrConditionGroup()
+orGroup.Parent = conditionFolder
+
+AdorneeConditionUtils.createRequiredProperty(&quot;Name&quot;, &quot;Allowed&quot;).Parent = orGroup
+
+local andGroup = AdorneeConditionUtils.createAndConditionGroup()
+andGroup.Parent = orGroup
+
+AdorneeConditionUtils.createRequiredProperty(&quot;Name&quot;, &quot;Allow&quot;).Parent = andGroup
+AdorneeConditionUtils.createRequiredAttribute(&quot;IsEnabled&quot;, true).Parent = andGroup
+
+local testInst = Instance.new(&quot;Folder&quot;)
+testInst.Name = &quot;Deny&quot;
+testInst:SetAttribute(&quot;IsEnabled&quot;, false)
+testInst.Parent = workspace
+
+AdorneeConditionUtils.observeConditionsMet(conditionFolder, testInst):Subscribe(function(isAllowed)
+	print(&quot;Is allowed&quot;, isAllowed)
+end) --&gt; Is allowed false
+
+task.delay(0.1, function()
+	testInst.Name = &quot;Allowed&quot; --&gt; Is allowed true
+end)
+```"><meta data-react-helmet="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/AdorneeConditionUtils"><meta data-react-helmet="true" name="docusaurus_locale" content="en"><meta data-react-helmet="true" name="docusaurus_tag" content="default"><link data-react-helmet="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/AdorneeConditionUtils"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/AdorneeConditionUtils" hreflang="en"><link data-react-helmet="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/AdorneeConditionUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.fb20d3d5.css">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.a918f0ff.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.f3e19334.js" as="script">
+</head>
+<body>
+<script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
+<div><a href="#" class="skipToContent_1oUP">Skip to main content</a></div><nav class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Navigation bar toggle" class="navbar__toggle clean-btn" type="button" tabindex="0"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/NevermoreEngine/"><b class="navbar__title">Nevermore</b></a><a class="navbar__item navbar__link" href="/NevermoreEngine/docs/intro">Docs</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/NevermoreEngine/api/">API</a><a class="navbar__item navbar__link" href="/NevermoreEngine/changelog">Changelog</a></div><div class="navbar__items navbar__items--right"><a href="https://discord.gg/mhtGUS8" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link"><span>Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a><a href="https://github.com/Quenty/NevermoreEngine" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link"><span>GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a><div class="toggle_71bT toggle_3Zt9 toggleDisabled_3cF-"><div class="toggleTrack_32Fl" role="button" tabindex="-1"><div class="toggleTrackCheck_3lV7"><span class="toggleIcon_O4iE">🌜</span></div><div class="toggleTrackX_S2yS"><span class="toggleIcon_O4iE">🌞</span></div><div class="toggleTrackThumb_xI_Z"></div></div><input type="checkbox" class="toggleScreenReader_28Tw" aria-label="Switch between dark and light mode"></div><div class="navbar__search"><span aria-label="expand searchbar" role="button" class="search-icon" tabindex="0"></span><input type="search" id="search_input_react" placeholder="Press S to Search..." aria-label="Search" class="navbar__search-input search-bar"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div class="main-wrapper docPageContainer_2Kz0"><div class="docPage_1bdk"><div class="docSidebarContainer_1ykS"><div class="sidebar_15mo"><nav class="menu thin-scrollbar menu_Bmed"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Acceltween</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Actionmanager</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><a class="menu__link menu__link--sublist menu__link--active" href="#">Conditions</a><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/NevermoreEngine/api/AdorneeConditionUtils">​Adornee​Condition​Utils</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Adorneeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sprites</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationgroup</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Animationtrackutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Applytagtotaggedchildren</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ik</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rigbuilderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Attributeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Axisangleutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Badgeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Baseobject</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Permissionprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Basicpane</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Bezierutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Binarysearch</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ragdoll</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Binder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Parttouchingcalculator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Blend</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Loader</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Boundlinkutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Boundingboxutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Brio</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Buttonhighlightmodel</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Buttonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cframeserializer</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cframeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Camera</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Camerastoryutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Canceltoken</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Characterutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Geometryutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Clipcharacters</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cmdrservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Collectionserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Color3serializationutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Color3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Colorsequenceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Contentproviderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cooldown</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Coreguienabler</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Coreguiutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cubicspline</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Datastore</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Debounce</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Depthoffield</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Tie</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Snackbar</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Draw</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Elo</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Enabledmixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Equippedtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Experiencecalculator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Fakeskybox</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Firstpersoncharactertransparency</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Friendutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Functionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gameconfig</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gameproductservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gamescalingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Gameversionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Generatewithmixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Genericscreenguiprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getpercentexposedutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Remoting</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Grouputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Guitriangle</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Guivisiblemanager</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hapticfeedbackutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hide</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Hintscoringutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Httppromise</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidanimatorutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoiddescriptionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidkillerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidmovedirectionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidspeed</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidteleportutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Humanoidutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputmode</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Idleservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputkeymaputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Scoredactionservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Inputobjectutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Insertserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Isamixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Clienttranslator</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Jsonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Jumpbuttonutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Linearsystemssolver</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Spring</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Linkutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Lipsum</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Localizedtextutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Maid</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Markdownrender</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Marketplaceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Timesyncservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Math</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Meshutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Metricutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Trajectory</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Modelappearance</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Modeltransparencyeffect</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Templateprovider</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Mouseovermixin</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Mouseshiftlockservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Multipleclickutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkownerservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkownerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Networkropeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Nocollisionconstraintutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numberrangeutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numbersequenceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Numbertoinputkeyutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rx</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Observablecollection</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Octree</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Overriddenproperty</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Particleengine</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Characterparticleplayer</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pathfindingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Promise</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Physicsutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pillbacking</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerbinder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Uiobjectutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerhumanoidbinder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playerthumbnailutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Playersservicepromises</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Polynomialutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Preferredparentutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Probability</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Pseudolocalize</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Qframe</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Quaternion</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">R15utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Racketingropeconstraint</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Randomutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Vector3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Raycaster</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Region3utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Region3int16utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Remotefunctionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Resetservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Roblox Api-dump</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rodux Actions</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rogue Properties</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rotatinglabel</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Roundedbackingbuilder</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rxbinderutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Instanceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Statestack</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Valuebaseutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Scrollingframe</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Selectionimageutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Servicebag</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Table</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Signal</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Socialserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sounds</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Spawning</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Steputils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Streamingutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">String</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Sunpositionutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Symbol</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Teamtracker</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Teamutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Terrainutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textfilterservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textfilterutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Textserviceutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Throttle</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Time</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Touchingpartutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Transparencyservice</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Utf8</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Ultrawidecontainerutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Rodux Undo</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Valueobject</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Vector3int16utils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Viewport</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Weldconstraintutils</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getgroundplane</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Cancellabledelay</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Deferred</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Getmechanismparts</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Optional</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Qgui</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Safedestroy</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><a class="menu__link menu__link--sublist" href="#">Setmechanismcframe</a></li></ul></nav><button type="button" title="Collapse sidebar" aria-label="Collapse sidebar" class="button button--secondary button--outline collapseSidebarButton_1CGd"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_3E-R"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></div><main class="docMainContainer_28N5"><div class="container padding-vert--lg"><div class="row"><div class="col docItemCol_3WPG"><div class="docItemContainer_3XDu"><article><div class="member_qHIL markdown"><div class="tocCollapsible_1PrD theme-doc-toc-mobile tocMobile_3ryM"><button type="button" class="clean-btn tocCollapsibleButton_2O1e">On this page</button></div><header><h1 class="docTitle_1ddc" style="text-decoration:none"><span style="display:inline-block">Adornee</span><span style="display:inline-block">Condition</span><span style="display:inline-block">Utils</span></h1><div class="luaClassTags_2Zrs"></div><div>
+<p>
+  Utility library that defines a generalized interface for scriptable conditions. These conditions are rooted in <a href="/NevermoreEngine/api/Rx">Rx</a> and
+  can be scripted by a variety of systems. For example, we may have conditions on what ammo we can consume, or whether
+  or not an action can be activated.
+</p>
+<p>
+  This library provides an interface for this to happen in. Conditions are marshalled through a BindableFunction and
+  must be defined on both the client and server. However, these conditions can be reactive. It would be very simple
+  to create a condition that also just links to a bool value if conditions should be only on the server.
+</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> conditionFolder <span class="token operator">=</span> AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">createConditionContainer</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+conditionFolder<span class="token punctuation">.</span>Parent <span class="token operator">=</span> workspace
+
+<span class="token keyword">local</span> orGroup <span class="token operator">=</span> AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">createOrConditionGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+orGroup<span class="token punctuation">.</span>Parent <span class="token operator">=</span> conditionFolder
+
+AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">createRequiredProperty</span><span class="token punctuation">(</span><span class="token string">"Name"</span><span class="token punctuation">,</span> <span class="token string">"Allowed"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>Parent <span class="token operator">=</span> orGroup
+
+<span class="token keyword">local</span> andGroup <span class="token operator">=</span> AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">createAndConditionGroup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+andGroup<span class="token punctuation">.</span>Parent <span class="token operator">=</span> orGroup
+
+AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">createRequiredProperty</span><span class="token punctuation">(</span><span class="token string">"Name"</span><span class="token punctuation">,</span> <span class="token string">"Allow"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>Parent <span class="token operator">=</span> andGroup
+AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">createRequiredAttribute</span><span class="token punctuation">(</span><span class="token string">"IsEnabled"</span><span class="token punctuation">,</span> <span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">.</span>Parent <span class="token operator">=</span> andGroup
+
+<span class="token keyword">local</span> testInst <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"Folder"</span><span class="token punctuation">)</span>
+testInst<span class="token punctuation">.</span>Name <span class="token operator">=</span> <span class="token string">"Deny"</span>
+testInst<span class="token punctuation">:</span><span class="token function">SetAttribute</span><span class="token punctuation">(</span><span class="token string">"IsEnabled"</span><span class="token punctuation">,</span> <span class="token keyword">false</span><span class="token punctuation">)</span>
+testInst<span class="token punctuation">.</span>Parent <span class="token operator">=</span> workspace
+
+AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">observeConditionsMet</span><span class="token punctuation">(</span>conditionFolder<span class="token punctuation">,</span> testInst<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">Subscribe</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>isAllowed<span class="token punctuation">)</span>
+	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"Is allowed"</span><span class="token punctuation">,</span> isAllowed<span class="token punctuation">)</span>
+<span class="token keyword">end</span><span class="token punctuation">)</span> <span class="token comment">--> Is allowed false</span>
+
+task<span class="token punctuation">.</span><span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">0.1</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	testInst<span class="token punctuation">.</span>Name <span class="token operator">=</span> <span class="token string">"Allowed"</span> <span class="token comment">--> Is allowed true</span>
+<span class="token keyword">end</span><span class="token punctuation">)</span>
+</code></pre>
+</div></header><h2 class="anchor anchorWithStickyNavbar_31ik" id="functions">Functions<a aria-hidden="true" class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="observeConditionsMet"><code style="text-decoration:none">observeConditionsMet</code><a aria-hidden="true" class="hash-link" href="#observeConditionsMet" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L77"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">observeConditionsMet</code><code>(</code><div class="inset_2cJr"><div><code>conditionObj<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_17uy">-- <span>
+<p>Condition to invoke</p>
+</span></span></div><div><code>adornee<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_17uy">-- <span>
+<p>Adornee to check conditions on</p>
+</span></span></div></div><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_1JtD">&lt;</code><code class="blue_2Afy">boolean</code><code class="op_1JtD">&gt;</code></div><div>
+<p>Observes whether conditions are met or not.</p>
+<pre class="language-lua"><code class="language-lua">AdorneeConditionUtils<span class="token punctuation">.</span><span class="token function">observeConditionsMet</span><span class="token punctuation">(</span>gun<span class="token punctuation">.</span>AmmoAllowedConditions<span class="token punctuation">,</span> ammo<span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">Subscribe</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>allowed<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> allowed <span class="token keyword">then</span>
+		<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"Can use this ammo to refill this gun"</span><span class="token punctuation">)</span>
+	<span class="token keyword">end</span>
+<span class="token keyword">end</span><span class="token punctuation">)</span>
+</code></pre>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="promiseQueryConditionsMet"><code style="text-decoration:none">promiseQueryConditionsMet</code><a aria-hidden="true" class="hash-link" href="#promiseQueryConditionsMet" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L93"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">promiseQueryConditionsMet</code><code>(</code><div class="inset_2cJr"><div><code>conditionObj<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_17uy">-- <span>
+<p>Condition to invoke</p>
+</span></span></div><div><code>adornee<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_17uy">-- <span>
+<p>Adornee to check conditions on</p>
+</span></span></div><div><code>cancelToken<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CancelToken">CancelToken?</a></code></div></div><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_1JtD">&lt;</code><code class="blue_2Afy">boolean</code><code class="op_1JtD">&gt;</code></div><div>
+<p>
+  Promises a query result of whether conditions are met or not. Unlike the observable, this will return
+  a result once all combinations are met.
+</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="createConditionContainer"><code style="text-decoration:none">createConditionContainer</code><a aria-hidden="true" class="hash-link" href="#createConditionContainer" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L106"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">createConditionContainer</code><code>(</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>
+  Creates a new condition container which conditions can be parented to. By default this is an
+  "and" container, that is, all conditions underneath this container must be met for something to be allowed.
+</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="create"><code style="text-decoration:none">create</code><a aria-hidden="true" class="hash-link" href="#create" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L121"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">create</code><code>(</code><code>observeCallback<!-- -->: </code><code class="blue_2Afy">function</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>Creates a new adornee condition</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="createRequiredProperty"><code style="text-decoration:none">createRequiredProperty</code><a aria-hidden="true" class="hash-link" href="#createRequiredProperty" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L139"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">createRequiredProperty</code><code>(</code><div class="inset_2cJr"><div><code>propertyName<!-- -->: </code><code class="blue_2Afy">string</code><code>,</code></div><div><code>requiredValue<!-- -->: </code><code class="blue_2Afy">any</code></div></div><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>Creates a new condition that a property is a set value.</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="createRequiredAttribute"><code style="text-decoration:none">createRequiredAttribute</code><a aria-hidden="true" class="hash-link" href="#createRequiredAttribute" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L163"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">createRequiredAttribute</code><code>(</code><div class="inset_2cJr"><div><code>attributeName<!-- -->: </code><code class="blue_2Afy">string</code><code>,</code></div><div><code>attributeValue<!-- -->: </code><code class="blue_2Afy">any</code></div></div><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>Creates a new condition that an attribute must be set to the current value</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="createRequiredTieInterface"><code style="text-decoration:none">createRequiredTieInterface</code><a aria-hidden="true" class="hash-link" href="#createRequiredTieInterface" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L186"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">createRequiredTieInterface</code><code>(</code><code>tieInterfaceDefinition<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/TieDefinition">TieDefinition</a></code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>Creates a new condition that a tie interface must be implemented for the object</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="createOrConditionGroup"><code style="text-decoration:none">createOrConditionGroup</code><a aria-hidden="true" class="hash-link" href="#createOrConditionGroup" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L205"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">createOrConditionGroup</code><code>(</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>
+  Creates a new "or" condition group where conditions are "or"ed together.
+  Conditions should be parented underneath this BindableFunction.
+</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="createAndConditionGroup"><code style="text-decoration:none">createAndConditionGroup</code><a aria-hidden="true" class="hash-link" href="#createAndConditionGroup" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L227"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">createAndConditionGroup</code><code>(</code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>
+  Creates a new "and" condition group where conditions are "and"ed together.
+  Conditions should be parented underneath this BindableFunction.
+</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getRequiredTag"><code style="text-decoration:none">getRequiredTag</code><a aria-hidden="true" class="hash-link" href="#getRequiredTag" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L250"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">getRequiredTag</code><code>(</code><code>) → </code><code class="blue_2Afy">string</code></div><div>
+<p>
+  Conditions must be tagged with a specific tag to make sure we don't invoke random code,
+  or code on the wrong host.
+</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getConditionNamePostfix"><code style="text-decoration:none">getConditionNamePostfix</code><a aria-hidden="true" class="hash-link" href="#getConditionNamePostfix" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L264"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">getConditionNamePostfix</code><code>(</code><code>) → </code><code class="blue_2Afy">string</code></div><div>
+<p>
+  Gets the postfix for the condition name to make it clear to users
+  if this condition is on the server or the client.
+</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="setValueWhenEmpty"><code style="text-decoration:none">setValueWhenEmpty</code><a aria-hidden="true" class="hash-link" href="#setValueWhenEmpty" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L278"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">setValueWhenEmpty</code><code>(</code><div class="inset_2cJr"><div><code>container<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>value<!-- -->: </code><code class="blue_2Afy">boolean</code><span class="inlineDescription_17uy">-- <span>
+<p>Value to default to</p>
+</span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Sets the default value if we have no value</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="getValueWhenEmpty"><code style="text-decoration:none">getValueWhenEmpty</code><a aria-hidden="true" class="hash-link" href="#getValueWhenEmpty" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L291"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">getValueWhenEmpty</code><code>(</code><code>container<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_2Afy">boolean</code></div><div>
+<p>Gets the default value on a container when empty</p>
+</div><div class="divider_3z1R"></div><h3 class="anchor anchorWithStickyNavbar_31ik" id="observeValueWhenEmpty"><code style="text-decoration:none">observeValueWhenEmpty</code><a aria-hidden="true" class="hash-link" href="#observeValueWhenEmpty" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_1UH0"><a class="sourceButton_2aE5" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/conditions/src/Shared/AdorneeConditionUtils.lua#L302"><div class="sourceButtonText_monK">&lt;/&gt;</div></a></div><div class="memberString_P8-X"><code>AdorneeConditionUtils<!-- -->.</code><code class="green_3LnD">observeValueWhenEmpty</code><code>(</code><code>container<!-- -->: </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/BindableFunction" target="_blank" rel="noopener noreferrer">BindableFunction<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_2Afy"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_1JtD">&lt;</code><code class="blue_2Afy">boolean</code><code class="op_1JtD">&gt;</code></div><div>
+<p>Sets the default value if we have no value</p>
+</div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
+    &quot;functions&quot;: [
+        {
+            &quot;name&quot;: &quot;observeConditionsMet&quot;,
+            &quot;desc&quot;: &quot;Observes whether conditions are met or not.\n\n```lua\nAdorneeConditionUtils.observeConditionsMet(gun.AmmoAllowedConditions, ammo):Subscribe(function(allowed)\n\tif allowed then\n\t\tprint(\&quot;Can use this ammo to refill this gun\&quot;)\n\tend\nend)\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;conditionObj&quot;,
+                    &quot;desc&quot;: &quot;Condition to invoke&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;adornee&quot;,
+                    &quot;desc&quot;: &quot;Adornee to check conditions on&quot;,
+                    &quot;lua_type&quot;: &quot;Instance&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Observable&lt;boolean&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 77,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;promiseQueryConditionsMet&quot;,
+            &quot;desc&quot;: &quot;Promises a query result of whether conditions are met or not. Unlike the observable, this will return\na result once all combinations are met.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;conditionObj&quot;,
+                    &quot;desc&quot;: &quot;Condition to invoke&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;adornee&quot;,
+                    &quot;desc&quot;: &quot;Adornee to check conditions on&quot;,
+                    &quot;lua_type&quot;: &quot;Instance&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;cancelToken&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;CancelToken?&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Promise&lt;boolean&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 93,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;createConditionContainer&quot;,
+            &quot;desc&quot;: &quot;Creates a new condition container which conditions can be parented to. By default this is an\n\&quot;and\&quot; container, that is, all conditions underneath this container must be met for something to be allowed.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 106,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;create&quot;,
+            &quot;desc&quot;: &quot;Creates a new adornee condition&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;observeCallback&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;function&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 121,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;createRequiredProperty&quot;,
+            &quot;desc&quot;: &quot;Creates a new condition that a property is a set value.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;propertyName&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;requiredValue&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;any&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 139,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;createRequiredAttribute&quot;,
+            &quot;desc&quot;: &quot;Creates a new condition that an attribute must be set to the current value&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;attributeName&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;attributeValue&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;any&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 163,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;createRequiredTieInterface&quot;,
+            &quot;desc&quot;: &quot;Creates a new condition that a tie interface must be implemented for the object&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;tieInterfaceDefinition&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;TieDefinition&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 186,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;createOrConditionGroup&quot;,
+            &quot;desc&quot;: &quot;Creates a new \&quot;or\&quot; condition group where conditions are \&quot;or\&quot;ed together.\nConditions should be parented underneath this BindableFunction.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 205,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;createAndConditionGroup&quot;,
+            &quot;desc&quot;: &quot;Creates a new \&quot;and\&quot; condition group where conditions are \&quot;and\&quot;ed together.\nConditions should be parented underneath this BindableFunction.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 227,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getRequiredTag&quot;,
+            &quot;desc&quot;: &quot;Conditions must be tagged with a specific tag to make sure we don&#x27;t invoke random code,\nor code on the wrong host.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 250,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getConditionNamePostfix&quot;,
+            &quot;desc&quot;: &quot;Gets the postfix for the condition name to make it clear to users\nif this condition is on the server or the client.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 264,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;setValueWhenEmpty&quot;,
+            &quot;desc&quot;: &quot;Sets the default value if we have no value&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;container&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;value&quot;,
+                    &quot;desc&quot;: &quot;Value to default to&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 278,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getValueWhenEmpty&quot;,
+            &quot;desc&quot;: &quot;Gets the default value on a container when empty&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;container&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 291,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;observeValueWhenEmpty&quot;,
+            &quot;desc&quot;: &quot;Sets the default value if we have no value&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;container&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindableFunction&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Observable&lt;boolean&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 302,
+                &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+            }
+        }
+    ],
+    &quot;properties&quot;: [],
+    &quot;types&quot;: [],
+    &quot;name&quot;: &quot;AdorneeConditionUtils&quot;,
+    &quot;desc&quot;: &quot;Utility library that defines a generalized interface for scriptable conditions. These conditions are rooted in [Rx] and\ncan be scripted by a variety of systems. For example, we may have conditions on what ammo we can consume, or whether\nor not an action can be activated.\n\nThis library provides an interface for this to happen in. Conditions are marshalled through a BindableFunction and\nmust be defined on both the client and server. However, these conditions can be reactive. It would be very simple\nto create a condition that also just links to a bool value if conditions should be only on the server.\n\n```lua\nlocal conditionFolder = AdorneeConditionUtils.createConditionContainer()\nconditionFolder.Parent = workspace\n\nlocal orGroup = AdorneeConditionUtils.createOrConditionGroup()\norGroup.Parent = conditionFolder\n\nAdorneeConditionUtils.createRequiredProperty(\&quot;Name\&quot;, \&quot;Allowed\&quot;).Parent = orGroup\n\nlocal andGroup = AdorneeConditionUtils.createAndConditionGroup()\nandGroup.Parent = orGroup\n\nAdorneeConditionUtils.createRequiredProperty(\&quot;Name\&quot;, \&quot;Allow\&quot;).Parent = andGroup\nAdorneeConditionUtils.createRequiredAttribute(\&quot;IsEnabled\&quot;, true).Parent = andGroup\n\nlocal testInst = Instance.new(\&quot;Folder\&quot;)\ntestInst.Name = \&quot;Deny\&quot;\ntestInst:SetAttribute(\&quot;IsEnabled\&quot;, false)\ntestInst.Parent = workspace\n\nAdorneeConditionUtils.observeConditionsMet(conditionFolder, testInst):Subscribe(function(isAllowed)\n\tprint(\&quot;Is allowed\&quot;, isAllowed)\nend) --&gt; Is allowed false\n\ntask.delay(0.1, function()\n\ttestInst.Name = \&quot;Allowed\&quot; --&gt; Is allowed true\nend)\n```&quot;,
+    &quot;source&quot;: {
+        &quot;line&quot;: 41,
+        &quot;path&quot;: &quot;src/conditions/src/Shared/AdorneeConditionUtils.lua&quot;
+    }
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#create" class="table-of-contents__link toc-highlight">.create</a></li><li><a href="#createAndConditionGroup" class="table-of-contents__link toc-highlight">.createAndConditionGroup</a></li><li><a href="#createConditionContainer" class="table-of-contents__link toc-highlight">.createConditionContainer</a></li><li><a href="#createOrConditionGroup" class="table-of-contents__link toc-highlight">.createOrConditionGroup</a></li><li><a href="#createRequiredAttribute" class="table-of-contents__link toc-highlight">.createRequiredAttribute</a></li><li><a href="#createRequiredProperty" class="table-of-contents__link toc-highlight">.createRequiredProperty</a></li><li><a href="#createRequiredTieInterface" class="table-of-contents__link toc-highlight">.createRequiredTieInterface</a></li><li><a href="#getConditionNamePostfix" class="table-of-contents__link toc-highlight">.getConditionNamePostfix</a></li><li><a href="#getRequiredTag" class="table-of-contents__link toc-highlight">.getRequiredTag</a></li><li><a href="#getValueWhenEmpty" class="table-of-contents__link toc-highlight">.getValueWhenEmpty</a></li><li><a href="#observeConditionsMet" class="table-of-contents__link toc-highlight">.observeConditionsMet</a></li><li><a href="#observeValueWhenEmpty" class="table-of-contents__link toc-highlight">.observeValueWhenEmpty</a></li><li><a href="#promiseQueryConditionsMet" class="table-of-contents__link toc-highlight">.promiseQueryConditionsMet</a></li><li><a href="#setValueWhenEmpty" class="table-of-contents__link toc-highlight">.setValueWhenEmpty</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2021 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.a918f0ff.js"></script>
+<script src="/NevermoreEngine/assets/js/main.f3e19334.js"></script>
+</body>
+</html>
