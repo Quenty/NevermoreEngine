@@ -172,6 +172,14 @@ function ServiceBag:Start()
 end
 
 --[=[
+	Returns whether the service bag has fully started or not.
+	@return boolean
+]=]
+function ServiceBag:IsStarted()
+	return self._serviceTypesToStart == nil
+end
+
+--[=[
 	Creates a scoped service bag, where services within the scope will not
 	be accessible outside of the scope.
 
