@@ -500,6 +500,65 @@ function Draw.terrainCell(position, color)
 	return part
 end
 
+
+
+function Draw.screenPointLine(a, b, parent, color)
+	local offset = (b - a)
+	local pos = a + offset/2
+
+
+	local frame = Instance.new("Frame")
+	frame.Name = "DebugScreenLine"
+	frame.Size = UDim2.fromScale(math.abs(offset.x), math.abs(offset.y))
+
+	frame.BackgroundTransparency = 1
+	frame.Position = UDim2.fromScale(pos.x, pos.y)
+	frame.AnchorPoint = Vector2.new(0.5, 0.5)
+	frame.BorderSizePixel = 0
+	frame.ZIndex = 10000
+	frame.Parent = parent
+
+	local length = offset.magnitude
+	if length == 0 then
+		return frame
+	end
+
+	local diameter = 3
+	local count = 25
+
+	local slope = offset.y/offset.x
+	if slope > 0 then
+		for i=0, count do
+			Draw.screenPoint(Vector2.new(i/count, i/count), frame, color, diameter)
+		end
+	else
+		for i=0, count do
+			Draw.screenPoint(Vector2.new(i/count, 1 - i/count), frame, color, diameter)
+		end
+	end
+
+	return frame
+end
+
+function Draw.screenPoint(position, parent, color, diameter)
+	local frame = Instance.new("Frame")
+	frame.Name = "DebugScreenPoint"
+	frame.Size = UDim2.new(0, diameter, 0, diameter)
+	frame.BackgroundColor3 = color or Color3.new(1, 0.1, 0.1)
+	frame.BackgroundTransparency = 0.5
+	frame.Position = UDim2.fromScale(position.x, position.y)
+	frame.AnchorPoint = Vector2.new(0.5, 0.5)
+	frame.BorderSizePixel = 0
+	frame.ZIndex = 20000
+
+	local uiCorner = Instance.new("UICorner")
+	uiCorner.CornerRadius = UDim.new(0.5, 0)
+	uiCorner.Parent = frame
+
+	frame.Parent = parent
+	return frame
+end
+
 --[=[
 	Draws a vector in 3D space.
 
