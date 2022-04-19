@@ -27,7 +27,7 @@ rumbleDefinition:RegisterToService(serviceBag)
 
 
 local function handlePlayer(player)
-	local volume = volumeDefinition:Get(serviceBag, player)
+	local volume = volumeDefinition:GetSettingProperty(serviceBag, player)
 
 	volume:PromiseValue()
 		:Then(function(value)

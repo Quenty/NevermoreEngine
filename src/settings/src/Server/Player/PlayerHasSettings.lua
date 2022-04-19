@@ -66,8 +66,6 @@ function PlayerHasSettings:_handleAttributeChanged(subStore, attributeName)
 	local settingName = PlayerSettingsUtils.getSettingName(attributeName)
 	local newValue = self._settings:GetAttribute(attributeName)
 	subStore:Store(settingName, newValue)
-
-	print("Storing", settingName, newValue)
 end
 
 return PlayerHasSettings

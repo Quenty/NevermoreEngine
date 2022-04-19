@@ -110,6 +110,11 @@ function PlayerSettingsBase:ObserveValue(settingName, defaultValue)
 	return RxAttributeUtils.observeAttribute(self._obj, attributeName, defaultValue)
 end
 
+function PlayerSettingsBase:RestoreDefault(settingName, defaultValue)
+	-- TODO: Maybe something more sophisticated?
+	self:SetValue(settingName, defaultValue)
+end
+
 --[=[
 	Ensures the setting is initialized on the server or client
 

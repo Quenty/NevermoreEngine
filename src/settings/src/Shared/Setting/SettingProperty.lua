@@ -66,6 +66,8 @@ function SettingProperty:__index(index)
 				}):Subscribe(callback)
 			end;
 		}
+	elseif index == "DefaultValue" then
+		return self._definition:GetDefaultValue()
 	elseif SettingProperty[index] then
 		return SettingProperty[index]
 	else
@@ -76,6 +78,8 @@ end
 function SettingProperty:__newindex(index, value)
 	if index == "Value" then
 		self:SetValue(value)
+	elseif index == "DefaultValue" or index == "Changed" or SettingProperty[index] then
+		error(("Cannot set %q"):format(tostring(index)))
 	else
 		rawset(self, index, value)
 	end
@@ -102,6 +106,15 @@ function SettingProperty:PromiseSetValue(value)
 		:Then(function(playerSettings)
 			playerSettings:SetValue(self._definition:GetSettingName(), value)
 		end)
+end
+
+function SettingProperty:RestoreDefault()
+	local settings = self:_getPlayerSettings()
+	if settings then
+		settings:RestoreDefault(self._definition:GetSettingName(), self._definition:GetDefaultValue())
+	else
+		warn("Cannot set setting value. Use :PromiseSetValue() to ensure value is set after load.")
+	end
 end
 
 function SettingProperty:_observePlayerSettings()

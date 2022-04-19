@@ -4,6 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local SettingProperty = require("SettingProperty")
 local SettingServiceBridge = require("SettingServiceBridge")
 local ServiceBag = require("ServiceBag")
@@ -38,11 +40,23 @@ end
 	@param player Player
 	@return SettingProperty<T>
 ]=]
-function SettingDefinition:Get(serviceBag, player)
+function SettingDefinition:GetSettingProperty(serviceBag, player)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return SettingProperty.new(serviceBag, player, self)
+end
+
+--[=[
+	Gets a new setting property for the given definition
+
+	@param serviceBag ServiceBag
+	@return SettingProperty<T>
+]=]
+function SettingDefinition:GetLocalPlayerSettingProperty(serviceBag)
+	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
+
+	return self:GetSettingProperty(serviceBag, Players.LocalPlayer)
 end
 
 --[=[
