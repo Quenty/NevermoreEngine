@@ -197,6 +197,8 @@ function Maid:DoCleaning()
 		tasks[index] = nil
 		if type(job) == "function" then
 			job()
+		elseif type(job) == "thread" then
+			task.cancel(job)
 		elseif typeof(job) == "RBXScriptConnection" then
 			job:Disconnect()
 		elseif job.Destroy then
