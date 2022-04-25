@@ -324,7 +324,7 @@ function Promise:_reject(values, valuesLength)
 
 	-- Check for uncaught exceptions
 	if self._unconsumedException and self._valuesLength > 0 then
-		coroutine.resume(coroutine.create(function()
+		task.spawn(function()
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
 			RunService.Heartbeat:Wait()
