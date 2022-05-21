@@ -591,7 +591,7 @@ end
 
 	@since 3.6.0
 	@param project (value: TBrio) -> TProject | Brio<TProject>
-	@return (brio<TBrio>) -> Brio<TProject>
+	@return (Brio<TBrio>) -> Brio<TProject>
 ]=]
 function RxBrioUtils.mapBrioBrio(project)
 	assert(type(project) == "function", "Bad project")
