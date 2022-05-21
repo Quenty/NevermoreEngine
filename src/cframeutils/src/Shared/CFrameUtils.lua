@@ -27,7 +27,7 @@ function CFrameUtils.lookAt(position, target, upVector)
 	local rightVector = forwardVector:Cross(upVector)
 	local upVector2 = rightVector:Cross(forwardVector)
 
-	return CFrame.fromMatrix(position, rightVector, upVector2)
+	return CFrame.fromMatrix(position, rightVector, upVector2):Orthonormalize()
 end
 
 --[=[
