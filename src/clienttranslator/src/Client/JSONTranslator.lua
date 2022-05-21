@@ -5,7 +5,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -52,7 +51,6 @@ function JSONTranslator.new(...)
 	self._fallbacks = {}
 
 	if RunService:IsRunning() then
-		self._localizationTable.Parent = LocalizationService
 		self._promiseTranslator = LocalizationServiceUtils.promiseTranslator(Players.LocalPlayer)
 	else
 		self._promiseTranslator = Promise.resolved(self._englishTranslator)
