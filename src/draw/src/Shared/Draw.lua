@@ -578,6 +578,46 @@ function Draw.vector(position, direction, color, parent, meshDiameter)
 end
 
 --[=[
+	Draws a ring in 3D space.
+
+	```lua
+	Draw.ring(Vector3.new(0, 0, 0), Vector3.new(0, 1, 0), 10)
+	```
+
+	@param ringPos Vector3 -- Position of the center of the ring
+	@param ringNorm Vector3 -- Direction of the ring.
+	@param ringRadius number? -- Optional radius for the ring
+	@param color Color3? -- Optional color
+	@param parent Instance? -- Optional instance
+	@return BasePart
+]=]
+function Draw.ring(ringPos, ringNorm, ringRadius, color, parent)
+	local ringCFrame = CFrame.new(ringPos, ringPos + ringNorm)
+
+	local points = {}
+	for angle = 0, 2*math.pi, math.pi/8 do
+		local x = math.cos(angle)*ringRadius
+		local y = math.sin(angle)*ringRadius
+		local vector = ringCFrame:pointToWorldSpace(Vector3.new(x, y, 0))
+		table.insert(points, vector)
+	end
+
+	local folder = Instance.new("Folder")
+	folder.Name = "DebugRing"
+
+	for i=1, #points do
+		local pos = points[i]
+		local nextPos = points[(i%#points)+1]
+        local ray = Ray.new(pos, nextPos - pos)
+        Draw.ray(ray, color, folder)
+	end
+
+	folder.Parent = parent or Draw.getDefaultParent()
+
+	return folder
+end
+
+--[=[
 	Retrieves the default parent for the current execution context.
 	@return Instance
 ]=]
