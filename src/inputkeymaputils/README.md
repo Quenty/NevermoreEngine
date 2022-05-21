@@ -13,9 +13,13 @@
 
 Utility methods for input map
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/InputKeyMapUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/InputKeyMapList">View docs →</a></div>
 
 ## Installation
 ```
 npm install @quenty/inputkeymaputils --save
 ```
+
+## Design
+
+Note this system is designed to simple hold data, it doesn't do any binding with that data. So basically, an InputKeyMap can hold the information on what to bind, and what preferences are in a structured way.
