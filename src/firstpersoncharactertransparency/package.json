@@ -27,7 +27,9 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/humanoidtracker": "file:../humanoidtracker",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/transparencyservice": "file:../transparencyservice"
   },
   "publishConfig": {
