@@ -1,3 +1,21 @@
+# (Sat May 21 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/adorneeutils@3.0.0`, `@quenty/adorneevalue@2.0.0`, `@quenty/basicpane@5.0.0`, `@quenty/blend@4.0.0`, `@quenty/brio@6.0.0`, `@quenty/cframeutils@4.0.0`, `@quenty/clienttranslator@6.0.0`, `@quenty/cmdrservice@5.0.0`, `@quenty/color3utils@3.0.0`, `@quenty/colorpalette@2.0.0`, `@quenty/colorpicker@2.0.0`, `@quenty/depthoffield@3.0.0`, `@quenty/draw@4.0.0`, `@quenty/firstpersoncharactertransparency@5.0.0`, `@quenty/gameproductservice@3.0.0`, `@quenty/idleservice@5.0.0`, `@quenty/ik@7.0.0`, `@quenty/inputkeymaputils@5.0.0`, `@quenty/inputmode@5.0.0`, `@quenty/inputobjectutils@3.0.0`, `@quenty/instanceutils@5.0.0`, `@quenty/loader@5.0.0`, `@quenty/messagingserviceutils@2.0.0`, `@quenty/observablecollection@3.0.0`, `@quenty/physicsutils@3.0.0`, `@quenty/r15utils@5.0.0`, `@quenty/ragdoll@7.0.0`, `@quenty/remoting@5.0.0`, `@quenty/rx@5.0.0`, `@quenty/scoredactionservice@7.0.0`, `@quenty/servicebag@5.0.0`, `@quenty/settings@2.0.0`, `@quenty/spring@5.0.0`, `@quenty/table@3.0.0`, `@quenty/teleportserviceutils@2.0.0`, `@quenty/userserviceutils@2.0.0`, `@quenty/valueobject@5.0.0`, `@quenty/vector3utils@5.0.0`
+  - feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Bump license/copyright date [#258](https://github.com/Quenty/NevermoreEngine/pull/258) ([@insyri](https://github.com/insyri))
+
+#### Authors: 2
+
+- insyri ([@insyri](https://github.com/insyri))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Mar 27 2022)
 
 #### 🚀 Enhancement
