@@ -2,16 +2,22 @@
 	@class ServerMain
 ]]
 
-local require = require(script.Parent.loader).load(script)
+local ServerScriptService = game:GetService("ServerScriptService")
+local RunService = game:GetService("RunService")
 
-local serviceBag = require("ServiceBag").new()
-serviceBag:GetService(require("IKService"))
+local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
+local packages = require(loader).bootstrapGame(ServerScriptService.ik)
 
+local serviceBag = require(packages.ServiceBag).new()
+local ikService = serviceBag:GetService(packages.IKService)
+
+-- Start game
 serviceBag:Init()
 serviceBag:Start()
 
+
 -- Build test NPC rigs
-local RigBuilderUtils = require("RigBuilderUtils")
+local RigBuilderUtils = require(packages.RigBuilderUtils)
 RigBuilderUtils.promiseR15MeshRig()
 	:Then(function(character)
 		local humanoid = character.Humanoid
@@ -21,6 +27,8 @@ RigBuilderUtils.promiseR15MeshRig()
 		character.Parent = workspace
 		humanoid.RootPart.CFrame = CFrame.new(0, 25, 0)
 
-		-- look down
-		serviceBag:GetService(require("IKService")):UpdateServerRigTarget(humanoid, Vector3.new(0, 0, 0))
+		-- look at origin
+		RunService.Stepped:Connect(function()
+			ikService:UpdateServerRigTarget(humanoid, Vector3.new(0, 0, 0))
+		end)
 	end)

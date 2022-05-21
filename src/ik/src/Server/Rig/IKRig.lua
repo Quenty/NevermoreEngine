@@ -21,6 +21,7 @@ function IKRig.new(humanoid)
 
 	self._remoteEvent = Instance.new("RemoteEvent")
 	self._remoteEvent.Name = IKConstants.REMOTE_EVENT_NAME
+	self._remoteEvent.Archivable = false
 	self._remoteEvent.Parent = self._obj
 	self._maid:GiveTask(self._remoteEvent)
 

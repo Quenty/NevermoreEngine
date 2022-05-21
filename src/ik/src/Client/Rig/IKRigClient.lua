@@ -22,14 +22,19 @@ function IKRigClient.new(humanoid, serviceBag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	if self:GetPlayer() == Players.LocalPlayer then
+		self:_setupLocalPlayer(self._remoteEvent)
+	end
+
 	self:PromiseRemoteEvent():Then(function(remoteEvent)
-		self._remoteEvent = remoteEvent or error("No remoteEvent")
+		self._remoteEvent = assert(remoteEvent, "No remoteEvent")
+
 		self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(...)
 			self:_handleRemoteEventClient(...)
 		end))
 
-		if self:GetPlayer() == Players.LocalPlayer then
-			self:_setupLocalPlayer(self._remoteEvent)
+		if self._localPlayerAimer then
+			self._localPlayerAimer:SetRemoteEvent(self._remoteEvent)
 		end
 	end)
 
@@ -56,8 +61,22 @@ end
 	@return IKRigAimerLocalPlayer?
 ]=]
 function IKRigClient:GetLocalPlayerAimer()
-	return self._aimer
+	return self._localPlayerAimer
 end
+
+--[=[
+	Returns where the rig is looking at
+
+	@return Vector3?
+]=]
+function IKRigClient:GetTarget()
+	if self._localPlayerAimer then
+		return self._localPlayerAimer:GetAimPosition()
+	end
+
+	return self._target
+end
+
 
 function IKRigClient:_handleRemoteEventClient(newTarget)
 	assert(typeof(newTarget) == "Vector3" or newTarget == nil, "Bad newTarget")
@@ -67,11 +86,13 @@ function IKRigClient:_handleRemoteEventClient(newTarget)
 	if torso then
 		torso:Point(newTarget)
 	end
+
+	self._target = newTarget
 end
 
 function IKRigClient:_setupLocalPlayer(remoteEvent)
-	self._aimer = IKRigAimerLocalPlayer.new(self._serviceBag, self, remoteEvent)
-	self._maid:GiveTask(self._aimer)
+	self._localPlayerAimer = IKRigAimerLocalPlayer.new(self._serviceBag, self, remoteEvent)
+	self._maid:GiveTask(self._localPlayerAimer)
 end
 
 return IKRigClient

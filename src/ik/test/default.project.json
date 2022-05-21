@@ -1,18 +1,10 @@
 {
-  "name": "iktest",
+  "name": "IKTest",
   "tree": {
     "$className": "DataModel",
-    "ReplicatedStorage": {
-      "Nevermore": {
-        "$path": "../node_modules/@quenty/loader"
-      }
-    },
     "ServerScriptService": {
-      "Nevermore": {
-        "$className": "folder",
-        "IK": {
-          "$path": ".."
-        }
+      "ik": {
+        "$path": ".."
       },
       "Script": {
         "$path": "scripts/Server"
