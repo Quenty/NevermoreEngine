@@ -118,11 +118,21 @@ function LoaderUtils.discoverTopLevelPackages(packages, instance)
 
 	if LoaderUtils.isPackage(instance) then
 		table.insert(packages, instance)
+	elseif instance:IsA("ObjectValue") then
+		local linkedValue = instance.Value
+		if linkedValue and LoaderUtils.isPackage(linkedValue) then
+			table.insert(packages, linkedValue)
+		end
 	else
 		-- Loop through all folders
 		for _, item in pairs(instance:GetChildren()) do
 			if item:IsA("Folder") then
 				LoaderUtils.discoverTopLevelPackages(packages, item)
+			elseif item:IsA("ObjectValue") then
+				local linkedValue = item.Value
+				if linkedValue and LoaderUtils.isPackage(linkedValue) then
+					table.insert(packages, linkedValue)
+				end
 			elseif item:IsA("ModuleScript") then
 				table.insert(packages, item)
 			end

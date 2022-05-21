@@ -1,0 +1,11 @@
+{
+  "name": "ObservableCollectionTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "observablecollection": {
+        "$path": ".."
+      }
+    }
+  }
+}

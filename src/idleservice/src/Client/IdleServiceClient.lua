@@ -119,6 +119,14 @@ function IdleServiceClient:IsHumanoidIdle()
 end
 
 --[=[
+	Returns whether the humanoid is idle.
+	@return boolean
+]=]
+function IdleServiceClient:IsMoving()
+	return not self._humanoidIdle.Value
+end
+
+--[=[
 	observes if the humanoid is idle.
 	@return Observable<boolean>
 ]=]

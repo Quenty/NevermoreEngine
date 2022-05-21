@@ -47,6 +47,15 @@ function InputMode.new(name, typesAndInputModes)
 end
 
 --[=[
+	Returns true if a given value is an InputMode
+	@param value any
+	@return boolean
+]=]
+function InputMode.isInputMode(value)
+	return type(value) == "table" and getmetatable(value) == InputMode
+end
+
+--[=[
 	Checks the last point this input mode was used.
 	@return number
 ]=]

@@ -37,13 +37,13 @@ end
 function CmdrServiceClient:Start()
 	assert(self._serviceBag, "Not initialized")
 
-	PromiseUtils.all({
+	self._maid:GivePromise(PromiseUtils.all({
 		self:PromiseCmdr(),
-		self._permissionService:PromisePermissionProvider()
+		self._maid:GivePromise(self._permissionService:PromisePermissionProvider())
 			:Then(function(provider)
 				return provider:PromiseIsAdmin()
 			end)
-	})
+	}))
 	:Then(function(cmdr, isAdmin)
 		if isAdmin then
 			self:_setBindings(cmdr)

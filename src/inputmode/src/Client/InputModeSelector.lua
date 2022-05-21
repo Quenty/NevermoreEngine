@@ -27,6 +27,9 @@ function InputModeSelector.new(inputModes)
 
 	self._maid = Maid.new()
 
+	-- keep this ordered so we are always stable in selection.
+	self._inputModeList = {}
+
 	self._activeMode = ValueObject.new()
 	self._maid:GiveTask(self._activeMode)
 
@@ -38,10 +41,37 @@ function InputModeSelector.new(inputModes)
 	self.Changed = self._activeMode.Changed
 
 	for _, inputMode in pairs(inputModes or InputModeSelector.DEFAULT_MODES) do
-		self:_addInputMode(inputMode)
+		self:AddInputMode(inputMode)
 	end
 
 	return self
+end
+
+--[=[
+	Constructs a new InputModeSelector
+	@param observeInputModesBrio Observable<Brio<InputMode>>
+	@return InputModeSelector
+]=]
+function InputModeSelector.fromObservableBrio(observeInputModesBrio)
+	local selector = InputModeSelector.new({})
+
+	selector._maid:GiveTask(observeInputModesBrio:Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local inputMode = brio:GetValue()
+		local maid = brio:ToMaid()
+		selector:AddInputMode(inputMode)
+
+		maid:GiveTask(function()
+			if selector.Destroy then
+				selector:RemoveInputMode(inputMode)
+			end
+		end)
+	end))
+
+	return selector
 end
 
 --[=[
@@ -50,6 +80,14 @@ end
 ]=]
 function InputModeSelector:GetActiveMode()
 	return rawget(self, "_activeMode").Value
+end
+
+--[=[
+	Observes the current active mode
+	@return Observable<InputMode>
+]=]
+function InputModeSelector:ObserveActiveMode()
+	return rawget(self, "_activeMode"):Observe()
 end
 
 --[=[
@@ -106,7 +144,10 @@ function InputModeSelector:Bind(updateBindFunction)
 		if newMode then
 			local modeMaid = Maid.new()
 			maid._modeMaid = modeMaid
-			updateBindFunction(newMode, modeMaid)
+
+			if newMode then
+				updateBindFunction(newMode, modeMaid)
+			end
 		end
 	end
 
@@ -116,9 +157,39 @@ function InputModeSelector:Bind(updateBindFunction)
 	return self
 end
 
-function InputModeSelector:_addInputMode(inputMode)
-	assert(not self._maid[inputMode], "Bad inputMode")
+--[=[
+	Removes the input mode
+	@param inputMode InputMode
+]=]
+function InputModeSelector:RemoveInputMode(inputMode)
+	if not self._maid[inputMode] then
+		return
+	end
 
+	local index = table.find(self._inputModeList, inputMode)
+	if index then
+		table.remove(self._inputModeList, index)
+	else
+		warn("[InputModeSelector] - Failed to find inputMode")
+	end
+
+	self._maid[inputMode] = nil
+
+	if self._activeMode.Value == inputMode then
+		self:_pickNewInputMode()
+	end
+end
+
+--[=[
+	Adds a new input mode
+	@param inputMode InputMode
+]=]
+function InputModeSelector:AddInputMode(inputMode)
+	if self._maid[inputMode] then
+		return
+	end
+
+	table.insert(self._inputModeList, inputMode)
 	self._maid[inputMode] = inputMode.Enabled:Connect(function()
 		self._activeMode.Value = inputMode
 	end)
@@ -127,6 +198,20 @@ function InputModeSelector:_addInputMode(inputMode)
 		or inputMode:GetLastEnabledTime() > self._activeMode.Value:GetLastEnabledTime() then
 		self._activeMode.Value = inputMode
 	end
+end
+
+function InputModeSelector:_pickNewInputMode()
+	local bestEnabledTime = -math.huge
+	local bestMode
+	for _, inputMode in pairs(self._inputModeList) do
+		local enableTime = inputMode:GetLastEnabledTime()
+		if enableTime >= bestEnabledTime then
+			bestEnabledTime = enableTime
+			bestMode = inputMode
+		end
+	end
+
+	self._activeMode.Value = bestMode
 end
 
 --[=[

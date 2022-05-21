@@ -47,6 +47,7 @@ local ResourceConstants = require("ResourceConstants")
 if not RunService:IsRunning() then
 	return function(name)
 		local event = Instance.new("RemoteEvent")
+		event.Archivable = false
 		event.Name = "Mock" .. name
 
 		return event
@@ -59,6 +60,7 @@ elseif RunService:IsServer() then
 		if not storage then
 			storage = Instance.new("Folder")
 			storage.Name = ResourceConstants.REMOTE_EVENT_STORAGE_NAME
+			storage.Archivable = false
 			storage.Parent = ReplicatedStorage
 		end
 
@@ -69,6 +71,7 @@ elseif RunService:IsServer() then
 
 		event = Instance.new("RemoteEvent")
 		event.Name = name
+		event.Archivable = false
 		event.Parent = storage
 
 		return event

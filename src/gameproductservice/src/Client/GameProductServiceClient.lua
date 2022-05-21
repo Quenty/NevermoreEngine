@@ -37,12 +37,13 @@ function GameProductServiceClient:Init(serviceBag)
 	self._promptClosedEvent = Signal.new()
 	self._maid:GiveTask(self._promptClosedEvent)
 
+	self._purchasedGamePassesThisSession = {}
 	self._maid:GiveTask(MarketplaceService.PromptGamePassPurchaseFinished
 		:Connect(function(player, gamepassId, wasPurchased)
 			if player == Players.LocalPlayer then
 				self._promptClosedEvent:Fire()
 				if wasPurchased then
-					self._purchased[gamepassId] = true
+					self._purchasedGamePassesThisSession[gamepassId] = true
 					-- self._fireworksService:Create(3)
 					self.GamepassPurchased:Fire(gamepassId)
 				end
@@ -71,12 +72,16 @@ end
 function GameProductServiceClient:PromiseLocalPlayerOwnsPass(passIdOrKey)
 	assert(type(passIdOrKey) == "number" or type(passIdOrKey) == "string", "Bad passIdOrKey")
 
-	local productId = self:_toAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
-	if not productId then
+	local passId = self:_toAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
+	if not passId then
 		return Promise.rejected(("No asset with key %q"):format(tostring(passIdOrKey)))
 	end
 
-	return self:PromisePlayerOwnsPass(Players.LocalPlayer, passIdOrKey)
+	if self._purchasedGamePassesThisSession[passId] == true then
+		return Promise.resolved(self._purchasedGamePassesThisSession[passId])
+	end
+
+	return self:PromisePlayerOwnsPass(Players.LocalPlayer, passId)
 end
 
 --[=[

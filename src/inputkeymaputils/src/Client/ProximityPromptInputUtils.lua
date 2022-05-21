@@ -6,8 +6,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local InputKeyMapUtils = require("InputKeyMapUtils")
+local InputKeyMapList = require("InputKeyMapList")
 local INPUT_MODES = require("INPUT_MODES")
+local InputKeyMap = require("InputKeyMap")
 
 local ProximityPromptInputUtils = {}
 
@@ -17,13 +18,13 @@ local ProximityPromptInputUtils = {}
 	@param prompt ProximityPrompt
 	@return InputKeyMapList
 ]=]
-function ProximityPromptInputUtils.inputKeyMapFromPrompt(prompt)
+function ProximityPromptInputUtils.newInputKeyMapFromPrompt(prompt)
 	assert(typeof(prompt) == "Instance", "Bad prompt")
 
-	return {
-		InputKeyMapUtils.createKeyMap(INPUT_MODES.Gamepads, { prompt.GamepadKeyCode });
-		InputKeyMapUtils.createKeyMap(INPUT_MODES.Keyboard, { prompt.KeyboardKeyCode })
-	}
+	return InputKeyMapList.new("custom", {
+		InputKeyMap.new(INPUT_MODES.Gamepads, { prompt.GamepadKeyCode });
+		InputKeyMap.new(INPUT_MODES.Keyboard, { prompt.KeyboardKeyCode })
+	})
 end
 
 

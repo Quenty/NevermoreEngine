@@ -2,13 +2,13 @@
 	@class ClientMain
 ]]
 
-local require = require(script.Parent.loader).load(script)
+local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
 
-local serviceBag = require("ServiceBag").new()
-serviceBag:GetService(require("IKServiceClient"))
+local serviceBag = require(packages.ServiceBag).new()
+local ikServiceClient = serviceBag:GetService(packages.IKServiceClient)
 
 serviceBag:Init()
 serviceBag:Start()
 
 -- Configure
-serviceBag:GetService(require("IKServiceClient")):SetLookAround(true)
+ikServiceClient:SetLookAround(true)

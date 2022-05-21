@@ -13,16 +13,34 @@ local MOUSE_USER_INPUT_TYPES = {
 	[Enum.UserInputType.MouseMovement] = true;
 }
 
+local MOUSE_BUTTON_USER_INPUT_TYPES = {
+	[Enum.UserInputType.MouseButton1] = true;
+	[Enum.UserInputType.MouseButton2] = true;
+	[Enum.UserInputType.MouseButton3] = true;
+}
+
 --[=[
 	Returns whether a user input type involves the mouse.
 
 	@param userInputType UserInputType
-	@return true
+	@return boolean
 ]=]
 function InputObjectUtils.isMouseUserInputType(userInputType)
 	assert(typeof(userInputType) == "EnumItem", "Bad userInputType")
 
 	return MOUSE_USER_INPUT_TYPES[userInputType] or false
+end
+
+--[=[
+	Returns whether a user input type is a mouse button specifically.
+
+	@param userInputType UserInputType
+	@return boolean
+]=]
+function InputObjectUtils.isMouseButtonInputType(userInputType)
+	assert(typeof(userInputType) == "EnumItem", "Bad userInputType")
+
+	return MOUSE_BUTTON_USER_INPUT_TYPES[userInputType] or false
 end
 
 --[=[

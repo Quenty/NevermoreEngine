@@ -19,6 +19,7 @@ local Symbol = require("Symbol")
 local Table = require("Table")
 local ThrottledFunction = require("ThrottledFunction")
 local cancellableDelay = require("cancellableDelay")
+local CancelToken = require("CancelToken")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -128,17 +129,26 @@ end
 function Rx.toPromise(observable, cancelToken)
 	local maid = Maid.new()
 
-	local promise = Promise.new(function(resolve, reject)
+	local newCancelToken = CancelToken.new(function(cancel)
+		maid:GiveTask(cancel)
 		if cancelToken then
 			if cancelToken:IsCancelled() then
-				reject()
-				return
+				cancel()
+			else
+				maid:GiveTask(cancelToken.Cancelled:Connect(cancel))
 			end
-
-			maid:GiveTask(cancelToken.Cancelled:Connect(function()
-				reject()
-			end))
 		end
+	end)
+
+	local promise = Promise.new(function(resolve, reject)
+		if newCancelToken:IsCancelled() then
+			reject()
+			return
+		end
+
+		maid:GiveTask(newCancelToken.Cancelled:Connect(function()
+			reject()
+		end))
 
 		maid:GiveTask(observable:Subscribe(resolve, reject, reject))
 	end)
@@ -1163,6 +1173,38 @@ function Rx.take(number)
 				if taken >= number then
 					sub:Complete()
 				end
+			end, sub:GetFailComplete()))
+
+			return maid
+		end)
+	end
+end
+
+--[=[
+	Takes n entries and then completes the observation.
+
+	https://rxjs.dev/api/operators/take
+	@param toSkip number
+	@return (source: Observable<T>) -> Observable<T>
+]=]
+function Rx.skip(toSkip)
+	assert(type(toSkip) == "number", "Bad toSkip")
+	assert(toSkip > 0, "Bad toSkip")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local skipped = 0
+			local maid = Maid.new()
+
+			maid:GiveTask(source:Subscribe(function(...)
+				if skipped <= toSkip then
+					skipped = skipped + 1
+					return
+				end
+
+				sub:Fire(...)
 			end, sub:GetFailComplete()))
 
 			return maid

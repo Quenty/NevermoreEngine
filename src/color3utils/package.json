@@ -26,5 +26,12 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/blend": "file:../blend",
+    "@quenty/loader": "file:../loader",
+    "@quenty/math": "file:../math",
+    "@quenty/rx": "file:../rx",
+    "@quenty/valueobject": "file:../valueobject"
   }
 }

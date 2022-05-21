@@ -26,9 +26,18 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
     "@quenty/inputmode": "file:../inputmode",
     "@quenty/loader": "file:../loader",
-    "@quenty/table": "file:../table"
+    "@quenty/maid": "file:../maid",
+    "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/statestack": "file:../statestack",
+    "@quenty/table": "file:../table",
+    "@quenty/valuebaseutils": "file:../valuebaseutils",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

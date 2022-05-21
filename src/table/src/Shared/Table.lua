@@ -39,6 +39,20 @@ function Table.merge(orig, new)
 end
 
 --[=[
+	Reverses the list and returns the reversed copy
+
+	@param orig table -- Original table
+	@return table
+]=]
+function Table.reverse(orig)
+	local new = {}
+	for i=#orig, 1, -1 do
+		table.insert(new, orig[i])
+	end
+	return new
+end
+
+--[=[
 	Returns a list of all of the values that a table has.
 
 	@param source table -- Table source to extract values from
@@ -48,6 +62,20 @@ function Table.values(source)
 	local new = {}
 	for _, val in pairs(source) do
 		table.insert(new, val)
+	end
+	return new
+end
+
+--[=[
+	Returns a list of all of the keys that a table has. (In order of pairs)
+
+	@param source table -- Table source to extract keys from
+	@return table -- A list with all the keys the table has
+]=]
+function Table.keys(source)
+	local new = {}
+	for key, _ in pairs(source) do
+		table.insert(new, key)
 	end
 	return new
 end

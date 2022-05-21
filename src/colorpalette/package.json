@@ -1,0 +1,43 @@
+{
+  "name": "@quenty/colorpalette",
+  "version": "1.0.0",
+  "description": "Color palette system for Roblox",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Color"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/colorpalette/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/blend": "file:../blend",
+    "@quenty/color3utils": "file:../color3utils",
+    "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math",
+    "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
+    "@quenty/valueobject": "file:../valueobject"
+  },
+  "devDependencies": {
+    "@quenty/colorpicker": "file:../colorpicker"
+  }
+}

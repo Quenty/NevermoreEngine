@@ -29,7 +29,7 @@
 	```
 
 	:::info
-	If the game is not running, then a mock remote event will be created
+	If the game is not running, then a mock remote function will be created
 	for use in testing.
 	:::
 
@@ -49,10 +49,11 @@ local ResourceConstants = require("ResourceConstants")
 
 if not RunService:IsRunning() then
 	return function(name)
-		local event = Instance.new("RemoteFunction")
-		event.Name = "Mock" .. name
+		local func = Instance.new("RemoteFunction")
+		func.Name = "Mock" .. name
+		func.Archivable = false
 
-		return event
+		return func
 	end
 elseif RunService:IsServer() then
 	return function(name)
@@ -62,6 +63,7 @@ elseif RunService:IsServer() then
 		if not storage then
 			storage = Instance.new("Folder")
 			storage.Name = ResourceConstants.REMOTE_FUNCTION_STORAGE_NAME
+			storage.Archivable = false
 			storage.Parent = ReplicatedStorage
 		end
 
@@ -72,6 +74,7 @@ elseif RunService:IsServer() then
 
 		func = Instance.new("RemoteFunction")
 		func.Name = name
+		func.Archivable = false
 		func.Parent = storage
 
 		return func

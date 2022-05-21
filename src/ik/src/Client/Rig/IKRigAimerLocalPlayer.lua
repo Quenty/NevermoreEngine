@@ -13,7 +13,7 @@ local CameraStackService = require("CameraStackService")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
 
 local MAX_AGE_FOR_AIM_DATA = 0.2
-local REPLICATION_RATE = 1.3
+local DEFAULT_REPLICATION_RATE = 1.3
 
 local IKRigAimerLocalPlayer = setmetatable({}, BaseObject)
 IKRigAimerLocalPlayer.ClassName = "IKRigAimerLocalPlayer"
@@ -25,22 +25,35 @@ IKRigAimerLocalPlayer.__index = IKRigAimerLocalPlayer
 
 	@param serviceBag ServiceBag
 	@param ikRig IKRigClient
-	@param remoteEvent RemoteEvent
 	@return IKRigAimerLocalPlayer
 ]=]
-function IKRigAimerLocalPlayer.new(serviceBag, ikRig, remoteEvent)
+function IKRigAimerLocalPlayer.new(serviceBag, ikRig)
 	local self = setmetatable(BaseObject.new(), IKRigAimerLocalPlayer)
 
 	self._cameraStackService = serviceBag:GetService(CameraStackService)
-	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._ikRig = ikRig or error("No ikRig")
 
 	self._lastUpdate = 0
 	self._lastReplication = 0
-	self._aimData = nil
 	self._lookAround = true
 
+	self._aimData = nil
+
+	self._replicationRate = DEFAULT_REPLICATION_RATE
+	self._replicationRates = {}
+
 	return self
+end
+
+--[=[
+	Sets the remote event for replication
+
+	@param remoteEvent RemoteEvent
+]=]
+function IKRigAimerLocalPlayer:SetRemoteEvent(remoteEvent)
+	assert(not self._remoteEvent, "Already have remoteEvent")
+
+	self._remoteEvent = assert(remoteEvent, "No remoteEvent")
 end
 
 --[=[
@@ -75,11 +88,46 @@ function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
 	}
 end
 
+function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate)
+	assert(type(replicateRate) == "number", "Bad replicateRate")
+
+	local data = {
+		replicateRate = replicateRate;
+	}
+
+	table.insert(self._replicationRates, data)
+	self:_updateReplicationRate()
+
+	if #self._replicationRates >= 10 then
+		warn("[IKRigAimerLocalPlayer] - More than 10 replication rates stored, memory leak possible")
+	end
+
+	return function()
+		local index = table.find(self._replicationRates, data)
+		if index then
+			table.remove(self._replicationRates, index)
+			self:_updateReplicationRate()
+		end
+	end
+end
+
+function IKRigAimerLocalPlayer:_updateReplicationRate()
+	local best = nil
+	for _, rateData in pairs(self._replicationRates) do
+		local rate = rateData.replicateRate
+		if not best or rate < best then
+			best = rate
+		end
+	end
+
+	self._replicationRate = best or DEFAULT_REPLICATION_RATE
+end
+
 --[=[
-	Gets the current aim direction.
+	Gets the current aim position.
 	@return Vector3?
 ]=]
-function IKRigAimerLocalPlayer:GetAimDirection()
+function IKRigAimerLocalPlayer:GetAimPosition()
 	if self._aimData and (os.clock() - self._aimData.timeStamp) < MAX_AGE_FOR_AIM_DATA then
 			-- If we have aim data within the last 0.2 seconds start pointing at that
 		return self._aimData.position -- May be nil
@@ -121,18 +169,18 @@ function IKRigAimerLocalPlayer:UpdateStepped()
 		return
 	end
 
-	local aimDirection = self:GetAimDirection()
+	local aimPosition = self:GetAimPosition()
 
 	self._lastUpdate = os.clock()
 	local torso = self._ikRig:GetTorso()
 	if torso then
-		torso:Point(aimDirection)
+		torso:Point(aimPosition)
 	end
 
 	-- Filter replicate
-	if (os.clock() - self._lastReplication) > REPLICATION_RATE then
+	if self._remoteEvent and (os.clock() - self._lastReplication) > self._replicationRate then
 		self._lastReplication = os.clock()
-		self._remoteEvent:FireServer(aimDirection)
+		self._remoteEvent:FireServer(aimPosition)
 	end
 end
 

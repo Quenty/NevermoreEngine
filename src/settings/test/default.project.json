@@ -1,0 +1,21 @@
+{
+  "name": "SettingsTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "settings": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

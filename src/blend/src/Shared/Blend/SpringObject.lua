@@ -73,6 +73,32 @@ function SpringObject:ObserveRenderStepped()
 	return self:ObserveOnSignal(RunService.RenderStepped)
 end
 
+function SpringObject:ObserveVelocityOnRenderStepped()
+	return self:ObserveVelocityOnSignal(RunService.RenderStepped)
+end
+
+function SpringObject:ObserveVelocityOnSignal(signal)
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local startAnimate, stopAnimate = StepUtils.bindToSignal(signal, function()
+			local animating = SpringUtils.animating(self._currentSpring)
+			if animating then
+				sub:Fire(SpringUtils.fromLinearIfNeeded(self._currentSpring.Velocity))
+			else
+				sub:Fire(SpringUtils.fromLinearIfNeeded(0*self._currentSpring.Velocity))
+			end
+			return animating
+		end)
+
+		maid:GiveTask(stopAnimate)
+		maid:GiveTask(self.Changed:Connect(startAnimate))
+		startAnimate()
+
+		return maid
+	end)
+end
+
 --[=[
 	Observes the spring animating
 	@param signal RBXScriptSignal

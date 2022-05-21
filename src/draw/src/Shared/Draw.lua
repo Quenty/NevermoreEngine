@@ -500,6 +500,65 @@ function Draw.terrainCell(position, color)
 	return part
 end
 
+
+
+function Draw.screenPointLine(a, b, parent, color)
+	local offset = (b - a)
+	local pos = a + offset/2
+
+
+	local frame = Instance.new("Frame")
+	frame.Name = "DebugScreenLine"
+	frame.Size = UDim2.fromScale(math.abs(offset.x), math.abs(offset.y))
+
+	frame.BackgroundTransparency = 1
+	frame.Position = UDim2.fromScale(pos.x, pos.y)
+	frame.AnchorPoint = Vector2.new(0.5, 0.5)
+	frame.BorderSizePixel = 0
+	frame.ZIndex = 10000
+	frame.Parent = parent
+
+	local length = offset.magnitude
+	if length == 0 then
+		return frame
+	end
+
+	local diameter = 3
+	local count = 25
+
+	local slope = offset.y/offset.x
+	if slope > 0 then
+		for i=0, count do
+			Draw.screenPoint(Vector2.new(i/count, i/count), frame, color, diameter)
+		end
+	else
+		for i=0, count do
+			Draw.screenPoint(Vector2.new(i/count, 1 - i/count), frame, color, diameter)
+		end
+	end
+
+	return frame
+end
+
+function Draw.screenPoint(position, parent, color, diameter)
+	local frame = Instance.new("Frame")
+	frame.Name = "DebugScreenPoint"
+	frame.Size = UDim2.new(0, diameter, 0, diameter)
+	frame.BackgroundColor3 = color or Color3.new(1, 0.1, 0.1)
+	frame.BackgroundTransparency = 0.5
+	frame.Position = UDim2.fromScale(position.x, position.y)
+	frame.AnchorPoint = Vector2.new(0.5, 0.5)
+	frame.BorderSizePixel = 0
+	frame.ZIndex = 20000
+
+	local uiCorner = Instance.new("UICorner")
+	uiCorner.CornerRadius = UDim.new(0.5, 0)
+	uiCorner.Parent = frame
+
+	frame.Parent = parent
+	return frame
+end
+
 --[=[
 	Draws a vector in 3D space.
 
@@ -516,6 +575,46 @@ end
 ]=]
 function Draw.vector(position, direction, color, parent, meshDiameter)
 	return Draw.ray(Ray.new(position, direction), color, parent, meshDiameter)
+end
+
+--[=[
+	Draws a ring in 3D space.
+
+	```lua
+	Draw.ring(Vector3.new(0, 0, 0), Vector3.new(0, 1, 0), 10)
+	```
+
+	@param ringPos Vector3 -- Position of the center of the ring
+	@param ringNorm Vector3 -- Direction of the ring.
+	@param ringRadius number? -- Optional radius for the ring
+	@param color Color3? -- Optional color
+	@param parent Instance? -- Optional instance
+	@return BasePart
+]=]
+function Draw.ring(ringPos, ringNorm, ringRadius, color, parent)
+	local ringCFrame = CFrame.new(ringPos, ringPos + ringNorm)
+
+	local points = {}
+	for angle = 0, 2*math.pi, math.pi/8 do
+		local x = math.cos(angle)*ringRadius
+		local y = math.sin(angle)*ringRadius
+		local vector = ringCFrame:pointToWorldSpace(Vector3.new(x, y, 0))
+		table.insert(points, vector)
+	end
+
+	local folder = Instance.new("Folder")
+	folder.Name = "DebugRing"
+
+	for i=1, #points do
+		local pos = points[i]
+		local nextPos = points[(i%#points)+1]
+        local ray = Ray.new(pos, nextPos - pos)
+        Draw.ray(ray, color, folder)
+	end
+
+	folder.Parent = parent or Draw.getDefaultParent()
+
+	return folder
 end
 
 --[=[

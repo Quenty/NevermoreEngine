@@ -43,7 +43,7 @@ local Spring = {}
 	```
 
 	@param initial T -- The initial parameter is a number or Vector3 (anything with * number and addition/subtraction).
-	@param clock? () -> number -- The clock function is option, and is used to update the spring
+	@param clock? () -> number -- The clock function is optional, and is used to update the spring
 	@return Spring<T>
 ]=]
 function Spring.new(initial, clock)

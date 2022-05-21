@@ -1,0 +1,11 @@
+{
+  "name": "ColorPaletteTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "colorpalette": {
+        "$path": ".."
+      }
+    }
+  }
+}

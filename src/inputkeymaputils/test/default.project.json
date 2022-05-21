@@ -1,0 +1,27 @@
+{
+  "name": "InputKeyMapUtilsTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "inputkeymaputils": {
+        "$className": "Folder",
+        "inputkeymaputils": {
+          "$path": ".."
+        },
+        "test": {
+          "$path": "modules"
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

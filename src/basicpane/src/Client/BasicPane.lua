@@ -1,5 +1,21 @@
 --[=[
-	Base UI object with visibility and a maid
+	Base UI object with visibility and a maid. BasicPane provides three points of utility.
+
+	1. BasicPane contain visibility API. It's very standard practice to use the VisibleChanged event and
+	pass visibility up or down the entire stack.
+
+	```lua
+	-- Standard visibility chaining
+	self._maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
+		self._otherComponent:SetVisible(isVisible, doNotAnimate)
+	end))
+	```
+
+	2. BasicPane contains a maid which cleans up upon :Destroy(). This just saves some time typing.
+
+	3. Finally, BasicPanes, by convention (although not requirement), contain a .Gui object which can generally
+	be safely reparented to another object.
+
 	@class BasicPane
 ]=]
 

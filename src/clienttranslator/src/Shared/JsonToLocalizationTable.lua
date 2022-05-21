@@ -5,9 +5,13 @@
 	@class JsonToLocalizationTable
 ]=]
 
+local LocalizationService = game:GetService("LocalizationService")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 local JsonToLocalizationTable = {}
+
+local LOCALIZATION_TABLE_NAME = "GeneratedJSONTable"
 
 --[[
 	Recursively iterates through the object to construct strings and add it to the localization table
@@ -52,12 +56,28 @@ function JsonToLocalizationTable.localeFromName(name)
 	end
 end
 
+function JsonToLocalizationTable.getOrCreateLocalizationTable()
+	local localizationTable = LocalizationService:FindFirstChild(LOCALIZATION_TABLE_NAME)
+
+	if not localizationTable then
+		localizationTable = Instance.new("LocalizationTable")
+		localizationTable.Name = LOCALIZATION_TABLE_NAME
+
+		if RunService:IsRunning() then
+			localizationTable.Parent = LocalizationService
+		end
+	end
+
+	return localizationTable
+end
+
 --[=[
 	Loads a folder into a localization table
 	@param folder Folder -- A Roblox folder with StringValues containing JSON, named with the localization in mind
 ]=]
 function JsonToLocalizationTable.loadFolder(folder)
-	local localizationTable = Instance.new("LocalizationTable")
+	local localizationTable = JsonToLocalizationTable.getOrCreateLocalizationTable()
+
 	for _, item in pairs(folder:GetDescendants()) do
 		if item:IsA("StringValue") then
 			local localeId = JsonToLocalizationTable.localeFromName(item.Name)
@@ -79,11 +99,10 @@ end
 function JsonToLocalizationTable.toLocalizationTable(first, second)
 	if typeof(first) == "Instance" then
 		local result = JsonToLocalizationTable.loadFolder(first)
-		result.Name = ("JSONTable_%s"):format(first.Name)
+		-- result.Name = ("JSONTable_%s"):format(first.Name)
 		return result
 	elseif type(first) == "string" and type(second) == "table" then
 		local result = JsonToLocalizationTable.loadTable(first, second)
-		result.Name = "JSONTable"
 		return result
 	else
 		error("Bad args")
@@ -97,8 +116,10 @@ end
 	@return LocalizationTable
 ]=]
 function JsonToLocalizationTable.loadTable(localeId, dataTable)
-	local localizationTable = Instance.new("LocalizationTable")
+	local localizationTable = JsonToLocalizationTable.getOrCreateLocalizationTable()
+
 	recurseAdd(localizationTable, localeId, "", dataTable)
+
 	return localizationTable
 end
 

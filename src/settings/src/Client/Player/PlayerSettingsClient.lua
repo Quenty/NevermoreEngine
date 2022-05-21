@@ -1,0 +1,201 @@
+--[=[
+	@class PlayerSettingsClient
+]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local Players = game:GetService("Players")
+
+local PlayerSettingsBase = require("PlayerSettingsBase")
+local PlayerSettingsConstants = require("PlayerSettingsConstants")
+local RemoteFunctionUtils = require("RemoteFunctionUtils")
+local PlayerSettingsUtils = require("PlayerSettingsUtils")
+local ThrottledFunction = require("ThrottledFunction")
+local Maid = require("Maid")
+local Symbol = require("Symbol")
+local Observable = require("Observable")
+local ValueObject = require("ValueObject")
+
+local UNSET_VALUE = Symbol.named("unsetValue")
+
+local PlayerSettingsClient = setmetatable({}, PlayerSettingsBase)
+PlayerSettingsClient.ClassName = "PlayerSettingsClient"
+PlayerSettingsClient.__index = PlayerSettingsClient
+
+require("PromiseRemoteFunctionMixin"):Add(PlayerSettingsClient, PlayerSettingsConstants.REMOTE_FUNCTION_NAME)
+
+function PlayerSettingsClient.new(obj, serviceBag)
+	local self = setmetatable(PlayerSettingsBase.new(obj, serviceBag), PlayerSettingsClient)
+
+	if self:GetPlayer() == Players.LocalPlayer then
+		self._toReplicate = nil
+		self._toReplicateCallbacks = {}
+
+		-- We only want to keep this data here until we're
+		-- actually done sending and the server acknowledges this is the state that
+		-- we have. Otherwise we accept the server as the state of truth
+		self._pendingReplicationDataInTransit = ValueObject.new(nil)
+		self._maid:GiveTask(self._pendingReplicationDataInTransit)
+
+		-- We need to avoid sending these quickly because otherwise
+		-- sliding a slider can lag out stuff.
+		self._queueSendSettingsFunc = ThrottledFunction.new(0.3, function()
+			self:_sendSettings()
+		end, { leading = true, trailing = true })
+		self._maid:GiveTask(self._queueSendSettingsFunc)
+	end
+
+	return self
+end
+
+function PlayerSettingsClient:GetValue(settingName, defaultValue)
+	assert(type(settingName) == "string", "Bad settingName")
+
+	if self._toReplicate and self._toReplicate[settingName] ~= nil then
+		return PlayerSettingsUtils.decodeForNetwork(self._toReplicate[settingName])
+	end
+
+	local pending = self._pendingReplicationDataInTransit.Value
+	if pending and pending[settingName] ~= nil then
+		return PlayerSettingsUtils.decodeForNetwork(pending[settingName])
+	end
+
+	return getmetatable(PlayerSettingsClient).GetValue(self, settingName, defaultValue)
+end
+
+function PlayerSettingsClient:ObserveValue(settingName, defaultValue)
+	assert(type(settingName) == "string", "Bad settingName")
+
+	local baseObservable = getmetatable(PlayerSettingsClient).ObserveValue(self, settingName, defaultValue)
+
+	-- We need to register our own replication checkers...
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local lastValue = UNSET_VALUE
+		local lastObservedValue = UNSET_VALUE
+
+		local function set(value)
+			if lastValue ~= value then
+				lastValue = value
+				sub:Fire(lastValue)
+			end
+		end
+
+		local function update()
+			-- If we have existing queued data, report that
+			if self._toReplicate ~= nil and self._toReplicate[settingName] ~= nil then
+				set(PlayerSettingsUtils.decodeForNetwork(self._toReplicate[settingName]))
+				return
+			end
+
+			-- Otherwise report data we're pending to send...
+			local pending = self._pendingReplicationDataInTransit.Value
+			if pending and pending[settingName] ~= nil then
+				set(PlayerSettingsUtils.decodeForNetwork(pending[settingName]))
+				return
+			end
+
+			-- Otherwise report the base value
+			if lastObservedValue ~= UNSET_VALUE then
+				set(lastObservedValue)
+			end
+		end
+
+		maid:GiveTask(self._pendingReplicationDataInTransit.Changed:Connect(update))
+
+		self._toReplicateCallbacks[settingName] = self._toReplicateCallbacks[settingName] or {}
+		self._toReplicateCallbacks[settingName][update] = true
+
+		maid:GiveTask(function()
+			local callbacks = self._toReplicateCallbacks[settingName]
+			if callbacks then
+				callbacks[update] = nil
+
+				if not next(callbacks) then
+					self._toReplicateCallbacks[settingName] = nil
+				end
+			end
+		end)
+
+		maid:GiveTask(baseObservable:Subscribe(function(newValue)
+			lastObservedValue = newValue
+			update()
+		end), sub:GetFailComplete())
+		update()
+
+		return maid
+	end)
+end
+
+function PlayerSettingsClient:SetValue(settingName, value)
+	assert(type(settingName) == "string", "Bad settingName")
+	assert(self:GetPlayer() == Players.LocalPlayer, "Cannot set settings of another player")
+
+	local queueReplication = false
+	if not self._toReplicate then
+		self._toReplicate = {}
+		queueReplication = true
+	end
+
+	self._toReplicate[settingName] = PlayerSettingsUtils.encodeForNetwork(value)
+
+	if self._toReplicateCallbacks[settingName] then
+		for callback, _ in pairs(self._toReplicateCallbacks[settingName]) do
+			task.spawn(callback)
+		end
+	end
+
+	if queueReplication then
+		if self._currentReplicationRequest and self._currentReplicationRequest:IsPending() then
+			-- Wait until current saving is done to save...
+			self._currentReplicationRequest:Finally(function()
+				if self.Destroy then
+					self._queueSendSettingsFunc:Call()
+				end
+			end)
+		else
+			self._queueSendSettingsFunc:Call()
+		end
+	end
+end
+
+function PlayerSettingsClient:_sendSettings()
+	if not self._toReplicate then
+		warn("Nothing to save, should not have called this method")
+		return
+	end
+
+	local toReplicate = self._toReplicate
+	self._toReplicate = nil
+
+	local promise = self:_promiseReplicateSettings(toReplicate)
+	self._pendingReplicationDataInTransit.Value = toReplicate
+
+	promise:Finally(function()
+		if self._currentReplicationRequest == promise then
+			self._currentReplicationRequest = nil
+		end
+
+		if self._pendingReplicationDataInTransit.Value == toReplicate then
+			self._pendingReplicationDataInTransit.Value = nil
+		end
+	end)
+
+	return promise
+end
+
+function PlayerSettingsClient:_promiseReplicateSettings(settingsMap)
+	assert(type(settingsMap) == "table", "Bad settingsMap")
+
+	return self:PromiseRemoteFunction()
+		:Then(function(remoteFunction)
+			return self._maid:GivePromise(RemoteFunctionUtils.promiseInvokeServer(
+				remoteFunction,
+				PlayerSettingsConstants.REQUEST_UPDATE_SETTINGS,
+				settingsMap))
+		end)
+end
+
+
+return PlayerSettingsClient

@@ -1,0 +1,152 @@
+--[=[
+	Cursor preview for mobile input especially
+	@class ColorPickerCursorPreview
+]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local BasicPane = require("BasicPane")
+local Blend = require("Blend")
+local BasicPaneUtils = require("BasicPaneUtils")
+local Math = require("Math")
+local ColorPickerUtils = require("ColorPickerUtils")
+local LuvColor3Utils = require("LuvColor3Utils")
+
+local ColorPickerCursorPreview = setmetatable({}, BasicPane)
+ColorPickerCursorPreview.ClassName = "ColorPickerCursorPreview"
+ColorPickerCursorPreview.__index = ColorPickerCursorPreview
+
+function ColorPickerCursorPreview.new()
+	local self = setmetatable(BasicPane.new(), ColorPickerCursorPreview)
+
+	self._backgroundColorHint = Instance.new("Color3Value")
+	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
+	self._maid:GiveTask(self._backgroundColorHint)
+
+	self._heightAbs = Instance.new("NumberValue")
+	self._heightAbs.Value = 60
+	self._maid:GiveTask(self._heightAbs)
+
+	self._offsetAbs = Instance.new("NumberValue")
+	self._offsetAbs.Value = -20
+	self._maid:GiveTask(self._offsetAbs)
+
+	self._position = Instance.new("Vector3Value")
+	self._position.Value = Vector3.new(0, 0, 0)
+	self._maid:GiveTask(self._position)
+
+	self._transparency = Instance.new("NumberValue")
+	self._transparency.Value = 0
+	self._maid:GiveTask(self._transparency)
+
+	self._colorValue = Instance.new("Color3Value")
+	self._colorValue.Value = Color3.new(0, 0, 0)
+	self._maid:GiveTask(self._colorValue)
+
+	self._maid:GiveTask(self:_render():Subscribe(function(gui)
+		self.Gui = gui
+	end))
+
+	self.PositionChanged = assert(self._position.Changed, "No .Changed event")
+
+	return self
+end
+
+function ColorPickerCursorPreview:HintBackgroundColor(color)
+	assert(typeof(color) == "Color3", "Bad color")
+
+	self._backgroundColorHint.Value = color
+end
+
+function ColorPickerCursorPreview:SetPosition(position)
+	self._position.Value = position
+end
+
+function ColorPickerCursorPreview:GetPosition()
+	return self._position.Value
+end
+
+function ColorPickerCursorPreview:SetColor(color)
+	assert(typeof(color) == "Color3", "Bad color")
+
+	self._colorValue.Value = color
+end
+
+function ColorPickerCursorPreview:SetTransparency(transparency)
+	assert(type(transparency) == "number", "Bad transparency")
+
+	self._transparency.Value = transparency
+end
+
+function ColorPickerCursorPreview:_render()
+	local percentVisible = Blend.Spring(BasicPaneUtils.observePercentVisible(self), 30, 0.5)
+	local transparencyTarget = Blend.Computed(BasicPaneUtils.observePercentVisible(self), self._transparency, function(visible, value)
+		return Math.map(visible, 0, 1, 1, value)
+	end)
+	local transparency = Blend.Spring(transparencyTarget, 30)
+	local isOutlineVisible = Blend.Computed(self._colorValue, self._backgroundColorHint, function(color, backingColor)
+		local _, _, v = unpack(LuvColor3Utils.fromColor3(color))
+		local _, _, bv = unpack(LuvColor3Utils.fromColor3(backingColor))
+
+		return math.abs(bv - v) <= 60
+	end)
+
+	return Blend.New "Frame" {
+		Name = "Preview";
+		BackgroundTransparency = 1;
+		Size = Blend.Computed(self._heightAbs, function(heightAbs)
+			return UDim2.fromOffset(heightAbs, heightAbs);
+		end);
+		AnchorPoint = Vector2.new(0.5, 0.5);
+		Position = Blend.Computed(self._position, self._offsetAbs, self._heightAbs, function(pos, offsetAbs, heightAbs)
+			return UDim2.new(pos.x, 0, pos.y, offsetAbs - heightAbs/2)
+		end);
+		ZIndex = 3;
+		[Blend.Children] = {
+			Blend.New "UIAspectRatioConstraint" {
+				AspectRatio = 1;
+			};
+
+			Blend.New "Frame" {
+				BackgroundTransparency = transparency;
+				BackgroundColor3 = self._colorValue;
+				AnchorPoint = Vector2.new(0.5, 0.5);
+				Position = UDim2.fromScale(0.5, 0.5);
+				Size = UDim2.fromScale(1, 1);
+				[Blend.Children] = {
+					Blend.New "UIScale" {
+						Scale = percentVisible;
+					};
+					Blend.New "UICorner" {
+						CornerRadius = UDim.new(1, 0);
+					};
+					Blend.New "UIStroke" {
+						Color = Blend.Spring(Blend.Computed(
+							self._colorValue,
+							self._backgroundColorHint,
+							isOutlineVisible,
+							function(color, backingColor, needed)
+								if needed then
+									return ColorPickerUtils.getOutlineWithContrast(color, backingColor)
+								else
+									return color
+								end
+							end), 20);
+						Transparency = transparency;
+						Thickness = Blend.Computed(percentVisible, function(percent)
+							return percent*3
+						end);
+					};
+				};
+			}
+		}
+	}
+end
+
+function ColorPickerCursorPreview:SetTransparency(transparency)
+	assert(type(transparency) == "number", "Bad transparency")
+
+	self._transparency.Value = transparency
+end
+
+return ColorPickerCursorPreview

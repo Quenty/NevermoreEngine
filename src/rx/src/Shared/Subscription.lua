@@ -207,4 +207,11 @@ function Subscription:Destroy()
 	self:_doCleanup()
 end
 
+--[=[
+	Alias for [Subscription.Destroy].
+]=]
+function Subscription:Disconnect()
+	self:Destroy()
+end
+
 return Subscription

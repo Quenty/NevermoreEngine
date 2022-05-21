@@ -37,6 +37,21 @@ function ValueObject.new(baseValue)
 end
 
 --[=[
+	Constructs a new value object
+	@param observable Observable<T>
+	@return ValueObject<T>
+]=]
+function ValueObject.fromObservable(observable)
+	local result = ValueObject.new()
+
+	result._maid:GiveTask(observable:Subscribe(function(value)
+		result.Value = value
+	end))
+
+	return result
+end
+
+--[=[
 	Returns whether the object is a ValueObject class
 	@param value any
 	@return boolean

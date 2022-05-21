@@ -14,6 +14,7 @@ local ScoredActionPickerProvider = require("ScoredActionPickerProvider")
 local Maid = require("Maid")
 local InputListScoreHelper = require("InputListScoreHelper")
 local Observable = require("Observable")
+local InputKeyMapList = require("InputKeyMapList")
 
 local ScoredActionService = {}
 
@@ -46,7 +47,7 @@ end
 	@return ScoredAction
 ]=]
 function ScoredActionService:GetScoredAction(inputKeyMapList)
-	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
+	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
 	assert(self._provider, "Not initialized")
 
 	local scoredAction = ScoredAction.new()
