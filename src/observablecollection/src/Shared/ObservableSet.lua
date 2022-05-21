@@ -17,7 +17,7 @@ ObservableSet.__index = ObservableSet
 
 --[=[
 	Constructs a new ObservableSet
-	@return ObservableSet
+	@return ObservableSet<T>
 ]=]
 function ObservableSet.new()
 	local self = setmetatable({}, ObservableSet)
@@ -58,7 +58,7 @@ function ObservableSet.new()
 end
 
 --[=[
-	Returns whether the set is an observable set
+	Returns whether the value is an observable set
 	@param value any
 	@return boolean
 ]=]
@@ -129,6 +129,7 @@ end
 --[=[
 	Adds the item to the set if it does not exists.
 	@param item T
+	@return callback -- Call to remove
 ]=]
 function ObservableSet:Add(item)
 	assert(item ~= nil, "Bad item")
@@ -163,6 +164,10 @@ function ObservableSet:Remove(item)
 	end
 end
 
+--[=[
+	Gets an arbitrary item in the set (not guaranteed to be ordered)
+	@return T
+]=]
 function ObservableSet:GetFirstItem()
 	local value = next(self._set)
 	return value
@@ -178,6 +183,18 @@ function ObservableSet:GetList()
 		table.insert(list, item)
 	end
 	return list
+end
+
+--[=[
+	Gets a copy of the set
+	@return { [T]: true }
+]=]
+function ObservableSet:GetSetCopy()
+	local set = {}
+	for item, _ in pairs(self._set) do
+		set[item] = true
+	end
+	return set
 end
 
 --[=[

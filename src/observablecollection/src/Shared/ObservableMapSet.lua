@@ -1,4 +1,7 @@
 --[=[
+	Holds a map of sets. That is, for a given key, a set of all valid entries. This is great
+	for looking up something that may have duplicate keys, like configurations or other things.
+
 	@class ObservableMapSet
 ]=]
 
@@ -13,21 +16,44 @@ local ObservableMapSet = {}
 ObservableMapSet.ClassName = "ObservableMapSet"
 ObservableMapSet.__index = ObservableMapSet
 
+--[=[
+	Constructs a new ObservableMapSet
+	@return ObservableMapSet<TKey, TValue>
+]=]
 function ObservableMapSet.new()
 	local self = setmetatable({}, ObservableMapSet)
 
 	self._maid = Maid.new()
 	self._observableSetMap = {} -- [key] = ObservableSet<TEntry>
 
+--[=[
+	Fires when an item is added
+	@readonly
+	@prop SetAdded Signal<TKey>
+	@within ObservableMapSet
+]=]
 	self.SetAdded = Signal.new() -- :Fire(key, set)
 	self._maid:GiveTask(self.SetAdded)
 
+--[=[
+	Fires when an item is removed
+	@readonly
+	@prop SetRemoved Signal<TKey>
+	@within ObservableMapSet
+]=]
 	self.SetRemoved = Signal.new() -- :Fire(key)
 	self._maid:GiveTask(self.SetRemoved)
 
 	return self
 end
 
+--[=[
+	Adds an entry with a dynamic key. This is great for caching things
+	that need to be looked up by key.
+
+	@param entry TValue
+	@param observeKey Observable<Brio<TKey>>
+]=]
 function ObservableMapSet:Add(entry, observeKey)
 	local maid = Maid.new()
 
