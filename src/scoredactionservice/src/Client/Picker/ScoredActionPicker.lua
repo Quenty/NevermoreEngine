@@ -81,6 +81,7 @@ function ScoredActionPicker:AddAction(action)
 	assert(type(action) == "table", "Bad action")
 
 	self._actionSet[action] = true
+	self:Update()
 end
 
 function ScoredActionPicker:RemoveAction(action)
@@ -91,6 +92,7 @@ function ScoredActionPicker:RemoveAction(action)
 	end
 
 	self._actionSet[action] = nil
+	self:Update()
 end
 
 function ScoredActionPicker:HasActions()

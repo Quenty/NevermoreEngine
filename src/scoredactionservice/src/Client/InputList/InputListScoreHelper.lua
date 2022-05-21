@@ -6,9 +6,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local InputKeyMapUtils = require("InputKeyMapUtils")
-local InputModeSelector = require("InputModeSelector")
+local InputKeyMapList = require("InputKeyMapList")
 local Set = require("Set")
+local Rx = require("Rx")
 
 local InputListScoreHelper = setmetatable({}, BaseObject)
 InputListScoreHelper.ClassName = "InputListScoreHelper"
@@ -21,15 +21,21 @@ function InputListScoreHelper.new(provider, scoredAction, inputKeyMapList)
 	self._scoredAction = assert(scoredAction, "No scoredAction")
 	self._inputKeyMapList = assert(inputKeyMapList, "No inputKeyMapList")
 
+	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
+
 	self._currentTypes = {}
 
-	self._modeSelector = InputModeSelector.new(InputKeyMapUtils.getInputModes(inputKeyMapList))
-	self._maid:GiveTask(self._modeSelector)
-
-	self._maid:GiveTask(self._modeSelector.Changed:Connect(function()
-		self:_handleModeChanged()
+	self._maid:GiveTask(self._inputKeyMapList:ObserveActiveInputKeyMap():Pipe({
+		Rx.switchMap(function(activeInputKeyMap)
+			if activeInputKeyMap then
+				return activeInputKeyMap:ObserveInputTypesList()
+			else
+				return Rx.of({})
+			end
+		end)
+	}):Subscribe(function(inputTypeList)
+		self:_updateInputTypeSet(inputTypeList)
 	end))
-	self:_handleModeChanged()
 
 	self._maid:GiveTask(function()
 		local current, _ = next(self._currentTypes)
@@ -45,14 +51,11 @@ function InputListScoreHelper.new(provider, scoredAction, inputKeyMapList)
 	return self
 end
 
-function InputListScoreHelper:_handleModeChanged()
-	local currentMode = self._modeSelector:GetActiveMode()
-	local inputTypeSet = InputKeyMapUtils.getInputTypeSetForMode(self._inputKeyMapList, currentMode)
-
+function InputListScoreHelper:_updateInputTypeSet(inputTypeList)
 	local remaining = Set.copy(self._currentTypes)
 
 	-- Register inputTypes
-	for inputType, _ in pairs(inputTypeSet) do
+	for _, inputType in pairs(inputTypeList) do
 		if not self._currentTypes[inputType] then
 			self._currentTypes[inputType] = true
 
@@ -70,8 +73,6 @@ function InputListScoreHelper:_handleModeChanged()
 	for inputType, _ in pairs(remaining) do
 		self:_unregisterAction(inputType)
 	end
-
-	self._currentTypes = inputTypeSet
 end
 
 function InputListScoreHelper:_unregisterAction(inputType)

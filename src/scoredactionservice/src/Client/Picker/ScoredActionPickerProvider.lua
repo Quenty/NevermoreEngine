@@ -8,7 +8,7 @@ local BaseObject = require("BaseObject")
 local ScoredActionPicker = require("ScoredActionPicker")
 local Table = require("Table")
 local TouchButtonScoredActionPicker = require("TouchButtonScoredActionPicker")
-local InputKeyMapUtils = require("InputKeyMapUtils")
+local InputTypeUtils = require("InputTypeUtils")
 
 local MAX_ACTION_LIST_SIZE_BEFORE_WARN = 25
 
@@ -25,14 +25,14 @@ function ScoredActionPickerProvider.new()
 end
 
 function ScoredActionPickerProvider:FindPicker(inputType)
-	local key = InputKeyMapUtils.getUniqueKeyForInputType(inputType)
+	local key = InputTypeUtils.getUniqueKeyForInputType(inputType)
 	return self._scoredActionPickers[key]
 end
 
 --inputType is most likely an enum, but could be a string!
 function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
 	assert(inputType, "Bad inputType")
-	local key = InputKeyMapUtils.getUniqueKeyForInputType(inputType)
+	local key = InputTypeUtils.getUniqueKeyForInputType(inputType)
 
 	if self._scoredActionPickers[key] then
 		return self._scoredActionPickers[key]
