@@ -111,7 +111,7 @@ end
 	@param doNotAnimate boolean
 ]=]
 function DepthOfFieldTweener:ResetRadius(doNotAnimate)
-	self:SetRadius(self._originalDistance, doNotAnimate)
+	self:SetRadius(self._originalRadius, doNotAnimate)
 	self:_startAnimation()
 end
 
