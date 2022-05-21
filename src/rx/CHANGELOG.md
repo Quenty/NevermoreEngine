@@ -1,25 +1,20 @@
-# v5.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add ObservableSubscriptionTable ([@Quenty](https://github.com/Quenty))
-- feat: Add Subscription:Disconnect() ([@Quenty](https://github.com/Quenty))
-- feat: Add Rx.skip(toSkip) and make promises autocancel ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@4.2.0...@quenty/rx@5.0.0) (2022-05-21)
+
+
+### Features
+
+* Add ObservableSubscriptionTable ([43152b8](https://github.com/Quenty/NevermoreEngine/commit/43152b876dda2f752c457eef8932bed27170ac9a))
+* Add Rx.skip(toSkip) and make promises autocancel ([69e13f6](https://github.com/Quenty/NevermoreEngine/commit/69e13f6f368f238e64868eecd358f6a6aff76e02))
+* Add Subscription:Disconnect() ([89d1218](https://github.com/Quenty/NevermoreEngine/commit/89d1218c8c7b5d5988d272561c2011df0e58a75c))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@4.1.0...@quenty/rx@4.2.0) (2022-03-27)
 

@@ -1,23 +1,18 @@
-# v7.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Upgrade ScoredActionService to handle input keybindings changing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@6.3.0...@quenty/scoredactionservice@7.0.0) (2022-05-21)
+
+
+### Bug Fixes
+
+* Upgrade ScoredActionService to handle input keybindings changing ([e2a38e4](https://github.com/Quenty/NevermoreEngine/commit/e2a38e4d4103e1f39c4bfa28c77848c9b08a6723))
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@6.2.0...@quenty/scoredactionservice@6.3.0) (2022-03-27)
 

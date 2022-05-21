@@ -1,23 +1,15 @@
-# v3.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Add kinematics utility class ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@2.1.0...@quenty/physicsutils@3.0.0) (2022-05-21)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@2.0.1...@quenty/physicsutils@2.1.0) (2022-03-27)
 

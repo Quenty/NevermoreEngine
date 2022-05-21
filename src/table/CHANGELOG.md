@@ -1,23 +1,18 @@
-# v3.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add Table.reverse(orig) and Table.keys(source) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@2.2.0...@quenty/table@3.0.0) (2022-05-21)
+
+
+### Features
+
+* Add Table.reverse(orig) and Table.keys(source) ([348fa58](https://github.com/Quenty/NevermoreEngine/commit/348fa58418df3e48d3e4d48d6d3144c949f9b53a))
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@2.1.1...@quenty/table@2.2.0) (2022-03-27)
 

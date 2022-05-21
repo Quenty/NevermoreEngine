@@ -1,24 +1,19 @@
-# v4.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add Draw.ring() ([@Quenty](https://github.com/Quenty))
-- feat: Add Draw API to draw things to screen ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@3.1.0...@quenty/draw@4.0.0) (2022-05-21)
+
+
+### Features
+
+* Add Draw API to draw things to screen ([6b08836](https://github.com/Quenty/NevermoreEngine/commit/6b08836573ad719de8b903ee5c51393cf0a8647f))
+* Add Draw.ring() ([85b56de](https://github.com/Quenty/NevermoreEngine/commit/85b56de9d5da5dbab6d1dcd4cde7b9b84b593017))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@3.0.0...@quenty/draw@3.1.0) (2022-03-27)
 

@@ -1,23 +1,18 @@
-# v5.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add ValueObject.fromObservable(observable) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@4.2.0...@quenty/valueobject@5.0.0) (2022-05-21)
+
+
+### Features
+
+* Add ValueObject.fromObservable(observable) ([80a14db](https://github.com/Quenty/NevermoreEngine/commit/80a14db258a8d2314d8eee89a011484850b58f11))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@4.1.0...@quenty/valueobject@4.2.0) (2022-03-27)
 

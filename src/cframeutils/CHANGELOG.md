@@ -1,23 +1,18 @@
-# v4.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Othonormalize CFrame.fromMatrix results after lookAt() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@3.1.0...@quenty/cframeutils@4.0.0) (2022-05-21)
+
+
+### Bug Fixes
+
+* Othonormalize CFrame.fromMatrix results after lookAt() ([9ab648c](https://github.com/Quenty/NevermoreEngine/commit/9ab648c231639d4e3821dff109583a1cd4f809df))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@3.0.0...@quenty/cframeutils@3.1.0) (2022-03-27)
 

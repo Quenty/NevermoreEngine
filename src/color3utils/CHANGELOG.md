@@ -1,23 +1,18 @@
-# v3.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add LuvUtils to Color3Utils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@2.1.0...@quenty/color3utils@3.0.0) (2022-05-21)
+
+
+### Features
+
+* Add LuvUtils to Color3Utils ([b705bdd](https://github.com/Quenty/NevermoreEngine/commit/b705bdd8cd1613329a73362899a4b8cd47f45336))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@2.0.1...@quenty/color3utils@2.1.0) (2022-03-27)
 

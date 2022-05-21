@@ -1,23 +1,18 @@
-# v6.0.0 (Sat May 21 2022)
-
-#### 💥 Breaking Change
-
-- feat: Generalized settings, key rebindings, and other fixes and changes to Nevermore [#261](https://github.com/Quenty/NevermoreEngine/pull/261) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Centralize generated localization tables onto one location. This is useful because it allows exporting just the one csv for localization. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@5.2.0...@quenty/clienttranslator@6.0.0) (2022-05-21)
+
+
+### Features
+
+* Centralize generated localization tables onto one location. This is useful because it allows exporting just the one csv for localization. ([8dcbaad](https://github.com/Quenty/NevermoreEngine/commit/8dcbaad5f7c0a8d1b0e0f450dfa69033eb8ad35c))
+
+
+
+
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@5.1.0...@quenty/clienttranslator@5.2.0) (2022-03-27)
 
