@@ -11,6 +11,9 @@ local RunService = game:GetService("RunService")
 local BaseObject = require("BaseObject")
 local RagdollBindersServer = require("RagdollBindersServer")
 local CharacterUtils = require("CharacterUtils")
+local AttributeValue = require("AttributeValue")
+local Maid = require("Maid")
+local UnragdollAutomaticallyConstants = require("UnragdollAutomaticallyConstants")
 
 local UnragdollAutomatically = setmetatable({}, BaseObject)
 UnragdollAutomatically.ClassName = "UnragdollAutomatically"
@@ -28,10 +31,22 @@ function UnragdollAutomatically.new(humanoid, serviceBag)
 	self._ragdollBindersServer = serviceBag:GetService(RagdollBindersServer)
 	self._player = CharacterUtils.getPlayerFromCharacter(self._obj)
 
-	self._maid:GiveTask(self._ragdollBindersServer.Ragdoll:ObserveInstance(self._obj, function()
-		self:_handleRagdollChanged()
+	self._disabledUnragdoll = AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.DISABLE_UNRAGDOLL_AUTOMATICALLY_ATTRIBUTE, false)
+	self._maid:GiveTask(self._disabledUnragdoll:Observe():Subscribe(function(isDisabled)
+		if isDisabled then
+			self._maid._updater = nil
+			return
+		end
+
+		local maid = Maid.new()
+
+		maid:GiveTask(self._ragdollBindersServer.Ragdoll:ObserveInstance(self._obj, function()
+			self:_handleRagdollChanged(maid)
+		end))
+		self:_handleRagdollChanged(maid)
+
+		self._maid._updater = maid
 	end))
-	self:_handleRagdollChanged()
 
 	return self
 end
@@ -44,11 +59,11 @@ function UnragdollAutomatically:_getTime()
 	end
 end
 
-function UnragdollAutomatically:_handleRagdollChanged()
+function UnragdollAutomatically:_handleRagdollChanged(maid)
 	if self._ragdollBindersServer.Ragdoll:Get(self._obj) then
 		self._ragdollTime = tick()
 
-		self._maid._conn = RunService.Stepped:Connect(function()
+		maid._conn = RunService.Stepped:Connect(function()
 			if tick() - self._ragdollTime >= self:_getTime() then
 				if self._obj.Health > 0 then
 					self._ragdollBindersServer.Ragdoll:Unbind(self._obj)
@@ -56,7 +71,7 @@ function UnragdollAutomatically:_handleRagdollChanged()
 			end
 		end)
 	else
-		self._maid._conn = nil
+		maid._conn = nil
 	end
 end
 
