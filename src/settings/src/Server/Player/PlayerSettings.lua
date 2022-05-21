@@ -20,6 +20,7 @@ function PlayerSettings.new(obj, serviceBag)
 
 	self._remoteFunction = Instance.new("RemoteFunction")
 	self._remoteFunction.Name = PlayerSettingsConstants.REMOTE_FUNCTION_NAME
+	self._remoteFunction.Archivable = false
 	self._remoteFunction.Parent = self._obj
 	self._maid:GiveTask(self._remoteFunction)
 
