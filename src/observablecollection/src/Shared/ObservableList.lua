@@ -184,7 +184,6 @@ end
 --[=[
 	Adds the item to the list at the specified index
 	@param item T
-	@param index number?
 	@return callback -- Call to remove
 ]=]
 function ObservableList:Add(item)
@@ -280,7 +279,7 @@ end
 
 --[=[
 	Removes the item at the index
-	@param key Symbol
+	@param index number
 	@return T
 ]=]
 function ObservableList:RemoveAt(index)

@@ -84,6 +84,7 @@ end
 --[=[
 	Returns whether this value is an InputKeyMapList
 
+	@param value any
 	@return boolean
 ]=]
 function InputKeyMapList.isInputKeyMapList(value)

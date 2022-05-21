@@ -11,7 +11,7 @@ local Maid = require("Maid")
 local RigBuilderUtils = require("RigBuilderUtils")
 local ArmIKBase = require("ArmIKBase")
 
-return function(target)
+return function(_target)
 	local maid = Maid.new()
 
 	maid:GivePromise(RigBuilderUtils.promisePlayerRig(4397833)):Then(function(character)

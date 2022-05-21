@@ -81,7 +81,7 @@ end
 	Sets the setting value for the given name
 
 	@param settingName string
-	@param defaultValue any
+	@param value any
 	@return any
 ]=]
 function PlayerSettingsBase:SetValue(settingName, value)

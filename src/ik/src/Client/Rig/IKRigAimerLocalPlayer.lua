@@ -25,7 +25,6 @@ IKRigAimerLocalPlayer.__index = IKRigAimerLocalPlayer
 
 	@param serviceBag ServiceBag
 	@param ikRig IKRigClient
-	@param remoteEvent RemoteEvent
 	@return IKRigAimerLocalPlayer
 ]=]
 function IKRigAimerLocalPlayer.new(serviceBag, ikRig)
@@ -46,6 +45,11 @@ function IKRigAimerLocalPlayer.new(serviceBag, ikRig)
 	return self
 end
 
+--[=[
+	Sets the remote event for replication
+
+	@param remoteEvent RemoteEvent
+]=]
 function IKRigAimerLocalPlayer:SetRemoteEvent(remoteEvent)
 	assert(not self._remoteEvent, "Already have remoteEvent")
 

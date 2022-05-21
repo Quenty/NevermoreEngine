@@ -258,7 +258,7 @@ end
 
 --[=[
 	Removes the item from the map if it exists.
-	@param item T
+	@param key TKey
 ]=]
 function ObservableMap:Remove(key)
 	assert(key ~= nil, "Bad key")

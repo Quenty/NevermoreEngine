@@ -80,7 +80,7 @@ end
 	players and all new players get this setting defined. This may be necessary for
 	replication.
 
-	@param serviceBag ServiceBag.
+	@param serviceBag ServiceBag
 ]=]
 function SettingDefinition:Init(serviceBag)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
@@ -91,6 +91,8 @@ end
 
 --[=[
 	Optional registration to the service bag
+
+	@param serviceBag ServiceBag
 ]=]
 function SettingDefinition:RegisterToService(serviceBag)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
@@ -104,6 +106,5 @@ function SettingDefinition:RegisterToService(serviceBag)
 		settingServiceBridge:RegisterDefinition(serviceBag:GetService(self))
 	end
 end
-
 
 return SettingDefinition

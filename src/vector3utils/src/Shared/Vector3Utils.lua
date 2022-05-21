@@ -72,7 +72,7 @@ end
 	Constrains a Vector3 into a cone.
 	@param direction Vector3 -- The vector direction to constrain
 	@param coneDirection Vector3 -- The direction of the cone.
-	@param condeAngleRad -- Angle of the cone
+	@param coneAngleRad -- Angle of the cone
 	@return Vector3 -- Constrained angle
 ]=]
 function Vector3Utils.constrainToCone(direction: Vector3, coneDirection: Vector3, coneAngleRad: number): Vector3

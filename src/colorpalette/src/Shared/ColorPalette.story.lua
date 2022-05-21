@@ -9,6 +9,8 @@ local Blend = require("Blend")
 local ColorPickerStoryUtils = require("ColorPickerStoryUtils")
 local ColorPalette = require("ColorPalette")
 
+local DARK_MODE_ENABLED = false
+
 return function(target)
 	local maid = Maid.new()
 
@@ -52,7 +54,11 @@ return function(target)
 		palette:SetColorGrade("mouseOver", -15)
 	end
 
-	light()
+	if DARK_MODE_ENABLED then
+		light()
+	else
+		dark()
+	end
 
 	local function sampleGui(labelText)
 		local mouseOver = Instance.new("NumberValue")

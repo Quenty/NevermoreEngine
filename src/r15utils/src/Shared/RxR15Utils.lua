@@ -14,7 +14,7 @@ local RxR15Utils = {}
 	Observes a rig attachment as a brio
 	@param character Model
 	@param partName string
-	@Param attachmentName string
+	@param attachmentName string
 	@return Observable<Brio<Attachment>>
 ]=]
 function RxR15Utils.observeRigAttachmentBrio(character, partName, attachmentName)
@@ -34,7 +34,7 @@ end
 	Observes a rig motor as a brio
 	@param character Model
 	@param partName string
-	@Param motorName string
+	@param motorName string
 	@return Observable<Brio<Motor6D>>
 ]=]
 function RxR15Utils.observeRigMotorBrio(character, partName, motorName)
