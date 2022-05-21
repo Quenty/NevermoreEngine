@@ -42,7 +42,7 @@ function Vector3Utils.getAngleRad(a: Vector3, b: Vector3): number
 end
 
 --[=[
-	Computes the angle between 2 vectors
+	Computes the angle between 2 vectors in radians
 	@param a Vector3
 	@param b Vector3
 	@return number
@@ -51,6 +51,40 @@ function Vector3Utils.angleBetweenVectors(a: Vector3, b: Vector3): number
 	local u = b.magnitude*a
 	local v = a.magnitude*b
 	return 2*math.atan2((v - u).magnitude, (u + v).magnitude)
+end
+
+--[=[
+	Spherically lerps between start and finish
+	@param start Vector3
+	@param finish Vector3
+	@param t number -- Amount to slerp. 0 is start, 1 is finish. beyond that is extended as expected.
+	@return Vector3
+]=]
+function Vector3Utils.slerp(start: Vector3, finish: Vector3, t: number)
+	local dot = math.clamp(start:Dot(finish), -1, 1)
+
+	local theta = math.acos(dot)*t
+	local relVec = (finish - start*dot).unit
+	return ((start*math.cos(theta)) + (relVec*math.sin(theta)))
+end
+
+--[=[
+	Constrains a Vector3 into a cone.
+	@param direction Vector3 -- The vector direction to constrain
+	@param coneDirection Vector3 -- The direction of the cone.
+	@param condeAngleRad -- Angle of the cone
+	@return Vector3 -- Constrained angle
+]=]
+function Vector3Utils.constrainToCone(direction: Vector3, coneDirection: Vector3, coneAngleRad: number): Vector3
+	local angle = Vector3Utils.angleBetweenVectors(direction, coneDirection)
+	local coneHalfAngle = 0.5*coneAngleRad
+
+	if angle > coneHalfAngle then
+		local proportion = coneHalfAngle / angle
+		return Vector3Utils.slerp(coneDirection.unit, direction.unit, proportion) * direction.magnitude
+	end
+
+	return direction
 end
 
 --[=[
