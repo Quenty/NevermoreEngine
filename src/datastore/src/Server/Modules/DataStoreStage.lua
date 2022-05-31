@@ -268,8 +268,13 @@ function DataStoreStage:HasWritableData()
 		return true
 	end
 
-	for _, value in pairs(self._stores) do
-		if value:HasWritableData() then
+	for name, store in pairs(self._stores) do
+		if not store.Destroy then
+			warn(("[DataStoreStage] - Substore %q destroyed"):format(name))
+			continue
+		end
+
+		if store:HasWritableData() then
 			return true
 		end
 	end
@@ -288,6 +293,11 @@ function DataStoreStage:GetNewWriter()
 	end
 
 	for name, store in pairs(self._stores) do
+		if not store.Destroy then
+			warn(("[DataStoreStage] - Substore %q destroyed"):format(name))
+			continue
+		end
+
 		if store:HasWritableData() then
 			writer:AddWriter(name, store:GetNewWriter())
 		end
