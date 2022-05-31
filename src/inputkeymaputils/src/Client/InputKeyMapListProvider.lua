@@ -140,7 +140,11 @@ function InputKeyMapListProvider:Start()
 end
 
 function InputKeyMapListProvider:Destroy()
-	self._maid:DoCleaning()
+	if self._maid then
+		self._maid:DoCleaning()
+		self._maid = nil
+	end
+
 	self._inputKeyMapLists = nil
 end
 
