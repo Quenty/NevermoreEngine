@@ -29,7 +29,6 @@ local function cancellableDelay(timeoutInSeconds, func, ...)
 
 	return function()
 		if running then
-			-- selene: allow(incorrect_standard_library_use)
 			coroutine.close(running)
 			running = nil
 			args = nil
