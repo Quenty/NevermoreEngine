@@ -44,6 +44,7 @@ end
 	When the humanoid dies, the brio is killed and the subscription completes.
 	If the humanoid is dead on subscription, the subscription immediatelty completes with nothing emitted.
 	@ignore
+	@param humanoid Humanoid
 	@return Observable<Brio<Humanoid>>
 ]=]
 local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid)
@@ -69,6 +70,7 @@ end
 
 --[=[
 	Observes a player's last living humanoid.
+	@param player Player
 	@return Observable<Brio<Humanoid>>
 ]=]
 function RxCharacterUtils.observeLastAliveHumanoidBrio(player: Player)
