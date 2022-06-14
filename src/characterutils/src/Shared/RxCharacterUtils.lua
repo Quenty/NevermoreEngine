@@ -19,11 +19,11 @@ local RxCharacterUtils = {}
 	@return Observable<Brio<Model>>
 ]=]
 function RxCharacterUtils.observeLastCharacterBrio(player: Player)
-	return RxInstanceUtils.observePropertyBrio(player, "Character"):Pipe({
-		RxBrioUtils.where(function(character)
-			return character ~= nil
-		end),
-	})
+	-- This assumes a player's 'Character' field is set to nil when
+	-- their character is destroyed, or when they leave the game.
+	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
+		return character ~= nil
+	end)
 end
 
 --[=[
@@ -40,9 +40,9 @@ function RxCharacterUtils.observeLastHumanoidBrio(player: Player)
 end
 
 --[=[
-	Returns an observable that emites a single brio with the value of the given humanoid.
+	Returns an observable that emits a single brio with the value of the given humanoid.
 	When the humanoid dies, the brio is killed and the subscription completes.
-	If the humanoid is dead on subscription, the subscription immediatelty completes with nothing emitted.
+	If the humanoid is dead on subscription, the observable immediately completes with nothing emitted.
 	@ignore
 	@param humanoid Humanoid
 	@return Observable<Brio<Humanoid>>
@@ -59,6 +59,7 @@ local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid)
 			maid._brio = Brio.new(humanoid)
 			sub:Fire(maid._brio)
 
+			-- Died can fire multiple dimes, but it's ok as we disconnect immediately.
 			maid:GiveTask(humanoid.Died:Connect(onDeath))
 
 			return maid
@@ -70,6 +71,25 @@ end
 
 --[=[
 	Observes a player's last living humanoid.
+
+	```lua
+	local Players = game:GetService("Players")
+
+	maid:GiveTask(
+		RxCharacterUtils.observeLastAliveHumanoidBrio(Players.LocalPlayer)
+			:Subscribe(function(charBrio)
+				local character = charBrio:GetValue()
+				local characterMaid = charBrio:ToMaid()
+
+				print("Character:", character)
+
+				characterMaid:GiveTask(function()
+					-- The maid cleans up on humanoid death, or when given player leaves the game.
+					print("Humanoid has been killed or destroyed!")
+				end)
+			end)
+	)
+	```
 	@param player Player
 	@return Observable<Brio<Humanoid>>
 ]=]
