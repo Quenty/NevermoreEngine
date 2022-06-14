@@ -77,13 +77,13 @@ end
 
 	maid:GiveTask(
 		RxCharacterUtils.observeLastAliveHumanoidBrio(Players.LocalPlayer)
-			:Subscribe(function(charBrio)
-				local character = charBrio:GetValue()
-				local characterMaid = charBrio:ToMaid()
+			:Subscribe(function(humanoidBrio)
+				local humanoid: Humanoid = humanoidBrio:GetValue()
+				local humanoidMaid = humanoidBrio:ToMaid()
 
-				print("Character:", character)
+				print("Humanoid:", humanoid)
 
-				characterMaid:GiveTask(function()
+				humanoidMaid:GiveTask(function()
 					-- The maid cleans up on humanoid death, or when given player leaves the game.
 					print("Humanoid has been killed or destroyed!")
 				end)
