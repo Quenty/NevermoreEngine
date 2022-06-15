@@ -59,7 +59,7 @@ local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid)
 			maid._brio = Brio.new(humanoid)
 			sub:Fire(maid._brio)
 
-			-- Died can fire multiple dimes, but it's ok as we disconnect immediately.
+			-- Died can fire multiple times, but it's ok as we disconnect immediately.
 			maid:GiveTask(humanoid.Died:Connect(onDeath))
 
 			return maid
