@@ -6,33 +6,33 @@
 local Table = {}
 
 --[=[
-	Concats `target` with `source`.
+	Concats `subject` with `source` in pairs order. The `subject` will be mutated.
 
-	@param target table -- Table to append to
-	@param source table -- Table read from
+	@param subject table -- Table to mutate / append to
+	@param source table -- Table to read from
 	@return table -- parameter table
 ]=]
-function Table.append(target, source)
+function Table.append(subject: table, source: table): table
 	for _, value in pairs(source) do
-		target[#target+1] = value
+		subject[#subject + 1] = value
 	end
 
-	return target
+	return subject
 end
 
 --[=[
 	Shallow merges two tables without modifying either.
 
-	@param orig table -- Original table
-	@param new table -- Result
-	@return table
+	@param tableA table -- Input table
+	@param tableB table -- Input table
+	@return table -- New, merged table
 ]=]
-function Table.merge(orig, new)
+function Table.merge(tableA: table, tableB: table): table
 	local result = {}
-	for key, val in pairs(orig) do
+	for key, val in pairs(tableA) do
 		result[key] = val
 	end
-	for key, val in pairs(new) do
+	for key, val in pairs(tableB) do
 		result[key] = val
 	end
 	return result
@@ -42,12 +42,13 @@ end
 	Reverses the list and returns the reversed copy
 
 	@param orig table -- Original table
-	@return table
+	@return table -- New, reversed table
 ]=]
-function Table.reverse(orig)
-	local new = {}
-	for i=#orig, 1, -1 do
-		table.insert(new, orig[i])
+function Table.reverse(orig: table): table
+	local len = #orig
+	local new = table.create(#orig)
+	for i = len, 1, -1 do
+		new[1 + len - i] = orig[i]
 	end
 	return new
 end
@@ -58,7 +59,7 @@ end
 	@param source table -- Table source to extract values from
 	@return table -- A list with all the values the table has
 ]=]
-function Table.values(source)
+function Table.values(source: table): table
 	local new = {}
 	for _, val in pairs(source) do
 		table.insert(new, val)
@@ -70,9 +71,9 @@ end
 	Returns a list of all of the keys that a table has. (In order of pairs)
 
 	@param source table -- Table source to extract keys from
-	@return table -- A list with all the keys the table has
+	@return table -- A list of the keys in the given table
 ]=]
-function Table.keys(source)
+function Table.keys(source: table): table
 	local new = {}
 	for key, _ in pairs(source) do
 		table.insert(new, key)
@@ -83,18 +84,18 @@ end
 --[=[
 	Shallow merges two lists without modifying either.
 
-	@param orig table -- Original table
-	@param new table -- Result
-	@return table
+	@param tableA table -- Input table
+	@param tableB table -- Input table
+	@return table -- New, merged table
 ]=]
-function Table.mergeLists(orig, new)
-	local _table = {}
-	for _, val in pairs(orig) do
-		table.insert(_table, val)
-	end
-	for _, val in pairs(new) do
-		table.insert(_table, val)
-	end
+function Table.mergeLists(tableA: table, tableB: table): table
+	local lenA = #tableA
+	local lenB = #tableB
+
+	local _table = table.create(lenA + lenB)
+	table.move(tableA, 1, lenA, 1, _table)
+	table.move(tableB, 1, lenB, lenA + 1, _table)
+
 	return _table
 end
 
@@ -102,10 +103,10 @@ end
 	Swaps keys with values, overwriting additional values if duplicated.
 
 	@param orig table -- Original table
-	@return table
+	@return table -- New table
 ]=]
-function Table.swapKeyValue(orig)
-	local tab = {}
+function Table.swapKeyValue(orig: table): table
+	local tab = table.create(#orig)
 	for key, val in pairs(orig) do
 		tab[val] = key
 	end
@@ -118,7 +119,7 @@ end
 	@param _table table -- Table to convert to a list
 	@return table
 ]=]
-function Table.toList(_table)
+function Table.toList(_table: table): table
 	local list = {}
 	for _, item in pairs(_table) do
 		table.insert(list, item)
@@ -127,13 +128,13 @@ function Table.toList(_table)
 end
 
 --[=[
-	Counts the number of items in `_table`.
+	Counts the number of items in `_table`, including numeric and string keys.
 	Useful since `__len` on table in Lua 5.2 returns just the array length.
 
 	@param _table table -- Table to count
 	@return number -- count
 ]=]
-function Table.count(_table)
+function Table.count(_table: table): number
 	local count = 0
 	for _, _ in pairs(_table) do
 		count = count + 1
@@ -147,8 +148,8 @@ end
 	@param target table -- Table to copy
 	@return table -- Result
 ]=]
-function Table.copy(target)
-	local new = {}
+function Table.copy(target: table): table
+	local new = table.create(#target)
 	for key, value in pairs(target) do
 		new[key] = value
 	end
@@ -162,8 +163,8 @@ end
 	@param _context table? -- Cntext to deepCopy the value in
 	@return table -- Result
 ]=]
-function Table.deepCopy(target, _context)
-	_context = _context or  {}
+function Table.deepCopy(target: table, _context: table): table
+	_context = _context or {}
 	if _context[target] then
 		return _context[target]
 	end
@@ -184,9 +185,9 @@ end
 	Overwrites a table's value
 	@param target table -- Target table
 	@param source table -- Table to read from
-	@return table -- target
+	@return table -- The 'target' table (now mutated)
 ]=]
-function Table.deepOverwrite(target, source)
+function Table.deepOverwrite(target: table, source: table): table
 	for index, value in pairs(source) do
 		if type(target[index]) == "table" and type(value) == "table" then
 			target[index] = Table.deepOverwrite(target[index], value)
@@ -200,12 +201,14 @@ end
 --[=[
 	Gets an index by value, returning `nil` if no index is found.
 	@param haystack table -- To search in
-	@param needle Value to search for
-	@return The index of the value, if found
+	@param needle any -- Value to search for
+	@return number -- The index of the value, if found
 	@return nil -- if not found
 ]=]
-function Table.getIndex(haystack, needle)
+function Table.getIndex(haystack: table, needle: any)
 	assert(needle ~= nil, "Needle cannot be nil")
+
+	-- Note: table.find cannot be used; currently it only works on array-style tables.
 
 	for index, item in pairs(haystack) do
 		if needle == item then
@@ -223,7 +226,7 @@ end
 	@param output string? -- Output string, used recursively
 	@return string -- The table in string form
 ]=]
-function Table.stringify(_table, indent, output)
+function Table.stringify(_table: table, indent: number?, output: string?): boolean
 	output = output or tostring(_table)
 	indent = indent or 0
 	for key, value in pairs(_table) do
@@ -245,14 +248,8 @@ end
 	@param value any -- Value to search for
 	@return boolean -- `true` if within, `false` otherwise
 ]=]
-function Table.contains(_table, value)
-	for _, item in pairs(_table) do
-		if item == value then
-			return true
-		end
-	end
-
-	return false
+function Table.contains(_table: table, value: any): boolean
+	return Table.getIndex(_table, value) ~= nil
 end
 
 --[=[
@@ -262,7 +259,7 @@ end
 	@param source table -- Source table to read from
 	@return table -- target
 ]=]
-function Table.overwrite(target, source)
+function Table.overwrite(target: table, source: table): table
 	for index, item in pairs(source) do
 		target[index] = item
 	end
@@ -271,21 +268,28 @@ function Table.overwrite(target, source)
 end
 
 --[=[
-	Takes `count` entries from the table. If the table does not have
+	Takes `count` entries from the given array-style table. If the table does not have
 	that many entries, will return up to the number the table has to
 	provide.
 
-	@param source table -- Source table to retrieve values from
+	@param source table -- Source array-style table to retrieve values from
 	@param count number -- Number of entries to take
 	@return table -- List with the entries retrieved
 ]=]
-function Table.take(source, count)
-	local newTable = {}
-	for i=1, math.min(#source, count) do
-		newTable[i] = source[i]
-	end
+function Table.take(source: table, count: number): table
+	local newTable = table.create(math.max(0, math.min(#source, count)))
+	table.move(source, 1, count, 1, newTable)
 	return newTable
 end
+
+local function errorOnIndex(_, index)
+	error(("Bad index %q"):format(tostring(index)), 2)
+end
+
+local READ_ONLY_METATABLE = {
+	__index = errorOnIndex;
+	__newindex = errorOnIndex;
+}
 
 --[=[
 	Sets a metatable on a table such that it errors when
@@ -294,8 +298,8 @@ end
 	@param target table -- Table to error on indexing
 	@return table -- The same table, with the metatable set to readonly
 ]=]
-function Table.readonly(target: table)
-	return table.freeze(target)
+function Table.readonly(target)
+	return setmetatable(target, READ_ONLY_METATABLE)
 end
 
 --[=[
@@ -304,7 +308,7 @@ end
 	@param target table -- Table to error on indexing
 	@return table -- The same table
 ]=]
-function Table.deepReadonly(target: table)
+function Table.deepReadonly(target: table): table
 	for _, item in pairs(target) do
 		if type(item) == "table" then
 			Table.deepReadonly(item)
