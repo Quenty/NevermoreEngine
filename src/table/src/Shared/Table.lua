@@ -287,15 +287,6 @@ function Table.take(source, count)
 	return newTable
 end
 
-local function errorOnIndex(_, index)
-	error(("Bad index %q"):format(tostring(index)), 2)
-end
-
-local READ_ONLY_METATABLE = {
-	__index = errorOnIndex;
-	__newindex = errorOnIndex;
-}
-
 --[=[
 	Sets a metatable on a table such that it errors when
 	indexing a nil value
@@ -303,8 +294,8 @@ local READ_ONLY_METATABLE = {
 	@param target table -- Table to error on indexing
 	@return table -- The same table, with the metatable set to readonly
 ]=]
-function Table.readonly(target)
-	return setmetatable(target, READ_ONLY_METATABLE)
+function Table.readonly(target: table)
+	return table.freeze(target)
 end
 
 --[=[
@@ -313,7 +304,7 @@ end
 	@param target table -- Table to error on indexing
 	@return table -- The same table
 ]=]
-function Table.deepReadonly(target)
+function Table.deepReadonly(target: table)
 	for _, item in pairs(target) do
 		if type(item) == "table" then
 			Table.deepReadonly(item)
