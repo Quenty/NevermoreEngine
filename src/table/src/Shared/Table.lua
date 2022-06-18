@@ -295,6 +295,7 @@ local READ_ONLY_METATABLE = {
 	Sets a metatable on a table such that it errors when
 	indexing a nil value
 
+	@ignore
 	@param target table -- Table to error on indexing
 	@return table -- The same table, with the metatable set to readonly
 ]=]
@@ -305,6 +306,7 @@ end
 --[=[
 	Recursively sets the table as ReadOnly
 
+	@ignore
 	@param target table -- Table to error on indexing
 	@return table -- The same table
 ]=]
@@ -317,5 +319,26 @@ function Table.deepReadonly(target: table): table
 
 	return Table.readonly(target)
 end
+
+--[=[
+	Guards a table, ensuring that it has no malformed reads/writes.
+	Writing a value or indexing nil will throw an error.
+
+	@method shallowStrictAccess
+	@within Table
+	@param target table -- Table to guard
+	@return table -- The same table, with the metatable set to readonly
+]=]
+Table.shallowStrictAccess = Table.readonly
+
+--[=[
+	Recursively sets the table as guarded.
+
+	@method deepStrictAccess
+	@within Table
+	@param target table -- Table to guard
+	@return table -- The same table, with the metatable set to readonly
+]=]
+Table.deepStrictAccess = Table.deepReadonly
 
 return Table
