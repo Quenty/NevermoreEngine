@@ -12,6 +12,8 @@ local Signal = require("Signal")
 local Maid = require("Maid")
 local DeathReportServiceConstants = require("DeathReportServiceConstants")
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
+local DeathReportProcessor = require("DeathReportProcessor")
+local DeathReportUtils = require("DeathReportUtils")
 
 -- Note: don't make this too big without upgrading the way we handle the queue
 local MAX_DEATH_REPORTS = 5
@@ -36,15 +38,38 @@ function DeathReportServiceClient:Init(serviceBag)
 	self.NewDeathReport = Signal.new()
 	self._maid:GiveTask(self.NewDeathReport)
 
+	self._reportProcessor = DeathReportProcessor.new()
+	self._maid:GiveTask(self._reportProcessor)
+
 	self._lastDeathReports = {}
 
 	-- Setup remote Event
 	self:_promiseRemoteEvent()
 		:Then(function(remoteEvent)
-			remoteEvent.OnClientEvent:Connect(function(...)
+			self._maid:GiveTask(remoteEvent.OnClientEvent:Connect(function(...)
 				self:_handleClientEvent(...)
-			end)
+			end))
 		end)
+end
+
+--[=[
+	Observes killer reports for the given player
+
+	@param player Player
+	@return Observable<DeathReport>
+]=]
+function DeathReportServiceClient:ObservePlayerKillerReports(player)
+	return self._reportProcessor:ObservePlayerKillerReports(player)
+end
+
+--[=[
+	Observes death reports for the given player
+
+	@param player Player
+	@return Observable<DeathReport>
+]=]
+function DeathReportServiceClient:ObservePlayerDeathReports(player)
+	return self._reportProcessor:ObservePlayerDeathReports(player)
 end
 
 --[=[
@@ -56,7 +81,7 @@ function DeathReportServiceClient:GetLastDeathReports()
 end
 
 function DeathReportServiceClient:_handleClientEvent(deathReport)
-	assert(type(deathReport) == "table", "Bad deathreport")
+	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathreport")
 
 	if typeof(deathReport.humanoid) ~= "Instance" then
 		warn("[DeathReportServiceClient] - Failed to get humanoid of deathReport")
@@ -69,7 +94,9 @@ function DeathReportServiceClient:_handleClientEvent(deathReport)
 		table.remove(self._lastDeathReports, 1)
 	end
 
+	-- Fire off events
 	self.NewDeathReport:Fire(deathReport)
+	self._reportProcessor:HandleDeathReport(deathReport)
 end
 
 function DeathReportServiceClient:_promiseRemoteEvent()

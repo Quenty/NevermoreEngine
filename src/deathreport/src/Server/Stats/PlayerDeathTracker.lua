@@ -21,7 +21,7 @@ function PlayerDeathTracker.new(scoreObject, serviceBag)
 
 	assert(self._player and self._player:IsA("Player"), "Bad player")
 
-	self._maid:GiveTask(self._deathReportService:ObserveDeathReports(self._player):Subscribe(function(deathReport)
+	self._maid:GiveTask(self._deathReportService:ObservePlayerDeathReports(self._player):Subscribe(function(deathReport)
 		assert(deathReport.player == self._player, "Bad player")
 		self._obj.Value = self._obj.Value + 1
 	end))

@@ -37,8 +37,8 @@ function TeamKillTracker:GetKills()
 end
 
 function TeamKillTracker:_handleDeathReport(deathReport)
-	if deathReport.killer then
-		if deathReport.killer.Team == self._team then
+	if deathReport.killerPlayer then
+		if deathReport.killerPlayer.Team == self._team then
 			-- increment kills
 			self._obj.Value = self._obj.Value + 1
 		end

@@ -22,9 +22,15 @@ function DeathReportUtils.fromDeceasedHumanoid(humanoid)
 		adornee = humanoid.Parent;
 		humanoid = humanoid;
 		player = CharacterUtils.getPlayerFromCharacter(humanoid);
-		killer = HumanoidKillerUtils.getKillerOfHumanoid(humanoid);
+		killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid);
+		killerPlayer = HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid);
 		weaponData = DeathReportUtils.createWeaponData();
 	}
+end
+
+function DeathReportUtils.isDeathReport(deathReport)
+	return type(deathReport) == "table"
+		and typeof(deathReport.humanoid) == "Instance"
 end
 
 --[=[
@@ -53,7 +59,7 @@ function DeathReportUtils.getDeadDisplayName(deathReport)
 		if character then
 			return character.Name
 		else
-			warn("DeathReport without character")
+			warn("DeathReport.humanoid without character")
 			return "Unknown entity"
 		end
 	else
@@ -71,61 +77,68 @@ end
 function DeathReportUtils.involvesPlayer(deathReport, player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return (deathReport.player == player) or (deathReport.killer == player)
+	return (deathReport.player == player) or (deathReport.killerPlayer == player)
 end
 
 --[=[
 	Gets the killer display name for the player who died.
 
 	@param deathReport DeathReport
-	@return string
+	@return string?
 ]=]
 function DeathReportUtils.getKillerDisplayName(deathReport)
-	if not deathReport.killer then
+	if deathReport.killerPlayer then
+		assert(deathReport.killerPlayer:IsA("Player"), "Bad player")
+		return deathReport.killerPlayer.DisplayName
+	elseif deathReport.killerHumanoid then
+		local character = deathReport.killerHumanoid.Parent
+		if character then
+			return character.Name
+		else
+			warn("DeathReport.killerHumanoid without character")
+			return nil
+		end
+	else
 		return nil
 	end
-
-	assert(deathReport.killer:IsA("Player"), "Bad player")
-
-	return deathReport.killer.DisplayName
 end
 
 --[=[
 	Returns the dead's color
 
 	@param deathReport DeathReport
-	@return Color3
+	@return Color3?
 ]=]
 function DeathReportUtils.getDeadColor(deathReport)
-	if not deathReport.player then
-		return DEFAULT_COLOR
+	if deathReport.player then
+		local team = deathReport.player.Team
+		if team then
+			return team.TeamColor.Color
+		end
 	end
 
-	local team = deathReport.player.Team
-	if not team then
-		return DEFAULT_COLOR
-	end
-
-	return team.TeamColor.Color
+	return nil
 end
 
 --[=[
 	Returns the killer's color
 
 	@param deathReport DeathReport
-	@return Color3
+	@return Color3?
 ]=]
 function DeathReportUtils.getKillerColor(deathReport)
-	if not deathReport.killer then
-		return DEFAULT_COLOR
+	if deathReport.killerPlayer then
+		local team = deathReport.killerPlayer.Team
+		if team then
+			return team.TeamColor.Color
+		end
 	end
 
-	local team = deathReport.killer.Team
-	if not team then
-		return DEFAULT_COLOR
-	end
+	return nil
+end
 
-	return team.TeamColor.Color
+function DeathReportUtils.getDefaultColor()
+	return DEFAULT_COLOR
 end
 
 return DeathReportUtils

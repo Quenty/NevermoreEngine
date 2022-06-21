@@ -20,8 +20,8 @@ function PlayerKillTracker.new(scoreObject, serviceBag)
 	self._player = self._obj.Parent
 	assert(self._player and self._player:IsA("Player"), "Bad player")
 
-	self._maid:GiveTask(self._deathReportService:ObserveKillerReports(self._player):Subscribe(function(deathReport)
-		assert(deathReport.killer == self._player, "Bad player")
+	self._maid:GiveTask(self._deathReportService:ObservePlayerKillerReports(self._player):Subscribe(function(deathReport)
+		assert(deathReport.killerPlayer == self._player, "Bad player")
 		self._obj.Value = self._obj.Value + 1
 	end))
 
