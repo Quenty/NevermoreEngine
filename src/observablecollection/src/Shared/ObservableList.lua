@@ -166,6 +166,19 @@ function ObservableList:ObserveIndexByKey(key)
 end
 
 --[=[
+	Gets the current index from the key
+	@return number
+]=]
+function ObservableList:GetIndexByKey(key)
+	local currentIndex = self._indexes[key]
+	if currentIndex then
+		return currentIndex
+	else
+		return nil
+	end
+end
+
+--[=[
 	Gets the count of items in the list
 	@return number
 ]=]

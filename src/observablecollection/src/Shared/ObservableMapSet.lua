@@ -11,6 +11,8 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSet = require("ObservableSet")
 local Signal = require("Signal")
+local Brio = require("Brio")
+local RxBrioUtils = require("RxBrioUtils")
 
 local ObservableMapSet = {}
 ObservableMapSet.ClassName = "ObservableMapSet"
@@ -52,7 +54,7 @@ end
 	that need to be looked up by key.
 
 	@param entry TValue
-	@param observeKey Observable<Brio<TKey>>
+	@param observeKey Observable<TKey>
 ]=]
 function ObservableMapSet:Add(entry, observeKey)
 	local maid = Maid.new()
@@ -125,6 +127,8 @@ function ObservableMapSet:ObserveItemsForKeyBrio(key)
 end
 
 function ObservableMapSet:GetListForKey(key)
+	assert(key ~= nil, "Bad key")
+
 	local observableSet = self._observableSetMap[key]
 	if not observableSet then
 		return {}
@@ -134,7 +138,56 @@ function ObservableMapSet:GetListForKey(key)
 end
 
 function ObservableMapSet:GetObservableSetForKey(key)
+	assert(key ~= nil, "Bad key")
+
 	return self._observableSetMap[key]
+end
+
+function ObservableMapSet:ObserveSetBrio(key)
+	assert(key ~= nil, "Bad key")
+
+	return Observable.new(function(sub)
+		local topMaid = Maid.new()
+
+		local function connect()
+			local brio
+
+			local set = self._observableSetMap[key]
+			if set then
+				brio = Brio.new(set)
+				sub:Fire(brio)
+			end
+
+			topMaid._current = brio
+		end
+
+		topMaid:GiveTask(self.SetAdded:Connect(function(addedKey)
+			if addedKey == key then
+				connect()
+			end
+		end))
+
+		topMaid:GiveTask(self.SetRemoved:Connect(function(removedKey)
+			if removedKey == key then
+				connect()
+			end
+		end))
+
+		connect()
+
+		return topMaid
+	end)
+end
+
+function ObservableMapSet:ObserveCountForKey(key)
+	assert(key ~= nil, "Bad key")
+
+	return self:ObserveSetBrio(key):Pipe({
+		RxBrioUtils.switchMapBrio(function(observableSet)
+			return observableSet:ObserveCount()
+		end);
+		RxBrioUtils.emitOnDeath(0);
+	})
 end
 
 function ObservableMapSet:_addToObservableSet(key, entry)
