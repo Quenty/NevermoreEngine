@@ -31,6 +31,20 @@ function RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		})
 end
 
+function RxLinkUtils.observeLinkValueBrio(linkName, parent)
+	assert(type(linkName) == "string", "linkName should be 'string'")
+	assert(typeof(parent) == "Instance", "parent should be 'Instance'")
+
+	return RxInstanceUtils.observeChildrenOfNameBrio(parent, "ObjectValue", linkName)
+		:Pipe({
+			RxBrioUtils.flatMapBrio(function(instance)
+				return RxInstanceUtils.observePropertyBrio(instance, "Value", function(value)
+					return value ~= nil
+				end)
+			end)
+		})
+end
+
 -- Fires off everytime the link is reconfigured into a valid link
 -- Fires with link, linkValue
 function RxLinkUtils.observeValidityBrio(linkName, link)
