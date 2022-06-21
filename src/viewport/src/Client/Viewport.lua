@@ -14,6 +14,7 @@ local Observable = require("Observable")
 local ViewportControls = require("ViewportControls")
 local SpringObject = require("SpringObject")
 local CircleUtils = require("CircleUtils")
+local Math = require("Math")
 
 local MAX_PITCH = math.pi/3
 local MIN_PITCH = -math.pi/3
@@ -134,7 +135,10 @@ function Viewport:Render(props)
 		CurrentCamera = currentCamera;
 		LightColor = props.LightColor or Color3.new(1, 1, 1);
 		Ambient = props.Ambient or Color3.new(1, 1, 1);
-		ImageTransparency = self._transparency;
+		ImageTransparency = Blend.Computed(props.Transparency or 0, self._transparency,
+			function(propTransparency, selfTransparency)
+				return Math.map(propTransparency, 0, 1, selfTransparency, 1)
+			end);
 		[Blend.OnChange "AbsoluteSize"] = self._absoluteSize;
 		[Blend.Attached(function(viewport)
 			return ViewportControls.new(viewport, self)

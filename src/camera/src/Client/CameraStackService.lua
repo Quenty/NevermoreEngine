@@ -35,17 +35,6 @@ function CameraStackService:Init(serviceBag)
 	self._impulseCamera = ImpulseCamera.new()
 	self._defaultCamera = (self._rawDefaultCamera + self._impulseCamera):SetMode("Relative")
 
-	if self._doNotUseDefaultCamera then
-		Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
-
-		-- TODO: Handle camera deleted too!
-		Workspace.CurrentCamera:GetPropertyChangedSignal("CameraType"):Connect(function()
-			Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
-		end)
-	else
-		self._rawDefaultCamera:BindToRenderStep()
-	end
-
 	-- Add camera to stack
 	self:Add(self._defaultCamera)
 
@@ -65,12 +54,28 @@ function CameraStackService:Init(serviceBag)
 	end)
 end
 
+function CameraStackService:Start()
+	self._started = true
+
+	-- TODO: Allow rebinding
+	if self._doNotUseDefaultCamera then
+		Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+
+		-- TODO: Handle camera deleted too!
+		Workspace.CurrentCamera:GetPropertyChangedSignal("CameraType"):Connect(function()
+			Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+		end)
+	else
+		self._rawDefaultCamera:BindToRenderStep()
+	end
+end
+
 --[=[
 	Prevents the default camera from being used
 	@param doNotUseDefaultCamera boolean
 ]=]
 function CameraStackService:SetDoNotUseDefaultCamera(doNotUseDefaultCamera)
-	assert(not self._stack, "Already initialized")
+	assert(not self._started, "Already started")
 
 	self._doNotUseDefaultCamera = doNotUseDefaultCamera
 end

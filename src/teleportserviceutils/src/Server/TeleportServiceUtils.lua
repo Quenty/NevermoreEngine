@@ -41,7 +41,7 @@ end
 function TeleportServiceUtils.promiseTeleport(placeId, players, teleportOptions)
 	assert(type(placeId) == "number", "Bad placeId")
 	assert(type(players) == "table", "Bad players")
-	assert(typeof(teleportOptions) == "Instance" and teleportOptions:IsA("TeleportOptions"), "Bad options")
+	assert(typeof(teleportOptions) == "Instance" and teleportOptions:IsA("TeleportOptions") or teleportOptions == nil, "Bad options")
 
 	return Promise.spawn(function(resolve, reject)
 		local teleportAsyncResult
@@ -54,7 +54,6 @@ function TeleportServiceUtils.promiseTeleport(placeId, players, teleportOptions)
 
 		return resolve(teleportAsyncResult)
 	end)
-
 end
 
 return TeleportServiceUtils

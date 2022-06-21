@@ -1,0 +1,11 @@
+{
+  "name": "RxTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "rx": {
+        "$path": ".."
+      }
+    }
+  }
+}

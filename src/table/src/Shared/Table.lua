@@ -144,16 +144,12 @@ end
 --[=[
 	Shallow copies a table from target into a new table
 
+	@function Table.copy
 	@param target table -- Table to copy
 	@return table -- Result
+	@within Table
 ]=]
-function Table.copy(target)
-	local new = {}
-	for key, value in pairs(target) do
-		new[key] = value
-	end
-	return new
-end
+Table.copy = table.clone
 
 --[=[
 	Deep copies a table including metatables

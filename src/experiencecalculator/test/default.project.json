@@ -1,0 +1,11 @@
+{
+  "name": "ExperienceTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "experience": {
+        "$path": ".."
+      }
+    }
+  }
+}

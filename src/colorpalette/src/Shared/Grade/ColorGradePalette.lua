@@ -32,6 +32,14 @@ function ColorGradePalette:SetDefaultSurfaceName(gradeName)
 	self._defaultSurfaceName.Value = gradeName
 end
 
+function ColorGradePalette:HasGrade(gradeName)
+	if self._grades[gradeName] then
+		return true
+	else
+		return false
+	end
+end
+
 function ColorGradePalette:GetGrade(gradeName)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
@@ -113,7 +121,6 @@ function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
 		Rx.map(function(state)
 			assert(type(state.grade) == "number", "Bad state.grade")
 			assert(type(state.amount) == "number", "Bad state.amount")
-
 			return state.grade + state.multiplier*state.amount
 		end);
 	})

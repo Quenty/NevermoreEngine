@@ -236,7 +236,7 @@ function Draw._textOnAdornee(adornee, text, color)
 	if tonumber(text) then
 		textLabel.Font = Enum.Font.Code
 	else
-		textLabel.Font = Enum.Font.GothamSemibold
+		textLabel.Font = Enum.Font.GothamMedium
 	end
 
 	local textSize = TextService:GetTextSize(

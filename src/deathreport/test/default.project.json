@@ -1,0 +1,21 @@
+{
+  "name": "DeathReportTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "deathreport": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}
