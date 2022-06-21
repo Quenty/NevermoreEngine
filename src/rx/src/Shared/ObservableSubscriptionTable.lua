@@ -39,6 +39,20 @@ function ObservableSubscriptionTable:Fire(key, ...)
 	end
 end
 
+function ObservableSubscriptionTable:Complete(key, ...)
+	local subs = self._subMap[key]
+	if not subs then
+		return
+	end
+
+	local subsToComplete = table.clone(subs)
+	self._subMap[key] = nil
+
+	for _, sub in pairs(subsToComplete) do
+		task.spawn(sub.Complete, sub, ...)
+	end
+end
+
 --[=[
 	Observes for the key
 	@param key TKey
