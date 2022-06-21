@@ -124,7 +124,7 @@ function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, do
 	screenGui.ResetOnSpawn = false
 	screenGui.AutoLocalize = false
 	screenGui.IgnoreGuiInset = true
-	screenGui.DisplayOrder = 1e10
+	screenGui.DisplayOrder = 1e9
 	screenGui.Parent = PlayerGuiUtils.getPlayerGui()
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	renderMaid:GiveTask(screenGui)
@@ -178,6 +178,20 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 		for screenGui, _ in pairs(enabledScreenGuis) do
 			screenGui.Enabled = true
 		end
+	end)
+
+	PlayerGuiUtils.getPlayerGui().ChildAdded:Connect(function(item)
+
+		if item:IsA("ScreenGui") and item ~= ignoreScreenGui and item.Enabled then
+			enabledScreenGuis[item] = item
+			item.Enabled = false
+
+			maid:GiveTask(function()
+				item.Enabled = true
+			end)
+
+		end
+
 	end)
 
 	for _, coreGuiType in pairs(DISABLE_CORE_GUI_TYPES) do
