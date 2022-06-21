@@ -1,6 +1,6 @@
 {
   "name": "@quenty/localizedtextutils",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Localized text utils which changes translationKey structures to shared locations",
   "keywords": [
     "Roblox",

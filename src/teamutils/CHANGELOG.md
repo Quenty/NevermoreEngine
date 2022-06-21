@@ -1,20 +1,18 @@
-# v2.2.0 (Tue Jun 21 2022)
-
-#### 🚀 Enhancement
-
-- feat: A variety of updates and changes [#265](https://github.com/Quenty/NevermoreEngine/pull/265) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxTeamUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@2.1.0...@quenty/teamutils@2.2.0) (2022-06-21)
+
+
+### Features
+
+* Add RxTeamUtils ([437b7c6](https://github.com/Quenty/NevermoreEngine/commit/437b7c6b146709852e7f99c4d999af845915a15d))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@2.0.1...@quenty/teamutils@2.1.0) (2022-03-27)
 

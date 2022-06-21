@@ -1,20 +1,18 @@
-# v5.1.0 (Tue Jun 21 2022)
-
-#### 🚀 Enhancement
-
-- feat: A variety of updates and changes [#265](https://github.com/Quenty/NevermoreEngine/pull/265) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxInstanceUtils.observeChildrenOfNameBrio ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@5.0.0...@quenty/instanceutils@5.1.0) (2022-06-21)
+
+
+### Features
+
+* Add RxInstanceUtils.observeChildrenOfNameBrio ([5e5e9a5](https://github.com/Quenty/NevermoreEngine/commit/5e5e9a52bf6cd164bb59f9dc1fdba4470fa6e2dc))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@4.2.0...@quenty/instanceutils@5.0.0) (2022-05-21)
 

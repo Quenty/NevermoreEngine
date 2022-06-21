@@ -1,24 +1,18 @@
-# v3.1.0 (Tue Jun 21 2022)
-
-#### 🚀 Enhancement
-
-- feat: A variety of updates and changes [#265](https://github.com/Quenty/NevermoreEngine/pull/265) ([@Quenty](https://github.com/Quenty))
-- feat: Add more API surface to ObservableMapSet ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.0.0...@quenty/observablecollection@3.1.0) (2022-06-21)
+
+
+### Features
+
+* Add more API surface to ObservableMapSet ([f2ae08b](https://github.com/Quenty/NevermoreEngine/commit/f2ae08ba714e3aefc9f9bf1ae30fefc679535d2b))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@2.2.0...@quenty/observablecollection@3.0.0) (2022-05-21)
 

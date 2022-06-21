@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2022-06-21)
+
+
+### Features
+
+* Add MemoryStore package ([f1a7cdd](https://github.com/Quenty/NevermoreEngine/commit/f1a7cddcb8e41b7dbf3898233e846925cbea2740))
+
+
+
+
+
 # v1.1.0 (Tue Jun 21 2022)
 
 #### 🚀 Enhancement

@@ -1,23 +1,18 @@
-# v5.1.0 (Tue Jun 21 2022)
-
-#### 🚀 Enhancement
-
-- feat: A variety of updates and changes [#265](https://github.com/Quenty/NevermoreEngine/pull/265) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add better warnings for when store is already destroyed while writing or storing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@5.0.0...@quenty/datastore@5.1.0) (2022-06-21)
+
+
+### Bug Fixes
+
+* Add better warnings for when store is already destroyed while writing or storing ([77544eb](https://github.com/Quenty/NevermoreEngine/commit/77544ebf9620c1f34b62d92eb45e9c95c819186f))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@4.3.0...@quenty/datastore@5.0.0) (2022-05-21)
 

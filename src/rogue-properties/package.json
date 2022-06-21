@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rogue-properties",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Roguelike properties which can be modified by external provides",
   "keywords": [
     "Roblox",

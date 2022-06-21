@@ -1,20 +1,18 @@
-# v5.1.0 (Tue Jun 21 2022)
-
-#### 🚀 Enhancement
-
-- feat: A variety of updates and changes [#265](https://github.com/Quenty/NevermoreEngine/pull/265) ([@Quenty](https://github.com/Quenty))
-- feat: Add CharacterTransparency and ability to disable hat particles ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@5.0.0...@quenty/firstpersoncharactertransparency@5.1.0) (2022-06-21)
+
+
+### Features
+
+* Add CharacterTransparency and ability to disable hat particles ([7cd7068](https://github.com/Quenty/NevermoreEngine/commit/7cd706867e8c63e7e467dd26e6f1892d2a41a93b))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@4.3.0...@quenty/firstpersoncharactertransparency@5.0.0) (2022-05-21)
 

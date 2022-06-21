@@ -1,20 +1,18 @@
-# v5.1.0 (Tue Jun 21 2022)
-
-#### 🚀 Enhancement
-
-- feat: A variety of updates and changes [#265](https://github.com/Quenty/NevermoreEngine/pull/265) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxLinkUtils.observeLinkValueBrio(linkName, parent) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linkutils@5.0.0...@quenty/linkutils@5.1.0) (2022-06-21)
+
+
+### Features
+
+* Add RxLinkUtils.observeLinkValueBrio(linkName, parent) ([535fd94](https://github.com/Quenty/NevermoreEngine/commit/535fd943a7a7c5c5d2ca603aff1cee042f63ff69))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linkutils@4.2.0...@quenty/linkutils@5.0.0) (2022-05-21)
 

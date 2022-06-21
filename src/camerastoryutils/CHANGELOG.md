@@ -1,23 +1,18 @@
-# v5.1.0 (Tue Jun 21 2022)
-
-#### 🚀 Enhancement
-
-- feat: A variety of updates and changes [#265](https://github.com/Quenty/NevermoreEngine/pull/265) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Make viewport optional ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@5.0.0...@quenty/camerastoryutils@5.1.0) (2022-06-21)
+
+
+### Bug Fixes
+
+* Make viewport optional ([4d68d62](https://github.com/Quenty/NevermoreEngine/commit/4d68d6218ead8f30d433760d3706a9c261679b19))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@4.3.0...@quenty/camerastoryutils@5.0.0) (2022-05-21)
 
