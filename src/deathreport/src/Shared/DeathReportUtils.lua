@@ -71,7 +71,7 @@ end
 	Returns true if the death involves another player
 
 	@param deathReport DeathReport
-	@parm player Player
+	@param player Player
 	@return string
 ]=]
 function DeathReportUtils.involvesPlayer(deathReport, player)

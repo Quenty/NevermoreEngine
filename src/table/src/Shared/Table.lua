@@ -144,8 +144,10 @@ end
 --[=[
 	Shallow copies a table from target into a new table
 
+	@function Table.copy
 	@param target table -- Table to copy
 	@return table -- Result
+	@within Table
 ]=]
 Table.copy = table.clone
 

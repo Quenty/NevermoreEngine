@@ -167,6 +167,8 @@ end
 
 --[=[
 	Gets the current index from the key
+
+	@param key Symbol
 	@return number
 ]=]
 function ObservableList:GetIndexByKey(key)

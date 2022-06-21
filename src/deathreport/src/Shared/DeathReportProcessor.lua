@@ -57,6 +57,8 @@ end
 
 --[=[
 	Handles the death report
+
+	@param deathReport DeathReport
 ]=]
 function DeathReportProcessor:HandleDeathReport(deathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathreport")

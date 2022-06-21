@@ -20,7 +20,7 @@ local ExperienceUtils = {}
 --[=[
 	Creates a new experience configuration to be used
 
-	@param factor number
+	@param options ExperienceConfig
 	@return ExperienceConfig
 ]=]
 function ExperienceUtils.createExperienceConfig(options)
