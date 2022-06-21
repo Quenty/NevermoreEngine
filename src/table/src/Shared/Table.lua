@@ -147,13 +147,7 @@ end
 	@param target table -- Table to copy
 	@return table -- Result
 ]=]
-function Table.copy(target)
-	local new = {}
-	for key, value in pairs(target) do
-		new[key] = value
-	end
-	return new
-end
+Table.copy = table.clone
 
 --[=[
 	Deep copies a table including metatables
