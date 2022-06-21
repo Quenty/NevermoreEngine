@@ -149,9 +149,7 @@ function Blend.Computed(...)
 			sub:Fire(compute())
 		end)
 	elseif #args == 1 then
-		return args[1]:Pipe({
-			Rx.map(compute)
-		})
+		return Rx.map(compute)(args[1])
 	else
 		return Rx.combineLatest(args)
 			:Pipe({
