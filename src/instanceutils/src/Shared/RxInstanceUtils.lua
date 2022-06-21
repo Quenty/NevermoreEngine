@@ -16,6 +16,9 @@ local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
+local Symbol = require("Symbol")
+
+local UNSET_VALUE = Symbol.named("unsetValue")
 
 local RxInstanceUtils = {}
 
@@ -109,15 +112,29 @@ function RxInstanceUtils.observePropertyBrio(instance, propertyName, predicate)
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
+		local lastValue = UNSET_VALUE
 
 		local function handlePropertyChanged()
-			maid._property = nil
-
 			local propertyValue = instance[propertyName]
-			if not predicate or predicate(propertyValue) then
-				local brio = Brio.new(instance[propertyName])
-				maid._property = brio
-				sub:Fire(brio)
+
+			-- Deferred events can cause multiple values to be queued at once
+			-- but we operate at this post-deferred layer, so lets only output
+			-- reflected values.
+			if lastValue ~= propertyValue then
+				lastValue = propertyValue
+
+				if not predicate or predicate(propertyValue) then
+					local brio = Brio.new(instance[propertyName])
+
+					maid._lastBrio = brio
+
+					-- The above line can cause us to be overwritten so make sure before firing.
+					if maid._lastBrio == brio then
+						sub:Fire(brio)
+					end
+				else
+					maid._lastBrio = nil
+				end
 			end
 		end
 
@@ -156,6 +173,59 @@ function RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 					local brio = Brio.new(child)
 					maid._brio = brio
 					topMaid._lastBrio = brio
+
+					sub:Fire(brio)
+				else
+					maid._brio = nil
+				end
+			end
+
+			maid:GiveTask(child:GetPropertyChangedSignal("Name"):Connect(handleNameChanged))
+			handleNameChanged()
+
+			topMaid[child] = maid
+		end
+
+		topMaid:GiveTask(parent.ChildAdded:Connect(handleChild))
+		topMaid:GiveTask(parent.ChildRemoved:Connect(function(child)
+			topMaid[child] = nil
+		end))
+
+		for _, child in pairs(parent:GetChildren()) do
+			handleChild(child)
+		end
+
+		return topMaid
+	end)
+end
+
+--[=[
+	Observes the children with a specific name.
+
+	@param parent Instance
+	@param className string
+	@param name string
+	@return Observable<Brio<Instance>>
+]=]
+function RxInstanceUtils.observeChildrenOfNameBrio(parent, className, name)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(className) == "string", "Bad className")
+	assert(type(name) == "string", "Bad name")
+
+	return Observable.new(function(sub)
+		local topMaid = Maid.new()
+
+		local function handleChild(child)
+			if not child:IsA(className) then
+				return
+			end
+
+			local maid = Maid.new()
+
+			local function handleNameChanged()
+				if child.Name == name then
+					local brio = Brio.new(child)
+					maid._brio = brio
 
 					sub:Fire(brio)
 				else
