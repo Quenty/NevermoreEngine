@@ -54,12 +54,51 @@ function HumanoidKillerUtils.tagKiller(humanoid, attacker)
 end
 
 --[=[
+	Killer can either be a humanoid or a player (which we'll grab the humanoid)
+
+	@param humanoid Humanoid
+	@return Humanoid?
+]=]
+function HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid)
+	assert(typeof(humanoid) == "Instance", "Bad humanoid")
+
+	local creator = humanoid:FindFirstChild(TAG_NAME)
+	if not creator then
+		return nil
+	end
+
+	if not creator:IsA("ObjectValue") then
+		return nil
+	end
+
+	local killer = creator.Value
+	if not killer then
+		return nil
+	end
+
+	if killer:IsA("Humanoid") then
+		return killer
+	end
+
+	if killer:IsA("Player") then
+		local character = killer.Character
+		if character then
+			return character:FindFirstChildWhichIsA("Humanoid")
+		else
+			return nil
+		end
+	end
+
+	return nil
+end
+
+--[=[
 	Killer must be a player
 
 	@param humanoid Humanoid
 	@return Player?
 ]=]
-function HumanoidKillerUtils.getKillerOfHumanoid(humanoid)
+function HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid)
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
 	local creator = humanoid:FindFirstChild(TAG_NAME)
