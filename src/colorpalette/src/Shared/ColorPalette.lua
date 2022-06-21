@@ -14,6 +14,8 @@ local Blend = require("Blend")
 local Observable = require("Observable")
 local Signal = require("Signal")
 local Table = require("Table")
+local ColorGradeUtils = require("ColorGradeUtils")
+local LuvColor3Utils = require("LuvColor3Utils")
 
 local ColorPalette = setmetatable({}, BaseObject)
 ColorPalette.ClassName = "ColorPalette"
@@ -76,20 +78,59 @@ function ColorPalette:GetColorValues()
 	return self._colorValues
 end
 
-function ColorPalette:GetColor(name, grade, vividness)
-	assert(type(name) == "string", "Bad name")
-
-	return self:GetColorSwatch(name):GetGraded(
-		self:_toGrade(grade, name),
-		self:_toVividness(vividness, grade, name))
+function ColorPalette:GetColor(color, grade, vividness)
+	if type(color) == "string" then
+		return self:GetColorSwatch(color):GetGraded(
+			self:_toGrade(grade, color),
+			self:_toVividness(vividness, grade, color))
+	elseif typeof(color) == "Color3" then
+		return ColorGradeUtils.getGradedColor(color, self:_toGrade(grade, color), self:_toVividness(vividness, grade, color))
+	elseif typeof(color) == "Instance" and color:IsA("Color3Value") then
+		return ColorGradeUtils.getGradedColor(color.Value,
+			self:_toGrade(grade, color),
+			self:_toVividness(vividness, grade, color))
+	else
+		error("Bad color")
+	end
 end
 
-function ColorPalette:ObserveColor(name, grade, vividness)
-	assert(type(name) == "string", "Bad name")
+function ColorPalette:ObserveColor(color, grade, vividness)
+	-- assert(type(color) == "string", "Bad color")
 
-	return self:GetColorSwatch(name):ObserveGraded(
-		self:_toGradeObservable(grade, name),
-		self:_toVividnessObservable(vividness, grade, name))
+	if type(color) == "string" then
+		return self:GetColorSwatch(color):ObserveGraded(
+			self:_toGradeObservable(grade, color),
+			self:_toVividnessObservable(vividness, grade, color))
+	end
+
+	-- handle observable of color. this is for custom colors.
+	local colorOrObservable
+	if typeof(color) == "Color3" then
+		colorOrObservable = color
+	else
+		colorOrObservable = Blend.toPropertyObservable(color)
+	end
+
+	-- compute graded color for custom color, but specific grades or vividness
+	if colorOrObservable then
+		if grade == nil and vividness == nil then
+			-- no modification needed
+			return colorOrObservable
+		end
+
+		-- TODO: Optimize this potentially
+		return Rx.combineLatest({
+			baseColor = colorOrObservable;
+			colorGrade = self:_toGradeObservable(grade, colorOrObservable);
+			vividness = self:_toVividnessObservable(vividness, grade, colorOrObservable);
+		}):Pipe({
+			Rx.map(function(state)
+				return ColorGradeUtils.getGradedColor(state.baseColor, state.colorGrade, state.vividness)
+			end)
+		})
+	else
+		error("Bad color")
+	end
 end
 
 function ColorPalette:SetDefaultSurfaceName(surfaceName)
@@ -120,7 +161,7 @@ function ColorPalette:ObserveGradeOn(colorName, newSurfaceName, baseSurfaceName)
 	return self._gradePalette:ObserveOn(colorName, newSurfaceName, baseSurfaceName)
 end
 
-function ColorPalette:_toGradeObservable(grade, name)
+function ColorPalette:_toGradeObservable(grade, fallbackColorSource)
 	if type(grade) == "string" then
 		return (self._gradePalette:ObserveGrade(grade))
 	elseif type(grade) == "number" then
@@ -131,13 +172,28 @@ function ColorPalette:_toGradeObservable(grade, name)
 		local propertyObservable = Blend.toPropertyObservable(grade)
 		if propertyObservable then
 			return propertyObservable
-		else
-			return (self._gradePalette:ObserveGrade(name))
 		end
+	end
+
+	-- Fallback
+	if type(fallbackColorSource) == "string" then
+		return (self._gradePalette:ObserveGrade(fallbackColorSource))
+	elseif typeof(fallbackColorSource) == "Color3" then
+		local luvColor = LuvColor3Utils.fromColor3(fallbackColorSource)
+		return Rx.of(luvColor[3])
+	elseif Observable.isObservable(fallbackColorSource) then
+		return fallbackColorSource:Pipe({
+			Rx.map(function(value)
+				local luvColor = LuvColor3Utils.fromColor3(value)
+				return luvColor[3]
+			end)
+		})
+	else
+		error("Bad fallbackColorSource argument")
 	end
 end
 
-function ColorPalette:_toVividnessObservable(vividness, grade, name)
+function ColorPalette:_toVividnessObservable(vividness, grade, fallbackColorSource)
 	if type(vividness) == "string" then
 		return self._gradePalette:ObserveVividness(vividness)
 	elseif type(vividness) == "number" then
@@ -154,9 +210,23 @@ function ColorPalette:_toVividnessObservable(vividness, grade, name)
 	if type(grade) == "string" then
 		-- Fall back to the grade value
 		return self._gradePalette:ObserveVividness(grade)
+	end
+
+	-- Otherwise fall back to name of color
+	if type(fallbackColorSource) == "string" then
+		return (self._gradePalette:ObserveVividness(fallbackColorSource))
+	elseif typeof(fallbackColorSource) == "Color3" then
+		local luvColor = LuvColor3Utils.fromColor3(fallbackColorSource)
+		return Rx.of(luvColor[2])
+	elseif Observable.isObservable(fallbackColorSource) then
+		return fallbackColorSource:Pipe({
+			Rx.map(function(value)
+				local luvColor = LuvColor3Utils.fromColor3(value)
+				return luvColor[2]
+			end)
+		})
 	else
-		-- Otherwise fall back to name of color
-		return self._gradePalette:ObserveVividness(name)
+		error("Bad fallbackColorSource argument")
 	end
 end
 
