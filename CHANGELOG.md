@@ -1,3 +1,26 @@
+# (Fri Jun 24 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@OttoHatt](https://github.com/OttoHatt), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@5.1.0`
+  - feat: Add RxCharacterUtils [#262](https://github.com/Quenty/NevermoreEngine/pull/262) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### 🐛 Bug Fix
+
+- `@quenty/characterutils@5.1.0`, `@quenty/cmdrservice@5.2.0`, `@quenty/softshutdown@1.2.0`
+  - fix: Make a variety of more fixes around docs and admin commands [#269](https://github.com/Quenty/NevermoreEngine/pull/269) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jun 21 2022)
 
 #### 🚀 Enhancement

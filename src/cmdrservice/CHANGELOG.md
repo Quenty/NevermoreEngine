@@ -1,3 +1,16 @@
+# v5.2.0 (Fri Jun 24 2022)
+
+#### 🐛 Bug Fix
+
+- fix: Make a variety of more fixes around docs and admin commands [#269](https://github.com/Quenty/NevermoreEngine/pull/269) ([@Quenty](https://github.com/Quenty))
+- fix: Fix issue where anyone can execute admin commands ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
