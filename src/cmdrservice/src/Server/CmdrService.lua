@@ -44,11 +44,18 @@ function CmdrService:Init(serviceBag)
 
 		local ok, provider = providerPromise:Yield()
 		if not ok then
-			return provider or "Failed to load permission provider"
+			if type(provider) == "string" then
+				return provider
+			else
+				return "Failed to load permission provider"
+			end
 		end
 
-		if context.Group == "DefaultAdmin" and not provider:IsAdmin(context.Executor) then
+		if not provider:IsAdmin(context.Executor) then
 			return "You don't have permission to run this command"
+		else
+			-- allow
+			return nil
 		end
 	end)
 

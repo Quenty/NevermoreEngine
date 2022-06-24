@@ -1,5 +1,5 @@
 --[=[
-	Utilities for observing characters (and humanoids).
+	Utilities for observing characters and their humanoids.
 	@class RxCharacterUtils
 ]=]
 
@@ -35,18 +35,17 @@ function RxCharacterUtils.observeLastHumanoidBrio(player: Player)
 	return RxCharacterUtils.observeLastCharacterBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(character)
 			return RxInstanceUtils.observeLastNamedChildBrio(character, "Humanoid", "Humanoid")
-		end),
+		end);
 	})
 end
 
---[=[
+--[[
 	Returns an observable that emits a single brio with the value of the given humanoid.
 	When the humanoid dies, the brio is killed and the subscription completes.
 	If the humanoid is dead on subscription, the observable immediately completes with nothing emitted.
-	@ignore
 	@param humanoid Humanoid
 	@return Observable<Brio<Humanoid>>
-]=]
+]]
 local function observeHumanoidLifetimeAsBrio(humanoid: Humanoid)
 	return Observable.new(function(sub)
 		local function onDeath()
@@ -97,7 +96,7 @@ function RxCharacterUtils.observeLastAliveHumanoidBrio(player: Player)
 	return RxCharacterUtils.observeLastHumanoidBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(humanoid)
 			return observeHumanoidLifetimeAsBrio(humanoid)
-		end),
+		end);
 	})
 end
 
