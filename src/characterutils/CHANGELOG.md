@@ -1,29 +1,18 @@
-# v5.1.0 (Fri Jun 24 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, null[@OttoHatt](https://github.com/OttoHatt), for all your work!
-
-#### 🚀 Enhancement
-
-- feat: Add RxCharacterUtils [#262](https://github.com/Quenty/NevermoreEngine/pull/262) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### 🐛 Bug Fix
-
-- fix: Make a variety of more fixes around docs and admin commands [#269](https://github.com/Quenty/NevermoreEngine/pull/269) ([@Quenty](https://github.com/Quenty))
-- docs: Fix documentation in CharacterUtils not compiling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- [@OttoHatt](https://github.com/OttoHatt)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@5.0.0...@quenty/characterutils@5.1.0) (2022-06-24)
+
+
+### Features
+
+* Add RxCharacterUtils ([#262](https://github.com/Quenty/NevermoreEngine/issues/262)) ([760a912](https://github.com/Quenty/NevermoreEngine/commit/760a9121368f17eedc5bfca2decec66444811dfe))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@4.2.0...@quenty/characterutils@5.0.0) (2022-05-21)
 

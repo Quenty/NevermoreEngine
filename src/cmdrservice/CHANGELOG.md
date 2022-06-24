@@ -1,20 +1,18 @@
-# v5.2.0 (Fri Jun 24 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Make a variety of more fixes around docs and admin commands [#269](https://github.com/Quenty/NevermoreEngine/pull/269) ([@Quenty](https://github.com/Quenty))
-- fix: Fix issue where anyone can execute admin commands ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@5.1.0...@quenty/cmdrservice@5.2.0) (2022-06-24)
+
+
+### Bug Fixes
+
+* Fix issue where anyone can execute admin commands ([c813877](https://github.com/Quenty/NevermoreEngine/commit/c813877b16429a7c56bd009cfe9ab9e9b51ce26a))
+
+
+
+
 
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@5.0.0...@quenty/cmdrservice@5.1.0) (2022-06-21)
 

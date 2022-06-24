@@ -1,20 +1,18 @@
-# v1.2.0 (Fri Jun 24 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Make a variety of more fixes around docs and admin commands [#269](https://github.com/Quenty/NevermoreEngine/pull/269) ([@Quenty](https://github.com/Quenty))
-- fix: Ignore playerGuis as they spawn in and stop showing UI ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@1.1.0...@quenty/softshutdown@1.2.0) (2022-06-24)
+
+
+### Bug Fixes
+
+* Ignore playerGuis as they spawn in and stop showing UI ([c6009ca](https://github.com/Quenty/NevermoreEngine/commit/c6009caf8cdabf46b53177ba37f2c78ccb9b0320))
+
+
+
+
 
 # 1.1.0 (2022-06-21)
 
