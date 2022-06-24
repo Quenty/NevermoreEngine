@@ -19,3 +19,8 @@ This service lets you shut down servers without losing a bunch of players. When 
 ```
 npm install @quenty/softshutdown --save
 ```
+
+You can also just insert this free model into ServerScriptService.
+
+https://www.roblox.com/library/9976385594/Quentys-soft-shutdown
+

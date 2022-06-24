@@ -60,7 +60,7 @@ function SoftShutdownServiceClient:Init(serviceBag)
 		isLobby = self._isLobby:Observe();
 		isShuttingDown = self._isUpdating:Observe();
 		localTeleportDataSaysIsLobby = RxValueBaseUtils.observeValue(self._localTeleportDataSaysIsLobby);
-		isArrivingAfterShutdown = self._isArrivingAfterShutdown;
+		isArrivingAfterShutdown = RxValueBaseUtils.observeValue(self._isArrivingAfterShutdown);
 	}):Subscribe(function(state)
 		if state.isLobby or state.localTeleportDataSaysIsLobby then
 			self._maid._shutdownUI = nil
@@ -124,7 +124,7 @@ function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, do
 	screenGui.ResetOnSpawn = false
 	screenGui.AutoLocalize = false
 	screenGui.IgnoreGuiInset = true
-	screenGui.DisplayOrder = 1e10
+	screenGui.DisplayOrder = 1e9
 	screenGui.Parent = PlayerGuiUtils.getPlayerGui()
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	renderMaid:GiveTask(screenGui)
@@ -166,13 +166,28 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 		end)
 	end
 
+	local playerGui = PlayerGuiUtils.getPlayerGui()
+
 	local enabledScreenGuis = {}
-	for _, item in pairs(PlayerGuiUtils.getPlayerGui():GetChildren()) do
-		if item:IsA("ScreenGui") and item ~= ignoreScreenGui and item.Enabled then
-			enabledScreenGuis[item] = item
-			item.Enabled = false
+
+	local function handleChild(child)
+		if child:IsA("ScreenGui") and child ~= ignoreScreenGui and child.Enabled then
+			enabledScreenGuis[child] = child
+			child.Enabled = false
 		end
 	end
+
+	for _, child in pairs(playerGui:GetChildren()) do
+		handleChild(child)
+	end
+
+	maid:GiveTask(playerGui.ChildAdded:Connect(function(child)
+		handleChild(child)
+	end))
+
+	maid:GiveTask(playerGui.ChildRemoved:Connect(function(child)
+		enabledScreenGuis[child] = nil
+	end))
 
 	maid:GiveTask(function()
 		for screenGui, _ in pairs(enabledScreenGuis) do
