@@ -1,20 +1,18 @@
-# v2.2.0 (Sat Jul 02 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add RogueHumanoid package [#270](https://github.com/Quenty/NevermoreEngine/pull/270) ([@Quenty](https://github.com/Quenty))
-- feat: Add RogueSetter for rogue properties which sets a properties value ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@2.1.0...@quenty/rogue-properties@2.2.0) (2022-07-02)
+
+
+### Features
+
+* Add RogueSetter for rogue properties which sets a properties value ([bd4e233](https://github.com/Quenty/NevermoreEngine/commit/bd4e233bd523faa372002c5e18e12139ec29b627))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@2.0.0...@quenty/rogue-properties@2.1.0) (2022-06-21)
 

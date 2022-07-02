@@ -1,23 +1,18 @@
-# v3.3.0 (Sat Jul 02 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add RogueHumanoid package [#270](https://github.com/Quenty/NevermoreEngine/pull/270) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Can clean up services properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@3.2.0...@quenty/gameconfig@3.3.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@3.1.0...@quenty/gameconfig@3.2.0) (2022-06-24)
 

@@ -1,20 +1,18 @@
-# v3.2.0 (Sat Jul 02 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add RogueHumanoid package [#270](https://github.com/Quenty/NevermoreEngine/pull/270) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableMapSet:GetSetCount() and ObservableMapSet:ObserveSetCount() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.1.0...@quenty/observablecollection@3.2.0) (2022-07-02)
+
+
+### Features
+
+* Add ObservableMapSet:GetSetCount() and ObservableMapSet:ObserveSetCount() ([6a25f61](https://github.com/Quenty/NevermoreEngine/commit/6a25f61d8dcadd9dda56daf1a52c4b4186740efe))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.0.0...@quenty/observablecollection@3.1.0) (2022-06-21)
 

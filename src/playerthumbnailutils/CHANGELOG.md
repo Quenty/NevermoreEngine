@@ -1,23 +1,15 @@
-# v5.1.0 (Sat Jul 02 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add RogueHumanoid package [#270](https://github.com/Quenty/NevermoreEngine/pull/270) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Update PlayerThumbnailUtils.promiseUserName(userId) docs with specification of display name ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@5.0.0...@quenty/playerthumbnailutils@5.1.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@4.2.0...@quenty/playerthumbnailutils@5.0.0) (2022-05-21)
 
