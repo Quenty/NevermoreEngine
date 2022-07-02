@@ -28,6 +28,7 @@ function RoguePropertyService:Init(serviceBag)
 	self._maid:GiveTask(self.ProviderAddedEvent)
 
 	-- Internal providers
+	self._serviceBag:GetService(require("RogueSetterProvider"))
 	self._serviceBag:GetService(require("RogueAdditiveProvider"))
 	self._serviceBag:GetService(require("RogueMultiplierProvider"))
 end
