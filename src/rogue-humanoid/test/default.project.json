@@ -1,0 +1,21 @@
+{
+  "name": "RogueHumanoidTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "roguehumanoid": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}
