@@ -32,6 +32,7 @@
     "@quenty/characterutils": "file:../characterutils",
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise",
+    "@quenty/rogue-humanoid": "file:../rogue-humanoid",
     "@quenty/table": "file:../table"
   },
   "publishConfig": {
