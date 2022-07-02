@@ -1,3 +1,16 @@
+# (Sat Jul 02 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@6.2.0`, `@quenty/camera@7.2.0`, `@quenty/cmdrservice@5.3.0`, `@quenty/datastore@5.2.0`, `@quenty/gameconfig@3.3.0`, `@quenty/gameproductservice@3.3.0`, `@quenty/humanoidspeed@3.3.0`, `@quenty/idleservice@5.3.0`, `@quenty/ik@7.3.0`, `@quenty/networkownerutils@2.2.0`, `@quenty/observablecollection@3.2.0`, `@quenty/permissionprovider@6.2.0`, `@quenty/playerthumbnailutils@5.1.0`, `@quenty/ragdoll@7.3.0`, `@quenty/resetservice@3.2.0`, `@quenty/rogue-humanoid@1.1.0`, `@quenty/rogue-properties@2.2.0`, `@quenty/timesyncservice@5.2.0`, `@quenty/transparencyservice@5.1.0`, `@quenty/ultrawidecontainerutils@2.2.0`
+  - feat: Add RogueHumanoid package [#270](https://github.com/Quenty/NevermoreEngine/pull/270) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jun 24 2022)
 
 :tada: This release contains work from a new contributor! :tada:
