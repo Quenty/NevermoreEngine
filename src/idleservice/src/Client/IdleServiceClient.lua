@@ -231,4 +231,8 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 	self._maid._humanoidMaid = maid
 end
 
+function IdleServiceClient:Destroy()
+	self._maid:DoCleaning()
+end
+
 return IdleServiceClient

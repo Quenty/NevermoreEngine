@@ -9,6 +9,8 @@ local BinderProvider = require("BinderProvider")
 local Binder = require("Binder")
 
 return BinderProvider.new(function(self, serviceBag)
+	serviceBag:GetService(require("RogueHumanoidService"))
+
 --[=[
 	@prop HumanoidSpeed Binder<HumanoidSpeed>
 	@within HumanoidSpeedBindersServer

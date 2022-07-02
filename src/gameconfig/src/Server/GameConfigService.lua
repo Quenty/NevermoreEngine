@@ -92,4 +92,8 @@ function GameConfigService:_getOrCreateDefaultGameConfig()
 	return config
 end
 
+function GameConfigService:Destroy()
+	self._maid:DoCleaning()
+end
+
 return GameConfigService

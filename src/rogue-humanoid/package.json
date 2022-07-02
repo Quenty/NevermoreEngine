@@ -1,12 +1,12 @@
 {
-  "name": "@quenty/permissionprovider",
-  "version": "6.1.0",
-  "description": "Permission provider for Roblox, including authenticating against group membership",
+  "name": "@quenty/rogue-humanoid",
+  "version": "1.0.0",
+  "description": "Roguelike humanoid properties which can be modified",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "permissions"
+    "Rogue-properties"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/permissionprovider/"
+    "directory": "src/rogue-humanoid/"
   },
   "funding": {
     "type": "patreon",
@@ -25,14 +25,18 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
-    "@quenty/grouputils": "file:../grouputils",
+    "@quenty/binder": "file:../binder",
+    "@quenty/brio": "file:../brio",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting",
+    "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
+    "@quenty/rogue-properties": "file:../rogue-properties",
+    "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
-    "@quenty/table": "file:../table"
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

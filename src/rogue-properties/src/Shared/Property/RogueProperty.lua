@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local RogueAdditiveProvider = require("RogueAdditiveProvider")
 local RogueMultiplierProvider = require("RogueMultiplierProvider")
+local RogueSetterProvider = require("RogueSetterProvider")
 local RoguePropertyBinderGroups = require("RoguePropertyBinderGroups")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
@@ -88,6 +89,16 @@ function RogueProperty:SetBaseValue(value)
 	end
 end
 
+function RogueProperty:GetBaseValue()
+	local baseValue = self:_getBaseValueObject()
+	if baseValue then
+		return self:_decodeValue(baseValue.Value)
+	else
+		return self:_decodeValue(self._definition:GetEncodedDefaultValue())
+	end
+end
+
+
 function RogueProperty:GetValue()
 	local propObj = self:_getBaseValueObject()
 	if not propObj then
@@ -106,7 +117,6 @@ end
 function RogueProperty:GetDefinition()
 	return self._definition
 end
-
 
 function RogueProperty:ObserveModifiersBrio()
 	return self:_observeBaseValueBrio()
@@ -192,6 +202,22 @@ function RogueProperty:CreateAdditive(amount, source)
 	multiplier.Parent = baseValue
 
 	return multiplier
+end
+
+function RogueProperty:CreateSetter(amount, source)
+	assert(type(amount) == "number", "Bad amount")
+
+	local provider = self._serviceBag:GetService(RogueSetterProvider)
+	local baseValue = self:_getBaseValueObject()
+
+	if not baseValue then
+		warn("Failed to get the baseValue to parent")
+	end
+
+	local setter = provider:Create(amount, source)
+	setter.Parent = baseValue
+
+	return setter
 end
 
 function RogueProperty:_observeModifiersBrio()

@@ -1,5 +1,5 @@
 --[=[
-	@class RogueMultiplierProvider
+	@class RogueSetterProvider
 ]=]
 
 local require = require(script.Parent.loader).load(script)
@@ -12,9 +12,9 @@ local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 
-local RogueMultiplierProvider = {}
+local RogueSetterProvider = {}
 
-function RogueMultiplierProvider:Init(serviceBag)
+function RogueSetterProvider:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -25,48 +25,48 @@ function RogueMultiplierProvider:Init(serviceBag)
 	self._roguePropetyService:AddProvider(self)
 end
 
-function RogueMultiplierProvider:GetBinder()
-	return self._rogueBinders.RogueMultiplier
+function RogueSetterProvider:GetBinder()
+	return self._rogueBinders.RogueSetter
 end
 
-function RogueMultiplierProvider:Create(multiplier, source)
-	assert(type(multiplier) == "number", "Bad multiplier")
+function RogueSetterProvider:Create(value, source)
+	assert(type(value) == "number", "Bad value")
 	assert(typeof(source) == "Instance" or source == nil, "Bad source")
 
 	local obj = Instance.new("NumberValue")
-	obj.Name = "Multiplier"
-	obj.Value = multiplier
+	obj.Name = "Setter"
+	obj.Value = value
 
 	if source then
 		RoguePropertyModifierUtils.createSourceLink(obj, source)
 	end
 
-	self._rogueBinders.RogueMultiplier:Bind(obj)
+	self._rogueBinders.RogueSetter:Bind(obj)
 
 	return obj
 end
 
-function RogueMultiplierProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
+function RogueSetterProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
+	-- TODO: Support more than just the base value type
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		local multiplier = 1
-
-		for _, item in pairs(self:_getMultipliers(propObj)) do
-			multiplier = multiplier*item:GetMultiplier()
+		for _, item in pairs(self:_getSetters(propObj)) do
+			return item:GetValue()
 		end
 
-		return baseValue*multiplier
+		return baseValue
 	else
 		return baseValue
 	end
 end
 
-function RogueMultiplierProvider:ObserveModifiedVersion(propObj, rogueProperty, observeBaseValue)
+function RogueSetterProvider:ObserveModifiedVersion(propObj, rogueProperty, observeBaseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
+		-- TODO: optimize this.
 		return RxBrioUtils.flatCombineLatest({
 			value = observeBaseValue;
-			multiplier = self:_observeMultipliersBrio(propObj):Pipe({
+			allSetters = self:_observeSettersBrio(propObj):Pipe({
 				RxBrioUtils.flatMapBrio(function(item)
-					return item:ObserveMultiplier();
+					return item:ObserveValue();
 				end); -- this gets us a list of multipliers which should mutate pretty frequently.
 				Rx.defaultsToNil;
 			});
@@ -80,12 +80,12 @@ function RogueMultiplierProvider:ObserveModifiedVersion(propObj, rogueProperty, 
 	end
 end
 
-function RogueMultiplierProvider:_observeMultipliersBrio(propObj)
-	return RxBinderUtils.observeBoundChildClassBrio(self._rogueBinders.RogueMultiplier, propObj)
+function RogueSetterProvider:_observeSettersBrio(propObj)
+	return RxBinderUtils.observeBoundChildClassBrio(self._rogueBinders.RogueSetter, propObj)
 end
 
-function RogueMultiplierProvider:_getMultipliers(propObj)
-	return BinderUtils.getChildren(self._rogueBinders.RogueMultiplier, propObj)
+function RogueSetterProvider:_getSetters(propObj)
+	return BinderUtils.getChildren(self._rogueBinders.RogueSetter, propObj)
 end
 
-return RogueMultiplierProvider
+return RogueSetterProvider

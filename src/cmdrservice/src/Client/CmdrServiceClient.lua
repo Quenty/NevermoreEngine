@@ -10,12 +10,12 @@ local require = require(script.Parent.loader).load(script)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
+local Maid = require("Maid")
+local PermissionServiceClient = require("PermissionServiceClient")
+local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
-local PermissionServiceClient = require("PermissionServiceClient")
-local Maid = require("Maid")
 local String = require("String")
-local Promise = require("Promise")
 
 local CmdrServiceClient = {}
 
@@ -28,7 +28,7 @@ function CmdrServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
-	self._permissionService = serviceBag:GetService(PermissionServiceClient)
+	self._permissionService = self._serviceBag:GetService(PermissionServiceClient)
 end
 
 --[=[
@@ -86,6 +86,7 @@ function CmdrServiceClient:PromiseCmdr()
 				return resolve(require(cmdClient))
 			end)
 		end)
+	self._maid:GiveTask(self._cmdrPromise)
 
 	return self._cmdrPromise
 end

@@ -201,7 +201,6 @@ end
 
 function IKServiceClient:Destroy()
 	self._maid:DoCleaning()
-	self._maid = nil
 end
 
 return IKServiceClient

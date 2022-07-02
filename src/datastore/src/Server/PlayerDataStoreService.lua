@@ -22,6 +22,7 @@ function PlayerDataStoreService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
+
 	self._started = Promise.new()
 	self._maid:GiveTask(self._started)
 
@@ -119,6 +120,10 @@ function PlayerDataStoreService:PromiseManager()
 		end)
 
 	return self._dataStoreManagerPromise
+end
+
+function PlayerDataStoreService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return PlayerDataStoreService

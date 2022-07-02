@@ -13,6 +13,7 @@ local ObservableSet = require("ObservableSet")
 local Signal = require("Signal")
 local Brio = require("Brio")
 local RxBrioUtils = require("RxBrioUtils")
+local RxValueBaseUtils = require("RxValueBaseUtils")
 
 local ObservableMapSet = {}
 ObservableMapSet.ClassName = "ObservableMapSet"
@@ -45,6 +46,10 @@ function ObservableMapSet.new()
 ]=]
 	self.SetRemoved = Signal.new() -- :Fire(key)
 	self._maid:GiveTask(self.SetRemoved)
+
+	self._setCount = Instance.new("IntValue")
+	self._setCount.Value = 0
+	self._maid:GiveTask(self._setCount)
 
 	return self
 end
@@ -89,6 +94,27 @@ function ObservableMapSet:Add(entry, observeKey)
 	return maid
 end
 
+--[=[
+	Gets how many sets exist
+	@return number
+]=]
+function ObservableMapSet:GetSetCount()
+	return self._setCount.Value
+end
+
+--[=[
+	Observes how many sets exist
+	@return Observable<number>
+]=]
+function ObservableMapSet:ObserveSetCount()
+	return RxValueBaseUtils.observeValue(self._setCount)
+end
+
+--[=[
+	Observes all items for the given key
+	@param key TKey
+	@return Observable<Brio<TValue>>
+]=]
 function ObservableMapSet:ObserveItemsForKeyBrio(key)
 	assert(key ~= nil, "Bad key")
 
@@ -126,6 +152,11 @@ function ObservableMapSet:ObserveItemsForKeyBrio(key)
 	end)
 end
 
+--[=[
+	Gets a list for a given key
+	@param key TKey
+	@return { TValue }
+]=]
 function ObservableMapSet:GetListForKey(key)
 	assert(key ~= nil, "Bad key")
 
@@ -137,6 +168,11 @@ function ObservableMapSet:GetListForKey(key)
 	return observableSet:GetList()
 end
 
+--[=[
+	Gets the observable set for the given key
+	@param key TKey
+	@return ObservableSet<TValue>
+]=]
 function ObservableMapSet:GetObservableSetForKey(key)
 	assert(key ~= nil, "Bad key")
 
@@ -225,6 +261,8 @@ function ObservableMapSet:_removeObservableSet(key)
 		if self.SetRemoved.Destroy then
 			self.SetRemoved:Fire(key)
 		end
+
+		self._setCount.Value = self._setCount.Value - 1
 	end
 end
 
@@ -240,6 +278,7 @@ function ObservableMapSet:_getOrCreateObservableSet(key)
 	self._observableSetMap[key] = set
 
 	self.SetAdded:Fire(key, set)
+	self._setCount.Value = self._setCount.Value + 1
 
 	self._maid[set] = maid
 	return set

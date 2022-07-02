@@ -15,6 +15,7 @@ local CustomCameraEffect = require("CustomCameraEffect")
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
 local ServiceBag = require("ServiceBag")
+local Maid = require("Maid")
 
 assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackService on client")
 
@@ -27,18 +28,23 @@ local CameraStackService = {}
 function CameraStackService:Init(serviceBag)
 	assert(ServiceBag.isServiceBag(serviceBag), "Not a valid service bag")
 
+	self._maid = Maid.new()
+	self._key = HttpService:GenerateGUID(false)
+
 	self._stack = {}
 	self._disabledSet = {}
 
 	-- Initialize default cameras
 	self._rawDefaultCamera = DefaultCamera.new()
+	self._maid:GiveTask(self._rawDefaultCamera)
+
 	self._impulseCamera = ImpulseCamera.new()
 	self._defaultCamera = (self._rawDefaultCamera + self._impulseCamera):SetMode("Relative")
 
 	-- Add camera to stack
 	self:Add(self._defaultCamera)
 
-	RunService:BindToRenderStep("CameraStackUpdateInternal", Enum.RenderPriority.Camera.Value + 75, function()
+	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, Enum.RenderPriority.Camera.Value + 75, function()
 		debug.profilebegin("CameraStackUpdate")
 
 		if next(self._disabledSet) then
@@ -51,6 +57,10 @@ function CameraStackService:Init(serviceBag)
 		end
 
 		debug.profileend()
+	end)
+
+	self._maid:GiveTask(function()
+		RunService:UnbindFromRenderStep("CameraStackUpdateInternal" .. self._key)
 	end)
 end
 
@@ -269,6 +279,10 @@ function CameraStackService:Add(state)
 	assert(self._stack, "Stack is not initialized yet")
 
 	table.insert(self._stack, state)
+end
+
+function CameraStackService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return CameraStackService
