@@ -17,6 +17,7 @@ HumanoidSpeed.__index = HumanoidSpeed
 --[=[
 	Constructs a new HumanoidSpeed
 	@param humanoid Humanoid
+	@param serviceBag ServiceBag
 	@return HumanoidSpeed
 ]=]
 function HumanoidSpeed.new(humanoid, serviceBag)
