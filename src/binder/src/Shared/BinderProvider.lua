@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
+local Maid = require("Maid")
 
 local BinderProvider = {}
 BinderProvider.ClassName = "BinderProvider"
@@ -87,14 +88,20 @@ end
 function BinderProvider:Init(...)
 	assert(not self._initialized, "Already initialized")
 
+	self._maid = Maid.new()
+
 	self._binders = {}
 	self._initialized = true
 
 	-- Pretty sure this is a bad idea
 	self._bindersAddedPromise = Promise.new()
+	self._maid:GiveTask(self._bindersAddedPromise)
+
 	self._startPromise = Promise.new()
+	self._maid:GiveTask(self._startPromise)
 
 	self._initMethod(self, ...)
+
 	self._bindersAddedPromise:Resolve()
 end
 
@@ -161,6 +168,15 @@ function BinderProvider:Add(binder)
 
 	table.insert(self._binders, binder)
 	self[binder:GetTag()] = binder
+end
+
+function BinderProvider:Destroy()
+	for _, item in pairs(self._binders) do
+		rawset(self, item:GetTag(), nil)
+	end
+
+	self._maid:DoCleaning()
+	self._binders = nil
 end
 
 return BinderProvider

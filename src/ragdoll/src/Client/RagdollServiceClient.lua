@@ -31,6 +31,7 @@ end
 ]=]
 function RagdollServiceClient:SetScreenShakeEnabled(value)
 	assert(type(value) == "boolean", "Bad value")
+
 	Players.LocalPlayer:SetAttribute(RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE)
 end
 
@@ -40,7 +41,6 @@ end
 ]=]
 function RagdollServiceClient:GetScreenShakeEnabled()
 	assert(self._serviceBag, "Not initialized")
-
 
 	return AttributeUtils.getAttribute(Players.LocalPlayer, RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE, true)
 end

@@ -38,4 +38,8 @@ function GameConfigServiceClient:GetConfigPicker()
 	return self._configPicker
 end
 
+function GameConfigServiceClient:Destroy()
+	self._maid:DoCleaning()
+end
+
 return GameConfigServiceClient

@@ -1,4 +1,5 @@
 --[=[
+	Helper functions for the TimeSyncService.
 	@class TimeSyncUtils
 ]=]
 
@@ -9,6 +10,12 @@ local Maid = require("Maid")
 
 local TimeSyncUtils = {}
 
+--[=[
+	Given a clock, returns a promise that resolves when the clock is syncronized.
+
+	@param clock MasterClock | SlaveClock
+	@return Promise<MasterClock | SlaveClock>
+]=]
 function TimeSyncUtils.promiseClockSynced(clock)
 	if clock:IsSynced() then
 		return Promise.resolved(clock)

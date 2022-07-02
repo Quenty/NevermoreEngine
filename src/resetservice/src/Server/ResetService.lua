@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local GetRemoteEvent = require("GetRemoteEvent")
 local ResetServiceConstants = require("ResetServiceConstants")
+local Maid = require("Maid")
 
 local ResetService = {}
 
@@ -17,14 +18,20 @@ local ResetService = {}
 function ResetService:Init()
 	assert(not self._remoteEvent, "Already initialized")
 
+	self._maid = Maid.new()
+
 	self._remoteEvent = GetRemoteEvent(ResetServiceConstants.REMOTE_EVENT_NAME)
-	self._remoteEvent.OnServerEvent:Connect(function(player)
-		self:_resetCharacter(player)
-	end)
+	self._maid:GiveTask(self._remoteEvent.OnServerEvent:Connect(function(player)
+		self:_resetCharacterYielding(player)
+	end))
 end
 
-function ResetService:_resetCharacter(player)
+function ResetService:_resetCharacterYielding(player)
 	player:LoadCharacter()
+end
+
+function ResetService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return ResetService

@@ -29,6 +29,7 @@ local GroupPermissionProvider = require("GroupPermissionProvider")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
+local Maid = require("Maid")
 
 local PermissionService = {}
 
@@ -41,7 +42,11 @@ function PermissionService:Init(_serviceBag)
 	assert(not self._provider, "Already have provider")
 
 	self._provider = nil
+
+	self._maid = Maid.new()
+
 	self._promise = Promise.new()
+	self._maid:GiveTask(self._promise)
 end
 
 --[=[
@@ -84,6 +89,11 @@ function PermissionService:PromisePermissionProvider()
 	assert(self._promise, "Not initialized")
 
 	return self._promise
+end
+
+function PermissionService:Destroy()
+	self._maid:DoCleaning()
+	self._provider = nil
 end
 
 return PermissionService

@@ -28,6 +28,7 @@
   "dependencies": {
     "@quenty/coreguiutils": "file:../coreguiutils",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/remoting": "file:../remoting",
     "@quenty/table": "file:../table"
   },

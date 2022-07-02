@@ -3,7 +3,11 @@
 	@class MasterClock
 ]=]
 
-local MasterClock = {}
+local require = require(script.Parent.loader).load(script)
+
+local BaseObject = require("BaseObject")
+
+local MasterClock = setmetatable({}, BaseObject)
 MasterClock.__index = MasterClock
 MasterClock.ClassName = "MasterClock"
 
@@ -15,7 +19,7 @@ MasterClock.ClassName = "MasterClock"
 	@return MasterClock
 ]=]
 function MasterClock.new(remoteEvent, remoteFunction)
-	local self = setmetatable({}, MasterClock)
+	local self = setmetatable(BaseObject.new(), MasterClock)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteFunction = remoteFunction or error("No remoteFunction")
@@ -23,14 +27,19 @@ function MasterClock.new(remoteEvent, remoteFunction)
 	self._remoteFunction.OnServerInvoke = function(_, timeThree)
 		return self:_handleDelayRequest(timeThree)
 	end
-	self._remoteEvent.OnServerEvent:Connect(function(player)
+	self._maid:GiveTask(self._remoteEvent.OnServerEvent:Connect(function(player)
 		 self._remoteEvent:FireClient(player, self:GetTime())
+	end))
+
+	local alive = true
+	self._maid:GiveTask(function()
+		alive = false
 	end)
 
-	task.spawn(function()
-		while true do
-			task.wait(5)
+	task.delay(5, function()
+		while alive do
 			self:_forceSync()
+			task.wait(5)
 		end
 	end)
 

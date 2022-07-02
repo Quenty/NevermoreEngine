@@ -3,7 +3,11 @@
 	@class SlaveClock
 ]=]
 
-local SlaveClock = {}
+local require = require(script.Parent.loader).load(script)
+
+local BaseObject = require("BaseObject")
+
+local SlaveClock = setmetatable({}, BaseObject)
 SlaveClock.__index = SlaveClock
 SlaveClock.ClassName = "SlaveClock"
 SlaveClock._offset = -1 -- Set uncalculated values to -1
@@ -16,14 +20,14 @@ SlaveClock._offset = -1 -- Set uncalculated values to -1
 	@return SlaveClock
 ]=]
 function SlaveClock.new(remoteEvent, remoteFunction)
-	local self = setmetatable({}, SlaveClock)
+	local self = setmetatable(BaseObject.new(), SlaveClock)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteFunction = remoteFunction or error("No remoteFunction")
 
-	self._remoteEvent.OnClientEvent:Connect(function(timeOne)
+	self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(timeOne)
 		self:_handleSyncEventAsync(timeOne)
-	end)
+	end))
 
 	self._remoteEvent:FireServer() -- Request server to syncronize with us
 

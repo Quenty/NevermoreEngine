@@ -28,6 +28,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/grouputils": "file:../grouputils",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
     "@quenty/servicebag": "file:../servicebag",

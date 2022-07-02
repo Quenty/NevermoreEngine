@@ -12,6 +12,9 @@ local Math = require("Math")
 
 local TransparencyService = {}
 
+--[=[
+	Initializes the transparency service
+]=]
 function TransparencyService:Init()
 	assert(not self._properties, "Already initialized")
 
@@ -21,12 +24,39 @@ function TransparencyService:Init()
 	}
 end
 
+--[=[
+	Uninitializes the transparency service, restoring transparency to original values.
+]=]
+function TransparencyService:Destroy()
+	for propertyName, storage in pairs(self._properties) do
+		for part, data in pairs(storage) do
+			part[propertyName] = data.original
+		end
+	end
+
+	self._properties = nil
+end
+
+--[=[
+	Sets the transparency of the part
+
+	@param key any
+	@param part Instance
+	@param transparency number
+]=]
 function TransparencyService:SetTransparency(key, part, transparency)
 	assert(self._properties, "Not initialized")
 
 	self:_set(key, part, "Transparency", transparency)
 end
 
+--[=[
+	Sets the local transparency modifier of the part
+
+	@param key any
+	@param part Instance
+	@param transparency number
+]=]
 function TransparencyService:SetLocalTransparencyModifier(key, part, transparency)
 	assert(self._properties, "Not initialized")
 
