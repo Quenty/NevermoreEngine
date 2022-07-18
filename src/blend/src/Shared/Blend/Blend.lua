@@ -298,7 +298,13 @@ function Blend.AccelTween(source, acceleration)
 	local accelerationObservable = Blend.toNumberObservable(acceleration)
 
 	local function createAccelTween(maid, initialValue)
-		local accelTween = AccelTween.new(initialValue)
+		local accelTween = AccelTween.new()
+
+		if initialValue then
+			accelTween.p = initialValue
+			accelTween.t = initialValue
+			accelTween.v = 0
+		end
 
 		if accelerationObservable then
 			maid:GiveTask(accelerationObservable:Subscribe(function(value)
