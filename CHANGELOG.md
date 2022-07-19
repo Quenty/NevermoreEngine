@@ -1,3 +1,16 @@
+# (Tue Jul 19 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/blend@4.2.1`
+  - fix: Fix broken initial value of Blend.AccelTween [#271](https://github.com/Quenty/NevermoreEngine/pull/271) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # (Sat Jul 02 2022)
 
 #### 🚀 Enhancement

@@ -1,3 +1,16 @@
+# v4.2.1 (Tue Jul 19 2022)
+
+#### 🐛 Bug Fix
+
+- fix: Fix broken initial value of Blend.AccelTween [#271](https://github.com/Quenty/NevermoreEngine/pull/271) ([@OttoHatt](https://github.com/OttoHatt))
+- fix: Fix broken initial value of AccelTween ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
