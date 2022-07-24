@@ -88,6 +88,7 @@ end
 	```
 	Maid[key] = (function)         Adds a task to perform
 	Maid[key] = (event connection) Manages an event connection
+	Maid[key] = (thread)           Manages a thread
 	Maid[key] = (Maid)             Maids can act as an event connection, allowing a Maid to have other maids to clean up.
 	Maid[key] = (Object)           Maids can cleanup objects with a `Destroy` method
 	Maid[key] = nil                Removes a named task.
@@ -197,6 +198,8 @@ function Maid:DoCleaning()
 		tasks[index] = nil
 		if type(job) == "function" then
 			job()
+		elseif type(job) == "thread" then
+			task.cancel(job)
 		elseif typeof(job) == "RBXScriptConnection" then
 			job:Disconnect()
 		elseif job.Destroy then
