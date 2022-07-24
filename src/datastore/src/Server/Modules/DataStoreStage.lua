@@ -17,6 +17,7 @@ local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local Signal = require("Signal")
 local Table = require("Table")
+local ValueObject = require("ValueObject")
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -245,7 +246,7 @@ end
 ]=]
 function DataStoreStage:StoreOnValueChange(name, valueObj)
 	assert(type(name) == "string", "Bad name")
-	assert(typeof(valueObj) == "Instance", "Bad valueObj")
+	assert(typeof(valueObj) == "Instance" or ValueObject.isValueObject(valueObj), "Bad valueObj")
 
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
