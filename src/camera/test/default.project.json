@@ -1,10 +1,20 @@
 {
-  "name": "cameratest",
+  "name": "CameraTest",
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
       "camera": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
       }
     }
   }
