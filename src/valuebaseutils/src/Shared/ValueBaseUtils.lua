@@ -68,7 +68,7 @@ end
 	@param parent Instance
 	@param instanceType string
 	@param name string
-	@param default any?
+	@param defaultValue any?
 	@return Instance
 ]=]
 function ValueBaseUtils.getOrCreateValue(parent, instanceType, name, defaultValue)
@@ -100,7 +100,7 @@ end
 	@param parent Instance
 	@param instanceType string
 	@param name string
-	@param default any?
+	@param value any
 	@return any
 ]=]
 function ValueBaseUtils.setValue(parent, instanceType, name, value)

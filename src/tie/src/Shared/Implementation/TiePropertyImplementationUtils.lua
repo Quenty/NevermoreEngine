@@ -2,8 +2,6 @@
 	@class TiePropertyImplementationUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local TiePropertyImplementationUtils = {}
 
 function TiePropertyImplementationUtils.changeToClassIfNeeded(memberDefinition, folder, className)

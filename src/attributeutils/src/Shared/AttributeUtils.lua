@@ -29,11 +29,15 @@ local VALID_ATTRIBUTE_TYPES = {
 }
 
 --[=[
-	Returns whether the attribute is valid or not.
+	Returns whether the attribute is a valid type or not for an attribute.
+
+	```lua
+	print(AttributeUtils.isValidAttributeType(typeof("hi"))) --> true
+	```
 
 	@param valueType string
 	@return boolean
---]=]
+]=]
 function AttributeUtils.isValidAttributeType(valueType)
 	return VALID_ATTRIBUTE_TYPES[valueType] == true
 end
