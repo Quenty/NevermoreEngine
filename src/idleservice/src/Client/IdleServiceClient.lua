@@ -10,13 +10,12 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 
-local HumanoidTrackerService = require("HumanoidTrackerService")
 local Maid = require("Maid")
 local RagdollBindersClient = require("RagdollBindersClient")
+local Rx = require("Rx")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local StateStack = require("StateStack")
 local ValueObject = require("ValueObject")
-local Rx = require("Rx")
 
 local IdleServiceClient = {}
 
@@ -35,9 +34,10 @@ function IdleServiceClient:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("RagdollServiceClient"))
-	self._humanoidTracker = self._serviceBag:GetService(HumanoidTrackerService):GetHumanoidTracker()
+	self._humanoidTracker = self._serviceBag:GetService(require("HumanoidTrackerService")):GetHumanoidTracker()
 	self._ragdollBindersClient = self._serviceBag:GetService(RagdollBindersClient)
 
+	-- Configure
 	self._disabledStack = StateStack.new(false)
 	self._maid:GiveTask(self._disabledStack)
 
