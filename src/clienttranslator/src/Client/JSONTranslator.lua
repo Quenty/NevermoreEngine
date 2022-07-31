@@ -16,6 +16,7 @@ local Observable = require("Observable")
 local Maid = require("Maid")
 local Blend = require("Blend")
 local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
@@ -63,6 +64,24 @@ function JSONTranslator.new(...)
 	return self
 end
 
+--[=[
+	Observes the current locale id for this translator.
+
+	@return Observable<string>
+]=]
+function JSONTranslator:ObserveLocaleId()
+	return Rx.fromPromise(self._promiseTranslator):Pipe({
+		Rx.switchMap(function(translator)
+			return RxInstanceUtils.observeProperty(translator, "LocaleId")
+		end)
+	})
+end
+
+--[=[
+	Gets the localization table the translation is using.
+
+	@return LocalizaitonTable
+]=]
 function JSONTranslator:GetLocalizationTable()
 	return self._localizationTable
 end

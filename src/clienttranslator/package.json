@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/blend": "file:../blend",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
