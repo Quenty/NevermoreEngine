@@ -114,6 +114,8 @@ function Maid:__newindex(index, newTask)
 	if oldTask then
 		if type(oldTask) == "function" then
 			oldTask()
+		elseif type(oldTask) == "thread" then
+			task.cancel(oldTask)
 		elseif typeof(oldTask) == "RBXScriptConnection" then
 			oldTask:Disconnect()
 		elseif oldTask.Destroy then

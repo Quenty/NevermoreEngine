@@ -32,9 +32,7 @@
     "@quenty/remoting": "file:../remoting",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/string": "file:../string",
-    "@quenty/templateprovider": "file:../templateprovider"
-  },
-  "peerDependencies": {
+    "@quenty/templateprovider": "file:../templateprovider",
     "@quentystudios/cmdr": "^1.8.4-quenty.1"
   },
   "publishConfig": {

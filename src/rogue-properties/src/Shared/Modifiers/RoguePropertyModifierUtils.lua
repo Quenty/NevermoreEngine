@@ -18,4 +18,8 @@ function RoguePropertyModifierUtils.observeSourceLinksBrio(modifier)
 	return RxLinkUtils.observeValidLinksBrio(RoguePropertyModifierConstants.PROPERTY_SOURCE_LINK_NAME, modifier)
 end
 
+function RoguePropertyModifierUtils.getSourceFromModifier(modifier)
+	return LinkUtils.getLinkValue(RoguePropertyModifierConstants.PROPERTY_SOURCE_LINK_NAME, modifier)
+end
+
 return RoguePropertyModifierUtils

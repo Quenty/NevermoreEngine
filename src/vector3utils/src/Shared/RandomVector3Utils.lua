@@ -19,6 +19,25 @@ function RandomVector3Utils.getRandomUnitVector(): Vector3
 	return Vector3.new(rx, ry, rz)
 end
 
+local function gaussianRandom()
+	return math.sqrt(-2*math.log(1 - math.random()))*math.cos(2*math.pi*math.random())
+end
+
+--[=[
+	Computes a gaussian random vector3.
+
+	@param mean Vector3 -- center
+	@param spread Vector3 -- std deviation
+	@return Vector3
+]=]
+function RandomVector3Utils.gaussianRandom(mean: Vector3, spread: Vector3): Vector3
+	return mean + spread*Vector3.new(
+		gaussianRandom(),
+		gaussianRandom(),
+		gaussianRandom()
+	)/math.sqrt(3)
+end
+
 --[=[
 	Gets a uniformally distributed random unit vector3 in the direction
 	specified.

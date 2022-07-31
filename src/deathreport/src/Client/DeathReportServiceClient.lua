@@ -73,6 +73,26 @@ function DeathReportServiceClient:ObservePlayerDeathReports(player)
 end
 
 --[=[
+	Observes killer reports for the given humanoid
+
+	@param humanoid Humanoid
+	@return Observable<DeathReport>
+]=]
+function DeathReportServiceClient:ObserveHumanoidKillerReports(humanoid)
+	return self._reportProcessor:ObserveHumanoidKillerReports(humanoid)
+end
+
+--[=[
+	Observes death reports for the given humanoid
+
+	@param humanoid Humanoid
+	@return Observable<DeathReport>
+]=]
+function DeathReportServiceClient:ObserveHumanoidDeathReports(humanoid)
+	return self._reportProcessor:ObserveHumanoidDeathReports(humanoid)
+end
+
+--[=[
 	Gets the last recorded death reports
 	@return { DeathReport }
 ]=]

@@ -4,34 +4,69 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local TieUtils = require("TieUtils")
 local TieSignalInterface = require("TieSignalInterface")
 local TiePropertyInterface = require("TiePropertyInterface")
+local TieMethodInterfaceUtils = require("TieMethodInterfaceUtils")
 
 local TieInterface = {}
 TieInterface.ClassName = "TieInterface"
 TieInterface.__index = TieInterface
 
-function TieInterface.new(definition, adornee)
+function TieInterface.new(definition, folder, adornee)
 	local self = setmetatable({}, TieInterface)
 
+	assert(folder or adornee, "Folder or adornee required")
+
 	self._definition = assert(definition, "No definition")
-	self._adornee = assert(adornee, "No adornee")
+	self._folder = folder -- could be nil
+	self._adornee = adornee -- could be nil
 	self._memberDefinitionMap = self._definition:GetMemberMap()
 
 	return self
 end
 
+--[=[
+	Returns whether this version of the definition is implemented to standard or not.
+
+	@return boolean
+]=]
 function TieInterface:IsImplemented()
+	local folder = rawget(self, "_folder")
 	local adornee = rawget(self, "_adornee")
 	local definition = rawget(self, "_definition")
+
+	if folder then
+		if adornee then
+			if folder.Parent ~= adornee then
+				return false
+			end
+
+			if folder.Name ~= self:GetContainerName() then
+				return false
+			end
+		end
+
+		return definition:IsImplementation(folder)
+	end
 
 	return definition:HasImplementation(adornee)
 end
 
+--[=[
+	@return Observable<boolean>
+]=]
 function TieInterface:ObserveIsImplemented()
+	local folder = rawget(self, "_folder")
 	local adornee = rawget(self, "_adornee")
 	local definition = rawget(self, "_definition")
+
+	if folder then
+		if adornee then
+			return definition:ObserveIsImplementationOn(folder, adornee)
+		else
+			return definition:ObserveIsImplementation(folder)
+		end
+	end
 
 	return definition:ObserveIsImplemented(adornee)
 end
@@ -42,36 +77,19 @@ function TieInterface:__index(index)
 	if member then
 		if member.ClassName == "TieMethodDefinition" then
 			local adornee = rawget(self, "_adornee")
-			return function(firstArg, ...)
-				if firstArg ~= self then
-					error(("Must call methods with self as first parameter (Hint use `%s:%s()` instead of `%s.%s()`)"):format(
-						definition:GetName(),
-						member:GetMemberName(),
-						definition:GetName(),
-						member:GetMemberName()))
-				end
+			local folder = rawget(self, "_folder")
 
-				local folder = adornee:FindFirstChild(definition:GetContainerName())
-				if not folder then
-					error("No folder")
-				end
-
-				local bindableFunction = folder:FindFirstChild(member:GetMemberName())
-				if not bindableFunction then
-					error("No bindableFunction")
-				end
-
-				return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))
-			end;
+			return TieMethodInterfaceUtils.get(self, definition, member, folder, adornee)
 		elseif member.ClassName == "TieSignalDefinition" then
-			-- TODO: Signal implementation
 			local adornee = rawget(self, "_adornee")
+			local folder = rawget(self, "_folder")
 
-			return TieSignalInterface.new(adornee, member)
+			return TieSignalInterface.new(folder, adornee, member)
 		elseif member.ClassName == "TiePropertyDefinition" then
 			local adornee = rawget(self, "_adornee")
+			local folder = rawget(self, "_folder")
 
-			return TiePropertyInterface.new(adornee, member)
+			return TiePropertyInterface.new(folder, adornee, member)
 		else
 			error(("Unknown member definition %q"):format(tostring(member.ClassName)))
 		end

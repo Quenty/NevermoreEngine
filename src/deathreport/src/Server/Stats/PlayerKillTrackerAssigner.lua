@@ -21,6 +21,8 @@ function PlayerKillTrackerAssigner.new(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._deathReportBindersServer = self._serviceBag:GetService(DeathReportBindersServer)
 
+	self._killTrackers = {}
+
 	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
 		self:_handlePlayerAdded(player)
 	end))
@@ -35,6 +37,24 @@ function PlayerKillTrackerAssigner.new(serviceBag)
 	return self
 end
 
+function PlayerKillTrackerAssigner:GetPlayerKills(player)
+	local tracker = self:GetPlayerKillTracker(player)
+	if tracker then
+		return tracker:GetKills()
+	else
+		return nil
+	end
+end
+
+function PlayerKillTrackerAssigner:GetPlayerKillTracker(player)
+	local trackerInstance = self._killTrackers[player]
+	if trackerInstance then
+		return self._deathReportBindersServer.PlayerKillTracker:Get(trackerInstance)
+	else
+		return nil
+	end
+end
+
 function PlayerKillTrackerAssigner:_handlePlayerRemoving(player)
 	self._maid[player] = nil
 end
@@ -44,6 +64,12 @@ function PlayerKillTrackerAssigner:_handlePlayerAdded(player)
 
 	local killTracker = PlayerKillTrackerUtils.create(self._deathReportBindersServer.PlayerKillTracker, player)
 	maid:GiveTask(killTracker)
+
+	self._killTrackers[player] = killTracker
+
+	maid:GiveTask(function()
+		self._killTrackers[player] = nil
+	end)
 
 	local deathTracker = PlayerKillTrackerUtils.create(self._deathReportBindersServer.PlayerDeathTracker, player)
 	maid:GiveTask(deathTracker)

@@ -2,8 +2,6 @@
 	@class RoguePropertyTable
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local RunService = game:GetService("RunService")
 
 local RoguePropertyTable = {}

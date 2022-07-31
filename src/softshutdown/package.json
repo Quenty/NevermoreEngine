@@ -38,8 +38,10 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
+    "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
+    "@quenty/table": "file:../table",
     "@quenty/teleportserviceutils": "file:../teleportserviceutils",
     "@quenty/uiobjectutils": "file:../uiobjectutils",
     "@quenty/valuebaseutils": "file:../valuebaseutils"

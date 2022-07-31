@@ -2,8 +2,6 @@
 	@class TieUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local TieUtils = {}
 
 --[=[

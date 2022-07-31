@@ -3,8 +3,6 @@
 	@class InputKeyMapServiceClient
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local RunService = game:GetService("RunService")
 
 local InputKeyMapServiceClient = {}

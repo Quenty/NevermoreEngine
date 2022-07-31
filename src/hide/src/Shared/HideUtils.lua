@@ -3,8 +3,6 @@
 	@class HideUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local CollectionService = game:GetService("CollectionService")
 local HideUtils = {}
 

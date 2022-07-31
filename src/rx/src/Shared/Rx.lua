@@ -1273,6 +1273,44 @@ function Rx.delay(seconds)
 end
 
 --[=[
+	Emits output every `n` seconds
+
+	@param initialDelaySeconds number
+	@param seconds number
+	@return (source: Observable<number>) -> Observable<number>
+]=]
+function Rx.timer(initialDelaySeconds, seconds)
+	assert(type(initialDelaySeconds) == "number" or initialDelaySeconds == nil, "Bad initialDelaySeconds")
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local number = -1
+		local running = true
+
+		local thread = task.spawn(function()
+			if initialDelaySeconds and initialDelaySeconds > 0 then
+				task.wait(initialDelaySeconds)
+			end
+
+			while running do
+				number += 1
+				sub:Fire(number)
+				task.wait(seconds)
+			end
+		end)
+
+		maid:GiveTask(function()
+			running = false
+			coroutine.close(thread)
+		end)
+
+		return maid
+	end)
+end
+
+--[=[
 	Honestly, I have not used this one much.
 
 	https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom

@@ -263,8 +263,12 @@ function ServiceBag:Destroy()
 	local key, service = next(services)
 	while service ~= nil do
 		services[key] = nil
-		if service.Destroy then
-			service:Destroy()
+		if not self._serviceTypesToInitializeSet[key] then
+			task.spawn(function()
+				if service.Destroy then
+					service:Destroy()
+				end
+			end)
 		end
 		key, service = next(services)
 	end

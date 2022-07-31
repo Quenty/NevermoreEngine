@@ -57,14 +57,7 @@ function CoreGuiEnabler.new()
 	end)
 
 	self:AddState("MouseIconEnabled", function(isEnabled)
-		if isEnabled then
-			UserInputService.MouseIconEnabled = isEnabled
-		else
-			UserInputService.MouseIconEnabled = false
-			self._maid:GiveTask(UserInputService:GetPropertyChangedSignal("MouseIconEnabled"):Connect(function()
-				UserInputService.MouseIconEnabled = false
-			end))
-		end
+		UserInputService.MouseIconEnabled = isEnabled
 	end)
 
 	return self

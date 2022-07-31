@@ -33,13 +33,13 @@ function RogueProperty.new(adornee, serviceBag, definition)
 	self._definition = assert(definition, "Bad definition")
 
 	if self._roguePropertyService:CanInitializeProperties() then
-		self:_getBaseValueObject()
+		self:GetBaseValueObject()
 	end
 
 	return self
 end
 
-function RogueProperty:_getBaseValueObject()
+function RogueProperty:GetBaseValueObject()
 	local parent
 	local tableDefinition = self._definition:GetPropertyTableDefinition()
 	if tableDefinition then
@@ -81,7 +81,7 @@ function RogueProperty:_observeBaseValueBrio()
 end
 
 function RogueProperty:SetBaseValue(value)
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 	if baseValue then
 		baseValue.Value = self:_encodeValue(value)
 	else
@@ -90,7 +90,7 @@ function RogueProperty:SetBaseValue(value)
 end
 
 function RogueProperty:GetBaseValue()
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 	if baseValue then
 		return self:_decodeValue(baseValue.Value)
 	else
@@ -100,7 +100,7 @@ end
 
 
 function RogueProperty:GetValue()
-	local propObj = self:_getBaseValueObject()
+	local propObj = self:GetBaseValueObject()
 	if not propObj then
 		return self._definition:GetDefaultValue()
 	end
@@ -169,6 +169,7 @@ function RogueProperty:Observe()
 			return current
 		end);
 		RxBrioUtils.emitOnDeath(self._definition:GetDefaultValue());
+		Rx.defaultsTo(self._definition:GetDefaultValue());
 	})
 end
 
@@ -176,7 +177,7 @@ function RogueProperty:CreateMultiplier(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
 	local provider = self._serviceBag:GetService(RogueMultiplierProvider)
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
 		warn("Failed to get the baseValue to parent")
@@ -192,7 +193,7 @@ function RogueProperty:CreateAdditive(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
 	local provider = self._serviceBag:GetService(RogueAdditiveProvider)
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
 		warn("Failed to get the baseValue to parent")
@@ -208,7 +209,7 @@ function RogueProperty:CreateSetter(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
 	local provider = self._serviceBag:GetService(RogueSetterProvider)
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
 		warn("Failed to get the baseValue to parent")

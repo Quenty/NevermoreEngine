@@ -29,33 +29,55 @@ TieDefinition.ClassName = "TieDefinition"
 TieDefinition.__index = TieDefinition
 
 TieDefinition.Types = Table.readonly({
-	METHOD = "method";
-	SIGNAL = "signal";
-	PROPERTY = "valueobject";
+	METHOD = Symbol.named("method");
+	SIGNAL = Symbol.named("signal");
+	PROPERTY = Symbol.named("property"); -- will default to nil
 })
 
-function TieDefinition.new(definitionName, methods)
+function TieDefinition.new(definitionName, members, isSharedDefinition)
 	local self = setmetatable({}, TieDefinition)
 
 	self._definitionName = assert(definitionName, "No definitionName")
 	self._memberMap = {}
 
-	for memberName, memberType in pairs(methods) do
+	self._isSharedDefinition = isSharedDefinition
+
+	for memberName, memberTypeOrDefaultValue in pairs(members) do
 		assert(type(memberName) == "string", "Bad memberName")
 
-		if memberType == TieDefinition.Types.METHOD then
+		if memberTypeOrDefaultValue == TieDefinition.Types.METHOD then
 			self._memberMap[memberName] = TieMethodDefinition.new(self, memberName)
-		elseif memberType == TieDefinition.Types.SIGNAL then
+		elseif memberTypeOrDefaultValue == TieDefinition.Types.SIGNAL then
 			self._memberMap[memberName] = TieSignalDefinition.new(self, memberName)
-		elseif memberType == TieDefinition.Types.PROPERTY then
-			self._memberMap[memberName] = TiePropertyDefinition.new(self, memberName)
+		elseif memberTypeOrDefaultValue == TieDefinition.Types.PROPERTY then
+			self._memberMap[memberName] = TiePropertyDefinition.new(self, memberName, nil)
 		else
-			error(("Bad memberType %q for member %q for %q"):format(
-				tostring(memberType), tostring(memberName), self._definitionName))
+			self._memberMap[memberName] = TiePropertyDefinition.new(self, memberName, memberTypeOrDefaultValue)
 		end
 	end
 
 	return self
+end
+
+--[=[
+	Gets all valid interfaces for this adornee
+	@param adornee Instance
+	@return { TieInterface }
+]=]
+function TieDefinition:GetImplementations(adornee: Instance)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	local implementations = {}
+
+	for _, item in pairs(adornee:GetChildren()) do
+		if item.Name == self:GetContainerName() then
+			if self:IsImplementation(item) then
+				table.insert(implementations, TieInterface.new(self, item, nil))
+			end
+		end
+	end
+
+	return implementations
 end
 
 --[=[
@@ -71,7 +93,7 @@ function TieDefinition:HasImplementation(adornee: Instance)
 		return false
 	end
 
-	return self:_checkImplementation(folder)
+	return self:IsImplementation(folder)
 end
 
 --[=[
@@ -82,7 +104,7 @@ end
 function TieDefinition:ObserveIsImplemented(adornee: Instance): boolean
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return self:ObserveImplementationBrio(adornee)
+	return self:ObserveLastImplementationBrio(adornee)
 		:Pipe({
 			RxBrioUtils.map(function(result)
 				return result and true or false
@@ -94,77 +116,149 @@ function TieDefinition:ObserveIsImplemented(adornee: Instance): boolean
 end
 
 --[=[
+	Observes whether the folder is a valid implementation
+	@param folder Instance
+	@return Observable<boolean>>
+]=]
+function TieDefinition:ObserveIsImplementation(folder: Folder)
+	return self:_observeImplementation(folder)
+		:Pipe({
+			RxBrioUtils.map(function(result)
+				return result and true or false
+			end);
+			RxBrioUtils.emitOnDeath(false);
+			Rx.defaultsTo(false);
+			Rx.distinct();
+		})
+end
+
+--[=[
+	Observes whether the folder is a valid implementation on the given adornee
+	@param folder Instance
+	@param adornee Instance
+	@return Observable<boolean>>
+]=]
+function TieDefinition:ObserveIsImplementedOn(folder: Folder, adornee: Instance)
+	assert(typeof(folder) == "Instance", "Bad folder")
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	return RxInstanceUtils.observePropertyBrio(folder, "Parent", function(parent)
+		return parent == adornee
+	end):Pipe({
+		RxBrioUtils.switchMapBrio(function()
+			return self:_observeImplementation(folder)
+		end);
+		RxBrioUtils.map(function(result)
+			return result and true or false
+		end);
+		RxBrioUtils.emitOnDeath(false);
+		Rx.defaultsTo(false);
+		Rx.distinct();
+	})
+end
+
+--[=[
 	Observes a valid implementation wrapped in a brio if it exists.
 	@param adornee Instance
 	@return Observable<Brio<TieImplementation<T>>>
 ]=]
-function TieDefinition:ObserveImplementationBrio(adornee: Instance)
+function TieDefinition:ObserveLastImplementationBrio(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return RxInstanceUtils.observeLastNamedChildBrio(adornee, "Folder", self:GetContainerName())
 		:Pipe({
 			RxBrioUtils.switchMapBrio(function(folder)
-				return Observable.new(function(sub)
-					-- Bind to all children, instead of individually. This is a
-					-- performance gain.
-
-					local maid = Maid.new()
-
-					local update
-					do
-						local isImplemented = ValueObject.new(UNSET_VALUE)
-						maid:GiveTask(isImplemented)
-
-						maid:GiveTask(isImplemented.Changed:Connect(function()
-							maid._brio = nil
-
-							if isImplemented.Value then
-								local brio = Brio.new(self:Get(adornee))
-								sub:Fire(brio)
-								maid._brio = brio
-							else
-								maid._brio = nil
-							end
-						end))
-
-						function update()
-							isImplemented.Value = self:_checkImplementation(folder)
-						end
-					end
-
-					maid:GiveTask(folder.ChildAdded:Connect(function(child)
-						maid[child] = child:GetPropertyChangedSignal("Name"):Connect(update)
-						update()
-					end))
-
-					maid:GiveTask(folder.ChildRemoved:Connect(function(child)
-						maid[child] = nil
-						update()
-					end))
-
-					for _, child in pairs(folder:GetChildren()) do
-						maid[child] = child:GetPropertyChangedSignal("Name"):Connect(update)
-					end
-
-					update()
-
-					return maid
-				end)
+				return self:_observeImplementation(folder)
 			end)
 		})
+end
+
+--[=[
+	Observes valid implementations wrapped in a brio if it exists.
+	@param adornee Instance
+	@return Observable<Brio<TieImplementation<T>>>
+]=]
+function TieDefinition:ObserveImplementationsBrio(adornee: Instance)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	return RxInstanceUtils.observeChildrenOfNameBrio(adornee, "Folder", self:GetContainerName())
+		:Pipe({
+			RxBrioUtils.flatMapBrio(function(folder)
+				return self:_observeImplementation(folder)
+			end)
+		})
+end
+
+function TieDefinition:_observeImplementation(folder)
+	return Observable.new(function(sub)
+		-- Bind to all children, instead of individually. This is a
+		-- performance gain.
+
+		local maid = Maid.new()
+
+		local update
+		do
+			local isImplemented = ValueObject.new(UNSET_VALUE)
+			maid:GiveTask(isImplemented)
+
+			maid:GiveTask(isImplemented.Changed:Connect(function()
+				maid._brio = nil
+
+				if isImplemented.Value then
+					local brio = Brio.new(TieInterface.new(self, folder, nil))
+					sub:Fire(brio)
+					maid._brio = brio
+				else
+					maid._brio = nil
+				end
+			end))
+
+			function update()
+				isImplemented.Value = self:IsImplementation(folder)
+			end
+		end
+
+		maid:GiveTask(folder.ChildAdded:Connect(function(child)
+			maid[child] = child:GetPropertyChangedSignal("Name"):Connect(update)
+			update()
+		end))
+
+		for memberName, member in pairs(self._memberMap) do
+			if member.ClassName == "TiePropertyDefinition" then
+				maid:GiveTask(folder:GetAttributeChangedSignal(memberName):Connect(update))
+			end
+		end
+
+		maid:GiveTask(folder.ChildRemoved:Connect(function(child)
+			maid[child] = nil
+			update()
+		end))
+
+		for _, child in pairs(folder:GetChildren()) do
+			maid[child] = child:GetPropertyChangedSignal("Name"):Connect(update)
+		end
+
+		update()
+
+		return maid
+	end)
 end
 
 --[=[
 	Ensures implementation of the object, binding table values and Lua OOP objects
 	to Roblox objects that can be invoked generally.
 
+	```lua
+
+	```
+
 	@param adornee Instance -- Adornee to implement interface on
-	@param implementer table -- Table with all interface values
+	@param implementer table? -- Table with all interface values or nil
 	@return TieImplementation<T>
 ]=]
 function TieDefinition:Implement(adornee: Instance, implementer)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
-	assert(type(implementer) == "table", "Bad implementer")
+	assert(type(implementer) == "table" or implementer == nil, "Bad implementer")
 
 	return TieImplementation.new(self, adornee, implementer)
 end
@@ -181,7 +275,7 @@ end
 function TieDefinition:Get(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return TieInterface.new(self, adornee)
+	return TieInterface.new(self, nil, adornee)
 end
 
 --[=[
@@ -193,7 +287,7 @@ function TieDefinition:GetName(): string
 end
 
 function TieDefinition:GetContainerName(): string
-	if RunService:IsClient() then
+	if RunService:IsClient() and not self._isSharedDefinition then
 		return self._definitionName .. "Client"
 	else
 		return self._definitionName
@@ -204,7 +298,8 @@ function TieDefinition:GetMemberMap()
 	return self._memberMap
 end
 
-function TieDefinition:_checkImplementation(folder)
+function TieDefinition:IsImplementation(folder)
+	local attributes = folder:GetAttributes()
 	local children = {}
 	for _, item in pairs(folder:GetChildren()) do
 		children[item.Name] = item
@@ -213,6 +308,14 @@ function TieDefinition:_checkImplementation(folder)
 	for memberName, member in pairs(self._memberMap) do
 		local found = children[memberName]
 		if not found then
+			if member.ClassName == "TiePropertyDefinition" then
+				if attributes[memberName] == nil then
+					return false
+				else
+					continue
+				end
+			end
+
 			return false
 		end
 
