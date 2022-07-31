@@ -17,14 +17,16 @@ local DeathReportUtils = {}
 	@param humanoid Humanomid
 	@return DeathReport
 ]=]
-function DeathReportUtils.fromDeceasedHumanoid(humanoid)
+function DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData)
+	assert(DeathReportUtils.isWeaponData(weaponData) or weaponData == nil, "Bad weaponData")
+
 	return {
 		adornee = humanoid.Parent;
 		humanoid = humanoid;
 		player = CharacterUtils.getPlayerFromCharacter(humanoid);
 		killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid);
 		killerPlayer = HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid);
-		weaponData = DeathReportUtils.createWeaponData();
+		weaponData = weaponData or DeathReportUtils.createWeaponData(nil);
 	}
 end
 
@@ -33,15 +35,20 @@ function DeathReportUtils.isDeathReport(deathReport)
 		and typeof(deathReport.humanoid) == "Instance"
 end
 
+function DeathReportUtils.isWeaponData(weaponData)
+	return type(weaponData) == "table" and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
+end
+
 --[=[
 	Creates weapon data information
 
 	@return WeaponData
 ]=]
-function DeathReportUtils.createWeaponData()
+function DeathReportUtils.createWeaponData(weaponInstance)
+	assert(typeof(weaponInstance) == "Instance" or weaponInstance == nil, "Bad weaponInstance")
+
 	return {
-		weaponKey = "test";
-		weaponInstance = nil;
+		weaponInstance = weaponInstance;
 	}
 end
 
