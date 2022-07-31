@@ -15,9 +15,6 @@
     "lerna": "^5.3.0",
     "moonwave": "^0.3.7"
   },
-  "workspaces": [
-    "./src/*"
-  ],
   "scripts": {
     "release": "auto shipit"
   },
