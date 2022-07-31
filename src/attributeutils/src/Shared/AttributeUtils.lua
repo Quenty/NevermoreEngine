@@ -11,6 +11,31 @@ local Maid = require("Maid")
 
 local AttributeUtils = {}
 
+local VALID_ATTRIBUTE_TYPES = {
+	["nil"] = true;
+	["string"] = true;
+	["boolean"] = true;
+	["number"] = true;
+	["UDim"] = true;
+	["UDim2"] = true;
+	["BrickColor"] = true;
+	["Color3"] = true;
+	["Vector2"] = true;
+	["Vector3"] = true;
+	["NumberSequence"] = true;
+	["ColorSequence"] = true;
+	["NumberRange"] = true;
+	["Rect"] = true;
+}
+
+--[=[
+	@param valueType string
+	@return boolean
+--]=]
+function AttributeUtils.isValidAttributeType(valueType)
+	return VALID_ATTRIBUTE_TYPES[valueType] == true
+end
+
 --[=[
 	Whenever the attribute is true, the binder will be bound, and when the
 	binder is bound, the attribute will be true.
