@@ -11,11 +11,11 @@ local BaseObject = require("BaseObject")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
 local IKResource = require("IKResource")
 local IKResourceUtils = require("IKResourceUtils")
+local LimbIKUtils = require("LimbIKUtils")
 local Maid = require("Maid")
 local Math = require("Math")
-local RagdollConstants = require("RagdollConstants")
-local LimbIKUtils = require("LimbIKUtils")
 local QFrame = require("QFrame")
+local RagdollConstants = require("RagdollConstants")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 local USE_OLD_IK_SYSTEM = false
