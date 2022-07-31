@@ -1,25 +1,18 @@
-# v1.4.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add DeathReport support for weapon data ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: weaponData being annotated wrong ([@Quenty](https://github.com/Quenty))
-- docs: Update docs and linting with more information ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@1.3.0...@quenty/deathreport@1.4.0) (2022-07-31)
+
+
+### Features
+
+* Add DeathReport support for weapon data ([010d5bd](https://github.com/Quenty/NevermoreEngine/commit/010d5bd760b456f52d1c50a5f6302e512ed57677))
+
+
+
+
 
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@1.2.0...@quenty/deathreport@1.3.0) (2022-07-02)
 

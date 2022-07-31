@@ -1,23 +1,18 @@
-# v1.4.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: SoftShutdown package has correct dependencies at top level ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@1.3.1...@quenty/softshutdown@1.4.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* SoftShutdown package has correct dependencies at top level ([d3ff4fb](https://github.com/Quenty/NevermoreEngine/commit/d3ff4fb3128c64c3e6b48fd3882c3b1bdc7614d4))
+
+
+
+
 
 ## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@1.3.0...@quenty/softshutdown@1.3.1) (2022-07-19)
 

@@ -1,29 +1,19 @@
-# v5.1.0 (Sun Jul 31 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, OptimisticSide ([@optimisticside](https://github.com/optimisticside)), for all your work!
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Promise uses task.defer() instead of Heartbeat ([@Quenty](https://github.com/Quenty))
-- fix: Replace coroutine.resume in favor of task.spawn [#260](https://github.com/Quenty/NevermoreEngine/pull/260) ([@optimisticside](https://github.com/optimisticside))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- OptimisticSide ([@optimisticside](https://github.com/optimisticside))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@5.0.0...@quenty/promise@5.1.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Promise uses task.defer() instead of Heartbeat ([0ae1e7a](https://github.com/Quenty/NevermoreEngine/commit/0ae1e7aa92543bf220ebd594772dea9b6b586612))
+* Replace coroutine.resume in favor of task.spawn ([#260](https://github.com/Quenty/NevermoreEngine/issues/260)) ([3686a1e](https://github.com/Quenty/NevermoreEngine/commit/3686a1e7926c0c5d116bd51843a95a5bb4e33743))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@4.2.0...@quenty/promise@5.0.0) (2022-05-21)
 

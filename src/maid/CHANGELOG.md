@@ -1,25 +1,23 @@
-# v2.4.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add thread-support for maids [#259](https://github.com/Quenty/NevermoreEngine/pull/259) ([@optimisticside](https://github.com/optimisticside))
-
-#### 🐛 Bug Fix
-
-- fix: Maid tasks cancel old threads upon rewrite ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- OptimisticSide ([@optimisticside](https://github.com/optimisticside))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.3.0...@quenty/maid@2.4.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Maid tasks cancel old threads upon rewrite ([f953eb8](https://github.com/Quenty/NevermoreEngine/commit/f953eb8650073a3da5b551239c87e8d9391bc858))
+
+
+### Features
+
+* Add thread-support for maids ([#259](https://github.com/Quenty/NevermoreEngine/issues/259)) ([b6f37fa](https://github.com/Quenty/NevermoreEngine/commit/b6f37fa430dad4c6801510335c62691c4b7b6e3c))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.2.0...@quenty/maid@2.3.0) (2022-03-27)
 

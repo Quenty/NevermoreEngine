@@ -1,24 +1,18 @@
-# v2.2.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add Tie bindings in the opposite direction allowing out-of-oop systems to bind to tie ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix additional docs and styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@2.1.0...@quenty/tie@2.2.0) (2022-07-31)
+
+
+### Features
+
+* Add Tie bindings in the opposite direction allowing out-of-oop systems to bind to tie ([6da4426](https://github.com/Quenty/NevermoreEngine/commit/6da4426bb47c9b88e099c461258163f8b26ee4b3))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@2.0.0...@quenty/tie@2.1.0) (2022-06-21)
 

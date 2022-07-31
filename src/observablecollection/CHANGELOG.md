@@ -1,24 +1,23 @@
-# v3.3.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableSortedList ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Prevent observables from being removed during insertion of observable ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.2.0...@quenty/observablecollection@3.3.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Prevent observables from being removed during insertion of observable ([27a3594](https://github.com/Quenty/NevermoreEngine/commit/27a35941f457f63a5f1dc84169448a750308fdc2))
+
+
+### Features
+
+* Add ObservableSortedList ([cca209f](https://github.com/Quenty/NevermoreEngine/commit/cca209fd8a6c2cfeb1ee6e39d2aabce0202b3072))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.1.0...@quenty/observablecollection@3.2.0) (2022-07-02)
 

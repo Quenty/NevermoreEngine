@@ -1,25 +1,23 @@
-# v2.3.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: RogueProperty has GetBaseValueObject API ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: RogueProperties work in test mode ([@Quenty](https://github.com/Quenty))
-- docs: Update docs and linting with more information ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@2.2.0...@quenty/rogue-properties@2.3.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* RogueProperties work in test mode ([e68b0e8](https://github.com/Quenty/NevermoreEngine/commit/e68b0e8fd883a2bdbd638d94656e35ecea6870e9))
+
+
+### Features
+
+* RogueProperty has GetBaseValueObject API ([424d3d6](https://github.com/Quenty/NevermoreEngine/commit/424d3d6fb032ae7f50199e9da0536266d2a56bb4))
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@2.1.0...@quenty/rogue-properties@2.2.0) (2022-07-02)
 

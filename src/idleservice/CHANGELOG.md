@@ -1,23 +1,18 @@
-# v5.4.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: IdleService has server component ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.3.0...@quenty/idleservice@5.4.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* IdleService has server component ([521670c](https://github.com/Quenty/NevermoreEngine/commit/521670c82acb3b992aec93f25807da8202682517))
+
+
+
+
 
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.2.0...@quenty/idleservice@5.3.0) (2022-07-02)
 

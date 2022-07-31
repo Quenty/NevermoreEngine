@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundlinkutils@6.2.0...@quenty/boundlinkutils@6.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/boundlinkutils
+
+
+
+
+
 # [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundlinkutils@6.1.0...@quenty/boundlinkutils@6.2.0) (2022-07-02)
 
 **Note:** Version bump only for package @quenty/boundlinkutils

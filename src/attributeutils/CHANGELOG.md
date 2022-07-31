@@ -1,26 +1,19 @@
-# v6.2.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add AttributeUtils.isValidAttributeType(valueType) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxAttributeUtils.observeAttributeBrio API call ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix additional docs and styling ([@Quenty](https://github.com/Quenty))
-- docs: Update docs and linting with more information ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@6.1.0...@quenty/attributeutils@6.2.0) (2022-07-31)
+
+
+### Features
+
+* Add AttributeUtils.isValidAttributeType(valueType) ([b77392b](https://github.com/Quenty/NevermoreEngine/commit/b77392b4e373c297fdc7b79bd26ef218ac327f18))
+* Add RxAttributeUtils.observeAttributeBrio API call ([e0e827f](https://github.com/Quenty/NevermoreEngine/commit/e0e827fcf9a17c4ff0ecad0209bcc976912ae3b5))
+
+
+
+
 
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@6.0.0...@quenty/attributeutils@6.1.0) (2022-06-21)
 

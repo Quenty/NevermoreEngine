@@ -1,24 +1,18 @@
-# v5.4.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Allow server-side execution of cmdr commands without an executor and allow only client-side commands ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Upgrade npm version to 18 from 12 and remove workspaces ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@5.3.0...@quenty/cmdrservice@5.4.0) (2022-07-31)
+
+
+### Features
+
+* Allow server-side execution of cmdr commands without an executor and allow only client-side commands ([e0d5189](https://github.com/Quenty/NevermoreEngine/commit/e0d5189a65ef813138e1f0065c7e933db47cb0a2))
+
+
+
+
 
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@5.2.0...@quenty/cmdrservice@5.3.0) (2022-07-02)
 

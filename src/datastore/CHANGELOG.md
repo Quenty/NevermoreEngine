@@ -1,25 +1,24 @@
-# v5.3.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Support StoreOnValueChange with non ValueBase instances. ([@Quenty](https://github.com/Quenty))
-- feat: Add GameDataStoreService service for global game data ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add DataStore SetCacheTime (not implemented yet) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@5.2.0...@quenty/datastore@5.3.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Add DataStore SetCacheTime (not implemented yet) ([906e723](https://github.com/Quenty/NevermoreEngine/commit/906e72397075200e8cb8b98bc8b7b7f96d992907))
+
+
+### Features
+
+* Add GameDataStoreService service for global game data ([5f6d52c](https://github.com/Quenty/NevermoreEngine/commit/5f6d52ca9f2be811c426714cd6d94d9794f366b5))
+* Support StoreOnValueChange with non ValueBase instances. ([ab45498](https://github.com/Quenty/NevermoreEngine/commit/ab4549833f41f2b3d8b43202965fd3202b649770))
+
+
+
+
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@5.1.0...@quenty/datastore@5.2.0) (2022-07-02)
 

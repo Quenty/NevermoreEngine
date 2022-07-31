@@ -1,20 +1,18 @@
-# v2.3.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxTeamUtils.observeEnemyTeamColorPlayersBrio(teamColor) and documentation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@2.2.0...@quenty/teamutils@2.3.0) (2022-07-31)
+
+
+### Features
+
+* Add RxTeamUtils.observeEnemyTeamColorPlayersBrio(teamColor) and documentation ([25690cb](https://github.com/Quenty/NevermoreEngine/commit/25690cb306dc2c6a140e3c12bacc9cec945a5b11))
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@2.1.0...@quenty/teamutils@2.2.0) (2022-06-21)
 

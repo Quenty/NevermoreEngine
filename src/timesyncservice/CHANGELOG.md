@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timesyncservice@5.2.0...@quenty/timesyncservice@5.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/timesyncservice
+
+
+
+
+
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timesyncservice@5.1.0...@quenty/timesyncservice@5.2.0) (2022-07-02)
 
 

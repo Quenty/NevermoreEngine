@@ -1,23 +1,18 @@
-# v5.1.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Ensure deconstructing service does not affect other services ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@5.0.0...@quenty/servicebag@5.1.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Ensure deconstructing service does not affect other services ([9ac2b9c](https://github.com/Quenty/NevermoreEngine/commit/9ac2b9c2ea4c1a68677182fd77103fcd0b5c6864))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@4.2.0...@quenty/servicebag@5.0.0) (2022-05-21)
 

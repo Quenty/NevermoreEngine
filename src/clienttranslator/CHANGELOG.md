@@ -1,20 +1,18 @@
-# v6.3.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObserveLocaleId() to JSONTranslator ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.2.1...@quenty/clienttranslator@6.3.0) (2022-07-31)
+
+
+### Features
+
+* Add ObserveLocaleId() to JSONTranslator ([b805a9e](https://github.com/Quenty/NevermoreEngine/commit/b805a9e2170623d17cc2a832ea78d867d829e094))
+
+
+
+
 
 ## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.2.0...@quenty/clienttranslator@6.2.1) (2022-07-19)
 

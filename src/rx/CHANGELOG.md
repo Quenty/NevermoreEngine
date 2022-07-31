@@ -1,20 +1,18 @@
-# v5.2.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add Rx.timer() method ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@5.1.0...@quenty/rx@5.2.0) (2022-07-31)
+
+
+### Features
+
+* Add Rx.timer() method ([36378c1](https://github.com/Quenty/NevermoreEngine/commit/36378c1d7fc4948d3e455a6bca487bc3552a5a6c))
+
+
+
+
 
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@5.0.0...@quenty/rx@5.1.0) (2022-06-21)
 

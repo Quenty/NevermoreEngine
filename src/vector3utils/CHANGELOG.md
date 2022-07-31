@@ -1,20 +1,18 @@
-# v5.1.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: add RandomVector3Utils.gaussianRandom() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@5.0.0...@quenty/vector3utils@5.1.0) (2022-07-31)
+
+
+### Features
+
+* add RandomVector3Utils.gaussianRandom() ([e131c4b](https://github.com/Quenty/NevermoreEngine/commit/e131c4b1a657163dc81f871f3ad1c85148d7434c))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@4.2.0...@quenty/vector3utils@5.0.0) (2022-05-21)
 

@@ -1,23 +1,15 @@
-# v7.3.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Add CameraStackService test ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@7.2.0...@quenty/camera@7.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
 
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@7.1.0...@quenty/camera@7.2.0) (2022-07-02)
 

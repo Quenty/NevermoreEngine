@@ -1,20 +1,18 @@
-# v3.4.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: API calls in GameProductService support passids or string keys to retrieve the passes. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@3.3.1...@quenty/gameproductservice@3.4.0) (2022-07-31)
+
+
+### Features
+
+* API calls in GameProductService support passids or string keys to retrieve the passes. ([083170e](https://github.com/Quenty/NevermoreEngine/commit/083170e92bf2e71628edd17bf526d4b0936fe1a9))
+
+
+
+
 
 ## [3.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@3.3.0...@quenty/gameproductservice@3.3.1) (2022-07-19)
 

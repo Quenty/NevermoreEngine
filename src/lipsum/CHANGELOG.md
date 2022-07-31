@@ -1,23 +1,18 @@
-# v6.3.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: LipsumUtils gsus l with 1 correctly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@6.2.1...@quenty/lipsum@6.3.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* LipsumUtils gsus l with 1 correctly ([c1b349d](https://github.com/Quenty/NevermoreEngine/commit/c1b349d4fc58dd9330810a328eeef5c1665bbb5d))
+
+
+
+
 
 ## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@6.2.0...@quenty/lipsum@6.2.1) (2022-07-19)
 

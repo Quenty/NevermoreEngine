@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/applytagtotaggedchildren@5.0.0...@quenty/applytagtotaggedchildren@5.1.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/applytagtotaggedchildren
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/applytagtotaggedchildren@4.2.0...@quenty/applytagtotaggedchildren@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/applytagtotaggedchildren

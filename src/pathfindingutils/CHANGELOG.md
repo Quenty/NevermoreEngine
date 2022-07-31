@@ -1,23 +1,18 @@
-# v5.2.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Wrap promiseComputeAsync with pcall, as path finding can fail on long path call requests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@5.1.0...@quenty/pathfindingutils@5.2.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Wrap promiseComputeAsync with pcall, as path finding can fail on long path call requests ([ca4faf5](https://github.com/Quenty/NevermoreEngine/commit/ca4faf595aed12b8de59eb1400e794b1db68d1d6))
+
+
+
+
 
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@5.0.0...@quenty/pathfindingutils@5.1.0) (2022-06-21)
 

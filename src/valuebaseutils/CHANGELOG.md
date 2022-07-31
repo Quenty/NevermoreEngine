@@ -1,24 +1,18 @@
-# v5.2.0 (Sun Jul 31 2022)
-
-#### 🚀 Enhancement
-
-- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
-- feat: Add ValueBaseUtils.getValueBaseType(valueBaseClassName) and ValueBaseUtils.getClassNameFromType(luaType) as well as docs ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix additional docs and styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@5.1.0...@quenty/valuebaseutils@5.2.0) (2022-07-31)
+
+
+### Features
+
+* Add ValueBaseUtils.getValueBaseType(valueBaseClassName) and ValueBaseUtils.getClassNameFromType(luaType) as well as docs ([1e0097d](https://github.com/Quenty/NevermoreEngine/commit/1e0097d22dcdc7051d1bf893c69056807926c301))
+
+
+
+
 
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@5.0.0...@quenty/valuebaseutils@5.1.0) (2022-06-21)
 
