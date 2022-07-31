@@ -45,7 +45,7 @@ end
 --[=[
 	Returns true if a WeaponData
 
-	@param deathReport any
+	@param weaponData any
 	@return boolean
 ]=]
 function DeathReportUtils.isWeaponData(weaponData)
