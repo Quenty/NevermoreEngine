@@ -112,7 +112,7 @@ end
 
 --[=[
 	Sets the disabled color
-	@param enabledColor Color3
+	@param disabledColor Color3
 ]=]
 function RadialImage:SetDisabledColor(disabledColor)
 	assert(typeof(disabledColor) == "Color3", "Bad disabledColor")
