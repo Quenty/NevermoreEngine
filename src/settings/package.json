@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/datastore": "file:../datastore",
     "@quenty/jsonutils": "file:../jsonutils",
