@@ -1,3 +1,20 @@
+# v5.4.0 (Sun Jul 31 2022)
+
+#### 🚀 Enhancement
+
+- July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
+- feat: Allow server-side execution of cmdr commands without an executor and allow only client-side commands ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- ci: Upgrade npm version to 18 from 12 and remove workspaces ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

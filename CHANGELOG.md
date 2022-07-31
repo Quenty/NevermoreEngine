@@ -1,3 +1,28 @@
+# (Sun Jul 31 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, OptimisticSide ([@optimisticside](https://github.com/optimisticside)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@6.2.0`, `@quenty/camera@7.3.0`, `@quenty/chatproviderservice@1.1.0`, `@quenty/clienttranslator@6.3.0`, `@quenty/cmdrservice@5.4.0`, `@quenty/coreguienabler@5.2.0`, `@quenty/datastore@5.3.0`, `@quenty/deathreport@1.4.0`, `@quenty/gameproductservice@3.4.0`, `@quenty/hide@3.3.0`, `@quenty/idleservice@5.4.0`, `@quenty/ik@7.4.0`, `@quenty/inputkeymaputils@5.3.0`, `@quenty/lipsum@6.3.0`, `@quenty/maid@2.4.0`, `@quenty/observablecollection@3.3.0`, `@quenty/pathfindingutils@5.2.0`, `@quenty/playerinputmode@1.1.0`, `@quenty/playerutils@1.1.0`, `@quenty/policyserviceutils@1.1.0`, `@quenty/promise@5.1.0`, `@quenty/radial-image@1.1.0`, `@quenty/rogue-properties@2.3.0`, `@quenty/rx@5.2.0`, `@quenty/servicebag@5.1.0`, `@quenty/settings@2.3.0`, `@quenty/softshutdown@1.4.0`, `@quenty/teamutils@2.3.0`, `@quenty/textfilterutils@5.1.0`, `@quenty/tie@2.2.0`, `@quenty/userserviceutils@2.1.0`, `@quenty/valuebaseutils@5.2.0`, `@quenty/vector3utils@5.1.0`
+  - July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
+- `@quenty/maid@2.4.0`
+  - feat: Add thread-support for maids [#259](https://github.com/Quenty/NevermoreEngine/pull/259) ([@optimisticside](https://github.com/optimisticside))
+
+#### 🐛 Bug Fix
+
+- `@quenty/promise@5.1.0`
+  - fix: Replace coroutine.resume in favor of task.spawn [#260](https://github.com/Quenty/NevermoreEngine/pull/260) ([@optimisticside](https://github.com/optimisticside))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- OptimisticSide ([@optimisticside](https://github.com/optimisticside))
+
+---
+
 # (Tue Jul 19 2022)
 
 #### 🐛 Bug Fix
