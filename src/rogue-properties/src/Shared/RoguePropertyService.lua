@@ -42,10 +42,20 @@ function RoguePropertyService:AddProvider(provider)
 end
 
 function RoguePropertyService:GetProviders()
+	if not RunService:IsRunning() then
+		return {}
+	end
+
 	return self._providers
 end
 
 function RoguePropertyService:ObserveProviderList()
+	if not RunService:IsRunning() then
+		return Observable.new(function(sub)
+			sub:Fire({})
+		end)
+	end
+
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
