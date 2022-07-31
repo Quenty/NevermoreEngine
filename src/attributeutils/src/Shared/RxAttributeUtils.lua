@@ -48,7 +48,6 @@ end
 	Observes an attribute on an instance with a conditional statement.
 	@param instance Instance
 	@param attributeName string
-	@param defaultValue any?
 	@param condition function
 	@return Observable<Brio<any>>
 ]=]

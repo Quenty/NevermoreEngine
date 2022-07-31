@@ -15,6 +15,7 @@ local DeathReportUtils = {}
 	Constructs a new DeathReport from a humanoid
 
 	@param humanoid Humanomid
+	@param weaponData WeaponData
 	@return DeathReport
 ]=]
 function DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData)
@@ -30,11 +31,23 @@ function DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData)
 	}
 end
 
+--[=[
+	Returns true if a DeathReport
+
+	@param deathReport any
+	@return boolean
+]=]
 function DeathReportUtils.isDeathReport(deathReport)
 	return type(deathReport) == "table"
 		and typeof(deathReport.humanoid) == "Instance"
 end
 
+--[=[
+	Returns true if a WeaponData
+
+	@param deathReport any
+	@return boolean
+]=]
 function DeathReportUtils.isWeaponData(weaponData)
 	return type(weaponData) == "table" and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
 end
@@ -42,6 +55,7 @@ end
 --[=[
 	Creates weapon data information
 
+	@param weaponInstance Instance?
 	@return WeaponData
 ]=]
 function DeathReportUtils.createWeaponData(weaponInstance)
@@ -144,6 +158,10 @@ function DeathReportUtils.getKillerColor(deathReport)
 	return nil
 end
 
+--[=[
+	Gets the default color of a death report to use.
+	@return Color3
+]=]
 function DeathReportUtils.getDefaultColor()
 	return DEFAULT_COLOR
 end

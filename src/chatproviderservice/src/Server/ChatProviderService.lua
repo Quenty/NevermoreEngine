@@ -1,5 +1,6 @@
 --[=[
 	Wrapper around Roblox chat service on the server
+	@class ChatProviderService
 ]=]
 
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -11,6 +12,12 @@ local Maid = require("Maid")
 
 local ChatProviderService = {}
 
+--[=[
+	Sets the speaker's tag (by speaker name)
+
+	@param speakerName string
+	@param tags { ChatTagData }
+]=]
 function ChatProviderService:PromiseSetSpeakerTags(speakerName, tags)
 	assert(type(speakerName) == "string", "Bad speakerName")
 	assert(type(tags) == "table", "Bad tags")

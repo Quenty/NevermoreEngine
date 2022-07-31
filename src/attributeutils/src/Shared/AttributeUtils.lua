@@ -29,6 +29,8 @@ local VALID_ATTRIBUTE_TYPES = {
 }
 
 --[=[
+	Returns whether the attribute is valid or not.
+
 	@param valueType string
 	@return boolean
 --]=]

@@ -2,10 +2,7 @@
 	@class SlottedTouchButtonUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local SlottedTouchButtonUtils = {}
-
 
 --[=[
 	Internal data representing a slotted touch button

@@ -103,6 +103,7 @@ end
 	Returns true if you can reference a specific social media title
 
 	@param policyInfo PolicyInfo
+	@param socialInfoName string
 	@return boolean
 ]=]
 function PolicyServiceUtils.canReferenceSocialMedia(policyInfo, socialInfoName)
