@@ -24,9 +24,15 @@ function PathfindingUtils.promiseComputeAsync(path, start, finish)
 	assert(start, "Bad start")
 	assert(finish, "Bad finish")
 
-	return Promise.spawn(function(resolve, _)
-		path:ComputeAsync(start, finish)
-		resolve(path)
+	return Promise.spawn(function(resolve, reject)
+		local ok, err = pcall(function()
+			path:ComputeAsync(start, finish)
+		end)
+		if not ok then
+			reject(err or "Failed to compute path")
+			return
+		end
+		return resolve(path)
 	end)
 end
 
