@@ -245,7 +245,7 @@ end
 ]=]
 function DataStoreStage:StoreOnValueChange(name, valueObj)
 	assert(type(name) == "string", "Bad name")
-	assert(typeof(valueObj) == "Instance", "Bad valueObj")
+	assert(typeof(valueObj) == "Instance" or (type(valueObj) == "table" and valueObj.Changed), "Bad valueObj")
 
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
