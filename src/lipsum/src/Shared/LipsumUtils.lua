@@ -41,7 +41,7 @@ function LipsumUtils.username(random)
 			word = word:gsub("i", "1")
 		end
 		if random:NextNumber() <= 0.75 then
-			word = word:gsub("i", "1")
+			word = word:gsub("l", "1")
 		end
 	end
 
