@@ -37,6 +37,11 @@ function CmdrService:Init(serviceBag)
 	self._executeData = {}
 
 	self._cmdr.Registry:RegisterHook("BeforeRun", function(context)
+		-- allow!
+		if context.Executor == nil then
+			return nil
+		end
+
 		local providerPromise = self._permissionService:PromisePermissionProvider()
 		if providerPromise:IsPending() then
 			return "Still loading permissions"

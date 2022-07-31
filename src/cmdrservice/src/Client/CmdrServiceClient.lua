@@ -28,7 +28,48 @@ function CmdrServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
-	self._permissionService = self._serviceBag:GetService(PermissionServiceClient)
+	self._permissionServiceClient = self._serviceBag:GetService(PermissionServiceClient)
+
+	self:PromiseCmdr():Then(function(cmdr)
+		cmdr.Registry:RegisterHook("BeforeRun", function(context)
+			-- allow!
+			if context.Executor == nil then
+				return nil
+			end
+
+			local providerPromise = self._permissionServiceClient:PromisePermissionProvider()
+			if providerPromise:IsPending() then
+				return "Still loading permissions"
+			end
+
+			local ok, provider = providerPromise:Yield()
+			if not ok then
+				if type(provider) == "string" then
+					return provider
+				else
+					return "Failed to load permission provider"
+				end
+			end
+
+			local isAdmin
+			ok, isAdmin = provider:PromiseIsAdmin(context.Executor):Yield()
+			if not ok then
+				if type(provider) == "string" then
+					return provider
+				else
+					return "Failed to load permission provider"
+				end
+			end
+
+			if not isAdmin then
+				return "You don't have permission to run this command"
+			else
+				-- allow
+				return nil
+			end
+		end)
+
+	end)
 end
 
 --[=[
@@ -39,7 +80,7 @@ function CmdrServiceClient:Start()
 
 	self._maid:GivePromise(PromiseUtils.all({
 		self:PromiseCmdr(),
-		self._maid:GivePromise(self._permissionService:PromisePermissionProvider())
+		self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider())
 			:Then(function(provider)
 				return provider:PromiseIsAdmin()
 			end)
