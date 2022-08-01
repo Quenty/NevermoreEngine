@@ -1,3 +1,18 @@
+# (Mon Aug 01 2022)
+
+#### 🐛 Bug Fix
+
+- docs: Try to get moonwave to generate again [#277](https://github.com/Quenty/NevermoreEngine/pull/277) ([@Quenty](https://github.com/Quenty))
+- `@quenty/draw@4.1.1`
+  - fix: Disable CanQuery/CanTouch on debug line part [#275](https://github.com/Quenty/NevermoreEngine/pull/275) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jul 31 2022)
 
 :tada: This release contains work from a new contributor! :tada:

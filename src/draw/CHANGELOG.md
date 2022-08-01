@@ -1,3 +1,16 @@
+# v4.1.1 (Mon Aug 01 2022)
+
+#### 🐛 Bug Fix
+
+- fix: Disable CanQuery/CanTouch on debug line part [#275](https://github.com/Quenty/NevermoreEngine/pull/275) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
