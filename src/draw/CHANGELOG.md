@@ -1,20 +1,18 @@
-# v4.1.1 (Mon Aug 01 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Disable CanQuery/CanTouch on debug line part [#275](https://github.com/Quenty/NevermoreEngine/pull/275) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- [@OttoHatt](https://github.com/OttoHatt)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@4.1.0...@quenty/draw@4.1.1) (2022-08-01)
+
+
+### Bug Fixes
+
+* Disable CanQuery/CanTouch on debug line part ([#275](https://github.com/Quenty/NevermoreEngine/issues/275)) ([00c6cfd](https://github.com/Quenty/NevermoreEngine/commit/00c6cfd5958ba0cca8787f7976ab01bb45721cf2))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@4.0.0...@quenty/draw@4.1.0) (2022-06-21)
 
