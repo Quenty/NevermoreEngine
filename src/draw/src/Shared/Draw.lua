@@ -100,8 +100,8 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	rotatedPart.Anchored = true
 	rotatedPart.Archivable = false
 	rotatedPart.CanCollide = false
-	part.CanQuery = false
-	part.CanTouch = false
+	rotatedPart.CanQuery = false
+	rotatedPart.CanTouch = false
 	rotatedPart.CastShadow = false
 	rotatedPart.CFrame = CFrame.new(ray.Origin, ray.Origin + ray.Direction)
 	rotatedPart.Transparency = 1
