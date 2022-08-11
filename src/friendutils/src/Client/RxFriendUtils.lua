@@ -1,7 +1,8 @@
---[[
+--[=[
 	Utilities for observing the local player's friends.
+
 	@class RxFriendUtils
-]]
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
@@ -18,6 +19,7 @@ local RxFriendUtils = {}
 	Observe friends in the current server (not including the LocalPlayer!), useful for social GUIs.
 	The lifetimes exist for the whole duration another player is a friend and in your server.
 	This means if a player is unfriended + friended multiple times per session, they will have emitted multiple friend lifetimes.
+
 	@return Observable<Brio<Player>>
 ]=]
 function RxFriendUtils.observeFriendsInServerAsBrios()
