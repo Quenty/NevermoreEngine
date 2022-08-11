@@ -1,24 +1,15 @@
-# v5.1.1 (Thu Aug 11 2022)
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs [#279](https://github.com/Quenty/NevermoreEngine/pull/279) ([@Quenty](https://github.com/Quenty))
-- feat: RxFriendUtils [#274](https://github.com/Quenty/NevermoreEngine/pull/274) ([@OttoHatt](https://github.com/OttoHatt))
-- docs: Add RxFriendUtils comments back ([@OttoHatt](https://github.com/OttoHatt))
-- Update RxFriendUtils.lua ([@OttoHatt](https://github.com/OttoHatt))
-- Create RxFriendUtils.lua ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 2
-
-- [@OttoHatt](https://github.com/OttoHatt)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@5.1.0...@quenty/friendutils@5.1.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+
+
+
 
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@5.0.0...@quenty/friendutils@5.1.0) (2022-07-31)
 

@@ -1,20 +1,18 @@
-# v5.2.1 (Thu Aug 11 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Updating a ValueObject invalidates prior brio [#278](https://github.com/Quenty/NevermoreEngine/pull/278) ([@OttoHatt](https://github.com/OttoHatt))
-- feat: RxFriendUtils [#274](https://github.com/Quenty/NevermoreEngine/pull/274) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@5.2.0...@quenty/valuebaseutils@5.2.1) (2022-08-11)
+
+
+### Bug Fixes
+
+* Updating a ValueObject invalidates prior brio ([#278](https://github.com/Quenty/NevermoreEngine/issues/278)) ([b3de8a7](https://github.com/Quenty/NevermoreEngine/commit/b3de8a7ed65b5cbc4b26c2bd5e76cfd21ba5c879))
+
+
+
+
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@5.1.0...@quenty/valuebaseutils@5.2.0) (2022-07-31)
 
