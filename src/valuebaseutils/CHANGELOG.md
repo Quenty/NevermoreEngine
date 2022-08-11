@@ -1,3 +1,16 @@
+# v5.2.1 (Thu Aug 11 2022)
+
+#### 🐛 Bug Fix
+
+- fix: Updating a ValueObject invalidates prior brio [#278](https://github.com/Quenty/NevermoreEngine/pull/278) ([@OttoHatt](https://github.com/OttoHatt))
+- feat: RxFriendUtils [#274](https://github.com/Quenty/NevermoreEngine/pull/274) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,20 @@
+# (Thu Aug 11 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/friendutils@5.1.1`
+  - docs: Fix docs [#279](https://github.com/Quenty/NevermoreEngine/pull/279) ([@Quenty](https://github.com/Quenty))
+  - feat: RxFriendUtils [#274](https://github.com/Quenty/NevermoreEngine/pull/274) ([@OttoHatt](https://github.com/OttoHatt))
+- `@quenty/valuebaseutils@5.2.1`
+  - fix: Updating a ValueObject invalidates prior brio [#278](https://github.com/Quenty/NevermoreEngine/pull/278) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Aug 01 2022)
 
 #### 🐛 Bug Fix

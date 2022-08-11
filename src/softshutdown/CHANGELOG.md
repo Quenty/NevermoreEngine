@@ -1,3 +1,15 @@
+# v1.4.1 (Thu Aug 11 2022)
+
+#### 🐛 Bug Fix
+
+- feat: RxFriendUtils [#274](https://github.com/Quenty/NevermoreEngine/pull/274) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
