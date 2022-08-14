@@ -16,7 +16,7 @@ function SettingsServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	-- Internal
-	self._serviceBag:GetService(require("SettingServiceBridge")):RegisterSettingService(self)
+	self._serviceBag:GetService(require("SettingRegistryServiceShared")):RegisterSettingService(self)
 	self._binders = self._serviceBag:GetService(require("SettingsBindersClient"))
 end
 

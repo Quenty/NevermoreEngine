@@ -18,6 +18,7 @@ local StateStack = require("StateStack")
 local ValueObject = require("ValueObject")
 
 local IdleServiceClient = {}
+IdleServiceClient.ServiceName = "IdleServiceClient"
 
 local STANDING_TIME_REQUIRED = 0.5
 local MOVE_DISTANCE_REQUIRED = 2.5

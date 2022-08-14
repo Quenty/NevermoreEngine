@@ -29,6 +29,7 @@ local HumanoidTracker = require("HumanoidTracker")
 local SERVER_UPDATE_RATE = 1/10
 
 local IKService = {}
+IKService.ServiceName = "IKService"
 
 --[=[
 	Initializes the IKService. Should be done via the ServiceBag.

@@ -4,10 +4,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SettingServiceBridge = require("SettingServiceBridge")
+local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
+local Maid = require("Maid")
 
 local SettingDefinitionProvider = {}
 SettingDefinitionProvider.ClassName = "SettingDefinitionProvider"
+SettingDefinitionProvider.ServiceName = "SettingDefinitionProvider"
 SettingDefinitionProvider.__index = SettingDefinitionProvider
 
 function SettingDefinitionProvider.new(settingDefinitions)
@@ -26,11 +28,13 @@ end
 
 function SettingDefinitionProvider:Init(serviceBag)
 	assert(serviceBag, "No serviceBag")
+	assert(not self._maid, "Already initialized")
 
-	serviceBag:GetService(SettingServiceBridge)
+	self._maid = Maid.new()
 
+	local settingRegistryServiceShared = serviceBag:GetService(SettingRegistryServiceShared)
 	for _, settingDefinition in pairs(self._settingDefinitions) do
-		settingDefinition:RegisterToService(serviceBag)
+		self._maid:GiveTask(settingRegistryServiceShared:RegisterSettingDefinition(settingDefinition))
 	end
 end
 
@@ -45,7 +49,7 @@ end
 function SettingDefinitionProvider:__index(index)
 	if SettingDefinitionProvider[index] then
 		return SettingDefinitionProvider[index]
-	elseif index == "_lookup" or index == "_settingDefinitions" then
+	elseif index == "_lookup" or index == "_settingDefinitions" or index == "_maid" then
 		return rawget(self, index)
 	elseif type(index) == "string" then
 		local lookup = rawget(self, "_lookup")
@@ -62,6 +66,10 @@ end
 
 function SettingDefinitionProvider:Get(settingName)
 	return self._lookup[settingName]
+end
+
+function SettingDefinitionProvider:Destroy()
+	self._maid:DoCleaning()
 end
 
 return SettingDefinitionProvider

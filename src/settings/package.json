@@ -29,6 +29,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/datastore": "file:../datastore",
+    "@quenty/enumutils": "file:../enumutils",
     "@quenty/jsonutils": "file:../jsonutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",

@@ -10,6 +10,7 @@ local Maid = require("Maid")
 
 local BinderProvider = {}
 BinderProvider.ClassName = "BinderProvider"
+BinderProvider.ServiceName = "BinderProvider"
 BinderProvider.__index = BinderProvider
 
 --[=[

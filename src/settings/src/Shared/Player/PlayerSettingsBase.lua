@@ -8,6 +8,7 @@ local BaseObject = require("BaseObject")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local RxAttributeUtils = require("RxAttributeUtils")
 local SettingDefinition = require("SettingDefinition")
+local Rx = require("Rx")
 
 local PlayerSettingsBase = setmetatable({}, BaseObject)
 PlayerSettingsBase.ClassName = "PlayerSettingsBase"
@@ -45,13 +46,13 @@ end
 	@param defaultValue any
 	@return SettingProperty
 ]=]
-function PlayerSettingsBase:GetSetting(settingName, defaultValue)
+function PlayerSettingsBase:GetSettingProperty(settingName, defaultValue)
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 
 	self:EnsureInitialized(settingName, defaultValue)
 
-	return SettingDefinition.new(settingName, defaultValue):Get(self._serviceBag, self:GetPlayer())
+	return SettingDefinition.new(settingName, defaultValue):GetSettingProperty(self._serviceBag, self:GetPlayer())
 end
 
 --[=[
@@ -69,7 +70,7 @@ function PlayerSettingsBase:GetValue(settingName, defaultValue)
 
 	self:EnsureInitialized(settingName, defaultValue)
 
-	local value = self._obj:GetAttribute(attributeName)
+	local value = PlayerSettingsUtils.decodeForAttribute(self._obj:GetAttribute(attributeName))
 	if value == nil then
 		return defaultValue
 	end
@@ -89,7 +90,7 @@ function PlayerSettingsBase:SetValue(settingName, value)
 
 	local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
-	self._obj:SetAttribute(attributeName, value)
+	self._obj:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(value))
 end
 
 --[=[
@@ -108,6 +109,9 @@ function PlayerSettingsBase:ObserveValue(settingName, defaultValue)
 	self:EnsureInitialized(settingName, defaultValue)
 
 	return RxAttributeUtils.observeAttribute(self._obj, attributeName, defaultValue)
+		:Pipe({
+			Rx.map(PlayerSettingsUtils.decodeForAttribute)
+		})
 end
 
 function PlayerSettingsBase:RestoreDefault(settingName, defaultValue)

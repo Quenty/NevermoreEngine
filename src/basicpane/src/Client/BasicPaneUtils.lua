@@ -8,6 +8,7 @@ local Observable = require("Observable")
 local Maid = require("Maid")
 local Rx = require("Rx")
 local BasicPane = require("BasicPane")
+local Brio = require("Brio")
 
 local BasicPaneUtils = {}
 
@@ -29,6 +30,88 @@ function BasicPaneUtils.observeVisible(basicPane)
 
 		return maid
 	end)
+end
+
+--[=[
+	Shows the basic pane only when the emitting observable is visible. This
+	allows the basic pane 1 second to hide. If the pane gets reshown in that
+	time it will reshow it.
+
+	This can help lead to performance gains when you have a generally hidden pane
+	underneath another one and it needs to be shown.
+
+	See [GuiVisibleManager] for the OOP version.
+
+	```lua
+	Rx.of(true):Pipe({
+		BasicPaneUtils.whenVisibleBrio(function(maid)
+			-- generally you'd have your subclass here
+			local pane = BasicPane.new()
+			pane.Gui.Parent = screenGui
+
+			return pane
+		end)
+	})
+	```
+
+	@param createBasicPane (maid: Maid) -> BasicPane
+	@return (source: Observable<boolean>) -> Observable<Brio<GuiBase>>
+]=]
+function BasicPaneUtils.whenVisibleBrio(createBasicPane)
+	return function(source)
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+
+			local currentPane = nil
+
+			local function ensurePane()
+				if currentPane then
+					return currentPane
+				end
+
+				local paneMaid = Maid.new()
+
+				local basicPane = createBasicPane(paneMaid)
+				assert(BasicPane.isBasicPane(basicPane), "Bad BasicPane")
+				paneMaid:GiveTask(basicPane)
+
+				local brio = Brio.new(basicPane.Gui)
+				paneMaid:GiveTask(brio)
+
+				do
+					currentPane = basicPane
+					maid:GiveTask(function()
+						if currentPane == basicPane then
+							currentPane = nil
+						end
+					end)
+				end
+
+				-- Fire off
+				maid._currentPaneMaid = paneMaid
+				sub:Fire(brio)
+
+				return currentPane
+			end
+
+			maid:GiveTask(source:Subscribe(function(isVisible)
+				if isVisible then
+					maid._hideTask = nil
+					ensurePane():Show()
+				else
+					if currentPane and currentPane:IsVisible() then
+						currentPane:Hide()
+						maid._hideTask = task.delay(1, function()
+							currentPane = nil
+							maid._currentPaneMaid = nil
+						end)
+					end
+				end
+			end))
+
+			return maid
+		end)
+	end
 end
 
 --[=[

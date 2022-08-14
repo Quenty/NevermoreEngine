@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build and deploy docs
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2

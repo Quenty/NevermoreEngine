@@ -6,8 +6,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local INPUT_MODES = require("INPUT_MODES")
-local InputModeSelector = require("InputModeSelector")
+local InputModeTypes = require("InputModeTypes")
+local InputModeTypeSelector = require("InputModeTypeSelector")
 local Maid = require("Maid")
 local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
@@ -16,32 +16,35 @@ local PlayerInputModeUtils = require("PlayerInputModeUtils")
 local PlayerInputModeTypes = require("PlayerInputModeTypes")
 
 local PlayerInputModeServiceClient = {}
+PlayerInputModeServiceClient.ServiceName = "PlayerInputModeServiceClient"
 
 function PlayerInputModeServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	self._serviceBag:GetService(require("InputModeServiceClient"))
+
 	self._maid = Maid.new()
 end
 
 function PlayerInputModeServiceClient:Start()
-	self._selector = InputModeSelector.new({
-		INPUT_MODES.Gamepads,
-		INPUT_MODES.Keyboard,
-		INPUT_MODES.Touch
+	self._selector = InputModeTypeSelector.new(self._serviceBag, {
+		InputModeTypes.Gamepads,
+		InputModeTypes.Keyboard,
+		InputModeTypes.Touch
 	})
 	self._maid:GiveTask(self._selector)
 
 	self:_promiseRemoteEvent():Then(function(remoteEvent)
-		self._maid:GiveTask(self._selector:ObserveActiveMode():Pipe({
+		self._maid:GiveTask(self._selector:ObserveActiveInputType():Pipe({
 			Rx.throttleTime(1, { leading = true; trailing = true });
 		}):Subscribe(function(activeMode)
 			local modeType
-			if activeMode == INPUT_MODES.Gamepads then
+			if activeMode == InputModeTypes.Gamepads then
 				modeType = PlayerInputModeTypes.GAMEPAD
-			elseif activeMode == INPUT_MODES.Keyboard then
+			elseif activeMode == InputModeTypes.Keyboard then
 				modeType = PlayerInputModeTypes.KEYBOARD
-			elseif activeMode == INPUT_MODES.Touch then
+			elseif activeMode == InputModeTypes.Touch then
 				modeType = PlayerInputModeTypes.TOUCH
 			else
 				error("Bad activeMode")

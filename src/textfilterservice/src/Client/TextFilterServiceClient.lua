@@ -11,6 +11,7 @@ local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
 local TextFilterServiceConstants = require("TextFilterServiceConstants")
 
 local TextFilterServiceClient = {}
+TextFilterServiceClient.ServiceName = "TextFilterServiceClient"
 
 function TextFilterServiceClient:PromiseNonChatStringForUser(text, fromUserId)
 	assert(type(text) == "string", "Bad text")

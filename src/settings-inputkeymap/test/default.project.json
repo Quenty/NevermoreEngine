@@ -1,0 +1,21 @@
+{
+  "name": "SettingsInputKeyMapTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "settings-inputkeymap": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

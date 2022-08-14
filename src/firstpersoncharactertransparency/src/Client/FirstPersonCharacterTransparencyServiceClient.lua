@@ -8,6 +8,7 @@ local Maid = require("Maid")
 local FirstPersonCharacterTransparency = require("FirstPersonCharacterTransparency")
 
 local FirstPersonCharacterTransparencyServiceClient = {}
+FirstPersonCharacterTransparencyServiceClient.ServiceName = "FirstPersonCharacterTransparencyServiceClient"
 
 function FirstPersonCharacterTransparencyServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

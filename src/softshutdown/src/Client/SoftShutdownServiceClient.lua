@@ -19,6 +19,7 @@ local SoftShutdownUI = require("SoftShutdownUI")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 
 local SoftShutdownServiceClient = {}
+SoftShutdownServiceClient.ServiceName = "SoftShutdownServiceClient"
 
 local DISABLE_CORE_GUI_TYPES = {
 	Enum.CoreGuiType.PlayerList;

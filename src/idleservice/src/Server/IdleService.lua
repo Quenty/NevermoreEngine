@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local IdleService = {}
+IdleService.ServiceName = "IdleService"
 
 function IdleService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

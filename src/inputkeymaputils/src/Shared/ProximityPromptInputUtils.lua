@@ -7,8 +7,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local InputKeyMapList = require("InputKeyMapList")
-local INPUT_MODES = require("INPUT_MODES")
+local InputModeTypes = require("InputModeTypes")
 local InputKeyMap = require("InputKeyMap")
+local InputModeType = require("InputModeType")
 
 local ProximityPromptInputUtils = {}
 
@@ -22,8 +23,11 @@ function ProximityPromptInputUtils.newInputKeyMapFromPrompt(prompt)
 	assert(typeof(prompt) == "Instance", "Bad prompt")
 
 	return InputKeyMapList.new("custom", {
-		InputKeyMap.new(INPUT_MODES.Gamepads, { prompt.GamepadKeyCode });
-		InputKeyMap.new(INPUT_MODES.Keyboard, { prompt.KeyboardKeyCode })
+		InputKeyMap.new(InputModeTypes.Gamepads, { prompt.GamepadKeyCode });
+		InputKeyMap.new(InputModeTypes.Keyboard, { prompt.KeyboardKeyCode })
+	}, {
+		bindingName = prompt.ActionText;
+		rebindable = false;
 	})
 end
 
@@ -38,8 +42,8 @@ function ProximityPromptInputUtils.configurePromptFromInputKeyMap(prompt, inputK
 	assert(typeof(prompt) == "Instance", "Bad prompt")
 	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
 
-	local keyboard = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, INPUT_MODES.Keyboard)
-	local gamepad = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, INPUT_MODES.Gamepads)
+	local keyboard = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, InputModeTypes.Keyboard)
+	local gamepad = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, InputModeTypes.Gamepads)
 
 	if keyboard then
 		prompt.KeyboardKeyCode = keyboard
@@ -51,21 +55,21 @@ function ProximityPromptInputUtils.configurePromptFromInputKeyMap(prompt, inputK
 end
 
 --[=[
-	Picks the first keyCode that matches the inputMode.
+	Picks the first keyCode that matches the inputModeType.
 
 	@param inputKeyMapList InputKeyMapList
-	@param inputMode InputMode
+	@param inputModeType InputModeType
 	@return KeyCode?
 ]=]
-function ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, inputMode)
+function ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, inputModeType)
 	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
-	assert(inputMode, "Bad inputMode")
+	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
 	for _, item in pairs(inputKeyMapList) do
 		for _, entry in pairs(item.inputTypes) do
 			if typeof(entry) == "EnumItem"
 				and entry.EnumType == Enum.KeyCode
-				and inputMode:IsValid(entry) then
+				and inputModeType:IsValid(entry) then
 
 				return entry
 			end

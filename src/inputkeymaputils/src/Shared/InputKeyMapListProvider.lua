@@ -6,19 +6,28 @@
 	```lua
 	local inputMapProvider = InputKeyMapListProvider.new("General", function(self)
 		self:Add(InputKeyMapList.new("JUMP", {
-			InputKeyMap.new(INPUT_MODES.KeyboardAndMouse, { Enum.KeyCode.Space });
-			InputKeyMap.new(INPUT_MODES.Gamepads, { Enum.KeyCode.ButtonA });
-			InputKeyMap.new(INPUT_MODES.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary3") });
+			InputKeyMap.new(InputModeTypes.KeyboardAndMouse, { Enum.KeyCode.Space });
+			InputKeyMap.new(InputModeTypes.Gamepads, { Enum.KeyCode.ButtonA });
+			InputKeyMap.new(InputModeTypes.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary3") });
+		}, {
+			bindingName = "Jump";
+			rebindable = true;
 		}))
 		self:Add(InputKeyMapList.new("HONK", {
-			InputKeyMap.new(INPUT_MODES.KeyboardAndMouse, { Enum.KeyCode.H });
-			InputKeyMap.new(INPUT_MODES.Gamepads, { Enum.KeyCode.DPadUp });
-			InputKeyMap.new(INPUT_MODES.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary2") });
+			InputKeyMap.new(InputModeTypes.KeyboardAndMouse, { Enum.KeyCode.H });
+			InputKeyMap.new(InputModeTypes.Gamepads, { Enum.KeyCode.DPadUp });
+			InputKeyMap.new(InputModeTypes.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary2") });
+		}, {
+			bindingName = "Honk";
+			rebindable = true;
 		}))
 		self:Add(InputKeyMapList.new("BOOST", {
-			InputKeyMap.new(INPUT_MODES.KeyboardAndMouse, { Enum.KeyCode.LeftControl });
-			InputKeyMap.new(INPUT_MODES.Gamepads, { Enum.KeyCode.ButtonX });
-			InputKeyMap.new(INPUT_MODES.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary4") });
+			InputKeyMap.new(InputModeTypes.KeyboardAndMouse, { Enum.KeyCode.LeftControl });
+			InputKeyMap.new(InputModeTypes.Gamepads, { Enum.KeyCode.ButtonX });
+			InputKeyMap.new(InputModeTypes.Touch, { SlottedTouchButtonUtils.createSlottedTouchButton("primary4") });
+		}, {
+			bindingName = "Boost";
+			rebindable = true;
 		}))
 	end)
 
@@ -36,10 +45,12 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
-local InputKeyMapServiceClient = require("InputKeyMapServiceClient")
+local InputKeyMapRegistryServiceShared = require("InputKeyMapRegistryServiceShared")
+local ObservableList = require("ObservableList")
 
 local InputKeyMapListProvider = {}
 InputKeyMapListProvider.ClassName = "InputKeyMapListProvider"
+InputKeyMapListProvider.ServiceName = "InputKeyMapListProvider"
 InputKeyMapListProvider.__index = InputKeyMapListProvider
 
 --[=[
@@ -55,9 +66,28 @@ function InputKeyMapListProvider.new(providerName, createDefaults)
 	local self = setmetatable({}, InputKeyMapListProvider)
 
 	self._providerName = assert(providerName, "No providerName")
+	self.ServiceName = providerName
 	self._createDefaults = assert(createDefaults, "No createDefaults")
 
 	return self
+end
+
+function InputKeyMapListProvider:Init(serviceBag)
+	assert(not self._serviceBag, "Already initialized")
+
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
+
+	self._inputMapLists = ObservableList.new()
+	self._maid:GiveTask(self._inputMapLists)
+
+	self._maid:GiveTask(self._serviceBag:GetService(InputKeyMapRegistryServiceShared):RegisterProvider(self))
+
+	self:_ensureDefaultsInit()
+end
+
+function InputKeyMapListProvider:Start()
+	-- empty function
 end
 
 --[=[
@@ -92,15 +122,16 @@ end
 function InputKeyMapListProvider:FindInputKeyMapList(keyMapListName)
 	assert(type(keyMapListName) == "string", "Bad keyMapListName")
 
-	if not self._inputKeyMapLists then
-		if not RunService:IsRunning() then
-			-- Test mode initialize
-			self._maid = Maid.new()
-			self:_ensureDefaultsInit()
-		else
-			error("Not initialized, make sure to retrieve via serviceBag and init")
-		end
+	if RunService:IsRunning() and not self._inputKeyMapLists then
+		error("Not initialized, make sure to retrieve via serviceBag and init")
 	end
+
+	-- Test mode initialize
+	if not self._inputKeyMapLists then
+		self._maid = Maid.new()
+	end
+
+	self:_ensureDefaultsInit()
 
 	return self._inputKeyMapLists[keyMapListName]
 end
@@ -115,16 +146,12 @@ function InputKeyMapListProvider:Add(inputKeyMapList)
 
 	self._inputKeyMapLists[inputKeyMapList:GetListName()] = inputKeyMapList
 	self._maid:GiveTask(inputKeyMapList)
+
+	self._maid:GiveTask(self._inputMapLists:Add(inputKeyMapList))
 end
 
-function InputKeyMapListProvider:Init(serviceBag)
-	assert(not self._serviceBag, "Already initialized")
-
-	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._serviceBag:GetService(InputKeyMapServiceClient):RegisterProvider(self)
-	self._maid = Maid.new()
-
-	self:_ensureDefaultsInit()
+function InputKeyMapListProvider:ObserveInputKeyMapListsBrio()
+	return self._inputMapLists:ObserveItemsBrio()
 end
 
 function InputKeyMapListProvider:_ensureDefaultsInit()
@@ -133,10 +160,6 @@ function InputKeyMapListProvider:_ensureDefaultsInit()
 
 		self._createDefaults(self, self._serviceBag)
 	end
-end
-
-function InputKeyMapListProvider:Start()
-	-- empty function
 end
 
 function InputKeyMapListProvider:Destroy()

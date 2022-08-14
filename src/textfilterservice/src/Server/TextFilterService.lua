@@ -9,6 +9,7 @@ local TextFilterServiceConstants = require("TextFilterServiceConstants")
 local TextFilterUtils = require("TextFilterUtils")
 
 local TextFilterService = {}
+TextFilterService.ServiceName = "TextFilterService"
 
 function TextFilterService:Init()
 	self._remoteFunction = GetRemoteFunction(TextFilterServiceConstants.REMOTE_FUNCTION_NAME)

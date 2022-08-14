@@ -8,6 +8,7 @@ local packages = require(loader).bootstrapGame(ServerScriptService.settings)
 
 local serviceBag = require(packages.ServiceBag).new()
 serviceBag:GetService(packages.SettingsService)
+local bridge = serviceBag:GetService(packages.SettingsServiceBridge)
 
 local SettingDefinition = require(packages.SettingDefinition)
 
@@ -20,10 +21,10 @@ serviceBag:Start()
 
 
 local volumeDefinition = SettingDefinition.new("Volume", 1)
-volumeDefinition:RegisterToService(serviceBag)
+bridge:RegisterSettingDefinition(volumeDefinition)
 
 local rumbleDefinition = SettingDefinition.new("Rumble", true)
-rumbleDefinition:RegisterToService(serviceBag)
+bridge:RegisterSettingDefinition(rumbleDefinition)
 
 
 local function handlePlayer(player)

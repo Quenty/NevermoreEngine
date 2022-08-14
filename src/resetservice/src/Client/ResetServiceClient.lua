@@ -20,6 +20,7 @@ local RETRY_ATTEMPTS = 3
 local INITIAL_WAIT_TIME = 1
 
 local ResetServiceClient = {}
+ResetServiceClient.ServiceName = "ResetServiceClient"
 
 --[=[
 	Initializes the reset service. Should be done via a [ServiceBag].

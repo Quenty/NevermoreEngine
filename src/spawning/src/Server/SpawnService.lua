@@ -17,6 +17,7 @@ local WARN_ON_CLASS_BUDGET_EXHAUST = false
 local TOTAL_BUDGET_BEFORE_WARN = 0.1
 
 local SpawnService = {}
+SpawnService.ServiceName = "SpawnService"
 
 function SpawnService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")

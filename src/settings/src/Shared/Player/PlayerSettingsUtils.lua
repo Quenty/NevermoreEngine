@@ -10,6 +10,7 @@ local RxBinderUtils = require("RxBinderUtils")
 local BinderUtils = require("BinderUtils")
 local Binder = require("Binder")
 local RxStateStackUtils = require("RxStateStackUtils")
+local EnumUtils = require("EnumUtils")
 
 local PlayerSettingsUtils = {}
 
@@ -68,6 +69,8 @@ function PlayerSettingsUtils.encodeForNetwork(settingValue)
 
 	if settingValue == nil then
 		return "<NIL_SETTING_VALUE>"
+	elseif typeof(settingValue) == "EnumItem" then
+		return EnumUtils.encodeAsString(settingValue)
 	else
 		return settingValue
 	end
@@ -76,6 +79,24 @@ end
 function PlayerSettingsUtils.decodeForNetwork(settingValue)
 	if settingValue == "<NIL_SETTING_VALUE>" then
 		return nil
+	elseif EnumUtils.isEncodedEnum(settingValue) then
+		return EnumUtils.decodeFromString(settingValue)
+	else
+		return settingValue
+	end
+end
+
+function PlayerSettingsUtils.decodeForAttribute(settingValue)
+	if EnumUtils.isEncodedEnum(settingValue) then
+		return EnumUtils.decodeFromString(settingValue)
+	else
+		return settingValue
+	end
+end
+
+function PlayerSettingsUtils.encodeForAttribute(settingValue)
+	if typeof(settingValue) == "EnumItem" then
+		return EnumUtils.encodeAsString(settingValue)
 	else
 		return settingValue
 	end

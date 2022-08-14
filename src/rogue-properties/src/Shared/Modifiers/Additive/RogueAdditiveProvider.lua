@@ -13,6 +13,7 @@ local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 
 local RogueAdditiveProvider = {}
+RogueAdditiveProvider.ServiceName = "RogueAdditiveProvider"
 
 function RogueAdditiveProvider:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

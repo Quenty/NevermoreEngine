@@ -19,6 +19,7 @@ local DeathReportUtils = require("DeathReportUtils")
 local MAX_DEATH_REPORTS = 5
 
 local DeathReportServiceClient = {}
+DeathReportServiceClient.ServiceName = "DeathReportServiceClient"
 
 --[=[
 	Initializes the death report service for the given service bag. Should be done

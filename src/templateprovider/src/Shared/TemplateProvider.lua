@@ -45,6 +45,7 @@ local Promise = require("Promise")
 
 local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
+TemplateProvider.ServiceName = "TemplateProvider"
 TemplateProvider.__index = TemplateProvider
 
 --[=[

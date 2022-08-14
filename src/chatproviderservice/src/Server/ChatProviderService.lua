@@ -11,6 +11,7 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 
 local ChatProviderService = {}
+ChatProviderService.ServiceName = "ChatProviderService"
 
 --[=[
 	Sets the speaker's tag (by speaker name)

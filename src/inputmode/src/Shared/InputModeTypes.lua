@@ -1,31 +1,22 @@
 --[=[
-	Holds input states for Keyboard, Mouse, et cetera. Mostly useful for providing UI input hints to the user by
-	identifying the most recent input state provided. See [InputMode] for more details, and [InputModeSelector] for
-	how to select between several modes.
-
-	@class INPUT_MODES
+	Holds all the input mode type configuration, accessible on both the server and the client for keybinding validations.
+	@class InputModeTypes
 ]=]
-
-local UserInputService = game:GetService("UserInputService")
-local GuiService = game:GetService("GuiService")
 
 local require = require(script.Parent.loader).load(script)
 
-local InputMode = require("InputMode")
-local InputModeProcessor = require("InputModeProcessor")
 local Table = require("Table")
+local InputModeType = require("InputModeType")
 
-local INPUT_MODES = {
-	THUMBSTICK_DEADZONE = 0.14
-}
+local InputModeTypes = {}
 
 --[=[
 	Input from a keypad
-	@prop Keypad InputMode
+	@prop Keypad InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.Keypad = InputMode.new("Keypad", {
+InputModeTypes.Keypad = InputModeType.new("Keypad", {
 	Enum.KeyCode.KeypadZero;
 	Enum.KeyCode.KeypadOne;
 	Enum.KeyCode.KeypadTwo;
@@ -47,15 +38,15 @@ INPUT_MODES.Keypad = InputMode.new("Keypad", {
 
 --[=[
 	Input from a keyboard
-	@prop Keyboard InputMode
+	@prop Keyboard InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.Keyboard = InputMode.new("Keyboard", {
+InputModeTypes.Keyboard = InputModeType.new("Keyboard", {
 	Enum.UserInputType.Keyboard;
 
 	-- Other input modes
-	INPUT_MODES.Keypad;
+	InputModeTypes.Keypad;
 
 	-- Valid KeyCodes for input binding
 	Enum.KeyCode.Backspace;
@@ -184,11 +175,11 @@ INPUT_MODES.Keyboard = InputMode.new("Keyboard", {
 
 --[=[
 	Input involving arrow keys!
-	@prop ArrowKeys InputMode
+	@prop ArrowKeys InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.ArrowKeys = InputMode.new("ArrowKeys", {
+InputModeTypes.ArrowKeys = InputModeType.new("ArrowKeys", {
 	Enum.KeyCode.Left;
 	Enum.KeyCode.Right;
 	Enum.KeyCode.Up;
@@ -197,11 +188,11 @@ INPUT_MODES.ArrowKeys = InputMode.new("ArrowKeys", {
 
 --[=[
 	Input involving WASD
-	@prop WASD InputMode
+	@prop WASD InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.WASD = InputMode.new("WASD", {
+InputModeTypes.WASD = InputModeType.new("WASD", {
 	Enum.KeyCode.W;
 	Enum.KeyCode.A;
 	Enum.KeyCode.S;
@@ -210,11 +201,11 @@ INPUT_MODES.WASD = InputMode.new("WASD", {
 
 --[=[
 	Input involving the mouse
-	@prop Mouse InputMode
+	@prop Mouse InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.Mouse = InputMode.new("Mouse", {
+InputModeTypes.Mouse = InputModeType.new("Mouse", {
 	Enum.UserInputType.MouseButton1;
 	Enum.UserInputType.MouseButton2;
 	Enum.UserInputType.MouseButton3;
@@ -224,31 +215,31 @@ INPUT_MODES.Mouse = InputMode.new("Mouse", {
 
 --[=[
 	Input involving the keyboard OR mouse.
-	@prop KeyboardAndMoues InputMode
+	@prop KeyboardAndMoues InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.KeyboardAndMouse = InputMode.new("KeyboardAndMouse", {
-	INPUT_MODES.Mouse;
-	INPUT_MODES.Keyboard;
+InputModeTypes.KeyboardAndMouse = InputModeType.new("KeyboardAndMouse", {
+	InputModeTypes.Mouse;
+	InputModeTypes.Keyboard;
 })
 
 --[=[
 	Input involving touch input.
-	@prop Touch InputMode
+	@prop Touch InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.Touch = InputMode.new("Touch", {
+InputModeTypes.Touch = InputModeType.new("Touch", {
 	Enum.UserInputType.Touch;
 })
 
 --[=[
-	@prop DPad InputMode
+	@prop DPad InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.DPad = InputMode.new("DPad", {
+InputModeTypes.DPad = InputModeType.new("DPad", {
 	Enum.KeyCode.DPadLeft;
 	Enum.KeyCode.DPadRight;
 	Enum.KeyCode.DPadUp;
@@ -257,22 +248,22 @@ INPUT_MODES.DPad = InputMode.new("DPad", {
 
 --[=[
 	Input involved thumbsticks.
-	@prop Thumbsticks InputMode
+	@prop Thumbsticks InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.Thumbsticks = InputMode.new("Thumbsticks", {
+InputModeTypes.Thumbsticks = InputModeType.new("Thumbsticks", {
 	Enum.KeyCode.Thumbstick1;
 	Enum.KeyCode.Thumbstick2;
 })
 
 --[=[
 	Input involving gamepads
-	@prop Gamepads InputMode
+	@prop Gamepads InputModeType
 	@readonly
-	@within INPUT_MODES
+	@within InputModeTypes
 ]=]
-INPUT_MODES.Gamepads = InputMode.new("Gamepads", {
+InputModeTypes.Gamepads = InputModeType.new("Gamepads", {
 	Enum.UserInputType.Gamepad1;
 	Enum.UserInputType.Gamepad2;
 	Enum.UserInputType.Gamepad3;
@@ -301,69 +292,4 @@ INPUT_MODES.Gamepads = InputMode.new("Gamepads", {
 	Enum.KeyCode.DPadDown;
 })
 
-local function triggerEnabled()
-	if UserInputService.MouseEnabled then
-		INPUT_MODES.Mouse:Enable()
-	end
-	if UserInputService.TouchEnabled then
-		INPUT_MODES.Touch:Enable()
-	end
-	if UserInputService.KeyboardEnabled then
-		INPUT_MODES.Keyboard:Enable()
-	end
-	if UserInputService.KeyboardEnabled and UserInputService.MouseEnabled then
-		INPUT_MODES.KeyboardAndMouse:Enable()
-	end
-	if UserInputService.GamepadEnabled
-		or #UserInputService:GetConnectedGamepads() > 0
-		or GuiService:IsTenFootInterface() then
-		INPUT_MODES.Gamepads:Enable()
-	end
-end
-
-local function bindProcessor()
-	local inputProcessor = InputModeProcessor.new({
-		INPUT_MODES.Keypad;
-		INPUT_MODES.Keyboard;
-		INPUT_MODES.Gamepads;
-		INPUT_MODES.Mouse;
-		INPUT_MODES.Touch;
-		INPUT_MODES.ArrowKeys;
-		INPUT_MODES.WASD;
-		INPUT_MODES.KeyboardAndMouse;
-		INPUT_MODES.DPad;
-		-- Don't add INPUT_MODES.Thumbsticks, we handle it seperately
-	})
-
-	UserInputService.InputBegan:Connect(function(inputObject)
-		inputProcessor:Evaluate(inputObject)
-	end)
-	UserInputService.InputEnded:Connect(function(inputObject)
-		inputProcessor:Evaluate(inputObject)
-	end)
-	UserInputService.InputChanged:Connect(function(inputObject)
-		if inputObject.KeyCode == Enum.KeyCode.Thumbstick1
-			or inputObject.KeyCode == Enum.KeyCode.Thumbstick2 then
-
-			if inputObject.Position.magnitude > INPUT_MODES.THUMBSTICK_DEADZONE then
-				inputProcessor:Evaluate(inputObject)
-				INPUT_MODES.Thumbsticks:Enable()
-			end
-		else
-			inputProcessor:Evaluate(inputObject)
-		end
-	end)
-
-	UserInputService.GamepadConnected:Connect(function(_)
-		INPUT_MODES.Gamepads:Enable()
-	end)
-
-	UserInputService.GamepadDisconnected:Connect(function(_)
-		triggerEnabled()
-	end)
-end
-
-bindProcessor()
-triggerEnabled()
-
-return Table.readonly(INPUT_MODES)
+return Table.readonly(InputModeTypes)

@@ -16,6 +16,7 @@ local Maid = require("Maid")
 local DeathReportProcessor = require("DeathReportProcessor")
 
 local DeathReportService = {}
+DeathReportService.ServiceName = "DeathReportService"
 
 --[=[
 	Initializes the DeathReportService. Should be done via [ServiceBag].

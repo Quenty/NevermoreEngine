@@ -20,13 +20,14 @@ local RxInstanceUtils = require("RxInstanceUtils")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
+JSONTranslator.ServiceName = "JSONTranslator"
 JSONTranslator.__index = JSONTranslator
 
 --[=[
 	Constructs a new JSONTranslator from the given args.
 
 	```lua
-	local translator = JSONTranslator.new("en", {
+	local translator = JSONTranslator.new("MyTranslator", en", {
 		actions = {
 			respawn = "Respawn {playerName}";
 		};
@@ -40,14 +41,18 @@ JSONTranslator.__index = JSONTranslator
 	-- assume there is an `en.json` underneath the script with valid JSON.
 	```
 
+	@param translatorName string -- Name of the translator. Used for source.
 	@param ... any
 	@return JSONTranslator
 ]=]
-function JSONTranslator.new(...)
+function JSONTranslator.new(translatorName, ...)
 	local self = setmetatable({}, JSONTranslator)
 
+	assert(type(translatorName) == "string", "Bad translatorName")
+	self.ServiceName = translatorName
+
 	-- Cache localizaiton table, because it can take 10-20ms to load.
-	self._localizationTable = JsonToLocalizationTable.toLocalizationTable(...)
+	self._localizationTable = JsonToLocalizationTable.toLocalizationTable(translatorName, ...)
 	self._englishTranslator = self._localizationTable:GetTranslator("en")
 	self._fallbacks = {}
 

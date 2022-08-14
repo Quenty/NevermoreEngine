@@ -5,6 +5,7 @@
 
 local ModuleProvider = {}
 ModuleProvider.ClassName = "ModuleProvider"
+ModuleProvider.ServiceName = "ModuleProvider"
 ModuleProvider.__index = ModuleProvider
 
 function ModuleProvider.new(parent, checkModule, initModule, sortList)

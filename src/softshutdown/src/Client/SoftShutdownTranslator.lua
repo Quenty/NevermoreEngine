@@ -4,7 +4,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-return require("JSONTranslator").new("en", {
+return require("JSONTranslator").new("SoftShutdownTranslator", "en", {
 	shutdown = {
 		lobby = {
 			title = "Rebooting servers for update.";

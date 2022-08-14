@@ -22,6 +22,7 @@ local TimeSyncUtils = require("TimeSyncUtils")
 local Maid = require("Maid")
 
 local TimeSyncService = {}
+TimeSyncService.ServiceName = "TimeSyncService"
 
 --[=[
 	Initializes the TimeSyncService

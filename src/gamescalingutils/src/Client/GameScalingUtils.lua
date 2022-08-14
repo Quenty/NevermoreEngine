@@ -53,6 +53,55 @@ function GameScalingUtils.observeUIScale(screenGui)
 end
 
 --[=[
+	Blend equivalent of rendering a UI Scale
+
+	@param props { Parent: Instance?, ScreenGui: ScreenGui }
+	@return Observable<number>
+]=]
+function GameScalingUtils.renderUIScale(props)
+	assert(props.ScreenGui, "No screenGui")
+
+	return Blend.New "UIScale" {
+		Parent = props.Parent;
+		Scale = GameScalingUtils.observeUIScale(props.ScreenGui)
+	}
+end
+
+--[=[
+	Blend equivalent of rendering the dialog padding
+
+	@param props { Parent: Instance?, ScreenGui: ScreenGui }
+	@return Observable<number>
+]=]
+function GameScalingUtils.renderDialogPadding(props)
+	assert(props.ScreenGui, "No screenGui")
+
+	return Blend.New "UIPadding" {
+		Parent = props.Parent;
+		PaddingTop = GameScalingUtils.observeDialogPadding(props.ScreenGui);
+		PaddingBottom = GameScalingUtils.observeDialogPadding(props.ScreenGui);
+		PaddingLeft = GameScalingUtils.observeDialogPadding(props.ScreenGui);
+		PaddingRight = GameScalingUtils.observeDialogPadding(props.ScreenGui);
+	}
+end
+
+--[=[
+	Observes a smoothed out UI scale for a given screenGui
+	@param screenGui ScreenGui
+	@return Observable<number>
+]=]
+function GameScalingUtils.observeDialogPadding(screenGui)
+	return Blend.Spring(RxInstanceUtils.observeProperty(screenGui, "AbsoluteSize")
+		:Pipe({
+			Rx.map(GameScalingUtils.getDialogPadding)
+		}), 30):Pipe({
+			Rx.map(function(padding)
+				return UDim.new(0, padding)
+			end);
+		})
+end
+
+--[=[
 	Computes a reasonable dialog padding for a given absolute screen size
 	@param screenAbsoluteSize Vector2
 	@return number

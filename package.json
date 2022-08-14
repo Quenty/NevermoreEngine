@@ -13,7 +13,7 @@
     "@auto-it/released": "^10.37.0",
     "auto": "^10.37.0",
     "lerna": "^5.3.0",
-    "moonwave": "^0.3.7"
+    "moonwave": "^0.3.10"
   },
   "scripts": {
     "release": "auto shipit"

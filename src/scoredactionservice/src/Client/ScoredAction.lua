@@ -1,5 +1,5 @@
 --[=[
-	An action that has a score, and may recieve priority from [ScoredActionService]
+	An action that has a score, and may recieve priority from [ScoredActionServiceClient]
 
 	@client
 	@class ScoredAction
@@ -16,7 +16,7 @@ ScoredAction.ClassName = "ScoredAction"
 ScoredAction.__index = ScoredAction
 
 --[=[
-	Constructs a new ScoredAction. Should not be called directly. See [ScoredActionService.GetScoredAction].
+	Constructs a new ScoredAction. Should not be called directly. See [ScoredActionServiceClient.GetScoredAction].
 
 	@return ScoredAction
 ]=]

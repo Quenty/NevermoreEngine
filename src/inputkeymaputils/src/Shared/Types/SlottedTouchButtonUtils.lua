@@ -2,13 +2,17 @@
 	@class SlottedTouchButtonUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local InputModeType = require("InputModeType")
+
 local SlottedTouchButtonUtils = {}
 
 --[=[
 	Internal data representing a slotted touch button
 	@interface SlottedTouchButtonData
 	.slotId string
-	.inputMode InputMode
+	.inputModeType InputModeType
 	@within SlottedTouchButtonUtils
 ]=]
 
@@ -58,13 +62,13 @@ end
 	Gets slotted touch button data for an inputKeyMapList
 
 	@param slotId string
-	@param inputMode InputMode
+	@param inputModeType InputModeType
 	@return SlottedTouchButtonData
 ]=]
-function SlottedTouchButtonUtils.createTouchButtonData(slotId, inputMode)
+function SlottedTouchButtonUtils.createTouchButtonData(slotId, inputModeType)
 	return {
 		slotId = slotId;
-		inputMode = inputMode;
+		inputModeType = inputModeType;
 	}
 end
 
@@ -78,13 +82,13 @@ function SlottedTouchButtonUtils.getSlottedTouchButtonData(inputKeyMapList)
 	local slottedTouchButtons = {}
 
 	for _, inputKeyMap in pairs(inputKeyMapList) do
-		assert(inputKeyMap.inputMode, "Bad inputKeyMap.inputMode")
+		assert(InputModeType.isInputModeType(inputKeyMap.inputModeType), "Bad inputKeyMap.inputModeType")
 		assert(inputKeyMap.inputTypes, "Bad inputKeyMap.inputTypes")
 
 		for _, touchButtonData in pairs(inputKeyMap.inputTypes) do
 			if SlottedTouchButtonUtils.isSlottedTouchButton(touchButtonData) then
 				table.insert(slottedTouchButtons, SlottedTouchButtonUtils.createTouchButtonData(
-					touchButtonData.slotId, inputKeyMap.inputMode))
+					touchButtonData.slotId, inputKeyMap.inputModeType))
 			end
 		end
 	end

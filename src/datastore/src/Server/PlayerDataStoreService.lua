@@ -13,6 +13,7 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 
 local PlayerDataStoreService = {}
+PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
 
 --[=[
 	Initializes the PlayerDataStoreService. Should be done via [ServiceBag.Init].

@@ -15,6 +15,7 @@ local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local ParticleEngineConstants = require("ParticleEngineConstants")
 
 local ParticleEngineClient = {}
+ParticleEngineClient.ServiceName = "ParticleEngineClient"
 
 -- 3000 if you have a good computer
 ParticleEngineClient._maxParticles = 400

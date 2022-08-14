@@ -24,7 +24,7 @@ function String.trim(str: string, pattern: string?): string
 end
 
 --[=[
-	Converts the string to UpperCamelCase
+	Converts the string to `UpperCamelCase` from `camelCase` or `snakeCase` or `YELL_CASE`
 	@param str string
 	@return string
 ]=]
@@ -37,7 +37,6 @@ function String.toCamelCase(str: string): string
 	return str
 end
 
-
 --[=[
 	Uppercases the first letter of the string
 	@param str string
@@ -48,7 +47,7 @@ function String.uppercaseFirstLetter(str: string): string
 end
 
 --[=[
-	Converts to the string to lowerCamelCase
+	Converts to the string to `lowerCamelCase` from `camelCase` or `snakeCase` or `YELL_CASE`
 	@param str string
 	@return string
 ]=]
@@ -182,17 +181,19 @@ end
 --[=[
 	Adds commas to a number. Not culture aware.
 	@param number string | number
+	@param seperator string?
 	@return string
 ]=]
-function String.addCommas(number: string | number): string
+function String.addCommas(number: string | number, seperator: string): string
 	if type(number) == "number" then
 		number = tostring(number)
 	end
+	seperator = seperator or ","
 
 	local index = -1
 
 	while index ~= 0 do
-		number, index = string.gsub(number, "^(-?%d+)(%d%d%d)", '%1,%2')
+		number, index = string.gsub(number, "^(-?%d+)(%d%d%d)", "%1" .. seperator .. "%2")
 	end
 
 	return number

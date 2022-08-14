@@ -11,6 +11,7 @@ local ResetServiceConstants = require("ResetServiceConstants")
 local Maid = require("Maid")
 
 local ResetService = {}
+ResetService.ServiceName = "ResetService"
 
 --[=[
 	Initializes the reset service. Should be done via a [ServiceBag].

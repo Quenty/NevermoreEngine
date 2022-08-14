@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/enumutils",
+  "version": "1.0.0",
+  "description": "Helds encode Roblox enums into a string",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Enum"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/enumutils/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

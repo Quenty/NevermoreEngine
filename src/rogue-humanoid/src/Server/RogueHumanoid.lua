@@ -31,6 +31,7 @@ function RogueHumanoid.new(humanoid, serviceBag)
 		self._obj.WalkSpeed = walkSpeed
 	end))
 	self._maid:GiveTask(self._properties.JumpHeight:Observe():Subscribe(function(jumpHeight)
+		self._obj.UseJumpPower = false
 		self._obj.JumpHeight = jumpHeight
 	end))
 

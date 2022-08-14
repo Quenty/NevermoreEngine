@@ -5,7 +5,7 @@ local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
 
 local ContextActionService = game:GetService("ContextActionService")
 
-local INPUT_MODES = require(packages.INPUT_MODES)
+local InputModeTypes = require(packages.InputModeTypes)
 local serviceBag = require(packages.ServiceBag).new()
 
 serviceBag:GetService(packages.InputKeyMapServiceClient)
@@ -25,4 +25,4 @@ keyMapList:ObserveInputEnumsList():Subscribe(function(...)
 end)
 
 
-keyMapList:SetForInputMode(INPUT_MODES.Keypad, { Enum.KeyCode.Space })
+keyMapList:SetForInputMode(InputModeTypes.Keypad, { Enum.KeyCode.Space })

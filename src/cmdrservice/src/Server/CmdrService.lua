@@ -15,6 +15,7 @@ local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
 local Promise = require("Promise")
 
 local CmdrService = {}
+CmdrService.ServiceName = "CmdrService"
 
 local GLOBAL_REGISTRY = setmetatable({}, {__mode = "kv"})
 

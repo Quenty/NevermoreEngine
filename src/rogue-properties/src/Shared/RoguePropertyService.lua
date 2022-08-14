@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 
 local RoguePropertyService = {}
+RoguePropertyService.ServiceName = "RoguePropertyService"
 
 function RoguePropertyService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

@@ -83,6 +83,36 @@ function Blend.State(defaultValue)
 	return ValueObject.new(defaultValue)
 end
 
+--[=[
+	Throttles the update to the end of the defer lane. Can help optimize scenarios when
+	Compute() can trigger multiple times per a frame.
+
+	Generally not needed.
+
+	@param observable Observable<T>
+	@return Observable<T>
+]=]
+function Blend.Throttled(observable)
+	return observable:Pipe({
+		Rx.throttleDefer();
+	})
+end
+
+--[=[
+	Shares this observables state/computation with all down-stream observables. This can be useful
+	when a very expensive computation was done and needs to be shared.
+
+	Generally not needed.
+
+	@param observable Observable<T>
+	@return Observable<T>
+]=]
+function Blend.Shared(observable)
+	return observable:Pipe({
+		Rx.cache();
+	})
+end
+
 function Blend.Dynamic(...)
 	return Blend.Computed(...)
 		:Pipe({

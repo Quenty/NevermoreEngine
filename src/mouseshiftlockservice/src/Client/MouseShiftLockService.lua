@@ -20,6 +20,7 @@ local StarterPlayer = game:GetService("StarterPlayer")
 local Promise = require("Promise")
 
 local MouseShiftLockService = {}
+MouseShiftLockService.ServiceName = "MouseShiftLockService"
 
 --[=[
 	Initializes the mouse shift lock service. Should be done via [ServiceBag].

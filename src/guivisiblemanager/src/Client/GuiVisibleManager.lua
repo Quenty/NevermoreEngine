@@ -1,5 +1,7 @@
 --[=[
-	Help manage the visibility of GUIs while only constructing the Gui while visible
+	Help manage the visibility of Guis while only constructing the Gui while visible.
+
+	See [BasicPaneUtils.whenVisibleBrio] for a version that is written in Rx.
 
 	@client
 	@class GuiVisibleManager
