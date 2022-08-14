@@ -308,6 +308,205 @@ function Rx.start(callback)
 end
 
 --[=[
+	Returns a new Observable that multicasts (shares) the original Observable. As long as there is at least one Subscriber this Observable will be subscribed and emitting data.
+	When all subscribers have unsubscribed it will unsubscribe from the source Observable.
+
+	https://rxjs.dev/api/operators/share
+
+	@return (source: Observable) -> Observable
+]=]
+function Rx.share()
+	return function(source)
+		local shareMaid = Maid.new()
+		local subs = {}
+
+		local lastFail = UNSET_VALUE
+		local lastComplete = UNSET_VALUE
+
+		local function connectToSourceIfNeeded()
+			if not shareMaid._currentSub then
+				lastFail = UNSET_VALUE
+				lastComplete = UNSET_VALUE
+
+				shareMaid._currentSub = source:Subscribe(function(...)
+					for _, sub in pairs(subs) do
+						sub:Fire(...)
+					end
+				end, function(...)
+					lastFail = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Fail(...)
+					end
+				end, function(...)
+					lastComplete = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Complete(...)
+					end
+				end)
+			end
+		end
+
+		local function disconnectFromSource()
+			shareMaid._currentSub = nil
+
+			lastFail = UNSET_VALUE
+			lastComplete = UNSET_VALUE
+		end
+
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			if lastFail ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastFail, 1, lastFail.n))
+				return
+			end
+
+			if lastComplete ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastComplete, 1, lastComplete.n))
+				return
+			end
+
+			table.insert(subs, sub)
+			connectToSourceIfNeeded()
+
+			return function()
+				local index = table.find(subs, sub)
+				if index then
+					table.remove(subs, index)
+
+					if #subs == 0 then
+						disconnectFromSource()
+					end
+				end
+			end
+		end)
+	end
+end
+
+--[=[
+	Same as [Rx.share] except it also replays the value
+
+	@param bufferSize number -- Number of entries to cache
+	@param windowTimeSeconds number -- Time
+	@return (source: Observable) -> Observable
+]=]
+function Rx.shareReplay(bufferSize, windowTimeSeconds)
+	assert(type(bufferSize) == "number" or bufferSize == nil, "Bad bufferSize")
+	assert(type(windowTimeSeconds) == "number" or windowTimeSeconds == nil, "Bad windowTimeSeconds")
+
+	bufferSize = bufferSize or math.huge
+	windowTimeSeconds = windowTimeSeconds or math.huge
+
+	return function(source)
+		local shareMaid = Maid.new()
+		local subs = {}
+
+		local buffer = {}
+		local lastFail = UNSET_VALUE
+		local lastComplete = UNSET_VALUE
+
+		local function getEventsCopy()
+			local now = os.clock()
+			local events = {}
+
+			for _, event in pairs(buffer) do
+				if (now - event.timestamp) <= windowTimeSeconds then
+					table.insert(events, event)
+				end
+			end
+
+			return events
+		end
+
+		local function connectToSourceIfNeeded()
+			if not shareMaid._currentSub then
+				buffer = {}
+				lastFail = UNSET_VALUE
+				lastComplete = UNSET_VALUE
+
+				shareMaid._currentSub = source:Subscribe(function(...)
+					-- TODO: also prune events by timestamp
+
+					if #buffer + 1 > bufferSize then
+						table.remove(buffer, 1) -- O(n), not great.
+					end
+
+					-- Queue before we start
+					local event = table.pack(...)
+					event.timestamp = os.clock()
+					table.insert(buffer, event)
+
+					for _, sub in pairs(subs) do
+						sub:Fire(...)
+					end
+				end, function(...)
+					lastFail = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Fail(...)
+					end
+				end, function(...)
+					lastComplete = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Complete(...)
+					end
+				end)
+			end
+		end
+
+		local function disconnectFromSource()
+			shareMaid._currentSub = nil
+
+			buffer = {}
+			lastFail = UNSET_VALUE
+			lastComplete = UNSET_VALUE
+		end
+
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			if lastFail ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastFail, 1, lastFail.n))
+				return
+			end
+
+			if lastComplete ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastComplete, 1, lastComplete.n))
+				return
+			end
+
+			table.insert(subs, sub)
+
+			-- Firing could lead to re-entrance. Lets just use the buffer as-is.
+			for _, item in pairs(getEventsCopy()) do
+				sub:Fire(table.unpack(item, 1, item.n))
+			end
+
+			connectToSourceIfNeeded()
+
+			return function()
+				local index = table.find(subs, sub)
+				if index then
+					table.remove(subs, index)
+
+					if #subs == 0 then
+						disconnectFromSource()
+					end
+				end
+			end
+		end)
+	end
+end
+
+--[=[
+	Caches the current value
+
+	@return (source: Observable) -> Observable
+]=]
+function Rx.cache()
+	return Rx.shareReplay(1)
+end
+
+--[=[
 	Like start, but also from (list!)
 
 	@param callback () -> { T }
@@ -1436,7 +1635,7 @@ function Rx.throttleDefer()
 					lastResult = table.pack(...)
 
 					-- Queue up our result
-					task.defer(function()
+					maid._currentQueue = task.defer(function()
 						local current = lastResult
 						lastResult = nil
 
