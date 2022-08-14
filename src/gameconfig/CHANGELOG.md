@@ -1,3 +1,24 @@
+# v4.0.0 (Sun Aug 14 2022)
+
+#### 💥 Breaking Change
+
+- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
+- fix!: Fix localization table sometimes not uploading to Roblox. ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- feat: Add ServiceName to most services for faster debugging ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix localization failure occuring on GameConfigAssets where source would be the same across the same asset so the cloud table wouldn't publish ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# v3.0.0 (Sun Aug 14 2022)
+
+#### 💥 Breaking Change
+
+- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
+- refactor!: Breaking changes in settings package while we're at it. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,20 @@
+# (Sun Aug 14 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/basicpane@6.0.0`, `@quenty/binder@7.0.0`, `@quenty/blend@5.0.0`, `@quenty/camera@8.0.0`, `@quenty/chatproviderservice@2.0.0`, `@quenty/clienttranslator@7.0.0`, `@quenty/cmdrservice@6.0.0`, `@quenty/datastore@6.0.0`, `@quenty/deathreport@2.0.0`, `@quenty/depthoffield@4.0.0`, `@quenty/enumutils@2.0.0`, `@quenty/firstpersoncharactertransparency@6.0.0`, `@quenty/gameconfig@4.0.0`, `@quenty/gamescalingutils@6.0.0`, `@quenty/guivisiblemanager@7.0.0`, `@quenty/humanoidtracker@6.0.0`, `@quenty/idleservice@6.0.0`, `@quenty/ik@8.0.0`, `@quenty/inputkeymaputils@6.0.0`, `@quenty/inputmode@6.0.0`, `@quenty/mouseshiftlockservice@6.0.0`, `@quenty/networkownerservice@4.0.0`, `@quenty/particleengine@6.0.0`, `@quenty/permissionprovider@7.0.0`, `@quenty/playerinputmode@2.0.0`, `@quenty/pseudolocalize@3.0.0`, `@quenty/queue@2.0.0`, `@quenty/r15utils@6.0.0`, `@quenty/radial-image@2.0.0`, `@quenty/ragdoll@8.0.0`, `@quenty/resetservice@4.0.0`, `@quenty/rodux-actions@4.0.0`, `@quenty/rogue-humanoid@2.0.0`, `@quenty/rogue-properties@3.0.0`, `@quenty/rx@6.0.0`, `@quenty/scoredactionservice@8.0.0`, `@quenty/settings-inputkeymap@2.0.0`, `@quenty/settings@3.0.0`, `@quenty/snackbar@6.0.0`, `@quenty/softshutdown@2.0.0`, `@quenty/spawning@3.0.0`, `@quenty/string@3.0.0`, `@quenty/templateprovider@6.0.0`, `@quenty/textfilterservice@6.0.0`, `@quenty/timesyncservice@6.0.0`, `@quenty/transparencyservice@6.0.0`
+  - feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Add metapackage default.project.json [#280](https://github.com/Quenty/NevermoreEngine/pull/280) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Aug 11 2022)
 
 #### 🐛 Bug Fix
