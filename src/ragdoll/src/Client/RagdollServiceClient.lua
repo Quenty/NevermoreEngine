@@ -11,6 +11,7 @@ local RagdollServiceConstants = require("RagdollServiceConstants")
 local Players = game:GetService("Players")
 
 local RagdollServiceClient = {}
+RagdollServiceClient.ServiceName = "RagdollServiceClient"
 
 --[=[
 	Initializes the ragdoll service on the client. Should be done via [ServiceBag].

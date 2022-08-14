@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RogueHumanoidServiceClient = {}
+RogueHumanoidServiceClient.ServiceName = "RogueHumanoidServiceClient"
 
 function RogueHumanoidServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

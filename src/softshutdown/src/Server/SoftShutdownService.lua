@@ -28,6 +28,7 @@ local SoftShutdownConstants = require("SoftShutdownConstants")
 local TeleportServiceUtils = require("TeleportServiceUtils")
 
 local SoftShutdownService = {}
+SoftShutdownService.ServiceName = "SoftShutdownService"
 
 function SoftShutdownService:Init()
 	self._dataStore = DataStoreService:GetDataStore("IsSoftShutdownServer")

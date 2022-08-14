@@ -10,6 +10,7 @@ local RxStateStackUtils = require("RxStateStackUtils")
 local Rx = require("Rx")
 
 local GameConfigCommandServiceClient = {}
+GameConfigCommandServiceClient.ServiceName = "GameConfigCommandServiceClient"
 
 function GameConfigCommandServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

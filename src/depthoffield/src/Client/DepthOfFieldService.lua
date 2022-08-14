@@ -12,6 +12,7 @@ local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 
 local DepthOfFieldService = {}
+DepthOfFieldService.ServiceName = "DepthOfFieldService"
 
 --[=[
 	Initializes the DepthOfFieldService. Should be done via [ServiceBag].

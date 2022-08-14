@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local Math = require("Math")
 
 local TransparencyService = {}
+TransparencyService.ServiceName = "TransparencyService"
 
 --[=[
 	Initializes the transparency service

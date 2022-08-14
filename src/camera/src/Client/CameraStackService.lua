@@ -20,6 +20,7 @@ local Maid = require("Maid")
 assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackService on client")
 
 local CameraStackService = {}
+CameraStackService.ServiceName = "CameraStackService"
 
 --[=[
 	Initializes a new camera stack. Should be done via the ServiceBag.

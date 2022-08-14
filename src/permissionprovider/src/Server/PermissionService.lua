@@ -32,6 +32,7 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 
 local PermissionService = {}
+PermissionService.ServiceName = "PermissionService"
 
 --[=[
 	Initializes the service. Should be done via [ServiceBag].

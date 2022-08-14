@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 local HumanoidTracker = require("HumanoidTracker")
 
 local HumanoidTrackerService = {}
+HumanoidTrackerService.ServiceName = "HumanoidTrackerService"
 
 function HumanoidTrackerService:Init()
 	assert(not self._humanoidTracker, "Already initialized")

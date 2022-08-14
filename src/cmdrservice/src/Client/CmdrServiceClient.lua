@@ -18,6 +18,7 @@ local PromiseUtils = require("PromiseUtils")
 local String = require("String")
 
 local CmdrServiceClient = {}
+CmdrServiceClient.ServiceName = "CmdrServiceClient"
 
 --[=[
 	Starts the cmdr service on the client. Should be done via [ServiceBag].

@@ -11,6 +11,7 @@ local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local BadgeUtils = require("BadgeUtils")
 
 local GameConfigCommandService = {}
+GameConfigCommandService.ServiceName = "GameConfigCommandService"
 
 function GameConfigCommandService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

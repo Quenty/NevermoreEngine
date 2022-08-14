@@ -22,6 +22,7 @@ local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")
 
 local IKServiceClient = {}
+IKServiceClient.ServiceName = "IKServiceClient"
 
 --[=[
 	Initializes the service. Should be called via the [ServiceBag].

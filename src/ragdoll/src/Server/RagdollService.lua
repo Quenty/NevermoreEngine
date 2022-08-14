@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RagdollService = {}
+RagdollService.ServiceName = "RagdollService"
 
 --[=[
 	Initializes the ragdoll service on the server. Should be done via [ServiceBag].

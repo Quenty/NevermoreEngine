@@ -14,6 +14,7 @@ local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
 
 local GameDataStoreService = {}
+GameDataStoreService.ServiceName = "GameDataStoreService"
 
 function GameDataStoreService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

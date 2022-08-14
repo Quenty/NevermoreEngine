@@ -10,6 +10,7 @@ local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants
 local PlayerInputModeUtils = require("PlayerInputModeUtils")
 
 local PlayerInputModeService = {}
+PlayerInputModeService.ServiceName = "PlayerInputModeService"
 
 function PlayerInputModeService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
