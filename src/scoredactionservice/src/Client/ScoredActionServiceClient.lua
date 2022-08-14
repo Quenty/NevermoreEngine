@@ -21,7 +21,7 @@ ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
 
 --[=[
 	Initializes the ScoredActionServiceClient. Should be done via [ServiceBag].
-	@param _serviceBag ServiceBag
+	@param serviceBag ServiceBag
 ]=]
 function ScoredActionServiceClient:Init(serviceBag)
 	assert(not self._provider, "Already initialize")

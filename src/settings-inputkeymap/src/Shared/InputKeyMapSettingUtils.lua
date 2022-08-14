@@ -14,6 +14,13 @@ local String = require("String")
 
 local InputKeyMapSettingUtils = {}
 
+--[=[
+	Returns the canonical setting name for this input key map list.
+
+	@param inputKeyMapList InputKeyMapList
+	@param inputModeType InputModeType
+	@return string
+]=]
 function InputKeyMapSettingUtils.getSettingName(inputKeyMapList, inputModeType)
 	return ("Keybind_%s_%s"):format(String.toCamelCase(inputKeyMapList:GetListName()), inputModeType.Name)
 end
@@ -44,7 +51,7 @@ end
 --[=[
 	Decodes the list from a string into a safe value.
 
-	@param list { InputType }
+	@param encoded string?
 	@return string
 ]=]
 function InputKeyMapSettingUtils.decodeInputTypeList(encoded)

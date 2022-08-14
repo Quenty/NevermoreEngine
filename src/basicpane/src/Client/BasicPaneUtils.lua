@@ -54,6 +54,7 @@ end
 	})
 	```
 
+	@param createBasicPane (maid: Maid) -> BasicPane
 	@return (source: Observable<boolean>) -> Observable<Brio<GuiBase>>
 ]=]
 function BasicPaneUtils.whenVisibleBrio(createBasicPane)

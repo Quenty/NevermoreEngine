@@ -14,7 +14,7 @@ local EnumUtils = {}
 	print(EnumUtils.encodeAsString(Enum.KeyCode.E)) --> Enum.KeyCode.E
 	```
 
-	@param value string? -- String to decode
+	@param enumItem EnumItem
 	@return EnumItem
 ]=]
 function EnumUtils.encodeAsString(enumItem)

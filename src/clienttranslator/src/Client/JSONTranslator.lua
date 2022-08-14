@@ -41,6 +41,7 @@ JSONTranslator.__index = JSONTranslator
 	-- assume there is an `en.json` underneath the script with valid JSON.
 	```
 
+	@param translatorName string -- Name of the translator. Used for source.
 	@param ... any
 	@return JSONTranslator
 ]=]

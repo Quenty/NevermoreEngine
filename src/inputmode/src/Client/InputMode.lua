@@ -26,9 +26,8 @@ InputMode.__index = InputMode
 InputMode.ClassName = "InputMode"
 
 --[=[
-	Constructs a new InputMode
+	Constructs a new InputMode. This inherits data from the name.
 
-	@param name string
 	@param inputModeType InputModeType
 	@return InputMode
 ]=]

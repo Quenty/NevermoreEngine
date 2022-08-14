@@ -21,6 +21,8 @@ InputModeTypeSelector.DEFAULT_MODE_TYPES = {
 
 --[=[
 	Constructs a new InputModeTypeSelector
+
+	@param serviceBag ServiceBag
 	@param inputModesTypes { InputModeType }
 	@return InputModeTypeSelector
 ]=]
@@ -28,6 +30,7 @@ function InputModeTypeSelector.new(serviceBag, inputModesTypes)
 	local self = setmetatable({}, InputModeTypeSelector)
 
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
+
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._inputModeServiceClient = self._serviceBag:GetService(InputModeServiceClient)
@@ -56,6 +59,8 @@ end
 
 --[=[
 	Constructs a new InputModeTypeSelector
+
+	@param serviceBag ServiceBag
 	@param observeInputModesBrio Observable<Brio<InputModeType>>
 	@return InputModeTypeSelector
 ]=]

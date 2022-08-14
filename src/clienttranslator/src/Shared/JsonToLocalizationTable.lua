@@ -15,6 +15,8 @@ local LOCALIZATION_TABLE_NAME = "GeneratedJSONTable"
 
 --[[
 	Recursively iterates through the object to construct strings and add it to the localization table
+
+	@param localizationTable LocalizationTable
 	@param localeId string -- The localizationid to add
 	@param baseKey string -- the key to add
 	@param object any -- The value to iterate over
@@ -48,6 +50,7 @@ end
 
 --[=[
 	Extracts the locale from the name
+
 	@param name string -- The name to parse
 	@return string -- The locale
 ]=]
@@ -59,6 +62,12 @@ function JsonToLocalizationTable.localeFromName(name)
 	end
 end
 
+--[=[
+	Gets or creates the global localization table. If the game isn't running (i.e. test mode), then
+	we'll just not parent it.
+
+	@return string -- The locale
+]=]
 function JsonToLocalizationTable.getOrCreateLocalizationTable()
 	local localizationTable = LocalizationService:FindFirstChild(LOCALIZATION_TABLE_NAME)
 
@@ -75,7 +84,9 @@ function JsonToLocalizationTable.getOrCreateLocalizationTable()
 end
 
 --[=[
-	Loads a folder into a localization table
+	Loads a folder into a localization table.
+
+	@param tableName string -- Used for source
 	@param folder Folder -- A Roblox folder with StringValues containing JSON, named with the localization in mind
 ]=]
 function JsonToLocalizationTable.loadFolder(tableName, folder)
@@ -97,6 +108,8 @@ end
 
 --[=[
 	Extracts the locale from the folder, or a locale and table.
+
+	@param tableName string -- Used for source
 	@param first Instance | string
 	@param second table?
 	@return LocalizationTable
@@ -118,6 +131,8 @@ end
 
 --[=[
 	Extracts the locale from the name
+
+	@param tableName string -- Used for source
 	@param localeId string -- the defaultlocaleId
 	@param dataTable table -- Data table to load from
 	@return LocalizationTable
@@ -134,9 +149,11 @@ end
 
 --[=[
 	Adds json to a localization table
+
 	@param localizationTable LocalizationTable -- The localization table to add to
 	@param localeId string -- The localeId to use
 	@param json string -- The json to add with
+	@param tableName string -- Used for source
 ]=]
 function JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, json, tableName)
 	assert(type(tableName) == "string", "Bad tableName")
