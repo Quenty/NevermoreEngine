@@ -1,20 +1,15 @@
-# v6.0.0 (Sun Aug 14 2022)
-
-#### 💥 Breaking Change
-
-- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
-- refactor!: Rename RxR15Utils.observeCharacterPart to RxR15Utils.observeCharacterPartBrio ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@5.2.0...@quenty/r15utils@6.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@5.1.0...@quenty/r15utils@5.2.0) (2022-07-31)
 

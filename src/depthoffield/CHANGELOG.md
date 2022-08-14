@@ -1,23 +1,18 @@
-# v4.0.0 (Sun Aug 14 2022)
-
-#### 💥 Breaking Change
-
-- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add ServiceName to most services for faster debugging ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@3.2.0...@quenty/depthoffield@4.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@3.1.0...@quenty/depthoffield@3.2.0) (2022-07-31)
 

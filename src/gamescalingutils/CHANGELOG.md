@@ -1,23 +1,18 @@
-# v6.0.0 (Sun Aug 14 2022)
-
-#### 💥 Breaking Change
-
-- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add blend helper methods to render the UI scale and dialog padding ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@5.3.1...@quenty/gamescalingutils@6.0.0) (2022-08-14)
+
+
+### Features
+
+* Add blend helper methods to render the UI scale and dialog padding ([f6d342f](https://github.com/Quenty/NevermoreEngine/commit/f6d342ffd92f0df04011efe762d294f681e19d8c))
+
+
+
+
 
 ## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@5.3.0...@quenty/gamescalingutils@5.3.1) (2022-08-11)
 

@@ -1,28 +1,23 @@
-# v4.0.0 (Sun Aug 14 2022)
-
-#### 💥 Breaking Change
-
-- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
-- fix!: Fix localization table sometimes not uploading to Roblox. ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add ServiceName to most services for faster debugging ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix localization failure occuring on GameConfigAssets where source would be the same across the same asset so the cloud table wouldn't publish ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@3.4.1...@quenty/gameconfig@4.0.0) (2022-08-14)
+
+
+### Bug Fixes
+
+* Fix localization failure occuring on GameConfigAssets where source would be the same across the same asset so the cloud table wouldn't publish ([23c78ab](https://github.com/Quenty/NevermoreEngine/commit/23c78abbb5f1dcf2de8c8c855dfe20a8a58b4e53))
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
 
 ## [3.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@3.4.0...@quenty/gameconfig@3.4.1) (2022-08-11)
 

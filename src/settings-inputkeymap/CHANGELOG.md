@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.0.0 (2022-08-14)
+
+
+### Features
+
+* Add Settings-InputKeyMap package which saves keybinds for the user into the setting system. ([225254b](https://github.com/Quenty/NevermoreEngine/commit/225254bf28744c1bd476d9882c9edafa800a7998))
+
+
+
+
+
 # v2.0.0 (Sun Aug 14 2022)
 
 #### 💥 Breaking Change

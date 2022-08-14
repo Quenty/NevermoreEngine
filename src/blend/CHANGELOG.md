@@ -1,23 +1,18 @@
-# v5.0.0 (Sun Aug 14 2022)
-
-#### 💥 Breaking Change
-
-- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add Blend.Shared and Blend.Throttled to optimize expensive blend scenarios. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.3.1...@quenty/blend@5.0.0) (2022-08-14)
+
+
+### Features
+
+* Add Blend.Shared and Blend.Throttled to optimize expensive blend scenarios. ([3073d57](https://github.com/Quenty/NevermoreEngine/commit/3073d57e5b52ef66c03c8fcd4a7dcd61aed22fda))
+
+
+
+
 
 ## [4.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.3.0...@quenty/blend@4.3.1) (2022-08-11)
 

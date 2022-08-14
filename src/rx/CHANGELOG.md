@@ -1,23 +1,18 @@
-# v6.0.0 (Sun Aug 14 2022)
-
-#### 💥 Breaking Change
-
-- feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add Rx.share, Rx.shareReplay and Rx.cache ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@5.2.0...@quenty/rx@6.0.0) (2022-08-14)
+
+
+### Features
+
+* Add Rx.share, Rx.shareReplay and Rx.cache ([6f1268f](https://github.com/Quenty/NevermoreEngine/commit/6f1268f8f70908f04dbebff7f2a267fc24eafc19))
+
+
+
+
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@5.1.0...@quenty/rx@5.2.0) (2022-07-31)
 
