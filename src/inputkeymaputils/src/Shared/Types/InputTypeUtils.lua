@@ -10,9 +10,19 @@ local InputTypeUtils = {}
 
 --[=[
 	A valid input type that can be represented here.
-	@type InputType KeyCode | UserInputType | SlottedTouchButton | "TouchButton" | "Tap" | any
+	@type InputType KeyCode | UserInputType | SlottedTouchButton | "TouchButton" | "Tap" | "Drag" | any
 	@within InputTypeUtils
 ]=]
+
+function InputTypeUtils.isKnownInputType(inputType)
+	return InputTypeUtils.isTapInWorld(inputType)
+		or InputTypeUtils.isRobloxTouchButton(inputType)
+		or InputTypeUtils.isDrag(inputType)
+		or SlottedTouchButtonUtils.isSlottedTouchButton(inputType)
+		or (typeof(inputType) == "EnumItem" and (
+			tostring(inputType.EnumType) == "UserInputType"
+			or tostring(inputType.EnumType) == "KeyCode"))
+end
 
 --[=[
 	Returns true if the input type is specifying a tap in the world
@@ -21,6 +31,16 @@ local InputTypeUtils = {}
 ]=]
 function InputTypeUtils.isTapInWorld(inputKey)
 	return inputKey == "Tap"
+end
+
+
+--[=[
+	Returns true if the input type is specifying a drag
+	@param inputKey any
+	@return boolean
+]=]
+function InputTypeUtils.isDrag(inputKey)
+	return inputKey == "Drag"
 end
 
 --[=[

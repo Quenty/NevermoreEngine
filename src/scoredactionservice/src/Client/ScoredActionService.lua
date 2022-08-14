@@ -17,15 +17,18 @@ local Observable = require("Observable")
 local InputKeyMapList = require("InputKeyMapList")
 
 local ScoredActionService = {}
+ScoredActionService.ServiceName = "ScoredActionService"
 
 --[=[
 	Initializes the ScoredActionService. Should be done via [ServiceBag].
 	@param _serviceBag ServiceBag
 ]=]
-function ScoredActionService:Init(_serviceBag)
+function ScoredActionService:Init(serviceBag)
 	assert(not self._provider, "Already initialize")
 
 	self._maid = Maid.new()
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
 	self._provider = ScoredActionPickerProvider.new()
 	self._maid:GiveTask(self._provider)
 end
@@ -55,7 +58,7 @@ function ScoredActionService:GetScoredAction(inputKeyMapList)
 	local maid = Maid.new()
 	maid:GiveTask(scoredAction)
 
-	maid:GiveTask(InputListScoreHelper.new(self._provider, scoredAction, inputKeyMapList))
+	maid:GiveTask(InputListScoreHelper.new(self._serviceBag, self._provider, scoredAction, inputKeyMapList))
 
 	-- Couple cleanup to the scored action
 	maid:GiveTask(scoredAction.Removing:Connect(function()

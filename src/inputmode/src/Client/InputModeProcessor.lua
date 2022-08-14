@@ -1,6 +1,5 @@
 --[=[
-	Process inputs by evaluating inputModes. Typically not used directly, but rather, just
-	use modes from INPUT_MODES.
+	Process inputs by evaluating inputModes. Helper object..
 
 	@class InputModeProcessor
 ]=]
@@ -11,7 +10,7 @@ InputModeProcessor.ClassName = InputModeProcessor
 
 --[=[
 	Construtcs a new inputModeProcessor
-	@param inputModes { InputMode }
+	@param inputModes { InputMode }?
 	@return InputModeProcessor
 ]=]
 function InputModeProcessor.new(inputModes)
@@ -19,11 +18,17 @@ function InputModeProcessor.new(inputModes)
 
 	self._inputModes = {}
 
-	for _, state in pairs(inputModes) do
-		self._inputModes[#self._inputModes+1] = state
+	if inputModes then
+		for _, inputMode in pairs(inputModes) do
+			self:AddInputMode(inputMode)
+		end
 	end
 
 	return self
+end
+
+function InputModeProcessor:AddInputMode(inputMode)
+	table.insert(self._inputModes, inputMode)
 end
 
 --[=[
