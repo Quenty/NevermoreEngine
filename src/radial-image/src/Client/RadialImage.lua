@@ -7,6 +7,9 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local Math = require("Math")
+local Observable = require("Observable")
+local Maid = require("Maid")
+local ValueObject = require("ValueObject")
 
 local RadialImage = setmetatable({}, BaseObject)
 RadialImage.ClassName = "RadialImage"
@@ -43,11 +46,74 @@ function RadialImage.new()
 	self._disabledColor.Value = Color3.new(1, 1, 1)
 	self._maid:GiveTask(self._disabledColor)
 
+	self._absoluteSize = ValueObject.new(Vector2.new(0, 0))
+	self._maid:GiveTask(self._absoluteSize)
+
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
 		self.Gui = gui
 	end))
 
 	return self
+end
+
+function RadialImage.blend(props)
+	assert(type(props) == "table", "Bad props")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local viewport = RadialImage.new()
+
+		local function bindObservable(propName, callback)
+			if props[propName] then
+				local observe = Blend.toPropertyObservable(props[propName])
+				if observe then
+					maid:GiveTask(observe:Subscribe(function(value)
+						callback(value)
+					end))
+				else
+					callback(props[propName])
+				end
+			end
+		end
+
+		bindObservable("Image", function(value)
+			viewport:SetImage(value)
+		end)
+
+		bindObservable("Percent", function(value)
+			viewport:SetPercent(value)
+		end)
+		bindObservable("EnabledTransparency", function(value)
+			viewport:SetEnabledTransparency(value)
+		end)
+		bindObservable("DisabledTransparency", function(value)
+			viewport:SetDisabledTransparency(value)
+		end)
+		bindObservable("EnabledColor", function(value)
+			viewport:SetEnabledColor(value)
+		end)
+		bindObservable("DisabledColor", function(value)
+			viewport:SetDisabledColor(value)
+		end)
+		bindObservable("Transparency", function(value)
+			viewport:SetTransparency(value)
+		end)
+
+		bindObservable("Size", function(value)
+			viewport.Gui.Size = value
+		end)
+		bindObservable("Position", function(value)
+			viewport.Gui.Position = value
+		end)
+		bindObservable("AnchorPoint", function(value)
+			viewport.Gui.AnchorPoint = value
+		end)
+
+		sub:Fire(viewport.Gui)
+
+		return maid
+	end)
 end
 
 --[=[
@@ -125,6 +191,7 @@ function RadialImage:_render()
 		Name = "RadialImage";
 		Size = UDim2.new(1, 0, 1, 0);
 		BackgroundTransparency = 1;
+		[Blend.OnChange("AbsoluteSize")] = self._absoluteSize;
 
 		[Blend.Children] = {
 			Blend.New "UIAspectRatioConstraint" {
@@ -133,7 +200,17 @@ function RadialImage:_render()
 
 			Blend.New "Frame" {
 				Name = "LeftFrame";
-				Size = UDim2.new(0.5, 0, 1, 0);
+				Size = Blend.Computed(self._absoluteSize, function(size)
+					-- hack: ensures when we're 24.5 wide or something we don't end
+					-- up with a split in the middle.
+					-- this is an issue because clips descendants tends towards floor
+					-- pixel clipping.
+					if size.x % 2 ~= 0 then
+						return UDim2.new(0.5, 1, 1, 0);
+					else
+						return UDim2.new(0.5, 0, 1, 0);
+					end
+				end);
 				Position = UDim2.new(0, 0, 0, 0);
 				BackgroundTransparency = 1;
 				ClipsDescendants = true;

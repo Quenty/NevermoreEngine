@@ -21,7 +21,10 @@ return function(target)
 	maid:GiveTask(radialImage)
 
 	maid:GiveTask(RunService.RenderStepped:Connect(function()
-		radialImage:SetPercent((os.clock()/5) % 1)
+		-- radialImage:SetPercent((os.clock()/5) % 1)
+
+		local scale = (1 + math.sin((os.clock()/5)*math.pi*2))/2
+		radialImage.Gui.Size = UDim2.fromOffset(scale*90, scale*90)
 	end))
 
 	radialImage.Gui.Parent = target

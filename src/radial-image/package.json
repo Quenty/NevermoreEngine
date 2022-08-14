@@ -30,7 +30,9 @@
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math"
+    "@quenty/math": "file:../math",
+    "@quenty/rx": "file:../rx",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"
