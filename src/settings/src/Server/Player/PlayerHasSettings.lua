@@ -40,7 +40,7 @@ function PlayerHasSettings:_promiseLoadSettings()
 				:Then(function(settings)
 					for settingName, value in pairs(settings) do
 						local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
-						self._settings:SetAttribute(attributeName, value)
+						self._settings:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(value))
 					end
 
 					self._maid:GiveTask(self._settings.AttributeChanged:Connect(function(attributeName)
@@ -64,7 +64,7 @@ function PlayerHasSettings:_handleAttributeChanged(subStore, attributeName)
 
 	-- Write the new value
 	local settingName = PlayerSettingsUtils.getSettingName(attributeName)
-	local newValue = self._settings:GetAttribute(attributeName)
+	local newValue = PlayerSettingsUtils.decodeForAttribute(self._settings:GetAttribute(attributeName))
 	subStore:Store(settingName, newValue)
 end
 

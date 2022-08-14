@@ -4,7 +4,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local SettingServiceBridge = require("SettingServiceBridge")
+local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
 local Rx = require("Rx")
 
 local SettingProperty = {}
@@ -15,7 +15,7 @@ function SettingProperty.new(serviceBag, player, definition)
 	local self = setmetatable({}, SettingProperty)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._bridge = self._serviceBag:GetService(SettingServiceBridge)
+	self._bridge = self._serviceBag:GetService(SettingRegistryServiceShared)
 
 	self._player = assert(player, "No player")
 	self._definition = assert(definition, "No definition")

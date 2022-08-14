@@ -7,7 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local PlayerSettingsBase = require("PlayerSettingsBase")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
-local SettingServiceBridge = require("SettingServiceBridge")
+local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
 
 local PlayerSettings = setmetatable({}, PlayerSettingsBase)
 PlayerSettings.ClassName = "PlayerSettings"
@@ -16,7 +16,8 @@ PlayerSettings.__index = PlayerSettings
 function PlayerSettings.new(obj, serviceBag)
 	local self = setmetatable(PlayerSettingsBase.new(obj, serviceBag), PlayerSettings)
 
-	self._bridge = self._serviceBag:GetService(SettingServiceBridge)
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._settingRegistryServiceShared = self._serviceBag:GetService(SettingRegistryServiceShared)
 
 	self._remoteFunction = Instance.new("RemoteFunction")
 	self._remoteFunction.Name = PlayerSettingsConstants.REMOTE_FUNCTION_NAME
@@ -28,7 +29,7 @@ function PlayerSettings.new(obj, serviceBag)
 		return self:_handleServerInvoke(...)
 	end
 
-	self._maid:GiveTask(self._bridge:ObserveRegisteredDefinitionsBrio():Subscribe(function(brio)
+	self._maid:GiveTask(self._settingRegistryServiceShared:ObserveRegisteredDefinitionsBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end
@@ -46,7 +47,7 @@ function PlayerSettings:EnsureInitialized(settingName, defaultValue)
 	local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
 	if self._obj:GetAttribute(attributeName) == nil then
-		self._obj:SetAttribute(attributeName, defaultValue)
+		self._obj:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(defaultValue))
 	end
 end
 
@@ -69,12 +70,12 @@ function PlayerSettings:_setSettings(settingsMap)
 		local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
 		if self._obj:GetAttribute(attributeName) == nil then
-			warn("[PlayerSettings] - Cannot set setting on attribute that is not defined on the server")
+			warn(("[PlayerSettings] - Cannot set setting %q on attribute that is not defined on the server."):format(attributeName))
 			continue
 		end
 
 		local decoded = PlayerSettingsUtils.decodeForNetwork(value)
-		self._obj:SetAttribute(attributeName, decoded)
+		self._obj:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(decoded))
 	end
 end
 
