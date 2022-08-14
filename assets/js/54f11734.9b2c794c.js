@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[60017],{52340:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GameProductBindersClient","desc":"","source":{"line":4,"path":"src/gameproductservice/src/Client/GameProductBindersClient.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[73330],{53449:function(i){i.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PillBackingBuilder","desc":"Builds a pill backing for Guis","source":{"line":5,"path":"src/pillbacking/src/Client/PillBackingBuilder.lua"}}')}}]);

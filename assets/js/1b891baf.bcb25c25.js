@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[1080],{29038:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"InputKeyMapSetting","desc":"Registers the settings automatically so we can validate on the server.","source":{"line":5,"path":"src/settings-inputkeymap/src/Server/InputKeyMapSetting.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[2465],{11718:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Door","desc":"","source":{"line":4,"path":"src/tie/test/modules/Server/Door.lua"}}')}}]);

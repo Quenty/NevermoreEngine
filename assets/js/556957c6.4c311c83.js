@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[18604],{44489:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"UIPaddingUtils","desc":"Utility functions for UI padding","source":{"line":5,"path":"src/uiobjectutils/src/Client/UIPaddingUtils.lua"}}')}}]);

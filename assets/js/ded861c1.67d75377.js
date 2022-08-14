@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[13219],{53592:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TextFilterService","desc":"","source":{"line":4,"path":"src/textfilterservice/src/Server/TextFilterService.lua"}}')}}]);

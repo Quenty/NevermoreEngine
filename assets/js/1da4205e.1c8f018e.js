@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[69071],{15850:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SettingRegistryServiceShared","desc":"Shared between client and server, letting us centralize definitions in one place.","source":{"line":6,"path":"src/settings/src/Shared/SettingRegistryServiceShared.lua"}}')}}]);

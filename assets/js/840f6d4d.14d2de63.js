@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[37609],{9706:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IKBindersServer","desc":"Holds binders","realm":["Server"],"source":{"line":6,"path":"src/ik/src/Server/IKBindersServer.lua"}}')}}]);

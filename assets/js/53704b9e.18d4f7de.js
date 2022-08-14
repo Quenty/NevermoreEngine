@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[90746],{48890:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"qGui","desc":"A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs","source":{"line":5,"path":"src/qgui/src/Shared/qGUI.lua"}}')}}]);

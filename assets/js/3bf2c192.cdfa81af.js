@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[57777],{10395:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"IKRigBase","desc":"","source":{"line":4,"path":"src/ik/src/Shared/Rig/IKRigBase.lua"}}')}}]);

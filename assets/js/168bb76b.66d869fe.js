@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[25088],{73059:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RogueMultiplierProvider","desc":"","source":{"line":4,"path":"src/rogue-properties/src/Shared/Modifiers/Multiplier/RogueMultiplierProvider.lua"}}')}}]);

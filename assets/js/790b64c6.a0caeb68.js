@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[64859],{79899:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"setMechanismCFrame","desc":"Sets a mechanisms cframe","source":{"line":5,"path":"src/setmechanismcframe/src/Shared/setMechanismCFrame.lua"}}')}}]);

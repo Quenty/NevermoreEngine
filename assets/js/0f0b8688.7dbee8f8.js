@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[95811],{80750:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ValueBaseUtils","desc":"Provides utilities for working with valuesbase objects, like IntValue or ObjectValue in Roblox.","source":{"line":5,"path":"src/valuebaseutils/src/Shared/ValueBaseUtils.lua"}}')}}]);

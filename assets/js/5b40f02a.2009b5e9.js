@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[25130],{80966:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Scrollbar","desc":"","source":{"line":4,"path":"src/scrollingframe/src/Client/Scrollbar.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[56156],{54120:function(s){s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollableConstants","desc":"Constants for the [Ragdollable] class.","source":{"line":5,"path":"src/ragdoll/src/Shared/RagdollableConstants.lua"}}')}}]);

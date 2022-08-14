@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[8460],{77485:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RoguePropertyBinderGroups","desc":"","source":{"line":4,"path":"src/rogue-properties/src/Shared/RoguePropertyBinderGroups.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[23427],{74442:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"InverseFader","desc":"Be the inverse of a fading camera (makes scaling in cameras easy).","source":{"line":5,"path":"src/camera/src/Client/Effects/InverseFader.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[88156],{64522:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"GamepadRotateModel","desc":"Rotation model for gamepad controls","source":{"line":5,"path":"src/camera/src/Client/Controls/GamepadRotateModel.lua"}}')}}]);

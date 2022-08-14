@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[89825],{75193:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ScrollModel","desc":"Scrolling model for scrolling frame","source":{"line":5,"path":"src/scrollingframe/src/Client/ScrollModel.lua"}}')}}]);

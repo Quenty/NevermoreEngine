@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[54463],{84949:function(i){i.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PillBackingUtils","desc":"Utilities for working with pill backings","source":{"line":5,"path":"src/pillbacking/src/Client/PillBackingUtils.lua"}}')}}]);

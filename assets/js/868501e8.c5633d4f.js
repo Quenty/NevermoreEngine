@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[84956],{93943:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RogueSetterProvider","desc":"","source":{"line":4,"path":"src/rogue-properties/src/Shared/Modifiers/Setter/RogueSetterProvider.lua"}}')}}]);

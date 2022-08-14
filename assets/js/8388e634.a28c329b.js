@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[62701],{75293:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RogueBindersShared","desc":"","source":{"line":4,"path":"src/rogue-properties/src/Shared/RogueBindersShared.lua"}}')}}]);

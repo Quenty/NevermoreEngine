@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[89973],{32280:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PlayerProductManager","desc":"","source":{"line":4,"path":"src/gameproductservice/src/Server/Manager/PlayerProductManager.lua"}}')}}]);

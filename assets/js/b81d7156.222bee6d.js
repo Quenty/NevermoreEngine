@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[48122],{93140:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"LocalizationServiceUtils","desc":"","source":{"line":4,"path":"src/clienttranslator/src/Client/LocalizationServiceUtils.lua"}}')}}]);

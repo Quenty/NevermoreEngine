@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[25225],{75744:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TaggedTemplateProvider","desc":"Like a template provider, but it also reparents and retrieves tagged objects","source":{"line":5,"path":"src/templateprovider/src/Shared/TaggedTemplateProvider.lua"}}')}}]);

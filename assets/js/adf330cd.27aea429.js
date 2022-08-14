@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[83793],{41626:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Viewport","desc":"","source":{"line":4,"path":"src/viewport/src/Client/Viewport.lua"}}')}}]);

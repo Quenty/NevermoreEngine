@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[80378],{944:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"AdorneeValue","desc":"Helper class to transform a an adornee into relative positions/information","source":{"line":5,"path":"src/adorneevalue/src/Shared/AdorneeValue.lua"}}')}}]);

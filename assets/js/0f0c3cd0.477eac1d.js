@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[71110],{62257:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SelectionImageUtils","desc":"Provides a utility method to clearing selection images with blank values.","source":{"line":5,"path":"src/selectionimageutils/src/Client/SelectionImageUtils.lua"}}')}}]);

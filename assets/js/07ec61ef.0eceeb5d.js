@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[12914],{60509:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TeamTracker","desc":"Tracks a player\'s current team, since the Team property is unreliable","source":{"line":5,"path":"src/teamtracker/src/Shared/TeamTracker.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[15328],{32657:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RogueHumanoidService","desc":"","source":{"line":4,"path":"src/rogue-humanoid/src/Server/RogueHumanoidService.lua"}}')}}]);

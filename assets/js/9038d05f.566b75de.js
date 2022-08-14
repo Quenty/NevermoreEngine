@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[41899],{53358:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SoftShutdownConstants","desc":"","source":{"line":4,"path":"src/softshutdown/src/Shared/SoftShutdownConstants.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[32219],{59533:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ColorPickerInput","desc":"","source":{"line":4,"path":"src/colorpicker/src/Client/Input/ColorPickerInput.lua"}}')}}]);

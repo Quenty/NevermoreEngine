@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[65497],{6538:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TieMethodImplementation","desc":"","source":{"line":4,"path":"src/tie/src/Shared/Implementation/TieMethodImplementation.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[62429],{66989:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SmoothPositionCamera","desc":"Lags the camera smoothly behind the position maintaining other components","source":{"line":5,"path":"src/camera/src/Client/Effects/SmoothPositionCamera.lua"}}')}}]);

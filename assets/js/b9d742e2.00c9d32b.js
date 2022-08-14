@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[40905],{4075:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SoftShutdownUI","desc":"","source":{"line":4,"path":"src/softshutdown/src/Client/SoftShutdownUI.lua"}}')}}]);

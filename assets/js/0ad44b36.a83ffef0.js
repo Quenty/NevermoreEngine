@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[87989],{6476:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PartTouchingRenderer","desc":"Renders touching parts from the PartTouchingCalculator","source":{"line":5,"path":"src/parttouchingcalculator/src/Shared/PartTouchingRenderer.lua"}}')}}]);

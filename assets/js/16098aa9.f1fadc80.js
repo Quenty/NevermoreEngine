@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[1529],{75935:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ColorPickerTriangle","desc":"","source":{"line":4,"path":"src/colorpicker/src/Client/Cursor/ColorPickerTriangle.lua"}}')}}]);

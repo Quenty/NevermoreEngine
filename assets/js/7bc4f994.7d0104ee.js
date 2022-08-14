@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[54339],{49688:o=>{o.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CooldownConstants","desc":"Holds constants for the cooldown.","source":{"line":5,"path":"src/cooldown/src/Shared/CooldownConstants.lua"}}')}}]);

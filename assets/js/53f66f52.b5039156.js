@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[9810],{68240:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Action","desc":"","source":{"line":4,"path":"src/tie/test/modules/Server/Action/Action.lua"}}')}}]);

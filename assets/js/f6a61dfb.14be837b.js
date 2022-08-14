@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[50799],{31482:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Region3int16Utils","desc":"Module for working with Region3int16","source":{"line":5,"path":"src/region3int16utils/src/Shared/Region3int16Utils.lua"}}')}}]);

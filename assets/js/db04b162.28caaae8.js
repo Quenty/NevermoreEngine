@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[41466],{869:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"CameraControls","desc":"Interface between user input and camera controls","source":{"line":5,"path":"src/camera/src/Client/Controls/CameraControls.lua"}}')}}]);

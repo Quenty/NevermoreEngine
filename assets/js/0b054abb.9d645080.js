@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[18058],{37762:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"MouseOverMixin","desc":"Mouse over mixin for general utility button mouse over effects","source":{"line":5,"path":"src/mouseovermixin/src/Client/MouseOverMixin.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[59645],{38256:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"XZPlaneLockCamera","desc":"Lock camera to only XZPlane, preventing TrackerCameras from making players sick.","source":{"line":5,"path":"src/camera/src/Client/Effects/XZPlaneLockCamera.lua"}}')}}]);

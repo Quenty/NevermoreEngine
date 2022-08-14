@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[89909],{43450:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PlayerKillTrackerAssigner","desc":"","source":{"line":4,"path":"src/deathreport/src/Server/Stats/PlayerKillTrackerAssigner.lua"}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[81573],{30592:function(e){e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"LoaderClass","desc":"Loading logic for Nevermore","private":true,"source":{"line":7,"path":"src/loader/src/Loader.lua"}}')}}]);
