@@ -51,7 +51,19 @@ function TintControllerUtils.setTint(controller: Instance, color: any)
 	local color3 = convertToColor3(color)
 	assert(color3, "Bad tintColor")
 
-	controller:SetAttribute(TintControllerConstants.ATTRIBUTE_NAME, color3)
+	controller:SetAttribute(TintControllerConstants.COLOR_ATTRIBUTE_NAME, color3)
+end
+
+--[=[
+	Sets the blending opacity of the tint applied by this controller.
+
+	@param controller Instance
+	@param blend number -- Typically between 0 and 1
+]=]
+function TintControllerUtils.setTintBlend(controller: Instance, blend: any)
+	assert(typeof(blend) == "number", "Bad blend value")
+
+	controller:SetAttribute(TintControllerConstants.BLEND_ATTRIBUTE_NAME, blend)
 end
 
 return TintControllerUtils

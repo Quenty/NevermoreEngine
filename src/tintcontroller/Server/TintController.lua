@@ -36,4 +36,13 @@ function TintController:SetTint(tint: any)
 	TintControllerUtils.setTint(self._obj, tint)
 end
 
+--[=[
+	Sets the blending of this controller's tint. Typically ranges between 0 and 1.
+
+	@param blend number
+]=]
+function TintController:SetTintBlend(blend: number)
+	TintControllerUtils.setTintBlend(self._obj, blend)
+end
+
 return TintController
