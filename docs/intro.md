@@ -32,7 +32,8 @@ Right now you need a special version of Rojo to sync in the npm dependencies pro
 
 ## Custom version of rojo. Why?
 
-We have a custom version of rojo to support syncing in symlinks for development, mesh parts, and optional node_modules for dependencies.
+We have a custom version of rojo to support syncing in symlinks for development, mesh parts. As for today, you should not need this version of rojo
+unless you are trying to sync in symlinked versions of this repo.
 
 ## Sample project
 

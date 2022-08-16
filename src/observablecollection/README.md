@@ -1,4 +1,4 @@
-## Observable Collection
+## ObservableCollection
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
@@ -11,7 +11,7 @@
   </a>
 </div>
 
-An observable set for use in UI situations
+A set of observable collections, such as sets, maps, sorted lists, and more. Great for use in UI.
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ObservableSet">View docs →</a></div>
 

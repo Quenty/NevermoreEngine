@@ -11,7 +11,7 @@
   </a>
 </div>
 
-Utility methods for input map
+System to define rebindable key bindings and inputs for Roblox.
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/InputKeyMapList">View docs →</a></div>
 

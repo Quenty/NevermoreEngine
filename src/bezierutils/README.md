@@ -11,7 +11,7 @@
   </a>
 </div>
 
-Make interpolation curves like CSS A good place to generate and test these out: http://cubic-bezier.com/ Based upon https://gist.github.com/gre/1926947#file-keyspline-js
+Make interpolation curves like CSS
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/BezierUtils">View docs →</a></div>
 
@@ -19,3 +19,6 @@ Make interpolation curves like CSS A good place to generate and test these out: 
 ```
 npm install @quenty/bezierutils --save
 ```
+
+A good place to generate and test these out: http://cubic-bezier.com/
+Based upon https://gist.github.com/gre/1926947#file-keyspline-js

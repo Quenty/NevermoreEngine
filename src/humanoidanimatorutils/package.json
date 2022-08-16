@@ -1,7 +1,7 @@
 {
   "name": "@quenty/humanoidanimatorutils",
   "version": "2.1.0",
-  "description": "HumanoidAnimatorUtils - Utility functions involving humanoids and animators for Roblox",
+  "description": "Utility functions to retrieve and manipulate the Animator object on Roblox from a humanoid.",
   "keywords": [
     "Roblox",
     "Nevermore",

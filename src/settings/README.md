@@ -1,4 +1,4 @@
-## Rx
+## Settings
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
@@ -11,11 +11,11 @@
   </a>
 </div>
 
-A reactive library for Roblox that lets you program in the observable pattern
+Centralized player settings service
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Rx">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SettingsService">View docs →</a></div>
 
 ## Installation
 ```
-npm install @quenty/rx --save
+npm install @quenty/settings --save
 ```
