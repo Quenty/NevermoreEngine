@@ -13,9 +13,12 @@
 
 Renders markdown in a Roblox Gui.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/MarkdownRenderw">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/MarkdownRender">View docs →</a></div>
 
 ## Installation
 ```
 npm install @quenty/markdownrender --save
 ```
+
+## Warning
+This API surface has not been touched for a while and may not be suitable for production.

@@ -13,7 +13,14 @@ local Brio = require("Brio")
 local BasicPaneUtils = {}
 
 --[=[
-	Observes visibility
+	Observes visibility of the basicPane, returning true when visible and false otherwise.
+
+	```lua
+	BasicPaneUtils.observeVisible(basicPane):Subscribe(function(isVisible)
+		print("isVisible", isVisible) --> false
+	end)
+	```
+
 	@param basicPane BasicPane
 	@return Observable<boolean>
 ]=]
@@ -115,7 +122,8 @@ function BasicPaneUtils.whenVisibleBrio(createBasicPane)
 end
 
 --[=[
-	Observes percent visibility
+	Observes percent visibility. Useful in [Blend].
+
 	@param basicPane BasicPane
 	@return Observable<number>
 ]=]
@@ -131,7 +139,7 @@ function BasicPaneUtils.observePercentVisible(basicPane)
 end
 
 --[=[
-	Convert percentVisible observable to transparency
+	Convert percentVisible observable to transparency. Useful for [Blend].
 
 	@function toTransparency
 	@param source Observable<number>
@@ -143,7 +151,9 @@ BasicPaneUtils.toTransparency = Rx.map(function(value)
 end)
 
 --[=[
-	Observes showing a basic pane
+	Observes showing a basic pane. Useful for playing back animations only
+	when the pane shows.
+
 	@param basicPane BasicPane
 	@return Observable<boolean>
 ]=]
