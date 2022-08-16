@@ -1,20 +1,15 @@
-# v6.0.1 (Tue Aug 16 2022)
-
-#### 🐛 Bug Fix
-
-- docs: Update documentation with package list and a bit more information. [#283](https://github.com/Quenty/NevermoreEngine/pull/283) ([@Quenty](https://github.com/Quenty))
-- docs: Update documentation with package list and a bit more information. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@6.0.0...@quenty/rx@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@5.2.0...@quenty/rx@6.0.0) (2022-08-14)
 

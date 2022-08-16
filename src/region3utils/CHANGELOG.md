@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/region3utils@5.0.0...@quenty/region3utils@5.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/region3utils
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/region3utils@4.1.0...@quenty/region3utils@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/region3utils

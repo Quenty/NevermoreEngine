@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@4.0.0...@quenty/resetservice@4.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+
+
+
+
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@3.3.0...@quenty/resetservice@4.0.0) (2022-08-14)
 
 

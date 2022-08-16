@@ -1,6 +1,6 @@
 {
   "name": "@quenty/actionmanager",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Holds single toggleable actions (like a tool system)",
   "keywords": [
     "Roblox",
