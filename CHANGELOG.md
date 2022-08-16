@@ -1,3 +1,16 @@
+# (Tue Aug 16 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneevalue@3.0.1`, `@quenty/basicpane@6.0.1`, `@quenty/bezierutils@2.1.1`, `@quenty/binarysearch@2.1.1`, `@quenty/datastore@6.0.1`, `@quenty/depthoffield@4.0.1`, `@quenty/humanoidanimatorutils@2.1.1`, `@quenty/humanoidmovedirectionutils@5.0.1`, `@quenty/inputkeymaputils@6.0.1`, `@quenty/lipsum@7.0.1`, `@quenty/loader@5.0.1`, `@quenty/markdownrender@2.1.1`, `@quenty/observablecollection@4.0.1`, `@quenty/r15utils@6.0.1`, `@quenty/radial-image@2.0.1`, `@quenty/ragdoll@8.0.1`, `@quenty/rx@6.0.1`, `@quenty/rxbinderutils@7.0.1`, `@quenty/servicebag@5.1.1`, `@quenty/settings@3.0.1`, `@quenty/sunpositionutils@2.2.1`, `@quenty/textfilterservice@6.0.1`
+  - docs: Update documentation with package list and a bit more information. [#283](https://github.com/Quenty/NevermoreEngine/pull/283) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Aug 14 2022)
 
 #### 💥 Breaking Change

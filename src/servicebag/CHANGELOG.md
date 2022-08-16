@@ -1,3 +1,16 @@
+# v5.1.1 (Tue Aug 16 2022)
+
+#### 🐛 Bug Fix
+
+- docs: Update documentation with package list and a bit more information. [#283](https://github.com/Quenty/NevermoreEngine/pull/283) ([@Quenty](https://github.com/Quenty))
+- docs: Update documentation with package list and a bit more information. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
