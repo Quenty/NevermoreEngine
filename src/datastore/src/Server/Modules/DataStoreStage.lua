@@ -241,7 +241,7 @@ end
 	Whenever the ValueObject changes, stores the resulting value in that entry.
 	@param name string
 	@param valueObj Instance -- ValueBase object to store on
-	@return MaidTask
+	@return MaidTask -- Cleanup to remove this writer and free the key.
 ]=]
 function DataStoreStage:StoreOnValueChange(name, valueObj)
 	assert(type(name) == "string", "Bad name")
@@ -255,8 +255,15 @@ function DataStoreStage:StoreOnValueChange(name, valueObj)
 	local conn = valueObj.Changed:Connect(function()
 		self:_doStore(name, valueObj.Value)
 	end)
-	self._maid:GiveTask(conn)
-	return conn
+
+	local gcIndex = self._maid:GiveTask(function()
+		conn:Disconnect()
+		-- Free this key, so that we could attach a new writer in future.
+		self._takenKeys[name] = false
+	end)
+	return function()
+		self._maid[gcIndex] = nil
+	end
 end
 
 --[=[
