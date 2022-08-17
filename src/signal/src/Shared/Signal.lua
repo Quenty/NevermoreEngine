@@ -1,5 +1,6 @@
 --[=[
-	Lua-side duplication of the API of events on Roblox objects.
+	Lua-side duplication of the [API of events on Roblox objects](https://create.roblox.com/docs/reference/engine/datatypes/RBXScriptSignal).
+
 	Signals are needed for to ensure that for local events objects are passed by
 	reference rather than by value where possible, as the BindableEvent objects
 	always pass signal arguments by value, meaning tables will be deep copied.
@@ -109,6 +110,26 @@ function Signal:Connect(handler)
 		-- note we could queue multiple events here, but we'll do this just as Roblox events expect
 		-- to behave.
 
+		local args = self._argMap[key]
+		if args then
+			handler(table.unpack(args, 1, args.n))
+		else
+			error("Missing arg data, probably due to reentrance.")
+		end
+	end)
+end
+
+--[=[
+	Connect a new, one-time handler to the event. Returns a connection object that can be disconnected.
+	@param handler (... T) -> () -- One-time function handler called when `:Fire(...)` is called
+	@return RBXScriptConnection
+]=]
+function Signal:Once(handler)
+	if not (type(handler) == "function") then
+		error(("once(%s)"):format(typeof(handler)), 2)
+	end
+
+	return self._bindableEvent.Event:Once(function(key)
 		local args = self._argMap[key]
 		if args then
 			handler(table.unpack(args, 1, args.n))
