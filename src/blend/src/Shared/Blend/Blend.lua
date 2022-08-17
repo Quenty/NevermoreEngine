@@ -14,6 +14,7 @@ local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local BrioUtils = require("BrioUtils")
+local RxAttributeUtils = require("RxAttributeUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Signal = require("Signal")
@@ -211,6 +212,31 @@ function Blend.OnChange(propertyName)
 
 	return function(instance)
 		return RxInstanceUtils.observeProperty(instance, propertyName)
+	end
+end
+
+
+--[=[
+	Short hand to register an attribute changing
+
+	```lua
+	Blend.mount(workspace, {
+		[Blend.OnAttributeChange "SurvivorCount"] = function(count)
+			print(count)
+		end;
+	}) --> Immediately will print nil
+
+	workspace:SetAttribute(5) --> Prints "5"
+	```
+
+	@param propertyName string
+	@return (instance: Instance) -> Observable
+]=]
+function Blend.OnAttributeChange(attributeName)
+	assert(type(attributeName) == "string", "Bad attributeName")
+
+	return function(instance)
+		return RxAttributeUtils.observeAttribute(instance, attributeName)
 	end
 end
 
@@ -584,6 +610,57 @@ function Blend.Children(parent, value)
 	else
 		return Rx.EMPTY
 	end
+end
+
+--[=[
+	Mounts attributes to the parent and returns an object which will cleanup and delete
+	all attributes when removed.
+
+	```lua
+	local attribute = Blend.State("abc")
+	Blend.New "ScreenGui" {
+		Parent = game.Players.LocalPlayer.PlayerGui;
+		[Blend.Attributes] = {
+			Attribute1 = attribute; --can only read from state
+			Attribute2 = 123;
+		};
+		[Blend.OnAttributeChange "Attribute1"] = function(v) --allows for writing to state
+			if not v then return end
+			attribute.Value = v
+		end;
+	};
+	```
+	Cleanup:
+	* Attributes will be set to nil on unsubscribe
+
+	@param parent Instance
+	@param value any
+	@return MaidTask
+]=]
+function Blend.Attributes(inst, value)
+	assert(typeof(inst) == "Instance", "Bad instance")
+	return Blend.ComputedPairs(value, function(attributeName, attributeValue, innerMaid)
+		assert(typeof(attributeName) == "string", "Attribute name is required to be a string")
+		local function getValue(v)
+			if type(v) == "table" then
+				if ValueObject.isValueObject(v) then
+					return getValue(v.Value)
+				elseif Brio.isBrio(v) then
+					innerMaid[attributeName] = v:GetDiedSignal():Connect(function()
+						inst:SetAttribute(attributeName, attributeValue)
+					end)
+					return getValue(v:GetValue())
+				end
+			else
+				return v
+			end
+		end
+		innerMaid[attributeName] = nil
+		inst:SetAttribute(attributeName, getValue(attributeValue))
+		innerMaid:GiveTask(function()
+			inst:SetAttribute(attributeName, nil)
+		end)
+	end)
 end
 
 --[=[
