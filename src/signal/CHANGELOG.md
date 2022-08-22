@@ -1,3 +1,15 @@
+# v2.3.0 (Mon Aug 22 2022)
+
+#### 🚀 Enhancement
+
+- feat: Signal :Once(fn) method [#285](https://github.com/Quenty/NevermoreEngine/pull/285) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

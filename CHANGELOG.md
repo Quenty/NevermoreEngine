@@ -1,3 +1,16 @@
+# (Mon Aug 22 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/signal@2.3.0`
+  - feat: Signal :Once(fn) method [#285](https://github.com/Quenty/NevermoreEngine/pull/285) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # (Tue Aug 16 2022)
 
 #### 🐛 Bug Fix
