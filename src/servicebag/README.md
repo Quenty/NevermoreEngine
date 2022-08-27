@@ -11,6 +11,8 @@
   </a>
 </div>
 
+Service providing mechanisms for Nevermore
+
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ServiceBag">View docs →</a></div>
 
 ## Installation
