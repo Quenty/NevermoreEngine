@@ -1,5 +1,7 @@
 --[=[
-	Utility functions involving binders and links
+	Utility functions involving binders and links. It's a common pattern to link
+	back to a bound class. This allows you to quickly retrieve these objects.
+
 	@class BoundLinkUtils
 ]=]
 
@@ -12,6 +14,14 @@ local BinderUtils = require("BinderUtils")
 
 local BoundLinkUtils = {}
 
+--[=[
+	Gets a linked object from the current instance.
+
+	@param binder Binder<T>
+	@param linkName string
+	@param from Instance
+	@return T?
+]=]
 function BoundLinkUtils.getLinkClass(binder, linkName, from)
 	assert(type(binder) == "table", "Bad binder")
 	assert(type(linkName) == "string", "Bad linkName")
@@ -25,6 +35,14 @@ function BoundLinkUtils.getLinkClass(binder, linkName, from)
 	return binder:Get(linkValue)
 end
 
+--[=[
+	Gets a linked objects from the current instance.
+
+	@param binder Binder<T>
+	@param linkName string
+	@param from Instance
+	@return { T }
+]=]
 function BoundLinkUtils.getLinkClasses(binder, linkName, from)
 	assert(type(binder) == "table", "Bad binder")
 	assert(type(linkName) == "string", "Bad linkName")
@@ -40,6 +58,14 @@ function BoundLinkUtils.getLinkClasses(binder, linkName, from)
 	return classes
 end
 
+--[=[
+	Gets a linked objects from the current instance.
+
+	@param binders { Binder<T> }
+	@param linkName string
+	@param from Instance
+	@return { T }
+]=]
 function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
 	assert(type(binders) == "table", "Bad binders")
 	assert(type(linkName) == "string", "Bad linkName")
@@ -67,6 +93,15 @@ function BoundLinkUtils.getClassesForLinkValues(binders, linkName, from)
 	return classes
 end
 
+--[=[
+	Calls a method on the binders
+
+	@param binders { Binder<T> }
+	@param linkName string
+	@param from Instance
+	@param methodName string
+	@param args {}
+]=]
 function BoundLinkUtils.callMethodOnLinkedClasses(binders, linkName, from, methodName, args)
 	assert(type(binders) == "table", "Bad arg 'binders'")
 	assert(type(linkName) == "string", "Bad arg 'linkName'")
