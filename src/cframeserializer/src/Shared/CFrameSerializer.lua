@@ -5,6 +5,8 @@
 	@class CFrameSerializer
 ]=]
 
+local HttpService = game:GetService("HttpService")
+
 local CFrameSerializer = {}
 
 local atan2 = math.atan2
@@ -46,6 +48,26 @@ function CFrameSerializer.outputRotationAzure(cf)
 	py = round(py * 128)
 	pz = round(pz * 128)
 	return {px, py, pz, azumith, roll, elevation}
+end
+
+--[=[
+	Encodes a CFrame into JSON for serialization in attributes.
+
+	@param cf CFrame
+	@return string
+]=]
+function CFrameSerializer.toJSONString(cf)
+	return HttpService:JSONEncode(CFrameSerializer.outputRotationAzure(cf))
+end
+
+--[=[
+	Decodes a CFrame from JSON. For serialization in attributes.
+
+	@param str string
+	@return CFrame
+]=]
+function CFrameSerializer.fromJSONString(str)
+	return CFrameSerializer.readRotationAzure(HttpService:JSONDecode(str))
 end
 
 --[=[
