@@ -1,0 +1,170 @@
+--[=[
+	@class RxSelectionUtils
+]=]
+
+local Selection = game:GetService("Selection")
+
+local require = require(script.Parent.loader).load(script)
+
+local Observable = require("Observable")
+local Maid = require("Maid")
+local Brio = require("Brio")
+local ValueObject = require("ValueObject")
+local RxBrioUtils = require("RxBrioUtils")
+
+local RxSelectionUtils = {}
+
+--[=[
+	Observes first selection in the selection list which is of a class
+
+	```lua
+	RxSelectionUtils.observeFirstSelectionIsAClass("BasePart"):Subscribe(function(part)
+		print("part", part)
+	end)
+	```
+
+	@param className string
+	@return Observable<Instance?>
+]=]
+function RxSelectionUtils.observeFirstSelectionIsAClass(className)
+	assert(type(className) == "string", "Bad className")
+
+	return RxSelectionUtils.observeFirstSelection(function(inst)
+		return inst:IsA(className)
+	end)
+end
+
+--[=[
+	Observes first selection which meets condition
+
+	```lua
+	RxSelectionUtils.observeFirstSelection(function(instance)
+		return instance:IsA("BasePart")
+	end):Subscribe(function(part)
+		print("part", part)
+	end)
+	```
+
+	@param where callback
+	@return Observable<Instance?>
+]=]
+function RxSelectionUtils.observeFirstSelection(where)
+	assert(type(where) == "function", "Bad where")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local current = ValueObject.new(nil)
+		maid:GiveTask(current)
+
+		local function handleSelectionChanged()
+			for _, item in pairs(Selection:Get()) do
+				if where(item) then
+					current.Value = item
+					return
+				end
+			end
+
+			current.Value = nil
+		end
+
+		maid:GiveTask(Selection.SelectionChanged:Connect(handleSelectionChanged))
+		handleSelectionChanged()
+
+		maid:GiveTask(current:Observe():Subscribe(function(value)
+			sub:Fire(value)
+		end))
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes first selection which meets condition
+
+	@param where callback
+	@return Observable<Brio<Instance>>
+]=]
+function RxSelectionUtils.observeFirstSelectionBrio(where)
+	assert(type(where) == "function", "Bad where")
+
+	return RxSelectionUtils.observeFirstSelection(where):Pipe({
+		RxBrioUtils.toBrio();
+		RxBrioUtils.onlyLastBrioSurvives();
+		RxBrioUtils.where(function(value)
+			return value ~= nil
+		end)
+	})
+end
+
+
+--[=[
+	Observes the current selection table.
+
+	@return Observable<{ Instance }>
+]=]
+function RxSelectionUtils.observeSelectionList()
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local current = Selection:Get()
+
+		maid:GiveTask(Selection.SelectionChanged:Connect(function()
+			sub:Fire(Selection:Get())
+		end))
+		sub:Fire(current)
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes selection items by brio. De-duplicates changed events.
+
+	@return Observable<Brio<Instance>>
+]=]
+function RxSelectionUtils.observeSelectionItemsBrio()
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local knownSet = {}
+
+		local function handleSelectionChanged()
+			local current = Selection:Get()
+
+			local toAddSet = {}
+			for _, item in pairs(current) do
+				toAddSet[item] = nil
+			end
+
+			local toRemoveSet = {}
+			for item, _ in pairs(knownSet) do
+				toRemoveSet[item] = true
+				toAddSet[item] = nil
+			end
+
+			for _, item in pairs(current) do
+				toRemoveSet[item] = nil
+			end
+
+			-- Remove first
+			for toRemove, _ in pairs(toRemoveSet) do
+				maid[toRemove] = nil
+			end
+
+			-- Then add
+			for toAdd, _ in pairs(toAddSet) do
+				local brio = Brio.new(toAdd)
+				sub:Fire(toAdd)
+				maid[toAdd] = brio
+			end
+		end
+
+		maid:GiveTask(Selection.SelectionChanged:Connect(handleSelectionChanged))
+		handleSelectionChanged()
+
+		return maid
+	end)
+end
+
+return RxSelectionUtils
