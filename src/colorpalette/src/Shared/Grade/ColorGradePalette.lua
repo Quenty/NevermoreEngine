@@ -9,6 +9,7 @@ local Rx = require("Rx")
 local Blend = require("Blend")
 local Observable = require("Observable")
 local ValueObject = require("ValueObject")
+local ColorGradeUtils = require("ColorGradeUtils")
 
 local ColorGradePalette = setmetatable({}, BaseObject)
 ColorGradePalette.ClassName = "ColorGradePalette"
@@ -161,7 +162,9 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 end
 
 function ColorGradePalette:_observeGradeFromName(gradeName)
-	if Observable.isObservable(gradeName) then
+	if typeof(gradeName) == "Color3" then
+		return Rx.of(ColorGradeUtils.getGrade(gradeName))
+	elseif Observable.isObservable(gradeName) then
 		return gradeName
 	end
 
