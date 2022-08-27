@@ -21,14 +21,12 @@ function InputKeyMapServiceClient:Init(serviceBag)
 	-- Internal
 	self._translator = self._serviceBag:GetService(require("InputKeyMapTranslator"))
 	self._registryService = self._serviceBag:GetService(require("InputKeyMapRegistryServiceShared"))
+
+	self:_ensureLocalizationEntries()
 end
 
 function InputKeyMapServiceClient:FindInputKeyMapList(providerName, listName)
 	return self._registryService:FindInputKeyMapList(providerName, listName)
-end
-
-function InputKeyMapServiceClient:Start()
-	self:_ensureLocalizationEntries()
 end
 
 function InputKeyMapServiceClient:_ensureLocalizationEntries()

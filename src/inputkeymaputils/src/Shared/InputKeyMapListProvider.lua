@@ -78,12 +78,10 @@ function InputKeyMapListProvider:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._inputMapLists = ObservableList.new()
-	self._maid:GiveTask(self._inputMapLists)
-
-	self._maid:GiveTask(self._serviceBag:GetService(InputKeyMapRegistryServiceShared):RegisterProvider(self))
-
 	self:_ensureDefaultsInit()
+
+	-- Only register after initialization
+	self._maid:GiveTask(self._serviceBag:GetService(InputKeyMapRegistryServiceShared):RegisterProvider(self))
 end
 
 function InputKeyMapListProvider:Start()
@@ -156,6 +154,9 @@ end
 
 function InputKeyMapListProvider:_ensureDefaultsInit()
 	if not self._inputKeyMapLists then
+		self._inputMapLists = ObservableList.new()
+		self._maid:GiveTask(self._inputMapLists)
+
 		self._inputKeyMapLists = {}
 
 		self._createDefaults(self, self._serviceBag)
