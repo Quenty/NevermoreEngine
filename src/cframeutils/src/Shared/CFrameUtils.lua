@@ -110,4 +110,24 @@ function CFrameUtils.scalePosition(cframe, scale)
 	end
 end
 
+function CFrameUtils.areClose(a, b, epsilon)
+	assert(type(epsilon) == "number", "Bad epsilon")
+
+	local apx, apy, apz, axx, ayx, azx, axy, ayy, azy, axz, ayz, azz = a:components()
+	local bpx, bpy, bpz, bxx, byx, bzx, bxy, byy, bzy, bxz, byz, bzz = b:components()
+
+	return math.abs(bpx - apx) <= epsilon
+		and math.abs(bpy - apy) <= epsilon
+		and math.abs(bpz - apz) <= epsilon
+		and math.abs(bxx - axx) <= epsilon
+		and math.abs(byx - ayx) <= epsilon
+		and math.abs(bzx - azx) <= epsilon
+		and math.abs(bxy - axy) <= epsilon
+		and math.abs(byy - ayy) <= epsilon
+		and math.abs(bzy - azy) <= epsilon
+		and math.abs(bxz - axz) <= epsilon
+		and math.abs(byz - ayz) <= epsilon
+		and math.abs(bzz - azz) <= epsilon
+end
+
 return CFrameUtils
