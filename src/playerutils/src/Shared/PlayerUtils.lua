@@ -29,4 +29,40 @@ function PlayerUtils.formatName(player)
 	end
 end
 
+local NAME_COLORS = {
+	BrickColor.new("Bright red").Color;
+	BrickColor.new("Bright blue").Color;
+	BrickColor.new("Earth green").Color;
+	BrickColor.new("Bright violet").Color,
+	BrickColor.new("Bright orange").Color,
+	BrickColor.new("Bright yellow").Color,
+	BrickColor.new("Light reddish violet").Color,
+	BrickColor.new("Brick yellow").Color,
+}
+
+local function hashName(pName)
+	local value = 0
+	for index = 1, #pName do
+		local cValue = string.byte(string.sub(pName, index, index))
+		local reverseIndex = #pName - index + 1
+		if #pName%2 == 1 then
+			reverseIndex = reverseIndex - 1
+		end
+		if reverseIndex%4 >= 2 then
+			cValue = -cValue
+		end
+		value = value + cValue
+	end
+	return value
+end
+
+--[=[
+	Retrieves the display name color for a given player (for the Roblox chat)
+	@param displayName string
+	@return Color3
+]=]
+function PlayerUtils.getDefaultNameColor(displayName)
+	return NAME_COLORS[(hashName(displayName) % #NAME_COLORS) + 1]
+end
+
 return PlayerUtils
