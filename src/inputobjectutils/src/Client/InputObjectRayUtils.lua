@@ -13,7 +13,7 @@ local InputObjectRayUtils = {}
 	Computes a camera ray from an inputObject
 	@param inputObject InputObject
 	@param distance number
-	@param offset Vector3? -- Optional
+	@param offset Vector3 | Vector2 | nil -- Optional
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
@@ -21,14 +21,15 @@ function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance, off
 	assert(inputObject, "Bad inputObject")
 	offset = offset or Vector3.new()
 
-	return InputObjectRayUtils.cameraRayFromScreenPosition(inputObject.Position + offset, distance, camera)
+	local position = inputObject.Position
+	return InputObjectRayUtils.cameraRayFromScreenPosition(Vector2.new(position.x + offset.x, position.y + offset.y), distance, camera)
 end
 
 --[=[
 	Computes a camera ray from the mouse
 	@param mouse Mouse
 	@param distance number
-	@param offset Vector3? -- Optional
+	@param offset Vector3 | Vector2 | nil -- Optional
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
@@ -45,21 +46,22 @@ end
 --[=[
 	@param inputObject InputObject
 	@param distance number? -- Optional
-	@param offset Vector3
+	@param offset Vector3 | Vector2
 	@param camera Camera? -- Optional
 	@return Ray
 ]=]
 function InputObjectRayUtils.cameraRayFromInputObjectWithOffset(inputObject, distance, offset, camera)
 	assert(inputObject, "Bad inputObject")
 
+	local position = inputObject.Position
 	return InputObjectRayUtils.cameraRayFromScreenPosition(
-		inputObject.Position + offset,
+		Vector2.new(position.x + offset.x, position.y + offset.y),
 		distance,
 		camera)
 end
 
 --[=[
-	@param position Vector3
+	@param position Vector3 | Vector2
 	@param distance number? -- Optional
 	@param camera Camera? -- Optional
 	@return Ray
@@ -73,7 +75,7 @@ function InputObjectRayUtils.cameraRayFromScreenPosition(position, distance, cam
 end
 
 --[=[
-	@param position Vector3
+	@param position Vector3 | Vector2
 	@param distance number? -- Optional
 	@param camera Camera? -- Optional
 	@return Ray
