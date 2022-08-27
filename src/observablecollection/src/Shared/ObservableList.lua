@@ -124,6 +124,23 @@ function ObservableList:ObserveIndex(indexToObserve)
 end
 
 --[=[
+	Removes the first instance found in contents
+
+	@param value T
+	@return boolean
+]=]
+function ObservableList:RemoveFirstInstance(value)
+	for key, item in pairs(self._contents) do
+		if item == value then
+			self:RemoveByKey(key)
+			return true
+		end
+	end
+
+	return false
+end
+
+--[=[
 	Observes the index as it changes, until the entry at the existing
 	key is removed.
 
