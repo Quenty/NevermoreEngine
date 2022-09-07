@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Brio = require("Brio")
 local ValueObject = require("ValueObject")
 local RxBrioUtils = require("RxBrioUtils")
+local Set = require("Set")
 
 local RxSelectionUtils = {}
 
@@ -18,7 +19,7 @@ local RxSelectionUtils = {}
 	Observes first selection in the selection list which is of a class
 
 	```lua
-	RxSelectionUtils.observeFirstSelectionIsAClass("BasePart"):Subscribe(function(part)
+	RxSelectionUtils.observeFirstSelectionWhichIsA("BasePart"):Subscribe(function(part)
 		print("part", part)
 	end)
 	```
@@ -26,13 +27,38 @@ local RxSelectionUtils = {}
 	@param className string
 	@return Observable<Instance?>
 ]=]
-function RxSelectionUtils.observeFirstSelectionIsAClass(className)
+function RxSelectionUtils.observeFirstSelectionWhichIsA(className)
 	assert(type(className) == "string", "Bad className")
 
 	return RxSelectionUtils.observeFirstSelection(function(inst)
 		return inst:IsA(className)
 	end)
 end
+
+--[=[
+	Observes first selection in the selection list which is an "Adornee"
+
+	@return Observable<Instance?>
+]=]
+function RxSelectionUtils.observeFirstAdornee()
+	return RxSelectionUtils.observeFirstSelection(function(inst)
+		return inst:IsA("BasePart") or inst:IsA("Model")
+	end)
+end
+
+--[=[
+	Observes selection in which are an "Adornee"
+
+	@return Observable<Brio<Instance>>
+]=]
+function RxSelectionUtils.observeAdorneesBrio()
+	return RxSelectionUtils.observeSelectionItemsBrio():Pipe({
+		RxBrioUtils.where(function(inst)
+			return inst:IsA("BasePart") or inst:IsA("Model")
+		end)
+	})
+end
+
 
 --[=[
 	Observes first selection which meets condition
@@ -72,7 +98,9 @@ function RxSelectionUtils.observeFirstSelection(where)
 		handleSelectionChanged()
 
 		maid:GiveTask(current:Observe():Subscribe(function(value)
-			sub:Fire(value)
+			task.spawn(function()
+				sub:Fire(value)
+			end)
 		end))
 
 		return maid
@@ -127,25 +155,13 @@ function RxSelectionUtils.observeSelectionItemsBrio()
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		local knownSet = {}
+		local lastSet = {}
 
 		local function handleSelectionChanged()
-			local current = Selection:Get()
-
-			local toAddSet = {}
-			for _, item in pairs(current) do
-				toAddSet[item] = nil
-			end
-
-			local toRemoveSet = {}
-			for item, _ in pairs(knownSet) do
-				toRemoveSet[item] = true
-				toAddSet[item] = nil
-			end
-
-			for _, item in pairs(current) do
-				toRemoveSet[item] = nil
-			end
+			local currentSet = Set.fromList(Selection:Get())
+			local toRemoveSet = Set.difference(lastSet, currentSet)
+			local toAddSet = Set.difference(currentSet, lastSet)
+			lastSet = currentSet
 
 			-- Remove first
 			for toRemove, _ in pairs(toRemoveSet) do
@@ -155,8 +171,11 @@ function RxSelectionUtils.observeSelectionItemsBrio()
 			-- Then add
 			for toAdd, _ in pairs(toAddSet) do
 				local brio = Brio.new(toAdd)
-				sub:Fire(toAdd)
 				maid[toAdd] = brio
+
+				task.spawn(function()
+					sub:Fire(brio)
+				end)
 			end
 		end
 
