@@ -26,5 +26,8 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/math": "file:../math"
   }
 }
