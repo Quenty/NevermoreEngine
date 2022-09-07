@@ -11,14 +11,23 @@ local DepthOfFieldModifier = setmetatable({}, BaseObject)
 DepthOfFieldModifier.ClassName = "DepthOfFieldModifier"
 DepthOfFieldModifier.__index = DepthOfFieldModifier
 
-function DepthOfFieldModifier.new(distance, radius)
+function DepthOfFieldModifier.new(distance, radius, nearIntensity, farIntensity)
 	local self = setmetatable(BaseObject.new(), DepthOfFieldModifier)
+
+	assert(type(distance) == "number", "Bad distance")
+	assert(type(radius) == "number", "Bad radius")
+	assert(type(nearIntensity) == "number", "Bad nearIntensity")
+	assert(type(farIntensity) == "number", "Bad farIntensity")
 
 	self._originalDistance = distance
 	self._originalRadius = radius
+	self._originalNearIntensity = nearIntensity
+	self._originalFarIntensity = farIntensity
 
 	self._distance = distance
 	self._radius = radius
+	self._nearIntensity = nearIntensity
+	self._farIntensity = farIntensity
 
 --[=[
 	Fires when the modifier is removing.
@@ -47,6 +56,12 @@ function DepthOfFieldModifier.new(distance, radius)
 	self.RadiusChanged = Signal.new()
 	self._maid:GiveTask(self.RadiusChanged)
 
+	self.NearIntensityChanged = Signal.new()
+	self._maid:GiveTask(self.NearIntensityChanged)
+
+	self.FarIntensityChanged = Signal.new()
+	self._maid:GiveTask(self.FarIntensityChanged)
+
 	return self
 end
 
@@ -66,6 +81,13 @@ function DepthOfFieldModifier:SetDistance(distance, doNotAnimate)
 	self.DistanceChanged:Fire(distance, doNotAnimate)
 end
 
+function DepthOfFieldModifier:GetOriginalDistance()
+	return self._originalDistance
+end
+
+function DepthOfFieldModifier:GetOriginalRadius()
+	return self._originalRadius
+end
 --[=[
 	Sets the target depth of field distance
 	@param radius number
@@ -80,6 +102,28 @@ function DepthOfFieldModifier:SetRadius(radius, doNotAnimate)
 
 	self._radius = radius
 	self.RadiusChanged:Fire(radius, doNotAnimate)
+end
+
+function DepthOfFieldModifier:SetNearIntensity(nearIntensity, doNotAnimate)
+	assert(type(nearIntensity) == "number", "Bad nearIntensity")
+
+	if self._nearIntensity == nearIntensity then
+		return
+	end
+
+	self._nearIntensity = nearIntensity
+	self.NearIntensityChanged:Fire(nearIntensity, doNotAnimate)
+end
+
+function DepthOfFieldModifier:SetFarIntensity(farIntensity, doNotAnimate)
+	assert(type(farIntensity) == "number", "Bad farIntensity")
+
+	if self._farIntensity == farIntensity then
+		return
+	end
+
+	self._farIntensity = farIntensity
+	self.FarIntensityChanged:Fire(farIntensity, doNotAnimate)
 end
 
 --[=[
@@ -98,6 +142,14 @@ function DepthOfFieldModifier:GetRadius()
 	return self._radius
 end
 
+function DepthOfFieldModifier:GetNearIntensity()
+	return self._nearIntensity
+end
+
+function DepthOfFieldModifier:GetFarIntensity()
+	return self._farIntensity
+end
+
 --[=[
 	Resets the radius
 	@param doNotAnimate boolean
@@ -105,6 +157,8 @@ end
 function DepthOfFieldModifier:Reset(doNotAnimate)
 	self:SetDistance(self._originalDistance, doNotAnimate)
 	self:SetRadius(self._originalRadius, doNotAnimate)
+	self:SetNearIntensity(self._originalNearIntensity, doNotAnimate)
+	self:SetFarIntensity(self._originalFarIntensity, doNotAnimate)
 end
 
 return DepthOfFieldModifier
