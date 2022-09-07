@@ -23,6 +23,7 @@ local TYPE_TO_CLASSNAME_LOOKUP = {
 local VALUE_BASE_TYPE_LOOKUP = {
 	BoolValue = "boolean";
 	NumberValue = "number";
+	IntValue = "number";
 	StringValue = "string";
 	BrickColorValue = "BrickColor";
 	CFrameValue = "CFrame";
