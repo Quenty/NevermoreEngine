@@ -124,6 +124,7 @@ end
 
 function Viewport:Render(props)
 	local currentCamera = ValueObject.new()
+	self._maid:GiveTask(currentCamera)
 
 	return Blend.New "ViewportFrame" {
 		Parent = props.Parent;
