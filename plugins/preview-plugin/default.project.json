@@ -1,0 +1,6 @@
+{
+  "name": "preview-plugin",
+  "tree": {
+    "$path": "src"
+  }
+}
