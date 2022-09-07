@@ -129,7 +129,7 @@ end
 	@param value T
 	@return boolean
 ]=]
-function ObservableList:RemoveFirstInstance(value)
+function ObservableList:RemoveFirst(value)
 	for key, item in pairs(self._contents) do
 		if item == value then
 			self:RemoveByKey(key)
@@ -138,6 +138,15 @@ function ObservableList:RemoveFirstInstance(value)
 	end
 
 	return false
+end
+
+--[=[
+	Returns an IntValue that represents the CountValue
+
+	@return IntValue
+]=]
+function ObservableList:GetCountValue()
+	return self._countValue
 end
 
 --[=[
