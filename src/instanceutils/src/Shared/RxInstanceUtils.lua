@@ -60,11 +60,11 @@ function RxInstanceUtils.observeAncestry(instance)
 end
 
 --[=[
-	Observes an instance's ancestry
+	Observes an instance's ancestry with a brio
 
 	@param instance Instance
 	@param className string
-	@return Observable<Instance>
+	@return Observable<Brio<Instance>>
 ]=]
 function RxInstanceUtils.observeFirstAncestorBrio(instance, className)
 	assert(typeof(instance) == "Instance", "Bad instance")
@@ -87,6 +87,36 @@ function RxInstanceUtils.observeFirstAncestorBrio(instance, className)
 			elseif lastFound then
 				maid._current = nil
 				lastFound = nil
+			end
+		end
+
+		maid:GiveTask(instance.AncestryChanged:Connect(handleAncestryChanged))
+		handleAncestryChanged()
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes an instance's ancestry
+
+	@param instance Instance
+	@param className string
+	@return Observable<Instance>
+]=]
+function RxInstanceUtils.observeFirstAncestor(instance, className)
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(className) == "string", "Bad className")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local lastFound = UNSET_VALUE
+		local function handleAncestryChanged()
+			local found = instance:FindFirstAncestorWhichIsA(className)
+			if found ~= lastFound then
+				lastFound = found
+				sub:Fire(found)
 			end
 		end
 
