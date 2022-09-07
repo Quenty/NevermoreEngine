@@ -267,7 +267,7 @@ function Promise:Resolve(...)
 			warn(message)
 		end
 
-		local func = {...}
+		local func = ...
 		func(self:_getResolveReject())
 	else
 		-- TODO: Handle thenable promises!
