@@ -24,6 +24,7 @@ local VALID_ATTRIBUTE_TYPES = {
 	["Vector3"] = true;
 	["NumberSequence"] = true;
 	["ColorSequence"] = true;
+	["IntValue"] = true;
 	["NumberRange"] = true;
 	["Rect"] = true;
 }
