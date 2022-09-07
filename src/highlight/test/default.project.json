@@ -1,0 +1,11 @@
+{
+  "name": "HighlightTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "highlight": {
+        "$path": ".."
+      }
+    }
+  }
+}
