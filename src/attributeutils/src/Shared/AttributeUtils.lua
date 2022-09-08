@@ -146,4 +146,17 @@ function AttributeUtils.getAttribute(instance, attributeName, default)
 	return value
 end
 
+--[=[
+	Removes all attributes from an instance.
+
+	@param instance Instance
+]=]
+function AttributeUtils.removeAllAttributes(instance: Instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	for key, _ in pairs(instance:GetAttributes()) do
+		instance:SetAttribute(key, nil)
+	end
+end
+
 return AttributeUtils
