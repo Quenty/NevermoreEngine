@@ -1583,7 +1583,7 @@ end
 --[=[
 	Throttles emission of observables.
 
-	https://rxjs-dev.firebaseapp.com/api/operators/debounceTime
+	https://rxjs-dev.firebaseapp.com/api/operators/throttleTime
 
 	:::note
 	Note that on complete, the last item is not included, for now, unlike the existing version in rxjs.
