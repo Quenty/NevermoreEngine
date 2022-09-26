@@ -284,8 +284,6 @@ function Replicator:_doReplicationClient(replicator, child)
 		-- TODO: Maybe do better
 		self:_setupReplicatedDescendantCountAdd(maid, 1)
 		self:_doStandardReplication(maid, replicator, child, copy)
-
-		return maid
 	end
 
 	return maid

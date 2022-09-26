@@ -57,7 +57,7 @@ local function bootstrapGame(packages)
 	end})
 end
 
-local function bootstrapPlugin(packages)
+local function bootstrapPlugin(_packages)
 	error("Not implemented")
 end
 
