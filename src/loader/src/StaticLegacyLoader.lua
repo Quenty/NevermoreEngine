@@ -109,7 +109,7 @@ function StaticLegacyLoader:_getPackageFolderLookup(instance)
 			warn("[StaticLegacyLoader] - Bad link in packageFolder")
 			return {}
 		end
-	elseif instance:IsA("Folder") then
+	elseif instance:IsA("Folder") or instance:IsA("Camera") then
 		return self:_getOrCreateLookup(instance)
 	elseif instance:IsA("ModuleScript") then
 		return self:_getOrCreateLookup(instance)
@@ -136,7 +136,7 @@ function StaticLegacyLoader:_getOrCreateLookup(packageFolderOrModuleScript)
 end
 
 function StaticLegacyLoader:_buildLookup(lookup, instance)
-	if instance:IsA("Folder") then
+	if instance:IsA("Folder") or instance:IsA("Camera") then
 		if instance.Name ~= ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
 			for _, item in pairs(instance:GetChildren()) do
 				self:_buildLookup(lookup, item)

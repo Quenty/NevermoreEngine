@@ -54,12 +54,12 @@ function ScriptInfoUtils.populateScriptInfoLookup(instance, scriptInfoLookup, la
 	assert(type(scriptInfoLookup) == "table", "Bad scriptInfoLookup")
 	assert(type(lastReplicationMode) == "string", "Bad lastReplicationMode")
 
-	if instance:IsA("Folder") then
+	if instance:IsA("Folder") or instance:IsA("Camera") then
 		local replicationMode = ScriptInfoUtils.getFolderReplicationMode(instance.Name, lastReplicationMode)
 		if replicationMode ~= ScriptInfoUtils.ModuleReplicationTypes.IGNORE then
 			for _, item in pairs(instance:GetChildren()) do
 				if not BounceTemplateUtils.isBounceTemplate(item) then
-					if item:IsA("Folder") then
+					if item:IsA("Folder") or item:IsA("Camera") then
 						ScriptInfoUtils.populateScriptInfoLookup(item, scriptInfoLookup, replicationMode)
 					elseif item:IsA("ModuleScript") then
 						ScriptInfoUtils.addToInfoMap(scriptInfoLookup,
