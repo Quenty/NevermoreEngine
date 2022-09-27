@@ -1,3 +1,23 @@
+# v8.0.0 (Tue Sep 27 2022)
+
+#### 💥 Breaking Change
+
+- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- feat: Add AttributeUtils.removeAllAttributes() ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Add IntValue support as a valid AttributeUtil ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

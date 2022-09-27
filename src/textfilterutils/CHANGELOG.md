@@ -1,3 +1,19 @@
+# v6.0.0 (Tue Sep 27 2022)
+
+#### 💥 Breaking Change
+
+- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- feat: Add TextFilterUtils.hasNonFilteredText() ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
