@@ -251,19 +251,18 @@ function DataStoreStage:StoreOnValueChange(name, valueObj)
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
 	end
 
+	local maid = Maid.new()
+
 	self._takenKeys[name] = true
-	local conn = valueObj.Changed:Connect(function()
-		self:_doStore(name, valueObj.Value)
+	maid:GiveTask(function()
+		self._takenKeys[name] = nil
 	end)
 
-	local gcIndex = self._maid:GiveTask(function()
-		conn:Disconnect()
-		-- Free this key, so that we could attach a new writer in future.
-		self._takenKeys[name] = false
-	end)
-	return function()
-		self._maid[gcIndex] = nil
-	end
+	maid:GiveTask(valueObj.Changed:Connect(function()
+		self:_doStore(name, valueObj.Value)
+	end))
+
+	return maid
 end
 
 --[=[
