@@ -26,6 +26,19 @@ function ColorGradeUtils.addGrade(grade, difference)
 	return finalGrade
 end
 
+--[=[
+	Gets the grade for a given color
+
+	@param color Color3
+	@return number
+]=]
+function ColorGradeUtils.getGrade(color)
+	assert(typeof(color) == "Color3", "Bad color")
+	local _, _, v = unpack(LuvColor3Utils.fromColor3(color))
+
+	return 100 - v
+end
+
 function ColorGradeUtils.getGradedColor(baseColor, colorGrade, vividness)
 	assert(typeof(baseColor) == "Color3", "Bad baseColor")
 	assert(type(vividness) == "number" or vividness == nil, "Bad vividness")

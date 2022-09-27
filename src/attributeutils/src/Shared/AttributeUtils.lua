@@ -24,6 +24,7 @@ local VALID_ATTRIBUTE_TYPES = {
 	["Vector3"] = true;
 	["NumberSequence"] = true;
 	["ColorSequence"] = true;
+	["IntValue"] = true;
 	["NumberRange"] = true;
 	["Rect"] = true;
 }
@@ -143,6 +144,19 @@ function AttributeUtils.getAttribute(instance, attributeName, default)
 	end
 
 	return value
+end
+
+--[=[
+	Removes all attributes from an instance.
+
+	@param instance Instance
+]=]
+function AttributeUtils.removeAllAttributes(instance: Instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	for key, _ in pairs(instance:GetAttributes()) do
+		instance:SetAttribute(key, nil)
+	end
 end
 
 return AttributeUtils

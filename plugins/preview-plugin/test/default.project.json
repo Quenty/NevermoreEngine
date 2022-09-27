@@ -1,0 +1,15 @@
+{
+  "name": "QuentyPreviewPlugin",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "QuentyPreviewPlugin": {
+        "$className": "Folder",
+        "QuentyPreviewPlugin": {
+          "$path": ".."
+        }
+      }
+    }
+  }
+}

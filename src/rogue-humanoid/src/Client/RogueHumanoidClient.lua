@@ -4,18 +4,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local RogueHumanoidProperties = require("RogueHumanoidProperties")
+local RogueHumanoidBase = require("RogueHumanoidBase")
 
-local RogueHumanoidClient = setmetatable({}, BaseObject)
+local RogueHumanoidClient = setmetatable({}, RogueHumanoidBase)
 RogueHumanoidClient.ClassName = "RogueHumanoidClient"
 RogueHumanoidClient.__index = RogueHumanoidClient
 
 function RogueHumanoidClient.new(humanoid, serviceBag)
-	local self = setmetatable(BaseObject.new(humanoid), RogueHumanoidClient)
-
-	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._properties = RogueHumanoidProperties:GetPropertyTable(self._serviceBag, self._obj)
+	local self = setmetatable(RogueHumanoidBase.new(humanoid, serviceBag), RogueHumanoidClient)
 
 	return self
 end

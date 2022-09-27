@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/kinematics",
+  "version": "1.0.0",
+  "description": "Kinematics class and utility functions",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Input"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/kinematics/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

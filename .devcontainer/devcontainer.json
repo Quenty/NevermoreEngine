@@ -1,0 +1,51 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.202.3/containers/ubuntu
+{
+	"name": "Ubuntu",
+	"runArgs": ["--init"],
+
+	"build": {
+		"dockerfile": "Dockerfile",
+		// Update 'VARIANT' to pick an Ubuntu version: hirsute, focal, bionic
+		// Use hirsute or bionic on local arm64/Apple Silicon.
+		"args": {
+			"VARIANT": "focal"
+		}
+	},
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"editorconfig.editorconfig",
+		"evaera.vscode-rojo",
+		"kampfkarren.selene-vscode",
+		"nightrains.robloxlsp",
+		"ms-vsliveshare.vsliveshare",
+		"bungcip.better-toml",
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [34872],
+	"portsAttributes": {
+		"34872": {
+			"label": "Rojo",
+			"onAutoForward": "silent"
+		}
+	},
+	"otherPortsAttributes": {
+		"onAutoForward": "silent"
+	},
+
+	// We do this weird git config setting for environments where the underlying files are stored on the Windows FS.
+	// It is safe to remove if you're only using the devcontainer in Codespaces or on Linux FS.
+	"remoteUser": "vscode",
+	"postCreateCommand": "git config --global --add safe.directory '*' && foreman install",
+	"postStartCommand": "selene generate-roblox-std",
+	"remoteEnv": {
+		"PATH": "${containerEnv:PATH}:/home/vscode/.foreman/bin"
+	},
+
+	"features": {}
+}

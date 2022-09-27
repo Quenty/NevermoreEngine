@@ -24,6 +24,32 @@ function EnumUtils.encodeAsString(enumItem)
 end
 
 --[=[
+	Returns whether an enum is of the expected type. Useful for asserts.
+
+	```lua
+	assert(EnumUtils.isOfType(Enum.KeyCode, enumItem))
+	```
+
+	@param expectedEnumType EnumType
+	@param enumItem any
+	@return boolean -- True if is of type
+	@return string -- Error message if there is an error.
+]=]
+function EnumUtils.isOfType(expectedEnumType, enumItem)
+	assert(typeof(expectedEnumType) == "Enum", "Bad enum")
+
+	if typeof(enumItem) ~= "EnumItem" then
+		return false, ("Bad enumItem. Expected enumItem to be %s, got %s '%s'"):format(tostring(expectedEnumType), typeof(enumItem), tostring(enumItem))
+	end
+
+	if enumItem.EnumType == expectedEnumType then
+		return true
+	else
+		return false, ("Bad enumItem. Expected enumItem to be %s, got %s"):format(tostring(expectedEnumType), EnumUtils.encodeAsString(enumItem))
+	end
+end
+
+--[=[
 	Returns true if the value is an encoded enum
 
 	@param value any? -- String to decode

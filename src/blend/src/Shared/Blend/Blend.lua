@@ -243,6 +243,24 @@ end
 --[=[
 	Uses the constructor to attach a class or resource to the actual object
 	for the lifetime of the subscription of that object.
+
+	```lua
+	return Blend.New "Frame" {
+		Parent = variables.Parent;
+		[Blend.Attached(function(parent)
+			local maid = Maid.new()
+
+			print("Got", parent)
+
+			maid:GiveTask(function()
+				print("Dead!")
+			end)
+
+			return maid
+		end)] = true;
+	}
+	```
+
 	@param constructor T
 	@return (parent: Instance) -> Observable<T>
 ]=]

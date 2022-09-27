@@ -111,11 +111,9 @@ end
 ]=]
 function BoundingBoxUtils.getBoundingBox(data, relativeTo)
 	relativeTo = relativeTo or CFrame.new()
-	local abs = math.abs
-	local inf = math.huge
 
-	local minx, miny, minz = inf, inf, inf
-	local maxx, maxy, maxz = -inf, -inf, -inf
+	local minx, miny, minz = math.huge, math.huge, math.huge
+	local maxx, maxy, maxz = -math.huge, -math.huge, -math.huge
 
 	for _, obj in pairs(data) do
 		local cf = relativeTo:toObjectSpace(obj.CFrame)
@@ -125,9 +123,9 @@ function BoundingBoxUtils.getBoundingBox(data, relativeTo)
 		local x, y, z, R00, R01, R02, R10, R11, R12, R20, R21, R22 = cf:components()
 
 		-- https://zeuxcg.org/2010/10/17/aabb-from-obb-with-component-wise-abs/
-		local wsx = 0.5 * (abs(R00) * sx + abs(R01) * sy + abs(R02) * sz)
-		local wsy = 0.5 * (abs(R10) * sx + abs(R11) * sy + abs(R12) * sz)
-		local wsz = 0.5 * (abs(R20) * sx + abs(R21) * sy + abs(R22) * sz)
+		local wsx = 0.5 * (math.abs(R00) * sx + math.abs(R01) * sy + math.abs(R02) * sz)
+		local wsy = 0.5 * (math.abs(R10) * sx + math.abs(R11) * sy + math.abs(R12) * sz)
+		local wsz = 0.5 * (math.abs(R20) * sx + math.abs(R21) * sy + math.abs(R22) * sz)
 
 		if minx > x - wsx then
 			minx = x - wsx
@@ -163,7 +161,7 @@ end
 	@param testPosition Vector3
 	@return boolean
 ]=]
-function BoundingBoxUtils.inBoundingBox(cframe, size, testPosition)
+function BoundingBoxUtils.inBoundingBox(cframe, size, testPosition: Vector3)
 	local relative = cframe:pointToObjectSpace(testPosition)
 	local hsx, hsy, hsz = size.X/2, size.Y/2, size.Z/2
 
@@ -174,6 +172,42 @@ function BoundingBoxUtils.inBoundingBox(cframe, size, testPosition)
 		and ry <= hsy
 		and rz >= -hsz
 		and rz <= hsz
+end
+
+--[=[
+	Returns if a point is in a bounding box defined by a Roblox part with the Cylinder shape.
+
+	@param cframe CFrame
+	@param size Vector3
+	@param testPosition Vector3
+	@return boolean
+]=]
+function BoundingBoxUtils.inCylinderBoundingBox(cframe, size, testPosition)
+	local relative = cframe:pointToObjectSpace(testPosition)
+	local half_height = size.x/2
+	local radius = math.min(size.y, size.z)/2
+
+	local rx, ry, rz = relative.x, relative.y, relative.z
+	local dist = ry*ry + rz*rz
+	return math.abs(rx) <= half_height
+		and dist <= (radius*radius)
+end
+
+--[=[
+	Returns if a point is in a bounding box defined by a Roblox part with the ball shape.
+
+	@param cframe CFrame
+	@param size Vector3
+	@param testPosition Vector3
+	@return boolean
+]=]
+function BoundingBoxUtils.inBallBoundingBox(cframe, size, testPosition)
+	local relative = cframe:pointToObjectSpace(testPosition)
+	local radius = math.min(size.x, size.y, size.z)/2
+
+	local rx, ry, rz = relative.x, relative.y, relative.z
+	local dist = rx*rx + ry*ry + rz*rz
+	return dist <= radius*radius
 end
 
 return BoundingBoxUtils

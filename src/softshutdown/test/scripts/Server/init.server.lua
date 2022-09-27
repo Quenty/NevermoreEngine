@@ -57,4 +57,8 @@ local clientScript = script.ClientScript
 clientScript.Name = "QuentySoftShutdownClientScript"
 clientScript:Clone().Parent = ReplicatedFirst
 
-require(server.SoftShutdownService):Init()
+local serviceBag = require(server.ServiceBag).new()
+serviceBag:GetService(require(server.SoftShutdownService))
+
+serviceBag:Init()
+serviceBag:Start()

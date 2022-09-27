@@ -195,6 +195,12 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			return ("PhysicalProperties.new(%s, %s, %s, %s, %s)"):format(
 				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity, value.FrictionWeight, value.ElasticityWeight))
 		end
+	elseif valueType == "Font" then
+		if value.Weight == Enum.FontWeight.Regular and value.Style == Enum.FontStyle.Normal then
+			return ("Font.new(%q)"):format(value.Family)
+		else
+			return ("Font.new(%q, %s, %s)"):format(value.Family, tostring(value.Weight), tostring(value.Style))
+		end
 	elseif valueType == "userdata" then
 		-- FontFace
 		warn(("Bad property type %s for %s - Cannot serialize."):format(valueType, debugHint and tostring(debugHint) or "?"))

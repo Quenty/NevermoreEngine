@@ -1,5 +1,6 @@
 --[=[
-	DataStore manager for player that automatically saves on player leave and game close.
+	DataStore manager for player that automatically saves on player leave and game close. Consider using
+	[PlayerDataStoreService] instead.
 
 	@server
 	@class PlayerDataStoreManager
@@ -23,12 +24,16 @@ PlayerDataStoreManager.__index = PlayerDataStoreManager
 
 --[=[
 	Constructs a new PlayerDataStoreManager.
+
 	@param robloxDataStore DataStore
 	@param keyGenerator (player) -> string -- Function that takes in a player, and outputs a key
+	@param skipBindingToClose boolean?
 	@return PlayerDataStoreManager
 ]=]
-function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
+function PlayerDataStoreManager.new(robloxDataStore, keyGenerator, skipBindingToClose)
 	local self = setmetatable(BaseObject.new(), PlayerDataStoreManager)
+
+	assert(type(skipBindingToClose) == "boolean" or skipBindingToClose == nil, "Bad skipBindingToClose")
 
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 	self._keyGenerator = keyGenerator or error("No keyGenerator")
@@ -48,13 +53,15 @@ function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
 		self:_removePlayerDataStore(player)
 	end))
 
-	game:BindToClose(function()
-		if self._disableSavingInStudio then
-			return
-		end
+	if skipBindingToClose ~= true then
+		game:BindToClose(function()
+			if self._disableSavingInStudio then
+				return
+			end
 
-		self:PromiseAllSaves():Wait()
-	end)
+			self:PromiseAllSaves():Wait()
+		end)
+	end
 
 	return self
 end

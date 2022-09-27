@@ -32,12 +32,16 @@ function DepthOfFieldService:Init(_serviceBag)
 	-- Assume we can enable now that we've recorded values
 	self._depthOfField.InFocusRadius = self._tweener:GetOriginalRadius()
 	self._depthOfField.FocusDistance = self._tweener:GetOriginalDistance()
+	self._depthOfField.NearIntensity = self._tweener:GetOriginalNearIntensity()
+	self._depthOfField.FarIntensity = self._tweener:GetOriginalFarIntensity()
 	self._depthOfField.Enabled = true
 
 	self._maid:GiveTask(self._topOfStack.Changed:Connect(function(new, _old, maid)
 		if new then
 			self._tweener:SetDistance(new:GetDistance(), false)
 			self._tweener:SetRadius(new:GetRadius(), false)
+			self._tweener:SetNearIntensity(new:GetNearIntensity(), false)
+			self._tweener:SetFarIntensity(new:GetFarIntensity(), false)
 
 			maid:GiveTask(new.DistanceChanged:Connect(function(distance, doNotAnimate)
 				self._tweener:SetDistance(distance, doNotAnimate)
@@ -45,6 +49,13 @@ function DepthOfFieldService:Init(_serviceBag)
 			maid:GiveTask(new.RadiusChanged:Connect(function(radius, doNotAnimate)
 				self._tweener:SetRadius(radius, doNotAnimate)
 			end))
+			maid:GiveTask(new.NearIntensityChanged:Connect(function(nearIntensity, doNotAnimate)
+				self._tweener:SetNearIntensity(nearIntensity, doNotAnimate)
+			end))
+			maid:GiveTask(new.FarIntensityChanged:Connect(function(farIntensity, doNotAnimate)
+				self._tweener:SetFarIntensity(farIntensity, doNotAnimate)
+			end))
+
 		else
 			self._tweener:Reset()
 		end
@@ -60,7 +71,11 @@ end
 function DepthOfFieldService:CreateModifier()
 	local maid = Maid.new()
 
-	local modifier = DepthOfFieldModifier.new(self._tweener:GetOriginalDistance(), self._tweener:GetOriginalRadius())
+	local modifier = DepthOfFieldModifier.new(
+		self._tweener:GetOriginalDistance(),
+		self._tweener:GetOriginalRadius(),
+		self._tweener:GetOriginalFarIntensity(),
+		self._tweener:GetOriginalNearIntensity())
 	maid:GiveTask(modifier)
 
 	maid:GiveTask(function()
@@ -109,7 +124,11 @@ function DepthOfFieldService:_getOrCreateDepthOfField()
 	warn("[DepthOfFieldService._getOrCreateDepthOfField] - Creating depthOfField effect!")
 
 	local depthOfField = Instance.new("DepthOfFieldEffect")
-	depthOfField.Enabled = false
+	depthOfField.FarIntensity = 0.75
+	depthOfField.FocusDistance = 500
+	depthOfField.InFocusRadius = 500
+	depthOfField.NearIntensity = 0.75
+	depthOfField.Enabled = true
 	depthOfField.Parent = Lighting
 	self._maid:GiveTask(depthOfField)
 

@@ -26,10 +26,6 @@ function TiePropertyDefinition:GetTieDefinition()
 	return self._tieDefinition
 end
 
-function TiePropertyDefinition:IsAttribute()
-	return self._isAttribute
-end
-
 function TiePropertyDefinition:GetDefaultValue()
 	return self._defaultValue
 end

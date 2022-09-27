@@ -176,4 +176,14 @@ function TextFilterUtils._promiseTextResult(getResult, ...)
 	return promise
 end
 
+--[=[
+	Returns true if there's non-filtered text or characters in the text
+	@return boolean
+]=]
+function TextFilterUtils.hasNonFilteredText(text: string): boolean
+	assert(type(text) == "string", "Bad text")
+
+	return string.find(text, "[^#%s]") ~= nil
+end
+
 return TextFilterUtils

@@ -7,8 +7,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local DataStore = require("DataStore")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
@@ -20,30 +18,9 @@ function GameDataStoreService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+
 	self._maid = Maid.new()
-end
-
---[=[
-	For if you want to disable saving in studio for faster close time!
-]=]
-function GameDataStoreService:DisableSaveOnCloseStudio()
-	assert(RunService:IsStudio())
-
-	self._disableSavingInStudio = true
-end
-
-function GameDataStoreService:Start()
-	game:BindToClose(function()
-		if self._disableSavingInStudio then
-			return
-		end
-
-		return self:PromiseDataStore()
-			:Then(function(dataStore)
-				return dataStore:Save()
-			end)
-			:Wait()
-	end)
 end
 
 function GameDataStoreService:PromiseDataStore()
@@ -54,7 +31,11 @@ function GameDataStoreService:PromiseDataStore()
 	self._dataStorePromise = self:_promiseRobloxDataStore()
 		:Then(function(robloxDataStore)
 			local dataStore = DataStore.new(robloxDataStore, self:_getKey())
-			self._maid._datastore = dataStore
+			self._maid:GiveTask(dataStore)
+
+			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
+				return dataStore:Save()
+			end))
 
 			return dataStore
 		end)

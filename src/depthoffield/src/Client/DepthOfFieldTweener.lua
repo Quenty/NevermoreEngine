@@ -9,8 +9,6 @@ local AccelTween = require("AccelTween")
 local BaseObject = require("BaseObject")
 local StepUtils = require("StepUtils")
 
-local DEFAULT_SPEED = 10000
-
 local DepthOfFieldTweener = setmetatable({}, BaseObject)
 DepthOfFieldTweener.ClassName = "DepthOfFieldTweener"
 DepthOfFieldTweener.__index = DepthOfFieldTweener
@@ -18,10 +16,9 @@ DepthOfFieldTweener.__index = DepthOfFieldTweener
 --[=[
 	Create a new DepthOfFieldTweener.
 	@param depthOfField number
-	@param speed number?
 	@return DepthOfFieldTweener
 ]=]
-function DepthOfFieldTweener.new(depthOfField, speed)
+function DepthOfFieldTweener.new(depthOfField)
 	local self = setmetatable(BaseObject.new(), DepthOfFieldTweener)
 
 	self._depthOfField = assert(depthOfField, "No depthOfField")
@@ -29,18 +26,30 @@ function DepthOfFieldTweener.new(depthOfField, speed)
 	-- If we aren't enabled we make sure to set distance to be far
 	self._originalDistance = self._depthOfField.Enabled and self._depthOfField.FocusDistance or 500
 	self._originalRadius = self._depthOfField.Enabled and self._depthOfField.InFocusRadius or 500
+	self._originalNearIntensity = self._depthOfField.NearIntensity
+	self._originalFarIntensity = self._depthOfField.FarIntensity
 
-	self._distance = AccelTween.new(speed or DEFAULT_SPEED)
+	self._distance = AccelTween.new(10000)
 	self._distance.t = self._originalDistance
 	self._distance.p = self._originalDistance
 
-	self._radius = AccelTween.new(speed or DEFAULT_SPEED)
+	self._radius = AccelTween.new(10000)
 	self._radius.t = self._originalRadius
 	self._radius.p = self._originalRadius
+
+	self._nearIntensity = AccelTween.new(30)
+	self._nearIntensity.t = self._originalNearIntensity
+	self._nearIntensity.p = self._originalNearIntensity
+
+	self._farIntensity = AccelTween.new(30)
+	self._farIntensity.t = self._originalFarIntensity
+	self._farIntensity.p = self._originalFarIntensity
 
 	self._maid:GiveTask(function()
 		self._depthOfField.FocusDistance = self._originalDistance
 		self._depthOfField.InFocusRadius = self._originalRadius
+		self._depthOfField.NearIntensity = self._originalNearIntensity
+		self._depthOfField.FarIntensity = self._originalFarIntensity
 	end)
 
 	self._startAnimation, self._maid._stop = StepUtils.bindToRenderStep(self._update)
@@ -49,12 +58,41 @@ function DepthOfFieldTweener.new(depthOfField, speed)
 	return self
 end
 
+function DepthOfFieldTweener:SetNearIntensity(nearIntensity, doNotAnimate)
+	assert(type(nearIntensity) == "number", "Bad nearIntensity")
+
+	local target = math.clamp(nearIntensity, 0, 1)
+	self._nearIntensity.t = target
+	if doNotAnimate then
+		self._nearIntensity.p = target
+		self._nearIntensity.v = 0
+	end
+
+	self:_startAnimation()
+end
+
+function DepthOfFieldTweener:SetFarIntensity(farIntensity, doNotAnimate)
+	assert(type(farIntensity) == "number", "Bad farIntensity")
+
+	local target = math.clamp(farIntensity, 0, 1)
+	self._farIntensity.t = target
+	if doNotAnimate then
+		self._farIntensity.p = target
+		self._farIntensity.v = 0
+	end
+
+	self:_startAnimation()
+end
+
+
 --[=[
 	Sets the radius and starts any animation
 	@param radius number
 	@param doNotAnimate boolean
 ]=]
 function DepthOfFieldTweener:SetRadius(radius, doNotAnimate)
+	assert(type(radius) == "number", "Bad radius")
+
 	local target = math.clamp(radius, 0, 500)
 	self._radius.t = target
 	if doNotAnimate then
@@ -87,6 +125,8 @@ end
 	@param doNotAnimate boolean
 ]=]
 function DepthOfFieldTweener:SetDistance(distance, doNotAnimate)
+	assert(type(distance) == "number", "Bad distance")
+
 	local target = math.clamp(distance, 0, 500)
 	self._distance.t = target
 	if doNotAnimate then
@@ -104,6 +144,8 @@ end
 function DepthOfFieldTweener:Reset(doNotAnimate)
 	self:ResetRadius(doNotAnimate)
 	self:ResetDistance(doNotAnimate)
+	self:ResetNearIntensity(doNotAnimate)
+	self:ResetFarIntensity(doNotAnimate)
 end
 
 --[=[
@@ -112,7 +154,6 @@ end
 ]=]
 function DepthOfFieldTweener:ResetRadius(doNotAnimate)
 	self:SetRadius(self._originalRadius, doNotAnimate)
-	self:_startAnimation()
 end
 
 --[=[
@@ -121,7 +162,14 @@ end
 ]=]
 function DepthOfFieldTweener:ResetDistance(doNotAnimate)
 	self:SetDistance(self._originalDistance, doNotAnimate)
-	self:_startAnimation()
+end
+
+function DepthOfFieldTweener:ResetNearIntensity(doNotAnimate)
+	self:SetNearIntensity(self._originalNearIntensity, doNotAnimate)
+end
+
+function DepthOfFieldTweener:ResetFarIntensity(doNotAnimate)
+	self:SetFarIntensity(self._originalFarIntensity, doNotAnimate)
 end
 
 function DepthOfFieldTweener:GetOriginalRadius()
@@ -132,12 +180,24 @@ function DepthOfFieldTweener:GetOriginalDistance()
 	return self._originalDistance
 end
 
+function DepthOfFieldTweener:GetOriginalNearIntensity()
+	return self._originalNearIntensity
+end
+
+function DepthOfFieldTweener:GetOriginalFarIntensity()
+	return self._originalFarIntensity
+end
+
 function DepthOfFieldTweener:_update()
 	self._depthOfField.FocusDistance = self._distance.p
 	self._depthOfField.InFocusRadius = self._radius.p
+	self._depthOfField.NearIntensity = self._nearIntensity.p
+	self._depthOfField.FarIntensity = self._farIntensity.p
 
 	return self._radius.rtime > 0
 		or self._distance.rtime > 0
+		or self._nearIntensity.rtime > 0
+		or self._farIntensity.rtime > 0
 end
 
 return DepthOfFieldTweener

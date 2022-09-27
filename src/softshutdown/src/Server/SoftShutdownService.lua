@@ -26,11 +26,16 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local SoftShutdownConstants = require("SoftShutdownConstants")
 local TeleportServiceUtils = require("TeleportServiceUtils")
+local BindToCloseService = require("BindToCloseService")
 
 local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
 
-function SoftShutdownService:Init()
+function SoftShutdownService:Init(serviceBag)
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
+	self._bindToCloseService = self._serviceBag:GetService(BindToCloseService)
+
 	self._dataStore = DataStoreService:GetDataStore("IsSoftShutdownServer")
 	self._maid = Maid.new()
 
@@ -38,10 +43,9 @@ function SoftShutdownService:Init()
 		if isLobby then
 			self:_promiseRedirectAllPlayers()
 		else
-			game:BindToClose(function()
-				local promise = self:_promiseTeleportPlayersToLobby()
-				promise:Wait()
-			end)
+			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
+				return self:_promiseTeleportPlayersToLobby()
+			end))
 		end
 	end)
 end

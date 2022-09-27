@@ -25,9 +25,11 @@ function TextServiceUtils.observeSizeForLabelProps(props)
 	assert(props.TextSize, "Bad props.TextSize")
 	assert(props.Font, "Bad props.Font")
 
-	return Blend.Computed(props.Text, props.TextSize, props.Font, props.MaxSize or Vector2.new(1e6, 1e6),
-		function(text, textSize, font, maxSize)
-			return TextService:GetTextSize(text, textSize, font, maxSize)
+	return Blend.Computed(props.Text, props.TextSize, props.Font, props.MaxSize or Vector2.new(1e6, 1e6), props.LineHeight or 1,
+		function(text, textSize, font, maxSize, lineHeight)
+			local size = TextService:GetTextSize(text, textSize, font, maxSize)
+
+			return Vector2.new(size.x, lineHeight*size.y)
 		end)
 end
 

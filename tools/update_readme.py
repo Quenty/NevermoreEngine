@@ -1,7 +1,6 @@
 import glob
 import os
 import json
-import semver
 import re
 
 # https://stackoverflow.com/questions/22081209/find-the-root-of-the-git-repository-where-the-file-lives

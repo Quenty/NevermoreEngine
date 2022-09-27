@@ -32,6 +32,7 @@
     "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/basicpane": "file:../basicpane",
+    "@quenty/bindtocloseservice": "file:../bindtocloseservice",
     "@quenty/blend": "file:../blend",
     "@quenty/clienttranslator": "file:../clienttranslator",
     "@quenty/datastore": "file:../datastore",

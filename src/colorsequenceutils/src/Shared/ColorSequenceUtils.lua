@@ -3,9 +3,45 @@
 	@class ColorSequenceUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local Math = require("Math")
+
 local ColorSequenceUtils = {}
 
 local EPSILON = 1e-3
+
+--[=[
+	Gets the current color for the color sequence at the given timestamp.
+
+	@param colorSequence ColorSequence
+	@param t number
+	@return Color3
+]=]
+function ColorSequenceUtils.getColor(colorSequence: ColorSequence, t: number): Color3
+	assert(typeof(colorSequence) == "ColorSequence", "Bad colorSequence")
+	assert(type(t) == "number", "Bad t")
+
+	-- TODO: Binary search
+	local keypoints = colorSequence.Keypoints
+
+	if t <= keypoints[1].Time then
+		return keypoints[1].Value
+	end
+
+	for i=2, #keypoints do
+		local point = keypoints[i]
+		if point.Time < t then
+			continue
+		end
+
+		local prevPoint = keypoints[i-1]
+		local scale = math.clamp(Math.map(t, prevPoint.Time, point.Time, 0, 1), 0, 1)
+		return prevPoint.Value:Lerp(point.Value, scale)
+	end
+
+	return keypoints[#keypoints].Value
+end
 
 --[=[
 	Makes stripes for color sequences.

@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
+local RunService = game:GetService("RunService")
 
 local InputModeType = require("InputModeType")
 local Maid = require("Maid")
@@ -47,6 +48,13 @@ end
 
 function InputModeServiceClient:GetInputMode(inputModeType)
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
+
+	if not RunService:IsRunning() then
+		if not self._inputModes then
+			-- fake it till we make it!
+			return InputMode.new(inputModeType)
+		end
+	end
 
 	if self._inputModes[inputModeType] then
 		return self._inputModes[inputModeType]
