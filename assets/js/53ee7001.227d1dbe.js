@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[73178],{68265:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BoundLinkUtils","desc":"Utility functions involving binders and links","source":{"line":5,"path":"src/boundlinkutils/src/Shared/BoundLinkUtils.lua"}}')}}]);
