@@ -1,23 +1,18 @@
-# v6.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix function returning call scenario ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@5.1.1...@quenty/promise@6.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Fix function returning call scenario ([7a099f3](https://github.com/Quenty/NevermoreEngine/commit/7a099f320918a6a520ed9e35c5e777cf895a05f6))
+
+
+
+
 
 ## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@5.1.0...@quenty/promise@5.1.1) (2022-08-16)
 

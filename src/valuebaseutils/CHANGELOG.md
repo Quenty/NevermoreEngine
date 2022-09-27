@@ -1,23 +1,18 @@
-# v7.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Support IntValue ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@6.1.0...@quenty/valuebaseutils@7.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Support IntValue ([118b2a7](https://github.com/Quenty/NevermoreEngine/commit/118b2a75c6e57f2aaa0b5fc382d23e6d6138e9e5))
+
+
+
+
 
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@6.0.1...@quenty/valuebaseutils@6.1.0) (2022-08-22)
 

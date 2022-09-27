@@ -1,23 +1,18 @@
-# v4.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add JSON encoding to CFrame serializer ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@3.1.0...@quenty/cframeserializer@4.0.0) (2022-09-27)
+
+
+### Features
+
+* Add JSON encoding to CFrame serializer ([a9ba514](https://github.com/Quenty/NevermoreEngine/commit/a9ba5146ad3afb7d14d5320b104359b16c3d68a1))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@3.0.0...@quenty/cframeserializer@3.1.0) (2022-03-27)
 

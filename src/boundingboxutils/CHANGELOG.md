@@ -1,23 +1,18 @@
-# v4.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add BoundingBoxUtils.inCylinderBoundingBox and BoundingBoxUtils.inBallBoundingBox ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@3.1.0...@quenty/boundingboxutils@4.0.0) (2022-09-27)
+
+
+### Features
+
+* Add BoundingBoxUtils.inCylinderBoundingBox and BoundingBoxUtils.inBallBoundingBox ([d26d1cc](https://github.com/Quenty/NevermoreEngine/commit/d26d1ccc54ecf52462703188e9b7b83227673c62))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@3.0.0...@quenty/boundingboxutils@3.1.0) (2022-03-27)
 

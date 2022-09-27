@@ -1,23 +1,18 @@
-# v7.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Support initialization of input modes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@6.1.0...@quenty/inputmode@7.0.0) (2022-09-27)
+
+
+### Features
+
+* Support initialization of input modes ([ca75eb5](https://github.com/Quenty/NevermoreEngine/commit/ca75eb51100af22f8cf91c7c79545b35a9cc0eaf))
+
+
+
+
 
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@6.0.1...@quenty/inputmode@6.1.0) (2022-08-22)
 

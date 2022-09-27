@@ -1,24 +1,19 @@
-# v3.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Hide server code by default from replication using cameras and init.meta.json. ([@Quenty](https://github.com/Quenty))
-- fix: Remove unnecessary node_modules in deathreport ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@2.1.0...@quenty/deathreport@3.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+* Remove unnecessary node_modules in deathreport ([a33f103](https://github.com/Quenty/NevermoreEngine/commit/a33f10345f5cc7c46cbb5bc074062b67a149cdad))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@2.0.1...@quenty/deathreport@2.1.0) (2022-08-22)
 

@@ -1,3 +1,24 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.0.0 (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+### Features
+
+* Add BindToCloseService package and implement across places binding to close ([afdd829](https://github.com/Quenty/NevermoreEngine/commit/afdd829538c9d0ce2d6f51ad9fee9063f0f5bd24))
+
+
+
+
+
 # v2.0.0 (Tue Sep 27 2022)
 
 #### 💥 Breaking Change

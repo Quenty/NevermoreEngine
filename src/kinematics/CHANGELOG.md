@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.0.0 (2022-09-27)
+
+**Note:** Version bump only for package @quenty/kinematics
+
+
+
+
+
 # v2.0.0 (Tue Sep 27 2022)
 
 #### 💥 Breaking Change

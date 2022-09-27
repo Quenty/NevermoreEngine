@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@6.1.0...@quenty/rx@7.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
+
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@6.0.1...@quenty/rx@6.1.0) (2022-08-22)
 
 **Note:** Version bump only for package @quenty/rx

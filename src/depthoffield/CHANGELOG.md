@@ -1,23 +1,18 @@
-# v5.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Support near and far intensity in depth of field tweener ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@4.1.0...@quenty/depthoffield@5.0.0) (2022-09-27)
+
+
+### Features
+
+* Support near and far intensity in depth of field tweener ([9dcb826](https://github.com/Quenty/NevermoreEngine/commit/9dcb826d1d621859637311e5493605c8b3b5242e))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@4.0.1...@quenty/depthoffield@4.1.0) (2022-08-22)
 

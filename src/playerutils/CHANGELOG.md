@@ -1,23 +1,18 @@
-# v2.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add PlayerUtils.getDefaultNameColor() API ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@1.1.0...@quenty/playerutils@2.0.0) (2022-09-27)
+
+
+### Features
+
+* Add PlayerUtils.getDefaultNameColor() API ([4cff733](https://github.com/Quenty/NevermoreEngine/commit/4cff733c86bb00a7c61c22af47994f5e6123c701))
+
+
+
+
 
 # 1.1.0 (2022-07-31)
 

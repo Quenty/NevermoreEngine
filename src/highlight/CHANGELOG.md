@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.0.0 (2022-09-27)
+
+
+### Features
+
+* Add animated highlight package ([fa70218](https://github.com/Quenty/NevermoreEngine/commit/fa702186b2cae6919fb925d5050d68c35ce6939b))
+
+
+
+
+
 # v2.0.0 (Tue Sep 27 2022)
 
 #### 💥 Breaking Change

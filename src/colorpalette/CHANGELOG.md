@@ -1,24 +1,19 @@
-# v4.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Support Observable colors in ObserveGradeOn ([@Quenty](https://github.com/Quenty))
-- feat: Add ColorGradeUtils.getGrade(color) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@3.1.0...@quenty/colorpalette@4.0.0) (2022-09-27)
+
+
+### Features
+
+* Add ColorGradeUtils.getGrade(color) ([9abd955](https://github.com/Quenty/NevermoreEngine/commit/9abd95567d591a2d154b1191f2280e86c4f01406))
+* Support Observable colors in ObserveGradeOn ([4093878](https://github.com/Quenty/NevermoreEngine/commit/409387884cc707e5eb2b18aa5fe9ffdfd3e6dbf4))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@3.0.1...@quenty/colorpalette@3.1.0) (2022-08-22)
 

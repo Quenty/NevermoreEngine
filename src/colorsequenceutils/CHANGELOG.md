@@ -1,23 +1,18 @@
-# v3.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add ColorSequenceUtils.getColor ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@2.1.0...@quenty/colorsequenceutils@3.0.0) (2022-09-27)
+
+
+### Features
+
+* Add ColorSequenceUtils.getColor ([6423d82](https://github.com/Quenty/NevermoreEngine/commit/6423d829816df56d99e0cfd2b61d04b12ebc5226))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@2.0.1...@quenty/colorsequenceutils@2.1.0) (2022-03-27)
 

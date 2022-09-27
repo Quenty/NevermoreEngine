@@ -1,23 +1,18 @@
-# v5.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Ensure currentCamera object GCs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@4.1.0...@quenty/viewport@5.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Ensure currentCamera object GCs ([c807bdd](https://github.com/Quenty/NevermoreEngine/commit/c807bdd49576691d593a78bf948829e29e9a8ef6))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@4.0.1...@quenty/viewport@4.1.0) (2022-08-22)
 

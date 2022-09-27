@@ -1,3 +1,20 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.0.0 (2022-09-27)
+
+
+### Features
+
+* Add RxSelectionUtils.observeFirstAdornee and fix RxSelectionUtils.observeSelectionItemsBrio ([ef4c76b](https://github.com/Quenty/NevermoreEngine/commit/ef4c76bfd8146811d336ae26fc33e211ad1a11c1))
+* Add SelectionUtils ([bb2b8ea](https://github.com/Quenty/NevermoreEngine/commit/bb2b8eab89c1c9d68ca0c5f8efc728c27ff1130f))
+
+
+
+
+
 # v2.0.0 (Tue Sep 27 2022)
 
 #### 💥 Breaking Change

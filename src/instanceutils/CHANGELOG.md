@@ -1,23 +1,18 @@
-# v7.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add RxInstanceUtils.observeFirstAncestor ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@6.1.0...@quenty/instanceutils@7.0.0) (2022-09-27)
+
+
+### Features
+
+* Add RxInstanceUtils.observeFirstAncestor ([8723b25](https://github.com/Quenty/NevermoreEngine/commit/8723b258c2590395f4d0eeb971a6a6c0e031a23a))
+
+
+
+
 
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@6.0.1...@quenty/instanceutils@6.1.0) (2022-08-22)
 

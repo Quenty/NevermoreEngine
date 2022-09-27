@@ -1,23 +1,18 @@
-# v3.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add EnumUtils.isOfType() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@2.0.0...@quenty/enumutils@3.0.0) (2022-09-27)
+
+
+### Features
+
+* Add EnumUtils.isOfType() ([eaafef1](https://github.com/Quenty/NevermoreEngine/commit/eaafef12fcf57fb6e96de865c6f0b2c110bf3bcc))
+
+
+
+
 
 # 2.0.0 (2022-08-14)
 

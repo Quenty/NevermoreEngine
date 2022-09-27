@@ -1,23 +1,18 @@
-# v4.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add NumberSequenceUtils.getValueGenerator ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@3.1.0...@quenty/numbersequenceutils@4.0.0) (2022-09-27)
+
+
+### Features
+
+* Add NumberSequenceUtils.getValueGenerator ([6d79a5c](https://github.com/Quenty/NevermoreEngine/commit/6d79a5cd5d7d42b945064d1b9666048378bc5585))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@3.0.0...@quenty/numbersequenceutils@3.1.0) (2022-03-27)
 

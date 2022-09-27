@@ -1,27 +1,23 @@
-# v8.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add AttributeUtils.removeAllAttributes() ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add IntValue support as a valid AttributeUtil ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@7.1.0...@quenty/attributeutils@8.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Add IntValue support as a valid AttributeUtil ([1cec7d9](https://github.com/Quenty/NevermoreEngine/commit/1cec7d9cce47811e1e4afe6b49ae94a050fa6a1f))
+
+
+### Features
+
+* Add AttributeUtils.removeAllAttributes() ([4096cd9](https://github.com/Quenty/NevermoreEngine/commit/4096cd94d2c38d382b7aafe8cb2fcb8bb340d051))
+
+
+
+
 
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@7.0.1...@quenty/attributeutils@7.1.0) (2022-08-22)
 

@@ -1,28 +1,23 @@
-# v6.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Support hiding server code behind the camera ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix selene style ([@Quenty](https://github.com/Quenty))
-- fix: Add untested hot reloading loader replication logic ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@5.0.1...@quenty/loader@6.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Add untested hot reloading loader replication logic ([384a8f1](https://github.com/Quenty/NevermoreEngine/commit/384a8f166c781a6d67485d8cee1269915ba2a5ad))
+
+
+### Features
+
+* Support hiding server code behind the camera ([afc0e0a](https://github.com/Quenty/NevermoreEngine/commit/afc0e0a35592f68397d6db8108e7955b737ecfe0))
+
+
+
+
 
 ## [5.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@5.0.0...@quenty/loader@5.0.1) (2022-08-16)
 

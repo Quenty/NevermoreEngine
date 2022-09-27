@@ -1,23 +1,18 @@
-# v5.0.0 (Tue Sep 27 2022)
-
-#### 💥 Breaking Change
-
-- feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add CFrameUtils.areClose() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@4.0.0...@quenty/cframeutils@5.0.0) (2022-09-27)
+
+
+### Features
+
+* Add CFrameUtils.areClose() ([6c07c61](https://github.com/Quenty/NevermoreEngine/commit/6c07c61012bae6fd147cc38f1dbf6ec5772a6cc5))
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@3.1.0...@quenty/cframeutils@4.0.0) (2022-05-21)
 
