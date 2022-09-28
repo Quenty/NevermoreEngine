@@ -1,2 +1,2 @@
-declare function debounce(timeoutInSeconds: number, func: Callback): () => void;
+declare function debounce(timeoutInSeconds: number, func: () => void): () => void;
 export = debounce;
