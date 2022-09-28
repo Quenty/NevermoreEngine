@@ -1,0 +1,7 @@
+{
+	"compilerOptions": {
+		"moduleDetection": "force",
+		"strict": true,
+		"typeRoots": ["node_modules/@rbxts"]
+	}
+}
