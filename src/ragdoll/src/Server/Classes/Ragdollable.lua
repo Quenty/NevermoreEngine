@@ -6,15 +6,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
--- local AttributeUtils = require("AttributeUtils")
+local RxBrioUtils = require("RxBrioUtils")
 local BaseObject = require("BaseObject")
-local CharacterUtils = require("CharacterUtils")
-local HumanoidAnimatorUtils = require("HumanoidAnimatorUtils")
-local Maid = require("Maid")
-local RagdollableConstants = require("RagdollableConstants")
 local RagdollBindersServer = require("RagdollBindersServer")
-local RagdollRigging = require("RagdollRigging")
-local RagdollUtils = require("RagdollUtils")
+local RxRagdollUtils = require("RxRagdollUtils")
+local Maid = require("Maid")
+local RagdollAdditionalAttachmentUtils = require("RagdollAdditionalAttachmentUtils")
+local RagdollCollisionUtils = require("RagdollCollisionUtils")
+local RagdollBallSocketUtils = require("RagdollBallSocketUtils")
 
 local Ragdollable = setmetatable({}, BaseObject)
 Ragdollable.ClassName = "Ragdollable"
@@ -29,57 +28,42 @@ Ragdollable.__index = Ragdollable
 function Ragdollable.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), Ragdollable)
 
-	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._ragdollBindersServer = self._serviceBag:GetService(RagdollBindersServer)
 
-	self._obj.BreakJointsOnDeath = false
-	RagdollRigging.configureRagdollJoints(true, self._obj.Parent, humanoid.RigType)
+	-- Ensure predefined physics rig immediatelly on the server.
+	-- We do this so during replication loop-back there's no chance of death.
+	self._maid:GiveTask(RxBrioUtils.flatCombineLatest({
+		character = RxRagdollUtils.observeCharacterBrio(self._obj);
+		rigType = RxRagdollUtils.observeRigType(self._obj);
+	}):Subscribe(function(state)
+		if state.character and state.rigType then
+			local maid = Maid.new()
 
-	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
-	if player then
-		self._player = player
+			maid:GiveTask(RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(state.character, state.rigType))
+			maid:GiveTask(RagdollBallSocketUtils.ensureBallSockets(state.character, state.rigType))
+			maid:GiveTask(RagdollCollisionUtils.ensureNoCollides(state.character, state.rigType))
 
-		self._remoteEvent = Instance.new("RemoteEvent")
-		self._remoteEvent.Name = RagdollableConstants.REMOTE_EVENT_NAME
-		self._remoteEvent.Archivable = false
-		self._remoteEvent.Parent = self._obj
-		self._maid:GiveTask(self._remoteEvent)
+			self._maid._configure = maid
+		else
+			self._maid._configure = nil
+		end
+	end))
 
-		self._maid:GiveTask(self._remoteEvent.OnServerEvent:Connect(function(...)
-			self:_handleServerEvent(...)
-		end))
-	else
-		-- NPC
-		self._maid:GiveTask(self._ragdollBinder:ObserveInstance(self._obj, function()
-			self:_onRagdollChangedForNPC()
-		end))
-
-		self:_onRagdollChangedForNPC()
-	end
-
-	-- For fast debugging
-	-- self._maid:GiveTask(AttributeUtils.bindToBinder(self._obj, "Ragdoll", self._ragdollBinder))
+	self._maid:GiveTask(self._ragdollBindersServer.Ragdoll:ObserveInstance(self._obj, function()
+		self:_onRagdollChanged()
+	end))
+	self:_onRagdollChanged()
 
 	return self
 end
 
-function Ragdollable:_onRagdollChangedForNPC()
-	if self._ragdollBinder:Get(self._obj) then
+function Ragdollable:_onRagdollChanged()
+	if self._ragdollBindersServer.Ragdoll:Get(self._obj) then
 		self:_setRagdollEnabled(true)
 	else
 		self:_setRagdollEnabled(false)
 	end
-end
-
-function Ragdollable:_handleServerEvent(player, state)
-	assert(self._player == player, "Bad player")
-
-	if state then
-		self._ragdollBinder:Bind(self._obj)
-	else
-		self._ragdollBinder:Unbind(self._obj)
-	end
-
-	self:_setRagdollEnabled(state)
 end
 
 function Ragdollable:_setRagdollEnabled(isEnabled)
@@ -88,31 +72,10 @@ function Ragdollable:_setRagdollEnabled(isEnabled)
 			return
 		end
 
-		self._maid._ragdoll = self:_enableServer()
+		self._maid._ragdoll = RxRagdollUtils.runLocal(self._obj)
 	else
 		self._maid._ragdoll = nil
 	end
-end
-
-function Ragdollable:_enableServer()
-	local maid = Maid.new()
-
-	-- This will reset friction too
-	RagdollRigging.configureRagdollJoints(true, self._obj.Parent, self._obj.RigType)
-
-	maid:GiveTask(RagdollUtils.setupState(self._obj))
-	maid:GiveTask(RagdollUtils.setupMotors(self._obj))
-	maid:GiveTask(RagdollUtils.setupHead(self._obj))
-	maid:GiveTask(RagdollUtils.preventAnimationTransformLoop(self._obj))
-
-	-- Do this after we setup motors
-	HumanoidAnimatorUtils.stopAnimations(self._obj, 0)
-
-	maid:GiveTask(self._obj.AnimationPlayed:Connect(function(track)
-		track:Stop(0)
-	end))
-
-	return maid
 end
 
 return Ragdollable

@@ -14,6 +14,10 @@ local CharacterUtils = require("CharacterUtils")
 local AttributeValue = require("AttributeValue")
 local Maid = require("Maid")
 local UnragdollAutomaticallyConstants = require("UnragdollAutomaticallyConstants")
+local cancellableDelay = require("cancellableDelay")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local UnragdollAutomatically = setmetatable({}, BaseObject)
 UnragdollAutomatically.ClassName = "UnragdollAutomatically"
@@ -31,48 +35,86 @@ function UnragdollAutomatically.new(humanoid, serviceBag)
 	self._ragdollBindersServer = serviceBag:GetService(RagdollBindersServer)
 	self._player = CharacterUtils.getPlayerFromCharacter(self._obj)
 
-	self._disabledUnragdoll = AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.DISABLE_UNRAGDOLL_AUTOMATICALLY_ATTRIBUTE, false)
-	self._maid:GiveTask(self._disabledUnragdoll:Observe():Subscribe(function(isDisabled)
-		if isDisabled then
-			self._maid._updater = nil
-			return
-		end
+	self._unragdollAutomatically = AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.UNRAGDOLL_AUTOMATICALLY_ATTRIBUTE, true)
+	self._unragdollAutomaticTime = AttributeValue.new(self._obj, UnragdollAutomaticallyConstants.UNRAGDOLL_AUTOMATIC_TIME_ATTRIBUTE, 5)
 
-		local maid = Maid.new()
-
-		maid:GiveTask(self._ragdollBindersServer.Ragdoll:ObserveInstance(self._obj, function()
-			self:_handleRagdollChanged(maid)
-		end))
-		self:_handleRagdollChanged(maid)
-
-		self._maid._updater = maid
+	self._maid:GiveTask(self._ragdollBindersServer.Ragdoll:ObserveInstance(self._obj, function()
+		self:_handleRagdollChanged(self._maid)
 	end))
+	self:_handleRagdollChanged(self._maid)
 
 	return self
 end
 
-function UnragdollAutomatically:_getTime()
-	if self._player then
-		return 2
-	else
-		return 5
-	end
-end
-
 function UnragdollAutomatically:_handleRagdollChanged(maid)
 	if self._ragdollBindersServer.Ragdoll:Get(self._obj) then
-		self._ragdollTime = tick()
-
-		maid._conn = RunService.Stepped:Connect(function()
-			if tick() - self._ragdollTime >= self:_getTime() then
-				if self._obj.Health > 0 then
-					self._ragdollBindersServer.Ragdoll:Unbind(self._obj)
+		maid._unragdoll = self:_observeCanUnragdollTimer():Pipe({
+			Rx.switchMap(function(state)
+				if state then
+					return self:_observeAlive()
+				else
+					return Rx.of(false);
 				end
+			end);
+			Rx.distinct();
+		}):Subscribe(function(canUnragdoll)
+			if canUnragdoll then
+				self._ragdollBindersServer.Ragdoll:Unbind(self._obj)
 			end
 		end)
 	else
-		maid._conn = nil
+		maid._unragdoll = nil
 	end
+end
+
+function UnragdollAutomatically:_observeAlive()
+	return RxInstanceUtils.observeProperty(self._obj, "Health"):Pipe({
+		Rx.map(function(health)
+			return health > 0
+		end);
+		Rx.distinct();
+	})
+end
+
+function UnragdollAutomatically:_observeCanUnragdollTimer()
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local startTime = os.clock()
+		local isReady = Instance.new("BoolValue")
+		isReady.Value = false
+		maid:GiveTask(isReady)
+
+		maid:GiveTask(Rx.combineLatest({
+			enabled = self._unragdollAutomatically:Observe();
+			time = self._unragdollAutomaticTime:Observe();
+		}):Subscribe(function(state)
+			if state.enabled then
+				maid._deferred = nil
+
+				local timeElapsed = os.clock() - startTime
+				local remainingTime = state.time - timeElapsed
+				if remainingTime <= 0 then
+					isReady.Value = true
+				else
+					isReady.Value = false
+					maid._deferred = cancellableDelay(remainingTime, function()
+						isReady.Value = true
+					end)
+				end
+			else
+				isReady.Value = false
+				maid._deferred = nil
+			end
+		end))
+
+		maid:GiveTask(isReady.Changed:Connect(function()
+			sub:Fire(isReady.Value)
+		end))
+		sub:Fire(isReady.Value)
+
+		return maid
+	end)
 end
 
 return UnragdollAutomatically
