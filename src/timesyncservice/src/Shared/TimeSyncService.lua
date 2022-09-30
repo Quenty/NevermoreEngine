@@ -120,6 +120,10 @@ function TimeSyncService:_buildMockClock()
 		return tick()
 	end
 
+	function mock.GetPing(_self)
+		return 0
+	end
+
 	return mock
 end
 
