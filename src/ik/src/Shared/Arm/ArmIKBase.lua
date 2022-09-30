@@ -357,14 +357,14 @@ function ArmIKBase:_setAttributes()
 	local elbow = self._resources:Get("Elbow")
 	local wrist = self._resources:Get("Wrist")
 
-	shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, true)
-	elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, true)
-	wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, true)
+	shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, true)
+	elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, true)
+	wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, true)
 
 	maid:GiveTask(function()
-		shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, false)
-		elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, false)
-		wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_NAME, false)
+		shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
+		elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
+		wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
 	end)
 
 	return maid

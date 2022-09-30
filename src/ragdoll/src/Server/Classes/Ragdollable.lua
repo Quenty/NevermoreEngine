@@ -14,6 +14,7 @@ local Maid = require("Maid")
 local RagdollAdditionalAttachmentUtils = require("RagdollAdditionalAttachmentUtils")
 local RagdollCollisionUtils = require("RagdollCollisionUtils")
 local RagdollBallSocketUtils = require("RagdollBallSocketUtils")
+local Motor6DBindersServer = require("Motor6DBindersServer")
 
 local Ragdollable = setmetatable({}, BaseObject)
 Ragdollable.ClassName = "Ragdollable"
@@ -30,6 +31,9 @@ function Ragdollable.new(humanoid, serviceBag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._ragdollBindersServer = self._serviceBag:GetService(RagdollBindersServer)
+	self._motor6DBindersServer = self._serviceBag:GetService(Motor6DBindersServer)
+
+	self._motor6DBindersServer.Motor6DStackHumanoid:Bind(self._obj)
 
 	-- Ensure predefined physics rig immediatelly on the server.
 	-- We do this so during replication loop-back there's no chance of death.

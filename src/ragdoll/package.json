@@ -38,6 +38,7 @@
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/motor6d": "file:../motor6d",
     "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
     "@quenty/promise": "file:../promise",
     "@quenty/qframe": "file:../qframe",
@@ -47,6 +48,7 @@
     "@quenty/spring": "file:../spring",
     "@quenty/steputils": "file:../steputils",
     "@quenty/table": "file:../table",
+    "@quenty/timesyncservice": "file:../timesyncservice",
     "@quenty/valuebaseutils": "file:../valuebaseutils"
   },
   "publishConfig": {

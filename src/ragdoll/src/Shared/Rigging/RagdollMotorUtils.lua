@@ -20,9 +20,8 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
 local Spring = require("Spring")
-local StepUtils = require("StepUtils")
 local RagdollCollisionUtils = require("RagdollCollisionUtils")
-local SpringUtils = require("SpringUtils")
+local Motor6DStackInterface = require("Motor6DStackInterface")
 local Rx = require("Rx")
 
 local RagdollMotorUtils = {}
@@ -166,29 +165,6 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 						-- make this stuff not physics collide with our own rig
 						lockMaid:GiveTask(RagdollCollisionUtils.preventCollisionAmongOthers(character, state.part1))
 
-						-- interpolate our target into the current animation...
-						if not state.motor.Enabled then
-							local initialTransform = (state.part0.CFrame * motor.C0):toObjectSpace(state.part1.CFrame * motor.C1)
-
-							local relativeTransformSpring = Spring.new(0)
-							relativeTransformSpring.t = 1
-
-							lockMaid:GiveTask(RxAttributeUtils.observeAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPEED)
-								:Subscribe(function(speed)
-									relativeTransformSpring.s = speed
-								end))
-
-							-- Start the aimation
-							local startAnimation, stopAnimate = StepUtils.bindToSignal(RunService.Stepped, function()
-								local isAnimating, percent = SpringUtils.animating(relativeTransformSpring, 1e-6)
-								motor.Transform = initialTransform:Lerp(motor.Transform, percent)
-								return isAnimating
-							end)
-							lockMaid:GiveTask(stopAnimate)
-
-							startAnimation()
-						end
-
 						motorMaid._lock = lockMaid
 					else
 						local lockMaid = Maid.new()
@@ -203,11 +179,41 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 							weldContainer.Parent = state.part0
 							lockMaid:GiveTask(weldContainer)
 
-							local weld = Instance.new("Weld")
-							weld.Name = "TempRagdollWeld"
-							weld.Part0 = state.part0
-							weld.Part1 = state.part1
-							lockMaid:GiveTask(weld)
+							local function setupWeld(weldType)
+								local weldMaid = Maid.new()
+
+								local weld = Instance.new(weldType)
+								weld.Name = "TempRagdollWeld"
+								weld.Part0 = state.part0
+								weld.Part1 = state.part1
+								weldMaid:GiveTask(weld)
+
+								-- Inserted C1/C0 here
+								weldMaid:GiveTask(Rx.combineLatest({
+									C0 = RxInstanceUtils.observeProperty(motor, "C0");
+									Transform = RxInstanceUtils.observeProperty(motor, "Transform");
+								}):Subscribe(function(innerState)
+									weld.C0 = innerState.C0 * innerState.Transform
+								end))
+								weldMaid:GiveTask(RxInstanceUtils.observeProperty(motor, "C1"):Subscribe(function(c1)
+									weld.C1 = c1
+								end))
+								weld.Parent = weldContainer
+
+								return weldMaid
+							end
+
+
+							if CharacterUtils.getPlayerFromCharacter(state.part0) then
+								-- Swap from choppy to interpolation
+								lockMaid._weld = setupWeld("Motor6D")
+								lockMaid:GiveTask(task.delay(0.25, function()
+									lockMaid._weld = setupWeld("Weld")
+								end))
+							else
+								-- Smooth all the way! (Probably NPC)
+								lockMaid._weld = setupWeld("Weld")
+							end
 
 							lockMaid:GiveTask(RxAttributeUtils.observeAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPEED)
 								:Subscribe(function(speed)
@@ -222,17 +228,6 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 								end
 							end))
 
-							-- Inserted C1/C0 here
-							lockMaid:GiveTask(Rx.combineLatest({
-								C0 = RxInstanceUtils.observeProperty(motor, "C0");
-								Transform = RxInstanceUtils.observeProperty(motor, "Transform");
-							}):Subscribe(function(innerState)
-								weld.C0 = innerState.C0 * innerState.Transform
-							end))
-							lockMaid:GiveTask(RxInstanceUtils.observeProperty(motor, "C1"):Subscribe(function(c1)
-								weld.C1 = c1
-							end))
-							weld.Parent = weldContainer
 							motor.Enabled = false
 
 							lockMaid:GiveTask(function()
@@ -242,6 +237,14 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 							motor.Enabled = false
 
 							lockMaid:GiveTask(function()
+								local implemention = Motor6DStackInterface:FindFirstImplementation(state.motor)
+								if implemention then
+									local initialTransform = (state.part0.CFrame * motor.C0):toObjectSpace(state.part1.CFrame * motor.C1)
+									local speed = AttributeUtils.getAttribute(state.motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPEED)
+
+									implemention:TransformFromCFrame(initialTransform, speed)
+								end
+
 								motor.Enabled = true
 							end)
 
