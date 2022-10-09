@@ -9,16 +9,21 @@ local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
-local IKResource = require("IKResource")
-local IKResourceUtils = require("IKResourceUtils")
 local LimbIKUtils = require("LimbIKUtils")
 local Maid = require("Maid")
 local Math = require("Math")
 local QFrame = require("QFrame")
-local RagdollConstants = require("RagdollConstants")
+local RxR15Utils = require("RxR15Utils")
+local RxInstanceUtils = require("RxInstanceUtils")
+local RxBrioUtils = require("RxBrioUtils")
+local Rx = require("Rx")
+local ArmIKUtils = require("ArmIKUtils")
+local Motor6DStackInterface = require("Motor6DStackInterface")
+local Motor6DSmoothTransformer = require("Motor6DSmoothTransformer")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 local USE_OLD_IK_SYSTEM = false
+local USE_MOTOR_6D_RAW = true
 
 local ArmIKBase = setmetatable({}, BaseObject)
 ArmIKBase.ClassName = "ArmIKBase"
@@ -28,101 +33,229 @@ function ArmIKBase.new(humanoid, armName)
 	local self = setmetatable(BaseObject.new(), ArmIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")
+	self._armName = assert(armName, "No armName")
 
 	self._grips = {}
 
-	if armName == "Left" then
+	if self._armName == "Left" then
 		self._direction = 1
-	elseif armName == "Right" then
+	elseif self._armName == "Right" then
 		self._direction = -1
 	else
-		error("Bad arm")
+		error(("[ArmIKBase] - Bad armName %q"):format(tostring(armName)))
 	end
-
-	self._resources = IKResource.new(IKResourceUtils.createResource({
-		name = "Character";
-		robloxName = self._humanoid.Parent.Name;
-		children = {
-			IKResourceUtils.createResource({
-				name = "UpperTorso";
-				robloxName = "UpperTorso";
-				children = {
-					IKResourceUtils.createResource({
-						name = "UpperTorsoShoulderRigAttachment";
-						robloxName = armName .. "ShoulderRigAttachment";
-					});
-				};
-			});
-			IKResourceUtils.createResource({
-				name = "UpperArm";
-				robloxName = armName .. "UpperArm";
-				children = {
-					IKResourceUtils.createResource({
-						name = "Shoulder";
-						robloxName = armName .. "Shoulder";
-					});
-					IKResourceUtils.createResource({
-						name = "UpperArmShoulderRigAttachment";
-						robloxName = armName .. "ShoulderRigAttachment";
-					});
-					IKResourceUtils.createResource({
-						name = "UpperArmElbowRigAttachment";
-						robloxName = armName .. "ElbowRigAttachment";
-					});
-				};
-			});
-			IKResourceUtils.createResource({
-				name = "LowerArm";
-				robloxName = armName .. "LowerArm";
-				children = {
-					IKResourceUtils.createResource({
-						name = "Elbow";
-						robloxName = armName .. "Elbow";
-					});
-					IKResourceUtils.createResource({
-						name = "LowerArmElbowRigAttachment";
-						robloxName = armName .. "ElbowRigAttachment";
-					});
-					IKResourceUtils.createResource({
-						name = "LowerArmWristRigAttachment";
-						robloxName = armName .. "WristRigAttachment";
-					});
-				};
-			});
-			IKResourceUtils.createResource({
-				name = "Hand";
-				robloxName = armName .. "Hand";
-				children = {
-					IKResourceUtils.createResource({
-						name = "Wrist";
-						robloxName = armName .. "Wrist";
-					});
-					IKResourceUtils.createResource({
-						name = "HandWristRigAttachment";
-						robloxName = armName .. "WristRigAttachment";
-					});
-					IKResourceUtils.createResource({
-						name = "HandGripAttachment";
-						robloxName = armName .. "GripAttachment";
-					});
-				};
-			});
-		}
-	}))
-
-	self._maid:GiveTask(self._resources)
-	self._resources:SetInstance(self._humanoid.Parent or error("No humanoid.Parent"))
 
 	self._gripping = Instance.new("BoolValue")
 	self._gripping.Value = false
 	self._maid:GiveTask(self._gripping)
 
-	self._maid:GiveTask(self._gripping.Changed:Connect(function()
-		self:_updateMotorsEnabled()
+	self._maid:GiveTask(self:_observeCharacterBrio():Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid = brio:ToMaid()
+		local character = brio:GetValue()
+
+		maid:GiveTask(RxInstanceUtils.observeProperty(self._gripping, "Value"):Subscribe(function(isGripping)
+			if isGripping then
+				maid._gripping = self:_startUpdateLoop(character)
+			else
+				maid._gripping = nil
+			end
+		end))
 	end))
-	self:_updateMotorsEnabled()
+
+	self._maid:GiveTask(self:_observeStateBrio():Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local state = brio:GetValue()
+		local maid = brio:ToMaid()
+
+		self._lastState = state
+
+		maid:GiveTask(function()
+			if self._lastState == state then
+				self._lastState = nil
+			end
+		end)
+	end))
 
 	return self
+end
+
+function ArmIKBase:_startUpdateLoop(character)
+	local maid = Maid.new()
+
+	maid:GiveTask(ArmIKUtils.ensureMotorAnimated(character, self._armName))
+
+	maid:GiveTask(self:_ensureAnimator(character, self._armName .. "UpperArm", self._armName .. "Shoulder", function()
+		return self._shoulderTransform
+	end))
+	maid:GiveTask(self:_ensureAnimator(character, self._armName .. "LowerArm", self._armName .. "Elbow", function()
+		return self._elbowTransform
+	end))
+	maid:GiveTask(self:_ensureAnimator(character, self._armName .. "Hand", self._armName .."Wrist", function()
+		return self._wristTransform
+	end))
+
+	return maid
+end
+
+function ArmIKBase:_ensureAnimator(character, partName, motorName, getTranform)
+	local topMaid = Maid.new()
+
+	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, partName, motorName):Pipe({
+		RxBrioUtils.switchMapBrio(function(motor)
+			return Motor6DStackInterface:ObserveLastImplementationBrio(motor)
+		end);
+	}):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid = brio:ToMaid()
+		local motor6DStack = brio:GetValue()
+
+		local transformer = Motor6DSmoothTransformer.new(getTranform)
+		transformer:SetTarget(1)
+
+		local cleanup = motor6DStack:Push(transformer)
+
+		maid:GiveTask(function()
+			transformer:SetTarget(0)
+
+			task.delay(2, function()
+				transformer:Destroy()
+				cleanup()
+			end)
+		end)
+	end))
+
+	return topMaid
+end
+
+function ArmIKBase:_observeCharacterBrio()
+	if self._characterObservable then
+		return self._characterObservable
+	end
+
+	self._characterObservable = RxInstanceUtils.observePropertyBrio(self._humanoid, "Parent", function(parent)
+		return parent ~= nil
+	end):Pipe({
+		Rx.shareReplay(1);
+	})
+
+	return self._characterObservable
+end
+
+
+function ArmIKBase:_observeStateBrio()
+	return self:_observeCharacterBrio():Pipe({
+		RxBrioUtils.switchMapBrio(function(character)
+			local observeUpperTorsoBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", "UpperTorso"):Pipe({
+				Rx.shareReplay(1);
+			});
+			local observeUpperArmBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "UpperArm"):Pipe({
+				Rx.shareReplay(1);
+			});
+			local observeLowerArmBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "LowerArm"):Pipe({
+				Rx.shareReplay(1);
+			});
+			local observeHandBrio = RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", self._armName .. "Hand"):Pipe({
+				Rx.shareReplay(1);
+			});
+
+			local observeShoulderBrio = observeUpperArmBrio:Pipe({
+				RxBrioUtils.switchMapBrio(function(upperArm)
+					return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Motor6D", self._armName .. "Shoulder")
+				end);
+				Rx.shareReplay(1);
+			});
+			local observeElbowBrio = observeLowerArmBrio:Pipe({
+				RxBrioUtils.switchMapBrio(function(lowerArm)
+					return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Motor6D", self._armName .. "Elbow")
+				end);
+				Rx.shareReplay(1);
+			});
+			local observeWristBrio = observeHandBrio:Pipe({
+				RxBrioUtils.switchMapBrio(function(hand)
+					return RxInstanceUtils.observeLastNamedChildBrio(hand, "Motor6D", self._armName .. "Wrist")
+				end);
+				Rx.shareReplay(1);
+			});
+
+			return RxBrioUtils.flatCombineLatest({
+				UpperTorso = observeUpperTorsoBrio;
+				UpperArm = observeUpperArmBrio;
+				LowerArm = observeLowerArmBrio;
+				Hand = observeHandBrio;
+
+				Shoulder = observeShoulderBrio;
+				Elbow = observeElbowBrio;
+				Wrist = observeWristBrio;
+
+				ShoulderMotor6DStack = observeShoulderBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(motor)
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor);
+					end);
+					Rx.defaultsToNil;
+				});
+				ElbowMotor6DStack = observeElbowBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(motor)
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor);
+					end);
+					Rx.defaultsToNil;
+				});
+				WristMotor6DStack = observeWristBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(motor)
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor);
+					end);
+					Rx.defaultsToNil;
+				});
+
+				UpperTorsoShoulderRigAttachment = observeUpperTorsoBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(upperTorso)
+						return RxInstanceUtils.observeLastNamedChildBrio(upperTorso, "Attachment", self._armName .. "ShoulderRigAttachment")
+					end)
+				});
+				UpperArmShoulderRigAttachment = observeUpperArmBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(upperArm)
+						return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Attachment", self._armName .. "ShoulderRigAttachment")
+					end)
+				});
+				UpperArmElbowRigAttachment = observeUpperArmBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(upperArm)
+						return RxInstanceUtils.observeLastNamedChildBrio(upperArm, "Attachment", self._armName .. "ElbowRigAttachment")
+					end)
+				});
+				LowerArmElbowRigAttachment = observeLowerArmBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(lowerArm)
+						return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Attachment", self._armName .. "ElbowRigAttachment")
+					end)
+				});
+				LowerArmWristRigAttachment = observeLowerArmBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(lowerArm)
+						return RxInstanceUtils.observeLastNamedChildBrio(lowerArm, "Attachment", self._armName .. "WristRigAttachment")
+					end)
+				});
+				HandWristRigAttachment = observeHandBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(hand)
+						return RxInstanceUtils.observeLastNamedChildBrio(hand, "Attachment", self._armName .. "WristRigAttachment")
+					end)
+				});
+				HandGripAttachment = observeHandBrio:Pipe({
+					RxBrioUtils.switchMapBrio(function(hand)
+						return RxInstanceUtils.observeLastNamedChildBrio(hand, "Attachment", self._armName .. "GripAttachment")
+					end)
+				});
+			})
+		end);
+		Rx.throttleDefer();
+
+	})
 end
 
 function ArmIKBase:Grip(attachment, priority)
@@ -160,42 +293,56 @@ function ArmIKBase:_stopGrip(grip)
 end
 
 -- Sets transform
-function ArmIKBase:UpdateTransformOnly()
-	if not self._grips[1] then
-		return
+if RunService:IsRunning() and not USE_MOTOR_6D_RAW then
+	function ArmIKBase:UpdateTransformOnly()
+		-- no work!
 	end
-	if not (self._shoulderTransform and self._elbowTransform and self._wristTransform) then
-		return
-	end
-	if not self._resources:IsReady() then
-		return
-	end
-
-	local shoulder = self._resources:Get("Shoulder")
-	local elbow = self._resources:Get("Elbow")
-	local wrist = self._resources:Get("Wrist")
-
-	if RunService:IsRunning() then
-		shoulder.Transform = self._shoulderTransform
-		elbow.Transform = self._elbowTransform
-		wrist.Transform = self._wristTransform
-	else
-		-- Test mode/story mode
-		if not self._initTest then
-			self._initTest = true
-			self._testDefaultShoulderC0 = shoulder.C0
-			self._testDefaultElbowC0 = elbow.C0
-			self._testDefaultWristC0 = wrist.C0
+else
+	function ArmIKBase:UpdateTransformOnly()
+		if not self._grips[1] then
+			return
+		end
+		if not (self._shoulderTransform and self._elbowTransform and self._wristTransform) then
+			return
+		end
+		if not self._lastState then
+			return
 		end
 
-		shoulder.C0 = self._testDefaultShoulderC0 * self._shoulderTransform
-		elbow.C0 = self._testDefaultElbowC0 * self._elbowTransform
-		wrist.C0 = self._testDefaultWristC0 * self._wristTransform
+		local shoulder = self._lastState["Shoulder"]
+		local elbow = self._lastState["Elbow"]
+		local wrist = self._lastState["Wrist"]
+		if not shoulder and elbow and wrist then
+			return
+		end
+
+		if RunService:IsRunning() then
+			if USE_MOTOR_6D_RAW then
+				shoulder.Transform = self._shoulderTransform
+				elbow.Transform = self._elbowTransform
+				wrist.Transform = self._wristTransform
+			else
+				error("Should not be called")
+			end
+		else
+			-- Test mode/story mode
+			if not self._initTest then
+				self._initTest = true
+				self._testDefaultShoulderC0 = shoulder.C0
+				self._testDefaultElbowC0 = elbow.C0
+				self._testDefaultWristC0 = wrist.C0
+			end
+
+			shoulder.C0 = self._testDefaultShoulderC0 * self._shoulderTransform
+			elbow.C0 = self._testDefaultElbowC0 * self._elbowTransform
+			wrist.C0 = self._testDefaultWristC0 * self._wristTransform
+		end
 	end
 end
 
-function ArmIKBase:Update()
-	if USE_OLD_IK_SYSTEM then
+
+if USE_OLD_IK_SYSTEM then
+	function ArmIKBase:Update()
 		if self:_oldUpdatePoint() then
 			local shoulderXAngle = self._shoulderXAngle
 			local elbowXAngle = self._elbowXAngle
@@ -208,7 +355,9 @@ function ArmIKBase:Update()
 
 			self:UpdateTransformOnly()
 		end
-	else
+	end
+else
+	function ArmIKBase:Update()
 		if self:_newUpdate() then
 			self:UpdateTransformOnly()
 		end
@@ -239,7 +388,7 @@ end
 
 function ArmIKBase:_newUpdate()
 	local grip = self._grips[1]
-	if not (grip and self._resources:IsReady()) then
+	if not (grip and self._lastState) then
 		self._elbowTransform = nil
 		self._shoulderTransform = nil
 		self._wristTransform = nil
@@ -248,18 +397,26 @@ function ArmIKBase:_newUpdate()
 
 	local targetCFrame = grip.attachment.WorldCFrame
 
-	local upperTorsoShoulderRigAttachment = self._resources:Get("UpperTorsoShoulderRigAttachment")
+	local upperTorsoShoulderRigAttachment = self._lastState["UpperTorsoShoulderRigAttachment"]
+	local upperArmShoulderRigAttachment = self._lastState["UpperArmShoulderRigAttachment"]
+	local upperArmElbowRigAttachment = self._lastState["UpperArmElbowRigAttachment"]
+	local lowerArmElbowRigAttachment = self._lastState["LowerArmElbowRigAttachment"]
+	local lowerArmWristRigAttachment = self._lastState["LowerArmWristRigAttachment"]
+	local handWristRigAttachment = self._lastState["HandWristRigAttachment"]
+	local handGripAttachment = self._lastState["HandGripAttachment"]
 
-	local upperArmShoulderRigAttachment = self._resources:Get("UpperArmShoulderRigAttachment")
-	local upperArmElbowRigAttachment = self._resources:Get("UpperArmElbowRigAttachment")
+	if not (upperTorsoShoulderRigAttachment
+		and upperArmShoulderRigAttachment
+		and upperArmElbowRigAttachment
+		and lowerArmElbowRigAttachment
+		and lowerArmWristRigAttachment
+		and handWristRigAttachment
+		and handGripAttachment) then
+		return false
+	end
+
 	local elbowOffset = upperArmElbowRigAttachment.Position - upperArmShoulderRigAttachment.Position
-
-	local lowerArmElbowRigAttachment = self._resources:Get("LowerArmElbowRigAttachment")
-	local lowerArmWristRigAttachment = self._resources:Get("LowerArmWristRigAttachment")
 	local wristOffset = lowerArmWristRigAttachment.Position - lowerArmElbowRigAttachment.Position
-
-	local handWristRigAttachment = self._resources:Get("HandWristRigAttachment")
-	local handGripAttachment = self._resources:Get("HandGripAttachment")
 	local handOffset = handGripAttachment.Position - handWristRigAttachment.Position
 
 	-- TODO: Cache config
@@ -278,14 +435,21 @@ function ArmIKBase:_newUpdate()
 end
 
 function ArmIKBase:_oldCalculatePoint(targetPositionWorld)
-	if not self._resources:IsReady() then
+	if not self._lastState then
 		return false
 	end
 
-	local shoulder = self._resources:Get("Shoulder")
-	local elbow = self._resources:Get("Elbow")
-	local wrist = self._resources:Get("Wrist")
-	local gripAttachment = self._resources:Get("HandGripAttachment")
+	local shoulder = self._lastState["Shoulder"]
+	local elbow = self._lastState["Elbow"]
+	local wrist = self._lastState["Wrist"]
+	local gripAttachment = self._lastState["HandGripAttachment"]
+	if not (shoulder
+		and elbow
+		and wrist
+		and gripAttachment) then
+		return false
+	end
+
 	if not (shoulder.Part0 and elbow.Part0 and elbow.Part1) then
 		return false
 	end
@@ -329,45 +493,5 @@ function ArmIKBase:_oldCalculatePoint(targetPositionWorld)
 	return true
 end
 
-function ArmIKBase:_updateMotorsEnabled()
-	self._maid._gripMaid = nil
-
-	if not self._gripping.Value then
-		return
-	end
-
-	local gripMaid = Maid.new()
-
-	gripMaid:GiveTask(self._resources.ReadyChanged:Connect(function()
-		gripMaid._attributes = self:_setAttributes()
-	end))
-	gripMaid._attributes = self:_setAttributes()
-
-	self._maid._gripMaid = gripMaid
-end
-
-function ArmIKBase:_setAttributes()
-	if not self._resources:IsReady() then
-		return nil
-	end
-
-	local maid = Maid.new()
-
-	local shoulder = self._resources:Get("Shoulder")
-	local elbow = self._resources:Get("Elbow")
-	local wrist = self._resources:Get("Wrist")
-
-	shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, true)
-	elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, true)
-	wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, true)
-
-	maid:GiveTask(function()
-		shoulder:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
-		elbow:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
-		wrist:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
-	end)
-
-	return maid
-end
 
 return ArmIKBase

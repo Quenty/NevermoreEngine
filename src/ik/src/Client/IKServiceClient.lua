@@ -16,8 +16,6 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 
-local CameraStackService = require("CameraStackService")
-local IKBindersClient = require("IKBindersClient")
 local IKRigUtils = require("IKRigUtils")
 local Maid = require("Maid")
 
@@ -48,8 +46,12 @@ function IKServiceClient:Init(serviceBag)
 	self._maid = Maid.new()
 	self._lookAround = false
 
-	self._ikBinders = self._serviceBag:GetService(IKBindersClient)
-	self._serviceBag:GetService(CameraStackService)
+	-- External
+	self._serviceBag:GetService(require("CameraStackService"))
+	self._serviceBag:GetService(require("Motor6DServiceClient"))
+
+	-- Internal
+	self._ikBinders = self._serviceBag:GetService(require("IKBindersClient"))
 end
 
 --[=[
