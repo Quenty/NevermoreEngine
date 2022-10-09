@@ -1,6 +1,6 @@
----
--- @classmod DisableHatParticles
--- @author Quenty
+--[=[
+	@class DisableHatParticles
+]=]
 
 local require = require(script.Parent.loader).load(script)
 
