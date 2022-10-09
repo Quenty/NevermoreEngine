@@ -17,6 +17,8 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local RoguePropertyUtils = require("RoguePropertyUtils")
+local RoguePropertyChangedSignalConnection = require("RoguePropertyChangedSignalConnection")
+local ValueObject = require("ValueObject")
 
 local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
@@ -228,6 +230,8 @@ end
 function RogueProperty:__index(index)
 	if index == "Value" then
 		return self:GetValue()
+	elseif index == "Changed" then
+		return self:_getChangedEvent()
 	elseif RogueProperty[index] then
 		return RogueProperty[index]
 	else
@@ -242,5 +246,25 @@ end
 function RogueProperty:_encodeValue(current)
 	return RoguePropertyUtils.encodeProperty(self._definition, current)
 end
+
+function RogueProperty:_getChangedEvent()
+	return {
+		Connect = function(_, callback)
+			assert(type(callback) == "function", "Bad callback")
+			return RoguePropertyChangedSignalConnection.new(function(connMaid)
+				local valueObject = ValueObject.new(self._definition:GetDefaultValue())
+				connMaid:GiveTask(valueObject)
+
+				connMaid:GiveTask(self:Observe():Subscribe(function(value)
+					valueObject.Value = value
+				end))
+
+				-- After observing, so we can emit only changes.
+				connMaid:GiveTask(valueObject.Changed:Connect(callback))
+			end)
+		end;
+	}
+end
+
 
 return RogueProperty
