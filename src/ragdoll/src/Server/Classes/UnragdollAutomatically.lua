@@ -6,8 +6,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local BaseObject = require("BaseObject")
 local RagdollBindersServer = require("RagdollBindersServer")
 local CharacterUtils = require("CharacterUtils")
@@ -91,6 +89,7 @@ function UnragdollAutomatically:_observeCanUnragdollTimer()
 		}):Subscribe(function(state)
 			if state.enabled then
 				maid._deferred = nil
+
 
 				local timeElapsed = os.clock() - startTime
 				local remainingTime = state.time - timeElapsed
