@@ -109,7 +109,7 @@ end
 lib.QuaternionFromCFrame = QuaternionFromCFrame
 
 local function SlerpQuaternions(q0, q1, t)
-	return Qmul(q0, Qpow(Qmul(q1, Qinv(q0)), t))
+	return Qmul(Qpow(Qmul(q1, Qinv(q0)), t), q0)
 end
 lib.SlerpQuaternions = SlerpQuaternions
 
