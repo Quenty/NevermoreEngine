@@ -64,7 +64,7 @@ function Motor6DAnimator:_getTransformResult(stackEntry, defaultTransform)
 	return stackEntry:Transform(function()
 		local index = table.find(self._stack, stackEntry)
 		if not index then
-			warn("Item is not in stack")
+			warn("[Motor6DAnimator] - Item is not in stack")
 			return defaultTransform
 		end
 
@@ -83,6 +83,7 @@ function Motor6DAnimator:_getTransformResult(stackEntry, defaultTransform)
 end
 
 function Motor6DAnimator:_updateStepped()
+	debug.profilebegin("motor6danimator")
 	local current = self._stack[#self._stack]
 
 	-- Detect animation
@@ -103,18 +104,21 @@ function Motor6DAnimator:_updateStepped()
 
 	if not current then
 		self:_resetTransform(unmodifiedTransform)
+		debug.profileend()
 		return false
 	end
-
 
 	local result = self:_getTransformResult(current, unmodifiedTransform)
 	if result then
 		self._lastSetTransform = result
 		self._obj.Transform = result
+		debug.profileend()
 		return true
 	else
 		self:_resetTransform(unmodifiedTransform)
-		return false
+		debug.profileend()
+		-- let it finish
+		return true
 	end
 end
 

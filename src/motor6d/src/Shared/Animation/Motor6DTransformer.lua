@@ -15,7 +15,10 @@ function Motor6DTransformer.new()
 	local self = setmetatable(BaseObject.new(), Motor6DTransformer)
 
 	self.Finished = Signal.new()
-	self._maid:GiveTask(self.Finished)
+	self._maid:GiveTask(function()
+		self.Finished:Fire()
+		self.Finished:Destroy()
+	end)
 
 	return self
 end
