@@ -83,6 +83,21 @@ function JSONTranslator:ObserveLocaleId()
 end
 
 --[=[
+	Gets the current localeId of the translator if it's initialized, or a default if it is not.
+
+	@return string
+]=]
+function JSONTranslator:GetLocaleId()
+	if self._promiseTranslator:IsFulfilled() then
+		local translator = self._promiseTranslator:Wait()
+		return translator.LocaleId
+	else
+		warn("[JSONTranslator] - Translator is not loaded yet, returning english")
+		return "en"
+	end
+end
+
+--[=[
 	Gets the localization table the translation is using.
 
 	@return LocalizaitonTable
