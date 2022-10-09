@@ -64,6 +64,8 @@ function InputModeType:_addValidTypesFromTable(keys)
 			self._valid[key] = true
 		elseif InputModeType.isInputModeType(key) then
 			self:_addInputModeType(key)
+		else
+			warn("invalid key", key)
 		end
 	end
 end

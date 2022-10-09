@@ -84,7 +84,7 @@ end
 	Enables the mode
 ]=]
 function InputMode:Enable()
-	self._lastEnabled = tick()
+	self._lastEnabled = os.clock()
 	self.Enabled:Fire()
 end
 
