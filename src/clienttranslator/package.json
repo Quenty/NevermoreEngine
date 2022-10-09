@@ -31,7 +31,8 @@
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/pseudolocalize": "file:../pseudolocalize",
-    "@quenty/rx": "file:../rx"
+    "@quenty/rx": "file:../rx",
+    "@quenty/table": "file:../table"
   },
   "publishConfig": {
     "access": "public"

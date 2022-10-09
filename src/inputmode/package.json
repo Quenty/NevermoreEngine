@@ -27,6 +27,7 @@
   "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"

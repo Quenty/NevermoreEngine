@@ -29,6 +29,7 @@
     "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/inputmode": "file:../inputmode",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",

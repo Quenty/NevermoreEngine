@@ -27,6 +27,7 @@
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
+    "@quenty/brio": "file:../brio",
     "@quenty/cframeutils": "file:../cframeutils",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
@@ -36,8 +37,10 @@
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/spring": "file:../spring",
+    "@quenty/steputils": "file:../steputils",
     "@quenty/symbol": "file:../symbol",
-    "@quenty/tie": "file:../tie"
+    "@quenty/tie": "file:../tie",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

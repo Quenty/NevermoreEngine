@@ -37,6 +37,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/settings": "file:../settings",
-    "@quenty/string": "file:../string"
+    "@quenty/string": "file:../string",
+    "@quenty/table": "file:../table"
   }
 }
