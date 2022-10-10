@@ -107,8 +107,8 @@ end
 	@return boolean
 ]=]
 function QFrame.isNAN(a)
-	return a.x == a.x and a.y == a.y and a.z == a.z
-		and a.W == a.W and a.X == a.X and a.Y == a.Y and a.Z == a.Z
+	return a.x ~= a.x or a.y ~= a.y or a.z ~= a.z
+		or a.W ~= a.W or a.X ~= a.X or a.Y ~= a.Y or a.Z ~= a.Z
 end
 
 --[=[
