@@ -61,6 +61,7 @@ function InputModeServiceClient:GetInputMode(inputModeType)
 	end
 
 	local inputMode = InputMode.new(inputModeType)
+	self._inputModeProcessor:AddInputMode(inputMode)
 	self._maid:GiveTask(inputMode)
 
 	self._inputModes[inputModeType] = inputMode

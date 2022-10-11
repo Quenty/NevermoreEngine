@@ -24,6 +24,7 @@ function SlaveClock.new(remoteEvent, remoteFunction)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteFunction = remoteFunction or error("No remoteFunction")
+	self._ping = 0
 
 	self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(timeOne)
 		self:_handleSyncEventAsync(timeOne)
@@ -71,12 +72,23 @@ function SlaveClock:_getLocalTime()
 	return tick()
 end
 
+--[=[
+	Returns estimated ping in seconds
+	@return number
+]=]
+function SlaveClock:GetPing()
+	return self._ping
+end
+
 function SlaveClock:_handleSyncEventAsync(timeOne)
 	local timeTwo = self:_getLocalTime() -- We can't actually get hardware stuff, so we'll send T1 immediately.
 	local masterSlaveDifference = timeTwo - timeOne -- We have Offst + MS Delay
 
 	local timeThree = self:_getLocalTime()
+
+	local startTime = os.clock()
 	local slaveMasterDifference = self:_sendDelayRequestAsync(timeThree)
+	local ping = os.clock() - startTime
 
 	--[[ From explination link.
 		The result is that we have the following two equations:
@@ -101,6 +113,7 @@ function SlaveClock:_handleSyncEventAsync(timeOne)
 
 	self._offset = offset -- Estimated difference between server/client
 	self._pneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
+	self._ping = ping
 
 	self._syncedBindable:Fire()
 end

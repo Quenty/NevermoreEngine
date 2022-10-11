@@ -28,6 +28,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@quenty/loader": "file:../loader",
     "@quenty/math": "file:../math"
   }
 }

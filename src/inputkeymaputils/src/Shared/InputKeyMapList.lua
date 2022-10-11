@@ -148,6 +148,41 @@ function InputKeyMapList:SetInputTypesList(inputModeType, inputTypes)
 	end
 end
 
+function InputKeyMapList:SetDefaultInputTypesList(inputModeType, inputTypes)
+	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
+	assert(type(inputTypes) == "table" or inputTypes == nil, "Bad inputTypes")
+
+	if inputTypes == nil then
+		self._inputModeTypeToInputKeyMap:Remove(inputModeType)
+		self._maid[inputModeType] = nil
+	else
+		local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
+		if not inputKeyMap then
+			self:Add(InputKeyMap.new(inputModeType, inputTypes))
+		else
+			inputKeyMap:SetDefaultInputTypesList(inputTypes)
+		end
+	end
+end
+
+function InputKeyMapList:GetInputTypesList(inputModeType)
+	local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
+	if inputKeyMap then
+		return inputKeyMap:GetInputTypesList()
+	else
+		return {}
+	end
+end
+
+function InputKeyMapList:GetDefaultInputTypesList(inputModeType)
+	local inputKeyMap = self._inputModeTypeToInputKeyMap:Get(inputModeType)
+	if inputKeyMap then
+		return inputKeyMap:GetDefaultInputTypesList()
+	else
+		return {}
+	end
+end
+
 --[=[
 	Observes a brio with the first value as the InputModeType and the second value as the KeyMapList
 	@return Observable<Brio<InputModeType, InputKeyMap>>

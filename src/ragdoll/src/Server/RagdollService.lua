@@ -16,6 +16,10 @@ function RagdollService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	-- External
+	self._serviceBag:GetService(require("Motor6DService"))
+
+	-- Internal
 	self._binders = self._serviceBag:GetService(require("RagdollBindersServer"))
 end
 

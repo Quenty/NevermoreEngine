@@ -9,9 +9,34 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
 local InputModeType = require("InputModeType")
+local Set = require("Set")
+
+local function convertValuesToJSONIfNeeded(list)
+	local result = {}
+	for key, value in pairs(list) do
+		if type(value) == "table" then
+			result[key] = HttpService:JSONEncode(value)
+		else
+			result[key] = value
+		end
+	end
+	return result
+end
+
+local function areInputTypesListsEquivalent(a, b)
+	-- allocate, hehe
+	local setA = Set.fromTableValue(convertValuesToJSONIfNeeded(a))
+	local setB = Set.fromTableValue(convertValuesToJSONIfNeeded(b))
+
+	local remaining = Set.difference(setA, setB)
+	local left = Set.toList(remaining)
+	return #left == 0
+end
 
 local InputKeyMap = setmetatable({}, BaseObject)
 InputKeyMap.ClassName = "InputKeyMap"
@@ -44,6 +69,17 @@ function InputKeyMap:SetInputTypesList(inputTypes)
 	assert(type(inputTypes) == "table", "Bad inputTypes")
 
 	self._inputType.Value = inputTypes
+end
+
+function InputKeyMap:SetDefaultInputTypesList(inputTypes)
+	assert(type(inputTypes) == "table", "Bad inputTypes")
+	assert(type(self._defaultInputTypes) == "table", "bad self._defaultInputTypes")
+
+	if areInputTypesListsEquivalent(self._inputType.Value, self._defaultInputTypes) then
+		self._inputType.Value = inputTypes
+	end
+
+	self._defaultInputTypes = inputTypes
 end
 
 function InputKeyMap:GetDefaultInputTypesList()

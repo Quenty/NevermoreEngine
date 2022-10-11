@@ -9,7 +9,7 @@ local RunService = game:GetService("RunService")
 local StepUtils = {}
 
 --[=[
-	Binds the given update function to render stepped.
+	Binds the given update function to [RunService.RenderStepped].
 
 	```lua
 	local spring = Spring.new(0)
@@ -37,6 +37,22 @@ local StepUtils = {}
 ]=]
 function StepUtils.bindToRenderStep(update)
 	return StepUtils.bindToSignal(RunService.RenderStepped, update)
+end
+
+--[=[
+	Binds the given update function to [RunService.Stepped]. See [StepUtils.bindToRenderStep] for details.
+
+
+	:::tip
+	Be sure to call the disconnect function when cleaning up, otherwise you may memory leak.
+	:::
+
+	@param update () -> boolean -- should return true while it needs to update
+	@return (...) -> () -- Connect function
+	@return () -> () -- Disconnect function
+]=]
+function StepUtils.bindToStepped(update)
+	return StepUtils.bindToSignal(RunService.Stepped, update)
 end
 
 --[=[

@@ -38,6 +38,7 @@
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
+    "@quenty/valueobject": "file:../valueobject",
     "@quentystudios/t": "^1.2.5"
   },
   "publishConfig": {

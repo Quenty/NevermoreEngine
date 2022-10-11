@@ -23,6 +23,7 @@
 
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService")
 local TextService = game:GetService("TextService")
 
 local Terrain = Workspace.Terrain
@@ -415,11 +416,70 @@ function Draw.cframe(cframe)
 end
 
 --[=[
+	Draws a part in 3D space
+
+	```lua
+	Draw.part(part, Color3.new(1, 1, 1))
+	```
+
+	@param template BasePart
+	@param cframe CFrame
+	@param color Color3?
+	@param transparency number
+	@return BasePart
+]=]
+function Draw.part(template, cframe, color, transparency)
+	assert(typeof(template) == "Instance" and template:IsA("BasePart"), "Bad template")
+
+	local part = template:Clone()
+	for _, child in pairs(part:GetChildren()) do
+		if child:IsA("Mesh") then
+			Draw._sanitize(child)
+			child:ClearAllChildren()
+		else
+			child:Destroy()
+		end
+	end
+
+	part.Color = color or Draw._defaultColor
+	part.Material = Enum.Material.ForceField
+	part.Transparency = transparency or 0.75
+	part.Name = "Debug" .. template.Name
+	part.Anchored = true
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
+	part.CastShadow = false
+	part.Archivable = false
+
+	if cframe then
+		part.CFrame = cframe
+	end
+
+	Draw._sanitize(part)
+
+	part.Parent = Draw.getDefaultParent()
+
+	return part
+end
+
+function Draw._sanitize(inst)
+	for key, _ in pairs(inst:GetAttributes()) do
+		inst:SetAttribute(key, nil)
+	end
+
+	for _, tag in pairs(CollectionService:GetTags(inst)) do
+		CollectionService:RemoveTag(inst, tag)
+	end
+end
+
+--[=[
 	Renders a box in 3D space. Great for debugging bounding boxes.
 
 	```lua
 	Draw.box(Vector3.new(0, 5, 0), Vector3.new(10, 10, 10))
 	```
+
 	@param cframe CFrame | Vector3 -- CFrame of the box
 	@param size Vector3 -- Size of the box
 	@param color Color3 -- Optional Color3

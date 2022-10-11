@@ -39,8 +39,8 @@ function IdleServiceClient:Init(serviceBag)
 	self._ragdollBindersClient = self._serviceBag:GetService(RagdollBindersClient)
 
 	-- Configure
-	self._disabledStack = StateStack.new(false)
-	self._maid:GiveTask(self._disabledStack)
+	self._disableStack = StateStack.new(false)
+	self._maid:GiveTask(self._disableStack)
 
 	self._enabled = Instance.new("BoolValue")
 	self._enabled.Value = true
@@ -72,8 +72,8 @@ function IdleServiceClient:Start()
 	self._maid:GiveTask(self._humanoidTracker.AliveHumanoid.Changed:Connect(function(...)
 		self:_handleAliveHumanoidChanged(...)
 	end))
-	self._maid:GiveTask(self._disabledStack.Changed:Connect(function()
-		self._enabled.Value = not self._disabledStack:GetState()
+	self._maid:GiveTask(self._disableStack.Changed:Connect(function()
+		self._enabled.Value = not self._disableStack:GetState()
 	end))
 
 	if self._humanoidTracker.AliveHumanoid.Value then
@@ -170,8 +170,8 @@ function IdleServiceClient:PushDisable()
 		return function() end
 	end
 
-	assert(self._disabledStack, "Not initialized")
-	return self._disabledStack:PushState(true)
+	assert(self._disableStack, "Not initialized")
+	return self._disableStack:PushState(true)
 end
 
 function IdleServiceClient:_setEnabled(enabled)

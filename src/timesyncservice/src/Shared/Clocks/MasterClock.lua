@@ -55,6 +55,14 @@ function MasterClock:IsSynced()
 end
 
 --[=[
+	Returns estimated ping in seconds
+	@return number
+]=]
+function MasterClock:GetPing()
+	return self._offset
+end
+
+--[=[
 	Returns the sycncronized time
 	@return number
 ]=]

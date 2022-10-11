@@ -40,6 +40,9 @@ function SlottedTouchButtonUtils.createSlottedTouchButton(slotId)
 		or slotId == "primary2"
 		or slotId == "primary3"
 		or slotId == "primary4"
+		or slotId == "inner1"
+		or slotId == "inner2"
+		or slotId == "jumpbutton"
 		or slotId == "touchpad1", "Bad slotId")
 
 	return {

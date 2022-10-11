@@ -22,7 +22,6 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local IKBindersServer = require("IKBindersServer")
 local Maid = require("Maid")
 local HumanoidTracker = require("HumanoidTracker")
 
@@ -46,10 +45,15 @@ IKService.ServiceName = "IKService"
 ]=]
 function IKService:Init(serviceBag)
 	assert(not self._maid, "Already initialized")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
 
-	self._ikBinders = serviceBag:GetService(IKBindersServer)
+	-- External
+	self._serviceBag:GetService(require("Motor6DService"))
+
+	-- Internal
+	self._ikBinders = self._serviceBag:GetService(require("IKBindersServer"))
 end
 
 --[=[

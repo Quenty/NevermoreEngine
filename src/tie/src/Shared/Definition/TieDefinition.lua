@@ -69,8 +69,9 @@ function TieDefinition:GetImplementations(adornee: Instance)
 
 	local implementations = {}
 
+	local containerName = self:GetContainerName()
 	for _, item in pairs(adornee:GetChildren()) do
-		if item.Name == self:GetContainerName() then
+		if item.Name == containerName then
 			if self:IsImplementation(item) then
 				table.insert(implementations, TieInterface.new(self, item, nil))
 			end
@@ -78,6 +79,26 @@ function TieDefinition:GetImplementations(adornee: Instance)
 	end
 
 	return implementations
+end
+
+--[=[
+	Finds the first valid interfaces for this adornee
+	@param adornee Instance
+	@return TieInterface
+]=]
+function TieDefinition:FindFirstImplementation(adornee: Instance)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	local containerName = self:GetContainerName()
+	for _, item in pairs(adornee:GetChildren()) do
+		if item.Name == containerName then
+			if self:IsImplementation(item) then
+				return TieInterface.new(self, item, nil)
+			end
+		end
+	end
+
+	return nil
 end
 
 --[=[
