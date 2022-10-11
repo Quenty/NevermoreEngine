@@ -406,4 +406,21 @@ function RxInstanceUtils.observeDescendantsBrio(parent, predicate)
 	end)
 end
 
+
+--[=[
+	Observes all descendants of a specific class
+
+	@param parent Instance
+	@param className string
+	@return Observable<Instance>
+]=]
+function RxInstanceUtils.observeDescendantsOfClassBrio(parent, className)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(className) == "string", "Bad className")
+
+	return RxInstanceUtils.observeChildrenBrio(parent, function(child)
+		return child:IsA(className)
+	end)
+end
+
 return RxInstanceUtils
