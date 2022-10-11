@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[72104],{91418:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Motor6DPhysicsTransformer","desc":"","source":{"line":4,"path":"src/motor6d/src/Shared/Animation/Motor6DPhysicsTransformer.lua"}}')}}]);

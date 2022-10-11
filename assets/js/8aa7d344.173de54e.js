@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[91350],{51857:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"RagdollBallSocketUtils","desc":"Instead of modifying this file, consider setting attributes on each motor on humanoid\\njoin.","source":{"line":7,"path":"src/ragdoll/src/Shared/Rigging/RagdollBallSocketUtils.lua"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[57768],{19322:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Motor6DBindersClient","desc":"","source":{"line":4,"path":"src/motor6d/src/Client/Motor6DBindersClient.lua"}}')}}]);
