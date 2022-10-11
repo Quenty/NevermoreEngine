@@ -1,26 +1,25 @@
-# v9.1.0 (Tue Oct 11 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
-- feat: Integrate Motor6D integration for smoother animations in and out of ragdoll ([@Quenty](https://github.com/Quenty))
-- feat: Smooth interpolated ragdolls that support full streaming and velocity inheritance ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Remove unneeded RunService call ([@Quenty](https://github.com/Quenty))
-- fix: Remove init.meta.json since it breaks in team create ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.0.0...@quenty/ragdoll@9.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+* Remove unneeded RunService call ([1b81716](https://github.com/Quenty/NevermoreEngine/commit/1b81716cad28eb02ed1c0b82f8403be20d64d7ae))
+
+
+### Features
+
+* Integrate Motor6D integration for smoother animations in and out of ragdoll ([e9c5b6d](https://github.com/Quenty/NevermoreEngine/commit/e9c5b6de7594e5eae2cdb8097d392deef09972cf))
+* Smooth interpolated ragdolls that support full streaming and velocity inheritance ([20471b6](https://github.com/Quenty/NevermoreEngine/commit/20471b65a6902f53a5afc58cba328862afdfe823))
+
+
+
+
 
 # [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@8.1.0...@quenty/ragdoll@9.0.0) (2022-09-27)
 

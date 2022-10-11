@@ -1,23 +1,18 @@
-# v6.1.0 (Tue Oct 11 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss)), for all your work!
-
-#### 🚀 Enhancement
-
-- fix: Fix QFrame.isNaN [#294](https://github.com/Quenty/NevermoreEngine/pull/294) ([@EthanCurtiss](https://github.com/EthanCurtiss))
-
-#### Authors: 1
-
-- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@6.0.0...@quenty/qframe@6.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Fix QFrame.isNaN ([#294](https://github.com/Quenty/NevermoreEngine/issues/294)) ([81b7918](https://github.com/Quenty/NevermoreEngine/commit/81b7918c57ac02dacc9640d2583dba00f4fd4955))
+
+
+
+
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@5.2.1...@quenty/qframe@6.0.0) (2022-09-27)
 

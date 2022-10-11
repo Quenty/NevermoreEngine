@@ -1,24 +1,23 @@
-# v4.1.0 (Tue Oct 11 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
-- feat: Add TieDefinition:FindFirstImplementation(adornee: Instance) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix encoding functions in tie ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.0.0...@quenty/tie@4.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Fix encoding functions in tie ([328911a](https://github.com/Quenty/NevermoreEngine/commit/328911a2553d576543f5efc221bfee8887580b61))
+
+
+### Features
+
+* Add TieDefinition:FindFirstImplementation(adornee: Instance) ([6210377](https://github.com/Quenty/NevermoreEngine/commit/621037732d9c366db2908882f132c19f76885990))
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@3.1.0...@quenty/tie@4.0.0) (2022-09-27)
 

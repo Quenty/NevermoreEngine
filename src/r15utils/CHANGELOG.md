@@ -1,20 +1,18 @@
-# v7.1.0 (Tue Oct 11 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
-- feat: Add R15Utils.getRigMotor(character, partName, motorName) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.0.0...@quenty/r15utils@7.1.0) (2022-10-11)
+
+
+### Features
+
+* Add R15Utils.getRigMotor(character, partName, motorName) ([a36b72d](https://github.com/Quenty/NevermoreEngine/commit/a36b72db4e0e18d82126182a18182c0468a79939))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@6.1.0...@quenty/r15utils@7.0.0) (2022-09-27)
 

@@ -1,20 +1,18 @@
-# v3.2.0 (Tue Oct 11 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
-- feat: Add StepUtils.bindToStepped ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.1.0...@quenty/steputils@3.2.0) (2022-10-11)
+
+
+### Features
+
+* Add StepUtils.bindToStepped ([f49f70d](https://github.com/Quenty/NevermoreEngine/commit/f49f70d870fa9fd8276a9cb0056a40ebeb85c049))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.0.1...@quenty/steputils@3.1.0) (2022-03-27)
 

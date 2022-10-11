@@ -1,25 +1,24 @@
-# v7.1.0 (Tue Oct 11 2022)
-
-#### 🚀 Enhancement
-
-- feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
-- feat: Add inner1 and inner2 buttons ([@Quenty](https://github.com/Quenty))
-- feat: Add support for setting default values in the InputKeyMapList ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Remove init.meta.json since it breaks in team create ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.0.0...@quenty/inputkeymaputils@7.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+
+
+### Features
+
+* Add inner1 and inner2 buttons ([f51b43c](https://github.com/Quenty/NevermoreEngine/commit/f51b43c58b606300dd96b1d79f5ac8aa2b2852d5))
+* Add support for setting default values in the InputKeyMapList ([958decc](https://github.com/Quenty/NevermoreEngine/commit/958deccdc62f12f10958ec60a3f2b5f85504273a))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@6.1.0...@quenty/inputkeymaputils@7.0.0) (2022-09-27)
 
