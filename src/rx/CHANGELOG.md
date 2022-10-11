@@ -1,3 +1,20 @@
+# v7.1.0 (Tue Oct 11 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, fox ([@fewkz](https://github.com/fewkz)), for all your work!
+
+#### 🐛 Bug Fix
+
+- docs: Fix incorrect reference link for `Rx.throttleTime` [#287](https://github.com/Quenty/NevermoreEngine/pull/287) ([@fewkz](https://github.com/fewkz) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- fox ([@fewkz](https://github.com/fewkz))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

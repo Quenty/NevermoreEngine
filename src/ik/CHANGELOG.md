@@ -1,3 +1,22 @@
+# v9.1.0 (Tue Oct 11 2022)
+
+#### 🚀 Enhancement
+
+- feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
+- feat: Support inverse kinematics and smooth motor in and out ([@Quenty](https://github.com/Quenty))
+- feat: Integrate Motor6D integration for smoother animations in and out of ragdoll ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix package dependencies ([@Quenty](https://github.com/Quenty))
+- fix: Remove init.meta.json since it breaks in team create ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

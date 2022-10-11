@@ -1,3 +1,19 @@
+# v6.1.0 (Tue Oct 11 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss)), for all your work!
+
+#### 🚀 Enhancement
+
+- fix: Fix QFrame.isNaN [#294](https://github.com/Quenty/NevermoreEngine/pull/294) ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+#### Authors: 1
+
+- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,34 @@
+# (Tue Oct 11 2022)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+:heart: fox ([@fewkz](https://github.com/fewkz))
+
+#### 🚀 Enhancement
+
+- `@quenty/bindtocloseservice@2.1.0`, `@quenty/chatproviderservice@3.1.0`, `@quenty/clienttranslator@8.1.0`, `@quenty/cmdrservice@7.1.0`, `@quenty/colorpalette@4.1.0`, `@quenty/colorsequenceutils@3.1.0`, `@quenty/cooldown@5.1.0`, `@quenty/datastore@7.1.0`, `@quenty/deathreport@3.1.0`, `@quenty/draw@4.2.0`, `@quenty/gameconfig@5.1.0`, `@quenty/gameproductservice@5.1.0`, `@quenty/gameversionutils@3.1.0`, `@quenty/hide@5.1.0`, `@quenty/httppromise@6.1.0`, `@quenty/humanoidspeed@5.1.0`, `@quenty/idleservice@7.1.0`, `@quenty/ik@9.1.0`, `@quenty/inputkeymaputils@7.1.0`, `@quenty/inputmode@7.1.0`, `@quenty/instanceutils@7.1.0`, `@quenty/messagingserviceutils@3.1.0`, `@quenty/motor6d@1.1.0`, `@quenty/networkownerservice@5.1.0`, `@quenty/networkownerutils@3.1.0`, `@quenty/particleengine@7.1.0`, `@quenty/permissionprovider@8.1.0`, `@quenty/playerbinder@8.1.0`, `@quenty/playerhumanoidbinder@8.1.0`, `@quenty/playerinputmode@3.1.0`, `@quenty/preferredparentutils@3.1.0`, `@quenty/r15utils@7.1.0`, `@quenty/ragdoll@9.1.0`, `@quenty/resetservice@5.1.0`, `@quenty/roblox-api-dump@4.1.0`, `@quenty/rogue-humanoid@3.1.0`, `@quenty/rogue-properties@4.1.0`, `@quenty/scoredactionservice@9.1.0`, `@quenty/settings-inputkeymap@3.1.0`, `@quenty/settings@4.1.0`, `@quenty/softshutdown@3.1.0`, `@quenty/spawning@4.1.0`, `@quenty/steputils@3.2.0`, `@quenty/teleportserviceutils@3.1.0`, `@quenty/textfilterservice@7.1.0`, `@quenty/tie@4.1.0`, `@quenty/timesyncservice@7.1.0`
+  - feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
+- `@quenty/qframe@6.1.0`
+  - fix: Fix QFrame.isNaN [#294](https://github.com/Quenty/NevermoreEngine/pull/294) ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+#### 🐛 Bug Fix
+
+- ci: Allow CI to run on external PRs [#289](https://github.com/Quenty/NevermoreEngine/pull/289) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rx@7.1.0`
+  - docs: Fix incorrect reference link for `Rx.throttleTime` [#287](https://github.com/Quenty/NevermoreEngine/pull/287) ([@fewkz](https://github.com/fewkz) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 3
+
+- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+- fox ([@fewkz](https://github.com/fewkz))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Sep 27 2022)
 
 #### 💥 Breaking Change
