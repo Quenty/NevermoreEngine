@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[44400],{4024:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"DisableHatParticles","desc":"","source":{"line":4,"path":"src/firstpersoncharactertransparency/src/Client/DisableHatParticles.lua"}}')}}]);
