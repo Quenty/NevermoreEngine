@@ -1,3 +1,16 @@
+# (Wed Oct 12 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/firstpersoncharactertransparency@8.0.0`
+  - feat!: Completely refactor the character transparency package to function differently [#292](https://github.com/Quenty/NevermoreEngine/pull/292) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Oct 11 2022)
 
 :tada: This release contains work from new contributors! :tada:

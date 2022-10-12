@@ -1,3 +1,16 @@
+# v8.0.0 (Wed Oct 12 2022)
+
+#### 💥 Breaking Change
+
+- feat!: Completely refactor the character transparency package to function differently [#292](https://github.com/Quenty/NevermoreEngine/pull/292) ([@Quenty](https://github.com/Quenty))
+- feat!: Completely refactor the character transparency package to function ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
