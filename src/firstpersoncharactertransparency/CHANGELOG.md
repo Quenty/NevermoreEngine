@@ -1,20 +1,15 @@
-# v8.0.0 (Wed Oct 12 2022)
-
-#### 💥 Breaking Change
-
-- feat!: Completely refactor the character transparency package to function differently [#292](https://github.com/Quenty/NevermoreEngine/pull/292) ([@Quenty](https://github.com/Quenty))
-- feat!: Completely refactor the character transparency package to function ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@7.1.0...@quenty/firstpersoncharactertransparency@8.0.0) (2022-10-12)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
 
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@7.0.0...@quenty/firstpersoncharactertransparency@7.1.0) (2022-10-11)
 
