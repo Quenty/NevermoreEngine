@@ -1,3 +1,16 @@
+# (Thu Oct 13 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/quaternion@2.3.0`
+  - Fix SlerpQuaternions [#291](https://github.com/Quenty/NevermoreEngine/pull/291) ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+#### Authors: 1
+
+- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+---
+
 # (Wed Oct 12 2022)
 
 #### 💥 Breaking Change

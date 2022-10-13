@@ -1,3 +1,23 @@
+# v2.3.0 (Thu Oct 13 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss)), for all your work!
+
+#### 🚀 Enhancement
+
+- Fix SlerpQuaternions [#291](https://github.com/Quenty/NevermoreEngine/pull/291) ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+#### 🐛 Bug Fix
+
+- Fix SlerpQuaternions ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+#### Authors: 1
+
+- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
