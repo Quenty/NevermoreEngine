@@ -1,27 +1,15 @@
-# v2.3.0 (Thu Oct 13 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss)), for all your work!
-
-#### 🚀 Enhancement
-
-- Fix SlerpQuaternions [#291](https://github.com/Quenty/NevermoreEngine/pull/291) ([@EthanCurtiss](https://github.com/EthanCurtiss))
-
-#### 🐛 Bug Fix
-
-- Fix SlerpQuaternions ([@EthanCurtiss](https://github.com/EthanCurtiss))
-
-#### Authors: 1
-
-- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/quaternion@2.2.0...@quenty/quaternion@2.3.0) (2022-10-13)
+
+**Note:** Version bump only for package @quenty/quaternion
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/quaternion@2.1.1...@quenty/quaternion@2.2.0) (2022-03-27)
 
