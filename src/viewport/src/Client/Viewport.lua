@@ -4,17 +4,19 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AdorneeUtils = require("AdorneeUtils")
 local BasicPane = require("BasicPane")
 local Blend = require("Blend")
-local ValueObject = require("ValueObject")
 local CameraUtils = require("CameraUtils")
-local AdorneeUtils = require("AdorneeUtils")
-local Maid = require("Maid")
-local Observable = require("Observable")
-local ViewportControls = require("ViewportControls")
-local SpringObject = require("SpringObject")
 local CircleUtils = require("CircleUtils")
+local Maid = require("Maid")
 local Math = require("Math")
+local Observable = require("Observable")
+local SpringObject = require("SpringObject")
+local ValueObject = require("ValueObject")
+local ViewportControls = require("ViewportControls")
+local Signal = require("Signal")
+local Rx = require("Rx")
 
 local MAX_PITCH = math.pi/3
 local MIN_PITCH = -math.pi/3
@@ -46,6 +48,9 @@ function Viewport.new()
 	self._rotationPitchSpring = SpringObject.new(-math.pi/6)
 	self._rotationPitchSpring.Speed = 30
 	self._maid:GiveTask(self._rotationPitchSpring)
+
+	self._notifyInstanceSizeChanged = Signal.new()
+	self._maid:GiveTask(self._notifyInstanceSizeChanged)
 
 	return self
 end
@@ -106,6 +111,10 @@ function Viewport:SetInstance(instance)
 	self._current.Value = instance
 end
 
+function Viewport:NotifyInstanceSizeChanged()
+	self._notifyInstanceSizeChanged:Fire()
+end
+
 function Viewport:RotateBy(deltaV2, doNotAnimate)
 	local target = (self._rotationYawSpring.Value + deltaV2.x) % TAU
 	self._rotationYawSpring.Position = CircleUtils.updatePositionToSmallestDistOnCircle(self._rotationYawSpring.Position, target, TAU)
@@ -134,8 +143,8 @@ function Viewport:Render(props)
 		LayoutOrder = props.LayoutOrder;
 		BackgroundTransparency = 1;
 		CurrentCamera = currentCamera;
-		LightColor = props.LightColor or Color3.new(1, 1, 1);
-		Ambient = props.Ambient or Color3.new(1, 1, 1);
+		LightColor = props.LightColor or Color3.fromRGB(200, 200, 200);
+		Ambient = props.Ambient or Color3.fromRGB(140, 140, 140);
 		ImageTransparency = Blend.Computed(props.Transparency or 0, self._transparency,
 			function(propTransparency, selfTransparency)
 				return Math.map(propTransparency, 0, 1, selfTransparency, 1)
@@ -175,9 +184,13 @@ function Viewport:Render(props)
 				[Blend.Instance] = currentCamera;
 				Name = "CurrentCamera";
 				FieldOfView = self._fieldOfView;
-				CFrame = Blend.Computed(self._current, self._absoluteSize, self._fieldOfView,
+				CFrame = Blend.Computed(
+					self._current,
+					self._absoluteSize,
+					self._fieldOfView,
 					self._rotationYawSpring:ObserveRenderStepped(),
 					self._rotationPitchSpring:ObserveRenderStepped(),
+					Rx.fromSignal(self._notifyInstanceSizeChanged),
 					function(inst, absSize, fov, rotationYaw, rotationPitch)
 						if typeof(inst) ~= "Instance" then
 							return CFrame.new()
