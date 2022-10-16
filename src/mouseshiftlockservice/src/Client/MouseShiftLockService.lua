@@ -27,6 +27,8 @@ MouseShiftLockService.ServiceName = "MouseShiftLockService"
 ]=]
 
 function MouseShiftLockService:Init()
+	assert(self ~= MouseShiftLockService, "Call via serviceBag")
+	assert(not self._enabled, "Not enabled")
 	self._enabled = Instance.new("BoolValue")
 	self._enabled.Value = true
 
@@ -78,6 +80,9 @@ end
 	Enables mouse shift lock
 ]=]
 function MouseShiftLockService:EnableShiftLock()
+	assert(self ~= MouseShiftLockService, "Call via serviceBag")
+	assert(self._enabled, "Not enabled")
+
 	self._enabled.Value = true
 end
 
@@ -86,6 +91,9 @@ end
 ]=]
 
 function MouseShiftLockService:DisableShiftLock()
+	assert(self ~= MouseShiftLockService, "Call via serviceBag")
+	assert(self._enabled, "Not enabled")
+
 	self._enabled.Value = false
 end
 

@@ -6,11 +6,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
 local Maid = require("Maid")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
 local RagdollMotorUtils = require("RagdollMotorUtils")
+local CharacterUtils = require("CharacterUtils")
 
 local RxRagdollUtils = {}
 
@@ -94,19 +98,34 @@ function RxRagdollUtils.runLocal(humanoid)
 
 			local maid = Maid.new()
 
-			maid:GivePromise(RagdollMotorUtils.promiseVelocityRecordings(character, rigType))
-				:Then(function(velocityReadings)
-					maid:GiveTask(RxRagdollUtils.suppressRootPartCollision(character, rigType))
-					maid:GiveTask(RxRagdollUtils.enforceHeadCollision(character))
+			local player = CharacterUtils.getPlayerFromCharacter(humanoid)
+			-- This velocity work only really needs to occur on the network owner and on the server
+			-- since the server will replicate all changes over to the client.
+			if RunService:IsServer() or player == Players.LocalPlayer then
+				maid:GivePromise(RagdollMotorUtils.promiseVelocityRecordings(character, rigType))
+					:Then(function(velocityReadings)
+						debug.profilebegin("initragdoll")
 
-					humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-					maid:GiveTask(function()
-						humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+						maid:GiveTask(RxRagdollUtils.suppressRootPartCollision(character, rigType))
+						maid:GiveTask(RxRagdollUtils.enforceHeadCollision(character))
+
+						-- Do motors
+						maid:GiveTask(RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings))
+
+						humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+						maid:GiveTask(function()
+							humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+						end)
+
+						debug.profileend()
 					end)
+			else
+				debug.profilebegin("initragdoll_nonowner")
 
-					-- Do motors
-					maid:GiveTask(RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings))
-				end)
+				maid:GiveTask(RagdollMotorUtils.suppressJustRootPart(character, rigType))
+
+				debug.profileend()
+			end
 
 			topMaid._current = maid
 		else

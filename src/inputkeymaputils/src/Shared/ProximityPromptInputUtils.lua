@@ -24,7 +24,8 @@ function ProximityPromptInputUtils.newInputKeyMapFromPrompt(prompt)
 
 	return InputKeyMapList.new("custom", {
 		InputKeyMap.new(InputModeTypes.Gamepads, { prompt.GamepadKeyCode });
-		InputKeyMap.new(InputModeTypes.Keyboard, { prompt.KeyboardKeyCode })
+		InputKeyMap.new(InputModeTypes.Keyboard, { prompt.KeyboardKeyCode });
+		InputKeyMap.new(InputModeTypes.Touch, { "Tap" });
 	}, {
 		bindingName = prompt.ActionText;
 		rebindable = false;

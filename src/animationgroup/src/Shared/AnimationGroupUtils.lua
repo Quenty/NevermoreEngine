@@ -27,12 +27,12 @@ local AnimationGroupUtils = {}
 
 --[=[
 	Creates a new weighted track list.
-	@param humanoid Humanoid
+	@param animatorOrHumanoid Humanoid | Animator
 	@param weightedAnimationList { WeightedAnimation }
 	@return { WeightedTrack }
 ]=]
-function AnimationGroupUtils.createdWeightedTracks(humanoid, weightedAnimationList)
-	assert(humanoid, "Bad humanoid")
+function AnimationGroupUtils.createdWeightedTracks(animatorOrHumanoid, weightedAnimationList)
+	assert(animatorOrHumanoid, "Bad animatorOrHumanoid")
 	assert(weightedAnimationList, "Bad weightedAnimationList")
 
 	local tracks = {}
@@ -41,7 +41,7 @@ function AnimationGroupUtils.createdWeightedTracks(humanoid, weightedAnimationLi
 		assert(weightedAnimation.weight, "Bad weightedAnimation.weight")
 
 		table.insert(tracks, AnimationGroupUtils.createdWeightedTrack(
-			AnimationTrackUtils.loadAnimationFromId(humanoid, weightedAnimation.animationId),
+			AnimationTrackUtils.loadAnimationFromId(animatorOrHumanoid, weightedAnimation.animationId),
 			weightedAnimation.weight))
 	end
 	return tracks

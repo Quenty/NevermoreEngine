@@ -21,6 +21,10 @@ function RagdollService:Init(serviceBag)
 
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("RagdollBindersServer"))
+
+	self._binders.RagdollHumanoidOnFall:SetAutomaticTagging(false)
+	self._binders.RagdollHumanoidOnDeath:SetAutomaticTagging(false)
+	self._binders.UnragdollAutomatically:SetAutomaticTagging(false)
 end
 
 --[=[

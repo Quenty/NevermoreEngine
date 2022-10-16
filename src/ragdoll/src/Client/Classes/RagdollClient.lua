@@ -60,6 +60,7 @@ function RagdollClient:_setupCameraShake(impulseCamera)
 
 	local lastVelocity = head.Velocity
 	self._maid:GiveTask(RunService.Heartbeat:Connect(function()
+		debug.profilebegin("ragdollcamerashake")
 		local cameraCFrame = Workspace.CurrentCamera.CFrame
 
 		local velocity = head.Velocity
@@ -71,6 +72,7 @@ function RagdollClient:_setupCameraShake(impulseCamera)
 		end
 
 		lastVelocity = velocity
+		debug.profileend()
 	end))
 end
 

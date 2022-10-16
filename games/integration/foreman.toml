@@ -1,3 +1,0 @@
-[tools]
-rojo = { source = "quenty/rojo", version = "=7.2.1-quenty-npm-canary.5" }
-selene = { source = "Kampfkarren/selene", version = "0.21.1" }
