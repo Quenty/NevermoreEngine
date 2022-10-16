@@ -1,20 +1,18 @@
-# v7.0.1 (Sun Oct 16 2022)
-
-#### 🐛 Bug Fix
-
-- Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
-- fix: MouseShiftLockService has better errors ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@7.0.0...@quenty/mouseshiftlockservice@7.0.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* MouseShiftLockService has better errors ([03ee1fb](https://github.com/Quenty/NevermoreEngine/commit/03ee1fbc10ad4bd3c54abca9dc86af29ed14e9a8))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@6.0.1...@quenty/mouseshiftlockservice@7.0.0) (2022-09-27)
 

@@ -1,20 +1,18 @@
-# v5.1.1 (Sun Oct 16 2022)
-
-#### 🐛 Bug Fix
-
-- Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
-- fix: Viewport has nicer default signal rendering ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@5.1.0...@quenty/viewport@5.1.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* Viewport has nicer default signal rendering ([b9440e6](https://github.com/Quenty/NevermoreEngine/commit/b9440e65a5aba795f40f9e2df56f78c2ee77ceaf))
+
+
+
+
 
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@5.0.0...@quenty/viewport@5.1.0) (2022-10-11)
 

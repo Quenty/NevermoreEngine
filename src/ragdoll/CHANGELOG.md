@@ -1,20 +1,18 @@
-# v9.1.1 (Sun Oct 16 2022)
-
-#### 🐛 Bug Fix
-
-- Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
-- fix(perf): Make Ragdoll performance better ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.1.0...@quenty/ragdoll@9.1.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* **perf:** Make Ragdoll performance better ([566d2bb](https://github.com/Quenty/NevermoreEngine/commit/566d2bb1045d62fd08f16c9042d68c328c5c307d))
+
+
+
+
 
 # [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.0.0...@quenty/ragdoll@9.1.0) (2022-10-11)
 

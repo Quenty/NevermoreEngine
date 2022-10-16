@@ -1,20 +1,15 @@
-# v6.0.1 (Sun Oct 16 2022)
-
-#### 🐛 Bug Fix
-
-- Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
-- docs: Specify that animator may also be used for animation tracks or groups ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@6.0.0...@quenty/animationgroup@6.0.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@5.1.1...@quenty/animationgroup@6.0.0) (2022-09-27)
 

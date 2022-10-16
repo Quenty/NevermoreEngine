@@ -1,20 +1,18 @@
-# v7.1.1 (Sun Oct 16 2022)
-
-#### 🐛 Bug Fix
-
-- Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
-- fix: Proximity prompt has tap in the custom input prompt too ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.1.0...@quenty/inputkeymaputils@7.1.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* Proximity prompt has tap in the custom input prompt too ([3c7097a](https://github.com/Quenty/NevermoreEngine/commit/3c7097a8972ac5eaf58fe737a1c615ada1afb3d4))
+
+
+
+
 
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.0.0...@quenty/inputkeymaputils@7.1.0) (2022-10-11)
 
