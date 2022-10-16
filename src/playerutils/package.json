@@ -26,5 +26,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/brio": "file:../brio",
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
   }
 }
