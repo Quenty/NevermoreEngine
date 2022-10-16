@@ -46,9 +46,10 @@ function CameraStackService:Init(serviceBag)
 	self:Add(self._defaultCamera)
 
 	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, Enum.RenderPriority.Camera.Value + 75, function()
-		debug.profilebegin("CameraStackUpdate")
+		debug.profilebegin("camerastack")
 
 		if next(self._disabledSet) then
+			debug.profileend()
 			return
 		end
 
