@@ -1,28 +1,18 @@
-# v2.1.0 (Sun Oct 16 2022)
-
-:tada: This release contains work from new contributors! :tada:
-
-Thanks for all your work!
-
-:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
-:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
-
-#### 🚀 Enhancement
-
-- feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-- feat: Created RxPlayerUtils ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
-#### Authors: 1
-
-- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.0.0...@quenty/playerutils@2.1.0) (2022-10-16)
+
+
+### Features
+
+* Created RxPlayerUtils ([abeac52](https://github.com/Quenty/NevermoreEngine/commit/abeac52171ef3db0e56fdeb7fb344876cc8a3a4f))
+
+
+
+
 
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@1.1.0...@quenty/playerutils@2.0.0) (2022-09-27)
 
