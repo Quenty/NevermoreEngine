@@ -15,6 +15,7 @@ local RagdollAdditionalAttachmentUtils = require("RagdollAdditionalAttachmentUti
 local RagdollCollisionUtils = require("RagdollCollisionUtils")
 local RagdollBallSocketUtils = require("RagdollBallSocketUtils")
 local Motor6DBindersServer = require("Motor6DBindersServer")
+local RagdollMotorUtils = require("RagdollMotorUtils")
 
 local Ragdollable = setmetatable({}, BaseObject)
 Ragdollable.ClassName = "Ragdollable"
@@ -47,6 +48,9 @@ function Ragdollable.new(humanoid, serviceBag)
 			maid:GiveTask(RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(state.character, state.rigType))
 			maid:GiveTask(RagdollBallSocketUtils.ensureBallSockets(state.character, state.rigType))
 			maid:GiveTask(RagdollCollisionUtils.ensureNoCollides(state.character, state.rigType))
+
+			-- Not super guarded against race conditions but it should be fine, as this is for debugging.
+			RagdollMotorUtils.initMotorAttributes(state.character, state.rigType)
 
 			self._maid._configure = maid
 		else

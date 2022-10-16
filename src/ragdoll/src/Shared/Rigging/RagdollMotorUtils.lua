@@ -26,6 +26,9 @@ local Rx = require("Rx")
 
 local RagdollMotorUtils = {}
 
+-- For easier debugging
+local DEFAULT_SPRING_SPEED = 20
+
 local R6_MOTORS = {
 	{
 		partName = "Torso";
@@ -118,6 +121,23 @@ local R15_MOTORS = {
 	};
 }
 
+local ROOT_JOINT_CACHE = {}
+
+function RagdollMotorUtils.getFirstRootJointData(rigType)
+	if ROOT_JOINT_CACHE[rigType] then
+		return ROOT_JOINT_CACHE[rigType]
+	end
+
+	for _, item in pairs(RagdollMotorUtils.getMotorData(rigType)) do
+		if item.isRootJoint then
+			ROOT_JOINT_CACHE[rigType] = item
+			return item
+		end
+	end
+
+	error("Could not find root joint data")
+end
+
 function RagdollMotorUtils.getMotorData(rigType)
 	if rigType == Enum.HumanoidRigType.R15 then
 		return R15_MOTORS
@@ -128,6 +148,159 @@ function RagdollMotorUtils.getMotorData(rigType)
 	end
 end
 
+function RagdollMotorUtils.initMotorAttributes(character, rigType)
+	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
+	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
+
+	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
+		local motor = R15Utils.getRigMotor(character, data.partName, data.motorName)
+		if motor then
+			AttributeUtils.initAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
+			AttributeUtils.initAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPRING_SPEED)
+		end
+	end
+end
+
+function RagdollMotorUtils.setupAnimatedMotor(character, part)
+	local maid = Maid.new()
+
+	-- make this stuff not physics collide with our own rig
+	-- O(n^2)
+	maid:GiveTask(RagdollCollisionUtils.preventCollisionAmongOthers(character, part))
+
+	return maid
+end
+
+function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
+	local maid = Maid.new()
+
+	local lastTransformSpring = Spring.new(QFrame.fromCFrameClosestTo(motor.Transform, QFrame.new()))
+	lastTransformSpring.t = QFrame.new()
+
+	-- replacing this weld ensures interpolation for some reason
+	local weldContainer = Instance.new("Camera")
+	weldContainer.Name = "TempWeldContainer"
+	weldContainer.Parent = part0
+	maid:GiveTask(weldContainer)
+
+	local function setupWeld(weldType)
+		local weldMaid = Maid.new()
+
+		local weld = Instance.new(weldType)
+		weld.Name = "TempRagdollWeld"
+		weld.Part0 = part0
+		weld.Part1 = part1
+		weldMaid:GiveTask(weld)
+
+		-- Inserted C1/C0 here
+		weldMaid:GiveTask(Rx.combineLatest({
+			C0 = RxInstanceUtils.observeProperty(motor, "C0");
+			Transform = RxInstanceUtils.observeProperty(motor, "Transform");
+		}):Subscribe(function(innerState)
+			weld.C0 = innerState.C0 * innerState.Transform
+		end))
+		weldMaid:GiveTask(RxInstanceUtils.observeProperty(motor, "C1"):Subscribe(function(c1)
+			weld.C1 = c1
+		end))
+		weld.Parent = weldContainer
+
+		return weldMaid
+	end
+
+	if CharacterUtils.getPlayerFromCharacter(part0) then
+		-- Swap from choppy to interpolation
+		maid._weld = setupWeld("Motor6D")
+		maid:GiveTask(task.delay(0.25, function()
+			maid._weld = setupWeld("Weld")
+		end))
+	else
+		-- Smooth all the way! (Probably NPC)
+		maid._weld = setupWeld("Weld")
+	end
+
+	maid:GiveTask(RxAttributeUtils.observeAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPRING_SPEED)
+		:Subscribe(function(speed)
+			lastTransformSpring.s = speed
+		end))
+
+	-- Lerp smoothly to 0 to avoid jarring camera.
+	maid:GiveTask(RunService.Stepped:Connect(function()
+		local target = QFrame.toCFrame(lastTransformSpring.p)
+		if target then
+			motor.Transform = target
+		end
+	end))
+
+	motor.Enabled = false
+
+	maid:GiveTask(function()
+		motor.Enabled = true
+	end)
+
+	return maid
+end
+
+function RagdollMotorUtils.setupRagdollMotor(motor, part0, part1)
+	local maid = Maid.new()
+
+	motor.Enabled = false
+	maid:GiveTask(function()
+		local implemention = Motor6DStackInterface:FindFirstImplementation(motor)
+		if implemention then
+			local initialTransform = (part0.CFrame * motor.C0):toObjectSpace(part1.CFrame * motor.C1)
+			local speed = AttributeUtils.getAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPRING_SPEED)
+
+			implemention:TransformFromCFrame(initialTransform, speed)
+		end
+
+		motor.Enabled = true
+	end)
+
+	maid:GiveTask(RunService.Stepped:Connect(function()
+		motor.Transform = CFrame.new()
+	end))
+
+	return maid
+end
+
+function RagdollMotorUtils.suppressJustRootPart(character, rigType)
+	local data = RagdollMotorUtils.getFirstRootJointData(rigType)
+
+	local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
+		RxBrioUtils.switchMapBrio(function(motor)
+			return RxBrioUtils.flatCombineLatest({
+				motor = motor;
+				part0 = RxInstanceUtils.observeProperty(motor, "Part0");
+				part1 = RxInstanceUtils.observeProperty(motor, "Part1");
+				isAnimated = RxAttributeUtils.observeAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false);
+			})
+		end);
+	})
+
+	local topMaid = Maid.new()
+
+	topMaid:GiveTask(observable:Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local state = brio:GetValue()
+		local motorMaid = brio:ToMaid()
+
+		if not (state.motor and state.part0 and state.part1) then
+			return
+		end
+
+		if state.isAnimated then
+			motorMaid._current = RagdollMotorUtils.setupAnimatedMotor(character, state.part1)
+		else
+			motorMaid._current = RagdollMotorUtils.setupRagdollRootPartMotor(state.motor, state.part0, state.part1)
+		end
+	end))
+
+	return topMaid
+end
+
 function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
@@ -135,151 +308,57 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 	local topMaid = Maid.new()
 
 	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
-		local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName)
-		topMaid:GiveTask(RxBrioUtils.flatCombineLatest({
-			motor = observable;
-			part0 = observable:Pipe({
-				RxBrioUtils.switchMapBrio(function(motor)
-					return RxInstanceUtils.observeProperty(motor, "Part0");
-				end);
-			});
-			part1 = observable:Pipe({
-				RxBrioUtils.switchMapBrio(function(motor)
-					return RxInstanceUtils.observeProperty(motor, "Part1");
-				end);
-			});
-		}):Subscribe(function(state)
-			if state.motor and state.part0 and state.part1 then
-				local motorMaid = Maid.new()
-				local motor = state.motor
+		local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
+			RxBrioUtils.switchMapBrio(function(motor)
+				return RxBrioUtils.flatCombineLatest({
+					motor = motor;
+					part0 = RxInstanceUtils.observeProperty(motor, "Part0");
+					part1 = RxInstanceUtils.observeProperty(motor, "Part1");
+					isAnimated = RxAttributeUtils.observeAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false);
+				})
+			end);
+		})
 
-				-- For easier debugging
-				local DEFAULT_SPEED = 20
-				AttributeUtils.initAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
-				AttributeUtils.initAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPEED)
+		topMaid:GiveTask(observable:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
 
-				motorMaid:GiveTask(RxAttributeUtils.observeAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false):Subscribe(function(isAnimated)
-					if isAnimated then
-						local lockMaid = Maid.new()
+			local state = brio:GetValue()
+			local motorMaid = brio:ToMaid()
 
-						-- make this stuff not physics collide with our own rig
-						lockMaid:GiveTask(RagdollCollisionUtils.preventCollisionAmongOthers(character, state.part1))
+			if not (state.motor and state.part0 and state.part1) then
+				return
+			end
 
-						motorMaid._lock = lockMaid
-					else
-						local lockMaid = Maid.new()
-
-						if data.isRootJoint then
-							local lastTransformSpring = Spring.new(QFrame.fromCFrameClosestTo(motor.Transform, QFrame.new()))
-							lastTransformSpring.t = QFrame.new()
-
-							-- replacing this weld ensures interpolation for some reason
-							local weldContainer = Instance.new("Camera")
-							weldContainer.Name = "TempWeldContainer"
-							weldContainer.Parent = state.part0
-							lockMaid:GiveTask(weldContainer)
-
-							local function setupWeld(weldType)
-								local weldMaid = Maid.new()
-
-								local weld = Instance.new(weldType)
-								weld.Name = "TempRagdollWeld"
-								weld.Part0 = state.part0
-								weld.Part1 = state.part1
-								weldMaid:GiveTask(weld)
-
-								-- Inserted C1/C0 here
-								weldMaid:GiveTask(Rx.combineLatest({
-									C0 = RxInstanceUtils.observeProperty(motor, "C0");
-									Transform = RxInstanceUtils.observeProperty(motor, "Transform");
-								}):Subscribe(function(innerState)
-									weld.C0 = innerState.C0 * innerState.Transform
-								end))
-								weldMaid:GiveTask(RxInstanceUtils.observeProperty(motor, "C1"):Subscribe(function(c1)
-									weld.C1 = c1
-								end))
-								weld.Parent = weldContainer
-
-								return weldMaid
-							end
-
-
-							if CharacterUtils.getPlayerFromCharacter(state.part0) then
-								-- Swap from choppy to interpolation
-								lockMaid._weld = setupWeld("Motor6D")
-								lockMaid:GiveTask(task.delay(0.25, function()
-									lockMaid._weld = setupWeld("Weld")
-								end))
-							else
-								-- Smooth all the way! (Probably NPC)
-								lockMaid._weld = setupWeld("Weld")
-							end
-
-							lockMaid:GiveTask(RxAttributeUtils.observeAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPEED)
-								:Subscribe(function(speed)
-									lastTransformSpring.s = speed
-								end))
-
-							-- Lerp smoothly to 0 to avoid jarring camera.
-							lockMaid:GiveTask(RunService.Stepped:Connect(function()
-								local target = QFrame.toCFrame(lastTransformSpring.p)
-								if target then
-									motor.Transform = target
-								end
-							end))
-
-							motor.Enabled = false
-
-							lockMaid:GiveTask(function()
-								motor.Enabled = true
-							end)
-						else
-							motor.Enabled = false
-
-							lockMaid:GiveTask(function()
-								local implemention = Motor6DStackInterface:FindFirstImplementation(state.motor)
-								if implemention then
-									local initialTransform = (state.part0.CFrame * motor.C0):toObjectSpace(state.part1.CFrame * motor.C1)
-									local speed = AttributeUtils.getAttribute(state.motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPEED)
-
-									implemention:TransformFromCFrame(initialTransform, speed)
-								end
-
-								motor.Enabled = true
-							end)
-
-							lockMaid:GiveTask(RunService.Stepped:Connect(function()
-								motor.Transform = CFrame.new()
-							end))
-						end
-
-						task.defer(function()
-							-- Note animator:ApplyJointVelocities fails. Do this manually.
-							-- We only want to do this on the network owner.
-							if RagdollMotorUtils.guessIfNetworkOwner(state.part1) then
-								-- use physics time
-								local passed = time() - velocityReadings.readingTimePhysics
-								if passed <= 0.1 then
-									local rotVelocity = velocityReadings.rotation[data]
-									if rotVelocity then
-										state.part1.RotVelocity += rotVelocity
-									end
-
-									local velocity = velocityReadings.linear[data]
-									if velocity then
-										state.part1.Velocity += velocity
-									end
-								end
-							end
-						end)
-
-						motorMaid._lock = lockMaid
-					end
-				end))
-
-				topMaid[data] = motorMaid
+			if state.isAnimated then
+				motorMaid._current = RagdollMotorUtils.setupAnimatedMotor(character, state.part1)
 			else
-				topMaid[data] = nil
+				if data.isRootJoint then
+					motorMaid._current = RagdollMotorUtils.setupRagdollRootPartMotor(state.motor, state.part0, state.part1)
+				else
+					motorMaid._current = RagdollMotorUtils.setupRagdollMotor(state.motor, state.part0, state.part1)
+				end
+
+				-- Note animator:ApplyJointVelocities fails. Do this manually.
+				-- We only want to do this on the network owner.
+				if RagdollMotorUtils.guessIfNetworkOwner(state.part1) then
+					task.defer(function()
+						-- use physics time
+						local passed = time() - velocityReadings.readingTimePhysics
+						if passed <= 0.1 then
+							local rotVelocity = velocityReadings.rotation[data]
+							if rotVelocity then
+								state.part1.RotVelocity += rotVelocity
+							end
+
+							local velocity = velocityReadings.linear[data]
+							if velocity then
+								state.part1.Velocity += velocity
+							end
+						end
+					end)
+				end
 			end
 		end))
 	end
