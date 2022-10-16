@@ -7,8 +7,8 @@
 <title data-rh="true">CameraStackService | Nevermore</title><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/CameraStackService"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="CameraStackService | Nevermore"><meta data-rh="true" name="description" content="Holds camera states and allows for the last camera state to be retrieved. Also
 initializes an impulse and default camera as the bottom of the stack. Is a singleton."><meta data-rh="true" property="og:description" content="Holds camera states and allows for the last camera state to be retrieved. Also
 initializes an impulse and default camera as the bottom of the stack. Is a singleton."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/CameraStackService"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/CameraStackService" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/CameraStackService" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.396b872c.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.5a7a6b82.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.8fdee9ce.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.05c165ad.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.3cf6ce79.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -19,19 +19,19 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
 </p>
 </div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Init"><code style="text-decoration:none">Init</code><a class="hash-link" href="#Init" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L29"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">Init</code><code>(</code><code>serviceBag<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ServiceBag">ServiceBag</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Initializes a new camera stack. Should be done via the ServiceBag.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetDoNotUseDefaultCamera"><code style="text-decoration:none">SetDoNotUseDefaultCamera</code><a class="hash-link" href="#SetDoNotUseDefaultCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L88"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">SetDoNotUseDefaultCamera</code><code>(</code><code>doNotUseDefaultCamera<!-- -->: </code><code class="blue_P4bS">boolean</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetDoNotUseDefaultCamera"><code style="text-decoration:none">SetDoNotUseDefaultCamera</code><a class="hash-link" href="#SetDoNotUseDefaultCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L89"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">SetDoNotUseDefaultCamera</code><code>(</code><code>doNotUseDefaultCamera<!-- -->: </code><code class="blue_P4bS">boolean</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Prevents the default camera from being used</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="PushDisable"><code style="text-decoration:none">PushDisable</code><a class="hash-link" href="#PushDisable" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L98"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">PushDisable</code><code>(</code><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="PushDisable"><code style="text-decoration:none">PushDisable</code><a class="hash-link" href="#PushDisable" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L99"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">PushDisable</code><code>(</code><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Function to cancel disable</p>
 </span></span></div><div>
 <p>Pushes a disable state onto the camera stack</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="PrintCameraStack"><code style="text-decoration:none">PrintCameraStack</code><a class="hash-link" href="#PrintCameraStack" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L113"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">PrintCameraStack</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="PrintCameraStack"><code style="text-decoration:none">PrintCameraStack</code><a class="hash-link" href="#PrintCameraStack" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L114"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">PrintCameraStack</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Outputs the camera stack. Intended for diagnostics.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetDefaultCamera"><code style="text-decoration:none">GetDefaultCamera</code><a class="hash-link" href="#GetDefaultCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L125"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetDefaultCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/SummedCamera">SummedCamera</a></code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetDefaultCamera"><code style="text-decoration:none">GetDefaultCamera</code><a class="hash-link" href="#GetDefaultCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L126"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetDefaultCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/SummedCamera">SummedCamera</a></code><span class="inlineDescription_G7Er">-- <span>
 <p>DefaultCamera + ImpulseCamera</p>
 </span></span></div><div>
 <p>Returns the default camera</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetImpulseCamera"><code style="text-decoration:none">GetImpulseCamera</code><a class="hash-link" href="#GetImpulseCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L150"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetImpulseCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ImpulseCamera">ImpulseCamera</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetImpulseCamera"><code style="text-decoration:none">GetImpulseCamera</code><a class="hash-link" href="#GetImpulseCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L151"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetImpulseCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ImpulseCamera">ImpulseCamera</a></code></div><div>
 <p>Returns the impulse camera. Useful for adding camera shake.</p>
 <p>Shaking the camera:</p>
 <pre class="language-lua"><code class="language-lua">self<span class="token punctuation">.</span>_cameraStackService<span class="token punctuation">:</span><span class="token function">GetImpulseCamera</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">Impulse</span><span class="token punctuation">(</span>Vector3<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token number">0.25</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.25</span><span class="token operator">*</span><span class="token punctuation">(</span>math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
@@ -44,23 +44,23 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
 <span class="token keyword">local</span> customCameraEffect <span class="token operator">=</span> <span class="token punctuation">...</span>
 <span class="token keyword">return</span> <span class="token punctuation">(</span>customCameraEffect <span class="token operator">+</span> self<span class="token punctuation">.</span>_cameraStackService<span class="token punctuation">:</span><span class="token function">GetImpulseCamera</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">SetMode</span><span class="token punctuation">(</span><span class="token string">"Relative"</span><span class="token punctuation">)</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetRawDefaultCamera"><code style="text-decoration:none">GetRawDefaultCamera</code><a class="hash-link" href="#GetRawDefaultCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L160"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetRawDefaultCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DefaultCamera">DefaultCamera</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetRawDefaultCamera"><code style="text-decoration:none">GetRawDefaultCamera</code><a class="hash-link" href="#GetRawDefaultCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L161"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetRawDefaultCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DefaultCamera">DefaultCamera</a></code></div><div>
 <p>Returns the default camera without any impulse cameras</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTopCamera"><code style="text-decoration:none">GetTopCamera</code><a class="hash-link" href="#GetTopCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L170"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetTopCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraEffectUtils#CameraEffect">CameraEffect</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTopCamera"><code style="text-decoration:none">GetTopCamera</code><a class="hash-link" href="#GetTopCamera" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L171"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetTopCamera</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraEffectUtils#CameraEffect">CameraEffect</a></code></div><div>
 <p>Gets the camera current on the top of the stack</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTopState"><code style="text-decoration:none">GetTopState</code><a class="hash-link" href="#GetTopState" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L180"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetTopState</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState?</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTopState"><code style="text-decoration:none">GetTopState</code><a class="hash-link" href="#GetTopState" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L181"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetTopState</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState?</a></code></div><div>
 <p>Retrieves the top state off the stack at this time</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetNewStateBelow"><code style="text-decoration:none">GetNewStateBelow</code><a class="hash-link" href="#GetNewStateBelow" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L206"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetNewStateBelow</code><code>(</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CustomCameraEffect">CustomCameraEffect</a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetNewStateBelow"><code style="text-decoration:none">GetNewStateBelow</code><a class="hash-link" href="#GetNewStateBelow" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L207"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetNewStateBelow</code><code>(</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CustomCameraEffect">CustomCameraEffect</a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Effect below</p>
 </span></span></div><div><code class="purple_ieR2">(</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState</a></code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
 <p>Function to set the state</p>
 </span></span></div></div><code>)</code></div><div>
 <p>Returns a new camera state that retrieves the state below its set state.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetIndex"><code style="text-decoration:none">GetIndex</code><a class="hash-link" href="#GetIndex" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L236"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetIndex</code><code>(</code><code>state<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraEffectUtils#CameraEffect">CameraEffect</a></code><code>) → </code><code class="blue_P4bS">number?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetIndex"><code style="text-decoration:none">GetIndex</code><a class="hash-link" href="#GetIndex" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L237"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetIndex</code><code>(</code><code>state<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraEffectUtils#CameraEffect">CameraEffect</a></code><code>) → </code><code class="blue_P4bS">number?</code><span class="inlineDescription_G7Er">-- <span>
 <p>index</p>
 </span></span></div><div>
 <p>Retrieves the index of a state</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetStack"><code style="text-decoration:none">GetStack</code><a class="hash-link" href="#GetStack" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L255"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetStack</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetStack"><code style="text-decoration:none">GetStack</code><a class="hash-link" href="#GetStack" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L256"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">GetStack</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code><code class="purple_ieR2">}</code></div><div>
 <p>Returns the current stack.</p>
 <div class="admonition admonition-warning alert alert--danger">
   <div class="admonition-heading">
@@ -72,9 +72,9 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
     <p>Do not modify this stack, this is the raw memory of the stack</p>
   </div>
 </div>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Remove"><code style="text-decoration:none">Remove</code><a class="hash-link" href="#Remove" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L265"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">Remove</code><code>(</code><code>state<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Remove"><code style="text-decoration:none">Remove</code><a class="hash-link" href="#Remove" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L266"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">Remove</code><code>(</code><code>state<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Removes the state from the stack</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Add"><code style="text-decoration:none">Add</code><a class="hash-link" href="#Add" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L279"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">Add</code><code>(</code><code>state<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Add"><code style="text-decoration:none">Add</code><a class="hash-link" href="#Add" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraStackService.lua#L280"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraStackService<!-- -->:</code><code class="green_DgR4">Add</code><code>(</code><code>state<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/CameraState">CameraState</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Adds the state from the stack</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -108,7 +108,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 88,
+                &quot;line&quot;: 89,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -124,7 +124,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 98,
+                &quot;line&quot;: 99,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -135,7 +135,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 113,
+                &quot;line&quot;: 114,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -151,7 +151,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 125,
+                &quot;line&quot;: 126,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -167,7 +167,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 150,
+                &quot;line&quot;: 151,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -183,7 +183,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 160,
+                &quot;line&quot;: 161,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -199,7 +199,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 170,
+                &quot;line&quot;: 171,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -215,7 +215,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 180,
+                &quot;line&quot;: 181,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -235,7 +235,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 206,
+                &quot;line&quot;: 207,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -257,7 +257,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 236,
+                &quot;line&quot;: 237,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -273,7 +273,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 255,
+                &quot;line&quot;: 256,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -290,7 +290,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 265,
+                &quot;line&quot;: 266,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         },
@@ -307,7 +307,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 279,
+                &quot;line&quot;: 280,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
             }
         }
@@ -321,7 +321,7 @@ initializes an impulse and default camera as the bottom of the stack. Is a singl
         &quot;path&quot;: &quot;src/camera/src/Client/CameraStackService.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#GetDefaultCamera" class="table-of-contents__link toc-highlight">:GetDefaultCamera</a></li><li><a href="#GetImpulseCamera" class="table-of-contents__link toc-highlight">:GetImpulseCamera</a></li><li><a href="#GetIndex" class="table-of-contents__link toc-highlight">:GetIndex</a></li><li><a href="#GetNewStateBelow" class="table-of-contents__link toc-highlight">:GetNewStateBelow</a></li><li><a href="#GetRawDefaultCamera" class="table-of-contents__link toc-highlight">:GetRawDefaultCamera</a></li><li><a href="#GetStack" class="table-of-contents__link toc-highlight">:GetStack</a></li><li><a href="#GetTopCamera" class="table-of-contents__link toc-highlight">:GetTopCamera</a></li><li><a href="#GetTopState" class="table-of-contents__link toc-highlight">:GetTopState</a></li><li><a href="#Init" class="table-of-contents__link toc-highlight">:Init</a></li><li><a href="#PrintCameraStack" class="table-of-contents__link toc-highlight">:PrintCameraStack</a></li><li><a href="#PushDisable" class="table-of-contents__link toc-highlight">:PushDisable</a></li><li><a href="#Remove" class="table-of-contents__link toc-highlight">:Remove</a></li><li><a href="#SetDoNotUseDefaultCamera" class="table-of-contents__link toc-highlight">:SetDoNotUseDefaultCamera</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.5a7a6b82.js"></script>
-<script src="/NevermoreEngine/assets/js/main.8fdee9ce.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.05c165ad.js"></script>
+<script src="/NevermoreEngine/assets/js/main.3cf6ce79.js"></script>
 </body>
 </html>
