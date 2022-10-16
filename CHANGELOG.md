@@ -1,3 +1,16 @@
+# (Sun Oct 16 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/acceltween@2.2.1`, `@quenty/animationgroup@6.0.1`, `@quenty/animationtrackutils@2.1.1`, `@quenty/camera@9.1.1`, `@quenty/inputkeymaputils@7.1.1`, `@quenty/mouseshiftlockservice@7.0.1`, `@quenty/ragdoll@9.1.1`, `@quenty/viewport@5.1.1`
+  - Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Oct 13 2022)
 
 #### 🚀 Enhancement

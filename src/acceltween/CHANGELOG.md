@@ -1,3 +1,16 @@
+# v2.2.1 (Sun Oct 16 2022)
+
+#### 🐛 Bug Fix
+
+- Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
+- test: Add AccelTween tests ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
