@@ -1,5 +1,26 @@
 # (Sun Oct 16 2022)
 
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### 🚀 Enhancement
+
+- `@quenty/playerutils@2.1.0`
+  - feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+---
+
+# (Sun Oct 16 2022)
+
 #### 🐛 Bug Fix
 
 - `@quenty/acceltween@2.2.1`, `@quenty/animationgroup@6.0.1`, `@quenty/animationtrackutils@2.1.1`, `@quenty/camera@9.1.1`, `@quenty/inputkeymaputils@7.1.1`, `@quenty/mouseshiftlockservice@7.0.1`, `@quenty/ragdoll@9.1.1`, `@quenty/viewport@5.1.1`
