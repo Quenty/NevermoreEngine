@@ -14,8 +14,8 @@ Getting started with Nevermore is not easy.
 
 ## Installing Nevermore
 
-1. Install foreman
-2. Install npm
+1. Install [aftman](https://github.com/LPGhatguy/aftman)
+2. Install [npm](https://nodejs.org/en/download/)
 
 ## Install using npm
 Nevermore is designed to use [npm](https://www.npmjs.com/) to manage packages. You can install a package like this.
