@@ -190,7 +190,9 @@ function Viewport:Render(props)
 					self._fieldOfView,
 					self._rotationYawSpring:ObserveRenderStepped(),
 					self._rotationPitchSpring:ObserveRenderStepped(),
-					Rx.fromSignal(self._notifyInstanceSizeChanged),
+					Rx.fromSignal(self._notifyInstanceSizeChanged):Pipe({
+						Rx.defaultsToNil;
+					}),
 					function(inst, absSize, fov, rotationYaw, rotationPitch)
 						if typeof(inst) ~= "Instance" then
 							return CFrame.new()
