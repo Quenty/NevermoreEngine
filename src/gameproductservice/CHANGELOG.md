@@ -1,27 +1,15 @@
-# v5.2.0 (Sun Oct 23 2022)
-
-:tada: This release contains work from new contributors! :tada:
-
-Thanks for all your work!
-
-:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
-:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
-
-#### 🚀 Enhancement
-
-- feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
-#### Authors: 1
-
-- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.1.1...@quenty/gameproductservice@5.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
 
 ## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.1.0...@quenty/gameproductservice@5.1.1) (2022-10-16)
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.1.0...@quenty/cooldown@5.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.0.0...@quenty/cooldown@5.1.0) (2022-10-11)
 
 

@@ -1,23 +1,18 @@
-# v5.1.0 (Sun Oct 23 2022)
-
-#### 🚀 Enhancement
-
-- fix: Can install via just NPM registry for now [#297](https://github.com/Quenty/NevermoreEngine/pull/297) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Can install via just NPM registry for now ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@5.0.0...@quenty/rodux-actions@5.1.0) (2022-10-23)
+
+
+### Bug Fixes
+
+* Can install via just NPM registry for now ([35291f2](https://github.com/Quenty/NevermoreEngine/commit/35291f2aa91d40ec9062b2c79a2ef826d706a795))
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@4.0.1...@quenty/rodux-actions@5.0.0) (2022-09-27)
 

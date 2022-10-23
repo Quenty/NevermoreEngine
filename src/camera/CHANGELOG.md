@@ -1,30 +1,18 @@
-# v9.2.0 (Sun Oct 23 2022)
-
-:tada: This release contains work from new contributors! :tada:
-
-Thanks for all your work!
-
-:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
-:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
-
-#### 🚀 Enhancement
-
-- fix: Can install via just NPM registry for now [#297](https://github.com/Quenty/NevermoreEngine/pull/297) ([@Quenty](https://github.com/Quenty))
-- feat: Move CameraStack to its own reusable class ([@Quenty](https://github.com/Quenty))
-- feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-
-#### Authors: 2
-
-- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.1.1...@quenty/camera@9.2.0) (2022-10-23)
+
+
+### Features
+
+* Move CameraStack to its own reusable class ([7020502](https://github.com/Quenty/NevermoreEngine/commit/70205024acb508552c0c922a0a8119a27b7f38cd))
+
+
+
+
 
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.1.0...@quenty/camera@9.1.1) (2022-10-16)
 

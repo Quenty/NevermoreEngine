@@ -1,23 +1,18 @@
-# v4.2.0 (Sun Oct 23 2022)
-
-#### 🚀 Enhancement
-
-- fix: Can install via just NPM registry for now [#297](https://github.com/Quenty/NevermoreEngine/pull/297) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Rx switch maps would lead to multiple brios alive against a single switched observable. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.1.0...@quenty/tie@4.2.0) (2022-10-23)
+
+
+### Bug Fixes
+
+* Rx switch maps would lead to multiple brios alive against a single switched observable. ([cd25a22](https://github.com/Quenty/NevermoreEngine/commit/cd25a220a2096fe1c3093deec7f9bc4e83815924))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.0.0...@quenty/tie@4.1.0) (2022-10-11)
 
