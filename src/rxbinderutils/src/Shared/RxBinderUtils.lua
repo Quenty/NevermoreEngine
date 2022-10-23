@@ -84,6 +84,7 @@ function RxBinderUtils.observeBoundParentClassBrio(binder, instance)
 					return Rx.EMPTY
 				end
 			end);
+			RxBrioUtils.onlyLastBrioSurvives();
 		})
 end
 

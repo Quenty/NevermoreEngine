@@ -228,6 +228,7 @@ function TiePropertyInterface:_observeValueBaseBrio()
 		RxBrioUtils.switchMapBrio(function(folder)
 			return self:_observeFromFolder(folder)
 		end);
+		RxBrioUtils.onlyLastBrioSurvives();
 	})
 end
 
