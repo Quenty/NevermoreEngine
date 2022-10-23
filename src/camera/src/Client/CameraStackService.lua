@@ -11,11 +11,11 @@ local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 
-local CustomCameraEffect = require("CustomCameraEffect")
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
 local ServiceBag = require("ServiceBag")
 local Maid = require("Maid")
+local CameraStack = require("CameraStack")
 
 assert(RunService:IsClient(), "[CameraStackService] - Only require CameraStackService on client")
 
@@ -32,8 +32,7 @@ function CameraStackService:Init(serviceBag)
 	self._maid = Maid.new()
 	self._key = HttpService:GenerateGUID(false)
 
-	self._stack = {}
-	self._disabledSet = {}
+	self._cameraStack = CameraStack.new()
 
 	-- Initialize default cameras
 	self._rawDefaultCamera = DefaultCamera.new()
@@ -46,12 +45,7 @@ function CameraStackService:Init(serviceBag)
 	self:Add(self._defaultCamera)
 
 	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, Enum.RenderPriority.Camera.Value + 75, function()
-		debug.profilebegin("camerastack")
-
-		if next(self._disabledSet) then
-			debug.profileend()
-			return
-		end
+		debug.profilebegin("camerastackservice")
 
 		local state = self:GetTopState()
 		if state then
@@ -97,26 +91,18 @@ end
 	@return function -- Function to cancel disable
 ]=]
 function CameraStackService:PushDisable()
-	assert(self._stack, "Not initialized")
+	assert(self._cameraStack, "Not initialized")
 
-	local disabledKey = HttpService:GenerateGUID(false)
-
-	self._disabledSet[disabledKey] = true
-
-	return function()
-		self._disabledSet[disabledKey] = nil
-	end
+	return self._cameraStack:PushDisable()
 end
 
 --[=[
 	Outputs the camera stack. Intended for diagnostics.
 ]=]
 function CameraStackService:PrintCameraStack()
-	assert(self._stack, "Stack is not initialized yet")
+	assert(self._cameraStack, "Not initialized")
 
-	for _, value in pairs(self._stack) do
-		print(tostring(type(value) == "table" and value.ClassName or tostring(value)))
-	end
+	return self._cameraStack:PrintCameraStack()
 end
 
 --[=[
@@ -169,9 +155,9 @@ end
 	@return CameraEffect
 ]=]
 function CameraStackService:GetTopCamera()
-	assert(self._stack, "Not initialized")
+	assert(self._cameraStack, "Not initialized")
 
-	return self._stack[#self._stack]
+	return self._cameraStack:GetTopCamera()
 end
 
 --[=[
@@ -179,23 +165,9 @@ end
 	@return CameraState?
 ]=]
 function CameraStackService:GetTopState()
-	assert(self._stack, "Stack is not initialized yet")
+	assert(self._cameraStack, "Not initialized")
 
-	if #self._stack > 10 then
-		warn(("[CameraStackService] - Stack is bigger than 10 in camerastackService (%d)"):format(#self._stack))
-	end
-	local topState = self._stack[#self._stack]
-
-	if type(topState) == "table" then
-		local state = topState.CameraState or topState
-		if state then
-			return state
-		else
-			warn("[CameraStackService] - No top state!")
-		end
-	else
-		warn("[CameraStackService] - Bad type on top of stack")
-	end
+	return self._cameraStack:GetTopState()
 end
 
 --[=[
@@ -205,27 +177,9 @@ end
 	@return (CameraState) -> () -- Function to set the state
 ]=]
 function CameraStackService:GetNewStateBelow()
-	assert(self._stack, "Stack is not initialized yet")
+	assert(self._cameraStack, "Not initialized")
 
-	local _stateToUse = nil
-
-	return CustomCameraEffect.new(function()
-		local index = self:GetIndex(_stateToUse)
-		if index then
-			local below = self._stack[index-1]
-			if below then
-				return below.CameraState or below
-			else
-				warn("[CameraStackService] - Could not get state below, found current state. Returning default.")
-				return self._stack[1].CameraState
-			end
-		else
-			warn(("[CameraStackService] - Could not get state from %q, returning default"):format(tostring(_stateToUse)))
-			return self._stack[1].CameraState
-		end
-	end), function(newStateToUse)
-		_stateToUse = newStateToUse
-	end
+	return self._cameraStack:GetNewStateBelow()
 end
 
 --[=[
@@ -235,13 +189,9 @@ end
 
 ]=]
 function CameraStackService:GetIndex(state)
-	assert(self._stack, "Stack is not initialized yet")
+	assert(self._cameraStack, "Not initialized")
 
-	for index, value in pairs(self._stack) do
-		if value == state then
-			return index
-		end
-	end
+	return self._cameraStack:GetIndex(state)
 end
 
 --[=[
@@ -253,10 +203,21 @@ end
 
 	@return { CameraState<T> }
 ]=]
-function CameraStackService:GetStack()
-	assert(self._stack, "Not initialized")
+function CameraStackService:GetRawStack()
+	assert(self._cameraStack, "Not initialized")
 
-	return self._stack
+	return self._cameraStack:GetRawStack()
+end
+
+--[=[
+	Gets the current camera stack
+
+	@return CameraStack
+]=]
+function CameraStackService:GetCameraStack()
+	assert(self._cameraStack, "Not initialized")
+
+	return self._cameraStack:GetStack()
 end
 
 --[=[
@@ -264,13 +225,9 @@ end
 	@param state CameraState
 ]=]
 function CameraStackService:Remove(state)
-	assert(self._stack, "Stack is not initialized yet")
+	assert(self._cameraStack, "Not initialized")
 
-	local index = self:GetIndex(state)
-
-	if index then
-		table.remove(self._stack, index)
-	end
+	return self._cameraStack:Remove(state)
 end
 
 --[=[
@@ -278,9 +235,9 @@ end
 	@param state CameraState
 ]=]
 function CameraStackService:Add(state)
-	assert(self._stack, "Stack is not initialized yet")
+	assert(self._cameraStack, "Not initialized")
 
-	table.insert(self._stack, state)
+	return self._cameraStack:Add(state)
 end
 
 function CameraStackService:Destroy()

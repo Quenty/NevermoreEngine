@@ -33,7 +33,7 @@
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/string": "file:../string",
     "@quenty/templateprovider": "file:../templateprovider",
-    "@quentystudios/cmdr": "^1.8.4-quenty.1"
+    "@quentystudios/cmdr": "^1.9.0-quenty.1"
   },
   "publishConfig": {
     "access": "public"

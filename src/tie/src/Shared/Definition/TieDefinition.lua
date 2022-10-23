@@ -190,7 +190,8 @@ function TieDefinition:ObserveLastImplementationBrio(adornee: Instance)
 		:Pipe({
 			RxBrioUtils.switchMapBrio(function(folder)
 				return self:_observeImplementation(folder)
-			end)
+			end);
+			RxBrioUtils.onlyLastBrioSurvives();
 		})
 end
 

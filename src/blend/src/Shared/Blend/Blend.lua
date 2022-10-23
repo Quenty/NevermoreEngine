@@ -53,10 +53,7 @@ function Blend.New(className)
 
 	return function(props)
 		return Observable.new(function(sub)
-			local maid = Maid.new()
-
 			local instance = Instance.new(className)
-			maid:GiveTask(instance)
 
 			if defaults then
 				for key, value in pairs(defaults) do
@@ -64,7 +61,8 @@ function Blend.New(className)
 				end
 			end
 
-			maid:GiveTask(Blend.mount(instance, props))
+			local maid = Blend.mount(instance, props)
+			maid:GiveTask(instance)
 
 			sub:Fire(instance)
 

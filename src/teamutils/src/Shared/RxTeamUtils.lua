@@ -108,7 +108,7 @@ function RxTeamUtils.observePlayersForTeamColorBrio(teamColor)
 		-- with the same color so no great solution here.
 		RxBrioUtils.switchMapBrio(function(team)
 			return RxTeamUtils.observePlayersForTeamBrio(team)
-		end)
+		end);
 	})
 end
 

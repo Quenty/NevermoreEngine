@@ -47,6 +47,7 @@ function RxR15Utils.observeRigMotorBrio(character, partName, motorName)
 			RxBrioUtils.switchMapBrio(function(part)
 				return RxInstanceUtils.observeLastNamedChildBrio(part, "Motor6D", motorName)
 			end);
+			RxBrioUtils.onlyLastBrioSurvives();
 		})
 end
 

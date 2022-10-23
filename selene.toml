@@ -1,1 +1,3 @@
+# This file specifies selene linting rules
+
 std = "roblox+testez"

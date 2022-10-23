@@ -64,6 +64,7 @@ function TieSignalConnection:_observeBindableEvent()
 		RxBrioUtils.switchMapBrio(function(folder)
 			return RxInstanceUtils.observeLastNamedChildBrio(folder, "BindableEvent", name)
 		end);
+		RxBrioUtils.onlyLastBrioSurvives();
 	})
 end
 

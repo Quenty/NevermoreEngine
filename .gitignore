@@ -6,6 +6,7 @@ roblox.toml
 roblox.yml
 .env
 build
+sourcemap.json
 
 # Normally it's a good idea to commit this. However, in this mono-repo scenario with linking
 # it adds a ton of noise and no real gain. Also we have seen no gains from reproducing
