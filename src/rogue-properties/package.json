@@ -39,7 +39,7 @@
     "@quenty/table": "file:../table",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject",
-    "@quentystudios/t": "^1.2.5"
+    "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"
