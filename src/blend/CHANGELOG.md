@@ -1,3 +1,29 @@
+# v6.2.0 (Sun Oct 23 2022)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### 🚀 Enhancement
+
+- fix: Can install via just NPM registry for now [#297](https://github.com/Quenty/NevermoreEngine/pull/297) ([@Quenty](https://github.com/Quenty))
+- feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+#### 🐛 Bug Fix
+
+- fix: Use one less maid when mounting blend ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

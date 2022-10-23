@@ -1,3 +1,27 @@
+# (Sun Oct 23 2022)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@6.2.0`, `@quenty/camera@9.2.0`, `@quenty/cmdrservice@7.2.0`, `@quenty/r15utils@7.2.0`, `@quenty/rodux-actions@5.1.0`, `@quenty/rogue-properties@4.2.0`, `@quenty/rxbinderutils@8.2.0`, `@quenty/spawning@4.2.0`, `@quenty/teamutils@4.2.0`, `@quenty/tie@4.2.0`, `@quenty/viewport@5.2.0`
+  - fix: Can install via just NPM registry for now [#297](https://github.com/Quenty/NevermoreEngine/pull/297) ([@Quenty](https://github.com/Quenty))
+- `@quenty/playerutils@2.2.0`
+  - feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+#### Authors: 2
+
+- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Oct 16 2022)
 
 :tada: This release contains work from new contributors! :tada:
