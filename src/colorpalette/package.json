@@ -37,9 +37,7 @@
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
-    "@quenty/valueobject": "file:../valueobject"
-  },
-  "devDependencies": {
+    "@quenty/valueobject": "file:../valueobject",
     "@quenty/colorpicker": "file:../colorpicker"
   }
 }
