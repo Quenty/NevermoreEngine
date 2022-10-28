@@ -1,24 +1,15 @@
-# v4.2.1 (Fri Oct 28 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Fixed ColorPalettes devDependency [#298](https://github.com/Quenty/NevermoreEngine/pull/298) ([@MrAsynchronous](https://github.com/MrAsynchronous))
-- bug: Fixed ColorPalettes devDependency ([@MrAsynchronous](https://github.com/MrAsynchronous))
-
-#### Authors: 1
-
-- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.2.0...@quenty/colorpalette@4.2.1) (2022-10-28)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.1.1...@quenty/colorpalette@4.2.0) (2022-10-23)
 
