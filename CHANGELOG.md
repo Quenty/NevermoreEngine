@@ -1,3 +1,17 @@
+# (Fri Oct 28 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@7.2.0`
+  - feat: Free DataStore key after its writer GCs to allow future writers [#284](https://github.com/Quenty/NevermoreEngine/pull/284) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Oct 23 2022)
 
 :tada: This release contains work from new contributors! :tada:

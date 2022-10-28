@@ -1,3 +1,22 @@
+# v7.2.0 (Fri Oct 28 2022)
+
+#### 🚀 Enhancement
+
+- feat: Free DataStore key after its writer GCs to allow future writers [#284](https://github.com/Quenty/NevermoreEngine/pull/284) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
+- feat: Free DataStore key after its writer GCs to allow future writers ([@OttoHatt](https://github.com/OttoHatt))
+
+#### 🐛 Bug Fix
+
+- fix: Import maid ([@Quenty](https://github.com/Quenty))
+- refactor: Use maid for clarity ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
