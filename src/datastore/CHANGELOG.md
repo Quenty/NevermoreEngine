@@ -1,26 +1,23 @@
-# v7.2.0 (Fri Oct 28 2022)
-
-#### 🚀 Enhancement
-
-- feat: Free DataStore key after its writer GCs to allow future writers [#284](https://github.com/Quenty/NevermoreEngine/pull/284) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
-- feat: Free DataStore key after its writer GCs to allow future writers ([@OttoHatt](https://github.com/OttoHatt))
-
-#### 🐛 Bug Fix
-
-- fix: Import maid ([@Quenty](https://github.com/Quenty))
-- refactor: Use maid for clarity ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- [@OttoHatt](https://github.com/OttoHatt)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.1.0...@quenty/datastore@7.2.0) (2022-10-28)
+
+
+### Bug Fixes
+
+* Import maid ([638e529](https://github.com/Quenty/NevermoreEngine/commit/638e529d87b3ae4df73482e91153540f41baaf36))
+
+
+### Features
+
+* Free DataStore key after its writer GCs to allow future writers ([9b2e8a2](https://github.com/Quenty/NevermoreEngine/commit/9b2e8a29332aacb99ac47550af37708f58cd39e5))
+
+
+
+
 
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.0.0...@quenty/datastore@7.1.0) (2022-10-11)
 
