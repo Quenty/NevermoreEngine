@@ -11,8 +11,8 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><meta d
 directly to this store, overwriting all children, or you can have more partial control
 at children level. This minimizes accidently overwriting.
 The big cost here is that we may leave keys that can&#x27;t be removed."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/DataStoreStage"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStoreStage" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStoreStage" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.396b872c.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.56a3a81f.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.a3b4211a.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.02d4ad16.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.217b09d3.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -23,38 +23,40 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
   at children level. This minimizes accidently overwriting.
   The big cost here is that we may leave keys that can't be removed.
 </p>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a class="hash-link" href="#new" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L32"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>loadName<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>loadParent<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreStage">DataStoreStage?</a></code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreStage">DataStoreStage</a></code></div><div>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a class="hash-link" href="#new" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L33"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>loadName<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>loadParent<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreStage">DataStoreStage?</a></code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreStage">DataStoreStage</a></code></div><div>
 <p>
   Constructs a new DataStoreStage to load from. Prefer to use DataStore because this doesn't
   have any way to retrieve this.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="AddSavingCallback"><code style="text-decoration:none">AddSavingCallback</code><a class="hash-link" href="#AddSavingCallback" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L75"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">AddSavingCallback</code><code>(</code><div class="inset_uKQm"><div><code>callback<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="AddSavingCallback"><code style="text-decoration:none">AddSavingCallback</code><a class="hash-link" href="#AddSavingCallback" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L76"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">AddSavingCallback</code><code>(</code><div class="inset_uKQm"><div><code>callback<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>May return a promise</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call to remove</p>
 </span></span></div><div>
 <p>Adds a callback to be called before save. This may return a promise.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RemoveSavingCallback"><code style="text-decoration:none">RemoveSavingCallback</code><a class="hash-link" href="#RemoveSavingCallback" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L89"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">RemoveSavingCallback</code><code>(</code><code>callback<!-- -->: </code><code class="blue_P4bS">function</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RemoveSavingCallback"><code style="text-decoration:none">RemoveSavingCallback</code><a class="hash-link" href="#RemoveSavingCallback" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L90"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">RemoveSavingCallback</code><code>(</code><code>callback<!-- -->: </code><code class="blue_P4bS">function</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Removes a saving callback from the data store stage</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTopLevelDataStoredSignal"><code style="text-decoration:none">GetTopLevelDataStoredSignal</code><a class="hash-link" href="#GetTopLevelDataStoredSignal" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L102"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetTopLevelDataStoredSignal</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTopLevelDataStoredSignal"><code style="text-decoration:none">GetTopLevelDataStoredSignal</code><a class="hash-link" href="#GetTopLevelDataStoredSignal" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L103"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetTopLevelDataStoredSignal</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code></div><div>
 <p>Gets an event that will fire off whenever something is stored at this level</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFullPath"><code style="text-decoration:none">GetFullPath</code><a class="hash-link" href="#GetFullPath" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L116"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetFullPath</code><code>(</code><code>) → </code><code class="blue_P4bS">string</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFullPath"><code style="text-decoration:none">GetFullPath</code><a class="hash-link" href="#GetFullPath" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L117"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetFullPath</code><code>(</code><code>) → </code><code class="blue_P4bS">string</code></div><div>
 <p>Retrieves the full path of this datastore stage for diagnostic purposes.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Load"><code style="text-decoration:none">Load</code><a class="hash-link" href="#Load" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L130"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">Load</code><code>(</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>defaultValue<!-- -->: </code><code class="blue_P4bS">T?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Load"><code style="text-decoration:none">Load</code><a class="hash-link" href="#Load" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L131"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">Load</code><code>(</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>defaultValue<!-- -->: </code><code class="blue_P4bS">T?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Loads the data at the <code>name</code>.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Delete"><code style="text-decoration:none">Delete</code><a class="hash-link" href="#Delete" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L179"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">Delete</code><code>(</code><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Delete"><code style="text-decoration:none">Delete</code><a class="hash-link" href="#Delete" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L180"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">Delete</code><code>(</code><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Explicitely deletes data at the key</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Wipe"><code style="text-decoration:none">Wipe</code><a class="hash-link" href="#Wipe" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L190"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">Wipe</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Wipe"><code style="text-decoration:none">Wipe</code><a class="hash-link" href="#Wipe" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L191"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">Wipe</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Queues up a wipe of all values. Data must load before it can be wiped.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetSubStore"><code style="text-decoration:none">GetSubStore</code><a class="hash-link" href="#GetSubStore" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L220"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetSubStore</code><code>(</code><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreStage">DataStoreStage</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetSubStore"><code style="text-decoration:none">GetSubStore</code><a class="hash-link" href="#GetSubStore" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L221"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetSubStore</code><code>(</code><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreStage">DataStoreStage</a></code></div><div>
 <p>Gets a sub-datastore that will write at the given name point</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="StoreOnValueChange"><code style="text-decoration:none">StoreOnValueChange</code><a class="hash-link" href="#StoreOnValueChange" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L246"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">StoreOnValueChange</code><code>(</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>valueObj<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="StoreOnValueChange"><code style="text-decoration:none">StoreOnValueChange</code><a class="hash-link" href="#StoreOnValueChange" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L247"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">StoreOnValueChange</code><code>(</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>valueObj<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
 <p>ValueBase object to store on</p>
-</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code></div><div>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MaidTaskUtils#MaidTask">MaidTask</a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Cleanup to remove this writer and free the key.</p>
+</span></span></div><div>
 <p>Whenever the ValueObject changes, stores the resulting value in that entry.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="HasWritableData"><code style="text-decoration:none">HasWritableData</code><a class="hash-link" href="#HasWritableData" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L266"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">HasWritableData</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="HasWritableData"><code style="text-decoration:none">HasWritableData</code><a class="hash-link" href="#HasWritableData" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L273"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">HasWritableData</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>If these is data not yet written then this will return true</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetNewWriter"><code style="text-decoration:none">GetNewWriter</code><a class="hash-link" href="#GetNewWriter" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L289"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetNewWriter</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreWriter">DataStoreWriter</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetNewWriter"><code style="text-decoration:none">GetNewWriter</code><a class="hash-link" href="#GetNewWriter" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Modules/DataStoreStage.lua#L296"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreStage<!-- -->:</code><code class="green_DgR4">GetNewWriter</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreWriter">DataStoreWriter</a></code></div><div>
 <p>Constructs a writer which provides a snapshot of the current data state to write</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -81,7 +83,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 32,
+                &quot;line&quot;: 33,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -103,7 +105,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 75,
+                &quot;line&quot;: 76,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -120,7 +122,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 89,
+                &quot;line&quot;: 90,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -136,7 +138,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 102,
+                &quot;line&quot;: 103,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -152,7 +154,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 116,
+                &quot;line&quot;: 117,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -179,7 +181,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 130,
+                &quot;line&quot;: 131,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -196,7 +198,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 179,
+                &quot;line&quot;: 180,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -207,7 +209,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 190,
+                &quot;line&quot;: 191,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -229,7 +231,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 220,
+                &quot;line&quot;: 221,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -250,13 +252,13 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;returns&quot;: [
                 {
-                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;desc&quot;: &quot;Cleanup to remove this writer and free the key.&quot;,
                     &quot;lua_type&quot;: &quot;MaidTask&quot;
                 }
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 246,
+                &quot;line&quot;: 247,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -272,7 +274,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 266,
+                &quot;line&quot;: 273,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         },
@@ -288,7 +290,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 289,
+                &quot;line&quot;: 296,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
             }
         }
@@ -305,7 +307,7 @@ The big cost here is that we may leave keys that can&#x27;t be removed."><link d
         &quot;path&quot;: &quot;src/datastore/src/Server/Modules/DataStoreStage.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#AddSavingCallback" class="table-of-contents__link toc-highlight">:AddSavingCallback</a></li><li><a href="#Delete" class="table-of-contents__link toc-highlight">:Delete</a></li><li><a href="#GetFullPath" class="table-of-contents__link toc-highlight">:GetFullPath</a></li><li><a href="#GetNewWriter" class="table-of-contents__link toc-highlight">:GetNewWriter</a></li><li><a href="#GetSubStore" class="table-of-contents__link toc-highlight">:GetSubStore</a></li><li><a href="#GetTopLevelDataStoredSignal" class="table-of-contents__link toc-highlight">:GetTopLevelDataStoredSignal</a></li><li><a href="#HasWritableData" class="table-of-contents__link toc-highlight">:HasWritableData</a></li><li><a href="#Load" class="table-of-contents__link toc-highlight">:Load</a></li><li><a href="#RemoveSavingCallback" class="table-of-contents__link toc-highlight">:RemoveSavingCallback</a></li><li><a href="#StoreOnValueChange" class="table-of-contents__link toc-highlight">:StoreOnValueChange</a></li><li><a href="#Wipe" class="table-of-contents__link toc-highlight">:Wipe</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.56a3a81f.js"></script>
-<script src="/NevermoreEngine/assets/js/main.a3b4211a.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.02d4ad16.js"></script>
+<script src="/NevermoreEngine/assets/js/main.217b09d3.js"></script>
 </body>
 </html>
