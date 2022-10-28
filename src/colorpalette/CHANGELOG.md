@@ -1,3 +1,20 @@
+# v4.2.1 (Fri Oct 28 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous)), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Fixed ColorPalettes devDependency [#298](https://github.com/Quenty/NevermoreEngine/pull/298) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+- bug: Fixed ColorPalettes devDependency ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

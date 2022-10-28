@@ -1,5 +1,22 @@
 # (Fri Oct 28 2022)
 
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/colorpalette@4.2.1`
+  - fix: Fixed ColorPalettes devDependency [#298](https://github.com/Quenty/NevermoreEngine/pull/298) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
+# (Fri Oct 28 2022)
+
 #### 🚀 Enhancement
 
 - `@quenty/datastore@7.2.0`
