@@ -164,11 +164,26 @@ function ServiceBag:Start()
 				service:Start()
 			end)
 
-			assert(coroutine.status(current) == "dead", "Starting service yielded")
+			local isDead = coroutine.status(current) == "dead"
+			if not isDead then
+				error(("Starting service %q yielded"):format(self:_getServiceName(serviceType)))
+			end
 		end
 	end
 
 	self._serviceTypesToStart = nil
+end
+
+function ServiceBag:_getServiceName(serviceType)
+	local serviceName
+	pcall(function()
+		serviceName = serviceType.ServiceName
+	end)
+	if serviceName then
+		return serviceName
+	end
+
+	return tostring(serviceType)
 end
 
 --[=[
@@ -202,7 +217,7 @@ end
 -- Adds a service to this provider only
 function ServiceBag:_addServiceType(serviceType)
 	if not self._serviceTypesToInitializeSet then
-		error(("Already finished initializing, cannot add %q"):format(tostring(serviceType)))
+		error(("Already finished initializing, cannot add %q"):format(self:_getServiceName(serviceType)))
 		return
 	end
 
@@ -244,7 +259,10 @@ function ServiceBag:_initService(serviceType)
 			service:Init(self)
 		end)
 
-		assert(coroutine.status(current) == "dead", "Initializing service yielded")
+		local isDead = coroutine.status(current) == "dead"
+		if not isDead then
+			error(("Initializing service %q yielded"):format(self:_getServiceName(serviceType)))
+		end
 	end
 
 	table.insert(self._serviceTypesToStart, serviceType)

@@ -106,8 +106,11 @@ function CmdrServiceClient:_setBindings(cmdr)
 		end
 	end))
 
-	-- Default blink for debugging purposes
-	cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
+	-- Race condition
+	task.defer(function()
+		-- Default blink for debugging purposes
+		cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
+	end)
 end
 
 --[=[
@@ -131,6 +134,10 @@ function CmdrServiceClient:PromiseCmdr()
 	self._maid:GiveTask(self._cmdrPromise)
 
 	return self._cmdrPromise
+end
+
+function CmdrServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return CmdrServiceClient
