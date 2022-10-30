@@ -1,20 +1,18 @@
-# v6.1.0 (Sun Oct 30 2022)
-
-#### 🚀 Enhancement
-
-- Add some fixes and thumbnail packages [#299](https://github.com/Quenty/NevermoreEngine/pull/299) ([@Quenty](https://github.com/Quenty))
-- feat: Add better errors to ServiceBag ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.0.0...@quenty/servicebag@6.1.0) (2022-10-30)
+
+
+### Features
+
+* Add better errors to ServiceBag ([387dd9a](https://github.com/Quenty/NevermoreEngine/commit/387dd9ac9d669094628598f05ee7a5d2f91d66c3))
+
+
+
+
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@5.2.0...@quenty/servicebag@6.0.0) (2022-09-27)
 

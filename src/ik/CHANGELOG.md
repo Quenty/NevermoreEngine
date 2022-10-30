@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.2.0...@quenty/ik@9.3.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
 # [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.1.1...@quenty/ik@9.2.0) (2022-10-23)
 
 **Note:** Version bump only for package @quenty/ik
