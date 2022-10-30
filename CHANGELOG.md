@@ -1,3 +1,16 @@
+# (Sun Oct 30 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/cmdrservice@7.3.0`, `@quenty/rbxthumb@1.1.0`, `@quenty/servicebag@6.1.0`
+  - Add some fixes and thumbnail packages [#299](https://github.com/Quenty/NevermoreEngine/pull/299) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Oct 28 2022)
 
 :tada: This release contains work from a new contributor! :tada:
