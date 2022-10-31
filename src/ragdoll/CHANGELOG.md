@@ -1,20 +1,18 @@
-# v9.4.0 (Mon Oct 31 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add Ragdoll customization [#300](https://github.com/Quenty/NevermoreEngine/pull/300) ([@Quenty](https://github.com/Quenty))
-- feat: Add Ragdoll customization ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.3.0...@quenty/ragdoll@9.4.0) (2022-10-31)
+
+
+### Features
+
+* Add Ragdoll customization ([bb72960](https://github.com/Quenty/NevermoreEngine/commit/bb729603fb725483b1f8e03aeb0914afca802c87))
+
+
+
+
 
 # [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.2.0...@quenty/ragdoll@9.3.0) (2022-10-30)
 
