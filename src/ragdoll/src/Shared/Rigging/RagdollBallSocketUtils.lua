@@ -318,6 +318,22 @@ function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
 
 				-- Easier debugging
 				AttributeUtils.initAttribute(state.motor, RagdollConstants.FRICTION_TORQUE_ATTRIBUTE, default)
+				AttributeUtils.initAttribute(state.motor, RagdollConstants.UPPER_ANGLE_ATTRIBUTE, limits.UpperAngle)
+				AttributeUtils.initAttribute(state.motor, RagdollConstants.TWIST_LOWER_ANGLE_ATTRIBUTE, limits.TwistLowerAngle)
+				AttributeUtils.initAttribute(state.motor, RagdollConstants.TWIST_UPPER_ANGLE_ATTRIBUTE, limits.TwistUpperAngle)
+
+				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.UPPER_ANGLE_ATTRIBUTE, limits.UpperAngle)
+					:Subscribe(function(value)
+						ballSocket.UpperAngle = value
+					end))
+				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.TWIST_LOWER_ANGLE_ATTRIBUTE, limits.TwistLowerAngle)
+					:Subscribe(function(value)
+						ballSocket.TwistLowerAngle = value
+					end))
+				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.TWIST_UPPER_ANGLE_ATTRIBUTE, limits.TwistUpperAngle)
+					:Subscribe(function(value)
+						ballSocket.TwistUpperAngle = value
+					end))
 
 				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.FRICTION_TORQUE_ATTRIBUTE, default)
 					:Subscribe(function(torque)
