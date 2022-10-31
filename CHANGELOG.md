@@ -1,3 +1,16 @@
+# (Mon Oct 31 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/ragdoll@9.4.0`
+  - feat: Add Ragdoll customization [#300](https://github.com/Quenty/NevermoreEngine/pull/300) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Oct 30 2022)
 
 #### 🚀 Enhancement
