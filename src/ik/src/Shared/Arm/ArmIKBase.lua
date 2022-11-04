@@ -7,22 +7,22 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
+local ArmIKUtils = require("ArmIKUtils")
 local BaseObject = require("BaseObject")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
-local LimbIKUtils = require("LimbIKUtils")
+local LimbIKUtils = require.optional(require, "LimbIKUtils")
 local Maid = require("Maid")
 local Math = require("Math")
-local QFrame = require("QFrame")
-local RxR15Utils = require("RxR15Utils")
-local RxInstanceUtils = require("RxInstanceUtils")
-local RxBrioUtils = require("RxBrioUtils")
-local Rx = require("Rx")
-local ArmIKUtils = require("ArmIKUtils")
-local Motor6DStackInterface = require("Motor6DStackInterface")
 local Motor6DSmoothTransformer = require("Motor6DSmoothTransformer")
+local Motor6DStackInterface = require("Motor6DStackInterface")
+local QFrame = require("QFrame")
+local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
+local RxR15Utils = require("RxR15Utils")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
-local USE_OLD_IK_SYSTEM = false
+local USE_OLD_IK_SYSTEM = (not LimbIKUtils) or false
 local USE_MOTOR_6D_RAW = true
 
 local ArmIKBase = setmetatable({}, BaseObject)
