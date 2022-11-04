@@ -1,5 +1,18 @@
 # (Fri Nov 04 2022)
 
+#### 🐛 Bug Fix
+
+- `@quenty/blend@6.3.1`, `@quenty/loader@6.0.1`
+  - fix: Fix hoarcekat loading scenarios [#302](https://github.com/Quenty/NevermoreEngine/pull/302) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 04 2022)
+
 #### 🚀 Enhancement
 
 - `@quenty/avatareditorutils@1.1.0`, `@quenty/blend@6.3.0`, `@quenty/highlight@2.3.0`, `@quenty/ik@9.5.0`, `@quenty/playerutils@2.2.0`

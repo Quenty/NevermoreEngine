@@ -1,3 +1,16 @@
+# v6.3.1 (Fri Nov 04 2022)
+
+#### 🐛 Bug Fix
+
+- fix: Fix hoarcekat loading scenarios [#302](https://github.com/Quenty/NevermoreEngine/pull/302) ([@Quenty](https://github.com/Quenty))
+- test: Fix blend name in blend test ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
