@@ -235,7 +235,7 @@ function SpringObject:_getSpringForType(converted)
 		return self._currentSpring
 	else
 		local currentType = typeof(SpringUtils.fromLinearIfNeeded(self._currentSpring.Value))
-		if currentType == typeof(converted) then
+		if currentType == typeof(SpringUtils.fromLinearIfNeeded(converted)) then
 			return self._currentSpring
 		else
 			local oldDamper = self._currentSpring.d
