@@ -155,12 +155,28 @@ function StaticLegacyLoader:_findPackageRoot(instance)
 	while current and current ~= game do
 		if LoaderUtils.isPackage(current) then
 			return current
+		elseif self:_couldBePackageRootTopLevel(current) then
+			return current
 		else
 			current = current.Parent
 		end
 	end
 
 	return nil
+end
+
+function StaticLegacyLoader:_couldBePackageRootTopLevel(current)
+	for _, instance in pairs(current:GetChildren()) do
+		if instance:IsA("Folder") and instance.Name:sub(1, 1) == "@" then
+			for _, item in pairs(instance:GetChildren()) do
+				if LoaderUtils.isPackage(item) then
+					return true
+				end
+			end
+		end
+	end
+
+	return true
 end
 
 function StaticLegacyLoader:_ensureFakeLoader(module)
