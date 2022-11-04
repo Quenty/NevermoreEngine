@@ -202,6 +202,20 @@ function AnimatedHighlightGroup:_getOrCreateHighlight(adornee)
 	return highlight
 end
 
+function AnimatedHighlightGroup:HighlightWithTransferredProperties(fromAdornee, toAdornee)
+	assert(typeof(fromAdornee) == "Instance", "Bad fromAdornee")
+	assert(typeof(toAdornee) == "Instance", "Bad toAdornee")
+
+	local source = self._highlights[fromAdornee]
+	if not source then
+		return self:Highlight(toAdornee)
+	end
+
+	local target = self:Highlight(toAdornee)
+	target:SetPropertiesFrom(source)
+	return target
+end
+
 function AnimatedHighlightGroup:_removeHighlight(highlight)
 	self._maid[highlight] = nil
 end

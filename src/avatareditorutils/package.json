@@ -1,0 +1,37 @@
+{
+  "name": "@quenty/avatareditorutils",
+  "version": "1.0.0",
+  "description": "Provides utility functions to work with the Roblox AvatarEditorService",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "AvatarEditorService"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/avatareditorutils/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/brio": "file:../brio",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx",
+    "@quenty/symbol": "file:../symbol"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
