@@ -1,20 +1,18 @@
-# v2.2.0 (Fri Nov 04 2022)
-
-#### 🚀 Enhancement
-
-- fix: A variety of fixes [#301](https://github.com/Quenty/NevermoreEngine/pull/301) ([@Quenty](https://github.com/Quenty))
-- feat: Add PlayerUtils.formatDisplayName(name, displayName) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.1.0...@quenty/playerutils@2.2.0) (2022-11-04)
+
+
+### Features
+
+* Add PlayerUtils.formatDisplayName(name, displayName) ([a27c3e9](https://github.com/Quenty/NevermoreEngine/commit/a27c3e9dae1f6a0ea7e18b6bbda78098fe504916))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.0.0...@quenty/playerutils@2.1.0) (2022-10-16)
 

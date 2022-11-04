@@ -1,23 +1,18 @@
-# v6.3.0 (Fri Nov 04 2022)
-
-#### 🚀 Enhancement
-
-- fix: A variety of fixes [#301](https://github.com/Quenty/NevermoreEngine/pull/301) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix setting velocity resetting position in blend spring object ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.2.0...@quenty/blend@6.3.0) (2022-11-04)
+
+
+### Bug Fixes
+
+* Fix setting velocity resetting position in blend spring object ([8285795](https://github.com/Quenty/NevermoreEngine/commit/8285795fb5c10305ffa7e5e5f11d6ad780d227bc))
+
+
+
+
 
 # [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.1.1...@quenty/blend@6.2.0) (2022-10-23)
 
