@@ -1,3 +1,16 @@
+# (Fri Nov 04 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/avatareditorutils@1.1.0`, `@quenty/blend@6.3.0`, `@quenty/highlight@2.3.0`, `@quenty/ik@9.5.0`, `@quenty/playerutils@2.2.0`
+  - fix: A variety of fixes [#301](https://github.com/Quenty/NevermoreEngine/pull/301) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Oct 31 2022)
 
 #### 🚀 Enhancement

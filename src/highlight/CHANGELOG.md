@@ -1,3 +1,17 @@
+# v2.3.0 (Fri Nov 04 2022)
+
+#### 🚀 Enhancement
+
+- fix: A variety of fixes [#301](https://github.com/Quenty/NevermoreEngine/pull/301) ([@Quenty](https://github.com/Quenty))
+- feat: Add AnimatedHighlightGroup:HighlightWithTransferredProperties(fromAdornee, toAdornee) ([@Quenty](https://github.com/Quenty))
+- feat: Add ability to clone properties from a source highlight ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

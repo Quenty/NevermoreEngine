@@ -1,3 +1,16 @@
+# v2.2.0 (Fri Nov 04 2022)
+
+#### 🚀 Enhancement
+
+- fix: A variety of fixes [#301](https://github.com/Quenty/NevermoreEngine/pull/301) ([@Quenty](https://github.com/Quenty))
+- feat: Add PlayerUtils.formatDisplayName(name, displayName) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
