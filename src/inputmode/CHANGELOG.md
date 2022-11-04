@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.2.0...@quenty/inputmode@7.2.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.1.0...@quenty/inputmode@7.2.0) (2022-10-30)
 
 **Note:** Version bump only for package @quenty/inputmode

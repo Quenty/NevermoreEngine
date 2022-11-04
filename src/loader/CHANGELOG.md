@@ -1,20 +1,18 @@
-# v6.0.1 (Fri Nov 04 2022)
-
-#### 🐛 Bug Fix
-
-- fix: Fix hoarcekat loading scenarios [#302](https://github.com/Quenty/NevermoreEngine/pull/302) ([@Quenty](https://github.com/Quenty))
-- fix: Fix hoarcekat stories not loading correctly when installed in a flat version of the repository (for example, via normal npm install @quenty/blend) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.0.0...@quenty/loader@6.0.1) (2022-11-04)
+
+
+### Bug Fixes
+
+* Fix hoarcekat stories not loading correctly when installed in a flat version of the repository (for example, via normal npm install @quenty/blend) ([02772ca](https://github.com/Quenty/NevermoreEngine/commit/02772caf01fd5c055edf64c7f26b2c06b379e9e3))
+
+
+
+
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@5.0.1...@quenty/loader@6.0.0) (2022-09-27)
 

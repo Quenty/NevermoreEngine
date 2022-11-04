@@ -1,6 +1,6 @@
 {
   "name": "@quenty/depthoffield",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "Depth of field service to allow multiple systems to write depth of field",
   "keywords": [
     "Roblox",
