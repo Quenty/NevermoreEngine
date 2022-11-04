@@ -58,6 +58,11 @@ function AnimatedHighlight.new()
 	return self
 end
 
+function AnimatedHighlight.isAnimatedHighlight(value)
+	return type(value) == "table" and
+		getmetatable(value) == AnimatedHighlight
+end
+
 --[=[
 	Sets the depth mode. Either can be:
 
@@ -70,6 +75,27 @@ function AnimatedHighlight:SetHighlightDepthMode(depthMode)
 	assert(EnumUtils.isOfType(Enum.HighlightDepthMode, depthMode))
 
 	self._highlightDepthMode.Value = depthMode
+end
+
+function AnimatedHighlight:SetPropertiesFrom(sourceHighlight)
+	assert(AnimatedHighlight.isAnimatedHighlight(sourceHighlight), "Bad AnimatedHighlight")
+
+	self._highlightDepthMode.Value = sourceHighlight._highlightDepthMode.Value
+	self._fillColor.Value = sourceHighlight._fillColor.Value
+	self._outlineColor.Value = sourceHighlight._outlineColor.Value
+
+	-- well, this can't be very fast...
+	local function transferSpringValue(target, source)
+		target.Speed = source.Speed
+		target.Damper = source.Damper
+		target.Target = source.Target
+		target.Position = source.Position
+		target.Velocity = source.Velocity
+	end
+
+	transferSpringValue(self._fillTransparencySpring, sourceHighlight._fillTransparencySpring)
+	transferSpringValue(self._outlineTransparencySpring, sourceHighlight._outlineTransparencySpring)
+	transferSpringValue(self._percentVisible, sourceHighlight._percentVisible)
 end
 
 function AnimatedHighlight:SetTransparencySpeed(speed)
