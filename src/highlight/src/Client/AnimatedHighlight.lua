@@ -5,7 +5,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
-local BasicPaneUtils = require("BasicPaneUtils")
 local Blend = require("Blend")
 local SpringObject = require("SpringObject")
 local Math = require("Math")
@@ -42,8 +41,16 @@ function AnimatedHighlight.new()
 	self._outlineTransparencySpring = SpringObject.new(0, 40)
 	self._maid:GiveTask(self._outlineTransparencySpring)
 
-	self._percentVisible = SpringObject.new(BasicPaneUtils.observePercentVisible(self), 20)
+	self._percentVisible = SpringObject.new(0, 20)
 	self._maid:GiveTask(self._percentVisible)
+
+	self._maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
+		self._percentVisible.t = isVisible and 1 or 0
+		if doNotAnimate then
+			self._percentVisible.p = self._percentVisible.t
+			self._percentVisible.v = 0
+		end
+	end))
 
 	self.Destroying = Signal.new()
 	self._maid:GiveTask(function()
@@ -93,6 +100,9 @@ function AnimatedHighlight:SetPropertiesFrom(sourceHighlight)
 		target.Velocity = source.Velocity
 	end
 
+	-- Transfer state before we set spring values
+	self:SetVisible(sourceHighlight:IsVisible(), true)
+
 	transferSpringValue(self._fillTransparencySpring, sourceHighlight._fillTransparencySpring)
 	transferSpringValue(self._outlineTransparencySpring, sourceHighlight._outlineTransparencySpring)
 	transferSpringValue(self._percentVisible, sourceHighlight._percentVisible)
@@ -114,18 +124,11 @@ end
 function AnimatedHighlight:Finish(doNotAnimate, callback)
 	if self._percentVisible.p == 0 and self._percentVisible.v == 0 then
 		callback()
-
 		return
 	end
 
 	local maid = Maid.new()
 	local done = false
-	maid:GiveTask(self._percentVisible:ObserveRenderStepped():Subscribe(function(position)
-		if position == 0 then
-			done = true
-			callback()
-		end
-	end))
 
 	self:Hide(doNotAnimate)
 
@@ -134,11 +137,18 @@ function AnimatedHighlight:Finish(doNotAnimate, callback)
 	end)
 	self._maid[maid] = maid
 
+	maid:GiveTask(self._percentVisible:ObserveRenderStepped():Subscribe(function(position)
+		if position == 0 and not done then
+			done = true
+			callback()
+		end
+	end))
+
 	if not done then
 		maid:GiveTask(self.VisibleChanged:Connect(function(isVisible)
 			if isVisible then
 				-- cancel
-				self._maid[maid]:DoCleaning()
+				self._maid[maid] = nil
 			end
 		end))
 	end
