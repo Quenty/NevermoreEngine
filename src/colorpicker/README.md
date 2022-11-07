@@ -11,7 +11,7 @@
   </a>
 </div>
 
-Color selector UI
+A HSV color picker component made with Blend.
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/HSColorPicker">View docs →</a></div>
 
