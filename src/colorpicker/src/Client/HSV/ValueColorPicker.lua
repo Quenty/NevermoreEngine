@@ -1,4 +1,5 @@
 --[=[
+	Picker for value in HSV. See [HSVColorPicker]
 	@class ValueColorPicker
 ]=]
 
