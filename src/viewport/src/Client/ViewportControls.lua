@@ -1,4 +1,5 @@
 --[=[
+	Controls for [Viewport]
 	@class ViewportControls
 ]=]
 
@@ -14,6 +15,12 @@ local ViewportControls = setmetatable({}, BaseObject)
 ViewportControls.ClassName = "ViewportControls"
 ViewportControls.__index = ViewportControls
 
+--[=[
+    Create the controls for dragging.
+    @param viewport Instance
+    @param viewportModel Viewport
+    @return BaseObject
+]=]
 function ViewportControls.new(viewport, viewportModel)
 	local self = setmetatable(BaseObject.new(viewport), ViewportControls)
 
