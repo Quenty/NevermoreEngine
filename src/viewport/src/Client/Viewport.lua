@@ -38,8 +38,8 @@ Viewport.ClassName = "Viewport"
 Viewport.__index = Viewport
 
 --[=[
-    Creates a Viewport.
-    @return BasicPane
+	Creates a Viewport.
+	@return BasicPane
 ]=]
 function Viewport.new()
 	local self = setmetatable(BasicPane.new(), Viewport)
@@ -71,9 +71,9 @@ function Viewport.new()
 end
 
 --[=[
-    Creates a Viewport and render it to Blend.
-    @param props { string } --Assigned to the ViewportFrame or aassign to the camera (FieldOfView, Instance, Transparency). 
-    @return Observable<Instance>
+	Creates a Viewport and render it to Blend.
+	@param props { string } --Assigned to the ViewportFrame or aassign to the camera (FieldOfView, Instance, Transparency). 
+	@return Observable<Instance>
 ]=]
 function Viewport.blend(props)
 	assert(type(props) == "table", "Bad props")
@@ -126,8 +126,8 @@ function Viewport:SetFieldOfView(fieldOfView)
 end
 
 --[=[
-    Set the targetted instance.
-    @param instance Instance
+ 	Set the targetted instance.
+	@param instance Instance
 ]=]
 function Viewport:SetInstance(instance)
 	assert(typeof(instance) == "Instance" or instance == nil, "Bad instance")
