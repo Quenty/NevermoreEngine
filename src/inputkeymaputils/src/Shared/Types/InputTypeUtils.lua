@@ -4,7 +4,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
+local Set = require("Set")
 
 local InputTypeUtils = {}
 
@@ -82,6 +85,35 @@ function InputTypeUtils.getUniqueKeyForInputType(inputType)
 	else
 		return inputType
 	end
+end
+
+local function convertValuesToJSONIfNeeded(list)
+	local result = {}
+	for key, value in pairs(list) do
+		if type(value) == "table" then
+			result[key] = HttpService:JSONEncode(value)
+		else
+			result[key] = value
+		end
+	end
+	return result
+end
+
+--[=[
+	Expensive comparison check to see if InputTypes are the same or not.
+
+	@param a { InputType }
+	@param b { InputType }
+	@return boolean
+]=]
+function InputTypeUtils.areInputTypesListsEquivalent(a, b)
+	-- allocate, hehe
+	local setA = Set.fromTableValue(convertValuesToJSONIfNeeded(a))
+	local setB = Set.fromTableValue(convertValuesToJSONIfNeeded(b))
+
+	local remaining = Set.difference(setA, setB)
+	local left = Set.toList(remaining)
+	return #left == 0
 end
 
 return InputTypeUtils
