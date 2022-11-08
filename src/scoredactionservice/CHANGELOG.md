@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.4.1...@quenty/scoredactionservice@9.5.0) (2022-11-08)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
 ## [9.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.4.0...@quenty/scoredactionservice@9.4.1) (2022-11-04)
 
 **Note:** Version bump only for package @quenty/scoredactionservice

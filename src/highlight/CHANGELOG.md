@@ -1,23 +1,18 @@
-# v2.4.0 (Tue Nov 08 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/visibility fix [#303](https://github.com/Quenty/NevermoreEngine/pull/303) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix visiblity not transferring from animated highlight (and more specifically, the event binding between visibility and the spring) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@2.3.1...@quenty/highlight@2.4.0) (2022-11-08)
+
+
+### Bug Fixes
+
+* Fix visiblity not transferring from animated highlight (and more specifically, the event binding between visibility and the spring) ([692d4ec](https://github.com/Quenty/NevermoreEngine/commit/692d4ec5beabe1d518775102c82bf0ecabc34cda))
+
+
+
+
 
 ## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@2.3.0...@quenty/highlight@2.3.1) (2022-11-04)
 

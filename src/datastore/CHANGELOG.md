@@ -1,23 +1,15 @@
-# v7.3.0 (Tue Nov 08 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/visibility fix [#303](https://github.com/Quenty/NevermoreEngine/pull/303) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Clarify datastore reuse ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.2.1...@quenty/datastore@7.3.0) (2022-11-08)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
 
 ## [7.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.2.0...@quenty/datastore@7.2.1) (2022-11-04)
 

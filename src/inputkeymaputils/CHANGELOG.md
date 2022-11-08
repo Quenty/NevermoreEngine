@@ -1,24 +1,18 @@
-# v7.5.0 (Tue Nov 08 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/visibility fix [#303](https://github.com/Quenty/NevermoreEngine/pull/303) ([@Quenty](https://github.com/Quenty))
-- feat: Add InputChordUtils ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Move InputTypeUtils.areInputTypesListsEquivalent and add additional documentation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.4.1...@quenty/inputkeymaputils@7.5.0) (2022-11-08)
+
+
+### Features
+
+* Add InputChordUtils ([4418e7b](https://github.com/Quenty/NevermoreEngine/commit/4418e7b5542429708ed4559d3b5e0f83dc4a5c5a))
+
+
+
+
 
 ## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.4.0...@quenty/inputkeymaputils@7.4.1) (2022-11-04)
 

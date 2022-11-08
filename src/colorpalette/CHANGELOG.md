@@ -1,23 +1,15 @@
-# v4.4.0 (Tue Nov 08 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Antcar ([@antcar0929](https://github.com/antcar0929)), for all your work!
-
-#### 🐛 Bug Fix
-
-- docs: Document a variety of packages [#304](https://github.com/Quenty/NevermoreEngine/pull/304) ([@antcar0929](https://github.com/antcar0929))
-
-#### Authors: 1
-
-- Antcar ([@antcar0929](https://github.com/antcar0929))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.3.1...@quenty/colorpalette@4.4.0) (2022-11-08)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
 
 ## [4.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.3.0...@quenty/colorpalette@4.3.1) (2022-11-04)
 
