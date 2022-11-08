@@ -1,3 +1,25 @@
+# v3.6.0 (Tue Nov 08 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Antcar ([@antcar0929](https://github.com/antcar0929)), for all your work!
+
+#### 🚀 Enhancement
+
+- Users/quenty/visibility fix [#303](https://github.com/Quenty/NevermoreEngine/pull/303) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Add more information to SoftShutdown docs ([@Quenty](https://github.com/Quenty))
+- docs: Document a variety of packages [#304](https://github.com/Quenty/NevermoreEngine/pull/304) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 2
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

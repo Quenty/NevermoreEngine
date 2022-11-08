@@ -1,3 +1,26 @@
+# (Tue Nov 08 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Antcar ([@antcar0929](https://github.com/antcar0929)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpicker@4.4.0`, `@quenty/datastore@7.3.0`, `@quenty/highlight@2.4.0`, `@quenty/inputkeymaputils@7.5.0`, `@quenty/softshutdown@3.6.0`, `@quenty/undostack@1.1.0`, `@quenty/viewport@5.5.0`
+  - Users/quenty/visibility fix [#303](https://github.com/Quenty/NevermoreEngine/pull/303) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/colorpalette@4.4.0`, `@quenty/colorpicker@4.4.0`, `@quenty/softshutdown@3.6.0`, `@quenty/viewport@5.5.0`
+  - docs: Document a variety of packages [#304](https://github.com/Quenty/NevermoreEngine/pull/304) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 2
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Nov 04 2022)
 
 #### 🐛 Bug Fix
