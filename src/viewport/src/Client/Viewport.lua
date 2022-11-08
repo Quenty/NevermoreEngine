@@ -126,7 +126,7 @@ function Viewport:SetFieldOfView(fieldOfView)
 end
 
 --[=[
- 	Set the targetted instance.
+	Set the targetted instance.
 	@param instance Instance
 ]=]
 function Viewport:SetInstance(instance)
