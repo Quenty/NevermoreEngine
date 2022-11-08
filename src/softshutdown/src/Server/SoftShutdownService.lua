@@ -32,8 +32,14 @@ local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
 
 --[=[
-    Initialize the service.
-    @param serviceBag ServiceBag 
+	Initialize the service. Should be done via [ServiceBag].
+
+	:::warning
+	Initializing this service effectively initializes side effects, which is, to initialize
+	the soft shutdown behavior.
+	:::
+
+	@param serviceBag ServiceBag
 ]=]
 function SoftShutdownService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
