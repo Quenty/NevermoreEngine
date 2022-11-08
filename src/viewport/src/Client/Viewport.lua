@@ -1,13 +1,15 @@
 --[=[
-	Creates a ViewportFrame with size fitting and drag controls.
+	Creates a ViewportFrame with size fitting and drag controls. This means that the
+	viewport will center the camera around the given instance, and allow the user
+	to control the camera itself.
 
 	```lua
-		local viewport = Viewport.new()
-		viewport:SetInstance(instance)
+	local viewport = Viewport.new()
+	viewport:SetInstance(instance)
 
-		maid:GiveTask(viewport:Render({
-			Parent = target;
-		}):Subscribe())
+	maid:GiveTask(viewport:Render({
+		Parent = target;
+	}):Subscribe())
 	```
 
 	@class Viewport
@@ -38,8 +40,10 @@ Viewport.ClassName = "Viewport"
 Viewport.__index = Viewport
 
 --[=[
-    Creates a Viewport.
-    @return BasicPane
+	Constructs a new viewport. Unlike a normal [BasicPane] this will not render anything
+	immediately. See [Viewport.Render] for details.
+
+	@return Viewport
 ]=]
 function Viewport.new()
 	local self = setmetatable(BasicPane.new(), Viewport)
@@ -71,12 +75,27 @@ function Viewport.new()
 end
 
 --[=[
-    Creates a Viewport and render it to Blend.
-    @param props { string } --Assigned to the ViewportFrame or aassign to the camera (FieldOfView, Instance, Transparency). 
-    @return Observable<Instance>
+	Creates a Viewport and render it to Blend. The following properties are supported
+
+	* Ambient - Color3
+	* AnchorPoint - Vector2
+	* FieldOfView - number
+	* Instance - Instance
+	* LayoutOrder - number
+	* LightColor - Color3
+	* Parent - Instance
+	* Position - UDim2
+	* Size - Vector3
+	* Transparency - number
+
+	Properties may be anything Blend would take as computable. See [Blend] for details.
+
+	@param props { string }
+	@return Observable<Instance>
 ]=]
 function Viewport.blend(props)
 	assert(type(props) == "table", "Bad props")
+
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -113,12 +132,23 @@ function Viewport.blend(props)
 	end)
 end
 
+
+--[=[
+	Sets the field of view on the viewport.
+
+	@param transparency number
+]=]
 function Viewport:SetTransparency(transparency)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
 end
 
+--[=[
+	Sets the field of view on the viewport.
+
+	@param fieldOfView number
+]=]
 function Viewport:SetFieldOfView(fieldOfView)
 	assert(type(fieldOfView) == "number", "Bad fieldOfView")
 
@@ -126,8 +156,16 @@ function Viewport:SetFieldOfView(fieldOfView)
 end
 
 --[=[
-    Set the targetted instance.
-    @param instance Instance
+	Set the instance to be rendered. The instance will be reparented
+	to the viewport.
+
+	:::warning
+	The instance you set here will NOT be destroyed by the viewport. This lets the
+	performance be optimized or the instance used in good transitions. However,
+	be sure to destroy it if you need to.
+	:::
+
+	@param instance Instance?
 ]=]
 function Viewport:SetInstance(instance)
 	assert(typeof(instance) == "Instance" or instance == nil, "Bad instance")
@@ -135,6 +173,10 @@ function Viewport:SetInstance(instance)
 	self._current.Value = instance
 end
 
+--[=[
+	Notifies the viewport of the instance size changing. We don't connect to
+	any events here because the instance can be anything.
+]=]
 function Viewport:NotifyInstanceSizeChanged()
 	self._notifyInstanceSizeChanged:Fire()
 end
@@ -155,6 +197,26 @@ function Viewport:RotateBy(deltaV2, doNotAnimate)
 	end
 end
 
+--[=[
+	Renders the viewport. Allows the following properties.
+
+	* Ambient - Color3
+	* AnchorPoint - Vector2
+	* LayoutOrder - number
+	* LightColor - Color3
+	* Parent - Instance
+	* Position - UDim2
+	* Size - Vector3
+	* Transparency - number
+
+	:::warning
+	This should only be called once per a Viewport instance, since the Instance property is
+	not duplicated.
+	:::
+
+	@param props { any }
+	@return Observable<ViewportFrame>
+]=]
 function Viewport:Render(props)
 	local currentCamera = ValueObject.new()
 	self._maid:GiveTask(currentCamera)
