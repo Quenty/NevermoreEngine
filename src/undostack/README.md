@@ -1,4 +1,4 @@
-## ColorPicker
+## UndoStack
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
@@ -11,11 +11,11 @@
   </a>
 </div>
 
-A HSV color picker which allows you to select colors in the same way as Roblox Studio.
+Undo stack functionality for editing stuff
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/HSVColorPicker">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/undostack">View docs →</a></div>
 
 ## Installation
 ```
-npm install @quenty/colorpicker --save
+npm install @quenty/undostack --save
 ```

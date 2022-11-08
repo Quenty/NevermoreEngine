@@ -1,5 +1,7 @@
 --[=[
-	A HSV color picker component made with Blend.
+	A HSV color picker component which can be used to select colors using
+	an interface standard to Roblox Studio.
+
 	@class HSVColorPicker
 ]=]
 
@@ -16,14 +18,15 @@ HSVColorPicker.ClassName = "HSVColorPicker"
 HSVColorPicker.__index = HSVColorPicker
 
 --[=[
-    Creates a color picker.
-    ```lua
-	local picker = HSVColorPicker.new()
-	picker.Gui.Parent = path.to.Parent
-	picker:SetColor(Color3.new(0.5, 0.5, 0.5))
-    ```
+	Creates a new color picker!
 
-    @return BaseObject
+	```lua
+	local picker = HSVColorPicker.new()
+	picker:SetColor(Color3.new(0.5, 0.5, 0.5))
+	picker.Gui.Parent = screenGui
+	```
+
+	@return HSVColorPicker
 ]=]
 function HSVColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSVColorPicker)
@@ -89,6 +92,12 @@ function HSVColorPicker.new()
 	return self
 end
 
+--[=[
+	Sets the height of the HSVColorPicker. This impacts the [GetSizeValue] return
+	size. This is a general interface to size things.
+
+	@param height number
+]=]
 function HSVColorPicker:SetSize(height)
 	assert(type(height) == "number", "Bad height")
 
@@ -96,6 +105,12 @@ function HSVColorPicker:SetSize(height)
 	self._valuePicker:SetSize(height)
 end
 
+--[=[
+	Syncs the color picker with the Color3Value.
+
+	@param color3Value Color3Value
+	@return maid
+]=]
 function HSVColorPicker:SyncValue(color3Value)
 	local maid = Maid.new()
 
@@ -119,14 +134,20 @@ function HSVColorPicker:SyncValue(color3Value)
 	return maid
 end
 
+--[=[
+	Hints what the background color of the HSVColorPicker. This impacts
+	some UI elements to ensure proper contrast.
+
+	@param color Color3
+]=]
 function HSVColorPicker:HintBackgroundColor(color)
 	self._valuePicker:HintBackgroundColor(color)
 end
 
 --[=[
-    Set the picker's current color3 value in HSV formet.
+	Set the current color in HSV formet.
 
-    @param color Vector3
+	@param hsvColor Vector3
 ]=]
 function HSVColorPicker:SetHSVColor(hsvColor)
 	assert(typeof(hsvColor) == "Vector3", "Bad hsvColor")
@@ -135,18 +156,18 @@ function HSVColorPicker:SetHSVColor(hsvColor)
 end
 
 --[=[
-    Get the picker's current color3 value in HSV formet.
+	Get the current color in HSV formet as a Vector3.
 
-    @return color Vector3
+	@return Vector3
 ]=]
 function HSVColorPicker:GetHSVColor()
 	return self._hsvColorValue.Value
 end
 
 --[=[
-    Set the picker's current color3 value.
+	Set the current color.
 
-    @param color Color3
+	@param color Color3
 ]=]
 function HSVColorPicker:SetColor(color)
 	local h, s, v = Color3.toHSV(color)
@@ -154,9 +175,9 @@ function HSVColorPicker:SetColor(color)
 end
 
 --[=[
-    Get the picker's current color3 value.
+	Get the current color.
 
-    @return color Color3
+	@return Color3
 ]=]
 function HSVColorPicker:GetColor()
 	local current = self._hsvColorValue.Value
@@ -164,10 +185,19 @@ function HSVColorPicker:GetColor()
 	return Color3.fromHSV(h, s, v)
 end
 
+--[=[
+	A size value that defines the aspect ratio and size of this picker. See [SetSize]
+	@return Vector3
+]=]
 function HSVColorPicker:GetSizeValue()
 	return self._sizeValue
 end
 
+--[=[
+	Sets the transparency of the color
+
+	@param transparency number
+]=]
 function HSVColorPicker:SetTransparency(transparency)
 	assert(type(transparency) == "number", "Bad transparency")
 

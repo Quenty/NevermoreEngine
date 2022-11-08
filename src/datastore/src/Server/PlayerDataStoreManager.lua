@@ -1,6 +1,9 @@
 --[=[
 	DataStore manager for player that automatically saves on player leave and game close. Consider using
-	[PlayerDataStoreService] instead.
+	[PlayerDataStoreService] instead, which wraps one PlayerDataStoreManager.
+
+	This will ensure that the datastores are reused between different services and other things integrating
+	with Nevermore.
 
 	@server
 	@class PlayerDataStoreManager
