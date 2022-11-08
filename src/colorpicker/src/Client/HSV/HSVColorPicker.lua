@@ -16,14 +16,14 @@ HSVColorPicker.ClassName = "HSVColorPicker"
 HSVColorPicker.__index = HSVColorPicker
 
 --[=[
-    Creates a color picker.
-    ```lua
-	local picker = HSVColorPicker.new()
-	picker.Gui.Parent = path.to.Parent
-	picker:SetColor(Color3.new(0.5, 0.5, 0.5))
-    ```
+	Creates a color picker.
+	```lua
+		local picker = HSVColorPicker.new()
+		picker.Gui.Parent = path.to.Parent
+		picker:SetColor(Color3.new(0.5, 0.5, 0.5))
+	```
 
-    @return BaseObject
+	@return BaseObject
 ]=]
 function HSVColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSVColorPicker)
@@ -124,9 +124,9 @@ function HSVColorPicker:HintBackgroundColor(color)
 end
 
 --[=[
-    Set the picker's current color3 value in HSV formet.
+	Set the picker's current color3 value in HSV formet.
 
-    @param hsvColor Vector3
+	@param hsvColor Vector3
 ]=]
 function HSVColorPicker:SetHSVColor(hsvColor)
 	assert(typeof(hsvColor) == "Vector3", "Bad hsvColor")
@@ -135,18 +135,18 @@ function HSVColorPicker:SetHSVColor(hsvColor)
 end
 
 --[=[
-    Get the picker's current color3 value in HSV formet.
+	Get the picker's current color3 value in HSV formet.
 
-    @return color Vector3
+	@return color Vector3
 ]=]
 function HSVColorPicker:GetHSVColor()
 	return self._hsvColorValue.Value
 end
 
 --[=[
-    Set the picker's current color3 value.
+	Set the picker's current color3 value.
 
-    @param color Color3
+	@param color Color3
 ]=]
 function HSVColorPicker:SetColor(color)
 	local h, s, v = Color3.toHSV(color)
@@ -154,9 +154,9 @@ function HSVColorPicker:SetColor(color)
 end
 
 --[=[
-    Get the picker's current color3 value.
+	Get the picker's current color3 value.
 
-    @return color Color3
+	@return color Color3
 ]=]
 function HSVColorPicker:GetColor()
 	local current = self._hsvColorValue.Value
