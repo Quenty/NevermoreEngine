@@ -126,7 +126,7 @@ end
 --[=[
     Set the picker's current color3 value in HSV formet.
 
-    @param color Vector3
+    @param hsvColor Vector3
 ]=]
 function HSVColorPicker:SetHSVColor(hsvColor)
 	assert(typeof(hsvColor) == "Vector3", "Bad hsvColor")
