@@ -17,5 +17,5 @@ Color palette system for
 
 ## Installation
 ```
-npm install @quenty/colorpalette --save
+npm install @quenty/color3utils --save
 ```

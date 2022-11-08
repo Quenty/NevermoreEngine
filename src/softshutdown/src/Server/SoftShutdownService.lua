@@ -31,10 +31,6 @@ local BindToCloseService = require("BindToCloseService")
 local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
 
---[=[
-    Initialize the service.
-    @param serviceBag ServiceBag 
-]=]
 function SoftShutdownService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

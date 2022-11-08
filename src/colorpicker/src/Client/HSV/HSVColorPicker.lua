@@ -1,5 +1,4 @@
 --[=[
-	A HSV color picker component made with Blend.
 	@class HSVColorPicker
 ]=]
 
@@ -15,16 +14,6 @@ local HSVColorPicker = setmetatable({}, BaseObject)
 HSVColorPicker.ClassName = "HSVColorPicker"
 HSVColorPicker.__index = HSVColorPicker
 
---[=[
-    Creates a color picker.
-    ```lua
-	local picker = HSVColorPicker.new()
-	picker.Gui.Parent = path.to.Parent
-	picker:SetColor(Color3.new(0.5, 0.5, 0.5))
-    ```
-
-    @return BaseObject
-]=]
 function HSVColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSVColorPicker)
 
@@ -123,41 +112,21 @@ function HSVColorPicker:HintBackgroundColor(color)
 	self._valuePicker:HintBackgroundColor(color)
 end
 
---[=[
-    Set the picker's current color3 value in HSV formet.
-
-    @param color Vector3
-]=]
 function HSVColorPicker:SetHSVColor(hsvColor)
 	assert(typeof(hsvColor) == "Vector3", "Bad hsvColor")
 
 	self._hsvColorValue.Value = hsvColor
 end
 
---[=[
-    Get the picker's current color3 value in HSV formet.
-
-    @return color Vector3
-]=]
 function HSVColorPicker:GetHSVColor()
 	return self._hsvColorValue.Value
 end
 
---[=[
-    Set the picker's current color3 value.
-
-    @param color Color3
-]=]
 function HSVColorPicker:SetColor(color)
 	local h, s, v = Color3.toHSV(color)
 	self._hsvColorValue.Value = Vector3.new(h, s, v)
 end
 
---[=[
-    Get the picker's current color3 value.
-
-    @return color Color3
-]=]
 function HSVColorPicker:GetColor()
 	local current = self._hsvColorValue.Value
 	local h, s, v = current.x, current.y, current.z

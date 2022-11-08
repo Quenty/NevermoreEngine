@@ -1,5 +1,4 @@
 --[=[
-	Picker for hue and Saturation in HSV. See [HSVColorPicker]
 	@class HSColorPickerCursor
 ]=]
 
