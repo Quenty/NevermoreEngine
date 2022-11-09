@@ -20,7 +20,7 @@ BinderProvider.__index = BinderProvider
 	local serviceBag = ServiceBag.new()
 
 	-- Usually in a separate file!
-	local binderProvider = BinderProvider.new(function(self, serviceBag)
+	local binderProvider = BinderProvider.new("BirdBinders", function(self, serviceBag)
 		serviceBag:Add(Binder.new("Bird", require("Bird")))
 	end)
 
@@ -32,11 +32,24 @@ BinderProvider.__index = BinderProvider
 	serviceBag:Start()
 	```
 
+	@param serviceName string -- Name of the service (used for memory tracking)
 	@param initMethod (self, serviceBag: ServiceBag)
 	@return BinderProvider
 ]=]
-function BinderProvider.new(initMethod)
+function BinderProvider.new(serviceName, initMethod)
 	local self = setmetatable({}, BinderProvider)
+
+	if type(serviceName) == "string" then
+		self.ServiceName = serviceName
+	else
+		-- Backwords compatibility (for now)
+		if type(serviceName) == "function" and initMethod == nil then
+			warn("[BinderProvider] - Missing serviceName for binder provider. Please pass in a service name as the first argument.")
+			initMethod = serviceName
+		else
+			error("Bad serviceName")
+		end
+	end
 
 	self._initMethod = initMethod or error("No initMethod")
 	self._initialized = false

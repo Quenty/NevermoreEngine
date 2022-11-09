@@ -9,7 +9,7 @@ local BinderProvider = require("BinderProvider")
 local Binder = require("Binder")
 local TimeSyncService = require("TimeSyncService")
 
-return BinderProvider.new(function(self, serviceBag)
+return BinderProvider.new(script.Name, function(self, serviceBag)
 	serviceBag:GetService(TimeSyncService)
 
 --[=[

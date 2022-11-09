@@ -156,17 +156,19 @@ function ServiceBag:Start()
 	while next(self._serviceTypesToStart) do
 		local serviceType = table.remove(self._serviceTypesToStart)
 		local service = assert(self._services[serviceType], "No service")
+		local serviceName = self:_getServiceName(serviceType)
 
 		if service.Start then
 			local current
 			task.spawn(function()
+				debug.setmemorycategory(serviceName)
 				current = coroutine.running()
 				service:Start()
 			end)
 
 			local isDead = coroutine.status(current) == "dead"
 			if not isDead then
-				error(("Starting service %q yielded"):format(self:_getServiceName(serviceType)))
+				error(("Starting service %q yielded"):format(serviceName))
 			end
 		end
 	end
@@ -179,7 +181,7 @@ function ServiceBag:_getServiceName(serviceType)
 	pcall(function()
 		serviceName = serviceType.ServiceName
 	end)
-	if serviceName then
+	if type(serviceName) == "string" then
 		return serviceName
 	end
 
@@ -251,17 +253,19 @@ end
 
 function ServiceBag:_initService(serviceType)
 	local service = assert(self._services[serviceType], "No service")
+	local serviceName = self:_getServiceName(serviceType)
 
 	if service.Init then
 		local current
 		task.spawn(function()
+			debug.setmemorycategory(serviceName)
 			current = coroutine.running()
 			service:Init(self)
 		end)
 
 		local isDead = coroutine.status(current) == "dead"
 		if not isDead then
-			error(("Initializing service %q yielded"):format(self:_getServiceName(serviceType)))
+			error(("Initializing service %q yielded"):format(serviceName))
 		end
 	end
 
