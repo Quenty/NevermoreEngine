@@ -2,9 +2,10 @@
 	Wraps the datastore object to provide async cached loading and saving. See [DataStoreStage] for more API.
 
 	Has the following features
-	* Automatic save
-	* Jitter
+	* Automatic saving every 5 minutes
+	* Jitter (doesn't save all at the same time)
 	* De-duplication (only updates data it needs)
+	* Battle tested across multiple top games.
 
 	```lua
 	local playerMoneyValue = Instance.new("IntValue")
@@ -17,7 +18,45 @@
 	end):Catch(function()
 		-- TODO: Notify player
 	end)
+	```
 
+	To use a datastore for a player, it's recommended you use the [PlayerDataStoreService]. This looks
+	something like this. See [ServiceBag] for more information on service initialization.
+
+	```lua
+	local serviceBag = ServiceBag.new()
+	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
+
+	serviceBag:Init()
+	serviceBag:Start()
+
+	local topMaid = Maid.new()
+
+	local function handlePlayer(player)
+		local maid = Maid.new()
+
+		local playerMoneyValue = Instance.new("IntValue")
+		playerMoneyValue.Name = "Money"
+		playerMoneyValue.Value = 0
+		playerMoneyValue.Parent = player
+
+		maid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)
+			maid:GivePromise(dataStore:Load("money", 0))
+				:Then(function(money)
+					playerMoneyValue.Value = money
+					maid:GiveTask(dataStore:StoreOnValueChange("money", playerMoneyValue))
+				end)
+		end)
+
+		topMaid[player] = maid
+	end
+	Players.PlayerAdded:Connect(handlePlayer)
+	Players.PlayerRemoving:Connect(function(player)
+		topMaid[player] = nil
+	end)
+	for _, player in pairs(Players:GetPlayers()) do
+		task.spawn(handlePlayer, player)
+	end
 	```
 
 	@server
@@ -48,6 +87,7 @@ DataStore.__index = DataStore
 	Constructs a new DataStore. See [DataStoreStage] for more API.
 	@param robloxDataStore DataStore
 	@param key string
+	@return DataStore
 ]=]
 function DataStore.new(robloxDataStore, key)
 	local self = setmetatable(DataStoreStage.new(), DataStore)
@@ -125,6 +165,11 @@ function DataStore:DidLoadFail()
 	return false
 end
 
+--[=[
+	Returns whether the datastore has loaded successfully.\
+
+	@return Promise<boolean>
+]=]
 function DataStore:PromiseLoadSuccessful()
 	return self._maid:GivePromise(self:_promiseLoad()):Then(function()
 		return true
