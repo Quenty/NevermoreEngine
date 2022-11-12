@@ -24,7 +24,7 @@ local BinderProvider = require("BinderProvider")
 local Binder = require("Binder")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 
-return BinderProvider.new(function(self, serviceBag)
+return BinderProvider.new(script.Name, function(self, serviceBag)
 --[=[
 	Apply this [Binder] to a humanoid to ragdoll it. Humanoid must already have [Ragdollable] defined.
 

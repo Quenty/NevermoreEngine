@@ -1,5 +1,15 @@
 --[=[
 	Utility function that loads a translator from a folder or a table.
+
+	To get translations uploaded.
+
+	1. Run the game
+	2. On the client, check LocalizationService.GeneratedJSONTable
+	3. Right click > Save as CSV
+	4. Stop the game
+	5. In Studio, go to plugins > "Localization Tools"
+	6. Upload the CSV (update)
+
 	@class JSONTranslator
 ]=]
 

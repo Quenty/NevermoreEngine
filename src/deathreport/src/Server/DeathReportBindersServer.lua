@@ -8,7 +8,7 @@ local BinderProvider = require("BinderProvider")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 local Binder = require("Binder")
 
-return BinderProvider.new(function(self, serviceBag)
+return BinderProvider.new(script.Name, function(self, serviceBag)
 	-- Tracking
 	self:Add(PlayerHumanoidBinder.new("DeathTrackedHumanoid", require("DeathTrackedHumanoid"), serviceBag))
 

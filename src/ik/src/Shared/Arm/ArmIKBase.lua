@@ -23,7 +23,7 @@ local RxR15Utils = require("RxR15Utils")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 local USE_OLD_IK_SYSTEM = (not LimbIKUtils) or false
-local USE_MOTOR_6D_RAW = true
+local USE_MOTOR_6D_RAW = false
 
 local ArmIKBase = setmetatable({}, BaseObject)
 ArmIKBase.ClassName = "ArmIKBase"

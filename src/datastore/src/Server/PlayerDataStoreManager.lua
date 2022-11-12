@@ -1,9 +1,48 @@
 --[=[
-	DataStore manager for player that automatically saves on player leave and game close. Consider using
-	[PlayerDataStoreService] instead, which wraps one PlayerDataStoreManager.
+	DataStore manager for player that automatically saves on player leave and game close.
+
+	:::tip
+	Consider using [PlayerDataStoreService] instead, which wraps one PlayerDataStoreManager.
+	:::
 
 	This will ensure that the datastores are reused between different services and other things integrating
 	with Nevermore.
+
+	```lua
+	local serviceBag = ServiceBag.new()
+	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
+
+	serviceBag:Init()
+	serviceBag:Start()
+
+	local topMaid = Maid.new()
+
+	local function handlePlayer(player)
+		local maid = Maid.new()
+
+		local playerMoneyValue = Instance.new("IntValue")
+		playerMoneyValue.Name = "Money"
+		playerMoneyValue.Value = 0
+		playerMoneyValue.Parent = player
+
+		maid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)
+			maid:GivePromise(dataStore:Load("money", 0))
+				:Then(function(money)
+					playerMoneyValue.Value = money
+					maid:GiveTask(dataStore:StoreOnValueChange("money", playerMoneyValue))
+				end)
+		end)
+
+		topMaid[player] = maid
+	end
+	Players.PlayerAdded:Connect(handlePlayer)
+	Players.PlayerRemoving:Connect(function(player)
+		topMaid[player] = nil
+	end)
+	for _, player in pairs(Players:GetPlayers()) do
+		task.spawn(handlePlayer, player)
+	end
+	```
 
 	@server
 	@class PlayerDataStoreManager

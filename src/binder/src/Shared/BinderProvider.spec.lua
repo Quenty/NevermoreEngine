@@ -13,7 +13,7 @@ return function()
 		local initialized = false
 
 		it("should execute immediately", function()
-			provider = BinderProvider.new(function(self, arg)
+			provider = BinderProvider.new("BinderServiceName", function(self, arg)
 				initialized = true
 				assert(arg == 12345, "Bad arg")
 
