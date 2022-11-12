@@ -7,9 +7,10 @@
 <title data-rh="true">DataStore | Nevermore</title><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/DataStore"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="DataStore | Nevermore"><meta data-rh="true" name="description" content="Wraps the datastore object to provide async cached loading and saving. See [DataStoreStage] for more API.
 
 Has the following features
-* Automatic save
-* Jitter
+* Automatic saving every 5 minutes
+* Jitter (doesn&#x27;t save all at the same time)
 * De-duplication (only updates data it needs)
+* Battle tested across multiple top games.
 
 ```lua
 local playerMoneyValue = Instance.new(&quot;IntValue&quot;)
@@ -22,13 +23,52 @@ dataStore:Load(&quot;money&quot;, 0):Then(function(money)
 end):Catch(function()
 	-- TODO: Notify player
 end)
+```
 
+To use a datastore for a player, it&#x27;s recommended you use the [PlayerDataStoreService]. This looks
+something like this. See [ServiceBag] for more information on service initialization.
+
+```lua
+local serviceBag = ServiceBag.new()
+local playerDataStoreService = serviceBag:GetService(require(&quot;PlayerDataStoreService&quot;))
+
+serviceBag:Init()
+serviceBag:Start()
+
+local topMaid = Maid.new()
+
+local function handlePlayer(player)
+	local maid = Maid.new()
+
+	local playerMoneyValue = Instance.new(&quot;IntValue&quot;)
+	playerMoneyValue.Name = &quot;Money&quot;
+	playerMoneyValue.Value = 0
+	playerMoneyValue.Parent = player
+
+	maid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)
+		maid:GivePromise(dataStore:Load(&quot;money&quot;, 0))
+			:Then(function(money)
+				playerMoneyValue.Value = money
+				maid:GiveTask(dataStore:StoreOnValueChange(&quot;money&quot;, playerMoneyValue))
+			end)
+	end)
+
+	topMaid[player] = maid
+end
+Players.PlayerAdded:Connect(handlePlayer)
+Players.PlayerRemoving:Connect(function(player)
+	topMaid[player] = nil
+end)
+for _, player in pairs(Players:GetPlayers()) do
+	task.spawn(handlePlayer, player)
+end
 ```"><meta data-rh="true" property="og:description" content="Wraps the datastore object to provide async cached loading and saving. See [DataStoreStage] for more API.
 
 Has the following features
-* Automatic save
-* Jitter
+* Automatic saving every 5 minutes
+* Jitter (doesn&#x27;t save all at the same time)
 * De-duplication (only updates data it needs)
+* Battle tested across multiple top games.
 
 ```lua
 local playerMoneyValue = Instance.new(&quot;IntValue&quot;)
@@ -41,10 +81,48 @@ dataStore:Load(&quot;money&quot;, 0):Then(function(money)
 end):Catch(function()
 	-- TODO: Notify player
 end)
+```
 
+To use a datastore for a player, it&#x27;s recommended you use the [PlayerDataStoreService]. This looks
+something like this. See [ServiceBag] for more information on service initialization.
+
+```lua
+local serviceBag = ServiceBag.new()
+local playerDataStoreService = serviceBag:GetService(require(&quot;PlayerDataStoreService&quot;))
+
+serviceBag:Init()
+serviceBag:Start()
+
+local topMaid = Maid.new()
+
+local function handlePlayer(player)
+	local maid = Maid.new()
+
+	local playerMoneyValue = Instance.new(&quot;IntValue&quot;)
+	playerMoneyValue.Name = &quot;Money&quot;
+	playerMoneyValue.Value = 0
+	playerMoneyValue.Parent = player
+
+	maid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)
+		maid:GivePromise(dataStore:Load(&quot;money&quot;, 0))
+			:Then(function(money)
+				playerMoneyValue.Value = money
+				maid:GiveTask(dataStore:StoreOnValueChange(&quot;money&quot;, playerMoneyValue))
+			end)
+	end)
+
+	topMaid[player] = maid
+end
+Players.PlayerAdded:Connect(handlePlayer)
+Players.PlayerRemoving:Connect(function(player)
+	topMaid[player] = nil
+end)
+for _, player in pairs(Players:GetPlayers()) do
+	task.spawn(handlePlayer, player)
+end
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/DataStore"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStore" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStore" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.396b872c.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.eba79876.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.b81d8ab8.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.84da6b4b.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.3006b2c4.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -52,9 +130,10 @@ end)
 <p>Wraps the datastore object to provide async cached loading and saving. See <a href="/NevermoreEngine/api/DataStoreStage">DataStoreStage</a> for more API.</p>
 <p>Has the following features</p>
 <ul>
-  <li>Automatic save</li>
-  <li>Jitter</li>
+  <li>Automatic saving every 5 minutes</li>
+  <li>Jitter (doesn't save all at the same time)</li>
   <li>De-duplication (only updates data it needs)</li>
+  <li>Battle tested across multiple top games.</li>
 </ul>
 <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> playerMoneyValue <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"IntValue"</span><span class="token punctuation">)</span>
 playerMoneyValue<span class="token punctuation">.</span>Value <span class="token operator">=</span> <span class="token number">0</span>
@@ -66,21 +145,60 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
 <span class="token keyword">end</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">Catch</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 	<span class="token comment">-- TODO: Notify player</span>
 <span class="token keyword">end</span><span class="token punctuation">)</span>
-
 </code></pre>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="properties">Properties<a class="hash-link" href="#properties" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Saving"><code style="text-decoration:none">Saving</code><a class="hash-link" href="#Saving" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L64"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->.<!-- -->Saving<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&gt;</code></div><div>
+<p>
+  To use a datastore for a player, it's recommended you use the <a href="/NevermoreEngine/api/PlayerDataStoreService">PlayerDataStoreService</a>. This looks
+  something like this. See <a href="/NevermoreEngine/api/ServiceBag">ServiceBag</a> for more information on service initialization.
+</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> serviceBag <span class="token operator">=</span> ServiceBag<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">local</span> playerDataStoreService <span class="token operator">=</span> serviceBag<span class="token punctuation">:</span><span class="token function">GetService</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"PlayerDataStoreService"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+serviceBag<span class="token punctuation">:</span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+serviceBag<span class="token punctuation">:</span><span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">local</span> topMaid <span class="token operator">=</span> Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">local</span> <span class="token keyword">function</span> <span class="token function">handlePlayer</span><span class="token punctuation">(</span>player<span class="token punctuation">)</span>
+	<span class="token keyword">local</span> maid <span class="token operator">=</span> Maid<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">local</span> playerMoneyValue <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"IntValue"</span><span class="token punctuation">)</span>
+	playerMoneyValue<span class="token punctuation">.</span>Name <span class="token operator">=</span> <span class="token string">"Money"</span>
+	playerMoneyValue<span class="token punctuation">.</span>Value <span class="token operator">=</span> <span class="token number">0</span>
+	playerMoneyValue<span class="token punctuation">.</span>Parent <span class="token operator">=</span> player
+
+	maid<span class="token punctuation">:</span><span class="token function">GivePromise</span><span class="token punctuation">(</span>playerDataStoreService<span class="token punctuation">:</span><span class="token function">PromiseDataStore</span><span class="token punctuation">(</span>Players<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span><span class="token function">Then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>dataStore<span class="token punctuation">)</span>
+		maid<span class="token punctuation">:</span><span class="token function">GivePromise</span><span class="token punctuation">(</span>dataStore<span class="token punctuation">:</span><span class="token function">Load</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+			<span class="token punctuation">:</span><span class="token function">Then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>money<span class="token punctuation">)</span>
+				playerMoneyValue<span class="token punctuation">.</span>Value <span class="token operator">=</span> money
+				maid<span class="token punctuation">:</span><span class="token function">GiveTask</span><span class="token punctuation">(</span>dataStore<span class="token punctuation">:</span><span class="token function">StoreOnValueChange</span><span class="token punctuation">(</span><span class="token string">"money"</span><span class="token punctuation">,</span> playerMoneyValue<span class="token punctuation">)</span><span class="token punctuation">)</span>
+			<span class="token keyword">end</span><span class="token punctuation">)</span>
+	<span class="token keyword">end</span><span class="token punctuation">)</span>
+
+	topMaid<span class="token punctuation">[</span>player<span class="token punctuation">]</span> <span class="token operator">=</span> maid
+<span class="token keyword">end</span>
+Players<span class="token punctuation">.</span>PlayerAdded<span class="token punctuation">:</span><span class="token function">Connect</span><span class="token punctuation">(</span>handlePlayer<span class="token punctuation">)</span>
+Players<span class="token punctuation">.</span>PlayerRemoving<span class="token punctuation">:</span><span class="token function">Connect</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>player<span class="token punctuation">)</span>
+	topMaid<span class="token punctuation">[</span>player<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">nil</span>
+<span class="token keyword">end</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> _<span class="token punctuation">,</span> player <span class="token keyword">in</span> <span class="token function">pairs</span><span class="token punctuation">(</span>Players<span class="token punctuation">:</span><span class="token function">GetPlayers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">do</span>
+	task<span class="token punctuation">.</span><span class="token function">spawn</span><span class="token punctuation">(</span>handlePlayer<span class="token punctuation">,</span> player<span class="token punctuation">)</span>
+<span class="token keyword">end</span>
+</code></pre>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="properties">Properties<a class="hash-link" href="#properties" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Saving"><code style="text-decoration:none">Saving</code><a class="hash-link" href="#Saving" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L104"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->.<!-- -->Saving<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Prop that fires when saving. Promise will resolve once saving is complete.</p>
-</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a class="hash-link" href="#new" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L52"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>robloxDataStore<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a class="hash-link" href="#new" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L92"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>robloxDataStore<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code></div><div>
 <p>Constructs a new DataStore. See <a href="/NevermoreEngine/api/DataStoreStage">DataStoreStage</a> for more API.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetCacheTime"><code style="text-decoration:none">SetCacheTime</code><a class="hash-link" href="#SetCacheTime" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L98"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">SetCacheTime</code><code>(</code><code>cacheTimeSeconds<!-- -->: </code><code class="blue_P4bS">number?</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetCacheTime"><code style="text-decoration:none">SetCacheTime</code><a class="hash-link" href="#SetCacheTime" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L138"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">SetCacheTime</code><code>(</code><code>cacheTimeSeconds<!-- -->: </code><code class="blue_P4bS">number?</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Sets how long the datastore will cache for</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFullPath"><code style="text-decoration:none">GetFullPath</code><a class="hash-link" href="#GetFullPath" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L108"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">GetFullPath</code><code>(</code><code>) → </code><code class="blue_P4bS">string</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFullPath"><code style="text-decoration:none">GetFullPath</code><a class="hash-link" href="#GetFullPath" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L148"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">GetFullPath</code><code>(</code><code>) → </code><code class="blue_P4bS">string</code></div><div>
 <p>Returns the full path for the datastore</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="DidLoadFail"><code style="text-decoration:none">DidLoadFail</code><a class="hash-link" href="#DidLoadFail" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L116"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">DidLoadFail</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="DidLoadFail"><code style="text-decoration:none">DidLoadFail</code><a class="hash-link" href="#DidLoadFail" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L156"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">DidLoadFail</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether the datastore failed.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Save"><code style="text-decoration:none">Save</code><a class="hash-link" href="#Save" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L140"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">Save</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="PromiseLoadSuccessful"><code style="text-decoration:none">PromiseLoadSuccessful</code><a class="hash-link" href="#PromiseLoadSuccessful" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L173"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">PromiseLoadSuccessful</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">boolean</code><code class="op_lSLc">&gt;</code></div><div>
+<p>Returns whether the datastore has loaded successfully.\</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Save"><code style="text-decoration:none">Save</code><a class="hash-link" href="#Save" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L185"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">Save</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code></div><div>
 <p>Saves all stored data.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Load"><code style="text-decoration:none">Load</code><a class="hash-link" href="#Load" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L172"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">Load</code><code>(</code><div class="inset_uKQm"><div><code>keyName<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>defaultValue<!-- -->: </code><code class="blue_P4bS">any?</code></div></div><code>) → </code><code class="blue_P4bS">any?</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Load"><code style="text-decoration:none">Load</code><a class="hash-link" href="#Load" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStore.lua#L217"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStore<!-- -->:</code><code class="green_DgR4">Load</code><code>(</code><div class="inset_uKQm"><div><code>keyName<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>defaultValue<!-- -->: </code><code class="blue_P4bS">any?</code></div></div><code>) → </code><code class="blue_P4bS">any?</code></div><div>
 <p>Loads data. This returns the originally loaded data.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -99,10 +217,15 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
                     &quot;lua_type&quot;: &quot;string&quot;
                 }
             ],
-            &quot;returns&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;DataStore&quot;
+                }
+            ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 52,
+                &quot;line&quot;: 92,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
             }
         },
@@ -119,7 +242,7 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 98,
+                &quot;line&quot;: 138,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
             }
         },
@@ -135,7 +258,7 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 108,
+                &quot;line&quot;: 148,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
             }
         },
@@ -151,7 +274,23 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 116,
+                &quot;line&quot;: 156,
+                &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;PromiseLoadSuccessful&quot;,
+            &quot;desc&quot;: &quot;Returns whether the datastore has loaded successfully.\\&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Promise&lt;boolean&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 173,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
             }
         },
@@ -167,7 +306,7 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 140,
+                &quot;line&quot;: 185,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
             }
         },
@@ -194,7 +333,7 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 172,
+                &quot;line&quot;: 217,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
             }
         }
@@ -205,23 +344,23 @@ dataStore<span class="token punctuation">:</span><span class="token function">Lo
             &quot;desc&quot;: &quot;Prop that fires when saving. Promise will resolve once saving is complete.&quot;,
             &quot;lua_type&quot;: &quot;Signal&lt;Promise&gt;&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 64,
+                &quot;line&quot;: 104,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
             }
         }
     ],
     &quot;types&quot;: [],
     &quot;name&quot;: &quot;DataStore&quot;,
-    &quot;desc&quot;: &quot;Wraps the datastore object to provide async cached loading and saving. See [DataStoreStage] for more API.\n\nHas the following features\n* Automatic save\n* Jitter\n* De-duplication (only updates data it needs)\n\n```lua\nlocal playerMoneyValue = Instance.new(\&quot;IntValue\&quot;)\nplayerMoneyValue.Value = 0\n\nlocal dataStore = DataStore.new(DataStoreService:GetDataStore(\&quot;test\&quot;), test-store\&quot;)\ndataStore:Load(\&quot;money\&quot;, 0):Then(function(money)\n\tplayerMoneyValue.Value = money\n\tdataStore:StoreOnValueChange(\&quot;money\&quot;, playerMoneyValue)\nend):Catch(function()\n\t-- TODO: Notify player\nend)\n\n```&quot;,
+    &quot;desc&quot;: &quot;Wraps the datastore object to provide async cached loading and saving. See [DataStoreStage] for more API.\n\nHas the following features\n* Automatic saving every 5 minutes\n* Jitter (doesn&#x27;t save all at the same time)\n* De-duplication (only updates data it needs)\n* Battle tested across multiple top games.\n\n```lua\nlocal playerMoneyValue = Instance.new(\&quot;IntValue\&quot;)\nplayerMoneyValue.Value = 0\n\nlocal dataStore = DataStore.new(DataStoreService:GetDataStore(\&quot;test\&quot;), test-store\&quot;)\ndataStore:Load(\&quot;money\&quot;, 0):Then(function(money)\n\tplayerMoneyValue.Value = money\n\tdataStore:StoreOnValueChange(\&quot;money\&quot;, playerMoneyValue)\nend):Catch(function()\n\t-- TODO: Notify player\nend)\n```\n\nTo use a datastore for a player, it&#x27;s recommended you use the [PlayerDataStoreService]. This looks\nsomething like this. See [ServiceBag] for more information on service initialization.\n\n```lua\nlocal serviceBag = ServiceBag.new()\nlocal playerDataStoreService = serviceBag:GetService(require(\&quot;PlayerDataStoreService\&quot;))\n\nserviceBag:Init()\nserviceBag:Start()\n\nlocal topMaid = Maid.new()\n\nlocal function handlePlayer(player)\n\tlocal maid = Maid.new()\n\n\tlocal playerMoneyValue = Instance.new(\&quot;IntValue\&quot;)\n\tplayerMoneyValue.Name = \&quot;Money\&quot;\n\tplayerMoneyValue.Value = 0\n\tplayerMoneyValue.Parent = player\n\n\tmaid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)\n\t\tmaid:GivePromise(dataStore:Load(\&quot;money\&quot;, 0))\n\t\t\t:Then(function(money)\n\t\t\t\tplayerMoneyValue.Value = money\n\t\t\t\tmaid:GiveTask(dataStore:StoreOnValueChange(\&quot;money\&quot;, playerMoneyValue))\n\t\t\tend)\n\tend)\n\n\ttopMaid[player] = maid\nend\nPlayers.PlayerAdded:Connect(handlePlayer)\nPlayers.PlayerRemoving:Connect(function(player)\n\ttopMaid[player] = nil\nend)\nfor _, player in pairs(Players:GetPlayers()) do\n\ttask.spawn(handlePlayer, player)\nend\n```&quot;,
     &quot;realm&quot;: [
         &quot;Server&quot;
     ],
     &quot;source&quot;: {
-        &quot;line&quot;: 26,
+        &quot;line&quot;: 65,
         &quot;path&quot;: &quot;src/datastore/src/Server/DataStore.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#Saving" class="table-of-contents__link toc-highlight">Saving</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#DidLoadFail" class="table-of-contents__link toc-highlight">:DidLoadFail</a></li><li><a href="#GetFullPath" class="table-of-contents__link toc-highlight">:GetFullPath</a></li><li><a href="#Load" class="table-of-contents__link toc-highlight">:Load</a></li><li><a href="#Save" class="table-of-contents__link toc-highlight">:Save</a></li><li><a href="#SetCacheTime" class="table-of-contents__link toc-highlight">:SetCacheTime</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.eba79876.js"></script>
-<script src="/NevermoreEngine/assets/js/main.b81d8ab8.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#Saving" class="table-of-contents__link toc-highlight">Saving</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#DidLoadFail" class="table-of-contents__link toc-highlight">:DidLoadFail</a></li><li><a href="#GetFullPath" class="table-of-contents__link toc-highlight">:GetFullPath</a></li><li><a href="#Load" class="table-of-contents__link toc-highlight">:Load</a></li><li><a href="#PromiseLoadSuccessful" class="table-of-contents__link toc-highlight">:PromiseLoadSuccessful</a></li><li><a href="#Save" class="table-of-contents__link toc-highlight">:Save</a></li><li><a href="#SetCacheTime" class="table-of-contents__link toc-highlight">:SetCacheTime</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.84da6b4b.js"></script>
+<script src="/NevermoreEngine/assets/js/main.3006b2c4.js"></script>
 </body>
 </html>
