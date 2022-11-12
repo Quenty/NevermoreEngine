@@ -1,20 +1,18 @@
-# v4.6.0 (Sat Nov 12 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/visibility fix [#307](https://github.com/Quenty/NevermoreEngine/pull/307) ([@Quenty](https://github.com/Quenty))
-- feat: Binder provider now provides name for debugging ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.5.0...@quenty/settings@4.6.0) (2022-11-12)
+
+
+### Features
+
+* Binder provider now provides name for debugging ([72d547e](https://github.com/Quenty/NevermoreEngine/commit/72d547ea47358dfab1128dd076723f5a1a0d9fd8))
+
+
+
+
 
 # [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.4.1...@quenty/settings@4.5.0) (2022-11-08)
 

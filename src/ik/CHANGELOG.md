@@ -1,21 +1,19 @@
-# v9.6.0 (Sat Nov 12 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/visibility fix [#307](https://github.com/Quenty/NevermoreEngine/pull/307) ([@Quenty](https://github.com/Quenty))
-- feat: Default to not using motor 6d raw ([@Quenty](https://github.com/Quenty))
-- feat: Binder provider now provides name for debugging ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.5.1...@quenty/ik@9.6.0) (2022-11-12)
+
+
+### Features
+
+* Binder provider now provides name for debugging ([72d547e](https://github.com/Quenty/NevermoreEngine/commit/72d547ea47358dfab1128dd076723f5a1a0d9fd8))
+* Default to not using motor 6d raw ([d601d03](https://github.com/Quenty/NevermoreEngine/commit/d601d0346a3aa2d3cf2b3e0ed54d0dbc062b9a87))
+
+
+
+
 
 ## [9.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.5.0...@quenty/ik@9.5.1) (2022-11-04)
 

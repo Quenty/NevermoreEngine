@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputkeymaputils",
-  "version": "7.5.0",
+  "version": "7.6.0",
   "description": "System to define rebindable key bindings and inputs for Roblox.",
   "keywords": [
     "Roblox",
