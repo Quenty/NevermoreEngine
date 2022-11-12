@@ -1,3 +1,16 @@
+# (Sat Nov 12 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@8.2.0`, `@quenty/clienttranslator@8.4.0`, `@quenty/cooldown@5.4.0`, `@quenty/datastore@7.4.0`, `@quenty/deathreport@3.4.0`, `@quenty/gameconfig@5.5.0`, `@quenty/gameproductservice@5.5.0`, `@quenty/hide@5.3.0`, `@quenty/humanoidspeed@5.4.0`, `@quenty/ik@9.6.0`, `@quenty/motor6d@1.4.0`, `@quenty/ragdoll@9.5.0`, `@quenty/rogue-humanoid@3.4.0`, `@quenty/rogue-properties@4.4.0`, `@quenty/servicebag@6.2.0`, `@quenty/settings-inputkeymap@3.7.0`, `@quenty/settings@4.6.0`
+  - Users/quenty/visibility fix [#307](https://github.com/Quenty/NevermoreEngine/pull/307) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Nov 08 2022)
 
 :tada: This release contains work from a new contributor! :tada:
