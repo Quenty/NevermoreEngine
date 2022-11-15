@@ -1,0 +1,54 @@
+{
+  "name": "@quenty/nevermore-cli",
+  "version": "1.0.0",
+  "description": "CLI interface for Nevermore",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "CLI"
+  ],
+  "bin": {
+    "nevermore": "./dist/nevermore.js"
+  },
+  "main": "dist/nevermore.js",
+  "bugs": {
+    "url": "https://github.com/Quenty/Nevermore/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/Nevermore.git",
+    "directory": "tools/nevermore-cli/"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "find-git-root": "^1.0.4",
+    "handlebars": "^4.7.7",
+    "inquirer": "^8.2.4",
+    "read-package-json": "^6.0.0",
+    "typescript-memoize": "^1.1.1",
+    "yargs": "^17.0.13",
+    "chalk": "^4.1.2",
+    "execa": "v5.1.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.2",
+    "@types/node": "^18.11.4",
+    "@types/yargs": "^17.0.13",
+    "prettier": "2.7.1",
+    "typescript": "^4.8.4"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "watch": "tsc --build --watch",
+    "clean": "tsc --build --clean"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
