@@ -8,6 +8,8 @@
     "Lua",
     "Time"
   ],
+  "main": "src/Shared/debounce.lua",
+  "types": "src/Shared/debounce.d.ts",
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
   },
