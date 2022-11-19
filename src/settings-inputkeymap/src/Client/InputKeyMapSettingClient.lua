@@ -40,7 +40,6 @@ function InputKeyMapSettingClient.new(serviceBag, inputKeyMapList)
 			local settingName = InputKeyMapSettingUtils.getSettingName(inputKeyMapList, inputModeType)
 			local settingProperty = settings:GetSettingProperty(settingName, InputKeyMapSettingConstants.DEFAULT_VALUE)
 
-			print("hi")
 			-- Try to retrieve
 			maid:GiveTask(settingProperty:Observe():Subscribe(function(currentValue)
 				if currentValue == InputKeyMapSettingConstants.DEFAULT_VALUE or currentValue == nil then

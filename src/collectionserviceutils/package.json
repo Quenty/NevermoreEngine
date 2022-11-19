@@ -20,6 +20,11 @@
     "type": "patreon",
     "url": "https://www.patreon.com/quenty"
   },
+  "dependencies": {
+    "@quenty/brio": "file:../brio",
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
+  },
   "license": "MIT",
   "contributors": [
     "Quenty"

@@ -53,6 +53,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
 local StateStack = require("StateStack")
 local String = require("String")
+local InputChordUtils = require("InputChordUtils")
 
 local InputKeyMapList = setmetatable({}, BaseObject)
 InputKeyMapList.ClassName = "InputKeyMapList"
@@ -332,6 +333,11 @@ function InputKeyMapList:ObserveSlottedTouchButtonDataBrio()
 	})
 end
 
+function InputKeyMapList:GetModifierChords(_inputEnumType)
+	-- TODO: Provide way to query modifer chords
+	return {}
+end
+
 function InputKeyMapList:_ensureInit()
 	if self._inputTypesForBinding then
 		return self._inputTypesForBinding
@@ -366,6 +372,8 @@ function InputKeyMapList:_ensureInit()
 					maid:GiveTask(self._isTapInWorld:PushState(true))
 				elseif InputTypeUtils.isRobloxTouchButton(inputType) then
 					maid:GiveTask(self._isRobloxTouchButton:PushState(true))
+				elseif InputChordUtils.isModifierInputChord(inputType) then
+					maid:GiveTask(self._inputTypesForBinding:Add(inputType.keyCode))
 				end
 			end
 

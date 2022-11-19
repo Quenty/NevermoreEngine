@@ -1,6 +1,7 @@
 {
   "packages": [
-    "src/*"
+    "src/*",
+    "tools/*"
   ],
   "command": {
     "publish": {

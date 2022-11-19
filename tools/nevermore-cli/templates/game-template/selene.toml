@@ -1,0 +1,6 @@
+# This file specifies selene linting rules
+
+std = "roblox"
+
+[rules]
+if_same_then_else = "allow" # This actually makes code less clear sometimes

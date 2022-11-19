@@ -102,7 +102,7 @@ end
 
 	@param instance Instance
 	@param className string
-	@return Observable<Instance>
+	@return Observable<Instance?>
 ]=]
 function RxInstanceUtils.observeFirstAncestor(instance, className)
 	assert(typeof(instance) == "Instance", "Bad instance")
