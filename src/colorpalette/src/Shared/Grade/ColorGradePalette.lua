@@ -122,6 +122,8 @@ function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
 		Rx.map(function(state)
 			assert(type(state.grade) == "number", "Bad state.grade")
 			assert(type(state.amount) == "number", "Bad state.amount")
+			assert(type(state.multiplier) == "number", "Bad state.multiplier")
+
 			return state.grade + state.multiplier*state.amount
 		end);
 	})
@@ -169,11 +171,19 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 	end
 
 	local gradeObservable = self._grades[gradeName]
-	if not gradeObservable then
-		error(("No grade for gradeName %q"):format(tostring(gradeName)))
+	if gradeObservable then
+		return gradeObservable
 	end
 
-	return gradeObservable
+	-- Support custom colors passed in here
+	local colorOrObservable = Blend.toPropertyObservable(gradeName)
+	if colorOrObservable then
+		return colorOrObservable:Pipe({
+			Rx.map(ColorGradeUtils.getGrade)
+		})
+	end
+
+	error(("No grade for gradeName %q"):format(tostring(gradeName)))
 end
 
 function ColorGradePalette:ObserveDefaultSurfaceGrade()
