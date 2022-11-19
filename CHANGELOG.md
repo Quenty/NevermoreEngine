@@ -1,3 +1,16 @@
+# (Sat Nov 19 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/avatareditorutils@1.2.0`, `@quenty/collectionserviceutils@2.2.0`, `@quenty/colorpalette@4.5.0`, `@quenty/inputkeymaputils@7.7.0`, `@quenty/instanceutils@7.2.0`, `@quenty/lipsum@8.4.0`, `@quenty/pagesutils@1.1.0`, `@quenty/servicebag@6.3.0`, `@quenty/settings-inputkeymap@3.8.0`, `@quenty/nevermore-cli@1.1.0`
+  - docs: Improve onboarding and more [#308](https://github.com/Quenty/NevermoreEngine/pull/308) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Nov 12 2022)
 
 #### 🚀 Enhancement
