@@ -354,6 +354,11 @@ end
 
 	https://create.roblox.com/docs/reference/engine/classes/AvatarEditorService#GetRecommendedAssets
 
+	:::warning
+	This API surface currently returns "AvatarEditorService is not yet enabled" when queried outside
+	of approved games.
+	:::
+
 	@param assetType AvatarAssetType
 	@param contextAssetId number? -- Optional. if not provided just gives recommendations in general
 	@return Promise<{ number }>
