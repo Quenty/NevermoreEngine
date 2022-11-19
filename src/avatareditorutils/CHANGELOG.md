@@ -1,23 +1,18 @@
-# v1.2.0 (Sat Nov 19 2022)
-
-#### 🚀 Enhancement
-
-- docs: Improve onboarding and more [#308](https://github.com/Quenty/NevermoreEngine/pull/308) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix avatar editor dependencies (missing promise and enumutils) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.1.1...@quenty/avatareditorutils@1.2.0) (2022-11-19)
+
+
+### Bug Fixes
+
+* Fix avatar editor dependencies (missing promise and enumutils) ([1bc2ca8](https://github.com/Quenty/NevermoreEngine/commit/1bc2ca8e99cc5775222263a7ae06c96604ac1aba))
+
+
+
+
 
 ## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.1.0...@quenty/avatareditorutils@1.1.1) (2022-11-04)
 

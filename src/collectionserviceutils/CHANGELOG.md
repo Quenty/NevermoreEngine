@@ -1,20 +1,18 @@
-# v2.2.0 (Sat Nov 19 2022)
-
-#### 🚀 Enhancement
-
-- docs: Improve onboarding and more [#308](https://github.com/Quenty/NevermoreEngine/pull/308) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxCollectionServiceUtils.observeTaggedBrio(tagName) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.1.0...@quenty/collectionserviceutils@2.2.0) (2022-11-19)
+
+
+### Features
+
+* Add RxCollectionServiceUtils.observeTaggedBrio(tagName) ([08b72a3](https://github.com/Quenty/NevermoreEngine/commit/08b72a3b8a451f0251c76fbe939ed177dafd71f9))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.0.1...@quenty/collectionserviceutils@2.1.0) (2022-03-27)
 

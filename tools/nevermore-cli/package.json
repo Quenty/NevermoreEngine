@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "CLI interface for Nevermore",
   "keywords": [
     "Roblox",
@@ -24,14 +24,14 @@
     "Quenty"
   ],
   "dependencies": {
+    "chalk": "^4.1.2",
+    "execa": "v5.1.1",
     "find-git-root": "^1.0.4",
     "handlebars": "^4.7.7",
     "inquirer": "^8.2.4",
     "read-package-json": "^6.0.0",
     "typescript-memoize": "^1.1.1",
-    "yargs": "^17.0.13",
-    "chalk": "^4.1.2",
-    "execa": "v5.1.1"
+    "yargs": "^17.0.13"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.2",

@@ -1,20 +1,18 @@
-# v4.5.0 (Sat Nov 19 2022)
-
-#### 🚀 Enhancement
-
-- docs: Improve onboarding and more [#308](https://github.com/Quenty/NevermoreEngine/pull/308) ([@Quenty](https://github.com/Quenty))
-- feat: ColorGradePallete allows grades to be observed from a custom Color3 value ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.4.0...@quenty/colorpalette@4.5.0) (2022-11-19)
+
+
+### Features
+
+* ColorGradePallete allows grades to be observed from a custom Color3 value ([d80bcd0](https://github.com/Quenty/NevermoreEngine/commit/d80bcd0af2e745a4881bdb02cd96443423cda59c))
+
+
+
+
 
 # [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.3.1...@quenty/colorpalette@4.4.0) (2022-11-08)
 

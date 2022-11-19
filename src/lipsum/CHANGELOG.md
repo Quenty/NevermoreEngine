@@ -1,20 +1,18 @@
-# v8.4.0 (Sat Nov 19 2022)
-
-#### 🚀 Enhancement
-
-- docs: Improve onboarding and more [#308](https://github.com/Quenty/NevermoreEngine/pull/308) ([@Quenty](https://github.com/Quenty))
-- feat: Add LipsumIconUtils to get random icons for testing UI ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@8.3.1...@quenty/lipsum@8.4.0) (2022-11-19)
+
+
+### Features
+
+* Add LipsumIconUtils to get random icons for testing UI ([356a934](https://github.com/Quenty/NevermoreEngine/commit/356a93488d8a53cd805a7f51f6244cbd1fb67929))
+
+
+
+
 
 ## [8.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@8.3.0...@quenty/lipsum@8.3.1) (2022-11-04)
 

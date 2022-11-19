@@ -1,23 +1,18 @@
-# v7.7.0 (Sat Nov 19 2022)
-
-#### 🚀 Enhancement
-
-- docs: Improve onboarding and more [#308](https://github.com/Quenty/NevermoreEngine/pull/308) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Start supporting :GetModifierChords(inputEnumType) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.6.0...@quenty/inputkeymaputils@7.7.0) (2022-11-19)
+
+
+### Bug Fixes
+
+* Start supporting :GetModifierChords(inputEnumType) ([7301613](https://github.com/Quenty/NevermoreEngine/commit/7301613f5a5f8a7aedd0ec2ca8e3409e3c39451b))
+
+
+
+
 
 # [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.5.0...@quenty/inputkeymaputils@7.6.0) (2022-11-12)
 
