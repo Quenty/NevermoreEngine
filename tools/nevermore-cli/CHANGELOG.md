@@ -1,20 +1,18 @@
-# v1.2.0 (Mon Nov 21 2022)
-
-#### 🚀 Enhancement
-
-- docs: Update docs so they build properly [#309](https://github.com/Quenty/NevermoreEngine/pull/309) ([@Quenty](https://github.com/Quenty))
-- feat: Add sublime project generation to game generator ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.1.0...@quenty/nevermore-cli@1.2.0) (2022-11-21)
+
+
+### Features
+
+* Add sublime project generation to game generator ([fc6509d](https://github.com/Quenty/Nevermore/commit/fc6509d3ebcf25dcdddf6637ca55f4aad9c00c7c))
+
+
+
+
 
 # 1.1.0 (2022-11-19)
 
