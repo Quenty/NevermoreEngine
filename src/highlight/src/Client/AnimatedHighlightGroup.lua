@@ -73,7 +73,7 @@ end
 function AnimatedHighlightGroup:SetDefaultOutlineTransparency(outlineTransparency)
 	assert(type(outlineTransparency) == "number", "Bad outlineTransparency")
 
-	self._defaultFillTransparency.Value = outlineTransparency
+	self._defaultOutlineTransparency.Value = outlineTransparency
 end
 
 function AnimatedHighlightGroup:SetDefaultFillColor(color)
