@@ -1,3 +1,16 @@
+# (Mon Nov 21 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/highlight@2.6.0`, `@quenty/nevermore-cli@1.2.0`
+  - docs: Update docs so they build properly [#309](https://github.com/Quenty/NevermoreEngine/pull/309) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Nov 19 2022)
 
 #### 🚀 Enhancement

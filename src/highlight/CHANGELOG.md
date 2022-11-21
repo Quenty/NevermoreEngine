@@ -1,3 +1,19 @@
+# v2.6.0 (Mon Nov 21 2022)
+
+#### 🚀 Enhancement
+
+- docs: Update docs so they build properly [#309](https://github.com/Quenty/NevermoreEngine/pull/309) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: FIx default outline transparency being set ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
