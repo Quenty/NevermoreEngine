@@ -4,7 +4,7 @@ sidebar_position: 3
 ---
 
 # Build Nevermore locally
-This document is intended to help people submit bug patches, new features, and more to Nevermore. If you would simply like to consume Nevermore and not contribute to it, then this is not the correct article. Please see the [installation](/docs/installation) docs for more.
+This document is intended to help people submit bug patches, new features, and more to Nevermore. If you would simply like to consume Nevermore and not contribute to it, then this is not the correct article. Please see the [installation](/docs/install) docs for more.
 
 To provide a bit of background, Nevermore is a mono-repo. This means that it has a few hundred packages in one repository. In general, you should feel free to deploy Nevermore compatible packages to your own repository. This is part of what using npm empowers us to do. 
 

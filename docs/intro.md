@@ -7,7 +7,7 @@ sidebar_position: 1
 
 Here are some quick links to get started with Nevermore:
 
-* [Installation guide](/docs/Installation)
+* [Installation guide](/docs/install)
 * [API docs](/api/AccelTween)
 
 Nevermore is a portable ModuleScript loader for Roblox, as well as the name for the collection of utility libraries that come with it. These libraries are separated into packages that can be consumed individually using npm.
