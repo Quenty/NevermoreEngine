@@ -27,6 +27,7 @@ local VALID_ATTRIBUTE_TYPES = {
 	["IntValue"] = true;
 	["NumberRange"] = true;
 	["Rect"] = true;
+	["Font"] = true;
 }
 
 --[=[
