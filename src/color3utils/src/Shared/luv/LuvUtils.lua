@@ -1,6 +1,6 @@
 --[[
-Lua implementation of LuvUtils and HPLuv color spaces
-Homepage: http://www.LuvUtils.org/
+Lua implementation of HSLuv and HPLuv color spaces
+Homepage: https://www.hsluv.org/
 
 Copyright (C) 2019 Alexei Boronine
 
