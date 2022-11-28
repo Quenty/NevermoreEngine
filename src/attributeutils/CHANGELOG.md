@@ -1,25 +1,15 @@
-# v8.1.2 (Mon Nov 28 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, null[@lolmanurfunny](https://github.com/lolmanurfunny), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Include "Font" as a valid attribute type in AttributeUtils #310 [#310](https://github.com/Quenty/NevermoreEngine/pull/310) ([@Quenty](https://github.com/Quenty))
-- Added "Font" to VALID_ATTRIBUTE_TYPES table ([@lolmanurfunny](https://github.com/lolmanurfunny))
-
-#### Authors: 2
-
-- [@lolmanurfunny](https://github.com/lolmanurfunny)
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.1.1...@quenty/attributeutils@8.1.2) (2022-11-28)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
 
 ## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.1.0...@quenty/attributeutils@8.1.1) (2022-11-04)
 
