@@ -1,3 +1,16 @@
+# (Mon Nov 28 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/attributeutils@8.1.2`
+  - fix: Include "Font" as a valid attribute type in AttributeUtils #310 [#310](https://github.com/Quenty/NevermoreEngine/pull/310) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Nov 21 2022)
 
 #### 🚀 Enhancement
