@@ -48,7 +48,6 @@
     "@quenty/spring": "file:../spring",
     "@quenty/steputils": "file:../steputils",
     "@quenty/table": "file:../table",
-    "@quenty/timesyncservice": "file:../timesyncservice",
     "@quenty/valuebaseutils": "file:../valuebaseutils"
   },
   "publishConfig": {
