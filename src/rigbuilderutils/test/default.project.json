@@ -2,17 +2,9 @@
   "name": "rigbuildertest",
   "tree": {
     "$className": "DataModel",
-    "ReplicatedStorage": {
-      "Nevermore": {
-        "$path": "../node_modules/@quenty/loader"
-      }
-    },
     "ServerScriptService": {
-      "Nevermore": {
-        "$className": "folder",
-        "RigBuilder": {
-          "$path": ".."
-        }
+      "rigbuilder": {
+        "$path": ".."
       }
     }
   }
