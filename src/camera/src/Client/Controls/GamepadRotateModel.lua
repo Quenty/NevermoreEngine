@@ -1,5 +1,6 @@
 --[=[
-	Rotation model for gamepad controls
+	Rotation model for gamepad controls that uses Roblox's curve smoothing and other components.
+
 	@class GamepadRotateModel
 ]=]
 
@@ -13,6 +14,10 @@ local GamepadRotateModel = setmetatable({}, BaseObject)
 GamepadRotateModel.__index = GamepadRotateModel
 GamepadRotateModel.ClassName = "GamepadRotateModel"
 
+--[=[
+	Constructs a new GamepadRotateModel.
+	@return GamepadRotateModel
+]=]
 function GamepadRotateModel.new()
 	local self = setmetatable(BaseObject.new(), GamepadRotateModel)
 
@@ -26,6 +31,27 @@ function GamepadRotateModel.new()
 	return self
 end
 
+--[=[
+	Sets the acceleration for the game rotate model. The higher the acceleration
+	the more linear the gamepad rotate model feels.
+
+	:::tip
+	Set this to something high, like 2500, for an FPS. This makes control feel a lot better.
+	:::
+
+	@param acceleration number
+]=]
+function GamepadRotateModel:SetAcceleration(acceleration)
+	assert(type(acceleration) == "number", "Bad acceleration")
+
+	self._rampVelocityX.a = acceleration
+	self._rampVelocityY.a = acceleration
+end
+
+--[=[
+	Gets the delta for the thumbstick
+	@return Vector2
+]=]
 function GamepadRotateModel:GetThumbstickDeltaAngle()
 	if not self._lastInputObject then
 		return Vector2.new()
@@ -34,6 +60,9 @@ function GamepadRotateModel:GetThumbstickDeltaAngle()
 	return Vector2.new(self._rampVelocityX.p, self._rampVelocityY.p)
 end
 
+--[=[
+	Stops rotation
+]=]
 function GamepadRotateModel:StopRotate()
 	self._lastInputObject = nil
 	self._rampVelocityX.t = 0
@@ -45,6 +74,12 @@ function GamepadRotateModel:StopRotate()
 	self.IsRotating.Value = false
 end
 
+--[=[
+	Converts the thumbstick input into a smoothed delta based upon deadzone and other
+	components.
+
+	@param inputObject InputObject
+]=]
 function GamepadRotateModel:HandleThumbstickInput(inputObject)
 	if CameraGamepadInputUtils.outOfDeadZone(inputObject) then
 		self._lastInputObject = inputObject

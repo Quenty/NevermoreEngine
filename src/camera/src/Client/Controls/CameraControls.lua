@@ -66,6 +66,16 @@ function CameraControls.new(zoomCamera, rotatedCamera)
 	return self
 end
 
+--[=[
+	Sets the gamepad rotation acceleration
+	@param acceleration number
+]=]
+function CameraControls:SetGamepadRotationAcceleration(acceleration)
+	assert(type(acceleration) == "number", "Bad acceleration")
+
+	self._gamepadRotateModel:SetAcceleration(acceleration)
+end
+
 function CameraControls:GetKey()
 	return self._key
 end
@@ -74,6 +84,9 @@ function CameraControls:IsEnabled()
 	return self._enabled
 end
 
+--[=[
+	Enables the control.
+]=]
 function CameraControls:Enable()
 	if self._enabled then
 		return
@@ -119,6 +132,9 @@ function CameraControls:Enable()
 	end)
 end
 
+--[=[
+	Disables the control.
+]=]
 function CameraControls:Disable()
 	if not self._enabled then
 		return
