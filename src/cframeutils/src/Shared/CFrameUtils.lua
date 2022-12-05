@@ -138,7 +138,7 @@ end
 
 	@param a CFrame
 	@param b CFrame
-	@param epislon number
+	@param epsilon number
 	@return boolean
 ]=]
 function CFrameUtils.areClose(a, b, epsilon)
