@@ -3,8 +3,6 @@
 	@class CFrameUtils
 ]=]
 
-local UP = Vector3.new(0, 1, 0)
-
 local CFrameUtils = {}
 
 --[=[
@@ -21,8 +19,8 @@ local CFrameUtils = {}
 	@param upVector Vector3? -- Optional, defaults to (0, 1, 0)
 	@return CFrame
 ]=]
-function CFrameUtils.lookAt(position, target, upVector)
-	upVector = upVector or UP
+function CFrameUtils.lookAt(position: Vector3, target: Vector3, upVector: Vector3): CFrame
+	upVector = upVector or Vector3.yAxis
 	local forwardVector = (position - target).Unit
 	local rightVector = forwardVector:Cross(upVector)
 	local upVector2 = rightVector:Cross(forwardVector)
@@ -49,7 +47,7 @@ end
 	@param worldGoal Vector3
 	@return CFrame
 ]=]
-function CFrameUtils.redirectLocalAxis(cframe, localAxis, worldGoal)
+function CFrameUtils.redirectLocalAxis(cframe: CFrame, localAxis: Vector3, worldGoal: Vector3): CFrame
 	local localGoal = cframe:VectorToObjectSpace(worldGoal)
 	local m = localAxis.magnitude*localGoal.magnitude
 	local d = localAxis:Dot(localGoal)
@@ -82,7 +80,7 @@ end
 	@param rightVector Vector3
 	@return CFrame?
 ]=]
-function CFrameUtils.fromUpRight(position, upVector, rightVector)
+function CFrameUtils.fromUpRight(position: Vector3, upVector: Vector3, rightVector: Vector3): CFrame | nil
 	local forwardVector = rightVector:Cross(upVector)
 	if forwardVector.magnitude == 0 then
 		return nil
@@ -101,7 +99,7 @@ end
 	@param scale number
 	@return CFrame
 ]=]
-function CFrameUtils.scalePosition(cframe, scale)
+function CFrameUtils.scalePosition(cframe: CFrame, scale: number): CFrame
 	if scale == 1 then
 		return cframe
 	else
@@ -110,6 +108,39 @@ function CFrameUtils.scalePosition(cframe, scale)
 	end
 end
 
+local function reflect(vector: Vector3, unitNormal: Vector3): Vector3
+	return vector - 2*(unitNormal*vector:Dot(unitNormal))
+end
+
+--[=[
+	Reflects the CFrame over the given axis
+
+	@param cframe CFrame
+	@param point Vector3?
+	@param normal Vector3?
+	@return CFrame
+]=]
+function CFrameUtils.mirror(cframe: CFrame, point, normal): CFrame
+	point = point or cframe.Position
+	normal = normal or Vector3.zAxis
+
+	local position = point + reflect(cframe.Position - point, normal)
+
+	local xVector = reflect(cframe.XVector)
+	local yVector = reflect(cframe.YVector)
+	local zVector = reflect(cframe.ZVector)
+
+	return CFrame.fromMatrix(position, xVector, yVector, zVector):Orthonormalize()
+end
+
+--[=[
+	Fuzzy comparison between 2 CFrames
+
+	@param a CFrame
+	@param b CFrame
+	@param epislon number
+	@return boolean
+]=]
 function CFrameUtils.areClose(a, b, epsilon)
 	assert(type(epsilon) == "number", "Bad epsilon")
 
