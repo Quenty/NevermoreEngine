@@ -140,6 +140,12 @@ end
 
 --[=[
 	Formats the resulting entry by args.
+
+	:::tip
+	You should use [JSONTranslator.ObserveFormatByKey] instead of this to respond
+	to locale changing.
+	:::
+
 	@param key string
 	@param args table?
 	@return Promise<string>
@@ -194,6 +200,12 @@ end
 
 --[=[
 	Formats or errors if the cloud translations are not loaded.
+
+	:::tip
+	You should use [JSONTranslator.ObserveFormatByKey] instead of this to respond
+	to locale changing.
+	:::
+
 	@param key string
 	@param args table?
 	@return string
