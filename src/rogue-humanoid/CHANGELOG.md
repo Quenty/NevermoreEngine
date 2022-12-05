@@ -1,19 +1,15 @@
-# v3.6.0 (Mon Dec 05 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add Rx.failed() [#311](https://github.com/Quenty/NevermoreEngine/pull/311) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.5.1...@quenty/rogue-humanoid@3.6.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
 
 ## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.5.0...@quenty/rogue-humanoid@3.5.1) (2022-11-28)
 

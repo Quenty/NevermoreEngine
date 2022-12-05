@@ -1,20 +1,18 @@
-# v7.2.0 (Mon Dec 05 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add Rx.failed() [#311](https://github.com/Quenty/NevermoreEngine/pull/311) ([@Quenty](https://github.com/Quenty))
-- feat: Add Rx.failed() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.1.1...@quenty/rx@7.2.0) (2022-12-05)
+
+
+### Features
+
+* Add Rx.failed() ([4b33fd1](https://github.com/Quenty/NevermoreEngine/commit/4b33fd1b2724b7eb40c7fd56096501d90f171b84))
+
+
+
+
 
 ## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.1.0...@quenty/rx@7.1.1) (2022-11-04)
 

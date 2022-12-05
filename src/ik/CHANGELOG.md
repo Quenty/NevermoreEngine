@@ -1,19 +1,15 @@
-# v9.8.0 (Mon Dec 05 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add Rx.failed() [#311](https://github.com/Quenty/NevermoreEngine/pull/311) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.7.1...@quenty/ik@9.8.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
 
 ## [9.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.7.0...@quenty/ik@9.7.1) (2022-11-28)
 

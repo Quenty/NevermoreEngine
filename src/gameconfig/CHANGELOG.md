@@ -1,19 +1,15 @@
-# v5.7.0 (Mon Dec 05 2022)
-
-#### 🚀 Enhancement
-
-- feat: Add Rx.failed() [#311](https://github.com/Quenty/NevermoreEngine/pull/311) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.6.1...@quenty/gameconfig@5.7.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
 
 ## [5.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.6.0...@quenty/gameconfig@5.6.1) (2022-11-28)
 
