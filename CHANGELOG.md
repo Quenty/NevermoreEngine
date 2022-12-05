@@ -1,3 +1,16 @@
+# (Mon Dec 05 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/color3utils@5.5.0`, `@quenty/rx@7.2.0`
+  - feat: Add Rx.failed() [#311](https://github.com/Quenty/NevermoreEngine/pull/311) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Nov 28 2022)
 
 #### 🐛 Bug Fix

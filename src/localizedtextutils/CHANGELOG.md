@@ -1,3 +1,15 @@
+# v6.2.0 (Mon Dec 05 2022)
+
+#### 🚀 Enhancement
+
+- feat: Add Rx.failed() [#311](https://github.com/Quenty/NevermoreEngine/pull/311) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
