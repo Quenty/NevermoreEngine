@@ -103,6 +103,20 @@ function Rx.of(...)
 end
 
 --[=[
+	Returns a failed observable
+
+	@param ... any -- Failure args
+	@return Observable
+]=]
+function Rx.failed(...)
+	local args = table.pack(...)
+
+	return Observable.new(function(sub)
+		sub:Fail(table.unpack(args, 1, args.n))
+	end)
+end
+
+--[=[
 	Converts an item
 	http://reactivex.io/documentation/operators/from.html
 
