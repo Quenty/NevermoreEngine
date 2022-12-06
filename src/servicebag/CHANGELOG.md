@@ -1,23 +1,18 @@
-# v6.4.0 (Tue Dec 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Minor adjustments [#312](https://github.com/Quenty/NevermoreEngine/pull/312) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add serviceName in error message in ServiceBag ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.3.0...@quenty/servicebag@6.4.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* Add serviceName in error message in ServiceBag ([c3809fb](https://github.com/Quenty/NevermoreEngine/commit/c3809fb6a1377e0a8cec2ef3be3ac2a124fbc247))
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.2.0...@quenty/servicebag@6.3.0) (2022-11-19)
 

@@ -1,20 +1,18 @@
-# v9.6.0 (Tue Dec 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Minor adjustments [#312](https://github.com/Quenty/NevermoreEngine/pull/312) ([@Quenty](https://github.com/Quenty))
-- feat: Add :SetAcceleration(acceleration) on GamepadRotateModel to allow for a more linear control of the camera ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.5.0...@quenty/camera@9.6.0) (2022-12-06)
+
+
+### Features
+
+* Add :SetAcceleration(acceleration) on GamepadRotateModel to allow for a more linear control of the camera ([3aec535](https://github.com/Quenty/NevermoreEngine/commit/3aec535dc88ed97ff4762e4b50d6e46d4c6c6ecb))
+
+
+
+
 
 # [9.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.4.0...@quenty/camera@9.5.0) (2022-11-19)
 

@@ -1,23 +1,18 @@
-# v9.8.0 (Tue Dec 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Minor adjustments [#312](https://github.com/Quenty/NevermoreEngine/pull/312) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Remove TimeSyncService unneeded dependency in Ragdoll package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.7.1...@quenty/ragdoll@9.8.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* Remove TimeSyncService unneeded dependency in Ragdoll package ([074c48a](https://github.com/Quenty/NevermoreEngine/commit/074c48a973c562db01c09ab2511aa2e66f7d81ec))
+
+
+
+
 
 ## [9.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.7.0...@quenty/ragdoll@9.7.1) (2022-12-06)
 

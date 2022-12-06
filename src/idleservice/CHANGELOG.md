@@ -1,19 +1,15 @@
-# v7.8.0 (Tue Dec 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Minor adjustments [#312](https://github.com/Quenty/NevermoreEngine/pull/312) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.7.1...@quenty/idleservice@7.8.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
 
 ## [7.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.7.0...@quenty/idleservice@7.7.1) (2022-12-06)
 

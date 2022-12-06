@@ -1,23 +1,15 @@
-# v6.1.0 (Tue Dec 06 2022)
-
-#### 🚀 Enhancement
-
-- feat: Minor adjustments [#312](https://github.com/Quenty/NevermoreEngine/pull/312) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Rigbuilder doesn't try to deploy Nevermore loader in a classic way ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@6.0.1...@quenty/rigbuilderutils@6.1.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+
+
+
 
 ## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@6.0.0...@quenty/rigbuilderutils@6.0.1) (2022-11-04)
 
