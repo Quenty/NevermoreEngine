@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[21305],{49124:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Vector3SerializationUtils","desc":"","source":{"line":4,"path":"src/vector3utils/src/Shared/Vector3SerializationUtils.lua"}}')}}]);
