@@ -1,5 +1,18 @@
 # (Tue Dec 06 2022)
 
+#### 🚀 Enhancement
+
+- `@quenty/buttonhighlightmodel@7.6.0`, `@quenty/camera@9.6.0`, `@quenty/cframeutils@5.1.0`, `@quenty/clienttranslator@8.7.0`, `@quenty/geometryutils@2.3.0`, `@quenty/hintscoringutils@9.6.0`, `@quenty/ragdoll@9.8.0`, `@quenty/rigbuilderutils@6.1.0`, `@quenty/servicebag@6.4.0`, `@quenty/vector3utils@6.1.0`
+  - feat: Minor adjustments [#312](https://github.com/Quenty/NevermoreEngine/pull/312) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Dec 06 2022)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, null[@systematicequation](https://github.com/systematicequation), for all your work!
