@@ -247,7 +247,8 @@ function ServiceBag:_ensureInitialization(serviceType)
 	elseif self._serviceTypesToInitializeSet then
 		self._serviceTypesToInitializeSet[serviceType] = true
 	else
-		error("[ServiceBag._ensureInitialization] - Cannot initialize past initializing phase ")
+		local serviceName = self:_getServiceName(serviceType)
+		error(string.format("Cannot initialize service %q past initializing phase", serviceName))
 	end
 end
 

@@ -42,6 +42,17 @@ function Vector3Utils.getAngleRad(a: Vector3, b: Vector3): number
 end
 
 --[=[
+	Reflects a vector over a unit normal
+
+	@param vector Vector3
+	@param unitNormal Vector3
+	@return Vector3
+]=]
+function Vector3Utils.reflect(vector: Vector3, unitNormal: Vector3): Vector3
+	return vector - 2*(unitNormal*vector:Dot(unitNormal))
+end
+
+--[=[
 	Computes the angle between 2 vectors in radians
 	@param a Vector3
 	@param b Vector3
