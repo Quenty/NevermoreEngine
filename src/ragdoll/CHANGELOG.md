@@ -1,23 +1,15 @@
-# v9.7.1 (Tue Dec 06 2022)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, null[@systematicequation](https://github.com/systematicequation), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Typo in RagdollServiceClient that makes SetScreenShakeEnabled work as intended [#313](https://github.com/Quenty/NevermoreEngine/pull/313) ([@systematicequation](https://github.com/systematicequation))
-
-#### Authors: 1
-
-- [@systematicequation](https://github.com/systematicequation)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [9.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.7.0...@quenty/ragdoll@9.7.1) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
 
 # [9.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.6.1...@quenty/ragdoll@9.7.0) (2022-12-05)
 
