@@ -37,7 +37,7 @@ end
 function RagdollServiceClient:SetScreenShakeEnabled(value)
 	assert(type(value) == "boolean", "Bad value")
 
-	Players.LocalPlayer:SetAttribute(RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE)
+	Players.LocalPlayer:SetAttribute(RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE, value)
 end
 
 --[=[
