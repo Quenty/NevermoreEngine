@@ -1,42 +1,37 @@
 {
-  "name": "@quenty/nevermore-cli",
-  "version": "1.2.0",
-  "description": "CLI interface for Nevermore",
+  "name": "@quenty/nevermore-template-helpers",
+  "version": "1.0.0",
+  "description": "Helpers to generate Nevermore package and game templates",
   "keywords": [
     "Roblox",
-    "Nevermore",
+    "Raven",
     "CLI"
   ],
-  "bin": {
-    "nevermore": "./dist/nevermore.js"
-  },
-  "main": "dist/nevermore.js",
+  "main": "dist/templateHelpers.js",
+  "files": [
+    "dist"
+  ],
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/Nevermore.git",
-    "directory": "tools/nevermore-cli/"
+    "directory": "tools/nevermore-template-helpers/"
   },
-  "license": "MIT",
+  "license": "UNLICENSED",
   "contributors": [
     "Quenty"
   ],
   "dependencies": {
     "@quenty/cli-output-helpers": "file:../cli-output-helpers",
-    "@quenty/nevermore-template-helpers": "file:../nevermore-template-helpers",
+    "chalk": "^4.1.2",
     "execa": "v5.1.1",
-    "find-git-root": "^1.0.4",
-    "inquirer": "^8.2.4",
-    "read-package-json": "^6.0.0",
-    "typescript-memoize": "^1.1.1",
-    "yargs": "^17.0.13"
+    "handlebars": "^4.7.7",
+    "typescript-memoize": "^1.1.1"
   },
   "devDependencies": {
-    "@types/inquirer": "^9.0.2",
     "@types/node": "^18.11.4",
-    "@types/yargs": "^17.0.13",
     "prettier": "2.7.1",
     "typescript": "^4.8.4"
   },
