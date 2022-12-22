@@ -8,9 +8,6 @@
     "CLI"
   ],
   "main": "dist/templateHelpers.js",
-  "files": [
-    "dist"
-  ],
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },
@@ -38,8 +35,7 @@
   "scripts": {
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "clean": "tsc --build --clean",
-    "prepare" : "npm run build"
+    "clean": "tsc --build --clean"
   },
   "publishConfig": {
     "access": "public"
