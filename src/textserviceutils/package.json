@@ -32,6 +32,7 @@
   "dependencies": {
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
+    "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx"
   }
 }
