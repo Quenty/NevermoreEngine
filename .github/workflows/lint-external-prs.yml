@@ -1,0 +1,8 @@
+# External PRs need their own linter in main, but we need the branch name to publish packages
+# So we explicitly just run the linting on external forks for now.
+name: lint-external-prs
+on: [pull_request_target]
+jobs:
+  lint:
+    if: "github.event.pull_request.head.repo.fork"
+    uses: ./.github/workflows/lint.yml
