@@ -1,3 +1,19 @@
+# v8.6.0 (Tue Dec 27 2022)
+
+#### 🚀 Enhancement
+
+- Users/quenty/tooling [#314](https://github.com/Quenty/NevermoreEngine/pull/314) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Update permission provider README.md with more information ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

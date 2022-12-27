@@ -1,3 +1,16 @@
+# v7.6.0 (Tue Dec 27 2022)
+
+#### 🚀 Enhancement
+
+- Users/quenty/tooling [#314](https://github.com/Quenty/NevermoreEngine/pull/314) ([@Quenty](https://github.com/Quenty))
+- feat: Add TextServiceUtils.promiseTextBounds with a workaround for Roblox cancelling certain calls in weird ways. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
