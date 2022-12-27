@@ -1,14 +1,12 @@
 {
-  "name": "@quenty/textserviceutils",
-  "version": "7.5.0",
-  "description": "Holds utilities involving the Roblox TextService and text fitting to size.",
+  "name": "@quenty/{{packageName}}",
+  "version": "1.0.0",
+  "description": "{{description}}",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "textserviceutils",
-    "sizing",
-    "gui"
+    "{{packageName}}"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -16,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/textserviceutils/"
+    "directory": "src/{{packageName}}/"
   },
   "funding": {
     "type": "patreon",
@@ -26,13 +24,10 @@
   "contributors": [
     "Quenty"
   ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "@quenty/blend": "file:../blend",
-    "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx"
   }
 }

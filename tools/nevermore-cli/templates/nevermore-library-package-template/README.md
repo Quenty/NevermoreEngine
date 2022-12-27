@@ -1,4 +1,5 @@
-## Vector3Utils
+## {{packageNameProper}}
+
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
@@ -11,11 +12,12 @@
   </a>
 </div>
 
-Utilities involving Vector3 objects in Roblox.
+{{description}}
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Vector3Utils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/{{packageNameProper}}Utils">View docs →</a></div>
 
 ## Installation
+
 ```
-npm install @quenty/vector3utils --save
+npm install @quenty/{{packageName}} --save
 ```

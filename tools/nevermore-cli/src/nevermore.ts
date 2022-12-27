@@ -6,8 +6,10 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+
 import { InitGameCommand } from './commands/init-game-command';
-import { OutputHelper } from './helper';
+import { InitPackageCommand } from './commands/init-package-command';
 
 yargs(hideBin(process.argv))
   .scriptName('nevermore')
@@ -27,6 +29,7 @@ yargs(hideBin(process.argv))
   })
   .usage(OutputHelper.formatInfo('Usage: $0 <command> [options]'))
   .command(new InitGameCommand())
+  .command(new InitPackageCommand())
   .recommendCommands()
   .demandCommand(
     1,

@@ -1,0 +1,6 @@
+{
+  "name": "{{packageName}}",
+  "tree": {
+    "$path": "src"
+  }
+}
