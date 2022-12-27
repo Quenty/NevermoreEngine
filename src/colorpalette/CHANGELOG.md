@@ -1,20 +1,18 @@
-# v4.7.0 (Tue Dec 27 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/tooling [#314](https://github.com/Quenty/NevermoreEngine/pull/314) ([@Quenty](https://github.com/Quenty))
-- feat: Add FontPalette:ObserveFontFace(fontName, weight, style) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.6.0...@quenty/colorpalette@4.7.0) (2022-12-27)
+
+
+### Features
+
+* Add FontPalette:ObserveFontFace(fontName, weight, style) ([a03f177](https://github.com/Quenty/NevermoreEngine/commit/a03f1775857b51981d443d9ac11518316524cac2))
+
+
+
+
 
 # [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.5.0...@quenty/colorpalette@4.6.0) (2022-12-05)
 
