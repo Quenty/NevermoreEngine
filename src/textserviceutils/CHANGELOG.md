@@ -1,19 +1,15 @@
-# v7.6.1 (Tue Dec 27 2022)
-
-#### 🐛 Bug Fix
-
-- docs: Update Observable.lua [#315](https://github.com/Quenty/NevermoreEngine/pull/315) ([@antcar0929](https://github.com/antcar0929))
-
-#### Authors: 1
-
-- Antcar ([@antcar0929](https://github.com/antcar0929))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.6.0...@quenty/textserviceutils@7.6.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
 
 # [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.5.0...@quenty/textserviceutils@7.6.0) (2022-12-27)
 
