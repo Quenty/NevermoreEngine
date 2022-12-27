@@ -1,3 +1,15 @@
+# v4.7.1 (Tue Dec 27 2022)
+
+#### 🐛 Bug Fix
+
+- docs: Update Observable.lua [#315](https://github.com/Quenty/NevermoreEngine/pull/315) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 1
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

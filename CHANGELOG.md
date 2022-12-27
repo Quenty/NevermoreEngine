@@ -1,5 +1,18 @@
 # (Tue Dec 27 2022)
 
+#### 🐛 Bug Fix
+
+- `@quenty/rx@7.2.1`
+  - docs: Update Observable.lua [#315](https://github.com/Quenty/NevermoreEngine/pull/315) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 1
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+
+---
+
+# (Tue Dec 27 2022)
+
 #### 🚀 Enhancement
 
 - `@quenty/colorpalette@4.7.0`, `@quenty/permissionprovider@8.6.0`, `@quenty/streamingutils@6.1.0`, `@quenty/textserviceutils@7.6.0`, `@quenty/vector3utils@6.2.0`, `@quenty/cli-output-helpers@1.1.0`, `@quenty/nevermore-cli@1.3.0`, `@quenty/nevermore-template-helpers@1.1.0`
