@@ -36,9 +36,9 @@ local function initialize(plugin)
 	local toolbar = plugin:CreateToolbar("Object")
 	local toggleButton = toolbar:CreateButton(
 		"convertButton",
-		"UI Converter",
+		"Convert UI elements to Blend or Fusion",
 		"rbxassetid://8542145374",
-		"Convert UI elements to Blend or Fusion"
+		"UI Converter"
 	)
 
 	local info = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, false, false, 0, 0)
