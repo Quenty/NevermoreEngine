@@ -97,4 +97,22 @@ function Color3Utils.setSaturation(color3, saturation)
 	return Color3.fromHSV(h, saturation, v)
 end
 
+--[=[
+	Compares 2 color3 values
+
+	@param a Color3
+	@param b Color3
+	@param epsilon number? -- Optional
+	@return boolean
+]=]
+function Color3Utils.areEqual(a, b, epsilon)
+	if not epsilon then
+		epsilon = 1e-6
+	end
+
+	return math.abs(a.r - b.r) <= epsilon
+		and math.abs(a.g - b.g) <= epsilon
+		and math.abs(a.b - b.b) <= epsilon
+end
+
 return Color3Utils
