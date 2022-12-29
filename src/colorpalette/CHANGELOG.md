@@ -1,23 +1,18 @@
-# v4.8.0 (Thu Dec 29 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/search [#317](https://github.com/Quenty/NevermoreEngine/pull/317) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add better error messages around ColorGradePalette ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.7.1...@quenty/colorpalette@4.8.0) (2022-12-29)
+
+
+### Bug Fixes
+
+* Add better error messages around ColorGradePalette ([53a24a4](https://github.com/Quenty/NevermoreEngine/commit/53a24a494885e51dba271922a1848b240872013c))
+
+
+
+
 
 ## [4.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.7.0...@quenty/colorpalette@4.7.1) (2022-12-27)
 

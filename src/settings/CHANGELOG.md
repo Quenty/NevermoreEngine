@@ -1,19 +1,15 @@
-# v4.10.0 (Thu Dec 29 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/search [#317](https://github.com/Quenty/NevermoreEngine/pull/317) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.9.1...@quenty/settings@4.10.0) (2022-12-29)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
 
 ## [4.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.9.0...@quenty/settings@4.9.1) (2022-12-27)
 

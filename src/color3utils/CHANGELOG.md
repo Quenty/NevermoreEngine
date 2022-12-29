@@ -1,20 +1,18 @@
-# v5.6.0 (Thu Dec 29 2022)
-
-#### 🚀 Enhancement
-
-- Users/quenty/search [#317](https://github.com/Quenty/NevermoreEngine/pull/317) ([@Quenty](https://github.com/Quenty))
-- feat: Add Color3Utils.areEqual(a, b, epsilon) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.5.1...@quenty/color3utils@5.6.0) (2022-12-29)
+
+
+### Features
+
+* Add Color3Utils.areEqual(a, b, epsilon) ([3943a7f](https://github.com/Quenty/NevermoreEngine/commit/3943a7fe2cc581ae85fa5eb2fc14bf146012dde3))
+
+
+
+
 
 ## [5.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.5.0...@quenty/color3utils@5.5.1) (2022-12-27)
 
