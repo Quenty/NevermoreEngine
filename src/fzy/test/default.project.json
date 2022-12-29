@@ -1,0 +1,11 @@
+{
+  "name": "FzyTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "fzy": {
+        "$path": ".."
+      }
+    }
+  }
+}
