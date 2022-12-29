@@ -1,3 +1,16 @@
+# (Thu Dec 29 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/color3utils@5.6.0`, `@quenty/colorpalette@4.8.0`, `@quenty/fzy@1.1.0`, `@quenty/observablecollection@5.4.0`, `@quenty/uiobjectutils@3.1.0`
+  - Users/quenty/search [#317](https://github.com/Quenty/NevermoreEngine/pull/317) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Dec 27 2022)
 
 #### 🐛 Bug Fix
