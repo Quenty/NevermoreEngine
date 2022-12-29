@@ -33,5 +33,17 @@ return function()
 			expect(observableSortedList:Get(2)).to.equal("b")
 			expect(observableSortedList:GetCount()).to.equal(2)
 		end)
+
+		it("should add in order if number is the same", function()
+			observableSortedList = ObservableSortedList.new()
+			observableSortedList:Add("a", Rx.of(0))
+			observableSortedList:Add("b", Rx.of(0))
+			observableSortedList:Add("c", Rx.of(0))
+
+			expect(observableSortedList:Get(1)).to.equal("a")
+			expect(observableSortedList:Get(2)).to.equal("b")
+			expect(observableSortedList:Get(3)).to.equal("c")
+			expect(observableSortedList:GetCount()).to.equal(1)
+		end)
 	end)
 end
