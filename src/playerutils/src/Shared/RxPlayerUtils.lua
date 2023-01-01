@@ -28,7 +28,7 @@ function RxPlayerUtils.observePlayersBrio(predicate: (Player) -> boolean?)
 			if predicate == nil or predicate(player) then
 				local brio = Brio.new(player)
 				maid[player] = brio
-	
+
 				sub:Fire(brio)
 			end
 		end
@@ -38,7 +38,7 @@ function RxPlayerUtils.observePlayersBrio(predicate: (Player) -> boolean?)
 		maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
 			maid[player] = nil
 		end))
-		
+
 		for _, player in Players:GetPlayers() do
 			handlePlayer(player)
 		end
