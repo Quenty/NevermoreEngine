@@ -58,6 +58,7 @@ function SoundUtils.createSoundFromId(id: string | number): Sound
 	local sound = Instance.new("Sound")
 	sound.Name = ("Sound_%s"):format(soundId)
 	sound.SoundId = soundId
+	sound.RollOffMode = Enum.RollOffMode.InverseTapered
 	sound.Volume = 0.25
 	sound.Archivable = false
 
