@@ -1,6 +1,6 @@
 {
   "name": "@quenty/statestack",
-  "version": "8.2.1",
+  "version": "8.3.0",
   "description": "Stack of values that allows multiple systems to enable or disable a state",
   "keywords": [
     "Roblox",

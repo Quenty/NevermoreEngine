@@ -1,23 +1,18 @@
-# v7.4.0 (Sun Jan 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: RxInstanceUtils.observeDescendantsOfClassBrio(parent, className) only observed children ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.3.1...@quenty/instanceutils@7.4.0) (2023-01-01)
+
+
+### Bug Fixes
+
+* RxInstanceUtils.observeDescendantsOfClassBrio(parent, className) only observed children ([900bda0](https://github.com/Quenty/NevermoreEngine/commit/900bda08abfc1fe3f2aa85f545ab5ef9750df607))
+
+
+
+
 
 ## [7.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.3.0...@quenty/instanceutils@7.3.1) (2022-12-27)
 

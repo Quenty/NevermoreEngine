@@ -1,23 +1,18 @@
-# v6.1.0 (Sun Jan 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: RollOffMode defaults to InverseTapered for sounds ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@6.0.1...@quenty/sounds@6.1.0) (2023-01-01)
+
+
+### Bug Fixes
+
+* RollOffMode defaults to InverseTapered for sounds ([83837ce](https://github.com/Quenty/NevermoreEngine/commit/83837ced3e0dcfa036e3d020466704a0d9f6b06f))
+
+
+
+
 
 ## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@6.0.0...@quenty/sounds@6.0.1) (2022-11-04)
 

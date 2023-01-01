@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.6.0...@quenty/color3utils@5.7.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/color3utils
+
+
+
+
+
 # [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.5.1...@quenty/color3utils@5.6.0) (2022-12-29)
 
 

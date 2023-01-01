@@ -1,20 +1,18 @@
-# v7.3.0 (Sun Jan 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
-- feat: Add Rx.interval() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.2.1...@quenty/rx@7.3.0) (2023-01-01)
+
+
+### Features
+
+* Add Rx.interval() ([8df8e82](https://github.com/Quenty/NevermoreEngine/commit/8df8e82d894c2786c4b5a2bd720ba00a89b6c2f2))
+
+
+
+
 
 ## [7.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.2.0...@quenty/rx@7.2.1) (2022-12-27)
 
