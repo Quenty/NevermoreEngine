@@ -124,7 +124,7 @@ end
 --[=[
 	Check if `needle` is a subsequence of the `haystack`.
 
-	Usually called before `score` or `positions`.
+	Usually called before [Fzy.score] or [Fzy.positions].
 
 	@param config FzyConfig
 	@param needle string
