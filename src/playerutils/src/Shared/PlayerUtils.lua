@@ -25,6 +25,19 @@ function PlayerUtils.formatName(player)
 	return PlayerUtils.formatDisplayName(name, displayName)
 end
 
+--[=[
+	Human-readable version of a player name. If the player's name is the same
+	as the display name, then returns that player's name. Otherwise returns
+	a formatted name with the player's name like this "oot (@martxn)" which
+	lets you know the username and the display name.
+
+	Note this is not localized, although most languages should be ok. Great for
+	output for dev logs and command services which are less picky.
+
+	@param name string
+	@param displayName string
+	@return string -- Formatted name
+]=]
 function PlayerUtils.formatDisplayName(name, displayName)
 	if name:lower() == displayName:lower() then
 		return displayName
@@ -62,6 +75,7 @@ end
 
 --[=[
 	Retrieves the display name color for a given player (for the Roblox chat)
+
 	@param displayName string
 	@return Color3
 ]=]

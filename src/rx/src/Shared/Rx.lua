@@ -1524,6 +1524,18 @@ function Rx.timer(initialDelaySeconds, seconds)
 end
 
 --[=[
+	https://www.learnrxjs.io/learn-rxjs/operators/creation/interval
+
+	@param seconds number
+	@return (source: Observable<number>) -> Observable<number>
+]=]
+function Rx.interval(seconds)
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return Rx.timer(0, seconds)
+end
+
+--[=[
 	Honestly, I have not used this one much.
 
 	https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom

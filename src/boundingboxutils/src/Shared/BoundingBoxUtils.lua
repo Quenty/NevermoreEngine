@@ -161,7 +161,7 @@ end
 	@param testPosition Vector3
 	@return boolean
 ]=]
-function BoundingBoxUtils.inBoundingBox(cframe, size, testPosition: Vector3)
+function BoundingBoxUtils.inBoundingBox(cframe: CFrame, size: Vector3, testPosition: Vector3): boolean
 	local relative = cframe:pointToObjectSpace(testPosition)
 	local hsx, hsy, hsz = size.X/2, size.Y/2, size.Z/2
 

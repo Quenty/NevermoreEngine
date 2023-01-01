@@ -78,10 +78,8 @@ function Binder.new(tagName, constructor, ...)
 	self._listeners = {} -- [inst] = callback
 	self._args = {...}
 
-	task.delay(5, function()
-		if not self._loaded then
-			warn(("Binder %q is not loaded. Call :Start() on it!"):format(self._tagName))
-		end
+	self._maid._warning = task.delay(5, function()
+		warn(("Binder %q is not loaded. Call :Start() on it!"):format(self._tagName))
 	end)
 
 	return self
@@ -120,6 +118,7 @@ function Binder:Start()
 	if self._loaded then
 		return
 	end
+	self._maid._warning = nil
 	self._loaded = true
 
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do

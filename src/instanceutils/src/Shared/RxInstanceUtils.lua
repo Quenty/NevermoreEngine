@@ -418,7 +418,7 @@ function RxInstanceUtils.observeDescendantsOfClassBrio(parent, className)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(className) == "string", "Bad className")
 
-	return RxInstanceUtils.observeChildrenBrio(parent, function(child)
+	return RxInstanceUtils.observeDescendantsBrio(parent, function(child)
 		return child:IsA(className)
 	end)
 end
