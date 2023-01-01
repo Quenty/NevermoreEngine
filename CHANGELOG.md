@@ -1,3 +1,16 @@
+# (Sun Jan 01 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@8.5.0`, `@quenty/boundingboxutils@4.1.0`, `@quenty/fzy@1.2.0`, `@quenty/instanceutils@7.4.0`, `@quenty/playerutils@2.4.0`, `@quenty/rx@7.3.0`, `@quenty/sounds@6.1.0`
+  - Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Dec 29 2022)
 
 #### 🚀 Enhancement

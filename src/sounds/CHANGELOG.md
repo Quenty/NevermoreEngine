@@ -1,3 +1,19 @@
+# v6.1.0 (Sun Jan 01 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: RollOffMode defaults to InverseTapered for sounds ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

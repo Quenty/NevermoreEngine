@@ -1,3 +1,19 @@
+# v8.5.0 (Sun Jan 01 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Cancel binder warning such that it will not warn upon failure to start if it's destroyed ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
