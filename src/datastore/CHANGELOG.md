@@ -1,3 +1,17 @@
+# v7.4.1 (Tue Jan 03 2023)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/patches [#319](https://github.com/Quenty/NevermoreEngine/pull/319) ([@Quenty](https://github.com/Quenty))
+- fix: Add PrivateServerDataStoreService ([@Quenty](https://github.com/Quenty))
+- fix: Better error message if key is an empty string ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

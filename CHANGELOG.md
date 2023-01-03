@@ -1,3 +1,16 @@
+# (Tue Jan 03 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/conditions@4.5.1`, `@quenty/datastore@7.4.1`, `@quenty/playerhumanoidbinder@8.5.1`
+  - Users/quenty/patches [#319](https://github.com/Quenty/NevermoreEngine/pull/319) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jan 01 2023)
 
 #### 🚀 Enhancement

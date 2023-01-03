@@ -1,3 +1,16 @@
+# v8.5.1 (Tue Jan 03 2023)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/patches [#319](https://github.com/Quenty/NevermoreEngine/pull/319) ([@Quenty](https://github.com/Quenty))
+- fix: Fix Humanoid and Character binders leaking warning message ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
