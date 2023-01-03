@@ -1,20 +1,18 @@
-# v4.5.1 (Tue Jan 03 2023)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/patches [#319](https://github.com/Quenty/NevermoreEngine/pull/319) ([@Quenty](https://github.com/Quenty))
-- fix: Remove deadcode ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/conditions@4.5.0...@quenty/conditions@4.5.1) (2023-01-03)
+
+
+### Bug Fixes
+
+* Remove deadcode ([17848e4](https://github.com/Quenty/NevermoreEngine/commit/17848e4fdfc1deee14f5bcdb8ff7b769a7aa7799))
+
+
+
+
 
 # [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/conditions@4.4.1...@quenty/conditions@4.5.0) (2023-01-01)
 

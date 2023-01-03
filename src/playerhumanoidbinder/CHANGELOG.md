@@ -1,20 +1,18 @@
-# v8.5.1 (Tue Jan 03 2023)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/patches [#319](https://github.com/Quenty/NevermoreEngine/pull/319) ([@Quenty](https://github.com/Quenty))
-- fix: Fix Humanoid and Character binders leaking warning message ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.5.0...@quenty/playerhumanoidbinder@8.5.1) (2023-01-03)
+
+
+### Bug Fixes
+
+* Fix Humanoid and Character binders leaking warning message ([ff173f1](https://github.com/Quenty/NevermoreEngine/commit/ff173f1412b07680f7288b265b1940f2df516332))
+
+
+
+
 
 # [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.4.1...@quenty/playerhumanoidbinder@8.5.0) (2023-01-01)
 
