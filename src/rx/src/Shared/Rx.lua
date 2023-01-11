@@ -1374,7 +1374,7 @@ function Rx.take(number)
 			local taken = 0
 			local maid = Maid.new()
 
-			maid:GiveTask(source:Subscribe(function(...)
+			maid._sub = source:Subscribe(function(...)
 				if taken >= number then
 					warn("[Rx.take] - Still getting values past subscription")
 					return
@@ -1385,8 +1385,11 @@ function Rx.take(number)
 
 				if taken >= number then
 					sub:Complete()
+
+					-- Paranoid disconnect, even though our parent should also disconnect
+					maid._sub = nil
 				end
-			end, sub:GetFailComplete()))
+			end, sub:GetFailComplete())
 
 			return maid
 		end)

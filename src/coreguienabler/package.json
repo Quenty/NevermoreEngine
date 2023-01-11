@@ -26,7 +26,8 @@
   "dependencies": {
     "@quenty/characterutils": "file:../characterutils",
     "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx"
   },
   "publishConfig": {
     "access": "public"
