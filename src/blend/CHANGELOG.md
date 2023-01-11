@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.6.0...@quenty/blend@6.7.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
 # [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.5.1...@quenty/blend@6.6.0) (2023-01-01)
 
 **Note:** Version bump only for package @quenty/blend

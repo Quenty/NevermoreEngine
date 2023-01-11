@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.5.1...@quenty/playerhumanoidbinder@8.6.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
 ## [8.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.5.0...@quenty/playerhumanoidbinder@8.5.1) (2023-01-03)
 
 

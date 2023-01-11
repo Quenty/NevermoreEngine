@@ -1,23 +1,18 @@
-# v7.4.0 (Wed Jan 11 2023)
-
-#### 🚀 Enhancement
-
-- fix: CoreGuiEnabler disables and observes nicely [#320](https://github.com/Quenty/NevermoreEngine/pull/320) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Paranoid disconnect take() calls ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.3.0...@quenty/rx@7.4.0) (2023-01-11)
+
+
+### Bug Fixes
+
+* Paranoid disconnect take() calls ([108c19e](https://github.com/Quenty/NevermoreEngine/commit/108c19edd63ee41bec1326750a19e770184df641))
+
+
+
+
 
 # [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.2.1...@quenty/rx@7.3.0) (2023-01-01)
 
