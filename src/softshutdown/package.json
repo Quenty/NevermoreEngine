@@ -35,6 +35,7 @@
     "@quenty/bindtocloseservice": "file:../bindtocloseservice",
     "@quenty/blend": "file:../blend",
     "@quenty/clienttranslator": "file:../clienttranslator",
+    "@quenty/coreguienabler": "file:../coreguienabler",
     "@quenty/datastore": "file:../datastore",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
