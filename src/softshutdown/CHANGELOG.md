@@ -1,3 +1,19 @@
+# v3.13.0 (Wed Jan 11 2023)
+
+#### 🚀 Enhancement
+
+- fix: CoreGuiEnabler disables and observes nicely [#320](https://github.com/Quenty/NevermoreEngine/pull/320) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Use CoreGuiEnabler to disable core gui types ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

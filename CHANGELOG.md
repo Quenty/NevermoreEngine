@@ -1,3 +1,16 @@
+# (Wed Jan 11 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/coreguienabler@6.1.0`, `@quenty/playerutils@2.5.0`, `@quenty/rx@7.4.0`, `@quenty/softshutdown@3.13.0`
+  - fix: CoreGuiEnabler disables and observes nicely [#320](https://github.com/Quenty/NevermoreEngine/pull/320) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jan 03 2023)
 
 #### 🐛 Bug Fix
