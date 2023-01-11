@@ -11,7 +11,7 @@
   </a>
 </div>
 
-Utilities involving Vector3 objects in Roblox
+Utilities involving Vector3 objects in Roblox.
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Vector3Utils">View docs →</a></div>
 
@@ -19,15 +19,3 @@ Utilities involving Vector3 objects in Roblox
 ```
 npm install @quenty/vector3utils --save
 ```
-
-## Usage
-Usage is designed to be simple.
-
-### `Vector3Utils.fromVector2XY(vector2)`
-
-### `Vector3Utils.fromVector2XZ(vector2)`
-
-### `Vector3Utils.getAngleRad(offsetUnit, lookVector)`
-
-### `Vector3Utils.round(vector3, amount)`
-

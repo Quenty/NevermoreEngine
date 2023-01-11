@@ -4,28 +4,13 @@
 
 import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
-import * as fs from 'fs';
-import * as Handlebars from 'handlebars';
-import { OutputHelper } from '../helper';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { TemplateHelper } from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../args/global-args';
 import execa = require('execa');
-import * as util from 'util';
-
-const existsAsync = util.promisify(fs.exists);
 
 export interface InitGameArgs extends NevermoreGlobalArgs {
   gameName: string;
-}
-
-/**
- * Makes the string upper camel case
- */
-function camelize(str: string) {
-  return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word: string, index: number) {
-      return word.toUpperCase();
-    })
-    .replace(/\s+/g, '');
 }
 
 /**
@@ -42,20 +27,14 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
       demandOption: false,
       type: 'string',
     });
-    args.option('dryrun', {
-      describe: 'Whether this run should be a dryrun.',
-      demandOption: false,
-      type: 'boolean',
-      default: false,
-    });
     return args as Argv<InitGameArgs>;
   }
 
   public async handler(args: InitGameArgs) {
     const rawGameName = await InitGameCommand._ensureGameName(args);
 
-    const gameName = camelize(rawGameName).toLowerCase();
-    const gameNameProper = camelize(rawGameName);
+    const gameName = TemplateHelper.camelize(rawGameName).toLowerCase();
+    const gameNameProper = TemplateHelper.camelize(rawGameName);
 
     const srcRoot = process.cwd();
     const templatePath = path.join(
@@ -70,14 +49,14 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
       `Creating a new game at '${srcRoot}' with template '${templatePath}'`
     );
 
-    await InitGameCommand._createDirectoryContentsAsync(
+    await TemplateHelper.createDirectoryContentsAsync(
       templatePath,
       srcRoot,
       {
         gameName: gameName,
         gameNameProper: gameNameProper,
       },
-      args
+      args.dryrun
     );
 
     const packages = [
@@ -110,67 +89,6 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
       OutputHelper.info(
         'Failed to run `selene generate-roblox-std`, is selene installed?'
       );
-    }
-  }
-
-  private static async _createDirectoryContentsAsync(
-    templatePath: string,
-    targetPath: string,
-    input: any,
-    args: InitGameArgs
-  ) {
-    // read all files/folders (1 level) from template folder
-    const filesToCreate = await fs.promises.readdir(templatePath);
-    for (const originalName of filesToCreate) {
-      const origFilePath = path.join(templatePath, originalName);
-
-      if (originalName == 'ENSURE_FOLDER_CREATED') {
-        continue;
-      }
-
-      const compiledName = (Handlebars as any).default.compile(originalName);
-      const newName = compiledName(input);
-      const stats = await fs.promises.stat(origFilePath);
-
-      if (stats.isFile()) {
-        // read file content and transform it using template engine
-        const contents = await fs.promises.readFile(origFilePath, 'utf8');
-        const compiled = (Handlebars as any).default.compile(contents);
-        const result = compiled(input);
-        const newFilePath = path.join(targetPath, newName);
-
-        if (args.dryrun) {
-          OutputHelper.info(`[DRYRUN]: Write file ${newFilePath}`);
-          console.log(`${result}`);
-        } else {
-          if (!(await existsAsync(newFilePath))) {
-            await fs.promises.writeFile(newFilePath, result, 'utf8');
-            OutputHelper.info(`Created '${newFilePath}'`);
-          } else {
-            OutputHelper.error(
-              `File already exists ${newFilePath} will not overwrite`
-            );
-          }
-        }
-      } else if (stats.isDirectory()) {
-        const newDirPath = path.join(targetPath, originalName);
-        if (args.dryrun) {
-          OutputHelper.info(`[DRYRUN]: Write folder ${newDirPath}`);
-        } else {
-          // create folder in destination folder
-          if (!(await existsAsync(newDirPath))) {
-            await fs.promises.mkdir(newDirPath);
-          }
-        }
-
-        // copy files/folder inside current folder recursively
-        await InitGameCommand._createDirectoryContentsAsync(
-          path.join(templatePath, originalName),
-          path.join(targetPath, newName),
-          input,
-          args
-        );
-      }
     }
   }
 
@@ -218,6 +136,10 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
   }
 
   private static _validateGameName(name: string): void {
+    if (!name) {
+      throw new Error('The project name is required.');
+    }
+
     if (name.length === 0) {
       throw new Error('The project name cannot be empty string.');
     }

@@ -1,3 +1,81 @@
+# (Wed Jan 11 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/coreguienabler@6.1.0`, `@quenty/playerutils@2.5.0`, `@quenty/rx@7.4.0`, `@quenty/softshutdown@3.13.0`
+  - fix: CoreGuiEnabler disables and observes nicely [#320](https://github.com/Quenty/NevermoreEngine/pull/320) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jan 03 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/conditions@4.5.1`, `@quenty/datastore@7.4.1`, `@quenty/playerhumanoidbinder@8.5.1`
+  - Users/quenty/patches [#319](https://github.com/Quenty/NevermoreEngine/pull/319) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jan 01 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@8.5.0`, `@quenty/boundingboxutils@4.1.0`, `@quenty/fzy@1.2.0`, `@quenty/instanceutils@7.4.0`, `@quenty/playerutils@2.4.0`, `@quenty/rx@7.3.0`, `@quenty/sounds@6.1.0`
+  - Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Dec 29 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/color3utils@5.6.0`, `@quenty/colorpalette@4.8.0`, `@quenty/fzy@1.1.0`, `@quenty/observablecollection@5.4.0`, `@quenty/uiobjectutils@3.1.0`
+  - Users/quenty/search [#317](https://github.com/Quenty/NevermoreEngine/pull/317) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Dec 27 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@7.2.1`
+  - docs: Update Observable.lua [#315](https://github.com/Quenty/NevermoreEngine/pull/315) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 1
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+
+---
+
+# (Tue Dec 27 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpalette@4.7.0`, `@quenty/permissionprovider@8.6.0`, `@quenty/streamingutils@6.1.0`, `@quenty/textserviceutils@7.6.0`, `@quenty/vector3utils@6.2.0`, `@quenty/cli-output-helpers@1.1.0`, `@quenty/nevermore-cli@1.3.0`, `@quenty/nevermore-template-helpers@1.1.0`
+  - Users/quenty/tooling [#314](https://github.com/Quenty/NevermoreEngine/pull/314) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Dec 06 2022)
 
 #### 🚀 Enhancement

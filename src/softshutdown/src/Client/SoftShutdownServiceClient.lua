@@ -6,7 +6,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
-local StarterGui = game:GetService("StarterGui")
 local TeleportService = game:GetService("TeleportService")
 
 local AttributeValue = require("AttributeValue")
@@ -17,6 +16,7 @@ local SoftShutdownConstants = require("SoftShutdownConstants")
 local SoftShutdownTranslator = require("SoftShutdownTranslator")
 local SoftShutdownUI = require("SoftShutdownUI")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local CoreGuiEnabler = require("CoreGuiEnabler")
 
 local SoftShutdownServiceClient = {}
 SoftShutdownServiceClient.ServiceName = "SoftShutdownServiceClient"
@@ -197,15 +197,7 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 	end)
 
 	for _, coreGuiType in pairs(DISABLE_CORE_GUI_TYPES) do
-		task.spawn(function()
-			if StarterGui:GetCoreGuiEnabled(coreGuiType) then
-				StarterGui:SetCoreGuiEnabled(coreGuiType, false)
-
-				maid:GiveTask(function()
-					StarterGui:SetCoreGuiEnabled(coreGuiType, true)
-				end)
-			end
-		end)
+		maid:GiveTask(CoreGuiEnabler:Disable(self, coreGuiType))
 	end
 end
 

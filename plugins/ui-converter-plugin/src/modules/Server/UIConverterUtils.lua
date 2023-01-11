@@ -219,7 +219,7 @@ end
 
 function UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
 	local data = {}
-	for key, value  in pairs(properties) do
+	for key, value in pairs(properties) do
 		if key ~= "Parent" then
 			if typeof(value) == "Instance" then
 				data[key] = UIConverterUtils.getRefProperty(refLookupMap, value)
@@ -263,7 +263,7 @@ function UIConverterUtils.propertiesTableToString(library, properties)
 	ensureLast(UIConverterUtils.getChildrenKey(library));
 
 	local data = {}
-	for _, key  in pairs(keys) do
+	for _, key in pairs(keys) do
 		table.insert(data, ("%s = %s;"):format(key, properties[key]))
 	end
 

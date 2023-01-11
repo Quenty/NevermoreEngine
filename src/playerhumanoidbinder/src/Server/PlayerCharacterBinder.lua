@@ -24,9 +24,6 @@ PlayerCharacterBinder.__index = PlayerCharacterBinder
 function PlayerCharacterBinder.new(tag, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerCharacterBinder)
 
-	self._maid = Maid.new()
-	self._maid:GiveTask(self._maid)
-
 	self._shouldTag = Instance.new("BoolValue")
 	self._shouldTag.Value = true
 	self._maid:GiveTask(self._shouldTag)

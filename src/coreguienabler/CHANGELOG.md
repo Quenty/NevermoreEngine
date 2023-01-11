@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.0.1...@quenty/coreguienabler@6.1.0) (2023-01-11)
+
+
+### Bug Fixes
+
+* Use CoreGuiEnabler to disable core gui types ([808d020](https://github.com/Quenty/NevermoreEngine/commit/808d020ce49a72e738c7abdc0f918cba40043f46))
+
+
+
+
+
 ## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.0.0...@quenty/coreguienabler@6.0.1) (2022-11-04)
 
 **Note:** Version bump only for package @quenty/coreguienabler

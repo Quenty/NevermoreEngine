@@ -1,0 +1,46 @@
+{
+  "name": "@quenty/nevermore-template-helpers",
+  "version": "1.1.0",
+  "description": "Helpers to generate Nevermore package and game templates",
+  "keywords": [
+    "Roblox",
+    "Raven",
+    "CLI"
+  ],
+  "main": "dist/templateHelpers.js",
+  "bugs": {
+    "url": "https://github.com/Quenty/Nevermore/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/Nevermore.git",
+    "directory": "tools/nevermore-template-helpers/"
+  },
+  "license": "UNLICENSED",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/cli-output-helpers": "file:../cli-output-helpers",
+    "chalk": "^4.1.2",
+    "execa": "v5.1.1",
+    "handlebars": "^4.7.7",
+    "typescript-memoize": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.4",
+    "prettier": "2.7.1",
+    "typescript": "^4.8.4"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "watch": "tsc --build --watch",
+    "clean": "tsc --build --clean"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

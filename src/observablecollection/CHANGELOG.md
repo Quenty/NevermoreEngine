@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.5.0...@quenty/observablecollection@5.6.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.4.0...@quenty/observablecollection@5.5.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.3.1...@quenty/observablecollection@5.4.0) (2022-12-29)
+
+
+### Features
+
+* Add FilteredObservableListView.new ([de1e703](https://github.com/Quenty/NevermoreEngine/commit/de1e70362c9bef48ae00cc4620beca3e549fb20b))
+
+
+
+
+
+## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.3.0...@quenty/observablecollection@5.3.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.2.0...@quenty/observablecollection@5.3.0) (2022-12-05)
 
 **Note:** Version bump only for package @quenty/observablecollection

@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.3.0...@quenty/rx@7.4.0) (2023-01-11)
+
+
+### Bug Fixes
+
+* Paranoid disconnect take() calls ([108c19e](https://github.com/Quenty/NevermoreEngine/commit/108c19edd63ee41bec1326750a19e770184df641))
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.2.1...@quenty/rx@7.3.0) (2023-01-01)
+
+
+### Features
+
+* Add Rx.interval() ([8df8e82](https://github.com/Quenty/NevermoreEngine/commit/8df8e82d894c2786c4b5a2bd720ba00a89b6c2f2))
+
+
+
+
+
+## [7.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.2.0...@quenty/rx@7.2.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
+
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.1.1...@quenty/rx@7.2.0) (2022-12-05)
 
 

@@ -29,7 +29,7 @@ There are certain open source technologies that Nevermore uses to keep the build
 8. [Hoarcekat](https://github.com/Kampfkarren/hoarcekat) - Story book (testing)
 
 :::info
-We use a custom version of Rojo to allow symlinks between components.
+We use a [custom version of Rojo](https://github.com/Quenty/rojo/releases/latest) to allow symlinks between components.
 :::
 
 Additionally in the cloud we use

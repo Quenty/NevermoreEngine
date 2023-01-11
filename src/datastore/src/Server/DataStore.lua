@@ -96,6 +96,10 @@ function DataStore.new(robloxDataStore, key)
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 	self._cacheTimeSeconds = DEFAULT_CACHE_TIME_SECONDS
 
+	if self._key == "" then
+		error("[DataStore] - Key cannot be an empty string")
+	end
+
 --[=[
 	Prop that fires when saving. Promise will resolve once saving is complete.
 	@prop Saving Signal<Promise>

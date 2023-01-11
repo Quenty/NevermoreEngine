@@ -21,6 +21,7 @@ local Brio = require("Brio")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Symbol = require("Symbol")
 
+-- Higher numbers last
 local function defaultCompare(a, b)
 	return a < b
 end

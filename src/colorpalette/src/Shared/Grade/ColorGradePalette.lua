@@ -135,6 +135,7 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 		observeBaseSurfaceGrade = self:ObserveDefaultSurfaceGrade()
 	else
 		observeBaseSurfaceGrade = self:_observeGradeFromName(baseSurfaceName)
+		assert(observeBaseSurfaceGrade, "Bad baseSurfaceName")
 	end
 
 	return Rx.combineLatest({

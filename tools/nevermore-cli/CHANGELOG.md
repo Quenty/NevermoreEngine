@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.2.0...@quenty/nevermore-cli@1.3.0) (2022-12-27)
+
+
+### Bug Fixes
+
+* Ignore distribution from nevermore-cli folder ([02a2297](https://github.com/Quenty/Nevermore/commit/02a2297065478bf0d457463cdf46719fe564efcc))
+
+
+### Features
+
+* Add ability to generate new Nevermore library packages ([e0e8e44](https://github.com/Quenty/Nevermore/commit/e0e8e44a21692d4c383274985d01a965dcfe389c))
+
+
+
+
+
 # [1.2.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.1.0...@quenty/nevermore-cli@1.2.0) (2022-11-21)
 
 

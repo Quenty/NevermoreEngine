@@ -1,6 +1,6 @@
 {
   "name": "@quenty/softshutdown",
-  "version": "3.10.0",
+  "version": "3.13.0",
   "description": "This service lets you shut down servers without losing a bunch of players. When game.OnClose is called, the script teleports everyone in the server into a reserved server.",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/bindtocloseservice": "file:../bindtocloseservice",
     "@quenty/blend": "file:../blend",
     "@quenty/clienttranslator": "file:../clienttranslator",
+    "@quenty/coreguienabler": "file:../coreguienabler",
     "@quenty/datastore": "file:../datastore",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",

@@ -55,6 +55,32 @@ function FontPalette:ObserveFont(fontName)
 	return self:GetFontValue(fontName):Observe()
 end
 
+--[=[
+	Observes the curent font face defined for the font name
+
+	@param fontName string
+	@param weight FontWeight | Observable<FontWeight> | nil
+	@param style FontStyle | Observable<FontStyle> | nil
+	@return Observable<Font>
+]=]
+function FontPalette:ObserveFontFace(fontName, weight, style)
+	assert(type(fontName) == "string", "Bad fontName")
+
+	return Rx.combineLatest({
+		family = self:GetFontValue(fontName):Observe():Pipe({
+			Rx.map(function(fontEnum)
+				return Font.fromEnum(fontEnum).Family
+			end);
+		});
+		weight = weight or Enum.FontWeight.Regular;
+		style = style or Enum.FontStyle.Normal;
+	}):Pipe({
+		Rx.map(function(state)
+			return Font.new(state.family, state.weight, state.style)
+		end);
+	})
+end
+
 function FontPalette:GetFontValue(fontName)
 	assert(type(fontName) == "string", "Bad fontName")
 

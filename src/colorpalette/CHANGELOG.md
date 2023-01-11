@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.9.0...@quenty/colorpalette@4.10.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.8.0...@quenty/colorpalette@4.9.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [4.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.7.1...@quenty/colorpalette@4.8.0) (2022-12-29)
+
+
+### Bug Fixes
+
+* Add better error messages around ColorGradePalette ([53a24a4](https://github.com/Quenty/NevermoreEngine/commit/53a24a494885e51dba271922a1848b240872013c))
+
+
+
+
+
+## [4.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.7.0...@quenty/colorpalette@4.7.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.6.0...@quenty/colorpalette@4.7.0) (2022-12-27)
+
+
+### Features
+
+* Add FontPalette:ObserveFontFace(fontName, weight, style) ([a03f177](https://github.com/Quenty/NevermoreEngine/commit/a03f1775857b51981d443d9ac11518316524cac2))
+
+
+
+
+
 # [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.5.0...@quenty/colorpalette@4.6.0) (2022-12-05)
 
 **Note:** Version bump only for package @quenty/colorpalette

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.0.0...@quenty/uiobjectutils@3.1.0) (2022-12-29)
+
+
+### Features
+
+* Add UIAlignmentUtils ([6b8fb3b](https://github.com/Quenty/NevermoreEngine/commit/6b8fb3b6167146ba60045980a3f94a7e90645c7c))
+
+
+
+
+
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@2.1.0...@quenty/uiobjectutils@3.0.0) (2022-09-27)
 
 **Note:** Version bump only for package @quenty/uiobjectutils

@@ -1,5 +1,5 @@
 --[=[
-	Observables are like an [signal](/api/Signal], except they do not execute code
+	Observables are like an [signal](/api/Signal), except they do not execute code
 	until the observable is subscribed to. This follows the standard
 	Rx API surface for an observable.
 

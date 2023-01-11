@@ -33,6 +33,7 @@
     "@quenty/basicpane": "file:../../src/basicpane",
     "@quenty/blend": "file:../../src/blend",
     "@quenty/collectionserviceutils": "file:../../src/collectionserviceutils",
+    "@quenty/color3utils": "file:../../src/color3utils",
     "@quenty/instanceutils": "file:../../src/instanceutils",
     "@quenty/loader": "file:../../src/loader",
     "@quenty/maid": "file:../../src/maid",

@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.11.0...@quenty/gameproductservice@5.12.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
+# [5.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.10.0...@quenty/gameproductservice@5.11.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
+# [5.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.9.1...@quenty/gameproductservice@5.10.0) (2022-12-29)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
+## [5.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.9.0...@quenty/gameproductservice@5.9.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
+# [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.8.0...@quenty/gameproductservice@5.9.0) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+
+
+
+
 # [5.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.7.0...@quenty/gameproductservice@5.8.0) (2022-12-06)
 
 **Note:** Version bump only for package @quenty/gameproductservice

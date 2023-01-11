@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.5.1...@quenty/playerhumanoidbinder@8.6.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+## [8.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.5.0...@quenty/playerhumanoidbinder@8.5.1) (2023-01-03)
+
+
+### Bug Fixes
+
+* Fix Humanoid and Character binders leaking warning message ([ff173f1](https://github.com/Quenty/NevermoreEngine/commit/ff173f1412b07680f7288b265b1940f2df516332))
+
+
+
+
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.4.1...@quenty/playerhumanoidbinder@8.5.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+## [8.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.4.0...@quenty/playerhumanoidbinder@8.4.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
 # [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.3.0...@quenty/playerhumanoidbinder@8.4.0) (2022-12-05)
 
 **Note:** Version bump only for package @quenty/playerhumanoidbinder

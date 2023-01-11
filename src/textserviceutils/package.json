@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textserviceutils",
-  "version": "7.5.0",
+  "version": "7.8.0",
   "description": "Holds utilities involving the Roblox TextService and text fitting to size.",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
   "dependencies": {
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
+    "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx"
   }
 }
