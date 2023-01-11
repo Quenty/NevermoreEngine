@@ -27,8 +27,8 @@ local CoreGuiEnabler = require(&quot;CoreGuiEnabler&quot;)
 local cleanup = CoreGuiEnabler:Disable(newproxy(), Enum.CoreGuiType.Backpack)
 task.delay(5, cleanup)
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/CoreGuiEnabler"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/CoreGuiEnabler" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/CoreGuiEnabler" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.0cd3badb.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.5d2eaca4.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.6d1dfb43.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.df2fef78.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.d3c3e169.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -45,16 +45,64 @@ task.delay(5, cleanup)
 <span class="token keyword">local</span> cleanup <span class="token operator">=</span> CoreGuiEnabler<span class="token punctuation">:</span><span class="token function">Disable</span><span class="token punctuation">(</span><span class="token function">newproxy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Enum<span class="token punctuation">.</span>CoreGuiType<span class="token punctuation">.</span>Backpack<span class="token punctuation">)</span>
 task<span class="token punctuation">.</span><span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span> cleanup<span class="token punctuation">)</span>
 </code></pre>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="AddState"><code style="text-decoration:none">AddState</code><a class="hash-link" href="#AddState" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L87"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">AddState</code><code>(</code><div class="inset_uKQm"><div><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>coreGuiStateChangeFunc<!-- -->: </code><code class="purple_ieR2">(</code><code>isEnabled<!-- -->: </code><code class="blue_P4bS">boolean</code><code class="purple_ieR2">)</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsEnabled"><code style="text-decoration:none">IsEnabled</code><a class="hash-link" href="#IsEnabled" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L88"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">IsEnabled</code><code>(</code><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>Gets the current state</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveIsEnabled"><code style="text-decoration:none">ObserveIsEnabled</code><a class="hash-link" href="#ObserveIsEnabled" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L102"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">ObserveIsEnabled</code><code>(</code><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">boolean</code><code class="op_lSLc">&gt;</code></div><div>
+<p>Observes the state whenever it changed</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="AddState"><code style="text-decoration:none">AddState</code><a class="hash-link" href="#AddState" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L121"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">AddState</code><code>(</code><div class="inset_uKQm"><div><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>onChangeCallback<!-- -->: </code><code class="purple_ieR2">(</code><code>isEnabled<!-- -->: </code><code class="blue_P4bS">boolean</code><code class="purple_ieR2">)</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Adds a state that can be disabled or enabled.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Disable"><code style="text-decoration:none">Disable</code><a class="hash-link" href="#Disable" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L117"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">Disable</code><code>(</code><div class="inset_uKQm"><div><code>key<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Disable"><code style="text-decoration:none">Disable</code><a class="hash-link" href="#Disable" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L156"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">Disable</code><code>(</code><div class="inset_uKQm"><div><code>key<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Callback function to re-enable the state</p>
 </span></span></div><div>
 <p>Disables a CoreGuiState</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Enable"><code style="text-decoration:none">Enable</code><a class="hash-link" href="#Enable" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L134"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">Enable</code><code>(</code><div class="inset_uKQm"><div><code>key<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Enable"><code style="text-decoration:none">Enable</code><a class="hash-link" href="#Enable" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/coreguienabler/src/Client/CoreGuiEnabler.lua#L175"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CoreGuiEnabler<!-- -->:</code><code class="green_DgR4">Enable</code><code>(</code><div class="inset_uKQm"><div><code>key<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>coreGuiState<!-- -->: </code><code class="blue_P4bS">string</code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/enum/CoreGuiType" target="_blank" rel="noopener noreferrer">CoreGuiType<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Enables a state for a given key</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
+        {
+            &quot;name&quot;: &quot;IsEnabled&quot;,
+            &quot;desc&quot;: &quot;Gets the current state&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;coreGuiState&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string | CoreGuiType&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 88,
+                &quot;path&quot;: &quot;src/coreguienabler/src/Client/CoreGuiEnabler.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;ObserveIsEnabled&quot;,
+            &quot;desc&quot;: &quot;Observes the state whenever it changed&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;coreGuiState&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string | CoreGuiType&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Observable&lt;boolean&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 102,
+                &quot;path&quot;: &quot;src/coreguienabler/src/Client/CoreGuiEnabler.lua&quot;
+            }
+        },
         {
             &quot;name&quot;: &quot;AddState&quot;,
             &quot;desc&quot;: &quot;Adds a state that can be disabled or enabled.&quot;,
@@ -65,7 +113,7 @@ task<span class="token punctuation">.</span><span class="token function">delay</
                     &quot;lua_type&quot;: &quot;string | CoreGuiType&quot;
                 },
                 {
-                    &quot;name&quot;: &quot;coreGuiStateChangeFunc&quot;,
+                    &quot;name&quot;: &quot;onChangeCallback&quot;,
                     &quot;desc&quot;: &quot;&quot;,
                     &quot;lua_type&quot;: &quot;(isEnabled: boolean)&quot;
                 }
@@ -73,7 +121,7 @@ task<span class="token punctuation">.</span><span class="token function">delay</
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 87,
+                &quot;line&quot;: 121,
                 &quot;path&quot;: &quot;src/coreguienabler/src/Client/CoreGuiEnabler.lua&quot;
             }
         },
@@ -100,7 +148,7 @@ task<span class="token punctuation">.</span><span class="token function">delay</
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 117,
+                &quot;line&quot;: 156,
                 &quot;path&quot;: &quot;src/coreguienabler/src/Client/CoreGuiEnabler.lua&quot;
             }
         },
@@ -122,7 +170,7 @@ task<span class="token punctuation">.</span><span class="token function">delay</
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 134,
+                &quot;line&quot;: 175,
                 &quot;path&quot;: &quot;src/coreguienabler/src/Client/CoreGuiEnabler.lua&quot;
             }
         }
@@ -135,8 +183,8 @@ task<span class="token punctuation">.</span><span class="token function">delay</
         &quot;line&quot;: 17,
         &quot;path&quot;: &quot;src/coreguienabler/src/Client/CoreGuiEnabler.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#AddState" class="table-of-contents__link toc-highlight">:AddState</a></li><li><a href="#Disable" class="table-of-contents__link toc-highlight">:Disable</a></li><li><a href="#Enable" class="table-of-contents__link toc-highlight">:Enable</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.5d2eaca4.js"></script>
-<script src="/NevermoreEngine/assets/js/main.6d1dfb43.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#AddState" class="table-of-contents__link toc-highlight">:AddState</a></li><li><a href="#Disable" class="table-of-contents__link toc-highlight">:Disable</a></li><li><a href="#Enable" class="table-of-contents__link toc-highlight">:Enable</a></li><li><a href="#IsEnabled" class="table-of-contents__link toc-highlight">:IsEnabled</a></li><li><a href="#ObserveIsEnabled" class="table-of-contents__link toc-highlight">:ObserveIsEnabled</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.df2fef78.js"></script>
+<script src="/NevermoreEngine/assets/js/main.d3c3e169.js"></script>
 </body>
 </html>
