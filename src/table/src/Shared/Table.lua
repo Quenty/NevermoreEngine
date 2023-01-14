@@ -80,16 +80,16 @@ end
 --[=[
 	Shallow merges two lists without modifying either.
 
-	@param orig table -- Original table
-	@param new table -- Result
+	@param a table -- Source table
+	@param b table -- Source table
 	@return table
 ]=]
-function Table.mergeLists(orig, new)
+function Table.mergeLists(a, b)
 	local _table = {}
-	for _, val in pairs(orig) do
+	for _, val in pairs(a) do
 		table.insert(_table, val)
 	end
-	for _, val in pairs(new) do
+	for _, val in pairs(b) do
 		table.insert(_table, val)
 	end
 	return _table
