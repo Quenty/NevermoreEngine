@@ -23,13 +23,13 @@ end
 --[=[
 	Shallow merges two tables without modifying either.
 
-	@param orig table -- Original table
-	@param new table -- Result
+	@param a table -- Table to merge
+	@param b table -- Table to merge
 	@return table
 ]=]
-function Table.merge(orig, new)
-	local result = table.clone(orig)
-	for key, val in pairs(new) do
+function Table.merge(a, b)
+	local result = table.clone(a)
+	for key, val in pairs(b) do
 		result[key] = val
 	end
 	return result
