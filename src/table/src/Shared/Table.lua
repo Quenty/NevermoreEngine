@@ -197,16 +197,7 @@ end
 	@return The index of the value, if found
 	@return nil -- if not found
 ]=]
-function Table.getIndex(haystack, needle)
-	assert(needle ~= nil, "Needle cannot be nil")
-
-	for index, item in pairs(haystack) do
-		if needle == item then
-			return index
-		end
-	end
-	return nil
-end
+Table.getIndex = table.find
 
 --[=[
 	Recursively prints the table. Does not handle recursive tables.
@@ -239,13 +230,7 @@ end
 	@return boolean -- `true` if within, `false` otherwise
 ]=]
 function Table.contains(_table, value)
-	for _, item in pairs(_table) do
-		if item == value then
-			return true
-		end
-	end
-
-	return false
+	return table.find(_table, value) ~= nil
 end
 
 --[=[
