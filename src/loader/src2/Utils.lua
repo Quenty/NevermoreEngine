@@ -18,13 +18,7 @@ function Utils.readonly(_table)
 	return setmetatable(_table, READ_ONLY_METATABLE)
 end
 
-function Utils.copyTable(target)
-	local new = {}
-	for key, value in pairs(target) do
-		new[key] = value
-	end
-	return new
-end
+Utils.copyTable = table.clone
 
 function Utils.count(_table)
 	local count = 0
