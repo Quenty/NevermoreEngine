@@ -19,6 +19,7 @@ local VALID_ATTRIBUTE_TYPES = {
 	["UDim"] = true;
 	["UDim2"] = true;
 	["BrickColor"] = true;
+	["CFrame"] = true;
 	["Color3"] = true;
 	["Vector2"] = true;
 	["Vector3"] = true;

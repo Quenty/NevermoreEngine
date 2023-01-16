@@ -1,4 +1,8 @@
 --[=[
+	A player's current settings. Handles replication back to the server
+	when a setting changes. See [PlayerSettingsBase].
+
+	@client
 	@class PlayerSettingsClient
 ]=]
 
@@ -6,14 +10,15 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local DataStoreStringUtils = require("DataStoreStringUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerSettingsBase = require("PlayerSettingsBase")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
-local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
-local ThrottledFunction = require("ThrottledFunction")
-local Maid = require("Maid")
+local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local Symbol = require("Symbol")
-local Observable = require("Observable")
+local ThrottledFunction = require("ThrottledFunction")
 local ValueObject = require("ValueObject")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
@@ -24,8 +29,15 @@ PlayerSettingsClient.__index = PlayerSettingsClient
 
 require("PromiseRemoteFunctionMixin"):Add(PlayerSettingsClient, PlayerSettingsConstants.REMOTE_FUNCTION_NAME)
 
-function PlayerSettingsClient.new(obj, serviceBag)
-	local self = setmetatable(PlayerSettingsBase.new(obj, serviceBag), PlayerSettingsClient)
+--[=[
+	See [SettingsBindersClient] and [SettingsServiceClient] on how to properly use this class.
+
+	@param folder Folder
+	@param serviceBag ServiceBag
+	@return PlayerSettingsClient
+]=]
+function PlayerSettingsClient.new(folder, serviceBag)
+	local self = setmetatable(PlayerSettingsBase.new(folder, serviceBag), PlayerSettingsClient)
 
 	if self:GetPlayer() == Players.LocalPlayer then
 		self._toReplicate = nil
@@ -48,6 +60,13 @@ function PlayerSettingsClient.new(obj, serviceBag)
 	return self
 end
 
+--[=[
+	Gets a settings value
+
+	@param settingName string
+	@param defaultValue T
+	@return T
+]=]
 function PlayerSettingsClient:GetValue(settingName, defaultValue)
 	assert(type(settingName) == "string", "Bad settingName")
 
@@ -63,6 +82,13 @@ function PlayerSettingsClient:GetValue(settingName, defaultValue)
 	return getmetatable(PlayerSettingsClient).GetValue(self, settingName, defaultValue)
 end
 
+--[=[
+	Observes a settings value.
+
+	@param settingName string
+	@param defaultValue T
+	@return Observable<T>
+]=]
 function PlayerSettingsClient:ObserveValue(settingName, defaultValue)
 	assert(type(settingName) == "string", "Bad settingName")
 
@@ -128,9 +154,24 @@ function PlayerSettingsClient:ObserveValue(settingName, defaultValue)
 	end)
 end
 
+--[=[
+	Sets a settings value and replicates the value eventually (in a de-duplicated manner).
+
+	@param settingName string
+	@param value T
+]=]
 function PlayerSettingsClient:SetValue(settingName, value)
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(self:GetPlayer() == Players.LocalPlayer, "Cannot set settings of another player")
+	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
+
+	if type(value) == "string" then
+		assert(DataStoreStringUtils.isValidUTF8(value), "Invalid string")
+
+		if (#value + #settingName) > PlayerSettingsConstants.MAX_SETTINGS_LENGTH then
+			error(string.format("[PlayerSettingsClient.SetValue] - Setting is too long for %q", settingName))
+		end
+	end
 
 	local queueReplication = false
 	if not self._toReplicate then

@@ -8,6 +8,8 @@ local BaseObject = require("BaseObject")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local SettingsBindersServer = require("SettingsBindersServer")
 local PlayerDataStoreService = require("PlayerDataStoreService")
+local DataStoreStringUtils = require("DataStoreStringUtils")
+local PlayerSettingsConstants = require("PlayerSettingsConstants")
 
 local PlayerHasSettings = setmetatable({}, BaseObject)
 PlayerHasSettings.ClassName = "PlayerHasSettings"
@@ -64,7 +66,21 @@ function PlayerHasSettings:_handleAttributeChanged(subStore, attributeName)
 
 	-- Write the new value
 	local settingName = PlayerSettingsUtils.getSettingName(attributeName)
+	if not DataStoreStringUtils.isValidUTF8(settingName) then
+		warn(string.format("[PlayerHasSettings] - Bad settingName %q, cannot save", settingName))
+		return
+	end
+
 	local newValue = PlayerSettingsUtils.decodeForAttribute(self._settings:GetAttribute(attributeName))
+
+	if type(newValue) == "string" then
+		if (#settingName + #newValue) > PlayerSettingsConstants.MAX_SETTINGS_LENGTH then
+			warn(string.format("[PlayerSettingsClient.SetValue] - Setting is too long for %q. Cannot save.", settingName))
+			return
+		end
+		-- TODO: JSON encode and check length for ther scenarios
+	end
+
 	subStore:Store(settingName, newValue)
 end
 
