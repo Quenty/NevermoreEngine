@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[56835],{68810:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PlayerSettingsClient","desc":"","source":{"line":4,"path":"src/settings/src/Client/Player/PlayerSettingsClient.lua"}}')}}]);
