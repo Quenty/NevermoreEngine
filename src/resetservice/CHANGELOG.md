@@ -1,23 +1,15 @@
-# v5.2.0 (Tue Jan 17 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Bark_ing ([@bark-ing](https://github.com/bark-ing)), for all your work!
-
-#### 🐛 Bug Fix
-
-- Fix: Corrected method call [#322](https://github.com/Quenty/NevermoreEngine/pull/322) ([@bark-ing](https://github.com/bark-ing))
-
-#### Authors: 1
-
-- Bark_ing ([@bark-ing](https://github.com/bark-ing))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@5.1.1...@quenty/resetservice@5.2.0) (2023-01-17)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+
+
+
 
 ## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@5.1.0...@quenty/resetservice@5.1.1) (2022-11-04)
 

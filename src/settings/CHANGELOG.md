@@ -1,23 +1,18 @@
-# v4.13.0 (Tue Jan 17 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/datastore hardening [#323](https://github.com/Quenty/NevermoreEngine/pull/323) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Ensure that Settings can't contain invalid UTF8 characters and document settings package better ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.12.0...@quenty/settings@4.13.0) (2023-01-17)
+
+
+### Bug Fixes
+
+* Ensure that Settings can't contain invalid UTF8 characters and document settings package better ([cbf1406](https://github.com/Quenty/NevermoreEngine/commit/cbf140620795846daf35ce6945bcdf801e1156f9))
+
+
+
+
 
 # [4.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.11.1...@quenty/settings@4.12.0) (2023-01-11)
 

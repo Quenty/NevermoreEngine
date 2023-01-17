@@ -1,20 +1,18 @@
-# v8.5.0 (Tue Jan 17 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/datastore hardening [#323](https://github.com/Quenty/NevermoreEngine/pull/323) ([@Quenty](https://github.com/Quenty))
-- feat: CFrame is considered a valid attribute now ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.4.0...@quenty/attributeutils@8.5.0) (2023-01-17)
+
+
+### Features
+
+* CFrame is considered a valid attribute now ([d09544d](https://github.com/Quenty/NevermoreEngine/commit/d09544d64e3ad60de58ec2b3204c51f3d8abc4cf))
+
+
+
+
 
 # [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.3.0...@quenty/attributeutils@8.4.0) (2023-01-11)
 
