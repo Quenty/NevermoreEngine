@@ -1,3 +1,19 @@
+# v7.9.0 (Tue Jan 17 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/datastore hardening [#323](https://github.com/Quenty/NevermoreEngine/pull/323) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix issue where TextServiceUtils.promiseTextBounds(params) may stack overflow while processing text bounds workaround ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

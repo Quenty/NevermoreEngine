@@ -1,3 +1,19 @@
+# v5.2.0 (Tue Jan 17 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Bark_ing ([@bark-ing](https://github.com/bark-ing)), for all your work!
+
+#### 🐛 Bug Fix
+
+- Fix: Corrected method call [#322](https://github.com/Quenty/NevermoreEngine/pull/322) ([@bark-ing](https://github.com/bark-ing))
+
+#### Authors: 1
+
+- Bark_ing ([@bark-ing](https://github.com/bark-ing))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
