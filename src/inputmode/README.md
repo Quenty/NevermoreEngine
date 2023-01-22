@@ -13,7 +13,7 @@
 
 Trace input mode state and trigger changes correctly. This is a more customizable version of UserInputService:GetLastInputType() or LastInputTypeChanged.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/INPUT_MODES">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/InputMode">View docs →</a></div>
 
 ## Installation
 ```
