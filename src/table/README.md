@@ -13,7 +13,7 @@
 
 Contains table and set utility functions for Roblox.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/table">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Table/">View docs →</a></div>
 
 ## Installation
 ```
