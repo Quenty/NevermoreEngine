@@ -3,6 +3,240 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.11.0...@quenty/ik@9.12.0) (2023-01-17)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.10.1...@quenty/ik@9.11.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [9.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.10.0...@quenty/ik@9.10.1) (2023-01-03)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.9.1...@quenty/ik@9.10.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [9.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.9.0...@quenty/ik@9.9.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.8.1...@quenty/ik@9.9.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [9.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.8.0...@quenty/ik@9.8.1) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.7.1...@quenty/ik@9.8.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [9.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.7.0...@quenty/ik@9.7.1) (2022-11-28)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.6.0...@quenty/ik@9.7.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.5.1...@quenty/ik@9.6.0) (2022-11-12)
+
+
+### Features
+
+* Binder provider now provides name for debugging ([72d547e](https://github.com/Quenty/NevermoreEngine/commit/72d547ea47358dfab1128dd076723f5a1a0d9fd8))
+* Default to not using motor 6d raw ([d601d03](https://github.com/Quenty/NevermoreEngine/commit/d601d0346a3aa2d3cf2b3e0ed54d0dbc062b9a87))
+
+
+
+
+
+## [9.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.5.0...@quenty/ik@9.5.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.4.0...@quenty/ik@9.5.0) (2022-11-04)
+
+
+### Features
+
+* Avoid exporting LimbIKUtils and use old IK method instead ([a1aae1c](https://github.com/Quenty/NevermoreEngine/commit/a1aae1c2cda8f9f30ee0276f00e17eca33ede1ee))
+
+
+
+
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.3.0...@quenty/ik@9.4.0) (2022-10-31)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.2.0...@quenty/ik@9.3.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.1.1...@quenty/ik@9.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.1.0...@quenty/ik@9.1.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.0.0...@quenty/ik@9.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Fix package dependencies ([06467b6](https://github.com/Quenty/NevermoreEngine/commit/06467b6bcbea4f0e33f3ecd6ea56424850824aef))
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+
+
+### Features
+
+* Integrate Motor6D integration for smoother animations in and out of ragdoll ([e9c5b6d](https://github.com/Quenty/NevermoreEngine/commit/e9c5b6de7594e5eae2cdb8097d392deef09972cf))
+* Support inverse kinematics and smooth motor in and out ([9dc19e6](https://github.com/Quenty/NevermoreEngine/commit/9dc19e6aed674783a0bf2c1da58be298f34171bf))
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@8.1.0...@quenty/ik@9.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@8.0.1...@quenty/ik@8.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [8.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@8.0.0...@quenty/ik@8.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@7.4.1...@quenty/ik@8.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@7.4.0...@quenty/ik@7.4.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@7.3.0...@quenty/ik@7.4.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@7.2.0...@quenty/ik@7.3.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@7.1.0...@quenty/ik@7.2.0) (2022-06-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@7.0.0...@quenty/ik@7.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/ik

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.2.0...@quenty/geometryutils@2.3.0) (2022-12-06)
+
+
+### Features
+
+* Add CameraPyramidUtils.rayIntersection(camera, rayOrigin, unitRayDirection, debugMaid) ([e728752](https://github.com/Quenty/NevermoreEngine/commit/e7287526b8eb78e6b702a73b56d6304e02c355de))
+
+
+
+
+
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.1.1...@quenty/geometryutils@2.2.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/geometryutils

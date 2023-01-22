@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local TieInterfaceUtils = require("TieInterfaceUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local TieUtils = require("TieUtils")
@@ -13,13 +14,16 @@ local TieSignalConnection = {}
 TieSignalConnection.ClassName = "TieSignalConnection"
 TieSignalConnection.__index = TieSignalConnection
 
-function TieSignalConnection.new(memberDefinition, adornee, callback)
+function TieSignalConnection.new(memberDefinition, folder, adornee, callback)
 	local self = setmetatable({}, TieSignalConnection)
+
+	assert(folder or adornee, "Folder or adornee required")
 
 	self._maid = Maid.new()
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
-	self._adornee = assert(adornee, "No adornee")
+	self._folder = folder
+	self._adornee = adornee
 	self._callback = assert(callback, "No callback")
 
 	self._connected = true
@@ -50,9 +54,7 @@ function TieSignalConnection:_connect()
 end
 
 function TieSignalConnection:_observeFolderBrio()
-	local containerName = self._tieDefinition:GetContainerName()
-
-	return RxInstanceUtils.observeLastNamedChildBrio(self._adornee, "Folder", containerName)
+	return TieInterfaceUtils.observeFolderBrio(self._tieDefinition, self._folder, self._adornee)
 end
 
 function TieSignalConnection:_observeBindableEvent()
@@ -62,11 +64,14 @@ function TieSignalConnection:_observeBindableEvent()
 		RxBrioUtils.switchMapBrio(function(folder)
 			return RxInstanceUtils.observeLastNamedChildBrio(folder, "BindableEvent", name)
 		end);
+		RxBrioUtils.onlyLastBrioSurvives();
 	})
 end
 
 function TieSignalConnection:__index(index)
-	if index == "IsConnected" then
+	if index == "_adornee" or index == "_folder" then
+		return rawget(self, index)
+	elseif index == "IsConnected" then
 		return self._connected
 	elseif TieSignalConnection[index] then
 		return TieSignalConnection[index]

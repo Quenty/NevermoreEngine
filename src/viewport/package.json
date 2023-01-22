@@ -1,6 +1,6 @@
 {
   "name": "@quenty/viewport",
-  "version": "3.1.0",
+  "version": "5.11.0",
   "description": "Rendering functionality for viewportFrames",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/spring": "file:../spring",
     "@quenty/valueobject": "file:../valueobject"
   },

@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@6.0.0...@quenty/camerastoryutils@6.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@5.2.1...@quenty/camerastoryutils@6.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+
+
+
+
+## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@5.2.0...@quenty/camerastoryutils@5.2.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@5.1.0...@quenty/camerastoryutils@5.2.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@5.0.0...@quenty/camerastoryutils@5.1.0) (2022-06-21)
 
 

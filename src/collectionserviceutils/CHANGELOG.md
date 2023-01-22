@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.4.0...@quenty/collectionserviceutils@2.5.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/collectionserviceutils
+
+
+
+
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.3.1...@quenty/collectionserviceutils@2.4.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/collectionserviceutils
+
+
+
+
+
+## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.3.0...@quenty/collectionserviceutils@2.3.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/collectionserviceutils
+
+
+
+
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.2.0...@quenty/collectionserviceutils@2.3.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/collectionserviceutils
+
+
+
+
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.1.0...@quenty/collectionserviceutils@2.2.0) (2022-11-19)
+
+
+### Features
+
+* Add RxCollectionServiceUtils.observeTaggedBrio(tagName) ([08b72a3](https://github.com/Quenty/NevermoreEngine/commit/08b72a3b8a451f0251c76fbe939ed177dafd71f9))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.0.1...@quenty/collectionserviceutils@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/collectionserviceutils

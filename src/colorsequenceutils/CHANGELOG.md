@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@3.1.0...@quenty/colorsequenceutils@3.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/colorsequenceutils
+
+
+
+
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@3.0.0...@quenty/colorsequenceutils@3.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Fix package dependencies ([06467b6](https://github.com/Quenty/NevermoreEngine/commit/06467b6bcbea4f0e33f3ecd6ea56424850824aef))
+
+
+
+
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@2.1.0...@quenty/colorsequenceutils@3.0.0) (2022-09-27)
+
+
+### Features
+
+* Add ColorSequenceUtils.getColor ([6423d82](https://github.com/Quenty/NevermoreEngine/commit/6423d829816df56d99e0cfd2b61d04b12ebc5226))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorsequenceutils@2.0.1...@quenty/colorsequenceutils@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/colorsequenceutils

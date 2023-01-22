@@ -12,8 +12,6 @@ local GameProductServiceBase = require("GameProductServiceBase")
 local Signal = require("Signal")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Promise = require("Promise")
-local RxStateStackUtils = require("RxStateStackUtils")
-local Rx = require("Rx")
 
 local GameProductServiceClient = GameProductServiceBase.new()
 
@@ -72,7 +70,7 @@ end
 function GameProductServiceClient:PromiseLocalPlayerOwnsPass(passIdOrKey)
 	assert(type(passIdOrKey) == "number" or type(passIdOrKey) == "string", "Bad passIdOrKey")
 
-	local passId = self:_toAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
+	local passId = self:ToAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
 	if not passId then
 		return Promise.rejected(("No asset with key %q"):format(tostring(passIdOrKey)))
 	end
@@ -91,29 +89,6 @@ end
 ]=]
 function GameProductServiceBase:ObserveLocalPlayerOwnsPass(passIdOrKey)
 	assert(type(passIdOrKey) == "number" or type(passIdOrKey) == "string", "Bad passIdOrKey")
-
-	if type(passIdOrKey) == "string" then
-		local picker = self._gameConfigService:GetConfigPicker()
-		return picker:ObserveActiveAssetOfAssetIdBrio()
-			:Pipe({
-				RxStateStackUtils.topOfStack();
-				Rx.switchMap(function(asset)
-					if asset then
-						return asset:ObserveAssetId()
-					else
-						return Rx.of(nil)
-					end
-				end);
-				Rx.switchMap(function(assetId)
-					if assetId then
-						return self:ObservePlayerOwnsPass(Players.LocalPlayer, passIdOrKey)
-					else
-						warn(("No asset with key %q"):format(tostring(passIdOrKey)))
-						return Rx.of(false)
-					end
-				end)
-			})
-	end
 
 	return self:ObservePlayerOwnsPass(Players.LocalPlayer, passIdOrKey)
 end
@@ -141,7 +116,7 @@ function GameProductServiceClient:HasPurchasedProductThisSession(productIdOrKey)
 	assert(self._serviceBag, "Not initialized")
 	assert(type(productIdOrKey) == "number" or type(productIdOrKey) == "string", "productIdOrKey")
 
-	local productId = self:_toAssetId(GameConfigAssetTypes.PRODUCT, productIdOrKey)
+	local productId = self:ToAssetId(GameConfigAssetTypes.PRODUCT, productIdOrKey)
 	if not productId then
 		warn(("No asset with key %q"):format(tostring(productIdOrKey)))
 		return false
@@ -155,7 +130,7 @@ function GameProductServiceClient:HasPurchasedProductThisSession(productIdOrKey)
 end
 
 function GameProductServiceClient:PromisePurchasedOrPrompt(passIdOrKey)
-	local gamepassId = self:_toAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
+	local gamepassId = self:ToAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
 	if not gamepassId then
 		return Promise.rejected(("No asset with key %q"):format(tostring(passIdOrKey)))
 	end
@@ -174,12 +149,12 @@ function GameProductServiceClient:PromiseGamepassOrProductUnlockOrPrompt(passIdO
 	assert(passIdOrKey, "Bad passIdOrKey")
 	assert(productIdOrKey, "Bad productIdOrKey")
 
-	local productId = self:_toAssetId(GameConfigAssetTypes.PRODUCT, productIdOrKey)
+	local productId = self:ToAssetId(GameConfigAssetTypes.PRODUCT, productIdOrKey)
 	if not productId then
 		return Promise.rejected(("No asset with key %q"):format(tostring(productIdOrKey)))
 	end
 
-	local gamepassId = self:_toAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
+	local gamepassId = self:ToAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
 	if not gamepassId then
 		return Promise.rejected(("No asset with key %q"):format(tostring(passIdOrKey)))
 	end
@@ -197,23 +172,6 @@ function GameProductServiceClient:PromiseGamepassOrProductUnlockOrPrompt(passIdO
 			MarketplaceService:PromptProductPurchase(Players.LocalPlayer, productId)
 			return owned
 		end)
-end
-
-
-function GameProductServiceClient:_toAssetId(assetType, assetIdOrKey)
-	assert(type(assetIdOrKey) == "number" or type(assetIdOrKey) == "string", "Bad assetIdOrKey")
-
-	if type(assetIdOrKey) == "string" then
-		local picker = self._gameConfigService:GetConfigPicker()
-		local asset = picker:FindFirstActiveAssetOfKey(assetType, assetIdOrKey)
-		if asset then
-			return asset:GetAssetId()
-		else
-			return nil
-		end
-	end
-
-	return assetIdOrKey
 end
 
 return GameProductServiceClient

@@ -2,8 +2,6 @@
 	@class PlayerProductManagerUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local PlayerProductManagerUtils = {}
 
 function PlayerProductManagerUtils.toOwnedAttribute(assetKey)

@@ -18,6 +18,7 @@ local CameraStackService = require("CameraStackService")
 local CharacterUtils = require("CharacterUtils")
 local HapticFeedbackUtils = require("HapticFeedbackUtils")
 local RagdollServiceClient = require("RagdollServiceClient")
+local RagdollMotorUtils = require("RagdollMotorUtils")
 
 local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
@@ -38,8 +39,13 @@ function RagdollClient.new(humanoid, serviceBag)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player == Players.LocalPlayer then
-		self:_setupHapticFeedback()
-		self:_setupCameraShake(self._cameraStackService:GetImpulseCamera())
+		self._maid:GiveTask(task.spawn(function()
+			-- Yield in the same way just to ensure no weird shakes.
+			RagdollMotorUtils.yieldUntilStepped()
+
+			self:_setupHapticFeedback()
+			self:_setupCameraShake(self._cameraStackService:GetImpulseCamera())
+		end))
 	end
 
 	return self
@@ -54,6 +60,7 @@ function RagdollClient:_setupCameraShake(impulseCamera)
 
 	local lastVelocity = head.Velocity
 	self._maid:GiveTask(RunService.Heartbeat:Connect(function()
+		debug.profilebegin("ragdollcamerashake")
 		local cameraCFrame = Workspace.CurrentCamera.CFrame
 
 		local velocity = head.Velocity
@@ -65,6 +72,7 @@ function RagdollClient:_setupCameraShake(impulseCamera)
 		end
 
 		lastVelocity = velocity
+		debug.profileend()
 	end))
 end
 

@@ -6,8 +6,6 @@
 	@class Promise
 ]=]
 
-local RunService = game:GetService("RunService")
-
 -- Turns out debug.traceback() is slow
 local ENABLE_TRACEBACK = false
 local _emptyRejectedPromise = nil
@@ -269,7 +267,7 @@ function Promise:Resolve(...)
 			warn(message)
 		end
 
-		local func = {...}
+		local func = ...
 		func(self:_getResolveReject())
 	else
 		-- TODO: Handle thenable promises!
@@ -324,11 +322,9 @@ function Promise:_reject(values, valuesLength)
 
 	-- Check for uncaught exceptions
 	if self._unconsumedException and self._valuesLength > 0 then
-		coroutine.resume(coroutine.create(function()
+		task.defer(function()
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
-			RunService.Heartbeat:Wait()
-
 			if self._unconsumedException then
 				if ENABLE_TRACEBACK then
 					warn(("[Promise] - Uncaught exception in promise\n\n%q\n\n%s")
@@ -338,7 +334,7 @@ function Promise:_reject(values, valuesLength)
 						:format(tostring(self._rejected[1])))
 				end
 			end
-		end))
+		end)
 	end
 end
 

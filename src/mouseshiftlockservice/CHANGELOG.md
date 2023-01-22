@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@7.0.1...@quenty/mouseshiftlockservice@7.0.2) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/mouseshiftlockservice
+
+
+
+
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@7.0.0...@quenty/mouseshiftlockservice@7.0.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* MouseShiftLockService has better errors ([03ee1fb](https://github.com/Quenty/NevermoreEngine/commit/03ee1fbc10ad4bd3c54abca9dc86af29ed14e9a8))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@6.0.1...@quenty/mouseshiftlockservice@7.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/mouseshiftlockservice
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@6.0.0...@quenty/mouseshiftlockservice@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/mouseshiftlockservice
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@5.1.0...@quenty/mouseshiftlockservice@6.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@5.0.0...@quenty/mouseshiftlockservice@5.1.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/mouseshiftlockservice
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/mouseshiftlockservice@4.2.0...@quenty/mouseshiftlockservice@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/mouseshiftlockservice

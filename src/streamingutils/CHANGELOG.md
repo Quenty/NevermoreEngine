@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@6.0.1...@quenty/streamingutils@6.1.0) (2022-12-27)
+
+
+### Bug Fixes
+
+* Fix StreamingUtils failing if streaming is disabled ([2c0d29a](https://github.com/Quenty/NevermoreEngine/commit/2c0d29af66d4f512528ee99cf5bc3e8a81188a96))
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@6.0.0...@quenty/streamingutils@6.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@5.1.1...@quenty/streamingutils@6.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+
+
+
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@5.1.0...@quenty/streamingutils@5.1.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@5.0.0...@quenty/streamingutils@5.1.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@4.2.0...@quenty/streamingutils@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/streamingutils

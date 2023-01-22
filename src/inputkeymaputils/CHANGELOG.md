@@ -3,6 +3,208 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.11.0...@quenty/inputkeymaputils@7.12.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.10.0...@quenty/inputkeymaputils@7.11.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.9.1...@quenty/inputkeymaputils@7.10.0) (2022-12-29)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [7.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.9.0...@quenty/inputkeymaputils@7.9.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.8.0...@quenty/inputkeymaputils@7.9.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.7.0...@quenty/inputkeymaputils@7.8.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.6.0...@quenty/inputkeymaputils@7.7.0) (2022-11-19)
+
+
+### Bug Fixes
+
+* Start supporting :GetModifierChords(inputEnumType) ([7301613](https://github.com/Quenty/NevermoreEngine/commit/7301613f5a5f8a7aedd0ec2ca8e3409e3c39451b))
+
+
+
+
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.5.0...@quenty/inputkeymaputils@7.6.0) (2022-11-12)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.4.1...@quenty/inputkeymaputils@7.5.0) (2022-11-08)
+
+
+### Features
+
+* Add InputChordUtils ([4418e7b](https://github.com/Quenty/NevermoreEngine/commit/4418e7b5542429708ed4559d3b5e0f83dc4a5c5a))
+
+
+
+
+
+## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.4.0...@quenty/inputkeymaputils@7.4.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.3.0...@quenty/inputkeymaputils@7.4.0) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.2.0...@quenty/inputkeymaputils@7.3.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.1.1...@quenty/inputkeymaputils@7.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.1.0...@quenty/inputkeymaputils@7.1.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* Proximity prompt has tap in the custom input prompt too ([3c7097a](https://github.com/Quenty/NevermoreEngine/commit/3c7097a8972ac5eaf58fe737a1c615ada1afb3d4))
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.0.0...@quenty/inputkeymaputils@7.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+
+
+### Features
+
+* Add inner1 and inner2 buttons ([f51b43c](https://github.com/Quenty/NevermoreEngine/commit/f51b43c58b606300dd96b1d79f5ac8aa2b2852d5))
+* Add support for setting default values in the InputKeyMapList ([958decc](https://github.com/Quenty/NevermoreEngine/commit/958deccdc62f12f10958ec60a3f2b5f85504273a))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@6.1.0...@quenty/inputkeymaputils@7.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+### Features
+
+* Support initialization of input modes ([ca75eb5](https://github.com/Quenty/NevermoreEngine/commit/ca75eb51100af22f8cf91c7c79545b35a9cc0eaf))
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@6.0.1...@quenty/inputkeymaputils@6.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@6.0.0...@quenty/inputkeymaputils@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@5.3.1...@quenty/inputkeymaputils@6.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@5.3.0...@quenty/inputkeymaputils@5.3.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@5.2.0...@quenty/inputkeymaputils@5.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@5.1.0...@quenty/inputkeymaputils@5.2.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@5.0.0...@quenty/inputkeymaputils@5.1.0) (2022-06-21)
 
 

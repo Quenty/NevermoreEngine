@@ -13,8 +13,10 @@ local HttpService = game:GetService("HttpService")
 local PermissionService = require("PermissionService")
 local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
 local Promise = require("Promise")
+local Maid = require("Maid")
 
 local CmdrService = {}
+CmdrService.ServiceName = "CmdrService"
 
 local GLOBAL_REGISTRY = setmetatable({}, {__mode = "kv"})
 
@@ -23,43 +25,65 @@ local GLOBAL_REGISTRY = setmetatable({}, {__mode = "kv"})
 	@param serviceBag ServiceBag
 ]=]
 function CmdrService:Init(serviceBag)
-	assert(not self._cmdr, "Already initialized")
+	assert(not self._promiseCmdr, "Already initialized")
 
+	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._cmdrTemplateProviderServer = self._serviceBag:GetService(CmdrTemplateProviderServer)
 
 	self._serviceId = HttpService:GenerateGUID(false)
-	self._cmdr = require("Cmdr")
+	self._promiseCmdr = self._maid:GivePromise(Promise.spawn(function(resolve, reject)
+		local cmdr
+		local ok, err = pcall(function()
+			cmdr = require("Cmdr")
+		end)
+		if not ok then
+			reject(err or "Failed to load cmdr")
+			return
+		end
+		resolve(cmdr)
+	end))
 
 	self._permissionService = serviceBag:GetService(PermissionService)
 
 	self._definitionData = {}
 	self._executeData = {}
 
-	self._cmdr.Registry:RegisterHook("BeforeRun", function(context)
-		local providerPromise = self._permissionService:PromisePermissionProvider()
-		if providerPromise:IsPending() then
-			return "Still loading permissions"
-		end
+	self._promiseCmdr:Then(function(cmdr)
+		task.spawn(function()
+			cmdr:RegisterDefaultCommands()
+		end)
 
-		local ok, provider = providerPromise:Yield()
-		if not ok then
-			return provider or "Failed to load permission provider"
-		end
+		cmdr.Registry:RegisterHook("BeforeRun", function(context)
+			-- allow!
+			if context.Executor == nil then
+				return nil
+			end
 
-		if context.Group == "DefaultAdmin" and not provider:IsAdmin(context.Executor) then
-			return "You don't have permission to run this command"
-		end
+			local providerPromise = self._permissionService:PromisePermissionProvider()
+			if providerPromise:IsPending() then
+				return "Still loading permissions"
+			end
+
+			local ok, provider = providerPromise:Yield()
+			if not ok then
+				if type(provider) == "string" then
+					return provider
+				else
+					return "Failed to load permission provider"
+				end
+			end
+
+			if not provider:IsAdmin(context.Executor) then
+				return "You don't have permission to run this command"
+			else
+				-- allow
+				return nil
+			end
+		end)
 	end)
 
 	GLOBAL_REGISTRY[self._serviceId] = self
-end
-
---[=[
-	Starts the service. Should be done via [ServiceBag]
-]=]
-function CmdrService:Start()
-	self._cmdr:RegisterDefaultCommands()
 end
 
 --[=[
@@ -67,9 +91,9 @@ end
 	@return Promise<Cmdr>
 ]=]
 function CmdrService:PromiseCmdr()
-	assert(self._cmdr, "Not initialized")
+	assert(self._promiseCmdr, "Not initialized")
 
-	return Promise.resolved(self._cmdr)
+	return self._promiseCmdr
 end
 
 --[=[
@@ -78,7 +102,7 @@ end
 	@param execute (context: table, ... T)
 ]=]
 function CmdrService:RegisterCommand(commandData, execute)
-	assert(self._cmdr, "Not initialized")
+	assert(self._promiseCmdr, "Not initialized")
 	assert(commandData, "No commandData")
 	assert(commandData.Name, "No commandData.Name")
 	assert(execute, "No execute")
@@ -114,7 +138,9 @@ function CmdrService:RegisterCommand(commandData, execute)
 	cmdrJsonCommandData.Name = "CmdrJsonCommandData"
 	cmdrJsonCommandData.Parent = commandScript
 
-	self._cmdr.Registry:RegisterCommand(commandScript, commandServerScript)
+	self._promiseCmdr:Then(function(cmdr)
+		cmdr.Registry:RegisterCommand(commandScript, commandServerScript)
+	end)
 end
 
 --[=[
@@ -125,7 +151,7 @@ end
 ]=]
 function CmdrService:__executeCommand(cmdrCommandId, ...)
 	assert(type(cmdrCommandId) == "string", "Bad cmdrCommandId")
-	assert(self._cmdr, "CmdrService is not initialized yet")
+	assert(self._promiseCmdr, "CmdrService is not initialized yet")
 
 	local execute = self._executeData[cmdrCommandId]
 	if not execute then
@@ -146,6 +172,10 @@ function CmdrService:__getServiceFromId(cmdrServiceId)
 	assert(type(cmdrServiceId) == "string", "Bad cmdrServiceId")
 
 	return GLOBAL_REGISTRY[cmdrServiceId]
+end
+
+function CmdrService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return CmdrService

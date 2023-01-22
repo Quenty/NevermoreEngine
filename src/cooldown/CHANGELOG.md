@@ -3,6 +3,167 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.9.0...@quenty/cooldown@5.10.0) (2023-01-17)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.8.0...@quenty/cooldown@5.9.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.7.1...@quenty/cooldown@5.8.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+## [5.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.7.0...@quenty/cooldown@5.7.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.6.0...@quenty/cooldown@5.7.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.5.1...@quenty/cooldown@5.6.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+## [5.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.5.0...@quenty/cooldown@5.5.1) (2022-11-28)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.4.0...@quenty/cooldown@5.5.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.3.1...@quenty/cooldown@5.4.0) (2022-11-12)
+
+
+### Features
+
+* Binder provider now provides name for debugging ([72d547e](https://github.com/Quenty/NevermoreEngine/commit/72d547ea47358dfab1128dd076723f5a1a0d9fd8))
+
+
+
+
+
+## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.3.0...@quenty/cooldown@5.3.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.2.0...@quenty/cooldown@5.3.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.1.0...@quenty/cooldown@5.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.0.0...@quenty/cooldown@5.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@4.1.0...@quenty/cooldown@5.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+
+
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@4.0.1...@quenty/cooldown@4.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@4.0.0...@quenty/cooldown@4.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@3.3.0...@quenty/cooldown@4.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@3.2.0...@quenty/cooldown@3.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@3.1.0...@quenty/cooldown@3.2.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
+
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@3.0.0...@quenty/cooldown@3.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/cooldown

@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/queue",
+  "version": "2.0.0",
+  "description": "Queue class with better performance characteristics than table.remove()",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Data"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "ssrc/queue/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

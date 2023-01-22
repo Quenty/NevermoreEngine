@@ -1,4 +1,6 @@
 --[=[
+	The actual cursor for the HSV (it's a plus). See [HSVColorPicker].
+
 	@class HSColorPickerCursor
 ]=]
 
@@ -52,6 +54,11 @@ function HSColorPickerCursor.new()
 	return self
 end
 
+--[=[
+	Hints the background color so contrast can be set appropriately.
+
+	@param color Color3
+]=]
 function HSColorPickerCursor:HintBackgroundColor(color)
 	assert(typeof(color) == "Color3", "Bad color")
 
@@ -66,18 +73,38 @@ function HSColorPickerCursor:SetHorizontalHairVisible(visible)
 	self._horizontalHairVisible.Value = visible
 end
 
+--[=[
+	Sets the size of the cursor.
+
+	@param height number
+]=]
 function HSColorPickerCursor:SetHeight(height)
 	self._height.Value = height
 end
 
+--[=[
+	Sets the Vector2 position in scale (from 0 to 1).
+
+	@param position Vector2
+]=]
 function HSColorPickerCursor:SetPosition(position)
 	self._position.Value = position
 end
 
+--[=[
+	Gets the position of the cursor in scale
+
+	@return Vector2
+]=]
 function HSColorPickerCursor:GetPosition()
 	return self._position.Value
 end
 
+--[=[
+	Sets the transparency of the cusor
+
+	@param transparency number
+]=]
 function HSColorPickerCursor:SetTransparency(transparency)
 	assert(type(transparency) == "number", "Bad transparency")
 

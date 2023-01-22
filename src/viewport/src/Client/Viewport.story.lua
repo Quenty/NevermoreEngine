@@ -15,7 +15,7 @@ return function(target)
 	local viewport = Viewport.new()
 	maid:GiveTask(viewport)
 
-	maid:GivePromise(InsertServiceUtils.promiseAsset(182451181))
+	maid:GivePromise(InsertServiceUtils.promiseAsset(182451181)) --The account must own the asset in order to insert it.
 		:Then(function(crate)
 			viewport:SetInstance(crate)
 		end)

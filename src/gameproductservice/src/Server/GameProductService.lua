@@ -29,6 +29,11 @@ function GameProductService:Start()
 	MarketplaceService.ProcessReceipt = function(...)
 		return self:_processReceipt(...)
 	end
+
+	self._maid:GiveTask(function()
+		-- This might be unsafe
+		MarketplaceService.ProcessReceipt = nil
+	end)
 end
 
 function GameProductService:GetPlayerProductManagerBinder()
@@ -50,6 +55,10 @@ function GameProductService:_processReceipt(receiptInfo)
 
 	-- Free money?
 	return Enum.ProductPurchaseDecision.PurchaseGranted
+end
+
+function GameProductService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return GameProductService

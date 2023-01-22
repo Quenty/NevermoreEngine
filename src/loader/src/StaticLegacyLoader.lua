@@ -109,7 +109,7 @@ function StaticLegacyLoader:_getPackageFolderLookup(instance)
 			warn("[StaticLegacyLoader] - Bad link in packageFolder")
 			return {}
 		end
-	elseif instance:IsA("Folder") then
+	elseif instance:IsA("Folder") or instance:IsA("Camera") then
 		return self:_getOrCreateLookup(instance)
 	elseif instance:IsA("ModuleScript") then
 		return self:_getOrCreateLookup(instance)
@@ -136,7 +136,7 @@ function StaticLegacyLoader:_getOrCreateLookup(packageFolderOrModuleScript)
 end
 
 function StaticLegacyLoader:_buildLookup(lookup, instance)
-	if instance:IsA("Folder") then
+	if instance:IsA("Folder") or instance:IsA("Camera") then
 		if instance.Name ~= ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
 			for _, item in pairs(instance:GetChildren()) do
 				self:_buildLookup(lookup, item)
@@ -155,12 +155,28 @@ function StaticLegacyLoader:_findPackageRoot(instance)
 	while current and current ~= game do
 		if LoaderUtils.isPackage(current) then
 			return current
+		elseif self:_couldBePackageRootTopLevel(current) then
+			return current
 		else
 			current = current.Parent
 		end
 	end
 
 	return nil
+end
+
+function StaticLegacyLoader:_couldBePackageRootTopLevel(current)
+	for _, instance in pairs(current:GetChildren()) do
+		if instance:IsA("Folder") and instance.Name:sub(1, 1) == "@" then
+			for _, item in pairs(instance:GetChildren()) do
+				if LoaderUtils.isPackage(item) then
+					return true
+				end
+			end
+		end
+	end
+
+	return true
 end
 
 function StaticLegacyLoader:_ensureFakeLoader(module)

@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.0.0...@quenty/promise@6.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@5.1.1...@quenty/promise@6.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Fix function returning call scenario ([7a099f3](https://github.com/Quenty/NevermoreEngine/commit/7a099f320918a6a520ed9e35c5e777cf895a05f6))
+
+
+
+
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@5.1.0...@quenty/promise@5.1.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/promise
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@5.0.0...@quenty/promise@5.1.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Promise uses task.defer() instead of Heartbeat ([0ae1e7a](https://github.com/Quenty/NevermoreEngine/commit/0ae1e7aa92543bf220ebd594772dea9b6b586612))
+* Replace coroutine.resume in favor of task.spawn ([#260](https://github.com/Quenty/NevermoreEngine/issues/260)) ([3686a1e](https://github.com/Quenty/NevermoreEngine/commit/3686a1e7926c0c5d116bd51843a95a5bb4e33743))
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@4.2.0...@quenty/promise@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/promise

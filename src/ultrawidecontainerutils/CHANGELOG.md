@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ultrawidecontainerutils@2.1.0...@quenty/ultrawidecontainerutils@2.2.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Ensure syncronization name for default.project.json is consistent with package name ([b21e462](https://github.com/Quenty/NevermoreEngine/commit/b21e4621df4d6c5f4fe6ea83e0398861dbff4a26))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ultrawidecontainerutils@2.0.1...@quenty/ultrawidecontainerutils@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/ultrawidecontainerutils

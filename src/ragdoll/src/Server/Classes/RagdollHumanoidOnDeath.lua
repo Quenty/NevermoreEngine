@@ -24,6 +24,11 @@ function RagdollHumanoidOnDeath.new(humanoid, serviceBag)
 
 	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
 
+	self._obj.BreakJointsOnDeath = false
+	self._maid:GiveTask(function()
+		self._obj.BreakJointsOnDeath = true
+	end)
+
 	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("Health"):Connect(function()
 		if self._obj.Health <= 0 then
 			self._ragdollBinder:Bind(self._obj)

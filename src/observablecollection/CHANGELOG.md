@@ -3,6 +3,143 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.5.0...@quenty/observablecollection@5.6.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.4.0...@quenty/observablecollection@5.5.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.3.1...@quenty/observablecollection@5.4.0) (2022-12-29)
+
+
+### Features
+
+* Add FilteredObservableListView.new ([de1e703](https://github.com/Quenty/NevermoreEngine/commit/de1e70362c9bef48ae00cc4620beca3e549fb20b))
+
+
+
+
+
+## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.3.0...@quenty/observablecollection@5.3.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.2.0...@quenty/observablecollection@5.3.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.1.1...@quenty/observablecollection@5.2.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.1.0...@quenty/observablecollection@5.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.0.0...@quenty/observablecollection@5.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@4.1.0...@quenty/observablecollection@5.0.0) (2022-09-27)
+
+
+### Features
+
+* Add ObservableList:RemoveFirstInstance ([7fc1662](https://github.com/Quenty/NevermoreEngine/commit/7fc1662c712e4d1e0a10f52fab5011deff6b31fe))
+
+
+
+
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@4.0.1...@quenty/observablecollection@4.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@4.0.0...@quenty/observablecollection@4.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.3.1...@quenty/observablecollection@4.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+## [3.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.3.0...@quenty/observablecollection@3.3.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.2.0...@quenty/observablecollection@3.3.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Prevent observables from being removed during insertion of observable ([27a3594](https://github.com/Quenty/NevermoreEngine/commit/27a35941f457f63a5f1dc84169448a750308fdc2))
+
+
+### Features
+
+* Add ObservableSortedList ([cca209f](https://github.com/Quenty/NevermoreEngine/commit/cca209fd8a6c2cfeb1ee6e39d2aabce0202b3072))
+
+
+
+
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.1.0...@quenty/observablecollection@3.2.0) (2022-07-02)
+
+
+### Features
+
+* Add ObservableMapSet:GetSetCount() and ObservableMapSet:ObserveSetCount() ([6a25f61](https://github.com/Quenty/NevermoreEngine/commit/6a25f61d8dcadd9dda56daf1a52c4b4186740efe))
+
+
+
+
+
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@3.0.0...@quenty/observablecollection@3.1.0) (2022-06-21)
 
 

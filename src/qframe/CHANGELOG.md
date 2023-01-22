@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@6.1.0...@quenty/qframe@6.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@6.0.0...@quenty/qframe@6.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Fix QFrame.isNaN ([#294](https://github.com/Quenty/NevermoreEngine/issues/294)) ([81b7918](https://github.com/Quenty/NevermoreEngine/commit/81b7918c57ac02dacc9640d2583dba00f4fd4955))
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@5.2.1...@quenty/qframe@6.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
+## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@5.2.0...@quenty/qframe@5.2.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@5.1.0...@quenty/qframe@5.2.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/qframe
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qframe@5.0.0...@quenty/qframe@5.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/qframe

@@ -155,9 +155,6 @@ function ColorPalette:SetColor(colorName, value)
 end
 
 function ColorPalette:ObserveGradeOn(colorName, newSurfaceName, baseSurfaceName)
-	assert(type(colorName) == "string", "Bad colorName")
-	assert(type(newSurfaceName) == "string", "Bad newSurfaceName")
-
 	return self._gradePalette:ObserveOn(colorName, newSurfaceName, baseSurfaceName)
 end
 

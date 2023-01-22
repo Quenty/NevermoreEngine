@@ -3,6 +3,162 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.6.0...@quenty/blend@6.7.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.5.1...@quenty/blend@6.6.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [6.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.5.0...@quenty/blend@6.5.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.4.0...@quenty/blend@6.5.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.3.1...@quenty/blend@6.4.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [6.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.3.0...@quenty/blend@6.3.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.2.0...@quenty/blend@6.3.0) (2022-11-04)
+
+
+### Bug Fixes
+
+* Fix setting velocity resetting position in blend spring object ([8285795](https://github.com/Quenty/NevermoreEngine/commit/8285795fb5c10305ffa7e5e5f11d6ad780d227bc))
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.1.1...@quenty/blend@6.2.0) (2022-10-23)
+
+
+### Bug Fixes
+
+* Use one less maid when mounting blend ([6451cc2](https://github.com/Quenty/NevermoreEngine/commit/6451cc27f71b6f360739f37dea754da1fea5ec04))
+
+
+
+
+
+## [6.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.1.0...@quenty/blend@6.1.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.0.0...@quenty/blend@6.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@5.1.0...@quenty/blend@6.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@5.0.1...@quenty/blend@5.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [5.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@5.0.0...@quenty/blend@5.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.3.1...@quenty/blend@5.0.0) (2022-08-14)
+
+
+### Features
+
+* Add Blend.Shared and Blend.Throttled to optimize expensive blend scenarios. ([3073d57](https://github.com/Quenty/NevermoreEngine/commit/3073d57e5b52ef66c03c8fcd4a7dcd61aed22fda))
+
+
+
+
+
+## [4.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.3.0...@quenty/blend@4.3.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.2.1...@quenty/blend@4.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.2.0...@quenty/blend@4.2.1) (2022-07-19)
+
+
+### Bug Fixes
+
+* Fix broken initial value of AccelTween ([52795f6](https://github.com/Quenty/NevermoreEngine/commit/52795f6f075e763023fb85ed1eb53531381acb49))
+
+
+
+
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.1.0...@quenty/blend@4.2.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@4.0.0...@quenty/blend@4.1.0) (2022-06-21)
 
 

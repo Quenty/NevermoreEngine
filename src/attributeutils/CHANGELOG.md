@@ -3,6 +3,125 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.4.0...@quenty/attributeutils@8.5.0) (2023-01-17)
+
+
+### Features
+
+* CFrame is considered a valid attribute now ([d09544d](https://github.com/Quenty/NevermoreEngine/commit/d09544d64e3ad60de58ec2b3204c51f3d8abc4cf))
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.3.0...@quenty/attributeutils@8.4.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.2.1...@quenty/attributeutils@8.3.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+## [8.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.2.0...@quenty/attributeutils@8.2.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.1.2...@quenty/attributeutils@8.2.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+## [8.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.1.1...@quenty/attributeutils@8.1.2) (2022-11-28)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.1.0...@quenty/attributeutils@8.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.0.0...@quenty/attributeutils@8.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@7.1.0...@quenty/attributeutils@8.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Add IntValue support as a valid AttributeUtil ([1cec7d9](https://github.com/Quenty/NevermoreEngine/commit/1cec7d9cce47811e1e4afe6b49ae94a050fa6a1f))
+
+
+### Features
+
+* Add AttributeUtils.removeAllAttributes() ([4096cd9](https://github.com/Quenty/NevermoreEngine/commit/4096cd94d2c38d382b7aafe8cb2fcb8bb340d051))
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@7.0.1...@quenty/attributeutils@7.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@7.0.0...@quenty/attributeutils@7.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@6.2.0...@quenty/attributeutils@7.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@6.1.0...@quenty/attributeutils@6.2.0) (2022-07-31)
+
+
+### Features
+
+* Add AttributeUtils.isValidAttributeType(valueType) ([b77392b](https://github.com/Quenty/NevermoreEngine/commit/b77392b4e373c297fdc7b79bd26ef218ac327f18))
+* Add RxAttributeUtils.observeAttributeBrio API call ([e0e827f](https://github.com/Quenty/NevermoreEngine/commit/e0e827fcf9a17c4ff0ecad0209bcc976912ae3b5))
+
+
+
+
+
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@6.0.0...@quenty/attributeutils@6.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/attributeutils

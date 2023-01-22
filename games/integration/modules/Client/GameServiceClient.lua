@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local GameServiceClient = {}
+GameServiceClient.ServiceName = "GameServiceClient"
 
 function GameServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")

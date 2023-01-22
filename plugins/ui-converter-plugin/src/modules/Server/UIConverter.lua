@@ -4,10 +4,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RobloxApiDump = require("RobloxApiDump")
 local BaseObject = require("BaseObject")
+local Color3Utils = require("Color3Utils")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
+local RobloxApiDump = require("RobloxApiDump")
 local UIConverterNeverSkipProps = require("UIConverterNeverSkipProps")
 
 local UIConverter = setmetatable({}, BaseObject)
@@ -47,8 +48,11 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 					local map = {}
 					local promises = {}
 
+					local hasProperties = {}
 
 					for _, property in pairs(properties) do
+						hasProperties[property:GetName()] = true
+
 						self._maid:GivePromise(self:PromiseDefaultValue(class, property, overrideMap))
 							:Then(function(defaultValue)
 								local currentValue = instance[property:GetName()]
@@ -68,6 +72,20 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 
 					return PromiseUtils.all(promises)
 						:Then(function()
+							-- Specifically handle edge-case with border size pixel defaults in the assumption of superfluous
+							-- border properties
+							-- TODO: Could group this all under a "PropertyObscuresOtherPropertyUnderCondition" scenario
+							-- TODO: also need to remove in case of UICorner or other scenarios
+							if hasProperties["BackgroundTransparency"] and instance.BackgroundTransparency >= 1 then
+								if hasProperties["BorderSizePixel"] and instance.BorderSizePixel == 1 then
+									map.BorderSizePixel = nil
+								end
+
+								if hasProperties["BorderColor3"] and Color3Utils.areEqual(instance.BorderColor3, Color3.fromRGB(27, 42, 53)) then
+									map.BorderColor3 = nil
+								end
+							end
+
 							return map
 						end)
 				end)
@@ -132,24 +150,39 @@ function UIConverter:PromiseDefaultValue(class, property, overrideMap)
 		return Promise.resolved(nil)
 	end
 
-	if not self._promiseDefaultValueCache[className] then
-		self._promiseDefaultValueCache[className] = {}
+	local classCache = self._promiseDefaultValueCache[className]
+	if not classCache then
+		classCache = {}
+		self._promiseDefaultValueCache[className] = classCache
 	end
 
-	if self._promiseDefaultValueCache[className][propertyName] then
-		return self._promiseDefaultValueCache[className][propertyName]
+	if not classCache[propertyName] then
+		classCache[propertyName] = {}
 	end
 
+	-- check cache for override map
+	if classCache[propertyName][overrideMap] then
+		return classCache[propertyName][overrideMap]
+	end
+
+	-- check cache for default
+	if classCache[propertyName].default then
+		return classCache[propertyName].default
+	end
+
+	-- check override map first
 	local properties = overrideMap[class:GetClassName()]
 	if properties and properties[propertyName] then
-		self._promiseDefaultValueCache[className][propertyName] = Promise.resolved(properties[propertyName])
-	else
-		local inst = Instance.new(className)
-		self._promiseDefaultValueCache[className][propertyName] = Promise.resolved(inst[propertyName])
-		inst:Destroy()
+		classCache[propertyName][overrideMap] = Promise.resolved(properties[propertyName])
+		return classCache[propertyName][overrideMap]
 	end
 
-	return self._promiseDefaultValueCache[className][propertyName]
+	-- then check default
+	local inst = Instance.new(className)
+	classCache[propertyName].default = Promise.resolved(inst[propertyName])
+	inst:Destroy()
+
+	return classCache[propertyName].default
 end
 
 

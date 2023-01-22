@@ -16,6 +16,7 @@ local PermissionProviderClient = require("PermissionProviderClient")
 local Promise = require("Promise")
 
 local PermissionServiceClient = {}
+PermissionServiceClient.ServiceName = "PermissionServiceClient"
 
 --[=[
 	Initializes the permission service on the client. Should be done via [ServiceBag].

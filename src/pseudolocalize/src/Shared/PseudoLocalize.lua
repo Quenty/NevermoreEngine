@@ -7,6 +7,8 @@
 
 local PseudoLocalize = {}
 
+local DEFAULT_PSEUDO_LOCALE_ID = "qlp-pls"
+
 --[=[
     Translates a line into pseudo text while maintaining params
     @param line string -- The line to translate
@@ -35,6 +37,10 @@ function PseudoLocalize.pseudoLocalize(line)
 	return out
 end
 
+function PseudoLocalize.getDefaultPseudoLocaleId()
+    return DEFAULT_PSEUDO_LOCALE_ID
+end
+
 --[=[
     Parses a localization table and adds a pseudo localized locale to the table.
 
@@ -44,7 +50,7 @@ end
     @return string -- The translated line
 ]=]
 function PseudoLocalize.addToLocalizationTable(localizationTable, preferredLocaleId, preferredFromLocale)
-	local localeId = preferredLocaleId or "qlp-pls"
+	local localeId = preferredLocaleId or DEFAULT_PSEUDO_LOCALE_ID
 	local fromLocale = preferredFromLocale or "en"
 
 	local entries = localizationTable:GetEntries()

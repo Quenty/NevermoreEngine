@@ -1,0 +1,35 @@
+{
+  "name": "@quenty/chatproviderservice",
+  "version": "3.1.1",
+  "description": "Provide wrapper around chat system to allow tags to be set",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Chat"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/chatproviderservice/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

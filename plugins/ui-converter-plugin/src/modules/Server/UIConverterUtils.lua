@@ -195,6 +195,12 @@ function UIConverterUtils.toLuaPropertyString(value, debugHint)
 			return ("PhysicalProperties.new(%s, %s, %s, %s, %s)"):format(
 				applyToTuple(roundNumber, value.Density, value.Friction, value.Elasticity, value.FrictionWeight, value.ElasticityWeight))
 		end
+	elseif valueType == "Font" then
+		if value.Weight == Enum.FontWeight.Regular and value.Style == Enum.FontStyle.Normal then
+			return ("Font.new(%q)"):format(value.Family)
+		else
+			return ("Font.new(%q, %s, %s)"):format(value.Family, tostring(value.Weight), tostring(value.Style))
+		end
 	elseif valueType == "userdata" then
 		-- FontFace
 		warn(("Bad property type %s for %s - Cannot serialize."):format(valueType, debugHint and tostring(debugHint) or "?"))
@@ -213,7 +219,7 @@ end
 
 function UIConverterUtils.convertPropertiesToTable(properties, refLookupMap)
 	local data = {}
-	for key, value  in pairs(properties) do
+	for key, value in pairs(properties) do
 		if key ~= "Parent" then
 			if typeof(value) == "Instance" then
 				data[key] = UIConverterUtils.getRefProperty(refLookupMap, value)
@@ -257,7 +263,7 @@ function UIConverterUtils.propertiesTableToString(library, properties)
 	ensureLast(UIConverterUtils.getChildrenKey(library));
 
 	local data = {}
-	for _, key  in pairs(keys) do
+	for _, key in pairs(keys) do
 		table.insert(data, ("%s = %s;"):format(key, properties[key]))
 	end
 

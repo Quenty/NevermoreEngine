@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@4.0.0...@quenty/boundingboxutils@4.1.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/boundingboxutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@3.1.0...@quenty/boundingboxutils@4.0.0) (2022-09-27)
+
+
+### Features
+
+* Add BoundingBoxUtils.inCylinderBoundingBox and BoundingBoxUtils.inBallBoundingBox ([d26d1cc](https://github.com/Quenty/NevermoreEngine/commit/d26d1ccc54ecf52462703188e9b7b83227673c62))
+
+
+
+
+
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/boundingboxutils@3.0.0...@quenty/boundingboxutils@3.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/boundingboxutils

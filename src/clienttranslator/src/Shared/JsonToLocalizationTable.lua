@@ -15,11 +15,13 @@ local LOCALIZATION_TABLE_NAME = "GeneratedJSONTable"
 
 --[[
 	Recursively iterates through the object to construct strings and add it to the localization table
+
+	@param localizationTable LocalizationTable
 	@param localeId string -- The localizationid to add
 	@param baseKey string -- the key to add
 	@param object any -- The value to iterate over
 ]]
-local function recurseAdd(localizationTable, localeId, baseKey, object)
+local function recurseAdd(localizationTable, localeId, baseKey, object, tableName)
 	if baseKey ~= "" then
 		baseKey = baseKey .. "."
 	end
@@ -27,10 +29,13 @@ local function recurseAdd(localizationTable, localeId, baseKey, object)
 	for index, value in pairs(object) do
 		local key = baseKey .. index
 		if type(value) == "table" then
-			recurseAdd(localizationTable, localeId, key, value)
+			recurseAdd(localizationTable, localeId, key, value, tableName)
 		elseif type(value) == "string" then
 			local source = ""
-			local context = ""
+
+			-- Guarantee the context is unique. This is important because Roblox will not
+			-- allow something with the same source without a differing context value.
+			local context = tableName .. "." .. key
 
 			if localeId == "en" then
 				source = value
@@ -45,6 +50,7 @@ end
 
 --[=[
 	Extracts the locale from the name
+
 	@param name string -- The name to parse
 	@return string -- The locale
 ]=]
@@ -56,6 +62,12 @@ function JsonToLocalizationTable.localeFromName(name)
 	end
 end
 
+--[=[
+	Gets or creates the global localization table. If the game isn't running (i.e. test mode), then
+	we'll just not parent it.
+
+	@return string -- The locale
+]=]
 function JsonToLocalizationTable.getOrCreateLocalizationTable()
 	local localizationTable = LocalizationService:FindFirstChild(LOCALIZATION_TABLE_NAME)
 
@@ -72,19 +84,23 @@ function JsonToLocalizationTable.getOrCreateLocalizationTable()
 end
 
 --[=[
-	Loads a folder into a localization table
+	Loads a folder into a localization table.
+
+	@param tableName string -- Used for source
 	@param folder Folder -- A Roblox folder with StringValues containing JSON, named with the localization in mind
 ]=]
-function JsonToLocalizationTable.loadFolder(folder)
+function JsonToLocalizationTable.loadFolder(tableName, folder)
+	assert(type(tableName) == "string", "Bad tableName")
+
 	local localizationTable = JsonToLocalizationTable.getOrCreateLocalizationTable()
 
 	for _, item in pairs(folder:GetDescendants()) do
 		if item:IsA("StringValue") then
 			local localeId = JsonToLocalizationTable.localeFromName(item.Name)
-			JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, item.Value)
+			JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, item.Value, tableName)
 		elseif item:IsA("ModuleScript") then
 			local localeId = JsonToLocalizationTable.localeFromName(item.Name)
-			recurseAdd(localizationTable, localeId, "", require(item))
+			recurseAdd(localizationTable, localeId, "", require(item), tableName)
 		end
 	end
 	return localizationTable
@@ -92,17 +108,21 @@ end
 
 --[=[
 	Extracts the locale from the folder, or a locale and table.
+
+	@param tableName string -- Used for source
 	@param first Instance | string
 	@param second table?
 	@return LocalizationTable
 ]=]
-function JsonToLocalizationTable.toLocalizationTable(first, second)
+function JsonToLocalizationTable.toLocalizationTable(tableName, first, second)
+	assert(type(tableName) == "string", "Bad tableName")
+
 	if typeof(first) == "Instance" then
-		local result = JsonToLocalizationTable.loadFolder(first)
+		local result = JsonToLocalizationTable.loadFolder(tableName, first)
 		-- result.Name = ("JSONTable_%s"):format(first.Name)
 		return result
 	elseif type(first) == "string" and type(second) == "table" then
-		local result = JsonToLocalizationTable.loadTable(first, second)
+		local result = JsonToLocalizationTable.loadTable(tableName, first, second)
 		return result
 	else
 		error("Bad args")
@@ -111,27 +131,35 @@ end
 
 --[=[
 	Extracts the locale from the name
+
+	@param tableName string -- Used for source
 	@param localeId string -- the defaultlocaleId
 	@param dataTable table -- Data table to load from
 	@return LocalizationTable
 ]=]
-function JsonToLocalizationTable.loadTable(localeId, dataTable)
+function JsonToLocalizationTable.loadTable(tableName, localeId, dataTable)
+	assert(type(tableName) == "string", "Bad tableName")
+
 	local localizationTable = JsonToLocalizationTable.getOrCreateLocalizationTable()
 
-	recurseAdd(localizationTable, localeId, "", dataTable)
+	recurseAdd(localizationTable, localeId, "", dataTable, tableName)
 
 	return localizationTable
 end
 
 --[=[
 	Adds json to a localization table
+
 	@param localizationTable LocalizationTable -- The localization table to add to
 	@param localeId string -- The localeId to use
 	@param json string -- The json to add with
+	@param tableName string -- Used for source
 ]=]
-function JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, json)
+function JsonToLocalizationTable.addJsonToTable(localizationTable, localeId, json, tableName)
+	assert(type(tableName) == "string", "Bad tableName")
+
 	local decodedTable = HttpService:JSONDecode(json)
-	recurseAdd(localizationTable, localeId, "", decodedTable)
+	recurseAdd(localizationTable, localeId, "", decodedTable, tableName)
 end
 
 return JsonToLocalizationTable

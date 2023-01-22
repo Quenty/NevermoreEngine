@@ -53,10 +53,7 @@ function Blend.New(className)
 
 	return function(props)
 		return Observable.new(function(sub)
-			local maid = Maid.new()
-
 			local instance = Instance.new(className)
-			maid:GiveTask(instance)
 
 			if defaults then
 				for key, value in pairs(defaults) do
@@ -64,7 +61,8 @@ function Blend.New(className)
 				end
 			end
 
-			maid:GiveTask(Blend.mount(instance, props))
+			local maid = Blend.mount(instance, props)
+			maid:GiveTask(instance)
 
 			sub:Fire(instance)
 
@@ -81,6 +79,36 @@ end
 ]=]
 function Blend.State(defaultValue)
 	return ValueObject.new(defaultValue)
+end
+
+--[=[
+	Throttles the update to the end of the defer lane. Can help optimize scenarios when
+	Compute() can trigger multiple times per a frame.
+
+	Generally not needed.
+
+	@param observable Observable<T>
+	@return Observable<T>
+]=]
+function Blend.Throttled(observable)
+	return observable:Pipe({
+		Rx.throttleDefer();
+	})
+end
+
+--[=[
+	Shares this observables state/computation with all down-stream observables. This can be useful
+	when a very expensive computation was done and needs to be shared.
+
+	Generally not needed.
+
+	@param observable Observable<T>
+	@return Observable<T>
+]=]
+function Blend.Shared(observable)
+	return observable:Pipe({
+		Rx.cache();
+	})
 end
 
 function Blend.Dynamic(...)
@@ -213,6 +241,24 @@ end
 --[=[
 	Uses the constructor to attach a class or resource to the actual object
 	for the lifetime of the subscription of that object.
+
+	```lua
+	return Blend.New "Frame" {
+		Parent = variables.Parent;
+		[Blend.Attached(function(parent)
+			local maid = Maid.new()
+
+			print("Got", parent)
+
+			maid:GiveTask(function()
+				print("Dead!")
+			end)
+
+			return maid
+		end)] = true;
+	}
+	```
+
 	@param constructor T
 	@return (parent: Instance) -> Observable<T>
 ]=]
@@ -298,7 +344,13 @@ function Blend.AccelTween(source, acceleration)
 	local accelerationObservable = Blend.toNumberObservable(acceleration)
 
 	local function createAccelTween(maid, initialValue)
-		local accelTween = AccelTween.new(initialValue)
+		local accelTween = AccelTween.new()
+
+		if initialValue then
+			accelTween.p = initialValue
+			accelTween.t = initialValue
+			accelTween.v = 0
+		end
 
 		if accelerationObservable then
 			maid:GiveTask(accelerationObservable:Subscribe(function(value)

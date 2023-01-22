@@ -3,6 +3,156 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.4.1...@quenty/datastore@7.5.0) (2023-01-17)
+
+
+### Features
+
+* Add DataStoreStringUtils.isValidUTF8(str) ([d3b245a](https://github.com/Quenty/NevermoreEngine/commit/d3b245a8fbd469ec51fb973a72cefc868e94c99a))
+
+
+
+
+
+## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.4.0...@quenty/datastore@7.4.1) (2023-01-03)
+
+
+### Bug Fixes
+
+* Add PrivateServerDataStoreService ([32c9921](https://github.com/Quenty/NevermoreEngine/commit/32c9921358f5728d9502b89c391ff761a0e454e7))
+* Better error message if key is an empty string ([dd2528d](https://github.com/Quenty/NevermoreEngine/commit/dd2528dfe99d272aa53790d883896f7523b5cb47))
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.3.0...@quenty/datastore@7.4.0) (2022-11-12)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.2.1...@quenty/datastore@7.3.0) (2022-11-08)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [7.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.2.0...@quenty/datastore@7.2.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.1.0...@quenty/datastore@7.2.0) (2022-10-28)
+
+
+### Bug Fixes
+
+* Import maid ([638e529](https://github.com/Quenty/NevermoreEngine/commit/638e529d87b3ae4df73482e91153540f41baaf36))
+
+
+### Features
+
+* Free DataStore key after its writer GCs to allow future writers ([9b2e8a2](https://github.com/Quenty/NevermoreEngine/commit/9b2e8a29332aacb99ac47550af37708f58cd39e5))
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.0.0...@quenty/datastore@7.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@6.1.0...@quenty/datastore@7.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+### Features
+
+* Add BindToCloseService package and implement across places binding to close ([afdd829](https://github.com/Quenty/NevermoreEngine/commit/afdd829538c9d0ce2d6f51ad9fee9063f0f5bd24))
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@6.0.1...@quenty/datastore@6.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@6.0.0...@quenty/datastore@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@5.3.0...@quenty/datastore@6.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@5.2.0...@quenty/datastore@5.3.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Add DataStore SetCacheTime (not implemented yet) ([906e723](https://github.com/Quenty/NevermoreEngine/commit/906e72397075200e8cb8b98bc8b7b7f96d992907))
+
+
+### Features
+
+* Add GameDataStoreService service for global game data ([5f6d52c](https://github.com/Quenty/NevermoreEngine/commit/5f6d52ca9f2be811c426714cd6d94d9794f366b5))
+* Support StoreOnValueChange with non ValueBase instances. ([ab45498](https://github.com/Quenty/NevermoreEngine/commit/ab4549833f41f2b3d8b43202965fd3202b649770))
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@5.1.0...@quenty/datastore@5.2.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+### Features
+
+* Add DataStorePromises support for ordered data stores ([927bdd9](https://github.com/Quenty/NevermoreEngine/commit/927bdd94b68eef114cff5a1eb6dc03d6db5867d8))
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@5.0.0...@quenty/datastore@5.1.0) (2022-06-21)
 
 

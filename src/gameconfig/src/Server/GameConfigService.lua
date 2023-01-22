@@ -16,6 +16,7 @@ local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigServiceConstants = require("GameConfigServiceConstants")
 
 local GameConfigService = {}
+GameConfigService.ServiceName = "GameConfigService"
 
 function GameConfigService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
@@ -90,6 +91,10 @@ function GameConfigService:_getOrCreateDefaultGameConfig()
 	config.Parent = self:GetPreferredParent()
 
 	return config
+end
+
+function GameConfigService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return GameConfigService

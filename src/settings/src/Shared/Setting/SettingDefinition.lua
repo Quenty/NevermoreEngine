@@ -1,4 +1,20 @@
 --[=[
+	These settings definitions are used to define a setting and register them on both the client and server. See
+	[SettingDefinitionProvider] for more details on grouping these.
+
+	Notably a setting is basically anything on the client that can be stored on the server by the client, and that
+	relatively minimal validation is required upon. This can be both user-set settings, as well as very temporary
+	data.
+
+	```lua
+	local SettingDefinition = require("SettingDefinition")
+
+	return require("SettingDefinitionProvider").new({
+		SettingDefinition.new("LastTimeUpdateSeen", 0);
+		SettingDefinition.new("LastTimeShopSeen", 0);
+	})
+	```
+
 	@class SettingDefinition
 ]=]
 
@@ -7,11 +23,11 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local SettingProperty = require("SettingProperty")
-local SettingServiceBridge = require("SettingServiceBridge")
 local ServiceBag = require("ServiceBag")
 
 local SettingDefinition = {}
 SettingDefinition.ClassName = "SettingDefinition"
+SettingDefinition.ServiceName = "SettingDefinition"
 SettingDefinition.__index = SettingDefinition
 
 --[=[
@@ -29,6 +45,8 @@ function SettingDefinition.new(settingName, defaultValue)
 
 	self._settingName = settingName
 	self._defaultValue = defaultValue
+
+	self.ServiceName = self._settingName
 
 	return self
 end
@@ -73,38 +91,6 @@ end
 ]=]
 function SettingDefinition:GetDefaultValue()
 	return self._defaultValue
-end
-
---[=[
-	Optional registration to the service bag. If registered, ensures all existing
-	players and all new players get this setting defined. This may be necessary for
-	replication.
-
-	@param serviceBag ServiceBag
-]=]
-function SettingDefinition:Init(serviceBag)
-	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
-	-- not strictly necessary... but...
-
-	serviceBag:GetService(SettingServiceBridge):RegisterDefinition(self)
-end
-
---[=[
-	Optional registration to the service bag
-
-	@param serviceBag ServiceBag
-]=]
-function SettingDefinition:RegisterToService(serviceBag)
-	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
-
-	local settingServiceBridge = serviceBag:GetService(SettingServiceBridge)
-
-	if serviceBag:IsStarted() and not serviceBag:HasService(self) then
-		-- We've already started so let's ensure
-		settingServiceBridge:RegisterDefinition(self)
-	else
-		settingServiceBridge:RegisterDefinition(serviceBag:GetService(self))
-	end
 end
 
 return SettingDefinition

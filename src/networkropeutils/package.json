@@ -1,6 +1,6 @@
 {
   "name": "@quenty/networkropeutils",
-  "version": "5.0.0",
+  "version": "6.0.1",
   "description": "Utility function to create network ropes which hint to Roblox that two assemblies should be considered to be owned by the same network owner.",
   "keywords": [
     "Roblox",

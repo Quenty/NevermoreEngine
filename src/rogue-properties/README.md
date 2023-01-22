@@ -17,7 +17,7 @@ Roguelike properties which can be modified by external provides -- and that modi
 
 ## Installation
 ```
-npm install @quenty/rogueproperties --save
+npm install @quenty/rogue-properties --save
 ```
 
 ## Design goals

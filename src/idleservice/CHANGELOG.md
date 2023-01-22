@@ -3,6 +3,222 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.10.0...@quenty/idleservice@7.11.0) (2023-01-17)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.9.1...@quenty/idleservice@7.10.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.9.0...@quenty/idleservice@7.9.1) (2023-01-03)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.8.1...@quenty/idleservice@7.9.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.8.0...@quenty/idleservice@7.8.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.7.1...@quenty/idleservice@7.8.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.7.0...@quenty/idleservice@7.7.1) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.6.1...@quenty/idleservice@7.7.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.6.0...@quenty/idleservice@7.6.1) (2022-11-28)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.5.0...@quenty/idleservice@7.6.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.4.1...@quenty/idleservice@7.5.0) (2022-11-12)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.4.0...@quenty/idleservice@7.4.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.3.0...@quenty/idleservice@7.4.0) (2022-10-31)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.2.0...@quenty/idleservice@7.3.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.1.1...@quenty/idleservice@7.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.1.0...@quenty/idleservice@7.1.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.0.0...@quenty/idleservice@7.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Fix package dependencies ([06467b6](https://github.com/Quenty/NevermoreEngine/commit/06467b6bcbea4f0e33f3ecd6ea56424850824aef))
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@6.1.0...@quenty/idleservice@7.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@6.0.1...@quenty/idleservice@6.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@6.0.0...@quenty/idleservice@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.4.1...@quenty/idleservice@6.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+## [5.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.4.0...@quenty/idleservice@5.4.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.3.0...@quenty/idleservice@5.4.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* IdleService has server component ([521670c](https://github.com/Quenty/NevermoreEngine/commit/521670c82acb3b992aec93f25807da8202682517))
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.2.0...@quenty/idleservice@5.3.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.1.0...@quenty/idleservice@5.2.0) (2022-06-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@5.0.0...@quenty/idleservice@5.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/idleservice

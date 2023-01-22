@@ -15,33 +15,54 @@ local DeathReportUtils = {}
 	Constructs a new DeathReport from a humanoid
 
 	@param humanoid Humanomid
+	@param weaponData WeaponData
 	@return DeathReport
 ]=]
-function DeathReportUtils.fromDeceasedHumanoid(humanoid)
+function DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData)
+	assert(DeathReportUtils.isWeaponData(weaponData) or weaponData == nil, "Bad weaponData")
+
 	return {
 		adornee = humanoid.Parent;
 		humanoid = humanoid;
 		player = CharacterUtils.getPlayerFromCharacter(humanoid);
 		killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid);
 		killerPlayer = HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid);
-		weaponData = DeathReportUtils.createWeaponData();
+		weaponData = weaponData or DeathReportUtils.createWeaponData(nil);
 	}
 end
 
+--[=[
+	Returns true if a DeathReport
+
+	@param deathReport any
+	@return boolean
+]=]
 function DeathReportUtils.isDeathReport(deathReport)
 	return type(deathReport) == "table"
 		and typeof(deathReport.humanoid) == "Instance"
 end
 
 --[=[
+	Returns true if a WeaponData
+
+	@param weaponData any
+	@return boolean
+]=]
+function DeathReportUtils.isWeaponData(weaponData)
+	return type(weaponData) == "table" and (typeof(weaponData.weaponInstance) == "Instance" or weaponData.weaponInstance == nil)
+end
+
+--[=[
 	Creates weapon data information
 
+	@param weaponInstance Instance?
 	@return WeaponData
 ]=]
-function DeathReportUtils.createWeaponData()
+function DeathReportUtils.createWeaponData(weaponInstance)
+	assert(typeof(weaponInstance) == "Instance" or weaponInstance == nil, "Bad weaponInstance")
+
 	return {
-		weaponKey = "test";
-		weaponInstance = nil;
+		weaponInstance = weaponInstance;
 	}
 end
 
@@ -137,6 +158,10 @@ function DeathReportUtils.getKillerColor(deathReport)
 	return nil
 end
 
+--[=[
+	Gets the default color of a death report to use.
+	@return Color3
+]=]
 function DeathReportUtils.getDefaultColor()
 	return DEFAULT_COLOR
 end

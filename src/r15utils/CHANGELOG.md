@@ -3,6 +3,116 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.5.0...@quenty/r15utils@7.6.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.4.1...@quenty/r15utils@7.5.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.4.0...@quenty/r15utils@7.4.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.3.0...@quenty/r15utils@7.4.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.2.1...@quenty/r15utils@7.3.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+## [7.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.2.0...@quenty/r15utils@7.2.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.1.0...@quenty/r15utils@7.2.0) (2022-10-23)
+
+
+### Bug Fixes
+
+* Rx switch maps would lead to multiple brios alive against a single switched observable. ([cd25a22](https://github.com/Quenty/NevermoreEngine/commit/cd25a220a2096fe1c3093deec7f9bc4e83815924))
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.0.0...@quenty/r15utils@7.1.0) (2022-10-11)
+
+
+### Features
+
+* Add R15Utils.getRigMotor(character, partName, motorName) ([a36b72d](https://github.com/Quenty/NevermoreEngine/commit/a36b72db4e0e18d82126182a18182c0468a79939))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@6.1.0...@quenty/r15utils@7.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@6.0.1...@quenty/r15utils@6.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@6.0.0...@quenty/r15utils@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@5.2.0...@quenty/r15utils@6.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@5.1.0...@quenty/r15utils@5.2.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@5.0.0...@quenty/r15utils@5.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/r15utils

@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RagdollService = {}
+RagdollService.ServiceName = "RagdollService"
 
 --[=[
 	Initializes the ragdoll service on the server. Should be done via [ServiceBag].
@@ -15,7 +16,15 @@ function RagdollService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	-- External
+	self._serviceBag:GetService(require("Motor6DService"))
+
+	-- Internal
 	self._binders = self._serviceBag:GetService(require("RagdollBindersServer"))
+
+	self._binders.RagdollHumanoidOnFall:SetAutomaticTagging(false)
+	self._binders.RagdollHumanoidOnDeath:SetAutomaticTagging(false)
+	self._binders.UnragdollAutomatically:SetAutomaticTagging(false)
 end
 
 --[=[

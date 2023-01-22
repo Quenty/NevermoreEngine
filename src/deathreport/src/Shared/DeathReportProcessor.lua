@@ -23,6 +23,12 @@ function DeathReportProcessor.new()
 	self._playerDeathSubTable = ObservableSubscriptionTable.new()
 	self._maid:GiveTask(self._playerDeathSubTable)
 
+	self._humanoidKillerSubTable = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._humanoidKillerSubTable)
+
+	self._humanoidDeathSubTable = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._humanoidDeathSubTable)
+
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
 		self._playerKillerSubTable:Complete(player)
 		self._playerDeathSubTable:Complete(player)
@@ -56,6 +62,30 @@ function DeathReportProcessor:ObservePlayerDeathReports(player)
 end
 
 --[=[
+	Observes death reports for the given humanoid
+
+	@param humanoid Humanoid
+	@return Observable<DeathReport>
+]=]
+function DeathReportProcessor:ObserveHumanoidDeathReports(humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
+	return self._humanoidDeathSubTable:Observe(humanoid)
+end
+
+--[=[
+	Observes killer reports for the given humanoid
+
+	@param humanoid Humanoid
+	@return Observable<DeathReport>
+]=]
+function DeathReportProcessor:ObserveHumanoidKillerReports(humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
+	return self._humanoidKillerSubTable:Observe(humanoid)
+end
+
+--[=[
 	Handles the death report
 
 	@param deathReport DeathReport
@@ -67,8 +97,16 @@ function DeathReportProcessor:HandleDeathReport(deathReport)
 		self._playerKillerSubTable:Fire(deathReport.killerPlayer, deathReport)
 	end
 
+	if deathReport.killerHumanoid then
+		self._humanoidKillerSubTable:Fire(deathReport.killerHumanoid, deathReport)
+	end
+
 	if deathReport.player then
 		self._playerDeathSubTable:Fire(deathReport.player, deathReport)
+	end
+
+	if deathReport.humanoid then
+		self._humanoidDeathSubTable:Fire(deathReport.humanoid, deathReport)
 	end
 end
 

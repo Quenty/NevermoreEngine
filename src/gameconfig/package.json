@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "3.1.0",
+  "version": "5.13.0",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",
@@ -41,6 +41,7 @@
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/preferredparentutils": "file:../preferredparentutils",
     "@quenty/promise": "file:../promise",
+    "@quenty/pseudolocalize": "file:../pseudolocalize",
     "@quenty/remotefunctionutils": "file:../remotefunctionutils",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",

@@ -11,6 +11,40 @@ local Maid = require("Maid")
 
 local AttributeUtils = {}
 
+local VALID_ATTRIBUTE_TYPES = {
+	["nil"] = true;
+	["string"] = true;
+	["boolean"] = true;
+	["number"] = true;
+	["UDim"] = true;
+	["UDim2"] = true;
+	["BrickColor"] = true;
+	["CFrame"] = true;
+	["Color3"] = true;
+	["Vector2"] = true;
+	["Vector3"] = true;
+	["NumberSequence"] = true;
+	["ColorSequence"] = true;
+	["IntValue"] = true;
+	["NumberRange"] = true;
+	["Rect"] = true;
+	["Font"] = true;
+}
+
+--[=[
+	Returns whether the attribute is a valid type or not for an attribute.
+
+	```lua
+	print(AttributeUtils.isValidAttributeType(typeof("hi"))) --> true
+	```
+
+	@param valueType string
+	@return boolean
+]=]
+function AttributeUtils.isValidAttributeType(valueType)
+	return VALID_ATTRIBUTE_TYPES[valueType] == true
+end
+
 --[=[
 	Whenever the attribute is true, the binder will be bound, and when the
 	binder is bound, the attribute will be true.
@@ -112,6 +146,19 @@ function AttributeUtils.getAttribute(instance, attributeName, default)
 	end
 
 	return value
+end
+
+--[=[
+	Removes all attributes from an instance.
+
+	@param instance Instance
+]=]
+function AttributeUtils.removeAllAttributes(instance: Instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	for key, _ in pairs(instance:GetAttributes()) do
+		instance:SetAttribute(key, nil)
+	end
 end
 
 return AttributeUtils

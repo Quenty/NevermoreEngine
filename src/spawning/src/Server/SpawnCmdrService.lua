@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local SpawnCmdrService = {}
+SpawnCmdrService.ServiceName = "SpawnCmdrService"
 
 function SpawnCmdrService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

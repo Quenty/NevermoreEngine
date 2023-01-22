@@ -13,6 +13,7 @@ local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 
 local RogueAdditiveProvider = {}
+RogueAdditiveProvider.ServiceName = "RogueAdditiveProvider"
 
 function RogueAdditiveProvider:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
@@ -64,10 +65,10 @@ function RogueAdditiveProvider:ObserveModifiedVersion(propObj, rogueProperty, ob
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
 		return RxBrioUtils.flatCombineLatest({
 			value = observeBaseValue;
-			multiplier = self:_observeMultipliers(propObj):Pipe({
+			adder = self:_observeAddersBrio(propObj):Pipe({
 				RxBrioUtils.flatMapBrio(function(item)
 					return item:ObserveAdditive();
-				end); -- this gets us a list of multipliers which should mutate pretty frequently.
+				end); -- this gets us a list of adders which should mutate pretty frequently.
 				Rx.defaultsToNil;
 			});
 		}):Pipe({
@@ -80,7 +81,7 @@ function RogueAdditiveProvider:ObserveModifiedVersion(propObj, rogueProperty, ob
 	end
 end
 
-function RogueAdditiveProvider:_observeMultipliers(propObj)
+function RogueAdditiveProvider:_observeAddersBrio(propObj)
 	return RxBinderUtils.observeBoundChildClassBrio(self._rogueBinders.RogueAdditive, propObj)
 end
 

@@ -2,46 +2,62 @@ name: build
 on: [push]
 jobs:
   lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: Roblox/setup-foreman@v1
-        with:
-          version: "^1.0.0"
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate standard library
-        run: selene generate-roblox-std
-
-      - name: Run Selene
-        run: selene src
-
-      - name: Run moonwave-extractor
-        if: success() || failure()
-        run: moonwave-extractor extract src
+    uses: ./.github/workflows/lint.yml
 
   release:
     needs: lint
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: "Setup Node"
+      - name: Setup node
         uses: actions/setup-node@v2
         env:
           NPM_TOKEN: '' # https://github.com/JS-DevTools/npm-publish/issues/15
         with:
           cache-dependency-path: package.json # we don't have a package-lock.json so we'll use this instead...
-          node-version: "12"
+          node-version: "18"
 
-      - run: npm install --no-save
+      - name: Run `npm ci` on cli-output-helpers
+        run: npm ci
+        working-directory: tools/cli-output-helpers
+
+      - name: Build cli-output-helpers
+        run: npm run build
+        working-directory: tools/cli-output-helpers
+
+      - name: Run `npm ci` on nevermore-template-helpers
+        run: npm ci
+        working-directory: tools/nevermore-template-helpers
+
+      - name: Build nevermore-template-helpers
+        run: npm run build
+        working-directory: tools/nevermore-template-helpers
+
+      - name: Run `npm ci` on nevermore-cli
+        run: npm ci
+        working-directory: tools/nevermore-cli
+
+      - name: Build nevermore-cli
+        run: npm run build
+        working-directory: tools/nevermore-cli
+
+      - name: Run npm install
+        run: npm install --no-save
 
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx auto shipit
+
+      - name: Upload lerna logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: lerna-debug.log
+          path: lerna-debug.log

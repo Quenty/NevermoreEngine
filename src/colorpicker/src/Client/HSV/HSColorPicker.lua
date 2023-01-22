@@ -1,4 +1,7 @@
 --[=[
+	Picker for hue and Saturation in HSV. See [HSVColorPicker] for the full color picker,
+	which also allows you to select "Value".
+
 	@class HSColorPicker
 ]=]
 
@@ -6,9 +9,9 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
+local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 local ColorPickerInput = require("ColorPickerInput")
 local HSColorPickerCursor = require("HSColorPickerCursor")
-local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 
 local HSColorPicker = setmetatable({}, BaseObject)
 HSColorPicker.ClassName = "HSColorPicker"
@@ -78,6 +81,11 @@ function HSColorPicker.new()
 	return self
 end
 
+--[=[
+	Gets whether the color picker is pressed or not.
+
+	@return BoolValue
+]=]
 function HSColorPicker:GetIsPressedValue()
 	return self._input:GetIsPressedValue()
 end
@@ -93,37 +101,70 @@ function HSColorPicker:_updateHintedColors()
 	self._preview:SetColor(hinted)
 end
 
+--[=[
+	Sets the HSVColor as a Vector3
+	@param hsvColor Vector3
+]=]
 function HSColorPicker:SetHSVColor(hsvColor)
 	assert(typeof(hsvColor) == "Vector3", "Bad hsvColor")
 
 	self._hsvColorValue.Value = hsvColor
 end
 
+--[=[
+	Gets the color as an HSV Vector3
+	@return Vector3
+]=]
 function HSColorPicker:GetHSVColor()
 	return self._hsvColorValue.Value
 end
 
+--[=[
+	Sets the color
+
+	@param color Color3
+]=]
 function HSColorPicker:SetColor(color)
 	local h, s, v = Color3.toHSV(color)
 	self._hsvColorValue.Value = Vector3.new(h, s, v)
 end
 
+--[=[
+	Gets the color
+
+	@return Color3
+]=]
 function HSColorPicker:GetColor()
 	local current = self._hsvColorValue.Value
 	local h, s, v = current.x, current.y, current.z
 	return Color3.fromHSV(h, s, v)
 end
 
+--[=[
+	Gets the size value for the HSColorPicker.
+
+	@return Vector3
+]=]
 function HSColorPicker:GetSizeValue()
 	return self._sizeValue
 end
 
+--[=[
+	Sets the transparency of the HSColorPicker
+
+	@param transparency number
+]=]
 function HSColorPicker:SetTransparency(transparency)
 	assert(type(transparency) == "number", "Bad transparency")
 
 	self._transparency.Value = transparency
 end
 
+--[=[
+	Sets the size of the color picker. This is in "line height" units.
+
+	@param height number
+]=]
 function HSColorPicker:SetSize(height)
 	assert(type(height) == "number", "Bad height")
 

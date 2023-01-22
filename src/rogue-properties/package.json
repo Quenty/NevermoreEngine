@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rogue-properties",
-  "version": "2.1.0",
+  "version": "4.9.0",
   "description": "Roguelike properties which can be modified by external provides",
   "keywords": [
     "Roblox",
@@ -38,7 +38,8 @@
     "@quenty/signal": "file:../signal",
     "@quenty/table": "file:../table",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
-    "@quentystudios/t": "^1.2.5"
+    "@quenty/valueobject": "file:../valueobject",
+    "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"

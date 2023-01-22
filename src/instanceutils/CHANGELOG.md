@@ -3,6 +3,112 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.4.0...@quenty/instanceutils@7.5.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.3.1...@quenty/instanceutils@7.4.0) (2023-01-01)
+
+
+### Bug Fixes
+
+* RxInstanceUtils.observeDescendantsOfClassBrio(parent, className) only observed children ([900bda0](https://github.com/Quenty/NevermoreEngine/commit/900bda08abfc1fe3f2aa85f545ab5ef9750df607))
+
+
+
+
+
+## [7.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.3.0...@quenty/instanceutils@7.3.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.2.0...@quenty/instanceutils@7.3.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.1.1...@quenty/instanceutils@7.2.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.1.0...@quenty/instanceutils@7.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.0.0...@quenty/instanceutils@7.1.0) (2022-10-11)
+
+
+### Features
+
+* Add RxInstanceUtils.observeDescendantsBrio(parent, predicate) ([6e34a60](https://github.com/Quenty/NevermoreEngine/commit/6e34a606a824a9255c60d1d83fd914b79ae0b31b))
+* Add RxInstanceUtils.observeDescendantsOfClassBrio() ([d0a2728](https://github.com/Quenty/NevermoreEngine/commit/d0a2728113387405ddd261a3930d562e2e2ad199))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@6.1.0...@quenty/instanceutils@7.0.0) (2022-09-27)
+
+
+### Features
+
+* Add RxInstanceUtils.observeFirstAncestor ([8723b25](https://github.com/Quenty/NevermoreEngine/commit/8723b258c2590395f4d0eeb971a6a6c0e031a23a))
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@6.0.1...@quenty/instanceutils@6.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@6.0.0...@quenty/instanceutils@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@5.2.0...@quenty/instanceutils@6.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@5.1.0...@quenty/instanceutils@5.2.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/instanceutils
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@5.0.0...@quenty/instanceutils@5.1.0) (2022-06-21)
 
 

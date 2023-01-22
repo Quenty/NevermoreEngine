@@ -3,6 +3,130 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.5.0...@quenty/binder@8.6.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.4.1...@quenty/binder@8.5.0) (2023-01-01)
+
+
+### Bug Fixes
+
+* Cancel binder warning such that it will not warn upon failure to start if it's destroyed ([c88411e](https://github.com/Quenty/NevermoreEngine/commit/c88411e00fb1f7452a3189a8f0dd3de0b771c9ce))
+
+
+
+
+
+## [8.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.4.0...@quenty/binder@8.4.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.3.0...@quenty/binder@8.4.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.2.0...@quenty/binder@8.3.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.1.1...@quenty/binder@8.2.0) (2022-11-12)
+
+
+### Features
+
+* Binder provider now provides name for debugging ([72d547e](https://github.com/Quenty/NevermoreEngine/commit/72d547ea47358dfab1128dd076723f5a1a0d9fd8))
+
+
+
+
+
+## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.1.0...@quenty/binder@8.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.0.0...@quenty/binder@8.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@7.1.0...@quenty/binder@8.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@7.0.1...@quenty/binder@7.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@7.0.0...@quenty/binder@7.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@6.3.0...@quenty/binder@7.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@6.2.0...@quenty/binder@6.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@6.1.0...@quenty/binder@6.2.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+
+
+
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@6.0.0...@quenty/binder@6.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/binder

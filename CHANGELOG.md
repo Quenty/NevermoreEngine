@@ -1,3 +1,582 @@
+# (Tue Jan 17 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Bark_ing ([@bark-ing](https://github.com/bark-ing)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@8.5.0`, `@quenty/colorpalette@4.11.0`, `@quenty/datastore@7.5.0`, `@quenty/settings@4.13.0`, `@quenty/textserviceutils@7.9.0`
+  - Users/quenty/datastore hardening [#323](https://github.com/Quenty/NevermoreEngine/pull/323) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/resetservice@5.2.0`
+  - Fix: Corrected method call [#322](https://github.com/Quenty/NevermoreEngine/pull/322) ([@bark-ing](https://github.com/bark-ing))
+
+#### Authors: 2
+
+- Bark_ing ([@bark-ing](https://github.com/bark-ing))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jan 11 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/coreguienabler@6.1.0`, `@quenty/playerutils@2.5.0`, `@quenty/rx@7.4.0`, `@quenty/softshutdown@3.13.0`
+  - fix: CoreGuiEnabler disables and observes nicely [#320](https://github.com/Quenty/NevermoreEngine/pull/320) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jan 03 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/conditions@4.5.1`, `@quenty/datastore@7.4.1`, `@quenty/playerhumanoidbinder@8.5.1`
+  - Users/quenty/patches [#319](https://github.com/Quenty/NevermoreEngine/pull/319) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jan 01 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@8.5.0`, `@quenty/boundingboxutils@4.1.0`, `@quenty/fzy@1.2.0`, `@quenty/instanceutils@7.4.0`, `@quenty/playerutils@2.4.0`, `@quenty/rx@7.3.0`, `@quenty/sounds@6.1.0`
+  - Users/quenty/patches [#318](https://github.com/Quenty/NevermoreEngine/pull/318) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Dec 29 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/color3utils@5.6.0`, `@quenty/colorpalette@4.8.0`, `@quenty/fzy@1.1.0`, `@quenty/observablecollection@5.4.0`, `@quenty/uiobjectutils@3.1.0`
+  - Users/quenty/search [#317](https://github.com/Quenty/NevermoreEngine/pull/317) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Dec 27 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@7.2.1`
+  - docs: Update Observable.lua [#315](https://github.com/Quenty/NevermoreEngine/pull/315) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 1
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+
+---
+
+# (Tue Dec 27 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpalette@4.7.0`, `@quenty/permissionprovider@8.6.0`, `@quenty/streamingutils@6.1.0`, `@quenty/textserviceutils@7.6.0`, `@quenty/vector3utils@6.2.0`, `@quenty/cli-output-helpers@1.1.0`, `@quenty/nevermore-cli@1.3.0`, `@quenty/nevermore-template-helpers@1.1.0`
+  - Users/quenty/tooling [#314](https://github.com/Quenty/NevermoreEngine/pull/314) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Dec 06 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/buttonhighlightmodel@7.6.0`, `@quenty/camera@9.6.0`, `@quenty/cframeutils@5.1.0`, `@quenty/clienttranslator@8.7.0`, `@quenty/geometryutils@2.3.0`, `@quenty/hintscoringutils@9.6.0`, `@quenty/ragdoll@9.8.0`, `@quenty/rigbuilderutils@6.1.0`, `@quenty/servicebag@6.4.0`, `@quenty/vector3utils@6.1.0`
+  - feat: Minor adjustments [#312](https://github.com/Quenty/NevermoreEngine/pull/312) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Dec 06 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@systematicequation](https://github.com/systematicequation), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/ragdoll@9.7.1`
+  - fix: Typo in RagdollServiceClient that makes SetScreenShakeEnabled work as intended [#313](https://github.com/Quenty/NevermoreEngine/pull/313) ([@systematicequation](https://github.com/systematicequation))
+
+#### Authors: 1
+
+- [@systematicequation](https://github.com/systematicequation)
+
+---
+
+# (Mon Dec 05 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/color3utils@5.5.0`, `@quenty/rx@7.2.0`
+  - feat: Add Rx.failed() [#311](https://github.com/Quenty/NevermoreEngine/pull/311) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 28 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/attributeutils@8.1.2`
+  - fix: Include "Font" as a valid attribute type in AttributeUtils #310 [#310](https://github.com/Quenty/NevermoreEngine/pull/310) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 21 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/highlight@2.6.0`, `@quenty/nevermore-cli@1.2.0`
+  - docs: Update docs so they build properly [#309](https://github.com/Quenty/NevermoreEngine/pull/309) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Nov 19 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/avatareditorutils@1.2.0`, `@quenty/collectionserviceutils@2.2.0`, `@quenty/colorpalette@4.5.0`, `@quenty/inputkeymaputils@7.7.0`, `@quenty/instanceutils@7.2.0`, `@quenty/lipsum@8.4.0`, `@quenty/pagesutils@1.1.0`, `@quenty/servicebag@6.3.0`, `@quenty/settings-inputkeymap@3.8.0`, `@quenty/nevermore-cli@1.1.0`
+  - docs: Improve onboarding and more [#308](https://github.com/Quenty/NevermoreEngine/pull/308) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Nov 12 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@8.2.0`, `@quenty/clienttranslator@8.4.0`, `@quenty/cooldown@5.4.0`, `@quenty/datastore@7.4.0`, `@quenty/deathreport@3.4.0`, `@quenty/gameconfig@5.5.0`, `@quenty/gameproductservice@5.5.0`, `@quenty/hide@5.3.0`, `@quenty/humanoidspeed@5.4.0`, `@quenty/ik@9.6.0`, `@quenty/motor6d@1.4.0`, `@quenty/ragdoll@9.5.0`, `@quenty/rogue-humanoid@3.4.0`, `@quenty/rogue-properties@4.4.0`, `@quenty/servicebag@6.2.0`, `@quenty/settings-inputkeymap@3.7.0`, `@quenty/settings@4.6.0`
+  - Users/quenty/visibility fix [#307](https://github.com/Quenty/NevermoreEngine/pull/307) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 08 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Antcar ([@antcar0929](https://github.com/antcar0929)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpicker@4.4.0`, `@quenty/datastore@7.3.0`, `@quenty/highlight@2.4.0`, `@quenty/inputkeymaputils@7.5.0`, `@quenty/softshutdown@3.6.0`, `@quenty/undostack@1.1.0`, `@quenty/viewport@5.5.0`
+  - Users/quenty/visibility fix [#303](https://github.com/Quenty/NevermoreEngine/pull/303) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/colorpalette@4.4.0`, `@quenty/colorpicker@4.4.0`, `@quenty/softshutdown@3.6.0`, `@quenty/viewport@5.5.0`
+  - docs: Document a variety of packages [#304](https://github.com/Quenty/NevermoreEngine/pull/304) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 2
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 04 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/blend@6.3.1`, `@quenty/loader@6.0.1`
+  - fix: Fix hoarcekat loading scenarios [#302](https://github.com/Quenty/NevermoreEngine/pull/302) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 04 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/avatareditorutils@1.1.0`, `@quenty/blend@6.3.0`, `@quenty/highlight@2.3.0`, `@quenty/ik@9.5.0`, `@quenty/playerutils@2.2.0`
+  - fix: A variety of fixes [#301](https://github.com/Quenty/NevermoreEngine/pull/301) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 31 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/ragdoll@9.4.0`
+  - feat: Add Ragdoll customization [#300](https://github.com/Quenty/NevermoreEngine/pull/300) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Oct 30 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/cmdrservice@7.3.0`, `@quenty/rbxthumb@1.1.0`, `@quenty/servicebag@6.1.0`
+  - Add some fixes and thumbnail packages [#299](https://github.com/Quenty/NevermoreEngine/pull/299) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Oct 28 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/colorpalette@4.2.1`
+  - fix: Fixed ColorPalettes devDependency [#298](https://github.com/Quenty/NevermoreEngine/pull/298) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
+# (Fri Oct 28 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@7.2.0`
+  - feat: Free DataStore key after its writer GCs to allow future writers [#284](https://github.com/Quenty/NevermoreEngine/pull/284) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Oct 23 2022)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@6.2.0`, `@quenty/camera@9.2.0`, `@quenty/cmdrservice@7.2.0`, `@quenty/r15utils@7.2.0`, `@quenty/rodux-actions@5.1.0`, `@quenty/rogue-properties@4.2.0`, `@quenty/rxbinderutils@8.2.0`, `@quenty/spawning@4.2.0`, `@quenty/teamutils@4.2.0`, `@quenty/tie@4.2.0`, `@quenty/viewport@5.2.0`
+  - fix: Can install via just NPM registry for now [#297](https://github.com/Quenty/NevermoreEngine/pull/297) ([@Quenty](https://github.com/Quenty))
+- `@quenty/playerutils@2.2.0`
+  - feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+#### Authors: 2
+
+- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Oct 16 2022)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+:heart: Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### 🚀 Enhancement
+
+- `@quenty/playerutils@2.1.0`
+  - feat: Created RxPlayerUtils [#295](https://github.com/Quenty/NevermoreEngine/pull/295) ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@brandon-wilcox-supersocial](https://github.com/brandon-wilcox-supersocial))
+
+---
+
+# (Sun Oct 16 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/acceltween@2.2.1`, `@quenty/animationgroup@6.0.1`, `@quenty/animationtrackutils@2.1.1`, `@quenty/camera@9.1.1`, `@quenty/inputkeymaputils@7.1.1`, `@quenty/mouseshiftlockservice@7.0.1`, `@quenty/ragdoll@9.1.1`, `@quenty/viewport@5.1.1`
+  - Upgrade to aftman and other things! [#296](https://github.com/Quenty/NevermoreEngine/pull/296) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Oct 13 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/quaternion@2.3.0`
+  - Fix SlerpQuaternions [#291](https://github.com/Quenty/NevermoreEngine/pull/291) ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+#### Authors: 1
+
+- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+---
+
+# (Wed Oct 12 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/firstpersoncharactertransparency@8.0.0`
+  - feat!: Completely refactor the character transparency package to function differently [#292](https://github.com/Quenty/NevermoreEngine/pull/292) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Oct 11 2022)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+:heart: fox ([@fewkz](https://github.com/fewkz))
+
+#### 🚀 Enhancement
+
+- `@quenty/bindtocloseservice@2.1.0`, `@quenty/chatproviderservice@3.1.0`, `@quenty/clienttranslator@8.1.0`, `@quenty/cmdrservice@7.1.0`, `@quenty/colorpalette@4.1.0`, `@quenty/colorsequenceutils@3.1.0`, `@quenty/cooldown@5.1.0`, `@quenty/datastore@7.1.0`, `@quenty/deathreport@3.1.0`, `@quenty/draw@4.2.0`, `@quenty/gameconfig@5.1.0`, `@quenty/gameproductservice@5.1.0`, `@quenty/gameversionutils@3.1.0`, `@quenty/hide@5.1.0`, `@quenty/httppromise@6.1.0`, `@quenty/humanoidspeed@5.1.0`, `@quenty/idleservice@7.1.0`, `@quenty/ik@9.1.0`, `@quenty/inputkeymaputils@7.1.0`, `@quenty/inputmode@7.1.0`, `@quenty/instanceutils@7.1.0`, `@quenty/messagingserviceutils@3.1.0`, `@quenty/motor6d@1.1.0`, `@quenty/networkownerservice@5.1.0`, `@quenty/networkownerutils@3.1.0`, `@quenty/particleengine@7.1.0`, `@quenty/permissionprovider@8.1.0`, `@quenty/playerbinder@8.1.0`, `@quenty/playerhumanoidbinder@8.1.0`, `@quenty/playerinputmode@3.1.0`, `@quenty/preferredparentutils@3.1.0`, `@quenty/r15utils@7.1.0`, `@quenty/ragdoll@9.1.0`, `@quenty/resetservice@5.1.0`, `@quenty/roblox-api-dump@4.1.0`, `@quenty/rogue-humanoid@3.1.0`, `@quenty/rogue-properties@4.1.0`, `@quenty/scoredactionservice@9.1.0`, `@quenty/settings-inputkeymap@3.1.0`, `@quenty/settings@4.1.0`, `@quenty/softshutdown@3.1.0`, `@quenty/spawning@4.1.0`, `@quenty/steputils@3.2.0`, `@quenty/teleportserviceutils@3.1.0`, `@quenty/textfilterservice@7.1.0`, `@quenty/tie@4.1.0`, `@quenty/timesyncservice@7.1.0`
+  - feat: Upgrade ragdoll and IK packages among with other changes to support smoother ragdolls [#293](https://github.com/Quenty/NevermoreEngine/pull/293) ([@Quenty](https://github.com/Quenty))
+- `@quenty/qframe@6.1.0`
+  - fix: Fix QFrame.isNaN [#294](https://github.com/Quenty/NevermoreEngine/pull/294) ([@EthanCurtiss](https://github.com/EthanCurtiss))
+
+#### 🐛 Bug Fix
+
+- ci: Allow CI to run on external PRs [#289](https://github.com/Quenty/NevermoreEngine/pull/289) ([@Quenty](https://github.com/Quenty))
+- `@quenty/rx@7.1.0`
+  - docs: Fix incorrect reference link for `Rx.throttleTime` [#287](https://github.com/Quenty/NevermoreEngine/pull/287) ([@fewkz](https://github.com/fewkz) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 3
+
+- Ethan ([@EthanCurtiss](https://github.com/EthanCurtiss))
+- fox ([@fewkz](https://github.com/fewkz))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Sep 27 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/attributeutils@8.0.0`, `@quenty/bindtocloseservice@2.0.0`, `@quenty/blend@6.0.0`, `@quenty/boundingboxutils@4.0.0`, `@quenty/boundlinkutils@8.0.0`, `@quenty/cframeserializer@4.0.0`, `@quenty/cframeutils@5.0.0`, `@quenty/chatproviderservice@3.0.0`, `@quenty/cmdrservice@7.0.0`, `@quenty/colorpalette@4.0.0`, `@quenty/colorsequenceutils@3.0.0`, `@quenty/cooldown@5.0.0`, `@quenty/datastore@7.0.0`, `@quenty/deathreport@3.0.0`, `@quenty/depthoffield@5.0.0`, `@quenty/enumutils@3.0.0`, `@quenty/gameconfig@5.0.0`, `@quenty/gameproductservice@5.0.0`, `@quenty/gameversionutils@3.0.0`, `@quenty/hide@5.0.0`, `@quenty/highlight@2.0.0`, `@quenty/httppromise@6.0.0`, `@quenty/humanoidspeed@5.0.0`, `@quenty/idleservice@7.0.0`, `@quenty/ik@9.0.0`, `@quenty/inputkeymaputils@7.0.0`, `@quenty/inputmode@7.0.0`, `@quenty/inputobjectutils@4.0.0`, `@quenty/instanceutils@7.0.0`, `@quenty/kinematics@2.0.0`, `@quenty/loader@6.0.0`, `@quenty/messagingserviceutils@3.0.0`, `@quenty/networkownerservice@5.0.0`, `@quenty/networkownerutils@3.0.0`, `@quenty/numberrangeutils@3.0.0`, `@quenty/numbersequenceutils@4.0.0`, `@quenty/observablecollection@5.0.0`, `@quenty/particleengine@7.0.0`, `@quenty/permissionprovider@8.0.0`, `@quenty/playerbinder@8.0.0`, `@quenty/playerhumanoidbinder@8.0.0`, `@quenty/playerinputmode@3.0.0`, `@quenty/playerutils@2.0.0`, `@quenty/preferredparentutils@3.0.0`, `@quenty/promise@6.0.0`, `@quenty/radial-image@3.0.0`, `@quenty/ragdoll@9.0.0`, `@quenty/raycaster@3.0.0`, `@quenty/resetservice@5.0.0`, `@quenty/roblox-api-dump@4.0.0`, `@quenty/rogue-humanoid@3.0.0`, `@quenty/scoredactionservice@9.0.0`, `@quenty/selectionutils@2.0.0`, `@quenty/servicebag@6.0.0`, `@quenty/settings-inputkeymap@3.0.0`, `@quenty/settings@4.0.0`, `@quenty/softshutdown@3.0.0`, `@quenty/spawning@4.0.0`, `@quenty/teleportserviceutils@3.0.0`, `@quenty/textfilterservice@7.0.0`, `@quenty/textfilterutils@6.0.0`, `@quenty/textserviceutils@7.0.0`, `@quenty/tie@4.0.0`, `@quenty/uiobjectutils@3.0.0`, `@quenty/valuebaseutils@7.0.0`, `@quenty/viewport@5.0.0`
+  - feat: Do a variety of updates [#288](https://github.com/Quenty/NevermoreEngine/pull/288) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 22 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/signal@2.3.0`
+  - feat: Signal :Once(fn) method [#285](https://github.com/Quenty/NevermoreEngine/pull/285) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
+# (Tue Aug 16 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneevalue@3.0.1`, `@quenty/basicpane@6.0.1`, `@quenty/bezierutils@2.1.1`, `@quenty/binarysearch@2.1.1`, `@quenty/datastore@6.0.1`, `@quenty/depthoffield@4.0.1`, `@quenty/humanoidanimatorutils@2.1.1`, `@quenty/humanoidmovedirectionutils@5.0.1`, `@quenty/inputkeymaputils@6.0.1`, `@quenty/lipsum@7.0.1`, `@quenty/loader@5.0.1`, `@quenty/markdownrender@2.1.1`, `@quenty/observablecollection@4.0.1`, `@quenty/r15utils@6.0.1`, `@quenty/radial-image@2.0.1`, `@quenty/ragdoll@8.0.1`, `@quenty/rx@6.0.1`, `@quenty/rxbinderutils@7.0.1`, `@quenty/servicebag@5.1.1`, `@quenty/settings@3.0.1`, `@quenty/sunpositionutils@2.2.1`, `@quenty/textfilterservice@6.0.1`
+  - docs: Update documentation with package list and a bit more information. [#283](https://github.com/Quenty/NevermoreEngine/pull/283) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Aug 14 2022)
+
+#### 💥 Breaking Change
+
+- `@quenty/basicpane@6.0.0`, `@quenty/binder@7.0.0`, `@quenty/blend@5.0.0`, `@quenty/camera@8.0.0`, `@quenty/chatproviderservice@2.0.0`, `@quenty/clienttranslator@7.0.0`, `@quenty/cmdrservice@6.0.0`, `@quenty/datastore@6.0.0`, `@quenty/deathreport@2.0.0`, `@quenty/depthoffield@4.0.0`, `@quenty/enumutils@2.0.0`, `@quenty/firstpersoncharactertransparency@6.0.0`, `@quenty/gameconfig@4.0.0`, `@quenty/gamescalingutils@6.0.0`, `@quenty/guivisiblemanager@7.0.0`, `@quenty/humanoidtracker@6.0.0`, `@quenty/idleservice@6.0.0`, `@quenty/ik@8.0.0`, `@quenty/inputkeymaputils@6.0.0`, `@quenty/inputmode@6.0.0`, `@quenty/mouseshiftlockservice@6.0.0`, `@quenty/networkownerservice@4.0.0`, `@quenty/particleengine@6.0.0`, `@quenty/permissionprovider@7.0.0`, `@quenty/playerinputmode@2.0.0`, `@quenty/pseudolocalize@3.0.0`, `@quenty/queue@2.0.0`, `@quenty/r15utils@6.0.0`, `@quenty/radial-image@2.0.0`, `@quenty/ragdoll@8.0.0`, `@quenty/resetservice@4.0.0`, `@quenty/rodux-actions@4.0.0`, `@quenty/rogue-humanoid@2.0.0`, `@quenty/rogue-properties@3.0.0`, `@quenty/rx@6.0.0`, `@quenty/scoredactionservice@8.0.0`, `@quenty/settings-inputkeymap@2.0.0`, `@quenty/settings@3.0.0`, `@quenty/snackbar@6.0.0`, `@quenty/softshutdown@2.0.0`, `@quenty/spawning@3.0.0`, `@quenty/string@3.0.0`, `@quenty/templateprovider@6.0.0`, `@quenty/textfilterservice@6.0.0`, `@quenty/timesyncservice@6.0.0`, `@quenty/transparencyservice@6.0.0`
+  - feat: Allow keybinds to save (Includes some breaking changes) [#281](https://github.com/Quenty/NevermoreEngine/pull/281) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Add metapackage default.project.json [#280](https://github.com/Quenty/NevermoreEngine/pull/280) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 11 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/friendutils@5.1.1`
+  - docs: Fix docs [#279](https://github.com/Quenty/NevermoreEngine/pull/279) ([@Quenty](https://github.com/Quenty))
+  - feat: RxFriendUtils [#274](https://github.com/Quenty/NevermoreEngine/pull/274) ([@OttoHatt](https://github.com/OttoHatt))
+- `@quenty/valuebaseutils@5.2.1`
+  - fix: Updating a ValueObject invalidates prior brio [#278](https://github.com/Quenty/NevermoreEngine/pull/278) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 01 2022)
+
+#### 🐛 Bug Fix
+
+- docs: Try to get moonwave to generate again [#277](https://github.com/Quenty/NevermoreEngine/pull/277) ([@Quenty](https://github.com/Quenty))
+- `@quenty/draw@4.1.1`
+  - fix: Disable CanQuery/CanTouch on debug line part [#275](https://github.com/Quenty/NevermoreEngine/pull/275) ([@OttoHatt](https://github.com/OttoHatt) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jul 31 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, OptimisticSide ([@optimisticside](https://github.com/optimisticside)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@6.2.0`, `@quenty/camera@7.3.0`, `@quenty/chatproviderservice@1.1.0`, `@quenty/clienttranslator@6.3.0`, `@quenty/cmdrservice@5.4.0`, `@quenty/coreguienabler@5.2.0`, `@quenty/datastore@5.3.0`, `@quenty/deathreport@1.4.0`, `@quenty/gameproductservice@3.4.0`, `@quenty/hide@3.3.0`, `@quenty/idleservice@5.4.0`, `@quenty/ik@7.4.0`, `@quenty/inputkeymaputils@5.3.0`, `@quenty/lipsum@6.3.0`, `@quenty/maid@2.4.0`, `@quenty/observablecollection@3.3.0`, `@quenty/pathfindingutils@5.2.0`, `@quenty/playerinputmode@1.1.0`, `@quenty/playerutils@1.1.0`, `@quenty/policyserviceutils@1.1.0`, `@quenty/promise@5.1.0`, `@quenty/radial-image@1.1.0`, `@quenty/rogue-properties@2.3.0`, `@quenty/rx@5.2.0`, `@quenty/servicebag@5.1.0`, `@quenty/settings@2.3.0`, `@quenty/softshutdown@1.4.0`, `@quenty/teamutils@2.3.0`, `@quenty/textfilterutils@5.1.0`, `@quenty/tie@2.2.0`, `@quenty/userserviceutils@2.1.0`, `@quenty/valuebaseutils@5.2.0`, `@quenty/vector3utils@5.1.0`
+  - July 31st update [#276](https://github.com/Quenty/NevermoreEngine/pull/276) ([@Quenty](https://github.com/Quenty))
+- `@quenty/maid@2.4.0`
+  - feat: Add thread-support for maids [#259](https://github.com/Quenty/NevermoreEngine/pull/259) ([@optimisticside](https://github.com/optimisticside))
+
+#### 🐛 Bug Fix
+
+- `@quenty/promise@5.1.0`
+  - fix: Replace coroutine.resume in favor of task.spawn [#260](https://github.com/Quenty/NevermoreEngine/pull/260) ([@optimisticside](https://github.com/optimisticside))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- OptimisticSide ([@optimisticside](https://github.com/optimisticside))
+
+---
+
+# (Tue Jul 19 2022)
+
+#### 🐛 Bug Fix
+
+- `@quenty/blend@4.2.1`
+  - fix: Fix broken initial value of Blend.AccelTween [#271](https://github.com/Quenty/NevermoreEngine/pull/271) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
+# (Sat Jul 02 2022)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@6.2.0`, `@quenty/camera@7.2.0`, `@quenty/cmdrservice@5.3.0`, `@quenty/datastore@5.2.0`, `@quenty/gameconfig@3.3.0`, `@quenty/gameproductservice@3.3.0`, `@quenty/humanoidspeed@3.3.0`, `@quenty/idleservice@5.3.0`, `@quenty/ik@7.3.0`, `@quenty/networkownerutils@2.2.0`, `@quenty/observablecollection@3.2.0`, `@quenty/permissionprovider@6.2.0`, `@quenty/playerthumbnailutils@5.1.0`, `@quenty/ragdoll@7.3.0`, `@quenty/resetservice@3.2.0`, `@quenty/rogue-humanoid@1.1.0`, `@quenty/rogue-properties@2.2.0`, `@quenty/timesyncservice@5.2.0`, `@quenty/transparencyservice@5.1.0`, `@quenty/ultrawidecontainerutils@2.2.0`
+  - feat: Add RogueHumanoid package [#270](https://github.com/Quenty/NevermoreEngine/pull/270) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jun 24 2022)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@OttoHatt](https://github.com/OttoHatt), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@5.1.0`
+  - feat: Add RxCharacterUtils [#262](https://github.com/Quenty/NevermoreEngine/pull/262) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### 🐛 Bug Fix
+
+- `@quenty/characterutils@5.1.0`, `@quenty/cmdrservice@5.2.0`, `@quenty/softshutdown@1.2.0`
+  - fix: Make a variety of more fixes around docs and admin commands [#269](https://github.com/Quenty/NevermoreEngine/pull/269) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jun 21 2022)
 
 #### 🚀 Enhancement

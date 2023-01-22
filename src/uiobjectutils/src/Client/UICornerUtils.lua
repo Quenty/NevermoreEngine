@@ -4,6 +4,12 @@
 
 local UICornerUtils = {}
 
+--[=[
+	Creates a new UI corner
+	@param scale number
+	@param parent Instance
+	@return UICorner
+]=]
 function UICornerUtils.fromScale(scale, parent)
 	local uiCorner = Instance.new("UICorner")
 	uiCorner.CornerRadius = UDim.new(scale, 0)
@@ -11,6 +17,12 @@ function UICornerUtils.fromScale(scale, parent)
 	return uiCorner
 end
 
+--[=[
+	Creates a new UI corner from offset
+	@param offset number
+	@param parent Instance
+	@return UICorner
+]=]
 function UICornerUtils.fromOffset(offset, parent)
 	local uiCorner = Instance.new("UICorner")
 	uiCorner.CornerRadius = UDim.new(0, offset)

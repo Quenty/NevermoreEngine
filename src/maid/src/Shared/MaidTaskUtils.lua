@@ -11,7 +11,7 @@
 
 --[=[
 	An object that can be cleaned up
-	@type MaidTask function | Destructable | RBXScriptConnection
+	@type MaidTask function | thread | Destructable | RBXScriptConnection
 	@within MaidTaskUtils
 ]=]
 local MaidTaskUtils = {}
@@ -24,6 +24,7 @@ local MaidTaskUtils = {}
 ]=]
 function MaidTaskUtils.isValidTask(job)
 	return type(job) == "function"
+		or type(job) == "thread"
 		or typeof(job) == "RBXScriptConnection"
 		or type(job) == "table" and type(job.Destroy) == "function"
 		or typeof(job) == "Instance"
@@ -37,6 +38,8 @@ end
 function MaidTaskUtils.doTask(job)
 	if type(job) == "function" then
 		job()
+	elseif type(job) == "thread" then
+		task.cancel(job)
 	elseif typeof(job) == "RBXScriptConnection" then
 		job:Disconnect()
 	elseif type(job) == "table" and type(job.Destroy) == "function" then

@@ -14,26 +14,29 @@ local Players = game:GetService("Players")
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local ResetServiceConstants = require("ResetServiceConstants")
 local CoreGuiUtils = require("CoreGuiUtils")
+local Maid = require("Maid")
 
 local RETRY_ATTEMPTS = 3
 local INITIAL_WAIT_TIME = 1
 
 local ResetServiceClient = {}
+ResetServiceClient.ServiceName = "ResetServiceClient"
 
 --[=[
 	Initializes the reset service. Should be done via a [ServiceBag].
 ]=]
 function ResetServiceClient:Init()
-	assert(not self._promiseRemoteEvent, "Already initialized")
+	assert(not self._maid, "Already initialized")
 
-	self._promiseRemoteEvent = PromiseGetRemoteEvent(ResetServiceConstants.REMOTE_EVENT_NAME)
+	self._maid = Maid.new()
 
-	local resetBindable = Instance.new("BindableEvent")
-	resetBindable.Event:connect(function()
+	self._resetBindable = Instance.new("BindableEvent")
+	self._resetBindable.Event:connect(function()
 		self:RequestResetCharacter()
 	end)
+	self._maid:GiveTask(self._resetBindable)
 
-	CoreGuiUtils.promiseRetrySetCore(RETRY_ATTEMPTS, INITIAL_WAIT_TIME, "ResetButtonCallback", resetBindable)
+	CoreGuiUtils.promiseRetrySetCore(RETRY_ATTEMPTS, INITIAL_WAIT_TIME, "ResetButtonCallback", self._resetBindable)
 		:Catch(function(err)
 			warn(("[ResetServiceClient] - Failed to SetCore due to %q"):format(tostring(err)))
 		end)
@@ -51,9 +54,18 @@ function ResetServiceClient:RequestResetCharacter()
 		end
 	end
 
-	self._promiseRemoteEvent:Then(function(remoteEvent)
+	self:_promiseRemoteEvent():Then(function(remoteEvent)
 		remoteEvent:FireServer()
 	end)
+end
+
+function ResetServiceClient:_promiseRemoteEvent()
+	return self._maid:GivePromise(PromiseGetRemoteEvent(ResetServiceConstants.REMOTE_EVENT_NAME))
+end
+
+function ResetServiceClient:Destroy()
+	self._maid:DoCleaning()
+	self._maid = nil
 end
 
 return ResetServiceClient

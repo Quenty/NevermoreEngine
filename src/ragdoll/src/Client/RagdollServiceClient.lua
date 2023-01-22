@@ -11,6 +11,7 @@ local RagdollServiceConstants = require("RagdollServiceConstants")
 local Players = game:GetService("Players")
 
 local RagdollServiceClient = {}
+RagdollServiceClient.ServiceName = "RagdollServiceClient"
 
 --[=[
 	Initializes the ragdoll service on the client. Should be done via [ServiceBag].
@@ -20,6 +21,10 @@ function RagdollServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	-- External
+	self._serviceBag:GetService(require("Motor6DServiceClient"))
+
+	-- Internal
 	self._serviceBag:GetService(require("RagdollBindersClient"))
 
 	self._screenShakeEnabled = true
@@ -31,7 +36,8 @@ end
 ]=]
 function RagdollServiceClient:SetScreenShakeEnabled(value)
 	assert(type(value) == "boolean", "Bad value")
-	Players.LocalPlayer:SetAttribute(RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE)
+
+	Players.LocalPlayer:SetAttribute(RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE, value)
 end
 
 --[=[
@@ -40,7 +46,6 @@ end
 ]=]
 function RagdollServiceClient:GetScreenShakeEnabled()
 	assert(self._serviceBag, "Not initialized")
-
 
 	return AttributeUtils.getAttribute(Players.LocalPlayer, RagdollServiceConstants.SCREEN_SHAKE_ENABLED_ATTRIBUTE, true)
 end

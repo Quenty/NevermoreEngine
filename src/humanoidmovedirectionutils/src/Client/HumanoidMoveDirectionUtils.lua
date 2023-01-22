@@ -1,4 +1,7 @@
 --[=[
+	Gets the relative move direction from the camera and the humanoid allowing Roblox's input system to
+	be layered on top of a camera system.
+
 	Ever wanted to not rewrite all of Roblox's input systems! Well, now you can with this slight hack!
 
 	@class HumanoidMoveDirectionUtils

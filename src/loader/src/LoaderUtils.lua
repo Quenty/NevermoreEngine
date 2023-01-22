@@ -87,7 +87,7 @@ function LoaderUtils.isPackage(folder)
 	assert(typeof(folder) == "Instance", "Bad instance")
 
 	for _, item in pairs(folder:GetChildren()) do
-		if item:IsA("Folder") then
+		if item:IsA("Folder") or item:IsA("Camera") then
 			if item.Name == "Server"
 				or item.Name == "Client"
 				or item.Name == "Shared"
@@ -126,7 +126,7 @@ function LoaderUtils.discoverTopLevelPackages(packages, instance)
 	else
 		-- Loop through all folders
 		for _, item in pairs(instance:GetChildren()) do
-			if item:IsA("Folder") then
+			if item:IsA("Folder") or item:IsA("Camera") then
 				LoaderUtils.discoverTopLevelPackages(packages, item)
 			elseif item:IsA("ObjectValue") then
 				local linkedValue = item.Value

@@ -13,6 +13,7 @@ local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 
 local RogueMultiplierProvider = {}
+RogueMultiplierProvider.ServiceName = "RogueMultiplierProvider"
 
 function RogueMultiplierProvider:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
@@ -64,7 +65,7 @@ function RogueMultiplierProvider:ObserveModifiedVersion(propObj, rogueProperty, 
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
 		return RxBrioUtils.flatCombineLatest({
 			value = observeBaseValue;
-			multiplier = self:_observeMultipliers(propObj):Pipe({
+			multiplier = self:_observeMultipliersBrio(propObj):Pipe({
 				RxBrioUtils.flatMapBrio(function(item)
 					return item:ObserveMultiplier();
 				end); -- this gets us a list of multipliers which should mutate pretty frequently.
@@ -80,7 +81,7 @@ function RogueMultiplierProvider:ObserveModifiedVersion(propObj, rogueProperty, 
 	end
 end
 
-function RogueMultiplierProvider:_observeMultipliers(propObj)
+function RogueMultiplierProvider:_observeMultipliersBrio(propObj)
 	return RxBinderUtils.observeBoundChildClassBrio(self._rogueBinders.RogueMultiplier, propObj)
 end
 

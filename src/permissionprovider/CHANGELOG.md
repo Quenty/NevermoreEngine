@@ -3,6 +3,122 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.5.0...@quenty/permissionprovider@8.6.0) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.4.0...@quenty/permissionprovider@8.5.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.3.0...@quenty/permissionprovider@8.4.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.2.1...@quenty/permissionprovider@8.3.0) (2022-11-12)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+## [8.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.2.0...@quenty/permissionprovider@8.2.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.1.0...@quenty/permissionprovider@8.2.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.0.0...@quenty/permissionprovider@8.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@7.1.0...@quenty/permissionprovider@8.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@7.0.1...@quenty/permissionprovider@7.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@7.0.0...@quenty/permissionprovider@7.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@6.3.0...@quenty/permissionprovider@7.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@6.2.0...@quenty/permissionprovider@6.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@6.1.0...@quenty/permissionprovider@6.2.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+
+
+
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@6.0.0...@quenty/permissionprovider@6.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/permissionprovider

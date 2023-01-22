@@ -3,6 +3,110 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.4.0...@quenty/localizedtextutils@6.5.0) (2023-01-17)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.3.0...@quenty/localizedtextutils@6.4.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.2.1...@quenty/localizedtextutils@6.3.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.2.0...@quenty/localizedtextutils@6.2.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.1.2...@quenty/localizedtextutils@6.2.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [6.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.1.1...@quenty/localizedtextutils@6.1.2) (2022-11-28)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [6.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.1.0...@quenty/localizedtextutils@6.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.0.0...@quenty/localizedtextutils@6.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@5.1.0...@quenty/localizedtextutils@6.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@5.0.1...@quenty/localizedtextutils@5.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+## [5.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@5.0.0...@quenty/localizedtextutils@5.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@4.2.0...@quenty/localizedtextutils@5.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@4.1.0...@quenty/localizedtextutils@4.2.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
+
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@4.0.0...@quenty/localizedtextutils@4.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/localizedtextutils

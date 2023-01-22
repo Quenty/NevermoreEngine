@@ -8,6 +8,7 @@ local RoduxActionFactory = require("RoduxActionFactory")
 local Table = require("Table")
 
 local RoduxActions = {}
+RoduxActions.ServiceName = "RoduxActions"
 RoduxActions.ClassName = "RoduxActions"
 
 function RoduxActions.new(initFunction)

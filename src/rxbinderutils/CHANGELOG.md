@@ -3,6 +3,129 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.6.0...@quenty/rxbinderutils@8.7.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.5.1...@quenty/rxbinderutils@8.6.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+## [8.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.5.0...@quenty/rxbinderutils@8.5.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.4.0...@quenty/rxbinderutils@8.5.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.3.0...@quenty/rxbinderutils@8.4.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.2.1...@quenty/rxbinderutils@8.3.0) (2022-11-12)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+## [8.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.2.0...@quenty/rxbinderutils@8.2.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.1.0...@quenty/rxbinderutils@8.2.0) (2022-10-23)
+
+
+### Bug Fixes
+
+* Rx switch maps would lead to multiple brios alive against a single switched observable. ([cd25a22](https://github.com/Quenty/NevermoreEngine/commit/cd25a220a2096fe1c3093deec7f9bc4e83815924))
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.0.0...@quenty/rxbinderutils@8.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@7.1.0...@quenty/rxbinderutils@8.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@7.0.1...@quenty/rxbinderutils@7.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@7.0.0...@quenty/rxbinderutils@7.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@6.3.0...@quenty/rxbinderutils@7.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@6.2.0...@quenty/rxbinderutils@6.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@6.1.0...@quenty/rxbinderutils@6.2.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@6.0.0...@quenty/rxbinderutils@6.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/rxbinderutils

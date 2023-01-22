@@ -212,7 +212,7 @@ function PackageInfoUtils.fillExplicitPackageDependencySet(
 	assert(defaultReplicationType, "No defaultReplicationType")
 
 	for _, item in pairs(packageFolder:GetChildren()) do
-		if item:IsA("Folder") and item.Name == ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
+		if (item:IsA("Folder") or item:IsA("Camera")) and item.Name == ScriptInfoUtils.DEPENDENCY_FOLDER_NAME then
 			local packageInfoList = PackageInfoUtils.getPackageInfoListFromDependencyFolder(
 				item,
 				packageInfoMap,

@@ -11,7 +11,7 @@
   </a>
 </div>
 
-Utility functions involving humanoids and animators for Roblox
+Utility functions to retrieve and manipulate the Animator object on Roblox from a humanoid.
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/HumanoidAnimatorUtils">View docs →</a></div>
 

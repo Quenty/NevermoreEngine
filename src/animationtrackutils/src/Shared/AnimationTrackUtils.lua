@@ -7,14 +7,14 @@ local AnimationTrackUtils = {}
 
 --[=[
 	Loads an animation from the animation id
-	@param humanoid Humanoid
+	@param animatorOrHumanoid Humanoid | Animator
 	@param animationId string
 	@return Animation
 ]=]
-function AnimationTrackUtils.loadAnimationFromId(humanoid, animationId)
+function AnimationTrackUtils.loadAnimationFromId(animatorOrHumanoid, animationId)
 	local animation = Instance.new("Animation")
 	animation.AnimationId = animationId
-	return humanoid:LoadAnimation(animation)
+	return animatorOrHumanoid:LoadAnimation(animation)
 end
 
 --[=[

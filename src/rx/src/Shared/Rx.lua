@@ -103,6 +103,20 @@ function Rx.of(...)
 end
 
 --[=[
+	Returns a failed observable
+
+	@param ... any -- Failure args
+	@return Observable
+]=]
+function Rx.failed(...)
+	local args = table.pack(...)
+
+	return Observable.new(function(sub)
+		sub:Fail(table.unpack(args, 1, args.n))
+	end)
+end
+
+--[=[
 	Converts an item
 	http://reactivex.io/documentation/operators/from.html
 
@@ -305,6 +319,205 @@ function Rx.start(callback)
 			return source:Subscribe(sub:GetFireFailComplete())
 		end)
 	end
+end
+
+--[=[
+	Returns a new Observable that multicasts (shares) the original Observable. As long as there is at least one Subscriber this Observable will be subscribed and emitting data.
+	When all subscribers have unsubscribed it will unsubscribe from the source Observable.
+
+	https://rxjs.dev/api/operators/share
+
+	@return (source: Observable) -> Observable
+]=]
+function Rx.share()
+	return function(source)
+		local shareMaid = Maid.new()
+		local subs = {}
+
+		local lastFail = UNSET_VALUE
+		local lastComplete = UNSET_VALUE
+
+		local function connectToSourceIfNeeded()
+			if not shareMaid._currentSub then
+				lastFail = UNSET_VALUE
+				lastComplete = UNSET_VALUE
+
+				shareMaid._currentSub = source:Subscribe(function(...)
+					for _, sub in pairs(subs) do
+						sub:Fire(...)
+					end
+				end, function(...)
+					lastFail = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Fail(...)
+					end
+				end, function(...)
+					lastComplete = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Complete(...)
+					end
+				end)
+			end
+		end
+
+		local function disconnectFromSource()
+			shareMaid._currentSub = nil
+
+			lastFail = UNSET_VALUE
+			lastComplete = UNSET_VALUE
+		end
+
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			if lastFail ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastFail, 1, lastFail.n))
+				return
+			end
+
+			if lastComplete ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastComplete, 1, lastComplete.n))
+				return
+			end
+
+			table.insert(subs, sub)
+			connectToSourceIfNeeded()
+
+			return function()
+				local index = table.find(subs, sub)
+				if index then
+					table.remove(subs, index)
+
+					if #subs == 0 then
+						disconnectFromSource()
+					end
+				end
+			end
+		end)
+	end
+end
+
+--[=[
+	Same as [Rx.share] except it also replays the value
+
+	@param bufferSize number -- Number of entries to cache
+	@param windowTimeSeconds number -- Time
+	@return (source: Observable) -> Observable
+]=]
+function Rx.shareReplay(bufferSize, windowTimeSeconds)
+	assert(type(bufferSize) == "number" or bufferSize == nil, "Bad bufferSize")
+	assert(type(windowTimeSeconds) == "number" or windowTimeSeconds == nil, "Bad windowTimeSeconds")
+
+	bufferSize = bufferSize or math.huge
+	windowTimeSeconds = windowTimeSeconds or math.huge
+
+	return function(source)
+		local shareMaid = Maid.new()
+		local subs = {}
+
+		local buffer = {}
+		local lastFail = UNSET_VALUE
+		local lastComplete = UNSET_VALUE
+
+		local function getEventsCopy()
+			local now = os.clock()
+			local events = {}
+
+			for _, event in pairs(buffer) do
+				if (now - event.timestamp) <= windowTimeSeconds then
+					table.insert(events, event)
+				end
+			end
+
+			return events
+		end
+
+		local function connectToSourceIfNeeded()
+			if not shareMaid._currentSub then
+				buffer = {}
+				lastFail = UNSET_VALUE
+				lastComplete = UNSET_VALUE
+
+				shareMaid._currentSub = source:Subscribe(function(...)
+					-- TODO: also prune events by timestamp
+
+					if #buffer + 1 > bufferSize then
+						table.remove(buffer, 1) -- O(n), not great.
+					end
+
+					-- Queue before we start
+					local event = table.pack(...)
+					event.timestamp = os.clock()
+					table.insert(buffer, event)
+
+					for _, sub in pairs(subs) do
+						sub:Fire(...)
+					end
+				end, function(...)
+					lastFail = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Fail(...)
+					end
+				end, function(...)
+					lastComplete = table.pack(...)
+					for _, sub in pairs(subs) do
+						sub:Complete(...)
+					end
+				end)
+			end
+		end
+
+		local function disconnectFromSource()
+			shareMaid._currentSub = nil
+
+			buffer = {}
+			lastFail = UNSET_VALUE
+			lastComplete = UNSET_VALUE
+		end
+
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			if lastFail ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastFail, 1, lastFail.n))
+				return
+			end
+
+			if lastComplete ~= UNSET_VALUE then
+				sub:Fail(table.unpack(lastComplete, 1, lastComplete.n))
+				return
+			end
+
+			table.insert(subs, sub)
+
+			-- Firing could lead to re-entrance. Lets just use the buffer as-is.
+			for _, item in pairs(getEventsCopy()) do
+				sub:Fire(table.unpack(item, 1, item.n))
+			end
+
+			connectToSourceIfNeeded()
+
+			return function()
+				local index = table.find(subs, sub)
+				if index then
+					table.remove(subs, index)
+
+					if #subs == 0 then
+						disconnectFromSource()
+					end
+				end
+			end
+		end)
+	end
+end
+
+--[=[
+	Caches the current value
+
+	@return (source: Observable) -> Observable
+]=]
+function Rx.cache()
+	return Rx.shareReplay(1)
 end
 
 --[=[
@@ -1161,7 +1374,7 @@ function Rx.take(number)
 			local taken = 0
 			local maid = Maid.new()
 
-			maid:GiveTask(source:Subscribe(function(...)
+			maid._sub = source:Subscribe(function(...)
 				if taken >= number then
 					warn("[Rx.take] - Still getting values past subscription")
 					return
@@ -1172,8 +1385,11 @@ function Rx.take(number)
 
 				if taken >= number then
 					sub:Complete()
+
+					-- Paranoid disconnect, even though our parent should also disconnect
+					maid._sub = nil
 				end
-			end, sub:GetFailComplete()))
+			end, sub:GetFailComplete())
 
 			return maid
 		end)
@@ -1273,6 +1489,56 @@ function Rx.delay(seconds)
 end
 
 --[=[
+	Emits output every `n` seconds
+
+	@param initialDelaySeconds number
+	@param seconds number
+	@return (source: Observable<number>) -> Observable<number>
+]=]
+function Rx.timer(initialDelaySeconds, seconds)
+	assert(type(initialDelaySeconds) == "number" or initialDelaySeconds == nil, "Bad initialDelaySeconds")
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local number = -1
+		local running = true
+
+		local thread = task.spawn(function()
+			if initialDelaySeconds and initialDelaySeconds > 0 then
+				task.wait(initialDelaySeconds)
+			end
+
+			while running do
+				number += 1
+				sub:Fire(number)
+				task.wait(seconds)
+			end
+		end)
+
+		maid:GiveTask(function()
+			running = false
+			coroutine.close(thread)
+		end)
+
+		return maid
+	end)
+end
+
+--[=[
+	https://www.learnrxjs.io/learn-rxjs/operators/creation/interval
+
+	@param seconds number
+	@return (source: Observable<number>) -> Observable<number>
+]=]
+function Rx.interval(seconds)
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return Rx.timer(0, seconds)
+end
+
+--[=[
 	Honestly, I have not used this one much.
 
 	https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom
@@ -1346,7 +1612,7 @@ end
 --[=[
 	Throttles emission of observables.
 
-	https://rxjs-dev.firebaseapp.com/api/operators/debounceTime
+	https://rxjs-dev.firebaseapp.com/api/operators/throttleTime
 
 	:::note
 	Note that on complete, the last item is not included, for now, unlike the existing version in rxjs.
@@ -1398,7 +1664,7 @@ function Rx.throttleDefer()
 					lastResult = table.pack(...)
 
 					-- Queue up our result
-					task.defer(function()
+					maid._currentQueue = task.defer(function()
 						local current = lastResult
 						lastResult = nil
 

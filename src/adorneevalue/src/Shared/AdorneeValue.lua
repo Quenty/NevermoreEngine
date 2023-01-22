@@ -16,23 +16,52 @@ local AdorneeValue = setmetatable({}, BaseObject)
 AdorneeValue.ClassName = "AdorneeValue"
 AdorneeValue.__index = AdorneeValue
 
+--[=[
+	Constructs a new AdorneeValue
+
+	@return AdorneeValue
+]=]
 function AdorneeValue.new()
 	local self = setmetatable(BaseObject.new(), AdorneeValue)
 
 	self._adornee = ValueObject.new()
 	self._maid:GiveTask(self._adornee)
 
+
+
 	return self
 end
 
+--[=[
+	Gets the current adornee. This is useful for attaching things to the world.
+
+	@return Instance | CFrame | Vector3 | nil
+]=]
 function AdorneeValue:GetAdornee()
 	return self._adornee.Value
 end
 
+--[=[
+	Observes the current adornee.
+
+	@return Observable<Instance | CFrame | Vector3 | nil>
+]=]
 function AdorneeValue:Observe()
 	return self._adornee:Observe()
 end
 
+--[=[
+	Event fires when adornee changes
+
+	@prop Changed Signal<T> -- fires with oldValue, newValue
+	@within AdorneeValue
+]=]
+
+--[=[
+	The value of the AdorneeValue
+	@prop Value Instance | CFrame | Vector3 | nil
+	@within AdorneeValue
+]=]
 function AdorneeValue:__index(index)
 	if index == "Value" then
 		return self._adornee.Value
@@ -67,6 +96,11 @@ function AdorneeValue:__newindex(index, value)
 	end
 end
 
+--[=[
+	Observes the bottom cframe of the adornee
+
+	@return Observable<CFrame | nil>
+]=]
 function AdorneeValue:ObserveBottomCFrame()
 	return Blend.Computed(self._adornee, function(adornee)
 		if typeof(adornee) == "CFrame" then
@@ -90,12 +124,22 @@ function AdorneeValue:ObserveBottomCFrame()
 	end)
 end
 
+--[=[
+	Observes the center position of the adornee
+
+	@return Observable<Vector3 | nil>
+]=]
 function AdorneeValue:ObserveCenterPosition()
 	return Blend.Computed(self._adornee, function()
 		return self:GetCenterPosition()
 	end)
 end
 
+--[=[
+	Gets the center position of the adornee
+
+	@return Vector3 | nil
+]=]
 function AdorneeValue:GetCenterPosition()
 	local adornee = self._adornee.Value
 
@@ -114,12 +158,22 @@ function AdorneeValue:GetCenterPosition()
 	end
 end
 
+--[=[
+	Observes the approximate radius of the adornee
+
+	@return Observable<number?>
+]=]
 function AdorneeValue:ObserveRadius()
 	return Blend.Computed(self._adornee, function()
 		return self:GetRadius()
 	end)
 end
 
+--[=[
+	Gets the approximate radius of the adornee
+
+	@return number?
+]=]
 function AdorneeValue:GetRadius()
 	local adornee = self._adornee.Value
 
@@ -143,6 +197,14 @@ function AdorneeValue:GetRadius()
 	end
 end
 
+--[=[
+	Observes the position towards a given target. This projects the current adornee's bounding box
+	and the position of the target to attach something generally near the outside of the box.
+
+	@param observeTargetPosition Observable<Vector3>
+	@param observeRadius Observable<number>
+	@return Observable
+]=]
 function AdorneeValue:ObservePositionTowards(observeTargetPosition, observeRadius)
 	-- TODO: Some sort of de-duplication/multicast.
 
@@ -155,6 +217,15 @@ function AdorneeValue:ObservePositionTowards(observeTargetPosition, observeRadiu
 		end)
 end
 
+--[=[
+	Gets a position projected from our current center and radius towards
+	the given target vector. Useful for attaching arrows and stuff.
+
+	@param target Vector3
+	@param radius Vector3
+	@param center Vector3
+	@return Vector3
+]=]
 function AdorneeValue:GetPositionTowards(target, radius, center)
 	assert(typeof(target) == "Vector3", "Bad target")
 
@@ -177,6 +248,12 @@ function AdorneeValue:_getPositionTowards(target, radius, center)
 	return center + offset.unit * radius
 end
 
+--[=[
+	Observes a parent value to use or an attachment we'll attach to the adornee. May end up being
+	the terrain if using an absolute position.
+
+	@return Observable<Instance?>
+]=]
 function AdorneeValue:ObserveAttachmentParent()
 	return Blend.Computed(self._adornee, function(adornee)
 		if typeof(adornee) == "Instance" then
@@ -197,6 +274,15 @@ function AdorneeValue:ObserveAttachmentParent()
 	end)
 end
 
+--[=[
+	Returns an [Observable] which when used can to render an attachment at a given
+	CFrame which can be used to play back a variety of effects.
+
+	See [Blend] for details.
+
+	@param props {} -- Takes [Blend.Children] as an option
+	@return Observable<Instance?>
+]=]
 function AdorneeValue:RenderPositionAttachment(props)
 	props = props or {}
 

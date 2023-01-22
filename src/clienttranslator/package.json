@@ -1,6 +1,6 @@
 {
   "name": "@quenty/clienttranslator",
-  "version": "6.1.0",
+  "version": "8.9.0",
   "description": "Gets local translator for player",
   "keywords": [
     "Roblox",
@@ -26,11 +26,13 @@
   ],
   "dependencies": {
     "@quenty/blend": "file:../blend",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/pseudolocalize": "file:../pseudolocalize",
-    "@quenty/rx": "file:../rx"
+    "@quenty/rx": "file:../rx",
+    "@quenty/table": "file:../table"
   },
   "publishConfig": {
     "access": "public"

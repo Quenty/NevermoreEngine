@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local RogueAdditiveProvider = require("RogueAdditiveProvider")
 local RogueMultiplierProvider = require("RogueMultiplierProvider")
+local RogueSetterProvider = require("RogueSetterProvider")
 local RoguePropertyBinderGroups = require("RoguePropertyBinderGroups")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
@@ -16,6 +17,8 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local RoguePropertyUtils = require("RoguePropertyUtils")
+local RoguePropertyChangedSignalConnection = require("RoguePropertyChangedSignalConnection")
+local ValueObject = require("ValueObject")
 
 local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
@@ -32,13 +35,13 @@ function RogueProperty.new(adornee, serviceBag, definition)
 	self._definition = assert(definition, "Bad definition")
 
 	if self._roguePropertyService:CanInitializeProperties() then
-		self:_getBaseValueObject()
+		self:GetBaseValueObject()
 	end
 
 	return self
 end
 
-function RogueProperty:_getBaseValueObject()
+function RogueProperty:GetBaseValueObject()
 	local parent
 	local tableDefinition = self._definition:GetPropertyTableDefinition()
 	if tableDefinition then
@@ -80,7 +83,7 @@ function RogueProperty:_observeBaseValueBrio()
 end
 
 function RogueProperty:SetBaseValue(value)
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 	if baseValue then
 		baseValue.Value = self:_encodeValue(value)
 	else
@@ -88,8 +91,18 @@ function RogueProperty:SetBaseValue(value)
 	end
 end
 
+function RogueProperty:GetBaseValue()
+	local baseValue = self:GetBaseValueObject()
+	if baseValue then
+		return self:_decodeValue(baseValue.Value)
+	else
+		return self:_decodeValue(self._definition:GetEncodedDefaultValue())
+	end
+end
+
+
 function RogueProperty:GetValue()
-	local propObj = self:_getBaseValueObject()
+	local propObj = self:GetBaseValueObject()
 	if not propObj then
 		return self._definition:GetDefaultValue()
 	end
@@ -106,7 +119,6 @@ end
 function RogueProperty:GetDefinition()
 	return self._definition
 end
-
 
 function RogueProperty:ObserveModifiersBrio()
 	return self:_observeBaseValueBrio()
@@ -159,6 +171,7 @@ function RogueProperty:Observe()
 			return current
 		end);
 		RxBrioUtils.emitOnDeath(self._definition:GetDefaultValue());
+		Rx.defaultsTo(self._definition:GetDefaultValue());
 	})
 end
 
@@ -166,7 +179,7 @@ function RogueProperty:CreateMultiplier(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
 	local provider = self._serviceBag:GetService(RogueMultiplierProvider)
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
 		warn("Failed to get the baseValue to parent")
@@ -182,7 +195,7 @@ function RogueProperty:CreateAdditive(amount, source)
 	assert(type(amount) == "number", "Bad amount")
 
 	local provider = self._serviceBag:GetService(RogueAdditiveProvider)
-	local baseValue = self:_getBaseValueObject()
+	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
 		warn("Failed to get the baseValue to parent")
@@ -194,6 +207,22 @@ function RogueProperty:CreateAdditive(amount, source)
 	return multiplier
 end
 
+function RogueProperty:CreateSetter(amount, source)
+	assert(type(amount) == "number", "Bad amount")
+
+	local provider = self._serviceBag:GetService(RogueSetterProvider)
+	local baseValue = self:GetBaseValueObject()
+
+	if not baseValue then
+		warn("Failed to get the baseValue to parent")
+	end
+
+	local setter = provider:Create(amount, source)
+	setter.Parent = baseValue
+
+	return setter
+end
+
 function RogueProperty:_observeModifiersBrio()
 	return RxBinderUtils.observeBoundChildClassesBrio(self._roguePropertyBinderGroups.RogueModifiers:GetAll(), self._adornee)
 end
@@ -201,6 +230,8 @@ end
 function RogueProperty:__index(index)
 	if index == "Value" then
 		return self:GetValue()
+	elseif index == "Changed" then
+		return self:_getChangedEvent()
 	elseif RogueProperty[index] then
 		return RogueProperty[index]
 	else
@@ -215,5 +246,25 @@ end
 function RogueProperty:_encodeValue(current)
 	return RoguePropertyUtils.encodeProperty(self._definition, current)
 end
+
+function RogueProperty:_getChangedEvent()
+	return {
+		Connect = function(_, callback)
+			assert(type(callback) == "function", "Bad callback")
+			return RoguePropertyChangedSignalConnection.new(function(connMaid)
+				local valueObject = ValueObject.new(self._definition:GetDefaultValue())
+				connMaid:GiveTask(valueObject)
+
+				connMaid:GiveTask(self:Observe():Subscribe(function(value)
+					valueObject.Value = value
+				end))
+
+				-- After observing, so we can emit only changes.
+				connMaid:GiveTask(valueObject.Changed:Connect(callback))
+			end)
+		end;
+	}
+end
+
 
 return RogueProperty

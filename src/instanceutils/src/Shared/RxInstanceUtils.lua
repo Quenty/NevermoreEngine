@@ -60,11 +60,11 @@ function RxInstanceUtils.observeAncestry(instance)
 end
 
 --[=[
-	Observes an instance's ancestry
+	Observes an instance's ancestry with a brio
 
 	@param instance Instance
 	@param className string
-	@return Observable<Instance>
+	@return Observable<Brio<Instance>>
 ]=]
 function RxInstanceUtils.observeFirstAncestorBrio(instance, className)
 	assert(typeof(instance) == "Instance", "Bad instance")
@@ -87,6 +87,36 @@ function RxInstanceUtils.observeFirstAncestorBrio(instance, className)
 			elseif lastFound then
 				maid._current = nil
 				lastFound = nil
+			end
+		end
+
+		maid:GiveTask(instance.AncestryChanged:Connect(handleAncestryChanged))
+		handleAncestryChanged()
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes an instance's ancestry
+
+	@param instance Instance
+	@param className string
+	@return Observable<Instance?>
+]=]
+function RxInstanceUtils.observeFirstAncestor(instance, className)
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(className) == "string", "Bad className")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local lastFound = UNSET_VALUE
+		local function handleAncestryChanged()
+			local found = instance:FindFirstAncestorWhichIsA(className)
+			if found ~= lastFound then
+				lastFound = found
+				sub:Fire(found)
 			end
 		end
 
@@ -308,7 +338,7 @@ end
 
 	@param parent Instance
 	@param predicate ((value: Instance) -> boolean)? -- Optional filter
-	@return Observable<Brio<Instance>>
+	@return Observable<Instance, boolean>
 ]=]
 function RxInstanceUtils.observeDescendants(parent, predicate)
 	assert(typeof(parent) == "Instance", "Bad parent")
@@ -338,6 +368,58 @@ function RxInstanceUtils.observeDescendants(parent, predicate)
 		end
 
 		return maid
+	end)
+end
+
+--[=[
+	Observes all descendants that match a predicate as a brio
+
+	@param parent Instance
+	@param predicate ((value: Instance) -> boolean)? -- Optional filter
+	@return Observable<Brio<Instance>>
+]=]
+function RxInstanceUtils.observeDescendantsBrio(parent, predicate)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local function handleDescendant(descendant)
+			if not predicate or predicate(descendant) then
+				local value = Brio.new(descendant)
+				maid[descendant] = value
+				sub:Fire(value)
+			end
+		end
+
+		maid:GiveTask(parent.DescendantAdded:Connect(handleDescendant))
+		maid:GiveTask(parent.DescendantRemoving:Connect(function(descendant)
+			maid[descendant] = nil
+		end))
+
+		for _, descendant in pairs(parent:GetDescendants()) do
+			handleDescendant(descendant)
+		end
+
+		return maid
+	end)
+end
+
+
+--[=[
+	Observes all descendants of a specific class
+
+	@param parent Instance
+	@param className string
+	@return Observable<Instance>
+]=]
+function RxInstanceUtils.observeDescendantsOfClassBrio(parent, className)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(className) == "string", "Bad className")
+
+	return RxInstanceUtils.observeDescendantsBrio(parent, function(child)
+		return child:IsA(className)
 	end)
 end
 

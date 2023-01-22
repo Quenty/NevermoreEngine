@@ -1,6 +1,6 @@
 {
   "name": "@quenty/tie",
-  "version": "2.1.0",
+  "version": "4.7.0",
   "description": "Tie allows interfaces to be defined between Lua OOP and Roblox objects.",
   "keywords": [
     "Roblox",
@@ -28,6 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
@@ -37,6 +38,7 @@
     "@quenty/string": "file:../string",
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table",
+    "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject"
   },
   "devDependencies": {

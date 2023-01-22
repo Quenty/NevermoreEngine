@@ -25,9 +25,6 @@ PlayerHumanoidBinder.__index = PlayerHumanoidBinder
 function PlayerHumanoidBinder.new(tag, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerHumanoidBinder)
 
-	self._maid = Maid.new()
-	self._maid:GiveTask(self._maid)
-
 	self._shouldTag = Instance.new("BoolValue")
 	self._shouldTag.Value = true
 	self._maid:GiveTask(self._shouldTag)

@@ -8,6 +8,7 @@ local Maid = require("Maid")
 local GameConfigPicker = require("GameConfigPicker")
 
 local GameConfigServiceClient = {}
+GameConfigServiceClient.ServiceName = "GameConfigServiceClient"
 
 function GameConfigServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
@@ -36,6 +37,10 @@ end
 ]=]
 function GameConfigServiceClient:GetConfigPicker()
 	return self._configPicker
+end
+
+function GameConfigServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return GameConfigServiceClient

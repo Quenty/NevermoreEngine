@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local DraggableSnackbar = require("DraggableSnackbar")
 
 local SnackbarManager = {}
+SnackbarManager.ServiceName = "SnackbarManager"
 
 function SnackbarManager:Init(screenGui)
 	self._currentSnackbar = nil

@@ -2,9 +2,10 @@
 	Wraps the datastore object to provide async cached loading and saving. See [DataStoreStage] for more API.
 
 	Has the following features
-	* Automatic save
-	* Jitter
+	* Automatic saving every 5 minutes
+	* Jitter (doesn't save all at the same time)
 	* De-duplication (only updates data it needs)
+	* Battle tested across multiple top games.
 
 	```lua
 	local playerMoneyValue = Instance.new("IntValue")
@@ -17,7 +18,45 @@
 	end):Catch(function()
 		-- TODO: Notify player
 	end)
+	```
 
+	To use a datastore for a player, it's recommended you use the [PlayerDataStoreService]. This looks
+	something like this. See [ServiceBag] for more information on service initialization.
+
+	```lua
+	local serviceBag = ServiceBag.new()
+	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
+
+	serviceBag:Init()
+	serviceBag:Start()
+
+	local topMaid = Maid.new()
+
+	local function handlePlayer(player)
+		local maid = Maid.new()
+
+		local playerMoneyValue = Instance.new("IntValue")
+		playerMoneyValue.Name = "Money"
+		playerMoneyValue.Value = 0
+		playerMoneyValue.Parent = player
+
+		maid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)
+			maid:GivePromise(dataStore:Load("money", 0))
+				:Then(function(money)
+					playerMoneyValue.Value = money
+					maid:GiveTask(dataStore:StoreOnValueChange("money", playerMoneyValue))
+				end)
+		end)
+
+		topMaid[player] = maid
+	end
+	Players.PlayerAdded:Connect(handlePlayer)
+	Players.PlayerRemoving:Connect(function(player)
+		topMaid[player] = nil
+	end)
+	for _, player in pairs(Players:GetPlayers()) do
+		task.spawn(handlePlayer, player)
+	end
 	```
 
 	@server
@@ -38,6 +77,7 @@ local DEBUG_WRITING = false
 local AUTO_SAVE_TIME = 60*5
 local CHECK_DIVISION = 15
 local JITTER = 20 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
+local DEFAULT_CACHE_TIME_SECONDS = math.huge
 
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
@@ -47,12 +87,18 @@ DataStore.__index = DataStore
 	Constructs a new DataStore. See [DataStoreStage] for more API.
 	@param robloxDataStore DataStore
 	@param key string
+	@return DataStore
 ]=]
 function DataStore.new(robloxDataStore, key)
 	local self = setmetatable(DataStoreStage.new(), DataStore)
 
 	self._key = key or error("No key")
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
+	self._cacheTimeSeconds = DEFAULT_CACHE_TIME_SECONDS
+
+	if self._key == "" then
+		error("[DataStore] - Key cannot be an empty string")
+	end
 
 --[=[
 	Prop that fires when saving. Promise will resolve once saving is complete.
@@ -90,6 +136,16 @@ function DataStore.new(robloxDataStore, key)
 end
 
 --[=[
+	Sets how long the datastore will cache for
+	@param cacheTimeSeconds number?
+]=]
+function DataStore:SetCacheTime(cacheTimeSeconds)
+	assert(type(cacheTimeSeconds) == "number" or cacheTimeSeconds == nil, "Bad cacheTimeSeconds")
+
+	self._cacheTimeSeconds = cacheTimeSeconds or DEFAULT_CACHE_TIME_SECONDS
+end
+
+--[=[
 	Returns the full path for the datastore
 	@return string
 ]=]
@@ -113,6 +169,11 @@ function DataStore:DidLoadFail()
 	return false
 end
 
+--[=[
+	Returns whether the datastore has loaded successfully.\
+
+	@return Promise<boolean>
+]=]
 function DataStore:PromiseLoadSuccessful()
 	return self._maid:GivePromise(self:_promiseLoad()):Then(function()
 		return true

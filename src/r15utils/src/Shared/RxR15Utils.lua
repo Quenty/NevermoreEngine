@@ -22,7 +22,7 @@ function RxR15Utils.observeRigAttachmentBrio(character, partName, attachmentName
 	assert(type(partName) == "string", "Bad partName")
 	assert(type(attachmentName) == "string", "Bad attachmentName")
 
-	return RxR15Utils.observeCharacterPart(character, partName)
+	return RxR15Utils.observeCharacterPartBrio(character, partName)
 		:Pipe({
 			RxBrioUtils.switchMapBrio(function(part)
 				return RxInstanceUtils.observeLastNamedChildBrio(part, "Attachment", attachmentName)
@@ -47,6 +47,7 @@ function RxR15Utils.observeRigMotorBrio(character, partName, motorName)
 			RxBrioUtils.switchMapBrio(function(part)
 				return RxInstanceUtils.observeLastNamedChildBrio(part, "Motor6D", motorName)
 			end);
+			RxBrioUtils.onlyLastBrioSurvives();
 		})
 end
 
@@ -56,7 +57,7 @@ end
 	@param partName string
 	@return Observable<Brio<BasePart>>
 ]=]
-function RxR15Utils.observeCharacterPart(character, partName)
+function RxR15Utils.observeCharacterPartBrio(character, partName)
 	assert(typeof(character) == "Instance", "Bad character")
 	assert(type(partName) == "string", "Bad partName")
 

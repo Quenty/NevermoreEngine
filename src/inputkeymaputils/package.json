@@ -1,7 +1,7 @@
 {
   "name": "@quenty/inputkeymaputils",
-  "version": "5.1.0",
-  "description": "Utility methods for input map",
+  "version": "7.12.0",
+  "description": "System to define rebindable key bindings and inputs for Roblox.",
   "keywords": [
     "Roblox",
     "Nevermore",
@@ -28,13 +28,17 @@
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
+    "@quenty/clienttranslator": "file:../clienttranslator",
+    "@quenty/enumutils": "file:../enumutils",
     "@quenty/inputmode": "file:../inputmode",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/pseudolocalize": "file:../pseudolocalize",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/statestack": "file:../statestack",
+    "@quenty/string": "file:../string",
     "@quenty/table": "file:../table",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject"

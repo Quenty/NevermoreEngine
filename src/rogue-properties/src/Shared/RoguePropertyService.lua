@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 
 local RoguePropertyService = {}
+RoguePropertyService.ServiceName = "RoguePropertyService"
 
 function RoguePropertyService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
@@ -28,6 +29,7 @@ function RoguePropertyService:Init(serviceBag)
 	self._maid:GiveTask(self.ProviderAddedEvent)
 
 	-- Internal providers
+	self._serviceBag:GetService(require("RogueSetterProvider"))
 	self._serviceBag:GetService(require("RogueAdditiveProvider"))
 	self._serviceBag:GetService(require("RogueMultiplierProvider"))
 end
@@ -41,10 +43,20 @@ function RoguePropertyService:AddProvider(provider)
 end
 
 function RoguePropertyService:GetProviders()
+	if not RunService:IsRunning() then
+		return {}
+	end
+
 	return self._providers
 end
 
 function RoguePropertyService:ObserveProviderList()
+	if not RunService:IsRunning() then
+		return Observable.new(function(sub)
+			sub:Fire({})
+		end)
+	end
+
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 

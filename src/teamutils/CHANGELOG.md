@@ -3,6 +3,116 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.5.0...@quenty/teamutils@4.6.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.4.1...@quenty/teamutils@4.5.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+## [4.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.4.0...@quenty/teamutils@4.4.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.3.0...@quenty/teamutils@4.4.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.2.1...@quenty/teamutils@4.3.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.2.0...@quenty/teamutils@4.2.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.1.0...@quenty/teamutils@4.2.0) (2022-10-23)
+
+
+### Bug Fixes
+
+* Rx switch maps would lead to multiple brios alive against a single switched observable. ([cd25a22](https://github.com/Quenty/NevermoreEngine/commit/cd25a220a2096fe1c3093deec7f9bc4e83815924))
+
+
+
+
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@4.0.0...@quenty/teamutils@4.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@3.1.0...@quenty/teamutils@4.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@3.0.1...@quenty/teamutils@3.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+## [3.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@3.0.0...@quenty/teamutils@3.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@2.3.0...@quenty/teamutils@3.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@2.2.0...@quenty/teamutils@2.3.0) (2022-07-31)
+
+
+### Features
+
+* Add RxTeamUtils.observeEnemyTeamColorPlayersBrio(teamColor) and documentation ([25690cb](https://github.com/Quenty/NevermoreEngine/commit/25690cb306dc2c6a140e3c12bacc9cec945a5b11))
+
+
+
+
+
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@2.1.0...@quenty/teamutils@2.2.0) (2022-06-21)
 
 

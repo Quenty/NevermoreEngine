@@ -11,9 +11,9 @@
   </a>
 </div>
 
-Color selector UI
+A HSV color picker which allows you to select colors in the same way as Roblox Studio.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/HSColorPicker">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/HSVColorPicker">View docs →</a></div>
 
 ## Installation
 ```

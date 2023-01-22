@@ -1,66 +1,60 @@
 --[=[
-	Not required to be initialized
 	@class InputKeyMapServiceClient
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
+local Maid = require("Maid")
+local PseudoLocalize = require("PseudoLocalize")
 
 local InputKeyMapServiceClient = {}
+InputKeyMapServiceClient.ServiceName = "InputKeyMapServiceClient"
 
 function InputKeyMapServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
 
-	self._providers = {}
+	-- External
+	self._serviceBag:GetService(require("InputModeServiceClient"))
+
+	-- Internal
+	self._translator = self._serviceBag:GetService(require("InputKeyMapTranslator"))
+	self._registryService = self._serviceBag:GetService(require("InputKeyMapRegistryServiceShared"))
+
+	self:_ensureLocalizationEntries()
 end
 
-function InputKeyMapServiceClient:RegisterProvider(provider)
-	assert(provider, "Bad provider")
-	assert(self._providers, "Not initialized")
-
-	local providerName = provider:GetProviderName()
-	if self._providers[providerName] then
-		error(("Already have a provider with name %q"):format(providerName))
-	end
-
-	self._providers[providerName] = provider
+function InputKeyMapServiceClient:FindInputKeyMapList(providerName, listName)
+	return self._registryService:FindInputKeyMapList(providerName, listName)
 end
 
-function InputKeyMapServiceClient:GetProvider(providerName)
-	assert(type(providerName) == "string", "Bad providerName")
-
-	return self._providers[providerName]
-end
-
--- function InputKeyMapServiceClient:ObserveInputKeyMapList(providerName, inputKeyMapListName)
--- 	assert(type(providerName) == "string", "Bad providerName")
--- 	assert(type(inputKeyMapListName) == "string", "Bad inputKeyMapListName")
-
--- end
-
-function InputKeyMapServiceClient:FindInputKeyMapList(providerName, inputKeyMapListName)
-	assert(type(providerName) == "string", "Bad providerName")
-	assert(type(inputKeyMapListName) == "string", "Bad inputKeyMapListName")
-
-	if not RunService:IsRunning() then
-		return nil
-	end
-
-	assert(self._providers, "Not initialized")
-	for _, provider in pairs(self._providers) do
-		if provider:GetProviderName() == providerName then
-			local found = provider:FindInputKeyMapList(inputKeyMapListName)
-			if found then
-				return found
-			end
+function InputKeyMapServiceClient:_ensureLocalizationEntries()
+	self._maid:GiveTask(self._registryService:ObserveInputKeyMapListsBrio():Subscribe(function(brio)
+		if brio:IsDead() then
+			return
 		end
-	end
 
-	return nil
+		local inputKeyMapList = brio:GetValue()
+
+		local text = inputKeyMapList:GetBindingName()
+
+		local localizationTable = self._translator:GetLocalizationTable()
+		local key = inputKeyMapList:GetBindingTranslationKey()
+		local source = text
+		local context = ("InputKeyMapServiceClient.%s"):format(inputKeyMapList:GetListName())
+		local localeId = "en"
+		local value = text
+
+		localizationTable:SetEntryValue(key, source, context, localeId, value)
+		localizationTable:SetEntryValue(key, source, context,
+			PseudoLocalize.getDefaultPseudoLocaleId(),
+			PseudoLocalize.pseudoLocalize(value))
+	end))
 end
 
-
+function InputKeyMapServiceClient:Destroy()
+	self._maid:DoCleaning()
+end
 
 return InputKeyMapServiceClient

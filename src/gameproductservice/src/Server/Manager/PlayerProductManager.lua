@@ -119,8 +119,8 @@ function PlayerProductManager:_handlePassFinished(player, gamePassId, isPurchase
 			self:SetPlayerOwnsPass(gamePassId, true)
 		end
 
-		promise:Resolve(isPurchased)
 		self._pendingPassPromises[gamePassId] = nil
+		promise:Resolve(isPurchased)
 	end
 end
 
@@ -133,8 +133,8 @@ function PlayerProductManager:_handlePromptFinished(player, productId, isPurchas
 	if promise then
 		-- Success handled by receipt processing
 		if not isPurchased then
-			promise:Resolve(false)
 			self._pendingProductPromises[productId] = nil
+			promise:Resolve(false)
 		end
 	end
 end

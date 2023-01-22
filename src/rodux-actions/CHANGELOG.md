@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@5.1.0...@quenty/rodux-actions@5.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/rodux-actions
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@5.0.0...@quenty/rodux-actions@5.1.0) (2022-10-23)
+
+
+### Bug Fixes
+
+* Can install via just NPM registry for now ([35291f2](https://github.com/Quenty/NevermoreEngine/commit/35291f2aa91d40ec9062b2c79a2ef826d706a795))
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@4.0.1...@quenty/rodux-actions@5.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/rodux-actions
+
+
+
+
+
+## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@4.0.0...@quenty/rodux-actions@4.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/rodux-actions
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@3.1.0...@quenty/rodux-actions@4.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@3.0.0...@quenty/rodux-actions@3.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/rodux-actions

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pseudolocalize@2.1.0...@quenty/pseudolocalize@3.0.0) (2022-08-14)
+
+
+### Features
+
+* Add PseudoLocalize.getDefaultPseudoLocaleId() ([67921db](https://github.com/Quenty/NevermoreEngine/commit/67921db1f9bafaab54919dcd9d6c778c6d4b04e7))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pseudolocalize@2.0.1...@quenty/pseudolocalize@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/pseudolocalize

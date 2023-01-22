@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rigbuilderutils",
-  "version": "5.1.0",
+  "version": "6.1.0",
   "description": "Utility functions for debugging, builds a Roblox character rig",
   "keywords": [
     "Roblox",

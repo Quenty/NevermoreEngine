@@ -62,6 +62,9 @@ end
 
 --[=[
 	Promises a player userName with retries enabled.
+
+	See UserServiceUtils for display name and a more up-to-date API.
+
 	@param userId number
 	@return Promise<string>
 ]=]

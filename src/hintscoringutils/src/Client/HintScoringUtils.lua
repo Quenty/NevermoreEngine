@@ -235,14 +235,15 @@ function HintScoringUtils.scoreAdornee(
 	end
 
 	local humanoidOffset = closestPoint - humanoidCenter
+	local flatHumanoidOffset = humanoidOffset * Vector3.new(1, 0, 1)
 	local angleOffset = center - humanoidCenter
 	local flatOffset = angleOffset * Vector3.new(1, 0, 1)
-	local angle = Vector3Utils.getAngleRad(flatOffset.Unit, humanoidLookVector)
+	local angle = Vector3Utils.angleBetweenVectors(flatOffset.Unit, humanoidLookVector * Vector3.new(1, 0, 1))
 	if not angle then
 		return false
 	end
 
-	local distScore = HintScoringUtils.scoreDist(humanoidOffset.magnitude, maxViewRadius, maxTriggerRadius)
+	local distScore = HintScoringUtils.scoreDist(flatHumanoidOffset.magnitude, maxViewRadius, maxTriggerRadius)
 	if not distScore then
 		return false
 	end
@@ -252,7 +253,7 @@ function HintScoringUtils.scoreAdornee(
 		return false
 	end
 
-	return (2*distScore + angleScore)/3
+	return (distScore + angleScore)/2
 end
 
 --[=[

@@ -9,6 +9,7 @@ local Promise = require("Promise")
 
 local BinderGroupProvider = {}
 BinderGroupProvider.ClassName = "BinderGroupProvider"
+BinderGroupProvider.ServiceName = "BinderGroupProvider"
 BinderGroupProvider.__index = BinderGroupProvider
 
 --[=[

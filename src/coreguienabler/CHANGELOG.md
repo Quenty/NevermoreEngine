@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.0.1...@quenty/coreguienabler@6.1.0) (2023-01-11)
+
+
+### Bug Fixes
+
+* Use CoreGuiEnabler to disable core gui types ([808d020](https://github.com/Quenty/NevermoreEngine/commit/808d020ce49a72e738c7abdc0f918cba40043f46))
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.0.0...@quenty/coreguienabler@6.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@5.2.1...@quenty/coreguienabler@6.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@5.2.0...@quenty/coreguienabler@5.2.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@5.1.0...@quenty/coreguienabler@5.2.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Stop leaking MouseIconEnabled property events in CoreGuiEnabler ([55e2b8c](https://github.com/Quenty/NevermoreEngine/commit/55e2b8cbb7bc504d20fcc7d6b6505f74cce48ed9))
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@5.0.0...@quenty/coreguienabler@5.1.0) (2022-06-24)
+
+**Note:** Version bump only for package @quenty/coreguienabler
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@4.2.0...@quenty/coreguienabler@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/coreguienabler

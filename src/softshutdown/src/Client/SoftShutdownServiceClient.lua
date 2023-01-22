@@ -6,7 +6,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
-local StarterGui = game:GetService("StarterGui")
 local TeleportService = game:GetService("TeleportService")
 
 local AttributeValue = require("AttributeValue")
@@ -17,8 +16,10 @@ local SoftShutdownConstants = require("SoftShutdownConstants")
 local SoftShutdownTranslator = require("SoftShutdownTranslator")
 local SoftShutdownUI = require("SoftShutdownUI")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local CoreGuiEnabler = require("CoreGuiEnabler")
 
 local SoftShutdownServiceClient = {}
+SoftShutdownServiceClient.ServiceName = "SoftShutdownServiceClient"
 
 local DISABLE_CORE_GUI_TYPES = {
 	Enum.CoreGuiType.PlayerList;
@@ -60,7 +61,7 @@ function SoftShutdownServiceClient:Init(serviceBag)
 		isLobby = self._isLobby:Observe();
 		isShuttingDown = self._isUpdating:Observe();
 		localTeleportDataSaysIsLobby = RxValueBaseUtils.observeValue(self._localTeleportDataSaysIsLobby);
-		isArrivingAfterShutdown = self._isArrivingAfterShutdown;
+		isArrivingAfterShutdown = RxValueBaseUtils.observeValue(self._isArrivingAfterShutdown);
 	}):Subscribe(function(state)
 		if state.isLobby or state.localTeleportDataSaysIsLobby then
 			self._maid._shutdownUI = nil
@@ -166,13 +167,28 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 		end)
 	end
 
+	local playerGui = PlayerGuiUtils.getPlayerGui()
+
 	local enabledScreenGuis = {}
-	for _, item in pairs(PlayerGuiUtils.getPlayerGui():GetChildren()) do
-		if item:IsA("ScreenGui") and item ~= ignoreScreenGui and item.Enabled then
-			enabledScreenGuis[item] = item
-			item.Enabled = false
+
+	local function handleChild(child)
+		if child:IsA("ScreenGui") and child ~= ignoreScreenGui and child.Enabled then
+			enabledScreenGuis[child] = child
+			child.Enabled = false
 		end
 	end
+
+	for _, child in pairs(playerGui:GetChildren()) do
+		handleChild(child)
+	end
+
+	maid:GiveTask(playerGui.ChildAdded:Connect(function(child)
+		handleChild(child)
+	end))
+
+	maid:GiveTask(playerGui.ChildRemoved:Connect(function(child)
+		enabledScreenGuis[child] = nil
+	end))
 
 	maid:GiveTask(function()
 		for screenGui, _ in pairs(enabledScreenGuis) do
@@ -195,15 +211,7 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 	end)
 
 	for _, coreGuiType in pairs(DISABLE_CORE_GUI_TYPES) do
-		task.spawn(function()
-			if StarterGui:GetCoreGuiEnabled(coreGuiType) then
-				StarterGui:SetCoreGuiEnabled(coreGuiType, false)
-
-				maid:GiveTask(function()
-					StarterGui:SetCoreGuiEnabled(coreGuiType, true)
-				end)
-			end
-		end)
+		maid:GiveTask(CoreGuiEnabler:Disable(self, coreGuiType))
 	end
 end
 

@@ -1,0 +1,38 @@
+{
+  "name": "@quenty/bindtocloseservice",
+  "version": "2.1.1",
+  "description": "Bind to game close API in a centralized location.",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/blend/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/promise": "file:../promise",
+    "@quenty/symbol": "file:../symbol"
+  },
+  "devDependencies": {
+    "@quenty/contentproviderutils": "file:../contentproviderutils",
+    "@quenty/playerthumbnailutils": "file:../playerthumbnailutils"
+  }
+}

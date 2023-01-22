@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numberrangeutils@2.1.0...@quenty/numberrangeutils@3.0.0) (2022-09-27)
+
+
+### Features
+
+* Add NumberRangeUtils.getValue ([f349061](https://github.com/Quenty/NevermoreEngine/commit/f34906110e39d32c1b4aade06ad56b57b1723e98))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numberrangeutils@2.0.1...@quenty/numberrangeutils@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/numberrangeutils

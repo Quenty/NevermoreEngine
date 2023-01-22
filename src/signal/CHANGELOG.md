@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.2.0...@quenty/signal@2.3.0) (2022-08-22)
+
+
+### Features
+
+* Signal :Once(fn) method ([#285](https://github.com/Quenty/NevermoreEngine/issues/285)) ([9f9f8e3](https://github.com/Quenty/NevermoreEngine/commit/9f9f8e3f0d50f73392271011aa3a37f137ae03fb))
+
+
+
+
+
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.1.0...@quenty/signal@2.2.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/signal

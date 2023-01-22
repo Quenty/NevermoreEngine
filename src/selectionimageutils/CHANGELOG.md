@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionimageutils@7.0.0...@quenty/selectionimageutils@7.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/selectionimageutils
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionimageutils@6.0.1...@quenty/selectionimageutils@7.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/selectionimageutils
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionimageutils@6.0.0...@quenty/selectionimageutils@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/selectionimageutils
+
+
+
+
+
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionimageutils@5.1.0...@quenty/selectionimageutils@6.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/selectionimageutils

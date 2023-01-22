@@ -22,6 +22,32 @@ function R15Utils.searchForRigAttachment(character, partName, attachmentName)
 end
 
 --[=[
+	Finds a rig motor
+	@param character Model
+	@param partName string
+	@param motorName string
+	@return Motor6D?
+]=]
+function R15Utils.getRigMotor(character, partName, motorName)
+	assert(typeof(character) == "Instance", "Bad character")
+	assert(type(partName) == "string", "Bad partName")
+	assert(type(motorName) == "string", "Bad motorName")
+
+	local basePart = character:FindFirstChild(partName)
+	if not basePart then
+		return nil
+	end
+
+	local motor = basePart:FindFirstChild(motorName)
+	if not motor then
+		return nil
+	end
+
+	return motor
+end
+
+
+--[=[
 	Retrieves the upper torso
 	@param character Model
 	@return BasePart?

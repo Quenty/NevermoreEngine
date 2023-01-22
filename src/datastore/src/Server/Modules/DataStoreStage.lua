@@ -13,6 +13,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreWriter = require("DataStoreWriter")
+local Maid = require("Maid")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local Signal = require("Signal")
@@ -241,22 +242,28 @@ end
 	Whenever the ValueObject changes, stores the resulting value in that entry.
 	@param name string
 	@param valueObj Instance -- ValueBase object to store on
-	@return MaidTask
+	@return MaidTask -- Cleanup to remove this writer and free the key.
 ]=]
 function DataStoreStage:StoreOnValueChange(name, valueObj)
 	assert(type(name) == "string", "Bad name")
-	assert(typeof(valueObj) == "Instance", "Bad valueObj")
+	assert(typeof(valueObj) == "Instance" or (type(valueObj) == "table" and valueObj.Changed), "Bad valueObj")
 
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
 	end
 
+	local maid = Maid.new()
+
 	self._takenKeys[name] = true
-	local conn = valueObj.Changed:Connect(function()
-		self:_doStore(name, valueObj.Value)
+	maid:GiveTask(function()
+		self._takenKeys[name] = nil
 	end)
-	self._maid:GiveTask(conn)
-	return conn
+
+	maid:GiveTask(valueObj.Changed:Connect(function()
+		self:_doStore(name, valueObj.Value)
+	end))
+
+	return maid
 end
 
 --[=[

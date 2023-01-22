@@ -23,6 +23,8 @@ local UserInputService = game:GetService("UserInputService")
 
 local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local Rx = require("Rx")
 
 local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
@@ -34,6 +36,9 @@ function CoreGuiEnabler.new()
 	self._maid = Maid.new()
 
 	self._states = {}
+
+	self._stateSubs = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._stateSubs)
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
@@ -57,62 +62,89 @@ function CoreGuiEnabler.new()
 	end)
 
 	self:AddState("MouseIconEnabled", function(isEnabled)
-		if isEnabled then
-			UserInputService.MouseIconEnabled = isEnabled
-		else
-			UserInputService.MouseIconEnabled = false
-			self._maid:GiveTask(UserInputService:GetPropertyChangedSignal("MouseIconEnabled"):Connect(function()
-				UserInputService.MouseIconEnabled = false
-			end))
-		end
+		UserInputService.MouseIconEnabled = isEnabled
 	end)
 
 	return self
 end
 
 function CoreGuiEnabler:_addStarterGuiState(stateName)
-	local boolValueName = stateName .. "State"
-	self[boolValueName] = Instance.new("BoolValue")
-	self[boolValueName].Value = false
-
 	self:AddState(stateName, function(isEnabled)
-		self[boolValueName].Value = isEnabled
 		local success, err = pcall(function()
 			StarterGui:SetCore(stateName, isEnabled)
 		end)
 		if not success then
-			warn("Failed to set core", err)
+			warn("[CoreGuiEnabler] - Failed to set core", err)
 		end
 	end)
 end
 
 --[=[
-	Adds a state that can be disabled or enabled.
+	Gets the current state
+
 	@param coreGuiState string | CoreGuiType
-	@param coreGuiStateChangeFunc (isEnabled: boolean)
+	@return boolean
 ]=]
-function CoreGuiEnabler:AddState(coreGuiState, coreGuiStateChangeFunc)
-	assert(type(coreGuiStateChangeFunc) == "function", "must have coreGuiStateChangeFunc as function")
-	assert(self._states[coreGuiState] == nil, "state already exists")
-
-	local realState = {}
-	local lastState = true
-
-	local function isEnabled()
-		return next(realState) == nil
+function CoreGuiEnabler:IsEnabled(coreGuiState)
+	local data = self._states[coreGuiState]
+	if not data then
+		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
 	end
 
-	self._states[coreGuiState] = setmetatable({}, {
-		__newindex = function(_, index, value)
-			rawset(realState, index, value)
+	return next(data.disabledBy) == nil
+end
 
-			local newState = isEnabled()
-			if lastState ~= newState then
-				lastState = newState
-				coreGuiStateChangeFunc(newState)
-			end
-		end;
-	})
+--[=[
+	Observes the state whenever it changed
+	@param coreGuiState string | CoreGuiType
+	@return Observable<boolean>
+]=]
+function CoreGuiEnabler:ObserveIsEnabled(coreGuiState)
+	local data = self._states[coreGuiState]
+	if not data then
+		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
+	end
+
+	return self._stateSubs:Observe(coreGuiState)
+		:Pipe({
+			Rx.startFrom(function()
+				return { self:IsEnabled(coreGuiState) }
+			end)
+		})
+end
+
+--[=[
+	Adds a state that can be disabled or enabled.
+	@param coreGuiState string | CoreGuiType
+	@param onChangeCallback (isEnabled: boolean)
+]=]
+function CoreGuiEnabler:AddState(coreGuiState, onChangeCallback)
+	assert(type(onChangeCallback) == "function", "must have onChangeCallback as function")
+	assert(self._states[coreGuiState] == nil, "state already exists")
+
+	self._states[coreGuiState] = {
+		lastState = true;
+		onChangeCallback = onChangeCallback;
+		disabledBy = {};
+	}
+end
+
+function CoreGuiEnabler:_setDisabledByKey(coreGuiState, key, value)
+	assert(key ~= nil, "Bad key")
+
+	local data = self._states[coreGuiState]
+	if not data then
+		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
+	end
+
+	data.disabledBy[key] = value
+
+	local newState = next(data.disabledBy) == nil
+	if data.lastState ~= newState then
+		data.lastState = newState
+		data.onChangeCallback(newState)
+		self._stateSubs:Fire(coreGuiState, newState)
+	end
 end
 
 --[=[
@@ -122,11 +154,13 @@ end
 	@return function -- Callback function to re-enable the state
 ]=]
 function CoreGuiEnabler:Disable(key, coreGuiState)
+	assert(key ~= nil, "Bad key")
+
 	if not self._states[coreGuiState] then
-		error(("[CoreGuiEnabler] - State '%s' does not exist."):format(tostring(coreGuiState)))
+		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
 	end
 
-	self._states[coreGuiState][key] = true
+	self:_setDisabledByKey(coreGuiState, key, true)
 
 	return function()
 		self:Enable(key, coreGuiState)
@@ -139,11 +173,13 @@ end
 	@param coreGuiState string | CoreGuiType
 ]=]
 function CoreGuiEnabler:Enable(key, coreGuiState)
+	assert(key ~= nil, "Bad key")
+
 	if not self._states[coreGuiState] then
-		error(("[CoreGuiEnabler] - State '%s' does not exist."):format(tostring(coreGuiState)))
+		error(string.format("[CoreGuiEnabler] - State '%s' does not exist.", tostring(coreGuiState)))
 	end
 
-	self._states[coreGuiState][key] = nil
+	self:_setDisabledByKey(coreGuiState, key, nil)
 end
 
 return CoreGuiEnabler.new()

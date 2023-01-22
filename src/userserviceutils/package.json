@@ -1,6 +1,6 @@
 {
   "name": "@quenty/userserviceutils",
-  "version": "2.0.0",
+  "version": "3.0.1",
   "description": "Utilities involving UserService in Roblox",
   "keywords": [
     "Roblox",
@@ -26,7 +26,8 @@
   ],
   "dependencies": {
     "@quenty/loader": "file:../loader",
-    "@quenty/math": "file:../math"
+    "@quenty/math": "file:../math",
+    "@quenty/promise": "file:../promise"
   },
   "publishConfig": {
     "access": "public"

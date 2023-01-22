@@ -3,6 +3,175 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.8.0...@quenty/textserviceutils@7.9.0) (2023-01-17)
+
+
+### Bug Fixes
+
+* Fix issue where TextServiceUtils.promiseTextBounds(params) may stack overflow while processing text bounds workaround ([2c887fc](https://github.com/Quenty/NevermoreEngine/commit/2c887fce4b5a4b4a19ad2f68c84c591778b0e349))
+
+
+
+
+
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.7.0...@quenty/textserviceutils@7.8.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.6.1...@quenty/textserviceutils@7.7.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [7.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.6.0...@quenty/textserviceutils@7.6.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.5.0...@quenty/textserviceutils@7.6.0) (2022-12-27)
+
+
+### Features
+
+* Add TextServiceUtils.promiseTextBounds with a workaround for Roblox cancelling certain calls in weird ways. ([9f91df0](https://github.com/Quenty/NevermoreEngine/commit/9f91df0ddf8edcac7c68945b22772a964621a5fa))
+
+
+
+
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.4.0...@quenty/textserviceutils@7.5.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.3.1...@quenty/textserviceutils@7.4.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [7.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.3.0...@quenty/textserviceutils@7.3.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.2.0...@quenty/textserviceutils@7.3.0) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.1.1...@quenty/textserviceutils@7.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.1.0...@quenty/textserviceutils@7.1.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.0.0...@quenty/textserviceutils@7.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@6.1.0...@quenty/textserviceutils@7.0.0) (2022-09-27)
+
+
+### Features
+
+* Support lineHeight as a property ([66d6ba3](https://github.com/Quenty/NevermoreEngine/commit/66d6ba38f013230d183a3402e31fa9e67d1cb723))
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@6.0.1...@quenty/textserviceutils@6.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@6.0.0...@quenty/textserviceutils@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@5.3.1...@quenty/textserviceutils@6.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@5.3.0...@quenty/textserviceutils@5.3.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@5.2.1...@quenty/textserviceutils@5.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@5.2.0...@quenty/textserviceutils@5.2.1) (2022-07-19)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@5.1.0...@quenty/textserviceutils@5.2.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@5.0.0...@quenty/textserviceutils@5.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/textserviceutils

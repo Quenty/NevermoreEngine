@@ -13,6 +13,7 @@ local GetRemoteEvent = require("GetRemoteEvent")
 local ParticleEngineConstants = require("ParticleEngineConstants")
 
 local ParticleEngineServer = {}
+ParticleEngineServer.ServiceName = "ParticleEngineServer"
 
 function ParticleEngineServer:Init()
 	assert(not self._remoteEvent, "Already initialized")

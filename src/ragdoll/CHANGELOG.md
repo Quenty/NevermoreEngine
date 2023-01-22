@@ -3,6 +3,237 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.10.0...@quenty/ragdoll@9.11.0) (2023-01-17)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.9.1...@quenty/ragdoll@9.10.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [9.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.9.0...@quenty/ragdoll@9.9.1) (2023-01-03)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.8.1...@quenty/ragdoll@9.9.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [9.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.8.0...@quenty/ragdoll@9.8.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.7.1...@quenty/ragdoll@9.8.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* Remove TimeSyncService unneeded dependency in Ragdoll package ([074c48a](https://github.com/Quenty/NevermoreEngine/commit/074c48a973c562db01c09ab2511aa2e66f7d81ec))
+
+
+
+
+
+## [9.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.7.0...@quenty/ragdoll@9.7.1) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.6.1...@quenty/ragdoll@9.7.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [9.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.6.0...@quenty/ragdoll@9.6.1) (2022-11-28)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.5.0...@quenty/ragdoll@9.6.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.4.1...@quenty/ragdoll@9.5.0) (2022-11-12)
+
+
+### Features
+
+* Binder provider now provides name for debugging ([72d547e](https://github.com/Quenty/NevermoreEngine/commit/72d547ea47358dfab1128dd076723f5a1a0d9fd8))
+
+
+
+
+
+## [9.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.4.0...@quenty/ragdoll@9.4.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.3.0...@quenty/ragdoll@9.4.0) (2022-10-31)
+
+
+### Features
+
+* Add Ragdoll customization ([bb72960](https://github.com/Quenty/NevermoreEngine/commit/bb729603fb725483b1f8e03aeb0914afca802c87))
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.2.0...@quenty/ragdoll@9.3.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.1.1...@quenty/ragdoll@9.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.1.0...@quenty/ragdoll@9.1.1) (2022-10-16)
+
+
+### Bug Fixes
+
+* **perf:** Make Ragdoll performance better ([566d2bb](https://github.com/Quenty/NevermoreEngine/commit/566d2bb1045d62fd08f16c9042d68c328c5c307d))
+
+
+
+
+
+# [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.0.0...@quenty/ragdoll@9.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Remove init.meta.json since it breaks in team create ([cba21e6](https://github.com/Quenty/NevermoreEngine/commit/cba21e602b50ea3799044eae9cb690d1cd9c88ec))
+* Remove unneeded RunService call ([1b81716](https://github.com/Quenty/NevermoreEngine/commit/1b81716cad28eb02ed1c0b82f8403be20d64d7ae))
+
+
+### Features
+
+* Integrate Motor6D integration for smoother animations in and out of ragdoll ([e9c5b6d](https://github.com/Quenty/NevermoreEngine/commit/e9c5b6de7594e5eae2cdb8097d392deef09972cf))
+* Smooth interpolated ragdolls that support full streaming and velocity inheritance ([20471b6](https://github.com/Quenty/NevermoreEngine/commit/20471b65a6902f53a5afc58cba328862afdfe823))
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@8.1.0...@quenty/ragdoll@9.0.0) (2022-09-27)
+
+
+### Bug Fixes
+
+* Hide server code by default from replication using cameras and init.meta.json. ([5636dd8](https://github.com/Quenty/NevermoreEngine/commit/5636dd8cafe68db4571ed214a82b84698f2f74c0))
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@8.0.1...@quenty/ragdoll@8.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [8.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@8.0.0...@quenty/ragdoll@8.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@7.4.1...@quenty/ragdoll@8.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@7.4.0...@quenty/ragdoll@7.4.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@7.3.0...@quenty/ragdoll@7.4.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@7.2.0...@quenty/ragdoll@7.3.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@7.1.0...@quenty/ragdoll@7.2.0) (2022-06-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@7.0.0...@quenty/ragdoll@7.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/ragdoll

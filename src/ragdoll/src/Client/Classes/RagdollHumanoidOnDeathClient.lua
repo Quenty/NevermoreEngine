@@ -7,13 +7,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local RunService = game:GetService("RunService")
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 
 local BaseObject = require("BaseObject")
 local RagdollBindersClient = require("RagdollBindersClient")
 local CharacterUtils = require("CharacterUtils")
-local RagdollRigging = require("RagdollRigging")
 
 local RagdollHumanoidOnDeathClient = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeathClient.ClassName = "RagdollHumanoidOnDeathClient"
@@ -54,14 +55,44 @@ function RagdollHumanoidOnDeathClient:_handleDeath()
 	end
 
 	local character = self._obj.Parent
-	task.delay(Players.RespawnTime - 0.5, function()
+	self._maid:GiveTask(task.delay(Players.RespawnTime - 0.5, function()
 		if not character:IsDescendantOf(Workspace) then
 			return
 		end
 
 		-- fade into the mist...
-		RagdollRigging.disableParticleEmittersAndFadeOutYielding(character, 0.4)
-	end)
+		RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(character, 0.4)
+	end))
+end
+
+--[=[
+	Disables all particle emitters and fades them out. Yields for the duration.
+
+	@yields
+	@param character Model
+	@param duration number
+]=]
+function RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(character, duration)
+	local descendants = character:GetDescendants()
+	local transparencies = {}
+	for _, instance in pairs(descendants) do
+		if instance:IsA("BasePart") or instance:IsA("Decal") then
+			transparencies[instance] = instance.Transparency
+		elseif instance:IsA("ParticleEmitter") then
+			instance.Enabled = false
+		end
+	end
+	local t = 0
+	while t < duration do
+		-- Using heartbeat because we want to update just before rendering next frame, and not
+		-- block the render thread kicking off (as RenderStepped does)
+		local dt = RunService.Heartbeat:Wait()
+		t = t + dt
+		local alpha = math.min(t / duration, 1)
+		for part, initialTransparency in pairs(transparencies) do
+			part.Transparency = (1 - alpha) * initialTransparency + alpha
+		end
+	end
 end
 
 return RagdollHumanoidOnDeathClient

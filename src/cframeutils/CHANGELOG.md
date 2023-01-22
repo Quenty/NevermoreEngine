@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.0.0...@quenty/cframeutils@5.1.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* Documentation on CFrameUtils was wrong ([d20c26e](https://github.com/Quenty/NevermoreEngine/commit/d20c26e538c567267d3b42584635362efea62232))
+
+
+### Features
+
+* Add CFrameUtils.mirror(cframe: CFrame, point, normal): CFrame ([7f3b924](https://github.com/Quenty/NevermoreEngine/commit/7f3b9242293145256f8c3b957ccf9cbc9669ac7c))
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@4.0.0...@quenty/cframeutils@5.0.0) (2022-09-27)
+
+
+### Features
+
+* Add CFrameUtils.areClose() ([6c07c61](https://github.com/Quenty/NevermoreEngine/commit/6c07c61012bae6fd147cc38f1dbf6ec5772a6cc5))
+
+
+
+
+
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@3.1.0...@quenty/cframeutils@4.0.0) (2022-05-21)
 
 

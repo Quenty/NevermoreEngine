@@ -18,7 +18,7 @@ function SettingsService:Init(serviceBag)
 
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("SettingsBindersServer"))
-	self._serviceBag:GetService(require("SettingServiceBridge")):RegisterSettingService(self)
+	self._serviceBag:GetService(require("SettingRegistryServiceShared")):RegisterSettingService(self)
 end
 
 function SettingsService:ObservePlayerSettingsBrio(player)

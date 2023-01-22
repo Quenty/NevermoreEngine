@@ -1,4 +1,4 @@
-# ServiceBag
+## ServiceBag
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/docs.yml/badge.svg" alt="Documentation status" />
@@ -10,6 +10,8 @@
     <img src="https://github.com/Quenty/NevermoreEngine/actions/workflows/build.yml/badge.svg" alt="Build and release status" />
   </a>
 </div>
+
+Service providing mechanisms for Nevermore
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ServiceBag">View docs →</a></div>
 

@@ -1,10 +1,12 @@
 --[=[
+	Helper methods involving teams on Roblox.
 	@class RxTeamUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
 local Teams = game:GetService("Teams")
+local Players = game:GetService("Players")
 
 local Observable = require("Observable")
 local Maid = require("Maid")
@@ -13,6 +15,12 @@ local RxBrioUtils = require("RxBrioUtils")
 
 local RxTeamUtils = {}
 
+--[=[
+	Observes all players on a taem.
+
+	@param team Team
+	@return Observable<Brio<Player>>
+]=]
 function RxTeamUtils.observePlayersForTeamBrio(team)
 	assert(typeof(team) == "Instance" and team:IsA("Team"), "Bad team")
 
@@ -39,6 +47,59 @@ function RxTeamUtils.observePlayersForTeamBrio(team)
 	end)
 end
 
+--[=[
+	Observes all enemy players for a team color
+
+	@param teamColor BrickColor
+	@return Observable<Brio<Player>>
+]=]
+function RxTeamUtils.observeEnemyTeamColorPlayersBrio(teamColor)
+	assert(typeof(teamColor) == "BrickColor", "Bad teamColor")
+
+	return Observable.new(function(sub)
+		local topMaid = Maid.new()
+
+		local function handlePlayerTeamChanged(playerMaid, player)
+			if player.Team and player.Team.TeamColor.Number == teamColor.Number then
+				playerMaid[player] = nil
+			else
+				local brio = Brio.new(player)
+				playerMaid[player] = brio
+				sub:Fire(brio)
+			end
+		end
+
+		local function handlePlayer(player)
+			local maid = Maid.new()
+
+			handlePlayerTeamChanged(maid, player)
+			maid:GiveTask(player:GetPropertyChangedSignal("Team"):Connect(function()
+				handlePlayerTeamChanged(maid, player)
+			end))
+
+			topMaid[player] = maid
+		end
+
+		topMaid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
+		topMaid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+			topMaid[player] = nil
+		end))
+
+		for _, player in pairs(Players:GetPlayers()) do
+			handlePlayer(player)
+		end
+
+		return topMaid
+	end)
+end
+
+
+--[=[
+	Observes all players for a team color (given they have a team)
+
+	@param teamColor BrickColor
+	@return Observable<Brio<Player>>
+]=]
 function RxTeamUtils.observePlayersForTeamColorBrio(teamColor)
 	assert(typeof(teamColor) == "BrickColor", "Bad teamColor")
 
@@ -47,10 +108,16 @@ function RxTeamUtils.observePlayersForTeamColorBrio(teamColor)
 		-- with the same color so no great solution here.
 		RxBrioUtils.switchMapBrio(function(team)
 			return RxTeamUtils.observePlayersForTeamBrio(team)
-		end)
+		end);
 	})
 end
 
+--[=[
+	Observes all teams for a given color
+
+	@param teamColor BrickColor
+	@return Observable<Brio<Team>>
+]=]
 function RxTeamUtils.observeTeamsForColorBrio(teamColor)
 	assert(typeof(teamColor) == "BrickColor", "Bad teamColor")
 
@@ -83,6 +150,11 @@ function RxTeamUtils.observeTeamsForColorBrio(teamColor)
 	end)
 end
 
+--[=[
+	Observes all teams in the game (In Teams service)
+
+	@return Observable<Brio<Team>>
+]=]
 function RxTeamUtils.observeTeamsBrio()
 	return Observable.new(function(sub)
 		local maid = Maid.new()

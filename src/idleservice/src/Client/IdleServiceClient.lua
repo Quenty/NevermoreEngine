@@ -10,15 +10,15 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 
-local HumanoidTrackerService = require("HumanoidTrackerService")
 local Maid = require("Maid")
 local RagdollBindersClient = require("RagdollBindersClient")
+local Rx = require("Rx")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local StateStack = require("StateStack")
 local ValueObject = require("ValueObject")
-local Rx = require("Rx")
 
 local IdleServiceClient = {}
+IdleServiceClient.ServiceName = "IdleServiceClient"
 
 local STANDING_TIME_REQUIRED = 0.5
 local MOVE_DISTANCE_REQUIRED = 2.5
@@ -35,11 +35,12 @@ function IdleServiceClient:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("RagdollServiceClient"))
-	self._humanoidTracker = self._serviceBag:GetService(HumanoidTrackerService):GetHumanoidTracker()
+	self._humanoidTracker = self._serviceBag:GetService(require("HumanoidTrackerService")):GetHumanoidTracker()
 	self._ragdollBindersClient = self._serviceBag:GetService(RagdollBindersClient)
 
-	self._disabledStack = StateStack.new(false)
-	self._maid:GiveTask(self._disabledStack)
+	-- Configure
+	self._disableStack = StateStack.new(false)
+	self._maid:GiveTask(self._disableStack)
 
 	self._enabled = Instance.new("BoolValue")
 	self._enabled.Value = true
@@ -71,8 +72,8 @@ function IdleServiceClient:Start()
 	self._maid:GiveTask(self._humanoidTracker.AliveHumanoid.Changed:Connect(function(...)
 		self:_handleAliveHumanoidChanged(...)
 	end))
-	self._maid:GiveTask(self._disabledStack.Changed:Connect(function()
-		self._enabled.Value = not self._disabledStack:GetState()
+	self._maid:GiveTask(self._disableStack.Changed:Connect(function()
+		self._enabled.Value = not self._disableStack:GetState()
 	end))
 
 	if self._humanoidTracker.AliveHumanoid.Value then
@@ -169,8 +170,8 @@ function IdleServiceClient:PushDisable()
 		return function() end
 	end
 
-	assert(self._disabledStack, "Not initialized")
-	return self._disabledStack:PushState(true)
+	assert(self._disableStack, "Not initialized")
+	return self._disableStack:PushState(true)
 end
 
 function IdleServiceClient:_setEnabled(enabled)
@@ -229,6 +230,10 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 	end))
 
 	self._maid._humanoidMaid = maid
+end
+
+function IdleServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return IdleServiceClient

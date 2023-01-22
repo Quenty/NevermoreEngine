@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@7.0.0...@quenty/transparencyservice@7.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/transparencyservice
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@6.0.1...@quenty/transparencyservice@7.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/transparencyservice
+
+
+
+
+
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@6.0.0...@quenty/transparencyservice@6.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/transparencyservice
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@5.1.0...@quenty/transparencyservice@6.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@5.0.0...@quenty/transparencyservice@5.1.0) (2022-07-02)
+
+
+### Bug Fixes
+
+* Can clean up services properly ([eb45e03](https://github.com/Quenty/NevermoreEngine/commit/eb45e03ce2897b18f1ae460974bf2bbb9e27cb97))
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@4.2.0...@quenty/transparencyservice@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/transparencyservice

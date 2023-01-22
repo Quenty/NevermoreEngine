@@ -1,6 +1,6 @@
 {
   "name": "@quenty/colorsequenceutils",
-  "version": "2.1.0",
+  "version": "3.1.1",
   "description": "Utility functions for Color sequences in Roblox.",
   "keywords": [
     "Roblox",
@@ -26,5 +26,9 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/math": "file:../math"
   }
 }

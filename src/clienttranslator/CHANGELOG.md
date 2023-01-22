@@ -3,6 +3,180 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.8.0...@quenty/clienttranslator@8.9.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.7.1...@quenty/clienttranslator@8.8.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+## [8.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.7.0...@quenty/clienttranslator@8.7.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.6.0...@quenty/clienttranslator@8.7.0) (2022-12-06)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.5.0...@quenty/clienttranslator@8.6.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.4.0...@quenty/clienttranslator@8.5.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.3.1...@quenty/clienttranslator@8.4.0) (2022-11-12)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+## [8.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.3.0...@quenty/clienttranslator@8.3.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.2.0...@quenty/clienttranslator@8.3.0) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.1.1...@quenty/clienttranslator@8.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.1.0...@quenty/clienttranslator@8.1.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.0.0...@quenty/clienttranslator@8.1.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* Fix package dependencies ([06467b6](https://github.com/Quenty/NevermoreEngine/commit/06467b6bcbea4f0e33f3ecd6ea56424850824aef))
+
+
+### Features
+
+* Add GetLocaleId() to JSONTranslator ([f149fbc](https://github.com/Quenty/NevermoreEngine/commit/f149fbc6c6e7b15928bfed2318dff762efabfc4d))
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@7.1.0...@quenty/clienttranslator@8.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@7.0.1...@quenty/clienttranslator@7.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@7.0.0...@quenty/clienttranslator@7.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.3.1...@quenty/clienttranslator@7.0.0) (2022-08-14)
+
+
+### Features
+
+* Add NumberLocalizationUtils based upon Roblox's localization code. ([89e75db](https://github.com/Quenty/NevermoreEngine/commit/89e75db2d1c69c2030568290195a5a9bbba5517a))
+
+
+
+
+
+## [6.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.3.0...@quenty/clienttranslator@6.3.1) (2022-08-11)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.2.1...@quenty/clienttranslator@6.3.0) (2022-07-31)
+
+
+### Features
+
+* Add ObserveLocaleId() to JSONTranslator ([b805a9e](https://github.com/Quenty/NevermoreEngine/commit/b805a9e2170623d17cc2a832ea78d867d829e094))
+
+
+
+
+
+## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.2.0...@quenty/clienttranslator@6.2.1) (2022-07-19)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.1.0...@quenty/clienttranslator@6.2.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@6.0.0...@quenty/clienttranslator@6.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/clienttranslator

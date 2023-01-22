@@ -1,4 +1,6 @@
 --[=[
+	Base class for player settings.
+
 	@class PlayerSettingsBase
 ]=]
 
@@ -8,13 +10,22 @@ local BaseObject = require("BaseObject")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local RxAttributeUtils = require("RxAttributeUtils")
 local SettingDefinition = require("SettingDefinition")
+local Rx = require("Rx")
+local DataStoreStringUtils = require("DataStoreStringUtils")
 
 local PlayerSettingsBase = setmetatable({}, BaseObject)
 PlayerSettingsBase.ClassName = "PlayerSettingsBase"
 PlayerSettingsBase.__index = PlayerSettingsBase
 
-function PlayerSettingsBase.new(obj, serviceBag)
-	local self = setmetatable(BaseObject.new(obj), PlayerSettingsBase)
+--[=[
+	Base class for player settings
+
+	@param folder Folder
+	@param serviceBag ServiceBag
+	@return PlayerSettingsBase
+]=]
+function PlayerSettingsBase.new(folder, serviceBag)
+	local self = setmetatable(BaseObject.new(folder), PlayerSettingsBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -45,13 +56,13 @@ end
 	@param defaultValue any
 	@return SettingProperty
 ]=]
-function PlayerSettingsBase:GetSetting(settingName, defaultValue)
+function PlayerSettingsBase:GetSettingProperty(settingName, defaultValue)
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
 
 	self:EnsureInitialized(settingName, defaultValue)
 
-	return SettingDefinition.new(settingName, defaultValue):Get(self._serviceBag, self:GetPlayer())
+	return SettingDefinition.new(settingName, defaultValue):GetSettingProperty(self._serviceBag, self:GetPlayer())
 end
 
 --[=[
@@ -64,12 +75,13 @@ end
 function PlayerSettingsBase:GetValue(settingName, defaultValue)
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
+	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 
 	local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
 	self:EnsureInitialized(settingName, defaultValue)
 
-	local value = self._obj:GetAttribute(attributeName)
+	local value = PlayerSettingsUtils.decodeForAttribute(self._obj:GetAttribute(attributeName))
 	if value == nil then
 		return defaultValue
 	end
@@ -86,10 +98,11 @@ end
 ]=]
 function PlayerSettingsBase:SetValue(settingName, value)
 	assert(type(settingName) == "string", "Bad settingName")
+	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 
 	local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
-	self._obj:SetAttribute(attributeName, value)
+	self._obj:SetAttribute(attributeName, PlayerSettingsUtils.encodeForAttribute(value))
 end
 
 --[=[
@@ -102,15 +115,28 @@ end
 function PlayerSettingsBase:ObserveValue(settingName, defaultValue)
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
+	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 
 	local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
 
 	self:EnsureInitialized(settingName, defaultValue)
 
 	return RxAttributeUtils.observeAttribute(self._obj, attributeName, defaultValue)
+		:Pipe({
+			Rx.map(PlayerSettingsUtils.decodeForAttribute)
+		})
 end
 
+--[=[
+	Restores the default value for the setting
+
+	@param settingName string
+	@param defaultValue T
+]=]
 function PlayerSettingsBase:RestoreDefault(settingName, defaultValue)
+	assert(type(settingName) == "string", "Bad settingName")
+	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
+
 	-- TODO: Maybe something more sophisticated?
 	self:SetValue(settingName, defaultValue)
 end
@@ -124,6 +150,7 @@ end
 function PlayerSettingsBase:EnsureInitialized(settingName, defaultValue)
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "defaultValue cannot be nil")
+	assert(DataStoreStringUtils.isValidUTF8(settingName), "Bad settingName")
 
 	-- noop
 end

@@ -1,0 +1,11 @@
+{
+  "name": "RadialImageTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "radial-image": {
+        "$path": ".."
+      }
+    }
+  }
+}

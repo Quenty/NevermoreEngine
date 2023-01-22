@@ -39,6 +39,7 @@
 ]=]
 
 local NetworkOwnerService = {}
+NetworkOwnerService.ServiceName = "NetworkOwnerService"
 
 local WEAK_METATABLE = { __mode = "kv" }
 

@@ -1,5 +1,15 @@
 --[=[
 	Utility function that loads a translator from a folder or a table.
+
+	To get translations uploaded.
+
+	1. Run the game
+	2. On the client, check LocalizationService.GeneratedJSONTable
+	3. Right click > Save as CSV
+	4. Stop the game
+	5. In Studio, go to plugins > "Localization Tools"
+	6. Upload the CSV (update)
+
 	@class JSONTranslator
 ]=]
 
@@ -16,16 +26,18 @@ local Observable = require("Observable")
 local Maid = require("Maid")
 local Blend = require("Blend")
 local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
+JSONTranslator.ServiceName = "JSONTranslator"
 JSONTranslator.__index = JSONTranslator
 
 --[=[
 	Constructs a new JSONTranslator from the given args.
 
 	```lua
-	local translator = JSONTranslator.new("en", {
+	local translator = JSONTranslator.new("MyTranslator", en", {
 		actions = {
 			respawn = "Respawn {playerName}";
 		};
@@ -39,14 +51,18 @@ JSONTranslator.__index = JSONTranslator
 	-- assume there is an `en.json` underneath the script with valid JSON.
 	```
 
+	@param translatorName string -- Name of the translator. Used for source.
 	@param ... any
 	@return JSONTranslator
 ]=]
-function JSONTranslator.new(...)
+function JSONTranslator.new(translatorName, ...)
 	local self = setmetatable({}, JSONTranslator)
 
+	assert(type(translatorName) == "string", "Bad translatorName")
+	self.ServiceName = translatorName
+
 	-- Cache localizaiton table, because it can take 10-20ms to load.
-	self._localizationTable = JsonToLocalizationTable.toLocalizationTable(...)
+	self._localizationTable = JsonToLocalizationTable.toLocalizationTable(translatorName, ...)
 	self._englishTranslator = self._localizationTable:GetTranslator("en")
 	self._fallbacks = {}
 
@@ -63,6 +79,39 @@ function JSONTranslator.new(...)
 	return self
 end
 
+--[=[
+	Observes the current locale id for this translator.
+
+	@return Observable<string>
+]=]
+function JSONTranslator:ObserveLocaleId()
+	return Rx.fromPromise(self._promiseTranslator):Pipe({
+		Rx.switchMap(function(translator)
+			return RxInstanceUtils.observeProperty(translator, "LocaleId")
+		end)
+	})
+end
+
+--[=[
+	Gets the current localeId of the translator if it's initialized, or a default if it is not.
+
+	@return string
+]=]
+function JSONTranslator:GetLocaleId()
+	if self._promiseTranslator:IsFulfilled() then
+		local translator = self._promiseTranslator:Wait()
+		return translator.LocaleId
+	else
+		warn("[JSONTranslator] - Translator is not loaded yet, returning english")
+		return "en"
+	end
+end
+
+--[=[
+	Gets the localization table the translation is using.
+
+	@return LocalizaitonTable
+]=]
 function JSONTranslator:GetLocalizationTable()
 	return self._localizationTable
 end
@@ -91,6 +140,12 @@ end
 
 --[=[
 	Formats the resulting entry by args.
+
+	:::tip
+	You should use [JSONTranslator.ObserveFormatByKey] instead of this to respond
+	to locale changing.
+	:::
+
 	@param key string
 	@param args table?
 	@return Promise<string>
@@ -145,6 +200,12 @@ end
 
 --[=[
 	Formats or errors if the cloud translations are not loaded.
+
+	:::tip
+	You should use [JSONTranslator.ObserveFormatByKey] instead of this to respond
+	to locale changing.
+	:::
+
 	@param key string
 	@param args table?
 	@return string

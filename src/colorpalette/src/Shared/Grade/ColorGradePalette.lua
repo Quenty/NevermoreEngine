@@ -9,6 +9,7 @@ local Rx = require("Rx")
 local Blend = require("Blend")
 local Observable = require("Observable")
 local ValueObject = require("ValueObject")
+local ColorGradeUtils = require("ColorGradeUtils")
 
 local ColorGradePalette = setmetatable({}, BaseObject)
 ColorGradePalette.ClassName = "ColorGradePalette"
@@ -121,6 +122,8 @@ function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
 		Rx.map(function(state)
 			assert(type(state.grade) == "number", "Bad state.grade")
 			assert(type(state.amount) == "number", "Bad state.amount")
+			assert(type(state.multiplier) == "number", "Bad state.multiplier")
+
 			return state.grade + state.multiplier*state.amount
 		end);
 	})
@@ -132,6 +135,7 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 		observeBaseSurfaceGrade = self:ObserveDefaultSurfaceGrade()
 	else
 		observeBaseSurfaceGrade = self:_observeGradeFromName(baseSurfaceName)
+		assert(observeBaseSurfaceGrade, "Bad baseSurfaceName")
 	end
 
 	return Rx.combineLatest({
@@ -161,16 +165,26 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 end
 
 function ColorGradePalette:_observeGradeFromName(gradeName)
-	if Observable.isObservable(gradeName) then
+	if typeof(gradeName) == "Color3" then
+		return Rx.of(ColorGradeUtils.getGrade(gradeName))
+	elseif Observable.isObservable(gradeName) then
 		return gradeName
 	end
 
 	local gradeObservable = self._grades[gradeName]
-	if not gradeObservable then
-		error(("No grade for gradeName %q"):format(tostring(gradeName)))
+	if gradeObservable then
+		return gradeObservable
 	end
 
-	return gradeObservable
+	-- Support custom colors passed in here
+	local colorOrObservable = Blend.toPropertyObservable(gradeName)
+	if colorOrObservable then
+		return colorOrObservable:Pipe({
+			Rx.map(ColorGradeUtils.getGrade)
+		})
+	end
+
+	error(("No grade for gradeName %q"):format(tostring(gradeName)))
 end
 
 function ColorGradePalette:ObserveDefaultSurfaceGrade()

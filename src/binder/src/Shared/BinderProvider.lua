@@ -6,9 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
+local Maid = require("Maid")
 
 local BinderProvider = {}
 BinderProvider.ClassName = "BinderProvider"
+BinderProvider.ServiceName = "BinderProvider"
 BinderProvider.__index = BinderProvider
 
 --[=[
@@ -18,7 +20,7 @@ BinderProvider.__index = BinderProvider
 	local serviceBag = ServiceBag.new()
 
 	-- Usually in a separate file!
-	local binderProvider = BinderProvider.new(function(self, serviceBag)
+	local binderProvider = BinderProvider.new("BirdBinders", function(self, serviceBag)
 		serviceBag:Add(Binder.new("Bird", require("Bird")))
 	end)
 
@@ -30,11 +32,24 @@ BinderProvider.__index = BinderProvider
 	serviceBag:Start()
 	```
 
+	@param serviceName string -- Name of the service (used for memory tracking)
 	@param initMethod (self, serviceBag: ServiceBag)
 	@return BinderProvider
 ]=]
-function BinderProvider.new(initMethod)
+function BinderProvider.new(serviceName, initMethod)
 	local self = setmetatable({}, BinderProvider)
+
+	if type(serviceName) == "string" then
+		self.ServiceName = serviceName
+	else
+		-- Backwords compatibility (for now)
+		if type(serviceName) == "function" and initMethod == nil then
+			warn("[BinderProvider] - Missing serviceName for binder provider. Please pass in a service name as the first argument.")
+			initMethod = serviceName
+		else
+			error("Bad serviceName")
+		end
+	end
 
 	self._initMethod = initMethod or error("No initMethod")
 	self._initialized = false
@@ -87,14 +102,20 @@ end
 function BinderProvider:Init(...)
 	assert(not self._initialized, "Already initialized")
 
+	self._maid = Maid.new()
+
 	self._binders = {}
 	self._initialized = true
 
 	-- Pretty sure this is a bad idea
 	self._bindersAddedPromise = Promise.new()
+	self._maid:GiveTask(self._bindersAddedPromise)
+
 	self._startPromise = Promise.new()
+	self._maid:GiveTask(self._startPromise)
 
 	self._initMethod(self, ...)
+
 	self._bindersAddedPromise:Resolve()
 end
 
@@ -161,6 +182,15 @@ function BinderProvider:Add(binder)
 
 	table.insert(self._binders, binder)
 	self[binder:GetTag()] = binder
+end
+
+function BinderProvider:Destroy()
+	for _, item in pairs(self._binders) do
+		rawset(self, item:GetTag(), nil)
+	end
+
+	self._maid:DoCleaning()
+	self._binders = nil
 end
 
 return BinderProvider

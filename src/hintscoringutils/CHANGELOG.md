@@ -3,6 +3,145 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.7.0...@quenty/hintscoringutils@9.8.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [9.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.6.0...@quenty/hintscoringutils@9.7.0) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.5.0...@quenty/hintscoringutils@9.6.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* Scoring respects humanoid angle much more than distance, which allows for better control in close trigger scenarios. ([5c628de](https://github.com/Quenty/NevermoreEngine/commit/5c628de08208bacb28d330a280c040cee551dfe0))
+
+
+
+
+
+# [9.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.4.0...@quenty/hintscoringutils@9.5.0) (2022-11-19)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.3.1...@quenty/hintscoringutils@9.4.0) (2022-11-12)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+## [9.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.3.0...@quenty/hintscoringutils@9.3.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.2.0...@quenty/hintscoringutils@9.3.0) (2022-10-30)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.1.1...@quenty/hintscoringutils@9.2.0) (2022-10-23)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.1.0...@quenty/hintscoringutils@9.1.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@9.0.0...@quenty/hintscoringutils@9.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@8.1.0...@quenty/hintscoringutils@9.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@8.0.1...@quenty/hintscoringutils@8.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+## [8.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@8.0.0...@quenty/hintscoringutils@8.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@7.3.1...@quenty/hintscoringutils@8.0.0) (2022-08-14)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+## [7.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@7.3.0...@quenty/hintscoringutils@7.3.1) (2022-08-01)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@7.2.0...@quenty/hintscoringutils@7.3.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@7.1.0...@quenty/hintscoringutils@7.2.0) (2022-07-02)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+
+
+
+
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@7.0.0...@quenty/hintscoringutils@7.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/hintscoringutils

@@ -1,6 +1,49 @@
 --[=[
 	DataStore manager for player that automatically saves on player leave and game close.
 
+	:::tip
+	Consider using [PlayerDataStoreService] instead, which wraps one PlayerDataStoreManager.
+	:::
+
+	This will ensure that the datastores are reused between different services and other things integrating
+	with Nevermore.
+
+	```lua
+	local serviceBag = ServiceBag.new()
+	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
+
+	serviceBag:Init()
+	serviceBag:Start()
+
+	local topMaid = Maid.new()
+
+	local function handlePlayer(player)
+		local maid = Maid.new()
+
+		local playerMoneyValue = Instance.new("IntValue")
+		playerMoneyValue.Name = "Money"
+		playerMoneyValue.Value = 0
+		playerMoneyValue.Parent = player
+
+		maid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)
+			maid:GivePromise(dataStore:Load("money", 0))
+				:Then(function(money)
+					playerMoneyValue.Value = money
+					maid:GiveTask(dataStore:StoreOnValueChange("money", playerMoneyValue))
+				end)
+		end)
+
+		topMaid[player] = maid
+	end
+	Players.PlayerAdded:Connect(handlePlayer)
+	Players.PlayerRemoving:Connect(function(player)
+		topMaid[player] = nil
+	end)
+	for _, player in pairs(Players:GetPlayers()) do
+		task.spawn(handlePlayer, player)
+	end
+	```
+
 	@server
 	@class PlayerDataStoreManager
 ]=]
@@ -23,12 +66,16 @@ PlayerDataStoreManager.__index = PlayerDataStoreManager
 
 --[=[
 	Constructs a new PlayerDataStoreManager.
+
 	@param robloxDataStore DataStore
 	@param keyGenerator (player) -> string -- Function that takes in a player, and outputs a key
+	@param skipBindingToClose boolean?
 	@return PlayerDataStoreManager
 ]=]
-function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
+function PlayerDataStoreManager.new(robloxDataStore, keyGenerator, skipBindingToClose)
 	local self = setmetatable(BaseObject.new(), PlayerDataStoreManager)
+
+	assert(type(skipBindingToClose) == "boolean" or skipBindingToClose == nil, "Bad skipBindingToClose")
 
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 	self._keyGenerator = keyGenerator or error("No keyGenerator")
@@ -48,13 +95,15 @@ function PlayerDataStoreManager.new(robloxDataStore, keyGenerator)
 		self:_removePlayerDataStore(player)
 	end))
 
-	game:BindToClose(function()
-		if self._disableSavingInStudio then
-			return
-		end
+	if skipBindingToClose ~= true then
+		game:BindToClose(function()
+			if self._disableSavingInStudio then
+				return
+			end
 
-		self:PromiseAllSaves():Wait()
-	end)
+			self:PromiseAllSaves():Wait()
+		end)
+	end
 
 	return self
 end

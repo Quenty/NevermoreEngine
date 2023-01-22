@@ -22,3 +22,13 @@ npm install @quenty/tie --save
 
 ## Design philosophy
 This package does two things. First of all, it basically automates the creation of interfaced definitions, that is, tying a Lua object to BindableEvent/BindableFunction definitions. Second of all, it lets objects be centralized as an interface definition.
+
+## Changes to make
+
+1. Ensure tie properties can be attributes
+1. Allow tie functions instead of methods
+1. Add tie library as a primary interface (less OOP)
+1. Ensure you can ad-hoc create a tie (low-level scripting)
+1. Support tagged ties with
+1. Ensure ties can be queried via CollectionService
+1. Allow client implementation of server-based ties

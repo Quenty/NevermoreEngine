@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@4.0.0...@quenty/numbersequenceutils@4.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/numbersequenceutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@3.1.0...@quenty/numbersequenceutils@4.0.0) (2022-09-27)
+
+
+### Features
+
+* Add NumberSequenceUtils.getValueGenerator ([6d79a5c](https://github.com/Quenty/NevermoreEngine/commit/6d79a5cd5d7d42b945064d1b9666048378bc5585))
+
+
+
+
+
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@3.0.0...@quenty/numbersequenceutils@3.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/numbersequenceutils

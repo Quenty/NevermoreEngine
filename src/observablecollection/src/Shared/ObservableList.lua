@@ -124,6 +124,32 @@ function ObservableList:ObserveIndex(indexToObserve)
 end
 
 --[=[
+	Removes the first instance found in contents
+
+	@param value T
+	@return boolean
+]=]
+function ObservableList:RemoveFirst(value)
+	for key, item in pairs(self._contents) do
+		if item == value then
+			self:RemoveByKey(key)
+			return true
+		end
+	end
+
+	return false
+end
+
+--[=[
+	Returns an IntValue that represents the CountValue
+
+	@return IntValue
+]=]
+function ObservableList:GetCountValue()
+	return self._countValue
+end
+
+--[=[
 	Observes the index as it changes, until the entry at the existing
 	key is removed.
 
@@ -131,7 +157,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableList:ObserveIndexByKey(key)
-	assert(key, "Bad key")
+	assert(type(key) == "userdata", "Bad key")
 
 	return Observable.new(function(sub)
 		local currentIndex = self._indexes[key]
@@ -266,17 +292,16 @@ function ObservableList:InsertAt(item, index)
 
 	-- Fire off the index change on the value
 	do
-		local list = self._keyObservables[key]
-		if list then
-			self._keyObservables[key] = nil
-
-			for _, sub in pairs(list) do
-				if sub:IsPending() then
-					sub:Fire(index)
-				end
-			end
+		local subs = self._keyObservables[key]
+		if subs then
+			table.insert(changed, {
+				key = key;
+				newIndex = index;
+				subs = subs;
+			})
 		end
 	end
+
 
 	-- Fire off index change on each key list (if the data isn't stale)
 	for _, data in pairs(changed) do
@@ -322,7 +347,7 @@ function ObservableList:RemoveByKey(key)
 	end
 
 	local item = self._contents[key]
-	if not item then
+	if item == nil then
 		return nil
 	end
 

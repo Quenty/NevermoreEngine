@@ -3,6 +3,93 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.3.0...@quenty/servicebag@6.4.0) (2022-12-06)
+
+
+### Bug Fixes
+
+* Add serviceName in error message in ServiceBag ([c3809fb](https://github.com/Quenty/NevermoreEngine/commit/c3809fb6a1377e0a8cec2ef3be3ac2a124fbc247))
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.2.0...@quenty/servicebag@6.3.0) (2022-11-19)
+
+
+### Bug Fixes
+
+* Fix service bag deconstruction ([11d7cc9](https://github.com/Quenty/NevermoreEngine/commit/11d7cc973195d6462b83c87cd96fadb752037880))
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.1.1...@quenty/servicebag@6.2.0) (2022-11-12)
+
+
+### Features
+
+* Binder provider now provides name for debugging ([72d547e](https://github.com/Quenty/NevermoreEngine/commit/72d547ea47358dfab1128dd076723f5a1a0d9fd8))
+
+
+
+
+
+## [6.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.1.0...@quenty/servicebag@6.1.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.0.0...@quenty/servicebag@6.1.0) (2022-10-30)
+
+
+### Features
+
+* Add better errors to ServiceBag ([387dd9a](https://github.com/Quenty/NevermoreEngine/commit/387dd9ac9d669094628598f05ee7a5d2f91d66c3))
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@5.2.0...@quenty/servicebag@6.0.0) (2022-09-27)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@5.1.1...@quenty/servicebag@5.2.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@5.1.0...@quenty/servicebag@5.1.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@5.0.0...@quenty/servicebag@5.1.0) (2022-07-31)
+
+
+### Bug Fixes
+
+* Ensure deconstructing service does not affect other services ([9ac2b9c](https://github.com/Quenty/NevermoreEngine/commit/9ac2b9c2ea4c1a68677182fd77103fcd0b5c6864))
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@4.2.0...@quenty/servicebag@5.0.0) (2022-05-21)
 
 

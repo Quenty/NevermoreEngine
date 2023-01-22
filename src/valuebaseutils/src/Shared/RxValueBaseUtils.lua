@@ -45,7 +45,8 @@ function RxValueBaseUtils.observeBrio(parent, className, name)
 		:Pipe({
 			RxBrioUtils.switchMapBrio(function(valueObject)
 				return RxValueBaseUtils.observeValue(valueObject)
-			end)
+			end),
+			RxBrioUtils.onlyLastBrioSurvives(),
 		})
 end
 

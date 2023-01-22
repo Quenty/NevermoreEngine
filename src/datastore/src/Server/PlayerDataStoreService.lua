@@ -13,6 +13,7 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 
 local PlayerDataStoreService = {}
+PlayerDataStoreService.ServiceName = "PlayerDataStoreService"
 
 --[=[
 	Initializes the PlayerDataStoreService. Should be done via [ServiceBag.Init].
@@ -22,6 +23,10 @@ function PlayerDataStoreService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
+
+	-- External
+	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+
 	self._started = Promise.new()
 	self._maid:GiveTask(self._started)
 
@@ -113,12 +118,23 @@ function PlayerDataStoreService:PromiseManager()
 				dataStore,
 				function(player)
 					return tostring(player.UserId)
-				end)
+				end,
+				true)
+
+			-- A lot safer if we're hot reloading or need to monitor bind to close calls
+			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
+				return manager:PromiseAllSaves()
+			end))
+
 			self._maid:GiveTask(manager)
 			return manager
 		end)
 
 	return self._dataStoreManagerPromise
+end
+
+function PlayerDataStoreService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return PlayerDataStoreService

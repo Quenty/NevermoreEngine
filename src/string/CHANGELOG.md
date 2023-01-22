@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@2.3.0...@quenty/string@3.0.0) (2022-08-14)
+
+
+### Features
+
+* Add seperator parameter to String library which allows comma seperator to be specified ([4bd70ae](https://github.com/Quenty/NevermoreEngine/commit/4bd70aefd30fb06447f0175a8ff94745bb1444c4))
+
+
+
+
+
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@2.2.1...@quenty/string@2.3.0) (2022-03-27)
 
 

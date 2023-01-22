@@ -5,25 +5,53 @@
 	@class RaycastUtils
 ]=]
 
+local Workspace = game:GetService("Workspace")
+
 local RaycastUtils = {}
 
---works for non-convex
---assumes non-selfintersecting
---what is the first exit along this line segment?
+--[=[
+	What is the first exit along this line segment?
+
+	* Works for non-convex
+	* Assumes non-selfintersecting
+
+	@param origin Vector3
+	@param direction Vector3
+	@param part BasePart
+	@return RaycastResult
+]=]
 function RaycastUtils.raycastSingleExit(origin, direction, part)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Whitelist
 	params.FilterDescendantsInstances = {part}
 
-	local resultFinal = workspace:Raycast(origin + direction, -direction, params)
+	local resultFinal = Workspace:Raycast(origin + direction, -direction, params)
 
 	return resultFinal
 end
 
+--[=[
+	Ignore function that ignores can collide false parts.
+
+	@param part BasePart
+	@return boolean
+]=]
 function RaycastUtils.ignoreCanCollideFalse(part)
 	return not part.CanCollide
 end
 
+--[=[
+	Raycasts from a given point and repeatedly raycasts until the ignore function
+	does not apply.
+
+	@param origin Vector3
+	@param direction Vector3
+	@param ignoreListWorkingEnvironment { Instance }
+	@param ignoreFunc callback
+	@param keepIgnoreListChanges boolean?
+	@param ignoreWater boolean?
+	@return RaycastResult
+]=]
 function RaycastUtils.raycast(
 	origin, direction,
 	ignoreListWorkingEnvironment,
@@ -38,7 +66,7 @@ function RaycastUtils.raycast(
 	params.IgnoreWater = ignoreWater and true or false
 
 	while true do
-		local result = workspace:Raycast(origin, direction, params)
+		local result = Workspace:Raycast(origin, direction, params)
 		if ignoreFunc and result and ignoreFunc(result.Instance) then
 			table.insert(ignoreListWorkingEnvironment, result.Instance)
 			params.FilterDescendantsInstances = ignoreListWorkingEnvironment

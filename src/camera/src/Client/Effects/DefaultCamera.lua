@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local HttpService = game:GetService("HttpService")
 
 local CameraState = require("CameraState")
 local SummedCamera = require("SummedCamera")
@@ -25,6 +26,7 @@ DefaultCamera.ClassName = "DefaultCamera"
 function DefaultCamera.new()
 	local self = setmetatable({}, DefaultCamera)
 
+	self._key = HttpService:GenerateGUID(false)
 	self._cameraState = CameraState.new(Workspace.CurrentCamera)
 
 	return self
@@ -54,11 +56,11 @@ end
 	:::
 ]=]
 function DefaultCamera:BindToRenderStep()
-	RunService:BindToRenderStep("DefaultCamera_Preupdate", Enum.RenderPriority.Camera.Value-2, function()
+	RunService:BindToRenderStep("DefaultCamera_Preupdate" .. self._key, Enum.RenderPriority.Camera.Value-2, function()
 		self._cameraState:Set(Workspace.CurrentCamera)
 	end)
 
-	RunService:BindToRenderStep("DefaultCamera_PostUpdate", Enum.RenderPriority.Camera.Value+2, function()
+	RunService:BindToRenderStep("DefaultCamera_PostUpdate" .. self._key, Enum.RenderPriority.Camera.Value+2, function()
 		self._cameraState = CameraState.new(Workspace.CurrentCamera)
 	end)
 
@@ -69,8 +71,15 @@ end
 	Unbinds the camera from the RunService
 ]=]
 function DefaultCamera:UnbindFromRenderStep()
-	RunService:UnbindFromRenderStep("DefaultCamera_Preupdate")
-	RunService:UnbindFromRenderStep("DefaultCamera_PostUpdate")
+	RunService:UnbindFromRenderStep("DefaultCamera_Preupdate" .. self._key)
+	RunService:UnbindFromRenderStep("DefaultCamera_PostUpdate" .. self._key)
+end
+
+--[=[
+	Cleans up the binding
+]=]
+function DefaultCamera:Destroy()
+	self:UnbindFromRenderStep()
 end
 
 --[=[

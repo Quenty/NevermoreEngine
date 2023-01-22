@@ -7,16 +7,18 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local InputKeyMapList = require("InputKeyMapList")
-local Set = require("Set")
+local InputKeyMapListUtils = require("InputKeyMapListUtils")
 local Rx = require("Rx")
+local Set = require("Set")
 
 local InputListScoreHelper = setmetatable({}, BaseObject)
 InputListScoreHelper.ClassName = "InputListScoreHelper"
 InputListScoreHelper.__index = InputListScoreHelper
 
-function InputListScoreHelper.new(provider, scoredAction, inputKeyMapList)
+function InputListScoreHelper.new(serviceBag, provider, scoredAction, inputKeyMapList)
 	local self = setmetatable(BaseObject.new(), InputListScoreHelper)
 
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._provider = assert(provider, "No provider")
 	self._scoredAction = assert(scoredAction, "No scoredAction")
 	self._inputKeyMapList = assert(inputKeyMapList, "No inputKeyMapList")
@@ -25,7 +27,7 @@ function InputListScoreHelper.new(provider, scoredAction, inputKeyMapList)
 
 	self._currentTypes = {}
 
-	self._maid:GiveTask(self._inputKeyMapList:ObserveActiveInputKeyMap():Pipe({
+	self._maid:GiveTask(InputKeyMapListUtils.observeActiveInputKeyMap(self._inputKeyMapList, self._serviceBag):Pipe({
 		Rx.switchMap(function(activeInputKeyMap)
 			if activeInputKeyMap then
 				return activeInputKeyMap:ObserveInputTypesList()

@@ -156,19 +156,36 @@ function ServiceBag:Start()
 	while next(self._serviceTypesToStart) do
 		local serviceType = table.remove(self._serviceTypesToStart)
 		local service = assert(self._services[serviceType], "No service")
+		local serviceName = self:_getServiceName(serviceType)
 
 		if service.Start then
 			local current
 			task.spawn(function()
+				debug.setmemorycategory(serviceName)
 				current = coroutine.running()
 				service:Start()
 			end)
 
-			assert(coroutine.status(current) == "dead", "Starting service yielded")
+			local isDead = coroutine.status(current) == "dead"
+			if not isDead then
+				error(("Starting service %q yielded"):format(serviceName))
+			end
 		end
 	end
 
 	self._serviceTypesToStart = nil
+end
+
+function ServiceBag:_getServiceName(serviceType)
+	local serviceName
+	pcall(function()
+		serviceName = serviceType.ServiceName
+	end)
+	if type(serviceName) == "string" then
+		return serviceName
+	end
+
+	return tostring(serviceType)
 end
 
 --[=[
@@ -202,7 +219,7 @@ end
 -- Adds a service to this provider only
 function ServiceBag:_addServiceType(serviceType)
 	if not self._serviceTypesToInitializeSet then
-		error(("Already finished initializing, cannot add %q"):format(tostring(serviceType)))
+		error(("Already finished initializing, cannot add %q"):format(self:_getServiceName(serviceType)))
 		return
 	end
 
@@ -230,21 +247,27 @@ function ServiceBag:_ensureInitialization(serviceType)
 	elseif self._serviceTypesToInitializeSet then
 		self._serviceTypesToInitializeSet[serviceType] = true
 	else
-		error("[ServiceBag._ensureInitialization] - Cannot initialize past initializing phase ")
+		local serviceName = self:_getServiceName(serviceType)
+		error(string.format("Cannot initialize service %q past initializing phase", serviceName))
 	end
 end
 
 function ServiceBag:_initService(serviceType)
 	local service = assert(self._services[serviceType], "No service")
+	local serviceName = self:_getServiceName(serviceType)
 
 	if service.Init then
 		local current
 		task.spawn(function()
+			debug.setmemorycategory(serviceName)
 			current = coroutine.running()
 			service:Init(self)
 		end)
 
-		assert(coroutine.status(current) == "dead", "Initializing service yielded")
+		local isDead = coroutine.status(current) == "dead"
+		if not isDead then
+			error(("Initializing service %q yielded"):format(serviceName))
+		end
 	end
 
 	table.insert(self._serviceTypesToStart, serviceType)
@@ -263,8 +286,13 @@ function ServiceBag:Destroy()
 	local key, service = next(services)
 	while service ~= nil do
 		services[key] = nil
-		if service.Destroy then
-			service:Destroy()
+
+		if not (self._serviceTypesToInitializeSet and self._serviceTypesToInitializeSet[key]) then
+			task.spawn(function()
+				if service.Destroy then
+					service:Destroy()
+				end
+			end)
 		end
 		key, service = next(services)
 	end

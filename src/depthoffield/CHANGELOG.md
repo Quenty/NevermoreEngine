@@ -3,6 +3,108 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.3.0...@quenty/depthoffield@5.4.0) (2023-01-11)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.2.1...@quenty/depthoffield@5.3.0) (2023-01-01)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+## [5.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.2.0...@quenty/depthoffield@5.2.1) (2022-12-27)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.1.2...@quenty/depthoffield@5.2.0) (2022-12-05)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+## [5.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.1.1...@quenty/depthoffield@5.1.2) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.1.0...@quenty/depthoffield@5.1.1) (2022-10-16)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.0.0...@quenty/depthoffield@5.1.0) (2022-10-11)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@4.1.0...@quenty/depthoffield@5.0.0) (2022-09-27)
+
+
+### Features
+
+* Support near and far intensity in depth of field tweener ([9dcb826](https://github.com/Quenty/NevermoreEngine/commit/9dcb826d1d621859637311e5493605c8b3b5242e))
+
+
+
+
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@4.0.1...@quenty/depthoffield@4.1.0) (2022-08-22)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@4.0.0...@quenty/depthoffield@4.0.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@3.2.0...@quenty/depthoffield@4.0.0) (2022-08-14)
+
+
+### Features
+
+* Add ServiceName to most services for faster debugging ([39fc3f4](https://github.com/Quenty/NevermoreEngine/commit/39fc3f4f2beb92fff49b2264424e07af7907324e))
+
+
+
+
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@3.1.0...@quenty/depthoffield@3.2.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@3.0.0...@quenty/depthoffield@3.1.0) (2022-06-21)
 
 **Note:** Version bump only for package @quenty/depthoffield

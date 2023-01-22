@@ -1,12 +1,12 @@
 {
   "name": "@quenty/particleengine",
-  "version": "5.1.0",
+  "version": "7.1.1",
   "description": "Adds GUI based particle engine to Roblox",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "optional"
+    "ParticleEngine"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/optional/"
+    "directory": "src/particleengine/"
   },
   "funding": {
     "type": "patreon",

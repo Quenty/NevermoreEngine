@@ -10,14 +10,15 @@ local require = require(script.Parent.loader).load(script)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
+local Maid = require("Maid")
+local PermissionServiceClient = require("PermissionServiceClient")
+local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
-local PermissionServiceClient = require("PermissionServiceClient")
-local Maid = require("Maid")
 local String = require("String")
-local Promise = require("Promise")
 
 local CmdrServiceClient = {}
+CmdrServiceClient.ServiceName = "CmdrServiceClient"
 
 --[=[
 	Starts the cmdr service on the client. Should be done via [ServiceBag].
@@ -28,7 +29,48 @@ function CmdrServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._maid = Maid.new()
-	self._permissionService = serviceBag:GetService(PermissionServiceClient)
+	self._permissionServiceClient = self._serviceBag:GetService(PermissionServiceClient)
+
+	self:PromiseCmdr():Then(function(cmdr)
+		cmdr.Registry:RegisterHook("BeforeRun", function(context)
+			-- allow!
+			if context.Executor == nil then
+				return nil
+			end
+
+			local providerPromise = self._permissionServiceClient:PromisePermissionProvider()
+			if providerPromise:IsPending() then
+				return "Still loading permissions"
+			end
+
+			local ok, provider = providerPromise:Yield()
+			if not ok then
+				if type(provider) == "string" then
+					return provider
+				else
+					return "Failed to load permission provider"
+				end
+			end
+
+			local isAdmin
+			ok, isAdmin = provider:PromiseIsAdmin(context.Executor):Yield()
+			if not ok then
+				if type(provider) == "string" then
+					return provider
+				else
+					return "Failed to load permission provider"
+				end
+			end
+
+			if not isAdmin then
+				return "You don't have permission to run this command"
+			else
+				-- allow
+				return nil
+			end
+		end)
+
+	end)
 end
 
 --[=[
@@ -39,7 +81,7 @@ function CmdrServiceClient:Start()
 
 	self._maid:GivePromise(PromiseUtils.all({
 		self:PromiseCmdr(),
-		self._maid:GivePromise(self._permissionService:PromisePermissionProvider())
+		self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider())
 			:Then(function(provider)
 				return provider:PromiseIsAdmin()
 			end)
@@ -64,8 +106,11 @@ function CmdrServiceClient:_setBindings(cmdr)
 		end
 	end))
 
-	-- Default blink for debugging purposes
-	cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
+	-- Race condition
+	task.defer(function()
+		-- Default blink for debugging purposes
+		cmdr.Dispatcher:Run("bind", Enum.KeyCode.G.Name, "blink")
+	end)
 end
 
 --[=[
@@ -86,8 +131,13 @@ function CmdrServiceClient:PromiseCmdr()
 				return resolve(require(cmdClient))
 			end)
 		end)
+	self._maid:GiveTask(self._cmdrPromise)
 
 	return self._cmdrPromise
+end
+
+function CmdrServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return CmdrServiceClient

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterutils@6.0.0...@quenty/textfilterutils@6.0.1) (2022-11-04)
+
+**Note:** Version bump only for package @quenty/textfilterutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterutils@5.1.1...@quenty/textfilterutils@6.0.0) (2022-09-27)
+
+
+### Features
+
+* Add TextFilterUtils.hasNonFilteredText() ([30808b9](https://github.com/Quenty/NevermoreEngine/commit/30808b9f267abdefd4178bd0d39747f6ebd88877))
+
+
+
+
+
+## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterutils@5.1.0...@quenty/textfilterutils@5.1.1) (2022-08-16)
+
+**Note:** Version bump only for package @quenty/textfilterutils
+
+
+
+
+
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterutils@5.0.0...@quenty/textfilterutils@5.1.0) (2022-07-31)
+
+**Note:** Version bump only for package @quenty/textfilterutils
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterutils@4.2.0...@quenty/textfilterutils@5.0.0) (2022-05-21)
 
 **Note:** Version bump only for package @quenty/textfilterutils

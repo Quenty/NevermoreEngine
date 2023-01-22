@@ -3,9 +3,90 @@
 	@class NumberSequenceUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local Math = require("Math")
+
 local NumberSequenceUtils = {}
 
 local EPSILON = 1e-3
+
+--[=[
+	Gets the current NumberSequence value for a given t
+
+	@param numberSequence NumberSequence
+	@return (number) -> number
+]=]
+function NumberSequenceUtils.getValueGenerator(numberSequence: NumberSequence): number
+	assert(typeof(numberSequence) == "NumberSequence", "Bad numberSequence")
+
+	-- TODO: Binary search
+	local keypoints = numberSequence.Keypoints
+	if #keypoints == 1 then
+		local keypoint = keypoints[1]
+		if keypoint.Envelope == 0 then
+			return function(t)
+				assert(type(t) == "number", "Bad t")
+
+				return keypoint.Value
+			end
+		else
+			return function(t)
+				assert(type(t) == "number", "Bad t")
+
+				return keypoint.Value + (math.random()-0.5)*keypoint.Envelope
+			end
+		end
+	elseif #keypoints == 2 then
+		local first = keypoints[1]
+		local second = keypoints[2]
+
+		if first.Value == second.Value and first.Envelope == 0 and second.Envelope == 0 then
+			return function(t)
+				assert(type(t) == "number", "Bad t")
+
+				return first.Value
+			end
+		else
+			local firstValue = first.Value + (math.random() - 0.5)*first.Envelope
+			local secondValue = second.Value + (math.random() - 0.5)*second.Envelope
+			return function(t)
+				assert(type(t) == "number", "Bad t")
+				local scale = math.clamp(Math.map(t, first.Time, second.Time, 0, 1), 0, 1)
+				return Math.lerp(firstValue, secondValue, scale)
+			end
+		end
+	else
+		-- pregenerate
+		local values = {}
+		for i=1, #keypoints do
+			local point = keypoints[i]
+			values[i] = point.Value + (math.random()-0.5)*point.Envelope
+		end
+
+		return function(t)
+			assert(type(t) == "number", "Bad t")
+
+			if t <= keypoints[1].Time then
+				return values[1]
+			end
+
+			-- TODO: Binary search
+			for i=2, #keypoints do
+				local point = keypoints[i]
+				if point.Time < t then
+					continue
+				end
+
+				local prevPoint = keypoints[i-1]
+				local scale = math.clamp(Math.map(t, prevPoint.Time, point.Time, 0, 1), 0, 1)
+				return Math.lerp(values[i-1], values[i], scale)
+			end
+
+			return values[#keypoints]
+		end
+	end
+end
 
 --[=[
 	Scales a number sequence value by the set amount

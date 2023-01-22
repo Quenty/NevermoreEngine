@@ -1,6 +1,6 @@
 {
   "name": "@quenty/collectionserviceutils",
-  "version": "2.1.0",
+  "version": "2.5.0",
   "description": "Utility functions for use with collection service tags",
   "keywords": [
     "Roblox",
@@ -19,6 +19,11 @@
   "funding": {
     "type": "patreon",
     "url": "https://www.patreon.com/quenty"
+  },
+  "dependencies": {
+    "@quenty/brio": "file:../brio",
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
   },
   "license": "MIT",
   "contributors": [

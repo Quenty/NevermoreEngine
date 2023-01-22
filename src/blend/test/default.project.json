@@ -3,7 +3,7 @@
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
-      "vrhands": {
+      "blend": {
         "$path": ".."
       },
       "Script": {
