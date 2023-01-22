@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.8.0...@quenty/textserviceutils@7.9.0) (2023-01-17)
+
+
+### Bug Fixes
+
+* Fix issue where TextServiceUtils.promiseTextBounds(params) may stack overflow while processing text bounds workaround ([2c887fc](https://github.com/Quenty/NevermoreEngine/commit/2c887fce4b5a4b4a19ad2f68c84c591778b0e349))
+
+
+
+
+
 # [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.7.0...@quenty/textserviceutils@7.8.0) (2023-01-11)
 
 **Note:** Version bump only for package @quenty/textserviceutils

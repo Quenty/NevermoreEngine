@@ -54,7 +54,7 @@ function ResetServiceClient:RequestResetCharacter()
 		end
 	end
 
-	self._promiseRemoteEvent():Then(function(remoteEvent)
+	self:_promiseRemoteEvent():Then(function(remoteEvent)
 		remoteEvent:FireServer()
 	end)
 end

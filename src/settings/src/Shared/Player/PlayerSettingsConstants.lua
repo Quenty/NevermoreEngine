@@ -14,4 +14,5 @@ return Table.readonly({
 	PLAYER_SETTINGS_NAME = "PlayerSettings";
 	REMOTE_FUNCTION_NAME = "PlayerSettingsRemoteFunction";
 	REQUEST_UPDATE_SETTINGS = "requestUpdateSettings";
+	MAX_SETTINGS_LENGTH = 2048;
 })

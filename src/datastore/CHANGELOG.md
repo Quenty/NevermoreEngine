@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.4.1...@quenty/datastore@7.5.0) (2023-01-17)
+
+
+### Features
+
+* Add DataStoreStringUtils.isValidUTF8(str) ([d3b245a](https://github.com/Quenty/NevermoreEngine/commit/d3b245a8fbd469ec51fb973a72cefc868e94c99a))
+
+
+
+
+
 ## [7.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.4.0...@quenty/datastore@7.4.1) (2023-01-03)
 
 

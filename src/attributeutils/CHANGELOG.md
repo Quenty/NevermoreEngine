@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.4.0...@quenty/attributeutils@8.5.0) (2023-01-17)
+
+
+### Features
+
+* CFrame is considered a valid attribute now ([d09544d](https://github.com/Quenty/NevermoreEngine/commit/d09544d64e3ad60de58ec2b3204c51f3d8abc4cf))
+
+
+
+
+
 # [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.3.0...@quenty/attributeutils@8.4.0) (2023-01-11)
 
 **Note:** Version bump only for package @quenty/attributeutils

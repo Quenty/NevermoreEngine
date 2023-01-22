@@ -1,3 +1,26 @@
+# (Tue Jan 17 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Bark_ing ([@bark-ing](https://github.com/bark-ing)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@8.5.0`, `@quenty/colorpalette@4.11.0`, `@quenty/datastore@7.5.0`, `@quenty/settings@4.13.0`, `@quenty/textserviceutils@7.9.0`
+  - Users/quenty/datastore hardening [#323](https://github.com/Quenty/NevermoreEngine/pull/323) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/resetservice@5.2.0`
+  - Fix: Corrected method call [#322](https://github.com/Quenty/NevermoreEngine/pull/322) ([@bark-ing](https://github.com/bark-ing))
+
+#### Authors: 2
+
+- Bark_ing ([@bark-ing](https://github.com/bark-ing))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jan 11 2023)
 
 #### 🚀 Enhancement

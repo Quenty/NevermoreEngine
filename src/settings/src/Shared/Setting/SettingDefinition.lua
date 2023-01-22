@@ -1,4 +1,20 @@
 --[=[
+	These settings definitions are used to define a setting and register them on both the client and server. See
+	[SettingDefinitionProvider] for more details on grouping these.
+
+	Notably a setting is basically anything on the client that can be stored on the server by the client, and that
+	relatively minimal validation is required upon. This can be both user-set settings, as well as very temporary
+	data.
+
+	```lua
+	local SettingDefinition = require("SettingDefinition")
+
+	return require("SettingDefinitionProvider").new({
+		SettingDefinition.new("LastTimeUpdateSeen", 0);
+		SettingDefinition.new("LastTimeShopSeen", 0);
+	})
+	```
+
 	@class SettingDefinition
 ]=]
 
