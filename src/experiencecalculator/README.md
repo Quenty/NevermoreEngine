@@ -13,7 +13,7 @@
 
 Calculate experience on an exponential curve and perform relevant calculations Uses formulas from stackoverflow.com/questions/6954874/php-game-formula-to-calculate-a-level-based-on-exp
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ExperienceCalculator">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ExperienceUtils">View docs →</a></div>
 
 ## Installation
 ```
