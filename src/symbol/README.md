@@ -13,7 +13,7 @@
 
 A 'Symbol' is an opaque marker type.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/symbol">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Symbol">View docs →</a></div>
 
 ## Installation
 ```
