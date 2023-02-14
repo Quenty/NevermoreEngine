@@ -18,7 +18,7 @@ A simple module loader for Roblox
 npm install @quenty/loader --save
 ```
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/loader">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Loader">View docs →</a></div>
 
 ## Installation with NPM
 

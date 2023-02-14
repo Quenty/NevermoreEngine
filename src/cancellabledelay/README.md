@@ -13,7 +13,7 @@
 
 cancellableDelay a delay that can be cancelled
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/cancellabledelay">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/cancellableDelay">View docs →</a></div>
 
 ## Installation
 ```

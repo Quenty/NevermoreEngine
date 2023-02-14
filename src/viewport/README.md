@@ -13,7 +13,7 @@
 
 Rendering functionality for viewportFrames
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/viewport">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Viewport">View docs →</a></div>
 
 ## Installation
 ```

@@ -15,7 +15,7 @@ A group of utility functions to be used to help create visual effectcs with ROBL
 
 This is a legacy utility, but should not be used for new development.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/qGUI">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/qG">View docs →</a></div>
 
 ## Installation
 ```

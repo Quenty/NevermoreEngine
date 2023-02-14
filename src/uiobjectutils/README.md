@@ -13,7 +13,7 @@
 
 Utility functions to make working with UI a little bit nicer in Roblox
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/UIObjectUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/PlayerGuiUtils">View docs →</a></div>
 
 ## Installation
 ```

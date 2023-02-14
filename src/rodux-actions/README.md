@@ -11,7 +11,7 @@
   </a>
 </div>
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/rodux-actions">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/RoduxActions">View docs →</a></div>
 
 ## Installation
 ```

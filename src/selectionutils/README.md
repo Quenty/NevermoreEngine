@@ -13,7 +13,7 @@
 
 Utility methods around Selection service. Useful for plugins and stories.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SelectionUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/RxSelectionUtils">View docs →</a></div>
 
 ## Installation
 ```

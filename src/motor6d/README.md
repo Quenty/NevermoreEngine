@@ -15,7 +15,7 @@ Centralized service to override motor6d on humanoids and other places transform 
 
 This allows for different blending of animations, et cetera.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Motor">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Motor6DAnimator">View docs →</a></div>
 
 ## Installation
 ```

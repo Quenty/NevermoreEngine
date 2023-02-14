@@ -11,7 +11,7 @@
   </a>
 </div>
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/rodux-undo">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/UndoableReducer">View docs →</a></div>
 
 ## Installation
 ```

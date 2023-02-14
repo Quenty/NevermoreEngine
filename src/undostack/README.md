@@ -13,7 +13,7 @@
 
 Undo stack functionality for editing stuff
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/undostack">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/UndoStack">View docs →</a></div>
 
 ## Installation
 ```

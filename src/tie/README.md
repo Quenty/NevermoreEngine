@@ -13,7 +13,7 @@
 
 Tie allows interfaces to be defined between Lua OOP and Roblox objects. This is designed in part to replace BinderGroups, which were a way to previously allow systems to interface with each other in a generic way. Instead, an object may implement a TieInterface, which is basically bindable functions/events.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Tie">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Action">View docs →</a></div>
 
 ## Installation
 ```

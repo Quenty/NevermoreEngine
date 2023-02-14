@@ -13,7 +13,7 @@
 
 This module provides utility functions for strings
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/string">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/String">View docs →</a></div>
 
 ## Installation
 ```
