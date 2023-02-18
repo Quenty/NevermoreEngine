@@ -70,7 +70,9 @@ local function startQueueProcess()
 			local ok = promiseTimeoutOrDone:Yield()
 
 			-- Cancel our delayed task
-			task.cancel(pendingTask)
+			pcall(function()
+				task.cancel(pendingTask)
+			end)
 
 			if not ok then
 				warn("[TextServiceUtils] - Requeuing entry")
