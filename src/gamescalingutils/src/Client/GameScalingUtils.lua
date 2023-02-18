@@ -53,6 +53,23 @@ function GameScalingUtils.observeUIScale(screenGui)
 end
 
 --[=[
+	Observes a smoothed out UI scale for a given screenGui
+	@param child Instance
+	@return Observable<number>
+]=]
+function GameScalingUtils.observeUIScaleForChild(child)
+	return RxInstanceUtils.observeFirstAncestor(child, "ScreenGui"):Pipe({
+		Rx.switchMap(function(screenGui)
+			if screenGui then
+				return GameScalingUtils.observeUIScale(screenGui)
+			else
+				return Rx.EMPTY
+			end
+		end)
+	})
+end
+
+--[=[
 	Blend equivalent of rendering a UI Scale
 
 	@param props { Parent: Instance?, ScreenGui: ScreenGui }
