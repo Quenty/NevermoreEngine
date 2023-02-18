@@ -32,7 +32,7 @@ function CameraPyramidUtils.rayIntersection(camera, rayOrigin, unitRayDirection,
 	unitRayDirection = unitRayDirection.unit
 	local camCFrame = camera.CFrame
 	local viewportSize = camera.ViewportSize
-	if viewportSize.x == 0 or viewportSize.y == 0 then
+	if viewportSize.x <= 0 or viewportSize.y <= 0 then
 		return nil, nil
 	end
 
