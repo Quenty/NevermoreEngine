@@ -196,6 +196,21 @@ function TieDefinition:ObserveLastImplementationBrio(adornee: Instance)
 end
 
 --[=[
+	Observes a valid implementation if it exists, or nil
+
+	@param adornee Instance
+	@return Observable<TieImplementation<T> | nil>>
+]=]
+function TieDefinition:ObserveLastImplementation(adornee: Instance)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	return self:ObserveLastImplementationBrio(adornee):Pipe({
+		RxStateStackUtils.topOfStack();
+	})
+end
+
+
+--[=[
 	Observes valid implementations wrapped in a brio if it exists.
 	@param adornee Instance
 	@return Observable<Brio<TieImplementation<T>>>
