@@ -31,6 +31,13 @@ function RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		})
 end
 
+--[=[
+	Observes a link value that is not nil.
+
+	@param linkName string
+	@param parent Instance
+	@return Brio<Instance>
+]=]
 function RxLinkUtils.observeLinkValueBrio(linkName, parent)
 	assert(type(linkName) == "string", "linkName should be 'string'")
 	assert(typeof(parent) == "Instance", "parent should be 'Instance'")
