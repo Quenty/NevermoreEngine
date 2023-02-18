@@ -53,6 +53,7 @@ function BinderProvider.new(serviceName, initMethod)
 
 	self._initMethod = initMethod or error("No initMethod")
 	self._initialized = false
+	self._destroyed = false
 	self._started = false
 
 	return self
@@ -157,7 +158,11 @@ function BinderProvider:__index(index)
 		return BinderProvider[index]
 	end
 
-	error(("%q Not a valid binder"):format(tostring(index)))
+	if rawget(self, "_destroyed") then
+		error(string.format("BinderProvider is destroyed. Cannot index %q", tostring(index)))
+	end
+
+	error(string.format("%q Not a valid binder", tostring(index)))
 end
 
 --[=[
@@ -185,6 +190,8 @@ function BinderProvider:Add(binder)
 end
 
 function BinderProvider:Destroy()
+	self._destroyed = true
+
 	for _, item in pairs(self._binders) do
 		rawset(self, item:GetTag(), nil)
 	end
