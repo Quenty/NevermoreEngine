@@ -195,7 +195,7 @@ function ValueColorPicker:_render()
 		[Blend.Children] = {
 			Blend.New "UIAspectRatioConstraint" {
 				AspectRatio = Blend.Computed(self._sizeValue, function(size)
-					if size.x == 0 or size.y == 0 then
+					if size.x <= 0 or size.y <= 0 then
 						return 1
 					else
 						return size.x/size.y

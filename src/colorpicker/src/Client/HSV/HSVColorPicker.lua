@@ -228,7 +228,7 @@ function HSVColorPicker:_render()
 				picker.Gui;
 				Blend.New "UIAspectRatioConstraint" {
 					AspectRatio = Blend.Computed(picker:GetSizeValue(), function(size)
-						if size.x == 0 or size.y == 0 then
+						if size.x <= 0 or size.y <= 0 then
 							return 1
 						else
 							return size.x/size.y
@@ -246,7 +246,7 @@ function HSVColorPicker:_render()
 		[Blend.Children] = {
 			Blend.New "UIAspectRatioConstraint" {
 				AspectRatio = Blend.Computed(self._sizeValue, function(size)
-					if size.x == 0 or size.y == 0 then
+					if size.x <= 0 or size.y <= 0 then
 						return 1
 					else
 						return size.x/size.y
