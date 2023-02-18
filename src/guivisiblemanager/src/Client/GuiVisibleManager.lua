@@ -51,6 +51,7 @@ end
 
 --[=[
 	Returns whether the Gui is visible.
+
 	@return boolean
 ]=]
 function GuiVisibleManager:IsVisible()
@@ -85,6 +86,8 @@ end
 --[=[
 	Creates a handle that will force the gui to be rendered. Clean up the task
 	to stop the showing.
+
+	@param doNotAnimate boolean | nil
 	@return MaidTask
 ]=]
 function GuiVisibleManager:CreateShowHandle(doNotAnimate)
