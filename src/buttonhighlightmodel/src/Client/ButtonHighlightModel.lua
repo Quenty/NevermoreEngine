@@ -243,23 +243,27 @@ end
 
 --[=[
 	Observes how pressed down the button is
+
+	@param acceleration number | nil
 	@return Observable<number>
 ]=]
-function ButtonHighlightModel:ObservePercentPressed()
+function ButtonHighlightModel:ObservePercentPressed(acceleration)
 	return Blend.AccelTween(Blend.toPropertyObservable(self.IsPressed)
 		:Pipe({
 			Rx.map(function(value)
 				return value and 1 or 0
 			end);
-		}), 200)
+		}), acceleration or 200)
 end
 
 --[=[
 	Observes how highlighted the button is
+
+	@param acceleration number | nil
 	@return Observable<number>
 ]=]
-function ButtonHighlightModel:ObservePercentHighlighted()
-	return Blend.AccelTween(self:ObservePercentHighlightedTarget(), 200)
+function ButtonHighlightModel:ObservePercentHighlighted(acceleration)
+	return Blend.AccelTween(self:ObservePercentHighlightedTarget(), acceleration or 200)
 end
 
 --[=[
@@ -277,15 +281,17 @@ end
 
 --[=[
 	Observes how choosen the button is
+
+	@param acceleration number | nil
 	@return Observable<number>
 ]=]
-function ButtonHighlightModel:ObservePercentChoosen()
+function ButtonHighlightModel:ObservePercentChoosen(acceleration)
 	return Blend.AccelTween(Blend.toPropertyObservable(self.IsChoosen)
 		:Pipe({
 			Rx.map(function(value)
 				return value and 1 or 0
 			end);
-		}), 200)
+		}), acceleration or 200)
 end
 
 --[=[
@@ -353,8 +359,7 @@ end
 function ButtonHighlightModel:_updateTargets()
 	self.IsMouseOrTouchOver.Value = self._isMouseOver.Value or self._numFingerDown.Value > 0
 	self.IsPressed.Value = (self._isMouseDown.Value or self._isKeyDown.Value or self._numFingerDown.Value > 0)
-	self.IsHighlighted.Value = self.IsChoosen.Value
-		or self.IsSelected.Value
+	self.IsHighlighted.Value = self.IsSelected.Value
 		or self._numFingerDown.Value > 0
 		or self._isKeyDown.Value
 		or self._isMouseOver.Value
