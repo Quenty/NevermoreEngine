@@ -1,23 +1,18 @@
-# v1.6.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Make AvatarEditorUtils shared ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.5.0...@quenty/avatareditorutils@1.6.0) (2023-02-21)
+
+
+### Bug Fixes
+
+* Make AvatarEditorUtils shared ([6d72a2c](https://github.com/Quenty/NevermoreEngine/commit/6d72a2c981d7d1427d22b20f8203ce0d45ad936f))
+
+
+
+
 
 # [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.4.0...@quenty/avatareditorutils@1.5.0) (2023-01-11)
 

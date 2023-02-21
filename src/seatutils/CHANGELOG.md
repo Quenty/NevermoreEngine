@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2023-02-21)
+
+
+### Features
+
+* Add seatutils ([c728672](https://github.com/Quenty/NevermoreEngine/commit/c728672e6313053ae744192219e3b6d0f0e6ea3b))
+
+
+
+
+
 # v1.1.0 (Tue Feb 21 2023)
 
 #### 🚀 Enhancement

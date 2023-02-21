@@ -1,24 +1,15 @@
-# v8.6.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: fixing broken links [#327](https://github.com/Quenty/NevermoreEngine/pull/327) ([@antcar0929](https://github.com/antcar0929))
-
-#### Authors: 2
-
-- Antcar ([@antcar0929](https://github.com/antcar0929))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.5.0...@quenty/firstpersoncharactertransparency@8.6.0) (2023-02-21)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
 
 # [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.4.0...@quenty/firstpersoncharactertransparency@8.5.0) (2023-01-11)
 

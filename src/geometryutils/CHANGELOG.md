@@ -1,23 +1,18 @@
-# v2.4.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Return nil if viewportSize is less than zero ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.3.0...@quenty/geometryutils@2.4.0) (2023-02-21)
+
+
+### Bug Fixes
+
+* Return nil if viewportSize is less than zero ([06981a8](https://github.com/Quenty/NevermoreEngine/commit/06981a891c280f6a85014a65b438a70fc08a344a))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.2.0...@quenty/geometryutils@2.3.0) (2022-12-06)
 

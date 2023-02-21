@@ -1,26 +1,18 @@
-# v4.8.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-- feat: Add TieDefinition:ObserveLastImplementation(adornee) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues and linting issues, as well as build issues with package-lock install ([@Quenty](https://github.com/Quenty))
-- docs: fixing broken links [#327](https://github.com/Quenty/NevermoreEngine/pull/327) ([@antcar0929](https://github.com/antcar0929))
-
-#### Authors: 2
-
-- Antcar ([@antcar0929](https://github.com/antcar0929))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.7.0...@quenty/tie@4.8.0) (2023-02-21)
+
+
+### Features
+
+* Add TieDefinition:ObserveLastImplementation(adornee) ([a690651](https://github.com/Quenty/NevermoreEngine/commit/a690651423e6e953654277e21f04c921bcb24fb3))
+
+
+
+
 
 # [4.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.6.0...@quenty/tie@4.7.0) (2023-01-17)
 

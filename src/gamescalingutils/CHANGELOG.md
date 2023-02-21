@@ -1,20 +1,18 @@
-# v7.8.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameScalingUtils.observeUIScaleForChild(child) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@7.7.0...@quenty/gamescalingutils@7.8.0) (2023-02-21)
+
+
+### Features
+
+* Add GameScalingUtils.observeUIScaleForChild(child) ([3c59cb3](https://github.com/Quenty/NevermoreEngine/commit/3c59cb3006191a0eca18b546db1f7f30bc2cc42d))
+
+
+
+
 
 # [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@7.6.0...@quenty/gamescalingutils@7.7.0) (2023-01-11)
 

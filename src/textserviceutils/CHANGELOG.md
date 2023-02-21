@@ -1,23 +1,18 @@
-# v7.10.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Suppress warnings while cancelling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.9.0...@quenty/textserviceutils@7.10.0) (2023-02-21)
+
+
+### Bug Fixes
+
+* Suppress warnings while cancelling ([2f49c88](https://github.com/Quenty/NevermoreEngine/commit/2f49c88e604b679251ae4e412ea845bc9c15e398))
+
+
+
+
 
 # [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.8.0...@quenty/textserviceutils@7.9.0) (2023-01-17)
 

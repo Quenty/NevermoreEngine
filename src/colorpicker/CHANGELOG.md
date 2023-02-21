@@ -1,23 +1,18 @@
-# v4.10.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix sizing when negative on color picker ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.9.0...@quenty/colorpicker@4.10.0) (2023-02-21)
+
+
+### Bug Fixes
+
+* Fix sizing when negative on color picker ([9e8d4f6](https://github.com/Quenty/NevermoreEngine/commit/9e8d4f6b22232fa0e93a45e22e17b35388a43787))
+
+
+
+
 
 # [4.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.8.0...@quenty/colorpicker@4.9.0) (2023-01-11)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/policyserviceutils",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Utility methods to query policies for players from PolicyService.",
   "keywords": [
     "Roblox",

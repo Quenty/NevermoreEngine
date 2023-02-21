@@ -1,20 +1,18 @@
-# v7.6.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-- feat: Add LinkUtils.setSingleLinkValue ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linkutils@7.5.0...@quenty/linkutils@7.6.0) (2023-02-21)
+
+
+### Features
+
+* Add LinkUtils.setSingleLinkValue ([325fcea](https://github.com/Quenty/NevermoreEngine/commit/325fceab423d57ab89e1c4ffbd549adba3bb6127))
+
+
+
+
 
 # [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linkutils@7.4.0...@quenty/linkutils@7.5.0) (2023-01-11)
 

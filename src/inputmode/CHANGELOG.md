@@ -1,25 +1,18 @@
-# v7.9.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Cache keys and retain order in InputModeType ([@Quenty](https://github.com/Quenty))
-- docs: fixing broken links [#327](https://github.com/Quenty/NevermoreEngine/pull/327) ([@antcar0929](https://github.com/antcar0929))
-
-#### Authors: 2
-
-- Antcar ([@antcar0929](https://github.com/antcar0929))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.8.0...@quenty/inputmode@7.9.0) (2023-02-21)
+
+
+### Bug Fixes
+
+* Cache keys and retain order in InputModeType ([256a7a2](https://github.com/Quenty/NevermoreEngine/commit/256a7a2b8585ecafd47a484d69185fa29542129f))
+
+
+
+
 
 # [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.7.0...@quenty/inputmode@7.8.0) (2023-01-11)
 

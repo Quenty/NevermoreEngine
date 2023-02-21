@@ -1,20 +1,18 @@
-# v7.9.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-- feat: Pass in acceleration as desired to ButtonHighlightModel ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@7.8.0...@quenty/buttonhighlightmodel@7.9.0) (2023-02-21)
+
+
+### Features
+
+* Pass in acceleration as desired to ButtonHighlightModel ([f1b5970](https://github.com/Quenty/NevermoreEngine/commit/f1b5970c19a396b68611b33b8a95e121800147ba))
+
+
+
+
 
 # [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@7.7.0...@quenty/buttonhighlightmodel@7.8.0) (2023-01-11)
 

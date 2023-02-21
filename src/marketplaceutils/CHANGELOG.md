@@ -1,20 +1,18 @@
-# v6.1.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-- feat: Add MarketplaceUtils.convertAssetTypeIdToAvatarAssetType(assetTypeId) and MarketplaceUtils.convertAssetTypeIdToAssetType(assetTypeId) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@6.0.1...@quenty/marketplaceutils@6.1.0) (2023-02-21)
+
+
+### Features
+
+* Add MarketplaceUtils.convertAssetTypeIdToAvatarAssetType(assetTypeId) and MarketplaceUtils.convertAssetTypeIdToAssetType(assetTypeId) ([7bc18ed](https://github.com/Quenty/NevermoreEngine/commit/7bc18ed2afc55b45c4ba98f87ac0f7132eb94a9c))
+
+
+
+
 
 ## [6.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@6.0.0...@quenty/marketplaceutils@6.0.1) (2022-11-04)
 

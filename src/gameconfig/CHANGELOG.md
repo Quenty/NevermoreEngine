@@ -1,19 +1,15 @@
-# v5.14.0 (Tue Feb 21 2023)
-
-#### 🚀 Enhancement
-
-- fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.13.0...@quenty/gameconfig@5.14.0) (2023-02-21)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
 
 # [5.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.12.0...@quenty/gameconfig@5.13.0) (2023-01-17)
 
