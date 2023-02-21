@@ -28,8 +28,8 @@ yargs(hideBin(process.argv))
     type: 'boolean',
   })
   .usage(OutputHelper.formatInfo('Usage: $0 <command> [options]'))
-  .command(new InitGameCommand())
-  .command(new InitPackageCommand())
+  .command(new InitGameCommand() as any)
+  .command(new InitPackageCommand() as any)
   .recommendCommands()
   .demandCommand(
     1,

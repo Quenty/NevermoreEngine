@@ -22,7 +22,7 @@ local RaycastUtils = {}
 ]=]
 function RaycastUtils.raycastSingleExit(origin, direction, part)
 	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Whitelist
+	params.FilterType = Enum.RaycastFilterType.Include
 	params.FilterDescendantsInstances = {part}
 
 	local resultFinal = Workspace:Raycast(origin + direction, -direction, params)

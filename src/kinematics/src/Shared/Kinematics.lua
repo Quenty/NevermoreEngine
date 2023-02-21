@@ -1,5 +1,6 @@
 --[=[
-	Basic kinematics calculator that can be used like a spring.
+	Basic kinematics calculator that can be used like a spring. See [Spring] also.
+
 	@class Kinematics
 ]=]
 
@@ -32,7 +33,7 @@ function Kinematics.new(initial, clock)
 	rawset(self, "_position0", initial)
 	rawset(self, "_velocity0", 0*initial)
 	rawset(self, "_acceleration", 0*initial)
-	rawset(self, "_speed", 0)
+	rawset(self, "_speed", 1)
 	rawset(self, "_time0", self._clock())
 
 	return self
@@ -61,7 +62,9 @@ function Kinematics:TimeSkip(delta)
 end
 
 --[=[
-	Sets data from some external source
+	Sets data from some external source all at once.
+	This is useful for synchronizing the network.
+
 	@param startTime number
 	@param position0 T
 	@param velocity0 T
@@ -73,6 +76,62 @@ function Kinematics:SetData(startTime, position0, velocity0, acceleration)
 	rawset(self, "_velocity0", velocity0)
 	rawset(self, "_acceleration", acceleration)
 end
+
+--[=[
+	Gets and sets the current position of the Kinematics
+	@prop Position T
+	@within Kinematics
+]=]
+
+--[=[
+	Gets and sets the current velocity of the Kinematics
+	@prop Velocity T
+	@within Kinematics
+]=]
+
+--[=[
+	Gets and sets the acceleration.
+	@prop Acceleration T
+	@within Kinematics
+]=]
+
+--[=[
+	Gets and sets the start time.
+	@prop StartTime T
+	@within Kinematics
+]=]
+
+--[=[
+	Gets and set the start position
+	@prop StartPosition T
+	@within Kinematics
+]=]
+
+--[=[
+	Sets the start velocity
+	@prop StartVelocity T
+	@within Kinematics
+]=]
+
+--[=[
+	Sets the playback speed
+	@prop Speed number
+	@within Kinematics
+]=]
+
+--[=[
+	Returns how old the kinematics is
+	@prop Age number
+	@readonly
+	@within Kinematics
+]=]
+
+--[=[
+	The current clock object to syncronize the kienmatics against.
+
+	@prop Clock () -> number
+	@within Kinematics
+]=]
 
 function Kinematics:__index(index)
 	local now = self._clock()

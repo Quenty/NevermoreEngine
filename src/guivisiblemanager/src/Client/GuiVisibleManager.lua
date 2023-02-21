@@ -22,7 +22,7 @@ GuiVisibleManager.__index = GuiVisibleManager
 --[=[
 	Constructs a new GuiVisibleManager.
 
-	@param promiseNewPane Promise<TPane> -- Returns a promise for a new pane.
+	@param promiseNewPane (maid: Maid) -> Promise<TPane> -- Returns a promise for a new pane.
 	@param maxHideTime number? -- Optional hide time
 	@return GuiVisibleManager
 ]=]
@@ -31,6 +31,8 @@ function GuiVisibleManager.new(promiseNewPane, maxHideTime)
 
 	self._maxHideTime = maxHideTime or 1
 	self._promiseNewPane = promiseNewPane or error("No promiseNewPane")
+
+	self._nextDoNotAnimate = false
 
 	self._paneVisible = Instance.new("BoolValue")
 	self._paneVisible.Value = false
@@ -49,6 +51,7 @@ end
 
 --[=[
 	Returns whether the Gui is visible.
+
 	@return boolean
 ]=]
 function GuiVisibleManager:IsVisible()
@@ -83,15 +86,17 @@ end
 --[=[
 	Creates a handle that will force the gui to be rendered. Clean up the task
 	to stop the showing.
+
+	@param doNotAnimate boolean | nil
 	@return MaidTask
 ]=]
-function GuiVisibleManager:CreateShowHandle()
+function GuiVisibleManager:CreateShowHandle(doNotAnimate)
 	assert(self._showHandles, "Not initialized yet")
 
 	local key = HttpService:GenerateGUID(false)
 
 	self._showHandles[key] = true
-	self:_updatePaneVisible()
+	self:_updatePaneVisible(doNotAnimate)
 
 	return {
 		Destroy = function()
@@ -107,8 +112,12 @@ function GuiVisibleManager:CreateShowHandle()
 	};
 end
 
-function GuiVisibleManager:_updatePaneVisible()
-	self._paneVisible.Value = next(self._showHandles) ~= nil
+function GuiVisibleManager:_updatePaneVisible(doNotAnimate)
+	local nextValue = next(self._showHandles) ~= nil
+	if nextValue ~= self._paneVisible.Value then
+		self._nextDoNotAnimate = doNotAnimate
+		self._paneVisible.Value = nextValue
+	end
 end
 
 function GuiVisibleManager:_onPaneVisibleChanged()
@@ -142,11 +151,14 @@ function GuiVisibleManager:_handleNewPane(maid, pane)
 	maid:GiveTask(pane)
 
 	local function updateVisible()
+		local doNotAnimate = self._nextDoNotAnimate
+		self._nextDoNotAnimate = false
+
 		if self._paneVisible.Value then
-			pane:Show()
+			pane:Show(doNotAnimate)
 			maid._hideTask = nil
 		else
-			pane:Hide()
+			pane:Hide(doNotAnimate)
 
 			-- cleanup after a given amount of time
 			maid._hideTask = cancellableDelay(self._maxHideTime, function()

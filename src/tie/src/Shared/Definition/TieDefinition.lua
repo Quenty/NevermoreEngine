@@ -12,6 +12,7 @@ local Observable = require("Observable")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local RxStateStackUtils = require("RxStateStackUtils")
 local String = require("String")
 local Symbol = require("Symbol")
 local Table = require("Table")
@@ -194,6 +195,21 @@ function TieDefinition:ObserveLastImplementationBrio(adornee: Instance)
 			RxBrioUtils.onlyLastBrioSurvives();
 		})
 end
+
+--[=[
+	Observes a valid implementation if it exists, or nil
+
+	@param adornee Instance
+	@return Observable<TieImplementation<T> | nil>>
+]=]
+function TieDefinition:ObserveLastImplementation(adornee: Instance)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	return self:ObserveLastImplementationBrio(adornee):Pipe({
+		RxStateStackUtils.topOfStack();
+	})
+end
+
 
 --[=[
 	Observes valid implementations wrapped in a brio if it exists.

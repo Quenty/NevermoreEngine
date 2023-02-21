@@ -25,6 +25,7 @@ function LinkUtils.createLink(linkName, from, to)
 	local objectValue = Instance.new("ObjectValue")
 	objectValue.Name = linkName
 	objectValue.Value = to
+	objectValue.Archivable = false
 	objectValue.Parent = from
 
 	return objectValue
@@ -53,6 +54,51 @@ function LinkUtils.getAllLinkValues(linkName, from)
 
 	return linkValues
 end
+
+
+--[=[
+	Ensures after operation a single link is pointed to the value, unless the value is "nil"
+	in which case no link will be set
+
+	@param linkName string
+	@param from Instance
+	@param to Instance
+	@return Instance | nil
+]=]
+function LinkUtils.setSingleLinkValue(linkName, from, to)
+	assert(type(linkName) == "string", "Bad linkName")
+	assert(typeof(from) == "Instance", "Bad from")
+	assert(typeof(to) == "Instance" or to == nil, "Bad to")
+
+	if to then
+		local existingLink = nil
+		for _, link in pairs(from:GetChildren()) do
+			if link:IsA("ObjectValue") and link.Name == linkName then
+				if existingLink then
+					link:Destroy()
+				else
+					existingLink = link
+					link.Value = to
+				end
+			end
+		end
+
+		if existingLink then
+			return existingLink
+		end
+
+		return LinkUtils.createLink(linkName, from, to)
+	else
+		for _, link in pairs(from:GetChildren()) do
+			if link:IsA("ObjectValue") and link.Name == linkName then
+				link:Destroy()
+			end
+		end
+
+		return nil
+	end
+end
+
 
 --[=[
 	Gets all links underneath an instance.

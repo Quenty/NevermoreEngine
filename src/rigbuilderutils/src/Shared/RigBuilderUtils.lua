@@ -5,8 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ServerScriptService = game:GetService("ServerScriptService")
-local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 
 local InsertServiceUtils = require("InsertServiceUtils")
 local PromiseUtils = require("PromiseUtils")
@@ -447,6 +446,87 @@ function RigBuilderUtils.promiseR15MeshRig()
 end
 
 --[=[
+	Creates an R15 rig with the base details of a given character, but not all of them
+	@param userId number
+	@param humanoidRigType HumanoidRigType | nil
+	@param assetTypeVerification AssetTypeVerification | nil
+	@return Promise<Instance>
+]=]
+function RigBuilderUtils.promiseBasePlayerRig(userId, humanoidRigType, assetTypeVerification)
+	assert(type(userId) == "number", "Bad userId")
+	assert(typeof(humanoidRigType) == "EnumItem" or humanoidRigType == nil, "Bad humanoidRigType")
+	assert(typeof(assetTypeVerification) == "EnumItem" or assetTypeVerification == nil, "Bad assetTypeVerification")
+
+	return HumanoidDescriptionUtils.promiseFromUserId(userId)
+		:Then(function(playerHumanoidDescription)
+			-- Wipe accessories
+			local humanoidDescription = playerHumanoidDescription:Clone()
+			humanoidDescription.BackAccessory = ""
+			humanoidDescription.FaceAccessory = ""
+			humanoidDescription.FrontAccessory = ""
+			humanoidDescription.HairAccessory = ""
+			humanoidDescription.HatAccessory = ""
+			humanoidDescription.NeckAccessory = ""
+			humanoidDescription.ShouldersAccessory = ""
+			humanoidDescription.WaistAccessory = ""
+			humanoidDescription.GraphicTShirt = 0
+			humanoidDescription.Shirt = 0
+			humanoidDescription.Pants = 0
+			humanoidDescription:SetAccessories({}, true)
+
+			return RigBuilderUtils.promiseHumanoidModelFromDescription(humanoidDescription, humanoidRigType, assetTypeVerification)
+		end)
+end
+
+function RigBuilderUtils.promiseHumanoidModelFromDescription(description, rigType, assetTypeVerification)
+	assert(typeof(description) == "Instance" and description:IsA("HumanoidDescription"), "Bad description")
+	assert(typeof(rigType) == "EnumItem" or rigType == nil, "Bad rigType")
+	assert(typeof(assetTypeVerification) == "EnumItem" or assetTypeVerification == nil, "Bad assetTypeVerification")
+
+	return Promise.spawn(function(resolve, reject)
+		local model = nil
+		local ok, err = pcall(function()
+			model = Players:CreateHumanoidModelFromDescription(
+				description,
+				rigType or Enum.HumanoidRigType.R15,
+				assetTypeVerification or Enum.AssetTypeVerification.Default)
+		end)
+		if not ok then
+			return reject(err or "Failed to create model")
+		end
+		if typeof(model) ~= "Instance" then
+			return reject("Bad model result type")
+		end
+
+		return resolve(model)
+	end)
+end
+
+function RigBuilderUtils.promiseHumanoidModelFromUserId(userId, rigType, assetTypeVerification)
+	assert(type(userId) == "number", "Bad userId")
+	assert(typeof(rigType) == "EnumItem" or rigType == nil, "Bad rigType")
+	assert(typeof(assetTypeVerification) == "EnumItem" or assetTypeVerification == nil, "Bad assetTypeVerification")
+
+	return Promise.spawn(function(resolve, reject)
+		local model = nil
+		local ok, err = pcall(function()
+			model = Players:CreateHumanoidModelFromUserId(
+				userId,
+				rigType or Enum.HumanoidRigType.R15,
+				assetTypeVerification or Enum.AssetTypeVerification.Default)
+		end)
+		if not ok then
+			return reject(err or "Failed to create model")
+		end
+		if typeof(model) ~= "Instance" then
+			return reject("Bad model result type")
+		end
+
+		return resolve(model)
+	end)
+end
+
+--[=[
 	Creates an R15 rig dressed as a given player
 	@param userId number
 	@return Promise<Instance>
@@ -454,35 +534,7 @@ end
 function RigBuilderUtils.promisePlayerRig(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return PromiseUtils.all({
-		RigBuilderUtils.promiseR15Rig(),
-		HumanoidDescriptionUtils.promiseFromUserId(userId)
-	}):Then(function(meshRig, humanoidDescription)
-		local humanoid = meshRig:FindFirstChildWhichIsA("Humanoid")
-		if not humanoid then
-			return Promise.rejected("No humanoid from rig builder")
-		end
-
-		meshRig.Archivable = false
-		local originalName = meshRig.Name
-
-		-- Hack! Apparently we need to parent this to the datamodel to apply the description
-		meshRig.Name = "RigBuilderUtils_LoadingHumanoid_" .. HttpService:GenerateGUID(false)
-		meshRig.Parent = ServerScriptService -- somewhere that does not replicate
-
-		return HumanoidDescriptionUtils.promiseApplyDescription(humanoid, humanoidDescription)
-			:Then(function()
-				meshRig.Parent = nil
-				meshRig.Archivable = true
-				meshRig.Name = originalName
-
-				return meshRig
-			end, function(...)
-				-- cleanup
-				meshRig:Destroy()
-				return Promise.rejected(...)
-			end)
-	end)
+	return RigBuilderUtils.promiseHumanoidModelFromUserId(userId)
 end
 
 return RigBuilderUtils
