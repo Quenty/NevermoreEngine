@@ -1,3 +1,22 @@
+# (Tue Feb 21 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/avatareditorutils@1.6.0`, `@quenty/binder@8.7.0`, `@quenty/buttonhighlightmodel@7.9.0`, `@quenty/colorpicker@4.10.0`, `@quenty/gamescalingutils@7.8.0`, `@quenty/geometryutils@2.4.0`, `@quenty/guivisiblemanager@8.1.0`, `@quenty/inputmode@7.9.0`, `@quenty/kinematics@2.1.0`, `@quenty/linkutils@7.6.0`, `@quenty/marketplaceutils@6.1.0`, `@quenty/raycaster@3.1.0`, `@quenty/rigbuilderutils@6.2.0`, `@quenty/seatutils@1.1.0`, `@quenty/textserviceutils@7.10.0`, `@quenty/tie@4.8.0`, `@quenty/cli-output-helpers@1.2.0`, `@quenty/nevermore-cli@1.4.0`, `@quenty/nevermore-template-helpers@1.2.0`
+  - fix: A variety of small changes [#328](https://github.com/Quenty/NevermoreEngine/pull/328) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/cancellabledelay@3.4.0`, `@quenty/experiencecalculator@2.3.0`, `@quenty/firstpersoncharactertransparency@8.6.0`, `@quenty/inputmode@7.9.0`, `@quenty/loader@6.1.0`, `@quenty/motor6d@1.11.0`, `@quenty/qgui@2.2.0`, `@quenty/rodux-actions@5.2.0`, `@quenty/rodux-undo@4.1.0`, `@quenty/selectionutils@2.5.0`, `@quenty/string@3.1.0`, `@quenty/symbol@2.2.0`, `@quenty/table@3.2.0`, `@quenty/tie@4.8.0`, `@quenty/uiobjectutils@3.2.0`, `@quenty/undostack@1.6.0`, `@quenty/viewport@5.12.0`
+  - docs: fixing broken links [#327](https://github.com/Quenty/NevermoreEngine/pull/327) ([@antcar0929](https://github.com/antcar0929))
+
+#### Authors: 2
+
+- Antcar ([@antcar0929](https://github.com/antcar0929))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jan 17 2023)
 
 :tada: This release contains work from a new contributor! :tada:
