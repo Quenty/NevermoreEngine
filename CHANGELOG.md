@@ -1,3 +1,16 @@
+# (Wed Feb 22 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@1.5.0`
+  - feat: Add github workflow to nevermore init command [#329](https://github.com/Quenty/NevermoreEngine/pull/329) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Feb 21 2023)
 
 #### 🚀 Enhancement
