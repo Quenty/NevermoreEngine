@@ -1,20 +1,18 @@
-# v1.5.0 (Wed Feb 22 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add github workflow to nevermore init command [#329](https://github.com/Quenty/NevermoreEngine/pull/329) ([@Quenty](https://github.com/Quenty))
-- feat: Add github workflow to nevermore init command ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.4.0...@quenty/nevermore-cli@1.5.0) (2023-02-22)
+
+
+### Features
+
+* Add github workflow to nevermore init command ([8369044](https://github.com/Quenty/Nevermore/commit/83690442c0914ed8b766348f12f79ea233dae3aa))
+
+
+
+
 
 # [1.4.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.3.0...@quenty/nevermore-cli@1.4.0) (2023-02-21)
 
