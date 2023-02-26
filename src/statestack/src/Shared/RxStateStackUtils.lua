@@ -13,14 +13,16 @@ local RxStateStackUtils = {}
 
 --[=[
 	Converts the observable of Brios into a statestack.
+
+	@param defaultValue T | nil
 	@return (source: Observable<Brio<T>>) -> Observable<T?>
 ]=]
-function RxStateStackUtils.topOfStack()
+function RxStateStackUtils.topOfStack(defaultValue)
 	return function(source)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
 
-			local current = StateStack.new(nil)
+			local current = StateStack.new(defaultValue)
 			maid:GiveTask(current)
 
 			maid:GiveTask(source:Subscribe(function(brio)
