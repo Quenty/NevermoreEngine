@@ -704,12 +704,39 @@ end
 
 	@since 3.6.0
 	@function switchToBrio
-	@return (source: Observable<T>) -> Observable<Brio<T>>
+	@return (source: Observable<T | Brio<T>>) -> Observable<Brio<T>>
 	@within RxBrioUtils
 ]=]
-RxBrioUtils.switchToBrio = Rx.pipe({
-	RxBrioUtils.toBrio();
-	RxBrioUtils.onlyLastBrioSurvives();
-})
+function RxBrioUtils.switchToBrio()
+	return function(source)
+		return Observable.new(function(sub)
+			local topMaid = Maid.new()
+
+			topMaid:GiveTask(source:Subscribe(function(result, ...)
+				if Brio.isBrio(result) then
+					if result:IsDead() then
+						topMaid._last = nil
+						return
+					end
+
+					local maid = result:ToMaid()
+					local newBrio = Brio.new(result:GetValue())
+					maid:GiveTask(newBrio)
+
+					topMaid._last = maid
+					sub:Fire(newBrio)
+				else
+					local newBrio = Brio.new(result, ...)
+
+					topMaid._last = newBrio
+					sub:Fire(newBrio)
+				end
+			end, sub:GetFailComplete()))
+
+			return topMaid
+		end)
+	end
+end
+
 
 return RxBrioUtils
