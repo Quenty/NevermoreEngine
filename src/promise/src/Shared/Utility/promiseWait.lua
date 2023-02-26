@@ -1,5 +1,5 @@
 --[=[
-	Wraps the wait()/delay() API in a promise
+	Wraps the task.delay() API in a promise
 
 	@class promiseWait
 ]=]
