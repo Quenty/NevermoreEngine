@@ -220,6 +220,10 @@ function GameConfigAssetBase:_promiseCloudDataForState(state)
 		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.GamePass)
 	elseif state.assetType == GameConfigAssetTypes.PLACE then
 		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.Asset)
+	elseif state.assetType == GameConfigAssetTypes.ASSET then
+		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.Asset)
+	elseif state.assetType == GameConfigAssetTypes.BUNDLE then
+		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.Bundle)
 	else
 		warn(("Unknown GameConfigAssetType %q. Ignoring asset."):format(tostring(state.assetType)))
 		return Promise.resolved(nil)

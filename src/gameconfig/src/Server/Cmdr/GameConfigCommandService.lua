@@ -1,4 +1,5 @@
 --[=[
+	Handles cmdr integration
 	@class GameConfigCommandService
 ]=]
 
@@ -101,7 +102,7 @@ function GameConfigCommandService:_registerCommands()
 				Description = "The player to prompt.";
 			},
 			{
-				Name = "Gamepass";
+				Name = "GamePass";
 				Type = "passId";
 				Description = "The gamepass to prompt.";
 			},
@@ -112,6 +113,60 @@ function GameConfigCommandService:_registerCommands()
 		for _, player in pairs(players) do
 			MarketplaceService:PromptGamePassPurchase(player, gamePassId)
 			table.insert(givenTo, ("%s prompted purchase of %d"):format(player.DisplayName, gamePassId))
+		end
+
+		return ("Prompted: %s"):format(table.concat(givenTo, ", "))
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "prompt-asset";
+		Description = "Prompts the player to make an asset purchase.";
+		Group = "GameConfig";
+		Args = {
+			{
+				Name = "Player";
+				Type = "players";
+				Description = "The player to prompt.";
+			},
+			{
+				Name = "Asset";
+				Type = "assetId";
+				Description = "The asset to prompt.";
+			},
+		};
+	}, function(_context, players, assetId)
+		local givenTo = {}
+
+		for _, player in pairs(players) do
+			MarketplaceService:PromptPurchase(player, assetId)
+			table.insert(givenTo, ("%s prompted purchase of %d"):format(player.DisplayName, assetId))
+		end
+
+		return ("Prompted: %s"):format(table.concat(givenTo, ", "))
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "prompt-bundle";
+		Description = "Prompts the player to make a bundle purchase.";
+		Group = "GameConfig";
+		Args = {
+			{
+				Name = "Player";
+				Type = "players";
+				Description = "The player to prompt.";
+			},
+			{
+				Name = "Bundle";
+				Type = "bundleId";
+				Description = "The asset to prompt.";
+			},
+		};
+	}, function(_context, players, bundleId)
+		local givenTo = {}
+
+		for _, player in pairs(players) do
+			MarketplaceService:PromptBundlePurchase(player, bundleId)
+			table.insert(givenTo, ("%s prompted purchase of %d"):format(player.DisplayName, bundleId))
 		end
 
 		return ("Prompted: %s"):format(table.concat(givenTo, ", "))
