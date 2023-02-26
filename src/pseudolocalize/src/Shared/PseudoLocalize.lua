@@ -37,6 +37,10 @@ function PseudoLocalize.pseudoLocalize(line)
 	return out
 end
 
+--[=[
+    Gets the default pseudo locale string.
+    @return string
+]=]
 function PseudoLocalize.getDefaultPseudoLocaleId()
     return DEFAULT_PSEUDO_LOCALE_ID
 end
