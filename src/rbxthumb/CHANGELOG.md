@@ -1,3 +1,16 @@
+# v1.2.0 (Mon Feb 27 2023)
+
+#### 🚀 Enhancement
+
+- feat: Add RbxThumbUtils.avatarItemTypeToThumbnailType(avatarItemType) [#332](https://github.com/Quenty/NevermoreEngine/pull/332) ([@Quenty](https://github.com/Quenty))
+- feat: Add RbxThumbUtils.avatarItemTypeToThumbnailType(avatarItemType) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,5 +1,18 @@
 # (Mon Feb 27 2023)
 
+#### 🚀 Enhancement
+
+- `@quenty/rbxthumb@1.2.0`
+  - feat: Add RbxThumbUtils.avatarItemTypeToThumbnailType(avatarItemType) [#332](https://github.com/Quenty/NevermoreEngine/pull/332) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Feb 27 2023)
+
 #### 💥 Breaking Change
 
 - `@quenty/gameproductservice@6.0.0`
