@@ -29,6 +29,23 @@ return Table.readonly({
 	PASS = "pass";
 
 --[=[
+	Specifies the asset is of type asset. This is basically anything in Roblox's asset id system.
+	Think models, UGC, et cetera.
+
+	@prop ASSET string
+	@within GameConfigAssetTypes
+]=]
+	ASSET = "asset";
+
+--[=[
+	Bundle asset type
+
+	@prop BUNDLE string
+	@within GameConfigAssetTypes
+]=]
+	BUNDLE = "bundle";
+
+--[=[
 	Specifies the asset is of type place
 	@prop PLACE string
 	@within GameConfigAssetTypes

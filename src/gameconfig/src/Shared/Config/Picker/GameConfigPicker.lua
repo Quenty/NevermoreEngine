@@ -220,4 +220,27 @@ function GameConfigPicker:_getConfigsForGameId(gameId: number)
 	return self._gameIdToConfigSet:GetListForKey(gameId)
 end
 
+--[=[
+	Converts an asset type and key to an id
+
+	@param assetType GameConfigAssetType
+	@param assetIdOrKey number | string
+	@return number | nil
+]=]
+function GameConfigPicker:ToAssetId(assetType, assetIdOrKey)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(assetIdOrKey) == "number" or type(assetIdOrKey) == "string", "Bad assetIdOrKey")
+
+	if type(assetIdOrKey) == "string" then
+		local asset = self:FindFirstActiveAssetOfKey(assetType, assetIdOrKey)
+		if asset then
+			return asset:GetAssetId()
+		else
+			return nil
+		end
+	end
+
+	return assetIdOrKey
+end
+
 return GameConfigPicker

@@ -7,6 +7,11 @@ local PendingPromiseTracker = {}
 PendingPromiseTracker.ClassName = "PendingPromiseTracker"
 PendingPromiseTracker.__index = PendingPromiseTracker
 
+--[=[
+	Returns a new pending promise tracker
+
+	@return PendingPromiseTracker<T>
+]=]
 function PendingPromiseTracker.new()
 	local self = setmetatable({}, PendingPromiseTracker)
 
@@ -15,6 +20,11 @@ function PendingPromiseTracker.new()
 	return self
 end
 
+--[=[
+	Adds a new promise to the tracker. If it's not pending it will not add.
+
+	@param promise Promise<T>
+]=]
 function PendingPromiseTracker:Add(promise)
 	if promise:IsPending() then
 		self._pendingPromises[promise] = true
@@ -24,6 +34,11 @@ function PendingPromiseTracker:Add(promise)
 	end
 end
 
+--[=[
+	Gets all of the promises that are pending
+
+	@return { Promise<T> }
+]=]
 function PendingPromiseTracker:GetAll()
 	local promises = {}
 	for promise, _ in pairs(self._pendingPromises) do

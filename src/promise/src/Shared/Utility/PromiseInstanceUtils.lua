@@ -10,6 +10,8 @@ local Maid = require("Maid")
 local PromiseInstanceUtils = {}
 
 --[=[
+	Promise that resolves when an instance is removed
+
 	@param instance Instance
 	@return Promise
 ]=]
@@ -17,7 +19,6 @@ function PromiseInstanceUtils.promiseRemoved(instance)
 	assert(instance:IsDescendantOf(game))
 
 	local maid = Maid.new()
-
 	local promise = Promise.new()
 
 	maid:GiveTask(instance.AncestryChanged:Connect(function(_, parent)

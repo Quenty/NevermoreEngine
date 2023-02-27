@@ -291,6 +291,33 @@ function AvatarEditorUtils.promiseIsFavorited(itemId: number, itemType: AvatarIt
 end
 
 --[=[
+	This function returns if the Players.LocalPlayer has favorited the given bundle or asset.
+
+	@param catalogSearchParams CatalogSearchParams
+	@return Promise<CatalogPages>
+]=]
+function AvatarEditorUtils.promiseSearchCatalog(catalogSearchParams: CatalogSearchParams)
+	assert(typeof(catalogSearchParams) == "CatalogSearchParams", "Bad catalogSearchParams")
+
+	return Promise.spawn(function(resolve, reject)
+		local catalogPages
+		local ok, err = pcall(function()
+			catalogPages = AvatarEditorService:SearchCatalog(catalogSearchParams)
+		end)
+
+		if not ok then
+			return reject(err or "[AvatarEditorUtils.promiseSearchCatalog] - Failed to GetFavorite")
+		end
+
+		if typeof(catalogPages) ~= "Instance" then
+			return reject(err, "[AvatarEditorUtils.promiseSearchCatalog] - Not a boolean result for catalogPages")
+		end
+
+		return resolve(catalogPages)
+	end)
+end
+
+--[=[
 	Returns an InventoryPages object with information about owned items in the users inventory with the given AvatarAssetTypes.
 
 	@param assetTypes { AvatarAssetType }

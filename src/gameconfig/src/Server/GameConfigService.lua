@@ -18,6 +18,10 @@ local GameConfigServiceConstants = require("GameConfigServiceConstants")
 local GameConfigService = {}
 GameConfigService.ServiceName = "GameConfigService"
 
+--[=[
+	Initializes the configuration service. Should be done via [ServiceBag].
+	@param serviceBag ServiceBag
+]=]
 function GameConfigService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -37,23 +41,76 @@ function GameConfigService:Init(serviceBag)
 	self._getPreferredParent = PreferredParentUtils.createPreferredParentRetriever(ReplicatedStorage, "GameConfigs")
 end
 
+--[=[
+	Starts the configuration service. Should be done via [ServiceBag].
+]=]
+function GameConfigService:Start()
+	assert(self._serviceBag, "Not initialized")
+	self._started = true
+end
+
+--[=[
+	Adds a new badge with the key configured to the `assetKey`
+	@param assetKey string -- Key name to use for the badge
+	@param badgeId number -- Cloud id
+]=]
 function GameConfigService:AddBadge(assetKey, badgeId)
-	self:AddAsset(GameConfigAssetTypes.BADGE, assetKey, badgeId)
+	self:AddTypedAsset(GameConfigAssetTypes.BADGE, assetKey, badgeId)
 end
 
+--[=[
+	Adds a new product with the key configured to the `assetKey`
+	@param assetKey string -- Key name to use for the product
+	@param productId number -- Cloud id
+]=]
 function GameConfigService:AddProduct(assetKey, productId)
-	self:AddAsset(GameConfigAssetTypes.PRODUCT, assetKey, productId)
+	self:AddTypedAsset(GameConfigAssetTypes.PRODUCT, assetKey, productId)
 end
 
+--[=[
+	Adds a new pass with the key configured to the `assetKey`
+	@param assetKey string -- Key name to use for the pass
+	@param passId number -- Cloud id
+]=]
 function GameConfigService:AddPass(assetKey, passId)
-	self:AddAsset(GameConfigAssetTypes.PASS, assetKey, passId)
+	self:AddTypedAsset(GameConfigAssetTypes.PASS, assetKey, passId)
 end
 
+--[=[
+	Adds a new place with the key configured to the `assetKey`
+	@param assetKey string -- Key name to use for the place
+	@param placeId number -- Cloud id
+]=]
 function GameConfigService:AddPlace(assetKey, placeId)
-	self:AddAsset(GameConfigAssetTypes.PLACE, assetKey, placeId)
+	self:AddTypedAsset(GameConfigAssetTypes.PLACE, assetKey, placeId)
 end
 
-function GameConfigService:AddAsset(assetType, assetKey, assetId)
+--[=[
+	Adds a new asset with the key configured to the `assetKey`
+	@param assetKey string -- Key name to use for the asset
+	@param assetId number -- Cloud id
+]=]
+function GameConfigService:AddAsset(assetKey, assetId)
+	self:AddTypedAsset(GameConfigAssetTypes.ASSET, assetKey, assetId)
+end
+
+--[=[
+	Adds a new bundle with the key configured to the `assetKey`
+	@param assetKey string -- Key name to use for the bundle
+	@param bundleId number -- Cloud id
+]=]
+function GameConfigService:AddBundle(assetKey, bundleId)
+	self:AddTypedAsset(GameConfigAssetTypes.BUNDLE, assetKey, bundleId)
+end
+
+--[=[
+	Adds a new asset with the specified type
+
+	@param assetType GameConfigAssetType
+	@param assetKey string -- Key name to use for the bundle
+	@param assetId number -- Cloud id
+]=]
+function GameConfigService:AddTypedAsset(assetType, assetKey, assetId)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 	assert(type(assetId) == "number", "Bad assetId")
@@ -66,22 +123,27 @@ function GameConfigService:AddAsset(assetType, assetKey, assetId)
 	return asset
 end
 
-function GameConfigService:Start()
-	assert(self._serviceBag, "Not initialized")
-	self._started = true
-end
+--[=[
+	Gets the current config picker
 
+	@return GameConfigPicker
+]=]
 function GameConfigService:GetConfigPicker()
 	return self._configPicker
 end
 
+--[=[
+	Returns the preferred parent for the configuration service
+
+	@return Instance
+]=]
 function GameConfigService:GetPreferredParent()
 	return self._getPreferredParent()
 end
 
 function GameConfigService:_getOrCreateDefaultGameConfig()
 	for _, item in pairs(self._binders.GameConfig:GetAll()) do
-		if item:GetGameId() == game.GameId and item:GetConfigName() == GameConfigServiceConstants.DEFAULT_CONFIG_NAME then
+		if item:GetGameId() == game.GameId then
 			return item:GetFolder()
 		end
 	end
@@ -93,6 +155,9 @@ function GameConfigService:_getOrCreateDefaultGameConfig()
 	return config
 end
 
+--[=[
+	Cleans up the configuration service. Should be done via [ServiceBag].
+]=]
 function GameConfigService:Destroy()
 	self._maid:DoCleaning()
 end

@@ -46,7 +46,7 @@ local MarketplaceUtils = {}
 
 --[=[
 	Product info result for gamepasses.
-	@interface GamepassOrDeveloperProductInfo
+	@interface GamePassOrDeveloperProductInfo
 	.Creator CreatorProductInfo -- A table of information describing the creator of the asset
 	.ProductId number -- If the InfoType was Product, this is the product ID
 	.IconImageAssetId number -- This is the asset ID of the product/pass icon, or 0 if there isn't one
@@ -65,7 +65,7 @@ local MarketplaceUtils = {}
 	Wraps [MarketplaceService.GetProductInfo] and retrieves information about
 	@param assetId number
 	@param infoType InfoType
-	@return Promise<AssetProductInfo | GamepassOrDeveloperProductInfo>
+	@return Promise<AssetProductInfo | GamePassOrDeveloperProductInfo>
 ]=]
 function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 	assert(type(assetId) == "number", "Bad assetId")

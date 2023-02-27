@@ -7,8 +7,19 @@ local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
 
--- NOTE: To use properly please make sure to reject the promise for proper GC if the object requiring
--- this value is GCed.
+--[=[
+	Promise that resolves when the property value is truthy.
+
+	:::warning
+	To use properly please make sure to reject the promise for proper GC if the object requiring
+	:::
+
+	@function promisePropertyValue
+	@param instance Instance
+	@param propertyName string
+	@return Promise<Instance>
+	@within promisePropertyValue
+]=]
 return function(instance, propertyName)
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(propertyName) == "string", "Bad propertyName")
