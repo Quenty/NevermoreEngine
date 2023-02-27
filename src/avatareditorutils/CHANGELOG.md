@@ -1,20 +1,18 @@
-# v1.7.0 (Mon Feb 27 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add small documentation and other changes to libraries [#330](https://github.com/Quenty/NevermoreEngine/pull/330) ([@Quenty](https://github.com/Quenty))
-- feat: Add AvatarEditorUtils.promiseSearchCatalog(catalogSearchParams: CatalogSearchParams) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.6.0...@quenty/avatareditorutils@1.7.0) (2023-02-27)
+
+
+### Features
+
+* Add AvatarEditorUtils.promiseSearchCatalog(catalogSearchParams: CatalogSearchParams) ([3784e65](https://github.com/Quenty/NevermoreEngine/commit/3784e658bac1fd82b5d90f805414864ec0a0e2da))
+
+
+
+
 
 # [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/avatareditorutils@1.5.0...@quenty/avatareditorutils@1.6.0) (2023-02-21)
 

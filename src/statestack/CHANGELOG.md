@@ -1,20 +1,18 @@
-# v8.6.0 (Mon Feb 27 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add small documentation and other changes to libraries [#330](https://github.com/Quenty/NevermoreEngine/pull/330) ([@Quenty](https://github.com/Quenty))
-- feat: Add defaultValue to RxStateStackUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.5.0...@quenty/statestack@8.6.0) (2023-02-27)
+
+
+### Features
+
+* Add defaultValue to RxStateStackUtils ([ada9d3e](https://github.com/Quenty/NevermoreEngine/commit/ada9d3e02eb4efe3fce6eeb8361ea92fccc9f49e))
+
+
+
+
 
 # [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.4.0...@quenty/statestack@8.5.0) (2023-02-21)
 

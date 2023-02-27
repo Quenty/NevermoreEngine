@@ -1,20 +1,18 @@
-# v5.15.0 (Mon Feb 27 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add small documentation and other changes to libraries [#330](https://github.com/Quenty/NevermoreEngine/pull/330) ([@Quenty](https://github.com/Quenty))
-- feat: Add assets and bundles to game configuration ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.14.0...@quenty/gameconfig@5.15.0) (2023-02-27)
+
+
+### Features
+
+* Add assets and bundles to game configuration ([0f37e07](https://github.com/Quenty/NevermoreEngine/commit/0f37e07e17c249ab09aed1bec795ae47e9d39f25))
+
+
+
+
 
 # [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.13.0...@quenty/gameconfig@5.14.0) (2023-02-21)
 

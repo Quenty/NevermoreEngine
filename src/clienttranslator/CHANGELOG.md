@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.10.0...@quenty/clienttranslator@8.11.0) (2023-02-27)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
 # [8.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.9.0...@quenty/clienttranslator@8.10.0) (2023-02-21)
 
 **Note:** Version bump only for package @quenty/clienttranslator
