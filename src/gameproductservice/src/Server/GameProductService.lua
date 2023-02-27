@@ -1,4 +1,13 @@
 --[=[
+	This service provides an interface to purchase produces, assets, and other
+	marketplace items. This listens to events, handles requests between server and
+	client, and takes in both assetKeys from GameConfigService, as well as
+	assetIds.
+
+	See [GameProductServiceClient] for the client equivalent. The API surface should be
+	effectively the same between the two.
+
+	@server
 	@class GameProductService
 ]=]
 
@@ -7,11 +16,17 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
 
-local GameProductServiceBase = require("GameProductServiceBase")
 local Maid = require("Maid")
+local GameProductServiceHelper = require("GameProductServiceHelper")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 
-local GameProductService = GameProductServiceBase.new()
+local GameProductService = {}
+GameProductService.ServiceName = "GameProductService"
 
+--[=[
+	Initializes the service. Should be done via [ServiceBag]
+	@param serviceBag ServiceBag
+]=]
 function GameProductService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 
@@ -23,21 +38,93 @@ function GameProductService:Init(serviceBag)
 
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("GameProductBindersServer"))
+
+	-- Configure
+	self._helper = GameProductServiceHelper.new(self._binders.PlayerProductManager)
+	self._maid:GiveTask(self._helper)
 end
 
+--[=[
+	Starts the service. Should be done via [ServiceBag]
+]=]
 function GameProductService:Start()
+	-- TODO: Avoid binding this unless explicitly asked to
+	-- TODO: Provide receipt processing API surface
+
 	MarketplaceService.ProcessReceipt = function(...)
 		return self:_processReceipt(...)
 	end
 
 	self._maid:GiveTask(function()
-		-- This might be unsafe
-		MarketplaceService.ProcessReceipt = nil
+		task.spawn(function()
+			-- This might be unsafe
+			MarketplaceService.ProcessReceipt = nil
+		end)
 	end)
 end
 
-function GameProductService:GetPlayerProductManagerBinder()
-	return self._binders.PlayerProductManager
+--[=[
+	Returns true if item has been purchased this session
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return boolean
+]=]
+function GameProductService:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+end
+
+--[=[
+	Prompts the user to purchase the asset, and returns true if purchased
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return boolean
+]=]
+function GameProductService:PromisePlayerPromptPurchase(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:PromisePromptPurchase(player, assetType, idOrKey)
+end
+
+--[=[
+	Returns true if item has been purchased this session
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise<boolean>
+]=]
+function GameProductService:PromisePlayerOwnership(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:PromisePlayerOwnership(player, assetType, idOrKey)
+end
+
+--[=[
+	Observes if the player owns this cloud asset or not
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Observable<boolean>
+]=]
+function GameProductService:ObservePlayerOwnership(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:ObservePlayerOwnership(player, assetType, idOrKey)
 end
 
 function GameProductService:_processReceipt(receiptInfo)
