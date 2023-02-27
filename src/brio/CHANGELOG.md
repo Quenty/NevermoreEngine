@@ -1,3 +1,19 @@
+# v8.6.0 (Mon Feb 27 2023)
+
+#### 🚀 Enhancement
+
+- feat: Add small documentation and other changes to libraries [#330](https://github.com/Quenty/NevermoreEngine/pull/330) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: switchToBrio() has better performance ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
