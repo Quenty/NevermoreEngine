@@ -1,3 +1,16 @@
+# v6.0.0 (Mon Feb 27 2023)
+
+#### 💥 Breaking Change
+
+- feat!: BREAKING CHANGE: Refactor GameProductService to reduce API sur… [#331](https://github.com/Quenty/NevermoreEngine/pull/331) ([@Quenty](https://github.com/Quenty))
+- feat!: BREAKING CHANGE: Refactor GameProductService to reduce API surface while adding supports for bundle and assets. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
