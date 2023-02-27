@@ -13,19 +13,39 @@ serviceBag:GetService(packages.GameProductService)
 serviceBag:Init()
 serviceBag:Start()
 
-serviceBag:GetService(packages.GameConfigService):AddPass("TestProduct", 27825080)
+serviceBag:GetService(packages.GameConfigService):AddPass("TestPass", 27825080)
+serviceBag:GetService(packages.GameConfigService):AddProduct("TestProduct", 29082053)
+serviceBag:GetService(packages.GameConfigService):AddAsset("FrogOnHead", 4556535529)
 
-local promptPart = Instance.new("Part")
-promptPart.Parent = workspace
-promptPart.Anchored = true
-promptPart.Name = "promptPart"
-promptPart.Size = Vector3.new(1, 1, 1)
-promptPart.CFrame = CFrame.new(0, 10, 0)
+local GameConfigAssetTypes = require(packages.GameConfigAssetTypes)
 
-local prompt = Instance.new("ProximityPrompt")
-prompt.ActionText = "Prompt Pass"
-prompt.Parent = promptPart
+local function makePrompt(assetType, idOrKey, cframe)
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-prompt.Triggered:Connect(function(player)
-	serviceBag:GetService(packages.GameProductService):PromptGamePassPurchase(player, 27825080)
-end)
+	local promptPart = Instance.new("Part")
+	promptPart.Parent = workspace
+	promptPart.Anchored = true
+	promptPart.TopSurface = Enum.SurfaceType.Smooth
+	promptPart.BottomSurface = Enum.SurfaceType.Smooth
+	promptPart.Name = "promptPart"
+	promptPart.Size = Vector3.new(1, 1, 1)
+	promptPart.CFrame = cframe
+
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText = string.format("Prompt %s (%s)", assetType, tostring(idOrKey))
+	prompt.Parent = promptPart
+
+	prompt.Triggered:Connect(function(player)
+		serviceBag:GetService(packages.GameProductService):PromisePromptPurchase(player, assetType, idOrKey)
+			:Then(function(purchased)
+				print("purchased", idOrKey, purchased)
+			end)
+	end)
+end
+
+makePrompt(GameConfigAssetTypes.ASSET, 9238589603, CFrame.new(0, 5, -20))
+makePrompt(GameConfigAssetTypes.PASS, "TestPass", CFrame.new(0, 5, -10))
+makePrompt(GameConfigAssetTypes.PASS, 27825080, CFrame.new(0, 5, 0))
+makePrompt(GameConfigAssetTypes.PRODUCT, "TestProduct", CFrame.new(0, 5, 10))
+makePrompt(GameConfigAssetTypes.PRODUCT, "SpyglassProduct", CFrame.new(0, 5, 20))
+makePrompt(GameConfigAssetTypes.ASSET, "FrogOnHead", CFrame.new(0, 5, 30))

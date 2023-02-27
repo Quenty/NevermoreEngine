@@ -10,6 +10,5 @@ return Table.readonly({
 	REMOTE_EVENT_NAME = "PlayerProductManagerRemoteEvent";
 
 	-- Client -> Server
-	NOTIFY_PROMPT_FINISHED = "NotifyPromptFinished";
-	NOTIFY_GAMEPASS_FINISHED = "NotifyGamepassFinished";
+	NOTIFY_PROMPT_FINISHED = "notifyPromptFinished";
 })

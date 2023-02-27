@@ -1,20 +1,35 @@
 --[=[
+	This service provides an interface to purchase produces, assets, and other
+	marketplace items. This listens to events, handles requests between server and
+	client, and takes in both assetKeys from GameConfigService, as well as
+	assetIds.
+
+	See [GameProductService] for the server equivalent. The API surface should be
+	effectively the same between the two.
+
+	@client
 	@class GameProductServiceClient
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
-local MarketplaceService = game:GetService("MarketplaceService")
 
-local Maid = require("Maid")
-local GameProductServiceBase = require("GameProductServiceBase")
-local Signal = require("Signal")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local Maid = require("Maid")
 local Promise = require("Promise")
+local RxBinderUtils = require("RxBinderUtils")
+local Signal = require("Signal")
+local GameProductServiceHelper = require("GameProductServiceHelper")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 
-local GameProductServiceClient = GameProductServiceBase.new()
+local GameProductServiceClient = {}
+GameProductServiceClient.ServiceName = "GameProductServiceClient"
 
+--[=[
+	Initializes the service. Should be done via [ServiceBag]
+	@param serviceBag ServiceBag
+]=]
 function GameProductServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -26,77 +41,117 @@ function GameProductServiceClient:Init(serviceBag)
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("GameProductBindersClient"))
 
-	self.GamepassPurchased = Signal.new() -- :Fire(gamepassId)
-	self._maid:GiveTask(self.GamepassPurchased)
+	self._helper = GameProductServiceHelper.new(self._binders.PlayerProductManager)
+	self._maid:GiveTask(self._helper)
 
-	self.DevProductPurchased = Signal.new() -- :Fire(productId)
-	self._maid:GiveTask(self.DevProductPurchased)
+	-- Additional API for ergonomics
+	self.GamePassPurchased = Signal.new() -- :Fire(gamePassId)
+	self._maid:GiveTask(self.GamePassPurchased)
 
-	self._promptClosedEvent = Signal.new()
-	self._maid:GiveTask(self._promptClosedEvent)
+	self.ProductPurchased = Signal.new() -- :Fire(productId)
+	self._maid:GiveTask(self.ProductPurchased)
 
-	self._purchasedGamePassesThisSession = {}
-	self._maid:GiveTask(MarketplaceService.PromptGamePassPurchaseFinished
-		:Connect(function(player, gamepassId, wasPurchased)
-			if player == Players.LocalPlayer then
-				self._promptClosedEvent:Fire()
-				if wasPurchased then
-					self._purchasedGamePassesThisSession[gamepassId] = true
-					-- self._fireworksService:Create(3)
-					self.GamepassPurchased:Fire(gamepassId)
-				end
-			end
-		end))
+	self.AssetPurchased = Signal.new() -- :Fire(assetId)
+	self._maid:GiveTask(self.AssetPurchased)
 
-	self._purchasedDevProductsThisSession = {}
-	self._maid:GiveTask(MarketplaceService.PromptProductPurchaseFinished
-		:Connect(function(userId, productId, wasPurchased)
-			if userId == Players.LocalPlayer.UserId then
-				self._promptClosedEvent:Fire()
-				if wasPurchased then
-					-- self._fireworksService:Create(3)
-					self._purchasedDevProductsThisSession[productId] = true
-					self.DevProductPurchased:Fire(productId)
-				end
-			end
-		end))
+	self.BundlePurchased = Signal.new() -- :Fire(bundleId)
+	self._maid:GiveTask(self.BundlePurchased)
 end
 
 --[=[
-	Promises whether the local player owns the pass or not
-	@param passIdOrKey string | number
+	Starts the service. Should be done via [ServiceBag]
+]=]
+function GameProductServiceClient:Start()
+	self._maid:GiveTask(RxBinderUtils.observeBoundClassBrio(self._binders.PlayerProductManager, Players.LocalPlayer):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid = brio:ToMaid()
+		local playerProductManager = brio:GetValue()
+		local playerMrketeer = playerProductManager:GetMarketeer()
+
+		local function exposeSignal(signal, assetType)
+			maid:GiveTask(playerMrketeer:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
+				signal:Fire(...)
+			end))
+		end
+
+		exposeSignal(self.GamePassPurchased, GameConfigAssetTypes.PASS)
+		exposeSignal(self.ProductPurchased, GameConfigAssetTypes.PRODUCT)
+		exposeSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
+		exposeSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
+	end))
+end
+
+--[=[
+	Returns true if item has been purchased this session
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return boolean
+]=]
+function GameProductServiceClient:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+end
+
+--[=[
+	Prompts the user to purchase the asset, and returns true if purchased
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromiseLocalPlayerOwnsPass(passIdOrKey)
-	assert(type(passIdOrKey) == "number" or type(passIdOrKey) == "string", "Bad passIdOrKey")
+function GameProductServiceClient:PromisePromptPurchase(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	local passId = self:ToAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
-	if not passId then
-		return Promise.rejected(("No asset with key %q"):format(tostring(passIdOrKey)))
-	end
 
-	if self._purchasedGamePassesThisSession[passId] == true then
-		return Promise.resolved(self._purchasedGamePassesThisSession[passId])
-	end
-
-	return self:PromisePlayerOwnsPass(Players.LocalPlayer, passId)
+	return self._helper:PromisePromptPurchase(player, assetType, idOrKey)
 end
 
 --[=[
-	Observes whether the local player owns the pass or not
-	@param passIdOrKey string | number
+	Returns true if item has been purchased this session
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise<boolean>
+]=]
+function GameProductServiceClient:PromisePlayerOwnership(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:PromisePromptPurchase(player, assetType, idOrKey)
+end
+
+--[=[
+	Observes if the player owns this cloud asset or not
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
 	@return Observable<boolean>
 ]=]
-function GameProductServiceBase:ObserveLocalPlayerOwnsPass(passIdOrKey)
-	assert(type(passIdOrKey) == "number" or type(passIdOrKey) == "string", "Bad passIdOrKey")
+function GameProductServiceClient:ObservePlayerOwnership(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self:ObservePlayerOwnsPass(Players.LocalPlayer, passIdOrKey)
+	return self._helper:ObservePlayerOwnership(player, assetType, idOrKey)
 end
 
-function GameProductServiceClient:GetPlayerProductManagerBinder()
-	return self._binders.PlayerProductManager
-end
-
+--[=[
+	Flags the propmt is open
+]=]
 function GameProductServiceClient:FlagPromptOpen()
 	assert(self ~= GameProductServiceClient, "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
@@ -104,6 +159,11 @@ function GameProductServiceClient:FlagPromptOpen()
 	self._promptOpenFlag = true
 end
 
+
+--[=[
+	Returns true if the prompt is open
+	@return boolean
+]=]
 function GameProductServiceClient:GuessIfPromptOpenFromFlags()
 	assert(self ~= GameProductServiceClient, "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
@@ -111,66 +171,28 @@ function GameProductServiceClient:GuessIfPromptOpenFromFlags()
 	return self._promptOpenFlag
 end
 
-function GameProductServiceClient:HasPurchasedProductThisSession(productIdOrKey)
-	assert(self ~= GameProductServiceClient, "Use serviceBag")
-	assert(self._serviceBag, "Not initialized")
-	assert(type(productIdOrKey) == "number" or type(productIdOrKey) == "string", "productIdOrKey")
+--[=[
+	Promises to either check a gamepass or a product to see if it's purchased.
 
-	local productId = self:ToAssetId(GameConfigAssetTypes.PRODUCT, productIdOrKey)
-	if not productId then
-		warn(("No asset with key %q"):format(tostring(productIdOrKey)))
-		return false
-	end
+	@param gamePassIdOrKey string | number
+	@param productIdOrKey string | number
+	@return boolean
+]=]
+function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(gamePassIdOrKey, productIdOrKey)
+	assert(type(gamePassIdOrKey) == "number" or type(gamePassIdOrKey) == "string", "Bad gamePassIdOrKey")
+	assert(type(productIdOrKey) == "number" or type(productIdOrKey) == "string", "Bad productIdOrKey")
 
-	if self._purchasedDevProductsThisSession[productIdOrKey] then
-		return true
-	end
-
-	return false
-end
-
-function GameProductServiceClient:PromisePurchasedOrPrompt(passIdOrKey)
-	local gamepassId = self:ToAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
-	if not gamepassId then
-		return Promise.rejected(("No asset with key %q"):format(tostring(passIdOrKey)))
-	end
-
-	return self:PromiseLocalPlayerOwnsPass(gamepassId)
-		:Then(function(owned)
-			if not owned then
-				MarketplaceService:PromptGamePassPurchase(Players.LocalPlayer, gamepassId)
-			end
-
-			return owned
-		end)
-end
-
-function GameProductServiceClient:PromiseGamepassOrProductUnlockOrPrompt(passIdOrKey, productIdOrKey)
-	assert(passIdOrKey, "Bad passIdOrKey")
-	assert(productIdOrKey, "Bad productIdOrKey")
-
-	local productId = self:ToAssetId(GameConfigAssetTypes.PRODUCT, productIdOrKey)
-	if not productId then
-		return Promise.rejected(("No asset with key %q"):format(tostring(productIdOrKey)))
-	end
-
-	local gamepassId = self:ToAssetId(GameConfigAssetTypes.PASS, passIdOrKey)
-	if not gamepassId then
-		return Promise.rejected(("No asset with key %q"):format(tostring(passIdOrKey)))
-	end
-
-	if self:HasPurchasedProductThisSession(productId) then
+	if self:HasPurchasedThisSession(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey) then
 		return Promise.resolved(true)
 	end
 
-	return self:PromiseLocalPlayerOwnsPass(gamepassId)
-		:Then(function(owned)
-			if owned then
-				return owned
+	return self:PromisePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.PASS, productIdOrKey)
+		:Then(function(owns)
+			if owns then
+				return true
+			else
+				return self:PromisePromptPurchase(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey)
 			end
-
-			MarketplaceService:PromptProductPurchase(Players.LocalPlayer, productId)
-			return owned
 		end)
 end
 

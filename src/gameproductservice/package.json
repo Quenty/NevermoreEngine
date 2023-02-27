@@ -34,6 +34,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/marketplaceutils": "file:../marketplaceutils",
+    "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/playerbinder": "file:../playerbinder",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
@@ -42,6 +43,7 @@
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
+    "@quenty/string": "file:../string",
     "@quenty/table": "file:../table"
   }
 }

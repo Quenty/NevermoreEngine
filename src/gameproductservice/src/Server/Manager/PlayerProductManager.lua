@@ -1,28 +1,41 @@
 --[=[
+	Handles product prompting state on the server
+
+	@server
 	@class PlayerProductManager
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local MarketplaceService = game:GetService("MarketplaceService")
-
-local PlayerProductManagerBase = require("PlayerProductManagerBase")
-local PlayerProductManagerConstants = require("PlayerProductManagerConstants")
-local Promise = require("Promise")
 local GameConfigService = require("GameConfigService")
+local BaseObject = require("BaseObject")
+local PlayerProductManagerConstants = require("PlayerProductManagerConstants")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local PlayerMarketeer = require("PlayerMarketeer")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 
-local PlayerProductManager = setmetatable({}, PlayerProductManagerBase)
+local PlayerProductManager = setmetatable({}, BaseObject)
 PlayerProductManager.ClassName = "PlayerProductManager"
 PlayerProductManager.__index = PlayerProductManager
 
-function PlayerProductManager.new(obj, serviceBag)
-	local self = setmetatable(PlayerProductManagerBase.new(obj), PlayerProductManager)
+--[=[
+	Managers players products and purchase state. Should be retrieved via binder.
+
+	@param player Player
+	@param serviceBag ServiceBag
+	@return PlayerProductManager
+]=]
+function PlayerProductManager.new(player, serviceBag)
+	local self = setmetatable(BaseObject.new(player), PlayerProductManager)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
 
-	self._pendingProductPromises = {} -- { [number] = Promise<boolean> }
-	self._pendingPassPromises = {} -- { [number] = Promise<boolean> }
+	self._marketeer = PlayerMarketeer.new(self._obj, self._gameConfigService:GetConfigPicker())
+	self._maid:GiveTask(self._marketeer)
+
+	-- Expect configuration on receipt processing
+	self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT):SetReceiptProcessingExpected(true)
 
 	self._remoteEvent = Instance.new("RemoteEvent")
 	self._remoteEvent.Name = PlayerProductManagerConstants.REMOTE_EVENT_NAME
@@ -34,121 +47,58 @@ function PlayerProductManager.new(obj, serviceBag)
 		self:_handleServerEvent(...)
 	end))
 
-	self._maid:GiveTask(function()
-		self:_cancelAllPendingPrompts()
-	end)
-
-	self:InitOwnershipAttributes()
+	-- Initialize attributes
+	self._marketeer:GetOwnershipTrackerOrError(GameConfigAssetTypes.PASS):SetWriteAttributesEnabled(true)
 
 	return self
 end
 
-function PlayerProductManager:PromptGamePassPurchase(gamePassId)
-	assert(type(gamePassId) == "number", "Bad gamePassId")
-
-	if self._pendingPassPromises[gamePassId] then
-		return self._maid:GivePromise(self._pendingPassPromises[gamePassId])
-	end
-
-	MarketplaceService:PromptGamePassPurchase(self._obj, gamePassId)
-	local promise = Promise.new()
-
-	self._pendingPassPromises[gamePassId] = promise
-
-	return self._maid:GivePromise(promise)
+function PlayerProductManager:GetMarketeer()
+	return self._marketeer
 end
 
-function PlayerProductManager:PromisePromptPurchase(productId)
-	assert(type(productId) == "number", "Bad productId")
-
-	if self._pendingProductPromises[productId] then
-		return self._maid:GivePromise(self._pendingProductPromises[productId])
-	end
-
-	MarketplaceService:PromptProductPurchase(self._obj, productId)
-	local promise = Promise.new()
-
-	self._pendingProductPromises[productId] = promise
-
-	return self._maid:GivePromise(promise)
-end
-
-function PlayerProductManager:HandleProcessReceipt(player, receiptInfo)
-	assert(self._obj == player, "Bad player")
-
-	local pendingForAssetId = self._pendingProductPromises[receiptInfo.ProductId]
-	if pendingForAssetId then
-		self._pendingProductPromises[receiptInfo.ProductId] = nil
-		pendingForAssetId:Resolve(true)
-
-		return Enum.ProductPurchaseDecision.PurchaseGranted
-	end
-
-	return Enum.ProductPurchaseDecision.NotProcessedYet
-end
-
--- For overrides
-function PlayerProductManagerBase:GetConfigPicker()
-	return self._gameConfigService:GetConfigPicker()
+--[=[
+	Gets the current player
+	@return Player
+]=]
+function PlayerProductManager:GetPlayer()
+	return self._obj
 end
 
 function PlayerProductManager:_handleServerEvent(player, request, ...)
 	assert(self._obj == player, "Bad player")
-	assert(typeof(player) == "Instance", "Bad player")
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(type(request) == "string", "Bad request")
 
 	if request == PlayerProductManagerConstants.NOTIFY_PROMPT_FINISHED then
 		self:_handlePromptFinished(player, ...)
-	elseif request == PlayerProductManagerConstants.NOTIFY_GAMEPASS_FINISHED then
-		self:_handlePassFinished(player, ...)
 	else
 		error(("Bad request %q"):format(PlayerProductManager))
 	end
 end
 
-function PlayerProductManager:_handlePassFinished(player, gamePassId, isPurchased)
-	assert(typeof(player) == "Instance", "Bad player")
-	assert(type(gamePassId) == "number", "Bad gamePassId")
+function PlayerProductManager:_handlePromptFinished(player, assetType, assetId, isPurchased)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(assetId) == "number", "Bad assetId")
 	assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
-	local promise = self._pendingPassPromises[gamePassId]
-	if promise then
-		if isPurchased then
-			-- TODO: verify this on the server here
-			-- Can we break cache?
-			self:SetPlayerOwnsPass(gamePassId, true)
-		end
-
-		self._pendingPassPromises[gamePassId] = nil
-		promise:Resolve(isPurchased)
-	end
+	local assetTracker = self._marketeer:GetAssetTrackerOrError(assetType)
+	assetTracker:HandlePurchaseEvent(assetId, isPurchased)
 end
 
-function PlayerProductManager:_handlePromptFinished(player, productId, isPurchased)
-	assert(typeof(player) == "Instance", "Bad player")
-	assert(type(productId) == "number", "Bad productId")
-	assert(type(isPurchased) == "boolean", "Bad isPurchased")
+--[=[
+	Handles the receipt processing. Not expected to be called immediately
 
-	local promise = self._pendingProductPromises[productId]
-	if promise then
-		-- Success handled by receipt processing
-		if not isPurchased then
-			self._pendingProductPromises[productId] = nil
-			promise:Resolve(false)
-		end
-	end
-end
+	@param player number
+	@param receiptInfo table
+	@return ProductPurchaseDecision
+]=]
+function PlayerProductManager:HandleProcessReceipt(player, receiptInfo)
+	assert(self._obj == player, "Bad player")
 
-function PlayerProductManager:_cancelAllPendingPrompts()
-	while #self._pendingProductPromises > 0 do
-		local pending = table.remove(self._pendingProductPromises, #self._pendingProductPromises)
-		pending:Reject()
-	end
-
-	while #self._pendingProductPromises > 0 do
-		local pending = table.remove(self._pendingProductPromises, #self._pendingProductPromises)
-		pending:Reject()
-	end
+	local assetTracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
+	return assetTracker:HandleProcessReceipt(player, receiptInfo)
 end
 
 return PlayerProductManager
