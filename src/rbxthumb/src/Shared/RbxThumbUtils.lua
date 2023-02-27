@@ -6,6 +6,10 @@
 	@class RbxThumbUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local RbxThumbnailTypes = require("RbxThumbnailTypes")
+
 local RbxThumbUtils = {}
 
 --[=[
@@ -25,7 +29,7 @@ local RbxThumbUtils = {}
 	"GroupIcon"         150x150, 420x420
 	"Outfit"            150x150, 420x420
 
-	@param thumbnailType ThumbnailType
+	@param thumbnailType RbxThumbnailTypes
 	@param targetId number
 	@param width number
 	@param height number
@@ -38,6 +42,21 @@ function RbxThumbUtils.getThumbnailUrl(thumbnailType, targetId, width, height)
 	assert(type(height) == "number", "Bad height")
 
 	return string.format("rbxthumb://type=%s&id=%d&w=%d&h=%d", thumbnailType, targetId, width, height)
+end
+
+--[=[
+	Converts an AvatarItemType to a string thumbnailType for thumbnail generation
+	@param avatarItemType AvatarItemType
+	@return string
+]=]
+function RbxThumbUtils.avatarItemTypeToThumbnailType(avatarItemType)
+	if avatarItemType == Enum.AvatarItemType.Asset then
+		return RbxThumbnailTypes.ASSET
+	elseif avatarItemType == Enum.AvatarItemType.Bundle then
+		return RbxThumbnailTypes.BUNDLE
+	else
+		error("Unknown avatarItemType")
+	end
 end
 
 --[=[
@@ -56,7 +75,7 @@ function RbxThumbUtils.getAssetThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("Asset", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.ASSET, targetId, width, height)
 end
 
 --[=[
@@ -75,7 +94,7 @@ function RbxThumbUtils.getAvatarThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("Avatar", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.AVATAR, targetId, width, height)
 end
 
 --[=[
@@ -94,7 +113,7 @@ function RbxThumbUtils.getAvatarHeadShotThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("AvatarHeadShot", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.AVATAR_HEAD_SHOT, targetId, width, height)
 end
 
 --[=[
@@ -113,7 +132,7 @@ function RbxThumbUtils.getBadgeIconThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("BadgeIcon", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.BADGE, targetId, width, height)
 end
 
 --[=[
@@ -132,7 +151,7 @@ function RbxThumbUtils.getBundleThumbnailThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("BundleThumbnail", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.BUNDLE, targetId, width, height)
 end
 
 --[=[
@@ -151,7 +170,7 @@ function RbxThumbUtils.getGameIconThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("GameIcon", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.GAME_ICON, targetId, width, height)
 end
 
 --[=[
@@ -170,7 +189,7 @@ function RbxThumbUtils.getGamePassThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("GamePass", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.GAME_PASS, targetId, width, height)
 end
 
 --[=[
@@ -189,7 +208,7 @@ function RbxThumbUtils.getGroupIconThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("GroupIcon", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.GROUP_ICON, targetId, width, height)
 end
 
 --[=[
@@ -208,7 +227,7 @@ function RbxThumbUtils.getOutfitThumbnailUrl(targetId, width, height)
 	width = width or 150
 	height = height or 150
 
-	return RbxThumbUtils.getThumbnailUrl("Outfit", targetId, width, height)
+	return RbxThumbUtils.getThumbnailUrl(RbxThumbnailTypes.OUTFIT, targetId, width, height)
 end
 
 
