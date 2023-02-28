@@ -1,6 +1,6 @@
 {
   "name": "@quenty/screenshothudservice",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Provides centralized API surface for screenshot hud API",
   "keywords": [
     "Roblox",

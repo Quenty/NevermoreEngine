@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2023-02-28)
+
+
+### Features
+
+* Add ScreenshotHudService which allows the screenshot HUD to be manipulated ([1160373](https://github.com/Quenty/NevermoreEngine/commit/11603739284ee3ffc4187a5b1c552e186e4095b2))
+
+
+
+
+
 # v1.1.0 (Tue Feb 28 2023)
 
 #### 🚀 Enhancement
