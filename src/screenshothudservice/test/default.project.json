@@ -1,0 +1,21 @@
+{
+  "name": "ScreenshotHudServiceTests",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "screenshothudservice": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}
