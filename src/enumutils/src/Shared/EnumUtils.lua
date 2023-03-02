@@ -50,6 +50,50 @@ function EnumUtils.isOfType(expectedEnumType, enumItem)
 end
 
 --[=[
+	Attempts to cast an item into an enum
+
+	@param enumType EnumType
+	@param value any
+	@return EnumItem
+]=]
+function EnumUtils.toEnum(enumType, value)
+	assert(typeof(enumType) == "Enum", "Bad enum")
+
+	if typeof(value) == "EnumItem" then
+		if value.EnumType == enumType then
+			return value
+		else
+			return nil
+		end
+	elseif type(value) == "number" then
+		-- There has to be a better way, right?
+		for _, item in pairs(enumType:GetEnumItems()) do
+			if item.Value == value then
+				return item
+			end
+		end
+
+		return nil
+	elseif type(value) == "string" then
+		local result = nil
+		pcall(function()
+			result = enumType[value]
+		end)
+		if result then
+			return result
+		end
+
+		-- Check full string name qualifier
+		local decoded = EnumUtils.decodeFromString(value)
+		if decoded and decoded.EnumType == enumType then
+			return decoded
+		else
+			return nil
+		end
+	end
+end
+
+--[=[
 	Returns true if the value is an encoded enum
 
 	@param value any? -- String to decode
