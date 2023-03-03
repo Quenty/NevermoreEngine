@@ -19,6 +19,9 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local Maid = require("Maid")
 local GameProductServiceHelper = require("GameProductServiceHelper")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local Signal = require("Signal")
+local RxBinderUtils = require("RxBinderUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 
 local GameProductService = {}
 GameProductService.ServiceName = "GameProductService"
@@ -42,6 +45,19 @@ function GameProductService:Init(serviceBag)
 	-- Configure
 	self._helper = GameProductServiceHelper.new(self._binders.PlayerProductManager)
 	self._maid:GiveTask(self._helper)
+
+	-- Additional API for ergonomics
+	self.GamePassPurchased = Signal.new() -- :Fire(player, gamePassId)
+	self._maid:GiveTask(self.GamePassPurchased)
+
+	self.ProductPurchased = Signal.new() -- :Fire(player, productId)
+	self._maid:GiveTask(self.ProductPurchased)
+
+	self.AssetPurchased = Signal.new() -- :Fire(player, assetId)
+	self._maid:GiveTask(self.AssetPurchased)
+
+	self.BundlePurchased = Signal.new() -- :Fire(player, bundleId)
+	self._maid:GiveTask(self.BundlePurchased)
 end
 
 --[=[
@@ -54,6 +70,27 @@ function GameProductService:Start()
 	MarketplaceService.ProcessReceipt = function(...)
 		return self:_processReceipt(...)
 	end
+
+	self._maid:GiveTask(RxBinderUtils.observeAllBrio(self._binders.PlayerProductManager):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid = brio:ToMaid()
+		local playerProductManager = brio:GetValue()
+		local playerMrketeer = playerProductManager:GetMarketeer()
+
+		local function exposeSignal(signal, assetType)
+			maid:GiveTask(playerMrketeer:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
+				signal:Fire(playerProductManager:GetPlayer(), ...)
+			end))
+		end
+
+		exposeSignal(self.GamePassPurchased, GameConfigAssetTypes.PASS)
+		exposeSignal(self.ProductPurchased, GameConfigAssetTypes.PRODUCT)
+		exposeSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
+		exposeSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
+	end))
 
 	self._maid:GiveTask(function()
 		task.spawn(function()
@@ -109,6 +146,24 @@ function GameProductService:PromisePlayerOwnership(player, assetType, idOrKey)
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self._helper:PromisePlayerOwnership(player, assetType, idOrKey)
+end
+
+--[=[
+	Checks if the asset is ownable and if it is, checks player ownership. Otherwise, it checks if the asset
+	has been purchased this session. If the asset has not been purchased this session it prompts the user to
+	purchase the item.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise<boolean>
+]=]
+function GameProductService:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
 end
 
 --[=[
