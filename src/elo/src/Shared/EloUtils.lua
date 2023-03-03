@@ -1,5 +1,5 @@
 --[=[
-	Utilities to compute elo scores for players
+	Utilities to compute [elo scores](https://en.wikipedia.org/wiki/Elo_rating_system) for players
 	@class EloUtils
 
 	```lua

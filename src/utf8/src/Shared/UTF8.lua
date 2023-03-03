@@ -1,5 +1,13 @@
 --[=[
 	UTF8 utility functions
+	
+	```lua
+	print(UTF8.upper("Foo"))
+	--FOO
+	print(UTF8.lower("Bar"))
+	--bar
+	```
+	
 	@class UTF8
 ]=]
 

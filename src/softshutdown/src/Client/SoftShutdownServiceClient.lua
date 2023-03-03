@@ -196,6 +196,20 @@ function SoftShutdownServiceClient:_hideCoreGuiUI(maid, ignoreScreenGui)
 		end
 	end)
 
+	PlayerGuiUtils.getPlayerGui().ChildAdded:Connect(function(item)
+
+		if item:IsA("ScreenGui") and item ~= ignoreScreenGui and item.Enabled then
+			enabledScreenGuis[item] = item
+			item.Enabled = false
+
+			maid:GiveTask(function()
+				item.Enabled = true
+			end)
+
+		end
+
+	end)
+
 	for _, coreGuiType in pairs(DISABLE_CORE_GUI_TYPES) do
 		maid:GiveTask(CoreGuiEnabler:Disable(self, coreGuiType))
 	end
