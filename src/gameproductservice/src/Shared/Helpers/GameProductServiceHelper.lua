@@ -10,6 +10,7 @@ local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local RxStateStackUtils = require("RxStateStackUtils")
+local Promise = require("Promise")
 
 local GameProductServiceHelper = setmetatable({}, BaseObject)
 GameProductServiceHelper.ClassName = "GameProductServiceHelper"
@@ -124,6 +125,47 @@ function GameProductServiceHelper:ObservePlayerOwnership(player, assetType, idOr
 		end);
 		RxStateStackUtils.topOfStack(false);
 	})
+end
+
+--[=[
+	Checks if the asset is ownable and if it is, checks player ownership. Otherwise, it checks if the asset
+	has been purchased this session. If the asset has not been purchased this session it prompts the user to
+	purchase the item.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise<boolean>
+]=]
+function GameProductServiceHelper:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self:_promisePlayerMarketeer(player)
+		:Then(function(marketeer)
+			local assetTracker = marketeer:GetAssetTrackerOrError(assetType)
+
+			if marketeer:IsOwnable(assetType) then
+				-- Retrieve ownership
+				local ownershipTracker = marketeer:GetOwnershipTrackerOrError(assetType)
+				return ownershipTracker:PromiseOwnsAsset(idOrKey)
+					:Then(function(ownsAsset)
+						if ownsAsset then
+							return true
+						else
+							return assetTracker:PromisePromptPurchase(idOrKey)
+						end
+					end)
+			else
+				-- Assume this is a single session purchase
+				if assetTracker:HasPurchasedThisSession(idOrKey) then
+					return Promise.resolved(true)
+				end
+
+				return assetTracker:PromisePromptPurchase(idOrKey)
+			end
+		end)
 end
 
 function GameProductServiceHelper:_observePlayerProductManagerBrio(player)

@@ -172,11 +172,29 @@ function GameProductServiceClient:GuessIfPromptOpenFromFlags()
 end
 
 --[=[
+	Checks if the asset is ownable and if it is, checks player ownership. Otherwise, it checks if the asset
+	has been purchased this session. If the asset has not been purchased this session it prompts the user to
+	purchase the item.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise<boolean>
+]=]
+function GameProductServiceClient:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+end
+
+--[=[
 	Promises to either check a gamepass or a product to see if it's purchased.
 
 	@param gamePassIdOrKey string | number
 	@param productIdOrKey string | number
-	@return boolean
+	@return Promise<boolean>
 ]=]
 function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(gamePassIdOrKey, productIdOrKey)
 	assert(type(gamePassIdOrKey) == "number" or type(gamePassIdOrKey) == "string", "Bad gamePassIdOrKey")
