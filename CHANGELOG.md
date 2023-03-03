@@ -1,3 +1,16 @@
+# (Fri Mar 03 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/enumutils@3.1.0`, `@quenty/gameproductservice@6.1.0`
+  - feat: Add EnumUtils.toEnum(enumType, value) [#334](https://github.com/Quenty/NevermoreEngine/pull/334) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Feb 28 2023)
 
 #### 🚀 Enhancement
