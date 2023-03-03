@@ -1,20 +1,18 @@
-# v3.1.0 (Fri Mar 03 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add EnumUtils.toEnum(enumType, value) [#334](https://github.com/Quenty/NevermoreEngine/pull/334) ([@Quenty](https://github.com/Quenty))
-- feat: Add EnumUtils.toEnum(enumType, value) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@3.0.0...@quenty/enumutils@3.1.0) (2023-03-03)
+
+
+### Features
+
+* Add EnumUtils.toEnum(enumType, value) ([04aa32c](https://github.com/Quenty/NevermoreEngine/commit/04aa32c899c27f7ec87325cf7bb72c3ea900a767))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enumutils@2.0.0...@quenty/enumutils@3.0.0) (2022-09-27)
 

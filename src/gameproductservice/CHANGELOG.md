@@ -1,20 +1,18 @@
-# v6.1.0 (Fri Mar 03 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add EnumUtils.toEnum(enumType, value) [#334](https://github.com/Quenty/NevermoreEngine/pull/334) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameProductServiceHelper:PromisePlayerOwnershipOrPrompt() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@6.0.0...@quenty/gameproductservice@6.1.0) (2023-03-03)
+
+
+### Features
+
+* Add GameProductServiceHelper:PromisePlayerOwnershipOrPrompt() ([4712dec](https://github.com/Quenty/NevermoreEngine/commit/4712dec250012283067e6d62ee01e3e682bb5cd4))
+
+
+
+
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@5.15.0...@quenty/gameproductservice@6.0.0) (2023-02-27)
 
