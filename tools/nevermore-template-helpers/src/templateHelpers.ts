@@ -59,7 +59,11 @@ export class TemplateHelper {
       }
 
       const compiledName = (Handlebars as any).default.compile(originalName);
-      const newName = compiledName(input);
+      let newName = compiledName(input);
+      if (newName == 'gitignore') {
+        newName = '.gitignore';
+      }
+
       const stats = await fs.promises.stat(origFilePath);
 
       if (stats.isFile()) {

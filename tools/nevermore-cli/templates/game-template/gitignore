@@ -8,3 +8,4 @@ roblox.yml
 dist
 sourcemap.json
 package-lock.json
+.DS_Store
