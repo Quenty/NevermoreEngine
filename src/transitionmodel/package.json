@@ -1,0 +1,39 @@
+{
+  "name": "@quenty/transitionmodel",
+  "version": "1.0.0",
+  "description": "Helps with Gui visiblity showing and hiding",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "transitionmodel"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/transitionmodel/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/basicpane": "file:../basicpane",
+    "@quenty/blend": "file:../blend",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/signal": "file:../signal"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
