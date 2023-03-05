@@ -1,3 +1,16 @@
+# v1.2.1 (Sun Mar 05 2023)
+
+#### 🐛 Bug Fix
+
+- docs: Add ServiceBag docs [#336](https://github.com/Quenty/NevermoreEngine/pull/336) ([@Quenty](https://github.com/Quenty))
+- fix: Include gitignore in package version of CLI tools ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

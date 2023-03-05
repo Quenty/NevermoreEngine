@@ -1,5 +1,18 @@
 # (Sun Mar 05 2023)
 
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@1.5.1`, `@quenty/nevermore-template-helpers@1.2.1`
+  - docs: Add ServiceBag docs [#336](https://github.com/Quenty/NevermoreEngine/pull/336) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Mar 05 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/blend@6.10.0`, `@quenty/loader@6.2.0`, `@quenty/maid@2.5.0`, `@quenty/transitionmodel@1.1.0`
