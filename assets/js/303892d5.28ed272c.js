@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[68773],{12371:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"TransitionModel","desc":"This model deduplicates and handles transitions for showing, hiding, and\\ntoggling.","source":{"line":7,"path":"src/transitionmodel/src/Shared/TransitionModel.lua"}}')}}]);

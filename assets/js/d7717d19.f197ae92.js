@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[41632],{5933:s=>{s.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"SpringTransitionModel","desc":"","source":{"line":4,"path":"src/transitionmodel/src/Shared/SpringTransitionModel.lua"}}')}}]);
