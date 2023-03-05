@@ -115,7 +115,18 @@ function Maid:__newindex(index, newTask)
 		if type(oldTask) == "function" then
 			oldTask()
 		elseif type(oldTask) == "thread" then
-			task.cancel(oldTask)
+			local cancelled
+			if coroutine.running() ~= oldTask then
+				cancelled = pcall(function()
+					task.cancel(oldTask)
+				end)
+			end
+
+			if not cancelled then
+				task.defer(function()
+					task.cancel(oldTask)
+				end)
+			end
 		elseif typeof(oldTask) == "RBXScriptConnection" then
 			oldTask:Disconnect()
 		elseif oldTask.Destroy then
@@ -201,7 +212,19 @@ function Maid:DoCleaning()
 		if type(job) == "function" then
 			job()
 		elseif type(job) == "thread" then
-			task.cancel(job)
+			local cancelled
+			if coroutine.running() ~= job then
+				cancelled = pcall(function()
+					task.cancel(job)
+				end)
+			end
+
+			if not cancelled then
+				local toCancel = job
+				task.defer(function()
+					task.cancel(toCancel)
+				end)
+			end
 		elseif typeof(job) == "RBXScriptConnection" then
 			job:Disconnect()
 		elseif job.Destroy then
