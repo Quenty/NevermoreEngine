@@ -14,6 +14,7 @@ local Observable = require("Observable")
 local SpringUtils = require("SpringUtils")
 local Blend = require("Blend")
 local Rx = require("Rx")
+local Promise = require("Promise")
 
 local SpringObject = {}
 SpringObject.ClassName = "SpringObject"
@@ -75,6 +76,42 @@ end
 
 function SpringObject:ObserveVelocityOnRenderStepped()
 	return self:ObserveVelocityOnSignal(RunService.RenderStepped)
+end
+
+--[=[
+	Promises that the spring is done, based upon the animating property
+	Relatively expensive.
+
+	@param signal RBXScriptSignal | nil
+	@return Observable<T>
+]=]
+function SpringObject:PromiseFinished(signal)
+	signal = signal or RunService.RenderStepped
+
+	local maid = Maid.new()
+	local promise = Promise.new()
+	maid:GiveTask(promise)
+
+	-- TODO: Mathematical solution?
+	local startAnimate, stopAnimate = StepUtils.bindToSignal(signal, function()
+		local animating = SpringUtils.animating(self._currentSpring)
+		if not animating then
+			promise:Resolve(true)
+		end
+		return animating
+	end)
+
+	maid:GiveTask(stopAnimate)
+	maid:GiveTask(self.Changed:Connect(startAnimate))
+	startAnimate()
+
+	self._maid[promise] = maid
+
+	maid:GiveTask(function()
+		self._maid[promise] = nil
+	end)
+
+	return promise
 end
 
 function SpringObject:ObserveVelocityOnSignal(signal)
