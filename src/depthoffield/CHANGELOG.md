@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.6.0...@quenty/depthoffield@5.7.0) (2023-03-05)
+
+**Note:** Version bump only for package @quenty/depthoffield
+
+
+
+
+
 # [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@5.5.0...@quenty/depthoffield@5.6.0) (2023-02-27)
 
 **Note:** Version bump only for package @quenty/depthoffield

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.9.0...@quenty/rxbinderutils@8.10.0) (2023-03-05)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+
+
+
+
 # [8.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@8.8.0...@quenty/rxbinderutils@8.9.0) (2023-02-27)
 
 **Note:** Version bump only for package @quenty/rxbinderutils

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/fzy",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Lua implementation of fzy string search algorithm",
   "keywords": [
     "Roblox",

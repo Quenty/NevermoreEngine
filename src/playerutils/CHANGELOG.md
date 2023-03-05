@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.7.0...@quenty/playerutils@2.8.0) (2023-03-05)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
 # [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.6.0...@quenty/playerutils@2.7.0) (2023-02-27)
 
 **Note:** Version bump only for package @quenty/playerutils

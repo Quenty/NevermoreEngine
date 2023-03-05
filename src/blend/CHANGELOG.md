@@ -1,20 +1,18 @@
-# v6.10.0 (Sun Mar 05 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/maid [#335](https://github.com/Quenty/NevermoreEngine/pull/335) ([@Quenty](https://github.com/Quenty))
-- feat: Add SpringObject:PromiseFinished(signal) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.9.0...@quenty/blend@6.10.0) (2023-03-05)
+
+
+### Features
+
+* Add SpringObject:PromiseFinished(signal) ([a789b24](https://github.com/Quenty/NevermoreEngine/commit/a789b2481c27d52de73ebabedee8b575f6e555b1))
+
+
+
+
 
 # [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.8.0...@quenty/blend@6.9.0) (2023-02-27)
 
