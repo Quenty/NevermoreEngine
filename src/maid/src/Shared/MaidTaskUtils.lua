@@ -39,7 +39,18 @@ function MaidTaskUtils.doTask(job)
 	if type(job) == "function" then
 		job()
 	elseif type(job) == "thread" then
-		task.cancel(job)
+		local cancelled
+		if coroutine.running() ~= job then
+			cancelled = pcall(function()
+				task.cancel(job)
+			end)
+		end
+
+		if not cancelled then
+			task.defer(function()
+				task.cancel(job)
+			end)
+		end
 	elseif typeof(job) == "RBXScriptConnection" then
 		job:Disconnect()
 	elseif type(job) == "table" and type(job.Destroy) == "function" then
