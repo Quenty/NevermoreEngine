@@ -1,20 +1,18 @@
-# v1.5.1 (Sun Mar 05 2023)
-
-#### 🐛 Bug Fix
-
-- docs: Add ServiceBag docs [#336](https://github.com/Quenty/NevermoreEngine/pull/336) ([@Quenty](https://github.com/Quenty))
-- fix: Include gitignore in package version of CLI tools ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.5.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.5.0...@quenty/nevermore-cli@1.5.1) (2023-03-05)
+
+
+### Bug Fixes
+
+* Include gitignore in package version of CLI tools ([24deebc](https://github.com/Quenty/Nevermore/commit/24deebc055fbd5149256d8ff32d3bd658859f7c7))
+
+
+
+
 
 # [1.5.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.4.0...@quenty/nevermore-cli@1.5.0) (2023-02-22)
 
