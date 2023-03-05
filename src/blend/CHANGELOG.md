@@ -1,3 +1,16 @@
+# v6.10.0 (Sun Mar 05 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/maid [#335](https://github.com/Quenty/NevermoreEngine/pull/335) ([@Quenty](https://github.com/Quenty))
+- feat: Add SpringObject:PromiseFinished(signal) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,19 @@
+# v2.5.0 (Sun Mar 05 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/maid [#335](https://github.com/Quenty/NevermoreEngine/pull/335) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Maids would sometimes error while cancelling threads they were part of. This ensures full cancellation. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

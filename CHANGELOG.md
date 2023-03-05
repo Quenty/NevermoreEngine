@@ -1,3 +1,16 @@
+# (Sun Mar 05 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@6.10.0`, `@quenty/loader@6.2.0`, `@quenty/maid@2.5.0`, `@quenty/transitionmodel@1.1.0`
+  - users/quenty/maid [#335](https://github.com/Quenty/NevermoreEngine/pull/335) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Mar 03 2023)
 
 #### 🚀 Enhancement
