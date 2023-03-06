@@ -1,3 +1,16 @@
+# v2.0.2 (Mon Mar 06 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Fix flipbook playback on odd row/column scenarios [#340](https://github.com/Quenty/NevermoreEngine/pull/340) ([@Quenty](https://github.com/Quenty))
+- fix: Fix flipbook playback on odd row/column scenarios ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

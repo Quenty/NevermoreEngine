@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/flipbook@2.0.2`
+  - fix: Fix flipbook playback on odd row/column scenarios [#340](https://github.com/Quenty/NevermoreEngine/pull/340) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Mar 06 2023)
+
+#### 🐛 Bug Fix
+
 - `@quenty/coreguienabler@6.4.1`, `@quenty/flipbook@2.0.1`
   - Users/quenty/fixes [#339](https://github.com/Quenty/NevermoreEngine/pull/339) ([@Quenty](https://github.com/Quenty))
 
