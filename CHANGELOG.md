@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/flipbook@2.0.3`, `@quenty/qgui@2.2.1`, `@quenty/screenshothudservice@1.2.1`, `@quenty/tie@4.10.1`, `@quenty/viewport@5.15.1`
+  - docs: Update documentation [#341](https://github.com/Quenty/NevermoreEngine/pull/341) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Mar 06 2023)
+
+#### 🐛 Bug Fix
+
 - `@quenty/flipbook@2.0.2`
   - fix: Fix flipbook playback on odd row/column scenarios [#340](https://github.com/Quenty/NevermoreEngine/pull/340) ([@Quenty](https://github.com/Quenty))
 

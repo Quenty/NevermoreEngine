@@ -1,3 +1,16 @@
+# v4.10.1 (Mon Mar 06 2023)
+
+#### 🐛 Bug Fix
+
+- docs: Update documentation [#341](https://github.com/Quenty/NevermoreEngine/pull/341) ([@Quenty](https://github.com/Quenty))
+- docs: Update documentation to have correct links ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
