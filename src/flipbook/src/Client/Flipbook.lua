@@ -37,7 +37,7 @@ function Flipbook.new(data)
 		self:SetFrameCount(data.frameCount)
 	else
 		assert(data.columns, "Bad columns")
-		assert(data.columns, "Bad rows")
+		assert(data.rows, "Bad rows")
 
 		self:SetFrameCount(data.rows*data.columns)
 	end
@@ -48,10 +48,10 @@ function Flipbook.new(data)
 
 	do
 		local image = assert(data.image, "Bad image")
-		local rows = assert(data.rows, "Bad rows")
+		local columns = assert(data.columns, "Bad columns")
 		local imageRectSize = assert(data.imageRectSize, "Bad imageRectSize")
 
-		self:_loadFrames(image, rows, imageRectSize)
+		self:_loadFrames(image, columns, imageRectSize)
 	end
 
 	return self
@@ -61,15 +61,15 @@ function Flipbook.isFlipbook(value)
 	return type(value) == "table" and getmetatable(value) == Flipbook
 end
 
-function Flipbook:_loadFrames(image, rows, imageRectSize)
-	assert(type(rows) == "number", "Bad rows")
+function Flipbook:_loadFrames(image, columns, imageRectSize)
+	assert(type(columns) == "number", "Bad columns")
 	assert(typeof(imageRectSize) == "Vector2", "Bad imageRectSize")
 
 	self:SetImageRectSize(imageRectSize)
 
 	for i=0, self._frameCount do
-		local x = i % rows
-		local y = math.floor(i / rows)
+		local x = i % columns
+		local y = math.floor(i / columns)
 		local position = imageRectSize*Vector2.new(x, y)
 
 		local index = i + 1
