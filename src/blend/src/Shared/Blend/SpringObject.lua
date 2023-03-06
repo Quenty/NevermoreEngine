@@ -30,13 +30,14 @@ SpringObject.__index = SpringObject
 function SpringObject.new(target, speed, damper)
 	local self = setmetatable({
 		_maid = Maid.new();
+		_epsilon = 1e-6;
 		Changed = Signal.new();
 	}, SpringObject)
 
 --[=[
 	Event fires when the spring value changes
 	@prop Changed Signal<()> -- Fires whenever the spring initially changes state
-	@within ValueObject
+	@within SpringObject
 ]=]
 	self._maid:GiveTask(self.Changed)
 
@@ -94,7 +95,7 @@ function SpringObject:PromiseFinished(signal)
 
 	-- TODO: Mathematical solution?
 	local startAnimate, stopAnimate = StepUtils.bindToSignal(signal, function()
-		local animating = SpringUtils.animating(self._currentSpring)
+		local animating = SpringUtils.animating(self._currentSpring, self._epsilon)
 		if not animating then
 			promise:Resolve(true)
 		end
@@ -119,7 +120,7 @@ function SpringObject:ObserveVelocityOnSignal(signal)
 		local maid = Maid.new()
 
 		local startAnimate, stopAnimate = StepUtils.bindToSignal(signal, function()
-			local animating = SpringUtils.animating(self._currentSpring)
+			local animating = SpringUtils.animating(self._currentSpring, self._epsilon)
 			if animating then
 				sub:Fire(SpringUtils.fromLinearIfNeeded(self._currentSpring.Velocity))
 			else
@@ -146,7 +147,7 @@ function SpringObject:ObserveOnSignal(signal)
 		local maid = Maid.new()
 
 		local startAnimate, stopAnimate = StepUtils.bindToSignal(signal, function()
-			local animating, position = SpringUtils.animating(self._currentSpring)
+			local animating, position = SpringUtils.animating(self._currentSpring, self._epsilon)
 			sub:Fire(SpringUtils.fromLinearIfNeeded(position))
 			return animating
 		end)
@@ -164,7 +165,7 @@ end
 	@return boolean -- True if animating
 ]=]
 function SpringObject:IsAnimating()
-	return (SpringUtils.animating(self._currentSpring))
+	return (SpringUtils.animating(self._currentSpring, self._epsilon))
 end
 
 --[=[
@@ -177,6 +178,41 @@ end
 function SpringObject:Impulse(velocity)
 	self._currentSpring:Impulse(SpringUtils.toLinearIfNeeded(velocity))
 	self.Changed:Fire()
+end
+
+--[=[
+	Sets the actual target. If doNotAnimate is set, then animation will be skipped.
+
+	@param value T -- The target to set
+	@param doNotAnimate boolean? -- Whether or not to animate
+	@return ()
+]=]
+function SpringObject:SetTarget(value, doNotAnimate)
+	local observable = Blend.toPropertyObservable(value) or Rx.of(value)
+
+	if doNotAnimate then
+		local isFirst = true
+
+		self._maid._targetSub = observable:Subscribe(function(unconverted)
+			local converted = SpringUtils.toLinearIfNeeded(unconverted)
+			local spring = self:_getSpringForType(converted)
+			spring.Target = converted
+
+			if isFirst then
+				spring.Position = converted
+				spring.Velocity = 0*converted
+			end
+
+			self.Changed:Fire()
+		end)
+	else
+		self._maid._targetSub = observable:Subscribe(function(unconverted)
+			local converted = SpringUtils.toLinearIfNeeded(unconverted)
+			self:_getSpringForType(converted).Target = converted
+
+			self.Changed:Fire()
+		end)
+	end
 end
 
 --[=[
@@ -204,6 +240,8 @@ function SpringObject:__index(index)
 		return self._currentSpring.Speed
 	elseif index == "Clock" then
 		return self._currentSpring.Clock
+	elseif index == "Epsilon" then
+		return self._epsilon
 	elseif SpringObject[index] then
 		return SpringObject[index]
 	else
@@ -230,14 +268,7 @@ function SpringObject:__newindex(index, value)
 			self.Changed:Fire()
 		end)
 	elseif index == "Target" or index == "t" then
-		local observable = Blend.toPropertyObservable(value) or Rx.of(value)
-
-		self._maid._targetSub = observable:Subscribe(function(unconverted)
-			local converted = SpringUtils.toLinearIfNeeded(unconverted)
-			self:_getSpringForType(converted).Target = converted
-
-			self.Changed:Fire()
-		end)
+		self:SetTarget(value)
 	elseif index == "Damper" or index == "d" then
 		local observable = assert(Blend.toNumberObservable(value), "Invalid damper")
 
@@ -256,6 +287,9 @@ function SpringObject:__newindex(index, value)
 			self._currentSpring.Speed = unconverted
 			self.Changed:Fire()
 		end)
+	elseif index == "Epsilon" then
+		assert(type(value) == "number", "Bad value")
+		rawset(self, "_epsilon", value)
 	elseif index == "Clock" then
 		assert(type(value) == "function", "Bad clock value")
 		self._currentSpring.Clock = value
