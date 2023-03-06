@@ -1,20 +1,18 @@
-# v6.4.1 (Mon Mar 06 2023)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/fixes [#339](https://github.com/Quenty/NevermoreEngine/pull/339) ([@Quenty](https://github.com/Quenty))
-- fix: Fix Enum.CoreGuiType.All leading to reenabled content ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.4.0...@quenty/coreguienabler@6.4.1) (2023-03-06)
+
+
+### Bug Fixes
+
+* Fix Enum.CoreGuiType.All leading to reenabled content ([16ebd45](https://github.com/Quenty/NevermoreEngine/commit/16ebd45ba78566eed679ff57b585b21752014912))
+
+
+
+
 
 # [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.3.0...@quenty/coreguienabler@6.4.0) (2023-03-05)
 
