@@ -1,3 +1,19 @@
+# v7.8.0 (Mon Mar 06 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/basicpane [#337](https://github.com/Quenty/NevermoreEngine/pull/337) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: BasicPane is accessible in shared ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
