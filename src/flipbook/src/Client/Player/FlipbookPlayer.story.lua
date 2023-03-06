@@ -111,19 +111,21 @@ return function(target)
 
 	makeLabel(maid, Flipbook.new({
 		image = "rbxassetid://9234616869";
-		rows = 6;
-		columns = 6;
+		rows = 10;
+		columns = 10;
+		frameCount = 92;
 		imageRectSize = Vector2.new(102, 102);
 		frameRate = 50;
-	}), container, true)
+	}), container, false)
 
 	makeButton(maid, Flipbook.new({
 		image = "rbxassetid://9234616869";
-		rows = 6;
-		columns = 6;
+		rows = 10;
+		columns = 10;
+		frameCount = 92;
 		imageRectSize = Vector2.new(102, 102);
 		frameRate = 60;
-	}), container, true)
+	}), container, false)
 
 	makeButton(maid, Flipbook.new({
 		image = "rbxassetid://5085366281";
@@ -133,6 +135,33 @@ return function(target)
 		imageRectSize = Vector2.new(85.33333, 85.33333);
 		frameRate = 20;
 	}), container, true)
+
+	makeLabel(maid, Flipbook.new({
+		image = "rbxassetid://9234616869";
+		rows = 10;
+		columns = 10;
+		frameCount = 92;
+		imageRectSize = Vector2.new(102, 102);
+		frameRate = 50;
+	}), container, false)
+
+	makeLabel(maid, Flipbook.new({
+		image = "rbxassetid://12273540121";
+		rows = 7;
+		columns = 7;
+		frameCount = 45;
+		imageRectSize = Vector2.new(146, 146);
+		frameRate = 30;
+	}), container, false)
+
+	makeLabel(maid, Flipbook.new({
+		image = "rbxassetid://9234650028";
+		columns = 9;
+		rows = 8;
+		frameCount = 66;
+		imageRectSize = Vector2.new(113, 113);
+		frameRate = 60;
+	}), container, false)
 
 	return function()
 		maid:DoCleaning()
