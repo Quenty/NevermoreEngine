@@ -1,20 +1,18 @@
-# v6.4.0 (Mon Mar 06 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/basicpane [#337](https://github.com/Quenty/NevermoreEngine/pull/337) ([@Quenty](https://github.com/Quenty))
-- feat: Add ImageLabelLoaded ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.3.0...@quenty/contentproviderutils@6.4.0) (2023-03-06)
+
+
+### Features
+
+* Add ImageLabelLoaded ([b24af97](https://github.com/Quenty/NevermoreEngine/commit/b24af97b56fb11edd8577598a44bbcacdb31e98e))
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.2.0...@quenty/contentproviderutils@6.3.0) (2023-03-05)
 

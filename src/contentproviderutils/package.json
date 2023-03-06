@@ -1,6 +1,6 @@
 {
   "name": "@quenty/contentproviderutils",
-  "version": "6.3.0",
+  "version": "6.4.0",
   "description": "Utility functions to ensure that content is preloaded (wrapping calls in promises)",
   "keywords": [
     "Roblox",

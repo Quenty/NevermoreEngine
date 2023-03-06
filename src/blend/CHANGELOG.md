@@ -1,20 +1,18 @@
-# v6.11.0 (Mon Mar 06 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/basicpane [#337](https://github.com/Quenty/NevermoreEngine/pull/337) ([@Quenty](https://github.com/Quenty))
-- feat: Add SetTarget() and Epsilon API to SpringObject ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.10.0...@quenty/blend@6.11.0) (2023-03-06)
+
+
+### Features
+
+* Add SetTarget() and Epsilon API to SpringObject ([5a60717](https://github.com/Quenty/NevermoreEngine/commit/5a607177b942a20e4679824661623a82ff296541))
+
+
+
+
 
 # [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.9.0...@quenty/blend@6.10.0) (2023-03-05)
 

@@ -1,20 +1,18 @@
-# v1.2.0 (Mon Mar 06 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/basicpane [#337](https://github.com/Quenty/NevermoreEngine/pull/337) ([@Quenty](https://github.com/Quenty))
-- feat: Add additional methods to transition model and documentation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@1.1.0...@quenty/transitionmodel@1.2.0) (2023-03-06)
+
+
+### Features
+
+* Add additional methods to transition model and documentation ([8466e0b](https://github.com/Quenty/NevermoreEngine/commit/8466e0bc4726c15070438bfa251992b04c5b0c15))
+
+
+
+
 
 # 1.1.0 (2023-03-05)
 
