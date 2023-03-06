@@ -1,5 +1,18 @@
 # (Mon Mar 06 2023)
 
+#### 💥 Breaking Change
+
+- `@quenty/sprites@8.0.0`
+  - feat!: BREAKING CHANGE: Removing AnimatedSpritesheet in favor of Flip… [#338](https://github.com/Quenty/NevermoreEngine/pull/338) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Mar 06 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/basicpane@7.8.0`, `@quenty/blend@6.11.0`, `@quenty/contentproviderutils@6.4.0`, `@quenty/flipbook@1.1.0`, `@quenty/transitionmodel@1.2.0`, `@quenty/nevermore-cli@1.6.0`

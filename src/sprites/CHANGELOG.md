@@ -1,3 +1,16 @@
+# v8.0.0 (Mon Mar 06 2023)
+
+#### 💥 Breaking Change
+
+- feat!: BREAKING CHANGE: Removing AnimatedSpritesheet in favor of Flip… [#338](https://github.com/Quenty/NevermoreEngine/pull/338) ([@Quenty](https://github.com/Quenty))
+- feat!: BREAKING CHANGE: Removing AnimatedSpritesheet in favor of Flipbook package ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
