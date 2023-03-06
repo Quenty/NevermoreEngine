@@ -44,6 +44,10 @@ function FlipbookPlayer.new(imageLabel)
 	self._flipbook = ValueObject.new(nil)
 	self._maid:GiveTask(self._flipbook)
 
+	self._originalImage = self._obj.Image
+	self._originalRectOffset = self._obj.ImageRectOffset
+	self._originalRectSize = self._obj.ImageRectSize
+
 	self._maid:GiveTask(Rx.combineLatest({
 		playData = self._playData:Observe();
 		flipbook = self._flipbook:Observe();
@@ -59,9 +63,9 @@ function FlipbookPlayer.new(imageLabel)
 			end
 		else
 			self._isPlaying.Value = false
-			self._obj.Image = ""
-			self._obj.ImageRectOffset = Vector2.new(0, 0)
-			self._obj.ImageRectSize = Vector2.new(0, 0)
+			self._obj.Image = self._originalImage
+			self._obj.ImageRectOffset = self._originalRectOffset
+			self._obj.ImageRectSize = self._originalRectSize
 		end
 	end))
 
