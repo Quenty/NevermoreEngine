@@ -25,6 +25,9 @@ local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Rx = require("Rx")
+local Symbol = require("Symbol")
+
+local ALL_TOKEN = Symbol.named("allToken")
 
 local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
@@ -43,6 +46,23 @@ function CoreGuiEnabler.new()
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
 		CharacterUtils.unequipTools(Players.LocalPlayer)
+	end)
+
+	-- Specifically handle this so we interface properly
+	self:AddState(Enum.CoreGuiType.All, function(isEnabled)
+		if isEnabled then
+			for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+				if coreGuiType ~= Enum.CoreGuiType.All then
+					self:Enable(ALL_TOKEN, coreGuiType)
+				end
+			end
+		else
+			for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+				if coreGuiType ~= Enum.CoreGuiType.All then
+					self:Disable(ALL_TOKEN, coreGuiType)
+				end
+			end
+		end
 	end)
 
 	for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
