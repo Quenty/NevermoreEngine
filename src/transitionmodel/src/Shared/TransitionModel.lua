@@ -1,6 +1,6 @@
 --[=[
 	This model deduplicates and handles transitions for showing, hiding, and
-	toggling.
+	toggling. Inherits from [BasicPane]. See for more API.
 
 	@class TransitionModel
 ]=]
@@ -10,11 +10,20 @@ local require = require(script.Parent.loader).load(script)
 local BasicPane = require("BasicPane")
 local Promise = require("Promise")
 local Maid = require("Maid")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local TransitionModel = setmetatable({}, BasicPane)
 TransitionModel.ClassName = "TransitionModel"
 TransitionModel.__index = TransitionModel
 
+--[=[
+	A transition model that takes a set amount of time to show
+	and hide. Can be used just like a [BasicPane] (in fact, it
+	inherits from it), but additionally allows for variable length
+	show and hide calls.
+
+	@return TransitionModel
+]=]
 function TransitionModel.new()
 	local self = setmetatable(BasicPane.new(), TransitionModel)
 
@@ -23,8 +32,11 @@ function TransitionModel.new()
 	self._maid:GiveTask(self._isShowingComplete)
 
 	self._isHidingComplete = Instance.new("BoolValue")
-	self._isHidingComplete.Value = false
+	self._isHidingComplete.Value = true
 	self._maid:GiveTask(self._isHidingComplete)
+
+	self._showCallback = nil
+	self._hideCallback = nil
 
 	self._maid:GiveTask(self.VisibleChanged:Connect(function(visible, doNotAnimate)
 		if visible then
@@ -37,18 +49,36 @@ function TransitionModel.new()
 	return self
 end
 
+--[=[
+	Shows the model and promises when the showing is complete.
+
+	@param doNotAnimate boolean
+	@return Promise
+]=]
 function TransitionModel:PromiseShow(doNotAnimate)
 	self:Show(doNotAnimate)
 
 	return self:_promiseIsShown()
 end
 
+--[=[
+	Hides the model and promises when the showing is complete.
+
+	@param doNotAnimate boolean
+	@return Promise
+]=]
 function TransitionModel:PromiseHide(doNotAnimate)
 	self:Hide(doNotAnimate)
 
 	return self:_promiseIsHidden()
 end
 
+--[=[
+	Toggles the model and promises when the transition is complete.
+
+	@param doNotAnimate boolean
+	@return Promise
+]=]
 function TransitionModel:PromiseToggle(doNotAnimate)
 	if self:IsVisible() then
 		return self:PromiseShow(doNotAnimate)
@@ -57,11 +87,52 @@ function TransitionModel:PromiseToggle(doNotAnimate)
 	end
 end
 
+--[=[
+	Returns true if showing is complete
+	@return boolean
+]=]
+function TransitionModel:IsShowingComplete()
+	return self._isShowingComplete.Value
+end
+
+--[=[
+	Returns true if hiding is complete
+	@return boolean
+]=]
+function TransitionModel:IsHidingComplete()
+	return self._isHidingComplete.Value
+end
+
+--[=[
+	Observe is showing is complete
+	@return Observable<boolean>
+]=]
+function TransitionModel:ObserveIsShowingComplete()
+	return RxInstanceUtils.observeProperty(self._isShowingComplete, "Value")
+end
+
+--[=[
+	Observe is hiding is complete
+	@return Observable<boolean>
+]=]
+function TransitionModel:ObserveIsHidingComplete()
+	return RxInstanceUtils.observeProperty(self._isHidingComplete, "Value")
+end
+
+--[=[
+	Binds the transition model to the actual visiblity of the pane
+
+	@param pane BasicPane
+	@return function -- Cleanup function
+]=]
 function TransitionModel:BindToPaneVisbility(pane)
 	local maid = Maid.new()
 
 	maid:GiveTask(pane.VisibleChanged:Connect(function(isVisible, doNotAnimate)
 		self:SetVisible(isVisible, doNotAnimate)
+	end))
+	maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
+		pane:SetVisible(isVisible, doNotAnimate)
 	end))
 
 	self:SetVisible(pane:IsVisible())
@@ -75,14 +146,24 @@ function TransitionModel:BindToPaneVisbility(pane)
 	end
 end
 
+--[=[
+	Sets the callback which will handle showing the transition
+
+	@param showCallback function? -- Callback which should return a promise
+]=]
 function TransitionModel:SetPromiseShow(showCallback)
-	assert(type(showCallback) == "function", "Bad showCallback")
+	assert(type(showCallback) == "function" or showCallback == nil, "Bad showCallback")
 
 	self._showCallback = showCallback
 end
 
+--[=[
+	Sets the callback which will handle hiding the transition
+
+	@param hideCallback function? -- Callback which should return a promise
+]=]
 function TransitionModel:SetPromiseHide(hideCallback)
-	assert(type(hideCallback) == "function", "Bad hideCallback")
+	assert(type(hideCallback) == "function" or hideCallback == nil, "Bad hideCallback")
 
 	self._hideCallback = hideCallback
 end
@@ -115,6 +196,7 @@ function TransitionModel:_promiseIsShown()
 
 	return promise
 end
+
 
 function TransitionModel:_promiseIsHidden()
 	if self._isHidingComplete.Value then
@@ -186,7 +268,7 @@ function TransitionModel:_executeHide(doNotAnimate)
 			promise:Resolve(result)
 		else
 			promise:Reject()
-			error(string.format("[TransitionModel] - Expected promise to be returned from showCallback, got %q", tostring(result)))
+			error(string.format("[TransitionModel] - Expected promise to be returned from hideCallback, got %q", tostring(result)))
 		end
 	end
 
@@ -196,6 +278,5 @@ function TransitionModel:_executeHide(doNotAnimate)
 
 	self._maid._transition = maid
 end
-
 
 return TransitionModel

@@ -8,6 +8,17 @@ local BasicPane = require("BasicPane")
 
 local TransitionUtils = {}
 
+--[=[
+	Returns true if the value is a transition, that is, it implements the following
+	methods:
+
+	* PromiseShow
+	* PromiseHide
+	* PromiseToggle
+
+	@param value any
+	@return boolean
+]=]
 function TransitionUtils.isTransition(value)
 	return BasicPane.isBasicPane(value)
 		and type(value.PromiseShow) == "function"
