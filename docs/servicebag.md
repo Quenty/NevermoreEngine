@@ -1,5 +1,7 @@
 # How ServiceBag works
 
+ServiceBag provides services and helps with game or plugin initialization.
+
 ## tl;dr
 
 ServiceBag is like a `game` in Roblox. You can retrieve services from it, and
