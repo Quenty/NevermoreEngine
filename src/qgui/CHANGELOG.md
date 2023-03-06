@@ -1,20 +1,15 @@
-# v2.2.1 (Mon Mar 06 2023)
-
-#### 🐛 Bug Fix
-
-- docs: Update documentation [#341](https://github.com/Quenty/NevermoreEngine/pull/341) ([@Quenty](https://github.com/Quenty))
-- docs: Update documentation to have correct links ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.2.0...@quenty/qgui@2.2.1) (2023-03-06)
+
+**Note:** Version bump only for package @quenty/qgui
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.1.0...@quenty/qgui@2.2.0) (2023-02-21)
 

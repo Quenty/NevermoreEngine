@@ -1,20 +1,15 @@
-# v2.0.3 (Mon Mar 06 2023)
-
-#### 🐛 Bug Fix
-
-- docs: Update documentation [#341](https://github.com/Quenty/NevermoreEngine/pull/341) ([@Quenty](https://github.com/Quenty))
-- docs: Update documentation to have correct links ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.0.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.0.2...@quenty/flipbook@2.0.3) (2023-03-06)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+
+
+
 
 ## [2.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.0.1...@quenty/flipbook@2.0.2) (2023-03-06)
 
