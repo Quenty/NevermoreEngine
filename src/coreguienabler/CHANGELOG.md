@@ -1,3 +1,16 @@
+# v6.4.1 (Mon Mar 06 2023)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/fixes [#339](https://github.com/Quenty/NevermoreEngine/pull/339) ([@Quenty](https://github.com/Quenty))
+- fix: Fix Enum.CoreGuiType.All leading to reenabled content ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
