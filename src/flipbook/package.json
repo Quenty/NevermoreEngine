@@ -1,14 +1,12 @@
 {
-  "name": "@quenty/contentproviderutils",
-  "version": "6.3.0",
-  "description": "Utility functions to ensure that content is preloaded (wrapping calls in promises)",
+  "name": "@quenty/flipbook",
+  "version": "1.0.0",
+  "description": "Handles playing back animated spritesheets",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "ContentProvider",
-    "Preload",
-    "Promises"
+    "flipbook"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -16,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/contentproviderutils/"
+    "directory": "src/flipbook/"
   },
   "funding": {
     "type": "patreon",
@@ -31,9 +29,9 @@
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal"
+    "@quenty/sprites": "file:../sprites",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"
