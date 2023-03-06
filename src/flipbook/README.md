@@ -14,7 +14,7 @@
 
 Handles playing back animated spritesheets
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/FlipbookUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Flipbook">View docs →</a></div>
 
 ## Installation
 

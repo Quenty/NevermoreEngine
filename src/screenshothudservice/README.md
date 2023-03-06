@@ -14,7 +14,7 @@
 
 Provides centralized API surface for screenshot hud API
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ScreenshotHudServiceUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ScreenshotHudServiceClient">View docs →</a></div>
 
 ## Installation
 
