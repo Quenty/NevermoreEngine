@@ -44,6 +44,13 @@ JSONTranslator.__index = JSONTranslator
 	})
 
 	print(translator:FormatByKey("actions.respawn"), { playerName = "Quenty"}) --> Respawn Quenty
+
+	-- Observing is preferred
+	maid:GiveTask(translator:ObserveFormatByKey("actions.respawn", {
+		playerName = RxInstanceUtils.observeProperty(player, "DisplayName");
+	}):Subscribe(function(text)
+		print(text) --> "Respawn Quenty"
+	end)
 	```
 
 	```lua

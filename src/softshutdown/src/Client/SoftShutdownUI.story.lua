@@ -19,13 +19,13 @@ return function(target)
 	local softShutdownUI = SoftShutdownUI.new()
 	maid:GiveTask(softShutdownUI)
 
-	maid:GivePromise(translator:PromiseFormatByKey("shutdown.lobby.title")):Then(function(text)
+	maid:GiveTask(translator:ObserveFormatByKey("shutdown.lobby.title"):Subscribe(function(text)
 		softShutdownUI:SetTitle(text)
-	end)
+	end))
 
-	maid:GivePromise(translator:PromiseFormatByKey("shutdown.lobby.subtitle")):Then(function(text)
+	maid:GiveTask(translator:ObserveFormatByKey("shutdown.lobby.subtitle"):Subscribe(function(text)
 		softShutdownUI:SetSubtitle(text)
-	end)
+	end))
 
 	softShutdownUI:Show()
 
