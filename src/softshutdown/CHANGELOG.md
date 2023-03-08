@@ -1,20 +1,18 @@
-# v3.18.2 (Wed Mar 08 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Fix localization not swapping in soft shutdown if locale swaps [#342](https://github.com/Quenty/NevermoreEngine/pull/342) ([@Quenty](https://github.com/Quenty))
-- fix: Fix localization not swapping in soft shutdown if locale swaps ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@3.18.1...@quenty/softshutdown@3.18.2) (2023-03-08)
+
+
+### Bug Fixes
+
+* Fix localization not swapping in soft shutdown if locale swaps ([ee93043](https://github.com/Quenty/NevermoreEngine/commit/ee93043b7da1511f6b86ce33040b422eb9cd6216))
+
+
+
+
 
 ## [3.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@3.18.0...@quenty/softshutdown@3.18.1) (2023-03-06)
 
