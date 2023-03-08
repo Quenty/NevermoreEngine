@@ -1,3 +1,16 @@
+# (Wed Mar 08 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@8.13.1`, `@quenty/softshutdown@3.18.2`
+  - fix: Fix localization not swapping in soft shutdown if locale swaps [#342](https://github.com/Quenty/NevermoreEngine/pull/342) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Mar 06 2023)
 
 #### 🐛 Bug Fix
