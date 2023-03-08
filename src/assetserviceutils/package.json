@@ -1,13 +1,13 @@
 {
-  "name": "@quenty/rigbuilderutils",
-  "version": "6.4.0",
-  "description": "Utility functions for debugging, builds a Roblox character rig",
+  "name": "@quenty/assetserviceutils",
+  "version": "1.0.0",
+  "description": "Provides a wrapper for AssetService&#x27;s async calls",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "Character",
-    "Debug"
+    "AssetService",
+    "Promise"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/rigbuilderutils/"
+    "directory": "src/assetserviceutils/"
   },
   "funding": {
     "type": "patreon",
@@ -26,15 +26,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/assetserviceutils": "file:../assetserviceutils",
-    "@quenty/humanoiddescriptionutils": "file:../humanoiddescriptionutils",
-    "@quenty/insertserviceutils": "file:../insertserviceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/promise": "file:../promise"
-  },
-  "devDependencies": {
-    "@quenty/camerastoryutils": "file:../camerastoryutils",
-    "@quenty/maid": "file:../maid"
   },
   "publishConfig": {
     "access": "public"
