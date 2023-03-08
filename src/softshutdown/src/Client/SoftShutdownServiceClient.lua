@@ -143,13 +143,13 @@ function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, do
 
 	self:_hideCoreGuiUI(renderMaid, screenGui)
 
-	maid:GivePromise(self._translator:PromiseFormatByKey(subtitleKey)):Then(function(subtitle)
+	maid:GiveTask(self._translator:ObserveFormatByKey(subtitleKey):Subscribe(function(subtitle)
 		softShutdownUI:SetSubtitle(subtitle)
-	end)
+	end))
 
-	maid:GivePromise(self._translator:PromiseFormatByKey(titleKey)):Then(function(title)
+	maid:GiveTask(self._translator:ObserveFormatByKey(titleKey):Subscribe(function(title)
 		softShutdownUI:SetTitle(title)
-	end)
+	end))
 
 	softShutdownUI:Show(doNotAnimateShow)
 
