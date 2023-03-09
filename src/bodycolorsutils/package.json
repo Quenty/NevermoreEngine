@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/bodycolorsutils",
+  "version": "1.0.0",
+  "description": "Body color helper utilities for merging and representing body colors over the network and datastore",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "bodycolorutils"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/bodycolorsutils/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/color3utils": "file:../color3utils",
+    "@quenty/loader": "file:../loader"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
