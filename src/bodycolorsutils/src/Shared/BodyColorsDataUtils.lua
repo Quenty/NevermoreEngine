@@ -87,6 +87,18 @@ function BodyColorsDataUtils.fromBodyColors(bodyColors)
 	})
 end
 
+function BodyColorsDataUtils.isDataStoreSafeBodyColors(bodyColors)
+
+end
+
+function BodyColorsDataUtils.toDataStoreSafe(bodyColorsData)
+
+end
+
+function BodyColorsDataUtils.fromDataStoreSafe(bodyColorsData)
+
+end
+
 --[=[
 	Constructs a BodyColorsData from a humanoidDescription
 
@@ -161,13 +173,13 @@ end
 --[=[
 	Applies body colors to the actual body color property
 
-	@param bodyColors BodyColors
 	@param bodyColorsData BodyColorsData
+	@param bodyColors BodyColors
 	@return BodyColors
 ]=]
-function BodyColorsDataUtils.applyToBodyColors(bodyColors, bodyColorsData)
-	assert(typeof(bodyColors) == "Instance" and bodyColors:IsA("BodyColors"), "Bad bodyColors")
+function BodyColorsDataUtils.applyToBodyColors(bodyColorsData, bodyColors)
 	assert(BodyColorsDataUtils.isBodyColorsData(bodyColorsData), "Bad bodyColorsData")
+	assert(typeof(bodyColors) == "Instance" and bodyColors:IsA("BodyColors"), "Bad bodyColors")
 
 	if bodyColorsData.HeadColor3 then
 		bodyColors.HeadColor3 = bodyColorsData.HeadColor3
@@ -197,13 +209,13 @@ end
 --[=[
 	Applies body colors to the actual body color property
 
-	@param bodyColors BodyColors
 	@param bodyColorsData BodyColorsData
+	@param humanoidDescription HumanoidDescription
 	@return BodyColors
 ]=]
-function BodyColorsDataUtils.applyToHumanoidDescription(humanoidDescription, bodyColorsData)
-	assert(typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"), "Bad humanoidDescription")
+function BodyColorsDataUtils.applyToHumanoidDescription(bodyColorsData, humanoidDescription)
 	assert(BodyColorsDataUtils.isBodyColorsData(bodyColorsData), "Bad bodyColorsData")
+	assert(typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"), "Bad humanoidDescription")
 
 	if bodyColorsData.HeadColor3 then
 		humanoidDescription.HeadColor = bodyColorsData.HeadColor3
