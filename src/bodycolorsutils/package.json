@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/color3serializationutils": "file:../color3serializationutils",
     "@quenty/color3utils": "file:../color3utils",
     "@quenty/loader": "file:../loader"
   },
