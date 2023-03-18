@@ -79,23 +79,28 @@ function BodyColorsDataUtils.fromBodyColors(bodyColors)
 	assert(typeof(bodyColors) == "Instance" and bodyColors:IsA("BodyColors"), "Bad bodyColors")
 
 	return BodyColorsDataUtils.createBodyColorsData({
-		headColor = bodyColors.headColor;
-		leftArmColor = bodyColors.leftArmColor;
-		leftLegColor = bodyColors.leftLegColor;
-		rightArmColor = bodyColors.rightArmColor;
-		rightLegColor = bodyColors.rightLegColor;
-		torsoColor = bodyColors.torsoColor;
+		headColor = bodyColors.HeadColor3;
+		leftArmColor = bodyColors.LeftArmColor3;
+		leftLegColor = bodyColors.LeftLegColor3;
+		rightArmColor = bodyColors.RightArmColor3;
+		rightLegColor = bodyColors.RightLegColor3;
+		torsoColor = bodyColors.TorsoColor3;
 	})
 end
 
+--[=[
+	Returns true if the data is a datastore safe body color
+	@param value any
+	@return boolean
+]=]
 function BodyColorsDataUtils.isDataStoreSafeBodyColorsData(value)
 	return type(value) == "table"
-		and (Color3SerializationUtils.isSerializedColor3(value.headColor3) == "Color3" or value.headColor3 == nil)
-		and (Color3SerializationUtils.isSerializedColor3(value.leftArmColor3) == "Color3" or value.leftArmColor3 == nil)
-		and (Color3SerializationUtils.isSerializedColor3(value.leftLegColor3) == "Color3" or value.leftLegColor3 == nil)
-		and (Color3SerializationUtils.isSerializedColor3(value.rightArmColor3) == "Color3" or value.rightArmColor3 == nil)
-		and (Color3SerializationUtils.isSerializedColor3(value.rightLegColor3) == "Color3" or value.rightLegColor3 == nil)
-		and (Color3SerializationUtils.isSerializedColor3(value.torsoColor3) == "Color3" or value.torsoColor3 == nil)
+		and (Color3SerializationUtils.isSerializedColor3(value.headColor) or value.headColor == nil)
+		and (Color3SerializationUtils.isSerializedColor3(value.leftArmColor) or value.leftArmColor == nil)
+		and (Color3SerializationUtils.isSerializedColor3(value.leftLegColor) or value.leftLegColor == nil)
+		and (Color3SerializationUtils.isSerializedColor3(value.rightArmColor) or value.rightArmColor == nil)
+		and (Color3SerializationUtils.isSerializedColor3(value.rightLegColor) or value.rightLegColor == nil)
+		and (Color3SerializationUtils.isSerializedColor3(value.torsoColor) or value.torsoColor == nil)
 end
 
 --[=[
@@ -236,15 +241,56 @@ function BodyColorsDataUtils.applyToBodyColors(bodyColorsData, bodyColors)
 	end
 end
 
-function BodyColorsDataUtils.fromAttributes(instance, bodyColorsData)
-	local attributes = {
-		headColor = instance:GetAttribute("HeadColor");
-		leftArmColor = instance:GetAttribute("LeftArmColor");
-		leftLegColor = instance:GetAttribute("LeftLegColor");
-		rightArmColor = instance:GetAttribute("RightArmColor");
-		rightLegColor = instance:GetAttribute("RightLegColor");
-		torsoColor = instance:GetAttribute("TorsoColor");
-	}
+local ATTRIBUTE_MAPPING = {
+	headColor = "HeadColor";
+	leftArmColor = "LeftArmColor";
+	leftLegColor = "LeftLegColor";
+	rightArmColor = "RightArmColor";
+	rightLegColor = "RightLegColor";
+	torsoColor = "TorsoColor";
+}
+
+--[=[
+	Extracts body colors from attributes
+	@param instance Instance
+	@return BodyColorsData
+]=]
+function BodyColorsDataUtils.fromAttributes(instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	local bodyColorsData = {}
+
+	for key, attributeName in pairs(ATTRIBUTE_MAPPING) do
+		local value = instance:GetAttribute(attributeName)
+		if value ~= nil then
+			if typeof(value) == "Color3" then
+				bodyColorsData[key] = value
+			else
+				warn(string.format("[BodyColorsDataUtils] - Bad attribute %q of type %q", attributeName, typeof(value)))
+			end
+		end
+	end
+
+	return BodyColorsDataUtils.createBodyColorsData(bodyColorsData)
+end
+
+--[=[
+	Sets attributes to store body colors.
+	@param instance Instance
+	@param bodyColorsData BodyColorsData
+]=]
+function BodyColorsDataUtils.setAttributes(instance, bodyColorsData)
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(BodyColorsDataUtils.isBodyColorsData(bodyColorsData), "Bad bodyColorsData")
+
+	for key, attributeName in pairs(ATTRIBUTE_MAPPING) do
+		local value = bodyColorsData[key]
+		if value then
+			instance:SetAttribute(attributeName, value)
+		else
+			instance:SetAttribute(attributeName, nil)
+		end
+	end
 end
 
 --[=[
