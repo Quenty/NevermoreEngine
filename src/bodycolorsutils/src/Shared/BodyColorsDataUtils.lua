@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Color3Utils = require("Color3Utils")
 local Color3SerializationUtils = require("Color3SerializationUtils")
+local BodyColorsDataConstants = require("BodyColorsDataConstants")
 
 local BodyColorsDataUtils = {}
 
@@ -241,15 +242,6 @@ function BodyColorsDataUtils.applyToBodyColors(bodyColorsData, bodyColors)
 	end
 end
 
-local ATTRIBUTE_MAPPING = {
-	headColor = "HeadColor";
-	leftArmColor = "LeftArmColor";
-	leftLegColor = "LeftLegColor";
-	rightArmColor = "RightArmColor";
-	rightLegColor = "RightLegColor";
-	torsoColor = "TorsoColor";
-}
-
 --[=[
 	Extracts body colors from attributes
 	@param instance Instance
@@ -260,13 +252,15 @@ function BodyColorsDataUtils.fromAttributes(instance)
 
 	local bodyColorsData = {}
 
-	for key, attributeName in pairs(ATTRIBUTE_MAPPING) do
+	for key, attributeName in pairs(BodyColorsDataConstants.ATTRIBUTE_MAPPING) do
 		local value = instance:GetAttribute(attributeName)
 		if value ~= nil then
 			if typeof(value) == "Color3" then
 				bodyColorsData[key] = value
 			else
-				warn(string.format("[BodyColorsDataUtils] - Bad attribute %q of type %q", attributeName, typeof(value)))
+				warn(string.format("[BodyColorsDataUtils.fromAttributes] - Bad attribute %q of type %q",
+					attributeName,
+					typeof(value)))
 			end
 		end
 	end
@@ -283,7 +277,7 @@ function BodyColorsDataUtils.setAttributes(instance, bodyColorsData)
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(BodyColorsDataUtils.isBodyColorsData(bodyColorsData), "Bad bodyColorsData")
 
-	for key, attributeName in pairs(ATTRIBUTE_MAPPING) do
+	for key, attributeName in pairs(BodyColorsDataConstants.ATTRIBUTE_MAPPING) do
 		local value = bodyColorsData[key]
 		if value then
 			instance:SetAttribute(attributeName, value)

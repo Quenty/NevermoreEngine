@@ -25,9 +25,12 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/color3serializationutils": "file:../color3serializationutils",
     "@quenty/color3utils": "file:../color3utils",
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx",
+    "@quenty/table": "file:../table"
   },
   "publishConfig": {
     "access": "public"
