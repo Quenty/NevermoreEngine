@@ -27,10 +27,10 @@ function ValueObject.new(baseValue)
 
 --[=[
 	Event fires when the value's object value change
-	@prop Changed Signal<T> -- fires with oldValue, newValue
+	@prop Changed Signal<T> -- fires with oldValue, newValue, ...
 	@within ValueObject
 ]=]
-	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid)
+	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid, ...)
 	self._maid:GiveTask(self.Changed)
 
 	return setmetatable(self, ValueObject)
@@ -44,8 +44,8 @@ end
 function ValueObject.fromObservable(observable)
 	local result = ValueObject.new()
 
-	result._maid:GiveTask(observable:Subscribe(function(value)
-		result.Value = value
+	result._maid:GiveTask(observable:Subscribe(function(value, ...)
+		result:SetValue(value, ...)
 	end))
 
 	return result
@@ -75,15 +75,53 @@ function ValueObject:Observe()
 
 		local maid = Maid.new()
 
-		maid:GiveTask(self.Changed:Connect(function()
-			sub:Fire(self.Value)
+		maid:GiveTask(self.Changed:Connect(function(newValue, _, _, ...)
+			sub:Fire(newValue, ...)
 		end))
 
-		sub:Fire(self.Value)
+		local args = rawget(self, "_lastEventContext")
+		if args then
+			sub:Fire(self.Value, table.unpack(args, 1, args.n))
+		else
+			sub:Fire(self.Value)
+		end
 
 		return maid
 	end)
+end
 
+--[=[
+	Allows you to set a value, and provide additional event context for the actual change.
+	For example, you might do.
+
+	```lua
+	self.IsVisible:SetValue(isVisible, true)
+
+	print(self.IsVisible.Changed:Connect(function(isVisible, _, _, doNotAnimate)
+		print(doNotAnimate)
+	end))
+	```
+
+	@param value T
+	@param ... -- Additional args. Can be used to pass event changing state args with value
+]=]
+function ValueObject:SetValue(value, ...)
+	local previous = rawget(self, "_value")
+	if previous ~= value then
+		if select("#", ...) > 0 then
+			rawset(self, "_lastEventContext", table.pack(...))
+		else
+			rawset(self, "_lastEventContext", nil)
+		end
+
+		rawset(self, "_value", value)
+
+		local maid = Maid.new()
+
+		self.Changed:Fire(value, previous, maid, ...)
+
+		self._maid._valueMaid = maid
+	end
 end
 
 --[=[
@@ -96,6 +134,13 @@ function ValueObject:__index(index)
 		return self._value
 	elseif ValueObject[index] then
 		return ValueObject[index]
+	elseif index == "LastEventContext" then
+		local args = rawget(self, "_lastEventContext")
+		if args then
+			return table.unpack(args, 1, args.n)
+		else
+			return
+		end
 	elseif index == "_value" then
 		return nil -- Edge case
 	else
@@ -105,16 +150,10 @@ end
 
 function ValueObject:__newindex(index, value)
 	if index == "Value" then
-		local previous = rawget(self, "_value")
-		if previous ~= value then
-			rawset(self, "_value", value)
-
-			local maid = Maid.new()
-
-			self.Changed:Fire(value, previous, maid)
-
-			self._maid._valueMaid = maid
-		end
+		-- Avoid deoptimization
+		ValueObject.SetValue(self, value)
+	elseif index == "LastEventContext" or ValueObject[index] then
+		error(("%q cannot be set in ValueObject"):format(tostring(index)))
 	else
 		error(("%q is not a member of ValueObject"):format(tostring(index)))
 	end
