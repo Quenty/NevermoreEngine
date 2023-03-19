@@ -108,6 +108,10 @@ function SpringObject:PromiseFinished(signal)
 
 	self._maid[promise] = maid
 
+	promise:Finally(function()
+		self._maid[promise] = nil
+	end)
+
 	maid:GiveTask(function()
 		self._maid[promise] = nil
 	end)
