@@ -35,6 +35,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
+    "@quenty/statestack": "file:../statestack",
     "@quenty/string": "file:../string",
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table",
