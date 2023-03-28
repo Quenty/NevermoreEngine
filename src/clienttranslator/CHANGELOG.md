@@ -1,20 +1,18 @@
-# v8.14.1 (Tue Mar 28 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Localization changes on localeId change [#344](https://github.com/Quenty/NevermoreEngine/pull/344) ([@Quenty](https://github.com/Quenty))
-- fix: Localization changes on localeId change ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.14.0...@quenty/clienttranslator@8.14.1) (2023-03-28)
+
+
+### Bug Fixes
+
+* Localization changes on localeId change ([551ce0b](https://github.com/Quenty/NevermoreEngine/commit/551ce0bb8a99f165529ec33d2130f4b65c01d8e8))
+
+
+
+
 
 # [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.13.1...@quenty/clienttranslator@8.14.0) (2023-03-28)
 
