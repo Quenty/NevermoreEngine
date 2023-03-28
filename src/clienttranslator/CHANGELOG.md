@@ -1,3 +1,16 @@
+# v8.14.1 (Tue Mar 28 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Localization changes on localeId change [#344](https://github.com/Quenty/NevermoreEngine/pull/344) ([@Quenty](https://github.com/Quenty))
+- fix: Localization changes on localeId change ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

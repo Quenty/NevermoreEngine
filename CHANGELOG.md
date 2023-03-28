@@ -1,5 +1,18 @@
 # (Tue Mar 28 2023)
 
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@8.14.1`
+  - fix: Localization changes on localeId change [#344](https://github.com/Quenty/NevermoreEngine/pull/344) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Mar 28 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/clienttranslator@8.14.0`, `@quenty/pseudolocalize@3.2.0`, `@quenty/tie@4.11.0`
