@@ -100,6 +100,33 @@ function JSONTranslator:ObserveLocaleId()
 end
 
 --[=[
+	Adds an entry value to the localization table itself. This can be useful
+	for ensuring pseudo localization and/or generating localization values
+	from the game data itself.
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param localeId string
+	@param text string
+]=]
+function JSONTranslator:SetEntryValue(translationKey, source, context, localeId, text)
+	assert(type(translationKey) == "string", "Bad translationKey")
+	assert(type(source) == "string", "Bad source")
+	assert(type(context) == "string", "Bad context")
+	assert(type(localeId) == "string", "Bad localeId")
+	assert(type(text) == "string", "Bad text")
+
+	self._localizationTable:SetEntryValue(translationKey, source, context, localeId, text or source)
+
+	if RunService:IsStudio() then
+		self._localizationTable:SetEntryValue(translationKey, source, context,
+			PseudoLocalize.getDefaultPseudoLocaleId(),
+			PseudoLocalize.pseudoLocalize(text))
+	end
+end
+
+--[=[
 	Gets the current localeId of the translator if it's initialized, or a default if it is not.
 
 	@return string
