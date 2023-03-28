@@ -218,13 +218,18 @@ function JSONTranslator:ObserveFormatByKey(key, argData)
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GivePromise(self._promiseTranslator:Then(function()
+		maid:GivePromise(self._promiseTranslator:Then(function(translator)
 			if argObservable then
-				maid:GiveTask(argObservable:Subscribe(function(args)
-					sub:Fire(self:FormatByKey(key, args))
+				maid:GiveTask(Rx.combineLatest({
+					localeId = RxInstanceUtils.observeProperty(translator, "LocaleId");
+					args = argObservable;
+				}):Subscribe(function(state)
+					sub:Fire(self:FormatByKey(key, state.args))
 				end))
 			else
-				sub:Fire(self:FormatByKey(key, nil))
+				maid:GiveTask(RxInstanceUtils.observeProperty(translator, "LocaleId"):Subscribe(function()
+					sub:Fire(self:FormatByKey(key, nil))
+				end))
 			end
 		end))
 
