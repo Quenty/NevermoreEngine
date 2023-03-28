@@ -21,10 +21,10 @@ function PseudoLocalize.pseudoLocalize(line)
 
 	for start, stop in utf8.graphemes(line) do
 		local char = line:sub(start, stop)
-		if char == "{" or char == "[" then
+		if char == "{" or char == "[" or char == "<" then
 			isParam = true
 			out = out .. char
-		elseif char == "}" or char == "]" then
+		elseif char == "}" or char == "]" or char == ">" then
 			isParam = false
 			out = out .. char
 		elseif not isParam and charMap[char] then
