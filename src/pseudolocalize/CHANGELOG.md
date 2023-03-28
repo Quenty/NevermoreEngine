@@ -1,23 +1,18 @@
-# v3.2.0 (Tue Mar 28 2023)
-
-#### 🚀 Enhancement
-
-- Localization changes [#343](https://github.com/Quenty/NevermoreEngine/pull/343) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: PseudoLocalize rich tech properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pseudolocalize@3.1.0...@quenty/pseudolocalize@3.2.0) (2023-03-28)
+
+
+### Bug Fixes
+
+* PseudoLocalize rich tech properly ([985d8d6](https://github.com/Quenty/NevermoreEngine/commit/985d8d633f3a1e6c6994f83ede6edbb4cec3688c))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pseudolocalize@3.0.0...@quenty/pseudolocalize@3.1.0) (2023-02-27)
 

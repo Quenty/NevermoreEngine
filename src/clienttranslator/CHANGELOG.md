@@ -1,20 +1,18 @@
-# v8.14.0 (Tue Mar 28 2023)
-
-#### 🚀 Enhancement
-
-- Localization changes [#343](https://github.com/Quenty/NevermoreEngine/pull/343) ([@Quenty](https://github.com/Quenty))
-- feat: Add JSONTranslator:SetEntryValue(translationKey, source, context, localeId, text) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.13.1...@quenty/clienttranslator@8.14.0) (2023-03-28)
+
+
+### Features
+
+* Add JSONTranslator:SetEntryValue(translationKey, source, context, localeId, text) ([3790994](https://github.com/Quenty/NevermoreEngine/commit/3790994ec62aceb475b7cddf7b2c30166dc27f96))
+
+
+
+
 
 ## [8.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.13.0...@quenty/clienttranslator@8.13.1) (2023-03-08)
 
