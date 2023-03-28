@@ -1,3 +1,16 @@
+# v8.14.0 (Tue Mar 28 2023)
+
+#### 🚀 Enhancement
+
+- Localization changes [#343](https://github.com/Quenty/NevermoreEngine/pull/343) ([@Quenty](https://github.com/Quenty))
+- feat: Add JSONTranslator:SetEntryValue(translationKey, source, context, localeId, text) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

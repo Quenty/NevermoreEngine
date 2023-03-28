@@ -1,3 +1,19 @@
+# v4.11.0 (Tue Mar 28 2023)
+
+#### 🚀 Enhancement
+
+- Localization changes [#343](https://github.com/Quenty/NevermoreEngine/pull/343) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Add missing dependency ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
