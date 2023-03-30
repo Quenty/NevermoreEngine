@@ -1,0 +1,6 @@
+{
+  "name": "influxdbclient",
+  "tree": {
+    "$path": "src"
+  }
+}

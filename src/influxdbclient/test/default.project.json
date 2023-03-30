@@ -1,0 +1,14 @@
+{
+  "name": "InfluxDBClientTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "influxdbclient": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}
