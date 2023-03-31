@@ -43,6 +43,7 @@ function PlayerMarketeer.new(player, configPicker)
 	-- Some assets can be owned and thus, are reflected here
 	local passOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.PASS)
 	local assetOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.ASSET)
+	local bundleOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.BUNDLE)
 
 	-- Prompt
 	self._maid:GiveTask(asset.ShowPromptRequested:Connect(function(assetId)
@@ -66,6 +67,10 @@ function PlayerMarketeer.new(player, configPicker)
 	-- Configure assets too
 	assetOwnership:SetQueryOwnershipCallback(function(assetId)
 		return MarketplaceUtils.promisePlayerOwnsAsset(self._player, assetId)
+	end)
+
+	bundleOwnership:SetQueryOwnershipCallback(function(assetId)
+		return MarketplaceUtils.promisePlayerOwnsBundle(self._player, assetId)
 	end)
 
 	return self

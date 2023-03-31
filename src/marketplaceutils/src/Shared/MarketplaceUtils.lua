@@ -173,4 +173,29 @@ function MarketplaceUtils.promisePlayerOwnsAsset(player, assetId)
 	end)
 end
 
+--[=[
+	Retrieves whether a player owns a bundle
+	@param player Player
+	@param bundleId number
+	@return Promise<boolean>
+]=]
+function MarketplaceUtils.promisePlayerOwnsBundle(player, bundleId)
+	assert(typeof(player) == "Instance", "Bad player")
+	assert(type(bundleId) == "number", "Bad bundleId")
+
+	return Promise.spawn(function(resolve, reject)
+		local result
+		local ok, err = pcall(function()
+			result = MarketplaceService:PlayerOwnsBundle(player, bundleId)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		if type(result) ~= "boolean" then
+			return reject("Bad result type")
+		end
+		return resolve(result)
+	end)
+end
+
 return MarketplaceUtils
