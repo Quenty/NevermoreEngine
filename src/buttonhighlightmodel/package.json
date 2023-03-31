@@ -32,7 +32,8 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
-    "@quenty/steputils": "file:../steputils"
+    "@quenty/steputils": "file:../steputils",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"
