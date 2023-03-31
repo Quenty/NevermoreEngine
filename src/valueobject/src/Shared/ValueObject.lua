@@ -103,7 +103,7 @@ end
 	```
 
 	@param value T
-	@param ... -- Additional args. Can be used to pass event changing state args with value
+	@param ... any -- Additional args. Can be used to pass event changing state args with value
 ]=]
 function ValueObject:SetValue(value, ...)
 	local previous = rawget(self, "_value")

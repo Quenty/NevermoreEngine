@@ -76,7 +76,7 @@ end
 	Details for the bundle
 
 	@interface BundleDetails
-	.Id -- Bundle Id (passed in as an argument)
+	.Id number -- Bundle Id (passed in as an argument)
 	.Name string -- Bundle name
 	.Description string -- Bundle description
 	.BundleType string -- Bundle Type. eg. BodyParts or `AvatarAnimation|AvatarAnimations`

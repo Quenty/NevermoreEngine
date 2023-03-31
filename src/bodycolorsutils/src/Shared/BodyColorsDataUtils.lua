@@ -27,7 +27,7 @@ local BodyColorsDataUtils = {}
 
 --[=[
 	Creates a new BodyColorsData
-	@param data any
+	@param bodyColorsData any
 	@return BodyColorsData
 ]=]
 function BodyColorsDataUtils.createBodyColorsData(bodyColorsData)
@@ -54,7 +54,7 @@ end
 --[=[
 	Creates a new BodyColorsData from a single color
 
-	@param data any
+	@param color3 Color3
 	@return BodyColorsData
 ]=]
 function BodyColorsDataUtils.fromSingleColor(color3)
