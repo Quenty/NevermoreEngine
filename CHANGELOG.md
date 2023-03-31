@@ -1,5 +1,18 @@
 # (Fri Mar 31 2023)
 
+#### 💥 Breaking Change
+
+- `@quenty/buttonhighlightmodel@8.0.0`
+  - feat!: Refactor ButtonHighlightModel API contract [#346](https://github.com/Quenty/NevermoreEngine/pull/346) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Mar 31 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/assetserviceutils@1.1.0`, `@quenty/blend@6.12.0`, `@quenty/bodycolorsutils@1.1.0`, `@quenty/gameproductservice@6.5.0`, `@quenty/marketplaceutils@6.4.0`, `@quenty/rigbuilderutils@6.5.0`, `@quenty/valueobject@7.8.0`, `@quenty/nevermore-cli@1.7.0`
