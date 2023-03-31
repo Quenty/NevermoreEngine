@@ -1,20 +1,15 @@
-# v8.0.0 (Fri Mar 31 2023)
-
-#### 💥 Breaking Change
-
-- feat!: Refactor ButtonHighlightModel API contract [#346](https://github.com/Quenty/NevermoreEngine/pull/346) ([@Quenty](https://github.com/Quenty))
-- feat!: Refactor ButtonHighlightModel API contract ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@7.13.0...@quenty/buttonhighlightmodel@8.0.0) (2023-03-31)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
 
 # [7.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@7.12.0...@quenty/buttonhighlightmodel@7.13.0) (2023-03-31)
 
