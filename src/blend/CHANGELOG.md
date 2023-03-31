@@ -1,23 +1,18 @@
-# v6.12.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/bodycolors [#345](https://github.com/Quenty/NevermoreEngine/pull/345) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Clean up promise effectively in spring object finish ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.11.0...@quenty/blend@6.12.0) (2023-03-31)
+
+
+### Bug Fixes
+
+* Clean up promise effectively in spring object finish ([6327d48](https://github.com/Quenty/NevermoreEngine/commit/6327d485d625554488be58efdf84d0baf406a6a1))
+
+
+
+
 
 # [6.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.10.0...@quenty/blend@6.11.0) (2023-03-06)
 

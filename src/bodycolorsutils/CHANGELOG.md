@@ -1,3 +1,27 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2023-03-31)
+
+
+### Bug Fixes
+
+* Fix body color serialization and add additional attribute support ([4490c02](https://github.com/Quenty/NevermoreEngine/commit/4490c02d990b9531ef6f4a49340be06a26f1ee52))
+
+
+### Features
+
+* Add baseline bodycolors package ([04cb07f](https://github.com/Quenty/NevermoreEngine/commit/04cb07fa0ae789f1534ea4310120c2dde97c1d4e))
+* Add BodyColorsDataUtils ([80aa539](https://github.com/Quenty/NevermoreEngine/commit/80aa53906a1ff4e3a736fd4a3cacc861b047c6e5))
+* Add RxBodyColorDataUtils ([2eb64e2](https://github.com/Quenty/NevermoreEngine/commit/2eb64e24f643a75e926eb32cc35775a2da7e1196))
+* Add serialization ([f08cbce](https://github.com/Quenty/NevermoreEngine/commit/f08cbce0e807ec1c911b48f88cd3c34dbefc11a3))
+
+
+
+
+
 # v1.1.0 (Fri Mar 31 2023)
 
 #### 🚀 Enhancement

@@ -1,20 +1,18 @@
-# v6.4.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/bodycolors [#345](https://github.com/Quenty/NevermoreEngine/pull/345) ([@Quenty](https://github.com/Quenty))
-- feat: Add MarketplaceUtils.promisePlayerOwnsBundle(player, bundleId) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@6.3.0...@quenty/marketplaceutils@6.4.0) (2023-03-31)
+
+
+### Features
+
+* Add MarketplaceUtils.promisePlayerOwnsBundle(player, bundleId) ([b2dbcbb](https://github.com/Quenty/NevermoreEngine/commit/b2dbcbb8b2e002fdf519e71a73a7fcba1e4a2f5c))
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@6.2.0...@quenty/marketplaceutils@6.3.0) (2023-03-05)
 

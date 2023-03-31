@@ -1,20 +1,18 @@
-# v6.5.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/bodycolors [#345](https://github.com/Quenty/NevermoreEngine/pull/345) ([@Quenty](https://github.com/Quenty))
-- feat: Add bundle ownership configuration to GameProductService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@6.4.1...@quenty/gameproductservice@6.5.0) (2023-03-31)
+
+
+### Features
+
+* Add bundle ownership configuration to GameProductService ([89b4fcd](https://github.com/Quenty/NevermoreEngine/commit/89b4fcd9ac1e0fa8ee96be099d3202b8051af5ef))
+
+
+
+
 
 ## [6.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@6.4.0...@quenty/gameproductservice@6.4.1) (2023-03-28)
 

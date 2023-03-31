@@ -1,24 +1,18 @@
-# v7.8.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/bodycolors [#345](https://github.com/Quenty/NevermoreEngine/pull/345) ([@Quenty](https://github.com/Quenty))
-- feat: Support chaining additional arguments to ValueObject ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@7.7.0...@quenty/valueobject@7.8.0) (2023-03-31)
+
+
+### Features
+
+* Support chaining additional arguments to ValueObject ([b53afa9](https://github.com/Quenty/NevermoreEngine/commit/b53afa993d710cad092975ad07d5ec92a563ddce))
+
+
+
+
 
 # [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@7.6.0...@quenty/valueobject@7.7.0) (2023-03-05)
 
