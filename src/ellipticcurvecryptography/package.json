@@ -1,0 +1,31 @@
+{
+  "name": "@quenty/ellipticcurvecryptography",
+  "version": "1.0.0",
+  "description": "Elliptic curve cryptography forked from BoatBomber, forked from ComputerCraft",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ellipticcurvecryptography"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/ellipticcurvecryptography/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty",
+    "BoatBomber"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

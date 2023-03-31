@@ -8,6 +8,12 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
+local Promise = require("Promise")
+local CancelToken = require("CancelToken")
+
+local DEFAULT_PREDICATE = function(value)
+	return value ~= nil
+end
 
 local AttributeUtils = {}
 
@@ -44,6 +50,54 @@ local VALID_ATTRIBUTE_TYPES = {
 function AttributeUtils.isValidAttributeType(valueType)
 	return VALID_ATTRIBUTE_TYPES[valueType] == true
 end
+
+--[=[
+	Promises attribute value fits predicate
+
+	@param instance Instance
+	@param attributeName string
+	@param predicate function | nil
+	@param cancelToken CancelToken
+	@return Promise<any>
+]=]
+function AttributeUtils.promiseAttribute(instance, attributeName, predicate, cancelToken)
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(attributeName) == "string", "Bad attributeName")
+	assert(CancelToken.isCancelToken(cancelToken) or cancelToken == nil, "Bad cancelToken")
+
+	predicate = predicate or DEFAULT_PREDICATE
+
+	do
+		local attributeValue = instance:GetAttribute(attributeName)
+		if predicate(attributeValue) then
+			return Promise.resolved(attributeValue)
+		end
+	end
+
+	local promise = Promise.new()
+	local maid = Maid.new()
+	maid:GiveTask(promise)
+
+	if cancelToken then
+		maid:GiveTask(cancelToken.Cancelled:Connect(function()
+			promise:Reject()
+		end))
+	end
+
+	maid:GiveTask(instance:GetAttributeChangedSignal(attributeName):Connect(function()
+		local attributeValue = instance:GetAttribute(attributeName)
+		if predicate(attributeValue) then
+			promise:Resolve(attributeValue)
+		end
+	end))
+
+	promise:Finally(function()
+		maid:DoCleaning()
+	end)
+
+	return promise
+end
+
 
 --[=[
 	Whenever the attribute is true, the binder will be bound, and when the

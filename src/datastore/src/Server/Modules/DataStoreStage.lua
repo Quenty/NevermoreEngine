@@ -18,6 +18,8 @@ local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local Signal = require("Signal")
 local Table = require("Table")
+local Observable = require("Observable")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -40,6 +42,9 @@ function DataStoreStage.new(loadName, loadParent)
 	self._savingCallbacks = {} -- [func, ...]
 	self._takenKeys = {} -- [name] = true
 	self._stores = {} -- [name] = dataSubStore
+
+	self._subsTable = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._subsTable)
 
 	return self
 end
@@ -79,7 +84,9 @@ function DataStoreStage:AddSavingCallback(callback)
 	table.insert(self._savingCallbacks, callback)
 
 	return function()
-		self:RemoveSavingCallback(callback)
+		if self.Destroy then
+			self:RemoveSavingCallback(callback)
+		end
 	end
 end
 
@@ -124,17 +131,13 @@ end
 
 --[=[
 	Loads the data at the `name`.
-	@param name string
+
+	@param name string | number
 	@param defaultValue T?
 	@return Promise<T>
 ]=]
 function DataStoreStage:Load(name, defaultValue)
-	if not self._loadParent then
-		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
-	end
-	if not self._loadName then
-		error("[DataStoreStage.Load] - Failed to load, no loadName!")
-	end
+	assert(type(name) == "string" or type(name) == "number", "Bad name")
 
 	if self._dataToSave and self._dataToSave[name] ~= nil then
 		if self._dataToSave[name] == DataStoreDeleteToken then
@@ -144,13 +147,42 @@ function DataStoreStage:Load(name, defaultValue)
 		end
 	end
 
-	return self._loadParent:Load(self._loadName, {}):Then(function(data)
+	return self:_promiseLoadParentContent():Then(function(data)
 		return self:_afterLoadGetAndApplyStagedData(name, data, defaultValue)
+	end)
+end
+
+--[=[
+	Observes the current value for the stage itself
+
+	@param name string | number
+	@param defaultValue T?
+	@return Observable<T>
+]=]
+function DataStoreStage:Observe(name, defaultValue)
+	assert(type(name) == "string" or type(name) == "number", "Bad name")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GiveTask(self._subsTable:Observe(name):Subscribe(sub:GetFireFailComplete()))
+
+		-- Load initially
+		maid:GivePromise(self:Load(name, defaultValue))
+			:Then(function(value)
+				sub:Fire(value)
+			end, function(...)
+				sub:Fail(...)
+			end)
+
+		return maid
 	end)
 end
 
 -- Protected!
 function DataStoreStage:_afterLoadGetAndApplyStagedData(name, data, defaultValue)
+	assert(type(name) == "string" or type(name) == "number", "Bad name")
+
 	if self._dataToSave and self._dataToSave[name] ~= nil then
 		if self._dataToSave[name] == DataStoreDeleteToken then
 			return defaultValue
@@ -175,9 +207,12 @@ end
 
 --[=[
 	Explicitely deletes data at the key
-	@param name string
+
+	@param name string | number
 ]=]
 function DataStoreStage:Delete(name)
+	assert(type(name) == "string", "Bad name")
+
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
 	end
@@ -201,7 +236,120 @@ function DataStoreStage:Wipe()
 		end)
 end
 
+--[=[
+	Promises a list of keys in the data store stage
+
+	@return Promise<{ string }>
+]=]
+function DataStoreStage:PromiseKeyList()
+	return self:PromiseKeySet()
+		:Then(function(keys)
+			local list = {}
+			for key, _ in pairs(keys) do
+				table.insert(list, key)
+			end
+			return list
+		end)
+end
+
+--[=[
+	Promises a set of keys in the data store stage
+
+	@return Promise<{ [string]: true }>
+]=]
+function DataStoreStage:PromiseKeySet()
+	return self:_promiseLoadParentContent():Then(function(data)
+		local keySet = {}
+
+		for key, value in pairs(data) do
+			if value ~= DataStoreDeleteToken then
+				keySet[key] = true
+			end
+		end
+
+		if self._dataToSave then
+			for key, value in pairs(self._dataToSave) do
+				if value ~= DataStoreDeleteToken then
+					keySet[key] = true
+				end
+			end
+		end
+
+		-- Otherwise we assume previous data would have it
+		for key, store in pairs(self._stores) do
+			if store:HasWritableData() then
+				keySet[key] = true
+			end
+		end
+
+		return keySet
+	end)
+end
+
+--[=[
+	Promises the full content for the datastore
+
+	@return Promise<any>
+]=]
+function DataStoreStage:LoadAll()
+	return self:_promiseLoadParentContent():Then(function(data)
+		local result = {}
+
+		for key, value in pairs(data) do
+			if value == DataStoreDeleteToken then
+				result[key] = nil
+			elseif type(value) == "table" then
+				result[key] = Table.deepCopy(value)
+			else
+				result[key] = value
+			end
+		end
+
+		if self._dataToSave then
+			for key, value in pairs(self._dataToSave) do
+				if value == DataStoreDeleteToken then
+					result[key] = nil
+				elseif type(value) == "table" then
+					result[key] = Table.deepCopy(value)
+				else
+					result[key] = value
+				end
+			end
+		end
+
+		for key, store in pairs(self._stores) do
+			if store:HasWritableData() then
+				local writer = store:GetNewWriter()
+				local original = Table.deepCopy(result[key] or {})
+				writer:WriteMerge(original)
+			end
+		end
+
+		return result
+	end)
+end
+
+function DataStoreStage:_promiseLoadParentContent()
+	if not self._loadParent then
+		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
+	end
+	if not self._loadName then
+		error("[DataStoreStage.Load] - Failed to load, no loadName!")
+	end
+
+	return self._loadParent:Load(self._loadName, {})
+end
+
+--[=[
+	Stores the value, firing off events and queuing the item
+	for save.
+
+	@param name string | number
+	@param value string
+]=]
 function DataStoreStage:Store(name, value)
+	assert(type(name) == "string", "Bad name")
+
 	if self._takenKeys[name] then
 		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
 	end
@@ -215,11 +363,12 @@ end
 
 --[=[
 	Gets a sub-datastore that will write at the given name point
-	@param name string
+
+	@param name string | number
 	@return DataStoreStage
 ]=]
 function DataStoreStage:GetSubStore(name)
-	assert(type(name) == "string", "Bad name")
+	assert(type(name) == "string" or type(name) == "number", "Bad name")
 
 	if self._stores[name] then
 		return self._stores[name]
@@ -240,12 +389,13 @@ end
 
 --[=[
 	Whenever the ValueObject changes, stores the resulting value in that entry.
-	@param name string
+
+	@param name string | number
 	@param valueObj Instance -- ValueBase object to store on
 	@return MaidTask -- Cleanup to remove this writer and free the key.
 ]=]
 function DataStoreStage:StoreOnValueChange(name, valueObj)
-	assert(type(name) == "string", "Bad name")
+	assert(type(name) == "string" or type(name) == "number", "Bad name")
 	assert(typeof(valueObj) == "Instance" or (type(valueObj) == "table" and valueObj.Changed), "Bad valueObj")
 
 	if self._takenKeys[name] then
@@ -268,6 +418,7 @@ end
 
 --[=[
 	If these is data not yet written then this will return true
+
 	@return boolean
 ]=]
 function DataStoreStage:HasWritableData()
@@ -291,6 +442,7 @@ end
 
 --[=[
 	Constructs a writer which provides a snapshot of the current data state to write
+
 	@return DataStoreWriter
 ]=]
 function DataStoreStage:GetNewWriter()
@@ -334,6 +486,12 @@ function DataStoreStage:_doStore(name, value)
 	self._dataToSave[name] = newValue
 	if self._topLevelStoreSignal then
 		self._topLevelStoreSignal:Fire()
+	end
+
+	if newValue == DataStoreDeleteToken then
+		self._subsTable:Fire(name, nil)
+	else
+		self._subsTable:Fire(name, newValue)
 	end
 end
 

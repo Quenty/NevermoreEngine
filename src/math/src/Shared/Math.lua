@@ -33,6 +33,24 @@ function Math.map(num: number, min0: number, max0: number, min1: number, max1: n
 end
 
 --[=[
+	Returns true if a number is NaN
+	@param num number
+	@return boolean
+]=]
+function Math.isNaN(num: number): boolean
+   return num ~= num
+end
+
+--[=[
+	Returns true if a number is finite
+	@param num number
+	@return boolean
+]=]
+function Math.isFinite(num: number): boolean
+   return num > -math.huge and num < math.huge
+end
+
+--[=[
 	Interpolates betweeen two numbers, given an percent. The percent is
 	a number in the range that will be used to define how interpolated
 	it is between num0 and num1.

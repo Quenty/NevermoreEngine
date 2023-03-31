@@ -36,7 +36,7 @@ function BindToCloseService:Start()
 
 		local ok, err = PromiseUtils.all(promises):Yield()
 		if not ok then
-			warn(err)
+			warn("[BindToCloseService] - Failed to close all", err)
 		end
 	end)
 end
