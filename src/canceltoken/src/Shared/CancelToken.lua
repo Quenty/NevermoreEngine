@@ -39,6 +39,16 @@ function CancelToken.new(executor)
 	return self
 end
 
+--[=[
+	Returns true if the value is a cancel token
+	@param value any
+	@return boolean
+]=]
+function CancelToken.isCancelToken(value)
+	return type(value) == "table"
+		and getmetatable(value) == CancelToken
+end
+
 local EMPTY_FUNCTION = function() end
 
 --[=[
