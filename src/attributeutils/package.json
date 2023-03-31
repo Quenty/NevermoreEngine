@@ -26,8 +26,10 @@
   ],
   "dependencies": {
     "@quenty/brio": "file:../brio",
+    "@quenty/canceltoken": "file:../canceltoken",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
     "@quenty/symbol": "file:../symbol"
   },
