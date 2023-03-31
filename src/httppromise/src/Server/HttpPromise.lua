@@ -80,6 +80,21 @@ function HttpPromise.request(request)
 end
 
 --[=[
+	Returns true if the value is an HttpResponse
+
+	@param value any
+	@return boolean
+]=]
+function HttpPromise.isHttpResponse(value)
+	return type(value) == "table"
+		and type(value.Success) == "boolean"
+		and type(value.StatusCode) == "number"
+		and type(value.StatusMessage) == "string"
+		and type(value.Headers) == "table"
+		and type(value.Body) == "string"
+end
+
+--[=[
 	Makes a GET JSON request and then expects JSON as a result from said request
 
 	```lua
