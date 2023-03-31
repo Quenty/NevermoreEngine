@@ -75,6 +75,44 @@ function PromiseUtils.all(promises)
 end
 
 --[=[
+	Combines the result of promises together
+
+	@param stateTable any
+	@return Promise<any>
+]=]
+function PromiseUtils.combine(stateTable)
+	assert(type(stateTable) == "table", "Bad stateTable")
+
+	local remainingCount = 0
+	for _, _ in pairs(stateTable) do
+		remainingCount = remainingCount + 1
+	end
+
+	local returnPromise = Promise.new()
+	local results = {}
+	local allFulfilled = true
+
+	local function syncronize(key, isFullfilled)
+		return function(value)
+			allFulfilled = allFulfilled and isFullfilled
+			results[key] = value
+			remainingCount = remainingCount - 1
+
+			if remainingCount == 0 then
+				local method = allFulfilled and "Resolve" or "Reject"
+				returnPromise[method](returnPromise, results)
+			end
+		end
+	end
+
+	for key, promise in pairs(stateTable) do
+		promise:Then(syncronize(key, true), syncronize(key, false))
+	end
+
+	return returnPromise
+end
+
+--[=[
 	Inverts the result of a promise, turning a resolved promise
 	into a rejected one, and a rejected one into a resolved one.
 
