@@ -1,5 +1,18 @@
 # (Fri Mar 31 2023)
 
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@8.9.0`, `@quenty/bindtocloseservice@2.6.0`, `@quenty/canceltoken@6.4.0`, `@quenty/datastore@7.10.0`, `@quenty/ellipticcurvecryptography@1.1.0`, `@quenty/flipbook@2.2.0`, `@quenty/httppromise@6.5.0`, `@quenty/influxdbclient@1.1.0`, `@quenty/math@2.3.0`, `@quenty/playerinputmode@3.14.0`, `@quenty/promise@6.4.0`, `@quenty/secrets@1.1.0`
+  - Users/quenty/influx [#347](https://github.com/Quenty/NevermoreEngine/pull/347) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Mar 31 2023)
+
 #### 💥 Breaking Change
 
 - `@quenty/buttonhighlightmodel@8.0.0`

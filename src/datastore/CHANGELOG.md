@@ -1,3 +1,20 @@
+# v7.10.0 (Fri Mar 31 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/influx [#347](https://github.com/Quenty/NevermoreEngine/pull/347) ([@Quenty](https://github.com/Quenty))
+- feat: Add DataStoreStage:Observe(), DataStoreStage:PromiseKeyList(), DataStoreStage:PromiseKeySet(), DataStoreStage:LoadAll() API surfaces ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix removing callback from DataStore when it would previously error ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
