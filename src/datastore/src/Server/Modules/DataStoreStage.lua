@@ -84,7 +84,9 @@ function DataStoreStage:AddSavingCallback(callback)
 	table.insert(self._savingCallbacks, callback)
 
 	return function()
-		self:RemoveSavingCallback(callback)
+		if self.Destroy then
+			self:RemoveSavingCallback(callback)
+		end
 	end
 end
 
