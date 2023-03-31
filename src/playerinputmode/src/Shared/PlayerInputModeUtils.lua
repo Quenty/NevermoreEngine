@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
 local RxAttributeUtils = require("RxAttributeUtils")
 local PlayerInputModeTypes = require("PlayerInputModeTypes")
+local AttributeUtils = require("AttributeUtils")
 
 local PlayerInputModeUtils = {}
 
@@ -20,6 +21,12 @@ function PlayerInputModeUtils.observePlayerInputModeType(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
 	return RxAttributeUtils.observeAttribute(player, PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE)
+end
+
+function PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
+	return AttributeUtils.promiseAttribute(player, PlayerInputModeServiceConstants.INPUT_MODE_ATTRIBUTE, PlayerInputModeUtils.isInputModeType, cancelToken)
 end
 
 function PlayerInputModeUtils.isInputModeType(playerInputModeType)

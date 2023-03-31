@@ -31,6 +31,10 @@ function PlayerInputModeService:GetPlayerInputModeType(player)
 	return PlayerInputModeUtils.getPlayerInputModeType(player)
 end
 
+function PlayerInputModeService:PromisePlayerInputMode(player, cancelToken)
+	return PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken)
+end
+
 function PlayerInputModeService:ObservePlayerInputType(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
