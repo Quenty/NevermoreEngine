@@ -1,23 +1,18 @@
-# v2.6.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/influx [#347](https://github.com/Quenty/NevermoreEngine/pull/347) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Better warning messages on BindToCloseService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@2.5.0...@quenty/bindtocloseservice@2.6.0) (2023-03-31)
+
+
+### Bug Fixes
+
+* Better warning messages on BindToCloseService ([294a1b0](https://github.com/Quenty/NevermoreEngine/commit/294a1b0efc6cf41ec992ef20ca9e75c6f9eb1eca))
+
+
+
+
 
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@2.4.0...@quenty/bindtocloseservice@2.5.0) (2023-03-06)
 

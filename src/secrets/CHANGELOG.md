@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2023-03-31)
+
+
+### Features
+
+* Add secrets package ([763dbf3](https://github.com/Quenty/NevermoreEngine/commit/763dbf3a391e44b868c105ff93fb26f387356cb9))
+
+
+
+
+
 # v1.1.0 (Fri Mar 31 2023)
 
 #### 🚀 Enhancement

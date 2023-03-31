@@ -1,23 +1,18 @@
-# v2.2.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/influx [#347](https://github.com/Quenty/NevermoreEngine/pull/347) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix flipbook package missing dependency ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.1.0...@quenty/flipbook@2.2.0) (2023-03-31)
+
+
+### Bug Fixes
+
+* Fix flipbook package missing dependency ([e5043c3](https://github.com/Quenty/NevermoreEngine/commit/e5043c3174f3ecc2753c79b7b17a16193fb94e07))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.0.3...@quenty/flipbook@2.1.0) (2023-03-31)
 

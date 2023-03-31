@@ -1,6 +1,6 @@
 {
   "name": "@quenty/httppromise",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "description": "HttpPromise - Wrapper functions around http requests in Roblox.",
   "keywords": [
     "Roblox",

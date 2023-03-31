@@ -1,20 +1,18 @@
-# v6.5.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/influx [#347](https://github.com/Quenty/NevermoreEngine/pull/347) ([@Quenty](https://github.com/Quenty))
-- feat: Add HttpPromise.isHttpResponse(value) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/httppromise@6.4.0...@quenty/httppromise@6.5.0) (2023-03-31)
+
+
+### Features
+
+* Add HttpPromise.isHttpResponse(value) ([4a654aa](https://github.com/Quenty/NevermoreEngine/commit/4a654aac55937205d4636138980d2df9094440e5))
+
+
+
+
 
 # [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/httppromise@6.3.0...@quenty/httppromise@6.4.0) (2023-03-05)
 

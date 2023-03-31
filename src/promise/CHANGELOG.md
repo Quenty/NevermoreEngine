@@ -1,20 +1,18 @@
-# v6.4.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/influx [#347](https://github.com/Quenty/NevermoreEngine/pull/347) ([@Quenty](https://github.com/Quenty))
-- feat: Add PromiseUtils.combine(stateTable) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.3.0...@quenty/promise@6.4.0) (2023-03-31)
+
+
+### Features
+
+* Add PromiseUtils.combine(stateTable) ([1cb3606](https://github.com/Quenty/NevermoreEngine/commit/1cb36067fa80e7a86746dbee9f1fa07f9f9766bf))
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.2.0...@quenty/promise@6.3.0) (2023-03-05)
 

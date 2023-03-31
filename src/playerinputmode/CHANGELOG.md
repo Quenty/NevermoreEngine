@@ -1,20 +1,18 @@
-# v3.14.0 (Fri Mar 31 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/influx [#347](https://github.com/Quenty/NevermoreEngine/pull/347) ([@Quenty](https://github.com/Quenty))
-- feat: Add PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@3.13.0...@quenty/playerinputmode@3.14.0) (2023-03-31)
+
+
+### Features
+
+* Add PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken) ([7f8ed94](https://github.com/Quenty/NevermoreEngine/commit/7f8ed942b254e40fa46398ca12db0bd3784d9080))
+
+
+
+
 
 # [3.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@3.12.0...@quenty/playerinputmode@3.13.0) (2023-03-31)
 
