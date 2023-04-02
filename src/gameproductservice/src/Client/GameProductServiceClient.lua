@@ -130,7 +130,7 @@ function GameProductServiceClient:PromisePlayerOwnership(player, assetType, idOr
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._helper:PromisePromptPurchase(player, assetType, idOrKey)
+	return self._helper:PromisePlayerOwnership(player, assetType, idOrKey)
 end
 
 --[=[
@@ -150,25 +150,15 @@ function GameProductServiceClient:ObservePlayerOwnership(player, assetType, idOr
 end
 
 --[=[
-	Flags the propmt is open
-]=]
-function GameProductServiceClient:FlagPromptOpen()
-	assert(self ~= GameProductServiceClient, "Use serviceBag")
-	assert(self._serviceBag, "Not initialized")
-
-	self._promptOpenFlag = true
-end
-
-
---[=[
 	Returns true if the prompt is open
 	@return boolean
 ]=]
-function GameProductServiceClient:GuessIfPromptOpenFromFlags()
+function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(self ~= GameProductServiceClient, "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
-	return self._promptOpenFlag
+	return self._helper:PromisePlayerIsPromptOpen(player)
 end
 
 --[=[
@@ -200,11 +190,11 @@ function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(gamePas
 	assert(type(gamePassIdOrKey) == "number" or type(gamePassIdOrKey) == "string", "Bad gamePassIdOrKey")
 	assert(type(productIdOrKey) == "number" or type(productIdOrKey) == "string", "Bad productIdOrKey")
 
-	if self:HasPurchasedThisSession(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey) then
+	if self:HasPlayerPurchasedThisSession(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey) then
 		return Promise.resolved(true)
 	end
 
-	return self:PromisePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.PASS, productIdOrKey)
+	return self:PromisePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.PASS, gamePassIdOrKey)
 		:Then(function(owns)
 			if owns then
 				return true

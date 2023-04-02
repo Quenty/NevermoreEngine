@@ -39,6 +39,7 @@ function GameProductServiceHelper:HasPlayerPurchasedThisSession(player, assetTyp
 
 	local marketeer = self:_getPlayerMarketeer(player)
 	if not marketeer then
+		warn("[GameProductServiceHelper.HasPlayerPurchasedThisSession] - Failed to find marketeer for player")
 		return false
 	end
 
@@ -103,6 +104,14 @@ function GameProductServiceHelper:PromiseIsOwnable(player, assetType)
 		end)
 end
 
+function GameProductServiceHelper:PromisePlayerIsPromptOpen(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
+	return self:_promisePlayerMarketeer(player)
+		:Then(function(marketeer)
+			return marketeer:IsPromptOpen()
+		end)
+end
 --[=[
 	Observes player ownership
 
