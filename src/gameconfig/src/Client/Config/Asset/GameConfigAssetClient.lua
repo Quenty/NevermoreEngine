@@ -30,15 +30,19 @@ function GameConfigAssetClient.new(obj, serviceBag)
 	return self
 end
 
-function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTarnslationValue)
+function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTranslationValue)
 	self._maid:GiveTask(Rx.combineLatest({
 		assetKey = self:ObserveAssetKey();
 		translationKey = observeTranslationKey;
-		text = observeTarnslationValue;
+		text = observeTranslationValue;
 	}):Pipe({
 		Rx.throttleDefer();
 	}):Subscribe(function(state)
-			if type(state.translationKey) == "string" and state.text and state.assetKey then
+			if type(state.translationKey) == "string"
+				and type(state.text) == "string"
+				and #state.text > 0
+				and state.assetKey then
+
 				local context = ("GameConfigAsset.%s"):format(state.assetKey)
 				local localeId = "en"
 
