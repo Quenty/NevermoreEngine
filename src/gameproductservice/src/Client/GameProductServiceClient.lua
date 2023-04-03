@@ -151,6 +151,8 @@ end
 
 --[=[
 	Returns true if the prompt is open
+
+	@param player Player
 	@return boolean
 ]=]
 function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
