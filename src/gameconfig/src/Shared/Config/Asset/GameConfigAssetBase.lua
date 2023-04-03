@@ -4,15 +4,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BadgeUtils = require("BadgeUtils")
 local BaseObject = require("BaseObject")
-local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local MarketplaceUtils = require("MarketplaceUtils")
 local GameConfigAssetConstants = require("GameConfigAssetConstants")
 local Promise = require("Promise")
+local GameConfigAssetUtils = require("GameConfigAssetUtils")
 
 local GameConfigAssetBase = setmetatable({}, BaseObject)
 GameConfigAssetBase.ClassName = "GameConfigAssetBase"
@@ -98,6 +96,14 @@ function GameConfigAssetBase:PromiseCloudPriceInRobux(cancelToken)
 	return Rx.toPromise(self:ObserveCloudPriceInRobux(), cancelToken)
 end
 
+--[=[
+	Promises the cloud price in Robux
+	@param cancelToken CancelToken
+	@return Promise<string?>
+]=]
+function GameConfigAssetBase:PromiseCloudName(cancelToken)
+	return Rx.toPromise(self:ObserveCloudName(), cancelToken)
+end
 --[=[
 	Promises the color of the game asset (for dialog and other systems)
 	@param _cancelToken CancelToken
@@ -196,9 +202,11 @@ function GameConfigAssetBase:_observeCloudProperty(propertyName, expectedType)
 end
 
 function GameConfigAssetBase:_observeCloudDataFromState()
-	-- TODO: Multicast
+	if self._cloudDataObservable then
+		return self._cloudDataObservable
+	end
 
-	return self:ObserveState():Pipe({
+	self._cloudDataObservable = self:ObserveState():Pipe({
 		Rx.switchMap(function(state)
 			if type(state.assetId) == "number" and type(state.assetType) == "string" and type(state.assetKey) == "string" then
 				return Rx.fromPromise(self:_promiseCloudDataForState(state))
@@ -207,27 +215,14 @@ function GameConfigAssetBase:_observeCloudDataFromState()
 			end
 		end);
 		Rx.distinct();
+		Rx.shareReplay(1);
 	})
+
+	return self._cloudDataObservable
 end
 
 function GameConfigAssetBase:_promiseCloudDataForState(state)
-	-- We really hope this stuff is cached
-	if state.assetType == GameConfigAssetTypes.BADGE then
-		return BadgeUtils.promiseBadgeInfo(state.assetId)
-	elseif state.assetType == GameConfigAssetTypes.PRODUCT then
-		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.Product)
-	elseif state.assetType == GameConfigAssetTypes.PASS then
-		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.GamePass)
-	elseif state.assetType == GameConfigAssetTypes.PLACE then
-		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.Asset)
-	elseif state.assetType == GameConfigAssetTypes.ASSET then
-		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.Asset)
-	elseif state.assetType == GameConfigAssetTypes.BUNDLE then
-		return MarketplaceUtils.promiseProductInfo(state.assetId, Enum.InfoType.Bundle)
-	else
-		warn(("Unknown GameConfigAssetType %q. Ignoring asset."):format(tostring(state.assetType)))
-		return Promise.resolved(nil)
-	end
+	return GameConfigAssetUtils.promiseCloudDataForAssetType(state.assetType, state.assetId)
 end
 
 return GameConfigAssetBase

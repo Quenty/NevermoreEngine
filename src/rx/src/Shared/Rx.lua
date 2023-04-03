@@ -450,18 +450,29 @@ function Rx.shareReplay(bufferSize, windowTimeSeconds)
 					event.timestamp = os.clock()
 					table.insert(buffer, event)
 
-					for _, sub in pairs(subs) do
-						sub:Fire(...)
+					-- Copy subs so removal doesn't affect replay
+					for _, sub in pairs(table.clone(subs)) do
+						if sub:IsPending() then
+							sub:Fire(table.unpack(event, 1, event.n))
+						end
 					end
 				end, function(...)
 					lastFail = table.pack(...)
-					for _, sub in pairs(subs) do
-						sub:Fail(...)
+
+					-- Copy subs so removal doesn't affect replay
+					for _, sub in pairs(table.clone(subs)) do
+						if sub:IsPending() then
+							sub:Fail(...)
+						end
 					end
 				end, function(...)
 					lastComplete = table.pack(...)
-					for _, sub in pairs(subs) do
-						sub:Complete(...)
+
+					-- Copy subs so removal doesn't affect replay
+					for _, sub in pairs(table.clone(subs)) do
+						if sub:IsPending() then
+							sub:Complete(...)
+						end
 					end
 				end)
 			end

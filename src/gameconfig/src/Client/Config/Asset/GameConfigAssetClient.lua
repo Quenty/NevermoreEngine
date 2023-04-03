@@ -7,7 +7,6 @@ local require = require(script.Parent.loader).load(script)
 local GameConfigAssetBase = require("GameConfigAssetBase")
 local GameConfigTranslator = require("GameConfigTranslator")
 local Rx = require("Rx")
-local PseudoLocalize = require("PseudoLocalize")
 
 local GameConfigAssetClient = setmetatable({}, GameConfigAssetBase)
 GameConfigAssetClient.ClassName = "GameConfigAssetClient"
@@ -25,10 +24,31 @@ function GameConfigAssetClient.new(obj, serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._configTranslator = self._serviceBag:GetService(GameConfigTranslator)
 
-	self._maid:GiveTask(self:ObserveTranslatedName():Subscribe())
-	self._maid:GiveTask(self:ObserveTranslatedDescription():Subscribe())
+	self:_setupEntrySet(self:ObserveNameTranslationKey(), self:ObserveCloudName())
+	self:_setupEntrySet(self:ObserveDescriptionTranslationKey(), self:ObserveCloudDescription())
 
 	return self
+end
+
+function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTranslationValue)
+	self._maid:GiveTask(Rx.combineLatest({
+		assetKey = self:ObserveAssetKey();
+		translationKey = observeTranslationKey;
+		text = observeTranslationValue;
+	}):Pipe({
+		Rx.throttleDefer();
+	}):Subscribe(function(state)
+			if type(state.translationKey) == "string"
+				and type(state.text) == "string"
+				and #state.text > 0
+				and state.assetKey then
+
+				local context = ("GameConfigAsset.%s"):format(state.assetKey)
+				local localeId = "en"
+
+				self._configTranslator:SetEntryValue(state.translationKey, state.text, context, localeId, state.text)
+			end
+	end))
 end
 
 --[=[
@@ -36,34 +56,9 @@ end
 	@return Observable<string>
 ]=]
 function GameConfigAssetClient:ObserveTranslatedName()
-	-- TODO: Multicast
-
-	return Rx.combineLatest({
-		assetKey = self:ObserveAssetKey();
-		translationKey = self:ObserveNameTranslationKey();
-		text = self:ObserveCloudName();
-	}):Pipe({
-		Rx.throttleDefer();
-		Rx.switchMap(function(state)
-			if type(state.translationKey) == "string" and state.text and state.assetKey then
-				-- Immediately write if necessary
-
-				local localizationTable = self._configTranslator:GetLocalizationTable()
-				local key = state.translationKey
-				local source = state.text
-				local context = ("GameConfigAsset.%s"):format(state.assetKey)
-				local localeId = "en"
-				local value = state.text
-
-				localizationTable:SetEntryValue(key, source, context, localeId, value)
-				localizationTable:SetEntryValue(key, source, context,
-					PseudoLocalize.getDefaultPseudoLocaleId(),
-					PseudoLocalize.pseudoLocalize(value))
-
-				return self._configTranslator:ObserveFormatByKey(state.translationKey)
-			else
-				return Rx.EMPTY -- just don't emit anything until we have it.
-			end
+	return self:ObserveNameTranslationKey():Pipe({
+		Rx.switchMap(function(key)
+			return self._configTranslator:ObserveFormatByKey(key)
 		end)
 	})
 end
@@ -73,34 +68,9 @@ end
 	@return Observable<string>
 ]=]
 function GameConfigAssetClient:ObserveTranslatedDescription()
-	-- TODO: Multicast
-
-	return Rx.combineLatest({
-		assetKey = self:ObserveAssetKey();
-		translationKey = self:ObserveDescriptionTranslationKey();
-		text = self:ObserveCloudDescription();
-	}):Pipe({
-		Rx.throttleDefer();
-		Rx.switchMap(function(state)
-			if type(state.translationKey) == "string" and state.text and state.assetKey then
-				-- Immediately write if necessary
-
-				local localizationTable = self._configTranslator:GetLocalizationTable()
-				local key = state.translationKey
-				local source = state.text
-				local context = ("GameConfigAsset.%s"):format(state.assetKey)
-				local localeId = "en"
-				local value = state.text
-
-				localizationTable:SetEntryValue(key, source, context, localeId, value)
-				localizationTable:SetEntryValue(key, source, context,
-					PseudoLocalize.getDefaultPseudoLocaleId(),
-					PseudoLocalize.pseudoLocalize(value))
-
-				return self._configTranslator:ObserveFormatByKey(state.translationKey)
-			else
-				return Rx.EMPTY -- just don't emit anything until we have it.
-			end
+	return self:ObserveDescriptionTranslationKey():Pipe({
+		Rx.switchMap(function(key)
+			return self._configTranslator:ObserveFormatByKey(key)
 		end)
 	})
 end

@@ -87,6 +87,16 @@ function PlayerMarketeer:IsOwnable(assetType)
 	return self._ownershipTrackers[assetType] ~= nil
 end
 
+function PlayerMarketeer:IsPromptOpen()
+	for _, assetTracker in pairs(self._assetMarketTrackers) do
+		if assetTracker:IsPromptOpen() then
+			return true
+		end
+	end
+
+	return false
+end
+
 --[=[
 	Gets the current asset tracker
 	@param assetType GameConfigAssetType
@@ -137,7 +147,7 @@ function PlayerMarketeer:_addAssetTracker(assetType)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(not self._assetMarketTrackers[assetType], "Already have tracker")
 
-	local assetMarketTracker = PlayerAssetMarketTracker.new(function(idOrKey)
+	local assetMarketTracker = PlayerAssetMarketTracker.new(assetType, function(idOrKey)
 		assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 		return self._configPicker:ToAssetId(assetType, idOrKey)

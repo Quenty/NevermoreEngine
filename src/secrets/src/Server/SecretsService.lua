@@ -24,10 +24,11 @@ function SecretsService:Init(serviceBag)
 	self._gameDataStoreService = self._serviceBag:GetService(require("GameDataStoreService"))
 	self._permissionsService = self._serviceBag:GetService(require("PermissionService"))
 
-	-- Encryption at rest. Not really secure but if the public key seed is not set
-	self:SetPublicKeySeed(game.GameId)
-
-	self._warningRequired = true
+	if not self._publicKey then
+		-- Encryption at rest. Not really secure but if the public key seed is not set
+		self:SetPublicKeySeed(game.GameId)
+		self._warningRequired = true
+	end
 
 	-- Internal
 	self._serviceBag:GetService(require("SecretsCommandService"))

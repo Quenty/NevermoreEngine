@@ -19,7 +19,7 @@ function InfluxDBPoint.new(measurementName)
 	assert(type(measurementName) == "string" or measurementName == nil, "Bad measurementName")
 
 	self._measurementName = measurementName
-	self._timestamp = nil
+	self._timestamp = self:_convertTimeToMillis(nil)
 	self._tags = {}
 	self._fields = {}
 
@@ -47,10 +47,14 @@ function InfluxDBPoint.isInfluxDBPoint(point)
 		and getmetatable(point) == InfluxDBPoint
 end
 
-function InfluxDBPoint:SetMeasurement(name)
+function InfluxDBPoint:SetMeasurementName(name)
 	assert(type(name) == "string" or name == nil, "Bad name")
 
 	self._measurementName = name
+end
+
+function InfluxDBPoint:GetMeasurementName()
+	return self._measurementName
 end
 
 function InfluxDBPoint:ToTableData()

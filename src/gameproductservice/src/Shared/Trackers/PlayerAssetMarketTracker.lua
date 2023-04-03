@@ -14,14 +14,19 @@ local PlayerAssetMarketTracker = setmetatable({}, BaseObject)
 PlayerAssetMarketTracker.ClassName = "PlayerAssetMarketTracker"
 PlayerAssetMarketTracker.__index = PlayerAssetMarketTracker
 
-function PlayerAssetMarketTracker.new(convertIds)
+function PlayerAssetMarketTracker.new(assetType, convertIds)
 	local self = setmetatable(BaseObject.new(), PlayerAssetMarketTracker)
 
+	self._assetType = assert(assetType, "No assetType")
 	self._convertIds = assert(convertIds, "No convertIds")
 
 	self._pendingPromises = {} -- { [number] = Promise<boolean> }
 	self._purchasedThisSession = {} -- [number] = true
 	self._receiptProcessingExpected = false
+
+	self._promptsOpen = Instance.new("IntValue")
+	self._promptsOpen.Value = 0
+	self._maid:GiveTask(self._promptsOpen)
 
 	self.Purchased = Signal.new() -- :Fire(id)
 	self._maid:GiveTask(self.Purchased)
@@ -54,13 +59,12 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 
 	local id = self._convertIds(idOrKey)
 	if not id then
-		return Promise.rejected(("No asset with key %q"):format(tostring(idOrKey)))
+		return Promise.rejected(("No %s with key %q"):format(self._assetType, tostring(idOrKey)))
 	end
 
 	if self._pendingPromises[id] then
 		return self._maid:GivePromise(self._pendingPromises[id])
 	end
-
 
 	local ownershipPromise
 	if self._ownershipTracker then
@@ -76,6 +80,12 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 
 		local promise = Promise.new()
 		self._pendingPromises[id] = promise
+
+		self._promptsOpen.Value = self._promptsOpen.Value + 1
+
+		promise:Finally(function()
+			self._promptsOpen.Value = self._promptsOpen.Value - 1
+		end)
 
 		self.ShowPromptRequested:Fire(id)
 
@@ -100,15 +110,19 @@ function PlayerAssetMarketTracker:HasPurchasedThisSession(idOrKey)
 
 	local id = self._convertIds(idOrKey)
 	if not id then
-		warn(("[PlayerAssetMarketTracker] - Nothing with key %q"):format(tostring(idOrKey)))
+		warn(("[PlayerAssetMarketTracker] - No %s with key %q"):format(self._assetType, tostring(idOrKey)))
 		return false
 	end
 
-	if self._purchasedThisSession[idOrKey] then
+	if self._purchasedThisSession[id] then
 		return true
 	end
 
 	return false
+end
+
+function PlayerAssetMarketTracker:IsPromptOpen()
+	return self._promptsOpen.Value > 0
 end
 
 --[=[
