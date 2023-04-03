@@ -1,3 +1,16 @@
+# (Mon Apr 03 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/friendutils@6.5.0`, `@quenty/gameconfig@5.21.0`, `@quenty/gameproductservice@6.7.0`, `@quenty/influxdbclient@1.2.0`, `@quenty/rx@7.9.0`, `@quenty/secrets@1.2.0`
+  - Users/quenty/friends [#348](https://github.com/Quenty/NevermoreEngine/pull/348) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Mar 31 2023)
 
 #### 🚀 Enhancement

@@ -1,3 +1,22 @@
+# v5.21.0 (Mon Apr 03 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/friends [#348](https://github.com/Quenty/NevermoreEngine/pull/348) ([@Quenty](https://github.com/Quenty))
+- feat: Add GameConfigAssetUtils.promiseCloudDataForAssetType(assetType, assetId) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix errors around config assets being empty ([@Quenty](https://github.com/Quenty))
+- fix: Fix localization issues with warnings in GameConfigAssetClient ([@Quenty](https://github.com/Quenty))
+- fix: Fix game config dependencies ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
