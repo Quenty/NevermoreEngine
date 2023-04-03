@@ -1,20 +1,18 @@
-# v6.5.0 (Mon Apr 03 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/friends [#348](https://github.com/Quenty/NevermoreEngine/pull/348) ([@Quenty](https://github.com/Quenty))
-- feat: RxFriendUtils is available on server ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.4.0...@quenty/friendutils@6.5.0) (2023-04-03)
+
+
+### Features
+
+* RxFriendUtils is available on server ([2d90850](https://github.com/Quenty/NevermoreEngine/commit/2d90850b5926fc953fd4875b8c6d243946291bf7))
+
+
+
+
 
 # [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.3.0...@quenty/friendutils@6.4.0) (2023-03-31)
 

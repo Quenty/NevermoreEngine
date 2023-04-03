@@ -1,23 +1,18 @@
-# v1.2.0 (Mon Apr 03 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/friends [#348](https://github.com/Quenty/NevermoreEngine/pull/348) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: InfluxDB sends stuff faster, timestamp is captured ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@1.1.0...@quenty/influxdbclient@1.2.0) (2023-04-03)
+
+
+### Bug Fixes
+
+* InfluxDB sends stuff faster, timestamp is captured ([2d5c037](https://github.com/Quenty/NevermoreEngine/commit/2d5c037498e149af3587cbfb73dae2aca2d95d71))
+
+
+
+
 
 # 1.1.0 (2023-03-31)
 

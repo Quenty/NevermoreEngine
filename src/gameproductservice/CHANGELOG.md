@@ -1,24 +1,18 @@
-# v6.7.0 (Mon Apr 03 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/friends [#348](https://github.com/Quenty/NevermoreEngine/pull/348) ([@Quenty](https://github.com/Quenty))
-- feat: Add IsPromptOpen query ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix documentation parameter annotation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@6.6.0...@quenty/gameproductservice@6.7.0) (2023-04-03)
+
+
+### Features
+
+* Add IsPromptOpen query ([7575282](https://github.com/Quenty/NevermoreEngine/commit/75752823b954dddaae6c362095a93050ae725d85))
+
+
+
+
 
 # [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@6.5.0...@quenty/gameproductservice@6.6.0) (2023-03-31)
 

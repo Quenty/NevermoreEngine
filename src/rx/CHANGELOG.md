@@ -1,23 +1,18 @@
-# v7.9.0 (Mon Apr 03 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/friends [#348](https://github.com/Quenty/NevermoreEngine/pull/348) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix sub removal not firing in certain cases ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.8.0...@quenty/rx@7.9.0) (2023-04-03)
+
+
+### Bug Fixes
+
+* Fix sub removal not firing in certain cases ([2c97208](https://github.com/Quenty/NevermoreEngine/commit/2c972087cbed8b4c041f4561ff46bb3ecf7bc750))
+
+
+
+
 
 # [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.7.0...@quenty/rx@7.8.0) (2023-03-31)
 

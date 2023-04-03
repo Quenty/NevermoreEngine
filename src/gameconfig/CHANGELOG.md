@@ -1,26 +1,25 @@
-# v5.21.0 (Mon Apr 03 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/friends [#348](https://github.com/Quenty/NevermoreEngine/pull/348) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameConfigAssetUtils.promiseCloudDataForAssetType(assetType, assetId) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix errors around config assets being empty ([@Quenty](https://github.com/Quenty))
-- fix: Fix localization issues with warnings in GameConfigAssetClient ([@Quenty](https://github.com/Quenty))
-- fix: Fix game config dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.20.0...@quenty/gameconfig@5.21.0) (2023-04-03)
+
+
+### Bug Fixes
+
+* Fix errors around config assets being empty ([71d70f9](https://github.com/Quenty/NevermoreEngine/commit/71d70f90f517e815143e162054e75e0ea149036c))
+* Fix game config dependencies ([6088666](https://github.com/Quenty/NevermoreEngine/commit/6088666c6e43691cb91ca92f6d955ea803be7e6d))
+* Fix localization issues with warnings in GameConfigAssetClient ([8d04f35](https://github.com/Quenty/NevermoreEngine/commit/8d04f352b97b7c6dd24895a34a2f9992aaf7cf0b))
+
+
+### Features
+
+* Add GameConfigAssetUtils.promiseCloudDataForAssetType(assetType, assetId) ([7dc6147](https://github.com/Quenty/NevermoreEngine/commit/7dc6147924e8746ae6529e7e33e16da01d59d4a6))
+
+
+
+
 
 # [5.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.19.0...@quenty/gameconfig@5.20.0) (2023-03-31)
 
