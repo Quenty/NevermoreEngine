@@ -1,5 +1,5 @@
 --[=[
-	Declarative UI system inspired by Fusion
+	Declarative UI system inspired by Fusion.
 	@class Blend
 ]=]
 
@@ -562,9 +562,23 @@ end
 	};
 	```
 
+	Note since 6.14 you don't need to be explicit about [Blend.Children]. Any number-based
+	index in the mounting process will be automatically inferred as children to mount.
+
+	```lua
+	Blend.New "ScreenGui" {
+		Parent = game.Players.LocalPlayer.PlayerGui;
+
+		Blend.New "Frame" {
+			Size = UDim2.new(1, 0, 1, 0);
+			BackgroundTransparency = 0.5;
+		};
+	};
+	```
+
 	Rules:
 
-	* `{ Instance }` -Tables of instances are all parented to the parent
+	* `{ Instance }` - Tables of instances are all parented to the parent
 	* Brio<Instance> will last for the lifetime of the brio
 	* Brio<Observable<Instance>> will last for the lifetime of the brio
 		* Brio<Signal<Instance>> will also act as above
@@ -579,18 +593,20 @@ end
 		* Observable<Brio<Instance>> will last for the lifetime of the brio, and parent the instance.
 		* Observable<Observable<Instance>> occurs when computed returns a value.
 	* ValueObject<Instance> will switch to the current value
+	* function - Will be invoked as `func(parent)` and then the standard scheme will be applied
 
 	Cleanup:
 	* Instances will be cleaned up on unsubscribe
 
 	@param parent Instance
 	@param value any
-	@return MaidTask
+	@return Observable
 ]=]
 function Blend.Children(parent, value)
 	assert(typeof(parent) == "Instance", "Bad parent")
 
-	local observe = Blend._observeChildren(value)
+	local observe = Blend._observeChildren(value, parent)
+
 	if observe then
 		return observe:Pipe({
 			Rx.tap(function(child)
@@ -599,6 +615,79 @@ function Blend.Children(parent, value)
 		})
 	else
 		return Rx.EMPTY
+	end
+end
+
+--[=[
+	Mounts Blend objects into an existing instance.
+
+	:::tip
+	Normally specifying ClassName as a property breaks mounting, since you
+	can't write to ClassName. However, if you specify ClassName here, it will only
+	listen to changes on children with that class name.
+	:::
+
+	If multiple instances are named the same thing, then this will
+	bind to both.
+
+	:::tip
+	This explicitly listens for any children underneath the mounted
+	instance with the name passed in here. This is fine for small amounts
+	of instances, like in most Gui hierarchies. However, it will be way less
+	performance friendly for large class hierarchies.
+	:::
+
+	```lua
+	maid:GiveTask(Blend.mount(frame, {
+		Size = UDim2.new(0.5, 0, 0.5, 0);
+
+		Blend.Find "MyUIScaleName" {
+			Scale = 2;
+		};
+	}))
+	```
+
+	@param name string
+	@return function
+]=]
+function Blend.Find(name)
+	assert(type(name) == "string", "Bad name")
+
+	return function(props)
+		assert(type(props) == "table", "Bad props")
+
+		local mountProps = props
+		local className
+		if props.ClassName then
+			className = props.ClassName
+			mountProps = table.clone(props)
+			mountProps.ClassName = nil
+		else
+			className = "Instance"
+		end
+
+		return function(parent)
+			return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, name):Pipe({
+				Rx.flatMap(function(brio)
+					if brio:IsDead() then
+						return
+					end
+
+					local maid = brio:ToMaid()
+					local instance = brio:GetValue()
+					maid:GiveTask(Blend.mount(instance, mountProps))
+
+					-- Dead after mounting? Clean up...
+					-- Probably caused by name change.
+					if brio:IsDead() then
+						maid:DoCleaning()
+					end
+
+					-- Avoid emitting anything else so we don't get cleaned up
+					return Rx.EMPTY
+				end);
+			})
+		end
 	end
 end
 
@@ -620,6 +709,20 @@ end
 			};
 		};
 	};
+	```
+
+	Note that since 6.14 you should also be able to just use the reification scheme of
+	[Blend.Children] implicitly in [Blend.mount] to get somewhat equivalent behavior.
+
+	```lua
+	Blend.mount(frame, {
+		-- Array indexed methods get treated as children-constructors, which get the parent
+		-- in them;
+
+		function(parent)
+			print("Got parent!", parent)
+		end;
+	})
 	```
 
 	You can also use this to execute code against an instance.
@@ -701,9 +804,10 @@ end
 	Observes children and ensures that the value is cleaned up
 	afterwards.
 	@param value any
+	@param parent Instance
 	@return Observable<Instance>
 ]=]
-function Blend._observeChildren(value)
+function Blend._observeChildren(value, parent)
 	if typeof(value) == "Instance" then
 		-- Should be uncommon
 		return Observable.new(function(sub)
@@ -711,6 +815,10 @@ function Blend._observeChildren(value)
 			-- don't complete, as this would clean everything up
 			return value
 		end)
+	end
+
+	if type(value) == "function" then
+		value = Blend._observeChildren(value(parent), parent)
 	end
 
 	if ValueObject.isValueObject(value) then
@@ -726,7 +834,7 @@ function Blend._observeChildren(value)
 					return
 				end
 
-				local observe = Blend._observeChildren(result)
+				local observe = Blend._observeChildren(result, parent)
 				if observe then
 					maid._current = nil
 
@@ -783,7 +891,7 @@ function Blend._observeChildren(value)
 				return maid
 			end
 
-			local observe = Blend._observeChildren(result)
+			local observe = Blend._observeChildren(result, parent)
 			if observe then
 				local maid = value:ToMaid()
 
@@ -829,7 +937,7 @@ function Blend._observeChildren(value)
 					return
 				end
 
-				local observe = Blend._observeChildren(result)
+				local observe = Blend._observeChildren(result, parent)
 
 				if observe then
 					local innerMaid = Maid.new()
@@ -864,7 +972,7 @@ function Blend._observeChildren(value)
 	if type(value) == "table" and not getmetatable(value) then
 		local observables = {}
 		for key, item in pairs(value) do
-			local observe = Blend._observeChildren(item)
+			local observe = Blend._observeChildren(item, parent)
 			if observe then
 				table.insert(observables, observe)
 			else
@@ -893,7 +1001,23 @@ end
 	* Keys of functions are invoked on the instance in question
 		* `(instance, value) -> Observable
 		* If this returns an observable (or can be turned into one), we subscribe the event immediately
-	* If the key is [Blend.Children] then we invoke mountChildren on it
+	* Keys of numbers (array components) are treated as implicit children
+	* If the key is [Blend.Children] then we invoke mountChildren on it.
+
+	```lua
+	Blend.mount(frame, {
+		BackgroundTransparency = 1;
+
+		-- All items named InventoryItem
+		Blend.Find "InventoryItem" {
+
+			-- Apply the following properties
+			Blend.New "UIScale" {
+				Scale = 0.5;
+			};
+		};
+	})
+	```
 
 	@param instance Instance
 	@param props table
@@ -931,6 +1055,10 @@ function Blend.mount(instance, props)
 			else
 				warn(("Unable to apply event listener %q"):format(tostring(key)))
 			end
+		elseif type(key) == "number" then
+			-- Treat this as an implicit children contract
+			-- Thus, we don't need an explicit [Blend.Children] call.
+			table.insert(dependentObservables, { Blend.Children(instance, value), value })
 		else
 			warn(("Unable to apply property %q"):format(tostring(key)))
 		end
