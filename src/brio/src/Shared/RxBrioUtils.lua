@@ -354,6 +354,7 @@ end
 	a brio so only the last state is valid.
 
 	@param observables { [any]: Observable<Brio<T>> | Observable<T> | T }
+	@param filter function | nil
 	@return Observable<Brio<{ [any]: T }>>
 ]=]
 function RxBrioUtils.flatCombineLatestBrio(observables, filter)

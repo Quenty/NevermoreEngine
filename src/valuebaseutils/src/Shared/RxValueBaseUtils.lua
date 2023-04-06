@@ -60,6 +60,7 @@ end
 	@param parent Instance
 	@param className string
 	@param name string
+	@param defaultValue any
 	@return Observable<any>
 ]=]
 function RxValueBaseUtils.observe(parent, className, name, defaultValue)
