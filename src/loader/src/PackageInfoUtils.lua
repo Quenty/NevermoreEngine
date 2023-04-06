@@ -195,8 +195,12 @@ function PackageInfoUtils.tryLoadPackageFromInstance(
 			table.insert(packageInfoList, PackageInfoUtils.getOrCreatePackageInfo(
 				value, packageInfoMap, scope, defaultReplicationType))
 		else
-			error(("Invalid %q ObjectValue in package linking to nothing cannot be resolved into package dependency\n\t-> %s")
-				:format(instance.Name, instance:GetFullName()))
+			local message = string.format("Invalid %q ObjectValue in package linking to nothing cannot be resolved into package dependency\n\t-> %s",
+				instance.Name,
+				instance:GetFullName())
+			message = message .. "\n\tTIP: This happens when Rojo fails to clean out an object value. Try disconnecting Rojo and reconnecting"
+
+			error(message)
 		end
 	end
 end
