@@ -1,20 +1,18 @@
-# v6.15.0 (Thu Apr 06 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
-- feat: Add Blend.Find which allows mounting in existing frames, as well as allowing [Blend.Children] to be optional ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.14.0...@quenty/blend@6.15.0) (2023-04-06)
+
+
+### Features
+
+* Add Blend.Find which allows mounting in existing frames, as well as allowing [Blend.Children] to be optional ([9af4998](https://github.com/Quenty/NevermoreEngine/commit/9af4998f5de3287c90f0e6eb279b95d10019bfd2))
+
+
+
+
 
 # [6.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.13.0...@quenty/blend@6.14.0) (2023-04-03)
 

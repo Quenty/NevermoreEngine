@@ -1,23 +1,18 @@
-# v9.20.0 (Thu Apr 06 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Ragdoll would jolt in weird ways when ragdolling while jumping (root part offset). This solves this issue. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.19.0...@quenty/ragdoll@9.20.0) (2023-04-06)
+
+
+### Bug Fixes
+
+* Ragdoll would jolt in weird ways when ragdolling while jumping (root part offset). This solves this issue. ([6f2f7c8](https://github.com/Quenty/NevermoreEngine/commit/6f2f7c83201918f4ea88bb638c5736d12768a7c4))
+
+
+
+
 
 # [9.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.18.0...@quenty/ragdoll@9.19.0) (2023-04-03)
 

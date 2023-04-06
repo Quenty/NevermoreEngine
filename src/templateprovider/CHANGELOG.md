@@ -1,20 +1,18 @@
-# v7.5.0 (Thu Apr 06 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
-- feat: Template registration order is respected ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@7.4.0...@quenty/templateprovider@7.5.0) (2023-04-06)
+
+
+### Features
+
+* Template registration order is respected ([11d0ef9](https://github.com/Quenty/NevermoreEngine/commit/11d0ef9411b3c3faa0041cd06adc6cc4f1acef70))
+
+
+
+
 
 # [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@7.3.0...@quenty/templateprovider@7.4.0) (2023-03-31)
 

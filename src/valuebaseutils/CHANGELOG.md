@@ -1,25 +1,19 @@
-# v7.11.0 (Thu Apr 06 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
-- feat: Add ValueBaseValue for single-value API interface ([@Quenty](https://github.com/Quenty))
-- feat: Add RxValueBaseUtils.observe(parent, className, name, defaultValue) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@7.10.0...@quenty/valuebaseutils@7.11.0) (2023-04-06)
+
+
+### Features
+
+* Add RxValueBaseUtils.observe(parent, className, name, defaultValue) ([173d598](https://github.com/Quenty/NevermoreEngine/commit/173d59877d82d4d12740937a2aa333b3659ab1d3))
+* Add ValueBaseValue for single-value API interface ([8bfa878](https://github.com/Quenty/NevermoreEngine/commit/8bfa878565611f68f489a528485a459cb1c0339e))
+
+
+
+
 
 # [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@7.9.0...@quenty/valuebaseutils@7.10.0) (2023-04-03)
 

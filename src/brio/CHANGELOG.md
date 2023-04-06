@@ -1,24 +1,18 @@
-# v8.10.0 (Thu Apr 06 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxBrioUtils.flatCombineLatestBrio(observables, filter) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.9.0...@quenty/brio@8.10.0) (2023-04-06)
+
+
+### Features
+
+* Add RxBrioUtils.flatCombineLatestBrio(observables, filter) ([9f61007](https://github.com/Quenty/NevermoreEngine/commit/9f61007339a5a937f4bb7a1970ac8426ce012bf0))
+
+
+
+
 
 # [8.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.8.0...@quenty/brio@8.9.0) (2023-04-03)
 

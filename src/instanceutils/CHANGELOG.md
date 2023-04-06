@@ -1,23 +1,18 @@
-# v7.11.0 (Thu Apr 06 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix issue where we might potentially leak if we GC while the name change actually occurs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.10.0...@quenty/instanceutils@7.11.0) (2023-04-06)
+
+
+### Bug Fixes
+
+* Fix issue where we might potentially leak if we GC while the name change actually occurs ([4822fac](https://github.com/Quenty/NevermoreEngine/commit/4822facd757c77a2466d8ec619e8b3e9b9706446))
+
+
+
+
 
 # [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.9.0...@quenty/instanceutils@7.10.0) (2023-04-03)
 
