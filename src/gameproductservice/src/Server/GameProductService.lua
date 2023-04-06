@@ -64,13 +64,6 @@ end
 	Starts the service. Should be done via [ServiceBag]
 ]=]
 function GameProductService:Start()
-	-- TODO: Avoid binding this unless explicitly asked to
-	-- TODO: Provide receipt processing API surface
-
-	MarketplaceService.ProcessReceipt = function(...)
-		return self:_processReceipt(...)
-	end
-
 	self._maid:GiveTask(RxBinderUtils.observeAllBrio(self._binders.PlayerProductManager):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
@@ -78,10 +71,10 @@ function GameProductService:Start()
 
 		local maid = brio:ToMaid()
 		local playerProductManager = brio:GetValue()
-		local playerMrketeer = playerProductManager:GetMarketeer()
+		local playerMarketeer = playerProductManager:GetMarketeer()
 
 		local function exposeSignal(signal, assetType)
-			maid:GiveTask(playerMrketeer:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
+			maid:GiveTask(playerMarketeer:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
 				signal:Fire(playerProductManager:GetPlayer(), ...)
 			end))
 		end
@@ -91,6 +84,12 @@ function GameProductService:Start()
 		exposeSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
 		exposeSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
 	end))
+end
+
+function GameProductService:BindProcessReceipt()
+	MarketplaceService.ProcessReceipt = function(...)
+		return self:HandleProcessReceipt(...)
+	end
 
 	self._maid:GiveTask(function()
 		task.spawn(function()
@@ -182,7 +181,7 @@ function GameProductService:ObservePlayerOwnership(player, assetType, idOrKey)
 	return self._helper:ObservePlayerOwnership(player, assetType, idOrKey)
 end
 
-function GameProductService:_processReceipt(receiptInfo)
+function GameProductService:HandleProcessReceipt(receiptInfo)
 	local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
 	if not player then
 		-- The player probably left the game
