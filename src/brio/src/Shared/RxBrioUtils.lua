@@ -350,6 +350,23 @@ function RxBrioUtils.combineLatest(observables)
 end
 
 --[=[
+	Flattens all the brios in one brio and combines them, and then switches it to
+	a brio so only the last state is valid.
+
+	@param observables { [any]: Observable<Brio<T>> | Observable<T> | T }
+	@return Observable<Brio<{ [any]: T }>>
+]=]
+function RxBrioUtils.flatCombineLatestBrio(observables, filter)
+	assert(type(observables) == "table", "Bad observables")
+
+	return RxBrioUtils.flatCombineLatest(observables)
+		:Pipe({
+			RxBrioUtils.switchToBrio();
+			filter and RxBrioUtils.where(filter) or nil
+		})
+end
+
+--[=[
 	Flat map equivalent for brios. The resulting observables will
 	be disconnected at the end of the brio.
 
