@@ -1,23 +1,18 @@
-# v7.0.0 (Thu Apr 06 2023)
-
-#### 💥 Breaking Change
-
-- feat!: Add game product service :BindProcessReceipt() call [#350](https://github.com/Quenty/NevermoreEngine/pull/350) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add game product service :BindProcessReceipt() call ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@6.8.0...@quenty/gameproductservice@7.0.0) (2023-04-06)
+
+
+### Features
+
+* Add game product service :BindProcessReceipt() call ([0df5062](https://github.com/Quenty/NevermoreEngine/commit/0df50625dbec6fd73bfd67db2933fee810221504))
+
+
+
+
 
 # [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@6.7.0...@quenty/gameproductservice@6.8.0) (2023-04-06)
 
