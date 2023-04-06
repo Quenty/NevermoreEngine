@@ -1,3 +1,21 @@
+# v7.11.0 (Thu Apr 06 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
+- feat: Add ValueBaseValue for single-value API interface ([@Quenty](https://github.com/Quenty))
+- feat: Add RxValueBaseUtils.observe(parent, className, name, defaultValue) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

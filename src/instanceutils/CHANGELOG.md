@@ -1,3 +1,19 @@
+# v7.11.0 (Thu Apr 06 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix issue where we might potentially leak if we GC while the name change actually occurs ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# v7.5.0 (Thu Apr 06 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
+- feat: Template registration order is respected ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

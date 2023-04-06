@@ -1,3 +1,16 @@
+# (Thu Apr 06 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@6.15.0`, `@quenty/brio@8.10.0`, `@quenty/datastore@7.12.0`, `@quenty/instanceutils@7.11.0`, `@quenty/ragdoll@9.20.0`, `@quenty/templateprovider@7.5.0`, `@quenty/valuebaseutils@7.11.0`
+  - Users/quenty/ragdoll [#349](https://github.com/Quenty/NevermoreEngine/pull/349) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Apr 03 2023)
 
 #### 🚀 Enhancement
