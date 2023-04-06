@@ -58,13 +58,15 @@ function TemplateProvider.new(container, replicationParent)
 
 	self._replicationParent = replicationParent
 	self._containersToInitializeSet = {}
+	self._containersToInitializeList = {}
 
 	if typeof(container) == "Instance" or type(container) == "number" then
-		self._containersToInitializeSet[container] = true
+		self:_registerContainer(container)
 	elseif typeof(container) == "table" then
 		for _, item in pairs(container) do
 			assert(typeof(item) == "Instance" or type(item) == "number", "Bad item in initialization set")
-			self._containersToInitializeSet[item] = true
+
+			self:_registerContainer(item)
 
 			-- For easy debugging/iteration loop
 			if typeof(item) == "Instance"
@@ -79,10 +81,19 @@ function TemplateProvider.new(container, replicationParent)
 
 	-- Make sure to replicate our parent
 	if self._replicationParent then
-		self._containersToInitializeSet[self._replicationParent] = true
+		self:_registerContainer(self._replicationParent)
 	end
 
 	return self
+end
+
+function TemplateProvider:_registerContainer(container)
+	assert(typeof(container) == "Instance" or type(container) == "number", "Bad container")
+
+	if not self._containersToInitializeSet[container] then
+		self._containersToInitializeSet[container] = true
+		table.insert(self._containersToInitializeList, container)
+	end
 end
 
 --[=[
@@ -98,7 +109,7 @@ function TemplateProvider:Init()
 
 	self._promises = {} -- [name]  = Promise
 
-	for container, _ in pairs(self._containersToInitializeSet) do
+	for _, container in pairs(self._containersToInitializeList) do
 		self:AddContainer(container)
 	end
 end
@@ -358,10 +369,10 @@ end
 
 function TemplateProvider:_addToRegistery(child)
 	local childName = child.Name
-	if self._registry[childName] then
-		warn(("[TemplateProvider._addToRegistery] - Duplicate %q in registery. Overridding")
-			:format(childName))
-	end
+	-- if self._registry[childName] then
+		-- warn(("[TemplateProvider._addToRegistery] - Duplicate %q in registery. Overridding")
+		-- 	:format(childName))
+	-- end
 
 	self._registry[childName] = child
 
