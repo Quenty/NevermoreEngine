@@ -4,8 +4,6 @@
 	@class DataStoreStringUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local DataStoreStringUtils = {}
 
 --[=[

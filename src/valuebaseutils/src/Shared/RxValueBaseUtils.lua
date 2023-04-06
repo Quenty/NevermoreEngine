@@ -41,12 +41,36 @@ end
 	@return Observable<Brio<any>>
 ]=]
 function RxValueBaseUtils.observeBrio(parent, className, name)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(className) == "string", "Bad className")
+	assert(type(name) == "string", "Bad naem")
+
 	return RxInstanceUtils.observeLastNamedChildBrio(parent, className, name)
 		:Pipe({
 			RxBrioUtils.switchMapBrio(function(valueObject)
 				return RxValueBaseUtils.observeValue(valueObject)
 			end),
 			RxBrioUtils.onlyLastBrioSurvives(),
+		})
+end
+
+--[=[
+	Observes a value base underneath a parent
+
+	@param parent Instance
+	@param className string
+	@param name string
+	@param defaultValue any
+	@return Observable<any>
+]=]
+function RxValueBaseUtils.observe(parent, className, name, defaultValue)
+	assert(typeof(parent) == "Instance", "Bad parent")
+	assert(type(className) == "string", "Bad className")
+	assert(type(name) == "string", "Bad name")
+
+	return RxValueBaseUtils.observeBrio(parent, className, name)
+		:Pipe({
+			RxBrioUtils.emitOnDeath(defaultValue)
 		})
 end
 

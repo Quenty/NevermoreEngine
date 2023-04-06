@@ -177,6 +177,11 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 	local lastTransformSpring = Spring.new(QFrame.fromCFrameClosestTo(motor.Transform, QFrame.new()))
 	lastTransformSpring.t = QFrame.new()
 
+	-- transform changed event doesn't fire, so let's use this to proxy it
+	local transformValue = Instance.new("CFrameValue")
+	transformValue.Value = motor.Transform
+	maid:GiveTask(transformValue)
+
 	-- replacing this weld ensures interpolation for some reason
 	local weldContainer = Instance.new("Camera")
 	weldContainer.Name = "TempWeldContainer"
@@ -195,10 +200,18 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 		-- Inserted C1/C0 here
 		weldMaid:GiveTask(Rx.combineLatest({
 			C0 = RxInstanceUtils.observeProperty(motor, "C0");
-			Transform = RxInstanceUtils.observeProperty(motor, "Transform");
+			Transform = RxInstanceUtils.observeProperty(transformValue, "Value");
 		}):Subscribe(function(innerState)
 			weld.C0 = innerState.C0 * innerState.Transform
 		end))
+
+		if weld:IsA("Motor6D") then
+			-- Suppress animations on any weld connection
+			weldMaid:GiveTask(RunService.Stepped:Connect(function()
+				weld.Transform = CFrame.new()
+			end))
+		end
+
 		weldMaid:GiveTask(RxInstanceUtils.observeProperty(motor, "C1"):Subscribe(function(c1)
 			weld.C1 = c1
 		end))
@@ -227,6 +240,7 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 	maid:GiveTask(RunService.Stepped:Connect(function()
 		local target = QFrame.toCFrame(lastTransformSpring.p)
 		if target then
+			transformValue.Value = target
 			motor.Transform = target
 		end
 	end))

@@ -263,10 +263,10 @@ function RxInstanceUtils.observeChildrenOfNameBrio(parent, className, name)
 				end
 			end
 
+			topMaid[child] = maid
+
 			maid:GiveTask(child:GetPropertyChangedSignal("Name"):Connect(handleNameChanged))
 			handleNameChanged()
-
-			topMaid[child] = maid
 		end
 
 		topMaid:GiveTask(parent.ChildAdded:Connect(handleChild))
