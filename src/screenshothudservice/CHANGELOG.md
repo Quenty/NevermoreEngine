@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@1.6.0...@quenty/screenshothudservice@1.6.1) (2023-04-07)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+
+
+
+
 # [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@1.5.0...@quenty/screenshothudservice@1.6.0) (2023-04-06)
 
 **Note:** Version bump only for package @quenty/screenshothudservice

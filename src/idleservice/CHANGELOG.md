@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.20.0...@quenty/idleservice@7.20.1) (2023-04-07)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
 # [7.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.19.0...@quenty/idleservice@7.20.0) (2023-04-06)
 
 **Note:** Version bump only for package @quenty/idleservice

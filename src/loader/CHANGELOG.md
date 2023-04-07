@@ -1,20 +1,18 @@
-# v6.2.1 (Fri Apr 07 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Loader provides better error message [#351](https://github.com/Quenty/NevermoreEngine/pull/351) ([@Quenty](https://github.com/Quenty))
-- fix: Loader provides better error message ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.2.0...@quenty/loader@6.2.1) (2023-04-07)
+
+
+### Bug Fixes
+
+* Loader provides better error message ([777f5eb](https://github.com/Quenty/NevermoreEngine/commit/777f5eb7764f6dad39f9ed7e0d11d717ac609d56))
+
+
+
+
 
 # [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.1.0...@quenty/loader@6.2.0) (2023-03-05)
 
