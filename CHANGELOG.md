@@ -1,3 +1,16 @@
+# (Fri Apr 07 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@6.2.1`
+  - fix: Loader provides better error message [#351](https://github.com/Quenty/NevermoreEngine/pull/351) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Apr 06 2023)
 
 #### 💥 Breaking Change
