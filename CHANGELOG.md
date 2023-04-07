@@ -1,5 +1,18 @@
 # (Fri Apr 07 2023)
 
+#### 🚀 Enhancement
+
+- `@quenty/colorpalette@4.20.0`
+  - feat: Add FontPalette:GetFontFaceValue(fontName) [#352](https://github.com/Quenty/NevermoreEngine/pull/352) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Apr 07 2023)
+
 #### 🐛 Bug Fix
 
 - `@quenty/loader@6.2.1`
