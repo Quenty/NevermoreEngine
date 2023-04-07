@@ -1,20 +1,18 @@
-# v4.20.0 (Fri Apr 07 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add FontPalette:GetFontFaceValue(fontName) [#352](https://github.com/Quenty/NevermoreEngine/pull/352) ([@Quenty](https://github.com/Quenty))
-- feat: Add FontPalette:GetFontFaceValue(fontName) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.19.1...@quenty/colorpalette@4.20.0) (2023-04-07)
+
+
+### Features
+
+* Add FontPalette:GetFontFaceValue(fontName) ([3411e11](https://github.com/Quenty/NevermoreEngine/commit/3411e116f2d48453a016d9dc15eab6ea64fb1bc4))
+
+
+
+
 
 ## [4.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.19.0...@quenty/colorpalette@4.19.1) (2023-04-07)
 
