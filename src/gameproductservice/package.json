@@ -44,6 +44,7 @@
     "@quenty/signal": "file:../signal",
     "@quenty/statestack": "file:../statestack",
     "@quenty/string": "file:../string",
-    "@quenty/table": "file:../table"
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   }
 }
