@@ -1,20 +1,18 @@
-# v7.0.2 (Sat Apr 08 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies and ownership promise [#353](https://github.com/Quenty/NevermoreEngine/pull/353) ([@Quenty](https://github.com/Quenty))
-- fix: Fix dependencies and ownership promise ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.0.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.0.1...@quenty/gameproductservice@7.0.2) (2023-04-08)
+
+
+### Bug Fixes
+
+* Fix dependencies and ownership promise ([4f44f2f](https://github.com/Quenty/NevermoreEngine/commit/4f44f2fbdb1bff0a0552c8f2e1562350ecd443cf))
+
+
+
+
 
 ## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.0.0...@quenty/gameproductservice@7.0.1) (2023-04-07)
 
