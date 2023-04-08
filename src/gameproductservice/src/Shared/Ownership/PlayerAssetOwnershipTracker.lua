@@ -101,6 +101,8 @@ function PlayerAssetOwnershipTracker:_promiseQueryIdOrKeyOwnershipCached(idOrKey
 	local promise = promiseOwnershipCallback(id)
 	assert(Promise.isPromise(promise), "Expected promise from callack")
 
+	promise = self._maid:GivePromise(promise)
+
 	promise:Then(function(ownsItem)
 		self._assetOwnershipPromiseCache[id] = ownsItem
 
