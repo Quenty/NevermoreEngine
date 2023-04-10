@@ -1,3 +1,16 @@
+# (Mon Apr 10 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/httppromise@6.6.0`, `@quenty/influxdbclient@1.4.0`, `@quenty/promise@6.5.0`
+  - Users/quenty/http [#354](https://github.com/Quenty/NevermoreEngine/pull/354) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Apr 08 2023)
 
 #### 🐛 Bug Fix

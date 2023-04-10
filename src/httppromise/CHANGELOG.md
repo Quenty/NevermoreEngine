@@ -1,3 +1,16 @@
+# v6.6.0 (Mon Apr 10 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/http [#354](https://github.com/Quenty/NevermoreEngine/pull/354) ([@Quenty](https://github.com/Quenty))
+- feat: Add HttpPromise.convertHttpResponseToString(value) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
