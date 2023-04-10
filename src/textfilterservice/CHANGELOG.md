@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@7.5.1...@quenty/textfilterservice@7.6.0) (2023-04-10)
+
+**Note:** Version bump only for package @quenty/textfilterservice
+
+
+
+
+
 ## [7.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@7.5.0...@quenty/textfilterservice@7.5.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/textfilterservice

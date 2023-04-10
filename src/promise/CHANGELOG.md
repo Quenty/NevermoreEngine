@@ -1,20 +1,18 @@
-# v6.5.0 (Mon Apr 10 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/http [#354](https://github.com/Quenty/NevermoreEngine/pull/354) ([@Quenty](https://github.com/Quenty))
-- feat: Add better error messaging to promise ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.4.1...@quenty/promise@6.5.0) (2023-04-10)
+
+
+### Features
+
+* Add better error messaging to promise ([25221f4](https://github.com/Quenty/NevermoreEngine/commit/25221f450cab71bc8a38300c21099feaad23f168))
+
+
+
+
 
 ## [6.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.4.0...@quenty/promise@6.4.1) (2023-04-07)
 

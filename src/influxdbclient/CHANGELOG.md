@@ -1,23 +1,18 @@
-# v1.4.0 (Mon Apr 10 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/http [#354](https://github.com/Quenty/NevermoreEngine/pull/354) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix RequestFinished APi call ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@1.3.1...@quenty/influxdbclient@1.4.0) (2023-04-10)
+
+
+### Bug Fixes
+
+* Fix RequestFinished APi call ([2564c4f](https://github.com/Quenty/NevermoreEngine/commit/2564c4f0541e2ef80f1a48ee384de8c7fe0637fd))
+
+
+
+
 
 ## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@1.3.0...@quenty/influxdbclient@1.3.1) (2023-04-07)
 

@@ -1,20 +1,18 @@
-# v6.6.0 (Mon Apr 10 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/http [#354](https://github.com/Quenty/NevermoreEngine/pull/354) ([@Quenty](https://github.com/Quenty))
-- feat: Add HttpPromise.convertHttpResponseToString(value) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/httppromise@6.5.1...@quenty/httppromise@6.6.0) (2023-04-10)
+
+
+### Features
+
+* Add HttpPromise.convertHttpResponseToString(value) ([890dd7a](https://github.com/Quenty/NevermoreEngine/commit/890dd7ae6b556ccdfae8b2954d768946e14d4802))
+
+
+
+
 
 ## [6.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/httppromise@6.5.0...@quenty/httppromise@6.5.1) (2023-04-07)
 
