@@ -95,6 +95,18 @@ function HttpPromise.isHttpResponse(value)
 end
 
 --[=[
+	Converts an http response to a string for debugging
+
+	@param value HttpResponse
+	@return string
+]=]
+function HttpPromise.convertHttpResponseToString(value)
+	assert(HttpPromise.isHttpResponse(value), "Bad value")
+
+	return string.format("%d: %s - %s", value.StatusCode, value.StatusMessage, value.Body)
+end
+
+--[=[
 	Makes a GET JSON request and then expects JSON as a result from said request
 
 	```lua
@@ -159,11 +171,11 @@ function HttpPromise.decodeJson(response)
 		if not ok then
 			reject(err)
 			return
-		elseif decoded then
+		elseif decoded ~= nil then
 			resolve(decoded)
 			return
 		else
-			reject("decoded nothing")
+			reject("Decoded nothing")
 			return
 		end
 	end)
