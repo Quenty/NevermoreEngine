@@ -36,8 +36,8 @@ local function logToDiscord(body)
 	:Catch(HttpPromise.logFailedRequests)
 end
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/HttpPromise"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/HttpPromise" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/HttpPromise" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.ede77ffb.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.28eeeac8.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.5dbd1013.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.8df0573a.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.4fea5df4.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -70,19 +70,21 @@ end
 </code></pre>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isHttpResponse"><code style="text-decoration:none">isHttpResponse</code><a href="#isHttpResponse" class="hash-link" aria-label="Direct link to isHttpResponse" title="Direct link to isHttpResponse">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L88"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">isHttpResponse</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns true if the value is an HttpResponse</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="json"><code style="text-decoration:none">json</code><a href="#json" class="hash-link" aria-label="Direct link to json" title="Direct link to json">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L108"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">json</code><code>(</code><code>request<!-- -->: </code><code class="blue_P4bS">table</code><code class="op_lSLc"> | </code><code class="blue_P4bS">string</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">table</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="convertHttpResponseToString"><code style="text-decoration:none">convertHttpResponseToString</code><a href="#convertHttpResponseToString" class="hash-link" aria-label="Direct link to convertHttpResponseToString" title="Direct link to convertHttpResponseToString">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L103"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">convertHttpResponseToString</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">HttpResponse</code><code>) → </code><code class="blue_P4bS">string</code></div><div>
+<p>Converts an http response to a string for debugging</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="json"><code style="text-decoration:none">json</code><a href="#json" class="hash-link" aria-label="Direct link to json" title="Direct link to json">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L120"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">json</code><code>(</code><code>request<!-- -->: </code><code class="blue_P4bS">table</code><code class="op_lSLc"> | </code><code class="blue_P4bS">string</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">table</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Makes a GET JSON request and then expects JSON as a result from said request</p>
 <pre class="language-lua"><code class="language-lua">HttpPromise<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token string">"https://quenty.org/banned/4397833/status"</span><span class="token punctuation">)</span>
 	<span class="token punctuation">:</span><span class="token function">Then</span><span class="token punctuation">(</span>print<span class="token punctuation">)</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="logFailedRequests"><code style="text-decoration:none">logFailedRequests</code><a href="#logFailedRequests" class="hash-link" aria-label="Direct link to logFailedRequests" title="Direct link to logFailedRequests">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L130"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">logFailedRequests</code><code>(</code><div class="inset_uKQm"><div><code>...<!-- -->: </code><code class="blue_P4bS">any</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="logFailedRequests"><code style="text-decoration:none">logFailedRequests</code><a href="#logFailedRequests" class="hash-link" aria-label="Direct link to logFailedRequests" title="Direct link to logFailedRequests">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L142"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">logFailedRequests</code><code>(</code><div class="inset_uKQm"><div><code>...<!-- -->: </code><code class="blue_P4bS">any</code><span class="inlineDescription_G7Er">-- <span>
 <p>A list of requests to retrieve. Meant to be used</p>
 </span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Logs failed requests and any errors retrieved</p>
 <pre class="language-lua"><code class="language-lua">HttpPromise<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token string">"https://quenty.org/banned/4397833/status"</span><span class="token punctuation">)</span>
 	<span class="token punctuation">:</span><span class="token function">Catch</span><span class="token punctuation">(</span>HttpPromise<span class="token punctuation">.</span>logFailedRequests<span class="token punctuation">)</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="decodeJson"><code style="text-decoration:none">decodeJson</code><a href="#decodeJson" class="hash-link" aria-label="Direct link to decodeJson" title="Direct link to decodeJson">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L146"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">decodeJson</code><code>(</code><code>response<!-- -->: </code><code class="purple_ieR2">{</code><code>Body<!-- -->: </code><code class="blue_P4bS">string</code><code class="purple_ieR2">}</code><code>) → </code><code class="blue_P4bS">table</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="decodeJson"><code style="text-decoration:none">decodeJson</code><a href="#decodeJson" class="hash-link" aria-label="Direct link to decodeJson" title="Direct link to decodeJson">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/httppromise/src/Server/HttpPromise.lua#L158"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HttpPromise<!-- -->.</code><code class="green_DgR4">decodeJson</code><code>(</code><code>response<!-- -->: </code><code class="purple_ieR2">{</code><code>Body<!-- -->: </code><code class="blue_P4bS">string</code><code class="purple_ieR2">}</code><code>) → </code><code class="blue_P4bS">table</code></div><div>
 <p>Decodes JSON from the response</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -131,6 +133,28 @@ end
             }
         },
         {
+            &quot;name&quot;: &quot;convertHttpResponseToString&quot;,
+            &quot;desc&quot;: &quot;Converts an http response to a string for debugging&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;value&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;HttpResponse&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 103,
+                &quot;path&quot;: &quot;src/httppromise/src/Server/HttpPromise.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;json&quot;,
             &quot;desc&quot;: &quot;Makes a GET JSON request and then expects JSON as a result from said request\n\n```lua\nHttpPromise.json(\&quot;https://quenty.org/banned/4397833/status\&quot;)\n\t:Then(print)\n```&quot;,
             &quot;params&quot;: [
@@ -148,7 +172,7 @@ end
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 108,
+                &quot;line&quot;: 120,
                 &quot;path&quot;: &quot;src/httppromise/src/Server/HttpPromise.lua&quot;
             }
         },
@@ -165,7 +189,7 @@ end
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 130,
+                &quot;line&quot;: 142,
                 &quot;path&quot;: &quot;src/httppromise/src/Server/HttpPromise.lua&quot;
             }
         },
@@ -187,7 +211,7 @@ end
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 146,
+                &quot;line&quot;: 158,
                 &quot;path&quot;: &quot;src/httppromise/src/Server/HttpPromise.lua&quot;
             }
         }
@@ -203,8 +227,8 @@ end
         &quot;line&quot;: 23,
         &quot;path&quot;: &quot;src/httppromise/src/Server/HttpPromise.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#decodeJson" class="table-of-contents__link toc-highlight">.decodeJson</a></li><li><a href="#isHttpResponse" class="table-of-contents__link toc-highlight">.isHttpResponse</a></li><li><a href="#json" class="table-of-contents__link toc-highlight">.json</a></li><li><a href="#logFailedRequests" class="table-of-contents__link toc-highlight">.logFailedRequests</a></li><li><a href="#request" class="table-of-contents__link toc-highlight">.request</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.28eeeac8.js"></script>
-<script src="/NevermoreEngine/assets/js/main.5dbd1013.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#convertHttpResponseToString" class="table-of-contents__link toc-highlight">.convertHttpResponseToString</a></li><li><a href="#decodeJson" class="table-of-contents__link toc-highlight">.decodeJson</a></li><li><a href="#isHttpResponse" class="table-of-contents__link toc-highlight">.isHttpResponse</a></li><li><a href="#json" class="table-of-contents__link toc-highlight">.json</a></li><li><a href="#logFailedRequests" class="table-of-contents__link toc-highlight">.logFailedRequests</a></li><li><a href="#request" class="table-of-contents__link toc-highlight">.request</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.8df0573a.js"></script>
+<script src="/NevermoreEngine/assets/js/main.4fea5df4.js"></script>
 </body>
 </html>
