@@ -134,14 +134,19 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend)
 	return self._maid:GivePromise(HttpPromise.request(request))
 		:Then(function(result)
 			if result.Success then
-				self.RequestFinished:Fire(result)
+				if self.Destroy then
+					self.RequestFinished:Fire(result)
+				end
+
 				return true
 			else
 				return Promise.rejected(result)
 			end
 		end)
 		:Catch(function(err)
-			self.RequestFinished:Fire(err)
+			if self.Destroy then
+				self.RequestFinished:Fire(err)
+			end
 
 			if HttpPromise.isHttpResponse(err) then
 				local errorBody = InfluxDBErrorUtils.tryParseErrorBody(err.Body)
