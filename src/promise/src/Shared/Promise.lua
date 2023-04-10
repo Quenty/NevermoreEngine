@@ -6,6 +6,8 @@
 	@class Promise
 ]=]
 
+local HttpService = game:GetService("HttpService")
+
 -- Turns out debug.traceback() is slow
 local ENABLE_TRACEBACK = false
 local _emptyRejectedPromise = nil
@@ -326,15 +328,32 @@ function Promise:_reject(values, valuesLength)
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
 			if self._unconsumedException then
+				local errOutput = self:_toHumanReadable(self._rejected[1])
+
 				if ENABLE_TRACEBACK then
 					warn(("[Promise] - Uncaught exception in promise\n\n%q\n\n%s")
-						:format(tostring(self._rejected[1]), self._source))
+						:format(errOutput, self._source))
 				else
 					warn(("[Promise] - Uncaught exception in promise: %q")
-						:format(tostring(self._rejected[1])))
+						:format(errOutput))
 				end
 			end
 		end)
+	end
+end
+
+function Promise:_toHumanReadable(data)
+	if type(data) == "table" then
+		local errOutput
+		local ok = pcall(function()
+			errOutput = HttpService:JSONEncode(data)
+		end)
+		if not ok then
+			errOutput = tostring(data)
+		end
+		return errOutput
+	else
+		return tostring(data)
 	end
 end
 
