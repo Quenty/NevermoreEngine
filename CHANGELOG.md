@@ -1,3 +1,16 @@
+# (Thu Apr 13 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@7.1.1`
+  - fix: Fix missing dependency in gameproductservice [#355](https://github.com/Quenty/NevermoreEngine/pull/355) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Apr 10 2023)
 
 #### 🚀 Enhancement
