@@ -1,20 +1,18 @@
-# v8.13.0 (Thu Apr 20 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/receipts [#358](https://github.com/Quenty/NevermoreEngine/pull/358) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxAttributeUtils.observeAttributeBrio(instance, attributeName, condition) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.12.0...@quenty/attributeutils@8.13.0) (2023-04-20)
+
+
+### Features
+
+* Add RxAttributeUtils.observeAttributeBrio(instance, attributeName, condition) ([c96df61](https://github.com/Quenty/NevermoreEngine/commit/c96df61279d73594afedbd048f3eb1dd6ffb889a))
+
+
+
+
 
 # [8.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.11.1...@quenty/attributeutils@8.12.0) (2023-04-10)
 

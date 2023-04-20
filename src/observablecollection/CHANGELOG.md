@@ -1,20 +1,18 @@
-# v5.14.0 (Thu Apr 20 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/receipts [#358](https://github.com/Quenty/NevermoreEngine/pull/358) ([@Quenty](https://github.com/Quenty))
-- feat: Ensure removal is a bit more clean ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.13.0...@quenty/observablecollection@5.14.0) (2023-04-20)
+
+
+### Features
+
+* Ensure removal is a bit more clean ([4b70f6d](https://github.com/Quenty/NevermoreEngine/commit/4b70f6d72cee9393c70b1ce17e78d8e63771ac3c))
+
+
+
+
 
 # [5.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.12.1...@quenty/observablecollection@5.13.0) (2023-04-10)
 

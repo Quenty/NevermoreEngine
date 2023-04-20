@@ -1,20 +1,18 @@
-# v5.24.0 (Thu Apr 20 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/receipts [#358](https://github.com/Quenty/NevermoreEngine/pull/358) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameConfigPicker:PromisePriceInRobux(assetType, assetIdOrKey) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.23.0...@quenty/gameconfig@5.24.0) (2023-04-20)
+
+
+### Features
+
+* Add GameConfigPicker:PromisePriceInRobux(assetType, assetIdOrKey) ([5250175](https://github.com/Quenty/NevermoreEngine/commit/52501754a64f86e54c40f95ea746a1c078fd553b))
+
+
+
+
 
 # [5.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.22.1...@quenty/gameconfig@5.23.0) (2023-04-10)
 

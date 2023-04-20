@@ -1,20 +1,18 @@
-# v7.2.0 (Thu Apr 20 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/receipts [#358](https://github.com/Quenty/NevermoreEngine/pull/358) ([@Quenty](https://github.com/Quenty))
-- feat: Add ReceiptProcessing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.1.1...@quenty/gameproductservice@7.2.0) (2023-04-20)
+
+
+### Features
+
+* Add ReceiptProcessing ([6590e0f](https://github.com/Quenty/NevermoreEngine/commit/6590e0fbb091956f903ddebc3110e4f86ec020d1))
+
+
+
+
 
 ## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.1.0...@quenty/gameproductservice@7.1.1) (2023-04-13)
 
