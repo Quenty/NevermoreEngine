@@ -10,6 +10,8 @@ local RxBinderUtils = require("RxBinderUtils")
 local ObservableMapSet = require("ObservableMapSet")
 local RxBrioUtils = require("RxBrioUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local Promise = require("Promise")
+local GameConfigAssetUtils = require("GameConfigAssetUtils")
 
 local GameConfigPicker = setmetatable({}, BaseObject)
 GameConfigPicker.ClassName = "GameConfigPicker"
@@ -170,6 +172,44 @@ function GameConfigPicker:FindFirstActiveAssetOfId(assetType: string, assetId: n
 	end
 
 	return nil
+end
+
+--[=[
+	Find the first asset of a given key
+
+	@param assetType string
+	@param assetIdOrKey string | number
+	@return GameConfigAssetBase
+]=]
+function GameConfigPicker:PromisePriceInRobux(assetType, assetIdOrKey)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(assetIdOrKey) == "number" or type(assetIdOrKey) == "string", "Bad assetIdOrKey")
+
+	if type(assetIdOrKey) == "string" then
+		local asset = self:FindFirstActiveAssetOfKey(assetType, assetIdOrKey)
+		if asset then
+			return asset:PromiseCloudPriceInRobux()
+		end
+
+		return Promise.rejected(string.format("Could not turn %q into asset id", tostring(assetIdOrKey)))
+	elseif type(assetIdOrKey) == "number" then
+		local asset = self:FindFirstActiveAssetOfId(assetType, assetIdOrKey)
+		if asset then
+			-- TODO: Maybe cancel token
+			return asset:PromiseCloudPriceInRobux()
+		end
+
+		return GameConfigAssetUtils.promiseCloudDataForAssetType(assetType, assetIdOrKey)
+			:Then(function(cloudData)
+				if type(cloudData.PriceInRobux) == "number" then
+					return cloudData.PriceInRobux
+				else
+					return Promise.rejected()
+				end
+			end)
+	else
+		error("[GameConfigPicker.PromisePriceInRobux] - Bad assetIdOrKey")
+	end
 end
 
 --[=[

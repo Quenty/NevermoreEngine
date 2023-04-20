@@ -14,7 +14,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
-local MarketplaceService = game:GetService("MarketplaceService")
 
 local Maid = require("Maid")
 local GameProductServiceHelper = require("GameProductServiceHelper")
@@ -38,6 +37,7 @@ function GameProductService:Init(serviceBag)
 
 	-- External
 	self._gameConfigService = self._serviceBag:GetService(require("GameConfigService"))
+	self._receiptProcessingService = self._serviceBag:GetService(require("ReceiptProcessingService"))
 
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("GameProductBindersServer"))
@@ -84,20 +84,12 @@ function GameProductService:Start()
 		exposeSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
 		exposeSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
 	end))
+
+	self._maid:GiveTask(self._receiptProcessingService:RegisterReceiptProcessor(function(receiptInfo)
+		self:_handleProcessReceipt(receiptInfo)
+	end))
 end
 
-function GameProductService:BindProcessReceipt()
-	MarketplaceService.ProcessReceipt = function(...)
-		return self:HandleProcessReceipt(...)
-	end
-
-	self._maid:GiveTask(function()
-		task.spawn(function()
-			-- This might be unsafe
-			MarketplaceService.ProcessReceipt = nil
-		end)
-	end)
-end
 
 --[=[
 	Returns true if item has been purchased this session
@@ -181,7 +173,7 @@ function GameProductService:ObservePlayerOwnership(player, assetType, idOrKey)
 	return self._helper:ObservePlayerOwnership(player, assetType, idOrKey)
 end
 
-function GameProductService:HandleProcessReceipt(receiptInfo)
+function GameProductService:_handleProcessReceipt(receiptInfo)
 	local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
 	if not player then
 		-- The player probably left the game

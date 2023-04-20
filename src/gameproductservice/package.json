@@ -38,6 +38,7 @@
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/playerbinder": "file:../playerbinder",
     "@quenty/promise": "file:../promise",
+    "@quenty/receiptprocessing": "file:../receiptprocessing",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",

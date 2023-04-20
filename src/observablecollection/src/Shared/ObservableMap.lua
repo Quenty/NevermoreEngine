@@ -216,14 +216,17 @@ end
 	Adds the item to the set if it does not exists.
 	@param key TKey
 	@param value TValue?
-	@return callback -- Call to remove the value.
+	@return callback -- Call to remove the value if it was added
 ]=]
 function ObservableMap:Set(key, value)
 	assert(key ~= nil, "Bad key")
 
 	local oldValue = self._map[key]
 	if oldValue == value then
-		return
+		-- no removal since we never added. this is a tad messy.
+		return function()
+
+		end
 	end
 
 	self._map[key] = value
@@ -249,8 +252,16 @@ function ObservableMap:Set(key, value)
 		end
 	end
 
+	return self:_getRemovalCallback(key, value)
+end
+
+function ObservableMap:_getRemovalCallback(key, value)
 	return function()
-		if self.Destroy then
+		if not self.Destroy then
+			return
+		end
+
+		if self._map[key] == value then
 			self:Remove(key)
 		end
 	end

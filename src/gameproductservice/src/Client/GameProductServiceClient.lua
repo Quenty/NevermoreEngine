@@ -69,10 +69,10 @@ function GameProductServiceClient:Start()
 
 		local maid = brio:ToMaid()
 		local playerProductManager = brio:GetValue()
-		local playerMrketeer = playerProductManager:GetMarketeer()
+		local playerMarketeer = playerProductManager:GetMarketeer()
 
 		local function exposeSignal(signal, assetType)
-			maid:GiveTask(playerMrketeer:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
+			maid:GiveTask(playerMarketeer:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
 				signal:Fire(...)
 			end))
 		end
