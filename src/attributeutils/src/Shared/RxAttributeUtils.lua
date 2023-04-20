@@ -48,7 +48,7 @@ end
 	Observes an attribute on an instance with a conditional statement.
 	@param instance Instance
 	@param attributeName string
-	@param condition function
+	@param condition function | nil
 	@return Observable<Brio<any>>
 ]=]
 function RxAttributeUtils.observeAttributeBrio(instance, attributeName, condition)
