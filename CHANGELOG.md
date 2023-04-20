@@ -1,3 +1,16 @@
+# (Thu Apr 20 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@8.13.0`, `@quenty/gameconfig@5.24.0`, `@quenty/gameproductservice@7.2.0`, `@quenty/observablecollection@5.14.0`, `@quenty/receiptprocessing@1.1.0`
+  - Users/quenty/receipts [#358](https://github.com/Quenty/NevermoreEngine/pull/358) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Apr 13 2023)
 
 #### 🐛 Bug Fix
