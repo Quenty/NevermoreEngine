@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/camerainfo@1.1.0`, `@quenty/collectionserviceutils@2.13.0`, `@quenty/flipbook@2.6.0`, `@quenty/friendutils@6.7.0`, `@quenty/gameproductservice@7.3.0`, `@quenty/inputmode@7.17.0`, `@quenty/permissionprovider@8.12.0`, `@quenty/playerutils@2.13.0`, `@quenty/seatutils@1.9.0`, `@quenty/secrets@1.5.0`, `@quenty/uiobjectutils@3.3.0`
+  - fix: Do additional fixes [#359](https://github.com/Quenty/NevermoreEngine/pull/359) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Apr 24 2023)
+
+#### 🚀 Enhancement
+
 - `@quenty/socialserviceutils@6.6.0`
   - feat: Allow passing ExperienceInviteOptions [#357](https://github.com/Quenty/NevermoreEngine/pull/357) ([@OttoHatt](https://github.com/OttoHatt))
 
