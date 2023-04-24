@@ -1,3 +1,16 @@
+# (Mon Apr 24 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/socialserviceutils@6.6.0`
+  - feat: Allow passing ExperienceInviteOptions [#357](https://github.com/Quenty/NevermoreEngine/pull/357) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # (Thu Apr 20 2023)
 
 #### 🚀 Enhancement

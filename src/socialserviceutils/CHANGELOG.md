@@ -1,3 +1,16 @@
+# v6.6.0 (Mon Apr 24 2023)
+
+#### 🚀 Enhancement
+
+- feat: Allow passing ExperienceInviteOptions [#357](https://github.com/Quenty/NevermoreEngine/pull/357) ([@OttoHatt](https://github.com/OttoHatt))
+- feat: Allow passing ExperienceInviteOptions ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
