@@ -92,6 +92,34 @@ function PermissionService:PromisePermissionProvider()
 	return self._promise
 end
 
+--[=[
+	Returns whether the player is an admin.
+	@param player Player
+	@return Promise<boolean>
+]=]
+function PermissionService:PromiseIsAdmin(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
+
+	return self:PromisePermissionProvider()
+		:Then(function(permissionProvider)
+			return permissionProvider:PromiseIsAdmin(player)
+		end)
+end
+
+--[=[
+	Returns whether the player is a creator.
+	@param player Player
+	@return Promise<boolean>
+]=]
+function PermissionService:PromiseIsCreator(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
+
+	return self:PromisePermissionProvider()
+		:Then(function(permissionProvider)
+			return permissionProvider:PromiseIsCreator(player)
+		end)
+end
+
 function PermissionService:Destroy()
 	self._maid:DoCleaning()
 	self._provider = nil

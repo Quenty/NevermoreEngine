@@ -16,11 +16,9 @@ local RxSeatUtils = {}
 	Defines occupant as the humanoid attached to the seat.
 
 	@param seat Seat | VehicleSeat
-	@return Observable<Humanoid | nil>
+	@return Observable<Brio<Humanoid>>
 ]=]
-function RxSeatUtils.observeOccupant(seat)
-	assert(typeof(seat) == "Instance", "Bad seat")
-
+function RxSeatUtils.observeOccupantBrio(seat)
 	return RxInstanceUtils.observeChildrenOfNameBrio(seat, "Weld", "SeatWeld"):Pipe({
 		RxBrioUtils.flatMapBrio(function(weld)
 			return RxBrioUtils.flatCombineLatest({
@@ -52,7 +50,19 @@ function RxSeatUtils.observeOccupant(seat)
 		RxBrioUtils.map(function(state)
 			return state.humanoid
 		end);
+	})
+end
 
+--[=[
+	Defines occupant as the humanoid attached to the seat.
+
+	@param seat Seat | VehicleSeat
+	@return Observable<Humanoid | nil>
+]=]
+function RxSeatUtils.observeOccupant(seat)
+	assert(typeof(seat) == "Instance", "Bad seat")
+
+	return RxSeatUtils.observeOccupantBrio(seat):Pipe({
 		-- Switch to top
 		RxStateStackUtils.topOfStack();
 		Rx.distinct();
