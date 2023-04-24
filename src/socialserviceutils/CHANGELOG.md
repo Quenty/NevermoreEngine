@@ -1,20 +1,18 @@
-# v6.6.0 (Mon Apr 24 2023)
-
-#### 🚀 Enhancement
-
-- feat: Allow passing ExperienceInviteOptions [#357](https://github.com/Quenty/NevermoreEngine/pull/357) ([@OttoHatt](https://github.com/OttoHatt))
-- feat: Allow passing ExperienceInviteOptions ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/socialserviceutils@6.5.0...@quenty/socialserviceutils@6.6.0) (2023-04-24)
+
+
+### Features
+
+* Allow passing ExperienceInviteOptions ([bca5847](https://github.com/Quenty/NevermoreEngine/commit/bca58475d846534e58bd14c89d580ab4e2eee070))
+
+
+
+
 
 # [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/socialserviceutils@6.4.1...@quenty/socialserviceutils@6.5.0) (2023-04-10)
 
