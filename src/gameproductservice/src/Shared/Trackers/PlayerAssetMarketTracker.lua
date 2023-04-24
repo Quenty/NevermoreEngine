@@ -173,15 +173,13 @@ function PlayerAssetMarketTracker:HandleProcessReceipt(_player, receiptInfo)
 	local pendingForAssetId = self._pendingPromises[productId]
 
 	if pendingForAssetId then
-		self._purchasedThisSession[productId] = true
-		self._pendingPromises[productId] = nil
-
-		pendingForAssetId:Resolve(true)
+		self:HandlePurchaseEvent(productId, true)
 
 		return Enum.ProductPurchaseDecision.PurchaseGranted
 	end
 
-	return Enum.ProductPurchaseDecision.NotProcessedYet
+	-- Always grant...
+	return Enum.ProductPurchaseDecision.PurchaseGranted
 end
 
 return PlayerAssetMarketTracker
