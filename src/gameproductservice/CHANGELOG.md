@@ -1,20 +1,18 @@
-# v7.3.1 (Mon Apr 24 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Ensure processing is handled properly [#360](https://github.com/Quenty/NevermoreEngine/pull/360) ([@Quenty](https://github.com/Quenty))
-- fix: Ensure processing is handled properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.3.0...@quenty/gameproductservice@7.3.1) (2023-04-24)
+
+
+### Bug Fixes
+
+* Ensure processing is handled properly ([e789a63](https://github.com/Quenty/NevermoreEngine/commit/e789a631d814622fcb37e1d14d03bf32956cf925))
+
+
+
+
 
 # [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.2.0...@quenty/gameproductservice@7.3.0) (2023-04-24)
 
