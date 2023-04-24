@@ -2,8 +2,6 @@
 	@class UIAlignmentUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local UIAlignmentUtils = {}
 
 function UIAlignmentUtils.horizontalAlignmentToNumber(horizontalAlignment)
