@@ -1,20 +1,18 @@
-# v8.12.0 (Mon Apr 24 2023)
-
-#### 🚀 Enhancement
-
-- fix: Do additional fixes [#359](https://github.com/Quenty/NevermoreEngine/pull/359) ([@Quenty](https://github.com/Quenty))
-- feat: Add PromiseIsCreator and PromiseIsAdmin utility helper methods on PermissionService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.11.0...@quenty/permissionprovider@8.12.0) (2023-04-24)
+
+
+### Features
+
+* Add PromiseIsCreator and PromiseIsAdmin utility helper methods on PermissionService ([179ed15](https://github.com/Quenty/NevermoreEngine/commit/179ed153a3c6329417569cfff93310a0e862bc1d))
+
+
+
+
 
 # [8.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.10.1...@quenty/permissionprovider@8.11.0) (2023-04-10)
 

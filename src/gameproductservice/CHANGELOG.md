@@ -1,23 +1,18 @@
-# v7.3.0 (Mon Apr 24 2023)
-
-#### 🚀 Enhancement
-
-- fix: Do additional fixes [#359](https://github.com/Quenty/NevermoreEngine/pull/359) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.2.0...@quenty/gameproductservice@7.3.0) (2023-04-24)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([3fbd817](https://github.com/Quenty/NevermoreEngine/commit/3fbd817b1fee45bda1b963b61a6ed22b0db12b82))
+
+
+
+
 
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.1.1...@quenty/gameproductservice@7.2.0) (2023-04-20)
 

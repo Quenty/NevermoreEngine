@@ -1,23 +1,18 @@
-# v3.3.0 (Mon Apr 24 2023)
-
-#### 🚀 Enhancement
-
-- fix: Do additional fixes [#359](https://github.com/Quenty/NevermoreEngine/pull/359) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix unnecessary loader call ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.2.0...@quenty/uiobjectutils@3.3.0) (2023-04-24)
+
+
+### Bug Fixes
+
+* Fix unnecessary loader call ([c006846](https://github.com/Quenty/NevermoreEngine/commit/c0068460643037d818adac74b3fd213657d40325))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.1.0...@quenty/uiobjectutils@3.2.0) (2023-02-21)
 

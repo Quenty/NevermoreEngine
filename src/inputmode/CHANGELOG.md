@@ -1,23 +1,18 @@
-# v7.17.0 (Mon Apr 24 2023)
-
-#### 🚀 Enhancement
-
-- fix: Do additional fixes [#359](https://github.com/Quenty/NevermoreEngine/pull/359) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: FIx issue where adding sub-dependent input modes would fail ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.16.0...@quenty/inputmode@7.17.0) (2023-04-24)
+
+
+### Bug Fixes
+
+* FIx issue where adding sub-dependent input modes would fail ([1836e7b](https://github.com/Quenty/NevermoreEngine/commit/1836e7b0808adfbf4a3fb5b0140d8bdc0114dd56))
+
+
+
+
 
 # [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.15.1...@quenty/inputmode@7.16.0) (2023-04-10)
 
