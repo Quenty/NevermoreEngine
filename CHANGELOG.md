@@ -1,3 +1,16 @@
+# (Tue May 02 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/influxdbclient@1.5.0`
+  - feat: Increase default flush time which will decrease RPS for InfluxDB [#361](https://github.com/Quenty/NevermoreEngine/pull/361) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Apr 24 2023)
 
 #### 🐛 Bug Fix
