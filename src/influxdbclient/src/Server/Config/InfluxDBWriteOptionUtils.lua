@@ -12,7 +12,7 @@ function InfluxDBWriteOptionUtils.getDefaultOptions()
 	return InfluxDBWriteOptionUtils.createWriteOptions({
 		batchSize = 1000;
 		maxBatchBytes = 50_000_000; -- default max batch size in the cloud
-		flushIntervalSeconds = 5;
+		flushIntervalSeconds = 60;
 		-- maxRetries = 5;
 		-- maxRetryTimeSeconds = 180;
 		-- maxBufferLines = 32_000;
