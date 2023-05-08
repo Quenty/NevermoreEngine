@@ -1,4 +1,11 @@
 --[=[
+	Helps with color grades, which is the concept where the darkness of the color
+	goes from 0 to 100, with a grade of 100 being white, and a grade of 0 being
+	black.
+
+	Grades ensure a human-readable contrast value which means a grade contrast
+	of 70 will always meet accessibility standards.
+
 	@class ColorGradeUtils
 ]=]
 
@@ -8,6 +15,15 @@ local LuvColor3Utils = require("LuvColor3Utils")
 
 local ColorGradeUtils = {}
 
+--[=[
+	Adds to the grade and picks the direction to ensure the best amount of contrast.
+	May consider using [ColorGradeUtils.ensureGradeContrast] for a more background
+	aware contrast picker.
+
+	@param grade number
+	@param difference number
+	@return Color3
+]=]
 function ColorGradeUtils.addGrade(grade, difference)
 	local finalGrade = grade + difference
 
@@ -27,6 +43,48 @@ function ColorGradeUtils.addGrade(grade, difference)
 end
 
 --[=[
+	Ensures the given contrast between the color and the backing, with
+	an adjustment to saturation to keep the UI loking good
+
+	@param color Color3
+	@param backing Color3
+	@param amount number -- Between 0 and 100
+	@return Color3
+]=]
+function ColorGradeUtils.ensureGradeContrast(color, backing, amount)
+	local l, u, v = unpack(LuvColor3Utils.fromColor3(color))
+	local _, _, bv = unpack(LuvColor3Utils.fromColor3(backing))
+
+	local grade = 100 - v
+	local backingGrade = 100 - bv
+
+	local rel = grade - backingGrade
+
+	-- Increase
+	if math.abs(rel) >= amount then
+		return color
+	end
+
+	local newRel = math.sign(rel)*amount
+
+	local newGrade = math.clamp(backingGrade + newRel, 0, 100)
+	local otherNewGrade = math.clamp(backingGrade - newRel, 0, 100)
+
+	local finalGrade
+	if math.abs(newGrade - backingGrade) > math.abs(otherNewGrade - backingGrade) then
+		finalGrade = newGrade
+	else
+		finalGrade = otherNewGrade
+	end
+
+	-- The further away from the original color the more we reduce vividness
+	local proportion = math.min(amount, math.abs(finalGrade - grade))/amount
+	u = math.clamp((1 - 0.5*proportion)*u, 0, 100)
+
+	return LuvColor3Utils.toColor3({l, u, 100 - finalGrade})
+end
+
+--[=[
 	Gets the grade for a given color
 
 	@param color Color3
@@ -39,6 +97,14 @@ function ColorGradeUtils.getGrade(color)
 	return 100 - v
 end
 
+--[=[
+	Converts a color into a graded version of that color.
+
+	@param baseColor Color3
+	@param colorGrade number -- 0 to 100
+	@param vividness number | nil
+	@return Color3
+]=]
 function ColorGradeUtils.getGradedColor(baseColor, colorGrade, vividness)
 	assert(typeof(baseColor) == "Color3", "Bad baseColor")
 	assert(type(vividness) == "number" or vividness == nil, "Bad vividness")
