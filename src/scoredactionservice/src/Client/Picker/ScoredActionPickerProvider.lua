@@ -51,7 +51,7 @@ function ScoredActionPickerProvider:GetOrCreatePicker(inputType)
 	local amount = Table.count(self._scoredActionPickers)
 	if amount > MAX_ACTION_LIST_SIZE_BEFORE_WARN then
 		warn(("[ScoredActionPickerProvider.GetPicker] - Pickers has size of %d/%d")
-			:format(#amount, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
+			:format(amount, MAX_ACTION_LIST_SIZE_BEFORE_WARN))
 	end
 
 	return picker
