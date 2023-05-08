@@ -45,6 +45,7 @@
     "@quenty/r15utils": "file:../r15utils",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
+    "@quenty/rxbinderutils": "file:../rxbinderutils",
     "@quenty/spring": "file:../spring",
     "@quenty/steputils": "file:../steputils",
     "@quenty/table": "file:../table",

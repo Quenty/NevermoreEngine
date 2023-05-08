@@ -10,6 +10,7 @@ local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
 local ObservableSet = {}
 ObservableSet.ClassName = "ObservableSet"
@@ -24,6 +25,9 @@ function ObservableSet.new()
 
 	self._maid = Maid.new()
 	self._set = {}
+
+	self._containsObservables = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._containsObservables)
 
 	self._countValue = Instance.new("IntValue")
 	self._countValue.Value = 0
@@ -100,6 +104,39 @@ function ObservableSet:ObserveItemsBrio()
 end
 
 --[=[
+	Observes the current value at a given index. This can be useful for observing
+	the first entry, or matching stuff up to a given slot.
+
+	@param item T
+	@return Observable<boolean>
+]=]
+function ObservableSet:ObserveContains(item)
+	assert(item ~= nil, "Bad item")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		if self._set[item] then
+			sub:Fire(true)
+		else
+			sub:Fire(false)
+		end
+
+		maid:GiveTask(self._containsObservables:Observe(item):Subscribe(function(doesContain)
+			sub:Fire(doesContain)
+		end))
+
+		self._maid[sub] = maid
+		maid:GiveTask(function()
+			self._maid[sub] = nil
+			sub:Complete()
+		end)
+
+		return maid
+	end)
+end
+
+--[=[
 	Returns whether the set contains the item
 	@param item T
 	@return boolean
@@ -135,9 +172,12 @@ function ObservableSet:Add(item)
 	assert(item ~= nil, "Bad item")
 
 	if not self._set[item] then
-		self._countValue.Value = self._countValue.Value + 1
 		self._set[item] = true
+
+		-- Fire events
+		self._countValue.Value = self._countValue.Value + 1
 		self.ItemAdded:Fire(item)
+		self._containsObservables:Fire(item, true)
 	end
 
 	return function()
@@ -155,12 +195,14 @@ function ObservableSet:Remove(item)
 	assert(item ~= nil, "Bad item")
 
 	if self._set[item] then
-		self._countValue.Value = self._countValue.Value - 1
 		self._set[item] = nil
 
+		-- Fire in reverse order
+		self._containsObservables:Fire(item, false)
 		if self.Destroy then
 			self.ItemRemoved:Fire(item)
 		end
+		self._countValue.Value = self._countValue.Value - 1
 	end
 end
 

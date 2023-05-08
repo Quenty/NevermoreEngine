@@ -214,7 +214,7 @@ function ObservableCountingMap:Set(key, amount)
 	end
 
 	if current < amount then
-		self:Remove(amount - current)
+		self:Add(-(amount - current))
 		return
 	elseif current == amount then
 		return
@@ -237,29 +237,50 @@ function ObservableCountingMap:Add(key, amount)
 
 	if amount == 0 then
 		return
-	elseif amount < 0 then
-		self:Remove(key, -amount)
-		return
 	end
 
-	if not self._map[key] then
+	if self._map[key] then
+		local newValue = self._map[key] + amount
+		if newValue == 0 then
+			-- Remove item
+			self._map[key] = nil
+
+			-- Fire events
+			self._totalKeyCountValue.Value = self._totalKeyCountValue.Value - 1
+
+			if self.Destroy then
+				self.KeyRemoved:Fire(key)
+			end
+
+			if self.Destroy then
+				self.KeyChanged:Fire(key, 0)
+			end
+		else
+			-- Update item
+			self._map[key] = newValue
+			self.KeyChanged:Fire(key, newValue)
+		end
+	else
+		-- Add item
 		self._map[key] = amount
+
+		-- Fire events
 		self._totalKeyCountValue.Value = self._totalKeyCountValue.Value + 1
 
 		if self.Destroy then
 			self.KeyAdded:Fire(key)
 		end
-	else
-		local newValue = self._map[key] + amount
-		self._map[key] = newValue
-		self.KeyChanged:Fire(key, newValue)
+
+		if self.Destroy then
+			self.KeyChanged:Fire(key, amount)
+		end
 	end
 
 	local removed = false
 	return function()
 		if self.Destroy and not removed then
 			removed = true
-			self:RemoveCount(key, amount)
+			self:Add(key, -amount)
 		end
 	end
 end
@@ -270,40 +291,12 @@ end
 	@param amount number?
 	@return callback
 ]=]
-function ObservableCountingMap:RemoveCount(key, amount)
+function ObservableCountingMap:Remove(key, amount)
 	assert(key ~= nil, "Bad key")
 	assert(type(amount) == "number" or amount == nil, "Bad amount")
 	amount = amount or 1
 
-	if amount == 0 then
-		return
-	elseif amount < 0 then
-		self:Add(key, -amount)
-		return
-	end
-
-	local current = self._map[key]
-	if not current then
-		return
-	end
-
-	local newValue = current - amount
-	if newValue > 0 then
-		self._map[key] = newValue
-		self.KeyChanged:Fire(key, newValue)
-	else
-		self._map[key] = nil
-
-		self._totalKeyCountValue.Value = self._totalKeyCountValue.Value - 1
-
-		if self.Destroy then
-			self.KeyRemoved:Fire(key)
-		end
-
-		if self.Destroy then
-			self.KeyChanged:Fire(key, 0)
-		end
-	end
+	self:Add(key, -amount)
 end
 
 --[=[

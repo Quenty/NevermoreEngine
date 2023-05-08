@@ -55,6 +55,22 @@ end
 ]=]
 function ScoredActionServiceClient:GetScoredAction(inputKeyMapList)
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
+
+	-- Mock for not running mode
+	if not RunService:IsRunning() then
+		local scoredAction = ScoredAction.new()
+
+		local maid = Maid.new()
+		maid:GiveTask(scoredAction:PushPreferred())
+
+		-- Couple cleanup to the scored action
+		maid:GiveTask(scoredAction.Removing:Connect(function()
+			maid:DoCleaning()
+		end))
+
+		return scoredAction
+	end
+
 	assert(self._provider, "Not initialized")
 
 	local scoredAction = ScoredAction.new()

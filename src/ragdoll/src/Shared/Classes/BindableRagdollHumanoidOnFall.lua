@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local FRAMES_TO_EXAMINE = 8
 local FRAME_TIME = 0.1
@@ -31,6 +32,10 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 	self.ShouldRagdoll.Value = false
 	self._maid:GiveTask(self.ShouldRagdoll)
 
+	self._isFalling = Instance.new("BoolValue")
+	self._isFalling.Value = false
+	self._maid:GiveTask(self._isFalling)
+
 	-- Setup Ragdoll
 	self:_initLastVelocityRecords()
 	self._lastRagDollTime = 0
@@ -50,12 +55,16 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 
 	self._maid:GiveTask(self._ragdollBinder:ObserveInstance(self._obj, function(class)
 		if not class then
-			self._lastRagDollTime = tick()
+			self._lastRagDollTime = os.clock()
 			self.ShouldRagdoll.Value = false
 		end
 	end))
 
 	return self
+end
+
+function BindableRagdollHumanoidOnFall:ObserveIsFalling()
+	return RxInstanceUtils.observeProperty(self._isFalling, "Value")
 end
 
 function BindableRagdollHumanoidOnFall:_initLastVelocityRecords()
@@ -103,6 +112,7 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 
 	local rootPart = self._obj.RootPart
 	if not rootPart then
+		self._isFalling.Value = false
 		table.insert(self._lastVelocityRecords, Vector3.new())
 		return
 	end
@@ -125,12 +135,17 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 	table.insert(self._lastVelocityRecords, currentVelocity)
 
 	if not fellForAllFrames then
+		self._isFalling.Value = false
 		return
 	end
 
 	if mostNegativeVelocityY >= REQUIRED_MAX_FALL_VELOCITY then
+		self._isFalling.Value = false
 		return
 	end
+
+	-- Write that we're falling (candidate for ragdoll)
+	self._isFalling.Value = true
 
 	-- print("currentVelocity.magnitude, mostNegativeVelocityY", currentVelocity.magnitude, mostNegativeVelocityY)
 
@@ -148,7 +163,8 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 		return
 	end
 
-	if (tick() - self._lastRagDollTime) <= RAGDOLL_DEBOUNCE_TIME then
+
+	if (os.clock() - self._lastRagDollTime) <= RAGDOLL_DEBOUNCE_TIME then
 		return
 	end
 
