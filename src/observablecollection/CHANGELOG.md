@@ -1,3 +1,21 @@
+# v5.15.0 (Mon May 08 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
+- feat: Add ObservableSet:ObserveContains(item) ([@Quenty](https://github.com/Quenty))
+- feat: Add ObservableSortedList:ObserveAtIndex(indexToObserve) and ObservableSortedList:FindFirstKey(content) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix removal firing events to fire correctly ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

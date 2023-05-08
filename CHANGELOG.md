@@ -1,3 +1,16 @@
+# (Mon May 08 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/brio@8.12.0`, `@quenty/cframeutils@5.2.0`, `@quenty/characterutils@6.6.0`, `@quenty/colorpalette@4.22.0`, `@quenty/firstpersoncharactertransparency@8.14.0`, `@quenty/inputkeymaputils@7.26.0`, `@quenty/inputmode@7.18.0`, `@quenty/numbertoinputkeyutils@2.2.0`, `@quenty/observablecollection@5.15.0`, `@quenty/ragdoll@9.23.0`, `@quenty/scoredactionservice@9.26.0`
+  - users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue May 02 2023)
 
 #### 🚀 Enhancement
