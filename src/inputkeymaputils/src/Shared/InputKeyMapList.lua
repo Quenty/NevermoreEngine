@@ -92,7 +92,6 @@ end
 	```
 
 	@param inputKeys { any }
-	@param inputKeyMapList { InputKeyMap }
 	@param options { bindingName: string, rebindable: boolean } | nil -- Optional configuration options
 	@return InputKeyMapList
 ]=]

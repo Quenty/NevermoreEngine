@@ -42,7 +42,7 @@ end
 
 --[=[
 	Retrieves number from keyCode
-	@param KeyCode keyCode
+	@param keyCode KeyCode
 	@return number
 ]=]
 function NumberToInputKeyUtils.getNumberFromKeyCode(keyCode)
