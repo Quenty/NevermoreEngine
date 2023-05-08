@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/brio": "file:../brio",
     "@quenty/deferred": "file:../deferred",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
