@@ -62,6 +62,33 @@ function CFrameUtils.redirectLocalAxis(cframe: CFrame, localAxis: Vector3, world
 end
 
 --[=[
+	Returns a CFrame from an axis angle, handling NaN values
+
+	@param axisAngle Vector3
+	@param position Vector3 | nil
+	@return CFrame
+]=]
+function CFrameUtils.axisAngleToCFrame(axisAngle, position)
+	local angle = axisAngle.magnitude
+	local cframe = CFrame.fromAxisAngle(axisAngle, angle)
+
+	if cframe ~= cframe then
+		-- warn("[AxisAngleUtils.toCFrame] - cframe is NAN")
+		if position then
+			return CFrame.new(position)
+		else
+			return CFrame.new()
+		end
+	end
+
+	if position then
+		cframe = cframe + position
+	end
+
+	return cframe
+end
+
+--[=[
 	Constructs a CFrame from a position, upVector, and rightVector
 	even if these upVector and rightVectors are not orthogonal to
 	each other.
