@@ -52,7 +52,19 @@ function InputModeServiceClient:GetInputMode(inputModeType)
 	if not RunService:IsRunning() then
 		if not self._inputModes then
 			-- fake it till we make it!
-			return InputMode.new(inputModeType)
+			local inputMode = InputMode.new(inputModeType)
+			local lastInputType = UserInputService:GetLastInputType()
+
+			-- Hack processing
+			if inputModeType:IsValid(lastInputType) then
+				inputMode:Enable()
+			end
+
+			if inputModeType == InputModeTypes.Keyboard or inputModeType == InputModeTypes.KeyboardAndMouse then
+				inputMode:Enable()
+			end
+
+			return inputMode
 		end
 	end
 
