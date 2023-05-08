@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v2.3.1">
 <title data-rh="true">ObservableCountingMap | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/ObservableCountingMap"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="ObservableCountingMap | Nevermore"><meta data-rh="true" name="description" content="An observable map that counts up/down and removes when the count is zero."><meta data-rh="true" property="og:description" content="An observable map that counts up/down and removes when the count is zero."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/ObservableCountingMap"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ObservableCountingMap" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ObservableCountingMap" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.ede77ffb.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.64efb9c6.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.b53e48d6.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.1171324b.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.8cfc3483.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -41,13 +41,13 @@
 <p>Sets the current value</p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Add"><code style="text-decoration:none">Add</code><a href="#Add" class="hash-link" aria-label="Direct link to Add" title="Direct link to Add">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L233"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">Add</code><code>(</code><div class="inset_uKQm"><div><code>key<!-- -->: </code><code class="blue_P4bS">T</code><code>,</code></div><div><code>amount<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code class="blue_P4bS">callback</code></div><div>
 <p>Adds the key to the map if it does not exists.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RemoveCount"><code style="text-decoration:none">RemoveCount</code><a href="#RemoveCount" class="hash-link" aria-label="Direct link to RemoveCount" title="Direct link to RemoveCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L273"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">RemoveCount</code><code>(</code><div class="inset_uKQm"><div><code>key<!-- -->: </code><code class="blue_P4bS">T</code><code>,</code></div><div><code>amount<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code class="blue_P4bS">callback</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Remove"><code style="text-decoration:none">Remove</code><a href="#Remove" class="hash-link" aria-label="Direct link to Remove" title="Direct link to Remove">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L294"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">Remove</code><code>(</code><div class="inset_uKQm"><div><code>key<!-- -->: </code><code class="blue_P4bS">T</code><code>,</code></div><div><code>amount<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code class="blue_P4bS">callback</code></div><div>
 <p>Removes the key from the set if it exists.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFirstKey"><code style="text-decoration:none">GetFirstKey</code><a href="#GetFirstKey" class="hash-link" aria-label="Direct link to GetFirstKey" title="Direct link to GetFirstKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L313"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">GetFirstKey</code><code>(</code><code>) → </code><code class="blue_P4bS">T</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFirstKey"><code style="text-decoration:none">GetFirstKey</code><a href="#GetFirstKey" class="hash-link" aria-label="Direct link to GetFirstKey" title="Direct link to GetFirstKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L306"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">GetFirstKey</code><code>(</code><code>) → </code><code class="blue_P4bS">T</code></div><div>
 <p>Gets the first key</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetKeysList"><code style="text-decoration:none">GetKeysList</code><a href="#GetKeysList" class="hash-link" aria-label="Direct link to GetKeysList" title="Direct link to GetKeysList">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L322"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">GetKeysList</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">T</code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetKeysList"><code style="text-decoration:none">GetKeysList</code><a href="#GetKeysList" class="hash-link" aria-label="Direct link to GetKeysList" title="Direct link to GetKeysList">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L315"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">GetKeysList</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">T</code><code class="purple_ieR2">}</code></div><div>
 <p>Gets a list of all keys.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L333"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableCountingMap.lua#L326"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableCountingMap<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Cleans up the ObservableCountingMap and sets the metatable to nil.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -268,7 +268,7 @@
             }
         },
         {
-            &quot;name&quot;: &quot;RemoveCount&quot;,
+            &quot;name&quot;: &quot;Remove&quot;,
             &quot;desc&quot;: &quot;Removes the key from the set if it exists.&quot;,
             &quot;params&quot;: [
                 {
@@ -290,7 +290,7 @@
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 273,
+                &quot;line&quot;: 294,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableCountingMap.lua&quot;
             }
         },
@@ -306,7 +306,7 @@
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 313,
+                &quot;line&quot;: 306,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableCountingMap.lua&quot;
             }
         },
@@ -322,7 +322,7 @@
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 322,
+                &quot;line&quot;: 315,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableCountingMap.lua&quot;
             }
         },
@@ -333,7 +333,7 @@
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 333,
+                &quot;line&quot;: 326,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableCountingMap.lua&quot;
             }
         }
@@ -386,8 +386,8 @@
         &quot;line&quot;: 5,
         &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableCountingMap.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#CountChanged" class="table-of-contents__link toc-highlight">CountChanged</a></li><li><a href="#KeyAdded" class="table-of-contents__link toc-highlight">KeyAdded</a></li><li><a href="#KeyChanged" class="table-of-contents__link toc-highlight">KeyChanged</a></li><li><a href="#KeyRemoved" class="table-of-contents__link toc-highlight">KeyRemoved</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#Contains" class="table-of-contents__link toc-highlight">:Contains</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#Get" class="table-of-contents__link toc-highlight">:Get</a></li><li><a href="#GetFirstKey" class="table-of-contents__link toc-highlight">:GetFirstKey</a></li><li><a href="#GetKeysList" class="table-of-contents__link toc-highlight">:GetKeysList</a></li><li><a href="#GetTotalKeyCount" class="table-of-contents__link toc-highlight">:GetTotalKeyCount</a></li><li><a href="#ObserveKeysBrio" class="table-of-contents__link toc-highlight">:ObserveKeysBrio</a></li><li><a href="#ObserveKeysList" class="table-of-contents__link toc-highlight">:ObserveKeysList</a></li><li><a href="#ObserveKeysSet" class="table-of-contents__link toc-highlight">:ObserveKeysSet</a></li><li><a href="#ObserveTotalKeyCount" class="table-of-contents__link toc-highlight">:ObserveTotalKeyCount</a></li><li><a href="#RemoveCount" class="table-of-contents__link toc-highlight">:RemoveCount</a></li><li><a href="#Set" class="table-of-contents__link toc-highlight">:Set</a></li><li><a href="#isObservableMap" class="table-of-contents__link toc-highlight">.isObservableMap</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.64efb9c6.js"></script>
-<script src="/NevermoreEngine/assets/js/main.b53e48d6.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#CountChanged" class="table-of-contents__link toc-highlight">CountChanged</a></li><li><a href="#KeyAdded" class="table-of-contents__link toc-highlight">KeyAdded</a></li><li><a href="#KeyChanged" class="table-of-contents__link toc-highlight">KeyChanged</a></li><li><a href="#KeyRemoved" class="table-of-contents__link toc-highlight">KeyRemoved</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#Contains" class="table-of-contents__link toc-highlight">:Contains</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#Get" class="table-of-contents__link toc-highlight">:Get</a></li><li><a href="#GetFirstKey" class="table-of-contents__link toc-highlight">:GetFirstKey</a></li><li><a href="#GetKeysList" class="table-of-contents__link toc-highlight">:GetKeysList</a></li><li><a href="#GetTotalKeyCount" class="table-of-contents__link toc-highlight">:GetTotalKeyCount</a></li><li><a href="#ObserveKeysBrio" class="table-of-contents__link toc-highlight">:ObserveKeysBrio</a></li><li><a href="#ObserveKeysList" class="table-of-contents__link toc-highlight">:ObserveKeysList</a></li><li><a href="#ObserveKeysSet" class="table-of-contents__link toc-highlight">:ObserveKeysSet</a></li><li><a href="#ObserveTotalKeyCount" class="table-of-contents__link toc-highlight">:ObserveTotalKeyCount</a></li><li><a href="#Remove" class="table-of-contents__link toc-highlight">:Remove</a></li><li><a href="#Set" class="table-of-contents__link toc-highlight">:Set</a></li><li><a href="#isObservableMap" class="table-of-contents__link toc-highlight">.isObservableMap</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.1171324b.js"></script>
+<script src="/NevermoreEngine/assets/js/main.8cfc3483.js"></script>
 </body>
 </html>

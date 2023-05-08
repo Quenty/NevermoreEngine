@@ -20,8 +20,8 @@ However, for small lists that don&#x27;t change frequently, such as a global lea
 a nice small interactive class.
 
 For performance reasons this class defers firing events until the next defer() event frame."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/ObservableSortedList"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ObservableSortedList" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ObservableSortedList" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.ede77ffb.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.64efb9c6.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.b53e48d6.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.1171324b.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.8cfc3483.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -36,45 +36,52 @@ For performance reasons this class defers firing events until the next defer() e
   a nice small interactive class.
 </p>
 <p>For performance reasons this class defers firing events until the next defer() event frame.</p>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ItemAdded"><code style="text-decoration:none">ItemAdded</code><a href="#ItemAdded" class="hash-link" aria-label="Direct link to ItemAdded" title="Direct link to ItemAdded">​</a></h3><span class="badge_Ba2I" style="color:#e74c3c"><span class="badgeTooltip_cWXP">This item is read only and cannot be modified.</span><span class="badgeToolTipTail_H9D_"><svg xmlns="http://www.w3.org/2000/svg" height="300px" width="300px" fill="#e74c3c" x="0px" y="0px" viewBox="0 0 96 96"><path d="M70.354,15.662h-7.496H25.566c-3.282,0-5.19-0.776-5.728-1.169v-1.456c0.538-0.393,2.445-1.168,5.728-1.168h46.479V8H25.566  c-4.776,0-9.594,1.468-9.594,4.747v61.458C15.972,86.645,20.328,88,37.495,88h42.535V15.662H70.354z"></path></svg> <!-- -->Read Only</span></span><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L62"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.<!-- -->ItemAdded<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T,</code><code class="blue_P4bS">number,</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code class="op_lSLc">&gt;</code></div><div>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ItemAdded"><code style="text-decoration:none">ItemAdded</code><a href="#ItemAdded" class="hash-link" aria-label="Direct link to ItemAdded" title="Direct link to ItemAdded">​</a></h3><span class="badge_Ba2I" style="color:#e74c3c"><span class="badgeTooltip_cWXP">This item is read only and cannot be modified.</span><span class="badgeToolTipTail_H9D_"><svg xmlns="http://www.w3.org/2000/svg" height="300px" width="300px" fill="#e74c3c" x="0px" y="0px" viewBox="0 0 96 96"><path d="M70.354,15.662h-7.496H25.566c-3.282,0-5.19-0.776-5.728-1.169v-1.456c0.538-0.393,2.445-1.168,5.728-1.168h46.479V8H25.566  c-4.776,0-9.594,1.468-9.594,4.747v61.458C15.972,86.645,20.328,88,37.495,88h42.535V15.662H70.354z"></path></svg> <!-- -->Read Only</span></span><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L69"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.<!-- -->ItemAdded<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T,</code><code class="blue_P4bS">number,</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Fires when an item is added</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ItemRemoved"><code style="text-decoration:none">ItemRemoved</code><a href="#ItemRemoved" class="hash-link" aria-label="Direct link to ItemRemoved" title="Direct link to ItemRemoved">​</a></h3><span class="badge_Ba2I" style="color:#e74c3c"><span class="badgeTooltip_cWXP">This item is read only and cannot be modified.</span><span class="badgeToolTipTail_H9D_"><svg xmlns="http://www.w3.org/2000/svg" height="300px" width="300px" fill="#e74c3c" x="0px" y="0px" viewBox="0 0 96 96"><path d="M70.354,15.662h-7.496H25.566c-3.282,0-5.19-0.776-5.728-1.169v-1.456c0.538-0.393,2.445-1.168,5.728-1.168h46.479V8H25.566  c-4.776,0-9.594,1.468-9.594,4.747v61.458C15.972,86.645,20.328,88,37.495,88h42.535V15.662H70.354z"></path></svg> <!-- -->Read Only</span></span><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L71"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.<!-- -->ItemRemoved<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T,</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ItemRemoved"><code style="text-decoration:none">ItemRemoved</code><a href="#ItemRemoved" class="hash-link" aria-label="Direct link to ItemRemoved" title="Direct link to ItemRemoved">​</a></h3><span class="badge_Ba2I" style="color:#e74c3c"><span class="badgeTooltip_cWXP">This item is read only and cannot be modified.</span><span class="badgeToolTipTail_H9D_"><svg xmlns="http://www.w3.org/2000/svg" height="300px" width="300px" fill="#e74c3c" x="0px" y="0px" viewBox="0 0 96 96"><path d="M70.354,15.662h-7.496H25.566c-3.282,0-5.19-0.776-5.728-1.169v-1.456c0.538-0.393,2.445-1.168,5.728-1.168h46.479V8H25.566  c-4.776,0-9.594,1.468-9.594,4.747v61.458C15.972,86.645,20.328,88,37.495,88h42.535V15.662H70.354z"></path></svg> <!-- -->Read Only</span></span><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L78"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.<!-- -->ItemRemoved<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T,</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Fires when an item is removed.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CountChanged"><code style="text-decoration:none">CountChanged</code><a href="#CountChanged" class="hash-link" aria-label="Direct link to CountChanged" title="Direct link to CountChanged">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.<!-- -->CountChanged<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/RBXScriptSignal" target="_blank" rel="noopener noreferrer">RBXScriptSignal<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CountChanged"><code style="text-decoration:none">CountChanged</code><a href="#CountChanged" class="hash-link" aria-label="Direct link to CountChanged" title="Direct link to CountChanged">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L86"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.<!-- -->CountChanged<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/RBXScriptSignal" target="_blank" rel="noopener noreferrer">RBXScriptSignal<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
 <p>Fires when the count changes.</p>
-</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L38"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>compare<!-- -->: </code><code class="blue_P4bS">callback?</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ObservableSortedList">ObservableSortedList</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
+</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L39"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>compare<!-- -->: </code><code class="blue_P4bS">callback?</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ObservableSortedList">ObservableSortedList</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Constructs a new ObservableSortedList</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isObservableSortedList"><code style="text-decoration:none">isObservableSortedList</code><a href="#isObservableSortedList" class="hash-link" aria-label="Direct link to isObservableSortedList" title="Direct link to isObservableSortedList">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L89"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.</code><code class="green_DgR4">isObservableSortedList</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isObservableSortedList"><code style="text-decoration:none">isObservableSortedList</code><a href="#isObservableSortedList" class="hash-link" aria-label="Direct link to isObservableSortedList" title="Direct link to isObservableSortedList">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L96"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->.</code><code class="green_DgR4">isObservableSortedList</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether the value is an observable list</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveItemsBrio"><code style="text-decoration:none">ObserveItemsBrio</code><a href="#ObserveItemsBrio" class="hash-link" aria-label="Direct link to ObserveItemsBrio" title="Direct link to ObserveItemsBrio">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L97"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveItemsBrio</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveItemsBrio"><code style="text-decoration:none">ObserveItemsBrio</code><a href="#ObserveItemsBrio" class="hash-link" aria-label="Direct link to ObserveItemsBrio" title="Direct link to ObserveItemsBrio">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L104"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveItemsBrio</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes all items in the list</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveIndex"><code style="text-decoration:none">ObserveIndex</code><a href="#ObserveIndex" class="hash-link" aria-label="Direct link to ObserveIndex" title="Direct link to ObserveIndex">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L133"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveIndex</code><code>(</code><code>indexToObserve<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="FindFirstKey"><code style="text-decoration:none">FindFirstKey</code><a href="#FindFirstKey" class="hash-link" aria-label="Direct link to FindFirstKey" title="Direct link to FindFirstKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L139"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">FindFirstKey</code><code>(</code><code>content<!-- -->: </code><code class="blue_P4bS">T</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code></div><div>
+<p>Gets the first key for a given symbol</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveIndex"><code style="text-decoration:none">ObserveIndex</code><a href="#ObserveIndex" class="hash-link" aria-label="Direct link to ObserveIndex" title="Direct link to ObserveIndex">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L156"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveIndex</code><code>(</code><code>indexToObserve<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Observes the index as it changes, until the entry at the existing
   index is removed.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveIndexByKey"><code style="text-decoration:none">ObserveIndexByKey</code><a href="#ObserveIndexByKey" class="hash-link" aria-label="Direct link to ObserveIndexByKey" title="Direct link to ObserveIndexByKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L151"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveIndexByKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveAtIndex"><code style="text-decoration:none">ObserveAtIndex</code><a href="#ObserveAtIndex" class="hash-link" aria-label="Direct link to ObserveAtIndex" title="Direct link to ObserveAtIndex">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L174"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveAtIndex</code><code>(</code><code>indexToObserve<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
+<p>
+  Observes the current value at a given index. This can be useful for observing
+  the first entry, or matching stuff up to a given slot.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveIndexByKey"><code style="text-decoration:none">ObserveIndexByKey</code><a href="#ObserveIndexByKey" class="hash-link" aria-label="Direct link to ObserveIndexByKey" title="Direct link to ObserveIndexByKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L202"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveIndexByKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Observes the index as it changes, until the entry at the existing
   key is removed.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetIndexByKey"><code style="text-decoration:none">GetIndexByKey</code><a href="#GetIndexByKey" class="hash-link" aria-label="Direct link to GetIndexByKey" title="Direct link to GetIndexByKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L189"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">GetIndexByKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetIndexByKey"><code style="text-decoration:none">GetIndexByKey</code><a href="#GetIndexByKey" class="hash-link" aria-label="Direct link to GetIndexByKey" title="Direct link to GetIndexByKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L240"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">GetIndexByKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Gets the current index from the key</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetCount"><code style="text-decoration:none">GetCount</code><a href="#GetCount" class="hash-link" aria-label="Direct link to GetCount" title="Direct link to GetCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L202"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">GetCount</code><code>(</code><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetCount"><code style="text-decoration:none">GetCount</code><a href="#GetCount" class="hash-link" aria-label="Direct link to GetCount" title="Direct link to GetCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L253"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">GetCount</code><code>(</code><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Gets the count of items in the list</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetList"><code style="text-decoration:none">GetList</code><a href="#GetList" class="hash-link" aria-label="Direct link to GetList" title="Direct link to GetList">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L210"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">GetList</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">T</code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetList"><code style="text-decoration:none">GetList</code><a href="#GetList" class="hash-link" aria-label="Direct link to GetList" title="Direct link to GetList">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L261"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">GetList</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">T</code><code class="purple_ieR2">}</code></div><div>
 <p>Gets a list of all entries.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveCount"><code style="text-decoration:none">ObserveCount</code><a href="#ObserveCount" class="hash-link" aria-label="Direct link to ObserveCount" title="Direct link to ObserveCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L222"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveCount</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveCount"><code style="text-decoration:none">ObserveCount</code><a href="#ObserveCount" class="hash-link" aria-label="Direct link to ObserveCount" title="Direct link to ObserveCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L273"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">ObserveCount</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes the count of the list</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Add"><code style="text-decoration:none">Add</code><a href="#Add" class="hash-link" aria-label="Direct link to Add" title="Direct link to Add">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L232"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">Add</code><code>(</code><div class="inset_uKQm"><div><code>item<!-- -->: </code><code class="blue_P4bS">T</code><code>,</code></div><div><code>observeValue<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">Comparable</code><code class="op_lSLc">&gt;</code></div></div><code>) → </code><code class="blue_P4bS">callback</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Add"><code style="text-decoration:none">Add</code><a href="#Add" class="hash-link" aria-label="Direct link to Add" title="Direct link to Add">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L283"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">Add</code><code>(</code><div class="inset_uKQm"><div><code>item<!-- -->: </code><code class="blue_P4bS">T</code><code>,</code></div><div><code>observeValue<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">Comparable</code><code class="op_lSLc">&gt;</code></div></div><code>) → </code><code class="blue_P4bS">callback</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call to remove</p>
 </span></span></div><div>
 <p>Adds the item to the list at the specified index</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Get"><code style="text-decoration:none">Get</code><a href="#Get" class="hash-link" aria-label="Direct link to Get" title="Direct link to Get">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L288"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">Get</code><code>(</code><code>index<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS">T?</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Get"><code style="text-decoration:none">Get</code><a href="#Get" class="hash-link" aria-label="Direct link to Get" title="Direct link to Get">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L339"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">Get</code><code>(</code><code>index<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS">T?</code></div><div>
 <p>Gets the current item at the index, or nil if it is not defined.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RemoveByKey"><code style="text-decoration:none">RemoveByKey</code><a href="#RemoveByKey" class="hash-link" aria-label="Direct link to RemoveByKey" title="Direct link to RemoveByKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L304"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">RemoveByKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code>) → </code><code class="blue_P4bS">T</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="RemoveByKey"><code style="text-decoration:none">RemoveByKey</code><a href="#RemoveByKey" class="hash-link" aria-label="Direct link to RemoveByKey" title="Direct link to RemoveByKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L355"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">RemoveByKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Symbol">Symbol</a></code><code>) → </code><code class="blue_P4bS">T</code></div><div>
 <p>Removes the item from the list if it exists.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L522"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableSortedList.lua#L588"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableSortedList<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Cleans up the ObservableSortedList and sets the metatable to nil.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -96,7 +103,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 38,
+                &quot;line&quot;: 39,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -118,7 +125,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 89,
+                &quot;line&quot;: 96,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -134,7 +141,29 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 97,
+                &quot;line&quot;: 104,
+                &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;FindFirstKey&quot;,
+            &quot;desc&quot;: &quot;Gets the first key for a given symbol&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;content&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;T&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Symbol&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 139,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -156,7 +185,29 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 133,
+                &quot;line&quot;: 156,
+                &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;ObserveAtIndex&quot;,
+            &quot;desc&quot;: &quot;Observes the current value at a given index. This can be useful for observing\nthe first entry, or matching stuff up to a given slot.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;indexToObserve&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Observable&lt;T&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 174,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -178,7 +229,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 151,
+                &quot;line&quot;: 202,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -200,7 +251,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 189,
+                &quot;line&quot;: 240,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -216,7 +267,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 202,
+                &quot;line&quot;: 253,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -232,7 +283,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 210,
+                &quot;line&quot;: 261,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -248,7 +299,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 222,
+                &quot;line&quot;: 273,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -275,7 +326,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 232,
+                &quot;line&quot;: 283,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -297,7 +348,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 288,
+                &quot;line&quot;: 339,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -319,7 +370,7 @@ For performance reasons this class defers firing events until the next defer() e
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 304,
+                &quot;line&quot;: 355,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -330,7 +381,7 @@ For performance reasons this class defers firing events until the next defer() e
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 522,
+                &quot;line&quot;: 588,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         }
@@ -342,7 +393,7 @@ For performance reasons this class defers firing events until the next defer() e
             &quot;lua_type&quot;: &quot;Signal&lt;T, number, Symbol&gt;&quot;,
             &quot;readonly&quot;: true,
             &quot;source&quot;: {
-                &quot;line&quot;: 62,
+                &quot;line&quot;: 69,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -352,7 +403,7 @@ For performance reasons this class defers firing events until the next defer() e
             &quot;lua_type&quot;: &quot;Signal&lt;T, Symbol&gt;&quot;,
             &quot;readonly&quot;: true,
             &quot;source&quot;: {
-                &quot;line&quot;: 71,
+                &quot;line&quot;: 78,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         },
@@ -361,7 +412,7 @@ For performance reasons this class defers firing events until the next defer() e
             &quot;desc&quot;: &quot;Fires when the count changes.&quot;,
             &quot;lua_type&quot;: &quot;RBXScriptSignal&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 79,
+                &quot;line&quot;: 86,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
             }
         }
@@ -373,8 +424,8 @@ For performance reasons this class defers firing events until the next defer() e
         &quot;line&quot;: 14,
         &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableSortedList.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#CountChanged" class="table-of-contents__link toc-highlight">CountChanged</a></li><li><a href="#ItemAdded" class="table-of-contents__link toc-highlight">ItemAdded</a></li><li><a href="#ItemRemoved" class="table-of-contents__link toc-highlight">ItemRemoved</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#Get" class="table-of-contents__link toc-highlight">:Get</a></li><li><a href="#GetCount" class="table-of-contents__link toc-highlight">:GetCount</a></li><li><a href="#GetIndexByKey" class="table-of-contents__link toc-highlight">:GetIndexByKey</a></li><li><a href="#GetList" class="table-of-contents__link toc-highlight">:GetList</a></li><li><a href="#ObserveCount" class="table-of-contents__link toc-highlight">:ObserveCount</a></li><li><a href="#ObserveIndex" class="table-of-contents__link toc-highlight">:ObserveIndex</a></li><li><a href="#ObserveIndexByKey" class="table-of-contents__link toc-highlight">:ObserveIndexByKey</a></li><li><a href="#ObserveItemsBrio" class="table-of-contents__link toc-highlight">:ObserveItemsBrio</a></li><li><a href="#RemoveByKey" class="table-of-contents__link toc-highlight">:RemoveByKey</a></li><li><a href="#isObservableSortedList" class="table-of-contents__link toc-highlight">.isObservableSortedList</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.64efb9c6.js"></script>
-<script src="/NevermoreEngine/assets/js/main.b53e48d6.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#CountChanged" class="table-of-contents__link toc-highlight">CountChanged</a></li><li><a href="#ItemAdded" class="table-of-contents__link toc-highlight">ItemAdded</a></li><li><a href="#ItemRemoved" class="table-of-contents__link toc-highlight">ItemRemoved</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#FindFirstKey" class="table-of-contents__link toc-highlight">:FindFirstKey</a></li><li><a href="#Get" class="table-of-contents__link toc-highlight">:Get</a></li><li><a href="#GetCount" class="table-of-contents__link toc-highlight">:GetCount</a></li><li><a href="#GetIndexByKey" class="table-of-contents__link toc-highlight">:GetIndexByKey</a></li><li><a href="#GetList" class="table-of-contents__link toc-highlight">:GetList</a></li><li><a href="#ObserveAtIndex" class="table-of-contents__link toc-highlight">:ObserveAtIndex</a></li><li><a href="#ObserveCount" class="table-of-contents__link toc-highlight">:ObserveCount</a></li><li><a href="#ObserveIndex" class="table-of-contents__link toc-highlight">:ObserveIndex</a></li><li><a href="#ObserveIndexByKey" class="table-of-contents__link toc-highlight">:ObserveIndexByKey</a></li><li><a href="#ObserveItemsBrio" class="table-of-contents__link toc-highlight">:ObserveItemsBrio</a></li><li><a href="#RemoveByKey" class="table-of-contents__link toc-highlight">:RemoveByKey</a></li><li><a href="#isObservableSortedList" class="table-of-contents__link toc-highlight">.isObservableSortedList</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.1171324b.js"></script>
+<script src="/NevermoreEngine/assets/js/main.8cfc3483.js"></script>
 </body>
 </html>
