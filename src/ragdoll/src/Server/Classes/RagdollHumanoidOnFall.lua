@@ -43,15 +43,29 @@ function RagdollHumanoidOnFall.new(humanoid, serviceBag)
 			self:_handleServerEvent(...)
 		end))
 	else
-		self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder)
-		self._maid:GiveTask(self._ragdollLogic)
 
-		self._maid:GiveTask(self._ragdollLogic.ShouldRagdoll.Changed:Connect(function()
+		self._maid:GiveTask(self:_getOrCreateRagdollLogic().ShouldRagdoll.Changed:Connect(function()
 			self:_update()
 		end))
 	end
 
 	return self
+end
+
+function RagdollHumanoidOnFall:ObserveIsFalling()
+	-- TODO: Remove logic if nothing is observing it
+	return self:_getOrCreateRagdollLogic():ObserveIsFalling()
+end
+
+function RagdollHumanoidOnFall:_getOrCreateRagdollLogic()
+	if self._ragdollLogic then
+		return self._ragdollLogic
+	end
+
+	self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder)
+	self._maid:GiveTask(self._ragdollLogic)
+
+	return self._ragdollLogic
 end
 
 function RagdollHumanoidOnFall:_handleServerEvent(player, value)

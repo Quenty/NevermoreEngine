@@ -16,6 +16,8 @@ local cancellableDelay = require("cancellableDelay")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local RxBrioUtils = require("RxBrioUtils")
+local RxBinderUtils = require("RxBinderUtils")
 
 local UnragdollAutomatically = setmetatable({}, BaseObject)
 UnragdollAutomatically.ClassName = "UnragdollAutomatically"
@@ -83,13 +85,26 @@ function UnragdollAutomatically:_observeCanUnragdollTimer()
 		isReady.Value = false
 		maid:GiveTask(isReady)
 
-		maid:GiveTask(Rx.combineLatest({
-			enabled = self._unragdollAutomatically:Observe();
+		maid:GiveTask(RxBrioUtils.flatCombineLatest({
+			canUnragdoll = RxBrioUtils.flatCombineLatest({
+				enabled = self._unragdollAutomatically:Observe();
+				isFallingRagdoll = self:_observeIsFallingRagdoll();
+			}):Pipe({
+				Rx.map(function(state)
+					return state.enabled and not state.isFallingRagdoll
+				end);
+				Rx.distinct();
+				Rx.tap(function(canUnragdoll)
+					-- Ensure we reset timer if we change state
+					if canUnragdoll then
+						startTime = os.clock()
+					end
+				end);
+			});
 			time = self._unragdollAutomaticTime:Observe();
 		}):Subscribe(function(state)
-			if state.enabled then
+			if state.canUnragdoll then
 				maid._deferred = nil
-
 
 				local timeElapsed = os.clock() - startTime
 				local remainingTime = state.time - timeElapsed
@@ -102,6 +117,7 @@ function UnragdollAutomatically:_observeCanUnragdollTimer()
 					end)
 				end
 			else
+
 				isReady.Value = false
 				maid._deferred = nil
 			end
@@ -114,6 +130,17 @@ function UnragdollAutomatically:_observeCanUnragdollTimer()
 
 		return maid
 	end)
+end
+
+function UnragdollAutomatically:_observeIsFallingRagdoll()
+	return RxBinderUtils.observeBoundClassBrio(self._ragdollBindersServer.RagdollHumanoidOnFall, self._obj)
+		:Pipe({
+			RxBrioUtils.switchMapBrio(function(ragdollHumanoidOnFall)
+				return ragdollHumanoidOnFall:ObserveIsFalling()
+			end);
+			RxBrioUtils.emitOnDeath(false);
+			Rx.distinct();
+		})
 end
 
 return UnragdollAutomatically
