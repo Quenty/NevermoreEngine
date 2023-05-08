@@ -23,6 +23,7 @@ function RagdollServiceClient:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("Motor6DServiceClient"))
+	self._serviceBag:GetService(require("CameraStackService"))
 
 	-- Internal
 	self._serviceBag:GetService(require("RagdollBindersClient"))
