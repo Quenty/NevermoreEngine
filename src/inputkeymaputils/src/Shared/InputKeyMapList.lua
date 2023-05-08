@@ -54,6 +54,7 @@ local SlottedTouchButtonUtils = require("SlottedTouchButtonUtils")
 local StateStack = require("StateStack")
 local String = require("String")
 local InputChordUtils = require("InputChordUtils")
+local InputModeTypes = require("InputModeTypes")
 
 local InputKeyMapList = setmetatable({}, BaseObject)
 InputKeyMapList.ClassName = "InputKeyMapList"
@@ -78,6 +79,47 @@ function InputKeyMapList.new(inputMapName, inputKeyMapList, options)
 
 	for _, inputKeyMap in pairs(inputKeyMapList) do
 		self:Add(inputKeyMap)
+	end
+
+	return self
+end
+
+--[=[
+	Constructs a new InputKeyMapList from specific keys
+
+	```
+	local inputKeyMapList = InputKeyMapList.fromInputKeys({ Enum.KeyCode.E })
+	```
+
+	@param inputKeys { any }
+	@param inputKeyMapList { InputKeyMap }
+	@param options { bindingName: string, rebindable: boolean } | nil -- Optional configuration options
+	@return InputKeyMapList
+]=]
+function InputKeyMapList.fromInputKeys(inputKeys, options)
+	assert(type(inputKeys) == "table", "Bad inputKeys")
+
+	local self = InputKeyMapList.new("generated", {}, options or {
+		rebindable = false;
+		bindingName = "generated";
+	})
+
+	local INPUT_TYPES = {
+		InputModeTypes.KeyboardAndMouse;
+		InputModeTypes.Gamepads;
+		InputModeTypes.Touch;
+	}
+
+	for _, inputModeType in pairs(INPUT_TYPES) do
+		local inputTypes = {}
+		for _, item in pairs(inputKeys) do
+			if inputModeType:IsValid(item) then
+				table.insert(inputTypes, item)
+			end
+		end
+
+		-- Adding it ensures clean up
+		self:Add(InputKeyMap.new(inputModeType, inputTypes))
 	end
 
 	return self
