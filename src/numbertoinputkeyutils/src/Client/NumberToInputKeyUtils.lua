@@ -16,6 +16,17 @@ local NUMBERS = {
 	[9] = { Enum.KeyCode.Nine; Enum.KeyCode.KeypadNine; };
 }
 
+local KEYCODES_TO_NUMBER = {}
+local ALL_KEYCODES = {}
+
+for number, keyCodes in pairs(NUMBERS) do
+	for _, keyCode in pairs(keyCodes) do
+		KEYCODES_TO_NUMBER[keyCode] = number
+		table.insert(ALL_KEYCODES, keyCode)
+	end
+
+end
+
 local NumberToInputKeyUtils = {}
 
 --[=[
@@ -24,7 +35,29 @@ local NumberToInputKeyUtils = {}
 	@return { Enum.KeyCode }
 ]=]
 function NumberToInputKeyUtils.getInputsForNumber(number)
+	assert(type(number) == "number", "Bad number")
+
 	return NUMBERS[number]
+end
+
+--[=[
+	Retrieves number from keyCode
+	@param KeyCode keyCode
+	@return number
+]=]
+function NumberToInputKeyUtils.getNumberFromKeyCode(keyCode)
+	assert(keyCode, "Bad keyCode")
+
+	return KEYCODES_TO_NUMBER[keyCode]
+end
+
+--[=[
+	Returns all number keycodes
+
+	@return { Enum.KeyCode }
+]=]
+function NumberToInputKeyUtils.getAllNumberKeyCodes()
+	return ALL_KEYCODES
 end
 
 return NumberToInputKeyUtils
