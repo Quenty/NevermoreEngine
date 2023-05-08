@@ -20,10 +20,11 @@ local Maid = require("Maid")
 local Brio = require("Brio")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Symbol = require("Symbol")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
--- Higher numbers last
+-- Higher numbers last. Using <= ensures insertion at end on ties.
 local function defaultCompare(a, b)
-	return a < b
+	return a <= b
 end
 
 local ObservableSortedList = {}
@@ -41,6 +42,12 @@ function ObservableSortedList.new(compare)
 	self._maid = Maid.new()
 
 	self._keyList = {} -- { [number]: Symbol } -- immutable
+
+	self._indexObservers = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._indexObservers)
+
+	self._contentIndexObservers = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._contentIndexObservers)
 
 	self._sortValue = {} -- { [Symbol]: number }
 	self._contents = {} -- { [Symbol]: T }
@@ -124,6 +131,22 @@ function ObservableSortedList:ObserveItemsBrio()
 end
 
 --[=[
+	Gets the first key for a given symbol
+
+	@param content T
+	@return Symbol
+]=]
+function ObservableSortedList:FindFirstKey(content)
+	for key, item  in pairs(self._contents) do
+		if item == content then
+			return key
+		end
+	end
+
+	return nil
+end
+
+--[=[
 	Observes the index as it changes, until the entry at the existing
 	index is removed.
 
@@ -139,6 +162,34 @@ function ObservableSortedList:ObserveIndex(indexToObserve)
 	end
 
 	return self:ObserveIndexByKey(key)
+end
+
+--[=[
+	Observes the current value at a given index. This can be useful for observing
+	the first entry, or matching stuff up to a given slot.
+
+	@param indexToObserve number
+	@return Observable<T>
+]=]
+function ObservableSortedList:ObserveAtIndex(indexToObserve)
+	assert(type(indexToObserve) == "number", "Bad indexToObserve")
+
+	return self._indexObservers:Observe(indexToObserve)
+		:Pipe({
+			function(source)
+				return Observable.new(function(sub)
+					local key = self._keyList[indexToObserve]
+
+					if key then
+						sub:Fire(self._contents[key]) -- Look up the content
+					else
+						sub:Fire(nil)
+					end
+
+					return source:Subscribe(sub:GetFireFailComplete())
+				end)
+			end
+		})
 end
 
 --[=[
@@ -410,6 +461,7 @@ function ObservableSortedList:_removeItemByKey(key, item)
 	local itemRemoved = {
 		key = key;
 		item = item;
+		previousIndex = index;
 	}
 
 	-- TODO: Defer item removed as a changed event?
@@ -453,14 +505,26 @@ function ObservableSortedList:_queueDeferredChange()
 
 			self._countValue.Value = self._countValue.Value + snapshot.countChange
 
-			if self.Destroy then
-				-- Fire off last adds
-				for _, lastAdded in pairs(snapshot.itemsAdded) do
-					self.ItemAdded:Fire(lastAdded.item, lastAdded.newIndex, lastAdded.key)
+			-- Fire off last adds
+			for _, lastAdded in pairs(snapshot.itemsAdded) do
+				if not self.ItemAdded.Destroy then
+					break
+				end
+				self.ItemAdded:Fire(lastAdded.item, lastAdded.newIndex, lastAdded.key)
+
+				-- Item adds are included in indexChanges.
+			end
+
+			for _, lastRemoved in pairs(snapshot.itemsRemoved) do
+				if not self.ItemRemoved.Destroy then
+					break
 				end
 
-				for _, lastRemoved in pairs(snapshot.itemsRemoved) do
-					self.ItemRemoved:Fire(lastRemoved.item, lastRemoved.key)
+				self.ItemRemoved:Fire(lastRemoved.item, lastRemoved.key)
+
+				-- Fire only if we aren't handled by an index change.
+				if self._keyList[lastRemoved.previousIndex] == nil then
+					self._indexObservers:Fire(lastRemoved.previousIndex, nil)
 				end
 			end
 
@@ -471,6 +535,8 @@ function ObservableSortedList:_queueDeferredChange()
 					if subs then
 						self:_fireSubs(subs, lastChange.newIndex)
 					end
+
+					self._indexObservers:Fire(lastChange.newIndex, self._contents[lastChange.key])
 				end
 			end
 		end)
