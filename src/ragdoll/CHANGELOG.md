@@ -1,25 +1,24 @@
-# v9.23.0 (Mon May 08 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
-- feat: Reduce friction torqueon ragdoll head ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Will not try to unragdoll automatically while falling ([@Quenty](https://github.com/Quenty))
-- fix: Ragdoll initializes CameraStackService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.22.0...@quenty/ragdoll@9.23.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* Ragdoll initializes CameraStackService ([814f327](https://github.com/Quenty/NevermoreEngine/commit/814f327beb53ab3665428a6357ca4293a7fdd9be))
+* Will not try to unragdoll automatically while falling ([ac3c062](https://github.com/Quenty/NevermoreEngine/commit/ac3c06200f6dd6a09ee53ed0f3a726bcc4a3105e))
+
+
+### Features
+
+* Reduce friction torqueon ragdoll head ([cfd1535](https://github.com/Quenty/NevermoreEngine/commit/cfd153587f199da77edce185c49a957aa23aee6b))
+
+
+
+
 
 # [9.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.21.0...@quenty/ragdoll@9.22.0) (2023-04-20)
 

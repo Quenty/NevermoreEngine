@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@3.19.0...@quenty/playerinputmode@3.20.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+
+
+
+
 # [3.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@3.18.0...@quenty/playerinputmode@3.19.0) (2023-04-24)
 
 **Note:** Version bump only for package @quenty/playerinputmode

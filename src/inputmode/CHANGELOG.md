@@ -1,24 +1,23 @@
-# v7.18.0 (Mon May 08 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
-- feat: Add InputModeTypeSelector:ObserveIsActive(inputModeType) and InputModeTypeSelector:IsActive(inputModeType) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: InputModeServiceClient now works in Hoarcekat stories ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.17.0...@quenty/inputmode@7.18.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* InputModeServiceClient now works in Hoarcekat stories ([ad31c5f](https://github.com/Quenty/NevermoreEngine/commit/ad31c5fe78ba888063a2c9f736803706309d7279))
+
+
+### Features
+
+* Add InputModeTypeSelector:ObserveIsActive(inputModeType) and InputModeTypeSelector:IsActive(inputModeType) ([83ad0ea](https://github.com/Quenty/NevermoreEngine/commit/83ad0ea6903bc1970e6020f85e76cfda2a025927))
+
+
+
+
 
 # [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.16.0...@quenty/inputmode@7.17.0) (2023-04-24)
 

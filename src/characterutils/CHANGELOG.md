@@ -1,23 +1,18 @@
-# v6.6.0 (Mon May 08 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: CharacterUtils was missing dependancy ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.5.0...@quenty/characterutils@6.6.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* CharacterUtils was missing dependancy ([903c319](https://github.com/Quenty/NevermoreEngine/commit/903c31919681399a58399737b2b16910b13a1163))
+
+
+
+
 
 # [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.4.1...@quenty/characterutils@6.5.0) (2023-04-10)
 

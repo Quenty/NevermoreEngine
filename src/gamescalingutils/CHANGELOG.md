@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@7.16.0...@quenty/gamescalingutils@7.17.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/gamescalingutils
+
+
+
+
+
 # [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@7.15.1...@quenty/gamescalingutils@7.16.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/gamescalingutils

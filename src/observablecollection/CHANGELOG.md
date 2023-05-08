@@ -1,25 +1,24 @@
-# v5.15.0 (Mon May 08 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableSet:ObserveContains(item) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableSortedList:ObserveAtIndex(indexToObserve) and ObservableSortedList:FindFirstKey(content) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix removal firing events to fire correctly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.14.0...@quenty/observablecollection@5.15.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* Fix removal firing events to fire correctly ([10f98c3](https://github.com/Quenty/NevermoreEngine/commit/10f98c329e7bab203ffc056d1ffb0c2c715392a8))
+
+
+### Features
+
+* Add ObservableSet:ObserveContains(item) ([df5beba](https://github.com/Quenty/NevermoreEngine/commit/df5beba6b196933653365719c26e6ed9fa21d4cc))
+* Add ObservableSortedList:ObserveAtIndex(indexToObserve) and ObservableSortedList:FindFirstKey(content) ([4d9f4d8](https://github.com/Quenty/NevermoreEngine/commit/4d9f4d8d34eafa0899157e4960ea87c9c812cf48))
+
+
+
+
 
 # [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.13.0...@quenty/observablecollection@5.14.0) (2023-04-20)
 

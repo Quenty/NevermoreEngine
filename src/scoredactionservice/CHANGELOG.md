@@ -1,24 +1,19 @@
-# v9.26.0 (Mon May 08 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: ScoredActionService works in Hoarcekat stories ([@Quenty](https://github.com/Quenty))
-- fix: ScoredActionService would error when getting above warn size ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.25.0...@quenty/scoredactionservice@9.26.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* ScoredActionService works in Hoarcekat stories ([f721c04](https://github.com/Quenty/NevermoreEngine/commit/f721c04b40c6822a3d9ab0adc913c7429d5e6c78))
+* ScoredActionService would error when getting above warn size ([f4e84f2](https://github.com/Quenty/NevermoreEngine/commit/f4e84f26980c999318c18542018983385c85a2a9))
+
+
+
+
 
 # [9.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.24.0...@quenty/scoredactionservice@9.25.0) (2023-04-24)
 

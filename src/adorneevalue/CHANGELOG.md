@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneevalue@4.16.0...@quenty/adorneevalue@4.17.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/adorneevalue
+
+
+
+
+
 # [4.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneevalue@4.15.1...@quenty/adorneevalue@4.16.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/adorneevalue

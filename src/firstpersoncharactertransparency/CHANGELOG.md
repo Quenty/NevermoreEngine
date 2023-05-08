@@ -1,23 +1,18 @@
-# v8.14.0 (Mon May 08 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Hide additional accessories which should not be rendered while in first-person ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.13.0...@quenty/firstpersoncharactertransparency@8.14.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* Hide additional accessories which should not be rendered while in first-person ([27cfe4f](https://github.com/Quenty/NevermoreEngine/commit/27cfe4f38ad0221fc65b6f86f716faaf5aa22982))
+
+
+
+
 
 # [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.12.1...@quenty/firstpersoncharactertransparency@8.13.0) (2023-04-10)
 

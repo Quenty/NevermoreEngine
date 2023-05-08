@@ -1,24 +1,18 @@
-# v7.26.0 (Mon May 08 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/ragdoll [#362](https://github.com/Quenty/NevermoreEngine/pull/362) ([@Quenty](https://github.com/Quenty))
-- feat: Add InputKeyMapList.fromInputKeys(inputKeys, options) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix docs styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.25.0...@quenty/inputkeymaputils@7.26.0) (2023-05-08)
+
+
+### Features
+
+* Add InputKeyMapList.fromInputKeys(inputKeys, options) ([be1c478](https://github.com/Quenty/NevermoreEngine/commit/be1c478e63371e32d27cb36e42b444b666fc425b))
+
+
+
+
 
 # [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.24.0...@quenty/inputkeymaputils@7.25.0) (2023-04-24)
 
