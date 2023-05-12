@@ -1010,6 +1010,62 @@ function Rx.flatMap(project, resultSelector)
 	end
 end
 
+--[=[
+	Switches to a new observable from the current observable
+
+	https://rxjs.dev/api/operators/switchMap
+
+	As each observable shows up, a new observable is mapped from that observable.
+
+	The old observable is disconnected.
+
+	Use Rx.switchMap to switch to a new RunService event
+
+	```lua
+	Rx.of(1, 2, 3):Pipe({
+		Rx.switchMap(function(value)
+			local startTime = os.clock()
+
+			-- Only the last observable returned will continue to emit,
+			-- others are disconnected.
+			return Rx.of(RunService.RenderStepped):Pipe({
+				Rx.map(function()
+					return os.clock() - startTime, value
+				end);
+			});
+		end);
+	}):Subscribe(print) --> 0.002352342, 3
+	```
+
+	Use Rx.switchMap() as a simple map...
+
+	```lua
+	Rx.of(1, 2, 3):Pipe({
+		Rx.switchMap(function(value)
+			print(value) --> 1 (and then 2, and then 3)
+
+			return Rx.of(value*2)
+		end);
+	}):Subscribe(print) --> 2, 4, 6
+
+	```
+
+	Use Rx.switchMap() with delayed input (to swap to a new one)
+
+	```lua
+	Rx.of(1, 2, 3):Pipe({
+		Rx.switchMap(function(value)
+			-- Emit 1 second later
+			return Rx.of(value*2):Pipe({
+				Rx.delay(1); -- These will each get cancelled
+			})
+		end);
+	}):Subscribe(print) --> 6 (other results were cancelled)
+	```
+
+	@param project function
+	@return Observable
+]=]
 function Rx.switchMap(project)
 	return Rx.pipe({
 		Rx.map(project);
