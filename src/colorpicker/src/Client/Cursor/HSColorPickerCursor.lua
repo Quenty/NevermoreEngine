@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ColorPickerUtils = require("ColorPickerUtils")
+local ValueObject = require("ValueObject")
 
 local HSColorPickerCursor = setmetatable({}, BaseObject)
 HSColorPickerCursor.ClassName = "HSColorPickerCursor"
@@ -21,28 +22,22 @@ function HSColorPickerCursor.new()
 	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
 	self._maid:GiveTask(self._backgroundColorHint)
 
-	self._height = Instance.new("NumberValue")
-	self._height.Value = 0.075
+	self._height = ValueObject.new(0.075, "number")
 	self._maid:GiveTask(self._height)
 
-	self._crossHairWidthAbs = Instance.new("NumberValue")
-	self._crossHairWidthAbs.Value = 1
+	self._crossHairWidthAbs = ValueObject.new(1, "number")
 	self._maid:GiveTask(self._crossHairWidthAbs)
 
-	self._verticalHairVisible = Instance.new("BoolValue")
-	self._verticalHairVisible.Value = true
+	self._verticalHairVisible = ValueObject.new(true, "boolean")
 	self._maid:GiveTask(self._verticalHairVisible)
 
-	self._horizontalHairVisible = Instance.new("BoolValue")
-	self._horizontalHairVisible.Value = true
+	self._horizontalHairVisible = ValueObject.new(true, "boolean")
 	self._maid:GiveTask(self._horizontalHairVisible)
 
-	self._position = Instance.new("Vector3Value")
-	self._position.Value = Vector3.new(0, 0, 0)
+	self._position = ValueObject.new(Vector2.zero, "Vector2")
 	self._maid:GiveTask(self._position)
 
-	self._transparency = Instance.new("NumberValue")
-	self._transparency.Value = 0
+	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
@@ -88,6 +83,8 @@ end
 	@param position Vector2
 ]=]
 function HSColorPickerCursor:SetPosition(position)
+	assert(typeof(position) == "Vector2", "Bad position")
+
 	self._position.Value = position
 end
 
