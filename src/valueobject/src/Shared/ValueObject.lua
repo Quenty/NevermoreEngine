@@ -18,10 +18,25 @@ ValueObject.ClassName = "ValueObject"
 	@param baseValue T
 	@return ValueObject
 ]=]
-function ValueObject.new(baseValue)
+function ValueObject.new(baseValue, checkType)
 	local self = {}
 
 	rawset(self, "_value", baseValue)
+
+	if type(checkType) == "string" then
+		rawset(self, "_checkType", function(value)
+			return typeof(value) == checkType
+		end)
+	elseif type(checkType) == "function" then
+		rawset(self, "_checkType", checkType)
+	elseif checkType == true then
+		checkType = typeof(checkType)
+		rawset(self, "_checkType", function(value)
+			return typeof(value) == checkType
+		end)
+	elseif checkType ~= nil then
+		error("Bad type for checkType")
+	end
 
 	self._maid = Maid.new()
 
@@ -44,9 +59,7 @@ end
 function ValueObject.fromObservable(observable)
 	local result = ValueObject.new()
 
-	result._maid:GiveTask(observable:Subscribe(function(value, ...)
-		result:SetValue(value, ...)
-	end))
+	result:Mount(observable)
 
 	return result
 end
@@ -58,6 +71,28 @@ end
 ]=]
 function ValueObject.isValueObject(value)
 	return type(value) == "table" and getmetatable(value) == ValueObject
+end
+
+--[=[
+	Mounts the value to the observable. Multiple objects can be mounted at once.
+
+	@param observable Observable
+]=]
+function ValueObject:Mount(observable)
+	assert(Observable.isObservable(observable), "No observable")
+
+	local maid = Maid.new()
+
+	maid:GiveTask(observable:Subscribe(function(value, ...)
+		self:SetValue(value, ...)
+	end))
+
+	self._maid[maid] = maid
+	maid:GiveTask(function()
+		self._maid[maid] = nil
+	end)
+
+	return maid
 end
 
 --[=[
@@ -107,6 +142,12 @@ end
 ]=]
 function ValueObject:SetValue(value, ...)
 	local previous = rawget(self, "_value")
+	local checkType = rawget(self, "_checkType")
+
+	if checkType then
+		assert(checkType(value))
+	end
+
 	if previous ~= value then
 		if select("#", ...) > 0 then
 			rawset(self, "_lastEventContext", table.pack(...))
