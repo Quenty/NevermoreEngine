@@ -213,7 +213,7 @@ function SoftShutdownUI:_render()
 								[Blend.Children] = {
 									Blend.New "Frame" {
 										BackgroundColor3 = backgroundColor;
-										Size = UDim2.fromScale(1/5, 1/5);
+										Size = UDim2.fromScale(4/14, 4/14);
 										AnchorPoint = Vector2.new(0.5, 0.5);
 										Position = UDim2.fromScale(0.5, 0.5);
 										BackgroundTransparency = transparency;

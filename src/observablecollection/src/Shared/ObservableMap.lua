@@ -9,7 +9,7 @@ local Signal = require("Signal")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueObject = require("ValueObject")
 
 local ObservableMap = {}
 ObservableMap.ClassName = "ObservableMap"
@@ -27,8 +27,7 @@ function ObservableMap.new()
 
 	self._keyToSubList = {}
 
-	self._countValue = Instance.new("IntValue")
-	self._countValue.Value = 0
+	self._countValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._countValue)
 
 --[=[
@@ -172,7 +171,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableMap:ObserveCount()
-	return RxValueBaseUtils.observeValue(self._countValue)
+	return self._countValue:Observe()
 end
 
 --[=[

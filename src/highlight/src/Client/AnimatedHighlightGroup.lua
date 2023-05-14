@@ -21,28 +21,22 @@ function AnimatedHighlightGroup.new()
 	self._highlightDepthMode = ValueObject.new(Enum.HighlightDepthMode.AlwaysOnTop)
 	self._maid:GiveTask(self._highlightDepthMode)
 
-	self._defaultFillColor = Instance.new("Color3Value")
-	self._defaultFillColor.Value = Color3.new(1, 1, 1)
+	self._defaultFillColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._defaultFillColor)
 
-	self._defaultTransparencySpeed = Instance.new("NumberValue")
-	self._defaultTransparencySpeed.Value = 40
+	self._defaultTransparencySpeed = ValueObject.new(40, "number")
 	self._maid:GiveTask(self._defaultTransparencySpeed)
 
-	self._defaultFillTransparency = Instance.new("NumberValue")
-	self._defaultFillTransparency.Value = 0.5
+	self._defaultFillTransparency = ValueObject.new(0.5, "number")
 	self._maid:GiveTask(self._defaultFillTransparency)
 
-	self._defaultOutlineTransparency = Instance.new("NumberValue")
-	self._defaultOutlineTransparency.Value = 0
+	self._defaultOutlineTransparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._defaultOutlineTransparency)
 
-	self._defaultSpeed = Instance.new("NumberValue")
-	self._defaultSpeed.Value = 20
+	self._defaultSpeed = ValueObject.new(20, "number")
 	self._maid:GiveTask(self._defaultSpeed)
 
-	self._defaultOutlineColor = Instance.new("Color3Value")
-	self._defaultOutlineColor.Value = Color3.new(1, 1, 1)
+	self._defaultOutlineColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._defaultOutlineColor)
 
 	self._highlights = {}

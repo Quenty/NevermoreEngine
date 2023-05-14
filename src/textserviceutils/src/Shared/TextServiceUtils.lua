@@ -34,6 +34,15 @@ function TextServiceUtils.getSizeForLabel(textLabel, text, maxWidth)
 	return TextService:GetTextSize(text, textLabel.TextSize, textLabel.Font, Vector2.new(maxWidth, 1e6))
 end
 
+function TextServiceUtils.removeRichTextEncoding(text)
+	return text:gsub("<[^>]+>", "")
+		:gsub("&lt;", "<")
+		:gsub("&gt;", ">")
+		:gsub("&quot;", "\"")
+		:gsub("&apos;", "'")
+		:gsub("&amp;", "&")
+end
+
 local queue = {}
 local queueRunning = false
 
@@ -105,15 +114,17 @@ function TextServiceUtils.promiseTextBounds(params)
 	-- https://devforum.roblox.com/t/calling-textservicegettextboundsasync-multiple-times-leads-to-requests-never-completing-thread-leaks/2083178
 	-- This is a hack to work around a Roblox bug.
 
-	local promise = Promise.new()
-	table.insert(queue, {
-		params = params;
-		promise = promise;
-	})
+	-- local promise = Promise.new()
+	-- table.insert(queue, {
+	-- 	params = params;
+	-- 	promise = promise;
+	-- })
 
-	startQueueProcess();
+	-- startQueueProcess();
 
-	return promise
+	-- return promise
+
+	return TextServiceUtils._promiseTextBounds(params)
 end
 
 function TextServiceUtils._promiseTextBounds(params)
@@ -198,7 +209,7 @@ function TextServiceUtils.observeSizeForLabelProps(props)
 				return Rx.of(Vector2.new(size.x, state.LineHeight*size.y))
 			else
 				warn("[TextServiceUtils.observeSizeForLabelProps] - Got neither FontFace or Font")
-				return Rx.of(Vector2.new(0, 0))
+				return Rx.of(Vector2.zero)
 			end
 		end)
 	})

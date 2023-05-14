@@ -19,12 +19,10 @@ ValueColorPicker.__index = ValueColorPicker
 function ValueColorPicker.new()
 	local self = setmetatable(BaseObject.new(), ValueColorPicker)
 
-	self._hsvColorValue = Instance.new("Vector3Value")
-	self._hsvColorValue.Value = Vector3.zero
+	self._hsvColorValue = ValueObject.new(Vector3.zero, "Vector3")
 	self._maid:GiveTask(self._hsvColorValue)
 
-	self._backgroundColorHint = Instance.new("Color3Value")
-	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
+	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(self._backgroundColorHint)
 
 	self.ColorChanged = self._hsvColorValue.Changed
@@ -32,8 +30,7 @@ function ValueColorPicker.new()
 	self._sizeValue = ValueObject.new(Vector2.new(0, 4), "Vector2")
 	self._maid:GiveTask(self._sizeValue)
 
-	self._leftWidth = Instance.new("NumberValue")
-	self._leftWidth.Value = 0.25
+	self._leftWidth = ValueObject.new(0.25, "number")
 	self._maid:GiveTask(self._leftWidth)
 
 	self._transparency = ValueObject.new(0, "number")
@@ -109,7 +106,6 @@ function ValueColorPicker.new()
 		self:_updateSize()
 	end))
 	self:_updateSize()
-
 
 	return self
 end

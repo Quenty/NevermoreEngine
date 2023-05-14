@@ -19,12 +19,10 @@ function ColorPickerTriangle.new()
 	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
-	self._backgroundColorHint = Instance.new("Color3Value")
-	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
+	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(self._backgroundColorHint)
 
-	self._color = Instance.new("Color3Value")
-	self._color.Value = Color3.new(1, 1, 1)
+	self._color = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._color)
 
 	self._sizeValue = ValueObject.new(Vector2.new(0.05, 0.1), "Vector2")

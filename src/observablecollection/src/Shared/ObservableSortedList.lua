@@ -18,7 +18,7 @@ local Signal = require("Signal")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueObject = require("ValueObject")
 local Symbol = require("Symbol")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
@@ -56,8 +56,8 @@ function ObservableSortedList.new(compare)
 	self._keyObservables = {} -- { [Symbol]: { Subscription } }
 
 	self._compare = compare or defaultCompare
-	self._countValue = Instance.new("IntValue")
-	self._countValue.Value = 0
+
+	self._countValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._countValue)
 
 --[=[
@@ -271,7 +271,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableSortedList:ObserveCount()
-	return RxValueBaseUtils.observeValue(self._countValue)
+	return self._countValue:Observe()
 end
 
 --[=[
@@ -491,17 +491,23 @@ function ObservableSortedList:_deferChange(countChange, itemAdded, itemRemoved, 
 end
 
 function ObservableSortedList:_queueDeferredChange()
-	if not self._deferredChange then
-		self._deferredChange = {
-			countChange = 0;
-			indexChanges = {};
-			itemsAdded = {};
-			itemsRemoved = {};
-		}
+	if self._deferredChange then
+		return
+	end
 
-		task.defer(function()
-			local snapshot = self._deferredChange
-			self._deferredChange = nil
+	self._deferredChange = {
+		countChange = 0;
+		indexChanges = {};
+		itemsAdded = {};
+		itemsRemoved = {};
+	}
+
+	self._maid._currentDefer = task.defer(function()
+		local snapshot = self._deferredChange
+		self._deferredChange = nil
+
+		task.spawn(function()
+			self._maid._currentDefer = nil
 
 			self._countValue.Value = self._countValue.Value + snapshot.countChange
 
@@ -540,7 +546,7 @@ function ObservableSortedList:_queueDeferredChange()
 				end
 			end
 		end)
-	end
+	end)
 end
 
 function ObservableSortedList:_findCorrectIndex(sortValue, currentIndex)

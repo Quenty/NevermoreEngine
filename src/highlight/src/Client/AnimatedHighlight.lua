@@ -20,19 +20,16 @@ AnimatedHighlight.__index = AnimatedHighlight
 function AnimatedHighlight.new()
 	local self = setmetatable(BasicPane.new(), AnimatedHighlight)
 
-	self._adornee = Instance.new("ObjectValue")
-	self._adornee.Value = nil
+	self._adornee = ValueObject.new(nil)
 	self._maid:GiveTask(self._adornee)
 
 	self._highlightDepthMode = ValueObject.new(Enum.HighlightDepthMode.AlwaysOnTop)
 	self._maid:GiveTask(self._highlightDepthMode)
 
-	self._fillColor = Instance.new("Color3Value")
-	self._fillColor.Value = Color3.new(1, 1, 1)
+	self._fillColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._fillColor)
 
-	self._outlineColor = Instance.new("Color3Value")
-	self._outlineColor.Value = Color3.new(1, 1, 1)
+	self._outlineColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._outlineColor)
 
 	self._fillTransparencySpring = SpringObject.new(0.5, 40)

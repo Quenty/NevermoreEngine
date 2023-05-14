@@ -13,7 +13,7 @@ local ObservableSet = require("ObservableSet")
 local Signal = require("Signal")
 local Brio = require("Brio")
 local RxBrioUtils = require("RxBrioUtils")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueObject = require("ValueObject")
 
 local ObservableMapSet = {}
 ObservableMapSet.ClassName = "ObservableMapSet"
@@ -47,8 +47,7 @@ function ObservableMapSet.new()
 	self.SetRemoved = Signal.new() -- :Fire(key)
 	self._maid:GiveTask(self.SetRemoved)
 
-	self._setCount = Instance.new("IntValue")
-	self._setCount.Value = 0
+	self._setCount = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._setCount)
 
 	return self
@@ -107,7 +106,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableMapSet:ObserveSetCount()
-	return RxValueBaseUtils.observeValue(self._setCount)
+	return self._setCount:Observe()
 end
 
 --[=[

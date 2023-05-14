@@ -29,6 +29,6 @@ RigBuilderUtils.promiseR15MeshRig()
 
 		-- look at origin
 		RunService.Stepped:Connect(function()
-			ikService:UpdateServerRigTarget(humanoid, Vector3.new(0, 0, 0))
+			ikService:UpdateServerRigTarget(humanoid, Vector3.zero)
 		end)
 	end)

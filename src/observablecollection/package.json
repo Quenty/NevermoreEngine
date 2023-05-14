@@ -34,7 +34,7 @@
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/symbol": "file:../symbol",
-    "@quenty/valuebaseutils": "file:../valuebaseutils"
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

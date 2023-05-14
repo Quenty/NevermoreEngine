@@ -18,7 +18,7 @@ function UltrawideContainerUtils.createContainer(parent)
 
 	local uiSizeConstraint = Instance.new("UISizeConstraint")
 	uiSizeConstraint.MaxSize = Vector2.new(1920, 1080)
-	uiSizeConstraint.MinSize = Vector2.new(0, 0)
+	uiSizeConstraint.MinSize = Vector2.zero
 	uiSizeConstraint.Parent = frame
 
 	frame.Parent = parent

@@ -51,13 +51,13 @@ function Viewport.new()
 	self._current = ValueObject.new(nil)
 	self._maid:GiveTask(self._current)
 
-	self._transparency = ValueObject.new(0)
+	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
-	self._absoluteSize = ValueObject.new(Vector2.new())
+	self._absoluteSize = ValueObject.new(Vector2.zero, "Vector2")
 	self._maid:GiveTask(self._absoluteSize)
 
-	self._fieldOfView = ValueObject.new(20)
+	self._fieldOfView = ValueObject.new(20, "number")
 	self._maid:GiveTask(self._fieldOfView)
 
 	self._rotationYawSpring = SpringObject.new(math.pi/4)

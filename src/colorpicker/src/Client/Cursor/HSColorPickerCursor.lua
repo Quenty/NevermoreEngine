@@ -18,8 +18,7 @@ HSColorPickerCursor.__index = HSColorPickerCursor
 function HSColorPickerCursor.new()
 	local self = setmetatable(BaseObject.new(), HSColorPickerCursor)
 
-	self._backgroundColorHint = Instance.new("Color3Value")
-	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
+	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(self._backgroundColorHint)
 
 	self._height = ValueObject.new(0.075, "number")

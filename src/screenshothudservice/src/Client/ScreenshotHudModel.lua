@@ -6,7 +6,6 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
-local RxInstanceUtils = require("RxInstanceUtils")
 local Signal = require("Signal")
 
 local ScreenshotHudModel = setmetatable({}, BaseObject)
@@ -16,8 +15,7 @@ ScreenshotHudModel.__index = ScreenshotHudModel
 function ScreenshotHudModel.new()
 	local self = setmetatable(BaseObject.new(), ScreenshotHudModel)
 
-	self._cameraButtonIcon = Instance.new("StringValue")
-	self._cameraButtonIcon.Value = ""
+	self._cameraButtonIcon = ValueObject.new("", "string")
 	self._maid:GiveTask(self._cameraButtonIcon)
 
 	self._cameraButtonPosition = ValueObject.new(UDim2.new(0, 0, 0, 0))
@@ -26,35 +24,28 @@ function ScreenshotHudModel.new()
 	self._closeButtonPosition = ValueObject.new(UDim2.new(0, 0, 0, 0))
 	self._maid:GiveTask(self._closeButtonPosition)
 
-	self._closeWhenScreenshotTaken = Instance.new("BoolValue")
-	self._closeWhenScreenshotTaken.Value = false
+	self._closeWhenScreenshotTaken = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._closeWhenScreenshotTaken)
 
-	self._experienceNameOverlayEnabled = Instance.new("BoolValue")
-	self._experienceNameOverlayEnabled.Value = false
+	self._experienceNameOverlayEnabled = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._experienceNameOverlayEnabled)
 
 	self._overlayFont = ValueObject.new(Enum.Font.SourceSans)
 	self._maid:GiveTask(self._overlayFont)
 
-	self._usernameOverlayEnabled = Instance.new("BoolValue")
-	self._usernameOverlayEnabled.Value = false
+	self._usernameOverlayEnabled = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._usernameOverlayEnabled)
 
-	self._visible = Instance.new("BoolValue")
-	self._visible.Value = false
+	self._visible = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._visible)
 
-	self._cameraButtonVisible = Instance.new("BoolValue")
-	self._cameraButtonVisible.Value = true
+	self._cameraButtonVisible = ValueObject.new(true, "boolean")
 	self._maid:GiveTask(self._cameraButtonVisible)
 
-	self._closeButtonVisible = Instance.new("BoolValue")
-	self._closeButtonVisible.Value = false
+	self._closeButtonVisible = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._closeButtonVisible)
 
-	self._keepOpen = Instance.new("BoolValue")
-	self._keepOpen.Value = true
+	self._keepOpen = ValueObject.new(true, "boolean")
 	self._maid:GiveTask(self._keepOpen)
 
 	self.CloseRequested = Signal.new()
@@ -78,7 +69,7 @@ end
 	@return Observable<boolean>
 ]=]
 function ScreenshotHudModel:ObserveCloseButtonVisible()
-	return RxInstanceUtils.observeProperty(self._closeButtonVisible, "Value")
+	return self._closeButtonVisible:Observe()
 end
 
 --[=[
@@ -96,7 +87,7 @@ end
 	@return Observable<boolean>
 ]=]
 function ScreenshotHudModel:ObserveCameraButtonVisible()
-	return RxInstanceUtils.observeProperty(self._cameraButtonVisible, "Value")
+	return self._cameraButtonVisible:Observe()
 end
 
 --[=[
@@ -199,7 +190,7 @@ end
 	@return Observable<string>
 ]=]
 function ScreenshotHudModel:ObserveCameraButtonIcon()
-	return RxInstanceUtils.observeProperty(self._cameraButtonIcon, "Value")
+	return self._cameraButtonIcon:Observe()
 end
 
 --[=[
@@ -226,7 +217,7 @@ end
 	@return Observable<boolean>
 ]=]
 function ScreenshotHudModel:ObserveCloseWhenScreenshotTaken()
-	return RxInstanceUtils.observeProperty(self._closeWhenScreenshotTaken, "Value")
+	return self._closeWhenScreenshotTaken:Observe()
 end
 
 --[=[
@@ -244,7 +235,7 @@ end
 	@return Observable<boolean>
 ]=]
 function ScreenshotHudModel:ObserveExperienceNameOverlayEnabled()
-	return RxInstanceUtils.observeProperty(self._experienceNameOverlayEnabled, "Value")
+	return self._experienceNameOverlayEnabled:Observe()
 end
 
 --[=[
@@ -262,7 +253,7 @@ end
 	@return Observable<boolean>
 ]=]
 function ScreenshotHudModel:ObserveUsernameOverlayEnabled()
-	return RxInstanceUtils.observeProperty(self._usernameOverlayEnabled, "Value")
+	return self._usernameOverlayEnabled:Observe()
 end
 
 --[=[
@@ -270,7 +261,7 @@ end
 	@return Observable<boolean>
 ]=]
 function ScreenshotHudModel:ObserveVisible()
-	return RxInstanceUtils.observeProperty(self._visible, "Value")
+	return self._visible:Observe()
 end
 
 function ScreenshotHudModel:InternalNotifyVisible(isVisible)

@@ -9,7 +9,7 @@ local Signal = require("Signal")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueObject = require("ValueObject")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
 local ObservableSet = {}
@@ -29,8 +29,7 @@ function ObservableSet.new()
 	self._containsObservables = ObservableSubscriptionTable.new()
 	self._maid:GiveTask(self._containsObservables)
 
-	self._countValue = Instance.new("IntValue")
-	self._countValue.Value = 0
+	self._countValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._countValue)
 
 --[=[
@@ -160,7 +159,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableSet:ObserveCount()
-	return RxValueBaseUtils.observeValue(self._countValue)
+	return self._countValue:Observe()
 end
 
 --[=[

@@ -5,9 +5,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ObservableSortedList = require("ObservableSortedList")
 local Observable = require("Observable")
+local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
+local ValueObject = require("ValueObject")
 
 local FilteredObservableListView = setmetatable({}, BaseObject)
 FilteredObservableListView.ClassName = "FilteredObservableListView"
@@ -34,10 +35,6 @@ function FilteredObservableListView.new(observableList, observeScoreCallback, co
 		end
 	end)
 	self._maid:GiveTask(self._scoredList)
-
-	self._countValue = Instance.new("IntValue")
-	self._countValue.Value = 0
-	self._maid:GiveTask(self._countValue)
 
 	-- Shockingly this is somewhat performant because the sorted list defers all events
 	-- to process the list reordering.

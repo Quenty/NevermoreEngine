@@ -123,7 +123,7 @@ function CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, low, high
 		assert(type(interpolate) == "function", "Bad interpolate")
 		assert(typeof(color) == "Color3", "Bad color")
 
-		labelOffset = labelOffset or Vector2.new(0, 0)
+		labelOffset = labelOffset or Vector2.zero
 
 		maid:GivePromise(CameraStoryUtils.promiseCrate(maid, viewportFrame, {
 			Color = color;

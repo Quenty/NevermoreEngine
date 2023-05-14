@@ -13,7 +13,6 @@ local VRService = game:GetService("VRService")
 local Maid = require("Maid")
 local RagdollBindersClient = require("RagdollBindersClient")
 local Rx = require("Rx")
-local RxValueBaseUtils = require("RxValueBaseUtils")
 local StateStack = require("StateStack")
 local ValueObject = require("ValueObject")
 
@@ -42,16 +41,13 @@ function IdleServiceClient:Init(serviceBag)
 	self._disableStack = StateStack.new(false)
 	self._maid:GiveTask(self._disableStack)
 
-	self._enabled = Instance.new("BoolValue")
-	self._enabled.Value = true
+	self._enabled = ValueObject.new(true, "boolean")
 	self._maid:GiveTask(self._enabled)
 
-	self._showIdleUI = Instance.new("BoolValue")
-	self._showIdleUI.Value = false
+	self._showIdleUI = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._showIdleUI)
 
-	self._humanoidIdle = Instance.new("BoolValue")
-	self._humanoidIdle.Value = false
+	self._humanoidIdle = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._humanoidIdle)
 
 	self._lastPosition = ValueObject.new(nil)
@@ -132,7 +128,7 @@ end
 	@return Observable<boolean>
 ]=]
 function IdleServiceClient:ObserveHumanoidIdle()
-	return RxValueBaseUtils.observeValue(self._humanoidIdle)
+	return self._humanoidIdle:Observe()
 end
 
 --[=[
@@ -148,7 +144,7 @@ end
 	@return Observable<boolean>
 ]=]
 function IdleServiceClient:ObserveShowIdleUI()
-	return RxValueBaseUtils.observeValue(self._showIdleUI)
+	return self._showIdleUI:Observe()
 end
 
 --[=[

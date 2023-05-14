@@ -15,7 +15,7 @@ Gestures.__index = Gestures
 function Gestures.new()
 	local self = setmetatable(Spritesheet.new("rbxassetid://1244652786"), Gestures)
 
-	self:AddSprite("DoubleRotate", Vector2.new(0, 0), Vector2.new(102, 139))
+	self:AddSprite("DoubleRotate", Vector2.zero, Vector2.new(102, 139))
 	self:AddSprite("DoubleTap", Vector2.new(102, 0), Vector2.new(100, 100))
 	self:AddSprite("FingerFront", Vector2.new(202, 0), Vector2.new(100, 100))
 	self:AddSprite("FingerSide", Vector2.new(302, 0), Vector2.new(100, 100))

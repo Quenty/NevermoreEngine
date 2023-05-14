@@ -12,7 +12,6 @@ local Flipbook = require("Flipbook")
 local Maid = require("Maid")
 local Promise = require("Promise")
 local Rx = require("Rx")
-local RxInstanceUtils = require("RxInstanceUtils")
 local ValueObject = require("ValueObject")
 
 local FlipbookPlayer = setmetatable({}, BaseObject)
@@ -30,12 +29,10 @@ function FlipbookPlayer.new(imageLabel)
 
 	assert(typeof(self._obj) == "Instance" and (self._obj:IsA("ImageLabel") or self._obj:IsA("ImageButton")), "Bad imageLabel")
 
-	self._isPlaying = Instance.new("BoolValue")
-	self._isPlaying.Value = false
+	self._isPlaying = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isPlaying)
 
-	self._isBoomarang = Instance.new("BoolValue")
-	self._isBoomarang.Value = false
+	self._isBoomarang = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isBoomarang)
 
 	self._playData = ValueObject.new(nil)
@@ -159,7 +156,7 @@ end
 	@return Observable<boolean>
 ]=]
 function FlipbookPlayer:ObserveIsPlaying()
-	return RxInstanceUtils.observeProperty(self._isPlaying, "Value")
+	return self._isPlaying:Observe()
 end
 
 function FlipbookPlayer:_promiseDonePlaying(data)

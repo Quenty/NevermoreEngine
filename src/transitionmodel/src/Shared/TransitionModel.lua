@@ -10,7 +10,7 @@ local require = require(script.Parent.loader).load(script)
 local BasicPane = require("BasicPane")
 local Promise = require("Promise")
 local Maid = require("Maid")
-local RxInstanceUtils = require("RxInstanceUtils")
+local ValueObject = require("ValueObject")
 
 local TransitionModel = setmetatable({}, BasicPane)
 TransitionModel.ClassName = "TransitionModel"
@@ -27,12 +27,10 @@ TransitionModel.__index = TransitionModel
 function TransitionModel.new()
 	local self = setmetatable(BasicPane.new(), TransitionModel)
 
-	self._isShowingComplete = Instance.new("BoolValue")
-	self._isShowingComplete.Value = false
+	self._isShowingComplete = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isShowingComplete)
 
-	self._isHidingComplete = Instance.new("BoolValue")
-	self._isHidingComplete.Value = true
+	self._isHidingComplete = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isHidingComplete)
 
 	self._showCallback = nil
@@ -108,7 +106,7 @@ end
 	@return Observable<boolean>
 ]=]
 function TransitionModel:ObserveIsShowingComplete()
-	return RxInstanceUtils.observeProperty(self._isShowingComplete, "Value")
+	return self._isShowingComplete:Observe()
 end
 
 --[=[
@@ -116,7 +114,7 @@ end
 	@return Observable<boolean>
 ]=]
 function TransitionModel:ObserveIsHidingComplete()
-	return RxInstanceUtils.observeProperty(self._isHidingComplete, "Value")
+	return self._isHidingComplete:Observe()
 end
 
 --[=[

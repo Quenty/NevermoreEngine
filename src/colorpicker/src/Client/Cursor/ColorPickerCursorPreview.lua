@@ -20,16 +20,13 @@ ColorPickerCursorPreview.__index = ColorPickerCursorPreview
 function ColorPickerCursorPreview.new()
 	local self = setmetatable(BasicPane.new(), ColorPickerCursorPreview)
 
-	self._backgroundColorHint = Instance.new("Color3Value")
-	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
+	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(self._backgroundColorHint)
 
-	self._heightAbs = Instance.new("NumberValue")
-	self._heightAbs.Value = 60
+	self._heightAbs = ValueObject.new(60, "number")
 	self._maid:GiveTask(self._heightAbs)
 
-	self._offsetAbs = Instance.new("NumberValue")
-	self._offsetAbs.Value = -20
+	self._offsetAbs = ValueObject.new(-20, "number")
 	self._maid:GiveTask(self._offsetAbs)
 
 	self._position = ValueObject.new(Vector2.zero, "Vector2")
@@ -38,8 +35,7 @@ function ColorPickerCursorPreview.new()
 	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
-	self._colorValue = Instance.new("Color3Value")
-	self._colorValue.Value = Color3.new(0, 0, 0)
+	self._colorValue = ValueObject.new(Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(self._colorValue)
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
