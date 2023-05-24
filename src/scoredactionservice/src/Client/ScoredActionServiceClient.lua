@@ -15,6 +15,7 @@ local Maid = require("Maid")
 local InputListScoreHelper = require("InputListScoreHelper")
 local Observable = require("Observable")
 local InputKeyMapList = require("InputKeyMapList")
+local ValueObject = require("ValueObject")
 
 local ScoredActionServiceClient = {}
 ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
@@ -100,7 +101,7 @@ end
 ]=]
 function ScoredActionServiceClient:ObserveNewFromInputKeyMapList(scoreValue)
 	assert(self._provider, "Not initialized")
-	assert(typeof(scoreValue) == "Instance" and scoreValue:IsA("NumberValue"), "Bad scoreValue")
+	assert(ValueObject.isValueObject(scoreValue), "Bad scoreValue")
 
 	-- It looks like we aren't capturing anything in this closure, but we're capturing `self`
 	return function(source)
