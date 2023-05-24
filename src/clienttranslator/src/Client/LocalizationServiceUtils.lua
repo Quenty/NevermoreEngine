@@ -40,17 +40,20 @@ function LocalizationServiceUtils.promiseTranslator(player)
 		timeout = 0.5
 	end
 
+	local rejectedCauseOfTimeout = false
 	task.delay(timeout, function()
 		if not asyncTranslatorPromise:IsPending() then
 			return
 		end
+
+		rejectedCauseOfTimeout = true
 		asyncTranslatorPromise:Reject(
 			("GetTranslatorForPlayerAsync is still pending after %f, using local table")
 			:format(timeout))
 	end)
 
 	return asyncTranslatorPromise:Catch(function(err)
-		if err ~= ERROR_PUBLISH_REQUIRED then
+		if err ~= ERROR_PUBLISH_REQUIRED and not rejectedCauseOfTimeout then
 			warn(("[LocalizationServiceUtils.promiseTranslator] - %s"):format(tostring(err)))
 		end
 
