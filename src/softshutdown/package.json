@@ -46,6 +46,7 @@
     "@quenty/table": "file:../table",
     "@quenty/teleportserviceutils": "file:../teleportserviceutils",
     "@quenty/uiobjectutils": "file:../uiobjectutils",
-    "@quenty/valuebaseutils": "file:../valuebaseutils"
+    "@quenty/valuebaseutils": "file:../valuebaseutils",
+    "@quenty/valueobject": "file:../valueobject"
   }
 }

@@ -27,9 +27,11 @@
   "dependencies": {
     "@quenty/brio": "file:../brio",
     "@quenty/deferred": "file:../deferred",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise"
+    "@quenty/promise": "file:../promise",
+    "@quenty/rx": "file:../rx"
   },
   "publishConfig": {
     "access": "public"
