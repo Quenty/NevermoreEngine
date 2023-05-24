@@ -576,6 +576,81 @@ function Rx.startWith(values)
 end
 
 --[=[
+	The Scan operator applies a function to the first item emitted by the source Observable and then
+	emits the result of that function as its own first emission. It also feeds the result of the function
+	back into the function along with the second item emitted by the source Observable in order to generate
+	its second emission. It continues to feed back its own subsequent emissions along with the subsequent
+	emissions from the source Observable in order to create the rest of its sequence.
+
+	https://reactivex.io/documentation/operators/scan.html
+
+	@param reducer function
+	@param seed any | nil
+	@return (source: Observable) -> Observable
+]=]
+function Rx.scan(reducer, seed)
+	assert(type(reducer) == "function", "Bad reducer")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+			local current = seed
+
+			maid:GiveTask(source:Subscribe(
+				function(...)
+					current = reducer(current, ...)
+					sub:Fire(current)
+				end,
+				sub:GetFailComplete()))
+
+			return maid
+		end)
+	end
+end
+
+--[=[
+	The Reduce operator applies a function to the first item emitted by the source Observable and
+	then feeds the result of the function back into the function along with the second item emitted
+	by the source Observable, continuing this process until the source Observable emits its final
+	item and completes, whereupon the Observable returned from Reduce emits the final value returned
+	from the function.
+
+	https://reactivex.io/documentation/operators/reduce.html
+
+	@param reducer function
+	@param seed any | nil
+	@return (source: Observable) -> Observable
+]=]
+function Rx.reduce(reducer, seed)
+	assert(type(reducer) == "function", "Bad reducer")
+
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+			local current = seed
+
+			maid:GiveTask(source:Subscribe(
+				function(...)
+					current = reducer(current, ...)
+				end,
+				function(...)
+					sub:Fail(...)
+				end),
+				function()
+					-- On complete emit the result.
+					sub:Fire(current)
+				end)
+
+			return maid
+		end)
+	end
+end
+
+--[=[
 	Defaults the observable to a value if it isn't fired immediately
 
 	```lua
@@ -1740,11 +1815,60 @@ function Rx.throttleDefer()
 						end
 					end)
 				else
+
 					lastResult = table.pack(...)
 				end
 			end, sub:GetFailComplete()))
 
 			return maid
+		end)
+	end
+end
+
+--[=[
+	Throttles emission of observables on the defer stack to the last emission.
+
+	https://rxjs.dev/api/operators/throttle
+
+	@param durationSelector (T: value) -> Observable
+	@return (source: Observable<T>) -> Observable<T>
+]=]
+function Rx.throttle(durationSelector)
+	return function(source)
+		assert(Observable.isObservable(source), "Bad observable")
+
+		return Observable.new(function(sub)
+			local topMaid = Maid.new()
+
+			local lastResult
+
+			topMaid:GiveTask(source:Subscribe(function(...)
+				if not lastResult then
+					lastResult = table.pack(...)
+
+					-- Queue up our result
+					local maid = Maid.new()
+
+					maid:GiveTask(durationSelector(lastResult):Subscribe(function()
+						local current = lastResult
+						lastResult = nil
+
+						if sub:IsPending() then
+							sub:Fire(table.unpack(current, 1, current.n))
+						end
+
+						if topMaid._currentQueue == maid then
+							topMaid._currentQueue = nil
+						end
+					end))
+
+					topMaid._currentQueue = maid
+				else
+					lastResult = table.pack(...)
+				end
+			end, sub:GetFailComplete()))
+
+			return topMaid
 		end)
 	end
 end
