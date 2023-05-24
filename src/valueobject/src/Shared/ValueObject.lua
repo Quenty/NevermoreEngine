@@ -88,7 +88,7 @@ end
 --[=[
 	Mounts the value to the observable. Overrides the last mount.
 
-	@param observable Observable | T
+	@param value Observable | T
 	@return MaidTask
 ]=]
 function ValueObject:Mount(value)
