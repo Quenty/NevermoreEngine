@@ -43,6 +43,10 @@ function ColorPickerTriangle:GetSizeValue()
 	return self._sizeValue
 end
 
+function ColorPickerTriangle:GetMeasureValue()
+	return self._sizeValue
+end
+
 function ColorPickerTriangle:SetColor(color)
 	self._color.Value = color
 end

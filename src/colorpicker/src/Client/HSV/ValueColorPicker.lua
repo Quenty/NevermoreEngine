@@ -171,6 +171,10 @@ function ValueColorPicker:GetSizeValue()
 	return self._sizeValue
 end
 
+function ValueColorPicker:GetMeasureValue()
+	return self._sizeValue
+end
+
 function ValueColorPicker:SetTransparency(transparency)
 	assert(type(transparency) == "number", "Bad transparency")
 

@@ -191,6 +191,10 @@ function HSVColorPicker:GetSizeValue()
 	return self._sizeValue
 end
 
+function HSVColorPicker:GetMeasureValue()
+	return self._sizeValue
+end
+
 --[=[
 	Sets the transparency of the color
 
