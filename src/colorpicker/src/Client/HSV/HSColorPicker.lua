@@ -171,7 +171,7 @@ end
 function HSColorPicker:SetSize(height)
 	assert(type(height) == "number", "Bad height")
 
-	self._sizeValue.Value = Vector2.new(height, height, 0)
+	self._sizeValue.Value = Vector2.new(height, height)
 end
 
 function HSColorPicker:_render()

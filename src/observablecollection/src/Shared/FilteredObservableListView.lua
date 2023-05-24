@@ -8,7 +8,6 @@ local BaseObject = require("BaseObject")
 local Observable = require("Observable")
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
-local ValueObject = require("ValueObject")
 
 local FilteredObservableListView = setmetatable({}, BaseObject)
 FilteredObservableListView.ClassName = "FilteredObservableListView"
