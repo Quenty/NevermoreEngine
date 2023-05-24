@@ -159,7 +159,7 @@ function PlayerAssetOwnershipTracker:SetOwnership(idOrKey, ownsPass)
 
 	-- Update trackers
 	for _, wellOwnedAsset in pairs(self:_getWellKnownAssets(idOrKey)) do
-		wellOwnedAsset:SetIsOwned(idOrKey, ownsPass)
+		wellOwnedAsset:SetIsOwned(ownsPass)
 	end
 end
 

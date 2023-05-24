@@ -47,6 +47,8 @@ function WellKnownAssetOwnershipHandler.new(adornee, gameConfigAsset)
 end
 
 function WellKnownAssetOwnershipHandler:SetIsOwned(isOwned)
+	assert(type(isOwned) == "boolean", "Bad isOwned")
+
 	self._isOwned.Value = isOwned
 end
 
