@@ -261,7 +261,9 @@ function ObservableMapSet:_removeObservableSet(key)
 			self.SetRemoved:Fire(key)
 		end
 
-		self._setCount.Value = self._setCount.Value - 1
+		if self._setCount.Destroy then
+			self._setCount.Value = self._setCount.Value - 1
+		end
 	end
 end
 
@@ -277,7 +279,10 @@ function ObservableMapSet:_getOrCreateObservableSet(key)
 	self._observableSetMap[key] = set
 
 	self.SetAdded:Fire(key, set)
-	self._setCount.Value = self._setCount.Value + 1
+
+	if self._setCount.Destroy then
+		self._setCount.Value = self._setCount.Value + 1
+	end
 
 	self._maid[set] = maid
 	return set

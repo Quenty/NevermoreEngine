@@ -163,7 +163,7 @@ end
 	@return number
 ]=]
 function ObservableMap:GetCount()
-	return self._countValue.Value
+	return self._countValue.Value or 0
 end
 
 --[=[

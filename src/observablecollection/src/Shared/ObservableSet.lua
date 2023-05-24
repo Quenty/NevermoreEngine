@@ -151,7 +151,7 @@ end
 	@return number
 ]=]
 function ObservableSet:GetCount()
-	return self._countValue.Value
+	return self._countValue.Value or 0
 end
 
 --[=[
