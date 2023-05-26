@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[76721],{42740:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Quaternion","desc":"Quaternion data type\\nAuthor: xXxMoNkEyMaNxXx","source":{"line":7,"path":"src/quaternion/src/Shared/Quaternion.lua"}}')}}]);
