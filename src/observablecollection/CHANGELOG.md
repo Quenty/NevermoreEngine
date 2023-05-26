@@ -1,3 +1,21 @@
+# v5.16.0 (Fri May 26 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
+- feat: Add :Observe() calls to ObservableList and ObservableSortedList ([@Quenty](https://github.com/Quenty))
+- feat: Initial refactor of guis to use ValueObject instead of ValueObject ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Fix missing style issues ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
