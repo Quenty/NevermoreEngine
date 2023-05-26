@@ -1,23 +1,18 @@
-# v7.19.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.18.0...@quenty/inputmode@7.19.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix dependencies ([67791a2](https://github.com/Quenty/NevermoreEngine/commit/67791a289c0956bf4947ac81bf792ee56496b3e8))
+
+
+
+
 
 # [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.17.0...@quenty/inputmode@7.18.0) (2023-05-08)
 

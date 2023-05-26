@@ -1,25 +1,24 @@
-# v7.5.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Initial refactor of guis to use ValueObject instead of ValueObject ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix purchase processing for products ([@Quenty](https://github.com/Quenty))
-- fix: Fix SetIsOwned call ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.4.0...@quenty/gameproductservice@7.5.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix purchase processing for products ([af9621c](https://github.com/Quenty/NevermoreEngine/commit/af9621c5afd5a8189aa25081ce069c2279e30a37))
+* Fix SetIsOwned call ([ebbec3c](https://github.com/Quenty/NevermoreEngine/commit/ebbec3cf0b4bd34ad39fbb079e311bde4bffed31))
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
 
 # [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.3.1...@quenty/gameproductservice@7.4.0) (2023-05-08)
 

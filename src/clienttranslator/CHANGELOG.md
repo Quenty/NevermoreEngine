@@ -1,23 +1,18 @@
-# v8.21.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix localization warnings ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.20.0...@quenty/clienttranslator@8.21.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix localization warnings ([3e98cd7](https://github.com/Quenty/NevermoreEngine/commit/3e98cd7135a0d174b4a6f1059b6a2f9fc03b9d6f))
+
+
+
+
 
 # [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.19.0...@quenty/clienttranslator@8.20.0) (2023-05-08)
 

@@ -1,19 +1,15 @@
-# v6.9.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.8.0...@quenty/friendutils@6.9.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+
+
+
 
 # [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.7.0...@quenty/friendutils@6.8.0) (2023-05-08)
 

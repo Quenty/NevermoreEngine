@@ -1,19 +1,15 @@
-# v6.15.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.14.0...@quenty/localizedtextutils@6.15.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/localizedtextutils
+
+
+
+
 
 # [6.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/localizedtextutils@6.13.0...@quenty/localizedtextutils@6.14.0) (2023-05-08)
 

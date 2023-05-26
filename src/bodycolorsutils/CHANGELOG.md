@@ -1,19 +1,15 @@
-# v1.8.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@1.7.0...@quenty/bodycolorsutils@1.8.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/bodycolorsutils
+
+
+
+
 
 # [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bodycolorsutils@1.6.0...@quenty/bodycolorsutils@1.7.0) (2023-05-08)
 

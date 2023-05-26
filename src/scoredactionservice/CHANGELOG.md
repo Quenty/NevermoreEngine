@@ -1,23 +1,18 @@
-# v9.27.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add better error messages for ScoredActionService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.26.0...@quenty/scoredactionservice@9.27.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Add better error messages for ScoredActionService ([19e53f0](https://github.com/Quenty/NevermoreEngine/commit/19e53f0eb8364b1c9c65ebbd7166e8eee7c70284))
+
+
+
+
 
 # [9.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.25.0...@quenty/scoredactionservice@9.26.0) (2023-05-08)
 

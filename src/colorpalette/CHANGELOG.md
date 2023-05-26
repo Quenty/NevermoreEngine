@@ -1,24 +1,23 @@
-# v4.23.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Initial refactor of guis to use ValueObject instead of ValueObject ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix unknown font construction in FontPalette ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.22.0...@quenty/colorpalette@4.23.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix unknown font construction in FontPalette ([b14b679](https://github.com/Quenty/NevermoreEngine/commit/b14b6799e0313fda7cd9977be7921d3edaba7fb2))
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
 
 # [4.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.21.0...@quenty/colorpalette@4.22.0) (2023-05-08)
 

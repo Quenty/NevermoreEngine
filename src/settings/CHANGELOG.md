@@ -1,24 +1,23 @@
-# v4.26.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Add cmdr support to settings ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.25.0...@quenty/settings@4.26.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix dependencies ([67791a2](https://github.com/Quenty/NevermoreEngine/commit/67791a289c0956bf4947ac81bf792ee56496b3e8))
+
+
+### Features
+
+* Add cmdr support to settings ([43e1c25](https://github.com/Quenty/NevermoreEngine/commit/43e1c2550dd02ad95827bc93a20a5aa1ff5e5e4a))
+
+
+
+
 
 # [4.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.24.0...@quenty/settings@4.25.0) (2023-05-08)
 

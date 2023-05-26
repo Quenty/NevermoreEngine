@@ -1,20 +1,18 @@
-# v1.14.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Initial refactor of guis to use ValueObject instead of ValueObject ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.13.0...@quenty/undostack@1.14.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
 
 # [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.12.0...@quenty/undostack@1.13.0) (2023-05-08)
 

@@ -1,25 +1,24 @@
-# v3.4.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Add UIAlignmentUtils.toNumber(alignment) and UIAlignmentUtils.toBias(alignment) ([@Quenty](https://github.com/Quenty))
-- feat: Add UIAlignmentUtils.verticalAlignmentToBias(verticalAlignment) and UIAlignmentUtils.horizontalAlignmentToBias(horizontalAlignment) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Better error message with radius ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.3.0...@quenty/uiobjectutils@3.4.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Better error message with radius ([c4952fb](https://github.com/Quenty/NevermoreEngine/commit/c4952fbe364847051f82173dca4631df0ff137c7))
+
+
+### Features
+
+* Add UIAlignmentUtils.toNumber(alignment) and UIAlignmentUtils.toBias(alignment) ([8092aba](https://github.com/Quenty/NevermoreEngine/commit/8092aba1cc564daaf5c775cb23f3c2131005da80))
+* Add UIAlignmentUtils.verticalAlignmentToBias(verticalAlignment) and UIAlignmentUtils.horizontalAlignmentToBias(horizontalAlignment) ([fb98622](https://github.com/Quenty/NevermoreEngine/commit/fb98622dad4ca05bf28ecf90b55521c6d48f9b38))
+
+
+
+
 
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.2.0...@quenty/uiobjectutils@3.3.0) (2023-04-24)
 

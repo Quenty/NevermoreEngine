@@ -1,26 +1,20 @@
-# v4.20.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Upgrade to ValueObject and measure values ([@Quenty](https://github.com/Quenty))
-- feat: Initial refactor of guis to use ValueObject instead of ValueObject ([@Quenty](https://github.com/Quenty))
-- feat: Convert ColorPicker to ValueObject instead of Roblox instnaces for viewmodel ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix missing style issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.19.0...@quenty/colorpicker@4.20.0) (2023-05-26)
+
+
+### Features
+
+* Convert ColorPicker to ValueObject instead of Roblox instnaces for viewmodel ([8f59d5e](https://github.com/Quenty/NevermoreEngine/commit/8f59d5e032acf47db5df4fb07ce4b8e0acfc8354))
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+* Upgrade to ValueObject and measure values ([83235f7](https://github.com/Quenty/NevermoreEngine/commit/83235f77b7b4f515eac40b16ef1fd230a0c877e7))
+
+
+
+
 
 # [4.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.18.0...@quenty/colorpicker@4.19.0) (2023-05-08)
 

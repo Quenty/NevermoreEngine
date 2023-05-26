@@ -1,21 +1,19 @@
-# v7.20.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Move rich text logic to a separate package and remove queuing mechanism ([@Quenty](https://github.com/Quenty))
-- feat: Initial refactor of guis to use ValueObject instead of ValueObject ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.19.0...@quenty/textserviceutils@7.20.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+* Move rich text logic to a separate package and remove queuing mechanism ([6ffee1a](https://github.com/Quenty/NevermoreEngine/commit/6ffee1a8bcfa96a6734e1bd861f922f810b9bad5))
+
+
+
+
 
 # [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@7.18.0...@quenty/textserviceutils@7.19.0) (2023-05-08)
 

@@ -1,25 +1,19 @@
-# v5.16.0 (Fri May 26 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/news [#363](https://github.com/Quenty/NevermoreEngine/pull/363) ([@Quenty](https://github.com/Quenty))
-- feat: Add :Observe() calls to ObservableList and ObservableSortedList ([@Quenty](https://github.com/Quenty))
-- feat: Initial refactor of guis to use ValueObject instead of ValueObject ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix missing style issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.15.0...@quenty/observablecollection@5.16.0) (2023-05-26)
+
+
+### Features
+
+* Add :Observe() calls to ObservableList and ObservableSortedList ([2f22fbc](https://github.com/Quenty/NevermoreEngine/commit/2f22fbc0830f51aa73ba01b6bb0d25f736e37b6e))
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
 
 # [5.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.14.0...@quenty/observablecollection@5.15.0) (2023-05-08)
 
