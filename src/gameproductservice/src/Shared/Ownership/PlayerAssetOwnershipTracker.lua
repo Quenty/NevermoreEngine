@@ -16,7 +16,6 @@ local Promise = require("Promise")
 local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
 local RxBrioUtils = require("RxBrioUtils")
-local RxInstanceUtils = require("RxInstanceUtils")
 local RxStateStackUtils = require("RxStateStackUtils")
 local ValueObject = require("ValueObject")
 local WellKnownAssetOwnershipHandler = require("WellKnownAssetOwnershipHandler")
@@ -38,8 +37,7 @@ function PlayerAssetOwnershipTracker.new(player, configPicker, assetType, market
 
 	self._assetOwnershipPromiseCache = {}
 
-	self._attributesEnabled = Instance.new("BoolValue")
-	self._attributesEnabled.Value = false
+	self._attributesEnabled = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._attributesEnabled)
 
 	self._assetIdToWellKnownOwnershipTracker = ObservableMapSet.new()
@@ -52,8 +50,8 @@ function PlayerAssetOwnershipTracker.new(player, configPicker, assetType, market
 		self:SetOwnership(idOrKey, true)
 	end))
 
-	self._maid:GiveTask(RxInstanceUtils.observeProperty(self._attributesEnabled, "Value"):Subscribe(function()
-		if self._attributesEnabled.Value then
+	self._maid:GiveTask(self._attributesEnabled:Observe():Subscribe(function(isEnabled)
+		if isEnabled then
 			self._maid._wellKnown = self:_cacheWellKnownAssets()
 		else
 			self._maid._wellKnown = nil
@@ -161,7 +159,7 @@ function PlayerAssetOwnershipTracker:SetOwnership(idOrKey, ownsPass)
 
 	-- Update trackers
 	for _, wellOwnedAsset in pairs(self:_getWellKnownAssets(idOrKey)) do
-		wellOwnedAsset:SetIsOwned(idOrKey, ownsPass)
+		wellOwnedAsset:SetIsOwned(ownsPass)
 	end
 end
 

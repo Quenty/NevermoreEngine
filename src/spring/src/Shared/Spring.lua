@@ -8,13 +8,13 @@
 	local RunService = game:GetService("RunService")
 	local UserInputService = game:GetService("UserInputService")
 
-	local spring = Spring.new(Vector3.new(0, 0, 0))
+	local spring = Spring.new(Vector3.zero)
 
 	RunService.RenderStepped:Connect(function()
 		if UserInputService:IsKeyDown(Enum.KeyCode.W) then
 			spring.Target = Vector3.new(0, 0, 1)
 		else
-			spring.Target = Vector3.new(0, 0, 0)
+			spring.Target = Vector3.zero
 		end
 
 		print(spring.Position) -- A smoothed out version of the input keycode W
@@ -36,10 +36,10 @@ local Spring = {}
 	local linearSpring = Spring.new(0)
 
 	-- Vector2 spring
-	local vector2Spring = Spring.new(Vector2.new(0, 0))
+	local vector2Spring = Spring.new(Vector2.zero)
 
 	-- Vector3 spring
-	local vector3Spring = Spring.new(Vector3.new(0, 0, 0))
+	local vector3Spring = Spring.new(Vector3.zero)
 	```
 
 	@param initial T -- The initial parameter is a number or Vector3 (anything with * number and addition/subtraction).

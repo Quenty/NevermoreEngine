@@ -6,15 +6,19 @@ local require = require(script.Parent.loader).load(script)
 
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local Rx = require("Rx")
+local Maid = require("Maid")
 
 local SettingsService = {}
 
 function SettingsService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
 
 	-- External
 	self._serviceBag:GetService(require("PlayerDataStoreService"))
+	self._serviceBag:GetService(require("SettingsCmdrService"))
+
 
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("SettingsBindersServer"))
@@ -47,6 +51,10 @@ function SettingsService:PromisePlayerSettings(player, cancelToken)
 			return x ~= nil
 		end)
 	}), cancelToken)
+end
+
+function SettingsService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return SettingsService

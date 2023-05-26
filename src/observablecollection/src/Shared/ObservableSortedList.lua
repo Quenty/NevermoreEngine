@@ -14,13 +14,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
-local RxValueBaseUtils = require("RxValueBaseUtils")
-local Symbol = require("Symbol")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local Rx = require("Rx")
+local Signal = require("Signal")
+local Symbol = require("Symbol")
+local ValueObject = require("ValueObject")
 
 -- Higher numbers last. Using <= ensures insertion at end on ties.
 local function defaultCompare(a, b)
@@ -56,8 +57,8 @@ function ObservableSortedList.new(compare)
 	self._keyObservables = {} -- { [Symbol]: { Subscription } }
 
 	self._compare = compare or defaultCompare
-	self._countValue = Instance.new("IntValue")
-	self._countValue.Value = 0
+
+	self._countValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._countValue)
 
 --[=[
@@ -78,6 +79,9 @@ function ObservableSortedList.new(compare)
 	self.ItemRemoved = Signal.new()
 	self._maid:GiveTask(self.ItemRemoved)
 
+	self.OrderChanged = Signal.new()
+	self._maid:GiveTask(self.OrderChanged)
+
 --[=[
 	Fires when the count changes.
 	@prop CountChanged RBXScriptSignal
@@ -87,6 +91,25 @@ function ObservableSortedList.new(compare)
 
 	return self
 end
+
+--[=[
+	Observes the list, allocating a new list in the process.
+
+	@return Observable<{ T }>
+]=]
+function ObservableSortedList:Observe()
+	return Rx.combineLatest({
+		Rx.fromSignal(self.ItemAdded):Pipe({ Rx.startWith({ true }) });
+		Rx.fromSignal(self.ItemRemoved):Pipe({ Rx.startWith({ true }) });
+		Rx.fromSignal(self.OrderChanged):Pipe({ Rx.startWith({ true }) });
+	}):Pipe({
+		Rx.throttleDefer();
+		Rx.map(function()
+			return self:GetList();
+		end);
+	})
+end
+
 
 --[=[
 	Returns whether the value is an observable list
@@ -251,7 +274,7 @@ end
 	@return number
 ]=]
 function ObservableSortedList:GetCount()
-	return self._countValue.Value
+	return self._countValue.Value or 0
 end
 
 --[=[
@@ -271,7 +294,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableSortedList:ObserveCount()
-	return RxValueBaseUtils.observeValue(self._countValue)
+	return self._countValue:Observe()
 end
 
 --[=[
@@ -491,17 +514,24 @@ function ObservableSortedList:_deferChange(countChange, itemAdded, itemRemoved, 
 end
 
 function ObservableSortedList:_queueDeferredChange()
-	if not self._deferredChange then
-		self._deferredChange = {
-			countChange = 0;
-			indexChanges = {};
-			itemsAdded = {};
-			itemsRemoved = {};
-		}
+	if self._deferredChange then
+		return
+	end
 
-		task.defer(function()
-			local snapshot = self._deferredChange
-			self._deferredChange = nil
+	self._deferredChange = {
+		countChange = 0;
+		indexChanges = {};
+		itemsAdded = {};
+		itemsRemoved = {};
+	}
+
+	self._maid._currentDefer = task.defer(function()
+		local snapshot = self._deferredChange
+		self._deferredChange = nil
+
+		task.spawn(function()
+			self._maid._currentDefer = nil
+			local changed = false
 
 			self._countValue.Value = self._countValue.Value + snapshot.countChange
 
@@ -510,6 +540,8 @@ function ObservableSortedList:_queueDeferredChange()
 				if not self.ItemAdded.Destroy then
 					break
 				end
+
+				changed = true
 				self.ItemAdded:Fire(lastAdded.item, lastAdded.newIndex, lastAdded.key)
 
 				-- Item adds are included in indexChanges.
@@ -520,6 +552,7 @@ function ObservableSortedList:_queueDeferredChange()
 					break
 				end
 
+				changed = true
 				self.ItemRemoved:Fire(lastRemoved.item, lastRemoved.key)
 
 				-- Fire only if we aren't handled by an index change.
@@ -531,6 +564,8 @@ function ObservableSortedList:_queueDeferredChange()
 			-- Fire off index change on each key list (if the data isn't stale)
 			for _, lastChange in pairs(snapshot.indexChanges) do
 				if self._indexes[lastChange.key] == lastChange.newIndex then
+					changed = true
+
 					local subs = self._keyObservables[lastChange.key]
 					if subs then
 						self:_fireSubs(subs, lastChange.newIndex)
@@ -539,8 +574,12 @@ function ObservableSortedList:_queueDeferredChange()
 					self._indexObservers:Fire(lastChange.newIndex, self._contents[lastChange.key])
 				end
 			end
+
+			if changed then
+				self.OrderChanged:Fire()
+			end
 		end)
-	end
+	end)
 end
 
 function ObservableSortedList:_findCorrectIndex(sortValue, currentIndex)

@@ -100,7 +100,7 @@ end
 	local IKAimPositionPriorites = require("IKAimPositionPriorites")
 
 	RunService.Stepped:Connect(function()
-		serviceBag:GetService(IKServiceClient):SetAimPosition(Vector3.new(0, 0, 0), IKAimPositionPriorites.HIGH)
+		serviceBag:GetService(IKServiceClient):SetAimPosition(Vector3.zero, IKAimPositionPriorites.HIGH)
 	end)
 	```
 

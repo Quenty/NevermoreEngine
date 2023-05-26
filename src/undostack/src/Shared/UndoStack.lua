@@ -7,7 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Promise = require("Promise")
 local UndoStackEntry = require("UndoStackEntry")
-local RxInstanceUtils = require("RxInstanceUtils")
+local ValueObject = require("ValueObject")
 
 local DEFAULT_MAX_SIZE = 25
 
@@ -25,16 +25,13 @@ function UndoStack.new(maxSize)
 	self._undoStack = {}
 	self._redoStack = {}
 
-	self._hasUndoEntries = Instance.new("BoolValue")
-	self._hasUndoEntries.Value = false
+	self._hasUndoEntries = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._hasUndoEntries)
 
-	self._hasRedoEntries = Instance.new("BoolValue")
-	self._hasRedoEntries.Value = false
+	self._hasRedoEntries = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._hasRedoEntries)
 
-	self._isActionExecuting = Instance.new("BoolValue")
-	self._isActionExecuting.Value = false
+	self._isActionExecuting = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isActionExecuting)
 
 	return self
@@ -63,7 +60,7 @@ end
 	@return Observable<boolean>
 ]=]
 function UndoStack:ObserveHasUndoEntries()
-	return RxInstanceUtils.observeProperty(self._hasUndoEntries, "Value")
+	return self._hasUndoEntries:Observe()
 end
 
 --[=[
@@ -71,7 +68,7 @@ end
 	@return Observable<boolean>
 ]=]
 function UndoStack:ObserveHasRedoEntries()
-	return RxInstanceUtils.observeProperty(self._hasRedoEntries, "Value")
+	return self._hasRedoEntries:Observe()
 end
 
 --[=[

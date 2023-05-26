@@ -47,7 +47,8 @@
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
-    "@quenty/table": "file:../table"
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "devDependencies": {
     "@quenty/rigbuilderutils": "file:../rigbuilderutils"

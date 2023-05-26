@@ -38,4 +38,24 @@ function RemoteFunctionUtils.promiseInvokeServer(remoteFunction, ...)
 	end)
 end
 
+--[=[
+	Converts a promise result into a promise
+
+	@param ok boolean
+	@param ... any
+	@return Promise<T>
+]=]
+function RemoteFunctionUtils.fromPromiseYieldResult(ok, ...)
+	if ok then
+		return ...
+	else
+		local n = select("#", ...)
+		if n == 0 then
+			return Promise.rejected("Failed to get result from RemoteFunction")
+		else
+			return Promise.rejected(...)
+		end
+	end
+end
+
 return RemoteFunctionUtils

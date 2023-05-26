@@ -24,7 +24,7 @@ LagPointCamera._OriginCamera = nil
 function LagPointCamera.new(originCamera, focusCamera)
 	local self = setmetatable({}, LagPointCamera)
 
-	self.FocusSpring = Spring.new(Vector3.new())
+	self.FocusSpring = Spring.new(Vector3.zero)
 	self.OriginCamera = originCamera or error("Must have originCamera")
 	self.FocusCamera = focusCamera or error("Must have focusCamera")
 	self.Speed = 10
@@ -41,7 +41,7 @@ function LagPointCamera:__newindex(index, value)
 		rawset(self, "_" .. index, value)
 		self.FocusSpring.Target = self.FocusCamera.CameraState.Position
 		self.FocusSpring.Position = self.FocusSpring.Target
-		self.FocusSpring.Velocity = Vector3.new(0, 0, 0)
+		self.FocusSpring.Velocity = Vector3.zero
 	elseif index == "OriginCamera" then
 		rawset(self, "_" .. index, value)
 	elseif index == "LastFocusUpdate" or index == "FocusSpring" then

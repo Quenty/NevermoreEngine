@@ -67,7 +67,7 @@ end
 ]=]
 function PhysicsUtils.getCenterOfMass(parts)
 	local mass = 0
-	local weightedSum = Vector3.new(0, 0, 0)
+	local weightedSum = Vector3.zero
 
 	for _, part in pairs(parts) do
 		mass = mass + part:GetMass()
@@ -152,7 +152,7 @@ function PhysicsUtils.applyForce(part, force, forcePosition)
 	if momentOfInertia ~= 0 then
 		rotAcceleration = torque/momentOfInertia
 	else
-		rotAcceleration = Vector3.new(0, 0, 0) -- We cannot divide by 0
+		rotAcceleration = Vector3.zero -- We cannot divide by 0
 	end
 
 	local acceleration = force/mass

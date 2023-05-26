@@ -3,12 +3,12 @@
 
 	```lua
 	local octree = Octree.new()
-	local node = octree:CreateNode(Vector3.new(0, 0, 0), "A")
-	print(octree:RadiusSearch(Vector3.new(0, 0, 0), 100)) --> { "A" }
+	local node = octree:CreateNode(Vector3.zero, "A")
+	print(octree:RadiusSearch(Vector3.zero, 100)) --> { "A" }
 
 	node:Destroy() -- Remove node from octree
 
-	print(octree:RadiusSearch(Vector3.new(0, 0, 0), 100)) --> { }
+	print(octree:RadiusSearch(Vector3.zero, 100)) --> { }
 	```
 	@class OctreeNode
 ]=]
@@ -51,7 +51,7 @@ end
 
 	```lua
 	local octree = Octree.new()
-	local node = octree:CreateNode(Vector3.new(0, 0, 0), "A")
+	local node = octree:CreateNode(Vector3.zero, "A")
 	octree:CreateNode(Vector3.new(0, 0, 5), "B")
 	print(octree:KNearestNeighborsSearch(10, 100)) --> { "A", "B" } { 0, 25 }
 	```
@@ -70,7 +70,7 @@ end
 
 	```lua
 	local octree = Octree.new()
-	local node = octree:CreateNode(Vector3.new(0, 0, 0), "A")
+	local node = octree:CreateNode(Vector3.zero, "A")
 	print(octree:GetObject()) --> "A"
 	```
 
@@ -116,11 +116,11 @@ end
 
 	```lua
 	local octree = Octree.new()
-	local node = octree:CreateNode(Vector3.new(0, 0, 0), "A")
-	print(octree:RadiusSearch(Vector3.new(0, 0, 0), 100)) --> { "A" }
+	local node = octree:CreateNode(Vector3.zero, "A")
+	print(octree:RadiusSearch(Vector3.zero, 100)) --> { "A" }
 
 	node:SetPosition(Vector3.new(1000, 0, 0))
-	print(octree:RadiusSearch(Vector3.new(0, 0, 0), 100)) --> {}
+	print(octree:RadiusSearch(Vector3.zero, 100)) --> {}
 	```
 
 	@param position Vector3

@@ -197,9 +197,12 @@ function FontPalette:DefineFont(fontName, defaultFont)
 	end))
 
 	self._maid:GiveTask(fontValue.Changed:Connect(function(fontEnum)
-		local font = Font.fromEnum(fontEnum)
-		local current = fontFaceValue.Value
-		fontFaceValue.Value = Font.new(font.Family, current.Weight, current.Style)
+		-- Assume fontFace is set with something reasonable
+		if fontEnum ~= Enum.Font.Unknown then
+			local font = Font.fromEnum(fontEnum)
+			local current = fontFaceValue.Value
+			fontFaceValue.Value = Font.new(font.Family, current.Weight, current.Style)
+		end
 	end))
 
 	self.FontAdded:Fire(fontName)

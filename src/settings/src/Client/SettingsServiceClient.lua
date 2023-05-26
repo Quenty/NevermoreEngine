@@ -12,6 +12,8 @@ local Players = game:GetService("Players")
 
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local Rx = require("Rx")
+local Maid = require("Maid")
+local SettingsCmdrUtils = require("SettingsCmdrUtils")
 
 local SettingsServiceClient = {}
 
@@ -23,10 +25,18 @@ local SettingsServiceClient = {}
 function SettingsServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
+
+	-- External
+	self._serviceBag:GetService(require("CmdrServiceClient"))
 
 	-- Internal
 	self._serviceBag:GetService(require("SettingRegistryServiceShared")):RegisterSettingService(self)
 	self._binders = self._serviceBag:GetService(require("SettingsBindersClient"))
+end
+
+function SettingsServiceClient:Start()
+	self:_setupCmdr()
 end
 
 --[=[
@@ -116,6 +126,19 @@ function SettingsServiceClient:PromisePlayerSettings(player, cancelToken)
 			return x ~= nil
 		end)
 	}), cancelToken)
+end
+
+
+function SettingsServiceClient:_setupCmdr()
+	local cmdrServiceClient = self._serviceBag:GetService(require("CmdrServiceClient"))
+
+	self._maid:GivePromise(cmdrServiceClient:PromiseCmdr()):Then(function(cmdr)
+		SettingsCmdrUtils.registerSettingDefinition(cmdr, self._serviceBag)
+	end)
+end
+
+function SettingsServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return SettingsServiceClient

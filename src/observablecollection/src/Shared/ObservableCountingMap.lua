@@ -9,7 +9,7 @@ local Signal = require("Signal")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueObject = require("ValueObject")
 
 local ObservableCountingMap = {}
 ObservableCountingMap.ClassName = "ObservableCountingMap"
@@ -25,8 +25,7 @@ function ObservableCountingMap.new()
 	self._maid = Maid.new()
 	self._map = {}
 
-	self._totalKeyCountValue = Instance.new("IntValue")
-	self._totalKeyCountValue.Value = 0
+	self._totalKeyCountValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._totalKeyCountValue)
 
 --[=[
@@ -198,7 +197,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableCountingMap:ObserveTotalKeyCount()
-	return RxValueBaseUtils.observeValue(self._totalKeyCountValue)
+	return self._totalKeyCountValue:Observe()
 end
 
 --[=[

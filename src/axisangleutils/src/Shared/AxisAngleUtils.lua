@@ -44,7 +44,7 @@ function AxisAngleUtils.fromCFrame(cframe)
 
     if axisAngle ~= axisAngle then
         -- warn("[AxisAngleUtils.fromCFrame] - axisAngle is NAN")
-        return Vector3.new(0, 0, 0), cframe.Position
+        return Vector3.zero, cframe.Position
     end
 
     return axisAngle, cframe.Position

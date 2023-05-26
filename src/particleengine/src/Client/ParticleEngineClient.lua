@@ -95,11 +95,11 @@ function ParticleEngineClient:Add(p)
 		return
 	end
 
-	p.Position = p.Position or Vector3.new()
-	p.Velocity = p.Velocity or Vector3.new()
+	p.Position = p.Position or Vector3.zero
+	p.Velocity = p.Velocity or Vector3.zero
 	p.Size = p.Size or Vector2.new(0.2,0.2)
-	p.Bloom = p.Bloom or Vector2.new()
-	p.Gravity = p.Gravity or Vector3.new()
+	p.Bloom = p.Bloom or Vector2.zero
+	p.Gravity = p.Gravity or Vector3.zero
 	p.Color = p.Color or Color3.new(1,1,1)
 	p.Transparency = p.Transparency or 0.5
 
@@ -150,7 +150,7 @@ function ParticleEngineClient:_updatePosVel(p, dt, t)
 	if p.WindResistance then
 		wind = (particleWind(t, p.Position)*self._windSpeed - p.Velocity)*p.WindResistance
 	else
-		wind = Vector3.new()
+		wind = Vector3.zero
 	end
 
 	p.Velocity = p.Velocity + (p.Gravity + wind)*dt

@@ -36,6 +36,7 @@
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math"
+    "@quenty/math": "file:../math",
+    "@quenty/valueobject": "file:../valueobject"
   }
 }

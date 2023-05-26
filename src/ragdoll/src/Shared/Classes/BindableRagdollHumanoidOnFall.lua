@@ -6,7 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local RxInstanceUtils = require("RxInstanceUtils")
+local ValueObject = require("ValueObject")
 
 local FRAMES_TO_EXAMINE = 8
 local FRAME_TIME = 0.1
@@ -28,12 +28,10 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 
 	self._ragdollBinder = assert(ragdollBinder, "Bad ragdollBinder")
 
-	self.ShouldRagdoll = Instance.new("BoolValue")
-	self.ShouldRagdoll.Value = false
+	self.ShouldRagdoll = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self.ShouldRagdoll)
 
-	self._isFalling = Instance.new("BoolValue")
-	self._isFalling.Value = false
+	self._isFalling = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isFalling)
 
 	-- Setup Ragdoll
@@ -64,13 +62,13 @@ function BindableRagdollHumanoidOnFall.new(humanoid, ragdollBinder)
 end
 
 function BindableRagdollHumanoidOnFall:ObserveIsFalling()
-	return RxInstanceUtils.observeProperty(self._isFalling, "Value")
+	return self._isFalling:Observe()
 end
 
 function BindableRagdollHumanoidOnFall:_initLastVelocityRecords()
 	self._lastVelocityRecords = {}
 	for _ = 1, FRAMES_TO_EXAMINE + 1 do -- Add an extra frame because we remove before inserting
-		table.insert(self._lastVelocityRecords, Vector3.new())
+		table.insert(self._lastVelocityRecords, Vector3.zero)
 	end
 end
 
@@ -113,7 +111,7 @@ function BindableRagdollHumanoidOnFall:_updateVelocity()
 	local rootPart = self._obj.RootPart
 	if not rootPart then
 		self._isFalling.Value = false
-		table.insert(self._lastVelocityRecords, Vector3.new())
+		table.insert(self._lastVelocityRecords, Vector3.zero)
 		return
 	end
 

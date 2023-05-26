@@ -12,6 +12,7 @@ local Blend = require("Blend")
 local HSColorPicker = require("HSColorPicker")
 local ValueColorPicker = require("ValueColorPicker")
 local Maid = require("Maid")
+local ValueObject = require("ValueObject")
 
 local HSVColorPicker = setmetatable({}, BaseObject)
 HSVColorPicker.ClassName = "HSVColorPicker"
@@ -32,21 +33,18 @@ function HSVColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSVColorPicker)
 
 	self._hsvColorValue = Instance.new("Vector3Value")
-	self._hsvColorValue.Value = Vector3.new(0, 0, 0)
+	self._hsvColorValue.Value = Vector3.zero
 	self._maid:GiveTask(self._hsvColorValue)
 
 	self.ColorChanged = self._hsvColorValue.Changed
 
-	self._sizeValue = Instance.new("Vector3Value")
-	self._sizeValue.Value = Vector3.new(6, 4, 0)
+	self._sizeValue = ValueObject.new(Vector2.new(6, 4), "Vector2")
 	self._maid:GiveTask(self._sizeValue)
 
-	self._innerPadding = Instance.new("NumberValue")
-	self._innerPadding.Value = 0.2
+	self._innerPadding = ValueObject.new(0.2, "number")
 	self._maid:GiveTask(self._innerPadding)
 
-	self._transparency = Instance.new("NumberValue")
-	self._transparency.Value = 0
+	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
 	self._hueSaturationPicker = HSColorPicker.new()
@@ -193,6 +191,10 @@ function HSVColorPicker:GetSizeValue()
 	return self._sizeValue
 end
 
+function HSVColorPicker:GetMeasureValue()
+	return self._sizeValue
+end
+
 --[=[
 	Sets the transparency of the color
 
@@ -211,7 +213,7 @@ function HSVColorPicker:_updateSize()
 	local width = valueSize.x + hueSize.x + self._innerPadding.Value
 	local height = math.max(valueSize.y, hueSize.y)
 
-	self._sizeValue.Value = Vector3.new(width, height)
+	self._sizeValue.Value = Vector2.new(width, height)
 end
 
 function HSVColorPicker:_render()
@@ -255,7 +257,7 @@ function HSVColorPicker:_render()
 			};
 
 			container(self._hueSaturationPicker, {
-				AnchorPoint = Vector2.new(0, 0);
+				AnchorPoint = Vector2.zero;
 				Position = UDim2.fromScale(0, 0);
 			});
 			container(self._valuePicker, {

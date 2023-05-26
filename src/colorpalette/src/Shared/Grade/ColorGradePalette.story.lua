@@ -53,8 +53,7 @@ return function(target)
 	dark:Add("mouseOver", -15)
 
 	local function sampleGui(labelText, gradePalette)
-		local mouseOver = Instance.new("NumberValue")
-		mouseOver.Value = 0
+		local mouseOver = ValueObject.new(0, "number")
 		maid:GiveTask(mouseOver)
 
 		local percentMouseOver = Blend.Spring(mouseOver, 60)
