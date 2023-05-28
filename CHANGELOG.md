@@ -1,3 +1,16 @@
+# (Sun May 28 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/richtext@1.2.0`
+  - feat: Remove loader dependency requirement [#364](https://github.com/Quenty/NevermoreEngine/pull/364) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri May 26 2023)
 
 #### 🚀 Enhancement

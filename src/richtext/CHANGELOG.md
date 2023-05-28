@@ -1,3 +1,16 @@
+# v1.2.0 (Sun May 28 2023)
+
+#### 🚀 Enhancement
+
+- feat: Remove loader dependency requirement [#364](https://github.com/Quenty/NevermoreEngine/pull/364) ([@Quenty](https://github.com/Quenty))
+- feat: Remove loader dependency requirement ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
