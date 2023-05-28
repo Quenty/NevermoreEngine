@@ -1,20 +1,18 @@
-# v1.2.0 (Sun May 28 2023)
-
-#### 🚀 Enhancement
-
-- feat: Remove loader dependency requirement [#364](https://github.com/Quenty/NevermoreEngine/pull/364) ([@Quenty](https://github.com/Quenty))
-- feat: Remove loader dependency requirement ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/richtext@1.1.0...@quenty/richtext@1.2.0) (2023-05-28)
+
+
+### Features
+
+* Remove loader dependency requirement ([ed790cd](https://github.com/Quenty/NevermoreEngine/commit/ed790cd39d6a93b8f8c07c5c7e50b96c14f108cd))
+
+
+
+
 
 # 1.1.0 (2023-05-26)
 
