@@ -24,9 +24,7 @@
   "contributors": [
     "Quenty"
   ],
-  "dependencies": {
-    "@quenty/loader": "file:../loader"
-  },
+  "dependencies": {},
   "publishConfig": {
     "access": "public"
   }

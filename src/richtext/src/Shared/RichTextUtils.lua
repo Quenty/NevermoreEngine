@@ -4,8 +4,6 @@
 	@class RichTextUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local RichTextUtils = {}
 
 --[=[
