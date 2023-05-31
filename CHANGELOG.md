@@ -1,3 +1,17 @@
+# (Wed May 31 2023)
+
+#### 🐛 Bug Fix
+
+- docs: Update README.md with latest packages [#365](https://github.com/Quenty/NevermoreEngine/pull/365) ([@Quenty](https://github.com/Quenty))
+- `@quenty/resetservice@5.7.1`
+  - fix: Player can try to reset while not in game [#366](https://github.com/Quenty/NevermoreEngine/pull/366) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun May 28 2023)
 
 #### 🚀 Enhancement

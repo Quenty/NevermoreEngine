@@ -1,3 +1,16 @@
+# v5.7.1 (Wed May 31 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Player can try to reset while not in game [#366](https://github.com/Quenty/NevermoreEngine/pull/366) ([@Quenty](https://github.com/Quenty))
+- fix: Player can reset while not in game ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
