@@ -28,6 +28,10 @@ function ResetService:Init()
 end
 
 function ResetService:_resetCharacterYielding(player)
+	if not player:IsDescendantOf(game) then
+		return
+	end
+
 	player:LoadCharacter()
 end
 
