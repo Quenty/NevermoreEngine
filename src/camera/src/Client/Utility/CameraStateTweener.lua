@@ -93,6 +93,8 @@ end
 	@param callback function
 ]=]
 function CameraStateTweener:Finish(doNotAnimate, callback)
+	assert(type(callback) == "function", "Bad callback")
+
 	self:Hide(doNotAnimate)
 
 	if self._fadeBetween.HasReachedTarget then
