@@ -33,6 +33,18 @@ function Math.map(num: number, min0: number, max0: number, min1: number, max1: n
 end
 
 --[=[
+	Returns jittered value at the average value, with the spread being
+	random.
+
+	@param average number
+	@param spread number
+	@return number
+]=]
+function Math.jitter(average: number, spread: number)
+	return average - 0.5*spread + math.random()*spread
+end
+
+--[=[
 	Returns true if a number is NaN
 	@param num number
 	@return boolean
