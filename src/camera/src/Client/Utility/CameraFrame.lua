@@ -62,9 +62,19 @@ end
 
 function CameraFrame:__index(index)
 	if index == "CFrame" then
-		return QFrame.toCFrame(self.QFrame) or warn("[CameraFrame] - NaN")
+		local result = QFrame.toCFrame(self.QFrame)
+		if not result then
+			warn("[CameraFrame.CFrame] - NaN in QFrame")
+			return CFrame.new()
+		end
+		return result
 	elseif index == "Position" then
-		return QFrame.toPosition(self.QFrame) or warn("[CameraFrame] - NaN")
+		local result = QFrame.toPosition(self.QFrame)
+		if not result then
+			warn("[CameraFrame.Position] - NaN in QFrame")
+			return Vector3.zero
+		end
+		return result
 	elseif CameraFrame[index] then
 		return CameraFrame[index]
 	else

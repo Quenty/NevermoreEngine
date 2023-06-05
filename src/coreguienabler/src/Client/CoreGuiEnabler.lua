@@ -48,6 +48,10 @@ function CoreGuiEnabler.new()
 		CharacterUtils.unequipTools(Players.LocalPlayer)
 	end)
 
+	self:AddState(Enum.CoreGuiType.SelfView, function(_isEnabled)
+		-- Noopt
+	end)
+
 	-- Specifically handle this so we interface properly
 	self:AddState(Enum.CoreGuiType.All, function(isEnabled)
 		if isEnabled then

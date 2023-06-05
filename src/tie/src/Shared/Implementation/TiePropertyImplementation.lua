@@ -11,6 +11,7 @@ local ValueBaseUtils = require("ValueBaseUtils")
 local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
 local AttributeUtils = require("AttributeUtils")
 local AttributeValue = require("AttributeValue")
+local ValueObject = require("ValueObject")
 
 local TiePropertyImplementation = setmetatable({}, BaseObject)
 TiePropertyImplementation.ClassName = "TiePropertyImplementation"
@@ -55,13 +56,28 @@ function TiePropertyImplementation:SetImplementation(implementation)
 end
 
 function TiePropertyImplementation:_updateImplementation(maid, implementation)
+	if ValueObject.isValueObject(implementation) then
+		local checkType = implementation:GetCheckType()
+
+		if checkType and AttributeUtils.isValidAttributeType(checkType) and checkType ~= "nil" then
+			self:_removeClassIfNeeded()
+
+			local attributeValue = AttributeValue.new(self._folder, self._memberDefinition:GetMemberName())
+			self:_syncMember(maid, attributeValue, implementation)
+			return
+		end
+	end
+
 	if type(implementation) == "table" and implementation.Changed then
 		local copy = self:_changeToClassIfNeeded("BindableFunction", implementation)
 		copy.OnInvoke = function()
 			return TieUtils.encode(implementation)
 		end
 		copy.Parent = self._folder
-	elseif typeof(implementation) == "Instance" and implementation:IsA("ValueBase") then
+		return
+	end
+
+	if typeof(implementation) == "Instance" and implementation:IsA("ValueBase") then
 		local resultingType = ValueBaseUtils.getValueBaseType(implementation.ClassName)
 		if resultingType and AttributeUtils.isValidAttributeType(resultingType) and resultingType ~= "nil" then
 			self:_removeClassIfNeeded()
@@ -73,22 +89,23 @@ function TiePropertyImplementation:_updateImplementation(maid, implementation)
 			self:_syncMember(maid, copy, implementation)
 			copy.Parent = self._folder
 		end
-	else
-		if AttributeUtils.isValidAttributeType(typeof(implementation)) and implementation ~= nil then
-			self:_removeClassIfNeeded()
-			self._folder:SetAttribute(self._memberDefinition:GetMemberName(), implementation)
-			return
-		end
-
-		local className = ValueBaseUtils.getClassNameFromType(typeof(implementation))
-		if not className then
-			error(("[TiePropertyImplementation] - Bad implementation value type %q, cannot set"):format(typeof(implementation)))
-		end
-
-		local copy = self:_changeToClassIfNeeded(className, implementation)
-		copy.Value = implementation
-		copy.Parent = self._folder
+		return
 	end
+
+	if AttributeUtils.isValidAttributeType(typeof(implementation)) and implementation ~= nil then
+		self:_removeClassIfNeeded()
+		self._folder:SetAttribute(self._memberDefinition:GetMemberName(), implementation)
+		return
+	end
+
+	local className = ValueBaseUtils.getClassNameFromType(typeof(implementation))
+	if not className then
+		error(("[TiePropertyImplementation] - Bad implementation value type %q, cannot set"):format(typeof(implementation)))
+	end
+
+	local copy = self:_changeToClassIfNeeded(className, implementation)
+	copy.Value = implementation
+	copy.Parent = self._folder
 end
 
 function TiePropertyImplementation:_changeToClassIfNeeded(className)

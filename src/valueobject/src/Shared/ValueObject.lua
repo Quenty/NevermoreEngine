@@ -45,6 +45,16 @@ function ValueObject.new(baseValue, checkType)
 	return setmetatable(self, ValueObject)
 end
 
+
+--[=[
+	Returns the current check type, if any
+
+	@return string | nil
+]=]
+function ValueObject:GetCheckType()
+	return rawget(self, "_checkType")
+end
+
 --[=[
 	Constructs a new value object
 	@param observable Observable<T>
