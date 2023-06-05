@@ -1,20 +1,18 @@
-# v7.15.0 (Mon Jun 05 2023)
-
-#### 🚀 Enhancement
-
-- feat: ValueObject and tie updates [#368](https://github.com/Quenty/NevermoreEngine/pull/368) ([@Quenty](https://github.com/Quenty))
-- feat: Tie interfaces can export checked ValueObjects as Attributes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@7.14.0...@quenty/valueobject@7.15.0) (2023-06-05)
+
+
+### Features
+
+* Tie interfaces can export checked ValueObjects as Attributes ([6360546](https://github.com/Quenty/NevermoreEngine/commit/63605466f3f27342982556ac1866caafd0202c94))
+
+
+
+
 
 # [7.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@7.13.0...@quenty/valueobject@7.14.0) (2023-05-26)
 

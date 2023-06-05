@@ -1,23 +1,18 @@
-# v6.10.0 (Mon Jun 05 2023)
-
-#### 🚀 Enhancement
-
-- feat: ValueObject and tie updates [#368](https://github.com/Quenty/NevermoreEngine/pull/368) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: No warning about SelfView ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.9.0...@quenty/coreguienabler@6.10.0) (2023-06-05)
+
+
+### Bug Fixes
+
+* No warning about SelfView ([98f6c90](https://github.com/Quenty/NevermoreEngine/commit/98f6c902ff0574fac0fdb6dd2bcc1e1a15c57940))
+
+
+
+
 
 # [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguienabler@6.8.0...@quenty/coreguienabler@6.9.0) (2023-05-26)
 
