@@ -17,12 +17,10 @@
 
 <div>&nbsp;</div>
 
-<div align="center">
-  ⚠ <b>WARNING</b>: This branch of Nevermore is under development and is gaining CI/CD and other quality-of-life upgrades. Usage may be unstable at this point, and versions may not be fully semantically versioned. ⚠
-</div>
-
-<div>&nbsp;</div>
 <!--moonwave-hide-before-this-line-->
+
+## Why Nevermore?
+Code in Nevermore has powered over a billion play sessions on Roblox. Nevermore is used is all [Studio Koi Koi](https://studiokoikoi.com/) games, as well as many other games on Roblox.
 
 ## Install using npm
 Nevermore is designed to use [npm](https://www.npmjs.com/) to manage packages. You can install a package like this.
