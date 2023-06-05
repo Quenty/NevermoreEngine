@@ -1,3 +1,19 @@
+# v6.10.0 (Mon Jun 05 2023)
+
+#### 🚀 Enhancement
+
+- feat: ValueObject and tie updates [#368](https://github.com/Quenty/NevermoreEngine/pull/368) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: No warning about SelfView ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Mon Jun 05 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/camera@9.14.0`, `@quenty/coreguienabler@6.10.0`, `@quenty/math@2.4.0`, `@quenty/tie@4.20.0`, `@quenty/valueobject@7.15.0`
+  - feat: ValueObject and tie updates [#368](https://github.com/Quenty/NevermoreEngine/pull/368) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed May 31 2023)
 
 #### 🐛 Bug Fix
