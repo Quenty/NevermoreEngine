@@ -27,11 +27,41 @@ function RemoteFunctionUtils.promiseInvokeServer(remoteFunction, ...)
 		end)
 
 		if not ok then
-			return reject(err or "Failed to invoke server")
+			return reject(err or "Failed to invoke server from RemoteFunction")
 		end
 
 		if not results then
-			return reject("Failed to get results somehow")
+			return reject("Failed to get results from RemoteFunction")
+		end
+
+		return resolve(table.unpack(results, 1, results.n))
+	end)
+end
+
+--[=[
+	Invokes the client with the remote function call.
+	@param remoteFunction RemoteFunction
+	@param player Instance
+	@param ... any
+	@return Promise<T>
+]=]
+function RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...)
+	assert(typeof(remoteFunction) == "Instance" and remoteFunction:IsA("RemoteFunction"), "Bad remoteFunction")
+
+	local args = table.pack(...)
+
+	return Promise.spawn(function(resolve, reject)
+		local results
+		local ok, err = pcall(function()
+			results = table.pack(remoteFunction:InvokeClient(player, table.unpack(args, 1, args.n)))
+		end)
+
+		if not ok then
+			return reject(err or "Failed to invoke clientfrom RemoteFunction")
+		end
+
+		if not results then
+			return reject("Failed to get results from RemoteFunction")
 		end
 
 		return resolve(table.unpack(results, 1, results.n))
