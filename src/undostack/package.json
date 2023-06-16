@@ -28,7 +28,10 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/signal": "file:../signal",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"
