@@ -1,3 +1,16 @@
+# v6.7.0 (Sat Jun 17 2023)
+
+#### 🚀 Enhancement
+
+- Update binders, add remoting contract, and more [#367](https://github.com/Quenty/NevermoreEngine/pull/367) ([@Quenty](https://github.com/Quenty))
+- feat: Add RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
