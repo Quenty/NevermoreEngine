@@ -34,8 +34,11 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
+    "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/rx": "file:../rx",
     "@quenty/selectionutils": "file:../selectionutils",
     "@quenty/signal": "file:../signal",
+    "@quenty/statestack": "file:../statestack",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"
   },

@@ -26,11 +26,11 @@ function AnimatedHighlight.new()
 	self._highlightDepthMode = ValueObject.new(Enum.HighlightDepthMode.AlwaysOnTop)
 	self._maid:GiveTask(self._highlightDepthMode)
 
-	self._fillColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
-	self._maid:GiveTask(self._fillColor)
+	self._fillColorSpring = SpringObject.new(Color3.new(1, 1, 1), 40)
+	self._maid:GiveTask(self._fillColorSpring)
 
-	self._outlineColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
-	self._maid:GiveTask(self._outlineColor)
+	self._outlineColorSpring = SpringObject.new(Color3.new(1, 1, 1), 40)
+	self._maid:GiveTask(self._outlineColorSpring)
 
 	self._fillTransparencySpring = SpringObject.new(0.5, 40)
 	self._maid:GiveTask(self._fillTransparencySpring)
@@ -85,8 +85,6 @@ function AnimatedHighlight:SetPropertiesFrom(sourceHighlight)
 	assert(AnimatedHighlight.isAnimatedHighlight(sourceHighlight), "Bad AnimatedHighlight")
 
 	self._highlightDepthMode.Value = sourceHighlight._highlightDepthMode.Value
-	self._fillColor.Value = sourceHighlight._fillColor.Value
-	self._outlineColor.Value = sourceHighlight._outlineColor.Value
 
 	-- well, this can't be very fast...
 	local function transferSpringValue(target, source)
@@ -100,6 +98,8 @@ function AnimatedHighlight:SetPropertiesFrom(sourceHighlight)
 	-- Transfer state before we set spring values
 	self:SetVisible(sourceHighlight:IsVisible(), true)
 
+	transferSpringValue(self._fillColorSpring, sourceHighlight._fillColorSpring)
+	transferSpringValue(self._outlineColorSpring, sourceHighlight._outlineColorSpring)
 	transferSpringValue(self._fillTransparencySpring, sourceHighlight._fillTransparencySpring)
 	transferSpringValue(self._outlineTransparencySpring, sourceHighlight._outlineTransparencySpring)
 	transferSpringValue(self._percentVisible, sourceHighlight._percentVisible)
@@ -110,6 +110,13 @@ function AnimatedHighlight:SetTransparencySpeed(speed)
 
 	self._fillTransparencySpring.Speed = speed
 	self._outlineTransparencySpring.Speed = speed
+end
+
+function AnimatedHighlight:SetColorSpeed(speed)
+	assert(type(speed) == "number", "Bad speed")
+
+	self._fillColorSpring.Speed = speed
+	self._outlineColorSpring.Speed = speed
 end
 
 function AnimatedHighlight:SetSpeed(speed)
@@ -151,16 +158,28 @@ function AnimatedHighlight:Finish(doNotAnimate, callback)
 	end
 end
 
-function AnimatedHighlight:SetFillColor(color)
+--[=[
+	Sets the fill color
+
+	@param color Color3
+	@param doNotAnimate boolean | nil
+]=]
+function AnimatedHighlight:SetFillColor(color, doNotAnimate)
 	assert(typeof(color) == "Color3", "Bad color")
 
-	self._fillColor.Value = color
+	self._fillColorSpring:SetTarget(color, doNotAnimate)
 end
 
-function AnimatedHighlight:SetOutlineColor(color)
+--[=[
+	Sets the outline color
+
+	@param color Color3
+	@param doNotAnimate boolean | nil
+]=]
+function AnimatedHighlight:SetOutlineColor(color, doNotAnimate)
 	assert(typeof(color) == "Color3", "Bad color")
 
-	self._outlineColor.Value = color
+	self._outlineColorSpring:SetTarget(color, doNotAnimate)
 end
 
 function AnimatedHighlight:SetAdornee(adornee)
@@ -173,6 +192,12 @@ function AnimatedHighlight:GetAdornee()
 	return self._adornee.Value
 end
 
+--[=[
+	Sets the outlineTransparency
+
+	@param outlineTransparency number
+	@param doNotAnimate boolean | nil
+]=]
 function AnimatedHighlight:SetOutlineTransparency(outlineTransparency, doNotAnimate)
 	assert(type(outlineTransparency) == "number", "Bad outlineTransparency")
 
@@ -183,6 +208,12 @@ function AnimatedHighlight:SetOutlineTransparency(outlineTransparency, doNotAnim
 	end
 end
 
+--[=[
+	Sets the fillTransparency
+
+	@param fillTransparency number
+	@param doNotAnimate boolean | nil
+]=]
 function AnimatedHighlight:SetFillTransparency(fillTransparency, doNotAnimate)
 	assert(type(fillTransparency) == "number", "Bad fillTransparency")
 
@@ -198,8 +229,8 @@ function AnimatedHighlight:_render()
 		Name = "AnimatedHighlight";
 		Archivable = false;
 		DepthMode = self._highlightDepthMode;
-		FillColor = self._fillColor;
-		OutlineColor = self._outlineColor;
+		FillColor = self._fillColorSpring:ObserveRenderStepped();
+		OutlineColor = self._outlineColorSpring:ObserveRenderStepped();
 		FillTransparency = Blend.Computed(
 			self._fillTransparencySpring:ObserveRenderStepped(),
 			self._percentVisible:ObserveRenderStepped(),
