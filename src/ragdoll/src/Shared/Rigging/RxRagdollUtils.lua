@@ -111,11 +111,7 @@ function RxRagdollUtils.runLocal(humanoid)
 
 						-- Do motors
 						maid:GiveTask(RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings))
-
-						humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-						maid:GiveTask(function()
-							humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-						end)
+						maid:GiveTask(RxRagdollUtils.enforceHumanoidState(humanoid))
 
 						debug.profileend()
 					end)
@@ -123,6 +119,7 @@ function RxRagdollUtils.runLocal(humanoid)
 				debug.profilebegin("initragdoll_nonowner")
 
 				maid:GiveTask(RagdollMotorUtils.suppressJustRootPart(character, rigType))
+				maid:GiveTask(RxRagdollUtils.enforceHumanoidState(humanoid))
 
 				debug.profileend()
 			end
@@ -134,6 +131,26 @@ function RxRagdollUtils.runLocal(humanoid)
 	end))
 
 	return topMaid
+end
+
+function RxRagdollUtils.enforceHumanoidState(humanoid)
+	local maid = Maid.new()
+	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+
+	-- If you're holding a humanoid and jump, then the humanoid state
+	-- changes to your humanoid's state.
+
+	maid._keepAsPhysics = humanoid.StateChanged:Connect(function(_old, new)
+		if new ~= Enum.HumanoidStateType.Physics then
+			humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+		end
+	end)
+
+	maid:GiveTask(function()
+		maid._keepAsPhysics = nil
+		humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+	end)
+	return maid
 end
 
 
