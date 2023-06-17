@@ -86,7 +86,7 @@ function Remoting:Connect(memberName, callback)
 
 		-- TODO: Cleanup if nothing else is expecting this
 	elseif RunService:IsClient() then
-		connectMaid:GiveTask(self:_observeRemoteEventBrio():Subscribe(function(brio)
+		connectMaid:GiveTask(self:_observeRemoteEventBrio(memberName):Subscribe(function(brio)
 			if brio:IsDead() then
 				return
 			end
@@ -151,6 +151,32 @@ function Remoting:Bind(memberName, callback)
 	end)
 
 	return bindMaid
+end
+
+--[=[
+	Forward declares an event on the remoting object
+
+	@param memberName string
+]=]
+function Remoting:DeclareEvent(memberName)
+	assert(type(memberName) == "string", "Bad memberName")
+
+	if RunService:IsServer() then
+		self:_getOrCreateRemoteEvent(memberName)
+	end
+end
+
+--[=[
+	Forward declares an event on the remoting object
+
+	@param memberName string
+]=]
+function Remoting:DeclareMethod(memberName)
+	assert(type(memberName) == "string", "Bad memberName")
+
+	if RunService:IsServer() then
+		self:_getOrCreateRemoteFunction(memberName)
+	end
 end
 
 function Remoting:_translateCallback(maid, memberName, callback)
@@ -397,9 +423,11 @@ function Remoting:_ensureFolder()
 end
 
 function Remoting:_observeRemoteFunctionBrio(memberName)
+	assert(type(memberName) == "string", "Bad memberName")
+
 	local remoteFunctionName = self:_getMemberName(memberName, REMOTE_FUNCTION_SUFFIX)
 
-	return self:_observeFolderBrio(self._instance):Pipe({
+	return self:_observeFolderBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(item)
 			return RxInstanceUtils.observeLastNamedChildBrio(item, "RemoteFunction", remoteFunctionName)
 		end)
@@ -407,9 +435,11 @@ function Remoting:_observeRemoteFunctionBrio(memberName)
 end
 
 function Remoting:_observeRemoteEventBrio(memberName)
+	assert(type(memberName) == "string", "Bad memberName")
+
 	local remoteFunctionName = self:_getMemberName(memberName, REMOTE_EVENT_SUFFIX)
 
-	return self:_observeFolderBrio(self._instance):Pipe({
+	return self:_observeFolderBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(item)
 			return RxInstanceUtils.observeLastNamedChildBrio(item, "RemoteEvent", remoteFunctionName)
 		end)
@@ -438,7 +468,9 @@ end
 
 
 function Remoting:_observeFolderBrio()
-	return RxInstanceUtils.observeLastNamedChildBrio(self._instance, self._remoteFolderName)
+	assert(self._instance, "Not initialized")
+
+	return RxInstanceUtils.observeLastNamedChildBrio(self._instance, "Folder", self._remoteFolderName)
 end
 
 function Remoting:_getOrCreateRemoteFunction(memberName)

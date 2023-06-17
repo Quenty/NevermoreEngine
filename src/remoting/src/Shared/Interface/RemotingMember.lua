@@ -60,6 +60,20 @@ function RemotingMember:Connect(callback)
 end
 
 --[=[
+	Forward declares an event on the remoting object
+]=]
+function RemotingMember:DeclareEvent()
+	return self._remoting:DeclareEvent(self._memberName)
+end
+
+--[=[
+	Forward declares a method on the remoting object
+]=]
+function RemotingMember:DeclareMethod()
+	return self._remoting:DeclareMethod(self._memberName)
+end
+
+--[=[
 	Fires the remote event on the server
 
 	@client
