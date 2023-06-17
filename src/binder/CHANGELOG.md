@@ -1,20 +1,18 @@
-# v8.18.0 (Sat Jun 17 2023)
-
-#### 🚀 Enhancement
-
-- Update binders, add remoting contract, and more [#367](https://github.com/Quenty/NevermoreEngine/pull/367) ([@Quenty](https://github.com/Quenty))
-- feat: Binders can be initialized by the ServiceBag directly instead of requireing a BinderProvider ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.17.0...@quenty/binder@8.18.0) (2023-06-17)
+
+
+### Features
+
+* Binders can be initialized by the ServiceBag directly instead of requireing a BinderProvider ([28ce17f](https://github.com/Quenty/NevermoreEngine/commit/28ce17fe254b7fdce115132244ca1a6e8693d24b))
+
+
+
+
 
 # [8.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.16.0...@quenty/binder@8.17.0) (2023-06-05)
 

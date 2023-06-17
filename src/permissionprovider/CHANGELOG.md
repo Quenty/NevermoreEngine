@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.13.0...@quenty/permissionprovider@8.14.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+
+
+
+
 # [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.12.0...@quenty/permissionprovider@8.13.0) (2023-05-26)
 
 **Note:** Version bump only for package @quenty/permissionprovider

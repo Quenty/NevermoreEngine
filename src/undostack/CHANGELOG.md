@@ -1,24 +1,18 @@
-# v1.15.0 (Sat Jun 17 2023)
-
-#### 🚀 Enhancement
-
-- Update binders, add remoting contract, and more [#367](https://github.com/Quenty/NevermoreEngine/pull/367) ([@Quenty](https://github.com/Quenty))
-- feat: UndoStackEntry has a maid and can be removed from the stack ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix documentation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.14.0...@quenty/undostack@1.15.0) (2023-06-17)
+
+
+### Features
+
+* UndoStackEntry has a maid and can be removed from the stack ([d40668e](https://github.com/Quenty/NevermoreEngine/commit/d40668e07dbd00fc9b816eb7070a1d90219f8e95))
+
+
+
+
 
 # [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.13.0...@quenty/undostack@1.14.0) (2023-05-26)
 

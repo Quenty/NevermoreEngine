@@ -1,20 +1,18 @@
-# v6.7.0 (Sat Jun 17 2023)
-
-#### 🚀 Enhancement
-
-- Update binders, add remoting contract, and more [#367](https://github.com/Quenty/NevermoreEngine/pull/367) ([@Quenty](https://github.com/Quenty))
-- feat: Add RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remotefunctionutils@6.6.0...@quenty/remotefunctionutils@6.7.0) (2023-06-17)
+
+
+### Features
+
+* Add RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...) ([5f513e5](https://github.com/Quenty/NevermoreEngine/commit/5f513e58a73f82fa9958bd9cddbeaaedb8663b05))
+
+
+
+
 
 # [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remotefunctionutils@6.5.0...@quenty/remotefunctionutils@6.6.0) (2023-05-26)
 

@@ -1,20 +1,18 @@
-# v2.16.0 (Sat Jun 17 2023)
-
-#### 🚀 Enhancement
-
-- Update binders, add remoting contract, and more [#367](https://github.com/Quenty/NevermoreEngine/pull/367) ([@Quenty](https://github.com/Quenty))
-- feat: Add CollectionServiceUtils.findInstanceOrFirstAncestor(tagName, child) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.15.0...@quenty/collectionserviceutils@2.16.0) (2023-06-17)
+
+
+### Features
+
+* Add CollectionServiceUtils.findInstanceOrFirstAncestor(tagName, child) ([3147b1a](https://github.com/Quenty/NevermoreEngine/commit/3147b1a3d3258e6802015f7f0b4f734f31df0e33))
+
+
+
+
 
 # [2.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@2.14.0...@quenty/collectionserviceutils@2.15.0) (2023-05-26)
 

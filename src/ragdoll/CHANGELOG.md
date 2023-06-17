@@ -1,23 +1,18 @@
-# v9.26.0 (Sat Jun 17 2023)
-
-#### 🚀 Enhancement
-
-- Update binders, add remoting contract, and more [#367](https://github.com/Quenty/NevermoreEngine/pull/367) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix humanoid state changing away from physics ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.25.0...@quenty/ragdoll@9.26.0) (2023-06-17)
+
+
+### Bug Fixes
+
+* Fix humanoid state changing away from physics ([a4545e8](https://github.com/Quenty/NevermoreEngine/commit/a4545e870071c95221365230486c3de344f7a7d0))
+
+
+
+
 
 # [9.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.24.0...@quenty/ragdoll@9.25.0) (2023-06-05)
 
