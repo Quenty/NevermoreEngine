@@ -1,5 +1,18 @@
 # (Sat Jun 17 2023)
 
+#### 💥 Breaking Change
+
+- `@quenty/highlight@3.0.0`
+  - feat!: Breaking change on highlights to make it OOP [#371](https://github.com/Quenty/NevermoreEngine/pull/371) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Jun 17 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/binder@8.18.0`, `@quenty/collectionserviceutils@2.16.0`, `@quenty/playerhumanoidbinder@8.18.0`, `@quenty/promise@6.6.0`, `@quenty/ragdoll@9.26.0`, `@quenty/remotefunctionutils@6.7.0`, `@quenty/remoting@6.6.0`, `@quenty/undostack@1.15.0`, `@quenty/nevermore-cli@1.8.0`

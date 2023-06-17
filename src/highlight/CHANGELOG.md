@@ -1,3 +1,16 @@
+# v3.0.0 (Sat Jun 17 2023)
+
+#### 💥 Breaking Change
+
+- feat!: Breaking change on highlights to make it OOP [#371](https://github.com/Quenty/NevermoreEngine/pull/371) ([@Quenty](https://github.com/Quenty))
+- feat!: Breaking change on highlights to make it OOP ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
