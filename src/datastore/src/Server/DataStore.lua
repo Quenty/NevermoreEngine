@@ -11,7 +11,7 @@
 	local playerMoneyValue = Instance.new("IntValue")
 	playerMoneyValue.Value = 0
 
-	local dataStore = DataStore.new(DataStoreService:GetDataStore("test"), test-store")
+	local dataStore = DataStore.new(DataStoreService:GetDataStore("test"), "test-store")
 	dataStore:Load("money", 0):Then(function(money)
 		playerMoneyValue.Value = money
 		dataStore:StoreOnValueChange("money", playerMoneyValue)
