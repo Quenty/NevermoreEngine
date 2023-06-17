@@ -13,7 +13,7 @@ return function(_target)
 
 	local animatedHighlightGroup = AnimatedHighlightGroup.new()
 	animatedHighlightGroup:SetDefaultFillColor(Color3.new(0.5, 1, 0.5))
-	animatedHighlightGroup:SetDefaultSpeed(20)
+	animatedHighlightGroup:SetDefaultSpeed(5)
 	animatedHighlightGroup:SetDefaultHighlightDepthMode(Enum.HighlightDepthMode.Occluded)
 	maid:GiveTask(animatedHighlightGroup)
 
@@ -25,13 +25,14 @@ return function(_target)
 		local adorneeMaid = brio:ToMaid()
 		local adornee = brio:GetValue()
 
-		animatedHighlightGroup:Highlight(adornee)
+		local highlight = animatedHighlightGroup:Highlight(adornee)
 
-		adorneeMaid:GiveTask(function()
-			if animatedHighlightGroup.Destroy then
-				animatedHighlightGroup:Erase(adornee)
-			end
-		end)
+		local color = BrickColor.random().Color
+
+		highlight:SetFillColor(color)
+		highlight:SetOutlineColor(color)
+
+		adorneeMaid:GiveTask(highlight)
 	end))
 
 	return function()
