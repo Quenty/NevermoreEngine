@@ -303,8 +303,8 @@ end
 
 	@client
 	@param memberName string
-	@param ...
-	@eturn Promise
+	@param ... any
+	@return Promise
 ]=]
 function Remoting:PromiseFireServer(memberName, ...)
 	assert(type(memberName) == "string", "Bad memberName")

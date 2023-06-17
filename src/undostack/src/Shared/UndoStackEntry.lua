@@ -44,7 +44,7 @@ end
 --[=[
 	Sets the handler that will undo the result
 
-	@param promiseRedo function | nil
+	@param promiseUndo function | nil
 ]=]
 function UndoStackEntry:SetPromiseUndo(promiseUndo)
 	assert(type(promiseUndo) == "function" or promiseUndo == nil, "Bad promiseUndo")
