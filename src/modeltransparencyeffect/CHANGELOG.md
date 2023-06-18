@@ -1,23 +1,18 @@
-# v7.6.0 (Sun Jun 18 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/camera [#373](https://github.com/Quenty/NevermoreEngine/pull/373) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: TransparencyService works in stories ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@7.5.0...@quenty/modeltransparencyeffect@7.6.0) (2023-06-18)
+
+
+### Bug Fixes
+
+* TransparencyService works in stories ([ff28404](https://github.com/Quenty/NevermoreEngine/commit/ff28404961e6378d8ec7110a4b4575e835604879))
+
+
+
+
 
 # [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@7.4.1...@quenty/modeltransparencyeffect@7.5.0) (2023-06-05)
 

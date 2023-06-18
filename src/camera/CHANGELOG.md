@@ -1,24 +1,18 @@
-# v9.16.0 (Sun Jun 18 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/camera [#373](https://github.com/Quenty/NevermoreEngine/pull/373) ([@Quenty](https://github.com/Quenty))
-- feat: Better interopability between Roblox and camera stack system ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Update camera docs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.15.0...@quenty/camera@9.16.0) (2023-06-18)
+
+
+### Features
+
+* Better interopability between Roblox and camera stack system ([1916352](https://github.com/Quenty/NevermoreEngine/commit/1916352394a777ec6ab01e869cc7d0cfe92bae76))
+
+
+
+
 
 # [9.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.14.0...@quenty/camera@9.15.0) (2023-06-17)
 
