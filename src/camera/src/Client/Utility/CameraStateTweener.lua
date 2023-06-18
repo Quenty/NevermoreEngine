@@ -8,13 +8,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
 local ServiceBag = require("ServiceBag")
 local BaseObject = require("BaseObject")
-local Maid = require("Maid")
 
 local CameraStateTweener = setmetatable({}, BaseObject)
 CameraStateTweener.ClassName = "CameraStateTweener"

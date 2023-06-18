@@ -68,7 +68,7 @@ DefaultCamera.OverrideCameraState = DefaultCamera.SetRobloxCameraState
 --[=[
 	Sets the CFrame of the Roblox Camera
 
-	@param cframe
+	@param cframe CFrame
 ]=]
 function DefaultCamera:SetRobloxCFrame(cframe)
 	self._cameraState.CFrame = cframe

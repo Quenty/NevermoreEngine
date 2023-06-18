@@ -25,6 +25,7 @@ OverrideDefaultCameraToo.ClassName = "OverrideDefaultCameraToo"
 
 	@param baseCamera Camera
 	@param defaultCamera DefaultCamera
+	@param predicate Filter on whether to override or not
 ]=]
 function OverrideDefaultCameraToo.new(baseCamera, defaultCamera, predicate)
 	local self = setmetatable({}, OverrideDefaultCameraToo)

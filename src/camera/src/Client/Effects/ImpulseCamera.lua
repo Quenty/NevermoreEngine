@@ -55,7 +55,7 @@ end
 	The current state.
 	@readonly
 	@prop CameraState CameraState
-	@within DefaultCamera
+	@within ImpulseCamera
 ]=]
 function ImpulseCamera:__index(index)
 	if index == "CameraState" then
