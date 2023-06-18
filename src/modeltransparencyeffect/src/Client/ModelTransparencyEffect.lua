@@ -85,14 +85,18 @@ function ModelTransparencyEffect:FinishTransparencyAnimation(callback)
 	if self._transparency.rtime == 0 then
 		callback()
 	else
-		task.delay(self._transparency.rtime, function()
+		self._maid:GiveTask(task.delay(self._transparency.rtime, function()
 			callback()
-		end)
+		end))
 	end
 end
 
 
 function ModelTransparencyEffect:_update()
+	if self._transparencyService:IsDead() then
+		return
+	end
+
 	local transparency = self._transparency.p
 
 	for part, _ in pairs(self:_getParts()) do
@@ -135,6 +139,10 @@ function ModelTransparencyEffect:_setupParts()
 	end))
 
 	self._maid:GiveTask(self._obj.DescendantRemoving:Connect(function(child)
+		if self._transparencyService:IsDead() then
+			return
+		end
+
 		if self._parts[child] then
 			self._parts[child] = nil
 			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, child, nil)
@@ -142,6 +150,10 @@ function ModelTransparencyEffect:_setupParts()
 	end))
 
 	self._maid:GiveTask(function()
+		if self._transparencyService:IsDead() then
+			return
+		end
+
 		for part, _ in pairs(self._parts) do
 			self._transparencyService[self._transparencyServiceMethodName](self._transparencyService, self, part, nil)
 		end
