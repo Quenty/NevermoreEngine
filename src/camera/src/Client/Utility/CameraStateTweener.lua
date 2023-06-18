@@ -10,10 +10,10 @@ local require = require(script.Parent.loader).load(script)
 
 local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
-local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local BaseObject = require("BaseObject")
 
-local CameraStateTweener = {}
+local CameraStateTweener = setmetatable({}, BaseObject)
 CameraStateTweener.ClassName = "CameraStateTweener"
 CameraStateTweener.__index = CameraStateTweener
 
@@ -26,12 +26,10 @@ CameraStateTweener.__index = CameraStateTweener
 	@return CameraStateTweener
 ]=]
 function CameraStateTweener.new(serviceBag, cameraEffect, speed)
-	local self = setmetatable({}, CameraStateTweener)
+	local self = setmetatable(BaseObject.new(), CameraStateTweener)
 
 	assert(ServiceBag.isServiceBag(serviceBag), "No serviceBag")
 	assert(cameraEffect, "No cameraEffect")
-
-	self._maid = Maid.new()
 
 	self._cameraStackService = serviceBag:GetService(CameraStackService)
 	local cameraBelow, assign = self._cameraStackService:GetNewStateBelow()
@@ -84,6 +82,14 @@ end
 ]=]
 function CameraStateTweener:IsFinishedHiding()
 	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 0
+end
+
+--[=[
+	Returns true if we're done showing
+	@return boolean
+]=]
+function CameraStateTweener:IsFinishedShowing()
+	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 1
 end
 
 --[=[
@@ -170,14 +176,6 @@ end
 ]=]
 function CameraStateTweener:GetFader()
 	return self._fadeBetween
-end
-
---[=[
-	Cleans up the fader, preventing any animation at all
-]=]
-function CameraStateTweener:Destroy()
-	self._maid:DoCleaning()
-	setmetatable(self, nil)
 end
 
 return CameraStateTweener
