@@ -54,6 +54,10 @@ function CameraState:__index(index)
 		return self.CameraFrame.CFrame
 	elseif index == "Position" then
 		return self.CameraFrame.Position
+	elseif index == "CameraFrame" then
+		return rawget(self, "CameraFrame")
+	elseif index == "CameraFrameDerivative" then
+		return rawget(self, "CameraFrameDerivative")
 	elseif index == "Velocity" then
 		return self.CameraFrameDerivative.Position
 	elseif index == "FieldOfView" then

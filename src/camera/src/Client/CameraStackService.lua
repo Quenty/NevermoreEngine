@@ -48,9 +48,13 @@ function CameraStackService:Init(serviceBag)
 		debug.profilebegin("camerastackservice")
 
 		local state = self:GetTopState()
+
+		self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
+
 		if state then
 			state:Set(Workspace.CurrentCamera)
 		end
+
 
 		debug.profileend()
 	end)
@@ -72,7 +76,7 @@ function CameraStackService:Start()
 			Workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
 		end)
 	else
-		self._rawDefaultCamera:BindToRenderStep()
+		self._maid:GiveTask(self._rawDefaultCamera:BindToRenderStep())
 	end
 end
 
