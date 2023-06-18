@@ -1,3 +1,16 @@
+# (Sun Jun 18 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/camera@9.16.0`, `@quenty/modeltransparencyeffect@7.6.0`, `@quenty/transparencyservice@7.5.0`
+  - users/quenty/camera [#373](https://github.com/Quenty/NevermoreEngine/pull/373) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Jun 17 2023)
 
 #### 💥 Breaking Change

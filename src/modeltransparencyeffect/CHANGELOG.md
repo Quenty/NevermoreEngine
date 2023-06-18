@@ -1,3 +1,19 @@
+# v7.6.0 (Sun Jun 18 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/camera [#373](https://github.com/Quenty/NevermoreEngine/pull/373) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: TransparencyService works in stories ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
