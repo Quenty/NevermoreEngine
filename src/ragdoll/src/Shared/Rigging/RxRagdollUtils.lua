@@ -141,15 +141,21 @@ function RxRagdollUtils.enforceHumanoidState(humanoid)
 	-- changes to your humanoid's state.
 
 	maid._keepAsPhysics = humanoid.StateChanged:Connect(function(_old, new)
-		if new ~= Enum.HumanoidStateType.Physics then
+		if new ~= Enum.HumanoidStateType.Physics
+			and new ~= Enum.HumanoidStateType.Dead then
+
 			humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 		end
 	end)
 
 	maid:GiveTask(function()
 		maid._keepAsPhysics = nil
-		humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+		if humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
+			humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+		end
 	end)
+
 	return maid
 end
 
