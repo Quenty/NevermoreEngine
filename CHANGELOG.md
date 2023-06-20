@@ -1,3 +1,16 @@
+# (Tue Jun 20 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/ragdoll@9.27.1`
+  - fix: Fix death respawn noise spam [#374](https://github.com/Quenty/NevermoreEngine/pull/374) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jun 18 2023)
 
 #### 🚀 Enhancement

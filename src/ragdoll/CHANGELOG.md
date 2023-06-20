@@ -1,3 +1,16 @@
+# v9.27.1 (Tue Jun 20 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Fix death respawn noise spam [#374](https://github.com/Quenty/NevermoreEngine/pull/374) ([@Quenty](https://github.com/Quenty))
+- fix: Fix infinite death loop ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
