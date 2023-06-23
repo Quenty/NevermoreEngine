@@ -1,3 +1,16 @@
+# v8.18.1 (Fri Jun 23 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Fix binder args failing in no-arg non-service-provided interface [#375](https://github.com/Quenty/NevermoreEngine/pull/375) ([@Quenty](https://github.com/Quenty))
+- fix: Fix binder args failing in no-arg non-service-provided interface ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
