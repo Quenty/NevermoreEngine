@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.21.0...@quenty/rogue-properties@4.21.1) (2023-06-23)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
 # [4.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.20.0...@quenty/rogue-properties@4.21.0) (2023-06-17)
 
 **Note:** Version bump only for package @quenty/rogue-properties
