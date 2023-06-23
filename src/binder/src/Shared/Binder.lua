@@ -133,6 +133,9 @@ function Binder:Init(...)
 		elseif not self:_argsMatch(...) then
 			warn("[Binder.Init] - Non-matching args from :Init() and .new()")
 		end
+	elseif not self._args then
+		-- Binder.new() would have captured args if we had them
+		self._args = {}
 	end
 
 	self._maid._warning = task.delay(5, function()
