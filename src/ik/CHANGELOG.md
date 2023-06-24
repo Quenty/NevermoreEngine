@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.28.2...@quenty/ik@9.29.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [9.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.28.1...@quenty/ik@9.28.2) (2023-06-23)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+## [9.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.28.0...@quenty/ik@9.28.1) (2023-06-20)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.27.0...@quenty/ik@9.28.0) (2023-06-18)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.26.0...@quenty/ik@9.27.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.25.0...@quenty/ik@9.26.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [9.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.24.0...@quenty/ik@9.25.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix dependencies ([67791a2](https://github.com/Quenty/NevermoreEngine/commit/67791a289c0956bf4947ac81bf792ee56496b3e8))
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [9.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.23.0...@quenty/ik@9.24.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
 # [9.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.22.0...@quenty/ik@9.23.0) (2023-04-20)
 
 **Note:** Version bump only for package @quenty/ik

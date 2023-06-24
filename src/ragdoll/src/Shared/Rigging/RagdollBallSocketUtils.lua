@@ -26,7 +26,7 @@ local HEAD_LIMITS = {
 	UpperAngle = 45,
 	TwistLowerAngle = -40,
 	TwistUpperAngle = 40,
-	FrictionTorque = 400,
+	FrictionTorque = 15, -- 400
 	ReferenceMass = 1.0249234437943,
 }
 

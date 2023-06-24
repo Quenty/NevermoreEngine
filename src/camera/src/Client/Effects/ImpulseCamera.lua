@@ -16,7 +16,7 @@ ImpulseCamera.ClassName = "ImpulseCamera"
 
 function ImpulseCamera.new()
 	local self = setmetatable({
-		_spring = Spring.new(Vector3.new(0, 0, 0))
+		_spring = Spring.new(Vector3.zero)
 	}, ImpulseCamera)
 
 	self._spring.Damper = 0.5
@@ -55,7 +55,7 @@ end
 	The current state.
 	@readonly
 	@prop CameraState CameraState
-	@within DefaultCamera
+	@within ImpulseCamera
 ]=]
 function ImpulseCamera:__index(index)
 	if index == "CameraState" then

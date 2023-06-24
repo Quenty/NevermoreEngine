@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.5.0...@quenty/promise@6.6.0) (2023-06-17)
+
+
+### Features
+
+* Performance gain from PromiseUtils.combine() ([b7cdd9f](https://github.com/Quenty/NevermoreEngine/commit/b7cdd9f67bf5d6933b0335524bad353ba254ccf6))
+
+
+
+
+
 # [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.4.1...@quenty/promise@6.5.0) (2023-04-10)
 
 

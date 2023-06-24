@@ -75,10 +75,11 @@ end
 	Creates a new Blend State which is actually just a ValueObject underneath.
 
 	@param defaultValue T
+	@param checkType string | nil
 	@return ValueObject<T>
 ]=]
-function Blend.State(defaultValue)
-	return ValueObject.new(defaultValue)
+function Blend.State(defaultValue, checkType)
+	return ValueObject.new(defaultValue, checkType)
 end
 
 --[=[
@@ -1024,6 +1025,8 @@ end
 	@return Maid
 ]=]
 function Blend.mount(instance, props)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
 	local maid = Maid.new()
 
 	local parent = nil

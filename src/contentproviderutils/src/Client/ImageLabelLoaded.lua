@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local ContentProviderUtils = require("ContentProviderUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local Rx = require("Rx")
+local ValueObject = require("ValueObject")
 
 local ImageLabelLoaded = setmetatable({}, BaseObject)
 ImageLabelLoaded.ClassName = "ImageLabelLoaded"
@@ -19,14 +20,12 @@ ImageLabelLoaded.__index = ImageLabelLoaded
 function ImageLabelLoaded.new()
 	local self = setmetatable(BaseObject.new(), ImageLabelLoaded)
 
-	self._isLoaded = Instance.new("BoolValue")
-	self._isLoaded.Value = false
+	self._isLoaded = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isLoaded)
 
 	self._defaultTimeout = 1
 
-	self._preloadImage = Instance.new("BoolValue")
-	self._preloadImage.Value = true
+	self._preloadImage = ValueObject.new(true, "boolean")
 	self._maid:GiveTask(self._preloadImage)
 
 	self.ImageChanged = Signal.new()
@@ -113,11 +112,11 @@ function ImageLabelLoaded:SetImageLabel(imageLabel)
 		end))
 
 		-- Setup preloading as necessary
-		maid:GiveTask(RxInstanceUtils.observeProperty(self._preloadImage, "Value"):Pipe({
+		maid:GiveTask(self._preloadImage:Observe():Pipe({
 			Rx.switchMap(function(preload)
 				if preload then
 					return Rx.combineLatest({
-						isLoaded = RxInstanceUtils.observeProperty(self._isLoaded, "Value");
+						isLoaded = self._isLoaded;
 						image = RxInstanceUtils.observeProperty(self._imageLabel, "Image");
 					})
 				else

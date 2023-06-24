@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.3.0...@quenty/signal@2.4.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.2.0...@quenty/signal@2.3.0) (2022-08-22)
 
 

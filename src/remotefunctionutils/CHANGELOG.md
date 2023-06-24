@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remotefunctionutils@6.6.0...@quenty/remotefunctionutils@6.7.0) (2023-06-17)
+
+
+### Features
+
+* Add RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...) ([5f513e5](https://github.com/Quenty/NevermoreEngine/commit/5f513e58a73f82fa9958bd9cddbeaaedb8663b05))
+
+
+
+
+
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remotefunctionutils@6.5.0...@quenty/remotefunctionutils@6.6.0) (2023-05-26)
+
+
+### Features
+
+* Add RemoteFunctionUtils.fromPromiseYieldResult(ok, ...) ([f598d90](https://github.com/Quenty/NevermoreEngine/commit/f598d90da143a8e41ed3af7928fcb1baf2030454))
+
+
+
+
+
 # [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remotefunctionutils@6.4.1...@quenty/remotefunctionutils@6.5.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/remotefunctionutils

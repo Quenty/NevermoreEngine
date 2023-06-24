@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.19.0...@quenty/blend@6.20.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.18.0...@quenty/blend@6.19.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
+# [6.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.17.0...@quenty/blend@6.18.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [6.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.16.0...@quenty/blend@6.17.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/blend
+
+
+
+
+
 # [6.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.15.1...@quenty/blend@6.16.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/blend

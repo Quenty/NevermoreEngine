@@ -60,7 +60,11 @@ function HideHead:_observeHeadAndFaceAccessoryPartsBrio()
 	return self:_observeAccessoriesBrio():Pipe({
 		RxBrioUtils.flatMapBrio(function(accessory)
 			return RxInstanceUtils.observePropertyBrio(accessory, "AccessoryType", function(accessoryType)
-				return accessoryType == Enum.AccessoryType.Hat or accessoryType == Enum.AccessoryType.Face
+				return accessoryType == Enum.AccessoryType.Hat
+					or accessoryType == Enum.AccessoryType.Face
+					or accessoryType == Enum.AccessoryType.Hair
+					or accessoryType == Enum.AccessoryType.Eyebrow
+					or accessoryType == Enum.AccessoryType.Eyelash
 			end):Pipe({
 				RxBrioUtils.onlyLastBrioSurvives();
 				RxBrioUtils.switchMapBrio(function()

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.22.0...@quenty/clienttranslator@8.23.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.21.0...@quenty/clienttranslator@8.22.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.20.0...@quenty/clienttranslator@8.21.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix localization warnings ([3e98cd7](https://github.com/Quenty/NevermoreEngine/commit/3e98cd7135a0d174b4a6f1059b6a2f9fc03b9d6f))
+
+
+
+
+
+# [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.19.0...@quenty/clienttranslator@8.20.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
 # [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.18.1...@quenty/clienttranslator@8.19.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/clienttranslator

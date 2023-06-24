@@ -70,7 +70,7 @@ function PillBackingBuilder:Create(gui, options)
 	-- Prevent negative sizes (for circles)
 	local sizeConstraint = Instance.new("UISizeConstraint")
 	sizeConstraint.MaxSize = Vector2.new(math.huge, math.huge)
-	sizeConstraint.MinSize = Vector2.new(0, 0)
+	sizeConstraint.MinSize = Vector2.zero
 	sizeConstraint.Parent = pillBacking
 
 	local left = self:_createLeft(options)
@@ -102,7 +102,7 @@ function PillBackingBuilder:CreateVertical(gui, options)
 	-- Prevent negative sizes (for circles)
 	local sizeConstraint = Instance.new("UISizeConstraint")
 	sizeConstraint.MaxSize = Vector2.new(math.huge, math.huge)
-	sizeConstraint.MinSize = Vector2.new(0, 0)
+	sizeConstraint.MinSize = Vector2.zero
 	sizeConstraint.Parent = pillBacking
 
 	local top = self:_createTop(options)
@@ -165,7 +165,7 @@ function PillBackingBuilder:CreateShadow(gui, options)
 	-- Prevent negative sizes (for circles)
 	local sizeConstraint = Instance.new("UISizeConstraint")
 	sizeConstraint.MaxSize = Vector2.new(math.huge, math.huge)
-	sizeConstraint.MinSize = Vector2.new(0, 0)
+	sizeConstraint.MinSize = Vector2.zero
 	sizeConstraint.Parent = shadow
 
 	local left = self:_createLeftShadow(options)

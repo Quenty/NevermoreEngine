@@ -34,64 +34,7 @@ function TextServiceUtils.getSizeForLabel(textLabel, text, maxWidth)
 	return TextService:GetTextSize(text, textLabel.TextSize, textLabel.Font, Vector2.new(maxWidth, 1e6))
 end
 
-local queue = {}
-local queueRunning = false
 
-local function startQueueProcess()
-	if queueRunning then
-		return
-	end
-
-	queueRunning = true
-
-	task.spawn(function()
-		while #queue > 0 do
-			local data = table.remove(queue)
-			local startTime = os.clock()
-
-			local result = TextServiceUtils._promiseTextBounds(data.params)
-			local promiseTimeoutOrDone = Promise.new()
-
-			result:Then(function(v2)
-				task.spawn(function()
-					data.promise:Resolve(v2)
-				end)
-
-				promiseTimeoutOrDone:Resolve()
-			end)
-
-			local pendingTask = task.delay(5, function()
-				if data.promise:IsPending() then
-					warn("[TextServiceUtils] - Timed out promise while processing queue")
-					promiseTimeoutOrDone:Reject()
-				end
-			end)
-
-			local ok = promiseTimeoutOrDone:Yield()
-
-			-- Cancel our delayed task
-			pcall(function()
-				task.cancel(pendingTask)
-			end)
-
-			if not ok then
-				warn("[TextServiceUtils] - Requeuing entry")
-				table.insert(queue, data)
-
-				local timeElapsed = os.clock() - startTime
-				local remainingTime = 0.05 - timeElapsed
-
-				-- Yield incase we requeue very quickly
-				if remainingTime > 0 then
-					task.wait(remainingTime)
-				end
-			end
-
-		end
-
-		queueRunning = false
-	end)
-end
 
 --[=[
 	Promises the text bounds for the given parameters
@@ -100,23 +43,6 @@ end
 	@return Promise<Vector2>
 ]=]
 function TextServiceUtils.promiseTextBounds(params)
-	assert(typeof(params) == "Instance" and params:IsA("GetTextBoundsParams"), "Bad params")
-
-	-- https://devforum.roblox.com/t/calling-textservicegettextboundsasync-multiple-times-leads-to-requests-never-completing-thread-leaks/2083178
-	-- This is a hack to work around a Roblox bug.
-
-	local promise = Promise.new()
-	table.insert(queue, {
-		params = params;
-		promise = promise;
-	})
-
-	startQueueProcess();
-
-	return promise
-end
-
-function TextServiceUtils._promiseTextBounds(params)
 	assert(typeof(params) == "Instance" and params:IsA("GetTextBoundsParams"), "Bad params")
 
 	return Promise.spawn(function(resolve, reject)
@@ -198,7 +124,7 @@ function TextServiceUtils.observeSizeForLabelProps(props)
 				return Rx.of(Vector2.new(size.x, state.LineHeight*size.y))
 			else
 				warn("[TextServiceUtils.observeSizeForLabelProps] - Got neither FontFace or Font")
-				return Rx.of(Vector2.new(0, 0))
+				return Rx.of(Vector2.zero)
 			end
 		end)
 	})

@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.20.0...@quenty/tie@4.21.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [4.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.19.0...@quenty/tie@4.20.0) (2023-06-05)
+
+
+### Features
+
+* Tie interfaces can export checked ValueObjects as Attributes ([6360546](https://github.com/Quenty/NevermoreEngine/commit/63605466f3f27342982556ac1866caafd0202c94))
+
+
+
+
+
+# [4.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.18.0...@quenty/tie@4.19.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [4.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.17.0...@quenty/tie@4.18.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
 # [4.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@4.16.0...@quenty/tie@4.17.0) (2023-04-20)
 
 **Note:** Version bump only for package @quenty/tie

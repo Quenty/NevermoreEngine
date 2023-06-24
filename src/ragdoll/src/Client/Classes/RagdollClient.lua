@@ -1,6 +1,14 @@
 --[=[
-	Client side ragdolling meant to be used with a binder. See [RagdollBindersClient].
+	Client side ragdolling meant to be used with a binder. This class exports a [Binder].
 	While a humanoid is bound with this class, it is ragdolled.
+
+	:::tip
+	Initialize this whole system through [RagdollServiceClient].
+	:::
+
+	```
+	serviceBag:GetService(require("RagdollClient"))
+	```
 
 	@client
 	@class RagdollClient
@@ -14,18 +22,22 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
+local Binder = require("Binder")
 local CameraStackService = require("CameraStackService")
 local CharacterUtils = require("CharacterUtils")
 local HapticFeedbackUtils = require("HapticFeedbackUtils")
-local RagdollServiceClient = require("RagdollServiceClient")
 local RagdollMotorUtils = require("RagdollMotorUtils")
+local RagdollServiceClient = require("RagdollServiceClient")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
+local RxR15Utils = require("RxR15Utils")
 
 local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
 RagdollClient.__index = RagdollClient
 
 --[=[
-	Constructs a new RagdollClient. Should be done via [Binder]. See [RagdollBindersClient].
+	Constructs a new RagdollClient. This module exports a [Binder].
 	@param humanoid Humanoid
 	@param serviceBag ServiceBag
 	@return RagdollClient
@@ -51,28 +63,58 @@ function RagdollClient.new(humanoid, serviceBag)
 	return self
 end
 
--- TODO: Move out of this open source module
 function RagdollClient:_setupCameraShake(impulseCamera)
-	local head = self._obj.Parent:FindFirstChild("Head")
-	if not head then
-		return
-	end
+	-- TODO: Move out of this open source module
 
-	local lastVelocity = head.Velocity
-	self._maid:GiveTask(RunService.Heartbeat:Connect(function()
-		debug.profilebegin("ragdollcamerashake")
-		local cameraCFrame = Workspace.CurrentCamera.CFrame
+	-- Use the upper torso instead of the head because the upper torso shakes a lot less so
+	-- we get a stronger response to full character movement.
 
-		local velocity = head.Velocity
-		local dVelocity = velocity - lastVelocity
-		if dVelocity.magnitude >= 0 then
-			if self._ragdollServiceClient:GetScreenShakeEnabled() then
-				impulseCamera:Impulse(cameraCFrame:vectorToObjectSpace(-0.1*cameraCFrame.lookVector:Cross(dVelocity)))
-			end
+	self._maid:GiveTask(RxInstanceUtils.observePropertyBrio(self._obj, "Parent", function(character)
+		return character ~= nil
+	end):Pipe({
+		RxBrioUtils.switchMapBrio(function(character)
+			return RxBrioUtils.flatCombineLatestBrio({
+				upperTorso = RxR15Utils.observeCharacterPartBrio(character, "UpperTorso");
+				head = RxR15Utils.observeCharacterPartBrio(character, "Head")
+			}, function(state)
+				return state.upperTorso and state.head
+			end)
+		end);
+	}):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
 		end
 
-		lastVelocity = velocity
-		debug.profileend()
+		local maid = brio:ToMaid()
+		local state = brio:GetValue()
+
+		local function getEstimatedVelocityFromUpperTorso()
+			-- TODO: Consider neck attachments
+			local headOffset = state.upperTorso.Size*Vector3.new(0, 0.5, 0)
+				+ state.head.Size*Vector3.new(0, 0.5, 0)
+			local headPosition = state.upperTorso.CFrame:PointToWorldSpace(headOffset)
+
+			return state.upperTorso:GetVelocityAtPosition(headPosition)
+		end
+
+		local lastVelocity = getEstimatedVelocityFromUpperTorso()
+		maid:GiveTask(RunService.Heartbeat:Connect(function()
+
+			debug.profilebegin("ragdollcamerashake")
+
+			local cameraCFrame = Workspace.CurrentCamera.CFrame
+
+			local velocity = getEstimatedVelocityFromUpperTorso()
+			local dVelocity = velocity - lastVelocity
+			if dVelocity.magnitude >= 0 then
+				if self._ragdollServiceClient:GetScreenShakeEnabled() then
+					impulseCamera:Impulse(cameraCFrame:vectorToObjectSpace(-0.1*cameraCFrame.lookVector:Cross(dVelocity)))
+				end
+			end
+
+			lastVelocity = velocity
+			debug.profileend()
+		end))
 	end))
 end
 
@@ -102,4 +144,4 @@ function RagdollClient:_setupHapticFeedback()
 	end)
 end
 
-return RagdollClient
+return Binder.new("Ragdoll", RagdollClient)

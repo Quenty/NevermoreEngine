@@ -58,7 +58,7 @@ function AdorneeUtils.getBoundingBox(adornee)
 	if adornee:IsA("Model") then
 		return adornee:GetBoundingBox()
 	elseif adornee:IsA("Attachment") then
-		return adornee.WorldCFrame, Vector3.new(0, 0, 0) -- This is a point
+		return adornee.WorldCFrame, Vector3.zero -- This is a point
 	else
 		return AdorneeUtils.getPartCFrame(adornee), AdorneeUtils.getAlignedSize(adornee)
 	end

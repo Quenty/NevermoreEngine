@@ -20,6 +20,7 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
+local ValueObject = require("ValueObject")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 local USE_OLD_IK_SYSTEM = (not LimbIKUtils) or false
@@ -45,8 +46,7 @@ function ArmIKBase.new(humanoid, armName)
 		error(("[ArmIKBase] - Bad armName %q"):format(tostring(armName)))
 	end
 
-	self._gripping = Instance.new("BoolValue")
-	self._gripping.Value = false
+	self._gripping = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._gripping)
 
 	self._maid:GiveTask(self:_observeCharacterBrio():Subscribe(function(brio)
@@ -57,7 +57,7 @@ function ArmIKBase.new(humanoid, armName)
 		local maid = brio:ToMaid()
 		local character = brio:GetValue()
 
-		maid:GiveTask(RxInstanceUtils.observeProperty(self._gripping, "Value"):Subscribe(function(isGripping)
+		maid:GiveTask(self._gripping:Observe():Subscribe(function(isGripping)
 			if isGripping then
 				maid._gripping = self:_startUpdateLoop(character)
 			else
@@ -347,7 +347,7 @@ if USE_OLD_IK_SYSTEM then
 			local shoulderXAngle = self._shoulderXAngle
 			local elbowXAngle = self._elbowXAngle
 
-			local yrot = CFrame.new(Vector3.new(), self._offset)
+			local yrot = CFrame.new(Vector3.zero, self._offset)
 
 			self._shoulderTransform = (yrot * CFA_90X * CFrame.Angles(shoulderXAngle, 0, 0)) --:inverse()
 			self._elbowTransform = CFrame.Angles(elbowXAngle, 0, 0)

@@ -6,9 +6,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
+local GoodSignal = require("GoodSignal")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ValueBaseUtils = require("ValueBaseUtils")
+local RxValueBaseUtils = require("RxValueBaseUtils")
+
+local EMPTY_FUNCTION = function() end
 
 local ValueObject = {}
 ValueObject.ClassName = "ValueObject"
@@ -16,24 +20,39 @@ ValueObject.ClassName = "ValueObject"
 --[=[
 	Constructs a new value object
 	@param baseValue T
+	@param checkType string | nil
 	@return ValueObject
 ]=]
-function ValueObject.new(baseValue)
-	local self = {}
+function ValueObject.new(baseValue, checkType)
+	local self = {
+		_value = baseValue;
+		_checkType = checkType;
+		_maid = Maid.new();
+	}
 
-	rawset(self, "_value", baseValue)
-
-	self._maid = Maid.new()
+	if checkType and typeof(baseValue) ~= checkType then
+		error(string.format("Expected value of type %q, got %q instead", checkType, typeof(baseValue)))
+	end
 
 --[=[
 	Event fires when the value's object value change
 	@prop Changed Signal<T> -- fires with oldValue, newValue, ...
 	@within ValueObject
 ]=]
-	self.Changed = Signal.new() -- :Fire(newValue, oldValue, maid, ...)
+	self.Changed = GoodSignal.new() -- :Fire(newValue, oldValue, maid, ...)
 	self._maid:GiveTask(self.Changed)
 
 	return setmetatable(self, ValueObject)
+end
+
+
+--[=[
+	Returns the current check type, if any
+
+	@return string | nil
+]=]
+function ValueObject:GetCheckType()
+	return rawget(self, "_checkType")
 end
 
 --[=[
@@ -44,9 +63,7 @@ end
 function ValueObject.fromObservable(observable)
 	local result = ValueObject.new()
 
-	result._maid:GiveTask(observable:Subscribe(function(value, ...)
-		result:SetValue(value, ...)
-	end))
+	result:Mount(observable)
 
 	return result
 end
@@ -58,6 +75,63 @@ end
 ]=]
 function ValueObject.isValueObject(value)
 	return type(value) == "table" and getmetatable(value) == ValueObject
+end
+
+function ValueObject:_toMountableObservable(value)
+	if Observable.isObservable(value) then
+		return value
+	elseif typeof(value) == "Instance" then
+		-- IntValue, ObjectValue, et cetera
+		if ValueBaseUtils.isValueBase(value) then
+			return RxValueBaseUtils.observeValue(value)
+		end
+	elseif type(value) == "table" then
+		if ValueObject.isValueObject(value) then
+			return value:Observe()
+		-- elseif Promise.isPromise(value) then
+		-- 	return Rx.fromPromise(value)
+		end
+	end
+
+	return nil
+end
+--[=[
+	Mounts the value to the observable. Overrides the last mount.
+
+	@param value Observable | T
+	@return MaidTask
+]=]
+function ValueObject:Mount(value)
+	local observable = self:_toMountableObservable(value)
+	if observable then
+		self._maid._mount = nil
+
+		local maid = Maid.new()
+
+		maid:GiveTask(observable:Subscribe(function(...)
+			self:SetValue(...)
+		end))
+
+		maid:GiveTask(function()
+			if self._maid._mount == maid then
+				self._maid._mount = nil
+			end
+		end)
+
+		self._maid._mount = maid
+
+		return function()
+			if self._maid._mount == maid then
+				self._maid._mount = nil
+			end
+		end
+	else
+		self._maid._mount = nil
+
+		self:SetValue(value)
+
+		return EMPTY_FUNCTION
+	end
 end
 
 --[=[
@@ -107,6 +181,12 @@ end
 ]=]
 function ValueObject:SetValue(value, ...)
 	local previous = rawget(self, "_value")
+	local checkType = rawget(self, "_checkType")
+
+	if checkType and typeof(value) ~= checkType then
+		error(string.format("Expected value of type %q, got %q instead", checkType, typeof(value)))
+	end
+
 	if previous ~= value then
 		if select("#", ...) > 0 then
 			rawset(self, "_lastEventContext", table.pack(...))

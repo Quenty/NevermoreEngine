@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.15.0...@quenty/playerutils@2.16.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+# [2.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.14.0...@quenty/playerutils@2.15.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+# [2.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.13.0...@quenty/playerutils@2.14.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/playerutils
+
+
+
+
+
+# [2.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.12.0...@quenty/playerutils@2.13.0) (2023-04-24)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([3fbd817](https://github.com/Quenty/NevermoreEngine/commit/3fbd817b1fee45bda1b963b61a6ed22b0db12b82))
+
+
+
+
+
 # [2.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@2.11.1...@quenty/playerutils@2.12.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/playerutils

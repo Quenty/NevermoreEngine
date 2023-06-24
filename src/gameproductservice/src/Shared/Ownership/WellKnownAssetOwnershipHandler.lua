@@ -6,7 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local PlayerAssetOwnershipUtils = require("PlayerAssetOwnershipUtils")
-local RxInstanceUtils = require("RxInstanceUtils")
+local ValueObject = require("ValueObject")
 
 local WellKnownAssetOwnershipHandler = setmetatable({}, BaseObject)
 WellKnownAssetOwnershipHandler.ClassName = "WellKnownAssetOwnershipHandler"
@@ -17,8 +17,7 @@ function WellKnownAssetOwnershipHandler.new(adornee, gameConfigAsset)
 
 	self._gameConfigAsset = assert(gameConfigAsset, "No gameConfigAsset")
 
-	self._isOwned = Instance.new("BoolValue")
-	self._isOwned.Value = false
+	self._isOwned = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isOwned)
 
 	self._maid:GiveTask(self:_observeAttributeNamesBrio():Subscribe(function(brio)
@@ -48,6 +47,8 @@ function WellKnownAssetOwnershipHandler.new(adornee, gameConfigAsset)
 end
 
 function WellKnownAssetOwnershipHandler:SetIsOwned(isOwned)
+	assert(type(isOwned) == "boolean", "Bad isOwned")
+
 	self._isOwned.Value = isOwned
 end
 
@@ -56,7 +57,7 @@ function WellKnownAssetOwnershipHandler:GetIsOwned()
 end
 
 function WellKnownAssetOwnershipHandler:ObserveIsOwned()
-	return RxInstanceUtils.observeProperty(self._isOwned, "Value")
+	return self._isOwned:Observe()
 end
 
 function WellKnownAssetOwnershipHandler:_observeAttributeNamesBrio()

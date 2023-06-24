@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.16.0...@quenty/camera@9.17.0) (2023-06-24)
+
+
+### Bug Fixes
+
+* Assert speed set on CameraStateTweener is a number ([0cef9b5](https://github.com/Quenty/NevermoreEngine/commit/0cef9b552f3d3c795e9a6f854de1009af8b7f1fb))
+
+
+
+
+
+# [9.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.15.0...@quenty/camera@9.16.0) (2023-06-18)
+
+
+### Features
+
+* Better interopability between Roblox and camera stack system ([1916352](https://github.com/Quenty/NevermoreEngine/commit/1916352394a777ec6ab01e869cc7d0cfe92bae76))
+
+
+
+
+
+# [9.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.14.0...@quenty/camera@9.15.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+# [9.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.13.0...@quenty/camera@9.14.0) (2023-06-05)
+
+
+### Bug Fixes
+
+* Better Camea warnings on NaN values ([9c76820](https://github.com/Quenty/NevermoreEngine/commit/9c7682087d946c235a46ea1377c20a2e1b5994f2))
+
+
+
+
+
+# [9.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.12.0...@quenty/camera@9.13.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [9.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.11.0...@quenty/camera@9.12.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
 # [9.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.10.1...@quenty/camera@9.11.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/camera

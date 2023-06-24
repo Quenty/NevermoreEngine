@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.21.0...@quenty/colorpicker@4.22.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [4.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.20.0...@quenty/colorpicker@4.21.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [4.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.19.0...@quenty/colorpicker@4.20.0) (2023-05-26)
+
+
+### Features
+
+* Convert ColorPicker to ValueObject instead of Roblox instnaces for viewmodel ([8f59d5e](https://github.com/Quenty/NevermoreEngine/commit/8f59d5e032acf47db5df4fb07ce4b8e0acfc8354))
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+* Upgrade to ValueObject and measure values ([83235f7](https://github.com/Quenty/NevermoreEngine/commit/83235f77b7b4f515eac40b16ef1fd230a0c877e7))
+
+
+
+
+
+# [4.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.18.0...@quenty/colorpicker@4.19.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
 # [4.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@4.17.1...@quenty/colorpicker@4.18.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/colorpicker

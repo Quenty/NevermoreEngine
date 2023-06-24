@@ -152,7 +152,7 @@ end
 -- print(os.clock() - startTime)
 
 -- local action = adornee.Action
--- action:SetAttribute("DisplayName", Vector3.new(0, 0, 0))
+-- action:SetAttribute("DisplayName", Vector3.zero)
 
 -- action.Parent = nil
 -- task.wait(0.1)

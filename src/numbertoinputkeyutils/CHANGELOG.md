@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbertoinputkeyutils@2.1.0...@quenty/numbertoinputkeyutils@2.2.0) (2023-05-08)
+
+
+### Features
+
+* Add NumberToInputKeyUtils.getAllNumberKeyCodes() and NumberToInputKeyUtils.getNumberFromKeyCode(keyCode) ([67e5a5d](https://github.com/Quenty/NevermoreEngine/commit/67e5a5d74b8085e5ca2455eb8ee038d55ce62be0))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbertoinputkeyutils@2.0.1...@quenty/numbertoinputkeyutils@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/numbertoinputkeyutils

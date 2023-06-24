@@ -28,6 +28,24 @@ function CollectionServiceUtils.findFirstAncestor(tagName, child)
 end
 
 --[=[
+	Finds the child with the tag name, or the first ancestor with the given tagName.
+
+	@param tagName string
+	@param child Instance
+	@return Instance?
+]=]
+function CollectionServiceUtils.findInstanceOrFirstAncestor(tagName, child)
+	assert(type(tagName) == "string", "Bad tagName")
+	assert(typeof(child) == "Instance", "Bad child")
+
+	if CollectionService:HasTag(child, tagName) then
+		return child
+	end
+
+	return CollectionServiceUtils.findFirstAncestor(tagName, child)
+end
+
+--[=[
 	Removes all tags from an instance.
 	@param instance Instance
 ]=]

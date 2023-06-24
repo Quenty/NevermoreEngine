@@ -31,8 +31,10 @@ local CollectionService = game:GetService("CollectionService")
 
 local Maid = require("Maid")
 local MaidTaskUtils = require("MaidTaskUtils")
-local Signal = require("Signal")
+local Observable = require("Observable")
 local promiseBoundClass = require("promiseBoundClass")
+local Signal = require("Signal")
+local Brio = require("Brio")
 
 local Binder = {}
 Binder.__index = Binder
@@ -65,22 +67,17 @@ Binder.ClassName = "Binder"
 	@return Binder<T>
 ]=]
 function Binder.new(tagName, constructor, ...)
+	assert(type(tagName) == "string", "Bad tagName")
+
 	local self = setmetatable({}, Binder)
 
-	self._maid = Maid.new()
-	self._tagName = tagName or error("Bad argument 'tagName', expected string")
-	self._constructor = constructor or error("Bad argument 'constructor', expected table or function")
+	self._tagName = assert(tagName, "Bad argument 'tagName', expected string")
+	self._constructor = assert(constructor, "Bad argument 'constructor', expected table or function")
+	self.ServiceName = self._tagName .. "Binder"
 
-	self._instToClass = {} -- [inst] = class
-	self._allClassSet = {} -- [class] = true
-	self._pendingInstSet = {} -- [inst] = true
-
-	self._listeners = {} -- [inst] = callback
-	self._args = {...}
-
-	self._maid._warning = task.delay(5, function()
-		warn(("Binder %q is not loaded. Call :Start() on it!"):format(self._tagName))
-	end)
+	if select("#", ...) > 0 then
+		self._args = { ... }
+	end
 
 	return self
 end
@@ -112,14 +109,67 @@ function Binder.isBinder(value)
 end
 
 --[=[
+	Initializes the Binder. Designed to be done via ServiceBag.
+
+	@param ... any
+]=]
+function Binder:Init(...)
+	if self._initialized then
+		return
+	end
+
+	self._initialized = true
+	self._maid = Maid.new()
+
+	self._instToClass = {} -- [inst] = class
+	self._allClassSet = {} -- [class] = true
+	self._pendingInstSet = {} -- [inst] = true
+
+	self._listeners = {} -- [inst] = callback
+
+	if select("#", ...) > 0 then
+		if not self._args then
+			self._args = {...}
+		elseif not self:_argsMatch(...) then
+			warn("[Binder.Init] - Non-matching args from :Init() and .new()")
+		end
+	elseif not self._args then
+		-- Binder.new() would have captured args if we had them
+		self._args = {}
+	end
+
+	self._maid._warning = task.delay(5, function()
+		warn(("Binder %q is not loaded. Call :Start() on it!"):format(self._tagName))
+	end)
+end
+
+function Binder:_argsMatch(...)
+	if #self._args ~= select("#", ...) then
+		return false
+	end
+
+	for index, value in pairs({...}) do
+		if self._args[index] ~= value then
+			return false
+		end
+	end
+
+	return true
+end
+
+--[=[
 	Listens for new instances and connects to the GetInstanceAddedSignal() and removed signal!
 ]=]
 function Binder:Start()
-	if self._loaded then
+	if not self._initialized then
+		self:Init()
+	end
+
+	if self._started then
 		return
 	end
 	self._maid._warning = nil
-	self._loaded = true
+	self._started = true
 
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
 		task.spawn(self._add, self, inst)
@@ -152,7 +202,63 @@ function Binder:GetConstructor()
 end
 
 --[=[
+	Observes the current value of the instance
+
+	@param instance Instance
+	@return Observable<T | nil>
+]=]
+function Binder:Observe(instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GiveTask(self:ObserveInstance(instance, function(...)
+			sub:Fire(...)
+		end))
+		sub:Fire(self:Get(instance))
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes a bound class on a given instance.
+
+	@param instance Instance
+	@return Observable<Brio<T>>
+]=]
+function Binder:ObserveBrio(instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local function handleClassChanged(class)
+			if class then
+				local brio = Brio.new(class)
+				maid._lastBrio = brio
+
+				sub:Fire(brio)
+			else
+				maid._lastBrio = nil
+			end
+		end
+
+		maid:GiveTask(self:ObserveInstance(instance, handleClassChanged))
+		handleClassChanged(self:Get(instance))
+
+		return maid
+	end)
+end
+
+--[=[
 	Fired when added, and then after removal, but before destroy!
+
+	```info
+	This is before [Rx] so it doesn't follow the same Rx pattern. See [Binder.Observe] for
+	an [Rx] compatible interface.
+	```
 
 	@param inst Instance
 	@param callback function
@@ -306,6 +412,28 @@ function Binder:Bind(inst)
 
 	CollectionService:AddTag(inst, self._tagName)
 	return self:Get(inst)
+end
+
+--[=[
+	Tags the instance with the tag for the binder
+
+	@param inst Instance
+]=]
+function Binder:Tag(inst)
+	assert(typeof(inst) == "Instance", "Bad inst")
+
+	CollectionService:AddTag(inst, self._tagName)
+end
+
+--[=[
+	Untags the instance with the tag for the binder
+
+	@param inst Instance
+]=]
+function Binder:Untag(inst)
+	assert(typeof(inst) == "Instance", "Bad inst")
+
+	CollectionService:RemoveTag(inst, self._tagName)
 end
 
 --[=[

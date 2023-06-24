@@ -18,35 +18,28 @@ RadialImage.__index = RadialImage
 function RadialImage.new()
 	local self = setmetatable(BaseObject.new(), RadialImage)
 
-	self._image = Instance.new("StringValue")
-	self._image.Value = ""
+	self._image = ValueObject.new("", "string")
 	self._maid:GiveTask(self._image)
 
-	self._percent = Instance.new("NumberValue")
-	self._percent.Value = 1
+	self._percent = ValueObject.new(1, "number")
 	self._maid:GiveTask(self._percent)
 
-	self._transparency = Instance.new("NumberValue")
-	self._transparency.Value = 0
+	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
-	self._enabledTransparency = Instance.new("NumberValue")
-	self._enabledTransparency.Value = 0
+	self._enabledTransparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._enabledTransparency)
 
-	self._disabledTransparency = Instance.new("NumberValue")
-	self._disabledTransparency.Value = 1
+	self._disabledTransparency = ValueObject.new(1, "number")
 	self._maid:GiveTask(self._disabledTransparency)
 
-	self._enabledColor = Instance.new("Color3Value")
-	self._enabledColor.Value = Color3.new(1, 1, 1)
+	self._enabledColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._enabledColor)
 
-	self._disabledColor = Instance.new("Color3Value")
-	self._disabledColor.Value = Color3.new(1, 1, 1)
+	self._disabledColor = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._disabledColor)
 
-	self._absoluteSize = ValueObject.new(Vector2.new(0, 0))
+	self._absoluteSize = ValueObject.new(Vector2.zero, "Vector2")
 	self._maid:GiveTask(self._absoluteSize)
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)

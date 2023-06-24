@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.13.0...@quenty/brio@8.14.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.12.0...@quenty/brio@8.13.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/brio
+
+
+
+
+
+# [8.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.11.0...@quenty/brio@8.12.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* With RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue), if the observable dies from the firing of the brio, then we would error previously ([04a9890](https://github.com/Quenty/NevermoreEngine/commit/04a989040b1b7a44041baa21acf9df3b968ebfbb))
+
+
+
+
+
 # [8.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.10.1...@quenty/brio@8.11.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/brio

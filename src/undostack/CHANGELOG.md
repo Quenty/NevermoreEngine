@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.14.0...@quenty/undostack@1.15.0) (2023-06-17)
+
+
+### Features
+
+* UndoStackEntry has a maid and can be removed from the stack ([d40668e](https://github.com/Quenty/NevermoreEngine/commit/d40668e07dbd00fc9b816eb7070a1d90219f8e95))
+
+
+
+
+
+# [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.13.0...@quenty/undostack@1.14.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.12.0...@quenty/undostack@1.13.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/undostack
+
+
+
+
+
 # [1.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@1.11.1...@quenty/undostack@1.12.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/undostack

@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.27.2...@quenty/idleservice@7.28.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.27.1...@quenty/idleservice@7.27.2) (2023-06-23)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+## [7.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.27.0...@quenty/idleservice@7.27.1) (2023-06-20)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.26.0...@quenty/idleservice@7.27.0) (2023-06-18)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.25.0...@quenty/idleservice@7.26.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.24.0...@quenty/idleservice@7.25.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.23.0...@quenty/idleservice@7.24.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.22.0...@quenty/idleservice@7.23.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
+
 # [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@7.21.0...@quenty/idleservice@7.22.0) (2023-04-20)
 
 **Note:** Version bump only for package @quenty/idleservice

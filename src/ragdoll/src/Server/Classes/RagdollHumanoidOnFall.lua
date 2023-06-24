@@ -11,7 +11,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local BindableRagdollHumanoidOnFall = require("BindableRagdollHumanoidOnFall")
 local CharacterUtils = require("CharacterUtils")
-local RagdollBindersServer = require("RagdollBindersServer")
+local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
+local Ragdoll = require("Ragdoll")
 local RagdollHumanoidOnFallConstants = require("RagdollHumanoidOnFallConstants")
 
 local RagdollHumanoidOnFall = setmetatable({}, BaseObject)
@@ -19,7 +20,7 @@ RagdollHumanoidOnFall.ClassName = "RagdollHumanoidOnFall"
 RagdollHumanoidOnFall.__index = RagdollHumanoidOnFall
 
 --[=[
-	Constructs a new RagdollHumanoidOnFall. Should be done via [Binder]. See [RagdollBindersServer].
+	Constructs a new RagdollHumanoidOnFall. Should be done via [Binder]. See [Ragdoll].
 	@param humanoid Humanoid
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnFall
@@ -27,7 +28,8 @@ RagdollHumanoidOnFall.__index = RagdollHumanoidOnFall
 function RagdollHumanoidOnFall.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFall)
 
-	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
+	self._serviceBag = assert(serviceBag, "Bad serviceBag")
+	self._ragdollBinder = self._serviceBag:GetService(Ragdoll)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player then
@@ -43,15 +45,29 @@ function RagdollHumanoidOnFall.new(humanoid, serviceBag)
 			self:_handleServerEvent(...)
 		end))
 	else
-		self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder)
-		self._maid:GiveTask(self._ragdollLogic)
 
-		self._maid:GiveTask(self._ragdollLogic.ShouldRagdoll.Changed:Connect(function()
+		self._maid:GiveTask(self:_getOrCreateRagdollLogic().ShouldRagdoll.Changed:Connect(function()
 			self:_update()
 		end))
 	end
 
 	return self
+end
+
+function RagdollHumanoidOnFall:ObserveIsFalling()
+	-- TODO: Remove logic if nothing is observing it
+	return self:_getOrCreateRagdollLogic():ObserveIsFalling()
+end
+
+function RagdollHumanoidOnFall:_getOrCreateRagdollLogic()
+	if self._ragdollLogic then
+		return self._ragdollLogic
+	end
+
+	self._ragdollLogic = BindableRagdollHumanoidOnFall.new(self._obj, self._ragdollBinder)
+	self._maid:GiveTask(self._ragdollLogic)
+
+	return self._ragdollLogic
 end
 
 function RagdollHumanoidOnFall:_handleServerEvent(player, value)
@@ -75,4 +91,4 @@ function RagdollHumanoidOnFall:_update()
 	end
 end
 
-return RagdollHumanoidOnFall
+return PlayerHumanoidBinder.new("RagdollHumanoidOnFall", RagdollHumanoidOnFall)

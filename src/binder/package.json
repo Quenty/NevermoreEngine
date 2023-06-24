@@ -1,6 +1,6 @@
 {
   "name": "@quenty/binder",
-  "version": "8.14.0",
+  "version": "8.19.0",
   "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
+    "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },

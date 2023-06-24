@@ -37,10 +37,12 @@ end
 	Prompts the user to send an in-game invite and resolves once the prompt is closed.
 
 	@param player Player
+	@param options ExperienceInviteOptions?
 	@return Promise
 ]=]
-function SocialServiceUtils.promisePromptGameInvite(player)
+function SocialServiceUtils.promisePromptGameInvite(player: Player, options: ExperienceInviteOptions?)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(not options or (typeof(options) == "Instance" and options:IsA("ExperienceInviteOptions")), "Bad options")
 
 	local maid = Maid.new()
 
@@ -52,7 +54,7 @@ function SocialServiceUtils.promisePromptGameInvite(player)
 		end))
 
 		local ok, err = pcall(function()
-			SocialService:PromptGameInvite(player)
+			SocialService:PromptGameInvite(player, options)
 		end)
 		if not ok then
 			return reject(err)

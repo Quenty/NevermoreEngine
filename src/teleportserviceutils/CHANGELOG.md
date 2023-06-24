@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@3.8.0...@quenty/teleportserviceutils@3.9.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+
+
+
+
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@3.7.0...@quenty/teleportserviceutils@3.8.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+
+
+
+
+# [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@3.6.0...@quenty/teleportserviceutils@3.7.0) (2023-05-26)
+
+
+### Features
+
+* Add RxTeleportUtils.observeTeleportBrio(player) ([1a09a41](https://github.com/Quenty/NevermoreEngine/commit/1a09a41e220c510384ec6583ffd294874ff3c8f5))
+
+
+
+
+
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@3.5.1...@quenty/teleportserviceutils@3.6.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/teleportserviceutils

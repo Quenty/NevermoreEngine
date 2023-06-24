@@ -43,10 +43,10 @@ function ConverterPane.new()
 	self._draggingState = ValueObject.new(false);
 	self._maid:GiveTask(self._draggingState)
 
-	self._absoluteSize = ValueObject.new(Vector2.new());
+	self._absoluteSize = ValueObject.new(Vector2.zero, "Vector2");
 	self._maid:GiveTask(self._absoluteSize)
 
-	self._absolutePosition = ValueObject.new(Vector2.new());
+	self._absolutePosition = ValueObject.new(Vector2.zero, "Vector2");
 	self._maid:GiveTask(self._absolutePosition)
 
 	self._code = ValueObject.new("");

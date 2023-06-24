@@ -54,7 +54,7 @@ end
 ]=]
 function GamepadRotateModel:GetThumbstickDeltaAngle()
 	if not self._lastInputObject then
-		return Vector2.new()
+		return Vector2.zero
 	end
 
 	return Vector2.new(self._rampVelocityX.p, self._rampVelocityY.p)

@@ -1,0 +1,30 @@
+{
+  "name": "@quenty/richtext",
+  "version": "1.2.0",
+  "description": "Holds rich text utility methods",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "richtext"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/richtext/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

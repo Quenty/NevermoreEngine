@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.21.1...@quenty/rogue-properties@4.22.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+## [4.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.21.0...@quenty/rogue-properties@4.21.1) (2023-06-23)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [4.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.20.0...@quenty/rogue-properties@4.21.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [4.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.19.0...@quenty/rogue-properties@4.20.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [4.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.18.0...@quenty/rogue-properties@4.19.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
+# [4.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.17.0...@quenty/rogue-properties@4.18.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
+
 # [4.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.16.1...@quenty/rogue-properties@4.17.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/rogue-properties

@@ -10,6 +10,8 @@ local Maid = require("Maid")
 local ValueObject = require("ValueObject")
 local InputModeServiceClient = require("InputModeServiceClient")
 local ServiceBag = require("ServiceBag")
+local Rx = require("Rx")
+local InputModeType = require("InputModeType")
 
 local InputModeTypeSelector = {}
 InputModeTypeSelector.ClassName = "InputModeTypeSelector"
@@ -103,6 +105,35 @@ function InputModeTypeSelector:ObserveActiveInputType()
 end
 
 --[=[
+	Returns true if the input mode is the most recently activated one
+
+	@param inputModeType InputModeType
+	@return boolean
+]=]
+function InputModeTypeSelector:IsActive(inputModeType)
+	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
+
+	return rawget(self, "_activeModeType").Value == inputModeType
+end
+
+--[=[
+	Observes if the input mode is the most recently activated one
+
+	@param inputModeType InputModeType
+	@return Observable<boolean>
+]=]
+function InputModeTypeSelector:ObserveIsActive(inputModeType)
+	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
+
+	return self:ObserveActiveInputType():Pipe({
+		Rx.map(function(inputType)
+			return inputType == inputModeType
+		end);
+		Rx.distinct();
+	})
+end
+
+--[=[
 	The current active input mode
 	@prop Value InputModeType?
 	@within InputModeTypeSelector
@@ -174,6 +205,8 @@ end
 	@param inputModeType InputModeType
 ]=]
 function InputModeTypeSelector:RemoveInputModeType(inputModeType)
+	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
+
 	if not self._maid[inputModeType] then
 		return
 	end
@@ -197,6 +230,8 @@ end
 	@param inputModeType InputModeType
 ]=]
 function InputModeTypeSelector:AddInputModeType(inputModeType)
+	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
+
 	if self._maid[inputModeType] then
 		return
 	end

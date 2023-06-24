@@ -135,11 +135,20 @@ function PlayerAssetMarketTracker:HandlePurchaseEvent(id, isPurchased)
 	assert(type(id) == "number", "Bad id")
 	assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
+	self:_handlePurchaseEvent(id, isPurchased, false)
+end
+
+function PlayerAssetMarketTracker:_handlePurchaseEvent(id, isPurchased, isFromReceipt)
+	assert(type(id) == "number", "Bad id")
+	assert(type(isPurchased) == "boolean", "Bad isPurchased")
+
 	local promise = self._pendingPromises[id]
 
 	-- Zero out promise resolution in receipt processing scenario (safety)
-	if self._receiptProcessingExpected and isPurchased then
-		promise = nil
+	if self._receiptProcessingExpected then
+		if isPurchased and not isFromReceipt then
+			promise = nil
+		end
 	end
 
 	if promise then
@@ -173,15 +182,13 @@ function PlayerAssetMarketTracker:HandleProcessReceipt(_player, receiptInfo)
 	local pendingForAssetId = self._pendingPromises[productId]
 
 	if pendingForAssetId then
-		self._purchasedThisSession[productId] = true
-		self._pendingPromises[productId] = nil
-
-		pendingForAssetId:Resolve(true)
+		self:_handlePurchaseEvent(productId, true, true)
 
 		return Enum.ProductPurchaseDecision.PurchaseGranted
 	end
 
-	return Enum.ProductPurchaseDecision.NotProcessedYet
+	-- Always grant...
+	return Enum.ProductPurchaseDecision.PurchaseGranted
 end
 
 return PlayerAssetMarketTracker

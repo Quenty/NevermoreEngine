@@ -13,7 +13,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local getRotationInXZPlane = require("getRotationInXZPlane")
 
-local ZERO_VECTOR = Vector3.new(0, 0, 0)
+local ZERO_VECTOR = Vector3.zero
 local RIGHT = Vector3.new(1, 0, 0)
 local DIRECTION_INPUT_MAPS = {
 	[Enum.KeyCode.Left] = -RIGHT;

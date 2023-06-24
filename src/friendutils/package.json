@@ -1,6 +1,6 @@
 {
   "name": "@quenty/friendutils",
-  "version": "6.6.0",
+  "version": "6.10.0",
   "description": "Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.",
   "keywords": [
     "Roblox",
@@ -25,8 +25,11 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/brio": "file:../brio",
     "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
+    "@quenty/rx": "file:../rx"
   },
   "publishConfig": {
     "access": "public"

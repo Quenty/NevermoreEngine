@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@6.5.0...@quenty/remoting@6.6.0) (2023-06-17)
+
+
+### Features
+
+* Add forward declaration ([40bb41e](https://github.com/Quenty/NevermoreEngine/commit/40bb41ebabe889faefda9aac11f03834bb1d4286))
+* Add Remoting class which accelerators remoting logic in Roblox ([50e3581](https://github.com/Quenty/NevermoreEngine/commit/50e358185e52fcc280d850d7f397264f8b31bff9))
+
+
+
+
+
 # [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@6.4.1...@quenty/remoting@6.5.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/remoting

@@ -23,7 +23,22 @@ PermissionServiceClient.ServiceName = "PermissionServiceClient"
 	@param _serviceBag ServiceBag
 ]=]
 function PermissionServiceClient:Init(_serviceBag)
-	self._provider = PermissionProviderClient.new(PermissionProviderConstants.DEFAULT_REMOTE_FUNCTION_NAME)
+	self._providerPromise = Promise.resolved(PermissionProviderClient.new(PermissionProviderConstants.DEFAULT_REMOTE_FUNCTION_NAME))
+end
+
+--[=[
+	Returns whether the player is an admin.
+
+	@param player Player | nil
+	@return Promise<boolean>
+]=]
+function PermissionServiceClient:PromiseIsAdmin(player)
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+
+	return self:PromisePermissionProvider()
+		:Then(function(permissionProvider)
+			return permissionProvider:PromiseIsAdmin(player)
+		end)
 end
 
 --[=[
@@ -31,7 +46,7 @@ end
 	@return Promise<PermissionProviderClient>
 ]=]
 function PermissionServiceClient:PromisePermissionProvider()
-	return Promise.resolved(self._provider)
+	return self._providerPromise
 end
 
 return PermissionServiceClient

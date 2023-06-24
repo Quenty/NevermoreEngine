@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.17.0...@quenty/firstpersoncharactertransparency@8.18.0) (2023-06-18)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [8.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.16.0...@quenty/firstpersoncharactertransparency@8.17.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [8.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.15.0...@quenty/firstpersoncharactertransparency@8.16.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [8.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.14.0...@quenty/firstpersoncharactertransparency@8.15.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/firstpersoncharactertransparency
+
+
+
+
+
+# [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.13.0...@quenty/firstpersoncharactertransparency@8.14.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* Hide additional accessories which should not be rendered while in first-person ([27cfe4f](https://github.com/Quenty/NevermoreEngine/commit/27cfe4f38ad0221fc65b6f86f716faaf5aa22982))
+
+
+
+
+
 # [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/firstpersoncharactertransparency@8.12.1...@quenty/firstpersoncharactertransparency@8.13.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/firstpersoncharactertransparency

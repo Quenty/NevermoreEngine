@@ -3,6 +3,61 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.29.0...@quenty/scoredactionservice@9.30.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [9.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.28.0...@quenty/scoredactionservice@9.29.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [9.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.27.0...@quenty/scoredactionservice@9.28.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [9.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.26.0...@quenty/scoredactionservice@9.27.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Add better error messages for ScoredActionService ([19e53f0](https://github.com/Quenty/NevermoreEngine/commit/19e53f0eb8364b1c9c65ebbd7166e8eee7c70284))
+
+
+
+
+
+# [9.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.25.0...@quenty/scoredactionservice@9.26.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* ScoredActionService works in Hoarcekat stories ([f721c04](https://github.com/Quenty/NevermoreEngine/commit/f721c04b40c6822a3d9ab0adc913c7429d5e6c78))
+* ScoredActionService would error when getting above warn size ([f4e84f2](https://github.com/Quenty/NevermoreEngine/commit/f4e84f26980c999318c18542018983385c85a2a9))
+
+
+
+
+
+# [9.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.24.0...@quenty/scoredactionservice@9.25.0) (2023-04-24)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
 # [9.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@9.23.0...@quenty/scoredactionservice@9.24.0) (2023-04-20)
 
 **Note:** Version bump only for package @quenty/scoredactionservice

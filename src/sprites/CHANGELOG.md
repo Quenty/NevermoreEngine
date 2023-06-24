@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@8.1.0...@quenty/sprites@8.2.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@8.0.1...@quenty/sprites@8.1.0) (2023-04-24)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
 ## [8.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@8.0.0...@quenty/sprites@8.0.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/sprites

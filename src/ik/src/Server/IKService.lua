@@ -117,7 +117,7 @@ end
 	local IKService = require("IKService")
 
 	-- Make the NPC look at a target
-	serviceBag:GetService(IKService):UpdateServerRigTarget(workspace.NPC.Humanoid, Vector3.new(0, 0, 0))
+	serviceBag:GetService(IKService):UpdateServerRigTarget(workspace.NPC.Humanoid, Vector3.zero)
 	```
 
 	@param humanoid Humanoid

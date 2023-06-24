@@ -8,6 +8,7 @@ local Maid = require("Maid")
 local Blend = require("Blend")
 local ColorPickerStoryUtils = require("ColorPickerStoryUtils")
 local ColorPalette = require("ColorPalette")
+local ValueObject = require("ValueObject")
 
 local DARK_MODE_ENABLED = false
 
@@ -61,8 +62,7 @@ return function(target)
 	end
 
 	local function sampleGui(labelText)
-		local mouseOver = Instance.new("NumberValue")
-		mouseOver.Value = 0
+		local mouseOver = ValueObject.new(0, "number")
 		maid:GiveTask(mouseOver)
 
 		local percentMouseOver = Blend.Spring(mouseOver, 60)

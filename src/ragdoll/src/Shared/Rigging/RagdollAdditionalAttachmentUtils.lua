@@ -12,7 +12,7 @@ local RxInstanceUtils = require("RxInstanceUtils")
 
 local RagdollAdditionalAttachmentUtils = {}
 
-local V3_ZERO = Vector3.new()
+local V3_ZERO = Vector3.zero
 local V3_UP = Vector3.new(0, 1, 0)
 local V3_DOWN = Vector3.new(0, -1, 0)
 local V3_RIGHT = Vector3.new(1, 0, 0)

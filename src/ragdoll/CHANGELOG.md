@@ -3,6 +3,93 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.27.2...@quenty/ragdoll@9.28.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [9.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.27.1...@quenty/ragdoll@9.27.2) (2023-06-23)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+## [9.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.27.0...@quenty/ragdoll@9.27.1) (2023-06-20)
+
+
+### Bug Fixes
+
+* Fix infinite death loop ([e4ea3e9](https://github.com/Quenty/NevermoreEngine/commit/e4ea3e9d7b6d9b6f07fd5f16f2690e89413be337))
+
+
+
+
+
+# [9.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.26.0...@quenty/ragdoll@9.27.0) (2023-06-18)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.25.0...@quenty/ragdoll@9.26.0) (2023-06-17)
+
+
+### Bug Fixes
+
+* Fix humanoid state changing away from physics ([a4545e8](https://github.com/Quenty/NevermoreEngine/commit/a4545e870071c95221365230486c3de344f7a7d0))
+
+
+
+
+
+# [9.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.24.0...@quenty/ragdoll@9.25.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
+
+# [9.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.23.0...@quenty/ragdoll@9.24.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix dependencies ([67791a2](https://github.com/Quenty/NevermoreEngine/commit/67791a289c0956bf4947ac81bf792ee56496b3e8))
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [9.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.22.0...@quenty/ragdoll@9.23.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* Ragdoll initializes CameraStackService ([814f327](https://github.com/Quenty/NevermoreEngine/commit/814f327beb53ab3665428a6357ca4293a7fdd9be))
+* Will not try to unragdoll automatically while falling ([ac3c062](https://github.com/Quenty/NevermoreEngine/commit/ac3c06200f6dd6a09ee53ed0f3a726bcc4a3105e))
+
+
+### Features
+
+* Reduce friction torqueon ragdoll head ([cfd1535](https://github.com/Quenty/NevermoreEngine/commit/cfd153587f199da77edce185c49a957aa23aee6b))
+
+
+
+
+
 # [9.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.21.0...@quenty/ragdoll@9.22.0) (2023-04-20)
 
 **Note:** Version bump only for package @quenty/ragdoll

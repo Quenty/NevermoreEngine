@@ -9,6 +9,7 @@ local UserInputService = game:GetService("UserInputService")
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local InputObjectUtils = require("InputObjectUtils")
+local ValueObject = require("ValueObject")
 
 local ColorPickerInput = setmetatable({}, BaseObject)
 ColorPickerInput.ClassName = "ColorPickerInput"
@@ -25,8 +26,7 @@ function ColorPickerInput.new()
 	self._numFingerDown.Value = 0
 	self._maid:GiveTask(self._numFingerDown)
 
-	self._currentPosition = Instance.new("Vector3Value")
-	self._currentPosition.Value = Vector3.new(0, 0, 0)
+	self._currentPosition = ValueObject.new(Vector2.zero, "Vector2")
 	self._maid:GiveTask(self._currentPosition)
 
 	self._activePositions = {}
@@ -196,15 +196,15 @@ function ColorPickerInput:_stopTouchTrack(buttonMaid, inputObject)
 end
 
 function ColorPickerInput:_toButtonSpace(button, position)
-	local pos = Vector3.new(button.AbsolutePosition.x, button.AbsolutePosition.y, 0)
-	local size = Vector3.new(button.AbsoluteSize.x, button.AbsoluteSize.y, 1)
+	local pos = button.AbsolutePosition
+	local size = button.AbsoluteSize
 
-	local result = (position - pos)/size
-	return Vector3.new(math.clamp(result.x, 0, 1), math.clamp(result.y, 0, 1), 0)
+	local result = (Vector2.new(position.x, position.y) - pos)/size
+	return Vector2.new(math.clamp(result.x, 0, 1), math.clamp(result.y, 0, 1))
 end
 
 function ColorPickerInput:_updateCurrentPosition()
-	local current = Vector3.new(0, 0, 0)
+	local current = Vector2.zero
 	local count = 0
 	for _, item in pairs(self._activePositions) do
 		current = current + item

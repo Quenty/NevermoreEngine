@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.7.0...@quenty/servicebag@6.8.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.6.1...@quenty/servicebag@6.7.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+
+
+
+
 ## [6.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.6.0...@quenty/servicebag@6.6.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/servicebag

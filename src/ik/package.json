@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ik",
-  "version": "9.23.0",
+  "version": "9.29.0",
   "description": "Inverse Kinematics for characters on Roblox",
   "keywords": [
     "Roblox",
@@ -47,7 +47,8 @@
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
-    "@quenty/table": "file:../table"
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "devDependencies": {
     "@quenty/rigbuilderutils": "file:../rigbuilderutils"

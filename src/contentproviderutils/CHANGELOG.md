@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.11.0...@quenty/contentproviderutils@6.12.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [6.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.10.0...@quenty/contentproviderutils@6.11.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.9.0...@quenty/contentproviderutils@6.10.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix dependencies ([67791a2](https://github.com/Quenty/NevermoreEngine/commit/67791a289c0956bf4947ac81bf792ee56496b3e8))
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.8.0...@quenty/contentproviderutils@6.9.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
 # [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.7.1...@quenty/contentproviderutils@6.8.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/contentproviderutils

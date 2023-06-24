@@ -1,6 +1,6 @@
 {
   "name": "@quenty/settings",
-  "version": "4.24.0",
+  "version": "4.29.0",
   "description": "Centralized player settings service",
   "keywords": [
     "Roblox",
@@ -28,6 +28,7 @@
     "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
+    "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/datastore": "file:../datastore",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/jsonutils": "file:../jsonutils",
@@ -35,6 +36,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/playerbinder": "file:../playerbinder",
+    "@quenty/playerutils": "file:../playerutils",
     "@quenty/remotefunctionutils": "file:../remotefunctionutils",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",

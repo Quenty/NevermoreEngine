@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.21.0...@quenty/inputmode@7.22.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+# [7.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.20.0...@quenty/inputmode@7.21.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+# [7.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.19.0...@quenty/inputmode@7.20.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+
+
+
+
+# [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.18.0...@quenty/inputmode@7.19.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix dependencies ([67791a2](https://github.com/Quenty/NevermoreEngine/commit/67791a289c0956bf4947ac81bf792ee56496b3e8))
+
+
+
+
+
+# [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.17.0...@quenty/inputmode@7.18.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* InputModeServiceClient now works in Hoarcekat stories ([ad31c5f](https://github.com/Quenty/NevermoreEngine/commit/ad31c5fe78ba888063a2c9f736803706309d7279))
+
+
+### Features
+
+* Add InputModeTypeSelector:ObserveIsActive(inputModeType) and InputModeTypeSelector:IsActive(inputModeType) ([83ad0ea](https://github.com/Quenty/NevermoreEngine/commit/83ad0ea6903bc1970e6020f85e76cfda2a025927))
+
+
+
+
+
+# [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.16.0...@quenty/inputmode@7.17.0) (2023-04-24)
+
+
+### Bug Fixes
+
+* FIx issue where adding sub-dependent input modes would fail ([1836e7b](https://github.com/Quenty/NevermoreEngine/commit/1836e7b0808adfbf4a3fb5b0140d8bdc0114dd56))
+
+
+
+
+
 # [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.15.1...@quenty/inputmode@7.16.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/inputmode

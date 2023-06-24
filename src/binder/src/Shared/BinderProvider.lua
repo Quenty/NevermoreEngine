@@ -117,6 +117,10 @@ function BinderProvider:Init(...)
 
 	self._initMethod(self, ...)
 
+	for _, binder in pairs(self._binders) do
+		binder:Init(...)
+	end
+
 	self._bindersAddedPromise:Resolve()
 end
 

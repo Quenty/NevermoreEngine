@@ -12,6 +12,7 @@ local Blend = require("Blend")
 local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 local ColorPickerInput = require("ColorPickerInput")
 local HSColorPickerCursor = require("HSColorPickerCursor")
+local ValueObject = require("ValueObject")
 
 local HSColorPicker = setmetatable({}, BaseObject)
 HSColorPicker.ClassName = "HSColorPicker"
@@ -21,17 +22,15 @@ function HSColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSColorPicker)
 
 	self._hsvColorValue = Instance.new("Vector3Value")
-	self._hsvColorValue.Value = Vector3.new(0, 0, 0)
+	self._hsvColorValue.Value = Vector3.zero
 	self._maid:GiveTask(self._hsvColorValue)
 
 	self.ColorChanged = self._hsvColorValue.Changed
 
-	self._sizeValue = Instance.new("Vector3Value")
-	self._sizeValue.Value = Vector3.new(4, 4, 0)
+	self._sizeValue = ValueObject.new(Vector2.new(4, 4), "Vector2")
 	self._maid:GiveTask(self._sizeValue)
 
-	self._transparency = Instance.new("NumberValue")
-	self._transparency.Value = 0
+	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
 	self._input = ColorPickerInput.new()
@@ -63,7 +62,7 @@ function HSColorPicker.new()
 	self._maid:GiveTask(self._hsvColorValue.Changed:Connect(function()
 		local current = self._hsvColorValue.Value
 		local h, s = current.x, current.y
-		self._cursor:SetPosition(Vector3.new(1 - h, 1 - s, 0))
+		self._cursor:SetPosition(Vector2.new(1 - h, 1 - s))
 	end))
 
 	-- Setup preview
@@ -149,6 +148,10 @@ function HSColorPicker:GetSizeValue()
 	return self._sizeValue
 end
 
+function HSColorPicker:GetMeasureValue()
+	return self._sizeValue
+end
+
 --[=[
 	Sets the transparency of the HSColorPicker
 
@@ -168,7 +171,7 @@ end
 function HSColorPicker:SetSize(height)
 	assert(type(height) == "number", "Bad height")
 
-	self._sizeValue.Value = Vector3.new(height, height, 0)
+	self._sizeValue.Value = Vector2.new(height, height)
 end
 
 function HSColorPicker:_render()

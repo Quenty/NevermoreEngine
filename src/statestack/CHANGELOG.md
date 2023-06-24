@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.15.0...@quenty/statestack@8.16.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
+# [8.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.14.0...@quenty/statestack@8.15.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
+# [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.13.0...@quenty/statestack@8.14.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
+# [8.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.12.0...@quenty/statestack@8.13.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/statestack
+
+
+
+
+
 # [8.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.11.1...@quenty/statestack@8.12.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/statestack

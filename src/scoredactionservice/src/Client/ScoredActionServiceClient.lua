@@ -15,6 +15,7 @@ local Maid = require("Maid")
 local InputListScoreHelper = require("InputListScoreHelper")
 local Observable = require("Observable")
 local InputKeyMapList = require("InputKeyMapList")
+local ValueObject = require("ValueObject")
 
 local ScoredActionServiceClient = {}
 ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
@@ -55,6 +56,22 @@ end
 ]=]
 function ScoredActionServiceClient:GetScoredAction(inputKeyMapList)
 	assert(InputKeyMapList.isInputKeyMapList(inputKeyMapList), "Bad inputKeyMapList")
+
+	-- Mock for not running mode
+	if not RunService:IsRunning() then
+		local scoredAction = ScoredAction.new()
+
+		local maid = Maid.new()
+		maid:GiveTask(scoredAction:PushPreferred())
+
+		-- Couple cleanup to the scored action
+		maid:GiveTask(scoredAction.Removing:Connect(function()
+			maid:DoCleaning()
+		end))
+
+		return scoredAction
+	end
+
 	assert(self._provider, "Not initialized")
 
 	local scoredAction = ScoredAction.new()
@@ -84,7 +101,7 @@ end
 ]=]
 function ScoredActionServiceClient:ObserveNewFromInputKeyMapList(scoreValue)
 	assert(self._provider, "Not initialized")
-	assert(typeof(scoreValue) == "Instance" and scoreValue:IsA("NumberValue"), "Bad scoreValue")
+	assert(ValueObject.isValueObject(scoreValue), "Bad scoreValue")
 
 	-- It looks like we aren't capturing anything in this closure, but we're capturing `self`
 	return function(source)

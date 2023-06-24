@@ -15,7 +15,7 @@ local Rx = require("Rx")
 local SoftShutdownConstants = require("SoftShutdownConstants")
 local SoftShutdownTranslator = require("SoftShutdownTranslator")
 local SoftShutdownUI = require("SoftShutdownUI")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueObject = require("ValueObject")
 local CoreGuiEnabler = require("CoreGuiEnabler")
 
 local SoftShutdownServiceClient = {}
@@ -40,12 +40,10 @@ function SoftShutdownServiceClient:Init(serviceBag)
 	self._isLobby = AttributeValue.new(Workspace, SoftShutdownConstants.IS_SOFT_SHUTDOWN_LOBBY_ATTRIBUTE, false)
 	self._isUpdating = AttributeValue.new(Workspace, SoftShutdownConstants.IS_SOFT_SHUTDOWN_UPDATING_ATTRIBUTE, false)
 
-	self._localTeleportDataSaysIsLobby = Instance.new("BoolValue")
-	self._localTeleportDataSaysIsLobby.Value = false
+	self._localTeleportDataSaysIsLobby = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._localTeleportDataSaysIsLobby)
 
-	self._isArrivingAfterShutdown = Instance.new("BoolValue")
-	self._isArrivingAfterShutdown.Value = false
+	self._isArrivingAfterShutdown = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isArrivingAfterShutdown)
 
 	task.spawn(function()
@@ -60,8 +58,8 @@ function SoftShutdownServiceClient:Init(serviceBag)
 	self._maid:GiveTask(Rx.combineLatest({
 		isLobby = self._isLobby:Observe();
 		isShuttingDown = self._isUpdating:Observe();
-		localTeleportDataSaysIsLobby = RxValueBaseUtils.observeValue(self._localTeleportDataSaysIsLobby);
-		isArrivingAfterShutdown = RxValueBaseUtils.observeValue(self._isArrivingAfterShutdown);
+		localTeleportDataSaysIsLobby = self._localTeleportDataSaysIsLobby:Observe();
+		isArrivingAfterShutdown = self._isArrivingAfterShutdown:Observe();
 	}):Subscribe(function(state)
 		if state.isLobby or state.localTeleportDataSaysIsLobby then
 			self._maid._shutdownUI = nil

@@ -45,7 +45,7 @@ end
 	The current state.
 	@readonly
 	@prop CameraState CameraState
-	@within DefaultCamera
+	@within HeartbeatCamera
 ]=]
 function HeartbeatCamera:__index(index)
 	if index == "CameraState" then

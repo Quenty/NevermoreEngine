@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.1.0...@quenty/trajectory@2.2.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/trajectory@2.0.1...@quenty/trajectory@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/trajectory

@@ -5,9 +5,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local PhysicalButtonConstants = require("PhysicalButtonConstants")
-local RagdollBindersServer = require("RagdollBindersServer")
 local CharacterUtils = require("CharacterUtils")
+local PhysicalButtonConstants = require("PhysicalButtonConstants")
+local Ragdoll = require("Ragdoll")
 
 local PhysicalButton = setmetatable({}, BaseObject)
 PhysicalButton.ClassName = "PhysicalButton"
@@ -17,7 +17,7 @@ function PhysicalButton.new(obj, serviceBag)
 	local self = setmetatable(BaseObject.new(obj), PhysicalButton)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._ragdollBinders = self._serviceBag:GetService(RagdollBindersServer)
+	self._ragdoll = self._serviceBag:GetService(Ragdoll)
 
 	self._remoteEvent = Instance.new("RemoteEvent")
 	self._remoteEvent.Name = PhysicalButtonConstants.REMOTE_EVENT_NAME
@@ -38,10 +38,10 @@ function PhysicalButton:_handleRemoteEvent(player)
 		return
 	end
 
-	if self._ragdollBinders.Ragdoll:Get(humanoid) then
-		self._ragdollBinders.Ragdoll:Unbind(humanoid)
+	if self._ragdoll:Get(humanoid) then
+		self._ragdoll:Unbind(humanoid)
 	else
-		self._ragdollBinders.Ragdoll:Bind(humanoid)
+		self._ragdoll:Bind(humanoid)
 	end
 end
 

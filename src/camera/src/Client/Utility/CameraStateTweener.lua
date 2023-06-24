@@ -10,10 +10,10 @@ local require = require(script.Parent.loader).load(script)
 
 local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
-local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local BaseObject = require("BaseObject")
 
-local CameraStateTweener = {}
+local CameraStateTweener = setmetatable({}, BaseObject)
 CameraStateTweener.ClassName = "CameraStateTweener"
 CameraStateTweener.__index = CameraStateTweener
 
@@ -26,12 +26,10 @@ CameraStateTweener.__index = CameraStateTweener
 	@return CameraStateTweener
 ]=]
 function CameraStateTweener.new(serviceBag, cameraEffect, speed)
-	local self = setmetatable({}, CameraStateTweener)
+	local self = setmetatable(BaseObject.new(), CameraStateTweener)
 
 	assert(ServiceBag.isServiceBag(serviceBag), "No serviceBag")
 	assert(cameraEffect, "No cameraEffect")
-
-	self._maid = Maid.new()
 
 	self._cameraStackService = serviceBag:GetService(CameraStackService)
 	local cameraBelow, assign = self._cameraStackService:GetNewStateBelow()
@@ -87,12 +85,22 @@ function CameraStateTweener:IsFinishedHiding()
 end
 
 --[=[
+	Returns true if we're done showing
+	@return boolean
+]=]
+function CameraStateTweener:IsFinishedShowing()
+	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 1
+end
+
+--[=[
 	Hides the tweener, and invokes the callback once the tweener
 	is finished hiding.
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 	@param callback function
 ]=]
 function CameraStateTweener:Finish(doNotAnimate, callback)
+	assert(type(callback) == "function", "Bad callback")
+
 	self:Hide(doNotAnimate)
 
 	if self._fadeBetween.HasReachedTarget then
@@ -144,6 +152,8 @@ end
 	@return CameraStateTweener -- self
 ]=]
 function CameraStateTweener:SetSpeed(speed)
+	assert(type(speed) == "number", "Bad speed")
+
 	self._fadeBetween.Speed = speed
 
 	return self
@@ -168,14 +178,6 @@ end
 ]=]
 function CameraStateTweener:GetFader()
 	return self._fadeBetween
-end
-
---[=[
-	Cleans up the fader, preventing any animation at all
-]=]
-function CameraStateTweener:Destroy()
-	self._maid:DoCleaning()
-	setmetatable(self, nil)
 end
 
 return CameraStateTweener

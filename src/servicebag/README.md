@@ -105,3 +105,33 @@ function DialogPane.new(serviceBag)
   self._maid:GiveTask(self._dialogInput)
 
 ```
+
+## Classes versus singletons
+
+Right now services and classes aren't the same. There's no contract to transform a class with lifetime
+into a service. However, because some of our services actually implement a .new() method (i.e. service definitions can be classes), we can't differentiate easily.
+
+The issue is around life-cycle.
+
+1. Service.new() can either be a constructor which establishes just data for the service or...
+2. Service.new() can actually establish state data.
+
+Other service providers solve this issue by doing the following...
+
+1. Separating out the service identifier from the actual service definition (interfaces)
+2. Separating out the addition of services from the actual services
+
+We inherently don't want to separate out interfaces yet because we don't know what the actors or tie-interfaces for hot reloading will even look like.
+
+It's important that we don't define this yet because there's a good chance separation at the service layer will be very important (i.e. we'll want to observe service state existing).
+
+### Potential solution: Interface provision
+
+We could establish a contract that providing an interface will be allowed. That is, a service can return a value it'd like to use as an interface instead. We may need to wait until we resolve these other problems first.
+
+## Major changes in the future
+
+1. Require-by-name
+1. Interfaces as definition
+2. Hot reloading
+3. Async interfaces

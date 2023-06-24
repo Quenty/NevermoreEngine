@@ -1,6 +1,6 @@
 {
   "name": "@quenty/observablecollection",
-  "version": "5.14.0",
+  "version": "5.18.0",
   "description": "A set of observable collections, such as sets, maps, sorted lists, and more.",
   "keywords": [
     "Roblox",
@@ -34,7 +34,7 @@
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/symbol": "file:../symbol",
-    "@quenty/valuebaseutils": "file:../valuebaseutils"
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

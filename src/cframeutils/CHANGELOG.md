@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.2.0...@quenty/cframeutils@5.3.0) (2023-06-24)
+
+
+### Features
+
+* Disambiguate CFrameUtils.redirctLocalAxis ([dedda0b](https://github.com/Quenty/NevermoreEngine/commit/dedda0bd08acc493e5fa8ccbd0f8c89377e3a6c5))
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.1.0...@quenty/cframeutils@5.2.0) (2023-05-08)
+
+
+### Features
+
+* Add CFrameUtils.axisAngleToCFrame(axisAngle, position) ([2a06025](https://github.com/Quenty/NevermoreEngine/commit/2a06025423ee3aa22fefdf5575dd255614f21e36))
+
+
+
+
+
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.0.0...@quenty/cframeutils@5.1.0) (2022-12-06)
 
 

@@ -19,7 +19,7 @@ local InputObjectRayUtils = {}
 ]=]
 function InputObjectRayUtils.cameraRayFromInputObject(inputObject, distance, offset, camera)
 	assert(inputObject, "Bad inputObject")
-	offset = offset or Vector3.new()
+	offset = offset or Vector3.zero
 
 	local position = inputObject.Position
 	return InputObjectRayUtils.cameraRayFromScreenPosition(Vector2.new(position.x + offset.x, position.y + offset.y), distance, camera)
@@ -35,7 +35,7 @@ end
 ]=]
 function InputObjectRayUtils.cameraRayFromMouse(mouse, distance, offset, camera)
 	assert(mouse, "Bad mouse")
-	offset = offset or Vector3.new(0, 0, 0)
+	offset = offset or Vector3.zero
 
 	return InputObjectRayUtils.cameraRayFromScreenPosition(
 		Vector2.new(mouse.x + offset.x, mouse.y + offset.y),

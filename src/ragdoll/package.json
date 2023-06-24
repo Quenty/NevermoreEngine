@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "9.22.0",
+  "version": "9.28.0",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -45,10 +45,12 @@
     "@quenty/r15utils": "file:../r15utils",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
+    "@quenty/rxbinderutils": "file:../rxbinderutils",
     "@quenty/spring": "file:../spring",
     "@quenty/steputils": "file:../steputils",
     "@quenty/table": "file:../table",
-    "@quenty/valuebaseutils": "file:../valuebaseutils"
+    "@quenty/valuebaseutils": "file:../valuebaseutils",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

@@ -84,12 +84,21 @@ function PromiseUtils.combine(stateTable)
 	assert(type(stateTable) == "table", "Bad stateTable")
 
 	local remainingCount = 0
-	for _, _ in pairs(stateTable) do
-		remainingCount = remainingCount + 1
+	local results = {}
+
+	for key, value in pairs(stateTable) do
+		if Promise.isPromise(value) then
+			remainingCount = remainingCount + 1
+		else
+			results[key] = value
+		end
+	end
+
+	if remainingCount == 0 then
+		return Promise.resolved(stateTable)
 	end
 
 	local returnPromise = Promise.new()
-	local results = {}
 	local allFulfilled = true
 
 	local function syncronize(key, isFullfilled)
@@ -105,8 +114,10 @@ function PromiseUtils.combine(stateTable)
 		end
 	end
 
-	for key, promise in pairs(stateTable) do
-		promise:Then(syncronize(key, true), syncronize(key, false))
+	for key, value in pairs(stateTable) do
+		if Promise.isPromise(value) then
+			value:Then(syncronize(key, true), syncronize(key, false))
+		end
 	end
 
 	return returnPromise

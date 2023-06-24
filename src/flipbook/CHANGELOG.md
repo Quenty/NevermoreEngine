@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.9.0...@quenty/flipbook@2.10.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+
+
+
+
+# [2.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.8.0...@quenty/flipbook@2.9.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+
+
+
+
+# [2.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.7.0...@quenty/flipbook@2.8.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.6.0...@quenty/flipbook@2.7.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/flipbook
+
+
+
+
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.5.0...@quenty/flipbook@2.6.0) (2023-04-24)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([3fbd817](https://github.com/Quenty/NevermoreEngine/commit/3fbd817b1fee45bda1b963b61a6ed22b0db12b82))
+
+
+
+
+
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.4.1...@quenty/flipbook@2.5.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/flipbook

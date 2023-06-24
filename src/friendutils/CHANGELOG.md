@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.9.0...@quenty/friendutils@6.10.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+
+
+
+
+# [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.8.0...@quenty/friendutils@6.9.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+
+
+
+
+# [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.7.0...@quenty/friendutils@6.8.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+
+
+
+
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.6.0...@quenty/friendutils@6.7.0) (2023-04-24)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([3fbd817](https://github.com/Quenty/NevermoreEngine/commit/3fbd817b1fee45bda1b963b61a6ed22b0db12b82))
+
+
+
+
+
 # [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@6.5.1...@quenty/friendutils@6.6.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/friendutils

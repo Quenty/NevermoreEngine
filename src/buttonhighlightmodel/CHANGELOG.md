@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@8.7.0...@quenty/buttonhighlightmodel@8.8.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
+
+# [8.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@8.6.0...@quenty/buttonhighlightmodel@8.7.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
+
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@8.5.0...@quenty/buttonhighlightmodel@8.6.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@8.4.0...@quenty/buttonhighlightmodel@8.5.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
+
+
+
+
 # [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@8.3.1...@quenty/buttonhighlightmodel@8.4.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/buttonhighlightmodel

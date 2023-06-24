@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@6.7.0...@quenty/camerastoryutils@6.8.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+
+
+
+
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@6.6.0...@quenty/camerastoryutils@6.7.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+
+
+
+
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@6.5.0...@quenty/camerastoryutils@6.6.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
 # [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@6.4.1...@quenty/camerastoryutils@6.5.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/camerastoryutils

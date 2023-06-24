@@ -13,11 +13,11 @@
 
 	```lua
 	local octree = Octree.new()
-	octree:CreateNode(Vector3.new(0, 0, 0), "A")
-	octree:CreateNode(Vector3.new(0, 0, 0), "B")
-	octree:CreateNode(Vector3.new(0, 0, 0), workspace)
+	octree:CreateNode(Vector3.zero, "A")
+	octree:CreateNode(Vector3.zero, "B")
+	octree:CreateNode(Vector3.zero, workspace)
 	octree:CreateNode(Vector3.new(0, 0, 1000), "C")
-	print(octree:RadiusSearch(Vector3.new(0, 0, 0), 100)) --> { "A", "B", workspace }
+	print(octree:RadiusSearch(Vector3.zero, 100)) --> { "A", "B", workspace }
 	```
 
 	:::tip
@@ -27,14 +27,14 @@
 	Sometimes using Roblox's spatial hash using the region API is faster than using an octree. However,
 	for data that is centralized, or static, an octree can be a very efficient spatial query mechanism.
 
-	That said, it is totally fine to track the objects that DO move around using octree, as long as you 
-	apply proper optimizations. The main performance cost of doing this comes down to tracking and 
-	upating the position of the objects, which is fine if: 
-		1) You have a way to detect the movement without having to loop through all the moving 
+	That said, it is totally fine to track the objects that DO move around using octree, as long as you
+	apply proper optimizations. The main performance cost of doing this comes down to tracking and
+	upating the position of the objects, which is fine if:
+		1) You have a way to detect the movement without having to loop through all the moving
 		objects to update the position
 		2) You can tolerate some inaccuracy with positions and smear this update
-		3) You have less than 1000 objects to track, in this case looping through everything 
-		shouldn't be too costly. 
+		3) You have less than 1000 objects to track, in this case looping through everything
+		shouldn't be too costly.
 	:::
 
 	@class Octree
@@ -71,8 +71,8 @@ end
 
 	```lua
 	local octree = Octree.new()
-	octree:CreateNode(Vector3.new(0, 0, 0), "Hi")
-	octree:CreateNode(Vector3.new(0, 0, 0), "Bob")
+	octree:CreateNode(Vector3.zero, "Hi")
+	octree:CreateNode(Vector3.zero, "Bob")
 	print(octree:GetAllNodes()) --> { "Hi", "Bob" }
 	```
 
@@ -108,8 +108,8 @@ end
 
 	```lua
 	local octree = Octree.new()
-	octree:CreateNode(Vector3.new(0, 0, 0), "A")
-	octree:CreateNode(Vector3.new(0, 0, 0), "B")
+	octree:CreateNode(Vector3.zero, "A")
+	octree:CreateNode(Vector3.zero, "B")
 	```
 
 	@param position Vector3
@@ -133,10 +133,10 @@ end
 
 	```lua
 	local octree = Octree.new()
-	octree:CreateNode(Vector3.new(0, 0, 0), "A")
-	octree:CreateNode(Vector3.new(0, 0, 0), "B")
+	octree:CreateNode(Vector3.zero, "A")
+	octree:CreateNode(Vector3.zero, "B")
 	octree:CreateNode(Vector3.new(0, 0, 1000), "C")
-	print(octree:RadiusSearch(Vector3.new(0, 0, 0), 100)) --> { "A", "B" }
+	print(octree:RadiusSearch(Vector3.zero, 100)) --> { "A", "B" }
 	```
 
 	@param position Vector3

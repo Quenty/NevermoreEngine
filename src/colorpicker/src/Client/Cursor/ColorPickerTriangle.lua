@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ColorPickerUtils = require("ColorPickerUtils")
+local ValueObject = require("ValueObject")
 
 local ColorPickerTriangle = setmetatable({}, BaseObject)
 ColorPickerTriangle.ClassName = "ColorPickerTriangle"
@@ -15,20 +16,16 @@ ColorPickerTriangle.__index = ColorPickerTriangle
 function ColorPickerTriangle.new()
 	local self = setmetatable(BaseObject.new(), ColorPickerTriangle)
 
-	self._transparency = Instance.new("NumberValue")
-	self._transparency.Value = 0
+	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
-	self._backgroundColorHint = Instance.new("Color3Value")
-	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
+	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(self._backgroundColorHint)
 
-	self._color = Instance.new("Color3Value")
-	self._color.Value = Color3.new(1, 1, 1)
+	self._color = ValueObject.new(Color3.new(1, 1, 1), "Color3")
 	self._maid:GiveTask(self._color)
 
-	self._sizeValue = Instance.new("Vector3Value")
-	self._sizeValue.Value = Vector3.new(0.05, 0.1, 0)
+	self._sizeValue = ValueObject.new(Vector2.new(0.05, 0.1), "Vector2")
 	self._maid:GiveTask(self._sizeValue)
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
@@ -43,6 +40,10 @@ function ColorPickerTriangle:HintBackgroundColor(color)
 end
 
 function ColorPickerTriangle:GetSizeValue()
+	return self._sizeValue
+end
+
+function ColorPickerTriangle:GetMeasureValue()
 	return self._sizeValue
 end
 

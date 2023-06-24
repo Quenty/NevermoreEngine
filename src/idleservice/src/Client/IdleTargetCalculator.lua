@@ -7,7 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueObject = require("ValueObject")
 
 local DIST_BEFORE_MOVEMENT = 0.15
 local TIME_UNTIL_IDLE = 1
@@ -19,8 +19,7 @@ IdleTargetCalculator.__index = IdleTargetCalculator
 function IdleTargetCalculator.new()
 	local self = setmetatable(BaseObject.new(), IdleTargetCalculator)
 
-	self._disableContextUI = Instance.new("BoolValue")
-	self._disableContextUI.Value = false
+	self._disableContextUI = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._disableContextUI)
 
 	self.Changed = self._disableContextUI.Changed
@@ -34,7 +33,7 @@ end
 
 
 function IdleTargetCalculator:ObserveShouldDisableContextUI()
-	return RxValueBaseUtils.observeValue(self._disableContextUI)
+	return self._disableContextUI:Observe()
 end
 
 function IdleTargetCalculator:SetTarget(targetPosition)

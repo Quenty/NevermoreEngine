@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@5.7.1...@quenty/resetservice@5.8.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+
+
+
+
+## [5.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@5.7.0...@quenty/resetservice@5.7.1) (2023-05-31)
+
+
+### Bug Fixes
+
+* Player can reset while not in game ([fac28fa](https://github.com/Quenty/NevermoreEngine/commit/fac28fa7dce6e1a8c29d1e90b4916c085a05092f))
+
+
+
+
+
 # [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@5.6.1...@quenty/resetservice@5.7.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/resetservice

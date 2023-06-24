@@ -25,6 +25,10 @@ function TransparencyService:Init()
 	}
 end
 
+function TransparencyService:IsDead()
+	return self._properties == nil
+end
+
 --[=[
 	Uninitializes the transparency service, restoring transparency to original values.
 ]=]

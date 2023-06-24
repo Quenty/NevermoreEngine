@@ -646,10 +646,22 @@ function RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
 				sub:Complete()
 			else
 				sub:Fire(brio:GetValue())
-				return brio:GetDiedSignal():Connect(function()
+
+				-- Firing killed the subscription
+				if not sub:IsPending() then
+					return
+				end
+
+				-- Firing this event actually killed the brio
+				if brio:IsDead() then
 					sub:Fire(emitOnDeathValue)
 					sub:Complete()
-				end)
+				else
+					return brio:GetDiedSignal():Connect(function()
+						sub:Fire(emitOnDeathValue)
+						sub:Complete()
+					end)
+				end
 			end
 		end)
 	end

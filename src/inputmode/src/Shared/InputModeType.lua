@@ -65,7 +65,7 @@ function InputModeType:_addValidTypesFromTable(keys)
 		elseif InputModeType.isInputModeType(key) then
 			self:_addInputModeType(key)
 		else
-			warn("invalid key", key)
+			warn(string.format("[InputModeType] - Invalid key of value %q of type %s", tostring(key), typeof(key)))
 		end
 	end
 end
@@ -73,7 +73,7 @@ end
 function InputModeType:_addInputModeType(inputModeType)
 	assert(InputModeType.isInputModeType(inputModeType), "Bad inputModeType")
 
-	for key, _ in pairs(inputModeType._keys) do
+	for _, key in pairs(inputModeType._keys) do
 		if not self._valid[key] then
 			self._valid[key] = true
 			table.insert(self._keys, key)

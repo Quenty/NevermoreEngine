@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@7.4.0...@quenty/transparencyservice@7.5.0) (2023-06-18)
+
+
+### Bug Fixes
+
+* TransparencyService works in stories ([ff28404](https://github.com/Quenty/NevermoreEngine/commit/ff28404961e6378d8ec7110a4b4575e835604879))
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@7.3.1...@quenty/transparencyservice@7.4.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/transparencyservice
+
+
+
+
+
 ## [7.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@7.3.0...@quenty/transparencyservice@7.3.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/transparencyservice

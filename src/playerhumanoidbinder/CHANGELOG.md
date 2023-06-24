@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.18.1...@quenty/playerhumanoidbinder@8.19.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+## [8.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.18.0...@quenty/playerhumanoidbinder@8.18.1) (2023-06-23)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+# [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.17.0...@quenty/playerhumanoidbinder@8.18.0) (2023-06-17)
+
+
+### Features
+
+* Binders can be initialized by the ServiceBag directly instead of requireing a BinderProvider ([28ce17f](https://github.com/Quenty/NevermoreEngine/commit/28ce17fe254b7fdce115132244ca1a6e8693d24b))
+
+
+
+
+
+# [8.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.16.0...@quenty/playerhumanoidbinder@8.17.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+# [8.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.15.0...@quenty/playerhumanoidbinder@8.16.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
+# [8.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.14.0...@quenty/playerhumanoidbinder@8.15.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/playerhumanoidbinder
+
+
+
+
+
 # [8.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.13.1...@quenty/playerhumanoidbinder@8.14.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/playerhumanoidbinder

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.3.0...@quenty/math@2.4.0) (2023-06-05)
+
+
+### Features
+
+* Add Math.jitter(average: number, spread: number) ([bf0b048](https://github.com/Quenty/NevermoreEngine/commit/bf0b048941fc658f65e2a41b39fa4c66cd3825e4))
+
+
+
+
+
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.2.0...@quenty/math@2.3.0) (2023-03-31)
 
 

@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.24.0...@quenty/colorpalette@4.25.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [4.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.23.0...@quenty/colorpalette@4.24.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
+# [4.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.22.0...@quenty/colorpalette@4.23.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix unknown font construction in FontPalette ([b14b679](https://github.com/Quenty/NevermoreEngine/commit/b14b6799e0313fda7cd9977be7921d3edaba7fb2))
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [4.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.21.0...@quenty/colorpalette@4.22.0) (2023-05-08)
+
+
+### Features
+
+* Add ColorGradeUtils.ensureGradeContrast(color, backing, amount) ([65a931b](https://github.com/Quenty/NevermoreEngine/commit/65a931b43b058c77585f1eb3b18b7614eb2a41cb))
+
+
+
+
+
 # [4.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.20.0...@quenty/colorpalette@4.21.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/colorpalette

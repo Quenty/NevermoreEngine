@@ -9,8 +9,9 @@ local Signal = require("Signal")
 local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
-local RxValueBaseUtils = require("RxValueBaseUtils")
 local Symbol = require("Symbol")
+local ValueObject = require("ValueObject")
+local Rx = require("Rx")
 
 local ObservableList = {}
 ObservableList.ClassName = "ObservableList"
@@ -31,8 +32,7 @@ function ObservableList.new()
 
 	self._keyObservables = {} -- { [Symbol]: { Subscription } }
 
-	self._countValue = Instance.new("IntValue")
-	self._countValue.Value = 0
+	self._countValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._countValue)
 
 --[=[
@@ -70,6 +70,23 @@ end
 ]=]
 function ObservableList.isObservableList(value)
 	return type(value) == "table" and getmetatable(value) == ObservableList
+end
+
+--[=[
+	Observes the list, allocating a new list in the process.
+
+	@return Observable<{ T }>
+]=]
+function ObservableList:Observe()
+	return Rx.combineLatest({
+		Rx.fromSignal(self.ItemAdded):Pipe({ Rx.startWith({ true }) });
+		Rx.fromSignal(self.ItemRemoved):Pipe({ Rx.startWith({ true }) });
+	}):Pipe({
+		Rx.throttleDefer();
+		Rx.map(function()
+			return self:GetList();
+		end);
+	})
 end
 
 --[=[
@@ -211,7 +228,7 @@ end
 	@return number
 ]=]
 function ObservableList:GetCount()
-	return self._countValue.Value
+	return self._countValue.Value or 0
 end
 
 --[=[
@@ -219,7 +236,7 @@ end
 	@return Observable<number>
 ]=]
 function ObservableList:ObserveCount()
-	return RxValueBaseUtils.observeValue(self._countValue)
+	return self._countValue:Observe()
 end
 
 --[=[

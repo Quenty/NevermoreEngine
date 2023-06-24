@@ -30,6 +30,10 @@ function SettingRegistryServiceShared:Init(serviceBag)
 	self._maid:GiveTask(self._settingDefinitions)
 end
 
+function SettingRegistryServiceShared:GetSettingDefinitions()
+	return self._settingDefinitions:GetList()
+end
+
 --[=[
 	Registers the shared setting service for this bridge
 

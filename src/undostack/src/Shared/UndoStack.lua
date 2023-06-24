@@ -7,7 +7,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Promise = require("Promise")
 local UndoStackEntry = require("UndoStackEntry")
-local RxInstanceUtils = require("RxInstanceUtils")
+local ValueObject = require("ValueObject")
+local Maid = require("Maid")
 
 local DEFAULT_MAX_SIZE = 25
 
@@ -25,16 +26,13 @@ function UndoStack.new(maxSize)
 	self._undoStack = {}
 	self._redoStack = {}
 
-	self._hasUndoEntries = Instance.new("BoolValue")
-	self._hasUndoEntries.Value = false
+	self._hasUndoEntries = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._hasUndoEntries)
 
-	self._hasRedoEntries = Instance.new("BoolValue")
-	self._hasRedoEntries.Value = false
+	self._hasRedoEntries = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._hasRedoEntries)
 
-	self._isActionExecuting = Instance.new("BoolValue")
-	self._isActionExecuting.Value = false
+	self._isActionExecuting = ValueObject.new(false, "boolean")
 	self._maid:GiveTask(self._isActionExecuting)
 
 	return self
@@ -46,7 +44,7 @@ end
 	@return boolean
 ]=]
 function UndoStack:ClearRedoStack()
-	self._redoStack ={}
+	self._redoStack = {}
 	self:_updateHasRedoEntries()
 end
 
@@ -63,7 +61,7 @@ end
 	@return Observable<boolean>
 ]=]
 function UndoStack:ObserveHasUndoEntries()
-	return RxInstanceUtils.observeProperty(self._hasUndoEntries, "Value")
+	return self._hasUndoEntries:Observe()
 end
 
 --[=[
@@ -71,7 +69,7 @@ end
 	@return Observable<boolean>
 ]=]
 function UndoStack:ObserveHasRedoEntries()
-	return RxInstanceUtils.observeProperty(self._hasRedoEntries, "Value")
+	return self._hasRedoEntries:Observe()
 end
 
 --[=[
@@ -111,6 +109,23 @@ end
 function UndoStack:Push(undoStackEntry)
 	assert(UndoStackEntry.isUndoStackEntry(undoStackEntry), "Bad undoStackEntry")
 
+	if self._maid[undoStackEntry] then
+		return function()
+			self:Remove(undoStackEntry)
+		end
+	end
+
+	local maid = Maid.new()
+	maid:GiveTask(undoStackEntry)
+
+	maid:GiveTask(undoStackEntry.Destroying:Connect(function()
+		if undoStackEntry.Destroy then
+			self:Remove(undoStackEntry)
+		end
+	end))
+
+	self._maid[undoStackEntry] = maid
+
 	table.insert(self._undoStack, undoStackEntry)
 	while #self._undoStack > self._maxSize do
 		table.remove(self._undoStack, 1)
@@ -135,18 +150,25 @@ end
 function UndoStack:Remove(undoStackEntry)
 	assert(UndoStackEntry.isUndoStackEntry(undoStackEntry), "Bad undoStackEntry")
 
+	self._maid[undoStackEntry] = nil
+
+	local changed = false
 	local undoIndex = table.find(self._undoStack, undoStackEntry)
 	if undoIndex then
 		table.remove(self._undoStack, undoIndex)
+		changed = true
 	end
 
 	local redoIndex = table.find(self._redoStack, undoStackEntry)
 	if redoIndex then
 		table.remove(self._redoStack, redoIndex)
+		changed = true
 	end
 
-	self:_updateHasUndoEntries()
-	self:_updateHasRedoEntries()
+	if changed then
+		self:_updateHasUndoEntries()
+		self:_updateHasRedoEntries()
+	end
 end
 
 --[=[
@@ -163,7 +185,9 @@ function UndoStack:PromiseUndo()
 
 		self:_updateHasUndoEntries()
 
-		return undoStackEntry:PromiseUndo()
+		return self:_executePromiseWithMaid(function(maid)
+			return undoStackEntry:PromiseUndo(maid)
+		end)
 			:Then(function()
 				if undoStackEntry:HasRedo() then
 					table.insert(self._redoStack, undoStackEntry)
@@ -189,7 +213,9 @@ function UndoStack:PromiseRedo()
 
 		self:_updateHasRedoEntries()
 
-		return undoStackEntry:PromiseRedo()
+		return self:_executePromiseWithMaid(function(maid)
+			return undoStackEntry:PromiseRedo(maid)
+		end)
 			:Then(function()
 				if undoStackEntry:HasUndo() then
 					table.insert(self._undoStack, undoStackEntry)
@@ -223,6 +249,28 @@ function UndoStack:_promiseCurrent(doNextPromise)
 			self._isActionExecuting.Value = false
 		end
 	end)
+
+	return promise
+end
+
+function UndoStack:_executePromiseWithMaid(callback)
+	local maid  = Maid.new()
+
+	local promise = Promise.new()
+	maid:GiveTask(promise)
+
+	local result = callback(maid)
+
+	maid:GiveTask(function()
+		self._maid[maid] = nil
+	end)
+	self._maid[maid] = maid
+
+	promise:Finally(function()
+		self._maid[maid] = nil
+	end)
+
+	promise:Resolve(result)
 
 	return promise
 end

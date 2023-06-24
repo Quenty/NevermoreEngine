@@ -1,4 +1,6 @@
 --[=[
+	Initializes the RagdollService on the client.
+
 	@client
 	@class RagdollServiceClient
 ]=]
@@ -23,8 +25,13 @@ function RagdollServiceClient:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("Motor6DServiceClient"))
+	self._serviceBag:GetService(require("CameraStackService"))
 
 	-- Internal
+	self._serviceBag:GetService(require("RagdollClient"))
+	self._serviceBag:GetService(require("RagdollableClient"))
+	self._serviceBag:GetService(require("RagdollHumanoidOnDeathClient"))
+	self._serviceBag:GetService(require("RagdollHumanoidOnFallClient"))
 	self._serviceBag:GetService(require("RagdollBindersClient"))
 
 	self._screenShakeEnabled = true

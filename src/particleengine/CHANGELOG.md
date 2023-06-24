@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@7.7.0...@quenty/particleengine@7.8.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/particleengine
+
+
+
+
+
+# [7.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@7.6.0...@quenty/particleengine@7.7.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
 # [7.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@7.5.1...@quenty/particleengine@7.6.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/particleengine

@@ -78,6 +78,10 @@ function InputListScoreHelper:_updateInputTypeSet(inputTypeList)
 end
 
 function InputListScoreHelper:_unregisterAction(inputType)
+	if not self.Destroy then
+		return
+	end
+
 	if not self._currentTypes[inputType] then
 		warn("[InputListScoreHelper] - Already unregistered")
 	end

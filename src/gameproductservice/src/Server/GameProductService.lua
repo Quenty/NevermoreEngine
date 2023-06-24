@@ -86,7 +86,7 @@ function GameProductService:Start()
 	end))
 
 	self._maid:GiveTask(self._receiptProcessingService:RegisterReceiptProcessor(function(receiptInfo)
-		self:_handleProcessReceipt(receiptInfo)
+		return self:_handleProcessReceipt(receiptInfo)
 	end))
 end
 

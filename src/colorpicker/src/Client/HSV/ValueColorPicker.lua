@@ -8,7 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ColorPickerInput = require("ColorPickerInput")
--- local HSColorPickerCursor = require("HSColorPickerCursor")
+local ValueObject = require("ValueObject")
 local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 local ColorPickerTriangle = require("ColorPickerTriangle")
 
@@ -19,26 +19,21 @@ ValueColorPicker.__index = ValueColorPicker
 function ValueColorPicker.new()
 	local self = setmetatable(BaseObject.new(), ValueColorPicker)
 
-	self._hsvColorValue = Instance.new("Vector3Value")
-	self._hsvColorValue.Value = Vector3.new(0, 0, 0)
+	self._hsvColorValue = ValueObject.new(Vector3.zero, "Vector3")
 	self._maid:GiveTask(self._hsvColorValue)
 
-	self._backgroundColorHint = Instance.new("Color3Value")
-	self._backgroundColorHint.Value = Color3.new(0, 0, 0)
+	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(self._backgroundColorHint)
 
 	self.ColorChanged = self._hsvColorValue.Changed
 
-	self._sizeValue = Instance.new("Vector3Value")
-	self._sizeValue.Value = Vector3.new(0, 4, 0)
+	self._sizeValue = ValueObject.new(Vector2.new(0, 4), "Vector2")
 	self._maid:GiveTask(self._sizeValue)
 
-	self._leftWidth = Instance.new("NumberValue")
-	self._leftWidth.Value = 0.25
+	self._leftWidth = ValueObject.new(0.25, "number")
 	self._maid:GiveTask(self._leftWidth)
 
-	self._transparency = Instance.new("NumberValue")
-	self._transparency.Value = 0
+	self._transparency = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._transparency)
 
 	self._input = ColorPickerInput.new()
@@ -112,7 +107,6 @@ function ValueColorPicker.new()
 	end))
 	self:_updateSize()
 
-
 	return self
 end
 
@@ -127,7 +121,7 @@ function ValueColorPicker:HintBackgroundColor(color)
 end
 
 function ValueColorPicker:_updatePreviewPosition()
-	self._preview:SetPosition(Vector3.new(0.5, 1 - self._hsvColorValue.Value.z))
+	self._preview:SetPosition(Vector2.new(0.5, 1 - self._hsvColorValue.Value.z))
 end
 
 function ValueColorPicker:_updateSize(newHeight)
@@ -135,7 +129,7 @@ function ValueColorPicker:_updateSize(newHeight)
 	local width = self._leftWidth.Value + triangleSize.y
 	local height = newHeight or self._sizeValue.Value.y
 
-	self._sizeValue.Value = Vector3.new(width, height, 0)
+	self._sizeValue.Value = Vector2.new(width, height)
 end
 
 function ValueColorPicker:_updateHintedColors()
@@ -174,6 +168,10 @@ function ValueColorPicker:GetColor()
 end
 
 function ValueColorPicker:GetSizeValue()
+	return self._sizeValue
+end
+
+function ValueColorPicker:GetMeasureValue()
 	return self._sizeValue
 end
 

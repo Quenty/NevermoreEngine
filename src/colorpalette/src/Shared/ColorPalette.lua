@@ -315,9 +315,7 @@ function ColorPalette:SetColor(colorName, color)
 		error(("No color grade with name %q"):format(colorName))
 	end
 
-	self._colorMaid[colorName] = Blend.mount(self._colorValues[colorName], {
-		Value = color;
-	})
+	self._colorMaid[colorName] = self._colorValues[colorName]:Mount(color)
 end
 
 function ColorPalette:SetVividness(gradeName, vividness)
@@ -327,21 +325,18 @@ function ColorPalette:SetVividness(gradeName, vividness)
 		error(("No vividness with name %q"):format(gradeName))
 	end
 
-	self._vividMaid[gradeName] = Blend.mount(self._vividnessValues[gradeName], {
-		Value = vividness;
-	})
+	self._vividMaid[gradeName] = self._vividnessValues[gradeName]:Mount(vividness)
 end
 
 function ColorPalette:SetColorGrade(gradeName, grade)
 	assert(type(gradeName) == "string", "Bad colorName")
+	assert(grade, "Bad grade")
 
 	if not self._colorGradeValues[gradeName] then
 		error(("No color grade with name %q"):format(gradeName))
 	end
 
-	self._gradeMaid[gradeName] = Blend.mount(self._colorGradeValues[gradeName], {
-		Value = grade;
-	})
+	self._gradeMaid[gradeName] = self._colorGradeValues[gradeName]:Mount(grade)
 end
 
 
@@ -355,11 +350,11 @@ function ColorPalette:DefineColorGrade(gradeName, gradeValue, vividnessValue)
 	assert(type(gradeName) == "string", "Bad gradeName")
 
 	if self._colorGradeValues[gradeName] then
-		warn(("Already defined grade of name %q"):format(gradeName))
+		warn(("[ColorPalette.DefineColorGrade] - Already defined grade of name %q"):format(gradeName))
 		return
 	end
 
-	local colorGrade = Instance.new("NumberValue")
+	local colorGrade = ValueObject.new(0, "number")
 	self._maid:GiveTask(colorGrade)
 
 	local vividness = ValueObject.new(nil)
@@ -371,7 +366,7 @@ function ColorPalette:DefineColorGrade(gradeName, gradeValue, vividnessValue)
 	self._vividnessValues[gradeName] = vividness
 
 	self:SetVividness(gradeName, vividnessValue)
-	self:SetColorGrade(gradeName, gradeValue)
+	self:SetColorGrade(gradeName, gradeValue or 0)
 
 	self.ColorGradeAdded:Fire(gradeName)
 
@@ -382,12 +377,11 @@ function ColorPalette:DefineColorSwatch(colorName, value)
 	assert(type(colorName) == "string", "Bad colorName")
 
 	if self._swatches[colorName] then
-		warn(("Already defined color of name %q"):format(colorName))
+		warn(("[ColorPalette.DefineColorGrade] -Already defined color of name %q"):format(colorName))
 		return
 	end
 
-	local colorValue = Instance.new("Color3Value")
-	colorValue.Value = value or Color3.new(0, 0, 0)
+	local colorValue = ValueObject.new(value or Color3.new(0, 0, 0), "Color3")
 	self._maid:GiveTask(colorValue)
 
 	local colorSwatch = ColorSwatch.new(colorValue)

@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.29.1...@quenty/gameconfig@5.30.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+## [5.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.29.0...@quenty/gameconfig@5.29.1) (2023-06-23)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [5.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.28.0...@quenty/gameconfig@5.29.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [5.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.27.0...@quenty/gameconfig@5.28.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [5.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.26.0...@quenty/gameconfig@5.27.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [5.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.25.0...@quenty/gameconfig@5.26.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
+# [5.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.24.0...@quenty/gameconfig@5.25.0) (2023-04-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
+
 # [5.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.23.0...@quenty/gameconfig@5.24.0) (2023-04-20)
 
 

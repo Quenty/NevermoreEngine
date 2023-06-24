@@ -24,11 +24,23 @@ PlayerCharacterBinder.__index = PlayerCharacterBinder
 function PlayerCharacterBinder.new(tag, class, ...)
 	local self = setmetatable(Binder.new(tag, class, ...), PlayerCharacterBinder)
 
-	self._shouldTag = Instance.new("BoolValue")
-	self._shouldTag.Value = true
-	self._maid:GiveTask(self._shouldTag)
-
 	return self
+end
+
+--[=[
+	Inits the binder. See [Binder.Init].
+	Should be done via a [ServiceBag].
+
+	@param ... any
+]=]
+function PlayerCharacterBinder:Init(...)
+	getmetatable(PlayerCharacterBinder).Init(self, ...)
+
+	if not self._shouldTag then
+		self._shouldTag = Instance.new("BoolValue")
+		self._shouldTag.Value = true
+		self._maid:GiveTask(self._shouldTag)
+	end
 end
 
 --[=[

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@3.19.0...@quenty/radial-image@3.20.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [3.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@3.18.0...@quenty/radial-image@3.19.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
+# [3.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@3.17.0...@quenty/radial-image@3.18.0) (2023-05-26)
+
+
+### Features
+
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [3.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@3.16.0...@quenty/radial-image@3.17.0) (2023-05-08)
+
+**Note:** Version bump only for package @quenty/radial-image
+
+
+
+
+
 # [3.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/radial-image@3.15.1...@quenty/radial-image@3.16.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/radial-image

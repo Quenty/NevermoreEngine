@@ -7,6 +7,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local Promise = require("Promise")
 local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
@@ -25,9 +27,16 @@ end
 
 --[=[
 	Returns whether the local player is an admin.
+
+	@param player Player | nil
 	@return Promise<boolean>
 ]=]
-function PermissionProviderClient:PromiseIsAdmin()
+function PermissionProviderClient:PromiseIsAdmin(player)
+	player = player or Players.LocalPlayer
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
+	assert(player == Players.LocalPlayer, "We only support local player for now")
+
 	if self._cachedAdminPromise then
 		return self._cachedAdminPromise
 	end

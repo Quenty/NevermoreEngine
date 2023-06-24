@@ -1,6 +1,6 @@
 {
   "name": "@quenty/valueobject",
-  "version": "7.12.0",
+  "version": "7.16.0",
   "description": "To work like value objects in Roblox and track a single item with .Changed events",
   "keywords": [
     "Roblox",
@@ -30,7 +30,8 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal"
+    "@quenty/signal": "file:../signal",
+    "@quenty/valuebaseutils": "file:../valuebaseutils"
   },
   "publishConfig": {
     "access": "public"

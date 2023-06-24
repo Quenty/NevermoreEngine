@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.17.0...@quenty/observablecollection@5.18.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.16.0...@quenty/observablecollection@5.17.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [5.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.15.0...@quenty/observablecollection@5.16.0) (2023-05-26)
+
+
+### Features
+
+* Add :Observe() calls to ObservableList and ObservableSortedList ([2f22fbc](https://github.com/Quenty/NevermoreEngine/commit/2f22fbc0830f51aa73ba01b6bb0d25f736e37b6e))
+* Initial refactor of guis to use ValueObject instead of ValueObject ([723aba0](https://github.com/Quenty/NevermoreEngine/commit/723aba0208cae7e06c9d8bf2d8f0092d042d70ea))
+
+
+
+
+
+# [5.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.14.0...@quenty/observablecollection@5.15.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* Fix removal firing events to fire correctly ([10f98c3](https://github.com/Quenty/NevermoreEngine/commit/10f98c329e7bab203ffc056d1ffb0c2c715392a8))
+
+
+### Features
+
+* Add ObservableSet:ObserveContains(item) ([df5beba](https://github.com/Quenty/NevermoreEngine/commit/df5beba6b196933653365719c26e6ed9fa21d4cc))
+* Add ObservableSortedList:ObserveAtIndex(indexToObserve) and ObservableSortedList:FindFirstKey(content) ([4d9f4d8](https://github.com/Quenty/NevermoreEngine/commit/4d9f4d8d34eafa0899157e4960ea87c9c812cf48))
+
+
+
+
+
 # [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.13.0...@quenty/observablecollection@5.14.0) (2023-04-20)
 
 

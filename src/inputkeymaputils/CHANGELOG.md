@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.29.0...@quenty/inputkeymaputils@7.30.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.28.0...@quenty/inputkeymaputils@7.29.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.27.0...@quenty/inputkeymaputils@7.28.0) (2023-06-05)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.26.0...@quenty/inputkeymaputils@7.27.0) (2023-05-26)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.25.0...@quenty/inputkeymaputils@7.26.0) (2023-05-08)
+
+
+### Features
+
+* Add InputKeyMapList.fromInputKeys(inputKeys, options) ([be1c478](https://github.com/Quenty/NevermoreEngine/commit/be1c478e63371e32d27cb36e42b444b666fc425b))
+
+
+
+
+
+# [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.24.0...@quenty/inputkeymaputils@7.25.0) (2023-04-24)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
 # [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.23.0...@quenty/inputkeymaputils@7.24.0) (2023-04-20)
 
 **Note:** Version bump only for package @quenty/inputkeymaputils

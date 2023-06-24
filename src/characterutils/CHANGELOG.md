@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.7.0...@quenty/characterutils@6.8.0) (2023-06-17)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+
+
+
+
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.6.0...@quenty/characterutils@6.7.0) (2023-05-26)
+
+
+### Bug Fixes
+
+* Fix dependencies ([67791a2](https://github.com/Quenty/NevermoreEngine/commit/67791a289c0956bf4947ac81bf792ee56496b3e8))
+
+
+
+
+
+# [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.5.0...@quenty/characterutils@6.6.0) (2023-05-08)
+
+
+### Bug Fixes
+
+* CharacterUtils was missing dependancy ([903c319](https://github.com/Quenty/NevermoreEngine/commit/903c31919681399a58399737b2b16910b13a1163))
+
+
+
+
+
 # [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.4.1...@quenty/characterutils@6.5.0) (2023-04-10)
 
 **Note:** Version bump only for package @quenty/characterutils
