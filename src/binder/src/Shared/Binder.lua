@@ -255,10 +255,10 @@ end
 --[=[
 	Fired when added, and then after removal, but before destroy!
 
-	```info
+	:::info
 	This is before [Rx] so it doesn't follow the same Rx pattern. See [Binder.Observe] for
 	an [Rx] compatible interface.
-	```
+	:::
 
 	@param inst Instance
 	@param callback function
