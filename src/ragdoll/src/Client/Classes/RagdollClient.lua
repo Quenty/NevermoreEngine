@@ -1,6 +1,14 @@
 --[=[
-	Client side ragdolling meant to be used with a binder. See [RagdollBindersClient].
+	Client side ragdolling meant to be used with a binder. This class exports a [Binder].
 	While a humanoid is bound with this class, it is ragdolled.
+
+	:::tip
+	Initialize this whole system through [RagdollServiceClient].
+	:::
+
+	```
+	serviceBag:GetService(require("RagdollClient"))
+	```
 
 	@client
 	@class RagdollClient
@@ -14,21 +22,22 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
+local Binder = require("Binder")
 local CameraStackService = require("CameraStackService")
 local CharacterUtils = require("CharacterUtils")
 local HapticFeedbackUtils = require("HapticFeedbackUtils")
-local RagdollServiceClient = require("RagdollServiceClient")
 local RagdollMotorUtils = require("RagdollMotorUtils")
-local RxR15Utils = require("RxR15Utils")
+local RagdollServiceClient = require("RagdollServiceClient")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
+local RxR15Utils = require("RxR15Utils")
 
 local RagdollClient = setmetatable({}, BaseObject)
 RagdollClient.ClassName = "RagdollClient"
 RagdollClient.__index = RagdollClient
 
 --[=[
-	Constructs a new RagdollClient. Should be done via [Binder]. See [RagdollBindersClient].
+	Constructs a new RagdollClient. This module exports a [Binder].
 	@param humanoid Humanoid
 	@param serviceBag ServiceBag
 	@return RagdollClient
@@ -135,4 +144,4 @@ function RagdollClient:_setupHapticFeedback()
 	end)
 end
 
-return RagdollClient
+return Binder.new("Ragdoll", RagdollClient)

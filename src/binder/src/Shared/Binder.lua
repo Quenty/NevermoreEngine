@@ -165,11 +165,11 @@ function Binder:Start()
 		self:Init()
 	end
 
-	if self._loaded then
+	if self._started then
 		return
 	end
 	self._maid._warning = nil
-	self._loaded = true
+	self._started = true
 
 	for _, inst in pairs(CollectionService:GetTagged(self._tagName)) do
 		task.spawn(self._add, self, inst)

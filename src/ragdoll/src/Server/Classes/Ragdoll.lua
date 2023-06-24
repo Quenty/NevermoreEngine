@@ -1,20 +1,27 @@
 --[=[
-	Base class for ragdolls, meant to be used with binders. See [RagdollBindersServer].
+	Base class for ragdolls, meant to be used with binders. This class exports a [Binder].
 	While a humanoid is bound with this class, it is ragdolled.
+
+	:::tip
+	Initialize this whole system through [RagdollService].
+	:::
 
 	```lua
 	-- Be sure to do the service init on the client too
-	local serviceBag = require("ServiceBag")
-	local ragdollBindersServer = serviceBag:GetService(require("RagdollBindersServer"))
+	local ServiceBag = require("ServiceBag")
+	local Ragdoll = require("Ragdoll")
+
+	local serviceBag = ServiceBag.new()
+	serviceBag:GetService(require("RagdollService"))
 
 	serviceBag:Init()
 	serviceBag:Start()
 
 	-- Enable ragdoll
-	ragdollBindersServer.Ragdoll:Bind(humanoid)
+	Ragdoll:Tag(humanoid)
 
 	-- Disable ragdoll
-	ragdollBindersServer.Ragdoll:Unbind(humanoid)
+	Ragdoll:Untag(humanoid)
 	```
 
 	@class Ragdoll
@@ -23,6 +30,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Binder = require("Binder")
 
 local Ragdoll = setmetatable({}, BaseObject)
 Ragdoll.ClassName = "Ragdoll"
@@ -40,4 +48,4 @@ function Ragdoll.new(humanoid, _serviceBag)
 	return self
 end
 
-return Ragdoll
+return Binder.new("Ragdoll", Ragdoll)

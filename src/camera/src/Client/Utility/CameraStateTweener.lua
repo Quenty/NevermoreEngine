@@ -152,6 +152,8 @@ end
 	@return CameraStateTweener -- self
 ]=]
 function CameraStateTweener:SetSpeed(speed)
+	assert(type(speed) == "number", "Bad speed")
+
 	self._fadeBetween.Speed = speed
 
 	return self
