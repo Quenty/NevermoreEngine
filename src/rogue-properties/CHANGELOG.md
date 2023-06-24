@@ -1,24 +1,15 @@
-# v4.22.1 (Sat Jun 24 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Deleted user ([@ghost](https://github.com/ghost)), for all your work!
-
-#### 🐛 Bug Fix
-
-- Update Logo.svg [#3](https://github.com/Quenty/NevermoreEngine/pull/3) (Mark.Otaris@gmail.com [@ghost](https://github.com/ghost))
-
-#### Authors: 2
-
-- Deleted user ([@ghost](https://github.com/ghost))
-- Mark Otaris (Mark.Otaris@gmail.com)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.22.0...@quenty/rogue-properties@4.22.1) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+
+
+
 
 # [4.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.21.1...@quenty/rogue-properties@4.22.0) (2023-06-24)
 

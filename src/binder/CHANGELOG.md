@@ -1,27 +1,15 @@
-# v8.19.1 (Sat Jun 24 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Deleted user ([@ghost](https://github.com/ghost)), for all your work!
-
-#### 🐛 Bug Fix
-
-- docs: Fixing Info block in Binder [#377](https://github.com/Quenty/NevermoreEngine/pull/377) ([@antcar0929](https://github.com/antcar0929))
-- docs: Fixing the Info block ([@antcar0929](https://github.com/antcar0929))
-- Update Logo.svg [#3](https://github.com/Quenty/NevermoreEngine/pull/3) (Mark.Otaris@gmail.com [@ghost](https://github.com/ghost))
-
-#### Authors: 3
-
-- Antcar ([@antcar0929](https://github.com/antcar0929))
-- Deleted user ([@ghost](https://github.com/ghost))
-- Mark Otaris (Mark.Otaris@gmail.com)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.19.0...@quenty/binder@8.19.1) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/binder
+
+
+
+
 
 # [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.18.1...@quenty/binder@8.19.0) (2023-06-24)
 
