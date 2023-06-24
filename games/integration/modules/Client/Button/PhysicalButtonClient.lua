@@ -8,14 +8,14 @@ local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
 local CameraStackService = require("CameraStackService")
-local PhysicalButtonConstants = require("PhysicalButtonConstants")
 local GameTranslator = require("GameTranslator")
+local PhysicalButtonConstants = require("PhysicalButtonConstants")
 local PromiseUtils = require("PromiseUtils")
-local RagdollBindersClient = require("RagdollBindersClient")
-local RxInstanceUtils = require("RxInstanceUtils")
+local RagdollClient = require("RagdollClient")
 local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local PhysicalButtonClient = setmetatable({}, BaseObject)
 PhysicalButtonClient.ClassName = "PhysicalButtonClient"
@@ -29,7 +29,7 @@ function PhysicalButtonClient.new(obj, serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._cameraStackService = self._serviceBag:GetService(CameraStackService)
 	self._gameTranslator = self._serviceBag:GetService(GameTranslator)
-	self._ragdollBinders = self._serviceBag:GetService(RagdollBindersClient)
+	self._ragdollClient = self._serviceBag:GetService(RagdollClient)
 
 	self:_setup()
 
@@ -52,7 +52,7 @@ function PhysicalButtonClient:_observeLocalPlayerRagdolled()
 			end);
 			Rx.switchMap(function(humanoid)
 				if humanoid then
-					return RxBinderUtils.observeBoundClass(self._ragdollBinders.Ragdoll, humanoid)
+					return RxBinderUtils.observeBoundClass(self._ragdollClient, humanoid)
 				else
 					return Rx.of(nil)
 				end
