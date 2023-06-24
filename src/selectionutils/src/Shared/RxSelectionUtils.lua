@@ -36,6 +36,30 @@ function RxSelectionUtils.observeFirstSelectionWhichIsA(className)
 end
 
 --[=[
+	Observes first selection in the selection list which is of a class wrapped in a brio
+
+	```lua
+	RxSelectionUtils.observeFirstSelectionWhichIsA("BasePart"):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		print("part", brio:GetValue())
+	end)
+	```
+
+	@param className string
+	@return Observable<Brio<Instance>>
+]=]
+function RxSelectionUtils.observeFirstSelectionWhichIsABrio(className)
+	assert(type(className) == "string", "Bad className")
+
+	return RxSelectionUtils.observeFirstSelectionBrio(function(inst)
+		return inst:IsA(className)
+	end)
+end
+
+--[=[
 	Observes first selection in the selection list which is an "Adornee"
 
 	@return Observable<Instance?>
