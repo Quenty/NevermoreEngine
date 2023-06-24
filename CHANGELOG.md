@@ -1,3 +1,16 @@
+# (Sat Jun 24 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneeboundingbox@1.1.0`, `@quenty/binder@8.19.0`, `@quenty/camera@9.17.0`, `@quenty/cframeutils@5.3.0`, `@quenty/idleservice@7.28.0`, `@quenty/promisemaid@1.1.0`, `@quenty/ragdoll@9.28.0`, `@quenty/selectionutils@2.17.0`, `@quenty/servicebag@6.8.0`, `@quenty/singleton@1.1.0`
+  - feat: Add some new packages and additional ragdoll binder changes [#376](https://github.com/Quenty/NevermoreEngine/pull/376) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jun 23 2023)
 
 #### 🐛 Bug Fix
