@@ -20,11 +20,19 @@ function RagdollService:Init(serviceBag)
 	self._serviceBag:GetService(require("Motor6DService"))
 
 	-- Internal
-	self._binders = self._serviceBag:GetService(require("RagdollBindersServer"))
+	self._serviceBag:GetService(require("RagdollBindersServer"))
 
-	self._binders.RagdollHumanoidOnFall:SetAutomaticTagging(false)
-	self._binders.RagdollHumanoidOnDeath:SetAutomaticTagging(false)
-	self._binders.UnragdollAutomatically:SetAutomaticTagging(false)
+	-- Binders
+	self._serviceBag:GetService(require("Ragdoll"))
+	self._serviceBag:GetService(require("Ragdollable"))
+	self._serviceBag:GetService(require("RagdollHumanoidOnDeath"))
+	self._serviceBag:GetService(require("RagdollHumanoidOnFall"))
+	self._serviceBag:GetService(require("UnragdollAutomatically"))
+
+	-- Configure
+	self._serviceBag:GetService(require("RagdollHumanoidOnDeath")):SetAutomaticTagging(false)
+	self._serviceBag:GetService(require("RagdollHumanoidOnFall")):SetAutomaticTagging(false)
+	self._serviceBag:GetService(require("UnragdollAutomatically")):SetAutomaticTagging(false)
 end
 
 --[=[
@@ -35,7 +43,7 @@ function RagdollService:SetRagdollOnFall(ragdollOnFall)
 	assert(self._serviceBag, "Not initialized")
 	assert(type(ragdollOnFall) == "boolean", "Bad ragdollOnFall")
 
-	self._binders.RagdollHumanoidOnFall:SetAutomaticTagging(ragdollOnFall)
+	self._serviceBag:GetService(require("RagdollHumanoidOnFall")):SetAutomaticTagging(ragdollOnFall)
 end
 
 --[=[
@@ -46,7 +54,7 @@ function RagdollService:SetRagdollOnDeath(ragdollOnDeath)
 	assert(self._serviceBag, "Not initialized")
 	assert(type(ragdollOnDeath) == "boolean", "Bad ragdollOnDeath")
 
-	self._binders.RagdollHumanoidOnDeath:SetAutomaticTagging(ragdollOnDeath)
+	self._serviceBag:GetService(require("RagdollHumanoidOnDeath")):SetAutomaticTagging(ragdollOnDeath)
 end
 
 --[=[
@@ -57,7 +65,7 @@ function RagdollService:SetUnragdollAutomatically(unragdollAutomatically)
 	assert(self._serviceBag, "Not initialized")
 	assert(type(unragdollAutomatically) == "boolean", "Bad unragdollAutomatically")
 
-	self._binders.UnragdollAutomatically:SetAutomaticTagging(unragdollAutomatically)
+	self._serviceBag:GetService(require("UnragdollAutomatically")):SetAutomaticTagging(unragdollAutomatically)
 end
 
 return RagdollService

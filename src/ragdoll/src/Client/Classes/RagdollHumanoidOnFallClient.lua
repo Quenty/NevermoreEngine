@@ -11,8 +11,9 @@ local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
 local BindableRagdollHumanoidOnFall = require("BindableRagdollHumanoidOnFall")
+local Binder = require("Binder")
 local CharacterUtils = require("CharacterUtils")
-local RagdollBindersClient = require("RagdollBindersClient")
+local RagdollClient = require("RagdollClient")
 local RagdollHumanoidOnFallConstants = require("RagdollHumanoidOnFallConstants")
 
 local RagdollHumanoidOnFallClient = setmetatable({}, BaseObject)
@@ -22,7 +23,7 @@ RagdollHumanoidOnFallClient.__index = RagdollHumanoidOnFallClient
 require("PromiseRemoteEventMixin"):Add(RagdollHumanoidOnFallClient, RagdollHumanoidOnFallConstants.REMOTE_EVENT_NAME)
 
 --[=[
-	Constructs a new RagdollHumanoidOnFallClient. Should be done via [Binder]. See [RagdollBindersClient].
+	Constructs a new RagdollHumanoidOnFallClient. This module exports a [Binder].
 	@param humanoid Humanoid
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnFallClient
@@ -30,7 +31,8 @@ require("PromiseRemoteEventMixin"):Add(RagdollHumanoidOnFallClient, RagdollHuman
 function RagdollHumanoidOnFallClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFallClient)
 
-	self._ragdollBinder = serviceBag:GetService(RagdollBindersClient).Ragdoll
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player == Players.LocalPlayer then
@@ -54,4 +56,4 @@ function RagdollHumanoidOnFallClient:_update()
 	end
 end
 
-return RagdollHumanoidOnFallClient
+return Binder.new("RagdollHumanoidOnFall", RagdollHumanoidOnFallClient)

@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 
 local Maid = require("Maid")
-local RagdollBindersClient = require("RagdollBindersClient")
+local RagdollClient = require("RagdollClient")
 local Rx = require("Rx")
 local StateStack = require("StateStack")
 local ValueObject = require("ValueObject")
@@ -35,7 +35,7 @@ function IdleServiceClient:Init(serviceBag)
 	-- External
 	self._serviceBag:GetService(require("RagdollServiceClient"))
 	self._humanoidTracker = self._serviceBag:GetService(require("HumanoidTrackerService")):GetHumanoidTracker()
-	self._ragdollBindersClient = self._serviceBag:GetService(RagdollBindersClient)
+	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
 
 	-- Configure
 	self._disableStack = StateStack.new(false)
@@ -214,7 +214,7 @@ function IdleServiceClient:_handleAliveHumanoidChanged()
 			self._lastPosition.Value = rootPart.Position
 		end
 
-		if self._ragdollBindersClient.Ragdoll:Get(humanoid) then
+		if self._ragdollBinder:Get(humanoid) then
 			lastMove = os.clock()
 		elseif rootPart then
 			if rootPart.Velocity.magnitude > MOVE_DISTANCE_REQUIRED then

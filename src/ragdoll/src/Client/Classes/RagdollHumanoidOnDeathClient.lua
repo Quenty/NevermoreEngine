@@ -8,20 +8,20 @@
 local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
-
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 
 local BaseObject = require("BaseObject")
-local RagdollBindersClient = require("RagdollBindersClient")
+local Binder = require("Binder")
 local CharacterUtils = require("CharacterUtils")
+local RagdollClient = require("RagdollClient")
 
 local RagdollHumanoidOnDeathClient = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeathClient.ClassName = "RagdollHumanoidOnDeathClient"
 RagdollHumanoidOnDeathClient.__index = RagdollHumanoidOnDeathClient
 
 --[=[
-	Constructs a new RagdollHumanoidOnDeathClient. Should be done via [Binder]. See [RagdollBindersClient].
+	Constructs a new RagdollHumanoidOnDeathClient. This module exports a [Binder].
 	@param humanoid Humanoid
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnDeathClient
@@ -29,7 +29,8 @@ RagdollHumanoidOnDeathClient.__index = RagdollHumanoidOnDeathClient
 function RagdollHumanoidOnDeathClient.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeathClient)
 
-	self._ragdollBinder = serviceBag:GetService(RagdollBindersClient).Ragdoll
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
 
 	if self._obj:GetState() == Enum.HumanoidStateType.Dead then
 		self:_handleDeath()
@@ -95,4 +96,4 @@ function RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(
 	end
 end
 
-return RagdollHumanoidOnDeathClient
+return Binder.new("RagdollHumanoidOnDeath", RagdollHumanoidOnDeathClient)

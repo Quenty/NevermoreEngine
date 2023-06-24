@@ -11,7 +11,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local BindableRagdollHumanoidOnFall = require("BindableRagdollHumanoidOnFall")
 local CharacterUtils = require("CharacterUtils")
-local RagdollBindersServer = require("RagdollBindersServer")
+local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
+local Ragdoll = require("Ragdoll")
 local RagdollHumanoidOnFallConstants = require("RagdollHumanoidOnFallConstants")
 
 local RagdollHumanoidOnFall = setmetatable({}, BaseObject)
@@ -19,7 +20,7 @@ RagdollHumanoidOnFall.ClassName = "RagdollHumanoidOnFall"
 RagdollHumanoidOnFall.__index = RagdollHumanoidOnFall
 
 --[=[
-	Constructs a new RagdollHumanoidOnFall. Should be done via [Binder]. See [RagdollBindersServer].
+	Constructs a new RagdollHumanoidOnFall. Should be done via [Binder]. See [Ragdoll].
 	@param humanoid Humanoid
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnFall
@@ -27,7 +28,8 @@ RagdollHumanoidOnFall.__index = RagdollHumanoidOnFall
 function RagdollHumanoidOnFall.new(humanoid, serviceBag)
 	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnFall)
 
-	self._ragdollBinder = serviceBag:GetService(RagdollBindersServer).Ragdoll
+	self._serviceBag = assert(serviceBag, "Bad serviceBag")
+	self._ragdollBinder = self._serviceBag:GetService(Ragdoll)
 
 	local player = CharacterUtils.getPlayerFromCharacter(self._obj)
 	if player then
@@ -89,4 +91,4 @@ function RagdollHumanoidOnFall:_update()
 	end
 end
 
-return RagdollHumanoidOnFall
+return PlayerHumanoidBinder.new("RagdollHumanoidOnFall", RagdollHumanoidOnFall)
