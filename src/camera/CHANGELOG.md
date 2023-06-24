@@ -1,23 +1,18 @@
-# v9.17.0 (Sat Jun 24 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add some new packages and additional ragdoll binder changes [#376](https://github.com/Quenty/NevermoreEngine/pull/376) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Assert speed set on CameraStateTweener is a number ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.16.0...@quenty/camera@9.17.0) (2023-06-24)
+
+
+### Bug Fixes
+
+* Assert speed set on CameraStateTweener is a number ([0cef9b5](https://github.com/Quenty/NevermoreEngine/commit/0cef9b552f3d3c795e9a6f854de1009af8b7f1fb))
+
+
+
+
 
 # [9.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.15.0...@quenty/camera@9.16.0) (2023-06-18)
 

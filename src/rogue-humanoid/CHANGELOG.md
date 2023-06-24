@@ -1,19 +1,15 @@
-# v3.24.0 (Sat Jun 24 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add some new packages and additional ragdoll binder changes [#376](https://github.com/Quenty/NevermoreEngine/pull/376) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.23.1...@quenty/rogue-humanoid@3.24.0) (2023-06-24)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
 
 ## [3.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.23.0...@quenty/rogue-humanoid@3.23.1) (2023-06-23)
 
