@@ -1,0 +1,11 @@
+{
+  "name": "AdorneeBoundingBoxTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "adorneeboundingbox": {
+        "$path": ".."
+      }
+    }
+  }
+}
