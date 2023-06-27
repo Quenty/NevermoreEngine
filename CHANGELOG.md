@@ -1,3 +1,20 @@
+# (Tue Jun 27 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Madison ([@Phalanxia](https://github.com/Phalanxia)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/octree@6.4.1`
+  - Fixed documentation typo in Octree.lua [#378](https://github.com/Quenty/NevermoreEngine/pull/378) ([@Phalanxia](https://github.com/Phalanxia))
+
+#### Authors: 1
+
+- Madison ([@Phalanxia](https://github.com/Phalanxia))
+
+---
+
 # (Sat Jun 24 2023)
 
 :tada: This release contains work from a new contributor! :tada:
