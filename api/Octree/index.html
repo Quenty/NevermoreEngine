@@ -33,7 +33,7 @@ for data that is centralized, or static, an octree can be a very efficient spati
 
 That said, it is totally fine to track the objects that DO move around using octree, as long as you
 apply proper optimizations. The main performance cost of doing this comes down to tracking and
-upating the position of the objects, which is fine if:
+updating the position of the objects, which is fine if:
 	1) You have a way to detect the movement without having to loop through all the moving
 	objects to update the position
 	2) You can tolerate some inaccuracy with positions and smear this update
@@ -69,15 +69,15 @@ for data that is centralized, or static, an octree can be a very efficient spati
 
 That said, it is totally fine to track the objects that DO move around using octree, as long as you
 apply proper optimizations. The main performance cost of doing this comes down to tracking and
-upating the position of the objects, which is fine if:
+updating the position of the objects, which is fine if:
 	1) You have a way to detect the movement without having to loop through all the moving
 	objects to update the position
 	2) You can tolerate some inaccuracy with positions and smear this update
 	3) You have less than 1000 objects to track, in this case looping through everything
 	shouldn&#x27;t be too costly.
 :::"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Octree"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Octree" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Octree" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.7d9d553b.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.8541fb58.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.295a774b.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.36851e54.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -121,7 +121,7 @@ octree<span class="token punctuation">:</span><span class="token function">Creat
     <p>
       That said, it is totally fine to track the objects that DO move around using octree, as long as you
       apply proper optimizations. The main performance cost of doing this comes down to tracking and
-      upating the position of the objects, which is fine if:
+      updating the position of the objects, which is fine if:
       1) You have a way to detect the movement without having to loop through all the moving
       objects to update the position
       2) You can tolerate some inaccuracy with positions and smear this update
@@ -361,13 +361,13 @@ octree<span class="token punctuation">:</span><span class="token function">Creat
     &quot;properties&quot;: [],
     &quot;types&quot;: [],
     &quot;name&quot;: &quot;Octree&quot;,
-    &quot;desc&quot;: &quot;Octree implementation. An octree is a data structure that allows for quick spatial\ndata queries of static objects. For example, trees can be stored in an octree, and\nnearby trees could be found near the player.\n\nOctrees exists as a grid of nodes, which are subdivided in half in each axis, which\nresults in 8 different regions. This recursively happens to a set depth.\n\nThis allows for O(n) data storage and log(n) retrieval of nearby objects. With a large\nquantity of items in the octree, this can make data retrieval significantly faster.\n\nSee also: https://en.wikipedia.org/wiki/Octree\n\n```lua\nlocal octree = Octree.new()\noctree:CreateNode(Vector3.zero, \&quot;A\&quot;)\noctree:CreateNode(Vector3.zero, \&quot;B\&quot;)\noctree:CreateNode(Vector3.zero, workspace)\noctree:CreateNode(Vector3.new(0, 0, 1000), \&quot;C\&quot;)\nprint(octree:RadiusSearch(Vector3.zero, 100)) --&gt; { \&quot;A\&quot;, \&quot;B\&quot;, workspace }\n```\n\n:::tip\nOctrees are best for static objects in the world, and not objects moving around, since then\ndata can be statically cached.\n\nSometimes using Roblox&#x27;s spatial hash using the region API is faster than using an octree. However,\nfor data that is centralized, or static, an octree can be a very efficient spatial query mechanism.\n\nThat said, it is totally fine to track the objects that DO move around using octree, as long as you\napply proper optimizations. The main performance cost of doing this comes down to tracking and\nupating the position of the objects, which is fine if:\n\t1) You have a way to detect the movement without having to loop through all the moving\n\tobjects to update the position\n\t2) You can tolerate some inaccuracy with positions and smear this update\n\t3) You have less than 1000 objects to track, in this case looping through everything\n\tshouldn&#x27;t be too costly.\n:::&quot;,
+    &quot;desc&quot;: &quot;Octree implementation. An octree is a data structure that allows for quick spatial\ndata queries of static objects. For example, trees can be stored in an octree, and\nnearby trees could be found near the player.\n\nOctrees exists as a grid of nodes, which are subdivided in half in each axis, which\nresults in 8 different regions. This recursively happens to a set depth.\n\nThis allows for O(n) data storage and log(n) retrieval of nearby objects. With a large\nquantity of items in the octree, this can make data retrieval significantly faster.\n\nSee also: https://en.wikipedia.org/wiki/Octree\n\n```lua\nlocal octree = Octree.new()\noctree:CreateNode(Vector3.zero, \&quot;A\&quot;)\noctree:CreateNode(Vector3.zero, \&quot;B\&quot;)\noctree:CreateNode(Vector3.zero, workspace)\noctree:CreateNode(Vector3.new(0, 0, 1000), \&quot;C\&quot;)\nprint(octree:RadiusSearch(Vector3.zero, 100)) --&gt; { \&quot;A\&quot;, \&quot;B\&quot;, workspace }\n```\n\n:::tip\nOctrees are best for static objects in the world, and not objects moving around, since then\ndata can be statically cached.\n\nSometimes using Roblox&#x27;s spatial hash using the region API is faster than using an octree. However,\nfor data that is centralized, or static, an octree can be a very efficient spatial query mechanism.\n\nThat said, it is totally fine to track the objects that DO move around using octree, as long as you\napply proper optimizations. The main performance cost of doing this comes down to tracking and\nupdating the position of the objects, which is fine if:\n\t1) You have a way to detect the movement without having to loop through all the moving\n\tobjects to update the position\n\t2) You can tolerate some inaccuracy with positions and smear this update\n\t3) You have less than 1000 objects to track, in this case looping through everything\n\tshouldn&#x27;t be too costly.\n:::&quot;,
     &quot;source&quot;: {
         &quot;line&quot;: 42,
         &quot;path&quot;: &quot;src/octree/src/Shared/Octree.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#CreateNode" class="table-of-contents__link toc-highlight">:CreateNode</a></li><li><a href="#GetAllNodes" class="table-of-contents__link toc-highlight">:GetAllNodes</a></li><li><a href="#KNearestNeighborsSearch" class="table-of-contents__link toc-highlight">:KNearestNeighborsSearch</a></li><li><a href="#RadiusSearch" class="table-of-contents__link toc-highlight">:RadiusSearch</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.7d9d553b.js"></script>
-<script src="/NevermoreEngine/assets/js/main.8541fb58.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.295a774b.js"></script>
+<script src="/NevermoreEngine/assets/js/main.36851e54.js"></script>
 </body>
 </html>
