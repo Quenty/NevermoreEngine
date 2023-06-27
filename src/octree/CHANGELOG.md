@@ -1,24 +1,15 @@
-# v6.4.1 (Tue Jun 27 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Madison ([@Phalanxia](https://github.com/Phalanxia)), for all your work!
-
-#### 🐛 Bug Fix
-
-- Fixed documentation typo in Octree.lua [#378](https://github.com/Quenty/NevermoreEngine/pull/378) ([@Phalanxia](https://github.com/Phalanxia))
-- Fixed documentation typo in Octree.lua ([@Phalanxia](https://github.com/Phalanxia))
-
-#### Authors: 1
-
-- Madison ([@Phalanxia](https://github.com/Phalanxia))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@6.4.0...@quenty/octree@6.4.1) (2023-06-27)
+
+**Note:** Version bump only for package @quenty/octree
+
+
+
+
 
 # [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@6.3.1...@quenty/octree@6.4.0) (2023-05-26)
 
