@@ -29,7 +29,7 @@
 
 	That said, it is totally fine to track the objects that DO move around using octree, as long as you
 	apply proper optimizations. The main performance cost of doing this comes down to tracking and
-	upating the position of the objects, which is fine if:
+	updating the position of the objects, which is fine if:
 		1) You have a way to detect the movement without having to loop through all the moving
 		objects to update the position
 		2) You can tolerate some inaccuracy with positions and smear this update
