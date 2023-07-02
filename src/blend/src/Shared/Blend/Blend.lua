@@ -787,14 +787,13 @@ function Blend.Single(observable)
 				local copy = BrioUtils.clone(result)
 				maid._current = copy
 				sub:Fire(copy)
-				return copy
+			elseif result then
+				local current = Brio.new(result)
+				maid._current = current
+				sub:Fire(current)
+			else
+				maid._current = nil
 			end
-
-			local current = Brio.new(result)
-			maid._current = current
-			sub:Fire(current)
-
-			return current
 		end))
 
 		return maid
