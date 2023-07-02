@@ -794,6 +794,10 @@ function Blend.Single(observable)
 			else
 				maid._current = nil
 			end
+		end, function(...)
+			sub:Fail(...)
+		end, function(...)
+			sub:Complete(...)
 		end))
 
 		return maid
