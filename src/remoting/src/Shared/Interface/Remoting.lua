@@ -281,7 +281,7 @@ function Remoting:FireAllClients(memberName, ...)
 	assert(RunService:IsServer(), "FireAllClients must be called on server")
 
 	local remoteEvent = self:_getOrCreateRemoteEvent(memberName)
-	remoteEvent:FireAllClients(memberName, ...)
+	remoteEvent:FireAllClients(...)
 end
 
 --[=[
