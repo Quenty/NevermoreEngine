@@ -1,3 +1,16 @@
+# (Mon Jul 03 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@5.18.1`, `@quenty/remoting@6.6.1`, `@quenty/rogue-properties@4.22.2`
+  - users/quenty/multipliers [#381](https://github.com/Quenty/NevermoreEngine/pull/381) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jun 27 2023)
 
 :tada: This release contains work from a new contributor! :tada:
