@@ -4,6 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local RunService = game:GetService("RunService")
+
 local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
@@ -42,7 +44,11 @@ function RogueAdditiveProvider:Create(additive, source)
 		RoguePropertyModifierUtils.createSourceLink(obj, source)
 	end
 
-	self._rogueBinders.RogueAdditive:Bind(obj)
+	if RunService:IsClient() then
+		self._rogueBinders.RogueAdditive:BindClient(obj)
+	else
+		self._rogueBinders.RogueAdditive:Bind(obj)
+	end
 
 	return obj
 end
