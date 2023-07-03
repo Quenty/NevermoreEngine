@@ -1,21 +1,18 @@
-# v4.22.2 (Mon Jul 03 2023)
-
-#### 🐛 Bug Fix
-
-- users/quenty/multipliers [#381](https://github.com/Quenty/NevermoreEngine/pull/381) ([@Quenty](https://github.com/Quenty))
-- docs: Update docs around rogue property ([@Quenty](https://github.com/Quenty))
-- fix: Suppress binder warning for rogue properties ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.22.1...@quenty/rogue-properties@4.22.2) (2023-07-03)
+
+
+### Bug Fixes
+
+* Suppress binder warning for rogue properties ([f7f3b40](https://github.com/Quenty/NevermoreEngine/commit/f7f3b40013143bf4b28cb13103d9937828738cef))
+
+
+
+
 
 ## [4.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.22.0...@quenty/rogue-properties@4.22.1) (2023-06-24)
 
