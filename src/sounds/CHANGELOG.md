@@ -1,3 +1,20 @@
+# v6.8.0 (Mon Jul 10 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/animations [#385](https://github.com/Quenty/NevermoreEngine/pull/385) ([@Quenty](https://github.com/Quenty))
+- feat: Use RbxAssetId package for SoundUtils ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Update documentation to fit moonwave standards ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
