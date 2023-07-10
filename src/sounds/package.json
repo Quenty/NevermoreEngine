@@ -27,7 +27,8 @@
   ],
   "dependencies": {
     "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/promise": "file:../promise",
+    "@quenty/rbxasset": "file:../rbxasset"
   },
   "publishConfig": {
     "access": "public"
