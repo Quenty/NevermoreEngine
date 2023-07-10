@@ -21,12 +21,22 @@ local HumanoidAnimatorUtils = {}
 function HumanoidAnimatorUtils.getOrCreateAnimator(humanoid)
 	local animator = humanoid:FindFirstChildOfClass("Animator")
 	if not animator then
+		warn("HumanoidAnimatorUtils] - Creating an animator")
 		animator = Instance.new("Animator")
 		animator.Name = "Animator"
 		animator.Parent = humanoid
 	end
 
 	return animator
+end
+
+--[=[
+	Finds an animator in an instance
+
+	@param target Instance
+]=]
+function HumanoidAnimatorUtils.findAnimator(target)
+	return target:FindFirstChildOfClass("Animator")
 end
 
 --[=[
