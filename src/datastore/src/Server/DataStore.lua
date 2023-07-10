@@ -235,11 +235,11 @@ function DataStore:_saveData(writer)
 		end
 
 		return data
-	end, function(err)
+	end)):Catch(function(err)
 		-- Might be caused by Maid rejecting state
 		warn("[DataStore] - Failed to UpdateAsync data", err)
 		return Promise.rejected(err)
-	end)))
+	end))
 
 	self._maid._saveMaid = maid
 
