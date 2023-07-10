@@ -1,3 +1,16 @@
+# v7.17.2 (Mon Jul 10 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Upgrade to cmdr 1.12.0 to patch security vulnerability [#384](https://github.com/Quenty/NevermoreEngine/pull/384) ([@Quenty](https://github.com/Quenty))
+- fix: Upgrade to cmdr 1.12.0 to patch security vulnerability ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
