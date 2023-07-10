@@ -77,7 +77,6 @@ local DEBUG_WRITING = false
 local AUTO_SAVE_TIME = 60*5
 local CHECK_DIVISION = 15
 local JITTER = 20 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
-local DEFAULT_CACHE_TIME_SECONDS = math.huge
 
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
@@ -94,7 +93,6 @@ function DataStore.new(robloxDataStore, key)
 
 	self._key = key or error("No key")
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
-	self._cacheTimeSeconds = DEFAULT_CACHE_TIME_SECONDS
 
 	if self._key == "" then
 		error("[DataStore] - Key cannot be an empty string")
@@ -135,14 +133,8 @@ function DataStore.new(robloxDataStore, key)
 	return self
 end
 
---[=[
-	Sets how long the datastore will cache for
-	@param cacheTimeSeconds number?
-]=]
 function DataStore:SetCacheTime(cacheTimeSeconds)
-	assert(type(cacheTimeSeconds) == "number" or cacheTimeSeconds == nil, "Bad cacheTimeSeconds")
-
-	self._cacheTimeSeconds = cacheTimeSeconds or DEFAULT_CACHE_TIME_SECONDS
+	-- Unimplemented; left to avoid a breaking API change.
 end
 
 --[=[
