@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cmdrservice",
-  "version": "7.17.1",
+  "version": "7.17.2",
   "description": "Bridge between cmdr and Nevermore services using servicebag",
   "keywords": [
     "Roblox",
