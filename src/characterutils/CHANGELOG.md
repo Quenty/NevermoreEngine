@@ -1,24 +1,18 @@
-# v6.9.0 (Mon Jul 10 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/animations [#385](https://github.com/Quenty/NevermoreEngine/pull/385) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxRootPartUtils.observeHumanoidRootPartBrio(character) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Update documentation to fit moonwave standards ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.8.0...@quenty/characterutils@6.9.0) (2023-07-10)
+
+
+### Features
+
+* Add RxRootPartUtils.observeHumanoidRootPartBrio(character) ([a7dd72e](https://github.com/Quenty/NevermoreEngine/commit/a7dd72e31018ac4c20f68c4caa0c9b6105325af8))
+
+
+
+
 
 # [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.7.0...@quenty/characterutils@6.8.0) (2023-06-17)
 

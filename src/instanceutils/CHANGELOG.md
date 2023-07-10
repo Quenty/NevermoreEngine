@@ -1,20 +1,18 @@
-# v7.16.0 (Mon Jul 10 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/animations [#385](https://github.com/Quenty/NevermoreEngine/pull/385) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxInstanceUtils.observeParentBrio(instance) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.15.0...@quenty/instanceutils@7.16.0) (2023-07-10)
+
+
+### Features
+
+* Add RxInstanceUtils.observeParentBrio(instance) ([d91395e](https://github.com/Quenty/NevermoreEngine/commit/d91395eed2cd77bd53b87db23a0692cac43843be))
+
+
+
+
 
 # [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instanceutils@7.14.0...@quenty/instanceutils@7.15.0) (2023-06-17)
 
