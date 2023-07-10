@@ -129,6 +129,10 @@ end
 
 --[=[
 	Converts a string or number to a string for playback.
+
+	Alias of [RbxAssetUtils.toRbxAssetId] for backwards compatibility.
+
+	@function toRbxAssetId
 	@param id string? | number
 	@return string?
 	@within SoundUtils

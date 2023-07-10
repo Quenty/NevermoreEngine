@@ -11,6 +11,7 @@ local RxRootPartUtils = {}
 --[=[
 	Observes the last humanoid root part of a character
 
+	@param character Model
 	@return Brio<BasePart>
 ]=]
 function RxRootPartUtils.observeHumanoidRootPartBrio(character)
