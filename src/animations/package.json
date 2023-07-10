@@ -1,13 +1,12 @@
 {
-  "name": "@quenty/sounds",
-  "version": "6.7.0",
-  "description": "Utility functions involving sounds and their state",
+  "name": "@quenty/animations",
+  "version": "1.0.0",
+  "description": "Utility methods for playing back animations on Roblox",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "Sounds",
-    "Promises"
+    "animations"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -15,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/sounds/"
+    "directory": "src/animations/"
   },
   "funding": {
     "type": "patreon",
@@ -26,8 +25,10 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/enumutils": "file:../enumutils",
+    "@quenty/humanoidanimatorutils": "file:../humanoidanimatorutils",
     "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
+    "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rbxasset": "file:../rbxasset"
   },
   "publishConfig": {

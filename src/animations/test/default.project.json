@@ -1,0 +1,21 @@
+{
+  "name": "AnimationTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "animations": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

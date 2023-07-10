@@ -98,6 +98,19 @@ function RxInstanceUtils.observeFirstAncestorBrio(instance, className)
 end
 
 --[=[
+	Observes the parent of the instance as long as it exists. This is very common when
+	initializing parent interfaces or other behaviors using binders.
+
+	@param instance Instance
+	@return Observable<Brio<Instance>>
+]=]
+function RxInstanceUtils.observeParentBrio(instance)
+	return RxInstanceUtils.observePropertyBrio(instance, "Parent", function(parent)
+		return parent ~= nil
+	end)
+end
+
+--[=[
 	Observes an instance's ancestry
 
 	@param instance Instance
