@@ -1,20 +1,18 @@
-# v6.7.1 (Tue Jul 11 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Pass 'memberName' in Remoting::Bind on the client [#386](https://github.com/Quenty/NevermoreEngine/pull/386) ([@OttoHatt](https://github.com/OttoHatt))
-- fix: Pass 'memberName' in Remoting::Bind on the client ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@6.7.0...@quenty/remoting@6.7.1) (2023-07-11)
+
+
+### Bug Fixes
+
+* Pass 'memberName' in Remoting::Bind on the client ([7fc8b25](https://github.com/Quenty/NevermoreEngine/commit/7fc8b2568ebdc29792f3cda20c404c4366f2faae))
+
+
+
+
 
 # [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@6.6.1...@quenty/remoting@6.7.0) (2023-07-10)
 
