@@ -1,19 +1,15 @@
-# v4.30.1 (Tue Jul 11 2023)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'Quenty:main' into main ([@DeveloperCron](https://github.com/DeveloperCron))
-
-#### Authors: 1
-
-- Lior Shaposhnikov ([@DeveloperCron](https://github.com/DeveloperCron))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.30.0...@quenty/settings@4.30.1) (2023-07-11)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
 
 # [4.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@4.29.3...@quenty/settings@4.30.0) (2023-07-10)
 
