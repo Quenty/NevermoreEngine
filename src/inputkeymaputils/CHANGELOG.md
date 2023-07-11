@@ -1,19 +1,15 @@
-# v7.31.2 (Tue Jul 11 2023)
-
-#### 🐛 Bug Fix
-
-- docs: Update blend docs [#388](https://github.com/Quenty/NevermoreEngine/pull/388) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.31.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.31.1...@quenty/inputkeymaputils@7.31.2) (2023-07-11)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
 
 ## [7.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.31.0...@quenty/inputkeymaputils@7.31.1) (2023-07-11)
 
