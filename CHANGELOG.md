@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/remoting@6.7.1`
+  - fix: Pass 'memberName' in Remoting::Bind on the client [#386](https://github.com/Quenty/NevermoreEngine/pull/386) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
+# (Tue Jul 11 2023)
+
+#### 🐛 Bug Fix
+
 - `@quenty/observablecollection@5.19.1`
   - Docs improvements [#387](https://github.com/Quenty/NevermoreEngine/pull/387) ([@DeveloperCron](https://github.com/DeveloperCron))
 
