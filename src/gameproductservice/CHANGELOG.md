@@ -1,3 +1,15 @@
+# v7.9.3 (Tue Jul 11 2023)
+
+#### 🐛 Bug Fix
+
+- docs: Update blend docs [#388](https://github.com/Quenty/NevermoreEngine/pull/388) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

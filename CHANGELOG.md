@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/blend@6.21.1`
+  - docs: Update blend docs [#388](https://github.com/Quenty/NevermoreEngine/pull/388) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 11 2023)
+
+#### 🐛 Bug Fix
+
 - `@quenty/remoting@6.7.1`
   - fix: Pass 'memberName' in Remoting::Bind on the client [#386](https://github.com/Quenty/NevermoreEngine/pull/386) ([@OttoHatt](https://github.com/OttoHatt))
 
