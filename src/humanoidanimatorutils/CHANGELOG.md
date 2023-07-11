@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidanimatorutils@2.1.1...@quenty/humanoidanimatorutils@2.2.0) (2023-07-10)
+
+
+### Features
+
+* Add HumanoidAnimatorUtils.findAnimator(target) ([771c8d9](https://github.com/Quenty/NevermoreEngine/commit/771c8d9fef18f992b798cc9192c849ac341b00e5))
+
+
+
+
+
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidanimatorutils@2.1.0...@quenty/humanoidanimatorutils@2.1.1) (2022-08-16)
 
 **Note:** Version bump only for package @quenty/humanoidanimatorutils

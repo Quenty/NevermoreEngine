@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@7.17.2...@quenty/cmdrservice@7.18.0) (2023-07-10)
+
+**Note:** Version bump only for package @quenty/cmdrservice
+
+
+
+
+
+## [7.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@7.17.1...@quenty/cmdrservice@7.17.2) (2023-07-10)
+
+
+### Bug Fixes
+
+* Upgrade to cmdr 1.12.0 to patch security vulnerability ([45414cd](https://github.com/Quenty/NevermoreEngine/commit/45414cdddaee11a6ac9c775b6d4bdad292ca1da0))
+
+
+
+
+
 ## [7.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@7.17.0...@quenty/cmdrservice@7.17.1) (2023-07-03)
 
 **Note:** Version bump only for package @quenty/cmdrservice

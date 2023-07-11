@@ -14,6 +14,7 @@ local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
 
 local SoundPromiseUtils = require("SoundPromiseUtils")
+local RbxAssetUtils = require("RbxAssetUtils")
 
 local SoundUtils = {}
 
@@ -32,7 +33,7 @@ local SoundUtils = {}
 	@return Sound
 ]=]
 function SoundUtils.playFromId(id: string | number): Sound
-	local soundId = SoundUtils.toRbxAssetId(id)
+	local soundId = RbxAssetUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
 
 	local sound = SoundUtils.createSoundFromId(id)
@@ -52,7 +53,7 @@ end
 	Creates a new sound object from the given id
 ]=]
 function SoundUtils.createSoundFromId(id: string | number): Sound
-	local soundId = SoundUtils.toRbxAssetId(id)
+	local soundId = RbxAssetUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
 
 	local sound = Instance.new("Sound")
@@ -128,16 +129,15 @@ end
 
 --[=[
 	Converts a string or number to a string for playback.
+
+	Alias of [RbxAssetUtils.toRbxAssetId] for backwards compatibility.
+
+	@function toRbxAssetId
 	@param id string? | number
 	@return string?
+	@within SoundUtils
 ]=]
-function SoundUtils.toRbxAssetId(id: string? | number): string
-	if type(id) == "number" then
-		return ("rbxassetid://%d"):format(id)
-	else
-		return id
-	end
-end
+SoundUtils.toRbxAssetId = RbxAssetUtils.toRbxAssetId
 
 --[=[
 	Plays back a sound template in a specific parent.

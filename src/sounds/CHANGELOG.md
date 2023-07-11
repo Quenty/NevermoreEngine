@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@6.7.0...@quenty/sounds@6.8.0) (2023-07-10)
+
+
+### Features
+
+* Use RbxAssetId package for SoundUtils ([097438e](https://github.com/Quenty/NevermoreEngine/commit/097438ed87e54c37212c421a58656711598dddb1))
+
+
+
+
+
 # [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@6.6.0...@quenty/sounds@6.7.0) (2023-06-17)
 
 **Note:** Version bump only for package @quenty/sounds

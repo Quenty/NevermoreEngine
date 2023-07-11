@@ -1,3 +1,29 @@
+# (Mon Jul 10 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@1.1.0`, `@quenty/characterutils@6.9.0`, `@quenty/humanoidanimatorutils@2.2.0`, `@quenty/instanceutils@7.16.0`, `@quenty/rbxasset@1.1.0`, `@quenty/sounds@6.8.0`
+  - users/quenty/animations [#385](https://github.com/Quenty/NevermoreEngine/pull/385) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 10 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cmdrservice@7.17.2`
+  - fix: Upgrade to cmdr 1.12.0 to patch security vulnerability [#384](https://github.com/Quenty/NevermoreEngine/pull/384) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Jul 03 2023)
 
 #### 🐛 Bug Fix
