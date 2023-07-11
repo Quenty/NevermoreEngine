@@ -129,7 +129,7 @@ function Remoting:Bind(memberName, callback)
 
 		-- TODO: Cleanup if nothing else is expecting this
 	elseif RunService:IsClient() then
-		bindMaid:GiveTask(self:_observeRemoteFunctionBrio():Subscribe(function(brio)
+		bindMaid:GiveTask(self:_observeRemoteFunctionBrio(memberName):Subscribe(function(brio)
 			if brio:IsDead() then
 				return
 			end
