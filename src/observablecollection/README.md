@@ -17,5 +17,5 @@ A set of observable collections, such as sets, maps, sorted lists, and more. Gre
 
 ## Installation
 ```
-npm install @quenty/observableset --save
+npm install @quenty/observablecollection --save
 ```
