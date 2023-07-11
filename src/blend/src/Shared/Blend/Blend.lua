@@ -32,19 +32,22 @@ local Blend = {}
 	equivalent of a pipe-able Rx command.
 
 	```lua
-	Blend.New "ScreenGui" {
+	local render = Blend.New "ScreenGui" {
 		Parent = game.Players.LocalPlayer.PlayerGui;
-		[Blend.Children] = {
-			Blend.New "Frame" {
-				Size = UDim2.new(1, 0, 1, 0);
-				BackgroundTransparency = 0.5;
-			};
+
+		Blend.New "Frame" {
+			Size = UDim2.new(1, 0, 1, 0);
+			BackgroundTransparency = 0.5;
 		};
 	};
 
+	maid:GiveTask(render:Subscribe(function(gui)
+		print(gui)
+	end))
+	```
+
 	@param className string
 	@return (props: { [string]: any; }) -> Observable<Instance>
-	```
 ]=]
 function Blend.New(className)
 	assert(type(className) == "string", "Bad className")
@@ -757,7 +760,7 @@ end
 	:::
 
 	```lua
-	Blend.New "ScreenGui" {
+	local render = Blend.New "ScreenGui" {
 		Parent = game.Players.LocalPlayer.PlayerGui;
 		[Blend.Children] = {
 			Blend.Single(Blend.Computed(percentVisible, function()
@@ -771,6 +774,10 @@ end
 			end)
 		};
 	};
+
+	maid:GiveTask(render:Subscribe(function(gui)
+		print(gui)
+	end))
 	```
 
 	@function Single
@@ -1006,7 +1013,7 @@ end
 	* If the key is [Blend.Children] then we invoke mountChildren on it.
 
 	```lua
-	Blend.mount(frame, {
+	maid:GiveTask(Blend.mount(frame, {
 		BackgroundTransparency = 1;
 
 		-- All items named InventoryItem
@@ -1017,7 +1024,7 @@ end
 				Scale = 0.5;
 			};
 		};
-	})
+	}))
 	```
 
 	@param instance Instance
