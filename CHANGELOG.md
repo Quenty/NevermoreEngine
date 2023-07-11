@@ -1,3 +1,16 @@
+# (Tue Jul 11 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@5.19.1`
+  - Docs improvements [#387](https://github.com/Quenty/NevermoreEngine/pull/387) ([@DeveloperCron](https://github.com/DeveloperCron))
+
+#### Authors: 1
+
+- Lior Shaposhnikov ([@DeveloperCron](https://github.com/DeveloperCron))
+
+---
+
 # (Mon Jul 10 2023)
 
 #### 🚀 Enhancement

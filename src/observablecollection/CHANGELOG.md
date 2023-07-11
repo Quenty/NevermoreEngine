@@ -1,3 +1,17 @@
+# v5.19.1 (Tue Jul 11 2023)
+
+#### 🐛 Bug Fix
+
+- Docs improvements [#387](https://github.com/Quenty/NevermoreEngine/pull/387) ([@DeveloperCron](https://github.com/DeveloperCron))
+- Update README.md ([@DeveloperCron](https://github.com/DeveloperCron))
+- Merge branch 'Quenty:main' into main ([@DeveloperCron](https://github.com/DeveloperCron))
+
+#### Authors: 1
+
+- Lior Shaposhnikov ([@DeveloperCron](https://github.com/DeveloperCron))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

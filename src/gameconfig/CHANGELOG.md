@@ -1,3 +1,15 @@
+# v5.31.1 (Tue Jul 11 2023)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'Quenty:main' into main ([@DeveloperCron](https://github.com/DeveloperCron))
+
+#### Authors: 1
+
+- Lior Shaposhnikov ([@DeveloperCron](https://github.com/DeveloperCron))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
