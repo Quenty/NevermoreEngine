@@ -31,8 +31,13 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 	self._maid:GiveTask(self._properties.WalkSpeed:Observe():Subscribe(function(walkSpeed)
 		self._obj.WalkSpeed = walkSpeed
 	end))
+	self._maid:GiveTask(self._properties.CharacterUseJumpPower:Observe():Subscribe(function(useJumpPower)
+		self._obj.UseJumpPower = useJumpPower
+	end))
+	self._maid:GiveTask(self._properties.JumpPower:Observe():Subscribe(function(jumpPower)
+		self._obj.JumpPower = jumpPower
+	end))
 	self._maid:GiveTask(self._properties.JumpHeight:Observe():Subscribe(function(jumpHeight)
-		self._obj.UseJumpPower = false
 		self._obj.JumpHeight = jumpHeight
 	end))
 

@@ -11,6 +11,8 @@ local RoguePropertyTableDefinition = require("RoguePropertyTableDefinition")
 return RoguePropertyTableDefinition.new("RogueHumanoidProperties", {
 	WalkSpeed = StarterPlayer.CharacterWalkSpeed;
 	JumpHeight = StarterPlayer.CharacterJumpHeight;
+	JumpPower = StarterPlayer.CharacterJumpPower;
+	CharacterUseJumpPower = StarterPlayer.CharacterUseJumpPower;
 
 	Scale = 1;
 	ScaleMax = 20;
