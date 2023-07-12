@@ -1,3 +1,16 @@
+# (Wed Jul 12 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@7.19.0`, `@quenty/rogue-humanoid@3.26.0`
+  - users/quenty/fix [#389](https://github.com/Quenty/NevermoreEngine/pull/389) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jul 11 2023)
 
 #### 🐛 Bug Fix

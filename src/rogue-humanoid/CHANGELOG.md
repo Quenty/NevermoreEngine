@@ -1,3 +1,16 @@
+# v3.26.0 (Wed Jul 12 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/fix [#389](https://github.com/Quenty/NevermoreEngine/pull/389) ([@Quenty](https://github.com/Quenty))
+- feat: Add UseJumpPower and JumpPower properties ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
