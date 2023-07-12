@@ -40,7 +40,7 @@
 		playerMoneyValue.Value = 0
 		playerMoneyValue.Parent = player
 
-		maid:GivePromise(playerDataStoreService:PromiseDataStore(Players)):Then(function(dataStore)
+		maid:GivePromise(playerDataStoreService:PromiseDataStore(player)):Then(function(dataStore)
 			maid:GivePromise(dataStore:Load("money", 0))
 				:Then(function(money)
 					playerMoneyValue.Value = money
