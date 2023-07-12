@@ -1,20 +1,18 @@
-# v3.26.0 (Wed Jul 12 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/fix [#389](https://github.com/Quenty/NevermoreEngine/pull/389) ([@Quenty](https://github.com/Quenty))
-- feat: Add UseJumpPower and JumpPower properties ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.25.0...@quenty/rogue-humanoid@3.26.0) (2023-07-12)
+
+
+### Features
+
+* Add UseJumpPower and JumpPower properties ([a23e46b](https://github.com/Quenty/NevermoreEngine/commit/a23e46b4406db47bc2240827b85ea093bebaec21))
+
+
+
+
 
 # [3.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.24.2...@quenty/rogue-humanoid@3.25.0) (2023-07-10)
 

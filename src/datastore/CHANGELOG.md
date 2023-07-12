@@ -1,23 +1,15 @@
-# v7.19.0 (Wed Jul 12 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/fix [#389](https://github.com/Quenty/NevermoreEngine/pull/389) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: FIx docs for datastore ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.18.0...@quenty/datastore@7.19.0) (2023-07-12)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
 
 # [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.17.0...@quenty/datastore@7.18.0) (2023-07-10)
 
