@@ -28,7 +28,8 @@
     "@quenty/brio": "file:../brio",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise"
+    "@quenty/promise": "file:../promise",
+    "@quenty/rxsignal": "file:../rxsignal"
   },
   "publishConfig": {
     "access": "public"
