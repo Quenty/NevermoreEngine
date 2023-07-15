@@ -1789,6 +1789,28 @@ function Rx.throttleTime(duration, throttleConfig)
 end
 
 --[=[
+	Only emits events after the deferred first signal.
+
+	@return (source: Observable) -> Observable
+]=]
+function Rx.onlyAfterDefer()
+	return function(observable)
+		return Observable.new(function(sub)
+			local isReady = false
+			task.defer(function()
+				isReady = true
+			end)
+
+			return observable:Subscribe(function(...)
+				if isReady then
+					sub:Fire(...)
+				end
+			end, sub:GetFailComplete())
+		end)
+	end;
+end
+
+--[=[
 	Throttles emission of observables on the defer stack to the last emission.
 	@return (source: Observable) -> Observable
 ]=]
