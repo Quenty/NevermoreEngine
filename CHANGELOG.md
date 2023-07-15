@@ -1,3 +1,16 @@
+# (Sat Jul 15 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/attributeutils@8.17.0`, `@quenty/binder@8.21.0`, `@quenty/blend@6.22.0`, `@quenty/cframeutils@5.4.0`, `@quenty/humanoidteleportutils@6.3.0`, `@quenty/observablecollection@5.20.0`, `@quenty/propertyvalue@1.1.0`, `@quenty/rogue-properties@4.24.0`, `@quenty/rx@7.13.0`, `@quenty/rxsignal@1.1.0`, `@quenty/tie@4.23.0`, `@quenty/valuebaseutils@7.17.0`
+  - Add :Observe() API calls to a variety of places [#393](https://github.com/Quenty/NevermoreEngine/pull/393) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jul 12 2023)
 
 #### 🚀 Enhancement
