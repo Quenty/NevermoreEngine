@@ -29,30 +29,37 @@ function CFrameUtils.lookAt(position: Vector3, target: Vector3, upVector: Vector
 end
 
 function CFrameUtils.cframeFromTo(a, b)
-    local dr = a:Dot(b)
-    local di = a:Cross(b)
+	local dr = a:Dot(b)
+	local di = a:Cross(b)
 
-    local d = math.sqrt(dr*dr + di:Dot(di))
-    if d < 1e-6 then
-        return CFrame.identity
-    end
+	local d = math.sqrt(dr*dr + di:Dot(di))
+	if d < 1e-6 then
+		return CFrame.identity
+	end
 
-    if dr < 0 and -di.magnitude/dr < 1e-6 then
-        -- this is a degenerate case where a ~ -b
-        -- so we must arbitrate a perpendicular axis to a and b to disambiguate.
-        local r = b - a
-        local r2 = r*r
-        local min = math.min(r2.x, r2.y, r2.z)
-        if min == r2.x then
-            return CFrame.new(0, 0, 0, 0, -r.z, r.y, 0)
-        elseif min == r2.y then
-            return CFrame.new(0, 0, 0, r.z, 0, -r.x, 0)
-        else --if min == r2.z then
-            return CFrame.new(0, 0, 0, -r.y, r.x, 0, 0)
-        end
-    end
+	if dr < 0 and -di.magnitude/dr < 1e-6 then
+		-- this is a degenerate case where a ~ -b
+		-- so we must arbitrate a perpendicular axis to a and b to disambiguate.
+		local r = b - a
+		local r2 = r*r
+		local min = math.min(r2.x, r2.y, r2.z)
+		if min == r2.x and min == r2.y then
 
-    return CFrame.new(0, 0, 0, di.x, di.y, di.z, dr + d)
+			return CFrame.new(0, 0, 0, 0, 0, r.z, 0)
+		elseif min == r2.y and min == r2.z then
+			return CFrame.new(0, 0, 0, 0, r.x, 0, 0)
+		elseif min == r2.x and min == r2.z then
+			return CFrame.new(0, 0, 0, r.y, 0, 0, 0)
+		elseif min == r2.x then
+			return CFrame.new(0, 0, 0, 0, -r.z, r.y, 0)
+		elseif min == r2.y then
+			return CFrame.new(0, 0, 0, r.z, 0, -r.x, 0)
+		else --if min == r2.z then
+			return CFrame.new(0, 0, 0, -r.y, r.x, 0, 0)
+		end
+	end
+
+	return CFrame.new(0, 0, 0, di.x, di.y, di.z, dr + d)
 end
 
 --[=[
@@ -80,19 +87,19 @@ end
 	@return CFrame
 ]=]
 function CFrameUtils.redirectLocalAxis(cframe: CFrame, localAxis: Vector3, worldGoal: Vector3): CFrame
-	-- local localGoal = cframe:VectorToObjectSpace(worldGoal)
-	-- local m = localAxis.magnitude*localGoal.magnitude
-	-- local d = localAxis:Dot(localGoal)
-	-- local c = localAxis:Cross(localGoal)
-	-- local R = CFrame.new(0, 0, 0, c.x, c.y, c.z, d + m)
+	local localGoal = cframe:VectorToObjectSpace(worldGoal)
+	local m = localAxis.magnitude*localGoal.magnitude
+	local d = localAxis:Dot(localGoal)
+	local c = localAxis:Cross(localGoal)
+	local R = CFrame.new(0, 0, 0, c.x, c.y, c.z, d + m)
 
-	-- if R == R then
-	-- 	return cframe*R
-	-- else
-	-- 	return cframe
-	-- end
+	if R == R then
+		return cframe*R
+	else
+		return cframe
+	end
 
-	return cframe*CFrameUtils.cframeFromTo(localAxis, cframe:vectorToObjectSpace(worldGoal))
+	-- return cframe*CFrameUtils.cframeFromTo(localAxis, cframe:vectorToObjectSpace(worldGoal))
 end
 
 --[=[
