@@ -75,6 +75,10 @@ end
 ]=]
 function ObservableSet:ObserveItemsBrio()
 	return Observable.new(function(sub)
+		if not self.Destroy then
+			return sub:Fail("ObservableSet is already cleaned up")
+		end
+
 		local maid = Maid.new()
 
 		local function handleItem(item)
@@ -113,6 +117,10 @@ function ObservableSet:ObserveContains(item)
 	assert(item ~= nil, "Bad item")
 
 	return Observable.new(function(sub)
+		if not self.Destroy then
+			return sub:Fail("ObservableSet is already cleaned up")
+		end
+
 		local maid = Maid.new()
 
 		if self._set[item] then

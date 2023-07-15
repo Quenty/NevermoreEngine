@@ -75,6 +75,15 @@ function SpringObject:ObserveRenderStepped()
 	return self:ObserveOnSignal(RunService.RenderStepped)
 end
 
+--[=[
+	Alias for [ObserveRenderStepped]
+
+	@return Observable<T>
+]=]
+function SpringObject:Observe()
+	return self:ObserveRenderStepped()
+end
+
 function SpringObject:ObserveVelocityOnRenderStepped()
 	return self:ObserveVelocityOnSignal(RunService.RenderStepped)
 end

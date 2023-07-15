@@ -21,6 +21,10 @@ local require = require(script.Parent.loader).load(script)
 
 local RxAttributeUtils = require("RxAttributeUtils")
 
+local DEFAULT_PREDICATE = function(value)
+	return value
+end
+
 local AttributeValue = {}
 AttributeValue.ClassName = "AttributeValue"
 AttributeValue.__index = AttributeValue
@@ -49,6 +53,11 @@ function AttributeValue.new(object, attributeName, defaultValue)
 	end
 
 	return setmetatable(self, AttributeValue)
+end
+
+function AttributeValue:ObserveBrio(condition)
+	condition = condition or DEFAULT_PREDICATE
+	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition)
 end
 
 --[=[
