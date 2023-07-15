@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/propertyvalue",
+  "version": "1.0.0",
+  "description": "Property value for Roblox instances",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "propertyvalue"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/propertyvalue/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/instanceutils": "file:../instanceutils",
+    "@quenty/loader": "file:../loader"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
