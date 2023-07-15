@@ -53,6 +53,20 @@ function RogueAdditiveProvider:Create(additive, source)
 	return obj
 end
 
+function RogueAdditiveProvider:GetInvertedVersion(propObj, rogueProperty, baseValue)
+	if rogueProperty:GetDefinition():GetValueType() == "number" then
+		local value = baseValue
+
+		for _, item in pairs(self:_getAdditives(propObj)) do
+			value = value - item:GetAdditive()
+		end
+
+		return value
+	else
+		return baseValue
+	end
+end
+
 function RogueAdditiveProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
 		local value = baseValue

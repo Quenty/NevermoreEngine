@@ -25,7 +25,7 @@ RogueProperty.ClassName = "RogueProperty"
 RogueProperty.__index = RogueProperty
 
 function RogueProperty.new(adornee, serviceBag, definition)
-	local self = setmetatable({}, RogueProperty)
+	local self = {}
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._roguePropertyBinderGroups = self._serviceBag:GetService(RoguePropertyBinderGroups)
@@ -33,6 +33,8 @@ function RogueProperty.new(adornee, serviceBag, definition)
 
 	self._adornee = assert(adornee, "Bad adornee")
 	self._definition = assert(definition, "Bad definition")
+
+	self = setmetatable(self, RogueProperty)
 
 	if self._roguePropertyService:CanInitializeProperties() then
 		self:GetBaseValueObject()
@@ -91,6 +93,22 @@ function RogueProperty:SetBaseValue(value)
 	end
 end
 
+function RogueProperty:SetValue(value)
+	local baseValue = self:GetBaseValueObject()
+	if not baseValue then
+		warn("Failed to get the baseValue to parent")
+		return
+	end
+
+	local current = value
+	-- TODO: Consider applying inverted chain here
+	for _, item in pairs(self._roguePropertyService:GetProviders()) do
+		current = item:GetInvertedVersion(baseValue, self, current)
+	end
+
+	baseValue.Value = self:_encodeValue(current)
+end
+
 function RogueProperty:GetBaseValue()
 	local baseValue = self:GetBaseValueObject()
 	if baseValue then
@@ -99,7 +117,6 @@ function RogueProperty:GetBaseValue()
 		return self:_decodeValue(self._definition:GetEncodedDefaultValue())
 	end
 end
-
 
 function RogueProperty:GetValue()
 	local propObj = self:GetBaseValueObject()
@@ -238,6 +255,19 @@ function RogueProperty:__index(index)
 		error(("Bad index %q"):format(tostring(index)))
 	end
 end
+
+function RogueProperty:__newindex(index, value)
+	if index == "Value" then
+		self:SetValue(value)
+	elseif index == "Changed" then
+		error("Cannot set .Changed event")
+	elseif RogueProperty[index] then
+		return RogueProperty[index]
+	else
+		error(("Bad index %q"):format(tostring(index)))
+	end
+end
+
 
 function RogueProperty:_decodeValue(current)
 	return RoguePropertyUtils.decodeProperty(self._definition, current)
