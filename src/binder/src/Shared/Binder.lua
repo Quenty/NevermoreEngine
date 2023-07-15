@@ -73,6 +73,7 @@ function Binder.new(tagName, constructor, ...)
 
 	self._tagName = assert(tagName, "Bad argument 'tagName', expected string")
 	self._constructor = assert(constructor, "Bad argument 'constructor', expected table or function")
+	self._defaultClassType = "Folder"
 	self.ServiceName = self._tagName .. "Binder"
 
 	if select("#", ...) > 0 then
@@ -505,6 +506,24 @@ end
 function Binder:Promise(inst, cancelToken)
 	assert(typeof(inst) == "Instance", "Argument 'inst' is not an Instance")
 	return promiseBoundClass(self, inst, cancelToken)
+end
+
+--[=[
+	Creates a new class tagged with this binder's instance
+
+	@param className string | nil
+	@return Instance
+]=]
+function Binder:Create(className)
+	assert(type(className) == "string" or className == nil, "Bad className")
+
+	local instance = Instance.new(className or self._defaultClassType)
+	instance.Name = self._tagName
+	instance.Archivable = false
+
+	self:Tag(instance)
+
+	return instance
 end
 
 function Binder:_add(inst)

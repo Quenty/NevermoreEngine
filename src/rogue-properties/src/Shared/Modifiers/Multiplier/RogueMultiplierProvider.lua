@@ -53,6 +53,20 @@ function RogueMultiplierProvider:Create(multiplier, source)
 	return obj
 end
 
+function RogueMultiplierProvider:GetInvertedVersion(propObj, rogueProperty, baseValue)
+	if rogueProperty:GetDefinition():GetValueType() == "number" then
+		local multiplier = 1
+
+		for _, item in pairs(self:_getMultipliers(propObj)) do
+			multiplier = multiplier*item:GetMultiplier()
+		end
+
+		return baseValue/multiplier
+	else
+		return baseValue
+	end
+end
+
 function RogueMultiplierProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
 		local multiplier = 1

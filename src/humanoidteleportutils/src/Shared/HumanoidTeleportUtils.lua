@@ -67,9 +67,13 @@ end
 	@param position Vector3
 ]=]
 function HumanoidTeleportUtils.teleportRootPart(humanoid, rootPart, position)
+	local offset = HumanoidTeleportUtils.getRootPartOffset(humanoid, rootPart)
+	rootPart.CFrame = rootPart.CFrame - rootPart.Position + position + offset
+end
+
+function HumanoidTeleportUtils.getRootPartOffset(humanoid, rootPart)
 	-- Calculate additional offset for teleportation
-	local offset = rootPart.Size.Y/2 + humanoid.HipHeight
-	rootPart.CFrame = rootPart.CFrame - rootPart.Position + position + Vector3.new(0, offset, 0)
+	return Vector3.new(0, rootPart.Size.Y/2 + humanoid.HipHeight, 0)
 end
 
 return HumanoidTeleportUtils

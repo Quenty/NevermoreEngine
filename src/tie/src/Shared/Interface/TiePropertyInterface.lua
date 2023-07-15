@@ -75,7 +75,7 @@ function TiePropertyInterface:_getFolder()
 	return TieInterfaceUtils.getFolder(self._tieDefinition, self._folder, self._adornee)
 end
 
-function TiePropertyInterface:_getValueBase()
+function TiePropertyInterface:_findValueBase()
 	local folder = self:_getFolder()
 	if not folder then
 		return nil
@@ -97,7 +97,7 @@ function TiePropertyInterface:_getValueBase()
 end
 
 function TiePropertyInterface:_getValueBaseOrError()
-	local valueBase = self:_getValueBase()
+	local valueBase = self:_findValueBase()
 	if not valueBase then
 		error(("%s.%s is not implemented for %s"):format(
 			self._tieDefinition:GetContainerName(),
@@ -263,7 +263,15 @@ function TiePropertyInterface:__newindex(index, value)
 	if index == "_adornee" or index == "_folder" or index == "_memberDefinition" or index == "_tieDefinition" then
 		rawset(self, index, value)
 	elseif index == "Value" then
-		if AttributeUtils.isValidAttributeType(typeof(value)) and value ~= nil then
+		local className = ValueBaseUtils.getClassNameFromType(typeof(value))
+		if not className then
+			error(("[TiePropertyImplementation] - Bad implementation value type %q, cannot set"):format(typeof(value)))
+		end
+
+		local valueBase = self:_findValueBase()
+		if type(valueBase) == "table" or (typeof(valueBase) == "Instance" and valueBase.ClassName == className) then
+			valueBase.Value = value
+		elseif AttributeUtils.isValidAttributeType(typeof(value)) and value ~= nil then
 			local folder = self:_getFolder()
 			if folder then
 				folder:SetAttribute(self._memberDefinition:GetMemberName(), value)
@@ -275,16 +283,6 @@ function TiePropertyInterface:__newindex(index, value)
 				end
 				return
 			end
-		end
-
-		local className = ValueBaseUtils.getClassNameFromType(typeof(value))
-		if not className then
-			error(("[TiePropertyImplementation] - Bad implementation value type %q, cannot set"):format(typeof(value)))
-		end
-
-		local valueBase = self:_getValueBase()
-		if valueBase and valueBase.ClassName == className then
-			valueBase.Value = value
 		else
 			local folder = self:_getFolder()
 			if folder then

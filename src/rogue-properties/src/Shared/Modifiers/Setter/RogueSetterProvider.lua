@@ -47,6 +47,11 @@ function RogueSetterProvider:Create(value, source)
 	return obj
 end
 
+function RogueSetterProvider:GetInvertedVersion(_propObj, _rogueProperty, baseValue)
+	-- TODO: discard previous value chain
+	return baseValue
+end
+
 function RogueSetterProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
 	-- TODO: Support more than just the base value type
 	if rogueProperty:GetDefinition():GetValueType() == "number" then

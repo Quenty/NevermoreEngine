@@ -196,6 +196,10 @@ function TieDefinition:ObserveLastImplementationBrio(adornee: Instance)
 		})
 end
 
+function TieDefinition:ObserveBrio(adornee: Instance)
+	return self:ObserveLastImplementationBrio(adornee)
+end
+
 --[=[
 	Observes a valid implementation if it exists, or nil
 
@@ -210,6 +214,9 @@ function TieDefinition:ObserveLastImplementation(adornee: Instance)
 	})
 end
 
+function TieDefinition:Observe(adornee: Instance)
+	return self:ObserveLastImplementation(adornee)
+end
 
 --[=[
 	Observes valid implementations wrapped in a brio if it exists.

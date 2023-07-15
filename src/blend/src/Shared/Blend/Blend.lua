@@ -480,6 +480,8 @@ function Blend.toPropertyObservable(value)
 			return ValueObjectUtils.observeValue(value)
 		elseif Promise.isPromise(value) then
 			return Rx.fromPromise(value)
+		elseif value.Observe then
+			return value:Observe()
 		end
 	end
 
