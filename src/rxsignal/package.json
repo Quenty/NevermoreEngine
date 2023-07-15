@@ -1,0 +1,34 @@
+{
+  "name": "@quenty/rxsignal",
+  "version": "1.0.0",
+  "description": "Signal API for RxObservables",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "rxsignal"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/rxsignal/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
