@@ -219,7 +219,7 @@ function Remoting:_translateCallback(maid, memberName, callback)
 			local yielded = table.pack(promise:Wait())
 			return table.unpack(yielded, 1, yielded.n)
 		else
-			return return table.unpack(results)
+			return table.unpack(results)
 		end
 	end
 end
