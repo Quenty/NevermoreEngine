@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@5.22.0...@quenty/hide@5.23.0) (2023-07-15)
+
+**Note:** Version bump only for package @quenty/hide
+
+
+
+
+
 # [5.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@5.21.1...@quenty/hide@5.22.0) (2023-07-10)
 
 **Note:** Version bump only for package @quenty/hide

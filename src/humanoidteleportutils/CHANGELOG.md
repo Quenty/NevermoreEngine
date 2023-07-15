@@ -1,20 +1,18 @@
-# v6.3.0 (Sat Jul 15 2023)
-
-#### 🚀 Enhancement
-
-- Add :Observe() API calls to a variety of places [#393](https://github.com/Quenty/NevermoreEngine/pull/393) ([@Quenty](https://github.com/Quenty))
-- feat: Add HumanoidTeleportUtils.getRootPartOffset(humanoid, ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@6.2.1...@quenty/humanoidteleportutils@6.3.0) (2023-07-15)
+
+
+### Features
+
+* Add HumanoidTeleportUtils.getRootPartOffset(humanoid, ([5144d8c](https://github.com/Quenty/NevermoreEngine/commit/5144d8cf992edf3cd28fe9ca0fa494ece52d8b61))
+
+
+
+
 
 ## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@6.2.0...@quenty/humanoidteleportutils@6.2.1) (2023-04-07)
 

@@ -1,20 +1,18 @@
-# v6.22.0 (Sat Jul 15 2023)
-
-#### 🚀 Enhancement
-
-- Add :Observe() API calls to a variety of places [#393](https://github.com/Quenty/NevermoreEngine/pull/393) ([@Quenty](https://github.com/Quenty))
-- feat: Add :Observe() API calls to a variety of systems and allow Blend to :Observe() stuff ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.21.1...@quenty/blend@6.22.0) (2023-07-15)
+
+
+### Features
+
+* Add :Observe() API calls to a variety of systems and allow Blend to :Observe() stuff ([ca29c68](https://github.com/Quenty/NevermoreEngine/commit/ca29c68164dfdaf136e9168faf48f487bed26088))
+
+
+
+
 
 ## [6.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.21.0...@quenty/blend@6.21.1) (2023-07-11)
 

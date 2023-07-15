@@ -1,20 +1,18 @@
-# v7.17.0 (Sat Jul 15 2023)
-
-#### 🚀 Enhancement
-
-- Add :Observe() API calls to a variety of places [#393](https://github.com/Quenty/NevermoreEngine/pull/393) ([@Quenty](https://github.com/Quenty))
-- feat: Support .Changed event o the ValueBaseValue ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@7.16.0...@quenty/valuebaseutils@7.17.0) (2023-07-15)
+
+
+### Features
+
+* Support .Changed event o the ValueBaseValue ([641af67](https://github.com/Quenty/NevermoreEngine/commit/641af67239738f4d71f82f5f8d5e558f1b836b79))
+
+
+
+
 
 # [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@7.15.0...@quenty/valuebaseutils@7.16.0) (2023-07-10)
 

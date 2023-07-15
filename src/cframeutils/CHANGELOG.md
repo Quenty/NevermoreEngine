@@ -1,20 +1,18 @@
-# v5.4.0 (Sat Jul 15 2023)
-
-#### 🚀 Enhancement
-
-- Add :Observe() API calls to a variety of places [#393](https://github.com/Quenty/NevermoreEngine/pull/393) ([@Quenty](https://github.com/Quenty))
-- feat: Swap back to old CFrameUtils settings ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.3.0...@quenty/cframeutils@5.4.0) (2023-07-15)
+
+
+### Features
+
+* Swap back to old CFrameUtils settings ([f2914a6](https://github.com/Quenty/NevermoreEngine/commit/f2914a6102e4547a122655445360d78795ce4ce3))
+
+
+
+
 
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeutils@5.2.0...@quenty/cframeutils@5.3.0) (2023-06-24)
 

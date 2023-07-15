@@ -1,20 +1,18 @@
-# v7.13.0 (Sat Jul 15 2023)
-
-#### 🚀 Enhancement
-
-- Add :Observe() API calls to a variety of places [#393](https://github.com/Quenty/NevermoreEngine/pull/393) ([@Quenty](https://github.com/Quenty))
-- feat: Add Rx.onlyAfterDefer() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.12.0...@quenty/rx@7.13.0) (2023-07-15)
+
+
+### Features
+
+* Add Rx.onlyAfterDefer() ([c23de79](https://github.com/Quenty/NevermoreEngine/commit/c23de79145d1069236e15e972c932373913854b9))
+
+
+
+
 
 # [7.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.11.0...@quenty/rx@7.12.0) (2023-06-17)
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidmovedirectionutils@6.6.0...@quenty/humanoidmovedirectionutils@6.7.0) (2023-07-15)
+
+**Note:** Version bump only for package @quenty/humanoidmovedirectionutils
+
+
+
+
+
 # [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidmovedirectionutils@6.5.0...@quenty/humanoidmovedirectionutils@6.6.0) (2023-06-24)
 
 **Note:** Version bump only for package @quenty/humanoidmovedirectionutils
