@@ -89,14 +89,14 @@ function RogueProperty:SetBaseValue(value)
 	if baseValue then
 		baseValue.Value = self:_encodeValue(value)
 	else
-		warn("Failed to get the baseValue to parent")
+		warn("[RogueProperty] - Failed to get the baseValue to parent")
 	end
 end
 
 function RogueProperty:SetValue(value)
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn("Failed to get the baseValue to parent")
+		warn("[RogueProperty] - Failed to get the baseValue to parent")
 		return
 	end
 
@@ -199,7 +199,7 @@ function RogueProperty:CreateMultiplier(amount, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn("Failed to get the baseValue to parent")
+		warn("[RogueProperty] - Failed to get the baseValue to parent")
 	end
 
 	local multiplier = provider:Create(amount, source)
@@ -215,7 +215,7 @@ function RogueProperty:CreateAdditive(amount, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn("Failed to get the baseValue to parent")
+		warn("[RogueProperty] - Failed to get the baseValue to parent")
 	end
 
 	local multiplier = provider:Create(amount, source)
@@ -224,17 +224,15 @@ function RogueProperty:CreateAdditive(amount, source)
 	return multiplier
 end
 
-function RogueProperty:CreateSetter(amount, source)
-	assert(type(amount) == "number", "Bad amount")
-
+function RogueProperty:CreateSetter(value, source)
 	local provider = self._serviceBag:GetService(RogueSetterProvider)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn("Failed to get the baseValue to parent")
+		warn("[RogueProperty] - Failed to get the baseValue to parent")
 	end
 
-	local setter = provider:Create(amount, source)
+	local setter = provider:Create(value, source)
 	setter.Parent = baseValue
 
 	return setter
