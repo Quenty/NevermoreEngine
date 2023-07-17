@@ -1,3 +1,16 @@
+# (Mon Jul 17 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/rogue-properties@4.25.0`
+  - feat: Can set rogue properties setter [#394](https://github.com/Quenty/NevermoreEngine/pull/394) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Jul 15 2023)
 
 #### 🚀 Enhancement

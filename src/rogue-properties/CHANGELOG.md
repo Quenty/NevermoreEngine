@@ -1,3 +1,16 @@
+# v4.25.0 (Mon Jul 17 2023)
+
+#### 🚀 Enhancement
+
+- feat: Can set rogue properties setter [#394](https://github.com/Quenty/NevermoreEngine/pull/394) ([@Quenty](https://github.com/Quenty))
+- feat: Can set rogue properties setter ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
