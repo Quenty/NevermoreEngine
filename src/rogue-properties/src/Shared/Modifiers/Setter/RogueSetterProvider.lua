@@ -11,6 +11,7 @@ local RogueBindersShared = require("RogueBindersShared")
 local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
+local ValueBaseUtils = require("ValueBaseUtils")
 
 local RogueSetterProvider = {}
 RogueSetterProvider.ServiceName = "RogueSetterProvider"
@@ -31,10 +32,15 @@ function RogueSetterProvider:GetBinder()
 end
 
 function RogueSetterProvider:Create(value, source)
-	assert(type(value) == "number", "Bad value")
 	assert(typeof(source) == "Instance" or source == nil, "Bad source")
 
-	local obj = Instance.new("NumberValue")
+	local className = ValueBaseUtils.getClassNameFromType(typeof(value))
+	if not className then
+		error(string.format("[RogueSetterProvider] - Can't set to type %q", typeof(value)))
+		return nil
+	end
+
+	local obj = Instance.new(className)
 	obj.Name = "Setter"
 	obj.Value = value
 
@@ -52,38 +58,30 @@ function RogueSetterProvider:GetInvertedVersion(_propObj, _rogueProperty, baseVa
 	return baseValue
 end
 
-function RogueSetterProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
-	-- TODO: Support more than just the base value type
-	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		for _, item in pairs(self:_getSetters(propObj)) do
-			return item:GetValue()
-		end
-
-		return baseValue
-	else
-		return baseValue
+function RogueSetterProvider:GetModifiedVersion(propObj, _rogueProperty, baseValue)
+	-- Just return the first value
+	for _, item in pairs(self:_getSetters(propObj)) do
+		return item:GetValue()
 	end
+
+	return baseValue
 end
 
 function RogueSetterProvider:ObserveModifiedVersion(propObj, rogueProperty, observeBaseValue)
-	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		-- TODO: optimize this.
-		return RxBrioUtils.flatCombineLatest({
-			value = observeBaseValue;
-			allSetters = self:_observeSettersBrio(propObj):Pipe({
-				RxBrioUtils.flatMapBrio(function(item)
-					return item:ObserveValue();
-				end); -- this gets us a list of multipliers which should mutate pretty frequently.
-				Rx.defaultsToNil;
-			});
-		}):Pipe({
-			Rx.map(function(state)
-				return self:GetModifiedVersion(propObj, rogueProperty, state.value)
-			end);
-		})
-	else
-		return observeBaseValue
-	end
+	-- TODO: optimize this.
+	return RxBrioUtils.flatCombineLatest({
+		value = observeBaseValue;
+		allSetters = self:_observeSettersBrio(propObj):Pipe({
+			RxBrioUtils.flatMapBrio(function(item)
+				return item:ObserveValue();
+			end); -- this gets us a list of multipliers which should mutate pretty frequently.
+			Rx.defaultsToNil;
+		});
+	}):Pipe({
+		Rx.map(function(state)
+			return self:GetModifiedVersion(propObj, rogueProperty, state.value)
+		end);
+	})
 end
 
 function RogueSetterProvider:_observeSettersBrio(propObj)
