@@ -1,20 +1,18 @@
-# v4.25.0 (Mon Jul 17 2023)
-
-#### 🚀 Enhancement
-
-- feat: Can set rogue properties setter [#394](https://github.com/Quenty/NevermoreEngine/pull/394) ([@Quenty](https://github.com/Quenty))
-- feat: Can set rogue properties setter ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.24.0...@quenty/rogue-properties@4.25.0) (2023-07-17)
+
+
+### Features
+
+* Can set rogue properties setter ([b3c148a](https://github.com/Quenty/NevermoreEngine/commit/b3c148a2d81a0c88e1fc7d9ae8e3c1cfc2033bf9))
+
+
+
+
 
 # [4.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.23.0...@quenty/rogue-properties@4.24.0) (2023-07-15)
 
