@@ -1,3 +1,16 @@
+# (Tue Jul 18 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/remoting@6.8.1`
+  - fix: Return results from non-promisified Remoting callbacks [#392](https://github.com/Quenty/NevermoreEngine/pull/392) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # (Mon Jul 17 2023)
 
 #### 🚀 Enhancement
