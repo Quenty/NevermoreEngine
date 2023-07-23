@@ -1,19 +1,18 @@
-# v1.8.1 (Sun Jul 23 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Escape generated workflow [#396](https://github.com/Quenty/NevermoreEngine/pull/396) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.8.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.8.0...@quenty/nevermore-cli@1.8.1) (2023-07-23)
+
+
+### Bug Fixes
+
+* Escape generated workflow ([#396](https://github.com/Quenty/Nevermore/issues/396)) ([2539ae7](https://github.com/Quenty/Nevermore/commit/2539ae767c5c6b87468a065f142c01006f9444eb))
+
+
+
+
 
 # [1.8.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.7.0...@quenty/nevermore-cli@1.8.0) (2023-06-17)
 
