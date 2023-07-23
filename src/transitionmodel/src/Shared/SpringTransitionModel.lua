@@ -103,6 +103,10 @@ function SpringTransitionModel:BindToPaneVisbility(pane)
 	self._maid._visibleBinding = maid
 
 	return function()
+		if not self.Destroy then
+			return
+		end
+
 		if self._maid._visibleBinding == maid then
 			self._maid._visibleBinding = nil
 		end
@@ -158,6 +162,15 @@ end
 ]=]
 function SpringTransitionModel:ObserveRenderStepped()
 	return self._springObject:ObserveRenderStepped()
+end
+
+--[=[
+	Alias to spring transition model observation!
+
+	@return Observable<T>
+]=]
+function SpringTransitionModel:Observe()
+	return self._springObject:Observe()
 end
 
 --[=[
