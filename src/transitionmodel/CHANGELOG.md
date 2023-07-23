@@ -1,20 +1,18 @@
-# v1.14.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-- feat: Add :Observe() to SpringTransitionModel so it can be passed directly into Blend ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@1.13.0...@quenty/transitionmodel@1.14.0) (2023-07-23)
+
+
+### Features
+
+* Add :Observe() to SpringTransitionModel so it can be passed directly into Blend ([2d9fb45](https://github.com/Quenty/NevermoreEngine/commit/2d9fb45af5f9dfdfeb2b4a2933e553d9efb63a8a))
+
+
+
+
 
 # [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@1.12.1...@quenty/transitionmodel@1.13.0) (2023-07-15)
 

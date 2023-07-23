@@ -1,24 +1,18 @@
-# v8.18.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Remove unused code ([@Quenty](https://github.com/Quenty))
-- fix: No default predicate ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.17.0...@quenty/attributeutils@8.18.0) (2023-07-23)
+
+
+### Bug Fixes
+
+* No default predicate ([1d41dd2](https://github.com/Quenty/NevermoreEngine/commit/1d41dd2f419c04f45c0fa43d9bfc8608f88adbf4))
+
+
+
+
 
 # [8.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@8.16.0...@quenty/attributeutils@8.17.0) (2023-07-15)
 

@@ -1,20 +1,18 @@
-# v3.2.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameVersionUtils.isVIPServer() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.1.0...@quenty/gameversionutils@3.2.0) (2023-07-23)
+
+
+### Features
+
+* Add GameVersionUtils.isVIPServer() ([dfbb648](https://github.com/Quenty/NevermoreEngine/commit/dfbb6488e947c9e29eeccbc02ada2070b8b1dafe))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.0.0...@quenty/gameversionutils@3.1.0) (2022-10-11)
 

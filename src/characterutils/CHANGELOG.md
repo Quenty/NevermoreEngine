@@ -1,20 +1,18 @@
-# v6.11.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxCharacterUtils.observeCharacter(player) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.10.0...@quenty/characterutils@6.11.0) (2023-07-23)
+
+
+### Features
+
+* Add RxCharacterUtils.observeCharacter(player) ([2a8240b](https://github.com/Quenty/NevermoreEngine/commit/2a8240b2c57bda9ba42ade2492110e535a187ad5))
+
+
+
+
 
 # [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@6.9.0...@quenty/characterutils@6.10.0) (2023-07-15)
 

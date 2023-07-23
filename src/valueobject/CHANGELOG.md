@@ -1,20 +1,18 @@
-# v7.19.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-- feat: Add ValueObject:ObserveBrio(condition) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@7.18.0...@quenty/valueobject@7.19.0) (2023-07-23)
+
+
+### Features
+
+* Add ValueObject:ObserveBrio(condition) ([2d3766a](https://github.com/Quenty/NevermoreEngine/commit/2d3766a535706d45ce5d217a7cdc81daa198f1f7))
+
+
+
+
 
 # [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valueobject@7.17.0...@quenty/valueobject@7.18.0) (2023-07-15)
 

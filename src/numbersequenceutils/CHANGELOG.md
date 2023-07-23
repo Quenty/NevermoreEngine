@@ -1,20 +1,18 @@
-# v4.5.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-- feat: Add NumberSequenceUtils.forEachValue helper method ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@4.4.0...@quenty/numbersequenceutils@4.5.0) (2023-07-23)
+
+
+### Features
+
+* Add NumberSequenceUtils.forEachValue helper method ([98e3890](https://github.com/Quenty/NevermoreEngine/commit/98e38903007a4510ab31bb28c69f35b14e1c1ffc))
+
+
+
+
 
 # [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/numbersequenceutils@4.3.1...@quenty/numbersequenceutils@4.4.0) (2023-06-05)
 

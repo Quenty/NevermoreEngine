@@ -1,20 +1,18 @@
-# v7.11.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObserveSyncedClock() to TimeSyncService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timesyncservice@7.10.1...@quenty/timesyncservice@7.11.0) (2023-07-23)
+
+
+### Features
+
+* Add ObserveSyncedClock() to TimeSyncService ([47e2e86](https://github.com/Quenty/NevermoreEngine/commit/47e2e86493aa40facb142a3298fb834a8a77a7e7))
+
+
+
+
 
 ## [7.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timesyncservice@7.10.0...@quenty/timesyncservice@7.10.1) (2023-07-18)
 

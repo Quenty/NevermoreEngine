@@ -1,19 +1,15 @@
-# v5.27.0 (Sun Jul 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/util [#395](https://github.com/Quenty/NevermoreEngine/pull/395) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.26.1...@quenty/cooldown@5.27.0) (2023-07-23)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
 
 ## [5.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.26.0...@quenty/cooldown@5.26.1) (2023-07-18)
 
