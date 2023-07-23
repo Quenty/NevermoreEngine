@@ -1,5 +1,18 @@
 # (Sun Jul 23 2023)
 
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@1.8.1`
+  - fix: Escape generated workflow [#396](https://github.com/Quenty/NevermoreEngine/pull/396) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jul 23 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/attributeutils@8.18.0`, `@quenty/characterutils@6.11.0`, `@quenty/gameversionutils@3.2.0`, `@quenty/numbersequenceutils@4.5.0`, `@quenty/propertyvalue@1.2.0`, `@quenty/timesyncservice@7.11.0`, `@quenty/transitionmodel@1.14.0`, `@quenty/valueobject@7.19.0`

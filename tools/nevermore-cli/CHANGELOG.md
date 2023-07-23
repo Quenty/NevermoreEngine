@@ -1,3 +1,15 @@
+# v1.8.1 (Sun Jul 23 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Escape generated workflow [#396](https://github.com/Quenty/NevermoreEngine/pull/396) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
