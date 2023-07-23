@@ -8,9 +8,6 @@ local require = require(script.Parent.loader).load(script)
 
 local RxInstanceUtils = require("RxInstanceUtils")
 
-local DEFAULT_PREDICATE = function(value)
-	return value
-end
 
 local PropertyValue = {}
 PropertyValue.ClassName = "PropertyValue"
@@ -29,7 +26,6 @@ function PropertyValue.new(instance, propertyName)
 end
 
 function PropertyValue:ObserveBrio(condition)
-	condition = condition or DEFAULT_PREDICATE
 	return RxInstanceUtils.observePropertyBrio(self._obj, self._propertyName, condition)
 end
 

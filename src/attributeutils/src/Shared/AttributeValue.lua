@@ -55,8 +55,13 @@ function AttributeValue.new(object, attributeName, defaultValue)
 	return setmetatable(self, AttributeValue)
 end
 
+--[=[
+	Handles observing the value conditionalli
+
+	@param condition function | nil
+	@return Observable<Brio<any>>
+]=]
 function AttributeValue:ObserveBrio(condition)
-	condition = condition or DEFAULT_PREDICATE
 	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition)
 end
 
