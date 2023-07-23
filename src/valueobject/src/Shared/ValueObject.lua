@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local ValueBaseUtils = require("ValueBaseUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local Brio = require("Brio")
 
 local EMPTY_FUNCTION = function() end
 
@@ -158,6 +159,50 @@ function ValueObject:Observe()
 			sub:Fire(self.Value, table.unpack(args, 1, args.n))
 		else
 			sub:Fire(self.Value)
+		end
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes the value as a brio. The condition defaults to truthy or nil.
+
+	@param condition function | nil -- optional
+	@return Observable<Brio<T>>
+]=]
+function ValueObject:ObserveBrio(condition)
+	assert(type(condition) == "function" or condition == nil, "Bad condition")
+
+	return Observable.new(function(sub)
+		if not self.Destroy then
+			warn("[ValueObject.observeValue] - Connecting to dead ValueObject")
+			-- No firing, we're dead
+			sub:Complete()
+			return
+		end
+
+		local maid = Maid.new()
+
+		local function handleNewValue(newValue, ...)
+			if not condition or condition(newValue) then
+				local brio = Brio.new(newValue, ...)
+				maid._current = brio
+				sub:Fire(brio)
+			else
+				maid._current = nil
+			end
+		end
+
+		maid:GiveTask(self.Changed:Connect(function(newValue, _, _, ...)
+			handleNewValue(newValue, ...)
+		end))
+
+		local args = rawget(self, "_lastEventContext")
+		if args then
+			handleNewValue(self.Value, table.unpack(args, 1, args.n))
+		else
+			handleNewValue(self.Value)
 		end
 
 		return maid
