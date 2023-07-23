@@ -11,7 +11,7 @@ jobs:
         uses: ok-nick/setup-aftman@v0.3.0
         with:
           version: 'v0.2.7'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: $\{{ secrets.GITHUB_TOKEN }}
 
       - name: Generate standard library
         run: selene generate-roblox-std
