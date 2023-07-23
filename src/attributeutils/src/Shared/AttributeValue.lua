@@ -21,10 +21,6 @@ local require = require(script.Parent.loader).load(script)
 
 local RxAttributeUtils = require("RxAttributeUtils")
 
-local DEFAULT_PREDICATE = function(value)
-	return value
-end
-
 local AttributeValue = {}
 AttributeValue.ClassName = "AttributeValue"
 AttributeValue.__index = AttributeValue
