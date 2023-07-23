@@ -20,6 +20,7 @@ local SlaveClock = require("SlaveClock")
 local TimeSyncConstants = require("TimeSyncConstants")
 local TimeSyncUtils = require("TimeSyncUtils")
 local Maid = require("Maid")
+local Rx = require("Rx")
 
 local TimeSyncService = {}
 TimeSyncService.ServiceName = "TimeSyncService"
@@ -107,6 +108,10 @@ function TimeSyncService:PromiseSyncedClock()
 
 	assert(self._clockPromise, "TimeSyncService is not initialized")
 	return Promise.resolved(self._clockPromise)
+end
+
+function TimeSyncService:ObserveSyncedClock()
+	return Rx.fromPromise(self:PromiseSyncedClock())
 end
 
 function TimeSyncService:_buildMockClock()
