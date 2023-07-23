@@ -15,6 +15,7 @@ local RxCharacterUtils = {}
 
 --[=[
 	Observe a player's last character.
+
 	@param player Player
 	@return Observable<Brio<Model>>
 ]=]
@@ -24,6 +25,16 @@ function RxCharacterUtils.observeLastCharacterBrio(player: Player)
 	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
 		return character ~= nil
 	end)
+end
+
+--[=[
+	Observes a player's character property
+
+	@param player Player
+	@return Observable<Model>
+]=]
+function RxCharacterUtils.observeCharacter(player)
+	return RxInstanceUtils.observeProperty(player, "Character")
 end
 
 --[=[

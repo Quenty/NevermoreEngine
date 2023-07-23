@@ -91,7 +91,27 @@ end
 --[=[
 	Scales a number sequence value by the set amount
 	@param sequence NumberSequence
+	@param callback function
+	@return NumberSequence
+]=]
+function NumberSequenceUtils.forEachValue(sequence, callback)
+	assert(type(callback) == "function", "Bad callback")
+
+	local waypoints = {}
+
+	local keypoints = sequence.Keypoints
+	for _, keypoint in pairs(keypoints) do
+		table.insert(waypoints, NumberSequenceKeypoint.new(keypoint.Time, callback(keypoint.Value), keypoint.Envelope))
+	end
+
+	return NumberSequence.new(waypoints)
+end
+
+--[=[
+	Scales a number sequence value by the set amount
+	@param sequence NumberSequence
 	@param scale number
+	@return NumberSequence
 ]=]
 function NumberSequenceUtils.scale(sequence, scale)
 	local waypoints = {}

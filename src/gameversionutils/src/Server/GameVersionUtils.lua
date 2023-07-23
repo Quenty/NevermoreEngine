@@ -43,4 +43,12 @@ function GameVersionUtils.getServerType()
 	end
 end
 
+--[=[
+	Returns true if we're a VIP server
+	@return boolean
+]=]
+function GameVersionUtils.isVIPServer()
+	return game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0
+end
+
 return GameVersionUtils
