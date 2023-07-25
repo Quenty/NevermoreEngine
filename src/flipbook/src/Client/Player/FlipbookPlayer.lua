@@ -56,7 +56,15 @@ function FlipbookPlayer.new(imageLabel)
 			else
 				self._isPlaying.Value = false
 				self._maid._playing = nil
-				self:_updateToFrame(state.flipbook, 1)
+
+				local restFrame = state.flipbook:GetRestFrame()
+				if restFrame then
+					self:_updateToFrame(state.flipbook, restFrame)
+				else
+					self._obj.Image = self._originalImage
+					self._obj.ImageRectOffset = self._originalRectOffset
+					self._obj.ImageRectSize = self._originalRectSize
+				end
 			end
 		else
 			self._isPlaying.Value = false
@@ -201,18 +209,20 @@ function FlipbookPlayer:_execPlay(flipbook, playData)
 	return maid
 end
 
+function FlipbookPlayer:_computeFrameCount(originalFrameCount, isBoomarang)
+	if isBoomarang then
+		return 2*originalFrameCount - 2
+	else
+		return originalFrameCount
+	end
+end
+
 function FlipbookPlayer:_update(flipbook, currentTime, playData)
 	local isBoomarang = self._isBoomarang.Value
 	local fps = flipbook:GetFrameRate()
 	local originalFrameCount = flipbook:GetFrameCount()
 
-	local frameCount
-	if isBoomarang then
-		frameCount = 2*originalFrameCount - 2
-	else
-		frameCount = originalFrameCount
-	end
-
+	local frameCount = self:_computeFrameCount(originalFrameCount, isBoomarang)
 	local frame = (math.floor((currentTime - playData.startTime)*fps)%frameCount) + 1
 
 	if isBoomarang then
@@ -237,7 +247,7 @@ function FlipbookPlayer:_update(flipbook, currentTime, playData)
 	end
 
 	if isOver then
-		self:_updateToFrame(flipbook, 1)
+		self:_updateToFrame(flipbook, frameCount)
 		self._playData.Value = nil
 	else
 		self:_updateToFrame(flipbook, frame)

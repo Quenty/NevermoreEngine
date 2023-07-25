@@ -90,6 +90,7 @@ return function(target)
 		frameCount = 34;
 		imageRectSize = Vector2.new(85.33333, 85.33333);
 		frameRate = 20;
+		restFrame = 1;
 	}), container, false)
 
 	makeLabel(maid, Flipbook.new({
@@ -99,6 +100,7 @@ return function(target)
 		frameCount = 34;
 		imageRectSize = Vector2.new(85.33333, 85.33333);
 		frameRate = 20;
+		restFrame = 1;
 	}), container, true)
 
 	makeLabel(maid, Flipbook.new({
@@ -107,6 +109,7 @@ return function(target)
 		columns = 6;
 		imageRectSize = Vector2.new(170, 170);
 		frameRate = 50;
+		restFrame = 1;
 	}), container, false)
 
 	makeLabel(maid, Flipbook.new({
@@ -116,6 +119,7 @@ return function(target)
 		frameCount = 92;
 		imageRectSize = Vector2.new(102, 102);
 		frameRate = 50;
+		restFrame = 1;
 	}), container, false)
 
 	makeButton(maid, Flipbook.new({
@@ -125,6 +129,7 @@ return function(target)
 		frameCount = 92;
 		imageRectSize = Vector2.new(102, 102);
 		frameRate = 60;
+		restFrame = 1;
 	}), container, false)
 
 	makeButton(maid, Flipbook.new({
@@ -134,6 +139,7 @@ return function(target)
 		frameCount = 34;
 		imageRectSize = Vector2.new(85.33333, 85.33333);
 		frameRate = 20;
+		restFrame = 1;
 	}), container, true)
 
 	makeLabel(maid, Flipbook.new({
@@ -143,6 +149,7 @@ return function(target)
 		frameCount = 92;
 		imageRectSize = Vector2.new(102, 102);
 		frameRate = 50;
+		restFrame = 1;
 	}), container, false)
 
 	makeLabel(maid, Flipbook.new({
@@ -152,6 +159,7 @@ return function(target)
 		frameCount = 45;
 		imageRectSize = Vector2.new(146, 146);
 		frameRate = 30;
+		restFrame = 1;
 	}), container, false)
 
 	makeLabel(maid, Flipbook.new({
@@ -161,6 +169,7 @@ return function(target)
 		frameCount = 66;
 		imageRectSize = Vector2.new(113, 113);
 		frameRate = 60;
+		restFrame = 1;
 	}), container, false)
 
 	return function()

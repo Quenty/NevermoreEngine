@@ -23,6 +23,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local Maid = require("Maid")
+local Observable = require("Observable")
 
 local BasicPane = {}
 BasicPane.__index = BasicPane
@@ -40,6 +41,7 @@ function BasicPane.isBasicPane(value)
 		and type(value.SetVisible) == "function"
 		and type(value.IsVisible) == "function"
 		and type(value.Show) == "function"
+		and type(value.ObserveVisible) == "function"
 		and type(value.Hide) == "function"
 		and type(value.Toggle) == "function"
 		and type(value.Destroy) == "function"
@@ -105,6 +107,19 @@ function BasicPane:SetVisible(isVisible, doNotAnimate)
 		self._maid._paneVisibleMaid = maid
 		self.VisibleChanged:Fire(self._visible, doNotAnimate, maid)
 	end
+end
+
+function BasicPane:ObserveVisible()
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
+			sub:Fire(isVisible, doNotAnimate)
+		end))
+		sub:Fire(self:IsVisible())
+
+		return maid
+	end)
 end
 
 --[=[
