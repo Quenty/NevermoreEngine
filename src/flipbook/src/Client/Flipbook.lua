@@ -9,12 +9,13 @@ local Sprite = require("Sprite")
 
 --[=[
 	@interface FlipbookData
-	.imageId string
+	.image string
 	.frameCount number
 	.rows number
 	.columns number
 	.imageRectSize Vector2
 	.frameRate number
+	.restFrame number | nil -- Optional reset frame
 	@within Flipbook
 ]=]
 
@@ -32,6 +33,9 @@ function Flipbook.new(data)
 
 	self._frameSprites = {}
 	self._frameRate = 60
+	self._restFrame = data.restFrame
+
+	assert(type(data.restFrame) == "number" or data.restFrame == nil, "Bad data.restFrame")
 
 	if data.frameCount then
 		self:SetFrameCount(data.frameCount)
@@ -82,6 +86,10 @@ function Flipbook:_loadFrames(image, columns, imageRectSize)
 			Name = name;
 		}))
 	end
+end
+
+function Flipbook:GetRestFrame()
+	return self._restFrame
 end
 
 function Flipbook:SetSpriteAtIndex(index, sprite)
