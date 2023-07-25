@@ -1,20 +1,18 @@
-# v6.24.0 (Tue Jul 25 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/userservice [#398](https://github.com/Quenty/NevermoreEngine/pull/398) ([@Quenty](https://github.com/Quenty))
-- feat: Add SpringObject:ObserveTarget() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.23.0...@quenty/blend@6.24.0) (2023-07-25)
+
+
+### Features
+
+* Add SpringObject:ObserveTarget() ([ff3f272](https://github.com/Quenty/NevermoreEngine/commit/ff3f2724a7776dcbcf12389767d7a62319caf63a))
+
+
+
+
 
 # [6.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.22.0...@quenty/blend@6.23.0) (2023-07-23)
 

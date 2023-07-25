@@ -1,20 +1,18 @@
-# v7.17.0 (Tue Jul 25 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/userservice [#398](https://github.com/Quenty/NevermoreEngine/pull/398) ([@Quenty](https://github.com/Quenty))
-- feat: Add BasicPane:ObserveVisible() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@7.16.0...@quenty/basicpane@7.17.0) (2023-07-25)
+
+
+### Features
+
+* Add BasicPane:ObserveVisible() ([03b7db5](https://github.com/Quenty/NevermoreEngine/commit/03b7db53a0ae793f70a7cf6abe6d92fc5de8679e))
+
+
+
+
 
 # [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/basicpane@7.15.0...@quenty/basicpane@7.16.0) (2023-07-15)
 

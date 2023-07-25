@@ -1,20 +1,18 @@
-# v2.14.0 (Tue Jul 25 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/userservice [#398](https://github.com/Quenty/NevermoreEngine/pull/398) ([@Quenty](https://github.com/Quenty))
-- feat: Add restFrame support to Flipbooks to control the frame the flipbooks rest on ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.13.0...@quenty/flipbook@2.14.0) (2023-07-25)
+
+
+### Features
+
+* Add restFrame support to Flipbooks to control the frame the flipbooks rest on ([cbf5f4f](https://github.com/Quenty/NevermoreEngine/commit/cbf5f4f4211156144e150dd960d9e2225cf9c5f5))
+
+
+
+
 
 # [2.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@2.12.0...@quenty/flipbook@2.13.0) (2023-07-23)
 

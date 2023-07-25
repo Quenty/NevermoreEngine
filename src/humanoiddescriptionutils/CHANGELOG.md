@@ -1,20 +1,18 @@
-# v6.7.0 (Tue Jul 25 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/userservice [#398](https://github.com/Quenty/NevermoreEngine/pull/398) ([@Quenty](https://github.com/Quenty))
-- feat: Add HumanoidDescriptionUtils.promiseApplyDescriptionReset(humanoid, description, assetTypeVerification) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@6.6.0...@quenty/humanoiddescriptionutils@6.7.0) (2023-07-25)
+
+
+### Features
+
+* Add HumanoidDescriptionUtils.promiseApplyDescriptionReset(humanoid, description, assetTypeVerification) ([21cc6f2](https://github.com/Quenty/NevermoreEngine/commit/21cc6f2c6786cc340d0f57e0c29ee4f124be1e64))
+
+
+
+
 
 # [6.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@6.5.0...@quenty/humanoiddescriptionutils@6.6.0) (2023-06-17)
 
