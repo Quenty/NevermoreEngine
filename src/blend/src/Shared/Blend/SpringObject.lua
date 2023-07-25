@@ -84,6 +84,31 @@ function SpringObject:Observe()
 	return self:ObserveRenderStepped()
 end
 
+--[=[
+	Observes the current target of the spring
+
+	@return Observable<T>
+]=]
+function SpringObject:ObserveTarget()
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local lastTarget = self.Target
+
+		maid:GiveTask(self.Changed:Connect(function()
+			local target = self.Target
+			if lastTarget ~= target then
+				lastTarget = target
+				sub:Fire(target)
+			end
+		end))
+
+		sub:Fire(lastTarget)
+
+		return maid
+	end)
+end
+
 function SpringObject:ObserveVelocityOnRenderStepped()
 	return self:ObserveVelocityOnSignal(RunService.RenderStepped)
 end
