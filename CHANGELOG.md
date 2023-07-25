@@ -1,3 +1,16 @@
+# (Tue Jul 25 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/basicpane@7.17.0`, `@quenty/blend@6.24.0`, `@quenty/flipbook@2.14.0`, `@quenty/humanoiddescriptionutils@6.7.0`, `@quenty/userserviceutils@3.8.0`
+  - Users/quenty/userservice [#398](https://github.com/Quenty/NevermoreEngine/pull/398) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jul 23 2023)
 
 #### 🐛 Bug Fix

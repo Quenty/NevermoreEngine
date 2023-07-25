@@ -1,3 +1,16 @@
+# v3.8.0 (Tue Jul 25 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/userservice [#398](https://github.com/Quenty/NevermoreEngine/pull/398) ([@Quenty](https://github.com/Quenty))
+- feat: Add UserInfoService to aggregate user info in a de-duplicated request format ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
