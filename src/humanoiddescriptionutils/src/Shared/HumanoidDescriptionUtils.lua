@@ -14,7 +14,7 @@ local PlayersServicePromises = require("PlayersServicePromises")
 local HumanoidDescriptionUtils = {}
 
 --[=[
-	Promises to apply a humaoid descrition
+	Promises to apply a humaoid description
 	@param humanoid Humanoid
 	@param description HumanoidDescription
 	@return Promise
@@ -35,6 +35,29 @@ function HumanoidDescriptionUtils.promiseApplyDescription(humanoid, description)
 	end)
 end
 
+--[=[
+	Promises to apply a humaoid description reset call
+
+	@param humanoid Humanoid
+	@param description HumanoidDescription
+	@param assetTypeVerification AssetTypeVerification
+	@return Promise
+]=]
+function HumanoidDescriptionUtils.promiseApplyDescriptionReset(humanoid, description, assetTypeVerification)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+	assert(typeof(description) == "Instance" and description:IsA("HumanoidDescription"), "Bad description")
+
+	return Promise.spawn(function(resolve, reject)
+		local ok, err = pcall(function()
+			humanoid:ApplyDescriptionReset(description, assetTypeVerification)
+		end)
+		if not ok then
+			reject(err)
+			return
+		end
+		resolve()
+	end)
+end
 --[=[
 	Applies humanoid description from userName.
 	@param humanoid Humanoid
