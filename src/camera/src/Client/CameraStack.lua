@@ -173,7 +173,9 @@ function CameraStack:Add(state)
 	table.insert(self._stack, state)
 
 	return function()
-		self:Remove(state)
+		if self.Destroy then
+			self:Remove(state)
+		end
 	end
 end
 
