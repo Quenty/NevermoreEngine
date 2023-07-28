@@ -32,6 +32,12 @@ function PromiseUtils.any(promises)
 	return returnPromise
 end
 
+function PromiseUtils.delayed(seconds)
+	return Promise.spawn(function(resolve, _reject)
+		task.delay(seconds, resolve)
+	end)
+end
+
 --[=[
 	Executes all promises. If any fails, the result will be rejected. However, it yields until
 	every promise is complete.
