@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/animations@1.2.0`, `@quenty/camera@9.20.0`, `@quenty/promise@6.7.0`, `@quenty/rogue-properties@4.27.0`
+  - Users/quenty/updates [#400](https://github.com/Quenty/NevermoreEngine/pull/400) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 28 2023)
+
+#### 🚀 Enhancement
+
 - `@quenty/camera@9.19.0`
   - feat: Allow for layered camera impulse [#399](https://github.com/Quenty/NevermoreEngine/pull/399) ([@Quenty](https://github.com/Quenty))
 

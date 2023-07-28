@@ -1,3 +1,15 @@
+# v4.27.0 (Fri Jul 28 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/updates [#400](https://github.com/Quenty/NevermoreEngine/pull/400) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
