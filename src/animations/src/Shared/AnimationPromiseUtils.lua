@@ -9,7 +9,7 @@ local PromiseMaidUtils = require("PromiseMaidUtils")
 
 local AnimationPromiseUtils = {}
 
-function AnimationPromiseUtils.promiseFinished(animationTrack)
+function AnimationPromiseUtils.promiseFinished(animationTrack, endMarkerName)
 	local promise = Promise.new()
 
 	PromiseMaidUtils.whilePromise(promise, function(maid)
@@ -24,6 +24,12 @@ function AnimationPromiseUtils.promiseFinished(animationTrack)
 		maid:GiveTask(animationTrack.Destroying:Connect(function()
 			promise:Resolve()
 		end))
+
+		if endMarkerName then
+			maid:GiveTask(animationTrack:GetMarkerReachedSignal(endMarkerName):Connect(function()
+				promise:Resolve()
+			end))
+		end
 	end)
 
 	return promise

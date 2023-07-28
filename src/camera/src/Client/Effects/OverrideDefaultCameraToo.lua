@@ -16,6 +16,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local SummedCamera = require("SummedCamera")
+local Vector3Utils = require("Vector3Utils")
 
 local OverrideDefaultCameraToo = {}
 OverrideDefaultCameraToo.ClassName = "OverrideDefaultCameraToo"
@@ -55,7 +56,12 @@ function OverrideDefaultCameraToo:__index(index)
 
 		local predicate = self.Predicate
 		if not predicate or predicate(result) then
-			self.DefaultCamera:SetRobloxCFrame(result.CFrame)
+			local angle = math.abs(Vector3Utils.angleBetweenVectors(result.CFrame:VectorToWorldSpace(Vector3.new(0, 0, -1)), Vector3.new(0, 1, 0)))
+
+			-- If the camera is straight up and down then Roblox breaks
+			if angle >= math.rad(0.1) and angle <= math.rad(179.9) then
+				self.DefaultCamera:SetRobloxCFrame(result.CFrame)
+			end
 		end
 
 		return result
