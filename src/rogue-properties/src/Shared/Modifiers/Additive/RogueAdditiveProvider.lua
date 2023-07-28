@@ -8,11 +8,12 @@ local RunService = game:GetService("RunService")
 
 local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
-local RxBrioUtils = require("RxBrioUtils")
 local RogueBindersShared = require("RogueBindersShared")
 local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
+local Observable = require("Observable")
+local Maid = require("Maid")
 
 local RogueAdditiveProvider = {}
 RogueAdditiveProvider.ServiceName = "RogueAdditiveProvider"
@@ -83,17 +84,37 @@ end
 
 function RogueAdditiveProvider:ObserveModifiedVersion(propObj, rogueProperty, observeBaseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		return RxBrioUtils.flatCombineLatest({
-			value = observeBaseValue;
-			adder = self:_observeAddersBrio(propObj):Pipe({
-				RxBrioUtils.flatMapBrio(function(item)
-					return item:ObserveAdditive();
-				end); -- this gets us a list of adders which should mutate pretty frequently.
-				Rx.defaultsToNil;
-			});
-		}):Pipe({
-			Rx.map(function(state)
-				return self:GetModifiedVersion(propObj, rogueProperty, state.value)
+		return Observable.new(function(sub)
+			local topMaid = Maid.new()
+
+			topMaid:GiveTask(self:_observeAddersBrio(propObj):Subscribe(function(brio)
+				if brio:IsDead() then
+					return
+				end
+
+				local maid = brio:ToMaid()
+				local value = brio:GetValue()
+
+				maid:GiveTask(value:ObserveAdditive():Subscribe(function()
+					sub:Fire()
+				end))
+
+				sub:Fire()
+
+				maid:GiveTask(function()
+					sub:Fire()
+				end)
+			end))
+
+			topMaid:GiveTask(observeBaseValue:Subscribe(function()
+				sub:Fire()
+			end))
+
+			return topMaid
+		end):Pipe({
+			Rx.throttleDefer();
+			Rx.map(function()
+				return self:GetModifiedVersion(propObj, rogueProperty, propObj.Value)
 			end);
 		})
 	else
