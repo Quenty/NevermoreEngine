@@ -1,19 +1,18 @@
-# v9.19.0 (Fri Jul 28 2023)
-
-#### 🚀 Enhancement
-
-- feat: Allow for layered camera impulse [#399](https://github.com/Quenty/NevermoreEngine/pull/399) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.18.0...@quenty/camera@9.19.0) (2023-07-28)
+
+
+### Features
+
+* Allow for layered camera impulse ([#399](https://github.com/Quenty/NevermoreEngine/issues/399)) ([458add5](https://github.com/Quenty/NevermoreEngine/commit/458add5c045cd120ec7f81a902fc9dfe5ed6da4b))
+
+
+
+
 
 # [9.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.17.0...@quenty/camera@9.18.0) (2023-07-15)
 
