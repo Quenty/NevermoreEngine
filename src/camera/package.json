@@ -35,7 +35,8 @@
     "@quenty/math": "file:../math",
     "@quenty/qframe": "file:../qframe",
     "@quenty/servicebag": "file:../servicebag",
-    "@quenty/spring": "file:../spring"
+    "@quenty/spring": "file:../spring",
+    "@quenty/vector3utils": "file:../vector3utils"
   },
   "devDependencies": {
     "@quenty/camerastoryutils": "file:../camerastoryutils"
