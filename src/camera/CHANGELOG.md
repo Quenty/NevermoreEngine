@@ -1,3 +1,15 @@
+# v9.19.0 (Fri Jul 28 2023)
+
+#### 🚀 Enhancement
+
+- feat: Allow for layered camera impulse [#399](https://github.com/Quenty/NevermoreEngine/pull/399) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

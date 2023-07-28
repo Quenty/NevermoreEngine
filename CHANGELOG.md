@@ -1,3 +1,16 @@
+# (Fri Jul 28 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/camera@9.19.0`
+  - feat: Allow for layered camera impulse [#399](https://github.com/Quenty/NevermoreEngine/pull/399) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jul 25 2023)
 
 #### 🚀 Enhancement
