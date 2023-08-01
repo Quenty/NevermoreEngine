@@ -14,7 +14,7 @@
 
 Holds utilities to work with Roblox seats
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SeatUtilsUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SeatUtils">View docs →</a></div>
 
 ## Installation
 

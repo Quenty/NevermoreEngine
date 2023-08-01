@@ -14,7 +14,7 @@
 
 Signal API for RxObservables
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/RxSignalUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/RxSignal">View docs →</a></div>
 
 ## Installation
 
