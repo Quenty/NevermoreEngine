@@ -240,9 +240,13 @@ end
 	Adds in new lines and whitespace to the text
 
 	@param text string
+	@param filteredText string
 	@return number
 ]=]
 function TextFilterUtils.addBackInNewLinesAndWhitespace(text, filteredText)
+	assert(type(text) == "string", "Bad text")
+	assert(type(filteredText) == "string", "Bad filteredText")
+
 	if text == filteredText then
 		return text
 	end

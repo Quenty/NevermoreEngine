@@ -53,7 +53,6 @@ end
 	Filters a preview-non-chat string for a broadcast
 
 	@param text string
-	@param fromUserId number
 	@return Promise<string>
 ]=]
 function TextFilterServiceClient:PromisePreviewNonChatStringForBroadcast(text)
