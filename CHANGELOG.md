@@ -1,3 +1,16 @@
+# (Tue Aug 01 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/color3utils@5.27.0`, `@quenty/deathreport@3.27.0`, `@quenty/propertyvalue@1.4.0`, `@quenty/rxsignal@1.3.0`, `@quenty/seatutils@1.18.0`, `@quenty/statestack@8.21.0`, `@quenty/textboxutils@1.1.0`, `@quenty/textfilterservice@7.11.0`, `@quenty/textfilterutils@6.8.0`, `@quenty/valuebaseutils@7.19.0`
+  - Users/quenty/observe brio [#401](https://github.com/Quenty/NevermoreEngine/pull/401) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jul 28 2023)
 
 #### 🚀 Enhancement
