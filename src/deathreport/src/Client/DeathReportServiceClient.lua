@@ -60,6 +60,8 @@ end
 	@return Observable<DeathReport>
 ]=]
 function DeathReportServiceClient:ObservePlayerKillerReports(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
 	return self._reportProcessor:ObservePlayerKillerReports(player)
 end
 
@@ -70,6 +72,8 @@ end
 	@return Observable<DeathReport>
 ]=]
 function DeathReportServiceClient:ObservePlayerDeathReports(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
 	return self._reportProcessor:ObservePlayerDeathReports(player)
 end
 
@@ -80,6 +84,8 @@ end
 	@return Observable<DeathReport>
 ]=]
 function DeathReportServiceClient:ObserveHumanoidKillerReports(humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
 	return self._reportProcessor:ObserveHumanoidKillerReports(humanoid)
 end
 
@@ -90,7 +96,33 @@ end
 	@return Observable<DeathReport>
 ]=]
 function DeathReportServiceClient:ObserveHumanoidDeathReports(humanoid)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
 	return self._reportProcessor:ObserveHumanoidDeathReports(humanoid)
+end
+
+--[=[
+	Observes killer reports for the given character
+
+	@param character Model
+	@return Observable<DeathReport>
+]=]
+function DeathReportServiceClient:ObserveCharacterKillerReports(character)
+	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
+
+	return self._reportProcessor:ObserveCharacterKillerReports(character)
+end
+
+--[=[
+	Observes killer reports for the given character
+
+	@param character Model
+	@return Observable<DeathReport>
+]=]
+function DeathReportServiceClient:ObserveCharacterDeathReports(character)
+	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
+
+	return self._reportProcessor:ObserveCharacterDeathReports(character)
 end
 
 --[=[
