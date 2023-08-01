@@ -9,10 +9,19 @@ local RunService = game:GetService("RunService")
 local Promise = require("Promise")
 local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
 local TextFilterServiceConstants = require("TextFilterServiceConstants")
+local Rx = require("Rx")
+local TextFilterUtils = require("TextFilterUtils")
 
 local TextFilterServiceClient = {}
 TextFilterServiceClient.ServiceName = "TextFilterServiceClient"
 
+--[=[
+	Filters a non-chat string for a user
+
+	@param text string
+	@param fromUserId number
+	@return Promise<string>
+]=]
 function TextFilterServiceClient:PromiseNonChatStringForUser(text, fromUserId)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
@@ -23,6 +32,13 @@ function TextFilterServiceClient:PromiseNonChatStringForUser(text, fromUserId)
 		fromUserId)
 end
 
+--[=[
+	Filters a non-chat string for a broadcast
+
+	@param text string
+	@param fromUserId number
+	@return Promise<string>
+]=]
 function TextFilterServiceClient:PromiseNonChatStringForBroadcast(text, fromUserId)
 	assert(type(text) == "string", "Bad text")
 	assert(type(fromUserId) == "number", "Bad fromUserId")
@@ -33,12 +49,29 @@ function TextFilterServiceClient:PromiseNonChatStringForBroadcast(text, fromUser
 		fromUserId)
 end
 
+--[=[
+	Filters a preview-non-chat string for a broadcast
+
+	@param text string
+	@param fromUserId number
+	@return Promise<string>
+]=]
 function TextFilterServiceClient:PromisePreviewNonChatStringForBroadcast(text)
 	assert(type(text) == "string", "Bad text")
 
 	return self:_promiseInvokeRemoteFunction(
 		TextFilterServiceConstants.REQUEST_PREVIEW_NON_CHAT_STRING_FOR_BROADCAST,
 		text)
+end
+
+--[=[
+	Observes a non-chat string preview for broadcast
+
+	@param text string
+	@return Promise<string>
+]=]
+function TextFilterServiceClient:ObservePreviewNonChatStringForBroadcast(text)
+	return Rx.fromPromise(self:PromisePreviewNonChatStringForBroadcast(text))
 end
 
 function TextFilterServiceClient:_promiseInvokeRemoteFunction(request, text, ...)
@@ -71,7 +104,7 @@ function TextFilterServiceClient:_promiseInvokeRemoteFunction(request, text, ...
 					return reject(err or result or "Failed to get string result from server")
 				end
 
-				return resolve(result)
+				return resolve(TextFilterUtils.addBackInNewLinesAndWhitespace(text, result))
 			end)
 		end)
 end
@@ -86,12 +119,14 @@ function TextFilterServiceClient:_promiseRemoteFunction()
 end
 
 function TextFilterServiceClient:_fakeTestFilter(text)
-	text = text:gsub("[fF][uU][cC][kK]", "####")
+	local filteredText = text
+	filteredText = filteredText:gsub("[fF][uU][cC][kK]", "####")
+	filteredText = filteredText:gsub("\n", "")
 
 	return Promise.spawn(function(resolve, _)
 		-- Simulate testing
 		task.delay(0.5, function()
-			resolve(text)
+			resolve(TextFilterUtils.addBackInNewLinesAndWhitespace(text, filteredText))
 		end)
 	end)
 end
