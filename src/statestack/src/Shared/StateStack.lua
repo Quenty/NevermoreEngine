@@ -33,13 +33,15 @@ StateStack.__index = StateStack
 --[=[
 	Constructs a new StateStack.
 	@param defaultValue any -- The default value to use for the statestack.
+	@param checkType string | nil
 	@return StateStack
 ]=]
-function StateStack.new(defaultValue)
+function StateStack.new(defaultValue, checkType)
 	local self = setmetatable(BaseObject.new(), StateStack)
 
 	self._defaultValue = defaultValue
-	self._state = ValueObject.new(defaultValue)
+
+	self._state = ValueObject.new(defaultValue, checkType)
 	self._maid:GiveTask(self._state)
 
 	self._stateStack = {}
@@ -76,6 +78,15 @@ end
 ]=]
 function StateStack:Observe()
 	return self._state:Observe()
+end
+
+--[=[
+	Observes the current value of stack
+	@param predicate function
+	@return Observable<T?>
+]=]
+function StateStack:ObserveBrio(predicate)
+	return self._state:ObserveBrio(predicate)
 end
 
 --[=[
