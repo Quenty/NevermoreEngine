@@ -186,4 +186,111 @@ function TextFilterUtils.hasNonFilteredText(text: string): boolean
 	return string.find(text, "[^#%s]") ~= nil
 end
 
+local WHITESPACE = {
+	["\r"] = true;
+	["\n"] = true;
+	[" "] = true;
+	["\t"] = true;
+}
+
+--[=[
+	Computes proportional text that is filtered ignoring whitespace.
+
+	@param text string
+	@return number
+]=]
+function TextFilterUtils.getProportionFiltered(text: string)
+	local filteredChars, unfilteredChars = TextFilterUtils.countFilteredCharacters(text)
+	local total = unfilteredChars + filteredChars
+	if total == 0 then
+		return 0
+	end
+
+	return filteredChars/total
+end
+
+--[=[
+	Gets the number of filtered characters in the text string
+
+	@param text string
+	@return number -- filtered characters
+	@return number -- Unfiltered characters
+	@return number -- White space characters
+]=]
+function TextFilterUtils.countFilteredCharacters(text: string)
+	local filteredChars = 0
+	local unfilteredChars = 0
+	local whitespaceCharacters = 0
+	for i=1, #text do
+		local textChar = string.sub(text, i, i)
+		if textChar == "#" then
+			filteredChars = filteredChars + 1
+		elseif WHITESPACE[textChar] then
+			whitespaceCharacters = whitespaceCharacters + 1
+		else
+			unfilteredChars = unfilteredChars + 1
+		end
+	end
+
+	return filteredChars, unfilteredChars, whitespaceCharacters
+end
+
+
+--[=[
+	Adds in new lines and whitespace to the text
+
+	@param text string
+	@return number
+]=]
+function TextFilterUtils.addBackInNewLinesAndWhitespace(text, filteredText)
+	if text == filteredText then
+		return text
+	end
+
+	-- Assume that any missing characters are actually our newlines.
+	local missingCharacters = math.max(0, #text - #filteredText)
+
+	-- TODO: Not all this GC
+	local newString = ""
+	local filteredTextIndex = 1
+
+	local textIndex = 1
+	while filteredTextIndex <= #filteredText or textIndex <= #text do
+		local textChar = string.sub(text, textIndex, textIndex)
+		local filteredChar = string.sub(filteredText, filteredTextIndex, filteredTextIndex)
+
+		if textChar == "\n" then
+			if missingCharacters > 0 then
+				missingCharacters = missingCharacters - 1
+				newString = newString .. "\n"
+			else
+				newString = newString .. "\n"
+				filteredTextIndex = filteredTextIndex + 1
+			end
+		elseif textChar == " " and filteredChar == "#" then
+			newString = newString .. " "
+		elseif textChar == "\t" and filteredChar == "#" then
+			newString = newString .. "\t"
+		elseif textChar == "\r" and filteredChar == "#" then
+			newString = newString .. "\r"
+		else
+			if filteredChar == "" then
+				if missingCharacters > 0 then
+					missingCharacters = missingCharacters - 1
+					newString = newString .. "\n"
+				end
+			else
+				newString = newString .. filteredChar
+			end
+
+			filteredTextIndex = filteredTextIndex + 1
+		end
+
+		textIndex = textIndex + 1
+	end
+
+	return newString
+end
+
+
 return TextFilterUtils
