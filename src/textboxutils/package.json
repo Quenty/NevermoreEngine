@@ -1,0 +1,35 @@
+{
+  "name": "@quenty/textboxutils",
+  "version": "1.0.0",
+  "description": "Holds utility methods for textboxes",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "textboxutils"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/textboxutils/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
