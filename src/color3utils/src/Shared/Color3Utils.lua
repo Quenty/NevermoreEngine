@@ -115,4 +115,15 @@ function Color3Utils.areEqual(a, b, epsilon)
 		and math.abs(a.b - b.b) <= epsilon
 end
 
+--[=[
+	Converts the color3 to the actual hex integer used in web and other
+	areas.
+
+	@param color3 Color3
+	@return number
+]=]
+function Color3Utils.toHexInteger(color3)
+	return bit32.bor(bit32.lshift(color3.r*0xFF, 16), bit32.lshift(color3.g*0xFF, 8), color3.b*0xFF)
+end
+
 return Color3Utils

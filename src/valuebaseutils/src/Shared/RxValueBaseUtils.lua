@@ -38,9 +38,10 @@ end
 	@param parent Instance
 	@param className string
 	@param name string
+	@param predicate callback -- Optional callback
 	@return Observable<Brio<any>>
 ]=]
-function RxValueBaseUtils.observeBrio(parent, className, name)
+function RxValueBaseUtils.observeBrio(parent, className, name, predicate)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(className) == "string", "Bad className")
 	assert(type(name) == "string", "Bad naem")
@@ -51,6 +52,7 @@ function RxValueBaseUtils.observeBrio(parent, className, name)
 				return RxValueBaseUtils.observeValue(valueObject)
 			end),
 			RxBrioUtils.onlyLastBrioSurvives(),
+			predicate and RxBrioUtils.where(predicate) or nil;
 		})
 end
 

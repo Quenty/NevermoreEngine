@@ -36,8 +36,8 @@ function ValueBaseValue.new(parent, className, name, defaultValue)
 	return setmetatable(self, ValueBaseValue)
 end
 
-function ValueBaseValue:ObserveBrio()
-	return RxValueBaseUtils.observeBrio(self._parent, self._className, self._name)
+function ValueBaseValue:ObserveBrio(predicate)
+	return RxValueBaseUtils.observeBrio(self._parent, self._className, self._name, predicate)
 end
 
 function ValueBaseValue:Observe()

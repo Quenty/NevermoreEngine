@@ -14,7 +14,7 @@
 
 Property value for Roblox instances
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/PropertyValueUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/PropertyValue">View docs →</a></div>
 
 ## Installation
 

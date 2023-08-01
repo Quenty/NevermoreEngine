@@ -1,4 +1,6 @@
 --[=[
+	Handles shared observable subscription tables for the client and server
+
 	@class DeathReportProcessor
 ]=]
 
@@ -28,6 +30,12 @@ function DeathReportProcessor.new()
 
 	self._humanoidDeathSubTable = ObservableSubscriptionTable.new()
 	self._maid:GiveTask(self._humanoidDeathSubTable)
+
+	self._characterKillerSubTable = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._characterKillerSubTable)
+
+	self._characterDeathSubTable = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._characterDeathSubTable)
 
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
 		self._playerKillerSubTable:Complete(player)
@@ -86,6 +94,31 @@ function DeathReportProcessor:ObserveHumanoidKillerReports(humanoid)
 end
 
 --[=[
+	Observes killer reports for the given character
+
+	@param character Model
+	@return Observable<DeathReport>
+]=]
+function DeathReportProcessor:ObserveCharacterKillerReports(character)
+	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
+
+	return self._characterKillerSubTable:Observe(character)
+end
+
+--[=[
+	Observes killer reports for the given character
+
+	@param character Model
+	@return Observable<DeathReport>
+]=]
+function DeathReportProcessor:ObserveCharacterDeathReports(character)
+	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
+
+	return self._characterDeathSubTable:Observe(character)
+end
+
+
+--[=[
 	Handles the death report
 
 	@param deathReport DeathReport
@@ -99,6 +132,11 @@ function DeathReportProcessor:HandleDeathReport(deathReport)
 
 	if deathReport.killerHumanoid then
 		self._humanoidKillerSubTable:Fire(deathReport.killerHumanoid, deathReport)
+
+		local character = deathReport.killerHumanoid.Parent
+		if character then
+			self._characterKillerSubTable:Fire(character, deathReport)
+		end
 	end
 
 	if deathReport.player then
@@ -107,6 +145,11 @@ function DeathReportProcessor:HandleDeathReport(deathReport)
 
 	if deathReport.humanoid then
 		self._humanoidDeathSubTable:Fire(deathReport.humanoid, deathReport)
+
+		local character = deathReport.humanoid.Parent
+		if character then
+			self._characterDeathSubTable:Fire(character, deathReport)
+		end
 	end
 end
 

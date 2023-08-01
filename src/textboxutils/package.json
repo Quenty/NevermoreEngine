@@ -1,14 +1,12 @@
 {
-  "name": "@quenty/textfilterservice",
-  "version": "7.10.0",
-  "description": "Utility service that provides text filtering to the client",
+  "name": "@quenty/textboxutils",
+  "version": "1.0.0",
+  "description": "Holds utility methods for textboxes",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "TextFilterService",
-    "filtering",
-    "text"
+    "textboxutils"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -16,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/textfilterservice/"
+    "directory": "src/textboxutils/"
   },
   "funding": {
     "type": "patreon",
@@ -28,11 +26,8 @@
   ],
   "dependencies": {
     "@quenty/loader": "file:../loader",
-    "@quenty/promise": "file:../promise",
-    "@quenty/remoting": "file:../remoting",
-    "@quenty/rx": "file:../rx",
-    "@quenty/table": "file:../table",
-    "@quenty/textfilterutils": "file:../textfilterutils"
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx"
   },
   "publishConfig": {
     "access": "public"

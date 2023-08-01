@@ -1,4 +1,4 @@
-## SeatUtils
+## TextBoxUtils
 
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
@@ -12,12 +12,12 @@
   </a>
 </div>
 
-Holds utilities to work with Roblox seats
+Holds utility methods for textboxes
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SeatUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/TextBoxUtils">View docs →</a></div>
 
 ## Installation
 
 ```
-npm install @quenty/seatutils --save
+npm install @quenty/textboxutils --save
 ```

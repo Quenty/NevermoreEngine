@@ -8,6 +8,12 @@ local CharacterUtils = require("CharacterUtils")
 
 local SeatUtils = {}
 
+--[=[
+	Gets seat player occupants for all seats
+
+	@param seats { Seat }
+	@return { Player }
+]=]
 function SeatUtils.getPlayerOccupants(seats)
 	local players = {}
 
