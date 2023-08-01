@@ -1,20 +1,18 @@
-# v8.21.0 (Tue Aug 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/observe brio [#401](https://github.com/Quenty/NevermoreEngine/pull/401) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObserveBrio() API call to StateStack ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.20.0...@quenty/statestack@8.21.0) (2023-08-01)
+
+
+### Features
+
+* Add ObserveBrio() API call to StateStack ([048b333](https://github.com/Quenty/NevermoreEngine/commit/048b33336f4030fb9125afdd473270518bc62b09))
+
+
+
+
 
 # [8.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@8.19.0...@quenty/statestack@8.20.0) (2023-07-28)
 

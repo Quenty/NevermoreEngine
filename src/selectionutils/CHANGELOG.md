@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@2.21.0...@quenty/selectionutils@2.22.0) (2023-08-01)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
 # [2.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@2.20.0...@quenty/selectionutils@2.21.0) (2023-07-28)
 
 **Note:** Version bump only for package @quenty/selectionutils

@@ -1,20 +1,18 @@
-# v5.27.0 (Tue Aug 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/observe brio [#401](https://github.com/Quenty/NevermoreEngine/pull/401) ([@Quenty](https://github.com/Quenty))
-- feat: Add Color3Utils.toHexInteger(color3) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.26.0...@quenty/color3utils@5.27.0) (2023-08-01)
+
+
+### Features
+
+* Add Color3Utils.toHexInteger(color3) ([4c0884f](https://github.com/Quenty/NevermoreEngine/commit/4c0884f2fa2c76420789b9637f0337fa591d5403))
+
+
+
+
 
 # [5.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.25.0...@quenty/color3utils@5.26.0) (2023-07-28)
 

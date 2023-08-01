@@ -1,20 +1,18 @@
-# v3.27.0 (Tue Aug 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/observe brio [#401](https://github.com/Quenty/NevermoreEngine/pull/401) ([@Quenty](https://github.com/Quenty))
-- feat: Add DeathReportServiceClient:ObserveCharacterKillerReports(character) and DeathReportServiceClient:ObserveCharacterDeathReports(character) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@3.26.0...@quenty/deathreport@3.27.0) (2023-08-01)
+
+
+### Features
+
+* Add DeathReportServiceClient:ObserveCharacterKillerReports(character) and DeathReportServiceClient:ObserveCharacterDeathReports(character) ([1c1d32e](https://github.com/Quenty/NevermoreEngine/commit/1c1d32eb0bae543b11a06e022aa400a40b6be73f))
+
+
+
+
 
 # [3.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@3.25.0...@quenty/deathreport@3.26.0) (2023-07-28)
 

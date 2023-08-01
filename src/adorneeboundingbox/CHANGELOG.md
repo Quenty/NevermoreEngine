@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@1.5.0...@quenty/adorneeboundingbox@1.6.0) (2023-08-01)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+
+
+
+
 # [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@1.4.0...@quenty/adorneeboundingbox@1.5.0) (2023-07-28)
 
 **Note:** Version bump only for package @quenty/adorneeboundingbox

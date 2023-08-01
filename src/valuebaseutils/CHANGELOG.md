@@ -1,20 +1,18 @@
-# v7.19.0 (Tue Aug 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/observe brio [#401](https://github.com/Quenty/NevermoreEngine/pull/401) ([@Quenty](https://github.com/Quenty))
-- feat: Add predicate to ObserveBrio of ValueBaseValue ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@7.18.0...@quenty/valuebaseutils@7.19.0) (2023-08-01)
+
+
+### Features
+
+* Add predicate to ObserveBrio of ValueBaseValue ([146d9da](https://github.com/Quenty/NevermoreEngine/commit/146d9da3d6df06188e08e5768d279b72daffd336))
+
+
+
+
 
 # [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/valuebaseutils@7.17.0...@quenty/valuebaseutils@7.18.0) (2023-07-28)
 

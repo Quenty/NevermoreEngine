@@ -1,25 +1,23 @@
-# v7.11.0 (Tue Aug 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/observe brio [#401](https://github.com/Quenty/NevermoreEngine/pull/401) ([@Quenty](https://github.com/Quenty))
-- feat: Ensure we add back in whitespace after filtering ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix missing doc types ([@Quenty](https://github.com/Quenty))
-- fix: Fix missing Rx dependency in TextFilterService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@7.10.0...@quenty/textfilterservice@7.11.0) (2023-08-01)
+
+
+### Bug Fixes
+
+* Fix missing Rx dependency in TextFilterService ([22c1326](https://github.com/Quenty/NevermoreEngine/commit/22c13268d17b838cd1baebac3000ecb93bafc905))
+
+
+### Features
+
+* Ensure we add back in whitespace after filtering ([632e1e0](https://github.com/Quenty/NevermoreEngine/commit/632e1e0d383ea90b67d81f8edd8bc8dd9b874d68))
+
+
+
+
 
 # [7.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@7.9.1...@quenty/textfilterservice@7.10.0) (2023-07-28)
 

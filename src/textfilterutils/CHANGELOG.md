@@ -1,24 +1,18 @@
-# v6.8.0 (Tue Aug 01 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/observe brio [#401](https://github.com/Quenty/NevermoreEngine/pull/401) ([@Quenty](https://github.com/Quenty))
-- feat: Add TextFilterUtils.countFilteredCharacters() ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix missing doc types ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterutils@6.7.0...@quenty/textfilterutils@6.8.0) (2023-08-01)
+
+
+### Features
+
+* Add TextFilterUtils.countFilteredCharacters() ([f156822](https://github.com/Quenty/NevermoreEngine/commit/f1568223d2da7051e24558a094ad7fe29c8a2d5e))
+
+
+
+
 
 # [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterutils@6.6.0...@quenty/textfilterutils@6.7.0) (2023-07-28)
 
