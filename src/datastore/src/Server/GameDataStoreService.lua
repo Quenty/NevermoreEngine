@@ -30,7 +30,10 @@ function GameDataStoreService:PromiseDataStore()
 
 	self._dataStorePromise = self:_promiseRobloxDataStore()
 		:Then(function(robloxDataStore)
+			-- Live sync this stuff pretty frequently
 			local dataStore = DataStore.new(robloxDataStore, self:_getKey())
+			dataStore:SetAutoSaveAlsoSyncs(true)
+			dataStore:SetAutoSaveTimeSeconds(10)
 			self._maid:GiveTask(dataStore)
 
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()

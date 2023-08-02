@@ -71,13 +71,12 @@ local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
 local Promise = require("Promise")
 local Signal = require("Signal")
+local Math = require("Math")
 
-local DEBUG_WRITING = false
+local DEBUG_WRITING = true
 
-local AUTO_SAVE_TIME = 60*5
-local CHECK_DIVISION = 15
-local JITTER = 20 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
-local DEFAULT_CACHE_TIME_SECONDS = math.huge
+local DEFAULT_AUTO_SAVE_TIME_SECONDS = 60*5
+local DEFAULT_JITTER_PROPORTION = 0.1 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
 
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
@@ -94,7 +93,9 @@ function DataStore.new(robloxDataStore, key)
 
 	self._key = key or error("No key")
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
-	self._cacheTimeSeconds = DEFAULT_CACHE_TIME_SECONDS
+	self._autoSaveTimeSeconds = DEFAULT_AUTO_SAVE_TIME_SECONDS
+	self._jitterProportion = DEFAULT_JITTER_PROPORTION
+	self._autoSaveAlsoSyncs = false
 
 	if self._key == "" then
 		error("[DataStore] - Key cannot be an empty string")
@@ -108,41 +109,36 @@ function DataStore.new(robloxDataStore, key)
 	self.Saving = Signal.new() -- :Fire(promise)
 	self._maid:GiveTask(self.Saving)
 
-	task.spawn(function()
-		while self.Destroy do
-			for _=1, CHECK_DIVISION do
-				task.wait(AUTO_SAVE_TIME/CHECK_DIVISION)
-				if not self.Destroy then
-					break
-				end
+	self._maid:GiveTask(task.spawn(function()
+		while true do
+			local startTime = os.clock()
+			local jitterBase = math.random()
+
+			repeat
+				local timeElapsed = os.clock() - startTime
+				local totalWaitTime = Math.jitter(self._autoSaveTimeSeconds, self._jitterProportion*self._autoSaveTimeSeconds, jitterBase)
+
+			  	if timeElapsed > totalWaitTime then
+			  		break
+			  	end
+
+			  	local totalLeft = totalWaitTime - timeElapsed
+
+			  	-- Wait at most 1 second
+				task.wait(math.min(totalLeft, 1))
+
+				timeElapsed = os.clock() - startTime
+			until timeElapsed > totalWaitTime
+
+			if self._autoSaveAlsoSyncs then
+				self:Sync()
+			else
+				self:Save()
 			end
-
-			if not self.Destroy then
-				break
-			end
-
-			-- Apply additional jitter on auto-save
-			task.wait(math.random(1, JITTER))
-
-			if not self.Destroy then
-				break
-			end
-
-			self:Save()
 		end
-	end)
+	end))
 
 	return self
-end
-
---[=[
-	Sets how long the datastore will cache for
-	@param cacheTimeSeconds number?
-]=]
-function DataStore:SetCacheTime(cacheTimeSeconds)
-	assert(type(cacheTimeSeconds) == "number" or cacheTimeSeconds == nil, "Bad cacheTimeSeconds")
-
-	self._cacheTimeSeconds = cacheTimeSeconds or DEFAULT_CACHE_TIME_SECONDS
 end
 
 --[=[
@@ -152,6 +148,19 @@ end
 function DataStore:GetFullPath()
 	return ("RobloxDataStore@%s"):format(self._key)
 end
+
+function DataStore:SetAutoSaveTimeSeconds(autoSaveTimeSeconds)
+	assert(type(autoSaveTimeSeconds) == "number", "Bad autoSaveTimeSeconds")
+
+	self._autoSaveTimeSeconds = autoSaveTimeSeconds
+end
+
+function DataStore:SetAutoSaveAlsoSyncs(autoSaveAlsoSyncs)
+	assert(type(autoSaveAlsoSyncs) == "boolean", "Bad autoSaveAlsoSyncs")
+
+	self._autoSaveAlsoSyncs = autoSaveAlsoSyncs
+end
+
 
 --[=[
 	Returns whether the datastore failed.
@@ -187,27 +196,46 @@ end
 	@return Promise
 ]=]
 function DataStore:Save()
+	return self:_syncData(false)
+end
+
+--[=[
+	Same as saving the data but it also loads fresh data from the datastore, which may consume
+	additional data-store query calls.
+
+	@return Promise
+]=]
+function DataStore:Sync()
+	return self:_syncData(true)
+end
+
+function DataStore:_syncData(mergeNewData)
 	if self:DidLoadFail() then
 		warn("[DataStore] - Not saving, failed to load")
 		return Promise.rejected("Load not successful, not saving")
 	end
 
 	if DEBUG_WRITING then
-		print("[DataStore.Save] - Starting save routine")
+		print("[DataStore._syncData] - Starting save routine")
 	end
 
-	-- Avoid constructing promises for every callback down the datastore
-	-- upon save.
-	return (self:_promiseInvokeSavingCallbacks() or Promise.resolved())
+	return self:_promiseInvokeSavingCallbacks()
 		:Then(function()
 			if not self:HasWritableData() then
-				-- Nothing to save, don't update anything
-				if DEBUG_WRITING then
-					print("[DataStore.Save] - Not saving, nothing staged")
+				if not mergeNewData then
+					-- Nothing to save, don't update anything
+					if DEBUG_WRITING then
+						print("[DataStore._syncData] - Not saving, nothing staged")
+					end
+
+					return nil
 				end
+
+				-- TODO: Merge data
+				print("TODO: Merge data from a get API call")
 				return nil
 			else
-				return self:_saveData(self:GetNewWriter())
+				return self:_doDataSync(self:GetNewWriter(), mergeNewData)
 			end
 		end)
 end
@@ -225,7 +253,9 @@ function DataStore:Load(keyName, defaultValue)
 		end)
 end
 
-function DataStore:_saveData(writer)
+function DataStore:_doDataSync(writer, mergeNewData)
+	assert(type(mergeNewData) == "boolean", "Bad mergeNewData")
+
 	local maid = Maid.new()
 
 	local promise = Promise.new()
@@ -235,11 +265,15 @@ function DataStore:_saveData(writer)
 			return nil
 		end
 
-		data = writer:WriteMerge(data or {})
+		data = writer:WriteMerge(data or {}, mergeNewData)
 		assert(data ~= DataStoreDeleteToken, "Cannot delete from UpdateAsync")
 
 		if DEBUG_WRITING then
 			print("[DataStore] - Writing", game:GetService("HttpService"):JSONEncode(data))
+		end
+
+		if mergeNewData then
+			self:_mergeNewDataFromWriter(writer)
 		end
 
 		return data

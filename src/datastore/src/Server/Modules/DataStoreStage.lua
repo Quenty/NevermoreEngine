@@ -52,7 +52,7 @@ end
 -- Also returns nil for speedyness
 function DataStoreStage:_promiseInvokeSavingCallbacks()
 	if not next(self._savingCallbacks) then
-		return nil
+		return Promise.resolved()
 	end
 
 	local removingPromises = {}
@@ -152,6 +152,12 @@ function DataStoreStage:Load(name, defaultValue)
 	end)
 end
 
+function DataStoreStage:_mergeNewDataFromWriter(writer)
+	for key, item in pairs(writer:GetNewDataToMerge()) do
+
+	end
+end
+
 --[=[
 	Observes the current value for the stage itself
 
@@ -193,7 +199,7 @@ function DataStoreStage:_afterLoadGetAndApplyStagedData(name, data, defaultValue
 		if self._stores[name]:HasWritableData() then
 			local writer = self._stores[name]:GetNewWriter()
 			local original = Table.deepCopy(data[name] or {})
-			writer:WriteMerge(original)
+			writer:WriteMerge(original, false)
 			return original
 		end
 	end
@@ -321,7 +327,7 @@ function DataStoreStage:LoadAll()
 			if store:HasWritableData() then
 				local writer = store:GetNewWriter()
 				local original = Table.deepCopy(result[key] or {})
-				writer:WriteMerge(original)
+				writer:WriteMerge(original, false)
 			end
 		end
 

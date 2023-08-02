@@ -23,6 +23,7 @@ function DataStoreWriter.new()
 
 	self._rawSetData = {}
 	self._writers = {}
+	self._newData = {}
 
 	return self
 end
@@ -48,14 +49,27 @@ function DataStoreWriter:AddWriter(name, writer)
 	self._writers[name] = writer
 end
 
+function DataStoreWriter:GetNewDataToMerge()
+	return self._newData
+end
+
 --[=[
 	Merges the new data into the original value
 
 	@param original table?
+	@param mergeNewData boolean
 	@return table -- The original table
 ]=]
-function DataStoreWriter:WriteMerge(original)
+function DataStoreWriter:WriteMerge(original, mergeNewData)
 	original = original or {}
+
+	if mergeNewData then
+		for key, value in pairs(original) do
+			if self._rawSetData[key] ~= nil and self._writers[key] ~= nil then
+				self._newData[key] = value
+			end
+		end
+	end
 
 	for key, value in pairs(self._rawSetData) do
 		if value == DataStoreDeleteToken then
@@ -71,7 +85,7 @@ function DataStoreWriter:WriteMerge(original)
 				:format(tostring(key)))
 		end
 
-		local result = writer:WriteMerge(original[key])
+		local result = writer:WriteMerge(original[key], mergeNewData)
 		if result == DataStoreDeleteToken then
 			original[key] = nil
 		else

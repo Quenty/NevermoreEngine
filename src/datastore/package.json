@@ -30,6 +30,7 @@
     "@quenty/bindtocloseservice": "file:../bindtocloseservice",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
