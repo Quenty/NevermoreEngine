@@ -25,11 +25,14 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/humanoidanimatorutils": "file:../humanoidanimatorutils",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/promisemaid": "file:../promisemaid",
-    "@quenty/rbxasset": "file:../rbxasset"
+    "@quenty/rbxasset": "file:../rbxasset",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"
