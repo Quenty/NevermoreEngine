@@ -56,9 +56,10 @@ end
 --[=[
 	Observes for the key
 	@param key TKey
+	@param retrieveInitialValue callback -- Optional
 	@return Observable<TEmit>
 ]=]
-function ObservableSubscriptionTable:Observe(key)
+function ObservableSubscriptionTable:Observe(key, retrieveInitialValue)
 	assert(key ~= nil, "Bad key")
 
 	return Observable.new(function(sub)
@@ -66,6 +67,10 @@ function ObservableSubscriptionTable:Observe(key)
 			self._subMap[key] = { sub }
 		else
 			table.insert(self._subMap[key], sub)
+		end
+
+		if retrieveInitialValue then
+			retrieveInitialValue(sub)
 		end
 
 		return function()
