@@ -33,6 +33,7 @@
     "@quenty/math": "file:../math",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table"

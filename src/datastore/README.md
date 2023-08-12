@@ -15,6 +15,17 @@ This system is a reliable datastore system designed with promises and asyncronio
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/DataStore">View docs →</a></div>
 
+## Executive overiew
+This datastore prevents data loss by being explicit about what we're writing to, and only modifying the data that exists there instead of modifying the whole structure.
+
+## How syncing works
+Sometimes datastores (like a global game data store) need to be synced live instead of upon server or player start. This is if we expect multiple servers to write to the same datastore at once.
+
+Syncing is like saving. However, instead of treating the current datastore as a session lock, we load in additional data from our "source-of-truth". From here, we merge that data into the datastore, which means both clearing any matching write tokens that our sync says is done. 
+
+This is best for a "shared" memory that can be temporarily not correct. Deleting with a sync is less effective.
+
+
 ## Installation
 ```
 npm install @quenty/datastore --save

@@ -209,20 +209,20 @@ function DataStore:Sync()
 	return self:_syncData(true)
 end
 
-function DataStore:_syncData(mergeNewData)
+function DataStore:_syncData(doMergeNewData)
 	if self:DidLoadFail() then
-		warn("[DataStore] - Not saving, failed to load")
-		return Promise.rejected("Load not successful, not saving")
+		warn("[DataStore] - Not syncing, failed to load")
+		return Promise.rejected("Load not successful, not syncing")
 	end
 
 	if DEBUG_WRITING then
-		print("[DataStore._syncData] - Starting save routine")
+		print("[DataStore._syncData] - Starting sync routine")
 	end
 
 	return self:_promiseInvokeSavingCallbacks()
 		:Then(function()
 			if not self:HasWritableData() then
-				if not mergeNewData then
+				if not doMergeNewData then
 					-- Nothing to save, don't update anything
 					if DEBUG_WRITING then
 						print("[DataStore._syncData] - Not saving, nothing staged")
@@ -231,11 +231,21 @@ function DataStore:_syncData(mergeNewData)
 					return nil
 				end
 
-				-- TODO: Merge data
-				print("TODO: Merge data from a get API call")
-				return nil
+				if DEBUG_WRITING then
+					print("[DataStore._syncData] - Merging data from a get API call")
+				end
+
+				local writer = self:GetNewWriter()
+
+				-- Reads are cheaper than writes
+				return self:_promiseLoadNoCache()
+					:Then(function(data)
+						writer:WriteMerge(data or {}, doMergeNewData)
+
+						self:_mergeNewDataFromWriter(writer)
+					end)
 			else
-				return self:_doDataSync(self:GetNewWriter(), mergeNewData)
+				return self:_doDataSync(self:GetNewWriter(), doMergeNewData)
 			end
 		end)
 end
@@ -253,8 +263,8 @@ function DataStore:Load(keyName, defaultValue)
 		end)
 end
 
-function DataStore:_doDataSync(writer, mergeNewData)
-	assert(type(mergeNewData) == "boolean", "Bad mergeNewData")
+function DataStore:_doDataSync(writer, doMergeNewData)
+	assert(type(doMergeNewData) == "boolean", "Bad doMergeNewData")
 
 	local maid = Maid.new()
 
@@ -265,14 +275,14 @@ function DataStore:_doDataSync(writer, mergeNewData)
 			return nil
 		end
 
-		data = writer:WriteMerge(data or {}, mergeNewData)
+		data = writer:WriteMerge(data or {}, doMergeNewData)
 		assert(data ~= DataStoreDeleteToken, "Cannot delete from UpdateAsync")
 
 		if DEBUG_WRITING then
 			print("[DataStore] - Writing", game:GetService("HttpService"):JSONEncode(data))
 		end
 
-		if mergeNewData then
+		if doMergeNewData then
 			self:_mergeNewDataFromWriter(writer)
 		end
 
@@ -297,22 +307,25 @@ function DataStore:_promiseLoad()
 		return self._loadPromise
 	end
 
-	self._loadPromise = self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key)
+	self._loadPromise = self:_promiseLoadNoCache()
+	return self._loadPromise
+end
+
+function DataStore:_promiseLoadNoCache()
+	return self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key)
 		:Then(function(data)
 			if data == nil then
 				return {}
 			elseif type(data) == "table" then
 				return data
 			else
-				return Promise.rejected("Failed to load data. Wrong type '" .. type(data) .. "'")
+				return Promise.rejected("[DataStore] - Failed to load data. Wrong type '" .. type(data) .. "'")
 			end
 		end, function(err)
 			-- Log:
 			warn("[DataStore] - Failed to GetAsync data", err)
 			return Promise.rejected(err)
 		end))
-
-	return self._loadPromise
 end
 
 return DataStore

@@ -153,9 +153,12 @@ function DataStoreStage:Load(name, defaultValue)
 end
 
 function DataStoreStage:_mergeNewDataFromWriter(writer)
-	for key, item in pairs(writer:GetNewDataToMerge()) do
+	-- TODO: Merge all of our newly downloaded data here into our base layer.
 
-	end
+	-- TODO: Fire off events
+
+	-- TODO: If the data matches our "write" data then mark the transaction as
+	--       complete so we don't sync again with updateAsync. Set self._dataToSave to nil.
 end
 
 --[=[

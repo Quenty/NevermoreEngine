@@ -57,13 +57,13 @@ end
 	Merges the new data into the original value
 
 	@param original table?
-	@param mergeNewData boolean
+	@param doMergeNewData boolean
 	@return table -- The original table
 ]=]
-function DataStoreWriter:WriteMerge(original, mergeNewData)
+function DataStoreWriter:WriteMerge(original, doMergeNewData)
 	original = original or {}
 
-	if mergeNewData then
+	if doMergeNewData then
 		for key, value in pairs(original) do
 			if self._rawSetData[key] ~= nil and self._writers[key] ~= nil then
 				self._newData[key] = value
@@ -85,7 +85,7 @@ function DataStoreWriter:WriteMerge(original, mergeNewData)
 				:format(tostring(key)))
 		end
 
-		local result = writer:WriteMerge(original[key], mergeNewData)
+		local result = writer:WriteMerge(original[key], doMergeNewData)
 		if result == DataStoreDeleteToken then
 			original[key] = nil
 		else

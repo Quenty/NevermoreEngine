@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local GameDataStoreService = {}
 GameDataStoreService.ServiceName = "GameDataStoreService"
@@ -37,7 +38,9 @@ function GameDataStoreService:PromiseDataStore()
 			self._maid:GiveTask(dataStore)
 
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
-				return dataStore:Save()
+				return Promise.defer(function(resolve)
+					return resolve(dataStore:Save())
+				end)
 			end))
 
 			return dataStore
