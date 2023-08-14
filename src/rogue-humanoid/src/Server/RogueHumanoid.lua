@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RogueHumanoidBase = require("RogueHumanoidBase")
+local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 
 local RogueHumanoid = setmetatable({}, RogueHumanoidBase)
 RogueHumanoid.ClassName = "RogueHumanoid"
@@ -16,5 +17,4 @@ function RogueHumanoid.new(humanoid, serviceBag)
 	return self
 end
 
-
-return RogueHumanoid
+return PlayerHumanoidBinder.new("RogueHumanoid", RogueHumanoid)
