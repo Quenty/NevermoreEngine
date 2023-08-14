@@ -184,7 +184,7 @@ end
 	@return Promise<boolean>
 ]=]
 function DataStore:PromiseLoadSuccessful()
-	return self._maid:GivePromise(self:_promiseLoad()):Then(function()
+	return self._maid:GivePromise(self:LoadAll()):Then(function()
 		return true
 	end, function()
 		return false
@@ -235,15 +235,8 @@ function DataStore:_syncData(doMergeNewData)
 					print("[DataStore._syncData] - Merging data from a get API call")
 				end
 
-				local writer = self:GetNewWriter()
-
 				-- Reads are cheaper than writes
 				return self:_promiseLoadNoCache()
-					:Then(function(data)
-						writer:WriteMerge(data or {}, doMergeNewData)
-
-						self:_mergeNewDataFromWriter(writer)
-					end)
 			else
 				return self:_doDataSync(self:GetNewWriter(), doMergeNewData)
 			end
@@ -257,7 +250,7 @@ end
 	@return any?
 ]=]
 function DataStore:Load(keyName, defaultValue)
-	return self:_promiseLoad()
+	return self:LoadAll()
 		:Then(function(data)
 			return self:_afterLoadGetAndApplyStagedData(keyName, data, defaultValue)
 		end)
@@ -275,7 +268,9 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 			return nil
 		end
 
-		data = writer:WriteMerge(data or {}, doMergeNewData)
+		writer:StoreDifference(data or {})
+
+		data = writer:WriteMerge(data or {})
 		assert(data ~= DataStoreDeleteToken, "Cannot delete from UpdateAsync")
 
 		if DEBUG_WRITING then
@@ -283,7 +278,9 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 		end
 
 		if doMergeNewData then
-			self:_mergeNewDataFromWriter(writer)
+			-- This prevents resaving at high frequency
+			self:MarkDataAsSaved(writer)
+			self:PromiseMergeNewBaseData(writer)
 		end
 
 		return data
@@ -302,7 +299,7 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 	return promise
 end
 
-function DataStore:_promiseLoad()
+function DataStore:LoadAll()
 	if self._loadPromise then
 		return self._loadPromise
 	end
@@ -326,6 +323,12 @@ function DataStore:_promiseLoadNoCache()
 			warn("[DataStore] - Failed to GetAsync data", err)
 			return Promise.rejected(err)
 		end))
+		:Then(function(data)
+			local writer = self:GetNewWriter()
+			writer:StoreDifference(data or {})
+
+			return self:PromiseMergeNewBaseData(writer)
+		end)
 end
 
 return DataStore

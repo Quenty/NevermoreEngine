@@ -25,11 +25,11 @@ local function spinUpGameCopy()
 	local gameDataStore = serviceBag:GetService(require(packages.GameDataStoreService))
 	local bindToCloseService = serviceBag:GetService(require(packages.BindToCloseService))
 
+	-- This would be an aggressive usage of this area, it probably won't scale well enough.
+	-- But writing some shared code or something like API keys should scale fine.
 	maid:GivePromise(gameDataStore:PromiseDataStore()):Then(function(dataStore)
 		local substore = dataStore:GetSubStore("AliveServers")
-		substore:Store(guid, {
-			CreateTime = DateTime.now().UnixTimestamp;
-		})
+		substore:Store(guid, true)
 
 		dataStore:LoadAll():Then(function(data)
 			print(data)

@@ -4,6 +4,12 @@
 	at children level. This minimizes accidently overwriting.
 	The big cost here is that we may leave keys that can't be removed.
 
+	Layers here include:
+
+	1. Base layer
+	2. Substores
+	3. Data to save
+
 	@server
 	@class DataStoreStage
 ]=]
@@ -38,6 +44,9 @@ function DataStoreStage.new(loadName, loadParent)
 	-- LoadParent is optional, used for loading
 	self._loadName = loadName
 	self._loadParent = loadParent
+
+	-- Stores the actual data loaded and synced (but not pending written data)
+	self._baseData = {}
 
 	self._savingCallbacks = {} -- [func, ...]
 	self._takenKeys = {} -- [name] = true
@@ -147,19 +156,11 @@ function DataStoreStage:Load(name, defaultValue)
 		end
 	end
 
-	return self:_promiseLoadParentContent():Then(function(data)
+	return self:_promiseLoadFromParent():Then(function(data)
 		return self:_afterLoadGetAndApplyStagedData(name, data, defaultValue)
 	end)
 end
 
-function DataStoreStage:_mergeNewDataFromWriter(writer)
-	-- TODO: Merge all of our newly downloaded data here into our base layer.
-
-	-- TODO: Fire off events
-
-	-- TODO: If the data matches our "write" data then mark the transaction as
-	--       complete so we don't sync again with updateAsync. Set self._dataToSave to nil.
-end
 
 --[=[
 	Observes the current value for the stage itself
@@ -173,6 +174,8 @@ function DataStoreStage:Observe(name, defaultValue)
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
+
+		-- TODO: Observe subtable
 
 		maid:GiveTask(self._subsTable:Observe(name):Subscribe(sub:GetFireFailComplete()))
 
@@ -267,7 +270,7 @@ end
 	@return Promise<{ [string]: true }>
 ]=]
 function DataStoreStage:PromiseKeySet()
-	return self:_promiseLoadParentContent():Then(function(data)
+	return self:_promiseLoadFromParent():Then(function(data)
 		local keySet = {}
 
 		for key, value in pairs(data) do
@@ -301,7 +304,7 @@ end
 	@return Promise<any>
 ]=]
 function DataStoreStage:LoadAll()
-	return self:_promiseLoadParentContent():Then(function(data)
+	return self:_promiseLoadFromParent():Then(function(data)
 		local result = {}
 
 		for key, value in pairs(data) do
@@ -338,7 +341,96 @@ function DataStoreStage:LoadAll()
 	end)
 end
 
-function DataStoreStage:_promiseLoadParentContent()
+--[=[
+	This will always prioritize our own view of the world over
+	incoming data.
+
+	@param parentWriter DataStoreWriter
+]=]
+function DataStoreStage:PromiseMergeNewBaseData(parentWriter)
+	local promises = {}
+
+	-- Merge all of our newly downloaded data here into our base layer.
+	for key, value in pairs(parentWriter:GetDiffData()) do
+		if self._stores[key] then
+			-- TODO: Merge here
+		end
+
+		if value == DataStoreDeleteToken then
+			self._baseData[key] = nil
+		else
+			self._baseData[key] = value
+		end
+	end
+
+	-- Merge all substores
+	for storeKey, store in pairs(self._stores) do
+		local subWriter = parentWriter:GetWriter(storeKey)
+		if subWriter then
+			table.insert(promises, store:PromiseMergeNewBaseData(subWriter))
+		end
+	end
+
+	-- Fire off events
+	for key, _ in pairs(parentWriter:GetDiffData()) do
+		if self._dataToSave and self._dataToSave[key] == nil and not self._stores[key] then
+			self._subsTable:Fire(key, self._baseData[key])
+		end
+	end
+
+	return PromiseUtils.all(promises)
+		:Then(function()
+			return self._baseData
+		end)
+end
+
+--[=[
+	Updates the base data to the saved / written data.
+
+	This will always prioritize our own view of the world over
+	incoming data.
+
+	@param parentWriter DataStoreWriter
+]=]
+function DataStoreStage:MarkDataAsSaved(parentWriter)
+	if self._dataToSave then
+		for key, value in pairs(parentWriter:GetDataToSave()) do
+			if self._dataToSave[key] ~= value then
+				-- More syncing will be required
+				continue
+			end
+
+			-- Merge our base data with the data to save.
+			-- This will not require any event firing.
+			if value == DataStoreDeleteToken then
+				self._baseData[key] = nil
+			else
+				self._baseData[key] = value
+			end
+
+			self._dataToSave[key] = nil
+		end
+
+		-- We also need to check here because we could have stored more
+		-- between write and this invocation.
+		if next(self._dataToSave) == nil then
+			self._dataToSave = nil
+		end
+	end
+
+	-- Also update al subwriters
+	for key, subwriter in pairs(parentWriter:GetSubWritersMap()) do
+		local store = self._stores[key]
+		if store then
+			store:MarkDataAsSaved(subwriter)
+		else
+			-- TODO: handle stores removal
+			warn("[DataStoreStage] - Store removed, but writer persists")
+		end
+	end
+end
+
+function DataStoreStage:_promiseLoadFromParent()
 	if not self._loadParent then
 		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
 	end
@@ -388,6 +480,16 @@ function DataStoreStage:GetSubStore(name)
 	end
 
 	local newStore = DataStoreStage.new(name, self)
+	-- TODO: better transfer of base data
+	-- TODO: Handle Delete
+	if self._baseData[name] ~= nil then
+		-- Merge as necessary
+		newStore:PromiseMergeNewBaseData(self._baseData[name])
+		self._baseData[name] = nil
+	end
+
+	-- TODO: Transfer save data here too
+
 	self._takenKeys[name] = true
 	self._maid:GiveTask(newStore)
 
@@ -456,8 +558,9 @@ end
 ]=]
 function DataStoreStage:GetNewWriter()
 	local writer = DataStoreWriter.new()
+	writer:SetBaseData(self._baseData)
 	if self._dataToSave then
-		writer:SetRawData(self._dataToSave)
+		writer:SetDataToSave(self._dataToSave)
 	end
 
 	for name, store in pairs(self._stores) do
@@ -467,7 +570,7 @@ function DataStoreStage:GetNewWriter()
 		end
 
 		if store:HasWritableData() then
-			writer:AddWriter(name, store:GetNewWriter())
+			writer:AddSubWriter(name, store:GetNewWriter())
 		end
 	end
 
