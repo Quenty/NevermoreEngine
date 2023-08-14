@@ -6,18 +6,17 @@ local require = require(script.Parent.loader).load(script)
 
 local RogueAdditiveProvider = require("RogueAdditiveProvider")
 local RogueMultiplierProvider = require("RogueMultiplierProvider")
-local RogueSetterProvider = require("RogueSetterProvider")
 local RoguePropertyBinderGroups = require("RoguePropertyBinderGroups")
+local RoguePropertyChangedSignalConnection = require("RoguePropertyChangedSignalConnection")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
+local RoguePropertyUtils = require("RoguePropertyUtils")
+local RogueSetterProvider = require("RogueSetterProvider")
 local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
-local ValueBaseUtils = require("ValueBaseUtils")
-local RoguePropertyUtils = require("RoguePropertyUtils")
-local RoguePropertyChangedSignalConnection = require("RoguePropertyChangedSignalConnection")
 local ValueObject = require("ValueObject")
 
 local RogueProperty = {}
@@ -34,7 +33,7 @@ function RogueProperty.new(adornee, serviceBag, definition)
 	self._adornee = assert(adornee, "Bad adornee")
 	self._definition = assert(definition, "Bad definition")
 
-	self = setmetatable(self, RogueProperty)
+	setmetatable(self, RogueProperty)
 
 	if self._roguePropertyService:CanInitializeProperties() then
 		self:GetBaseValueObject()
@@ -45,9 +44,10 @@ end
 
 function RogueProperty:GetBaseValueObject()
 	local parent
-	local tableDefinition = self._definition:GetPropertyTableDefinition()
-	if tableDefinition then
-		parent = tableDefinition:GetContainer(self._serviceBag, self._adornee)
+	local parentDefinition = self._definition:GetParentPropertyDefinition()
+
+	if parentDefinition then
+		parent = parentDefinition:GetContainer(self._serviceBag, self._adornee)
 	else
 		parent = self._adornee
 	end
@@ -57,20 +57,16 @@ function RogueProperty:GetBaseValueObject()
 	end
 
 	if self._roguePropertyService:CanInitializeProperties() then
-		return ValueBaseUtils.getOrCreateValue(
-			parent,
-			self._definition:GetStorageInstanceType(),
-			self._definition:GetName(),
-			self._definition:GetEncodedDefaultValue())
+		return self._definition:GetOrCreateInstance(parent)
 	else
 		return parent:FindFirstChild(self._definition:GetName())
 	end
 end
 
 function RogueProperty:_observeBaseValueBrio()
-	local tableDefinition = self._definition:GetPropertyTableDefinition()
-	if tableDefinition then
-		return tableDefinition:ObserveContainerBrio(self._serviceBag, self._adornee)
+	local parentDefinition = self._definition:GetParentPropertyDefinition()
+	if parentDefinition then
+		return parentDefinition:ObserveContainerBrio(self._serviceBag, self._adornee)
 			:Pipe({
 				RxBrioUtils.switchMapBrio(function(container)
 					return RxInstanceUtils.observeLastNamedChildBrio(
@@ -141,6 +137,7 @@ function RogueProperty:ObserveModifiersBrio()
 	return self:_observeBaseValueBrio()
 		:Pipe({
 			RxBrioUtils.flatMapBrio(function(baseValue)
+				print("Got base value")
 				if baseValue then
 					return RxBinderUtils.observeBoundChildClassesBrio(self._roguePropertyBinderGroups.RogueModifiers:GetBinders(), baseValue)
 				else
@@ -246,7 +243,7 @@ function RogueProperty:__index(index)
 	if index == "Value" then
 		return self:GetValue()
 	elseif index == "Changed" then
-		return self:_getChangedEvent()
+		return self:GetChangedEvent()
 	elseif RogueProperty[index] then
 		return RogueProperty[index]
 	else
@@ -260,12 +257,11 @@ function RogueProperty:__newindex(index, value)
 	elseif index == "Changed" then
 		error("Cannot set .Changed event")
 	elseif RogueProperty[index] then
-		return RogueProperty[index]
+		error(string.format("Cannot set %q", tostring(index)))
 	else
-		error(("Bad index %q"):format(tostring(index)))
+		error(string.format("Bad index %q", tostring(index)))
 	end
 end
-
 
 function RogueProperty:_decodeValue(current)
 	return RoguePropertyUtils.decodeProperty(self._definition, current)
@@ -275,7 +271,7 @@ function RogueProperty:_encodeValue(current)
 	return RoguePropertyUtils.encodeProperty(self._definition, current)
 end
 
-function RogueProperty:_getChangedEvent()
+function RogueProperty:GetChangedEvent()
 	return {
 		Connect = function(_, callback)
 			assert(type(callback) == "function", "Bad callback")

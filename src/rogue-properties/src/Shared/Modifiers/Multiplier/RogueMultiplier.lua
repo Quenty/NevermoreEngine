@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local Binder = require("Binder")
 
 local RogueMultiplier = setmetatable({}, BaseObject)
 RogueMultiplier.ClassName = "RogueMultiplier"
@@ -31,4 +32,4 @@ function RogueMultiplier:GetObject()
 	return self._obj
 end
 
-return RogueMultiplier
+return Binder.new("RogueMultiplier", RogueMultiplier)

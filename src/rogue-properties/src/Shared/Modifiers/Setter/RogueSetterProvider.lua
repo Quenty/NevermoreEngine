@@ -7,7 +7,6 @@ local require = require(script.Parent.loader).load(script)
 local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
-local RogueBindersShared = require("RogueBindersShared")
 local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
@@ -22,13 +21,13 @@ function RogueSetterProvider:Init(serviceBag)
 
 	-- Internal
 	self._roguePropetyService = self._serviceBag:GetService(RoguePropertyService)
-	self._rogueBinders = self._serviceBag:GetService(RogueBindersShared)
+	self._rogueSetterBinder = self._serviceBag:GetService(require("RogueSetter"))
 
 	self._roguePropetyService:AddProvider(self)
 end
 
 function RogueSetterProvider:GetBinder()
-	return self._rogueBinders.RogueSetter
+	return self._rogueSetterBinder
 end
 
 function RogueSetterProvider:Create(value, source)
@@ -48,7 +47,7 @@ function RogueSetterProvider:Create(value, source)
 		RoguePropertyModifierUtils.createSourceLink(obj, source)
 	end
 
-	self._rogueBinders.RogueSetter:Bind(obj)
+	self._rogueSetterBinder:Bind(obj)
 
 	return obj
 end
@@ -85,11 +84,11 @@ function RogueSetterProvider:ObserveModifiedVersion(propObj, rogueProperty, obse
 end
 
 function RogueSetterProvider:_observeSettersBrio(propObj)
-	return RxBinderUtils.observeBoundChildClassBrio(self._rogueBinders.RogueSetter, propObj)
+	return RxBinderUtils.observeBoundChildClassBrio(self._rogueSetterBinder, propObj)
 end
 
 function RogueSetterProvider:_getSetters(propObj)
-	return BinderUtils.getChildren(self._rogueBinders.RogueSetter, propObj)
+	return BinderUtils.getChildren(self._rogueSetterBinder, propObj)
 end
 
 return RogueSetterProvider

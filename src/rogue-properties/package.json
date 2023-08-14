@@ -27,6 +27,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/jsonutils": "file:../jsonutils",
     "@quenty/linkutils": "file:../linkutils",

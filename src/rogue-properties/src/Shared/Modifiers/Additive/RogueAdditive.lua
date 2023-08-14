@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local Binder = require("Binder")
 
 local RogueAdditive = setmetatable({}, BaseObject)
 RogueAdditive.ClassName = "RogueAdditive"
@@ -31,4 +32,4 @@ function RogueAdditive:GetAdditive()
 	return self._obj.Value
 end
 
-return RogueAdditive
+return Binder.new("RogueAdditive", RogueAdditive)
