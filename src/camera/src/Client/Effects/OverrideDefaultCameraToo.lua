@@ -4,8 +4,8 @@
 	controls.
 
 	```lua
-	local combiner = OverrideDefaultCameraToo.new(effect, self._cameraStackService:GetRawDefaultCamera())
-	combiner.Predicate = function()
+	local overrideDefaultCamera = OverrideDefaultCameraToo.new(effect, self._cameraStackService:GetRawDefaultCamera())
+	overrideDefaultCamera.Predicate = function()
 		return self._cameraStateTweener:IsFinishedShowing()
 	end
 	```
@@ -56,6 +56,10 @@ function OverrideDefaultCameraToo:__index(index)
 
 		local predicate = self.Predicate
 		if not predicate or predicate(result) then
+			if not predicate then
+				warn("[OverrideDefaultCameraToo] - No predicate set")
+			end
+
 			local angle = math.abs(Vector3Utils.angleBetweenVectors(result.CFrame:VectorToWorldSpace(Vector3.new(0, 0, -1)), Vector3.new(0, 1, 0)))
 
 			-- If the camera is straight up and down then Roblox breaks
