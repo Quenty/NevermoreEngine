@@ -4,11 +4,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local BaseObject = require("BaseObject")
 local AttributeUtils = require("AttributeUtils")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
 local RogueHumanoidProperties = require("RogueHumanoidProperties")
+local CharacterUtils = require("CharacterUtils")
 
 local GROWTH_VALUE_NAMES = {
 	"HeadScale";
@@ -28,18 +31,20 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 
 	self._properties = RogueHumanoidProperties:GetPropertyTable(self._serviceBag, self._obj)
 
-	self._maid:GiveTask(self._properties.WalkSpeed:Observe():Subscribe(function(walkSpeed)
-		self._obj.WalkSpeed = walkSpeed
-	end))
-	self._maid:GiveTask(self._properties.CharacterUseJumpPower:Observe():Subscribe(function(useJumpPower)
-		self._obj.UseJumpPower = useJumpPower
-	end))
-	self._maid:GiveTask(self._properties.JumpPower:Observe():Subscribe(function(jumpPower)
-		self._obj.JumpPower = jumpPower
-	end))
-	self._maid:GiveTask(self._properties.JumpHeight:Observe():Subscribe(function(jumpHeight)
-		self._obj.JumpHeight = jumpHeight
-	end))
+	if CharacterUtils.getPlayerFromCharacter(self._obj) == Players.LocalPlayer then
+		self._maid:GiveTask(self._properties.WalkSpeed:Observe():Subscribe(function(walkSpeed)
+			self._obj.WalkSpeed = walkSpeed
+		end))
+		self._maid:GiveTask(self._properties.CharacterUseJumpPower:Observe():Subscribe(function(useJumpPower)
+			self._obj.UseJumpPower = useJumpPower
+		end))
+		self._maid:GiveTask(self._properties.JumpPower:Observe():Subscribe(function(jumpPower)
+			self._obj.JumpPower = jumpPower
+		end))
+		self._maid:GiveTask(self._properties.JumpHeight:Observe():Subscribe(function(jumpHeight)
+			self._obj.JumpHeight = jumpHeight
+		end))
+	end
 
 	self._scaleState = ValueObject.fromObservable(Rx.combineLatest({
 		scale = self._properties.Scale:Observe();

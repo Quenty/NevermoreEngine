@@ -109,13 +109,14 @@ function ScreenshotHudModel:GetKeepOpen()
 end
 
 --[=[
-	Sets the close button's position
+	Sets whether we are visible or not
+
 	@param visible boolean
 ]=]
-function ScreenshotHudModel:SetCloseButtonVisible(visible)
+function ScreenshotHudModel:SetVisible(visible)
 	assert(type(visible) == "boolean", "Bad visible")
 
-	self._closeButtonPosition.Value = visible
+	self._visible.Value = visible
 end
 
 

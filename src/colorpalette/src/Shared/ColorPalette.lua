@@ -148,12 +148,6 @@ function ColorPalette:GetColorSwatch(colorName)
 	return swatch
 end
 
-function ColorPalette:SetColor(colorName, value)
-	assert(type(colorName) == "string", "Bad colorName")
-
-	self._swatches[colorName]:SetColor(value)
-end
-
 function ColorPalette:ObserveGradeOn(colorName, newSurfaceName, baseSurfaceName)
 	return self._gradePalette:ObserveOn(colorName, newSurfaceName, baseSurfaceName)
 end

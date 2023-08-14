@@ -1,0 +1,11 @@
+{
+  "name": "{{packageNameProper}}Test",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "{{packageName}}": {
+        "$path": ".."
+      }
+    }
+  }
+}

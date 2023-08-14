@@ -15,7 +15,7 @@ function RogueHumanoidService:Init(serviceBag)
 	self._serviceBag:GetService(require("RoguePropertyService"))
 
 	-- Internal
-	self._serviceBag:GetService(require("RogueHumanoidBindersServer"))
+	self._serviceBag:GetService(require("RogueHumanoid"))
 end
 
 return RogueHumanoidService

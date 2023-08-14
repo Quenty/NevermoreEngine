@@ -4,17 +4,18 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
 local RogueProperty = require("RogueProperty")
 local ServiceBag = require("ServiceBag")
 local RoguePropertyUtils = require("RoguePropertyUtils")
+local DuckTypeUtils = require("DuckTypeUtils")
+local ValueBaseUtils = require("ValueBaseUtils")
 
-local RoguePropertyDefinition = setmetatable({}, BaseObject)
+local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"
 RoguePropertyDefinition.__index = RoguePropertyDefinition
 
 function RoguePropertyDefinition.new(name, defaultValue, roguePropertyTableDefinition)
-	local self = setmetatable(BaseObject.new(), RoguePropertyDefinition)
+	local self = setmetatable({}, RoguePropertyDefinition)
 
 	assert(defaultValue ~= nil, "Bad defaultValue")
 
@@ -26,6 +27,10 @@ function RoguePropertyDefinition.new(name, defaultValue, roguePropertyTableDefin
 	self._encodedDefaultValue = RoguePropertyUtils.encodeProperty(self, self._defaultValue)
 
 	return self
+end
+
+function RoguePropertyDefinition.isRoguePropertyDefinition(value)
+	return DuckTypeUtils.isImplementation(RoguePropertyDefinition, value)
 end
 
 --[=[
@@ -40,8 +45,17 @@ function RoguePropertyDefinition:Get(serviceBag, adornee)
 	return RogueProperty.new(adornee, serviceBag, self)
 end
 
+function RoguePropertyDefinition:GetOrCreateInstance(parent)
+	assert(typeof(parent) == "Instance", "Bad parent")
 
-function RoguePropertyDefinition:GetPropertyTableDefinition()
+	return ValueBaseUtils.getOrCreateValue(
+		parent,
+		self:GetStorageInstanceType(),
+		self:GetName(),
+		self:GetEncodedDefaultValue())
+end
+
+function RoguePropertyDefinition:GetParentPropertyDefinition()
 	return self._roguePropertyTableDefinition
 end
 
@@ -74,8 +88,10 @@ function RoguePropertyDefinition:GetEncodedDefaultValue()
 end
 
 function RoguePropertyDefinition:_computeStorageInstanceType()
-	if self._valueType == "string" or self._valueType == "table" then
+	if self._valueType == "string" then
 		return "StringValue"
+	elseif self._valueType == "table" then
+		return "Folder"
 	elseif self._valueType == "number" then
 		return "NumberValue"
 	elseif self._valueType == "boolean" then

@@ -56,6 +56,86 @@ function Draw.setRandomColor()
 end
 
 --[=[
+	Draws a line between two points
+
+	@param start Vector3
+	@param finish Vector3
+	@param color Color3 -- Optional
+	@param parent Instance? -- Optional
+	@param meshDiameter number -- Optional
+	@param diameter number -- Optional
+	@return Instance
+]=]
+function Draw.line(start, finish, color, parent, meshDiameter, diameter)
+	start = assert(Draw._toVector3(start), "Bad start")
+	finish = assert(Draw._toVector3(finish), "Bad finish")
+	color = Draw._toColor3(color)
+
+	return Draw.ray(Ray.new(start, finish - start), color, parent, meshDiameter, diameter)
+end
+
+--[=[
+	Draws a line between directions
+
+	@param start Vector3
+	@param direction Vector3
+	@param color Color3 -- Optional
+	@param parent Instance? -- Optional
+	@param meshDiameter number -- Optional
+	@param diameter number -- Optional
+	@return Instance
+]=]
+function Draw.direction(start, direction, color, parent, meshDiameter, diameter)
+	start = assert(Draw._toVector3(start), "Bad start")
+	direction = assert(Draw._toVector3(direction), "Bad direction")
+	color = Draw._toColor3(color)
+
+	return Draw.ray(Ray.new(start, direction), color, parent, meshDiameter, diameter)
+end
+
+--[=[
+	Draws a spherecast
+
+	@param origin Vector3
+	@param radius number
+	@param direction Vector3
+	@param color Color3
+	@param parent Parent
+]=]
+function Draw.sphereCast(origin, radius, direction, color, parent)
+	return Draw.ray(Ray.new(origin, direction), color, parent, 2*radius)
+end
+
+--[=[
+	Draws a spherecast
+
+	@param cframe CFrame
+	@param size Vector3
+	@param direction Vector3
+	@param color Color3
+	@param parent Parent
+]=]
+function Draw.blockcast(cframe, size, direction, color, parent)
+	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
+	size = assert(Draw._toVector3(size), "Bad size")
+	color = Draw._toColor3(color)
+	parent = parent or Draw.getDefaultParent()
+
+	local folder = Instance.new("Folder")
+	folder.Name = "Blockcast"
+	folder.Archivable = false
+
+	-- Draw beginning and end for now...
+	-- TODO: Convex hull
+	Draw.box(cframe, size, color).Parent = folder
+	Draw.box(cframe + direction, size, color).Parent = folder
+
+	folder.Parent = parent
+
+	return folder
+end
+
+--[=[
 	Draws a ray for debugging.
 
 	```lua
@@ -73,7 +153,7 @@ end
 function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
 
-	color = color or Draw._defaultColor
+	color = Draw._toColor3(color) or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
 	meshDiameter = meshDiameter or 0.2
 	diameter = diameter or 0.2
@@ -150,7 +230,7 @@ end
 	@param color Color3
 ]=]
 function Draw.updateRay(part, ray, color)
-	color = color or part.Color
+	color = Draw._toColor3(color) or part.Color
 
 	local diameter = part.Size.x
 	local rayCenter = ray.Origin + ray.Direction/2
@@ -186,6 +266,8 @@ end
 	@return Instance
 ]=]
 function Draw.text(adornee, text, color)
+	color = Draw._toColor3(color)
+
 	if typeof(adornee) == "Vector3" then
 		local attachment = Instance.new("Attachment")
 		attachment.WorldPosition = adornee
@@ -309,13 +391,9 @@ end
 	@return BasePart
 ]=]
 function Draw.point(position, color, parent, diameter)
-	if typeof(position) == "CFrame" then
-		position = position.Position
-	end
+	position = assert(Draw._toVector3(position), "Bad position")
+	color = Draw._toColor3(color) or Draw._defaultColor
 
-	assert(typeof(position) == "Vector3", "Bad position")
-
-	color = color or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
 	diameter = diameter or 1
 
@@ -364,9 +442,8 @@ end
 	@return BasePart
 ]=]
 function Draw.labelledPoint(position, label, color, parent)
-	if typeof(position) == "CFrame" then
-		position = position.Position
-	end
+	position = assert(Draw._toVector3(position), "Bad position")
+	color = Draw._toColor3(color)
 
 	local part = Draw.point(position, color, parent)
 
@@ -386,6 +463,8 @@ end
 	@return Model
 ]=]
 function Draw.cframe(cframe)
+	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
+
 	local model = Instance.new("Model")
 	model.Name = "DebugCFrame"
 
@@ -430,6 +509,8 @@ end
 ]=]
 function Draw.part(template, cframe, color, transparency)
 	assert(typeof(template) == "Instance" and template:IsA("BasePart"), "Bad template")
+	cframe = Draw._toCFrame(cframe)
+	color = Draw._toColor3(color)
 
 	local part = template:Clone()
 	for _, child in pairs(part:GetChildren()) do
@@ -486,10 +567,14 @@ end
 	@return BasePart
 ]=]
 function Draw.box(cframe, size, color)
+	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
+	size = assert(Draw._toVector3(size), "Bad size")
+	color = Draw._toColor3(color)
+
+	assert(typeof(cframe) == "CFrame", "Bad cframe")
 	assert(typeof(size) == "Vector3", "Bad size")
 
 	color = color or Draw._defaultColor
-	cframe = typeof(cframe) == "Vector3" and CFrame.new(cframe) or cframe
 
 	local part = Instance.new("Part")
 	part.Color = color
@@ -533,6 +618,8 @@ end
 	@return BasePart
 ]=]
 function Draw.region3(region3, color)
+	color = Draw._toColor3(color)
+
 	return Draw.box(region3.CFrame, region3.Size, color)
 end
 
@@ -549,6 +636,9 @@ end
 	@return BasePart
 ]=]
 function Draw.terrainCell(position, color)
+	position = assert(Draw._toVector3(position), "Bad position")
+	color = Draw._toColor3(color)
+
 	local size = Vector3.new(4, 4, 4)
 
 	local solidCell = Terrain:WorldToCell(position)
@@ -560,9 +650,9 @@ function Draw.terrainCell(position, color)
 	return part
 end
 
-
-
 function Draw.screenPointLine(a, b, parent, color)
+	color = Draw._toColor3(color)
+
 	local offset = (b - a)
 	local pos = a + offset/2
 
@@ -601,6 +691,8 @@ function Draw.screenPointLine(a, b, parent, color)
 end
 
 function Draw.screenPoint(position, parent, color, diameter)
+	color = Draw._toColor3(color)
+
 	local frame = Instance.new("Frame")
 	frame.Name = "DebugScreenPoint"
 	frame.Size = UDim2.new(0, diameter, 0, diameter)
@@ -634,6 +726,10 @@ end
 	@return BasePart
 ]=]
 function Draw.vector(position, direction, color, parent, meshDiameter)
+	position = assert(Draw._toVector3(position), "Bad position")
+	direction = assert(Draw._toVector3(direction), "Bad direction")
+	color = Draw._toColor3(color)
+
 	return Draw.ray(Ray.new(position, direction), color, parent, meshDiameter)
 end
 
@@ -652,6 +748,9 @@ end
 	@return BasePart
 ]=]
 function Draw.ring(ringPos, ringNorm, ringRadius, color, parent)
+	ringPos = assert(Draw._toVector3(ringPos), "Bad ringPos")
+	ringNorm = assert(Draw._toVector3(ringNorm), "Bad ringNorm")
+
 	local ringCFrame = CFrame.new(ringPos, ringPos + ringNorm)
 
 	local points = {}
@@ -675,6 +774,62 @@ function Draw.ring(ringPos, ringNorm, ringRadius, color, parent)
 	folder.Parent = parent or Draw.getDefaultParent()
 
 	return folder
+end
+
+function Draw._toVector3(position)
+	if typeof(position) == "Vector3" then
+		return position
+	elseif typeof(position) == "CFrame" then
+		return position.Position
+	elseif typeof(position) == "Instance" then
+		if position:IsA("Attachment") then
+			return position.WorldPosition
+		elseif position:IsA("BasePart") then
+			return position.Position
+		elseif position:IsA("Model") then
+			return position:GetBoundingBox().p
+		else
+			return nil
+		end
+	else
+		return nil
+	end
+end
+
+function Draw._toColor3(color)
+	if typeof(color) == "Color3" then
+		return color
+	elseif typeof(color) == "BrickColor" then
+		return color.Color
+	elseif typeof(color) == "Instance" then
+		if color:IsA("BasePart") then
+			return color.Color
+		else
+			return nil
+		end
+	else
+		return nil
+	end
+end
+
+function Draw._toCFrame(cframe)
+	if typeof(cframe) == "CFrame" then
+		return cframe
+	elseif typeof(cframe) == "Vector3" then
+		return CFrame.new(cframe)
+	elseif typeof(cframe) == "Instance" then
+		if cframe:IsA("Attachment") then
+			return cframe.WorldCFrame
+		elseif cframe:IsA("BasePart") then
+			return cframe.CFrame
+		elseif cframe:IsA("Model") then
+			return (cframe:GetBoundingBox())
+		else
+			return nil
+		end
+	else
+		return nil
+	end
 end
 
 --[=[

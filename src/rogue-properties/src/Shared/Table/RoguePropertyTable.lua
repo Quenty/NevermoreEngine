@@ -2,20 +2,21 @@
 	@class RoguePropertyTable
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local RunService = game:GetService("RunService")
 
-local RoguePropertyTable = {}
+local RogueProperty = require("RogueProperty")
+local Rx = require("Rx")
+
+local RoguePropertyTable = {} -- inherits from RogueProperty
 RoguePropertyTable.ClassName = "RoguePropertyTable"
 RoguePropertyTable.__index = RoguePropertyTable
 
 function RoguePropertyTable.new(adornee, serviceBag, roguePropertyTableDefinition)
-	local self = setmetatable({}, RoguePropertyTable)
+	local self = setmetatable(RogueProperty.new(adornee, serviceBag, roguePropertyTableDefinition), RoguePropertyTable)
 
-	self._adornee = assert(adornee, "No roguePropertyTableDefinition")
-	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._definition = assert(roguePropertyTableDefinition, "No roguePropertyTableDefinition")
-
-	self._properties = {}
+	rawset(self, "_properties", {})
 
 	if RunService:IsServer() then
 		self:_setup()
@@ -32,10 +33,10 @@ function RoguePropertyTable:GetContainer()
 	return self._definition:GetContainer(self._serviceBag, self._adornee)
 end
 
-function RoguePropertyTable:Set(newBaseValues)
-	assert(type(newBaseValues) == "table", "Bad newBaseValues")
+function RoguePropertyTable:SetBaseValue(newBaseValue)
+	assert(type(newBaseValue) == "table", "Bad newBaseValue")
 
-	for propertyName, value in pairs(newBaseValues) do
+	for propertyName, value in pairs(newBaseValue) do
 		local rogueProperty = self:GetRogueProperty(propertyName)
 		if not rogueProperty then
 			error(("Bad property %q"):format(tostring(propertyName)))
@@ -43,6 +44,63 @@ function RoguePropertyTable:Set(newBaseValues)
 
 		rogueProperty:SetBaseValue(value)
 	end
+end
+
+function RoguePropertyTable:SetValue(newBaseValue)
+	assert(type(newBaseValue) == "table", "Bad newBaseValue")
+
+	for propertyName, value in pairs(newBaseValue) do
+		local rogueProperty = self:GetRogueProperty(propertyName)
+		if not rogueProperty then
+			error(("Bad property %q"):format(tostring(propertyName)))
+		end
+
+		rogueProperty:SetValue(value)
+	end
+end
+
+function RoguePropertyTable:GetValue()
+	local values = {}
+	for key, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
+		local property = self:GetRogueProperty(rogueDefinition:GetName())
+		assert(property, "Failed to get rogue property")
+
+		values[key] = property:GetValue()
+	end
+
+	return values
+end
+
+function RoguePropertyTable:GetBaseValue()
+	local values = {}
+	for key, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
+		local property = self:GetRogueProperty(rogueDefinition:GetName())
+		assert(property, "Failed to get rogue property")
+
+		values[key] = property:GetBaseValue()
+	end
+
+	return values
+end
+
+function RoguePropertyTable:Observe()
+	-- ok, this is definitely slow
+	local toObserve = {}
+
+	for propertyName, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
+		local rogueProperty = self:GetRogueProperty(rogueDefinition:GetName())
+		if not rogueProperty then
+			error(("Bad property %q"):format(tostring(rogueDefinition:GetName())))
+		end
+
+		toObserve[propertyName] = rogueProperty:Observe():Pipe({
+			Rx.distinct();
+		})
+	end
+
+	return Rx.combineLatest(toObserve):Pipe({
+		Rx.throttleDefer();
+	})
 end
 
 function RoguePropertyTable:_setup()
@@ -66,11 +124,29 @@ function RoguePropertyTable:GetRogueProperty(name)
 	end
 end
 
+function RoguePropertyTable:__newindex(index, value)
+	if index == "Value" then
+		self:SetValue(value)
+	elseif index == "Changed" then
+		error("Cannot set .Changed event")
+	elseif RoguePropertyTable[index] then
+		error(string.format("Cannot set %q", tostring(index)))
+	else
+		error(string.format("Bad index %q", tostring(index)))
+	end
+end
+
 function RoguePropertyTable:__index(index)
 	assert(type(index) == "string", "Bad index")
 
 	if RoguePropertyTable[index] then
 		return RoguePropertyTable[index]
+	elseif rawget(RogueProperty, index) ~= nil then
+		return rawget(RogueProperty, index)
+	elseif index == "Value" then
+		return self:GetValue()
+	elseif index == "Changed" then
+		return self:GetChangedEvent()
 	elseif type(index) == "string" then
 		local property = self:GetRogueProperty(index)
 		if not property then

@@ -8,7 +8,6 @@ local RunService = game:GetService("RunService")
 
 local Rx = require("Rx")
 local RxBinderUtils = require("RxBinderUtils")
-local RogueBindersShared = require("RogueBindersShared")
 local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
@@ -24,13 +23,13 @@ function RogueMultiplierProvider:Init(serviceBag)
 
 	-- Internal
 	self._roguePropetyService = self._serviceBag:GetService(RoguePropertyService)
-	self._rogueBinders = self._serviceBag:GetService(RogueBindersShared)
+	self._rogueMultiplierBinder = self._serviceBag:GetService(require("RogueMultiplier"))
 
 	self._roguePropetyService:AddProvider(self)
 end
 
 function RogueMultiplierProvider:GetBinder()
-	return self._rogueBinders.RogueMultiplier
+	return self._rogueMultiplierBinder
 end
 
 function RogueMultiplierProvider:Create(multiplier, source)
@@ -46,9 +45,9 @@ function RogueMultiplierProvider:Create(multiplier, source)
 	end
 
 	if RunService:IsClient() then
-		self._rogueBinders.RogueMultiplier:BindClient(obj)
+		self._rogueMultiplierBinder:BindClient(obj)
 	else
-		self._rogueBinders.RogueMultiplier:Bind(obj)
+		self._rogueMultiplierBinder:Bind(obj)
 	end
 
 	return obj
@@ -123,11 +122,11 @@ function RogueMultiplierProvider:ObserveModifiedVersion(propObj, rogueProperty, 
 end
 
 function RogueMultiplierProvider:_observeMultipliersBrio(propObj)
-	return RxBinderUtils.observeBoundChildClassBrio(self._rogueBinders.RogueMultiplier, propObj)
+	return RxBinderUtils.observeBoundChildClassBrio(self._rogueMultiplierBinder, propObj)
 end
 
 function RogueMultiplierProvider:_getMultipliers(propObj)
-	return BinderUtils.getChildren(self._rogueBinders.RogueMultiplier, propObj)
+	return BinderUtils.getChildren(self._rogueMultiplierBinder, propObj)
 end
 
 return RogueMultiplierProvider

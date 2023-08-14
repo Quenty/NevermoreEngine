@@ -10,33 +10,38 @@ local ServiceBag = require("ServiceBag")
 local RoguePropertyDefinition = require("RoguePropertyDefinition")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RoguePropertyService = require("RoguePropertyService")
+local DuckTypeUtils = require("DuckTypeUtils")
+local RxBrioUtils = require("RxBrioUtils")
 
-local RoguePropertyTableDefinition = {}
+local RoguePropertyTableDefinition = {} -- Inherits from RoguePropertyDefinition
 RoguePropertyTableDefinition.ClassName = "RoguePropertyTableDefinition"
 RoguePropertyTableDefinition.__index = RoguePropertyTableDefinition
 
-function RoguePropertyTableDefinition.new(tableName: string, propertyDefinition: {[string]: any})
-	local self = setmetatable({}, RoguePropertyTableDefinition)
-
+function RoguePropertyTableDefinition.new(tableName: string, propertyDefinition: {[string]: any}, roguePropertyTableDefinition)
 	assert(type(tableName) == "string", "Bad tableName")
 	assert(type(propertyDefinition) == "table", "Bad propertyDefinition")
 
-	self._tableName = tableName
+	local self = setmetatable(RoguePropertyDefinition.new(tableName, propertyDefinition, roguePropertyTableDefinition), RoguePropertyTableDefinition)
+
 	self._definitionMap = {}
 
 	for key, defaultValue in pairs(propertyDefinition) do
-		self._definitionMap[key] = RoguePropertyDefinition.new(key, defaultValue, self)
+		if type(defaultValue) == "table" then
+			if RoguePropertyDefinition.isRoguePropertyDefinition(defaultValue) then
+				self._definitionMap[key] = defaultValue
+			else
+				self._definitionMap[key] = RoguePropertyTableDefinition.new(key, defaultValue, self)
+			end
+		else
+			self._definitionMap[key] = RoguePropertyDefinition.new(key, defaultValue, self)
+		end
 	end
 
 	return self
 end
 
---[=[
-	Gets the name of the rogue property table
-	@return string
-]=]
-function RoguePropertyTableDefinition:GetName(): string
-	return self._tableName
+function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value)
+	return DuckTypeUtils.isImplementation(RoguePropertyTableDefinition, value)
 end
 
 function RoguePropertyTableDefinition:GetDefinitionMap()
@@ -63,12 +68,14 @@ end
 	@param adornee Instance
 	@return RoguePropertyTable
 ]=]
-function RoguePropertyTableDefinition:GetPropertyTable(serviceBag, adornee)
+function RoguePropertyTableDefinition:Get(serviceBag, adornee)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return RoguePropertyTable.new(adornee, serviceBag, self)
 end
+
+RoguePropertyTableDefinition.GetPropertyTable = RoguePropertyTableDefinition.Get
 
 --[=[
 	Observes the current container while it exists for the given adornee.
@@ -82,11 +89,19 @@ function RoguePropertyTableDefinition:ObserveContainerBrio(serviceBag, adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	-- TODO: Optimize so we aren't duplcating this logic each time we index a property
-	if serviceBag:GetService(RoguePropertyService):CanInitializeProperties() then
-		self:_ensureContainer(adornee)
-	end
+	self:GetContainer(serviceBag, adornee)
 
-	return RxInstanceUtils.observeLastNamedChildBrio(adornee, "Folder", self._tableName)
+	local parentDefinition = self:GetParentPropertyDefinition()
+	if parentDefinition then
+		return parentDefinition:ObserveContainerBrio(serviceBag, adornee)
+			:Pipe({
+				RxBrioUtils.switchMapBrio(function(parent)
+					return RxInstanceUtils.observeLastNamedChildBrio(parent, "Folder", self:GetName())
+				end)
+			})
+	else
+		return RxInstanceUtils.observeLastNamedChildBrio(adornee, "Folder", self:GetName())
+	end
 end
 
 --[=[
@@ -99,22 +114,36 @@ function RoguePropertyTableDefinition:GetContainer(serviceBag, adornee)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	if serviceBag:GetService(RoguePropertyService):CanInitializeProperties() then
-		return self:_ensureContainer(adornee)
+	local parent
+	local parentDefinition = self:GetParentPropertyDefinition()
+	if parentDefinition then
+		parent = parentDefinition:GetContainer(serviceBag, adornee)
 	else
-		return adornee:FindFirstChild(self._tableName)
+		parent = adornee
+	end
+
+	if not parent then
+		return nil
+	end
+
+	if serviceBag:GetService(RoguePropertyService):CanInitializeProperties() then
+		return self:GetOrCreateInstance(parent)
+	else
+		return parent:FindFirstChild(self:GetName())
 	end
 end
 
-function RoguePropertyTableDefinition:_ensureContainer(adornee)
-	local existing = adornee:FindFirstChild(self._tableName)
+function RoguePropertyTableDefinition:GetOrCreateInstance(parent)
+	assert(typeof(parent) == "Instance", "Bad parent")
+
+	local existing = parent:FindFirstChild(self:GetName())
 	if existing then
 		return existing
 	end
 
 	local folder = Instance.new("Folder")
-	folder.Name = self._tableName
-	folder.Parent = adornee
+	folder.Name = self:GetName()
+	folder.Parent = parent
 	return folder
 end
 
@@ -123,8 +152,12 @@ function RoguePropertyTableDefinition:__index(index)
 
 	if index == "_definitionMap" then
 		return rawget(self, "_definitionMap")
+	elseif index == "_roguePropertyTableDefinition" then
+		return rawget(self, "_roguePropertyTableDefinition")
 	elseif RoguePropertyTableDefinition[index] then
 		return RoguePropertyTableDefinition[index]
+	elseif RoguePropertyDefinition[index] then
+		return RoguePropertyDefinition[index]
 	else
 		local definitions = rawget(self, "_definitionMap")
 

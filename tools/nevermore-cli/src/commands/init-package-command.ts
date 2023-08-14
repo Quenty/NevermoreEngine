@@ -7,6 +7,7 @@ import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { TemplateHelper } from '@quenty/nevermore-template-helpers';
 import { NevermoreGlobalArgs } from '../args/global-args';
+import { getTemplatePathByName } from '../utils/nevermore-cli-utils';
 
 export interface InitPackageArgs extends NevermoreGlobalArgs {
   packageName: string;
@@ -44,11 +45,7 @@ export class InitPackageCommand<T>
     const description = await InitPackageCommand._ensureDescription(args);
 
     const srcRoot = process.cwd();
-    const templatePath = path.join(
-      __dirname,
-      '..',
-      '..',
-      'templates',
+    const templatePath = getTemplatePathByName(
       'nevermore-library-package-template'
     );
 

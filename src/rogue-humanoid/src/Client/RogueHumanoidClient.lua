@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RogueHumanoidBase = require("RogueHumanoidBase")
+local Binder = require("Binder")
 
 local RogueHumanoidClient = setmetatable({}, RogueHumanoidBase)
 RogueHumanoidClient.ClassName = "RogueHumanoidClient"
@@ -16,4 +17,4 @@ function RogueHumanoidClient.new(humanoid, serviceBag)
 	return self
 end
 
-return RogueHumanoidClient
+return Binder.new("RogueHumanoid", RogueHumanoidClient)

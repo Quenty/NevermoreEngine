@@ -171,6 +171,22 @@ function RemotingMember:FireAllClients(...)
 end
 
 --[=[
+	Fires all clients with the event except the excluded player. The excluded player may be nil to support
+	NPC actions.
+
+	@server
+	@param excludePlayer Player | nil
+	@param ... any
+]=]
+function RemotingMember:FireAllClientsExcept(excludePlayer, ...)
+	assert(typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil, "Bad excludePlayer")
+	assert(RunService:IsServer(), "FireAllClientsExcept must be called on server")
+
+	self._remoting:FireAllClientsExcept(self._memberName, excludePlayer, ...)
+end
+
+
+--[=[
 	Fires the client with the data
 
 	See [Remoting.FireClient].

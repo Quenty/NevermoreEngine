@@ -23,8 +23,12 @@ function RoguePropertyService:Init(serviceBag)
 	self._maid = Maid.new()
 
 	-- Internal
-	self._serviceBag:GetService(require("RogueBindersShared"))
 	self._roguePropertyBinderGroups = self._serviceBag:GetService(require("RoguePropertyBinderGroups"))
+
+	-- Binders
+	self._serviceBag:GetService(require("RogueAdditive"))
+	self._serviceBag:GetService(require("RogueMultiplier"))
+	self._serviceBag:GetService(require("RogueSetter"))
 
 	self._providers = {}
 

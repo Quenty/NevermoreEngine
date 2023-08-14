@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RxValueBaseUtils = require("RxValueBaseUtils")
+local Binder = require("Binder")
 
 local RogueSetter = setmetatable({}, BaseObject)
 RogueSetter.ClassName = "RogueSetter"
@@ -31,4 +32,4 @@ function RogueSetter:GetObject()
 	return self._obj
 end
 
-return RogueSetter
+return Binder.new("RogueSetter", RogueSetter)

@@ -264,7 +264,7 @@ function AdorneeValue:ObserveAttachmentParent()
 			else
 				return nil
 			end
-		elseif typeof(adornee) == "Vector3" or typeof(adornee) == "CFrame" or typeof(adornee) == "Vector3" then
+		elseif typeof(adornee) == "Vector3" or typeof(adornee) == "CFrame" then
 			return Workspace.Terrain
 		elseif adornee then
 			warn("Bad adornee")
