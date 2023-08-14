@@ -1,0 +1,33 @@
+{
+  "name": "@quenty/ducktype",
+  "version": "1.0.0",
+  "description": "Utility functions to duck type a value",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "ducktype"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/ducktype/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/loader": "file:../loader"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
