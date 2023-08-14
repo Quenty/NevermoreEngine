@@ -140,10 +140,4 @@ function ColorPickerCursorPreview:_render()
 	}
 end
 
-function ColorPickerCursorPreview:SetTransparency(transparency)
-	assert(type(transparency) == "number", "Bad transparency")
-
-	self._transparency.Value = transparency
-end
-
 return ColorPickerCursorPreview
