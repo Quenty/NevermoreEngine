@@ -103,14 +103,14 @@ function ObservableList:ObserveItemsBrio()
 			sub:Fire(brio)
 		end
 
-		for index, key in pairs(self._keyList) do
-			handleItem(self._contents[key], index, key)
-		end
-
 		maid:GiveTask(self.ItemAdded:Connect(handleItem))
 		maid:GiveTask(self.ItemRemoved:Connect(function(_item, includeKey)
 			maid[includeKey] = nil
 		end))
+
+		for index, key in pairs(self._keyList) do
+			handleItem(self._contents[key], index, key)
+		end
 
 		self._maid[sub] = maid
 		maid:GiveTask(function()
