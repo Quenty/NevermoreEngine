@@ -8,6 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
 local Maid = require("Maid")
 local Promise = require("Promise")
@@ -86,18 +87,22 @@ function Remoting:Connect(memberName, callback)
 
 		-- TODO: Cleanup if nothing else is expecting this
 	elseif RunService:IsClient() then
+		connectMaid._warning = task.delay(5, function()
+			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never fire", memberName))
+		end)
+
 		connectMaid:GiveTask(self:_observeRemoteEventBrio(memberName):Subscribe(function(brio)
 			if brio:IsDead() then
 				return
 			end
+
+			connectMaid._warning = nil
 
 			local remoteEvent = brio:GetValue()
 			local maid = brio:ToMaid()
 
 			maid:GiveTask(remoteEvent.OnClientEvent:Connect(callback))
 		end))
-
-		-- TODO: Warn if remote event doesn't exist
 	else
 		error("[Remoting.Connect] - Unknown RunService state")
 	end
@@ -129,10 +134,16 @@ function Remoting:Bind(memberName, callback)
 
 		-- TODO: Cleanup if nothing else is expecting this
 	elseif RunService:IsClient() then
+		bindMaid._warning = task.delay(5, function()
+			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never fire", memberName))
+		end)
+
 		bindMaid:GiveTask(self:_observeRemoteFunctionBrio(memberName):Subscribe(function(brio)
 			if brio:IsDead() then
 				return
 			end
+
+			bindMaid._warning = nil
 
 			local remoteFunction = brio:GetValue()
 			local maid = brio:ToMaid()
@@ -282,6 +293,28 @@ function Remoting:FireAllClients(memberName, ...)
 
 	local remoteEvent = self:_getOrCreateRemoteEvent(memberName)
 	remoteEvent:FireAllClients(...)
+end
+
+--[=[
+	Fires all clients with the event except the excluded player. The excluded player may be nil to support
+	NPC actions.
+
+	@server
+	@param memberName string
+	@param excludePlayer Player | nil
+	@param ... any
+]=]
+function Remoting:FireAllClientsExcept(memberName, excludePlayer, ...)
+	assert(type(memberName) == "string", "Bad memberName")
+	assert(typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil, "Bad excludePlayer")
+	assert(RunService:IsServer(), "FireAllClientsExcept must be called on server")
+
+	local remoteEvent = self:_getOrCreateRemoteEvent(memberName)
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= excludePlayer then
+			remoteEvent:FireClient(player, ...)
+		end
+	end
 end
 
 --[=[
