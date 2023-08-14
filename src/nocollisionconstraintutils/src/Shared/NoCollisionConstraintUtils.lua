@@ -17,12 +17,14 @@ local NoCollisionConstraintUtils = {}
 	Creates a new [NoCollisionConstraint] between the two parts.
 	@param part0 BasePart
 	@param part1 BasePart
+	@param parent Instance?
 	@return NoCollisionConstraint
 ]=]
-function NoCollisionConstraintUtils.create(part0, part1)
+function NoCollisionConstraintUtils.create(part0, part1, parent)
 	local noCollision = Instance.new("NoCollisionConstraint")
 	noCollision.Part0 = part0
 	noCollision.Part1 = part1
+	noCollision.Parent = parent
 
 	return noCollision
 end
@@ -34,10 +36,12 @@ end
 	@param parts1 { BasePart }
 	@return Maid
 ]=]
-function NoCollisionConstraintUtils.tempNoCollision(parts0, parts1)
+function NoCollisionConstraintUtils.tempNoCollision(parts0, parts1, parent)
+	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == nil, "Bad parent")
+
 	local maid = Maid.new()
 
-	for _, item in pairs(NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1)) do
+	for _, item in pairs(NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent or true)) do
 		maid:GiveTask(item)
 	end
 
@@ -49,15 +53,34 @@ end
 
 	@param parts0 { BasePart }
 	@param parts1 { BasePart }
+	@param parent Instance | boolean | nil
 	@return { NoCollisionConstraint }
 ]=]
-function NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1)
+function NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent)
+	assert(type(parts0) == "table", "Bad parts0")
+	assert(type(parts1) == "table", "Bad parts1")
+	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == nil, "Bad parent")
+
 	local collisionConstraints = {}
-	for _, part0 in pairs(parts0) do
-		for _, part1 in pairs(parts1) do
-			table.insert(collisionConstraints, NoCollisionConstraintUtils.create(part0, part1))
+
+	if parent == false then
+		parent = nil
+	end
+
+	if type(parent) == "boolean" then
+		for _, part0 in pairs(parts0) do
+			for _, part1 in pairs(parts1) do
+				table.insert(collisionConstraints, NoCollisionConstraintUtils.create(part0, part1, part0))
+			end
+		end
+	else
+		for _, part0 in pairs(parts0) do
+			for _, part1 in pairs(parts1) do
+				table.insert(collisionConstraints, NoCollisionConstraintUtils.create(part0, part1, parent))
+			end
 		end
 	end
+
 	return collisionConstraints
 end
 
@@ -66,10 +89,11 @@ end
 
 	@param adornee0 BasePart
 	@param adornee1 BasePart
+	@param parent Instance | boolean | nil
 	@return { NoCollisionConstraint }
 ]=]
-function NoCollisionConstraintUtils.createBetweenMechanisms(adornee0, adornee1)
-	return NoCollisionConstraintUtils.createBetweenPartsLists(getMechanismParts(adornee0), getMechanismParts(adornee1))
+function NoCollisionConstraintUtils.createBetweenMechanisms(adornee0, adornee1, parent)
+	return NoCollisionConstraintUtils.createBetweenPartsLists(getMechanismParts(adornee0), getMechanismParts(adornee1), parent)
 end
 
 return NoCollisionConstraintUtils
