@@ -63,7 +63,7 @@ function BadgeUtils.promiseBadgeInfo(badgeId)
 		if not ok then
 			return reject(err)
 		end
-		if not type(data) == "table" then
+		if type(data) ~= "table" then
 			return reject("Failed to get a table of data of badgeInfo")
 		end
 
