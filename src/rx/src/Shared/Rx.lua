@@ -584,28 +584,23 @@ end
 
 	https://reactivex.io/documentation/operators/scan.html
 
-	@param reducer function
+	@param accumulator function
 	@param seed any | nil
 	@return (source: Observable) -> Observable
 ]=]
-function Rx.scan(reducer, seed)
-	assert(type(reducer) == "function", "Bad reducer")
+function Rx.scan(accumulator, seed)
+	assert(type(accumulator) == "function", "Bad accumulator")
 
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local maid = Maid.new()
 			local current = seed
 
-			maid:GiveTask(source:Subscribe(
-				function(...)
-					current = reducer(current, ...)
-					sub:Fire(current)
-				end,
-				sub:GetFailComplete()))
-
-			return maid
+			return source:Subscribe(function(...)
+				current = accumulator(current, ...)
+				sub:Fire(current)
+			end, sub:GetFailComplete())
 		end)
 	end
 end
@@ -1723,30 +1718,6 @@ function Rx.withLatestFrom(inputObservables)
 			end, sub:GetFailComplete()))
 
 			return maid
-		end)
-	end
-end
-
---[=[
-	https://rxjs-dev.firebaseapp.com/api/operators/scan
-
-	@param accumulator (current: TSeed, ...: TInput) -> TResult
-	@param seed TSeed
-	@return (source: Observable<TInput>) -> Observable<TResult>
-]=]
-function Rx.scan(accumulator, seed)
-	assert(type(accumulator) == "function", "Bad accumulator")
-
-	return function(source)
-		assert(Observable.isObservable(source), "Bad observable")
-
-		return Observable.new(function(sub)
-			local current = seed
-
-			return source:Subscribe(function(...)
-				current = accumulator(current, ...)
-				sub:Fire(current)
-			end, sub:GetFailComplete())
 		end)
 	end
 end
