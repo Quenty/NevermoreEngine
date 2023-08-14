@@ -63,7 +63,7 @@ end
 	@param color Color3 -- Optional
 	@param parent Instance? -- Optional
 	@param meshDiameter number -- Optional
-	@param diameter -- Optional
+	@param diameter number -- Optional
 	@return Instance
 ]=]
 function Draw.line(start, finish, color, parent, meshDiameter, diameter)
@@ -78,11 +78,11 @@ end
 	Draws a line between directions
 
 	@param start Vector3
-	@param finish Vector3
+	@param direction Vector3
 	@param color Color3 -- Optional
 	@param parent Instance? -- Optional
 	@param meshDiameter number -- Optional
-	@param diameter -- Optional
+	@param diameter number -- Optional
 	@return Instance
 ]=]
 function Draw.direction(start, direction, color, parent, meshDiameter, diameter)
@@ -109,13 +109,15 @@ end
 --[=[
 	Draws a spherecast
 
-	@param origin Vector3
-	@param radius number
+	@param cframe CFrame
+	@param size Vector3
 	@param direction Vector3
 	@param color Color3
 	@param parent Parent
 ]=]
 function Draw.blockcast(cframe, size, direction, color, parent)
+	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
+	size = assert(Draw._toVector3(size), "Bad size")
 	color = Draw._toColor3(color)
 	parent = parent or Draw.getDefaultParent()
 

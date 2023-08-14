@@ -15,6 +15,7 @@ local NoCollisionConstraintUtils = {}
 
 --[=[
 	Creates a new [NoCollisionConstraint] between the two parts.
+
 	@param part0 BasePart
 	@param part1 BasePart
 	@param parent Instance?
@@ -32,8 +33,10 @@ end
 --[=[
 	Creates [NoCollisionConstraint] objects between the two part lists, and adds them all to a [Maid]
 	for cleanup.
+
 	@param parts0 { BasePart }
 	@param parts1 { BasePart }
+	@param parent Instance | boolean | nil
 	@return Maid
 ]=]
 function NoCollisionConstraintUtils.tempNoCollision(parts0, parts1, parent)

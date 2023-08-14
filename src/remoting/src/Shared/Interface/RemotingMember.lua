@@ -175,7 +175,6 @@ end
 	NPC actions.
 
 	@server
-	@param memberName string
 	@param excludePlayer Player | nil
 	@param ... any
 ]=]
