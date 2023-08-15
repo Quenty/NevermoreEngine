@@ -10,6 +10,7 @@ local Table = require("Table")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local Symbol = require("Symbol")
 local Set = require("Set")
+local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
 
 local UNSET_TOKEN = Symbol.named("unsetValue")
 
@@ -108,8 +109,6 @@ function DataStoreWriter:ComputeDiffSnapshot(incoming)
 	assert(incoming ~= DataStoreDeleteToken, "Incoming value should not be DataStoreDeleteToken")
 
 	if type(incoming) == "table" then
-		local diffSnapshot = {}
-
 		local keys = Set.union(Set.fromKeys(self._writers), Set.fromKeys(incoming))
 
 		local baseSnapshot
@@ -120,6 +119,7 @@ function DataStoreWriter:ComputeDiffSnapshot(incoming)
 			baseSnapshot = {}
 		end
 
+		local diffSnapshot = {}
 		for key, _ in pairs(keys) do
 			if self._writers[key] then
 				diffSnapshot[key] = self._writers[key]:ComputeDiffSnapshot(incoming[key])
@@ -128,7 +128,15 @@ function DataStoreWriter:ComputeDiffSnapshot(incoming)
 			end
 		end
 
-		return table.freeze(diffSnapshot)
+		if not DataStoreSnapshotUtils.isEmptySnapshot(diffSnapshot) then
+			return table.freeze(diffSnapshot)
+		else
+			if next(keys) then
+				return nil -- No delta
+			else
+				return DataStoreDeleteToken
+			end
+		end
 	else
 		return self:_computeValueDiff(self._fullBaseDataSnapshot, incoming)
 	end
@@ -155,15 +163,19 @@ function DataStoreWriter:_computeTableDiff(original, incoming)
 
 	local keys = Set.union(Set.fromKeys(original), Set.fromKeys(incoming))
 
-	local diff = {}
+	local diffSnapshot = {}
 	for key, _ in pairs(keys) do
-		diff[key] = self:_computeValueDiff(original[key], incoming[key])
+		diffSnapshot[key] = self:_computeValueDiff(original[key], incoming[key])
 	end
 
-	if next(diff) ~= nil then
-		return table.freeze(diff)
+	if not DataStoreSnapshotUtils.isEmptySnapshot(diffSnapshot) then
+		return table.freeze(diffSnapshot)
 	else
-		return DataStoreDeleteToken
+		if next(keys) then
+			return nil -- No delta
+		else
+			return DataStoreDeleteToken
+		end
 	end
 end
 

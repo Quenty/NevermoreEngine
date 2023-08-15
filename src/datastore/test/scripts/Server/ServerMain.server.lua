@@ -11,6 +11,8 @@ local packages = require(loader).bootstrapGame(ServerScriptService.datastore)
 local Maid = require(packages.Maid)
 local Promise = require(packages.Promise)
 
+local TURN_TIME = 8
+
 local function spinUpGameCopy(prefix)
 	assert(type(prefix) == "string", "Bad prefix")
 
@@ -33,41 +35,64 @@ local function spinUpGameCopy(prefix)
 		local substore = dataStore:GetSubStore("AliveServers")
 		substore:Store(guid, true)
 
-		-- maid:GiveTask(substore:Observe():Subscribe(function(data)
-		-- 	print(string.format("(%s) dataStore.AliveServers:Observe()", prefix), data)
+		-- maid:GiveTask(dataStore:Observe():Subscribe(function(viewSnapshot)
+		-- 	print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
 		-- end))
 
 		if prefix == "blue" then
-			dataStore:SetDoDebugWriting(true)
-			dataStore:SetSyncOnSave(true)
-			dataStore:SetAutoSaveTimeSeconds(3)
-
-			maid:GiveTask(dataStore:Observe():Subscribe(function(viewSnapshot)
-				print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
-			end))
-		else
 			-- dataStore:SetDoDebugWriting(true)
-			dataStore:SetSyncOnSave(false)
-			dataStore:SetAutoSaveTimeSeconds(nil)
-			dataStore:Save()
+			dataStore:SetSyncOnSave(true)
+			dataStore:SetAutoSaveTimeSeconds(4)
 
-			task.delay(5, function()
-				warn("Red is wiping data")
+			-- maid:GiveTask(dataStore:Observe():Subscribe(function(viewSnapshot)
+			-- 	print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
+			-- end))
+
+			task.delay(4*TURN_TIME, function()
+				warn("Blue server is restoring data")
+
+				substore:Store(guid, true)
+			end)
+		elseif prefix == "red" then
+			warn(string.format("%s server is storing data", prefix))
+
+			-- dataStore:SetDoDebugWriting(true)
+			dataStore:SetSyncOnSave(true)
+			dataStore:SetAutoSaveTimeSeconds(4)
+			-- dataStore:Save()
+
+			task.delay(TURN_TIME, function()
+				warn(string.format("%s server is wiping data", prefix))
 
 				substore:Wipe()
-				dataStore:Save()
+				-- dataStore:Save()
 
-				task.delay(5, function()
-					warn("Red is adding substore data")
+				task.delay(TURN_TIME, function()
+					warn(string.format("%s server is adding substore data", prefix))
 
 					substore:Store(guid, {
 						playerCount = 5;
 						startTime = DateTime.now().UnixTimestamp
 					})
-					dataStore:Save()
+					-- dataStore:Save()
+
+					task.delay(TURN_TIME, function()
+						warn(string.format("%s server is changing player count", prefix))
+						local guidStore = substore:GetSubStore(guid)
+						guidStore:Store("playerCount", 25)
+						-- dataStore:Save()
+					end)
 				end)
 			end)
 		end
+
+		-- TODO: Update some random numbers every second for a while....
+
+		-- TODO: Force saving twice
+
+		maid:GiveTask(dataStore:Observe():Subscribe(function(viewSnapshot)
+			print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
+		end))
 
 		-- dataStore:LoadAll():Then(function(data)
 		-- 	-- print(string.format("[%s][LoadAll] - Load all", prefix), data)
@@ -92,3 +117,4 @@ end
 
 spinUpGameCopy("red")
 spinUpGameCopy("blue")
+spinUpGameCopy("green")

@@ -27,6 +27,7 @@ local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local Set = require("Set")
 local Table = require("Table")
+local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -92,6 +93,9 @@ function DataStoreStage:Store(key, value)
 	if value == nil then
 		value = DataStoreDeleteToken
 	end
+
+	-- Ensure that we at least start loading (and thus the autosave loop) for write
+	self:PromiseViewUpToDate()
 
 	self:_storeAtKey(key, value)
 end
@@ -188,7 +192,7 @@ function DataStoreStage:GetSubStore(key)
 
 			newStore:Overwrite(saveDataToTransfer)
 
-			if self:_isEmptySnapshot(newSnapshot) then
+			if DataStoreSnapshotUtils.isEmptySnapshot(newSnapshot) then
 				self._saveDataSnapshot = nil
 			else
 				self._saveDataSnapshot = table.freeze(newSnapshot)
@@ -369,7 +373,7 @@ end
 ]=]
 function DataStoreStage:MergeDiffSnapshot(diffSnapshot)
 	self:_checkIntegrity()
-	self._baseDataSnapshot = self:_updateStoresAndComputeBaseDataSnapshotFromDiff(diffSnapshot)
+	self._baseDataSnapshot = self:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(diffSnapshot)
 	self:_updateViewSnapshot()
 	self:_checkIntegrity()
 end
@@ -402,19 +406,24 @@ function DataStoreStage:MarkDataAsSaved(parentWriter)
 	elseif type(self._saveDataSnapshot) == "table" or type(dataToSave) == "table" then
 		if type(self._saveDataSnapshot) == "table" and type(dataToSave) == "table" then
 			local newSaveSnapshot = table.clone(self._saveDataSnapshot)
-			local newBaseDataSnapshot = table.clone(self._baseDataSnapshot)
+			local newBaseDataSnapshot
+			if type(self._baseDataSnapshot) == "table" then
+				newBaseDataSnapshot = table.clone(self._baseDataSnapshot)
+			else
+				newBaseDataSnapshot = {}
+			end
 
 			for key, value in pairs(dataToSave) do
 				if self._saveDataSnapshot[key] == value then
 					-- This shouldn't fire any event because our save data is matching
-					newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiff(key, value)
+					newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
 					newSaveSnapshot[key] = nil
 				end
 			end
 
 			self._baseDataSnapshot = table.freeze(newBaseDataSnapshot)
 
-			if self:_isEmptySnapshot(newSaveSnapshot) then
+			if DataStoreSnapshotUtils.isEmptySnapshot(newSaveSnapshot) then
 				self._saveDataSnapshot = nil
 			else
 				self._saveDataSnapshot = table.freeze(newSaveSnapshot)
@@ -467,6 +476,9 @@ end
 	@param data any
 ]=]
 function DataStoreStage:Overwrite(data)
+	-- Ensure that we at least start loading (and thus the autosave loop) for write
+	self:PromiseViewUpToDate()
+
 	if data == nil then
 		data = DataStoreDeleteToken
 	end
@@ -517,6 +529,9 @@ end
 	@param data any
 ]=]
 function DataStoreStage:OverwriteMerge(data)
+	-- Ensure that we at least start loading (and thus the autosave loop) for write
+	self:PromiseViewUpToDate()
+
 	if type(data) == "table" and data ~= DataStoreDeleteToken then
 		-- Note we explicitly don't wipe values here! Need delete token if we want to delete!
 		for key, value in pairs(data) do
@@ -662,7 +677,7 @@ function DataStoreStage:_createFullBaseDataSnapshot()
 			end
 		end
 
-		if self:_isEmptySnapshot(newSnapshot) then
+		if DataStoreSnapshotUtils.isEmptySnapshot(newSnapshot) then
 			return nil
 		else
 			return table.freeze(newSnapshot)
@@ -672,11 +687,7 @@ function DataStoreStage:_createFullBaseDataSnapshot()
 	end
 end
 
-function DataStoreStage:_isEmptySnapshot(snapshot)
-	return type(snapshot) == "table" and next(snapshot) == nil
-end
-
-function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiff(diffSnapshot)
+function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(diffSnapshot)
 	if diffSnapshot == DataStoreDeleteToken then
 		return nil
 	elseif type(diffSnapshot) == "table" then
@@ -689,7 +700,7 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiff(diffSnap
 
 		-- Merge all of our newly downloaded data here into our base layer.
 		for key, value in pairs(diffSnapshot) do
-			newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiff(key, value)
+			newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
 		end
 
 		return table.freeze(newBaseDataSnapshot)
@@ -698,7 +709,7 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiff(diffSnap
 	end
 end
 
-function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotValueFromDiff(key, value)
+function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if self._stores[key] then
@@ -706,8 +717,28 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotValueFromDiff(key
 		return nil
 	elseif value == DataStoreDeleteToken then
 		return nil
+	elseif type(value) == "table" and type(self._baseDataSnapshot) == "table" and type(self._baseDataSnapshot[key]) == "table" then
+		return self:_recurseMergeTable(self._baseDataSnapshot[key], value)
 	else
 		return value
+	end
+end
+
+function DataStoreStage:_recurseMergeTable(original, incoming)
+	if incoming == DataStoreDeleteToken then
+		return nil
+	elseif type(incoming) == "table" and type(original) == "table" then
+		-- Merge
+		local newSnapshot = table.clone(original)
+
+		-- Overwerite with merged values...
+		for key, value in pairs(incoming) do
+			newSnapshot[key] = self:_recurseMergeTable(original[key], value)
+		end
+
+		return table.freeze(newSnapshot)
+	else
+		return incoming
 	end
 end
 

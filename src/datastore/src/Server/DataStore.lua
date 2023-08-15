@@ -270,9 +270,13 @@ function DataStore:_setupAutoSaving()
 		syncOnSave = self._syncOnSave:Observe();
 		loadedOk = self._loadedOk:Observe();
 	}):Subscribe(function(state)
-		local maid = Maid.new()
-
 		if state.autoSaveTimeSeconds and state.loadedOk then
+			local maid = Maid.new()
+			if self._debugWriting then
+				print("Auto-saving loop started")
+			end
+
+			-- TODO: First jitter is way noisier to differentiate servers
 			maid:GiveTask(task.spawn(function()
 				while true do
 					local jitterBase = math.random()
@@ -295,9 +299,11 @@ function DataStore:_setupAutoSaving()
 					task.wait(0.1)
 				end
 			end))
-		end
 
-		self._maid._autoSavingMaid = maid
+			self._maid._autoSavingMaid = maid
+		else
+			self._maid._autoSavingMaid = nil
+		end
 	end))
 end
 
