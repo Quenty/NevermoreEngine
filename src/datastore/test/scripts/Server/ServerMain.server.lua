@@ -21,7 +21,7 @@ local function spinUpGameCopy(prefix)
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local guid = prefix .. "_" .. HttpService:GenerateGUID(false)
+	local guid = prefix .. " " .. HttpService:GenerateGUID(false)
 	local maid = Maid.new()
 
 	local gameDataStore = serviceBag:GetService(require(packages.GameDataStoreService))
@@ -30,23 +30,44 @@ local function spinUpGameCopy(prefix)
 	-- This would be an aggressive usage of this area, it probably won't scale well enough.
 	-- But writing some shared code or something like API keys should scale fine.
 	maid:GivePromise(gameDataStore:PromiseDataStore()):Then(function(dataStore)
-		-- dataStore:SetDoDebugWriting(true)
-
 		local substore = dataStore:GetSubStore("AliveServers")
 		substore:Store(guid, true)
 
 		-- maid:GiveTask(substore:Observe():Subscribe(function(data)
-		-- 	print(prefix, "Changed", data)
+		-- 	print(string.format("(%s) dataStore.AliveServers:Observe()", prefix), data)
 		-- end))
 
-		maid:GiveTask(dataStore.Changed:Connect(function(viewSnapshot)
-			print(string.format("(%s) dataStore.Changed", prefix), viewSnapshot)
-		end))
+		if prefix == "blue" then
+			dataStore:SetDoDebugWriting(true)
+			dataStore:SetSyncOnSave(true)
+			dataStore:SetAutoSaveTimeSeconds(3)
 
-		maid:GiveTask(dataStore:Observe():Subscribe(function(viewSnapshot)
-			print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
-			-- print(string.format("[%s][Observe] - Alive servers", prefix), value)
-		end))
+			maid:GiveTask(dataStore:Observe():Subscribe(function(viewSnapshot)
+				print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
+			end))
+		else
+			-- dataStore:SetDoDebugWriting(true)
+			dataStore:SetSyncOnSave(false)
+			dataStore:SetAutoSaveTimeSeconds(nil)
+			dataStore:Save()
+
+			task.delay(5, function()
+				warn("Red is wiping data")
+
+				substore:Wipe()
+				dataStore:Save()
+
+				task.delay(5, function()
+					warn("Red is adding substore data")
+
+					substore:Store(guid, {
+						playerCount = 5;
+						startTime = DateTime.now().UnixTimestamp
+					})
+					dataStore:Save()
+				end)
+			end)
+		end
 
 		-- dataStore:LoadAll():Then(function(data)
 		-- 	-- print(string.format("[%s][LoadAll] - Load all", prefix), data)
@@ -69,5 +90,5 @@ local function spinUpGameCopy(prefix)
 	return maid
 end
 
-spinUpGameCopy("quenty")
-spinUpGameCopy("martxn")
+spinUpGameCopy("red")
+spinUpGameCopy("blue")

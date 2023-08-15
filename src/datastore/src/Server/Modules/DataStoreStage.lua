@@ -173,7 +173,7 @@ function DataStoreStage:GetSubStore(key)
 		if baseDataToTransfer ~= nil then
 			local newSnapshot = table.clone(self._baseDataSnapshot)
 			newSnapshot[key] = nil
-			newStore:MergeDiffBaseData(baseDataToTransfer)
+			newStore:MergeDiffSnapshot(baseDataToTransfer)
 			self._baseDataSnapshot = table.freeze(newSnapshot)
 		end
 	end
@@ -200,9 +200,9 @@ function DataStoreStage:GetSubStore(key)
 	self._maid[maid] = maid
 
 	maid:GiveTask(newStore.Changed:Connect(function()
-		self:_updateViewDataAtKey(key)
+		self:_updateViewSnapshotAtKey(key)
 	end))
-	self:_updateViewDataAtKey(key)
+	self:_updateViewSnapshotAtKey(key)
 
 	return newStore
 end
@@ -365,24 +365,12 @@ end
 	This is a helper method that helps load diff data into the data store.
 	:::
 
-	@param parentWriter DataStoreWriter
+	@param diffSnapshot any
 ]=]
-function DataStoreStage:MergeDiffBaseData(diffData)
-	if diffData == DataStoreDeleteToken then
-		diffData = nil
-	end
-
-	if type(diffData) == "table" then
-		-- Merge all of our newly downloaded data here into our base layer.
-		for key, value in pairs(diffData) do
-			self:_setBaseDataAtKey(key, value)
-		end
-	else
-		for _, store in pairs(self._stores) do
-			store:MergeDiffBaseData(nil)
-		end
-	end
-
+function DataStoreStage:MergeDiffSnapshot(diffSnapshot)
+	self:_checkIntegrity()
+	self._baseDataSnapshot = self:_updateStoresAndComputeBaseDataSnapshotFromDiff(diffSnapshot)
+	self:_updateViewSnapshot()
 	self:_checkIntegrity()
 end
 
@@ -401,7 +389,6 @@ function DataStoreStage:MarkDataAsSaved(parentWriter)
 		if store then
 			store:MarkDataAsSaved(subwriter)
 		else
-			-- TODO: handle stores removal
 			warn("[DataStoreStage] - Store removed, but writer persists")
 		end
 	end
@@ -414,20 +401,23 @@ function DataStoreStage:MarkDataAsSaved(parentWriter)
 		end
 	elseif type(self._saveDataSnapshot) == "table" or type(dataToSave) == "table" then
 		if type(self._saveDataSnapshot) == "table" and type(dataToSave) == "table" then
-			local newSnapshot = table.clone(self._saveDataSnapshot)
+			local newSaveSnapshot = table.clone(self._saveDataSnapshot)
+			local newBaseDataSnapshot = table.clone(self._baseDataSnapshot)
 
 			for key, value in pairs(dataToSave) do
 				if self._saveDataSnapshot[key] == value then
 					-- This shouldn't fire any event because our save data is matching
-					self:_storeAtKey(key, value)
-					newSnapshot[key] = nil
+					newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiff(key, value)
+					newSaveSnapshot[key] = nil
 				end
 			end
 
-			if self:_isEmptySnapshot(newSnapshot) then
+			self._baseDataSnapshot = table.freeze(newBaseDataSnapshot)
+
+			if self:_isEmptySnapshot(newSaveSnapshot) then
 				self._saveDataSnapshot = nil
 			else
-				self._saveDataSnapshot = table.freeze(newSnapshot)
+				self._saveDataSnapshot = table.freeze(newSaveSnapshot)
 			end
 		end
 	else
@@ -482,7 +472,7 @@ function DataStoreStage:Overwrite(data)
 	end
 
 	if type(data) == "table" then
-		local newSnapshot = {}
+		local newSaveSnapshot = {}
 
 		local remaining = Set.fromKeys(self._stores)
 		for key, store in pairs(self._stores) do
@@ -495,7 +485,7 @@ function DataStoreStage:Overwrite(data)
 			if self._stores[key] then
 				self._stores[key]:Overwrite(value)
 			else
-				newSnapshot[key] = value
+				newSaveSnapshot[key] = value
 			end
 		end
 
@@ -503,7 +493,7 @@ function DataStoreStage:Overwrite(data)
 			self._stores[key]:Overwrite(DataStoreDeleteToken)
 		end
 
-		self._saveDataSnapshot = table.freeze(newSnapshot)
+		self._saveDataSnapshot = table.freeze(newSaveSnapshot)
 	else
 		for _, store in pairs(self._stores) do
 			store:Overwrite(DataStoreDeleteToken)
@@ -512,7 +502,7 @@ function DataStoreStage:Overwrite(data)
 		self._saveDataSnapshot = data
 	end
 
-	self:_updateViewData()
+	self:_updateViewSnapshot()
 end
 
 --[=[
@@ -532,7 +522,6 @@ function DataStoreStage:OverwriteMerge(data)
 		for key, value in pairs(data) do
 			self:_storeAtKey(key, value)
 		end
-
 	else
 		-- Non-tables
 		self:Overwrite(data)
@@ -687,43 +676,42 @@ function DataStoreStage:_isEmptySnapshot(snapshot)
 	return type(snapshot) == "table" and next(snapshot) == nil
 end
 
-function DataStoreStage:_setBaseDataAtKey(key, value)
-	assert(type(key) == "string" or type(key) == "number", "Bad key")
+function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiff(diffSnapshot)
+	if diffSnapshot == DataStoreDeleteToken then
+		return nil
+	elseif type(diffSnapshot) == "table" then
+		local newBaseDataSnapshot
+		if type(self._baseDataSnapshot) == "table" then
+			newBaseDataSnapshot = table.clone(self._baseDataSnapshot)
+		else
+			newBaseDataSnapshot = {}
+		end
 
-	if value == DataStoreDeleteToken then
-		value = nil
-	end
+		-- Merge all of our newly downloaded data here into our base layer.
+		for key, value in pairs(diffSnapshot) do
+			newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiff(key, value)
+		end
 
-	if self._stores[key] then
-		self._stores[key]:MergeDiffBaseData(value)
-		return
-	end
-
-	if type(self._baseDataSnapshot) == "table" and self._baseDataSnapshot[key] == value then
-		return
-	end
-
-	local newSnapshot
-
-	local swappedBaseData = false
-	if type(self._baseDataSnapshot) ~= "table" then
-		swappedBaseData = true
-		newSnapshot = {}
+		return table.freeze(newBaseDataSnapshot)
 	else
-		newSnapshot = table.clone(self._baseDataSnapshot)
-	end
-
-	newSnapshot[key] = value
-	self._baseDataSnapshot = table.freeze(newSnapshot)
-
-	if swappedBaseData then
-		self:_updateViewData()
-	else
-		self:_updateViewDataAtKey(key)
+		return diffSnapshot
 	end
 end
 
-function DataStoreStage:_updateViewData()
+function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotValueFromDiff(key, value)
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
+
+	if self._stores[key] then
+		self._stores[key]:MergeDiffSnapshot(value)
+		return nil
+	elseif value == DataStoreDeleteToken then
+		return nil
+	else
+		return value
+	end
+end
+
+function DataStoreStage:_updateViewSnapshot()
 	self:_checkIntegrity()
 
 	local newViewSnapshot = self:_computeNewViewSnapshot()
@@ -774,11 +762,11 @@ function DataStoreStage:_updateViewData()
 	self:_checkIntegrity()
 end
 
-function DataStoreStage:_updateViewDataAtKey(key)
+function DataStoreStage:_updateViewSnapshotAtKey(key)
 	assert(type(key) == "string" or type(key) == "number", "Bad key")
 
 	if type(self._viewSnapshot) ~= "table" then
-		self:_updateViewData()
+		self:_updateViewSnapshot()
 		return
 	end
 
@@ -828,6 +816,11 @@ function DataStoreStage:_computeNewViewSnapshot()
 					newView[key] = value
 				end
 			end
+		end
+
+		if next(newView) == nil and not (type(self._baseDataSnapshot) == "table" or type(self._saveDataSnapshot) == "table") then
+			-- We haev no reason to be a table, make sure we return nil
+			return nil
 		end
 
 		return table.freeze(newView)
@@ -893,14 +886,14 @@ function DataStoreStage:_storeAtKey(key, value)
 		return
 	end
 
-	local swappedSaveData = false
+	local swappedSaveSnapshotType = false
 	local newSnapshot
 
-	if type(self._saveDataSnapshot) ~= "table" then
-		swappedSaveData = true
-		newSnapshot = {}
-	else
+	if type(self._saveDataSnapshot) == "table" then
 		newSnapshot = table.clone(self._saveDataSnapshot)
+	else
+		swappedSaveSnapshotType = true
+		newSnapshot = {}
 	end
 
 	newSnapshot[key] = deepClonedSaveValue
@@ -909,10 +902,10 @@ function DataStoreStage:_storeAtKey(key, value)
 
 	self.DataStored:Fire()
 
-	if swappedSaveData then
-		self:_updateViewData()
+	if swappedSaveSnapshotType then
+		self:_updateViewSnapshot()
 	else
-		self:_updateViewDataAtKey(key)
+		self:_updateViewSnapshotAtKey(key)
 	end
 	self:_checkIntegrity()
 end

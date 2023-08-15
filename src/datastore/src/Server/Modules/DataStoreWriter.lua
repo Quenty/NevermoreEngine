@@ -29,7 +29,6 @@ function DataStoreWriter.new(debugName)
 	self._debugName = assert(debugName, "No debugName")
 	self._saveDataSnapshot = UNSET_TOKEN
 	self._fullBaseDataSnapshot = UNSET_TOKEN
-	self._diffData = UNSET_TOKEN
 	self._userIdList = UNSET_TOKEN
 
 	self._writers = {}
@@ -105,41 +104,49 @@ end
 
 	Won't really perform a delete operation because we can't be sure if we were suppose to have reified this stuff or not.
 ]=]
-function DataStoreWriter:StoreDifference(incoming)
+function DataStoreWriter:ComputeDiffSnapshot(incoming)
 	assert(incoming ~= DataStoreDeleteToken, "Incoming value should not be DataStoreDeleteToken")
 
 	if type(incoming) == "table" then
-		self._diffData = {}
+		local diffSnapshot = {}
 
-		for key, value in pairs(incoming) do
-			-- Route to writers first
+		local keys = Set.union(Set.fromKeys(self._writers), Set.fromKeys(incoming))
+
+		local baseSnapshot
+		if type(self._fullBaseDataSnapshot) == "table" then
+			baseSnapshot = self._fullBaseDataSnapshot
+			Set.unionUpdate(keys, Set.fromKeys(self._fullBaseDataSnapshot))
+		else
+			baseSnapshot = {}
+		end
+
+		for key, _ in pairs(keys) do
 			if self._writers[key] then
-				self._writers[key]:StoreDifference(value)
-			elseif type(self._fullBaseDataSnapshot) == "table" then
-				self._diffData[key] = self:_computeValueDiff(self._fullBaseDataSnapshot[key], value)
+				diffSnapshot[key] = self._writers[key]:ComputeDiffSnapshot(incoming[key])
 			else
-				self._diffData[key] = self:_computeValueDiff(nil, value)
+				diffSnapshot[key] = self:_computeValueDiff(baseSnapshot[key], incoming[key])
 			end
 		end
+
+		return table.freeze(diffSnapshot)
 	else
-		self._diffData = self:_computeValueDiff(self._fullBaseDataSnapshot, incoming)
+		return self:_computeValueDiff(self._fullBaseDataSnapshot, incoming)
 	end
 end
 
 function DataStoreWriter:_computeValueDiff(original, incoming)
+	assert(original ~= DataStoreDeleteToken, "original cannot be DataStoreDeleteToken")
+	assert(incoming ~= DataStoreDeleteToken, "incoming cannot be DataStoreDeleteToken")
+
 	if original == incoming then
 		return nil
-	end
-
-	if incoming == DataStoreDeleteToken and original == nil then
-		return nil
-	end
-
-	if type(original) == "table" and type(incoming) == "table" then
+	elseif original ~= nil and incoming == nil then
+		return DataStoreDeleteToken
+	elseif type(original) == "table" and type(incoming) == "table" then
 		return self:_computeTableDiff(original, incoming)
+	else
+		return incoming
 	end
-
-	return incoming
 end
 
 function DataStoreWriter:_computeTableDiff(original, incoming)
@@ -154,46 +161,10 @@ function DataStoreWriter:_computeTableDiff(original, incoming)
 	end
 
 	if next(diff) ~= nil then
-		return diff
+		return table.freeze(diff)
 	else
-		return nil
-	end
-end
-
-function DataStoreWriter:GetDiffData()
-	-- Prioritize our value first, followed by writers
-	if self._diffData == DataStoreDeleteToken then
 		return DataStoreDeleteToken
-	elseif self._diffData == UNSET_TOKEN or self._diffData == nil or type(self._diffData) == "table" then
-		return self:_mergeDiffDataWithWriters()
-	else
-		return self._diffData
 	end
-end
-
-function DataStoreWriter:_mergeDiffDataWithWriters()
-	local result = {}
-
-	-- Writers are overwritten by diff data
-	for key, writer in pairs(self._writers) do
-		result[key] = writer:GetDiffData()
-	end
-
-	if type(self._diffData) == "table" then
-		for key, value in pairs(self._diffData) do
-			if result[key] ~= nil then
-				warn(string.format("[DataStoreWriter._mergeDiffDataWithWriters] - Overwriting diff data %q already from a writer", key))
-			end
-
-			result[key] = value
-		end
-	end
-
-	if next(result) ~= nil then
-		return result
-	end
-
-	return nil
 end
 
 function DataStoreWriter:SetUserIdList(userIdList)
@@ -252,6 +223,14 @@ function DataStoreWriter:_writeMergeWriters(original)
 			else
 				copy[key] = value
 			end
+		end
+	end
+
+	-- Handle empty table scenario..
+	-- This would also imply our original is nil somehow...
+	if next(copy) == nil then
+		if type(self._saveDataSnapshot) ~= "table" then
+			return nil
 		end
 	end
 

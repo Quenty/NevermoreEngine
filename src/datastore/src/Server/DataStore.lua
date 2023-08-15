@@ -73,6 +73,7 @@ local Promise = require("Promise")
 local Signal = require("Signal")
 local Math = require("Math")
 local ValueObject = require("ValueObject")
+local Rx = require("Rx")
 
 local DEFAULT_DEBUG_WRITING = false
 
@@ -101,14 +102,17 @@ function DataStore.new(robloxDataStore, key)
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 	self._debugWriting = DEFAULT_DEBUG_WRITING
 
-	self._autoSaveTimeSeconds = ValueObject.new(DEFAULT_AUTO_SAVE_TIME_SECONDS, "number")
+	self._autoSaveTimeSeconds = ValueObject.new(DEFAULT_AUTO_SAVE_TIME_SECONDS)
 	self._maid:GiveTask(self._autoSaveTimeSeconds)
 
 	self._jitterProportion = ValueObject.new(DEFAULT_JITTER_PROPORTION, "number")
 	self._maid:GiveTask(self._jitterProportion)
 
-	self._autoSaveAlsoSyncs = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._autoSaveAlsoSyncs)
+	self._syncOnSave = ValueObject.new(false, "boolean")
+	self._maid:GiveTask(self._syncOnSave)
+
+	self._loadedOk = ValueObject.new(false, "boolean")
+	self._maid:GiveTask(self._loadedOk)
 
 	self._userIdList = nil
 
@@ -124,39 +128,16 @@ function DataStore.new(robloxDataStore, key)
 	self.Saving = Signal.new() -- :Fire(promise)
 	self._maid:GiveTask(self.Saving)
 
-	self._maid:GiveTask(task.spawn(function()
-		while true do
-			local startTime = os.clock()
-			local jitterBase = math.random()
-
-			repeat
-				local autoSaveTimeSeconds = self._autoSaveTimeSeconds.Value
-				local timeElapsed = os.clock() - startTime
-				local totalWaitTime = Math.jitter(autoSaveTimeSeconds, self._jitterProportion.Value*autoSaveTimeSeconds, jitterBase)
-
-			  	if timeElapsed > totalWaitTime then
-			  		break
-			  	end
-
-			  	local totalLeft = totalWaitTime - timeElapsed
-
-			  	-- Wait at most 1 second
-				task.wait(math.min(totalLeft, 1))
-
-				timeElapsed = os.clock() - startTime
-			until timeElapsed > totalWaitTime
-
-			if self._autoSaveAlsoSyncs.Value then
-				self:Sync()
-			else
-				self:Save()
-			end
-		end
-	end))
+	self:_setupAutoSaving()
 
 	return self
 end
 
+--[=[
+	Set to true to debug writing this data store
+
+	@param debugWriting boolean
+]=]
 function DataStore:SetDoDebugWriting(debugWriting)
 	assert(type(debugWriting) == "boolean", "Bad debugWriting")
 
@@ -171,16 +152,27 @@ function DataStore:GetFullPath()
 	return ("RobloxDataStore@%s"):format(self._key)
 end
 
+--[=[
+	How frequent the data store will autosave (or sync) to the cloud. If set to nil then the datastore
+	will not do any syncing.
+
+	@param autoSaveTimeSeconds number | nil
+]=]
 function DataStore:SetAutoSaveTimeSeconds(autoSaveTimeSeconds)
-	assert(type(autoSaveTimeSeconds) == "number", "Bad autoSaveTimeSeconds")
+	assert(type(autoSaveTimeSeconds) == "number" or autoSaveTimeSeconds == nil, "Bad autoSaveTimeSeconds")
 
 	self._autoSaveTimeSeconds.Value = autoSaveTimeSeconds
 end
 
-function DataStore:SetAutoSaveAlsoSyncs(autoSaveAlsoSyncs)
-	assert(type(autoSaveAlsoSyncs) == "boolean", "Bad autoSaveAlsoSyncs")
+--[=[
+	How frequent the data store will autosave (or sync) to the cloud
 
-	self._autoSaveAlsoSyncs.Value = autoSaveAlsoSyncs
+	@param syncEnabled boolean
+]=]
+function DataStore:SetSyncOnSave(syncEnabled)
+	assert(type(syncEnabled) == "boolean", "Bad syncEnabled")
+
+	self._syncOnSave.Value = syncEnabled
 end
 
 --[=[
@@ -261,7 +253,52 @@ function DataStore:PromiseViewUpToDate()
 	end
 
 	self._firstLoadPromise = self:_promiseGetAsyncNoCache()
+
+	self._firstLoadPromise:Tap(function()
+		self._loadedOk.Value = true
+	end)
+
 	return self._firstLoadPromise
+end
+
+function DataStore:_setupAutoSaving()
+	local startTime = os.clock()
+
+	self._maid:GiveTask(Rx.combineLatest({
+		autoSaveTimeSeconds = self._autoSaveTimeSeconds:Observe();
+		jitterProportion = self._jitterProportion:Observe();
+		syncOnSave = self._syncOnSave:Observe();
+		loadedOk = self._loadedOk:Observe();
+	}):Subscribe(function(state)
+		local maid = Maid.new()
+
+		if state.autoSaveTimeSeconds and state.loadedOk then
+			maid:GiveTask(task.spawn(function()
+				while true do
+					local jitterBase = math.random()
+					local timeElapsed = os.clock() - startTime
+					local totalWaitTime = Math.jitter(state.autoSaveTimeSeconds, state.jitterProportion*state.autoSaveTimeSeconds, jitterBase)
+					local timeRemaining = totalWaitTime - timeElapsed
+
+					if timeRemaining > 0 then
+						task.wait(timeRemaining)
+					end
+
+					startTime = os.clock()
+
+					if state.syncOnSave then
+						self:Sync()
+					else
+						self:Save()
+					end
+
+					task.wait(0.1)
+				end
+			end))
+		end
+
+		self._maid._autoSavingMaid = maid
+	end))
 end
 
 function DataStore:_syncData(doMergeNewData)
@@ -323,17 +360,22 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 			print(string.format("[DataStore] - DataStorePromises.updateAsync(%q)", self._key))
 		end
 
-		promise:Resolve(maid:GivePromise(DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(data, datastoreKeyInfo)
+		promise:Resolve(maid:GivePromise(DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(original, datastoreKeyInfo)
 			if promise:IsRejected() then
 				-- Cancel if we have another request
 				return nil
 			end
 
-			writer:StoreDifference(data)
-			local result = writer:WriteMerge(data)
+			local diffSnapshot
+			if doMergeNewData then
+				diffSnapshot = writer:ComputeDiffSnapshot(original)
+			end
 
-			assert(result ~= DataStoreDeleteToken, "Cannot delete from UpdateAsync (got delete token)")
-			assert(result ~= nil, "Cannot delete from UpdateAsync (got nil)")
+			local result = writer:WriteMerge(original)
+
+			if result == DataStoreDeleteToken or result == nil then
+				result = {}
+			end
 
 			if self._debugWriting then
 				print("[DataStore] - Writing", result)
@@ -342,7 +384,7 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 			if doMergeNewData then
 				-- This prevents resaving at high frequency
 				self:MarkDataAsSaved(writer)
-				self:MergeDiffBaseData(writer:GetDiffData())
+				self:MergeDiffSnapshot(diffSnapshot)
 			end
 
 			local userIdList = writer:GetUserIdList()
@@ -374,21 +416,20 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 end
 
 function DataStore:_promiseGetAsyncNoCache()
-	if self._debugWriting then
-		print("[DataStore._promiseGetAsyncNoCache] - Retrieving and merging from a get API call")
-	end
-
-	return self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key)
+	return self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key))
 		:Catch(function(err)
-			-- Log:
-			warn("[DataStore._promiseGetAsyncNoCache] - Failed to GetAsync data", err)
+			warn(string.format("DataStorePromises.getAsync(%q) -> warning - ", self._key), err)
 			return Promise.rejected(err)
-		end))
+		end)
 		:Then(function(data)
 			local writer = self:GetNewWriter()
-			writer:StoreDifference(data)
+			local diffSnapshot = writer:ComputeDiffSnapshot(data)
 
-			self:MergeDiffBaseData(writer:GetDiffData())
+			self:MergeDiffSnapshot(diffSnapshot)
+
+			if self._debugWriting then
+				print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data, "with diff snapshot", diffSnapshot, "to view", self._viewSnapshot)
+			end
 		end)
 end
 
