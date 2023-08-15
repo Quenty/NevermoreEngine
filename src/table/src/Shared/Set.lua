@@ -65,6 +65,19 @@ function Set.copy(set)
 end
 
 --[=[
+	Makes a new set from the given keys of a table
+	@param tab table
+	@return table
+]=]
+function Set.fromKeys(tab)
+	local newSet = {}
+	for key, _ in pairs(tab) do
+		newSet[key] = true
+	end
+	return newSet
+end
+
+--[=[
 	Converts a set from table values.
 	@param tab table
 	@return table
