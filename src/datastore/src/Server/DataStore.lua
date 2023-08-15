@@ -72,8 +72,9 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local Signal = require("Signal")
 local Math = require("Math")
+local ValueObject = require("ValueObject")
 
-local DEBUG_WRITING = true
+local DEFAULT_DEBUG_WRITING = false
 
 local DEFAULT_AUTO_SAVE_TIME_SECONDS = 60*5
 local DEFAULT_JITTER_PROPORTION = 0.1 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
@@ -84,18 +85,32 @@ DataStore.__index = DataStore
 
 --[=[
 	Constructs a new DataStore. See [DataStoreStage] for more API.
+
+	```lua
+	local dataStore = serviceBag:GetService(PlayerDataStoreService):PromiseDataStore(player):Yield()
+	```
+
 	@param robloxDataStore DataStore
 	@param key string
 	@return DataStore
 ]=]
 function DataStore.new(robloxDataStore, key)
-	local self = setmetatable(DataStoreStage.new(), DataStore)
+	local self = setmetatable(DataStoreStage.new(key), DataStore)
 
 	self._key = key or error("No key")
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
-	self._autoSaveTimeSeconds = DEFAULT_AUTO_SAVE_TIME_SECONDS
-	self._jitterProportion = DEFAULT_JITTER_PROPORTION
-	self._autoSaveAlsoSyncs = false
+	self._debugWriting = DEFAULT_DEBUG_WRITING
+
+	self._autoSaveTimeSeconds = ValueObject.new(DEFAULT_AUTO_SAVE_TIME_SECONDS, "number")
+	self._maid:GiveTask(self._autoSaveTimeSeconds)
+
+	self._jitterProportion = ValueObject.new(DEFAULT_JITTER_PROPORTION, "number")
+	self._maid:GiveTask(self._jitterProportion)
+
+	self._autoSaveAlsoSyncs = ValueObject.new(false, "boolean")
+	self._maid:GiveTask(self._autoSaveAlsoSyncs)
+
+	self._userIdList = nil
 
 	if self._key == "" then
 		error("[DataStore] - Key cannot be an empty string")
@@ -115,8 +130,9 @@ function DataStore.new(robloxDataStore, key)
 			local jitterBase = math.random()
 
 			repeat
+				local autoSaveTimeSeconds = self._autoSaveTimeSeconds.Value
 				local timeElapsed = os.clock() - startTime
-				local totalWaitTime = Math.jitter(self._autoSaveTimeSeconds, self._jitterProportion*self._autoSaveTimeSeconds, jitterBase)
+				local totalWaitTime = Math.jitter(autoSaveTimeSeconds, self._jitterProportion.Value*autoSaveTimeSeconds, jitterBase)
 
 			  	if timeElapsed > totalWaitTime then
 			  		break
@@ -130,7 +146,7 @@ function DataStore.new(robloxDataStore, key)
 				timeElapsed = os.clock() - startTime
 			until timeElapsed > totalWaitTime
 
-			if self._autoSaveAlsoSyncs then
+			if self._autoSaveAlsoSyncs.Value then
 				self:Sync()
 			else
 				self:Save()
@@ -139,6 +155,12 @@ function DataStore.new(robloxDataStore, key)
 	end))
 
 	return self
+end
+
+function DataStore:SetDoDebugWriting(debugWriting)
+	assert(type(debugWriting) == "boolean", "Bad debugWriting")
+
+	self._debugWriting = debugWriting
 end
 
 --[=[
@@ -152,26 +174,25 @@ end
 function DataStore:SetAutoSaveTimeSeconds(autoSaveTimeSeconds)
 	assert(type(autoSaveTimeSeconds) == "number", "Bad autoSaveTimeSeconds")
 
-	self._autoSaveTimeSeconds = autoSaveTimeSeconds
+	self._autoSaveTimeSeconds.Value = autoSaveTimeSeconds
 end
 
 function DataStore:SetAutoSaveAlsoSyncs(autoSaveAlsoSyncs)
 	assert(type(autoSaveAlsoSyncs) == "boolean", "Bad autoSaveAlsoSyncs")
 
-	self._autoSaveAlsoSyncs = autoSaveAlsoSyncs
+	self._autoSaveAlsoSyncs.Value = autoSaveAlsoSyncs
 end
-
 
 --[=[
 	Returns whether the datastore failed.
 	@return boolean
 ]=]
 function DataStore:DidLoadFail()
-	if not self._loadPromise then
+	if not self._firstLoadPromise then
 		return false
 	end
 
-	if self._loadPromise:IsRejected() then
+	if self._firstLoadPromise:IsRejected() then
 		return true
 	end
 
@@ -184,7 +205,7 @@ end
 	@return Promise<boolean>
 ]=]
 function DataStore:PromiseLoadSuccessful()
-	return self._maid:GivePromise(self:LoadAll()):Then(function()
+	return self._maid:GivePromise(self:PromiseViewUpToDate()):Then(function()
 		return true
 	end, function()
 		return false
@@ -209,86 +230,139 @@ function DataStore:Sync()
 	return self:_syncData(true)
 end
 
+--[=[
+	Sets the user id list associated with this datastore. Can be useful for GDPR compliance.
+
+	@param userIdList
+]=]
+function DataStore:SetUserIdList(userIdList)
+	assert(type(userIdList) == "table" or userIdList == nil, "Bad userIdList")
+
+	self._userIdList = userIdList
+end
+
+--[=[
+	Returns a list of user ids or nil
+
+	@return { number } | nil
+]=]
+function DataStore:GetUserIdList()
+	return self._userIdList
+end
+
+--[=[
+	Overridden helper method for data store stage below.
+
+	@return Promise
+]=]
+function DataStore:PromiseViewUpToDate()
+	if self._firstLoadPromise then
+		return self._firstLoadPromise
+	end
+
+	self._firstLoadPromise = self:_promiseGetAsyncNoCache()
+	return self._firstLoadPromise
+end
+
 function DataStore:_syncData(doMergeNewData)
 	if self:DidLoadFail() then
 		warn("[DataStore] - Not syncing, failed to load")
 		return Promise.rejected("Load not successful, not syncing")
 	end
 
-	if DEBUG_WRITING then
-		print("[DataStore._syncData] - Starting sync routine")
-	end
-
-	return self:_promiseInvokeSavingCallbacks()
+	return self._maid:GivePromise(self:PromiseViewUpToDate())
+		:Then(function()
+			return self._maid:GivePromise(self:PromiseInvokeSavingCallbacks())
+		end)
 		:Then(function()
 			if not self:HasWritableData() then
-				if not doMergeNewData then
-					-- Nothing to save, don't update anything
-					if DEBUG_WRITING then
-						print("[DataStore._syncData] - Not saving, nothing staged")
-					end
-
-					return nil
+				if doMergeNewData then
+					-- Reads are cheaper than update async calls
+					return self:_promiseGetAsyncNoCache()
 				end
 
-				if DEBUG_WRITING then
-					print("[DataStore._syncData] - Merging data from a get API call")
+				-- Nothing to save, don't update anything
+				if self._debugWriting then
+					print("[DataStore] - Not saving, nothing staged")
 				end
 
-				-- Reads are cheaper than writes
-				return self:_promiseLoadNoCache()
+				return nil
 			else
 				return self:_doDataSync(self:GetNewWriter(), doMergeNewData)
 			end
 		end)
 end
 
---[=[
-	Loads data. This returns the originally loaded data.
-	@param keyName string
-	@param defaultValue any?
-	@return any?
-]=]
-function DataStore:Load(keyName, defaultValue)
-	return self:LoadAll()
-		:Then(function(data)
-			return self:_afterLoadGetAndApplyStagedData(keyName, data, defaultValue)
-		end)
-end
-
 function DataStore:_doDataSync(writer, doMergeNewData)
 	assert(type(doMergeNewData) == "boolean", "Bad doMergeNewData")
+
+	-- Cache user id list
+	writer:SetUserIdList(self:GetUserIdList())
 
 	local maid = Maid.new()
 
 	local promise = Promise.new()
-	promise:Resolve(maid:GivePromise(DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(data)
-		if promise:IsRejected() then
-			-- Cancel if we have another request
-			return nil
+
+	if writer:IsCompleteWipe() then
+		if self._debugWriting then
+			print(string.format("[DataStore] - DataStorePromises.removeAsync(%q)", self._key))
 		end
 
-		writer:StoreDifference(data or {})
+		-- This is, of course, dangerous, because we won't merge
+		promise:Resolve(maid:GivePromise(DataStorePromises.removeAsync(self._robloxDataStore, self._key)):Then(function()
+			if doMergeNewData then
+				-- Write our data
+				self:MarkDataAsSaved(writer)
 
-		data = writer:WriteMerge(data or {})
-		assert(data ~= DataStoreDeleteToken, "Cannot delete from UpdateAsync")
-
-		if DEBUG_WRITING then
-			print("[DataStore] - Writing", game:GetService("HttpService"):JSONEncode(data))
+				-- Do syncing after
+				return self:_promiseGetAsyncNoCache()
+			end
+		end))
+	else
+		if self._debugWriting then
+			print(string.format("[DataStore] - DataStorePromises.updateAsync(%q)", self._key))
 		end
 
-		if doMergeNewData then
-			-- This prevents resaving at high frequency
-			self:MarkDataAsSaved(writer)
-			self:PromiseMergeNewBaseData(writer)
-		end
+		promise:Resolve(maid:GivePromise(DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(data, datastoreKeyInfo)
+			if promise:IsRejected() then
+				-- Cancel if we have another request
+				return nil
+			end
 
-		return data
-	end, function(err)
+			writer:StoreDifference(data)
+			local result = writer:WriteMerge(data)
+
+			assert(result ~= DataStoreDeleteToken, "Cannot delete from UpdateAsync (got delete token)")
+			assert(result ~= nil, "Cannot delete from UpdateAsync (got nil)")
+
+			if self._debugWriting then
+				print("[DataStore] - Writing", result)
+			end
+
+			if doMergeNewData then
+				-- This prevents resaving at high frequency
+				self:MarkDataAsSaved(writer)
+				self:MergeDiffBaseData(writer:GetDiffData())
+			end
+
+			local userIdList = writer:GetUserIdList()
+			if datastoreKeyInfo then
+				userIdList = datastoreKeyInfo:GetUserIds()
+			end
+
+			local metadata = nil
+			if datastoreKeyInfo then
+				metadata = datastoreKeyInfo:GetMetadata()
+			end
+
+			return result, userIdList, metadata
+		end)))
+	end
+
+	promise:Tap(nil, function(err)
 		-- Might be caused by Maid rejecting state
-		warn("[DataStore] - Failed to UpdateAsync data", err)
-		return Promise.rejected(err)
-	end)))
+		warn("[DataStore] - Failed to sync data", err)
+	end)
 
 	self._maid._saveMaid = maid
 
@@ -299,35 +373,22 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 	return promise
 end
 
-function DataStore:LoadAll()
-	if self._loadPromise then
-		return self._loadPromise
+function DataStore:_promiseGetAsyncNoCache()
+	if self._debugWriting then
+		print("[DataStore._promiseGetAsyncNoCache] - Retrieving and merging from a get API call")
 	end
 
-	self._loadPromise = self:_promiseLoadNoCache()
-	return self._loadPromise
-end
-
-function DataStore:_promiseLoadNoCache()
 	return self._maid:GivePromise(DataStorePromises.getAsync(self._robloxDataStore, self._key)
-		:Then(function(data)
-			if data == nil then
-				return {}
-			elseif type(data) == "table" then
-				return data
-			else
-				return Promise.rejected("[DataStore] - Failed to load data. Wrong type '" .. type(data) .. "'")
-			end
-		end, function(err)
+		:Catch(function(err)
 			-- Log:
-			warn("[DataStore] - Failed to GetAsync data", err)
+			warn("[DataStore._promiseGetAsyncNoCache] - Failed to GetAsync data", err)
 			return Promise.rejected(err)
 		end))
 		:Then(function(data)
 			local writer = self:GetNewWriter()
-			writer:StoreDifference(data or {})
+			writer:StoreDifference(data)
 
-			return self:PromiseMergeNewBaseData(writer)
+			self:MergeDiffBaseData(writer:GetDiffData())
 		end)
 end
 

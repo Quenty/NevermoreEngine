@@ -69,13 +69,14 @@ function DataStorePromises.getAsync(robloxDataStore, key)
 
 	return Promise.spawn(function(resolve, reject)
 		local result = nil
+		local dataStoreKeyInfo = nil
 		local ok, err = pcall(function()
-			result = robloxDataStore:GetAsync(key)
+			result, dataStoreKeyInfo = robloxDataStore:GetAsync(key)
 		end)
 		if not ok then
 			return reject(err)
 		end
-		return resolve(result)
+		return resolve(result, dataStoreKeyInfo)
 	end)
 end
 

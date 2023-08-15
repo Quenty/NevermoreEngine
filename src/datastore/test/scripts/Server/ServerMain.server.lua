@@ -11,7 +11,9 @@ local packages = require(loader).bootstrapGame(ServerScriptService.datastore)
 local Maid = require(packages.Maid)
 local Promise = require(packages.Promise)
 
-local function spinUpGameCopy()
+local function spinUpGameCopy(prefix)
+	assert(type(prefix) == "string", "Bad prefix")
+
 	local serviceBag = require(packages.ServiceBag).new()
 	serviceBag:GetService(require(packages.GameDataStoreService))
 	serviceBag:GetService(require(packages.PlayerDataStoreService))
@@ -19,7 +21,7 @@ local function spinUpGameCopy()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local guid = HttpService:GenerateGUID(false)
+	local guid = prefix .. "_" .. HttpService:GenerateGUID(false)
 	local maid = Maid.new()
 
 	local gameDataStore = serviceBag:GetService(require(packages.GameDataStoreService))
@@ -28,25 +30,44 @@ local function spinUpGameCopy()
 	-- This would be an aggressive usage of this area, it probably won't scale well enough.
 	-- But writing some shared code or something like API keys should scale fine.
 	maid:GivePromise(gameDataStore:PromiseDataStore()):Then(function(dataStore)
+		-- dataStore:SetDoDebugWriting(true)
+
 		local substore = dataStore:GetSubStore("AliveServers")
 		substore:Store(guid, true)
 
-		dataStore:LoadAll():Then(function(data)
-			print(data)
-		end)
+		-- maid:GiveTask(substore:Observe():Subscribe(function(data)
+		-- 	print(prefix, "Changed", data)
+		-- end))
+
+		maid:GiveTask(dataStore.Changed:Connect(function(viewSnapshot)
+			print(string.format("(%s) dataStore.Changed", prefix), viewSnapshot)
+		end))
+
+		maid:GiveTask(dataStore:Observe():Subscribe(function(viewSnapshot)
+			print(string.format("(%s) dataStore:Observe()", prefix), viewSnapshot)
+			-- print(string.format("[%s][Observe] - Alive servers", prefix), value)
+		end))
+
+		-- dataStore:LoadAll():Then(function(data)
+		-- 	-- print(string.format("[%s][LoadAll] - Load all", prefix), data)
+		-- end)
+
+		-- local entrySubstore = substore:GetSubStore(guid)
+		-- entrySubstore:LoadAll():Then(function(data)
+		-- 	-- print(string.format("[%s][SUBSTORE][LoadAll] Loaded substore", prefix), data)
+		-- end)
+
+		-- entrySubstore:Overwrite(os.clock())
 
 		maid:GiveTask(bindToCloseService:RegisterPromiseOnCloseCallback(function()
 			substore:Delete(guid)
 			return Promise.resolved()
 		end))
 
-		maid:GiveTask(dataStore:Observe("AliveServers", {}):Subscribe(function(value)
-			print("[Observe] - Alive servers", value)
-		end))
 	end)
 
 	return maid
 end
 
-spinUpGameCopy()
-spinUpGameCopy()
+spinUpGameCopy("quenty")
+spinUpGameCopy("martxn")
