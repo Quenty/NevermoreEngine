@@ -28,10 +28,7 @@ end
 	@return table
 ]=]
 function Table.merge(orig, new)
-	local result = {}
-	for key, val in pairs(orig) do
-		result[key] = val
-	end
+	local result = table.clone(orig)
 	for key, val in pairs(new) do
 		result[key] = val
 	end

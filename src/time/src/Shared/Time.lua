@@ -24,10 +24,7 @@ local DAYS_OF_WEEK_SHORT = {"Sun",    "Mon",    "Tues",    "Weds",      "Thurs",
 	@return { [number]: number }
 ]=]
 function Time.getDaysMonthTable(year)
-	local copy = {}
-	for key, value in pairs(DAYS_IN_MONTH) do
-		copy[key] = value
-	end
+	local copy = table.clone(DAYS_IN_MONTH)
 
 	if year % 4 == 0 and (year % 100 ~= 0 or year % 400 == 0) then
 		copy[2] = 29

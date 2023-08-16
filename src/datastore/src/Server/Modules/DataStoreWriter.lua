@@ -104,6 +104,8 @@ end
 	Merges the incoming data.
 
 	Won't really perform a delete operation because we can't be sure if we were suppose to have reified this stuff or not.
+
+	@param incoming any
 ]=]
 function DataStoreWriter:ComputeDiffSnapshot(incoming)
 	assert(incoming ~= DataStoreDeleteToken, "Incoming value should not be DataStoreDeleteToken")

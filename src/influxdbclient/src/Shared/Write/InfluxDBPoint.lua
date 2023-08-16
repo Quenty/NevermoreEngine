@@ -204,11 +204,7 @@ function InfluxDBPoint:ToLineProtocol(pointSettings)
 
 	local defaultTags = pointSettings:GetDefaultTags()
 	if next(defaultTags) or next(self._tags) then
-		local tagKeysSet = {}
-
-		for key, value in pairs(self._tags) do
-			tagKeysSet[key] = value
-		end
+		local tagKeysSet = table.clone(self._tags)
 		for key, value in pairs(defaultTags) do
 			tagKeysSet[key] = value
 		end

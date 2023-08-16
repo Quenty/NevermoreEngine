@@ -225,7 +225,7 @@ end
 --[=[
 	Sets the user id list associated with this datastore. Can be useful for GDPR compliance.
 
-	@param userIdList
+	@param userIdList { number } | nil
 ]=]
 function DataStore:SetUserIdList(userIdList)
 	assert(type(userIdList) == "table" or userIdList == nil, "Bad userIdList")
