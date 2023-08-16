@@ -435,6 +435,7 @@ function DataStore:_promiseGetAsyncNoCache()
 
 			if self._debugWriting then
 				print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data, "with diff snapshot", diffSnapshot, "to view", self._viewSnapshot)
+				-- print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data)
 			end
 		end)
 end

@@ -40,7 +40,7 @@ local function spinUpGameCopy(prefix)
 		-- end))
 
 		if prefix == "blue" then
-			-- dataStore:SetDoDebugWriting(true)
+			dataStore:SetDoDebugWriting(true)
 			dataStore:SetSyncOnSave(true)
 			dataStore:SetAutoSaveTimeSeconds(4)
 

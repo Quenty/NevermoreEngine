@@ -179,12 +179,22 @@ function DataStoreWriter:_computeTableDiff(original, incoming)
 	end
 end
 
+--[=[
+	Set of user ids to write with the data (only applies to top-level writer)
+
+	@param userIdList { number }
+]=]
 function DataStoreWriter:SetUserIdList(userIdList)
 	assert(type(userIdList) == "table" or userIdList == nil, "Bad userIdList")
 
 	self._userIdList = userIdList
 end
 
+--[=[
+	User ids to associate with data
+
+	@return userIdList { number }
+]=]
 function DataStoreWriter:GetUserIdList()
 	if self._userIdList == UNSET_TOKEN then
 		return nil
