@@ -14,7 +14,7 @@ local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"
 RoguePropertyDefinition.__index = RoguePropertyDefinition
 
-function RoguePropertyDefinition.new(name, defaultValue, roguePropertyTableDefinition)
+function RoguePropertyDefinition.new(name, defaultValue, parentPropertyTableDefinition)
 	local self = setmetatable({}, RoguePropertyDefinition)
 
 	assert(defaultValue ~= nil, "Bad defaultValue")
@@ -23,7 +23,7 @@ function RoguePropertyDefinition.new(name, defaultValue, roguePropertyTableDefin
 	self._defaultValue = defaultValue
 	self._valueType = typeof(self._defaultValue)
 	self._storageType = self:_computeStorageInstanceType()
-	self._roguePropertyTableDefinition = roguePropertyTableDefinition or nil
+	self._parentPropertyTableDefinition = parentPropertyTableDefinition or nil
 	self._encodedDefaultValue = RoguePropertyUtils.encodeProperty(self, self._defaultValue)
 
 	return self
@@ -56,7 +56,7 @@ function RoguePropertyDefinition:GetOrCreateInstance(parent)
 end
 
 function RoguePropertyDefinition:GetParentPropertyDefinition()
-	return self._roguePropertyTableDefinition
+	return self._parentPropertyTableDefinition
 end
 
 --[=[
@@ -65,6 +65,18 @@ end
 ]=]
 function RoguePropertyDefinition:GetName(): string
 	return self._name
+end
+
+--[=[
+	Gets the full name of the rogue property
+	@return string
+]=]
+function RoguePropertyDefinition:GetFullName(): string
+	if self._parentPropertyTableDefinition then
+		return self._parentPropertyTableDefinition:GetFullName() .. "." .. self._name
+	else
+		return self._name
+	end
 end
 
 --[=[

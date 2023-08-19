@@ -32,14 +32,25 @@ function RogueProperty.new(adornee, serviceBag, definition)
 
 	self._adornee = assert(adornee, "Bad adornee")
 	self._definition = assert(definition, "Bad definition")
+	self._canInitialize = self._roguePropertyService:CanInitializeProperties()
 
 	setmetatable(self, RogueProperty)
 
-	if self._roguePropertyService:CanInitializeProperties() then
+	if rawget(self, "_canInitialize") then
 		self:GetBaseValueObject()
 	end
 
 	return self
+end
+
+function RogueProperty:SetCanInitialize(canInitialize)
+	assert(type(canInitialize) == "boolean", "Bad canInitialize")
+
+	rawset(self, "_canInitialize", canInitialize)
+end
+
+function RogueProperty:CanInitialize()
+	return rawget(self, "_canInitialize")
 end
 
 function RogueProperty:GetBaseValueObject()
@@ -47,7 +58,7 @@ function RogueProperty:GetBaseValueObject()
 	local parentDefinition = self._definition:GetParentPropertyDefinition()
 
 	if parentDefinition then
-		parent = parentDefinition:GetContainer(self._serviceBag, self._adornee)
+		parent = parentDefinition:GetContainer(self._adornee, self:CanInitialize())
 	else
 		parent = self._adornee
 	end
@@ -56,7 +67,7 @@ function RogueProperty:GetBaseValueObject()
 		return nil
 	end
 
-	if self._roguePropertyService:CanInitializeProperties() then
+	if self:CanInitialize() then
 		return self._definition:GetOrCreateInstance(parent)
 	else
 		return parent:FindFirstChild(self._definition:GetName())
@@ -66,7 +77,7 @@ end
 function RogueProperty:_observeBaseValueBrio()
 	local parentDefinition = self._definition:GetParentPropertyDefinition()
 	if parentDefinition then
-		return parentDefinition:ObserveContainerBrio(self._serviceBag, self._adornee)
+		return parentDefinition:ObserveContainerBrio(self._adornee, self:CanInitialize())
 			:Pipe({
 				RxBrioUtils.switchMapBrio(function(container)
 					return RxInstanceUtils.observeLastNamedChildBrio(
@@ -85,14 +96,14 @@ function RogueProperty:SetBaseValue(value)
 	if baseValue then
 		baseValue.Value = self:_encodeValue(value)
 	else
-		warn("[RogueProperty] - Failed to get the baseValue to parent")
+		warn(string.format("[RogueProperty.SetBaseValue] - Failed to get the baseValue for %q", self._definition:GetFullName()))
 	end
 end
 
 function RogueProperty:SetValue(value)
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn("[RogueProperty] - Failed to get the baseValue to parent")
+		warn(string.format("[RogueProperty.SetValue] - Failed to get the baseValue for %q", self._definition:GetFullName()))
 		return
 	end
 
@@ -196,7 +207,7 @@ function RogueProperty:CreateMultiplier(amount, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn("[RogueProperty] - Failed to get the baseValue to parent")
+		warn(string.format("[RogueProperty.CreateMultiplier] - Failed to get the baseValue for %q", self._definition:GetFullName()))
 	end
 
 	local multiplier = provider:Create(amount, source)
@@ -212,7 +223,7 @@ function RogueProperty:CreateAdditive(amount, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn("[RogueProperty] - Failed to get the baseValue to parent")
+		warn(string.format("[RogueProperty.CreateAdditive] - Failed to get the baseValue for %q", self._definition:GetFullName()))
 	end
 
 	local multiplier = provider:Create(amount, source)
@@ -226,7 +237,7 @@ function RogueProperty:CreateSetter(value, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn("[RogueProperty] - Failed to get the baseValue to parent")
+		warn(string.format("[RogueProperty.CreateSetter] - Failed to get the baseValue for %q", self._definition:GetFullName()))
 	end
 
 	local setter = provider:Create(value, source)

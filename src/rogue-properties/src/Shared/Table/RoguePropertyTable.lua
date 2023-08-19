@@ -4,8 +4,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local RogueProperty = require("RogueProperty")
 local Rx = require("Rx")
 
@@ -18,19 +16,29 @@ function RoguePropertyTable.new(adornee, serviceBag, roguePropertyTableDefinitio
 
 	rawset(self, "_properties", {})
 
-	if RunService:IsServer() then
+	if self:CanInitialize() then
 		self:_setup()
 	end
 
 	return self
 end
 
+function RoguePropertyTable:SetCanInitialize(canInitialize)
+	assert(type(canInitialize) == "boolean", "Bad canInitialize")
+
+	RogueProperty.SetCanInitialize(self, canInitialize)
+
+	for _, property in pairs(self._properties) do
+		property:SetCanInitialize(canInitialize)
+	end
+end
+
 function RoguePropertyTable:ObserveContainerBrio()
-	return self._definition:ObserveContainerBrio(self._serviceBag, self._adornee)
+	return self._definition:ObserveContainerBrio(self._adornee, self:CanInitialize())
 end
 
 function RoguePropertyTable:GetContainer()
-	return self._definition:GetContainer(self._serviceBag, self._adornee)
+	return self._definition:GetContainer(self._adornee, self:CanInitialize())
 end
 
 function RoguePropertyTable:SetBaseValue(newBaseValue)
@@ -73,6 +81,7 @@ end
 
 function RoguePropertyTable:GetBaseValue()
 	local values = {}
+
 	for key, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
 		local property = self:GetRogueProperty(rogueDefinition:GetName())
 		assert(property, "Failed to get rogue property")
@@ -117,8 +126,11 @@ function RoguePropertyTable:GetRogueProperty(name)
 
 	local definition = self._definition:GetDefinition(name)
 	if definition then
-		self._properties[name] = definition:Get(self._serviceBag, self._adornee)
-		return self._properties[name]
+		local newProperty = definition:Get(self._serviceBag, self._adornee)
+		newProperty:SetCanInitialize(self:CanInitialize())
+
+		self._properties[name] = newProperty
+		return newProperty
 	else
 		return nil
 	end
