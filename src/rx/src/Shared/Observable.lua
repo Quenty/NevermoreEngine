@@ -138,7 +138,7 @@ function Observable:Pipe(transformers)
 	for _, transformer in pairs(transformers) do
 		assert(type(transformer) == "function", "Bad transformer")
 		current = transformer(current)
-		assert(Observable.isObservable(current))
+		assert(Observable.isObservable(current), "Transformer must return an observable")
 	end
 
 	return current
