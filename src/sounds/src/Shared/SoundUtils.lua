@@ -93,11 +93,7 @@ function SoundUtils.playFromIdInParent(id: string | number | table, parent: Inst
 	local sound = SoundUtils.createSoundFromId(id)
 	sound.Parent = parent
 
-	if not RunService:IsRunning() then
-		SoundService:PlayLocalSound(sound)
-	else
-		sound:Play()
-	end
+	sound:Play()
 
 	SoundUtils.removeAfterTimeLength(sound)
 
