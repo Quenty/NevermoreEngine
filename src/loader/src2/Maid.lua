@@ -136,6 +136,26 @@ function Maid:__newindex(index, newTask)
 end
 
 --[=[
+	Gives a task to the maid for cleanup and returnsthe resulting value
+
+	@param task MaidTask -- An item to clean
+	@return MaidTask
+]=]
+function Maid:Add(task)
+	if not task then
+		error("Task cannot be false or nil", 2)
+	end
+
+	self[#self._tasks+1] = task
+
+	if type(task) == "table" and (not task.Destroy) then
+		warn("[Maid.GiveTask] - Gave table task without .Destroy\n\n" .. debug.traceback())
+	end
+
+	return task
+end
+
+--[=[
 	Gives a task to the maid for cleanup, but uses an incremented number as a key.
 
 	@param task MaidTask -- An item to clean
