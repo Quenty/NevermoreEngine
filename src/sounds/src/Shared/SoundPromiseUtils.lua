@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
+local PromiseMaidUtils = require("PromiseMaidUtils")
+local Maid = require("Maid")
 
 local SoundPromiseUtils = {}
 
@@ -21,22 +23,44 @@ function SoundPromiseUtils.promiseLoaded(sound)
 	end
 
 	local promise = Promise.new()
+	local maid = Maid.new()
 
-	local conn
-
-	conn = sound.Loaded:Connect(function()
+	maid:GiveTask(sound:GetPropertyChangedSignal("IsLoaded"):Connect(function()
 		if sound.IsLoaded then
 			promise:Resolve()
 		end
-	end)
+	end))
+
+	maid:GiveTask(sound.Loaded:Connect(function()
+		if sound.IsLoaded then
+			promise:Resolve()
+		end
+	end))
 
 	promise:Finally(function()
-		conn:Disconnect()
+		maid:DoCleaning()
 	end)
 
 	return promise
 end
 
+function SoundPromiseUtils.promisePlayed(sound)
+	return SoundPromiseUtils.promiseLoaded(sound):Then(function()
+		return PromiseUtils.delayed(sound.TimeLength)
+	end)
+end
+
+function SoundPromiseUtils.promiseLooped(sound)
+	local promise = Promise.new()
+
+	PromiseMaidUtils.whilePromise(promise, function(maid)
+		maid:GiveTask(sound.DidLoop:Connect(function()
+			promise:Resolve()
+		end))
+	end)
+
+	return promise
+end
 --[=[
 	Promises that all sounds are loaded
 	@param sounds { Sound }

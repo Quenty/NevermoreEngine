@@ -29,13 +29,9 @@ local SoundUtils = {}
 	The sound will be automatically cleaned up after the sound is played.
 	:::
 
-	@param id string | number
 	@return Sound
 ]=]
-function SoundUtils.playFromId(id: string | number): Sound
-	local soundId = RbxAssetUtils.toRbxAssetId(id)
-	assert(type(soundId) == "string", "Bad id")
-
+function SoundUtils.playFromId(id: string | number | table): Sound
 	local sound = SoundUtils.createSoundFromId(id)
 
 	if RunService:IsClient() then
@@ -52,24 +48,46 @@ end
 --[=[
 	Creates a new sound object from the given id
 ]=]
-function SoundUtils.createSoundFromId(id: string | number): Sound
-	local soundId = RbxAssetUtils.toRbxAssetId(id)
+function SoundUtils.createSoundFromId(id: string | number | table): Sound
+	local soundId = SoundUtils.toRbxAssetId(id)
 	assert(type(soundId) == "string", "Bad id")
 
 	local sound = Instance.new("Sound")
+	sound.Archivable = false
+
+	SoundUtils.applyPropertiesFromId(sound, id)
+
+	return sound
+end
+
+function SoundUtils.applyPropertiesFromId(sound, id)
+	local soundId = SoundUtils.toRbxAssetId(id)
 	sound.Name = ("Sound_%s"):format(soundId)
 	sound.SoundId = soundId
 	sound.RollOffMode = Enum.RollOffMode.InverseTapered
 	sound.Volume = 0.25
-	sound.Archivable = false
 
-	return sound
+	if type(id) == "table" then
+		for property, value in pairs(id) do
+			if property ~= "Parent" and property ~= "RollOffMinDistance" then
+				sound[property] = value
+			end
+		end
+
+		if id.RollOffMinDistance then
+			sound.RollOffMinDistance = id.RollOffMinDistance
+		end
+
+		if id.Parent then
+			sound.Parent = id.Parent
+		end
+	end
 end
 
 --[=[
 	Plays back a template given asset id in the parent
 ]=]
-function SoundUtils.playFromIdInParent(id: string | number, parent: Instance): Sound
+function SoundUtils.playFromIdInParent(id: string | number | table, parent: Instance): Sound
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local sound = SoundUtils.createSoundFromId(id)
@@ -130,14 +148,26 @@ end
 --[=[
 	Converts a string or number to a string for playback.
 
-	Alias of [RbxAssetUtils.toRbxAssetId] for backwards compatibility.
-
 	@function toRbxAssetId
 	@param id string? | number
 	@return string?
 	@within SoundUtils
 ]=]
-SoundUtils.toRbxAssetId = RbxAssetUtils.toRbxAssetId
+function SoundUtils.toRbxAssetId(soundId)
+	if type(soundId) == "table" then
+		return RbxAssetUtils.toRbxAssetId(soundId.SoundId)
+	else
+		return RbxAssetUtils.toRbxAssetId(soundId)
+	end
+end
+
+function SoundUtils.isConvertableToRbxAsset(soundId)
+	if type(soundId) == "table" then
+		return RbxAssetUtils.isConvertableToRbxAsset(soundId.SoundId)
+	else
+		return RbxAssetUtils.isConvertableToRbxAsset(soundId)
+	end
+end
 
 --[=[
 	Plays back a sound template in a specific parent.
