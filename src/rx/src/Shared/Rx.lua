@@ -1626,6 +1626,22 @@ function Rx.delay(seconds)
 end
 
 --[=[
+	Creates an observable that will emit N seconds later.
+
+	@param seconds number
+	@return Observable<()>
+]=]
+function Rx.delayed(seconds)
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return Observable.new(function(sub)
+		return task.delay(seconds, function()
+			sub:Fire()
+		end)
+	end)
+end
+
+--[=[
 	Emits output every `n` seconds
 
 	@param initialDelaySeconds number
