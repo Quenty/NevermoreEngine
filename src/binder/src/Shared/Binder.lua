@@ -224,6 +224,36 @@ function Binder:Observe(instance)
 end
 
 --[=[
+	Observes all entries in the binder
+
+	@return Observable<Brio<T>>
+]=]
+function Binder:ObserveAllBrio()
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local function handleNewClass(class)
+			local brio = Brio.new(class)
+			maid[class] = brio
+
+			sub:Fire(brio)
+		end
+
+		maid:GiveTask(self:GetClassAddedSignal():Connect(handleNewClass))
+
+		for _, item in pairs(self:GetAll()) do
+			handleNewClass(item)
+		end
+
+		maid:GiveTask(self:GetClassRemovingSignal():Connect(function(class)
+			maid[class] = nil
+		end))
+
+		return maid
+	end)
+end
+
+--[=[
 	Observes a bound class on a given instance.
 
 	@param instance Instance
