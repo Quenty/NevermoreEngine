@@ -53,7 +53,7 @@ function Promise.new(func)
 end
 
 --[=[
-	Initializes a new promise with the given function in a deferred wrapper.
+	Initializes a new promise with the given function in a spawn wrapper.
 
 	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
 	@return Promise<T>
@@ -62,6 +62,24 @@ function Promise.spawn(func)
 	local self = Promise.new()
 
 	task.spawn(func, self:_getResolveReject())
+
+	return self
+end
+
+--[=[
+	Initializes a new promise with the given function in a delay wrapper.
+
+	@param seconds number
+	@param func (resolve: (...) -> (), reject: (...) -> ()) -> ()?
+	@return Promise<T>
+]=]
+function Promise.delay(seconds, func)
+	assert(type(seconds) == "number", "Bad seconds")
+	assert(type(func) == "function", "Bad func")
+
+	local self = Promise.new()
+
+	task.delay(seconds, func, self:_getResolveReject())
 
 	return self
 end

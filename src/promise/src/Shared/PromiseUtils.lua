@@ -32,9 +32,17 @@ function PromiseUtils.any(promises)
 	return returnPromise
 end
 
+--[=[
+	Returns a promise that will resolve after the set amount of seconds
+
+	@param seconds number
+	@return Promise
+]=]
 function PromiseUtils.delayed(seconds)
-	return Promise.spawn(function(resolve, _reject)
-		task.delay(seconds, resolve)
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return Promise.delay(seconds, function(resolve, _reject)
+		resolve()
 	end)
 end
 
