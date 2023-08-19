@@ -9,7 +9,6 @@ local RoguePropertyTable = require("RoguePropertyTable")
 local ServiceBag = require("ServiceBag")
 local RoguePropertyDefinition = require("RoguePropertyDefinition")
 local RxInstanceUtils = require("RxInstanceUtils")
-local RoguePropertyService = require("RoguePropertyService")
 local DuckTypeUtils = require("DuckTypeUtils")
 local RxBrioUtils = require("RxBrioUtils")
 

@@ -96,14 +96,14 @@ function RogueProperty:SetBaseValue(value)
 	if baseValue then
 		baseValue.Value = self:_encodeValue(value)
 	else
-		warn(string.format("[RogueProperty.SetBaseValue] - Failed to get the baseValue for %q", self._definition:GetFullName()))
+		warn(string.format("[RogueProperty.SetBaseValue] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
 	end
 end
 
 function RogueProperty:SetValue(value)
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
-		warn(string.format("[RogueProperty.SetValue] - Failed to get the baseValue for %q", self._definition:GetFullName()))
+		warn(string.format("[RogueProperty.SetValue] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
 		return
 	end
 
@@ -207,7 +207,7 @@ function RogueProperty:CreateMultiplier(amount, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn(string.format("[RogueProperty.CreateMultiplier] - Failed to get the baseValue for %q", self._definition:GetFullName()))
+		warn(string.format("[RogueProperty.CreateMultiplier] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
 	end
 
 	local multiplier = provider:Create(amount, source)
@@ -223,7 +223,7 @@ function RogueProperty:CreateAdditive(amount, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn(string.format("[RogueProperty.CreateAdditive] - Failed to get the baseValue for %q", self._definition:GetFullName()))
+		warn(string.format("[RogueProperty.CreateAdditive] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
 	end
 
 	local multiplier = provider:Create(amount, source)
@@ -237,7 +237,7 @@ function RogueProperty:CreateSetter(value, source)
 	local baseValue = self:GetBaseValueObject()
 
 	if not baseValue then
-		warn(string.format("[RogueProperty.CreateSetter] - Failed to get the baseValue for %q", self._definition:GetFullName()))
+		warn(string.format("[RogueProperty.CreateSetter] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
 	end
 
 	local setter = provider:Create(value, source)
