@@ -27,5 +27,8 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/loader": "file:../loader"
   }
 }
