@@ -1,0 +1,21 @@
+{
+  "name": "{{packageNameProper}}Test",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "{{packageName}}": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

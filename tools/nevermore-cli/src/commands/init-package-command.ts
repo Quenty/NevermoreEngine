@@ -12,6 +12,7 @@ import { getTemplatePathByName } from '../utils/nevermore-cli-utils';
 export interface InitPackageArgs extends NevermoreGlobalArgs {
   packageName: string;
   description: string;
+  packageTemplate: 'library' | 'service';
 }
 
 /**
@@ -20,25 +21,33 @@ export interface InitPackageArgs extends NevermoreGlobalArgs {
 export class InitPackageCommand<T>
   implements CommandModule<T, InitPackageArgs>
 {
-  public command = 'init-package [package-name] [description]';
+  public command =
+    'init-package [package-name] [description] [package-template]';
   public describe = 'Initializes a new package within Nevermore.';
 
   public builder(args: Argv<T>) {
-    args.positional('package-name', {
-      describe: 'Name of the new package folder.',
-      demandOption: true,
-      type: 'string',
-    });
-    args.positional('description', {
-      describe: 'The description of the package.',
-      demandOption: true,
-      type: 'string',
-    });
-    return args as Argv<InitPackageArgs>;
+    let result = args
+      .positional('package-name', {
+        describe: 'Name of the new package folder.',
+        demandOption: true,
+        type: 'string',
+      })
+      .positional('description', {
+        describe: 'The description of the package.',
+        demandOption: true,
+        type: 'string',
+      })
+      .positional('package-template', {
+        describe: 'The template type to use.',
+        default: 'library',
+        choices: ['library', 'service'],
+      });
+
+    return result as any;
   }
 
   public async handler(args: InitPackageArgs) {
-    const rawPackageName = await InitPackageCommand._ensurePackageName(args);
+    let rawPackageName = await InitPackageCommand._ensurePackageName(args);
 
     const packageName = TemplateHelper.camelize(rawPackageName).toLowerCase();
     const packageNameProper = TemplateHelper.camelize(rawPackageName);
@@ -46,7 +55,7 @@ export class InitPackageCommand<T>
 
     const srcRoot = process.cwd();
     const templatePath = getTemplatePathByName(
-      'nevermore-library-package-template'
+      `nevermore-${args.packageTemplate}-package-template`
     );
 
     OutputHelper.info(
