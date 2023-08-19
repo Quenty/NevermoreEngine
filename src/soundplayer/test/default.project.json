@@ -1,0 +1,11 @@
+{
+  "name": "SoundPlayerTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "soundplayer": {
+        "$path": ".."
+      }
+    }
+  }
+}
