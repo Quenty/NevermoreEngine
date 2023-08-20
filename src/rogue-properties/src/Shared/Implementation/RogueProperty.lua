@@ -7,7 +7,6 @@ local require = require(script.Parent.loader).load(script)
 local RogueAdditiveProvider = require("RogueAdditiveProvider")
 local RogueMultiplierProvider = require("RogueMultiplierProvider")
 local RoguePropertyBinderGroups = require("RoguePropertyBinderGroups")
-local RoguePropertyChangedSignalConnection = require("RoguePropertyChangedSignalConnection")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 local RoguePropertyUtils = require("RoguePropertyUtils")
@@ -17,7 +16,7 @@ local RxBinderUtils = require("RxBinderUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
-local ValueObject = require("ValueObject")
+local RxSignal = require("RxSignal")
 
 local RogueProperty = {}
 RogueProperty.ClassName = "RogueProperty"
@@ -32,13 +31,9 @@ function RogueProperty.new(adornee, serviceBag, definition)
 
 	self._adornee = assert(adornee, "Bad adornee")
 	self._definition = assert(definition, "Bad definition")
-	self._canInitialize = self._roguePropertyService:CanInitializeProperties()
+	self._canInitialize = false
 
 	setmetatable(self, RogueProperty)
-
-	if rawget(self, "_canInitialize") then
-		self:GetBaseValueObject()
-	end
 
 	return self
 end
@@ -46,7 +41,17 @@ end
 function RogueProperty:SetCanInitialize(canInitialize)
 	assert(type(canInitialize) == "boolean", "Bad canInitialize")
 
-	rawset(self, "_canInitialize", canInitialize)
+	if rawget(self, "_canInitialize") ~= canInitialize then
+		rawset(self, "_canInitialize", canInitialize)
+
+		if canInitialize then
+			self:GetBaseValueObject()
+		end
+	end
+end
+
+function RogueProperty:GetAdornee()
+	return self._adornee
 end
 
 function RogueProperty:CanInitialize()
@@ -92,6 +97,8 @@ function RogueProperty:_observeBaseValueBrio()
 end
 
 function RogueProperty:SetBaseValue(value)
+	assert(self._definition:CanAssign(value, false)) -- This has a good error message
+
 	local baseValue = self:GetBaseValueObject()
 	if baseValue then
 		baseValue.Value = self:_encodeValue(value)
@@ -101,6 +108,8 @@ function RogueProperty:SetBaseValue(value)
 end
 
 function RogueProperty:SetValue(value)
+	assert(self._definition:CanAssign(value, false)) -- This has a good error message
+
 	local baseValue = self:GetBaseValueObject()
 	if not baseValue then
 		warn(string.format("[RogueProperty.SetValue] - Failed to get the baseValue for %q on %q", self._definition:GetFullName(), self._adornee:GetFullName()))
@@ -148,7 +157,6 @@ function RogueProperty:ObserveModifiersBrio()
 	return self:_observeBaseValueBrio()
 		:Pipe({
 			RxBrioUtils.flatMapBrio(function(baseValue)
-				print("Got base value")
 				if baseValue then
 					return RxBinderUtils.observeBoundChildClassesBrio(self._roguePropertyBinderGroups.RogueModifiers:GetBinders(), baseValue)
 				else
@@ -197,6 +205,7 @@ function RogueProperty:Observe()
 		end);
 		RxBrioUtils.emitOnDeath(self._definition:GetDefaultValue());
 		Rx.defaultsTo(self._definition:GetDefaultValue());
+		Rx.distinct();
 	})
 end
 
@@ -283,22 +292,7 @@ function RogueProperty:_encodeValue(current)
 end
 
 function RogueProperty:GetChangedEvent()
-	return {
-		Connect = function(_, callback)
-			assert(type(callback) == "function", "Bad callback")
-			return RoguePropertyChangedSignalConnection.new(function(connMaid)
-				local valueObject = ValueObject.new(self._definition:GetDefaultValue())
-				connMaid:GiveTask(valueObject)
-
-				connMaid:GiveTask(self:Observe():Subscribe(function(value)
-					valueObject.Value = value
-				end))
-
-				-- After observing, so we can emit only changes.
-				connMaid:GiveTask(valueObject.Changed:Connect(callback))
-			end)
-		end;
-	}
+	return RxSignal.new(self:Observe())
 end
 
 

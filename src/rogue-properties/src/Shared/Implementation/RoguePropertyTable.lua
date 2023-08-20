@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local RogueProperty = require("RogueProperty")
 local Rx = require("Rx")
+local RoguePropertyArrayHelper = require("RoguePropertyArrayHelper")
 
 local RoguePropertyTable = {} -- inherits from RogueProperty
 RoguePropertyTable.ClassName = "RoguePropertyTable"
@@ -16,8 +17,9 @@ function RoguePropertyTable.new(adornee, serviceBag, roguePropertyTableDefinitio
 
 	rawset(self, "_properties", {})
 
-	if self:CanInitialize() then
-		self:_setup()
+	local arrayDefinitionHelper = self:GetDefinition():GetDefinitionArrayHelper()
+	if arrayDefinitionHelper then
+		rawset(self, "_arrayHelper", RoguePropertyArrayHelper.new(serviceBag, arrayDefinitionHelper, self))
 	end
 
 	return self
@@ -28,8 +30,13 @@ function RoguePropertyTable:SetCanInitialize(canInitialize)
 
 	RogueProperty.SetCanInitialize(self, canInitialize)
 
-	for _, property in pairs(self._properties) do
+	for _, property in pairs(self:GetRogueProperties()) do
 		property:SetCanInitialize(canInitialize)
+	end
+
+	local arrayHelper = rawget(self, "_arrayHelper")
+	if arrayHelper then
+		arrayHelper:SetCanInitialize(canInitialize)
 	end
 end
 
@@ -42,33 +49,81 @@ function RoguePropertyTable:GetContainer()
 end
 
 function RoguePropertyTable:SetBaseValue(newBaseValue)
-	assert(type(newBaseValue) == "table", "Bad newBaseValue")
+	assert(self._definition:CanAssign(newBaseValue, false)) -- This has a good error message
+
+	local arrayData = {}
 
 	for propertyName, value in pairs(newBaseValue) do
-		local rogueProperty = self:GetRogueProperty(propertyName)
-		if not rogueProperty then
-			error(("Bad property %q"):format(tostring(propertyName)))
-		end
+		if type(propertyName) == "string" then
+			local rogueProperty = self:GetRogueProperty(propertyName)
+			if not rogueProperty then
+				error(string.format("Bad property %q", tostring(propertyName)))
+			end
 
-		rogueProperty:SetBaseValue(value)
+			rogueProperty:SetBaseValue(value)
+		else
+			table.insert(arrayData, value)
+		end
+	end
+
+	if next(arrayData) ~= nil then
+		local arrayHelper = rawget(self, "_arrayHelper")
+		if arrayHelper then
+			arrayHelper:SetArrayBaseData(arrayData)
+		else
+			error("Had array data but we are not an array")
+		end
 	end
 end
 
-function RoguePropertyTable:SetValue(newBaseValue)
-	assert(type(newBaseValue) == "table", "Bad newBaseValue")
+function RoguePropertyTable:SetValue(newValue)
+	assert(self._definition:CanAssign(newValue, false)) -- This has a good error message
 
-	for propertyName, value in pairs(newBaseValue) do
-		local rogueProperty = self:GetRogueProperty(propertyName)
+	local arrayData = {}
+
+	for propertyName, value in pairs(newValue) do
+		if type(propertyName) == "string" then
+			local rogueProperty = self:GetRogueProperty(propertyName)
+			if not rogueProperty then
+				error(string.format("Bad property %q", tostring(propertyName)))
+			end
+
+			rogueProperty:SetValue(value)
+		else
+			table.insert(arrayData, value)
+		end
+	end
+
+	if next(arrayData) ~= nil then
+		local arrayHelper = rawget(self, "_arrayHelper")
+		if arrayHelper then
+			arrayHelper:SetArrayData(arrayData)
+		else
+			error("Had array data but we are not an array")
+		end
+	end
+end
+
+function RoguePropertyTable:GetRogueProperties()
+	local arrayHelper = rawget(self, "_arrayHelper")
+	local properties = arrayHelper and arrayHelper:GetArrayRogueProperties() or {}
+
+	for propertyName, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
+		local rogueProperty = self:GetRogueProperty(rogueDefinition:GetName())
 		if not rogueProperty then
-			error(("Bad property %q"):format(tostring(propertyName)))
+			error(string.format("Bad property %q", tostring(rogueDefinition:GetName())))
 		end
 
-		rogueProperty:SetValue(value)
+		properties[propertyName] = rogueProperty
 	end
+
+	return properties
 end
 
 function RoguePropertyTable:GetValue()
-	local values = {}
+	local arrayHelper = rawget(self, "_arrayHelper")
+	local values = arrayHelper and arrayHelper:GetArrayValues() or {}
+
 	for key, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
 		local property = self:GetRogueProperty(rogueDefinition:GetName())
 		assert(property, "Failed to get rogue property")
@@ -80,7 +135,8 @@ function RoguePropertyTable:GetValue()
 end
 
 function RoguePropertyTable:GetBaseValue()
-	local values = {}
+	local arrayHelper = rawget(self, "_arrayHelper")
+	local values = arrayHelper and arrayHelper:GetArrayBaseValues() or {}
 
 	for key, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
 		local property = self:GetRogueProperty(rogueDefinition:GetName())
@@ -93,32 +149,40 @@ function RoguePropertyTable:GetBaseValue()
 end
 
 function RoguePropertyTable:Observe()
+	local arrayHelper = rawget(self, "_arrayHelper")
+	if arrayHelper then
+		warn("[RoguePropertyTable] - Observing arrays not supported yet! Changed event will only fire with dictionary components.")
+
+		return self:_observeDictionary()
+	end
+
+	return self:_observeDictionary()
+end
+
+function RoguePropertyTable:_observeDictionary()
 	-- ok, this is definitely slow
+
 	local toObserve = {}
 
 	for propertyName, rogueDefinition in pairs(self._definition:GetDefinitionMap()) do
 		local rogueProperty = self:GetRogueProperty(rogueDefinition:GetName())
 		if not rogueProperty then
-			error(("Bad property %q"):format(tostring(rogueDefinition:GetName())))
+			error(string.format("Bad property %q", tostring(rogueDefinition:GetName())))
 		end
 
-		toObserve[propertyName] = rogueProperty:Observe():Pipe({
-			Rx.distinct();
-		})
+		toObserve[propertyName] = rogueProperty:Observe()
 	end
 
-	return Rx.combineLatest(toObserve):Pipe({
-		Rx.throttleDefer();
-	})
-end
-
-function RoguePropertyTable:_setup()
-	for definitionName, _ in pairs(self._definition:GetDefinitionMap()) do
-		self:GetRogueProperty(definitionName)
+	if next(toObserve) == nil then
+		return Rx.of({})
 	end
+
+	return Rx.combineLatest(toObserve)
 end
 
 function RoguePropertyTable:GetRogueProperty(name)
+	assert(type(name) == "string", "Bad name")
+
 	-- Caching these things doesn't do a whole lot, but saves on table allocation.
 	if self._properties[name] then
 		return self._properties[name]
@@ -162,11 +226,24 @@ function RoguePropertyTable:__index(index)
 	elseif type(index) == "string" then
 		local property = self:GetRogueProperty(index)
 		if not property then
-			error(("Bad index %q"):format(tostring(index)))
+			error(string.format("Bad index %q", tostring(index)))
 		end
 		return property
+	elseif type(index) == "number" then
+		local arrayHelper = rawget(self, "_arrayHelper")
+		if arrayHelper then
+			local result = arrayHelper:GetArrayRogueProperty(index)
+
+			if result then
+				return result
+			else
+				error(string.format("Bad index %q", tostring(index)))
+			end
+		else
+			error(string.format("Bad index %q - We are not an array", tostring(index)))
+		end
 	else
-		error(("Bad index %q"):format(tostring(index)))
+		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 
