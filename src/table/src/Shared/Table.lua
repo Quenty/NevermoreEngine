@@ -152,11 +152,11 @@ Table.copy = table.clone
 	Deep copies a table including metatables
 
 	@param target table -- Table to deep copy
-	@param _context table? -- Cntext to deepCopy the value in
+	@param _context table? -- Context to deepCopy the value in
 	@return table -- Result
 ]=]
 function Table.deepCopy(target, _context)
-	_context = _context or  {}
+	_context = _context or {}
 	if _context[target] then
 		return _context[target]
 	end
