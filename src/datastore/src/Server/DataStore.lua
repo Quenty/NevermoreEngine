@@ -363,7 +363,7 @@ function DataStore:_doDataSync(writer, doMergeNewData)
 		end))
 	else
 		if self._debugWriting then
-			print(string.format("[DataStore] - DataStorePromises.updateAsync(%q)", self._key))
+			print(string.format("[DataStore] - DataStorePromises.updateAsync(%q) with doMergeNewData = %s", self._key, tostring(doMergeNewData)))
 		end
 
 		promise:Resolve(maid:GivePromise(DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(original, datastoreKeyInfo)

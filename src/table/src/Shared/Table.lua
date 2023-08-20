@@ -264,6 +264,42 @@ function Table.overwrite(target, source)
 end
 
 --[=[
+	Deep equivalent comparison of a table assuming keys are indexable in the same way.
+
+	@param target table -- Table to check
+	@param source table -- Other table to check
+	@return boolean
+]=]
+function Table.deepEquivalent(target, source)
+	if target == source then
+		return true
+	end
+
+	if type(target) ~= type(source) then
+		return false
+	end
+
+	if type(target) == "table" then
+		for key, value in pairs(target) do
+			if not Table.deepEquivalent(value, source[key]) then
+				return false
+			end
+		end
+
+		for key, value in pairs(source) do
+			if not Table.deepEquivalent(value, target[key]) then
+				return false
+			end
+		end
+
+		return true
+	else
+		-- target == source should do it.
+		return false
+	end
+end
+
+--[=[
 	Takes `count` entries from the table. If the table does not have
 	that many entries, will return up to the number the table has to
 	provide.

@@ -29,6 +29,8 @@ local Set = require("Set")
 local Table = require("Table")
 local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
 
+local SLOW_INTEGRITY_CHECK_ENABLED = true
+
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
 DataStoreStage.__index = DataStoreStage
@@ -373,7 +375,9 @@ end
 ]=]
 function DataStoreStage:MergeDiffSnapshot(diffSnapshot)
 	self:_checkIntegrity()
+
 	self._baseDataSnapshot = self:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(diffSnapshot)
+
 	self:_updateViewSnapshot()
 	self:_checkIntegrity()
 end
@@ -414,7 +418,8 @@ function DataStoreStage:MarkDataAsSaved(parentWriter)
 			end
 
 			for key, value in pairs(dataToSave) do
-				if self._saveDataSnapshot[key] == value then
+				local ourSnapshotValue = self._saveDataSnapshot[key]
+				if Table.deepEquivalent(ourSnapshotValue, value) or ourSnapshotValue == nil then
 					-- This shouldn't fire any event because our save data is matching
 					newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
 					newSaveSnapshot[key] = nil
@@ -704,6 +709,8 @@ function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(
 		end
 
 		return table.freeze(newBaseDataSnapshot)
+	elseif diffSnapshot == nil then
+		return self._baseDataSnapshot
 	else
 		return diffSnapshot
 	end
@@ -747,43 +754,21 @@ function DataStoreStage:_updateViewSnapshot()
 
 	local newViewSnapshot = self:_computeNewViewSnapshot()
 
-	-- This will only filter out a few items
-	if self._viewSnapshot == newViewSnapshot then
-		return
-	end
-
-	local previousView = self._viewSnapshot
-
-	-- Detect keys that changed
-	local changedKeys
-	if type(previousView) == "table" and type(newViewSnapshot) == "table" then
-		changedKeys = {}
-		local keys = Set.union(Set.fromKeys(previousView), Set.fromKeys(newViewSnapshot))
-		for key, _ in pairs(keys) do
-			if previousView[key] ~= newViewSnapshot[key] then
-				changedKeys[key] = true
-			end
-		end
-	elseif type(newViewSnapshot) == "table" then
-		-- Swap to table, all keys change
-		changedKeys = Set.fromKeys(newViewSnapshot)
-	elseif type(previousView) == "table" then
-		-- Swap from table, all keys change
-		changedKeys = Set.fromKeys(previousView)
-	else
-		changedKeys = {}
-	end
-
-	if next(changedKeys) ~= nil then
+	if not Table.deepEquivalent(self._viewSnapshot, newViewSnapshot) then
+		local previousViewSnapshot = self._viewSnapshot
 		self._viewSnapshot = newViewSnapshot
 
-		if type(newViewSnapshot) == "table" then
-			for key, value in pairs(changedKeys) do
-				self._keySubscriptions:Fire(key, newViewSnapshot[value])
-			end
-		else
-			for key, _ in pairs(changedKeys) do
-				self._keySubscriptions:Fire(key, nil)
+		-- Fire off changed keys
+		local changedKeys = self:_computeChangedKeys(previousViewSnapshot, newViewSnapshot)
+		if next(changedKeys) ~= nil then
+			if type(newViewSnapshot) == "table" then
+				for key, _ in pairs(changedKeys) do
+					self._keySubscriptions:Fire(key, newViewSnapshot[key])
+				end
+			else
+				for key, _ in pairs(changedKeys) do
+					self._keySubscriptions:Fire(key, nil)
+				end
 			end
 		end
 
@@ -791,6 +776,30 @@ function DataStoreStage:_updateViewSnapshot()
 	end
 
 	self:_checkIntegrity()
+end
+
+function DataStoreStage:_computeChangedKeys(previousViewSnapshot, newViewSnapshot)
+	-- Detect keys that changed
+	if type(previousViewSnapshot) == "table" and type(newViewSnapshot) == "table" then
+		local changedKeys = {}
+
+		local keys = Set.union(Set.fromKeys(previousViewSnapshot), Set.fromKeys(newViewSnapshot))
+		for key, _ in pairs(keys) do
+			if not Table.deepEquivalent(previousViewSnapshot[key], newViewSnapshot[key]) then
+				changedKeys[key] = true
+			end
+		end
+
+		return changedKeys
+	elseif type(newViewSnapshot) == "table" then
+		-- Swap to table, all keys change
+		return Set.fromKeys(newViewSnapshot)
+	elseif type(previousViewSnapshot) == "table" then
+		-- Swap from table, all keys change
+		return Set.fromKeys(previousViewSnapshot)
+	else
+		return {}
+	end
 end
 
 function DataStoreStage:_updateViewSnapshotAtKey(key)
@@ -856,6 +865,9 @@ function DataStoreStage:_computeNewViewSnapshot()
 
 		return table.freeze(newView)
 	else
+		assert(self._saveDataSnapshot ~= nil, "Bad _saveDataSnapshot")
+		assert(type(self._saveDataSnapshot) ~= "table", "Bad self._saveDataSnapshot")
+
 		-- If save data isn't nil or a table then we are to return the save table
 		return self._saveDataSnapshot
 	end
@@ -942,6 +954,10 @@ function DataStoreStage:_storeAtKey(key, value)
 end
 
 function DataStoreStage:_checkIntegrity()
+	if not SLOW_INTEGRITY_CHECK_ENABLED then
+		return
+	end
+
 	assert(self._baseDataSnapshot ~= DataStoreDeleteToken, "BaseDataSnapshot should not be DataStoreDeleteToken")
 	assert(self._viewSnapshot ~= DataStoreDeleteToken, "ViewSnapshot should not be DataStoreDeleteToken")
 
