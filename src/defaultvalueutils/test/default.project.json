@@ -1,0 +1,11 @@
+{
+  "name": "DefaultValueUtilsTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "defaultvalueutils": {
+        "$path": ".."
+      }
+    }
+  }
+}
