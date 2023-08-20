@@ -3,8 +3,6 @@
 	@class DefaultValueUtils
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
 local DefaultValueUtils = {}
 
 -- selene: allow(incorrect_standard_library_use)
