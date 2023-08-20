@@ -22,7 +22,7 @@ function RxSignal.new(observable)
 	local self = setmetatable({}, RxSignal)
 
 	self._observable = observable:Pipe({
-		Rx.onlyAfterDefer();
+		Rx.skip(1);
 	})
 
 	return self
