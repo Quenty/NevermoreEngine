@@ -1551,7 +1551,7 @@ function Rx.skip(toSkip)
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(function(...)
-				if skipped <= toSkip then
+				if skipped < toSkip then
 					skipped = skipped + 1
 					return
 				end
