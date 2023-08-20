@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Promise = require("Promise")
 local UserServiceUtils = require("UserServiceUtils")
+local Rx = require("Rx")
 
 local UserInfoAggregator = setmetatable({}, BaseObject)
 UserInfoAggregator.ClassName = "UserInfoAggregator"
@@ -61,6 +62,18 @@ function UserInfoAggregator:PromiseDisplayName(userId)
 		:Then(function(userInfo)
 			return userInfo.DisplayName
 		end)
+end
+
+--[=[
+	Observes the user display name for the userId
+
+	@param userId number
+	@return Observable<string>
+]=]
+function UserInfoAggregator:ObserveDisplayName(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return Rx.fromPromise(self:PromiseUserInfo(userId))
 end
 
 function UserInfoAggregator:_sendAggregatedPromises()
