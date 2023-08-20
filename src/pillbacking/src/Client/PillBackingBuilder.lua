@@ -3,10 +3,6 @@
 	@class PillBackingBuilder
 ]=]
 
-local require = require(script.Parent.loader).load(script)
-
-local Table = require("Table")
-
 local PillBackingBuilder = {}
 PillBackingBuilder.__index = PillBackingBuilder
 PillBackingBuilder.ClassName = "PillBackingBuilder"
@@ -342,7 +338,7 @@ end
 function PillBackingBuilder:_configureOptions(gui, options)
 	assert(gui, "Must pass in GUI")
 
-	options = Table.copy(options or self._options)
+	options = table.clone(options or self._options)
 	options.ZIndex = options.ZIndex or gui.ZIndex
 	options.ShadowZIndex = options.ShadowZIndex or options.ZIndex - 1
 	options.BackgroundColor3 = options.BackgroundColor3 or gui.BackgroundColor3
