@@ -16,7 +16,6 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Symbol = require("Symbol")
-local Table = require("Table")
 local ThrottledFunction = require("ThrottledFunction")
 local cancellableDelay = require("cancellableDelay")
 local CancelToken = require("CancelToken")
@@ -1421,7 +1420,7 @@ function Rx.combineLatest(observables)
 				end
 			end
 
-			sub:Fire(Table.copy(latest))
+			sub:Fire(table.clone(latest))
 		end
 
 		for key, observer in pairs(observables) do
