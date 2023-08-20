@@ -33,6 +33,7 @@
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/rbxasset": "file:../rbxasset",
     "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
