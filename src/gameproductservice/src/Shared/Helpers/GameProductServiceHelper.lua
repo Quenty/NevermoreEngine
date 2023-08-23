@@ -1,4 +1,6 @@
 --[=[
+	Helper that is used for each game product service. See [GameProductService].
+
 	@class GameProductServiceHelper
 ]=]
 
@@ -11,11 +13,17 @@ local RxBrioUtils = require("RxBrioUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local RxStateStackUtils = require("RxStateStackUtils")
 local Promise = require("Promise")
+local Rx = require("Rx")
 
 local GameProductServiceHelper = setmetatable({}, BaseObject)
 GameProductServiceHelper.ClassName = "GameProductServiceHelper"
 GameProductServiceHelper.__index = GameProductServiceHelper
 
+--[=[
+	Helper to observe state for the game product service
+
+	@param playerProductManagerBinder Binder<PlayerProductManager>
+]=]
 function GameProductServiceHelper.new(playerProductManagerBinder)
 	local self = setmetatable(BaseObject.new(), GameProductServiceHelper)
 
@@ -104,6 +112,11 @@ function GameProductServiceHelper:PromiseIsOwnable(player, assetType)
 		end)
 end
 
+--[=[
+	Promises the player prompt as opened
+
+	@return Promise<boolean>
+]=]
 function GameProductServiceHelper:PromisePlayerIsPromptOpen(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
@@ -133,6 +146,66 @@ function GameProductServiceHelper:ObservePlayerOwnership(player, assetType, idOr
 			return ownershipTracker:ObserveOwnsAsset(idOrKey)
 		end);
 		RxStateStackUtils.topOfStack(false);
+	})
+end
+
+--[=[
+	Fires when the specified player purchases an asset
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Observable<>
+]=]
+function GameProductServiceHelper:ObservePlayerAssetPurchased(player, assetType, idOrKey)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self:_observePlayerProductManagerBrio(player):Pipe({
+		RxBrioUtils.switchMapBrio(function(playerProductManager)
+			local marketeer = playerProductManager:GetMarketeer()
+			local ownershipTracker = marketeer:GetOwnershipTrackerOrError(assetType)
+			return ownershipTracker:ObserveAssetPurchased(idOrKey)
+		end);
+		Rx.map(function(_brio)
+			return true
+		end)
+	})
+end
+
+--[=[
+	Fires when any player purchases an asset
+
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Observable<Player>
+]=]
+function GameProductServiceHelper:ObserveAssetPurchased(assetType, idOrKey)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._playerProductManagerBinder:ObserveAllBrio():Pipe({
+		RxBrioUtils.flatMapBrio(function(playerProductManager)
+			local marketeer = playerProductManager:GetMarketeer()
+			local assetTracker = marketeer:GetAssetTrackerOrError(assetType)
+			return assetTracker:ObserveAssetPurchased(idOrKey):Pipe({
+				Rx.map(function()
+					return playerProductManager:GetPlayer()
+				end);
+			})
+		end);
+		Rx.map(function(brio)
+			-- I THINK THIS LEAKS
+			if brio:IsDead() then
+				return nil
+			end
+
+			return brio:GetValue()
+		end);
+		Rx.where(function(value)
+			return value ~= nil
+		end);
 	})
 end
 

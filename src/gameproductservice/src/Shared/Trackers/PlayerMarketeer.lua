@@ -87,6 +87,11 @@ function PlayerMarketeer:IsOwnable(assetType)
 	return self._ownershipTrackers[assetType] ~= nil
 end
 
+--[=[
+	Returns true if any prompt is open
+
+	@return boolean
+]=]
 function PlayerMarketeer:IsPromptOpen()
 	for _, assetTracker in pairs(self._assetMarketTrackers) do
 		if assetTracker:IsPromptOpen() then
@@ -99,6 +104,7 @@ end
 
 --[=[
 	Gets the current asset tracker
+
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
@@ -114,6 +120,7 @@ end
 
 --[=[
 	Gets the current asset tracker
+
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
@@ -151,6 +158,10 @@ function PlayerMarketeer:_addAssetTracker(assetType)
 		assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 		return self._configPicker:ToAssetId(assetType, idOrKey)
+	end, function(idOrKey)
+		assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+		return self._configPicker:ObserveToAssetIdBrio(assetType, idOrKey)
 	end)
 	self._maid:GiveTask(assetMarketTracker)
 

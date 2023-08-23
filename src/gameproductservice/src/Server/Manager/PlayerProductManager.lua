@@ -7,12 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GameConfigService = require("GameConfigService")
 local BaseObject = require("BaseObject")
-local PlayerProductManagerConstants = require("PlayerProductManagerConstants")
-local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
-local PlayerMarketeer = require("PlayerMarketeer")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigService = require("GameConfigService")
+local PlayerMarketeer = require("PlayerMarketeer")
+local Remoting = require("Remoting")
 
 local PlayerProductManager = setmetatable({}, BaseObject)
 PlayerProductManager.ClassName = "PlayerProductManager"
@@ -37,14 +37,12 @@ function PlayerProductManager.new(player, serviceBag)
 	-- Expect configuration on receipt processing
 	self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT):SetReceiptProcessingExpected(true)
 
-	self._remoteEvent = Instance.new("RemoteEvent")
-	self._remoteEvent.Name = PlayerProductManagerConstants.REMOTE_EVENT_NAME
-	self._remoteEvent.Archivable = false
-	self._remoteEvent.Parent = self._obj
-	self._maid:GiveTask(self._remoteEvent)
+	self._remoting = Remoting.new(self._obj, "PlayerProductManager")
+	self._remoting:DeclareEvent("NotifyReceiptProcessed")
+	self._maid:GiveTask(self._remoting)
 
-	self._maid:GiveTask(self._remoteEvent.OnServerEvent:Connect(function(...)
-		self:_handleServerEvent(...)
+	self._maid:GiveTask(self._remoting.NotifyPromptFinished:Connect(function(...)
+		self:_handlePromptFinished(...)
 	end))
 
 	-- Initialize attributes
@@ -63,18 +61,6 @@ end
 ]=]
 function PlayerProductManager:GetPlayer()
 	return self._obj
-end
-
-function PlayerProductManager:_handleServerEvent(player, request, ...)
-	assert(self._obj == player, "Bad player")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(type(request) == "string", "Bad request")
-
-	if request == PlayerProductManagerConstants.NOTIFY_PROMPT_FINISHED then
-		self:_handlePromptFinished(player, ...)
-	else
-		error(("Bad request %q"):format(PlayerProductManager))
-	end
 end
 
 function PlayerProductManager:_handlePromptFinished(player, assetType, assetId, isPurchased)
@@ -96,8 +82,13 @@ end
 ]=]
 function PlayerProductManager:HandleProcessReceipt(player, receiptInfo)
 	assert(self._obj == player, "Bad player")
+	assert(type(receiptInfo) == "table", "Bad receiptInfo")
 
 	local assetTracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
+
+	-- Notify the player
+	self._remoting.NotifyReceiptProcessed:FireClient(self._obj, receiptInfo)
+
 	return assetTracker:HandleProcessReceipt(player, receiptInfo)
 end
 
