@@ -1,0 +1,33 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBXF9AE7DD2C8164667BDC8CDB19C1D4E7F">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<string name="Name">TagList</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags">VGFnRWRpdG9yVGFnQ29udGFpbmVy</BinaryString>
+		</Properties>
+		<Item class="Configuration" referent="RBXE4BC7C911EE941E8844A6F61840E1BAB">
+			<Properties>
+				<BinaryString name="AttributesSerialize"><![CDATA[BgAAAAsAAABBbHdheXNPblRvcAMABQAAAENvbG9yD73Kuj32/iw+np0dPwgAAABEcmF3VHlw
+ZQIDAAAAQm94BQAAAEdyb3VwAgwAAABDaGF0UHJvdmlkZXIEAAAASWNvbgIUAAAAZW1vamk6
+c3BlZWNoLWJhbGxvb24HAAAAVmlzaWJsZQMB]]></BinaryString>
+				<string name="Name">HasChatTags</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="Configuration" referent="RBXBB7051BF179249AD850A6AB78678D7C8">
+			<Properties>
+				<BinaryString name="AttributesSerialize"><![CDATA[BgAAAAsAAABBbHdheXNPblRvcAMABQAAAENvbG9yD+uNRT9ypVg/rx2ZPggAAABEcmF3VHlw
+ZQIDAAAAQm94BQAAAEdyb3VwAgwAAABDaGF0UHJvdmlkZXIEAAAASWNvbgIUAAAAZW1vamk6
+c3BlZWNoLWJhbGxvb24HAAAAVmlzaWJsZQMB]]></BinaryString>
+				<string name="Name">ChatTag</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>

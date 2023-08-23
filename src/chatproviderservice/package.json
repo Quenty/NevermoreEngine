@@ -25,9 +25,28 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/binder": "file:../binder",
+    "@quenty/brio": "file:../brio",
+    "@quenty/clienttranslator": "file:../clienttranslator",
+    "@quenty/cmdrservice": "file:../cmdrservice",
+    "@quenty/color3utils": "file:../color3utils",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
+    "@quenty/localizedtextutils": "file:../localizedtextutils",
     "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise"
+    "@quenty/permissionprovider": "file:../permissionprovider",
+    "@quenty/playerbinder": "file:../playerbinder",
+    "@quenty/playerutils": "file:../playerutils",
+    "@quenty/promise": "file:../promise",
+    "@quenty/richtext": "file:../richtext",
+    "@quenty/rx": "file:../rx",
+    "@quenty/rxbinderutils": "file:../rxbinderutils",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/string": "file:../string",
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"
