@@ -64,10 +64,7 @@ end
 	@return { T }
 ]=]
 function RandomUtils.shuffledCopy(list, random)
-	local copy = {}
-	for i=1, #list do
-		copy[i] = list[i]
-	end
+	local copy = table.clone(list)
 
 	RandomUtils.shuffle(copy, random)
 
