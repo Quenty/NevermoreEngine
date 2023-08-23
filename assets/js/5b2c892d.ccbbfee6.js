@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[53003],{84775:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"WellKnownAssetOwnershipHandler","desc":"","source":{"line":4,"path":"src/gameproductservice/src/Shared/Ownership/WellKnownAssetOwnershipHandler.lua"}}')}}]);
