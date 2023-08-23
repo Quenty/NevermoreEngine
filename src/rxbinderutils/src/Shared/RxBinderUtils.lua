@@ -40,7 +40,7 @@ function RxBinderUtils.observeLinkedBoundClassBrio(linkName, parent, binder)
 	return RxLinkUtils.observeValidLinksBrio(linkName, parent)
 		:Pipe({
 			RxBrioUtils.flatMapBrio(function(_, linkValue)
-				return RxBinderUtils.observeBoundClassBrio(binder, linkValue)
+				return binder:ObserveBrio(linkValue)
 			end);
 		});
 end
@@ -52,17 +52,28 @@ end
 	@param instance Instance
 	@return Observable<Brio<T>>
 ]=]
-function RxBinderUtils.observeBoundChildClassBrio(binder, instance)
+function RxBinderUtils.observeChildrenBrio(binder, instance)
 	assert(Binder.isBinder(binder), "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	return RxInstanceUtils.observeChildrenBrio(instance)
 		:Pipe({
 			RxBrioUtils.flatMapBrio(function(child)
-				return RxBinderUtils.observeBoundClassBrio(binder, child)
+				return binder:ObserveBrio(child)
 			end);
 		})
 end
+
+
+--[=[
+	Observes bound children classes.
+
+	@param binder Binder<T>
+	@param instance Instance
+	@return Observable<Brio<T>>
+]=]
+RxBinderUtils.observeBoundChildClassBrio = RxBinderUtils.observeChildrenBrio
+
 
 --[=[
 	Observes ainstance's parent class that is bound.
