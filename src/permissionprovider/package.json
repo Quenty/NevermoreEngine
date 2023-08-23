@@ -26,11 +26,14 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
     "@quenty/grouputils": "file:../grouputils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/playerutils": "file:../playerutils",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
+    "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
     "@quenty/table": "file:../table"
   },

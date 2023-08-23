@@ -26,10 +26,15 @@ local require = require(script.Parent.loader).load(script)
 
 local CreatorPermissionProvider = require("CreatorPermissionProvider")
 local GroupPermissionProvider = require("GroupPermissionProvider")
+local Maid = require("Maid")
+local PermissionLevel = require("PermissionLevel")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local Promise = require("Promise")
-local Maid = require("Maid")
+local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxPlayerUtils = require("RxPlayerUtils")
+local PermissionLevelUtils = require("PermissionLevelUtils")
 
 local PermissionService = {}
 PermissionService.ServiceName = "PermissionService"
@@ -100,10 +105,7 @@ end
 function PermissionService:PromiseIsAdmin(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 
-	return self:PromisePermissionProvider()
-		:Then(function(permissionProvider)
-			return permissionProvider:PromiseIsAdmin(player)
-		end)
+	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
 end
 
 --[=[
@@ -114,10 +116,48 @@ end
 function PermissionService:PromiseIsCreator(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
 
+	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
+end
+
+--[=[
+	Returns whether the player is a creator.
+	@param player Player
+	@param permissionLevel PermissionLevel
+	@return Promise<boolean>
+]=]
+function PermissionService:PromiseIsPermissionLevel(player, permissionLevel)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
+	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+
 	return self:PromisePermissionProvider()
 		:Then(function(permissionProvider)
-			return permissionProvider:PromiseIsCreator(player)
+			return permissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
 		end)
+end
+
+--[=[
+	Observe all creators in the game
+
+	@param permissionLevel PermissionLevel
+	@return Observable<Brio<Player>>
+]=]
+function PermissionService:ObservePermissionedPlayersBrio(permissionLevel)
+	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+
+	return RxPlayerUtils.observePlayersBrio():Pipe({
+		RxBrioUtils.flatMapBrio(function(player)
+			return Rx.fromPromise(self:PromiseIsPermissionLevel(player, permissionLevel))
+				:Pipe({
+					Rx.switchMap(function(hasPermission)
+						if hasPermission then
+							return Rx.of(player)
+						else
+							return Rx.EMPTY
+						end
+					end)
+				})
+		end);
+	})
 end
 
 function PermissionService:Destroy()

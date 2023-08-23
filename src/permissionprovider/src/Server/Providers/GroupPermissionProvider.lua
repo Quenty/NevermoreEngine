@@ -9,10 +9,12 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
-local PermissionProviderConstants = require("PermissionProviderConstants")
-local Promise = require("Promise")
 local BasePermissionProvider = require("BasePermissionProvider")
 local GroupUtils = require("GroupUtils")
+local PermissionLevel = require("PermissionLevel")
+local PermissionLevelUtils = require("PermissionLevelUtils")
+local PermissionProviderConstants = require("PermissionProviderConstants")
+local Promise = require("Promise")
 
 local GroupPermissionProvider = setmetatable({}, BasePermissionProvider)
 GroupPermissionProvider.__index = GroupPermissionProvider
@@ -72,7 +74,20 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GroupPermissionProvider:PromiseIsCreator(player)
+function GroupPermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+
+	if permissionLevel == PermissionLevel.ADMIN then
+		return self:_promiseIsAdmin(player)
+	elseif permissionLevel == PermissionLevel.CREATOR then
+		return self:_promiseIsCreator(player)
+	else
+		error("Unknown permissionLevel")
+	end
+end
+
+function GroupPermissionProvider:_promiseIsCreator(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(player:IsDescendantOf(game), "Bad player")
 
@@ -86,12 +101,7 @@ function GroupPermissionProvider:PromiseIsCreator(player)
 		end)
 end
 
---[=[
-	Returns whether the player is an admin.
-	@param player Player
-	@return Promise<boolean>
-]=]
-function GroupPermissionProvider:PromiseIsAdmin(player)
+function GroupPermissionProvider:_promiseIsAdmin(player)
 	assert(player:IsDescendantOf(game))
 
 	-- really not saving much time.
