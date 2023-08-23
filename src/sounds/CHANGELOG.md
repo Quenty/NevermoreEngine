@@ -1,3 +1,27 @@
+# v6.10.0 (Wed Aug 23 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
+
+#### 🚀 Enhancement
+
+- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
+- feat: Sound plays using :Play() always since PlayLocalSound no longer works in Hoarcekat ([@Quenty](https://github.com/Quenty))
+- feat: Sounds can play back tables ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Add missing dependencies ([@Quenty](https://github.com/Quenty))
+- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Max Bacon ([@max-bacon](https://github.com/max-bacon))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,22 @@
+# v3.3.0 (Wed Aug 23 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
+- feat: Add Set.fromKeys(tab) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Changed events weren't firing for the datastore stage ([@Quenty](https://github.com/Quenty))
+- style: Fix context spelling in Table library ([@Quenty](https://github.com/Quenty))
+- style: Fix style issues ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

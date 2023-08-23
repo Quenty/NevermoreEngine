@@ -1,3 +1,30 @@
+# v4.29.0 (Wed Aug 23 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
+
+#### 🚀 Enhancement
+
+- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
+- feat: Add array support to RogueProperty package ([@Quenty](https://github.com/Quenty))
+- feat: Add :SetCanInitialize(canInitialize) to rogue-property system ([@Quenty](https://github.com/Quenty))
+- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
+- feat: RogueProperties allow for nested property tables ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
+- refactor: Move code to implementation folder ([@Quenty](https://github.com/Quenty))
+- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Max Bacon ([@max-bacon](https://github.com/max-bacon))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

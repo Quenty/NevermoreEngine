@@ -1,3 +1,31 @@
+# v7.15.0 (Wed Aug 23 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
+
+#### 🚀 Enhancement
+
+- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
+- feat: Add Rx.delayed(seconds) ([@Quenty](https://github.com/Quenty))
+- feat: ObservableMap uses subscription table ([@Quenty](https://github.com/Quenty))
+- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Skip would skip one too many ([@Quenty](https://github.com/Quenty))
+- fix: Use table.clone in Rx ([@Quenty](https://github.com/Quenty))
+- fix: Rx Observables provide better errors ([@Quenty](https://github.com/Quenty))
+- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
+- fix: Remove duplicate Rx.scan API ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Max Bacon ([@max-bacon](https://github.com/max-bacon))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

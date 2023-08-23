@@ -1,3 +1,28 @@
+# (Wed Aug 23 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.3.0`, `@quenty/animations@1.3.0`, `@quenty/binder@8.25.0`, `@quenty/blend@6.27.0`, `@quenty/brio@8.17.0`, `@quenty/characterutils@6.13.0`, `@quenty/chatproviderservice@3.9.0`, `@quenty/color3utils@5.28.0`, `@quenty/colorpalette@4.32.0`, `@quenty/datastore@7.24.0`, `@quenty/defaultvalueutils@1.1.0`, `@quenty/draw@4.3.0`, `@quenty/gameconfig@5.37.0`, `@quenty/gameproductservice@7.15.0`, `@quenty/influxdbclient@1.16.0`, `@quenty/loader@6.3.0`, `@quenty/maid@2.6.0`, `@quenty/math@2.5.0`, `@quenty/nocollisionconstraintutils@6.3.0`, `@quenty/observablecollection@5.24.0`, `@quenty/permissionprovider@8.19.0`, `@quenty/pillbacking@6.4.0`, `@quenty/playerhumanoidbinder@8.25.0`, `@quenty/promise@6.8.0`, `@quenty/randomutils@2.3.0`, `@quenty/raycaster@3.2.0`, `@quenty/rbxthumb@1.4.0`, `@quenty/rigbuilderutils@6.13.0`, `@quenty/rodux-actions@5.4.0`, `@quenty/rogue-humanoid@3.32.0`, `@quenty/rogue-properties@4.29.0`, `@quenty/rx@7.15.0`, `@quenty/rxbinderutils@8.26.0`, `@quenty/rxsignal@1.4.0`, `@quenty/soundplayer@1.1.0`, `@quenty/sounds@6.10.0`, `@quenty/table@3.3.0`, `@quenty/time@2.2.0`, `@quenty/timedtween@1.1.0`, `@quenty/transitionmodel@1.18.0`, `@quenty/userserviceutils@3.10.0`, `@quenty/nevermore-cli@1.9.0`
+  - users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
+- `@quenty/adorneevalue@4.27.0`, `@quenty/animations@1.3.0`, `@quenty/badgeutils@6.8.0`, `@quenty/camera@9.21.0`, `@quenty/colorpalette@4.32.0`, `@quenty/colorpicker@4.29.0`, `@quenty/draw@4.3.0`, `@quenty/ducktype@1.1.0`, `@quenty/nocollisionconstraintutils@6.3.0`, `@quenty/observablecollection@5.24.0`, `@quenty/remoting@6.10.0`, `@quenty/rogue-humanoid@3.32.0`, `@quenty/rogue-properties@4.29.0`, `@quenty/rx@7.15.0`, `@quenty/screenshothudservice@1.18.0`, `@quenty/valuebaseutils@7.20.0`, `@quenty/nevermore-cli@1.9.0`
+  - users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@7.24.0`
+  - Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Max Bacon ([@max-bacon](https://github.com/max-bacon))
+
+---
+
 # (Tue Aug 01 2023)
 
 #### 🚀 Enhancement

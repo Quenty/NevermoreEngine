@@ -1,3 +1,29 @@
+# v6.3.0 (Wed Aug 23 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
+
+#### 🚀 Enhancement
+
+- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
+- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix additional parent assert ([@Quenty](https://github.com/Quenty))
+- fix: Fix parenting in NoCollisionConstraintUtils ([@Quenty](https://github.com/Quenty))
+- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
+- docs: Fix documentation annotations on a variety of files ([@Quenty](https://github.com/Quenty))
+- fix: NoCollisionConstraintUtils.tempNoCollision(parts0, parts1) actually parents the collision constraint ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Max Bacon ([@max-bacon](https://github.com/max-bacon))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,34 @@
+# v7.24.0 (Wed Aug 23 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
+
+#### 🚀 Enhancement
+
+- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
+- feat: DataStores appear to be working, but require more testing ([@Quenty](https://github.com/Quenty))
+- feat: Semi-broken datastore changes ([@Quenty](https://github.com/Quenty))
+- feat: More untested datastore syncing code ([@Quenty](https://github.com/Quenty))
+- feat: Unfinished datastore changes ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Changed events weren't firing for the datastore stage ([@Quenty](https://github.com/Quenty))
+- style: Fix style issues ([@Quenty](https://github.com/Quenty))
+- fix: More data store improvements ([@Quenty](https://github.com/Quenty))
+- fix: Fix additional components but data store writing ping-pings back and forth ([@Quenty](https://github.com/Quenty))
+- refactor: Start with syncing refactor but no merging yet ([@Quenty](https://github.com/Quenty))
+- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
+- Fix DataStore.lua documentation type ([@max-bacon](https://github.com/max-bacon))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Max Bacon ([@max-bacon](https://github.com/max-bacon))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
