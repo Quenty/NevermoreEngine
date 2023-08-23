@@ -12,11 +12,18 @@ local RxBrioUtils = require("RxBrioUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local Promise = require("Promise")
 local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local Rx = require("Rx")
 
 local GameConfigPicker = setmetatable({}, BaseObject)
 GameConfigPicker.ClassName = "GameConfigPicker"
 GameConfigPicker.__index = GameConfigPicker
 
+--[=[
+	Constructs a new game config picker. Should be gotten by [GameConfigService].
+
+	@param gameConfigBinder Binder<GameConfig>
+	@param gameConfigAssetBinder Binder<GameConfigAsset>
+]=]
 function GameConfigPicker.new(gameConfigBinder, gameConfigAssetBinder)
 	local self = setmetatable(BaseObject.new(), GameConfigPicker)
 
@@ -282,5 +289,30 @@ function GameConfigPicker:ToAssetId(assetType, assetIdOrKey)
 
 	return assetIdOrKey
 end
+
+--[=[
+	Observes a converted asset type and key to an id
+
+	@param assetType GameConfigAssetType
+	@param assetIdOrKey number | string
+	@return Observable<Brio<number>>
+]=]
+function GameConfigPicker:ObserveToAssetIdBrio(assetType, assetIdOrKey)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(assetIdOrKey) == "number" or type(assetIdOrKey) == "string", "Bad assetIdOrKey")
+
+	if type(assetIdOrKey) == "string" then
+		return self:ObserveActiveAssetOfAssetTypeAndKeyBrio(assetType, assetIdOrKey):Pipe({
+			RxBrioUtils.switchMapBrio(function(asset)
+				return asset:ObserveAssetId()
+			end);
+		})
+	elseif type(assetIdOrKey) == "number" then
+		return RxBrioUtils.of(assetIdOrKey)
+	else
+		error("Bad idOrKey")
+	end
+end
+
 
 return GameConfigPicker
