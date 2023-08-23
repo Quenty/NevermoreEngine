@@ -93,7 +93,6 @@ end
 --[=[
 	Fires when the specified player purchases an asset
 
-	@param player Player
 	@param assetType GameConfigAssetType
 	@param idOrKey string | number
 	@return Observable<>

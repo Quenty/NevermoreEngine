@@ -68,9 +68,11 @@ end
 --[=[
 	Observes bound children classes.
 
+	@function observeBoundChildClassBrio
 	@param binder Binder<T>
 	@param instance Instance
 	@return Observable<Brio<T>>
+	@within RxBinderUtils
 ]=]
 RxBinderUtils.observeBoundChildClassBrio = RxBinderUtils.observeChildrenBrio
 

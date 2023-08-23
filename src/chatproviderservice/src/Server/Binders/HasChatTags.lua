@@ -44,7 +44,9 @@ function HasChatTags:GetChatTagBinder()
 end
 
 --[=[
-	Removes all chat tags from the player
+	Adds chat tags to the player
+
+	@param chatTagData ChatTagData
 ]=]
 function HasChatTags:AddChatTag(chatTagData)
 	assert(ChatTagDataUtils.isChatTagData(chatTagData), "Bad chatTagData")

@@ -55,7 +55,7 @@ local propertyDefinition = RoguePropertyTableDefinition.new("CombatStats", {
 
 local properties = propertyDefinition:GetPropertyTable(serviceBag, workspace)
 local ultAttackDamage = propertyDefinition.Ultimate.AttackDamage:Get(serviceBag, workspace)
-local ultAbilityPower = propertyDefinition.Ultimate.AbilityPower:Get(serviceBag, workspace)
+-- local ultAbilityPower = propertyDefinition.Ultimate.AbilityPower:Get(serviceBag, workspace)
 
 -- ultAttackDamage:Observe():Subscribe(function(value)
 -- 	print("--> Attack damage", value)
@@ -120,4 +120,4 @@ local multiplier = ultAttackDamage:CreateMultiplier(2, workspace)
 -- 	print(value:GetValue())
 -- end)
 
--- multiplier:Destroy()
+multiplier:Destroy()

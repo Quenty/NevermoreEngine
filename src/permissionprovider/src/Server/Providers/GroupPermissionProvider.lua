@@ -70,8 +70,10 @@ function GroupPermissionProvider:Start()
 end
 
 --[=[
-	Returns whether the player is a creator.
+	Returns whether the player is at a specific permission level
+
 	@param player Player
+	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
 function GroupPermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)

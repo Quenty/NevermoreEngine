@@ -33,8 +33,10 @@ function CreatorPermissionProvider.new(config)
 end
 
 --[=[
-	Returns whether the player is a creator.
+	Returns whether the player is at a specific permission level.
+
 	@param player Player
+	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
 function CreatorPermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)

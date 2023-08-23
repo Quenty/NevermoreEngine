@@ -142,7 +142,7 @@ end
 	Draw.raycast(origin, direction)
 	```
 
-	@param start Vector3
+	@param origin Vector3
 	@param direction Vector3
 	@param color Color3 -- Optional
 	@param parent Instance? -- Optional

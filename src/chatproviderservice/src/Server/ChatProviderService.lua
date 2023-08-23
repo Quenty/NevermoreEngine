@@ -145,11 +145,9 @@ function ChatProviderService:PromiseAddChatTag(player, chatTagData)
 end
 
 --[=[
-	Clears the player's chat chatTagData
+	Clears the player's chat chatTagData.
 
 	@param player Player
-	@param chatTagData ChatTagData
-	@return Promise<Instance>
 ]=]
 function ChatProviderService:ClearChatTags(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")

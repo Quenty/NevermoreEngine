@@ -12,7 +12,6 @@ local RxBrioUtils = require("RxBrioUtils")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local Promise = require("Promise")
 local GameConfigAssetUtils = require("GameConfigAssetUtils")
-local Rx = require("Rx")
 
 local GameConfigPicker = setmetatable({}, BaseObject)
 GameConfigPicker.ClassName = "GameConfigPicker"

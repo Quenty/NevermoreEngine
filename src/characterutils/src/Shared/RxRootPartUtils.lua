@@ -22,7 +22,7 @@ end
 --[=[
 	Observes the last humanoid root part of a character
 
-	@param character Model
+	@param humanoid Humanoid
 	@return Brio<BasePart>
 ]=]
 function RxRootPartUtils.observeHumanoidRootPartBrioFromHumanoid(humanoid)
