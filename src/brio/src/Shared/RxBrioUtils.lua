@@ -32,6 +32,18 @@ function RxBrioUtils.toBrio()
 end
 
 --[=[
+	Same as [Rx.of] but wraps it in a Brio.
+
+	@param ... T
+	@return Observable<Brio<T>>
+]=]
+function RxBrioUtils.of(...)
+	return Rx.of(...):Pipe({
+		RxBrioUtils.toBrio()
+	})
+end
+
+--[=[
 	Completes the observable on death
 
 	@param brio Brio
