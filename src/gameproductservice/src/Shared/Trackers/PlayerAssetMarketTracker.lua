@@ -137,6 +137,9 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 		self._promptsOpen.Value = self._promptsOpen.Value + 1
 
 		promise:Finally(function()
+			if self._pendingPromises[id] == promise then
+				self._pendingPromises[id] = nil
+			end
 			self._promptsOpen.Value = self._promptsOpen.Value - 1
 		end)
 
@@ -212,10 +215,6 @@ function PlayerAssetMarketTracker:_handlePurchaseEvent(id, isPurchased, isFromRe
 		if isPurchased and not isFromReceipt then
 			promise = nil
 		end
-	end
-
-	if promise then
-		self._pendingPromises[id] = nil
 	end
 
 	if isPurchased then
