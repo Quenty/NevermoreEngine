@@ -1,29 +1,18 @@
-# v1.18.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add TimedTransitionModel.new() ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@1.17.0...@quenty/transitionmodel@1.18.0) (2023-08-23)
+
+
+### Features
+
+* Add TimedTransitionModel.new() ([4d582f0](https://github.com/Quenty/NevermoreEngine/commit/4d582f0b290fca4cf3ef9b65ca4d526f0d8061ab))
+
+
+
+
 
 # [1.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@1.16.0...@quenty/transitionmodel@1.17.0) (2023-08-01)
 

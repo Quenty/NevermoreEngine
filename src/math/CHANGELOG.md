@@ -1,20 +1,18 @@
-# v2.5.0 (Wed Aug 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add jitter randomValue to control randomness computation ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.4.0...@quenty/math@2.5.0) (2023-08-23)
+
+
+### Features
+
+* Add jitter randomValue to control randomness computation ([66c75d0](https://github.com/Quenty/NevermoreEngine/commit/66c75d0b1f19e2ce0b8c380242b1e9525ad91609))
+
+
+
+
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.3.0...@quenty/math@2.4.0) (2023-06-05)
 

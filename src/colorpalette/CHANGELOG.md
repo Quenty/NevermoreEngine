@@ -1,33 +1,25 @@
-# v4.32.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add ColorGradeUtils.addGradeToColor(color, difference, vividness) ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Vividness pass-though as messy ([@Quenty](https://github.com/Quenty))
-- fix: Use table.clone instead of Table.copy ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- fix: Remove dead code ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.31.0...@quenty/colorpalette@4.32.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Remove dead code ([b8719a7](https://github.com/Quenty/NevermoreEngine/commit/b8719a7abe0b7a34bc869064a5a1595499801598))
+* Use table.clone instead of Table.copy ([44468bd](https://github.com/Quenty/NevermoreEngine/commit/44468bda58a95b5a17c5998807231124d2a55187))
+* Vividness pass-though as messy ([9335e8d](https://github.com/Quenty/NevermoreEngine/commit/9335e8d2809de7c8768982addf03d6b64b60ea6a))
+
+
+### Features
+
+* Add ColorGradeUtils.addGradeToColor(color, difference, vividness) ([715abf8](https://github.com/Quenty/NevermoreEngine/commit/715abf8b497fb1c087e29266eb7c88ed538a2870))
+
+
+
+
 
 # [4.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.30.0...@quenty/colorpalette@4.31.0) (2023-08-01)
 

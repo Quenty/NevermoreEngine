@@ -1,24 +1,18 @@
-# v6.3.0 (Wed Aug 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add Maid:Add() which returns the task you pass into the maid ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix style issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.2.1...@quenty/loader@6.3.0) (2023-08-23)
+
+
+### Features
+
+* Add Maid:Add() which returns the task you pass into the maid ([bf9e3d6](https://github.com/Quenty/NevermoreEngine/commit/bf9e3d66e5c31ec0dafcc1c9e4142d963d309c65))
+
+
+
+
 
 ## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.2.0...@quenty/loader@6.2.1) (2023-04-07)
 

@@ -1,38 +1,28 @@
-# v7.24.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: DataStores appear to be working, but require more testing ([@Quenty](https://github.com/Quenty))
-- feat: Semi-broken datastore changes ([@Quenty](https://github.com/Quenty))
-- feat: More untested datastore syncing code ([@Quenty](https://github.com/Quenty))
-- feat: Unfinished datastore changes ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Changed events weren't firing for the datastore stage ([@Quenty](https://github.com/Quenty))
-- style: Fix style issues ([@Quenty](https://github.com/Quenty))
-- fix: More data store improvements ([@Quenty](https://github.com/Quenty))
-- fix: Fix additional components but data store writing ping-pings back and forth ([@Quenty](https://github.com/Quenty))
-- refactor: Start with syncing refactor but no merging yet ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- Fix DataStore.lua documentation type ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.23.0...@quenty/datastore@7.24.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Changed events weren't firing for the datastore stage ([04f2cf9](https://github.com/Quenty/NevermoreEngine/commit/04f2cf921fcc5e5c7db8ed16b8c76a0bc06c5688))
+* Fix additional components but data store writing ping-pings back and forth ([667015d](https://github.com/Quenty/NevermoreEngine/commit/667015d65fe44856076346394c4b218bead012b5))
+* More data store improvements ([b4c5918](https://github.com/Quenty/NevermoreEngine/commit/b4c5918055ffde9e3c5041e98432a13f4e8c913a))
+
+
+### Features
+
+* DataStores appear to be working, but require more testing ([ef03495](https://github.com/Quenty/NevermoreEngine/commit/ef0349554ea29f1812e39bb4bc833adc09c92968))
+* More untested datastore syncing code ([276909d](https://github.com/Quenty/NevermoreEngine/commit/276909dadc819e07b78727d56c95b597760fcf6e))
+* Semi-broken datastore changes ([7e9a32b](https://github.com/Quenty/NevermoreEngine/commit/7e9a32bbadebd729305f36bba965d2c47b14d6d9))
+* Unfinished datastore changes ([d627fa0](https://github.com/Quenty/NevermoreEngine/commit/d627fa0a36f2a733deead8b63b1b72be4e1c3a9f))
+
+
+
+
 
 # [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.22.0...@quenty/datastore@7.23.0) (2023-08-01)
 

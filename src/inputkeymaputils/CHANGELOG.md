@@ -1,23 +1,15 @@
-# v7.37.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 1
-
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.36.0...@quenty/inputkeymaputils@7.37.0) (2023-08-23)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
 
 # [7.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@7.35.0...@quenty/inputkeymaputils@7.36.0) (2023-08-01)
 

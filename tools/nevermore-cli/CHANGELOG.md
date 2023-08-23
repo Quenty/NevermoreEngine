@@ -1,34 +1,24 @@
-# v1.9.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-- feat: Add initial pack command (not finished yet) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Update game-template with latest data and ideas ([@Quenty](https://github.com/Quenty))
-- tools: Add tool to generate service ([@Quenty](https://github.com/Quenty))
-- ci: Update aftman styles ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- fix: Fix package template ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.9.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.8.1...@quenty/nevermore-cli@1.9.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Fix package template ([4b1be5b](https://github.com/Quenty/Nevermore/commit/4b1be5b18267c22b6e01401d4555dd5413f0bf91))
+* Update game-template with latest data and ideas ([922ef09](https://github.com/Quenty/Nevermore/commit/922ef0979359beaee1c4cc8085f4e1a209bf793d))
+
+
+### Features
+
+* Add initial pack command (not finished yet) ([73ac451](https://github.com/Quenty/Nevermore/commit/73ac4519fb9221d95c43e2737f5eb5a3b51b563c))
+
+
+
+
 
 ## [1.8.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.8.0...@quenty/nevermore-cli@1.8.1) (2023-07-23)
 

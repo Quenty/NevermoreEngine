@@ -1,31 +1,23 @@
-# v5.24.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: ObservableMap uses subscription table ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- fix: Handle items after connecting to events ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.23.0...@quenty/observablecollection@5.24.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Handle items after connecting to events ([800364b](https://github.com/Quenty/NevermoreEngine/commit/800364b77ce0b7fc42ad141846265657876512f8))
+
+
+### Features
+
+* ObservableMap uses subscription table ([fa39e53](https://github.com/Quenty/NevermoreEngine/commit/fa39e539c809e77f7d9539442727c48505f98ea1))
+
+
+
+
 
 # [5.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.22.0...@quenty/observablecollection@5.23.0) (2023-08-01)
 

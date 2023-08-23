@@ -1,30 +1,18 @@
-# v3.9.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Upgrade ChatProvider package to provide tags automatically, as well as work with new Roblox chat ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@3.8.0...@quenty/chatproviderservice@3.9.0) (2023-08-23)
+
+
+### Features
+
+* Upgrade ChatProvider package to provide tags automatically, as well as work with new Roblox chat ([ece736a](https://github.com/Quenty/NevermoreEngine/commit/ece736aad667df8b24f6398a975f7f0ac79ab2ac))
+
+
+
+
 
 # [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@3.7.0...@quenty/chatproviderservice@3.8.0) (2023-07-28)
 

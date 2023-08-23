@@ -1,29 +1,18 @@
-# v5.28.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add Color3Utils.toWebHexString(color3) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.27.0...@quenty/color3utils@5.28.0) (2023-08-23)
+
+
+### Features
+
+* Add Color3Utils.toWebHexString(color3) ([e99602a](https://github.com/Quenty/NevermoreEngine/commit/e99602a9a30dfeb5008f6f75b36cbbfc9043ef51))
+
+
+
+
 
 # [5.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.26.0...@quenty/color3utils@5.27.0) (2023-08-01)
 

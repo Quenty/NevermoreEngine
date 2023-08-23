@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2023-08-23)
+
+
+### Features
+
+* Add DuckType package which allows for easy ducktyping interface checkers to be made ([14874e8](https://github.com/Quenty/NevermoreEngine/commit/14874e8f4b0789e203bd60f418d70510fac950e9))
+
+
+
+
+
 # v1.1.0 (Wed Aug 23 2023)
 
 :tada: This release contains work from a new contributor! :tada:

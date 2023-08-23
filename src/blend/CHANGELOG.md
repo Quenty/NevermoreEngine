@@ -1,29 +1,18 @@
-# v6.27.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Blend defaults sounds to inverse tapered ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.26.0...@quenty/blend@6.27.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Blend defaults sounds to inverse tapered ([ab1cac8](https://github.com/Quenty/NevermoreEngine/commit/ab1cac84faac048a6a9f3a3999f157d8987a017f))
+
+
+
+
 
 # [6.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.25.0...@quenty/blend@6.26.0) (2023-08-01)
 

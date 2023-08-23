@@ -1,6 +1,6 @@
 {
   "name": "@quenty/idleservice",
-  "version": "7.34.0",
+  "version": "7.35.0",
   "description": "Helps track whether or not a player is idle and if so, then can show UI or other cute things.",
   "keywords": [
     "Roblox",

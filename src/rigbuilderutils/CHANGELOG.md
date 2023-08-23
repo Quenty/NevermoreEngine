@@ -1,29 +1,18 @@
-# v6.13.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Don't enable any scripts on the resulting model (like Animate, et cetera). ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@6.12.0...@quenty/rigbuilderutils@6.13.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Don't enable any scripts on the resulting model (like Animate, et cetera). ([5ca272f](https://github.com/Quenty/NevermoreEngine/commit/5ca272f005b2e9fa82ae13af533dd28856df3e39))
+
+
+
+
 
 # [6.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@6.11.0...@quenty/rigbuilderutils@6.12.0) (2023-07-28)
 

@@ -1,26 +1,23 @@
-# v3.3.0 (Wed Aug 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add Set.fromKeys(tab) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Changed events weren't firing for the datastore stage ([@Quenty](https://github.com/Quenty))
-- style: Fix context spelling in Table library ([@Quenty](https://github.com/Quenty))
-- style: Fix style issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@3.2.0...@quenty/table@3.3.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Changed events weren't firing for the datastore stage ([04f2cf9](https://github.com/Quenty/NevermoreEngine/commit/04f2cf921fcc5e5c7db8ed16b8c76a0bc06c5688))
+
+
+### Features
+
+* Add Set.fromKeys(tab) ([f4a3699](https://github.com/Quenty/NevermoreEngine/commit/f4a3699828bbc518594a16dff1f24c2ce3c295ff))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/table@3.1.0...@quenty/table@3.2.0) (2023-02-21)
 

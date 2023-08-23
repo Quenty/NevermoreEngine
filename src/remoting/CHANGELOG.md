@@ -1,30 +1,18 @@
-# v6.10.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-- feat: Add :FireAllClientsExcept(excludePlayer, ...) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- docs: Fix documentation annotations on a variety of files ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@6.9.0...@quenty/remoting@6.10.0) (2023-08-23)
+
+
+### Features
+
+* Add :FireAllClientsExcept(excludePlayer, ...) ([6fb3ca1](https://github.com/Quenty/NevermoreEngine/commit/6fb3ca167aa742c4f80829c74a2a1d05b720918e))
+
+
+
+
 
 # [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@6.8.1...@quenty/remoting@6.9.0) (2023-07-28)
 

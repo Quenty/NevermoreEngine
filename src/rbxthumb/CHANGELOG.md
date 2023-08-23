@@ -1,23 +1,18 @@
-# v1.4.0 (Wed Aug 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add missing dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@1.3.1...@quenty/rbxthumb@1.4.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Add missing dependencies ([324e3db](https://github.com/Quenty/NevermoreEngine/commit/324e3dbcd7ed260542eebe24889cbc6cd968d380))
+
+
+
+
 
 ## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@1.3.0...@quenty/rbxthumb@1.3.1) (2023-04-07)
 

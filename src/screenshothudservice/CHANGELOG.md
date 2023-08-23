@@ -1,29 +1,15 @@
-# v1.18.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- style: Remove repeated code that was shadowed ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@1.17.0...@quenty/screenshothudservice@1.18.0) (2023-08-23)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+
+
+
 
 # [1.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@1.16.0...@quenty/screenshothudservice@1.17.0) (2023-08-01)
 

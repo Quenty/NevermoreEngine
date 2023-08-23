@@ -1,30 +1,18 @@
-# v8.19.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add PermissionService:PromiseIsPermissionLevel(player, permissionLevel) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.18.0...@quenty/permissionprovider@8.19.0) (2023-08-23)
+
+
+### Features
+
+* Add PermissionService:PromiseIsPermissionLevel(player, permissionLevel) ([2297438](https://github.com/Quenty/NevermoreEngine/commit/229743882002800c917e5fd131f81b4f7a36dc89))
+
+
+
+
 
 # [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@8.17.1...@quenty/permissionprovider@8.18.0) (2023-07-28)
 

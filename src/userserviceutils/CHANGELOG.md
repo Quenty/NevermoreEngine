@@ -1,29 +1,18 @@
-# v3.10.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add UserInfoService:ObserveDisplayName(userId) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/userserviceutils@3.9.0...@quenty/userserviceutils@3.10.0) (2023-08-23)
+
+
+### Features
+
+* Add UserInfoService:ObserveDisplayName(userId) ([950c121](https://github.com/Quenty/NevermoreEngine/commit/950c121c35d734d7a66415ada647b146e06c4bf7))
+
+
+
+
 
 # [3.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/userserviceutils@3.8.0...@quenty/userserviceutils@3.9.0) (2023-07-28)
 

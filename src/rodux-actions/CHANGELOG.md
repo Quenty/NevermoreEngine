@@ -1,23 +1,18 @@
-# v5.4.0 (Wed Aug 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Use table.clone instead of Table.copy ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@5.3.1...@quenty/rodux-actions@5.4.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Use table.clone instead of Table.copy ([44468bd](https://github.com/Quenty/NevermoreEngine/commit/44468bda58a95b5a17c5998807231124d2a55187))
+
+
+
+
 
 ## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-actions@5.3.0...@quenty/rodux-actions@5.3.1) (2023-04-07)
 

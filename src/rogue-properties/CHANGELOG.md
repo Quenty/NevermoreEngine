@@ -1,34 +1,20 @@
-# v4.29.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add array support to RogueProperty package ([@Quenty](https://github.com/Quenty))
-- feat: Add :SetCanInitialize(canInitialize) to rogue-property system ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-- feat: RogueProperties allow for nested property tables ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-- refactor: Move code to implementation folder ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.28.0...@quenty/rogue-properties@4.29.0) (2023-08-23)
+
+
+### Features
+
+* Add :SetCanInitialize(canInitialize) to rogue-property system ([6fc8804](https://github.com/Quenty/NevermoreEngine/commit/6fc8804131d7fdb30424fcea7946a0422fb7420f))
+* Add array support to RogueProperty package ([a677409](https://github.com/Quenty/NevermoreEngine/commit/a6774091dafb09c61d28a61778fd15307f897881))
+* RogueProperties allow for nested property tables ([6db8062](https://github.com/Quenty/NevermoreEngine/commit/6db8062ef54791970435c1a7d2d69b7e23ead11f))
+
+
+
+
 
 # [4.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.27.0...@quenty/rogue-properties@4.28.0) (2023-08-01)
 

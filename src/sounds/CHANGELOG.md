@@ -1,31 +1,24 @@
-# v6.10.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Sound plays using :Play() always since PlayLocalSound no longer works in Hoarcekat ([@Quenty](https://github.com/Quenty))
-- feat: Sounds can play back tables ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add missing dependencies ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@6.9.0...@quenty/sounds@6.10.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Add missing dependencies ([324e3db](https://github.com/Quenty/NevermoreEngine/commit/324e3dbcd7ed260542eebe24889cbc6cd968d380))
+
+
+### Features
+
+* Sound plays using :Play() always since PlayLocalSound no longer works in Hoarcekat ([58eeb15](https://github.com/Quenty/NevermoreEngine/commit/58eeb15e832c5d13a4a602c87656b233862d8392))
+* Sounds can play back tables ([d33bbee](https://github.com/Quenty/NevermoreEngine/commit/d33bbeed98016b04b0958ce27df5a82f7c9cbf4e))
+
+
+
+
 
 # [6.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@6.8.0...@quenty/sounds@6.9.0) (2023-07-28)
 

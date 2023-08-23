@@ -1,29 +1,18 @@
-# v8.17.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxBrioUtils.of(...) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.16.0...@quenty/brio@8.17.0) (2023-08-23)
+
+
+### Features
+
+* Add RxBrioUtils.of(...) ([fc13e2e](https://github.com/Quenty/NevermoreEngine/commit/fc13e2e5d1b39bb034330078b5fee3fae0584859))
+
+
+
+
 
 # [8.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.15.0...@quenty/brio@8.16.0) (2023-07-28)
 

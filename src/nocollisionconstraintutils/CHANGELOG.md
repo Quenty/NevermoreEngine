@@ -1,33 +1,20 @@
-# v6.3.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix additional parent assert ([@Quenty](https://github.com/Quenty))
-- fix: Fix parenting in NoCollisionConstraintUtils ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- docs: Fix documentation annotations on a variety of files ([@Quenty](https://github.com/Quenty))
-- fix: NoCollisionConstraintUtils.tempNoCollision(parts0, parts1) actually parents the collision constraint ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nocollisionconstraintutils@6.2.1...@quenty/nocollisionconstraintutils@6.3.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Fix additional parent assert ([0903f14](https://github.com/Quenty/NevermoreEngine/commit/0903f1464c494b50e5dd6bb8bb7cea40b835ba60))
+* Fix parenting in NoCollisionConstraintUtils ([b8ac9cb](https://github.com/Quenty/NevermoreEngine/commit/b8ac9cb699a58af01b5aaeb09edaa519e62cff97))
+* NoCollisionConstraintUtils.tempNoCollision(parts0, parts1) actually parents the collision constraint ([bd0fc16](https://github.com/Quenty/NevermoreEngine/commit/bd0fc165c47bd3911591e125722de04b4e12d1ea))
+
+
+
+
 
 ## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nocollisionconstraintutils@6.2.0...@quenty/nocollisionconstraintutils@6.2.1) (2023-04-07)
 

@@ -1,31 +1,23 @@
-# v7.15.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameProductServiceClient:ObserveAssetPurchased(assetType, idOrKey) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-- fix: Clean up pending promises ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.14.0...@quenty/gameproductservice@7.15.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Clean up pending promises ([8cf5024](https://github.com/Quenty/NevermoreEngine/commit/8cf5024bef89538aac0f05363bc12f58fde257ae))
+
+
+### Features
+
+* Add GameProductServiceClient:ObserveAssetPurchased(assetType, idOrKey) ([608b509](https://github.com/Quenty/NevermoreEngine/commit/608b509d43efe3cc174515c19fffcf08b0ee8350))
+
+
+
+
 
 # [7.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.13.0...@quenty/gameproductservice@7.14.0) (2023-08-01)
 

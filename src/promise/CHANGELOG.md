@@ -1,29 +1,18 @@
-# v6.8.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add Promise.delay(seconds, func) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.7.0...@quenty/promise@6.8.0) (2023-08-23)
+
+
+### Features
+
+* Add Promise.delay(seconds, func) ([db100f3](https://github.com/Quenty/NevermoreEngine/commit/db100f3212928f52ba47be089e6bc2f3d3e05f75))
+
+
+
+
 
 # [6.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@6.6.0...@quenty/promise@6.7.0) (2023-07-28)
 

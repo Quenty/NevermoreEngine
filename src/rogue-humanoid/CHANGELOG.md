@@ -1,31 +1,23 @@
-# v3.32.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-- feat: Only set properties on the network owner to prevent ping-back ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add missing dependencies ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.31.0...@quenty/rogue-humanoid@3.32.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Add missing dependencies ([324e3db](https://github.com/Quenty/NevermoreEngine/commit/324e3dbcd7ed260542eebe24889cbc6cd968d380))
+
+
+### Features
+
+* Only set properties on the network owner to prevent ping-back ([2d061f9](https://github.com/Quenty/NevermoreEngine/commit/2d061f980064a4ea9ef6224f589a3ed8f43fabc4))
+
+
+
+
 
 # [3.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@3.30.0...@quenty/rogue-humanoid@3.31.0) (2023-08-01)
 

@@ -1,35 +1,27 @@
-# v7.15.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add Rx.delayed(seconds) ([@Quenty](https://github.com/Quenty))
-- feat: ObservableMap uses subscription table ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Skip would skip one too many ([@Quenty](https://github.com/Quenty))
-- fix: Use table.clone in Rx ([@Quenty](https://github.com/Quenty))
-- fix: Rx Observables provide better errors ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- fix: Remove duplicate Rx.scan API ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.14.0...@quenty/rx@7.15.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Remove duplicate Rx.scan API ([388dd46](https://github.com/Quenty/NevermoreEngine/commit/388dd464e85f3692a3e14e59891291916d6b86a3))
+* Rx Observables provide better errors ([74e59af](https://github.com/Quenty/NevermoreEngine/commit/74e59af192600ceaed30efff9958d324ea7e90f9))
+* Skip would skip one too many ([8c90d59](https://github.com/Quenty/NevermoreEngine/commit/8c90d595f8d128bb35ac6bf458151aa140df28f6))
+* Use table.clone in Rx ([08ab13c](https://github.com/Quenty/NevermoreEngine/commit/08ab13c90176e4e875bdd55ecc55fa24b3935665))
+
+
+### Features
+
+* Add Rx.delayed(seconds) ([cdb34e3](https://github.com/Quenty/NevermoreEngine/commit/cdb34e32286f481a976852391068afe899ecc95b))
+* ObservableMap uses subscription table ([fa39e53](https://github.com/Quenty/NevermoreEngine/commit/fa39e539c809e77f7d9539442727c48505f98ea1))
+
+
+
+
 
 # [7.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@7.13.0...@quenty/rx@7.14.0) (2023-07-28)
 

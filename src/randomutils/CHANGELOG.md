@@ -1,24 +1,23 @@
-# v2.3.0 (Wed Aug 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add RandomSampler object to RandomUtils ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Use table.clone() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@2.2.0...@quenty/randomutils@2.3.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Use table.clone() ([28f311b](https://github.com/Quenty/NevermoreEngine/commit/28f311b9c2534fa7b2056265db05c1447dc43a8a))
+
+
+### Features
+
+* Add RandomSampler object to RandomUtils ([5ca48d9](https://github.com/Quenty/NevermoreEngine/commit/5ca48d91697ee0b20ec1df8dda91a0e9f9ceb0a3))
+
+
+
+
 
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@2.1.1...@quenty/randomutils@2.2.0) (2022-03-27)
 

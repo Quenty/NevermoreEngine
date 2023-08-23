@@ -1,29 +1,18 @@
-# v8.25.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add :ObserveAutomaticTagging() ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.24.0...@quenty/playerhumanoidbinder@8.25.0) (2023-08-23)
+
+
+### Bug Fixes
+
+* Add :ObserveAutomaticTagging() ([cafbc1a](https://github.com/Quenty/NevermoreEngine/commit/cafbc1ad1420e9476206c63c8e280ad0bc8f6a28))
+
+
+
+
 
 # [8.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerhumanoidbinder@8.23.0...@quenty/playerhumanoidbinder@8.24.0) (2023-08-01)
 

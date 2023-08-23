@@ -1,31 +1,19 @@
-# v5.37.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameConfigPicker:ObserveToAssetIdBrio(assetType, ([@Quenty](https://github.com/Quenty))
-- feat: Add tags to GameConfig ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.36.0...@quenty/gameconfig@5.37.0) (2023-08-23)
+
+
+### Features
+
+* Add GameConfigPicker:ObserveToAssetIdBrio(assetType, ([776ecbe](https://github.com/Quenty/NevermoreEngine/commit/776ecbed26d8fcdf36339747c4e983bebc301249))
+* Add tags to GameConfig ([56962ce](https://github.com/Quenty/NevermoreEngine/commit/56962cec4598d0e5640acb6c8b54e449f1002031))
+
+
+
+
 
 # [5.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.35.0...@quenty/gameconfig@5.36.0) (2023-08-01)
 

@@ -1,33 +1,19 @@
-# v4.3.0 (Wed Aug 23 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Max Bacon ([@max-bacon](https://github.com/max-bacon)), for all your work!
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Add Draw.raycast() ([@Quenty](https://github.com/Quenty))
-- users/quenty/pack [#405](https://github.com/Quenty/NevermoreEngine/pull/405) ([@Quenty](https://github.com/Quenty))
-- feat: Add Draw.line, Draw.direction, Draw.sphereCast, Draw.blockCast, and better draw semantics ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling issues ([@Quenty](https://github.com/Quenty))
-- Fix DataStore.lua documentation type [#372](https://github.com/Quenty/NevermoreEngine/pull/372) ([@max-bacon](https://github.com/max-bacon))
-- docs: Fix documentation annotations on a variety of files ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Max Bacon ([@max-bacon](https://github.com/max-bacon))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@4.2.0...@quenty/draw@4.3.0) (2023-08-23)
+
+
+### Features
+
+* Add Draw.line, Draw.direction, Draw.sphereCast, Draw.blockCast, and better draw semantics ([6d78106](https://github.com/Quenty/NevermoreEngine/commit/6d78106879fb6daa5bf5a28711aed746ed0a6f3e))
+* Add Draw.raycast() ([1071969](https://github.com/Quenty/NevermoreEngine/commit/10719695aede9bc9b16f7c311a98dcd5120c43ac))
+
+
+
+
 
 # [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@4.1.1...@quenty/draw@4.2.0) (2022-10-11)
 

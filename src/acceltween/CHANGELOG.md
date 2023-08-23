@@ -1,20 +1,18 @@
-# v2.3.0 (Wed Aug 23 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/datastore [#402](https://github.com/Quenty/NevermoreEngine/pull/402) ([@Quenty](https://github.com/Quenty))
-- feat: Use os.clock() instead of tick() in AccelTween clock state ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/acceltween@2.2.1...@quenty/acceltween@2.3.0) (2023-08-23)
+
+
+### Features
+
+* Use os.clock() instead of tick() in AccelTween clock state ([70d8d93](https://github.com/Quenty/NevermoreEngine/commit/70d8d933ad3cd37f8033833507156e5eb4546672))
+
+
+
+
 
 ## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/acceltween@2.2.0...@quenty/acceltween@2.2.1) (2022-10-16)
 
