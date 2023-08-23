@@ -14,19 +14,21 @@ local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"
 RoguePropertyDefinition.__index = RoguePropertyDefinition
 
-function RoguePropertyDefinition.new(name, defaultValue, roguePropertyTableDefinition)
+function RoguePropertyDefinition.new()
 	local self = setmetatable({}, RoguePropertyDefinition)
 
+	self._name = "Unnamed"
+
+	return self
+end
+
+function RoguePropertyDefinition:SetDefaultValue(defaultValue)
 	assert(defaultValue ~= nil, "Bad defaultValue")
 
-	self._name = assert(name, "Bad name")
 	self._defaultValue = defaultValue
 	self._valueType = typeof(self._defaultValue)
 	self._storageType = self:_computeStorageInstanceType()
-	self._roguePropertyTableDefinition = roguePropertyTableDefinition or nil
 	self._encodedDefaultValue = RoguePropertyUtils.encodeProperty(self, self._defaultValue)
-
-	return self
 end
 
 function RoguePropertyDefinition.isRoguePropertyDefinition(value)
@@ -55,8 +57,26 @@ function RoguePropertyDefinition:GetOrCreateInstance(parent)
 		self:GetEncodedDefaultValue())
 end
 
+function RoguePropertyDefinition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)
+	self._parentPropertyTableDefinition = parentPropertyTableDefinition
+end
+
 function RoguePropertyDefinition:GetParentPropertyDefinition()
-	return self._roguePropertyTableDefinition
+	return self._parentPropertyTableDefinition
+end
+
+function RoguePropertyDefinition:CanAssign(value, _strict)
+	if self._valueType == typeof(value) then
+		return true
+	else
+		return false, string.format("got %q, expected %q when assigning to %q", self._valueType, typeof(value), self:GetFullName())
+	end
+end
+
+function RoguePropertyDefinition:SetName(name)
+	assert(type(name) == "string", "Bad name")
+
+	self._name = name
 end
 
 --[=[
@@ -65,6 +85,18 @@ end
 ]=]
 function RoguePropertyDefinition:GetName(): string
 	return self._name
+end
+
+--[=[
+	Gets the full name of the rogue property
+	@return string
+]=]
+function RoguePropertyDefinition:GetFullName(): string
+	if self._parentPropertyTableDefinition then
+		return self._parentPropertyTableDefinition:GetFullName() .. "." .. self._name
+	else
+		return self._name
+	end
 end
 
 --[=[

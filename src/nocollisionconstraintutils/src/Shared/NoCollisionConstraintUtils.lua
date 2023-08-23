@@ -40,7 +40,7 @@ end
 	@return Maid
 ]=]
 function NoCollisionConstraintUtils.tempNoCollision(parts0, parts1, parent)
-	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == nil, "Bad parent")
+	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == "nil", "Bad parent")
 
 	local maid = Maid.new()
 
@@ -62,7 +62,7 @@ end
 function NoCollisionConstraintUtils.createBetweenPartsLists(parts0, parts1, parent)
 	assert(type(parts0) == "table", "Bad parts0")
 	assert(type(parts1) == "table", "Bad parts1")
-	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == nil, "Bad parent")
+	assert(typeof(parent) == "Instance" or type(parent) == "boolean" or type(parent) == "nil", "Bad parent")
 
 	local collisionConstraints = {}
 

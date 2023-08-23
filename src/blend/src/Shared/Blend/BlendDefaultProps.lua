@@ -128,4 +128,8 @@ return {
 	UIListLayout = {
 		SortOrder = Enum.SortOrder.LayoutOrder;
 	},
+
+	Sound = {
+		RollOffMode = Enum.RollOffMode.InverseTapered;
+	};
 }

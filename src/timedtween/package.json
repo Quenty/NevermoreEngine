@@ -1,0 +1,41 @@
+{
+  "name": "@quenty/timedtween",
+  "version": "1.0.0",
+  "description": "Linear timed tweening model",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "timedtween"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/timedtween/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/basicpane": "file:../basicpane",
+    "@quenty/blend": "file:../blend",
+    "@quenty/loader": "file:../loader",
+    "@quenty/math": "file:../math",
+    "@quenty/promise": "file:../promise",
+    "@quenty/promisemaid": "file:../promisemaid",
+    "@quenty/rx": "file:../rx",
+    "@quenty/steputils": "file:../steputils",
+    "@quenty/valueobject": "file:../valueobject"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

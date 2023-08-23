@@ -65,9 +65,13 @@ function AnimationSlotPlayer:Play(id, fadeTime, weight, speed, priority)
 		local maid = brio:ToMaid()
 
 		local track = AnimationUtils.playAnimation(animationTarget, id, fadeTime, weight, speed, priority)
-		maid:GiveTask(function()
-			track:AdjustWeight(0, fadeTime or self._defaultFadeTime.Value)
-		end)
+		if track then
+			maid:GiveTask(function()
+				track:AdjustWeight(0, fadeTime or self._defaultFadeTime.Value)
+			end)
+		else
+			warn("[AnimationSlotPlayer] - Failed to get animation to play")
+		end
 	end))
 
 	self._maid._current = topMaid

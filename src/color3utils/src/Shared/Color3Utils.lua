@@ -123,7 +123,42 @@ end
 	@return number
 ]=]
 function Color3Utils.toHexInteger(color3)
+	assert(typeof(color3) == "Color3", "Bad color3")
+
 	return bit32.bor(bit32.lshift(color3.r*0xFF, 16), bit32.lshift(color3.g*0xFF, 8), color3.b*0xFF)
+end
+
+--[=[
+	Converts the color3 to the actual hex integer used in web and other
+	areas.
+
+	```
+	Color3Utils.toHexString(Color3.fromRGB(0, 255, 0)) --> 00FF00
+	```
+
+	@param color3 Color3
+	@return number
+]=]
+function Color3Utils.toHexString(color3)
+	assert(typeof(color3) == "Color3", "Bad color3")
+
+	return string.format("%06X", Color3Utils.toHexInteger(color3))
+end
+
+--[=[
+	Converts the color3 to the standard web hex string
+
+	```
+	Color3Utils.toWebHexString(Color3.fromRGB(0, 255, 0)) --> #00FF00
+	```
+
+	@param color3 Color3
+	@return number
+]=]
+function Color3Utils.toWebHexString(color3)
+	assert(typeof(color3) == "Color3", "Bad color3")
+
+	return string.format("#%06X", Color3Utils.toHexInteger(color3))
 end
 
 return Color3Utils

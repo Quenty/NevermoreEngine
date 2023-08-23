@@ -12,6 +12,8 @@ local RunService = game:GetService("RunService")
 local BasePermissionProvider = require("BasePermissionProvider")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local Promise = require("Promise")
+local PermissionLevel = require("PermissionLevel")
+local PermissionLevelUtils = require("PermissionLevelUtils")
 
 local CreatorPermissionProvider = setmetatable({}, BasePermissionProvider)
 CreatorPermissionProvider.ClassName = "CreatorPermissionProvider"
@@ -31,23 +33,22 @@ function CreatorPermissionProvider.new(config)
 end
 
 --[=[
-	Returns whether the player is a creator.
-	@param player Player
-	@return Promise<boolean>
-]=]
-function CreatorPermissionProvider:PromiseIsCreator(player)
-	return Promise.resolved(player.UserId == self._userId
-		or RunService:IsStudio())
-end
+	Returns whether the player is at a specific permission level.
 
---[=[
-	Returns whether the player is an admin.
 	@param player Player
+	@param permissionLevel PermissionLevel
 	@return Promise<boolean>
 ]=]
-function CreatorPermissionProvider:PromiseIsAdmin(player)
-	return Promise.resolved(player.UserId == self._userId
-		or RunService:IsStudio())
+function CreatorPermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+
+	if permissionLevel == PermissionLevel.ADMIN
+		or permissionLevel == PermissionLevel.CREATOR then
+		return Promise.resolved(player.UserId == self._userId or RunService:IsStudio())
+	else
+		error("Unknown permissionLevel")
+	end
 end
 
 return CreatorPermissionProvider

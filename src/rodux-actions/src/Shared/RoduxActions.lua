@@ -48,7 +48,7 @@ function RoduxActions:CreateReducer(initialState, handlers)
 
 			assert(validator:Validate(action))
 
-			return handler(state, Table.readonly(Table.copy(action)))
+			return handler(state, Table.readonly(table.clone(action)))
 		end
 
 		return state

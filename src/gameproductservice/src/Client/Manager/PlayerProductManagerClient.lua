@@ -9,16 +9,15 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
-local PlayerProductManagerConstants = require("PlayerProductManagerConstants")
-local GameConfigServiceClient = require("GameConfigServiceClient")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigServiceClient = require("GameConfigServiceClient")
 local PlayerMarketeer = require("PlayerMarketeer")
+local Remoting = require("Remoting")
 
 local PlayerProductManagerClient = setmetatable({}, BaseObject)
 PlayerProductManagerClient.ClassName = "PlayerProductManagerClient"
 PlayerProductManagerClient.__index = PlayerProductManagerClient
-
-require("PromiseRemoteEventMixin"):Add(PlayerProductManagerClient, PlayerProductManagerConstants.REMOTE_EVENT_NAME)
 
 function PlayerProductManagerClient.new(obj, serviceBag)
 	local self = setmetatable(BaseObject.new(obj), PlayerProductManagerClient)
@@ -27,8 +26,18 @@ function PlayerProductManagerClient.new(obj, serviceBag)
 	self._gameConfigServiceClient = self._serviceBag:GetService(GameConfigServiceClient)
 
 	if self._obj == Players.LocalPlayer then
+		self._remoting = Remoting.new(self._obj, "PlayerProductManager")
+		self._maid:GiveTask(self._remoting)
+
 		self._marketeer = PlayerMarketeer.new(self._obj, self._gameConfigServiceClient:GetConfigPicker())
 		self._maid:GiveTask(self._marketeer)
+
+		self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT):SetReceiptProcessingExpected(true)
+
+		self._maid:GiveTask(self._remoting.NotifyReceiptProcessed:Connect(function(receipt)
+			local assetTracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
+			assetTracker:HandleProcessReceipt(self._obj, receipt)
+		end))
 
 		self:_connectMarketplace()
 
@@ -50,12 +59,15 @@ function PlayerProductManagerClient:GetMarketeer()
 end
 
 function PlayerProductManagerClient:_replicateRemoteEventType(assetType)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+
 	local tracker = self._marketeer:GetAssetTrackerOrError(assetType)
 
 	self._maid:GiveTask(tracker.PromptFinished:Connect(function(assetId, isPurchased)
-		self:PromiseRemoteEvent():Then(function(remoteEvent)
-			remoteEvent:FireServer(PlayerProductManagerConstants.NOTIFY_PROMPT_FINISHED, assetType, assetId, isPurchased)
-		end)
+		assert(type(assetId) == "number", "Bad assetId")
+		assert(type(isPurchased) == "boolean", "Bad isPurchased")
+
+		self._remoting.NotifyPromptFinished:FireServer(assetType, assetId, isPurchased)
 	end))
 end
 

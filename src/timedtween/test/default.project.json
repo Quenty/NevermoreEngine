@@ -1,0 +1,11 @@
+{
+  "name": "TimedTweenTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "timedtween": {
+        "$path": ".."
+      }
+    }
+  }
+}

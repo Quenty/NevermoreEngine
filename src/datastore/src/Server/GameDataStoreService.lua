@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
+local Promise = require("Promise")
 
 local GameDataStoreService = {}
 GameDataStoreService.ServiceName = "GameDataStoreService"
@@ -30,11 +31,16 @@ function GameDataStoreService:PromiseDataStore()
 
 	self._dataStorePromise = self:_promiseRobloxDataStore()
 		:Then(function(robloxDataStore)
+			-- Live sync this stuff pretty frequently
 			local dataStore = DataStore.new(robloxDataStore, self:_getKey())
+			dataStore:SetSyncOnSave(true)
+			dataStore:SetAutoSaveTimeSeconds(15)
 			self._maid:GiveTask(dataStore)
 
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
-				return dataStore:Save()
+				return Promise.defer(function(resolve)
+					return resolve(dataStore:Save())
+				end)
 			end))
 
 			return dataStore

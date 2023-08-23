@@ -28,10 +28,7 @@ end
 	@return table
 ]=]
 function Table.merge(orig, new)
-	local result = {}
-	for key, val in pairs(orig) do
-		result[key] = val
-	end
+	local result = table.clone(orig)
 	for key, val in pairs(new) do
 		result[key] = val
 	end
@@ -155,11 +152,11 @@ Table.copy = table.clone
 	Deep copies a table including metatables
 
 	@param target table -- Table to deep copy
-	@param _context table? -- Cntext to deepCopy the value in
+	@param _context table? -- Context to deepCopy the value in
 	@return table -- Result
 ]=]
 function Table.deepCopy(target, _context)
-	_context = _context or  {}
+	_context = _context or {}
 	if _context[target] then
 		return _context[target]
 	end
@@ -264,6 +261,42 @@ function Table.overwrite(target, source)
 	end
 
 	return target
+end
+
+--[=[
+	Deep equivalent comparison of a table assuming keys are indexable in the same way.
+
+	@param target table -- Table to check
+	@param source table -- Other table to check
+	@return boolean
+]=]
+function Table.deepEquivalent(target, source)
+	if target == source then
+		return true
+	end
+
+	if type(target) ~= type(source) then
+		return false
+	end
+
+	if type(target) == "table" then
+		for key, value in pairs(target) do
+			if not Table.deepEquivalent(value, source[key]) then
+				return false
+			end
+		end
+
+		for key, value in pairs(source) do
+			if not Table.deepEquivalent(value, target[key]) then
+				return false
+			end
+		end
+
+		return true
+	else
+		-- target == source should do it.
+		return false
+	end
 end
 
 --[=[

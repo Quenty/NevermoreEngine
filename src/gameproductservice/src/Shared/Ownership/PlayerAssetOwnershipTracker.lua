@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local Maid = require("Maid")
 local ObservableMapSet = require("ObservableMapSet")
 local PlayerAssetOwnershipUtils = require("PlayerAssetOwnershipUtils")
@@ -25,6 +26,8 @@ PlayerAssetOwnershipTracker.ClassName = "PlayerAssetOwnershipTracker"
 PlayerAssetOwnershipTracker.__index = PlayerAssetOwnershipTracker
 
 function PlayerAssetOwnershipTracker.new(player, configPicker, assetType, marketTracker)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+
 	local self = setmetatable(BaseObject.new(), PlayerAssetOwnershipTracker)
 
 	self._player = assert(player, "No player")
@@ -84,7 +87,7 @@ function PlayerAssetOwnershipTracker:_promiseQueryIdOrKeyOwnershipCached(idOrKey
 
 	local id = self._configPicker:ToAssetId(self._assetType, idOrKey)
 	if not id then
-		warn(("[PlayerAssetOwnershipTracker] - Nothing with key %q"):format(tostring(idOrKey)))
+		warn(("[PlayerAssetOwnershipTracker._promiseQueryIdOrKeyOwnershipCached] - Nothing with key %q"):format(tostring(idOrKey)))
 		return Promise.resolved(false)
 	end
 
@@ -234,7 +237,7 @@ function PlayerAssetOwnershipTracker:_getWellKnownAssets(idOrKey)
 	elseif type(idOrKey) == "string" then
 		return self._assetKeyToWellKnownOwnershipTracker:GetListForKey(idOrKey)
 	else
-		error("Bad idOrKey")
+		error("[PlayerAssetOwnershipTracker._getWellKnownAssets] - Bad idOrKey")
 	end
 end
 
@@ -244,7 +247,7 @@ function PlayerAssetOwnershipTracker:_observeWellKnownAsset(idOrKey)
 	elseif type(idOrKey) == "string" then
 		return self._assetKeyToWellKnownOwnershipTracker:ObserveItemsForKeyBrio(idOrKey)
 	else
-		error("Bad idOrKey")
+		error("[PlayerAssetOwnershipTracker._observeWellKnownAsset] - Bad idOrKey")
 	end
 end
 

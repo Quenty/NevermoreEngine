@@ -16,7 +16,6 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Symbol = require("Symbol")
-local Table = require("Table")
 local ThrottledFunction = require("ThrottledFunction")
 local cancellableDelay = require("cancellableDelay")
 local CancelToken = require("CancelToken")
@@ -1421,7 +1420,7 @@ function Rx.combineLatest(observables)
 				end
 			end
 
-			sub:Fire(Table.copy(latest))
+			sub:Fire(table.clone(latest))
 		end
 
 		for key, observer in pairs(observables) do
@@ -1552,7 +1551,7 @@ function Rx.skip(toSkip)
 			local maid = Maid.new()
 
 			maid:GiveTask(source:Subscribe(function(...)
-				if skipped <= toSkip then
+				if skipped < toSkip then
 					skipped = skipped + 1
 					return
 				end
@@ -1623,6 +1622,22 @@ function Rx.delay(seconds)
 			return maid
 		end)
 	end
+end
+
+--[=[
+	Creates an observable that will emit N seconds later.
+
+	@param seconds number
+	@return Observable<()>
+]=]
+function Rx.delayed(seconds)
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return Observable.new(function(sub)
+		return task.delay(seconds, function()
+			sub:Fire()
+		end)
+	end)
 end
 
 --[=[

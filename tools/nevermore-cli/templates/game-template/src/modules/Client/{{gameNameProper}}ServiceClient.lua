@@ -15,7 +15,6 @@ function {{gameNameProper}}ServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("CmdrServiceClient"))
 
 	-- Internal
-	self._serviceBag:GetService(require("{{gameNameProper}}BindersClient"))
 	self._serviceBag:GetService(require("{{gameNameProper}}Translator"))
 end
 

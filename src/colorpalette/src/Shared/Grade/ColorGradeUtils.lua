@@ -42,6 +42,11 @@ function ColorGradeUtils.addGrade(grade, difference)
 	return finalGrade
 end
 
+function ColorGradeUtils.addGradeToColor(color, difference)
+	local grade = ColorGradeUtils.getGrade(color)
+	return ColorGradeUtils.getGradedColor(color, ColorGradeUtils.addGrade(grade, difference))
+end
+
 --[=[
 	Ensures the given contrast between the color and the backing, with
 	an adjustment to saturation to keep the UI loking good
@@ -65,7 +70,8 @@ function ColorGradeUtils.ensureGradeContrast(color, backing, amount)
 		return color
 	end
 
-	local newRel = math.sign(rel)*amount
+	local direction = math.sign(rel) > 0 and 1 or -1
+	local newRel = direction*amount
 
 	local newGrade = math.clamp(backingGrade + newRel, 0, 100)
 	local otherNewGrade = math.clamp(backingGrade - newRel, 0, 100)

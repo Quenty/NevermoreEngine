@@ -7,18 +7,30 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Signal = require("Signal")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
+local Signal = require("Signal")
 
 local PlayerAssetMarketTracker = setmetatable({}, BaseObject)
 PlayerAssetMarketTracker.ClassName = "PlayerAssetMarketTracker"
 PlayerAssetMarketTracker.__index = PlayerAssetMarketTracker
 
-function PlayerAssetMarketTracker.new(assetType, convertIds)
+--[=[
+	@param assetType GameConfigAssetTypes
+	@param convertIds function
+	@param observeIdsBrio function
+	@return PlayerAssetMarketTracker
+]=]
+function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+
 	local self = setmetatable(BaseObject.new(), PlayerAssetMarketTracker)
 
 	self._assetType = assert(assetType, "No assetType")
 	self._convertIds = assert(convertIds, "No convertIds")
+	self._observeIdsBrio = assert(observeIdsBrio, "No observeIdsBrio")
 
 	self._pendingPromises = {} -- { [number] = Promise<boolean> }
 	self._purchasedThisSession = {} -- [number] = true
@@ -45,6 +57,47 @@ function PlayerAssetMarketTracker.new(assetType, convertIds)
 	end)
 
 	return self
+end
+
+--[=[
+	Observes an asset purchased
+
+	@param idOrKey string | number
+	@return Observable<()>
+]=]
+function PlayerAssetMarketTracker:ObserveAssetPurchased(idOrKey)
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return Observable.new(function(sub)
+		local topMaid = Maid.new()
+		local knownIds = {}
+
+		topMaid:GiveTask(self._observeIdsBrio(idOrKey):Subscribe(function(brio)
+			if brio:IsDead() then
+				return
+			end
+
+			local maid = brio:ToMaid()
+			local id = brio:GetValue()
+
+			knownIds[id] = (knownIds[id] or 0) + 1
+
+			maid:GiveTask(function()
+				knownIds[id] = (knownIds[id] or 0) - 1
+				if knownIds[id] <= 0 then
+					knownIds[id] = nil
+				end
+			end)
+		end))
+
+		topMaid:GiveTask(self.Purchased:Connect(function(purchasedId)
+			if knownIds[purchasedId] then
+				sub:Fire()
+			end
+		end))
+
+		return topMaid
+	end)
 end
 
 --[=[
@@ -84,6 +137,9 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 		self._promptsOpen.Value = self._promptsOpen.Value + 1
 
 		promise:Finally(function()
+			if self._pendingPromises[id] == promise then
+				self._pendingPromises[id] = nil
+			end
 			self._promptsOpen.Value = self._promptsOpen.Value - 1
 		end)
 
@@ -93,6 +149,11 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 	end)
 end
 
+--[=[
+	Sets the ownership tracker for this asset tracker
+
+	@param ownershipTracker PlayerAssetOwnershipTracker
+]=]
 function PlayerAssetMarketTracker:SetOwnershipTracker(ownershipTracker)
 	assert(type(ownershipTracker) == "table" or ownershipTracker == nil, "Bad ownershipTracker")
 
@@ -121,6 +182,11 @@ function PlayerAssetMarketTracker:HasPurchasedThisSession(idOrKey)
 	return false
 end
 
+--[=[
+	Returns true if a prompt is open for the asset
+
+	@return boolean
+]=]
 function PlayerAssetMarketTracker:IsPromptOpen()
 	return self._promptsOpen.Value > 0
 end
@@ -151,16 +217,21 @@ function PlayerAssetMarketTracker:_handlePurchaseEvent(id, isPurchased, isFromRe
 		end
 	end
 
-	if promise then
-		self._pendingPromises[id] = nil
-	end
-
 	if isPurchased then
 		self._purchasedThisSession[id] = true
-		self.Purchased:Fire(id)
+
+		if self._receiptProcessingExpected then
+			if isFromReceipt then
+				self.Purchased:Fire(id)
+			end
+		else
+			self.Purchased:Fire(id)
+		end
 	end
 
-	self.PromptFinished:Fire(id, isPurchased)
+	if not isFromReceipt then
+		self.PromptFinished:Fire(id, isPurchased)
+	end
 
 	if promise then
 		task.spawn(function()
@@ -169,23 +240,38 @@ function PlayerAssetMarketTracker:_handlePurchaseEvent(id, isPurchased, isFromRe
 	end
 end
 
+--[=[
+	Sets if this tracker is handling purchase receipts as a more authenticated mechanism
+
+	@param receiptProcessingExpected boolean
+]=]
 function PlayerAssetMarketTracker:SetReceiptProcessingExpected(receiptProcessingExpected)
 	assert(type(receiptProcessingExpected) == "boolean", "Bad receiptProcessingExpected")
 
 	self._receiptProcessingExpected = receiptProcessingExpected
 end
 
-function PlayerAssetMarketTracker:HandleProcessReceipt(_player, receiptInfo)
+--[=[
+	Gets if this tracker is handling purchase receipts as a more authenticated mechanism
+
+	@return boolean
+]=]
+function PlayerAssetMarketTracker:GetReceiptProcessingExpected()
+	return self._receiptProcessingExpected
+end
+
+--[=[
+	Handles the receipt processing
+
+	@param player Player
+	@param receiptInfo ReceiptInfo
+	@return ProductPurchaseDecision
+]=]
+function PlayerAssetMarketTracker:HandleProcessReceipt(player, receiptInfo)
+	assert(typeof(player) == "Instance", "Bad player")
 	assert(self._receiptProcessingExpected, "No receiptProcessingExpected")
 
-	local productId = receiptInfo.ProductId
-	local pendingForAssetId = self._pendingPromises[productId]
-
-	if pendingForAssetId then
-		self:_handlePurchaseEvent(productId, true, true)
-
-		return Enum.ProductPurchaseDecision.PurchaseGranted
-	end
+	self:_handlePurchaseEvent(receiptInfo.ProductId, true, true)
 
 	-- Always grant...
 	return Enum.ProductPurchaseDecision.PurchaseGranted

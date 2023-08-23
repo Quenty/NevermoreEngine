@@ -90,6 +90,33 @@ function GameProductService:Start()
 	end))
 end
 
+--[=[
+	Fires when the specified player purchases an asset
+
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Observable<>
+]=]
+function GameProductService:ObservePlayerAssetPurchased(assetType, idOrKey)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:ObservePlayerAssetPurchased(assetType, idOrKey)
+end
+
+--[=[
+	Fires when any player purchases an asset
+
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Observable<Player>
+]=]
+function GameProductService:ObserveAssetPurchased(assetType, idOrKey)
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._helper:ObserveAssetPurchased(assetType, idOrKey)
+end
 
 --[=[
 	Returns true if item has been purchased this session
@@ -190,6 +217,9 @@ function GameProductService:_handleProcessReceipt(receiptInfo)
 	return Enum.ProductPurchaseDecision.PurchaseGranted
 end
 
+--[=[
+	Cleans up the game product service
+]=]
 function GameProductService:Destroy()
 	self._maid:DoCleaning()
 end

@@ -4,6 +4,12 @@
 	at children level. This minimizes accidently overwriting.
 	The big cost here is that we may leave keys that can't be removed.
 
+	Layers in priority order:
+
+	1. Save data
+	2. Substores
+	3. Base layer
+
 	@server
 	@class DataStoreStage
 ]=]
@@ -13,13 +19,17 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreWriter = require("DataStoreWriter")
+local GoodSignal = require("GoodSignal")
 local Maid = require("Maid")
-local Promise = require("Promise")
-local PromiseUtils = require("PromiseUtils")
-local Signal = require("Signal")
-local Table = require("Table")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
+local Set = require("Set")
+local Table = require("Table")
+local DataStoreSnapshotUtils = require("DataStoreSnapshotUtils")
+
+local SLOW_INTEGRITY_CHECK_ENABLED = true
 
 local DataStoreStage = setmetatable({}, BaseObject)
 DataStoreStage.ClassName = "DataStoreStage"
@@ -28,6 +38,14 @@ DataStoreStage.__index = DataStoreStage
 --[=[
 	Constructs a new DataStoreStage to load from. Prefer to use DataStore because this doesn't
 	have any way to retrieve this.
+
+	See [DataStore], [GameDataStoreService], and [PlayerDataStoreService].
+
+	```lua
+	-- Data store inherits from DataStoreStage
+	local dataStore = serviceBag:GetService(PlayerDataStoreService):PromiseDataStore(player):Yield()
+	```
+
 	@param loadName string
 	@param loadParent DataStoreStage?
 	@return DataStoreStage
@@ -39,42 +57,231 @@ function DataStoreStage.new(loadName, loadParent)
 	self._loadName = loadName
 	self._loadParent = loadParent
 
-	self._savingCallbacks = {} -- [func, ...]
-	self._takenKeys = {} -- [name] = true
-	self._stores = {} -- [name] = dataSubStore
+	self.Changed = GoodSignal.new() -- :Fire(viewSnapshot)
+	self._maid:GiveTask(self.Changed)
 
-	self._subsTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._subsTable)
+	self.DataStored = GoodSignal.new()
+	self._maid:GiveTask(self.DataStored)
+
+	-- Stores the actual data loaded and synced (but not pending written data)
+	self._saveDataSnapshot = nil
+	self._stores = {} -- [name] = dataSubStore
+	self._baseDataSnapshot = nil
+
+	-- View data
+	self._viewSnapshot = nil
+
+	self._savingCallbacks = {} -- [func, ...]
+
+	self._keySubscriptions = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._keySubscriptions)
 
 	return self
 end
 
--- Also returns nil for speedyness
-function DataStoreStage:_promiseInvokeSavingCallbacks()
-	if not next(self._savingCallbacks) then
-		return nil
+--[=[
+	Stores the value, firing off events and queuing the item for save.
+
+	```lua
+	dataStore:Store("money", 25)
+	```
+
+	@param key string | number
+	@param value any
+]=]
+function DataStoreStage:Store(key, value)
+	assert(type(key) == "string", "Bad key")
+
+	if value == nil then
+		value = DataStoreDeleteToken
 	end
 
-	local removingPromises = {}
-	for _, func in pairs(self._savingCallbacks) do
-		local result = func()
-		if Promise.isPromise(result) then
-			table.insert(removingPromises, result)
+	-- Ensure that we at least start loading (and thus the autosave loop) for write
+	self:PromiseViewUpToDate()
+
+	self:_storeAtKey(key, value)
+end
+
+--[=[
+	Loads the data at the `key` and returns a promise with that value
+
+	```lua
+	dataStore:Load():Then(function(data)
+		print(data)
+	end)
+	```
+
+	@param key string | number
+	@param defaultValue T?
+	@return Promise<T>
+]=]
+function DataStoreStage:Load(key, defaultValue)
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
+
+	return self:PromiseViewUpToDate():Then(function()
+		if type(self._viewSnapshot) == "table" then
+			local value = self._viewSnapshot[key]
+			if value ~= nil then
+				return value
+			else
+				return defaultValue
+			end
+		else
+			return defaultValue
+		end
+	end)
+end
+
+--[=[
+	Promises the full content for the datastore
+
+	```lua
+	dataStore:LoadAll():Then(function(data)
+		print(data)
+	end)
+	```
+
+	@return Promise<any>
+]=]
+function DataStoreStage:LoadAll()
+	return self:PromiseViewUpToDate():Then(function()
+		return self._viewSnapshot
+	end)
+end
+
+--[=[
+	Gets a sub-datastore that will write at the given key. This will have the same
+	helper methods as any other data store object.
+
+	```lua
+	local dataStore = DataStore.new()
+
+	local saveslot = dataStore:GetSubStore("saveslot0")
+	saveslot:Store("Money", 0)
+	```
+
+	@param key string | number
+	@return DataStoreStage
+]=]
+function DataStoreStage:GetSubStore(key)
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
+
+	if self._stores[key] then
+		return self._stores[key]
+	end
+
+	local maid = Maid.new()
+	local newStore = DataStoreStage.new(key, self)
+	maid:GiveTask(newStore)
+
+	if type(self._baseDataSnapshot) == "table" then
+		local baseDataToTransfer = self._baseDataSnapshot[key]
+		if baseDataToTransfer ~= nil then
+			local newSnapshot = table.clone(self._baseDataSnapshot)
+			newSnapshot[key] = nil
+			newStore:MergeDiffSnapshot(baseDataToTransfer)
+			self._baseDataSnapshot = table.freeze(newSnapshot)
 		end
 	end
 
-	for _, substore in pairs(self._stores) do
-		local promise = substore:_promiseInvokeSavingCallbacks()
-		if promise then
-			table.insert(removingPromises, promise)
+	-- Transfer save data to substore
+	if type(self._saveDataSnapshot) == "table" then
+		local saveDataToTransfer = self._saveDataSnapshot[key]
+
+		if saveDataToTransfer ~= nil then
+			local newSnapshot = table.clone(self._saveDataSnapshot)
+			newSnapshot[key] = nil
+
+			newStore:Overwrite(saveDataToTransfer)
+
+			if DataStoreSnapshotUtils.isEmptySnapshot(newSnapshot) then
+				self._saveDataSnapshot = nil
+			else
+				self._saveDataSnapshot = table.freeze(newSnapshot)
+			end
 		end
 	end
 
-	return PromiseUtils.all(removingPromises)
+	self._stores[key] = newStore
+	self._maid[maid] = maid
+
+	maid:GiveTask(newStore.Changed:Connect(function()
+		self:_updateViewSnapshotAtKey(key)
+	end))
+	self:_updateViewSnapshotAtKey(key)
+
+	return newStore
+end
+
+--[=[
+	Explicitely deletes data at the key
+
+	@param key string | number
+]=]
+function DataStoreStage:Delete(key)
+	assert(type(key) == "string", "Bad key")
+
+	self:_storeAtKey(key, DataStoreDeleteToken)
+end
+
+--[=[
+	Queues up a wipe of all values. This will completely set the data to nil.
+]=]
+function DataStoreStage:Wipe()
+	self:Overwrite(DataStoreDeleteToken)
+end
+
+--[=[
+	Observes the current value for the stage itself
+
+	If no key is passed than it will observe the whole view snapshot
+
+	@param key string | number | nil
+	@param defaultValue T?
+	@return Observable<T>
+]=]
+function DataStoreStage:Observe(key, defaultValue)
+	assert(type(key) == "string" or type(key) == "number" or key == nil, "Bad key")
+
+	if key == nil then
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+			maid:GivePromise(self:LoadAll())
+				:Then(function()
+					-- Only connect once loaded
+					maid:GiveTask(self.Changed:Connect(function(viewSnapshot)
+						sub:Fire(viewSnapshot)
+					end))
+
+					sub:Fire(self._viewSnapshot)
+				end, function(...)
+					sub:Fail(...)
+				end)
+
+			return maid
+		end)
+	end
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GiveTask(self._keySubscriptions:Observe(key):Subscribe(sub:GetFireFailComplete()))
+
+		-- Load initially
+		maid:GivePromise(self:Load(key, defaultValue))
+			:Then(function(value)
+				sub:Fire(value)
+			end, function(...)
+				sub:Fail(...)
+			end)
+
+		return maid
+	end)
 end
 
 --[=[
 	Adds a callback to be called before save. This may return a promise.
+
 	@param callback function -- May return a promise
 	@return function -- Call to remove
 ]=]
@@ -105,135 +312,28 @@ end
 
 --[=[
 	Gets an event that will fire off whenever something is stored at this level
+
 	@return Signal
 ]=]
 function DataStoreStage:GetTopLevelDataStoredSignal()
-	if self._topLevelStoreSignal then
-		return self._topLevelStoreSignal
-	end
-
-	self._topLevelStoreSignal = Signal.new()
-	self._maid:GiveTask(self._topLevelStoreSignal)
-	return self._topLevelStoreSignal
+	return self.DataStored
 end
 
 --[=[
 	Retrieves the full path of this datastore stage for diagnostic purposes.
+
 	@return string
 ]=]
 function DataStoreStage:GetFullPath()
-	if self._loadParent then
-		return self._loadParent:GetFullPath() .. "." .. tostring(self._loadName)
+	if self._fullPath then
+		return self._fullPath
+	elseif self._loadParent then
+		self._fullPath = self._loadParent:GetFullPath() .. "." .. tostring(self._loadName)
+		return self._fullPath
 	else
-		return tostring(self._loadName)
+		self._fullPath = tostring(self._loadName)
+		return self._fullPath
 	end
-end
-
---[=[
-	Loads the data at the `name`.
-
-	@param name string | number
-	@param defaultValue T?
-	@return Promise<T>
-]=]
-function DataStoreStage:Load(name, defaultValue)
-	assert(type(name) == "string" or type(name) == "number", "Bad name")
-
-	if self._dataToSave and self._dataToSave[name] ~= nil then
-		if self._dataToSave[name] == DataStoreDeleteToken then
-			return Promise.resolved(defaultValue)
-		else
-			return Promise.resolved(self._dataToSave[name])
-		end
-	end
-
-	return self:_promiseLoadParentContent():Then(function(data)
-		return self:_afterLoadGetAndApplyStagedData(name, data, defaultValue)
-	end)
-end
-
---[=[
-	Observes the current value for the stage itself
-
-	@param name string | number
-	@param defaultValue T?
-	@return Observable<T>
-]=]
-function DataStoreStage:Observe(name, defaultValue)
-	assert(type(name) == "string" or type(name) == "number", "Bad name")
-
-	return Observable.new(function(sub)
-		local maid = Maid.new()
-
-		maid:GiveTask(self._subsTable:Observe(name):Subscribe(sub:GetFireFailComplete()))
-
-		-- Load initially
-		maid:GivePromise(self:Load(name, defaultValue))
-			:Then(function(value)
-				sub:Fire(value)
-			end, function(...)
-				sub:Fail(...)
-			end)
-
-		return maid
-	end)
-end
-
--- Protected!
-function DataStoreStage:_afterLoadGetAndApplyStagedData(name, data, defaultValue)
-	assert(type(name) == "string" or type(name) == "number", "Bad name")
-
-	if self._dataToSave and self._dataToSave[name] ~= nil then
-		if self._dataToSave[name] == DataStoreDeleteToken then
-			return defaultValue
-		else
-			return self._dataToSave[name]
-		end
-	elseif self._stores[name] then
-		if self._stores[name]:HasWritableData() then
-			local writer = self._stores[name]:GetNewWriter()
-			local original = Table.deepCopy(data[name] or {})
-			writer:WriteMerge(original)
-			return original
-		end
-	end
-
-	if data[name] == nil then
-		return defaultValue
-	else
-		return data[name]
-	end
-end
-
---[=[
-	Explicitely deletes data at the key
-
-	@param name string | number
-]=]
-function DataStoreStage:Delete(name)
-	assert(type(name) == "string", "Bad name")
-
-	if self._takenKeys[name] then
-		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
-	end
-
-	self:_doStore(name, DataStoreDeleteToken)
-end
-
---[=[
-	Queues up a wipe of all values. Data must load before it can be wiped.
-]=]
-function DataStoreStage:Wipe()
-	return self._loadParent:Load(self._loadName, {})
-		:Then(function(data)
-			for key, _ in pairs(data) do
-				if self._stores[key] then
-					self._stores[key]:Wipe()
-				else
-					self:_doStore(key, DataStoreDeleteToken)
-				end
-			end
-		end)
 end
 
 --[=[
@@ -258,78 +358,108 @@ end
 	@return Promise<{ [string]: true }>
 ]=]
 function DataStoreStage:PromiseKeySet()
-	return self:_promiseLoadParentContent():Then(function(data)
-		local keySet = {}
-
-		for key, value in pairs(data) do
-			if value ~= DataStoreDeleteToken then
-				keySet[key] = true
-			end
-		end
-
-		if self._dataToSave then
-			for key, value in pairs(self._dataToSave) do
-				if value ~= DataStoreDeleteToken then
-					keySet[key] = true
-				end
-			end
-		end
-
-		-- Otherwise we assume previous data would have it
-		for key, store in pairs(self._stores) do
-			if store:HasWritableData() then
-				keySet[key] = true
-			end
-		end
-
-		return keySet
+	return self:PromiseViewUpToDate():Then(function()
+		return Set.fromKeys(self._viewSnapshot)
 	end)
 end
 
 --[=[
-	Promises the full content for the datastore
+	This will always prioritize our own view of the world over
+	incoming data.
 
-	@return Promise<any>
+	:::tip
+	This is a helper method that helps load diff data into the data store.
+	:::
+
+	@param diffSnapshot any
 ]=]
-function DataStoreStage:LoadAll()
-	return self:_promiseLoadParentContent():Then(function(data)
-		local result = {}
+function DataStoreStage:MergeDiffSnapshot(diffSnapshot)
+	self:_checkIntegrity()
 
-		for key, value in pairs(data) do
-			if value == DataStoreDeleteToken then
-				result[key] = nil
-			elseif type(value) == "table" then
-				result[key] = Table.deepCopy(value)
-			else
-				result[key] = value
-			end
-		end
+	self._baseDataSnapshot = self:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(diffSnapshot)
 
-		if self._dataToSave then
-			for key, value in pairs(self._dataToSave) do
-				if value == DataStoreDeleteToken then
-					result[key] = nil
-				elseif type(value) == "table" then
-					result[key] = Table.deepCopy(value)
-				else
-					result[key] = value
-				end
-			end
-		end
-
-		for key, store in pairs(self._stores) do
-			if store:HasWritableData() then
-				local writer = store:GetNewWriter()
-				local original = Table.deepCopy(result[key] or {})
-				writer:WriteMerge(original)
-			end
-		end
-
-		return result
-	end)
+	self:_updateViewSnapshot()
+	self:_checkIntegrity()
 end
 
-function DataStoreStage:_promiseLoadParentContent()
+--[=[
+	Updates the base data to the saved / written data.
+
+	This will always prioritize our own view of the world over
+	incoming data.
+
+	@param parentWriter DataStoreWriter
+]=]
+function DataStoreStage:MarkDataAsSaved(parentWriter)
+	-- Update all children first
+	for key, subwriter in pairs(parentWriter:GetSubWritersMap()) do
+		local store = self._stores[key]
+		if store then
+			store:MarkDataAsSaved(subwriter)
+		else
+			warn("[DataStoreStage] - Store removed, but writer persists")
+		end
+	end
+
+	local dataToSave = parentWriter:GetDataToSave()
+	if self._saveDataSnapshot == DataStoreDeleteToken or dataToSave == DataStoreDeleteToken then
+		if self._saveDataSnapshot == dataToSave then
+			self._baseDataSnapshot = nil
+			self._saveDataSnapshot = nil
+		end
+	elseif type(self._saveDataSnapshot) == "table" or type(dataToSave) == "table" then
+		if type(self._saveDataSnapshot) == "table" and type(dataToSave) == "table" then
+			local newSaveSnapshot = table.clone(self._saveDataSnapshot)
+			local newBaseDataSnapshot
+			if type(self._baseDataSnapshot) == "table" then
+				newBaseDataSnapshot = table.clone(self._baseDataSnapshot)
+			else
+				newBaseDataSnapshot = {}
+			end
+
+			for key, value in pairs(dataToSave) do
+				local ourSnapshotValue = self._saveDataSnapshot[key]
+				if Table.deepEquivalent(ourSnapshotValue, value) or ourSnapshotValue == nil then
+					-- This shouldn't fire any event because our save data is matching
+					newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
+					newSaveSnapshot[key] = nil
+				end
+			end
+
+			self._baseDataSnapshot = table.freeze(newBaseDataSnapshot)
+
+			if DataStoreSnapshotUtils.isEmptySnapshot(newSaveSnapshot) then
+				self._saveDataSnapshot = nil
+			else
+				self._saveDataSnapshot = table.freeze(newSaveSnapshot)
+			end
+		end
+	else
+		assert(type(self._saveDataSnapshot) ~= "table", "Case is covered above")
+		assert(self._saveDataSnapshot ~= DataStoreDeleteToken, "Case is covered above")
+		assert(dataToSave ~= DataStoreDeleteToken, "Case is covered above")
+		assert(type(dataToSave) ~= "table", "Case is covered above")
+
+		-- In the none-table scenario move stuff
+		if self._saveDataSnapshot == dataToSave then
+			self._baseDataSnapshot = dataToSave
+			self._saveDataSnapshot = nil
+		end
+	end
+
+	self:_checkIntegrity()
+end
+
+--[=[
+	Helper method that when invokes ensures the data view.
+
+	:::tip
+	This is a helper method. You probably want [DataStore.LoadAll] instead.
+	:::
+
+	@return Promise
+]=]
+function DataStoreStage:PromiseViewUpToDate()
 	if not self._loadParent then
 		error("[DataStoreStage.Load] - Failed to load, no loadParent!")
 	end
@@ -337,54 +467,85 @@ function DataStoreStage:_promiseLoadParentContent()
 		error("[DataStoreStage.Load] - Failed to load, no loadName!")
 	end
 
-	return self._loadParent:Load(self._loadName, {})
+	return self._loadParent:PromiseViewUpToDate()
 end
 
 --[=[
-	Stores the value, firing off events and queuing the item
-	for save.
+	Ovewrites the full stage with the data specified.
 
-	@param name string | number
-	@param value string
+	:::tip
+	Use this method carefully as it can lead to data loss in ways that a specific :Store() call
+	on the right stage would do better.
+	:::
+
+	@param data any
 ]=]
-function DataStoreStage:Store(name, value)
-	assert(type(name) == "string", "Bad name")
+function DataStoreStage:Overwrite(data)
+	-- Ensure that we at least start loading (and thus the autosave loop) for write
+	self:PromiseViewUpToDate()
 
-	if self._takenKeys[name] then
-		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
+	if data == nil then
+		data = DataStoreDeleteToken
 	end
 
-	if value == nil then
-		value = DataStoreDeleteToken
+	if type(data) == "table" then
+		local newSaveSnapshot = {}
+
+		local remaining = Set.fromKeys(self._stores)
+		for key, store in pairs(self._stores) do
+			-- Update each store
+			store:Overwrite(data[key])
+		end
+
+		for key, value in pairs(data) do
+			remaining[key] = nil
+			if self._stores[key] then
+				self._stores[key]:Overwrite(value)
+			else
+				newSaveSnapshot[key] = value
+			end
+		end
+
+		for key, _ in pairs(remaining) do
+			self._stores[key]:Overwrite(DataStoreDeleteToken)
+		end
+
+		self._saveDataSnapshot = table.freeze(newSaveSnapshot)
+	else
+		for _, store in pairs(self._stores) do
+			store:Overwrite(DataStoreDeleteToken)
+		end
+
+		self._saveDataSnapshot = data
 	end
 
-	self:_doStore(name, value)
+	self:_updateViewSnapshot()
 end
 
 --[=[
-	Gets a sub-datastore that will write at the given name point
+	Ovewrites the full stage with the data specified. However, it will merge the data
+	to help prevent data-loss.
 
-	@param name string | number
-	@return DataStoreStage
+	:::tip
+	Use this method carefully as it can lead to data loss in ways that a specific :Store() call
+	on the right stage would do better.
+	:::
+
+	@param data any
 ]=]
-function DataStoreStage:GetSubStore(name)
-	assert(type(name) == "string" or type(name) == "number", "Bad name")
+function DataStoreStage:OverwriteMerge(data)
+	-- Ensure that we at least start loading (and thus the autosave loop) for write
+	self:PromiseViewUpToDate()
 
-	if self._stores[name] then
-		return self._stores[name]
+	if type(data) == "table" and data ~= DataStoreDeleteToken then
+		-- Note we explicitly don't wipe values here! Need delete token if we want to delete!
+		for key, value in pairs(data) do
+			self:_storeAtKey(key, value)
+		end
+	else
+		-- Non-tables
+		self:Overwrite(data)
 	end
-
-	if self._takenKeys[name] then
-		error(("[DataStoreStage.GetSubStore] - Already have a writer for %q"):format(name))
-	end
-
-	local newStore = DataStoreStage.new(name, self)
-	self._takenKeys[name] = true
-	self._maid:GiveTask(newStore)
-
-	self._stores[name] = newStore
-
-	return newStore
 end
 
 --[=[
@@ -398,19 +559,10 @@ function DataStoreStage:StoreOnValueChange(name, valueObj)
 	assert(type(name) == "string" or type(name) == "number", "Bad name")
 	assert(typeof(valueObj) == "Instance" or (type(valueObj) == "table" and valueObj.Changed), "Bad valueObj")
 
-	if self._takenKeys[name] then
-		error(("[DataStoreStage] - Already have a writer for %q"):format(name))
-	end
-
 	local maid = Maid.new()
 
-	self._takenKeys[name] = true
-	maid:GiveTask(function()
-		self._takenKeys[name] = nil
-	end)
-
 	maid:GiveTask(valueObj.Changed:Connect(function()
-		self:_doStore(name, valueObj.Value)
+		self:_storeAtKey(name, valueObj.Value)
 	end))
 
 	return maid
@@ -422,7 +574,7 @@ end
 	@return boolean
 ]=]
 function DataStoreStage:HasWritableData()
-	if self._dataToSave then
+	if self._saveDataSnapshot ~= nil then
 		return true
 	end
 
@@ -441,57 +593,403 @@ function DataStoreStage:HasWritableData()
 end
 
 --[=[
-	Constructs a writer which provides a snapshot of the current data state to write
+	Constructs a writer which provides a snapshot of the current data state to write.
+
+	:::tip
+	This is automatically invoked during saving and is public so [DataStore] can invoke it.
+	:::
 
 	@return DataStoreWriter
 ]=]
 function DataStoreStage:GetNewWriter()
-	local writer = DataStoreWriter.new()
-	if self._dataToSave then
-		writer:SetRawData(self._dataToSave)
+	self:_checkIntegrity()
+
+	local writer = DataStoreWriter.new(self:GetFullPath())
+
+	local fullBaseDataSnapshot = self:_createFullBaseDataSnapshot()
+
+	if self._saveDataSnapshot ~= nil then
+		writer:SetSaveDataSnapshot(self._saveDataSnapshot)
 	end
 
-	for name, store in pairs(self._stores) do
+	for key, store in pairs(self._stores) do
 		if not store.Destroy then
-			warn(("[DataStoreStage] - Substore %q destroyed"):format(name))
+			warn(("[DataStoreStage] - Substore %q destroyed"):format(key))
 			continue
 		end
 
 		if store:HasWritableData() then
-			writer:AddWriter(name, store:GetNewWriter())
+			writer:AddSubWriter(key, store:GetNewWriter())
 		end
 	end
+
+	writer:SetFullBaseDataSnapshot(fullBaseDataSnapshot)
 
 	return writer
 end
 
+--[=[
+	Invokes all saving callbacks
+
+	:::tip
+	This is automatically invoked before saving and is public so [DataStore] can invoke it.
+	:::
+
+	@return Promise
+]=]
+function DataStoreStage:PromiseInvokeSavingCallbacks()
+	if not next(self._savingCallbacks) then
+		return Promise.resolved()
+	end
+
+	local removingPromises = {}
+	for _, func in pairs(self._savingCallbacks) do
+		local result = func()
+		if Promise.isPromise(result) then
+			table.insert(removingPromises, result)
+		end
+	end
+
+	for _, substore in pairs(self._stores) do
+		local promise = substore:PromiseInvokeSavingCallbacks()
+		if promise then
+			table.insert(removingPromises, promise)
+		end
+	end
+
+	return PromiseUtils.all(removingPromises)
+end
+
+function DataStoreStage:_createFullBaseDataSnapshot()
+	if self._baseDataSnapshot == DataStoreDeleteToken then
+		error("BadDataSnapshot cannot be a delete token")
+	elseif type(self._baseDataSnapshot) == "table" or self._baseDataSnapshot == nil then
+		local newSnapshot
+		if type(self._baseDataSnapshot) == "table" then
+			newSnapshot = table.clone(self._baseDataSnapshot)
+		else
+			newSnapshot = {}
+		end
+
+		for key, store in pairs(self._stores) do
+			if not store.Destroy then
+				warn(("[DataStoreStage] - Substore %q destroyed"):format(key))
+				continue
+			end
+
+			if not store:HasWritableData() then
+				newSnapshot[key] = store:_createFullBaseDataSnapshot()
+			end
+		end
+
+		if DataStoreSnapshotUtils.isEmptySnapshot(newSnapshot) then
+			return nil
+		else
+			return table.freeze(newSnapshot)
+		end
+	else
+		return self._baseDataSnapshot
+	end
+end
+
+function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotFromDiffSnapshot(diffSnapshot)
+	if diffSnapshot == DataStoreDeleteToken then
+		return nil
+	elseif type(diffSnapshot) == "table" then
+		local newBaseDataSnapshot
+		if type(self._baseDataSnapshot) == "table" then
+			newBaseDataSnapshot = table.clone(self._baseDataSnapshot)
+		else
+			newBaseDataSnapshot = {}
+		end
+
+		-- Merge all of our newly downloaded data here into our base layer.
+		for key, value in pairs(diffSnapshot) do
+			newBaseDataSnapshot[key] = self:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
+		end
+
+		return table.freeze(newBaseDataSnapshot)
+	elseif diffSnapshot == nil then
+		return self._baseDataSnapshot
+	else
+		return diffSnapshot
+	end
+end
+
+function DataStoreStage:_updateStoresAndComputeBaseDataSnapshotValueFromDiffSnapshot(key, value)
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
+
+	if self._stores[key] then
+		self._stores[key]:MergeDiffSnapshot(value)
+		return nil
+	elseif value == DataStoreDeleteToken then
+		return nil
+	elseif type(value) == "table" and type(self._baseDataSnapshot) == "table" and type(self._baseDataSnapshot[key]) == "table" then
+		return self:_recurseMergeTable(self._baseDataSnapshot[key], value)
+	else
+		return value
+	end
+end
+
+function DataStoreStage:_recurseMergeTable(original, incoming)
+	if incoming == DataStoreDeleteToken then
+		return nil
+	elseif type(incoming) == "table" and type(original) == "table" then
+		-- Merge
+		local newSnapshot = table.clone(original)
+
+		-- Overwerite with merged values...
+		for key, value in pairs(incoming) do
+			newSnapshot[key] = self:_recurseMergeTable(original[key], value)
+		end
+
+		return table.freeze(newSnapshot)
+	else
+		return incoming
+	end
+end
+
+function DataStoreStage:_updateViewSnapshot()
+	self:_checkIntegrity()
+
+	local newViewSnapshot = self:_computeNewViewSnapshot()
+
+	if not Table.deepEquivalent(self._viewSnapshot, newViewSnapshot) then
+		local previousViewSnapshot = self._viewSnapshot
+		self._viewSnapshot = newViewSnapshot
+
+		-- Fire off changed keys
+		local changedKeys = self:_computeChangedKeys(previousViewSnapshot, newViewSnapshot)
+		if next(changedKeys) ~= nil then
+			if type(newViewSnapshot) == "table" then
+				for key, _ in pairs(changedKeys) do
+					self._keySubscriptions:Fire(key, newViewSnapshot[key])
+				end
+			else
+				for key, _ in pairs(changedKeys) do
+					self._keySubscriptions:Fire(key, nil)
+				end
+			end
+		end
+
+		self.Changed:Fire(self._viewSnapshot)
+	end
+
+	self:_checkIntegrity()
+end
+
+function DataStoreStage:_computeChangedKeys(previousViewSnapshot, newViewSnapshot)
+	-- Detect keys that changed
+	if type(previousViewSnapshot) == "table" and type(newViewSnapshot) == "table" then
+		local changedKeys = {}
+
+		local keys = Set.union(Set.fromKeys(previousViewSnapshot), Set.fromKeys(newViewSnapshot))
+		for key, _ in pairs(keys) do
+			if not Table.deepEquivalent(previousViewSnapshot[key], newViewSnapshot[key]) then
+				changedKeys[key] = true
+			end
+		end
+
+		return changedKeys
+	elseif type(newViewSnapshot) == "table" then
+		-- Swap to table, all keys change
+		return Set.fromKeys(newViewSnapshot)
+	elseif type(previousViewSnapshot) == "table" then
+		-- Swap from table, all keys change
+		return Set.fromKeys(previousViewSnapshot)
+	else
+		return {}
+	end
+end
+
+function DataStoreStage:_updateViewSnapshotAtKey(key)
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
+
+	if type(self._viewSnapshot) ~= "table" then
+		self:_updateViewSnapshot()
+		return
+	end
+
+	local newValue = self:_computeViewValueForKey(key)
+	if self._viewSnapshot[key] == newValue then
+		return
+	end
+
+	local newSnapshot = table.clone(self._viewSnapshot)
+	newSnapshot[key] = newValue
+
+
+	self._viewSnapshot = table.freeze(newSnapshot)
+	self._keySubscriptions:Fire(key, newValue)
+	self.Changed:Fire(self._viewSnapshot)
+
+	self:_checkIntegrity()
+end
+
+function DataStoreStage:_computeNewViewSnapshot()
+	-- This prioritizes save data first, then stores, then base data
+
+	if self._saveDataSnapshot == DataStoreDeleteToken then
+		return nil
+	elseif self._saveDataSnapshot == nil or type(self._saveDataSnapshot) == "table" then
+		-- Compute a new view
+
+		-- Start with base data
+		local newView
+		if type(self._baseDataSnapshot) == "table" then
+			newView = table.clone(self._baseDataSnapshot)
+		else
+			newView = {}
+		end
+
+		-- Add in stores
+		for key, store in pairs(self._stores) do
+			newView[key] = store._viewSnapshot
+		end
+
+		-- Then finally save data
+		if type(self._saveDataSnapshot) == "table" then
+			for key, value in pairs(self._saveDataSnapshot) do
+				if value == DataStoreDeleteToken then
+					newView[key] = nil
+				else
+					newView[key] = value
+				end
+			end
+		end
+
+		if next(newView) == nil and not (type(self._baseDataSnapshot) == "table" or type(self._saveDataSnapshot) == "table") then
+			-- We haev no reason to be a table, make sure we return nil
+			return nil
+		end
+
+		return table.freeze(newView)
+	else
+		assert(self._saveDataSnapshot ~= nil, "Bad _saveDataSnapshot")
+		assert(type(self._saveDataSnapshot) ~= "table", "Bad self._saveDataSnapshot")
+
+		-- If save data isn't nil or a table then we are to return the save table
+		return self._saveDataSnapshot
+	end
+end
+
+function DataStoreStage:_computeViewValueForKey(key)
+	-- This prioritizes save data first, then stores, then base data
+
+	if self._saveDataSnapshot == DataStoreDeleteToken then
+		return nil
+	elseif self._saveDataSnapshot == nil or type(self._saveDataSnapshot) == "table" then
+		if type(self._saveDataSnapshot) == "table" then
+			if self._saveDataSnapshot[key] ~= nil then
+				local value = self._saveDataSnapshot[key]
+				if value == DataStoreDeleteToken then
+					return nil
+				else
+					return value
+				end
+			end
+		end
+
+		if self._stores[key] then
+			local value = self._stores[key]._viewSnapshot
+			if value == DataStoreDeleteToken then
+				return nil
+			else
+				return value
+			end
+		end
+
+		if type(self._baseDataSnapshot) == "table" then
+			if self._baseDataSnapshot[key] ~= nil then
+				return self._baseDataSnapshot[key]
+			end
+		end
+
+		return nil
+	else
+		-- If save data isn't nil or a table then we are to return nil.
+		return nil
+	end
+end
+
 -- Stores the data for overwrite.
-function DataStoreStage:_doStore(name, value)
-	assert(type(name) == "string" or type(name) == "number", "Bad name")
+function DataStoreStage:_storeAtKey(key, value)
+	assert(type(key) == "string" or type(key) == "number", "Bad key")
 	assert(value ~= nil, "Bad value")
 
-	local newValue
-	if value == DataStoreDeleteToken then
-		newValue = DataStoreDeleteToken
-	elseif type(value) == "table" then
-		newValue = Table.deepCopy(value)
+	local deepClonedSaveValue
+	if type(value) == "table" then
+		deepClonedSaveValue = table.freeze(Table.deepCopy(value))
 	else
-		newValue = value
+		deepClonedSaveValue = value
 	end
 
-	if not self._dataToSave then
-		self._dataToSave = {}
+	if self._stores[key] then
+		self._stores[key]:Overwrite(value)
+		return
 	end
 
-	self._dataToSave[name] = newValue
-	if self._topLevelStoreSignal then
-		self._topLevelStoreSignal:Fire()
-	end
+	local swappedSaveSnapshotType = false
+	local newSnapshot
 
-	if newValue == DataStoreDeleteToken then
-		self._subsTable:Fire(name, nil)
+	if type(self._saveDataSnapshot) == "table" then
+		newSnapshot = table.clone(self._saveDataSnapshot)
 	else
-		self._subsTable:Fire(name, newValue)
+		swappedSaveSnapshotType = true
+		newSnapshot = {}
+	end
+
+	newSnapshot[key] = deepClonedSaveValue
+
+	self._saveDataSnapshot = table.freeze(newSnapshot)
+
+	self.DataStored:Fire()
+
+	if swappedSaveSnapshotType then
+		self:_updateViewSnapshot()
+	else
+		self:_updateViewSnapshotAtKey(key)
+	end
+	self:_checkIntegrity()
+end
+
+function DataStoreStage:_checkIntegrity()
+	if not SLOW_INTEGRITY_CHECK_ENABLED then
+		return
+	end
+
+	assert(self._baseDataSnapshot ~= DataStoreDeleteToken, "BaseDataSnapshot should not be DataStoreDeleteToken")
+	assert(self._viewSnapshot ~= DataStoreDeleteToken, "ViewSnapshot should not be DataStoreDeleteToken")
+
+	if type(self._baseDataSnapshot) == "table" then
+		assert(table.isfrozen(self._baseDataSnapshot), "Base snapshot should be frozen")
+	end
+
+	if type(self._saveDataSnapshot) == "table" then
+		assert(table.isfrozen(self._saveDataSnapshot), "Save snapshot should be frozen")
+	end
+
+	if type(self._viewSnapshot) == "table" then
+		assert(table.isfrozen(self._viewSnapshot), "View snapshot should be frozen")
+	end
+
+	for key, _ in pairs(self._stores) do
+		if type(self._baseDataSnapshot) == "table" and self._baseDataSnapshot[key] ~= nil then
+			error(string.format("[DataStoreStage] - Duplicate baseData at key %q", key))
+		end
+
+		if type(self._saveDataSnapshot) == "table" and self._saveDataSnapshot[key] ~= nil then
+			error(string.format("[DataStoreStage] - Duplicate saveData at key %q", key))
+		end
+	end
+
+	if type(self._viewSnapshot) == "table" then
+		for key, value in pairs(self._viewSnapshot) do
+			assert(type(key) == "string" or type(key) == "number", "Bad key")
+			if value == DataStoreDeleteToken then
+				error(string.format("[DataStoreStage] - View at key %q is delete token", key))
+			end
+		end
 	end
 end
 

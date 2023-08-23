@@ -10,6 +10,7 @@ local Players = game:GetService("Players")
 local Binder = require("Binder")
 local Maid = require("Maid")
 local HumanoidTracker = require("HumanoidTracker")
+local ValueObject = require("ValueObject")
 
 local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
@@ -38,8 +39,7 @@ function PlayerHumanoidBinder:Init(...)
 	getmetatable(PlayerHumanoidBinder).Init(self, ...)
 
 	if not self._shouldTag then
-		self._shouldTag = Instance.new("BoolValue")
-		self._shouldTag.Value = true
+		self._shouldTag = ValueObject.new(true, "boolean")
 		self._maid:GiveTask(self._shouldTag)
 	end
 end
@@ -53,6 +53,21 @@ function PlayerHumanoidBinder:SetAutomaticTagging(shouldTag)
 	assert(self._shouldTag, "Missing self._shouldTag")
 
 	self._shouldTag.Value = shouldTag
+end
+
+--[=[
+	@return Observable<boolean>
+]=]
+function PlayerHumanoidBinder:ObserveAutomaticTagging()
+	return self._shouldTag:Observe()
+end
+
+--[=[
+	@param predicate function -- Optional predicate
+	@return Observable<Brio<boolean>>
+]=]
+function PlayerHumanoidBinder:ObserveAutomaticTaggingBrio(predicate)
+	return self._shouldTag:ObserveBrio(predicate)
 end
 
 --[=[

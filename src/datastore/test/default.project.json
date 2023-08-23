@@ -1,0 +1,21 @@
+{
+  "name": "DataStoreTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "datastore": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

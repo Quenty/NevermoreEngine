@@ -15,7 +15,6 @@ function {{gameNameProper}}Service:Init(serviceBag)
 	self._serviceBag:GetService(require("CmdrService"))
 
 	-- Internal
-	self._serviceBag:GetService(require("{{gameNameProper}}BindersServer"))
 end
 
 return {{gameNameProper}}Service

@@ -22,7 +22,7 @@ export interface InitGameArgs extends NevermoreGlobalArgs {
 export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
   public command = 'init [game-name]';
   public describe =
-    'Initializes a new game to use Nevermore with Cmdr and a few other packages.';
+    'Initializes a new game template.';
 
   public builder(args: Argv<T>) {
     args.positional('game-name', {

@@ -29,6 +29,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
+    "@quenty/characterutils": "file:../characterutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",

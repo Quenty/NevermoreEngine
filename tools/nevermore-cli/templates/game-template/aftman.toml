@@ -2,5 +2,5 @@
 # For more information, see https://github.com/LPGhatguy/aftman
 [tools]
 rojo = "quenty/rojo@7.3.0-quenty-npm-canary.7"
-selene = "Kampfkarren/selene@0.23.1"
+selene = "Kampfkarren/selene@0.25.0"
 moonwave-extractor = "UpliftGames/moonwave@1.0.1"

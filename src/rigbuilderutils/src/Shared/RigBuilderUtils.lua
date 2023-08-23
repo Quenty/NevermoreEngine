@@ -514,6 +514,12 @@ function RigBuilderUtils.promiseHumanoidModelFromUserId(userId, rigType, assetTy
 				userId,
 				rigType or Enum.HumanoidRigType.R15,
 				assetTypeVerification or Enum.AssetTypeVerification.Default)
+
+			for _, item in pairs(model:GetDescendants()) do
+				if item:IsA("LocalScript") then
+					item.Enabled = false
+				end
+			end
 		end)
 		if not ok then
 			return reject(err or "Failed to create model")

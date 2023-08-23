@@ -1,0 +1,21 @@
+{
+  "name": "ChatProviderServiceTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "chatproviderservice": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

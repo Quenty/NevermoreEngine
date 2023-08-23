@@ -1,0 +1,33 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBXA71E776B91854FE784E1CC1791A97E21">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<string name="Name">TagList</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags">VGFnRWRpdG9yVGFnQ29udGFpbmVy</BinaryString>
+		</Properties>
+		<Item class="Configuration" referent="RBXCFB22A2A14CE4962A6A74084D998A485">
+			<Properties>
+				<BinaryString name="AttributesSerialize"><![CDATA[BgAAAAsAAABBbHdheXNPblRvcAMABQAAAENvbG9yD2iilz6RxPc+9jHXPQgAAABEcmF3VHlw
+ZQIDAAAAQm94BQAAAEdyb3VwAgoAAABHYW1lQ29uZmlnBAAAAEljb24CCgAAAGVtb2ppOmdl
+YXIHAAAAVmlzaWJsZQMB]]></BinaryString>
+				<string name="Name">GameConfig</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="Configuration" referent="RBX96AB56F422F3467DA228FCE9311AED0D">
+			<Properties>
+				<BinaryString name="AttributesSerialize"><![CDATA[BgAAAAsAAABBbHdheXNPblRvcAMABQAAAENvbG9yD3yv4j6Lw6Y9TmrZPggAAABEcmF3VHlw
+ZQIDAAAAQm94BQAAAEdyb3VwAgoAAABHYW1lQ29uZmlnBAAAAEljb24CCgAAAGVtb2ppOmdl
+YXIHAAAAVmlzaWJsZQMB]]></BinaryString>
+				<string name="Name">GameConfigAsset</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>

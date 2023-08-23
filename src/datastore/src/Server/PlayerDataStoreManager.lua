@@ -171,6 +171,7 @@ function PlayerDataStoreManager:_createDataStore(player)
 	assert(not self._datastores[player], "Bad player")
 
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(player))
+	datastore:SetUserIdList({ player.UserId })
 
 	self._maid._savingConns[player] = datastore.Saving:Connect(function(promise)
 		self._pendingSaves:Add(promise)

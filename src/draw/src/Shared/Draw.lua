@@ -77,7 +77,7 @@ end
 --[=[
 	Draws a line between directions
 
-	@param start Vector3
+	@param origin Vector3
 	@param direction Vector3
 	@param color Color3 -- Optional
 	@param parent Instance? -- Optional
@@ -85,12 +85,12 @@ end
 	@param diameter number -- Optional
 	@return Instance
 ]=]
-function Draw.direction(start, direction, color, parent, meshDiameter, diameter)
-	start = assert(Draw._toVector3(start), "Bad start")
+function Draw.direction(origin, direction, color, parent, meshDiameter, diameter)
+	origin = assert(Draw._toVector3(origin), "Bad origin")
 	direction = assert(Draw._toVector3(direction), "Bad direction")
 	color = Draw._toColor3(color)
 
-	return Draw.ray(Ray.new(start, direction), color, parent, meshDiameter, diameter)
+	return Draw.ray(Ray.new(origin, direction), color, parent, meshDiameter, diameter)
 end
 
 --[=[
@@ -133,6 +133,25 @@ function Draw.blockcast(cframe, size, direction, color, parent)
 	folder.Parent = parent
 
 	return folder
+end
+
+--[=[
+	Draws a raycast for debugging
+
+	```lua
+	Draw.raycast(origin, direction)
+	```
+
+	@param origin Vector3
+	@param direction Vector3
+	@param color Color3 -- Optional
+	@param parent Instance? -- Optional
+	@param meshDiameter number -- Optional
+	@param diameter number -- Optional
+	@return Instance
+]=]
+function Draw.raycast(origin, direction, color, parent, meshDiameter, diameter)
+	return Draw.direction(origin, direction, color, parent, meshDiameter, diameter)
 end
 
 --[=[

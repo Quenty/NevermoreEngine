@@ -38,10 +38,12 @@ end
 
 	@param average number
 	@param spread number
+	@param randomValue number?
 	@return number
 ]=]
-function Math.jitter(average: number, spread: number)
-	return average - 0.5*spread + math.random()*spread
+function Math.jitter(average: number, spread: number, randomValue)
+	randomValue = randomValue or math.random()
+	return average - 0.5*spread + randomValue*spread
 end
 
 --[=[

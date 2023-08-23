@@ -5,10 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local ObservableMap = {}
@@ -25,7 +26,8 @@ function ObservableMap.new()
 	self._maid = Maid.new()
 	self._map = {}
 
-	self._keyToSubList = {}
+	self._keySubTable = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._keySubTable)
 
 	self._countValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._countValue)
@@ -182,32 +184,8 @@ end
 function ObservableMap:ObserveValueForKey(key)
 	assert(key ~= nil, "Bad key")
 
-	return Observable.new(function(sub)
-		local maid = Maid.new()
-
-		if not self._keyToSubList[key] then
-			self._keyToSubList[key] = {}
-		end
-		table.insert(self._keyToSubList[key], sub)
-
-		maid:GiveTask(function()
-			local subsList = self._keyToSubList[key]
-			if subsList then
-				local index = table.find(subsList, sub)
-
-				if index then
-					table.remove(subsList, index)
-				end
-
-				if #subsList == 0 then
-					self._keyToSubList[key] = nil
-				end
-			end
-		end)
-
+	return self._keySubTable:Observe(key, function(sub)
 		sub:Fire(self._map[key])
-
-		return maid
 	end)
 end
 
@@ -239,17 +217,7 @@ function ObservableMap:Set(key, value)
 	end
 
 	self.KeyValueChanged:Fire(key, value, oldValue)
-
-	local subList = self._keyToSubList[key]
-	if subList then
-		for _, sub in pairs(table.clone(subList)) do
-			if sub and sub:IsPending() then
-				task.spawn(function()
-					sub:Fire(value)
-				end)
-			end
-		end
-	end
+	self._keySubTable:Fire(key, value)
 
 	return self:_getRemovalCallback(key, value)
 end

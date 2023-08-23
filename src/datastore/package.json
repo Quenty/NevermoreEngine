@@ -30,11 +30,14 @@
     "@quenty/bindtocloseservice": "file:../bindtocloseservice",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/signal": "file:../signal",
     "@quenty/symbol": "file:../symbol",
-    "@quenty/table": "file:../table"
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

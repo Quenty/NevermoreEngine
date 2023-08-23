@@ -46,6 +46,18 @@ function UserInfoServiceClient:PromiseDisplayName(userId)
 	return self._aggregator:PromiseDisplayName(userId)
 end
 
+--[=[
+	Observes the user display name for the userId
+
+	@param userId number
+	@return Observable<string>
+]=]
+function UserInfoServiceClient:ObserveDisplayName(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return self._aggregator:ObserveDisplayName(userId)
+end
+
 function UserInfoServiceClient:Destroy()
 	self._maid:DoCleaning()
 end

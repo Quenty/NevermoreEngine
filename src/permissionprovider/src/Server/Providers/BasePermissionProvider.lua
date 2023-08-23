@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local GetRemoteFunction = require("GetRemoteFunction")
+local PermissionLevel = require("PermissionLevel")
+local PermissionLevelUtils = require("PermissionLevelUtils")
 local Table = require("Table")
 
 local BasePermissionProvider = setmetatable({}, BaseObject)
@@ -44,12 +46,49 @@ end
 --[=[
 	Returns whether the player is a creator.
 	@param player Player
+	@param permissionLevel PermissionLevel
+	@return Promise<boolean>
+]=]
+function BasePermissionProvider:PromiseIsPermissionLevel(player, permissionLevel)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+
+	error("Not implemented")
+end
+
+--[=[
+	Returns whether the player is a creator.
+	@param player Player
+	@param permissionLevel PermissionLevel
+	@return Promise<boolean>
+]=]
+function BasePermissionProvider:IsPermissionLevel(player, permissionLevel)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(PermissionLevelUtils.isPermissionLevel(permissionLevel), "Bad permissionLevel")
+
+	local promise = self:PromiseIsPermissionLevel(player, permissionLevel)
+	if promise:IsPending() then
+		return false -- We won't yield for this
+	end
+
+	local ok, result = promise:Yield()
+	if not ok then
+		warn("[BasePermissionProvider] - %s"):format(tostring(result))
+		return false
+	end
+
+	return result
+end
+
+--[=[
+	Returns whether the player is a creator.
+	@param player Player
 	@return Promise<boolean>
 ]=]
 function BasePermissionProvider:PromiseIsCreator(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	error("Not implemented")
+	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
 end
 
 --[=[
@@ -60,7 +99,7 @@ end
 function BasePermissionProvider:PromiseIsAdmin(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	error("Not implemented")
+	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
 end
 
 --[=[
@@ -76,18 +115,7 @@ end
 function BasePermissionProvider:IsCreator(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	local promise = self:PromiseIsCreator(player)
-	if promise:IsPending() then
-		return false -- We won't yield for this
-	end
-
-	local ok, result = promise:Yield()
-	if not ok then
-		warn("[BasePermissionProvider] - %s"):format(tostring(result))
-		return false
-	end
-
-	return result
+	return self:IsCreator(player, PermissionLevel.CREATOR)
 end
 
 --[=[
@@ -103,18 +131,7 @@ end
 function BasePermissionProvider:IsAdmin(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	local promise = self:PromiseIsAdmin(player)
-	if promise:IsPending() then
-		return false -- We won't yield for this
-	end
-
-	local ok, result = promise:Yield()
-	if not ok then
-		warn("[BasePermissionProvider] - %s"):format(tostring(result))
-		return false
-	end
-
-	return result
+	return self:IsPermissionLevel(player, PermissionLevel.ADMIN)
 end
 
 function BasePermissionProvider:_onServerInvoke(player)

@@ -85,7 +85,6 @@ function ColorGradePalette:GetVividness(gradeName)
 
 	assert(type(vividness) == "number", "Bad vividness retrieved")
 	return vividness
-
 end
 
 function ColorGradePalette:Add(gradeName, colorGrade, vividness)

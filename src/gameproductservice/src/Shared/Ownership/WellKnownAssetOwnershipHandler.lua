@@ -46,16 +46,31 @@ function WellKnownAssetOwnershipHandler.new(adornee, gameConfigAsset)
 	return self
 end
 
+--[=[
+	Sets if the asset is owned
+
+	@param isOwned boolean
+]=]
 function WellKnownAssetOwnershipHandler:SetIsOwned(isOwned)
 	assert(type(isOwned) == "boolean", "Bad isOwned")
 
 	self._isOwned.Value = isOwned
 end
 
+--[=[
+	Gets if the asset is owned
+
+	@return boolean
+]=]
 function WellKnownAssetOwnershipHandler:GetIsOwned()
 	return self._isOwned.Value
 end
 
+--[=[
+	Observes if the asset is owned
+
+	@return Observable<boolean>
+]=]
 function WellKnownAssetOwnershipHandler:ObserveIsOwned()
 	return self._isOwned:Observe()
 end
