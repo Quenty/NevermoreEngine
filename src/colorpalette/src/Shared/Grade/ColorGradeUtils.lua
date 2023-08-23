@@ -42,9 +42,9 @@ function ColorGradeUtils.addGrade(grade, difference)
 	return finalGrade
 end
 
-function ColorGradeUtils.addGradeToColor(color, difference, vividness)
+function ColorGradeUtils.addGradeToColor(color, difference)
 	local grade = ColorGradeUtils.getGrade(color)
-	return ColorGradeUtils.getGradedColor(color, ColorGradeUtils.addGrade(grade, difference), vividness)
+	return ColorGradeUtils.getGradedColor(color, ColorGradeUtils.addGrade(grade, difference))
 end
 
 --[=[
