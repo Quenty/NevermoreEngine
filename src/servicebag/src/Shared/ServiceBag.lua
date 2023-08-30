@@ -54,6 +54,8 @@ function ServiceBag.new(parentProvider)
 	local self = setmetatable(BaseObject.new(), ServiceBag)
 
 	self._services = {}
+	self._serviceTypesByName = {}
+
 	self._parentProvider = parentProvider
 
 	self._serviceTypesToInitializeSet = {}
@@ -87,6 +89,11 @@ end
 	@return any
 ]=]
 function ServiceBag:GetService(serviceType)
+	if type(serviceType) == "string" then
+		serviceType = self._serviceTypesByName[serviceType]
+		-- TODO: Error if it doesn't exist if it's past init, otherwise...
+	end
+
 	if typeof(serviceType) == "Instance" then
 		serviceType = require(serviceType)
 	end
@@ -115,6 +122,11 @@ end
 	@return boolean
 ]=]
 function ServiceBag:HasService(serviceType)
+	if type(serviceType) == "string" then
+		serviceType = self._serviceTypesByName[serviceType]
+		-- TODO: Error if it doesn't exist if it's past init, otherwise...
+	end
+
 	if typeof(serviceType) == "Instance" then
 		serviceType = require(serviceType)
 	end
@@ -141,6 +153,8 @@ function ServiceBag:Init()
 
 		self:_ensureInitialization(serviceType)
 	end
+
+	-- TODO: Error on any unretrieved errors
 
 	self._serviceTypesToInitializeSet = nil
 	self._initializing = false
@@ -218,8 +232,10 @@ end
 
 -- Adds a service to this provider only
 function ServiceBag:_addServiceType(serviceType)
+	local serviceName = self:_getServiceName(serviceType)
+
 	if not self._serviceTypesToInitializeSet then
-		error(("Already finished initializing, cannot add %q"):format(self:_getServiceName(serviceType)))
+		error(string.format("Already finished initializing, cannot add %q", serviceName))
 		return
 	end
 
@@ -231,6 +247,12 @@ function ServiceBag:_addServiceType(serviceType)
 	-- Construct a new version of this service so we're isolated
 	local service = setmetatable({}, { __index = serviceType })
 	self._services[serviceType] = service
+
+	if self._serviceTypesByName[serviceName] then
+		warn(string.format("[ServiceBag] - Already added service with name %q", serviceName))
+	else
+		self._serviceTypesByName[serviceName] = serviceType
+	end
 
 	self:_ensureInitialization(serviceType)
 end
@@ -266,7 +288,7 @@ function ServiceBag:_initService(serviceType)
 
 		local isDead = coroutine.status(current) == "dead"
 		if not isDead then
-			error(("Initializing service %q yielded"):format(serviceName))
+			error(string.format("Initializing service %q yielded", serviceName))
 		end
 	end
 
