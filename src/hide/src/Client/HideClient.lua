@@ -1,8 +1,13 @@
 --[=[
-	See [HideBindersClient] for usage.
+	See [Binder] for usage.
+
 	@client
 	@class HideClient
 ]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local Binder = require("Binder")
 
 local HideClient = {}
 HideClient.ClassName = "HideClient"
@@ -24,4 +29,4 @@ function HideClient:Destroy()
 	setmetatable(self, nil)
 end
 
-return HideClient
+return Binder.new("Hide", HideClient)
