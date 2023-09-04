@@ -5,12 +5,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Promise = require("Promise")
-local Signal = require("Signal")
-local Maid = require("Maid")
 local ContentProviderUtils = require("ContentProviderUtils")
-local RxInstanceUtils = require("RxInstanceUtils")
+local Maid = require("Maid")
+local Promise = require("Promise")
 local Rx = require("Rx")
+local RxInstanceUtils = require("RxInstanceUtils")
+local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 
 local ImageLabelLoaded = setmetatable({}, BaseObject)
