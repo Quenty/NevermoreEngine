@@ -41,7 +41,7 @@ function GameConfigPicker.new(gameConfigBinder, gameConfigAssetBinder)
 			local gameConfig = brio:GetValue()
 			local maid = brio:ToMaid()
 
-			maid:GiveTask(self._gameIdToConfigSet:Add(gameConfig, gameConfig:ObserveGameId()))
+			maid:GiveTask(self._gameIdToConfigSet:Push(gameConfig:ObserveGameId(), gameConfig))
 		end))
 
 	return self

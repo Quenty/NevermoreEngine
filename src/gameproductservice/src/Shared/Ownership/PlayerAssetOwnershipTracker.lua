@@ -288,8 +288,8 @@ function PlayerAssetOwnershipTracker:_cacheWellKnownAssets()
 			wellKnownHandler:SetIsOwned(owned)
 		end))
 
-		gameConfigMaid:GiveTask(self._assetIdToWellKnownOwnershipTracker:Add(wellKnownHandler, gameConfigAsset:ObserveAssetId()))
-		gameConfigMaid:GiveTask(self._assetKeyToWellKnownOwnershipTracker:Add(wellKnownHandler, gameConfigAsset:ObserveAssetKey()))
+		gameConfigMaid:GiveTask(self._assetIdToWellKnownOwnershipTracker:Push(gameConfigAsset:ObserveAssetId(), wellKnownHandler))
+		gameConfigMaid:GiveTask(self._assetKeyToWellKnownOwnershipTracker:Push(gameConfigAsset:ObserveAssetKey(), wellKnownHandler))
 	end))
 
 	return maid
