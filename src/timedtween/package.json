@@ -28,6 +28,7 @@
     "@quenty/basicpane": "file:../basicpane",
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/math": "file:../math",
     "@quenty/promise": "file:../promise",
     "@quenty/promisemaid": "file:../promisemaid",

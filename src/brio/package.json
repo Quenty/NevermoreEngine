@@ -28,7 +28,9 @@
   "dependencies": {
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/rx": "file:../rx"
+    "@quenty/rx": "file:../rx",
+    "@quenty/signal": "file:../signal",
+    "@quenty/steputils": "file:../steputils"
   },
   "publishConfig": {
     "access": "public"
