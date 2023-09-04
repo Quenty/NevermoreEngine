@@ -1,23 +1,18 @@
-# v1.4.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add versions to package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@1.3.0...@quenty/animations@1.4.0) (2023-09-04)
+
+
+### Bug Fixes
+
+* Add versions to package ([104323f](https://github.com/Quenty/NevermoreEngine/commit/104323fb7f53b866282b2cdef9bf8a849cfb308c))
+
+
+
+
 
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@1.2.0...@quenty/animations@1.3.0) (2023-08-23)
 

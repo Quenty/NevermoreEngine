@@ -1,20 +1,18 @@
-# v7.16.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-- feat: Add Push API method ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.15.0...@quenty/gameproductservice@7.16.0) (2023-09-04)
+
+
+### Features
+
+* Add Push API method ([36d49af](https://github.com/Quenty/NevermoreEngine/commit/36d49afe58738c45410d300a935789d5b7dacb79))
+
+
+
+
 
 # [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.14.0...@quenty/gameproductservice@7.15.0) (2023-08-23)
 

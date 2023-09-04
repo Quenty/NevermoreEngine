@@ -1,24 +1,23 @@
-# v8.18.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-- feat: Use GoodSignal and add :ToMaidAndValue helper method ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add versions to package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.17.0...@quenty/brio@8.18.0) (2023-09-04)
+
+
+### Bug Fixes
+
+* Add versions to package ([104323f](https://github.com/Quenty/NevermoreEngine/commit/104323fb7f53b866282b2cdef9bf8a849cfb308c))
+
+
+### Features
+
+* Use GoodSignal and add :ToMaidAndValue helper method ([7dd9196](https://github.com/Quenty/NevermoreEngine/commit/7dd91960cc06977c6a13784d3109123b259010a5))
+
+
+
+
 
 # [8.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@8.16.0...@quenty/brio@8.17.0) (2023-08-23)
 

@@ -1,24 +1,18 @@
-# v5.25.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableMapList.new() and fix unit tests ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.24.0...@quenty/observablecollection@5.25.0) (2023-09-04)
+
+
+### Features
+
+* Add ObservableMapList.new() and fix unit tests ([84e16ed](https://github.com/Quenty/NevermoreEngine/commit/84e16ed86af9bbc1ad19486f0298a9f7f3484b3e))
+
+
+
+
 
 # [5.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.23.0...@quenty/observablecollection@5.24.0) (2023-08-23)
 

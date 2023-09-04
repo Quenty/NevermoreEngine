@@ -1,20 +1,18 @@
-# v5.28.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-- feat: Remove HideBindersClient and HideBindersServer and replace them with HideServiceClient and HideServiceServer ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@5.27.0...@quenty/hide@5.28.0) (2023-09-04)
+
+
+### Features
+
+* Remove HideBindersClient and HideBindersServer and replace them with HideServiceClient and HideServiceServer ([b93f4d1](https://github.com/Quenty/NevermoreEngine/commit/b93f4d15735f0c6daa7a500594a4c043926d9427))
+
+
+
+
 
 # [5.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hide@5.26.0...@quenty/hide@5.27.0) (2023-08-23)
 

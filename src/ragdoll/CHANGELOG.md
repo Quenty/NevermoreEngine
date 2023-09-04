@@ -1,23 +1,18 @@
-# v9.36.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Only apply network owner check on the server, as the check can be slow ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.35.0...@quenty/ragdoll@9.36.0) (2023-09-04)
+
+
+### Performance Improvements
+
+* Only apply network owner check on the server, as the check can be slow ([66f08a4](https://github.com/Quenty/NevermoreEngine/commit/66f08a45b60e86a28f7532cf6b04975ade72e31f))
+
+
+
+
 
 # [9.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.34.0...@quenty/ragdoll@9.35.0) (2023-08-23)
 

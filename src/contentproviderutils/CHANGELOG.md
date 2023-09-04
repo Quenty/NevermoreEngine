@@ -1,23 +1,15 @@
-# v6.19.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Sort image label loaded values ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.18.0...@quenty/contentproviderutils@6.19.0) (2023-09-04)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
 
 # [6.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@6.17.0...@quenty/contentproviderutils@6.18.0) (2023-08-23)
 

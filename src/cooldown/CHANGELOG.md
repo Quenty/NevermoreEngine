@@ -1,24 +1,15 @@
-# v5.31.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling ([@Quenty](https://github.com/Quenty))
-- refactor: Cooldown exports a CooldownModel which allows state to be decoupled from triggers ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.30.0...@quenty/cooldown@5.31.0) (2023-09-04)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+
+
+
 
 # [5.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.29.0...@quenty/cooldown@5.30.0) (2023-08-23)
 

@@ -1,24 +1,18 @@
-# v3.3.0 (Mon Sep 04 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
-- feat: Add StepUtils.deferWait() ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix styling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.2.0...@quenty/steputils@3.3.0) (2023-09-04)
+
+
+### Features
+
+* Add StepUtils.deferWait() ([caac896](https://github.com/Quenty/NevermoreEngine/commit/caac896fc8439d0de87245cf4bdcb534ba2a9efe))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.1.0...@quenty/steputils@3.2.0) (2022-10-11)
 
