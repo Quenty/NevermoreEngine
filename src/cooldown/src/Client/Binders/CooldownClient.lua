@@ -8,6 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local CooldownBase = require("CooldownBase")
+local Binder = require("Binder")
 
 local CooldownClient = setmetatable({}, CooldownBase)
 CooldownClient.ClassName = "CooldownClient"
@@ -21,10 +22,14 @@ CooldownClient.__index = CooldownClient
 	@param serviceBag ServiceBag
 	@return Cooldown
 ]=]
-function CooldownClient.new(obj, serviceBag)
-	local self = setmetatable(CooldownBase.new(obj, serviceBag), CooldownClient)
+function CooldownClient.new(numberValue, serviceBag)
+	local self = setmetatable(CooldownBase.new(numberValue, serviceBag), CooldownClient)
+
+	self._maid:GiveTask(self.Done:Connect(function()
+		self._obj:Remove()
+	end))
 
 	return self
 end
 
-return CooldownClient
+return Binder.new("Cooldown", CooldownClient)
