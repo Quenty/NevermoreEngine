@@ -18,7 +18,7 @@ CooldownClient.__index = CooldownClient
 	Constructs a new cooldown. Should be done via [CooldownBindersClient]. To create an
 	instance of this in Roblox, see [CooldownUtils.create].
 
-	@param obj NumberValue
+	@param numberValue NumberValue
 	@param serviceBag ServiceBag
 	@return Cooldown
 ]=]

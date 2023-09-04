@@ -13,7 +13,6 @@ local CooldownUtils = {}
 
 --[=[
 	Creates a new Roblox instance representing a cooldown.
-	@param cooldownBinder Binder<Cooldown | CooldownClient>
 	@param parent Instance
 	@param length number
 	@return Instance

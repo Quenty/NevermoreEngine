@@ -41,8 +41,6 @@ end
 
 --[=[
 	Yields until the frame deferral is done
-
-	@param StepUtils
 ]=]
 function StepUtils.deferWait()
 	local signal = Instance.new("BindableEvent")

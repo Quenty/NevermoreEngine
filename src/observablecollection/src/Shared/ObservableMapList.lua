@@ -101,6 +101,7 @@ end
 	Gets the current value at the list index
 
 	@param key TKey
+	@param index number
 	@return Observable<TValue?>
 ]=]
 function ObservableMapList:GetAtListIndex(key, index)
@@ -119,6 +120,7 @@ end
 	Observes the current value at the index
 
 	@param key TKey
+	@param index number
 	@return Observable<TValue?>
 ]=]
 function ObservableMapList:ObserveAtListIndex(key, index)
@@ -158,6 +160,7 @@ end
 	Observes the current value at the index
 
 	@param key TKey
+	@param index number
 	@return Observable<Brio<TValue>>
 ]=]
 function ObservableMapList:ObserveAtListIndexBrio(key, index)
