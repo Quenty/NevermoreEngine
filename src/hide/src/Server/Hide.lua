@@ -2,11 +2,15 @@
 	Primarily used for authoring, this hides the tagged instance from render. Great for
 	making bounding boxes in studio that are then hidden upon runtime.
 
-	See [HideBindersServer] for usage.
+	See [Binder] for usage.
 
 	@server
 	@class Hide
 ]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local Binder = require("Binder")
 
 local Hide = {}
 Hide.ClassName = "Hide"
@@ -49,4 +53,4 @@ function Hide:Destroy()
 	setmetatable(self, nil)
 end
 
-return Hide
+return Binder.new("Hide", Hide)

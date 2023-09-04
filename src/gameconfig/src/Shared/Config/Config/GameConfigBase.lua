@@ -61,8 +61,8 @@ function GameConfigBase.new(folder: Instance)
 				local gameAssetConfig = brio:GetValue()
 				local maid = brio:ToMaid()
 
-				maid:GiveTask(self._assetTypeToAssetKeyMappings[assetType]:Add(gameAssetConfig, gameAssetConfig:ObserveAssetKey()))
-				maid:GiveTask(self._assetTypeToAssetIdMappings[assetType]:Add(gameAssetConfig, gameAssetConfig:ObserveAssetId()))
+				maid:GiveTask(self._assetTypeToAssetKeyMappings[assetType]:Push(gameAssetConfig:ObserveAssetKey(), gameAssetConfig))
+				maid:GiveTask(self._assetTypeToAssetIdMappings[assetType]:Push(gameAssetConfig:ObserveAssetId(), gameAssetConfig))
 			end))
 	end
 
@@ -200,9 +200,9 @@ function GameConfigBase:InitObservation()
 		local gameAssetConfig = brio:GetValue()
 		local maid = brio:ToMaid()
 
-		maid:GiveTask(self._assetTypeToAssetConfig:Add(gameAssetConfig, gameAssetConfig:ObserveAssetType()))
-		maid:GiveTask(self._assetKeyToAssetConfig:Add(gameAssetConfig, gameAssetConfig:ObserveAssetKey()))
-		maid:GiveTask(self._assetIdToAssetConfig:Add(gameAssetConfig, gameAssetConfig:ObserveAssetId()))
+		maid:GiveTask(self._assetTypeToAssetConfig:Push(gameAssetConfig:ObserveAssetType(), gameAssetConfig))
+		maid:GiveTask(self._assetKeyToAssetConfig:Push(gameAssetConfig:ObserveAssetKey(), gameAssetConfig))
+		maid:GiveTask(self._assetIdToAssetConfig:Push(gameAssetConfig:ObserveAssetId(), gameAssetConfig))
 	end))
 end
 

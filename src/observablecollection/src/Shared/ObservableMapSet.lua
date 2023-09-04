@@ -14,6 +14,7 @@ local Signal = require("Signal")
 local Brio = require("Brio")
 local RxBrioUtils = require("RxBrioUtils")
 local ValueObject = require("ValueObject")
+local Rx = require("Rx")
 
 local ObservableMapSet = {}
 ObservableMapSet.ClassName = "ObservableMapSet"
@@ -57,15 +58,28 @@ end
 	Adds an entry with a dynamic key. This is great for caching things
 	that need to be looked up by key.
 
+	:::tip
+	If `observeKey` emits nil then the value will be excluded from the map.
+	:::
+
 	@param entry TValue
-	@param observeKey Observable<TKey>
+	@param observeKey Observable<TKey> | TKey
+	@return MaidTask -- Cleanup object that will remove the entry
 ]=]
-function ObservableMapSet:Add(entry, observeKey)
+
+function ObservableMapSet:Push(observeKey, entry)
+	assert(observeKey ~= nil, "Bad observeKey")
+	assert(entry ~= nil, "Bad entry")
+
+	if not Observable.isObservable(observeKey) then
+		observeKey = Rx.of(observeKey)
+	end
+
 	local maid = Maid.new()
 
 	local lastKey = nil
 	local function removeLastEntry()
-		if lastKey then
+		if lastKey ~= nil then
 			self:_removeFromObservableSet(lastKey, entry)
 		end
 		lastKey = nil
@@ -74,13 +88,12 @@ function ObservableMapSet:Add(entry, observeKey)
 	maid:GiveTask(observeKey:Subscribe(function(key)
 		removeLastEntry()
 
-		if key then
+		if key ~= nil then
 			self:_addToObservableSet(key, entry)
 		end
 
 		lastKey = key
 	end))
-
 
 	maid:GiveTask(removeLastEntry)
 
@@ -91,6 +104,30 @@ function ObservableMapSet:Add(entry, observeKey)
 	end)
 
 	return maid
+end
+
+--[=[
+	Adds an entry with a dynamic key. This is great for caching things
+	that need to be looked up by key.
+
+	This code is legacy code since our argument order isn't intuitive
+
+	:::tip
+	If `observeKey` emits nil then the value will be excluded from the map.
+	:::
+
+	@param entry TValue
+	@param observeKey Observable<TKey> | TKey
+	@return MaidTask -- Cleanup object that will remove the entry
+]=]
+function ObservableMapSet:Add(entry, observeKey)
+	assert(Observable.isObservable(observeKey), "Bad observeKey")
+	assert(entry ~= nil, "Bad entry")
+
+	warn(string.format("[ObservableMapSet.Add] - This API call will swap observable key order eventually. Use ObservableMapSet.Push for now to suppress this warning.\n%s",
+		debug.traceback()))
+
+	return self:Push(observeKey, entry)
 end
 
 --[=[

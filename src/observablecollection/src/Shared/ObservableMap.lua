@@ -11,6 +11,7 @@ local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
+local RxBrioUtils = require("RxBrioUtils")
 
 local ObservableMap = {}
 ObservableMap.ClassName = "ObservableMap"
@@ -170,6 +171,7 @@ end
 
 --[=[
 	Observes the count of the set
+
 	@return Observable<number>
 ]=]
 function ObservableMap:ObserveCount()
@@ -177,17 +179,45 @@ function ObservableMap:ObserveCount()
 end
 
 --[=[
-	Observes the value for the given slot
+	Observes the value for the given key.
+
+	@param key TKey
+	@return Observable<Brio<TValue>>
+]=]
+function ObservableMap:ObserveAtKeyBrio(key)
+	assert(key ~= nil, "Bad key")
+
+	return self:ObserveAtKey(key):Pipe({
+		RxBrioUtils.toBrio();
+		RxBrioUtils.where(function(value)
+			return value ~= nil
+		end)
+	})
+end
+
+--[=[
+	Observes the value for the given key.
+
 	@param key TKey
 	@return Observable<TValue?>
 ]=]
-function ObservableMap:ObserveValueForKey(key)
+function ObservableMap:ObserveAtKey(key)
 	assert(key ~= nil, "Bad key")
 
 	return self._keySubTable:Observe(key, function(sub)
 		sub:Fire(self._map[key])
 	end)
 end
+
+--[=[
+	Observes the value for the given key. Alias for [ObservableMap.ObserveAtKey].
+
+	@function ObserveValueForKey
+	@param key TKey
+	@return Observable<TValue?>
+	@within ObservableMap
+]=]
+ObservableMap.ObserveValueForKey = ObservableMap.ObserveAtKey
 
 --[=[
 	Adds the item to the set if it does not exists.

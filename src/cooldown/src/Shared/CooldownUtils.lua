@@ -5,19 +5,19 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CollectionService = game:GetService("CollectionService")
+
 local BinderUtils = require("BinderUtils")
 
 local CooldownUtils = {}
 
 --[=[
 	Creates a new Roblox instance representing a cooldown.
-	@param cooldownBinder Binder<Cooldown | CooldownClient>
 	@param parent Instance
 	@param length number
 	@return Instance
 ]=]
-function CooldownUtils.create(cooldownBinder, parent, length)
-	assert(cooldownBinder, "Bad cooldownBinder")
+function CooldownUtils.create(parent, length)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(length) == "number", "Bad length")
 	assert(length > 0, "Bad length")
@@ -26,7 +26,7 @@ function CooldownUtils.create(cooldownBinder, parent, length)
 	cooldown.Value = length
 	cooldown.Name = "Cooldown"
 
-	cooldownBinder:Bind(cooldown)
+	CollectionService:AddTag(cooldown, "Cooldown")
 
 	cooldown.Parent = parent
 

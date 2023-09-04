@@ -8,7 +8,9 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local TimeSyncService = require("TimeSyncService")
 local CooldownConstants = require("CooldownConstants")
-local Signal = require("Signal")
+local CooldownModel = require("CooldownModel")
+local RxAttributeUtils = require("RxAttributeUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local CooldownBase = setmetatable({}, BaseObject)
 CooldownBase.ClassName = "CooldownBase"
@@ -17,33 +19,42 @@ CooldownBase.__index = CooldownBase
 --[=[
 	Constructs a new Cooldown.
 
-	@param obj NumberValue
+	@param numberValue NumberValue
 	@param serviceBag ServiceBag
 	@return CooldownBase
 ]=]
-function CooldownBase.new(obj, serviceBag)
-	local self = setmetatable(BaseObject.new(obj), CooldownBase)
+function CooldownBase.new(numberValue, serviceBag)
+	local self = setmetatable(BaseObject.new(numberValue), CooldownBase)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._timeSyncService = self._serviceBag:GetService(TimeSyncService)
 
+	self._cooldownModel = self._maid:Add(CooldownModel.new())
 	self._maid:GivePromise(self._timeSyncService:PromiseSyncedClock())
 		:Then(function(syncedClock)
 			self._syncedClock = syncedClock
+
+			-- Setup
+			self._cooldownModel:SetStartTime(RxAttributeUtils.observeAttribute(self._obj, CooldownConstants.COOLDOWN_START_TIME_ATTRIBUTE, syncedClock:GetTime()))
+			self._cooldownModel:SetLength(RxInstanceUtils.observeProperty(self._obj, "Value"))
+
+			self._cooldownModel:SetClock(function()
+				return self._syncedClock:GetTime()
+			end)
 		end)
 
 --[=[
 	Event that fires when the cooldown is done.
 	@prop Done Signal<()>
-	@within CooldownClient
+	@within CooldownBase
 ]=]
-	self.Done = Signal.new()
-	self._maid:GiveTask(function()
-		self.Done:Fire()
-		self.Done:Destroy()
-	end)
+	self.Done = assert(self._cooldownModel.Done, "No done signal")
 
 	return self
+end
+
+function CooldownBase:GetCooldownModel()
+	return self._cooldownModel
 end
 
 --[=[
@@ -59,16 +70,7 @@ end
 	@return number?
 ]=]
 function CooldownBase:GetTimePassed()
-	local startTime = self:GetStartTime()
-	if not startTime then
-		return nil
-	end
-
-	if not self._syncedClock then
-		return nil
-	end
-
-	return self._syncedClock:GetTime() - startTime
+	return self._cooldownModel:GetTimePassed()
 end
 
 --[=[
@@ -76,16 +78,7 @@ end
 	@return number?
 ]=]
 function CooldownBase:GetTimeRemaining()
-	local endTime = self:GetEndTime()
-	if not endTime then
-		return nil
-	end
-
-	if not self._syncedClock then
-		return nil
-	end
-
-	return math.max(0, endTime - self._syncedClock:GetTime())
+	return self._cooldownModel:GetTimeRemaining()
 end
 
 --[=[
@@ -93,11 +86,7 @@ end
 	@return number?
 ]=]
 function CooldownBase:GetEndTime()
-	local startTime = self:GetStartTime()
-	if not startTime then
-		return nil
-	end
-	return startTime + self:GetLength()
+	return self._cooldownModel:GetEndTime()
 end
 
 --[=[
@@ -105,12 +94,7 @@ end
 	@return number?
 ]=]
 function CooldownBase:GetStartTime()
-	local startTime = self._obj:GetAttribute(CooldownConstants.COOLDOWN_START_TIME_ATTRIBUTE)
-	if type(startTime) == "number" then
-		return startTime
-	else
-		return nil
-	end
+	return self._cooldownModel:GetStartTime()
 end
 
 --[=[
@@ -118,7 +102,7 @@ end
 	@return number
 ]=]
 function CooldownBase:GetLength()
-	return self._obj.Value
+	return self._cooldownModel:GetLength()
 end
 
 return CooldownBase

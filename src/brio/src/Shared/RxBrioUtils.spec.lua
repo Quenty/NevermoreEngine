@@ -63,18 +63,17 @@ return function()
 		local lastResult = nil
 		local fireCount = 0
 
+		local sub = observe:Subscribe(function(result)
+			lastResult = result
+			fireCount = fireCount + 1
+		end)
+
 		it("should execute immediately", function()
-			local sub = observe:Subscribe(function(result)
-				lastResult = result
-				fireCount = fireCount + 1
-			end)
 			expect(fireCount).to.equal(1)
 			expect(lastResult).to.be.a("table")
 			expect(Brio.isBrio(lastResult)).to.equal(false)
 			expect(lastResult.value).to.equal(5)
 			expect(lastResult.otherValue).to.equal(25)
-
-			sub:Destroy()
 		end)
 
 		it("should reset when the brio is killed", function()
@@ -111,6 +110,10 @@ return function()
 			expect(Brio.isBrio(lastResult)).to.equal(false)
 			expect(lastResult.value).to.equal(75)
 			expect(lastResult.otherValue).to.equal(25)
+		end)
+
+		it("should cleanup the sub", function()
+			sub:Destroy()
 		end)
 	end)
 end

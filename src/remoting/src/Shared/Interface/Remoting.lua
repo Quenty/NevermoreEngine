@@ -88,7 +88,7 @@ function Remoting:Connect(memberName, callback)
 		-- TODO: Cleanup if nothing else is expecting this
 	elseif RunService:IsClient() then
 		connectMaid._warning = task.delay(5, function()
-			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never fire", memberName))
+			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never connect", memberName))
 		end)
 
 		connectMaid:GiveTask(self:_observeRemoteEventBrio(memberName):Subscribe(function(brio)

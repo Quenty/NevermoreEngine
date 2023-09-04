@@ -110,8 +110,8 @@ function PolicyServiceUtils.canReferenceSocialMedia(policyInfo, socialInfoName)
 	assert(type(policyInfo) == "table", "Bad policyInfo")
 	assert(type(socialInfoName) == "string", "Bad socialInfoName")
 
-	if not (type(policyInfo.AllowedExternalLinkReferences) == "table") then
-		warn("[PolicyServiceUtils.canReferenceDiscord] - Bad policyInfo")
+	if type(policyInfo.AllowedExternalLinkReferences) ~= "table" then
+		warn("[PolicyServiceUtils.canReferenceSocialMedia] - Bad policyInfo")
 		return false
 	end
 
