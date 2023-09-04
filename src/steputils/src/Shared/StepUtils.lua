@@ -40,6 +40,21 @@ function StepUtils.bindToRenderStep(update)
 end
 
 --[=[
+	Yields until the frame deferral is done
+
+	@param StepUtils
+]=]
+function StepUtils.deferWait()
+	local signal = Instance.new("BindableEvent")
+	task.defer(function()
+		signal:Fire()
+		signal:Destroy()
+	end)
+
+	signal.Event:Wait()
+end
+
+--[=[
 	Binds the given update function to [RunService.Stepped]. See [StepUtils.bindToRenderStep] for details.
 
 
