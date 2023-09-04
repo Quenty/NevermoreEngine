@@ -6,6 +6,7 @@ local require = require(game:GetService("ServerScriptService"):FindFirstChild("L
 
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")
+local StepUtils = require("StepUtils")
 
 return function()
 	describe("ObservableSortedList.new()", function()
@@ -20,6 +21,8 @@ return function()
 
 			observableSortedList:Add("b", Rx.of("b"))
 
+			StepUtils.deferWait()
+
 			expect(observableSortedList:Get(1)).to.equal("b")
 			expect(observableSortedList:GetCount()).to.equal(1)
 		end)
@@ -28,6 +31,8 @@ return function()
 			expect(observableSortedList:GetCount()).to.equal(1)
 
 			observableSortedList:Add("a", Rx.of("a"))
+
+			StepUtils.deferWait()
 
 			expect(observableSortedList:Get(1)).to.equal("a")
 			expect(observableSortedList:Get(2)).to.equal("b")
@@ -40,10 +45,12 @@ return function()
 			observableSortedList:Add("b", Rx.of(0))
 			observableSortedList:Add("c", Rx.of(0))
 
+			StepUtils.deferWait()
+
 			expect(observableSortedList:Get(1)).to.equal("a")
 			expect(observableSortedList:Get(2)).to.equal("b")
 			expect(observableSortedList:Get(3)).to.equal("c")
-			expect(observableSortedList:GetCount()).to.equal(1)
+			expect(observableSortedList:GetCount()).to.equal(3)
 		end)
 	end)
 end

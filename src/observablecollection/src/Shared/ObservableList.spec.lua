@@ -23,11 +23,23 @@ return function()
 			expect(observableList:GetCount()).to.equal(1)
 		end)
 
+		it("should allow negative queries", function()
+			expect(observableList:Get(-1)).to.equal("a")
+			expect(observableList:Get(-2)).to.equal(nil)
+		end)
 
 		it("should allow false as a value", function()
 			expect(observableList:Get(2)).to.equal(nil)
 			observableList:Add(false)
 			expect(observableList:Get(2)).to.equal(false)
+		end)
+
+		it("should allow negative queries after false", function()
+			expect(observableList:Get(1)).to.equal("a")
+			expect(observableList:Get(2)).to.equal(false)
+
+			expect(observableList:Get(-1)).to.equal(false)
+			expect(observableList:Get(-2)).to.equal("a")
 		end)
 
 		it("should fire off events for a specific key", function()
@@ -59,6 +71,42 @@ return function()
 
 			expect(#seen).to.equal(4)
 			expect(seen[4]:IsDead()).to.equal(true)
+		end)
+
+		it("it should be able to observe a specific key", function()
+			local seen = {}
+			local sub = observableList:ObserveAtIndex(1):Subscribe(function(value)
+				table.insert(seen, value)
+			end)
+
+			local originalList = observableList:GetList()
+			expect(originalList[1]).to.equal("c")
+
+			observableList:InsertAt("dragon", 1)
+
+			sub:Destroy()
+
+			expect(#seen).to.equal(2)
+			expect(seen[1]).to.equal("c")
+			expect(seen[2]).to.equal("dragon")
+		end)
+
+		it("it should be able to observe a specific negative key", function()
+			local seen = {}
+			local sub = observableList:ObserveAtIndex(-1):Subscribe(function(value)
+				table.insert(seen, value)
+			end)
+
+			local originalList = observableList:GetList()
+			expect(originalList[#originalList]).to.equal("a")
+
+			observableList:Add("fire")
+
+			sub:Destroy()
+
+			expect(#seen).to.equal(2)
+			expect(seen[1]).to.equal("a")
+			expect(seen[2]).to.equal("fire")
 		end)
 
 		it("should fire off events on removal", function()

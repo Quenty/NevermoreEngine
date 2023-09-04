@@ -199,19 +199,9 @@ function ObservableSortedList:ObserveAtIndex(indexToObserve)
 
 	return self._indexObservers:Observe(indexToObserve)
 		:Pipe({
-			function(source)
-				return Observable.new(function(sub)
-					local key = self._keyList[indexToObserve]
-
-					if key then
-						sub:Fire(self._contents[key]) -- Look up the content
-					else
-						sub:Fire(nil)
-					end
-
-					return source:Subscribe(sub:GetFireFailComplete())
-				end)
-			end
+			Rx.start(function()
+				return self:Get(indexToObserve)
+			end);
 		})
 end
 

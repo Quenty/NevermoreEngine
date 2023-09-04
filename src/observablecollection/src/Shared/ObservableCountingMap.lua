@@ -311,7 +311,7 @@ end
 	Gets a list of all keys.
 	@return { T }
 ]=]
-function ObservableCountingMap:GetKeysList()
+function ObservableCountingMap:GetKeyList()
 	local list = {}
 	for key, _ in pairs(self._map) do
 		table.insert(list, key)

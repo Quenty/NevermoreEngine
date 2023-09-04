@@ -5,13 +5,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Signal = require("Signal")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Brio = require("Brio")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local Signal = require("Signal")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
-local Rx = require("Rx")
 
 local ObservableList = {}
 ObservableList.ClassName = "ObservableList"
@@ -30,7 +32,11 @@ function ObservableList.new()
 	self._contents = {} -- { [Symbol]: T }
 	self._indexes = {} -- { [Symbol]: number }
 
-	self._keyObservables = {} -- { [Symbol]: { Subscription } }
+	self._indexObservers = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._indexObservers)
+
+	self._keyIndexObservables = ObservableSubscriptionTable.new()
+	self._maid:GiveTask(self._keyIndexObservables)
 
 	self._countValue = ValueObject.new(0, "number")
 	self._maid:GiveTask(self._countValue)
@@ -134,10 +140,41 @@ function ObservableList:ObserveIndex(indexToObserve)
 
 	local key = self._keyList[indexToObserve]
 	if not key then
-		error(("No entry at index %q, cannot observe changes"):format(indexToObserve))
+		error(string.format("No entry at index %q, cannot observe changes", indexToObserve))
 	end
 
 	return self:ObserveIndexByKey(key)
+end
+
+--[=[
+	Observes the current value at a given index. This can be useful for observing
+	the first entry, or matching stuff up to a given slot.
+
+	@param indexToObserve number
+	@return Observable<T?>
+]=]
+function ObservableList:ObserveAtIndex(indexToObserve)
+	assert(type(indexToObserve) == "number", "Bad indexToObserve")
+
+	return self._indexObservers:Observe(indexToObserve, function(sub)
+		sub:Fire(self:Get(indexToObserve))
+	end)
+end
+
+--[=[
+	Observes the current value at a given index. This can be useful for observing
+	the first entry, or matching stuff up to a given slot.
+
+	@param indexToObserve number
+	@return Observable<Brio<T>>
+]=]
+function ObservableList:ObserveAtIndexBrio(indexToObserve)
+	assert(type(indexToObserve) == "number", "Bad indexToObserve")
+
+	return self:ObserveAtIndex(indexToObserve):Pipe({
+		RxBrioUtils.toBrio();
+		RxBrioUtils.onlyLastBrioSurvives();
+	})
 end
 
 --[=[
@@ -176,35 +213,8 @@ end
 function ObservableList:ObserveIndexByKey(key)
 	assert(type(key) == "userdata", "Bad key")
 
-	return Observable.new(function(sub)
-		local currentIndex = self._indexes[key]
-		if not currentIndex then
-			sub:Complete()
-			return
-		end
-
-		local maid = Maid.new()
-		self._keyObservables[key] = self._keyObservables[key] or {}
-		table.insert(self._keyObservables[key], sub)
-
-		sub:Fire(currentIndex)
-
-		maid:GiveTask(function()
-			local list = self._keyObservables[key]
-			if not list then
-				return
-			end
-
-			local index = table.find(list, sub)
-			if index then
-				table.remove(list, index)
-				if #list == 0 then
-					self._keyObservables[key] = nil
-				end
-			end
-		end)
-
-		return maid
+	return self._keyIndexObservables:Observe(key, function(sub)
+		sub:Fire(self:GetIndexByKey(key))
 	end)
 end
 
@@ -256,6 +266,8 @@ end
 function ObservableList:Get(index)
 	assert(type(index) == "number", "Bad index")
 
+	index = self:_toPositiveIndex(index)
+
 	local key = self._keyList[index]
 	if not key then
 		return nil
@@ -289,17 +301,14 @@ function ObservableList:InsertAt(item, index)
 		self._indexes[nextKey] = i + 1
 		self._keyList[i + 1] = nextKey
 
-		local subs = self._keyObservables[nextKey]
-		if subs then
-			table.insert(changed, {
-				key = nextKey;
-				newIndex = i + 1;
-				subs = subs;
-			})
-		end
+		table.insert(changed, {
+			key = nextKey;
+			newIndex = i + 1;
+		})
 	end
 
 	self._keyList[index] = key
+	local listLength = #self._keyList
 
 	-- Fire off count
 	self._countValue.Value = self._countValue.Value + 1
@@ -307,23 +316,17 @@ function ObservableList:InsertAt(item, index)
 	-- Fire off add
 	self.ItemAdded:Fire(item, index, key)
 
+
 	-- Fire off the index change on the value
-	do
-		local subs = self._keyObservables[key]
-		if subs then
-			table.insert(changed, {
-				key = key;
-				newIndex = index;
-				subs = subs;
-			})
-		end
-	end
+	self._keyIndexObservables:Fire(key, index)
+	self._indexObservers:Fire(index, item)
+	self._indexObservers:Fire(self:_toNegativeIndex(listLength, index), item)
 
-
-	-- Fire off index change on each key list (if the data isn't stale)
 	for _, data in pairs(changed) do
 		if self._indexes[data.key] == data.newIndex then
-			self:_fireSubs(data.subs, data.newIndex)
+			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
+			self._indexObservers:Fire(self:_toNegativeIndex(listLength, index), self._contents[data.key])
+			self._keyIndexObservables:Fire(data.key, data.newIndex)
 		end
 	end
 
@@ -368,8 +371,6 @@ function ObservableList:RemoveByKey(key)
 		return nil
 	end
 
-	local observableSubs = self._keyObservables[key]
-	self._keyObservables[key] = nil
 	self._indexes[key] = nil
 	self._contents[key] = nil
 
@@ -382,16 +383,13 @@ function ObservableList:RemoveByKey(key)
 		self._indexes[nextKey] = i
 		self._keyList[i] = nextKey
 
-		local subs = self._keyObservables[nextKey]
-		if subs then
-			table.insert(changed, {
-				key = nextKey;
-				newIndex = i;
-				subs = subs;
-			})
-		end
+		table.insert(changed, {
+			key = nextKey;
+			newIndex = i;
+		})
 	end
 	self._keyList[n] = nil
+	local listLength = #self._keyList
 
 	-- Fire off that count changed
 	self._countValue.Value = self._countValue.Value - 1
@@ -401,37 +399,23 @@ function ObservableList:RemoveByKey(key)
 	end
 
 	-- Fire off the index change on the value
-	if observableSubs then
-		self:_completeSubs(observableSubs)
+	self._keyIndexObservables:Complete(key)
+	self._indexObservers:Fire(listLength, nil)
+
+	if listLength == 0 then
+		self._indexObservers:Fire(-1, nil)
 	end
 
 	-- Fire off index change on each key list (if the data isn't stale)
 	for _, data in pairs(changed) do
 		if self._indexes[data.key] == data.newIndex then
-			self:_fireSubs(data.subs, data.newIndex)
+			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
+			self._indexObservers:Fire(self:_toNegativeIndex(listLength, index), self._contents[data.key])
+			self._keyIndexObservables:Fire(data.key, data.newIndex)
 		end
 	end
 
 	return item
-end
-
-function ObservableList:_fireSubs(list, index)
-	for _, sub in pairs(list) do
-		if sub:IsPending() then
-			task.spawn(function()
-				sub:Fire(index)
-			end)
-		end
-	end
-end
-
-function ObservableList:_completeSubs(list)
-	for _, sub in pairs(list) do
-		if sub:IsPending() then
-			sub:Fire(nil)
-			sub:Complete()
-		end
-	end
 end
 
 --[=[
@@ -444,6 +428,20 @@ function ObservableList:GetList()
 		table.insert(list, self._contents[key])
 	end
 	return list
+end
+
+function ObservableList:_toPositiveIndex(index)
+	if index > 0 then
+		return index
+	elseif index < 0 then
+		return #self._keyList + index + 1
+	else
+		error(string.format("[ObservableList._toPositiveIndex] - Bad index %d", index))
+	end
+end
+
+function ObservableList:_toNegativeIndex(listLength, index)
+	return -listLength + index - 1
 end
 
 --[=[
