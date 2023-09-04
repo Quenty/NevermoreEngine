@@ -59,6 +59,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local GoodSignal = require("GoodSignal")
 
 local Brio = {}
 Brio.ClassName = "Brio"
@@ -136,11 +137,11 @@ function Brio:GetDiedSignal()
 	end
 
 	if self._diedEvent then
-		return self._diedEvent.Event
+		return self._diedEvent
 	end
 
-	self._diedEvent = Instance.new("BindableEvent")
-	return self._diedEvent.Event
+	self._diedEvent = GoodSignal.new()
+	return self._diedEvent
 end
 
 --[=[
@@ -203,6 +204,10 @@ function Brio:ToMaid()
 	end))
 
 	return maid
+end
+
+function Brio:ToMaidAndValue()
+	return self:ToMaid(), self:GetValue()
 end
 
 --[=[

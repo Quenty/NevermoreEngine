@@ -699,7 +699,9 @@ end
 	@return (source: Observable<Brio<T> | T>) -> Observable<T | U>
 ]=]
 function RxBrioUtils.emitOnDeath(emitOnDeathValue)
-	return Rx.switchMap(RxBrioUtils.mapBrioToEmitOnDeathObservable(emitOnDeathValue));
+	return Rx.switchMap(function(brio)
+		return RxBrioUtils.toEmitOnDeathObservable(brio, emitOnDeathValue)
+	end);
 end
 
 --[=[
