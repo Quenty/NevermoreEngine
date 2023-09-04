@@ -108,8 +108,8 @@ In order to know how long we can keep this object/use it, we wrap the object wit
 
 Modeling this with pure observables is very tricky because the subscriber will have to also monitor/emit
 a similar object with less clear conventions. For example  an observable that emits the object, and then nil on death."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Brio"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Brio" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Brio" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.d9cf4ba9.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.3deab68c.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.b90473dc.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.320e5d15.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -182,26 +182,26 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
   Modeling this with pure observables is very tricky because the subscriber will have to also monitor/emit
   a similar object with less clear conventions. For example an observable that emits the object, and then nil on death.
 </p>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="DEAD"><code style="text-decoration:none">DEAD</code><a href="#DEAD" class="hash-link" aria-label="Direct link to DEAD" title="Direct link to DEAD">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L290"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.<!-- -->DEAD<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code></div><div>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="DEAD"><code style="text-decoration:none">DEAD</code><a href="#DEAD" class="hash-link" aria-label="Direct link to DEAD" title="Direct link to DEAD">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L295"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.<!-- -->DEAD<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code></div><div>
 <p>An already dead brio which may be used for identity purposes.</p>
 <pre class="language-lua"><code class="language-lua"><span class="token function">print</span><span class="token punctuation">(</span>Brio<span class="token punctuation">.</span>DEAD<span class="token punctuation">:</span><span class="token function">IsDead</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> true</span>
 </code></pre>
-</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isBrio"><code style="text-decoration:none">isBrio</code><a href="#isBrio" class="hash-link" aria-label="Direct link to isBrio" title="Direct link to isBrio">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L76"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.</code><code class="green_DgR4">isBrio</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isBrio"><code style="text-decoration:none">isBrio</code><a href="#isBrio" class="hash-link" aria-label="Direct link to isBrio" title="Direct link to isBrio">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L77"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.</code><code class="green_DgR4">isBrio</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether a value is a Brio.</p>
 <pre class="language-lua"><code class="language-lua"><span class="token function">print</span><span class="token punctuation">(</span>Brio<span class="token punctuation">.</span><span class="token function">isBrio</span><span class="token punctuation">(</span><span class="token string">"yolo"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> false</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L91"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>...<!-- -->: </code><code class="blue_P4bS">any</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L92"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>...<!-- -->: </code><code class="blue_P4bS">any</code><span class="inlineDescription_G7Er">-- <span>
 <p>Brio values</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code></div><div>
 <p>Constructs a new Brio.</p>
 <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> brio <span class="token operator">=</span> Brio<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"a"</span><span class="token punctuation">,</span> <span class="token string">"b"</span><span class="token punctuation">)</span>
 <span class="token function">print</span><span class="token punctuation">(</span>brio<span class="token punctuation">:</span><span class="token function">GetValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> a b</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="delayed"><code style="text-decoration:none">delayed</code><a href="#delayed" class="hash-link" aria-label="Direct link to delayed" title="Direct link to delayed">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">since <!-- -->3.6.0</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L105"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.</code><code class="green_DgR4">delayed</code><code>(</code><div class="inset_uKQm"><div><code>time<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>...<!-- -->: </code><code class="blue_P4bS">any</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="delayed"><code style="text-decoration:none">delayed</code><a href="#delayed" class="hash-link" aria-label="Direct link to delayed" title="Direct link to delayed">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">since <!-- -->3.6.0</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L106"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->.</code><code class="green_DgR4">delayed</code><code>(</code><div class="inset_uKQm"><div><code>time<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>...<!-- -->: </code><code class="blue_P4bS">any</code><span class="inlineDescription_G7Er">-- <span>
 <p>Brio values</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code></div><div>
 <p>Constructs a new brio that will cleanup afer the set amount of time</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetDiedSignal"><code style="text-decoration:none">GetDiedSignal</code><a href="#GetDiedSignal" class="hash-link" aria-label="Direct link to GetDiedSignal" title="Direct link to GetDiedSignal">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L133"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">GetDiedSignal</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetDiedSignal"><code style="text-decoration:none">GetDiedSignal</code><a href="#GetDiedSignal" class="hash-link" aria-label="Direct link to GetDiedSignal" title="Direct link to GetDiedSignal">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L134"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">GetDiedSignal</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code></div><div>
 <p>
   Gets a signal that will fire when the Brio dies. If the brio is already dead
   calling this method will error.
@@ -224,7 +224,7 @@ brio<span class="token punctuation">:</span><span class="token function">GetDied
 brio<span class="token punctuation">:</span><span class="token function">Kill</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">--> Brio died</span>
 brio<span class="token punctuation">:</span><span class="token function">Kill</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">-- no output</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsDead"><code style="text-decoration:none">IsDead</code><a href="#IsDead" class="hash-link" aria-label="Direct link to IsDead" title="Direct link to IsDead">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L160"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">IsDead</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsDead"><code style="text-decoration:none">IsDead</code><a href="#IsDead" class="hash-link" aria-label="Direct link to IsDead" title="Direct link to IsDead">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L161"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">IsDead</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns true is the brio is dead.</p>
 <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> brio <span class="token operator">=</span> Brio<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"a"</span><span class="token punctuation">,</span> <span class="token string">"b"</span><span class="token punctuation">)</span>
 <span class="token function">print</span><span class="token punctuation">(</span>brio<span class="token punctuation">:</span><span class="token function">IsDead</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> false</span>
@@ -233,11 +233,11 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
 
 <span class="token function">print</span><span class="token punctuation">(</span>brio<span class="token punctuation">:</span><span class="token function">IsDead</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> true</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ErrorIfDead"><code style="text-decoration:none">ErrorIfDead</code><a href="#ErrorIfDead" class="hash-link" aria-label="Direct link to ErrorIfDead" title="Direct link to ErrorIfDead">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L171"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">ErrorIfDead</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ErrorIfDead"><code style="text-decoration:none">ErrorIfDead</code><a href="#ErrorIfDead" class="hash-link" aria-label="Direct link to ErrorIfDead" title="Direct link to ErrorIfDead">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L172"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">ErrorIfDead</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Throws an error if the Brio is dead.</p>
 <pre class="language-lua"><code class="language-lua">brio<span class="token punctuation">.</span>DEAD<span class="token punctuation">:</span><span class="token function">ErrorIfDead</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">--> ERROR: [Brio.ErrorIfDead] - Brio is dead</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ToMaid"><code style="text-decoration:none">ToMaid</code><a href="#ToMaid" class="hash-link" aria-label="Direct link to ToMaid" title="Direct link to ToMaid">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L196"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">ToMaid</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Maid">Maid</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ToMaid"><code style="text-decoration:none">ToMaid</code><a href="#ToMaid" class="hash-link" aria-label="Direct link to ToMaid" title="Direct link to ToMaid">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L197"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">ToMaid</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Maid">Maid</a></code></div><div>
 <p>
   Constructs a new Maid which will clean up when the brio dies.
   Will error if the Brio is dead.
@@ -259,7 +259,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
 <span class="token keyword">end</span><span class="token punctuation">)</span>
 brio<span class="token punctuation">:</span><span class="token function">Kill</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">--> Cleaning up!</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetValue"><code style="text-decoration:none">GetValue</code><a href="#GetValue" class="hash-link" aria-label="Direct link to GetValue" title="Direct link to GetValue">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L226"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">GetValue</code><code>(</code><code>) → </code><code class="blue_P4bS">any</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetValue"><code style="text-decoration:none">GetValue</code><a href="#GetValue" class="hash-link" aria-label="Direct link to GetValue" title="Direct link to GetValue">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L231"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">GetValue</code><code>(</code><code>) → </code><code class="blue_P4bS">any</code></div><div>
 <p>If the brio is not dead, will return the values unpacked from the brio.</p>
 <div class="admonition admonition-info alert alert--info">
   <div class="admonition-heading">
@@ -280,9 +280,9 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
 
 <span class="token function">print</span><span class="token punctuation">(</span>brio<span class="token punctuation">:</span><span class="token function">GetValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> ERROR: Brio is dead</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetPackedValues"><code style="text-decoration:none">GetPackedValues</code><a href="#GetPackedValues" class="hash-link" aria-label="Direct link to GetPackedValues" title="Direct link to GetPackedValues">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">since <!-- -->3.6.0</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L238"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">GetPackedValues</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><div class="inset_uKQm"><code>n<!-- -->: </code><code class="blue_P4bS">number</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">...</code><code class="blue_P4bS">T</code></div><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetPackedValues"><code style="text-decoration:none">GetPackedValues</code><a href="#GetPackedValues" class="hash-link" aria-label="Direct link to GetPackedValues" title="Direct link to GetPackedValues">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">since <!-- -->3.6.0</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L243"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">GetPackedValues</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><div class="inset_uKQm"><code>n<!-- -->: </code><code class="blue_P4bS">number</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">...</code><code class="blue_P4bS">T</code></div><code class="purple_ieR2">}</code></div><div>
 <p>Returns the packed values from table.pack() format</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L259"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L264"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Kills the Brio.</p>
 <div class="admonition admonition-info alert alert--info">
   <div class="admonition-heading">
@@ -300,7 +300,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
 
 <span class="token function">print</span><span class="token punctuation">(</span>brio<span class="token punctuation">:</span><span class="token function">GetValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">--> ERROR: Brio is dead</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Kill"><code style="text-decoration:none">Kill</code><a href="#Kill" class="hash-link" aria-label="Direct link to Kill" title="Direct link to Kill">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L278"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">Kill</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Kill"><code style="text-decoration:none">Kill</code><a href="#Kill" class="hash-link" aria-label="Direct link to Kill" title="Direct link to Kill">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/brio/src/Shared/Brio.lua#L283"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Brio<!-- -->:</code><code class="green_DgR4">Kill</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Alias for Destroy.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -322,7 +322,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 76,
+                &quot;line&quot;: 77,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -344,7 +344,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 91,
+                &quot;line&quot;: 92,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -372,7 +372,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;since&quot;: &quot;3.6.0&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 105,
+                &quot;line&quot;: 106,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -388,7 +388,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 133,
+                &quot;line&quot;: 134,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -404,7 +404,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 160,
+                &quot;line&quot;: 161,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -415,7 +415,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 171,
+                &quot;line&quot;: 172,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -431,7 +431,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 196,
+                &quot;line&quot;: 197,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -447,7 +447,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 226,
+                &quot;line&quot;: 231,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -464,7 +464,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;since&quot;: &quot;3.6.0&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 238,
+                &quot;line&quot;: 243,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -475,7 +475,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 259,
+                &quot;line&quot;: 264,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         },
@@ -486,7 +486,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 278,
+                &quot;line&quot;: 283,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         }
@@ -497,7 +497,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
             &quot;desc&quot;: &quot;An already dead brio which may be used for identity purposes.\n\n```lua\nprint(Brio.DEAD:IsDead()) --&gt; true\n```&quot;,
             &quot;lua_type&quot;: &quot;Brio&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 290,
+                &quot;line&quot;: 295,
                 &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
             }
         }
@@ -510,7 +510,7 @@ brio<span class="token punctuation">:</span><span class="token function">Kill</s
         &quot;path&quot;: &quot;src/brio/src/Shared/Brio.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#DEAD" class="table-of-contents__link toc-highlight">DEAD</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#ErrorIfDead" class="table-of-contents__link toc-highlight">:ErrorIfDead</a></li><li><a href="#GetDiedSignal" class="table-of-contents__link toc-highlight">:GetDiedSignal</a></li><li><a href="#GetPackedValues" class="table-of-contents__link toc-highlight">:GetPackedValues</a></li><li><a href="#GetValue" class="table-of-contents__link toc-highlight">:GetValue</a></li><li><a href="#IsDead" class="table-of-contents__link toc-highlight">:IsDead</a></li><li><a href="#Kill" class="table-of-contents__link toc-highlight">:Kill</a></li><li><a href="#ToMaid" class="table-of-contents__link toc-highlight">:ToMaid</a></li><li><a href="#delayed" class="table-of-contents__link toc-highlight">.delayed</a></li><li><a href="#isBrio" class="table-of-contents__link toc-highlight">.isBrio</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.d9cf4ba9.js"></script>
-<script src="/NevermoreEngine/assets/js/main.3deab68c.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.b90473dc.js"></script>
+<script src="/NevermoreEngine/assets/js/main.320e5d15.js"></script>
 </body>
 </html>
