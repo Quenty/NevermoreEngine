@@ -384,12 +384,16 @@ function RagdollMotorUtils.guessIfNetworkOwner(part)
 	local currentNetworkOwner
 	local expectedNetworkOwner = Players.LocalPlayer
 
-	-- hopefully someday GetNetworkOwner() works on the client
-	local ok = pcall(function()
-		currentNetworkOwner = part:GetNetworkOwner()
-	end)
-	if ok then
-		return currentNetworkOwner == expectedNetworkOwner
+	-- hopefully someday GetNetworkOwner() works on the client.
+	-- However, this can take up to 1ms of frame time on slow clients, so we aren't doing this check.
+	if RunService:IsServer() then
+		local ok = pcall(function()
+			currentNetworkOwner = part:GetNetworkOwner()
+		end)
+
+		if ok then
+			return currentNetworkOwner == expectedNetworkOwner
+		end
 	end
 
 	return CharacterUtils.getPlayerFromCharacter(part) == expectedNetworkOwner
