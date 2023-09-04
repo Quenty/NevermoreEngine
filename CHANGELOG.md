@@ -1,3 +1,16 @@
+# (Mon Sep 04 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@1.4.0`, `@quenty/brio@8.18.0`, `@quenty/contentproviderutils@6.19.0`, `@quenty/cooldown@5.31.0`, `@quenty/gameconfig@5.38.0`, `@quenty/gameproductservice@7.16.0`, `@quenty/hide@5.28.0`, `@quenty/observablecollection@5.25.0`, `@quenty/policyserviceutils@2.9.0`, `@quenty/ragdoll@9.36.0`, `@quenty/remoting@6.11.0`, `@quenty/steputils@3.3.0`, `@quenty/timedtween@1.2.0`
+  - Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Aug 23 2023)
 
 :tada: This release contains work from a new contributor! :tada:

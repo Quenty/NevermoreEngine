@@ -1,3 +1,20 @@
+# v8.18.0 (Mon Sep 04 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/misc [#407](https://github.com/Quenty/NevermoreEngine/pull/407) ([@Quenty](https://github.com/Quenty))
+- feat: Use GoodSignal and add :ToMaidAndValue helper method ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Add versions to package ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
