@@ -229,4 +229,52 @@ function RxBinderUtils.observeAllBrio(binder)
 	end)
 end
 
+--[=[
+	Observes all instances bound to the given binder as an unordered array.
+
+	@param binder Binder
+	@return Observable<Brio<{ T }>>
+]=]
+function RxBinderUtils.observeAllArrayBrio(binder)
+	assert(Binder.isBinder(binder), "Bad binder")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local array = binder:GetAll()
+
+		local function emit()
+			maid._brio = Brio.new(array)
+			sub:Fire(maid._brio)
+		end
+
+		maid:GiveTask(binder:GetClassAddedSignal():Connect(function(class)
+			table.insert(array, class)
+			emit()
+		end))
+		maid:GiveTask(binder:GetClassRemovingSignal():Connect(function(class)
+			local idx: number? = table.find(array, class)
+			if not idx then
+				return
+			end
+			-- Avoid 'table.remove'; that would suck with a very large list.
+			-- We're assuming order doesn't matter. Instead, move the back element of the array over.
+			-- From earlier benchmarking, calling #arr each time is faster than caching.
+			if idx == #array then
+				-- Just truncate. Handles case where array is 1 item.
+				array[idx] = nil
+			else
+				-- Move back element forward.
+				array[idx] = array[#array]
+				array[#array] = nil
+			end
+			emit()
+		end))
+
+		emit()
+
+		return maid
+	end)
+end
+
 return RxBinderUtils
