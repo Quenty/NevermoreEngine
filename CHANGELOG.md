@@ -1,3 +1,22 @@
+# (Thu Sep 07 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Gael ([@TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@7.25.1`
+  - fix: Fix actual code for data store match [#409](https://github.com/Quenty/NevermoreEngine/pull/409) ([@Quenty](https://github.com/Quenty))
+  - Fix `DataStoreStringUtils.isValidUTF8` not detecting invalid strings [#406](https://github.com/Quenty/NevermoreEngine/pull/406) ([@TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven))
+
+#### Authors: 2
+
+- Gael ([@TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Sep 04 2023)
 
 #### 🚀 Enhancement
