@@ -17,8 +17,12 @@ function DataStoreStringUtils.isValidUTF8(str)
 		return false, "Not a string"
 	end
 
+	if not utf8.len(str) then
+		return false, "Invalid string"
+	end
+
 	-- https://gist.github.com/TheGreatSageEqualToHeaven/e0e1dc2698307c93f6013b9825705899#patch-1
-	if string.match(input, "[^\0-\127]") then
+	if string.match(str, "[^\0-\127]") then
 		return false, "Invalid string"
 	end
 
