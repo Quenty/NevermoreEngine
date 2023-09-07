@@ -1,27 +1,19 @@
-# v7.25.1 (Thu Sep 07 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Gael ([@TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Fix actual code for data store match [#409](https://github.com/Quenty/NevermoreEngine/pull/409) ([@Quenty](https://github.com/Quenty))
-- fix: Fix actual code for data store match ([@Quenty](https://github.com/Quenty))
-- Fix `DataStoreStringUtils.isValidUTF8` not detecting invalid strings [#406](https://github.com/Quenty/NevermoreEngine/pull/406) ([@TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven))
-- fix: Fix issue where DataStoreStringUtils.isValidUTF8(str) may not detect invalid strings ([@TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven))
-
-#### Authors: 2
-
-- Gael ([@TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.25.0...@quenty/datastore@7.25.1) (2023-09-07)
+
+
+### Bug Fixes
+
+* Fix actual code for data store match ([ed39424](https://github.com/Quenty/NevermoreEngine/commit/ed3942460c7abbd3f21f988e562d0e5b84aeec05))
+* Fix issue where DataStoreStringUtils.isValidUTF8(str) may not detect invalid strings ([88682b0](https://github.com/Quenty/NevermoreEngine/commit/88682b0600be6642fd44dc9db09a124eca46433c))
+
+
+
+
 
 # [7.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.24.0...@quenty/datastore@7.25.0) (2023-09-04)
 
