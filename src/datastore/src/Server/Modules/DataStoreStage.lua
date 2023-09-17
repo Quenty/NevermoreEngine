@@ -141,11 +141,16 @@ end
 	end)
 	```
 
+	@param defaultValue any
 	@return Promise<any>
 ]=]
-function DataStoreStage:LoadAll()
+function DataStoreStage:LoadAll(defaultValue)
 	return self:PromiseViewUpToDate():Then(function()
-		return self._viewSnapshot
+		if self._viewSnapshot == nil then
+			return defaultValue
+		else
+			return self._viewSnapshot
+		end
 	end)
 end
 
@@ -250,10 +255,18 @@ function DataStoreStage:Observe(key, defaultValue)
 				:Then(function()
 					-- Only connect once loaded
 					maid:GiveTask(self.Changed:Connect(function(viewSnapshot)
-						sub:Fire(viewSnapshot)
+						if viewSnapshot == nil then
+							sub:Fire(defaultValue)
+						else
+							sub:Fire(viewSnapshot)
+						end
 					end))
 
-					sub:Fire(self._viewSnapshot)
+					if self._viewSnapshot == nil then
+						sub:Fire(defaultValue)
+					else
+						sub:Fire(self._viewSnapshot)
+					end
 				end, function(...)
 					sub:Fail(...)
 				end)
@@ -265,7 +278,13 @@ function DataStoreStage:Observe(key, defaultValue)
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GiveTask(self._keySubscriptions:Observe(key):Subscribe(sub:GetFireFailComplete()))
+		maid:GiveTask(self._keySubscriptions:Observe(key):Subscribe(function(value)
+			if value == nil then
+				sub:Fire(defaultValue)
+			else
+				sub:Fire(value)
+			end
+		end), sub:GetFailComplete())
 
 		-- Load initially
 		maid:GivePromise(self:Load(key, defaultValue))
