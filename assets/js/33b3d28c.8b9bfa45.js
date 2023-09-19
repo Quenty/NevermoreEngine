@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[38982],{65544:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"BounceTemplateUtils","desc":"","private":true,"source":{"line":5,"path":"src/loader/src2/Bounce/BounceTemplateUtils.lua"}}')}}]);
