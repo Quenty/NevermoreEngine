@@ -1,3 +1,16 @@
+# (Tue Sep 19 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@7.25.2`
+  - fix: Ensure default value is returned in certain nil scenarios [#410](https://github.com/Quenty/NevermoreEngine/pull/410) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Sep 07 2023)
 
 :tada: This release contains work from a new contributor! :tada:

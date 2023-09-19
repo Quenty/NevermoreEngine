@@ -1,3 +1,16 @@
+# v7.25.2 (Tue Sep 19 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Ensure default value is returned in certain nil scenarios [#410](https://github.com/Quenty/NevermoreEngine/pull/410) ([@Quenty](https://github.com/Quenty))
+- fix: Ensure default value is returned in certain nil scenarios ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
