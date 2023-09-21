@@ -13,8 +13,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
-
 local Maid = require("Maid")
 local GameProductServiceHelper = require("GameProductServiceHelper")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
