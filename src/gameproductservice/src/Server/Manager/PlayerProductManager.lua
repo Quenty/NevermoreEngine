@@ -8,10 +8,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigService = require("GameConfigService")
 local PlayerMarketeer = require("PlayerMarketeer")
+local ReceiptProcessingService = require("ReceiptProcessingService")
 local Remoting = require("Remoting")
 
 local PlayerProductManager = setmetatable({}, BaseObject)
@@ -30,6 +32,7 @@ function PlayerProductManager.new(player, serviceBag)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
+	self._receiptProcessingService = self._serviceBag:GetService(ReceiptProcessingService)
 
 	self._marketeer = PlayerMarketeer.new(self._obj, self._gameConfigService:GetConfigPicker())
 	self._maid:GiveTask(self._marketeer)
@@ -43,6 +46,10 @@ function PlayerProductManager.new(player, serviceBag)
 
 	self._maid:GiveTask(self._remoting.NotifyPromptFinished:Connect(function(...)
 		self:_handlePromptFinished(...)
+	end))
+
+	self._maid:GiveTask(self._receiptProcessingService:ObserveReceiptProcessedForPlayer(self._obj):Subscribe(function(receiptInfo, result)
+		self:_handleProcessReceipt(receiptInfo, result)
 	end))
 
 	-- Initialize attributes
@@ -73,23 +80,16 @@ function PlayerProductManager:_handlePromptFinished(player, assetType, assetId, 
 	assetTracker:HandlePurchaseEvent(assetId, isPurchased)
 end
 
---[=[
-	Handles the receipt processing. Not expected to be called immediately
-
-	@param player number
-	@param receiptInfo table
-	@return ProductPurchaseDecision
-]=]
-function PlayerProductManager:HandleProcessReceipt(player, receiptInfo)
-	assert(self._obj == player, "Bad player")
+function PlayerProductManager:_handleProcessReceipt(receiptInfo, productPurchaseDecision)
 	assert(type(receiptInfo) == "table", "Bad receiptInfo")
+	assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad decision")
 
 	local assetTracker = self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
 
 	-- Notify the player
 	self._remoting.NotifyReceiptProcessed:FireClient(self._obj, receiptInfo)
 
-	return assetTracker:HandleProcessReceipt(player, receiptInfo)
+	assetTracker:HandleProcessReceipt(self._obj, receiptInfo)
 end
 
 return PlayerProductManager

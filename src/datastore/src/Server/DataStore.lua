@@ -102,17 +102,10 @@ function DataStore.new(robloxDataStore, key)
 	self._robloxDataStore = robloxDataStore or error("No robloxDataStore")
 	self._debugWriting = DEFAULT_DEBUG_WRITING
 
-	self._autoSaveTimeSeconds = ValueObject.new(DEFAULT_AUTO_SAVE_TIME_SECONDS)
-	self._maid:GiveTask(self._autoSaveTimeSeconds)
-
-	self._jitterProportion = ValueObject.new(DEFAULT_JITTER_PROPORTION, "number")
-	self._maid:GiveTask(self._jitterProportion)
-
-	self._syncOnSave = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._syncOnSave)
-
-	self._loadedOk = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._loadedOk)
+	self._autoSaveTimeSeconds = self._maid:Add(ValueObject.new(DEFAULT_AUTO_SAVE_TIME_SECONDS))
+	self._jitterProportion = self._maid:Add(ValueObject.new(DEFAULT_JITTER_PROPORTION, "number"))
+	self._syncOnSave = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._loadedOk = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self._userIdList = nil
 

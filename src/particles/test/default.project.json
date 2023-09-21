@@ -1,0 +1,11 @@
+{
+  "name": "ParticlesTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "particles": {
+        "$path": ".."
+      }
+    }
+  }
+}

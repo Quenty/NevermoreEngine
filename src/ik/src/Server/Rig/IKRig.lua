@@ -11,7 +11,7 @@ local Players = game:GetService("Players")
 local IKRigBase = require("IKRigBase")
 local IKConstants = require("IKConstants")
 local CharacterUtils = require("CharacterUtils")
-local Motor6DBindersServer = require("Motor6DBindersServer")
+local Motor6DStackHumanoid = require("Motor6DStackHumanoid")
 
 local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
@@ -21,7 +21,6 @@ function IKRig.new(humanoid, serviceBag)
 	local self = setmetatable(IKRigBase.new(humanoid), IKRig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._motor6DBindersServer = self._serviceBag:GetService(Motor6DBindersServer)
 
 	self._remoteEvent = Instance.new("RemoteEvent")
 	self._remoteEvent.Name = IKConstants.REMOTE_EVENT_NAME
@@ -33,7 +32,7 @@ function IKRig.new(humanoid, serviceBag)
 		self:_onServerEvent(...)
 	end))
 
-	self._motor6DBindersServer.Motor6DStackHumanoid:Bind(self._obj)
+	Motor6DStackHumanoid:Tag(self._obj)
 
 	self._target = nil
 

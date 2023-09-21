@@ -11,8 +11,8 @@ function Motor6DServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	-- Internal
-	self._serviceBag:GetService(require("Motor6DBindersClient"))
+	-- Binders
+	self._serviceBag:GetService(require("Motor6DStackClient"))
 end
 
 return Motor6DServiceClient

@@ -39,11 +39,13 @@
     "@quenty/permissionprovider": "file:../permissionprovider",
     "@quenty/playerbinder": "file:../playerbinder",
     "@quenty/playerutils": "file:../playerutils",
+    "@quenty/preferredparentutils": "file:../preferredparentutils",
     "@quenty/promise": "file:../promise",
     "@quenty/richtext": "file:../richtext",
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",
     "@quenty/servicebag": "file:../servicebag",
+    "@quenty/signal": "file:../signal",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"

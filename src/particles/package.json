@@ -1,12 +1,12 @@
 {
-  "name": "@quenty/receiptprocessing",
-  "version": "1.6.0",
-  "description": "Centralize receipt processing within games since this is a constrained resource.",
+  "name": "@quenty/particles",
+  "version": "1.0.0",
+  "description": "Holds utilitity for playing back particles",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "receiptprocessing"
+    "particles"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/receiptprocessing/"
+    "directory": "src/particles/"
   },
   "funding": {
     "type": "patreon",
@@ -25,13 +25,8 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/enumutils": "file:../enumutils",
     "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid",
-    "@quenty/promise": "file:../promise",
-    "@quenty/rx": "file:../rx",
-    "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal"
+    "@quenty/numbersequenceutils": "file:../numbersequenceutils"
   },
   "publishConfig": {
     "access": "public"

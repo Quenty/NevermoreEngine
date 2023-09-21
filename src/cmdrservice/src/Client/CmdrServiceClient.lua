@@ -16,6 +16,8 @@ local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local String = require("String")
+local ChatProviderServiceClient = require("ChatProviderServiceClient")
+local Remoting = require("Remoting")
 
 local CmdrServiceClient = {}
 CmdrServiceClient.ServiceName = "CmdrServiceClient"
@@ -30,6 +32,7 @@ function CmdrServiceClient:Init(serviceBag)
 
 	self._maid = Maid.new()
 	self._permissionServiceClient = self._serviceBag:GetService(PermissionServiceClient)
+	self._chatProviderServiceClient = self._serviceBag:GetService(ChatProviderServiceClient)
 
 	self:PromiseCmdr():Then(function(cmdr)
 		cmdr.Registry:RegisterHook("BeforeRun", function(context)
@@ -69,7 +72,6 @@ function CmdrServiceClient:Init(serviceBag)
 				return nil
 			end
 		end)
-
 	end)
 end
 
@@ -78,6 +80,8 @@ end
 ]=]
 function CmdrServiceClient:Start()
 	assert(self._serviceBag, "Not initialized")
+
+	self._remoting = self._maid:Add(Remoting.new(ReplicatedStorage, "CmdrService"))
 
 	self._maid:GivePromise(PromiseUtils.all({
 		self:PromiseCmdr(),
@@ -102,6 +106,21 @@ function CmdrServiceClient:_setBindings(cmdr)
 	-- enable activation on mobile
 	self._maid:GiveTask(Players.LocalPlayer.Chatted:Connect(function(chat)
 		if String.startsWith(chat, "/cmdr") then
+			cmdr:Show()
+		end
+	end))
+
+	self._maid:GiveTask(self._remoting.OpenCmdr:Connect(function()
+		cmdr:Show()
+	end))
+
+	-- same with chat provider
+	self._maid:GiveTask(self._chatProviderServiceClient.MessageIncoming:Connect(function(textChatMessage)
+		if not (textChatMessage.TextSource and textChatMessage.TextSource.UserId == Players.LocalPlayer.UserId) then
+			return
+		end
+
+		if String.startsWith(textChatMessage.Text, "/cmdr")  then
 			cmdr:Show()
 		end
 	end))

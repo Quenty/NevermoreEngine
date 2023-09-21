@@ -28,9 +28,11 @@
     "access": "public"
   },
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/blend": "file:../blend",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
-    "@quenty/rx": "file:../rx"
+    "@quenty/rx": "file:../rx",
+    "@quenty/valueobject": "file:../valueobject"
   }
 }

@@ -221,7 +221,7 @@ end
 	@return Observable<T>
 ]=]
 function Rx.fromPromise(promise)
-	assert(Promise.isPromise(promise))
+	assert(Promise.isPromise(promise), "Bad promise")
 
 	return Observable.new(function(sub)
 		if promise:IsFulfilled() then

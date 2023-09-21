@@ -13,8 +13,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
-
 local Maid = require("Maid")
 local GameProductServiceHelper = require("GameProductServiceHelper")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
@@ -37,7 +35,7 @@ function GameProductService:Init(serviceBag)
 
 	-- External
 	self._gameConfigService = self._serviceBag:GetService(require("GameConfigService"))
-	self._receiptProcessingService = self._serviceBag:GetService(require("ReceiptProcessingService"))
+	self._serviceBag:GetService(require("ReceiptProcessingService"))
 
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("GameProductBindersServer"))
@@ -83,10 +81,6 @@ function GameProductService:Start()
 		exposeSignal(self.ProductPurchased, GameConfigAssetTypes.PRODUCT)
 		exposeSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
 		exposeSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
-	end))
-
-	self._maid:GiveTask(self._receiptProcessingService:RegisterReceiptProcessor(function(receiptInfo)
-		return self:_handleProcessReceipt(receiptInfo)
 	end))
 end
 
@@ -198,23 +192,6 @@ function GameProductService:ObservePlayerOwnership(player, assetType, idOrKey)
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self._helper:ObservePlayerOwnership(player, assetType, idOrKey)
-end
-
-function GameProductService:_handleProcessReceipt(receiptInfo)
-	local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
-	if not player then
-		-- The player probably left the game
-		-- If they come back, the callback will be called again
-		return Enum.ProductPurchaseDecision.NotProcessedYet
-	end
-
-	local productManager = self._binders.PlayerProductManager:Get(player)
-	if productManager then
-		return productManager:HandleProcessReceipt(player, receiptInfo)
-	end
-
-	-- Free money?
-	return Enum.ProductPurchaseDecision.PurchaseGranted
 end
 
 --[=[
