@@ -1,20 +1,18 @@
-# v7.26.1 (Thu Sep 21 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Fix datastore writer copying non-table scenario [#413](https://github.com/Quenty/NevermoreEngine/pull/413) ([@Quenty](https://github.com/Quenty))
-- fix: Fix datastore writer copying non-table scenario ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.26.0...@quenty/datastore@7.26.1) (2023-09-21)
+
+
+### Bug Fixes
+
+* Fix datastore writer copying non-table scenario ([3303b36](https://github.com/Quenty/NevermoreEngine/commit/3303b36511ca9a3d89ffa711dfc5723276166d55))
+
+
+
+
 
 # [7.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.25.2...@quenty/datastore@7.26.0) (2023-09-21)
 
