@@ -1,5 +1,18 @@
 # (Thu Sep 21 2023)
 
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@7.26.1`
+  - fix: Fix datastore writer copying non-table scenario [#413](https://github.com/Quenty/NevermoreEngine/pull/413) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Sep 21 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/preferredparentutils@3.2.0`
