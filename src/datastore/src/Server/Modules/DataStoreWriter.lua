@@ -252,7 +252,7 @@ function DataStoreWriter:_writeMergeWriters(original)
 
 	-- Handle empty table scenario..
 	-- This would also imply our original is nil somehow...
-	if next(copy) == nil then
+	if type(copy) == "table" and next(copy) == nil then
 		if type(self._saveDataSnapshot) ~= "table" then
 			return nil
 		end
