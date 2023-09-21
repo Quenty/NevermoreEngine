@@ -1,0 +1,11 @@
+{
+  "name": "VoiceChatTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "voicechat": {
+        "$path": ".."
+      }
+    }
+  }
+}
