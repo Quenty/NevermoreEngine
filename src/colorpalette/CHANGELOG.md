@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.33.0...@quenty/colorpalette@4.34.0) (2023-09-21)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+
+
+
+
 # [4.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.32.0...@quenty/colorpalette@4.33.0) (2023-09-04)
 
 **Note:** Version bump only for package @quenty/colorpalette

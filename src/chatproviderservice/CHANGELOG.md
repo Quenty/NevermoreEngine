@@ -1,20 +1,18 @@
-# v3.11.0 (Thu Sep 21 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/product fix [#411](https://github.com/Quenty/NevermoreEngine/pull/411) ([@Quenty](https://github.com/Quenty))
-- feat: Better integration into chat for cmdr ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@3.10.0...@quenty/chatproviderservice@3.11.0) (2023-09-21)
+
+
+### Features
+
+* Better integration into chat for cmdr ([433373d](https://github.com/Quenty/NevermoreEngine/commit/433373dbecb191b61f03b857f11ad9bc586eb8ee))
+
+
+
+
 
 # [3.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@3.9.0...@quenty/chatproviderservice@3.10.0) (2023-09-04)
 

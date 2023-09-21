@@ -1,20 +1,18 @@
-# v7.29.0 (Thu Sep 21 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/product fix [#411](https://github.com/Quenty/NevermoreEngine/pull/411) ([@Quenty](https://github.com/Quenty))
-- feat: Add GameScalingHelper to help with scaling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@7.28.0...@quenty/gamescalingutils@7.29.0) (2023-09-21)
+
+
+### Features
+
+* Add GameScalingHelper to help with scaling ([95876ef](https://github.com/Quenty/NevermoreEngine/commit/95876efad772f83450aa7d6a8f65d3228fe0a71f))
+
+
+
+
 
 # [7.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gamescalingutils@7.27.0...@quenty/gamescalingutils@7.28.0) (2023-09-04)
 

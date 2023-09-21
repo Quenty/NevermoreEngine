@@ -1,23 +1,15 @@
-# v1.33.0 (Thu Sep 21 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/product fix [#411](https://github.com/Quenty/NevermoreEngine/pull/411) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Use Motor6DStack uses new binder system ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@1.32.0...@quenty/motor6d@1.33.0) (2023-09-21)
+
+**Note:** Version bump only for package @quenty/motor6d
+
+
+
+
 
 # [1.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/motor6d@1.31.0...@quenty/motor6d@1.32.0) (2023-09-04)
 

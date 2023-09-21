@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.25.0...@quenty/observablecollection@5.26.0) (2023-09-21)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
 # [5.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.24.0...@quenty/observablecollection@5.25.0) (2023-09-04)
 
 

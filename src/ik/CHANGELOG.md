@@ -1,23 +1,18 @@
-# v9.39.0 (Thu Sep 21 2023)
-
-#### 🚀 Enhancement
-
-- Users/quenty/product fix [#411](https://github.com/Quenty/NevermoreEngine/pull/411) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Use Motor6DStackHumanoid directly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.38.0...@quenty/ik@9.39.0) (2023-09-21)
+
+
+### Bug Fixes
+
+* Use Motor6DStackHumanoid directly ([e6eb607](https://github.com/Quenty/NevermoreEngine/commit/e6eb60722375b6f5b81c6c54a1fd612ae94fbf0b))
+
+
+
+
 
 # [9.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@9.37.0...@quenty/ik@9.38.0) (2023-09-04)
 
