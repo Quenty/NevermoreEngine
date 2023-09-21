@@ -4,6 +4,8 @@
 
 	@class PreferredParentUtils
 ]=]
+local RunService = game:GetService("RunService")
+
 local PreferredParentUtils = {}
 
 --[=[
@@ -52,11 +54,15 @@ function PreferredParentUtils.getPreferredParent(parent, name)
 		return found
 	end
 
-	local newParent = Instance.new("Folder")
-	newParent.Name = name
-	newParent.Parent = parent
+	if RunService:IsServer() then
+		local newParent = Instance.new("Folder")
+		newParent.Name = name
+		newParent.Parent = parent
 
-	return newParent
+		return newParent
+	end
+
+	return nil
 end
 
 
