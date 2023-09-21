@@ -6,14 +6,17 @@
 local require = require(script.Parent.loader).load(script)
 
 local ServerScriptService = game:GetService("ServerScriptService")
+local TextChatService = game:GetService("TextChatService")
 
 local ChatTagDataUtils = require("ChatTagDataUtils")
 local LocalizedTextUtils = require("LocalizedTextUtils")
 local Maid = require("Maid")
 local PermissionLevel = require("PermissionLevel")
+local PreferredParentUtils = require("PreferredParentUtils")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local Signal = require("Signal")
 
 local ChatProviderService = {}
 ChatProviderService.ServiceName = "ChatProviderService"
@@ -21,6 +24,9 @@ ChatProviderService.ServiceName = "ChatProviderService"
 function ChatProviderService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
+
+	-- State
+	self.MessageIncoming = self._maid:Add(Signal.new())
 
 	-- External
 	self._serviceBag:GetService(require("CmdrService"))
@@ -47,6 +53,11 @@ function ChatProviderService:Init(serviceBag)
 	}))
 end
 
+function ChatProviderService:AddChatCommand(textChatCommand)
+	assert(typeof(textChatCommand) == "Instance", "Bad textChatCommand")
+
+	textChatCommand.Parent = PreferredParentUtils.getPreferredParent(TextChatService, "ChatProviderCommands")
+end
 
 --[=[
 	Sets the developer chat tag

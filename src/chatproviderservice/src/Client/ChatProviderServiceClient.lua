@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
 
+local Maid = require("Maid")
+local Signal = require("Signal")
 local String = require("String")
 
 local ChatProviderServiceClient = {}
@@ -15,10 +17,13 @@ ChatProviderServiceClient.ServiceName = "ChatProviderServiceClient"
 function ChatProviderServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
+
+	-- State
+	self.MessageIncoming = self._maid:Add(Signal.new())
 
 	-- External
 	self._serviceBag:GetService(require("CmdrServiceClient"))
-
 
 	-- Binders
 	self._serviceBag:GetService(require("ChatTagClient"))
@@ -28,6 +33,8 @@ end
 
 function ChatProviderServiceClient:Start()
 	TextChatService.OnIncomingMessage = function(textChatMessage)
+		self.MessageIncoming:Fire(textChatMessage)
+
 		local textSource =  textChatMessage.TextSource
 		if not textSource then
 			return
@@ -60,5 +67,8 @@ function ChatProviderServiceClient:_renderTags(textSource)
 	return hasChatTags:GetAsRichText()
 end
 
+function ChatProviderServiceClient:Destroy()
+	self._maid:DoCleaning()
+end
 
 return ChatProviderServiceClient
