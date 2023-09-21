@@ -1,3 +1,20 @@
+# v7.17.0 (Thu Sep 21 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/product fix [#411](https://github.com/Quenty/NevermoreEngine/pull/411) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Fix unused code ([@Quenty](https://github.com/Quenty))
+- fix: Process and report products properly ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

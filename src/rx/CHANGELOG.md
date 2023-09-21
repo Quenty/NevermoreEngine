@@ -1,3 +1,19 @@
+# v7.16.0 (Thu Sep 21 2023)
+
+#### 🚀 Enhancement
+
+- Users/quenty/product fix [#411](https://github.com/Quenty/NevermoreEngine/pull/411) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Better error message is Rx.fromPromise() when passing non-promise in ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
