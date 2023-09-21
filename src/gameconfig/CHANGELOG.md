@@ -1,19 +1,15 @@
-# v5.40.0 (Thu Sep 21 2023)
-
-#### 🚀 Enhancement
-
-- Users/martin/preferred parent to shared [#412](https://github.com/Quenty/NevermoreEngine/pull/412) ([@imagerymartin](https://github.com/imagerymartin))
-
-#### Authors: 1
-
-- Martin Cardenas ([@imagerymartin](https://github.com/imagerymartin))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.39.0...@quenty/gameconfig@5.40.0) (2023-09-21)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+
+
+
 
 # [5.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@5.38.0...@quenty/gameconfig@5.39.0) (2023-09-21)
 

@@ -1,20 +1,18 @@
-# v3.2.0 (Thu Sep 21 2023)
-
-#### 🚀 Enhancement
-
-- Users/martin/preferred parent to shared [#412](https://github.com/Quenty/NevermoreEngine/pull/412) ([@imagerymartin](https://github.com/imagerymartin))
-- feat: moved preferred parent utils to shared ([@imagerymartin](https://github.com/imagerymartin))
-
-#### Authors: 1
-
-- Martin Cardenas ([@imagerymartin](https://github.com/imagerymartin))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@3.1.0...@quenty/preferredparentutils@3.2.0) (2023-09-21)
+
+
+### Features
+
+* moved preferred parent utils to shared ([432af44](https://github.com/Quenty/NevermoreEngine/commit/432af44808f780391649faf6fad418efc767581c))
+
+
+
+
 
 # [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@3.0.0...@quenty/preferredparentutils@3.1.0) (2022-10-11)
 
