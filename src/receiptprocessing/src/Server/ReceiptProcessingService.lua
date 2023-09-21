@@ -12,6 +12,8 @@ local Promise = require("Promise")
 local EnumUtils = require("EnumUtils")
 local Signal = require("Signal")
 local Maid = require("Maid")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local ValueObject = require("ValueObject")
 
 local ReceiptProcessingService = {}
 ReceiptProcessingService.ServiceName = "ReceiptProcessingService"
@@ -21,11 +23,11 @@ function ReceiptProcessingService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self.ReceiptCreated = Signal.new() -- :Fire(receiptInfo)
-	self._maid:GiveTask(self.ReceiptCreated)
+	self.ReceiptCreated = self._maid:Add(Signal.new()) -- :Fire(receiptInfo)
+	self.ReceiptProcessed = self._maid:Add(Signal.new()) -- :Fire(receiptInfo, productPurchaseDecision)
 
-	self.ReceiptProcessed = Signal.new() -- :Fire(receiptInfo, productPurchaseDecision)
-	self._maid:GiveTask(self.ReceiptProcessed)
+	self._receiptProcessedForUserId = self._maid:Add(ObservableSubscriptionTable.new()) -- :Fire(receiptInfo, productPurchaseDecision)
+	self._defaultDecision = self._maid:Add(ValueObject.new(Enum.ProductPurchaseDecision.PurchaseGranted, "EnumItem"))
 
 	self._processors = {}
 end
@@ -34,6 +36,39 @@ function ReceiptProcessingService:Start()
 	MarketplaceService.ProcessReceipt = function(...)
 		return self:_handleProcessReceiptAsync(...)
 	end
+end
+
+--[=[
+	Sets the default purchase decision in case you want more control
+	@param productPurchaseDecision ProductPurchaseDecision
+]=]
+function ReceiptProcessingService:SetDefaultPurchaseDecision(productPurchaseDecision)
+	assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad productPurchaseDecision")
+
+	self._defaultDecision.Value = productPurchaseDecision
+end
+
+--[=[
+	Observes receipt by player
+
+	@param player Player
+	@return Observable<ReceiptInfo>
+]=]
+function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
+	return self:ObserveReceiptProcessedForUserId(player.UserId)
+end
+--[=[
+	Observes receipt by userId
+
+	@param userId number
+	@return Observable<ReceiptInfo>
+]=]
+function ReceiptProcessingService:ObserveReceiptProcessedForUserId(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return self._receiptProcessedForUserId:Observe(userId)
 end
 
 --[=[
@@ -98,7 +133,7 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
 		end
 
 		if EnumUtils.isOfType(Enum.ProductPurchaseDecision, result) then
-			self.ReceiptProcessed:Fire(receiptInfo, result)
+			self:_fireProcessed(receiptInfo, result)
 			return result
 		elseif result == nil then
 			continue
@@ -108,8 +143,20 @@ function ReceiptProcessingService:_handleProcessReceiptAsync(receiptInfo)
 	end
 
 	-- Retry in the future
-	self.ReceiptProcessed:Fire(receiptInfo, Enum.ProductPurchaseDecision.NotProcessedYet)
-	return Enum.ProductPurchaseDecision.NotProcessedYet
+	self:_fireProcessed(receiptInfo, self._defaultDecision.Value)
+	return self._defaultDecision.Value
+end
+
+function ReceiptProcessingService:_fireProcessed(receiptInfo, productPurchaseDecision)
+	assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad productPurchaseDecision")
+
+	self.ReceiptProcessed:Fire(receiptInfo, productPurchaseDecision)
+
+	if type(receiptInfo.PlayerId) == "number" then
+		self._receiptProcessedForUserId:Fire(receiptInfo.PlayerId, receiptInfo, productPurchaseDecision)
+	else
+		warn("[ReceiptProcessingService._fireProcessed] - No receiptInfo.PlayerId")
+	end
 end
 
 function ReceiptProcessingService:Destroy()

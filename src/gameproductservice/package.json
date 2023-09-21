@@ -31,6 +31,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
+    "@quenty/enumutils": "file:../enumutils",
     "@quenty/gameconfig": "file:../gameconfig",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",

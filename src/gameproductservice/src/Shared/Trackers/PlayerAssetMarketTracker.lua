@@ -265,16 +265,12 @@ end
 
 	@param player Player
 	@param receiptInfo ReceiptInfo
-	@return ProductPurchaseDecision
 ]=]
 function PlayerAssetMarketTracker:HandleProcessReceipt(player, receiptInfo)
 	assert(typeof(player) == "Instance", "Bad player")
 	assert(self._receiptProcessingExpected, "No receiptProcessingExpected")
 
 	self:_handlePurchaseEvent(receiptInfo.ProductId, true, true)
-
-	-- Always grant...
-	return Enum.ProductPurchaseDecision.PurchaseGranted
 end
 
 return PlayerAssetMarketTracker
