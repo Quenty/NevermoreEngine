@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/preferredparentutils@3.2.0`
+  - Users/martin/preferred parent to shared [#412](https://github.com/Quenty/NevermoreEngine/pull/412) ([@imagerymartin](https://github.com/imagerymartin))
+
+#### Authors: 1
+
+- Martin Cardenas ([@imagerymartin](https://github.com/imagerymartin))
+
+---
+
+# (Thu Sep 21 2023)
+
+#### 🚀 Enhancement
+
 - `@quenty/chatproviderservice@3.11.0`, `@quenty/cmdrservice@7.23.0`, `@quenty/datastore@7.26.0`, `@quenty/gameproductservice@7.17.0`, `@quenty/gamescalingutils@7.29.0`, `@quenty/ik@9.39.0`, `@quenty/motor6d@1.33.0`, `@quenty/particles@1.1.0`, `@quenty/ragdoll@9.37.0`, `@quenty/receiptprocessing@1.7.0`, `@quenty/rx@7.16.0`, `@quenty/voicechat@1.1.0`
   - Users/quenty/product fix [#411](https://github.com/Quenty/NevermoreEngine/pull/411) ([@Quenty](https://github.com/Quenty))
 
