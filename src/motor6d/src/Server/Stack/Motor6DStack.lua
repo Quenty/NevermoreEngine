@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Motor6DStackBase = require("Motor6DStackBase")
+local Binder = require("Binder")
 
 local Motor6DStack = setmetatable({}, Motor6DStackBase)
 Motor6DStack.ClassName = "Motor6DStack"
@@ -18,4 +19,4 @@ function Motor6DStack.new(obj, serviceBag)
 	return self
 end
 
-return Motor6DStack
+return Binder.new("Motor6DStack", Motor6DStack)
