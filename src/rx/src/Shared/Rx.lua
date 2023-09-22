@@ -83,7 +83,7 @@ end
 	```lua
 	Rx.of(1, 2, 3):Subscribe(print, function()
 		print("Complete")
-	end)) --> 1, 2, 3, "Complete"
+	end) --> 1, 2, 3, "Complete"
 	```
 
 	@param ... any -- Arguments to emit
