@@ -40,6 +40,7 @@
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/playerbinder": "file:../playerbinder",
     "@quenty/promise": "file:../promise",
+    "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/receiptprocessing": "file:../receiptprocessing",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",

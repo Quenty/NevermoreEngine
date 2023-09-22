@@ -29,8 +29,7 @@ function GameConfigPicker.new(gameConfigBinder, gameConfigAssetBinder)
 	self._gameConfigBinder = assert(gameConfigBinder, "No gameConfigBinder")
 	self._gameConfigAssetBinder = assert(gameConfigAssetBinder, "No gameConfigAssetBinder")
 
-	self._gameIdToConfigSet = ObservableMapSet.new()
-	self._maid:GiveTask(self._gameIdToConfigSet)
+	self._gameIdToConfigSet = self._maid:Add(ObservableMapSet.new())
 
 	self._maid:GiveTask(RxBinderUtils.observeAllBrio(self._gameConfigBinder)
 		:Subscribe(function(brio)
