@@ -452,6 +452,8 @@ function Remoting:_ensureFolder()
 	self._remoteFolder.Archivable = false
 	self._remoteFolder.Parent = self._instance
 
+	self._maid:GiveTask(self._remoteFolder)
+
 	return self._remoteFolder
 end
 
