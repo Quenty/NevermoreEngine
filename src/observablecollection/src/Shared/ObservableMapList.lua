@@ -199,23 +199,6 @@ function ObservableMapList:ObserveItemsForKeyBrio(key)
 end
 
 --[=[
-	Gets a list for a given key.
-
-	@param key TKey
-	@return { TValue }
-]=]
-function ObservableMapList:GetListForKey(key)
-	assert(key ~= nil, "Bad key")
-
-	local observableList = self:GetListForKey(key)
-	if not observableList then
-		return {}
-	end
-
-	return observableList:GetList()
-end
-
---[=[
 	Gets the observable list for the given key
 	@param key TKey
 	@return ObservableList<TValue>
