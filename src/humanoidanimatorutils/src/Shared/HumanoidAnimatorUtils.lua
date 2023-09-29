@@ -5,6 +5,8 @@
 	@class HumanoidAnimatorUtils
 ]=]
 
+local RunService = game:GetService("RunService")
+
 local HumanoidAnimatorUtils = {}
 
 --[=[
@@ -21,7 +23,10 @@ local HumanoidAnimatorUtils = {}
 function HumanoidAnimatorUtils.getOrCreateAnimator(humanoid)
 	local animator = humanoid:FindFirstChildOfClass("Animator")
 	if not animator then
-		warn("HumanoidAnimatorUtils] - Creating an animator")
+		if RunService:IsClient() then
+			warn(string.format("[HumanoidAnimatorUtils.getOrCreateAnimator] - Creating an animator on %s on the client", humanoid:GetFullName()))
+		end
+
 		animator = Instance.new("Animator")
 		animator.Name = "Animator"
 		animator.Parent = humanoid
