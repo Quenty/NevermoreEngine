@@ -23,6 +23,12 @@ npm install @quenty/clienttranslator --save
 ## Usage
 Usage is designed to be simple.
 
+## Easy-use scenario
+
+1. Call Translate(data, "blah") on anything
+2. Translation is magically replicated to clients and can be saved
+3. Only one place needed to save the data
+
 ## Adding localization files
 
 Add files to ReplicatedStorage/i18n. Files will be in string values, and be valid JSON. This allows lookup like this:

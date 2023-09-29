@@ -32,6 +32,7 @@ function GameConfigService:Init(serviceBag)
 
 	-- Internal
 	self._serviceBag:GetService(require("GameConfigCommandService"))
+	self._serviceBag:GetService(require("GameConfigTranslator"))
 	self._binders = self._serviceBag:GetService(require("GameConfigBindersServer"))
 
 	-- Setup picker

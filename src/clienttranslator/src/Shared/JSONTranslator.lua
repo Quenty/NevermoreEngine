@@ -18,15 +18,16 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local JsonToLocalizationTable = require("JsonToLocalizationTable")
-local PseudoLocalize = require("PseudoLocalize")
-local LocalizationServiceUtils = require("LocalizationServiceUtils")
-local Promise = require("Promise")
-local Observable = require("Observable")
-local Maid = require("Maid")
 local Blend = require("Blend")
+local JsonToLocalizationTable = require("JsonToLocalizationTable")
+local LocalizationServiceUtils = require("LocalizationServiceUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
+local PseudoLocalize = require("PseudoLocalize")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
+local TranslationKeyUtils = require("TranslationKeyUtils")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
@@ -73,7 +74,7 @@ function JSONTranslator.new(translatorName, ...)
 	self._englishTranslator = self._localizationTable:GetTranslator("en")
 	self._fallbacks = {}
 
-	if RunService:IsRunning() then
+	if RunService:IsRunning() and RunService:IsClient() then
 		self._promiseTranslator = LocalizationServiceUtils.promiseTranslator(Players.LocalPlayer)
 	else
 		self._promiseTranslator = Promise.resolved(self._englishTranslator)
@@ -84,6 +85,10 @@ function JSONTranslator.new(translatorName, ...)
 	end
 
 	return self
+end
+
+function JSONTranslator:Init(serviceBag)
+	self._serviceBag = assert(serviceBag, "No serviceBag")
 end
 
 --[=[
@@ -126,6 +131,25 @@ function JSONTranslator:SetEntryValue(translationKey, source, context, localeId,
 	end
 end
 
+function JSONTranslator:ObserveTranslation(prefix, text, argData)
+	assert(type(prefix) == "string", "Bad text")
+	assert(type(text) == "string", "Bad text")
+
+	return self:ObserveFormatByKey(self:ToTranslationKey(prefix, text), argData)
+end
+
+function JSONTranslator:ToTranslationKey(prefix, text)
+	assert(type(prefix) == "string", "Bad text")
+	assert(type(text) == "string", "Bad text")
+
+	local translationKey = TranslationKeyUtils.getTranslationKey(prefix, text)
+	local context = ("automatic.%s"):format(translationKey)
+
+	self:SetEntryValue(translationKey, text, context, "en", text)
+
+	return translationKey
+end
+
 --[=[
 	Gets the current localeId of the translator if it's initialized, or a default if it is not.
 
@@ -136,7 +160,7 @@ function JSONTranslator:GetLocaleId()
 		local translator = self._promiseTranslator:Wait()
 		return translator.LocaleId
 	else
-		warn("[JSONTranslator] - Translator is not loaded yet, returning english")
+		warn("[JSONTranslator.GetLocaleId] - Translator is not loaded yet, returning english")
 		return "en"
 	end
 end
@@ -322,7 +346,7 @@ function JSONTranslator:_formatByKeyTestMode(key, args)
 	if err then
 		warn(err)
 	else
-		warn("Failed to localize '" .. key .. "'")
+		warn("[JSONTranslator._formatByKeyTestMode] - Failed to localize '" .. key .. "'")
 	end
 
 	return key

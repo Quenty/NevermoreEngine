@@ -15,6 +15,7 @@ function GameServiceServer:Init(serviceBag)
 	self._serviceBag:GetService(require("IKService"))
 
 	-- Internal
+	self._serviceBag:GetService(require("GameTranslator"))
 	self._serviceBag:GetService(require("GameBindersServer"))
 end
 
