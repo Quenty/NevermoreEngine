@@ -51,9 +51,18 @@ function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
 	self.ShowPromptRequested = Signal.new() -- :Fire(id)
 	self._maid:GiveTask(self.ShowPromptRequested)
 
+	self._maid:GiveTask(self.Purchased:Connect(function(id)
+		self._purchasedThisSession[id] = true
+	end))
+
 	self._maid:GiveTask(function()
-		while #self._purchasedThisSession > 0 do
-			local pending = table.remove(self._purchasedThisSession, #self._purchasedThisSession)
+		while #self._pendingPurchasePromises > 0 do
+			local pending = table.remove(self._pendingPurchasePromises, #self._pendingPurchasePromises)
+			pending:Reject()
+		end
+
+		while #self._pendingPromptOpenPromises > 0 do
+			local pending = table.remove(self._pendingPromptOpenPromises, #self._pendingPromptOpenPromises)
 			pending:Reject()
 		end
 	end)
