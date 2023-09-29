@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
     "@quenty/numbersequenceutils": "file:../numbersequenceutils"
   },
   "publishConfig": {
