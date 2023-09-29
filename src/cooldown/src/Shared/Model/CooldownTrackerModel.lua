@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local CooldownTrackerModel = setmetatable({}, BaseObject)
 CooldownTrackerModel.ClassName = "CooldownTrackerModel"
@@ -32,6 +33,10 @@ function CooldownTrackerModel.new()
 	end))
 
 	return self
+end
+
+function CooldownTrackerModel.isCooldownTrackerModel(value)
+	return DuckTypeUtils.isImplementation(CooldownTrackerModel, value)
 end
 
 function CooldownTrackerModel:IsCoolingDown()
