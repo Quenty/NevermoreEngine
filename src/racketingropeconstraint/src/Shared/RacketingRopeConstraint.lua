@@ -10,6 +10,7 @@ local RunService = game:GetService("RunService")
 local BaseObject = require("BaseObject")
 local OverriddenProperty = require("OverriddenProperty")
 local Promise = require("Promise")
+local Binder = require("Binder")
 
 local START_DISTANCE = 1000
 
@@ -115,4 +116,4 @@ function RacketingRopeConstraint:_setLength(length)
 	end
 end
 
-return RacketingRopeConstraint
+return Binder.new("RacketingRopeConstraint", RacketingRopeConstraint)
