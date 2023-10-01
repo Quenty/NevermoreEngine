@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local RogueHumanoidProperties = require("RogueHumanoidProperties")
+local Binder = require("Binder")
 
 local HumanoidSpeed = setmetatable({}, BaseObject)
 HumanoidSpeed.ClassName = "HumanoidSpeed"
@@ -60,4 +61,4 @@ function HumanoidSpeed:ApplySpeedAdditive(amount)
 	return self._properties.WalkSpeed:CreateAdditive(amount)
 end
 
-return HumanoidSpeed
+return Binder.new("HumanoidSpeed", HumanoidSpeed)

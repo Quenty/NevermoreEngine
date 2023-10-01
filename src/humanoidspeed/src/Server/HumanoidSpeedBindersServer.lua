@@ -6,7 +6,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local BinderProvider = require("BinderProvider")
-local Binder = require("Binder")
 
 return BinderProvider.new(script.Name, function(self, serviceBag)
 	serviceBag:GetService(require("RogueHumanoidService"))
@@ -15,5 +14,5 @@ return BinderProvider.new(script.Name, function(self, serviceBag)
 	@prop HumanoidSpeed Binder<HumanoidSpeed>
 	@within HumanoidSpeedBindersServer
 ]=]
-	self:Add(Binder.new("HumanoidSpeed", require("HumanoidSpeed"), serviceBag))
+	self:Add(serviceBag:GetService(require("HumanoidSpeed")))
 end)
