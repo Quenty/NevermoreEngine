@@ -25,8 +25,7 @@ function ObservableCountingMap.new()
 	self._maid = Maid.new()
 	self._map = {}
 
-	self._totalKeyCountValue = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._totalKeyCountValue)
+	self._totalKeyCountValue = self._maid:Add(ValueObject.new(0, "number"))
 
 --[=[
 	Fires when an key is added
@@ -34,8 +33,7 @@ function ObservableCountingMap.new()
 	@prop KeyAdded Signal<T>
 	@within ObservableCountingMap
 ]=]
-	self.KeyAdded = Signal.new()
-	self._maid:GiveTask(self.KeyAdded)
+	self.KeyAdded = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when an key is removed.
@@ -43,8 +41,7 @@ function ObservableCountingMap.new()
 	@prop KeyRemoved Signal<T>
 	@within ObservableCountingMap
 ]=]
-	self.KeyRemoved = Signal.new()
-	self._maid:GiveTask(self.KeyRemoved)
+	self.KeyRemoved = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when an item count changes
@@ -52,8 +49,7 @@ function ObservableCountingMap.new()
 	@prop KeyChanged Signal<T>
 	@within ObservableCountingMap
 ]=]
-	self.KeyChanged = Signal.new()
-	self._maid:GiveTask(self.KeyChanged)
+	self.KeyChanged = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when the total count changes.

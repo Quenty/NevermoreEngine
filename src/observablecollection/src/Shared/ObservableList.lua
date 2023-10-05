@@ -32,14 +32,9 @@ function ObservableList.new()
 	self._contents = {} -- { [Symbol]: T }
 	self._indexes = {} -- { [Symbol]: number }
 
-	self._indexObservers = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._indexObservers)
-
-	self._keyIndexObservables = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._keyIndexObservables)
-
-	self._countValue = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._countValue)
+	self._indexObservers = self._maid:Add(ObservableSubscriptionTable.new())
+	self._keyIndexObservables = self._maid:Add(ObservableSubscriptionTable.new())
+	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
 --[=[
 	Fires when an item is added
@@ -47,8 +42,7 @@ function ObservableList.new()
 	@prop ItemAdded Signal<T, number, Symbol>
 	@within ObservableList
 ]=]
-	self.ItemAdded = Signal.new()
-	self._maid:GiveTask(self.ItemAdded)
+	self.ItemAdded = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when an item is removed.
@@ -56,8 +50,7 @@ function ObservableList.new()
 	@prop ItemRemoved Signal<T, Symbol>
 	@within ObservableList
 ]=]
-	self.ItemRemoved = Signal.new()
-	self._maid:GiveTask(self.ItemRemoved)
+	self.ItemRemoved = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when the count changes.
