@@ -7,12 +7,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
+local RagdollableBase = require("RagdollableBase")
 local RagdollClient = require("RagdollClient")
 local RxRagdollUtils = require("RxRagdollUtils")
 local Binder = require("Binder")
+local RagdollableInterface = require("RagdollableInterface")
+local Rx = require("Rx")
 
-local RagdollableClient = setmetatable({}, BaseObject)
+local RagdollableClient = setmetatable({}, RagdollableBase)
 RagdollableClient.ClassName = "RagdollableClient"
 RagdollableClient.__index = RagdollableClient
 
@@ -23,7 +25,7 @@ RagdollableClient.__index = RagdollableClient
 	@return RagdollableClient
 ]=]
 function RagdollableClient.new(humanoid, serviceBag)
-	local self = setmetatable(BaseObject.new(humanoid), RagdollableClient)
+	local self = setmetatable(RagdollableBase.new(humanoid), RagdollableClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
@@ -32,7 +34,17 @@ function RagdollableClient.new(humanoid, serviceBag)
 		self:_onRagdollChanged(ragdoll)
 	end))
 
+	self._maid:GiveTask(RagdollableInterface:Implement(self._obj, self))
+
 	return self
+end
+
+function RagdollableClient:ObserveIsRagdolled()
+	return self._ragdollBinder:Observe(self._obj):Pipe({
+		Rx.map(function(value)
+			return value and true or false
+		end)
+	})
 end
 
 function RagdollableClient:_onRagdollChanged(ragdoll)
