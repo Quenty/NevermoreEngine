@@ -48,28 +48,18 @@ Viewport.__index = Viewport
 function Viewport.new()
 	local self = setmetatable(BasicPane.new(), Viewport)
 
-	self._current = ValueObject.new(nil)
-	self._maid:GiveTask(self._current)
+	self._current = self._maid:Add(ValueObject.new(nil))
+	self._transparency = self._maid:Add(ValueObject.new(0, "number"))
+	self._absoluteSize = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
+	self._fieldOfView = self._maid:Add(ValueObject.new(20, "number"))
 
-	self._transparency = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._transparency)
-
-	self._absoluteSize = ValueObject.new(Vector2.zero, "Vector2")
-	self._maid:GiveTask(self._absoluteSize)
-
-	self._fieldOfView = ValueObject.new(20, "number")
-	self._maid:GiveTask(self._fieldOfView)
-
-	self._rotationYawSpring = SpringObject.new(math.pi/4)
+	self._rotationYawSpring = self._maid:Add(SpringObject.new(math.rad(90 + 90 - 30)))
 	self._rotationYawSpring.Speed = 30
-	self._maid:GiveTask(self._rotationYawSpring)
 
-	self._rotationPitchSpring = SpringObject.new(-math.pi/6)
+	self._rotationPitchSpring = self._maid:Add(SpringObject.new(math.rad(-15)))
 	self._rotationPitchSpring.Speed = 30
-	self._maid:GiveTask(self._rotationPitchSpring)
 
-	self._notifyInstanceSizeChanged = Signal.new()
-	self._maid:GiveTask(self._notifyInstanceSizeChanged)
+	self._notifyInstanceSizeChanged = self._maid:Add(Signal.new())
 
 	return self
 end
@@ -132,6 +122,9 @@ function Viewport.blend(props)
 	end)
 end
 
+function Viewport:ObserveTransparency()
+	return self._transparency:Observe()
+end
 
 --[=[
 	Sets the field of view on the viewport.
@@ -171,6 +164,12 @@ function Viewport:SetInstance(instance)
 	assert(typeof(instance) == "Instance" or instance == nil, "Bad instance")
 
 	self._current.Value = instance
+
+	return function()
+		if self._current.Value == instance then
+			self._current.Value = nil
+		end
+	end
 end
 
 --[=[
@@ -181,26 +180,34 @@ function Viewport:NotifyInstanceSizeChanged()
 	self._notifyInstanceSizeChanged:Fire()
 end
 
-function Viewport:RotateBy(deltaV2, doNotAnimate)
-	local target = (self._rotationYawSpring.Value + deltaV2.x) % TAU
-	self._rotationYawSpring.Position = CircleUtils.updatePositionToSmallestDistOnCircle(self._rotationYawSpring.Position, target, TAU)
+function Viewport:SetYaw(yaw, doNotAnimate)
+	yaw = yaw % TAU
 
-	self._rotationYawSpring.Target = target
+	self._rotationYawSpring.Position = CircleUtils.updatePositionToSmallestDistOnCircle(self._rotationYawSpring.Position, yaw, TAU)
+	self._rotationYawSpring.Target = yaw
 
 	if doNotAnimate then
 		self._rotationYawSpring.Position = self._rotationYawSpring.Target
 	end
+end
 
-	self._rotationPitchSpring.Target = math.clamp(self._rotationPitchSpring.Value + deltaV2.y, MIN_PITCH, MAX_PITCH)
+function Viewport:SetPitch(pitch, doNotAnimate)
+	self._rotationPitchSpring.Target = math.clamp(pitch, MIN_PITCH, MAX_PITCH)
 	if doNotAnimate then
 		self._rotationPitchSpring.Position = self._rotationPitchSpring.Target
 	end
+end
+
+function Viewport:RotateBy(deltaV2, doNotAnimate)
+	self:SetYaw(self._rotationYawSpring.Value + deltaV2.x, doNotAnimate)
+	self:SetPitch(self._rotationPitchSpring.Value + deltaV2.y, doNotAnimate)
 end
 
 --[=[
 	Renders the viewport. Allows the following properties.
 
 	* Ambient - Color3
+	* ImageColor3 - Color3
 	* AnchorPoint - Vector2
 	* LayoutOrder - number
 	* LightColor - Color3
@@ -221,16 +228,25 @@ function Viewport:Render(props)
 	local currentCamera = ValueObject.new()
 	self._maid:GiveTask(currentCamera)
 
+	local lightDirectionCFrame = (CFrame.Angles(0, math.rad(180), 0)
+			* CFrame.Angles(math.rad(-45), 0, 0))
+	local brightness = 1.25
+	local ambientBrightness = 0.75
+
 	return Blend.New "ViewportFrame" {
 		Parent = props.Parent;
 		Size = props.Size or UDim2.new(1, 0, 1, 0);
 		AnchorPoint = props.AnchorPoint;
 		Position = props.Position;
+		ImageColor3 = props.ImageColor3;
 		LayoutOrder = props.LayoutOrder;
 		BackgroundTransparency = 1;
+		BackgroundColor3 = props.BackgroundColor3;
 		CurrentCamera = currentCamera;
-		LightColor = props.LightColor or Color3.fromRGB(200, 200, 200);
-		Ambient = props.Ambient or Color3.fromRGB(140, 140, 140);
+		-- selene:allow(roblox_incorrect_color3_new_bounds)
+		LightColor = props.LightColor or Color3.new(brightness, brightness, brightness + 0.15);
+		LightDirection = props.LightDirection or lightDirectionCFrame:vectorToWorldSpace(Vector3.new(0, 0, -1));
+		Ambient = props.Ambient or Color3.new(ambientBrightness, ambientBrightness, ambientBrightness + 0.15);
 		ImageTransparency = Blend.Computed(props.Transparency or 0, self._transparency,
 			function(propTransparency, selfTransparency)
 				return Math.map(propTransparency, 0, 1, selfTransparency, 1)
@@ -265,7 +281,10 @@ function Viewport:Render(props)
 			return maid
 		end)] = true;
 		[Blend.Children] = {
+			props[Blend.Children];
+
 			self._current;
+
 			Blend.New "Camera" {
 				[Blend.Instance] = currentCamera;
 				Name = "CurrentCamera";
