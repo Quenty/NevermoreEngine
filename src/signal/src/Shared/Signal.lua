@@ -30,6 +30,14 @@
 	@class Signal
 ]=]
 
+local USE_GOOD_SIGNAL_ONLY = true
+
+if USE_GOOD_SIGNAL_ONLY then
+	local require = require(script.Parent.loader).load(script)
+
+	return require("GoodSignal")
+end
+
 local HttpService = game:GetService("HttpService")
 
 local ENABLE_TRACEBACK = false
