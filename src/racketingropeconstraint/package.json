@@ -31,7 +31,9 @@
     "@quenty/binder": "file:../binder",
     "@quenty/loader": "file:../loader",
     "@quenty/overriddenproperty": "file:../overriddenproperty",
-    "@quenty/promise": "file:../promise"
+    "@quenty/promise": "file:../promise",
+    "@quenty/tie": "file:../tie",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

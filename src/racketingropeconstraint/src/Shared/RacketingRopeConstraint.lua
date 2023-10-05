@@ -8,9 +8,11 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
+local Binder = require("Binder")
 local OverriddenProperty = require("OverriddenProperty")
 local Promise = require("Promise")
-local Binder = require("Binder")
+local RacketingRopeConstraintInterface = require("RacketingRopeConstraintInterface")
+local ValueObject = require("ValueObject")
 
 local START_DISTANCE = 1000
 
@@ -23,6 +25,9 @@ function RacketingRopeConstraint.new(ropeConstraint)
 
 	self._smallestDistance = START_DISTANCE
 	self._targetDistance = 0.5
+
+	self._isConstrained = ValueObject.new(false, "boolean")
+	self._maid:GiveTask(self._isConstrained)
 
 	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("Enabled"):Connect(function()
 		self:_handleActiveChanged()
@@ -41,11 +46,13 @@ function RacketingRopeConstraint.new(ropeConstraint)
 		self._maid:GiveTask(self._overriddenLength)
 	end
 
+	self._maid:GiveTask(RacketingRopeConstraintInterface:Implement(self._obj, self))
+
 	return self
 end
 
 function RacketingRopeConstraint:PromiseConstrained()
-	if self:_isValid() and self:_isConstrained() then
+	if self:_isValid() and self:_queryIsConstrained() then
 		return Promise.resolved()
 	end
 
@@ -58,7 +65,11 @@ function RacketingRopeConstraint:PromiseConstrained()
 	return promise
 end
 
-function RacketingRopeConstraint:_isConstrained()
+function RacketingRopeConstraint:ObserveIsConstrained()
+	return self._isConstrained:Observe()
+end
+
+function RacketingRopeConstraint:_queryIsConstrained()
 	return self._obj.Length <= self._targetDistance
 end
 
@@ -95,11 +106,12 @@ function RacketingRopeConstraint:_update()
 
 	self:_setLength(self._smallestDistance)
 
-	if self:_isConstrained() then
+	if self:_queryIsConstrained() then
 		self._maid._updateHeartbeat = nil
 
 		if self._maid._pendingConstrainedPromise then
-			if self:_isValid() and self:_isConstrained() then
+			if self:_isValid() and self:_queryIsConstrained() then
+				self._isConstrained.Value = true
 				self._maid._pendingConstrainedPromise:Resolve()
 			end
 
