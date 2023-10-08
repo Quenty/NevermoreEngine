@@ -242,7 +242,7 @@ function JSONTranslator:ObserveFormatByKey(key, argData)
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
-		maid:GivePromise(self._promiseTranslator:Then(function(translator)
+		maid:GivePromise(self._promiseTranslator):Then(function(translator)
 			if argObservable then
 				maid:GiveTask(Rx.combineLatest({
 					localeId = RxInstanceUtils.observeProperty(translator, "LocaleId");
@@ -255,7 +255,7 @@ function JSONTranslator:ObserveFormatByKey(key, argData)
 					sub:Fire(self:FormatByKey(key, nil))
 				end))
 			end
-		end))
+		end)
 
 		return maid
 	end)
