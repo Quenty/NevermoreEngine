@@ -25,10 +25,10 @@ function FilteredObservableListView.new(observableList, observeScoreCallback, co
 	self._baseList = assert(observableList, "No observableList")
 	self._observeScoreCallback = assert(observeScoreCallback, "No observeScoreCallback")
 
-	self._scoredList = ObservableSortedList.new(function(a, b)
+	self._scoredList = ObservableSortedList.new(false, function(a, b)
 		-- Preserve index when scoring does not
 		if a.score == b.score then
-			return a.index < b.index
+			return a.index - b.index
 		else
 			return self._compare(a.score, b.score)
 		end

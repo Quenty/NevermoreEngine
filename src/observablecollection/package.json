@@ -38,6 +38,9 @@
     "@quenty/symbol": "file:../symbol",
     "@quenty/valueobject": "file:../valueobject"
   },
+  "devDependencies": {
+    "@quenty/blend": "file:../blend"
+  },
   "publishConfig": {
     "access": "public"
   }
