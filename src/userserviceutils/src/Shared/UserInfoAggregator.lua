@@ -1,5 +1,5 @@
 --[=[
-	Aggregates all requests into one big send request
+	Aggregates all requests into one big send request to deduplicate the request
 
 	@class UserInfoAggregator
 ]=]
@@ -11,6 +11,8 @@ local Promise = require("Promise")
 local UserServiceUtils = require("UserServiceUtils")
 local Rx = require("Rx")
 
+local MAX_USER_IDS_PER_REQUEST = 200
+
 local UserInfoAggregator = setmetatable({}, BaseObject)
 UserInfoAggregator.ClassName = "UserInfoAggregator"
 UserInfoAggregator.__index = UserInfoAggregator
@@ -20,6 +22,8 @@ function UserInfoAggregator.new()
 
 	-- TODO: LRU cache this? Limit to 1k or something?
 	self._promises = {}
+
+	self._unsentCount = 0
 	self._unsentPromises = {}
 
 	return self
@@ -42,6 +46,7 @@ function UserInfoAggregator:PromiseUserInfo(userId)
 	local promise = Promise.new()
 
 	self._unsentPromises[userId] = promise
+	self._unsentCount = self._unsentCount + 1
 	self._promises[userId] = promise
 
 	self:_queueAggregatedPromises()
@@ -65,6 +70,48 @@ function UserInfoAggregator:PromiseDisplayName(userId)
 end
 
 --[=[
+	Promises the user display name for the userId
+
+	@param userId number
+	@return Promise<string>
+]=]
+function UserInfoAggregator:PromiseDisplayName(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return self:PromiseUserInfo(userId)
+		:Then(function(userInfo)
+			return userInfo.DisplayName
+		end)
+end
+
+--[=[
+	Promises the user display name for the userId
+
+	@param userId number
+	@return Promise<boolean>
+]=]
+function UserInfoAggregator:PromiseHasVerifiedBadge(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return self:PromiseUserInfo(userId)
+		:Then(function(userInfo)
+			return userInfo.HasVerifiedBadge
+		end)
+end
+
+--[=[
+	Observes the user display name for the userId
+
+	@param userId number
+	@return Observable<UserInfo>
+]=]
+function UserInfoAggregator:ObserveUserInfo(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return Rx.fromPromise(self:PromiseUserInfo(userId))
+end
+
+--[=[
 	Observes the user display name for the userId
 
 	@param userId number
@@ -73,12 +120,15 @@ end
 function UserInfoAggregator:ObserveDisplayName(userId)
 	assert(type(userId) == "number", "Bad userId")
 
-	return Rx.fromPromise(self:PromiseUserInfo(userId))
+	return self:ObserveUserInfo():Pipe({
+		Rx.map(function(userInfo)
+			return userInfo.DisplayName
+		end)
+	})
 end
 
-function UserInfoAggregator:_sendAggregatedPromises()
-	local promiseMap = self._unsentPromises
-	self._unsentPromises = {}
+function UserInfoAggregator:_sendAggregatedPromises(promiseMap)
+	assert(promiseMap, "No promiseMap")
 
 	local userIds = {}
 	local unresolvedMap = {}
@@ -90,6 +140,8 @@ function UserInfoAggregator:_sendAggregatedPromises()
 	if #userIds == 0 then
 		return
 	end
+
+	assert(#userIds <= MAX_USER_IDS_PER_REQUEST, "Too many userIds sent")
 
 	self._maid:GivePromise(UserServiceUtils.promiseUserInfosByUserIds(userIds))
 		:Then(function(result)
@@ -109,24 +161,37 @@ function UserInfoAggregator:_sendAggregatedPromises()
 				promise:Reject(string.format("Failed to get result for userId %d", userId))
 			end
 		end, function(...)
-			for _, item in pairs(promiseMap) do
+			for _, item in pairs(unresolvedMap) do
 				item:Reject(...)
 			end
 		end)
 end
 
+function UserInfoAggregator:_resetQueue()
+	local promiseMap = self._unsentPromises
+
+	self._maid._queue = nil
+	self._unsentCount = 0
+	self._unsentPromises = {}
+
+	return promiseMap
+end
+
 function UserInfoAggregator:_queueAggregatedPromises()
-	if self._queued then
+	if self._unsentCount >= MAX_USER_IDS_PER_REQUEST then
+		self:_sendAggregatedPromises(self:_resetQueue())
 		return
 	end
 
-	self._queued = true
-	self._maid._queue = task.delay(0.05, function()
-		self._queued = false
-		self:_sendAggregatedPromises()
+	if self._maid._queue then
+		return
+	end
+
+	self._maid._queue = task.delay(0.1, function()
+		task.spawn(function()
+			self:_sendAggregatedPromises(self:_resetQueue())
+		end)
 	end)
 end
-
-
 
 return UserInfoAggregator
