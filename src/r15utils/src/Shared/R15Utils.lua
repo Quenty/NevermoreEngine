@@ -297,6 +297,17 @@ function R15Utils.getWristToGripLength(character, side)
 	end
 end
 
+function R15Utils.getHumanoidScaleProperty(humanoid, scaleValueName)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
+	local scaleValue = humanoid:FindFirstChild(scaleValueName)
+	if scaleValue then
+		return scaleValue.Value
+	else
+		return nil
+	end
+end
+
 --[=[
 	Computes the length of an arm for a given character
 	@param character Model

@@ -64,4 +64,32 @@ function RxR15Utils.observeCharacterPartBrio(character, partName)
 	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName)
 end
 
+--[=[
+	Observes a rig motor as a brio
+	@param character Model
+	@return Observable<Brio<Humanoid>>
+]=]
+function RxR15Utils.observeHumanoidBrio(character)
+	assert(typeof(character) == "Instance", "Bad character")
+
+	return RxInstanceUtils.observeLastNamedChildBrio(character, "Humanoid", "Humanoid")
+end
+
+function RxR15Utils.observeHumanoidScaleValueObject(humanoid, scaleValueName)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
+	return RxInstanceUtils.observeLastNamedChildBrio(humanoid, "NumberValue", scaleValueName)
+end
+
+function RxR15Utils.observeHumanoidScaleProperty(humanoid, scaleValueName)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+
+	return RxR15Utils.observeHumanoidScaleValueObject(humanoid, scaleValueName):Pipe({
+		RxBrioUtils.switchMapBrio(function(scaleValue)
+			return RxInstanceUtils.observeProperty(scaleValue, "Value")
+		end)
+	})
+end
+
+
 return RxR15Utils
