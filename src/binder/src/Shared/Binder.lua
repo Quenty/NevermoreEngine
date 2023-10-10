@@ -76,6 +76,10 @@ function Binder.new(tagName, constructor, ...)
 	self._defaultClassType = "Folder"
 	self.ServiceName = self._tagName .. "Binder"
 
+	if Binder.isBinder(self._constructor) then
+		error("Cannot make a binder that constructs another binder")
+	end
+
 	if select("#", ...) > 0 then
 		self._args = { ... }
 	end
