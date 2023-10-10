@@ -11,9 +11,10 @@ local PreferredParentUtils = {}
 --[=[
 	@param parent Instance
 	@param name string
+	@param forceCreate boolean
 	@return () -> Instance
 ]=]
-function PreferredParentUtils.createPreferredParentRetriever(parent, name)
+function PreferredParentUtils.createPreferredParentRetriever(parent, name, forceCreate)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(name) == "string", "Bad name")
 
@@ -24,7 +25,7 @@ function PreferredParentUtils.createPreferredParentRetriever(parent, name)
 			return cache
 		end
 
-		cache = PreferredParentUtils.getPreferredParent(parent, name)
+		cache = PreferredParentUtils.getPreferredParent(parent, name, forceCreate)
 		return cache
 	end
 end
@@ -32,9 +33,10 @@ end
 --[=[
 	@param parent Instance
 	@param name string
+	@param forceCreate boolean
 	@return Instance
 ]=]
-function PreferredParentUtils.getPreferredParent(parent, name)
+function PreferredParentUtils.getPreferredParent(parent, name, forceCreate)
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(type(name) == "string", "Bad name")
 
@@ -54,7 +56,7 @@ function PreferredParentUtils.getPreferredParent(parent, name)
 		return found
 	end
 
-	if RunService:IsServer() then
+	if RunService:IsServer() or forceCreate then
 		local newParent = Instance.new("Folder")
 		newParent.Name = name
 		newParent.Parent = parent
