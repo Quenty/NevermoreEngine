@@ -1,20 +1,18 @@
-# v9.1.0 (Wed Oct 11 2023)
-
-#### 🚀 Enhancement
-
-- PS5 support [#418](https://github.com/Quenty/NevermoreEngine/pull/418) ([@Quenty](https://github.com/Quenty))
-- feat: Support PS5 icons in input image library ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@9.0.0...@quenty/sprites@9.1.0) (2023-10-11)
+
+
+### Features
+
+* Support PS5 icons in input image library ([9e75b62](https://github.com/Quenty/NevermoreEngine/commit/9e75b6205a536bd5f6d9136ad25282c0ade24c94))
+
+
+
+
 
 # [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@8.3.0...@quenty/sprites@9.0.0) (2023-10-11)
 

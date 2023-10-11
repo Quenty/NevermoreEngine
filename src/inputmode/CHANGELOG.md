@@ -1,23 +1,18 @@
-# v8.1.0 (Wed Oct 11 2023)
-
-#### 🚀 Enhancement
-
-- PS5 support [#418](https://github.com/Quenty/NevermoreEngine/pull/418) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: MouseMovement doesn't flicker when connecting PS5 controller to PC ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@8.0.0...@quenty/inputmode@8.1.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* MouseMovement doesn't flicker when connecting PS5 controller to PC ([af4c08f](https://github.com/Quenty/NevermoreEngine/commit/af4c08fd902979f5cdec63d8cae9730e02c049b3))
+
+
+
+
 
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@7.30.0...@quenty/inputmode@8.0.0) (2023-10-11)
 
