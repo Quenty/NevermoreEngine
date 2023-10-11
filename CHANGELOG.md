@@ -1,5 +1,18 @@
 # (Wed Oct 11 2023)
 
+#### 🐛 Bug Fix
+
+- `@quenty/remoting@7.0.1`
+  - fix: Cleanup remoting folder [#415](https://github.com/Quenty/NevermoreEngine/pull/415) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
+# (Wed Oct 11 2023)
+
 #### 🚀 Enhancement
 
 - `@quenty/inputmode@8.1.0`, `@quenty/sprites@9.1.0`
