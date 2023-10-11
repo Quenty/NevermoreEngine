@@ -1,19 +1,15 @@
-# v8.0.1 (Wed Oct 11 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Cleanup remoting folder [#415](https://github.com/Quenty/NevermoreEngine/pull/415) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@8.0.0...@quenty/textfilterservice@8.0.1) (2023-10-11)
+
+**Note:** Version bump only for package @quenty/textfilterservice
+
+
+
+
 
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@7.14.0...@quenty/textfilterservice@8.0.0) (2023-10-11)
 

@@ -1,19 +1,15 @@
-# v4.0.1 (Wed Oct 11 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Cleanup remoting folder [#415](https://github.com/Quenty/NevermoreEngine/pull/415) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@4.0.0...@quenty/deathreport@4.0.1) (2023-10-11)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
 
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@3.30.0...@quenty/deathreport@4.0.0) (2023-10-11)
 

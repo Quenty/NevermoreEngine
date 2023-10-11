@@ -1,20 +1,18 @@
-# v7.0.1 (Wed Oct 11 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Cleanup remoting folder [#415](https://github.com/Quenty/NevermoreEngine/pull/415) ([@OttoHatt](https://github.com/OttoHatt))
-- fix: Cleanup remoting folder ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@7.0.0...@quenty/remoting@7.0.1) (2023-10-11)
+
+
+### Bug Fixes
+
+* Cleanup remoting folder ([b2758cd](https://github.com/Quenty/NevermoreEngine/commit/b2758cd36eee8cc9aad0e38439d927dc640434b9))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@6.12.0...@quenty/remoting@7.0.0) (2023-10-11)
 
