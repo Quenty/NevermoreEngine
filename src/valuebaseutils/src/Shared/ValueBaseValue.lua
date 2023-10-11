@@ -11,6 +11,7 @@ local RunService = game:GetService("RunService")
 local ValueBaseUtils = require("ValueBaseUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local RxSignal = require("RxSignal")
+local Rx = require("Rx")
 
 local ValueBaseValue = {}
 ValueBaseValue.ClassName = "ValueBaseValue"
@@ -48,7 +49,9 @@ function ValueBaseValue:__index(index)
 	if index == "Value" then
 		return ValueBaseUtils.getValue(self._parent, self._className, self._name, self._defaultValue)
 	elseif index == "Changed" then
-		return RxSignal.new(self:Observe())
+		return RxSignal.new(self:Observe():Pipe({
+			Rx.skip(1)
+		}))
 	elseif ValueBaseValue[index] or index == "_defaultValue" then
 		return ValueBaseValue[index]
 	else

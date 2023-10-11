@@ -151,6 +151,10 @@ function TiePropertyInterface:_observeFromFolder(folder)
 		local lastImplementationType = UNSET_VALUE
 
 		local function update()
+			if not sub:IsPending() then
+				return
+			end
+
 			-- Prioritize attributes first
 			local currentAttribute = folder:GetAttribute(memberName)
 			if currentAttribute ~= nil then
