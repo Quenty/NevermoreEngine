@@ -83,6 +83,10 @@ function Counter:_addObservable(observeAmount)
 	end))
 
 	maid:GiveTask(function()
+		if not self._count.Destroy then
+			return
+		end
+
 		local delta = lastCount
 		lastCount = 0
 		self._count.Value = self._count.Value - delta
