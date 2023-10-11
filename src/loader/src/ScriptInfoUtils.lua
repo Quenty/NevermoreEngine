@@ -85,8 +85,6 @@ function ScriptInfoUtils.populateScriptInfoLookup(instance, scriptInfoLookup, la
 end
 
 local AVAILABLE_IN_SHARED = {
-	["HoldingBindersServer"] = true;
-	["HoldingBindersClient"] = true;
 	["IKService"] = true;
 	["IKServiceClient"] = true;
 }
