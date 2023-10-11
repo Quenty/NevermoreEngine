@@ -23,6 +23,7 @@ local StepUtils = require("StepUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
 local ValueObjectUtils = require("ValueObjectUtils")
+local RxBrioUtils = require("RxBrioUtils")
 
 local Blend = {}
 
@@ -625,6 +626,54 @@ function Blend.Children(parent, value)
 end
 
 --[=[
+	Allows you to add [CollectionService] tags to a Blend object.
+
+	```lua
+	Blend.New "ScreenGui" {
+		[Blend.Tags] = { "Hide", "ScreenGui" };
+	};
+	```
+
+	@param parent Instance
+	@param value any
+	@return Observable
+]=]
+function Blend.Tags(parent, value)
+	assert(typeof(parent) == "Instance", "Bad parent")
+
+	local observe = Blend._observeTags(value, parent)
+
+	if observe then
+		return observe:Pipe({
+			Rx.tap(function(tag)
+				if type(tag) == "string" then
+					parent:AddTag(tag)
+				else
+					error("Bad tag")
+				end
+			end);
+		})
+	else
+		return Rx.EMPTY
+	end
+end
+
+
+function Blend._observeTags(tags)
+	if type(tags) == "string" then
+		return Rx.of(tags)
+	elseif type(tags) == "table" then
+		if Observable.isObservable(tags) then
+			return tags
+		else
+			error("Bad tags")
+		end
+	else
+		error("Bad tags")
+	end
+end
+
+--[=[
 	Mounts Blend objects into an existing instance.
 
 	:::tip
@@ -647,33 +696,41 @@ end
 	maid:GiveTask(Blend.mount(frame, {
 		Size = UDim2.new(0.5, 0, 0.5, 0);
 
-		Blend.Find "MyUIScaleName" {
+		Blend.Find "UIScale" {
 			Scale = 2;
 		};
 	}))
 	```
 
-	@param name string
+	:::tip
+
+	:::
+
+	@param className string
 	@return function
 ]=]
-function Blend.Find(name)
-	assert(type(name) == "string", "Bad name")
+function Blend.Find(className)
+	assert(type(className) == "string", "Bad className")
 
 	return function(props)
 		assert(type(props) == "table", "Bad props")
+		assert(type(props.Name) == "string", "No props.Name")
 
-		local mountProps = props
-		local className
-		if props.ClassName then
-			className = props.ClassName
-			mountProps = table.clone(props)
-			mountProps.ClassName = nil
-		else
-			className = "Instance"
-		end
+		-- Return observable and assume we're being used in anexternal context
+		-- TODO: Maybe not this
+		if props.Parent then
+			local propertyObservable = Blend.toPropertyObservable(props.Parent) or Rx.of(props.Parent)
 
-		return function(parent)
-			return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, name):Pipe({
+			return propertyObservable:Pipe({
+				RxBrioUtils.toBrio();
+				RxBrioUtils.where(function(parent)
+					return parent ~= nil
+				end);
+				RxBrioUtils.switchMapBrio(function(parent)
+					assert(typeof(parent) == "Instance", "Bad parent retrieved during find spec")
+
+					return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, props.Name)
+				end);
 				Rx.flatMap(function(brio)
 					if brio:IsDead() then
 						return
@@ -681,20 +738,48 @@ function Blend.Find(name)
 
 					local maid = brio:ToMaid()
 					local instance = brio:GetValue()
-					maid:GiveTask(Blend.mount(instance, mountProps))
+					maid:GiveTask(Blend.mount(instance, props))
 
-					-- Dead after mounting? Clean up...
-					-- Probably caused by name change.
 					if brio:IsDead() then
 						maid:DoCleaning()
 					end
 
-					-- Avoid emitting anything else so we don't get cleaned up
-					return Rx.EMPTY
+					-- Emit back found value (we're used in property scenario)
+					return Rx.of(instance)
 				end);
 			})
 		end
+
+		-- Return callback
+		return function(parent)
+			-- TODO: Swap based upon name
+			-- TODO: Avoid assigning name
+			return RxInstanceUtils.observeChildrenOfNameBrio(parent, className, props.Name):Pipe({
+				Blend._mountToFinding(props);
+			})
+		end
 	end
+end
+
+function Blend._mountToFinding(props)
+	return Rx.flatMap(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid = brio:ToMaid()
+		local instance = brio:GetValue()
+		maid:GiveTask(Blend.mount(instance, props))
+
+		-- Dead after mounting? Clean up...
+		-- Probably caused by name change.
+		if brio:IsDead() then
+			maid:DoCleaning()
+		end
+
+		-- Avoid emitting anything else so we don't get cleaned up
+		return Rx.EMPTY
+	end);
 end
 
 --[=[
@@ -1018,8 +1103,9 @@ end
 	maid:GiveTask(Blend.mount(frame, {
 		BackgroundTransparency = 1;
 
-		-- All items named InventoryItem
-		Blend.Find "InventoryItem" {
+		-- All items named InventoryFrame
+		Blend.Find "Frame" {
+			Name = "InventoryFrame"
 
 			-- Apply the following properties
 			Blend.New "UIScale" {
