@@ -115,6 +115,11 @@ function InputModeServiceClient:_bindProcessor()
 				self._inputModeProcessor:Evaluate(inputObject)
 				self:GetInputMode(InputModeTypes.Thumbsticks):Enable()
 			end
+		elseif inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+			-- Prevent mouse movement from flickering
+			if self:_shouldProcessMouseMovement(inputObject) then
+				self._inputModeProcessor:Evaluate(inputObject)
+			end
 		else
 			self._inputModeProcessor:Evaluate(inputObject)
 		end
@@ -127,6 +132,27 @@ function InputModeServiceClient:_bindProcessor()
 	self._maid:GiveTask(UserInputService.GamepadDisconnected:Connect(function(_)
 		self:_triggerEnabled()
 	end))
+end
+
+function InputModeServiceClient:_shouldProcessMouseMovement(inputObject)
+	-- Prevent mouse movement from flickering
+	local position = inputObject.Position
+	local lastMousePosition = self._lastMousePosition
+	self._lastMousePosition = position
+
+	if inputObject.Delta.magnitude > 0 then
+		return true
+	end
+
+	if not lastMousePosition then
+		return true
+	end
+
+	if (lastMousePosition - position).magnitude > 0 then
+		return true
+	end
+
+	return false
 end
 
 function InputModeServiceClient:Destroy()

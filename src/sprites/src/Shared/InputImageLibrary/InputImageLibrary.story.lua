@@ -10,7 +10,7 @@ local UIPaddingUtils = require("UIPaddingUtils")
 local UICornerUtils = require("UICornerUtils")
 local String = require("String")
 
-local XBOX = {
+local CONSOLE = {
 	Enum.KeyCode.ButtonA;
 	Enum.KeyCode.ButtonB;
 	Enum.KeyCode.ButtonX;
@@ -90,7 +90,7 @@ local MOUSE = {
 	Enum.UserInputType.MouseMovement;
 }
 
-local function create(keyCode, theme, parent)
+local function createInputKey(keyCode, theme, platform, parent)
 	local container = Instance.new("Frame")
 	container.BorderSizePixel = 0
 	container.Size = UDim2.new(1, 0, 1, 0)
@@ -117,7 +117,7 @@ local function create(keyCode, theme, parent)
 	local uiListLayout = Instance.new("UIListLayout")
 	uiListLayout.Parent = container
 
-	local sprite = InputImageLibrary:GetScaledImageLabel(keyCode, theme)
+	local sprite = InputImageLibrary:GetScaledImageLabel(keyCode, theme, platform)
 	sprite.Parent = container
 
 	container.Parent = parent
@@ -141,11 +141,13 @@ local function makeTitle(title, parent)
 	return titleLabel
 end
 
-local function makeSection(keycodes, theme, parent)
+local function makeSection(keycodes, theme, platform, parent)
 	local container = Instance.new("Frame")
 	container.BorderSizePixel = 0
 	container.BackgroundTransparency = 1
-	container.Size = UDim2.new(1, 0, 1, 0)
+	container.Size = UDim2.new(1, 0, 0, 0)
+	container.BackgroundColor3 = Color3.new(0.5, 0, 0)
+	container.AutomaticSize = Enum.AutomaticSize.Y
 
 	local uiGridLayout = Instance.new("UIGridLayout")
 	uiGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -156,11 +158,10 @@ local function makeSection(keycodes, theme, parent)
 	uiGridLayout.Parent = container
 
 	for _, item in pairs(keycodes) do
-		create(item, theme, container)
+		createInputKey(item, theme, platform, container)
 	end
 
 	container.Parent = parent
-	container.Size = UDim2.new(1, 0, 0, uiGridLayout.AbsoluteContentSize.y)
 
 	return container
 end
@@ -189,22 +190,28 @@ return function(target)
 	end
 
 	add(makeTitle("Mouse Light", scrollingFrame))
-	add(makeSection(MOUSE, "Light", scrollingFrame))
+	add(makeSection(MOUSE, "Light", nil, scrollingFrame))
 
 	add(makeTitle("Mouse Dark", scrollingFrame))
-	add(makeSection(MOUSE, "Dark", scrollingFrame))
+	add(makeSection(MOUSE, "Dark", nil, scrollingFrame))
 
 	add(makeTitle("XBox Dark", scrollingFrame))
-	add(makeSection(XBOX, "Dark", scrollingFrame))
+	add(makeSection(CONSOLE, "Dark", "XBox", scrollingFrame))
 
 	add(makeTitle("XBox Light", scrollingFrame))
-	add(makeSection(XBOX, "Light", scrollingFrame))
+	add(makeSection(CONSOLE, "Light", "XBox", scrollingFrame))
+
+	add(makeTitle("PS5 Dark", scrollingFrame))
+	add(makeSection(CONSOLE, "Dark", "PlayStation", scrollingFrame))
+
+	add(makeTitle("PS5 Light", scrollingFrame))
+	add(makeSection(CONSOLE, "Light", "PlayStation", scrollingFrame))
 
 	add(makeTitle("Keyboard Dark", scrollingFrame))
-	add(makeSection(KEYBOARD, "Dark", scrollingFrame))
+	add(makeSection(KEYBOARD, "Dark", nil, scrollingFrame))
 
 	add(makeTitle("Keyboard Light", scrollingFrame))
-	add(makeSection(KEYBOARD, "Light", scrollingFrame))
+	add(makeSection(KEYBOARD, "Light", nil, scrollingFrame))
 
 
 	return function()

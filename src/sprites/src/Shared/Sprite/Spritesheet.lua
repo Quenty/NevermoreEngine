@@ -34,43 +34,43 @@ function Spritesheet:GetPreloadAssetId()
 end
 
 --[=[
-	@param index any
+	@param keyCode any
 	@param position Vector2
 	@param size Vector2
 
-	Adds a named sprite at the given index
+	Adds a named sprite at the given keyCode
 ]=]
-function Spritesheet:AddSprite(index, position, size)
-	assert(not self._sprites[index], "Already exists")
+function Spritesheet:AddSprite(keyCode, position, size)
+	assert(not self._sprites[keyCode], "Already exists")
 
 	local sprite = Sprite.new({
 		Texture = self._texture;
 		Position = position;
 		Size = size;
-		Name = tostring(index);
+		Name = tostring(keyCode);
 	})
 
-	self._sprites[index] = sprite
+	self._sprites[keyCode] = sprite
 end
 
 --[=[
-	Retrieves the sprite for the given index
-	@param index any | EnumItem
+	Retrieves the sprite for the given keyCode
+	@param keyCode any | EnumItem
 	@return Sprite?
 ]=]
-function Spritesheet:GetSprite(index)
-	if not index then
+function Spritesheet:GetSprite(keyCode)
+	if not keyCode then
 		warn("[Spritesheet.GetSprite] - Image name cannot be nil")
 		return nil
 	end
 
-	local sprite = self._sprites[index]
+	local sprite = self._sprites[keyCode]
 	if sprite then
 		return sprite
 	end
 
-	if typeof(index) == "EnumItem" then
-		sprite = self._sprites[index.Name]
+	if typeof(keyCode) == "EnumItem" then
+		sprite = self._sprites[keyCode.Name]
 	end
 
 	return sprite
@@ -78,11 +78,11 @@ end
 
 --[=[
 	Returns true if the sprite exists
-	@param index any | EnumItem
+	@param keyCode any | EnumItem
 	@return boolean
 ]=]
-function Spritesheet:HasSprite(index)
-	return self:GetSprite(index) ~= nil
+function Spritesheet:HasSprite(keyCode)
+	return self:GetSprite(keyCode) ~= nil
 end
 
 return Spritesheet

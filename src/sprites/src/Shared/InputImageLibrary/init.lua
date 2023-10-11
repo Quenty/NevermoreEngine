@@ -7,6 +7,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local UserInputService = game:GetService("UserInputService")
+
 local SUPRESS_UNFOUND_IMAGE_WARNING = true
 
 local InputImageLibrary = {}
@@ -38,6 +40,8 @@ function InputImageLibrary:GetPreloadAssetIds()
 end
 
 function InputImageLibrary:_loadSpriteSheets(parentFolder)
+	assert(typeof(parentFolder) == "Instance", "Bad parentFolder")
+
 	for _, platform in pairs(parentFolder:GetChildren()) do
 		self._spritesheets[platform.Name] = {}
 		for _, style in pairs(platform:GetChildren()) do
@@ -51,21 +55,74 @@ end
 --[=[
 	Retrieves a sprite from the library
 
-	@param index number -- The sprite index to get
+	@param keyCode any -- The sprite keyCode to get
 	@param preferredStyle string -- The preferred style type to retrieve this in
 	@param preferredPlatform string -- The preferred platform to get the sprite for
 	@return Sprite
 ]=]
-function InputImageLibrary:GetSprite(index, preferredStyle, preferredPlatform)
-	local sheet = self:_pickSheet(index, preferredStyle, preferredPlatform)
+function InputImageLibrary:GetSprite(keyCode, preferredStyle, preferredPlatform)
+	assert(keyCode ~= nil, "Bad keyCode")
+	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
+	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
+
+	local sheet = self:PickSheet(keyCode, preferredStyle, preferredPlatform)
 	if sheet then
-		return sheet:GetSprite(index)
+		return sheet:GetSprite(keyCode)
 	end
 
 	return nil
 end
 
+--[=[
+	Styles a GUI for a specific keycode
+
+	```lua
+	local InputImageLibrary = require("InputImageLibrary")
+	InputImageLibrary:StyleImage(script.Parent, Enum.KeyCode.ButtonA)
+	```
+
+	@param gui ImageLabel | ImageButton
+	@param keyCode any -- The sprite keyCode to get
+	@param preferredStyle string -- The preferred style type to retrieve this in
+	@param preferredPlatform string -- The preferred platform to get the sprite for
+	@return Sprite
+]=]
+function InputImageLibrary:StyleImage(gui, keyCode, preferredStyle, preferredPlatform)
+	assert(typeof(gui) == "Instance" and (gui:IsA("ImageLabel") or gui:IsA("ImageButton")), "Bad gui")
+	assert(keyCode ~= nil, "Bad keyCode")
+	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
+	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
+
+	local sheet = self:PickSheet(keyCode, preferredStyle, preferredPlatform)
+	if sheet then
+		return sheet:GetSprite(keyCode):Style(gui)
+	end
+
+	return nil
+end
+
+function InputImageLibrary:_getDefaultPreferredPlatform()
+	-- Hack to select the right preferred platform
+	-- TODO: Maybe pass this into our selector?
+	local result = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonA)
+	if not result then
+		return nil
+	end
+
+	if string.find(result, "PlayStation") then
+		return "PlayStation"
+	elseif string.find(result, "Xbox") then
+		return "XBox"
+	else
+		return "XBox"
+	end
+end
+
 function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle, preferredPlatform)
+	assert(keyCode ~= nil, "Bad keyCode")
+	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
+	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
+
 	local image = self:_getImageInstance("ImageLabel", keyCode, preferredStyle or "Dark", preferredPlatform)
 	if not image then
 		return nil
@@ -84,25 +141,33 @@ function InputImageLibrary:GetScaledImageLabel(keyCode, preferredStyle, preferre
 	return image
 end
 
-function InputImageLibrary:_pickSheet(index, preferredStyle, preferredPlatform)
+function InputImageLibrary:PickSheet(keyCode, preferredStyle, preferredPlatform)
+	assert(keyCode ~= nil, "Bad keyCode")
+	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
+	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
+
 	local function findSheet(platformSheets)
 		local preferredSheet = platformSheets[preferredStyle]
-		if preferredSheet and preferredSheet:HasSprite(index) then
+		if preferredSheet and preferredSheet:HasSprite(keyCode) then
 			return preferredSheet
 		end
 
 		-- otherwise search (yes, we double hit a sheet)
 		for _, sheet in pairs(platformSheets) do
-			if sheet:HasSprite(index) then
+			if sheet:HasSprite(keyCode) then
 				return sheet
 			end
 		end
 	end
 
-	local sheet = self._spritesheets[preferredPlatform]
-	local preferredSheet = sheet and findSheet(sheet)
-	if preferredSheet then
-		return preferredSheet
+	preferredPlatform = preferredPlatform or self:_getDefaultPreferredPlatform()
+
+	if preferredPlatform then
+		local sheet = self._spritesheets[preferredPlatform]
+		local preferredSheet = sheet and findSheet(sheet)
+		if preferredSheet and preferredSheet:HasSprite(keyCode) then
+			return preferredSheet
+		end
 	end
 
 	-- otherwise search (repeats preferred :/ )
@@ -114,17 +179,22 @@ function InputImageLibrary:_pickSheet(index, preferredStyle, preferredPlatform)
 	end
 
 	if not SUPRESS_UNFOUND_IMAGE_WARNING then
-		warn("[InputImageLibrary] - Unable to find sprite for", tostring(index), "type", typeof(index))
+		warn("[InputImageLibrary] - Unable to find sprite for", tostring(keyCode), "type", typeof(keyCode))
 	end
 
 	return nil
 end
 
 
-function InputImageLibrary:_getImageInstance(instanceType, index, preferredStyle, preferredPlatform)
-	local sheet = self:_pickSheet(index, preferredStyle, preferredPlatform)
+function InputImageLibrary:_getImageInstance(instanceType, keyCode, preferredStyle, preferredPlatform)
+	assert(type(instanceType) == "string", "Bad instanceType")
+	assert(keyCode ~= nil, "Bad keyCode")
+	assert(type(preferredStyle) == "string" or preferredStyle == nil, "Bad preferredStyle")
+	assert(type(preferredPlatform) == "string" or preferredPlatform == nil, "Bad preferredPlatform")
+
+	local sheet = self:PickSheet(keyCode, preferredStyle, preferredPlatform)
 	if sheet then
-		return sheet:GetSprite(index):Get(instanceType)
+		return sheet:GetSprite(keyCode):Get(instanceType)
 	end
 
 	return nil
