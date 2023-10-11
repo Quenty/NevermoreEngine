@@ -21,6 +21,7 @@ GameConfigAssetBase.__index = GameConfigAssetBase
 --[=[
 	Constructs a new GameConfigAssetBase. Should be done via binder. This is a base class.
 	@param obj Folder
+	@param serviceBag ServiceBag
 	@return GameConfigAssetBase
 ]=]
 function GameConfigAssetBase.new(obj, serviceBag)

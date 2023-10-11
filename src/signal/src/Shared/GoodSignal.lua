@@ -147,7 +147,7 @@ end
 --[=[
 	Connect a new handler to the event. Returns a connection object that can be disconnected.
 
-	@param handler (... T) -> () -- Function handler called when `:Fire(...)` is called
+	@param fn (... T) -> () -- Function handler called when `:Fire(...)` is called
 	@return RBXScriptConnection
 ]=]
 function Signal:Connect(fn)
@@ -229,7 +229,7 @@ end
 	-- itself before running the handler.
 	:::
 
-	@param handler (... T) -> () -- One-time function handler called when `:Fire(...)` is called
+	@param fn (... T) -> () -- One-time function handler called when `:Fire(...)` is called
 	@return RBXScriptConnection
 ]=]
 function Signal:Once(fn)

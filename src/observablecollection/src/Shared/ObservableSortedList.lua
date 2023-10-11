@@ -45,7 +45,7 @@ ObservableSortedList.__index = ObservableSortedList
 --[=[
 	Constructs a new ObservableSortedList
 	@param isReversed boolean
-	@param compare
+	@param compare function
 	@return ObservableSortedList<T>
 ]=]
 function ObservableSortedList.new(isReversed, compare)
@@ -86,9 +86,16 @@ function ObservableSortedList.new(isReversed, compare)
 	Fires when an item is removed.
 	@readonly
 	@prop ItemRemoved self._maid:Add(Signal<T, Symbol>)
+	@within ObservableSortedList
 ]=]
 	self.ItemRemoved = self._maid:Add(Signal.new())
 
+--[=[
+	Fires when an item's order changes.
+	@readonly
+	@prop OrderChanged self._maid:Add(Signal<T, Symbol>)
+	@within ObservableSortedList
+]=]
 	self.OrderChanged = self._maid:Add(Signal.new())
 
 --[=[

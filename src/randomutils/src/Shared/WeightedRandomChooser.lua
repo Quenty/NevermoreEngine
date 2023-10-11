@@ -25,7 +25,8 @@ function WeightedRandomChooser.new()
 end
 
 --[=[
-	Sets the weight for a given option
+	Sets the weight for a given option. Setting the weight to nil
+	removes the option.
 
 	@param option T
 	@param weight number | nil
@@ -38,8 +39,9 @@ function WeightedRandomChooser:SetWeight(option, weight)
 end
 
 --[=[
-	Gets the weight
+	Gets the weight for the option
 
+	@param option T
 	@return number | nil
 ]=]
 function WeightedRandomChooser:GetWeight(option)
@@ -49,6 +51,7 @@ end
 --[=[
 	Gets the percent probability from 0 to 1
 
+	@param option T
 	@return number | nil
 ]=]
 function WeightedRandomChooser:GetProbability(option)
@@ -67,10 +70,9 @@ function WeightedRandomChooser:GetProbability(option)
 end
 
 --[=[
-	Removes the option from the chooser
+	Removes the option from the chooser. Equivalent of setting the weight to nil
 
 	@param option T
-	@param weight number | nil
 ]=]
 function WeightedRandomChooser:Remove(option)
 	self:SetWeight(option, nil)
