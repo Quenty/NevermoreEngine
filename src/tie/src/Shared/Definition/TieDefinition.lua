@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local RxCollectionServiceUtils = require("RxCollectionServiceUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxStateStackUtils = require("RxStateStackUtils")
 local String = require("String")
@@ -80,6 +81,85 @@ function TieDefinition:GetImplementations(adornee: Instance)
 	end
 
 	return implementations
+end
+
+--[=[
+	Observes all the children implementations for this adornee
+
+	@param adornee Instance
+	@return Observable<Brio<TieInterface>>
+]=]
+function TieDefinition:ObserveChildrenBrio(adornee: Instance)
+	return RxInstanceUtils.observeChildrenBrio(adornee):Pipe({
+		RxBrioUtils.flatMapBrio(function(child)
+			return self:ObserveBrio(child)
+		end)
+	})
+end
+
+--[=[
+	Promises the implementation
+
+	@param adornee Adornee
+	@return Promise<TieInterface>
+]=]
+function TieDefinition:Promise(adornee)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	-- TODO: Support cancellation cleanup here.
+
+	return Rx.toPromise(self:Observe(adornee):Pipe({
+		Rx.where(function(value)
+			return value ~= nil
+		end)
+	}))
+end
+
+--[=[
+	Gets all valid interfaces for this adornee's children
+
+	@param adornee Instance
+	@return { TieInterface }
+]=]
+function TieDefinition:GetChildren(adornee: Instance)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	local implementations = {}
+
+	-- TODO: Make this faster
+	for _, item in pairs(adornee:GetChildren()) do
+		for _, option in pairs(self:GetImplementations(item)) do
+			table.insert(implementations, option)
+		end
+	end
+
+	return implementations
+end
+
+--[=[
+	Finds the implementation on the adornee. Alais for [FindFirstImplementation]
+
+	@param adornee Adornee
+	@return TieInterface | nil
+]=]
+function TieDefinition:Find(adornee: Instance)
+	return self:FindFirstImplementation(adornee)
+end
+
+--[=[
+	Observes all implementations that are tagged with the given tag name
+
+	@param tagName string
+	@return TieInterface | nil
+]=]
+function TieDefinition:ObserveAllTaggedBrio(tagName)
+	assert(type(tagName) == "string", "Bad tagName")
+
+	return RxCollectionServiceUtils.observeTaggedBrio(tagName):Pipe({
+		RxBrioUtils.flatMapBrio(function(instance)
+			return self:ObserveBrio(instance)
+		end)
+	})
 end
 
 --[=[

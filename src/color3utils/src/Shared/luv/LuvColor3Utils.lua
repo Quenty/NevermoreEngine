@@ -33,12 +33,23 @@ function LuvColor3Utils.lerp(color0, color1, t)
 		local l0, u0, v0 = unpack(LuvColor3Utils.fromColor3(color0))
 		local l1, u1, v1 = unpack(LuvColor3Utils.fromColor3(color1))
 
-		local l = Math.lerp(l0, l1, t)
+		local shortest_angle = ((((l1 - l0) % 360) + 540) % 360) - 180
+		local l = l0 + shortest_angle*t
 		local u = Math.lerp(u0, u1, t)
 		local v = Math.lerp(v0, v1, t)
 
 		return LuvColor3Utils.toColor3({l, u, v})
 	end
+end
+
+function LuvColor3Utils.desaturate(color0, proportion)
+	local l0, u0, v0 = unpack(LuvColor3Utils.fromColor3(color0))
+	return LuvColor3Utils.toColor3({l0, u0*math.clamp(1 - proportion, 0, 1), v0})
+end
+
+function LuvColor3Utils.darken(color0, proportion)
+	local l0, u0, v0 = unpack(LuvColor3Utils.fromColor3(color0))
+	return LuvColor3Utils.toColor3({l0, u0, v0*math.clamp(1 - proportion, 0, 1)})
 end
 
 --[=[

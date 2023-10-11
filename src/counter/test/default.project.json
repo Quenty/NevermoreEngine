@@ -1,0 +1,11 @@
+{
+  "name": "CounterTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "counter": {
+        "$path": ".."
+      }
+    }
+  }
+}

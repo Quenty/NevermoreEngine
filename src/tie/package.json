@@ -31,6 +31,7 @@
     "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
+    "@quenty/collectionserviceutils": "file:../collectionserviceutils",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",

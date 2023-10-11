@@ -32,7 +32,9 @@ function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
 	self._convertIds = assert(convertIds, "No convertIds")
 	self._observeIdsBrio = assert(observeIdsBrio, "No observeIdsBrio")
 
-	self._pendingPromises = {} -- { [number] = Promise<boolean> }
+	self._pendingPurchasePromises = {} -- { [number] = Promise<boolean> }
+	self._pendingPromptOpenPromises = {} -- { [number] = Promise<boolean> }
+
 	self._purchasedThisSession = {} -- [number] = true
 	self._receiptProcessingExpected = false
 
@@ -49,9 +51,18 @@ function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
 	self.ShowPromptRequested = Signal.new() -- :Fire(id)
 	self._maid:GiveTask(self.ShowPromptRequested)
 
+	self._maid:GiveTask(self.Purchased:Connect(function(id)
+		self._purchasedThisSession[id] = true
+	end))
+
 	self._maid:GiveTask(function()
-		while #self._purchasedThisSession > 0 do
-			local pending = table.remove(self._purchasedThisSession, #self._purchasedThisSession)
+		while #self._pendingPurchasePromises > 0 do
+			local pending = table.remove(self._pendingPurchasePromises, #self._pendingPurchasePromises)
+			pending:Reject()
+		end
+
+		while #self._pendingPromptOpenPromises > 0 do
+			local pending = table.remove(self._pendingPromptOpenPromises, #self._pendingPromptOpenPromises)
 			pending:Reject()
 		end
 	end)
@@ -112,41 +123,67 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 
 	local id = self._convertIds(idOrKey)
 	if not id then
-		return Promise.rejected(("No %s with key %q"):format(self._assetType, tostring(idOrKey)))
+		return Promise.rejected(string.format("[PlayerAssetMarketTracker.PromisePromptPurchase] - No %s with key %q",
+			self._assetType,
+			tostring(idOrKey)))
 	end
 
-	if self._pendingPromises[id] then
-		return self._maid:GivePromise(self._pendingPromises[id])
-	end
-
-	local ownershipPromise
-	if self._ownershipTracker then
-		ownershipPromise = self._ownershipTracker:PromiseOwnsAsset(id)
-	else
-		ownershipPromise = Promise.resolved(false)
-	end
-
-	return ownershipPromise:Then(function(ownsAsset)
-		if ownsAsset then
-			return true
-		end
-
-		local promise = Promise.new()
-		self._pendingPromises[id] = promise
-
-		self._promptsOpen.Value = self._promptsOpen.Value + 1
-
-		promise:Finally(function()
-			if self._pendingPromises[id] == promise then
-				self._pendingPromises[id] = nil
+	return Promise.resolved()
+		:Then(function()
+			if self._ownershipTracker then
+				return self._maid:GivePromise(self._ownershipTracker:PromiseOwnsAsset(id))
+			else
+				return false
 			end
-			self._promptsOpen.Value = self._promptsOpen.Value - 1
 		end)
+		:Then(function(ownsAsset)
+			if ownsAsset then
+				return true
+			end
 
-		self.ShowPromptRequested:Fire(id)
+			-- We reject here because there's no safe way to queue this
+			if self._promptsOpen.Value > 0 then
+				return Promise.rejected(string.format("[PlayerAssetMarketTracker] - Either already prompting user, or prompting is on cooldown. Will not prompt for %s", idOrKey))
+			end
 
-		return self._maid:GivePromise(promise)
-	end)
+			-- We reject here because there's no safe way to queue this
+			if self._pendingPurchasePromises[id] then
+				return Promise.rejected(string.format("[PlayerAssetMarketTracker] - Already prompting user. Will not prompt for %s", idOrKey))
+			end
+
+			if self._pendingPromptOpenPromises[id] then
+				warn("[PlayerAssetMarketTracker] - Failure. Prompts open should be tracking this.")
+
+				return Promise.rejected(string.format("[PlayerAssetMarketTracker] - Already prompting user. Will not prompt for %s", idOrKey))
+			end
+
+			do
+				local promptOpenPromise = Promise.new()
+				self._pendingPromptOpenPromises[id] = promptOpenPromise
+
+				self._promptsOpen.Value = self._promptsOpen.Value + 1
+				promptOpenPromise:Finally(function()
+					if self._pendingPromptOpenPromises[id] == promptOpenPromise then
+						self._pendingPromptOpenPromises[id] = nil
+					end
+					self._promptsOpen.Value = self._promptsOpen.Value - 1
+				end)
+			end
+
+			-- Make sure to do promise here so we can't double-open prompts
+			local purchasePromise = Promise.new()
+			self._pendingPurchasePromises[id] = purchasePromise
+
+			purchasePromise:Finally(function()
+				if self._pendingPurchasePromises[id] == purchasePromise then
+					self._pendingPurchasePromises[id] = nil
+				end
+			end)
+
+			self.ShowPromptRequested:Fire(id)
+
+			return self._maid:GivePromise(purchasePromise)
+		end)
 end
 
 --[=[
@@ -208,35 +245,33 @@ function PlayerAssetMarketTracker:_handlePurchaseEvent(id, isPurchased, isFromRe
 	assert(type(id) == "number", "Bad id")
 	assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
-	local promise = self._pendingPromises[id]
+	local purchasePromise = self._pendingPurchasePromises[id] or Promise.new()
+	local promptOpenPromise = self._pendingPromptOpenPromises[id] or Promise.new()
 
-	-- Zero out promise resolution in receipt processing scenario (safety)
 	if self._receiptProcessingExpected then
-		if isPurchased and not isFromReceipt then
-			promise = nil
-		end
-	end
-
-	if isPurchased then
-		self._purchasedThisSession[id] = true
-
-		if self._receiptProcessingExpected then
+		if isPurchased then
+			-- In this scenario we've got two possible purchase scenarios, resolving different promises.
+			-- We expect the event here to be fired twice.
 			if isFromReceipt then
 				self.Purchased:Fire(id)
+				purchasePromise:Resolve(true)
+			else
+				self.PromptFinished:Fire(id, true)
+				promptOpenPromise:Resolve(true)
 			end
 		else
+			self.PromptFinished:Fire(id, false)
+			purchasePromise:Resolve(false)
+			promptOpenPromise:Resolve(false)
+		end
+	else
+		if isPurchased then
 			self.Purchased:Fire(id)
 		end
-	end
 
-	if not isFromReceipt then
 		self.PromptFinished:Fire(id, isPurchased)
-	end
-
-	if promise then
-		task.spawn(function()
-			promise:Resolve(isPurchased)
-		end)
+		purchasePromise:Resolve(isPurchased)
+		promptOpenPromise:Resolve(isPurchased)
 	end
 end
 

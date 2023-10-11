@@ -58,8 +58,15 @@ function ButtonHighlightModel.new(button, onUpdate)
 
 	self._onUpdate = onUpdate
 
-	self._interactionEnabled = ValueObject.new(true)
-	self._maid:GiveTask(self._interactionEnabled)
+	self._interactionEnabled = self._maid:Add(ValueObject.new(true, "boolean"))
+	self._isSelected = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isMouseOrTouchOver = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isMouseDown = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._numFingerDown = self._maid:Add(ValueObject.new(0, "number"))
+	self._isChoosen = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isMouseOver = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isKeyDown = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isHighlighted = self._maid:Add(ValueObject.new(false, "boolean"))
 
 --[=[
 	@prop InteractionEnabledChanged Signal<boolean>
@@ -68,18 +75,12 @@ function ButtonHighlightModel.new(button, onUpdate)
 ]=]
 	self.InteractionEnabledChanged = self._interactionEnabled.Changed
 
-	self._isSelected = ValueObject.new(false)
-	self._maid:GiveTask(self._isSelected)
-
 --[=[
 	@prop IsSelectedChanged Signal<boolean>
 	@readonly
 	@within ButtonHighlightModel
 ]=]
 	self.IsSelectedChanged = self._isSelected.Changed
-
-	self._isMouseOrTouchOver = ValueObject.new(false)
-	self._maid:GiveTask(self._isMouseOrTouchOver)
 
 --[=[
 	@prop IsMouseOrTouchOverChanged Signal<boolean>
@@ -88,27 +89,6 @@ function ButtonHighlightModel.new(button, onUpdate)
 ]=]
 	self.IsMouseOrTouchOverChanged = self._isMouseOrTouchOver.Changed
 
-	self._isMouseDown = Instance.new("BoolValue")
-	self._isMouseDown.Value = false
-	self._maid:GiveTask(self._isMouseDown)
-
-	self._numFingerDown = Instance.new("IntValue")
-	self._numFingerDown.Value = 0
-	self._maid:GiveTask(self._numFingerDown)
-
-	self._isChoosen = ValueObject.new(false)
-	self._maid:GiveTask(self._isChoosen)
-
-	self._isMouseOver = Instance.new("BoolValue")
-	self._isMouseOver.Value = false
-	self._maid:GiveTask(self._isMouseOver)
-
-	self._isKeyDown = ValueObject.new(false)
-	self._maid:GiveTask(self._isKeyDown)
-
-	self._isHighlighted = ValueObject.new(false)
-	self._maid:GiveTask(self._isHighlighted)
-
 --[=[
 	@prop IsHighlightedChanged Signal<boolean>
 	@readonly
@@ -116,8 +96,7 @@ function ButtonHighlightModel.new(button, onUpdate)
 ]=]
 	self.IsHighlightedChanged = self._isHighlighted.Changed
 
-	self._isPressed = ValueObject.new(false)
-	self._maid:GiveTask(self._isPressed)
+	self._isPressed = self._maid:Add(ValueObject.new(false))
 
 --[=[
 	@prop IsPressedChanged Signal<boolean>
@@ -210,6 +189,12 @@ function ButtonHighlightModel:SetButton(button: Instance)
 	end
 
 	self._maid._buttonMaid = maid
+
+	return function()
+		if self._maid._buttonMaid == maid then
+			self._maid._buttonMaid = nil
+		end
+	end
 end
 
 --[=[
@@ -371,9 +356,7 @@ end
 	@param interactionEnabled boolean
 ]=]
 function ButtonHighlightModel:SetInteractionEnabled(interactionEnabled)
-	assert(type(interactionEnabled) == "boolean", "Bad interactionEnabled")
-
-	self._interactionEnabled.Value = interactionEnabled
+	self._interactionEnabled:Mount(interactionEnabled)
 end
 
 --[=[

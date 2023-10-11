@@ -4,18 +4,17 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AttributeValue = require("AttributeValue")
 local BaseObject = require("BaseObject")
-local RxAttributeUtils = require("RxAttributeUtils")
-local AttributeUtils = require("AttributeUtils")
-local GameConfigConstants = require("GameConfigConstants")
-local RxInstanceUtils = require("RxInstanceUtils")
-local GameConfigUtils = require("GameConfigUtils")
-local RxBinderUtils = require("RxBinderUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
-local RxBrioUtils = require("RxBrioUtils")
-local Rx = require("Rx")
-local ObservableMapSet = require("ObservableMapSet")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local GameConfigConstants = require("GameConfigConstants")
+local GameConfigUtils = require("GameConfigUtils")
+local ObservableMapSet = require("ObservableMapSet")
+local Rx = require("Rx")
+local RxBinderUtils = require("RxBinderUtils")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local GameConfigBase = setmetatable({}, BaseObject)
 GameConfigBase.ClassName = "GameConfigBase"
@@ -29,17 +28,12 @@ GameConfigBase.__index = GameConfigBase
 function GameConfigBase.new(folder: Instance)
 	local self = setmetatable(BaseObject.new(folder), GameConfigBase)
 
-	AttributeUtils.initAttribute(self._obj, GameConfigConstants.GAME_ID_ATTRIBUTE, game.GameId)
+	self._gameId = AttributeValue.new(self._obj, GameConfigConstants.GAME_ID_ATTRIBUTE, game.GameId)
 
 	-- Setup observable indexes
-	self._assetTypeToAssetConfig = ObservableMapSet.new()
-	self._maid:GiveTask(self._assetTypeToAssetConfig)
-
-	self._assetKeyToAssetConfig = ObservableMapSet.new()
-	self._maid:GiveTask(self._assetKeyToAssetConfig)
-
-	self._assetIdToAssetConfig = ObservableMapSet.new()
-	self._maid:GiveTask(self._assetIdToAssetConfig)
+	self._assetTypeToAssetConfig = self._maid:Add(ObservableMapSet.new())
+	self._assetKeyToAssetConfig = self._maid:Add(ObservableMapSet.new())
+	self._assetIdToAssetConfig = self._maid:Add(ObservableMapSet.new())
 
 	self._assetTypeToAssetKeyMappings = {}
 	self._assetTypeToAssetIdMappings = {}
@@ -215,7 +209,7 @@ end
 	@return Observable<number>
 ]=]
 function GameConfigBase:ObserveGameId()
-	return RxAttributeUtils.observeAttribute(self._obj, GameConfigConstants.GAME_ID_ATTRIBUTE, game.GameId)
+	return self._gameId:Observe()
 end
 
 --[=[
@@ -223,7 +217,7 @@ end
 	@return number
 ]=]
 function GameConfigBase:GetGameId()
-	return AttributeUtils.getAttribute(self._obj, GameConfigConstants.GAME_ID_ATTRIBUTE, game.GameId)
+	return self._gameId.Value
 end
 
 --[=[

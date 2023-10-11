@@ -16,7 +16,7 @@ local CircleUtils = {}
 function CircleUtils.updatePositionToSmallestDistOnCircle(position, target, circumference)
 	assert(target >= 0 and target <= circumference, "Target must be between 0 and circumference")
 
-	if math.abs(position - target) <= math.pi then
+	if math.abs(position - target) <= circumference/2 then
 		-- No need to force spring update
 		return position
 	end

@@ -11,7 +11,8 @@ local RunService = game:GetService("RunService")
 
 local JsonToLocalizationTable = {}
 
-local LOCALIZATION_TABLE_NAME = "GeneratedJSONTable"
+local LOCALIZATION_TABLE_NAME_CLIENT = "GeneratedJSONTable_Client"
+local LOCALIZATION_TABLE_NAME_SERVER = "GeneratedJSONTable_Server"
 
 --[[
 	Recursively iterates through the object to construct strings and add it to the localization table
@@ -69,11 +70,18 @@ end
 	@return string -- The locale
 ]=]
 function JsonToLocalizationTable.getOrCreateLocalizationTable()
-	local localizationTable = LocalizationService:FindFirstChild(LOCALIZATION_TABLE_NAME)
+	local localizationTableName
+	if RunService:IsServer() then
+		localizationTableName = LOCALIZATION_TABLE_NAME_SERVER
+	else
+		localizationTableName = LOCALIZATION_TABLE_NAME_CLIENT
+	end
+
+	local localizationTable = LocalizationService:FindFirstChild(localizationTableName)
 
 	if not localizationTable then
 		localizationTable = Instance.new("LocalizationTable")
-		localizationTable.Name = LOCALIZATION_TABLE_NAME
+		localizationTable.Name = localizationTableName
 
 		if RunService:IsRunning() then
 			localizationTable.Parent = LocalizationService

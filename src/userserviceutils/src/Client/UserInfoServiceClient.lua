@@ -47,6 +47,18 @@ function UserInfoServiceClient:PromiseDisplayName(userId)
 end
 
 --[=[
+	Observes the user info for the user
+
+	@param userId number
+	@return Observable<UserInfo>
+]=]
+function UserInfoServiceClient:ObserveUserInfo(userId)
+	assert(type(userId) == "number", "Bad userId")
+
+	return self._aggregator:ObserveDisplayName(userId)
+end
+
+--[=[
 	Observes the user display name for the userId
 
 	@param userId number

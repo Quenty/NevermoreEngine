@@ -189,6 +189,22 @@ function ObservableMapSet:ObserveItemsForKeyBrio(key)
 end
 
 --[=[
+	Gets the first item for the given key
+	@param key TKey
+	@return TValue
+]=]
+function ObservableMapSet:GetFirstItemForKey(key)
+	assert(key ~= nil, "Bad key")
+
+	local observableSet = self._observableSetMap[key]
+	if not observableSet then
+		return nil
+	end
+
+	return observableSet:GetFirstItem()
+end
+
+--[=[
 	Gets a list for a given key
 	@param key TKey
 	@return { TValue }

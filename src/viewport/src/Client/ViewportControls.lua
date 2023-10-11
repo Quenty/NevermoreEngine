@@ -68,6 +68,10 @@ function ViewportControls:_startDrag(startInputObject)
 	end))
 
 	maid:GiveTask(function()
+		if not self._viewportModel.Destroy then
+			return
+		end
+
 		-- Compute rotation
 		if lastDelta then
 			self._viewportModel:RotateBy(lastDelta)

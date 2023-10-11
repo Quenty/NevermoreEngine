@@ -100,7 +100,7 @@ function TiePropertyImplementation:_updateImplementation(maid, implementation)
 
 	local className = ValueBaseUtils.getClassNameFromType(typeof(implementation))
 	if not className then
-		error(("[TiePropertyImplementation] - Bad implementation value type %q, cannot set"):format(typeof(implementation)))
+		error(string.format("[TiePropertyImplementation] - Bad implementation value type %q, cannot set %s", typeof(implementation), self._memberDefinition:GetMemberName()))
 	end
 
 	local copy = self:_changeToClassIfNeeded(className, implementation)

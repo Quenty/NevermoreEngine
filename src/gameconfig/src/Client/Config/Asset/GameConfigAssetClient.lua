@@ -19,13 +19,10 @@ GameConfigAssetClient.__index = GameConfigAssetClient
 	@return GameConfigAssetClient
 ]=]
 function GameConfigAssetClient.new(obj, serviceBag)
-	local self = setmetatable(GameConfigAssetBase.new(obj), GameConfigAssetClient)
+	local self = setmetatable(GameConfigAssetBase.new(obj, serviceBag), GameConfigAssetClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._configTranslator = self._serviceBag:GetService(GameConfigTranslator)
-
-	self:_setupEntrySet(self:ObserveNameTranslationKey(), self:ObserveCloudName())
-	self:_setupEntrySet(self:ObserveDescriptionTranslationKey(), self:ObserveCloudDescription())
 
 	return self
 end
@@ -49,30 +46,6 @@ function GameConfigAssetClient:_setupEntrySet(observeTranslationKey, observeTran
 				self._configTranslator:SetEntryValue(state.translationKey, state.text, context, localeId, state.text)
 			end
 	end))
-end
-
---[=[
-	Observes the translated name
-	@return Observable<string>
-]=]
-function GameConfigAssetClient:ObserveTranslatedName()
-	return self:ObserveNameTranslationKey():Pipe({
-		Rx.switchMap(function(key)
-			return self._configTranslator:ObserveFormatByKey(key)
-		end)
-	})
-end
-
---[=[
-	Observes the translated description
-	@return Observable<string>
-]=]
-function GameConfigAssetClient:ObserveTranslatedDescription()
-	return self:ObserveDescriptionTranslationKey():Pipe({
-		Rx.switchMap(function(key)
-			return self._configTranslator:ObserveFormatByKey(key)
-		end)
-	})
 end
 
 return GameConfigAssetClient

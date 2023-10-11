@@ -9,6 +9,9 @@
 
 	For performance reasons this class defers firing events until the next defer() event frame.
 
+	This class always prefers to add equivalent elements to the end of the list if they're not in the list.
+	Otherwise it prefers minimal movement.
+
 	@class ObservableSortedList
 ]=]
 
@@ -23,9 +26,16 @@ local Signal = require("Signal")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
 
--- Higher numbers last. Using <= ensures insertion at end on ties.
+-- Higher numbers last
 local function defaultCompare(a, b)
-	return a <= b
+	-- equivalent of `return a - b` except it supports comparison of strings and stuff
+	if b > a then
+		return -1
+	elseif b < a then
+		return 1
+	else
+		return 0
+	end
 end
 
 local ObservableSortedList = {}
@@ -34,10 +44,13 @@ ObservableSortedList.__index = ObservableSortedList
 
 --[=[
 	Constructs a new ObservableSortedList
-	@param compare callback?
+	@param isReversed boolean
+	@param compare function
 	@return ObservableSortedList<T>
 ]=]
-function ObservableSortedList.new(compare)
+function ObservableSortedList.new(isReversed, compare)
+	assert(type(isReversed) == "boolean" or isReversed == nil, "Bad isReversed")
+
 	local self = setmetatable({}, ObservableSortedList)
 
 	self._maid = Maid.new()
@@ -56,10 +69,10 @@ function ObservableSortedList.new(compare)
 
 	self._keyObservables = {} -- { [Symbol]: { Subscription } }
 
+	self._isReversed = isReversed or false
 	self._compare = compare or defaultCompare
 
-	self._countValue = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._countValue)
+	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
 --[=[
 	Fires when an item is added
@@ -67,20 +80,23 @@ function ObservableSortedList.new(compare)
 	@prop ItemAdded Signal<T, number, Symbol>
 	@within ObservableSortedList
 ]=]
-	self.ItemAdded = Signal.new()
-	self._maid:GiveTask(self.ItemAdded)
+	self.ItemAdded = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when an item is removed.
 	@readonly
-	@prop ItemRemoved Signal<T, Symbol>
+	@prop ItemRemoved self._maid:Add(Signal<T, Symbol>)
 	@within ObservableSortedList
 ]=]
-	self.ItemRemoved = Signal.new()
-	self._maid:GiveTask(self.ItemRemoved)
+	self.ItemRemoved = self._maid:Add(Signal.new())
 
-	self.OrderChanged = Signal.new()
-	self._maid:GiveTask(self.OrderChanged)
+--[=[
+	Fires when an item's order changes.
+	@readonly
+	@prop OrderChanged self._maid:Add(Signal<T, Symbol>)
+	@within ObservableSortedList
+]=]
+	self.OrderChanged = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when the count changes.
@@ -303,12 +319,14 @@ function ObservableSortedList:Add(item, observeValue)
 	self._contents[key] = item
 
 	maid:GiveTask(observeValue:Subscribe(function(sortValue)
-		self._sortValue[key] = sortValue
+		self:_debugVerifyIntegrity()
 
 		if sortValue ~= nil then
 			local currentIndex = self._indexes[key]
 			local targetIndex = self:_findCorrectIndex(sortValue, currentIndex)
-			self:_updateIndex(key, item, targetIndex)
+
+			self._sortValue[key] = sortValue
+			self:_updateIndex(key, item, targetIndex, sortValue)
 		else
 			local observableSubs = self._keyObservables[key]
 
@@ -320,6 +338,8 @@ function ObservableSortedList:Add(item, observeValue)
 				self:_fireSubs(observableSubs, nil)
 			end
 		end
+
+		self:_debugVerifyIntegrity()
 	end))
 
 	maid:GiveTask(function()
@@ -371,23 +391,23 @@ function ObservableSortedList:RemoveByKey(key)
 	self._maid[key] = nil
 end
 
-function ObservableSortedList:_updateIndex(key, item, index)
+function ObservableSortedList:_updateIndex(key, item, newIndex)
 	assert(item ~= nil, "Bad item")
-	assert(type(index) == "number", "Bad index")
+	assert(type(newIndex) == "number", "Bad newIndex")
 
-	local pastIndex = self._indexes[key]
-	if pastIndex == index then
+	local prevIndex = self._indexes[key]
+	if prevIndex == newIndex then
 		return
 	end
 
-	self._indexes[key] = index
+	self._indexes[key] = newIndex
 
 	local changed = {}
 
-	if not pastIndex then
+	if not prevIndex then
 		-- shift everything up to fit this space
 		local n = #self._keyList
-		for i=n, index, -1 do
+		for i=n, newIndex, -1 do
 			local nextKey = self._keyList[i]
 			self._indexes[nextKey] = i + 1
 			self._keyList[i + 1] = nextKey
@@ -397,9 +417,9 @@ function ObservableSortedList:_updateIndex(key, item, index)
 				newIndex = i + 1;
 			})
 		end
-	elseif index > pastIndex then
-		-- we're moving up (3 -> 5), so everything shifts down to fill up the pastIndex
-		for i=pastIndex + 1, index do
+	elseif newIndex > prevIndex then
+		-- we're shifting down
+		for i=prevIndex + 1, newIndex do
 			local nextKey = self._keyList[i]
 			self._indexes[nextKey] = i - 1
 			self._keyList[i - 1] = nextKey
@@ -409,10 +429,10 @@ function ObservableSortedList:_updateIndex(key, item, index)
 				newIndex = i - 1;
 			})
 		end
-	else
-		-- if index < pastIndex then
-		-- we're moving down (5 -> 3) so everything shifts up to fit this space
-		for i=pastIndex-1, index, -1 do
+	elseif newIndex < prevIndex then
+		-- we're shifting up
+
+		for i=prevIndex-1, newIndex, -1 do
 			local belowKey = self._keyList[i]
 			self._indexes[belowKey] = i + 1
 			self._keyList[i + 1] = belowKey
@@ -421,23 +441,24 @@ function ObservableSortedList:_updateIndex(key, item, index)
 				newIndex = i + 1;
 			})
 		end
+	else
+		error("Bad state")
 	end
 
 	local itemAdded = {
 		key = key;
-		newIndex = index;
+		newIndex = newIndex;
 		item = item;
 	}
 
 	-- ensure ourself is considered changed
 	table.insert(changed, itemAdded)
 
-
-	self._keyList[index] = key
+	self._keyList[newIndex] = key
 
 	-- Fire off our count value changed
 	-- still O(n^2) but at least we prevent emitting O(n^2) events
-	if pastIndex == nil then
+	if prevIndex == nil then
 		self:_deferChange(1, itemAdded, nil, changed)
 	else
 		self:_deferChange(0, nil, nil, changed)
@@ -573,23 +594,119 @@ function ObservableSortedList:_queueDeferredChange()
 end
 
 function ObservableSortedList:_findCorrectIndex(sortValue, currentIndex)
-	-- todo: binary search
-	-- todo: stable
+	local highInsertionIndex = self:_highBinarySearch(sortValue)
 
-	for i=#self._keyList, 1, -1 do
-		local currentKey = self._keyList[i]
-		if self._compare(self._sortValue[currentKey], sortValue) then
+	-- we're inserting, so always insert at end
+	if not currentIndex then
+		return highInsertionIndex
+	end
 
-			-- include index in this
-			if currentIndex and currentIndex <= i then
-				return i
+	local lowInsertionIndex = self:_lowBinarySearch(sortValue)
+
+	-- remember we get insertion index so we need to subtract one
+	if highInsertionIndex > currentIndex then
+		highInsertionIndex = highInsertionIndex - 1
+	end
+	if lowInsertionIndex > currentIndex then
+		lowInsertionIndex = lowInsertionIndex - 1
+	end
+
+	-- prioritize the smallest potential movement
+	if currentIndex < lowInsertionIndex then
+		return lowInsertionIndex
+	elseif currentIndex > highInsertionIndex then
+		return highInsertionIndex
+	else
+		return currentIndex
+	end
+end
+
+function ObservableSortedList:_highBinarySearch(sortValue)
+	if #self._keyList == 0 then
+		return 1
+	end
+
+	local minIndex = 1
+	local maxIndex = #self._keyList
+	while true do
+		local mid = math.floor((minIndex + maxIndex) / 2)
+		local compareValue = self._compare(self._sortValue[self._keyList[mid]], sortValue)
+		assert(type(compareValue) == "number", "Expecting number")
+
+		if self._isReversed then
+			compareValue = -compareValue
+		end
+
+		if compareValue > 0 then
+			maxIndex = mid - 1
+			if minIndex > maxIndex then
+				return mid
 			end
+		else
+			minIndex = mid + 1
+			if minIndex > maxIndex then
+				return mid + 1
+			end
+		end
+	end
+end
 
-			return i + 1
+function ObservableSortedList:_lowBinarySearch(sortValue)
+	if #self._keyList == 0 then
+		return 1
+	end
+
+	local minIndex = 1
+	local maxIndex = #self._keyList
+	while true do
+		local mid = math.floor((minIndex + maxIndex) / 2)
+		local compareValue = self._compare(self._sortValue[self._keyList[mid]], sortValue)
+		assert(type(compareValue) == "number", "Expecting number")
+
+		if self._isReversed then
+			compareValue = -compareValue
+		end
+
+		if compareValue < 0 then
+			minIndex = mid + 1
+			if minIndex > maxIndex then
+				return mid + 1
+			end
+		else
+			maxIndex = mid - 1
+			if minIndex > maxIndex then
+				return mid
+			end
+		end
+	end
+end
+
+function ObservableSortedList:_debugSortValuesToString()
+	local values = {}
+
+	for _, key in pairs(self._keyList) do
+		table.insert(values, string.format("%4d", self._sortValue[key]))
+	end
+
+	return table.concat(values, ", ")
+end
+
+function ObservableSortedList:_debugVerifyIntegrity()
+	for i=2, #self._keyList do
+		local compare = self._compare(self._sortValue[self._keyList[i-1]], self._sortValue[self._keyList[i]])
+		if self._isReversed then
+			compare = -compare
+		end
+		if compare > 0 then
+			warn(string.format("Bad sorted list state %s at index %d", self:_debugSortValuesToString(), i))
 		end
 	end
 
-	return 1
+	for i=1, #self._keyList do
+		if self._indexes[self._keyList[i]] ~= i then
+			warn(string.format("Index is out of date for %d for %s", i, self:_debugSortValuesToString()))
+		end
+	end
 end
 
 function ObservableSortedList:_fireSubs(list, index)

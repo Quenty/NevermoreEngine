@@ -26,7 +26,6 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local SoftShutdownConstants = require("SoftShutdownConstants")
 local TeleportServiceUtils = require("TeleportServiceUtils")
-local BindToCloseService = require("BindToCloseService")
 
 local SoftShutdownService = {}
 SoftShutdownService.ServiceName = "SoftShutdownService"
@@ -44,7 +43,8 @@ SoftShutdownService.ServiceName = "SoftShutdownService"
 function SoftShutdownService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	self._bindToCloseService = self._serviceBag:GetService(BindToCloseService)
+	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+	self._serviceBag:GetService(require("SoftShutdownTranslator"))
 
 	self._dataStore = DataStoreService:GetDataStore("IsSoftShutdownServer")
 	self._maid = Maid.new()

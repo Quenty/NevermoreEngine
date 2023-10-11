@@ -10,7 +10,7 @@ local ColorPickerStoryUtils = require("ColorPickerStoryUtils")
 local ColorPalette = require("ColorPalette")
 local ValueObject = require("ValueObject")
 
-local DARK_MODE_ENABLED = false
+local DARK_MODE_ENABLED = true
 
 return function(target)
 	local maid = Maid.new()
@@ -53,12 +53,14 @@ return function(target)
 		palette:SetColorGrade("highlight", 70, 1)
 		palette:SetColorGrade("action", palette:ObserveColorBaseGradeBetween("action", 70, 100), 0.1)
 		palette:SetColorGrade("mouseOver", -15)
+		palette:SetVividness("text", 0.5)
+		palette:SetVividness("action", 0.5)
 	end
 
 	if DARK_MODE_ENABLED then
-		light()
-	else
 		dark()
+	else
+		light()
 	end
 
 	local function sampleGui(labelText)
@@ -224,6 +226,12 @@ return function(target)
 
 			Blend.New "UIPadding" {
 				PaddingTop = UDim.new(0, 10);
+			};
+
+			Blend.New "Frame" {
+				Name = "TestCustomColor";
+				Size = UDim2.new(0, 30, 0, 30);
+				BackgroundColor3 = palette:ObserveColor(Color3.new(0, 0, 1), "text");
 			};
 		}
 	}):Subscribe())

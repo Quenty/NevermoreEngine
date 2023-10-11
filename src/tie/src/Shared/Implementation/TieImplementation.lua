@@ -59,7 +59,7 @@ function TieImplementation:__index(index)
 	if memberMap[index] then
 		return memberMap[index]:GetInterface(self._folder, self)
 	else
-		error(("Bad index %q for TieImplementation"):format(tostring(index)))
+		error(string.format("Bad index %q for TieImplementation", tostring(index)))
 	end
 end
 

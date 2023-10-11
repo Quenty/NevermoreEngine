@@ -6,7 +6,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
+local RagdollableBase = require("RagdollableBase")
 local Maid = require("Maid")
 local Motor6DStackHumanoid = require("Motor6DStackHumanoid")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
@@ -17,8 +17,10 @@ local RagdollCollisionUtils = require("RagdollCollisionUtils")
 local RagdollMotorUtils = require("RagdollMotorUtils")
 local RxBrioUtils = require("RxBrioUtils")
 local RxRagdollUtils = require("RxRagdollUtils")
+local RagdollableInterface = require("RagdollableInterface")
+local Rx = require("Rx")
 
-local Ragdollable = setmetatable({}, BaseObject)
+local Ragdollable = setmetatable({}, RagdollableBase)
 Ragdollable.ClassName = "Ragdollable"
 Ragdollable.__index = Ragdollable
 
@@ -29,7 +31,7 @@ Ragdollable.__index = Ragdollable
 	@return Ragdollable
 ]=]
 function Ragdollable.new(humanoid, serviceBag)
-	local self = setmetatable(BaseObject.new(humanoid), Ragdollable)
+	local self = setmetatable(RagdollableBase.new(humanoid), Ragdollable)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._ragdollBinder = self._serviceBag:GetService(Ragdoll)
@@ -63,7 +65,17 @@ function Ragdollable.new(humanoid, serviceBag)
 	end))
 	self:_onRagdollChanged()
 
+	self._maid:GiveTask(RagdollableInterface:Implement(self._obj, self))
+
 	return self
+end
+
+function Ragdollable:ObserveIsRagdolled()
+	return self._ragdollBinder:Observe(self._obj):Pipe({
+		Rx.map(function(value)
+			return value and true or false
+		end)
+	})
 end
 
 function Ragdollable:_onRagdollChanged()

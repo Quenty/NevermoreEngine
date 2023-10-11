@@ -292,8 +292,9 @@ function RogueProperty:_encodeValue(current)
 end
 
 function RogueProperty:GetChangedEvent()
-	return RxSignal.new(self:Observe())
+	return RxSignal.new(self:Observe():Pipe({
+		Rx.skip(1)
+	}))
 end
-
 
 return RogueProperty

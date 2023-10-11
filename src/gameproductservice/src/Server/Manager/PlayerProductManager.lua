@@ -34,15 +34,13 @@ function PlayerProductManager.new(player, serviceBag)
 	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
 	self._receiptProcessingService = self._serviceBag:GetService(ReceiptProcessingService)
 
-	self._marketeer = PlayerMarketeer.new(self._obj, self._gameConfigService:GetConfigPicker())
-	self._maid:GiveTask(self._marketeer)
+	self._marketeer = self._maid:Add(PlayerMarketeer.new(self._obj, self._gameConfigService:GetConfigPicker()))
 
 	-- Expect configuration on receipt processing
 	self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT):SetReceiptProcessingExpected(true)
 
-	self._remoting = Remoting.new(self._obj, "PlayerProductManager")
+	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager"))
 	self._remoting:DeclareEvent("NotifyReceiptProcessed")
-	self._maid:GiveTask(self._remoting)
 
 	self._maid:GiveTask(self._remoting.NotifyPromptFinished:Connect(function(...)
 		self:_handlePromptFinished(...)

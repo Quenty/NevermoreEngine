@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local CharacterUtils = require("CharacterUtils")
+local Binder = require("Binder")
 
 local HumanoidSpeedClient = setmetatable({}, BaseObject)
 HumanoidSpeedClient.ClassName = "HumanoidSpeedClient"
@@ -28,4 +29,4 @@ function HumanoidSpeedClient:GetPlayer()
 	return CharacterUtils.getPlayerFromCharacter(self._obj)
 end
 
-return HumanoidSpeedClient
+return Binder.new("HumanoidSpeed", HumanoidSpeedClient)

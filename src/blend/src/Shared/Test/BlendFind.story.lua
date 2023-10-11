@@ -52,9 +52,11 @@ return function(target)
 			CornerRadius = UDim.new(0.05, 0);
 		};
 
-		Blend.Find "CenterFrame" {
-			Blend.Find "MyUIScale" {
-				ClassName = "UIScale";
+		Blend.Find "Frame" {
+			Name = "CenterFrame";
+
+			Blend.Find "UIScale" {
+				Name = "MyUIScale";
 
 				Scale = Blend.Computed(percentVisible, function(percent)
 					return 0.8 + 0.2*percent

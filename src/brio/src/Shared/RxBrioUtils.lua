@@ -17,6 +17,28 @@ local Rx = require("Rx")
 local RxBrioUtils = {}
 
 --[=[
+	Creates a new observable wrapping the brio
+
+	@param callback function
+	@return Observable<Brio>
+]=]
+function RxBrioUtils.ofBrio(callback)
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		if type(callback) == "function" then
+			local brio = maid:Add(Brio.new(callback(maid)))
+			sub:Fire(brio)
+		else
+			local brio = maid:Add(Brio.new(callback))
+			sub:Fire(brio)
+		end
+
+		return maid
+	end)
+end
+
+--[=[
 	Takes a result and converts it to a brio if it is not one.
 
 	@return (source: Observable<Brio<T> | T>) -> Observable<Brio<T>>

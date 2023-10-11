@@ -34,6 +34,7 @@ function ChatProviderService:Init(serviceBag)
 
 	-- Internal
 	self._serviceBag:GetService(require("ChatProviderCommandService"))
+	self._serviceBag:GetService(require("ChatProviderTranslator"))
 
 	-- Binders
 	self._serviceBag:GetService(require("ChatTag"))

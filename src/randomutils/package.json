@@ -29,6 +29,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@quenty/loader": "file:../loader"
+    "@quenty/loader": "file:../loader",
+    "@quenty/table": "file:../table"
   }
 }

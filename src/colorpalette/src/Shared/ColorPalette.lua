@@ -184,7 +184,7 @@ function ColorPalette:_toGradeObservable(grade, fallbackColorSource)
 	end
 end
 
-function ColorPalette:_toVividnessObservable(vividness, grade, fallbackColorSource)
+function ColorPalette:_toVividnessObservable(vividness, grade, colorOrObservable)
 	if type(vividness) == "string" then
 		return self._gradePalette:ObserveVividness(vividness)
 	elseif type(vividness) == "number" then
@@ -199,25 +199,14 @@ function ColorPalette:_toVividnessObservable(vividness, grade, fallbackColorSour
 	end
 
 	if type(grade) == "string" then
-		-- Fall back to the grade value
+		-- Fall back to the grade value's vividness
 		return self._gradePalette:ObserveVividness(grade)
-	end
-
-	-- Otherwise fall back to name of color
-	if type(fallbackColorSource) == "string" then
-		return (self._gradePalette:ObserveVividness(fallbackColorSource))
-	elseif typeof(fallbackColorSource) == "Color3" then
-		local luvColor = LuvColor3Utils.fromColor3(fallbackColorSource)
-		return Rx.of(luvColor[2])
-	elseif Observable.isObservable(fallbackColorSource) then
-		return fallbackColorSource:Pipe({
-			Rx.map(function(value)
-				local luvColor = LuvColor3Utils.fromColor3(value)
-				return luvColor[2]
-			end)
-		})
+	elseif type(colorOrObservable) == "string" then
+		-- Fall back to color
+		return self._gradePalette:ObserveVividness(colorOrObservable)
 	else
-		error("Bad fallbackColorSource argument")
+		-- Vividness is pretty optional
+		return Rx.of(nil)
 	end
 end
 
@@ -234,8 +223,8 @@ end
 function ColorPalette:_toVividness(vividness, grade, name)
 	if type(vividness) == "string" then
 		return self._gradePalette:GetVividness(vividness)
-	elseif type(grade) == "number" then
-		return grade
+	elseif type(vividness) == "number" then
+		return vividness
 	elseif type(grade) == "string" then
 		-- Fall back to the grade value
 		return self._gradePalette:GetVividness(grade)

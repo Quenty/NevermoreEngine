@@ -46,9 +46,11 @@
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",
     "@quenty/rxbinderutils": "file:../rxbinderutils",
+    "@quenty/rxsignal": "file:../rxsignal",
     "@quenty/spring": "file:../spring",
     "@quenty/steputils": "file:../steputils",
     "@quenty/table": "file:../table",
+    "@quenty/tie": "file:../tie",
     "@quenty/valuebaseutils": "file:../valuebaseutils",
     "@quenty/valueobject": "file:../valueobject"
   },

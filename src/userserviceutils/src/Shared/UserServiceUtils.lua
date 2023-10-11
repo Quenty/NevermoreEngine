@@ -1,4 +1,6 @@
 --[=[
+	Wraps [UserService] API calls with [Promise].
+
 	@class UserServiceUtils
 ]=]
 
@@ -15,11 +17,17 @@ local UserServiceUtils = {}
 	.Id number -- The Id associated with the UserInfoResponse object
 	.Username string -- The username associated with the UserInfoResponse object
 	.DisplayName string	 -- The display name associated with the UserInfoResponse object
+	.HasVerifiedBadge boolean -- The HasVerifiedBadge value associated with the user.
 	@within UserServiceUtils
 ]=]
 
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync(userIds)
+
+	::: tip
+	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::
+
 	@param userIds { number }
 	@return Promise<{ UserInfo }>
 ]=]
@@ -46,6 +54,10 @@ end
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync({ userId })[1]
 
+	::: tip
+	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::
+
 	@param userId number
 	@return Promise<UserInfo>
 ]=]
@@ -67,6 +79,10 @@ end
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync({ userId })[1].DisplayName
 
+	::: tip
+	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::
+
 	@param userId number
 	@return Promise<string>
 ]=]
@@ -81,6 +97,10 @@ end
 
 --[=[
 	Wraps UserService:GetUserInfosByUserIdsAsync({ userId })[1].Username
+
+	::: tip
+	User [UserInfoAggregator] via [UserInfoService] to get this deduplicated.
+	:::
 
 	@param userId number
 	@return Promise<string>

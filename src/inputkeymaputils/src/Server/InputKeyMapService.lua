@@ -13,6 +13,7 @@ function InputKeyMapService:Init(serviceBag)
 
 	-- Internal
 	self._serviceBag:GetService(require("InputKeyMapRegistryServiceShared"))
+	self._serviceBag:GetService(require("InputKeyMapTranslator"))
 end
 
 return InputKeyMapService

@@ -11,6 +11,8 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local GameConfigAssetConstants = require("GameConfigAssetConstants")
 local Promise = require("Promise")
 local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local AttributeValue = require("AttributeValue")
+local GameConfigTranslator = require("GameConfigTranslator")
 
 local GameConfigAssetBase = setmetatable({}, BaseObject)
 GameConfigAssetBase.ClassName = "GameConfigAssetBase"
@@ -19,12 +21,55 @@ GameConfigAssetBase.__index = GameConfigAssetBase
 --[=[
 	Constructs a new GameConfigAssetBase. Should be done via binder. This is a base class.
 	@param obj Folder
+	@param serviceBag ServiceBag
 	@return GameConfigAssetBase
 ]=]
-function GameConfigAssetBase.new(obj)
+function GameConfigAssetBase.new(obj, serviceBag)
 	local self = setmetatable(BaseObject.new(obj), GameConfigAssetBase)
 
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._nameTranslationKey = AttributeValue.new(self._obj, "NameTranslationKey", "assets.name.unknown")
+	self._descriptionTranslationKey = AttributeValue.new(self._obj, "DescriptionTranslationKey", "assets.description.unknown")
+	self._configTranslator = self._serviceBag:GetService(GameConfigTranslator)
+
 	return self
+end
+
+
+--[=[
+	Observes the translated name
+	@return Observable<string>
+]=]
+function GameConfigAssetBase:ObserveTranslatedName()
+	return self:ObserveNameTranslationKey():Pipe({
+		Rx.switchMap(function(key)
+			return self._configTranslator:ObserveFormatByKey(key)
+		end)
+	})
+end
+
+--[=[
+	Observes the translated description
+	@return Observable<string>
+]=]
+function GameConfigAssetBase:ObserveTranslatedDescription()
+	return self:ObserveDescriptionTranslationKey():Pipe({
+		Rx.switchMap(function(key)
+			return self._configTranslator:ObserveFormatByKey(key)
+		end)
+	})
+end
+
+function GameConfigAssetBase:SetNameTranslationKey(nameTranslationKey)
+	assert(type(nameTranslationKey) == "string" or nameTranslationKey == nil, "Bad nameTranslationKey")
+
+	self._nameTranslationKey.Value = nameTranslationKey or "assets.name.unknown"
+end
+
+function GameConfigAssetBase:SetDescriptionTranslationKey(descriptionTranslationKey)
+	assert(type(descriptionTranslationKey) == "string" or descriptionTranslationKey == nil, "Bad descriptionTranslationKey")
+
+	self._descriptionTranslationKey.Value = descriptionTranslationKey or "assets.description.unknown"
 end
 
 --[=[
@@ -127,7 +172,7 @@ end
 	@return Observable<string?>
 ]=]
 function GameConfigAssetBase:ObserveNameTranslationKey()
-	return self:_observeTranslationKey("name")
+	return self._nameTranslationKey:Observe()
 end
 
 --[=[
@@ -135,7 +180,7 @@ end
 	@return Observable<string?>
 ]=]
 function GameConfigAssetBase:ObserveDescriptionTranslationKey()
-	return self:_observeTranslationKey("description")
+	return self._descriptionTranslationKey:Observe()
 end
 
 --[=[
@@ -169,18 +214,6 @@ end
 ]=]
 function GameConfigAssetBase:ObserveCloudIconImageAssetId()
 	return self:_observeCloudProperty("IconImageAssetId", "number")
-end
-
-function GameConfigAssetBase:_observeTranslationKey(postfix)
-	return self:ObserveState():Pipe({
-		Rx.map(function(state)
-			if type(state) == "table" and type(state.assetType) == "string" and type(state.assetKey) == "string" then
-				return ("cloud.%s.%s.%s"):format(state.assetType, state.assetKey, postfix)
-			else
-				return nil
-			end
-		end)
-	})
 end
 
 function GameConfigAssetBase:_observeCloudProperty(propertyName, expectedType)
