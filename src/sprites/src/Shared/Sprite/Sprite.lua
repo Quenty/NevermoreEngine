@@ -39,6 +39,8 @@ end
 	@return Instance
 ]=]
 function Sprite:Style(gui)
+	assert(typeof(gui) == "Instance" and (gui:IsA("ImageLabel") or gui:IsA("ImageButton")), "Bad gui")
+
 	gui.Image = self.Texture
 	gui.ImageRectOffset = self.Position
 	gui.ImageRectSize = self.Size
@@ -52,6 +54,8 @@ end
 	@return ImageLabel | ImageButton
 ]=]
 function Sprite:Get(instanceType)
+	assert(type(instanceType) == "string", "Bad instanceType")
+
 	local gui = Instance.new(instanceType)
 	gui.Size = UDim2.new(0, self.Size.X, 0, self.Size.Y)
 	gui.Name = self.Name
