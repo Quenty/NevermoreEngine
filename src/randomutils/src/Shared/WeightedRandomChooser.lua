@@ -47,6 +47,26 @@ function WeightedRandomChooser:GetWeight(option)
 end
 
 --[=[
+	Gets the percent probability from 0 to 1
+
+	@return number | nil
+]=]
+function WeightedRandomChooser:GetProbability(option)
+	local weight = self._optionToWeight[option]
+	if weight then
+		return nil
+	end
+
+	-- TODO: Cache if we call like a million times
+	local total = 0
+	for _, item in pairs(self._optionToWeight) do
+		total = total + item
+	end
+
+	return weight/total
+end
+
+--[=[
 	Removes the option from the chooser
 
 	@param option T
