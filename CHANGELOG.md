@@ -1,3 +1,16 @@
+# (Wed Oct 11 2023)
+
+#### 💥 Breaking Change
+
+- `@quenty/animations@2.0.0`, `@quenty/binder@9.0.0`, `@quenty/blend@7.0.0`, `@quenty/brio@9.0.0`, `@quenty/buttonhighlightmodel@9.0.0`, `@quenty/chatproviderservice@4.0.0`, `@quenty/clienttranslator@9.0.0`, `@quenty/color3utils@6.0.0`, `@quenty/colorpalette@5.0.0`, `@quenty/cooldown@6.0.0`, `@quenty/counter@2.0.0`, `@quenty/gameconfig@6.0.0`, `@quenty/gameproductservice@8.0.0`, `@quenty/geometryutils@3.0.0`, `@quenty/humanoidanimatorutils@3.0.0`, `@quenty/humanoidspeed@6.0.0`, `@quenty/inputkeymaputils@8.0.0`, `@quenty/loader@7.0.0`, `@quenty/observablecollection@6.0.0`, `@quenty/particles@2.0.0`, `@quenty/preferredparentutils@4.0.0`, `@quenty/r15utils@8.0.0`, `@quenty/racketingropeconstraint@7.0.0`, `@quenty/ragdoll@10.0.0`, `@quenty/randomutils@3.0.0`, `@quenty/rogue-properties@5.0.0`, `@quenty/rxsignal@2.0.0`, `@quenty/signal@3.0.0`, `@quenty/softshutdown@4.0.0`, `@quenty/tie@5.0.0`, `@quenty/userserviceutils@4.0.0`, `@quenty/valuebaseutils@8.0.0`, `@quenty/viewport@6.0.0`, `@quenty/nevermore-cli@2.0.0`
+  - Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Sep 21 2023)
 
 #### 🐛 Bug Fix

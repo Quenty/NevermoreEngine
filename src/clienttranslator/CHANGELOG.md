@@ -1,3 +1,24 @@
+# v9.0.0 (Wed Oct 11 2023)
+
+#### 💥 Breaking Change
+
+- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- feat: JSONTranslator can exist on server and generate translation keys (improved ergonomics) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix localization table replication ([@Quenty](https://github.com/Quenty))
+- fix: Fix localization firing after close ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

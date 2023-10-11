@@ -1,3 +1,16 @@
+# v7.0.0 (Wed Oct 11 2023)
+
+#### 💥 Breaking Change
+
+- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
+- feat!: Refactor contract for Blend.Find and add [Blend.Tags] ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
