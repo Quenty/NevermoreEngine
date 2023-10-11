@@ -167,7 +167,17 @@ function ColorGradePalette:_observeGradeFromName(gradeName)
 	if typeof(gradeName) == "Color3" then
 		return Rx.of(ColorGradeUtils.getGrade(gradeName))
 	elseif Observable.isObservable(gradeName) then
-		return gradeName
+		return gradeName:Pipe({
+			Rx.map(function(value)
+				if typeof(value) == "Color3" then
+					return ColorGradeUtils.getGrade(value)
+				elseif typeof(value) == "number" then
+					return value
+				else
+					error("Bad grade value")
+				end
+			end)
+		})
 	end
 
 	local gradeObservable = self._grades[gradeName]
