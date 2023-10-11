@@ -1,23 +1,18 @@
-# v4.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: User information de-duplication occurs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/userserviceutils@3.11.0...@quenty/userserviceutils@4.0.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* User information de-duplication occurs ([bcb5c2a](https://github.com/Quenty/NevermoreEngine/commit/bcb5c2a062fa775e6c0949f2f56f7026456f849a))
+
+
+
+
 
 # [3.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/userserviceutils@3.10.0...@quenty/userserviceutils@3.11.0) (2023-09-21)
 

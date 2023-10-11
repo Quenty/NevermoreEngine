@@ -1,23 +1,18 @@
-# v6.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add CooldownTrackerModel.isCooldownTrackerModel(value) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.32.0...@quenty/cooldown@6.0.0) (2023-10-11)
+
+
+### Features
+
+* Add CooldownTrackerModel.isCooldownTrackerModel(value) ([8f0ade2](https://github.com/Quenty/NevermoreEngine/commit/8f0ade2ce96e70090ebab6085cf3f24696a7cca6))
+
+
+
+
 
 # [5.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@5.31.0...@quenty/cooldown@5.32.0) (2023-09-21)
 

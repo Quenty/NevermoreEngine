@@ -1,20 +1,21 @@
-# v5.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-- fix!: Make RxSignal not automatically skip first input ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.31.0...@quenty/rogue-properties@5.0.0) (2023-10-11)
+
+
+* fix!: Make RxSignal not automatically skip first input ([6fe7586](https://github.com/Quenty/NevermoreEngine/commit/6fe7586029ea4753b1de7a8633c7d5af15bab420))
+
+
+### BREAKING CHANGES
+
+* RxSignal used to export a different value
+
+
+
+
 
 # [4.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@4.30.0...@quenty/rogue-properties@4.31.0) (2023-09-21)
 

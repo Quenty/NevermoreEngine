@@ -1,24 +1,26 @@
-# v7.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-- feat!: RacketingRopeContraint exports binder ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add RacketingRopeConstraint interface ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@6.8.0...@quenty/racketingropeconstraint@7.0.0) (2023-10-11)
+
+
+* feat!: RacketingRopeContraint exports binder ([65a385d](https://github.com/Quenty/NevermoreEngine/commit/65a385dce3e3f0bfdbd201b9b008fbb472bee7d9))
+
+
+### Features
+
+* Add RacketingRopeConstraint interface ([1217260](https://github.com/Quenty/NevermoreEngine/commit/12172607c55082367764025f9ea67c7ae0c84b60))
+
+
+### BREAKING CHANGES
+
+* This breaks the previous exported RacketingRopeConstraint
+
+
+
+
 
 # [6.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/racketingropeconstraint@6.7.0...@quenty/racketingropeconstraint@6.8.0) (2023-08-23)
 

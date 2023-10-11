@@ -1,25 +1,19 @@
-# v8.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Use maid:Add() ([@Quenty](https://github.com/Quenty))
-- fix: Fix :HasPurchasedThisSession business logic ([@Quenty](https://github.com/Quenty))
-- fix: Fix prompt product purchase from stalling ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.18.0...@quenty/gameproductservice@8.0.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* Fix :HasPurchasedThisSession business logic ([d6fd6fb](https://github.com/Quenty/NevermoreEngine/commit/d6fd6fb5034919c9aba8357c8d8758fd09113403))
+* Fix prompt product purchase from stalling ([124dd61](https://github.com/Quenty/NevermoreEngine/commit/124dd61171bd74bfcb5c690e5370211e0952a63a))
+
+
+
+
 
 # [7.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@7.17.0...@quenty/gameproductservice@7.18.0) (2023-09-21)
 

@@ -1,23 +1,18 @@
-# v9.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Binder has warning about constructing other binders ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.27.0...@quenty/binder@9.0.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* Binder has warning about constructing other binders ([3729779](https://github.com/Quenty/NevermoreEngine/commit/37297794d59310a53a3659a406f1e6e266460283))
+
+
+
+
 
 # [8.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@8.26.0...@quenty/binder@8.27.0) (2023-09-21)
 

@@ -1,27 +1,18 @@
-# v3.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Use GoodSignal only as signal implementation ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix doc strings and style ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.4.0...@quenty/signal@3.0.0) (2023-10-11)
+
+
+### Features
+
+* Use GoodSignal only as signal implementation ([4475cab](https://github.com/Quenty/NevermoreEngine/commit/4475cab448564a8cf8e51902e30f5c486bf49ac3))
+
+
+
+
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@2.3.0...@quenty/signal@2.4.0) (2023-05-26)
 

@@ -1,23 +1,18 @@
-# v2.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add AnimationSlotPlayer:AdjustSpeed(id, speed) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@1.5.0...@quenty/animations@2.0.0) (2023-10-11)
+
+
+### Features
+
+* Add AnimationSlotPlayer:AdjustSpeed(id, speed) ([bd59858](https://github.com/Quenty/NevermoreEngine/commit/bd598582df448591a71996b6198ac3ba40f03404))
+
+
+
+
 
 # [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@1.4.0...@quenty/animations@1.5.0) (2023-09-21)
 

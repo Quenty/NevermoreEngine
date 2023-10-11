@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@6.3.0...@quenty/animationgroup@7.0.0) (2023-10-11)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@6.2.1...@quenty/animationgroup@6.3.0) (2023-08-23)
 
 **Note:** Version bump only for package @quenty/animationgroup

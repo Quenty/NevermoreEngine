@@ -1,24 +1,19 @@
-# v5.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: GradePalette can take in Color3 value ([@Quenty](https://github.com/Quenty))
-- fix: Vividness handling for custom colors is more consistent ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.34.0...@quenty/colorpalette@5.0.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* GradePalette can take in Color3 value ([642796d](https://github.com/Quenty/NevermoreEngine/commit/642796d24e23f0691f0ee324e646c89c4396ee6e))
+* Vividness handling for custom colors is more consistent ([539fbee](https://github.com/Quenty/NevermoreEngine/commit/539fbeed18aaaeefaa9772ba9ca4f7fd8084e710))
+
+
+
+
 
 # [4.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@4.33.0...@quenty/colorpalette@4.34.0) (2023-09-21)
 

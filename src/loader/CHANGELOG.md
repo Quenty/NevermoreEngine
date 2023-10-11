@@ -1,23 +1,15 @@
-# v7.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix; Remove hardcoded holding binders being shared ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.3.0...@quenty/loader@7.0.0) (2023-10-11)
+
+**Note:** Version bump only for package @quenty/loader
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.2.1...@quenty/loader@6.3.0) (2023-08-23)
 

@@ -1,23 +1,18 @@
-# v4.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add forceCreate to PreferredParentUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@3.2.0...@quenty/preferredparentutils@4.0.0) (2023-10-11)
+
+
+### Features
+
+* Add forceCreate to PreferredParentUtils ([ab0c5e4](https://github.com/Quenty/NevermoreEngine/commit/ab0c5e473a9bdb21de9d105232f5ff8d39f51ad2))
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/preferredparentutils@3.1.0...@quenty/preferredparentutils@3.2.0) (2023-09-21)
 

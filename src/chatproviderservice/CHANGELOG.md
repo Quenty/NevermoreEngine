@@ -1,23 +1,18 @@
-# v4.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: JSONTranslator can exist on server and generate translation keys (improved ergonomics) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@3.12.0...@quenty/chatproviderservice@4.0.0) (2023-10-11)
+
+
+### Features
+
+* JSONTranslator can exist on server and generate translation keys (improved ergonomics) ([84b84b5](https://github.com/Quenty/NevermoreEngine/commit/84b84b5587b9cfebad9b9bbda7694ba714188d9c))
+
+
+
+
 
 # [3.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@3.11.0...@quenty/chatproviderservice@3.12.0) (2023-09-21)
 

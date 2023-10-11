@@ -1,23 +1,18 @@
-# v10.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add Ragdoll interface ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.37.0...@quenty/ragdoll@10.0.0) (2023-10-11)
+
+
+### Features
+
+* Add Ragdoll interface ([4c785b3](https://github.com/Quenty/NevermoreEngine/commit/4c785b3a2d828256525e784abd3f9dffaae6e0e7))
+
+
+
+
 
 # [9.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@9.36.0...@quenty/ragdoll@9.37.0) (2023-09-21)
 

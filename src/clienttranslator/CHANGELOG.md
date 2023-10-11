@@ -1,28 +1,24 @@
-# v9.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: JSONTranslator can exist on server and generate translation keys (improved ergonomics) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix localization table replication ([@Quenty](https://github.com/Quenty))
-- fix: Fix localization firing after close ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.32.0...@quenty/clienttranslator@9.0.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* Fix localization firing after close ([aa1ab9b](https://github.com/Quenty/NevermoreEngine/commit/aa1ab9b0a21f9eab19e159012931b0114b24cad0))
+* Fix localization table replication ([c1a7b0a](https://github.com/Quenty/NevermoreEngine/commit/c1a7b0a4105af1a9e6959d0836447ffb8835c0f2))
+
+
+### Features
+
+* JSONTranslator can exist on server and generate translation keys (improved ergonomics) ([84b84b5](https://github.com/Quenty/NevermoreEngine/commit/84b84b5587b9cfebad9b9bbda7694ba714188d9c))
+
+
+
+
 
 # [8.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@8.31.0...@quenty/clienttranslator@8.32.0) (2023-09-21)
 

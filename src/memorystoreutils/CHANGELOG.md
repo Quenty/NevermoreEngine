@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memorystoreutils@2.8.0...@quenty/memorystoreutils@3.0.0) (2023-10-11)
+
+**Note:** Version bump only for package @quenty/memorystoreutils
+
+
+
+
+
 # [2.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/memorystoreutils@2.7.0...@quenty/memorystoreutils@2.8.0) (2023-08-23)
 
 **Note:** Version bump only for package @quenty/memorystoreutils

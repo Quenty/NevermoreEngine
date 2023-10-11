@@ -1,23 +1,18 @@
-# v6.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix LuvColor3Utils lerping logic ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.30.0...@quenty/color3utils@6.0.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* Fix LuvColor3Utils lerping logic ([b3bb154](https://github.com/Quenty/NevermoreEngine/commit/b3bb154f507977726a117b8d366600b73f04cc52))
+
+
+
+
 
 # [5.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/color3utils@5.29.0...@quenty/color3utils@5.30.0) (2023-09-21)
 

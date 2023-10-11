@@ -1,20 +1,21 @@
-# v7.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-- feat!: Refactor contract for Blend.Find and add [Blend.Tags] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.29.0...@quenty/blend@7.0.0) (2023-10-11)
+
+
+* feat!: Refactor contract for Blend.Find and add [Blend.Tags] ([ecab2ff](https://github.com/Quenty/NevermoreEngine/commit/ecab2ffc2c0da9da1bd9ee8c7edfe5dd3cf29711))
+
+
+### BREAKING CHANGES
+
+* Find now takes a class name, not a name
+
+
+
+
 
 # [6.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@6.28.0...@quenty/blend@6.29.0) (2023-09-21)
 

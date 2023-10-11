@@ -1,23 +1,18 @@
-# v3.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: CIrlceUtils handles edge case properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.7.0...@quenty/geometryutils@3.0.0) (2023-10-11)
+
+
+### Bug Fixes
+
+* CIrlceUtils handles edge case properly ([1103664](https://github.com/Quenty/NevermoreEngine/commit/1103664a23a1fad747d440e4e09476e626413d94))
+
+
+
+
 
 # [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.6.0...@quenty/geometryutils@2.7.0) (2023-08-23)
 

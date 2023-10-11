@@ -1,28 +1,19 @@
-# v3.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add GetProbability ([@Quenty](https://github.com/Quenty))
-- feat: Add WeightedRandomChooser ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- style: Fix doc strings and style ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@2.3.0...@quenty/randomutils@3.0.0) (2023-10-11)
+
+
+### Features
+
+* Add GetProbability ([2267080](https://github.com/Quenty/NevermoreEngine/commit/2267080fc6c1c53153f15cd9f638bddbff2371b7))
+* Add WeightedRandomChooser ([b0cdcd1](https://github.com/Quenty/NevermoreEngine/commit/b0cdcd1ab69104535683609469cd806e647ef000))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@2.2.0...@quenty/randomutils@2.3.0) (2023-08-23)
 

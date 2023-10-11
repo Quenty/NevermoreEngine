@@ -1,23 +1,18 @@
-# v8.0.0 (Wed Oct 11 2023)
-
-#### 💥 Breaking Change
-
-- Users/quenty/improvements [#417](https://github.com/Quenty/NevermoreEngine/pull/417) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- feat: Add helper methods to RxR15Utils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.22.0...@quenty/r15utils@8.0.0) (2023-10-11)
+
+
+### Features
+
+* Add helper methods to RxR15Utils ([8b60f4c](https://github.com/Quenty/NevermoreEngine/commit/8b60f4c1c1e3c74efd506fdef1ee98047b5aaa3d))
+
+
+
+
 
 # [7.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@7.21.0...@quenty/r15utils@7.22.0) (2023-09-21)
 
