@@ -1,3 +1,16 @@
+# (Thu Oct 12 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/observablecollection@6.1.0`
+  - feat: Add ObservableMapSet:GetKeyList() [#419](https://github.com/Quenty/NevermoreEngine/pull/419) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Oct 11 2023)
 
 #### 🐛 Bug Fix
