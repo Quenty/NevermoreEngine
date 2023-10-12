@@ -6,8 +6,8 @@
 <title data-rh="true">ObservableMapSet | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/ObservableMapSet"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="ObservableMapSet | Nevermore"><meta data-rh="true" name="description" content="Holds a map of sets. That is, for a given key, a set of all valid entries. This is great
 for looking up something that may have duplicate keys, like configurations or other things."><meta data-rh="true" property="og:description" content="Holds a map of sets. That is, for a given key, a set of all valid entries. This is great
 for looking up something that may have duplicate keys, like configurations or other things."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/ObservableMapSet"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ObservableMapSet" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ObservableMapSet" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.02577399.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.527d0bf0.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.ac9306d9.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.30efea9d.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -57,19 +57,21 @@ for looking up something that may have duplicate keys, like configurations or ot
     <p>If <code>observeKey</code> emits nil then the value will be excluded from the map.</p>
   </div>
 </div>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetSetCount"><code style="text-decoration:none">GetSetCount</code><a href="#GetSetCount" class="hash-link" aria-label="Direct link to GetSetCount" title="Direct link to GetSetCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L137"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetSetCount</code><code>(</code><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetKeyList"><code style="text-decoration:none">GetKeyList</code><a href="#GetKeyList" class="hash-link" aria-label="Direct link to GetKeyList" title="Direct link to GetKeyList">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L137"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetKeyList</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">TKey</code><code class="purple_ieR2">}</code></div><div>
+<p>Gets a list of all keys.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetSetCount"><code style="text-decoration:none">GetSetCount</code><a href="#GetSetCount" class="hash-link" aria-label="Direct link to GetSetCount" title="Direct link to GetSetCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L149"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetSetCount</code><code>(</code><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Gets how many sets exist</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveSetCount"><code style="text-decoration:none">ObserveSetCount</code><a href="#ObserveSetCount" class="hash-link" aria-label="Direct link to ObserveSetCount" title="Direct link to ObserveSetCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L145"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">ObserveSetCount</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveSetCount"><code style="text-decoration:none">ObserveSetCount</code><a href="#ObserveSetCount" class="hash-link" aria-label="Direct link to ObserveSetCount" title="Direct link to ObserveSetCount">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L157"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">ObserveSetCount</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes how many sets exist</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveItemsForKeyBrio"><code style="text-decoration:none">ObserveItemsForKeyBrio</code><a href="#ObserveItemsForKeyBrio" class="hash-link" aria-label="Direct link to ObserveItemsForKeyBrio" title="Direct link to ObserveItemsForKeyBrio">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L154"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">ObserveItemsForKeyBrio</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">TValue</code><code class="op_lSLc">&gt;</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="ObserveItemsForKeyBrio"><code style="text-decoration:none">ObserveItemsForKeyBrio</code><a href="#ObserveItemsForKeyBrio" class="hash-link" aria-label="Direct link to ObserveItemsForKeyBrio" title="Direct link to ObserveItemsForKeyBrio">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L166"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">ObserveItemsForKeyBrio</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Brio">Brio</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">TValue</code><code class="op_lSLc">&gt;</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes all items for the given key</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFirstItemForKey"><code style="text-decoration:none">GetFirstItemForKey</code><a href="#GetFirstItemForKey" class="hash-link" aria-label="Direct link to GetFirstItemForKey" title="Direct link to GetFirstItemForKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L196"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetFirstItemForKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="blue_P4bS">TValue</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFirstItemForKey"><code style="text-decoration:none">GetFirstItemForKey</code><a href="#GetFirstItemForKey" class="hash-link" aria-label="Direct link to GetFirstItemForKey" title="Direct link to GetFirstItemForKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L208"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetFirstItemForKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="blue_P4bS">TValue</code></div><div>
 <p>Gets the first item for the given key</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetListForKey"><code style="text-decoration:none">GetListForKey</code><a href="#GetListForKey" class="hash-link" aria-label="Direct link to GetListForKey" title="Direct link to GetListForKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L212"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetListForKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">TValue</code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetListForKey"><code style="text-decoration:none">GetListForKey</code><a href="#GetListForKey" class="hash-link" aria-label="Direct link to GetListForKey" title="Direct link to GetListForKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L224"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetListForKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">TValue</code><code class="purple_ieR2">}</code></div><div>
 <p>Gets a list for a given key</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetObservableSetForKey"><code style="text-decoration:none">GetObservableSetForKey</code><a href="#GetObservableSetForKey" class="hash-link" aria-label="Direct link to GetObservableSetForKey" title="Direct link to GetObservableSetForKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L228"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetObservableSetForKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ObservableSet">ObservableSet</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">TValue</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetObservableSetForKey"><code style="text-decoration:none">GetObservableSetForKey</code><a href="#GetObservableSetForKey" class="hash-link" aria-label="Direct link to GetObservableSetForKey" title="Direct link to GetObservableSetForKey">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L240"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">GetObservableSetForKey</code><code>(</code><code>key<!-- -->: </code><code class="blue_P4bS">TKey</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ObservableSet">ObservableSet</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">TValue</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Gets the observable set for the given key</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L347"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/observablecollection/src/Shared/ObservableMapSet.lua#L359"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ObservableMapSet<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Cleans up the ObservableMapSet and sets the metatable to nil.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -144,6 +146,22 @@ for looking up something that may have duplicate keys, like configurations or ot
             }
         },
         {
+            &quot;name&quot;: &quot;GetKeyList&quot;,
+            &quot;desc&quot;: &quot;Gets a list of all keys.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;{ TKey }&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 137,
+                &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;GetSetCount&quot;,
             &quot;desc&quot;: &quot;Gets how many sets exist&quot;,
             &quot;params&quot;: [],
@@ -155,7 +173,7 @@ for looking up something that may have duplicate keys, like configurations or ot
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 137,
+                &quot;line&quot;: 149,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
             }
         },
@@ -171,7 +189,7 @@ for looking up something that may have duplicate keys, like configurations or ot
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 145,
+                &quot;line&quot;: 157,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
             }
         },
@@ -193,7 +211,7 @@ for looking up something that may have duplicate keys, like configurations or ot
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 154,
+                &quot;line&quot;: 166,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
             }
         },
@@ -215,7 +233,7 @@ for looking up something that may have duplicate keys, like configurations or ot
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 196,
+                &quot;line&quot;: 208,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
             }
         },
@@ -237,7 +255,7 @@ for looking up something that may have duplicate keys, like configurations or ot
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 212,
+                &quot;line&quot;: 224,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
             }
         },
@@ -259,7 +277,7 @@ for looking up something that may have duplicate keys, like configurations or ot
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 228,
+                &quot;line&quot;: 240,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
             }
         },
@@ -270,7 +288,7 @@ for looking up something that may have duplicate keys, like configurations or ot
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 347,
+                &quot;line&quot;: 359,
                 &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
             }
         }
@@ -304,8 +322,8 @@ for looking up something that may have duplicate keys, like configurations or ot
         &quot;line&quot;: 7,
         &quot;path&quot;: &quot;src/observablecollection/src/Shared/ObservableMapSet.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#SetAdded" class="table-of-contents__link toc-highlight">SetAdded</a></li><li><a href="#SetRemoved" class="table-of-contents__link toc-highlight">SetRemoved</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#GetFirstItemForKey" class="table-of-contents__link toc-highlight">:GetFirstItemForKey</a></li><li><a href="#GetListForKey" class="table-of-contents__link toc-highlight">:GetListForKey</a></li><li><a href="#GetObservableSetForKey" class="table-of-contents__link toc-highlight">:GetObservableSetForKey</a></li><li><a href="#GetSetCount" class="table-of-contents__link toc-highlight">:GetSetCount</a></li><li><a href="#ObserveItemsForKeyBrio" class="table-of-contents__link toc-highlight">:ObserveItemsForKeyBrio</a></li><li><a href="#ObserveSetCount" class="table-of-contents__link toc-highlight">:ObserveSetCount</a></li><li><a href="#Push" class="table-of-contents__link toc-highlight">:Push</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.02577399.js"></script>
-<script src="/NevermoreEngine/assets/js/main.527d0bf0.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#SetAdded" class="table-of-contents__link toc-highlight">SetAdded</a></li><li><a href="#SetRemoved" class="table-of-contents__link toc-highlight">SetRemoved</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Add" class="table-of-contents__link toc-highlight">:Add</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#GetFirstItemForKey" class="table-of-contents__link toc-highlight">:GetFirstItemForKey</a></li><li><a href="#GetKeyList" class="table-of-contents__link toc-highlight">:GetKeyList</a></li><li><a href="#GetListForKey" class="table-of-contents__link toc-highlight">:GetListForKey</a></li><li><a href="#GetObservableSetForKey" class="table-of-contents__link toc-highlight">:GetObservableSetForKey</a></li><li><a href="#GetSetCount" class="table-of-contents__link toc-highlight">:GetSetCount</a></li><li><a href="#ObserveItemsForKeyBrio" class="table-of-contents__link toc-highlight">:ObserveItemsForKeyBrio</a></li><li><a href="#ObserveSetCount" class="table-of-contents__link toc-highlight">:ObserveSetCount</a></li><li><a href="#Push" class="table-of-contents__link toc-highlight">:Push</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.ac9306d9.js"></script>
+<script src="/NevermoreEngine/assets/js/main.30efea9d.js"></script>
 </body>
 </html>
