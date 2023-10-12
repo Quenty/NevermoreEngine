@@ -1,20 +1,18 @@
-# v6.1.0 (Thu Oct 12 2023)
-
-#### 🚀 Enhancement
-
-- feat: Add ObservableMapSet:GetKeyList() [#419](https://github.com/Quenty/NevermoreEngine/pull/419) ([@Quenty](https://github.com/Quenty))
-- feat: Add ObservableMapSet:GetKeyList() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.0.0...@quenty/observablecollection@6.1.0) (2023-10-12)
+
+
+### Features
+
+* Add ObservableMapSet:GetKeyList() ([a1141f4](https://github.com/Quenty/NevermoreEngine/commit/a1141f43b900f5518dd798e0c35a383c575b1890))
+
+
+
+
 
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@5.26.0...@quenty/observablecollection@6.0.0) (2023-10-11)
 
