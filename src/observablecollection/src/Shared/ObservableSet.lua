@@ -26,11 +26,8 @@ function ObservableSet.new()
 	self._maid = Maid.new()
 	self._set = {}
 
-	self._containsObservables = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._containsObservables)
-
-	self._countValue = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._countValue)
+	self._containsObservables = self._maid:Add(ObservableSubscriptionTable.new())
+	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
 --[=[
 	Fires when an item is added
@@ -38,8 +35,7 @@ function ObservableSet.new()
 	@prop ItemAdded Signal<T>
 	@within ObservableSet
 ]=]
-	self.ItemAdded = Signal.new()
-	self._maid:GiveTask(self.ItemAdded)
+	self.ItemAdded = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when an item is removed.
@@ -47,8 +43,7 @@ function ObservableSet.new()
 	@prop ItemRemoved Signal<T>
 	@within ObservableSet
 ]=]
-	self.ItemRemoved = Signal.new()
-	self._maid:GiveTask(self.ItemRemoved)
+	self.ItemRemoved = self._maid:Add(Signal.new())
 
 --[=[
 	Fires when the count changes.
