@@ -131,6 +131,18 @@ function ObservableMapSet:Add(entry, observeKey)
 end
 
 --[=[
+	Gets a list of all keys.
+	@return { TKey }
+]=]
+function ObservableMapSet:GetKeyList()
+	local list = {}
+	for key, _ in pairs(self._observableSetMap) do
+		table.insert(list, key)
+	end
+	return list
+end
+
+--[=[
 	Gets how many sets exist
 	@return number
 ]=]
