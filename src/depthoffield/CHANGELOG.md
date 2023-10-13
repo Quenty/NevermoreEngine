@@ -1,3 +1,16 @@
+# v6.0.1 (Fri Oct 13 2023)
+
+#### 🐛 Bug Fix
+
+- fix: disable depth of field to fix boxing for now [#422](https://github.com/Quenty/NevermoreEngine/pull/422) ([@Quenty](https://github.com/Quenty))
+- fix: disable depth of field to fix boxing for now ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

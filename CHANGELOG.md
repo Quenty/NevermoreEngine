@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/depthoffield@6.0.1`
+  - fix: disable depth of field to fix boxing for now [#422](https://github.com/Quenty/NevermoreEngine/pull/422) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Oct 13 2023)
+
+#### 🐛 Bug Fix
+
 - `@quenty/datastore@8.0.1`
   - fix: Fix retrieving key set from datastore [#420](https://github.com/Quenty/NevermoreEngine/pull/420) ([@Quenty](https://github.com/Quenty))
 
