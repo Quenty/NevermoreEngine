@@ -30,11 +30,11 @@ function DepthOfFieldService:Init(_serviceBag)
 	self._maid:GiveTask(self._tweener)
 
 	-- Assume we can enable now that we've recorded values
-	self._depthOfField.InFocusRadius = self._tweener:GetOriginalRadius()
-	self._depthOfField.FocusDistance = self._tweener:GetOriginalDistance()
-	self._depthOfField.NearIntensity = self._tweener:GetOriginalNearIntensity()
-	self._depthOfField.FarIntensity = self._tweener:GetOriginalFarIntensity()
-	self._depthOfField.Enabled = true
+	-- self._depthOfField.InFocusRadius = self._tweener:GetOriginalRadius()
+	-- self._depthOfField.FocusDistance = self._tweener:GetOriginalDistance()
+	-- self._depthOfField.NearIntensity = self._tweener:GetOriginalNearIntensity()
+	-- self._depthOfField.FarIntensity = self._tweener:GetOriginalFarIntensity()
+	-- self._depthOfField.Enabled = true
 
 	self._maid:GiveTask(self._topOfStack.Changed:Connect(function(new, _old, maid)
 		if new then
@@ -128,7 +128,7 @@ function DepthOfFieldService:_getOrCreateDepthOfField()
 	depthOfField.FocusDistance = 500
 	depthOfField.InFocusRadius = 500
 	depthOfField.NearIntensity = 0.75
-	depthOfField.Enabled = true
+	depthOfField.Enabled = false
 	depthOfField.Parent = Lighting
 	self._maid:GiveTask(depthOfField)
 
