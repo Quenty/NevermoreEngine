@@ -378,7 +378,11 @@ end
 ]=]
 function DataStoreStage:PromiseKeySet()
 	return self:PromiseViewUpToDate():Then(function()
-		return Set.fromKeys(self._viewSnapshot)
+		if type(self._viewSnapshot) == "table" then
+			return Set.fromKeys(self._viewSnapshot)
+		else
+			return {}
+		end
 	end)
 end
 
