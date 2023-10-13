@@ -1,3 +1,16 @@
+# (Fri Oct 13 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@8.0.1`
+  - fix: Fix retrieving key set from datastore [#420](https://github.com/Quenty/NevermoreEngine/pull/420) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Oct 12 2023)
 
 #### 🚀 Enhancement
