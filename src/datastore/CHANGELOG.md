@@ -1,20 +1,18 @@
-# v8.0.1 (Fri Oct 13 2023)
-
-#### 🐛 Bug Fix
-
-- fix: Fix retrieving key set from datastore [#420](https://github.com/Quenty/NevermoreEngine/pull/420) ([@Quenty](https://github.com/Quenty))
-- fix: Fix retrieving key set from datastore ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.0.0...@quenty/datastore@8.0.1) (2023-10-13)
+
+
+### Bug Fixes
+
+* Fix retrieving key set from datastore ([2ec98e4](https://github.com/Quenty/NevermoreEngine/commit/2ec98e49fe511c868d6513deb350bfb1937d9a7d))
+
+
+
+
 
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@7.26.1...@quenty/datastore@8.0.0) (2023-10-11)
 
