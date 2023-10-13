@@ -40,7 +40,9 @@ function RxPlayerUtils.observePlayersBrio(predicate: (Player) -> boolean)
 		end))
 
 		for _, player in Players:GetPlayers() do
-			handlePlayer(player)
+			task.spawn(function()
+				handlePlayer(player)
+			end)
 		end
 
 		return maid
