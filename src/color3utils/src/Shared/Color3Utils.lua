@@ -49,7 +49,7 @@ end
 	@return Color3
 ]=]
 function Color3Utils.scaleValue(color3, percent)
-	local h, s, v = Color3.toHSV(color3)
+	local h, s, v = color3:ToHsv()
 	return Color3.fromHSV(h, s, percent*v)
 end
 
@@ -60,7 +60,7 @@ end
 	@return Color3
 ]=]
 function Color3Utils.setValue(color3, value)
-	local h, s, _ = Color3.toHSV(color3)
+	local h, s, _ = color3:ToHsv()
 	return Color3.fromHSV(h, s, value)
 end
 
@@ -71,7 +71,7 @@ end
 	@return Color3
 ]=]
 function Color3Utils.setHue(color3, hue)
-	local _, s, v = Color3.toHSV(color3)
+	local _, s, v = color3:ToHsv()
 	return Color3.fromHSV(hue, s, v)
 end
 
@@ -82,7 +82,7 @@ end
 	@return Color3
 ]=]
 function Color3Utils.scaleSaturation(color3, percent)
-	local h, s, v = Color3.toHSV(color3)
+	local h, s, v = color3:ToHsv()
 	return Color3.fromHSV(h, percent*s, v)
 end
 
@@ -93,7 +93,7 @@ end
 	@return Color3
 ]=]
 function Color3Utils.setSaturation(color3, saturation)
-	local h, _, v = Color3.toHSV(color3)
+	local h, _, v = color3:ToHsv()
 	return Color3.fromHSV(h, saturation, v)
 end
 
