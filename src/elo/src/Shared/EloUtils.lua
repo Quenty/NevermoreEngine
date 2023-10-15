@@ -5,34 +5,29 @@
 	```lua
 	local config = EloUtils.createConfig()
 
-	local playerRating = 1400
-	local opponentRating = 1800
+	local playerOneRating = 1400
+	local playerTwoRating = 1800
 
 	-- Update rating!
-	playerRating, opponentRating = EloUtils.getNewScores(
+	playerOneRating, playerTwoRating = EloUtils.getNewElo(
 		config,
-		playerRating,
-		opponentRating,
+		playerOneRating,
+		playerTwoRating,
 		{
-			EloUtils.Scores.WIN;
+			EloMatchResult.PLAYER_ONE_WIN;
 		})
 
 	-- New rankings!
-	print(playerRating, opponentRating)
+	print(playerOneRating, playerTwoRating)
 	```
 ]=]
 
-local EloUtils = {}
+local require = require(script.Parent.loader).load(script)
 
-EloUtils.Scores = setmetatable({
-	WIN = 1;
-	DRAW = 0.5;
-	LOSS = 0;
-}, {
-	__index = function()
-		error("Bad index onto EloUtils.Scores")
-	end;
-})
+local EloMatchResult = require("EloMatchResult")
+local EloMatchResultUtils = require("EloMatchResultUtils")
+
+local EloUtils = {}
 
 --[=[
 	@interface EloConfig
@@ -40,6 +35,7 @@ EloUtils.Scores = setmetatable({
 	.kfactor number | function
 	.initial number
 	.ratingFloor number
+	.groupMultipleResultAsOne boolean
 	@within EloUtils
 ]=]
 
@@ -56,6 +52,7 @@ function EloUtils.createConfig(config)
 		kfactor = config.kfactor or EloUtils.standardKFactorFormula;
 		initial = config.initial or 1400;
 		ratingFloor = config.ratingFloor or 100;
+		groupMultipleResultAsOne = false;
 	}
 end
 
@@ -73,38 +70,60 @@ end
 	Gets the new score for the player and opponent after a series of matches.
 
 	@param config EloConfig
-	@param playerRating number
-	@param opponentRating number
-	@param matchScores { number } -- 0 for loss, 1 for win, 0.5 for draw.
-	@return number -- playerRating
-	@return number -- opponentRating
+	@param playerOneRating number
+	@param playerTwoRating number
+	@param eloMatchResultList { EloMatchResult }
+	@return number -- playerOneRating
+	@return number -- playerTwoRating
 ]=]
-function EloUtils.getNewScores(config, playerRating, opponentRating, matchScores)
+function EloUtils.getNewElo(config, playerOneRating, playerTwoRating, eloMatchResultList)
 	assert(EloUtils.isEloConfig(config), "Bad config")
-	assert(type(playerRating) == "number", "Bad playerRating")
-	assert(type(opponentRating) == "number", "Bad opponentRating")
-	assert(type(matchScores) == "table", "Bad matchScores")
+	assert(type(playerOneRating) == "number", "Bad playerOneRating")
+	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
+	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
-	return EloUtils.getNewScore(config, playerRating, opponentRating, matchScores),
-		EloUtils.getNewScore(config, opponentRating, playerRating, EloUtils.fromOpponentPerspective(matchScores))
+	local newPlayerOneRating = EloUtils.getNewPlayerOneScore(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	local newPlayerTwoRating = EloUtils.getNewPlayerOneScore(config, playerTwoRating, playerOneRating, EloUtils.fromOpponentPerspective(eloMatchResultList))
+	return newPlayerOneRating, newPlayerTwoRating
 end
 
+--[=[
+	Gets the change in elo for the given players and the results
+
+	@param config EloConfig
+	@param playerOneRating number
+	@param playerTwoRating number
+	@param eloMatchResultList { EloMatchResult }
+	@return number -- playerOneRating
+	@return number -- playerTwoRating
+]=]
+function EloUtils.getEloChange(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	assert(EloUtils.isEloConfig(config), "Bad config")
+	assert(type(playerOneRating) == "number", "Bad playerOneRating")
+	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
+	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
+
+	local newPlayerOneRating, newPlayerTwoRating = EloUtils.getNewElo(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	local playerOneChange = newPlayerOneRating - playerOneRating
+	local playerTwoChange = newPlayerTwoRating - playerTwoRating
+	return playerOneChange, playerTwoChange
+end
 
 --[=[
 	Gets the new score for the player after a series of matches.
 
 	@param config EloConfig
-	@param playerRating number
-	@param opponentRating number
-	@param matchScores { number } -- 0 for loss, 1 for win, 0.5 for draw.
+	@param playerOneRating number
+	@param playerTwoRating number
+	@param eloMatchResultList { EloMatchResult }
 ]=]
-function EloUtils.getNewScore(config, playerRating, opponentRating, matchScores)
+function EloUtils.getNewPlayerOneScore(config, playerOneRating, playerTwoRating, eloMatchResultList)
 	assert(EloUtils.isEloConfig(config), "Bad config")
-	assert(type(playerRating) == "number", "Bad playerRating")
-	assert(type(opponentRating) == "number", "Bad opponentRating")
-	assert(type(matchScores) == "table", "Bad matchScores")
+	assert(type(playerOneRating) == "number", "Bad playerOneRating")
+	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
+	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
-	return math.max(config.ratingFloor, playerRating + EloUtils.getScoreAdjustment(config, playerRating, opponentRating, matchScores))
+	return math.max(config.ratingFloor, playerOneRating + EloUtils.getPlayerOneScoreAdjustment(config, playerOneRating, playerTwoRating, eloMatchResultList))
 end
 
 --[=[
@@ -115,16 +134,16 @@ end
 	:::
 
 	@param config EloConfig
-	@param playerRating number
-	@param opponentRating number
+	@param playerOneRating number
+	@param playerTwoRating number
 	@return number
 ]=]
-function EloUtils.getExpected(config, playerRating, opponentRating)
+function EloUtils.getPlayerOneExpected(config, playerOneRating, playerTwoRating)
 	assert(EloUtils.isEloConfig(config), "Bad config")
-	assert(type(playerRating) == "number", "Bad playerRating")
-	assert(type(opponentRating) == "number", "Bad opponentRating")
+	assert(type(playerOneRating) == "number", "Bad playerOneRating")
+	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
 
-	local diff = opponentRating - playerRating
+	local diff = playerTwoRating - playerOneRating
 	return 1 / (1 + 10 ^ (diff / config.factor))
 end
 
@@ -132,44 +151,95 @@ end
 	Gets the score adjustment for a given player's base.
 
 	@param config EloConfig
-	@param playerRating number
-	@param opponentRating number
-	@param matchScores { number } -- 0 for loss, 1 for win, 0.5 for draw.
+	@param playerOneRating number
+	@param playerTwoRating number
+	@param eloMatchResultList { EloMatchResult }
 	@return number
 ]=]
-function EloUtils.getScoreAdjustment(config, playerRating, opponentRating, matchScores)
+function EloUtils.getPlayerOneScoreAdjustment(config, playerOneRating, playerTwoRating, eloMatchResultList)
 	assert(EloUtils.isEloConfig(config), "Bad config")
-	assert(type(playerRating) == "number", "Bad playerRating")
-	assert(type(opponentRating) == "number", "Bad opponentRating")
-	assert(type(matchScores) == "table", "Bad matchScores")
+	assert(type(playerOneRating) == "number", "Bad playerOneRating")
+	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
+	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
 	local adjustment = 0
-	local expected = EloUtils.getExpected(config, playerRating, opponentRating)
+	local expected = EloUtils.getPlayerOneExpected(config, playerOneRating, playerTwoRating)
 
-	for _, score in pairs(matchScores) do
-		adjustment = adjustment + (score - expected)
+	if config.groupMultipleResultAsOne then
+		local wins = EloUtils.countPlayerOneWins(eloMatchResultList)
+		local losses = EloUtils.countPlayerTwoWins(eloMatchResultList)
+		local score = wins > losses and 1 or 0
+		local multiplier = 1
+
+		if wins > losses then
+			multiplier = wins
+		else
+			multiplier = losses
+		end
+
+		adjustment = multiplier*(score - expected)
+	else
+		for _, score in pairs(eloMatchResultList) do
+			adjustment = adjustment + (score - expected)
+		end
 	end
 
-	local kfactor = EloUtils.extractKFactor(config, playerRating)
+	local kfactor = EloUtils.extractKFactor(config, playerOneRating)
 	return kfactor*adjustment
 end
 
 --[=[
 	Flips the scores for the opponent
 
-	@param matchScores { number } -- 0 for loss, 1 for win, 0.5 for draw.
+	@param eloMatchResultList { EloMatchResult }
 	@return { number }
 ]=]
-function EloUtils.fromOpponentPerspective(matchScores)
-	assert(type(matchScores) == "table", "Bad matchScores")
+function EloUtils.fromOpponentPerspective(eloMatchResultList)
+	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
 	local newScores = {}
 
-	for index, score in pairs(matchScores) do
+	for index, score in pairs(eloMatchResultList) do
 		newScores[index] = 1 - score
 	end
 
 	return newScores
+end
+
+--[=[
+	Counts the number of wins for player one
+
+	@param eloMatchResultList { EloMatchResult }
+	@return { number }
+]=]
+function EloUtils.countPlayerOneWins(eloMatchResultList)
+	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
+
+	local count = 0
+	for _, score in pairs(eloMatchResultList) do
+		if score == EloMatchResult.PLAYER_ONE_WIN then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+--[=[
+	Counts the number of wins for player two
+
+	@param eloMatchResultList { EloMatchResult }
+	@return { number }
+]=]
+function EloUtils.countPlayerTwoWins(eloMatchResultList)
+	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
+
+	local count = 0
+	for _, score in pairs(eloMatchResultList) do
+		if score == EloMatchResult.PLAYER_TWO_WIN then
+			count = count + 1
+		end
+	end
+	return count
 end
 
 --[=[

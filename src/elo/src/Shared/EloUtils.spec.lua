@@ -6,7 +6,7 @@
 local EloUtils = require(script.Parent.EloUtils)
 
 return function()
-	describe("EloUtils.getNewScores", function()
+	describe("EloUtils.getNewElo", function()
 		local config = EloUtils.createConfig()
 
 		local playerRating = 1400
@@ -17,12 +17,12 @@ return function()
 		local newPlayerDrawRating, newOpponentDrawRating
 
 		it("should change on win", function()
-			newPlayerWinRating, newOpponentWinRating = EloUtils.getNewScores(
+			newPlayerWinRating, newOpponentWinRating = EloUtils.getNewElo(
 				config,
 				playerRating,
 				opponentRating,
 				{
-					EloUtils.Scores.WIN;
+					EloUtils.MatchResult.PLAYER_ONE_WIN;
 				})
 
 			expect(newPlayerWinRating > playerRating).to.equal(true)
@@ -30,12 +30,12 @@ return function()
 		end)
 
 		it("should change on a loss", function()
-			newPlayerLossRating, newOpponentLossRating = EloUtils.getNewScores(
+			newPlayerLossRating, newOpponentLossRating = EloUtils.getNewElo(
 				config,
 				playerRating,
 				opponentRating,
 				{
-					EloUtils.Scores.LOSS;
+					EloUtils.MatchResult.PLAYER_TWO_WIN;
 				})
 
 			expect(newPlayerLossRating < playerRating).to.equal(true)
@@ -43,12 +43,12 @@ return function()
 		end)
 
 		it("should change on a draw", function()
-			newPlayerDrawRating, newOpponentDrawRating = EloUtils.getNewScores(
+			newPlayerDrawRating, newOpponentDrawRating = EloUtils.getNewElo(
 				config,
 				playerRating,
 				opponentRating,
 				{
-					EloUtils.Scores.DRAW;
+					EloUtils.MatchResult.DRAW;
 				})
 
 			expect(newPlayerDrawRating > playerRating).to.equal(true)
