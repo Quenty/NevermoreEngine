@@ -27,5 +27,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "@quenty/blend": "file:../blend",
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid"
   }
 }
