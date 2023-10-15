@@ -275,9 +275,9 @@ function ObservableMapList:_removeFromList(key, entry)
 end
 
 function ObservableMapList:_removeList(key)
-	local list = self._observableLists[key]
+	local list = self._observableMapOfLists:Get(key)
 	if list then
-		self._observableLists[key] = nil
+		self._observableMapOfLists:Set(key, nil)
 		self._maid[list] = nil
 	end
 end
