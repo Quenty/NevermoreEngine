@@ -1,3 +1,16 @@
+# (Sun Oct 15 2023)
+
+#### 💥 Breaking Change
+
+- `@quenty/elo@2.0.0`
+  - feat!: Refactor EloUtils to be easier to use and visualize elo utils [#424](https://github.com/Quenty/NevermoreEngine/pull/424) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Oct 13 2023)
 
 #### 🐛 Bug Fix
