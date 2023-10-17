@@ -1,5 +1,18 @@
 # (Tue Oct 17 2023)
 
+#### 🚀 Enhancement
+
+- `@quenty/playerutils@3.1.0`
+  - fix: no yield so task spawn in for loop [#421](https://github.com/Quenty/NevermoreEngine/pull/421) ([@imagerymartin](https://github.com/imagerymartin))
+
+#### Authors: 1
+
+- Martin Cardenas ([@imagerymartin](https://github.com/imagerymartin))
+
+---
+
+# (Tue Oct 17 2023)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
