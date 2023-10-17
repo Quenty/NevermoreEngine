@@ -37,10 +37,9 @@ local stateTypes = {
 	@param fireCallback function?
 	@param failCallback function?
 	@param completeCallback function?
-	@param onSubscribe () -> MaidTask
 	@return Subscription
 ]=]
-function Subscription.new(fireCallback, failCallback, completeCallback, onSubscribe)
+function Subscription.new(fireCallback, failCallback, completeCallback)
 	assert(type(fireCallback) == "function" or fireCallback == nil, "Bad fireCallback")
 	assert(type(failCallback) == "function" or failCallback == nil, "Bad failCallback")
 	assert(type(completeCallback) == "function" or completeCallback == nil, "Bad completeCallback")
@@ -51,7 +50,6 @@ function Subscription.new(fireCallback, failCallback, completeCallback, onSubscr
 		_fireCallback = fireCallback;
 		_failCallback = failCallback;
 		_completeCallback = completeCallback;
-		_onSubscribe = onSubscribe;
 	}, Subscription)
 end
 
