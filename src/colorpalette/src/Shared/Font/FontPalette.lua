@@ -28,8 +28,7 @@ function FontPalette.new()
 	self._fontFaces = {}
 	self._defaultFontMap = {} -- [name] = Enum.Font.?
 
-	self.FontAdded = Signal.new() -- :Fire(name)
-	self._maid:GiveTask(self.FontAdded)
+	self.FontAdded = self._maid:Add(Signal.new()) -- :Fire(name)
 
 	return self
 end
@@ -123,7 +122,7 @@ function FontPalette:GetFontFaceValue(fontName)
 
 	local fontValue = self._fontFaces[fontName]
 	if not fontValue then
-		error(("No font with name %q"):format(fontName))
+		error(string.format("No font with name %q", fontName))
 	end
 
 	return fontValue
@@ -140,7 +139,7 @@ function FontPalette:GetFontValue(fontName)
 
 	local fontValue = self._fonts[fontName]
 	if not fontValue then
-		error(("No font with name %q"):format(fontName))
+		error(string.format("No font with name %q", fontName))
 	end
 
 	return fontValue
