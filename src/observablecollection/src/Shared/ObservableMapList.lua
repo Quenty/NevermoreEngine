@@ -204,7 +204,7 @@ end
 	@param key TKey
 	@return { TValue }
 ]=]
-function ObservableMapList:GetListForKey(key)
+function ObservableMapList:GetListFromKey(key)
 	assert(key ~= nil, "Bad key")
 
 	local observableList = self:GetListForKey(key)
@@ -226,10 +226,16 @@ function ObservableMapList:GetListForKey(key)
 	return self._observableMapOfLists:Get(key)
 end
 
-function ObservableMapList:ObserveListBrio(key)
+function ObservableMapList:ObserveList(key)
 	assert(key ~= nil, "Bad key")
 
 	return self._observableMapOfLists:ObserveAtKey(key)
+end
+
+function ObservableMapList:ObserveListBrio(key)
+	assert(key ~= nil, "Bad key")
+
+	return self._observableMapOfLists:ObserveAtKeyBrio(key)
 end
 
 function ObservableMapList:ObserveCountForKey(key)
@@ -269,9 +275,9 @@ function ObservableMapList:_removeFromList(key, entry)
 end
 
 function ObservableMapList:_removeList(key)
-	local list = self._observableLists[key]
+	local list = self._observableMapOfLists:Get(key)
 	if list then
-		self._observableLists[key] = nil
+		self._observableMapOfLists:Set(key, nil)
 		self._maid[list] = nil
 	end
 end
