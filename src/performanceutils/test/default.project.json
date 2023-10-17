@@ -1,0 +1,11 @@
+{
+  "name": "PerformanceUtilsTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "performanceutils": {
+        "$path": ".."
+      }
+    }
+  }
+}
