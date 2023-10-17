@@ -1,3 +1,20 @@
+# (Tue Oct 17 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@6.1.1`
+  - fix: Fix function implementations/names in ObservableList [#423](https://github.com/Quenty/NevermoreEngine/pull/423) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # (Sun Oct 15 2023)
 
 #### 💥 Breaking Change

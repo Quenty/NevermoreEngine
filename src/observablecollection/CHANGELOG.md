@@ -1,3 +1,19 @@
+# v6.1.1 (Tue Oct 17 2023)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Fix function implementations/names in ObservableList [#423](https://github.com/Quenty/NevermoreEngine/pull/423) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
