@@ -1,23 +1,18 @@
-# v6.1.1 (Tue Oct 17 2023)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Fix function implementations/names in ObservableList [#423](https://github.com/Quenty/NevermoreEngine/pull/423) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 1
-
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [6.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.1.0...@quenty/observablecollection@6.1.1) (2023-10-17)
+
+
+### Bug Fixes
+
+* Fix function implementations/names in ObservableList ([#423](https://github.com/Quenty/NevermoreEngine/issues/423)) ([cf3ece3](https://github.com/Quenty/NevermoreEngine/commit/cf3ece3866564f3f6af71815939ce0d984d9c3b1))
+
+
+
+
 
 # [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.0.0...@quenty/observablecollection@6.1.0) (2023-10-12)
 
