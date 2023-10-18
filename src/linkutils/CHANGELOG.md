@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linkutils@8.0.0...@quenty/linkutils@8.1.0) (2023-10-18)
+
+**Note:** Version bump only for package @quenty/linkutils
+
+
+
+
+
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linkutils@7.21.0...@quenty/linkutils@8.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/linkutils

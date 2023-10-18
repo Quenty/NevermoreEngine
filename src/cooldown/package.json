@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cooldown",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "description": "Generalized networked cooldown system for Roblox",
   "keywords": [
     "Roblox",
