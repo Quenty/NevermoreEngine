@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[39321],{79764:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"PerformanceUtils","desc":"","source":{"line":4,"path":"src/performanceutils/src/Shared/PerformanceUtils.lua"}}')}}]);
