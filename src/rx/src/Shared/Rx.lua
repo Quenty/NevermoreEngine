@@ -1392,18 +1392,20 @@ end
 function Rx.combineLatest(observables)
 	assert(type(observables) == "table", "Bad observables")
 
-	return Observable.new(function(sub)
-		local pending = 0
-
-		local latest = {}
-		for key, value in pairs(observables) do
-			if Observable.isObservable(value) then
-				pending = pending + 1
-				latest[key] = UNSET_VALUE
-			else
-				latest[key] = value
-			end
+	local initialPending = 0
+	local defaultLatest = {}
+	for key, value in pairs(observables) do
+		if Observable.isObservable(value) then
+			initialPending = initialPending + 1
+			defaultLatest[key] = UNSET_VALUE
+		else
+			defaultLatest[key] = value
 		end
+	end
+
+	return Observable.new(function(sub)
+		local pending = initialPending
+		local latest = table.clone(defaultLatest)
 
 		if pending == 0 then
 			sub:Fire(latest)
