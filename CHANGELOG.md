@@ -1,3 +1,16 @@
+# (Wed Oct 18 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/colorpalette@5.1.0`, `@quenty/performanceutils@1.1.0`, `@quenty/rx@8.1.0`
+  - Users/quenty/updates [#425](https://github.com/Quenty/NevermoreEngine/pull/425) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Oct 17 2023)
 
 #### 🚀 Enhancement
