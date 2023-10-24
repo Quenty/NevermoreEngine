@@ -265,8 +265,8 @@ function ObservableMapList:_removeFromList(key, entry)
 		return
 	end
 
-	if list:Contains(entry) then
-		list:Remove(entry)
+	if list:Get(entry) ~= nil then
+		list:RemoveFirst(entry)
 
 		if list:GetCount() == 0 then
 			self:_removeList(key)
