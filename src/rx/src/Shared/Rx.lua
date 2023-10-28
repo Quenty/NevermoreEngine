@@ -1671,9 +1671,9 @@ function Rx.timer(initialDelaySeconds, seconds)
 			end
 		end)
 
+		maid:GiveTask(thread)
 		maid:GiveTask(function()
 			running = false
-			coroutine.close(thread)
 		end)
 
 		return maid
