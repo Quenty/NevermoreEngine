@@ -1,19 +1,18 @@
-# v8.1.1 (Sat Oct 28 2023)
-
-#### 🐛 Bug Fix
-
-- fix(rx): Rx.timer() bad coroutine close [#428](https://github.com/Quenty/NevermoreEngine/pull/428) ([@MrAsynchronous](https://github.com/MrAsynchronous))
-
-#### Authors: 1
-
-- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@8.1.0...@quenty/rx@8.1.1) (2023-10-28)
+
+
+### Bug Fixes
+
+* **rx:** Rx.timer() bad coroutine close ([#428](https://github.com/Quenty/NevermoreEngine/issues/428)) ([2a08298](https://github.com/Quenty/NevermoreEngine/commit/2a08298d793e06d3afffdf7f300253dc29967947))
+
+
+
+
 
 # [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@8.0.0...@quenty/rx@8.1.0) (2023-10-18)
 
