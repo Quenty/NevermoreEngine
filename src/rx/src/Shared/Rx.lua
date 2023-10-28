@@ -1657,24 +1657,18 @@ function Rx.timer(initialDelaySeconds, seconds)
 		local maid = Maid.new()
 
 		local number = -1
-		local running = true
 
-		local thread = task.spawn(function()
+		maid:GiveTask(task.spawn(function()
 			if initialDelaySeconds and initialDelaySeconds > 0 then
 				task.wait(initialDelaySeconds)
 			end
 
-			while running do
+			while true do
 				number += 1
 				sub:Fire(number)
 				task.wait(seconds)
 			end
-		end)
-
-		maid:GiveTask(function()
-			running = false
-			coroutine.close(thread)
-		end)
+		end))
 
 		return maid
 	end)
