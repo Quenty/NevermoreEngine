@@ -1,3 +1,16 @@
+# (Sat Oct 28 2023)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@8.1.1`
+  - fix(rx): Rx.timer() bad coroutine close [#428](https://github.com/Quenty/NevermoreEngine/pull/428) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
 # (Wed Oct 18 2023)
 
 #### 🚀 Enhancement

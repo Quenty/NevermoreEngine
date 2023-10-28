@@ -1,3 +1,15 @@
+# v8.1.1 (Sat Oct 28 2023)
+
+#### 🐛 Bug Fix
+
+- fix(rx): Rx.timer() bad coroutine close [#428](https://github.com/Quenty/NevermoreEngine/pull/428) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
