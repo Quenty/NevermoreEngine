@@ -1,0 +1,11 @@
+{
+  "name": "AttributeDataTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "attributedata": {
+        "$path": ".."
+      }
+    }
+  }
+}
