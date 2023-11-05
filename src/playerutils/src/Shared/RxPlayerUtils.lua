@@ -10,6 +10,7 @@ local Players = game:GetService("Players")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxPlayerUtils = {}
 
@@ -50,6 +51,17 @@ function RxPlayerUtils.observePlayersBrio(predicate: (Player) -> boolean)
 end
 
 --[=[
+	Observes the current local player
+
+	@return Observable<Brio<Player>>
+]=]
+function RxPlayerUtils.observeLocalPlayerBrio()
+	return RxInstanceUtils.observePropertyBrio(Players, "LocalPlayer", function(value)
+		return value ~= nil
+	end)
+end
+
+--[=[
 	Observe players as they're added, and as they are.
 	@param predicate callback
 	@return Observable<Player>
@@ -67,7 +79,9 @@ function RxPlayerUtils.observePlayers(predicate: (Player) -> boolean)
 		maid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
 
 		for _, player in Players:GetPlayers() do
-			handlePlayer(player)
+			task.spawn(function()
+				handlePlayer(player)
+			end)
 		end
 
 		return maid
