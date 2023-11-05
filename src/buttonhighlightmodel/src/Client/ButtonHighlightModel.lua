@@ -396,7 +396,9 @@ function ButtonHighlightModel:_trackTouch(inputObject)
 
 	self._numFingerDown.Value = self._numFingerDown.Value + 1
 	maid:GiveTask(function()
-		self._numFingerDown.Value = self._numFingerDown.Value - 1
+		if self._numFingerDown.Destroy then
+			self._numFingerDown.Value = self._numFingerDown.Value - 1
+		end
 	end)
 	maid:GiveTask(inputObject:GetPropertyChangedSignal("UserInputState"):Connect(function()
 		if inputObject.UserInputState == Enum.UserInputState.End then
