@@ -10,6 +10,7 @@ local TeleportService = game:GetService("TeleportService")
 
 local GameConfigCmdrUtils = require("GameConfigCmdrUtils")
 local BadgeUtils = require("BadgeUtils")
+local PlayerUtils = require("PlayerUtils")
 
 local GameConfigCommandService = {}
 GameConfigCommandService.ServiceName = "GameConfigCommandService"
@@ -57,11 +58,11 @@ function GameConfigCommandService:_registerCommands()
 		for _, player in pairs(players) do
 			for _, badgeId in pairs(badgeIds) do
 				BadgeUtils.promiseAwardBadge(player, badgeId)
-				table.insert(givenTo, ("%s badge %d"):format(player.DisplayName, badgeId))
+				table.insert(givenTo, string.format("%s badge %d", PlayerUtils.formatName(player), badgeId))
 			end
 		end
 
-		return ("Awards: %s"):format(table.concat(givenTo, ", "))
+		return string.format("Awards: %s", table.concat(givenTo, ", "))
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -85,10 +86,10 @@ function GameConfigCommandService:_registerCommands()
 
 		for _, player in pairs(players) do
 			MarketplaceService:PromptProductPurchase(player, productId)
-			table.insert(givenTo, ("%s prompted purchase of %d"):format(player.DisplayName, productId))
+			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), productId))
 		end
 
-		return ("Prompted: %s"):format(table.concat(givenTo, ", "))
+		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -112,10 +113,10 @@ function GameConfigCommandService:_registerCommands()
 
 		for _, player in pairs(players) do
 			MarketplaceService:PromptGamePassPurchase(player, gamePassId)
-			table.insert(givenTo, ("%s prompted purchase of %d"):format(player.DisplayName, gamePassId))
+			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), gamePassId))
 		end
 
-		return ("Prompted: %s"):format(table.concat(givenTo, ", "))
+		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -139,10 +140,10 @@ function GameConfigCommandService:_registerCommands()
 
 		for _, player in pairs(players) do
 			MarketplaceService:PromptPurchase(player, assetId)
-			table.insert(givenTo, ("%s prompted purchase of %d"):format(player.DisplayName, assetId))
+			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), assetId))
 		end
 
-		return ("Prompted: %s"):format(table.concat(givenTo, ", "))
+		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -166,10 +167,10 @@ function GameConfigCommandService:_registerCommands()
 
 		for _, player in pairs(players) do
 			MarketplaceService:PromptBundlePurchase(player, bundleId)
-			table.insert(givenTo, ("%s prompted purchase of %d"):format(player.DisplayName, bundleId))
+			table.insert(givenTo, string.format("%s prompted purchase of %d", PlayerUtils.formatName(player), bundleId))
 		end
 
-		return ("Prompted: %s"):format(table.concat(givenTo, ", "))
+		return string.format("Prompted: %s", table.concat(givenTo, ", "))
 	end)
 
 	self._cmdrService:RegisterCommand({
