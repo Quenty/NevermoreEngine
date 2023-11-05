@@ -9,14 +9,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
 
 local PermissionService = require("PermissionService")
 local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
 local Promise = require("Promise")
 local Maid = require("Maid")
-local Remoting = require("Remoting")
 
 local CmdrService = {}
 CmdrService.ServiceName = "CmdrService"

@@ -16,7 +16,6 @@ local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local String = require("String")
-local Remoting = require("Remoting")
 
 local CmdrServiceClient = {}
 CmdrServiceClient.ServiceName = "CmdrServiceClient"
@@ -28,8 +27,8 @@ CmdrServiceClient.ServiceName = "CmdrServiceClient"
 function CmdrServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-
 	self._maid = Maid.new()
+
 	self._permissionServiceClient = self._serviceBag:GetService(PermissionServiceClient)
 
 	self:PromiseCmdr():Then(function(cmdr)
@@ -125,7 +124,7 @@ function CmdrServiceClient:PromiseCmdr()
 		return self._cmdrPromise
 	end
 
-	self._cmdrPromise = promiseChild(ReplicatedStorage, "CmdrClient")
+	self._cmdrPromise = self._maid:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient"))
 		:Then(function(cmdClient)
 			return Promise.spawn(function(resolve, _reject)
 				-- Requiring cmdr can yield
