@@ -22,6 +22,8 @@ local RxBinderUtils = require("RxBinderUtils")
 local Signal = require("Signal")
 local GameProductServiceHelper = require("GameProductServiceHelper")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local RxPlayerUtils = require("RxPlayerUtils")
+local RxBrioUtils = require("RxBrioUtils")
 
 local GameProductServiceClient = {}
 GameProductServiceClient.ServiceName = "GameProductServiceClient"
@@ -62,7 +64,11 @@ end
 	Starts the service. Should be done via [ServiceBag]
 ]=]
 function GameProductServiceClient:Start()
-	self._maid:GiveTask(RxBinderUtils.observeBoundClassBrio(self._binders.PlayerProductManager, Players.LocalPlayer):Subscribe(function(brio)
+	self._maid:GiveTask(RxPlayerUtils.observeLocalPlayerBrio():Pipe({
+		RxBrioUtils.switchMapBrio(function(localPlayer)
+			return RxBinderUtils.observeBoundClassBrio(self._binders.PlayerProductManager, localPlayer)
+		end)
+	}):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end

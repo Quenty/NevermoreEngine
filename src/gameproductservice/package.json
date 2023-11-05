@@ -39,6 +39,7 @@
     "@quenty/marketplaceutils": "file:../marketplaceutils",
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/playerbinder": "file:../playerbinder",
+    "@quenty/playerutils": "file:../playerutils",
     "@quenty/promise": "file:../promise",
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/receiptprocessing": "file:../receiptprocessing",
