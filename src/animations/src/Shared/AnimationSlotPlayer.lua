@@ -22,6 +22,7 @@ function AnimationSlotPlayer.new(animationTarget)
 	self._defaultFadeTime = self._maid:Add(ValueObject.new(0.1, "number"))
 	self._defaultAnimationPriority = self._maid:Add(ValueObject.new(nil))
 	self._currentAnimationTrackData = self._maid:Add(ValueObject.new(nil))
+	self._currentAnimationId = self._maid:Add(ValueObject.new(nil))
 
 	if animationTarget then
 		self:SetAnimationTarget(animationTarget)
@@ -46,7 +47,7 @@ end
 
 function AnimationSlotPlayer:AdjustSpeed(id, speed)
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
-	assert(type(speed) == "number", "Bad number")
+	assert(type(speed) == "number", "Bad speed")
 
 	local animationId = RbxAssetUtils.toRbxAssetId(id)
 
@@ -79,6 +80,46 @@ function AnimationSlotPlayer:AdjustSpeed(id, speed)
 	return function()
 		if self._maid._currentSpeedAdjustment == topMaid then
 			self._maid._currentSpeedAdjustment = nil
+		end
+	end
+end
+
+function AnimationSlotPlayer:AdjustWeight(id, weight, fadeTime)
+	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
+	assert(type(weight) == "number", "Bad weight")
+	assert(type(fadeTime) == "number" or fadeTime == nil, "Bad fadeTime")
+
+	local animationId = RbxAssetUtils.toRbxAssetId(id)
+
+	local topMaid = Maid.new()
+
+	topMaid:GiveTask(self._currentAnimationTrackData:ObserveBrio(function(data)
+		return data and data.animationId == animationId
+	end):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local data = brio:GetValue()
+		local maid = brio:ToMaid()
+
+		data.track:AdjustWeight(weight, fadeTime)
+
+		-- TODO: Use stack here?
+		-- TODO: Probably need rogue property mechanisms
+		maid:GiveTask(function()
+			if math.abs(data.track.Speed - weight) <= 1e-3 then
+				data.track:AdjustWeight(data.originalWeight, fadeTime)
+			end
+		end)
+	end))
+
+	-- TODO: Probably per-a-track instead of global like this
+	self._maid._currentWeightAdjustment = topMaid
+
+	return function()
+		if self._maid._currentWeightAdjustment == topMaid then
+			self._maid._currentWeightAdjustment = nil
 		end
 	end
 end
