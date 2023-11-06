@@ -55,7 +55,9 @@ function ObservableMapList:Push(observeKey, entry)
 	local lastKey = nil
 	local function removeLastEntry()
 		if lastKey ~= nil then
-			self:_removeFromList(lastKey, entry)
+			if self._observableMapOfLists.Destroy then
+				self:_removeFromList(lastKey, entry)
+			end
 		end
 		lastKey = nil
 	end
@@ -147,6 +149,13 @@ function ObservableMapList:GetKeyList()
 	return self._observableMapOfLists:GetKeyList()
 end
 
+--[=[
+	Observes the list of all keys.
+	@return Observable<{ TKey }>
+]=]
+function ObservableMapList:ObserveKeyList()
+	return self._observableMapOfLists:ObserveKeyList()
+end
 
 --[=[
 	Observes all keys in the map
@@ -169,7 +178,7 @@ function ObservableMapList:ObserveAtListIndexBrio(key, index)
 
 	return self._observableMapOfLists:ObserveAtKeyBrio(key):Pipe({
 		RxBrioUtils.switchMapBrio(function(list)
-			return list:ObserveAtIndexBrio(-1)
+			return list:ObserveAtIndexBrio(index)
 		end);
 		RxBrioUtils.toBrio();
 		RxBrioUtils.where(function(value)
