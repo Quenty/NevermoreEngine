@@ -33,11 +33,11 @@ function TimeSyncService:Init()
 
 	self._maid = Maid.new()
 
-	self._clockPromise = Promise.new()
-	self._maid:GiveTask(self._clockPromise)
+	self._clockPromise = self._maid:Add(Promise.new())
 
 	if not RunService:IsRunning() then
-		error("Cannot initialize in test mode")
+		-- Assume we're in server mode
+		self._clockPromise:Resolve(self:_buildMasterClock())
 	elseif RunService:IsServer() then
 		self._clockPromise:Resolve(self:_buildMasterClock())
 	elseif RunService:IsClient() then
@@ -136,8 +136,7 @@ function TimeSyncService:_buildMasterClock()
 	local remoteEvent = GetRemoteEvent(TimeSyncConstants.REMOTE_EVENT_NAME)
 	local remoteFunction = GetRemoteFunction(TimeSyncConstants.REMOTE_FUNCTION_NAME)
 
-	local clock = MasterClock.new(remoteEvent, remoteFunction)
-	self._maid:GiveTask(clock)
+	local clock = self._maid:Add(MasterClock.new(remoteEvent, remoteFunction))
 
 	return clock
 end
@@ -147,8 +146,8 @@ function TimeSyncService:_promiseSlaveClock()
 		PromiseGetRemoteEvent(TimeSyncConstants.REMOTE_EVENT_NAME);
 		PromiseGetRemoteFunction(TimeSyncConstants.REMOTE_FUNCTION_NAME);
 	})):Then(function(remoteEvent, remoteFunction)
-		local clock = SlaveClock.new(remoteEvent, remoteFunction)
-		self._maid:GiveTask(clock)
+		local clock = self._maid:Add(SlaveClock.new(remoteEvent, remoteFunction))
+
 		return TimeSyncUtils.promiseClockSynced(clock)
 	end)
 end
