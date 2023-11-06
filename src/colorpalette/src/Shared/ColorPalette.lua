@@ -24,17 +24,10 @@ ColorPalette.__index = ColorPalette
 function ColorPalette.new()
 	local self = setmetatable(BaseObject.new(), ColorPalette)
 
-	self._gradePalette = ColorGradePalette.new()
-	self._maid:GiveTask(self._gradePalette)
-
-	self._gradeMaid = Maid.new()
-	self._maid:GiveTask(self._gradeMaid)
-
-	self._colorMaid = Maid.new()
-	self._maid:GiveTask(self._colorMaid)
-
-	self._vividMaid = Maid.new()
-	self._maid:GiveTask(self._vividMaid)
+	self._gradePalette = self._maid:Add(ColorGradePalette.new())
+	self._gradeMaid = self._maid:Add(Maid.new())
+	self._colorMaid = self._maid:Add(Maid.new())
+	self._vividMaid = self._maid:Add(Maid.new())
 
 	self._swatches = {}
 	self._colorValues = {}

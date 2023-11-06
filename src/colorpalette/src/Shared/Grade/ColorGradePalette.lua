@@ -123,6 +123,7 @@ function ColorGradePalette:ObserveModified(gradeName, amount, multiplier)
 			assert(type(state.amount) == "number", "Bad state.amount")
 			assert(type(state.multiplier) == "number", "Bad state.multiplier")
 
+
 			return state.grade + state.multiplier*state.amount
 		end);
 	})
@@ -164,7 +165,9 @@ function ColorGradePalette:ObserveOn(gradeName, newSurfaceName, baseSurfaceName)
 end
 
 function ColorGradePalette:_observeGradeFromName(gradeName)
-	if typeof(gradeName) == "Color3" then
+	if type(gradeName) == "number" then
+		return Rx.of(gradeName)
+	elseif typeof(gradeName) == "Color3" then
 		return Rx.of(ColorGradeUtils.getGrade(gradeName))
 	elseif Observable.isObservable(gradeName) then
 		return gradeName:Pipe({
