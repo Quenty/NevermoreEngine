@@ -4,8 +4,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
-
 local InputModeTypes = require("InputModeTypes")
 local InputModeTypeSelector = require("InputModeTypeSelector")
 local Maid = require("Maid")
@@ -14,6 +12,8 @@ local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local Rx = require("Rx")
 local PlayerInputModeUtils = require("PlayerInputModeUtils")
 local PlayerInputModeTypes = require("PlayerInputModeTypes")
+local RxPlayerUtils = require("RxPlayerUtils")
+local RxBrioUtils = require("RxBrioUtils")
 
 local PlayerInputModeServiceClient = {}
 PlayerInputModeServiceClient.ServiceName = "PlayerInputModeServiceClient"
@@ -36,22 +36,27 @@ function PlayerInputModeServiceClient:Start()
 	self._maid:GiveTask(self._selector)
 
 	self:_promiseRemoteEvent():Then(function(remoteEvent)
-		self._maid:GiveTask(self._selector:ObserveActiveInputType():Pipe({
+		self._maid:GiveTask(RxBrioUtils.flatCombineLatest({
+			activeMode = self._selector:ObserveActiveInputType();
+			localPlayer = RxPlayerUtils.observeLocalPlayerBrio();
+		}):Pipe({
 			Rx.throttleTime(1, { leading = true; trailing = true });
-		}):Subscribe(function(activeMode)
+		}):Subscribe(function(state)
 			local modeType
-			if activeMode == InputModeTypes.Gamepads then
+			if state.activeMode == InputModeTypes.Gamepads then
 				modeType = PlayerInputModeTypes.GAMEPAD
-			elseif activeMode == InputModeTypes.Keyboard then
+			elseif state.activeMode == InputModeTypes.Keyboard then
 				modeType = PlayerInputModeTypes.KEYBOARD
-			elseif activeMode == InputModeTypes.Touch then
+			elseif state.activeMode == InputModeTypes.Touch then
 				modeType = PlayerInputModeTypes.TOUCH
 			else
 				error("Bad activeMode")
 			end
 
-			PlayerInputModeUtils.setPlayerInputModeType(Players.LocalPlayer, modeType)
-			remoteEvent:FireServer(PlayerInputModeServiceConstants.REQUEST_SET_INPUT_MODE, modeType)
+			if state.localPlayer then
+				PlayerInputModeUtils.setPlayerInputModeType(state.localPlayer, modeType)
+				remoteEvent:FireServer(PlayerInputModeServiceConstants.REQUEST_SET_INPUT_MODE, modeType)
+			end
 		end))
 	end)
 end
