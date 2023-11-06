@@ -39,6 +39,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/marketplaceutils": "file:../marketplaceutils",
     "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/playerutils": "file:../playerutils",
     "@quenty/preferredparentutils": "file:../preferredparentutils",
     "@quenty/promise": "file:../promise",
     "@quenty/pseudolocalize": "file:../pseudolocalize",
