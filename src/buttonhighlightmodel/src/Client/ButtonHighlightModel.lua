@@ -396,7 +396,7 @@ function ButtonHighlightModel:_trackTouch(inputObject)
 
 	self._numFingerDown.Value += 1
 	maid:GiveTask(function()
-		if self.Destroy then
+		if self._numFingerDown.Value then
 			self._numFingerDown.Value -= 1
 		end
 	end)
