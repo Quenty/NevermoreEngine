@@ -59,7 +59,9 @@ function Counter:Add(amount)
 		self._count.Value = self._count.Value + amount
 
 		return function()
-			self._count.Value = self._count.Value - amount
+			if self._count.Destroy then
+				self._count.Value = self._count.Value - amount
+			end
 		end
 	elseif Observable.isObservable(amount) then
 		return self:_addObservable(amount)
