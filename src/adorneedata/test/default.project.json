@@ -1,9 +1,9 @@
 {
-  "name": "AttributeDataTest",
+  "name": "AdorneeDataTest",
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
-      "attributedata": {
+      "adorneedata": {
         "$path": ".."
       }
     }

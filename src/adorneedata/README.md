@@ -1,4 +1,4 @@
-## AttributeData
+## AdorneeData
 
 <div align="center">
   <a href="http://quenty.github.io/NevermoreEngine/">
@@ -14,12 +14,12 @@
 
 Bridges attributes and serialization
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/AttributeDataUtils">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/AdorneeData">View docs →</a></div>
 
 ## Installation
 
 ```
-npm install @quenty/attributedata --save
+npm install @quenty/adorneedata --save
 ```
 
 ## Requirements
@@ -31,7 +31,7 @@ These are the requirements for this attribute data library.
 
 ### Centralized definition with no server/client information
 ```lua
-return AttributeData.new({
+return AdorneeData.new({
   CurrencyColor = Color3.new();
   CurrencyNameTranslationKey = "";
   CurrencyFormatTranslationKey = "";
@@ -99,4 +99,3 @@ Should replace following files:
 
 Should be able to flash to constant 
 
-### Easy to write to
