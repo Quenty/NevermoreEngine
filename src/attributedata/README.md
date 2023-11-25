@@ -56,7 +56,7 @@ CurrencyDefinitionData:CreateData({
 })
 ```
 
-We should be able to create partial requ
+We should be able to create partial data
 
 ```lua
 CurrencyDefinitionData:CreatePartialData({

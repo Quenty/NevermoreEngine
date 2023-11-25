@@ -7,28 +7,39 @@
 
 	Providing all 3
 
-	@class AttributeData
+	@class AdorneeData
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local AttributeTableValue = require("AttributeTableValue")
-local t = require("t")
+local AdorneeDataEntry = require("AdorneeDataEntry")
+local AdorneeDataValue = require("AdorneeDataValue")
 local AttributeUtils = require("AttributeUtils")
+local t = require("t")
 
-local AttributeData = {}
-AttributeData.ClassName = "AttributeData"
-AttributeData.__index = AttributeData
+local AdorneeData = {}
+AdorneeData.ClassName = "AdorneeData"
+AdorneeData.__index = AdorneeData
 
 --[=[
 	Attribute data specification
 
-	@return AttributeData<T>
+	@return AdorneeData<T>
 ]=]
-function AttributeData.new(prototype)
-	local self = setmetatable({}, AttributeData)
+function AdorneeData.new(prototype)
+	local self = setmetatable({}, AdorneeData)
 
-	self._prototype = assert(prototype, "Bad prototype")
+	self._fullPrototype = assert(prototype, "Bad prototype")
+	self._attributePrototype = {}
+	self._valueObjectPrototype = {}
+
+	for key, item in pairs(self._fullPrototype) do
+		if AdorneeDataEntry.isAdorneeDataEntry(item) then
+			self._valueObjectPrototype[key] = item
+		else
+			self._attributePrototype[key] = item
+		end
+	end
 
 	return self
 end
@@ -39,7 +50,7 @@ end
 	@return boolean
 	@return string -- Error message
 ]=]
-function AttributeData:IsData(data)
+function AdorneeData:IsData(data)
 	return self:GetStrictTInterface()(data)
 end
 
@@ -49,7 +60,7 @@ end
 	@param data T
 	@return T
 ]=]
-function AttributeData:CreateData(data)
+function AdorneeData:CreateData(data)
 	assert(self:IsData(data))
 
 	return table.freeze(table.clone(data))
@@ -65,7 +76,7 @@ end
 	@param partialData TPartial
 	@return TPartial
 ]=]
-function AttributeData:CreatePartialData(partialData)
+function AdorneeData:CreatePartialData(partialData)
 	assert(self:IsPartialData(partialData))
 
 	return table.freeze(table.clone(partialData))
@@ -76,12 +87,14 @@ end
 	Gets attribute table for the data
 
 	@param adornee Instance
-	@return AttributeTableValue
+	@return AdorneeDataValue
 ]=]
-function AttributeData:CreateAttributeTableValue(adornee)
+function AdorneeData:CreateAdorneeDataValue(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return AttributeTableValue.new(adornee, self._prototype)
+	local attributeTableValue = AdorneeDataValue.new(adornee, self._fullPrototype)
+
+	return attributeTableValue
 end
 
 --[=[
@@ -90,13 +103,19 @@ end
 	@param adornee Instance
 	@return T
 ]=]
-function AttributeData:GetAttributes(adornee)
+function AdorneeData:GetAttributes(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local data = {}
-	for key, value in pairs(self._prototype) do
+	for key, value in pairs(self._attributePrototype) do
 		data[key] = adornee:GetAttribute(value)
 	end
+
+	-- TODO: Avoid additional allocation
+	for key, value in pairs(self._valueObjectPrototype) do
+		data[key] = value:CreateValueObject(adornee).Value
+	end
+
 	return self:CreateData(data)
 end
 
@@ -106,25 +125,38 @@ end
 	@param adornee Instance
 	@param data T
 ]=]
-function AttributeData:SetAttributes(adornee, data)
+function AdorneeData:SetAttributes(adornee, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
 
-	for key, value in pairs(data) do
-		adornee:SetAttribute(key, value)
+	for key, _ in pairs(self._attributePrototype) do
+		adornee:SetAttribute(key, data[key])
+	end
+
+	-- TODO: Avoid additional allocation
+	for key, value in pairs(self._valueObjectPrototype) do
+		value:CreateValueObject(adornee).Value = data[key]
 	end
 end
 
 --[=[
 	Initializes the attributes for the adornee
 ]=]
-function AttributeData:InitAttributes(adornee, data)
+function AdorneeData:InitAttributes(adornee, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
 
-	for key, value in pairs(data) do
+	for key, _ in pairs(self._attributePrototype) do
 		if adornee:GetAttribute(key) == nil then
-			adornee:SetAttribute(key, value)
+			adornee:SetAttribute(key, data[key])
+		end
+	end
+
+	-- TODO: Avoid additional allocation
+	for key, value in pairs(self._valueObjectPrototype) do
+		local valueObject = value:CreateValueObject(adornee)
+		if valueObject == nil then
+			valueObject.Value = data[key]
 		end
 	end
 end
@@ -132,11 +164,11 @@ end
 --[=[
 	@param partialData TPartial
 ]=]
-function AttributeData:SetPartialAttributes(adornee, partialData)
+function AdorneeData:SetPartialAttributes(adornee, partialData)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsPartialData(partialData))
 
-	local attributeTable = self:CreateAttributeTableValue(adornee)
+	local attributeTable = self:CreateAdorneeDataValue(adornee)
 	for key, value in pairs(partialData) do
 		attributeTable[key].Value = value
 	end
@@ -148,7 +180,7 @@ end
 
 	@return function
 ]=]
-function AttributeData:GetStrictTInterface()
+function AdorneeData:GetStrictTInterface()
 	if self._fullInterface then
 		return self._fullInterface
 	end
@@ -163,7 +195,7 @@ end
 
 	@return function
 ]=]
-function AttributeData:GetPartialTInterface()
+function AdorneeData:GetPartialTInterface()
 	if self._partialInterface then
 		return self._partialInterface
 	end
@@ -184,26 +216,30 @@ end
 	@return boolean
 	@return string -- Error message
 ]=]
-function AttributeData:IsPartialData(data)
+function AdorneeData:IsPartialData(data)
 	return self:GetPartialTInterface()(data)
 end
 
-function AttributeData:_getOrCreateTypeInterfaceList()
+function AdorneeData:_getOrCreateTypeInterfaceList()
 	if self._typeInterfaceList then
 		return self._typeInterfaceList
 	end
 
 	local interfaceList = {}
 
-	for key, value in pairs(self._prototype) do
-		local valueType = typeof(value)
-		assert(AttributeUtils.isValidAttributeType(valueType), "Not a valid value type")
+	for key, value in pairs(self._fullPrototype) do
+		if AdorneeDataEntry.isAdorneeDataEntry(value) then
+			interfaceList[key] = value:GetStrictInterface()
+		else
+			local valueType = typeof(value)
+			assert(AttributeUtils.isValidAttributeType(valueType), "Not a valid value type")
 
-		interfaceList[key] = t.typeof(valueType)
+			interfaceList[key] = t.typeof(valueType)
+		end
 	end
 
 	self._typeInterfaceList = interfaceList
 	return interfaceList
 end
 
-return AttributeData
+return AdorneeData
