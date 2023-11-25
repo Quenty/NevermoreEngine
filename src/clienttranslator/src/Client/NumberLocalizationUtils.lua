@@ -180,6 +180,7 @@ localeInfos["tr-tr"] = {
 }
 
 -- Aliases for languages that use the same mappings.
+localeInfos["en"] = localeInfos["en-us"]
 localeInfos["en-gb"] = localeInfos["en-us"]
 localeInfos["es-mx"] = localeInfos["es-es"]
 
