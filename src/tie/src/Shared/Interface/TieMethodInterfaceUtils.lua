@@ -33,7 +33,7 @@ function TieMethodInterfaceUtils.get(aliasSelf, definition, member, folder, ador
 
 		local bindableFunction = folder:FindFirstChild(member:GetMemberName())
 		if not bindableFunction then
-			error("No bindableFunction")
+			error(string.format("No bindableFunction implemented for %s on %q", member:GetMemberName(), folder:GetFullName()))
 		end
 
 		return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))
