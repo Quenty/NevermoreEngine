@@ -1794,6 +1794,12 @@ end
 
 --[=[
 	Throttles emission of observables on the defer stack to the last emission.
+
+	:::tip
+	There's a limited re-entrance amount for this. However, this can prevent computation being done repeatedly if
+	stuff is being added all at once. Use with care.
+	:::
+
 	@return (source: Observable) -> Observable
 ]=]
 function Rx.throttleDefer()
