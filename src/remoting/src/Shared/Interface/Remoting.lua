@@ -55,6 +55,8 @@ function Remoting.new(instance, name)
 	self._remoteFolderName = string.format("%sRemotes", self._name)
 	self._remoteObjects = {}
 
+	self._reliableEvents = true
+
 	return self
 end
 
@@ -82,7 +84,7 @@ function Remoting:Connect(memberName, callback)
 	local connectMaid = Maid.new()
 
 	if RunService:IsServer() then
-		local remoteEvent = self:_getOrCreateRemoteEvent(memberName)
+		local remoteEvent = self:_getOrCreateRemoteEvent(memberName, self._reliableEvents)
 		connectMaid:GiveTask(remoteEvent.OnServerEvent:Connect(callback))
 
 		-- TODO: Cleanup if nothing else is expecting this
@@ -169,11 +171,11 @@ end
 
 	@param memberName string
 ]=]
-function Remoting:DeclareEvent(memberName)
+function Remoting:DeclareEvent(memberName, reliable)
 	assert(type(memberName) == "string", "Bad memberName")
 
 	if RunService:IsServer() then
-		self:_getOrCreateRemoteEvent(memberName)
+		self:_getOrCreateRemoteEvent(memberName, if reliable ~= nil then reliable else self._reliableEvents)
 	end
 end
 
@@ -255,7 +257,7 @@ function Remoting:FireClient(memberName, player, ...)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(RunService:IsServer(), "FireClient must be called on server")
 
-	local remoteEvent = self:_getOrCreateRemoteEvent(memberName)
+	local remoteEvent = self:_getOrCreateRemoteEvent(memberName, self._reliableEvents)
 	remoteEvent:FireClient(player, ...)
 end
 
@@ -291,7 +293,7 @@ function Remoting:FireAllClients(memberName, ...)
 	assert(type(memberName) == "string", "Bad memberName")
 	assert(RunService:IsServer(), "FireAllClients must be called on server")
 
-	local remoteEvent = self:_getOrCreateRemoteEvent(memberName)
+	local remoteEvent = self:_getOrCreateRemoteEvent(memberName, self._reliableEvents)
 	remoteEvent:FireAllClients(...)
 end
 
@@ -309,7 +311,7 @@ function Remoting:FireAllClientsExcept(memberName, excludePlayer, ...)
 	assert(typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil, "Bad excludePlayer")
 	assert(RunService:IsServer(), "FireAllClientsExcept must be called on server")
 
-	local remoteEvent = self:_getOrCreateRemoteEvent(memberName)
+	local remoteEvent = self:_getOrCreateRemoteEvent(memberName, self._reliableEvents)
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= excludePlayer then
 			remoteEvent:FireClient(player, ...)
@@ -530,7 +532,7 @@ function Remoting:_getOrCreateRemoteFunction(memberName)
 	return remoteFunction
 end
 
-function Remoting:_getOrCreateRemoteEvent(memberName)
+function Remoting:_getOrCreateRemoteEvent(memberName, reliable)
 	assert(type(memberName) == "string", "Bad memberName")
 
 	local remoteEventName = self:_getMemberName(memberName, REMOTE_EVENT_SUFFIX)
@@ -541,7 +543,12 @@ function Remoting:_getOrCreateRemoteEvent(memberName)
 
 	local folder = self:_ensureFolder()
 
-	local remoteEvent = Instance.new("RemoteEvent")
+	local eventType = "RemoteEvent"
+	if reliable == false then
+		eventType == "UnreliableRemoteEvent"
+	end
+
+	local remoteEvent = Instance.new(eventType)
 	remoteEvent.Name = remoteEventName
 	remoteEvent.Archivable = false
 	remoteEvent.Parent = folder
@@ -554,6 +561,13 @@ end
 
 function Remoting:_getMemberName(memberName, objectType)
 	return memberName .. objectType
+end
+
+function Remoting:SetNewEventReliability(enabled)
+	assert(RunService:IsServer(), "Event reliability should only be set on the server")
+	assert(type(enabled) == "boolean", "Bad value")
+
+	self._reliableEvents = enabled
 end
 
 --[=[

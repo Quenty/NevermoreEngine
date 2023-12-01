@@ -53,7 +53,7 @@ if not RunService:IsRunning() then
 		return event
 	end
 elseif RunService:IsServer() then
-	return function(name)
+	return function(name, reliable)
 		assert(type(name) == "string", "Bad name")
 
 		local storage = ReplicatedStorage:FindFirstChild(ResourceConstants.REMOTE_EVENT_STORAGE_NAME)
@@ -69,7 +69,12 @@ elseif RunService:IsServer() then
 			return event
 		end
 
-		event = Instance.new("RemoteEvent")
+		local eventType = "RemoteEvent"
+		if reliable == false then
+			eventType == "UnreliableRemoteEvent"
+		end
+		
+		event = Instance.new(eventType)
 		event.Name = name
 		event.Archivable = false
 		event.Parent = storage
