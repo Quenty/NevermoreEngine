@@ -1,24 +1,26 @@
 # Reusable workflow that lints the repository!
 name: lint
-on:
-  workflow_call
+on: workflow_call
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup Aftman
-        uses: ok-nick/setup-aftman@v0.3.0
+      - name: Checkout the Repository
+        uses: actions/checkout@v4.1.1
         with:
-          version: "v0.2.7"
+          fetch-depth: 0
+
+      - name: Setting up Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+        with:
+          version: 'v0.2.7'
+          cache: 'true'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate standard library
+      - name: Generate the Standard Library
         run: selene generate-roblox-std
 
-      - name: Run Selene
+      - name: Source Checking With Selene
         run: selene src
 
       - name: Run moonwave-extractor
