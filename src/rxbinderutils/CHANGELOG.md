@@ -1,19 +1,18 @@
-# v9.3.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- feat: RxBinderUtils.observeAllArrayBrio [#408](https://github.com/Quenty/NevermoreEngine/pull/408) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@9.2.0...@quenty/rxbinderutils@9.3.0) (2023-12-14)
+
+
+### Features
+
+* RxBinderUtils.observeAllArrayBrio ([#408](https://github.com/Quenty/NevermoreEngine/issues/408)) ([98da8c2](https://github.com/Quenty/NevermoreEngine/commit/98da8c29f61965ebf8ad516a650ccabab7ce6bdb))
+
+
+
+
 
 # [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@9.1.1...@quenty/rxbinderutils@9.2.0) (2023-12-14)
 
