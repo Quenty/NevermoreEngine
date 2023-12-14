@@ -416,12 +416,19 @@ end
 
 function ButtonHighlightModel:_updateTargets()
 	self._isMouseOrTouchOver.Value = self._isMouseOver.Value or self._numFingerDown.Value > 0
-	self._isPressed.Value = (self._isMouseDown.Value or self._isKeyDown.Value or self._numFingerDown.Value > 0)
-	self._isHighlighted.Value = self._isSelected.Value
-		or self._numFingerDown.Value > 0
-		or self._isKeyDown.Value
-		or self._isMouseOver.Value
-		or self._isMouseDown.Value
+
+	-- Assume event emission can lead to cleanup in middle of call
+	if self._isPressed.Destroy then
+		self._isPressed.Value = (self._isMouseDown.Value or self._isKeyDown.Value or self._numFingerDown.Value > 0)
+	end
+
+	if self._isHighlighted.Destroy then
+		self._isHighlighted.Value = self._isSelected.Value
+			or self._numFingerDown.Value > 0
+			or self._isKeyDown.Value
+			or self._isMouseOver.Value
+			or self._isMouseDown.Value
+	end
 end
 
 function ButtonHighlightModel:_update()
