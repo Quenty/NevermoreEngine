@@ -20,16 +20,12 @@ ImageLabelLoaded.__index = ImageLabelLoaded
 function ImageLabelLoaded.new()
 	local self = setmetatable(BaseObject.new(), ImageLabelLoaded)
 
-	self._isLoaded = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isLoaded)
+	self._isLoaded = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._preloadImage = self._maid:Add(ValueObject.new(true, "boolean"))
 
 	self._defaultTimeout = 1
 
-	self._preloadImage = ValueObject.new(true, "boolean")
-	self._maid:GiveTask(self._preloadImage)
-
-	self.ImageChanged = Signal.new()
-	self._maid:GiveTask(self.ImageChanged)
+	self.ImageChanged = self._maid:Add(Signal.new())
 
 	return self
 end

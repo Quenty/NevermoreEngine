@@ -384,14 +384,9 @@ function InputKeyMapList:_ensureInit()
 		return self._inputTypesForBinding
 	end
 
-	self._inputTypesForBinding = ObservableCountingMap.new()
-	self._maid:GiveTask(self._inputTypesForBinding)
-
-	self._isTapInWorld = StateStack.new(false)
-	self._maid:GiveTask(self._isTapInWorld)
-
-	self._isRobloxTouchButton = StateStack.new(false)
-	self._maid:GiveTask(self._isRobloxTouchButton)
+	self._inputTypesForBinding = self._maid:Add(ObservableCountingMap.new())
+	self._isTapInWorld = self._maid:Add(StateStack.new(false, "boolean"))
+	self._isRobloxTouchButton = self._maid:Add(StateStack.new(false, "boolean"))
 
 	-- Listen
 	self._maid:GiveTask(self._inputModeTypeToInputKeyMap:ObserveValuesBrio():Subscribe(function(brio)
