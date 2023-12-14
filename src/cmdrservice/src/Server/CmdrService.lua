@@ -45,7 +45,7 @@ function CmdrService:Init(serviceBag)
 		resolve(cmdr)
 	end))
 
-	self._permissionService = serviceBag:GetService(PermissionService)
+	self._permissionService = self._serviceBag:GetService(PermissionService)
 
 	self._definitionData = {}
 	self._executeData = {}
