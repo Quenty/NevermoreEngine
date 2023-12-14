@@ -233,6 +233,8 @@ function SpringObject:SetTarget(value, doNotAnimate)
 
 		self._maid._targetSub = observable:Subscribe(function(unconverted)
 			local converted = SpringUtils.toLinearIfNeeded(unconverted)
+			assert(converted, "Not a valid converted value")
+
 			local spring = self:_getSpringForType(converted)
 			spring.Target = converted
 
