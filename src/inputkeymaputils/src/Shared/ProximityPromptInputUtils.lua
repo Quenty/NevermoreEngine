@@ -24,7 +24,7 @@ function ProximityPromptInputUtils.newInputKeyMapFromPrompt(prompt)
 
 	return InputKeyMapList.new("custom", {
 		InputKeyMap.new(InputModeTypes.Gamepads, { prompt.GamepadKeyCode });
-		InputKeyMap.new(InputModeTypes.Keyboard, { prompt.KeyboardKeyCode });
+		InputKeyMap.new(InputModeTypes.KeyboardAndMouse, { prompt.KeyboardKeyCode });
 		InputKeyMap.new(InputModeTypes.Touch, { "Tap" });
 	}, {
 		bindingName = prompt.ActionText;
@@ -43,7 +43,7 @@ function ProximityPromptInputUtils.configurePromptFromInputKeyMap(prompt, inputK
 	assert(typeof(prompt) == "Instance", "Bad prompt")
 	assert(type(inputKeyMapList) == "table", "Bad inputKeyMapList")
 
-	local keyboard = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, InputModeTypes.Keyboard)
+	local keyboard = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, InputModeTypes.KeyboardAndMouse)
 	local gamepad = ProximityPromptInputUtils.getFirstInputKeyCode(inputKeyMapList, InputModeTypes.Gamepads)
 
 	if keyboard then

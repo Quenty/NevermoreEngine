@@ -38,31 +38,16 @@ function LoopedSoundPlayer.new(soundId, soundParent)
 
 	self:SetSpeed(10)
 
-	self._bpm = ValueObject.new(nil)
-	self._maid:GiveTask(self._bpm)
-
-	self._soundParent = ValueObject.new(nil)
-	self._maid:GiveTask(self._soundParent)
-
-	self._crossFadeTime = ValueObject.new(0.5, "number")
-	self._maid:GiveTask(self._crossFadeTime)
-
-	self._volumeMultiplier = ValueObject.new(1, "number")
-	self._maid:GiveTask(self._volumeMultiplier)
-
-	self._doSyncSoundPlayback = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._doSyncSoundPlayback)
-
-	self._currentActiveSound = ValueObject.new(nil)
-	self._maid:GiveTask(self._currentActiveSound)
-
-	self._currentSoundId = ValueObject.new(soundId)
-	self._maid:GiveTask(self._currentSoundId)
+	self._bpm = self._maid:Add(ValueObject.new(nil))
+	self._soundParent = self._maid:Add(ValueObject.new(nil))
+	self._crossFadeTime = self._maid:Add(ValueObject.new(0.5, "number"))
+	self._volumeMultiplier = self._maid:Add(ValueObject.new(1, "number"))
+	self._doSyncSoundPlayback = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._currentActiveSound = self._maid:Add(ValueObject.new(nil))
+	self._currentSoundId = self._maid:Add(ValueObject.new(soundId))
 
 	self._defaultScheduleOptions = SoundLoopScheduleUtils.default()
-
-	self._currentLoopSchedule = ValueObject.new(self._defaultScheduleOptions)
-	self._maid:GiveTask(self._currentLoopSchedule)
+	self._currentLoopSchedule = self._maid:Add(ValueObject.new(self._defaultScheduleOptions))
 
 	if soundParent then
 		self:SetSoundParent(soundParent)

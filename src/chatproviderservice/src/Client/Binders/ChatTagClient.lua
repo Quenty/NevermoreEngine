@@ -4,8 +4,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local ChatTagBase = require("ChatTagBase")
 local Binder = require("Binder")
+local ChatTagBase = require("ChatTagBase")
 
 local ChatTagClient = setmetatable({}, ChatTagBase)
 ChatTagClient.ClassName = "ChatTagClient"

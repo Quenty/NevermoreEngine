@@ -1,0 +1,11 @@
+{
+  "name": "AdorneeDataTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "adorneedata": {
+        "$path": ".."
+      }
+    }
+  }
+}

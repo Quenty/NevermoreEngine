@@ -182,15 +182,29 @@ end
 function Rx.merge(observables)
 	assert(type(observables) == "table", "Bad observables")
 
+	local totalCount = 0
 	for _, item in pairs(observables) do
 		assert(Observable.isObservable(item), "Not an observable")
+		totalCount = totalCount + 1
 	end
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
+		local pendingCount = totalCount
 
 		for _, observable in pairs(observables) do
-			maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
+			maid:GiveTask(observable:Subscribe(function(...)
+				sub:Fire(...)
+			end, function(...)
+				pendingCount = pendingCount - 1
+				sub:Fail(...)
+			end, function()
+				-- Only complete once all are complete
+				pendingCount = pendingCount - 1
+				if pendingCount == 0 then
+					sub:Complete()
+				end
+			end))
 		end
 
 		return maid
@@ -966,9 +980,13 @@ function Rx.switchAll()
 					currentInside = observable
 					outerMaid._innerSub = nil
 
-					outerMaid._innerSub = observable:Subscribe(
+					local subscription = observable:Subscribe(
 						function(...)
-							sub:Fire(...)
+							if currentInside == observable then
+								sub:Fire(...)
+							else
+								warn(string.format("[Rx.switchAll] - Observable is still firing despite disconnect (%q)", observable._source))
+							end
 						end, -- Merge each inner observable
 						function(...)
 							if currentInside == observable then
@@ -984,6 +1002,13 @@ function Rx.switchAll()
 								end
 							end
 						end)
+
+					if currentInside == observable then
+						outerMaid._innerSub = subscription
+					else
+						-- We cleaned up while connecting
+						subscription:Destroy()
+					end
 				end,
 				function(...)
 					sub:Fail(...) -- Also reflect failures up to the top!
@@ -1034,7 +1059,7 @@ function Rx.flatMap(project, resultSelector)
 
 					local innerMaid = Maid.new()
 
-					innerMaid:GiveTask(observable:Subscribe(
+					local subscription = innerMaid:Add(observable:Subscribe(
 						function(...)
 							-- Merge each inner observable
 							if resultSelector then
@@ -1055,12 +1080,16 @@ function Rx.flatMap(project, resultSelector)
 							end
 						end))
 
-					local key = maid:GiveTask(innerMaid)
+					if subscription:IsPending() then
+						local key = maid:GiveTask(innerMaid)
 
-					-- Cleanup
-					innerMaid:GiveTask(function()
-						maid[key] = nil
-					end)
+						-- Cleanup
+						innerMaid:GiveTask(function()
+							maid[key] = nil
+						end)
+					else
+						subscription:Destroy()
+					end
 				end,
 				function(...)
 					sub:Fail(...) -- Also reflect failures up to the top!
@@ -1794,6 +1823,12 @@ end
 
 --[=[
 	Throttles emission of observables on the defer stack to the last emission.
+
+	:::tip
+	There's a limited re-entrance amount for this. However, this can prevent computation being done repeatedly if
+	stuff is being added all at once. Use with care.
+	:::
+
 	@return (source: Observable) -> Observable
 ]=]
 function Rx.throttleDefer()

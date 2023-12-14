@@ -180,6 +180,7 @@ localeInfos["tr-tr"] = {
 }
 
 -- Aliases for languages that use the same mappings.
+localeInfos["en"] = localeInfos["en-us"]
 localeInfos["en-gb"] = localeInfos["en-us"]
 localeInfos["es-mx"] = localeInfos["es-es"]
 
@@ -201,7 +202,7 @@ local function roundToSignificantDigits(number, significantDigits, roundingBehav
 	local offset = findDecimalOffset(number)
 	local multiplier = 10^(significantDigits + offset)
 	local significand
-	if roundingBehaviourType == RoundingBehaviourTypes.Truncate then
+	if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE then
 		significand = math.modf(number * multiplier)
 	else
 		significand = math.floor(number * multiplier + 0.5)
@@ -228,7 +229,7 @@ local function findDenominationEntry(localeInfo, number, roundingBehaviourType)
 	for i = #localeInfo, 2, -1 do
 		local entry = localeInfo[i]
 		local baseValue
-		if roundingBehaviourType == RoundingBehaviourTypes.Truncate then
+		if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE then
 			baseValue = entry[1]
 		else
 			baseValue = entry[1] - (localeInfo[i - 1][1]) / 2
@@ -260,13 +261,31 @@ function NumberLocalizationUtils.localize(number, locale)
     return number
 end
 
+--[=[
+	Abbreviates the number to a truncated amount in a localized way.
+
+	```lua
+	print(NumberLocalizationUtils.abbreviate(2500, "en-us", RoundingBehaviourTypes.ROUND_TO_CLOSEST, 3)) --> 2.5k
+	```
+
+	@param number number
+	@param locale string
+	@param roundingBehaviourType RoundingBehaviourType?
+	@param numSignificantDigits number?
+]=]
 function NumberLocalizationUtils.abbreviate(number, locale, roundingBehaviourType, numSignificantDigits)
+	assert(type(number) == "number", "Bad number")
+
+	if roundingBehaviourType == RoundingBehaviourTypes.NONE then
+		return NumberLocalizationUtils.localize(number, locale)
+	end
+
 	if number == 0 then
 		return "0"
 	end
 
 	if roundingBehaviourType == nil then
-		roundingBehaviourType = RoundingBehaviourTypes.RoundToClosest
+		roundingBehaviourType = RoundingBehaviourTypes.ROUND_TO_CLOSEST
 	end
 
 	if numSignificantDigits == nil then
@@ -290,11 +309,14 @@ function NumberLocalizationUtils.abbreviate(number, locale, roundingBehaviourTyp
 
 	-- trim to 1 decimal point
 	local trimmedQuotient
-	if roundingBehaviourType == RoundingBehaviourTypes.Truncate then
+	if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE then
 		trimmedQuotient = math.modf(significantQuotient * 10) / 10
-	else
+	elseif roundingBehaviourType == RoundingBehaviourTypes.ROUND_TO_CLOSEST then
 		trimmedQuotient = math.floor(significantQuotient * 10 + 0.5) / 10
+	else
+		error(string.format("[NumberLocalizationUtils.abbreviate] - Unknown roundingBehaviourType %q", tostring(roundingBehaviourType)))
 	end
+
 	local trimmedQuotientString = tostring(trimmedQuotient)
 
 	-- Split the string into integer and fraction parts

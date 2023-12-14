@@ -13,6 +13,7 @@ local HasChatTagsConstants = require("HasChatTagsConstants")
 local LocalizedTextUtils = require("LocalizedTextUtils")
 local PlayerBinder = require("PlayerBinder")
 local String = require("String")
+local BinderUtils = require("BinderUtils")
 
 local HasChatTags = setmetatable({}, HasChatTagsBase)
 HasChatTags.ClassName = "HasChatTags"
@@ -53,6 +54,7 @@ function HasChatTags:AddChatTag(chatTagData)
 
 	local tag = self._chatTagBinder:Create("Folder")
 	tag.Name = string.format("ChatTag_%s", String.toCamelCase(chatTagData.TagText))
+	tag:SetAttribute(ChatTagConstants.TAG_KEY_ATTRIBUTE, String.toCamelCase(chatTagData.TagText))
 	tag:SetAttribute(ChatTagConstants.TAG_TEXT_ATTRIBUTE, chatTagData.TagText)
 	tag:SetAttribute(ChatTagConstants.TAG_COLOR_ATTRIBUTE, chatTagData.TagColor)
 	tag:SetAttribute(ChatTagConstants.TAG_PRIORITY_ATTRIBUTE, chatTagData.TagPriority)
@@ -64,6 +66,18 @@ function HasChatTags:AddChatTag(chatTagData)
 	tag.Parent = self._chatTagsContainer
 
 	return tag
+end
+
+function HasChatTags:GetChatTagByKey(chatTagKey)
+	assert(type(chatTagKey) == "string", "Bad chatTagKey")
+
+	for _, item in pairs(BinderUtils.getChildren(self._chatTagBinder, self._chatTagsContainer)) do
+		if item.ChatTagKey.Value == chatTagKey then
+			return item
+		end
+	end
+
+	return nil
 end
 
 --[=[

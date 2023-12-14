@@ -34,10 +34,10 @@ function PlayerBinder:Start()
 	local results = { getmetatable(PlayerBinder).Start(self) }
 
 	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
-		self:Bind(player)
+		self:Tag(player)
 	end))
 	for _, item in pairs(Players:GetPlayers()) do
-		self:Bind(item)
+		self:Tag(item)
 	end
 
 	return unpack(results)

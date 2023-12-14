@@ -300,6 +300,9 @@ end
 	@return function -- Cleanup function
 ]=]
 function Binder:ObserveInstance(inst, callback)
+	assert(typeof(inst) == "Instance", "Bad inst")
+	assert(type(callback) == "function", "Bad callback")
+
 	self._listeners[inst] = self._listeners[inst] or {}
 	self._listeners[inst][callback] = true
 

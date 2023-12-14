@@ -226,10 +226,10 @@ function TransitionModel:_promiseIsHidden()
 end
 
 function TransitionModel:_executeShow(doNotAnimate)
-	local maid = Maid.new()
+	self._maid._transition = nil
 
-	local promise = Promise.new()
-	maid:GiveTask(promise)
+	local maid = Maid.new()
+	local promise = maid:Add(Promise.new())
 
 	self._isHidingComplete.Value = false
 	self._isShowingComplete.Value = false
@@ -242,6 +242,9 @@ function TransitionModel:_executeShow(doNotAnimate)
 			promise:Reject()
 			error(string.format("[TransitionModel] - Expected promise to be returned from showCallback, got %q", tostring(result)))
 		end
+	else
+		-- Immediately resolve
+		promise:Resolve()
 	end
 
 	promise:Then(function()
@@ -252,13 +255,13 @@ function TransitionModel:_executeShow(doNotAnimate)
 end
 
 function TransitionModel:_executeHide(doNotAnimate)
+	self._maid._transition = nil
+
 	local maid = Maid.new()
+	local promise = maid:Add(Promise.new())
 
 	self._isHidingComplete.Value = false
 	self._isShowingComplete.Value = false
-
-	local promise = Promise.new()
-	maid:GiveTask(promise)
 
 	if self._hideCallback then
 		local result = self._hideCallback(maid, doNotAnimate)
@@ -268,6 +271,9 @@ function TransitionModel:_executeHide(doNotAnimate)
 			promise:Reject()
 			error(string.format("[TransitionModel] - Expected promise to be returned from hideCallback, got %q", tostring(result)))
 		end
+	else
+		-- Immediately resolve
+		promise:Resolve()
 	end
 
 	promise:Then(function()

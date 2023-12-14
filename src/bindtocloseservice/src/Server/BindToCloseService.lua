@@ -7,9 +7,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local RunService = game:GetService("RunService")
+
 local PromiseUtils = require("PromiseUtils")
 local Symbol = require("Symbol")
 local Promise = require("Promise")
+local Maid = require("Maid")
 
 local BindToCloseService = {}
 BindToCloseService.ServiceName = "BindToCloseService"
@@ -17,28 +20,43 @@ BindToCloseService.ServiceName = "BindToCloseService"
 function BindToCloseService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
 
 	self._subscriptions = {}
 end
 
 function BindToCloseService:Start()
-	game:BindToClose(function()
-		local promises = {}
-
-		for _, caller in pairs(self._subscriptions) do
-			local promise = caller()
-			if Promise.isPromise(promise) then
-				table.insert(promises, promise)
-			else
-				warn("[BindToCloseService.BindToClose] - Bad promise returned from close callback.")
+	if RunService:IsServer() then
+		game:BindToClose(function()
+			local ok, err = self:_promiseClose():Yield()
+			if not ok then
+				warn("[BindToCloseService] - Failed to close all", err)
 			end
-		end
+		end)
 
-		local ok, err = PromiseUtils.all(promises):Yield()
-		if not ok then
-			warn("[BindToCloseService] - Failed to close all", err)
+		-- TODO: Also close on cleanup here
+	else
+		-- This happens when running in a plugin or some other scenario....
+
+		self._maid:GiveTask(function()
+			self:_promiseClose()
+		end)
+	end
+end
+
+function BindToCloseService:_promiseClose()
+	local promises = {}
+
+	for _, caller in pairs(self._subscriptions) do
+		local promise = caller()
+		if Promise.isPromise(promise) then
+			table.insert(promises, promise)
+		else
+			warn("[BindToCloseService.BindToClose] - Bad promise returned from close callback.")
 		end
-	end)
+	end
+
+	return PromiseUtils.all(promises)
 end
 
 --[=[
@@ -57,6 +75,10 @@ function BindToCloseService:RegisterPromiseOnCloseCallback(saveCallback)
 	return function()
 		self._subscriptions[id] = nil
 	end
+end
+
+function BindToCloseService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return BindToCloseService

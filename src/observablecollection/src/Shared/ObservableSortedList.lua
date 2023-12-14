@@ -138,7 +138,7 @@ end
 
 --[=[
 	Observes all items in the list
-	@return Observable<Brio<T>>
+	@return Observable<Brio<T, Symbol>>
 ]=]
 function ObservableSortedList:ObserveItemsBrio()
 	return Observable.new(function(sub)

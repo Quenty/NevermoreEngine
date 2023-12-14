@@ -37,18 +37,6 @@ function Loader:__call(value)
 	end
 end
 
-function Loader:__index(value)
-	if type(value) == "string" then
-		local object = self._script.Parent[value]
-		if object:IsA("ObjectValue") then
-			return require(waitForValue(object))
-		else
-			return require(object)
-		end
-	else
-		return require(value)
-	end
-end
-
+Loader.__index = Loader.__call
 
 return Loader

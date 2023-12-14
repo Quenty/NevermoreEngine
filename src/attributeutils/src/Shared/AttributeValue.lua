@@ -96,7 +96,7 @@ function AttributeValue:__index(index)
 	elseif AttributeValue[index] then
 		return AttributeValue[index]
 	else
-		error(("%q is not a member of AttributeValue"):format(tostring(index)))
+		error(string.format("%q is not a member of AttributeValue", tostring(index)))
 	end
 end
 
@@ -104,7 +104,7 @@ function AttributeValue:__newindex(index, value)
 	if index == "Value" then
 		self._object:SetAttribute(rawget(self, "_attributeName"), value)
 	else
-		error(("%q is not a member of AttributeValue"):format(tostring(index)))
+		error(string.format("%q is not a member of AttributeValue", tostring(index)))
 	end
 end
 

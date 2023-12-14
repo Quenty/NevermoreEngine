@@ -1,7 +1,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local NumberLocalizationUtils = require("NumberLocalizationUtils")
-local RoundingBehaviour = require("RoundingBehaviourTypes")
+local RoundingBehaviourTypes = require("RoundingBehaviourTypes")
 
 return function()
 
@@ -68,7 +68,7 @@ return function()
 	end)
 
 	describe("NumberLocalizationUtils.abbreviate", function()
-		it("should round towards zero when using RoundingBehaviour.Truncate", function()
+		it("should round towards zero when using RoundingBehaviourTypes.Truncate", function()
 			local roundToZeroMap = {
 				[0] = "0",
 				[1] = "1",
@@ -103,7 +103,7 @@ return function()
 			}
 
 			for input, output in pairs(roundToZeroMap) do
-				expect(NumberLocalizationUtils.abbreviate(input, "en-us", RoundingBehaviour.Truncate)).to.equal(output)
+				expect(NumberLocalizationUtils.abbreviate(input, "en-us", RoundingBehaviourTypes.TRUNCATE)).to.equal(output)
 			end
 		end)
 	end)

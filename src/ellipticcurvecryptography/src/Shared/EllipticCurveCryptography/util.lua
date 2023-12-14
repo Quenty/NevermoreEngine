@@ -1,3 +1,5 @@
+--!native
+
 local util = {}
 
 util.byteTableMT = {

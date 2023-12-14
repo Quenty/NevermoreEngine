@@ -1,3 +1,5 @@
+--!native
+
 --[=[
 	Elliptic Curve Cryptography
 
@@ -36,7 +38,6 @@ local chacha20 = require(script.chacha20)
 local random = require(script.random)
 local modq = require(script.modq)
 local curve = require(script.curve)
-
 local EllipticCurveCryptography = {}
 
 EllipticCurveCryptography.chacha20 = chacha20;

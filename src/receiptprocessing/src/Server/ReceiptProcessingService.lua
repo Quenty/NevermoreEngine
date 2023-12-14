@@ -7,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local MarketplaceService = game:GetService("MarketplaceService")
+local RunService = game:GetService("RunService")
 
 local Promise = require("Promise")
 local EnumUtils = require("EnumUtils")
@@ -33,8 +34,13 @@ function ReceiptProcessingService:Init(serviceBag)
 end
 
 function ReceiptProcessingService:Start()
-	MarketplaceService.ProcessReceipt = function(...)
-		return self:_handleProcessReceiptAsync(...)
+	if RunService:IsServer() then
+		MarketplaceService.ProcessReceipt = function(...)
+			return self:_handleProcessReceiptAsync(...)
+		end
+	else
+		-- Note: we're probably in test mode and initialized on the client
+		warn("[ReceiptProcessingService] - Failed to bind process receipt")
 	end
 end
 

@@ -121,11 +121,11 @@ function PlayerCharacterBinder:_handlePlayerAdded(playerMaid, player)
 	local maid = Maid.new()
 
 	maid:GiveTask(player.CharacterAdded:Connect(function(character)
-		self:Bind(character)
+		self:Tag(character)
 	end))
 
 	if player.Character then
-		self:Bind(player.Character)
+		self:Tag(player.Character)
 	end
 
 	playerMaid[player] = maid

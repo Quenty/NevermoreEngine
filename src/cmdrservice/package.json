@@ -25,7 +25,6 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/chatproviderservice": "file:../chatproviderservice",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/permissionprovider": "file:../permissionprovider",

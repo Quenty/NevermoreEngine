@@ -189,7 +189,7 @@ end
 	@return Observable<string?>
 ]=]
 function GameConfigAssetBase:ObserveCloudName()
-	return self:_observeCloudProperty("Name", "string")
+	return self:_observeCloudProperty({ "Name" }, "string")
 end
 
 --[=[
@@ -198,7 +198,7 @@ end
 	@return Observable<string?>
 ]=]
 function GameConfigAssetBase:ObserveCloudDescription()
-	return self:_observeCloudProperty("Description", "string")
+	return self:_observeCloudProperty({ "Description" }, "string")
 end
 
 --[=[
@@ -206,27 +206,31 @@ end
 	@return Observable<number?>
 ]=]
 function GameConfigAssetBase:ObserveCloudPriceInRobux()
-	return self:_observeCloudProperty("PriceInRobux", "number")
+	return self:_observeCloudProperty({ "PriceInRobux" }, "number")
 end
 
 --[=[
 	@return Observable<number?>
 ]=]
 function GameConfigAssetBase:ObserveCloudIconImageAssetId()
-	return self:_observeCloudProperty("IconImageAssetId", "number")
+	return self:_observeCloudProperty({ "IconImageAssetId", "IconImageId" }, "number")
 end
 
-function GameConfigAssetBase:_observeCloudProperty(propertyName, expectedType)
-	assert(type(propertyName) == "string", "Bad propertyName")
+function GameConfigAssetBase:_observeCloudProperty(propertyNameList, expectedType)
+	assert(type(propertyNameList) == "table", "Bad propertyNameList")
 	assert(type(expectedType) == "string", "Bad expectedType")
 
 	return self:_observeCloudDataFromState():Pipe({
 		Rx.map(function(data)
 			if type(data) == "table" then
-				local result = data[propertyName]
-				if type(result) == expectedType then
-					return result
+				for _, propertyName in pairs(propertyNameList) do
+					local result = data[propertyName]
+					if type(result) == expectedType then
+						return result
+					end
 				end
+
+				return nil
 			else
 				return nil
 			end

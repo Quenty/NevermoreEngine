@@ -26,5 +26,9 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/enumutils": "file:../enumutils",
+    "@quenty/loader": "file:../loader"
   }
 }

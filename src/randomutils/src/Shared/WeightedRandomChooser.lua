@@ -4,7 +4,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RandomUtils = require("RandomUtils")
 local Table = require("Table")
 
 local WeightedRandomChooser = {}
@@ -35,7 +34,21 @@ function WeightedRandomChooser:SetWeight(option, weight)
 	assert(option ~= nil, "Bad option")
 	assert(type(weight) == "number" or weight == nil, "Bad weight")
 
+	if self._optionToWeight[option] == weight then
+		return
+	end
+
+	self._cache = nil
 	self._optionToWeight[option] = weight
+end
+
+--[=[
+	Removes the option from the chooser. Equivalent of setting the weight to nil
+
+	@param option T
+]=]
+function WeightedRandomChooser:Remove(option)
+	self:SetWeight(option, nil)
 end
 
 --[=[
@@ -60,37 +73,64 @@ function WeightedRandomChooser:GetProbability(option)
 		return nil
 	end
 
-	-- TODO: Cache if we call like a million times
-	local total = 0
-	for _, item in pairs(self._optionToWeight) do
-		total = total + item
-	end
-
-	return weight/total
-end
-
---[=[
-	Removes the option from the chooser. Equivalent of setting the weight to nil
-
-	@param option T
-]=]
-function WeightedRandomChooser:Remove(option)
-	self:SetWeight(option, nil)
+	local cache = self:_getOrCreateDataCache()
+	return weight/cache.total
 end
 
 --[=[
 	Picks a weighted choise
 
+	@param random Random
 	@return T
 ]=]
-function WeightedRandomChooser:Choose()
-	local options = Table.keys(self._optionToWeight)
-	local weights = {}
-	for index, key in pairs(options) do
-		weights[index] = self._optionToWeight[key]
+function WeightedRandomChooser:Choose(random)
+	local data = self:_getOrCreateDataCache()
+
+	local randomNum
+	if random then
+		randomNum = random:NextNumber()
+	else
+		randomNum = math.random()
 	end
 
-	return RandomUtils.weightedChoice(options, weights)
+	local totalSum = 0
+
+	-- TODO: Binary search
+	for i=1, #data.options do
+		totalSum = totalSum + data.weights[i]
+
+		-- TODO: cache threshold?
+		local threshold = totalSum/data.total
+		if randomNum <= threshold then
+			return data.options[i]
+		end
+	end
+
+	warn("[WeightedRandomChooser.Choose] - Failed to reach threshold! Algorithm is wrong!")
+	return data.options[#data.options]
+end
+
+function WeightedRandomChooser:_getOrCreateDataCache()
+	if self._cache then
+		return self._cache
+	end
+
+	local options = Table.keys(self._optionToWeight)
+	local weights = {}
+
+	local total = 0
+	for index, key in pairs(options) do
+		local weight = self._optionToWeight[key]
+		total = total + weight
+		weights[index] = weight
+	end
+
+	self._cache = {
+		options = options;
+		weights = weights;
+		total = total;
+	}
+	return self._cache
 end
 
 return WeightedRandomChooser

@@ -52,25 +52,13 @@ function ObservableMapList:Push(observeKey, entry)
 
 	local maid = Maid.new()
 
-	local lastKey = nil
-	local function removeLastEntry()
-		if lastKey ~= nil then
-			self:_removeFromList(lastKey, entry)
-		end
-		lastKey = nil
-	end
-
 	maid:GiveTask(observeKey:Subscribe(function(key)
-		removeLastEntry()
+		maid._currentAddValue = nil
 
 		if key ~= nil then
-			self:_addToList(key, entry)
+			maid._currentAddValue = self:_addToList(key, entry)
 		end
-
-		lastKey = key
 	end))
-
-	maid:GiveTask(removeLastEntry)
 
 	-- Ensure self-cleanup when map cleans up
 	self._maid[maid] = maid
@@ -147,6 +135,13 @@ function ObservableMapList:GetKeyList()
 	return self._observableMapOfLists:GetKeyList()
 end
 
+--[=[
+	Observes the list of all keys.
+	@return Observable<{ TKey }>
+]=]
+function ObservableMapList:ObserveKeyList()
+	return self._observableMapOfLists:ObserveKeyList()
+end
 
 --[=[
 	Observes all keys in the map
@@ -169,7 +164,7 @@ function ObservableMapList:ObserveAtListIndexBrio(key, index)
 
 	return self._observableMapOfLists:ObserveAtKeyBrio(key):Pipe({
 		RxBrioUtils.switchMapBrio(function(list)
-			return list:ObserveAtIndexBrio(-1)
+			return list:ObserveAtIndexBrio(index)
 		end);
 		RxBrioUtils.toBrio();
 		RxBrioUtils.where(function(value)
@@ -251,35 +246,11 @@ end
 
 function ObservableMapList:_addToList(key, entry)
 	local list = self:_getOrCreateList(key)
-	list:Add(entry)
+	return list:Add(entry)
 end
 
-function ObservableMapList:_removeFromList(key, entry)
-	local list = self._observableMapOfLists:Get(key)
-	if not list then
-		return
-	end
-
-	-- This happens when we're cleaning up sometimes
-	if not list.Destroy then
-		return
-	end
-
-	if list:Contains(entry) then
-		list:Remove(entry)
-
-		if list:GetCount() == 0 then
-			self:_removeList(key)
-		end
-	end
-end
-
-function ObservableMapList:_removeList(key)
-	local list = self._observableMapOfLists:Get(key)
-	if list then
-		self._observableMapOfLists:Set(key, nil)
-		self._maid[list] = nil
-	end
+function ObservableMapList:_removeList(list)
+	self._maid[list] = nil
 end
 
 function ObservableMapList:_getOrCreateList(key)
@@ -291,7 +262,13 @@ function ObservableMapList:_getOrCreateList(key)
 	local maid = Maid.new()
 	local list = maid:Add(ObservableList.new(nil))
 
-	self._observableMapOfLists:Set(key, list)
+	maid:GiveTask(list.CountChanged:Connect(function(count)
+		if count <= 0 then
+			self._maid[list] = nil
+		end
+	end))
+
+	maid:GiveTask(self._observableMapOfLists:Set(key, list))
 	self._maid[list] = maid
 
 	return list

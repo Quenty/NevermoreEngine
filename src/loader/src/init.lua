@@ -79,7 +79,7 @@ local function bootstrapGame(packageFolder)
 	sharedFolder.Parent = ReplicatedStorage
 	serverFolder.Parent = ServerScriptService
 
-	return serverFolder
+	return serverFolder, clientFolder, sharedFolder
 end
 
 local function bootstrapPlugin(packageFolder)

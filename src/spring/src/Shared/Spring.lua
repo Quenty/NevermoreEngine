@@ -183,7 +183,7 @@ function Spring:__index(index)
 	elseif index == "Clock" then
 		return self._clock
 	else
-		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
+		error(string.format("%q is not a valid member of Spring", tostring(index)), 2)
 	end
 end
 
@@ -225,7 +225,7 @@ function Spring:__newindex(index, value)
 		self._clock = value
 		self._time0 = value()
 	else
-		error(("%q is not a valid member of Spring"):format(tostring(index)), 2)
+		error(string.format("%q is not a valid member of Spring", tostring(index)), 2)
 	end
 end
 

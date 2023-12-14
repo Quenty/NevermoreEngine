@@ -25,10 +25,7 @@ function ScoredAction.new()
 
 	self._score = -math.huge
 	self._createdTimeStamp = tick()
-
-
-	self._preferredStack = StateStack.new(false)
-	self._maid:GiveTask(self._preferredStack)
+	self._preferredStack = self._maid:Add(StateStack.new(false, "boolean"))
 
 --[=[
 	@prop PreferredChanged Signal<boolean>
