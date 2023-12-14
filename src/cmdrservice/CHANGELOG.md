@@ -1,3 +1,21 @@
+# v8.3.0 (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
+- feat: ChatProviderService can disable chat ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- style: Fix query for permission service ([@Quenty](https://github.com/Quenty))
+- fix: Remove remoting calls and ensure we cancel promise for cmdr cleanup ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

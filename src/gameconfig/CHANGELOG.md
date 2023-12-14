@@ -1,3 +1,21 @@
+# v6.4.0 (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
+- feat: Provider better formatted errors when prompting ([@Quenty](https://github.com/Quenty))
+- feat: Can provide translated cloud description for badges ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix dependencies ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

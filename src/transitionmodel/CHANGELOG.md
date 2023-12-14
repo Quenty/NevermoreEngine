@@ -1,3 +1,19 @@
+# v2.2.0 (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: TransitionModel would sometimes stall if no callback was specified ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

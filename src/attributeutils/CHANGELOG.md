@@ -1,3 +1,17 @@
+# v9.2.0 (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
+- feat: Refactor AttributeTableValue to support non-attibute values. ([@Quenty](https://github.com/Quenty))
+- feat: Add AttributeTableValue.new(adornee, defaultValues) which allows for a cleaner use of multiple attributes being returned or indexed into. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

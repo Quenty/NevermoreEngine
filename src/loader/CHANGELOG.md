@@ -1,3 +1,17 @@
+# v7.1.0 (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
+- feat: Return server, client, and shared folders so they can be renamed ([@Quenty](https://github.com/Quenty))
+- feat: Reduce duplicate __call() and __index code ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,21 @@
+# v8.4.0 (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- refactor: Use new Maid syntax ([@Quenty](https://github.com/Quenty))
+- fix: Proximity prompt utils assumes keyboard and mouse to be more consistent in behavior with other input hints ([@Quenty](https://github.com/Quenty))
+- fix: InputKeyMapTranslator was passing in bad initial language ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
