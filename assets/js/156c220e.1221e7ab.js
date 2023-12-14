@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[26073],{11628:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ScreenGuiService","desc":"","source":{"line":4,"path":"src/genericscreenguiprovider/src/Client/ScreenGuiService.lua"}}')}}]);
