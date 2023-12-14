@@ -37,8 +37,8 @@ function TimedTween.new(transitionTime)
 		self:_updateState()
 	end))
 
-	self._maid:GiveTask(self.VisibleChanged:Connect(function()
-		self:_updateState()
+	self._maid:GiveTask(self.VisibleChanged:Connect(function(_, doNotAnimate)
+		self:_updateState(doNotAnimate)
 	end))
 	self:_updateState()
 
@@ -109,7 +109,7 @@ function TimedTween:PromiseFinished()
 	return promise
 end
 
-function TimedTween:_updateState()
+function TimedTween:_updateState(doNotAnimate)
 	local transitionTime = self._transitionTime.Value
 	local target = self:IsVisible() and 1 or 0;
 
@@ -118,13 +118,21 @@ function TimedTween:_updateState()
 	local p0 = computed.p
 
 	local remainingDist = target - p0
-
-	self._state.Value = {
-		p0 = p0;
-		p1 = target;
-		t0 = now;
-		t1 = now + Math.map(math.abs(remainingDist), 0, 1, 0, transitionTime);
-	}
+	if doNotAnimate then
+		self._state.Value = {
+			p0 = target;
+			p1 = target;
+			t0 = now;
+			t1 = now;
+		}
+	else
+		self._state.Value = {
+			p0 = p0;
+			p1 = target;
+			t0 = now;
+			t1 = now + Math.map(math.abs(remainingDist), 0, 1, 0, transitionTime);
+		}
+	end
 end
 
 function TimedTween:_computeState(now)
