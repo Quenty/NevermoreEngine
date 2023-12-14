@@ -83,7 +83,7 @@ end
 	@param adornee Instance
 	@return { TieInterface }
 ]=]
-function TieDefinition:GetImplementations(adornee: Instance, realm)
+function TieDefinition:GetImplementations(adornee: Instance)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local implementations = {}
@@ -92,7 +92,7 @@ function TieDefinition:GetImplementations(adornee: Instance, realm)
 	for _, item in pairs(adornee:GetChildren()) do
 		if item.Name == containerName then
 			if self:IsImplementation(item) then
-				table.insert(implementations, TieInterface.new(self, item, nil, realm))
+				table.insert(implementations, TieInterface.new(self, item, nil))
 			end
 		end
 	end
@@ -449,7 +449,10 @@ function TieDefinition:GetMemberMap()
 end
 
 --[=[
-	@param folder
+	Returns true if the folder is an implementation
+
+	@param folder Folder
+	@return boolean
 ]=]
 function TieDefinition:IsImplementation(folder)
 	local attributes = folder:GetAttributes()

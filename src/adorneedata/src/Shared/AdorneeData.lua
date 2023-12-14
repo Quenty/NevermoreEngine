@@ -24,6 +24,7 @@ AdorneeData.__index = AdorneeData
 --[=[
 	Attribute data specification
 
+	@param prototype any
 	@return AdorneeData<T>
 ]=]
 function AdorneeData.new(prototype)
@@ -47,6 +48,7 @@ end
 --[=[
 	Returns true if the data is valid data, otherwise returns false and an error.
 
+	@param data any
 	@return boolean
 	@return string -- Error message
 ]=]
@@ -141,6 +143,9 @@ end
 
 --[=[
 	Initializes the attributes for the adornee
+
+	@param adornee Instance
+	@param data T
 ]=]
 function AdorneeData:InitAttributes(adornee, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
@@ -162,6 +167,9 @@ function AdorneeData:InitAttributes(adornee, data)
 end
 
 --[=[
+	Sets partial attributes on the adornee
+
+	@param adornee Instance
 	@param partialData TPartial
 ]=]
 function AdorneeData:SetPartialAttributes(adornee, partialData)
@@ -213,6 +221,7 @@ end
 --[=[
 	Returns true if the data is valid partial data, otherwise returns false and an error.
 
+	@param data any
 	@return boolean
 	@return string -- Error message
 ]=]

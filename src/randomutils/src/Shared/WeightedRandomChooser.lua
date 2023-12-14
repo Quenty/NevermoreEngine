@@ -4,7 +4,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RandomUtils = require("RandomUtils")
 local Table = require("Table")
 
 local WeightedRandomChooser = {}
@@ -81,6 +80,7 @@ end
 --[=[
 	Picks a weighted choise
 
+	@param random Random
 	@return T
 ]=]
 function WeightedRandomChooser:Choose(random)

@@ -38,6 +38,7 @@ function TimeSyncService:Init()
 	if not RunService:IsRunning() then
 		-- Assume we're in server mode
 		self._clockPromise:Resolve(self:_buildMasterClock())
+		-- selene: allow(if_same_then_else)
 	elseif RunService:IsServer() then
 		self._clockPromise:Resolve(self:_buildMasterClock())
 	elseif RunService:IsClient() then
