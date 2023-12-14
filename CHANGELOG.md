@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/rxbinderutils@9.3.0`
+  - feat: RxBinderUtils.observeAllArrayBrio [#408](https://github.com/Quenty/NevermoreEngine/pull/408) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
+# (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
 - `@quenty/adorneeboundingbox@2.3.0`, `@quenty/adorneedata@1.1.0`, `@quenty/animations@2.2.0`, `@quenty/attributeutils@9.2.0`, `@quenty/badgeutils@7.1.0`, `@quenty/basicpane@8.2.0`, `@quenty/binder@9.2.0`, `@quenty/bindtocloseservice@3.2.0`, `@quenty/blend@7.2.0`, `@quenty/buttonhighlightmodel@9.2.0`, `@quenty/chatproviderservice@4.3.0`, `@quenty/clienttranslator@9.2.0`, `@quenty/cmdrservice@8.3.0`, `@quenty/collectionserviceutils@3.2.0`, `@quenty/colorpalette@5.2.0`, `@quenty/conditions@5.2.0`, `@quenty/contentproviderutils@7.2.0`, `@quenty/countdowntext@1.1.0`, `@quenty/counter@2.2.0`, `@quenty/datastore@8.2.0`, `@quenty/ellipticcurvecryptography@1.2.0`, `@quenty/elo@2.2.0`, `@quenty/gameconfig@6.4.0`, `@quenty/gameproductservice@8.4.0`, `@quenty/genericscreenguiprovider@8.2.0`, `@quenty/idleservice@8.2.0`, `@quenty/inputkeymaputils@8.4.0`, `@quenty/lipsum@9.2.0`, `@quenty/loader@7.1.0`, `@quenty/observablecollection@6.3.0`, `@quenty/pathfindingutils@7.1.0`, `@quenty/permissionprovider@9.3.0`, `@quenty/playerbinder@9.2.0`, `@quenty/playerhumanoidbinder@9.2.0`, `@quenty/playerinputmode@4.3.0`, `@quenty/playerutils@3.3.0`, `@quenty/preferredparentutils@4.1.0`, `@quenty/randomutils@3.1.0`, `@quenty/receiptprocessing@2.2.0`, `@quenty/rx@8.2.0`, `@quenty/scoredactionservice@10.4.0`, `@quenty/servicebag@7.1.0`, `@quenty/settings@5.4.0`, `@quenty/soundplayer@2.2.0`, `@quenty/spring@7.1.0`, `@quenty/statestack@9.2.0`, `@quenty/table@3.4.0`, `@quenty/tie@5.2.0`, `@quenty/timedtween@2.2.0`, `@quenty/timesyncservice@8.2.0`, `@quenty/transitionmodel@2.2.0`, `@quenty/uiobjectutils@3.5.0`, `@quenty/valuebaseutils@8.2.0`, `@quenty/voicechat@2.1.0`
   - users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
 

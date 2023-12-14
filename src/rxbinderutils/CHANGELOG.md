@@ -1,3 +1,15 @@
+# v9.3.0 (Thu Dec 14 2023)
+
+#### 🚀 Enhancement
+
+- feat: RxBinderUtils.observeAllArrayBrio [#408](https://github.com/Quenty/NevermoreEngine/pull/408) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
