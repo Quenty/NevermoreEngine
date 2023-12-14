@@ -79,8 +79,7 @@ function BasicPane.new(gui)
 
 	self._visible = false
 
-	self.VisibleChanged = Signal.new() -- :Fire(isVisible, doNotAnimate, maid)
-	self._maid:GiveTask(self.VisibleChanged)
+	self.VisibleChanged = self._maid:Add(Signal.new()) -- :Fire(isVisible, doNotAnimate, maid)
 
 	if gui then
 		self._gui = gui
