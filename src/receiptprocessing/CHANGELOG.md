@@ -1,24 +1,23 @@
-# v2.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Allow receipt processing to handle client-side initialization if we're in a plugin or other scenario ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix missing dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@2.1.1...@quenty/receiptprocessing@2.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([91e9170](https://github.com/Quenty/NevermoreEngine/commit/91e9170a2e34d2bdcc1ceb4f384ee59947a541ef))
+
+
+### Features
+
+* Allow receipt processing to handle client-side initialization if we're in a plugin or other scenario ([299280f](https://github.com/Quenty/NevermoreEngine/commit/299280f68f6f2c689ebd11bbf337da7102c22709))
+
+
+
+
 
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@2.1.0...@quenty/receiptprocessing@2.1.1) (2023-10-28)
 

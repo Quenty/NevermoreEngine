@@ -1,23 +1,18 @@
-# v2.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: TransitionModel would sometimes stall if no callback was specified ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@2.1.1...@quenty/transitionmodel@2.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* TransitionModel would sometimes stall if no callback was specified ([981cb47](https://github.com/Quenty/NevermoreEngine/commit/981cb4725b4567e3efd6d3ade2566b5a596fea8d))
+
+
+
+
 
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@2.1.0...@quenty/transitionmodel@2.1.1) (2023-10-28)
 

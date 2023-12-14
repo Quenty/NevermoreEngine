@@ -1,20 +1,18 @@
-# v3.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add support for BindToClose to run on client (in plugin and other scenarios) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@3.1.1...@quenty/bindtocloseservice@3.2.0) (2023-12-14)
+
+
+### Features
+
+* Add support for BindToClose to run on client (in plugin and other scenarios) ([8fa0f80](https://github.com/Quenty/NevermoreEngine/commit/8fa0f80b0881e0052a7db11eba68f422e84ef4c5))
+
+
+
+
 
 ## [3.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@3.1.0...@quenty/bindtocloseservice@3.1.1) (2023-10-28)
 

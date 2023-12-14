@@ -1,21 +1,19 @@
-# v9.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Refactor AttributeTableValue to support non-attibute values. ([@Quenty](https://github.com/Quenty))
-- feat: Add AttributeTableValue.new(adornee, defaultValues) which allows for a cleaner use of multiple attributes being returned or indexed into. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.1.1...@quenty/attributeutils@9.2.0) (2023-12-14)
+
+
+### Features
+
+* Add AttributeTableValue.new(adornee, defaultValues) which allows for a cleaner use of multiple attributes being returned or indexed into. ([a2f2aa1](https://github.com/Quenty/NevermoreEngine/commit/a2f2aa1ebe049eb36e9c623a8e96216cba93a1d3))
+* Refactor AttributeTableValue to support non-attibute values. ([17af0b6](https://github.com/Quenty/NevermoreEngine/commit/17af0b6bbc46b31e70cf067aa41d88d2b7717cc7))
+
+
+
+
 
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.1.0...@quenty/attributeutils@9.1.1) (2023-10-28)
 

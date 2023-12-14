@@ -1,21 +1,19 @@
-# v3.5.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add PlayerGuiUtils.findPlayerGui() and documentation ([@Quenty](https://github.com/Quenty))
-- feat: Add ScrollingDirectionUtils.canScrollHorizontal(scrollingDirection) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.4.0...@quenty/uiobjectutils@3.5.0) (2023-12-14)
+
+
+### Features
+
+* Add PlayerGuiUtils.findPlayerGui() and documentation ([8f6ddd7](https://github.com/Quenty/NevermoreEngine/commit/8f6ddd7186b296dfe158f66f666bc08b02d02e8a))
+* Add ScrollingDirectionUtils.canScrollHorizontal(scrollingDirection) ([0b18d30](https://github.com/Quenty/NevermoreEngine/commit/0b18d30af7003ce4abb75398490d40d4afb530ac))
+
+
+
+
 
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.3.0...@quenty/uiobjectutils@3.4.0) (2023-05-26)
 

@@ -1,21 +1,19 @@
-# v3.3.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxPlayerUtils.observeFirstAppearanceLoaded(player) helper method ([@Quenty](https://github.com/Quenty))
-- feat: Add RxPlayerUtils.observeLocalPlayerBrio() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@3.2.1...@quenty/playerutils@3.3.0) (2023-12-14)
+
+
+### Features
+
+* Add RxPlayerUtils.observeFirstAppearanceLoaded(player) helper method ([00de417](https://github.com/Quenty/NevermoreEngine/commit/00de41797896e3c2177bcdafcac337f4722281ab))
+* Add RxPlayerUtils.observeLocalPlayerBrio() ([7838296](https://github.com/Quenty/NevermoreEngine/commit/783829619cc1577af434aa5dd62957ddddf839bb))
+
+
+
+
 
 ## [3.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@3.2.0...@quenty/playerutils@3.2.1) (2023-10-28)
 

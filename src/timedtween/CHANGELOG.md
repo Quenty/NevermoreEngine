@@ -1,23 +1,18 @@
-# v2.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: TimedTween can handle immediate jump to animation state ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@2.1.1...@quenty/timedtween@2.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* TimedTween can handle immediate jump to animation state ([73dc9c8](https://github.com/Quenty/NevermoreEngine/commit/73dc9c8d73774d9c9993ebb20be087574ee9c55a))
+
+
+
+
 
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@2.1.0...@quenty/timedtween@2.1.1) (2023-10-28)
 

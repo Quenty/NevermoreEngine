@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionimageutils@8.0.0...@quenty/selectionimageutils@8.1.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/selectionimageutils
+
+
+
+
+
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionimageutils@7.3.0...@quenty/selectionimageutils@8.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/selectionimageutils

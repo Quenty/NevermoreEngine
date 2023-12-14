@@ -1,25 +1,23 @@
-# v6.3.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add :ObserveKeyList() to ObservableMap and equivalents ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix removing from lists in ObservableMapList ([@Quenty](https://github.com/Quenty))
-- docs: Update documentation of ObserrvableSortedList ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.2.1...@quenty/observablecollection@6.3.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Fix removing from lists in ObservableMapList ([14278f0](https://github.com/Quenty/NevermoreEngine/commit/14278f0136b944ad679fa5b29e1e94a560bef8ac))
+
+
+### Features
+
+* Add :ObserveKeyList() to ObservableMap and equivalents ([8f1cb4b](https://github.com/Quenty/NevermoreEngine/commit/8f1cb4b705c98fed0e96c9889c4aa62f635751ce))
+
+
+
+
 
 ## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.2.0...@quenty/observablecollection@6.2.1) (2023-10-28)
 

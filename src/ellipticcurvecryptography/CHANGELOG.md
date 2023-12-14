@@ -1,23 +1,18 @@
-# v1.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Improve performance of elliptic curve crypto module, saving 100ms of startup compute time on server start ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.1.0...@quenty/ellipticcurvecryptography@1.2.0) (2023-12-14)
+
+
+### Performance Improvements
+
+* Improve performance of elliptic curve crypto module, saving 100ms of startup compute time on server start ([b9b500e](https://github.com/Quenty/NevermoreEngine/commit/b9b500e33b0b297c0510b28ce272c553d19408e6))
+
+
+
+
 
 # 1.1.0 (2023-03-31)
 

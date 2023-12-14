@@ -1,20 +1,18 @@
-# v4.3.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: ChatProviderService can disable chat ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.2.1...@quenty/chatproviderservice@4.3.0) (2023-12-14)
+
+
+### Features
+
+* ChatProviderService can disable chat ([99d06db](https://github.com/Quenty/NevermoreEngine/commit/99d06db7c7f1a2b16d2cb5ae9c0a26c842f1270b))
+
+
+
+
 
 ## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.2.0...@quenty/chatproviderservice@4.2.1) (2023-10-28)
 

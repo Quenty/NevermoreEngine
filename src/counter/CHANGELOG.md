@@ -1,24 +1,19 @@
-# v2.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Counter handles scenario where it is cleaned up ([@Quenty](https://github.com/Quenty))
-- fix: Fix missing dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@2.1.1...@quenty/counter@2.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Counter handles scenario where it is cleaned up ([890652e](https://github.com/Quenty/NevermoreEngine/commit/890652ec12fe49841d8ef6bdc4fe1463e46acb3e))
+* Fix missing dependencies ([91e9170](https://github.com/Quenty/NevermoreEngine/commit/91e9170a2e34d2bdcc1ceb4f384ee59947a541ef))
+
+
+
+
 
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/counter@2.1.0...@quenty/counter@2.1.1) (2023-10-28)
 

@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2023-12-14)
+
+
+### Features
+
+* Add countdown text utility methods ([5d45ac1](https://github.com/Quenty/NevermoreEngine/commit/5d45ac1951d51a3c44b983f82b84509915e80ec9))
+
+
+
+
+
 # v1.1.0 (Thu Dec 14 2023)
 
 #### 🚀 Enhancement

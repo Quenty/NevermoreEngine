@@ -1,24 +1,19 @@
-# v7.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: SpringObject has better errors ([@Quenty](https://github.com/Quenty))
-- fix: Update default props to be enums, and smooth top and bottom surfaces of parts ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@7.1.1...@quenty/blend@7.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* SpringObject has better errors ([ff78f35](https://github.com/Quenty/NevermoreEngine/commit/ff78f359dfab564a27b363c47edb9415138e7185))
+* Update default props to be enums, and smooth top and bottom surfaces of parts ([6036177](https://github.com/Quenty/NevermoreEngine/commit/60361779332eb6f04575c9c654c9d3d6440d3d1c))
+
+
+
+
 
 ## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@7.1.0...@quenty/blend@7.1.1) (2023-10-28)
 

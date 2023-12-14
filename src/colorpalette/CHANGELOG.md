@@ -1,20 +1,18 @@
-# v5.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Allow grades of raw numbers to be passed in ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@5.1.1...@quenty/colorpalette@5.2.0) (2023-12-14)
+
+
+### Features
+
+* Allow grades of raw numbers to be passed in ([a4e291a](https://github.com/Quenty/NevermoreEngine/commit/a4e291a78d09ad498bd7646471bd2e43527cb541))
+
+
+
+
 
 ## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@5.1.0...@quenty/colorpalette@5.1.1) (2023-10-28)
 

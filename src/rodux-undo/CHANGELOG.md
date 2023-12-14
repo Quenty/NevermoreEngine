@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-undo@5.0.0...@quenty/rodux-undo@5.1.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/rodux-undo
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rodux-undo@4.3.0...@quenty/rodux-undo@5.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/rodux-undo

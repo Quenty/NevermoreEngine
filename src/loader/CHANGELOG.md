@@ -1,21 +1,19 @@
-# v7.1.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Return server, client, and shared folders so they can be renamed ([@Quenty](https://github.com/Quenty))
-- feat: Reduce duplicate __call() and __index code ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@7.0.0...@quenty/loader@7.1.0) (2023-12-14)
+
+
+### Features
+
+* Reduce duplicate __call() and __index code ([422d019](https://github.com/Quenty/NevermoreEngine/commit/422d0193378076fca308c96a330ad6da0eb3784e))
+* Return server, client, and shared folders so they can be renamed ([8a12f42](https://github.com/Quenty/NevermoreEngine/commit/8a12f4225b91767b8ec87f3a1569a47c1a5154ce))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@6.3.0...@quenty/loader@7.0.0) (2023-10-11)
 

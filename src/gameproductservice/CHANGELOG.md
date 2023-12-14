@@ -1,20 +1,18 @@
-# v8.4.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Support GameProductServiceClient not having a local player ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@8.3.1...@quenty/gameproductservice@8.4.0) (2023-12-14)
+
+
+### Features
+
+* Support GameProductServiceClient not having a local player ([c9fd7a6](https://github.com/Quenty/NevermoreEngine/commit/c9fd7a684d3295fc62a7cfd34474642a2a51a430))
+
+
+
+
 
 ## [8.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@8.3.0...@quenty/gameproductservice@8.3.1) (2023-10-28)
 

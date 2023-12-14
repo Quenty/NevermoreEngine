@@ -1,20 +1,18 @@
-# v2.3.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Fix bounding box calculations to handle parts that are unanchored ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@2.2.1...@quenty/adorneeboundingbox@2.3.0) (2023-12-14)
+
+
+### Features
+
+* Fix bounding box calculations to handle parts that are unanchored ([c252a99](https://github.com/Quenty/NevermoreEngine/commit/c252a99bbb1ba76bf86ec73a0fe80d0cf057309b))
+
+
+
+
 
 ## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@2.2.0...@quenty/adorneeboundingbox@2.2.1) (2023-10-28)
 

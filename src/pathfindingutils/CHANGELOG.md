@@ -1,20 +1,18 @@
-# v7.1.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Draw lines when calling `PathfindingUtils.visualizePath` which helps diagnose the path better ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@7.0.0...@quenty/pathfindingutils@7.1.0) (2023-12-14)
+
+
+### Features
+
+* Draw lines when calling `PathfindingUtils.visualizePath` which helps diagnose the path better ([5f3e21e](https://github.com/Quenty/NevermoreEngine/commit/5f3e21ea63c5d652904d28233f2a1ad65cd4ab66))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@6.9.0...@quenty/pathfindingutils@7.0.0) (2023-10-11)
 

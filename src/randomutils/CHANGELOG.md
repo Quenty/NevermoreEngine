@@ -1,24 +1,18 @@
-# v3.1.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Cache random choice calculations to be speedy ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs and style ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@3.0.0...@quenty/randomutils@3.1.0) (2023-12-14)
+
+
+### Features
+
+* Cache random choice calculations to be speedy ([c32f301](https://github.com/Quenty/NevermoreEngine/commit/c32f30184d11e1ce04e3e9fa2cbd21861c54a09b))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@2.3.0...@quenty/randomutils@3.0.0) (2023-10-11)
 

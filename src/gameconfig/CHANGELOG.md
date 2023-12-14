@@ -1,25 +1,24 @@
-# v6.4.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Provider better formatted errors when prompting ([@Quenty](https://github.com/Quenty))
-- feat: Can provide translated cloud description for badges ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix dependencies ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@6.3.1...@quenty/gameconfig@6.4.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Fix dependencies ([11beb58](https://github.com/Quenty/NevermoreEngine/commit/11beb582b2d238abb077399fd1c59dea1c9ac90f))
+
+
+### Features
+
+* Can provide translated cloud description for badges ([5a899e7](https://github.com/Quenty/NevermoreEngine/commit/5a899e77a937bc5cf424af32e03b9240ed639f76))
+* Provider better formatted errors when prompting ([702e538](https://github.com/Quenty/NevermoreEngine/commit/702e5381c2981b6b57ba73882c7d9bc07740e99e))
+
+
+
+
 
 ## [6.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@6.3.0...@quenty/gameconfig@6.3.1) (2023-10-28)
 

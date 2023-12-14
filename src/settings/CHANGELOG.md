@@ -1,23 +1,18 @@
-# v5.4.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add ServiceName to SettingsService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.3.1...@quenty/settings@5.4.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Add ServiceName to SettingsService ([f5bcd0b](https://github.com/Quenty/NevermoreEngine/commit/f5bcd0b31196e8d35b8623b198dedb95455be387))
+
+
+
+
 
 ## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.3.0...@quenty/settings@5.3.1) (2023-10-28)
 

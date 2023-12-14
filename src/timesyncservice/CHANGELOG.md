@@ -1,24 +1,18 @@
-# v8.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Fix docs and style ([@Quenty](https://github.com/Quenty))
-- fix: Allow TimeSyncService to initialize in test mode ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timesyncservice@8.1.1...@quenty/timesyncservice@8.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Allow TimeSyncService to initialize in test mode ([bb53e48](https://github.com/Quenty/NevermoreEngine/commit/bb53e48443997beac4ff9ef6a193130d8128eb86))
+
+
+
+
 
 ## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timesyncservice@8.1.0...@quenty/timesyncservice@8.1.1) (2023-10-28)
 

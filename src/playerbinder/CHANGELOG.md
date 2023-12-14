@@ -1,20 +1,18 @@
-# v9.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Use :Tag() instead of :Bind() ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@9.1.1...@quenty/playerbinder@9.2.0) (2023-12-14)
+
+
+### Features
+
+* Use :Tag() instead of :Bind() ([99c9e13](https://github.com/Quenty/NevermoreEngine/commit/99c9e13f4489af2fd6bb677324e4640c0a2cb4e6))
+
+
+
+
 
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@9.1.0...@quenty/playerbinder@9.1.1) (2023-10-28)
 

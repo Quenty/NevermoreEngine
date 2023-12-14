@@ -1,20 +1,18 @@
-# v4.3.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Handle not having a local player setup ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@4.2.1...@quenty/playerinputmode@4.3.0) (2023-12-14)
+
+
+### Features
+
+* Handle not having a local player setup ([544a28b](https://github.com/Quenty/NevermoreEngine/commit/544a28b4c1e10f72e335583bd4e7ef6102a8eb0e))
+
+
+
+
 
 ## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@4.2.0...@quenty/playerinputmode@4.2.1) (2023-10-28)
 

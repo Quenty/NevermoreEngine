@@ -1,23 +1,15 @@
-# v10.4.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Use new maid syntax ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@10.3.1...@quenty/scoredactionservice@10.4.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
 
 ## [10.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@10.3.0...@quenty/scoredactionservice@10.3.1) (2023-10-28)
 

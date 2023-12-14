@@ -1,20 +1,18 @@
-# v9.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add LipsumIconUtils.coloredOutlineIcon(random) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@9.1.1...@quenty/lipsum@9.2.0) (2023-12-14)
+
+
+### Features
+
+* Add LipsumIconUtils.coloredOutlineIcon(random) ([7d8c74c](https://github.com/Quenty/NevermoreEngine/commit/7d8c74c5610f428d71ef4b5a71c5d85c533cb7c8))
+
+
+
+
 
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@9.1.0...@quenty/lipsum@9.1.1) (2023-10-28)
 

@@ -1,25 +1,19 @@
-# v8.4.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Use new Maid syntax ([@Quenty](https://github.com/Quenty))
-- fix: Proximity prompt utils assumes keyboard and mouse to be more consistent in behavior with other input hints ([@Quenty](https://github.com/Quenty))
-- fix: InputKeyMapTranslator was passing in bad initial language ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@8.3.1...@quenty/inputkeymaputils@8.4.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* InputKeyMapTranslator was passing in bad initial language ([030a1ea](https://github.com/Quenty/NevermoreEngine/commit/030a1eabfde882f7b0fc787f86cb6bea845a1300))
+* Proximity prompt utils assumes keyboard and mouse to be more consistent in behavior with other input hints ([a87d13b](https://github.com/Quenty/NevermoreEngine/commit/a87d13bd7527f43aaa59298b1c65e0f84628f9cf))
+
+
+
+
 
 ## [8.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@8.3.0...@quenty/inputkeymaputils@8.3.1) (2023-10-28)
 

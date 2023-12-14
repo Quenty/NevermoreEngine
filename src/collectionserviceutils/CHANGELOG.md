@@ -1,20 +1,18 @@
-# v3.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxCollectionServiceUtils.observeTagged(tagName) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@3.1.1...@quenty/collectionserviceutils@3.2.0) (2023-12-14)
+
+
+### Features
+
+* Add RxCollectionServiceUtils.observeTagged(tagName) ([1d611ce](https://github.com/Quenty/NevermoreEngine/commit/1d611ceaa94758872c1645249e17936348f5e016))
+
+
+
+
 
 ## [3.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/collectionserviceutils@3.1.0...@quenty/collectionserviceutils@3.1.1) (2023-10-28)
 

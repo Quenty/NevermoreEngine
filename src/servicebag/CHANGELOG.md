@@ -1,20 +1,18 @@
-# v7.1.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add service bag destruction errors that are more clear ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@7.0.0...@quenty/servicebag@7.1.0) (2023-12-14)
+
+
+### Features
+
+* Add service bag destruction errors that are more clear ([0d3087e](https://github.com/Quenty/NevermoreEngine/commit/0d3087efbf67c047839aa062496ed7d09fa8da69))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@6.9.0...@quenty/servicebag@7.0.0) (2023-10-11)
 

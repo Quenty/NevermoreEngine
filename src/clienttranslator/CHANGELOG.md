@@ -1,21 +1,19 @@
-# v9.2.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add support for roundingbehaviortypes.NONE and ([@Quenty](https://github.com/Quenty))
-- feat: Handle studio test mode localization numbers ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@9.1.1...@quenty/clienttranslator@9.2.0) (2023-12-14)
+
+
+### Features
+
+* Add support for roundingbehaviortypes.NONE and ([6869d9e](https://github.com/Quenty/NevermoreEngine/commit/6869d9e5b3a726fa3e15e6dbbfeedebdfcc71a3d))
+* Handle studio test mode localization numbers ([a30226d](https://github.com/Quenty/NevermoreEngine/commit/a30226d1d64cb2df89450d3d33b81d15192e61ff))
+
+
+
+
 
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@9.1.0...@quenty/clienttranslator@9.1.1) (2023-10-28)
 

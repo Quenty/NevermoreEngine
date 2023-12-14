@@ -1,20 +1,18 @@
-# v7.1.0 (Thu Dec 14 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/updates [#433](https://github.com/Quenty/NevermoreEngine/pull/433) ([@Quenty](https://github.com/Quenty))
-- feat: Add BadgeUtils.promiseUserHasBadge(userId, badgeId) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@7.0.0...@quenty/badgeutils@7.1.0) (2023-12-14)
+
+
+### Features
+
+* Add BadgeUtils.promiseUserHasBadge(userId, badgeId) ([bd46efc](https://github.com/Quenty/NevermoreEngine/commit/bd46efc830942ec91a24a45b4244f3ee94d0934a))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@6.8.0...@quenty/badgeutils@7.0.0) (2023-10-11)
 
