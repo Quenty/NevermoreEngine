@@ -1,4 +1,6 @@
 --[=[
+	Initializes ragdoll related binders
+
 	@server
 	@class RagdollService
 ]=]
