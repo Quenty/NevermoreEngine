@@ -1,5 +1,6 @@
 --[=[
 	Centralized group
+	@client
 	@class HighlightServiceClient
 ]=]
 
