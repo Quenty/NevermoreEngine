@@ -464,6 +464,17 @@ function Binder:Tag(inst)
 end
 
 --[=[
+	Returns true if the instance has a tag
+
+	@param inst Instance
+]=]
+function Binder:HasTag(inst)
+	assert(typeof(inst) == "Instance", "Bad inst")
+
+	return CollectionService:HasTag(inst, self._tagName)
+end
+
+--[=[
 	Untags the instance with the tag for the binder
 
 	@param inst Instance
