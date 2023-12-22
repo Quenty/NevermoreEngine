@@ -661,11 +661,8 @@ end
 	@return Promise
 ]=]
 function DataStoreStage:PromiseInvokeSavingCallbacks()
-	if not next(self._savingCallbacks) then
-		return Promise.resolved()
-	end
-
 	local removingPromises = {}
+
 	for _, func in pairs(self._savingCallbacks) do
 		local result = func()
 		if Promise.isPromise(result) then
