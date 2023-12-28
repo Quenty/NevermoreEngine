@@ -1,23 +1,18 @@
-# v5.3.0 (Thu Dec 28 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Improve error messages and assertion in TieDefinition ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.2.0...@quenty/tie@5.3.0) (2023-12-28)
+
+
+### Bug Fixes
+
+* Improve error messages and assertion in TieDefinition ([7e48f01](https://github.com/Quenty/NevermoreEngine/commit/7e48f0195970ab72c259bbf664a393ff59960370))
+
+
+
+
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.1.1...@quenty/tie@5.2.0) (2023-12-14)
 

@@ -1,23 +1,18 @@
-# v8.3.0 (Thu Dec 28 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix data store not invoking all saving callbacks ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.2.0...@quenty/datastore@8.3.0) (2023-12-28)
+
+
+### Bug Fixes
+
+* Fix data store not invoking all saving callbacks ([00ff0c0](https://github.com/Quenty/NevermoreEngine/commit/00ff0c0d65ebd3d0e948550759e4832ccf7d6834))
+
+
+
+
 
 # [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.1.1...@quenty/datastore@8.2.0) (2023-12-14)
 

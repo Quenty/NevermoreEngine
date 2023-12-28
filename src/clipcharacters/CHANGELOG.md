@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@7.2.0...@quenty/clipcharacters@7.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/clipcharacters
+
+
+
+
+
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@7.1.1...@quenty/clipcharacters@7.2.0) (2023-12-14)
 
 **Note:** Version bump only for package @quenty/clipcharacters

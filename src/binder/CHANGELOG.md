@@ -1,24 +1,19 @@
-# v9.3.0 (Thu Dec 28 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Binder doesn't push stuff past lifetime of subscription ([@Quenty](https://github.com/Quenty))
-- fix: Add :HasTag() call to Binder ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@9.2.0...@quenty/binder@9.3.0) (2023-12-28)
+
+
+### Bug Fixes
+
+* Add :HasTag() call to Binder ([13f8c62](https://github.com/Quenty/NevermoreEngine/commit/13f8c62d4d62675db0f7ebd42c32daf8e61bb904))
+* Binder doesn't push stuff past lifetime of subscription ([f7d11a1](https://github.com/Quenty/NevermoreEngine/commit/f7d11a1c05ad6a8c7151952a2b5b89e93bbb5540))
+
+
+
+
 
 # [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@9.1.1...@quenty/binder@9.2.0) (2023-12-14)
 

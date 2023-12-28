@@ -1,20 +1,18 @@
-# v7.2.0 (Thu Dec 28 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
-- feat: Add CancelToken.fromSeconds(seconds) to CancelToken ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@7.1.0...@quenty/canceltoken@7.2.0) (2023-12-28)
+
+
+### Features
+
+* Add CancelToken.fromSeconds(seconds) to CancelToken ([baf7db4](https://github.com/Quenty/NevermoreEngine/commit/baf7db49ae1952b1ddb2f917074564a20f7e1b2b))
+
+
+
+
 
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@7.0.0...@quenty/canceltoken@7.1.0) (2023-12-14)
 

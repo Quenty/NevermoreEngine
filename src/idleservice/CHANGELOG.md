@@ -1,19 +1,15 @@
-# v8.4.0 (Thu Dec 28 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@8.3.0...@quenty/idleservice@8.4.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+
+
+
 
 # [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@8.2.0...@quenty/idleservice@8.3.0) (2023-12-14)
 

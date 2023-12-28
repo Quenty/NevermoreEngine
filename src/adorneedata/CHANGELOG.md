@@ -1,23 +1,18 @@
-# v1.2.0 (Thu Dec 28 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Adornee attribute retrieval includes default values ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@1.1.0...@quenty/adorneedata@1.2.0) (2023-12-28)
+
+
+### Bug Fixes
+
+* Adornee attribute retrieval includes default values ([577691d](https://github.com/Quenty/NevermoreEngine/commit/577691d0bbdf2dbb0809c71dcf733881d74670ba))
+
+
+
+
 
 # 1.1.0 (2023-12-14)
 

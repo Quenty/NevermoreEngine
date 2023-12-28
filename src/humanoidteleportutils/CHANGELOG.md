@@ -1,20 +1,18 @@
-# v7.2.0 (Thu Dec 28 2023)
-
-#### 🚀 Enhancement
-
-- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
-- feat: Add HumanoidTeleportUtils.tryTeleportCharacter(character, position) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@7.1.0...@quenty/humanoidteleportutils@7.2.0) (2023-12-28)
+
+
+### Features
+
+* Add HumanoidTeleportUtils.tryTeleportCharacter(character, position) ([db3f254](https://github.com/Quenty/NevermoreEngine/commit/db3f254213666f9e19183f917ae2e283d7b0e07b))
+
+
+
+
 
 # [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@7.0.0...@quenty/humanoidteleportutils@7.1.0) (2023-12-14)
 
