@@ -1,3 +1,16 @@
+# (Thu Dec 28 2023)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneedata@1.2.0`, `@quenty/binder@9.3.0`, `@quenty/canceltoken@7.2.0`, `@quenty/chatproviderservice@4.5.0`, `@quenty/clienttranslator@9.3.0`, `@quenty/datastore@8.3.0`, `@quenty/highlight@4.4.0`, `@quenty/humanoidteleportutils@7.2.0`, `@quenty/playerinputmode@4.4.0`, `@quenty/ragdoll@10.4.0`, `@quenty/tie@5.3.0`
+  - users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Dec 14 2023)
 
 #### 🚀 Enhancement

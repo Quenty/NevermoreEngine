@@ -1,3 +1,15 @@
+# v8.4.0 (Thu Dec 28 2023)
+
+#### 🚀 Enhancement
+
+- users/quenty/adornee [#434](https://github.com/Quenty/NevermoreEngine/pull/434) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
