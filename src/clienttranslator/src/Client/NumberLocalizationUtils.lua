@@ -307,17 +307,21 @@ function NumberLocalizationUtils.abbreviate(number, locale, roundingBehaviourTyp
 	-- Round to required significant digits
 	local significantQuotient = roundToSignificantDigits(number / baseValue, numSignificantDigits, roundingBehaviourType)
 
-	-- trim to 1 decimal point
+	-- trim decimal points
+	local trimmedQuotientString
+	local symbolsAboveDecimal = math.ceil(math.log10(significantQuotient))
+	local maxDecimals = math.max(1, numSignificantDigits - symbolsAboveDecimal)
 	local trimmedQuotient
+	local roundingFactor = 10^maxDecimals
 	if roundingBehaviourType == RoundingBehaviourTypes.TRUNCATE then
-		trimmedQuotient = math.modf(significantQuotient * 10) / 10
+		trimmedQuotient = math.modf(significantQuotient * roundingFactor) / roundingFactor
 	elseif roundingBehaviourType == RoundingBehaviourTypes.ROUND_TO_CLOSEST then
-		trimmedQuotient = math.floor(significantQuotient * 10 + 0.5) / 10
+		trimmedQuotient = math.floor(significantQuotient * roundingFactor + 0.5) / roundingFactor
 	else
 		error(string.format("[NumberLocalizationUtils.abbreviate] - Unknown roundingBehaviourType %q", tostring(roundingBehaviourType)))
 	end
 
-	local trimmedQuotientString = tostring(trimmedQuotient)
+	trimmedQuotientString = tostring(trimmedQuotient)
 
 	-- Split the string into integer and fraction parts
 	local decimalPointIndex = findDecimalPointIndex(trimmedQuotientString)
