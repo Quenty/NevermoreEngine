@@ -1,4 +1,5 @@
 --[=[
+	@client
 	@class AnimatedHighlight
 ]=]
 

@@ -2,6 +2,7 @@
 	Service which manages central access to datastore. This datastore will refresh pretty frequently and
 	can be used for configuration and other components, such as Twitter codes or global settings.
 
+	@server
 	@class GameDataStoreService
 ]=]
 

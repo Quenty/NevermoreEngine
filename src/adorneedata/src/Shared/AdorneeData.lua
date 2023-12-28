@@ -109,8 +109,12 @@ function AdorneeData:GetAttributes(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local data = {}
-	for key, value in pairs(self._attributePrototype) do
-		data[key] = adornee:GetAttribute(value)
+	for key, defaultValue in pairs(self._attributePrototype) do
+		local result = adornee:GetAttribute(key)
+		if result == nil then
+			result = defaultValue
+		end
+		data[key] = result
 	end
 
 	-- TODO: Avoid additional allocation

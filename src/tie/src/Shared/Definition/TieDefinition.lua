@@ -455,6 +455,8 @@ end
 	@return boolean
 ]=]
 function TieDefinition:IsImplementation(folder)
+	assert(typeof(folder) == "Instance", "Bad folder")
+
 	local attributes = folder:GetAttributes()
 	local children = {}
 	for _, item in pairs(folder:GetChildren()) do
@@ -492,7 +494,7 @@ function TieDefinition:IsImplementation(folder)
 				return false
 			end
 		else
-			error("Unknown member type")
+			error("[TieDefinition.IsImplementation] - Unknown member type")
 		end
 	end
 
