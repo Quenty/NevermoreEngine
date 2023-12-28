@@ -67,8 +67,36 @@ end
 	@param position Vector3
 ]=]
 function HumanoidTeleportUtils.teleportRootPart(humanoid, rootPart, position)
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
+	assert(typeof(rootPart) == "Instance" and rootPart:IsA("BasePart"), "Bad rootPart")
+	assert(typeof(position) == "Vector3", "Bad position")
+
 	local offset = HumanoidTeleportUtils.getRootPartOffset(humanoid, rootPart)
 	rootPart.CFrame = rootPart.CFrame - rootPart.Position + position + offset
+end
+
+--[=[
+	Tries to teleport the character to a given position
+
+	@param character Model
+	@param position Vector3
+]=]
+function HumanoidTeleportUtils.tryTeleportCharacter(character, position)
+	assert(typeof(character) == "Instance", "Bad character")
+	assert(typeof(position) == "Vector3", "Bad position")
+
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+	if not humanoid then
+		return false
+	end
+
+	local rootPart = humanoid.RootPart
+	if not rootPart then
+		return false
+	end
+
+	HumanoidTeleportUtils.teleportRootPart(humanoid, rootPart, position)
+	return true
 end
 
 function HumanoidTeleportUtils.getRootPartOffset(humanoid, rootPart)
