@@ -246,12 +246,18 @@ function Binder:ObserveAllBrio()
 		maid:GiveTask(self:GetClassAddedSignal():Connect(handleNewClass))
 
 		for _, item in pairs(self:GetAll()) do
+			if not sub:IsPending() then
+				break
+			end
+
 			handleNewClass(item)
 		end
 
-		maid:GiveTask(self:GetClassRemovingSignal():Connect(function(class)
-			maid[class] = nil
-		end))
+		if sub:IsPending() then
+			maid:GiveTask(self:GetClassRemovingSignal():Connect(function(class)
+				maid[class] = nil
+			end))
+		end
 
 		return maid
 	end)
