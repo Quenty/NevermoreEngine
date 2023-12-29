@@ -12,6 +12,7 @@ Loader.__index = Loader
 function Loader.new(script)
 	return setmetatable({
 		_script = script;
+		_cache = {}
 	}, Loader)
 end
 
@@ -26,11 +27,20 @@ end
 
 function Loader:__call(value)
 	if type(value) == "string" then
+		local cache = rawget(self, "_cache")
+		if cache[value] ~= nil then
+			return cache[value]
+		end
+
 		local object = self._script.Parent[value]
 		if object:IsA("ObjectValue") then
-			return require(waitForValue(object))
+			local result = require(waitForValue(object))
+			cache[value] = result
+			return result
 		else
-			return require(object)
+			local result = require(object)
+			cache[value] = result
+			return result
 		end
 	else
 		return require(value)
