@@ -15,6 +15,7 @@ local ServiceBag = require("ServiceBag")
 local RoguePropertyService = require("RoguePropertyService")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local Set = require("Set")
+local RoguePropertyCacheService = require("RoguePropertyCacheService")
 
 local RoguePropertyTableDefinition = {} -- Inherits from RoguePropertyDefinition
 RoguePropertyTableDefinition.ClassName = "RoguePropertyTableDefinition"
@@ -168,7 +169,15 @@ function RoguePropertyTableDefinition:Get(serviceBag, adornee)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
+	local cacheService = serviceBag:GetService(RoguePropertyCacheService)
+	local cache = cacheService:GetCache(self)
+	local found = cache:Find(adornee)
+	if found then
+		return found
+	end
+
 	local roguePropertyTable = RoguePropertyTable.new(adornee, serviceBag, self)
+	cache:Store(adornee, roguePropertyTable)
 
 	if not self:GetParentPropertyDefinition() then
 		-- Set default value for top level only
