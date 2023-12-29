@@ -234,12 +234,17 @@ end
 	@return { [T]: true }
 ]=]
 function ObservableSet:GetSetCopy()
-	local set = {}
-	for item, _ in pairs(self._set) do
-		set[item] = true
-	end
-	return set
+	return table.clone(self._set)
 end
+
+--[=[
+	Gets the raw set. Do not modify this set.
+	@return { [T]: true }
+]=]
+function ObservableSet:GetRawSet()
+	return self._set
+end
+
 
 --[=[
 	Cleans up the ObservableSet and sets the metatable to nil.
