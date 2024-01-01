@@ -149,23 +149,38 @@ end
 	Initializes the attributes for the adornee
 
 	@param adornee Instance
-	@param data T
+	@param partialData T?
 ]=]
-function AdorneeData:InitAttributes(adornee, data)
+function AdorneeData:InitAttributes(adornee, partialData)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
-	assert(self:IsData(data))
+	assert(self:IsPartialData(partialData) or partialData == nil, "Bad partialData")
 
-	for key, _ in pairs(self._attributePrototype) do
-		if adornee:GetAttribute(key) == nil then
-			adornee:SetAttribute(key, data[key])
+	-- TODO: Better performance
+	if partialData == nil then
+		partialData = {}
+	end
+
+	for key, defaultValue in pairs(self._attributePrototype) do
+		if adornee:GetAttribute(key) ~= nil then
+			continue
+		end
+
+		if partialData[key] == nil then
+			adornee:SetAttribute(key, defaultValue)
+		else
+			adornee:SetAttribute(key, partialData[key])
 		end
 	end
 
 	-- TODO: Avoid additional allocation
 	for key, value in pairs(self._valueObjectPrototype) do
 		local valueObject = value:CreateValueObject(adornee)
-		if valueObject == nil then
-			valueObject.Value = data[key]
+		if valueObject.Value ~= nil then
+			continue
+		end
+
+		if partialData[key] ~= nil then
+			valueObject.Value = partialData[key]
 		end
 	end
 end
