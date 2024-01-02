@@ -1,4 +1,6 @@
 --[=[
+	@ignore
+
 	Private queue class for loading system.
 
 	@private
@@ -10,6 +12,8 @@ Queue.ClassName = "Queue"
 Queue.__index = Queue
 
 --[=[
+	@ignore
+
 	Constructs a new queue
 	@return Queue<T>
 ]=]
@@ -21,6 +25,8 @@ function Queue.new()
 end
 
 --[=[
+	@ignore
+
 	Pushes an entry to the left of the queue
 	@param value T
 ]=]
@@ -30,6 +36,8 @@ function Queue:PushLeft(value)
 end
 
 --[=[
+	@ignore
+
 	Pushes an entry to the right of the queue
 	@param value T
 ]=]
@@ -39,6 +47,8 @@ function Queue:PushRight(value)
 end
 
 --[=[
+	@ignore
+
 	Pops an entry from the left of the queue
 	@return T
 ]=]
@@ -55,6 +65,8 @@ function Queue:PopLeft()
 end
 
 --[=[
+	@ignore
+
 	Pops an entry from the right of the queue
 	@return T
 ]=]
@@ -71,6 +83,8 @@ function Queue:PopRight()
 end
 
 --[=[
+	@ignore
+
 	Returns true if the queue is empty
 	@return boolean
 ]=]

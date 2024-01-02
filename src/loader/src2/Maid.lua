@@ -1,4 +1,6 @@
 --[=[
+	@ignore
+
 	Manages the cleaning of events and other things. Useful for
 	encapsulating state and make deconstructors easy.
 
@@ -26,6 +28,8 @@ local Maid = {}
 Maid.ClassName = "Maid"
 
 --[=[
+	@ignore
+
 	Constructs a new Maid object
 
 	```lua
@@ -41,6 +45,8 @@ function Maid.new()
 end
 
 --[=[
+	@ignore
+
 	Returns true if the class is a maid, and false otherwise.
 
 	```lua
@@ -56,6 +62,8 @@ function Maid.isMaid(value)
 end
 
 --[=[
+	@ignore
+
 	Returns Maid[key] if not part of Maid metatable
 
 	```lua
@@ -79,6 +87,8 @@ function Maid:__index(index)
 end
 
 --[=[
+	@ignore
+
 	Add a task to clean up. Tasks given to a maid will be cleaned when
 	maid[index] is set to a different value.
 
@@ -136,6 +146,8 @@ function Maid:__newindex(index, newTask)
 end
 
 --[=[
+	@ignore
+
 	Gives a task to the maid for cleanup and returnsthe resulting value
 
 	@param task MaidTask -- An item to clean
@@ -156,6 +168,8 @@ function Maid:Add(task)
 end
 
 --[=[
+	@ignore
+
 	Gives a task to the maid for cleanup, but uses an incremented number as a key.
 
 	@param task MaidTask -- An item to clean
@@ -177,6 +191,8 @@ function Maid:GiveTask(task)
 end
 
 --[=[
+	@ignore
+
 	Gives a promise to the maid for clean.
 
 	@param promise Promise<T>
@@ -199,6 +215,8 @@ function Maid:GivePromise(promise)
 end
 
 --[=[
+	@ignore
+
 	Cleans up all tasks and removes them as entries from the Maid.
 
 	:::note
@@ -255,6 +273,8 @@ function Maid:DoCleaning()
 end
 
 --[=[
+	@ignore
+
 	Alias for [Maid.DoCleaning()](/api/Maid#DoCleaning)
 
 	@function Destroy
