@@ -351,8 +351,10 @@ function SpringObject:_getSpringForType(converted)
 		else
 			local oldDamper = self._currentSpring.d
 			local oldSpeed = self._currentSpring.s
+			local clock = self._currentSpring.Clock
 
 			self._currentSpring = Spring.new(converted)
+			self._currentSpring.Clock = clock
 			self._currentSpring.Speed = oldSpeed
 			self._currentSpring.Damper = oldDamper
 			return self._currentSpring
