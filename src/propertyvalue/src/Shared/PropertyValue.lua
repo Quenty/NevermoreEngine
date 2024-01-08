@@ -41,7 +41,7 @@ function PropertyValue:__index(index)
 	elseif PropertyValue[index] or index == "_obj" then
 		return PropertyValue[index]
 	else
-		error(("%q is not a member of PropertyValue"):format(tostring(index)))
+		error(string.format("%q is not a member of PropertyValue", tostring(index)))
 	end
 end
 
@@ -49,7 +49,7 @@ function PropertyValue:__newindex(index, value)
 	if index == "Value" then
 		self._obj[self._propertyName] = value
 	else
-		error(("%q is not a member of PropertyValue"):format(tostring(index)))
+		error(string.format("%q is not a member of PropertyValue", tostring(index)))
 	end
 end
 
