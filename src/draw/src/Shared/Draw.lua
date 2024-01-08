@@ -351,6 +351,7 @@ end
 	@param rayPart Instance -- Ray part
 	@param ray Ray -- New ray
 	@param color Color3 -- New color
+	@param diameter number -- Number
 ]=]
 function Draw.updateRay(rayPart, ray, color, diameter)
 	assert(typeof(rayPart) == "Instance", "Bad rayPart")

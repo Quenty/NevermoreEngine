@@ -23,7 +23,6 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
-local HumanoidTracker = require("HumanoidTracker")
 
 local SERVER_UPDATE_RATE = 1/10
 

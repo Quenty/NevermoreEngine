@@ -33,6 +33,7 @@ end
 	Inits the binder. See [Binder.Init].
 	Should be done via a [ServiceBag].
 
+	@param serviceBag ServiceBag
 	@param ... any
 ]=]
 function PlayerHumanoidBinder:Init(serviceBag, ...)
