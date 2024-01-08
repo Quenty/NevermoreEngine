@@ -16,8 +16,8 @@ Providing all 3"><meta data-rh="true" property="og:description" content="Bridges
 3. Within AttributeValues for writing regular code
 
 Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/AdorneeData"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/AdorneeData" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/AdorneeData" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.d9451b04.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.4246f63c.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.0f70eb11.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.7a0bd5ec.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -31,39 +31,46 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
 <p>Providing all 3</p>
 </div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L30"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>prototype<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/AdorneeData">AdorneeData</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Attribute data specification</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsData"><code style="text-decoration:none">IsData</code><a href="#IsData" class="hash-link" aria-label="Direct link to IsData" title="Direct link to IsData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L55"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">IsData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">boolean</code><code>,</code></div><div><code class="blue_P4bS">string</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsStrictData"><code style="text-decoration:none">IsStrictData</code><a href="#IsStrictData" class="hash-link" aria-label="Direct link to IsStrictData" title="Direct link to IsStrictData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L59"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">IsStrictData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">boolean</code><code>,</code></div><div><code class="blue_P4bS">string</code><span class="inlineDescription_G7Er">-- <span>
 <p>Error message</p>
 </span></span></div></div><code>)</code></div><div>
 <p>Returns true if the data is valid data, otherwise returns false and an error.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreateData"><code style="text-decoration:none">CreateData</code><a href="#CreateData" class="hash-link" aria-label="Direct link to CreateData" title="Direct link to CreateData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L65"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">CreateData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">T</code><code>) → </code><code class="blue_P4bS">T</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreateStrictData"><code style="text-decoration:none">CreateStrictData</code><a href="#CreateStrictData" class="hash-link" aria-label="Direct link to CreateStrictData" title="Direct link to CreateStrictData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L69"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">CreateStrictData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">TStrict</code><code>) → </code><code class="blue_P4bS">TStrict</code></div><div>
 <p>Validates and creates a new data table for the data that is readonly and frozen</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreatePartialData"><code style="text-decoration:none">CreatePartialData</code><a href="#CreatePartialData" class="hash-link" aria-label="Direct link to CreatePartialData" title="Direct link to CreatePartialData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L81"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">CreatePartialData</code><code>(</code><code>partialData<!-- -->: </code><code class="blue_P4bS">TPartial</code><code>) → </code><code class="blue_P4bS">TPartial</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreateFullData"><code style="text-decoration:none">CreateFullData</code><a href="#CreateFullData" class="hash-link" aria-label="Direct link to CreateFullData" title="Direct link to CreateFullData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L82"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">CreateFullData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">T</code><code>) → </code><code class="blue_P4bS">T</code></div><div>
+<p>
+  Validates and creates a new data table that is readonly. This table will have all values or
+  the defaults
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreateData"><code style="text-decoration:none">CreateData</code><a href="#CreateData" class="hash-link" aria-label="Direct link to CreateData" title="Direct link to CreateData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L103"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">CreateData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">TPartial</code><code>) → </code><code class="blue_P4bS">TPartial</code></div><div>
 <p>
   Validates and creates a new data table that is readonly and frozen, but for partial
   data.
 </p>
-<p>The partial data can just be part of the attributes.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreateAdorneeDataValue"><code style="text-decoration:none">CreateAdorneeDataValue</code><a href="#CreateAdorneeDataValue" class="hash-link" aria-label="Direct link to CreateAdorneeDataValue" title="Direct link to CreateAdorneeDataValue">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L94"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">CreateAdorneeDataValue</code><code>(</code><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/AdorneeDataValue">AdorneeDataValue</a></code></div><div>
+<p>The data can just be part of the attributes.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Observe"><code style="text-decoration:none">Observe</code><a href="#Observe" class="hash-link" aria-label="Direct link to Observe" title="Direct link to Observe">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L115"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">Observe</code><code>(</code><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">TStrict</code><code class="op_lSLc">&gt;</code></div><div>
+<p>Observes the attribute table for adornee</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreateAdorneeDataValue"><code style="text-decoration:none">CreateAdorneeDataValue</code><a href="#CreateAdorneeDataValue" class="hash-link" aria-label="Direct link to CreateAdorneeDataValue" title="Direct link to CreateAdorneeDataValue">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L127"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">CreateAdorneeDataValue</code><code>(</code><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/AdorneeDataValue">AdorneeDataValue</a></code></div><div>
 <p>Gets attribute table for the data</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetAttributes"><code style="text-decoration:none">GetAttributes</code><a href="#GetAttributes" class="hash-link" aria-label="Direct link to GetAttributes" title="Direct link to GetAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L108"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">GetAttributes</code><code>(</code><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">T</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetAttributes"><code style="text-decoration:none">GetAttributes</code><a href="#GetAttributes" class="hash-link" aria-label="Direct link to GetAttributes" title="Direct link to GetAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L141"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">GetAttributes</code><code>(</code><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">TStrict</code></div><div>
 <p>Gets the attributes for the adornee</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetAttributes"><code style="text-decoration:none">SetAttributes</code><a href="#SetAttributes" class="hash-link" aria-label="Direct link to SetAttributes" title="Direct link to SetAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L134"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">SetAttributes</code><code>(</code><div class="inset_uKQm"><div><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>data<!-- -->: </code><code class="blue_P4bS">T</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetAttributes"><code style="text-decoration:none">SetAttributes</code><a href="#SetAttributes" class="hash-link" aria-label="Direct link to SetAttributes" title="Direct link to SetAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L167"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">SetAttributes</code><code>(</code><div class="inset_uKQm"><div><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>data<!-- -->: </code><code class="blue_P4bS">T</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Sets the attributes for the adornee</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="InitAttributes"><code style="text-decoration:none">InitAttributes</code><a href="#InitAttributes" class="hash-link" aria-label="Direct link to InitAttributes" title="Direct link to InitAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L154"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">InitAttributes</code><code>(</code><div class="inset_uKQm"><div><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>partialData<!-- -->: </code><code class="blue_P4bS">T?</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetStrictAttributes"><code style="text-decoration:none">SetStrictAttributes</code><a href="#SetStrictAttributes" class="hash-link" aria-label="Direct link to SetStrictAttributes" title="Direct link to SetStrictAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L183"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">SetStrictAttributes</code><code>(</code><div class="inset_uKQm"><div><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>data<!-- -->: </code><code class="blue_P4bS">TStrict</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Sets the attributes for the adornee</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="InitAttributes"><code style="text-decoration:none">InitAttributes</code><a href="#InitAttributes" class="hash-link" aria-label="Direct link to InitAttributes" title="Direct link to InitAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L203"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">InitAttributes</code><code>(</code><div class="inset_uKQm"><div><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>data<!-- -->: </code><code class="blue_P4bS">T</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Initializes the attributes for the adornee</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetPartialAttributes"><code style="text-decoration:none">SetPartialAttributes</code><a href="#SetPartialAttributes" class="hash-link" aria-label="Direct link to SetPartialAttributes" title="Direct link to SetPartialAttributes">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L194"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">SetPartialAttributes</code><code>(</code><div class="inset_uKQm"><div><code>adornee<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>partialData<!-- -->: </code><code class="blue_P4bS">TPartial</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
-<p>Sets partial attributes on the adornee</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetStrictTInterface"><code style="text-decoration:none">GetStrictTInterface</code><a href="#GetStrictTInterface" class="hash-link" aria-label="Direct link to GetStrictTInterface" title="Direct link to GetStrictTInterface">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L210"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">GetStrictTInterface</code><code>(</code><code>) → </code><code class="blue_P4bS">function</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetStrictTInterface"><code style="text-decoration:none">GetStrictTInterface</code><a href="#GetStrictTInterface" class="hash-link" aria-label="Direct link to GetStrictTInterface" title="Direct link to GetStrictTInterface">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L234"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">GetStrictTInterface</code><code>(</code><code>) → </code><code class="blue_P4bS">function</code></div><div>
 <p>
   Gets a strict interface which will return true if the value is a partial interface and
   false otherwise.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetPartialTInterface"><code style="text-decoration:none">GetPartialTInterface</code><a href="#GetPartialTInterface" class="hash-link" aria-label="Direct link to GetPartialTInterface" title="Direct link to GetPartialTInterface">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L225"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">GetPartialTInterface</code><code>(</code><code>) → </code><code class="blue_P4bS">function</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTInterface"><code style="text-decoration:none">GetTInterface</code><a href="#GetTInterface" class="hash-link" aria-label="Direct link to GetTInterface" title="Direct link to GetTInterface">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L249"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">GetTInterface</code><code>(</code><code>) → </code><code class="blue_P4bS">function</code></div><div>
 <p>
   Gets a [t] interface which will return true if the value is a partial interface, and
   false otherwise.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsPartialData"><code style="text-decoration:none">IsPartialData</code><a href="#IsPartialData" class="hash-link" aria-label="Direct link to IsPartialData" title="Direct link to IsPartialData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L247"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">IsPartialData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">boolean</code><code>,</code></div><div><code class="blue_P4bS">string</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsData"><code style="text-decoration:none">IsData</code><a href="#IsData" class="hash-link" aria-label="Direct link to IsData" title="Direct link to IsData">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/adorneedata/src/Shared/AdorneeData.lua#L270"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>AdorneeData<!-- -->:</code><code class="green_DgR4">IsData</code><code>(</code><code>data<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">boolean</code><code>,</code></div><div><code class="blue_P4bS">string</code><span class="inlineDescription_G7Er">-- <span>
 <p>Error message</p>
 </span></span></div></div><code>)</code></div><div>
 <p>Returns true if the data is valid partial data, otherwise returns false and an error.</p>
@@ -92,7 +99,7 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             }
         },
         {
-            &quot;name&quot;: &quot;IsData&quot;,
+            &quot;name&quot;: &quot;IsStrictData&quot;,
             &quot;desc&quot;: &quot;Returns true if the data is valid data, otherwise returns false and an error.&quot;,
             &quot;params&quot;: [
                 {
@@ -113,13 +120,35 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 55,
+                &quot;line&quot;: 59,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;CreateData&quot;,
+            &quot;name&quot;: &quot;CreateStrictData&quot;,
             &quot;desc&quot;: &quot;Validates and creates a new data table for the data that is readonly and frozen&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;data&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;TStrict&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;TStrict&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 69,
+                &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;CreateFullData&quot;,
+            &quot;desc&quot;: &quot;Validates and creates a new data table that is readonly. This table will have all values or\nthe defaults&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;data&quot;,
@@ -135,16 +164,16 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 65,
+                &quot;line&quot;: 82,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;CreatePartialData&quot;,
-            &quot;desc&quot;: &quot;Validates and creates a new data table that is readonly and frozen, but for partial\ndata.\n\nThe partial data can just be part of the attributes.&quot;,
+            &quot;name&quot;: &quot;CreateData&quot;,
+            &quot;desc&quot;: &quot;Validates and creates a new data table that is readonly and frozen, but for partial\ndata.\n\nThe  data can just be part of the attributes.&quot;,
             &quot;params&quot;: [
                 {
-                    &quot;name&quot;: &quot;partialData&quot;,
+                    &quot;name&quot;: &quot;data&quot;,
                     &quot;desc&quot;: &quot;&quot;,
                     &quot;lua_type&quot;: &quot;TPartial&quot;
                 }
@@ -157,7 +186,29 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 81,
+                &quot;line&quot;: 103,
+                &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Observe&quot;,
+            &quot;desc&quot;: &quot;Observes the attribute table for adornee&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;adornee&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Instance&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Observable&lt;TStrict&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 115,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
@@ -179,7 +230,7 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 94,
+                &quot;line&quot;: 127,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
@@ -196,12 +247,12 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             &quot;returns&quot;: [
                 {
                     &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;T&quot;
+                    &quot;lua_type&quot;: &quot;TStrict&quot;
                 }
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 108,
+                &quot;line&quot;: 141,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
@@ -223,7 +274,29 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 134,
+                &quot;line&quot;: 167,
+                &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;SetStrictAttributes&quot;,
+            &quot;desc&quot;: &quot;Sets the attributes for the adornee&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;adornee&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Instance&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;data&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;TStrict&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 183,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
@@ -237,37 +310,15 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
                     &quot;lua_type&quot;: &quot;Instance&quot;
                 },
                 {
-                    &quot;name&quot;: &quot;partialData&quot;,
+                    &quot;name&quot;: &quot;data&quot;,
                     &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;T?&quot;
+                    &quot;lua_type&quot;: &quot;T&quot;
                 }
             ],
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 154,
-                &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
-            }
-        },
-        {
-            &quot;name&quot;: &quot;SetPartialAttributes&quot;,
-            &quot;desc&quot;: &quot;Sets partial attributes on the adornee&quot;,
-            &quot;params&quot;: [
-                {
-                    &quot;name&quot;: &quot;adornee&quot;,
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;Instance&quot;
-                },
-                {
-                    &quot;name&quot;: &quot;partialData&quot;,
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;TPartial&quot;
-                }
-            ],
-            &quot;returns&quot;: [],
-            &quot;function_type&quot;: &quot;method&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 194,
+                &quot;line&quot;: 203,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
@@ -283,12 +334,12 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 210,
+                &quot;line&quot;: 234,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;GetPartialTInterface&quot;,
+            &quot;name&quot;: &quot;GetTInterface&quot;,
             &quot;desc&quot;: &quot;Gets a [t] interface which will return true if the value is a partial interface, and\nfalse otherwise.&quot;,
             &quot;params&quot;: [],
             &quot;returns&quot;: [
@@ -299,12 +350,12 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 225,
+                &quot;line&quot;: 249,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         },
         {
-            &quot;name&quot;: &quot;IsPartialData&quot;,
+            &quot;name&quot;: &quot;IsData&quot;,
             &quot;desc&quot;: &quot;Returns true if the data is valid partial data, otherwise returns false and an error.&quot;,
             &quot;params&quot;: [
                 {
@@ -325,7 +376,7 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 247,
+                &quot;line&quot;: 270,
                 &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
             }
         }
@@ -338,8 +389,8 @@ Providing all 3"><link data-rh="true" rel="canonical" href="https://quenty.githu
         &quot;line&quot;: 12,
         &quot;path&quot;: &quot;src/adorneedata/src/Shared/AdorneeData.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#CreateAdorneeDataValue" class="table-of-contents__link toc-highlight">:CreateAdorneeDataValue</a></li><li><a href="#CreateData" class="table-of-contents__link toc-highlight">:CreateData</a></li><li><a href="#CreatePartialData" class="table-of-contents__link toc-highlight">:CreatePartialData</a></li><li><a href="#GetAttributes" class="table-of-contents__link toc-highlight">:GetAttributes</a></li><li><a href="#GetPartialTInterface" class="table-of-contents__link toc-highlight">:GetPartialTInterface</a></li><li><a href="#GetStrictTInterface" class="table-of-contents__link toc-highlight">:GetStrictTInterface</a></li><li><a href="#InitAttributes" class="table-of-contents__link toc-highlight">:InitAttributes</a></li><li><a href="#IsData" class="table-of-contents__link toc-highlight">:IsData</a></li><li><a href="#IsPartialData" class="table-of-contents__link toc-highlight">:IsPartialData</a></li><li><a href="#SetAttributes" class="table-of-contents__link toc-highlight">:SetAttributes</a></li><li><a href="#SetPartialAttributes" class="table-of-contents__link toc-highlight">:SetPartialAttributes</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.d9451b04.js"></script>
-<script src="/NevermoreEngine/assets/js/main.4246f63c.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#CreateAdorneeDataValue" class="table-of-contents__link toc-highlight">:CreateAdorneeDataValue</a></li><li><a href="#CreateData" class="table-of-contents__link toc-highlight">:CreateData</a></li><li><a href="#CreateFullData" class="table-of-contents__link toc-highlight">:CreateFullData</a></li><li><a href="#CreateStrictData" class="table-of-contents__link toc-highlight">:CreateStrictData</a></li><li><a href="#GetAttributes" class="table-of-contents__link toc-highlight">:GetAttributes</a></li><li><a href="#GetStrictTInterface" class="table-of-contents__link toc-highlight">:GetStrictTInterface</a></li><li><a href="#GetTInterface" class="table-of-contents__link toc-highlight">:GetTInterface</a></li><li><a href="#InitAttributes" class="table-of-contents__link toc-highlight">:InitAttributes</a></li><li><a href="#IsData" class="table-of-contents__link toc-highlight">:IsData</a></li><li><a href="#IsStrictData" class="table-of-contents__link toc-highlight">:IsStrictData</a></li><li><a href="#Observe" class="table-of-contents__link toc-highlight">:Observe</a></li><li><a href="#SetAttributes" class="table-of-contents__link toc-highlight">:SetAttributes</a></li><li><a href="#SetStrictAttributes" class="table-of-contents__link toc-highlight">:SetStrictAttributes</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.0f70eb11.js"></script>
+<script src="/NevermoreEngine/assets/js/main.7a0bd5ec.js"></script>
 </body>
 </html>
