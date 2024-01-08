@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/defaultvalueutils": "file:../defaultvalueutils",
     "@quenty/ducktype": "file:../ducktype",
     "@quenty/loader": "file:../loader",
     "@quenty/rx": "file:../rx",
