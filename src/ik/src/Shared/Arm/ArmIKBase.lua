@@ -259,9 +259,14 @@ function ArmIKBase:_observeStateBrio()
 end
 
 function ArmIKBase:Grip(attachment, priority)
+	assert(typeof(attachment) == "Instance", "Bad attachment")
+	assert(type(priority) == "number" or priority == nil, "Bad priority")
+
+	priority = priority or IKAimPositionPriorites.DEFAULT
+
 	local gripData = {
 		attachment = attachment;
-		priority = priority or IKAimPositionPriorites.DEFAULT;
+		priority = priority;
 	}
 
 	local i = 1
