@@ -32,12 +32,16 @@ function AdorneeData.new(prototype)
 
 	self._fullPrototype = assert(prototype, "Bad prototype")
 	self._attributePrototype = {}
+	self._defaultValuesPrototype = {}
 	self._valueObjectPrototype = {}
 
 	for key, item in pairs(self._fullPrototype) do
 		if AdorneeDataEntry.isAdorneeDataEntry(item) then
+			local default = item:GetDefaultValue()
+			self._defaultValuesPrototype[key] = default
 			self._valueObjectPrototype[key] = item
 		else
+			self._defaultValuesPrototype[key] = item
 			self._attributePrototype[key] = item
 		end
 	end
@@ -52,15 +56,49 @@ end
 	@return boolean
 	@return string -- Error message
 ]=]
-function AdorneeData:IsData(data)
+function AdorneeData:IsStrictData(data)
 	return self:GetStrictTInterface()(data)
 end
 
 --[=[
 	Validates and creates a new data table for the data that is readonly and frozen
 
+	@param data TStrict
+	@return TStrict
+]=]
+function AdorneeData:CreateStrictData(data)
+	assert(self:IsStrictData(data))
+
+	return table.freeze(table.clone(data))
+end
+
+--[=[
+	Validates and creates a new data table that is readonly. This table will have all values or
+	the defaults
+
 	@param data T
 	@return T
+]=]
+function AdorneeData:CreateFullData(data)
+	assert(self:IsData(data))
+
+	local result = table.clone(self._defaultValuesPrototype)
+
+	for key, value in pairs(data) do
+		result[key] = value
+	end
+
+	return table.freeze(table.clone(result))
+end
+
+--[=[
+	Validates and creates a new data table that is readonly and frozen, but for partial
+	data.
+
+	The  data can just be part of the attributes.
+
+	@param data TPartial
+	@return TPartial
 ]=]
 function AdorneeData:CreateData(data)
 	assert(self:IsData(data))
@@ -68,22 +106,17 @@ function AdorneeData:CreateData(data)
 	return table.freeze(table.clone(data))
 end
 
-
 --[=[
-	Validates and creates a new data table that is readonly and frozen, but for partial
-	data.
+	Observes the attribute table for adornee
 
-	The partial data can just be part of the attributes.
-
-	@param partialData TPartial
-	@return TPartial
+	@param adornee Instance
+	@return Observable<TStrict>
 ]=]
-function AdorneeData:CreatePartialData(partialData)
-	assert(self:IsPartialData(partialData))
+function AdorneeData:Observe(adornee)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return table.freeze(table.clone(partialData))
+	return self:CreateAdorneeDataValue(adornee):Observe(adornee)
 end
-
 
 --[=[
 	Gets attribute table for the data
@@ -103,7 +136,7 @@ end
 	Gets the attributes for the adornee
 
 	@param adornee Instance
-	@return T
+	@return TStrict
 ]=]
 function AdorneeData:GetAttributes(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
@@ -122,7 +155,7 @@ function AdorneeData:GetAttributes(adornee)
 		data[key] = value:CreateValueObject(adornee).Value
 	end
 
-	return self:CreateData(data)
+	return self:CreateStrictData(data)
 end
 
 --[=[
@@ -134,6 +167,22 @@ end
 function AdorneeData:SetAttributes(adornee, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
+
+	local attributeTable = self:CreateAdorneeDataValue(adornee)
+	for key, value in pairs(data) do
+		attributeTable[key].Value = value
+	end
+end
+
+--[=[
+	Sets the attributes for the adornee
+
+	@param adornee Instance
+	@param data TStrict
+]=]
+function AdorneeData:SetStrictAttributes(adornee, data)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+	assert(self:IsStrictData(data))
 
 	for key, _ in pairs(self._attributePrototype) do
 		adornee:SetAttribute(key, data[key])
@@ -149,55 +198,30 @@ end
 	Initializes the attributes for the adornee
 
 	@param adornee Instance
-	@param partialData T?
+	@param data T
 ]=]
-function AdorneeData:InitAttributes(adornee, partialData)
+function AdorneeData:InitAttributes(adornee, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
-	assert(self:IsPartialData(partialData) or partialData == nil, "Bad partialData")
-
-	-- TODO: Better performance
-	if partialData == nil then
-		partialData = {}
-	end
+	assert(self:IsData(data))
 
 	for key, defaultValue in pairs(self._attributePrototype) do
-		if adornee:GetAttribute(key) ~= nil then
-			continue
-		end
-
-		if partialData[key] == nil then
-			adornee:SetAttribute(key, defaultValue)
-		else
-			adornee:SetAttribute(key, partialData[key])
+		if adornee:GetAttribute(key) == nil then
+			if data[key] ~= nil then
+				adornee:SetAttribute(key, data[key])
+			else
+				adornee:SetAttribute(key, defaultValue)
+			end
 		end
 	end
 
 	-- TODO: Avoid additional allocation
 	for key, value in pairs(self._valueObjectPrototype) do
 		local valueObject = value:CreateValueObject(adornee)
-		if valueObject.Value ~= nil then
-			continue
+		if valueObject == nil then
+			if data[key] ~= nil then
+				valueObject.Value = data[key]
+			end
 		end
-
-		if partialData[key] ~= nil then
-			valueObject.Value = partialData[key]
-		end
-	end
-end
-
---[=[
-	Sets partial attributes on the adornee
-
-	@param adornee Instance
-	@param partialData TPartial
-]=]
-function AdorneeData:SetPartialAttributes(adornee, partialData)
-	assert(typeof(adornee) == "Instance", "Bad adornee")
-	assert(self:IsPartialData(partialData))
-
-	local attributeTable = self:CreateAdorneeDataValue(adornee)
-	for key, value in pairs(partialData) do
-		attributeTable[key].Value = value
 	end
 end
 
@@ -222,9 +246,9 @@ end
 
 	@return function
 ]=]
-function AdorneeData:GetPartialTInterface()
-	if self._partialInterface then
-		return self._partialInterface
+function AdorneeData:GetTInterface()
+	if self._interface then
+		return self._interface
 	end
 
 	local interfaceList = {}
@@ -232,10 +256,9 @@ function AdorneeData:GetPartialTInterface()
 		interfaceList[key] = t.optional(value)
 	end
 
-	self._partialInterface = t.strictInterface(interfaceList)
-	return self._partialInterface
+	self._interface = t.strictInterface(interfaceList)
+	return self._interface
 end
-
 
 --[=[
 	Returns true if the data is valid partial data, otherwise returns false and an error.
@@ -244,8 +267,8 @@ end
 	@return boolean
 	@return string -- Error message
 ]=]
-function AdorneeData:IsPartialData(data)
-	return self:GetPartialTInterface()(data)
+function AdorneeData:IsData(data)
+	return self:GetTInterface()(data)
 end
 
 function AdorneeData:_getOrCreateTypeInterfaceList()

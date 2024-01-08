@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DuckTypeUtils = require("DuckTypeUtils")
 local t = require("t")
+local DefaultValueUtils = require("DefaultValueUtils")
 
 local AdorneeDataEntry = {}
 AdorneeDataEntry.ClassName = "AdorneeDataEntry"
@@ -21,6 +22,12 @@ function AdorneeDataEntry.new(dataType, createValueObject)
 	self._createValueObject = createValueObject
 	self._strictInterface = t.typeof(self._dataType)
 
+	if self._dataType == "Instance" then
+		self._defaultValue = nil
+	else
+		self._defaultValue = DefaultValueUtils.getDefaultValueForType(self._dataType)
+	end
+
 	return self
 end
 
@@ -32,6 +39,10 @@ function AdorneeDataEntry:CreateValueObject(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	return self._createValueObject(adornee)
+end
+
+function AdorneeDataEntry:GetDefaultValue()
+	return self._defaultValue
 end
 
 function AdorneeDataEntry:GetStrictInterface()
