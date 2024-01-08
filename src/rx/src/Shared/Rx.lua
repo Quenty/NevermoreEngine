@@ -1873,6 +1873,8 @@ end
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
 function Rx.throttle(durationSelector)
+	assert(type(durationSelector) == "function", "Bad durationSelector")
+
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 
