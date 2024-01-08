@@ -1,0 +1,11 @@
+{
+  "name": "DrawTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "draw": {
+        "$path": ".."
+      }
+    }
+  }
+}

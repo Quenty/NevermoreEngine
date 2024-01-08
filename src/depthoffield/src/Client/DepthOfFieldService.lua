@@ -24,10 +24,11 @@ function DepthOfFieldService:Init(_serviceBag)
 	self._topOfStack = ValueObject.new()
 	self._maid:GiveTask(self._topOfStack)
 
-	self._depthOfField = self:_getOrCreateDepthOfField()
+	self._depthOfField = self:_createDepthOfFIeld()
 
-	self._tweener = DepthOfFieldTweener.new(self._depthOfField)
-	self._maid:GiveTask(self._tweener)
+	self._tweener = self._maid:Add(DepthOfFieldTweener.new(self._depthOfField))
+
+	-- TODO: Reprogram completely to be independent...
 
 	-- Assume we can enable now that we've recorded values
 	-- self._depthOfField.InFocusRadius = self._tweener:GetOriginalRadius()
@@ -72,10 +73,10 @@ function DepthOfFieldService:CreateModifier()
 	local maid = Maid.new()
 
 	local modifier = DepthOfFieldModifier.new(
-		self._tweener:GetOriginalDistance(),
-		self._tweener:GetOriginalRadius(),
-		self._tweener:GetOriginalFarIntensity(),
-		self._tweener:GetOriginalNearIntensity())
+		500,
+		500,
+		1,
+		1)
 	maid:GiveTask(modifier)
 
 	maid:GiveTask(function()
@@ -115,20 +116,14 @@ function DepthOfFieldService:_removeModifier(modifier)
 	self:_updateTopOfStack()
 end
 
-function DepthOfFieldService:_getOrCreateDepthOfField()
-	local foundDepthOfField = Lighting:FindFirstChildOfClass("DepthOfFieldEffect")
-	if foundDepthOfField then
-		return foundDepthOfField
-	end
-
-	warn("[DepthOfFieldService._getOrCreateDepthOfField] - Creating depthOfField effect!")
-
+function DepthOfFieldService:_createDepthOfFIeld()
 	local depthOfField = Instance.new("DepthOfFieldEffect")
-	depthOfField.FarIntensity = 0.75
+	depthOfField.Name = "DepthOfFieldService_DepthOfField"
+	depthOfField.FarIntensity = 0
 	depthOfField.FocusDistance = 500
 	depthOfField.InFocusRadius = 500
-	depthOfField.NearIntensity = 0.75
-	depthOfField.Enabled = false
+	depthOfField.NearIntensity = 0
+	depthOfField.Enabled = true
 	depthOfField.Parent = Lighting
 	self._maid:GiveTask(depthOfField)
 

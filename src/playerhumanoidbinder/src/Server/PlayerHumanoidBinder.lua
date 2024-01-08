@@ -9,8 +9,8 @@ local Players = game:GetService("Players")
 
 local Binder = require("Binder")
 local Maid = require("Maid")
-local HumanoidTracker = require("HumanoidTracker")
 local ValueObject = require("ValueObject")
+local HumanoidTrackerService = require("HumanoidTrackerService")
 
 local PlayerHumanoidBinder = setmetatable({}, Binder)
 PlayerHumanoidBinder.ClassName = "PlayerHumanoidBinder"
@@ -33,10 +33,15 @@ end
 	Inits the binder. See [Binder.Init].
 	Should be done via a [ServiceBag].
 
+	@param serviceBag ServiceBag
 	@param ... any
 ]=]
-function PlayerHumanoidBinder:Init(...)
-	getmetatable(PlayerHumanoidBinder).Init(self, ...)
+function PlayerHumanoidBinder:Init(serviceBag, ...)
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
+	getmetatable(PlayerHumanoidBinder).Init(self, serviceBag, ...)
+
+	self._humanoidTrackerService = self._serviceBag:GetService(HumanoidTrackerService)
 
 	if not self._shouldTag then
 		self._shouldTag = ValueObject.new(true, "boolean")
@@ -89,8 +94,7 @@ function PlayerHumanoidBinder:_bindTagging(doUnbinding)
 	if self._shouldTag.Value then
 		local maid = Maid.new()
 
-		local playerMaid = Maid.new()
-		maid:GiveTask(playerMaid)
+		local playerMaid = maid:Add(Maid.new())
 
 		maid:GiveTask(Players.PlayerAdded:Connect(function(player)
 			self:_handlePlayerAdded(playerMaid, player)
@@ -123,19 +127,11 @@ function PlayerHumanoidBinder:_handlePlayerAdded(playerMaid, player)
 	local maid = Maid.new()
 
 	-- TODO: Use HumanoidTrackerService
-	local tracker = HumanoidTracker.new(player)
-	maid:GiveTask(tracker)
-
-	local function handleHumanoid(newHumanoid)
-		if newHumanoid then
-			self:Bind(newHumanoid)
+	maid:GiveTask(self._humanoidTrackerService:ObserveHumanoid(player):Subscribe(function(humanoid)
+		if humanoid then
+			self:Bind(humanoid)
 		end
-	end
-
-	maid:GiveTask(tracker.Humanoid.Changed:Connect(handleHumanoid))
-
-	-- Bind humanoid
-	handleHumanoid(tracker.Humanoid.Value)
+	end))
 
 	playerMaid[player] = maid
 end

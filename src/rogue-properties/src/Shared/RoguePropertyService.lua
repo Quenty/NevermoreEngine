@@ -24,6 +24,7 @@ function RoguePropertyService:Init(serviceBag)
 
 	-- Internal
 	self._roguePropertyBinderGroups = self._serviceBag:GetService(require("RoguePropertyBinderGroups"))
+	self._serviceBag:GetService(require("RoguePropertyCacheService"))
 
 	-- Binders
 	self._serviceBag:GetService(require("RogueAdditive"))
@@ -32,8 +33,7 @@ function RoguePropertyService:Init(serviceBag)
 
 	self._providers = {}
 
-	self.ProviderAddedEvent = Signal.new()
-	self._maid:GiveTask(self.ProviderAddedEvent)
+	self.ProviderAddedEvent = self._maid:Add(Signal.new())
 
 	-- Internal providers
 	self._serviceBag:GetService(require("RogueSetterProvider"))

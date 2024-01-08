@@ -47,11 +47,13 @@ function AdorneeModelBoundingBox.new(model)
 		end);
 		Rx.throttleDefer();
 	}):Subscribe(function()
+		debug.profilebegin("modelboundingbox")
 		self._isDirty.Value = false
 
 		local bbCFrame, bbSize = self._obj:GetBoundingBox()
 		self._bbSize.Value = bbSize
 		self._bbCFrame.Value = bbCFrame
+		debug.profileend()
 	end))
 
 	self._maid:GiveTask(self._unanchoredPartsSet:ObserveCount():Pipe({

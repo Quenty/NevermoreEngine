@@ -1,13 +1,13 @@
 {
-  "name": "@quenty/draw",
-  "version": "4.3.0",
-  "description": "A utility library to debug things in 3D space for Roblox.",
+  "name": "@quenty/convexhull",
+  "version": "1.0.0",
+  "description": "Convex hull computation algorithms",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "draw",
-    "debug"
+    "ConvexHull",
+    "Geometry"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/draw/"
+    "directory": "src/convexhull/"
   },
   "funding": {
     "type": "patreon",
@@ -25,11 +25,13 @@
   "contributors": [
     "Quenty"
   ],
+  "dependencies": {
+    "@quenty/draw": "file:../draw",
+    "@quenty/loader": "file:../loader",
+    "@quenty/queue": "file:../queue",
+    "@quenty/vector3utils": "file:../vector3utils"
+  },
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "@quenty/loader": "file:../loader",
-    "@quenty/maid": "file:../maid"
   }
 }

@@ -33,11 +33,14 @@ function AdorneePartBoundingBox.new(part)
 		self:_setupUnanchoredLoop(maid)
 	end))
 
+	self._bbSize.Value = self._obj.Size
+	self._bbCFrame.Value = self._obj.CFrame
+
 	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("Size"):Connect(function()
 		self._bbSize.Value = self._obj.Size
 	end))
 	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("CFrame"):Connect(function()
-		self:_update()
+		self._bbCFrame.Value = self._obj.CFrame
 	end))
 
 	return self
@@ -46,12 +49,10 @@ end
 function AdorneePartBoundingBox:_setupUnanchoredLoop(maid)
 	-- Paranoid
 	maid:GiveTask(RunService.Heartbeat:Connect(function()
+		debug.profilebegin("adorneeboundingbox")
 		self._bbCFrame.Value = self._obj.CFrame
+		debug.profileend()
 	end))
-end
-
-function AdorneePartBoundingBox:_update()
-	self._bbCFrame.Value = self._obj.CFrame
 end
 
 function AdorneePartBoundingBox:ObserveCFrame()

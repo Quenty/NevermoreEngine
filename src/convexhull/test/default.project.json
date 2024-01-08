@@ -1,0 +1,11 @@
+{
+  "name": "ConvexHullTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "convexhull": {
+        "$path": ".."
+      }
+    }
+  }
+}

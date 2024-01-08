@@ -1,4 +1,7 @@
 --[=[
+	Centralized provider so Hoarcekat stories can bootstrap in a fake PlayerGui
+
+	@client
 	@class ScreenGuiService
 ]=]
 
@@ -13,6 +16,11 @@ local PlayerGuiUtils = require("PlayerGuiUtils")
 local ScreenGuiService = {}
 ScreenGuiService.ServiceName = "ScreenGuiService"
 
+--[=[
+	Initializes the ScreenGuiService
+
+	@param serviceBag ServiceBag
+]=]
 function ScreenGuiService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -20,18 +28,40 @@ function ScreenGuiService:Init(serviceBag)
 	self:_ensureInit()
 end
 
+--[=[
+	Gets the current player gui to use
+
+	return ScreenGui?
+]=]
 function ScreenGuiService:GetPlayerGui()
 	self:_ensureInit()
 
 	return self._playerGui.Value
 end
 
+--[=[
+	Sets the current playerGui to use
+
+	@param playerGui PlayerGui | Instance
+	return MaidTask
+]=]
 function ScreenGuiService:SetGuiParent(playerGui)
 	self:_ensureInit()
 
 	self._playerGui.Value = playerGui
+
+	return function()
+		if self._playerGui.Value == playerGui then
+			self._playerGui.Value = nil
+		end
+	end
 end
 
+--[=[
+	Observes the player gui to parent stuff into
+
+	return Observable<ScreenGui?>
+]=]
 function ScreenGuiService:ObservePlayerGui()
 	self:_ensureInit()
 
@@ -56,6 +86,9 @@ function ScreenGuiService:_ensureInit()
 	end
 end
 
+--[=[
+	Cleans up the ScreenGuiService
+]=]
 function ScreenGuiService:Destroy()
 	self._maid:DoCleaning()
 end

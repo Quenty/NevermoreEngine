@@ -23,7 +23,6 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
-local HumanoidTracker = require("HumanoidTracker")
 
 local SERVER_UPDATE_RATE = 1/10
 
@@ -51,6 +50,7 @@ function IKService:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("Motor6DService"))
+	self._humanoidTrackerService = self._serviceBag:GetService(require("HumanoidTrackerService"))
 
 	-- Internal
 	self._ikBinders = self._serviceBag:GetService(require("IKBindersServer"))
@@ -143,8 +143,7 @@ end
 function IKService:_handlePlayer(player)
 	local maid = Maid.new()
 
-	local humanoidTracker = HumanoidTracker.new(player)
-	maid:GiveTask(humanoidTracker)
+	local humanoidTracker = self._humanoidTrackerService:GetHumanoidTracker(player)
 
 	maid:GiveTask(humanoidTracker.AliveHumanoid.Changed:Connect(function(new, old)
 		if old then

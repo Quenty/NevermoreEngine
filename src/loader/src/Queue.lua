@@ -1,7 +1,18 @@
 --[=[
-	Private queue class for loading system.
+	Queue class with better performance characteristics than table.remove()
 
-	@private
+	```lua
+	local queue = Queue.new()
+	queue:PushRight("a")
+	queue:PushRight("b")
+	queue:PushRight("c")
+
+	while not queue:IsEmpty() do
+	    local entry = queue:PopLeft()
+	    print(entry) --> a, b, c
+	end
+	```
+
 	@class Queue
 ]=]
 
@@ -18,6 +29,23 @@ function Queue.new()
 		_first = 0;
 		_last = -1;
 	}, Queue)
+end
+
+--[=[
+	Gets the queues length
+	@return number
+]=]
+function Queue:__len()
+	return self._last + 1 - self._first
+end
+
+--[=[
+	Returns the count of the queue
+
+	@return number
+]=]
+function Queue:GetCount()
+	return self._last + 1 - self._first
 end
 
 --[=[

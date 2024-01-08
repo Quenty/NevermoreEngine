@@ -32,6 +32,24 @@ function Queue.new()
 end
 
 --[=[
+	Gets the queues length
+
+	@return number
+]=]
+function Queue:__len()
+	return self._last + 1 - self._first
+end
+
+--[=[
+	Returns the count of the queue
+
+	@return number
+]=]
+function Queue:GetCount()
+	return self._last + 1 - self._first
+end
+
+--[=[
 	Pushes an entry to the left of the queue
 	@param value T
 ]=]
