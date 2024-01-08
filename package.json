@@ -27,13 +27,13 @@
           "forcePublish": false
         }
       ],
-      "all-contributors",
       [
         "conventional-commits",
         {
           "defaultReleaseType": "patch"
         }
       ],
+      "all-contributors",
       "first-time-contributor",
       "released"
     ]
