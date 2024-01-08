@@ -1,23 +1,18 @@
-# v6.4.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Create depth of field always (hack) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@6.3.0...@quenty/depthoffield@6.4.0) (2024-01-08)
+
+
+### Bug Fixes
+
+* Create depth of field always (hack) ([d08dd64](https://github.com/Quenty/NevermoreEngine/commit/d08dd641615f51bc83b2fe46f11f41bd95acdec1))
+
+
+
+
 
 # [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@6.2.0...@quenty/depthoffield@6.3.0) (2023-12-28)
 

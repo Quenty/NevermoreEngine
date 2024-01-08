@@ -1,20 +1,18 @@
-# v8.4.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-- feat: Allow SetGuiParent to return a calback ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@8.3.0...@quenty/genericscreenguiprovider@8.4.0) (2024-01-08)
+
+
+### Features
+
+* Allow SetGuiParent to return a calback ([b2a9239](https://github.com/Quenty/NevermoreEngine/commit/b2a923967653f886f230fc868debb82d698f70b9))
+
+
+
+
 
 # [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@8.2.0...@quenty/genericscreenguiprovider@8.3.0) (2023-12-28)
 

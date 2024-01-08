@@ -1,6 +1,6 @@
 {
   "name": "@quenty/generatewithmixin",
-  "version": "8.1.0",
+  "version": "8.2.0",
   "description": "Simple mixin to generate code for a class",
   "keywords": [
     "Roblox",

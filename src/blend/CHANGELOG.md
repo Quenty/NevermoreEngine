@@ -1,23 +1,18 @@
-# v7.4.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: SpringObject transfers clock properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@7.3.0...@quenty/blend@7.4.0) (2024-01-08)
+
+
+### Bug Fixes
+
+* SpringObject transfers clock properly ([b47b91c](https://github.com/Quenty/NevermoreEngine/commit/b47b91cfc7d4aea2bb715744730a1fcc4c397868))
+
+
+
+
 
 # [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@7.2.0...@quenty/blend@7.3.0) (2023-12-28)
 

@@ -1,25 +1,18 @@
-# v2.2.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-- feat: Add Queue:GetCount() ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Upgrade to latest auto-it and lerna [#438](https://github.com/Quenty/NevermoreEngine/pull/438) ([@Quenty](https://github.com/Quenty))
-- ci: Manually increment partially published packages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/queue@2.0.0...@quenty/queue@2.2.0) (2024-01-08)
+
+
+### Features
+
+* Add Queue:GetCount() ([2e6ee3c](https://github.com/Quenty/NevermoreEngine/commit/2e6ee3cf54df42aebc84b192f2156afddedfd75d))
+
+
+
+
 
 # 2.0.0 (2022-08-14)
 

@@ -1,23 +1,18 @@
-# v1.3.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: InitAttributes works on partial data ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@1.2.0...@quenty/adorneedata@1.3.0) (2024-01-08)
+
+
+### Bug Fixes
+
+* InitAttributes works on partial data ([a5831f6](https://github.com/Quenty/NevermoreEngine/commit/a5831f6fad116b76717bea3d2bc9d414ce58d874))
+
+
+
+
 
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@1.1.0...@quenty/adorneedata@1.2.0) (2023-12-28)
 

@@ -1,23 +1,18 @@
-# v5.5.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- perf: Cache rogue properties to avoid more initialization ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@5.4.0...@quenty/rogue-properties@5.5.0) (2024-01-08)
+
+
+### Performance Improvements
+
+* Cache rogue properties to avoid more initialization ([9fd7a92](https://github.com/Quenty/NevermoreEngine/commit/9fd7a92d051f3eeae89c312564b094278704303c))
+
+
+
+
 
 # [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@5.3.0...@quenty/rogue-properties@5.4.0) (2023-12-28)
 

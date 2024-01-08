@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@9.2.0...@quenty/sprites@9.3.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
 # [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@9.1.0...@quenty/sprites@9.2.0) (2023-12-14)
 
 **Note:** Version bump only for package @quenty/sprites

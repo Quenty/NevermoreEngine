@@ -1,23 +1,18 @@
-# v2.4.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix errors in PropertyValue ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@2.3.0...@quenty/propertyvalue@2.4.0) (2024-01-08)
+
+
+### Bug Fixes
+
+* Fix errors in PropertyValue ([ef90f6f](https://github.com/Quenty/NevermoreEngine/commit/ef90f6fdcbe4a362a0dcd66b73baf2e3a0399342))
+
+
+
+
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@2.2.0...@quenty/propertyvalue@2.3.0) (2023-12-28)
 

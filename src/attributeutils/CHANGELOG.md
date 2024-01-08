@@ -1,20 +1,18 @@
-# v9.4.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-- feat: Add RxAttributeUtils.observeAttributeKeysBrio(instance) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.3.0...@quenty/attributeutils@9.4.0) (2024-01-08)
+
+
+### Features
+
+* Add RxAttributeUtils.observeAttributeKeysBrio(instance) ([896633f](https://github.com/Quenty/NevermoreEngine/commit/896633f3fef85e14f4275163c8ad37fc57f43921))
+
+
+
+
 
 # [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.2.0...@quenty/attributeutils@9.3.0) (2023-12-28)
 

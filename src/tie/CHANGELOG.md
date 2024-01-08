@@ -1,23 +1,15 @@
-# v5.4.0 (Mon Jan 08 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: Use string.format() call ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.3.0...@quenty/tie@5.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
 
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.2.0...@quenty/tie@5.3.0) (2023-12-28)
 
