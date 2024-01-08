@@ -1,5 +1,28 @@
 # (Mon Jan 08 2024)
 
+#### 💥 Breaking Change
+
+- `@quenty/adorneedata@2.0.0`, `@quenty/deathreport@5.0.0`
+  - users/quenty/adorneedata [#437](https://github.com/Quenty/NevermoreEngine/pull/437) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneeboundingbox@3.0.0`, `@quenty/adorneedata@2.0.0`, `@quenty/attributeutils@10.0.0`, `@quenty/blend@8.0.0`, `@quenty/convexhull@2.0.0`, `@quenty/depthoffield@7.0.0`, `@quenty/draw@5.0.0`, `@quenty/genericscreenguiprovider@9.0.0`, `@quenty/humanoidtracker@9.0.0`, `@quenty/idleservice@9.0.0`, `@quenty/ik@11.0.0`, `@quenty/loader@8.0.0`, `@quenty/observablecollection@7.0.0`, `@quenty/playerhumanoidbinder@10.0.0`, `@quenty/propertyvalue@3.0.0`, `@quenty/queue@3.0.0`, `@quenty/rogue-properties@6.0.0`, `@quenty/rx@9.0.0`, `@quenty/softshutdown@5.0.0`, `@quenty/tie@6.0.0`, `@quenty/timedtween@3.0.0`, `@quenty/timesyncservice@9.0.0`, `@quenty/vector3utils@8.0.0`
+  - users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/countdowntext@2.0.0`, `@quenty/loader@8.0.0`, `@quenty/queue@3.0.0`
+  - ci: Upgrade to latest auto-it and lerna [#438](https://github.com/Quenty/NevermoreEngine/pull/438) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jan 08 2024)
+
 #### 🚀 Enhancement
 
 - `@quenty/adorneeboundingbox@2.5.0`, `@quenty/adorneedata@1.3.0`, `@quenty/attributeutils@9.4.0`, `@quenty/blend@7.4.0`, `@quenty/convexhull@1.1.0`, `@quenty/depthoffield@6.4.0`, `@quenty/draw@4.4.0`, `@quenty/genericscreenguiprovider@8.4.0`, `@quenty/humanoidtracker@8.4.0`, `@quenty/idleservice@8.5.0`, `@quenty/ik@10.5.0`, `@quenty/loader@7.3.0`, `@quenty/observablecollection@6.5.0`, `@quenty/playerhumanoidbinder@9.4.0`, `@quenty/propertyvalue@2.4.0`, `@quenty/queue@2.2.0`, `@quenty/rogue-properties@5.5.0`, `@quenty/rx@8.4.0`, `@quenty/softshutdown@4.4.0`, `@quenty/tie@5.4.0`, `@quenty/timedtween@2.4.0`, `@quenty/timesyncservice@8.4.0`, `@quenty/vector3utils@7.2.0`
