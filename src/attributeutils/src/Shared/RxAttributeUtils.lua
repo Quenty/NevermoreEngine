@@ -45,6 +45,81 @@ function RxAttributeUtils.observeAttribute(instance, attributeName, defaultValue
 end
 
 --[=[
+	Observes all the attribute keys that
+	@param instance Instance
+	@return Observable<Brio<string>>
+]=]
+function RxAttributeUtils.observeAttributeKeysBrio(instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local attributeNameToBrio = {}
+
+		local function handleAttributeChanged(attributeName, attributeValue)
+			if attributeValue == nil then
+				local brio = attributeNameToBrio[attributeName]
+				if brio then
+					attributeNameToBrio[attributeName] = nil
+					maid[brio] = nil
+				end
+			else
+				if not attributeNameToBrio[attributeName] then
+					local brio = Brio.new(attributeName)
+					attributeNameToBrio[attributeName] = brio
+					maid[brio] = brio
+					sub:Fire(brio)
+				end
+			end
+		end
+
+		maid:GiveTask(instance.AttributeChanged:Connect(function(attributeName)
+			handleAttributeChanged(attributeName, instance:GetAttribute(attributeName))
+		end))
+
+		for attributeName, attributeValue in pairs(instance:GetAttributes()) do
+			if not sub:IsPending() then
+				break
+			end
+
+			-- TODO: Maybe we technically need to requery here but it's expensive
+			handleAttributeChanged(attributeName, attributeValue)
+		end
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes all the attribute keys for an instance
+
+	@param instance Instance
+	@return Observable<string>
+]=]
+function RxAttributeUtils.observeAttributeKeys(instance)
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		maid:GiveTask(instance.AttributeChanged:Connect(function(attribute)
+			sub:Fire(attribute)
+		end))
+
+		for attribute, _ in pairs(instance:GetAttributes()) do
+			if not sub:IsPending() then
+				break
+			end
+
+			sub:Fire(attribute)
+		end
+
+		return maid
+	end)
+end
+
+--[=[
 	Observes an attribute on an instance with a conditional statement.
 	@param instance Instance
 	@param attributeName string
