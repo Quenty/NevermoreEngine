@@ -1,4 +1,6 @@
 --[=[
+	Tween that is a specific time, useful for countdowns and other things
+
 	@class TimedTween
 ]=]
 
@@ -18,6 +20,12 @@ local TimedTween = setmetatable({}, BasicPane)
 TimedTween.ClassName = "TimedTween"
 TimedTween.__index = TimedTween
 
+--[=[
+	Timed transition module
+
+	@param transitionTime number? -- Optional
+	@return TimedTween
+]=]
 function TimedTween.new(transitionTime)
 	local self = setmetatable(BasicPane.new(), TimedTween)
 
@@ -45,14 +53,49 @@ function TimedTween.new(transitionTime)
 	return self
 end
 
+--[=[
+	Sets the transition time
+
+	@param transitionTime number | Observable<number>
+	@return MaidTask
+]=]
 function TimedTween:SetTransitionTime(transitionTime)
 	return self._transitionTime:Mount(transitionTime)
 end
 
+--[=[
+	Gets the transition time
+
+	@return number
+]=]
+function TimedTween:GetTransitionTime()
+	return self._transitionTime.Value
+end
+
+--[=[
+	Observes the transition time
+
+	@return Observable<number>
+]=]
+function TimedTween:ObserveTransitionTime()
+	return self._transitionTime:Observe()
+end
+
+--[=[
+	Observes how far into the transition we are, from 0 to 1
+
+	@return Observable<number>
+]=]
 function TimedTween:ObserveRenderStepped()
 	return self:ObserveOnSignal(RunService.RenderStepped)
 end
 
+--[=[
+	Observes the transition on a specific signal
+
+	@param signal Signal
+	@return Observable<number>
+]=]
 function TimedTween:ObserveOnSignal(signal)
 	return Observable.new(function(sub)
 		local maid = Maid.new()
@@ -71,10 +114,20 @@ function TimedTween:ObserveOnSignal(signal)
 	end)
 end
 
+--[=[
+	Observes the transition
+
+	@return Observable<number>
+]=]
 function TimedTween:Observe()
 	return self:ObserveOnSignal(RunService.RenderStepped)
 end
 
+--[=[
+	Promises when the tween is finished
+
+	@return Promise
+]=]
 function TimedTween:PromiseFinished()
 	local initState = self:_computeState(os.clock())
 	if initState.rtime <=  0 then
