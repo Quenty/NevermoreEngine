@@ -24,22 +24,19 @@ DeathReportService.ServiceName = "DeathReportService"
 	@param serviceBag ServiceBag
 ]=]
 function DeathReportService:Init(serviceBag)
-	assert(not self.NewDeathReport, "Already initialized")
-
+	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	-- Internal
 	self._serviceBag:GetService(require("DeathReportBindersServer"))
 
-	-- Configure
-	self.NewDeathReport = Signal.new()
-	self._maid:GiveTask(self.NewDeathReport)
+	-- Export
+	self.NewDeathReport = self._maid:Add(Signal.new())
 
+	-- State
 	self._remoteEvent = GetRemoteEvent(DeathReportServiceConstants.REMOTE_EVENT_NAME)
-
-	self._reportProcessor = DeathReportProcessor.new()
-	self._maid:GiveTask(self._reportProcessor)
+	self._reportProcessor = self._maid:Add(DeathReportProcessor.new())
 
 	self._weaponDataRetrievers = {}
 end
@@ -56,6 +53,8 @@ function DeathReportService:AddWeaponDataRetriever(getWeaponData)
 end
 
 function DeathReportService:FindWeaponData(humanoid)
+	assert(typeof(humanoid) == "Instance", "Bad humanoid")
+
 	for _, item in pairs(self._weaponDataRetrievers) do
 		local result = item(humanoid)
 		if result then
@@ -147,16 +146,24 @@ end
 	@param humanoid Humanoid -- Humanoid that died
 	@param weaponData WeaponData? -- Weapon data to report
 ]=]
-function DeathReportService:ReportDeath(humanoid, weaponData)
+function DeathReportService:ReportHumanoidDeath(humanoid, weaponData)
+	assert(typeof(humanoid) == "Instance", "Bad humanoid")
+
 	local report = DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData or self:FindWeaponData(humanoid))
 
-	-- Notify services
-	self.NewDeathReport:Fire(report)
+	self:ReportDeathReport(report)
+end
 
-	self._reportProcessor:HandleDeathReport(report)
+function DeathReportService:ReportDeathReport(deathReport)
+	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathReport")
+
+	-- Notify services
+	self.NewDeathReport:Fire(deathReport)
+
+	self._reportProcessor:HandleDeathReport(deathReport)
 
 	-- Send to all clients
-	self._remoteEvent:FireAllClients(report)
+	self._remoteEvent:FireAllClients(deathReport)
 end
 
 function DeathReportService:Destroy()
