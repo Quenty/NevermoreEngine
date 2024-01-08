@@ -36,6 +36,10 @@ function MasterClock.new(remoteEvent, remoteFunction)
 		alive = false
 	end)
 
+	self._clockFunction = function()
+		return self:GetTime()
+	end
+
 	task.delay(5, function()
 		while alive do
 			self:_forceSync()
@@ -44,6 +48,15 @@ function MasterClock.new(remoteEvent, remoteFunction)
 	end)
 
 	return self
+end
+
+--[=[
+	Gets a function that can be used as a clock, like `time` and `tick` are.
+
+	@return function
+]=]
+function MasterClock:GetClockFunction()
+	return self._clockFunction
 end
 
 --[=[

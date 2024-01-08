@@ -35,7 +35,20 @@ function SlaveClock.new(remoteEvent, remoteFunction)
 	self._syncedBindable = Instance.new("BindableEvent")
 	self.SyncedEvent = self._syncedBindable.Event
 
+	self._clockFunction = function()
+		return self:GetTime()
+	end
+
 	return self
+end
+
+--[=[
+	Gets a function that can be used as a clock, like `time` and `tick` are.
+
+	@return function
+]=]
+function SlaveClock:GetClockFunction()
+	return self._clockFunction
 end
 
 --[=[
