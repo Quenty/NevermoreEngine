@@ -1,3 +1,33 @@
+# (Tue Jan 09 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
+
+#### 💥 Breaking Change
+
+- `@quenty/adorneedata@3.0.0`, `@quenty/deathreport@6.0.0`
+  - users/quenty/adorneedata [#437](https://github.com/Quenty/NevermoreEngine/pull/437) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneeboundingbox@3.0.0`, `@quenty/adorneedata@3.0.0`, `@quenty/attributeutils@10.0.0`, `@quenty/blend@8.0.0`, `@quenty/convexhull@2.0.0`, `@quenty/depthoffield@7.0.0`, `@quenty/draw@5.0.0`, `@quenty/genericscreenguiprovider@9.0.0`, `@quenty/humanoidtracker@9.0.0`, `@quenty/idleservice@9.0.0`, `@quenty/ik@11.0.0`, `@quenty/loader@8.0.0`, `@quenty/observablecollection@7.0.0`, `@quenty/playerhumanoidbinder@10.0.0`, `@quenty/propertyvalue@3.0.0`, `@quenty/queue@3.0.0`, `@quenty/rogue-properties@6.0.0`, `@quenty/rx@9.0.0`, `@quenty/softshutdown@5.0.0`, `@quenty/tie@6.0.0`, `@quenty/timedtween@3.0.0`, `@quenty/timesyncservice@9.0.0`, `@quenty/vector3utils@8.0.0`
+  - users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/singleton@3.0.0`
+  - fix: Singleton uses rawget/rawset to query stuff [#435](https://github.com/Quenty/NevermoreEngine/pull/435) ([@InvisibleWater](https://github.com/InvisibleWater))
+- `@quenty/countdowntext@2.0.0`, `@quenty/loader@8.0.0`, `@quenty/queue@3.0.0`
+  - ci: Upgrade to latest auto-it and lerna [#438](https://github.com/Quenty/NevermoreEngine/pull/438) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # (Mon Jan 08 2024)
 
 #### 💥 Breaking Change
