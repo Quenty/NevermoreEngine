@@ -27,9 +27,9 @@ function Singleton:Init(serviceBag)
 	local object = self._constructor(serviceBag)
 	assert(type(object) == "table", "Bad object")
 
-	object.ServiceName = self.ServiceName
+	rawset(object, "ServiceName", self.ServiceName)
 
-	if object.Init then
+	if rawget(object, "Init") then
 		object:Init(serviceBag)
 	end
 
