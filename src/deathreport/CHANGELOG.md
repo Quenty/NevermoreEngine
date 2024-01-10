@@ -1,25 +1,15 @@
-# v6.0.0 (Wed Jan 10 2024)
-
-#### 💥 Breaking Change
-
-- users/quenty/adorneedata [#437](https://github.com/Quenty/NevermoreEngine/pull/437) ([@Quenty](https://github.com/Quenty))
-- feat!: Rename DeathReportService:ReportDeath(humanoid) to DeathReportService:ReportHumanoidDeath(humanoid) (BREAKING CHANGE) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@5.0.0...@quenty/deathreport@6.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@4.5.0...@quenty/deathreport@5.0.0) (2024-01-08)
 

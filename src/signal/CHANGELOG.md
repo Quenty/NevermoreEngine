@@ -1,25 +1,15 @@
-# v4.0.0 (Wed Jan 10 2024)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
-
-#### 🐛 Bug Fix
-
-- refactor: Update SignalUtils.lua to use :Once() [#427](https://github.com/Quenty/NevermoreEngine/pull/427) ([@InvisibleWater](https://github.com/InvisibleWater))
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@3.2.0...@quenty/signal@4.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/signal
+
+
+
+
 
 # [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@3.1.0...@quenty/signal@3.2.0) (2024-01-08)
 

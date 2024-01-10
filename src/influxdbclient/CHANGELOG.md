@@ -1,19 +1,15 @@
-# v3.0.0 (Wed Jan 10 2024)
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@2.4.0...@quenty/influxdbclient@3.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/influxdbclient
+
+
+
+
 
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@2.3.0...@quenty/influxdbclient@2.4.0) (2024-01-08)
 
