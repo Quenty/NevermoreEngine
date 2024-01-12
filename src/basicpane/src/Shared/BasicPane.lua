@@ -24,6 +24,7 @@ local require = require(script.Parent.loader).load(script)
 local Signal = require("Signal")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local BasicPane = {}
 BasicPane.__index = BasicPane
@@ -35,16 +36,7 @@ BasicPane.ClassName = "BasicPane"
 	@return boolean
 ]=]
 function BasicPane.isBasicPane(value)
-	return type(value) == "table"
-		and Maid.isMaid(value._maid)
-		and Signal.isSignal(value.VisibleChanged)
-		and type(value.SetVisible) == "function"
-		and type(value.IsVisible) == "function"
-		and type(value.Show) == "function"
-		and type(value.ObserveVisible) == "function"
-		and type(value.Hide) == "function"
-		and type(value.Toggle) == "function"
-		and type(value.Destroy) == "function"
+	return DuckTypeUtils.isImplementation(BasicPane, value)
 end
 
 --[=[
@@ -108,6 +100,11 @@ function BasicPane:SetVisible(isVisible, doNotAnimate)
 	end
 end
 
+--[=[
+	Returns an observable that observes visibility
+
+	@return Observable<boolean>
+]=]
 function BasicPane:ObserveVisible()
 	return Observable.new(function(sub)
 		local maid = Maid.new()

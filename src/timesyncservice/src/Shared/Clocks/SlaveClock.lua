@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local ValueObject = require("ValueObject")
 
 local SlaveClock = setmetatable({}, BaseObject)
 SlaveClock.__index = SlaveClock
@@ -24,7 +25,7 @@ function SlaveClock.new(remoteEvent, remoteFunction)
 
 	self._remoteEvent = remoteEvent or error("No remoteEvent")
 	self._remoteFunction = remoteFunction or error("No remoteFunction")
-	self._ping = 0
+	self._ping = self._maid:Add(ValueObject.new(0, "number"))
 
 	self._maid:GiveTask(self._remoteEvent.OnClientEvent:Connect(function(timeOne)
 		self:_handleSyncEventAsync(timeOne)
@@ -49,6 +50,10 @@ end
 ]=]
 function SlaveClock:GetClockFunction()
 	return self._clockFunction
+end
+
+function SlaveClock:ObservePing()
+	return self._ping:Observe()
 end
 
 --[=[
@@ -90,7 +95,7 @@ end
 	@return number
 ]=]
 function SlaveClock:GetPing()
-	return self._ping
+	return self._ping.Value
 end
 
 function SlaveClock:_handleSyncEventAsync(timeOne)
@@ -126,7 +131,7 @@ function SlaveClock:_handleSyncEventAsync(timeOne)
 
 	self._offset = offset -- Estimated difference between server/client
 	self._pneWayDelay = oneWayDelay -- Estimated time for network events to send. (MSDelay/SMDelay)
-	self._ping = ping
+	self._ping.Value = ping
 
 	self._syncedBindable:Fire()
 end

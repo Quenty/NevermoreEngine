@@ -12,6 +12,7 @@ local Rx = require("Rx")
 local Signal = require("Signal")
 local ObservableSortedList = require("ObservableSortedList")
 local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local AnimatedHighlightStack = setmetatable({}, BaseObject)
 AnimatedHighlightStack.ClassName = "AnimatedHighlightStack"
@@ -24,17 +25,11 @@ function AnimatedHighlightStack.new(adornee, defaultModelValues)
 
 	self._defaultModelValues = assert(defaultModelValues, "No defaultModelValues")
 
-	self._list = ObservableSortedList.new()
-	self._maid:GiveTask(self._list)
+	self._list = self._maid:Add(ObservableSortedList.new())
+	self._currentModel = self._maid:Add(AnimatedHighlightModel.new())
+	self._hasEntries = self._maid:Add(ValueObject.new(false, "boolean"))
 
-	self.Done = Signal.new()
-	self._maid:GiveTask(self.Done)
-
-	self._currentModel = AnimatedHighlightModel.new()
-	self._maid:GiveTask(self._currentModel)
-
-	self._hasEntries = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._hasEntries)
+	self.Done = self._maid:Add(Signal.new())
 
 	self._maid:GiveTask(self._list:ObserveCount():Pipe({
 		Rx.switchMap(function(count)
@@ -85,7 +80,7 @@ end
 	@return boolean
 ]=]
 function AnimatedHighlightStack.isAnimatedHighlightStack(value)
-	return type(value) == "table" and getmetatable(value) == AnimatedHighlightStack
+	return DuckTypeUtils.isImplementation(AnimatedHighlightStack, value)
 end
 
 --[=[

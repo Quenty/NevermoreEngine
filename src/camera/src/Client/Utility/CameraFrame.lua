@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local QFrame = require("QFrame")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local CameraFrame = {}
 CameraFrame.ClassName = "CameraFrame"
@@ -32,7 +33,7 @@ end
 	@return boolean
 ]=]
 function CameraFrame.isCameraFrame(value)
-	return getmetatable(value) == CameraFrame
+	return DuckTypeUtils.isImplementation(CameraFrame, value)
 end
 
 --[=[

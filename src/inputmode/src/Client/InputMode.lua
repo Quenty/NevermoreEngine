@@ -8,6 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 --[=[
 	Fires off when the mode is enabled
@@ -50,7 +51,7 @@ end
 	@return boolean
 ]=]
 function InputMode.isInputMode(value)
-	return type(value) == "table" and getmetatable(value) == InputMode
+	return DuckTypeUtils.isImplementation(InputMode, value)
 end
 
 --[=[

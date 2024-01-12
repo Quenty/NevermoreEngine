@@ -12,6 +12,7 @@ local Observable = require("Observable")
 local ValueBaseUtils = require("ValueBaseUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Brio = require("Brio")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local EMPTY_FUNCTION = function() end
 
@@ -75,7 +76,7 @@ end
 	@return boolean
 ]=]
 function ValueObject.isValueObject(value)
-	return type(value) == "table" and getmetatable(value) == ValueObject
+	return DuckTypeUtils.isImplementation(ValueObject, value)
 end
 
 function ValueObject:_toMountableObservable(value)
@@ -269,7 +270,7 @@ function ValueObject:__index(index)
 	elseif index == "_value" then
 		return nil -- Edge case
 	else
-		error(("%q is not a member of ValueObject"):format(tostring(index)))
+		error(string.format("%q is not a member of ValueObject", tostring(index)))
 	end
 end
 
@@ -278,9 +279,9 @@ function ValueObject:__newindex(index, value)
 		-- Avoid deoptimization
 		ValueObject.SetValue(self, value)
 	elseif index == "LastEventContext" or ValueObject[index] then
-		error(("%q cannot be set in ValueObject"):format(tostring(index)))
+		error(string.format("%q cannot be set in ValueObject", tostring(index)))
 	else
-		error(("%q is not a member of ValueObject"):format(tostring(index)))
+		error(string.format("%q is not a member of ValueObject", tostring(index)))
 	end
 end
 

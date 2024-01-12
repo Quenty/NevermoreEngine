@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Rx = require("Rx")
 
 local MasterClock = setmetatable({}, BaseObject)
 MasterClock.__index = MasterClock
@@ -57,6 +58,15 @@ end
 ]=]
 function MasterClock:GetClockFunction()
 	return self._clockFunction
+end
+
+--[=[
+	Observes how much ping the clock has
+
+	@return Observable<number>
+]=]
+function MasterClock:ObservePing()
+	return Rx.of(0)
 end
 
 --[=[
