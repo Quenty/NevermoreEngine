@@ -31,41 +31,18 @@ function ConverterPane.new()
 
 	self._previewTextName = "ClassConverterPreviewText" .. HttpService:GenerateGUID(false)
 
-	self._converter = UIConverter.new()
-	self._maid:GiveTask(self._converter)
-
-	self._vDividerPosition = ValueObject.new(0.3);
-	self._maid:GiveTask(self._vDividerPosition)
-
-	self._hDividerPosition = ValueObject.new(0.5);
-	self._maid:GiveTask(self._hDividerPosition)
-
-	self._draggingState = ValueObject.new(false);
-	self._maid:GiveTask(self._draggingState)
-
-	self._absoluteSize = ValueObject.new(Vector2.zero, "Vector2");
-	self._maid:GiveTask(self._absoluteSize)
-
-	self._absolutePosition = ValueObject.new(Vector2.zero, "Vector2");
-	self._maid:GiveTask(self._absolutePosition)
-
-	self._code = ValueObject.new("");
-	self._maid:GiveTask(self._code)
-
-	self._captureFocus = Signal.new()
-	self._maid:GiveTask(self._captureFocus)
-
-	self._selectedList = ValueObject.new({})
-	self._maid:GiveTask(self._selectedList)
-
-	self._copyPreview = ValueObject.new(nil)
-	self._maid:GiveTask(self._copyPreview)
-
-	self._renderPreview = ValueObject.new(nil)
-	self._maid:GiveTask(self._renderPreview)
-
-	self._libraryName = ValueObject.new("Blend")
-	self._maid:GiveTask(self._libraryName)
+	self._converter = self._maid:Add(UIConverter.new())
+	self._vDividerPosition = self._maid:Add(ValueObject.new(0.3))
+	self._hDividerPosition = self._maid:Add(ValueObject.new(0.5))
+	self._draggingState = self._maid:Add(ValueObject.new(false))
+	self._absoluteSize = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
+	self._absolutePosition = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
+	self._code = self._maid:Add(ValueObject.new(""))
+	self._captureFocus = self._maid:Add(Signal.new())
+	self._selectedList = self._maid:Add(ValueObject.new({}))
+	self._copyPreview = self._maid:Add(ValueObject.new(nil))
+	self._renderPreview = self._maid:Add(ValueObject.new(nil))
+	self._libraryName = self._maid:Add(ValueObject.new("Blend"))
 
 	self._maid:GiveTask(Rx.combineLatest({
 		library = self._libraryName:Observe();
