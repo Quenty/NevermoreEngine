@@ -588,6 +588,13 @@ function DataStoreStage:StoreOnValueChange(name, valueObj)
 		self:_storeAtKey(name, valueObj.Value)
 	end))
 
+	-- Hopefully this doesn't result in data-loss when writing as
+	-- the user leaves.
+	self._maid[maid] = maid
+	maid:GiveTask(function()
+		self._maid[maid] = nil
+	end)
+
 	return maid
 end
 
