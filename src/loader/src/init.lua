@@ -96,7 +96,7 @@ local function bootstrapPlugin(packageFolder)
 				return require(pluginFolder:FindFirstChild(value))
 			end
 
-			error(("Unknown module %q"):format(tostring(value)))
+			error(string.format("Unknown module %q", tostring(value)))
 		else
 			return require(value)
 		end

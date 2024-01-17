@@ -5,6 +5,10 @@
 	@class DependencyUtils
 ]=]
 
+local loader = script.Parent.Parent
+local ReplicationType = require(loader.Replication.ReplicationType)
+local ReplicationTypeUtils = require(loader.Replication.ReplicationTypeUtils)
+
 local DependencyUtils = {}
 
 --[=[
@@ -13,16 +17,22 @@ local DependencyUtils = {}
 
 	@param requester Instance
 	@param moduleName string
+	@param requestedReplicationType ReplicationType
 	@return ModuleScript?
 ]=]
-function DependencyUtils.findDependency(requester, moduleName)
+function DependencyUtils.findDependency(requester, moduleName, requestedReplicationType)
 	assert(typeof(requester) == "Instance", "Bad requester")
 	assert(type(moduleName) == "string", "Bad moduleName")
+	assert(ReplicationTypeUtils.isReplicationType(requestedReplicationType), "Bad requestedReplicationType")
 
 	for packageInst in DependencyUtils.iterPackages(requester) do
-		for module in DependencyUtils.iterModules(packageInst) do
+		for module, replicationType in DependencyUtils.iterModules(packageInst, ReplicationType.SHARED) do
 			if module.Name == moduleName then
-				return module
+				if ReplicationTypeUtils.isAllowed(replicationType, requestedReplicationType) then
+					return module
+				else
+					error(string.format("[DependencyUtils] - %q is not allowed in %q", moduleName, requestedReplicationType))
+				end
 			end
 		end
 	end
@@ -30,20 +40,24 @@ function DependencyUtils.findDependency(requester, moduleName)
 	return nil
 end
 
-function DependencyUtils.iterModules(packageInst)
+function DependencyUtils.iterModules(packageInst, ancestorReplicationType)
 	assert(typeof(packageInst) == "Instance", "Bad packageInst")
+	assert(ReplicationTypeUtils.isReplicationType(ancestorReplicationType), "Bad ancestorReplicationType")
 
 	return coroutine.wrap(function()
 		if packageInst:IsA("ModuleScript") then
-			coroutine.yield(packageInst)
+			coroutine.yield(packageInst, ancestorReplicationType)
 			return
 		end
 
 		-- Iterate over the package contents
 		for _, item in pairs(packageInst:GetChildren()) do
-			if item.Name ~= "node_modules" then
-				for result in DependencyUtils.iterModules(item) do
-					coroutine.yield(result)
+			local itemName = item.Name
+			local itemReplicationType = ReplicationTypeUtils.getFolderReplicationType(itemName, ancestorReplicationType)
+
+			if itemName ~= "node_modules" then
+				for result, resultReplicationType in DependencyUtils.iterModules(item, itemReplicationType) do
+					coroutine.yield(result, resultReplicationType)
 				end
 			end
 		end
@@ -98,10 +112,10 @@ function DependencyUtils.iterPackagesInModuleModules(nodeModules)
 								if linked:IsA("ModuleScript") or linked:IsA("Folder") then
 									coroutine.yield(linked)
 								else
-									warn("Bad link value type")
+									warn("[DependencyUtils] - Bad link value type")
 								end
 							else
-								warn("Nothing linked")
+								warn("[DependencyUtils] - Nothing linked")
 							end
 						end
 					end
@@ -116,10 +130,10 @@ function DependencyUtils.iterPackagesInModuleModules(nodeModules)
 					if linked:IsA("ModuleScript") or linked:IsA("Folder") then
 						coroutine.yield(linked)
 					else
-						warn("Bad link value type")
+						warn("[DependencyUtils] - Bad link value type")
 					end
 				else
-					warn("Nothing linked")
+					warn("[DependencyUtils] - Nothing linked")
 				end
 			end
 		end
