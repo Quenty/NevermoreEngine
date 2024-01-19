@@ -40,18 +40,18 @@ function ChatProviderService:Init(serviceBag)
 	self._serviceBag:GetService(require("ChatTag"))
 	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTags"))
 
-	self:SetDeveloperTag(ChatTagDataUtils.createChatTagData({
-		TagText = "(dev)";
-		LocalizedText = LocalizedTextUtils.create("chatTags.dev");
-		TagPriority = 15;
-		TagColor = Color3.fromRGB(245, 163, 27);
-	}))
-	self:SetAdminTag(ChatTagDataUtils.createChatTagData({
-		TagText = "(mod)";
-		LocalizedText = LocalizedTextUtils.create("chatTags.mod");
-		TagPriority = 10;
-		TagColor = Color3.fromRGB(78, 205, 196);
-	}))
+	-- self:SetDeveloperTag(ChatTagDataUtils.createChatTagData({
+	-- 	TagText = "(dev)";
+	-- 	LocalizedText = LocalizedTextUtils.create("chatTags.dev");
+	-- 	TagPriority = 15;
+	-- 	TagColor = Color3.fromRGB(245, 163, 27);
+	-- }))
+	-- self:SetAdminTag(ChatTagDataUtils.createChatTagData({
+	-- 	TagText = "(mod)";
+	-- 	LocalizedText = LocalizedTextUtils.create("chatTags.mod");
+	-- 	TagPriority = 10;
+	-- 	TagColor = Color3.fromRGB(78, 205, 196);
+	-- }))
 end
 
 function ChatProviderService:AddChatCommand(textChatCommand)

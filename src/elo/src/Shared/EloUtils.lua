@@ -103,10 +103,67 @@ function EloUtils.getEloChange(config, playerOneRating, playerTwoRating, eloMatc
 	assert(type(playerTwoRating) == "number", "Bad playerTwoRating")
 	assert(EloMatchResultUtils.isEloMatchResultList(eloMatchResultList), "Bad eloMatchResultList")
 
-	local newPlayerOneRating, newPlayerTwoRating = EloUtils.getNewElo(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	local newPlayerOneRating, newPlayerTwoRating = EloUtils.martinCustomAdjustElo(playerOneRating, playerTwoRating, eloMatchResultList)
 	local playerOneChange = newPlayerOneRating - playerOneRating
 	local playerTwoChange = newPlayerTwoRating - playerTwoRating
+
 	return playerOneChange, playerTwoChange
+
+	-- local newPlayerOneRating, newPlayerTwoRating = EloUtils.getNewElo(config, playerOneRating, playerTwoRating, eloMatchResultList)
+	-- local playerOneChange = newPlayerOneRating - playerOneRating
+	-- local playerTwoChange = newPlayerTwoRating - playerTwoRating
+	-- return playerOneChange, playerTwoChange
+end
+
+function EloUtils.martinCustomAdjustElo(player1, player2, result)
+	local K_FACTOR = 30
+
+	local player1Elo = player1:FindFirstChild("RankedElo")
+	if not player1Elo then
+		warn("[EloAdjustmentServer] - No ranked elo value")
+		return
+	end
+	local player2Elo = player2:FindFirstChild("RankedElo")
+	if not player2Elo then
+		warn("[EloAdjustmentServer] - No ranked elo value")
+		return
+	end
+
+	local function checkWinnerFromResultsTable(matchResult)
+		if matchResult[1] == 1 then
+			return "Player1Wins"
+		elseif matchResult[2] == 1 then
+			return "Player2Wins"
+		else
+			return "Draw"
+		end
+	end
+
+	local winString = checkWinnerFromResultsTable(result)
+
+	local function calculateExpectedScore(ratingA, ratingB)
+		return 1 / (1 + 10 ^ ((ratingB - ratingA) / 400))
+	end
+
+	local expectedScorePlayer1 = calculateExpectedScore(player1Elo.Value, player2Elo.Value)
+	local expectedScorePlayer2 = calculateExpectedScore(player2Elo.Value, player1Elo.Value)
+
+	local actualScorePlayer1, actualScorePlayer2
+	if winString == "Player1Wins" then
+		actualScorePlayer1 = 1
+		actualScorePlayer2 = 0
+	elseif winString == "Player2Wins" then
+		actualScorePlayer1 = 0
+		actualScorePlayer2 = 1
+	else -- Assuming a draw
+		actualScorePlayer1 = 0.5
+		actualScorePlayer2 = 0.5
+	end
+
+	local newPlayer1Elo = player1Elo.Value + K_FACTOR * (actualScorePlayer1 - expectedScorePlayer1)
+	local newPlayer2Elo = player2Elo.Value + K_FACTOR * (actualScorePlayer2 - expectedScorePlayer2)
+
+	return newPlayer1Elo, newPlayer2Elo
 end
 
 --[=[

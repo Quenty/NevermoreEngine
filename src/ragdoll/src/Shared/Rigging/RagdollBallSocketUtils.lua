@@ -20,7 +20,7 @@ local Maid = require("Maid")
 
 local RagdollBallSocketUtils = {}
 
-local REFERENCE_GRAVITY = 196.2 -- Gravity that joint friction values were tuned under.
+local REFERENCE_GRAVITY = 75 -- Gravity that joint friction values were tuned under.
 
 local HEAD_LIMITS = {
 	UpperAngle = 45,
@@ -67,7 +67,7 @@ local KNEE_LIMITS = {
 	UpperAngle = 5,
 	TwistLowerAngle = -120,
 	TwistUpperAngle = -5,
-	FrictionTorque = 0.5;
+	FrictionTorque = 2;
 	ReferenceMass = 0.65389388799667,
 }
 
