@@ -9,7 +9,7 @@
         "game": {
           "$path": "modules"
         },
-        "packages": {
+        "node_modules": {
           "$path": "node_modules"
         }
       },
