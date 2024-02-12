@@ -41,8 +41,7 @@ function ValueObject.new(baseValue, checkType)
 	@prop Changed Signal<T> -- fires with oldValue, newValue, ...
 	@within ValueObject
 ]=]
-	self.Changed = GoodSignal.new() -- :Fire(newValue, oldValue, maid, ...)
-	self._maid:GiveTask(self.Changed)
+	self.Changed = self._maid:Add(GoodSignal.new()) -- :Fire(newValue, oldValue, ...)
 
 	return setmetatable(self, ValueObject)
 end
@@ -151,7 +150,7 @@ function ValueObject:Observe()
 
 		local maid = Maid.new()
 
-		maid:GiveTask(self.Changed:Connect(function(newValue, _, _, ...)
+		maid:GiveTask(self.Changed:Connect(function(newValue, _, ...)
 			sub:Fire(newValue, ...)
 		end))
 
@@ -195,7 +194,7 @@ function ValueObject:ObserveBrio(condition)
 			end
 		end
 
-		maid:GiveTask(self.Changed:Connect(function(newValue, _, _, ...)
+		maid:GiveTask(self.Changed:Connect(function(newValue, _, ...)
 			handleNewValue(newValue, ...)
 		end))
 
@@ -217,7 +216,7 @@ end
 	```lua
 	self.IsVisible:SetValue(isVisible, true)
 
-	print(self.IsVisible.Changed:Connect(function(isVisible, _, _, doNotAnimate)
+	print(self.IsVisible.Changed:Connect(function(isVisible, _, doNotAnimate)
 		print(doNotAnimate)
 	end))
 	```
@@ -242,11 +241,7 @@ function ValueObject:SetValue(value, ...)
 
 		rawset(self, "_value", value)
 
-		local maid = Maid.new()
-
-		self.Changed:Fire(value, previous, maid, ...)
-
-		self._maid._valueMaid = maid
+		self.Changed:Fire(value, previous, ...)
 	end
 end
 
