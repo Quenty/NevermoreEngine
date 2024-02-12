@@ -106,6 +106,7 @@ end
 --[=[
 	Returns an observable that observes visibility
 
+	@param predicate function | nil -- Optional predicate. If not includeded returns the value.
 	@return Observable<Brio<boolean>>
 ]=]
 function BasicPane:ObserveVisibleBrio(predicate)
