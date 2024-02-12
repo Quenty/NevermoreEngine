@@ -140,7 +140,7 @@ function Loader:_findDependency(request)
 	end
 
 	-- TODO: Track location and provider install command
-	error(string.format("[Loader] - %q is not available", request))
+	error(string.format("[Loader] - %q is not available. Please make this module or install it to the package requiring it.", request))
 	return nil
 end
 

@@ -28,7 +28,7 @@ function PackageTracker.new(packageTrackerProvider, packageRoot)
 	self._subpackagesTrackerList = {}
 	self._packageModuleScriptMap = {}
 
-	if packageRoot:IsA("ModuleScript") then
+	if self._packageRoot:IsA("ModuleScript") then
 		-- Module script children don't get to be observed
 		self._maid:GiveTask(self:_trackModuleScript(self._packageRoot, ReplicationType.SHARED))
 	else

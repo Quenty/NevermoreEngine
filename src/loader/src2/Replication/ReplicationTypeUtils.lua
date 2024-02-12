@@ -37,7 +37,9 @@ function ReplicationTypeUtils.getFolderReplicationType(folderName, ancestorRepli
 end
 
 function ReplicationTypeUtils.inferReplicationType()
-	if RunService:IsServer() then
+	if (not RunService:IsRunning()) and RunService:IsStudio() then
+		return ReplicationType.PLUGIN
+	elseif RunService:IsServer() then
 		return ReplicationType.SERVER
 	elseif RunService:IsClient() then
 		return ReplicationType.CLIENT
