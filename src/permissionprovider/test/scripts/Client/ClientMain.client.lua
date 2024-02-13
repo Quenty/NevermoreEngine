@@ -1,12 +1,10 @@
 --[[
 	@class ClientMain
 ]]
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("permissionprovider"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local packages = ReplicatedStorage:WaitForChild("Packages")
-local serviceBag = require(packages:FindFirstChild("ServiceBag", true)).new()
-
+local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("PermissionServiceClient"))
 serviceBag:Init()
 serviceBag:Start()

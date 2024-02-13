@@ -42,6 +42,8 @@
 
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
+error("TODO: Update this code before publishing again to support new loader")
+
 local client, server, shared = require(script:FindFirstChild("LoaderUtils", true)).toWallyFormat(script.src, false)
 
 server.Name = "_SoftShutdownServerPackages"

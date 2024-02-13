@@ -9,7 +9,6 @@ local require = require(loader).bootstrapGame(ServerScriptService.cmdrservice)
 
 local serviceBag = require("ServiceBag").new()
 serviceBag:GetService(require("CmdrService"))
-
 serviceBag:Init()
 serviceBag:Start()
 
