@@ -13,7 +13,7 @@
 	```lua
 	-- Server
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(packages.Templates)
+	local templates = serviceBag:GetService(require("Templates"))
 	serviceBag:Init()
 	serviceBag:Start()
 	```
@@ -21,7 +21,7 @@
 	```lua
 	-- Client
 	local serviceBag = ServiceBag.new()
-	local templates = serviceBag:GetService(packages.Templates)
+	local templates = serviceBag:GetService(require("Templates"))
 	serviceBag:Init()
 	serviceBag:Start()
 

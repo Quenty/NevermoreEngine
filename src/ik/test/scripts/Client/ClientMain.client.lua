@@ -2,11 +2,11 @@
 	@class ClientMain
 ]]
 
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("ik"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local serviceBag = require(packages.ServiceBag).new()
-local ikServiceClient = serviceBag:GetService(packages.IKServiceClient)
-
+local serviceBag = require("ServiceBag").new()
+local ikServiceClient = serviceBag:GetService(require("IKServiceClient"))
 serviceBag:Init()
 serviceBag:Start()
 

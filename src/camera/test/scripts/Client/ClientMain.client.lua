@@ -1,11 +1,11 @@
 --[[
 	@class ClientMain
 ]]
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("camera"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
-
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(require(packages.CameraStackService))
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("CameraStackService"))
 
 serviceBag:Init()
 serviceBag:Start()

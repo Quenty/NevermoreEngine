@@ -6,18 +6,15 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.ik)
+local require = require(loader).bootstrapGame(ServerScriptService.ik)
 
-local serviceBag = require(packages.ServiceBag).new()
-local ikService = serviceBag:GetService(packages.IKService)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+local ikService = serviceBag:GetService(require("IKService"))
 serviceBag:Init()
 serviceBag:Start()
 
-
 -- Build test NPC rigs
-local RigBuilderUtils = require(packages.RigBuilderUtils)
+local RigBuilderUtils = require("RigBuilderUtils")
 RigBuilderUtils.promiseR15MeshRig()
 	:Then(function(character)
 		local humanoid = character.Humanoid

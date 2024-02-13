@@ -1,16 +1,15 @@
 --[[
 	@class ClientMain
 ]]
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("settings"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.SettingsServiceClient)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("SettingsServiceClient"))
 serviceBag:Init()
 serviceBag:Start()
 
-local SettingDefinition = require(packages.SettingDefinition)
+local SettingDefinition = require("SettingDefinition")
 
 local volumeDefinition = SettingDefinition.new("Volume", 1)
 local volume = volumeDefinition:Get(serviceBag, game.Players.LocalPlayer)

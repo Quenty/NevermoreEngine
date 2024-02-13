@@ -5,15 +5,14 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.cmdrservice)
+local require = require(loader).bootstrapGame(ServerScriptService.cmdrservice)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(require(packages.CmdrService))
-
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("CmdrService"))
 serviceBag:Init()
 serviceBag:Start()
 
-serviceBag:GetService(require(packages.CmdrService)):RegisterCommand({
+serviceBag:GetService(require("CmdrService")):RegisterCommand({
 	Name = "explode";
 	Aliases = { "boom" };
 	Description = "Makes players explode";

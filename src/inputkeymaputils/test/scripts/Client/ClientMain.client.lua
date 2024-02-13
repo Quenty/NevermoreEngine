@@ -1,21 +1,20 @@
 --[[
 	@class ClientMain
 ]]
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("inputkeymaputils"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
 local ContextActionService = game:GetService("ContextActionService")
 
-local InputModeTypes = require(packages.InputModeTypes)
-local serviceBag = require(packages.ServiceBag).new()
-
-serviceBag:GetService(packages.InputKeyMapServiceClient)
-local inputKeyMap = serviceBag:GetService(packages.TestInputKeyMap)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("InputKeyMapServiceClient"))
+serviceBag:GetService(require("TestInputKeyMap"))
 serviceBag:Init()
 serviceBag:Start()
 
-local keyMapList = inputKeyMap:GetInputKeyMapList("HONK")
+local InputModeTypes = require("InputModeTypes")
+
+local keyMapList = serviceBag:GetService(require("TestInputKeyMap")):GetInputKeyMapList("HONK")
 
 keyMapList:ObserveInputEnumsList():Subscribe(function(...)
 	print("activeInputTypes", ...)
