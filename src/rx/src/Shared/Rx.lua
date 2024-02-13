@@ -302,7 +302,7 @@ function Rx.tap(onFire, onError, onComplete)
 					if onError then
 						onError(...)
 					end
-					sub:Error(...)
+					sub:Fail(...)
 				end,
 				function(...)
 					if onComplete then
