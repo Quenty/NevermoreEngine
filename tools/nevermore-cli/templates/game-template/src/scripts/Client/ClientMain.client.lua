@@ -1,11 +1,14 @@
 --[[
 	@class ClientMain
 ]]
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local serviceBag = require(packages:WaitForChild("ServiceBag")).new()
+local loader = ReplicatedStorage:WaitForChild("{{gameNameProper}}"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-serviceBag:GetService(packages:WaitForChild("{{gameNameProper}}ServiceClient"))
+local serviceBag = require("ServiceBag").new()
+
+serviceBag:GetService(require("{{gameNameProper}}ServiceClient"))
 
 serviceBag:Init()
 serviceBag:Start()

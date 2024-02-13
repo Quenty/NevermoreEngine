@@ -25,6 +25,7 @@ local Rx = require("Rx")
 local Signal = require("Signal")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 -- Higher numbers last
 local function defaultCompare(a, b)
@@ -133,7 +134,7 @@ end
 	@return boolean
 ]=]
 function ObservableSortedList.isObservableSortedList(value)
-	return type(value) == "table" and getmetatable(value) == ObservableSortedList
+	return DuckTypeUtils.isImplementation(ObservableSortedList, value)
 end
 
 --[=[

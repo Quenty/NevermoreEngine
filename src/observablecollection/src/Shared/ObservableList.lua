@@ -14,6 +14,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local Signal = require("Signal")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ObservableList = {}
 ObservableList.ClassName = "ObservableList"
@@ -68,7 +69,7 @@ end
 	@return boolean
 ]=]
 function ObservableList.isObservableList(value)
-	return type(value) == "table" and getmetatable(value) == ObservableList
+	return DuckTypeUtils.isImplementation(ObservableList, value)
 end
 
 --[=[

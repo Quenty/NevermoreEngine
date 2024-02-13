@@ -29,6 +29,7 @@
   "dependencies": {
     "@quenty/cancellabledelay": "file:../cancellabledelay",
     "@quenty/canceltoken": "file:../canceltoken",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",

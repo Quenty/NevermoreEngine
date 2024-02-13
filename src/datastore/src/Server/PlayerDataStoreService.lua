@@ -27,8 +27,7 @@ function PlayerDataStoreService:Init(serviceBag)
 	-- External
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
 
-	self._started = Promise.new()
-	self._maid:GiveTask(self._started)
+	self._started = self._maid:Add(Promise.new())
 
 	self._dataStoreName = "PlayerData"
 	self._dataStoreScope = "SaveData"

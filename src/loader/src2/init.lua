@@ -1,68 +1,171 @@
+--[=[
+	Primary loader which handles bootstrapping different scenarios quickly
+
+	@class loader
+]=]
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local DependencyUtils = require(script.Dependencies.DependencyUtils)
+local LoaderLinkCreator = require(script.LoaderLink.LoaderLinkCreator)
+local LoaderLinkUtils = require(script.LoaderLink.LoaderLinkUtils)
+local Maid = require(script.Maid)
+local PackageTrackerProvider = require(script.Dependencies.PackageTrackerProvider)
+local ReplicationType = require(script.Replication.ReplicationType)
+local ReplicationTypeUtils = require(script.Replication.ReplicationTypeUtils)
 local Replicator = require(script.Replication.Replicator)
 local ReplicatorReferences = require(script.Replication.ReplicatorReferences)
-local Maid = require(script.Maid)
-local LoaderAdder = require(script.Loader.LoaderAdder)
-local ReplicationType = require(script.Replication.ReplicationType)
 
-local function handleLoad(moduleScript)
-	assert(typeof(moduleScript) == "Instance", "Bad moduleScript")
+local GLOBAL_PACKAGE_TRACKER = PackageTrackerProvider.new()
 
-	return function(request)
-		if type(request) == "string" then
-			local module = DependencyUtils.findDependency(moduleScript, request)
-			return require(module)
+local Loader = {}
+Loader.__index = Loader
+Loader.ClassName = "Loader"
+
+function Loader.new(packages, replicationType)
+	assert(typeof(packages) == "Instance", "Bad packages")
+	assert(ReplicationTypeUtils.isReplicationType(replicationType), "Bad replicationType")
+
+	local self = setmetatable({}, Loader)
+
+	self._maid = Maid.new()
+
+	self._replicationType = assert(replicationType, "No replicationType")
+	self._packages = assert(packages, "No packages")
+
+	return self
+end
+
+function Loader.bootstrapGame(packages)
+	assert(typeof(packages) == "Instance", "Bad packages")
+
+	local self = Loader.new(packages, ReplicationTypeUtils.inferReplicationType())
+
+	if self._replicationType == ReplicationType.SERVER then
+		self:_setupLoaderPopulation()
+
+		-- Trade off security for performance
+		if RunService:IsStudio() then
+			packages.Parent = ReplicatedStorage
 		else
-			return require(request)
+			self:_setupClientReplication()
 		end
+	end
+
+	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
+
+	return self
+end
+
+function Loader.bootstrapPlugin(packages)
+	assert(typeof(packages) == "Instance", "Bad packages")
+
+	local self = Loader.new(packages, ReplicationType.PLUGIN)
+
+	self:_setupLoaderPopulation()
+
+	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
+
+	return self
+end
+
+function Loader.load(packagesOrModuleScript)
+	assert(typeof(packagesOrModuleScript) == "Instance", "Bad packagesOrModuleScript")
+
+	local self = Loader.new(packagesOrModuleScript, ReplicationTypeUtils.inferReplicationType())
+
+	return self
+end
+
+function Loader:__index(request)
+	if Loader[request] then
+		return Loader[request]
+	end
+
+	return self:_findDependency(request)
+end
+
+function Loader:__call(request)
+	if type(request) == "string" then
+		local module = self:_findDependency(request)
+		return require(module)
+	else
+		return require(request)
 	end
 end
 
-local function bootstrapGame(packages)
-	local maid = Maid.new()
+function Loader:_findDependency(request)
+	assert(type(request) == "string", "Bad request")
 
-	local copy = Instance.new("Folder")
-	copy.Name = packages.Name
-	maid:GiveTask(copy)
+	local packageTracker = GLOBAL_PACKAGE_TRACKER:FindPackageTracker(self._packages)
+	if packageTracker then
+		local foundDependency = packageTracker:ResolveDependency(request, self._replicationType)
+		if foundDependency then
+			return foundDependency
+		end
+
+		-- Otherwise let's fail with an error acknowledging that the module exists
+		if self._replicationType == ReplicationType.SERVER or self._replicationType == ReplicationType.SHARED then
+			local foundClientDependency = packageTracker:ResolveDependency(request, ReplicationType.CLIENT)
+			if foundClientDependency then
+				error(string.format("[Loader] - %q is only available on the client", foundClientDependency.Name))
+			end
+		end
+
+		if self._replicationType == ReplicationType.CLIENT or self._replicationType == ReplicationType.SHARED then
+			local foundServerDependency = packageTracker:ResolveDependency(request, ReplicationType.SERVER)
+			if foundServerDependency then
+				error(string.format("[Loader] - %q is only available on the server", foundServerDependency.Name))
+			end
+		end
+	end
+
+	-- Just standard dependency search
+	local foundBackup = DependencyUtils.findDependency(self._packages, request, self._replicationType)
+	if foundBackup then
+		if RunService:IsRunning() then
+			warn(string.format("[Loader] - Failed to find package %q in package tracker", request))
+		end
+
+		-- Ensure hoarcekat story has a link to use
+		-- TODO: Maybe add to global package cache instead...
+		local parent = foundBackup.Parent
+		if parent and not parent:FindFirstChild("loader") then
+			local link = LoaderLinkUtils.create(script, "loader")
+			link.Parent = parent
+		end
+
+		return foundBackup
+	end
+
+	-- TODO: Track location and provider install command
+	error(string.format("[Loader] - %q is not available. Please make this module or install it to the package requiring it.", request))
+	return nil
+end
+
+function Loader:_setupClientReplication()
+	local copy = self._maid:Add(Instance.new("Folder"))
+	copy.Name = self._packages.Name
 
 	local references = ReplicatorReferences.new()
 
-	local serverAdder = LoaderAdder.new(references, packages, ReplicationType.SERVER)
-	maid:GiveTask(serverAdder)
-
-	local replicator = Replicator.new(references)
+	local replicator = self._maid:Add(Replicator.new(references))
 	replicator:SetTarget(copy)
-	replicator:ReplicateFrom(packages)
-	maid:GiveTask(replicator)
+	replicator:ReplicateFrom(self._packages)
 
-	local clientAdder = LoaderAdder.new(references, copy, ReplicationType.CLIENT)
-	maid:GiveTask(clientAdder)
+	self._maid:Add(LoaderLinkCreator.new(copy, references, true))
 
 	copy.Parent = ReplicatedStorage
-
-	return setmetatable({}, {__index = function(_, value)
-		-- Lookup module script
-		if type(value) == "string" then
-			local result = DependencyUtils.findDependency(packages, value)
-			if result then
-				return result
-			else
-				error(("Could not find dependency %q"):format(value))
-			end
-		else
-			error(("Bad index %q"):format(type(value)))
-		end
-	end})
 end
 
-local function bootstrapPlugin(_packages)
-	error("Not implemented")
+function Loader:_setupLoaderPopulation()
+	self._maid:Add(LoaderLinkCreator.new(self._packages, nil, true))
 end
 
-return {
-	load = handleLoad;
-	bootstrapGame = bootstrapGame;
-	bootstrapPlugin = bootstrapPlugin;
-}
+function Loader:Destroy()
+	self._maid:DoCleaning()
+	setmetatable(self, nil)
+end
+
+return Loader

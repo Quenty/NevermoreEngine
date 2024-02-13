@@ -29,6 +29,18 @@ local VERTICAL_BIAS = {
 	[Enum.VerticalAlignment.Bottom] = 1;
 }
 
+local VERTICAL_TO_HORIZONTAL = {
+	[Enum.VerticalAlignment.Top] = Enum.HorizontalAlignment.Left;
+	[Enum.VerticalAlignment.Center] = Enum.HorizontalAlignment.Center;
+	[Enum.VerticalAlignment.Bottom] = Enum.HorizontalAlignment.Right;
+}
+
+local HORIZONTAL_TO_VERTICAL = {
+	[Enum.HorizontalAlignment.Left] = Enum.VerticalAlignment.Top;
+	[Enum.HorizontalAlignment.Center] = Enum.VerticalAlignment.Center;
+	[Enum.HorizontalAlignment.Right] = Enum.VerticalAlignment.Bottom;
+}
+
 --[=[
 	Converts alignment to 0, 0.5 or 1
 
@@ -43,9 +55,40 @@ function UIAlignmentUtils.toNumber(alignment)
 	elseif VERTICAL_ALIGNMENT[alignment] then
 		return VERTICAL_ALIGNMENT[alignment]
 	else
-		error(("[UIAlignmentUtils.toNumber] - Bad alignment %q"):format(tostring(alignment)))
+		error(string.format("[UIAlignmentUtils.toNumber] - Bad alignment %q", tostring(alignment)))
 	end
 end
+
+--[=[
+	Converts the HorizontalAlignment to a HorizontalAlignment
+	@param verticalAlignment HorizontalAlignment
+	@return HorizontalAlignment
+]=]
+function UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment)
+	assert(verticalAlignment, "Bad verticalAlignment")
+
+	local found = VERTICAL_TO_HORIZONTAL[verticalAlignment]
+	if not found then
+		error(string.format("[UIAlignmentUtils.verticalToHorizontalAlignment] - Bad verticalAlignment %q", tostring(verticalAlignment)))
+	end
+	return found
+end
+
+--[=[
+	Converts the HorizontalAlignment to a VertialAlignment
+	@param horizontalAlignment HorizontalAlignment
+	@return VertialAlignment
+]=]
+function UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+	assert(horizontalAlignment, "Bad horizontalAlignment")
+
+	local found = HORIZONTAL_TO_VERTICAL[horizontalAlignment]
+	if not found then
+		error(string.format("[UIAlignmentUtils.horizontalToVerticalAlignment] - Bad horizontalAlignment %q", tostring(horizontalAlignment)))
+	end
+	return found
+end
+
 
 --[=[
 	Converts alignment to bias, as -1, 0, or 1
@@ -61,7 +104,7 @@ function UIAlignmentUtils.toBias(alignment)
 	elseif VERTICAL_BIAS[alignment] then
 		return VERTICAL_BIAS[alignment]
 	else
-		error(("[UIAlignmentUtils.toBias] - Bad alignment %q"):format(tostring(alignment)))
+		error(string.format("[UIAlignmentUtils.toBias] - Bad alignment %q", tostring(alignment)))
 	end
 end
 
@@ -77,7 +120,7 @@ function UIAlignmentUtils.horizontalAlignmentToNumber(horizontalAlignment)
 	if HORIZONTAL_ALIGNMENT[horizontalAlignment] then
 		return HORIZONTAL_ALIGNMENT[horizontalAlignment]
 	else
-		error(("[UIAlignmentUtils] - Bad horizontalAlignment %q"):format(tostring(horizontalAlignment)))
+		error(string.format("[UIAlignmentUtils] - Bad horizontalAlignment %q", tostring(horizontalAlignment)))
 	end
 end
 
@@ -93,7 +136,7 @@ function UIAlignmentUtils.horizontalAlignmentToBias(horizontalAlignment)
 	if HORIZONTAL_BIAS[horizontalAlignment] then
 		return HORIZONTAL_BIAS[horizontalAlignment]
 	else
-		error(("[UIAlignmentUtils] - Bad horizontalAlignment %q"):format(tostring(horizontalAlignment)))
+		error(string.format("[UIAlignmentUtils] - Bad horizontalAlignment %q", tostring(horizontalAlignment)))
 	end
 end
 
@@ -109,7 +152,7 @@ function UIAlignmentUtils.verticalAlignmentToNumber(verticalAlignment)
 	if VERTICAL_ALIGNMENT[verticalAlignment] then
 		return VERTICAL_ALIGNMENT[verticalAlignment]
 	else
-		error(("[UIAlignmentUtils] - Bad verticalAlignment %q"):format(tostring(verticalAlignment)))
+		error(string.format("[UIAlignmentUtils] - Bad verticalAlignment %q", tostring(verticalAlignment)))
 	end
 end
 
@@ -125,7 +168,7 @@ function UIAlignmentUtils.verticalAlignmentToBias(verticalAlignment)
 	if VERTICAL_BIAS[verticalAlignment] then
 		return VERTICAL_BIAS[verticalAlignment]
 	else
-		error(("[UIAlignmentUtils] - Bad verticalAlignment %q"):format(tostring(verticalAlignment)))
+		error(string.format("[UIAlignmentUtils] - Bad verticalAlignment %q", tostring(verticalAlignment)))
 	end
 end
 

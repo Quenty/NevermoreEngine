@@ -10,6 +10,7 @@ local CooldownShared = require("CooldownShared")
 local ValueObject = require("ValueObject")
 local RxBinderUtils = require("RxBinderUtils")
 local CooldownTrackerModel = require("CooldownTrackerModel")
+local Maid = require("Maid")
 
 local CooldownTracker = setmetatable({}, BaseObject)
 CooldownTracker.ClassName = "CooldownTracker"
@@ -68,7 +69,9 @@ function CooldownTracker:IsCoolingDown()
 	return self._cooldownTrackModel:IsCoolingDown()
 end
 
-function CooldownTracker:_handleNewCooldown(new, _old, maid)
+function CooldownTracker:_handleNewCooldown(new, _old)
+	local maid = Maid.new()
+
 	if new then
 		maid:GiveTask(new.Done:Connect(function()
 			if self.CurrentCooldown.Value == new then
@@ -76,6 +79,8 @@ function CooldownTracker:_handleNewCooldown(new, _old, maid)
 			end
 		end))
 	end
+
+	self._maid._cooldownMaid = maid
 end
 
 return CooldownTracker

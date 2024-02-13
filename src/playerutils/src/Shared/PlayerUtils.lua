@@ -2,6 +2,10 @@
 	@class PlayerUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local Promise = require("Promise")
+
 local PlayerUtils = {}
 
 --[=[
@@ -81,6 +85,50 @@ end
 ]=]
 function PlayerUtils.getDefaultNameColor(displayName)
 	return NAME_COLORS[(hashName(displayName) % #NAME_COLORS) + 1]
+end
+
+--[=[
+	Calls :LoadCharacter() in a promise
+
+	@param player Player
+	@return Promise<Model>
+]=]
+function PlayerUtils.promiseLoadCharacter(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
+	return Promise.spawn(function(resolve, reject)
+		local ok, err = pcall(function()
+			player:LoadCharacter()
+		end)
+		if not ok then
+			return reject(err or "Failed to load character")
+		end
+
+		return resolve()
+	end)
+end
+
+--[=[
+	Calls :LoadCharacterWithHumanoidDescription() in a promise
+
+	@param player Player
+	@param humanoidDescription HumanoidDescription
+	@return Promise<Model>
+]=]
+function PlayerUtils.promiseLoadCharacterWithHumanoidDescription(player, humanoidDescription)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"), "Bad humanoidDescription")
+
+	return Promise.spawn(function(resolve, reject)
+		local ok, err = pcall(function()
+			player:LoadCharacterWithHumanoidDescription(humanoidDescription)
+		end)
+		if not ok then
+			return reject(err or "Failed to load character")
+		end
+
+		return resolve()
+	end)
 end
 
 return PlayerUtils

@@ -8,6 +8,7 @@ local BaseObject = require("BaseObject")
 local ValueObject = require("ValueObject")
 local EnumUtils = require("EnumUtils")
 local Signal = require("Signal")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local AnimatedHighlightModel = setmetatable({}, BaseObject)
 AnimatedHighlightModel.ClassName = "AnimatedHighlightModel"
@@ -23,32 +24,15 @@ AnimatedHighlightModel.__index = AnimatedHighlightModel
 function AnimatedHighlightModel.new()
 	local self = setmetatable(BaseObject.new(), AnimatedHighlightModel)
 
-	self.HighlightDepthMode = ValueObject.new(nil)
-	self._maid:GiveTask(self.HighlightDepthMode)
-
-	self.FillColor = ValueObject.new(nil)
-	self._maid:GiveTask(self.FillColor)
-
-	self.OutlineColor = ValueObject.new(nil)
-	self._maid:GiveTask(self.OutlineColor)
-
-	self.FillTransparency = ValueObject.new(nil)
-	self._maid:GiveTask(self.FillTransparency)
-
-	self.OutlineTransparency = ValueObject.new(nil)
-	self._maid:GiveTask(self.OutlineTransparency)
-
-	self.Speed = ValueObject.new(nil)
-	self._maid:GiveTask(self.Speed)
-
-	self.ColorSpeed = ValueObject.new(nil)
-	self._maid:GiveTask(self.ColorSpeed)
-
-	self.TransparencySpeed = ValueObject.new(nil)
-	self._maid:GiveTask(self.TransparencySpeed)
-
-	self.FillSpeed = ValueObject.new(nil)
-	self._maid:GiveTask(self.FillSpeed)
+	self.HighlightDepthMode = self._maid:Add(ValueObject.new(nil))
+	self.FillColor = self._maid:Add(ValueObject.new(nil))
+	self.OutlineColor = self._maid:Add(ValueObject.new(nil))
+	self.FillTransparency = self._maid:Add(ValueObject.new(nil))
+	self.OutlineTransparency = self._maid:Add(ValueObject.new(nil))
+	self.Speed = self._maid:Add(ValueObject.new(nil))
+	self.ColorSpeed = self._maid:Add(ValueObject.new(nil))
+	self.TransparencySpeed = self._maid:Add(ValueObject.new(nil))
+	self.FillSpeed = self._maid:Add(ValueObject.new(nil))
 
 	self.Destroying = Signal.new()
 	self._maid:GiveTask(function()
@@ -66,7 +50,7 @@ end
 	@return boolean
 ]=]
 function AnimatedHighlightModel.isAnimatedHighlightModel(value)
-	return type(value) == "table" and getmetatable(value) == AnimatedHighlightModel
+	return DuckTypeUtils.isImplementation(AnimatedHighlightModel, value)
 end
 
 --[=[

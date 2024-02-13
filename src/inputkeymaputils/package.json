@@ -29,6 +29,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
     "@quenty/clienttranslator": "file:../clienttranslator",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/inputmode": "file:../inputmode",
     "@quenty/loader": "file:../loader",

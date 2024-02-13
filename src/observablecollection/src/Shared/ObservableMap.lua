@@ -12,6 +12,7 @@ local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 local RxBrioUtils = require("RxBrioUtils")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ObservableMap = {}
 ObservableMap.ClassName = "ObservableMap"
@@ -70,7 +71,7 @@ end
 	@return boolean
 ]=]
 function ObservableMap.isObservableMap(value)
-	return type(value) == "table" and getmetatable(value) == ObservableMap
+	return DuckTypeUtils.isImplementation(ObservableMap, value)
 end
 
 --[=[

@@ -3,6 +3,11 @@
 
 	@class LinearValue
 ]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local DuckTypeUtils = require("DuckTypeUtils")
+
 local LinearValue = {}
 LinearValue.ClassName = "LinearValue"
 LinearValue.__index = LinearValue
@@ -28,7 +33,7 @@ end
 	@return boolean -- True if a linear value, false otherwise
 ]=]
 function LinearValue.isLinear(value)
-	return type(value) == "table" and getmetatable(value) == LinearValue
+	return DuckTypeUtils.isImplementation(LinearValue, value)
 end
 
 --[=[

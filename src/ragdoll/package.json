@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/adorneedata": "file:../adorneedata",
     "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
@@ -39,6 +40,7 @@
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/motor6d": "file:../motor6d",
+    "@quenty/physicsutils": "file:../physicsutils",
     "@quenty/playerhumanoidbinder": "file:../playerhumanoidbinder",
     "@quenty/promise": "file:../promise",
     "@quenty/qframe": "file:../qframe",
