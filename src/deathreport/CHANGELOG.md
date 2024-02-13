@@ -1,3 +1,26 @@
+# v9.0.0 (Tue Feb 13 2024)
+
+#### 💥 Breaking Change
+
+- users/quenty/adorneedata [#437](https://github.com/Quenty/NevermoreEngine/pull/437) ([@Quenty](https://github.com/Quenty))
+- feat!: Rename DeathReportService:ReportDeath(humanoid) to DeathReportService:ReportHumanoidDeath(humanoid) (BREAKING CHANGE) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- Fix loader and other issues [#444](https://github.com/Quenty/NevermoreEngine/pull/444) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix bootstrap of test environments and loader samples ([@Quenty](https://github.com/Quenty))
+- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
+- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

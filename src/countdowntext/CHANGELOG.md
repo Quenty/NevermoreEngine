@@ -1,3 +1,18 @@
+# v3.0.0 (Tue Feb 13 2024)
+
+#### 🐛 Bug Fix
+
+- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
+- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
+- ci: Upgrade to latest auto-it and lerna [#438](https://github.com/Quenty/NevermoreEngine/pull/438) ([@Quenty](https://github.com/Quenty))
+- ci: Manually increment partially published packages ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
