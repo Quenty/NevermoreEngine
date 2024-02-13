@@ -1,6 +1,6 @@
 {
   "name": "@quenty/remotefunctionutils",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "description": "Utility functions to wrap invoking a remote function with a promise",
   "keywords": [
     "Roblox",

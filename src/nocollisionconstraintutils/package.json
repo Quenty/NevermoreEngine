@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nocollisionconstraintutils",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "description": "Utility functions to create and manipulate NoCollisionConstraints between Roblox objects",
   "keywords": [
     "Roblox",

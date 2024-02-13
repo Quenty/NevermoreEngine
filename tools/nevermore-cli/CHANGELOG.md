@@ -1,30 +1,19 @@
-# v4.0.0 (Tue Feb 13 2024)
-
-#### 💥 Breaking Change
-
-- feat: New loader (breaking changes), fixing loader issues [#439](https://github.com/Quenty/NevermoreEngine/pull/439) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- Fix loader and other issues [#444](https://github.com/Quenty/NevermoreEngine/pull/444) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix bootstrap of test environments and loader samples ([@Quenty](https://github.com/Quenty))
-- fix: Fix loader require ([@Quenty](https://github.com/Quenty))
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@3.0.0...@quenty/nevermore-cli@4.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/Nevermore/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+* Fix loader require ([5a78e8c](https://github.com/Quenty/Nevermore/commit/5a78e8ceb0df372e4efe1382f9438b51e6c182fa))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@2.0.0...@quenty/nevermore-cli@3.0.0) (2024-02-13)
 

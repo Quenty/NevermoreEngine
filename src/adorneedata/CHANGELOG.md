@@ -1,32 +1,15 @@
-# v6.0.0 (Tue Feb 13 2024)
-
-#### 💥 Breaking Change
-
-- feat: New loader (breaking changes), fixing loader issues [#439](https://github.com/Quenty/NevermoreEngine/pull/439) ([@Quenty](https://github.com/Quenty))
-- users/quenty/adorneedata [#437](https://github.com/Quenty/NevermoreEngine/pull/437) ([@Quenty](https://github.com/Quenty))
-- feat!: Swap AdorneeData:IsPartialData() and partial contract to being the default, and make strict the non-default. ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- Fix loader and other issues [#444](https://github.com/Quenty/NevermoreEngine/pull/444) ([@Quenty](https://github.com/Quenty))
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- fix: InitAttributes works on partial data ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@5.0.0...@quenty/adorneedata@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/adorneedata
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@4.0.0...@quenty/adorneedata@5.0.0) (2024-02-13)
 

@@ -1,36 +1,15 @@
-# v12.0.0 (Tue Feb 13 2024)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
-
-#### 💥 Breaking Change
-
-- feat: New loader (breaking changes), fixing loader issues [#439](https://github.com/Quenty/NevermoreEngine/pull/439) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- Fix loader and other issues [#444](https://github.com/Quenty/NevermoreEngine/pull/444) ([@Quenty](https://github.com/Quenty))
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- fix: Replace Subscription:Error() call in Rx.tap with Subscription:Fail() [#440](https://github.com/Quenty/NevermoreEngine/pull/440) ([@InvisibleWater](https://github.com/InvisibleWater))
-- fix: Check duration selector ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@11.0.0...@quenty/rx@12.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/rx
+
+
+
+
 
 # [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@10.0.0...@quenty/rx@11.0.0) (2024-02-13)
 
