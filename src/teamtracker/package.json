@@ -1,6 +1,6 @@
 {
   "name": "@quenty/teamtracker",
-  "version": "9.0.0",
+  "version": "10.0.0",
   "description": "Tracks a player's current team, since the Team property is unreliable",
   "keywords": [
     "Roblox",

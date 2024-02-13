@@ -1,19 +1,15 @@
-# v9.0.0 (Tue Feb 13 2024)
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@8.2.0...@quenty/transparencyservice@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/transparencyservice
+
+
+
+
 
 # [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@8.1.0...@quenty/transparencyservice@8.2.0) (2024-01-08)
 
