@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textfilterservice",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "description": "Utility service that provides text filtering to the client",
   "keywords": [
     "Roblox",

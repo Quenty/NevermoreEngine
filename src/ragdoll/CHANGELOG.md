@@ -1,24 +1,15 @@
-# v13.0.0 (Tue Feb 13 2024)
-
-#### 💥 Breaking Change
-
-- feat: New loader (breaking changes), fixing loader issues [#439](https://github.com/Quenty/NevermoreEngine/pull/439) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@12.0.0...@quenty/ragdoll@13.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
 
 # [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@11.0.0...@quenty/ragdoll@12.0.0) (2024-02-13)
 

@@ -1,29 +1,15 @@
-# v11.0.0 (Tue Feb 13 2024)
-
-#### 💥 Breaking Change
-
-- feat: New loader (breaking changes), fixing loader issues [#439](https://github.com/Quenty/NevermoreEngine/pull/439) ([@Quenty](https://github.com/Quenty))
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-- feat: Add HumanoidTrackerService API methods that allow for use on server too ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@10.0.0...@quenty/humanoidtracker@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/humanoidtracker
+
+
+
+
 
 # [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidtracker@9.0.0...@quenty/humanoidtracker@10.0.0) (2024-02-13)
 
