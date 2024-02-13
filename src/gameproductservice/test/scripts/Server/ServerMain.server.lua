@@ -5,19 +5,19 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.gameproduct)
+local require = require(loader).bootstrapGame(ServerScriptService.gameproduct)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.GameProductService)
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("GameProductService"))
 
 serviceBag:Init()
 serviceBag:Start()
 
-serviceBag:GetService(packages.GameConfigService):AddPass("TestPass", 27825080)
-serviceBag:GetService(packages.GameConfigService):AddProduct("TestProduct", 29082053)
-serviceBag:GetService(packages.GameConfigService):AddAsset("FrogOnHead", 4556535529)
+serviceBag:GetService(require("GameConfigService")):AddPass("TestPass", 27825080)
+serviceBag:GetService(require("GameConfigService")):AddProduct("TestProduct", 29082053)
+serviceBag:GetService(require("GameConfigService")):AddAsset("FrogOnHead", 4556535529)
 
-local GameConfigAssetTypes = require(packages.GameConfigAssetTypes)
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 
 local function makePrompt(assetType, idOrKey, cframe)
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -36,7 +36,7 @@ local function makePrompt(assetType, idOrKey, cframe)
 	prompt.Parent = promptPart
 
 	prompt.Triggered:Connect(function(player)
-		serviceBag:GetService(packages.GameProductService):PromisePromptPurchase(player, assetType, idOrKey)
+		serviceBag:GetService(require("GameProductService")):PromisePromptPurchase(player, assetType, idOrKey)
 			:Then(function(purchased)
 				print("purchased", idOrKey, purchased)
 			end)

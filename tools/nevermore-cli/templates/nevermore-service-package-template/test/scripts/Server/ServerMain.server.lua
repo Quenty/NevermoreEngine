@@ -4,11 +4,9 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.{{packageName}})
+local require = require(loader).bootstrapGame(ServerScriptService.{{packageName}})
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.{{packageNameProper}}Service)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("{{packageNameProper}}Service"))
 serviceBag:Init()
 serviceBag:Start()

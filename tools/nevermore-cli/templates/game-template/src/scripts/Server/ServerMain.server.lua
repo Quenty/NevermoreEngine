@@ -7,8 +7,6 @@ local loader = ServerScriptService.{{gameNameProper}}:FindFirstChild("LoaderUtil
 local require = require(loader).bootstrapGame(ServerScriptService.{{gameNameProper}})
 
 local serviceBag = require("ServiceBag").new()
-
 serviceBag:GetService(require("{{gameNameProper}}Service"))
-
 serviceBag:Init()
 serviceBag:Start()

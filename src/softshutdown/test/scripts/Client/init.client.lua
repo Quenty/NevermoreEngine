@@ -6,8 +6,8 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local packages = ReplicatedFirst:WaitForChild("_SoftShutdownClientPackages")
 
-local SoftShutdownServiceClient = require(packages.SoftShutdownServiceClient)
-local serviceBag = require(packages.ServiceBag).new()
+local SoftShutdownServiceClient = require("SoftShutdownServiceClient")
+local serviceBag = require("ServiceBag").new()
 
 serviceBag:GetService(SoftShutdownServiceClient)
 

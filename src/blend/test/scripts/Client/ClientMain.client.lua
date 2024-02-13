@@ -1,14 +1,16 @@
--- Main injection point
+--[[
+	@class ClientMain
+]]
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("blend"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
-
-local Blend = require(packages.Blend)
-
+local Blend = require("Blend")
+local PlayerGuiUtils = require("PlayerGuiUtils")
 
 local state = Blend.State("a")
 
 Blend.New "ScreenGui" {
-	Parent = require(packages.PlayerGuiUtils).getPlayerGui();
+	Parent = PlayerGuiUtils.getPlayerGui();
 	[Blend.Children] = {
 		Blend.New "TextLabel" {
 			Size = UDim2.new(0, 100, 0, 50);

@@ -2,10 +2,11 @@
 	@class ClientMain
 ]]
 
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("deathreport"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(require(packages.DeathReportServiceClient))
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("DeathReportServiceClient"))
 
 serviceBag:Init()
 serviceBag:Start()

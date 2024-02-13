@@ -4,16 +4,14 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.rogueproperties)
+local require = require(loader).bootstrapGame(ServerScriptService.rogueproperties)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.RoguePropertyService)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("RoguePropertyService"))
 serviceBag:Init()
 serviceBag:Start()
 
-local RoguePropertyTableDefinition = require(packages.RoguePropertyTableDefinition)
+local RoguePropertyTableDefinition = require("RoguePropertyTableDefinition")
 
 local propertyDefinition = RoguePropertyTableDefinition.new("CombatStats", {
 	Health = 100;

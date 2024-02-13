@@ -7,11 +7,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local packages = ReplicatedStorage:WaitForChild("Packages")
 local serviceBag = require(packages:FindFirstChild("ServiceBag", true)).new()
 
-serviceBag:GetService(require(packages.PermissionServiceClient))
+serviceBag:GetService(require("PermissionServiceClient"))
 serviceBag:Init()
 serviceBag:Start()
 
-serviceBag:GetService(require(packages.PermissionServiceClient)):PromisePermissionProvider()
+serviceBag:GetService(require("PermissionServiceClient")):PromisePermissionProvider()
 	:Then(function(permissionProvider)
 		return permissionProvider:PromiseIsAdmin()
 	end)
