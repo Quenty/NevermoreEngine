@@ -6,6 +6,42 @@ Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
 
 #### 💥 Breaking Change
 
+- `@quenty/adorneedata@5.0.0`, `@quenty/basicpane@11.0.0`, `@quenty/blend@10.0.0`, `@quenty/buttonhighlightmodel@12.0.0`, `@quenty/camera@13.0.0`, `@quenty/canceltoken@10.0.0`, `@quenty/cooldown@9.0.0`, `@quenty/datastore@11.0.0`, `@quenty/depthoffield@9.0.0`, `@quenty/ducktype@4.0.0`, `@quenty/flipbook@6.0.0`, `@quenty/highlight@7.0.0`, `@quenty/humanoidtracker@11.0.0`, `@quenty/ik@13.0.0`, `@quenty/influxdbclient@5.0.0`, `@quenty/inputkeymaputils@11.0.0`, `@quenty/inputmode@11.0.0`, `@quenty/loader@9.0.0`, `@quenty/localizedtextutils@10.0.0`, `@quenty/maid@4.0.0`, `@quenty/observablecollection@9.0.0`, `@quenty/physicsutils@6.0.0`, `@quenty/playerutils@6.0.0`, `@quenty/promise@9.0.0`, `@quenty/ragdoll@13.0.0`, `@quenty/resetservice@9.0.0`, `@quenty/rx@11.0.0`, `@quenty/spring@9.0.0`, `@quenty/symbol@4.0.0`, `@quenty/timesyncservice@11.0.0`, `@quenty/uiobjectutils@5.0.0`, `@quenty/undostack@5.0.0`, `@quenty/valueobject@11.0.0`, `@quenty/weldconstraintutils@4.0.0`, `@quenty/nevermore-cli@4.0.0`
+  - feat: New loader (breaking changes), fixing loader issues [#439](https://github.com/Quenty/NevermoreEngine/pull/439) ([@Quenty](https://github.com/Quenty))
+- `@quenty/adorneedata@5.0.0`, `@quenty/deathreport@8.0.0`
+  - users/quenty/adorneedata [#437](https://github.com/Quenty/NevermoreEngine/pull/437) ([@Quenty](https://github.com/Quenty))
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneeboundingbox@5.0.0`, `@quenty/adorneedata@5.0.0`, `@quenty/attributeutils@12.0.0`, `@quenty/blend@10.0.0`, `@quenty/convexhull@3.0.0`, `@quenty/depthoffield@9.0.0`, `@quenty/draw@6.0.0`, `@quenty/genericscreenguiprovider@11.0.0`, `@quenty/humanoidtracker@11.0.0`, `@quenty/idleservice@11.0.0`, `@quenty/ik@13.0.0`, `@quenty/loader@9.0.0`, `@quenty/observablecollection@9.0.0`, `@quenty/playerhumanoidbinder@12.0.0`, `@quenty/propertyvalue@5.0.0`, `@quenty/queue@3.0.0`, `@quenty/rogue-properties@8.0.0`, `@quenty/rx@11.0.0`, `@quenty/softshutdown@7.0.0`, `@quenty/tie@8.0.0`, `@quenty/timedtween@5.0.0`, `@quenty/timesyncservice@11.0.0`, `@quenty/vector3utils@9.0.0`
+  - users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/rx@11.0.0`
+  - fix: Replace Subscription:Error() call in Rx.tap with Subscription:Fail() [#440](https://github.com/Quenty/NevermoreEngine/pull/440) ([@InvisibleWater](https://github.com/InvisibleWater))
+- `@quenty/signal@6.0.0`
+  - refactor: Update SignalUtils.lua to use :Once() [#427](https://github.com/Quenty/NevermoreEngine/pull/427) ([@InvisibleWater](https://github.com/InvisibleWater))
+- `@quenty/singleton@5.0.0`
+  - fix: Singleton uses rawget/rawset to query stuff [#435](https://github.com/Quenty/NevermoreEngine/pull/435) ([@InvisibleWater](https://github.com/InvisibleWater))
+- `@quenty/countdowntext@3.0.0`, `@quenty/loader@9.0.0`, `@quenty/queue@3.0.0`
+  - ci: Upgrade to latest auto-it and lerna [#438](https://github.com/Quenty/NevermoreEngine/pull/438) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
+# (Tue Feb 13 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
+
+#### 💥 Breaking Change
+
 - `@quenty/adorneedata@4.0.0`, `@quenty/basicpane@10.0.0`, `@quenty/blend@9.0.0`, `@quenty/buttonhighlightmodel@11.0.0`, `@quenty/camera@12.0.0`, `@quenty/canceltoken@9.0.0`, `@quenty/cooldown@8.0.0`, `@quenty/datastore@10.0.0`, `@quenty/depthoffield@8.0.0`, `@quenty/ducktype@3.0.0`, `@quenty/flipbook@5.0.0`, `@quenty/highlight@6.0.0`, `@quenty/humanoidtracker@10.0.0`, `@quenty/ik@12.0.0`, `@quenty/influxdbclient@4.0.0`, `@quenty/inputkeymaputils@10.0.0`, `@quenty/inputmode@10.0.0`, `@quenty/loader@8.0.0`, `@quenty/localizedtextutils@9.0.0`, `@quenty/maid@3.0.0`, `@quenty/observablecollection@8.0.0`, `@quenty/physicsutils@5.0.0`, `@quenty/playerutils@5.0.0`, `@quenty/promise@8.0.0`, `@quenty/ragdoll@12.0.0`, `@quenty/resetservice@8.0.0`, `@quenty/rx@10.0.0`, `@quenty/spring@8.0.0`, `@quenty/symbol@3.0.0`, `@quenty/timesyncservice@10.0.0`, `@quenty/uiobjectutils@4.0.0`, `@quenty/undostack@4.0.0`, `@quenty/valueobject@10.0.0`, `@quenty/weldconstraintutils@3.0.0`, `@quenty/nevermore-cli@3.0.0`
   - feat: New loader (breaking changes), fixing loader issues [#439](https://github.com/Quenty/NevermoreEngine/pull/439) ([@Quenty](https://github.com/Quenty))
 - `@quenty/adorneedata@4.0.0`, `@quenty/deathreport@7.0.0`
