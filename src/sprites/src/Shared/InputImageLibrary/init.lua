@@ -109,9 +109,9 @@ function InputImageLibrary:_getDefaultPreferredPlatform()
 		return nil
 	end
 
-	if string.find(result, "PlayStation") then
+	if string.find(result, "PlayStation", nil, true) then
 		return "PlayStation"
-	elseif string.find(result, "Xbox") then
+	elseif string.find(result, "Xbox", nil, true) then
 		return "XBox"
 	else
 		return "XBox"
