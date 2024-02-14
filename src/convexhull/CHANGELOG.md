@@ -1,26 +1,15 @@
-# v4.0.0 (Wed Feb 14 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/draw [#436](https://github.com/Quenty/NevermoreEngine/pull/436) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Remove info type as nil [#445](https://github.com/Quenty/NevermoreEngine/pull/445) ([@Quenty](https://github.com/Quenty))
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- fix: Add ConvexHull package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@3.0.0...@quenty/convexhull@4.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@2.0.0...@quenty/convexhull@3.0.0) (2024-02-13)
 

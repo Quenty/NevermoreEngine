@@ -1,6 +1,6 @@
 {
   "name": "@quenty/deathreport",
-  "version": "9.0.0",
+  "version": "10.0.0",
   "description": "Death report service which will track the deaths of players",
   "keywords": [
     "Roblox",

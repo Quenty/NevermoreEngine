@@ -1,27 +1,15 @@
-# v6.0.0 (Wed Feb 14 2024)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Remove info type as nil [#445](https://github.com/Quenty/NevermoreEngine/pull/445) ([@Quenty](https://github.com/Quenty))
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- fix: Singleton uses rawget/rawset to query stuff [#435](https://github.com/Quenty/NevermoreEngine/pull/435) ([@InvisibleWater](https://github.com/InvisibleWater))
-
-#### Authors: 2
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/singleton@5.0.0...@quenty/singleton@6.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/singleton
+
+
+
+
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/singleton@4.0.0...@quenty/singleton@5.0.0) (2024-02-13)
 
