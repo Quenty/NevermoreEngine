@@ -1,22 +1,18 @@
-# v10.0.0 (Wed Feb 14 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Remove info type as nil [#445](https://github.com/Quenty/NevermoreEngine/pull/445) ([@Quenty](https://github.com/Quenty))
-- fix: Remove info type as nil ([@Quenty](https://github.com/Quenty))
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@9.0.0...@quenty/marketplaceutils@10.0.0) (2024-02-14)
+
+
+### Bug Fixes
+
+* Remove info type as nil ([ee7e5d6](https://github.com/Quenty/NevermoreEngine/commit/ee7e5d6ada857eba67b462aa37a00de9f430ae97))
+
+
+
+
 
 # [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@8.0.0...@quenty/marketplaceutils@9.0.0) (2024-02-13)
 
