@@ -1,3 +1,18 @@
+# v12.0.0 (Wed Feb 14 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Remove info type as nil [#445](https://github.com/Quenty/NevermoreEngine/pull/445) ([@Quenty](https://github.com/Quenty))
+- fix: Fix search to use plain query ([@Quenty](https://github.com/Quenty))
+- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
+- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
