@@ -15,7 +15,6 @@ function PackageTrackerProvider.new()
 	local self = setmetatable({}, PackageTrackerProvider)
 
 	self._maid = Maid.new()
-
 	self._packageTrackersRoots = {}
 
 	return self
@@ -31,8 +30,9 @@ function PackageTrackerProvider:AddPackageRoot(instance)
 	local maid = Maid.new()
 
 	self._packageTrackersRoots[instance] = maid:Add(PackageTracker.new(self, instance))
-
 	self._maid[instance] = maid
+
+	self._packageTrackersRoots[instance]:StartTracking()
 
 	-- TODO: Provide cleanup mechanism
 

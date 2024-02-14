@@ -28,14 +28,16 @@ function PackageTracker.new(packageTrackerProvider, packageRoot)
 	self._subpackagesTrackerList = {}
 	self._packageModuleScriptMap = {}
 
+	return self
+end
+
+function PackageTracker:StartTracking()
 	if self._packageRoot:IsA("ModuleScript") then
 		-- Module script children don't get to be observed
 		self._maid:GiveTask(self:_trackModuleScript(self._packageRoot, ReplicationType.SHARED))
 	else
 		self._maid:GiveTask(self:_trackChildren(self._packageRoot, ReplicationType.SHARED))
 	end
-
-	return self
 end
 
 function PackageTracker:ResolveDependency(request, replicationType)
