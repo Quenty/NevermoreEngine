@@ -85,7 +85,7 @@ function ConverterPane:_preview(code, library, className)
 	local result, loadstrErr
 	local ok, err = pcall(function()
 		local newCode
-		if not string.find(code, "return") then
+		if not string.find(code, "return", nil, true) then
 			newCode = "return " .. code
 		else
 			newCode = code

@@ -632,7 +632,9 @@ function ObservableSortedList:_highBinarySearch(sortValue)
 	while true do
 		local mid = math.floor((minIndex + maxIndex) / 2)
 		local compareValue = self._compare(self._sortValue[self._keyList[mid]], sortValue)
-		assert(type(compareValue) == "number", "Expecting number")
+		if type(compareValue) ~= "number" then
+			error(string.format("Bad compareValue, expected number, got %q", type(compareValue)))
+		end
 
 		if self._isReversed then
 			compareValue = -compareValue

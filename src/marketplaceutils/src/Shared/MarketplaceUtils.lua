@@ -64,12 +64,12 @@ local MarketplaceUtils = {}
 --[=[
 	Wraps [MarketplaceService.GetProductInfo] and retrieves information about
 	@param assetId number
-	@param infoType InfoType
+	@param infoType InfoType | nil
 	@return Promise<AssetProductInfo | GamePassOrDeveloperProductInfo>
 ]=]
 function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 	assert(type(assetId) == "number", "Bad assetId")
-	assert(typeof(infoType) == "EnumItem", "Bad infoType")
+	assert(typeof(infoType) == "EnumItem" or infoType == nil, "Bad infoType")
 
 	return Promise.spawn(function(resolve, reject)
 		-- We hope this caches
