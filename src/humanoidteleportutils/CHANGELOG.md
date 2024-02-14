@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@9.0.0...@quenty/humanoidteleportutils@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/humanoidteleportutils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@8.0.0...@quenty/humanoidteleportutils@9.0.0) (2024-02-13)
+
+
+### Features
+
+* Allow full character teleportation ([190ba96](https://github.com/Quenty/NevermoreEngine/commit/190ba96af390db1188693c4f2f59150551e582d3))
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@7.3.0...@quenty/humanoidteleportutils@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/humanoidteleportutils
+
+
+
+
+
 # [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidteleportutils@7.2.0...@quenty/humanoidteleportutils@7.3.0) (2024-01-08)
 
 **Note:** Version bump only for package @quenty/humanoidteleportutils

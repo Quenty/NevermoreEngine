@@ -4,11 +4,11 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.conditions)
+local require = require(loader).bootstrapGame(ServerScriptService.conditions)
 
-local AdorneeConditionUtils = require(packages.AdorneeConditionUtils)
-local TieDefinition = require(packages.TieDefinition)
-local AttributeValue = require(packages.AttributeValue)
+local AdorneeConditionUtils = require("AdorneeConditionUtils")
+local TieDefinition = require("TieDefinition")
+local AttributeValue = require("AttributeValue")
 
 do
 	local conditionFolder = AdorneeConditionUtils.createConditionContainer()

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@10.0.0...@quenty/marketplaceutils@11.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@9.0.0...@quenty/marketplaceutils@10.0.0) (2024-02-14)
+
+
+### Bug Fixes
+
+* Remove info type as nil ([ee7e5d6](https://github.com/Quenty/NevermoreEngine/commit/ee7e5d6ada857eba67b462aa37a00de9f430ae97))
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@8.0.0...@quenty/marketplaceutils@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@7.2.0...@quenty/marketplaceutils@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+
+
+
+
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@7.1.0...@quenty/marketplaceutils@7.2.0) (2024-01-08)
 
 **Note:** Version bump only for package @quenty/marketplaceutils

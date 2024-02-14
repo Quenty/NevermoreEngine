@@ -10,4 +10,5 @@ return Utils.readonly({
 	CLIENT = "client";
 	SERVER = "server";
 	SHARED = "shared";
+	PLUGIN = "plugin";
 })

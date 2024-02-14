@@ -1,11 +1,12 @@
 --[[
 	@class ClientMain
 ]]
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("animations"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
 local Players = game:GetService("Players")
 
-local AnimationUtils = require(packages:WaitForChild("AnimationUtils"))
+local AnimationUtils = require("AnimationUtils")
 
 game.UserInputService.InputBegan:Connect(function(inputObject)
 	if inputObject.KeyCode == Enum.KeyCode.Q then

@@ -55,11 +55,15 @@ function HumanoidTracker.new(player)
 	-- Tracks the alive humanoid, may be nil
 	self.AliveHumanoid = self._maid:Add(ValueObject.new())
 
-	self._maid:GiveTask(self.Humanoid.Changed:Connect(function(newHumanoid, oldHumanoid, maid)
+	self._maid:GiveTask(self.Humanoid.Changed:Connect(function(newHumanoid, oldHumanoid)
+		local maid = Maid.new()
+
 		if not self.Destroy then
 			return
 		end
 		self:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
+
+		self._maid._current = maid
 	end))
 
 	self._maid:GiveTask(self._player:GetPropertyChangedSignal("Character"):Connect(function()

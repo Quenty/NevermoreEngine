@@ -112,7 +112,7 @@ function ImageLabelLoaded:SetImageLabel(imageLabel)
 			Rx.switchMap(function(preload)
 				if preload then
 					return Rx.combineLatest({
-						isLoaded = self._isLoaded;
+						isLoaded = self._isLoaded:Observe();
 						image = RxInstanceUtils.observeProperty(self._imageLabel, "Image");
 					})
 				else

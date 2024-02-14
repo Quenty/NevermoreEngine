@@ -35,7 +35,7 @@ function UIConverter:PromiseProperties(instance, overrideMap)
 		:Then(function(class)
 			if class:IsService() then
 				-- TODO: Mount here
-				return Promise.rejected(("%q is a service and cannot be created"):format(class:GetClassName()))
+				return Promise.rejected(string.format("%q is a service and cannot be created", class:GetClassName()))
 			end
 
 			if class:IsNotCreatable() then

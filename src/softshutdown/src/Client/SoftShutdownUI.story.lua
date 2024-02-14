@@ -11,13 +11,10 @@ local ServiceBag = require("ServiceBag")
 
 return function(target)
 	local maid = Maid.new()
-	local serviceBag = ServiceBag.new()
-	maid:GiveTask(serviceBag)
-
+	local serviceBag = maid:Add(ServiceBag.new())
 	local translator = serviceBag:GetService(SoftShutdownTranslator)
 
-	local softShutdownUI = SoftShutdownUI.new()
-	maid:GiveTask(softShutdownUI)
+	local softShutdownUI = maid:Add(SoftShutdownUI.new())
 
 	maid:GiveTask(translator:ObserveFormatByKey("shutdown.lobby.title"):Subscribe(function(text)
 		softShutdownUI:SetTitle(text)

@@ -24,11 +24,13 @@
 	@class Replicator
 ]=]
 
-local Maid = require(script.Parent.Parent.Maid)
-local ReplicationType = require(script.Parent.ReplicationType)
-local ReplicationTypeUtils = require(script.Parent.ReplicationTypeUtils)
-local ReplicatorUtils = require(script.Parent.ReplicatorUtils)
-local ReplicatorReferences = require(script.Parent.ReplicatorReferences)
+local loader = script.Parent.Parent
+
+local Maid = require(loader.Maid)
+local ReplicationType = require(loader.Replication.ReplicationType)
+local ReplicationTypeUtils = require(loader.Replication.ReplicationTypeUtils)
+local ReplicatorUtils = require(loader.Replication.ReplicatorUtils)
+local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
 
 local Replicator = {}
 Replicator.ClassName = "Replicator"
@@ -48,20 +50,17 @@ function Replicator.new(references)
 	self._maid = Maid.new()
 	self._references = references
 
-	self._target = Instance.new("ObjectValue")
+	self._target = self._maid:Add(Instance.new("ObjectValue"))
 	self._target.Value = nil
-	self._maid:GiveTask(self._target)
 
-	self._replicatedDescendantCount = Instance.new("IntValue")
+	self._replicatedDescendantCount = self._maid:Add(Instance.new("IntValue"))
 	self._replicatedDescendantCount.Value = 0
-	self._maid:GiveTask(self._replicatedDescendantCount)
-	self._hasReplicatedDescendants = Instance.new("BoolValue")
-	self._hasReplicatedDescendants.Value = false
-	self._maid:GiveTask(self._hasReplicatedDescendants)
 
-	self._replicationType = Instance.new("StringValue")
+	self._hasReplicatedDescendants = self._maid:Add(Instance.new("BoolValue"))
+	self._hasReplicatedDescendants.Value = false
+
+	self._replicationType = self._maid:Add(Instance.new("StringValue"))
 	self._replicationType.Value = ReplicationType.SHARED
-	self._maid:GiveTask(self._replicationType)
 
 	self._maid:GiveTask(self._replicatedDescendantCount.Changed:Connect(function()
 		self._hasReplicatedDescendants.Value = self._replicatedDescendantCount.Value > 0
@@ -99,8 +98,7 @@ end
 	@return boolean
 ]=]
 function Replicator.isReplicator(replicator)
-	return type(replicator) == "table" and
-		getmetatable(replicator) == Replicator
+	return type(replicator) == "table" and getmetatable(replicator) == Replicator
 end
 
 --[=[
@@ -242,12 +240,11 @@ end
 function Replicator:_doServerClone(replicator, child)
 	-- Always a folder to prevent information from leaking...
 	local maid = Maid.new()
-	local copy = Instance.new("Folder")
+	local copy = maid:Add(Instance.new("Folder"))
 
 	self:_setupNameReplication(maid, child, copy)
 	self:_setupParentReplication(maid, copy)
 	self:_setupReference(maid, child, copy)
-	maid:GiveTask(copy)
 
 	-- Setup replication for this specific instance.
 	self:_setupReplicatorTarget(maid, replicator, copy)
@@ -269,17 +266,16 @@ function Replicator:_doReplicationClient(replicator, child)
 			end
 		end))
 	elseif child:IsA("Folder") then
-		local copy = Instance.new("Folder")
+		local copy = maid:Add(Instance.new("Folder"))
 
 		self:_doStandardReplication(maid, replicator, child, copy)
-
 	elseif child:IsA("ObjectValue") then
-		local copy = Instance.new("ObjectValue")
+		local copy = maid:Add(Instance.new("ObjectValue"))
 
 		self:_setupObjectValueReplication(maid, child, copy)
 		self:_doStandardReplication(maid, replicator, child, copy)
 	else
-		local copy = ReplicatorUtils.cloneWithoutChildren(child)
+		local copy = maid:Add(ReplicatorUtils.cloneWithoutChildren(child))
 
 		-- TODO: Maybe do better
 		self:_setupReplicatedDescendantCountAdd(maid, 1)
@@ -293,8 +289,9 @@ function Replicator:_doModuleScriptCloneClient(replicator, child)
 	assert(Replicator.isReplicator(replicator), "Bad replicator")
 	assert(typeof(child) == "Instance", "Bad child")
 
-	local copy = ReplicatorUtils.cloneWithoutChildren(child)
 	local maid = Maid.new()
+
+	local copy = maid:Add(ReplicatorUtils.cloneWithoutChildren(child))
 
 	self:_doStandardReplication(maid, replicator, child, copy)
 
@@ -310,7 +307,6 @@ function Replicator:_doStandardReplication(maid, replicator, child, copy)
 	self:_setupNameReplication(maid, child, copy)
 	self:_setupParentReplication(maid, copy)
 	self:_setupReference(maid, child, copy)
-	maid:GiveTask(copy)
 
 	-- Setup replication for this specific instance.
 	self:_setupReplicatorTarget(maid, replicator, copy)

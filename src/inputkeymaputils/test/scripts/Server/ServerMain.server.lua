@@ -4,13 +4,10 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.inputkeymaputils)
+local require = require(loader).bootstrapGame(ServerScriptService.inputkeymaputils)
 
-local serviceBag = require(packages.ServiceBag).new()
-
-serviceBag:GetService(packages.TestInputKeyMap)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("TestInputKeyMap"))
 serviceBag:Init()
 serviceBag:Start()
 

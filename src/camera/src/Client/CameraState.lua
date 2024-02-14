@@ -7,18 +7,10 @@ local require = require(script.Parent.loader).load(script)
 
 local QFrame = require("QFrame")
 local CameraFrame = require("CameraFrame")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local CameraState = {}
 CameraState.ClassName = "CameraState"
-
---[=[
-	Returns true if the result is a camera state
-	@param value any
-	@return boolean
-]=]
-function CameraState.isCameraState(value)
-	return getmetatable(value) == CameraState
-end
 
 --[=[
 	Constructs a new CameraState
@@ -43,6 +35,15 @@ function CameraState.new(cameraFrame, cameraFrameDerivative)
 	self.CameraFrameDerivative = cameraFrameDerivative or CameraFrame.new()
 
 	return self
+end
+
+--[=[
+	Returns true if the result is a camera state
+	@param value any
+	@return boolean
+]=]
+function CameraState.isCameraState(value)
+	return DuckTypeUtils.isImplementation(CameraState, value)
 end
 
 --[=[

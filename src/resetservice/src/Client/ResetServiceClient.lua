@@ -10,11 +10,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
-local ResetServiceConstants = require("ResetServiceConstants")
 local CoreGuiUtils = require("CoreGuiUtils")
 local Maid = require("Maid")
+local Remoting = require("Remoting")
 
 local RETRY_ATTEMPTS = 3
 local INITIAL_WAIT_TIME = 1
@@ -27,14 +27,15 @@ ResetServiceClient.ServiceName = "ResetServiceClient"
 ]=]
 function ResetServiceClient:Init()
 	assert(not self._maid, "Already initialized")
-
 	self._maid = Maid.new()
 
-	self._resetBindable = Instance.new("BindableEvent")
+	-- Configure
+	self._remoting = self._maid:Add(Remoting.new(ReplicatedStorage, "ResetService"))
+
+	self._resetBindable = self._maid:Add(Instance.new("BindableEvent"))
 	self._resetBindable.Event:connect(function()
-		self:RequestResetCharacter()
+		self:PromiseResetCharacter()
 	end)
-	self._maid:GiveTask(self._resetBindable)
 
 	CoreGuiUtils.promiseRetrySetCore(RETRY_ATTEMPTS, INITIAL_WAIT_TIME, "ResetButtonCallback", self._resetBindable)
 		:Catch(function(err)
@@ -46,6 +47,10 @@ end
 	Requests the player's character resets
 ]=]
 function ResetServiceClient:RequestResetCharacter()
+	return self:PromiseResetCharacter()
+end
+
+function ResetServiceClient:PromiseResetCharacter()
 	local character = Players.LocalPlayer.Character
 	if character then
 		local humanoid = character:FindFirstChildWhichIsA("Humanoid")
@@ -54,13 +59,7 @@ function ResetServiceClient:RequestResetCharacter()
 		end
 	end
 
-	self:_promiseRemoteEvent():Then(function(remoteEvent)
-		remoteEvent:FireServer()
-	end)
-end
-
-function ResetServiceClient:_promiseRemoteEvent()
-	return self._maid:GivePromise(PromiseGetRemoteEvent(ResetServiceConstants.REMOTE_EVENT_NAME))
+	return self._maid:GivePromise(self._remoting.ResetCharacter:PromiseInvokeServer())
 end
 
 function ResetServiceClient:Destroy()

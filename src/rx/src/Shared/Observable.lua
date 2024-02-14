@@ -58,6 +58,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Subscription = require("Subscription")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ENABLE_STACK_TRACING = false
 
@@ -71,7 +72,7 @@ Observable.__index = Observable
 	@return boolean
 ]=]
 function Observable.isObservable(item)
-	return type(item) == "table" and item.ClassName == "Observable"
+	return DuckTypeUtils.isImplementation(Observable, item)
 end
 
 --[=[

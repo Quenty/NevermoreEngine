@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/singleton@5.0.0...@quenty/singleton@6.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/singleton
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/singleton@4.0.0...@quenty/singleton@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/singleton
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/singleton@3.0.0...@quenty/singleton@4.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/singleton
+
+
+
+
+
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/singleton@2.2.0...@quenty/singleton@3.0.0) (2024-01-09)
 
 **Note:** Version bump only for package @quenty/singleton

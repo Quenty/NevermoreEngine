@@ -12,6 +12,7 @@ function ReplicatorUtils.cloneWithoutChildren(value)
 			item.Archivable = false
 		end
 	end
+
 	local copy = value:Clone()
 
 	for item, _ in pairs(original) do

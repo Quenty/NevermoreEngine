@@ -1,11 +1,10 @@
 --[[
 	@class ClientMain
 ]]
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("rogue-humanoid"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.RogueHumanoidServiceClient)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("RogueHumanoidServiceClient"))
 serviceBag:Init()
 serviceBag:Start()

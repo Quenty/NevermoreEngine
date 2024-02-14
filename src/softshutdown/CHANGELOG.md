@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@8.0.0...@quenty/softshutdown@9.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@7.0.0...@quenty/softshutdown@8.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+* Fix loader issues ([4f02c27](https://github.com/Quenty/NevermoreEngine/commit/4f02c27e96314724c58778e8c113c0d362e16ae4))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@6.0.0...@quenty/softshutdown@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@5.0.0...@quenty/softshutdown@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@4.4.0...@quenty/softshutdown@5.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/softshutdown

@@ -10,6 +10,7 @@ local Observable = require("Observable")
 local Maid = require("Maid")
 local Brio = require("Brio")
 local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ObservableCountingMap = {}
 ObservableCountingMap.ClassName = "ObservableCountingMap"
@@ -67,7 +68,7 @@ end
 	@return boolean
 ]=]
 function ObservableCountingMap.isObservableMap(value)
-	return type(value) == "table" and getmetatable(value) == ObservableCountingMap
+	return DuckTypeUtils.isImplementation(ObservableCountingMap, value)
 end
 
 --[=[

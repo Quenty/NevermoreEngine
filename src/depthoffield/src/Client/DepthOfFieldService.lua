@@ -21,8 +21,7 @@ DepthOfFieldService.ServiceName = "DepthOfFieldService"
 function DepthOfFieldService:Init(_serviceBag)
 	self._maid = Maid.new()
 
-	self._topOfStack = ValueObject.new()
-	self._maid:GiveTask(self._topOfStack)
+	self._topOfStack = self._maid:Add(ValueObject.new())
 
 	self._depthOfField = self:_createDepthOfFIeld()
 
@@ -37,7 +36,9 @@ function DepthOfFieldService:Init(_serviceBag)
 	-- self._depthOfField.FarIntensity = self._tweener:GetOriginalFarIntensity()
 	-- self._depthOfField.Enabled = true
 
-	self._maid:GiveTask(self._topOfStack.Changed:Connect(function(new, _old, maid)
+	self._maid:GiveTask(self._topOfStack.Changed:Connect(function(new)
+		local maid = Maid.new()
+
 		if new then
 			self._tweener:SetDistance(new:GetDistance(), false)
 			self._tweener:SetRadius(new:GetRadius(), false)
@@ -56,10 +57,11 @@ function DepthOfFieldService:Init(_serviceBag)
 			maid:GiveTask(new.FarIntensityChanged:Connect(function(farIntensity, doNotAnimate)
 				self._tweener:SetFarIntensity(farIntensity, doNotAnimate)
 			end))
-
 		else
 			self._tweener:Reset()
 		end
+
+		self._maid._currentVisible = maid
 	end))
 
 	self._modifierStack = {}

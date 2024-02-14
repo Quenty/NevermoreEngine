@@ -54,7 +54,7 @@ end
 	local ServerScriptService = game:GetService("ServerScriptService")
 
 	local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-	local packages = require(loader).bootstrapGame(ServerScriptService.ik)
+	local require = require(loader).bootstrapGame(ServerScriptService.ik)
 	```
 
 	:::info
@@ -96,7 +96,7 @@ local function bootstrapPlugin(packageFolder)
 				return require(pluginFolder:FindFirstChild(value))
 			end
 
-			error(("Unknown module %q"):format(tostring(value)))
+			error(string.format("Unknown module %q", tostring(value)))
 		else
 			return require(value)
 		end

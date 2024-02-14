@@ -26,14 +26,9 @@ function UndoStack.new(maxSize)
 	self._undoStack = {}
 	self._redoStack = {}
 
-	self._hasUndoEntries = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._hasUndoEntries)
-
-	self._hasRedoEntries = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._hasRedoEntries)
-
-	self._isActionExecuting = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isActionExecuting)
+	self._hasUndoEntries = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._hasRedoEntries = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isActionExecuting = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	return self
 end

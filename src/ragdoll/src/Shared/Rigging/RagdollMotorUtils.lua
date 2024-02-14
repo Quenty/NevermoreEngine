@@ -7,27 +7,22 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-local AttributeUtils = require("AttributeUtils")
 local CharacterUtils = require("CharacterUtils")
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
+local Motor6DStackInterface = require("Motor6DStackInterface")
 local Promise = require("Promise")
 local QFrame = require("QFrame")
 local R15Utils = require("R15Utils")
-local RagdollConstants = require("RagdollConstants")
-local RxAttributeUtils = require("RxAttributeUtils")
+local RagdollCollisionUtils = require("RagdollCollisionUtils")
+local RagdollMotorData = require("RagdollMotorData")
+local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
 local Spring = require("Spring")
-local RagdollCollisionUtils = require("RagdollCollisionUtils")
-local Motor6DStackInterface = require("Motor6DStackInterface")
-local Rx = require("Rx")
 
 local RagdollMotorUtils = {}
-
--- For easier debugging
-local DEFAULT_SPRING_SPEED = 20
 
 local R6_MOTORS = {
 	{
@@ -155,8 +150,7 @@ function RagdollMotorUtils.initMotorAttributes(character, rigType)
 	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
 		local motor = R15Utils.getRigMotor(character, data.partName, data.motorName)
 		if motor then
-			AttributeUtils.initAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
-			AttributeUtils.initAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPRING_SPEED)
+			RagdollMotorData:InitAttributes(motor)
 		end
 	end
 end
@@ -173,6 +167,8 @@ end
 
 function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 	local maid = Maid.new()
+
+	local ragdollMotorData = RagdollMotorData:CreateValue(motor)
 
 	local lastTransformSpring = Spring.new(QFrame.fromCFrameClosestTo(motor.Transform, QFrame.new()))
 	lastTransformSpring.t = QFrame.new()
@@ -231,7 +227,7 @@ function RagdollMotorUtils.setupRagdollRootPartMotor(motor, part0, part1)
 		maid._weld = setupWeld("Weld")
 	end
 
-	maid:GiveTask(RxAttributeUtils.observeAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPRING_SPEED)
+	maid:GiveTask(ragdollMotorData.RagdollSpringReturnSpeed:Observe()
 		:Subscribe(function(speed)
 			lastTransformSpring.s = speed
 		end))
@@ -261,8 +257,9 @@ function RagdollMotorUtils.setupRagdollMotor(motor, part0, part1)
 	maid:GiveTask(function()
 		local implemention = Motor6DStackInterface:FindFirstImplementation(motor)
 		if implemention then
+			local ragdollMotorData = RagdollMotorData:CreateValue(motor)
 			local initialTransform = (part0.CFrame * motor.C0):toObjectSpace(part1.CFrame * motor.C1)
-			local speed = AttributeUtils.getAttribute(motor, RagdollConstants.RETURN_SPRING_SPEED_ATTRIBUTE, DEFAULT_SPRING_SPEED)
+			local speed = ragdollMotorData.RagdollSpringReturnSpeed.Value
 
 			implemention:TransformFromCFrame(initialTransform, speed)
 		end
@@ -282,11 +279,13 @@ function RagdollMotorUtils.suppressJustRootPart(character, rigType)
 
 	local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
 		RxBrioUtils.switchMapBrio(function(motor)
-			return RxBrioUtils.flatCombineLatest({
+			local ragdollMotorData = RagdollMotorData:CreateValue(motor)
+
+			return Rx.combineLatest({
 				motor = motor;
 				part0 = RxInstanceUtils.observeProperty(motor, "Part0");
 				part1 = RxInstanceUtils.observeProperty(motor, "Part1");
-				isAnimated = RxAttributeUtils.observeAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false);
+				isAnimated = ragdollMotorData.IsMotorAnimated:Observe();
 			})
 		end);
 	})
@@ -324,11 +323,13 @@ function RagdollMotorUtils.suppressMotors(character, rigType, velocityReadings)
 	for _, data in pairs(RagdollMotorUtils.getMotorData(rigType)) do
 		local observable = RxR15Utils.observeRigMotorBrio(character, data.partName, data.motorName):Pipe({
 			RxBrioUtils.switchMapBrio(function(motor)
+				local ragdollMotorData = RagdollMotorData:CreateValue(motor)
+
 				return RxBrioUtils.flatCombineLatest({
 					motor = motor;
 					part0 = RxInstanceUtils.observeProperty(motor, "Part0");
 					part1 = RxInstanceUtils.observeProperty(motor, "Part1");
-					isAnimated = RxAttributeUtils.observeAttribute(motor, RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false);
+					isAnimated = ragdollMotorData.IsMotorAnimated:Observe();
 				})
 			end);
 		})

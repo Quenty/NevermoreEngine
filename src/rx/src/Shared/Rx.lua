@@ -302,7 +302,7 @@ function Rx.tap(onFire, onError, onComplete)
 					if onError then
 						onError(...)
 					end
-					sub:Error(...)
+					sub:Fail(...)
 				end,
 				function(...)
 					if onComplete then
@@ -974,7 +974,7 @@ function Rx.switchAll()
 
 			outerMaid._outerSuber = source:Subscribe(
 				function(observable)
-					assert(Observable.isObservable(observable), "Bad observable")
+					assert(Observable.isObservable(observable), "Bad observable returned from subscription in switchAll()")
 
 					insideComplete = false
 					currentInside = observable

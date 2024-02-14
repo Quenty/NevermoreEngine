@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@12.0.0...@quenty/textfilterservice@13.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/textfilterservice
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@11.0.0...@quenty/textfilterservice@12.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/textfilterservice
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@10.0.0...@quenty/textfilterservice@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/textfilterservice
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@9.0.0...@quenty/textfilterservice@10.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/textfilterservice
+
+
+
+
+
 # [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textfilterservice@8.4.0...@quenty/textfilterservice@9.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/textfilterservice

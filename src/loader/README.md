@@ -56,8 +56,6 @@ For a given package folder, all packages underneath it shall have...
 3. Access to every package in the dependency folder at each ancestor level at the 1st level of recursion
 4. Access to every sibling package (this is because we expect to be installed at a uniform level)
 
-We will 
-
 
 
 -------

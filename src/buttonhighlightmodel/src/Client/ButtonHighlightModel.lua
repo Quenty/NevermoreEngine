@@ -449,7 +449,7 @@ function ButtonHighlightModel:_setupLegacySteppedMode()
 	self._percentChoosenAccelTween.t = 0
 	self._percentChoosenAccelTween.p = 0
 
-	self._maid:GiveTask(self._isChoosen.Changed:Connect(function(isChoosen, _, _, doNotAnimate)
+	self._maid:GiveTask(self._isChoosen.Changed:Connect(function(isChoosen, _, doNotAnimate)
 		self._percentChoosenAccelTween.t = isChoosen and 1 or 0
 		if doNotAnimate then
 			self._percentChoosenAccelTween.p = self._percentChoosenAccelTween.t

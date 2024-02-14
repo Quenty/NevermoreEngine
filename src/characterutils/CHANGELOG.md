@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@11.0.0...@quenty/characterutils@12.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@10.0.0...@quenty/characterutils@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@9.0.0...@quenty/characterutils@10.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@8.0.0...@quenty/characterutils@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+
+
+
+
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@7.4.0...@quenty/characterutils@8.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/characterutils

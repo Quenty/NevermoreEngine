@@ -9,104 +9,16 @@ local require = require(script.Parent.loader).load(script)
 
 local Workspace = game:GetService("Workspace")
 
-local RagdollConstants = require("RagdollConstants")
-local RxAttributeUtils = require("RxAttributeUtils")
-local AttributeUtils = require("AttributeUtils")
-local RxR15Utils = require("RxR15Utils")
 local EnumUtils = require("EnumUtils")
+local Maid = require("Maid")
+local RagdollMotorLimitData = require("RagdollMotorLimitData")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
-local Maid = require("Maid")
+local RxR15Utils = require("RxR15Utils")
+local Rx = require("Rx")
+local RxPhysicsUtils = require("RxPhysicsUtils")
 
 local RagdollBallSocketUtils = {}
-
-local REFERENCE_GRAVITY = 196.2 -- Gravity that joint friction values were tuned under.
-
-local HEAD_LIMITS = {
-	UpperAngle = 45,
-	TwistLowerAngle = -40,
-	TwistUpperAngle = 40,
-	FrictionTorque = 15, -- 400
-	ReferenceMass = 1.0249234437943,
-}
-
-local WAIST_LIMITS = {
-	UpperAngle = 20,
-	TwistLowerAngle = -40,
-	TwistUpperAngle = 20,
-	FrictionTorque = 750,
-	ReferenceMass = 2.861558675766,
-}
-
-local ANKLE_LIMITS = {
-	UpperAngle = 10,
-	TwistLowerAngle = -10,
-	TwistUpperAngle = 10,
-	FrictionTorque = 0.5;
-	ReferenceMass = 0.43671694397926,
-}
-
-local ELBOW_LIMITS = {
-	-- Elbow is basically a hinge, but allow some twist for Supination and Pronation
-	UpperAngle = 20,
-	TwistLowerAngle = 5,
-	TwistUpperAngle = 120,
-	FrictionTorque = 0.5;
-	ReferenceMass = 0.70196455717087,
-}
-
-local WRIST_LIMITS = {
-	UpperAngle = 30,
-	TwistLowerAngle = -10,
-	TwistUpperAngle = 10,
-	FrictionTorque = 1;
-	ReferenceMass = 0.69132566452026,
-}
-
-local KNEE_LIMITS = {
-	UpperAngle = 5,
-	TwistLowerAngle = -120,
-	TwistUpperAngle = -5,
-	FrictionTorque = 0.5;
-	ReferenceMass = 0.65389388799667,
-}
-
-local SHOULDER_LIMITS = {
-	UpperAngle = 110,
-	TwistLowerAngle = -85,
-	TwistUpperAngle = 85,
-	FrictionTorque = 0.5,
-	ReferenceMass = 0.90918225049973,
-}
-
-local HIP_LIMITS = {
-	UpperAngle = 40,
-	TwistLowerAngle = -5,
-	TwistUpperAngle = 80,
-	FrictionTorque = 0.5,
-	ReferenceMass = 1.9175016880035,
-}
-
-local R6_HEAD_LIMITS = {
-	UpperAngle = 30,
-	TwistLowerAngle = -40,
-	TwistUpperAngle = 40,
-	FrictionTorque = 0.5;
-}
-
-local R6_SHOULDER_LIMITS = {
-	UpperAngle = 110,
-	TwistLowerAngle = -85,
-	TwistUpperAngle = 85,
-	FrictionTorque = 0.5;
-}
-
-local R6_HIP_LIMITS = {
-	UpperAngle = 40,
-	TwistLowerAngle = -5,
-	TwistUpperAngle = 80,
-	FrictionTorque = 0.5;
-}
 
 local R6_RAGDOLL_RIG = {
 	{
@@ -115,7 +27,7 @@ local R6_RAGDOLL_RIG = {
 		attachmentName = "NeckAttachment";
 		motorParentName = "Torso";
 		motorName = "Neck";
-		limits = R6_HEAD_LIMITS;
+		limitData = RagdollMotorLimitData.R6_NECK_LIMITS;
 	};
 	{
 		part0Name = "Torso";
@@ -123,7 +35,7 @@ local R6_RAGDOLL_RIG = {
 		attachmentName = "LeftHipAttachment";
 		motorParentName = "Torso";
 		motorName = "Left Hip";
-		limits = R6_HIP_LIMITS;
+		limitData = RagdollMotorLimitData.R6_HIP_LIMITS;
 	};
 	{
 		part0Name = "Torso";
@@ -131,7 +43,7 @@ local R6_RAGDOLL_RIG = {
 		attachmentName = "RightHipAttachment";
 		motorParentName = "Torso";
 		motorName = "Right Hip";
-		limits = R6_HIP_LIMITS;
+		limitData = RagdollMotorLimitData.R6_HIP_LIMITS;
 	};
 	{
 		part0Name = "Torso";
@@ -139,7 +51,7 @@ local R6_RAGDOLL_RIG = {
 		attachmentName = "LeftShoulderRagdollAttachment";
 		motorParentName = "Torso";
 		motorName = "Left Shoulder";
-		limits = R6_SHOULDER_LIMITS;
+		limitData = RagdollMotorLimitData.R6_SHOULDER_LIMITS;
 	};
 	{
 		part0Name = "Torso";
@@ -147,7 +59,7 @@ local R6_RAGDOLL_RIG = {
 		attachmentName = "RightShoulderRagdollAttachment";
 		motorParentName = "Torso";
 		motorName = "Right Shoulder";
-		limits = R6_SHOULDER_LIMITS;
+		limitData = RagdollMotorLimitData.R6_SHOULDER_LIMITS;
 	};
 }
 
@@ -158,7 +70,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "NeckRigAttachment";
 		motorParentName = "Head";
 		motorName = "Neck";
-		limits = HEAD_LIMITS;
+		limitData = RagdollMotorLimitData.NECK_LIMITS;
 	};
 	{
 		part0Name = "LowerTorso";
@@ -166,7 +78,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "WaistRigAttachment";
 		motorParentName = "UpperTorso";
 		motorName = "Waist";
-		limits = WAIST_LIMITS;
+		limitData = RagdollMotorLimitData.WAIST_LIMITS;
 	};
 	{
 		part0Name = "UpperTorso";
@@ -174,7 +86,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "LeftShoulderRagdollAttachment";
 		motorParentName = "LeftUpperArm";
 		motorName = "LeftShoulder";
-		limits = SHOULDER_LIMITS;
+		limitData = RagdollMotorLimitData.SHOULDER_LIMITS;
 	};
 	{
 		part0Name = "LeftUpperArm";
@@ -182,7 +94,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "LeftElbowRigAttachment";
 		motorParentName = "LeftLowerArm";
 		motorName = "LeftElbow";
-		limits = ELBOW_LIMITS;
+		limitData = RagdollMotorLimitData.ELBOW_LIMITS;
 	};
 	{
 		part0Name = "LeftLowerArm";
@@ -190,7 +102,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "LeftWristRigAttachment";
 		motorParentName = "LeftHand";
 		motorName = "LeftWrist";
-		limits = WRIST_LIMITS;
+		limitData = RagdollMotorLimitData.WRIST_LIMITS;
 	};
 	{
 		part0Name = "UpperTorso";
@@ -198,7 +110,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "RightShoulderRagdollAttachment";
 		motorParentName = "RightUpperArm";
 		motorName = "RightShoulder";
-		limits = SHOULDER_LIMITS;
+		limitData = RagdollMotorLimitData.SHOULDER_LIMITS;
 	};
 	{
 		part0Name = "RightUpperArm";
@@ -206,7 +118,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "RightElbowRigAttachment";
 		motorParentName = "RightLowerArm";
 		motorName = "RightElbow";
-		limits = ELBOW_LIMITS;
+		limitData = RagdollMotorLimitData.ELBOW_LIMITS;
 	};
 	{
 		part0Name = "RightLowerArm";
@@ -214,7 +126,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "RightWristRigAttachment";
 		motorParentName = "RightHand";
 		motorName = "RightWrist";
-		limits = WRIST_LIMITS;
+		limitData = RagdollMotorLimitData.WRIST_LIMITS;
 	};
 
 	{
@@ -223,7 +135,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "LeftHipRigAttachment";
 		motorParentName = "LeftUpperLeg";
 		motorName = "LeftHip";
-		limits = HIP_LIMITS;
+		limitData = RagdollMotorLimitData.HIP_LIMITS;
 	};
 	{
 		part0Name = "LeftUpperLeg";
@@ -231,7 +143,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "LeftKneeRigAttachment";
 		motorParentName = "LeftLowerLeg";
 		motorName = "LeftKnee";
-		limits = KNEE_LIMITS;
+		limitData = RagdollMotorLimitData.KNEE_LIMITS;
 	};
 	{
 		part0Name = "LeftLowerLeg";
@@ -239,7 +151,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "LeftAnkleRigAttachment";
 		motorParentName = "LeftFoot";
 		motorName = "LeftAnkle";
-		limits = ANKLE_LIMITS;
+		limitData = RagdollMotorLimitData.ANKLE_LIMITS;
 	};
 
 	{
@@ -248,7 +160,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "RightHipRigAttachment";
 		motorParentName = "RightUpperLeg";
 		motorName = "RightHip";
-		limits = HIP_LIMITS;
+		limitData = RagdollMotorLimitData.HIP_LIMITS;
 	};
 	{
 		part0Name = "RightUpperLeg";
@@ -256,7 +168,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "RightKneeRigAttachment";
 		motorParentName = "RightLowerLeg";
 		motorName = "RightKnee";
-		limits = KNEE_LIMITS;
+		limitData = RagdollMotorLimitData.KNEE_LIMITS;
 	};
 	{
 		part0Name = "RightLowerLeg";
@@ -264,7 +176,7 @@ local R15_RAGDOLL_RIG = {
 		attachmentName = "RightAnkleRigAttachment";
 		motorParentName = "RightFoot";
 		motorName = "RightAnkle";
-		limits = ANKLE_LIMITS;
+		limitData = RagdollMotorLimitData.ANKLE_LIMITS;
 	};
 }
 
@@ -289,67 +201,74 @@ function RagdollBallSocketUtils.ensureBallSockets(character, rigType)
 		local part1Name = assert(data.part1Name, "No part1Name")
 		local motorName = assert(data.motorName, "No motorName")
 		local attachmentName = assert(data.attachmentName, "No attachmentName")
-		local limits = assert(data.limits, "No limits")
+		local limitData = assert(data.limitData, "No limits")
 
-		local observable = RxBrioUtils.flatCombineLatest({
-			motor = RxR15Utils.observeRigMotorBrio(character, data.motorParentName, motorName);
-			part1 = RxR15Utils.observeCharacterPartBrio(character, part1Name);
-			attachment0 = RxR15Utils.observeRigAttachmentBrio(character, part0Name, attachmentName);
-			attachment1 = RxR15Utils.observeRigAttachmentBrio(character, part1Name, attachmentName);
-			gravity = RxInstanceUtils.observeProperty(Workspace, "Gravity");
+		local observable = RxR15Utils.observeRigMotorBrio(character, data.motorParentName, motorName):Pipe({
+			RxBrioUtils.switchMapBrio(function(motor)
+				if motor then
+					return RxBrioUtils.flatCombineLatest({
+						motor = Rx.of(motor);
+						part1 = RxR15Utils.observeCharacterPartBrio(character, part1Name);
+						attachment0 = RxR15Utils.observeRigAttachmentBrio(character, part0Name, attachmentName);
+						attachment1 = RxR15Utils.observeRigAttachmentBrio(character, part1Name, attachmentName);
+						limitData = Rx.of(limitData);
+					})
+				else
+					return Rx.of({})
+				end
+			end);
+			RxBrioUtils.where(function(motorState)
+				return motorState.attachment0 and motorState.attachment1 and motorState.part1 and motorState.motor and true or false
+			end);
 		})
 
-		topMaid:GiveTask(observable:Subscribe(function(state)
-			if state.attachment0 and state.attachment1 and state.part1 and state.motor then
-				local maid = Maid.new()
-
-				local ballSocket = Instance.new("BallSocketConstraint")
-				ballSocket.Name = "RagdollBallSocket"
-				ballSocket.Enabled = true
-				ballSocket.LimitsEnabled = true
-				ballSocket.UpperAngle = limits.UpperAngle
-				ballSocket.TwistLimitsEnabled = true
-				ballSocket.TwistLowerAngle = limits.TwistLowerAngle
-				ballSocket.TwistUpperAngle = limits.TwistUpperAngle
-				ballSocket.Attachment0 = state.attachment0
-				ballSocket.Attachment1 = state.attachment1
-
-				local default = assert(limits.FrictionTorque, "No FrictionTorque")
-
-				-- Easier debugging
-				AttributeUtils.initAttribute(state.motor, RagdollConstants.FRICTION_TORQUE_ATTRIBUTE, default)
-				AttributeUtils.initAttribute(state.motor, RagdollConstants.UPPER_ANGLE_ATTRIBUTE, limits.UpperAngle)
-				AttributeUtils.initAttribute(state.motor, RagdollConstants.TWIST_LOWER_ANGLE_ATTRIBUTE, limits.TwistLowerAngle)
-				AttributeUtils.initAttribute(state.motor, RagdollConstants.TWIST_UPPER_ANGLE_ATTRIBUTE, limits.TwistUpperAngle)
-
-				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.UPPER_ANGLE_ATTRIBUTE, limits.UpperAngle)
-					:Subscribe(function(value)
-						ballSocket.UpperAngle = value
-					end))
-				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.TWIST_LOWER_ANGLE_ATTRIBUTE, limits.TwistLowerAngle)
-					:Subscribe(function(value)
-						ballSocket.TwistLowerAngle = value
-					end))
-				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.TWIST_UPPER_ANGLE_ATTRIBUTE, limits.TwistUpperAngle)
-					:Subscribe(function(value)
-						ballSocket.TwistUpperAngle = value
-					end))
-
-				maid:GiveTask(RxAttributeUtils.observeAttribute(state.motor, RagdollConstants.FRICTION_TORQUE_ATTRIBUTE, default)
-					:Subscribe(function(torque)
-						local gravityScale = state.gravity / REFERENCE_GRAVITY
-						local referenceMass = limits.ReferenceMass
-						local massScale = referenceMass and (state.part1:GetMass() / referenceMass) or 1
-						ballSocket.MaxFrictionTorque = torque * massScale * gravityScale
-					end))
-
-				ballSocket.Parent = state.part1
-				maid:GiveTask(ballSocket)
-
-				topMaid[data] = maid
-			else
-				topMaid[data] = nil
+		topMaid:GiveTask(observable:Subscribe(function(brio)
+			if brio:IsDead() then
+				return
 			end
+
+			local maid, motorState = brio:ToMaidAndValue()
+			local limitValue = motorState.limitData:CreateAdorneeDataValue(motorState.motor)
+
+			local ballSocket = maid:Add(Instance.new("BallSocketConstraint"))
+			ballSocket.Name = "RagdollBallSocket"
+			ballSocket.Enabled = true
+			ballSocket.LimitsEnabled = true
+			ballSocket.UpperAngle = limitValue.UpperAngle.Value
+			ballSocket.TwistLimitsEnabled = true
+			ballSocket.TwistLowerAngle = limitValue.TwistLowerAngle.Value
+			ballSocket.TwistUpperAngle = limitValue.TwistUpperAngle.Value
+			ballSocket.Attachment0 = motorState.attachment0
+			ballSocket.Attachment1 = motorState.attachment1
+
+			maid:GiveTask(limitValue.UpperAngle:Observe()
+				:Subscribe(function(value)
+					ballSocket.UpperAngle = value
+				end))
+			maid:GiveTask(limitValue.TwistLowerAngle:Observe()
+				:Subscribe(function(value)
+					ballSocket.TwistLowerAngle = value
+				end))
+			maid:GiveTask(limitValue.TwistUpperAngle:Observe()
+				:Subscribe(function(value)
+					ballSocket.TwistUpperAngle = value
+				end))
+
+			maid:GiveTask(Rx.combineLatest({
+				frictionTorque = limitValue.FrictionTorque:Observe();
+				referenceGravity = limitValue.ReferenceGravity:Observe();
+				referenceMass = limitValue.ReferenceMass:Observe();
+				gravity = RxInstanceUtils.observeProperty(Workspace, "Gravity");
+				mass = RxPhysicsUtils.observePartMass(motorState.part1);
+			}):Subscribe(function(state)
+				local gravityScale = state.gravity / state.referenceGravity
+				local referenceMass = state.referenceMass;
+				local massScale = referenceMass and (state.mass / referenceMass) or 1
+				ballSocket.MaxFrictionTorque = state.frictionTorque * massScale * gravityScale
+			end))
+
+			ballSocket.Parent = motorState.part1
+
 		end))
 	end
 

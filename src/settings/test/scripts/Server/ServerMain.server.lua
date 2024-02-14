@@ -4,18 +4,16 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.settings)
+local require = require(loader).bootstrapGame(ServerScriptService.settings)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.SettingsService)
-local bridge = serviceBag:GetService(packages.SettingsServiceBridge)
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("SettingsService"))
+local bridge = serviceBag:GetService(require("SettingsServiceBridge"))
 
-local SettingDefinition = require(packages.SettingDefinition)
+local SettingDefinition = require("SettingDefinition")
 
 local screenShakeDefinition = SettingDefinition.new("ScreenShake", false)
 serviceBag:GetService(screenShakeDefinition)
-
--- Start game
 serviceBag:Init()
 serviceBag:Start()
 

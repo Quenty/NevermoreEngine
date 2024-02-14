@@ -45,9 +45,7 @@ function LoaderUtils.toWallyFormat(instance, isPlugin)
 	PackageInfoUtils.fillDependencySet(packageInfoList)
 
 	if isPlugin then
-		local pluginGroup = GroupInfoUtils.groupPackageInfos(packageInfoList,
-			ScriptInfoUtils.ModuleReplicationTypes.PLUGIN)
-
+		local pluginGroup = GroupInfoUtils.groupPackageInfos(packageInfoList, ScriptInfoUtils.ModuleReplicationTypes.PLUGIN)
 		local publishSet = LoaderUtils.getPublishPackageInfoSet(packageInfoList)
 
 		local pluginFolder = Instance.new("Folder")
@@ -57,13 +55,9 @@ function LoaderUtils.toWallyFormat(instance, isPlugin)
 
 		return pluginFolder
 	else
-		local clientGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
-			ScriptInfoUtils.ModuleReplicationTypes.CLIENT)
-		local serverGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
-			ScriptInfoUtils.ModuleReplicationTypes.SERVER)
-		local sharedGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList,
-			ScriptInfoUtils.ModuleReplicationTypes.SHARED)
-
+		local clientGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList, ScriptInfoUtils.ModuleReplicationTypes.CLIENT)
+		local serverGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList, ScriptInfoUtils.ModuleReplicationTypes.SERVER)
+		local sharedGroupList = GroupInfoUtils.groupPackageInfos(packageInfoList, ScriptInfoUtils.ModuleReplicationTypes.SHARED)
 		local publishSet = LoaderUtils.getPublishPackageInfoSet(packageInfoList)
 
 		local clientFolder = Instance.new("Folder")

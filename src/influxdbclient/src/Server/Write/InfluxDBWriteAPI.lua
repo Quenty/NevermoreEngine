@@ -123,6 +123,7 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend)
 			["Accept"] = "application/json";
 			["Authorization"] = "Token " .. clientConfig.token;
 		};
+		Compress = Enum.HttpCompression.Gzip;
 		Url = self:_getWriteUrl();
 		Body = body;
 	}

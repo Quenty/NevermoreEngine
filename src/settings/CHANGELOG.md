@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@10.0.0...@quenty/settings@11.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@9.0.0...@quenty/settings@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@8.0.0...@quenty/settings@9.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@7.0.0...@quenty/settings@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@6.0.0...@quenty/settings@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.7.0...@quenty/settings@6.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/settings

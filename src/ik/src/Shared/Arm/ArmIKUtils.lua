@@ -4,9 +4,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RagdollConstants = require("RagdollConstants")
-local RxR15Utils = require("RxR15Utils")
 local Maid = require("Maid")
+local RagdollMotorData = require("RagdollMotorData")
+local RxR15Utils = require("RxR15Utils")
 
 local ArmIKUtils = {}
 
@@ -18,12 +18,12 @@ function ArmIKUtils.ensureMotorAnimated(character, armName)
 			return
 		end
 
-		local motor = brio:GetValue()
-		local maid = brio:ToMaid()
+		local maid, motor = brio:ToMaidAndValue()
+		local ragdollMotorData = RagdollMotorData:CreateValue(motor)
 
-		motor:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, true)
+		ragdollMotorData.IsMotorAnimated.Value = true
 		maid:GiveTask(function()
-			motor:SetAttribute(RagdollConstants.IS_MOTOR_ANIMATED_ATTRIBUTE, false)
+			ragdollMotorData.IsMotorAnimated.Value = false
 		end)
 	end
 

@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@15.0.0...@quenty/scoredactionservice@16.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [15.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@14.0.0...@quenty/scoredactionservice@15.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@13.0.0...@quenty/scoredactionservice@14.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@12.0.0...@quenty/scoredactionservice@13.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@11.0.0...@quenty/scoredactionservice@12.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/scoredactionservice
+
+
+
+
+
 # [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@10.6.0...@quenty/scoredactionservice@11.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/scoredactionservice

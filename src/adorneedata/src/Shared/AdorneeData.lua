@@ -118,6 +118,21 @@ function AdorneeData:Observe(adornee)
 	return self:CreateAdorneeDataValue(adornee):Observe(adornee)
 end
 
+
+--[=[
+	Gets attribute table for the data
+
+	@param adornee Instance
+	@return AdorneeDataValue
+]=]
+function AdorneeData:CreateValue(adornee)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	local attributeTableValue = AdorneeDataValue.new(adornee, self._fullPrototype)
+
+	return attributeTableValue
+end
+
 --[=[
 	Gets attribute table for the data
 
@@ -127,9 +142,7 @@ end
 function AdorneeData:CreateAdorneeDataValue(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	local attributeTableValue = AdorneeDataValue.new(adornee, self._fullPrototype)
-
-	return attributeTableValue
+	return self:CreateValue(adornee)
 end
 
 --[=[
@@ -198,9 +211,10 @@ end
 	Initializes the attributes for the adornee
 
 	@param adornee Instance
-	@param data T
+	@param data T | nil
 ]=]
 function AdorneeData:InitAttributes(adornee, data)
+	data = data or {}
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
 

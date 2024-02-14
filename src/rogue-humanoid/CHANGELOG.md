@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@8.0.0...@quenty/rogue-humanoid@9.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@7.0.0...@quenty/rogue-humanoid@8.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@6.0.0...@quenty/rogue-humanoid@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@5.0.0...@quenty/rogue-humanoid@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
+
+
+
+
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@4.5.0...@quenty/rogue-humanoid@5.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/rogue-humanoid

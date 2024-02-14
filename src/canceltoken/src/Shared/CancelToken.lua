@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Promise = require("Promise")
 local Signal = require("Signal")
 local Maid = require("Maid")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local CancelToken = {}
 CancelToken.ClassName = "CancelToken"
@@ -47,8 +48,7 @@ end
 	@return boolean
 ]=]
 function CancelToken.isCancelToken(value)
-	return type(value) == "table"
-		and getmetatable(value) == CancelToken
+	return DuckTypeUtils.isImplementation(CancelToken, value)
 end
 
 local EMPTY_FUNCTION = function() end

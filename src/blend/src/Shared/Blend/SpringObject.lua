@@ -6,15 +6,16 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService= game:GetService("RunService")
 
-local Spring = require("Spring")
-local Maid = require("Maid")
-local Signal = require("Signal")
-local StepUtils = require("StepUtils")
-local Observable = require("Observable")
-local SpringUtils = require("SpringUtils")
 local Blend = require("Blend")
-local Rx = require("Rx")
+local DuckTypeUtils = require("DuckTypeUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local Promise = require("Promise")
+local Rx = require("Rx")
+local Signal = require("Signal")
+local Spring = require("Spring")
+local SpringUtils = require("SpringUtils")
+local StepUtils = require("StepUtils")
 
 local SpringObject = {}
 SpringObject.ClassName = "SpringObject"
@@ -64,7 +65,7 @@ end
 	@return boolean
 ]=]
 function SpringObject.isSpringObject(value)
-	return type(value) == "table" and getmetatable(value) == SpringObject
+	return DuckTypeUtils.isImplementation(SpringObject, value)
 end
 
 --[=[

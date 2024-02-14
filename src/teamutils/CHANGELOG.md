@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@9.0.0...@quenty/teamutils@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@8.0.0...@quenty/teamutils@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@7.0.0...@quenty/teamutils@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@6.0.0...@quenty/teamutils@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/teamutils
+
+
+
+
+
 # [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@5.4.0...@quenty/teamutils@6.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/teamutils

@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@7.0.0...@quenty/roblox-api-dump@8.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/roblox-api-dump
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@6.0.0...@quenty/roblox-api-dump@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/roblox-api-dump
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@5.2.0...@quenty/roblox-api-dump@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/roblox-api-dump
+
+
+
+
+
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/roblox-api-dump@5.1.0...@quenty/roblox-api-dump@5.2.0) (2024-01-08)
 
 **Note:** Version bump only for package @quenty/roblox-api-dump

@@ -27,16 +27,7 @@ local BasicPaneUtils = {}
 function BasicPaneUtils.observeVisible(basicPane)
 	assert(BasicPane.isBasicPane(basicPane), "Bad BasicPane")
 
-	return Observable.new(function(sub)
-		local maid = Maid.new()
-
-		maid:GiveTask(basicPane.VisibleChanged:Connect(function(isVisible)
-			sub:Fire(isVisible)
-		end))
-		sub:Fire(basicPane:IsVisible())
-
-		return maid
-	end)
+	return basicPane:ObserveVisible()
 end
 
 --[=[

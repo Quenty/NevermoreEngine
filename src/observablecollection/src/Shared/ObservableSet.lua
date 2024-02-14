@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Brio = require("Brio")
 local ValueObject = require("ValueObject")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ObservableSet = {}
 ObservableSet.ClassName = "ObservableSet"
@@ -61,7 +62,7 @@ end
 	@return boolean
 ]=]
 function ObservableSet.isObservableSet(value)
-	return type(value) == "table" and getmetatable(value) == ObservableSet
+	return DuckTypeUtils.isImplementation(ObservableSet, value)
 end
 
 --[=[

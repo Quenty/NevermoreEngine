@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@14.0.0...@quenty/ik@15.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@13.0.0...@quenty/ik@14.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@12.0.0...@quenty/ik@13.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/ik
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@11.0.0...@quenty/ik@12.0.0) (2024-02-13)
+
+
+### Features
+
+* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
+
+
+### BREAKING CHANGES
+
+* Standard loader
+
+Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
+
+This means you'll need to change you how require client-side modules, as we export a simple `loader` module instead of all modules available.
+
+Signed-off-by: James Onnen <jonnen0@gmail.com>
+
+* fix: Fix missing dependency in ResetService
+
+* feat: Add RxPhysicsUtils.observePartMass
+
+* fix: Fix package discovery for games
+
+* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+
+* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+
+* ci: Upgrade to new rojo 7.4.0
+
+* fix: Update loader to handle hoarcekat properly
+
+* docs: Fix spacing in Maid
+
+* fix: Add new ragdoll constants
+
+* fix: Compress influxDB sends
+
+* style: Errors use string.format
+
+* fix: Handle motor animations
+
+* ci: Upgrade rojo version
+
+* feat!: Maid no longer is includd in ValueObject.Changed event
+
+* docs: Fix docs
+
+
+
+
+
 # [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@10.5.0...@quenty/ik@11.0.0) (2024-01-10)
 
 **Note:** Version bump only for package @quenty/ik
