@@ -17,20 +17,12 @@ AnimationTrackPlayer.__index = AnimationTrackPlayer
 function AnimationTrackPlayer.new(animationTarget, animationId)
 	local self = setmetatable(BaseObject.new(), AnimationTrackPlayer)
 
-	self._animationTarget = ValueObject.new(nil)
-	self._maid:GiveTask(self._animationTarget)
+	self._animationTarget = self._maid:Add(ValueObject.new(nil))
+	self._trackId = self._maid:Add(ValueObject.new(nil))
+	self._currentTrack = self._maid:Add(ValueObject.new(nil))
+	self._animationPriority = self._maid:Add(ValueObject.new(nil))
 
-	self._trackId = ValueObject.new(nil)
-	self._maid:GiveTask(self._trackId)
-
-	self._currentTrack = ValueObject.new(nil)
-	self._maid:GiveTask(self._currentTrack)
-
-	self.KeyframeReached = Signal.new()
-	self._maid:GiveTask(self.KeyframeReached)
-
-	self._animationPriority = ValueObject.new(nil)
-	self._maid:GiveTask(self._animationPriority)
+	self.KeyframeReached = self._maid:Add(Signal.new())
 
 	if animationTarget then
 		self:SetAnimationTarget(animationTarget)
