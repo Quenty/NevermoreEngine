@@ -1,28 +1,18 @@
-# v8.0.0 (Mon Feb 19 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add AnimationPromiseUtils.promiseLoaded(animationTrack) and other helper calls [#447](https://github.com/Quenty/NevermoreEngine/pull/447) ([@Quenty](https://github.com/Quenty))
-- feat: Add AnimationPromiseUtils.promiseLoaded(animationTrack) and other helper calls ([@Quenty](https://github.com/Quenty))
-- Fix loader and other issues [#444](https://github.com/Quenty/NevermoreEngine/pull/444) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- fix: Remove info type as nil [#445](https://github.com/Quenty/NevermoreEngine/pull/445) ([@Quenty](https://github.com/Quenty))
-- fix: Fix bootstrap of test environments and loader samples ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@7.0.0...@quenty/animations@8.0.0) (2024-02-19)
+
+
+### Features
+
+* Add AnimationPromiseUtils.promiseLoaded(animationTrack) and other helper calls ([5f743bf](https://github.com/Quenty/NevermoreEngine/commit/5f743bf3bc877af91fb91074aa7d4b03d29a09c4))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@6.0.0...@quenty/animations@7.0.0) (2024-02-14)
 
