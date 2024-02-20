@@ -20,7 +20,7 @@
 <!--moonwave-hide-before-this-line-->
 
 ## Why Nevermore?
-Code in Nevermore has powered over a billion play sessions on Roblox. Nevermore is used is all [Studio Koi Koi](https://studiokoikoi.com/) games, as well as many other games on Roblox.
+Code in Nevermore has powered over a billion play sessions on Roblox. Nevermore is used in all [Studio Koi Koi](https://studiokoikoi.com/) games, as well as many other games on Roblox.
 
 ## Install using npm
 Nevermore is designed to use [npm](https://www.npmjs.com/) to manage packages. You can install a package like this.
