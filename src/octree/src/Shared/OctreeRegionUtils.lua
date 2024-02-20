@@ -1,3 +1,4 @@
+--!native
 --[=[
 	Octree implementation utilities. Primarily this utility code
 	should not be used directly and should be considered private to
