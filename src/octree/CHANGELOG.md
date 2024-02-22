@@ -1,26 +1,18 @@
-# v11.0.0 (Thu Feb 22 2024)
-
-#### 🚀 Enhancement
-
-- perf: Use native compilation on OctreeRegionUtils [#449](https://github.com/Quenty/NevermoreEngine/pull/449) ([@Quenty](https://github.com/Quenty))
-- feat: Add AnimationPromiseUtils.promiseLoaded(animationTrack) and other helper calls [#447](https://github.com/Quenty/NevermoreEngine/pull/447) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- fix: Remove info type as nil [#445](https://github.com/Quenty/NevermoreEngine/pull/445) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@10.0.0...@quenty/octree@11.0.0) (2024-02-22)
+
+
+### Performance Improvements
+
+* Use native compilation on OctreeRegionUtils ([#449](https://github.com/Quenty/NevermoreEngine/issues/449)) ([9a8bea9](https://github.com/Quenty/NevermoreEngine/commit/9a8bea973d3ee37c12d77d239e21ab3a49b48ac4))
+
+
+
+
 
 # [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@9.0.0...@quenty/octree@10.0.0) (2024-02-14)
 
