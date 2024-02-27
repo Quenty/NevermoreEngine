@@ -13,6 +13,7 @@ local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 local Observable = require("Observable")
 local Maid = require("Maid")
+local ValueObject = require("ValueObject")
 
 local RogueAdditiveProvider = {}
 RogueAdditiveProvider.ServiceName = "RogueAdditiveProvider"
@@ -86,6 +87,12 @@ function RogueAdditiveProvider:ObserveModifiedVersion(propObj, rogueProperty, ob
 		return Observable.new(function(sub)
 			local topMaid = Maid.new()
 
+			local lastValue = topMaid:Add(ValueObject.fromObservable(observeBaseValue))
+
+			local function update()
+				sub:Fire(lastValue.Value)
+			end
+
 			topMaid:GiveTask(self:_observeAddersBrio(propObj):Subscribe(function(brio)
 				if brio:IsDead() then
 					return
@@ -95,25 +102,25 @@ function RogueAdditiveProvider:ObserveModifiedVersion(propObj, rogueProperty, ob
 				local value = brio:GetValue()
 
 				maid:GiveTask(value:ObserveAdditive():Subscribe(function()
-					sub:Fire()
+					update()
 				end))
 
-				sub:Fire()
+				update()
 
 				maid:GiveTask(function()
-					sub:Fire()
+					update()
 				end)
 			end))
 
 			topMaid:GiveTask(observeBaseValue:Subscribe(function()
-				sub:Fire()
+				update()
 			end))
 
 			return topMaid
 		end):Pipe({
 			Rx.throttleDefer();
-			Rx.map(function()
-				return self:GetModifiedVersion(propObj, rogueProperty, propObj.Value)
+			Rx.map(function(baseValue)
+				return self:GetModifiedVersion(propObj, rogueProperty, baseValue)
 			end);
 		})
 	else
