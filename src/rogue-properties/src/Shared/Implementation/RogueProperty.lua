@@ -211,8 +211,8 @@ function RogueProperty:Observe()
 				current = Rx.of(self._definition:GetDefaultValue())
 			end
 
-			for _, item in pairs(self._roguePropertyService:GetProviders()) do
-				current = item:ObserveModifiedVersion(baseValue, self, current)
+			for _, provider in pairs(self._roguePropertyService:GetProviders()) do
+				current = provider:ObserveModifiedVersion(baseValue, self, current)
 			end
 
 			return current
