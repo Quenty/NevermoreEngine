@@ -1,28 +1,18 @@
-# v12.0.0 (Tue Feb 27 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add AnimationPromiseUtils.promiseLoaded(animationTrack) and other helper calls [#447](https://github.com/Quenty/NevermoreEngine/pull/447) ([@Quenty](https://github.com/Quenty))
-- Fix loader and other issues [#444](https://github.com/Quenty/NevermoreEngine/pull/444) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix rogue properties [#451](https://github.com/Quenty/NevermoreEngine/pull/451) ([@Quenty](https://github.com/Quenty))
-- fix: Fix humanioid speed service ([@Quenty](https://github.com/Quenty))
-- chore(release): %s \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- Update CHANGELOG.md \[skip ci\] ([@Quenty](https://github.com/Quenty))
-- fix: Remove info type as nil [#445](https://github.com/Quenty/NevermoreEngine/pull/445) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@11.0.0...@quenty/humanoidspeed@12.0.0) (2024-02-27)
+
+
+### Bug Fixes
+
+* Fix humanioid speed service ([ee93033](https://github.com/Quenty/NevermoreEngine/commit/ee93033b6a01f0103ddb01248a885e1b5d265d8a))
+
+
+
+
 
 # [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@10.0.0...@quenty/humanoidspeed@11.0.0) (2024-02-14)
 
