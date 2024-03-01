@@ -334,7 +334,7 @@ end
 	@param haystacks { string }
 	@return {{idx, positions, score}, ...}
 ]=]
-function Fzy.filter(config, needle: string, haystacks: string)
+function Fzy.filter(config, needle: string, haystacks: { string })
 	local result = {}
 
 	for i, line in ipairs(haystacks) do
