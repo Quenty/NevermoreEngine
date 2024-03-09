@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[12237],{5623:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"LegacyLoader","desc":"Legacy loading logic","private":true,"source":{"line":7,"path":"src/loader/src/LegacyLoader.lua"}}')}}]);
