@@ -85,6 +85,24 @@ function Spring:TimeSkip(delta)
 end
 
 --[=[
+	Sets the actual target. If doNotAnimate is set, then animation will be skipped.
+
+	@param value T -- The target to set
+	@param doNotAnimate boolean? -- Whether or not to animate
+]=]
+function Spring:SetTarget(value, doNotAnimate)
+	if doNotAnimate then
+		local now = self._clock()
+		self._position0 = value
+		self._velocity0 = 0*value
+		self._target = value
+		self._time0 = now
+	else
+		self.Target = value
+	end
+end
+
+--[=[
 	The current position at the given clock time. Assigning the position will change the spring to have that position.
 
 	```lua
