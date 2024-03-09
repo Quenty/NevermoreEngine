@@ -120,6 +120,7 @@ function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, do
 	screenGui.ResetOnSpawn = false
 	screenGui.AutoLocalize = false
 	screenGui.IgnoreGuiInset = true
+	screenGui.ClipToDeviceSafeArea = false
 	screenGui.DisplayOrder = 1e9
 	screenGui.Parent = PlayerGuiUtils.getPlayerGui()
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
