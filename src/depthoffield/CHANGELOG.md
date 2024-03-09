@@ -1,20 +1,18 @@
-# v11.1.0 (Sat Mar 09 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
-- feat: Refactor DepthOfFieldService (Technically a breaking change, but I don't think anyone is using this package) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@11.0.0...@quenty/depthoffield@11.1.0) (2024-03-09)
+
+
+### Features
+
+* Refactor DepthOfFieldService (Technically a breaking change, but I don't think anyone is using this package) ([b43d54e](https://github.com/Quenty/NevermoreEngine/commit/b43d54ea4edccf33def7e8d60c97d9dbec694379))
+
+
+
+
 
 # [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/depthoffield@10.0.0...@quenty/depthoffield@11.0.0) (2024-02-14)
 

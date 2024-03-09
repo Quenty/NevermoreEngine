@@ -1,23 +1,18 @@
-# v3.1.0 (Sat Mar 09 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add Maid package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@3.0.0...@quenty/maid@3.1.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* Add Maid package ([e0bc7fc](https://github.com/Quenty/NevermoreEngine/commit/e0bc7fc47e7981b74f404410f14b539cd1191223))
+
+
+
+
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/maid@2.6.0...@quenty/maid@3.0.0) (2024-02-13)
 

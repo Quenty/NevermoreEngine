@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2024-03-09)
+
+
+### Features
+
+* Add SoundGroupService to Nevermore ([20cbabd](https://github.com/Quenty/NevermoreEngine/commit/20cbabd6156f781f1fdf6cac255c9a2d33275adc))
+
+
+
+
+
 # v1.1.0 (Sat Mar 09 2024)
 
 #### 🚀 Enhancement

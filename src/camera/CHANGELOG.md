@@ -1,20 +1,18 @@
-# v14.1.0 (Sat Mar 09 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
-- feat: Expose RenderPriority in CameraStackService ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.0.0...@quenty/camera@14.1.0) (2024-03-09)
+
+
+### Features
+
+* Expose RenderPriority in CameraStackService ([4d44a82](https://github.com/Quenty/NevermoreEngine/commit/4d44a82857060c7e7ef4a5598a56bec8e7c03a88))
+
+
+
+
 
 # [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@13.0.0...@quenty/camera@14.0.0) (2024-02-14)
 

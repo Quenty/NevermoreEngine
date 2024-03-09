@@ -1,23 +1,18 @@
-# v12.1.0 (Sat Mar 09 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: SetTarget properly in SpringObject ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.0.0...@quenty/blend@12.1.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* SetTarget properly in SpringObject ([94358e6](https://github.com/Quenty/NevermoreEngine/commit/94358e6d3cda41a0ecc65672ca21ae1efa13aa4e))
+
+
+
+
 
 # [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@11.0.0...@quenty/blend@12.0.0) (2024-02-14)
 

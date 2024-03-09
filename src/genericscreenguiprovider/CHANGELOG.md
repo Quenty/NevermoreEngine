@@ -1,23 +1,18 @@
-# v13.1.0 (Sat Mar 09 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add ServiceName to GenericScreenGuiProvider ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.0.0...@quenty/genericscreenguiprovider@13.1.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* Add ServiceName to GenericScreenGuiProvider ([3477655](https://github.com/Quenty/NevermoreEngine/commit/34776559bac7c2b70ba762d0643d3ec7e5e233a5))
+
+
+
+
 
 # [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@12.0.0...@quenty/genericscreenguiprovider@13.0.0) (2024-02-14)
 

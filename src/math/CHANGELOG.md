@@ -1,23 +1,18 @@
-# v2.6.0 (Sat Mar 09 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add default spread value ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.5.0...@quenty/math@2.6.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* Add default spread value ([5b42f96](https://github.com/Quenty/NevermoreEngine/commit/5b42f96817d9f54efe7f97724ce6d3b80ab3098c))
+
+
+
+
 
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.4.0...@quenty/math@2.5.0) (2023-08-23)
 

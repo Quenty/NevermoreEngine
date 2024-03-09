@@ -1,23 +1,18 @@
-# v7.1.0 (Sat Mar 09 2024)
-
-#### 🚀 Enhancement
-
-- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Adjust the influx db config to send stuff from the client ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.0.0...@quenty/influxdbclient@7.1.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* Adjust the influx db config to send stuff from the client ([696b452](https://github.com/Quenty/NevermoreEngine/commit/696b452e0125b48a265abfed5b7c7e6e3b15176f))
+
+
+
+
 
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@6.0.0...@quenty/influxdbclient@7.0.0) (2024-02-14)
 
