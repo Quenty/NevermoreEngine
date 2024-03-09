@@ -1,3 +1,16 @@
+# (Sat Mar 09 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/blend@12.1.0`, `@quenty/camera@14.1.0`, `@quenty/depthoffield@11.1.0`, `@quenty/fzy@5.1.0`, `@quenty/gameproductservice@14.1.0`, `@quenty/genericscreenguiprovider@13.1.0`, `@quenty/influxdbclient@7.1.0`, `@quenty/loader@10.1.0`, `@quenty/maid@3.1.0`, `@quenty/math@2.6.0`, `@quenty/softshutdown@9.1.0`, `@quenty/soundgroup@1.1.0`, `@quenty/soundplayer@7.1.0`, `@quenty/spawning@10.1.0`, `@quenty/spring@10.1.0`
+  - fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Feb 27 2024)
 
 :tada: This release contains work from new contributors! :tada:

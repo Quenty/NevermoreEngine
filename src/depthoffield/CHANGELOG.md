@@ -1,3 +1,16 @@
+# v11.1.0 (Sat Mar 09 2024)
+
+#### 🚀 Enhancement
+
+- fix: Fix loader in deferred mode and other small changes [#453](https://github.com/Quenty/NevermoreEngine/pull/453) ([@Quenty](https://github.com/Quenty))
+- feat: Refactor DepthOfFieldService (Technically a breaking change, but I don't think anyone is using this package) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
