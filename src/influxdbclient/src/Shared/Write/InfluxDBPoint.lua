@@ -28,14 +28,31 @@ end
 
 function InfluxDBPoint.fromTableData(data)
 	assert(type(data) == "table", "Bad data")
+	assert(type(data.measurementName) == "string" or data.measurementName == nil, "Bad data.measurementName")
 
 	local copy = InfluxDBPoint.new(data.measurementName)
-	copy:SetTimestamp(data.timestamp)
+	copy._timestamp = copy:_convertTimeToMillis(data.timestamp)
 
 	if data.tags then
+		assert(type(data.tags) == "table", "Bad data.tags")
+
+		for tagKey, tagValue in pairs(data.tags) do
+			assert(type(tagKey) == "string", "Bad tagKey")
+			assert(type(tagValue) == "string", "Bad tagValue")
+		end
+
 		copy._tags = data.tags
 	end
 	if data.fields then
+		assert(type(data.fields) == "table", "Bad data.fields")
+
+		for fieldKey, fieldValue in pairs(data.fields) do
+			assert(type(fieldKey) == "string", "Bad fieldKey")
+			assert(type(fieldValue) == "string", "Bad fieldValue")
+
+			-- TODO: Additional validation on fieldValue types
+		end
+
 		copy._fields = data.fields
 	end
 
