@@ -11,9 +11,8 @@ local Blend = require("Blend")
 return function(target)
 	local maid = Maid.new()
 
-	local simpleLoopedSoundPlayer = SimpleLoopedSoundPlayer.new("rbxassetid://14477453689")
+	local simpleLoopedSoundPlayer = maid:Add(SimpleLoopedSoundPlayer.new("rbxassetid://14477453689"))
 	simpleLoopedSoundPlayer:SetTransitionTime(1)
-	maid:GiveTask(simpleLoopedSoundPlayer)
 
 	simpleLoopedSoundPlayer.Sound.Parent = target
 

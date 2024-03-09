@@ -19,20 +19,13 @@ LayeredLoopedSoundPlayer.__index = LayeredLoopedSoundPlayer
 function LayeredLoopedSoundPlayer.new(soundParent)
 	local self = setmetatable(SpringTransitionModel.new(), LayeredLoopedSoundPlayer)
 
-	self._soundParent = ValueObject.new(nil)
-	self._maid:GiveTask(self._soundParent)
+	self._layerMaid = self._maid:Add(Maid.new())
 
-	self._bpm = ValueObject.new(nil)
-	self._maid:GiveTask(self._bpm)
-
-	self._defaultCrossFadeTime = ValueObject.new(0.5, "number")
-	self._maid:GiveTask(self._defaultCrossFadeTime)
-
-	self._layerMaid = Maid.new()
-	self._maid:GiveTask(self._layerMaid)
-
-	self._volumeMultiplier = ValueObject.new(1, "number")
-	self._maid:GiveTask(self._volumeMultiplier)
+	self._soundParent = self._maid:Add(ValueObject.new(nil))
+	self._soundGroup = self._maid:Add(ValueObject.new(nil))
+	self._bpm = self._maid:Add(ValueObject.new(nil))
+	self._defaultCrossFadeTime = self._maid:Add(ValueObject.new(0.5, "number"))
+	self._volumeMultiplier = self._maid:Add(ValueObject.new(1, "number"))
 
 	self._layers = {}
 
@@ -58,7 +51,13 @@ function LayeredLoopedSoundPlayer:SetBPM(bpm)
 end
 
 function LayeredLoopedSoundPlayer:SetSoundParent(soundParent)
+	assert(typeof(soundParent) == "Instance" or soundParent == nil, "Bad soundParent")
+
 	self._soundParent.Value = soundParent
+end
+
+function LayeredLoopedSoundPlayer:SetSoundGroup(soundGroup)
+	return self._soundGroup:Mount(soundGroup)
 end
 
 function LayeredLoopedSoundPlayer:Swap(layerId, soundId, scheduleOptions)
@@ -119,9 +118,12 @@ function LayeredLoopedSoundPlayer:_getOrCreateLayer(layerId)
 
 	local maid = Maid.new()
 
-	local layer = LoopedSoundPlayer.new()
+	local layer = maid:Add(LoopedSoundPlayer.new())
 	layer:SetDoSyncSoundPlayback(true)
-	maid:GiveTask(layer)
+
+	maid:GiveTask(self._soundGroup:Observe():Subscribe(function(soundGroup)
+		layer:SetSoundGroup(soundGroup)
+	end))
 
 	maid:GiveTask(layer:SetCrossFadeTime(self._defaultCrossFadeTime:Observe()))
 
