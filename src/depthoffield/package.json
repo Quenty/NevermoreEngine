@@ -27,10 +27,17 @@
   "dependencies": {
     "@quenty/acceltween": "file:../acceltween",
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/basicpane": "file:../basicpane",
+    "@quenty/blend": "file:../blend",
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math",
+    "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/steputils": "file:../steputils",
+    "@quenty/transitionmodel": "file:../transitionmodel",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
