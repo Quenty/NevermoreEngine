@@ -187,7 +187,7 @@ end
 	Returns true if the prompt is open
 
 	@param player Player
-	@return boolean
+	@return Promise<boolean>
 ]=]
 function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
@@ -195,6 +195,20 @@ function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
 	assert(self._serviceBag, "Not initialized")
 
 	return self._helper:PromisePlayerIsPromptOpen(player)
+end
+
+--[=[
+	Returns a promise that will resolve when all prompts are closed
+
+	@param player Player
+	@return Promise
+]=]
+function GameProductServiceClient:PromisePlayerPromptClosed(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(self ~= GameProductServiceClient, "Use serviceBag")
+	assert(self._serviceBag, "Not initialized")
+
+	return self._helper:PromisePlayerPromptClosed(player)
 end
 
 --[=[
