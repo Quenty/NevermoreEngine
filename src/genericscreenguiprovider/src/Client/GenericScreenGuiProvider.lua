@@ -34,7 +34,8 @@ local ScreenGuiService = require("ScreenGuiService")
 local ServiceBag = require("ServiceBag")
 
 local GenericScreenGuiProvider = {}
-GenericScreenGuiProvider.ClassName = GenericScreenGuiProvider
+GenericScreenGuiProvider.ClassName = "GenericScreenGuiProvider"
+GenericScreenGuiProvider.ServiceName = "GenericScreenGuiProvider"
 
 --[=[
 	Constructs a new screen gui provider.
