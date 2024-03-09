@@ -1,5 +1,18 @@
 # (Sat Mar 09 2024)
 
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.0.1`
+  - ci: Update to use selene 26.1 [#454](https://github.com/Quenty/NevermoreEngine/pull/454) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Mar 09 2024)
+
 #### 🚀 Enhancement
 
 - `@quenty/blend@12.1.0`, `@quenty/camera@14.1.0`, `@quenty/depthoffield@11.1.0`, `@quenty/fzy@5.1.0`, `@quenty/gameproductservice@14.1.0`, `@quenty/genericscreenguiprovider@13.1.0`, `@quenty/influxdbclient@7.1.0`, `@quenty/loader@10.1.0`, `@quenty/maid@3.1.0`, `@quenty/math@2.6.0`, `@quenty/softshutdown@9.1.0`, `@quenty/soundgroup@1.1.0`, `@quenty/soundplayer@7.1.0`, `@quenty/spawning@10.1.0`, `@quenty/spring@10.1.0`

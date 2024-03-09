@@ -1,3 +1,15 @@
+# v4.0.1 (Sat Mar 09 2024)
+
+#### 🐛 Bug Fix
+
+- ci: Update to use selene 26.1 [#454](https://github.com/Quenty/NevermoreEngine/pull/454) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
