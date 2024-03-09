@@ -18,15 +18,13 @@ SimpleLoopedSoundPlayer.__index = SimpleLoopedSoundPlayer
 function SimpleLoopedSoundPlayer.new(soundId)
 	local self = setmetatable(TimedTransitionModel.new(), SimpleLoopedSoundPlayer)
 
-	self.Sound = SoundUtils.createSoundFromId(soundId)
+	self.Sound = self._maid:Add(SoundUtils.createSoundFromId(soundId))
 	self.Sound.Looped = true
 	self.Sound.Archivable = false
-	self._maid:GiveTask(self.Sound)
 
 	self:SetTransitionTime(1)
 
-	self._volumeMultiplier = ValueObject.new(1, "number")
-	self._maid:GiveTask(self._volumeMultiplier)
+	self._volumeMultiplier = self._maid:Add(ValueObject.new(1, "number"))
 
 	self._maxVolume = self.Sound.Volume
 
@@ -44,6 +42,12 @@ function SimpleLoopedSoundPlayer.new(soundId)
 	end))
 
 	return self
+end
+
+function SimpleLoopedSoundPlayer:SetSoundGroup(soundGroup)
+	assert(typeof(soundGroup) == "Instance" or soundGroup == nil, "Bad soundGroup")
+
+	self.Sound.SoundGroup = soundGroup
 end
 
 function SimpleLoopedSoundPlayer:SetVolumeMultiplier(volume)

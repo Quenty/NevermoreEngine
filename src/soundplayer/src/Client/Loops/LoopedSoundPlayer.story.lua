@@ -15,12 +15,11 @@ return function(target)
 
 	local ORIGINAL = nil --"rbxassetid://14477435416"
 
-	local loopedSoundPlayer = LoopedSoundPlayer.new(ORIGINAL, target)
+	local loopedSoundPlayer = maid:Add(LoopedSoundPlayer.new(ORIGINAL, target))
 	loopedSoundPlayer:SetDoSyncSoundPlayback(true)
 	loopedSoundPlayer:SetCrossFadeTime(2)
 	loopedSoundPlayer:SetVolumeMultiplier(0.25)
 	loopedSoundPlayer:SetSoundParent(target)
-	maid:GiveTask(loopedSoundPlayer)
 
 	local OPTIONS = {
 		"rbxassetid://14477453689";

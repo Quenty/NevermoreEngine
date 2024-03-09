@@ -237,12 +237,8 @@ function SpringObject:SetTarget(value, doNotAnimate)
 			assert(converted, "Not a valid converted value")
 
 			local spring = self:_getSpringForType(converted)
-			spring.Target = converted
-
-			if isFirst then
-				spring.Position = converted
-				spring.Velocity = 0*converted
-			end
+			spring:SetTarget(converted, isFirst)
+			isFirst = false
 
 			self.Changed:Fire()
 		end)

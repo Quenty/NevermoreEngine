@@ -129,6 +129,32 @@ function GameProductService:HasPlayerPurchasedThisSession(player, assetType, idO
 end
 
 --[=[
+	Returns true if the prompt is open
+
+	@param player Player
+	@return Promise<boolean>
+]=]
+function GameProductService:PromisePlayerIsPromptOpen(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(self._serviceBag, "Not initialized")
+
+	return self._helper:PromisePlayerIsPromptOpen(player)
+end
+
+--[=[
+	Returns a promise that will resolve when all prompts are closed
+
+	@param player Player
+	@return Promise
+]=]
+function GameProductService:PromisePlayerPromptClosed(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(self._serviceBag, "Not initialized")
+
+	return self._helper:PromisePlayerPromptClosed(player)
+end
+
+--[=[
 	Prompts the user to purchase the asset, and returns true if purchased
 
 	@param player Player

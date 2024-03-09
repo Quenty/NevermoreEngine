@@ -1,12 +1,12 @@
 {
-  "name": "@quenty/depthoffield",
-  "version": "11.0.0",
-  "description": "Depth of field service to allow multiple systems to write depth of field",
+  "name": "@quenty/soundgroup",
+  "version": "1.0.0",
+  "description": "Service and utility methods to working with sound groups and sounds in Roblox",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "DepthOfField"
+    "soundgroup"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "src/depthoffield/"
+    "directory": "src/soundgroup/"
   },
   "funding": {
     "type": "patreon",
@@ -25,19 +25,14 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/acceltween": "file:../acceltween",
     "@quenty/baseobject": "file:../baseobject",
-    "@quenty/basicpane": "file:../basicpane",
-    "@quenty/blend": "file:../blend",
-    "@quenty/brio": "file:../brio",
+    "@quenty/counter": "file:../counter",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/math": "file:../math",
+    "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal",
-    "@quenty/steputils": "file:../steputils",
-    "@quenty/transitionmodel": "file:../transitionmodel",
+    "@quenty/table": "file:../table",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

@@ -45,8 +45,12 @@ function CameraStackService:Init(serviceBag)
 	self:Add(self._defaultCamera)
 end
 
+function CameraStackService:GetRenderPriority()
+	return Enum.RenderPriority.Camera.Value + 75
+end
+
 function CameraStackService:Start()
-	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, Enum.RenderPriority.Camera.Value + 75, function()
+	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, self:GetRenderPriority(), function()
 		debug.profilebegin("camerastackservice")
 
 		local state = self:GetTopState()
