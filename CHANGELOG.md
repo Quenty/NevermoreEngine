@@ -1,3 +1,16 @@
+# (Mon Mar 11 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.2.0`
+  - feat: custom key for private server datastore [#455](https://github.com/Quenty/NevermoreEngine/pull/455) ([@imagerymartin](https://github.com/imagerymartin))
+
+#### Authors: 1
+
+- Martin Cardenas ([@imagerymartin](https://github.com/imagerymartin))
+
+---
+
 # (Sat Mar 09 2024)
 
 #### 🐛 Bug Fix

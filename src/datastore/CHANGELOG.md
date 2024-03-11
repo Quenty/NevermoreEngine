@@ -1,3 +1,16 @@
+# v13.2.0 (Mon Mar 11 2024)
+
+#### 🚀 Enhancement
+
+- feat: custom key for private server datastore [#455](https://github.com/Quenty/NevermoreEngine/pull/455) ([@imagerymartin](https://github.com/imagerymartin))
+- feat: custom key for private server datastore ([@imagerymartin](https://github.com/imagerymartin))
+
+#### Authors: 1
+
+- Martin Cardenas ([@imagerymartin](https://github.com/imagerymartin))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
