@@ -26,8 +26,8 @@ if not RunService:IsRunning() then
 		return Promise.resolved(GetRemoteEvent(name))
 	end
 elseif RunService:IsServer() then
-	return function(name)
-		return Promise.resolved(GetRemoteEvent(name))
+	return function(name, reliable)
+		return Promise.resolved(GetRemoteEvent(name, reliable))
 	end
 else -- RunService:IsClient()
 	return function(name)
