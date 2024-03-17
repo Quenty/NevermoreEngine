@@ -27,11 +27,11 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local String = require("String")
 local Blend = require("Blend")
 local Maid = require("Maid")
 local ScreenGuiService = require("ScreenGuiService")
 local ServiceBag = require("ServiceBag")
+local String = require("String")
 
 local GenericScreenGuiProvider = {}
 GenericScreenGuiProvider.ClassName = "GenericScreenGuiProvider"
@@ -129,7 +129,7 @@ function GenericScreenGuiProvider:Get(orderName)
 		frame.BorderSizePixel = 0
 		frame.BackgroundTransparency = 1
 		frame.BackgroundColor3 = Color3.new(1, 1, 1)
-		frame.Parent = self:_getScreenGuiService():GetPlayerGui()
+		frame.Parent = self:_getScreenGuiService():GetGuiParent()
 		return frame
 	end
 
@@ -139,7 +139,7 @@ function GenericScreenGuiProvider:Get(orderName)
 	screenGui.AutoLocalize = false
 	screenGui.Archivable = false
 	screenGui.DisplayOrder = self:GetDisplayOrder(orderName)
-	screenGui.Parent = self:_getScreenGuiService():GetPlayerGui()
+	screenGui.Parent = self:_getScreenGuiService():GetGuiParent()
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 	return screenGui

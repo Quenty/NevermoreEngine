@@ -646,7 +646,7 @@ end
 function AvatarEditorUtils.promptUpdateOutfit(outfitId: number, updatedOutfit: HumanoidDescription, rigType: HumanoidRigType)
 	assert(type(outfitId) == "number", "Bad outfitId")
 	assert(typeof(updatedOutfit) == "Instance" and updatedOutfit:IsA("HumanoidDescription"), "Bad updatedOutfit")
-	assert(EnumUtils.isOfType(Enum.AvatarItemType, rigType), "Bad rigType")
+	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
 	local maid = Maid.new()
 

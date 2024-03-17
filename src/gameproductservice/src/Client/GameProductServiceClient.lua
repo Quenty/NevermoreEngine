@@ -43,21 +43,16 @@ function GameProductServiceClient:Init(serviceBag)
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("GameProductBindersClient"))
 
-	self._helper = GameProductServiceHelper.new(self._binders.PlayerProductManager)
-	self._maid:GiveTask(self._helper)
+	self._helper = self._maid:Add(GameProductServiceHelper.new(self._binders.PlayerProductManager))
 
 	-- Additional API for ergonomics
-	self.GamePassPurchased = Signal.new() -- :Fire(gamePassId)
-	self._maid:GiveTask(self.GamePassPurchased)
+	self.GamePassPurchased = self._maid:Add(Signal.new()) -- :Fire(gamePassId)
 
-	self.ProductPurchased = Signal.new() -- :Fire(productId)
-	self._maid:GiveTask(self.ProductPurchased)
+	self.ProductPurchased = self._maid:Add(Signal.new()) -- :Fire(productId)
 
-	self.AssetPurchased = Signal.new() -- :Fire(assetId)
-	self._maid:GiveTask(self.AssetPurchased)
+	self.AssetPurchased = self._maid:Add(Signal.new()) -- :Fire(assetId)
 
-	self.BundlePurchased = Signal.new() -- :Fire(bundleId)
-	self._maid:GiveTask(self.BundlePurchased)
+	self.BundlePurchased = self._maid:Add(Signal.new()) -- :Fire(bundleId)
 end
 
 --[=[
@@ -252,6 +247,10 @@ function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(gamePas
 				return self:PromisePromptPurchase(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey)
 			end
 		end)
+end
+
+function GameProductServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return GameProductServiceClient

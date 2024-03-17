@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
 local PermissionServiceClient = require("PermissionServiceClient")
@@ -124,7 +125,13 @@ function CmdrServiceClient:PromiseCmdr()
 		return self._cmdrPromise
 	end
 
-	self._cmdrPromise = self._maid:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient"))
+	-- Suppress warning in test mode for hoarcekat
+	local timeout = nil
+	if not RunService:IsRunning() then
+		timeout = 1e10
+	end
+
+	self._cmdrPromise = self._maid:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient", timeout))
 		:Then(function(cmdClient)
 			return Promise.spawn(function(resolve, _reject)
 				-- Requiring cmdr can yield
