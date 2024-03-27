@@ -21,7 +21,7 @@ PermissionServiceClient.ServiceName = "PermissionServiceClient"
 
 --[=[
 	Initializes the permission service on the client. Should be done via [ServiceBag].
-	@param _serviceBag ServiceBag
+	@param serviceBag ServiceBag
 ]=]
 function PermissionServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
