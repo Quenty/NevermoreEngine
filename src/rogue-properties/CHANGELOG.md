@@ -1,23 +1,18 @@
-# v11.2.0 (Wed Mar 27 2024)
-
-#### 🚀 Enhancement
-
-- feat: Update avatar editor updates [#456](https://github.com/Quenty/NevermoreEngine/pull/456) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Adjust calculations for additive providers ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.1.0...@quenty/rogue-properties@11.2.0) (2024-03-27)
+
+
+### Bug Fixes
+
+* Adjust calculations for additive providers ([b8e15e0](https://github.com/Quenty/NevermoreEngine/commit/b8e15e071499bbc55631ab5f0183e37c42b1d242))
+
+
+
+
 
 # [11.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.0.0...@quenty/rogue-properties@11.1.0) (2024-03-09)
 

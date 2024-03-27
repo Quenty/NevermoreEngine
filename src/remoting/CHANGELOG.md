@@ -1,23 +1,18 @@
-# v12.2.0 (Wed Mar 27 2024)
-
-#### 🚀 Enhancement
-
-- feat: Update avatar editor updates [#456](https://github.com/Quenty/NevermoreEngine/pull/456) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Remoting has better warnings ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.1.0...@quenty/remoting@12.2.0) (2024-03-27)
+
+
+### Bug Fixes
+
+* Remoting has better warnings ([8ccc275](https://github.com/Quenty/NevermoreEngine/commit/8ccc275919eac1cb9bf6d3304c700ada900c576d))
+
+
+
+
 
 # [12.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.0.0...@quenty/remoting@12.1.0) (2024-03-09)
 

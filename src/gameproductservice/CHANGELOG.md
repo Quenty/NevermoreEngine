@@ -1,20 +1,18 @@
-# v14.2.0 (Wed Mar 27 2024)
-
-#### 🚀 Enhancement
-
-- feat: Update avatar editor updates [#456](https://github.com/Quenty/NevermoreEngine/pull/456) ([@Quenty](https://github.com/Quenty))
-- feat: Update avatar editor stuff ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.1.0...@quenty/gameproductservice@14.2.0) (2024-03-27)
+
+
+### Features
+
+* Update avatar editor stuff ([16d10a8](https://github.com/Quenty/NevermoreEngine/commit/16d10a876c90d3b43d69b5f66e217e4c3749296b))
+
+
+
+
 
 # [14.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.0.0...@quenty/gameproductservice@14.1.0) (2024-03-09)
 
