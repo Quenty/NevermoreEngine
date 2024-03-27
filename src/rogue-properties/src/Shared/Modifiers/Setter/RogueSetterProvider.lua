@@ -11,6 +11,7 @@ local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 local ValueBaseUtils = require("ValueBaseUtils")
+local Observable = require("Observable")
 
 local RogueSetterProvider = {}
 RogueSetterProvider.ServiceName = "RogueSetterProvider"
@@ -67,19 +68,37 @@ function RogueSetterProvider:GetModifiedVersion(propObj, _rogueProperty, baseVal
 end
 
 function RogueSetterProvider:ObserveModifiedVersion(propObj, rogueProperty, observeBaseValue)
+	assert(rogueProperty, "No rogueProperty")
+	assert(Observable.isObservable(observeBaseValue), "Bad observeBaseValue")
+
 	-- TODO: optimize this.
 	return RxBrioUtils.flatCombineLatest({
 		value = observeBaseValue;
-		allSetters = self:_observeSettersBrio(propObj):Pipe({
+		prioritySetter = self:_observeSettersBrio(propObj):Pipe({
 			RxBrioUtils.flatMapBrio(function(item)
 				return item:ObserveValue();
-			end); -- this gets us a list of multipliers which should mutate pretty frequently.
-			Rx.defaultsToNil;
+			end);
+			RxBrioUtils.reduceToAliveList();
+			RxBrioUtils.switchMapBrio(function(state)
+				local lastSetter = nil
+				for _, item in pairs(state) do
+					lastSetter = item
+				end
+				return Rx.of(lastSetter)
+			end);
+			-- TODO: Emit token instead
+			RxBrioUtils.emitOnDeath(nil);
+			Rx.distinct();
 		});
 	}):Pipe({
 		Rx.map(function(state)
-			return self:GetModifiedVersion(propObj, rogueProperty, state.value)
+			if state.prioritySetter ~= nil then
+				return state.prioritySetter
+			else
+				return state.value
+			end
 		end);
+		Rx.distinct();
 	})
 end
 

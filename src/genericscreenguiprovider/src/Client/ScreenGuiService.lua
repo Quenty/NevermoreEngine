@@ -33,10 +33,10 @@ end
 
 	return ScreenGui?
 ]=]
-function ScreenGuiService:GetPlayerGui()
+function ScreenGuiService:GetGuiParent()
 	self:_ensureInit()
 
-	return self._playerGui.Value
+	return self._guiParent.Value
 end
 
 --[=[
@@ -48,11 +48,11 @@ end
 function ScreenGuiService:SetGuiParent(playerGui)
 	self:_ensureInit()
 
-	self._playerGui.Value = playerGui
+	self._guiParent.Value = playerGui
 
 	return function()
-		if self._playerGui.Value == playerGui then
-			self._playerGui.Value = nil
+		if self._guiParent.Value == playerGui then
+			self._guiParent.Value = nil
 		end
 	end
 end
@@ -65,7 +65,7 @@ end
 function ScreenGuiService:ObservePlayerGui()
 	self:_ensureInit()
 
-	return self._playerGui:Observe()
+	return self._guiParent:Observe()
 end
 
 function ScreenGuiService:_ensureInit()
@@ -73,14 +73,14 @@ function ScreenGuiService:_ensureInit()
 
 	if not self._maid then
 		self._maid = Maid.new()
-		self._playerGui = self._maid:Add(ValueObject.new(PlayerGuiUtils.findPlayerGui()))
+		self._guiParent = self._maid:Add(ValueObject.new(PlayerGuiUtils.findPlayerGui()))
 
 		-- TODO: Don't do this? But what's the alternative..
 		if not RunService:IsRunning() then
 			if ScreenGuiService._hackPlayerGui then
-				self._playerGui:Mount(ScreenGuiService._hackPlayerGui:Observe())
+				self._guiParent:Mount(ScreenGuiService._hackPlayerGui:Observe())
 			else
-				ScreenGuiService._hackPlayerGui = self._playerGui
+				ScreenGuiService._hackPlayerGui = self._guiParent
 			end
 		end
 	end

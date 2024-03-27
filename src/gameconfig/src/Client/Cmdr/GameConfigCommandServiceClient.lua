@@ -30,7 +30,7 @@ function GameConfigCommandServiceClient:_setupCommands()
 	-- TODO: Determine production vs. staging and set cmdr annotation accordingly.
 
 
-	self._cmdrService:PromiseCmdr():Then(function(cmdr)
+	self._maid:GivePromise(self._cmdrService:PromiseCmdr()):Then(function(cmdr)
 		GameConfigCmdrUtils.registerAssetTypes(cmdr, picker)
 
 		local latestConfig = RxStateStackUtils.createStateStack(picker:ObserveActiveConfigsBrio())
@@ -53,6 +53,10 @@ function GameConfigCommandServiceClient:_setupCommands()
 			end
 		end))
 	end)
+end
+
+function GameConfigCommandServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return GameConfigCommandServiceClient

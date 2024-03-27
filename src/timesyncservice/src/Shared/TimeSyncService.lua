@@ -11,16 +11,16 @@ local RunService = game:GetService("RunService")
 
 local GetRemoteEvent = require("GetRemoteEvent")
 local GetRemoteFunction = require("GetRemoteFunction")
+local Maid = require("Maid")
 local MasterClock = require("MasterClock")
 local Promise = require("Promise")
 local PromiseGetRemoteEvent = require("PromiseGetRemoteEvent")
 local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
 local PromiseUtils = require("PromiseUtils")
+local Rx = require("Rx")
 local SlaveClock = require("SlaveClock")
 local TimeSyncConstants = require("TimeSyncConstants")
 local TimeSyncUtils = require("TimeSyncUtils")
-local Maid = require("Maid")
-local Rx = require("Rx")
 
 local TimeSyncService = {}
 TimeSyncService.ServiceName = "TimeSyncService"
