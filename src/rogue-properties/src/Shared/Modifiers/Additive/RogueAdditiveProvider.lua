@@ -12,8 +12,7 @@ local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 local Observable = require("Observable")
-local Maid = require("Maid")
-local ValueObject = require("ValueObject")
+local RxBrioUtils = require("RxBrioUtils")
 
 local RogueAdditiveProvider = {}
 RogueAdditiveProvider.ServiceName = "RogueAdditiveProvider"
@@ -56,13 +55,7 @@ end
 
 function RogueAdditiveProvider:GetInvertedVersion(propObj, rogueProperty, baseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		local value = baseValue
-
-		for _, item in pairs(self:_getAdditives(propObj)) do
-			value = value - item:GetAdditive()
-		end
-
-		return value
+		return baseValue - self:_getTotalAdditive(propObj)
 	else
 		return baseValue
 	end
@@ -70,58 +63,39 @@ end
 
 function RogueAdditiveProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		local value = baseValue
-
-		for _, item in pairs(self:_getAdditives(propObj)) do
-			value = value + item:GetAdditive()
-		end
-
-		return value
+		return baseValue + self:_getTotalAdditive(propObj)
 	else
 		return baseValue
 	end
 end
 
 function RogueAdditiveProvider:ObserveModifiedVersion(propObj, rogueProperty, observeBaseValue)
+	assert(rogueProperty, "No rogueProperty")
+	assert(Observable.isObservable(observeBaseValue), "Bad observeBaseValue")
+
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		return Observable.new(function(sub)
-			local topMaid = Maid.new()
-
-			local lastValue = topMaid:Add(ValueObject.fromObservable(observeBaseValue))
-
-			local function update()
-				sub:Fire(lastValue.Value)
-			end
-
-			topMaid:GiveTask(self:_observeAddersBrio(propObj):Subscribe(function(brio)
-				if brio:IsDead() then
-					return
-				end
-
-				local maid = brio:ToMaid()
-				local value = brio:GetValue()
-
-				maid:GiveTask(value:ObserveAdditive():Subscribe(function()
-					update()
-				end))
-
-				update()
-
-				maid:GiveTask(function()
-					update()
-				end)
-			end))
-
-			topMaid:GiveTask(observeBaseValue:Subscribe(function()
-				update()
-			end))
-
-			return topMaid
-		end):Pipe({
-			Rx.throttleDefer();
-			Rx.map(function(baseValue)
-				return self:GetModifiedVersion(propObj, rogueProperty, baseValue)
+		return RxBrioUtils.flatCombineLatest({
+			baseValue = observeBaseValue;
+			additive = self:_observeAddersBrio(propObj):Pipe({
+				RxBrioUtils.flatMapBrio(function(item)
+					return item:ObserveAdditive();
+				end);
+				RxBrioUtils.reduceToAliveList();
+				RxBrioUtils.switchMapBrio(function(state)
+					local additive = 0
+					for _, item in pairs(state) do
+						additive = additive + item
+					end
+					return Rx.of(additive)
+				end);
+				RxBrioUtils.emitOnDeath(0);
+				Rx.distinct();
+			});
+		}):Pipe({
+			Rx.map(function(state)
+				return state.baseValue + state.additive
 			end);
+			Rx.distinct();
 		})
 	else
 		return observeBaseValue
@@ -132,8 +106,12 @@ function RogueAdditiveProvider:_observeAddersBrio(propObj)
 	return RxBinderUtils.observeBoundChildClassBrio(self._rogueAdditiveBinder, propObj)
 end
 
-function RogueAdditiveProvider:_getAdditives(propObj)
-	return BinderUtils.getChildren(self._rogueAdditiveBinder, propObj)
+function RogueAdditiveProvider:_getTotalAdditive(propObj)
+	local additive = 0
+	for _, item in pairs(BinderUtils.getChildren(self._rogueAdditiveBinder, propObj)) do
+		additive = additive + item:GetAdditive()
+	end
+	return additive
 end
 
 return RogueAdditiveProvider
