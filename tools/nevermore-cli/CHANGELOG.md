@@ -1,3 +1,16 @@
+# v4.0.2 (Wed Mar 27 2024)
+
+#### 🐛 Bug Fix
+
+- ci: Upgrade to latest rojo [#457](https://github.com/Quenty/NevermoreEngine/pull/457) ([@Quenty](https://github.com/Quenty))
+- ci: Upgrade to latest rojo ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

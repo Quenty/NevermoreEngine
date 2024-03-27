@@ -1,5 +1,18 @@
 # (Wed Mar 27 2024)
 
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.0.2`
+  - ci: Upgrade to latest rojo [#457](https://github.com/Quenty/NevermoreEngine/pull/457) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Mar 27 2024)
+
 #### 🚀 Enhancement
 
 - `@quenty/assetserviceutils@5.2.0`, `@quenty/avatareditorutils@7.2.0`, `@quenty/binder@14.2.0`, `@quenty/cmdrservice@13.2.0`, `@quenty/gameconfig@12.2.0`, `@quenty/gameproductservice@14.2.0`, `@quenty/genericscreenguiprovider@13.2.0`, `@quenty/inputobjectutils@4.2.0`, `@quenty/permissionprovider@14.2.0`, `@quenty/remoting@12.2.0`, `@quenty/rogue-properties@11.2.0`, `@quenty/scoredactionservice@16.2.0`, `@quenty/tie@10.2.0`, `@quenty/timesyncservice@13.2.0`
