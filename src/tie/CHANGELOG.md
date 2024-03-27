@@ -1,3 +1,16 @@
+# v10.2.0 (Wed Mar 27 2024)
+
+#### 🚀 Enhancement
+
+- feat: Update avatar editor updates [#456](https://github.com/Quenty/NevermoreEngine/pull/456) ([@Quenty](https://github.com/Quenty))
+- feat: Update avatar editor stuff ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
