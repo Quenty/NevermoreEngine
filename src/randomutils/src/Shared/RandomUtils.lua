@@ -145,6 +145,9 @@ function RandomUtils.weightedChoice(list, weights, random)
 		local totalSum = 0
 
 		for i=1, #list do
+			if weights[i] == 0 then
+				continue
+			end
 			totalSum = totalSum + weights[i]
 			local threshold = totalSum/total
 			if randomNum <= threshold then
