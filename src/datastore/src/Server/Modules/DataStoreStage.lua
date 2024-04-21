@@ -514,10 +514,17 @@ function DataStoreStage:Overwrite(data)
 	if type(data) == "table" then
 		local newSaveSnapshot = {}
 
-		local remaining = Set.fromKeys(self._stores)
 		for key, store in pairs(self._stores) do
 			-- Update each store
 			store:Overwrite(data[key])
+		end
+
+		local remaining = Set.fromKeys(self._stores)
+		if typeof(self._saveDataSnapshot) == "table" then
+			Set.unionUpdate(remaining, Set.fromKeys(self._saveDataSnapshot))
+		end
+		if typeof(self._baseDataSnapshot) == "table" then
+			Set.unionUpdate(remaining, Set.fromKeys(self._baseDataSnapshot))
 		end
 
 		for key, value in pairs(data) do
@@ -530,7 +537,11 @@ function DataStoreStage:Overwrite(data)
 		end
 
 		for key, _ in pairs(remaining) do
-			self._stores[key]:Overwrite(DataStoreDeleteToken)
+			if self._stores[key] then
+				self._stores[key]:Overwrite(DataStoreDeleteToken)
+			else
+				newSaveSnapshot[key] = DataStoreDeleteToken
+			end
 		end
 
 		self._saveDataSnapshot = table.freeze(newSaveSnapshot)
