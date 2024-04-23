@@ -37,16 +37,18 @@ local stateTypes = {
 	@param fireCallback function?
 	@param failCallback function?
 	@param completeCallback function?
+	@param observableSource string?
 	@return Subscription
 ]=]
-function Subscription.new(fireCallback, failCallback, completeCallback)
+function Subscription.new(fireCallback, failCallback, completeCallback, observableSource)
 	assert(type(fireCallback) == "function" or fireCallback == nil, "Bad fireCallback")
 	assert(type(failCallback) == "function" or failCallback == nil, "Bad failCallback")
 	assert(type(completeCallback) == "function" or completeCallback == nil, "Bad completeCallback")
 
 	return setmetatable({
 		_state = stateTypes.PENDING;
-		_source = ENABLE_STACK_TRACING and debug.traceback() or "";
+		_source = ENABLE_STACK_TRACING and debug.traceback() or nil;
+		_observableSource = observableSource;
 		_fireCallback = fireCallback;
 		_failCallback = failCallback;
 		_completeCallback = completeCallback;
@@ -69,6 +71,7 @@ function Subscription:Fire(...)
 		if ENABLE_STACK_TRACING then
 			print(debug.traceback())
 			print(self._source)
+			print(self._observableSource)
 		end
 	end
 end
@@ -169,16 +172,17 @@ function Subscription:IsPending()
 	return self._state == stateTypes.PENDING
 end
 
-function Subscription:_giveCleanup(task)
-	assert(task, "Bad task")
+function Subscription:_assignCleanup(task)
 	assert(not self._cleanupTask, "Already have _cleanupTask")
 
-	if self._state ~= stateTypes.PENDING then
-		MaidTaskUtils.doTask(task)
-		return
-	end
+	if task then
+		if self._state ~= stateTypes.PENDING then
+			MaidTaskUtils.doTask(task)
+			return
+		end
 
-	self._cleanupTask = task
+		self._cleanupTask = task
+	end
 end
 
 function Subscription:_doCleanup()
