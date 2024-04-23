@@ -55,8 +55,7 @@ function Rx.pipe(transformers)
 	assert(type(transformers) == "table", "Bad transformers")
 	for index, transformer in pairs(transformers) do
 		if type(transformer) ~= "function" then
-			error(("[Rx.pipe] Bad pipe value of type %q at index %q, expected function")
-				:format(type(transformer), tostring(index)))
+			error(string.format("[Rx.pipe] Bad pipe value of type %q at index %q, expected function", type(transformer), tostring(index)))
 		end
 	end
 
@@ -68,8 +67,7 @@ function Rx.pipe(transformers)
 			current = transformer(current)
 
 			if not (type(current) == "table" and current.ClassName == "Observable") then
-				error(("[Rx.pipe] - Failed to transform %q in pipe, made %q (%s)")
-					:format(tostring(key), tostring(current), tostring(type(current) == "table" and current.ClassName or "")))
+				error(string.format("[Rx.pipe] - Failed to transform %q in pipe, made %q (%s)", tostring(key), tostring(current), tostring(type(current) == "table" and current.ClassName or "")))
 			end
 		end
 
@@ -888,20 +886,19 @@ function Rx.mergeAll()
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local maid = Maid.new()
+			local topMaid = Maid.new()
 
 			local pendingCount = 0
 			local topComplete = false
 
-			maid:GiveTask(source:Subscribe(
+			topMaid:GiveTask(source:Subscribe(
 				function(observable)
 					assert(Observable.isObservable(observable), "Not an observable")
 
 					pendingCount = pendingCount + 1
 
-					local innerMaid = Maid.new()
-
-					innerMaid:GiveTask(observable:Subscribe(
+					local innerSub = nil
+					innerSub = observable:Subscribe(
 						function(...)
 							-- Merge each inner observable
 							sub:Fire(...)
@@ -909,36 +906,46 @@ function Rx.mergeAll()
 						function(...)
 							-- Emit failure automatically
 							sub:Fail(...)
+							topMaid:DoCleaning()
+
+							if innerSub then
+								topMaid[innerSub] = nil
+							end
 						end,
 						function()
-							innerMaid:DoCleaning()
 							pendingCount = pendingCount - 1
 							if pendingCount == 0 and topComplete then
 								sub:Complete()
-								maid:DoCleaning()
+								topMaid:DoCleaning()
 							end
-						end))
 
-					local key = maid:GiveTask(innerMaid)
+							if innerSub then
+								topMaid[innerSub] = nil
+							end
+						end)
 
-					-- Cleanup
-					innerMaid:GiveTask(function()
-						maid[key] = nil
-					end)
+					-- Make sure we only do this if we aren't already cleaned up here
+					if innerSub:IsPending() then
+						if sub:IsPending() then
+							topMaid[innerSub] = innerSub
+						else
+							innerSub:Destroy()
+						end
+					end
 				end,
 				function(...)
 					sub:Fail(...) -- Also reflect failures up to the top!
-					maid:DoCleaning()
+					topMaid:DoCleaning()
 				end,
 				function()
 					topComplete = true
 					if pendingCount == 0 then
 						sub:Complete()
-						maid:DoCleaning()
+						topMaid:DoCleaning()
 					end
 				end))
 
-			return maid
+			return topMaid
 		end)
 	end
 end
@@ -990,6 +997,7 @@ function Rx.switchAll()
 						end, -- Merge each inner observable
 						function(...)
 							if currentInside == observable then
+								currentInside = nil
 								sub:Fail(...)
 							end
 						end, -- Emit failure automatically
