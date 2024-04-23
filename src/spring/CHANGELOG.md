@@ -1,19 +1,18 @@
-# v10.1.1 (Tue Apr 23 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Also allow the tweening of UDims, previously this code errored [#460](https://github.com/Quenty/NevermoreEngine/pull/460) ([@anscg](https://github.com/anscg))
-
-#### Authors: 1
-
-- Anson Chung ([@anscg](https://github.com/anscg))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.1.0...@quenty/spring@10.1.1) (2024-04-23)
+
+
+### Bug Fixes
+
+* Also allow the tweening of UDims, previously this code errored ([#460](https://github.com/Quenty/NevermoreEngine/issues/460)) ([ae8c3de](https://github.com/Quenty/NevermoreEngine/commit/ae8c3dec00057d5640f0c9f1cc1eca8df4a144b5))
+
+
+
+
 
 # [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spring@10.0.0...@quenty/spring@10.1.0) (2024-03-09)
 
