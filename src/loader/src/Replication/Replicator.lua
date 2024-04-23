@@ -54,12 +54,15 @@ function Replicator.new(references)
 	self._target.Value = nil
 
 	self._replicatedDescendantCount = self._maid:Add(Instance.new("IntValue"))
+	self._replicatedDescendantCount.Name = "Replicator_ReplicatedDescendantCount"
 	self._replicatedDescendantCount.Value = 0
 
 	self._hasReplicatedDescendants = self._maid:Add(Instance.new("BoolValue"))
+	self._hasReplicatedDescendants.Name = "Replicator_HasReplicatedDescendants"
 	self._hasReplicatedDescendants.Value = false
 
 	self._replicationType = self._maid:Add(Instance.new("StringValue"))
+	self._replicationType.Name = "Replicator_ReplicationType"
 	self._replicationType.Value = ReplicationType.SHARED
 
 	self._maid:GiveTask(self._replicatedDescendantCount.Changed:Connect(function()
