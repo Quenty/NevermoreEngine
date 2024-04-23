@@ -1,3 +1,16 @@
+# (Tue Apr 23 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/spring@10.1.1`
+  - fix: Also allow the tweening of UDims, previously this code errored [#460](https://github.com/Quenty/NevermoreEngine/pull/460) ([@anscg](https://github.com/anscg))
+
+#### Authors: 1
+
+- Anson Chung ([@anscg](https://github.com/anscg))
+
+---
+
 # (Wed Mar 27 2024)
 
 #### 🐛 Bug Fix

@@ -1,3 +1,15 @@
+# v10.1.1 (Tue Apr 23 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Also allow the tweening of UDims, previously this code errored [#460](https://github.com/Quenty/NevermoreEngine/pull/460) ([@anscg](https://github.com/anscg))
+
+#### Authors: 1
+
+- Anson Chung ([@anscg](https://github.com/anscg))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
