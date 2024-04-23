@@ -200,7 +200,7 @@ end
 --[=[
 	Gets a specific animation name for an animation id
 ]=]
-function AnimationUtils.getAnimationName(animationId): string
+function AnimationUtils.getAnimationName(animationId: string): string
 	return string.format("Animation_%s", animationId)
 end
 

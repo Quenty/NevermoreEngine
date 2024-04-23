@@ -167,6 +167,7 @@ end
 	Plays the animation in the slot, overriding any previous animation
 
 	@param id string | number
+	@param fadeTime number?
 	@param weight number?
 	@param speed number?
 	@param priority number?

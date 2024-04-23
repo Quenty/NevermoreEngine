@@ -1,5 +1,9 @@
 --[=[
-	Ship to run animations in hoarcekat
+	Helps to run animations in hoarcekat or in Studio when the game isn't running.
+
+	```lua
+	maid:GiveTask(StudioRigAnimator.new(humanoid))
+	```
 
 	@class StudioRigAnimator
 ]=]
@@ -15,6 +19,13 @@ local StudioRigAnimator = setmetatable({}, BaseObject)
 StudioRigAnimator.ClassName = "StudioRigAnimator"
 StudioRigAnimator.__index = StudioRigAnimator
 
+--[=[
+	Constructs a new rig animator which will play the animations for the lifetime of the
+	object.
+
+	@param animatorOrHumanoid Animator | Humanoid
+	@return StudioRigAnimator
+]=]
 function StudioRigAnimator.new(animatorOrHumanoid)
 	local self = setmetatable(BaseObject.new(animatorOrHumanoid), StudioRigAnimator)
 
