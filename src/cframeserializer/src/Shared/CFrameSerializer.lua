@@ -7,18 +7,14 @@
 
 local HttpService = game:GetService("HttpService")
 
+local require = require(script.Parent.loader).load(script)
+
+local Math = require("Math")
+
 local CFrameSerializer = {}
 
-local atan2 = math.atan2
-local floor = math.floor
-local PI = math.pi
-local Angles = CFrame.Angles
-
-local function round(n)
-	return floor(n + 0.5)
-end
-
 local PRECISION = 10000
+local MULTIPLIER = 128
 
 --[=[
 	Outputs the rotation
@@ -27,26 +23,26 @@ local PRECISION = 10000
 ]=]
 function CFrameSerializer.outputRotationAzure(cf)
 	local lookVector = cf.LookVector
-	local azumith = atan2(-lookVector.X, -lookVector.Z)
+	local azumith = math.atan2(-lookVector.X, -lookVector.Z)
 	local ybase = (lookVector.X^2 + lookVector.Z^2)^0.5
-	local elevation = atan2(lookVector.Y, ybase)
+	local elevation = math.atan2(lookVector.Y, ybase)
 
-	local withoutRoll = Angles(0, azumith, 0) * Angles(elevation, 0, 0) + cf.Position
+	local withoutRoll = CFrame.Angles(0, azumith, 0) * CFrame.Angles(elevation, 0, 0) + cf.Position
 	local _, _, roll = (withoutRoll:Inverse()*cf):ToEulerAnglesXYZ()
 
 	-- Atan2 -> in the range [-pi, pi]
-	azumith   = round((azumith   /  PI   ) * PRECISION)
-	roll      = round((roll      /  PI   ) * PRECISION)
-	elevation = round((elevation / (PI/2)) * PRECISION)
-	--
-	--[[Buffer:WriteSigned(22, azumith)
-	Buffer:WriteSigned(21, roll)
-	Buffer:WriteSigned(21, elevation)--]]
+	azumith   = Math.round((azumith   /  math.pi   ) * PRECISION)
+	roll      = Math.round((roll      /  math.pi   ) * PRECISION)
+	elevation = Math.round((elevation / (math.pi/2)) * PRECISION)
+
+	-- Buffer:WriteSigned(22, azumith)
+	-- Buffer:WriteSigned(21, roll)
+	-- Buffer:WriteSigned(21, elevation)
 
 	local px, py, pz = cf.X, cf.Y, cf.Z
-	px = round(px * 128)
-	py = round(py * 128)
-	pz = round(pz * 128)
+	px = Math.round(px * MULTIPLIER)
+	py = Math.round(py * MULTIPLIER)
+	pz = Math.round(pz * MULTIPLIER)
 	return {px, py, pz, azumith, roll, elevation}
 end
 
@@ -61,13 +57,34 @@ function CFrameSerializer.toJSONString(cf)
 end
 
 --[=[
+	Returnst true if it's a table encoded cframe
+
+	@param data any
+	@return boolean
+]=]
+function CFrameSerializer.isRotationAzure(data)
+	return type(data) == "table"
+		and type(data[1]) == "number"
+		and type(data[2]) == "number"
+		and type(data[3]) == "number"
+		and type(data[4]) == "number"
+		and type(data[5]) == "number"
+		and type(data[6]) == "number"
+end
+
+--[=[
 	Decodes a CFrame from JSON. For serialization in attributes.
 
 	@param str string
 	@return CFrame
 ]=]
 function CFrameSerializer.fromJSONString(str)
-	return CFrameSerializer.readRotationAzure(HttpService:JSONDecode(str))
+	local decoded = HttpService:JSONDecode(str)
+	if CFrameSerializer.isRotationAzure(decoded) then
+		return CFrameSerializer.readRotationAzure(decoded)
+	else
+		return nil
+	end
 end
 
 --[=[
@@ -76,29 +93,26 @@ end
 	@return Vector3
 ]=]
 function CFrameSerializer.readPosition(data)
-	return Vector3.new(data[1]/128, data[2]/128, data[3]/128)
+	return Vector3.new(data[1]/MULTIPLIER, data[2]/MULTIPLIER, data[3]/MULTIPLIER)
 end
 
 --[=[
 	Returns the CFrame
+
 	@param data { number, number, number, number, number, number }
 	@return Vector3
 ]=]
 function CFrameSerializer.readRotationAzure(data)
 	local azumith = data[4]
-	local roll = data[5] --Buffer:ReadSigned(21)
-	local elevation = data[6] --Buffer:ReadSigned(21)
-	--
-	azumith = PI * (azumith/PRECISION)
-	roll = PI * (roll/PRECISION)
-	elevation = (PI/2) * (elevation/PRECISION)
-	--
-	--local rot = Angles(0, azumith, 0)
-	--rot = rot * Angles(elevation, 0, 0)
-	--rot = rot * Angles(0, 0, roll)
-	local rot = Angles(0, azumith, 0) * Angles(elevation, 0, roll)
-	--
-	return rot + Vector3.new(data[1]/128, data[2]/128, data[3]/128) --, azumith, roll, elevation}
+	local roll = data[5] -- Buffer:ReadSigned(21)
+	local elevation = data[6] -- Buffer:ReadSigned(21)
+
+	azumith = math.pi * (azumith/PRECISION)
+	roll = math.pi * (roll/PRECISION)
+	elevation = (math.pi/2) * (elevation/PRECISION)
+
+	local cframe = CFrame.Angles(0, azumith, 0) * CFrame.Angles(elevation, 0, roll)
+	return cframe + Vector3.new(data[1]/MULTIPLIER, data[2]/MULTIPLIER, data[3]/MULTIPLIER) --, azumith, roll, elevation}
 end
 
 return CFrameSerializer
