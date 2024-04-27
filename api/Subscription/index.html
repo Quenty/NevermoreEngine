@@ -26,8 +26,8 @@ Observable.new(function(sub)
 	sub:Complete() -- ends stream
 end)
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Subscription"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Subscription" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Subscription" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.2c2da390.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.a8a25554.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.3b9c8afd.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.0bc47720.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -44,13 +44,13 @@ Observable<span class="token punctuation">.</span><span class="token function">n
 	sub<span class="token punctuation">:</span><span class="token function">Complete</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">-- ends stream</span>
 <span class="token keyword">end</span><span class="token punctuation">)</span>
 </code></pre>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L42"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>fireCallback<!-- -->: </code><code class="blue_P4bS">function?</code><code>,</code></div><div><code>failCallback<!-- -->: </code><code class="blue_P4bS">function?</code><code>,</code></div><div><code>completeCallback<!-- -->: </code><code class="blue_P4bS">function?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Subscription">Subscription</a></code></div><div>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L43"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>fireCallback<!-- -->: </code><code class="blue_P4bS">function?</code><code>,</code></div><div><code>failCallback<!-- -->: </code><code class="blue_P4bS">function?</code><code>,</code></div><div><code>completeCallback<!-- -->: </code><code class="blue_P4bS">function?</code><code>,</code></div><div><code>observableSource<!-- -->: </code><code class="blue_P4bS">string?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Subscription">Subscription</a></code></div><div>
 <p>Constructs a new Subscription</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Fire"><code style="text-decoration:none">Fire</code><a href="#Fire" class="hash-link" aria-label="Direct link to Fire" title="Direct link to Fire">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L61"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Fire</code><code>(</code><code>...<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Fire"><code style="text-decoration:none">Fire</code><a href="#Fire" class="hash-link" aria-label="Direct link to Fire" title="Direct link to Fire">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L63"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Fire</code><code>(</code><code>...<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Fires the subscription</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Fail"><code style="text-decoration:none">Fail</code><a href="#Fail" class="hash-link" aria-label="Direct link to Fail" title="Direct link to Fail">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Fail</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Fail"><code style="text-decoration:none">Fail</code><a href="#Fail" class="hash-link" aria-label="Direct link to Fail" title="Direct link to Fail">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L82"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Fail</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Fails the subscription, preventing anything else from emitting.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFireFailComplete"><code style="text-decoration:none">GetFireFailComplete</code><a href="#GetFireFailComplete" class="hash-link" aria-label="Direct link to GetFireFailComplete" title="Direct link to GetFireFailComplete">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L112"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">GetFireFailComplete</code><code>(</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">function</code><code>,</code></div><div><code class="blue_P4bS">function</code><code>,</code></div><div><code class="blue_P4bS">function</code></div></div><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFireFailComplete"><code style="text-decoration:none">GetFireFailComplete</code><a href="#GetFireFailComplete" class="hash-link" aria-label="Direct link to GetFireFailComplete" title="Direct link to GetFireFailComplete">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L115"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">GetFireFailComplete</code><code>(</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">function</code><code>,</code></div><div><code class="blue_P4bS">function</code><code>,</code></div><div><code class="blue_P4bS">function</code></div></div><code>)</code></div><div>
 <p>
   Returns a tuple of fire, fail and complete functions which
   can be chained into the the next subscription.
@@ -63,7 +63,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
 	<span class="token keyword">end</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFailComplete"><code style="text-decoration:none">GetFailComplete</code><a href="#GetFailComplete" class="hash-link" aria-label="Direct link to GetFailComplete" title="Direct link to GetFailComplete">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L139"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">GetFailComplete</code><code>(</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">function</code><code>,</code></div><div><code class="blue_P4bS">function</code></div></div><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetFailComplete"><code style="text-decoration:none">GetFailComplete</code><a href="#GetFailComplete" class="hash-link" aria-label="Direct link to GetFailComplete" title="Direct link to GetFailComplete">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L142"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">GetFailComplete</code><code>(</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">function</code><code>,</code></div><div><code class="blue_P4bS">function</code></div></div><code>)</code></div><div>
 <p>
   Returns a tuple of fail and complete functions which
   can be chained into the the next subscription.
@@ -76,14 +76,14 @@ Observable<span class="token punctuation">.</span><span class="token function">n
 	<span class="token keyword">end</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Complete"><code style="text-decoration:none">Complete</code><a href="#Complete" class="hash-link" aria-label="Direct link to Complete" title="Direct link to Complete">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L151"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Complete</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Complete"><code style="text-decoration:none">Complete</code><a href="#Complete" class="hash-link" aria-label="Direct link to Complete" title="Direct link to Complete">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L154"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Complete</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Completes the subscription, preventing anything else from being
   emitted.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsPending"><code style="text-decoration:none">IsPending</code><a href="#IsPending" class="hash-link" aria-label="Direct link to IsPending" title="Direct link to IsPending">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L168"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">IsPending</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsPending"><code style="text-decoration:none">IsPending</code><a href="#IsPending" class="hash-link" aria-label="Direct link to IsPending" title="Direct link to IsPending">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L171"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">IsPending</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether the subscription is pending.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L200"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L204"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Destroy</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Cleans up the subscription</p>
 <div class="admonition admonition-tip alert alert--success">
   <div class="admonition-heading">
@@ -98,7 +98,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
     </p>
   </div>
 </div>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Disconnect"><code style="text-decoration:none">Disconnect</code><a href="#Disconnect" class="hash-link" aria-label="Direct link to Disconnect" title="Direct link to Disconnect">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L211"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Disconnect</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Disconnect"><code style="text-decoration:none">Disconnect</code><a href="#Disconnect" class="hash-link" aria-label="Direct link to Disconnect" title="Direct link to Disconnect">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/rx/src/Shared/Subscription.lua#L215"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Subscription<!-- -->:</code><code class="green_DgR4">Disconnect</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Alias for <a href="/NevermoreEngine/api/Subscription#Destroy">Subscription.Destroy</a>.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -120,6 +120,11 @@ Observable<span class="token punctuation">.</span><span class="token function">n
                     &quot;name&quot;: &quot;completeCallback&quot;,
                     &quot;desc&quot;: &quot;&quot;,
                     &quot;lua_type&quot;: &quot;function?&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;observableSource&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -130,7 +135,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 42,
+                &quot;line&quot;: 43,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -147,7 +152,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 61,
+                &quot;line&quot;: 63,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -158,7 +163,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 79,
+                &quot;line&quot;: 82,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -182,7 +187,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 112,
+                &quot;line&quot;: 115,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -202,7 +207,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 139,
+                &quot;line&quot;: 142,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -213,7 +218,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 151,
+                &quot;line&quot;: 154,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -229,7 +234,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 168,
+                &quot;line&quot;: 171,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -240,7 +245,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 200,
+                &quot;line&quot;: 204,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         },
@@ -251,7 +256,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 211,
+                &quot;line&quot;: 215,
                 &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
             }
         }
@@ -265,7 +270,7 @@ Observable<span class="token punctuation">.</span><span class="token function">n
         &quot;path&quot;: &quot;src/rx/src/Shared/Subscription.lua&quot;
     }
 }</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Complete" class="table-of-contents__link toc-highlight">:Complete</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">:Destroy</a></li><li><a href="#Disconnect" class="table-of-contents__link toc-highlight">:Disconnect</a></li><li><a href="#Fail" class="table-of-contents__link toc-highlight">:Fail</a></li><li><a href="#Fire" class="table-of-contents__link toc-highlight">:Fire</a></li><li><a href="#GetFailComplete" class="table-of-contents__link toc-highlight">:GetFailComplete</a></li><li><a href="#GetFireFailComplete" class="table-of-contents__link toc-highlight">:GetFireFailComplete</a></li><li><a href="#IsPending" class="table-of-contents__link toc-highlight">:IsPending</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.2c2da390.js"></script>
-<script src="/NevermoreEngine/assets/js/main.a8a25554.js"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.3b9c8afd.js"></script>
+<script src="/NevermoreEngine/assets/js/main.0bc47720.js"></script>
 </body>
 </html>
