@@ -1,20 +1,18 @@
-# v4.2.0 (Sat Apr 27 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
-- feat: Add object tracking to PerformanceUtils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.1.0...@quenty/performanceutils@4.2.0) (2024-04-27)
+
+
+### Features
+
+* Add object tracking to PerformanceUtils ([bd8ccb2](https://github.com/Quenty/NevermoreEngine/commit/bd8ccb21142b79d39e8abd8ae27e73a8596de912))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.0.0...@quenty/performanceutils@4.1.0) (2024-03-09)
 

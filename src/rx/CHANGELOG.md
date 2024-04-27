@@ -1,24 +1,23 @@
-# v13.2.0 (Sat Apr 27 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
-- feat: Add observableSource for easier debugging and better cleanup ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Rx.mergeAll handles cleaning properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.1.0...@quenty/rx@13.2.0) (2024-04-27)
+
+
+### Bug Fixes
+
+* Rx.mergeAll handles cleaning properly ([770829f](https://github.com/Quenty/NevermoreEngine/commit/770829f996dc91f7ec09bc464e3f9f176fd2a0de))
+
+
+### Features
+
+* Add observableSource for easier debugging and better cleanup ([b3907a6](https://github.com/Quenty/NevermoreEngine/commit/b3907a6fb25d4c9ca846987a1430bb009be9af0f))
+
+
+
+
 
 # [13.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.0.0...@quenty/rx@13.1.0) (2024-03-09)
 

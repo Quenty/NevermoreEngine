@@ -1,23 +1,18 @@
-# v10.3.0 (Sat Apr 27 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Add pending check in tie definition ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.2.0...@quenty/tie@10.3.0) (2024-04-27)
+
+
+### Bug Fixes
+
+* Add pending check in tie definition ([2f4d932](https://github.com/Quenty/NevermoreEngine/commit/2f4d93218d709f778ac84bc0bcb57f7240deacad))
+
+
+
+
 
 # [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.1.0...@quenty/tie@10.2.0) (2024-03-27)
 

@@ -1,19 +1,15 @@
-# v15.3.0 (Sat Apr 27 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.2.1...@quenty/ragdoll@15.3.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+
+
+
 
 ## [15.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.2.0...@quenty/ragdoll@15.2.1) (2024-04-23)
 

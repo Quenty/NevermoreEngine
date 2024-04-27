@@ -1,24 +1,18 @@
-# v4.1.0 (Sat Apr 27 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- ci: Upgrade moonwave ([@Quenty](https://github.com/Quenty))
-- fix: Patch issues in package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.1.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.0.2...@quenty/nevermore-cli@4.1.0) (2024-04-27)
+
+
+### Bug Fixes
+
+* Patch issues in package ([7f6d2f1](https://github.com/Quenty/Nevermore/commit/7f6d2f1d862d10131bf97368067eed35f4286ea9))
+
+
+
+
 
 ## [4.0.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.0.1...@quenty/nevermore-cli@4.0.2) (2024-03-27)
 

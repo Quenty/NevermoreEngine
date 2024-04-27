@@ -1,24 +1,15 @@
-# v10.2.0 (Sat Apr 27 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- docs: Maid is duplicated in docs (closes #397) ([@Quenty](https://github.com/Quenty))
-- refactor: Replication has names for debugging ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.1.0...@quenty/loader@10.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/loader
+
+
+
+
 
 # [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.0.0...@quenty/loader@10.1.0) (2024-03-09)
 
