@@ -1,4 +1,6 @@
 --[=[
+	This is like a [Spring], but it can be observed, and emits events. It handles [Observable]s and
+
 	@class SpringObject
 ]=]
 
