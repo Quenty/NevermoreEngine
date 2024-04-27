@@ -98,7 +98,10 @@ function AnimationUtils.getOrCreateAnimationTrack(
 	return animationTrack
 end
 
-function AnimationUtils.getOrCreateAnimationFromIdInAnimator(animator: Animator, id: string | number)
+--[=[
+	Gets or creates an animation from the id in the animator
+]=]
+function AnimationUtils.getOrCreateAnimationFromIdInAnimator(animator: Animator, id: string | number): Animation?
 	assert(typeof(animator) == "Instance" and animator:IsA("Animator"), "Bad animator")
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 
@@ -117,9 +120,12 @@ function AnimationUtils.getOrCreateAnimationFromIdInAnimator(animator: Animator,
 	return animation
 end
 
+--[=[
+	Finds an animation track
+]=]
 function AnimationUtils.findAnimationTrack(
 	target: Animator | Player | Model | AnimationController,
-	id: string | number)
+	id: string | number): AnimationTrack?
 	assert(typeof(target) == "Instance", "Bad target")
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 
@@ -131,7 +137,10 @@ function AnimationUtils.findAnimationTrack(
 	return AnimationUtils.findAnimationTrackInAnimator(animator, id)
 end
 
-function AnimationUtils.findAnimationTrackInAnimator(animator: Animator, id: string | number)
+--[=[
+	Finds an animation track in an animator
+]=]
+function AnimationUtils.findAnimationTrackInAnimator(animator: Animator, id: string | number): AnimationTrack?
 	assert(typeof(animator) == "Instance" and animator:IsA("Animator"), "Bad animator")
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 
@@ -150,7 +159,7 @@ end
 --[=[
 	Finds an animator for the current instance
 ]=]
-function AnimationUtils.getOrCreateAnimator(target: Animator | Player | Model | AnimationController)
+function AnimationUtils.getOrCreateAnimator(target: Animator | Player | Model | AnimationController): Animator?
 	assert(typeof(target) == "Instance", "Bad target")
 
 	if target:IsA("Animator") then
@@ -188,7 +197,10 @@ function AnimationUtils.getOrCreateAnimator(target: Animator | Player | Model | 
 	end
 end
 
-function AnimationUtils.getAnimationId(animationId)
+--[=[
+	Gets a specific animation name for an animation id
+]=]
+function AnimationUtils.getAnimationName(animationId: string): string
 	return string.format("Animation_%s", animationId)
 end
 
@@ -202,7 +214,7 @@ function AnimationUtils.createAnimationFromId(id: string | number): Animation
 	assert(type(animationId) == "string", "Bad id")
 
 	local animation = Instance.new("Animation")
-	animation.Name = AnimationUtils.getAnimationId(animationId)
+	animation.Name = AnimationUtils.getAnimationName(animationId)
 	animation.AnimationId = animationId
 	animation.Archivable = false
 

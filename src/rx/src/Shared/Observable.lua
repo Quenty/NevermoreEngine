@@ -155,12 +155,9 @@ end
 	@return MaidTask
 ]=]
 function Observable:Subscribe(fireCallback, failCallback, completeCallback)
-	local sub = Subscription.new(fireCallback, failCallback, completeCallback)
-	local cleanup = self._onSubscribe(sub)
+	local sub = Subscription.new(fireCallback, failCallback, completeCallback, self._source)
 
-	if cleanup then
-		sub:_giveCleanup(cleanup)
-	end
+	sub:_assignCleanup(self._onSubscribe(sub))
 
 	return sub
 end

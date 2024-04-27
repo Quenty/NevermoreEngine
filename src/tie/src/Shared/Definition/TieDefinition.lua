@@ -21,9 +21,9 @@ local TieImplementation = require("TieImplementation")
 local TieInterface = require("TieInterface")
 local TieMethodDefinition = require("TieMethodDefinition")
 local TiePropertyDefinition = require("TiePropertyDefinition")
+local TieRealms = require("TieRealms")
 local TieSignalDefinition = require("TieSignalDefinition")
 local ValueObject = require("ValueObject")
-local TieRealms = require("TieRealms")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
@@ -340,11 +340,14 @@ function TieDefinition:_observeImplementation(folder)
 
 		local update
 		do
-			local isImplemented = ValueObject.new(UNSET_VALUE)
-			maid:GiveTask(isImplemented)
+			local isImplemented = maid:Add(ValueObject.new(UNSET_VALUE))
 
 			maid:GiveTask(isImplemented.Changed:Connect(function()
 				maid._brio = nil
+
+				if not sub:IsPending() then
+					return
+				end
 
 				if isImplemented.Value then
 					local brio = Brio.new(TieInterface.new(self, folder, nil))

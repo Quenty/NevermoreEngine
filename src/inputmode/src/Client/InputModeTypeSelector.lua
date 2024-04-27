@@ -42,8 +42,7 @@ function InputModeTypeSelector.new(serviceBag, inputModesTypes)
 	-- keep this ordered so we are always stable in selection.
 	self._inputModeTypeList = {}
 
-	self._activeModeType = ValueObject.new()
-	self._maid:GiveTask(self._activeModeType)
+	self._activeModeType = self._maid:Add(ValueObject.new())
 
 --[=[
 	Event that fires whenever the active mode changes.

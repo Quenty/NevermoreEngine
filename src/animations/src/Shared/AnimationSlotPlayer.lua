@@ -1,4 +1,7 @@
 --[=[
+	Acts as a priority slot which can be overridden and play any animation in.
+	See Roblox's animation system for more information.
+
 	@class AnimationSlotPlayer
 ]=]
 
@@ -15,6 +18,12 @@ local AnimationSlotPlayer = setmetatable({}, BaseObject)
 AnimationSlotPlayer.ClassName = "AnimationSlotPlayer"
 AnimationSlotPlayer.__index = AnimationSlotPlayer
 
+--[=[
+	Creates a new AnimationSlotPlayer with a target to play the animation on.
+
+	@param animationTarget Instance? | Observable<Instance>
+	@return AnimationSlotPlayer
+]=]
 function AnimationSlotPlayer.new(animationTarget)
 	local self = setmetatable(BaseObject.new(), AnimationSlotPlayer)
 
@@ -31,20 +40,42 @@ function AnimationSlotPlayer.new(animationTarget)
 	return self
 end
 
+--[=[
+	Sets a new default fade time
+
+	@param defaultFadeTime number
+]=]
 function AnimationSlotPlayer:SetDefaultFadeTime(defaultFadeTime)
 	self._defaultFadeTime.Value = defaultFadeTime
 end
 
+--[=[
+	Sets a new default animation priority
+
+	@param defaultAnimationPriority number
+]=]
 function AnimationSlotPlayer:SetDefaultAnimationPriority(defaultAnimationPriority)
 	assert(EnumUtils.isOfType(Enum.AnimationPriority, defaultAnimationPriority) or defaultAnimationPriority == nil, "Bad defaultAnimationPriority")
 
 	self._defaultAnimationPriority.Value = defaultAnimationPriority
 end
 
+--[=[
+	Sets an animation target to play the animation on
+
+	@param animationTarget Instance | Observable<Instance>
+]=]
 function AnimationSlotPlayer:SetAnimationTarget(animationTarget)
 	self._animationTarget:Mount(animationTarget)
 end
 
+--[=[
+	Adjusts the speed of the animation playing in the slot
+
+	@param id string | number
+	@param speed number
+	@return () -> () -- Callback to clean things up
+]=]
 function AnimationSlotPlayer:AdjustSpeed(id, speed)
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 	assert(type(speed) == "number", "Bad speed")
@@ -84,6 +115,14 @@ function AnimationSlotPlayer:AdjustSpeed(id, speed)
 	end
 end
 
+--[=[
+	Adjusts the weight of the animation playing in the slot
+
+	@param id string | number
+	@param weight number
+	@param fadeTime number
+	@return () -> () -- Callback to clean things up
+]=]
 function AnimationSlotPlayer:AdjustWeight(id, weight, fadeTime)
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 	assert(type(weight) == "number", "Bad weight")
@@ -124,6 +163,16 @@ function AnimationSlotPlayer:AdjustWeight(id, weight, fadeTime)
 	end
 end
 
+--[=[
+	Plays the animation in the slot, overriding any previous animation
+
+	@param id string | number
+	@param fadeTime number?
+	@param weight number?
+	@param speed number?
+	@param priority number?
+	@return () -> () -- Callback to clean things up
+]=]
 function AnimationSlotPlayer:Play(id, fadeTime, weight, speed, priority)
 	fadeTime = fadeTime or self._defaultFadeTime.Value
 	priority = priority or self._defaultAnimationPriority.Value
@@ -177,6 +226,9 @@ function AnimationSlotPlayer:Play(id, fadeTime, weight, speed, priority)
 	end
 end
 
+--[=[
+	Stops the current animation playing
+]=]
 function AnimationSlotPlayer:Stop()
 	self._maid._current = nil
 end
