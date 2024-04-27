@@ -1,3 +1,19 @@
+# v4.1.0 (Sat Apr 27 2024)
+
+#### 🚀 Enhancement
+
+- Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Update cframe serialize to handle NaN values in JSON ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

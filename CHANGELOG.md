@@ -1,3 +1,16 @@
+# (Sat Apr 27 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.2.0`, `@quenty/blend@12.2.0`, `@quenty/cframeserializer@4.1.0`, `@quenty/datastore@13.3.0`, `@quenty/inputmode@13.2.0`, `@quenty/loader@10.2.0`, `@quenty/performanceutils@4.2.0`, `@quenty/rx@13.2.0`, `@quenty/tie@10.3.0`, `@quenty/nevermore-cli@4.1.0`
+  - Users/quenty/cframe serializer [#461](https://github.com/Quenty/NevermoreEngine/pull/461) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Apr 23 2024)
 
 #### 🐛 Bug Fix
