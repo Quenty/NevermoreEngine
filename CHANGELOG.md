@@ -1,5 +1,18 @@
 # (Sun Apr 28 2024)
 
+#### 🚀 Enhancement
+
+- `@quenty/clienttranslator@14.3.0`, `@quenty/elo@7.3.0`, `@quenty/ik@15.4.0`, `@quenty/probability@2.2.0`, `@quenty/snackbar@11.3.0`
+  - elo util updates [#462](https://github.com/Quenty/NevermoreEngine/pull/462) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Apr 28 2024)
+
 #### 🐛 Bug Fix
 
 - `@quenty/randomutils@6.2.1`

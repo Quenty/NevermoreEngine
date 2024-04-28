@@ -1,3 +1,20 @@
+# v7.3.0 (Sun Apr 28 2024)
+
+#### 🚀 Enhancement
+
+- elo util updates [#462](https://github.com/Quenty/NevermoreEngine/pull/462) ([@Quenty](https://github.com/Quenty))
+- feat: Add EloUtils percentile helper logic ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs: Fix elo docs ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
