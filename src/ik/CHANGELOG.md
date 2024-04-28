@@ -1,20 +1,18 @@
-# v15.4.0 (Sun Apr 28 2024)
-
-#### 🚀 Enhancement
-
-- elo util updates [#462](https://github.com/Quenty/NevermoreEngine/pull/462) ([@Quenty](https://github.com/Quenty))
-- feat: Refactor IK logic ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.3.0...@quenty/ik@15.4.0) (2024-04-28)
+
+
+### Features
+
+* Refactor IK logic ([f83df38](https://github.com/Quenty/NevermoreEngine/commit/f83df385a895eb791b74e2a1be6069c1a094b788))
+
+
+
+
 
 # [15.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.2.1...@quenty/ik@15.3.0) (2024-04-27)
 

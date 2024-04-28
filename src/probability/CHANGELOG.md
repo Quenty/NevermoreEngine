@@ -1,20 +1,18 @@
-# v2.2.0 (Sun Apr 28 2024)
-
-#### 🚀 Enhancement
-
-- elo util updates [#462](https://github.com/Quenty/NevermoreEngine/pull/462) ([@Quenty](https://github.com/Quenty))
-- feat: Add EloUtils percentile helper logic ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/probability@2.1.0...@quenty/probability@2.2.0) (2024-04-28)
+
+
+### Features
+
+* Add EloUtils percentile helper logic ([d2b4910](https://github.com/Quenty/NevermoreEngine/commit/d2b4910b93570f30c1060f78992286b1bf6a7698))
+
+
+
+
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/probability@2.0.1...@quenty/probability@2.1.0) (2022-03-27)
 
