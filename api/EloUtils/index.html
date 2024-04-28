@@ -42,8 +42,8 @@ playerOneRating, playerTwoRating = EloUtils.getNewElo(
 -- New rankings!
 print(playerOneRating, playerTwoRating)
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/EloUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/EloUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/EloUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.2acbceba.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.5c37b306.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.abc86482.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.a3b79d9b.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -66,27 +66,33 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
 <span class="token comment">-- New rankings!</span>
 <span class="token function">print</span><span class="token punctuation">(</span>playerOneRating<span class="token punctuation">,</span> playerTwoRating<span class="token punctuation">)</span>
 </code></pre>
-</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="types">Types<a href="#types" class="hash-link" aria-label="Direct link to Types" title="Direct link to Types">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="EloConfig"><code style="text-decoration:none">EloConfig</code><a href="#EloConfig" class="hash-link" aria-label="Direct link to EloConfig" title="Direct link to EloConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L41"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>EloConfig<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>factor<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>kfactor<!-- -->: </code><code class="blue_P4bS">number</code><code class="op_lSLc"> | </code><code class="blue_P4bS">function</code></div><div><code>initial<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>ratingFloor<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>groupMultipleResultAsOne<!-- -->: </code><code class="blue_P4bS">boolean</code></div></div><code>}</code></div><div></div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="createConfig"><code style="text-decoration:none">createConfig</code><a href="#createConfig" class="hash-link" aria-label="Direct link to createConfig" title="Direct link to createConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L47"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">createConfig</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS">table?</code><span class="inlineDescription_G7Er">-- <span>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="types">Types<a href="#types" class="hash-link" aria-label="Direct link to Types" title="Direct link to Types">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="EloConfig"><code style="text-decoration:none">EloConfig</code><a href="#EloConfig" class="hash-link" aria-label="Direct link to EloConfig" title="Direct link to EloConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L42"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>EloConfig<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>factor<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>kfactor<!-- -->: </code><code class="blue_P4bS">number</code><code class="op_lSLc"> | </code><code class="blue_P4bS">function</code></div><div><code>initial<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>ratingFloor<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>groupMultipleResultAsOne<!-- -->: </code><code class="blue_P4bS">boolean</code></div></div><code>}</code></div><div></div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="createConfig"><code style="text-decoration:none">createConfig</code><a href="#createConfig" class="hash-link" aria-label="Direct link to createConfig" title="Direct link to createConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L48"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">createConfig</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS">table?</code><span class="inlineDescription_G7Er">-- <span>
 <p>Optional table with defaults</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code></div><div>
 <p>Creates a new elo config.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isEloConfig"><code style="text-decoration:none">isEloConfig</code><a href="#isEloConfig" class="hash-link" aria-label="Direct link to isEloConfig" title="Direct link to isEloConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L65"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">isEloConfig</code><code>(</code><code>config<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="isEloConfig"><code style="text-decoration:none">isEloConfig</code><a href="#isEloConfig" class="hash-link" aria-label="Direct link to isEloConfig" title="Direct link to isEloConfig">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L66"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">isEloConfig</code><code>(</code><code>config<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether an object is an elo config</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getNewElo"><code style="text-decoration:none">getNewElo</code><a href="#getNewElo" class="hash-link" aria-label="Direct link to getNewElo" title="Direct link to getNewElo">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getNewElo</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getStandardDeviation"><code style="text-decoration:none">getStandardDeviation</code><a href="#getStandardDeviation" class="hash-link" aria-label="Direct link to getStandardDeviation" title="Direct link to getStandardDeviation">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L81"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getStandardDeviation</code><code>(</code><code>eloConfig<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>) → </code><code class="blue_P4bS">number</code></div><div>
+<p>Gets the standard deviation of the elo curve</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getPercentile"><code style="text-decoration:none">getPercentile</code><a href="#getPercentile" class="hash-link" aria-label="Direct link to getPercentile" title="Direct link to getPercentile">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L94"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getPercentile</code><code>(</code><div class="inset_uKQm"><div><code>eloConfig<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>elo<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
+<p>Gets the standard deviation of the elo curve from 0 to 1</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="percentileToElo"><code style="text-decoration:none">percentileToElo</code><a href="#percentileToElo" class="hash-link" aria-label="Direct link to percentileToElo" title="Direct link to percentileToElo">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L111"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">percentileToElo</code><code>(</code><div class="inset_uKQm"><div><code>eloConfig<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>percentile<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
+<p>Gets the standard deviation of the elo curve from 0 to 1</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getNewElo"><code style="text-decoration:none">getNewElo</code><a href="#getNewElo" class="hash-link" aria-label="Direct link to getNewElo" title="Direct link to getNewElo">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L131"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getNewElo</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>playerOneRating</p>
 </span></span></div><div><code class="blue_P4bS">number</code><span class="inlineDescription_G7Er">-- <span>
 <p>playerTwoRating</p>
 </span></span></div></div><code>)</code></div><div>
 <p>Gets the new score for the player and opponent after a series of matches.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getEloChange"><code style="text-decoration:none">getEloChange</code><a href="#getEloChange" class="hash-link" aria-label="Direct link to getEloChange" title="Direct link to getEloChange">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L100"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getEloChange</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getEloChange"><code style="text-decoration:none">getEloChange</code><a href="#getEloChange" class="hash-link" aria-label="Direct link to getEloChange" title="Direct link to getEloChange">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L152"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getEloChange</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>playerOneRating</p>
 </span></span></div><div><code class="blue_P4bS">number</code><span class="inlineDescription_G7Er">-- <span>
 <p>playerTwoRating</p>
 </span></span></div></div><code>)</code></div><div>
 <p>Gets the change in elo for the given players and the results</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getNewPlayerOneScore"><code style="text-decoration:none">getNewPlayerOneScore</code><a href="#getNewPlayerOneScore" class="hash-link" aria-label="Direct link to getNewPlayerOneScore" title="Direct link to getNewPlayerOneScore">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L120"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getNewPlayerOneScore</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getNewPlayerOneScore"><code style="text-decoration:none">getNewPlayerOneScore</code><a href="#getNewPlayerOneScore" class="hash-link" aria-label="Direct link to getNewPlayerOneScore" title="Direct link to getNewPlayerOneScore">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L172"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getNewPlayerOneScore</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Gets the new score for the player after a series of matches.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getPlayerOneExpected"><code style="text-decoration:none">getPlayerOneExpected</code><a href="#getPlayerOneExpected" class="hash-link" aria-label="Direct link to getPlayerOneExpected" title="Direct link to getPlayerOneExpected">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L141"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getPlayerOneExpected</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getPlayerOneExpected"><code style="text-decoration:none">getPlayerOneExpected</code><a href="#getPlayerOneExpected" class="hash-link" aria-label="Direct link to getPlayerOneExpected" title="Direct link to getPlayerOneExpected">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L193"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getPlayerOneExpected</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Compute expected score for a player vs. player given the rating.</p>
 <div class="admonition admonition-info alert alert--info">
   <div class="admonition-heading">
@@ -98,17 +104,17 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
     <p>A player's expected score is their probability of winning plus half their probability of drawing. Thus, an expected score of 0.75 could represent a 75% chance of winning, 25% chance of losing, and 0% chance of drawing</p>
   </div>
 </div>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getPlayerOneScoreAdjustment"><code style="text-decoration:none">getPlayerOneScoreAdjustment</code><a href="#getPlayerOneScoreAdjustment" class="hash-link" aria-label="Direct link to getPlayerOneScoreAdjustment" title="Direct link to getPlayerOneScoreAdjustment">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L159"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getPlayerOneScoreAdjustment</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="getPlayerOneScoreAdjustment"><code style="text-decoration:none">getPlayerOneScoreAdjustment</code><a href="#getPlayerOneScoreAdjustment" class="hash-link" aria-label="Direct link to getPlayerOneScoreAdjustment" title="Direct link to getPlayerOneScoreAdjustment">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L211"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">getPlayerOneScoreAdjustment</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>playerOneRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>playerTwoRating<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Gets the score adjustment for a given player's base.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="fromOpponentPerspective"><code style="text-decoration:none">fromOpponentPerspective</code><a href="#fromOpponentPerspective" class="hash-link" aria-label="Direct link to fromOpponentPerspective" title="Direct link to fromOpponentPerspective">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L197"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">fromOpponentPerspective</code><code>(</code><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="fromOpponentPerspective"><code style="text-decoration:none">fromOpponentPerspective</code><a href="#fromOpponentPerspective" class="hash-link" aria-label="Direct link to fromOpponentPerspective" title="Direct link to fromOpponentPerspective">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L249"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">fromOpponentPerspective</code><code>(</code><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code></div><div>
 <p>Flips the scores for the opponent</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="countPlayerOneWins"><code style="text-decoration:none">countPlayerOneWins</code><a href="#countPlayerOneWins" class="hash-link" aria-label="Direct link to countPlayerOneWins" title="Direct link to countPlayerOneWins">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L215"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">countPlayerOneWins</code><code>(</code><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="countPlayerOneWins"><code style="text-decoration:none">countPlayerOneWins</code><a href="#countPlayerOneWins" class="hash-link" aria-label="Direct link to countPlayerOneWins" title="Direct link to countPlayerOneWins">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L267"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">countPlayerOneWins</code><code>(</code><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code></div><div>
 <p>Counts the number of wins for player one</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="countPlayerTwoWins"><code style="text-decoration:none">countPlayerTwoWins</code><a href="#countPlayerTwoWins" class="hash-link" aria-label="Direct link to countPlayerTwoWins" title="Direct link to countPlayerTwoWins">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L233"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">countPlayerTwoWins</code><code>(</code><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="countPlayerTwoWins"><code style="text-decoration:none">countPlayerTwoWins</code><a href="#countPlayerTwoWins" class="hash-link" aria-label="Direct link to countPlayerTwoWins" title="Direct link to countPlayerTwoWins">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L285"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">countPlayerTwoWins</code><code>(</code><code>eloMatchResultList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloMatchResult">EloMatchResult</a></code><code class="purple_ieR2">}</code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code></div><div>
 <p>Counts the number of wins for player two</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="standardKFactorFormula"><code style="text-decoration:none">standardKFactorFormula</code><a href="#standardKFactorFormula" class="hash-link" aria-label="Direct link to standardKFactorFormula" title="Direct link to standardKFactorFormula">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L251"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">standardKFactorFormula</code><code>(</code><code>rating<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="standardKFactorFormula"><code style="text-decoration:none">standardKFactorFormula</code><a href="#standardKFactorFormula" class="hash-link" aria-label="Direct link to standardKFactorFormula" title="Direct link to standardKFactorFormula">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L303"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">standardKFactorFormula</code><code>(</code><code>rating<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Standard kfactor formula for use in the elo config.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="extractKFactor"><code style="text-decoration:none">extractKFactor</code><a href="#extractKFactor" class="hash-link" aria-label="Direct link to extractKFactor" title="Direct link to extractKFactor">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L268"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">extractKFactor</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>rating<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="extractKFactor"><code style="text-decoration:none">extractKFactor</code><a href="#extractKFactor" class="hash-link" aria-label="Direct link to extractKFactor" title="Direct link to extractKFactor">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/elo/src/Shared/EloUtils.lua#L320"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>EloUtils<!-- -->.</code><code class="green_DgR4">extractKFactor</code><code>(</code><div class="inset_uKQm"><div><code>config<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/EloUtils#EloConfig">EloConfig</a></code><code>,</code></div><div><code>rating<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Computes the kfactor for the given player from the rating</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -130,7 +136,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 47,
+                &quot;line&quot;: 48,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -152,7 +158,83 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 65,
+                &quot;line&quot;: 66,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getStandardDeviation&quot;,
+            &quot;desc&quot;: &quot;Gets the standard deviation of the elo curve&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;eloConfig&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 81,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getPercentile&quot;,
+            &quot;desc&quot;: &quot;Gets the standard deviation of the elo curve from 0 to 1&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;eloConfig&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;elo&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 94,
+                &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;percentileToElo&quot;,
+            &quot;desc&quot;: &quot;Gets the standard deviation of the elo curve from 0 to 1&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;eloConfig&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;EloConfig&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;percentile&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 111,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -193,7 +275,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 79,
+                &quot;line&quot;: 131,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -234,7 +316,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 100,
+                &quot;line&quot;: 152,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -266,7 +348,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 120,
+                &quot;line&quot;: 172,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -298,7 +380,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 141,
+                &quot;line&quot;: 193,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -335,7 +417,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 159,
+                &quot;line&quot;: 211,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -357,7 +439,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 197,
+                &quot;line&quot;: 249,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -379,7 +461,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 215,
+                &quot;line&quot;: 267,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -401,7 +483,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 233,
+                &quot;line&quot;: 285,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -423,7 +505,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 251,
+                &quot;line&quot;: 303,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         },
@@ -450,7 +532,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 268,
+                &quot;line&quot;: 320,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         }
@@ -488,7 +570,7 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
                 }
             ],
             &quot;source&quot;: {
-                &quot;line&quot;: 41,
+                &quot;line&quot;: 42,
                 &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
             }
         }
@@ -499,8 +581,8 @@ playerOneRating<span class="token punctuation">,</span> playerTwoRating <span cl
         &quot;line&quot;: 24,
         &quot;path&quot;: &quot;src/elo/src/Shared/EloUtils.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a><ul><li><a href="#EloConfig" class="table-of-contents__link toc-highlight">EloConfig</a></li></ul></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#countPlayerOneWins" class="table-of-contents__link toc-highlight">.countPlayerOneWins</a></li><li><a href="#countPlayerTwoWins" class="table-of-contents__link toc-highlight">.countPlayerTwoWins</a></li><li><a href="#createConfig" class="table-of-contents__link toc-highlight">.createConfig</a></li><li><a href="#extractKFactor" class="table-of-contents__link toc-highlight">.extractKFactor</a></li><li><a href="#fromOpponentPerspective" class="table-of-contents__link toc-highlight">.fromOpponentPerspective</a></li><li><a href="#getEloChange" class="table-of-contents__link toc-highlight">.getEloChange</a></li><li><a href="#getNewElo" class="table-of-contents__link toc-highlight">.getNewElo</a></li><li><a href="#getNewPlayerOneScore" class="table-of-contents__link toc-highlight">.getNewPlayerOneScore</a></li><li><a href="#getPlayerOneExpected" class="table-of-contents__link toc-highlight">.getPlayerOneExpected</a></li><li><a href="#getPlayerOneScoreAdjustment" class="table-of-contents__link toc-highlight">.getPlayerOneScoreAdjustment</a></li><li><a href="#isEloConfig" class="table-of-contents__link toc-highlight">.isEloConfig</a></li><li><a href="#standardKFactorFormula" class="table-of-contents__link toc-highlight">.standardKFactorFormula</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.2acbceba.js"></script>
-<script src="/NevermoreEngine/assets/js/main.5c37b306.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a><ul><li><a href="#EloConfig" class="table-of-contents__link toc-highlight">EloConfig</a></li></ul></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#countPlayerOneWins" class="table-of-contents__link toc-highlight">.countPlayerOneWins</a></li><li><a href="#countPlayerTwoWins" class="table-of-contents__link toc-highlight">.countPlayerTwoWins</a></li><li><a href="#createConfig" class="table-of-contents__link toc-highlight">.createConfig</a></li><li><a href="#extractKFactor" class="table-of-contents__link toc-highlight">.extractKFactor</a></li><li><a href="#fromOpponentPerspective" class="table-of-contents__link toc-highlight">.fromOpponentPerspective</a></li><li><a href="#getEloChange" class="table-of-contents__link toc-highlight">.getEloChange</a></li><li><a href="#getNewElo" class="table-of-contents__link toc-highlight">.getNewElo</a></li><li><a href="#getNewPlayerOneScore" class="table-of-contents__link toc-highlight">.getNewPlayerOneScore</a></li><li><a href="#getPercentile" class="table-of-contents__link toc-highlight">.getPercentile</a></li><li><a href="#getPlayerOneExpected" class="table-of-contents__link toc-highlight">.getPlayerOneExpected</a></li><li><a href="#getPlayerOneScoreAdjustment" class="table-of-contents__link toc-highlight">.getPlayerOneScoreAdjustment</a></li><li><a href="#getStandardDeviation" class="table-of-contents__link toc-highlight">.getStandardDeviation</a></li><li><a href="#isEloConfig" class="table-of-contents__link toc-highlight">.isEloConfig</a></li><li><a href="#percentileToElo" class="table-of-contents__link toc-highlight">.percentileToElo</a></li><li><a href="#standardKFactorFormula" class="table-of-contents__link toc-highlight">.standardKFactorFormula</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.abc86482.js"></script>
+<script src="/NevermoreEngine/assets/js/main.a3b79d9b.js"></script>
 </body>
 </html>
