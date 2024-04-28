@@ -1,19 +1,15 @@
-# v7.2.1 (Sun Apr 28 2024)
-
-#### 🐛 Bug Fix
-
-- fix: RandomUtils.weightedChoice when chances array starts with 0(s) [#458](https://github.com/Quenty/NevermoreEngine/pull/458) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.2.0...@quenty/soundplayer@7.2.1) (2024-04-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+
+
+
 
 # [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.1.1...@quenty/soundplayer@7.2.0) (2024-04-27)
 

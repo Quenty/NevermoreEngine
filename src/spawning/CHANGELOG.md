@@ -1,19 +1,15 @@
-# v10.3.1 (Sun Apr 28 2024)
-
-#### 🐛 Bug Fix
-
-- fix: RandomUtils.weightedChoice when chances array starts with 0(s) [#458](https://github.com/Quenty/NevermoreEngine/pull/458) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.3.0...@quenty/spawning@10.3.1) (2024-04-28)
+
+**Note:** Version bump only for package @quenty/spawning
+
+
+
+
 
 # [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.2.0...@quenty/spawning@10.3.0) (2024-04-27)
 
