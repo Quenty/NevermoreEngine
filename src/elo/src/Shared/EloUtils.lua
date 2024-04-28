@@ -88,6 +88,7 @@ end
 	Gets the standard deviation of the elo curve from 0 to 1
 
 	@param eloConfig EloConfig
+	@param elo number
 	@return number
 ]=]
 function EloUtils.getPercentile(eloConfig, elo)
@@ -104,6 +105,7 @@ end
 	Gets the standard deviation of the elo curve from 0 to 1
 
 	@param eloConfig EloConfig
+	@param percentile number
 	@return number
 ]=]
 function EloUtils.percentileToElo(eloConfig, percentile)
