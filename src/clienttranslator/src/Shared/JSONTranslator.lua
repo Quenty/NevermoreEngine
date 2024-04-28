@@ -145,6 +145,7 @@ function JSONTranslator:ToTranslationKey(prefix, text)
 	local translationKey = TranslationKeyUtils.getTranslationKey(prefix, text)
 	local context = ("automatic.%s"):format(translationKey)
 
+	-- TODO: Only set if we don't need it
 	self:SetEntryValue(translationKey, text, context, "en", text)
 
 	return translationKey

@@ -32,5 +32,8 @@
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid"
+  },
+  "dependencies": {
+    "@quenty/probability": "file:../probability"
   }
 }

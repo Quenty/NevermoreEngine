@@ -10,6 +10,7 @@ local Players = game:GetService("Players")
 local IKRigBase = require("IKRigBase")
 local IKConstants = require("IKConstants")
 local IKRigAimerLocalPlayer = require("IKRigAimerLocalPlayer")
+local Binder = require("Binder")
 
 local IKRigClient = setmetatable({}, IKRigBase)
 IKRigClient.ClassName = "IKRigClient"
@@ -95,4 +96,4 @@ function IKRigClient:_setupLocalPlayer(remoteEvent)
 	self._maid:GiveTask(self._localPlayerAimer)
 end
 
-return IKRigClient
+return Binder.new("IKRig", IKRigClient)

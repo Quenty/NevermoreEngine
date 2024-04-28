@@ -1,27 +1,29 @@
 --[=[
 	Guarantees that only one snackbar is visible at once
-	@class SnackbarManager
+	@class SnackbarServiceClient
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
 local DraggableSnackbar = require("DraggableSnackbar")
 
-local SnackbarManager = {}
-SnackbarManager.ServiceName = "SnackbarManager"
+local SnackbarServiceClient = {}
+SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
 
-function SnackbarManager:Init(screenGui)
+function SnackbarServiceClient:Init(serviceBag)
+	assert(not self._serviceBag, "Already initialized")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
 	self._currentSnackbar = nil
-	self:WithScreenGui(screenGui)
 end
 
 --[=[
 	Sets the screenGui to use
 
 	@param screenGui ScreenGui
-	@return SnackbarManager
+	@return SnackbarServiceClient
 ]=]
-function SnackbarManager:WithScreenGui(screenGui)
+function SnackbarServiceClient:SetScreenGui(screenGui)
 	self._screenGui = screenGui or error("No screenGui")
 
 	return self
@@ -39,7 +41,7 @@ end
 			};
 		};
 ]]
-function SnackbarManager:MakeSnackbar(text, options)
+function SnackbarServiceClient:ShowSnackbar(text, options)
 	assert(type(text) == "string", "text must be a string")
 
 	local snackbar = DraggableSnackbar.new(self._screenGui, text, true, options)
@@ -48,7 +50,7 @@ function SnackbarManager:MakeSnackbar(text, options)
 	return snackbar
 end
 
-function SnackbarManager:_showSnackbar(snackbar)
+function SnackbarServiceClient:_showSnackbar(snackbar)
 	assert(snackbar, "Must send a snackbar")
 
 	if self._currentSnackbar == snackbar and self._currentSnackbar:IsVisible() then
@@ -77,4 +79,4 @@ function SnackbarManager:_showSnackbar(snackbar)
 	end
 end
 
-return SnackbarManager
+return SnackbarServiceClient

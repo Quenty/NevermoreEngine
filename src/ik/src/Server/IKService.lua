@@ -52,8 +52,10 @@ function IKService:Init(serviceBag)
 	self._serviceBag:GetService(require("Motor6DService"))
 	self._humanoidTrackerService = self._serviceBag:GetService(require("HumanoidTrackerService"))
 
-	-- Internal
-	self._ikBinders = self._serviceBag:GetService(require("IKBindersServer"))
+	-- Binders
+	self._ikRigBinder = self._serviceBag:GetService(require("IKRig"))
+	self._serviceBag:GetService(require("IKRightGrip"))
+	self._serviceBag:GetService(require("IKLeftGrip"))
 end
 
 --[=[
@@ -85,7 +87,7 @@ end
 	@return IKRig?
 ]=]
 function IKService:GetRig(humanoid)
-	return self._ikBinders.IKRig:Bind(humanoid)
+	return self._ikRigBinder:Bind(humanoid)
 end
 
 --[=[
@@ -96,8 +98,8 @@ end
 function IKService:PromiseRig(humanoid)
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
-	self._ikBinders.IKRig:Bind(humanoid)
-	return self._ikBinders.IKRig:Promise(humanoid)
+	self._ikRigBinder:Bind(humanoid)
+	return self._ikRigBinder:Promise(humanoid)
 end
 
 --[=[
@@ -107,7 +109,7 @@ end
 function IKService:RemoveRig(humanoid)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
-	self._ikBinders.IKRig:Unbind(humanoid)
+	self._ikRigBinder:Unbind(humanoid)
 end
 
 --[=[
@@ -127,7 +129,7 @@ function IKService:UpdateServerRigTarget(humanoid, target)
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(target) == "Vector3", "Bad target")
 
-	local serverRig = self._ikBinders.IKRig:Bind(humanoid)
+	local serverRig = self._ikRigBinder:Bind(humanoid)
 	if not serverRig then
 		warn("[IKService.UpdateServerRigTarget] - No serverRig")
 		return
@@ -147,15 +149,15 @@ function IKService:_handlePlayer(player)
 
 	maid:GiveTask(humanoidTracker.AliveHumanoid.Changed:Connect(function(new, old)
 		if old then
-			self._ikBinders.IKRig:Unbind(old)
+			self._ikRigBinder:Unbind(old)
 		end
 		if new then
-			self._ikBinders.IKRig:Bind(new)
+			self._ikRigBinder:Bind(new)
 		end
 	end))
 
 	if humanoidTracker.AliveHumanoid.Value then
-		self._ikBinders.IKRig:Bind(humanoidTracker.AliveHumanoid.Value)
+		self._ikRigBinder:Bind(humanoidTracker.AliveHumanoid.Value)
 	end
 
 	self._maid[player] = maid
@@ -164,7 +166,7 @@ end
 function IKService:_updateStepped()
 	debug.profilebegin("IKUpdateServer")
 
-	for _, rig in pairs(self._ikBinders.IKRig:GetAll()) do
+	for _, rig in pairs(self._ikRigBinder:GetAll()) do
 		debug.profilebegin("RigUpdateServer")
 
 		local lastUpdateTime = rig:GetLastUpdateTime()
