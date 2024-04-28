@@ -64,5 +64,11 @@ return function()
 			expect(winChange > drawChange ).to.equal(true)
 			expect(drawChange > lossChange).to.equal(true)
 		end)
+
+		it("should compute percentile as 0.5", function()
+			local percentile = EloUtils.getPercentile(config, 1400)
+
+			expect(percentile).to.equal(0.5)
+		end)
 	end)
 end

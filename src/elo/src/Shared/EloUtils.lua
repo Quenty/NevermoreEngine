@@ -26,6 +26,7 @@ local require = require(script.Parent.loader).load(script)
 
 local EloMatchResult = require("EloMatchResult")
 local EloMatchResultUtils = require("EloMatchResultUtils")
+local Probability = require("Probability")
 
 local EloUtils = {}
 
@@ -64,6 +65,55 @@ end
 ]=]
 function EloUtils.isEloConfig(config)
 	return type(config) == "table"
+		and type(config.factor) == "number"
+		and (type(config.kfactor) == "number" or type(config.kfactor) == "function")
+		and type(config.initial) == "number"
+		and type(config.ratingFloor) == "number"
+		and type(config.groupMultipleResultAsOne) == "boolean"
+end
+
+--[=[
+	Gets the standard deviation of the elo curve
+
+	@param eloConfig EloConfig
+	@return number
+]=]
+function EloUtils.getStandardDeviation(eloConfig)
+	assert(EloUtils.isEloConfig(eloConfig), "Bad eloConfig")
+
+	return 0.5*eloConfig.factor*math.sqrt(2)
+end
+
+--[=[
+	Gets the standard deviation of the elo curve from 0 to 1
+
+	@param eloConfig EloConfig
+	@return number
+]=]
+function EloUtils.getPercentile(eloConfig, elo)
+	assert(EloUtils.isEloConfig(eloConfig), "Bad eloConfig")
+
+	local standardDeviation = EloUtils.getStandardDeviation(eloConfig)
+	local mean = eloConfig.initial
+
+	local zScore = (elo - mean)/standardDeviation
+	return Probability.cdf(zScore)
+end
+
+--[=[
+	Gets the standard deviation of the elo curve from 0 to 1
+
+	@param eloConfig EloConfig
+	@return number
+]=]
+function EloUtils.percentileToElo(eloConfig, percentile)
+	assert(EloUtils.isEloConfig(eloConfig), "Bad eloConfig")
+
+	local standardDeviation = EloUtils.getStandardDeviation(eloConfig)
+	local mean = eloConfig.initial
+
+	local zScore = Probability.percentileToZScore(percentile)
+	return mean + zScore*standardDeviation
 end
 
 --[=[
