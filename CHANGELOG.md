@@ -1,3 +1,16 @@
+# (Sun Apr 28 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/randomutils@6.2.1`
+  - fix: RandomUtils.weightedChoice when chances array starts with 0(s) [#458](https://github.com/Quenty/NevermoreEngine/pull/458) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # (Sat Apr 27 2024)
 
 #### 🚀 Enhancement

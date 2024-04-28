@@ -1,3 +1,15 @@
+# v7.2.1 (Sun Apr 28 2024)
+
+#### 🐛 Bug Fix
+
+- fix: RandomUtils.weightedChoice when chances array starts with 0(s) [#458](https://github.com/Quenty/NevermoreEngine/pull/458) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
