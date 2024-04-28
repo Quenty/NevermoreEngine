@@ -10,7 +10,7 @@ local IKGripUtils = {}
 
 	```lua
 	-- Get the binder
-	local leftGripAttachmentBinder = serviceBag:GetService(require("IKBindersServer")).IKLeftGrip
+	local leftGripAttachmentBinder = serviceBag:GetService(require("IKLeftGrip"))
 
 	-- Setup sample grip
 	local attachment = Instance.new("Attachment")

@@ -12,6 +12,7 @@ local IKRigBase = require("IKRigBase")
 local IKConstants = require("IKConstants")
 local CharacterUtils = require("CharacterUtils")
 local Motor6DStackHumanoid = require("Motor6DStackHumanoid")
+local Binder = require("Binder")
 
 local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
@@ -90,4 +91,4 @@ function IKRig:_onServerEvent(player, target)
 	end
 end
 
-return IKRig
+return Binder.new("IKRig", IKRig)

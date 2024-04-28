@@ -51,7 +51,9 @@ function IKServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("Motor6DServiceClient"))
 
 	-- Internal
-	self._ikBinders = self._serviceBag:GetService(require("IKBindersClient"))
+	self._ikRigBinderClient = self._serviceBag:GetService(require("IKRigClient"))
+	self._serviceBag:GetService(require("IKRightGrip"))
+	self._serviceBag:GetService(require("IKLeftGrip"))
 end
 
 --[=[
@@ -74,7 +76,7 @@ function IKServiceClient:GetRig(humanoid)
 	assert(self._serviceBag, "Not initialized")
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
-	return self._ikBinders.IKRig:Get(humanoid)
+	return self._ikRigBinderClient:Get(humanoid)
 end
 
 --[=[
@@ -86,7 +88,7 @@ function IKServiceClient:PromiseRig(humanoid)
 	assert(self._serviceBag, "Not initialized")
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
-	return self._ikBinders.IKRig:Promise(humanoid)
+	return self._ikRigBinderClient:Promise(humanoid)
 end
 
 --[=[
@@ -163,9 +165,9 @@ end
 ]=]
 function IKServiceClient:GetLocalPlayerRig()
 	assert(self._serviceBag, "Not initialized")
-	assert(self._ikBinders.IKRig, "Not initialize")
+	assert(self._ikRigBinderClient, "Not initialize")
 
-	return IKRigUtils.getPlayerIKRig(self._ikBinders.IKRig, Players.LocalPlayer)
+	return IKRigUtils.getPlayerIKRig(self._ikRigBinderClient, Players.LocalPlayer)
 end
 
 function IKServiceClient:_updateStepped()
@@ -179,7 +181,7 @@ function IKServiceClient:_updateStepped()
 
 	local camPosition = Workspace.CurrentCamera.CFrame.p
 
-	for _, rig in pairs(self._ikBinders.IKRig:GetAll()) do
+	for _, rig in pairs(self._ikRigBinderClient:GetAll()) do
 		debug.profilebegin("RigUpdate")
 
 		local position = rig:GetPositionOrNil()
