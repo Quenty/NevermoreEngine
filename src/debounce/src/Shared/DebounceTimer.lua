@@ -52,7 +52,7 @@ function DebounceTimer:GetTimeRemaining()
 		return 0
 	end
 
-	return math.min((self._startTime + self._length) - tick(), 0)
+	return math.max((self._startTime + self._length) - tick(), 0)
 end
 
 --[=[
