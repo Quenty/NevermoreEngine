@@ -17,8 +17,7 @@ function UserInfoService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._aggregator = UserInfoAggregator.new()
-	self._maid:GiveTask(self._aggregator)
+	self._aggregator = self._maid:Add(UserInfoAggregator.new())
 end
 
 --[=[

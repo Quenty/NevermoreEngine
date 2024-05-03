@@ -21,13 +21,11 @@ function RxStateStackUtils.topOfStack(defaultValue)
 	return function(source)
 		return Observable.new(function(sub)
 			local maid = Maid.new()
-
-			local current = StateStack.new(defaultValue)
-			maid:GiveTask(current)
+			local current = maid:Add(StateStack.new(defaultValue))
 
 			maid:GiveTask(source:Subscribe(function(brio)
 				if not Brio.isBrio(brio) then
-					warn("Not a brio")
+					warn("[RxStateStackUtils.topOfStack] - Not a brio. Ignoring.")
 					return
 				end
 

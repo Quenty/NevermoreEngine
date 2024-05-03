@@ -26,6 +26,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
+local ServiceInitLogger = require("ServiceInitLogger")
 
 --[=[
 	@interface Service
@@ -61,11 +62,19 @@ function ServiceBag.new(parentProvider)
 	self._initializing = false
 	self._destructing = false
 
+	self._serviceInitLogger = ServiceInitLogger.new("initialized")
+	self._serviceStartLogger = ServiceInitLogger.new("started")
+
 	self._serviceTypesToStart = {}
 
 	self._destroyingSignal = Signal.new()
 
 	return self
+end
+
+function ServiceBag:PrintInitialization()
+	self._serviceInitLogger:Print()
+	self._serviceStartLogger:Print()
 end
 
 --[=[
@@ -161,9 +170,13 @@ function ServiceBag:Start()
 		if service.Start then
 			local current
 			task.spawn(function()
+				local stopClock = self._serviceStartLogger:StartInitClock(serviceName)
+
 				debug.setmemorycategory(serviceName)
 				current = coroutine.running()
 				service:Start()
+
+				stopClock()
 			end)
 
 			local isDead = coroutine.status(current) == "dead"
@@ -272,8 +285,13 @@ function ServiceBag:_initService(serviceType)
 		local current
 		task.spawn(function()
 			debug.setmemorycategory(serviceName)
+
+			local stopClock = self._serviceInitLogger:StartInitClock(serviceName)
+
 			current = coroutine.running()
 			service:Init(self)
+
+			stopClock()
 		end)
 
 		local isDead = coroutine.status(current) == "dead"
