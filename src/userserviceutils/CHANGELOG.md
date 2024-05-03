@@ -1,3 +1,16 @@
+# v9.3.0 (Fri May 03 2024)
+
+#### 🚀 Enhancement
+
+- Users/quenty/service bag profiling [#466](https://github.com/Quenty/NevermoreEngine/pull/466) ([@Quenty](https://github.com/Quenty))
+- feat: Centralize UserInfoService ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

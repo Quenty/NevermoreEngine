@@ -1,3 +1,16 @@
+# (Fri May 03 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/ellipticcurvecryptography@1.3.0`, `@quenty/servicebag@11.3.0`, `@quenty/statestack@14.3.0`, `@quenty/userserviceutils@9.3.0`
+  - Users/quenty/service bag profiling [#466](https://github.com/Quenty/NevermoreEngine/pull/466) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Apr 28 2024)
 
 #### 🚀 Enhancement
