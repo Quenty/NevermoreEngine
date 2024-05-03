@@ -1,23 +1,18 @@
-# v14.3.0 (Fri May 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/service bag profiling [#466](https://github.com/Quenty/NevermoreEngine/pull/466) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Better warrning and error messsages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.2.0...@quenty/statestack@14.3.0) (2024-05-03)
+
+
+### Bug Fixes
+
+* Better warrning and error messsages ([faaa31b](https://github.com/Quenty/NevermoreEngine/commit/faaa31b0d543816552e893908a320fb20be1587c))
+
+
+
+
 
 # [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/statestack@14.1.0...@quenty/statestack@14.2.0) (2024-04-27)
 

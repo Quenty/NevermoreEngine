@@ -1,20 +1,18 @@
-# v11.3.0 (Fri May 03 2024)
-
-#### 🚀 Enhancement
-
-- Users/quenty/service bag profiling [#466](https://github.com/Quenty/NevermoreEngine/pull/466) ([@Quenty](https://github.com/Quenty))
-- feat: Add logging to service bag ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.2.0...@quenty/servicebag@11.3.0) (2024-05-03)
+
+
+### Features
+
+* Add logging to service bag ([d1a2804](https://github.com/Quenty/NevermoreEngine/commit/d1a28048a9fc02d8ab2d272f7a0eb1c81c4f60f6))
+
+
+
+
 
 # [11.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.1.0...@quenty/servicebag@11.2.0) (2024-04-27)
 
