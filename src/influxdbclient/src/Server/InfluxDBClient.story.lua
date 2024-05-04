@@ -2,7 +2,7 @@
 	@class InfluxDBClient.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local InfluxDBClient = require("InfluxDBClient")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")

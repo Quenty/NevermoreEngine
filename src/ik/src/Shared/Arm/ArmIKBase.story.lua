@@ -2,7 +2,7 @@
 	@class ArmIKBase.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")

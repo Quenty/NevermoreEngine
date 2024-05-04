@@ -2,7 +2,7 @@
 	@class BinderProvider.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local BinderProvider = require("BinderProvider")
 local Binder = require("Binder")
