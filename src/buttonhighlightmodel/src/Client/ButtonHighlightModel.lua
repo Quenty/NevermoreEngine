@@ -229,6 +229,19 @@ function ButtonHighlightModel:ObservePercentPressed(acceleration)
 end
 
 --[=[
+	Observes target for how pressed the button is
+	@return Observable<number>
+]=]
+function ButtonHighlightModel:ObservePercentPressedTarget()
+	return self._isPressed:Observe()
+		:Pipe({
+			Rx.map(function(value)
+				return value and 1 or 0
+			end);
+		})
+end
+
+--[=[
 	Returns true if highlighted
 
 	@return boolean
@@ -334,6 +347,19 @@ end
 ]=]
 function ButtonHighlightModel:ObserveIsChoosen()
 	return self._isChoosen:Observe()
+end
+
+--[=[
+	Observes target for if the button is selected or not
+	@return Observable<number>
+]=]
+function ButtonHighlightModel:ObservePercentChoosenTarget()
+	return self._isChoosen:Observe()
+		:Pipe({
+			Rx.map(function(value)
+				return value and 1 or 0
+			end);
+		})
 end
 
 --[=[
