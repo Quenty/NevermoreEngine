@@ -1,5 +1,6 @@
 {
   "name": "influxdbclient",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

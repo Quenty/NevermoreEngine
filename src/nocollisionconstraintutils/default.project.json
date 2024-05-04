@@ -1,5 +1,6 @@
 {
   "name": "nocollisionconstraintutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

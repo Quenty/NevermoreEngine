@@ -1,5 +1,6 @@
 {
   "name": "vector3int16utils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

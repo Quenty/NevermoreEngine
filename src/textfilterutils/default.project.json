@@ -1,5 +1,6 @@
 {
   "name": "textfilterutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

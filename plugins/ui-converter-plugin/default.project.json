@@ -1,5 +1,6 @@
 {
   "name": "ui-converter-plugin",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

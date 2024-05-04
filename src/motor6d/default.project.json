@@ -1,5 +1,6 @@
 {
   "name": "motor6d",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

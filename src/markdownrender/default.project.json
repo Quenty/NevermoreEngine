@@ -1,5 +1,6 @@
 {
   "name": "MarkdownRender",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

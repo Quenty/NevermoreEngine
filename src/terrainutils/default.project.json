@@ -1,5 +1,6 @@
 {
   "name": "terrainutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

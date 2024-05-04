@@ -1,5 +1,6 @@
 {
   "name": "utf8",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

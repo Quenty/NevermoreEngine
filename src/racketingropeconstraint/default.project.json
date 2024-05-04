@@ -1,5 +1,6 @@
 {
   "name": "racketingropeconstraint",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

@@ -1,5 +1,6 @@
 {
   "name": "promise",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

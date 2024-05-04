@@ -1,5 +1,6 @@
 {
   "name": "rogue-humanoid",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

@@ -1,5 +1,6 @@
 {
   "name": "valueobject",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }
