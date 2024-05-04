@@ -7,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AvatarEditorService = game:GetService("AvatarEditorService")
+local RunService = game:GetService("RunService")
 
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
@@ -464,6 +465,10 @@ function AvatarEditorUtils.promptAllowInventoryReadAccess()
 
 	if not ok then
 		promise:Reject(err or "Failed to PromptAllowInventoryReadAccess")
+	end
+
+	if not RunService:IsRunning() then
+		promise:Resolve()
 	end
 
 	return promise
