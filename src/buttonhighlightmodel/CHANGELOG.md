@@ -1,24 +1,18 @@
-# v14.2.1 (Sat May 04 2024)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, null[@unrooot](https://github.com/unrooot), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Add missing ObservePercentTarget methods [#467](https://github.com/Quenty/NevermoreEngine/pull/467) ([@unrooot](https://github.com/unrooot))
-- fix: Add missing ObservePercentTarget methods ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.2.0...@quenty/buttonhighlightmodel@14.2.1) (2024-05-04)
+
+
+### Bug Fixes
+
+* Add missing ObservePercentTarget methods ([530d059](https://github.com/Quenty/NevermoreEngine/commit/530d0590b20d4fb18c0c6258adaed31abff6e229))
+
+
+
+
 
 # [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.1.1...@quenty/buttonhighlightmodel@14.2.0) (2024-04-27)
 
