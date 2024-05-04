@@ -1,3 +1,16 @@
+# (Sat May 04 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttonhighlightmodel@14.2.1`
+  - fix: Add missing ObservePercentTarget methods [#467](https://github.com/Quenty/NevermoreEngine/pull/467) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Fri May 03 2024)
 
 #### 🚀 Enhancement

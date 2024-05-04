@@ -1,3 +1,20 @@
+# v14.2.1 (Sat May 04 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, null[@unrooot](https://github.com/unrooot), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Add missing ObservePercentTarget methods [#467](https://github.com/Quenty/NevermoreEngine/pull/467) ([@unrooot](https://github.com/unrooot))
+- fix: Add missing ObservePercentTarget methods ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
