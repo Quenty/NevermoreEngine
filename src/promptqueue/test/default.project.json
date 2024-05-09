@@ -1,0 +1,12 @@
+{
+  "name": "PromptQueueTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "promptqueue": {
+        "$path": ".."
+      }
+    }
+  }
+}
