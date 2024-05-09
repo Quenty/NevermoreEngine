@@ -39,6 +39,8 @@ function CameraStateTweener.new(serviceBagOrCameraStack, cameraEffect, speed)
 		error("Bad serviceBagOrCameraStack")
 	end
 
+	assert(self._cameraStack, "No CameraStack")
+
 	local cameraBelow, assign = self._cameraStack:GetNewStateBelow()
 
 	self._cameraEffect = cameraEffect
