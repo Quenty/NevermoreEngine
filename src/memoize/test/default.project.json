@@ -1,0 +1,11 @@
+{
+  "name": "MemoizeTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "memoize": {
+        "$path": ".."
+      }
+    }
+  }
+}
