@@ -21,7 +21,7 @@ AnimationTrackPlayer.__index = AnimationTrackPlayer
 	all data is found.
 
 	@param animationTarget Instance | Observable<Instance>
-	@param animationId string | number
+	@param animationId string | number | nil
 	@return AnimationTrackPlayer
 ]=]
 function AnimationTrackPlayer.new(animationTarget, animationId)
