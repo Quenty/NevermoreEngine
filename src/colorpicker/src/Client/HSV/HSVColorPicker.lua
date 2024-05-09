@@ -223,7 +223,7 @@ function HSVColorPicker:_render()
 			Position = props.Position;
 			BackgroundTransparency = 1;
 			Size = UDim2.new(1, 0, 1, 0);
-			ZIndex = Blend.Computed(picker:GetIsPressedValue(), function(isPressed)
+			ZIndex = Blend.Computed(picker:ObserveIsPressed(), function(isPressed)
 				return isPressed and 2 or 1
 			end);
 			[Blend.Children] = {
