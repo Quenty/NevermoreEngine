@@ -11,6 +11,7 @@ local BasicPane = require("BasicPane")
 local Promise = require("Promise")
 local Maid = require("Maid")
 local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local TransitionModel = setmetatable({}, BasicPane)
 TransitionModel.ClassName = "TransitionModel"
@@ -27,11 +28,8 @@ TransitionModel.__index = TransitionModel
 function TransitionModel.new()
 	local self = setmetatable(BasicPane.new(), TransitionModel)
 
-	self._isShowingComplete = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isShowingComplete)
-
-	self._isHidingComplete = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isHidingComplete)
+	self._isShowingComplete = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isHidingComplete = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self._showCallback = nil
 	self._hideCallback = nil
@@ -48,15 +46,27 @@ function TransitionModel.new()
 end
 
 --[=[
+	Returnes true if it's a transition model
+
+	@param value any
+	@return boolean
+]=]
+function TransitionModel.isTransitionModel(value)
+	return DuckTypeUtils.isImplementation(TransitionModel, value)
+end
+
+--[=[
 	Shows the model and promises when the showing is complete.
 
 	@param doNotAnimate boolean
 	@return Promise
 ]=]
 function TransitionModel:PromiseShow(doNotAnimate)
+	local promise = self:_promiseIsShown()
+
 	self:Show(doNotAnimate)
 
-	return self:_promiseIsShown()
+	return promise
 end
 
 --[=[
@@ -66,9 +76,11 @@ end
 	@return Promise
 ]=]
 function TransitionModel:PromiseHide(doNotAnimate)
+	local promise = self:_promiseIsHidden()
+
 	self:Hide(doNotAnimate)
 
-	return self:_promiseIsHidden()
+	return promise
 end
 
 --[=[
@@ -251,7 +263,11 @@ function TransitionModel:_executeShow(doNotAnimate)
 		self._isShowingComplete.Value = true
 	end)
 
-	self._maid._transition = maid
+	if self.Destroy then
+		self._maid._transition = maid
+	else
+		maid:DoCleaning()
+	end
 end
 
 function TransitionModel:_executeHide(doNotAnimate)
@@ -280,7 +296,11 @@ function TransitionModel:_executeHide(doNotAnimate)
 		self._isHidingComplete.Value = true
 	end)
 
-	self._maid._transition = maid
+	if self.Destroy then
+		self._maid._transition = maid
+	else
+		maid:DoCleaning()
+	end
 end
 
 return TransitionModel

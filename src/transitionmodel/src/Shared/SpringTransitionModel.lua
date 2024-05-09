@@ -9,6 +9,7 @@ local TransitionModel = require("TransitionModel")
 local SpringObject = require("SpringObject")
 local Promise = require("Promise")
 local Maid = require("Maid")
+local SpringUtils = require("SpringUtils")
 
 local SpringTransitionModel = setmetatable({}, BasicPane)
 SpringTransitionModel.ClassName = "SpringTransitionModel"
@@ -25,20 +26,14 @@ SpringTransitionModel.__index = SpringTransitionModel
 function SpringTransitionModel.new(showTarget, hideTarget)
 	local self = setmetatable(BasicPane.new(), SpringTransitionModel)
 
-	self._transitionModel = TransitionModel.new()
-	self._transitionModel:BindToPaneVisbility(self)
-	self._maid:GiveTask(self._transitionModel)
-
 	self._showTarget = showTarget or 1
-	if hideTarget then
-		self._hideTarget = hideTarget
-	else
-		self._hideTarget = 0*self._showTarget
-	end
+	self._hideTarget = hideTarget
 
-	self._springObject = SpringObject.new(self._hideTarget)
+	self._transitionModel = self._maid:Add(TransitionModel.new())
+	self._transitionModel:BindToPaneVisbility(self)
+
+	self._springObject = self._maid:Add(SpringObject.new(self:_computeHideTarget()))
 	self._springObject.Speed = 30
-	self._maid:GiveTask(self._springObject)
 
 	self._transitionModel:SetPromiseShow(function(maid, doNotAnimate)
 		return self:_promiseShow(maid, doNotAnimate)
@@ -48,6 +43,38 @@ function SpringTransitionModel.new(showTarget, hideTarget)
 	end)
 
 	return self
+end
+
+--[=[
+	Sets the show target for the transition model
+
+	@param hideTarget T?
+	@param doNotAnimate boolean?
+]=]
+function SpringTransitionModel:SetShowTarget(showTarget, doNotAnimate)
+	self._showTarget = SpringUtils.toLinearIfNeeded(showTarget or 1)
+
+	if self:IsVisible() then
+		self._springObject:SetTarget(self._showTarget, doNotAnimate)
+	else
+		self._springObject:SetTarget(self:_computeHideTarget(), doNotAnimate)
+	end
+end
+
+--[=[
+	Sets the hide target for the transition model
+
+	@param hideTarget T?
+	@param doNotAnimate boolean?
+]=]
+function SpringTransitionModel:SetHideTarget(hideTarget, doNotAnimate)
+	self._hideTarget = hideTarget
+
+	if self:IsVisible() then
+		self._springObject:SetTarget(self._showTarget, doNotAnimate)
+	else
+		self._springObject:SetTarget(self:_computeHideTarget(), doNotAnimate)
+	end
 end
 
 --[=[
@@ -214,12 +241,20 @@ function SpringTransitionModel:_promiseShow(maid, doNotAnimate)
 end
 
 function SpringTransitionModel:_promiseHide(maid, doNotAnimate)
-	self._springObject:SetTarget(self._hideTarget, doNotAnimate)
+	self._springObject:SetTarget(self:_computeHideTarget(), doNotAnimate)
 
 	if doNotAnimate then
 		return Promise.resolved()
 	else
 		return maid:GivePromise(self._springObject:PromiseFinished())
+	end
+end
+
+function SpringTransitionModel:_computeHideTarget()
+	if self._hideTarget then
+		return SpringUtils.toLinearIfNeeded(self._hideTarget)
+	else
+		return 0*SpringUtils.toLinearIfNeeded(self._showTarget)
 	end
 end
 
