@@ -100,6 +100,22 @@ function AvatarEditorUtils.promiseItemDetails(itemId: number, itemType: AvatarIt
 	end)
 end
 
+function AvatarEditorUtils.tryGetAccessoryType(avatarAssetType)
+	if not avatarAssetType then
+		return nil, "No avatarAssetType"
+	end
+
+	local accessoryType
+	local ok, err = pcall(function()
+		accessoryType = AvatarEditorService:GetAccessoryType(avatarAssetType)
+	end)
+	if not ok then
+		return nil, err or "Failed to GetAccessoryType from avatarAssetType"
+	end
+
+	return accessoryType
+end
+
 --[=[
 	Gets the item details for a list of items at once. More efficient than [AvatarEditorService.GetItemDetails]
 	if you need to get all the item details of a list.
