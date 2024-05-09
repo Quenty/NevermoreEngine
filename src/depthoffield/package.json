@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/acceltween": "file:../acceltween",
+    "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/basicpane": "file:../basicpane",
     "@quenty/blend": "file:../blend",
