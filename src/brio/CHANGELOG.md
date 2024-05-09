@@ -1,3 +1,20 @@
+# v14.3.0 (Thu May 09 2024)
+
+#### 🚀 Enhancement
+
+- Updates [#468](https://github.com/Quenty/NevermoreEngine/pull/468) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Bootstrap specifically to loader ([@Quenty](https://github.com/Quenty))
+- fix: Fix .package-lock.json replicating in packages ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
