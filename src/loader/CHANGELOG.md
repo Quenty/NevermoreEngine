@@ -1,25 +1,20 @@
-# v10.3.0 (Thu May 09 2024)
-
-#### 🚀 Enhancement
-
-- Updates [#468](https://github.com/Quenty/NevermoreEngine/pull/468) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix hoarcekat asset addition logic ([@Quenty](https://github.com/Quenty))
-- fix: Immediate replication mode for loader and ability to bootstrap stories faster ([@Quenty](https://github.com/Quenty))
-- fix: Fix .package-lock.json replicating in packages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.2.0...@quenty/loader@10.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+* Fix hoarcekat asset addition logic ([89e2c18](https://github.com/Quenty/NevermoreEngine/commit/89e2c181f83f9bca4d659477702d695af6e7b0cd))
+* Immediate replication mode for loader and ability to bootstrap stories faster ([43967ec](https://github.com/Quenty/NevermoreEngine/commit/43967ecf3947241138dd3a44ba23ffe05de6d2b0))
+
+
+
+
 
 # [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/loader@10.1.0...@quenty/loader@10.2.0) (2024-04-27)
 

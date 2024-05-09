@@ -1,24 +1,19 @@
-# v4.2.0 (Thu May 09 2024)
-
-#### 🚀 Enhancement
-
-- Updates [#468](https://github.com/Quenty/NevermoreEngine/pull/468) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: update default project to ignore package-lock.json ([@Quenty](https://github.com/Quenty))
-- fix: Fix .package-lock.json replicating in packages ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.2.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.1.0...@quenty/nevermore-cli@4.2.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/Nevermore/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+* update default project to ignore package-lock.json ([6e7f533](https://github.com/Quenty/Nevermore/commit/6e7f533fddee8efb803febad4cc97020b5e59703))
+
+
+
+
 
 # [4.1.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.0.2...@quenty/nevermore-cli@4.1.0) (2024-04-27)
 

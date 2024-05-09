@@ -1,6 +1,6 @@
 {
   "name": "@quenty/sunpositionutils",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Utility to position the sun and to retrieve sun information specific to Roblox.",
   "keywords": [
     "Roblox",
