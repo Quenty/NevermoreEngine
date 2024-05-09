@@ -8,7 +8,6 @@ local require = require(script.Parent.loader).load(script)
 local Snackbar = require("Snackbar")
 local SnackbarScreenGuiProvider = require("SnackbarScreenGuiProvider")
 local Maid = require("Maid")
-local Promise = require("Promise")
 local SnackbarOptionUtils = require("SnackbarOptionUtils")
 local PromptQueue = require("PromptQueue")
 

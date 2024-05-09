@@ -48,7 +48,7 @@ end
 --[=[
 	Sets the show target for the transition model
 
-	@param hideTarget T?
+	@param showTarget T?
 	@param doNotAnimate boolean?
 ]=]
 function SpringTransitionModel:SetShowTarget(showTarget, doNotAnimate)
