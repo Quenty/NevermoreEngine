@@ -1,5 +1,6 @@
 {
   "name": "enabledmixin",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

@@ -218,14 +218,14 @@ function CameraStackService:GetRawStack()
 end
 
 --[=[
-	Gets the current camera stack
+	Gets the global camera stack for this service
 
 	@return CameraStack
 ]=]
 function CameraStackService:GetCameraStack()
 	assert(self._cameraStack, "Not initialized")
 
-	return self._cameraStack:GetStack()
+	return self._cameraStack
 end
 
 --[=[

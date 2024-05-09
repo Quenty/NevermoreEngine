@@ -48,6 +48,10 @@ function ReplicatorReferences:UnsetReference(orig, replicated)
 	end
 end
 
+function ReplicatorReferences:GetReference(orig)
+	return self._lookup[orig]
+end
+
 function ReplicatorReferences:_fireSubs(orig, newValue)
 	assert(typeof(orig) == "Instance", "Bad orig")
 

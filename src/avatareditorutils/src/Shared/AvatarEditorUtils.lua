@@ -7,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AvatarEditorService = game:GetService("AvatarEditorService")
+local RunService = game:GetService("RunService")
 
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
@@ -97,6 +98,22 @@ function AvatarEditorUtils.promiseItemDetails(itemId: number, itemType: AvatarIt
 
 		return resolve(itemDetails)
 	end)
+end
+
+function AvatarEditorUtils.tryGetAccessoryType(avatarAssetType)
+	if not avatarAssetType then
+		return nil, "No avatarAssetType"
+	end
+
+	local accessoryType
+	local ok, err = pcall(function()
+		accessoryType = AvatarEditorService:GetAccessoryType(avatarAssetType)
+	end)
+	if not ok then
+		return nil, err or "Failed to GetAccessoryType from avatarAssetType"
+	end
+
+	return accessoryType
 end
 
 --[=[
@@ -464,6 +481,10 @@ function AvatarEditorUtils.promptAllowInventoryReadAccess()
 
 	if not ok then
 		promise:Reject(err or "Failed to PromptAllowInventoryReadAccess")
+	end
+
+	if not RunService:IsRunning() then
+		promise:Resolve()
 	end
 
 	return promise

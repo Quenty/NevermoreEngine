@@ -1,5 +1,6 @@
 {
   "name": "rogue-properties",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

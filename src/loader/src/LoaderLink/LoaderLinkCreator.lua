@@ -29,9 +29,29 @@ function LoaderLinkCreator.new(root, references, isRoot)
 	self._hasLoaderCount = self._maid:Add(Instance.new("IntValue"))
 	self._hasLoaderCount.Value = 0
 
-	self._needsLoader = self._maid:Add(Instance.new("BoolValue"))
-	self._needsLoader.Value = false
+	self._provideLoader = self._maid:Add(Instance.new("BoolValue"))
+	self._provideLoader.Value = false
 
+	-- prevent frame delay
+	self:_setupEventTracking()
+	self:_setupRendering()
+
+	return self
+end
+
+function LoaderLinkCreator:_setupEventTracking()
+	self._maid:GiveTask(self._root.ChildAdded:Connect(function(child)
+		self:_handleChildAdded(child)
+	end))
+	self._maid:GiveTask(self._root.ChildRemoved:Connect(function(child)
+		self:_handleChildRemoved(child)
+	end))
+
+	for _, child in pairs(self._root:GetChildren()) do
+		self:_handleChildAdded(child)
+	end
+
+	-- Need to do this AFTER child added loop
 	if self._references then
 		self._maid:GiveTask(self._references:ObserveReferenceChanged(loader, function(replicatedLoader)
 			if replicatedLoader and replicatedLoader ~= loader then
@@ -40,52 +60,49 @@ function LoaderLinkCreator.new(root, references, isRoot)
 				self._maid._trackFakeLoader = nil
 			end
 		end))
-
-		self._maid:GiveTask(self._needsLoader.Changed:Connect(function()
-			if self._needsLoader.Value then
-				self._maid._loader = self:_renderLoaderWithReferences()
-			else
-				self._maid._loader = nil
-			end
-		end))
 	else
-		-- No references, just render as needed
-		self._maid:GiveTask(self._needsLoader.Changed:Connect(function()
-			if self._needsLoader.Value then
-				self._maid._loader = self:_doLoaderRender(loader)
-			else
-				self._maid._loader = nil
-			end
-		end))
-
 		self._maid:GiveTask(self:_countLoaderReferences(loader))
 	end
 
 	-- Update state
 	self._maid:GiveTask(self._childRequiresLoaderCount.Changed:Connect(function()
-		self:_updateNeedsLoader()
+		self:_updateProviderLoader()
 	end))
 	self._maid:GiveTask(self._hasLoaderCount.Changed:Connect(function()
-		self:_updateNeedsLoader()
+		self:_updateProviderLoader()
 	end))
-	self:_updateNeedsLoader()
-
-	-- Do actual setup
-	self._maid:GiveTask(self._root.ChildAdded:Connect(function(child)
-		self:_handleChildAdded(child)
-	end))
-	self._maid:GiveTask(self._root.ChildRemoved:Connect(function(child)
-		self:_handleChildRemoved(child)
-	end))
-	for _, child in pairs(self._root:GetChildren()) do
-		self:_handleChildAdded(child)
-	end
-
-	return self
+	self:_updateProviderLoader()
 end
 
-function LoaderLinkCreator:_updateNeedsLoader()
-	self._needsLoader.Value = (self._childRequiresLoaderCount.Value > 0) and self._hasLoaderCount.Value <= 0
+function LoaderLinkCreator:_setupRendering()
+	if self._references then
+		local function renderLoader()
+			if self._provideLoader.Value then
+				self._maid._loader = self:_renderLoaderWithReferences()
+			else
+				self._maid._loader = nil
+			end
+		end
+
+		self._maid:GiveTask(self._provideLoader.Changed:Connect(renderLoader))
+		renderLoader()
+	else
+		local function renderLoader()
+			if self._provideLoader.Value then
+				self._maid._loader = self:_doLoaderRender(loader)
+			else
+				self._maid._loader = nil
+			end
+		end
+
+		-- No references, just render as needed
+		self._maid:GiveTask(self._provideLoader.Changed:Connect(renderLoader))
+		renderLoader()
+	end
+end
+
+function LoaderLinkCreator:_updateProviderLoader()
+	self._provideLoader.Value = (self._childRequiresLoaderCount.Value > 0) and self._hasLoaderCount.Value <= 0
 end
 
 function LoaderLinkCreator:_handleChildRemoved(child)
@@ -96,7 +113,13 @@ function LoaderLinkCreator:_handleChildAdded(child)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	if child:IsA("ModuleScript") then
-		self._maid[child] = self:_incrementNeededLoader(1)
+		if child.Name ~= "loader" then
+			self._maid[child] = self:_incrementNeededLoader(1)
+		else
+			if child ~= self._lastProvidedLoader then
+				self._maid[child] = self:_addToHasLoaderCount(1)
+			end
+		end
 	elseif child:IsA("Folder") then
 		-- TODO: Maybe add to children with node_modules explicitly in its list.
 		self._maid[child] = LoaderLinkCreator.new(child, self._references)
@@ -119,7 +142,10 @@ end
 
 function LoaderLinkCreator:_doLoaderRender(value)
 	local loaderLink = LoaderLinkUtils.create(value, loader.Name)
+	self._lastProvidedLoader = loaderLink
+
 	loaderLink.Parent = self._root
+
 
 	return loaderLink
 end
@@ -133,7 +159,7 @@ function LoaderLinkCreator:_incrementNeededLoader(amount)
 	end
 end
 
-function LoaderLinkCreator:_addToLoaderCount(amount)
+function LoaderLinkCreator:_addToHasLoaderCount(amount)
 	assert(type(amount) == "number", "Bad amount")
 
 	self._hasLoaderCount.Value = self._hasLoaderCount.Value + amount
@@ -149,12 +175,12 @@ function LoaderLinkCreator:_countLoaderReferences(robloxInst)
 
 	-- TODO: Maybe handle loader reparenting more elegantly? this seems deeply unlikely.
 	if robloxInst.Parent == self._root then
-		maid._current = self:_addToLoaderCount(1)
+		maid._current = self:_addToHasLoaderCount(1)
 	end
 
 	maid:GiveTask(robloxInst:GetPropertyChangedSignal("Parent"):Connect(function()
 		if robloxInst.Parent == self._root then
-			maid._current = self:_addToLoaderCount(1)
+			maid._current = self:_addToHasLoaderCount(1)
 		else
 			maid._current = nil
 		end

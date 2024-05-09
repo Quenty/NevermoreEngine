@@ -8,11 +8,17 @@ local HttpService = game:GetService("HttpService")
 
 local BaseObject = require("BaseObject")
 local CustomCameraEffect = require("CustomCameraEffect")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local CameraStack = setmetatable({}, BaseObject)
 CameraStack.ClassName = "CameraStack"
 CameraStack.__index = CameraStack
 
+--[=[
+	Constructs a new camera stack
+
+	@return CameraStack
+]=]
 function CameraStack.new()
 	local self = setmetatable(BaseObject.new(), CameraStack)
 
@@ -20,6 +26,14 @@ function CameraStack.new()
 	self._disabledSet = {}
 
 	return self
+end
+
+--[=[
+	@param value any
+	@return boolean
+]=]
+function CameraStack.isCameraStack(value)
+	return DuckTypeUtils.isImplementation(CameraStack, value)
 end
 
 --[=[

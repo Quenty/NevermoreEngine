@@ -28,6 +28,7 @@
   "dependencies": {
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
+    "@quenty/memoize": "file:../memoize",
     "@quenty/promise": "file:../promise"
   },
   "publishConfig": {

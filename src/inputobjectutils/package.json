@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
-    "@quenty/maid": "file:../maid"
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx"
   }
 }

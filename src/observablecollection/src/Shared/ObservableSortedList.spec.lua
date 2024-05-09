@@ -2,7 +2,7 @@
 	@class ObservableSortedList.spec.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local ObservableSortedList = require("ObservableSortedList")
 local Rx = require("Rx")

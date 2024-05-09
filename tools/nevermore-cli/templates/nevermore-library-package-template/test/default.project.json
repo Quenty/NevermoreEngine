@@ -1,5 +1,6 @@
 {
   "name": "{{packageNameProper}}Test",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {

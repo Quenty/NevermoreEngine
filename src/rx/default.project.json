@@ -1,5 +1,6 @@
 {
   "name": "rx",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

@@ -5,7 +5,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local DraggableSnackbar = require("DraggableSnackbar")
+local Snackbar = require("Snackbar")
+local SnackbarScreenGuiProvider = require("SnackbarScreenGuiProvider")
+local Maid = require("Maid")
+local SnackbarOptionUtils = require("SnackbarOptionUtils")
+local PromptQueue = require("PromptQueue")
 
 local SnackbarServiceClient = {}
 SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
@@ -13,8 +17,12 @@ SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
 function SnackbarServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
 
-	self._currentSnackbar = nil
+	self._snackbarScreenGuiProvider = self._serviceBag:GetService(SnackbarScreenGuiProvider)
+	self._screenGui = self._maid:Add(self._snackbarScreenGuiProvider:Get("SNACKBAR"))
+
+	self._queue = self._maid:Add(PromptQueue.new())
 end
 
 --[=[
@@ -29,54 +37,50 @@ function SnackbarServiceClient:SetScreenGui(screenGui)
 	return self
 end
 
--- Automatically makes a snackbar and shows it
--- @param text to show
--- @param[opt] options
---[[
-		If options are included, in this format, a call to action will be presented to the player
-		options = {
-			CallToAction = {
-				Text = "Action";
-				OnClick = function() end;
-			};
+--[=[
+	Makes a snackbar and shows it to the user
+
+	If options are included, in this format, a call to action will be presented to the player
+
+	```
+	{
+		CallToAction = {
+			Text = "Action";
+			OnClick = function() end;
 		};
-]]
+	};
+	```
+
+	@param text string
+	@param options SnackbarOptions
+]=]
 function SnackbarServiceClient:ShowSnackbar(text, options)
 	assert(type(text) == "string", "text must be a string")
+	assert(SnackbarOptionUtils.isSnackbarOptions(options) or options == nil, "Bad snackbarOptions")
 
-	local snackbar = DraggableSnackbar.new(self._screenGui, text, true, options)
-	self:_showSnackbar(snackbar)
+	local snackbar = Snackbar.new(text, options)
+	snackbar.Gui.Parent = self._screenGui
+
+	self._queue:HideCurrent()
+
+	self._maid:GivePromise(self._queue:Queue(snackbar))
+		:Finally(function()
+			snackbar:Destroy()
+		end)
 
 	return snackbar
 end
 
-function SnackbarServiceClient:_showSnackbar(snackbar)
-	assert(snackbar, "Must send a snackbar")
+function SnackbarServiceClient:HideCurrent(doNotAnimate)
+	return self._queue:HideCurrent(doNotAnimate)
+end
 
-	if self._currentSnackbar == snackbar and self._currentSnackbar:IsVisible() then
-		snackbar:Dismiss()
-	else
-		local dismissedSnackbar = false
+function SnackbarServiceClient:ClearQueue(doNotAnimate)
+	self._queue:Clear(doNotAnimate)
+end
 
-		if self._currentSnackbar then
-			if self._currentSnackbar:IsVisible() then
-				self._currentSnackbar:Dismiss()
-				self._currentSnackbar = nil
-				dismissedSnackbar = true
-			end
-		end
-
-		self._currentSnackbar = snackbar
-		if dismissedSnackbar then
-			task.delay(snackbar.FadeTime, function()
-				if self._currentSnackbar == snackbar then
-					snackbar:Show()
-				end
-			end)
-		else
-			snackbar:Show()
-		end
-	end
+function SnackbarServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return SnackbarServiceClient

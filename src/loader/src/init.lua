@@ -55,10 +55,6 @@ function Loader.bootstrapGame(packages)
 
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
 
-	-- We need to wait here once we "populate" the loader so the Ancestry/query events can
-	-- fire in Signal deferred mode.
-	self:_waitForNextDeferFrame()
-
 	return self
 end
 
@@ -71,9 +67,25 @@ function Loader.bootstrapPlugin(packages)
 
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
 
-	-- We need to wait here once we "populate" the loader so the Ancestry/query events can
-	-- fire in Signal deferred mode.
-	self:_waitForNextDeferFrame()
+	return self
+end
+
+function Loader.bootstrapStory(storyScript)
+	assert(typeof(storyScript) == "Instance", "Bad storyScript")
+
+	-- Prepopulate global package roots
+	local topNodeModule = storyScript
+	for node_modules in DependencyUtils.iterNodeModules(storyScript) do
+		if not node_modules:IsDescendantOf(topNodeModule) then
+			topNodeModule = node_modules
+		end
+	end
+
+	local self = Loader.new(topNodeModule.Parent, ReplicationType.PLUGIN)
+
+	self:_setupLoaderPopulation()
+
+	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(topNodeModule.Parent)
 
 	return self
 end
@@ -101,15 +113,6 @@ function Loader:__call(request)
 	else
 		return require(request)
 	end
-end
-
-function Loader:_waitForNextDeferFrame()
-	local signal = Instance.new("BindableEvent")
-	task.defer(function()
-		signal:Fire()
-	end)
-	signal.Event:Wait()
-	signal:Destroy()
 end
 
 function Loader:_findDependency(request)
@@ -141,9 +144,7 @@ function Loader:_findDependency(request)
 	-- Just standard dependency search
 	local foundBackup = DependencyUtils.findDependency(self._packages, request, self._replicationType)
 	if foundBackup then
-		if RunService:IsRunning() then
-			warn(string.format("[Loader] - Failed to find package %q in package tracker\n%s", request, debug.traceback()))
-		end
+		warn(string.format("[Loader] - Failed to find package %q in package tracker\n%s", request, debug.traceback()))
 
 		-- Ensure hoarcekat story has a link to use
 		-- TODO: Maybe add to global package cache instead...

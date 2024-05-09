@@ -2,7 +2,7 @@
 	Unit tests for RxBrioUtils.lua
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local RxBrioUtils = require("RxBrioUtils")
 local Brio = require("Brio")

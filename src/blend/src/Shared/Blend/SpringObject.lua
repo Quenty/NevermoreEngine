@@ -84,7 +84,11 @@ end
 	@return Observable<T>
 ]=]
 function SpringObject:Observe()
-	return self:ObserveRenderStepped()
+	if RunService:IsClient() then
+		return self:ObserveOnSignal(RunService.RenderStepped)
+	else
+		return self:ObserveOnSignal(RunService.Stepped)
+	end
 end
 
 --[=[

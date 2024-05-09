@@ -427,7 +427,7 @@ function PackageTracker:_tryStorePackage(fullPackageName, packageInst)
 	return function()
 		local index = table.find(self._subpackagesTrackerList, packageTracker)
 		if index then
-			table.remove(self._subpackagesTrackerList, packageTracker)
+			table.remove(self._subpackagesTrackerList, index)
 		end
 
 		if self._subpackagesMap[fullPackageName] == packageInst then

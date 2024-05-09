@@ -1,5 +1,6 @@
 {
   "name": "voicechat",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

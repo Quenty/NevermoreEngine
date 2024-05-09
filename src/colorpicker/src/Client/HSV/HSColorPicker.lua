@@ -10,7 +10,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
-local ColorPickerInput = require("ColorPickerInput")
+local ButtonDragModel = require("ButtonDragModel")
 local HSColorPickerCursor = require("HSColorPickerCursor")
 local ValueObject = require("ValueObject")
 
@@ -21,26 +21,17 @@ HSColorPicker.__index = HSColorPicker
 function HSColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSColorPicker)
 
-	self._hsvColorValue = Instance.new("Vector3Value")
-	self._hsvColorValue.Value = Vector3.zero
-	self._maid:GiveTask(self._hsvColorValue)
+	self._hsvColorValue = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
+	self._sizeValue = self._maid:Add(ValueObject.new(Vector2.new(4, 4), "Vector2"))
+	self._transparency = self._maid:Add(ValueObject.new(0, "number"))
+
+	self._dragModel = self._maid:Add(ButtonDragModel.new())
+	self._dragModel:SetClampWithinButton(true)
+
+	self._cursor = self._maid:Add(HSColorPickerCursor.new())
+	self._preview = self._maid:Add(ColorPickerCursorPreview.new())
 
 	self.ColorChanged = self._hsvColorValue.Changed
-
-	self._sizeValue = ValueObject.new(Vector2.new(4, 4), "Vector2")
-	self._maid:GiveTask(self._sizeValue)
-
-	self._transparency = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._transparency)
-
-	self._input = ColorPickerInput.new()
-	self._maid:GiveTask(self._input)
-
-	self._cursor = HSColorPickerCursor.new()
-	self._maid:GiveTask(self._cursor)
-
-	self._preview = ColorPickerCursorPreview.new()
-	self._maid:GiveTask(self._preview)
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
 		self.Gui = gui
@@ -52,11 +43,13 @@ function HSColorPicker.new()
 	end))
 
 	-- Binding
-	self._maid:GiveTask(self._input.PositionChanged:Connect(function()
-		local position = self._input:GetPosition()
-		local v = self._hsvColorValue.Value.z
-		self._hsvColorValue.Value = Vector3.new(1 - position.x, 1 - position.y, v)
-		self._cursor:SetPosition(position)
+	self._maid:GiveTask(self._dragModel.DragPositionChanged:Connect(function()
+		local position = self._dragModel:GetDragPosition()
+		if position then
+			local v = self._hsvColorValue.Value.z
+			self._hsvColorValue.Value = Vector3.new(1 - position.x, 1 - position.y, v)
+			self._cursor:SetPosition(position)
+		end
 	end))
 
 	self._maid:GiveTask(self._hsvColorValue.Changed:Connect(function()
@@ -66,8 +59,8 @@ function HSColorPicker.new()
 	end))
 
 	-- Setup preview
-	self._maid:GiveTask(self._input.IsPressedChanged:Connect(function()
-		self._preview:SetVisible(self._input:GetIsPressed())
+	self._maid:GiveTask(self._dragModel:ObserveIsDragging():Subscribe(function(isDragging)
+		self._preview:SetVisible(isDragging)
 	end))
 	self._maid:GiveTask(self._cursor.PositionChanged:Connect(function()
 		self._preview:SetPosition(self._cursor:GetPosition())
@@ -85,8 +78,8 @@ end
 
 	@return BoolValue
 ]=]
-function HSColorPicker:GetIsPressedValue()
-	return self._input:GetIsPressedValue()
+function HSColorPicker:ObserveIsPressed()
+	return self._dragModel:ObserveIsPressed()
 end
 
 function HSColorPicker:_updateHintedColors()
@@ -183,7 +176,7 @@ function HSColorPicker:_render()
 		Image = "rbxassetid://9290917908";
 		ImageTransparency = self._transparency;
 		[Blend.Instance] = function(inst)
-			self._input:SetButton(inst)
+			self._dragModel:SetButton(inst)
 		end;
 		[Blend.Children] = {
 			Blend.New "UIAspectRatioConstraint" {

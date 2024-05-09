@@ -1,5 +1,6 @@
 {
   "name": "color3serializationutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

@@ -1,5 +1,6 @@
 {
   "name": "animationtrackutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }
