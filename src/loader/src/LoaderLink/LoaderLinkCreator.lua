@@ -115,6 +115,10 @@ function LoaderLinkCreator:_handleChildAdded(child)
 	if child:IsA("ModuleScript") then
 		if child.Name ~= "loader" then
 			self._maid[child] = self:_incrementNeededLoader(1)
+		else
+			if child ~= self._lastProvidedLoader then
+				self._maid[child] = self:_addToHasLoaderCount(1)
+			end
 		end
 	elseif child:IsA("Folder") then
 		-- TODO: Maybe add to children with node_modules explicitly in its list.
@@ -138,7 +142,10 @@ end
 
 function LoaderLinkCreator:_doLoaderRender(value)
 	local loaderLink = LoaderLinkUtils.create(value, loader.Name)
+	self._lastProvidedLoader = loaderLink
+
 	loaderLink.Parent = self._root
+
 
 	return loaderLink
 end
@@ -152,7 +159,7 @@ function LoaderLinkCreator:_incrementNeededLoader(amount)
 	end
 end
 
-function LoaderLinkCreator:_addToLoaderCount(amount)
+function LoaderLinkCreator:_addToHasLoaderCount(amount)
 	assert(type(amount) == "number", "Bad amount")
 
 	self._hasLoaderCount.Value = self._hasLoaderCount.Value + amount
@@ -168,12 +175,12 @@ function LoaderLinkCreator:_countLoaderReferences(robloxInst)
 
 	-- TODO: Maybe handle loader reparenting more elegantly? this seems deeply unlikely.
 	if robloxInst.Parent == self._root then
-		maid._current = self:_addToLoaderCount(1)
+		maid._current = self:_addToHasLoaderCount(1)
 	end
 
 	maid:GiveTask(robloxInst:GetPropertyChangedSignal("Parent"):Connect(function()
 		if robloxInst.Parent == self._root then
-			maid._current = self:_addToLoaderCount(1)
+			maid._current = self:_addToHasLoaderCount(1)
 		else
 			maid._current = nil
 		end
