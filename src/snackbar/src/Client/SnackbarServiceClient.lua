@@ -14,6 +14,11 @@ local PromptQueue = require("PromptQueue")
 local SnackbarServiceClient = {}
 SnackbarServiceClient.ServiceName = "SnackbarServiceClient"
 
+--[=[
+	Initializes the snackbar service. Should be done via [ServiceBag].
+
+	@param serviceBag ServiceBag
+]=]
 function SnackbarServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -38,17 +43,19 @@ function SnackbarServiceClient:SetScreenGui(screenGui)
 end
 
 --[=[
-	Makes a snackbar and shows it to the user
+	Makes a snackbar and shows it to the user in a queue.
 
-	If options are included, in this format, a call to action will be presented to the player
+	```lua
+	local snackbarServiceClient = serviceBag:GetService(SnackbarServiceClient)
 
-	```
-	{
+	snackbarServiceClient:ShowSnackbar("Settings saved!", {
 		CallToAction = {
-			Text = "Action";
-			OnClick = function() end;
-		};
-	};
+			Text = "Undo";
+			OnClick = function()
+				print("Activated action")
+			end;
+		}
+	})
 	```
 
 	@param text string
@@ -71,14 +78,27 @@ function SnackbarServiceClient:ShowSnackbar(text, options)
 	return snackbar
 end
 
+--[=[
+	Hides the current snackbar shown in the queue
+
+	@param doNotAnimate boolean
+]=]
 function SnackbarServiceClient:HideCurrent(doNotAnimate)
 	return self._queue:HideCurrent(doNotAnimate)
 end
 
+--[=[
+	Completely clears the queue
+
+	@param doNotAnimate boolean
+]=]
 function SnackbarServiceClient:ClearQueue(doNotAnimate)
 	self._queue:Clear(doNotAnimate)
 end
 
+--[=[
+	Cleans up the snackbar service!
+]=]
 function SnackbarServiceClient:Destroy()
 	self._maid:DoCleaning()
 end

@@ -1,4 +1,7 @@
 --[=[
+	Server-side snackbar service. See [SnackbarServiceClient] for more details.
+
+	@server
 	@class SnackbarService
 ]=]
 
