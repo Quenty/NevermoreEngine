@@ -2,6 +2,7 @@
 	Picker for hue and Saturation in HSV. See [HSVColorPicker] for the full color picker,
 	which also allows you to select "Value".
 
+	@client
 	@class HSColorPicker
 ]=]
 
@@ -9,8 +10,8 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
-local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 local ButtonDragModel = require("ButtonDragModel")
+local ColorPickerCursorPreview = require("ColorPickerCursorPreview")
 local HSColorPickerCursor = require("HSColorPickerCursor")
 local ValueObject = require("ValueObject")
 
@@ -18,6 +19,9 @@ local HSColorPicker = setmetatable({}, BaseObject)
 HSColorPicker.ClassName = "HSColorPicker"
 HSColorPicker.__index = HSColorPicker
 
+--[=[
+	@return HSColorPicker
+]=]
 function HSColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSColorPicker)
 
@@ -59,7 +63,7 @@ function HSColorPicker.new()
 	end))
 
 	-- Setup preview
-	self._maid:GiveTask(self._dragModel:ObserveIsDragging():Subscribe(function(isDragging)
+	self._maid:GiveTask(self._dragModel:ObserveIsPressed():Subscribe(function(isDragging)
 		self._preview:SetVisible(isDragging)
 	end))
 	self._maid:GiveTask(self._cursor.PositionChanged:Connect(function()
@@ -175,27 +179,27 @@ function HSColorPicker:_render()
 		Active = true;
 		Image = "rbxassetid://9290917908";
 		ImageTransparency = self._transparency;
+
 		[Blend.Instance] = function(inst)
 			self._dragModel:SetButton(inst)
 		end;
-		[Blend.Children] = {
-			Blend.New "UIAspectRatioConstraint" {
-				AspectRatio = Blend.Computed(self._sizeValue, function(size)
-					if size.x <= 0 or size.y <= 0 then
-						return 1
-					else
-						return size.x/size.y
-					end
-				end);
-			};
 
-			Blend.New "UICorner" {
-				CornerRadius = UDim.new(0, 4);
-			};
-
-			self._preview.Gui;
-			self._cursor.Gui;
+		Blend.New "UIAspectRatioConstraint" {
+			AspectRatio = Blend.Computed(self._sizeValue, function(size)
+				if size.x <= 0 or size.y <= 0 then
+					return 1
+				else
+					return size.x/size.y
+				end
+			end);
 		};
+
+		Blend.New "UICorner" {
+			CornerRadius = UDim.new(0, 4);
+		};
+
+		self._preview.Gui;
+		self._cursor.Gui;
 	};
 end
 

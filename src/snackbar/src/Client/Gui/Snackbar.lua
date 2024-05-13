@@ -117,7 +117,7 @@ function Snackbar:_setupDragging()
 		self:_updateHideFromDragTarget()
 	end))
 
-	self._maid:GiveTask(self._dragModel:ObserveIsDraggingBrio():Subscribe(function(brio)
+	self._maid:GiveTask(self._dragModel:ObserveIsPressedBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end
