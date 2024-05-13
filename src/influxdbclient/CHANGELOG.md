@@ -1,3 +1,15 @@
+# v7.5.0 (Mon May 13 2024)
+
+#### 🚀 Enhancement
+
+- feat: Support HttpService secrets for InfluxDb ClientConfig [#469](https://github.com/Quenty/NevermoreEngine/pull/469) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

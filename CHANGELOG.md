@@ -1,3 +1,16 @@
+# (Mon May 13 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/influxdbclient@7.5.0`
+  - feat: Support HttpService secrets for InfluxDb ClientConfig [#469](https://github.com/Quenty/NevermoreEngine/pull/469) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # (Thu May 09 2024)
 
 #### 🚀 Enhancement
