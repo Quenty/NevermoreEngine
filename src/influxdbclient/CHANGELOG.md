@@ -1,19 +1,18 @@
-# v7.5.0 (Mon May 13 2024)
-
-#### 🚀 Enhancement
-
-- feat: Support HttpService secrets for InfluxDb ClientConfig [#469](https://github.com/Quenty/NevermoreEngine/pull/469) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.4.0...@quenty/influxdbclient@7.5.0) (2024-05-13)
+
+
+### Features
+
+* Support HttpService secrets for InfluxDb ClientConfig ([#469](https://github.com/Quenty/NevermoreEngine/issues/469)) ([708f69b](https://github.com/Quenty/NevermoreEngine/commit/708f69bd8ac36ecd5d7f76918474db39efc3bd57))
+
+
+
+
 
 # [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.3.0...@quenty/influxdbclient@7.4.0) (2024-05-09)
 
