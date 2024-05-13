@@ -7,7 +7,7 @@ local InfluxDBClientConfigUtils = {}
 function InfluxDBClientConfigUtils.isClientConfig(config)
 	return type(config) == "table"
 		and type(config.url) == "string"
-		and type(config.token) == "string"
+		and (typeof(config.token) == "string" or typeof(config.token) == "Secret")
 end
 
 function InfluxDBClientConfigUtils.createClientConfig(config)
