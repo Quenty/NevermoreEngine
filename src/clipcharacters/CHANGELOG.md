@@ -1,21 +1,18 @@
-# v12.4.1 (Tue May 14 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Fix drag model in color picker code [#472](https://github.com/Quenty/NevermoreEngine/pull/472) ([@Quenty](https://github.com/Quenty))
-- docs: Fix docs ([@Quenty](https://github.com/Quenty))
-- fix: Update ClipCharacters to act as a service ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.4.0...@quenty/clipcharacters@12.4.1) (2024-05-14)
+
+
+### Bug Fixes
+
+* Update ClipCharacters to act as a service ([b6651b6](https://github.com/Quenty/NevermoreEngine/commit/b6651b6d01375857e022641f62461e179292a97c))
+
+
+
+
 
 # [12.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clipcharacters@12.3.0...@quenty/clipcharacters@12.4.0) (2024-05-09)
 

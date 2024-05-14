@@ -1,20 +1,15 @@
-# v13.3.1 (Tue May 14 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Fix drag model in color picker code [#472](https://github.com/Quenty/NevermoreEngine/pull/472) ([@Quenty](https://github.com/Quenty))
-- refactor: Simplify syntax ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.3.0...@quenty/equippedtracker@13.3.1) (2024-05-14)
+
+**Note:** Version bump only for package @quenty/equippedtracker
+
+
+
+
 
 # [13.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/equippedtracker@13.2.0...@quenty/equippedtracker@13.3.0) (2024-05-09)
 

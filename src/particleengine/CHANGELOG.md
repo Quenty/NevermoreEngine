@@ -1,20 +1,18 @@
-# v13.4.1 (Tue May 14 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Fix drag model in color picker code [#472](https://github.com/Quenty/NevermoreEngine/pull/472) ([@Quenty](https://github.com/Quenty))
-- fix: Particle engine works with ServiceBag ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@13.4.0...@quenty/particleengine@13.4.1) (2024-05-14)
+
+
+### Bug Fixes
+
+* Particle engine works with ServiceBag ([293968f](https://github.com/Quenty/NevermoreEngine/commit/293968f18eb090def80d590b0908d2d0d25d758c))
+
+
+
+
 
 # [13.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particleengine@13.3.0...@quenty/particleengine@13.4.0) (2024-05-09)
 
