@@ -25,9 +25,17 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/brio": "file:../brio",
+    "@quenty/characterutils": "file:../characterutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
-    "@quenty/remoting": "file:../remoting"
+    "@quenty/playerutils": "file:../playerutils",
+    "@quenty/remoting": "file:../remoting",
+    "@quenty/servicebag": "file:../servicebag",
+    "@quenty/statestack": "file:../statestack",
+    "@quenty/table": "file:../table",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"
