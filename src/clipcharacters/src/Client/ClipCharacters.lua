@@ -18,7 +18,6 @@ ClipCharacters.__index = ClipCharacters
 --[=[
 	Prevents characters from clipping together
 
-	@param collisionGroupId number
 	@return ClipCharacters
 ]=]
 function ClipCharacters.new()
