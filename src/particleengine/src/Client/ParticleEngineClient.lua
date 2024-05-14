@@ -31,7 +31,9 @@ local function newFrame(name)
 	return frame
 end
 
-function ParticleEngineClient:Init(screen)
+function ParticleEngineClient:Init(serviceBag)
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
 	PromiseGetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME):Then(function(remoteEvent)
 		self._remoteEvent = remoteEvent
 
@@ -40,7 +42,6 @@ function ParticleEngineClient:Init(screen)
 		end)
 	end)
 
-	self._screen = screen or error("No screen")
 	self._player = Players.LocalPlayer or error("No LocalPlayer")
 
 	self._lastUpdateTime = tick()
@@ -57,8 +58,10 @@ function ParticleEngineClient:Init(screen)
 		self:_update()
 		debug.profileend()
 	end)
+end
 
-	return self
+function ParticleEngineClient:SetScreenGui(screenGui)
+	self._screen = screenGui
 end
 
 -- Removes a particle
