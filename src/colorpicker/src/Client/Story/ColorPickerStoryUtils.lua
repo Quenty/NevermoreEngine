@@ -11,18 +11,16 @@ local ValueObject = require("ValueObject")
 local ColorPickerStoryUtils = {}
 
 function ColorPickerStoryUtils.createPicker(maid, valueSync, labelText, currentVisible)
-	local picker = HSVColorPicker.new()
+	local picker = maid:Add(HSVColorPicker.new())
 	picker.Gui.AnchorPoint = Vector2.new(0.5, 1)
 	picker.Gui.Position = UDim2.new(0.5, 0, 1, 0)
 	picker.Gui.Size = UDim2.new(0, 150, 1, -30);
 	picker.Gui.ZIndex = 2;
-	maid:GiveTask(picker)
 
 	maid:GiveTask(picker:SyncValue(valueSync))
 
-	local visible = Instance.new("BoolValue")
+	local visible = maid:Add(Instance.new("BoolValue"))
 	visible.Value = false
-	maid:GiveTask(visible)
 
 	maid:GiveTask(visible.Changed:Connect(function()
 		if visible.Value then
@@ -51,49 +49,47 @@ function ColorPickerStoryUtils.createPicker(maid, valueSync, labelText, currentV
 		[Blend.OnEvent "Activated"] = function()
 			visible.Value = not visible.Value
 		end;
-		[Blend.Children] = {
-			picker.Gui;
-			Blend.New "TextLabel" {
-				BackgroundTransparency = 1;
-				Text = labelText;
-				Position = UDim2.new(0, 35, 0, 5);
-				Size = UDim2.new(1, -40, 0, 20);
-				Font = Enum.Font.FredokaOne;
-				TextXAlignment = Enum.TextXAlignment.Left;
-				TextScaled = true;
-				TextColor3 = Color3.new(1, 1, 1);
-				ZIndex = 0;
-			};
 
-			Blend.New "Frame" {
-				BackgroundColor3 = valueSync;
-				Size = UDim2.new(0, 20, 0, 20);
-				Position = UDim2.new(0, 5, 0, 5);
-				[Blend.Children] = {
-					Blend.New "UICorner" {
-						CornerRadius = UDim.new(0, 10);
-					};
+		picker.Gui;
+		Blend.New "TextLabel" {
+			BackgroundTransparency = 1;
+			Text = labelText;
+			Position = UDim2.new(0, 35, 0, 5);
+			Size = UDim2.new(1, -40, 0, 20);
+			Font = Enum.Font.FredokaOne;
+			TextXAlignment = Enum.TextXAlignment.Left;
+			TextScaled = true;
+			TextColor3 = Color3.new(1, 1, 1);
+			ZIndex = 0;
+		};
+
+		Blend.New "Frame" {
+			BackgroundColor3 = valueSync;
+			Size = UDim2.new(0, 20, 0, 20);
+			Position = UDim2.new(0, 5, 0, 5);
+			[Blend.Children] = {
+				Blend.New "UICorner" {
+					CornerRadius = UDim.new(0, 10);
 				};
 			};
+		};
 
-			Blend.New "UIPadding" {
-				PaddingTop = UDim.new(0, 10);
-				PaddingBottom = UDim.new(0, 10);
-				PaddingLeft = UDim.new(0, 10);
-				PaddingRight = UDim.new(0, 10);
-			};
+		Blend.New "UIPadding" {
+			PaddingTop = UDim.new(0, 10);
+			PaddingBottom = UDim.new(0, 10);
+			PaddingLeft = UDim.new(0, 10);
+			PaddingRight = UDim.new(0, 10);
+		};
 
-			Blend.New "UICorner" {
-				CornerRadius = UDim.new(0, 10);
-			};
+		Blend.New "UICorner" {
+			CornerRadius = UDim.new(0, 10);
 		};
 	}
 
 end
 
 function ColorPickerStoryUtils.create(maid, buildPickers)
-	local currentVisible = ValueObject.new()
-	maid:GiveTask(currentVisible)
+	local currentVisible = maid:Add(ValueObject.new())
 
 	local built = {}
 
@@ -103,22 +99,21 @@ function ColorPickerStoryUtils.create(maid, buildPickers)
 
 	local function pickerGroup(pickers)
 		return Blend.New "Frame" {
-				Size = UDim2.new(1, 0, 0, 0);
-				AnchorPoint = Vector2.new(0.5, 0.5);
-				Position = UDim2.fromScale(0.5, 0.5);
-				BackgroundTransparency = 1;
-				AutomaticSize = Enum.AutomaticSize.Y;
-				[Blend.Children] = {
-					Blend.New "UIListLayout" {
-						Padding = UDim.new(0, 10);
-						HorizontalAlignment = Enum.HorizontalAlignment.Left;
-						VerticalAlignment = Enum.VerticalAlignment.Top;
-						FillDirection = Enum.FillDirection.Horizontal;
-					};
+			Size = UDim2.new(1, 0, 0, 0);
+			AnchorPoint = Vector2.new(0.5, 0.5);
+			Position = UDim2.fromScale(0.5, 0.5);
+			BackgroundTransparency = 1;
+			AutomaticSize = Enum.AutomaticSize.Y;
 
-					pickers;
-				};
+			Blend.New "UIListLayout" {
+				Padding = UDim.new(0, 10);
+				HorizontalAlignment = Enum.HorizontalAlignment.Left;
+				VerticalAlignment = Enum.VerticalAlignment.Top;
+				FillDirection = Enum.FillDirection.Horizontal;
 			};
+
+			pickers;
+		};
 	end
 
 	local groups = {}
@@ -152,16 +147,14 @@ function ColorPickerStoryUtils.create(maid, buildPickers)
 			end
 		end;
 
-		[Blend.Children] = {
-			Blend.New "UIListLayout" {
-				Padding = UDim.new(0, 10);
-				HorizontalAlignment = Enum.HorizontalAlignment.Center;
-				VerticalAlignment = Enum.VerticalAlignment.Top;
-				FillDirection = Enum.FillDirection.Vertical;
-			};
-
-			groups;
+		Blend.New "UIListLayout" {
+			Padding = UDim.new(0, 10);
+			HorizontalAlignment = Enum.HorizontalAlignment.Center;
+			VerticalAlignment = Enum.VerticalAlignment.Top;
+			FillDirection = Enum.FillDirection.Vertical;
 		};
+
+		groups;
 	};
 end
 

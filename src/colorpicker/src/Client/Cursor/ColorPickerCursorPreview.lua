@@ -20,23 +20,12 @@ ColorPickerCursorPreview.__index = ColorPickerCursorPreview
 function ColorPickerCursorPreview.new()
 	local self = setmetatable(BasicPane.new(), ColorPickerCursorPreview)
 
-	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
-	self._maid:GiveTask(self._backgroundColorHint)
-
-	self._heightAbs = ValueObject.new(60, "number")
-	self._maid:GiveTask(self._heightAbs)
-
-	self._offsetAbs = ValueObject.new(-20, "number")
-	self._maid:GiveTask(self._offsetAbs)
-
-	self._position = ValueObject.new(Vector2.zero, "Vector2")
-	self._maid:GiveTask(self._position)
-
-	self._transparency = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._transparency)
-
-	self._colorValue = ValueObject.new(Color3.new(0, 0, 0), "Color3")
-	self._maid:GiveTask(self._colorValue)
+	self._backgroundColorHint = self._maid:Add(ValueObject.new(Color3.new(0, 0, 0), "Color3"))
+	self._heightAbs = self._maid:Add(ValueObject.new(60, "number"))
+	self._offsetAbs = self._maid:Add(ValueObject.new(-20, "number"))
+	self._position = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
+	self._transparency = self._maid:Add(ValueObject.new(0, "number"))
+	self._colorValue = self._maid:Add(ValueObject.new(Color3.new(0, 0, 0), "Color3"))
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
 		self.Gui = gui
@@ -99,43 +88,43 @@ function ColorPickerCursorPreview:_render()
 			return UDim2.new(pos.x, 0, pos.y, offsetAbs - heightAbs/2)
 		end);
 		ZIndex = 3;
-		[Blend.Children] = {
-			Blend.New "UIAspectRatioConstraint" {
-				AspectRatio = 1;
+
+		Blend.New "UIAspectRatioConstraint" {
+			AspectRatio = 1;
+		};
+
+		Blend.New "Frame" {
+			BackgroundTransparency = transparency;
+			BackgroundColor3 = self._colorValue;
+			AnchorPoint = Vector2.new(0.5, 0.5);
+			Position = UDim2.fromScale(0.5, 0.5);
+			Size = UDim2.fromScale(1, 1);
+
+			Blend.New "UIScale" {
+				Scale = percentVisible;
 			};
 
-			Blend.New "Frame" {
-				BackgroundTransparency = transparency;
-				BackgroundColor3 = self._colorValue;
-				AnchorPoint = Vector2.new(0.5, 0.5);
-				Position = UDim2.fromScale(0.5, 0.5);
-				Size = UDim2.fromScale(1, 1);
-				[Blend.Children] = {
-					Blend.New "UIScale" {
-						Scale = percentVisible;
-					};
-					Blend.New "UICorner" {
-						CornerRadius = UDim.new(1, 0);
-					};
-					Blend.New "UIStroke" {
-						Color = Blend.Spring(Blend.Computed(
-							self._colorValue,
-							self._backgroundColorHint,
-							isOutlineVisible,
-							function(color, backingColor, needed)
-								if needed then
-									return ColorPickerUtils.getOutlineWithContrast(color, backingColor)
-								else
-									return color
-								end
-							end), 20);
-						Transparency = transparency;
-						Thickness = Blend.Computed(percentVisible, function(percent)
-							return percent*3
-						end);
-					};
-				};
-			}
+			Blend.New "UICorner" {
+				CornerRadius = UDim.new(1, 0);
+			};
+
+			Blend.New "UIStroke" {
+				Color = Blend.Spring(Blend.Computed(
+					self._colorValue,
+					self._backgroundColorHint,
+					isOutlineVisible,
+					function(color, backingColor, needed)
+						if needed then
+							return ColorPickerUtils.getOutlineWithContrast(color, backingColor)
+						else
+							return color
+						end
+					end), 20);
+				Transparency = transparency;
+				Thickness = Blend.Computed(percentVisible, function(percent)
+					return percent*3
+				end);
+			};
 		}
 	}
 end

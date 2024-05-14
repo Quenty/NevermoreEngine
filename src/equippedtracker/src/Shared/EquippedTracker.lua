@@ -31,8 +31,7 @@ function EquippedTracker.new(tool)
 	@prop Player ValueObject<Player>
 	@within EquippedTracker
 ]=]
-	self.Player = ValueObject.new()
-	self._maid:GiveTask(self.Player)
+	self.Player = self._maid:Add(ValueObject.new(nil))
 
 	self._maid:GiveTask(self._tool.Equipped:Connect(function()
 		self:_update()

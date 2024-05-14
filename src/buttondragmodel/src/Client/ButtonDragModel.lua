@@ -32,17 +32,17 @@ function ButtonDragModel.new(initialButton)
 	self._button = self._maid:Add(ValueObject.new(nil))
 
 	self._absoluteSize = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
-	self._isDragging = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isPressed = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._clampWithinButton = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	self._activePositions = {}
 
 	self._maid:GiveTask(self._dragPosition.Changed:Connect(function()
-		self._isDragging.Value = self._dragPosition.Value ~= nil
+		self._isPressed.Value = self._dragPosition.Value ~= nil
 	end))
 
 	self.DragPositionChanged = self._dragPosition.Changed
-	self.IsDraggingChanged = self._isDragging.Changed
+	self.IsDraggingChanged = self._isPressed.Changed
 
 	if initialButton then
 		self:SetButton(initialButton)
@@ -63,19 +63,28 @@ function ButtonDragModel.new(initialButton)
 end
 
 --[=[
+	Returns true if pressed
+
+	@return boolean
+]=]
+function ButtonDragModel:IsPressed()
+	return self._isPressed.Value
+end
+
+--[=[
 	Observes if anything is pressing down on the button itself
 
 	@return Observable<boolean>
 ]=]
-function ButtonDragModel:ObserveIsDragging()
-	return self._isDragging:Observe()
+function ButtonDragModel:ObserveIsPressed()
+	return self._isPressed:Observe()
 end
 
 --[=[
 	@return Observable<Brio<true>>
 ]=]
-function ButtonDragModel:ObserveIsDraggingBrio()
-	return self._isDragging:ObserveBrio(function(value)
+function ButtonDragModel:ObserveIsPressedBrio()
+	return self._isPressed:ObserveBrio(function(value)
 		return value
 	end)
 end
@@ -92,15 +101,6 @@ end
 ]=]
 function ButtonDragModel:GetDragDelta()
 	return self._dragDelta.Value
-end
-
---[=[
-	Returns true if pressed
-
-	@return boolean
-]=]
-function ButtonDragModel:GetIsPressed()
-	return self._isDragging.Value
 end
 
 --[=[
@@ -323,7 +323,7 @@ function ButtonDragModel:_updateCurrentPosition()
 
 	if self._clampWithinButton.Value then
 		x = math.clamp(x, 0, 1)
-		y = math.clamp(x, 0, 1)
+		y = math.clamp(y, 0, 1)
 	end
 
 	local position = Vector2.new(x, y)

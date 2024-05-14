@@ -2,6 +2,7 @@
 	A HSV color picker component which can be used to select colors using
 	an interface standard to Roblox Studio.
 
+	@client
 	@class HSVColorPicker
 ]=]
 
@@ -10,8 +11,8 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local Blend = require("Blend")
 local HSColorPicker = require("HSColorPicker")
-local ValueColorPicker = require("ValueColorPicker")
 local Maid = require("Maid")
+local ValueColorPicker = require("ValueColorPicker")
 local ValueObject = require("ValueObject")
 
 local HSVColorPicker = setmetatable({}, BaseObject)
@@ -32,26 +33,14 @@ HSVColorPicker.__index = HSVColorPicker
 function HSVColorPicker.new()
 	local self = setmetatable(BaseObject.new(), HSVColorPicker)
 
-	self._hsvColorValue = Instance.new("Vector3Value")
-	self._hsvColorValue.Value = Vector3.zero
-	self._maid:GiveTask(self._hsvColorValue)
+	self._hsvColorValue = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
+	self._sizeValue = self._maid:Add(ValueObject.new(Vector2.new(6, 4), "Vector2"))
+	self._innerPadding = self._maid:Add(ValueObject.new(0.2, "number"))
+	self._transparency = self._maid:Add(ValueObject.new(0, "number"))
+	self._hueSaturationPicker = self._maid:Add(HSColorPicker.new())
+	self._valuePicker = self._maid:Add(ValueColorPicker.new())
 
 	self.ColorChanged = self._hsvColorValue.Changed
-
-	self._sizeValue = ValueObject.new(Vector2.new(6, 4), "Vector2")
-	self._maid:GiveTask(self._sizeValue)
-
-	self._innerPadding = ValueObject.new(0.2, "number")
-	self._maid:GiveTask(self._innerPadding)
-
-	self._transparency = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._transparency)
-
-	self._hueSaturationPicker = HSColorPicker.new()
-	self._maid:GiveTask(self._hueSaturationPicker)
-
-	self._valuePicker = ValueColorPicker.new()
-	self._maid:GiveTask(self._valuePicker)
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
 		self.Gui = gui
@@ -226,17 +215,17 @@ function HSVColorPicker:_render()
 			ZIndex = Blend.Computed(picker:ObserveIsPressed(), function(isPressed)
 				return isPressed and 2 or 1
 			end);
-			[Blend.Children] = {
-				picker.Gui;
-				Blend.New "UIAspectRatioConstraint" {
-					AspectRatio = Blend.Computed(picker:GetSizeValue(), function(size)
-						if size.x <= 0 or size.y <= 0 then
-							return 1
-						else
-							return size.x/size.y
-						end
-					end);
-				};
+
+			picker.Gui;
+
+			Blend.New "UIAspectRatioConstraint" {
+				AspectRatio = Blend.Computed(picker:GetSizeValue(), function(size)
+					if size.x <= 0 or size.y <= 0 then
+						return 1
+					else
+						return size.x/size.y
+					end
+				end);
 			};
 		};
 	end
@@ -245,26 +234,26 @@ function HSVColorPicker:_render()
 		Name = "HSVColorPicker";
 		Size = UDim2.new(1, 0, 1, 0);
 		BackgroundTransparency = 1;
-		[Blend.Children] = {
-			Blend.New "UIAspectRatioConstraint" {
-				AspectRatio = Blend.Computed(self._sizeValue, function(size)
-					if size.x <= 0 or size.y <= 0 then
-						return 1
-					else
-						return size.x/size.y
-					end
-				end);
-			};
 
-			container(self._hueSaturationPicker, {
-				AnchorPoint = Vector2.zero;
-				Position = UDim2.fromScale(0, 0);
-			});
-			container(self._valuePicker, {
-				AnchorPoint = Vector2.new(1, 0);
-				Position = UDim2.fromScale(1, 0);
-			});
+		Blend.New "UIAspectRatioConstraint" {
+			AspectRatio = Blend.Computed(self._sizeValue, function(size)
+				if size.x <= 0 or size.y <= 0 then
+					return 1
+				else
+					return size.x/size.y
+				end
+			end);
 		};
+
+		container(self._hueSaturationPicker, {
+			AnchorPoint = Vector2.zero;
+			Position = UDim2.fromScale(0, 0);
+		});
+
+		container(self._valuePicker, {
+			AnchorPoint = Vector2.new(1, 0);
+			Position = UDim2.fromScale(1, 0);
+		});
 	};
 end
 
