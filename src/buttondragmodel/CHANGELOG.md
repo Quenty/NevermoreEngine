@@ -1,3 +1,16 @@
+# v1.1.1 (Tue May 14 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Fix drag model in color picker code [#472](https://github.com/Quenty/NevermoreEngine/pull/472) ([@Quenty](https://github.com/Quenty))
+- fix: Fix drag model in color picker code ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

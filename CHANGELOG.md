@@ -1,3 +1,16 @@
+# (Tue May 14 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/buttondragmodel@1.1.1`, `@quenty/clipcharacters@12.4.1`, `@quenty/colorpicker@10.4.1`, `@quenty/equippedtracker@13.3.1`, `@quenty/particleengine@13.4.1`, `@quenty/snackbar@11.4.1`
+  - fix: Fix drag model in color picker code [#472](https://github.com/Quenty/NevermoreEngine/pull/472) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon May 13 2024)
 
 #### 🚀 Enhancement
