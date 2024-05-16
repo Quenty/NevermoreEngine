@@ -1,20 +1,18 @@
-# v14.6.0 (Thu May 16 2024)
-
-#### 🚀 Enhancement
-
-- feat: Add slotIds for priority1 and priority2 buttons [#473](https://github.com/Quenty/NevermoreEngine/pull/473) ([@unrooot](https://github.com/unrooot))
-- feat: Add slotIds for priority1 and priority2 buttons ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.5.0...@quenty/inputkeymaputils@14.6.0) (2024-05-16)
+
+
+### Features
+
+* Add slotIds for priority1 and priority2 buttons ([55c4529](https://github.com/Quenty/NevermoreEngine/commit/55c4529de568cf5ce768c78085adc2f5f7c434b5))
+
+
+
+
 
 # [14.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.4.0...@quenty/inputkeymaputils@14.5.0) (2024-05-09)
 
