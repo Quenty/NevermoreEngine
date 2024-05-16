@@ -1,3 +1,16 @@
+# (Thu May 16 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/inputkeymaputils@14.6.0`
+  - feat: Add slotIds for priority1 and priority2 buttons [#473](https://github.com/Quenty/NevermoreEngine/pull/473) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Tue May 14 2024)
 
 #### 🐛 Bug Fix

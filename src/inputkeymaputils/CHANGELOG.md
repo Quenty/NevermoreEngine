@@ -1,3 +1,16 @@
+# v14.6.0 (Thu May 16 2024)
+
+#### 🚀 Enhancement
+
+- feat: Add slotIds for priority1 and priority2 buttons [#473](https://github.com/Quenty/NevermoreEngine/pull/473) ([@unrooot](https://github.com/unrooot))
+- feat: Add slotIds for priority1 and priority2 buttons ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
