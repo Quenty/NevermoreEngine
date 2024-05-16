@@ -36,7 +36,9 @@ local SlottedTouchButtonUtils = {}
 	@return SlottedTouchButton
 ]=]
 function SlottedTouchButtonUtils.createSlottedTouchButton(slotId)
-	assert(slotId == "primary1"
+	assert(slotId == "priority1"
+		or slotId == "priority2"
+		or slotId == "primary1"
 		or slotId == "primary2"
 		or slotId == "primary3"
 		or slotId == "primary4"
