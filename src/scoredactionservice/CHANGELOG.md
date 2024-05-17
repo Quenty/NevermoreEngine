@@ -1,3 +1,15 @@
+# v16.7.1 (Fri May 17 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Rename priority1 & priority2 -> primary4 & primary5 [#474](https://github.com/Quenty/NevermoreEngine/pull/474) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

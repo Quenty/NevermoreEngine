@@ -1,3 +1,16 @@
+# (Fri May 17 2024)
+
+#### 🐛 Bug Fix
+
+- `@quenty/inputkeymaputils@14.6.1`
+  - fix: Rename priority1 & priority2 -> primary4 & primary5 [#474](https://github.com/Quenty/NevermoreEngine/pull/474) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Thu May 16 2024)
 
 #### 🚀 Enhancement
