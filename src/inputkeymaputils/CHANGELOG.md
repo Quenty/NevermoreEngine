@@ -1,20 +1,18 @@
-# v14.6.1 (Fri May 17 2024)
-
-#### 🐛 Bug Fix
-
-- fix: Rename priority1 & priority2 -> primary4 & primary5 [#474](https://github.com/Quenty/NevermoreEngine/pull/474) ([@unrooot](https://github.com/unrooot))
-- fix: Rename priority1 & priority2 -> primary4 & primary5 ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.6.0...@quenty/inputkeymaputils@14.6.1) (2024-05-17)
+
+
+### Bug Fixes
+
+* Rename priority1 & priority2 -> primary4 & primary5 ([daf1700](https://github.com/Quenty/NevermoreEngine/commit/daf1700dcf89e1d0c3f7576f899ba79b37b7f877))
+
+
+
+
 
 # [14.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.5.0...@quenty/inputkeymaputils@14.6.0) (2024-05-16)
 
