@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[59280],{35372:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"AdorneeDataEntry","desc":"","source":{"line":4,"path":"src/adorneedata/src/Shared/AdorneeDataEntry.lua"}}')}}]);
