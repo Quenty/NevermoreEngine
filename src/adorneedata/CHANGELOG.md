@@ -1,20 +1,18 @@
-# v7.4.0 (Sat May 18 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/marketplace update [#475](https://github.com/Quenty/NevermoreEngine/pull/475) ([@Quenty](https://github.com/Quenty))
-- feat: Add AdorneeData docs and ability to use indirectly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.3.0...@quenty/adorneedata@7.4.0) (2024-05-18)
+
+
+### Features
+
+* Add AdorneeData docs and ability to use indirectly ([8df4e84](https://github.com/Quenty/NevermoreEngine/commit/8df4e844c027ec196476306d472c7c8e4625c53f))
+
+
+
+
 
 # [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.2.0...@quenty/adorneedata@7.3.0) (2024-05-09)
 

@@ -1,20 +1,18 @@
-# v11.4.0 (Sat May 18 2024)
-
-#### 🚀 Enhancement
-
-- users/quenty/marketplace update [#475](https://github.com/Quenty/NevermoreEngine/pull/475) ([@Quenty](https://github.com/Quenty))
-- feat: Add MarketplaceServiceCache ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.3.0...@quenty/marketplaceutils@11.4.0) (2024-05-18)
+
+
+### Features
+
+* Add MarketplaceServiceCache ([fafe9b4](https://github.com/Quenty/NevermoreEngine/commit/fafe9b4ceb5148b46d046e8fef333eb3e1f8433f))
+
+
+
+
 
 # [11.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.2.0...@quenty/marketplaceutils@11.3.0) (2024-05-09)
 
