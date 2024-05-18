@@ -7,6 +7,67 @@
 
 	Providing all 3
 
+	## Usage
+	Here's how the usage works:
+
+	```lua
+	-- Store data somewhere central
+
+	return AdorneeData.new({
+		EnableCombat = true;
+		PunchDamage = 15;
+	})
+	```
+
+	You can then use the data to retrieve values
+
+	```lua
+	local data = CombatConfiguration:CreateValue(workspace)
+
+	-- Can ready any data
+	print(data.EnableCombat.Value) --> true
+	print(data.PunchDamage.Value) --> 15
+	print(data.Value) --> { EnableCombat = true, PunchDamage = true }
+
+	-- Can write any data
+	data.EnableCombat.Value = false
+	data.PunchDamage.Value = 15
+	data.Value = {
+		EnableCombat = false;
+		PunchDamage = 150;
+	}
+
+	-- Can subscribe to the data
+	data.EnableCombat:Observe():Subscribe(print)
+	data.PunchDamage:Observe():Subscribe(print)
+	data:Observe():Subscribe(print)
+
+	-- Can also operate without creating a value (although creating value is cheap)
+	local punchDamage = CombatConfiguration.PunchDamage:Create(workspace)
+	punchDamage.Value = 20
+	punchDamage:Observe():Subscribe(print)
+
+	-- Or like this
+	CombatConfiguration.PunchDamage:SetValue(workspace, 25)
+	print(CombatConfiguration.PunchDamage:GetValue(workspace))
+	CombatConfiguration.PunchDamage:Observe(workspace):Subscribe(print)
+
+	-- You can also create validated data
+	local defaultCombatState = CombatConfiguration:CreateData({
+		EnableCombat = true;
+		PunchDamage = 15;
+	})
+
+	-- Or validate that the data you're getting is valid
+	assert(CombatConfiguration:IsData(defaultCombatState))
+
+	-- Or read attributes directly
+	CombatConfiguration:GetAttributes(workspace))
+
+	-- Note that this is the same as an attribute
+	print(workspace:GetAttribute("EnableCombat")) --> true
+	```
+
 	@class AdorneeData
 ]=]
 
@@ -15,6 +76,7 @@ local require = require(script.Parent.loader).load(script)
 local AdorneeDataEntry = require("AdorneeDataEntry")
 local AdorneeDataValue = require("AdorneeDataValue")
 local AttributeUtils = require("AttributeUtils")
+local AttributeValue = require("AttributeValue")
 local t = require("t")
 
 local AdorneeData = {}
@@ -47,6 +109,26 @@ function AdorneeData.new(prototype)
 	end
 
 	return self
+end
+
+function AdorneeData:__index(index)
+	if AdorneeData[index] then
+		return AdorneeData[index]
+	elseif type(index) == "string" then
+		local found = self._fullPrototype[index]
+		if not found then
+			error(string.format("[AdorneeData] - Bad index %q is not a known adornee", index))
+		end
+
+		if AdorneeDataEntry.isAdorneeDataEntry(found) then
+			return found
+		else
+			-- TODO: Cache this construction
+			return AdorneeDataEntry.new(index, function(adornee)
+				return AttributeValue.new(adornee, index, found)
+			end)
+		end
+	end
 end
 
 --[=[
@@ -165,7 +247,7 @@ function AdorneeData:GetAttributes(adornee)
 
 	-- TODO: Avoid additional allocation
 	for key, value in pairs(self._valueObjectPrototype) do
-		data[key] = value:CreateValueObject(adornee).Value
+		data[key] = value:Create(adornee).Value
 	end
 
 	return self:CreateStrictData(data)
@@ -203,7 +285,7 @@ function AdorneeData:SetStrictAttributes(adornee, data)
 
 	-- TODO: Avoid additional allocation
 	for key, value in pairs(self._valueObjectPrototype) do
-		value:CreateValueObject(adornee).Value = data[key]
+		value:Create(adornee).Value = data[key]
 	end
 end
 
@@ -230,7 +312,7 @@ function AdorneeData:InitAttributes(adornee, data)
 
 	-- TODO: Avoid additional allocation
 	for key, value in pairs(self._valueObjectPrototype) do
-		local valueObject = value:CreateValueObject(adornee)
+		local valueObject = value:Create(adornee)
 		if valueObject == nil then
 			if data[key] ~= nil then
 				valueObject.Value = data[key]
@@ -246,8 +328,9 @@ end
 	@return function
 ]=]
 function AdorneeData:GetStrictTInterface()
-	if self._fullInterface then
-		return self._fullInterface
+	local found = rawget(self, "_fullInterface")
+	if found then
+		return found
 	end
 
 	self._fullInterface = t.strictInterface(self:_getOrCreateTypeInterfaceList())
@@ -261,8 +344,9 @@ end
 	@return function
 ]=]
 function AdorneeData:GetTInterface()
-	if self._interface then
-		return self._interface
+	local found = rawget(self, "_interface")
+	if found then
+		return found
 	end
 
 	local interfaceList = {}
@@ -286,8 +370,9 @@ function AdorneeData:IsData(data)
 end
 
 function AdorneeData:_getOrCreateTypeInterfaceList()
-	if self._typeInterfaceList then
-		return self._typeInterfaceList
+	local found = rawget(self, "_typeInterfaceList")
+	if found then
+		return found
 	end
 
 	local interfaceList = {}

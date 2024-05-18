@@ -50,7 +50,7 @@ function AdorneeDataValue.new(adornee, prototype)
 
 	for key, value in pairs(prototype) do
 		if AdorneeDataEntry.isAdorneeDataEntry(value) then
-			self._valueObjects[key] = value:CreateValueObject(adornee)
+			self._valueObjects[key] = value:Create(adornee)
 		else
 			self._valueObjects[key] = AttributeValue.new(adornee, key, value)
 		end
