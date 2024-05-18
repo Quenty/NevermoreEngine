@@ -1,3 +1,16 @@
+# (Sat May 18 2024)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneedata@7.4.0`, `@quenty/assetserviceutils@5.5.0`, `@quenty/marketplaceutils@11.4.0`
+  - users/quenty/marketplace update [#475](https://github.com/Quenty/NevermoreEngine/pull/475) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri May 17 2024)
 
 #### 🐛 Bug Fix
