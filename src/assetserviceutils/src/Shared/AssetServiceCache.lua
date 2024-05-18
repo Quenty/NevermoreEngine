@@ -1,5 +1,5 @@
 --[=[
-	@class AssetServiceCacheService
+	@class AssetServiceCache
 ]=]
 
 local require = require(script.Parent.loader).load(script)
@@ -7,17 +7,17 @@ local require = require(script.Parent.loader).load(script)
 local MemorizeUtils = require("MemorizeUtils")
 local AssetServiceUtils = require("AssetServiceUtils")
 
-local AssetServiceCacheService = {}
-AssetServiceCacheService.ServiceName = "AssetServiceCacheService"
+local AssetServiceCache = {}
+AssetServiceCache.ServiceName = "AssetServiceCache"
 
-function AssetServiceCacheService:Init(serviceBag)
+function AssetServiceCache:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self:_ensureInit()
 end
 
-function AssetServiceCacheService:PromiseBundleDetails(bundleId)
+function AssetServiceCache:PromiseBundleDetails(bundleId)
 	assert(type(bundleId) == "number", "Bad bundleId")
 
 	self:_ensureInit()
@@ -25,7 +25,7 @@ function AssetServiceCacheService:PromiseBundleDetails(bundleId)
 	return self._promiseBundleDetails(bundleId)
 end
 
-function AssetServiceCacheService:_ensureInit()
+function AssetServiceCache:_ensureInit()
 	if self._promiseBundleDetails then
 		return
 	end
@@ -33,4 +33,4 @@ function AssetServiceCacheService:_ensureInit()
 	self._promiseBundleDetails = MemorizeUtils.memoize(AssetServiceUtils.promiseBundleDetails)
 end
 
-return AssetServiceCacheService
+return AssetServiceCache

@@ -1,7 +1,7 @@
 {
     "recommendations": [
         "kampfkarren.selene-vscode",
-        "dwenegar.vscode-luacheck",
-        "nightrains.robloxlsp"
+        "nightrains.robloxlsp",
+        "shardulm94.trailing-spaces"
     ]
 }
