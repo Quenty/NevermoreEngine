@@ -44,6 +44,18 @@ function DebounceTimer:IsRunning()
 end
 
 --[=[
+	Returns the amount of time remaining in the timer.
+	@return number
+]=]
+function DebounceTimer:GetTimeRemaining()
+	if not self:IsRunning() then
+		return 0
+	end
+
+	return math.max((self._startTime + self._length) - tick(), 0)
+end
+
+--[=[
 	Returns if the timer is done
 	@return boolean
 ]=]
