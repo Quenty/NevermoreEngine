@@ -122,15 +122,16 @@ function ObservableMap:_observeKeyValueChanged(packValue)
 			handleValue(key, value)
 		end
 
-		maid:GiveTask(self.KeyValueChanged:Connect(handleValue))
+		local conn = self.KeyValueChanged:Connect(handleValue)
 
-		self._maid[sub] = maid
-		maid:GiveTask(function()
+		local function cleanup()
 			self._maid[sub] = nil
+			conn:Disconnect()
 			sub:Complete()
-		end)
-
-		return maid
+			maid:Destroy()
+		end
+		self._maid[sub] = cleanup
+		return cleanup
 	end)
 end
 
