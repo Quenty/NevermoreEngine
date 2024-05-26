@@ -39,7 +39,7 @@ function PlayerProductManager.new(player, serviceBag)
 	-- Expect configuration on receipt processing
 	self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT):SetReceiptProcessingExpected(true)
 
-	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager"))
+	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager", Remoting.Realms.SERVER))
 	self._remoting:DeclareEvent("NotifyReceiptProcessed")
 
 	self._maid:GiveTask(self._remoting.NotifyPromptFinished:Connect(function(...)

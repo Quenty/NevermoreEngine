@@ -26,7 +26,7 @@ function PlayerProductManagerClient.new(obj, serviceBag)
 	self._gameConfigServiceClient = self._serviceBag:GetService(GameConfigServiceClient)
 
 	if self._obj == Players.LocalPlayer then
-		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager"))
+		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager", Remoting.Realms.CLIENT))
 		self._marketeer = self._maid:Add(PlayerMarketeer.new(self._obj, self._gameConfigServiceClient:GetConfigPicker()))
 
 		self._marketeer:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT):SetReceiptProcessingExpected(true)
