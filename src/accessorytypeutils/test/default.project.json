@@ -1,0 +1,12 @@
+{
+  "name": "AccessoryTypeUtilsTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "accessorytypeutils": {
+        "$path": ".."
+      }
+    }
+  }
+}

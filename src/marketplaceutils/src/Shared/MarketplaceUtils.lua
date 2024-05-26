@@ -88,42 +88,6 @@ function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 end
 
 --[=[
-	Converts an enum value (retrieved from MarketplaceService) into a proper enum if possible
-
-	@param assetTypeId number
-	@return AssetType | nl
-]=]
-function MarketplaceUtils.convertAssetTypeIdToAssetType(assetTypeId)
-	assert(type(assetTypeId) == "number", "Bad assetTypeId")
-
-	for _, enumItem in pairs(Enum.AssetType:GetEnumItems()) do
-		if enumItem.Value == assetTypeId then
-			return enumItem
-		end
-	end
-
-	return nil
-end
-
---[=[
-	Converts an enum value (retrieved from MarketplaceService) into a proper enum if possible
-
-	@param assetTypeId number
-	@return AvatarAssetType | nil
-]=]
-function MarketplaceUtils.convertAssetTypeIdToAvatarAssetType(assetTypeId)
-	assert(type(assetTypeId) == "number", "Bad assetTypeId")
-
-	for _, enumItem in pairs(Enum.AvatarAssetType:GetEnumItems()) do
-		if enumItem.Value == assetTypeId then
-			return enumItem
-		end
-	end
-
-	return nil
-end
-
---[=[
 	Retrieves whether a player owns a gamepass.
 	@param userId number
 	@param gamePassId number
