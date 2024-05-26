@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
+local RunService = game:GetService("RunService")
 
 local Brio = require("Brio")
 local Maid = require("Maid")
@@ -87,7 +88,8 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player)
 		-- There's a non-zero chance these get removed someday... :(
 		-- https://devforum.roblox.com/t/playerfriendedevent-was-deleted-from-corescripts/696683
 		-- So just incase these connections throw, use a new thread so we don't error out the whole observable.
-		if player == Players.LocalPlayer then
+		-- Only allow this while the game is running too
+		if player == Players.LocalPlayer and RunService:IsRunning() then
 			task.spawn(function()
 				maid:GiveTask(StarterGui:GetCore("PlayerFriendedEvent").Event:Connect(function(otherPlayer: Player)
 					handleFriendState(otherPlayer, true)
