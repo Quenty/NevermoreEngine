@@ -36,6 +36,10 @@ function HumanoidTrackerService:GetHumanoidTracker(player)
 
 	player = player or Players.LocalPlayer
 
+	if player == nil then
+		return nil
+	end
+
 	if self._humanoidTrackerMap[player] then
 		return self._humanoidTrackerMap[player]
 	else
