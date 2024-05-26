@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 local DuckTypeUtils = require("DuckTypeUtils")
 local t = require("t")
 local DefaultValueUtils = require("DefaultValueUtils")
+local AttributeValue = require("AttributeValue")
 
 local AdorneeDataEntry = {}
 AdorneeDataEntry.ClassName = "AdorneeDataEntry"
@@ -17,27 +18,44 @@ AdorneeDataEntry.__index = AdorneeDataEntry
 --[=[
 	Creates a new adornee data entry
 
-	@param dataType string
+	@param interface string | (value: any) -> (boolean, string?)
 	@param createValueObject (adornee: Instance) -> ValueObject<T>
+	@param defaultValue T?
 	@return AdorneeDataEntry<T>
 ]=]
-function AdorneeDataEntry.new(dataType, createValueObject)
-	assert(type(dataType) == "string", "Bad dataType")
+function AdorneeDataEntry.new(interface, createValueObject, defaultValue)
+	assert(type(interface) == "string" or type(interface) == "function", "Bad interface")
 	assert(type(createValueObject) == "function", "Bad createValueObject")
 
 	local self = setmetatable({}, AdorneeDataEntry)
 
-	self._dataType = dataType
 	self._createValueObject = createValueObject
-	self._strictInterface = t.typeof(self._dataType)
 
-	if self._dataType == "Instance" then
-		self._defaultValue = nil
+	if type(interface) == "string" then
+		self._interface = t.typeof(interface)
+	elseif type(interface) == "function" then
+		self._interface = interface
 	else
-		self._defaultValue = DefaultValueUtils.getDefaultValueForType(self._dataType)
+		error("Bad interface")
+	end
+
+	if defaultValue ~= nil then
+		self._defaultValue = defaultValue
+	elseif self._dataType == "Instance" then
+		self._defaultValue = nil
+	elseif type(interface) ~= "function" then
+		self._defaultValue = DefaultValueUtils.getDefaultValueForType(interface)
 	end
 
 	return self
+end
+
+function AdorneeDataEntry.optionalAttribute(interface, name)
+	assert(type(interface) == "string" or type(interface) == "function", "Bad interface")
+
+	return AdorneeDataEntry.new(t.optional(interface), function(instance)
+		return AttributeValue.new(instance, name, nil)
+	end, nil)
 end
 
 --[=[
@@ -81,7 +99,7 @@ end
 	@param adornee Instance
 	@return T
 ]=]
-function AdorneeDataEntry:GetValue(adornee)
+function AdorneeDataEntry:Get(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local valueObject = self:Create(adornee)
@@ -95,18 +113,18 @@ end
 	@param adornee Instance
 	@param value T
 ]=]
-function AdorneeDataEntry:SetValue(adornee, value)
+function AdorneeDataEntry:Set(adornee, value)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
-	assert(self._strictInterface(value))
+	assert(self._interface(value))
 
-	local valueObject = self:CreateValueObject(adornee)
+	local valueObject = self:Create(adornee)
 	valueObject.Value = value
 end
 
 --[=[
 	Gets the default value
 
-	@return T
+	@return T?
 ]=]
 function AdorneeDataEntry:GetDefaultValue()
 	return self._defaultValue
@@ -118,7 +136,7 @@ end
 	@return (value: any) -> (boolean, string)
 ]=]
 function AdorneeDataEntry:GetStrictInterface()
-	return self._strictInterface
+	return self._interface
 end
 
 --[=[
@@ -128,7 +146,7 @@ end
 	@return (boolean, string)
 ]=]
 function AdorneeDataEntry:IsValid(value)
-	return self._strictInterface(value)
+	return self._interface(value)
 end
 
 return AdorneeDataEntry
