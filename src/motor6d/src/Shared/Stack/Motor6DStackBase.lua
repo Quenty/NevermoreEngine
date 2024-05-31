@@ -16,8 +16,7 @@ Motor6DStackBase.__index = Motor6DStackBase
 function Motor6DStackBase.new(motor6D)
 	local self = setmetatable(BaseObject.new(motor6D), Motor6DStackBase)
 
-	self._animator = Motor6DAnimator.new(motor6D)
-	self._maid:GiveTask(self._animator)
+	self._animator = self._maid:Add(Motor6DAnimator.new(motor6D))
 
 	self._maid:GiveTask(Motor6DStackInterface:Implement(self._obj, self))
 
