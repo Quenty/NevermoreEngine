@@ -10,13 +10,15 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local Binder = require("Binder")
 local DataStoreStringUtils = require("DataStoreStringUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerSettingsBase = require("PlayerSettingsBase")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
+local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
-local RemoteFunctionUtils = require("RemoteFunctionUtils")
+local Remoting = require("Remoting")
 local Symbol = require("Symbol")
 local ThrottledFunction = require("ThrottledFunction")
 local ValueObject = require("ValueObject")
@@ -26,8 +28,6 @@ local UNSET_VALUE = Symbol.named("unsetValue")
 local PlayerSettingsClient = setmetatable({}, PlayerSettingsBase)
 PlayerSettingsClient.ClassName = "PlayerSettingsClient"
 PlayerSettingsClient.__index = PlayerSettingsClient
-
-require("PromiseRemoteFunctionMixin"):Add(PlayerSettingsClient, PlayerSettingsConstants.REMOTE_FUNCTION_NAME)
 
 --[=[
 	See [SettingsBindersClient] and [SettingsServiceClient] on how to properly use this class.
@@ -40,21 +40,23 @@ function PlayerSettingsClient.new(folder, serviceBag)
 	local self = setmetatable(PlayerSettingsBase.new(folder, serviceBag), PlayerSettingsClient)
 
 	if self:GetPlayer() == Players.LocalPlayer then
+		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.CLIENT))
+
 		self._toReplicate = nil
 		self._toReplicateCallbacks = {}
 
 		-- We only want to keep this data here until we're
 		-- actually done sending and the server acknowledges this is the state that
 		-- we have. Otherwise we accept the server as the state of truth
-		self._pendingReplicationDataInTransit = ValueObject.new(nil)
-		self._maid:GiveTask(self._pendingReplicationDataInTransit)
+		self._pendingReplicationDataInTransit = self._maid:Add(ValueObject.new(nil))
 
 		-- We need to avoid sending these quickly because otherwise
 		-- sliding a slider can lag out stuff.
-		self._queueSendSettingsFunc = ThrottledFunction.new(0.3, function()
+		self._queueSendSettingsFunc = self._maid:Add(ThrottledFunction.new(0.3, function()
 			self:_sendSettings()
-		end, { leading = true, trailing = true })
-		self._maid:GiveTask(self._queueSendSettingsFunc)
+		end, { leading = true, trailing = true }))
+
+		self._maid:GiveTask(PlayerSettingsInterface.Client:Implement(self._obj, self))
 	end
 
 	return self
@@ -229,14 +231,7 @@ end
 function PlayerSettingsClient:_promiseReplicateSettings(settingsMap)
 	assert(type(settingsMap) == "table", "Bad settingsMap")
 
-	return self:PromiseRemoteFunction()
-		:Then(function(remoteFunction)
-			return self._maid:GivePromise(RemoteFunctionUtils.promiseInvokeServer(
-				remoteFunction,
-				PlayerSettingsConstants.REQUEST_UPDATE_SETTINGS,
-				settingsMap))
-		end)
+	return self._remoting.RequestUpdateSettings:PromiseInvokeServer(settingsMap)
 end
 
-
-return PlayerSettingsClient
+return Binder.new("PlayerSettings", PlayerSettingsClient)

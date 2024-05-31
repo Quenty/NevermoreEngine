@@ -4,11 +4,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
+local DataStoreStringUtils = require("DataStoreStringUtils")
 local PlayerSettingsBase = require("PlayerSettingsBase")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
+local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
+local Remoting = require("Remoting")
 local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
-local DataStoreStringUtils = require("DataStoreStringUtils")
 
 local PlayerSettings = setmetatable({}, PlayerSettingsBase)
 PlayerSettings.ClassName = "PlayerSettings"
@@ -20,15 +23,7 @@ function PlayerSettings.new(obj, serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._settingRegistryServiceShared = self._serviceBag:GetService(SettingRegistryServiceShared)
 
-	self._remoteFunction = Instance.new("RemoteFunction")
-	self._remoteFunction.Name = PlayerSettingsConstants.REMOTE_FUNCTION_NAME
-	self._remoteFunction.Archivable = false
-	self._remoteFunction.Parent = self._obj
-	self._maid:GiveTask(self._remoteFunction)
-
-	self._remoteFunction.OnServerInvoke = function(...)
-		return self:_handleServerInvoke(...)
-	end
+	self:_setupRemoting()
 
 	self._maid:GiveTask(self._settingRegistryServiceShared:ObserveRegisteredDefinitionsBrio():Subscribe(function(brio)
 		if brio:IsDead() then
@@ -38,6 +33,8 @@ function PlayerSettings.new(obj, serviceBag)
 		local value = brio:GetValue()
 		self:EnsureInitialized(value:GetSettingName(), value:GetDefaultValue())
 	end))
+
+	self._maid:GiveTask(PlayerSettingsInterface.Server:Implement(self._obj, self))
 
 	return self
 end
@@ -65,17 +62,17 @@ function PlayerSettings:EnsureInitialized(settingName, defaultValue)
 	end
 end
 
-function PlayerSettings:_handleServerInvoke(player, request, ...)
-	assert(self:GetPlayer() == player, "Bad player")
+function PlayerSettings:_setupRemoting()
+	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.SERVER))
 
-	if request == PlayerSettingsConstants.REQUEST_UPDATE_SETTINGS then
-		return self:_setSettings(...)
-	else
-		error(("Unknown request %q"):format(tostring(request)))
-	end
+	self._maid:Add(self._remoting.RequestUpdateSettings:Bind(function(player, settingsMap)
+		assert(self:GetPlayer() == player, "Bad player")
+
+		return self:_setSettingsMap(settingsMap)
+	end))
 end
 
-function PlayerSettings:_setSettings(settingsMap)
+function PlayerSettings:_setSettingsMap(settingsMap)
 	assert(type(settingsMap) == "table", "Bad settingsMap")
 
 	for settingName, value in pairs(settingsMap) do
@@ -123,4 +120,4 @@ function PlayerSettings:_setSettings(settingsMap)
 	end
 end
 
-return PlayerSettings
+return Binder.new("PlayerSettings", PlayerSettings)

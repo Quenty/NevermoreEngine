@@ -48,6 +48,7 @@
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table",
     "@quenty/throttle": "file:../throttle",
+    "@quenty/tie": "file:../tie",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

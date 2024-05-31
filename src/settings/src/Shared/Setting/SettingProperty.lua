@@ -83,7 +83,7 @@ function SettingProperty:__index(index)
 	elseif SettingProperty[index] then
 		return SettingProperty[index]
 	else
-		error(("%q is not a member of SettingProperty %s"):format(tostring(index), self._definition:GetSettingName()))
+		error(string.format("%q is not a member of SettingProperty %s", tostring(index), self._definition:GetSettingName()))
 	end
 end
 
@@ -91,7 +91,7 @@ function SettingProperty:__newindex(index, value)
 	if index == "Value" then
 		self:SetValue(value)
 	elseif index == "DefaultValue" or index == "Changed" or SettingProperty[index] then
-		error(("Cannot set %q"):format(tostring(index)))
+		error(string.format("Cannot set %q", tostring(index)))
 	else
 		rawset(self, index, value)
 	end

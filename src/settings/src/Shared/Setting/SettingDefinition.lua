@@ -10,8 +10,8 @@
 	local SettingDefinition = require("SettingDefinition")
 
 	return require("SettingDefinitionProvider").new({
-		SettingDefinition.new("LastTimeUpdateSeen", 0);
-		SettingDefinition.new("LastTimeShopSeen", 0);
+		LastTimeUpdateSeen = 0;
+		LastTimeShopSeen = 0;
 	})
 	```
 
@@ -24,6 +24,7 @@ local Players = game:GetService("Players")
 
 local SettingProperty = require("SettingProperty")
 local ServiceBag = require("ServiceBag")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local SettingDefinition = {}
 SettingDefinition.ClassName = "SettingDefinition"
@@ -38,10 +39,11 @@ SettingDefinition.__index = SettingDefinition
 	@return SettingDefinition<T>
 ]=]
 function SettingDefinition.new(settingName, defaultValue)
-	local self = setmetatable({}, SettingDefinition)
-
 	assert(type(settingName) == "string", "Bad settingName")
 	assert(defaultValue ~= nil, "DefaultValue cannot be nil")
+
+	local self = setmetatable({}, SettingDefinition)
+
 
 	self._settingName = settingName
 	self._defaultValue = defaultValue
@@ -49,6 +51,16 @@ function SettingDefinition.new(settingName, defaultValue)
 	self.ServiceName = self._settingName
 
 	return self
+end
+
+--[=[
+	Returns true if the value is a setting definition
+
+	@param value any
+	@return boolean
+]=]
+function SettingDefinition.isSettingDefinition(value)
+	return DuckTypeUtils.isImplementation(SettingDefinition, value)
 end
 
 --[=[
@@ -60,7 +72,9 @@ end
 ]=]
 function SettingDefinition:GetSettingProperty(serviceBag, player)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+
+	player = player or Players.LocalPlayer
 
 	return SettingProperty.new(serviceBag, player, self)
 end
