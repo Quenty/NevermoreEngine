@@ -11,18 +11,17 @@ local TieMethodImplementation = setmetatable({}, BaseObject)
 TieMethodImplementation.ClassName = "TieMethodImplementation"
 TieMethodImplementation.__index = TieMethodImplementation
 
-function TieMethodImplementation.new(memberDefinition, folder, initialValue, actualSelf)
+function TieMethodImplementation.new(memberDefinition, parent, initialValue, actualSelf)
 	local self = setmetatable(BaseObject.new(), TieMethodImplementation)
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
-	self._folder = assert(folder, "No folder")
+	self._parent = assert(parent, "No parent")
 	self._actualSelf = assert(actualSelf, "No actualSelf")
 
-	self._bindableFunction = Instance.new("BindableFunction")
+	self._bindableFunction = self._maid:Add(Instance.new("BindableFunction"))
 	self._bindableFunction.Name = memberDefinition:GetMemberName()
 	self._bindableFunction.Archivable = false
-	self._bindableFunction.Parent = self._folder
-	self._maid:GiveTask(self._bindableFunction)
+	self._bindableFunction.Parent = self._parent
 
 	self:SetImplementation(initialValue)
 

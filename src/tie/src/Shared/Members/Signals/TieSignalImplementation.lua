@@ -12,17 +12,16 @@ local TieSignalImplementation = setmetatable({}, BaseObject)
 TieSignalImplementation.ClassName = "TieSignalImplementation"
 TieSignalImplementation.__index = TieSignalImplementation
 
-function TieSignalImplementation.new(memberDefinition, folder, initialValue)
+function TieSignalImplementation.new(memberDefinition, implParent, initialValue)
 	local self = setmetatable(BaseObject.new(), TieSignalImplementation)
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
-	self._folder = assert(folder, "No folder")
+	self._implParent = assert(implParent, "No implParent")
 
-	self._bindableEvent = Instance.new("BindableEvent")
+	self._bindableEvent = self._maid:Add(Instance.new("BindableEvent"))
 	self._bindableEvent.Archivable = false
 	self._bindableEvent.Name = memberDefinition:GetMemberName()
-	self._bindableEvent.Parent = self._folder
-	self._maid:GiveTask(self._bindableEvent)
+	self._bindableEvent.Parent = self._implParent
 
 	-- Abuse the fact that the first signal connected is the first
 	-- signal to fire!

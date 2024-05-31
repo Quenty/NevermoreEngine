@@ -4,37 +4,30 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AttributeUtils = require("AttributeUtils")
+local AttributeValue = require("AttributeValue")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local String = require("String")
-local TieInterfaceUtils = require("TieInterfaceUtils")
+local Symbol = require("Symbol")
 local TiePropertyChangedSignalConnection = require("TiePropertyChangedSignalConnection")
 local TiePropertyImplementationUtils = require("TiePropertyImplementationUtils")
 local TieUtils = require("TieUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
 local ValueObject = require("ValueObject")
-local AttributeUtils = require("AttributeUtils")
-local AttributeValue = require("AttributeValue")
-local Symbol = require("Symbol")
+local TieMemberInterface = require("TieMemberInterface")
 
 local UNSET_VALUE = Symbol.named("unsetValue")
 
-local TiePropertyInterface = {}
+local TiePropertyInterface = setmetatable({}, TieMemberInterface)
 TiePropertyInterface.ClassName = "TiePropertyInterface"
 TiePropertyInterface.__index = TiePropertyInterface
 
-function TiePropertyInterface.new(folder, adornee, memberDefinition)
-	local self = setmetatable({}, TiePropertyInterface)
-
-	assert(folder or adornee, "Folder or adornee required")
-
-	self._folder = folder
-	self._adornee = adornee
-	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
-	self._tieDefinition = self._memberDefinition:GetTieDefinition()
+function TiePropertyInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm)
+	local self = setmetatable(TieMemberInterface.new(implParent, adornee, memberDefinition, interfaceTieRealm), TiePropertyInterface)
 
 	return self
 end
@@ -84,17 +77,13 @@ function TiePropertyInterface:Observe()
 	})
 end
 
-function TiePropertyInterface:_getFolder()
-	return TieInterfaceUtils.getFolder(self._tieDefinition, self._folder, self._adornee)
-end
-
 function TiePropertyInterface:_findValueBase()
-	local folder = self:_getFolder()
-	if not folder then
+	local implParent = self:GetImplParent()
+	if not implParent then
 		return nil
 	end
 
-	local implementation = folder:FindFirstChild(self._memberDefinition:GetMemberName())
+	local implementation = implParent:FindFirstChild(self._memberDefinition:GetMemberName())
 	if not implementation then
 		return nil
 	end
@@ -112,21 +101,20 @@ end
 function TiePropertyInterface:_getValueBaseOrError()
 	local valueBase = self:_findValueBase()
 	if not valueBase then
-		error(("%s.%s is not implemented for %s"):format(
-			self._tieDefinition:GetContainerName(),
-			self._memberDefinition:GetMemberName(),
+		error(string.format("%s.%s is not implemented for %s",
+			self._memberDefinition:GetFriendlyName(),
 			self:_getFullName()))
 	end
 	return valueBase
 end
 
 function TiePropertyInterface:_getFullName()
-	if self._folder then
-		return self._folder:GetFullName()
+	if self._implParent then
+		return self._implParent:GetFullName()
 	elseif self._adornee then
 		return self._adornee:GetFullName()
 	else
-		error("[TiePropertyInterface] - Either folder or adornee should be defined")
+		error("[TiePropertyInterface] - Either implParent or adornee should be defined")
 	end
 end
 
@@ -135,8 +123,7 @@ function TiePropertyInterface:_getChangedEvent()
 		Connect = function(_, callback)
 			assert(type(callback) == "function", "Bad callback")
 			return TiePropertyChangedSignalConnection.new(function(connMaid)
-				local valueObject = ValueObject.new(nil)
-				connMaid:GiveTask(valueObject)
+				local valueObject = connMaid:Add(ValueObject.new(nil)		)
 
 				connMaid:GiveTask(self:Observe():Subscribe(function(value)
 					valueObject.Value = value
@@ -154,7 +141,7 @@ local IMPLEMENTATION_TYPES = {
 	none = "none";
 }
 
-function TiePropertyInterface:_observeFromFolder(folder)
+function TiePropertyInterface:_observeFromImplParent(implParent)
 	return Observable.new(function(sub)
 		local memberName = self._memberDefinition:GetMemberName()
 		local topMaid = Maid.new()
@@ -169,11 +156,11 @@ function TiePropertyInterface:_observeFromFolder(folder)
 			end
 
 			-- Prioritize attributes first
-			local currentAttribute = folder:GetAttribute(memberName)
+			local currentAttribute = implParent:GetAttribute(memberName)
 			if currentAttribute ~= nil then
 				if lastImplementationType ~= IMPLEMENTATION_TYPES.attribute then
 					lastImplementationType = IMPLEMENTATION_TYPES.attribute
-					sub:Fire(AttributeValue.new(folder, memberName))
+					sub:Fire(AttributeValue.new(implParent, memberName))
 				end
 
 				return
@@ -210,7 +197,7 @@ function TiePropertyInterface:_observeFromFolder(folder)
 		end
 
 		-- Subscribe to named children
-		topMaid:GiveTask(RxInstanceUtils.observeChildrenOfNameBrio(folder, "Instance", self._memberDefinition:GetMemberName())
+		topMaid:GiveTask(RxInstanceUtils.observeChildrenOfNameBrio(implParent, "Instance", self._memberDefinition:GetMemberName())
 			:Subscribe(function(brio)
 				if brio:IsDead() then
 					return
@@ -233,7 +220,7 @@ function TiePropertyInterface:_observeFromFolder(folder)
 				update()
 			end))
 
-		topMaid:GiveTask(folder:GetAttributeChangedSignal(memberName):Connect(update))
+		topMaid:GiveTask(implParent:GetAttributeChangedSignal(memberName):Connect(update))
 		update()
 
 		return topMaid
@@ -241,25 +228,21 @@ function TiePropertyInterface:_observeFromFolder(folder)
 end
 
 function TiePropertyInterface:_observeValueBaseBrio()
-	return self:_observeFolderBrio():Pipe({
-		RxBrioUtils.switchMapBrio(function(folder)
-			return self:_observeFromFolder(folder)
+	return self:ObserveImplParentBrio():Pipe({
+		RxBrioUtils.switchMapBrio(function(implParent)
+			return self:_observeFromImplParent(implParent)
 		end);
 		RxBrioUtils.onlyLastBrioSurvives();
 	})
-end
-
-function TiePropertyInterface:_observeFolderBrio()
-	return TieInterfaceUtils.observeFolderBrio(self._tieDefinition, self._folder, self._adornee)
 end
 
 function TiePropertyInterface:__index(index)
 	if TiePropertyInterface[index] then
 		return TiePropertyInterface[index]
 	elseif index == "Value" then
-		local folder = self:_getFolder()
-		if folder then
-			local currentAttributeValue = folder:GetAttribute(self._memberDefinition:GetMemberName())
+		local implParent = self:GetImplParent()
+		if implParent then
+			local currentAttributeValue = implParent:GetAttribute(self._memberDefinition:GetMemberName())
 			if currentAttributeValue ~= nil then
 				return currentAttributeValue
 			end
@@ -269,51 +252,51 @@ function TiePropertyInterface:__index(index)
 		return valueBase.Value
 	elseif index == "Changed" then
 		return self:_getChangedEvent()
-	elseif index == "_adornee" or index == "_folder" or index == "_memberDefinition" or index == "_tieDefinition" then
+	elseif index == "_adornee" or index == "_implParent" or index == "_memberDefinition" or index == "_tieDefinition" then
 		return rawget(self, index)
 	else
-		error(("Bad index %q for TiePropertyInterface"):format(tostring(index)))
+		error(string.format("Bad index %q for TiePropertyInterface", tostring(index)))
 	end
 end
 
 function TiePropertyInterface:__newindex(index, value)
-	if index == "_adornee" or index == "_folder" or index == "_memberDefinition" or index == "_tieDefinition" then
+	if index == "_adornee" or index == "_implParent" or index == "_memberDefinition" or index == "_tieDefinition" then
 		rawset(self, index, value)
 	elseif index == "Value" then
 		local className = ValueBaseUtils.getClassNameFromType(typeof(value))
 		if not className then
-			error(("[TiePropertyImplementation] - Bad implementation value type %q, cannot set"):format(typeof(value)))
+			error(string.format("[TiePropertyImplementation] - Bad implementation value type %q, cannot set", typeof(value)))
 		end
 
 		local valueBase = self:_findValueBase()
 		if type(valueBase) == "table" or (typeof(valueBase) == "Instance" and valueBase.ClassName == className) then
 			valueBase.Value = value
 		elseif AttributeUtils.isValidAttributeType(typeof(value)) and value ~= nil then
-			local folder = self:_getFolder()
-			if folder then
-				folder:SetAttribute(self._memberDefinition:GetMemberName(), value)
+			local implParent = self:GetImplParent()
+			if implParent then
+				implParent:SetAttribute(self._memberDefinition:GetMemberName(), value)
 
 				-- Remove existing as needed
-				local current = folder:FindFirstChild(self._memberDefinition:GetMemberName())
+				local current = implParent:FindFirstChild(self._memberDefinition:GetMemberName())
 				if current then
 					current:Destroy()
 				end
 				return
 			end
 		else
-			local folder = self:_getFolder()
-			if folder then
-				local copy = TiePropertyImplementationUtils.changeToClassIfNeeded(self._memberDefinition, folder, className)
+			local implParent = self:GetImplParent()
+			if implParent then
+				local copy = TiePropertyImplementationUtils.changeToClassIfNeeded(self._memberDefinition, implParent, className)
 				copy.Value = value
-				copy.Parent = folder
+				copy.Parent = implParent
 			else
-				error(("[TiePropertyImplementation] - No folder for %q"):format(self._memberDefinition:GetMemberName()))
+				error(string.format("[TiePropertyImplementation] - No implParent for %q", self._memberDefinition:GetMemberName()))
 			end
 		end
 	elseif index == "Changed" then
-		error(("Cannot assign %q for TiePropertyInterface"):format(tostring(index)))
+		error(string.format("Cannot assign %q for TiePropertyInterface", tostring(index)))
 	else
-		error(("Bad index %q for TiePropertyInterface"):format(tostring(index)))
+		error(string.format("Bad index %q for TiePropertyInterface", tostring(index)))
 	end
 end
 

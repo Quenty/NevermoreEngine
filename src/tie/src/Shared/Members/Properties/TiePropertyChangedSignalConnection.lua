@@ -31,7 +31,7 @@ function TiePropertyChangedSignalConnection:__index(index)
 	elseif TiePropertyChangedSignalConnection[index] then
 		return TiePropertyChangedSignalConnection[index]
 	else
-		error(("Bad index %q for TiePropertyChangedSignalConnection"):format(tostring(index)))
+		error(string.format("Bad index %q for TiePropertyChangedSignalConnection", tostring(index)))
 	end
 end
 
