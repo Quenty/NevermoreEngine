@@ -319,22 +319,38 @@ function ServiceBag:Destroy()
 	self._destroyingSignal:Fire()
 	self._destroyingSignal:Destroy()
 
-	local services = self._services
-	local key, service = next(services)
-	while service ~= nil do
-		services[key] = nil
+	self:_destructServices()
 
-		if not (self._serviceTypesToInitializeSet and self._serviceTypesToInitializeSet[key]) then
+	super.Destroy(self)
+end
+
+function ServiceBag:_destructServices()
+	local services = self._services
+	local serviceType, service = next(services)
+	while service ~= nil do
+		services[serviceType] = nil
+
+		if not (self._serviceTypesToInitializeSet and self._serviceTypesToInitializeSet[serviceType]) then
+			local serviceName = self:_getServiceName(serviceType)
+
+			local current
 			task.spawn(function()
+				debug.setmemorycategory(serviceName)
+				current = coroutine.running()
+
 				if service.Destroy then
 					service:Destroy()
 				end
 			end)
-		end
-		key, service = next(services)
-	end
 
-	super.Destroy(self)
+			local isDead = coroutine.status(current) == "dead"
+			if not isDead then
+				warn(string.format("Destroying service %q yielded", serviceName))
+			end
+		end
+
+		serviceType, service = next(services)
+	end
 end
 
 return ServiceBag

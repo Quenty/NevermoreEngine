@@ -189,7 +189,6 @@ function RemotingMember:FireAllClientsExcept(excludePlayer, ...)
 	self._remoting:FireAllClientsExcept(self._memberName, excludePlayer, ...)
 end
 
-
 --[=[
 	Fires the client with the data
 

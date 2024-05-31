@@ -26,7 +26,7 @@ local RAW_MEMBERS = {
 	_maid = true;
 	_instance = true;
 	_remoteObjects = true;
-	_remoteFolder = true;
+	_container = true;
 }
 
 local REMOTE_EVENT_SUFFIX = "Event"
@@ -93,7 +93,7 @@ function Remoting:Connect(memberName, callback)
 		if self._useDummyObject then
 			self:DeclareEvent(memberName)
 
-			self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnClientInvoke"))
+			self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnClientEvent"))
 			local bindableEvent = self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnServerEvent"))
 			connectMaid:GiveTask(bindableEvent.Event:Connect(callback))
 		else
@@ -542,21 +542,25 @@ function Remoting:PromiseInvokeClient(memberName, player, ...)
 	return promise
 end
 
-function Remoting:_ensureFolder()
+function Remoting:GetContainerClass()
+	return "Configuration"
+end
+
+function Remoting:_ensureContainer()
 	assert(self._remotingRealm == RemotingRealms.SERVER, "Folder should only be created on server")
 
-	if self._remoteFolder then
-		return self._remoteFolder
+	if self._container then
+		return self._container
 	end
 
-	self._remoteFolder = Instance.new("Folder")
-	self._remoteFolder.Name = self._remoteFolderName
-	self._remoteFolder.Archivable = false
-	self._remoteFolder.Parent = self._instance
+	self._container = Instance.new(self:GetContainerClass())
+	self._container.Name = self._remoteFolderName
+	self._container.Archivable = false
+	self._container.Parent = self._instance
 
-	self._maid:GiveTask(self._remoteFolder)
+	self._maid:GiveTask(self._container)
 
-	return self._remoteFolder
+	return self._container
 end
 
 function Remoting:_observeRemoteFunctionBrio(memberName)
@@ -591,30 +595,30 @@ function Remoting:_observeRemoteEventBrio(memberName)
 	})
 end
 
-function Remoting:_promiseFolder(maid)
+function Remoting:_promiseContainer(maid)
 	return maid:GivePromise(promiseChild(self._instance, self._remoteFolderName, 5))
 end
 
 function Remoting:_promiseRemoteEvent(maid, memberName)
 	local remoteEventName = self:_getMemberName(memberName, REMOTE_EVENT_SUFFIX)
-	return self:_promiseFolder(maid)
-		:Then(function(folder)
-			return maid:GivePromise(promiseChild(folder, remoteEventName, 5))
+	return self:_promiseContainer(maid)
+		:Then(function(container)
+			return maid:GivePromise(promiseChild(container, remoteEventName, 5))
 		end)
 end
 
 function Remoting:_promiseRemoteFunction(maid, memberName)
 	local remoteEventName = self:_getMemberName(memberName, REMOTE_FUNCTION_SUFFIX)
-	return self:_promiseFolder(maid)
-		:Then(function(folder)
-			return maid:GivePromise(promiseChild(folder, remoteEventName, 5))
+	return self:_promiseContainer(maid)
+		:Then(function(container)
+			return maid:GivePromise(promiseChild(container, remoteEventName, 5))
 		end)
 end
 
 function Remoting:_observeFolderBrio()
 	assert(self._instance, "Not initialized")
 
-	return RxInstanceUtils.observeLastNamedChildBrio(self._instance, "Folder", self._remoteFolderName)
+	return RxInstanceUtils.observeLastNamedChildBrio(self._instance, self:GetContainerClass(), self._remoteFolderName)
 end
 
 function Remoting:_getOrCreateRemoteFunction(memberName)
@@ -626,7 +630,7 @@ function Remoting:_getOrCreateRemoteFunction(memberName)
 		return self._remoteObjects[remoteFunctionName]
 	end
 
-	local folder = self:_ensureFolder()
+	local container = self:_ensureContainer()
 
 	local remoteFunction
 	if self._useDummyObject then
@@ -637,7 +641,7 @@ function Remoting:_getOrCreateRemoteFunction(memberName)
 
 	remoteFunction.Name = remoteFunctionName
 	remoteFunction.Archivable = false
-	remoteFunction.Parent = folder
+	remoteFunction.Parent = container
 
 	self._remoteObjects[remoteFunctionName] = remoteFunction
 	self._maid[remoteFunction] = remoteFunction
@@ -654,7 +658,7 @@ function Remoting:_getOrCreateRemoteEvent(memberName)
 		return self._remoteObjects[remoteEventName]
 	end
 
-	local folder = self:_ensureFolder()
+	local container = self:_ensureContainer()
 
 	local remoteEvent
 	if self._useDummyObject then
@@ -665,7 +669,7 @@ function Remoting:_getOrCreateRemoteEvent(memberName)
 
 	remoteEvent.Name = remoteEventName
 	remoteEvent.Archivable = false
-	remoteEvent.Parent = folder
+	remoteEvent.Parent = container
 
 	self._maid[remoteEvent] = remoteEvent
 	self._remoteObjects[remoteEventName] = remoteEvent
