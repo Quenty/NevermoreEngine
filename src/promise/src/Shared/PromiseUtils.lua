@@ -210,4 +210,21 @@ function PromiseUtils.timeout(timeoutTime, fromPromise)
 	return promise
 end
 
+function PromiseUtils.retry(callback, times, waitTimeBetweenRetys, ...)
+	assert(type(callback) == "function", "Bad callback")
+	assert(type(times) == "number", "Bad times")
+	assert(type(waitTimeBetweenRetys) == "number", "Bad waitTime")
+	
+	local args, length = {...}, select("#", ...)
+
+	return callback(...):Catch(function(...)
+		if times > 0 then
+			task.wait(waitTimeBetweenRetys)
+			return PromiseUtils.retry(callback, times - 1, waitTimeBetweenRetys, unpack(args, 1, length)) 
+		else
+			return Promise.rejected(...)
+		end
+	end)
+end
+
 return PromiseUtils
