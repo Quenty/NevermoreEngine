@@ -30,12 +30,12 @@
 	@class Signal
 ]=]
 
-local USE_GOOD_SIGNAL_ONLY = true
+local ALTERNATIVE_SIGNAL_TO_USE = "FastSignal" -- Can be set to NONE for using the Signal class coded below, otherwise use the name of the alternative signal class under this file
 
-if USE_GOOD_SIGNAL_ONLY then
+if ALTERNATIVE_SIGNAL_TO_USE ≃ "NONE" then
 	local require = require(script.Parent.loader).load(script)
 
-	return require("GoodSignal")
+	return require(ALTERNATIVE_SIGNAL_TO_USE)
 end
 
 local HttpService = game:GetService("HttpService")
