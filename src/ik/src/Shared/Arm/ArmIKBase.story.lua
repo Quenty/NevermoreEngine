@@ -10,9 +10,11 @@ local RunService = game:GetService("RunService")
 local Maid = require("Maid")
 local RigBuilderUtils = require("RigBuilderUtils")
 local ArmIKBase = require("ArmIKBase")
+local ServiceBag = require("ServiceBag")
 
 return function(_target)
 	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 
 	maid:GivePromise(RigBuilderUtils.promisePlayerRig(4397833)):Then(function(character)
 		maid:GiveTask(character)
@@ -20,7 +22,7 @@ return function(_target)
 		local humanoid = character.Humanoid
 		local position = Workspace.CurrentCamera.CFrame:pointToWorldSpace(Vector3.new(0, 0, -10))
 
-		local armIKBase = ArmIKBase.new(humanoid, "Right")
+		local armIKBase = ArmIKBase.new(humanoid, "Right", serviceBag)
 		maid:GiveTask(armIKBase)
 
 		local attachment = Instance.new("Attachment")

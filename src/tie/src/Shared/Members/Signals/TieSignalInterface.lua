@@ -40,7 +40,10 @@ function TieSignalInterface:Fire(...)
 end
 
 --[=[
+	Connects like an RBXSignalConnection
 
+	@param callback (T...) -> ()
+	@return TieSignalConnection
 ]=]
 function TieSignalInterface:Connect(callback)
 	assert(type(callback) == "function", "Bad callback")
@@ -53,7 +56,7 @@ function TieSignalInterface:Wait()
 	error("Not implemented")
 end
 
-function TieSignalInterface:Once(callback)
+function TieSignalInterface:Once(_callback)
 	-- TODO: Implement
 	error("Not implemented")
 end
@@ -61,7 +64,7 @@ end
 function TieSignalInterface:ObserveBindableEventBrio()
 	local name = self._memberDefinition:GetMemberName()
 
-	return self._tieSignalInterface:ObserveImplParentBrio():Pipe({
+	return self:ObserveImplParentBrio():Pipe({
 		RxBrioUtils.switchMapBrio(function(implParent)
 			return RxInstanceUtils.observeLastNamedChildBrio(implParent, "BindableEvent", name)
 		end);

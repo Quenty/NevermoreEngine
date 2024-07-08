@@ -51,7 +51,7 @@ function PlayerHasSettings:_promiseLoadSettings()
 				end)
 		end)
 		:Catch(function(err)
-			warn(("[PlayerHasSettings] - Failed to load settings for player. %s"):format(tostring(err)))
+			warn(string.format("[PlayerHasSettings] - Failed to load settings for player. %s", tostring(err)))
 		end)
 		:Finally(function()
 			-- Parent anyway...

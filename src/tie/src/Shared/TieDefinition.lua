@@ -313,6 +313,9 @@ function TieDefinition:HasImplementation(adornee: Instance, tieRealm)
 	-- TODO: Maybe something faster
 	for containerName, _ in pairs(self:GetValidContainerNameSet(tieRealm)) do
 		local implParent = adornee:FindFirstChild(containerName)
+		if not implParent then
+			continue
+		end
 
 		if self:IsImplementation(implParent, tieRealm) then
 			return true
@@ -559,18 +562,22 @@ end
 	invoking interface methods, or querying the interface will result
 	in errors.
 
+	```tip
+	Probably use :Find() instead of Get, since this always returns an interface.
+	```
+
 	@param adornee Instance -- Adornee to get interface on
 	@param tieRealm TieRealm?
 	@return TieInterface<T>
 ]=]
--- function TieDefinition:Get(adornee: Instance, tieRealm)
--- 	assert(typeof(adornee) == "Instance", "Bad adornee")
--- 	assert(TieRealmUtils.isTieRealm(tieRealm) or tieRealm == nil, "Bad tieRealm")
+function TieDefinition:Get(adornee: Instance, tieRealm)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+	assert(TieRealmUtils.isTieRealm(tieRealm) or tieRealm == nil, "Bad tieRealm")
 
--- 	tieRealm = tieRealm or self._defaultTieRealm
+	tieRealm = tieRealm or self._defaultTieRealm
 
--- 	return TieInterface.new(self, nil, adornee, tieRealm)
--- end
+	return TieInterface.new(self, nil, adornee, tieRealm)
+end
 
 --[=[
 	Gets the name of the definition
@@ -580,6 +587,12 @@ function TieDefinition:GetName(): string
 	return self._definitionName
 end
 
+--[=[
+	Gets the valid container name set for the tie definition
+
+	@param tieRealm TieRealm
+	@return { [string]: boolean }
+]=]
 function TieDefinition:GetValidContainerNameSet(tieRealm)
 	-- TODO: Still generate unique datamodel key here?
 
@@ -605,6 +618,13 @@ function TieDefinition:GetValidContainerNameSet(tieRealm)
 	end
 end
 
+--[=[
+	Gets a container name for a new container. See [GetValidContainerNameSet]
+	for the full set of valid container names for the tie definition.
+
+	@param tieRealm TieRealm
+	@return string
+]=]
 function TieDefinition:GetNewContainerName(tieRealm): string
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
@@ -630,6 +650,7 @@ end
 	Returns true if the implParent is an implementation
 
 	@param implParent Instance
+	@param tieRealm TieRealm? -- Optional tie realm
 	@return boolean
 ]=]
 function TieDefinition:IsImplementation(implParent, tieRealm)

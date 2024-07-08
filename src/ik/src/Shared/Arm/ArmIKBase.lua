@@ -21,6 +21,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxR15Utils = require("RxR15Utils")
 local ValueObject = require("ValueObject")
+local TieRealmService = require("TieRealmService")
 
 local CFA_90X = CFrame.Angles(math.pi/2, 0, 0)
 local USE_OLD_IK_SYSTEM = (not LimbIKUtils) or false
@@ -30,11 +31,14 @@ local ArmIKBase = setmetatable({}, BaseObject)
 ArmIKBase.ClassName = "ArmIKBase"
 ArmIKBase.__index = ArmIKBase
 
-function ArmIKBase.new(humanoid, armName)
+function ArmIKBase.new(humanoid, armName, serviceBag)
 	local self = setmetatable(BaseObject.new(), ArmIKBase)
 
 	self._humanoid = humanoid or error("No humanoid")
 	self._armName = assert(armName, "No armName")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
 
 	self._grips = {}
 
@@ -109,7 +113,7 @@ function ArmIKBase:_ensureAnimator(character, partName, motorName, getTranform)
 
 	topMaid:GiveTask(RxR15Utils.observeRigMotorBrio(character, partName, motorName):Pipe({
 		RxBrioUtils.switchMapBrio(function(motor)
-			return Motor6DStackInterface:ObserveLastImplementationBrio(motor)
+			return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm())
 		end);
 	}):Subscribe(function(brio)
 		if brio:IsDead() then
@@ -199,19 +203,19 @@ function ArmIKBase:_observeStateBrio()
 
 				ShoulderMotor6DStack = observeShoulderBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor);
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm());
 					end);
 					Rx.defaultsToNil;
 				});
 				ElbowMotor6DStack = observeElbowBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor);
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm());
 					end);
 					Rx.defaultsToNil;
 				});
 				WristMotor6DStack = observeWristBrio:Pipe({
 					RxBrioUtils.switchMapBrio(function(motor)
-						return Motor6DStackInterface:ObserveLastImplementationBrio(motor);
+						return Motor6DStackInterface:ObserveLastImplementationBrio(motor, self._tieRealmService:GetTieRealm());
 					end);
 					Rx.defaultsToNil;
 				});

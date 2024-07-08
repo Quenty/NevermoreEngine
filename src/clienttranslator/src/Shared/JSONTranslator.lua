@@ -15,19 +15,17 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local Blend = require("Blend")
-local JsonToLocalizationTable = require("JsonToLocalizationTable")
-local LocalizationServiceUtils = require("LocalizationServiceUtils")
+local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
 local Maid = require("Maid")
-local Observable = require("Observable")
-local Promise = require("Promise")
 local PseudoLocalize = require("PseudoLocalize")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local TranslationKeyUtils = require("TranslationKeyUtils")
+local TranslatorService = require("TranslatorService")
+local ValueObject = require("ValueObject")
 
 local JSONTranslator = {}
 JSONTranslator.ClassName = "JSONTranslator"
@@ -60,28 +58,26 @@ JSONTranslator.__index = JSONTranslator
 	```
 
 	@param translatorName string -- Name of the translator. Used for source.
-	@param ... any
+	@param localeId string
+	@param dataTable table
 	@return JSONTranslator
 ]=]
-function JSONTranslator.new(translatorName, ...)
+function JSONTranslator.new(translatorName, localeId, dataTable)
+	assert(type(translatorName) == "string", "Bad translatorName")
+
 	local self = setmetatable({}, JSONTranslator)
 
-	assert(type(translatorName) == "string", "Bad translatorName")
+	self._translatorName = translatorName
 	self.ServiceName = translatorName
 
-	-- Cache localizaiton table, because it can take 10-20ms to load.
-	self._localizationTable = JsonToLocalizationTable.toLocalizationTable(translatorName, ...)
-	self._englishTranslator = self._localizationTable:GetTranslator("en")
-	self._fallbacks = {}
-
-	if RunService:IsRunning() and RunService:IsClient() then
-		self._promiseTranslator = LocalizationServiceUtils.promiseTranslator(Players.LocalPlayer)
+	if type(localeId) == "string" and type(dataTable) == "table" then
+		self._entries = LocalizationEntryParserUtils.decodeFromTable(self._translatorName, localeId, dataTable)
+	elseif typeof(localeId) == "Instance" then
+		local parent = localeId
+		local sourceLocaleId = "en"
+		self._entries = LocalizationEntryParserUtils.decodeFromInstance(self._translatorName, sourceLocaleId, parent)
 	else
-		self._promiseTranslator = Promise.resolved(self._englishTranslator)
-	end
-
-	if RunService:IsStudio() then
-		PseudoLocalize.addToLocalizationTable(self._localizationTable, nil, "en")
+		error("Must pass a localeId and dataTable")
 	end
 
 	return self
@@ -89,6 +85,99 @@ end
 
 function JSONTranslator:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._translatorService = self._serviceBag:GetService(TranslatorService)
+
+	self._maid = Maid.new()
+	self._localTranslator = self._maid:Add(ValueObject.new(nil))
+	self._sourceTranslator = self._maid:Add(ValueObject.new(nil))
+
+	self._localizationTable = self._translatorService:GetLocalizationTable()
+
+	for _, item in pairs(self._entries) do
+		for localeId, text in pairs(item.Values) do
+			self._localizationTable:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
+		end
+		self._localizationTable:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+	end
+
+	self._maid:GiveTask(RxInstanceUtils.observeProperty(self._localizationTable, "SourceLocaleId"):Subscribe(function(localeId)
+		self._sourceTranslator.Value = self._localizationTable:GetTranslator(localeId)
+	end))
+	self._maid:GiveTask(self._translatorService:ObserveLocaleId():Subscribe(function(localeId)
+		self._localTranslator.Value = self._localizationTable:GetTranslator(localeId)
+	end))
+end
+
+--[=[
+	Observes the translated value
+	@param translationKey string
+	@param translationArgs table? -- May have observables (or convertable to observables) in it.
+	@return Observable<string>
+]=]
+function JSONTranslator:ObserveFormatByKey(translationKey, translationArgs)
+	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
+	assert(type(translationKey) == "string", "Key must be a string")
+
+	return Rx.combineLatest({
+		translator = self:ObserveTranslator();
+		translationKey = translationKey;
+		translationArgs = self:_observeArgs(translationArgs);
+	}):Pipe({
+		Rx.switchMap(function(mainState)
+			if mainState.translator then
+				return Rx.of(self:_doTranslation(mainState.translator, mainState.translationKey, mainState.translationArgs))
+			end
+
+			-- Fall back to local or source translator
+			return Rx.combineLatest({
+				localTranslator = self._localTranslator:Observe();
+				sourceTranslator = self._sourceTranslator:Observe();
+			}):Pipe({
+				Rx.map(function(state)
+					if state.localTranslator then
+						return self:_doTranslation(state.localTranslator, mainState.translationKey, mainState.translationArgs)
+					elseif state.sourceTranslator then
+						return self:_doTranslation(state.sourceTranslator, mainState.translationKey, mainState.translationArgs)
+					else
+						return nil
+					end
+				end);
+				Rx.where(function(value)
+					return value ~= nil
+				end);
+			})
+		end)
+	})
+end
+
+--[=[
+	Formats the resulting entry by args.
+
+	:::tip
+	You should use [JSONTranslator.ObserveFormatByKey] instead of this to respond
+	to locale changing.
+	:::
+
+	@param translationKey string
+	@param args table?
+	@return Promise<string>
+]=]
+function JSONTranslator:PromiseFormatByKey(translationKey, args)
+	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
+	assert(type(translationKey) == "string", "Key must be a string")
+
+	-- Always waits for full translator to be loaded since we only get one shot
+	return self:PromiseTranslator():Then(function(translator)
+		return self:_doTranslation(translator, translationKey, args)
+	end)
+end
+
+function JSONTranslator:PromiseTranslator()
+	return self._translatorService:PromiseTranslator()
+end
+
+function JSONTranslator:ObserveTranslator()
+	return self._translatorService:ObserveTranslator()
 end
 
 --[=[
@@ -97,11 +186,7 @@ end
 	@return Observable<string>
 ]=]
 function JSONTranslator:ObserveLocaleId()
-	return Rx.fromPromise(self._promiseTranslator):Pipe({
-		Rx.switchMap(function(translator)
-			return RxInstanceUtils.observeProperty(translator, "LocaleId")
-		end)
-	})
+	return self._translatorService:ObserveLocaleId()
 end
 
 --[=[
@@ -125,17 +210,15 @@ function JSONTranslator:SetEntryValue(translationKey, source, context, localeId,
 	self._localizationTable:SetEntryValue(translationKey, source, context, localeId, text or source)
 
 	if RunService:IsStudio() then
-		self._localizationTable:SetEntryValue(translationKey, source, context,
-			PseudoLocalize.getDefaultPseudoLocaleId(),
-			PseudoLocalize.pseudoLocalize(text))
+		self._localizationTable:SetEntryValue(translationKey, source, context, PseudoLocalize.getDefaultPseudoLocaleId(), PseudoLocalize.pseudoLocalize(text))
 	end
 end
 
-function JSONTranslator:ObserveTranslation(prefix, text, argData)
+function JSONTranslator:ObserveTranslation(prefix, text, translationArgs)
 	assert(type(prefix) == "string", "Bad text")
 	assert(type(text) == "string", "Bad text")
 
-	return self:ObserveFormatByKey(self:ToTranslationKey(prefix, text), argData)
+	return self:ObserveFormatByKey(self:ToTranslationKey(prefix, text), translationArgs)
 end
 
 function JSONTranslator:ToTranslationKey(prefix, text)
@@ -157,13 +240,7 @@ end
 	@return string
 ]=]
 function JSONTranslator:GetLocaleId()
-	if self._promiseTranslator:IsFulfilled() then
-		local translator = self._promiseTranslator:Wait()
-		return translator.LocaleId
-	else
-		warn("[JSONTranslator.GetLocaleId] - Translator is not loaded yet, returning english")
-		return "en"
-	end
+	return self._translatorService:GetLocaleId()
 end
 
 --[=[
@@ -180,86 +257,7 @@ end
 	@return Promise
 ]=]
 function JSONTranslator:PromiseLoaded()
-	return self._promiseTranslator
-end
-
---[=[
-	Makes the translator fall back to another translator if an entry cannot be found.
-
-	Mostly just used for testing.
-
-	@param translator JSONTranslator | Translator
-]=]
-function JSONTranslator:FallbackTo(translator)
-	assert(translator, "Bad translator")
-	assert(translator.FormatByKey, "Bad translator")
-
-	table.insert(self._fallbacks, translator)
-end
-
---[=[
-	Formats the resulting entry by args.
-
-	:::tip
-	You should use [JSONTranslator.ObserveFormatByKey] instead of this to respond
-	to locale changing.
-	:::
-
-	@param key string
-	@param args table?
-	@return Promise<string>
-]=]
-function JSONTranslator:PromiseFormatByKey(key, args)
-	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
-	assert(type(key) == "string", "Key must be a string")
-
-	return self._promiseTranslator:Then(function()
-		return self:FormatByKey(key, args)
-	end)
-end
-
---[=[
-	Observes the translated value
-	@param key string
-	@param argData table? -- May have observables (or convertable to observables) in it.
-	@return Observable<string>
-]=]
-function JSONTranslator:ObserveFormatByKey(key, argData)
-	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
-	assert(type(key) == "string", "Key must be a string")
-
-	local argObservable
-	if argData then
-		local args = {}
-		for argKey, value in pairs(argData) do
-			args[argKey] = Blend.toPropertyObservable(value) or Rx.of(value)
-		end
-
-		argObservable = Rx.combineLatest(args)
-	else
-		argObservable = nil
-	end
-
-	return Observable.new(function(sub)
-		local maid = Maid.new()
-
-		maid:GivePromise(self._promiseTranslator):Then(function(translator)
-			if argObservable then
-				maid:GiveTask(Rx.combineLatest({
-					localeId = RxInstanceUtils.observeProperty(translator, "LocaleId");
-					args = argObservable;
-				}):Subscribe(function(state)
-					sub:Fire(self:FormatByKey(key, state.args))
-				end))
-			else
-				maid:GiveTask(RxInstanceUtils.observeProperty(translator, "LocaleId"):Subscribe(function()
-					sub:Fire(self:FormatByKey(key, nil))
-				end))
-			end
-		end)
-
-		return maid
-	end)
+	return self:PromiseTranslator()
 end
 
 --[=[
@@ -270,98 +268,87 @@ end
 	to locale changing.
 	:::
 
-	@param key string
+	@param translationKey string
 	@param args table?
 	@return string
 ]=]
-function JSONTranslator:FormatByKey(key, args)
+function JSONTranslator:FormatByKey(translationKey, args)
 	assert(self ~= JSONTranslator, "Construct a new version of this class to use it")
-	assert(type(key) == "string", "Key must be a string")
+	assert(type(translationKey) == "string", "Key must be a string")
 
-	if not RunService:IsRunning() then
-		return self:_formatByKeyTestMode(key, args)
+	local translator = self._translatorService:GetTranslator()
+	if not translator then
+		error("Translator is not yet acquired yet")
 	end
 
-	local clientTranslator = self:_getClientTranslatorOrError()
+	return self:_doTranslation(translator, translationKey, args)
+end
 
-	local result
+function JSONTranslator:_observeArgs(translationArgs)
+	if translationArgs == nil then
+		return Rx.of(nil)
+	end
+
+	local args = {}
+	for argKey, value in pairs(translationArgs) do
+		args[argKey] = Blend.toPropertyObservable(value) or Rx.of(value)
+	end
+
+	return Rx.combineLatest(args)
+end
+
+function JSONTranslator:_doTranslation(translator, translationKey, args)
+	assert(typeof(translator) == "Instance", "Bad translator")
+	assert(type(translationKey) == "string", "Bad translationKey")
+
+	local translation
 	local ok, err = pcall(function()
-		result = clientTranslator:FormatByKey(key, args)
+		translation = translator:FormatByKey(translationKey, args)
 	end)
 
-	if ok and not err then
-		return result
+	if translation then
+		return translation
 	end
 
 	if err then
 		warn(err)
 	else
-		warn("Failed to localize '" .. key .. "'")
+		warn("Failed to localize '" .. translationKey .. "'")
 	end
 
-	-- Fallback to English
-	if clientTranslator.LocaleId ~= self._englishTranslator.LocaleId then
-		-- Ignore results as we know this may error
+	-- Try the local translator next (not from cloud)
+	local localTranslator = self._localTranslator.Value
+	if localTranslator then
 		ok, err = pcall(function()
-			result = self._englishTranslator:FormatByKey(key, args)
+			translation = localTranslator:FormatByKey(translationKey, args)
 		end)
 
-		if ok and not err then
-			return result
+		if translation then
+			return translation
 		end
 	end
 
-	return key
-end
-
-function JSONTranslator:_getClientTranslatorOrError()
-	assert(self._promiseTranslator, "ClientTranslator is not initialized")
-
-	if self._promiseTranslator:IsFulfilled() then
-		return assert(self._promiseTranslator:Wait(), "Failed to get translator")
-	else
-		error("Translator is not yet acquired yet")
-		return nil
+	-- Try the source translator next (we're missing the locale id)
+	local sourceTranslator = self._sourceTranslator.Value
+	if sourceTranslator then
+		ok, err = pcall(function()
+			translation = sourceTranslator:FormatByKey(translationKey, args)
+		end)
 	end
-end
-
-function JSONTranslator:_formatByKeyTestMode(key, args)
-	-- Can't read LocalizationService.ForcePlayModeRobloxLocaleId :(
-	local translator = self._localizationTable:GetTranslator("en")
-	local result
-	local ok, err = pcall(function()
-		result = translator:FormatByKey(key, args)
-	end)
 
 	if ok and not err then
-		return result
+		return translation
 	end
 
-	for _, fallback in pairs(self._fallbacks) do
-		local value = fallback:FormatByKey(key, args)
-		if value then
-			return value
-		end
-	end
-
-	if err then
-		warn(err)
-	else
-		warn("[JSONTranslator._formatByKeyTestMode] - Failed to localize '" .. key .. "'")
-	end
-
-	return key
+	return translationKey
 end
 
 --[=[
 	Cleans up the translator and deletes the localization table if it exists.
+	Should be called by [ServiceBag]
 ]=]
 function JSONTranslator:Destroy()
-	self._localizationTable:Destroy()
-	self._localizationTable = nil
-	self._englishTranslator = nil
-	self._promiseTranslator = nil
-
+	self._maid:DoCleaning()
 	setmetatable(self, nil)
 end
 

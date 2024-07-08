@@ -30,6 +30,7 @@
     "@quenty/binder": "file:../binder",
     "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/datastore": "file:../datastore",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/jsonutils": "file:../jsonutils",
     "@quenty/loader": "file:../loader",

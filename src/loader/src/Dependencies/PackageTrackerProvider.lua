@@ -16,6 +16,7 @@ function PackageTrackerProvider.new()
 
 	self._maid = Maid.new()
 	self._packageTrackersRoots = {}
+	self._trackCount = 0
 
 	return self
 end
@@ -26,6 +27,8 @@ function PackageTrackerProvider:AddPackageRoot(instance)
 	if self._packageTrackersRoots[instance] then
 		return self._packageTrackersRoots[instance]
 	end
+
+	self._trackCount = self._trackCount + 1
 
 	local maid = Maid.new()
 
@@ -42,12 +45,7 @@ end
 function PackageTrackerProvider:FindPackageTracker(instance)
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	local found = self._packageTrackersRoots[instance]
-	if found then
-		return found
-	end
-
-	local current = instance.Parent
+	local current = instance
 	while current do
 		if self._packageTrackersRoots[current] then
 			return self._packageTrackersRoots[current]

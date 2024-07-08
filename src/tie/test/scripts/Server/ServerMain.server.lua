@@ -73,7 +73,7 @@ do
 
 	-- Implement via interface calls
 	do
-		local thrust = ActionInterface:Implement(adornee)
+		local thrust = ActionInterface.Server:Implement(adornee)
 		-- thrust:GetFolder().Name = "Action_Thrust"
 		thrust.DisplayName.Value = "Thrust"
 

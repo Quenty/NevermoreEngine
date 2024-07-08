@@ -57,11 +57,8 @@ function DataStoreStage.new(loadName, loadParent)
 	self._loadName = loadName
 	self._loadParent = loadParent
 
-	self.Changed = GoodSignal.new() -- :Fire(viewSnapshot)
-	self._maid:GiveTask(self.Changed)
-
-	self.DataStored = GoodSignal.new()
-	self._maid:GiveTask(self.DataStored)
+	self.Changed = self._maid:Add(GoodSignal.new()) -- :Fire(viewSnapshot)
+	self.DataStored = self._maid:Add(GoodSignal.new())
 
 	-- Stores the actual data loaded and synced (but not pending written data)
 	self._saveDataSnapshot = nil
@@ -73,8 +70,7 @@ function DataStoreStage.new(loadName, loadParent)
 
 	self._savingCallbacks = {} -- [func, ...]
 
-	self._keySubscriptions = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._keySubscriptions)
+	self._keySubscriptions = self._maid:Add(ObservableSubscriptionTable.new())
 
 	return self
 end
@@ -279,6 +275,7 @@ function DataStoreStage:Observe(key, defaultValue)
 		local maid = Maid.new()
 
 		maid:GiveTask(self._keySubscriptions:Observe(key):Subscribe(function(value)
+			print()
 			if value == nil then
 				sub:Fire(defaultValue)
 			else
@@ -610,7 +607,7 @@ function DataStoreStage:HasWritableData()
 
 	for name, store in pairs(self._stores) do
 		if not store.Destroy then
-			warn(("[DataStoreStage] - Substore %q destroyed"):format(name))
+			warn(string.format("[DataStoreStage] - Substore %q destroyed", name))
 			continue
 		end
 
@@ -799,7 +796,7 @@ function DataStoreStage:_updateViewSnapshot()
 			end
 		end
 
-		self.Changed:Fire(self._viewSnapshot)
+		self.Changed:Fire(newViewSnapshot)
 	end
 
 	self:_checkIntegrity()
@@ -844,11 +841,11 @@ function DataStoreStage:_updateViewSnapshotAtKey(key)
 
 	local newSnapshot = table.clone(self._viewSnapshot)
 	newSnapshot[key] = newValue
+	newSnapshot = table.freeze(newSnapshot)
 
-
-	self._viewSnapshot = table.freeze(newSnapshot)
+	self._viewSnapshot = newSnapshot
 	self._keySubscriptions:Fire(key, newValue)
-	self.Changed:Fire(self._viewSnapshot)
+	self.Changed:Fire(newSnapshot)
 
 	self:_checkIntegrity()
 end
@@ -886,7 +883,7 @@ function DataStoreStage:_computeNewViewSnapshot()
 		end
 
 		if next(newView) == nil and not (type(self._baseDataSnapshot) == "table" or type(self._saveDataSnapshot) == "table") then
-			-- We haev no reason to be a table, make sure we return nil
+			-- We have no reason to be a table, make sure we return nil
 			return nil
 		end
 

@@ -90,29 +90,9 @@ function Viewport.blend(props)
 		local maid = Maid.new()
 
 		local viewport = Viewport.new()
-
-		local function bindObservable(propName, callback)
-			if props[propName] then
-				local observe = Blend.toPropertyObservable(props[propName])
-				if observe then
-					maid:GiveTask(observe:Subscribe(function(value)
-						callback(value)
-					end))
-				else
-					callback(props[propName])
-				end
-			end
-		end
-
-		bindObservable("FieldOfView", function(value)
-			viewport:SetFieldOfView(value)
-		end)
-		bindObservable("Instance", function(value)
-			viewport:SetInstance(value)
-		end)
-		bindObservable("Transparency", function(value)
-			viewport:SetTransparency(value)
-		end)
+		viewport:SetInstance(props.Instance)
+		viewport:SetFieldOfView(props.FieldOfView)
+		viewport:SetTransparency(props.Transparency)
 
 		maid:GiveTask(viewport:Render(props):Subscribe(function(result)
 			sub:Fire(result)
@@ -132,9 +112,7 @@ end
 	@param transparency number
 ]=]
 function Viewport:SetTransparency(transparency)
-	assert(type(transparency) == "number", "Bad transparency")
-
-	self._transparency.Value = transparency
+	return self._transparency:Mount(transparency or 0)
 end
 
 --[=[
@@ -143,9 +121,7 @@ end
 	@param fieldOfView number
 ]=]
 function Viewport:SetFieldOfView(fieldOfView)
-	assert(type(fieldOfView) == "number", "Bad fieldOfView")
-
-	self._fieldOfView.Value = fieldOfView
+	return self._fieldOfView:Mount(fieldOfView or 20)
 end
 
 --[=[
@@ -161,9 +137,7 @@ end
 	@param instance Instance?
 ]=]
 function Viewport:SetInstance(instance)
-	assert(typeof(instance) == "Instance" or instance == nil, "Bad instance")
-
-	self._current.Value = instance
+	self._current:Mount(instance)
 
 	return function()
 		if self._current.Value == instance then
