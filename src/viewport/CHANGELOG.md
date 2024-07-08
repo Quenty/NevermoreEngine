@@ -1,3 +1,16 @@
+# v11.6.0 (Mon Jul 08 2024)
+
+#### 🚀 Enhancement
+
+- feat[Viewport]: Added ability to disable ViewportControls [#443](https://github.com/Quenty/NevermoreEngine/pull/443) ([@MrAsynchronous](https://github.com/MrAsynchronous))
+- feat: added enabled controls to viewport controls ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+#### Authors: 1
+
+- Brandon Wilcox ([@MrAsynchronous](https://github.com/MrAsynchronous))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
