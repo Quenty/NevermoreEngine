@@ -26,8 +26,8 @@ maid:GiveTask(viewport:Render({
 	Parent = target;
 }):Subscribe())
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Viewport"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Viewport" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Viewport" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.47d82d04.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.3d8729c4.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.9f995f20.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.01850622.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -49,7 +49,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
   Constructs a new viewport. Unlike a normal <a href="/NevermoreEngine/api/BasicPane">BasicPane</a> this will not render anything
   immediately. See <a href="/NevermoreEngine/api/Viewport#Render">Viewport.Render</a> for details.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="blend"><code style="text-decoration:none">blend</code><a href="#blend" class="hash-link" aria-label="Direct link to blend" title="Direct link to blend">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L86"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->.</code><code class="green_DgR4">blend</code><code>(</code><code>props<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">string</code><code class="purple_ieR2">}</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="blend"><code style="text-decoration:none">blend</code><a href="#blend" class="hash-link" aria-label="Direct link to blend" title="Direct link to blend">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L87"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->.</code><code class="green_DgR4">blend</code><code>(</code><code>props<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">string</code><code class="purple_ieR2">}</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Creates a Viewport and render it to Blend. The following properties are supported</p>
 <ul>
   <li>Ambient - Color3</li>
@@ -64,11 +64,13 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
   <li>Transparency - number</li>
 </ul>
 <p>Properties may be anything Blend would take as computable. See <a href="/NevermoreEngine/api/Blend">Blend</a> for details.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetTransparency"><code style="text-decoration:none">SetTransparency</code><a href="#SetTransparency" class="hash-link" aria-label="Direct link to SetTransparency" title="Direct link to SetTransparency">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L134"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">SetTransparency</code><code>(</code><code>transparency<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetControlsEnabled"><code style="text-decoration:none">SetControlsEnabled</code><a href="#SetControlsEnabled" class="hash-link" aria-label="Direct link to SetControlsEnabled" title="Direct link to SetControlsEnabled">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L135"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">SetControlsEnabled</code><code>(</code><code>enabled<!-- -->: </code><code class="blue_P4bS">boolean</code><code>) → </code><code>(</code><code>)</code></div><div>
+<p>Sets the enabled state of the ViewportControls</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetTransparency"><code style="text-decoration:none">SetTransparency</code><a href="#SetTransparency" class="hash-link" aria-label="Direct link to SetTransparency" title="Direct link to SetTransparency">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L146"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">SetTransparency</code><code>(</code><code>transparency<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Sets the field of view on the viewport.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetFieldOfView"><code style="text-decoration:none">SetFieldOfView</code><a href="#SetFieldOfView" class="hash-link" aria-label="Direct link to SetFieldOfView" title="Direct link to SetFieldOfView">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L145"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">SetFieldOfView</code><code>(</code><code>fieldOfView<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetFieldOfView"><code style="text-decoration:none">SetFieldOfView</code><a href="#SetFieldOfView" class="hash-link" aria-label="Direct link to SetFieldOfView" title="Direct link to SetFieldOfView">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L157"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">SetFieldOfView</code><code>(</code><code>fieldOfView<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Sets the field of view on the viewport.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetInstance"><code style="text-decoration:none">SetInstance</code><a href="#SetInstance" class="hash-link" aria-label="Direct link to SetInstance" title="Direct link to SetInstance">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L163"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">SetInstance</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="SetInstance"><code style="text-decoration:none">SetInstance</code><a href="#SetInstance" class="hash-link" aria-label="Direct link to SetInstance" title="Direct link to SetInstance">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L175"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">SetInstance</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Set the instance to be rendered. The instance will be reparented
   to the viewport.
@@ -87,12 +89,12 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
     </p>
   </div>
 </div>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="NotifyInstanceSizeChanged"><code style="text-decoration:none">NotifyInstanceSizeChanged</code><a href="#NotifyInstanceSizeChanged" class="hash-link" aria-label="Direct link to NotifyInstanceSizeChanged" title="Direct link to NotifyInstanceSizeChanged">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L179"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">NotifyInstanceSizeChanged</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="NotifyInstanceSizeChanged"><code style="text-decoration:none">NotifyInstanceSizeChanged</code><a href="#NotifyInstanceSizeChanged" class="hash-link" aria-label="Direct link to NotifyInstanceSizeChanged" title="Direct link to NotifyInstanceSizeChanged">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L191"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">NotifyInstanceSizeChanged</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Notifies the viewport of the instance size changing. We don't connect to
   any events here because the instance can be anything.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Render"><code style="text-decoration:none">Render</code><a href="#Render" class="hash-link" aria-label="Direct link to Render" title="Direct link to Render">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L227"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">Render</code><code>(</code><code>props<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">any</code><code class="purple_ieR2">}</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ViewportFrame" target="_blank" rel="noopener noreferrer">ViewportFrame<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Render"><code style="text-decoration:none">Render</code><a href="#Render" class="hash-link" aria-label="Direct link to Render" title="Direct link to Render">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/viewport/src/Client/Viewport.lua#L239"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Viewport<!-- -->:</code><code class="green_DgR4">Render</code><code>(</code><code>props<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">any</code><code class="purple_ieR2">}</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/ViewportFrame" target="_blank" rel="noopener noreferrer">ViewportFrame<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Renders the viewport. Allows the following properties.</p>
 <ul>
   <li>Ambient - Color3</li>
@@ -154,7 +156,24 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 86,
+                &quot;line&quot;: 87,
+                &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;SetControlsEnabled&quot;,
+            &quot;desc&quot;: &quot;Sets the enabled state of the ViewportControls&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;enabled&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 135,
                 &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
             }
         },
@@ -171,7 +190,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 134,
+                &quot;line&quot;: 146,
                 &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
             }
         },
@@ -188,7 +207,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 145,
+                &quot;line&quot;: 157,
                 &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
             }
         },
@@ -205,7 +224,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 163,
+                &quot;line&quot;: 175,
                 &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
             }
         },
@@ -216,7 +235,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 179,
+                &quot;line&quot;: 191,
                 &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
             }
         },
@@ -238,7 +257,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 227,
+                &quot;line&quot;: 239,
                 &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
             }
         }
@@ -251,8 +270,8 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
         &quot;line&quot;: 17,
         &quot;path&quot;: &quot;src/viewport/src/Client/Viewport.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#NotifyInstanceSizeChanged" class="table-of-contents__link toc-highlight">:NotifyInstanceSizeChanged</a></li><li><a href="#Render" class="table-of-contents__link toc-highlight">:Render</a></li><li><a href="#SetFieldOfView" class="table-of-contents__link toc-highlight">:SetFieldOfView</a></li><li><a href="#SetInstance" class="table-of-contents__link toc-highlight">:SetInstance</a></li><li><a href="#SetTransparency" class="table-of-contents__link toc-highlight">:SetTransparency</a></li><li><a href="#blend" class="table-of-contents__link toc-highlight">.blend</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.47d82d04.js"></script>
-<script src="/NevermoreEngine/assets/js/main.3d8729c4.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#NotifyInstanceSizeChanged" class="table-of-contents__link toc-highlight">:NotifyInstanceSizeChanged</a></li><li><a href="#Render" class="table-of-contents__link toc-highlight">:Render</a></li><li><a href="#SetControlsEnabled" class="table-of-contents__link toc-highlight">:SetControlsEnabled</a></li><li><a href="#SetFieldOfView" class="table-of-contents__link toc-highlight">:SetFieldOfView</a></li><li><a href="#SetInstance" class="table-of-contents__link toc-highlight">:SetInstance</a></li><li><a href="#SetTransparency" class="table-of-contents__link toc-highlight">:SetTransparency</a></li><li><a href="#blend" class="table-of-contents__link toc-highlight">.blend</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.9f995f20.js"></script>
+<script src="/NevermoreEngine/assets/js/main.01850622.js"></script>
 </body>
 </html>
