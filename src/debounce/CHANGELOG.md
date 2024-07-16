@@ -1,3 +1,15 @@
+# v2.3.0 (Tue Jul 16 2024)
+
+#### 🚀 Enhancement
+
+- feat: Add :GetTimeRemaining() to DebounceTimer [#465](https://github.com/Quenty/NevermoreEngine/pull/465) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

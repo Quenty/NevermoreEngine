@@ -1,5 +1,18 @@
 # (Tue Jul 16 2024)
 
+#### 🚀 Enhancement
+
+- `@quenty/debounce@2.3.0`
+  - feat: Add :GetTimeRemaining() to DebounceTimer [#465](https://github.com/Quenty/NevermoreEngine/pull/465) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
+# (Tue Jul 16 2024)
+
 #### 🐛 Bug Fix
 
 - `@quenty/observablecollection@12.3.1`
