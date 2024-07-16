@@ -345,9 +345,8 @@ function CameraControls:_handleGamepadRotateStart()
 end
 
 function CameraControls:Destroy()
-	self._gamepadRotateModel:Destroy()
-
 	self:Disable()
+	self._gamepadRotateModel:Destroy()
 	setmetatable(self, nil)
 end
 
