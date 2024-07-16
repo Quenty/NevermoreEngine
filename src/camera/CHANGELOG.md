@@ -1,3 +1,15 @@
+# v14.5.1 (Tue Jul 16 2024)
+
+#### 🐛 Bug Fix
+
+- fix: CameraControls destruction in Enabled state [#477](https://github.com/Quenty/NevermoreEngine/pull/477) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

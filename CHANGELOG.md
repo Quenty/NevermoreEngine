@@ -1,3 +1,22 @@
+# (Tue Jul 16 2024)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Ayo ([@GoodGithubAccount](https://github.com/GoodGithubAccount)), for all your work!
+
+#### 🐛 Bug Fix
+
+- Docs: Update installation docs to include info on new loader [#476](https://github.com/Quenty/NevermoreEngine/pull/476) ([@GoodGithubAccount](https://github.com/GoodGithubAccount))
+- `@quenty/camera@14.5.1`
+  - fix: CameraControls destruction in Enabled state [#477](https://github.com/Quenty/NevermoreEngine/pull/477) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 2
+
+- [@OttoHatt](https://github.com/OttoHatt)
+- Ayo ([@GoodGithubAccount](https://github.com/GoodGithubAccount))
+
+---
+
 # (Mon Jul 08 2024)
 
 #### 🚀 Enhancement
