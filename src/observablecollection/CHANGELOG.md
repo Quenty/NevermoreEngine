@@ -1,3 +1,15 @@
+# v12.3.1 (Tue Jul 16 2024)
+
+#### 🐛 Bug Fix
+
+- fix: Using integer keys in w/ Observe methods in ObservableMap [#470](https://github.com/Quenty/NevermoreEngine/pull/470) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,5 +1,18 @@
 # (Tue Jul 16 2024)
 
+#### 🐛 Bug Fix
+
+- `@quenty/observablecollection@12.3.1`
+  - fix: Using integer keys in w/ Observe methods in ObservableMap [#470](https://github.com/Quenty/NevermoreEngine/pull/470) ([@OttoHatt](https://github.com/OttoHatt))
+
+#### Authors: 1
+
+- [@OttoHatt](https://github.com/OttoHatt)
+
+---
+
+# (Tue Jul 16 2024)
+
 :tada: This release contains work from a new contributor! :tada:
 
 Thank you, Ayo ([@GoodGithubAccount](https://github.com/GoodGithubAccount)), for all your work!
