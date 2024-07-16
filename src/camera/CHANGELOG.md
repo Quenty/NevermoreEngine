@@ -1,19 +1,18 @@
-# v14.5.1 (Tue Jul 16 2024)
-
-#### 🐛 Bug Fix
-
-- fix: CameraControls destruction in Enabled state [#477](https://github.com/Quenty/NevermoreEngine/pull/477) ([@OttoHatt](https://github.com/OttoHatt))
-
-#### Authors: 1
-
-- [@OttoHatt](https://github.com/OttoHatt)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.5.0...@quenty/camera@14.5.1) (2024-07-16)
+
+
+### Bug Fixes
+
+* CameraControls destruction in Enabled state ([#477](https://github.com/Quenty/NevermoreEngine/issues/477)) ([ef6975e](https://github.com/Quenty/NevermoreEngine/commit/ef6975e7fb2d396569f33231d45b32684e803940))
+
+
+
+
 
 # [14.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.4.0...@quenty/camera@14.5.0) (2024-05-09)
 
