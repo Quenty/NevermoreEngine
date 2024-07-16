@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v2.3.1">
 <title data-rh="true">DebounceTimer | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/DebounceTimer"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="DebounceTimer | Nevermore"><meta data-rh="true" name="description" content="DebounceTimer"><meta data-rh="true" property="og:description" content="DebounceTimer"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/DebounceTimer"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DebounceTimer" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DebounceTimer" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.cfbd8942.css">
-<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.b44a4f44.js" as="script">
-<link rel="preload" href="/NevermoreEngine/assets/js/main.11e537bd.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/runtime~main.4fb85269.js" as="script">
+<link rel="preload" href="/NevermoreEngine/assets/js/main.b5e97460.js" as="script">
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
@@ -17,7 +17,9 @@
 <p>Restarts the timer</p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsRunning"><code style="text-decoration:none">IsRunning</code><a href="#IsRunning" class="hash-link" aria-label="Direct link to IsRunning" title="Direct link to IsRunning">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/debounce/src/Shared/DebounceTimer.lua#L42"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DebounceTimer<!-- -->:</code><code class="green_DgR4">IsRunning</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether or not the timer is running.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsDone"><code style="text-decoration:none">IsDone</code><a href="#IsDone" class="hash-link" aria-label="Direct link to IsDone" title="Direct link to IsDone">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/debounce/src/Shared/DebounceTimer.lua#L50"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DebounceTimer<!-- -->:</code><code class="green_DgR4">IsDone</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="GetTimeRemaining"><code style="text-decoration:none">GetTimeRemaining</code><a href="#GetTimeRemaining" class="hash-link" aria-label="Direct link to GetTimeRemaining" title="Direct link to GetTimeRemaining">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/debounce/src/Shared/DebounceTimer.lua#L50"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DebounceTimer<!-- -->:</code><code class="green_DgR4">GetTimeRemaining</code><code>(</code><code>) → </code><code class="blue_P4bS">number</code></div><div>
+<p>Returns the amount of time remaining in the timer.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="IsDone"><code style="text-decoration:none">IsDone</code><a href="#IsDone" class="hash-link" aria-label="Direct link to IsDone" title="Direct link to IsDone">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/debounce/src/Shared/DebounceTimer.lua#L62"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DebounceTimer<!-- -->:</code><code class="green_DgR4">IsDone</code><code>(</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns if the timer is done</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -88,6 +90,22 @@
             }
         },
         {
+            &quot;name&quot;: &quot;GetTimeRemaining&quot;,
+            &quot;desc&quot;: &quot;Returns the amount of time remaining in the timer.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 50,
+                &quot;path&quot;: &quot;src/debounce/src/Shared/DebounceTimer.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;IsDone&quot;,
             &quot;desc&quot;: &quot;Returns if the timer is done&quot;,
             &quot;params&quot;: [],
@@ -99,7 +117,7 @@
             ],
             &quot;function_type&quot;: &quot;method&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 50,
+                &quot;line&quot;: 62,
                 &quot;path&quot;: &quot;src/debounce/src/Shared/DebounceTimer.lua&quot;
             }
         }
@@ -112,8 +130,8 @@
         &quot;line&quot;: 5,
         &quot;path&quot;: &quot;src/debounce/src/Shared/DebounceTimer.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#IsDone" class="table-of-contents__link toc-highlight">:IsDone</a></li><li><a href="#IsRunning" class="table-of-contents__link toc-highlight">:IsRunning</a></li><li><a href="#Restart" class="table-of-contents__link toc-highlight">:Restart</a></li><li><a href="#SetLength" class="table-of-contents__link toc-highlight">:SetLength</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
-<script src="/NevermoreEngine/assets/js/runtime~main.b44a4f44.js"></script>
-<script src="/NevermoreEngine/assets/js/main.11e537bd.js"></script>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#GetTimeRemaining" class="table-of-contents__link toc-highlight">:GetTimeRemaining</a></li><li><a href="#IsDone" class="table-of-contents__link toc-highlight">:IsDone</a></li><li><a href="#IsRunning" class="table-of-contents__link toc-highlight">:IsRunning</a></li><li><a href="#Restart" class="table-of-contents__link toc-highlight">:Restart</a></li><li><a href="#SetLength" class="table-of-contents__link toc-highlight">:SetLength</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2022 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+<script src="/NevermoreEngine/assets/js/runtime~main.4fb85269.js"></script>
+<script src="/NevermoreEngine/assets/js/main.b5e97460.js"></script>
 </body>
 </html>
