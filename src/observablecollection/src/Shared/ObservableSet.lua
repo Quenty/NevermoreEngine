@@ -76,10 +76,14 @@ function ObservableSet:ObserveItemsBrio()
 		end
 
 		local maid = Maid.new()
+		local brios = {}
 
 		local function handleItem(item)
 			local brio = Brio.new(item)
-			maid[item] = brio
+			if brios[item] then
+				brios[item]:Destroy()
+			end
+			brios[item] = brio
 			sub:Fire(brio)
 		end
 
@@ -89,13 +93,21 @@ function ObservableSet:ObserveItemsBrio()
 
 		maid:GiveTask(self.ItemAdded:Connect(handleItem))
 		maid:GiveTask(self.ItemRemoved:Connect(function(item)
-			maid[item] = nil
+			-- Checking the brio exists first may be superflous?
+			-- I worry about strange ordering as a result of signals.
+			if brios[item] then
+				brios[item]:Destroy()
+				brios[item] = nil
+			end
 		end))
 
 		self._maid[sub] = maid
 		maid:GiveTask(function()
 			self._maid[sub] = nil
 			sub:Complete()
+			for _, v in brios do
+				v:Destroy()
+			end
 		end)
 
 		return maid
