@@ -25,7 +25,6 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "file:../baseobject",
     "@quenty/brio": "file:../brio",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
