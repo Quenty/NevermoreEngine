@@ -4,7 +4,7 @@
 	@class loader
 ]=]
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local RunService = game:GetService("RunService")
 
 local DependencyUtils = require(script.Dependencies.DependencyUtils)
@@ -45,12 +45,7 @@ function Loader.bootstrapGame(packages)
 	if self._replicationType == ReplicationType.SERVER then
 		self:_setupLoaderPopulation()
 
-		-- Trade off security for performance
-		if RunService:IsStudio() then
-			packages.Parent = ReplicatedStorage
-		else
-			self:_setupClientReplication()
-		end
+		self:_setupClientReplication()
 	end
 
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
@@ -174,7 +169,7 @@ function Loader:_setupClientReplication()
 
 	self._maid:Add(LoaderLinkCreator.new(copy, references, true))
 
-	copy.Parent = ReplicatedStorage
+	copy.Parent = ReplicatedFirst
 end
 
 function Loader:_setupLoaderPopulation()
