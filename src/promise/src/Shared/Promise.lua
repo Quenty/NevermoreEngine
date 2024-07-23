@@ -24,7 +24,7 @@ Promise.__index = Promise
 	@return boolean
 ]=]
 function Promise.isPromise(value)
-	return type(value) == "table" and value.ClassName == "Promise"
+	return type(value) == "table" and getmetatable(value) == Promise
 end
 
 --[=[
