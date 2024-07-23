@@ -5,7 +5,6 @@
 ]=]
 
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local RunService = game:GetService("RunService")
 
 local DependencyUtils = require(script.Dependencies.DependencyUtils)
 local LoaderLinkCreator = require(script.LoaderLink.LoaderLinkCreator)
