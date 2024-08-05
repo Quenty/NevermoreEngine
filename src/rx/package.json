@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rx",
-  "version": "8.1.1",
+  "version": "13.3.0",
   "description": "Quenty's reactive library for Roblox",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
   "dependencies": {
     "@quenty/cancellabledelay": "file:../cancellabledelay",
     "@quenty/canceltoken": "file:../canceltoken",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",

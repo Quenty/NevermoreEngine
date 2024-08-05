@@ -62,16 +62,15 @@ end
 	@param finish Vector3
 	@param color Color3 -- Optional
 	@param parent Instance? -- Optional
-	@param meshDiameter number -- Optional
 	@param diameter number -- Optional
 	@return Instance
 ]=]
-function Draw.line(start, finish, color, parent, meshDiameter, diameter)
+function Draw.line(start, finish, color, parent, diameter)
 	start = assert(Draw._toVector3(start), "Bad start")
 	finish = assert(Draw._toVector3(finish), "Bad finish")
 	color = Draw._toColor3(color)
 
-	return Draw.ray(Ray.new(start, finish - start), color, parent, meshDiameter, diameter)
+	return Draw.ray(Ray.new(start, finish - start), color, parent, diameter)
 end
 
 --[=[
@@ -96,18 +95,38 @@ end
 --[=[
 	Draws a spherecast
 
+	:::tip
+	Unlike WorldRoot:GetPartsInPart(), spherecast does not detect BaseParts
+	that initially intersect the shape. So this draw doesn't render that initial sphere.
+	:::
+
 	@param origin Vector3
 	@param radius number
 	@param direction Vector3
 	@param color Color3
 	@param parent Parent
 ]=]
-function Draw.sphereCast(origin, radius, direction, color, parent)
-	return Draw.ray(Ray.new(origin, direction), color, parent, 2*radius)
+function Draw.spherecast(origin, radius, direction, color, parent)
+	origin = assert(Draw._toVector3(origin), "Bad cframe")
+	assert(type(radius) == "number", "Bad radius")
+	direction = assert(Draw._toVector3(direction), "Bad direction")
+	color = Draw._toColor3(color)
+	parent = parent or Draw.getDefaultParent()
+
+	local folder = Instance.new("Folder")
+	folder.Name = "SphereCast"
+	folder.Archivable = false
+
+	Draw.ray(Ray.new(origin, direction), color, folder, 2*radius)
+	Draw.sphere(origin + direction, radius, color, folder)
+
+	folder.Parent = parent
+
+	return folder
 end
 
 --[=[
-	Draws a spherecast
+	Draws a block cast
 
 	@param cframe CFrame
 	@param size Vector3
@@ -118,6 +137,7 @@ end
 function Draw.blockcast(cframe, size, direction, color, parent)
 	cframe = assert(Draw._toCFrame(cframe), "Bad cframe")
 	size = assert(Draw._toVector3(size), "Bad size")
+	direction = assert(Draw._toVector3(direction), "Bad direction")
 	color = Draw._toColor3(color)
 	parent = parent or Draw.getDefaultParent()
 
@@ -133,6 +153,99 @@ function Draw.blockcast(cframe, size, direction, color, parent)
 	folder.Parent = parent
 
 	return folder
+end
+
+function Draw.triangle(a, b, c, color, parent)
+	a = assert(Draw._toVector3(a), "Bad a")
+	b = assert(Draw._toVector3(b), "Bad b")
+	c = assert(Draw._toVector3(c), "Bad c")
+	color = Draw._toColor3(color) or Draw._defaultColor
+	parent = parent or Draw.getDefaultParent()
+
+	local edges = {
+		{longest = (c - a), other = (b - a), origin = a},
+		{longest = (a - b), other = (c - b), origin = b},
+		{longest = (b - c), other = (a - c), origin = c}
+	};
+
+	local edge = edges[1]
+	for i = 2, #edges do
+		if edges[i].longest.magnitude > edge.longest.magnitude then
+			edge = edges[i]
+		end
+	end
+
+	local theta = math.acos(edge.longest.unit:Dot(edge.other.unit))
+	local w1 = math.cos(theta) * edge.other.magnitude
+	local w2 = edge.longest.magnitude - w1
+	local h = math.sin(theta) * edge.other.magnitude
+
+	local p1 = edge.origin + edge.other * 0.5;
+	local p2 = edge.origin + edge.longest + (edge.other - edge.longest) * 0.5
+
+	local right = edge.longest:Cross(edge.other).unit
+	local up = right:Cross(edge.longest).unit
+	local back = edge.longest.unit
+
+	local cf1 = CFrame.new(
+		p1.x, p1.y, p1.z,
+		-right.x, up.x, back.x,
+		-right.y, up.y, back.y,
+		-right.z, up.z, back.z
+	);
+
+	local cf2 = CFrame.new(
+		p2.x, p2.y, p2.z,
+		right.x, up.x, -back.x,
+		right.y, up.y, -back.y,
+		right.z, up.z, -back.z
+	);
+
+	-- put it all together by creating the wedges
+	local triangle = Instance.new("Folder")
+	triangle.Name = "Triangle"
+	triangle.Archivable = false
+
+	local wedge1 = Instance.new("WedgePart")
+	wedge1.Material = Enum.Material.SmoothPlastic
+	wedge1.Transparency = 0
+	wedge1.Anchored = true
+	wedge1.CanCollide = false
+	wedge1.CanQuery = false
+	wedge1.CanTouch = false
+	wedge1.Archivable = false
+	wedge1.CastShadow = false
+	wedge1.Size = Vector3.new(0.05, h, w1)
+	wedge1.CFrame = cf1
+	wedge1.Color = color
+
+	local mesh1 = Instance.new("SpecialMesh")
+	mesh1.MeshType = Enum.MeshType.Wedge
+	mesh1.Scale = Vector3.new(0, 1, 1)
+	mesh1.Parent = wedge1
+
+	local wedge2 = Instance.new("WedgePart")
+	wedge2.Material = Enum.Material.SmoothPlastic
+	wedge2.Transparency = 0
+	wedge2.Anchored = true
+	wedge2.CanCollide = false
+	wedge2.CanQuery = false
+	wedge2.CanTouch = false
+	wedge2.Archivable = false
+	wedge2.CastShadow = false
+	wedge2.Size = Vector3.new(0.05, h, w2)
+	wedge2.CFrame = cf2
+	wedge2.Color = color
+
+	local mesh2 = Instance.new("SpecialMesh")
+	mesh2.MeshType = Enum.MeshType.Wedge
+	mesh2.Scale = Vector3.new(0, 1, 1)
+	mesh2.Parent = wedge2
+
+	wedge1.Parent = triangle
+	wedge2.Parent = triangle
+
+	return triangle
 end
 
 --[=[
@@ -166,18 +279,17 @@ end
 	@param color Color3? -- Optional color to draw in
 	@param parent Instance? -- Optional parent
 	@param diameter number? -- Optional diameter
-	@param meshDiameter number? -- Optional mesh diameter
 	@return BasePart
 ]=]
-function Draw.ray(ray, color, parent, meshDiameter, diameter)
+function Draw.ray(ray, color, parent, diameter)
 	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
 
 	color = Draw._toColor3(color) or Draw._defaultColor
 	parent = parent or Draw.getDefaultParent()
-	meshDiameter = meshDiameter or 0.2
 	diameter = diameter or 0.2
 
 	local rayCenter = ray.Origin + ray.Direction/2
+	local distance = ray.Direction.Magnitude
 
 	local part = Instance.new("Part")
 	part.Material = Enum.Material.ForceField
@@ -187,41 +299,33 @@ function Draw.ray(ray, color, parent, meshDiameter, diameter)
 	part.CanQuery = false
 	part.CanTouch = false
 	part.CastShadow = false
-	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(math.pi/2, 0, 0)
+	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(0, math.pi/2, 0)
 	part.Color = color
 	part.Name = "DebugRay"
 	part.Shape = Enum.PartType.Cylinder
-	part.Size = Vector3.new(diameter, ray.Direction.Magnitude, diameter)
+	part.Size = Vector3.new(distance, diameter, diameter)
 	part.TopSurface = Enum.SurfaceType.Smooth
 	part.Transparency = 0.5
 
-	local rotatedPart = Instance.new("Part")
-	rotatedPart.Name = "RotatedPart"
-	rotatedPart.Anchored = true
-	rotatedPart.Archivable = false
-	rotatedPart.CanCollide = false
-	rotatedPart.CanQuery = false
-	rotatedPart.CanTouch = false
-	rotatedPart.CastShadow = false
-	rotatedPart.CFrame = CFrame.new(ray.Origin, ray.Origin + ray.Direction)
-	rotatedPart.Transparency = 1
-	rotatedPart.Size = Vector3.new(1, 1, 1)
-	rotatedPart.Parent = part
+	local cylinderHandleAdornment = Instance.new("CylinderHandleAdornment")
+	cylinderHandleAdornment.Name = "CylinderHandleAdornment"
+	cylinderHandleAdornment.Height = ray.Direction.Magnitude
+	cylinderHandleAdornment.InnerRadius = 0
+	cylinderHandleAdornment.Radius = diameter/4
+	cylinderHandleAdornment.ZIndex = 3
+	cylinderHandleAdornment.Color3 = color
+	cylinderHandleAdornment.AlwaysOnTop = true
+	cylinderHandleAdornment.Transparency = 0.25
+	cylinderHandleAdornment.CFrame = CFrame.Angles(0, math.pi/2, 0)
+	cylinderHandleAdornment.Adornee = part
+	cylinderHandleAdornment.Parent = part
 
-	local lineHandleAdornment = Instance.new("LineHandleAdornment")
-	lineHandleAdornment.Name = "DrawRayLineHandleAdornment"
-	lineHandleAdornment.Length = ray.Direction.Magnitude
-	lineHandleAdornment.Thickness = 5*diameter
-	lineHandleAdornment.ZIndex = 3
-	lineHandleAdornment.Color3 = color
-	lineHandleAdornment.AlwaysOnTop = true
-	lineHandleAdornment.Transparency = 0
-	lineHandleAdornment.Adornee = rotatedPart
-	lineHandleAdornment.Parent = rotatedPart
+	local partSize = part.Size
 
 	local mesh = Instance.new("SpecialMesh")
+	mesh.MeshType = Enum.MeshType.Cylinder
 	mesh.Name = "DrawRayMesh"
-	mesh.Scale = Vector3.new(0, 1, 0) + Vector3.new(meshDiameter, 0, meshDiameter) / diameter
+	mesh.Scale = Vector3.new(distance/partSize.x, diameter/partSize.y, diameter/partSize.z)
 	mesh.Parent = part
 
 	part.Parent = parent
@@ -244,30 +348,35 @@ end
 	end)
 	```
 
-	@param part Ray part
-	@param ray Ray
-	@param color Color3
+	@param rayPart Instance -- Ray part
+	@param ray Ray -- New ray
+	@param color Color3 -- New color
+	@param diameter number -- Number
 ]=]
-function Draw.updateRay(part, ray, color)
-	color = Draw._toColor3(color) or part.Color
+function Draw.updateRay(rayPart, ray, color, diameter)
+	assert(typeof(rayPart) == "Instance", "Bad rayPart")
+	assert(typeof(ray) == "Ray", "Bad typeof(ray) for Ray")
+	color = Draw._toColor3(color) or rayPart.Color
+	diameter = diameter or rayPart.Size.x
 
-	local diameter = part.Size.x
 	local rayCenter = ray.Origin + ray.Direction/2
+	local distance = ray.Direction.Magnitude
 
-	part.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(math.pi/2, 0, 0)
-	part.Size = Vector3.new(diameter, ray.Direction.Magnitude, diameter)
-	part.Color = color
+	rayPart.Color = color
+	rayPart.Size = Vector3.new(distance, diameter, diameter)
+	rayPart.CFrame = CFrame.new(rayCenter, ray.Origin + ray.Direction) * CFrame.Angles(0, math.pi/2, 0)
 
-	local rotatedPart = part:FindFirstChild("RotatedPart")
-	if rotatedPart then
-		rotatedPart.CFrame = CFrame.new(ray.Origin, ray.Origin + ray.Direction)
+	local lineHandleAdornment = rayPart:FindFirstChildWhichIsA("CylinderHandleAdornment")
+	if lineHandleAdornment then
+		lineHandleAdornment.Height = ray.Direction.Magnitude
+		lineHandleAdornment.Radius = 5*diameter
+		lineHandleAdornment.Color3 = color
 	end
 
-	local lineHandleAdornment = rotatedPart and rotatedPart:FindFirstChild("DrawRayLineHandleAdornment")
-	if lineHandleAdornment then
-		lineHandleAdornment.Length = ray.Direction.Magnitude
-		lineHandleAdornment.Thickness = 5*diameter
-		lineHandleAdornment.Color3 = color
+	local partSize = rayPart.Size
+	local mesh = rayPart:FindFirstChildWhichIsA("SpecialMesh")
+	if mesh then
+		mesh.Scale = Vector3.new(distance/partSize.x, diameter/partSize.y, diameter/partSize.z)
 	end
 end
 
@@ -435,6 +544,7 @@ function Draw.point(position, color, parent, diameter)
 
 	local sphereHandle = Instance.new("SphereHandleAdornment")
 	sphereHandle.Archivable = false
+	sphereHandle.Transparency = 0.25
 	sphereHandle.Radius = diameter/4
 	sphereHandle.Color3 = color
 	sphereHandle.AlwaysOnTop = true
@@ -810,6 +920,10 @@ function Draw._toVector3(position)
 		else
 			return nil
 		end
+	elseif typeof(position) == "RaycastResult" then
+		return position.Position
+	elseif typeof(position) == "PathWaypoint" then
+		return position.Position
 	else
 		return nil
 	end
@@ -846,6 +960,10 @@ function Draw._toCFrame(cframe)
 		else
 			return nil
 		end
+	elseif typeof(cframe) == "RaycastResult" then
+		return CFrame.new(cframe.Position, cframe.Normal)
+	elseif typeof(cframe) == "PathWaypoint" then
+		return CFrame.new(cframe.Position)
 	else
 		return nil
 	end

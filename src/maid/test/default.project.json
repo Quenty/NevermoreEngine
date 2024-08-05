@@ -1,0 +1,14 @@
+{
+  "name": "MaidTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "maid": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}

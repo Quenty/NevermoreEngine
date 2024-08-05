@@ -9,14 +9,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
 
 local PermissionService = require("PermissionService")
 local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
 local Promise = require("Promise")
 local Maid = require("Maid")
-local Remoting = require("Remoting")
 
 local CmdrService = {}
 CmdrService.ServiceName = "CmdrService"
@@ -31,13 +28,6 @@ function CmdrService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-
-	-- State
-	self._remoting = self._maid:Add(Remoting.new(ReplicatedStorage, "CmdrService"))
-	self._remoting:DeclareEvent("OpenCmdr")
-
-	-- External
-	self._chatProviderService = self._serviceBag:GetService(require("ChatProviderService"))
 
 	-- Internal
 	self._cmdrTemplateProviderServer = self._serviceBag:GetService(CmdrTemplateProviderServer)
@@ -55,7 +45,7 @@ function CmdrService:Init(serviceBag)
 		resolve(cmdr)
 	end))
 
-	self._permissionService = serviceBag:GetService(PermissionService)
+	self._permissionService = self._serviceBag:GetService(PermissionService)
 
 	self._definitionData = {}
 	self._executeData = {}
@@ -95,10 +85,6 @@ function CmdrService:Init(serviceBag)
 	end)
 
 	GLOBAL_REGISTRY[self._serviceId] = self
-end
-
-function CmdrService:Start()
-	self:_createActivateChatCommand()
 end
 
 --[=[
@@ -158,27 +144,6 @@ function CmdrService:RegisterCommand(commandData, execute)
 	end)
 end
 
-function CmdrService:_createActivateChatCommand()
-	local command = Instance.new("TextChatCommand")
-	command.Name = "OpenCmdrCommand"
-	command.PrimaryAlias = "/cmdr"
-
-	self._maid:GiveTask(command)
-	self._maid:GiveTask(command.Triggered:Connect(function(originTextSource, _unfilteredText)
-		local player = Players:GetPlayerByUserId(originTextSource.UserId)
-		if not player then
-			return
-		end
-
-		self._permissionService:PromiseIsAdmin(player):Then(function(isAdmin)
-			if isAdmin then
-				self._remoting.OpenCmdr:FireClient(player)
-			end
-		end)
-	end))
-
-	self._chatProviderService:AddChatCommand(command)
-end
 
 
 --[=[

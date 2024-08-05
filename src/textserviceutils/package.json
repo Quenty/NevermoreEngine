@@ -1,6 +1,6 @@
 {
   "name": "@quenty/textserviceutils",
-  "version": "8.1.1",
+  "version": "13.3.0",
   "description": "Holds utilities involving the Roblox TextService and text fitting to size.",
   "keywords": [
     "Roblox",

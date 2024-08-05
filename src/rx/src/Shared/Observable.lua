@@ -58,6 +58,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Subscription = require("Subscription")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ENABLE_STACK_TRACING = false
 
@@ -71,7 +72,7 @@ Observable.__index = Observable
 	@return boolean
 ]=]
 function Observable.isObservable(item)
-	return type(item) == "table" and item.ClassName == "Observable"
+	return DuckTypeUtils.isImplementation(Observable, item)
 end
 
 --[=[
@@ -154,12 +155,9 @@ end
 	@return MaidTask
 ]=]
 function Observable:Subscribe(fireCallback, failCallback, completeCallback)
-	local sub = Subscription.new(fireCallback, failCallback, completeCallback)
-	local cleanup = self._onSubscribe(sub)
+	local sub = Subscription.new(fireCallback, failCallback, completeCallback, self._source)
 
-	if cleanup then
-		sub:_giveCleanup(cleanup)
-	end
+	sub:_assignCleanup(self._onSubscribe(sub))
 
 	return sub
 end

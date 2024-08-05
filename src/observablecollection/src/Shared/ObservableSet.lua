@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Brio = require("Brio")
 local ValueObject = require("ValueObject")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ObservableSet = {}
 ObservableSet.ClassName = "ObservableSet"
@@ -61,7 +62,7 @@ end
 	@return boolean
 ]=]
 function ObservableSet.isObservableSet(value)
-	return type(value) == "table" and getmetatable(value) == ObservableSet
+	return DuckTypeUtils.isImplementation(ObservableSet, value)
 end
 
 --[=[
@@ -234,12 +235,17 @@ end
 	@return { [T]: true }
 ]=]
 function ObservableSet:GetSetCopy()
-	local set = {}
-	for item, _ in pairs(self._set) do
-		set[item] = true
-	end
-	return set
+	return table.clone(self._set)
 end
+
+--[=[
+	Gets the raw set. Do not modify this set.
+	@return { [T]: true }
+]=]
+function ObservableSet:GetRawSet()
+	return self._set
+end
+
 
 --[=[
 	Cleans up the ObservableSet and sets the metatable to nil.

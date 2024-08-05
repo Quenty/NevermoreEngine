@@ -12,6 +12,7 @@ local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 local RxBrioUtils = require("RxBrioUtils")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local ObservableMap = {}
 ObservableMap.ClassName = "ObservableMap"
@@ -27,11 +28,8 @@ function ObservableMap.new()
 	self._maid = Maid.new()
 	self._map = {}
 
-	self._keySubTable = ObservableSubscriptionTable.new()
-	self._maid:GiveTask(self._keySubTable)
-
-	self._countValue = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._countValue)
+	self._keySubTable = self._maid:Add(ObservableSubscriptionTable.new())
+	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
 --[=[
 	Fires when a key is added
@@ -39,8 +37,7 @@ function ObservableMap.new()
 	@prop KeyAdded Signal<TKey>
 	@within ObservableMap
 ]=]
-	self.KeyAdded = Signal.new() -- :Fire(key, value)
-	self._maid:GiveTask(self.KeyAdded)
+	self.KeyAdded = self._maid:Add(Signal.new()) -- :Fire(key, value)
 
 --[=[
 	Fires when a key is removed
@@ -48,8 +45,7 @@ function ObservableMap.new()
 	@prop KeyRemoved Signal<TKey>
 	@within ObservableMap
 ]=]
-	self.KeyRemoved = Signal.new() -- :Fire(key)
-	self._maid:GiveTask(self.KeyRemoved)
+	self.KeyRemoved = self._maid:Add(Signal.new()) -- :Fire(key)
 
 --[=[
 	Fires when a key value changes, including add and remove.
@@ -57,8 +53,7 @@ function ObservableMap.new()
 	@prop KeyValueChanged Signal<(TKey, TValue, TValue)>
 	@within ObservableMap
 ]=]
-	self.KeyValueChanged = Signal.new() -- :Fire(key, value, oldValue)
-	self._maid:GiveTask(self.KeyValueChanged)
+	self.KeyValueChanged = self._maid:Add(Signal.new()) -- :Fire(key, value, oldValue)
 
 --[=[
 	Fires when the count changes.
@@ -76,7 +71,7 @@ end
 	@return boolean
 ]=]
 function ObservableMap.isObservableMap(value)
-	return type(value) == "table" and getmetatable(value) == ObservableMap
+	return DuckTypeUtils.isImplementation(ObservableMap, value)
 end
 
 --[=[
@@ -127,15 +122,16 @@ function ObservableMap:_observeKeyValueChanged(packValue)
 			handleValue(key, value)
 		end
 
-		maid:GiveTask(self.KeyValueChanged:Connect(handleValue))
+		local conn = self.KeyValueChanged:Connect(handleValue)
 
-		self._maid[sub] = maid
-		maid:GiveTask(function()
+		local function cleanup()
 			self._maid[sub] = nil
+			conn:Disconnect()
 			sub:Complete()
-		end)
-
-		return maid
+			maid:Destroy()
+		end
+		self._maid[sub] = cleanup
+		return cleanup
 	end)
 end
 
@@ -298,6 +294,39 @@ function ObservableMap:GetKeyList()
 	return list
 end
 
+--[=[
+	Observes the list of all keys.
+	@return Observable<{ TKey }>
+]=]
+function ObservableMap:ObserveKeyList()
+	return Observable.new(function(sub)
+		local topMaid = Maid.new()
+
+		-- TODO: maybe don't allocate as much here?
+		local keyList = {}
+
+		topMaid:GiveTask(self.KeyAdded:Connect(function(addedKey)
+			table.insert(keyList, addedKey)
+			sub:Fire(table.clone(keyList))
+		end))
+
+		topMaid:GiveTask(self.KeyRemoved:Connect(function(removedKey)
+			local index = table.find(keyList, removedKey)
+			if index then
+				table.remove(keyList, index)
+			end
+			sub:Fire(table.clone(keyList))
+		end))
+
+		for key, _ in pairs(self._map) do
+			table.insert(keyList, key)
+		end
+
+		sub:Fire(table.clone(keyList))
+
+		return topMaid
+	end)
+end
 
 --[=[
 	Cleans up the ObservableMap and sets the metatable to nil.

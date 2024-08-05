@@ -1,0 +1,12 @@
+{
+  "name": "ButtonDragModelTest",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "buttondragmodel": {
+        "$path": ".."
+      }
+    }
+  }
+}

@@ -1,3 +1,5 @@
+--!native
+
 -- SHA-256, HMAC and PBKDF2 functions in ComputerCraft
 -- By Anavrins
 -- For help and details, you can PM me on the CC forums
@@ -5,6 +7,8 @@
 -- http://www.computercraft.info/forums2/index.php?/user/12870-anavrins
 -- http://pastebin.com/6UV4qfNF
 -- Last update: October 10, 2017
+-- Updated by Quenty December 4th, 2023
+
 local twoPower = require(script.Parent.twoPower)
 local util = require(script.Parent.util)
 

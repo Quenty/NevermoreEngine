@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local Rx = require("Rx")
 
 local MasterClock = setmetatable({}, BaseObject)
 MasterClock.__index = MasterClock
@@ -36,6 +37,10 @@ function MasterClock.new(remoteEvent, remoteFunction)
 		alive = false
 	end)
 
+	self._clockFunction = function()
+		return self:GetTime()
+	end
+
 	task.delay(5, function()
 		while alive do
 			self:_forceSync()
@@ -44,6 +49,24 @@ function MasterClock.new(remoteEvent, remoteFunction)
 	end)
 
 	return self
+end
+
+--[=[
+	Gets a function that can be used as a clock, like `time` and `tick` are.
+
+	@return function
+]=]
+function MasterClock:GetClockFunction()
+	return self._clockFunction
+end
+
+--[=[
+	Observes how much ping the clock has
+
+	@return Observable<number>
+]=]
+function MasterClock:ObservePing()
+	return Rx.of(0)
 end
 
 --[=[

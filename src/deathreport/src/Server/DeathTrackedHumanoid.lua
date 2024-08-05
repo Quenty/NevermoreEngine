@@ -32,7 +32,7 @@ function DeathTrackedHumanoid:_handleDeath()
 
 	if self._obj.Health <= 0 then
 		self._maid._diedEvent = nil -- prevent double tracking of death
-		self._deathReportService:ReportDeath(self._obj)
+		self._deathReportService:ReportHumanoidDeath(self._obj)
 	end
 end
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/time",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Library handles time based parsing / operations. Untested. Based off of PHP's time system. Note: This library is out of date, and does not necessarily work. I recommend using os.time()",
   "keywords": [
     "Roblox",

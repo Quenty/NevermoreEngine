@@ -36,6 +36,7 @@ function AnimationGroupUtils.createdWeightedTracks(animatorOrHumanoid, weightedA
 	assert(weightedAnimationList, "Bad weightedAnimationList")
 
 	local tracks = {}
+
 	for _, weightedAnimation in pairs(weightedAnimationList) do
 		assert(weightedAnimation.animationId, "Bad weightedAnimation.animationId")
 		assert(weightedAnimation.weight, "Bad weightedAnimation.weight")
@@ -44,6 +45,7 @@ function AnimationGroupUtils.createdWeightedTracks(animatorOrHumanoid, weightedA
 			AnimationTrackUtils.loadAnimationFromId(animatorOrHumanoid, weightedAnimation.animationId),
 			weightedAnimation.weight))
 	end
+
 	return tracks
 end
 

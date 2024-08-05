@@ -3,6 +3,125 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.4.0...@quenty/colorpicker@10.4.1) (2024-05-14)
+
+
+### Bug Fixes
+
+* Fix drag model in color picker code ([a46b6fd](https://github.com/Quenty/NevermoreEngine/commit/a46b6fd06a7a385cdbca1ec6e6102becd499e579))
+
+
+
+
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.3.0...@quenty/colorpicker@10.4.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.2.1...@quenty/colorpicker@10.3.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+## [10.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.2.0...@quenty/colorpicker@10.2.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.1.0...@quenty/colorpicker@10.2.0) (2024-03-27)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.0.0...@quenty/colorpicker@10.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@9.0.0...@quenty/colorpicker@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@8.0.0...@quenty/colorpicker@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@7.0.0...@quenty/colorpicker@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@6.0.0...@quenty/colorpicker@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@5.4.0...@quenty/colorpicker@6.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@5.3.0...@quenty/colorpicker@5.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@5.2.0...@quenty/colorpicker@5.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@5.1.1...@quenty/colorpicker@5.2.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
+
+
+
+
 ## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@5.1.0...@quenty/colorpicker@5.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/colorpicker

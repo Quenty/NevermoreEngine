@@ -6,9 +6,10 @@ local twoPower = setmetatable({}, {
 	end,
 })
 
+-- NOTE: This takes somewhere between 1.5 ms to 4 ms
 -- precache
-for index = -512, 512 do
-	local _ = twoPower[index]
-end
+-- for index = -512, 512 do
+-- 	twoPower[index] = 2 ^ index
+-- end
 
 return twoPower

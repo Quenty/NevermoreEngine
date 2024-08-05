@@ -14,6 +14,8 @@ local MarketplaceUtils = require("MarketplaceUtils")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
 local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local Promise = require("Promise")
+local Rx = require("Rx")
 
 local PlayerMarketeer = setmetatable({}, BaseObject)
 PlayerMarketeer.ClassName = "PlayerMarketeer"
@@ -100,6 +102,46 @@ function PlayerMarketeer:IsPromptOpen()
 	end
 
 	return false
+end
+
+--[=[
+	Promises that no prompt is open
+
+	@return Promise
+]=]
+function PlayerMarketeer:PromisePlayerPromptClosed()
+	if not self:IsPromptOpen() then
+		return Promise.resolved()
+	end
+
+	if self._observeNextNoPromptOpen then
+		return Rx.toPromise(self._observeNextNoPromptOpen)
+	end
+
+	local observeOpenCounts = {}
+
+	for assetType, assetTracker in pairs(self._assetMarketTrackers) do
+		observeOpenCounts[assetType] = assetTracker:ObservePromptOpenCount()
+	end
+
+	self._observeNextNoPromptOpen = Rx.combineLatest(observeOpenCounts):Pipe({
+		Rx.map(function(state)
+			for _, item in pairs(state) do
+				if item > 0 then
+					return false
+				end
+			end
+
+			return true
+		end);
+		Rx.where(function(value)
+			return value
+		end);
+		Rx.distinct();
+		Rx.share();
+	})
+
+	return Rx.toPromise(self._observeNextNoPromptOpen)
 end
 
 --[=[

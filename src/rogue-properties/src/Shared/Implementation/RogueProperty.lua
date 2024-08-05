@@ -59,24 +59,38 @@ function RogueProperty:CanInitialize()
 end
 
 function RogueProperty:GetBaseValueObject()
+	local cached = rawget(self, "_baseValueCache")
+	local adornee = rawget(self, "_adornee")
+	local definition = rawget(self, "_definition")
+
+	if cached and cached:IsDescendantOf(adornee) then
+		return cached
+	end
+
 	local parent
-	local parentDefinition = self._definition:GetParentPropertyDefinition()
+	local parentDefinition = definition:GetParentPropertyDefinition()
 
 	if parentDefinition then
-		parent = parentDefinition:GetContainer(self._adornee, self:CanInitialize())
+		parent = parentDefinition:GetContainer(adornee, self:CanInitialize())
 	else
-		parent = self._adornee
+		parent = adornee
 	end
 
 	if not parent then
 		return nil
 	end
 
+	local found
 	if self:CanInitialize() then
-		return self._definition:GetOrCreateInstance(parent)
+		found = definition:GetOrCreateInstance(parent)
 	else
-		return parent:FindFirstChild(self._definition:GetName())
+		found = parent:FindFirstChild(definition:GetName())
 	end
+
+	-- Store cache
+	rawset(self, "_baseValueCache", found)
+
+	return found
 end
 
 function RogueProperty:_observeBaseValueBrio()
@@ -197,8 +211,8 @@ function RogueProperty:Observe()
 				current = Rx.of(self._definition:GetDefaultValue())
 			end
 
-			for _, item in pairs(self._roguePropertyService:GetProviders()) do
-				current = item:ObserveModifiedVersion(baseValue, self, current)
+			for _, provider in pairs(self._roguePropertyService:GetProviders()) do
+				current = provider:ObserveModifiedVersion(baseValue, self, current)
 			end
 
 			return current

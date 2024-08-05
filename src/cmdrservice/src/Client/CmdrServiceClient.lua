@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Maid = require("Maid")
 local PermissionServiceClient = require("PermissionServiceClient")
@@ -16,8 +17,6 @@ local Promise = require("Promise")
 local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local String = require("String")
-local ChatProviderServiceClient = require("ChatProviderServiceClient")
-local Remoting = require("Remoting")
 
 local CmdrServiceClient = {}
 CmdrServiceClient.ServiceName = "CmdrServiceClient"
@@ -29,10 +28,9 @@ CmdrServiceClient.ServiceName = "CmdrServiceClient"
 function CmdrServiceClient:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-
 	self._maid = Maid.new()
+
 	self._permissionServiceClient = self._serviceBag:GetService(PermissionServiceClient)
-	self._chatProviderServiceClient = self._serviceBag:GetService(ChatProviderServiceClient)
 
 	self:PromiseCmdr():Then(function(cmdr)
 		cmdr.Registry:RegisterHook("BeforeRun", function(context)
@@ -81,8 +79,6 @@ end
 function CmdrServiceClient:Start()
 	assert(self._serviceBag, "Not initialized")
 
-	self._remoting = self._maid:Add(Remoting.new(ReplicatedStorage, "CmdrService"))
-
 	self._maid:GivePromise(PromiseUtils.all({
 		self:PromiseCmdr(),
 		self._maid:GivePromise(self._permissionServiceClient:PromisePermissionProvider())
@@ -110,20 +106,6 @@ function CmdrServiceClient:_setBindings(cmdr)
 		end
 	end))
 
-	self._maid:GiveTask(self._remoting.OpenCmdr:Connect(function()
-		cmdr:Show()
-	end))
-
-	-- same with chat provider
-	self._maid:GiveTask(self._chatProviderServiceClient.MessageIncoming:Connect(function(textChatMessage)
-		if not (textChatMessage.TextSource and textChatMessage.TextSource.UserId == Players.LocalPlayer.UserId) then
-			return
-		end
-
-		if String.startsWith(textChatMessage.Text, "/cmdr")  then
-			cmdr:Show()
-		end
-	end))
 
 	-- Race condition
 	task.defer(function()
@@ -143,7 +125,13 @@ function CmdrServiceClient:PromiseCmdr()
 		return self._cmdrPromise
 	end
 
-	self._cmdrPromise = promiseChild(ReplicatedStorage, "CmdrClient")
+	-- Suppress warning in test mode for hoarcekat
+	local timeout = nil
+	if not RunService:IsRunning() then
+		timeout = 1e10
+	end
+
+	self._cmdrPromise = self._maid:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient", timeout))
 		:Then(function(cmdClient)
 			return Promise.spawn(function(resolve, _reject)
 				-- Requiring cmdr can yield

@@ -3,6 +3,119 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.2.0...@quenty/animations@8.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+### Features
+
+* Allow tracks to be set in the AnimationGroup ([b51619a](https://github.com/Quenty/NevermoreEngine/commit/b51619add82097b5bc7449a21a9fd202374cd7bb))
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.1.0...@quenty/animations@8.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.0.0...@quenty/animations@8.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@7.0.0...@quenty/animations@8.0.0) (2024-02-19)
+
+
+### Features
+
+* Add AnimationPromiseUtils.promiseLoaded(animationTrack) and other helper calls ([5f743bf](https://github.com/Quenty/NevermoreEngine/commit/5f743bf3bc877af91fb91074aa7d4b03d29a09c4))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@6.0.0...@quenty/animations@7.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@5.0.0...@quenty/animations@6.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@4.0.0...@quenty/animations@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@3.0.0...@quenty/animations@4.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@2.4.0...@quenty/animations@3.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@2.3.0...@quenty/animations@2.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@2.2.0...@quenty/animations@2.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/animations
+
+
+
+
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@2.1.1...@quenty/animations@2.2.0) (2023-12-14)
+
+
+### Features
+
+* Add AnimationSlotPlayer:AdjustWeight() API call ([6e8f586](https://github.com/Quenty/NevermoreEngine/commit/6e8f586afb65303920a78b762d9bc519b30c0ffd))
+
+
+
+
+
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@2.1.0...@quenty/animations@2.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/animations

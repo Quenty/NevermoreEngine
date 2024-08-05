@@ -3,6 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.2.0...@quenty/propertyvalue@7.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.1.0...@quenty/propertyvalue@7.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.0.0...@quenty/propertyvalue@7.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@6.0.0...@quenty/propertyvalue@7.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@5.0.0...@quenty/propertyvalue@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@4.0.0...@quenty/propertyvalue@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@3.0.0...@quenty/propertyvalue@4.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@2.4.0...@quenty/propertyvalue@3.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@2.3.0...@quenty/propertyvalue@2.4.0) (2024-01-08)
+
+
+### Bug Fixes
+
+* Fix errors in PropertyValue ([ef90f6f](https://github.com/Quenty/NevermoreEngine/commit/ef90f6fdcbe4a362a0dcd66b73baf2e3a0399342))
+
+
+
+
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@2.2.0...@quenty/propertyvalue@2.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@2.1.1...@quenty/propertyvalue@2.2.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+
+
+
+
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@2.1.0...@quenty/propertyvalue@2.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/propertyvalue

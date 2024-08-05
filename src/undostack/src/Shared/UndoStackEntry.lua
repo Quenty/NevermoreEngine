@@ -9,6 +9,7 @@ local Promise = require("Promise")
 local Maid = require("Maid")
 local BaseObject = require("BaseObject")
 local Signal = require("Signal")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local UndoStackEntry = setmetatable({}, BaseObject)
 UndoStackEntry.ClassName = "UndoStackEntry"
@@ -38,7 +39,7 @@ end
 	@return boolean
 ]=]
 function UndoStackEntry.isUndoStackEntry(value)
-	return type(value) == "table" and getmetatable(value) == UndoStackEntry
+	return DuckTypeUtils.isImplementation(UndoStackEntry, value)
 end
 
 --[=[

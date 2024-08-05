@@ -229,6 +229,19 @@ function ButtonHighlightModel:ObservePercentPressed(acceleration)
 end
 
 --[=[
+	Observes target for how pressed the button is
+	@return Observable<number>
+]=]
+function ButtonHighlightModel:ObservePercentPressedTarget()
+	return self._isPressed:Observe()
+		:Pipe({
+			Rx.map(function(value)
+				return value and 1 or 0
+			end);
+		})
+end
+
+--[=[
 	Returns true if highlighted
 
 	@return boolean
@@ -337,6 +350,19 @@ function ButtonHighlightModel:ObserveIsChoosen()
 end
 
 --[=[
+	Observes target for if the button is selected or not
+	@return Observable<number>
+]=]
+function ButtonHighlightModel:ObservePercentChoosenTarget()
+	return self._isChoosen:Observe()
+		:Pipe({
+			Rx.map(function(value)
+				return value and 1 or 0
+			end);
+		})
+end
+
+--[=[
 	Observes how choosen the button is
 
 	@param acceleration number | nil
@@ -396,7 +422,9 @@ function ButtonHighlightModel:_trackTouch(inputObject)
 
 	self._numFingerDown.Value = self._numFingerDown.Value + 1
 	maid:GiveTask(function()
-		self._numFingerDown.Value = self._numFingerDown.Value - 1
+		if self._numFingerDown.Destroy then
+			self._numFingerDown.Value = self._numFingerDown.Value - 1
+		end
 	end)
 	maid:GiveTask(inputObject:GetPropertyChangedSignal("UserInputState"):Connect(function()
 		if inputObject.UserInputState == Enum.UserInputState.End then
@@ -414,12 +442,19 @@ end
 
 function ButtonHighlightModel:_updateTargets()
 	self._isMouseOrTouchOver.Value = self._isMouseOver.Value or self._numFingerDown.Value > 0
-	self._isPressed.Value = (self._isMouseDown.Value or self._isKeyDown.Value or self._numFingerDown.Value > 0)
-	self._isHighlighted.Value = self._isSelected.Value
-		or self._numFingerDown.Value > 0
-		or self._isKeyDown.Value
-		or self._isMouseOver.Value
-		or self._isMouseDown.Value
+
+	-- Assume event emission can lead to cleanup in middle of call
+	if self._isPressed.Destroy then
+		self._isPressed.Value = (self._isMouseDown.Value or self._isKeyDown.Value or self._numFingerDown.Value > 0)
+	end
+
+	if self._isHighlighted.Destroy then
+		self._isHighlighted.Value = self._isSelected.Value
+			or self._numFingerDown.Value > 0
+			or self._isKeyDown.Value
+			or self._isMouseOver.Value
+			or self._isMouseDown.Value
+	end
 end
 
 function ButtonHighlightModel:_update()
@@ -440,7 +475,7 @@ function ButtonHighlightModel:_setupLegacySteppedMode()
 	self._percentChoosenAccelTween.t = 0
 	self._percentChoosenAccelTween.p = 0
 
-	self._maid:GiveTask(self._isChoosen.Changed:Connect(function(isChoosen, _, _, doNotAnimate)
+	self._maid:GiveTask(self._isChoosen.Changed:Connect(function(isChoosen, _, doNotAnimate)
 		self._percentChoosenAccelTween.t = isChoosen and 1 or 0
 		if doNotAnimate then
 			self._percentChoosenAccelTween.p = self._percentChoosenAccelTween.t

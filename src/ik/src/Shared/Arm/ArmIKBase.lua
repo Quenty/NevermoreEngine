@@ -10,7 +10,7 @@ local RunService = game:GetService("RunService")
 local ArmIKUtils = require("ArmIKUtils")
 local BaseObject = require("BaseObject")
 local IKAimPositionPriorites = require("IKAimPositionPriorites")
-local LimbIKUtils = require.optional(require, "LimbIKUtils")
+local LimbIKUtils = require("optional")(require, "LimbIKUtils")
 local Maid = require("Maid")
 local Math = require("Math")
 local Motor6DSmoothTransformer = require("Motor6DSmoothTransformer")
@@ -259,9 +259,14 @@ function ArmIKBase:_observeStateBrio()
 end
 
 function ArmIKBase:Grip(attachment, priority)
+	assert(typeof(attachment) == "Instance", "Bad attachment")
+	assert(type(priority) == "number" or priority == nil, "Bad priority")
+
+	priority = priority or IKAimPositionPriorites.DEFAULT
+
 	local gripData = {
 		attachment = attachment;
-		priority = priority or IKAimPositionPriorites.DEFAULT;
+		priority = priority;
 	}
 
 	local i = 1

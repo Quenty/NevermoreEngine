@@ -1,5 +1,6 @@
 {
   "name": "radial-image",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

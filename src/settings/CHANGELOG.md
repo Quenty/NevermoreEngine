@@ -3,6 +3,159 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.6.0...@quenty/settings@11.6.1) (2024-07-16)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.5.0...@quenty/settings@11.6.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [11.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.4.0...@quenty/settings@11.5.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.3.1...@quenty/settings@11.4.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+## [11.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.3.0...@quenty/settings@11.3.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.2.0...@quenty/settings@11.3.0) (2024-03-27)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.1.0...@quenty/settings@11.2.0) (2024-03-11)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.0.0...@quenty/settings@11.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@10.0.0...@quenty/settings@11.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@9.0.0...@quenty/settings@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@8.0.0...@quenty/settings@9.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@7.0.0...@quenty/settings@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@6.0.0...@quenty/settings@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.7.0...@quenty/settings@6.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.6.0...@quenty/settings@5.7.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.5.0...@quenty/settings@5.6.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [5.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.4.0...@quenty/settings@5.5.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+
+
+
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.3.1...@quenty/settings@5.4.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Add ServiceName to SettingsService ([f5bcd0b](https://github.com/Quenty/NevermoreEngine/commit/f5bcd0b31196e8d35b8623b198dedb95455be387))
+
+
+
+
+
 ## [5.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@5.3.0...@quenty/settings@5.3.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/settings

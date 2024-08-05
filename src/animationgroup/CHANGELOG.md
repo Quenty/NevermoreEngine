@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.2.0...@quenty/animationgroup@10.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+### Features
+
+* Allow tracks to be set in the AnimationGroup ([b51619a](https://github.com/Quenty/NevermoreEngine/commit/b51619add82097b5bc7449a21a9fd202374cd7bb))
+
+
+
+
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.1.0...@quenty/animationgroup@10.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.0.0...@quenty/animationgroup@10.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@9.0.0...@quenty/animationgroup@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@8.0.0...@quenty/animationgroup@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@7.2.0...@quenty/animationgroup@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@7.1.0...@quenty/animationgroup@7.2.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@7.0.0...@quenty/animationgroup@7.1.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+
+
+
+
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@6.3.0...@quenty/animationgroup@7.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/animationgroup

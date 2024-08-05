@@ -3,6 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.4.0...@quenty/snackbar@11.4.1) (2024-05-14)
+
+
+### Bug Fixes
+
+* Fix drag model in color picker code ([a46b6fd](https://github.com/Quenty/NevermoreEngine/commit/a46b6fd06a7a385cdbca1ec6e6102becd499e579))
+
+
+
+
+
+# [11.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.3.0...@quenty/snackbar@11.4.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+### Features
+
+* Refactor snackbar package to new snackbar system ([6f5113b](https://github.com/Quenty/NevermoreEngine/commit/6f5113b3ff1b637f40abb17160ab61788245a05d))
+
+
+
+
+
+# [11.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.2.0...@quenty/snackbar@11.3.0) (2024-04-28)
+
+
+### Features
+
+* Refactor SnackbarManager ([1bcac76](https://github.com/Quenty/NevermoreEngine/commit/1bcac762686c93a432438374d17831fb4b77ee68))
+
+
+
+
+
+# [11.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.1.0...@quenty/snackbar@11.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
+# [11.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@11.0.0...@quenty/snackbar@11.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@10.0.0...@quenty/snackbar@11.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@9.0.0...@quenty/snackbar@10.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@8.2.0...@quenty/snackbar@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@8.1.0...@quenty/snackbar@8.2.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@8.0.0...@quenty/snackbar@8.1.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/snackbar
+
+
+
+
+
 # [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/snackbar@7.5.0...@quenty/snackbar@8.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/snackbar

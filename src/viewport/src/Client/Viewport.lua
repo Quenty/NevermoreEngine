@@ -52,6 +52,7 @@ function Viewport.new()
 	self._transparency = self._maid:Add(ValueObject.new(0, "number"))
 	self._absoluteSize = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
 	self._fieldOfView = self._maid:Add(ValueObject.new(20, "number"))
+	self._controlsEnabled = self._maid:Add(ValueObject.new(true, "boolean"))
 
 	self._rotationYawSpring = self._maid:Add(SpringObject.new(math.rad(90 + 90 - 30)))
 	self._rotationYawSpring.Speed = 30
@@ -124,6 +125,17 @@ end
 
 function Viewport:ObserveTransparency()
 	return self._transparency:Observe()
+end
+
+--[=[
+	Sets the enabled state of the ViewportControls
+
+	@param enabled boolean
+]=]
+function Viewport:SetControlsEnabled(enabled)
+	assert(type(enabled) == "boolean", "Bad enabled")
+
+	self._controlsEnabled.Value = enabled
 end
 
 --[=[
@@ -253,7 +265,16 @@ function Viewport:Render(props)
 			end);
 		[Blend.OnChange "AbsoluteSize"] = self._absoluteSize;
 		[Blend.Attached(function(viewport)
-			return ViewportControls.new(viewport, self)
+			local controlsMaid = Maid.new()
+
+			-- create viewport controls and obey enabled state
+			local viewportControls = ViewportControls.new(viewport, self)
+			controlsMaid:Add(viewportControls)
+			controlsMaid:Add(self._controlsEnabled:Observe():Subscribe(function(controlsEnabled)
+				viewportControls:SetEnabled(controlsEnabled)
+			end))
+
+			return controlsMaid
 		end)] = true;
 		[Blend.Attached(function(viewport)
 			-- custom parenting scheme to ensure we don't call destroy on children

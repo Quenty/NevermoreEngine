@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@10.2.0...@quenty/vector3utils@10.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@10.1.0...@quenty/vector3utils@10.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/vector3utils
+
+
+
+
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@10.0.0...@quenty/vector3utils@10.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/vector3utils
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@9.0.0...@quenty/vector3utils@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/vector3utils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@8.0.0...@quenty/vector3utils@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/vector3utils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@7.2.0...@quenty/vector3utils@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/vector3utils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@7.1.0...@quenty/vector3utils@7.2.0) (2024-01-08)
+
+
+### Features
+
+* Add Vector3Utils.areClose ([1820b38](https://github.com/Quenty/NevermoreEngine/commit/1820b38ca52315925a85b1c4f45e10d4b448e96d))
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@7.0.0...@quenty/vector3utils@7.1.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/vector3utils
+
+
+
+
+
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@6.7.0...@quenty/vector3utils@7.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/vector3utils

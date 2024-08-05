@@ -1,6 +1,6 @@
 {
   "name": "@quenty/highlight",
-  "version": "4.2.1",
+  "version": "10.4.1",
   "description": "Animated highlight system for the Roblox highlight object",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/basicpane": "file:../basicpane",
     "@quenty/blend": "file:../blend",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",

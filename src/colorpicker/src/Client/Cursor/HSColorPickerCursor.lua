@@ -18,26 +18,13 @@ HSColorPickerCursor.__index = HSColorPickerCursor
 function HSColorPickerCursor.new()
 	local self = setmetatable(BaseObject.new(), HSColorPickerCursor)
 
-	self._backgroundColorHint = ValueObject.new(Color3.new(0, 0, 0), "Color3")
-	self._maid:GiveTask(self._backgroundColorHint)
-
-	self._height = ValueObject.new(0.075, "number")
-	self._maid:GiveTask(self._height)
-
-	self._crossHairWidthAbs = ValueObject.new(1, "number")
-	self._maid:GiveTask(self._crossHairWidthAbs)
-
-	self._verticalHairVisible = ValueObject.new(true, "boolean")
-	self._maid:GiveTask(self._verticalHairVisible)
-
-	self._horizontalHairVisible = ValueObject.new(true, "boolean")
-	self._maid:GiveTask(self._horizontalHairVisible)
-
-	self._position = ValueObject.new(Vector2.zero, "Vector2")
-	self._maid:GiveTask(self._position)
-
-	self._transparency = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._transparency)
+	self._backgroundColorHint = self._maid:Add(ValueObject.new(Color3.new(0, 0, 0), "Color3"))
+	self._height = self._maid:Add(ValueObject.new(0.075, "number"))
+	self._crossHairWidthAbs = self._maid:Add(ValueObject.new(1, "number"))
+	self._verticalHairVisible = self._maid:Add(ValueObject.new(true, "boolean"))
+	self._horizontalHairVisible = self._maid:Add(ValueObject.new(true, "boolean"))
+	self._position = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
+	self._transparency = self._maid:Add(ValueObject.new(0, "number"))
 
 	self._maid:GiveTask(self:_render():Subscribe(function(gui)
 		self.Gui = gui
@@ -119,47 +106,41 @@ function HSColorPickerCursor:_render()
 			return UDim2.fromScale(pos.x, pos.y)
 		end);
 
-		[Blend.Children] = {
-			Blend.New "UIAspectRatioConstraint" {
-				AspectRatio = 1;
+		Blend.New "UIAspectRatioConstraint" {
+			AspectRatio = 1;
+		};
+
+		Blend.New "Frame" {
+			AnchorPoint = Vector2.new(0.5, 0.5);
+			Position = UDim2.fromScale(0.5, 0.5);
+			Visible = self._horizontalHairVisible;
+			Size = Blend.Computed(self._crossHairWidthAbs, function(width)
+				return UDim2.new(1, 0, 0, width)
+			end);
+			BackgroundColor3 = Blend.Computed(self._backgroundColorHint, function(backingColor)
+				return ColorPickerUtils.getOutlineWithContrast(Color3.new(0, 0, 0), backingColor)
+			end);
+			BackgroundTransparency = self._transparency;
+
+			Blend.New "UICorner" {
+				CornerRadius = UDim.new(1, 0);
 			};
+		};
 
-			Blend.New "Frame" {
-				AnchorPoint = Vector2.new(0.5, 0.5);
-				Position = UDim2.fromScale(0.5, 0.5);
-				Visible = self._horizontalHairVisible;
-				Size = Blend.Computed(self._crossHairWidthAbs, function(width)
-					return UDim2.new(1, 0, 0, width)
-				end);
-				BackgroundColor3 = Blend.Computed(self._backgroundColorHint, function(backingColor)
-					return ColorPickerUtils.getOutlineWithContrast(Color3.new(0, 0, 0), backingColor)
-				end);
-				BackgroundTransparency = self._transparency;
+		Blend.New "Frame" {
+			AnchorPoint = Vector2.new(0.5, 0.5);
+			Position = UDim2.fromScale(0.5, 0.5);
+			Visible = self._verticalHairVisible;
+			Size = Blend.Computed(self._crossHairWidthAbs, function(width)
+				return UDim2.new(0, width, 1, 0)
+			end);
+			BackgroundColor3 = Blend.Spring(Blend.Computed(self._backgroundColorHint, function(backingColor)
+				return ColorPickerUtils.getOutlineWithContrast(Color3.new(0, 0, 0), backingColor)
+			end), 20);
+			BackgroundTransparency = self._transparency;
 
-				[Blend.Children] = {
-					Blend.New "UICorner" {
-						CornerRadius = UDim.new(1, 0);
-					};
-				};
-			};
-
-			Blend.New "Frame" {
-				AnchorPoint = Vector2.new(0.5, 0.5);
-				Position = UDim2.fromScale(0.5, 0.5);
-				Visible = self._verticalHairVisible;
-				Size = Blend.Computed(self._crossHairWidthAbs, function(width)
-					return UDim2.new(0, width, 1, 0)
-				end);
-				BackgroundColor3 = Blend.Spring(Blend.Computed(self._backgroundColorHint, function(backingColor)
-					return ColorPickerUtils.getOutlineWithContrast(Color3.new(0, 0, 0), backingColor)
-				end), 20);
-				BackgroundTransparency = self._transparency;
-
-				[Blend.Children] = {
-					Blend.New "UICorner" {
-						CornerRadius = UDim.new(1, 0);
-					};
-				};
+			Blend.New "UICorner" {
+				CornerRadius = UDim.new(1, 0);
 			};
 		};
 	};

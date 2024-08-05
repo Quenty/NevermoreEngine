@@ -1,6 +1,6 @@
 {
   "name": "@quenty/flipbook",
-  "version": "3.2.1",
+  "version": "9.3.0",
   "description": "Handles playing back animated spritesheets",
   "keywords": [
     "Roblox",
@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",

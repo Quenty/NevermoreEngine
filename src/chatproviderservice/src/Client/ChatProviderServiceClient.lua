@@ -28,6 +28,7 @@ function ChatProviderServiceClient:Init(serviceBag)
 	-- Binders
 	self._serviceBag:GetService(require("ChatTagClient"))
 	self._serviceBag:GetService(require("ChatProviderTranslator"))
+	self._serviceBag:GetService(require("ChatProviderCommandServiceClient"))
 	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTagsClient"))
 end
 

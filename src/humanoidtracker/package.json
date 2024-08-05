@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidtracker",
-  "version": "8.1.1",
+  "version": "13.3.0",
   "description": "HumanoidTracker for Roblox - Tracks a player's character's humanoid",
   "keywords": [
     "Roblox",
@@ -25,6 +25,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",

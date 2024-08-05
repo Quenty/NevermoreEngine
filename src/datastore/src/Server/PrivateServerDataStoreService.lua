@@ -33,6 +33,10 @@ function PrivateServerDataStoreService:PromiseDataStore()
 			local dataStore = DataStore.new(robloxDataStore, self:_getKey())
 			self._maid:GiveTask(dataStore)
 
+			if game.PrivateServerOwnerId ~= 0 then
+				dataStore:Store("LastPrivateServerOwnerId", game.PrivateServerOwnerId)
+			end
+
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
 				return dataStore:Save()
 			end))
@@ -41,6 +45,12 @@ function PrivateServerDataStoreService:PromiseDataStore()
 		end)
 
 	return self._dataStorePromise
+end
+
+function PrivateServerDataStoreService:SetCustomKey(customKey)
+	assert(self._dataStorePromise == nil, "[PrivateServerDataStoreService] - Already got datastore, cannot set custom key")
+
+	self._customKey = customKey
 end
 
 function PrivateServerDataStoreService:_promiseRobloxDataStore()
@@ -55,6 +65,9 @@ function PrivateServerDataStoreService:_promiseRobloxDataStore()
 end
 
 function PrivateServerDataStoreService:_getKey()
+	if self._customKey then
+		return self._customKey
+	end
 	if game.PrivateServerId ~= "" then
 		return game.PrivateServerId
 	else

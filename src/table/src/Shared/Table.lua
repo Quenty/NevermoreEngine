@@ -317,7 +317,7 @@ function Table.take(source, count)
 end
 
 local function errorOnIndex(_, index)
-	error(("Bad index %q"):format(tostring(index)), 2)
+	error(string.format("Bad index %q", tostring(index)), 2)
 end
 
 local READ_ONLY_METATABLE = {

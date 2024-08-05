@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.2.0...@quenty/pathfindingutils@10.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.1.0...@quenty/pathfindingutils@10.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@10.0.0...@quenty/pathfindingutils@10.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@9.0.0...@quenty/pathfindingutils@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@8.0.0...@quenty/pathfindingutils@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@7.2.0...@quenty/pathfindingutils@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@7.1.0...@quenty/pathfindingutils@7.2.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/pathfindingutils
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@7.0.0...@quenty/pathfindingutils@7.1.0) (2023-12-14)
+
+
+### Features
+
+* Draw lines when calling `PathfindingUtils.visualizePath` which helps diagnose the path better ([5f3e21e](https://github.com/Quenty/NevermoreEngine/commit/5f3e21ea63c5d652904d28233f2a1ad65cd4ab66))
+
+
+
+
+
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pathfindingutils@6.9.0...@quenty/pathfindingutils@7.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/pathfindingutils

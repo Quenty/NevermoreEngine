@@ -3,6 +3,130 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.4.0...@quenty/genericscreenguiprovider@13.5.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [13.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.3.0...@quenty/genericscreenguiprovider@13.4.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [13.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.2.1...@quenty/genericscreenguiprovider@13.3.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+## [13.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.2.0...@quenty/genericscreenguiprovider@13.2.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [13.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.1.0...@quenty/genericscreenguiprovider@13.2.0) (2024-03-27)
+
+
+### Features
+
+* Update avatar editor stuff ([16d10a8](https://github.com/Quenty/NevermoreEngine/commit/16d10a876c90d3b43d69b5f66e217e4c3749296b))
+
+
+
+
+
+# [13.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.0.0...@quenty/genericscreenguiprovider@13.1.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* Add ServiceName to GenericScreenGuiProvider ([3477655](https://github.com/Quenty/NevermoreEngine/commit/34776559bac7c2b70ba762d0643d3ec7e5e233a5))
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@12.0.0...@quenty/genericscreenguiprovider@13.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@11.0.0...@quenty/genericscreenguiprovider@12.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@10.0.0...@quenty/genericscreenguiprovider@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@9.0.0...@quenty/genericscreenguiprovider@10.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@8.4.0...@quenty/genericscreenguiprovider@9.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@8.3.0...@quenty/genericscreenguiprovider@8.4.0) (2024-01-08)
+
+
+### Features
+
+* Allow SetGuiParent to return a calback ([b2a9239](https://github.com/Quenty/NevermoreEngine/commit/b2a923967653f886f230fc868debb82d698f70b9))
+
+
+
+
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@8.2.0...@quenty/genericscreenguiprovider@8.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@8.1.1...@quenty/genericscreenguiprovider@8.2.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+
+
+
+
 ## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@8.1.0...@quenty/genericscreenguiprovider@8.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/genericscreenguiprovider

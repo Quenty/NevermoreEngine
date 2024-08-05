@@ -1,3 +1,5 @@
+--!native
+
 -- Arithmetic on the Finite Field of Integers modulo q
 -- Where q is the generator's subgroup order.
 local util = require(script.Parent.util)

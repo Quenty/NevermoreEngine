@@ -31,41 +31,18 @@ function ConverterPane.new()
 
 	self._previewTextName = "ClassConverterPreviewText" .. HttpService:GenerateGUID(false)
 
-	self._converter = UIConverter.new()
-	self._maid:GiveTask(self._converter)
-
-	self._vDividerPosition = ValueObject.new(0.3);
-	self._maid:GiveTask(self._vDividerPosition)
-
-	self._hDividerPosition = ValueObject.new(0.5);
-	self._maid:GiveTask(self._hDividerPosition)
-
-	self._draggingState = ValueObject.new(false);
-	self._maid:GiveTask(self._draggingState)
-
-	self._absoluteSize = ValueObject.new(Vector2.zero, "Vector2");
-	self._maid:GiveTask(self._absoluteSize)
-
-	self._absolutePosition = ValueObject.new(Vector2.zero, "Vector2");
-	self._maid:GiveTask(self._absolutePosition)
-
-	self._code = ValueObject.new("");
-	self._maid:GiveTask(self._code)
-
-	self._captureFocus = Signal.new()
-	self._maid:GiveTask(self._captureFocus)
-
-	self._selectedList = ValueObject.new({})
-	self._maid:GiveTask(self._selectedList)
-
-	self._copyPreview = ValueObject.new(nil)
-	self._maid:GiveTask(self._copyPreview)
-
-	self._renderPreview = ValueObject.new(nil)
-	self._maid:GiveTask(self._renderPreview)
-
-	self._libraryName = ValueObject.new("Blend")
-	self._maid:GiveTask(self._libraryName)
+	self._converter = self._maid:Add(UIConverter.new())
+	self._vDividerPosition = self._maid:Add(ValueObject.new(0.3))
+	self._hDividerPosition = self._maid:Add(ValueObject.new(0.5))
+	self._draggingState = self._maid:Add(ValueObject.new(false))
+	self._absoluteSize = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
+	self._absolutePosition = self._maid:Add(ValueObject.new(Vector2.zero, "Vector2"))
+	self._code = self._maid:Add(ValueObject.new(""))
+	self._captureFocus = self._maid:Add(Signal.new())
+	self._selectedList = self._maid:Add(ValueObject.new({}))
+	self._copyPreview = self._maid:Add(ValueObject.new(nil))
+	self._renderPreview = self._maid:Add(ValueObject.new(nil))
+	self._libraryName = self._maid:Add(ValueObject.new("Blend"))
 
 	self._maid:GiveTask(Rx.combineLatest({
 		library = self._libraryName:Observe();
@@ -108,7 +85,7 @@ function ConverterPane:_preview(code, library, className)
 	local result, loadstrErr
 	local ok, err = pcall(function()
 		local newCode
-		if not string.find(code, "return") then
+		if not string.find(code, "return", nil, true) then
 			newCode = "return " .. code
 		else
 			newCode = code
@@ -121,7 +98,7 @@ function ConverterPane:_preview(code, library, className)
 		return self:_showPreviewText(err or loadstrErr or "Failed to loadstring")
 	end
 	if type(result) ~= "function" then
-		return self:_showPreviewText(err or loadstrErr or ("loadstring return type %q"):format(type(result)))
+		return self:_showPreviewText(err or loadstrErr or string.format("loadstring return type %q", type(result)))
 	end
 
 	local observable
@@ -143,7 +120,7 @@ function ConverterPane:_preview(code, library, className)
 	end
 
 	if observable == nil then
-		return self:_showPreviewText(("Cannot preview %q"):format(className))
+		return self:_showPreviewText(string.format("Cannot preview %q", className))
 	end
 
 
@@ -167,7 +144,7 @@ function ConverterPane:_preview(code, library, className)
 			end)
 		end
 
-		return self:_showPreviewText(("Got type %s back instead of observable"):format(typeof(observable)))
+		return self:_showPreviewText(string.format("Got type %s back instead of observable", typeof(observable)))
 	end
 
 	return observable
@@ -210,7 +187,7 @@ function ConverterPane:_setupPreview(maid, library, className)
 			local codeMaid = Maid.new()
 
 			if type(code) ~= "string" or #code == 0 then
-				return self:_showPreviewText(("Cannot preview %q"):format(className))
+				return self:_showPreviewText(string.format("Cannot preview %q", className))
 			end
 
 			local alive = true
@@ -231,7 +208,7 @@ function ConverterPane:_setupPreview(maid, library, className)
 					end
 
 					if typeof(inst) ~= "Instance" then
-						self._renderPreview.Value = self:_showPreviewText(("Did not got instance back for"):format(className))
+						self._renderPreview.Value = self:_showPreviewText(string.format("Did not got instance back for", className))
 						return
 					end
 
@@ -346,7 +323,7 @@ function ConverterPane:_renderFromInstance(state)
 					end
 
 					if #results == 0 then
-						return self:_showPreviewText(("Cannot preview %q"):format(state.selectedList[1].ClassName))
+						return self:_showPreviewText(string.format("Cannot preview %q", state.selectedList[1].ClassName))
 					elseif #results == 1 then
 						return results[1]
 					else
@@ -449,7 +426,7 @@ function ConverterPane:_isRenderableInViewport(inst)
 	elseif typeof(inst) == "Instance" then
 		return isRenderableCheck(inst)
 	else
-		error(("Bad argument of type %q"):format(typeof(inst)))
+		error(string.format("Bad argument of type %q", typeof(inst)))
 	end
 end
 
@@ -673,9 +650,9 @@ function ConverterPane:Render(props)
 
 	local selectionName = Blend.Computed(self._selectedList, function(selectionList)
 		if #selectionList == 1 then
-			return ("- %q"):format(tostring(selectionList[1]))
+			return string.format("- %q", tostring(selectionList[1]))
 		elseif #selectionList > 1 then
-			return ("- %d items"):format(#selectionList)
+			return string.format("- %d items", #selectionList)
 		else
 			return ""
 		end
@@ -701,7 +678,7 @@ function ConverterPane:Render(props)
 				BackgroundTransparency = 1;
 				[Blend.Children] = {
 					header(Blend.Computed(selectionName, function(name)
-						return ("Quenty's UI Converter - Selection %s"):format(name)
+						return string.format("Quenty's UI Converter - Selection %s", name)
 					end));
 					content(self:_renderPreviewPane(self._copyPreview));
 				}
@@ -748,7 +725,7 @@ function ConverterPane:Render(props)
 
 				[Blend.Children] = {
 					header(Blend.Computed(self._libraryName, selectionName, function(libraryName, name)
-						return ("Quenty's UI Converter - %s Render %s"):format(libraryName, name)
+						return string.format("Quenty's UI Converter - %s Render %s", libraryName, name)
 					end));
 
 					content(self:_renderPreviewPane(self._renderPreview));
@@ -805,7 +782,7 @@ function ConverterPane:Render(props)
 
 				[Blend.Children] = {
 					header(Blend.Computed(self._libraryName, selectionName, function(libraryName, name)
-						return ("Quenty's UI Converter - %s Code %s"):format(libraryName, name)
+						return string.format("Quenty's UI Converter - %s Code %s", libraryName, name)
 					end));
 
 					content(self:_previewCode(self._code));

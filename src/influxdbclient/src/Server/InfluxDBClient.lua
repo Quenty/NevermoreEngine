@@ -18,8 +18,7 @@ InfluxDBClient.__index = InfluxDBClient
 function InfluxDBClient.new(clientConfig)
 	local self = setmetatable(BaseObject.new(), InfluxDBClient)
 
-	self._clientConfig = ValueObject.new(nil)
-	self._maid:GiveTask(self._clientConfig)
+	self._clientConfig = self._maid:Add(ValueObject.new(nil))
 
 	if clientConfig then
 		self:SetClientConfig(clientConfig)
@@ -49,8 +48,7 @@ function InfluxDBClient:GetWriteAPI(org, bucket, precision)
 
 	local maid = Maid.new()
 
-	local writeAPI = InfluxDBWriteAPI.new(org, bucket, precision)
-	maid:GiveTask(writeAPI)
+	local writeAPI = maid:Add(InfluxDBWriteAPI.new(org, bucket, precision))
 
 	maid:GiveTask(self._clientConfig:Observe():Subscribe(function(clientConfig)
 		writeAPI:SetClientConfig(clientConfig)

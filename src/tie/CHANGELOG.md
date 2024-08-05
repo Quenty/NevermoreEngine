@@ -3,6 +3,128 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.4.0...@quenty/tie@10.5.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.3.0...@quenty/tie@10.4.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.2.0...@quenty/tie@10.3.0) (2024-04-27)
+
+
+### Bug Fixes
+
+* Add pending check in tie definition ([2f4d932](https://github.com/Quenty/NevermoreEngine/commit/2f4d93218d709f778ac84bc0bcb57f7240deacad))
+
+
+
+
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.1.0...@quenty/tie@10.2.0) (2024-03-27)
+
+
+### Features
+
+* Update avatar editor stuff ([16d10a8](https://github.com/Quenty/NevermoreEngine/commit/16d10a876c90d3b43d69b5f66e217e4c3749296b))
+
+
+
+
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.0.0...@quenty/tie@10.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@9.0.0...@quenty/tie@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@8.0.0...@quenty/tie@9.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@7.0.0...@quenty/tie@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@6.0.0...@quenty/tie@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.4.0...@quenty/tie@6.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.3.0...@quenty/tie@5.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/tie
+
+
+
+
+
+# [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.2.0...@quenty/tie@5.3.0) (2023-12-28)
+
+
+### Bug Fixes
+
+* Improve error messages and assertion in TieDefinition ([7e48f01](https://github.com/Quenty/NevermoreEngine/commit/7e48f0195970ab72c259bbf664a393ff59960370))
+
+
+
+
+
+# [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.1.1...@quenty/tie@5.2.0) (2023-12-14)
+
+
+### Features
+
+* Add realm support to tie ([cefc3fc](https://github.com/Quenty/NevermoreEngine/commit/cefc3fcd40287c85bd68e0f3438c15d701560df0))
+
+
+
+
+
 ## [5.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@5.1.0...@quenty/tie@5.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/tie

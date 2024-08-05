@@ -102,6 +102,17 @@ This will create the following components which you can rename if you want.
 
 From here, every exported package will exist in the packages folder root, with only modules needed to be replicated.
 
+To access the exported packages on the client, you perform the same bootstrap operation on the new replicated location.
+
+```lua
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local loader = ReplicatedStorage.Path.To.Replicated.NodeModules:FindFirstChild("LoaderUtils", true).Parent
+local packages = require(loader).bootstrapGame(ReplicatedStorage.Path.To.Replicated.NodeModules)
+```
+
+Assuming you've changed nothing, the path to the replicated modules should be the same as the one used on the server, just indexed under ReplicatedStorage instead.
+
 ## Manually installing via NPM for a stand-alone module.
 If you want to use Nevermore for more stand-alone or reusable scenarios (where you can't assume that a packages folder will be reused, you can manually bootstrap the components using the loader system.
 

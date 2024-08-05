@@ -5,11 +5,11 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local TweenService = game:GetService("TweenService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.observablecollection)
+local require = require(loader).bootstrapGame(ServerScriptService.observablecollection)
 
-local ObservableSortedList = require(packages.ObservableSortedList)
-local RxInstanceUtils = require(packages.RxInstanceUtils)
-local Rx = require(packages.Rx)
+local ObservableSortedList = require("ObservableSortedList")
+local RxInstanceUtils = require("RxInstanceUtils")
+local Rx = require("Rx")
 
 local observableSortedList = ObservableSortedList.new()
 

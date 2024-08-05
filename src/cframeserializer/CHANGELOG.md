@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@4.1.0...@quenty/cframeserializer@4.2.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [4.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@4.0.0...@quenty/cframeserializer@4.1.0) (2024-04-27)
+
+
+### Bug Fixes
+
+* Update cframe serialize to handle NaN values in JSON ([5b36417](https://github.com/Quenty/NevermoreEngine/commit/5b36417a9fb6256a79118897364febd4dabb0d1e))
+
+
+
+
+
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cframeserializer@3.1.0...@quenty/cframeserializer@4.0.0) (2022-09-27)
 
 

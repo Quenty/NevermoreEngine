@@ -56,7 +56,7 @@ function PreferredParentUtils.getPreferredParent(parent, name, forceCreate)
 		return found
 	end
 
-	if RunService:IsServer() or forceCreate then
+	if not RunService:IsRunning() or RunService:IsServer() or forceCreate then
 		local newParent = Instance.new("Folder")
 		newParent.Name = name
 		newParent.Parent = parent

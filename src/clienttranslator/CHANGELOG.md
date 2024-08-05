@@ -3,6 +3,120 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.3.0...@quenty/clienttranslator@14.4.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [14.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.2.0...@quenty/clienttranslator@14.3.0) (2024-04-28)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.1.1...@quenty/clienttranslator@14.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+## [14.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.1.0...@quenty/clienttranslator@14.1.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [14.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.0.0...@quenty/clienttranslator@14.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@13.0.0...@quenty/clienttranslator@14.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@12.0.0...@quenty/clienttranslator@13.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@11.0.0...@quenty/clienttranslator@12.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@10.0.0...@quenty/clienttranslator@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@9.4.0...@quenty/clienttranslator@10.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@9.3.0...@quenty/clienttranslator@9.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@9.2.0...@quenty/clienttranslator@9.3.0) (2023-12-28)
+
+
+### Bug Fixes
+
+* Number localization trims properly to the desired number of decimals instead of just 1 ([05fe6a4](https://github.com/Quenty/NevermoreEngine/commit/05fe6a442d6a2dbece358ed73fedacfaa837b488))
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@9.1.1...@quenty/clienttranslator@9.2.0) (2023-12-14)
+
+
+### Features
+
+* Add support for roundingbehaviortypes.NONE and ([6869d9e](https://github.com/Quenty/NevermoreEngine/commit/6869d9e5b3a726fa3e15e6dbbfeedebdfcc71a3d))
+* Handle studio test mode localization numbers ([a30226d](https://github.com/Quenty/NevermoreEngine/commit/a30226d1d64cb2df89450d3d33b81d15192e61ff))
+
+
+
+
+
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@9.1.0...@quenty/clienttranslator@9.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/clienttranslator

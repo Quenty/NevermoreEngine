@@ -4,6 +4,10 @@
 	@class InputModeType
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local DuckTypeUtils = require("DuckTypeUtils")
+
 local InputModeType = {}
 InputModeType.ClassName = "InputModeType"
 InputModeType.__index = InputModeType
@@ -33,7 +37,7 @@ end
 	@return boolean
 ]=]
 function InputModeType.isInputModeType(value)
-	return type(value) == "table" and getmetatable(value) == InputModeType
+	return DuckTypeUtils.isImplementation(InputModeType, value)
 end
 
 --[=[

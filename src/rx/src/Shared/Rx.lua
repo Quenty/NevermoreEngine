@@ -55,8 +55,7 @@ function Rx.pipe(transformers)
 	assert(type(transformers) == "table", "Bad transformers")
 	for index, transformer in pairs(transformers) do
 		if type(transformer) ~= "function" then
-			error(("[Rx.pipe] Bad pipe value of type %q at index %q, expected function")
-				:format(type(transformer), tostring(index)))
+			error(string.format("[Rx.pipe] Bad pipe value of type %q at index %q, expected function", type(transformer), tostring(index)))
 		end
 	end
 
@@ -68,8 +67,7 @@ function Rx.pipe(transformers)
 			current = transformer(current)
 
 			if not (type(current) == "table" and current.ClassName == "Observable") then
-				error(("[Rx.pipe] - Failed to transform %q in pipe, made %q (%s)")
-					:format(tostring(key), tostring(current), tostring(type(current) == "table" and current.ClassName or "")))
+				error(string.format("[Rx.pipe] - Failed to transform %q in pipe, made %q (%s)", tostring(key), tostring(current), tostring(type(current) == "table" and current.ClassName or "")))
 			end
 		end
 
@@ -182,15 +180,29 @@ end
 function Rx.merge(observables)
 	assert(type(observables) == "table", "Bad observables")
 
+	local totalCount = 0
 	for _, item in pairs(observables) do
 		assert(Observable.isObservable(item), "Not an observable")
+		totalCount = totalCount + 1
 	end
 
 	return Observable.new(function(sub)
 		local maid = Maid.new()
+		local pendingCount = totalCount
 
 		for _, observable in pairs(observables) do
-			maid:GiveTask(observable:Subscribe(sub:GetFireFailComplete()))
+			maid:GiveTask(observable:Subscribe(function(...)
+				sub:Fire(...)
+			end, function(...)
+				pendingCount = pendingCount - 1
+				sub:Fail(...)
+			end, function()
+				-- Only complete once all are complete
+				pendingCount = pendingCount - 1
+				if pendingCount == 0 then
+					sub:Complete()
+				end
+			end))
 		end
 
 		return maid
@@ -288,7 +300,7 @@ function Rx.tap(onFire, onError, onComplete)
 					if onError then
 						onError(...)
 					end
-					sub:Error(...)
+					sub:Fail(...)
 				end,
 				function(...)
 					if onComplete then
@@ -874,20 +886,19 @@ function Rx.mergeAll()
 		assert(Observable.isObservable(source), "Bad observable")
 
 		return Observable.new(function(sub)
-			local maid = Maid.new()
+			local topMaid = Maid.new()
 
 			local pendingCount = 0
 			local topComplete = false
 
-			maid:GiveTask(source:Subscribe(
+			topMaid:GiveTask(source:Subscribe(
 				function(observable)
 					assert(Observable.isObservable(observable), "Not an observable")
 
 					pendingCount = pendingCount + 1
 
-					local innerMaid = Maid.new()
-
-					innerMaid:GiveTask(observable:Subscribe(
+					local innerSub = nil
+					innerSub = observable:Subscribe(
 						function(...)
 							-- Merge each inner observable
 							sub:Fire(...)
@@ -895,36 +906,46 @@ function Rx.mergeAll()
 						function(...)
 							-- Emit failure automatically
 							sub:Fail(...)
+							topMaid:DoCleaning()
+
+							if innerSub then
+								topMaid[innerSub] = nil
+							end
 						end,
 						function()
-							innerMaid:DoCleaning()
 							pendingCount = pendingCount - 1
 							if pendingCount == 0 and topComplete then
 								sub:Complete()
-								maid:DoCleaning()
+								topMaid:DoCleaning()
 							end
-						end))
 
-					local key = maid:GiveTask(innerMaid)
+							if innerSub then
+								topMaid[innerSub] = nil
+							end
+						end)
 
-					-- Cleanup
-					innerMaid:GiveTask(function()
-						maid[key] = nil
-					end)
+					-- Make sure we only do this if we aren't already cleaned up here
+					if innerSub:IsPending() then
+						if sub:IsPending() then
+							topMaid[innerSub] = innerSub
+						else
+							innerSub:Destroy()
+						end
+					end
 				end,
 				function(...)
 					sub:Fail(...) -- Also reflect failures up to the top!
-					maid:DoCleaning()
+					topMaid:DoCleaning()
 				end,
 				function()
 					topComplete = true
 					if pendingCount == 0 then
 						sub:Complete()
-						maid:DoCleaning()
+						topMaid:DoCleaning()
 					end
 				end))
 
-			return maid
+			return topMaid
 		end)
 	end
 end
@@ -960,18 +981,23 @@ function Rx.switchAll()
 
 			outerMaid._outerSuber = source:Subscribe(
 				function(observable)
-					assert(Observable.isObservable(observable), "Bad observable")
+					assert(Observable.isObservable(observable), "Bad observable returned from subscription in switchAll()")
 
 					insideComplete = false
 					currentInside = observable
 					outerMaid._innerSub = nil
 
-					outerMaid._innerSub = observable:Subscribe(
+					local subscription = observable:Subscribe(
 						function(...)
-							sub:Fire(...)
+							if currentInside == observable then
+								sub:Fire(...)
+							else
+								warn(string.format("[Rx.switchAll] - Observable is still firing despite disconnect (%q)", observable._source))
+							end
 						end, -- Merge each inner observable
 						function(...)
 							if currentInside == observable then
+								currentInside = nil
 								sub:Fail(...)
 							end
 						end, -- Emit failure automatically
@@ -984,6 +1010,13 @@ function Rx.switchAll()
 								end
 							end
 						end)
+
+					if currentInside == observable then
+						outerMaid._innerSub = subscription
+					else
+						-- We cleaned up while connecting
+						subscription:Destroy()
+					end
 				end,
 				function(...)
 					sub:Fail(...) -- Also reflect failures up to the top!
@@ -1034,7 +1067,7 @@ function Rx.flatMap(project, resultSelector)
 
 					local innerMaid = Maid.new()
 
-					innerMaid:GiveTask(observable:Subscribe(
+					local subscription = innerMaid:Add(observable:Subscribe(
 						function(...)
 							-- Merge each inner observable
 							if resultSelector then
@@ -1055,12 +1088,16 @@ function Rx.flatMap(project, resultSelector)
 							end
 						end))
 
-					local key = maid:GiveTask(innerMaid)
+					if subscription:IsPending() then
+						local key = maid:GiveTask(innerMaid)
 
-					-- Cleanup
-					innerMaid:GiveTask(function()
-						maid[key] = nil
-					end)
+						-- Cleanup
+						innerMaid:GiveTask(function()
+							maid[key] = nil
+						end)
+					else
+						subscription:Destroy()
+					end
 				end,
 				function(...)
 					sub:Fail(...) -- Also reflect failures up to the top!
@@ -1794,6 +1831,12 @@ end
 
 --[=[
 	Throttles emission of observables on the defer stack to the last emission.
+
+	:::tip
+	There's a limited re-entrance amount for this. However, this can prevent computation being done repeatedly if
+	stuff is being added all at once. Use with care.
+	:::
+
 	@return (source: Observable) -> Observable
 ]=]
 function Rx.throttleDefer()
@@ -1838,6 +1881,8 @@ end
 	@return (source: Observable<T>) -> Observable<T>
 ]=]
 function Rx.throttle(durationSelector)
+	assert(type(durationSelector) == "function", "Bad durationSelector")
+
 	return function(source)
 		assert(Observable.isObservable(source), "Bad observable")
 

@@ -3,6 +3,151 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.6.0...@quenty/chatproviderservice@9.7.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [9.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.5.0...@quenty/chatproviderservice@9.6.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [9.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.4.0...@quenty/chatproviderservice@9.5.0) (2024-04-28)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.3.1...@quenty/chatproviderservice@9.4.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+## [9.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.3.0...@quenty/chatproviderservice@9.3.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.2.0...@quenty/chatproviderservice@9.3.0) (2024-03-27)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.1.0...@quenty/chatproviderservice@9.2.0) (2024-03-11)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.0.0...@quenty/chatproviderservice@9.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@8.0.0...@quenty/chatproviderservice@9.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@7.0.0...@quenty/chatproviderservice@8.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@6.0.0...@quenty/chatproviderservice@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@5.0.0...@quenty/chatproviderservice@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.6.0...@quenty/chatproviderservice@5.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [4.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.5.0...@quenty/chatproviderservice@4.6.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [4.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.4.0...@quenty/chatproviderservice@4.5.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.3.0...@quenty/chatproviderservice@4.4.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+
+
+
+
+# [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.2.1...@quenty/chatproviderservice@4.3.0) (2023-12-14)
+
+
+### Features
+
+* ChatProviderService can disable chat ([99d06db](https://github.com/Quenty/NevermoreEngine/commit/99d06db7c7f1a2b16d2cb5ae9c0a26c842f1270b))
+
+
+
+
+
 ## [4.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@4.2.0...@quenty/chatproviderservice@4.2.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/chatproviderservice

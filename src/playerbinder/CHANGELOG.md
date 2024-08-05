@@ -3,6 +3,108 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.3.0...@quenty/playerbinder@14.4.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [14.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.2.0...@quenty/playerbinder@14.3.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.1.0...@quenty/playerbinder@14.2.0) (2024-03-27)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [14.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.0.0...@quenty/playerbinder@14.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@13.0.0...@quenty/playerbinder@14.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@12.0.0...@quenty/playerbinder@13.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@11.0.0...@quenty/playerbinder@12.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@10.0.0...@quenty/playerbinder@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@9.4.0...@quenty/playerbinder@10.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@9.3.0...@quenty/playerbinder@9.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@9.2.0...@quenty/playerbinder@9.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@9.1.1...@quenty/playerbinder@9.2.0) (2023-12-14)
+
+
+### Features
+
+* Use :Tag() instead of :Bind() ([99c9e13](https://github.com/Quenty/NevermoreEngine/commit/99c9e13f4489af2fd6bb677324e4640c0a2cb4e6))
+
+
+
+
+
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@9.1.0...@quenty/playerbinder@9.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/playerbinder

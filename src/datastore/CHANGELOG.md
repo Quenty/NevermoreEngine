@@ -3,6 +3,169 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.4.0...@quenty/datastore@13.5.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [13.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.3.0...@quenty/datastore@13.4.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.2.0...@quenty/datastore@13.3.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.1.0...@quenty/datastore@13.2.0) (2024-03-11)
+
+
+### Features
+
+* custom key for private server datastore ([45dc12d](https://github.com/Quenty/NevermoreEngine/commit/45dc12d46f5901e448cced518e3dace16e0c5b6a))
+
+
+
+
+
+# [13.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.0.0...@quenty/datastore@13.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@12.0.0...@quenty/datastore@13.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@11.0.0...@quenty/datastore@12.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@10.0.0...@quenty/datastore@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@9.0.0...@quenty/datastore@10.0.0) (2024-02-13)
+
+
+### Features
+
+* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
+
+
+### BREAKING CHANGES
+
+* Standard loader
+
+Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
+
+This means you'll need to change you how require client-side modules, as we export a simple `loader` module instead of all modules available.
+
+Signed-off-by: James Onnen <jonnen0@gmail.com>
+
+* fix: Fix missing dependency in ResetService
+
+* feat: Add RxPhysicsUtils.observePartMass
+
+* fix: Fix package discovery for games
+
+* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+
+* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+
+* ci: Upgrade to new rojo 7.4.0
+
+* fix: Update loader to handle hoarcekat properly
+
+* docs: Fix spacing in Maid
+
+* fix: Add new ragdoll constants
+
+* fix: Compress influxDB sends
+
+* style: Errors use string.format
+
+* fix: Handle motor animations
+
+* ci: Upgrade rojo version
+
+* feat!: Maid no longer is includd in ValueObject.Changed event
+
+* docs: Fix docs
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.4.0...@quenty/datastore@9.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.3.0...@quenty/datastore@8.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/datastore
+
+
+
+
+
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.2.0...@quenty/datastore@8.3.0) (2023-12-28)
+
+
+### Bug Fixes
+
+* Fix data store not invoking all saving callbacks ([00ff0c0](https://github.com/Quenty/NevermoreEngine/commit/00ff0c0d65ebd3d0e948550759e4832ccf7d6834))
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.1.1...@quenty/datastore@8.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Datastore would clean up while closing instead of saving and then cleaning up ([07d8f20](https://github.com/Quenty/NevermoreEngine/commit/07d8f20c3c8d638c8291364406f92c3d1e2ee833))
+
+
+
+
+
 ## [8.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@8.1.0...@quenty/datastore@8.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/datastore

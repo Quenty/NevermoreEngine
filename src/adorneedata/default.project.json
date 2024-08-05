@@ -1,0 +1,7 @@
+{
+  "name": "adorneedata",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$path": "src"
+  }
+}

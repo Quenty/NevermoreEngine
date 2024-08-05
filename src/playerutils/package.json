@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerutils",
-  "version": "3.2.1",
+  "version": "8.3.0",
   "description": "Player utility functions",
   "keywords": [
     "Roblox",
@@ -29,8 +29,10 @@
   },
   "dependencies": {
     "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx"
   }
 }

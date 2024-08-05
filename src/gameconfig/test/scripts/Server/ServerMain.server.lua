@@ -5,13 +5,13 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.gameconfig)
+local require = require(loader).bootstrapGame(ServerScriptService.gameconfig)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.GameConfigService)
-serviceBag:GetService(packages.TestMantleConfigProvider)
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("GameConfigService"))
+serviceBag:GetService(require("TestMantleConfigProvider"))
 
 serviceBag:Init()
 serviceBag:Start()
 
-serviceBag:GetService(packages.GameConfigService):AddProduct("BuyDiamondsProduct", 1235017833)
+serviceBag:GetService(require("GameConfigService")):AddProduct("BuyDiamondsProduct", 1235017833)

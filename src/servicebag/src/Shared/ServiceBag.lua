@@ -26,6 +26,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Signal = require("Signal")
 local BaseObject = require("BaseObject")
+local ServiceInitLogger = require("ServiceInitLogger")
 
 --[=[
 	@interface Service
@@ -59,13 +60,21 @@ function ServiceBag.new(parentProvider)
 	self._serviceTypesToInitializeSet = {}
 	self._initializedServiceTypeSet = {}
 	self._initializing = false
+	self._destructing = false
+
+	self._serviceInitLogger = ServiceInitLogger.new("initialized")
+	self._serviceStartLogger = ServiceInitLogger.new("started")
 
 	self._serviceTypesToStart = {}
 
-	self._destroying = Signal.new()
-	self._maid:GiveTask(self._destroying)
+	self._destroyingSignal = Signal.new()
 
 	return self
+end
+
+function ServiceBag:PrintInitialization()
+	self._serviceInitLogger:Print()
+	self._serviceStartLogger:Print()
 end
 
 --[=[
@@ -161,14 +170,18 @@ function ServiceBag:Start()
 		if service.Start then
 			local current
 			task.spawn(function()
+				local stopClock = self._serviceStartLogger:StartInitClock(serviceName)
+
 				debug.setmemorycategory(serviceName)
 				current = coroutine.running()
 				service:Start()
+
+				stopClock()
 			end)
 
 			local isDead = coroutine.status(current) == "dead"
 			if not isDead then
-				error(("Starting service %q yielded"):format(serviceName))
+				error(string.format("Starting service %q yielded", serviceName))
 			end
 		end
 	end
@@ -208,7 +221,7 @@ function ServiceBag:CreateScope()
 	self:_addServiceType(provider)
 
 	-- Remove from parent provider
-	self._maid[provider] = provider._destroying:Connect(function()
+	self._maid[provider] = provider._destroyingSignal:Connect(function()
 		self._maid[provider] = nil
 		self._services[provider] = nil
 	end)
@@ -218,8 +231,14 @@ end
 
 -- Adds a service to this provider only
 function ServiceBag:_addServiceType(serviceType)
+	if self._destructing then
+		local serviceName = self:_getServiceName(serviceType)
+		error(string.format("Cannot query service %q after ServiceBag is cleaned up", serviceName))
+		return
+	end
+
 	if not self._serviceTypesToInitializeSet then
-		error(("Already finished initializing, cannot add %q"):format(self:_getServiceName(serviceType)))
+		error(string.format("Already finished initializing, cannot add %q", self:_getServiceName(serviceType)))
 		return
 	end
 
@@ -237,6 +256,12 @@ end
 
 function ServiceBag:_ensureInitialization(serviceType)
 	if self._initializedServiceTypeSet[serviceType] then
+		return
+	end
+
+	if self._destructing then
+		local serviceName = self:_getServiceName(serviceType)
+		error(string.format("Cannot initialize service %q after ServiceBag is cleaned up", serviceName))
 		return
 	end
 
@@ -260,13 +285,18 @@ function ServiceBag:_initService(serviceType)
 		local current
 		task.spawn(function()
 			debug.setmemorycategory(serviceName)
+
+			local stopClock = self._serviceInitLogger:StartInitClock(serviceName)
+
 			current = coroutine.running()
 			service:Init(self)
+
+			stopClock()
 		end)
 
 		local isDead = coroutine.status(current) == "dead"
 		if not isDead then
-			error(("Initializing service %q yielded"):format(serviceName))
+			error(string.format("Initializing service %q yielded", serviceName))
 		end
 	end
 
@@ -278,9 +308,16 @@ end
 	initialized in the service bag.
 ]=]
 function ServiceBag:Destroy()
+	if self._destructing then
+		return
+	end
+
 	local super = getmetatable(ServiceBag)
 
-	self._destroying:Fire()
+	self._destructing = true
+
+	self._destroyingSignal:Fire()
+	self._destroyingSignal:Destroy()
 
 	local services = self._services
 	local key, service = next(services)

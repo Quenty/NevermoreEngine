@@ -1,0 +1,11 @@
+{
+  "name": "LrucacheTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "lrucache": {
+        "$path": ".."
+      }
+    }
+  }
+}

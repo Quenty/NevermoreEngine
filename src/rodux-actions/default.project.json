@@ -1,5 +1,6 @@
 {
   "name": "rodux-actions",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

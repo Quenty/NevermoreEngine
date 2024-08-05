@@ -3,6 +3,173 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.5.0...@quenty/camera@14.5.1) (2024-07-16)
+
+
+### Bug Fixes
+
+* CameraControls destruction in Enabled state ([#477](https://github.com/Quenty/NevermoreEngine/issues/477)) ([ef6975e](https://github.com/Quenty/NevermoreEngine/commit/ef6975e7fb2d396569f33231d45b32684e803940))
+
+
+
+
+
+# [14.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.4.0...@quenty/camera@14.5.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+* Fix camera stack return in CameraStackService ([a3b8c67](https://github.com/Quenty/NevermoreEngine/commit/a3b8c6779420143d2aa2ccc979259bb23a130703))
+
+
+### Features
+
+* Adjust camera state tweener to support camera stack ([677b621](https://github.com/Quenty/NevermoreEngine/commit/677b6210bcfe2adfb85a1cadf1006a4642be1ba3))
+
+
+
+
+
+# [14.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.3.0...@quenty/camera@14.4.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+# [14.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.2.1...@quenty/camera@14.3.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+## [14.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.2.0...@quenty/camera@14.2.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+# [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.1.0...@quenty/camera@14.2.0) (2024-03-27)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+# [14.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.0.0...@quenty/camera@14.1.0) (2024-03-09)
+
+
+### Features
+
+* Expose RenderPriority in CameraStackService ([4d44a82](https://github.com/Quenty/NevermoreEngine/commit/4d44a82857060c7e7ef4a5598a56bec8e7c03a88))
+
+
+
+
+
+# [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@13.0.0...@quenty/camera@14.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@12.0.0...@quenty/camera@13.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@11.0.0...@quenty/camera@12.0.0) (2024-02-13)
+
+
+### Features
+
+* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
+
+
+### BREAKING CHANGES
+
+* Standard loader
+
+Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
+
+This means you'll need to change you how require client-side modules, as we export a simple `loader` module instead of all modules available.
+
+Signed-off-by: James Onnen <jonnen0@gmail.com>
+
+* fix: Fix missing dependency in ResetService
+
+* feat: Add RxPhysicsUtils.observePartMass
+
+* fix: Fix package discovery for games
+
+* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+
+* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+
+* ci: Upgrade to new rojo 7.4.0
+
+* fix: Update loader to handle hoarcekat properly
+
+* docs: Fix spacing in Maid
+
+* fix: Add new ragdoll constants
+
+* fix: Compress influxDB sends
+
+* style: Errors use string.format
+
+* fix: Handle motor animations
+
+* ci: Upgrade rojo version
+
+* feat!: Maid no longer is includd in ValueObject.Changed event
+
+* docs: Fix docs
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@10.2.0...@quenty/camera@11.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@10.1.0...@quenty/camera@10.2.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@10.0.0...@quenty/camera@10.1.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/camera
+
+
+
+
+
 # [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@9.21.0...@quenty/camera@10.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/camera

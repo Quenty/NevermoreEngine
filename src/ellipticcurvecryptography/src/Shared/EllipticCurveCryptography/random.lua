@@ -1,8 +1,12 @@
+--!native
+
 -- random.lua - Random Byte Generator
 local sha256 = require(script.Parent.sha256)
 
 local entropy = ""
 local accumulator, accumulator_len = {}, 0
+
+local random = {}
 
 local function feed(data)
 	accumulator_len += 1
@@ -16,23 +20,44 @@ local function digest()
 	accumulator_len = 0
 end
 
-feed("init")
-feed(math.random(1, 2 ^ 31 - 1))
-feed("|")
-feed(math.random(1, 2 ^ 31 - 1))
-feed("|")
-feed(math.random(1, 2 ^ 4))
-feed("|")
-feed(DateTime.now().UnixTimestampMillis)
-feed("|")
-for _ = 1, 10000 do
-	feed(tostring({}):sub(-8))
-end
-digest()
-feed(DateTime.now().UnixTimestampMillis)
-digest()
+local entropyInitialized = false
 
-local function save()
+-- Defer this initialization until requested
+local function ensureEntropyInit()
+	if entropyInitialized then
+		return
+	end
+
+	local startTime = os.clock()
+	entropyInitialized = true
+
+	-- This takes about 100ms
+
+	feed("init")
+	feed(math.random(1, 2 ^ 31 - 1))
+	feed("|")
+	feed(math.random(1, 2 ^ 31 - 1))
+	feed("|")
+	feed(math.random(1, 2 ^ 4))
+	feed("|")
+	feed(DateTime.now().UnixTimestampMillis)
+	feed("|")
+	for _ = 1, 10000 do
+		feed(tostring({}):sub(-8))
+	end
+	digest()
+	feed(DateTime.now().UnixTimestampMillis)
+	digest()
+
+	random.save()
+
+	-- TODO: Suppress this warning
+	warn(string.format("[EllipticCurveCryptography.random] - Generating entropy took %s ms", 1000*(os.clock() - startTime)))
+end
+
+function random.save()
+	ensureEntropyInit()
+
 	feed("save")
 	feed(DateTime.now().UnixTimestampMillis)
 	feed({})
@@ -40,23 +65,26 @@ local function save()
 
 	entropy = tostring(sha256.digest(entropy))
 end
-save()
 
-local function seed(data)
+function random.seed(data)
+	ensureEntropyInit()
+
 	feed("seed")
 	feed(DateTime.now().UnixTimestampMillis)
 	feed({})
 	feed(data)
 	digest()
-	save()
+	random.save()
 end
 
-local function random()
+function random.random()
+	ensureEntropyInit()
+
 	feed("random")
 	feed(DateTime.now().UnixTimestampMillis)
 	feed({})
 	digest()
-	save()
+	random.save()
 
 	local result = sha256.hmac("out", entropy)
 	entropy = tostring(sha256.digest(entropy))
@@ -64,8 +92,4 @@ local function random()
 	return result
 end
 
-return {
-	seed = seed,
-	save = save,
-	random = random,
-}
+return random

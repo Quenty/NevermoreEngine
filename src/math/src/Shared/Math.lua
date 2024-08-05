@@ -37,12 +37,14 @@ end
 	random.
 
 	@param average number
-	@param spread number
+	@param spread number? -- Defaults to 50% of the average number which is pretty standard for industry
 	@param randomValue number?
 	@return number
 ]=]
 function Math.jitter(average: number, spread: number, randomValue)
 	randomValue = randomValue or math.random()
+	spread = spread or 0.5*average
+
 	return average - 0.5*spread + randomValue*spread
 end
 

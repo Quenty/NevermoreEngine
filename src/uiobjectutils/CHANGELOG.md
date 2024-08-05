@@ -3,6 +3,121 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.2.0...@quenty/uiobjectutils@6.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.1.0...@quenty/uiobjectutils@6.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.0.0...@quenty/uiobjectutils@6.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@5.0.0...@quenty/uiobjectutils@6.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@4.0.0...@quenty/uiobjectutils@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.6.0...@quenty/uiobjectutils@4.0.0) (2024-02-13)
+
+
+### Features
+
+* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
+
+
+### BREAKING CHANGES
+
+* Standard loader
+
+Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
+
+This means you'll need to change you how require client-side modules, as we export a simple `loader` module instead of all modules available.
+
+Signed-off-by: James Onnen <jonnen0@gmail.com>
+
+* fix: Fix missing dependency in ResetService
+
+* feat: Add RxPhysicsUtils.observePartMass
+
+* fix: Fix package discovery for games
+
+* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+
+* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+
+* ci: Upgrade to new rojo 7.4.0
+
+* fix: Update loader to handle hoarcekat properly
+
+* docs: Fix spacing in Maid
+
+* fix: Add new ragdoll constants
+
+* fix: Compress influxDB sends
+
+* style: Errors use string.format
+
+* fix: Handle motor animations
+
+* ci: Upgrade rojo version
+
+* feat!: Maid no longer is includd in ValueObject.Changed event
+
+* docs: Fix docs
+
+
+
+
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.5.0...@quenty/uiobjectutils@3.6.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+
+
+
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.4.0...@quenty/uiobjectutils@3.5.0) (2023-12-14)
+
+
+### Features
+
+* Add PlayerGuiUtils.findPlayerGui() and documentation ([8f6ddd7](https://github.com/Quenty/NevermoreEngine/commit/8f6ddd7186b296dfe158f66f666bc08b02d02e8a))
+* Add ScrollingDirectionUtils.canScrollHorizontal(scrollingDirection) ([0b18d30](https://github.com/Quenty/NevermoreEngine/commit/0b18d30af7003ce4abb75398490d40d4afb530ac))
+
+
+
+
+
 # [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@3.3.0...@quenty/uiobjectutils@3.4.0) (2023-05-26)
 
 

@@ -9,6 +9,7 @@ local ServiceBag = require("ServiceBag")
 local RoguePropertyUtils = require("RoguePropertyUtils")
 local DuckTypeUtils = require("DuckTypeUtils")
 local ValueBaseUtils = require("ValueBaseUtils")
+local RoguePropertyCacheService = require("RoguePropertyCacheService")
 
 local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"
@@ -44,7 +45,17 @@ function RoguePropertyDefinition:Get(serviceBag, adornee)
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return RogueProperty.new(adornee, serviceBag, self)
+	local cacheService = serviceBag:GetService(RoguePropertyCacheService)
+	local cache = cacheService:GetCache(self)
+	local found = cache:Find(adornee)
+	if found then
+		return found
+	end
+
+	local rogueProperty = RogueProperty.new(adornee, serviceBag, self)
+	cache:Store(adornee, rogueProperty)
+
+	return rogueProperty
 end
 
 function RoguePropertyDefinition:GetOrCreateInstance(parent)

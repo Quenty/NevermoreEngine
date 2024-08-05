@@ -12,6 +12,7 @@ function IdleService:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._serviceBag:GetService(require("RagdollService"))
+	self._serviceBag:GetService(require("HumanoidTrackerService"))
 end
 
 return IdleService

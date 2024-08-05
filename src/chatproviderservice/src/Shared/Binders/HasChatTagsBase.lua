@@ -68,8 +68,14 @@ function HasChatTagsBase:_observeTagDataListBrio()
 		RxBrioUtils.switchMapBrio(function(child)
 			return RxBinderUtils.observeChildrenBrio(chatTagBinder, child);
 		end);
-		RxBrioUtils.switchMapBrio(function(chatTag)
-			return chatTag:ObserveChatTagData()
+		RxBrioUtils.flatMapBrio(function(chatTag)
+			return chatTag:ObserveChatTagData():Pipe({
+				RxBrioUtils.toBrio();
+				RxBrioUtils.onlyLastBrioSurvives();
+			})
+		end);
+		RxBrioUtils.where(function(chatTagData)
+			return not chatTagData.UserDisabled
 		end);
 		RxBrioUtils.reduceToAliveList()
 	})

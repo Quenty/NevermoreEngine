@@ -2,21 +2,17 @@
 	@class SimpleLoopedSoundPlayer.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
-local ServiceBag = require("ServiceBag")
 local SimpleLoopedSoundPlayer = require("SimpleLoopedSoundPlayer")
 local Blend = require("Blend")
 
 return function(target)
 	local maid = Maid.new()
-	local serviceBag = ServiceBag.new()
-	maid:GiveTask(serviceBag)
 
-	local simpleLoopedSoundPlayer = SimpleLoopedSoundPlayer.new("rbxassetid://14477453689")
+	local simpleLoopedSoundPlayer = maid:Add(SimpleLoopedSoundPlayer.new("rbxassetid://14477453689"))
 	simpleLoopedSoundPlayer:SetTransitionTime(1)
-	maid:GiveTask(simpleLoopedSoundPlayer)
 
 	simpleLoopedSoundPlayer.Sound.Parent = target
 

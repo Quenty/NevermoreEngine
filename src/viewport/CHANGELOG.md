@@ -3,6 +3,141 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.6.0...@quenty/viewport@11.6.1) (2024-07-16)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.5.0...@quenty/viewport@11.6.0) (2024-07-08)
+
+
+### Features
+
+* added enabled controls to viewport controls ([e945319](https://github.com/Quenty/NevermoreEngine/commit/e94531946e293f2e4b4da821f0d94f2c89d70248))
+
+
+
+
+
+# [11.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.4.0...@quenty/viewport@11.5.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [11.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.3.0...@quenty/viewport@11.4.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.2.1...@quenty/viewport@11.3.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+## [11.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.2.0...@quenty/viewport@11.2.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.1.0...@quenty/viewport@11.2.0) (2024-03-27)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@11.0.0...@quenty/viewport@11.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@10.0.0...@quenty/viewport@11.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@9.0.0...@quenty/viewport@10.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@8.0.0...@quenty/viewport@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@7.0.0...@quenty/viewport@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@6.4.0...@quenty/viewport@7.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@6.3.0...@quenty/viewport@6.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@6.2.0...@quenty/viewport@6.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@6.1.1...@quenty/viewport@6.2.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/viewport
+
+
+
+
+
 ## [6.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/viewport@6.1.0...@quenty/viewport@6.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/viewport

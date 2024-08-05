@@ -126,6 +126,22 @@ function GameProductServiceHelper:PromisePlayerIsPromptOpen(player)
 			return marketeer:IsPromptOpen()
 		end)
 end
+
+--[=[
+	Promises the player prompt as opened
+
+	@param player Player
+	@return Promise<boolean>
+]=]
+function GameProductServiceHelper:PromisePlayerPromptClosed(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
+	return self:_promisePlayerMarketeer(player)
+		:Then(function(marketeer)
+			return marketeer:PromisePlayerPromptClosed()
+		end)
+end
+
 --[=[
 	Observes player ownership
 

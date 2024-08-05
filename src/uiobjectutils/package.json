@@ -1,6 +1,6 @@
 {
   "name": "@quenty/uiobjectutils",
-  "version": "3.4.0",
+  "version": "6.3.0",
   "description": "UI object utils library for Roblox",
   "keywords": [
     "Roblox",
@@ -26,5 +26,9 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/enumutils": "file:../enumutils",
+    "@quenty/loader": "file:../loader"
   }
 }

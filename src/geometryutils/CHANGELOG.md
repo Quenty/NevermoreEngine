@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@6.2.0...@quenty/geometryutils@6.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@6.1.0...@quenty/geometryutils@6.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/geometryutils
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@6.0.0...@quenty/geometryutils@6.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/geometryutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@5.0.0...@quenty/geometryutils@6.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/geometryutils
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@4.0.0...@quenty/geometryutils@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/geometryutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@3.2.0...@quenty/geometryutils@4.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/geometryutils
+
+
+
+
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@3.1.0...@quenty/geometryutils@3.2.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/geometryutils
+
+
+
+
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@3.0.0...@quenty/geometryutils@3.1.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/geometryutils
+
+
+
+
+
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/geometryutils@2.7.0...@quenty/geometryutils@3.0.0) (2023-10-11)
 
 

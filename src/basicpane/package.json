@@ -1,6 +1,6 @@
 {
   "name": "@quenty/basicpane",
-  "version": "8.1.1",
+  "version": "13.3.0",
   "description": "Base UI object with visibility and a maid",
   "keywords": [
     "Roblox",
@@ -26,10 +26,12 @@
   ],
   "dependencies": {
     "@quenty/brio": "file:../brio",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/rx": "file:../rx",
-    "@quenty/signal": "file:../signal"
+    "@quenty/signal": "file:../signal",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

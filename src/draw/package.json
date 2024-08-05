@@ -1,6 +1,6 @@
 {
   "name": "@quenty/draw",
-  "version": "4.3.0",
+  "version": "7.3.0",
   "description": "A utility library to debug things in 3D space for Roblox.",
   "keywords": [
     "Roblox",
@@ -27,5 +27,9 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid"
   }
 }

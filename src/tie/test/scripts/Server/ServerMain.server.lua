@@ -4,13 +4,13 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.tie)
+local require = require(loader).bootstrapGame(ServerScriptService.tie)
 
-local Door = require(packages.Door)
-local Window = require(packages.Window)
-local OpenableInterface = require(packages.OpenableInterface)
-local ActionInterface = require(packages.ActionInterface)
-local Action = require(packages.Action)
+local Door = require("Door")
+local Window = require("Window")
+local OpenableInterface = require("OpenableInterface")
+local ActionInterface = require("ActionInterface")
+local Action = require("Action")
 
 local DO_DOOR_WINDOW_TEST = false
 

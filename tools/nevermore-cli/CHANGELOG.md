@@ -3,6 +3,109 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.1.0...@quenty/nevermore-cli@4.2.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/Nevermore/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+* update default project to ignore package-lock.json ([6e7f533](https://github.com/Quenty/Nevermore/commit/6e7f533fddee8efb803febad4cc97020b5e59703))
+
+
+
+
+
+# [4.1.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.0.2...@quenty/nevermore-cli@4.1.0) (2024-04-27)
+
+
+### Bug Fixes
+
+* Patch issues in package ([7f6d2f1](https://github.com/Quenty/Nevermore/commit/7f6d2f1d862d10131bf97368067eed35f4286ea9))
+
+
+
+
+
+## [4.0.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.0.1...@quenty/nevermore-cli@4.0.2) (2024-03-27)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+## [4.0.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.0.0...@quenty/nevermore-cli@4.0.1) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@3.0.0...@quenty/nevermore-cli@4.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/Nevermore/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+* Fix loader require ([5a78e8c](https://github.com/Quenty/Nevermore/commit/5a78e8ceb0df372e4efe1382f9438b51e6c182fa))
+
+
+
+
+
+# [3.0.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@2.0.0...@quenty/nevermore-cli@3.0.0) (2024-02-13)
+
+
+### Features
+
+* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/Nevermore/issues/439)) ([3534345](https://github.com/Quenty/Nevermore/commit/353434522918812953bd9f13fece73e27a4d034d))
+
+
+### BREAKING CHANGES
+
+* Standard loader
+
+Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
+
+This means you'll need to change you how require client-side modules, as we export a simple `loader` module instead of all modules available.
+
+Signed-off-by: James Onnen <jonnen0@gmail.com>
+
+* fix: Fix missing dependency in ResetService
+
+* feat: Add RxPhysicsUtils.observePartMass
+
+* fix: Fix package discovery for games
+
+* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+
+* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+
+* ci: Upgrade to new rojo 7.4.0
+
+* fix: Update loader to handle hoarcekat properly
+
+* docs: Fix spacing in Maid
+
+* fix: Add new ragdoll constants
+
+* fix: Compress influxDB sends
+
+* style: Errors use string.format
+
+* fix: Handle motor animations
+
+* ci: Upgrade rojo version
+
+* feat!: Maid no longer is includd in ValueObject.Changed event
+
+* docs: Fix docs
+
+
+
+
+
 # [2.0.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@1.9.0...@quenty/nevermore-cli@2.0.0) (2023-10-11)
 
 

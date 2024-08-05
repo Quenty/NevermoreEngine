@@ -1,0 +1,7 @@
+{
+  "name": "countdowntext",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
+  "tree": {
+    "$path": "src"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "6.3.1",
+  "version": "12.7.1",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",
@@ -39,6 +39,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/marketplaceutils": "file:../marketplaceutils",
     "@quenty/observablecollection": "file:../observablecollection",
+    "@quenty/playerutils": "file:../playerutils",
     "@quenty/preferredparentutils": "file:../preferredparentutils",
     "@quenty/promise": "file:../promise",
     "@quenty/pseudolocalize": "file:../pseudolocalize",

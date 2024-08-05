@@ -32,12 +32,12 @@ function SpawnService:Init(serviceBag)
 end
 
 function SpawnService:Start()
-	local lastUpdateTime = (tick() - UPDATE_PERIOD_SEC + SPAWN_AFTER_GAME_START)
+	local lastUpdateTime = (os.clock() - UPDATE_PERIOD_SEC + SPAWN_AFTER_GAME_START)
 
 	-- TODO: Smear across update pipeline
 	self._maid:GiveTask(RunService.Stepped:Connect(function()
-		if (lastUpdateTime + UPDATE_PERIOD_SEC) <= tick() then
-			lastUpdateTime = tick()
+		if (lastUpdateTime + UPDATE_PERIOD_SEC) <= os.clock() then
+			lastUpdateTime = os.clock()
 			self:Update()
 		end
 	end))
@@ -48,7 +48,7 @@ function SpawnService:AddSpawnerBinder(spawnerBinder)
 end
 
 function SpawnService:Regenerate()
-	local startTime = tick()
+	local startTime = os.clock()
 
 	for _, binder in pairs(self._spawnBinderGroupsServer.Spawners:GetBinders()) do
 		for _, spawner in pairs(binder:GetAll()) do
@@ -56,29 +56,28 @@ function SpawnService:Regenerate()
 		end
 	end
 
-	if (tick() - startTime) >= 0.05 then
-		warn(("SpawnService regenerate time: %0.4f ms"):format((tick() - startTime)*1000))
+	if (os.clock() - startTime) >= 0.05 then
+		warn(string.format("SpawnService regenerate time: %0.4f ms", (os.clock() - startTime)*1000))
 	end
 end
 
 function SpawnService:Update()
 	debug.profilebegin("spawnService")
 
-	local startTime = tick()
+	local startTime = os.clock()
 	local spawnerCount = 0
 
 	for _, binder in pairs(self._spawnBinderGroupsServer.Spawners:GetBinders()) do
-		local classStartTime = tick()
+		local classStartTime = os.clock()
 		local classes = RandomUtils.shuffledCopy(binder:GetAll())
 
 		for _, spawner in pairs(classes) do
 			spawnerCount = spawnerCount + 1
 			spawner:SpawnUpdate(false)
 
-			if (tick() - classStartTime) >= MAX_BUDGET_PER_CLASS then
+			if (os.clock() - classStartTime) >= MAX_BUDGET_PER_CLASS then
 				if WARN_ON_CLASS_BUDGET_EXHAUST then
-					warn(("[SpawnService.Update] - Class %q ran out of execution budget at %0.4f ms")
-						:format(binder:GetTag(), (tick() - classStartTime)*1000))
+					warn(string.format("[SpawnService.Update] - Class %q ran out of execution budget at %0.4f ms", binder:GetTag(), (os.clock() - classStartTime)*1000))
 				end
 				break
 			end
@@ -86,9 +85,8 @@ function SpawnService:Update()
 	end
 
 	-- watch dog
-	if (tick() - startTime) >= TOTAL_BUDGET_BEFORE_WARN then
-		warn(("[SpawnService.Update] - Update time: %0.4f ms for %d spawners")
-			:format((tick() - startTime)*1000, spawnerCount))
+	if (os.clock() - startTime) >= TOTAL_BUDGET_BEFORE_WARN then
+		warn(string.format("[SpawnService.Update] - Update time: %0.4f ms for %d spawners", (os.clock() - startTime)*1000, spawnerCount))
 	end
 
 	debug.profileend()

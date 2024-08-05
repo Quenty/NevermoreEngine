@@ -2,12 +2,12 @@
 	Stack of values that allows multiple systems to enable or disable a state.
 
 	```lua
-	local disabledStack = StateStack.new(false)
+	local disabledStack = maid:Add(StateStack.new(false, "boolean"))
 	print(disabledStack:GetState()) --> false
 
-	disabledStack.Changed:Connect(function()
+	maid:GiveTask(disabledStack.Changed:Connect(function()
 		print("From changed event we have state: ", disabledStack:GetState())
-	end)
+	end))
 
 	local cancel = disabledStack:PushState(true) --> From changed event we have state: true
 	print(disabledStack:GetState()) --> true
@@ -39,11 +39,8 @@ StateStack.__index = StateStack
 function StateStack.new(defaultValue, checkType)
 	local self = setmetatable(BaseObject.new(), StateStack)
 
+	self._state = self._maid:Add(ValueObject.new(defaultValue, checkType))
 	self._defaultValue = defaultValue
-
-	self._state = ValueObject.new(defaultValue, checkType)
-	self._maid:GiveTask(self._state)
-
 	self._stateStack = {}
 
 --[=[

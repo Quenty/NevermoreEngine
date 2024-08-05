@@ -1,3 +1,5 @@
+--!native
+
 --[=[
 	Elliptic curve arithmetic
 

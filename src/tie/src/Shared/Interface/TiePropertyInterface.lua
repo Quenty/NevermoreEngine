@@ -39,6 +39,19 @@ function TiePropertyInterface.new(folder, adornee, memberDefinition)
 	return self
 end
 
+function TiePropertyInterface:ObserveBrio(predicate)
+	return self:_observeValueBaseBrio():Pipe({
+		RxBrioUtils.switchMapBrio(function(valueBase)
+			if typeof(valueBase) == "Instance" then
+				return RxInstanceUtils.observePropertyBrio(valueBase, "Value", predicate)
+			else
+				-- TODO: Maybe don't assumet his exists and use a helper method instead.
+				return valueBase:ObserveBrio(predicate)
+			end
+		end);
+	})
+end
+
 function TiePropertyInterface:Observe()
 	return self:_observeValueBaseBrio():Pipe({
 		Rx.switchMap(function(brio)

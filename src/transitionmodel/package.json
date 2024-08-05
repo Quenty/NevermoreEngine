@@ -1,6 +1,6 @@
 {
   "name": "@quenty/transitionmodel",
-  "version": "2.1.1",
+  "version": "7.3.0",
   "description": "Helps with Gui visiblity showing and hiding",
   "keywords": [
     "Roblox",
@@ -28,12 +28,14 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/basicpane": "file:../basicpane",
     "@quenty/blend": "file:../blend",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
+    "@quenty/spring": "file:../spring",
     "@quenty/timedtween": "file:../timedtween",
     "@quenty/valueobject": "file:../valueobject"
   },

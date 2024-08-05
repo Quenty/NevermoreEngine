@@ -1,6 +1,6 @@
 {
   "name": "@quenty/elo",
-  "version": "2.1.1",
+  "version": "7.4.0",
   "description": "Elo rating utility library.",
   "keywords": [
     "Roblox",
@@ -32,5 +32,8 @@
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid"
+  },
+  "dependencies": {
+    "@quenty/probability": "file:../probability"
   }
 }

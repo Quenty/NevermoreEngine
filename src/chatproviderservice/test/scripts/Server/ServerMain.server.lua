@@ -4,11 +4,9 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.chatproviderservice)
+local require = require(loader).bootstrapGame(ServerScriptService.chatproviderservice)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.ChatProviderService)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("ChatProviderService"))
 serviceBag:Init()
 serviceBag:Start()

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameproductservice",
-  "version": "8.3.1",
+  "version": "14.7.1",
   "description": "Generalized monetization system for handling products and purchases correctly.",
   "keywords": [
     "Roblox",
@@ -39,6 +39,7 @@
     "@quenty/marketplaceutils": "file:../marketplaceutils",
     "@quenty/observablecollection": "file:../observablecollection",
     "@quenty/playerbinder": "file:../playerbinder",
+    "@quenty/playerutils": "file:../playerutils",
     "@quenty/promise": "file:../promise",
     "@quenty/promisemaid": "file:../promisemaid",
     "@quenty/receiptprocessing": "file:../receiptprocessing",

@@ -63,6 +63,20 @@ function SpringUtils.getVelocityAdjustment(velocity, dampen, speed)
 	return velocity*(2*dampen/speed)
 end
 
+local function convertUDim2(scaleX, offsetX, scaleY, offsetY)
+	-- Roblox UDim2.new(0, 9.999, 0, 9.999) rounds to UDim2.new(0, 9, 0, 9) which means small floating point
+	-- errors can cause shaking UI.
+
+	return UDim2.new(scaleX, math.round(offsetX), scaleY, math.round(offsetY))
+end
+
+local function convertUDim(scale, offset)
+	-- Roblox UDim.new(0, 9.999) rounds to UDim.new(0, 9) which means small floating point
+	-- errors can cause shaking UI.
+
+	return UDim.new(scale, math.round(offset))
+end
+
 --[=[
 	Converts an arbitrary value to a LinearValue if Roblox has not defined this value
 	for multiplication and addition.
@@ -74,9 +88,9 @@ function SpringUtils.toLinearIfNeeded(value)
 	if typeof(value) == "Color3" then
 		return LinearValue.new(Color3.new, {value.r, value.g, value.b})
 	elseif typeof(value) == "UDim2" then
-		return LinearValue.new(UDim2.new, {value.X.Scale, value.X.Offset, value.Y.Scale, value.Y.Offset})
+		return LinearValue.new(convertUDim2, {value.X.Scale, math.round(value.X.Offset), value.Y.Scale, math.round(value.Y.Offset)})
 	elseif typeof(value) == "UDim" then
-		return LinearValue.new(UDim.new, {value.scale, value.offset})
+		return LinearValue.new(convertUDim, {value.Scale, math.round(value.Offset)})
 	else
 		return value
 	end

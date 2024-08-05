@@ -136,7 +136,31 @@ function LocalizedTextUtils.observeFormatByKeyRecursive(translator, translationK
 end
 
 --[=[
+	Observes the translations by string recursively
+
+	@param translator Translator | JSONTranslator
+	@param localizedText LocalizedTextData
+	@param extraArgs table?
+	@return Observable<string>
+]=]
+function LocalizedTextUtils.observeLocalizedTextToString(translator, localizedText, extraArgs)
+	assert(translator, "Bad translator")
+	assert(LocalizedTextUtils.isLocalizedText(localizedText), "No localizedText")
+
+	return LocalizedTextUtils.observeFormatByKeyRecursive(
+		translator,
+		localizedText.translationKey,
+		localizedText.translationArgs,
+		extraArgs)
+end
+
+--[=[
 	Recursively formats the translated text
+
+	:::tip
+	Use LocalizedTextUtils.observeLocalizedTextToString(translator, localizedText, extraArgs)
+	:::
+
 	@param translator Translator | JSONTranslator
 	@param localizedText LocalizedTextData
 	@param extraArgs table?

@@ -1,5 +1,6 @@
 {
   "name": "numbersequenceutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

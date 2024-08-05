@@ -53,6 +53,25 @@ function TieInterface:IsImplemented()
 end
 
 --[=[
+	Gets the adornee the tie interface is on if it can be found.
+
+	@return Instance | nil
+]=]
+function TieInterface:GetTieAdornee()
+	local adornee = rawget(self, "_adornee")
+	if adornee then
+		return adornee
+	end
+
+	local folder = rawget(self, "_folder")
+	if folder then
+		return folder.Parent
+	end
+
+	return nil
+end
+
+--[=[
 	@return Observable<boolean>
 ]=]
 function TieInterface:ObserveIsImplemented()
@@ -74,7 +93,7 @@ end
 function TieInterface:__index(index)
 	local member = rawget(self, "_memberDefinitionMap")[index]
 	local definition = rawget(self, "_definition")
-	if member then
+	if member and member:IsAllowed() then
 		if member.ClassName == "TieMethodDefinition" then
 			local adornee = rawget(self, "_adornee")
 			local folder = rawget(self, "_folder")
@@ -91,12 +110,12 @@ function TieInterface:__index(index)
 
 			return TiePropertyInterface.new(folder, adornee, member)
 		else
-			error(("Unknown member definition %q"):format(tostring(member.ClassName)))
+			error(string.format("Unknown member definition %q", tostring(member.ClassName)))
 		end
 	elseif TieInterface[index] then
 		return TieInterface[index]
 	else
-		error(("Bad %q is not a member of %s"):format(tostring(index), definition:GetContainerName()))
+		error(string.format("Bad %q is not a member of %s", tostring(index), definition:GetContainerName()))
 	end
 end
 

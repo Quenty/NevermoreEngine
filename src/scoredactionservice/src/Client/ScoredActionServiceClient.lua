@@ -25,8 +25,7 @@ ScoredActionServiceClient.ServiceName = "ScoredActionServiceClient"
 	@param serviceBag ServiceBag
 ]=]
 function ScoredActionServiceClient:Init(serviceBag)
-	assert(not self._provider, "Already initialize")
-
+	assert(not self._serviceBag, "Already initialize")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -34,8 +33,7 @@ function ScoredActionServiceClient:Init(serviceBag)
 	self._serviceBag:GetService(require("InputModeServiceClient"))
 	self._serviceBag:GetService(require("InputKeyMapServiceClient"))
 
-	self._provider = ScoredActionPickerProvider.new()
-	self._maid:GiveTask(self._provider)
+	self._provider = self._maid:Add(ScoredActionPickerProvider.new())
 end
 
 --[=[
@@ -135,6 +133,10 @@ function ScoredActionServiceClient:ObserveNewFromInputKeyMapList(scoreValue)
 			return topMaid
 		end)
 	end
+end
+
+function ScoredActionServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return ScoredActionServiceClient

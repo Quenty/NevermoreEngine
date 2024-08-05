@@ -38,20 +38,11 @@ function IdleServiceClient:Init(serviceBag)
 	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
 
 	-- Configure
-	self._disableStack = StateStack.new(false)
-	self._maid:GiveTask(self._disableStack)
-
-	self._enabled = ValueObject.new(true, "boolean")
-	self._maid:GiveTask(self._enabled)
-
-	self._showIdleUI = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._showIdleUI)
-
-	self._humanoidIdle = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._humanoidIdle)
-
-	self._lastPosition = ValueObject.new(nil)
-	self._maid:GiveTask(self._lastPosition)
+	self._disableStack = self._maid:Add(StateStack.new(false, "boolean"))
+	self._enabled = self._maid:Add(ValueObject.new(true, "boolean"))
+	self._showIdleUI = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._humanoidIdle = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._lastPosition = self._maid:Add(ValueObject.new(nil))
 end
 
 --[=[

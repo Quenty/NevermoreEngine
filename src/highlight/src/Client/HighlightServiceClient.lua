@@ -1,5 +1,6 @@
 --[=[
 	Centralized group
+	@client
 	@class HighlightServiceClient
 ]=]
 
@@ -21,8 +22,7 @@ function HighlightServiceClient:Init(serviceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._group = AnimatedHighlightGroup.new()
-	self._maid:GiveTask(self._group)
+	self._group = self._maid:Add(AnimatedHighlightGroup.new())
 end
 
 --[=[

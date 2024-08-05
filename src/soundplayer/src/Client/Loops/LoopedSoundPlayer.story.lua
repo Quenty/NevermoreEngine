@@ -2,7 +2,7 @@
 	@class LoopedSoundPlayer.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
 local LoopedSoundPlayer = require("LoopedSoundPlayer")
@@ -15,12 +15,11 @@ return function(target)
 
 	local ORIGINAL = nil --"rbxassetid://14477435416"
 
-	local loopedSoundPlayer = LoopedSoundPlayer.new(ORIGINAL, target)
+	local loopedSoundPlayer = maid:Add(LoopedSoundPlayer.new(ORIGINAL, target))
 	loopedSoundPlayer:SetDoSyncSoundPlayback(true)
 	loopedSoundPlayer:SetCrossFadeTime(2)
 	loopedSoundPlayer:SetVolumeMultiplier(0.25)
 	loopedSoundPlayer:SetSoundParent(target)
-	maid:GiveTask(loopedSoundPlayer)
 
 	local OPTIONS = {
 		"rbxassetid://14477453689";

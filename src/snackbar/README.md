@@ -13,7 +13,7 @@
 
 Snackbars provide lightweight feedback on an operation at the base of the screen. They automatically disappear after a timeout or user interaction. There can only be one on the screen at a time.
 
-<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Snackbar">View docs →</a></div>
+<div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/SnackbarServiceClient">View docs →</a></div>
 
 ## Installation
 ```
@@ -24,69 +24,14 @@ npm install @quenty/snackbar --save
 Using the snackbar should be done via the SnackbarManager, which ensures only one snackbar can be visible at a time.
 
 ```lua
--- Client script
+local snackbarServiceClient = serviceBag:GetService(SnackbarServiceClient)
 
-require("SnackbarManager"):Init(screenGui)
-
--- Sometime later on the client
-
-require("SnackbarManager"):MakeSnackbar("Hello world!")
+snackbarServiceClient:ShowSnackbar("Settings saved!", {
+  CallToAction = {
+    Text = "Undo";
+    OnClick = function()
+      print("Activated action")
+    end;
+  }
+})
 ```
-
-## SnackbarManager API
-Usage is designed to be simple.
-
-### `SnackbarManager:Init(screenGui)`
-
-### `SnackbarManager:WithScreenGui(screenGui)`
-Sets the screenGui to use
-
-### `SnackbarManager:MakeSnackbar(text, options)`
-
-## DraggableSnackbar API
-Usage is designed to be simple.
-
-### `DraggableSnackbar.new(Parent, Text, GCOnDismissal, Options)`
-Note that this will not show until :Show() is called
-
-### `DraggableSnackbar:Show()`
-
-### `DraggableSnackbar:StartTrack(X, Y)`
-
-### `DraggableSnackbar:Track()`
-
-### `DraggableSnackbar:GetOffsetXY()`
-
-### `DraggableSnackbar:EndTrack()`
-
-### `DraggableSnackbar:Dismiss()`
-
-### `DraggableSnackbar:IsVisible()`
-
-### `DraggableSnackbar:Destroy()`
-
-## Snackbar API
-
-### `Snackbar.new(Parent, Text, options)`
-
-### `Snackbar:Dismiss()`
-
-### `Snackbar:SetBackgroundTransparency(Transparency)`
-
-### `Snackbar:FadeOutTransparency(PercentFaded)`
-
-### `Snackbar:FadeInTransparency(PercentFaded)`
-Will animate unless given PercentFaded
-
-### `Snackbar:FadeHandler(NewPosition, DoNotAnimate, IsFadingOut)`
-
-### `Snackbar:FadeOutUp(DoNotAnimate)`
-
-### `Snackbar:FadeOutDown(DoNotAnimate)`
-
-### `Snackbar:FadeOutRight(DoNotAnimate)`
-
-### `Snackbar:FadeOutLeft(DoNotAnimate)`
-
-### `Snackbar:FadeIn(DoNotAnimate)`
-

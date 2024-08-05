@@ -1,4 +1,8 @@
 --[=[
+	Reports back the player input mode to the server which allows for displaying what
+	mode the uesr is using.
+
+	@server
 	@class PlayerInputModeService
 ]=]
 
@@ -27,14 +31,37 @@ function PlayerInputModeService:Start()
 	end))
 end
 
+--[=[
+	Gets the player input mode type from the player
+
+	@param player Player
+	@return PlayerInputModeType
+]=]
 function PlayerInputModeService:GetPlayerInputModeType(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
 	return PlayerInputModeUtils.getPlayerInputModeType(player)
 end
 
+--[=[
+	Promises the player input mode type from the player
+
+	@param player Player
+	@param cancelToken CancelToken
+	@return Promise<PlayerInputModeType>
+]=]
 function PlayerInputModeService:PromisePlayerInputMode(player, cancelToken)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+
 	return PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken)
 end
 
+--[=[
+	Observes the player input mode type from the player
+
+	@param player Player
+	@return Observable<PlayerInputModeType>
+]=]
 function PlayerInputModeService:ObservePlayerInputType(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 

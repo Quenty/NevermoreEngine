@@ -45,7 +45,14 @@ function RoguePropertyTable:ObserveContainerBrio()
 end
 
 function RoguePropertyTable:GetContainer()
-	return self._definition:GetContainer(self._adornee, self:CanInitialize())
+	local cached = rawget(self, "_containerCache")
+	if cached and cached:IsDescendantOf(self._adornee) then
+		return cached
+	end
+
+	local container = self._definition:GetContainer(self._adornee, self:CanInitialize())
+	rawset(self, "_containerCache", container)
+	return container
 end
 
 function RoguePropertyTable:SetBaseValue(newBaseValue)

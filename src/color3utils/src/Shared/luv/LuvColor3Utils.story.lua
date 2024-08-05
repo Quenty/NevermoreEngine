@@ -2,7 +2,7 @@
 	@class LuvColor3Utils.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
 local Maid = require("Maid")
 local LuvColor3Utils = require("LuvColor3Utils")

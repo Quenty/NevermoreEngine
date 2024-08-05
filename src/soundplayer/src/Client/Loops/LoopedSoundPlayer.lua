@@ -30,39 +30,22 @@ function LoopedSoundPlayer.new(soundId, soundParent)
 
 	local self = setmetatable(SpringTransitionModel.new(), LoopedSoundPlayer)
 
-	self._currentSoundLooped = Signal.new()
-	self._maid:GiveTask(self._currentSoundLooped)
-
-	self._currentSoundLoopedAfterDelay = Signal.new()
-	self._maid:GiveTask(self._currentSoundLoopedAfterDelay)
+	self._currentSoundLooped = self._maid:Add(Signal.new())
+	self._currentSoundLoopedAfterDelay = self._maid:Add(Signal.new())
 
 	self:SetSpeed(10)
 
-	self._bpm = ValueObject.new(nil)
-	self._maid:GiveTask(self._bpm)
-
-	self._soundParent = ValueObject.new(nil)
-	self._maid:GiveTask(self._soundParent)
-
-	self._crossFadeTime = ValueObject.new(0.5, "number")
-	self._maid:GiveTask(self._crossFadeTime)
-
-	self._volumeMultiplier = ValueObject.new(1, "number")
-	self._maid:GiveTask(self._volumeMultiplier)
-
-	self._doSyncSoundPlayback = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._doSyncSoundPlayback)
-
-	self._currentActiveSound = ValueObject.new(nil)
-	self._maid:GiveTask(self._currentActiveSound)
-
-	self._currentSoundId = ValueObject.new(soundId)
-	self._maid:GiveTask(self._currentSoundId)
+	self._bpm = self._maid:Add(ValueObject.new(nil))
+	self._soundParent = self._maid:Add(ValueObject.new(nil))
+	self._soundGroup = self._maid:Add(ValueObject.new(nil))
+	self._crossFadeTime = self._maid:Add(ValueObject.new(0.5, "number"))
+	self._volumeMultiplier = self._maid:Add(ValueObject.new(1, "number"))
+	self._doSyncSoundPlayback = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._currentActiveSound = self._maid:Add(ValueObject.new(nil))
+	self._currentSoundId = self._maid:Add(ValueObject.new(soundId))
 
 	self._defaultScheduleOptions = SoundLoopScheduleUtils.default()
-
-	self._currentLoopSchedule = ValueObject.new(self._defaultScheduleOptions)
-	self._maid:GiveTask(self._currentLoopSchedule)
+	self._currentLoopSchedule = self._maid:Add(ValueObject.new(self._defaultScheduleOptions))
 
 	if soundParent then
 		self:SetSoundParent(soundParent)
@@ -83,6 +66,10 @@ end
 
 function LoopedSoundPlayer:SetVolumeMultiplier(volume)
 	self._volumeMultiplier.Value = volume
+end
+
+function LoopedSoundPlayer:SetSoundGroup(soundGroup)
+	return self._soundGroup:Mount(soundGroup)
 end
 
 function LoopedSoundPlayer:SetBPM(bpm)
@@ -133,9 +120,12 @@ function LoopedSoundPlayer:_renderSoundPlayer(soundId)
 	local maid = Maid.new()
 
 	local renderMaid = Maid.new()
-	local soundPlayer = SimpleLoopedSoundPlayer.new(soundId)
+	local soundPlayer = renderMaid:Add(SimpleLoopedSoundPlayer.new(soundId))
 	soundPlayer:SetTransitionTime(self._crossFadeTime)
-	renderMaid:GiveTask(soundPlayer)
+
+	renderMaid:GiveTask(self._soundGroup:Observe():Subscribe(function(soundGroup)
+		soundPlayer:SetSoundGroup(soundGroup)
+	end))
 
 	renderMaid:GiveTask(Rx.combineLatest({
 		bpm = self._bpm:Observe();

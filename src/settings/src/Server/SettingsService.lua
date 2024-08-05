@@ -9,6 +9,7 @@ local Rx = require("Rx")
 local Maid = require("Maid")
 
 local SettingsService = {}
+SettingsService.ServiceName = "SettingsService"
 
 function SettingsService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")

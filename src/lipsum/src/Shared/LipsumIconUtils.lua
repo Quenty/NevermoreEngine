@@ -103,10 +103,42 @@ local OUTLINE_ICONS = {
 	"rbxassetid://6035190844";
 }
 
+-- NOTE: These icons can't be used in production without a license
+-- https://rhosgfx.itch.io/vector-icon-pack
+local COLORED_OUTLINE_ICONS = {
+	"rbxassetid://10049672584";
+	"rbxassetid://10049673405";
+	"rbxassetid://10049674340";
+	"rbxassetid://10049676437";
+	"rbxassetid://10049677223";
+	"rbxassetid://10049679313";
+	"rbxassetid://10049681901";
+	"rbxassetid://10184125962";
+	"rbxassetid://10184127146";
+	"rbxassetid://10184128128";
+	"rbxassetid://10184139303";
+	"rbxassetid://10184140737";
+	"rbxassetid://10184144109";
+	"rbxassetid://10184774260";
+	"rbxassetid://10227981754";
+	"rbxassetid://10227983832";
+	"rbxassetid://10422318513";
+	"rbxassetid://10477537109";
+	"rbxassetid://10477544246";
+	"rbxassetid://10477548138";
+	"rbxassetid://10477567272";
+	"rbxassetid://10514673495";
+	"rbxassetid://9996257514";
+	"rbxassetid://9996311475";
+	"rbxassetid://9996312372";
+	"rbxassetid://9996372111";
+}
+
 local LipsumIconUtils = {}
 
 --[=[
-	Gets a random icon
+	Gets a random icon that is white in color
+
 	@param random Random
 	@return string
 ]=]
@@ -115,12 +147,29 @@ function LipsumIconUtils.icon(random)
 end
 
 --[=[
-	Gets a random outline icon
+	Gets a random outline icon that is white in color
+
 	@param random Random
 	@return string
 ]=]
 function LipsumIconUtils.outlineIcon(random)
 	return RandomUtils.choice(OUTLINE_ICONS, random)
+end
+
+--[=[
+	Gets a random colorful icon
+
+	:::warning
+	These icons must be be licensed to use in production.
+
+	https://rhosgfx.itch.io/vector-icon-pack
+	:::
+
+	@param random Random
+	@return string
+]=]
+function LipsumIconUtils.coloredOutlineIcon(random)
+	return RandomUtils.choice(COLORED_OUTLINE_ICONS, random)
 end
 
 return LipsumIconUtils

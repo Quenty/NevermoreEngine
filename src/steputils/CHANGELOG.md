@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.3.0...@quenty/steputils@3.4.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
 # [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.2.0...@quenty/steputils@3.3.0) (2023-09-04)
 
 

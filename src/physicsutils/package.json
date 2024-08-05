@@ -1,6 +1,6 @@
 {
   "name": "@quenty/physicsutils",
-  "version": "4.1.0",
+  "version": "8.3.0",
   "description": "General physics library for use on Roblox",
   "keywords": [
     "Roblox",
@@ -26,5 +26,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx"
   }
 }

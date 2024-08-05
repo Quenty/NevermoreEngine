@@ -1,0 +1,21 @@
+{
+  "name": "SoundGroupTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "soundgroup": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Main": {
+          "$path": "scripts/Client"
+        }
+      }
+    }
+  }
+}

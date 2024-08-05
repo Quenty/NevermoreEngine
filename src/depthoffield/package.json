@@ -1,6 +1,6 @@
 {
   "name": "@quenty/depthoffield",
-  "version": "6.1.1",
+  "version": "11.3.0",
   "description": "Depth of field service to allow multiple systems to write depth of field",
   "keywords": [
     "Roblox",
@@ -26,11 +26,19 @@
   ],
   "dependencies": {
     "@quenty/acceltween": "file:../acceltween",
+    "@quenty/attributeutils": "file:../attributeutils",
     "@quenty/baseobject": "file:../baseobject",
+    "@quenty/basicpane": "file:../basicpane",
+    "@quenty/blend": "file:../blend",
+    "@quenty/brio": "file:../brio",
+    "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/math": "file:../math",
+    "@quenty/rx": "file:../rx",
     "@quenty/signal": "file:../signal",
     "@quenty/steputils": "file:../steputils",
+    "@quenty/transitionmodel": "file:../transitionmodel",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

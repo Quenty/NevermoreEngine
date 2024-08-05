@@ -1,5 +1,6 @@
 {
   "name": "region3int16utils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cmdrservice",
-  "version": "8.2.1",
+  "version": "13.5.0",
   "description": "Bridge between cmdr and Nevermore services using servicebag",
   "keywords": [
     "Roblox",
@@ -25,7 +25,6 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/chatproviderservice": "file:../chatproviderservice",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
     "@quenty/permissionprovider": "file:../permissionprovider",

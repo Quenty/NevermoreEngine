@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@10.2.0...@quenty/badgeutils@10.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@10.1.0...@quenty/badgeutils@10.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/badgeutils
+
+
+
+
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@10.0.0...@quenty/badgeutils@10.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/badgeutils
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@9.0.0...@quenty/badgeutils@10.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/badgeutils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@8.0.0...@quenty/badgeutils@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/badgeutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@7.2.0...@quenty/badgeutils@8.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/badgeutils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@7.1.0...@quenty/badgeutils@7.2.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/badgeutils
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@7.0.0...@quenty/badgeutils@7.1.0) (2023-12-14)
+
+
+### Features
+
+* Add BadgeUtils.promiseUserHasBadge(userId, badgeId) ([bd46efc](https://github.com/Quenty/NevermoreEngine/commit/bd46efc830942ec91a24a45b4244f3ee94d0934a))
+
+
+
+
+
 # [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/badgeutils@6.8.0...@quenty/badgeutils@7.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/badgeutils

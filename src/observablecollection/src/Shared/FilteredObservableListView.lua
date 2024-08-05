@@ -15,7 +15,14 @@ FilteredObservableListView.__index = FilteredObservableListView
 
 -- Higher numbers last
 local function defaultCompare(a, b)
-	return a < b
+	-- equivalent of `return a - b` except it supports comparison of strings and stuff
+	if b > a then
+		return -1
+	elseif b < a then
+		return 1
+	else
+		return 0
+	end
 end
 
 function FilteredObservableListView.new(observableList, observeScoreCallback, compare)
@@ -25,15 +32,14 @@ function FilteredObservableListView.new(observableList, observeScoreCallback, co
 	self._baseList = assert(observableList, "No observableList")
 	self._observeScoreCallback = assert(observeScoreCallback, "No observeScoreCallback")
 
-	self._scoredList = ObservableSortedList.new(false, function(a, b)
+	self._scoredList = self._maid:Add(ObservableSortedList.new(false, function(a, b)
 		-- Preserve index when scoring does not
 		if a.score == b.score then
 			return a.index - b.index
 		else
 			return self._compare(a.score, b.score)
 		end
-	end)
-	self._maid:GiveTask(self._scoredList)
+	end))
 
 	-- Shockingly this is somewhat performant because the sorted list defers all events
 	-- to process the list reordering.
@@ -58,8 +64,6 @@ function FilteredObservableListView.new(observableList, observeScoreCallback, co
 				return state
 			end)
 		}))
-
-
 	end))
 
 	return self

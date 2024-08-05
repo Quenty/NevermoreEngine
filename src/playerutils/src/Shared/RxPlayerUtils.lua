@@ -10,15 +10,16 @@ local Players = game:GetService("Players")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RxPlayerUtils = {}
 
 --[=[
 	Observe players for the lifetime they exist
-	@param predicate callback
+	@param predicate (Player) -> boolean
 	@return Observable<Brio<Player>>
 ]=]
-function RxPlayerUtils.observePlayersBrio(predicate: (Player) -> boolean)
+function RxPlayerUtils.observePlayersBrio(predicate)
 	assert(type(predicate) == "function" or predicate == nil, "Bad predicate!")
 
 	return Observable.new(function(sub)
@@ -50,11 +51,24 @@ function RxPlayerUtils.observePlayersBrio(predicate: (Player) -> boolean)
 end
 
 --[=[
+	Observes the current local player
+
+	@return Observable<Brio<Player>>
+]=]
+function RxPlayerUtils.observeLocalPlayerBrio()
+	return RxInstanceUtils.observePropertyBrio(Players, "LocalPlayer", function(value)
+		return value ~= nil
+	end)
+end
+
+--[=[
 	Observe players as they're added, and as they are.
-	@param predicate callback
+	@param predicate (Player) -> boolean
 	@return Observable<Player>
 ]=]
-function RxPlayerUtils.observePlayers(predicate: (Player) -> boolean)
+function RxPlayerUtils.observePlayers(predicate)
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
+
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -67,8 +81,51 @@ function RxPlayerUtils.observePlayers(predicate: (Player) -> boolean)
 		maid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
 
 		for _, player in Players:GetPlayers() do
-			handlePlayer(player)
+			task.spawn(function()
+				handlePlayer(player)
+			end)
 		end
+
+		return maid
+	end)
+end
+
+--[=[
+	Observes the first time the character appearance is loaded
+
+	@param player Player
+	@return Observable<void>
+]=]
+function RxPlayerUtils.observeFirstAppearanceLoaded(player)
+	assert(typeof(player) == "Instance", "Bad player")
+
+	return Observable.new(function(sub)
+		if player:HasAppearanceLoaded() then
+			sub:Fire()
+			sub:Complete()
+			return
+		end
+
+		local maid = Maid.new()
+
+		-- In case this works
+		maid:GiveTask(player.CharacterAppearanceLoaded:Connect(function()
+			sub:Fire()
+			sub:Complete()
+		end))
+
+		maid:GiveTask(task.spawn(function()
+			while not player:HasAppearanceLoaded() and player:IsDescendantOf(game) do
+				task.wait(0.05)
+			end
+
+			if player:HasAppearanceLoaded() then
+				sub:Fire()
+				sub:Complete()
+			else
+				sub:Fail("Failed to load appearance before player left the game")
+			end
+		end))
 
 		return maid
 	end)

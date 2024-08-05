@@ -20,17 +20,10 @@ AdorneeModelBoundingBox.__index = AdorneeModelBoundingBox
 function AdorneeModelBoundingBox.new(model)
 	local self = setmetatable(BaseObject.new(model), AdorneeModelBoundingBox)
 
-	self._bbCFrame = ValueObject.new(nil)
-	self._maid:GiveTask(self._bbCFrame)
-
-	self._bbSize = ValueObject.new(nil)
-	self._maid:GiveTask(self._bbSize)
-
-	self._isDirty = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isDirty)
-
-	self._unanchoredPartsSet = ObservableSet.new(false)
-	self._maid:GiveTask(self._unanchoredPartsSet)
+	self._bbCFrame = self._maid:Add(ValueObject.new(nil))
+	self._bbSize = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
+	self._isDirty = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._unanchoredPartsSet = self._maid:Add(ObservableSet.new(false))
 
 	self._maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(self._obj, function(part)
 		return part:IsA("BasePart")
@@ -39,8 +32,7 @@ function AdorneeModelBoundingBox.new(model)
 			return
 		end
 
-		local maid = brio:ToMaid()
-		local part = brio:GetValue()
+		local maid, part = brio:ToMaidAndValue()
 
 		self:_handlePart(maid, part)
 	end))
@@ -55,11 +47,13 @@ function AdorneeModelBoundingBox.new(model)
 		end);
 		Rx.throttleDefer();
 	}):Subscribe(function()
+		debug.profilebegin("modelboundingbox")
 		self._isDirty.Value = false
 
 		local bbCFrame, bbSize = self._obj:GetBoundingBox()
 		self._bbSize.Value = bbSize
 		self._bbCFrame.Value = bbCFrame
+		debug.profileend()
 	end))
 
 	self._maid:GiveTask(self._unanchoredPartsSet:ObserveCount():Pipe({

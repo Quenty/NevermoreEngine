@@ -9,8 +9,9 @@ local Maid = require("Maid")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
 local Promise = require("Promise")
+local BaseObject = require("BaseObject")
 
-local HumanoidTracker = {}
+local HumanoidTracker = setmetatable({}, BaseObject)
 HumanoidTracker.ClassName = "HumanoidTracker"
 HumanoidTracker.__index = HumanoidTracker
 
@@ -42,24 +43,27 @@ HumanoidTracker.__index = HumanoidTracker
 	@return HumanoidTracker
 ]=]
 function HumanoidTracker.new(player)
-	local self = setmetatable({}, HumanoidTracker)
+	local self = setmetatable(BaseObject.new(), HumanoidTracker)
 
 	self._player = player or error("No player")
-	self._maid = Maid.new()
+
+	self.HumanoidDied = self._maid:Add(Signal.new())
 
 	-- Tracks the current character humanoid, may be nil
-	self.Humanoid = ValueObject.new()
-	self._maid:GiveTask(self.Humanoid)
+	self.Humanoid = self._maid:Add(ValueObject.new())
 
 	-- Tracks the alive humanoid, may be nil
-	self.AliveHumanoid = ValueObject.new()
-	self._maid:GiveTask(self.AliveHumanoid)
+	self.AliveHumanoid = self._maid:Add(ValueObject.new())
 
-	self._maid:GiveTask(self.Humanoid.Changed:Connect(function(newHumanoid, oldHumanoid, maid)
+	self._maid:GiveTask(self.Humanoid.Changed:Connect(function(newHumanoid, oldHumanoid)
+		local maid = Maid.new()
+
 		if not self.Destroy then
 			return
 		end
 		self:_handleHumanoidChanged(newHumanoid, oldHumanoid, maid)
+
+		self._maid._current = maid
 	end))
 
 	self._maid:GiveTask(self._player:GetPropertyChangedSignal("Character"):Connect(function()
@@ -68,9 +72,6 @@ function HumanoidTracker.new(player)
 		end
 		self:_onCharacterChanged()
 	end))
-
-	self.HumanoidDied = Signal.new()
-	self._maid:GiveTask(self.HumanoidDied)
 
 	self:_onCharacterChanged()
 
@@ -166,14 +167,6 @@ function HumanoidTracker:_handleHumanoidChanged(newHumanoid, _, maid)
 			self.HumanoidDied:Fire(newHumanoid)
 		end
 	end))
-end
-
---[=[
-	Cleans up the humanoid tracker and sets the metatable to be nil.
-]=]
-function HumanoidTracker:Destroy()
-	self._maid:DoCleaning()
-	setmetatable(self, nil)
 end
 
 return HumanoidTracker

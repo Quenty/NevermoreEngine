@@ -588,6 +588,13 @@ function DataStoreStage:StoreOnValueChange(name, valueObj)
 		self:_storeAtKey(name, valueObj.Value)
 	end))
 
+	-- Hopefully this doesn't result in data-loss when writing as
+	-- the user leaves.
+	self._maid[maid] = maid
+	maid:GiveTask(function()
+		self._maid[maid] = nil
+	end)
+
 	return maid
 end
 
@@ -661,11 +668,8 @@ end
 	@return Promise
 ]=]
 function DataStoreStage:PromiseInvokeSavingCallbacks()
-	if not next(self._savingCallbacks) then
-		return Promise.resolved()
-	end
-
 	local removingPromises = {}
+
 	for _, func in pairs(self._savingCallbacks) do
 		local result = func()
 		if Promise.isPromise(result) then

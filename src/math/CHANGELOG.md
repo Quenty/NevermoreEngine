@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.6.0...@quenty/math@2.7.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.5.0...@quenty/math@2.6.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* Add default spread value ([5b42f96](https://github.com/Quenty/NevermoreEngine/commit/5b42f96817d9f54efe7f97724ce6d3b80ab3098c))
+
+
+
+
+
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/math@2.4.0...@quenty/math@2.5.0) (2023-08-23)
 
 

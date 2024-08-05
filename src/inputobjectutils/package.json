@@ -1,6 +1,6 @@
 {
   "name": "@quenty/inputobjectutils",
-  "version": "4.1.0",
+  "version": "4.4.0",
   "description": "Provides utility functions involving input objects",
   "keywords": [
     "Roblox",
@@ -26,5 +26,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@quenty/baseobject": "file:../baseobject",
+    "@quenty/maid": "file:../maid",
+    "@quenty/rx": "file:../rx"
   }
 }

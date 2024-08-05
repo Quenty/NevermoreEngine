@@ -31,6 +31,7 @@ function ChatProviderService:Init(serviceBag)
 	-- External
 	self._serviceBag:GetService(require("CmdrService"))
 	self._serviceBag:GetService(require("PermissionService"))
+	self._serviceBag:GetService(require("PlayerDataStoreService"))
 
 	-- Internal
 	self._serviceBag:GetService(require("ChatProviderCommandService"))
@@ -40,6 +41,8 @@ function ChatProviderService:Init(serviceBag)
 	self._serviceBag:GetService(require("ChatTag"))
 	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTags"))
 
+	-- note: normally we don't expose default API surfaces like this with defaults, however, because this only affects developers and this
+	-- tends to significantly improve feedback we're leaving this default configuration in place.
 	self:SetDeveloperTag(ChatTagDataUtils.createChatTagData({
 		TagText = "(dev)";
 		LocalizedText = LocalizedTextUtils.create("chatTags.dev");

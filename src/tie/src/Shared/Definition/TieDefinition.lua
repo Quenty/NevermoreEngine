@@ -21,6 +21,7 @@ local TieImplementation = require("TieImplementation")
 local TieInterface = require("TieInterface")
 local TieMethodDefinition = require("TieMethodDefinition")
 local TiePropertyDefinition = require("TiePropertyDefinition")
+local TieRealms = require("TieRealms")
 local TieSignalDefinition = require("TieSignalDefinition")
 local ValueObject = require("ValueObject")
 
@@ -36,6 +37,8 @@ TieDefinition.Types = Table.readonly({
 	PROPERTY = Symbol.named("property"); -- will default to nil
 })
 
+TieDefinition.Realms = TieRealms
+
 function TieDefinition.new(definitionName, members, isSharedDefinition)
 	local self = setmetatable({}, TieDefinition)
 
@@ -44,21 +47,35 @@ function TieDefinition.new(definitionName, members, isSharedDefinition)
 
 	self._isSharedDefinition = isSharedDefinition
 
-	for memberName, memberTypeOrDefaultValue in pairs(members) do
-		assert(type(memberName) == "string", "Bad memberName")
-
-		if memberTypeOrDefaultValue == TieDefinition.Types.METHOD then
-			self._memberMap[memberName] = TieMethodDefinition.new(self, memberName)
-		elseif memberTypeOrDefaultValue == TieDefinition.Types.SIGNAL then
-			self._memberMap[memberName] = TieSignalDefinition.new(self, memberName)
-		elseif memberTypeOrDefaultValue == TieDefinition.Types.PROPERTY then
-			self._memberMap[memberName] = TiePropertyDefinition.new(self, memberName, nil)
-		else
-			self._memberMap[memberName] = TiePropertyDefinition.new(self, memberName, memberTypeOrDefaultValue)
-		end
-	end
+	self:_addMembers(members, TieDefinition.Realms.SHARED)
 
 	return self
+end
+
+function TieDefinition:_addMembers(members, realm)
+	for memberName, memberTypeOrDefaultValue in pairs(members) do
+		if memberName == TieRealms.CLIENT then
+			self:_addMembers(memberTypeOrDefaultValue, TieRealms.CLIENT)
+		elseif memberName == TieRealms.SERVER then
+			self:_addMembers(memberTypeOrDefaultValue, TieRealms.SERVER)
+		else
+			assert(type(memberName) == "string", "Bad memberName")
+
+			self:_addMember(memberName, memberTypeOrDefaultValue, realm)
+		end
+	end
+end
+
+function TieDefinition:_addMember(memberName, memberTypeOrDefaultValue, realm)
+	if memberTypeOrDefaultValue == TieDefinition.Types.METHOD then
+		self._memberMap[memberName] = TieMethodDefinition.new(self, memberName, realm)
+	elseif memberTypeOrDefaultValue == TieDefinition.Types.SIGNAL then
+		self._memberMap[memberName] = TieSignalDefinition.new(self, memberName, realm)
+	elseif memberTypeOrDefaultValue == TieDefinition.Types.PROPERTY then
+		self._memberMap[memberName] = TiePropertyDefinition.new(self, memberName, nil, realm)
+	else
+		self._memberMap[memberName] = TiePropertyDefinition.new(self, memberName, memberTypeOrDefaultValue, realm)
+	end
 end
 
 --[=[
@@ -323,11 +340,14 @@ function TieDefinition:_observeImplementation(folder)
 
 		local update
 		do
-			local isImplemented = ValueObject.new(UNSET_VALUE)
-			maid:GiveTask(isImplemented)
+			local isImplemented = maid:Add(ValueObject.new(UNSET_VALUE))
 
 			maid:GiveTask(isImplemented.Changed:Connect(function()
 				maid._brio = nil
+
+				if not sub:IsPending() then
+					return
+				end
 
 				if isImplemented.Value then
 					local brio = Brio.new(TieInterface.new(self, folder, nil))
@@ -348,7 +368,11 @@ function TieDefinition:_observeImplementation(folder)
 			update()
 		end))
 
-		for memberName, member in pairs(self._memberMap) do
+		for memberName, member in pairs(self:GetMemberMap()) do
+			if not member:IsAllowed() then
+				continue
+			end
+
 			if member.ClassName == "TiePropertyDefinition" then
 				maid:GiveTask(folder:GetAttributeChangedSignal(memberName):Connect(update))
 			end
@@ -411,6 +435,10 @@ function TieDefinition:GetName(): string
 	return self._definitionName
 end
 
+function TieDefinition:GetContainerNameForServer()
+	return self._definitionName
+end
+
 function TieDefinition:GetContainerName(): string
 	if RunService:IsClient() and not self._isSharedDefinition then
 		return self._definitionName .. "Client"
@@ -423,14 +451,26 @@ function TieDefinition:GetMemberMap()
 	return self._memberMap
 end
 
+--[=[
+	Returns true if the folder is an implementation
+
+	@param folder Folder
+	@return boolean
+]=]
 function TieDefinition:IsImplementation(folder)
+	assert(typeof(folder) == "Instance", "Bad folder")
+
 	local attributes = folder:GetAttributes()
 	local children = {}
 	for _, item in pairs(folder:GetChildren()) do
 		children[item.Name] = item
 	end
 
-	for memberName, member in pairs(self._memberMap) do
+	for memberName, member in pairs(self:GetMemberMap()) do
+		if not member:IsRequired() then
+			continue
+		end
+
 		local found = children[memberName]
 		if not found then
 			if member.ClassName == "TiePropertyDefinition" then
@@ -457,7 +497,7 @@ function TieDefinition:IsImplementation(folder)
 				return false
 			end
 		else
-			error("Unknown member type")
+			error("[TieDefinition.IsImplementation] - Unknown member type")
 		end
 	end
 

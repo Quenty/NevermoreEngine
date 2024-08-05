@@ -88,7 +88,7 @@ function Remoting:Connect(memberName, callback)
 		-- TODO: Cleanup if nothing else is expecting this
 	elseif RunService:IsClient() then
 		connectMaid._warning = task.delay(5, function()
-			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never connect", memberName))
+			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never connect", self:_getDebugMemberName(memberName)))
 		end)
 
 		connectMaid:GiveTask(self:_observeRemoteEventBrio(memberName):Subscribe(function(brio)
@@ -135,7 +135,7 @@ function Remoting:Bind(memberName, callback)
 		-- TODO: Cleanup if nothing else is expecting this
 	elseif RunService:IsClient() then
 		bindMaid._warning = task.delay(5, function()
-			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never fire", memberName))
+			warn(string.format("[Remoting] - Failed to find RemoteEvent %q, event may never fire", self:_getDebugMemberName(memberName)))
 		end)
 
 		bindMaid:GiveTask(self:_observeRemoteFunctionBrio(memberName):Subscribe(function(brio)
@@ -198,7 +198,7 @@ function Remoting:_translateCallback(maid, memberName, callback)
 
 	return function(...)
 		if not alive then
-			error(string.format("[Remoting] - Function for %s is disconnected and can't be called", memberName))
+			error(string.format("[Remoting] - Function for %s is disconnected and can't be called", self:_getDebugMemberName(memberName)))
 			return
 		end
 
@@ -554,6 +554,10 @@ end
 
 function Remoting:_getMemberName(memberName, objectType)
 	return memberName .. objectType
+end
+
+function Remoting:_getDebugMemberName(memberName)
+	return string.format("%s.%s", self._name, memberName)
 end
 
 --[=[

@@ -4,8 +4,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local PlayerUtils = require("PlayerUtils")
+local Players = game:GetService("Players")
+
+local ChatTagCmdrUtils = require("ChatTagCmdrUtils")
 local ChatTagDataUtils = require("ChatTagDataUtils")
+local PlayerUtils = require("PlayerUtils")
+local Set = require("Set")
+local Maid = require("Maid")
 
 local ChatProviderCommandService = {}
 ChatProviderCommandService.ServiceName = "ChatProviderCommandService"
@@ -13,19 +18,60 @@ ChatProviderCommandService.ServiceName = "ChatProviderCommandService"
 function ChatProviderCommandService:Init(serviceBag)
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
 
 	-- External
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
 
 	-- Internal
 	self._chatProviderService = self._serviceBag:GetService(require("ChatProviderService"))
+	self._chatTagBinder = self._serviceBag:GetService(require("ChatTag"))
+	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTags"))
 end
 
 function ChatProviderCommandService:Start()
 	self:_registerCommands()
+	self:_createActivateChatCommand()
+end
+
+function ChatProviderCommandService:_createActivateChatCommand()
+	local command = Instance.new("TextChatCommand")
+	command.Name = "OpenCmdrCommand"
+	command.PrimaryAlias = "/cmdr"
+
+	self._maid:GiveTask(command)
+	self._maid:GiveTask(command.Triggered:Connect(function(originTextSource, _unfilteredText)
+		local player = Players:GetPlayerByUserId(originTextSource.UserId)
+		if not player then
+			return
+		end
+
+		self._permissionService:PromiseIsAdmin(player):Then(function(isAdmin)
+			if isAdmin then
+				self._remoting.OpenCmdr:FireClient(player)
+			end
+		end)
+	end))
+
+	self._chatProviderService:AddChatCommand(command)
+end
+
+
+function ChatProviderCommandService:GetChatTagKeyList()
+	local tagSet = {}
+	for chatTag, _ in pairs(self._chatTagBinder:GetAllSet()) do
+		local tagKey = chatTag.ChatTagKey.Value
+		tagSet[tagKey] = true
+	end
+
+	return Set.toList(tagSet)
 end
 
 function ChatProviderCommandService:_registerCommands()
+	self._cmdrService:PromiseCmdr():Then(function(cmdr)
+		ChatTagCmdrUtils.registerChatTagKeys(cmdr, self)
+	end)
+
 	self._cmdrService:RegisterCommand({
 		Name = "add-chat-tag";
 		Aliases = { };
@@ -84,6 +130,50 @@ function ChatProviderCommandService:_registerCommands()
 
 		return string.format("Cleared chat tags on a player %q", PlayerUtils.formatName(player))
 	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "set-chat-tag-disabled";
+		Aliases = { };
+		Description = "Sets if a chat tag is disabled for a player. This will save.";
+		Group = "ChatTags";
+		Args = {
+			{
+				Name = "Target";
+				Type = "player";
+				Description = "Player to disable or enable the tag for";
+			},
+			{
+				Name = "TagKey";
+				Type = "chatTagKey";
+				Description = "Chat tag to disable";
+			},
+			{
+				Name = "ChatTagDisabled";
+				Type = "boolean";
+				Description = "Whether or not the tag is disabled";
+				Default = true;
+			},
+		};
+	}, function(_context, player, chatTagKey, chatTagDisabled)
+		local hasChatTags = self._hasChatTagsBinder:Get(player)
+
+		if not hasChatTags then
+			return string.format("%s does not have chat tags", PlayerUtils.formatName(player))
+		end
+
+		local chatTag = hasChatTags:GetChatTagByKey(chatTagKey)
+		if not chatTag then
+			return string.format("%s does not have a chat tag with that key", PlayerUtils.formatName(player))
+		end
+
+		chatTag.UserDisabled.Value = chatTagDisabled
+
+		return string.format("Chat tag %q on player %q `UserDisabled` set to %s", chatTagKey, PlayerUtils.formatName(player), tostring(chatTagDisabled))
+	end)
+end
+
+function ChatProviderCommandService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return ChatProviderCommandService

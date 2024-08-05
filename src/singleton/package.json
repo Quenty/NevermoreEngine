@@ -1,6 +1,6 @@
 {
   "name": "@quenty/singleton",
-  "version": "2.0.0",
+  "version": "6.3.0",
   "description": "Provides a way to transform from a class to a singleton",
   "keywords": [
     "Roblox",

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/mouseshiftlockservice",
-  "version": "8.0.0",
+  "version": "11.3.0",
   "description": "Utility service to enable or disable mouse shift lock on the fly on Roblox.",
   "keywords": [
     "Roblox",

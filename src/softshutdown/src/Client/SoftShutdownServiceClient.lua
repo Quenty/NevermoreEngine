@@ -40,11 +40,8 @@ function SoftShutdownServiceClient:Init(serviceBag)
 	self._isLobby = AttributeValue.new(Workspace, SoftShutdownConstants.IS_SOFT_SHUTDOWN_LOBBY_ATTRIBUTE, false)
 	self._isUpdating = AttributeValue.new(Workspace, SoftShutdownConstants.IS_SOFT_SHUTDOWN_UPDATING_ATTRIBUTE, false)
 
-	self._localTeleportDataSaysIsLobby = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._localTeleportDataSaysIsLobby)
-
-	self._isArrivingAfterShutdown = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._isArrivingAfterShutdown)
+	self._localTeleportDataSaysIsLobby = self._maid:Add(ValueObject.new(false, "boolean"))
+	self._isArrivingAfterShutdown = self._maid:Add(ValueObject.new(false, "boolean"))
 
 	task.spawn(function()
 		if self:_queryLocalTeleportInfo() then
@@ -123,6 +120,7 @@ function SoftShutdownServiceClient:_showSoftShutdownUI(titleKey, subtitleKey, do
 	screenGui.ResetOnSpawn = false
 	screenGui.AutoLocalize = false
 	screenGui.IgnoreGuiInset = true
+	screenGui.ClipToDeviceSafeArea = false
 	screenGui.DisplayOrder = 1e9
 	screenGui.Parent = PlayerGuiUtils.getPlayerGui()
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling

@@ -1,3 +1,5 @@
+--!native
+
 -- Chacha20 cipher in ComputerCraft
 -- By Anavrins
 -- For help and details, you can PM me on the CC forums

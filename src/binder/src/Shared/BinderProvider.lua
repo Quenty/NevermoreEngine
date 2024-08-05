@@ -16,12 +16,16 @@ BinderProvider.__index = BinderProvider
 --[=[
 	Constructs a new BinderProvider.
 
+	:::tip
+	Don't use this! You can retrieve binders from the service bag directly
+	:::
+
 	```lua
 	local serviceBag = ServiceBag.new()
 
 	-- Usually in a separate file!
 	local binderProvider = BinderProvider.new("BirdBinders", function(self, serviceBag)
-		serviceBag:Add(Binder.new("Bird", require("Bird")))
+		self:Add(Binder.new("Bird", require("Bird"), serviceBag))
 	end)
 
 	-- Retrieve binders
@@ -109,11 +113,8 @@ function BinderProvider:Init(...)
 	self._initialized = true
 
 	-- Pretty sure this is a bad idea
-	self._bindersAddedPromise = Promise.new()
-	self._maid:GiveTask(self._bindersAddedPromise)
-
-	self._startPromise = Promise.new()
-	self._maid:GiveTask(self._startPromise)
+	self._bindersAddedPromise = self._maid:Add(Promise.new())
+	self._startPromise = self._maid:Add(Promise.new())
 
 	self._initMethod(self, ...)
 
@@ -188,6 +189,8 @@ end
 function BinderProvider:Add(binder)
 	assert(not self._started, "Already inited")
 	assert(not self:Get(binder:GetTag()), "Binder already exists")
+
+	self._maid:GiveTask(binder)
 
 	table.insert(self._binders, binder)
 	self[binder:GetTag()] = binder

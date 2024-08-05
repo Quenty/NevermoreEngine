@@ -1,11 +1,10 @@
 --[[
 	@class ClientMain
 ]]
-local packages = game:GetService("ReplicatedStorage"):WaitForChild("Packages")
+local loader = game:GetService("ReplicatedStorage"):WaitForChild("chatproviderservice"):WaitForChild("loader")
+local require = require(loader).bootstrapGame(loader.Parent)
 
-local serviceBag = require(packages.ServiceBag).new()
-serviceBag:GetService(packages.ChatProviderServiceClient)
-
--- Start game
+local serviceBag = require("ServiceBag").new()
+serviceBag:GetService(require("ChatProviderServiceClient"))
 serviceBag:Init()
 serviceBag:Start()

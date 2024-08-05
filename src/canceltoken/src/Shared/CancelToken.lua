@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Promise = require("Promise")
 local Signal = require("Signal")
+local Maid = require("Maid")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local CancelToken = {}
 CancelToken.ClassName = "CancelToken"
@@ -23,8 +25,9 @@ function CancelToken.new(executor)
 
 	assert(type(executor) == "function", "Bad executor")
 
-	self.PromiseCancelled = Promise.new()
+	self._maid = Maid.new()
 
+	self.PromiseCancelled = Promise.new()
 	self.Cancelled = Signal.new()
 
 	self.PromiseCancelled:Then(function()
@@ -34,7 +37,7 @@ function CancelToken.new(executor)
 
 	executor(function()
 		self:_cancel()
-	end)
+	end, self._maid)
 
 	return self
 end
@@ -45,8 +48,7 @@ end
 	@return boolean
 ]=]
 function CancelToken.isCancelToken(value)
-	return type(value) == "table"
-		and getmetatable(value) == CancelToken
+	return DuckTypeUtils.isImplementation(CancelToken, value)
 end
 
 local EMPTY_FUNCTION = function() end
@@ -71,6 +73,14 @@ function CancelToken.fromMaid(maid)
 	return token
 end
 
+function CancelToken.fromSeconds(seconds)
+	assert(type(seconds) == "number", "Bad seconds")
+
+	return CancelToken.new(function(cancel, maid)
+		maid:GiveTask(task.delay(seconds, cancel))
+	end)
+end
+
 --[=[
 	Errors if cancelled
 ]=]
@@ -89,6 +99,7 @@ function CancelToken:IsCancelled()
 end
 
 function CancelToken:_cancel()
+	self._maid:DoCleaning()
 	self.PromiseCancelled:Resolve()
 end
 

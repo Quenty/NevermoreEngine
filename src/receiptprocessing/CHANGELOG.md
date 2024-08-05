@@ -3,6 +3,113 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.3.0...@quenty/receiptprocessing@7.4.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.2.0...@quenty/receiptprocessing@7.3.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.1.0...@quenty/receiptprocessing@7.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.0.0...@quenty/receiptprocessing@7.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@6.0.0...@quenty/receiptprocessing@7.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@5.0.0...@quenty/receiptprocessing@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@4.0.0...@quenty/receiptprocessing@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@3.0.0...@quenty/receiptprocessing@4.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@2.4.0...@quenty/receiptprocessing@3.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@2.3.0...@quenty/receiptprocessing@2.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@2.2.0...@quenty/receiptprocessing@2.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/receiptprocessing
+
+
+
+
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@2.1.1...@quenty/receiptprocessing@2.2.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Fix missing dependencies ([91e9170](https://github.com/Quenty/NevermoreEngine/commit/91e9170a2e34d2bdcc1ceb4f384ee59947a541ef))
+
+
+### Features
+
+* Allow receipt processing to handle client-side initialization if we're in a plugin or other scenario ([299280f](https://github.com/Quenty/NevermoreEngine/commit/299280f68f6f2c689ebd11bbf337da7102c22709))
+
+
+
+
+
 ## [2.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@2.1.0...@quenty/receiptprocessing@2.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/receiptprocessing

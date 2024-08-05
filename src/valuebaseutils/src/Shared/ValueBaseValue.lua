@@ -8,10 +8,10 @@ local require = require(script.Parent.loader).load(script)
 
 local RunService = game:GetService("RunService")
 
-local ValueBaseUtils = require("ValueBaseUtils")
-local RxValueBaseUtils = require("RxValueBaseUtils")
-local RxSignal = require("RxSignal")
 local Rx = require("Rx")
+local RxSignal = require("RxSignal")
+local RxValueBaseUtils = require("RxValueBaseUtils")
+local ValueBaseUtils = require("ValueBaseUtils")
 
 local ValueBaseValue = {}
 ValueBaseValue.ClassName = "ValueBaseValue"

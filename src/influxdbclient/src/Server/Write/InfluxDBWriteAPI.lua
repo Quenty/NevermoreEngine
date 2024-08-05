@@ -113,7 +113,15 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend)
 		return Promise.rejected("No client configuration")
 	end
 
-	assert(type(clientConfig.token) == "string" and #clientConfig.token > 0, "Bad clientConfig.token")
+	-- Transform to "Token %s".
+	local authHeader: string | Secret
+	if typeof(clientConfig.token) == "string" and #clientConfig.token > 0 then
+		authHeader = "Token " .. clientConfig.token
+	elseif typeof(clientConfig.token) == "Secret" then
+		authHeader = clientConfig.token:AddPrefix("Token ")
+	else
+		error("Bad clientConfig.token")
+	end
 
 	local body = table.concat(toSend, "\n")
 	local request = {
@@ -121,8 +129,9 @@ function InfluxDBWriteAPI:_promiseSendBatch(toSend)
 		Headers = {
 			["Content-Type"] = "application/json";
 			["Accept"] = "application/json";
-			["Authorization"] = "Token " .. clientConfig.token;
+			["Authorization"] = authHeader;
 		};
+		Compress = Enum.HttpCompression.Gzip;
 		Url = self:_getWriteUrl();
 		Body = body;
 	}

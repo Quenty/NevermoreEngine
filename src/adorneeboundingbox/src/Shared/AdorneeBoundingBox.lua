@@ -12,25 +12,43 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxPartBoundingBoxUtils = require("RxPartBoundingBoxUtils")
 local ValueObject = require("ValueObject")
+local AdorneePartBoundingBox = require("AdorneePartBoundingBox")
 
 local AdorneeBoundingBox = setmetatable({}, BaseObject)
 AdorneeBoundingBox.ClassName = "AdorneeBoundingBox"
 AdorneeBoundingBox.__index = AdorneeBoundingBox
 
-function AdorneeBoundingBox.new(adornee)
-	assert(typeof(adornee) == "Instance", "Bad adornee")
+function AdorneeBoundingBox.new(initialAdornee)
+	local self = setmetatable(BaseObject.new(), AdorneeBoundingBox)
 
-	local self = setmetatable(BaseObject.new(adornee), AdorneeBoundingBox)
+	self._adornee = self._maid:Add(ValueObject.new(initialAdornee))
+	self._bbCFrame = self._maid:Add(ValueObject.new(nil))
+	self._bbSize = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
 
-	self._bbCFrame = ValueObject.new(nil)
-	self._maid:GiveTask(self._bbCFrame)
+	self._maid:GiveTask(self._adornee:ObserveBrio(function(adornee)
+		return adornee ~= nil
+	end):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
 
-	self._bbSize = ValueObject.new(Vector3.zero)
-	self._maid:GiveTask(self._bbSize)
-
-	self:_setup()
+		local maid, adornee = brio:ToMaidAndValue()
+		self:_setup(maid, adornee)
+	end))
 
 	return self
+end
+
+function AdorneeBoundingBox:SetAdornee(adornee)
+	assert(typeof(adornee) == "Instance" or adornee == nil, "Bad adornee")
+
+	self._adornee.Value = adornee
+
+	return function()
+		if self._adornee.Value == adornee then
+			self._adornee.Value = nil
+		end
+	end
 end
 
 --[=[
@@ -65,22 +83,26 @@ function AdorneeBoundingBox:GetSize()
 	return self._bbSize.Value
 end
 
-function AdorneeBoundingBox:_setup()
-	if self._obj:IsA("BasePart") then
-		self._maid:GiveTask(self:_setupPart(self._obj))
-	elseif self._obj:IsA("Model") then
-		self._maid:GiveTask(self:_setupModel(self._obj))
-	elseif self._obj:IsA("Attachment") then
-		self._maid:GiveTask(self:_setupAttachment(self._obj))
-	elseif self._obj:IsA("Humanoid") then
-		self._maid:GiveTask(self:_setupHumanoid(self._obj))
-	elseif self._obj:IsA("Accessory") or self._obj:IsA("Clothing") then
+function AdorneeBoundingBox:_setup(maid, adornee)
+	if adornee:IsA("BasePart") then
+		maid:GiveTask(self:_setupPart(adornee))
+	elseif adornee:IsA("Model") then
+		maid:GiveTask(self:_setupModel(adornee))
+	elseif adornee:IsA("Attachment") then
+		maid:GiveTask(self:_setupAttachment(adornee))
+	elseif adornee:IsA("Humanoid") then
+		maid:GiveTask(self:_setupHumanoid(adornee))
+	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
 		-- TODO: Rethink this contract
-		warn("Accessories and clothing not supported yet")
-	elseif self._obj:IsA("Tool") then
-		self._maid:GiveTask(self:_setupTool(self._obj))
+		warn("[AdorneeBoundingBox] - Accessories and clothing not supported yet")
+		self._bbCFrame.Value = nil
+		self._bbSize.Value = Vector3.zero
+	elseif adornee:IsA("Tool") then
+		maid:GiveTask(self:_setupTool(adornee))
 	else
-		warn("Unsupported adornee")
+		self._bbCFrame.Value = nil
+		self._bbSize.Value = Vector3.zero
+		warn("[AdorneeBoundingBox] - Unsupported adornee")
 	end
 end
 
@@ -109,9 +131,7 @@ function AdorneeBoundingBox:_setupModel(model)
 
 	local topMaid = Maid.new()
 
-	local adorneeModelBoundingBox = AdorneeModelBoundingBox.new(model)
-	topMaid:GiveTask(adorneeModelBoundingBox)
-
+	local adorneeModelBoundingBox = topMaid:Add(AdorneeModelBoundingBox.new(model))
 	topMaid:GiveTask(adorneeModelBoundingBox:ObserveCFrame():Subscribe(function(cframe)
 		self._bbCFrame.Value = cframe
 	end))
@@ -180,11 +200,12 @@ function AdorneeBoundingBox:_setupPart(part)
 
 	local maid = Maid.new()
 
-	maid:GiveTask(RxInstanceUtils.observeProperty(part, "Size"):Subscribe(function(size)
-		self._bbSize.Value = size
-	end))
-	maid:GiveTask(RxPartBoundingBoxUtils.observePartCFrame(part):Subscribe(function(cframe)
+	local partBoundingBox = maid:Add(AdorneePartBoundingBox.new(part))
+	maid:GiveTask(partBoundingBox:ObserveCFrame():Subscribe(function(cframe)
 		self._bbCFrame.Value = cframe
+	end))
+	maid:GiveTask(partBoundingBox:ObserveSize():Subscribe(function(size)
+		self._bbSize.Value = size
 	end))
 
 	return maid

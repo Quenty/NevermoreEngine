@@ -1,6 +1,6 @@
 {
   "name": "@quenty/colorpicker",
-  "version": "5.1.1",
+  "version": "10.4.1",
   "description": "Color picking UI system for Roblox.",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/basicpane": "file:../basicpane",
     "@quenty/blend": "file:../blend",
+    "@quenty/buttondragmodel": "file:../buttondragmodel",
     "@quenty/color3utils": "file:../color3utils",
     "@quenty/inputobjectutils": "file:../inputobjectutils",
     "@quenty/instanceutils": "file:../instanceutils",

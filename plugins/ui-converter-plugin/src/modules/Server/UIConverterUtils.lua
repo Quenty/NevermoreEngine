@@ -24,8 +24,7 @@ local function roundNumber(value)
 	elseif value == -math.huge then
 		return "-math.huge"
 	else
-		return (("%0.6f"):format(value)
-			:gsub("%.?0+$", ""))
+		return string.format("%0.6f", value):gsub("%.?0+$", "")
 	end
 end
 
@@ -41,15 +40,15 @@ local function roundToPi(value)
 		local fractionBottom = Math.round(math.pi/value, 1e-6)
 		if math.floor(fractionBottom) == fractionBottom then
 			if fractionBottom < 0 then
-				return ("-math.pi/%d"):format(math.abs(fractionBottom))
+				return string.format("-math.pi/%d", math.abs(fractionBottom))
 			else
-				return ("math.pi/%d"):format(fractionBottom)
+				return string.format("math.pi/%d", fractionBottom)
 			end
 		end
 
 		local deg = Math.round(math.deg(value), 1e-6)
 		if math.floor(deg) == deg then
-			return ("math.deg(%d)"):format(deg)
+			return string.format("math.deg(%d)", deg)
 		end
 
 		return nil
@@ -60,14 +59,14 @@ function UIConverterUtils.toMultiLineEscape(text)
 	if text:find("\n") then
 		for i=0, 250 do
 			local equals = ("="):rep(i)
-			local sep = ("%%[%s%%["):format(equals)
-			local endSep = ("%%]%s%%]"):format(equals)
+			local sep = string.format("%%[%s%%[", equals)
+			local endSep = string.format("%%]%s%%]", equals)
 
 			if not text:find(sep) and not text:find(endSep) then
-				return ("%s%s%s"):format(("[%s["):format(equals), text, ("]%s]"):format(equals))
+				return string.format("%s%s%s", string.format("[%s[", equals), text, string.format("]%s]", equals))
 			end
 		end
-		return ("[[%s]]"):format(text)
+		return string.format("[[%s]]", text)
 	end
 end
 

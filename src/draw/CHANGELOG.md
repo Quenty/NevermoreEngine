@@ -3,6 +3,69 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.2.0...@quenty/draw@7.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.1.0...@quenty/draw@7.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
+
+# [7.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.0.0...@quenty/draw@7.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@6.0.0...@quenty/draw@7.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@5.0.0...@quenty/draw@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@4.4.0...@quenty/draw@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/draw
+
+
+
+
+
+# [4.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@4.3.0...@quenty/draw@4.4.0) (2024-01-08)
+
+
+### Features
+
+* Update draw package ([2b5aeab](https://github.com/Quenty/NevermoreEngine/commit/2b5aeab42ae8861aabacf2f796fba43d1e2e8717))
+
+
+
+
+
 # [4.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@4.2.0...@quenty/draw@4.3.0) (2023-08-23)
 
 

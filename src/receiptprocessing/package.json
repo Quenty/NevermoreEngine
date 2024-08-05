@@ -1,6 +1,6 @@
 {
   "name": "@quenty/receiptprocessing",
-  "version": "2.1.1",
+  "version": "7.4.0",
   "description": "Centralize receipt processing within games since this is a constrained resource.",
   "keywords": [
     "Roblox",
@@ -31,7 +31,8 @@
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
     "@quenty/servicebag": "file:../servicebag",
-    "@quenty/signal": "file:../signal"
+    "@quenty/signal": "file:../signal",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

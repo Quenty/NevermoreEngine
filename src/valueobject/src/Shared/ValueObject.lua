@@ -12,6 +12,7 @@ local Observable = require("Observable")
 local ValueBaseUtils = require("ValueBaseUtils")
 local RxValueBaseUtils = require("RxValueBaseUtils")
 local Brio = require("Brio")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local EMPTY_FUNCTION = function() end
 
@@ -40,8 +41,7 @@ function ValueObject.new(baseValue, checkType)
 	@prop Changed Signal<T> -- fires with oldValue, newValue, ...
 	@within ValueObject
 ]=]
-	self.Changed = GoodSignal.new() -- :Fire(newValue, oldValue, maid, ...)
-	self._maid:GiveTask(self.Changed)
+	self.Changed = self._maid:Add(GoodSignal.new()) -- :Fire(newValue, oldValue, ...)
 
 	return setmetatable(self, ValueObject)
 end
@@ -75,7 +75,7 @@ end
 	@return boolean
 ]=]
 function ValueObject.isValueObject(value)
-	return type(value) == "table" and getmetatable(value) == ValueObject
+	return DuckTypeUtils.isImplementation(ValueObject, value)
 end
 
 function ValueObject:_toMountableObservable(value)
@@ -150,7 +150,7 @@ function ValueObject:Observe()
 
 		local maid = Maid.new()
 
-		maid:GiveTask(self.Changed:Connect(function(newValue, _, _, ...)
+		maid:GiveTask(self.Changed:Connect(function(newValue, _, ...)
 			sub:Fire(newValue, ...)
 		end))
 
@@ -194,7 +194,7 @@ function ValueObject:ObserveBrio(condition)
 			end
 		end
 
-		maid:GiveTask(self.Changed:Connect(function(newValue, _, _, ...)
+		maid:GiveTask(self.Changed:Connect(function(newValue, _, ...)
 			handleNewValue(newValue, ...)
 		end))
 
@@ -216,7 +216,7 @@ end
 	```lua
 	self.IsVisible:SetValue(isVisible, true)
 
-	print(self.IsVisible.Changed:Connect(function(isVisible, _, _, doNotAnimate)
+	print(self.IsVisible.Changed:Connect(function(isVisible, _, doNotAnimate)
 		print(doNotAnimate)
 	end))
 	```
@@ -241,11 +241,7 @@ function ValueObject:SetValue(value, ...)
 
 		rawset(self, "_value", value)
 
-		local maid = Maid.new()
-
-		self.Changed:Fire(value, previous, maid, ...)
-
-		self._maid._valueMaid = maid
+		self.Changed:Fire(value, previous, ...)
 	end
 end
 
@@ -269,7 +265,7 @@ function ValueObject:__index(index)
 	elseif index == "_value" then
 		return nil -- Edge case
 	else
-		error(("%q is not a member of ValueObject"):format(tostring(index)))
+		error(string.format("%q is not a member of ValueObject", tostring(index)))
 	end
 end
 
@@ -278,9 +274,9 @@ function ValueObject:__newindex(index, value)
 		-- Avoid deoptimization
 		ValueObject.SetValue(self, value)
 	elseif index == "LastEventContext" or ValueObject[index] then
-		error(("%q cannot be set in ValueObject"):format(tostring(index)))
+		error(string.format("%q cannot be set in ValueObject", tostring(index)))
 	else
-		error(("%q is not a member of ValueObject"):format(tostring(index)))
+		error(string.format("%q is not a member of ValueObject", tostring(index)))
 	end
 end
 

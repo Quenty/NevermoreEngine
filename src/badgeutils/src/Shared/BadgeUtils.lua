@@ -71,4 +71,32 @@ function BadgeUtils.promiseBadgeInfo(badgeId)
 	end)
 end
 
+--[=[
+	Returns true if the uesr has the badge
+
+	@param userId number
+	@param badgeId number
+	@return Promise<BadgeInfoDictionary>
+]=]
+function BadgeUtils.promiseUserHasBadge(userId, badgeId)
+	assert(type(userId) == "number", "Bad userId")
+	assert(type(badgeId) == "number", "Bad badgeId")
+
+	return Promise.spawn(function(resolve, reject)
+		local result
+		local ok, err = pcall(function()
+			result = BadgeService:UserHasBadgeAsync(userId, badgeId)
+		end)
+
+		if not ok then
+			return reject(err)
+		end
+		if type(result) ~= "boolean" then
+			return reject("Failed to get a boolean from UserHasBadgeAsync")
+		end
+
+		return resolve(result)
+	end)
+end
+
 return BadgeUtils

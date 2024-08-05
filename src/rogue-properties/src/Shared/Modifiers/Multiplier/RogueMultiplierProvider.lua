@@ -12,7 +12,7 @@ local BinderUtils = require("BinderUtils")
 local RoguePropertyModifierUtils = require("RoguePropertyModifierUtils")
 local RoguePropertyService = require("RoguePropertyService")
 local Observable = require("Observable")
-local Maid = require("Maid")
+local RxBrioUtils = require("RxBrioUtils")
 
 local RogueMultiplierProvider = {}
 RogueMultiplierProvider.ServiceName = "RogueMultiplierProvider"
@@ -55,11 +55,7 @@ end
 
 function RogueMultiplierProvider:GetInvertedVersion(propObj, rogueProperty, baseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		local multiplier = 1
-
-		for _, item in pairs(self:_getMultipliers(propObj)) do
-			multiplier = multiplier*item:GetMultiplier()
-		end
+		local multiplier = self:_getTotalMultiplier(propObj)
 
 		return baseValue/multiplier
 	else
@@ -69,11 +65,7 @@ end
 
 function RogueMultiplierProvider:GetModifiedVersion(propObj, rogueProperty, baseValue)
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		local multiplier = 1
-
-		for _, item in pairs(self:_getMultipliers(propObj)) do
-			multiplier = multiplier*item:GetMultiplier()
-		end
+		local multiplier = self:_getTotalMultiplier(propObj)
 
 		return baseValue*multiplier
 	else
@@ -82,39 +74,32 @@ function RogueMultiplierProvider:GetModifiedVersion(propObj, rogueProperty, base
 end
 
 function RogueMultiplierProvider:ObserveModifiedVersion(propObj, rogueProperty, observeBaseValue)
+	assert(rogueProperty, "No rogueProperty")
+	assert(Observable.isObservable(observeBaseValue), "Bad observeBaseValue")
+
 	if rogueProperty:GetDefinition():GetValueType() == "number" then
-		return Observable.new(function(sub)
-			local topMaid = Maid.new()
-
-			topMaid:GiveTask(self:_observeMultipliersBrio(propObj):Subscribe(function(brio)
-				if brio:IsDead() then
-					return
-				end
-
-				local maid = brio:ToMaid()
-				local value = brio:GetValue()
-
-				maid:GiveTask(value:ObserveMultiplier():Subscribe(function()
-					sub:Fire()
-				end))
-
-				sub:Fire()
-
-				maid:GiveTask(function()
-					sub:Fire()
-				end)
-			end))
-
-			topMaid:GiveTask(observeBaseValue:Subscribe(function()
-				sub:Fire()
-			end))
-
-			return topMaid
-		end):Pipe({
-			Rx.throttleDefer();
-			Rx.map(function()
-				return self:GetModifiedVersion(propObj, rogueProperty, propObj.Value)
+		return RxBrioUtils.flatCombineLatest({
+			baseValue = observeBaseValue;
+			multiplier = self:_observeMultipliersBrio(propObj):Pipe({
+				RxBrioUtils.flatMapBrio(function(item)
+					return item:ObserveMultiplier();
+				end);
+				RxBrioUtils.reduceToAliveList();
+				RxBrioUtils.switchMapBrio(function(state)
+					local multiplier = 1
+					for _, item in pairs(state) do
+						multiplier = multiplier*item
+					end
+					return Rx.of(multiplier)
+				end);
+				RxBrioUtils.emitOnDeath(1);
+				Rx.distinct();
+			});
+		}):Pipe({
+			Rx.map(function(state)
+				return state.baseValue*state.multiplier
 			end);
+			Rx.distinct();
 		})
 	else
 		return observeBaseValue
@@ -125,8 +110,12 @@ function RogueMultiplierProvider:_observeMultipliersBrio(propObj)
 	return RxBinderUtils.observeBoundChildClassBrio(self._rogueMultiplierBinder, propObj)
 end
 
-function RogueMultiplierProvider:_getMultipliers(propObj)
-	return BinderUtils.getChildren(self._rogueMultiplierBinder, propObj)
+function RogueMultiplierProvider:_getTotalMultiplier(propObj)
+	local multiplier = 1
+	for _, item in pairs(BinderUtils.getChildren(self._rogueMultiplierBinder, propObj)) do
+		multiplier = multiplier*item:GetMultiplier()
+	end
+	return multiplier
 end
 
 return RogueMultiplierProvider

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/genericscreenguiprovider",
-  "version": "8.1.1",
+  "version": "13.5.0",
   "description": "Providers screenGuis with a given display order for easy use",
   "keywords": [
     "Roblox",
@@ -26,8 +26,11 @@
   "dependencies": {
     "@quenty/blend": "file:../blend",
     "@quenty/loader": "file:../loader",
+    "@quenty/maid": "file:../maid",
+    "@quenty/servicebag": "file:../servicebag",
     "@quenty/string": "file:../string",
-    "@quenty/uiobjectutils": "file:../uiobjectutils"
+    "@quenty/uiobjectutils": "file:../uiobjectutils",
+    "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {
     "access": "public"

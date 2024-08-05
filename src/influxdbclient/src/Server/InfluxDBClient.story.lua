@@ -2,18 +2,15 @@
 	@class InfluxDBClient.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
-local ServiceBag = require("ServiceBag")
 local InfluxDBClient = require("InfluxDBClient")
-local InfluxDBPoint = require("InfluxDBPoint")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")
+local InfluxDBPoint = require("InfluxDBPoint")
+local Maid = require("Maid")
 
 return function(_target)
 	local maid = Maid.new()
-	local serviceBag = ServiceBag.new()
-	maid:GiveTask(serviceBag)
 
 	local config = InfluxDBClientConfigUtils.createClientConfig({
 		url = "https://ingest.robloxanalytics.com/";

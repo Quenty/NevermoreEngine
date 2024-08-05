@@ -8,6 +8,7 @@
 MIT License
 
 Copyright (c) 2021 Elttob
+Copyright (c) 2021-2023 Quenty
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,19 +33,19 @@ SOFTWARE.
 return {
 	ScreenGui = {
 		ResetOnSpawn = false,
-		ZIndexBehavior = "Sibling"
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	},
 
 	BillboardGui = {
 		ResetOnSpawn = false,
-		ZIndexBehavior = "Sibling"
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	},
 
 	SurfaceGui = {
 		ResetOnSpawn = false,
-		ZIndexBehavior = "Sibling",
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 
-		SizingMode = "PixelsPerStud",
+		SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud,
 		PixelsPerStud = 50
 	},
 
@@ -67,7 +68,7 @@ return {
 		BorderColor3 = Color3.new(0, 0, 0),
 		BorderSizePixel = 0,
 
-		Font = "SourceSans",
+		Font = Enum.Font.SourceSans,
 		Text = "",
 		TextColor3 = Color3.new(0, 0, 0),
 		TextSize = 14
@@ -80,7 +81,7 @@ return {
 
 		AutoButtonColor = false,
 
-		Font = "SourceSans",
+		Font = Enum.Font.SourceSans,
 		Text = "",
 		TextColor3 = Color3.new(0, 0, 0),
 		TextSize = 14
@@ -93,7 +94,7 @@ return {
 
 		ClearTextOnFocus = false,
 
-		Font = "SourceSans",
+		Font = Enum.Font.SourceSans,
 		Text = "",
 		TextColor3 = Color3.new(0, 0, 0),
 		TextSize = 14
@@ -131,5 +132,10 @@ return {
 
 	Sound = {
 		RollOffMode = Enum.RollOffMode.InverseTapered;
+	};
+
+	Part = {
+		TopSurface = Enum.SurfaceType.Smooth;
+		BottomSurface = Enum.SurfaceType.Smooth;
 	};
 }

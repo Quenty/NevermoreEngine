@@ -2,6 +2,7 @@
 	Service which manages central access to datastore. This datastore will refresh pretty frequently and
 	can be used for configuration and other components, such as Twitter codes or global settings.
 
+	@server
 	@class GameDataStoreService
 ]=]
 
@@ -35,11 +36,13 @@ function GameDataStoreService:PromiseDataStore()
 			local dataStore = DataStore.new(robloxDataStore, self:_getKey())
 			dataStore:SetSyncOnSave(true)
 			dataStore:SetAutoSaveTimeSeconds(15)
-			self._maid:GiveTask(dataStore)
 
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
 				return Promise.defer(function(resolve)
 					return resolve(dataStore:Save())
+				end)
+				:Finally(function()
+					dataStore:Destroy()
 				end)
 			end))
 

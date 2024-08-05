@@ -1,6 +1,6 @@
 {
   "name": "@quenty/resetservice",
-  "version": "6.1.1",
+  "version": "11.5.0",
   "description": "Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly",
   "keywords": [
     "Roblox",
@@ -29,7 +29,10 @@
     "@quenty/coreguiutils": "file:../coreguiutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/playerutils": "file:../playerutils",
+    "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
+    "@quenty/statestack": "file:../statestack",
     "@quenty/table": "file:../table"
   },
   "publishConfig": {

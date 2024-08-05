@@ -27,8 +27,7 @@ function PlayerDataStoreService:Init(serviceBag)
 	-- External
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
 
-	self._started = Promise.new()
-	self._maid:GiveTask(self._started)
+	self._started = self._maid:Add(Promise.new())
 
 	self._dataStoreName = "PlayerData"
 	self._dataStoreScope = "SaveData"
@@ -114,19 +113,18 @@ function PlayerDataStoreService:PromiseManager()
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)
 		:Then(function(dataStore)
-			local manager = PlayerDataStoreManager.new(
+			local manager = self._maid:Add(PlayerDataStoreManager.new(
 				dataStore,
 				function(player)
 					return tostring(player.UserId)
 				end,
-				true)
+				true))
 
 			-- A lot safer if we're hot reloading or need to monitor bind to close calls
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
 				return manager:PromiseAllSaves()
 			end))
 
-			self._maid:GiveTask(manager)
 			return manager
 		end)
 

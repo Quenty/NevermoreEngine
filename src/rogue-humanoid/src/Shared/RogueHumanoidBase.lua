@@ -46,13 +46,12 @@ function RogueHumanoidBase.new(humanoid, serviceBag)
 		end))
 	end
 
-	self._scaleState = ValueObject.fromObservable(Rx.combineLatest({
+	self._scaleState = self._maid:Add(ValueObject.fromObservable(Rx.combineLatest({
 		scale = self._properties.Scale:Observe();
 		maxSize = self._properties.ScaleMax:Observe();
 		minSize = self._properties.ScaleMin:Observe();
-	}))
+	})))
 
-	self._maid:GiveTask(self._scaleState)
 	self._maid:GiveTask(self._scaleState:Observe():Subscribe(function(state)
 		if state then
 			self:_updateScale(state)
@@ -90,7 +89,7 @@ function RogueHumanoidBase:_updateScale(state)
 	for _, name in pairs(GROWTH_VALUE_NAMES) do
 		local numberValue = self._obj:FindFirstChild(name)
 		if not numberValue then
-			return
+			continue
 		end
 
 		self:_updateScaleValue(numberValue, state)

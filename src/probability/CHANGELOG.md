@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/probability@2.2.0...@quenty/probability@2.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/probability@2.1.0...@quenty/probability@2.2.0) (2024-04-28)
+
+
+### Features
+
+* Add EloUtils percentile helper logic ([d2b4910](https://github.com/Quenty/NevermoreEngine/commit/d2b4910b93570f30c1060f78992286b1bf6a7698))
+
+
+
+
+
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/probability@2.0.1...@quenty/probability@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/probability

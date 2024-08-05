@@ -1,5 +1,6 @@
 {
   "name": "avatareditorutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

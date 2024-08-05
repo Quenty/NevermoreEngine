@@ -36,8 +36,7 @@ function ObservableMapSet.new()
 	@prop SetAdded Signal<TKey>
 	@within ObservableMapSet
 ]=]
-	self.SetAdded = Signal.new() -- :Fire(key, set)
-	self._maid:GiveTask(self.SetAdded)
+	self.SetAdded = self._maid:Add(Signal.new()) -- :Fire(key, set)
 
 --[=[
 	Fires when an item is removed
@@ -45,11 +44,9 @@ function ObservableMapSet.new()
 	@prop SetRemoved Signal<TKey>
 	@within ObservableMapSet
 ]=]
-	self.SetRemoved = Signal.new() -- :Fire(key)
-	self._maid:GiveTask(self.SetRemoved)
+	self.SetRemoved = self._maid:Add(Signal.new()) -- :Fire(key)
 
-	self._setCount = ValueObject.new(0, "number")
-	self._maid:GiveTask(self._setCount)
+	self._setCount = self._maid:Add(ValueObject.new(0, "number"))
 
 	return self
 end
@@ -140,6 +137,40 @@ function ObservableMapSet:GetKeyList()
 		table.insert(list, key)
 	end
 	return list
+end
+
+--[=[
+	Observes the list of all keys.
+	@return Observable<{ TKey }>
+]=]
+function ObservableMapSet:ObserveKeyList()
+	return Observable.new(function(sub)
+		local topMaid = Maid.new()
+
+		-- TODO: maybe don't allocate as much here?
+		local keyList = {}
+
+		topMaid:GiveTask(self.SetAdded:Connect(function(addedKey)
+			table.insert(keyList, addedKey)
+			sub:Fire(table.clone(keyList))
+		end))
+
+		topMaid:GiveTask(self.SetRemoved:Connect(function(removedKey)
+			local index = table.find(keyList, removedKey)
+			if index then
+				table.remove(keyList, index)
+			end
+			sub:Fire(table.clone(keyList))
+		end))
+
+		for key, _ in pairs(self._observableSetMap) do
+			table.insert(keyList, key)
+		end
+
+		sub:Fire(table.clone(keyList))
+
+		return topMaid
+	end)
 end
 
 --[=[

@@ -11,6 +11,7 @@ local Vector3Utils = {}
 
 --[=[
 	Creates a Vector3 from a Vector2 in the XY plane
+
 	@param vector2 Vector2
 	@return Vector3
 ]=]
@@ -20,6 +21,7 @@ end
 
 --[=[
 	Creates a Vector3 from a Vector2 in the XZ plane
+
 	@param vector2 Vector2
 	@return Vector3
 ]=]
@@ -29,6 +31,7 @@ end
 
 --[=[
 	Computes the angle between 2 vectors in radians
+
 	@param a Vector3
 	@param b Vector3
 	@return number?
@@ -54,6 +57,7 @@ end
 
 --[=[
 	Computes the angle between 2 vectors in radians
+
 	@param a Vector3
 	@param b Vector3
 	@return number
@@ -66,6 +70,7 @@ end
 
 --[=[
 	Spherically lerps between start and finish
+
 	@param start Vector3
 	@param finish Vector3
 	@param t number -- Amount to slerp. 0 is start, 1 is finish. beyond that is extended as expected.
@@ -81,6 +86,7 @@ end
 
 --[=[
 	Constrains a Vector3 into a cone.
+
 	@param direction Vector3 -- The vector direction to constrain
 	@param coneDirection Vector3 -- The direction of the cone.
 	@param coneAngleRad -- Angle of the cone
@@ -112,6 +118,22 @@ end
 ]=]
 function Vector3Utils.round(vector3: Vector3, amount: number): number
 	return Vector3.new(Math.round(vector3.x, amount), Math.round(vector3.y, amount), Math.round(vector3.z, amount))
+end
+
+--[=[
+	Checks if 2 Vector3 values are clsoe to each other
+
+	@param a Vector3
+	@param b Vector3
+	@param epsilon number
+	@return boolean
+]=]
+function Vector3Utils.areClose(a, b, epsilon)
+	assert(type(epsilon) == "number", "Bad epsilon")
+
+	return math.abs(a.x - b.x) <= epsilon
+		and math.abs(a.y - b.y) <= epsilon
+		and math.abs(a.z - b.z) <= epsilon
 end
 
 return Vector3Utils

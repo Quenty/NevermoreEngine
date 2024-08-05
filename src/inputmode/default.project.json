@@ -1,5 +1,6 @@
 {
   "name": "inputmode",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

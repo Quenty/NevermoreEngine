@@ -23,10 +23,10 @@ AnimationGroup.__index = AnimationGroup
 function AnimationGroup.new(weightedTracks)
 	local self = setmetatable(BaseObject.new(), AnimationGroup)
 
-	self._weightedTracks = weightedTracks or error("No tracksWithWeight")
-	for _, animation in pairs(self._weightedTracks) do
-		assert(animation.track, "Bad animation.track")
-		assert(animation.weight, "Bad animation.weight")
+	self._weightedTracks = {}
+
+	if weightedTracks then
+		self:SetWeightedTracks(weightedTracks)
 	end
 
 	self._maid:GiveTask(function()
@@ -41,17 +41,41 @@ end
 	@param transitionTime number
 ]=]
 function AnimationGroup:Play(transitionTime)
+	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
+
 	if self._currentTrack and self._currentTrack.IsPlaying then
 		return
 	end
 
 	self:_playNewTrack(transitionTime)
 end
+
+--[=[
+	@param weightedTracks { WeightedTrack }
+	@param transitionTime number | nil
+]=]
+function AnimationGroup:SetWeightedTracks(weightedTracks, transitionTime)
+	assert(type(weightedTracks) == "table", "Bad weightedTracks")
+	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
+
+	for _, animation in pairs(weightedTracks) do
+		assert(animation.track, "Bad animation.track")
+		assert(animation.weight, "Bad animation.weight")
+	end
+
+	self._weightedTracks = weightedTracks
+
+	self:Stop(transitionTime)
+	self:Play(transitionTime)
+end
+
 --[=[
 	Stops the animations
 	@param transitionTime number
 ]=]
 function AnimationGroup:Stop(transitionTime)
+	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
+
 	if self._currentTrack then
 		self._currentTrack:Stop(transitionTime)
 		self._currentTrack = nil
@@ -59,7 +83,13 @@ function AnimationGroup:Stop(transitionTime)
 end
 
 function AnimationGroup:_playNewTrack(transitionTime)
+	assert(type(transitionTime) == "number" or transitionTime == nil, "Bad transitionTime")
+
 	local trackData = AnimationGroupUtils.selectFromWeightedTracks(self._weightedTracks)
+	if not trackData then
+		return
+	end
+
 	local track = trackData.track or error("No track")
 
 	if self._currentTrack == track and self._currentTrack.IsPlaying then

@@ -317,8 +317,7 @@ function AdorneeConditionUtils._mapToAnd(observeValueWhenEmpty)
 		return Observable.new(function(sub)
 			local topMaid = Maid.new()
 
-			local isDisabled = StateStack.new(false)
-			topMaid:GiveTask(isDisabled)
+			local isDisabled = topMaid:Add(StateStack.new(false, "boolean"))
 
 			local activeSourceCount = Instance.new("IntValue")
 			activeSourceCount.Value = 0
@@ -391,8 +390,7 @@ function AdorneeConditionUtils._mapToOr(observeValueWhenEmpty)
 		return Observable.new(function(sub)
 			local topMaid = Maid.new()
 
-			local isEnabled = StateStack.new(false)
-			topMaid:GiveTask(isEnabled)
+			local isEnabled = topMaid:Add(StateStack.new(false, "boolean"))
 
 			local activeSourceCount = Instance.new("IntValue")
 			activeSourceCount.Value = 0

@@ -2,12 +2,12 @@
 	@class QFrame.story
 ]]
 
-local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).load(script)
+local require = require(game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent).bootstrapStory(script)
 
-local Maid = require("Maid")
-local QFrame = require("QFrame")
 local CameraStoryUtils = require("CameraStoryUtils")
 local CubicSplineUtils = require("CubicSplineUtils")
+local Maid = require("Maid")
+local QFrame = require("QFrame")
 
 return function(target)
 	local maid = Maid.new()
@@ -18,7 +18,6 @@ return function(target)
 	local a = QFrame.fromCFrameClosestTo(
 		CFrame.new(cameraCFrame.Position + cameraCFrame.lookVector*25 - 20*cameraCFrame.RightVector),
 		QFrame.new())
-
 
 	local setup = CameraStoryUtils.getInterpolationFactory(maid, viewportFrame, -1, 2, 8, function(qFrame)
 		return QFrame.toCFrame(qFrame)

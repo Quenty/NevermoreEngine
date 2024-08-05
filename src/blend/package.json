@@ -1,6 +1,6 @@
 {
   "name": "@quenty/blend",
-  "version": "7.1.1",
+  "version": "12.3.0",
   "description": "Declarative UI system.",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
   "dependencies": {
     "@quenty/acceltween": "file:../acceltween",
     "@quenty/brio": "file:../brio",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/instanceutils": "file:../instanceutils",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",

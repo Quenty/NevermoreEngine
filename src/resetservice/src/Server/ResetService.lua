@@ -6,9 +6,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local GetRemoteEvent = require("GetRemoteEvent")
-local ResetServiceConstants = require("ResetServiceConstants")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Remoting = require("Remoting")
 local Maid = require("Maid")
+local StateStack = require("StateStack")
+local PlayerUtils = require("PlayerUtils")
+local Promise = require("Promise")
 
 local ResetService = {}
 ResetService.ServiceName = "ResetService"
@@ -18,21 +22,44 @@ ResetService.ServiceName = "ResetService"
 ]=]
 function ResetService:Init()
 	assert(not self._remoteEvent, "Already initialized")
-
 	self._maid = Maid.new()
 
-	self._remoteEvent = GetRemoteEvent(ResetServiceConstants.REMOTE_EVENT_NAME)
-	self._maid:GiveTask(self._remoteEvent.OnServerEvent:Connect(function(player)
-		self:_resetCharacterYielding(player)
+	self._remoting = self._maid:Add(Remoting.new(ReplicatedStorage, "ResetService"))
+
+	self._maid:GiveTask(self._remoting.ResetCharacter:Bind(function(player)
+		return self:PromiseResetCharacter(player)
 	end))
+
+	self._resetProviderStack = self._maid:Add(StateStack.new(function(player)
+		return PlayerUtils.promiseLoadCharacter(player)
+	end, "function"))
 end
 
-function ResetService:_resetCharacterYielding(player)
+--[=[
+	Pushes a reset provider onto the reset service
+
+	@param promiseReset function -- Reset provider
+	@return MaidTask
+]=]
+function ResetService:PushResetProvider(promiseReset)
+	assert(type(promiseReset) == "function", "Bad promiseReset")
+
+	return self._resetProviderStack:PushState(promiseReset)
+end
+
+function ResetService:PromiseResetCharacter(player)
+	assert(typeof(player) == "Instance", "Bad player")
+
 	if not player:IsDescendantOf(game) then
-		return
+		return Promise.rejected("Player is not descendant of game")
 	end
 
-	player:LoadCharacter()
+	local provider = self._resetProviderStack:GetState()
+	if not provider then
+		return Promise.rejected("No reset provider")
+	end
+
+	return provider(player)
 end
 
 function ResetService:Destroy()

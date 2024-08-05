@@ -25,6 +25,7 @@ local Rx = require("Rx")
 local Signal = require("Signal")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 -- Higher numbers last
 local function defaultCompare(a, b)
@@ -133,12 +134,12 @@ end
 	@return boolean
 ]=]
 function ObservableSortedList.isObservableSortedList(value)
-	return type(value) == "table" and getmetatable(value) == ObservableSortedList
+	return DuckTypeUtils.isImplementation(ObservableSortedList, value)
 end
 
 --[=[
 	Observes all items in the list
-	@return Observable<Brio<T>>
+	@return Observable<Brio<T, Symbol>>
 ]=]
 function ObservableSortedList:ObserveItemsBrio()
 	return Observable.new(function(sub)
@@ -631,7 +632,9 @@ function ObservableSortedList:_highBinarySearch(sortValue)
 	while true do
 		local mid = math.floor((minIndex + maxIndex) / 2)
 		local compareValue = self._compare(self._sortValue[self._keyList[mid]], sortValue)
-		assert(type(compareValue) == "number", "Expecting number")
+		if type(compareValue) ~= "number" then
+			error(string.format("Bad compareValue, expected number, got %q", type(compareValue)))
+		end
 
 		if self._isReversed then
 			compareValue = -compareValue

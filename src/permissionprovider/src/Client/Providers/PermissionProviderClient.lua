@@ -32,10 +32,15 @@ end
 	@return Promise<boolean>
 ]=]
 function PermissionProviderClient:PromiseIsAdmin(player)
-	player = player or Players.LocalPlayer
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 
-	assert(player == Players.LocalPlayer, "We only support local player for now")
+	if player ~= nil then
+		assert(player == Players.LocalPlayer, "We only support local player for now")
+	end
+
+	if player == nil then
+		player = Players.LocalPlayer
+	end
 
 	if self._cachedAdminPromise then
 		return self._cachedAdminPromise

@@ -10,12 +10,17 @@ local PerformanceUtils = {}
 
 local timeStack = {}
 local counters = {}
+local objectStacks = {}
 
 function PerformanceUtils.profileTimeBegin(label)
 	table.insert(timeStack, {
 		label = label;
 		startTime = os.clock()
 	})
+
+	return function()
+		PerformanceUtils.profileTimeEnd()
+	end
 end
 
 function PerformanceUtils.profileTimeEnd()
@@ -26,7 +31,12 @@ function PerformanceUtils.profileTimeEnd()
 end
 
 function PerformanceUtils.incrementCounter(label, amount)
+	amount = amount or 1
 	PerformanceUtils.getOrCreateCounter(label).total += amount
+
+	return function()
+		PerformanceUtils.getOrCreateCounter(label).total -= amount
+	end
 end
 
 function PerformanceUtils.readCounter(label)
@@ -91,6 +101,86 @@ end
 function PerformanceUtils.countObject(label, object)
 	PerformanceUtils.countCalls(label .. "_new", object, "new")
 	PerformanceUtils.countCalls(label .. "_destroy", object, "Destroy")
+end
+
+function PerformanceUtils.trackObjectConstruction(object)
+	local originalNew = object["new"]
+	object["new"] = function(...)
+		local self = originalNew(...)
+
+		-- HACK for observables
+		local trace = debug.traceback()
+
+		local stacks = objectStacks[object]
+		if not stacks then
+			stacks = {}
+			objectStacks[object] = stacks
+		end
+
+		stacks[trace] = (stacks[trace] or 0) + 1
+		rawset(self, "_performanceStackTrace", trace)
+
+		return self
+	end
+
+	local originalDestroy = object["Destroy"]
+	object["Destroy"] = function(self, ...)
+		local trace = rawget(self, "_performanceStackTrace")
+		if trace then
+			local stacks = objectStacks[object]
+			if not stacks then
+				stacks = {}
+				objectStacks[object] = stacks
+			end
+
+			stacks[trace] = (stacks[trace] or 0) - 1
+			if stacks[trace] <= 0 then
+				stacks[trace] = nil
+			end
+		end
+
+		return originalDestroy(self, ...)
+	end
+
+	local lastObjectStackTraceMap = {}
+
+	return function()
+		local objectStackTraceMap = objectStacks[object]
+		if not objectStackTraceMap then
+			return
+		end
+
+		local leakedStackTraaces = {}
+
+		-- Limit what we print
+		for stackTrace, _ in pairs(objectStackTraceMap) do
+			table.insert(leakedStackTraaces, stackTrace)
+			-- if count > 15 then
+			-- 	if delta > 0 then
+			-- 	end
+			-- end
+			--
+		end
+
+		table.sort(leakedStackTraaces, function(a, b)
+			return objectStackTraceMap[a] > objectStackTraceMap[b]
+		end)
+		local toShow = math.clamp(#leakedStackTraaces, 0, 5)
+
+		for i=1, toShow do
+			local stackTrace = leakedStackTraaces[i]
+			local count = objectStackTraceMap[stackTrace]
+			local lastCount = lastObjectStackTraceMap[stackTrace] or 0
+			local delta = count - lastCount
+
+			if delta > 0 then
+				print(string.format("Added %d to total of %d", delta, count))
+				print(stackTrace)
+			end
+		end
+
+		lastObjectStackTraceMap = table.clone(objectStackTraceMap)
+	end
 end
 
 function PerformanceUtils.printAll()

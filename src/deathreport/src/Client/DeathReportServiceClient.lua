@@ -136,8 +136,8 @@ end
 function DeathReportServiceClient:_handleClientEvent(deathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathreport")
 
-	if typeof(deathReport.humanoid) ~= "Instance" then
-		warn("[DeathReportServiceClient] - Failed to get humanoid of deathReport")
+	if typeof(deathReport.adornee) ~= "Instance" then
+		warn("[DeathReportServiceClient] - Failed to get adornee of deathReport. Probably not streamed in.")
 		return
 	end
 

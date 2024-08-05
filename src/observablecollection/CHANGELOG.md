@@ -3,6 +3,186 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.3.0...@quenty/observablecollection@12.3.1) (2024-07-16)
+
+
+### Bug Fixes
+
+* Using integer keys in w/ Observe methods in ObservableMap ([#470](https://github.com/Quenty/NevermoreEngine/issues/470)) ([59cf850](https://github.com/Quenty/NevermoreEngine/commit/59cf8508f4afe060bea7b07d70cb9e312dffe996))
+
+
+
+
+
+# [12.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.2.0...@quenty/observablecollection@12.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [12.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.1.1...@quenty/observablecollection@12.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+## [12.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.1.0...@quenty/observablecollection@12.1.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [12.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.0.0...@quenty/observablecollection@12.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@11.0.0...@quenty/observablecollection@12.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@10.0.0...@quenty/observablecollection@11.0.0) (2024-02-14)
+
+
+### Bug Fixes
+
+* Fix sorting errors ([43ac468](https://github.com/Quenty/NevermoreEngine/commit/43ac468dd49147011c04e9d61e08573fb543423c))
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@9.0.0...@quenty/observablecollection@10.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@8.0.0...@quenty/observablecollection@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@7.0.0...@quenty/observablecollection@8.0.0) (2024-02-13)
+
+
+### Features
+
+* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
+
+
+### BREAKING CHANGES
+
+* Standard loader
+
+Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
+
+This means you'll need to change you how require client-side modules, as we export a simple `loader` module instead of all modules available.
+
+Signed-off-by: James Onnen <jonnen0@gmail.com>
+
+* fix: Fix missing dependency in ResetService
+
+* feat: Add RxPhysicsUtils.observePartMass
+
+* fix: Fix package discovery for games
+
+* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+
+* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+
+* ci: Upgrade to new rojo 7.4.0
+
+* fix: Update loader to handle hoarcekat properly
+
+* docs: Fix spacing in Maid
+
+* fix: Add new ragdoll constants
+
+* fix: Compress influxDB sends
+
+* style: Errors use string.format
+
+* fix: Handle motor animations
+
+* ci: Upgrade rojo version
+
+* feat!: Maid no longer is includd in ValueObject.Changed event
+
+* docs: Fix docs
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.5.0...@quenty/observablecollection@7.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [6.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.4.0...@quenty/observablecollection@6.5.0) (2024-01-08)
+
+
+### Features
+
+* Add ObservableSet:GetRawSet() ([7a31f7e](https://github.com/Quenty/NevermoreEngine/commit/7a31f7ed8ab04c69d1098945f58d580cebdd29fb))
+
+
+
+
+
+# [6.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.3.0...@quenty/observablecollection@6.4.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+
+
+
+
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.2.1...@quenty/observablecollection@6.3.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* Fix removing from lists in ObservableMapList ([14278f0](https://github.com/Quenty/NevermoreEngine/commit/14278f0136b944ad679fa5b29e1e94a560bef8ac))
+
+
+### Features
+
+* Add :ObserveKeyList() to ObservableMap and equivalents ([8f1cb4b](https://github.com/Quenty/NevermoreEngine/commit/8f1cb4b705c98fed0e96c9889c4aa62f635751ce))
+
+
+
+
+
 ## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@6.2.0...@quenty/observablecollection@6.2.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/observablecollection

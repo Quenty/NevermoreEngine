@@ -1,4 +1,5 @@
 --[=[
+	@client
 	@class AnimatedHighlightGroup
 ]=]
 
@@ -18,9 +19,7 @@ AnimatedHighlightGroup.__index = AnimatedHighlightGroup
 function AnimatedHighlightGroup.new()
 	local self = setmetatable(BaseObject.new(), AnimatedHighlightGroup)
 
-	self._defaultValues = AnimatedHighlightModel.new()
-	self._maid:GiveTask(self._defaultValues)
-
+	self._defaultValues = self._maid:Add(AnimatedHighlightModel.new())
 	self._defaultValues:SetHighlightDepthMode(Enum.HighlightDepthMode.AlwaysOnTop)
 	self._defaultValues:SetFillColor(Color3.new(1, 1, 1))
 	self._defaultValues:SetOutlineColor(Color3.new(1, 1, 1))

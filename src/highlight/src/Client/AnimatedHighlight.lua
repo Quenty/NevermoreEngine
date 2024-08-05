@@ -1,4 +1,5 @@
 --[=[
+	@client
 	@class AnimatedHighlight
 ]=]
 
@@ -12,6 +13,7 @@ local ValueObject = require("ValueObject")
 local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local Signal = require("Signal")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 local AnimatedHighlight = setmetatable({}, BasicPane)
 AnimatedHighlight.ClassName = "AnimatedHighlight"
@@ -20,26 +22,13 @@ AnimatedHighlight.__index = AnimatedHighlight
 function AnimatedHighlight.new()
 	local self = setmetatable(BasicPane.new(), AnimatedHighlight)
 
-	self._adornee = ValueObject.new(nil)
-	self._maid:GiveTask(self._adornee)
-
-	self._highlightDepthMode = ValueObject.new(Enum.HighlightDepthMode.AlwaysOnTop)
-	self._maid:GiveTask(self._highlightDepthMode)
-
-	self._fillColorSpring = SpringObject.new(Color3.new(1, 1, 1), 40)
-	self._maid:GiveTask(self._fillColorSpring)
-
-	self._outlineColorSpring = SpringObject.new(Color3.new(1, 1, 1), 40)
-	self._maid:GiveTask(self._outlineColorSpring)
-
-	self._fillTransparencySpring = SpringObject.new(0.5, 40)
-	self._maid:GiveTask(self._fillTransparencySpring)
-
-	self._outlineTransparencySpring = SpringObject.new(0, 40)
-	self._maid:GiveTask(self._outlineTransparencySpring)
-
-	self._percentVisible = SpringObject.new(0, 20)
-	self._maid:GiveTask(self._percentVisible)
+	self._adornee = self._maid:Add(ValueObject.new(nil))
+	self._highlightDepthMode = self._maid:Add(ValueObject.new(Enum.HighlightDepthMode.AlwaysOnTop))
+	self._fillColorSpring = self._maid:Add(SpringObject.new(Color3.new(1, 1, 1), 40))
+	self._outlineColorSpring = self._maid:Add(SpringObject.new(Color3.new(1, 1, 1), 40))
+	self._fillTransparencySpring = self._maid:Add(SpringObject.new(0.5, 40))
+	self._outlineTransparencySpring = self._maid:Add(SpringObject.new(0, 40))
+	self._percentVisible = self._maid:Add(SpringObject.new(0, 20))
 
 	self._maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
 		self._percentVisible.t = isVisible and 1 or 0
@@ -63,8 +52,7 @@ function AnimatedHighlight.new()
 end
 
 function AnimatedHighlight.isAnimatedHighlight(value)
-	return type(value) == "table" and
-		getmetatable(value) == AnimatedHighlight
+	return DuckTypeUtils.isImplementation(AnimatedHighlight, value)
 end
 
 --[=[

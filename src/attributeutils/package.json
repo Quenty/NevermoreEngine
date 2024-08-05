@@ -1,6 +1,6 @@
 {
   "name": "@quenty/attributeutils",
-  "version": "9.1.1",
+  "version": "14.3.0",
   "description": "Provides utility functions to work with attributes in Roblox",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
     "@quenty/maid": "file:../maid",
     "@quenty/promise": "file:../promise",
     "@quenty/rx": "file:../rx",
+    "@quenty/rxsignal": "file:../rxsignal",
     "@quenty/symbol": "file:../symbol"
   },
   "publishConfig": {

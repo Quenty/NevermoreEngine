@@ -1,0 +1,11 @@
+{
+  "name": "CountdownTextTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "countdowntext": {
+        "$path": ".."
+      }
+    }
+  }
+}

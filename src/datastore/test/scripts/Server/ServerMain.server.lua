@@ -6,19 +6,19 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local HttpService = game:GetService("HttpService")
 
 local loader = ServerScriptService:FindFirstChild("LoaderUtils", true).Parent
-local packages = require(loader).bootstrapGame(ServerScriptService.datastore)
+local require = require(loader).bootstrapGame(ServerScriptService.datastore)
 
-local Maid = require(packages.Maid)
-local Promise = require(packages.Promise)
+local Maid = require("Maid")
+local Promise = require("Promise")
 
 local TURN_TIME = 8
 
 local function spinUpGameCopy(prefix)
 	assert(type(prefix) == "string", "Bad prefix")
 
-	local serviceBag = require(packages.ServiceBag).new()
-	serviceBag:GetService(require(packages.GameDataStoreService))
-	serviceBag:GetService(require(packages.PlayerDataStoreService))
+	local serviceBag = require("ServiceBag").new()
+	serviceBag:GetService(require("GameDataStoreService"))
+	serviceBag:GetService(require("PlayerDataStoreService"))
 
 	serviceBag:Init()
 	serviceBag:Start()
@@ -26,8 +26,8 @@ local function spinUpGameCopy(prefix)
 	local guid = prefix .. " " .. HttpService:GenerateGUID(false)
 	local maid = Maid.new()
 
-	local gameDataStore = serviceBag:GetService(require(packages.GameDataStoreService))
-	local bindToCloseService = serviceBag:GetService(require(packages.BindToCloseService))
+	local gameDataStore = serviceBag:GetService(require("GameDataStoreService"))
+	local bindToCloseService = serviceBag:GetService(require("BindToCloseService"))
 
 	-- This would be an aggressive usage of this area, it probably won't scale well enough.
 	-- But writing some shared code or something like API keys should scale fine.

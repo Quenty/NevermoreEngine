@@ -136,7 +136,7 @@ function Maid:__newindex(index, newTask)
 end
 
 --[=[
-	Gives a task to the maid for cleanup and returnsthe resulting value
+	Gives a task to the maid for cleanup and returns the resulting value
 
 	@param task MaidTask -- An item to clean
 	@return MaidTask

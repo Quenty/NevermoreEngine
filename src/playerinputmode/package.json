@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerinputmode",
-  "version": "4.2.1",
+  "version": "9.5.0",
   "description": "Service that takes active input modes from the player and exposes it to every other player via the server.",
   "keywords": [
     "Roblox",
@@ -27,9 +27,11 @@
   ],
   "dependencies": {
     "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/brio": "file:../brio",
     "@quenty/inputmode": "file:../inputmode",
     "@quenty/loader": "file:../loader",
     "@quenty/maid": "file:../maid",
+    "@quenty/playerutils": "file:../playerutils",
     "@quenty/promise": "file:../promise",
     "@quenty/remoting": "file:../remoting",
     "@quenty/rx": "file:../rx",

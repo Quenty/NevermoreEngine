@@ -63,16 +63,24 @@ function PathfindingUtils.visualizePath(path)
 	parent.Name = "PathVisualization"
 	maid:GiveTask(parent)
 
+	local lastWaypoint
+
 	for index, waypoint in pairs(path:GetWaypoints()) do
+
 		if waypoint.Action == Enum.PathWaypointAction.Walk then
-			local point = Draw.point(waypoint.Position, Color3.new(0.5, 1, 0.5), parent)
-			point.Name = ("%03d_WalkPoint"):format(index)
-			maid:GiveTask(point)
+			local point = maid:Add(Draw.point(waypoint.Position, Color3.new(0.5, 1, 0.5), parent))
+			point.Name = string.format("%03d_WalkPoint", index)
 		elseif waypoint.Action == Enum.PathWaypointAction.Jump then
-			local point = Draw.point(waypoint.Position, Color3.new(0.5, 0.5, 1), parent)
-			point.Name = ("%03d_JumpPoint"):format(index)
-			maid:GiveTask(point)
+			local point = maid:Add(Draw.point(waypoint.Position, Color3.new(0.5, 0.5, 1), parent))
+			point.Name = string.format("%03d_JumpPoint", index)
 		end
+
+		if lastWaypoint then
+			local line = maid:Add(Draw.line(waypoint.Position, lastWaypoint.Position))
+			line.Name = string.format("%03d_Line", index)
+			line.Parent = parent
+		end
+		lastWaypoint = waypoint
 	end
 
 	parent.Parent = Draw.getDefaultParent()

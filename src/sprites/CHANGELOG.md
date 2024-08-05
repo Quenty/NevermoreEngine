@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.2.0...@quenty/sprites@13.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Bootstrap specifically to loader ([7f4d4f9](https://github.com/Quenty/NevermoreEngine/commit/7f4d4f9cd4a6602af8daaf04983bb349dafc7e95))
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [13.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.1.0...@quenty/sprites@13.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [13.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@13.0.0...@quenty/sprites@13.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@12.0.0...@quenty/sprites@13.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@11.0.0...@quenty/sprites@12.0.0) (2024-02-14)
+
+
+### Bug Fixes
+
+* Fix search to use plain query ([bf8e4c3](https://github.com/Quenty/NevermoreEngine/commit/bf8e4c3cbff3de4e4c7ffbfc768c1f7ae2ff9e42))
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@10.0.0...@quenty/sprites@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@9.3.0...@quenty/sprites@10.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@9.2.0...@quenty/sprites@9.3.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@9.1.0...@quenty/sprites@9.2.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/sprites
+
+
+
+
+
 # [9.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sprites@9.0.0...@quenty/sprites@9.1.0) (2023-10-11)
 
 

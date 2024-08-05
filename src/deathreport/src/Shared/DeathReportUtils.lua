@@ -21,12 +21,28 @@ local DeathReportUtils = {}
 function DeathReportUtils.fromDeceasedHumanoid(humanoid, weaponData)
 	assert(DeathReportUtils.isWeaponData(weaponData) or weaponData == nil, "Bad weaponData")
 
+	local killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid)
+	return DeathReportUtils.create(humanoid.Parent, killerHumanoid, weaponData)
+end
+
+function DeathReportUtils.create(adornee, killerAdornee, weaponData)
+	assert(typeof(adornee) == "Instance", "Bad adornee")
+
+	local humanoid
+	if adornee:IsA("Humanoid") then
+		humanoid = adornee
+	else
+		humanoid = adornee:FindFirstChildWhichIsA("Humanoid")
+	end
+
 	return {
-		adornee = humanoid.Parent;
+		type = "deathReport";
+		adornee = adornee;
 		humanoid = humanoid;
-		player = CharacterUtils.getPlayerFromCharacter(humanoid);
-		killerHumanoid = HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid);
-		killerPlayer = HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid);
+		player = CharacterUtils.getPlayerFromCharacter(adornee);
+		killerAdornee = killerAdornee;
+		killerHumanoid = killerAdornee and killerAdornee:IsA("Humanoid") and killerAdornee or nil;
+		killerPlayer = killerAdornee and CharacterUtils.getPlayerFromCharacter(killerAdornee) or nil;
 		weaponData = weaponData or DeathReportUtils.createWeaponData(nil);
 	}
 end
@@ -39,7 +55,7 @@ end
 ]=]
 function DeathReportUtils.isDeathReport(deathReport)
 	return type(deathReport) == "table"
-		and typeof(deathReport.humanoid) == "Instance"
+		and deathReport.type == "deathReport"
 end
 
 --[=[
@@ -83,8 +99,10 @@ function DeathReportUtils.getDeadDisplayName(deathReport)
 			warn("DeathReport.humanoid without character")
 			return "Unknown entity"
 		end
+	elseif deathReport.adornee then
+		return nil
 	else
-		error("DeathReport without a humanoid")
+		error("DeathReport without an adornee")
 	end
 end
 

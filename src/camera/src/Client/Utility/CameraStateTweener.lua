@@ -12,6 +12,7 @@ local CameraStackService = require("CameraStackService")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
 local ServiceBag = require("ServiceBag")
 local BaseObject = require("BaseObject")
+local CameraStack = require("CameraStack")
 
 local CameraStateTweener = setmetatable({}, BaseObject)
 CameraStateTweener.ClassName = "CameraStateTweener"
@@ -20,33 +21,41 @@ CameraStateTweener.__index = CameraStateTweener
 --[=[
 	Constructs a new camera state tweener
 
-	@param serviceBag ServiceBag -- Service bag to find the CameraStackService in
+	@param serviceBagOrCameraStack ServiceBag | CameraStack -- Service bag to find the CameraStackService in
 	@param cameraEffect CameraLike -- A camera effect
 	@param speed number? -- Speed that the camera tweener tweens at. Defaults to 20
 	@return CameraStateTweener
 ]=]
-function CameraStateTweener.new(serviceBag, cameraEffect, speed)
+function CameraStateTweener.new(serviceBagOrCameraStack, cameraEffect, speed)
 	local self = setmetatable(BaseObject.new(), CameraStateTweener)
 
-	assert(ServiceBag.isServiceBag(serviceBag), "No serviceBag")
 	assert(cameraEffect, "No cameraEffect")
 
-	self._cameraStackService = serviceBag:GetService(CameraStackService)
-	local cameraBelow, assign = self._cameraStackService:GetNewStateBelow()
+	if ServiceBag.isServiceBag(serviceBagOrCameraStack) then
+		self._cameraStack = serviceBagOrCameraStack:GetService(CameraStackService):GetCameraStack()
+	elseif CameraStack.isCameraStack(serviceBagOrCameraStack) then
+		self._cameraStack = serviceBagOrCameraStack
+	else
+		error("Bad serviceBagOrCameraStack")
+	end
+
+	assert(self._cameraStack, "No CameraStack")
+
+	local cameraBelow, assign = self._cameraStack:GetNewStateBelow()
 
 	self._cameraEffect = cameraEffect
 	self._cameraBelow = cameraBelow
 	self._fadeBetween = FadeBetweenCamera3.new(cameraBelow, cameraEffect)
 	assign(self._fadeBetween)
 
-	self._cameraStackService:Add(self._fadeBetween)
+	self._cameraStack:Add(self._fadeBetween)
 
 	self._fadeBetween.Speed = speed or 20
 	self._fadeBetween.Target = 0
 	self._fadeBetween.Value = 0
 
 	self._maid:GiveTask(function()
-		self._cameraStackService:Remove(self._fadeBetween)
+		self._cameraStack:Remove(self._fadeBetween)
 	end)
 
 	return self

@@ -3,6 +3,87 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.2.1...@quenty/randomutils@6.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+## [6.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.2.0...@quenty/randomutils@6.2.1) (2024-04-28)
+
+
+### Bug Fixes
+
+* RandomUtils.weightedChoice when chances array starts with 0(s) ([cd4a616](https://github.com/Quenty/NevermoreEngine/commit/cd4a61663ece9f731f1c6184ae0107124f1120dd))
+
+
+
+
+
+# [6.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.1.0...@quenty/randomutils@6.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
+# [6.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.0.0...@quenty/randomutils@6.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@5.0.0...@quenty/randomutils@6.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@4.0.0...@quenty/randomutils@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@3.2.0...@quenty/randomutils@4.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@3.1.0...@quenty/randomutils@3.2.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/randomutils
+
+
+
+
+
+# [3.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@3.0.0...@quenty/randomutils@3.1.0) (2023-12-14)
+
+
+### Features
+
+* Cache random choice calculations to be speedy ([c32f301](https://github.com/Quenty/NevermoreEngine/commit/c32f30184d11e1ce04e3e9fa2cbd21861c54a09b))
+
+
+
+
+
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@2.3.0...@quenty/randomutils@3.0.0) (2023-10-11)
 
 

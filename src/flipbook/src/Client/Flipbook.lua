@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Sprite = require("Sprite")
+local DuckTypeUtils = require("DuckTypeUtils")
 
 --[=[
 	@interface FlipbookData
@@ -62,7 +63,7 @@ function Flipbook.new(data)
 end
 
 function Flipbook.isFlipbook(value)
-	return type(value) == "table" and getmetatable(value) == Flipbook
+	return DuckTypeUtils.isImplementation(Flipbook, value)
 end
 
 function Flipbook:_loadFrames(image, columns, imageRectSize)

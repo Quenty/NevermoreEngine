@@ -12,6 +12,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Signal = require("Signal")
+local ValueObject = require("ValueObject")
 
 local PlayerAssetMarketTracker = setmetatable({}, BaseObject)
 PlayerAssetMarketTracker.ClassName = "PlayerAssetMarketTracker"
@@ -38,21 +39,23 @@ function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
 	self._purchasedThisSession = {} -- [number] = true
 	self._receiptProcessingExpected = false
 
-	self._promptsOpen = Instance.new("IntValue")
-	self._promptsOpen.Value = 0
-	self._maid:GiveTask(self._promptsOpen)
-
-	self.Purchased = Signal.new() -- :Fire(id)
-	self._maid:GiveTask(self.Purchased)
-
-	self.PromptFinished = Signal.new() -- :Fire(id, isPurchased)
-	self._maid:GiveTask(self.PromptFinished)
-
-	self.ShowPromptRequested = Signal.new() -- :Fire(id)
-	self._maid:GiveTask(self.ShowPromptRequested)
+	self._promptsOpenCount = self._maid:Add(ValueObject.new(0, "number"))
+	self.Purchased = self._maid:Add(Signal.new()) -- :Fire(id)
+	self.PromptFinished = self._maid:Add(Signal.new()) -- :Fire(id, isPurchased)
+	self.ShowPromptRequested = self._maid:Add(Signal.new()) -- :Fire(id)
 
 	self._maid:GiveTask(self.Purchased:Connect(function(id)
 		self._purchasedThisSession[id] = true
+	end))
+
+	self._maid:GiveTask(self._promptsOpenCount:Observe():Subscribe(function(promptsOpen)
+		if promptsOpen <= 0 then
+			local promise = self._promiseNoPromptOpen
+			self._promiseNoPromptOpen = nil
+			if promise then
+				promise:Resolve()
+			end
+		end
 	end))
 
 	self._maid:GiveTask(function()
@@ -68,6 +71,10 @@ function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
 	end)
 
 	return self
+end
+
+function PlayerAssetMarketTracker:ObservePromptOpenCount()
+	return self._promptsOpenCount:Observe()
 end
 
 --[=[
@@ -142,7 +149,7 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 			end
 
 			-- We reject here because there's no safe way to queue this
-			if self._promptsOpen.Value > 0 then
+			if self._promptsOpenCount.Value > 0 then
 				return Promise.rejected(string.format("[PlayerAssetMarketTracker] - Either already prompting user, or prompting is on cooldown. Will not prompt for %s", idOrKey))
 			end
 
@@ -161,12 +168,12 @@ function PlayerAssetMarketTracker:PromisePromptPurchase(idOrKey)
 				local promptOpenPromise = Promise.new()
 				self._pendingPromptOpenPromises[id] = promptOpenPromise
 
-				self._promptsOpen.Value = self._promptsOpen.Value + 1
+				self._promptsOpenCount.Value = self._promptsOpenCount.Value + 1
 				promptOpenPromise:Finally(function()
 					if self._pendingPromptOpenPromises[id] == promptOpenPromise then
 						self._pendingPromptOpenPromises[id] = nil
 					end
-					self._promptsOpen.Value = self._promptsOpen.Value - 1
+					self._promptsOpenCount.Value = self._promptsOpenCount.Value - 1
 				end)
 			end
 
@@ -225,7 +232,7 @@ end
 	@return boolean
 ]=]
 function PlayerAssetMarketTracker:IsPromptOpen()
-	return self._promptsOpen.Value > 0
+	return self._promptsOpenCount.Value > 0
 end
 
 --[=[

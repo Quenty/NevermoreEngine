@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local TieRealms = require("TieRealms")
 
 local TieImplementation = setmetatable({}, BaseObject)
 TieImplementation.ClassName = "TieImplementation"
@@ -21,10 +22,8 @@ function TieImplementation.new(tieDefinition, adornee, implementer)
 	self._adornee = assert(adornee, "No adornee")
 	self._actualSelf = implementer or {}
 
-	self._folder = Instance.new("Folder")
-	self._folder.Name = self._definition:GetContainerName()
+	self._folder = self._maid:Add(Instance.new("Folder"))
 	self._folder.Archivable = false
-	self._maid:GiveTask(self._folder)
 
 	self._memberImplementations = {}
 	self._memberMap = self._definition:GetMemberMap()
@@ -56,8 +55,13 @@ function TieImplementation:__index(index)
 	end
 
 	local memberMap = rawget(self, "_memberMap")
-	if memberMap[index] then
-		return memberMap[index]:GetInterface(self._folder, self)
+	local memberDefinition = memberMap[index]
+	if memberDefinition then
+		if memberDefinition:IsAllowed() then
+			return memberDefinition:GetInterface(self._folder, self)
+		else
+			error(string.format("%q is not a valid member", tostring(index)))
+		end
 	else
 		error(string.format("Bad index %q for TieImplementation", tostring(index)))
 	end
@@ -75,29 +79,50 @@ function TieImplementation:__newindex(index, value)
 	elseif self._memberImplementations[index] then
 		self._memberImplementations[index]:SetImplementation(value, self._actualSelf)
 	elseif TieImplementation[index] then
-		error(("Cannot set %q in TieImplementation"):format(tostring(index)))
+		error(string.format("Cannot set %q in TieImplementation", tostring(index)))
 	else
-		error(("Bad index %q for TieImplementation"):format(tostring(index)))
+		error(string.format("Bad index %q for TieImplementation", tostring(index)))
 	end
 end
 
 function TieImplementation:_buildMemberImplementations(implementer)
-	for _, memberDefinition in pairs(self._definition:GetMemberMap()) do
+	local allClientImplemented = true
+
+	for _, memberDefinition in pairs(self._memberMap) do
+		if not memberDefinition:IsAllowed() then
+			if memberDefinition:GetTieRealm() == TieRealms.CLIENT then
+				allClientImplemented = false
+			end
+			continue
+		end
+
 		local initialValue
 		if implementer then
 			local memberName = memberDefinition:GetMemberName()
 			initialValue = implementer[memberName]
 			if not initialValue then
-				error(("Missing member %q on %q"):format(memberName, self._adornee:GetFullName()))
+				if memberDefinition:IsRequired() then
+					error(string.format("Missing member %q on %q", memberName, self._adornee:GetFullName()))
+				else
+					if memberDefinition:GetTieRealm() == TieRealms.CLIENT then
+						allClientImplemented = false
+					end
+					continue
+				end
 			end
 		else
 			initialValue = nil
 		end
 
-		local memberImplementation = memberDefinition:Implement(self._folder, initialValue, self._actualSelf)
-		self._maid:GiveTask(memberImplementation)
-
+		local memberImplementation = self._maid:Add(memberDefinition:Implement(self._folder, initialValue, self._actualSelf))
 		self._memberImplementations[memberDefinition:GetMemberName()] = memberImplementation
+	end
+
+	-- Hack to make server objects look like server
+	if allClientImplemented then
+		self._folder.Name = self._definition:GetContainerName()
+	else
+		self._folder.Name = self._definition:GetContainerNameForServer()
 	end
 end
 

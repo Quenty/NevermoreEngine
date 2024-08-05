@@ -3,6 +3,210 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.6.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.6.1...@quenty/inputkeymaputils@14.6.2) (2024-07-16)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [14.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.6.0...@quenty/inputkeymaputils@14.6.1) (2024-05-17)
+
+
+### Bug Fixes
+
+* Rename priority1 & priority2 -> primary4 & primary5 ([daf1700](https://github.com/Quenty/NevermoreEngine/commit/daf1700dcf89e1d0c3f7576f899ba79b37b7f877))
+
+
+
+
+
+# [14.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.5.0...@quenty/inputkeymaputils@14.6.0) (2024-05-16)
+
+
+### Features
+
+* Add slotIds for priority1 and priority2 buttons ([55c4529](https://github.com/Quenty/NevermoreEngine/commit/55c4529de568cf5ce768c78085adc2f5f7c434b5))
+
+
+
+
+
+# [14.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.4.0...@quenty/inputkeymaputils@14.5.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [14.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.3.0...@quenty/inputkeymaputils@14.4.0) (2024-05-03)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.2.0...@quenty/inputkeymaputils@14.3.0) (2024-04-28)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.1.1...@quenty/inputkeymaputils@14.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+## [14.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.1.0...@quenty/inputkeymaputils@14.1.1) (2024-04-23)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@14.0.0...@quenty/inputkeymaputils@14.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@13.0.0...@quenty/inputkeymaputils@14.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@12.0.0...@quenty/inputkeymaputils@13.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@11.0.0...@quenty/inputkeymaputils@12.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix bootstrap of test environments and loader samples ([441e4a9](https://github.com/Quenty/NevermoreEngine/commit/441e4a90d19fcc203da2fdedc08e532c20d52f99))
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@10.0.0...@quenty/inputkeymaputils@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@9.0.0...@quenty/inputkeymaputils@10.0.0) (2024-02-13)
+
+
+### Features
+
+* New loader (breaking changes), fixing loader issues  ([#439](https://github.com/Quenty/NevermoreEngine/issues/439)) ([3534345](https://github.com/Quenty/NevermoreEngine/commit/353434522918812953bd9f13fece73e27a4d034d))
+
+
+### BREAKING CHANGES
+
+* Standard loader
+
+Adds new loader version which replicates full structure instead of some partial structure. This allows us to have hot-reloading (in the future), as well as generally do less computation, handle dependencies more carefully, and other changes.
+
+This means you'll need to change you how require client-side modules, as we export a simple `loader` module instead of all modules available.
+
+Signed-off-by: James Onnen <jonnen0@gmail.com>
+
+* fix: Fix missing dependency in ResetService
+
+* feat: Add RxPhysicsUtils.observePartMass
+
+* fix: Fix package discovery for games
+
+* feat: Add UIAlignmentUtils.verticalToHorizontalAlignment(verticalAlignment) and UIAlignmentUtils.horizontalToVerticalAlignment(horizontalAlignment)
+
+* feat: AdorneeData:InitAttributes() does not require data as a  secondparameter
+
+* ci: Upgrade to new rojo 7.4.0
+
+* fix: Update loader to handle hoarcekat properly
+
+* docs: Fix spacing in Maid
+
+* fix: Add new ragdoll constants
+
+* fix: Compress influxDB sends
+
+* style: Errors use string.format
+
+* fix: Handle motor animations
+
+* ci: Upgrade rojo version
+
+* feat!: Maid no longer is includd in ValueObject.Changed event
+
+* docs: Fix docs
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@8.6.0...@quenty/inputkeymaputils@9.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [8.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@8.5.0...@quenty/inputkeymaputils@8.6.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [8.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@8.4.0...@quenty/inputkeymaputils@8.5.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/inputkeymaputils
+
+
+
+
+
+# [8.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@8.3.1...@quenty/inputkeymaputils@8.4.0) (2023-12-14)
+
+
+### Bug Fixes
+
+* InputKeyMapTranslator was passing in bad initial language ([030a1ea](https://github.com/Quenty/NevermoreEngine/commit/030a1eabfde882f7b0fc787f86cb6bea845a1300))
+* Proximity prompt utils assumes keyboard and mouse to be more consistent in behavior with other input hints ([a87d13b](https://github.com/Quenty/NevermoreEngine/commit/a87d13bd7527f43aaa59298b1c65e0f84628f9cf))
+
+
+
+
+
 ## [8.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputkeymaputils@8.3.0...@quenty/inputkeymaputils@8.3.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/inputkeymaputils

@@ -1,3 +1,4 @@
+--!native
 local ecc = require(script.Parent)
 
 warn("Running EllipticCurveCryptography benchmark...")

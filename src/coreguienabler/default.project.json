@@ -1,5 +1,6 @@
 {
   "name": "coreguienabler",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

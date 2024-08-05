@@ -22,8 +22,8 @@ function qGUI.PointInBounds(frame, x, y)
 		and x < right
 end
 
-function qGUI.MouseOver(Mouse, Frame)
-	return qGUI.PointInBounds(Frame, Mouse.X, Mouse.Y)
+function qGUI.MouseOver(mouse, frame)
+	return qGUI.PointInBounds(frame, mouse.X, mouse.Y)
 end
 
 -- @param UpdateFunction()

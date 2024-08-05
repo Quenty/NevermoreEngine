@@ -1,0 +1,40 @@
+{
+  "name": "@quenty/adorneedata",
+  "version": "7.4.0",
+  "description": "Bridges attributes and serialization",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "AdorneeData"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/adorneedata/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/attributeutils": "file:../attributeutils",
+    "@quenty/defaultvalueutils": "file:../defaultvalueutils",
+    "@quenty/ducktype": "file:../ducktype",
+    "@quenty/loader": "file:../loader",
+    "@quenty/rx": "file:../rx",
+    "@quenty/rxsignal": "file:../rxsignal",
+    "@quenty/table": "file:../table",
+    "@quentystudios/t": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

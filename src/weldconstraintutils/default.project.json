@@ -1,5 +1,6 @@
 {
-  "name": "WeldConstraintUtils",
+  "name": "weldconstraintutils",
+  "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
   }

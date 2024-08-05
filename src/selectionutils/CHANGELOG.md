@@ -3,6 +3,97 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.2.0...@quenty/selectionutils@8.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [8.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.1.0...@quenty/selectionutils@8.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [8.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.0.0...@quenty/selectionutils@8.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@7.0.0...@quenty/selectionutils@8.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [7.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@6.0.0...@quenty/selectionutils@7.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [6.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@5.0.0...@quenty/selectionutils@6.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@4.0.0...@quenty/selectionutils@5.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@3.4.0...@quenty/selectionutils@4.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@3.3.0...@quenty/selectionutils@3.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [3.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@3.2.0...@quenty/selectionutils@3.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
+# [3.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@3.1.1...@quenty/selectionutils@3.2.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+
+
+
+
 ## [3.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@3.1.0...@quenty/selectionutils@3.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/selectionutils

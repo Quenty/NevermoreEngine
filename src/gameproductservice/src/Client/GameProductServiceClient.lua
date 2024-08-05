@@ -22,6 +22,8 @@ local RxBinderUtils = require("RxBinderUtils")
 local Signal = require("Signal")
 local GameProductServiceHelper = require("GameProductServiceHelper")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
+local RxPlayerUtils = require("RxPlayerUtils")
+local RxBrioUtils = require("RxBrioUtils")
 
 local GameProductServiceClient = {}
 GameProductServiceClient.ServiceName = "GameProductServiceClient"
@@ -41,28 +43,27 @@ function GameProductServiceClient:Init(serviceBag)
 	-- Internal
 	self._binders = self._serviceBag:GetService(require("GameProductBindersClient"))
 
-	self._helper = GameProductServiceHelper.new(self._binders.PlayerProductManager)
-	self._maid:GiveTask(self._helper)
+	self._helper = self._maid:Add(GameProductServiceHelper.new(self._binders.PlayerProductManager))
 
 	-- Additional API for ergonomics
-	self.GamePassPurchased = Signal.new() -- :Fire(gamePassId)
-	self._maid:GiveTask(self.GamePassPurchased)
+	self.GamePassPurchased = self._maid:Add(Signal.new()) -- :Fire(gamePassId)
 
-	self.ProductPurchased = Signal.new() -- :Fire(productId)
-	self._maid:GiveTask(self.ProductPurchased)
+	self.ProductPurchased = self._maid:Add(Signal.new()) -- :Fire(productId)
 
-	self.AssetPurchased = Signal.new() -- :Fire(assetId)
-	self._maid:GiveTask(self.AssetPurchased)
+	self.AssetPurchased = self._maid:Add(Signal.new()) -- :Fire(assetId)
 
-	self.BundlePurchased = Signal.new() -- :Fire(bundleId)
-	self._maid:GiveTask(self.BundlePurchased)
+	self.BundlePurchased = self._maid:Add(Signal.new()) -- :Fire(bundleId)
 end
 
 --[=[
 	Starts the service. Should be done via [ServiceBag]
 ]=]
 function GameProductServiceClient:Start()
-	self._maid:GiveTask(RxBinderUtils.observeBoundClassBrio(self._binders.PlayerProductManager, Players.LocalPlayer):Subscribe(function(brio)
+	self._maid:GiveTask(RxPlayerUtils.observeLocalPlayerBrio():Pipe({
+		RxBrioUtils.switchMapBrio(function(localPlayer)
+			return RxBinderUtils.observeBoundClassBrio(self._binders.PlayerProductManager, localPlayer)
+		end)
+	}):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end
@@ -181,7 +182,7 @@ end
 	Returns true if the prompt is open
 
 	@param player Player
-	@return boolean
+	@return Promise<boolean>
 ]=]
 function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
@@ -189,6 +190,20 @@ function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
 	assert(self._serviceBag, "Not initialized")
 
 	return self._helper:PromisePlayerIsPromptOpen(player)
+end
+
+--[=[
+	Returns a promise that will resolve when all prompts are closed
+
+	@param player Player
+	@return Promise
+]=]
+function GameProductServiceClient:PromisePlayerPromptClosed(player)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(self ~= GameProductServiceClient, "Use serviceBag")
+	assert(self._serviceBag, "Not initialized")
+
+	return self._helper:PromisePlayerPromptClosed(player)
 end
 
 --[=[
@@ -232,6 +247,10 @@ function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(gamePas
 				return self:PromisePromptPurchase(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey)
 			end
 		end)
+end
+
+function GameProductServiceClient:Destroy()
+	self._maid:DoCleaning()
 end
 
 return GameProductServiceClient

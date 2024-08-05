@@ -252,8 +252,7 @@ function Promise:Resolve(...)
 		self:Reject("TypeError: Resolved to self")
 	elseif Promise.isPromise(...) then
 		if len > 1 then
-			local message = ("When resolving a promise, extra arguments are discarded! See:\n\n%s")
-				:format(self._source)
+			local message = string.format("When resolving a promise, extra arguments are discarded! See:\n\n%s", self._source)
 			warn(message)
 		end
 
@@ -282,8 +281,7 @@ function Promise:Resolve(...)
 		end
 	elseif type(...) == "function" then
 		if len > 1 then
-			local message = ("When resolving a function, extra arguments are discarded! See:\n\n%s")
-				:format(self._source)
+			local message = string.format("When resolving a function, extra arguments are discarded! See:\n\n%s", self._source)
 			warn(message)
 		end
 
@@ -349,11 +347,9 @@ function Promise:_reject(values, valuesLength)
 				local errOutput = self:_toHumanReadable(self._rejected[1])
 
 				if ENABLE_TRACEBACK then
-					warn(("[Promise] - Uncaught exception in promise\n\n%q\n\n%s")
-						:format(errOutput, self._source))
+					warn(string.format("[Promise] - Uncaught exception in promise\n\n%q\n\n%s", errOutput, self._source))
 				else
-					warn(("[Promise] - Uncaught exception in promise: %q")
-						:format(errOutput))
+					warn(string.format("[Promise] - Uncaught exception in promise: %q", errOutput))
 				end
 			end
 		end)

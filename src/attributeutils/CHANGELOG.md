@@ -3,6 +3,104 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.2.0...@quenty/attributeutils@14.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [14.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.1.0...@quenty/attributeutils@14.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [14.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.0.0...@quenty/attributeutils@14.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [14.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@13.0.0...@quenty/attributeutils@14.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [13.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@12.0.0...@quenty/attributeutils@13.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@11.0.0...@quenty/attributeutils@12.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@10.0.0...@quenty/attributeutils@11.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.4.0...@quenty/attributeutils@10.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [9.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.3.0...@quenty/attributeutils@9.4.0) (2024-01-08)
+
+
+### Features
+
+* Add RxAttributeUtils.observeAttributeKeysBrio(instance) ([896633f](https://github.com/Quenty/NevermoreEngine/commit/896633f3fef85e14f4275163c8ad37fc57f43921))
+
+
+
+
+
+# [9.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.2.0...@quenty/attributeutils@9.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+
+
+
+
+# [9.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.1.1...@quenty/attributeutils@9.2.0) (2023-12-14)
+
+
+### Features
+
+* Add AttributeTableValue.new(adornee, defaultValues) which allows for a cleaner use of multiple attributes being returned or indexed into. ([a2f2aa1](https://github.com/Quenty/NevermoreEngine/commit/a2f2aa1ebe049eb36e9c623a8e96216cba93a1d3))
+* Refactor AttributeTableValue to support non-attibute values. ([17af0b6](https://github.com/Quenty/NevermoreEngine/commit/17af0b6bbc46b31e70cf067aa41d88d2b7717cc7))
+
+
+
+
+
 ## [9.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@9.1.0...@quenty/attributeutils@9.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/attributeutils

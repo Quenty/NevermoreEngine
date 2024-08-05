@@ -3,6 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.2.0...@quenty/contentproviderutils@12.3.0) (2024-05-09)
+
+
+### Bug Fixes
+
+* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
+
+
+
+
+
+# [12.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.1.0...@quenty/contentproviderutils@12.2.0) (2024-04-27)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [12.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.0.0...@quenty/contentproviderutils@12.1.0) (2024-03-09)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [12.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@11.0.0...@quenty/contentproviderutils@12.0.0) (2024-02-14)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [11.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@10.0.0...@quenty/contentproviderutils@11.0.0) (2024-02-13)
+
+
+### Bug Fixes
+
+* Fix loading of circle cover ([72a7bcd](https://github.com/Quenty/NevermoreEngine/commit/72a7bcd92d89c4c456600874e517f1fd6f1f12f2))
+
+
+
+
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@9.0.0...@quenty/contentproviderutils@10.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [9.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@8.0.0...@quenty/contentproviderutils@9.0.0) (2024-02-13)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [8.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@7.4.0...@quenty/contentproviderutils@8.0.0) (2024-01-10)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [7.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@7.3.0...@quenty/contentproviderutils@7.4.0) (2024-01-08)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [7.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@7.2.0...@quenty/contentproviderutils@7.3.0) (2023-12-28)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
+# [7.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@7.1.1...@quenty/contentproviderutils@7.2.0) (2023-12-14)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+
+
+
+
 ## [7.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@7.1.0...@quenty/contentproviderutils@7.1.1) (2023-10-28)
 
 **Note:** Version bump only for package @quenty/contentproviderutils

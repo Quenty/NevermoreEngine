@@ -40,7 +40,7 @@ function TieMethodImplementation:SetImplementation(implementation)
 		end
 
 		self._bindableFunction.OnInvoke = function()
-			warn(("%q is not implemented"):format(tostring(self._memberDefinition:GetMemberName())))
+			warn(string.format("%q is not implemented", tostring(self._memberDefinition:GetMemberName())))
 		end
 	end
 end

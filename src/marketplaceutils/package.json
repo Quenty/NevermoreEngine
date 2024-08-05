@@ -1,6 +1,6 @@
 {
   "name": "@quenty/marketplaceutils",
-  "version": "7.0.0",
+  "version": "11.4.0",
   "description": "Provides utility methods for MarketplaceService",
   "keywords": [
     "Roblox",
@@ -27,6 +27,7 @@
   ],
   "dependencies": {
     "@quenty/loader": "file:../loader",
+    "@quenty/memoize": "file:../memoize",
     "@quenty/promise": "file:../promise"
   },
   "publishConfig": {
