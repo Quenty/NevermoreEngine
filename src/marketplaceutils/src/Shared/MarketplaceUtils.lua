@@ -62,6 +62,15 @@ local MarketplaceUtils = {}
 ]=]
 
 --[=[
+	Subscription Status
+
+	@interface UserSubscriptonStatus
+	.IsSubscribed boolean -- True if the user's subscription is active.
+	.IsRenewing boolean -- True if the user is set to renew this subscription after the current subscription period ends.
+	@within MarketplaceUtils
+]=]
+
+--[=[
 	Wraps [MarketplaceService.GetProductInfo] and retrieves information about
 	@param assetId number
 	@param infoType InfoType | nil
@@ -84,6 +93,32 @@ function MarketplaceUtils.promiseProductInfo(assetId, infoType)
 			return reject("Bad productInfo type")
 		end
 		return resolve(productInfo)
+	end)
+end
+
+--[=[
+	Returns the subscription status
+
+	@param player Player
+	@param subscriptionId string
+	@return UserSubscriptonStatus
+]=]
+function MarketplaceUtils.promiseUserSubscriptionStatus(player, subscriptionId)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(type(subscriptionId) == "string", "Bad subscriptionId")
+
+	return Promise.spawn(function(resolve, reject)
+		local subStatus
+		local ok, err = pcall(function()
+			subStatus = MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		if type(subStatus) ~= "table" then
+			return reject("Bad subStatus type")
+		end
+		return resolve(subStatus)
 	end)
 end
 
