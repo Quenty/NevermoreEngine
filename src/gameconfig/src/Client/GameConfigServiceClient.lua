@@ -21,10 +21,12 @@ function GameConfigServiceClient:Init(serviceBag)
 	-- Internal
 	self._serviceBag:GetService(require("GameConfigCommandServiceClient"))
 	self._serviceBag:GetService(require("GameConfigTranslator"))
+	self._serviceBag:GetService(require("GameConfigDataService"))
 	self._binders = self._serviceBag:GetService(require("GameConfigBindersClient"))
 
-	self._configPicker = GameConfigPicker.new(self._binders.GameConfig, self._binders.GameConfigAsset)
-	self._maid:GiveTask(self._configPicker)
+	self._configPicker = self._maid:Add(GameConfigPicker.new(self._binders.GameConfig, self._binders.GameConfigAsset))
+
+	self._serviceBag:GetService(require("GameConfigDataService")):SetConfigPicker(self._configPicker)
 end
 
 function GameConfigServiceClient:Start()

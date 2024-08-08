@@ -32,14 +32,16 @@ function GameConfigService:Init(serviceBag)
 
 	-- Internal
 	self._serviceBag:GetService(require("GameConfigCommandService"))
+	self._serviceBag:GetService(require("GameConfigDataService"))
 	self._serviceBag:GetService(require("GameConfigTranslator"))
 	self._binders = self._serviceBag:GetService(require("GameConfigBindersServer"))
 
 	-- Setup picker
-	self._configPicker = GameConfigPicker.new(self._binders.GameConfig, self._binders.GameConfigAsset)
-	self._maid:GiveTask(self._configPicker)
+	self._configPicker = self._maid:Add(GameConfigPicker.new(self._binders.GameConfig, self._binders.GameConfigAsset))
 
 	self._getPreferredParent = PreferredParentUtils.createPreferredParentRetriever(ReplicatedStorage, "GameConfigs")
+
+	self._serviceBag:GetService(require("GameConfigDataService")):SetConfigPicker(self._configPicker)
 end
 
 --[=[
@@ -93,6 +95,15 @@ end
 ]=]
 function GameConfigService:AddAsset(assetKey, assetId)
 	self:AddTypedAsset(GameConfigAssetTypes.ASSET, assetKey, assetId)
+end
+
+--[=[
+	Adds a new asset with the key configured to the `assetKey`
+	@param assetKey string -- Key name to use for the asset
+	@param subscriptionId string -- Cloud id
+]=]
+function GameConfigService:AddSubscription(assetKey, subscriptionId)
+	self:AddTypedAsset(GameConfigAssetTypes.SUBSCRIPTION, assetKey, subscriptionId)
 end
 
 --[=[
