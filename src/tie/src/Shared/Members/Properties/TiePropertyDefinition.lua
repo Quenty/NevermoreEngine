@@ -27,6 +27,19 @@ function TiePropertyDefinition:GetDefaultValue()
 	return self._defaultValue
 end
 
+function TiePropertyDefinition:IsRequiredForImplementation(currentRealm)
+	-- Override
+	if getmetatable(TiePropertyDefinition).IsRequiredForImplementation(self, currentRealm) then
+		if self:GetDefaultValue() ~= nil then
+			return false
+		end
+
+		return true
+	end
+
+	return false
+end
+
 function TiePropertyDefinition:Implement(implParent: Instance, initialValue, _actualSelf, tieRealm)
 	assert(typeof(implParent) == "Instance", "Bad implParent")
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
