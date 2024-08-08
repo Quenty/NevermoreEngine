@@ -37,11 +37,11 @@ function PlayerAssetMarketTracker.new(assetType, convertIds, observeIdsBrio)
 	self._pendingPromptOpenPromises = {} -- { [number] = Promise<boolean> }
 
 	self._purchasedThisSession = {} -- [number] = true
-	self._receiptProcessingExpected = false
 
 	self._promptsOpenCount = self._maid:Add(ValueObject.new(0, "number"))
+
 	self.Purchased = self._maid:Add(Signal.new()) -- :Fire(id)
-	self.PromptFinished = self._maid:Add(Signal.new()) -- :Fire(id, isPurchased)
+	self.PromptClosed = self._maid:Add(Signal.new()) -- :Fire(id, isPurchased)
 	self.ShowPromptRequested = self._maid:Add(Signal.new()) -- :Fire(id)
 
 	self._maid:GiveTask(self.Purchased:Connect(function(id)
@@ -116,6 +116,10 @@ function PlayerAssetMarketTracker:ObserveAssetPurchased(idOrKey)
 
 		return topMaid
 	end)
+end
+
+function PlayerAssetMarketTracker:GetOwnershipTracker()
+	return self._ownershipTracker
 end
 
 --[=[
@@ -204,6 +208,10 @@ function PlayerAssetMarketTracker:SetOwnershipTracker(ownershipTracker)
 	self._ownershipTracker = ownershipTracker
 end
 
+function PlayerAssetMarketTracker:GetAssetType()
+	return self._assetType
+end
+
 --[=[
 	Returns true if item has been purchased this session
 
@@ -245,74 +253,20 @@ function PlayerAssetMarketTracker:HandlePurchaseEvent(id, isPurchased)
 	assert(type(id) == "number", "Bad id")
 	assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
-	self:_handlePurchaseEvent(id, isPurchased, false)
-end
-
-function PlayerAssetMarketTracker:_handlePurchaseEvent(id, isPurchased, isFromReceipt)
-	assert(type(id) == "number", "Bad id")
-	assert(type(isPurchased) == "boolean", "Bad isPurchased")
-
 	local purchasePromise = self._pendingPurchasePromises[id] or Promise.new()
-	local promptOpenPromise = self._pendingPromptOpenPromises[id] or Promise.new()
 
-	if self._receiptProcessingExpected then
-		if isPurchased then
-			-- In this scenario we've got two possible purchase scenarios, resolving different promises.
-			-- We expect the event here to be fired twice.
-			if isFromReceipt then
-				self.Purchased:Fire(id)
-				purchasePromise:Resolve(true)
-			else
-				self.PromptFinished:Fire(id, true)
-				promptOpenPromise:Resolve(true)
-			end
-		else
-			self.PromptFinished:Fire(id, false)
-			purchasePromise:Resolve(false)
-			promptOpenPromise:Resolve(false)
-		end
-	else
-		if isPurchased then
-			self.Purchased:Fire(id)
-		end
-
-		self.PromptFinished:Fire(id, isPurchased)
-		purchasePromise:Resolve(isPurchased)
-		promptOpenPromise:Resolve(isPurchased)
+	if isPurchased then
+		self.Purchased:Fire(id)
 	end
+
+	purchasePromise:Resolve(isPurchased)
 end
 
---[=[
-	Sets if this tracker is handling purchase receipts as a more authenticated mechanism
+function PlayerAssetMarketTracker:HandlePromptClosedEvent(id)
+	assert(type(id) == "number", "Bad id")
 
-	@param receiptProcessingExpected boolean
-]=]
-function PlayerAssetMarketTracker:SetReceiptProcessingExpected(receiptProcessingExpected)
-	assert(type(receiptProcessingExpected) == "boolean", "Bad receiptProcessingExpected")
-
-	self._receiptProcessingExpected = receiptProcessingExpected
-end
-
---[=[
-	Gets if this tracker is handling purchase receipts as a more authenticated mechanism
-
-	@return boolean
-]=]
-function PlayerAssetMarketTracker:GetReceiptProcessingExpected()
-	return self._receiptProcessingExpected
-end
-
---[=[
-	Handles the receipt processing
-
-	@param player Player
-	@param receiptInfo ReceiptInfo
-]=]
-function PlayerAssetMarketTracker:HandleProcessReceipt(player, receiptInfo)
-	assert(typeof(player) == "Instance", "Bad player")
-	assert(self._receiptProcessingExpected, "No receiptProcessingExpected")
-
-	self:_handlePurchaseEvent(receiptInfo.ProductId, true, true)
+	local promptOpenPromise = self._pendingPromptOpenPromises[id] or Promise.new()
+	promptOpenPromise:Resolve()
 end
 
 return PlayerAssetMarketTracker

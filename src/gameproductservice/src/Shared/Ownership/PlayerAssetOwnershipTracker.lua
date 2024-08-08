@@ -20,6 +20,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxStateStackUtils = require("RxStateStackUtils")
 local ValueObject = require("ValueObject")
 local WellKnownAssetOwnershipHandler = require("WellKnownAssetOwnershipHandler")
+local ObservableSet = require("ObservableSet")
 
 local PlayerAssetOwnershipTracker = setmetatable({}, BaseObject)
 PlayerAssetOwnershipTracker.ClassName = "PlayerAssetOwnershipTracker"
@@ -35,19 +36,14 @@ function PlayerAssetOwnershipTracker.new(player, configPicker, assetType, market
 	self._assetType = assert(assetType, "No assetType")
 	self._marketTracker = assert(marketTracker, "No marketTracker")
 
-	self._ownershipCallback = ValueObject.new(nil)
-	self._maid:GiveTask(self._ownershipCallback)
+	self._ownershipCallback = self._maid:Add(ValueObject.new(nil))
+	self._attributesEnabled = self._maid:Add(ValueObject.new(false, "boolean"))
+
+	self._ownedAssetIdSet = self._maid:Add(ObservableSet.new())
+	self._assetIdToWellKnownOwnershipTracker = self._maid:Add(ObservableMapSet.new())
+	self._assetKeyToWellKnownOwnershipTracker = self._maid:Add(ObservableMapSet.new())
 
 	self._assetOwnershipPromiseCache = {}
-
-	self._attributesEnabled = ValueObject.new(false, "boolean")
-	self._maid:GiveTask(self._attributesEnabled)
-
-	self._assetIdToWellKnownOwnershipTracker = ObservableMapSet.new()
-	self._maid:GiveTask(self._assetIdToWellKnownOwnershipTracker)
-
-	self._assetKeyToWellKnownOwnershipTracker = ObservableMapSet.new()
-	self._maid:GiveTask(self._assetKeyToWellKnownOwnershipTracker)
 
 	self._maid:GiveTask(self._marketTracker.Purchased:Connect(function(idOrKey)
 		self:SetOwnership(idOrKey, true)
@@ -87,7 +83,7 @@ function PlayerAssetOwnershipTracker:_promiseQueryIdOrKeyOwnershipCached(idOrKey
 
 	local id = self._configPicker:ToAssetId(self._assetType, idOrKey)
 	if not id then
-		warn(("[PlayerAssetOwnershipTracker._promiseQueryIdOrKeyOwnershipCached] - Nothing with key %q"):format(tostring(idOrKey)))
+		warn(string.format("[PlayerAssetOwnershipTracker._promiseQueryIdOrKeyOwnershipCached] - Nothing with key %q", tostring(idOrKey)))
 		return Promise.resolved(false)
 	end
 
@@ -118,7 +114,7 @@ function PlayerAssetOwnershipTracker:_promiseQueryIdOrKeyOwnershipCached(idOrKey
 	return promise
 end
 
-function PlayerAssetOwnershipTracker:_observeQueryOwnershipIdOrKeyCached(idOrKey)
+function PlayerAssetOwnershipTracker:_observeQueryOwnershipIdOrKeyCachedBrio(idOrKey)
 	return self._ownershipCallback:Observe():Pipe({
 		RxBrioUtils.switchToBrio();
 		RxBrioUtils.switchMapBrio(function()
@@ -147,22 +143,34 @@ end
 	Sets the players ownership of a the asset
 
 	@param idOrKey number
-	@param ownsPass boolean
+	@param ownsAsset boolean
 ]=]
-function PlayerAssetOwnershipTracker:SetOwnership(idOrKey, ownsPass)
+function PlayerAssetOwnershipTracker:SetOwnership(idOrKey, ownsAsset)
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "idOrKey")
-	assert(type(ownsPass) == "boolean", "Bad ownsPass")
+	assert(type(ownsAsset) == "boolean", "Bad ownsAsset")
+
+	local id = self._configPicker:ToAssetId(self._assetType, idOrKey)
+	if not id then
+		warn(string.format("[PlayerAssetOwnershipTracker.SetOwnership] - Nothing with key %q", tostring(idOrKey)))
+		return
+	end
+
+	if self._ownedAssetIdSet:Contains(id) then
+		return
+	end
+
+	self._ownedAssetIdSet:Add(id)
 
 	if self._attributesEnabled.Value then
 		local attributeNames = PlayerAssetOwnershipUtils.getAttributeNames(self._configPicker, self._assetType, idOrKey)
 		for _, attributeName in pairs(attributeNames) do
-			self._player:SetAttribute(attributeName, ownsPass)
+			self._player:SetAttribute(attributeName, ownsAsset)
 		end
 	end
 
 	-- Update trackers
 	for _, wellOwnedAsset in pairs(self:_getWellKnownAssets(idOrKey)) do
-		wellOwnedAsset:SetIsOwned(ownsPass)
+		wellOwnedAsset:SetIsOwned(ownsAsset)
 	end
 end
 
@@ -183,6 +191,15 @@ function PlayerAssetOwnershipTracker:PromiseOwnsAsset(idOrKey)
 				return Promise.resolved(true)
 			end
 		end
+	end
+
+local id = self._configPicker:ToAssetId(self._assetType, idOrKey)
+	if id then
+		if self._ownedAssetIdSet:Contains(id) then
+			return Promise.resolved(true)
+		end
+	else
+		warn(string.format("[PlayerAssetOwnershipTracker.PromiseOwnsAsset] - Nothing with key %q", tostring(idOrKey)))
 	end
 
 	-- Check actual callback querying Roblox
@@ -219,8 +236,15 @@ function PlayerAssetOwnershipTracker:ObserveOwnsAsset(idOrKey)
 				end);
 			});
 
+			-- Observe our internal cache
+			self._configPicker:ObserveToAssetIdBrio(self._assetType, idOrKey):Pipe({
+				RxBrioUtils.flatMapBrio(function(id)
+					return self._ownedAssetIdSet:ObserveContains(id)
+				end);
+			});
+
 			-- Observe promise (in case we aren't a well known asset)
-			self:_observeQueryOwnershipIdOrKeyCached(idOrKey);
+			self:_observeQueryOwnershipIdOrKeyCachedBrio(idOrKey);
 		})
 		:Pipe({
 			RxBrioUtils.where(function(value)

@@ -1,36 +1,67 @@
 --[=[
-	Helper that is used for each game product service. See [GameProductService].
-
-	@class GameProductServiceHelper
+	@class GameProductDataService
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
-local promiseBoundClass = require("promiseBoundClass")
-local RxBinderUtils = require("RxBinderUtils")
-local RxBrioUtils = require("RxBrioUtils")
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
-local RxStateStackUtils = require("RxStateStackUtils")
+local Maid = require("Maid")
+local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Promise = require("Promise")
 local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxStateStackUtils = require("RxStateStackUtils")
+local Signal = require("Signal")
+local TieRealmService = require("TieRealmService")
 
-local GameProductServiceHelper = setmetatable({}, BaseObject)
-GameProductServiceHelper.ClassName = "GameProductServiceHelper"
-GameProductServiceHelper.__index = GameProductServiceHelper
+local GameProductDataService = {}
+GameProductDataService.ServiceName = "GameProductDataService"
+
+function GameProductDataService:Init(serviceBag)
+	assert(not self._serviceBag, "Already initialized")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
+	-- External
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
+
+	self._maid = Maid.new()
+
+	-- Configure
+	self.GamePassPurchased = self._maid:Add(Signal.new()) -- :Fire(player, gamePassId)
+	self.ProductPurchased = self._maid:Add(Signal.new()) -- :Fire(player, productId)
+	self.AssetPurchased = self._maid:Add(Signal.new()) -- :Fire(player, assetId)
+	self.BundlePurchased = self._maid:Add(Signal.new()) -- :Fire(player, bundleId)
+	self.SubscriptionPurchased = self._maid:Add(Signal.new()) -- :Fire(player, subscriptionId)
+	self.MembershipPurchased = self._maid:Add(Signal.new()) -- :Fire(player, membershipId)
+end
 
 --[=[
-	Helper to observe state for the game product service
-
-	@param playerProductManagerBinder Binder<PlayerProductManager>
+	Starts the service. Should be done via [ServiceBag]
 ]=]
-function GameProductServiceHelper.new(playerProductManagerBinder)
-	local self = setmetatable(BaseObject.new(), GameProductServiceHelper)
+function GameProductDataService:Start()
+	self._maid:GiveTask(PlayerProductManagerInterface:ObserveAllTaggedBrio("PlayerProductManager", self._tieRealmService:GetTieRealm()):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
 
-	self._playerProductManagerBinder = assert(playerProductManagerBinder, "Bad playerProductManagerBinder")
+		local maid, playerProductManager = brio:ToMaidAndValue()
 
-	return self
+		local function exportSignal(signal, assetType)
+			maid:GiveTask(playerProductManager:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
+				signal:Fire(playerProductManager:GetPlayer(), ...)
+			end))
+		end
+
+		exportSignal(self.GamePassPurchased, GameConfigAssetTypes.PASS)
+		exportSignal(self.ProductPurchased, GameConfigAssetTypes.PRODUCT)
+		exportSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
+		exportSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
+		exportSignal(self.SubscriptionPurchased, GameConfigAssetTypes.SUBSCRIPTION)
+		exportSignal(self.MembershipPurchased, GameConfigAssetTypes.MEMBERSHIP)
+	end))
 end
+
 
 --[=[
 	Returns true if item has been purchased this session
@@ -40,18 +71,18 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function GameProductServiceHelper:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+function GameProductDataService:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	local marketeer = self:_getPlayerMarketeer(player)
-	if not marketeer then
-		warn("[GameProductServiceHelper.HasPlayerPurchasedThisSession] - Failed to find marketeer for player")
+	local playerProductManager = self:_getPlayerProductManager(player)
+	if not playerProductManager then
+		warn("[GameProductDataService.HasPlayerPurchasedThisSession] - Failed to find playerProductManager for player")
 		return false
 	end
 
-	local assetTracker = marketeer:GetAssetTrackerOrError(assetType)
+	local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
 	return assetTracker:HasPurchasedThisSession(idOrKey)
 end
 
@@ -63,14 +94,14 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceHelper:PromisePromptPurchase(player, assetType, idOrKey)
+function GameProductDataService:PromisePromptPurchase(player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self:_promisePlayerMarketeer(player)
-		:Then(function(marketeer)
-			local assetTracker = marketeer:GetAssetTrackerOrError(assetType)
+	return self:_promisePlayerProductManager(player)
+		:Then(function(playerProductManager)
+			local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
 			return assetTracker:PromisePromptPurchase(idOrKey)
 		end)
 end
@@ -83,14 +114,14 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceHelper:PromisePlayerOwnership(player, assetType, idOrKey)
+function GameProductDataService:PromisePlayerOwnership(player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self:_promisePlayerMarketeer(player)
-		:Then(function(marketeer)
-			local ownershipTracker = marketeer:GetOwnershipTrackerOrError(assetType)
+	return self:_promisePlayerProductManager(player)
+		:Then(function(playerProductManager)
+			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
 			return ownershipTracker:PromiseOwnsAsset(idOrKey)
 		end)
 end
@@ -102,13 +133,13 @@ end
 	@param assetType GameConfigAssetType
 	@return Promise<boolean>
 ]=]
-function GameProductServiceHelper:PromiseIsOwnable(player, assetType)
+function GameProductDataService:PromiseIsOwnable(player, assetType)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
-	return self:_promisePlayerMarketeer(player)
-		:Then(function(marketeer)
-			return marketeer:IsOwnable(assetType)
+	return self:_promisePlayerProductManager(player)
+		:Then(function(playerProductManager)
+			return playerProductManager:IsOwnable(assetType)
 		end)
 end
 
@@ -118,12 +149,12 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GameProductServiceHelper:PromisePlayerIsPromptOpen(player)
+function GameProductDataService:PromisePlayerIsPromptOpen(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return self:_promisePlayerMarketeer(player)
-		:Then(function(marketeer)
-			return marketeer:IsPromptOpen()
+	return self:_promisePlayerProductManager(player)
+		:Then(function(playerProductManager)
+			return playerProductManager:IsPromptOpen()
 		end)
 end
 
@@ -133,12 +164,12 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GameProductServiceHelper:PromisePlayerPromptClosed(player)
+function GameProductDataService:PromisePlayerPromptClosed(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return self:_promisePlayerMarketeer(player)
-		:Then(function(marketeer)
-			return marketeer:PromisePlayerPromptClosed()
+	return self:_promisePlayerProductManager(player)
+		:Then(function(playerProductManager)
+			return playerProductManager:PromisePlayerPromptClosed()
 		end)
 end
 
@@ -150,7 +181,7 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceHelper:ObservePlayerOwnership(player, assetType, idOrKey)
+function GameProductDataService:ObservePlayerOwnership(player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -158,8 +189,7 @@ function GameProductServiceHelper:ObservePlayerOwnership(player, assetType, idOr
 	-- TODO: Maybe make this more light weight and cache
 	return self:_observePlayerProductManagerBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(playerProductManager)
-			local marketeer = playerProductManager:GetMarketeer()
-			local ownershipTracker = marketeer:GetOwnershipTrackerOrError(assetType)
+			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
 			return ownershipTracker:ObserveOwnsAsset(idOrKey)
 		end);
 		RxStateStackUtils.topOfStack(false);
@@ -174,15 +204,14 @@ end
 	@param idOrKey string | number
 	@return Observable<>
 ]=]
-function GameProductServiceHelper:ObservePlayerAssetPurchased(player, assetType, idOrKey)
+function GameProductDataService:ObservePlayerAssetPurchased(player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self:_observePlayerProductManagerBrio(player):Pipe({
 		RxBrioUtils.switchMapBrio(function(playerProductManager)
-			local marketeer = playerProductManager:GetMarketeer()
-			local ownershipTracker = marketeer:GetOwnershipTrackerOrError(assetType)
+			local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
 			return ownershipTracker:ObserveAssetPurchased(idOrKey)
 		end);
 		Rx.map(function(_brio)
@@ -198,14 +227,13 @@ end
 	@param idOrKey string | number
 	@return Observable<Player>
 ]=]
-function GameProductServiceHelper:ObserveAssetPurchased(assetType, idOrKey)
+function GameProductDataService:ObserveAssetPurchased(assetType, idOrKey)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._playerProductManagerBinder:ObserveAllBrio():Pipe({
+	return PlayerProductManagerInterface:ObserveAllTaggedBrio("PlayerProductManager", self._tieRealmService:GetTieRealm()):Pipe({
 		RxBrioUtils.flatMapBrio(function(playerProductManager)
-			local marketeer = playerProductManager:GetMarketeer()
-			local assetTracker = marketeer:GetAssetTrackerOrError(assetType)
+			local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
 			return assetTracker:ObserveAssetPurchased(idOrKey):Pipe({
 				Rx.map(function()
 					return playerProductManager:GetPlayer()
@@ -236,18 +264,18 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceHelper:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+function GameProductDataService:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self:_promisePlayerMarketeer(player)
-		:Then(function(marketeer)
-			local assetTracker = marketeer:GetAssetTrackerOrError(assetType)
+	return self:_promisePlayerProductManager(player)
+		:Then(function(playerProductManager)
+			local assetTracker = playerProductManager:GetAssetTrackerOrError(assetType)
 
-			if marketeer:IsOwnable(assetType) then
+			if playerProductManager:IsOwnable(assetType) then
 				-- Retrieve ownership
-				local ownershipTracker = marketeer:GetOwnershipTrackerOrError(assetType)
+				local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
 				return ownershipTracker:PromiseOwnsAsset(idOrKey)
 					:Then(function(ownsAsset)
 						if ownsAsset then
@@ -267,40 +295,26 @@ function GameProductServiceHelper:PromisePlayerOwnershipOrPrompt(player, assetTy
 		end)
 end
 
-function GameProductServiceHelper:_observePlayerProductManagerBrio(player)
+function GameProductDataService:_observePlayerProductManagerBrio(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return RxBinderUtils.observeBoundClassBrio(self._playerProductManagerBinder, player)
+	return PlayerProductManagerInterface:ObserveBrio(player, self._tieRealmService:GetTieRealm())
 end
 
-function GameProductServiceHelper:_promisePlayerProductManager(player)
+function GameProductDataService:_promisePlayerProductManager(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return promiseBoundClass(self._playerProductManagerBinder, player)
+	return PlayerProductManagerInterface:Promise(player, self._tieRealmService:GetTieRealm())
 end
 
-function GameProductServiceHelper:_promisePlayerMarketeer(player)
+function GameProductDataService:_getPlayerProductManager(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return self:_promisePlayerProductManager(player)
-		:Then(function(productManager)
-			return productManager:GetMarketeer()
-		end)
+	return PlayerProductManagerInterface:Find(player, self._tieRealmService:GetTieRealm())
 end
 
-function GameProductServiceHelper:_getPlayerProductManager(player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-
-	return self._playerProductManagerBinder:Get(player)
+function GameProductDataService:Destroy()
+	self._maid:DoCleaning()
 end
 
-function GameProductServiceHelper:_getPlayerMarketeer(player)
-	local productManager = self:_getPlayerProductManager(player)
-	if productManager then
-		return productManager:GetMarketeer()
-	else
-		return nil
-	end
-end
-
-return GameProductServiceHelper
+return GameProductDataService

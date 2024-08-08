@@ -1,7 +1,7 @@
 --[=[
 	See [PlayerProductManager] and [PlayerProductManagerClient]
 
-	@class PlayerMarketeer
+	@class PlayerProductManagerBase
 ]=]
 
 local require = require(script.Parent.loader).load(script)
@@ -16,23 +16,32 @@ local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local Promise = require("Promise")
 local Rx = require("Rx")
+local GameConfigDataService = require("GameConfigDataService")
+local PlayerAssetMarketTrackerInterface = require("PlayerAssetMarketTrackerInterface")
+local TieRealmService = require("TieRealmService")
+local String = require("String")
 
-local PlayerMarketeer = setmetatable({}, BaseObject)
-PlayerMarketeer.ClassName = "PlayerMarketeer"
-PlayerMarketeer.__index = PlayerMarketeer
+local PlayerProductManagerBase = setmetatable({}, BaseObject)
+PlayerProductManagerBase.ClassName = "PlayerProductManagerBase"
+PlayerProductManagerBase.__index = PlayerProductManagerBase
 
 --[=[
-	Constructs a new PlayerMarketeer in charge of handling market connections
+	Constructs a new PlayerProductManagerBase in charge of handling market connections
 
 	@param player Player
 	@param configPicker GameConfigPicker
-	@return PlayerMarketeer
+	@return PlayerProductManagerBase
 ]=]
-function PlayerMarketeer.new(player, configPicker)
-	local self = setmetatable(BaseObject.new(), PlayerMarketeer)
+function PlayerProductManagerBase.new(player, serviceBag)
+	local self = setmetatable(BaseObject.new(player), PlayerProductManagerBase)
 
 	self._player = assert(player, "No player")
-	self._configPicker = assert(configPicker, "No configPicker")
+
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
+	self._gameConfigDataService = self._serviceBag:GetService(GameConfigDataService)
+
+	self._configPicker = self._gameConfigDataService:GetConfigPicker()
 
 	self._assetMarketTrackers = {}
 	self._ownershipTrackers = {}
@@ -41,11 +50,15 @@ function PlayerMarketeer.new(player, configPicker)
 	local bundle = self:_addAssetTracker(GameConfigAssetTypes.BUNDLE)
 	local pass = self:_addAssetTracker(GameConfigAssetTypes.PASS)
 	local product = self:_addAssetTracker(GameConfigAssetTypes.PRODUCT)
+	local subscription = self:_addAssetTracker(GameConfigAssetTypes.SUBSCRIPTION)
+	local membership = self:_addAssetTracker(GameConfigAssetTypes.MEMBERSHIP)
 
 	-- Some assets can be owned and thus, are reflected here
 	local passOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.PASS)
 	local assetOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.ASSET)
 	local bundleOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.BUNDLE)
+	local subscriptionOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.SUBSCRIPTION)
+	local membershipOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.MEMBERSHIP)
 
 	-- Prompt
 	self._maid:GiveTask(asset.ShowPromptRequested:Connect(function(assetId)
@@ -60,6 +73,17 @@ function PlayerMarketeer.new(player, configPicker)
 	self._maid:GiveTask(product.ShowPromptRequested:Connect(function(productId)
 		MarketplaceService:PromptProductPurchase(self._player, productId)
 	end))
+	self._maid:GiveTask(subscription.ShowPromptRequested:Connect(function(subscriptionId)
+		MarketplaceService:PromptSubscriptionPurchase(self._player, subscriptionId)
+	end))
+
+	self._maid:GiveTask(membership.ShowPromptRequested:Connect(function(membershipType)
+		if membershipType == Enum.MembershipType.Premium then
+			MarketplaceService:PromptPremiumPurchase(self._player)
+		else
+			warn(string.format("[PlayerProductManagerBase] - Unsure how to prompt for membershipType %q", tostring(membershipType)))
+		end
+	end))
 
 	-- Configure gamepass to be a bit special
 	passOwnership:SetQueryOwnershipCallback(function(gamePassId)
@@ -71,11 +95,39 @@ function PlayerMarketeer.new(player, configPicker)
 		return MarketplaceUtils.promisePlayerOwnsAsset(self._player, assetId)
 	end)
 
-	bundleOwnership:SetQueryOwnershipCallback(function(assetId)
-		return MarketplaceUtils.promisePlayerOwnsBundle(self._player, assetId)
+	bundleOwnership:SetQueryOwnershipCallback(function(bundleId)
+		return MarketplaceUtils.promisePlayerOwnsBundle(self._player, bundleId)
+	end)
+
+	subscriptionOwnership:SetQueryOwnershipCallback(function(subscriptionId)
+		return MarketplaceUtils.promisePlayerOwnsBundle(self._player, subscriptionId)
+	end)
+
+	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
+		return Promise.resolved(self._player.MembershipType == membershipType)
 	end)
 
 	return self
+end
+
+function PlayerProductManagerBase:ExportMarketTrackers(parent)
+	for assetType, assetMarketTracker in pairs(self._assetMarketTrackers) do
+		local folder = self._maid:Add(Instance.new("Folder"))
+		folder.Name = String.toCamelCase(GameConfigAssetTypeUtils.getPlural(assetType))
+		folder.Archivable = false
+
+		self._maid:Add(PlayerAssetMarketTrackerInterface:Implement(folder, assetMarketTracker, self._tieRealmService:GetTieRealm()))
+
+		folder.Parent = parent
+	end
+end
+
+--[=[
+	Gets the current player
+	@return Player
+]=]
+function PlayerProductManagerBase:GetPlayer()
+	return self._obj
 end
 
 --[=[
@@ -83,7 +135,7 @@ end
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerMarketeer:IsOwnable(assetType)
+function PlayerProductManagerBase:IsOwnable(assetType)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self._ownershipTrackers[assetType] ~= nil
@@ -94,7 +146,7 @@ end
 
 	@return boolean
 ]=]
-function PlayerMarketeer:IsPromptOpen()
+function PlayerProductManagerBase:IsPromptOpen()
 	for _, assetTracker in pairs(self._assetMarketTrackers) do
 		if assetTracker:IsPromptOpen() then
 			return true
@@ -109,7 +161,7 @@ end
 
 	@return Promise
 ]=]
-function PlayerMarketeer:PromisePlayerPromptClosed()
+function PlayerProductManagerBase:PromisePlayerPromptClosed()
 	if not self:IsPromptOpen() then
 		return Promise.resolved()
 	end
@@ -150,7 +202,7 @@ end
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerMarketeer:GetAssetTrackerOrError(assetType)
+function PlayerProductManagerBase:GetAssetTrackerOrError(assetType)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	local assetTracker = self._assetMarketTrackers[assetType]
@@ -166,7 +218,7 @@ end
 	@param assetType GameConfigAssetType
 	@return PlayerAssetMarketTracker
 ]=]
-function PlayerMarketeer:GetOwnershipTrackerOrError(assetType)
+function PlayerProductManagerBase:GetOwnershipTrackerOrError(assetType)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	local assetTracker = self._ownershipTrackers[assetType]
@@ -176,15 +228,13 @@ function PlayerMarketeer:GetOwnershipTrackerOrError(assetType)
 	return assetTracker
 end
 
-function PlayerMarketeer:_addOwnershipTracker(assetType)
+function PlayerProductManagerBase:_addOwnershipTracker(assetType)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(not self._ownershipTrackers[assetType], "Already have ownership tracker")
 
 	local marketAssetTracker = self:GetAssetTrackerOrError(assetType)
 
-	local ownershipTracker = PlayerAssetOwnershipTracker.new(self._player, self._configPicker, assetType, marketAssetTracker)
-	self._maid:GiveTask(ownershipTracker)
-
+	local ownershipTracker = self._maid:Add(PlayerAssetOwnershipTracker.new(self._player, self._configPicker, assetType, marketAssetTracker))
 	marketAssetTracker:SetOwnershipTracker(ownershipTracker)
 
 	self._ownershipTrackers[assetType] = ownershipTracker
@@ -192,11 +242,11 @@ function PlayerMarketeer:_addOwnershipTracker(assetType)
 	return ownershipTracker
 end
 
-function PlayerMarketeer:_addAssetTracker(assetType)
+function PlayerProductManagerBase:_addAssetTracker(assetType)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(not self._assetMarketTrackers[assetType], "Already have tracker")
 
-	local assetMarketTracker = PlayerAssetMarketTracker.new(assetType, function(idOrKey)
+	local assetMarketTracker = self._maid:Add(PlayerAssetMarketTracker.new(assetType, function(idOrKey)
 		assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 		return self._configPicker:ToAssetId(assetType, idOrKey)
@@ -204,12 +254,11 @@ function PlayerMarketeer:_addAssetTracker(assetType)
 		assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 		return self._configPicker:ObserveToAssetIdBrio(assetType, idOrKey)
-	end)
-	self._maid:GiveTask(assetMarketTracker)
+	end))
 
 	self._assetMarketTrackers[assetType] = assetMarketTracker
 
 	return assetMarketTracker
 end
 
-return PlayerMarketeer
+return PlayerProductManagerBase

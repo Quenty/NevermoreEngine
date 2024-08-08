@@ -16,14 +16,10 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local Maid = require("Maid")
 local Promise = require("Promise")
-local RxBinderUtils = require("RxBinderUtils")
 local Signal = require("Signal")
-local GameProductServiceHelper = require("GameProductServiceHelper")
-local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
-local RxPlayerUtils = require("RxPlayerUtils")
-local RxBrioUtils = require("RxBrioUtils")
 
 local GameProductServiceClient = {}
 GameProductServiceClient.ServiceName = "GameProductServiceClient"
@@ -38,51 +34,40 @@ function GameProductServiceClient:Init(serviceBag)
 	self._maid = Maid.new()
 
 	-- External
-	self._gameConfigService = self._serviceBag:GetService(require("GameConfigServiceClient"))
+	self._serviceBag:GetService(require("GameConfigServiceClient"))
+	self._serviceBag:GetService(require("CmdrServiceClient"))
 
 	-- Internal
-	self._binders = self._serviceBag:GetService(require("GameProductBindersClient"))
-
-	self._helper = self._maid:Add(GameProductServiceHelper.new(self._binders.PlayerProductManager))
+	self._gameProductDataService = self._serviceBag:GetService(require("GameProductDataService"))
+	self._serviceBag:GetService(require("PlayerProductManagerClient"))
 
 	-- Additional API for ergonomics
 	self.GamePassPurchased = self._maid:Add(Signal.new()) -- :Fire(gamePassId)
-
 	self.ProductPurchased = self._maid:Add(Signal.new()) -- :Fire(productId)
-
 	self.AssetPurchased = self._maid:Add(Signal.new()) -- :Fire(assetId)
-
 	self.BundlePurchased = self._maid:Add(Signal.new()) -- :Fire(bundleId)
+	self.SubscriptionPurchased = self._maid:Add(Signal.new()) -- :Fire(subscriptionId)
+	self.MembershipPurchased = self._maid:Add(Signal.new()) -- :Fire(membershipId)
 end
 
 --[=[
 	Starts the service. Should be done via [ServiceBag]
 ]=]
 function GameProductServiceClient:Start()
-	self._maid:GiveTask(RxPlayerUtils.observeLocalPlayerBrio():Pipe({
-		RxBrioUtils.switchMapBrio(function(localPlayer)
-			return RxBinderUtils.observeBoundClassBrio(self._binders.PlayerProductManager, localPlayer)
-		end)
-	}):Subscribe(function(brio)
-		if brio:IsDead() then
-			return
-		end
-
-		local maid = brio:ToMaid()
-		local playerProductManager = brio:GetValue()
-		local playerMarketeer = playerProductManager:GetMarketeer()
-
-		local function exposeSignal(signal, assetType)
-			maid:GiveTask(playerMarketeer:GetAssetTrackerOrError(assetType).Purchased:Connect(function(...)
+	local function forwardSignal(origSignal, signal)
+		self._maid:GiveTask(origSignal:Connect(function(player, ...)
+			if player == Players.LocalPlayer then
 				signal:Fire(...)
-			end))
-		end
+			end
+		end))
+	end
 
-		exposeSignal(self.GamePassPurchased, GameConfigAssetTypes.PASS)
-		exposeSignal(self.ProductPurchased, GameConfigAssetTypes.PRODUCT)
-		exposeSignal(self.AssetPurchased, GameConfigAssetTypes.ASSET)
-		exposeSignal(self.BundlePurchased, GameConfigAssetTypes.BUNDLE)
-	end))
+	forwardSignal(self._gameProductDataService.GamePassPurchased, self.GamePassPurchased)
+	forwardSignal(self._gameProductDataService.ProductPurchased, self.ProductPurchased)
+	forwardSignal(self._gameProductDataService.AssetPurchased, self.AssetPurchased)
+	forwardSignal(self._gameProductDataService.BundlePurchased, self.BundlePurchased)
+	forwardSignal(self._gameProductDataService.SubscriptionPurchased, self.SubscriptionPurchased)
+	forwardSignal(self._gameProductDataService.MembershipPurchased, self.MembershipPurchased)
 end
 
 --[=[
@@ -96,7 +81,7 @@ function GameProductServiceClient:ObservePlayerAssetPurchased(assetType, idOrKey
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._helper:ObservePlayerAssetPurchased(assetType, idOrKey)
+	return self._gameProductDataService:ObservePlayerAssetPurchased(assetType, idOrKey)
 end
 
 --[=[
@@ -110,7 +95,7 @@ function GameProductServiceClient:ObserveAssetPurchased(assetType, idOrKey)
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._helper:ObserveAssetPurchased(assetType, idOrKey)
+	return self._gameProductDataService:ObserveAssetPurchased(assetType, idOrKey)
 end
 
 --[=[
@@ -126,7 +111,7 @@ function GameProductServiceClient:HasPlayerPurchasedThisSession(player, assetTyp
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._helper:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
+	return self._gameProductDataService:HasPlayerPurchasedThisSession(player, assetType, idOrKey)
 end
 
 --[=[
@@ -143,7 +128,7 @@ function GameProductServiceClient:PromisePromptPurchase(player, assetType, idOrK
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 
-	return self._helper:PromisePromptPurchase(player, assetType, idOrKey)
+	return self._gameProductDataService:PromisePromptPurchase(player, assetType, idOrKey)
 end
 
 --[=[
@@ -159,7 +144,7 @@ function GameProductServiceClient:PromisePlayerOwnership(player, assetType, idOr
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._helper:PromisePlayerOwnership(player, assetType, idOrKey)
+	return self._gameProductDataService:PromisePlayerOwnership(player, assetType, idOrKey)
 end
 
 --[=[
@@ -175,7 +160,7 @@ function GameProductServiceClient:ObservePlayerOwnership(player, assetType, idOr
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._helper:ObservePlayerOwnership(player, assetType, idOrKey)
+	return self._gameProductDataService:ObservePlayerOwnership(player, assetType, idOrKey)
 end
 
 --[=[
@@ -189,7 +174,7 @@ function GameProductServiceClient:PromisePlayerIsPromptOpen(player)
 	assert(self ~= GameProductServiceClient, "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
-	return self._helper:PromisePlayerIsPromptOpen(player)
+	return self._gameProductDataService:PromisePlayerIsPromptOpen(player)
 end
 
 --[=[
@@ -203,7 +188,7 @@ function GameProductServiceClient:PromisePlayerPromptClosed(player)
 	assert(self ~= GameProductServiceClient, "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
-	return self._helper:PromisePlayerPromptClosed(player)
+	return self._gameProductDataService:PromisePlayerPromptClosed(player)
 end
 
 --[=[
@@ -221,7 +206,7 @@ function GameProductServiceClient:PromisePlayerOwnershipOrPrompt(player, assetTy
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
-	return self._helper:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
+	return self._gameProductDataService:PromisePlayerOwnershipOrPrompt(player, assetType, idOrKey)
 end
 
 --[=[
