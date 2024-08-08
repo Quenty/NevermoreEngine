@@ -257,7 +257,7 @@ function Snackbar:_render()
 			};
 
 			Blend.New "Frame" {
-				Name = "Container";
+				Name = "InnerSnackbarContainer";
 				AutomaticSize = Enum.AutomaticSize.XY;
 				Size = UDim2.new(0, 0, 0, 0);
 				ZIndex = 2;

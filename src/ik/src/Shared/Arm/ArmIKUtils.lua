@@ -19,7 +19,7 @@ function ArmIKUtils.ensureMotorAnimated(character, armName)
 		end
 
 		local maid, motor = brio:ToMaidAndValue()
-		local ragdollMotorData = RagdollMotorData:CreateValue(motor)
+		local ragdollMotorData = RagdollMotorData:Create(motor)
 
 		ragdollMotorData.IsMotorAnimated.Value = true
 		maid:GiveTask(function()

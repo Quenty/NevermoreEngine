@@ -281,7 +281,7 @@ function RogueProperty:__index(index)
 	elseif RogueProperty[index] then
 		return RogueProperty[index]
 	else
-		error(("Bad index %q"):format(tostring(index)))
+		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 

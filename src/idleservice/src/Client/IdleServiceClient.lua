@@ -34,7 +34,8 @@ function IdleServiceClient:Init(serviceBag)
 
 	-- External
 	self._serviceBag:GetService(require("RagdollServiceClient"))
-	self._humanoidTracker = self._serviceBag:GetService(require("HumanoidTrackerService")):GetHumanoidTracker()
+	self._serviceBag:GetService(require("HumanoidTrackerService"))
+
 	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
 
 	-- Configure
@@ -56,16 +57,20 @@ function IdleServiceClient:Start()
 		self:_updateShowIdleUI()
 	end))
 
-	self._maid:GiveTask(self._humanoidTracker.AliveHumanoid.Changed:Connect(function(...)
-		self:_handleAliveHumanoidChanged(...)
-	end))
-	self._maid:GiveTask(self._disableStack.Changed:Connect(function()
-		self._enabled.Value = not self._disableStack:GetState()
-	end))
+	self._humanoidTracker = self._serviceBag:GetService(require("HumanoidTrackerService")):GetHumanoidTracker()
+	if self._humanoidTracker then
+		self._maid:GiveTask(self._humanoidTracker.AliveHumanoid.Changed:Connect(function(...)
+			self:_handleAliveHumanoidChanged(...)
+		end))
+		self._maid:GiveTask(self._disableStack.Changed:Connect(function()
+			self._enabled.Value = not self._disableStack:GetState()
+		end))
 
-	if self._humanoidTracker.AliveHumanoid.Value then
-		self:_handleAliveHumanoidChanged()
+		if self._humanoidTracker.AliveHumanoid.Value then
+			self:_handleAliveHumanoidChanged()
+		end
 	end
+
 	self:_updateShowIdleUI()
 end
 

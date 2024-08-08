@@ -31,6 +31,7 @@
     "@quenty/baseobject": "file:../baseobject",
     "@quenty/binder": "file:../binder",
     "@quenty/brio": "file:../brio",
+    "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/gameconfig": "file:../gameconfig",
     "@quenty/instanceutils": "file:../instanceutils",
@@ -51,6 +52,7 @@
     "@quenty/statestack": "file:../statestack",
     "@quenty/string": "file:../string",
     "@quenty/table": "file:../table",
+    "@quenty/tie": "file:../tie",
     "@quenty/valueobject": "file:../valueobject"
   }
 }

@@ -15,11 +15,12 @@ local IKRigBase = setmetatable({}, BaseObject)
 IKRigBase.ClassName = "IKRigBase"
 IKRigBase.__index = IKRigBase
 
-function IKRigBase.new(humanoid)
-	local self = setmetatable(BaseObject.new(humanoid), IKRigBase)
+function IKRigBase.new(humanoid, serviceBag)
+	local self = setmetatable(BaseObject.new(humanoid, serviceBag), IKRigBase)
 
-	self.Updating = Signal.new()
-	self._maid:GiveTask(self.Updating)
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+
+	self.Updating = self._maid:Add(Signal.new())
 
 	self._ikTargets = {}
 	self._character = humanoid.Parent or error("No character")
@@ -107,7 +108,7 @@ function IKRigBase:_getNewArm(armName)
 		return nil
 	end
 
-	local newIk = ArmIKBase.new(self._obj, armName)
+	local newIk = ArmIKBase.new(self._obj, armName, self._serviceBag)
 	table.insert(self._ikTargets, newIk)
 
 	return newIk

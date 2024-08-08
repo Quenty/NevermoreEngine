@@ -32,7 +32,7 @@ function SettingsServiceClient:Init(serviceBag)
 
 	-- Internal
 	self._serviceBag:GetService(require("SettingRegistryServiceShared")):RegisterSettingService(self)
-	self._binders = self._serviceBag:GetService(require("SettingsBindersClient"))
+	self._playerSettingsBinder = self._serviceBag:GetService(require("PlayerSettingsClient"))
 end
 
 function SettingsServiceClient:Start()
@@ -84,7 +84,7 @@ end
 function SettingsServiceClient:ObservePlayerSettings(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.observePlayerSettings(self._binders.PlayerSettings, player)
+	return PlayerSettingsUtils.observePlayerSettings(self._playerSettingsBinder, player)
 end
 
 --[=[
@@ -96,7 +96,7 @@ end
 function SettingsServiceClient:ObservePlayerSettingsBrio(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.observePlayerSettingsBrio(self._binders.PlayerSettings, player)
+	return PlayerSettingsUtils.observePlayerSettingsBrio(self._playerSettingsBinder, player)
 end
 
 --[=[
@@ -108,7 +108,7 @@ end
 function SettingsServiceClient:GetPlayerSettings(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.getPlayerSettings(self._binders.PlayerSettings, player)
+	return PlayerSettingsUtils.getPlayerSettings(self._playerSettingsBinder, player)
 end
 
 --[=[

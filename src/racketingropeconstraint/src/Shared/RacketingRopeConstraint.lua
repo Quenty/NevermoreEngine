@@ -13,6 +13,7 @@ local OverriddenProperty = require("OverriddenProperty")
 local Promise = require("Promise")
 local RacketingRopeConstraintInterface = require("RacketingRopeConstraintInterface")
 local ValueObject = require("ValueObject")
+local TieRealmService = require("TieRealmService")
 
 local START_DISTANCE = 1000
 
@@ -20,8 +21,11 @@ local RacketingRopeConstraint = setmetatable({}, BaseObject)
 RacketingRopeConstraint.ClassName = "RacketingRopeConstraint"
 RacketingRopeConstraint.__index = RacketingRopeConstraint
 
-function RacketingRopeConstraint.new(ropeConstraint)
+function RacketingRopeConstraint.new(ropeConstraint, serviceBag)
 	local self = setmetatable(BaseObject.new(ropeConstraint), RacketingRopeConstraint)
+
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
 
 	self._smallestDistance = START_DISTANCE
 	self._targetDistance = 0.5
@@ -46,7 +50,7 @@ function RacketingRopeConstraint.new(ropeConstraint)
 		self._maid:GiveTask(self._overriddenLength)
 	end
 
-	self._maid:GiveTask(RacketingRopeConstraintInterface:Implement(self._obj, self))
+	self._maid:GiveTask(RacketingRopeConstraintInterface:Implement(self._obj, self, self._tieRealmService:GetTieRealm()))
 
 	return self
 end

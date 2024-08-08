@@ -6,10 +6,11 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
-local SettingsBindersServer = require("SettingsBindersServer")
+local PlayerSettings = require("PlayerSettings")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local DataStoreStringUtils = require("DataStoreStringUtils")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
+local PlayerBinder = require("PlayerBinder")
 
 local PlayerHasSettings = setmetatable({}, BaseObject)
 PlayerHasSettings.ClassName = "PlayerHasSettings"
@@ -19,7 +20,7 @@ function PlayerHasSettings.new(player, serviceBag)
 	local self = setmetatable(BaseObject.new(player), PlayerHasSettings)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._settingsBindersServer = self._serviceBag:GetService(SettingsBindersServer)
+	self._playerSettingsBinder = self._serviceBag:GetService(PlayerSettings)
 	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
 
 	self:_promiseLoadSettings()
@@ -28,8 +29,7 @@ function PlayerHasSettings.new(player, serviceBag)
 end
 
 function PlayerHasSettings:_promiseLoadSettings()
-	self._settings = PlayerSettingsUtils.create(self._settingsBindersServer.PlayerSettings)
-	self._maid:GiveTask(self._settings)
+	self._settings = self._maid:Add(PlayerSettingsUtils.create())
 
 	self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj))
 		:Then(function(dataStore)
@@ -51,7 +51,7 @@ function PlayerHasSettings:_promiseLoadSettings()
 				end)
 		end)
 		:Catch(function(err)
-			warn(("[PlayerHasSettings] - Failed to load settings for player. %s"):format(tostring(err)))
+			warn(string.format("[PlayerHasSettings] - Failed to load settings for player. %s", tostring(err)))
 		end)
 		:Finally(function()
 			-- Parent anyway...
@@ -84,4 +84,4 @@ function PlayerHasSettings:_handleAttributeChanged(subStore, attributeName)
 	subStore:Store(settingName, newValue)
 end
 
-return PlayerHasSettings
+return PlayerBinder.new("PlayerHasSettings", PlayerHasSettings)

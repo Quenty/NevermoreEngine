@@ -11,6 +11,7 @@ local Maid = require("Maid")
 local Brio = require("Brio")
 local ValueObject = require("ValueObject")
 local DuckTypeUtils = require("DuckTypeUtils")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
 local ObservableCountingMap = {}
 ObservableCountingMap.ClassName = "ObservableCountingMap"
@@ -27,6 +28,7 @@ function ObservableCountingMap.new()
 	self._map = {}
 
 	self._totalKeyCountValue = self._maid:Add(ValueObject.new(0, "number"))
+	self._keySubTable = self._maid:Add(ObservableSubscriptionTable.new())
 
 --[=[
 	Fires when an key is added
@@ -104,7 +106,7 @@ function ObservableCountingMap:ObserveKeysSet()
 end
 
 function ObservableCountingMap:_observeDerivedDataStructureFromKeys(gatherValues)
-		return Observable.new(function(sub)
+	return Observable.new(function(sub)
 		local maid = Maid.new()
 
 		local function emit()
@@ -123,6 +125,55 @@ function ObservableCountingMap:_observeDerivedDataStructureFromKeys(gatherValues
 		end)
 
 		return maid
+	end)
+end
+
+--[=[
+	Observes all keys in the map
+	@return Observable<Brio<(T, number)>>
+]=]
+function ObservableCountingMap:ObservePairsBrio()
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local function handleValue(key, value)
+			if value ~= 0 then
+				local brio = Brio.new(key, value)
+				maid[key] = brio
+				sub:Fire(brio)
+			else
+				maid[key] = nil
+			end
+		end
+
+		for key, value in pairs(self._map) do
+			handleValue(key, value)
+		end
+
+		maid:GiveTask(self.KeyChanged:Connect(handleValue))
+
+		self._maid[sub] = maid
+		maid:GiveTask(function()
+			self._maid[sub] = nil
+			sub:Complete()
+		end)
+
+		return maid
+
+	end)
+end
+
+--[=[
+	Observes the value for the given key.
+
+	@param key TKey
+	@return Observable<TValue?>
+]=]
+function ObservableCountingMap:ObserveAtKey(key)
+	assert(key ~= nil, "Bad key")
+
+	return self._keySubTable:Observe(key, function(sub)
+		sub:Fire(self._map[key] or 0)
 	end)
 end
 
@@ -250,11 +301,13 @@ function ObservableCountingMap:Add(key, amount)
 
 			if self.Destroy then
 				self.KeyChanged:Fire(key, 0)
+				self._keySubTable:Fire(key, 0)
 			end
 		else
 			-- Update item
 			self._map[key] = newValue
 			self.KeyChanged:Fire(key, newValue)
+			self._keySubTable:Fire(key, newValue)
 		end
 	else
 		-- Add item
@@ -269,6 +322,7 @@ function ObservableCountingMap:Add(key, amount)
 
 		if self.Destroy then
 			self.KeyChanged:Fire(key, amount)
+			self._keySubTable:Fire(key, amount)
 		end
 	end
 

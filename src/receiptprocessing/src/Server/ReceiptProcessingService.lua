@@ -38,9 +38,6 @@ function ReceiptProcessingService:Start()
 		MarketplaceService.ProcessReceipt = function(...)
 			return self:_handleProcessReceiptAsync(...)
 		end
-	else
-		-- Note: we're probably in test mode and initialized on the client
-		warn("[ReceiptProcessingService] - Failed to bind process receipt")
 	end
 end
 

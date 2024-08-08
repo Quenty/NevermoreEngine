@@ -34,11 +34,8 @@ function ColorPalette.new()
 	self._colorGradeValues = {}
 	self._vividnessValues = {}
 
-	self.ColorSwatchAdded = Signal.new() -- :Fire(name)
-	self._maid:GiveTask(self.ColorSwatchAdded)
-
-	self.ColorGradeAdded = Signal.new() -- :Fire(name)
-	self._maid:GiveTask(self.ColorGradeAdded)
+	self.ColorSwatchAdded = self._maid:Add(Signal.new()) -- :Fire(name)
+	self.ColorGradeAdded = self._maid:Add(Signal.new()) -- :Fire(name)
 
 	return self
 end

@@ -30,6 +30,7 @@
     "@quenty/binder": "file:../binder",
     "@quenty/cmdrservice": "file:../cmdrservice",
     "@quenty/datastore": "file:../datastore",
+    "@quenty/ducktype": "file:../ducktype",
     "@quenty/enumutils": "file:../enumutils",
     "@quenty/jsonutils": "file:../jsonutils",
     "@quenty/loader": "file:../loader",
@@ -48,6 +49,7 @@
     "@quenty/symbol": "file:../symbol",
     "@quenty/table": "file:../table",
     "@quenty/throttle": "file:../throttle",
+    "@quenty/tie": "file:../tie",
     "@quenty/valueobject": "file:../valueobject"
   },
   "publishConfig": {

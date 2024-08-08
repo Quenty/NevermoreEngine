@@ -59,7 +59,7 @@ function ServiceBag.new(parentProvider)
 
 	self._serviceTypesToInitializeSet = {}
 	self._initializedServiceTypeSet = {}
-	self._initializing = false
+	self._initRunAllowed = false
 	self._destructing = false
 
 	self._serviceInitLogger = ServiceInitLogger.new("initialized")
@@ -72,11 +72,6 @@ function ServiceBag.new(parentProvider)
 	return self
 end
 
-function ServiceBag:PrintInitialization()
-	self._serviceInitLogger:Print()
-	self._serviceStartLogger:Print()
-end
-
 --[=[
 	Returns whether the value is a serviceBag
 
@@ -86,6 +81,11 @@ end
 function ServiceBag.isServiceBag(value)
 	return type(value) == "table"
 		and value.ClassName == "ServiceBag"
+end
+
+function ServiceBag:PrintInitialization()
+	self._serviceInitLogger:Print()
+	self._serviceStartLogger:Print()
 end
 
 --[=[
@@ -140,9 +140,9 @@ end
 	can occur
 ]=]
 function ServiceBag:Init()
-	assert(not self._initializing, "Already initializing")
+	assert(not self._initRunAllowed, "Already initializing")
 	assert(self._serviceTypesToInitializeSet, "Already initialized")
-	self._initializing = true
+	self._initRunAllowed = true
 
 	while next(self._serviceTypesToInitializeSet) do
 		local serviceType = next(self._serviceTypesToInitializeSet)
@@ -152,7 +152,6 @@ function ServiceBag:Init()
 	end
 
 	self._serviceTypesToInitializeSet = nil
-	self._initializing = false
 end
 
 --[=[
@@ -160,7 +159,9 @@ end
 ]=]
 function ServiceBag:Start()
 	assert(self._serviceTypesToStart, "Already started")
-	assert(not self._initializing, "Still initializing")
+	assert(not self._serviceTypesToInitializeSet, "Not initialized yet. Call serviceBag:Init() first.")
+
+	self._initRunAllowed = false
 
 	while next(self._serviceTypesToStart) do
 		local serviceType = table.remove(self._serviceTypesToStart)
@@ -237,8 +238,8 @@ function ServiceBag:_addServiceType(serviceType)
 		return
 	end
 
-	if not self._serviceTypesToInitializeSet then
-		error(string.format("Already finished initializing, cannot add %q", self:_getServiceName(serviceType)))
+	if self:IsStarted() then
+		error(string.format("Already started, cannot add %q", self:_getServiceName(serviceType)))
 		return
 	end
 
@@ -265,15 +266,18 @@ function ServiceBag:_ensureInitialization(serviceType)
 		return
 	end
 
-	if self._initializing then
-		self._serviceTypesToInitializeSet[serviceType] = nil
+	if self._initRunAllowed then
+		if self._serviceTypesToInitializeSet then
+			self._serviceTypesToInitializeSet[serviceType] = nil
+		end
+
 		self._initializedServiceTypeSet[serviceType] = true
 		self:_initService(serviceType)
 	elseif self._serviceTypesToInitializeSet then
 		self._serviceTypesToInitializeSet[serviceType] = true
 	else
 		local serviceName = self:_getServiceName(serviceType)
-		error(string.format("Cannot initialize service %q past initializing phase", serviceName))
+		error(string.format("Cannot initialize service %q after start", serviceName))
 	end
 end
 
@@ -319,22 +323,38 @@ function ServiceBag:Destroy()
 	self._destroyingSignal:Fire()
 	self._destroyingSignal:Destroy()
 
-	local services = self._services
-	local key, service = next(services)
-	while service ~= nil do
-		services[key] = nil
+	self:_destructServices()
 
-		if not (self._serviceTypesToInitializeSet and self._serviceTypesToInitializeSet[key]) then
+	super.Destroy(self)
+end
+
+function ServiceBag:_destructServices()
+	local services = self._services
+	local serviceType, service = next(services)
+	while service ~= nil do
+		services[serviceType] = nil
+
+		if not (self._serviceTypesToInitializeSet and self._serviceTypesToInitializeSet[serviceType]) then
+			local serviceName = self:_getServiceName(serviceType)
+
+			local current
 			task.spawn(function()
+				debug.setmemorycategory(serviceName)
+				current = coroutine.running()
+
 				if service.Destroy then
 					service:Destroy()
 				end
 			end)
-		end
-		key, service = next(services)
-	end
 
-	super.Destroy(self)
+			local isDead = coroutine.status(current) == "dead"
+			if not isDead then
+				warn(string.format("Destroying service %q yielded", serviceName))
+			end
+		end
+
+		serviceType, service = next(services)
+	end
 end
 
 return ServiceBag

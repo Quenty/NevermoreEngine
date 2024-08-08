@@ -41,13 +41,13 @@ SoftShutdownService.ServiceName = "SoftShutdownService"
 	@param serviceBag ServiceBag
 ]=]
 function SoftShutdownService:Init(serviceBag)
+	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
 	self._serviceBag:GetService(require("SoftShutdownTranslator"))
 
 	self._dataStore = DataStoreService:GetDataStore("IsSoftShutdownServer")
-	self._maid = Maid.new()
 
 	self:_promiseIsLobby():Then(function(isLobby)
 		if isLobby then
@@ -174,6 +174,10 @@ function SoftShutdownService:_promiseRedirectAllPlayers()
 			-- Try to keep players in the same group
 			return TeleportServiceUtils.promiseTeleport(game.PlaceId, players, teleportOptions)
 		end)
+end
+
+function SoftShutdownService:Destroy()
+	self._maid:DoCleaning()
 end
 
 return SoftShutdownService

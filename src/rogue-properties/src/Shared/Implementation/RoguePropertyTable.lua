@@ -158,9 +158,7 @@ end
 function RoguePropertyTable:Observe()
 	local arrayHelper = rawget(self, "_arrayHelper")
 	if arrayHelper then
-		warn("[RoguePropertyTable] - Observing arrays not supported yet! Changed event will only fire with dictionary components.")
-
-		return self:_observeDictionary()
+		return arrayHelper:ObserveArrayValues()
 	end
 
 	return self:_observeDictionary()

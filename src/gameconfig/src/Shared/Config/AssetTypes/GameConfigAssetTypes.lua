@@ -51,4 +51,18 @@ return Table.readonly({
 	@within GameConfigAssetTypes
 ]=]
 	PLACE = "place";
+
+--[=[
+	Specifies the asset is of type subscription
+	@prop SUBSCRIPTION string
+	@within GameConfigAssetTypes
+]=]
+	SUBSCRIPTION = "subscription";
+
+--[=[
+	Specifies the asset is of type membership (Roblox Premium)
+	@prop MEMBERSHIP string
+	@within GameConfigAssetTypes
+]=]
+	MEMBERSHIP = "membership";
 })

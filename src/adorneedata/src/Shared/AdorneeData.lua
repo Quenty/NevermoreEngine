@@ -22,7 +22,7 @@
 	You can then use the data to retrieve values
 
 	```lua
-	local data = CombatConfiguration:CreateValue(workspace)
+	local data = CombatConfiguration:Create(workspace)
 
 	-- Can ready any data
 	print(data.EnableCombat.Value) --> true
@@ -62,7 +62,7 @@
 	assert(CombatConfiguration:IsData(defaultCombatState))
 
 	-- Or read attributes directly
-	CombatConfiguration:GetAttributes(workspace))
+	CombatConfiguration:Get(workspace))
 
 	-- Note that this is the same as an attribute
 	print(workspace:GetAttribute("EnableCombat")) --> true
@@ -116,17 +116,17 @@ function AdorneeData:__index(index)
 		return AdorneeData[index]
 	elseif type(index) == "string" then
 		local found = self._fullPrototype[index]
-		if not found then
-			error(string.format("[AdorneeData] - Bad index %q is not a known adornee", index))
+		if found == nil then
+			error(string.format("[AdorneeData] - Bad index %q is not a known attribute name", index))
 		end
 
 		if AdorneeDataEntry.isAdorneeDataEntry(found) then
 			return found
 		else
 			-- TODO: Cache this construction
-			return AdorneeDataEntry.new(index, function(adornee)
+			return AdorneeDataEntry.new(typeof(found), function(adornee)
 				return AttributeValue.new(adornee, index, found)
-			end)
+			end, found)
 		end
 	end
 end
@@ -197,9 +197,8 @@ end
 function AdorneeData:Observe(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return self:CreateAdorneeDataValue(adornee):Observe(adornee)
+	return self:Create(adornee):Observe(adornee)
 end
-
 
 --[=[
 	Gets attribute table for the data
@@ -207,7 +206,7 @@ end
 	@param adornee Instance
 	@return AdorneeDataValue
 ]=]
-function AdorneeData:CreateValue(adornee)
+function AdorneeData:Create(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local attributeTableValue = AdorneeDataValue.new(adornee, self._fullPrototype)
@@ -216,24 +215,12 @@ function AdorneeData:CreateValue(adornee)
 end
 
 --[=[
-	Gets attribute table for the data
-
-	@param adornee Instance
-	@return AdorneeDataValue
-]=]
-function AdorneeData:CreateAdorneeDataValue(adornee)
-	assert(typeof(adornee) == "Instance", "Bad adornee")
-
-	return self:CreateValue(adornee)
-end
-
---[=[
 	Gets the attributes for the adornee
 
 	@param adornee Instance
 	@return TStrict
 ]=]
-function AdorneeData:GetAttributes(adornee)
+function AdorneeData:Get(adornee)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local data = {}
@@ -253,17 +240,18 @@ function AdorneeData:GetAttributes(adornee)
 	return self:CreateStrictData(data)
 end
 
+
 --[=[
 	Sets the attributes for the adornee
 
 	@param adornee Instance
 	@param data T
 ]=]
-function AdorneeData:SetAttributes(adornee, data)
+function AdorneeData:Set(adornee, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsData(data))
 
-	local attributeTable = self:CreateAdorneeDataValue(adornee)
+	local attributeTable = self:Create(adornee)
 	for key, value in pairs(data) do
 		attributeTable[key].Value = value
 	end
@@ -275,7 +263,7 @@ end
 	@param adornee Instance
 	@param data TStrict
 ]=]
-function AdorneeData:SetStrictAttributes(adornee, data)
+function AdorneeData:SetStrict(adornee, data)
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 	assert(self:IsStrictData(data))
 
@@ -320,6 +308,12 @@ function AdorneeData:InitAttributes(adornee, data)
 		end
 	end
 end
+
+AdorneeData.GetAttributes = AdorneeData.Get
+AdorneeData.SetAttributes = AdorneeData.Set
+AdorneeData.CreateAdorneeDataValue = AdorneeData.Create
+AdorneeData.CreateValue = AdorneeData.CreateValue
+AdorneeData.SetStrictAttributes = AdorneeData.SetStrict
 
 --[=[
 	Gets a strict interface which will return true if the value is a partial interface and

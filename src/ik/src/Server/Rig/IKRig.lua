@@ -19,7 +19,7 @@ IKRig.ClassName = "IKRig"
 IKRig.__index = IKRig
 
 function IKRig.new(humanoid, serviceBag)
-	local self = setmetatable(IKRigBase.new(humanoid), IKRig)
+	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 

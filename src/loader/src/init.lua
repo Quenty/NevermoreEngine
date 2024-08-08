@@ -18,6 +18,9 @@ local Replicator = require(script.Replication.Replicator)
 local ReplicatorReferences = require(script.Replication.ReplicatorReferences)
 
 local GLOBAL_PACKAGE_TRACKER = PackageTrackerProvider.new()
+script.Destroying:Connect(function()
+	GLOBAL_PACKAGE_TRACKER:Destroy()
+end)
 
 local Loader = {}
 Loader.__index = Loader
@@ -43,7 +46,7 @@ function Loader.bootstrapGame(packages)
 	local self = Loader.new(packages, ReplicationTypeUtils.inferReplicationType())
 
 	if self._replicationType == ReplicationType.SERVER then
-		self:_setupLoaderPopulation()
+		self:_setupLoaderPopulation(self._packages)
 
 		-- Trade off security for performance
 		if RunService:IsStudio() then
@@ -63,7 +66,7 @@ function Loader.bootstrapPlugin(packages)
 
 	local self = Loader.new(packages, ReplicationType.PLUGIN)
 
-	self:_setupLoaderPopulation()
+	self:_setupLoaderPopulation(self._packages)
 
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
 
@@ -74,18 +77,19 @@ function Loader.bootstrapStory(storyScript)
 	assert(typeof(storyScript) == "Instance", "Bad storyScript")
 
 	-- Prepopulate global package roots
-	local topNodeModule = storyScript
-	for node_modules in DependencyUtils.iterNodeModules(storyScript) do
-		if not node_modules:IsDescendantOf(topNodeModule) then
-			topNodeModule = node_modules
-		end
+	local topNodeModules = storyScript
+	for node_modules in DependencyUtils.iterNodeModulesUp(storyScript) do
+		topNodeModules = node_modules
 	end
 
-	local self = Loader.new(topNodeModule.Parent, ReplicationType.PLUGIN)
+	local self = Loader.new(storyScript, ReplicationType.PLUGIN)
 
-	self:_setupLoaderPopulation()
+	local root = topNodeModules.Parent
 
-	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(topNodeModule.Parent)
+	self:_setupLoaderPopulation(root)
+
+	-- Track the package root
+	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(root)
 
 	return self
 end
@@ -144,7 +148,7 @@ function Loader:_findDependency(request)
 	-- Just standard dependency search
 	local foundBackup = DependencyUtils.findDependency(self._packages, request, self._replicationType)
 	if foundBackup then
-		warn(string.format("[Loader] - Failed to find package %q in package tracker\n%s", request, debug.traceback()))
+		warn(string.format("[Loader] - Failed to find package %q in package tracker of root %s\n%s", request, self._packages:GetFullName(), debug.traceback()))
 
 		-- Ensure hoarcekat story has a link to use
 		-- TODO: Maybe add to global package cache instead...
@@ -177,8 +181,8 @@ function Loader:_setupClientReplication()
 	copy.Parent = ReplicatedStorage
 end
 
-function Loader:_setupLoaderPopulation()
-	self._maid:Add(LoaderLinkCreator.new(self._packages, nil, true))
+function Loader:_setupLoaderPopulation(root)
+	self._maid:Add(LoaderLinkCreator.new(root, nil, true))
 end
 
 function Loader:Destroy()

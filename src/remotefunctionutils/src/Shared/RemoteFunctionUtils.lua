@@ -69,6 +69,35 @@ function RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...)
 end
 
 --[=[
+	Invokes the server with the remote function call.
+	@param bindableFunction RemoteFunction
+	@param ... any
+	@return Promise<T>
+]=]
+function RemoteFunctionUtils.promiseInvokeBindableFunction(bindableFunction, ...)
+	assert(typeof(bindableFunction) == "Instance" and bindableFunction:IsA("BindableFunction"), "Bad bindableFunction")
+
+	local args = table.pack(...)
+
+	return Promise.spawn(function(resolve, reject)
+		local results
+		local ok, err = pcall(function()
+			results = table.pack(bindableFunction:Invoke(table.unpack(args, 1, args.n)))
+		end)
+
+		if not ok then
+			return reject(err or "Failed to invoke from BindableFunction")
+		end
+
+		if not results then
+			return reject("Failed to get results from BindableFunction")
+		end
+
+		return resolve(table.unpack(results, 1, results.n))
+	end)
+end
+
+--[=[
 	Converts a promise result into a promise
 
 	@param ok boolean

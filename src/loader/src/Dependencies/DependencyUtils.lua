@@ -68,7 +68,7 @@ function DependencyUtils.iterPackages(requester)
 	assert(typeof(requester) == "Instance", "Bad requester")
 
 	return coroutine.wrap(function()
-		for nodeModules in DependencyUtils.iterNodeModules(requester) do
+		for nodeModules in DependencyUtils.iterNodeModulesUp(requester) do
 			coroutine.yield(nodeModules.Parent)
 
 			for packageInst in DependencyUtils.iterPackagesInModuleModules(nodeModules) do
@@ -78,7 +78,7 @@ function DependencyUtils.iterPackages(requester)
 	end)
 end
 
-function DependencyUtils.iterNodeModules(module)
+function DependencyUtils.iterNodeModulesUp(module)
 	assert(typeof(module) == "Instance", "Bad module")
 
 	return coroutine.wrap(function()

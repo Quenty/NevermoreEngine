@@ -92,4 +92,8 @@ function BinderGroupProvider:Add(groupName, binderGroup)
 	self[groupName] = binderGroup
 end
 
+function BinderGroupProvider:Destroy()
+	-- Do nothing
+end
+
 return BinderGroupProvider

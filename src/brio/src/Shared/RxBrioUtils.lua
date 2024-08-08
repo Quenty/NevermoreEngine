@@ -770,10 +770,13 @@ end
 
 	@since 3.6.0
 	@function switchToBrio
+	@param predicate ((T) -> boolean)?
 	@return (source: Observable<T | Brio<T>>) -> Observable<Brio<T>>
 	@within RxBrioUtils
 ]=]
-function RxBrioUtils.switchToBrio()
+function RxBrioUtils.switchToBrio(predicate)
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
+
 	return function(source)
 		return Observable.new(function(sub)
 			local topMaid = Maid.new()
@@ -785,17 +788,24 @@ function RxBrioUtils.switchToBrio()
 						return
 					end
 
-					local maid = result:ToMaid()
-					local newBrio = Brio.new(result:GetValue())
-					maid:GiveTask(newBrio)
+					if predicate == nil or predicate(result:GetValue()) then
+						local maid = result:ToMaid()
+						local newBrio = maid:Add(Brio.new(result:GetValue()))
+						sub:Fire(newBrio)
 
-					topMaid._last = maid
-					sub:Fire(newBrio)
+						topMaid._last = maid
+					else
+						topMaid._last = nil
+					end
 				else
-					local newBrio = Brio.new(result, ...)
+					if predicate == nil or predicate(result, ...) then
+						local newBrio = Brio.new(result, ...)
 
-					topMaid._last = newBrio
-					sub:Fire(newBrio)
+						topMaid._last = newBrio
+						sub:Fire(newBrio)
+					else
+						topMaid._last = nil
+					end
 				end
 			end, sub:GetFailComplete()))
 

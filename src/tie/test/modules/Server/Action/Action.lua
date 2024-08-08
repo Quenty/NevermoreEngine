@@ -15,18 +15,15 @@ Action.__index = Action
 function Action.new(obj)
 	local self = setmetatable(BaseObject.new(obj), Action)
 
-	self.Activated = Signal.new()
-	self._maid:GiveTask(self.Activated)
+	self.Activated = self._maid:Add(Signal.new())
 
-	self.DisplayName = Instance.new("StringValue")
+	self.DisplayName = self._maid:Add(Instance.new("StringValue"))
 	self.DisplayName.Value = "Action"
-	self._maid:GiveTask(self.DisplayName)
 
-	self.IsEnabled = Instance.new("BoolValue")
+	self.IsEnabled = self._maid:Add(Instance.new("BoolValue"))
 	self.IsEnabled.Value = false
-	self._maid:GiveTask(self.IsEnabled)
 
-	self._maid:GiveTask(ActionInterface:Implement(self._obj, self))
+	self._maid:GiveTask(ActionInterface.Server:Implement(self._obj, self))
 
 	return self
 end

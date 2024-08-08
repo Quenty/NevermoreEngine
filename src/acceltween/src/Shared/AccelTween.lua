@@ -95,7 +95,7 @@ function AccelTween:__index(index)
 		local time = os.clock()
 		return time < self._t1 and self._t1 - time or 0
 	else
-		error(("Bad index %q"):format(tostring(index)))
+		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 
@@ -111,7 +111,7 @@ function AccelTween:__newindex(index, value)
 	elseif index == "pt" then
 		self:_setstate(value, 0, nil, value)
 	else
-		error(("Bad index %q"):format(tostring(index)))
+		error(string.format("Bad index %q", tostring(index)))
 	end
 end
 

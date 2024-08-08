@@ -15,6 +15,8 @@ local pluralMap = {
 	[GameConfigAssetTypes.PLACE] = "places";
 	[GameConfigAssetTypes.ASSET] = "assets";
 	[GameConfigAssetTypes.BUNDLE] = "bundles";
+	[GameConfigAssetTypes.SUBSCRIPTION] = "subscriptions";
+	[GameConfigAssetTypes.MEMBERSHIP] = "memberships";
 }
 
 for _, item in pairs(GameConfigAssetTypes) do

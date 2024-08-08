@@ -9,11 +9,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
-local PermissionService = require("PermissionService")
 local CmdrTemplateProviderServer = require("CmdrTemplateProviderServer")
 local Promise = require("Promise")
 local Maid = require("Maid")
+local PermissionService = require("PermissionService")
 
 local CmdrService = {}
 CmdrService.ServiceName = "CmdrService"
@@ -29,11 +30,19 @@ function CmdrService:Init(serviceBag)
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
+	-- External
+	self._permissionService = self._serviceBag:GetService(PermissionService)
+
 	-- Internal
 	self._cmdrTemplateProviderServer = self._serviceBag:GetService(CmdrTemplateProviderServer)
 
 	self._serviceId = HttpService:GenerateGUID(false)
 	self._promiseCmdr = self._maid:GivePromise(Promise.spawn(function(resolve, reject)
+		if not RunService:IsRunning() then
+			reject() -- Avoid running when game isn't available
+			return
+		end
+
 		local cmdr
 		local ok, err = pcall(function()
 			cmdr = require("Cmdr")
@@ -45,7 +54,6 @@ function CmdrService:Init(serviceBag)
 		resolve(cmdr)
 	end))
 
-	self._permissionService = self._serviceBag:GetService(PermissionService)
 
 	self._definitionData = {}
 	self._executeData = {}

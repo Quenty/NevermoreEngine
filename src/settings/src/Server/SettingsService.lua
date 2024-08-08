@@ -22,26 +22,28 @@ function SettingsService:Init(serviceBag)
 
 
 	-- Internal
-	self._binders = self._serviceBag:GetService(require("SettingsBindersServer"))
+	self._playerSettingsBinder = self._serviceBag:GetService(require("PlayerSettings"))
+	self._serviceBag:GetService(require("PlayerHasSettings"))
+
 	self._serviceBag:GetService(require("SettingRegistryServiceShared")):RegisterSettingService(self)
 end
 
 function SettingsService:ObservePlayerSettingsBrio(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.observePlayerSettingsBrio(self._binders.PlayerSettings, player)
+	return PlayerSettingsUtils.observePlayerSettingsBrio(self._playerSettingsBinder, player)
 end
 
 function SettingsService:ObservePlayerSettings(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.observePlayerSettings(self._binders.PlayerSettings, player)
+	return PlayerSettingsUtils.observePlayerSettings(self._playerSettingsBinder, player)
 end
 
 function SettingsService:GetPlayerSettings(player)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 
-	return PlayerSettingsUtils.getPlayerSettings(self._binders.PlayerSettings, player)
+	return PlayerSettingsUtils.getPlayerSettings(self._playerSettingsBinder, player)
 end
 
 function SettingsService:PromisePlayerSettings(player, cancelToken)

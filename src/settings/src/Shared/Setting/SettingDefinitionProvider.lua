@@ -15,9 +15,9 @@
 	local SettingDefinition = require("SettingDefinition")
 
 	return require("SettingDefinitionProvider").new({
-		SettingDefinition.new("KeyBinding", Enum.KeyCode.X);
-		SettingDefinition.new("CameraShake", true);
-		SettingDefinition.new("CameraSensitivity", 1);
+		KeyBinding = Enum.KeyCode.X;
+		CameraShake = true;
+		CameraSensitivity = 1;
 	})
 	```
 
@@ -28,6 +28,7 @@ local require = require(script.Parent.loader).load(script)
 
 local SettingRegistryServiceShared = require("SettingRegistryServiceShared")
 local Maid = require("Maid")
+local SettingDefinition = require("SettingDefinition")
 
 local SettingDefinitionProvider = {}
 SettingDefinitionProvider.ClassName = "SettingDefinitionProvider"
@@ -41,9 +42,9 @@ SettingDefinitionProvider.__index = SettingDefinitionProvider
 	local SettingDefinition = require("SettingDefinition")
 
 	return require("SettingDefinitionProvider").new({
-		SettingDefinition.new("KeyBinding", Enum.KeyCode.X);
-		SettingDefinition.new("CameraShake", true);
-		SettingDefinition.new("CameraSensitivity", 1);
+		KeyBinding = Enum.KeyCode.X;
+		CameraShake = true;
+		CameraSensitivity = 1;
 	})
 	```
 
@@ -56,12 +57,31 @@ function SettingDefinitionProvider.new(settingDefinitions)
 	self._settingDefinitions = {}
 	self._lookup = {}
 
-	for _, settingDefinition in pairs(settingDefinitions) do
-		table.insert(self._settingDefinitions, settingDefinition)
-		self._lookup[settingDefinition:GetSettingName()] = settingDefinition
+	for key, value in pairs(settingDefinitions) do
+		if type(key) == "number" then
+			assert(SettingDefinition.isSettingDefinition(key), "Bad settingDefinition")
+
+			self:_addSettingDefinition(key)
+		elseif type(key) == "string" then
+			if SettingDefinition.isSettingDefinition(value) then
+				self:_addSettingDefinition(value)
+			else
+				local definition = SettingDefinition.new(key, value)
+				self:_addSettingDefinition(definition)
+			end
+		else
+			error("Bad key for settingDefinitions")
+		end
 	end
 
 	return self
+end
+
+function SettingDefinitionProvider:_addSettingDefinition(settingDefinition)
+	assert(SettingDefinition.isSettingDefinition(settingDefinition), "Bad settingDefinition")
+
+	table.insert(self._settingDefinitions, settingDefinition)
+	self._lookup[settingDefinition:GetSettingName()] = settingDefinition
 end
 
 --[=[
@@ -104,9 +124,9 @@ end
 	local SettingDefinition = require("SettingDefinition")
 
 	local provider = require("SettingDefinitionProvider").new({
-		SettingDefinition.new("KeyBinding", Enum.KeyCode.X);
-		SettingDefinition.new("CameraShake", true);
-		SettingDefinition.new("CameraSensitivity", 1);
+		KeyBinding = Enum.KeyCode.X;
+		CameraShake = true;
+		CameraSensitivity = 1;
 	})
 
 	local service = serviceBag:GetService(provider)

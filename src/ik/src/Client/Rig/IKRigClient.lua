@@ -19,7 +19,7 @@ IKRigClient.__index = IKRigClient
 require("PromiseRemoteEventMixin"):Add(IKRigClient, IKConstants.REMOTE_EVENT_NAME)
 
 function IKRigClient.new(humanoid, serviceBag)
-	local self = setmetatable(IKRigBase.new(humanoid), IKRigClient)
+	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRigClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
