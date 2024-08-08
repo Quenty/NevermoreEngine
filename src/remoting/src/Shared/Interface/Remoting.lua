@@ -16,10 +16,10 @@ local promiseChild = require("promiseChild")
 local PromiseUtils = require("PromiseUtils")
 local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local RemotingMember = require("RemotingMember")
-local RxBrioUtils = require("RxBrioUtils")
-local RxInstanceUtils = require("RxInstanceUtils")
 local RemotingRealms = require("RemotingRealms")
 local RemotingRealmUtils = require("RemotingRealmUtils")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
 
 local RAW_MEMBERS = {
 	_name = true;
