@@ -1,5 +1,18 @@
 # (Fri Aug 09 2024)
 
+#### 🚀 Enhancement
+
+- `@quenty/throttle@10.4.0`
+  - feat: Add __call metamethod to ThrottledFunction [#484](https://github.com/Quenty/NevermoreEngine/pull/484) ([@InvisibleWater](https://github.com/InvisibleWater))
+
+#### Authors: 1
+
+- Matthew Miller ([@InvisibleWater](https://github.com/InvisibleWater))
+
+---
+
+# (Fri Aug 09 2024)
+
 #### 🐛 Bug Fix
 
 - `@quenty/roblox-api-dump@8.3.1`
