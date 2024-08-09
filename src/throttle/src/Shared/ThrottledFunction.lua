@@ -59,6 +59,8 @@ function ThrottledFunction:Call(...)
 	end
 end
 
+ThrottledFunction.__call = ThrottledFunction.Call
+
 function ThrottledFunction:_dispatch()
 	self._nextCallTimeStamp = tick() + self._timeout
 
